@@ -82,53 +82,39 @@ namespace Belle2 {
     private:
       typedef boost::multi_array<double, 2> array2d;
 
-      /** Matrix allocation helper function */
-      int** allocateMatrix(unsigned int , unsigned int) const;
-
-      /** deallocation functions */
-      void deallocate(std::vector<int**> matrices) const;
-      void deallocate(int** pointer) const;
-
       /** Event number */
       int    m_nEvent;
 
-      /** input trigger time 0-23 (*m_ttrig=delta/T*24;    */
-      int m_ttrig ;
-      /** number of points before signal *m_n16=16       */
-      int m_n16 ;
-      /** output results: Amplitude 18-bits          */
-      int m_lar ;
-      /** Time 12 bits               */
-      int m_ltr ;
-      /**quality 2 bits              */
-      int m_lq ;
-
-      /** array of shape function looking up table      */
-      std::vector<double>* m_ft;
+      std::vector<double> m_ft; // shape function looking up table
 
       // Lookup Table to get aux matrices used in WF fit algorithm
-      ECLLookupTable m_funcTable;
+      std::vector<int> m_funcTable;
+      std::vector<int> m_eclWaveformDataTable;
+      std::vector<int> m_eclWFAlgoParamsTable;
+      std::vector<int> m_eclNoiseDataTable;
+      std::vector<ECLWFAlgoParams> m_eclWFAlgoParams;
+      std::vector<ECLNoiseData> m_eclNoiseData;
+
+      typedef int int_array_192x16_t[192][16];
+      typedef int int_array_24x16_t[24][16];
+      typedef short int shortint_array_16_t[16];
+      typedef std::pair<unsigned int, unsigned int> uint_pair_t;
+
+      struct fitparams_t {
+        int_array_192x16_t f, f1, fg31, fg32, fg33;
+        int_array_24x16_t fg41, fg43;
+      };
+
+      struct algoparams_t {
+        shortint_array_16_t id;
+      };
 
       /* Fit algorihtm parameters shared by group of crystals */
-      std::vector< short int*> m_idn;
+      std::vector<algoparams_t> m_idn;
+      std::vector<fitparams_t> m_fitparams;
 
-      // array of function tabulation
-      std::vector<int**> m_f; // int [192][16];
-      //array of the df/dt tabulation
-      std::vector<int**> m_f1; // int [192][16];
-      //array for iteration ampl reconstr.
-      std::vector<int**> m_fg31; // int [192][16];
-      //array for iteration time reconstr.
-      std::vector<int**> m_fg32; // int [192][16];
-      //array for iteration pedestal reconstr.
-      std::vector<int**> m_fg33; // int [192][16];
-      //array for iteration ampl. reconstr. (for fixed t)
-      std::vector<int**> m_fg41; // int [24][16];
-      //array for iteration ped. reconstr. (for fixed t)
-      std::vector<int**> m_fg43; // int [24][16];
-
-      //** pow for int
-      int myPow(int x, int y);
+      void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
+                              int& m_lar, int& m_ltr, int& m_lq);
 
       /** Module parameters */
       bool m_background;

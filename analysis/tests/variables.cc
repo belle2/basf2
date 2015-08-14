@@ -559,7 +559,6 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
   }
 
-  /*
   TEST_F(MetaVariableTest, particleCached)
   {
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
@@ -573,7 +572,6 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(&p), -0.5);
   }
-  */
 
   TEST_F(MetaVariableTest, formula)
   {

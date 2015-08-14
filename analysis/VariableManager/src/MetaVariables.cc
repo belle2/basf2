@@ -145,19 +145,26 @@ namespace Belle2 {
       }
     }
 
-    /* Cannot be used at the moment because given particle object is const
     Manager::FunctionPtr particleCached(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         std::string key = std::string("__") + makeROOTCompatible(var->name);
-        auto func = [var, key](const Particle *particle) -> double {
+        auto func = [var, key](const Particle * particle) -> double {
 
-          if (particle->hasExtraInfo(key)) {
+          if (particle->hasExtraInfo(key))
+          {
             return particle->getExtraInfo(key);
           } else {
             double value = var->function(particle);
-            particle->addExtraInfo(key, value);
+            // Remove constness from Particle pointer.
+            // The extra-info is used as a cache in our case,
+            // indicated by the double-underscore in front of the key.
+            // One could implement the cache as a separate property of the particle object
+            // and mark it as mutable, however, this would only lead to code duplication
+            // and an increased size of the particle object.
+            // Thus, we decided to use the extra-info field and cast away the const in this case.
+            const_cast<Particle*>(particle)->addExtraInfo(key, value);
             return value;
           }
         };
@@ -166,7 +173,7 @@ namespace Belle2 {
         B2WARNING("Wrong number of arguments for meta function particleCached");
         return nullptr;
       }
-    }*/
+    }
 
     Manager::FunctionPtr formula(const std::vector<std::string>& arguments)
     {
@@ -595,9 +602,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
-    /*REGISTER_VARIABLE("particleCached(variable)", particleCached,
+    REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
-                      "The result of second call to this variable on the same particle will be provided from the cache.");*/
+                      "The result of second call to this variable on the same particle will be provided from the cache.");
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");

@@ -572,7 +572,7 @@ class CDCRecoFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
-                 pdg_code=211, vxdParams=None, use_daf=False):
+                 pdg_code=211, vxdParams=None, use_filter="kalman"):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
                                                                                         whichGeometry=fit_geometry)
@@ -584,6 +584,7 @@ class CDCRecoFitter(metamodules.PathModule):
         usedCDCMeasurementCreators = {"RecoHitCreator": {}}
         usedSVDMeasurementCreators = {"RecoHitCreator": {}}
         usedPXDMeasurementCreators = {"RecoHitCreator": {}}
+        usedAdditionalMeasurementCreators = {}
 
         if vxdParams is not None:
             usedSVDMeasurementCreators.update({"MomentumEstimationCreator": vxdParams})
@@ -593,14 +594,18 @@ class CDCRecoFitter(metamodules.PathModule):
             "MeasurementCreator",
             usedCDCMeasurementCreators=usedCDCMeasurementCreators,
             usedSVDMeasurementCreators=usedSVDMeasurementCreators,
-            usedPXDMeasurementCreators=usedPXDMeasurementCreators)
+            usedPXDMeasurementCreators=usedPXDMeasurementCreators,
+            usedAdditionalMeasurementCreators=usedAdditionalMeasurementCreators)
 
-        if use_daf:
+        if use_filter == "daf":
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", resortHits=True,
                                                                              numberOfFailedHits=2,
                                                                              pdgCodeToUseForFitting=pdg_code)
-        else:
+        elif use_filter == "kalman":
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module("KalmanRecoFitter",
+                                                                             pdgCodeToUseForFitting=pdg_code)
+        elif use_filter == "gbl":
+            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("GBLRecoFitter",
                                                                              pdgCodeToUseForFitting=pdg_code)
 
         track_builder = StandardEventGenerationRun.get_basf2_module(

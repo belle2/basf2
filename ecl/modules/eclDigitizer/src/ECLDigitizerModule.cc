@@ -426,8 +426,8 @@ void ECLDigitizerModule::readDSPDB()
         ref_fg33[k][i] = lrint(fg33 * ic * idd);
       }
       //first approximation without time correction
-      int jk = k;
-      if (jk < 24) {
+      int jk = 24 - ((k + 3) >> 2);
+      if (jk >= 0 && jk < 24 && (k + 3) % 4 == 0) {
         double igg1 = 1 / a11;
         // to fixed point
         for (int i = 0; i < 16; i++) {

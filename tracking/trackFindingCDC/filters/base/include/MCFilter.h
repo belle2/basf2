@@ -18,7 +18,7 @@ namespace Belle2 {
     template <class TruthVarSet>
     class MCFilter : public FilterOnVarSet<TruthVarSet> {
 
-    private:
+    public:
       /// Type of the super class
       typedef FilterOnVarSet<TruthVarSet> Super;
       typedef typename TruthVarSet::Object Object;
@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Constructor
       MCFilter() : Super() { }
 
-      virtual CellWeight operator()(const Object& object) IF_NOT_CINT(override final)
+      virtual CellWeight operator()(const Object& object) IF_NOT_CINT(override)
       {
         Super::operator()(object);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();

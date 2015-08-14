@@ -80,7 +80,7 @@ namespace Belle2 {
       }
     public:
       /// Function to evaluate the cluster for its backgroundness.
-      virtual CellWeight operator()(const Object& obj) override final
+      virtual CellWeight operator()(const Object& obj) override
       {
         CellWeight extracted = Super::operator()(obj);
         if (isNotACell(extracted)) {

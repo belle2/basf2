@@ -350,9 +350,8 @@ void ECLDigitizerModule::readDSPDB()
     int ic = 1 << eclWFAlgo.getkc();
 
     const int    ndt = 96;
-    const double  dt = 0.5;
-    const double  sc = 1 / 0.881944444;
-    const double ddt = 0.005 * dt;
+    const double  dt = 72. / 127.;
+    const double ddt = 0.001 * dt;
 
     int_array_192x16_t& ref_f    = m_fitparams[ip].f;
     int_array_192x16_t& ref_f1   = m_fitparams[ip].f1;
@@ -369,14 +368,11 @@ void ECLDigitizerModule::readDSPDB()
       for (int j = 0; j < 16; j++) {
         double t = j * dt - t0;
 
-        f0[j] = ShaperDSP_F(t * sc, MP);
-        if (t - 0.5 > ddt) {
-          double sp = ShaperDSP_F((t + ddt) * sc, MP);
-          double sm = ShaperDSP_F((t - ddt) * sc, MP);
-          f1[j] = (sp - sm) / (2 * ddt);
-        } else {
-          f1[j] = ShaperDSP_F((t + ddt) * sc, MP) / (ddt + t - 0.5);
-        }
+        double fx = ShaperDSP_F(t      , MP);
+        double fp = ShaperDSP_F(t + ddt, MP);
+        double fm = ShaperDSP_F(t - ddt, MP);
+        f0[j] =  fx;
+        f1[j] = (fp - fm) / (2 * ddt);
       }
 
       double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;

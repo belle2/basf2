@@ -219,21 +219,61 @@ class VXDHarvester(QueueHarvester):
                         lambda cluster: False,
                         lambda cluster: True)
 
-            yield dict(cluster_charge=cluster_charge,
-                       dedx=cluster_charge / path_length,
-                       dedx_with_mc=cluster_charge / mc_path_length,
-                       dedx_with_thickness=cluster_charge / cluster_thickness,
-                       p=mc_momentum.Mag(),
-                       perp_s_at_cluster_entry=perp_s_at_cluster_entry,
-                       perp_s_at_cluster_exit=perp_s_at_cluster_exit,
-                       cluster_thickness=cluster_thickness,
-                       track_charge=track_charge,
-                       path_length=path_length,
-                       mc_path_length=mc_path_length,
-                       cluster_radius=cluster_radius,
-                       cluster_is_u=cluster_is_u,
-                       p_origin=mc_particle.getMomentum().Mag(),
-                       cluster_is_pxd=cluster_is_pxd)
+                    cluster_layer = tools.getLayerOfCluster(cluster)
+                    cluster_segment = tools.getSegmentNumberOfCluster(cluster)
+                    cluster_ladder = tools.getLadderOfCluster(cluster)
+                    cluster_sensor = tools.getSensorNumberOfCluster(cluster)
+
+                    cluster_dict = dict(cluster_charge=cluster_charge,
+                                        cluster_thickness=cluster_thickness,
+                                        cluster_radius=cluster_radius,
+                                        cluster_is_u=cluster_is_u,
+                                        cluster_is_pxd=cluster_is_pxd,
+                                        cluster_layer=cluster_layer,
+                                        cluster_segment=cluster_segment,
+                                        cluster_ladder=cluster_ladder,
+                                        cluster_sensor=cluster_sensor)
+
+                    mc_at_hit_dict = dict(mc_helix_perigee_x=mc_helix.getPerigeeX(),
+                                          mc_helix_perigee_y=mc_helix.getPerigeeY(),
+                                          mc_helix_perigee_z=mc_helix.getPerigeeZ(),
+                                          mc_helix_momentum_x=mc_helix.getMomentumX(1.5),
+                                          mc_helix_momentum_y=mc_helix.getMomentumY(1.5),
+                                          mc_helix_momentum_z=mc_helix.getMomentumZ(1.5),
+                                          mc_position=mc_position.Mag(),
+                                          mc_position_x=mc_position.X(),
+                                          mc_position_y=mc_position.Y(),
+                                          mc_position_z=mc_position.Z(),
+                                          mc_momentum=mc_momentum.Mag(),
+                                          mc_momentum_x=mc_momentum.X(),
+                                          mc_momentum_y=mc_momentum.Y(),
+                                          mc_momentum_z=mc_momentum.Z())
+
+                    dedx_dict = dict(dedx=cluster_charge / path_length,
+                                     dedx_with_mc=cluster_charge / mc_path_length,
+                                     dedx_with_thickness=cluster_charge / cluster_thickness,
+                                     p=mc_momentum.Mag(),
+                                     perp_s_at_cluster_entry=perp_s_at_cluster_entry,
+                                     perp_s_at_cluster_exit=perp_s_at_cluster_exit,
+                                     track_charge=track_charge,
+                                     path_length=path_length,
+                                     mc_path_length=mc_path_length,
+                                     p_origin=mc_particle.getMomentum().Mag())
+
+                    track_dict = dict(track_helix_perigee_x=track_helix.getPerigeeX(),
+                                      track_helix_perigee_y=track_helix.getPerigeeY(),
+                                      track_helix_perigee_z=track_helix.getPerigeeZ(),
+                                      track_helix_momentum_x=track_helix.getMomentumX(1.5),
+                                      track_helix_momentum_y=track_helix.getMomentumY(1.5),
+                                      track_helix_momentum_z=track_helix.getMomentumZ(1.5))
+
+                    result_dict = dict()
+                    result_dict.update(cluster_dict)
+                    result_dict.update(mc_at_hit_dict)
+                    result_dict.update(dedx_dict)
+                    result_dict.update(track_dict)
+
+            yield result_dict
 
     save_tree = refiners.SaveTreeRefiner()
 

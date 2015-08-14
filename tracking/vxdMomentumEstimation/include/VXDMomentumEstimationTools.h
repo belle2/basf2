@@ -65,7 +65,7 @@ namespace Belle2 {
     {
       const VxdID&   vxdID = cluster.getSensorID();
       const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-      return sensorInfoBase.getThickness() / 100;
+      return sensorInfoBase.getThickness();
     }
 
     /** Returns the distance from the interaction point to the cluster in the r-phi-plane */
@@ -77,11 +77,43 @@ namespace Belle2 {
       if (spacePoint == nullptr) {
         VxdID vxdID = cluster.getSensorID();
         VxdID::baseType layer = vxdID.getLayerNumber();
-        radius = m_layerPositions[layer - 1];
+        radius = m_layerPositions[layer - 1] / 100.0;
       } else {
         radius = spacePoint->getPosition().Perp();
       }
-      return radius / 100;
+      return radius;
+    }
+
+    /** Return the layer of the cluster */
+    VxdID::baseType getLayerOfCluster(const ClusterType& cluster) const
+    {
+      VxdID vxdID = cluster.getSensorID();
+      VxdID::baseType layer = vxdID.getLayerNumber();
+      return layer;
+    }
+
+    /** Return the ladder of the cluster */
+    VxdID::baseType getLadderOfCluster(const ClusterType& cluster) const
+    {
+      VxdID vxdID = cluster.getSensorID();
+      VxdID::baseType ladder = vxdID.getLadderNumber();
+      return ladder;
+    }
+
+    /** Return the sensor number of the cluster */
+    VxdID::baseType getSensorNumberOfCluster(const ClusterType& cluster) const
+    {
+      VxdID vxdID = cluster.getSensorID();
+      VxdID::baseType sensorNumber = vxdID.getSensorNumber();
+      return sensorNumber;
+    }
+
+    /** Return the segment number of the cluster */
+    VxdID::baseType getSegmentNumberOfCluster(const ClusterType& cluster) const
+    {
+      VxdID vxdID = cluster.getSensorID();
+      VxdID::baseType segmentNumber = vxdID.getSegmentNumber();
+      return segmentNumber;
     }
 
     /** Return the charge of the cluster (in ADC count) calibrated with a factor of ~0.6 for pxd hits.
@@ -114,33 +146,41 @@ namespace Belle2 {
     /** Return the path length of a particle with the given helix that goes through the cluster.
      * If the helix does not pass the cluster, return the thickness of the cluster instead.
      * It is assumed that the cluster is passed from bottom to top and not transverse or something.
+     * Also we assume every cluster to not be tilted. This is wrong for the wedge cluster.
+     * We have to find a way to handle those cases correctly!
      */
     double getPathLength(const ClusterType& cluster, const Helix& trajectory) const
     {
+      // This is not quite correct but we can not do better without doing an extrapolation with material effects.
+      // If the distance_3D is nan, it means that the helix does not reach into the cluster or curls that much
+      // that it does not reach the far end of the cluster. The first case is strange
+      // because the track is associated with the cluster (so it should normally reach it). The second case should be
+      // really rare (because the clusters are that thin), but we have to deal with it.
+      // There is also the possibility that the track curls that much that it interacts with the same sensor twice.
+      // This can not be handled properly in this stage.
 
       const double thickness = getThicknessOfCluster(cluster);
       const double radius = getRadiusOfCluster(cluster);
 
-      const double perp_s_at_cluster_entry = trajectory.getArcLength2DAtCylindricalR(radius - thickness / 2.0);
-      const double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness / 2.0);
+      const double perp_s_at_cluster_entry = trajectory.getArcLength2DAtCylindricalR(radius);
+
+      if (std::isnan(perp_s_at_cluster_entry)) {
+        return thickness;
+      }
 
       const TVector3& position_at_inner_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_entry);
+
+      const double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness);
+
+      if (std::isnan(perp_s_at_cluster_exit)) {
+        return thickness;
+      }
+
       const TVector3& position_at_outer_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_exit);
 
       const double distance_3D = (position_at_outer_radius - position_at_inner_radius).Mag();
 
-      if (std::isnan(distance_3D)) {
-        // This is not quite correct but we can not do better without doing an extrapolation with material effects.
-        // If the distance_3D is nan, it means that the helix does not reach into the cluster or curls that much
-        // that it does not reach the far end of the cluster. The first case is strange
-        // because the track is associated with the cluster (so it should normally reach it). The second case should be
-        // really rare (because the clusters are that thin), but we have to deal with it.
-        // There is also the possibility that the track curls that much that it interacts with the same sensor twice.
-        // This can not be handled properly in this stage.
-        return thickness;
-      } else {
-        return distance_3D;
-      }
+      return distance_3D;
     }
 
   private:

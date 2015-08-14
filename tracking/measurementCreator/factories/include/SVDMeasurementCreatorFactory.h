@@ -9,28 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/MeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/MeasurementCreatorFactory.h>
 #include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
 #include <tracking/measurementCreator/creators/VXDMomentumEstimationMeasurementCreator.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
-  class PXDMeasurementCreatorFactory : public
-    MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>> {
+  class SVDMeasurementCreatorFactory : public
+    MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>> {
 
   public:
-    explicit PXDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>>(),
+    /** Initialize with a measurement factory */
+    explicit SVDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+      MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>>(),
           m_measurementFactory(measurementFactory) {}
 
     /** Only a simple reco hit creator and the momentum estimation is implemented in the moment */
-    BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>* createMeasurementCreatorFromName(
+    BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>* createMeasurementCreatorFromName(
       const std::string& creatorName) const
     {
       if (creatorName == "RecoHitCreator") {
-        return new CoordinateMeasurementCreator<RecoTrack::UsedPXDHit, Const::PXD>(m_measurementFactory);
+        return new CoordinateMeasurementCreator<RecoTrack::UsedSVDHit, Const::SVD>(m_measurementFactory);
       } else if (creatorName == "MomentumEstimationCreator") {
-        return new VXDMomentumEstimationMeasurementCreator<RecoTrack::UsedPXDHit, Const::PXD>(m_measurementFactory);
+        return new VXDMomentumEstimationMeasurementCreator<RecoTrack::UsedSVDHit, Const::SVD>(m_measurementFactory);
       }
 
       return nullptr;

@@ -10,15 +10,10 @@
 
 #pragma once
 
-#include <genfit/PlanarMeasurement.h>
+#include <tracking/measurementCreator/measurements/PlanarMomentumMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
-#include <genfit/Exception.h>
-#include <genfit/RKTrackRep.h>
-#include <tracking/vxdMomentumEstimation/HMatrixQP.h>
-#include <cassert>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/dataobjects/Helix.h>
-#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
@@ -28,14 +23,14 @@ namespace Belle2 {
    *
    */
   template <class HitType>
-  class PlanarMomentumMeasurement : public genfit::PlanarMeasurement {
+  class PlanarVXDMomentumMeasurement : public PlanarMomentumMeasurement {
 
   public:
-    PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit,
-                              const typename VXDMomentumEstimation<HitType>::FitParameters& fitParameters,
-                              const typename VXDMomentumEstimation<HitType>::CorrectionFitParameters& correctionFitParameters,
-                              bool useTrackFinderSeeds, bool useThickness) :
-      genfit::PlanarMeasurement(parentElement),
+    PlanarVXDMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit,
+                                 const typename VXDMomentumEstimation<HitType>::FitParameters& fitParameters,
+                                 const typename VXDMomentumEstimation<HitType>::CorrectionFitParameters& correctionFitParameters,
+                                 bool useTrackFinderSeeds, bool useThickness) :
+      PlanarMomentumMeasurement(parentElement),
       m_fitParameters(fitParameters),
       m_correctionFitParameters(correctionFitParameters),
       m_useTrackFinderSeeds(useTrackFinderSeeds),
@@ -46,9 +41,7 @@ namespace Belle2 {
       rawHitCov_.ResizeTo(1, 1);
     }
 
-    virtual genfit::AbsMeasurement* clone() const {return new PlanarMomentumMeasurement(*this);}
-
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const;
+    virtual genfit::AbsMeasurement* clone() const {return new PlanarVXDMomentumMeasurement(*this);}
 
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
@@ -66,17 +59,7 @@ namespace Belle2 {
   };
 
   template <class HitType>
-  const genfit::AbsHMatrix* PlanarMomentumMeasurement<HitType>::constructHMatrix(const genfit::AbsTrackRep* rep) const
-  {
-    if (dynamic_cast<const genfit::RKTrackRep*>(rep) == NULL) {
-      B2FATAL("PlanarMomentumMeasurement default implementation can only handle state vectors of type RKTrackRep!");
-    }
-
-    return new HMatrixQP();
-  }
-
-  template <class HitType>
-  std::vector<genfit::MeasurementOnPlane*> PlanarMomentumMeasurement<HitType>::constructMeasurementsOnPlane(
+  std::vector<genfit::MeasurementOnPlane*> PlanarVXDMomentumMeasurement<HitType>::constructMeasurementsOnPlane(
     const genfit::StateOnPlane& state) const
   {
     const VXDMomentumEstimation<HitType>& momentumEstimation = VXDMomentumEstimation<HitType>::getInstance();

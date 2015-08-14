@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/CDCMeasurementCreatorFactory.h>
-#include <tracking/measurementCreator/SVDMeasurementCreatorFactory.h>
-#include <tracking/measurementCreator/PXDMeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/CDCMeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/SVDMeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/PXDMeasurementCreatorFactory.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>

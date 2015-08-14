@@ -11,7 +11,7 @@
 
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromCoordinateMeasurement.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
-#include <tracking/vxdMomentumEstimation/PlanarMomentumMeasurement.h>
+#include <tracking/measurementCreator/measurements/PlanarVXDMomentumMeasurement.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <genfit/PlanarMeasurement.h>
 
@@ -74,7 +74,7 @@ namespace Belle2 {
         return {};
       }
 
-      PlanarMomentumMeasurement<HitType>* momentumMeasurement = new PlanarMomentumMeasurement<HitType>(*planarMeasurement, hit,
+      PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
           m_fitParameters, m_correctionFitParameters, m_useTrackFinderSeeds, m_useThickness);
       return {momentumMeasurement};
     }

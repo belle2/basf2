@@ -9,28 +9,26 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/measurementCreator/MeasurementCreatorFactory.h>
+#include <tracking/measurementCreator/factories/MeasurementCreatorFactory.h>
 #include <tracking/measurementCreator/creators/CoordinateMeasurementCreator.h>
-#include <tracking/measurementCreator/creators/VXDMomentumEstimationMeasurementCreator.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
-  class SVDMeasurementCreatorFactory : public
-    MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>> {
+  class CDCMeasurementCreatorFactory : public
+    MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>> {
 
   public:
-    explicit SVDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
-      MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>>(),
+    /** Initialize with a measurement factory */
+    explicit CDCMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
+      MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>>(),
           m_measurementFactory(measurementFactory) {}
 
-    /** Only a simple reco hit creator and the momentum estimation is implemented in the moment */
-    BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>* createMeasurementCreatorFromName(
+    /** Only a simple reco hit creator is implemented in the moment */
+    BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>* createMeasurementCreatorFromName(
       const std::string& creatorName) const
     {
       if (creatorName == "RecoHitCreator") {
-        return new CoordinateMeasurementCreator<RecoTrack::UsedSVDHit, Const::SVD>(m_measurementFactory);
-      } else if (creatorName == "MomentumEstimationCreator") {
-        return new VXDMomentumEstimationMeasurementCreator<RecoTrack::UsedSVDHit, Const::SVD>(m_measurementFactory);
+        return new CoordinateMeasurementCreator<RecoTrack::UsedCDCHit, Const::CDC>(m_measurementFactory);
       }
 
       return nullptr;

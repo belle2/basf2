@@ -1,4 +1,4 @@
-#include <tracking/vxdMomentumEstimation/HMatrixQP.h>
+#include <tracking/measurementCreator/measurements/HMatrixQP.h>
 #include <cassert>
 #include <alloca.h>
 #include <iostream>
@@ -6,9 +6,6 @@
 using namespace genfit;
 
 namespace Belle2 {
-
-
-// 1, 0, 0, 0, 0
 
   const TMatrixD& HMatrixQP::getMatrix() const
   {

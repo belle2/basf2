@@ -13,29 +13,41 @@ class TrackingValidationResult:
     #: It has methods for plotting the mostly needed graphs
 
     def __init__(self, filename, label=None, color_index=0, additional_information=None):
+        #: The root filename
         self.filename = filename
+        #: The pr data
         self.pr_data = read_root(self.filename, tree_key="pr_tree/pr_tree")
         self.pr_data["is_prompt"] = (
             np.sqrt(self.pr_data.x_truth ** 2 + self.pr_data.y_truth ** 2) < 0.5) & (self.pr_data.is_primary == 1)
+        #: the mc data
         self.mc_data = read_root(self.filename, tree_key="mc_tree/mc_tree")
         self.mc_data["is_prompt"] = (
             np.sqrt(self.mc_data.x_truth ** 2 + self.mc_data.y_truth ** 2) < 0.5) & (self.mc_data.is_primary == 1)
 
+        #: the mc prompt data
         self.mc_prompts = self.mc_data[self.mc_data.is_prompt == 1]
+        #: the pr prompt data
         self.pr_prompts = self.pr_data[self.pr_data.is_prompt == 1]
 
         colors = [(.64, .69, .83), (1, 199.0 / 256, 128.0 / 256),
                   (255.0 / 256, 128.0 / 256, 128.0 / 256), "red", "green", "blue", "black", "gray", "lightgreen"]
 
+        #: the label
         self.label = label
+        #: the color index
         self.color = colors[color_index % len(colors)]
 
+        #: the finding efficiency
         self.finding_efficiency = None
+        #: the hit efficiency
         self.hit_efficiency = None
+        #: the fake rate
         self.fake_rate = None
+        #: the clone rate
         self.clone_rate = None
         self.get_figure_of_merits()
 
+        #: the additional information
         self.additional_information = additional_information
 
     def get_figure_of_merits(self):

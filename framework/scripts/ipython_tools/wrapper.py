@@ -22,11 +22,15 @@ class QueueDrawer(CDCSVGDisplayModule):
         queue: The queue to write to
         label: The key name in the queue
         """
+        #: The queue to handle
         self.queue = queue
+        #: The label for writing to the queue
         self.label = label
         CDCSVGDisplayModule.__init__(self, interactive=False, *args, **kwargs)
+        #: We want to use cpp for sure
         self.use_cpp = True
 
+        #: The list of created paths
         self.file_list = []
 
     def terminate(self):

@@ -10,6 +10,8 @@ with warnings.catch_warnings():
 import random
 import string
 import os
+import time
+import numbers
 
 
 class Basf2Widget(object):
@@ -42,7 +44,9 @@ class ComparisonImageViewer(Basf2Widget):
         """
         Initialize with the image file names
         """
+        #: The first image path
         self.images1 = images1
+        #: The second image path
         self.images2 = images2
 
     def create(self):
@@ -97,8 +101,10 @@ class PathViewer(Basf2Widget):
         """
         Create a new path viewer object with the path from the process
         """
+        #: The path to show
         self.path = path
 
+        #: Some styling we need
         self.styling_text = """
         <style>
             .path-table table{
@@ -150,8 +156,15 @@ class ProgressBarViewer(Basf2Widget):
     """
 
     def __init__(self):
+        #: Part of the name representating the object for javascript
         self.random_name = ''.join(random.choice(string.lowercase) for _ in range(10))
+        #: The name representating the object for javascript
         self.js_name = "progress_bar_" + self.random_name
+
+        #: The starting time of the process
+        self.last_time = time.time()
+        #: The starting percentage (obviously 0)
+        self.last_percentage = 0
 
         display(self)
 
@@ -163,12 +176,6 @@ class ProgressBarViewer(Basf2Widget):
         js = """
         <script type="text/Javascript">
         function set_event_number(number, js_name) {
-            if(isNaN(number)) {
-                $("#" + js_name + " > .event_number").html("Status: " + number + "");
-            } else {
-                $("#" + js_name + " > .event_number").html("Percentage: " + 100 * number + "");
-            }
-
             var progressbar = $("#" + js_name + " > .progressbar");
             var progressbarValue = progressbar.find( ".ui-progressbar-value" );
 
@@ -184,6 +191,10 @@ class ProgressBarViewer(Basf2Widget):
             }
         }
 
+        function set_event_text(text, js_name) {
+            $("#" + js_name + " > .event_number").html(text);
+        }
+
         $(function() {
           $("#""" + self.js_name + """ > .progressbar").progressbar({
             value: false
@@ -195,11 +206,36 @@ class ProgressBarViewer(Basf2Widget):
 
         return html + js
 
-    def update(self, text):
+    def update(self, text_or_percentage):
         """
         Update the widget with a new event number
         """
-        js = "set_event_number(\"" + str(text) + "\", \"" + self.js_name + "\"); "
+
+        if isinstance(text_or_percentage, numbers.Number):
+
+            current_percentage = float(text_or_percentage)
+            current_time = time.time()
+
+            remaining_percentage = 1.0 - current_percentage
+
+            time_delta = current_time - self.last_time
+            percentage_delta = current_percentage - self.last_percentage
+
+            if percentage_delta > 0:
+                time_delta_per_percentage = 1.0 * time_delta / percentage_delta
+
+                display_text = "%d %% Remaining time: %.2f s" % (
+                    100 * current_percentage, time_delta_per_percentage * remaining_percentage)
+
+                js = "set_event_text(\"" + display_text + "\", \"" + self.js_name + "\"); "
+                js += "set_event_number(\"" + str(current_percentage) + "\", \"" + self.js_name + "\"); "
+            else:
+                js = ""
+
+        else:
+            js = "set_event_number(\"" + str(text_or_percentage) + "\", \"" + self.js_name + "\"); "
+            js += "set_event_text(\"Status: " + str(text_or_percentage) + "\", \"" + self.js_name + "\"); "
+
         return display(Javascript(js))
 
     def show(self):
@@ -220,8 +256,10 @@ class CollectionsViewer(Basf2Widget):
         """
         Create a new collections viewer with the collections object from the process
         """
+        #: The collections to show
         self.collections = collections
 
+        #: Some styling we need
         self.styling_text = """
         <style>
             .coll-table {
@@ -268,8 +306,10 @@ class StatisticsViewer(Basf2Widget):
 
     def __init__(self, statistics):
         """ Init the widget with the statistics from the basf2 process """
+        #: The statistics we want to show
         self.statistics = statistics
 
+        #: Some styling we need
         self.styling_text = """
         <style>
             .stat-table {
@@ -329,6 +369,7 @@ class ProcessViewer(object):
     """
 
     def __init__(self, children):
+        #: The children for each process
         self.children = children
 
     def create(self):

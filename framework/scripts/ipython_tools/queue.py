@@ -15,7 +15,9 @@ class Basf2CalculationQueue():
     """
 
     def __init__(self):
+        #: The multiprocessing queue to handle
         self.queue = Queue()
+        #: The results to be filled in the end
         self.results = dict()
 
     def put(self, name, item, **kwargs):
@@ -63,7 +65,9 @@ class Basf2CalculationQueueItem():
     """
 
     def __init__(self, name, item):
+        #: Name of the item
         self.name = name
+        #: Item to store
         self.item = item
 
 
@@ -74,13 +78,21 @@ class ModuleStatistics():
     """
 
     def __init__(self, stats, categories):
+        #: Name property
         self.name = stats.name
+        #: Time sum property
         self.time_sum = self.get_dict(stats.time_sum, categories)
+        #: Time mean property
         self.time_mean = self.get_dict(stats.time_mean, categories)
+        #: Time std property
         self.time_stddev = self.get_dict(stats.time_stddev, categories)
+        #: Memory sum property
         self.memory_sum = self.get_dict(stats.memory_sum, categories)
+        #: Memory mean property
         self.memory_mean = self.get_dict(stats.memory_mean, categories)
+        #: Memory std property
         self.memory_stddev = self.get_dict(stats.memory_stddev, categories)
+        #: Calls property
         self.calls = self.get_dict(stats.calls, categories)
 
     def get_dict(self, function, categories):
@@ -104,6 +116,7 @@ class Basf2CalculationQueueStatistics():
 
     def __init__(self, statistics):
         """ Initialize with the C++ statistics """
+        #: The module statistics list
         self.module = []
 
         categories = [("INIT", statistics.INIT),
@@ -118,6 +131,7 @@ class Basf2CalculationQueueStatistics():
 
         self.append_module_statistics(statistics.getGlobal(), categories)
 
+        #: The str representation
         self.str = statistics()
 
     def append_module_statistics(self, stats, categories):

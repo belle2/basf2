@@ -14,6 +14,7 @@ class Basf2Calculation():
 
     def __init__(self, process_list):
         """ Init with the list of processes (possibly empty) """
+        #: The process list (possibly empty)
         self.process_list = process_list
 
     def __iter__(self):
@@ -60,48 +61,47 @@ class Basf2Calculation():
         (but before - although a calculation is running.).
         """
 
-        def initialize_process_bar(process):
-            if process.path is None:
-                return
+        if display_bar:
+            # Initialize all process bars
+            process_bars = {process: viewer.ProgressBarViewer()
+                            for process in self.process_list if process.path is not None}
 
-            if process.already_run:
-                return viewer.ProgressBarViewer()
-
-        # Initialize all process bars
-        process_bars = {process: viewer.ProgressBarViewer()
-                        for process in self.process_list if process.path is not None}
-
+        number_of_finished_processes = 0
         # Update all process bars as long as minimum one process is running
-        while True:
-            running_list = filter(lambda p: self.is_running(p) and p.path is not None, self.process_list)
-            if len(running_list) == 0:
-                break
+        while number_of_finished_processes < len(self.process_list):
+            for process in self.process_list:
+                # Check if the process is still running. If not set the end result correctly.
+                if not self.is_running(process) or process.path is None:
+                    number_of_finished_processes += 1
+                    if display_bar:
+                        self.show_end_result(process, process_bars)
 
-            for process in running_list:
-                process_bar = process_bars[process]
-                if process.progress_queue_local.poll():
+                # Check if there are news from the process python module (a new percentage)
+                elif process.progress_queue_local.poll():
                     result = process.progress_queue_local.recv()
                     if result == "end":
                         process.join()
-                        if self.has_failed(process):
-                            process_bar.update("failed!")
-                        else:
-                            process_bar.update("finished")
 
                     elif display_bar:
+                        process_bar = process_bars[process]
                         process_bar.update(result)
 
             time.sleep(0.01)
-            running_list = filter(lambda p: self.is_running(p), self.process_list)
 
-        # Join all processes and set the result correctly
-        for process in self.process_list:
-            if process in process_bars:
-                process_bar = process_bars[process]
-                if self.has_failed(process):
-                    process_bar.update("failed!")
-                else:
-                    process_bar.update("finished")
+        if display_bar:
+            for process in self.process_list:
+                self.show_end_result(process, process_bars)
+
+    def show_end_result(self, process, process_bars):
+        """
+        Shows the end result (finished or failed) for all processes in the process_bars list
+        """
+        if process in process_bars:
+            process_bar = process_bars[process]
+            if self.has_failed(process):
+                process_bar.update("failed!")
+            else:
+                process_bar.update("finished")
 
     def map_on_processes(self, map_function, index):
         """
@@ -276,7 +276,11 @@ class Basf2CalculationList():
 
     def __init__(self, path_function, lists):
         """ Init with the path_function and the lists of named parameters """
+
+        #: The path function
         self.path_function = path_function
+
+        #: The lists of parameters
         self.lists = lists
 
     def create_all_paths(self):

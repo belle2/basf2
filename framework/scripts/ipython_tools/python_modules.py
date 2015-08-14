@@ -14,10 +14,14 @@ class PrintCollections(basf2.Module):
         """
         Create the module with the given queue.
         """
+        #: The queue to handle
         self.queue = queue
         basf2.Module.__init__(self)
+        #: The contents of the store arrays for some events
         self.store_content_list = []
+        #: The current event number
         self.event_number = 0
+        #: The total number of events
         self.total_number_of_events = 0
 
     def initialize(self):
@@ -75,8 +79,11 @@ class ProgressPython(basf2.Module):
     def __init__(self, queue):
         """ Init the module """
         basf2.Module.__init__(self)
+        #: The queue to handle
         self.queue = queue
+        #: The current event number
         self.event_number = 0
+        #: The total number of events
         self.total_number_of_events = 0
         self.queue.send("init")
 

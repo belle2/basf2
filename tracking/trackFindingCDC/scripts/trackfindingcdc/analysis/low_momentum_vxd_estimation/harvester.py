@@ -203,7 +203,11 @@ class VXDHarvester(QueueHarvester):
                     perp_s_at_cluster_entry = track_helix.getArcLength2DAtCylindricalR(cluster_radius - cluster_thickness / 2.0)
                     perp_s_at_cluster_exit = track_helix.getArcLength2DAtCylindricalR(cluster_radius + cluster_thickness / 2.0)
 
-                    mc_momentum = tools.getMomentumOfMCParticle(cluster).Mag()
+                    mc_momentum = tools.getEntryMomentumOfMCParticle(cluster)
+                    mc_position = tools.getEntryPositionOfMCParticle(cluster)
+
+                    mc_helix = Belle2.Helix(mc_position, mc_momentum, int(track_charge), 1.5)
+                    mc_path_length = tools.getPathLength(cluster, mc_helix)
 
                     cluster_is_u = VXDMomentumEnergyEstimator.do_for_each_hit_type(
                         cluster,
@@ -217,13 +221,15 @@ class VXDHarvester(QueueHarvester):
 
             yield dict(cluster_charge=cluster_charge,
                        dedx=cluster_charge / path_length,
+                       dedx_with_mc=cluster_charge / mc_path_length,
                        dedx_with_thickness=cluster_charge / cluster_thickness,
-                       p=mc_momentum,
+                       p=mc_momentum.Mag(),
                        perp_s_at_cluster_entry=perp_s_at_cluster_entry,
                        perp_s_at_cluster_exit=perp_s_at_cluster_exit,
                        cluster_thickness=cluster_thickness,
                        track_charge=track_charge,
                        path_length=path_length,
+                       mc_path_length=mc_path_length,
                        cluster_radius=cluster_radius,
                        cluster_is_u=cluster_is_u,
                        p_origin=mc_particle.getMomentum().Mag(),

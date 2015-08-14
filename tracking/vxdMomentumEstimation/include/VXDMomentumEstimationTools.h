@@ -97,7 +97,15 @@ namespace Belle2 {
 
     /** Return the momentum of the simulated MCParticle at this cluster (by using the TrueHit associated with this cluster)
      * This method is implemented for the two cluster types differently below. */
-    TVector3 getMomentumOfMCParticle(const ClusterType&) const
+    TVector3 getEntryMomentumOfMCParticle(const ClusterType&) const
+    {
+      B2FATAL("Can not deal with this cluster type!")
+      return TVector3();
+    }
+
+    /** Return the entry position of the simulated MCParticle at this cluster (by using the TrueHit associated with this cluster)
+     * This method is implemented for the two cluster types differently below. */
+    TVector3 getEntryPositionOfMCParticle(const ClusterType&) const
     {
       B2FATAL("Can not deal with this cluster type!")
       return TVector3();
@@ -151,9 +159,17 @@ namespace Belle2 {
 
   /** We have to handle PXD and SVD differently here */
   template <>
-  TVector3 VXDMomentumEstimationTools<PXDCluster>::getMomentumOfMCParticle(const PXDCluster& cluster) const;
+  TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const;
 
   /** We have to handle PXD and SVD differently here */
   template <>
-  TVector3 VXDMomentumEstimationTools<SVDCluster>::getMomentumOfMCParticle(const SVDCluster& cluster) const;
+  TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const;
+
+  /** We have to handle PXD and SVD differently here */
+  template <>
+  TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const;
+
+  /** We have to handle PXD and SVD differently here */
+  template <>
+  TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const;
 }

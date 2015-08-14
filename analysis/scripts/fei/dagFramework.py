@@ -222,10 +222,10 @@ class DAG(object):
                 cache = cPickle.load(f)
                 for resource in cache:
                     resource.env = self.env
-                    if 'listCounts' in resource.identifier:
-                        continue
-                    if 'mcCounts' in resource.identifier:
-                        continue
+                    # if 'listCounts' in resource.identifier:
+                    #     continue
+                    # if 'mcCounts' in resource.identifier:
+                    #     continue
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):

@@ -18,9 +18,10 @@
 #include <analysis/raveInterface/RaveVertexFitter.h>
 #include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 
-// track objects
+// DataObjects
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <analysis/dataobjects/FlavorTagInfo.h>
 
 #include <string>
 
@@ -66,10 +67,10 @@ namespace Belle2 {
     std::string m_listName;         /**< Breco particle list name */
     double m_confidenceLevel;       /**< required fit confidence level */
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
-    std::string m_useConstraint;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
+    std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
 
     double m_Bfield;              /**< magnetic field from data base */
-    std::vector<Belle2::Track*> tagTracks;  /**< tracks of the rest of the event */
+    std::vector<Belle2::Track*> m_tagTracks;  /**< tracks of the rest of the event */
     double m_fitPval;             /**< P value of the tag side fit result */
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
@@ -80,12 +81,14 @@ namespace Belle2 {
     double m_MCdeltaT;            /**< generated DeltaT */
     TMatrixDSym m_tube;           /**< constrained to be used in the tag vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    bool m_MCInfo;                /**< true if user wants to retrieve MC information out from the tracks used    in the fit */
+    double m_shiftZ;
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);
 
     /** calculate the constraint for the vertex fit on the tag side */
-    bool findConstraint(Particle* Breco);
+    bool findConstraint(Particle* Breco, double cut);
 
     /** ADD COMMENT*/
     bool findConstraintBoost(double cut);
@@ -96,8 +99,20 @@ namespace Belle2 {
     /** compare Breco with the two MC B particles */
     bool compBrecoBgen(Particle* Breco, MCParticle* Bgen);
 
-    /** get the tracks list from the rest of event */
-    bool getTagTracks(Particle* Breco);
+    /** asks for the MC information of the tracks performing the vertex fit **/
+    void FlavorTagInfoMCMatch(Particle* Breco);
+
+
+    /** performs the fit using the standard algorithm - using all tracks in RoE
+    The user can specify a request on the PXD hits left by the tracks*/
+    bool getTagTracks_standardAlgorithm(Particle* Breco, int nPXDHits);
+
+    /** performs the vertex fit using only one track
+    The user can specify a request on the PXD hits left by the tracks*/
+    bool getTagTracks_singleTrackAlgorithm(Particle* Breco, int nPXDHits);
+
+    /** eliminates an invalid track from a track list **/
+    void eliminateTrack(std::vector<int>& listTracks, int trackPosition);
 
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);
@@ -115,9 +130,6 @@ namespace Belle2 {
      * DT = Dl / gamma beta c  ,  l = boost direction
      */
     void deltaT(Particle* Breco);
-
-
   };
 }
-
 #endif /* TAGVERTEXMODULE_H */

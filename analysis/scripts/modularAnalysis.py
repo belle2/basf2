@@ -1035,9 +1035,10 @@ def buildRestOfEvent(list_name, only_good_ecl=True, path=analysis_main):
 def TagV(
     list_name,
     MCassociation='',
-    confidenceLevel=0.,
-    useConstraint='boostcut',
-    path=analysis_main,
+    confidenceLevel=0.001,
+    useFitAlgorithm='standard',
+    askMCInfo=False,
+    path=analysis_main
 ):
     """
     For each Particle in the given Breco ParticleList:
@@ -1063,7 +1064,8 @@ def TagV(
     tvfit.param('listName', list_name)
     tvfit.param('confidenceLevel', confidenceLevel)
     tvfit.param('MCAssociation', MCassociation)
-    tvfit.param('useConstraint', useConstraint)
+    tvfit.param('useFitAlgorithm', useFitAlgorithm)
+    tvfit.param('askMCInformation', askMCInfo)
     path.add_module(tvfit)
 
 

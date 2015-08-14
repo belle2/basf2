@@ -25,12 +25,15 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/FlavorTagInfo.h>
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/VariableManager/TrackVariables.h>
 
-// MC particle
+// msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 
 // Magnetic field
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -62,8 +65,11 @@ namespace Belle2 {
              0.001);
     addParam("MCAssociation", m_useMCassociation,
              "'': no MC association. breco: use standard Breco MC association. internal: use internal MC association", string("breco"));
-    addParam("useConstraint", m_useConstraint,
-             "Choose spatial constraint for the Tag Vertex fit: boostcut,boost,breco,no ", string("boostcut"));
+    addParam("useFitAlgorithm", m_useFitAlgorithm,
+             "Choose the fit algorithm: boost,breco, standard, standard_pxd, singleTrack, singleTrack_pxd, no ", string("standard"));
+    addParam("askMCInformation", m_MCInfo,
+             "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
+
     //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
 
   }
@@ -71,7 +77,20 @@ namespace Belle2 {
   void TagVertexModule::initialize()
   {
 
-    m_BeamSpotCenter = TVector3(0., 0., 0.);  // TEST TEST TEST
+    // The constraint used in the Single Track Fit needs to be shifted 120 um in the boost direction.
+    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
+      PCmsLabTransform T;
+      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boostDir = boost.Unit();
+      float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
+
+      m_shiftZ = 120 * 0.0001; // shift of 120 um in the boost direction
+
+      m_BeamSpotCenter = TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
+    } else {
+      m_BeamSpotCenter = TVector3(0., 0., 0.); // Standard algorithm needs no shift
+    }
+
 
     // magnetic field
     m_Bfield = BFieldMap::Instance().getBField(m_BeamSpotCenter).Z();
@@ -88,7 +107,6 @@ namespace Belle2 {
     StoreArray<Vertex> verArray;
     verArray.registerInDataStore();
     particles.registerRelationTo(verArray);
-
   }
 
   void TagVertexModule::beginRun()
@@ -99,7 +117,6 @@ namespace Belle2 {
 
   void TagVertexModule::event()
   {
-
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
@@ -109,16 +126,16 @@ namespace Belle2 {
 
     // input
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
+
     // output
     StoreArray<Vertex> verArray;
-
     analysis::RaveSetup::initialize(1, m_Bfield);
 
     std::vector<unsigned int> toRemove;
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       Particle* particle =  plist->getParticle(i);
+      if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
       bool ok = doVertexFit(particle);
-      if (ok && (m_useMCassociation == "breco" || m_useMCassociation == "internal")) BtagMCVertex(particle);
       if (ok) deltaT(particle);
 
       if (m_fitPval < m_confidenceLevel) {
@@ -156,48 +173,56 @@ namespace Belle2 {
 
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
-
-    if (m_useConstraint == "breco") {
-
-    }
-
-
-    m_fitPval = 0;
+    m_fitPval = 1;
     bool ok = false;
+    if (!(Breco->getRelatedTo<RestOfEvent>())) return false;
 
     if (m_Bfield == 0) {
       B2ERROR("TagVertex: No magnetic field");
       return false;
     }
 
-    ok = false;
-    if (m_useConstraint == "breco") ok = findConstraint(Breco);
-    if (m_useConstraint == "boostcut") ok = findConstraintBoost(0.03);
-    if (m_useConstraint == "boost") ok = findConstraintBoost(2);
-    if (m_useConstraint == "no") ok = true;
+    // Each fit algorithm has its own constraint. Therefore, depending on the user's choice, the constraint will change.
+    if (m_useFitAlgorithm == "breco") ok = findConstraint(Breco, 0.03);
+    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
+      ok = findConstraintBoost(0.025 - m_shiftZ); // The constraint size is specially squeezzed when using the Single Track Algorithm
+      if (ok && m_MCInfo) FlavorTagInfoMCMatch(
+          Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
+    }
+    if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(0.025);
+    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(2);
+    if (m_useFitAlgorithm == "no") ok = true;
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
     }
 
-    ok = getTagTracks(Breco);
-    if (!ok) return false;
-    try {
-      ok = makeGeneralFit();
-    } catch (rave::CheckedFloatException) {
-      B2ERROR("Invalid inputs (nan/inf)?");
-      ok = false;
+    /* Depending on the user's choice, one of the possible algorithms is chosen for the fit. In case the algorithm does not converge, in order to assure
+       high efficiency, the next algorithm less restictive is used. I.e, if standard_PXD does not work, the program tries with standard.
+    */
+    if (m_useFitAlgorithm == "singleTrack_PXD") {
+      ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
+      if (ok) ok = makeGeneralFit();
     }
-    if (!ok) return false;
+    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "singleTrack") {
+      ok = getTagTracks_singleTrackAlgorithm(Breco, 0);
+      if (ok) ok = makeGeneralFit();
+    }
+    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard_PXD") {
+      ok = getTagTracks_standardAlgorithm(Breco, 1);
+      if (ok) ok = makeGeneralFit();
+    }
+    if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
+        || m_useFitAlgorithm == "boost") {
+      ok = getTagTracks_standardAlgorithm(Breco, 0);
+      if (ok) ok = makeGeneralFit();
+    }
 
-
-    deltaT(Breco);
-
-    return true;
+    return ok;
 
   }
 
-  bool TagVertexModule::findConstraint(Particle* Breco)
+  bool TagVertexModule::findConstraint(Particle* Breco, double cut)
   {
     if (Breco->getPValue() < 0.) return false;
 
@@ -283,7 +308,7 @@ namespace Belle2 {
     TMatrix TubeZPart(3, 3);  TubeZPart.Mult(r1t, errFinal);
     TMatrix TubeZ(3, 3); TubeZ.Mult(TubeZPart, r1);
 
-    TubeZ(2, 2) = 10;
+    TubeZ(2, 2) = cut;
     TubeZ(2, 0) = 0; TubeZ(0, 2) = 0;
     TubeZ(2, 1) = 0; TubeZ(1, 2) = 0;
 
@@ -459,63 +484,403 @@ namespace Belle2 {
     }
 
     return isDecMode;
+  }
+
+
+
+  // MC MATCHING OF THE TRACKS PERFORMING THE FIT
+  /*
+   This function extracts MC information from the tracks performing the fit, and needs to be activated by the user.
+   The function has been created to investigate the procedence of each track so the user can elaborate cuts and selection criterias
+   for the tracks when performing the vertex fit. It also extracts this information for the tracks inside the RestOfEvent.
+   The MAIN interest is to know for a given track whether it comes directly from the B0 or from one of their immediately decaying daughters.
+   Finally, the function saves this information in a codified form inside the FlavorTagInfo dataObject.
+   */
+  void TagVertexModule::FlavorTagInfoMCMatch(Particle* Breco)
+  {
+
+    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+
+    std::vector<int> FTGoodTracks;
+    std::vector<int> FTTotalTracks;
+
+    std::vector<float> momentum = flavorTagInfo->getP();
+    std::vector<Particle*> particle = flavorTagInfo->getParticle();
+    std::vector<Belle2::Track*> tracksFT = flavorTagInfo->getTracks();
+
+
+    // FLAVOR TAG MC MATCHING
+    /* The loop runs through all the tracks stored in the FlavorTagInfo. For each one it tracks back the mother, grandmother, grand grand mother...
+       The iteration will go on while the mother is an immediately decaying particle (PDG). The iteration will stop tracking back mothers once it reaches either the B0, or another particle coming from the B0 that does not decay immediately. In the later case it assumes that the correspondent track does not share its production point with the decaying point of the B0 */
+    for (unsigned i = 0; i < tracksFT.size(); i++) {
+
+      if (i == 6 || (tracksFT[i] == NULL)) { // Tracks belonging to the Lambda category or not well reconstructed are discarted
+        flavorTagInfo->setIsFromB(0);
+        flavorTagInfo->setProdPointResolutionZ(100);
+        continue;
+      }
+
+      MCParticle* trackMCParticle = particle[i]->getRelatedTo<MCParticle>();
+      flavorTagInfo->setMCParticle(trackMCParticle);
+
+      flavorTagInfo->setProdPointResolutionZ((trackMCParticle->getProductionVertex() - m_MCtagV).Mag2());
+      MCParticle* trackMCParticleMother = trackMCParticle->getMother();
+      int step = 0;
+      bool exitFTWhile = false;
+      do {
+        int PDG = TMath::Abs(trackMCParticleMother->getPDG()); // In order to identify the mother nature, we compare with the PDG code
+        std::string motherPDGString = std::to_string(PDG);
+        // Particles that do not decay immediately: like pi+ , kaon, D+ ... Those give the code number : 0
+        if (PDG == 211 || PDG == 130 || PDG == 310 || PDG == 311 ||
+            PDG == 321 || PDG == 411 || PDG == 421 || PDG == 431) {
+          flavorTagInfo->setIsFromB(0);
+          break;
+        }
+        // Here Gauge bosons, leptons and special resonances are discarted
+        if (motherPDGString.size() == 4 || motherPDGString.size() < 3) {
+          flavorTagInfo->setIsFromB(0);
+          break; // Exit the while with false
+        }
+        // If the mother is the B_CP and not the B_tag, we discard this track
+        if (trackMCParticleMother->getPDG() == -m_mcPDG) {
+          flavorTagInfo->setIsFromB(0);
+          break; // Exit the while with false
+        }
+        // If the first step mother is already the B_tag, the code number is: 5
+        if (trackMCParticleMother->getPDG() == m_mcPDG) {
+          flavorTagInfo->setIsFromB(5);
+          exitFTWhile = true; // Exit the while with true
+          break;
+        }
+
+        /* If none of the previous work, the mother may be an immediately decaying meson, daugther of the B_tag. Thus, this checks which kind of
+          meson is it, and whether the grandmother is a B0. The given code depends on the PDG code of the meson */
+        MCParticle* trackMCParticleGrandMother = trackMCParticleMother->getMother();
+        if (motherPDGString[motherPDGString.size() - 3] == '1' && trackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          flavorTagInfo->setIsFromB(step * 10 + 1);
+          exitFTWhile = true; // Exit the while with true
+        } else if (motherPDGString[motherPDGString.size() - 3] == '2' && trackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          flavorTagInfo->setIsFromB(step * 10 + 2);
+          exitFTWhile = true; // Exit the while with true
+        } else if (motherPDGString[motherPDGString.size() - 3] == '3' && trackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          flavorTagInfo->setIsFromB(step * 10 + 3);
+          exitFTWhile = true; // Exit the while with true
+        } else if (motherPDGString[motherPDGString.size() - 3] == '4' && trackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          flavorTagInfo->setIsFromB(step * 10 + 4);
+          exitFTWhile = true; // Exit the while with true
+
+        } else { // If it corresponds to an immediately decaying meson, but this one does not come from the B_tag directly, the iteration carries on
+          trackMCParticle = trackMCParticleMother;
+          trackMCParticleMother = trackMCParticleGrandMother;
+          step++;
+          exitFTWhile = false;
+        }
+      } while (exitFTWhile == false);
+
+
+      /* In this part of the function, the code finds hoy many tracks from the FlavorTagInfo come directly from the B_tag
+       (or from immediately decaying daughters, that is, code number > 0. This will be stored in the FlavorTagInfo DataObject
+       NOTE: Good means coming from the B_tag, and Bad means not coming from the B_tag */
+      if (i == 2 || i == 7) continue; // Skip KinLepton and MaxP categories, for they are repeated tracks from other categories
+      unsigned totalsize = FTTotalTracks.size();
+      unsigned goodsize = FTGoodTracks.size();
+
+      if (goodsize == 0 && exitFTWhile == true) {
+        FTGoodTracks.push_back(i);
+        FTTotalTracks.push_back(i);
+      } else if (totalsize == 0) {
+        FTTotalTracks.push_back(i);
+      } else {
+        for (unsigned j = 0; j < totalsize; j++) {
+          if (tracksFT[FTTotalTracks[j]] == tracksFT[i]) {
+            break;
+          }
+
+          if (momentum[i] == 0) break; // Skip tracks with no momenta, i.e tracks not well reconstructed
+          if (j == totalsize - 1) {
+            if (exitFTWhile == true) {
+              FTTotalTracks.push_back(i);
+              FTGoodTracks.push_back(i);
+            } else {
+              FTTotalTracks.push_back(i);
+            }
+          }
+        }
+      }
+    }
+    if (momentum[6] != 0) FTTotalTracks.push_back(
+        6); // Since Lambdas have been discarted manually before, we add that track (if it exist) by hand
+
+
+
+    // REST OF EVENT MC MATCHING
+    /* In this part of the code the tracks from the RestOfEvent are taken into account. The same MC analysis is performed as
+     before with the exact same criteria */
+    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
+    int ROEGoodTracks = 0;
+    bool exitROEWhile = false;
+    int ROETotalTracks = roe->getNTracks();
+    for (int i = 0; i < ROETotalTracks; i++) {
+      MCParticle* roeTrackMCParticle = ROETracks[i]->getRelatedTo<MCParticle>();
+      MCParticle* roeTrackMCParticleMother = roeTrackMCParticle->getMother();
+      do {
+        int PDG = TMath::Abs(roeTrackMCParticleMother->getPDG());
+        std::string motherPDGString = std::to_string(PDG);
+        if (PDG == 211 || PDG == 130 || PDG == 310 || PDG == 311 ||
+            PDG == 321 || PDG == 411 || PDG == 421 || PDG == 431) break;
+        if (motherPDGString.size() == 4 || motherPDGString.size() < 3) break;
+        if (roeTrackMCParticleMother->getPDG() == -m_mcPDG) break;
+        if (roeTrackMCParticleMother->getPDG() == m_mcPDG) {
+          ROEGoodTracks++;
+          break;
+        }
+        MCParticle* roeTrackMCParticleGrandMother = roeTrackMCParticleMother->getMother();
+        if (motherPDGString[motherPDGString.size() - 3] == '1' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          ROEGoodTracks++;
+          exitROEWhile = true;
+        } else if (motherPDGString[motherPDGString.size() - 3] == '2' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          ROEGoodTracks++;
+          exitROEWhile = true;
+        } else if (motherPDGString[motherPDGString.size() - 3] == '3' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          ROEGoodTracks++;
+          exitROEWhile = true;
+        } else if (motherPDGString[motherPDGString.size() - 3] == '4' && roeTrackMCParticleGrandMother->getPDG() == m_mcPDG) {
+          ROEGoodTracks++;
+          exitROEWhile = true;
+
+        } else {
+          roeTrackMCParticle = roeTrackMCParticleMother;
+          roeTrackMCParticleMother = roeTrackMCParticleGrandMother;
+          exitROEWhile = false;
+        }
+      } while (exitROEWhile == false);
+    }
+
+
+    // SET IN THE FT DATAOBJECT THE GOOD/BAD TRACKS INFORMATION FROM FT AND ROE
+    /* Finally the MC information is stored in the FlavorTagInfo DataObject for future uses. More concretely the number
+     of tracks coming directly from the B_tag and immediately decaying daughters (good tracks), and tracks coming from any
+     other intermediate particle (bad track) */
+    flavorTagInfo->setGoodTracksROE(ROEGoodTracks);
+    flavorTagInfo->setBadTracksROE(ROETotalTracks - ROEGoodTracks);
+    flavorTagInfo->setGoodTracksFT(FTGoodTracks.size());
+    flavorTagInfo->setBadTracksFT(FTTotalTracks.size() - FTGoodTracks.size());
+
+    if (FTTotalTracks.size() == 0) {
+      flavorTagInfo->setGoodTracksPurityFT(-1);
+    } else {
+      flavorTagInfo->setGoodTracksPurityFT(float(FTGoodTracks.size()) / FTTotalTracks.size());
+    }
+
+    if (ROETotalTracks == 0) {
+      flavorTagInfo->setGoodTracksPurityROE(-1);
+    } else {
+      flavorTagInfo->setGoodTracksPurityROE(float(ROEGoodTracks) / ROETotalTracks);
+    }
 
   }
 
 
-  bool TagVertexModule::getTagTracks(Particle* Breco)
+// SINGLE TRACK FIT ALGORITHM
+  /* The algorithm basically selects only one track to perform the vertex fit. The first idea was to select all tracks
+   coming from the B_tag directly together with the tracks coming from its immediately decaying daughters. It did not work though,
+   and therefore it was opted to select only one track.
+   Nevertheless there is still some basic cuts applied to all tracks before performing the "one track selection", as there is
+   still room for improvement, trying to take more than one track if possible. That is not implemented now.
+   */
+  bool TagVertexModule::getTagTracks_singleTrackAlgorithm(Particle* Breco, int reqPXDHits)
   {
+    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    std::vector<Belle2::Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
-    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
 
-    if (roe) {
-      tagTracks = roe->getTracks();
-    } else {
+    std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
+    std::vector<float> listTargetP = flavorTagInfo->getTargProb(); // Probability of a track to come directly from B_tag
+    std::vector<float> listCategoryP = flavorTagInfo->getCatProb(); // Probability of a track to belong to a given category
+    std::vector<int> listTracks(8);
+    std::vector<Belle2::Track*> originalTracks = flavorTagInfo->getTracks();
+    std::vector<Particle*> listParticle = flavorTagInfo->getParticle();
+    std::vector<std::string> categories = flavorTagInfo->getCategories();
+
+    if (m_MCInfo == 0) {
+      flavorTagInfo->setGoodTracksROE(0);
+      flavorTagInfo->setBadTracksROE(0);
+      flavorTagInfo->setGoodTracksFT(0);
+      flavorTagInfo->setBadTracksFT(0);
+      for (unsigned i = 0; i < listTracks.size(); i++) {
+        flavorTagInfo->setProdPointResolutionZ(0);
+        flavorTagInfo->setIsFromB(0);
+      }
+    }
+
+    // Obtain the impact parameters of the tracks, D0 and Z0. Need the result of the track Fit.
+    Const::ChargedStable constArray[8] = {Const::electron, Const::muon, Const::muon, Const::kaon,
+                                          Const::pion, Const::pion, Const::kaon, Const::muon
+                                         };
+
+    for (unsigned i = 0; i < listCategoryP.size(); i++) {
+      if (i ==  6 || (originalTracks[i] == NULL)) { // Skip Lambdas and non-reconstructed tracks
+
+        flavorTagInfo->setD0(1.0); // Giving by hand 1cm is more than enough to make Lambdas discardable
+        flavorTagInfo->setZ0(1.0);
+        continue;
+      }
+      float D0, Z0;
+      D0 = originalTracks[i]->getTrackFitResult(constArray[i])->getD0();
+      Z0 = originalTracks[i]->getTrackFitResult(constArray[i])->getZ0();
+      flavorTagInfo->setD0(D0); // Save them on the FlavorTagInfo
+      flavorTagInfo->setZ0(Z0);
+    }
+    std::vector<float> listZ0 = flavorTagInfo->getZ0();
+    std::vector<float> listD0 = flavorTagInfo->getD0();
+
+
+    // Save in a vector the hits left by each track in the Pixel Vertex Detector. This will be useful when requesting PXD hits.
+    std::vector<int> listNPXDHits(listParticle.size());
+    for (unsigned i = 0; i < listParticle.size(); i++) {
+      listNPXDHits[i] = int(Variable::trackNPXDHits(listParticle[i]));
+    }
+
+    // Here the program keeps track of the tracks that are repeated inside the FlavorTagInfo
+    int nonRepeated = 1;
+    bool repeatedTrack = false;
+    for (unsigned i = 0; i < listTracks.size(); i++) {
+      repeatedTrack = false;
+      for (int j = i - 1; j >= 0; j--) {
+        if (originalTracks[i] == originalTracks[j]) {
+          repeatedTrack = true;
+          listTracks[i] = listTracks[j]; // If repeated, assign the same number for both tracks
+          break;
+        }
+      }
+      if (repeatedTrack == true) continue;
+      listTracks[i] = nonRepeated; // Assign different numbers for different tracks
+      nonRepeated++;
+    }
+
+
+    // Basic cut. Impact parameter needs to be small.
+    for (unsigned i = 0; i < listTracks.size(); i++) {
+      if ((listZ0[i] > 0.1 || listD0[i] > 0.1) && listTracks[i] != 0) eliminateTrack(listTracks, i);
+    }
+
+//      B2ERROR("Required PXD hits " << reqPXDHits);
+    for (unsigned i = 0; i < listTracks.size(); i++) {
+      if (listNPXDHits[i] < reqPXDHits) {
+//              B2ERROR("Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
+        eliminateTrack(listTracks, i);
+      }
+    }
+
+    // Residual cut from the previous algorithm. Used to give good results discarding secondary tracks. Could be more useful for future non-single track algorithms.
+    for (unsigned i = 0; i < listTracks.size(); i++) {
+      for (int j = 4; j > 1 ; j--) {
+        if (((TMath::Abs(listD0[j]) - TMath::Abs(listD0[i])) < -0.25
+             || (TMath::Abs(listZ0[j]) - TMath::Abs(listZ0[i])) < -0.25) && listTracks[i] != 0) {
+          eliminateTrack(listTracks, i);
+        } else if (((TMath::Abs(listD0[j]) - TMath::Abs(listD0[i])) > 0.25
+                    || (TMath::Abs(listZ0[j]) - TMath::Abs(listZ0[i])) > 0.25) && listTracks[j] != 0) {
+          eliminateTrack(listTracks, j);
+        }
+      }
+    }
+
+    // SINGLE TRACK SELECTION
+    /* Here the code selects only one track to perform the Single Track Fit. Up to now 3 conditions has been implemented for the chosen track to be taken as primary:
+     - Maximum momentum
+     - High Target Probability
+     - High Category Probability
+     The last two parameters can be tunned to make the criteria more or less restrictive. The values written here are the standard ones.
+     The conditions have been taken only for the Muon and Electron categories. At this moment (Aug 2015) the other categories still are not very easily filtered. A deep MC study confirms it.
+     */
+
+    float maxP = listMomentum[7];
+    float minTargetProb = 0.2;
+    float minCategoryProb = 0.2;
+
+    if (listMomentum[1] == maxP && listTargetP[1] > minTargetProb && listCategoryP[1] > minCategoryProb && listTracks[1] != 0) {
+      fitTracks.push_back(originalTracks[1]);
+      m_tagTracks = fitTracks;
+    } else if (listMomentum[0] == maxP && listTargetP[0] > minTargetProb && listCategoryP[0] > minCategoryProb && listTracks[0] != 0) {
+      fitTracks.push_back(originalTracks[0]);
+      m_tagTracks = fitTracks;
+    } else { // When no single track is available, return false and try with other algorithm.
       return false;
     }
 
     return true;
+
   }
 
+// This function puts a 0 in the position of listTracks where is placed the eliminated track.
+// It has been specially useful when using a track elimination algorithm, instead of a track selection
+  void TagVertexModule::eliminateTrack(std::vector<int>& listTracks, int trackPosition)
+  {
+    if (listTracks[trackPosition] == 0) return;
+    int toEliminate = listTracks[trackPosition];
+    for (unsigned i = 0; i < listTracks.size(); i++) {
+      if (listTracks[i] == toEliminate) {
+        listTracks.at(i) = 0;
+      }
+    }
+  }
 
-  //bool TagVertexModule::makeSemileptonicFit(Particle *Breco){
-  //  return true;
-  //}
+// STANDARD FIT ALGORITHM
+  /* This algorithm basically takes all the tracks coming from the Rest Of Events and send them to perform a multi-track fit
+   The option of requestion PXD hits for the tracks can be chosen by the user.
+   */
+  bool TagVertexModule::getTagTracks_standardAlgorithm(Particle* Breco, int reqPXDHits)
+  {
+    RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    if (!roe) return false;
+    std::vector<Belle2::Track*> ROETracks = roe->getTracks();
+    if (ROETracks.size() == 0) return false;
+    std::vector<Belle2::Track*> fitTracks;
+    for (unsigned i = 0; i < ROETracks.size(); i++) {
+      if (!ROETracks[i]->getTrackFitResult(Const::pion)) {
+        continue;
+      }
+      HitPatternVXD roeTrackPattern = ROETracks[i]->getTrackFitResult(Const::pion)->getHitPatternVXD();
 
+      if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
+        fitTracks.push_back(ROETracks[i]);
+      }
+    }
+    if (fitTracks.size() == 0) return false;
+    m_tagTracks = fitTracks;
+    return true;
+  }
 
   bool TagVertexModule::makeGeneralFit()
   {
-
     // apply constraint
     analysis::RaveSetup::getInstance()->unsetBeamSpot();
-    if (m_useConstraint != "no") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
-
-
+    if (m_useFitAlgorithm != "no") analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_tube);
     analysis::RaveVertexFitter rFit;
 
-    // Mpi and MKs
+    // Mpi &&  MKs
     const double mpi = Const::pionMass;
     const double mks = Const::K0Mass;
-
+    double Mass = 0.0;
     // remove traks from KS
-    for (unsigned int i = 0; i < tagTracks.size(); i++) {
-
-      const Track* trak1 = tagTracks[i];
-
+    for (unsigned int i = 0; i < m_tagTracks.size(); i++) {
+      const Track* trak1 = m_tagTracks[i];
       const TrackFitResult* trak1Res = NULL;
       if (trak1) trak1Res = trak1->getTrackFitResult(Const::pion);
-
       TVector3 mom1;
       if (trak1Res) mom1 = trak1Res->getMomentum();
       if (std::isinf(mom1.Mag2()) == true || std::isnan(mom1.Mag2()) == true) continue;
       if (!trak1Res) continue;
 
       bool isKsDau = false;
-      for (unsigned int j = 0; j < tagTracks.size(); j++) {
-
+      for (unsigned int j = 0; j < m_tagTracks.size(); j++) {
         if (i != j) {
-          const Track* trak2 = tagTracks[j];
+          const Track* trak2 = m_tagTracks[j];
           const TrackFitResult* trak2Res = NULL;
+
           if (trak2) trak2Res = trak2->getTrackFitResult(Const::pion);
 
           TVector3 mom2;
@@ -525,16 +890,13 @@ namespace Belle2 {
 
           double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)
                          - (mom1 + mom2).Mag2();
-          double Mass = TMath::Sqrt(Mass2);
+          Mass = TMath::Sqrt(Mass2);
           if (TMath::Abs(Mass - mks) < 0.01) isKsDau = true;
         }
 
       }
-
-      if (!isKsDau) rFit.addTrack(trak1Res);
+      if (!isKsDau) rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
     }
-
-
 
     int isGoodFit = rFit.fit("avf");
     if (isGoodFit < 1) return false;
@@ -548,7 +910,6 @@ namespace Belle2 {
     return true;
 
   }
-
 
 
   void TagVertexModule::deltaT(Particle* Breco)

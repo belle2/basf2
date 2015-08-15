@@ -894,9 +894,10 @@ c     .        esoft,cth,w,phsp,ie)
          sdif = sdif * phsp * w
          
          if (isnan(phsp).or.isnan(w)) then
-            print*,'NAN found (pos 1)!!!'
-            print*,isvec
-            print*,'end ----!!!'
+!             print*,'NAN found (pos 1)!!!'
+!             print*,isvec
+!             print*,'end ----!!!'
+            CALL babayaganlo_error_isnan1(phsp, w)
          endif
 *
 ** final state radiation with structure function
@@ -994,7 +995,14 @@ ccc additive form            sdif = sdif / prod/(1.d0+deltasv) * (1.d0+deltasv+d
          endif
 
 ! rescaling for Z exchange (bornmez = 0 for gg...)
-         sdif = sdif/bornme*(bornme + bornmez)
+         sdif = sdif/bornme*(bornme + bornmez)         
+         
+!          moved before any cross section calculation (TF)
+         if (isnan(sdif)) then
+           CALL babayaganlo_error_isnan2(sdif)
+           continue
+         endif 
+         
 !!         emtx = 1.d0 ! uncomment  for phase space integral
          iii = 0
          if (sdif.gt.sdifmax) then 
@@ -1044,9 +1052,13 @@ c               if (store.eq.'yes') call eventstorage(p1,p2,qph)
             endif
          endif ! END UNWEIGHTED EVENT GENERATION 
        
+!        MOVED (TF)
          if (isnan(sdif)) then
-            print*,'NAN found (pos 2)!!!'
-            print*,sdif,phsp,w
+              CALL babayaganlo_error_isnan2(sdif)
+            print*,'--> NAN2 - this should never happen again'
+
+!             print*,'NAN found (pos 2)!!!'
+!             print*,sdif,phsp,w
 !             if (iverbose.gt.0) then
 !                call printstatus(5,k,p1,p2,qph,xsec,var,varbefore,
 !      .              sdif,sdifmax,fmax)

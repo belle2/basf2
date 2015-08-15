@@ -237,6 +237,18 @@ extern "C" {
     B2WARNING("Babayaga.NLO: Prescale of less than one, increase prescale safety margin " << *weight);
   }
 
+  void babayaganlo_error_isnan1_(double* phsp, double* w)
+  {
+    B2ERROR("Babayaga.NLO: phsp (" << *phsp << ") or w (" << *w << ") are NAN, skipping event (nan1 type)");
+  }
+
+  void babayaganlo_error_isnan2_(double* sdif)
+  {
+    B2ERROR("Babayaga.NLO: sdif (" << *sdif << ") is NAN, skipping event (nan2 type)");
+  }
+
+
+
 }
 
 BabayagaNLO::BabayagaNLO()

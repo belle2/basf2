@@ -50,15 +50,15 @@ BabayagaNLOInputModule::BabayagaNLOInputModule() : Module()
   setDescription("Generates radiative Bhabha scattering and exclusive two-photon events with Babayaga.NLO.");
 
   //Parameter definition
-  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner, default) or hlmnt (Teubner)",
+  addParam("VacuumPolarization", m_vacPol, "Vacuum polarization: off, hadr5 (Jegerlehner) or hlmnt (Teubner, default)",
            std::string("hlmnt"));
   addParam("Model", m_model, "Model: ps or matched (default)", std::string("matched"));
   addParam("Order", m_order, "Order: born, alpha, exp (default)", std::string("exp"));
   addParam("Mode", m_mode, "Mode: weighted or unweighted (default)", std::string("unweighted"));
-  addParam("FinalState", m_finalState, "Final state: ee (default), mm (not recommended) or gg", std::string("ee"));
+  addParam("FinalState", m_finalState, "Final state: ee (default), mm or gg", std::string("ee"));
   addParam("MinEnergyFrac", m_eMinFrac,
-           "Fractional minimum energy for leptons (ee mode) or photons (gg mode) in the final state [fraction of ECMS]", -1.0);
-  addParam("MinEnergy", m_eMin, "Minimum energy for leptons (ee mode) or photons (gg mode) in the final state [GeV]", 0.10);
+           "Fractional minimum energy for leptons (ee or mm mode) or photons (gg mode) in the final state [fraction of ECMS]", -1.0);
+  addParam("MinEnergy", m_eMin, "Minimum energy for leptons (ee or mm mode) or photons (gg mode) in the final state [GeV]", 0.10);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator [fraction of ECMS/2], must be <=1e-7 for ee and mumu, <=1e-5 for gg",
            1.e-7);
   addParam("MaxAcollinearity", m_maxAcollinearity, "Maximum acollinearity angle between finale state leptons/photons [degree]",

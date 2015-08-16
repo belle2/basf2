@@ -283,7 +283,7 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
     if (m_targetVar->function(part) < 0.5)
       continue;
     m_withoutCut->get().Fill(1);
-    if (!m_cut->check(&particle))
+    if (!m_cut->check(part))
       continue;
     m_histogramSignal->get().Fill(m_var->function(part));
   }

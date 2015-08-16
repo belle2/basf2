@@ -556,7 +556,7 @@ class Overtraining(Plotter):
         @param bckgrd_mask boolean numpy.array defining which events are background events
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis, normed=True)
+        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=True)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -649,7 +649,7 @@ class VerboseDistribution(Plotter):
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis, self.normed)
+        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -706,7 +706,7 @@ class Correlation(Plotter):
             B2WARNING("Ignore empty Correlation.")
             return self
         percentiles = numpy.percentile(data[cut_column], q=quantiles)
-        distribution = Distribution(self.figure, self.axis, normed=False)
+        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=False)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)

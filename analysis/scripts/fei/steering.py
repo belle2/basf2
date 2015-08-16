@@ -546,6 +546,9 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         fei_path.add_module("RootOutput")
         if is_first_run and selection_path is not None:
             path.add_path(selection_path)
+            # TODO SignalMC with no correct signal-candidate will be still used as background component
+            # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
+            # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
             cut = 'isSignalAcceptMissingNeutrino == 1'
             cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
             applyCuts(signalParticleList, cut, path=path)

@@ -219,9 +219,9 @@ class DAG(object):
                 for resource in cache:
                     resource.env = self.env
                     # if 'listCounts' in resource.identifier:
-                    #     continue
+                    #    continue
                     # if 'mcCounts' in resource.identifier:
-                    #     continue
+                    #    continue
                     self.resources[resource.identifier] = resource
 
     def save_cached_resources(self, cacheFile):

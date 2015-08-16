@@ -83,7 +83,7 @@ def SelectParticleList(resource, particleName, particleLabel, userCut, mvaTarget
 
     if resource.env['ROE']:
         sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or [{sigmc} == 0 and {target} == 0]'.format(sigmc=sigmc, target=mvaTarget)
+        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
         if userCut != '':
             cut = '[' + userCut + '] and isInRestOfEvent > 0.5 and [' + specificCut + ']'
         else:
@@ -135,7 +135,7 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, user
 
     if resource.env['ROE']:
         sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or [{sigmc} == 0 and {target} == 0]'.format(sigmc=sigmc, target=mvaTarget)
+        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
         cut = '[' + specificCut + ']'
         if userCut != '':
             cut += ' and [' + userCut + ']'
@@ -256,7 +256,7 @@ def CreatePreCutHistogram(resource, particleName, channelName, mvaTarget, preCut
 
     if resource.env['ROE']:
         sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or [{sigmc} == 0 and {target} == 0]'.format(sigmc=sigmc, target=mvaTarget)
+        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
         cut = '[' + specificCut + ']'
         if userCut != '':
             cut += ' and [' + userCut + ']'

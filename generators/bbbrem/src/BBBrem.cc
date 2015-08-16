@@ -195,8 +195,8 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 
     double t = 0.0;
     do {
-      double b = 0.0;
-//       b = exp(gRandom->Uniform() * log(1.0 + 2.0 * sy / temp1));
+      double b;
+// b = exp(gRandom->Uniform() * log(1.0 + 2.0 * sy / temp1));
 // Expression 'log(1 + x)' is replaced by 'log1p(x)' to avoid loss of precision.
       b = exp(gRandom->Uniform() * log1p(2.0 * sy / temp1));
       t = -b * z * z * rme2 / ((b - 1) * (b * z + b - 1));

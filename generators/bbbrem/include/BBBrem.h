@@ -52,6 +52,8 @@ namespace Belle2 {
       m_crossSectionError(0.0),
       m_crossSectionOver(0.0),
       m_crossSectionErrorOver(0.0),
+      m_densityCorrectionMode(0),
+      m_densityCorrectionParameter(0.0),
       alpha(0.0),
       rme(0.0),
       s(0.0),
@@ -147,7 +149,7 @@ namespace Belle2 {
     double m_crossSectionErrorOver; /**< The overweight bias error on the cross-section in millibarns. */
 
     int m_densityCorrectionMode;   /**< Mode for bunch density correction. */
-    double m_DensityCorrectionParameter;   /**< Density correction parameter tc. */
+    double m_densityCorrectionParameter;   /**< Density correction parameter tc. */
 
     /** Calculate the outgoing leptons and the event weight for one single radiative Bhabha scattering.
      * The main method. A direct translation from the BBBrem Fortran source code.

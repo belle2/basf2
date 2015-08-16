@@ -29,7 +29,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
   m_unweighted = unweighted;
   m_maxWeight = maxWeight;
   m_densityCorrectionMode = densitymode;
-  m_DensityCorrectionParameter = densityparameter;
+  m_densityCorrectionParameter = densityparameter;
 
   m_maxWeightDelivered = 0.0;
   m_sumWeightDelivered = 0.0;
@@ -367,7 +367,7 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
       // tc = (hbarc/simga_y)^2
 //       double tc = 1.68e-17;  //SuperKEKB LER (sigma_y*=48nm)
       //double tc = 9.81e-18;  //SuperKEKB HER (sigma_y*=63nm)
-      double tc = m_DensityCorrectionParameter;
+      double tc = m_densityCorrectionParameter;
 //       int cutflag = 0 ;  // 0: no cut, 1: hard cut, 2: soft cut
       if (m_densityCorrectionMode == 1) {
         if (abs(t) < tc) weight = 0.0;

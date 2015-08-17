@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/hough/perigee/ImpactSweeped.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvSweepedXLine.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/DiscretePhi0.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteImpact.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
+#include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
+#include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
+#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
 #include <tracking/trackFindingCDC/utilities/TimeIt.h>
 

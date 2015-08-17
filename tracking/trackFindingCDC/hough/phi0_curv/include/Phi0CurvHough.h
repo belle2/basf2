@@ -9,9 +9,6 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscretePhi0.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
-
 #include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
 
 #include <cmath>

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
+#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

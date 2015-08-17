@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteImpact.h>
+#include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 #include <tracking/trackFindingCDC/hough/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 

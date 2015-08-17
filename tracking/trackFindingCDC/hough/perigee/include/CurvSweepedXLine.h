@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscretePhi0.h>
+#include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
+#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/Box.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 

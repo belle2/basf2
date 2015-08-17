@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitIn.h>
 #include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
 

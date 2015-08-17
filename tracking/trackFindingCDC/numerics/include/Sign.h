@@ -19,9 +19,14 @@ namespace Belle2 {
     /// Type to represent the sign of a quantity
     class Sign {
 
-    public:
+    private:
       /// Implementing type of the sign
-      typedef float SignType;
+      typedef signed short SignType;
+      //typedef signed char SignType; // This can be used to tighten memory
+
+      /// Constant for an invalid sign
+      static const SignType c_NaNSign = -32768;
+
 
     public:
       /// Default constructor
@@ -29,23 +34,27 @@ namespace Belle2 {
       Sign() : m_sign(0)
       {;}
 
+    private:
+      /// Constructor from the internal representation
+      constexpr
+      Sign(const SignType& s) :
+        m_sign(s)
+      {;}
+
+    public:
       /// Constructor from a float signed quantity
       constexpr
       Sign(const float& s) :
-        m_sign(std::isnan(s) ? s : (s > 0) - (s < 0))
+        m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
       {;}
 
       /// Constructor from a double signed quantity
       constexpr
       Sign(const double& s) :
-        m_sign(std::isnan(s) ? s : (s > 0) - (s < 0))
+        m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
       {;}
 
     public:
-      /** Helper function that yield the second argument if the first is NAN. */
-      static float fillnan(const float testValue, const float& defaultValue)
-      { return std::isnan(testValue) ? defaultValue : testValue; }
-
       /** Calculate the common distance sign in a sweep operation over a geometric object.
        *  If the sign changes in a sweep over a geometric object or was zero in the begining
        *  the combined sign is zero. Forward the one sign if both are equal.
@@ -62,50 +71,51 @@ namespace Belle2 {
       static Sign sweep(const Sign& sign0, const Sign& sign1)
       {
         if (sign0.m_sign == 0 or sign1.m_sign == 0) {
-          return Sign(0.0);
-        } else if (not sign0.isValid()) {
+          return 0.0;
+        } else if (sign0.isnan()) {
           return sign1;
-        } else if (not sign1.isValid()) {
+        } else if (sign1.isnan()) {
           return sign0;
         } else {
-          return (sign0.m_sign + sign1.m_sign) / 2;
+          return Sign(static_cast<SignType>((sign0.m_sign + sign1.m_sign) / 2));
         }
       }
-      /// Investigates if two signs are identical.
-      static bool same(const Sign& sign0, const Sign& sign1)
-      { return sign0 == sign1; }
 
     public:
       /// Change the sign inplace to its opposite.
       void reverse()
-      { m_sign = SignType(-m_sign); }
+      { m_sign = static_cast<SignType>(-m_sign); }
 
       /// Return a copy with the reversed sign
-      Sign reversed()
-      { return Sign(SignType(-m_sign)); }
+      Sign reversed() const
+      { return Sign(static_cast<SignType>(-m_sign)); }
 
       /// Returns true if sign is equal to c_PlusSign, c_MinusSign or c_ZeroSign.
-      inline bool isValid() const
-      { return not std::isnan(m_sign); }
+      inline bool isfinite() const
+      { return std::abs(m_sign) <= 1; }
+
+      /// Returns true if the sign is the nan equivalent represenation.
+      inline bool isnan() const
+      { return m_sign == c_NaNSign; }
 
       /// Equality comparision
       bool operator==(const Sign& other) const
-      { return m_sign == other.m_sign; }
+      { return (isfinite() and other.isfinite()) ? m_sign == other.m_sign : false; }
 
       /// Multiplication with another float
       float operator*(const float& rhs) const
-      { return m_sign * rhs; }
+      { return isnan() ? NAN : m_sign * rhs; }
 
       /// Multiplication with another double
       double operator*(const double& rhs) const
-      { return m_sign * rhs; }
+      { return isnan() ? NAN : m_sign * rhs; }
 
       /// Printing operator
       friend std::ostream& operator<<(std::ostream& output, const Sign& sign)
       { return output << sign.m_sign; }
 
     private:
-      /// Memory for the sign
+      /// Memory for the sign implementation
       SignType m_sign = 0;
     };
 

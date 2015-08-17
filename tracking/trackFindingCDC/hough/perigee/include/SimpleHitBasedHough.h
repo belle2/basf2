@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/StereoHitIn.h>
+#include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
 
 #include <vector>
@@ -18,28 +18,28 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     template<class HitPtr,
-             class Sweeped,
+             class InBox,
              size_t ... divisions>
     class SimpleHitBasedHough :
-      public BoxDivisionHoughTree<HitPtr, typename Sweeped::HoughBox, divisions...> {
+      public BoxDivisionHoughTree<HitPtr, typename InBox::HoughBox, divisions...> {
 
     private:
       /// Type of the base class.
-      using Super = BoxDivisionHoughTree<HitPtr, typename Sweeped::HoughBox, divisions...>;
+      using Super = BoxDivisionHoughTree<HitPtr, typename InBox::HoughBox, divisions...>;
 
     public:
       /// Type of the node in the hough tree.
       using Node = typename Super::Node;
 
       /// Type of the hough box
-      using HoughBox = typename Sweeped::HoughBox;
+      using HoughBox = typename InBox::HoughBox;
 
     public:
       /// Constructor using the given maximal level.
       SimpleHitBasedHough(size_t maxLevel, float curlCurv = NAN) :
         Super(maxLevel),
         m_curlCurv(curlCurv),
-        m_stereoHitInSweeped(curlCurv)
+        m_stereoHitContainedInBox(curlCurv)
       {;}
 
     public:
@@ -51,7 +51,7 @@ namespace Belle2 {
           const HoughBox& houghBox = *node;
           return not(node->getWeight() >= minWeight and not(getLowerCurv(houghBox) > maxCurv));
         };
-        return this->getTree()->findLeavesDisjoint(m_stereoHitInSweeped,
+        return this->getTree()->findLeavesDisjoint(m_stereoHitContainedInBox,
                                                    this->getMaxLevel(),
                                                    skipHighCurvatureAndLowWeightNode);
       }
@@ -64,7 +64,7 @@ namespace Belle2 {
           const HoughBox& houghBox = *node;
           return not(node->getWeight() >= minWeight and not(getLowerCurv(houghBox) > maxCurv));
         };
-        return this->getTree()->findHeaviestLeafRepeated(m_stereoHitInSweeped,
+        return this->getTree()->findHeaviestLeafRepeated(m_stereoHitContainedInBox,
                                                          this->getMaxLevel(),
                                                          skipHighCurvatureAndLowWeightNode);
       }
@@ -74,7 +74,7 @@ namespace Belle2 {
       double m_curlCurv = 0.018;
 
       /// Predicate checking if a hit is in the realm of the sweeped object.
-      StereoHitIn<Sweeped> m_stereoHitInSweeped ;
+      StereoHitContained<InBox> m_stereoHitContainedInBox;
     };
   }
 }

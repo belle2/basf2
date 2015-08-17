@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Sweeped.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvSweepedXLine.h>
-#include <tracking/trackFindingCDC/hough/perigee/StereoHitIn.h>
+#include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 
 
 #include <gtest/gtest.h>
@@ -22,12 +22,12 @@ using namespace TrackFindingCDC;
 
 namespace {
 
-  TEST(TrackFindingCDCTest, hough_perigee_StereoHitIn_compile)
+  TEST(TrackFindingCDCTest, hough_perigee_StereoHitContained_compile)
   {
     using Phi0SweepedXCircle = Phi0Sweeped<CurvSweepedXLine>;
 
     const float curlCurv = 0.013;
-    StereoHitIn<Phi0SweepedXCircle> stereoHitIn(curlCurv);
-    stereoHitIn.setRLWeightGain(0.1);
+    StereoHitContained<Phi0SweepedXCircle> stereoHitContained(curlCurv);
+    stereoHitContained.setRLWeightGain(0.1);
   }
 }

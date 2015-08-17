@@ -23,14 +23,14 @@ Phi0BinsSpec::Phi0BinsSpec(size_t nBins, size_t nOverlap, size_t nWidth) :
            m_nWidth > m_nOverlap);
 }
 
-DiscretePhi0Array Phi0BinsSpec::constructArray() const
+DiscretePhi0::Array Phi0BinsSpec::constructArray() const
 {
   const size_t nPositions = getNPositions();
   const double overlap = getOverlap();
   // Adjust the angle bounds such that overlap occures at the wrap around as well
   const double lowerBound = -PI - overlap / 2;
   const double upperBound = +PI + overlap / 2;
-  return DiscretePhi0Array(lowerBound, upperBound, nPositions);
+  return linspace<Vector2D>(lowerBound, upperBound, nPositions, &(Vector2D::Phi));
 }
 
 size_t Phi0BinsSpec::getNPositions() const

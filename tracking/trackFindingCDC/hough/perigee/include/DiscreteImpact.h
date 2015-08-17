@@ -9,30 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteValues.h>
+#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type for the container of the discrete values
-    using DiscreteImpactArray = DiscreteValueArray<float>;
+    /// Phantom type tag for the discrete impact representation
+    class ImpactTag;
 
-    /// Type for discrete float values
-    class DiscreteImpact : public DiscreteValue<float> {
-    public:
-      /// Exposing the base class constructors
-      using DiscreteValue<float>::DiscreteValue;
-
-      /// The type of the array which contains the underlying values.
-      using Array = DiscreteImpactArray;
-
-    public:
-      /// Extract the range from an array providing the discrete values.
-      static std::pair<DiscreteImpact, DiscreteImpact> getRange(const DiscreteImpactArray& valueArray)
-      { return {DiscreteImpact(valueArray.front()), DiscreteImpact(valueArray.back())}; }
-    };
-
-
+    /// Type for discrete impact values
+    using DiscreteImpact = DiscreteValue<float, ImpactTag>;
 
     /// Strategy to construct discrete impact points from discrete overlap specifications.
     class ImpactBinsSpec {
@@ -55,7 +41,7 @@ namespace Belle2 {
                      size_t nWidth);
 
       /// Constuct the array of discrete impact positions
-      DiscreteImpactArray constructArray() const;
+      DiscreteImpact::Array constructArray() const;
 
       /// Getter for the number of bounds
       size_t getNPositions() const;

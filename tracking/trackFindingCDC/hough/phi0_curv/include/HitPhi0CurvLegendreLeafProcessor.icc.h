@@ -82,8 +82,10 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   double phi0Precision = PI / (pow(2., levelPrecision + 1));
 
   // Make a hough space box with the determined precision
-  DiscreteCurvArray curvBounds(curv - curvPrecision, curv + curvPrecision, 2);
-  DiscretePhi0Array phi0Bounds(phi0 - phi0Precision, phi0 + phi0Precision, 2);
+  DiscreteCurv::Array curvBounds = linspace<float>(curv - curvPrecision, curv + curvPrecision, 2);
+  DiscretePhi0::Array phi0Bounds = linspace<Vector2D>(phi0 - phi0Precision, phi0 + phi0Precision, 2,
+                                                      &(Vector2D::Phi));
+
   Phi0CurvBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
                                    DiscreteCurv::getRange(curvBounds));
 

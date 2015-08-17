@@ -57,8 +57,8 @@ namespace Belle2 {
         const double z0UpperBound = +m_maximumAbsZ0 + z0Overlap;
 
 
-        m_discreteZ0s = DiscreteZ0Array(z0LowerBound, z0UpperBound, nDiscreteZ0s);
-        std::pair<DiscreteZ0, DiscreteZ0> z0Range(m_discreteZ0s.getRange());
+        m_discreteZ0s = linspace<float>(z0LowerBound, z0UpperBound, nDiscreteZ0s);
+        std::pair<DiscreteZ0, DiscreteZ0> z0Range(DiscreteZ0::getRange(m_discreteZ0s));
 
         // Setup three discrete values for the two dimensional curvature
         assert(m_discreteZSlopeWidth > m_discreteZSlopeOverlap);
@@ -74,8 +74,8 @@ namespace Belle2 {
         const double zSlopeUpperBound = +m_maximumAbsZSlope + zSlopeOverlap;
 
 
-        m_discreteZSlopes = DiscreteZSlopeArray(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
-        std::pair<DiscreteZSlope, DiscreteZSlope > zSlopeRange(m_discreteZSlopes.getRange());
+        m_discreteZSlopes = linspace<float>(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
+        std::pair<DiscreteZSlope, DiscreteZSlope > zSlopeRange(DiscreteZSlope::getRange(m_discreteZSlopes));
 
         // Compose the hough space
         m_z0ZSlopeHoughPlain = Z0ZSlopeBox(z0Range, zSlopeRange);
@@ -163,13 +163,14 @@ namespace Belle2 {
       // Dummy initialisation of the other constructs
 
       /// Space for the discrete values that mark the usable bin bound in z0
-      DiscreteZ0Array m_discreteZ0s{NAN, NAN, 1};
+      DiscreteZ0Array m_discreteZ0s;
 
       /// Space for the discrete values that mark the usable bin bound in inverse z slope
-      DiscreteZSlopeArray m_discreteZSlopes{NAN, NAN, 1};
+      DiscreteZSlopeArray m_discreteZSlopes;
 
       /// The top level hough plain
-      Z0ZSlopeBox m_z0ZSlopeHoughPlain{m_discreteZ0s.getRange(), m_discreteZSlopes.getRange()};
+      Z0ZSlopeBox m_z0ZSlopeHoughPlain{DiscreteZ0::getRange(m_discreteZ0s),
+                                       DiscreteZSlope::getRange(m_discreteZSlopes)};
 
       /// Dynamic hough tree structure traversed in the leave search.
       std::unique_ptr<HitZ0ZSlopeFastHoughTree> m_hitZ0ZSlopeFastHoughTree{nullptr};

@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
 
 #include <tracking/trackFindingCDC/hough/BoxDivisionHoughTree.h>
-#include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
 
 #include <cmath>
 #include <vector>
@@ -67,20 +66,20 @@ namespace Belle2 {
 
         this->template assignArray<1>(curvBinsSpec.constructArray(), m_discreteCurvOverlap);
 
-        const DiscretePhi0Array& discretePhi0s = this->template getArray<0>();
-        const DiscreteCurvArray& discreteCurvs = this->template getArray<1>();
+        const DiscretePhi0::Array& discretePhi0s = this->template getArray<0>();
+        const DiscreteCurv::Array& discreteCurvs = this->template getArray<1>();
 
         B2INFO("Initialize hough plan");
-        B2INFO("First curvature bin lower bound " << discreteCurvs[0].getValue());
-        B2INFO("First curvature bin upper bound " << discreteCurvs[m_discreteCurvWidth].getValue());
-        B2INFO("Curvature bin width " << discreteCurvs[m_discreteCurvWidth].getValue() - discreteCurvs[0].getValue());
-        B2INFO("Curvature bin overlap " << discreteCurvs[m_discreteCurvOverlap].getValue() - discreteCurvs[0].getValue());
+        B2INFO("First curvature bin lower bound " << discreteCurvs[0]);
+        B2INFO("First curvature bin upper bound " << discreteCurvs[m_discreteCurvWidth]);
+        B2INFO("Curvature bin width " << discreteCurvs[m_discreteCurvWidth] - discreteCurvs[0]);
+        B2INFO("Curvature bin overlap " << discreteCurvs[m_discreteCurvOverlap] - discreteCurvs[0]);
 
-        double phi0Width = discretePhi0s[m_discretePhi0Width]->phi() - discretePhi0s[0]->phi();
+        double phi0Width = discretePhi0s[m_discretePhi0Width].phi() - discretePhi0s[0].phi();
         // need modulo 2 * Pi because of the wrap around of the lowest bin.
         phi0Width = std::remainder(phi0Width, 2 * PI);
 
-        double phi0Overlap = discretePhi0s[m_discretePhi0Overlap]->phi() - discretePhi0s[0]->phi();
+        double phi0Overlap = discretePhi0s[m_discretePhi0Overlap].phi() - discretePhi0s[0].phi();
         // need modulo 2 * Pi because of the wrap around of the lowest bin.
         phi0Overlap = std::remainder(phi0Overlap, 2 * PI);
 

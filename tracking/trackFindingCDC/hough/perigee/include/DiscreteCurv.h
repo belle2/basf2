@@ -9,28 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteValues.h>
+#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type for the container of the discrete values
-    using DiscreteCurvArray = DiscreteValueArray<float>;
+    /// Phantom type tag for the discrete curvature representation
+    class CurvTag;
 
-    /// Type for discrete float values
-    class DiscreteCurv : public DiscreteValue<float> {
-    public:
-      /// Exposing the base class constructors
-      using DiscreteValue<float>::DiscreteValue;
-
-      /// The type of the array which contains the underlying values.
-      using Array = DiscreteCurvArray;
-
-    public:
-      /// Extract the range from an array providing the discrete values.
-      static std::pair<DiscreteCurv, DiscreteCurv> getRange(const DiscreteCurvArray& valueArray)
-      { return {DiscreteCurv(valueArray.front()), DiscreteCurv(valueArray.back())}; }
-    };
+    /// Type for discrete curv values
+    using DiscreteCurv = DiscreteValue<float, CurvTag>;
 
     /// Strategy to construct discrete curv points from discrete overlap specifications.
     class CurvBinsSpec {
@@ -53,7 +41,7 @@ namespace Belle2 {
                    size_t nWidth);
 
       /// Constuct the array of discrete curv positions
-      DiscreteCurvArray constructArray() const;
+      DiscreteCurv::Array constructArray() const;
 
       /// Getter for the number of bounds
       size_t getNPositions() const;

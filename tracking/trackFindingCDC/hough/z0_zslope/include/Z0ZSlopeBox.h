@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/Box.h>
-#include <tracking/trackFindingCDC/hough/DiscreteValues.h>
+#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
 
 // For better readability we use z slope instead of inverse z slope everywhere!
 namespace Belle2 {
@@ -20,10 +20,10 @@ namespace Belle2 {
     typedef DiscreteValue<float> DiscreteZSlope;
 
     /// Type for the container of the discrete values in z0 direction
-    typedef DiscreteValueArray<float> DiscreteZ0Array;
+    typedef DiscreteZ0::Array DiscreteZ0Array;
 
     /// Type for the container of the discrete values in inverse z slope direction
-    typedef DiscreteValueArray<float> DiscreteZSlopeArray;
+    typedef DiscreteZSlope::Array DiscreteZSlopeArray;
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
     class Z0ZSlopeBox : public Box<DiscreteZ0, DiscreteZSlope> {
@@ -39,19 +39,19 @@ namespace Belle2 {
     public:
       /// Concise getter for the lower z0 bound.
       const float& getLowerZ0() const
-      { return getLowerBound<0>().getValue(); }
+      { return static_cast<const float&>(getLowerBound<0>()); }
 
       /// Concise getter for the upper z0 bound.
       const float& getUpperZ0() const
-      { return getUpperBound<0>().getValue(); }
+      { return  static_cast<const float&>(getUpperBound<0>()); }
 
       /// Concise getter for the lower inverse z0 slope bound.
       const float& getLowerZSlope() const
-      { return getLowerBound<1>().getValue(); }
+      { return static_cast<const float&>(getLowerBound<1>()); }
 
       /// Concise getter for the lower inverse z0 slope bound.
       const float& getUpperZSlope() const
-      { return getUpperBound<1>().getValue(); }
+      { return static_cast<const float&>(getUpperBound<1>()); }
     };
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

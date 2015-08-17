@@ -9,29 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
+#include <tracking/trackFindingCDC/hough/DiscreteValue.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type to represent an array of discrete phi0 values
-    using DiscretePhi0Array = DiscreteAngleArray;
+    /// Phantom type tag for the discrete phi0 representation
+    class Phi0Tag;
 
-    /// Type to represent a discrete phi0 value
-    class DiscretePhi0 : public DiscreteAngle {
-    public:
-      /// Inheriting the constructor of the base class
-      using DiscreteAngle::DiscreteAngle;
-
-      /// The type of the array which contains the underlying values.
-      using Array = DiscretePhi0Array;
-
-    public:
-      /// Extract the range from an array providing the discrete values.
-      static std::pair<DiscretePhi0, DiscretePhi0> getRange(const DiscretePhi0Array& valueArray)
-      { return {DiscretePhi0(valueArray.front()), DiscretePhi0(valueArray.back())}; }
-    };
-
+    /// Type for discrete phi0 values
+    using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
 
     /// Strategy to construct discrete phi0 points from discrete overlap specifications.
     class Phi0BinsSpec {
@@ -41,7 +30,7 @@ namespace Belle2 {
       Phi0BinsSpec(size_t nBins, size_t nOverlap, size_t nWidth);
 
       /// Constuct the array of discrete phi0 positions
-      DiscretePhi0Array constructArray() const;
+      DiscretePhi0::Array constructArray() const;
 
       /// Getter for the number of bounds
       size_t getNPositions() const;

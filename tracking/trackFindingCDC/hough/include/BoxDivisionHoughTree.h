@@ -58,7 +58,7 @@ namespace Belle2 {
     private:
       /// Type of the discrete value array to coordinate index I.
       template<size_t I>
-      using Array = typename std::tuple_element<I, typename HoughBox::Point>::type::Array;
+      using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
       using Arrays = MapGenIndices<Array, sizeof...(divisions)>;
@@ -107,7 +107,7 @@ namespace Belle2 {
       {
         // Double move assignment
         std::get<I>(m_arrays) = std::move(array);
-        std::get<I>(m_overlaps) = std::move(overlap);
+        std::get<I>(m_overlaps) = overlap;
       }
 
     public:
@@ -154,7 +154,7 @@ namespace Belle2 {
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
       template<size_t ... Is>
       HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>&)
-      { return HoughBox(Type<Is>::getRange(getArray<Is>())...); }
+      { return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...); }
 
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()

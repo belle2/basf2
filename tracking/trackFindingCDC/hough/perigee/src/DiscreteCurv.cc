@@ -32,7 +32,7 @@ CurvBinsSpec::CurvBinsSpec(double lowerBound,
 }
 
 
-DiscreteCurvArray CurvBinsSpec::constructArray() const
+DiscreteCurv::Array CurvBinsSpec::constructArray() const
 {
   const size_t nPositions = getNPositions();
   if (m_lowerBound == 0) {
@@ -41,9 +41,9 @@ DiscreteCurvArray CurvBinsSpec::constructArray() const
     // the negative curvature spaces.
     const double width = getBinWidth();
     const double expandedLowerBound = -width / 2;
-    return DiscreteCurvArray(expandedLowerBound, m_upperBound, nPositions);
+    return linspace<float>(expandedLowerBound, m_upperBound, nPositions);
   } else {
-    return DiscreteCurvArray(m_lowerBound, m_upperBound, nPositions);
+    return linspace<float>(m_lowerBound, m_upperBound, nPositions);
   }
 }
 

@@ -12,8 +12,9 @@
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
 #include <vector>
+#include <functional>
 #include <utility>
-#include <math.h>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -111,15 +112,16 @@ namespace Belle2 {
     }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class T>
-    std::vector<T> linspace(const T& start, const T& end, const int n)
+    template<class OUT = double>
+    std::vector<OUT> linspace(const double& start, const double& end, const int n,
+                              const std::function<OUT(double)>& map = [](const double& in) -> OUT {return OUT(in);})
     {
-      std::vector<T> result(n);
-      result[0] = start;
+      std::vector<OUT> result(n);
+      result[0] = map(start);
       for (int i = 1; i < n - 1; ++i) {
-        result[i] = (start * (n - 1 - i) + end * i) / (n - 1);
+        result[i] = map((start * (n - 1 - i) + end * i) / (n - 1));
       }
-      result[n - 1] = end;
+      result[n - 1] = map(end);
       return result;
     }
 

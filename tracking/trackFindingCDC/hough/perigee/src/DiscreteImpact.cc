@@ -32,10 +32,10 @@ ImpactBinsSpec::ImpactBinsSpec(double lowerBound,
 }
 
 
-DiscreteImpactArray ImpactBinsSpec::constructArray() const
+DiscreteImpact::Array ImpactBinsSpec::constructArray() const
 {
   const size_t nPositions = getNPositions();
-  return DiscreteImpactArray(m_lowerBound, m_upperBound, nPositions);
+  return linspace<float>(m_lowerBound, m_upperBound, nPositions);
 }
 
 size_t ImpactBinsSpec::getNPositions() const

@@ -131,7 +131,7 @@ namespace Belle2 {
       Type<I> getDivision(size_t nDivisions, size_t iDivision) const
       {
         assert(nDivisions >= iDivision);
-        return getLowerBound<I>() + getWidth<I>() * iDivision / nDivisions;
+        return Type<I>(getLowerBound<I>() + getWidth<I>() * iDivision / nDivisions);
       }
 
       /// Get the lower partition in the coordinate I
@@ -156,7 +156,7 @@ namespace Belle2 {
                                        size_t iDivision) const
       {
         assert(nDivisions >= iDivision);
-        return getLowerBound<I>() + (getWidth<I>() - overlap) * iDivision / nDivisions;
+        return Type<I>(getLowerBound<I>() + (getWidth<I>() - overlap) * iDivision / nDivisions);
       }
 
       template<std::size_t I>
@@ -166,7 +166,7 @@ namespace Belle2 {
                                        size_t iDivision) const
       {
         assert(nDivisions >= iDivision);
-        return getUpperBound<I>() - (getWidth<I>() - overlap) * (nDivisions - iDivision - 1) / nDivisions;
+        return Type<I>(getUpperBound<I>() - (getWidth<I>() - overlap) * (nDivisions - iDivision - 1) / nDivisions);
       }
 
       /// Get the lower partition in the coordinate I

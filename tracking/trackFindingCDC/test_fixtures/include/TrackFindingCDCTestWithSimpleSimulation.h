@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/legendre/TrackHit.h>
+
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
@@ -52,6 +54,7 @@ namespace Belle2 {
         m_mcTrajectories.clear();
         m_axialWireHits.clear();
         m_wireHits.clear();
+        m_trackHits.clear();
       }
 
       /// Populate the event with hits generated from the given helices.
@@ -85,6 +88,23 @@ namespace Belle2 {
         // Propagate the tracks and write hits to the eventtopology
         m_mcTracks = m_simpleSimulation.simulate(trajectories);
 
+        fillCaches();
+      }
+
+      /// Populate the event with hits hard codes presimulated hits
+      void loadPreparedEvent()
+      {
+        // No trajectory information present
+        m_mcTrajectories.clear();
+        // Propagate the tracks and write hits to the eventtopology
+        m_mcTracks = m_simpleSimulation.loadPreparedEvent();
+
+        fillCaches();
+      }
+
+      /// Prepare a set of hits, axial hits, segments, axial segments and track hits.
+      void fillCaches()
+      {
         for (size_t iTrack = 0; iTrack < m_mcTracks.size(); ++iTrack) {
           B2INFO("Size mc track " << iTrack << " : " << m_mcTracks[iTrack].size());
         }
@@ -115,6 +135,11 @@ namespace Belle2 {
         // Pick up points for all hits
         for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
           m_wireHits.push_back(&wireHit);
+        }
+
+        // Prepare instances of track hits
+        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+          m_trackHits.emplace_back(&wireHit);
         }
 
         m_plotter.draw(CDCWireTopology::getInstance());
@@ -191,6 +216,7 @@ namespace Belle2 {
         m_mcTrajectories.clear();
         m_axialWireHits.clear();
         m_wireHits.clear();
+        m_trackHits.clear();
       }
 
     protected:
@@ -224,6 +250,8 @@ namespace Belle2 {
       /// Memory for the hits of the current event.
       std::vector<const CDCWireHit*> m_wireHits;
 
+      /// Memory for prepared track hits.
+      std::vector<TrackHit> m_trackHits;
     private:
       /// Plotter facility to generate visual representations
       EventDataPlotter m_plotter;

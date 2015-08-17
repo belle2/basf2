@@ -57,15 +57,38 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     vector<SimpleSimHit> simpleSimHitsForTrajectory = createHits(globalHelix, arcLength2DOffset);
 
     for (SimpleSimHit& simpleSimHit : simpleSimHitsForTrajectory) {
-      simpleSimHit.iMCTrack = iMCTrack;
+      simpleSimHit.m_iMCTrack = iMCTrack;
       simpleSimHits.push_back(simpleSimHit);
     }
   }
 
+  vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
+
+  /// Assign mc trajectories to the tracks
+  for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
+    CDCTrack& mcTrack = mcTracks[iMCTrack];
+    CDCTrajectory3D mcTrajectory = trajectories3D[iMCTrack];
+    if (not mcTrack.empty()) {
+      mcTrajectory.setLocalOrigin(mcTrack.front().getRecoPos3D());
+      mcTrack.setStartTrajectory3D(mcTrajectory);
+      mcTrajectory.setLocalOrigin(mcTrack.back().getRecoPos3D());
+      mcTrack.setEndTrajectory3D(mcTrajectory);
+    } else {
+      mcTrack.setStartTrajectory3D(mcTrajectory);
+      mcTrack.setEndTrajectory3D(mcTrajectory);
+    }
+  }
+  return mcTracks;
+}
+
+vector<CDCTrack>
+CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> simpleSimHits) const
+{
+
   // Sort the hits along side their wire hits
   std::stable_sort(simpleSimHits.begin(), simpleSimHits.end(),
   [](const SimpleSimHit & lhs, const SimpleSimHit & rhs) -> bool {
-    return lhs.wireHit < rhs.wireHit;
+    return lhs.m_wireHit < rhs.m_wireHit;
   });
 
   // Discard multiple hits on the same wire up to the maximal exceeding the maximal desired number
@@ -77,12 +100,12 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     auto exceedsMaxNHitOnWire =
     [&lastWire, &nSameWire, maxNHitOnWire](const SimpleSimHit & simpleSimHit) -> bool {
 
-      if (&(simpleSimHit.wireHit.getWire()) == lastWire)
+      if (&(simpleSimHit.m_wireHit.getWire()) == lastWire)
       {
         ++nSameWire;
       } else {
         nSameWire = 1;
-        lastWire = &(simpleSimHit.wireHit.getWire());
+        lastWire = &(simpleSimHit.m_wireHit.getWire());
       }
       return nSameWire > maxNHitOnWire ? true : false;
     };
@@ -96,7 +119,7 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
   {
     wireHitTopology.clear();
     for (SimpleSimHit& simpleSimHit : simpleSimHits) {
-      wireHitTopology.m_wireHits.push_back(simpleSimHit.wireHit);
+      wireHitTopology.m_wireHits.push_back(simpleSimHit.m_wireHit);
     }
 
     if (not wireHitTopology.m_wireHits.checkSorted()) {
@@ -124,32 +147,17 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     const CDCWireHit& wireHit = wireHits[iWireHit];
     const SimpleSimHit& simpleSimHit = simpleSimHits[iWireHit];
 
-    CDCTrack& mcTrack = mcTracks[simpleSimHit.iMCTrack];
+    CDCTrack& mcTrack = mcTracks[simpleSimHit.m_iMCTrack];
 
-    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(wireHit, simpleSimHit.rlInfo);
+    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(wireHit, simpleSimHit.m_rlInfo);
 
-    CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.pos3D, simpleSimHit.arcLength2D);
+    CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
     mcTrack.push_back(recoHit3D);
   }
 
   /// Sort the hits by the order of their occurance
   for (CDCTrack& mcTrack : mcTracks) {
     mcTrack.sortByPerpS();
-  }
-
-  /// Assign mc trajectories to the tracks
-  for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
-    CDCTrack& mcTrack = mcTracks[iMCTrack];
-    CDCTrajectory3D mcTrajectory = trajectories3D[iMCTrack];
-    if (not mcTrack.empty()) {
-      mcTrajectory.setLocalOrigin(mcTrack.front().getRecoPos3D());
-      mcTrack.setStartTrajectory3D(mcTrajectory);
-      mcTrajectory.setLocalOrigin(mcTrack.back().getRecoPos3D());
-      mcTrack.setEndTrajectory3D(mcTrajectory);
-    } else {
-      mcTrack.setStartTrajectory3D(mcTrajectory);
-      mcTrack.setEndTrajectory3D(mcTrajectory);
-    }
   }
 
   return mcTracks;
@@ -215,7 +223,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
       simpleSimHitsInLayer = createHitsForLayer(closestWire, globalHelix, arcLength2DOffset);
 
       for (SimpleSimHit& simpleSimHit : simpleSimHitsInLayer) {
-        if (simpleSimHit.arcLength2D < maxArcLength2D) {
+        if (simpleSimHit.m_arcLength2D < maxArcLength2D) {
           simpleSimHits.push_back(simpleSimHit);
         }
       }
@@ -244,7 +252,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
         // Check again if the wire has been hit before
         bool wireAllReadyHit = false;
         for (const SimpleSimHit& simpleSimHit : simpleSimHits) {
-          if (simpleSimHit.wireHit.hasWire(closestWire)) {
+          if (simpleSimHit.m_wireHit.hasWire(closestWire)) {
             wireAllReadyHit = true;
           }
         }
@@ -253,7 +261,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
             createHitsForLayer(closestWire, globalHelix, arcLength2DOffset);
 
           for (SimpleSimHit& simpleSimHit : secondSimpleSimHitsInLayer) {
-            if (simpleSimHit.arcLength2D < maxArcLength2D) {
+            if (simpleSimHit.m_arcLength2D < maxArcLength2D) {
               simpleSimHits.push_back(simpleSimHit);
             }
           }
@@ -273,7 +281,7 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
   std::vector<SimpleSimHit> result;
 
   SimpleSimHit simpleSimHit = createHitForCell(nearWire, globalHelix, arcLength2DOffset);
-  if (not std::isnan(simpleSimHit.wireHit.getRefDriftLength())) {
+  if (not std::isnan(simpleSimHit.m_wireHit.getRefDriftLength())) {
     result.push_back(simpleSimHit);
   }
 
@@ -281,8 +289,8 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
   const CDCWire* ccwWire = nearWire.getNeighborCCW();
   while (true) {
     SimpleSimHit simpleSimHitForWire = createHitForCell(*ccwWire, globalHelix, arcLength2DOffset);
-    if (std::isnan(simpleSimHitForWire.arcLength2D) or
-        std::isnan(simpleSimHitForWire.trueDriftLength)) {
+    if (std::isnan(simpleSimHitForWire.m_arcLength2D) or
+        std::isnan(simpleSimHitForWire.m_trueDriftLength)) {
       break;
     }
     result.push_back(simpleSimHitForWire);
@@ -293,8 +301,8 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
   const CDCWire* cwWire = nearWire.getNeighborCW();
   while (true) {
     SimpleSimHit simpleSimHitForWire = createHitForCell(*cwWire, globalHelix, arcLength2DOffset);
-    if (std::isnan(simpleSimHitForWire.arcLength2D) or
-        std::isnan(simpleSimHitForWire.trueDriftLength)) {
+    if (std::isnan(simpleSimHitForWire.m_arcLength2D) or
+        std::isnan(simpleSimHitForWire.m_trueDriftLength)) {
       break;
     }
     result.push_back(simpleSimHitForWire);
@@ -367,3 +375,236 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
   };
 }
 
+
+std::vector<Belle2::TrackFindingCDC::CDCTrack>
+CDCSimpleSimulation::loadPreparedEvent() const
+{
+  const size_t nMCTracks = 2;
+  vector<SimpleSimHit> simpleSimHits;
+  simpleSimHits.reserve(128 + 64); // First plus second mc track
+
+  // First MC track
+  /////////////////////////////////////////////////////////////////////////////////////////////
+  size_t iMCTrack = 0;
+
+  // SL 6
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 4, 251), 0.104), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 4, 250), 0.272), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 4, 249), 0.488), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 4, 248), 0.764), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 247), 0.9), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 4, 247), 1.024), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 246), 0.64), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 245), 0.304), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 244), 0.012), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 243), 0.352), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 3, 242), 0.74), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 241), 0.46), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 240), 0.02), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 239), 0.46), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 238), 0.884), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 238), 1.104), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 237), 0.612), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 236), 0.12), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 235), 0.356), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 234), 0.884), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 0, 235), 1.032), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 0, 234), 0.52), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 0, 233), 0.06), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 0, 232), 0.62), iMCTrack, LEFT});
+
+  // SL 5
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 5, 206), 1.116), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 5, 205), 0.464), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 5, 204), 0.168), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 4, 204), 1.08), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 4, 203), 0.392), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 4, 202), 0.304), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 3, 201), 0.968), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 3, 200), 0.252), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 3, 199), 0.476), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 2, 199), 0.736), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 2, 198), 0.008), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 2, 197), 0.788), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 1, 197), 1.188), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 1, 196), 0.404), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 1, 195), 0.356), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 0, 195), 0.74), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 0, 194), 0.04), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 0, 193), 0.832), iMCTrack, LEFT});
+
+  // SL 4
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 5, 173), 0.692), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 5, 172), 0.22), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 5, 171), 1.132), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 4, 172), 0.816), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 4, 171), 0.136), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 4, 170), 1.048), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 3, 170), 0.884), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 3, 169), 0.032), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 3, 168), 0.96), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 2, 169), 0.972), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 2, 168), 0.044), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 2, 167), 0.872), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 1, 167), 1.004), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 1, 166), 0.1), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 1, 165), 0.828), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 0, 166), 1.004), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 0, 165), 0.084), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 0, 164), 0.82), iMCTrack, LEFT});
+
+  // SL 3
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 5, 145), 0.508), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 5, 144), 0.5), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 4, 145), 1.348), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 4, 144), 0.292), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 4, 143), 0.68), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 3, 143), 1.136), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 3, 142), 0.12), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 3, 141), 0.872), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 2, 142), 0.96), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 2, 141), 0.036), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 1, 140), 0.756), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 1, 139), 0.204), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 0, 139), 0.588), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 0, 138), 0.332), iMCTrack, LEFT});
+
+  // SL 2
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 5, 116), 1.1), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 5, 115), 0.008), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 5, 114), 1.048), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 4, 115), 0.712), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 4, 114), 0.316), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 3, 113), 0.428), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 3, 112), 0.572), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 2, 112), 0.188), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 2, 111), 0.776), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 1, 111), 0.92), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 1, 110), 0.024), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 1, 109), 0.928), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 0, 110), 0.776), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 0, 109), 0.116), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 0, 108), 0.992), iMCTrack, LEFT});
+
+  // SL 1
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 5, 87), 0.664), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 5, 86), 0.3), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 4, 86), 0.504), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 4, 85), 0.424), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 3, 85), 1.256), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 3, 84), 0.388), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 3, 83), 0.5), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 2, 84), 1.128), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 2, 83), 0.28), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 2, 82), 0.532), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 1, 82), 1.084), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 1, 81), 0.3), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 1, 80), 0.472), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 81), 1.124), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 80), 0.428), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 79), 0.296), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 78), 0.972), iMCTrack, LEFT});
+
+  // SL 0
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 7, 81), 0.192), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 7, 80), 0.452), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 6, 80), 0.596), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 6, 79), 0.024), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 6, 78), 0.66), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 5, 79), 0.388), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 5, 78), 0.184), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 4, 77), 0.296), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 4, 76), 0.244), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 3, 76), 0.268), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 3, 75), 0.212), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 2, 74), 0.316), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 2, 73), 0.112), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 2, 72), 0.588), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 1, 73), 0.464), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 1, 72), 0.028), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 0, 70), 0.284), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 0, 69), 0.088), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 0, 68), 0.416), iMCTrack, LEFT});
+
+  // Second MC track
+  /////////////////////////////////////////////////////////////////////////////////////////////
+  iMCTrack = 1;
+
+  // SL 0
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 1, 140), 0.308), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 2, 139), 0.08), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 3, 139), 0.16), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 4, 139), 0.404), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 4, 138), 0.38), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 5, 139), 0.132), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 6, 138), 0.108), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 7, 139), 0.48), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(0, 7, 138), 0.424), iMCTrack, RIGHT});
+
+  // SL 1
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 136), 0.532), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 0, 135), 0.452), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 1, 135), 0.396), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 2, 135), 0.26), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 1, 134), 0.64), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 3, 134), 0.092), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 4, 134), 0.16), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(1, 5, 133), 0.524), iMCTrack, RIGHT});
+
+  // SL 2
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 0, 163), 0.228), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 1, 162), 0.356), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 2, 163), 0.776), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 2, 162), 0.46), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 3, 162), 0.744), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 3, 161), 0.58), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 4, 162), 0.656), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 4, 161), 0.68), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 5, 161), 0.568), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(2, 5, 160), 0.812), iMCTrack, RIGHT});
+
+  // SL 3
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 0, 190), 0.54), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 1, 188), 0.688), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 2, 188), 0.656), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 3, 188), 0.664), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 3, 187), 0.68), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 4, 188), 0.724), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 4, 187), 0.656), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(3, 5, 186), 0.676), iMCTrack, RIGHT});
+
+  // SL 4
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 0, 211), 0.42), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 0, 210), 0.872), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 1, 210), 0.548), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 1, 209), 0.796), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 2, 210), 0.716), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 2, 209), 0.656), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 3, 209), 0.856), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 4, 209), 1.056), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 4, 208), 0.36), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(4, 5, 207), 0.232), iMCTrack, RIGHT});
+
+  // SL 5
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 0, 231), 0.224), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 0, 230), 1.088), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 1, 230), 0.452), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 1, 229), 0.912), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 2, 230), 0.72), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 2, 229), 0.632), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 3, 229), 1.016), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 3, 228), 0.34), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 4, 228), 0.04), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 5, 227), 0.22), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(5, 5, 226), 1.196), iMCTrack, RIGHT});
+
+  // SL 6
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 0, 254), 0.104), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 253), 0.504), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 1, 252), 0.78), iMCTrack, RIGHT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 253), 0.968), iMCTrack, LEFT});
+  simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 252), 0.332), iMCTrack, RIGHT});
+
+  vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
+  return mcTracks;
+}

@@ -41,12 +41,34 @@ namespace Belle2 {
     private:
       /// Structure to accomdate information about the individual hits.
       struct SimpleSimHit {
-        CDCWireHit wireHit;
-        size_t iMCTrack;
-        RightLeftInfo rlInfo;
-        Vector3D pos3D;
-        FloatType arcLength2D;
-        FloatType trueDriftLength;
+        SimpleSimHit(CDCWireHit wireHit,
+                     size_t iMCTrack,
+                     RightLeftInfo rlInfo) :
+          m_wireHit(wireHit),
+          m_iMCTrack(iMCTrack),
+          m_rlInfo(rlInfo)
+        {;}
+
+        SimpleSimHit(CDCWireHit wireHit,
+                     size_t iMCTrack,
+                     RightLeftInfo rlInfo,
+                     Vector3D pos3D,
+                     FloatType arcLength2D = NAN,
+                     FloatType trueDriftLength = NAN) :
+          m_wireHit(wireHit),
+          m_iMCTrack(iMCTrack),
+          m_rlInfo(rlInfo),
+          m_pos3D(pos3D),
+          m_arcLength2D(arcLength2D),
+          m_trueDriftLength(trueDriftLength)
+        {;}
+
+        CDCWireHit m_wireHit;
+        size_t m_iMCTrack;
+        RightLeftInfo m_rlInfo;
+        Vector3D m_pos3D  = m_wireHit.getRefPos3D();
+        FloatType m_arcLength2D = NAN;
+        FloatType m_trueDriftLength = NAN;
       };
 
     public:
@@ -71,7 +93,16 @@ namespace Belle2 {
       Belle2::TrackFindingCDC::CDCTrack
       simulate(const Belle2::TrackFindingCDC::CDCTrajectory3D& trajectory3D);
 
+      /// Fills the CDCWireHitTopology with a hard coded event from the real simulation.
+      std::vector<Belle2::TrackFindingCDC::CDCTrack>
+      loadPreparedEvent() const;
+
     private:
+      /// Creates CDCWireHits in the CDCWireHitTopology and uses them to construct the true CDCTracks.
+      std::vector<Belle2::TrackFindingCDC::CDCTrack>
+      constructMCTracks(size_t nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const;
+
+      /// Generate hits for the given helix in starting from the two dimensional arc length.
       std::vector<SimpleSimHit>
       createHits(const Helix& globalHelix,
                  const FloatType& arcLength2DOffset) const;

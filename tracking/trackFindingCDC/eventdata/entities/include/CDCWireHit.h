@@ -137,6 +137,10 @@ namespace Belle2 {
       const Vector2D& getRefPos2D() const
       { return getWire().getRefPos2D(); }
 
+      /// The three dimensional reference position of the underlying wire
+      const Vector3D& getRefPos3D() const
+      { return getWire().getRefPos3D(); }
+
       /// The distance from the beam line at reference position of the underlying wire
       FloatType getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }

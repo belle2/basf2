@@ -7,64 +7,40 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
-
-#include <gtest/gtest.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_straight)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_straight)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   Helix straightOriginLine(0, 0, 0, 0, 0);
-
-  CDCTrajectory3D straightTrajectory(straightOriginLine);
-  CDCTrack mcTrack = simpleSimulation.simulate(straightTrajectory);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  plotter.draw(mcTrack);
-  plotter.save("straight.svg");
+  simulate({straightOriginLine});
+  saveDisplay("straight.svg");
 }
 
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_high)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_high)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   Helix lowCurvOriginHelix(0.015, 0, 0, 1, 0);
+  simulate({lowCurvOriginHelix});
 
-  CDCTrajectory3D straightTrajectory(lowCurvOriginHelix);
-  CDCTrack mcTrack = simpleSimulation.simulate(straightTrajectory);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  for (CDCRecoHit3D& recoHit3D : mcTrack) {
+  for (const CDCRecoHit3D& recoHit3D : m_mcTracks[0]) {
     EventDataPlotter::AttributeMap rl {{"stroke", recoHit3D.getRLInfo() == RIGHT ? "green" : "red"}};
-    plotter.draw(recoHit3D, rl);
+    draw(recoHit3D, rl);
   }
-  plotter.save("low.svg");
+
+  saveDisplay("low.svg");
 }
 
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_cosmic)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   Helix straightOffOriginLine(0, 1, 20, 1, 75);
   double outerWallR = CDCWireTopology::getInstance().getOuterCylindricalR();
   double arcLengthToOuterWall =
@@ -74,56 +50,28 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSim
   CDCTrajectory3D cosmicTrajectory(straightOffOriginLine);
   cosmicTrajectory.setLocalOrigin(startPoint);
 
-  CDCTrack mcTrack = simpleSimulation.simulate(cosmicTrajectory);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  plotter.draw(mcTrack);
-  plotter.save("cosmic.svg");
+  simulate({cosmicTrajectory});
+  saveDisplay("cosmic.svg");
 }
 
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_curl)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_curl)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   Helix highCurvOriginHelix(0.02, 1, 0, 0.5, 0);
-
-  CDCTrajectory3D straightTrajectory(highCurvOriginHelix);
-  CDCTrack mcTrack = simpleSimulation.simulate(straightTrajectory);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  plotter.draw(mcTrack);
-  plotter.save("curl.svg");
+  simulate({highCurvOriginHelix});
+  saveDisplay("curl.svg");
 }
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_secondary_curl)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_secondary_curl)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   Helix highCurvOffOriginHelix(0.02, 1, -30, 0.2, 0);
-
-  CDCTrajectory3D straightTrajectory(highCurvOffOriginHelix);
-  CDCTrack mcTrack = simpleSimulation.simulate(straightTrajectory);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  plotter.draw(mcTrack);
-  plotter.save("secondary_curl.svg");
+  simulate({highCurvOffOriginHelix});
+  saveDisplay("secondary_curl.svg");
 }
 
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_photon_conversion)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_photon_conversion)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-
   // Should probably be placed at a vxd ladder
   Vector3D vertex(1.0, 0.0, 0.0);
   Vector3D momentum(1.0, 0.0, 0.0);
@@ -131,19 +79,11 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSim
   CDCTrajectory3D electronTrajectory(vertex, momentum, -1, 1.5);
   CDCTrajectory3D positronTrajectory(vertex, momentum, 1, 1.5);
 
-  std::vector<CDCTrajectory3D> trajectories{electronTrajectory, positronTrajectory};
-
-  std::vector<CDCTrack> mcTracks = simpleSimulation.simulate(trajectories);
-
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  for (CDCTrack& mcTrack : mcTracks) {
-    plotter.draw(mcTrack);
-  }
-  plotter.save("photon_conversion.svg");
+  simulate({electronTrajectory, positronTrajectory});
+  saveDisplay("photon_conversion.svg");
 }
 
-TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSimulation_cosmic_with_delay)
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic_with_delay)
 {
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -160,10 +100,31 @@ TEST_F(DISABLED_Long_TrackFindingCDCTestWithTopology, eventtopology_CDCSimpleSim
   CDCTrajectory3D cosmicTrajectory(straightOffOriginLine);
   cosmicTrajectory.setLocalOrigin(startPoint);
 
-  CDCTrack mcTrack = simpleSimulation.simulate(cosmicTrajectory);
 
-  EventDataPlotter plotter;
-  plotter.draw(CDCWireTopology::getInstance());
-  plotter.draw(mcTrack);
-  plotter.save("cosmic_with_delay.svg");
+  CDCTrack mcTrack = simpleSimulation.simulate(cosmicTrajectory);
+  draw(CDCWireTopology::getInstance());
+  draw(mcTrack);
+  saveDisplay("cosmic_with_delay.svg");
+}
+
+
+TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_prepared_event_rl_flags)
+{
+  std::string svgFileName = "rl_flags_prepared_event.svg";
+  loadPreparedEvent();
+
+  for (CDCTrack& track : m_mcTracks) {
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      const CDCRLWireHit& rlWireHit = recoHit3D.getRLWireHit();
+      std::string color = "blue";
+      if (rlWireHit.getRLInfo() == RIGHT) {
+        color = "green";
+      } else if (rlWireHit.getRLInfo() == LEFT) {
+        color = "red";
+      }
+      EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
+      draw(rlWireHit.getWireHit(), strokeAttr);
+    }
+  }
+  saveDisplay(svgFileName);
 }

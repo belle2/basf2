@@ -44,6 +44,41 @@ namespace Belle2 {
                            std::forward<T>(obj), static_cast<int>(0));
     }
 
+
+    /** Calls a getter function with the given object.
+     *  If the function can not be call with the argument the signature due to decltype
+     *  is invalid and the template instantiation is rejected (SFINAE)
+     *  In this case the other overload that does not call the function is selected. */
+    template<class Default, class Function, class T>
+    auto getIfApplicableImpl(Function&& function, T&& obj, Default /*value*/, int)
+    -> decltype(function(std::forward<T>(obj)), Default())
+    { return function(std::forward<T>(obj)); }
+
+    /** Implemenation that does not call the getter function with the object.
+     *  This implementation is selected with the function is not applicable and returns the
+     * provided default value
+     */
+    template<class Default, class Function, class T>
+    Default getIfApplicableImpl(Function&&, T&&, Default value, long)
+    { return value;}
+
+    /** Invokes a getter function with one argument obj, but only if the call is allowed.
+     *
+     *  If the call is not allowed return the default value.
+     *
+     *  Useful in static polymorphic situations where the injected base class
+     *  may or many not have a certain method and the derived class wants to override it.
+     *  To not completly shadow the method the derived class needs call it if present but
+     *  omit it if not.
+     */
+    template<class Default, class Function, class T>
+    Default getIfApplicable(Function&& function, T&& obj, Default value)
+    {
+      return getIfApplicableImpl<Default>(std::forward<Function>(function),
+                                          std::forward<T>(obj), value, static_cast<int>(0));
+    }
+
+
     /// Functor for clearing an object.
     struct ClearMethod {
       /// Function to clear an object.

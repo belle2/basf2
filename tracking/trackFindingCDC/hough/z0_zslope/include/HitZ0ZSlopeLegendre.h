@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
         m_discreteZ0s = linspace<float>(z0LowerBound, z0UpperBound, nDiscreteZ0s);
-        std::pair<DiscreteZ0, DiscreteZ0> z0Range(DiscreteZ0::getRange(m_discreteZ0s));
+        std::array<DiscreteZ0, 2> z0Range(DiscreteZ0::getRange(m_discreteZ0s));
 
         // Setup three discrete values for the two dimensional curvature
         assert(m_discreteZSlopeWidth > m_discreteZSlopeOverlap);
@@ -75,7 +75,7 @@ namespace Belle2 {
 
 
         m_discreteZSlopes = linspace<float>(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
-        std::pair<DiscreteZSlope, DiscreteZSlope > zSlopeRange(DiscreteZSlope::getRange(m_discreteZSlopes));
+        std::array<DiscreteZSlope, 2> zSlopeRange(DiscreteZSlope::getRange(m_discreteZSlopes));
 
         // Compose the hough space
         m_z0ZSlopeHoughPlain = Z0ZSlopeBox(z0Range, zSlopeRange);

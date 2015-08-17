@@ -10,6 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/typedefs/SignType.h>
+#include <array>
+#include <algorithm>
 #include <cmath>
 
 namespace Belle2 {
@@ -47,6 +49,48 @@ namespace Belle2 {
         return std::isnan(n1) and std::isnan(n2) ?
                INVALID_SIGN :
                ((not(n1 <= 0) and not(n2 <= 0)) - (not(n1 >= 0) and not(n2 >= 0)));
+      }
+
+      /** Check if four values have a common sign.
+       *  Ignores nan values.
+       *  Returns PLUS if all signs are positive.
+       *  Returns MINUS if all signs are negative.
+       *  Returns ZERO for mixed signs.
+       */
+      template<std::size_t n>
+      static inline SignType commonSign(const std::array<float, n>& a)
+      {
+        return (std::all_of(a.begin(), a.end(), std::isnan) ?
+                INVALID_SIGN :
+        std::all_of(a.begin(), a.end(), [](const float & a) { return not(a <= 0); }) -
+        std::all_of(a.begin(), a.end(), [](const float & a) { return not(a >= 0); }));
+      }
+
+      /** Check if four values have a common sign.
+       *  Ignores nan values.
+       *  Returns PLUS if all signs are positive.
+       *  Returns MINUS if all signs are negative.
+       *  Returns ZERO for mixed signs.
+       */
+      static inline SignType commonSign(const std::array<float, 4>& a)
+      {
+        return (std::isnan(a[0]) and std::isnan(a[1]) and std::isnan(a[2]) and std::isnan(a[3])) ?
+               INVALID_SIGN :
+               (not(a[0] <= 0) and not(a[1] <= 0) and not(a[2] <= 0) and not(a[3] <= 0)) -
+               (not(a[0] >= 0) and not(a[1] >= 0) and not(a[2] >= 0) and not(a[3] >= 0));
+      }
+
+      /** Check if two values have a common sign.
+       *  Ignores nan values.
+       *  Returns PLUS if all signs are positive.
+       *  Returns MINUS if all signs are negative.
+       *  Returns ZERO for mixed signs.
+       */
+      static inline SignType commonSign(const std::array<float, 2>& a)
+      {
+        return std::isnan(a[0]) and std::isnan(a[1]) ?
+               INVALID_SIGN :
+               ((not(a[0] <= 0) and not(a[1] <= 0)) - (not(a[0] >= 0) and not(a[1] >= 0)));
       }
 
       /** Check if two values have a common sign.

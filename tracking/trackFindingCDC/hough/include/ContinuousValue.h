@@ -34,7 +34,7 @@ namespace Belle2 {
 
       /// Extract the range from an array providing the discrete values.
       static
-      std::pair<This, This> getRange(const Array& bounds)
+      std::array<This, 2> getRange(const Array& bounds)
       { return { This(bounds.front()), This(bounds.back()) }; }
 
     private:

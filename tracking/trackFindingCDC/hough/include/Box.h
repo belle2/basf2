@@ -15,7 +15,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tuple>
+#include <array>
 #include <algorithm>
 #include <assert.h>
 
@@ -75,9 +75,9 @@ namespace Belle2 {
       typedef GenIndices<c_nTypes> Indices;
 
       /// Initialise the box with bound in each dimension.
-      Box(const std::pair<FirstType, FirstType>& firstBound,
-          const std::pair<SubordinaryTypes, SubordinaryTypes>& ... subordinaryBounds) :
-        m_firstBounds{std::minmax(firstBound.first, firstBound.second)},
+      Box(const std::array<FirstType, 2>& firstBound,
+          const std::array<SubordinaryTypes, 2>& ... subordinaryBounds) :
+        m_firstBounds{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])},
         m_subordinaryBox(subordinaryBounds...)
       {;}
 
@@ -85,16 +85,17 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const This& box)
       {
         return output <<
-               "Range from " << box.m_firstBounds.first <<
-               " to " << box.m_firstBounds.second << std::endl <<
+               "Range from " << box.m_firstBounds[0] <<
+               " to " << box.m_firstBounds[1] << std::endl <<
                box.getSubordinaryBox();
       }
 
       /// Set bounds of the box to new values
-      void setBounds(std::pair<FirstType, FirstType> firstBound,
-                     std::pair<SubordinaryTypes, SubordinaryTypes>... subordinaryBounds)
+      void setBounds(std::array<FirstType, 2> firstBounds,
+                     std::array<SubordinaryTypes, 2>... subordinaryBounds)
       {
-        m_firstBounds = std::minmax(firstBound.first, firstBound.second);
+        m_firstBounds[0] = std::min(firstBounds[0], firstBounds[1]);
+        m_firstBounds[1] = std::max(firstBounds[0], firstBounds[1]);
         m_subordinaryBox.setBounds(subordinaryBounds...);
       }
 
@@ -105,7 +106,7 @@ namespace Belle2 {
       /// Get the lower bound of the box in the coordinate I - first coordinate case
       template<std::size_t I>
       const EnableIf<I == 0, Type<I> >& getLowerBound() const
-      { return m_firstBounds.first; }
+      { return m_firstBounds[0]; }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
@@ -125,7 +126,7 @@ namespace Belle2 {
       /// Get the upper bound of the box in the coordinate I
       template<std::size_t I>
       const EnableIf<I == 0, Type<I> >& getUpperBound() const
-      { return m_firstBounds.second; }
+      { return m_firstBounds[1]; }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
@@ -141,6 +142,26 @@ namespace Belle2 {
       const EnableIf< HasType<T>::value, T>&
       getUpperBound() const
       { return getUpperBound< TypeIndex<T>::value > (); }
+
+      /// Get the bounds of the box in the coordinate I - first coordinate case
+      template<std::size_t I>
+      const EnableIf< I == 0, std::array<Type<I>, 2> >& getBounds() const
+      { return m_firstBounds; }
+
+      /// Get the bounds of the box in the coordinate I - subordinary coordinate case
+      template<std::size_t I>
+      const EnableIf < I != 0, std::array<Type<I>, 2> > & getBounds() const
+      {
+        static_assert(I < c_nTypes,
+                      "Accessed index exceeds number of coordinates");
+        return m_subordinaryBox.template getBounds < I - 1 > ();
+      }
+
+      /// Get the bounds of the box by the type of the coordinate.
+      template<class T>
+      const EnableIf< HasType<T>::value, std::array<T, 2> >&
+      getBounds() const
+      { return getBounds< TypeIndex<T>::value > (); }
 
       /// Get the difference of upper and lower bound
       template<std::size_t I>
@@ -158,12 +179,11 @@ namespace Belle2 {
 
       /// Get the lower partition in the coordinate I
       template<std::size_t I>
-      std::pair<Type<I>, Type<I> >
+      std::array<Type<I>, 2 >
       getDivisionBounds(size_t nDivisions, size_t iDivision) const
       {
         assert(nDivisions > iDivision);
-        return std::make_pair(getDivision<I>(nDivisions, iDivision),
-                              getDivision<I>(nDivisions, iDivision + 1));
+        return {getDivision<I>(nDivisions, iDivision), getDivision<I>(nDivisions, iDivision + 1)};
       }
 
       /// Get for the distance between two division bounds with overlap.
@@ -193,14 +213,14 @@ namespace Belle2 {
 
       /// Get the lower partition in the coordinate I
       template<std::size_t I>
-      std::pair<Type<I>, Type<I> >
+      std::array<Type<I>, 2 >
       getDivisionBoundsWithOverlap(const Width<I>& overlap,
                                    size_t nDivisions,
                                    size_t iDivision) const
       {
         assert(nDivisions > iDivision);
-        return std::make_pair(getLowerDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision),
-                              getUpperDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision));
+        return {getLowerDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision),
+                getUpperDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision)};
       }
 
       /// Get the center of the box in the coordinate I
@@ -208,19 +228,14 @@ namespace Belle2 {
       Type<I> getCenter() const
       { return getDivision<I>(2, 1); }
 
-      /// Get the bounds of the box in the coordinate I
-      template<std::size_t I>
-      std::pair<Type<I>, Type<I> > getBounds() const
-      { return std::make_pair(getLowerBound<I>(), getUpperBound<I>()); }
-
       /// Get the lower partition in the coordinate I
       template<std::size_t I>
-      std::pair<Type<I>, Type<I> > getLowerHalfBounds() const
+      std::array<Type<I>, 2> getLowerHalfBounds() const
       { return getDivisionBounds(2, 0); }
 
       /// Get the upper partition in the coordinate I
       template<std::size_t I>
-      std::pair<Type<I>, Type<I> > getUpperHalfBounds() const
+      std::array<Type<I>, 2> getUpperHalfBounds() const
       { return getDivisionBounds(2, 1); }
 
       /// Indicate if the given value is in the range of the coordinate I
@@ -281,7 +296,7 @@ namespace Belle2 {
 
     private:
       /// Bound in the first coordindate
-      std::pair<FirstType, FirstType> m_firstBounds;
+      std::array<FirstType, 2> m_firstBounds;
 
       /// Box in the other coordinate
       Box<SubordinaryTypes... > m_subordinaryBox;

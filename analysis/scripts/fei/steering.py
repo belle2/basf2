@@ -225,10 +225,10 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
             dag.add('RawParticleList_' + particle.identifier, provider.SelectParticleList,
                     particleName='Name_' + particle.identifier,
                     particleLabel='Label_' + particle.identifier,
-                    userCut='UserCut_' + particle.identifier,
-                    mvaTarget='MVATarget_' + particle.identifier)
+                    userCut='UserCut_' + particle.identifier)
             dag.add('MatchedParticleList_' + particle.identifier, provider.MatchParticleList,
-                    particleList='RawParticleList_' + particle.identifier)
+                    particleList='RawParticleList_' + particle.identifier,
+                    mvaTarget='MVATarget_' + particle.identifier)
         else:
             # Reconstruct every channel
             for channel in particle.channels:
@@ -237,10 +237,10 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
                         daughterParticleLists=['ParticleList_' + daughter for daughter in channel.daughters],
                         preCut='PreCut_' + channel.name,
                         userCut='UserCut_' + channel.name,
-                        decayModeID='DecayModeID_' + channel.name,
-                        mvaTarget='MVATarget_' + particle.identifier)
+                        decayModeID='DecayModeID_' + channel.name)
                 dag.add('MatchedParticleList_' + channel.name, provider.MatchParticleList,
-                        particleList='RawParticleList_' + channel.name)
+                        particleList='RawParticleList_' + channel.name,
+                        mvaTarget='MVATarget_' + channel.name)
 
         # Copy all channel lists into a single particle list
         dag.add('ParticleList_' + particle.identifier, provider.CopyParticleLists,

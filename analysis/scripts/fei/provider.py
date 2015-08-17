@@ -68,55 +68,58 @@ def LoadGeometry(resource):
     resource.path.add_module(geometry)
 
 
-def SelectParticleList(resource, particleName, particleLabel, userCut, mvaTarget):
+def SelectParticleList(resource, particleName, particleLabel, userCut):
     """
     Creates a ParticleList gathering up all Particles with the given particleName
         @param resource object
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param userCut user defined cut
-        @param mvaTarget target variable which determines signal and background
         @return name of ParticleList
     """
     resource.cache = True
     particleList = particleName + ':' + resource.hash
 
+    cut = ''
     if resource.env['ROE']:
-        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
         if userCut != '':
-            cut = '[' + userCut + '] and isInRestOfEvent > 0.5 and [' + specificCut + ']'
+            cut = '[' + userCut + '] and isInRestOfEvent > 0.5'
         else:
-            cut = 'isInRestOfEvent > 0.5 and [' + specificCut + ']'
+            cut = 'isInRestOfEvent > 0.5'
     else:
         if userCut != '':
             cut = userCut
-        else:
-            cut = ''
 
     modularAnalysis.fillParticleList(particleList, cut, writeOut=True, path=resource.path)
     return particleList
 
 
-def MatchParticleList(resource, particleList):
+def MatchParticleList(resource, particleList, mvaTarget):
     """
     Match MC truth of the given ParticleList
         @param resource object
         @param particleList raw ParticleList
         @return name of matched ParticleList
+        @param mvaTarget which distinguishs between signal and background
     """
     resource.cache = True
     if particleList is None:
         return
     resource.condition = ('EventType', '==0')
     modularAnalysis.matchMCTruth(particleList, path=resource.path)
+
+    cut = ''
+    if resource.env['ROE']:
+        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
+        cut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
+    modularAnalysis.applyCuts(particleList, cut, path=resource.path)
     # If the MatchedParticleList is different from the RawParticleList the CPU Statistics will work not correctly,
     # because the name of the MatchedParticleList is used to identify all modules which process this channel.
     # You have to fix this issue before changing the returned value in this function.
     return particleList
 
 
-def MakeParticleList(resource, particleName, daughterParticleLists, preCut, userCut, decayModeID, mvaTarget):
+def MakeParticleList(resource, particleName, daughterParticleLists, preCut, userCut, decayModeID):
     """
     Creates a ParticleList by combining other ParticleLists via the ParticleCombiner module.
         @param resource object
@@ -126,30 +129,20 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, user
                before the combination of the daughter particles.
         @param userCut user-defined cut
         @param decayModeID integer ID of this decay channel, added to extra-info of Particles
-        @param mvaTarget which distinguishs between signal and background
         @return name of new ParticleList
     """
     resource.cache = True
     if preCut is None:
         return
 
-    if resource.env['ROE']:
-        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
-        cut = '[' + specificCut + ']'
-        if userCut != '':
-            cut += ' and [' + userCut + ']'
-        if preCut['cutstring'] != '':
-            cut += ' and [' + preCut['cutstring'] + ']'
+    if userCut != '' and preCut['cutstring'] != '':
+        cut = '[' + preCut['cutstring'] + '] and [' + userCut + ']'
+    elif userCut != '':
+        cut = userCut
+    elif preCut['cutstring'] != '':
+        cut = preCut['cutstring']
     else:
-        if userCut != '' and preCut['cutstring'] != '':
-            cut = '[' + preCut['cutstring'] + '] and [' + userCut + ']'
-        elif userCut != '':
-            cut = userCut
-        elif preCut['cutstring'] != '':
-            cut = preCut['cutstring']
-        else:
-            cut = ''
+        cut = ''
     particleList = particleName + ':' + resource.hash
     decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
     modularAnalysis.reconstructDecay(decayString, cut, decayModeID, writeOut=True, path=resource.path)
@@ -254,21 +247,12 @@ def CreatePreCutHistogram(resource, particleName, channelName, mvaTarget, preCut
     if os.path.isfile(filename):
         return (filename, particleName + ':' + resource.hash)
 
-    if resource.env['ROE']:
-        sigmc = 'eventCached(countInList(' + resource.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1))'
-        specificCut = '[{sigmc} > 0 and {target} == 1] or {sigmc} == 0'.format(sigmc=sigmc, target=mvaTarget)
-        cut = '[' + specificCut + ']'
-        if userCut != '':
-            cut += ' and [' + userCut + ']'
-    else:
-        cut = userCut
-
     outputList = particleName + ':' + resource.hash + ' ==> ' + ' '.join(daughterParticleLists)
     pmake = register_module('PreCutHistMaker')
     pmake.set_name('PreCutHistMaker_{c}'.format(c=channelName))
     pmake.param('fileName', filename)
     pmake.param('decayString', outputList)
-    pmake.param('cut', cut)
+    pmake.param('cut', userCut)
     pmake.param('target', mvaTarget)
     pmake.param('variable', preCutConfig.variable)
     if isinstance(preCutConfig.binning, tuple):

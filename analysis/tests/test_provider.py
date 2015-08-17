@@ -134,11 +134,11 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleListInROE(self):
         # Set environment to ROE
-        self.resource.env['ROE'] = True
+        self.resource.env['ROE'] = 'B+'
         # Returns name of ParticleList
         self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', 'eid > 0.2'), 'e+:42')
         # Enables caching
-        result = MockResource(env={'ROE': True}, cache=True)
+        result = MockResource(env={'ROE': 'B+'}, cache=True)
         # Adds ParticleLoader with cut
         result.path.add_module('ParticleLoader',
                                decayStringsWithCuts=[('e+:42', '[eid > 0.2] and isInRestOfEvent > 0.5')], writeOut=True)
@@ -146,11 +146,11 @@ class TestSelectParticleList(unittest.TestCase):
 
     def test_SelectParticleListInROEWithoutCut(self):
         # Set environment to ROE
-        self.resource.env['ROE'] = True
+        self.resource.env['ROE'] = 'B+'
         # Returns name of ParticleList
         self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', ''), 'e+:42')
         # Enables caching
-        result = MockResource(env={'ROE': True}, cache=True)
+        result = MockResource(env={'ROE': 'B+'}, cache=True)
         # Adds ParticleLoader with cut
         result.path.add_module('ParticleLoader',
                                decayStringsWithCuts=[('e+:42', 'isInRestOfEvent > 0.5')], writeOut=True)
@@ -160,22 +160,37 @@ class TestSelectParticleList(unittest.TestCase):
 class TestMatchParticleList(unittest.TestCase):
 
     def setUp(self):
-        self.resource = MockResource()
+        self.resource = MockResource(env={'ROE': False})
 
     def test_MatchParticleList(self):
         # Returns name of ParticleList
-        self.assertEqual(MatchParticleList(self.resource, 'e+:generic'), 'e+:generic')
+        self.assertEqual(MatchParticleList(self.resource, 'e+:generic', 'isSignal'), 'e+:generic')
         # Enables caching and MC-data condition
-        result = MockResource(cache=True, condition=('EventType', '==0'))
+        result = MockResource(env={'ROE': False}, cache=True, condition=('EventType', '==0'))
         # Adds MCMatching for given particle List
         result.path.add_module('MCMatching', listName='e+:generic')
+        result.path.add_module('ParticleSelector', decayString='e+:generic', cut='')
+        self.assertEqual(self.resource, result)
+
+    def test_MatchParticleListInROE(self):
+        # Set environment to ROE
+        self.resource.env['ROE'] = 'B+'
+        # Returns name of ParticleList
+        self.assertEqual(MatchParticleList(self.resource, 'e+:generic', 'isSignal'), 'e+:generic')
+        # Enables caching and MC-data condition
+        result = MockResource(env={'ROE': 'B+'}, cache=True, condition=('EventType', '==0'))
+        # Adds MCMatching for given particle List
+        cut = '[eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) > 0 and isSignal == 1] or '
+        cut += 'eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) == 0'
+        result.path.add_module('MCMatching', listName='e+:generic')
+        result.path.add_module('ParticleSelector', decayString='e+:generic', cut=cut)
         self.assertEqual(self.resource, result)
 
     def test_MatchParticleListWithNone(self):
         # Returns None if given ParticleList is None
-        self.assertEqual(MatchParticleList(self.resource, None), None)
+        self.assertEqual(MatchParticleList(self.resource, None, 'isSignal'), None)
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(env={'ROE': False}, cache=True)
         self.assertEqual(self.resource, result)
 
 

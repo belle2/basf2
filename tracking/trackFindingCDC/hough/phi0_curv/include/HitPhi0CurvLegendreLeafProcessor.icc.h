@@ -71,8 +71,8 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   double phi0Precision = PI / (pow(2., levelPrecision + 1));
 
   // Make a hough space box with the determined precision
-  DiscreteCurvatureArray curvBounds(curv - curvPrecision, curv + curvPrecision, 2);
-  DiscreteAngleArray phi0Bounds(phi0 - phi0Precision, phi0 + phi0Precision, 2);
+  DiscreteCurvArray curvBounds(curv - curvPrecision, curv + curvPrecision, 2);
+  DiscretePhi0Array phi0Bounds(phi0 - phi0Precision, phi0 + phi0Precision, 2);
   Phi0CurvBox precisionPhi0CurvBox(phi0Bounds.getRange(), curvBounds.getRange());
 
   // Acquire all available items

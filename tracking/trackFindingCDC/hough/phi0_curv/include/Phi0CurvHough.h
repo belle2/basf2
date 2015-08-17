@@ -9,6 +9,9 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/perigee/DiscretePhi0.h>
+#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
+
 #include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 #include <tracking/trackFindingCDC/hough/DiscreteAngles.h>
@@ -54,32 +57,31 @@ namespace Belle2 {
       {
         // Setup the discrete values for phi0
         const size_t nPhi0Bins = std::pow(phi0Divisions, m_maxLevel);
-        m_discretePhi0s = DiscreteAngleArray::forBinsWithOverlaps(nPhi0Bins,
-                                                                  m_discretePhi0Width,
-                                                                  m_discretePhi0Overlap);
+        m_discretePhi0s = DiscretePhi0Array::forBinsWithOverlaps(nPhi0Bins,
+                                                                 m_discretePhi0Width,
+                                                                 m_discretePhi0Overlap);
 
         // Setup the discrete values for the two dimensional curvature
         assert(m_discreteCurvWidth > m_discreteCurvOverlap);
         const size_t nCurvBins = std::pow(curvDivisions, m_maxLevel);
         if (m_minCurv == 0) {
           m_discreteCurvs =
-            DiscreteCurvatureArray::forPositiveCurvatureBinsWithOverlap(m_maxCurv,
-                nCurvBins,
-                m_discreteCurvWidth,
-                m_discreteCurvOverlap);
+            DiscreteCurvArray::forPositiveCurvBinsWithOverlap(m_maxCurv,
+                                                              nCurvBins,
+                                                              m_discreteCurvWidth,
+                                                              m_discreteCurvOverlap);
         } else {
           m_discreteCurvs =
-            DiscreteCurvatureArray::forCurvatureBinsWithOverlap(m_minCurv,
-                                                                m_maxCurv,
-                                                                nCurvBins,
-                                                                m_discreteCurvWidth,
-                                                                m_discreteCurvOverlap);
+            DiscreteCurvArray::forCurvBinsWithOverlap(m_minCurv,
+                                                      m_maxCurv,
+                                                      nCurvBins,
+                                                      m_discreteCurvWidth,
+                                                      m_discreteCurvOverlap);
         }
 
         // Compose the hough space
-        std::pair<DiscreteAngle, DiscreteAngle> phi0Range(m_discretePhi0s.getRange());
-        std::pair<DiscreteCurvature, DiscreteCurvature > curvRange(m_discreteCurvs.getRange());
-        Phi0CurvBox phi0CurvHoughPlain(phi0Range, curvRange);
+        Phi0CurvBox phi0CurvHoughPlain(m_discretePhi0s.getRange(), m_discreteCurvs.getRange());
+
 
         Phi0CurvBox::Delta phi0CurvOverlaps{m_discretePhi0Overlap, m_discreteCurvOverlap};
         Phi0CurvBoxDivision phi0CurvBoxDivision(phi0CurvOverlaps);
@@ -162,10 +164,10 @@ namespace Belle2 {
 
       // Dummy initialisation of the other constructs
       /// Space for the discrete values that mark the usable bin bound in phi0
-      DiscreteAngleArray m_discretePhi0s{NAN, NAN, 1};
+      DiscretePhi0Array m_discretePhi0s{NAN, NAN, 1};
 
       /// Space for the discrete values that mark the usable bin bound in the curvature
-      DiscreteCurvatureArray m_discreteCurvs{NAN, NAN, 1};
+      DiscreteCurvArray m_discreteCurvs{NAN, NAN, 1};
 
       /// Dynamic hough tree structure traversed in the leave search.
       std::unique_ptr<Phi0CurvFastHoughTree> m_phi0CurvFastHoughTree{nullptr};

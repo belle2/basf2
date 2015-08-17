@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
+#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -39,6 +40,14 @@ namespace Belle2 {
       /// Type of the coordinate I.
       template<size_t I>
       using Type = typename HoughBox::template Type<I>;
+
+      /// Predicate that the given type is indeed a coordinate of the hough space
+      template<class T>
+      using HasType = typename HoughBox::template HasType<T>;
+
+      /// Function to get the coordinate index from its type
+      template<class T>
+      using TypeIndex = typename HoughBox::template TypeIndex<T>;
 
       /// Type of the width in coordinate I.
       template<size_t I>
@@ -101,13 +110,26 @@ namespace Belle2 {
         B2INFO("Upper value " << array.back());
       }
 
-      /// Provide an externally constructed array
+      /// Provide an externally constructed array by coordinate index
       template<size_t I>
-      void assignArray(Array<I> array, Width<I> overlap)
+      void
+      assignArray(Array<I> array, Width<I> overlap)
       {
-        // Double move assignment
+        // Double move assignment idiom
         std::get<I>(m_arrays) = std::move(array);
         std::get<I>(m_overlaps) = overlap;
+      }
+
+      /// Provide an externally constructed array by coordinate type
+      template<class T>
+      EnableIf< HasType<T>::value, void>
+      assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap)
+      {
+        // Double move assignment idiom
+        // Double move assignment idiom
+        std::get<TypeIndex<T>::value >(m_arrays) = std::move(array);
+        std::get<TypeIndex<T>::value >(m_overlaps) = overlap;
+
       }
 
     public:

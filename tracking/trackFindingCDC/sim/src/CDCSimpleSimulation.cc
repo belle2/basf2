@@ -318,25 +318,30 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
                                       const Helix& globalHelix,
                                       const FloatType& arcLength2DOffset) const
 {
-  double arclength2D = globalHelix.arcLength2DToXY(wire.getRefPos2D());
-  if ((arclength2D + arcLength2DOffset) < 0) {
-    arclength2D += globalHelix.perimeterXY();
+  double arcLength2D = globalHelix.arcLength2DToXY(wire.getRefPos2D());
+  if ((arcLength2D + arcLength2DOffset) < 0) {
+    arcLength2D += globalHelix.perimeterXY();
   }
 
-  Vector3D pos3D = globalHelix.atArcLength2D(arclength2D);
+  Vector3D pos3D = globalHelix.atArcLength2D(arcLength2D);
 
-  // Iterate the extrapolation once more to the stereo shifted position.
-  const Vector2D correctedWirePos = wire.getWirePos2DAtZ(pos3D.z());
-  double correctedArcLength2D = globalHelix.arcLength2DToXY(correctedWirePos);
+  Vector3D correctedPos3D = pos3D;
+  Vector2D correctedWirePos(wire.getWirePos2DAtZ(correctedPos3D.z()));
+  double correctedArcLength2D = arcLength2D;
 
-  if ((correctedArcLength2D + arcLength2DOffset) < 0) {
-    correctedArcLength2D += globalHelix.perimeterXY();
+  for (int iIter = 0; iIter < 2; iIter++) {
+    // Iterate the extrapolation to the stereo shifted position.
+    correctedWirePos = wire.getWirePos2DAtZ(correctedPos3D.z());
+    correctedArcLength2D = globalHelix.arcLength2DToXY(correctedWirePos);
+
+    if ((correctedArcLength2D + arcLength2DOffset) < 0) {
+      correctedArcLength2D += globalHelix.perimeterXY();
+    }
+    correctedPos3D = globalHelix.atArcLength2D(correctedArcLength2D);
   }
-
-  Vector3D correctedPos3D = globalHelix.atArcLength2D(correctedArcLength2D);
 
   const double trueDriftLength = wire.getDriftLength(correctedPos3D);
-  const double smearedDriftLength = trueDriftLength + gRandom->Gaus(0, m_driftLengthSigma) * 0;
+  const double smearedDriftLength = trueDriftLength + gRandom->Gaus(0, m_driftLengthSigma);
 
   double delayTime = getEventTime();
   if (m_addTOFDelay) {

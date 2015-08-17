@@ -47,9 +47,13 @@ namespace Belle2 {
       explicit operator const T& () const
       { return getValue(); }
 
-      // Comparision operator to the discrete values.
+      /// Comparision operator to the discrete values.
       bool operator<(const T& rhs) const
       { return getValue() < rhs; }
+
+      /// Output operator for debugging
+      friend std::ostream& operator<<(std::ostream& output, const DiscreteValue<T>& discreteValue)
+      { return output << discreteValue.getValue(); }
 
       /// Advance to next discrete values
       DiscreteValue<T> operator+(const DifferenceType& advanceBy) const

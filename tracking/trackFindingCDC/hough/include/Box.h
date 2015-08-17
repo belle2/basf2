@@ -30,6 +30,10 @@ namespace Belle2 {
     public:
       /// Nothing to do on set bounds.
       void setBounds() {;}
+
+      /// Nothing to do on printing
+      friend std::ostream& operator<<(std::ostream& output, const Box<>&)
+      { return output; }
     };
 
     template<class FirstType_, class... SubordinaryTypes>
@@ -68,6 +72,15 @@ namespace Belle2 {
         m_firstBounds{std::minmax(firstBound.first, firstBound.second)},
         m_subordinaryBox(subordinaryBounds...)
       {;}
+
+      /// Output operator for debugging
+      friend std::ostream& operator<<(std::ostream& output, const This& box)
+      {
+        return output <<
+               "Range from " << box.m_firstBounds.first <<
+               " to " << box.m_firstBounds.second << std::endl <<
+               box.getSubordinaryBox();
+      }
 
       /// Set bounds of the box to new values
       void setBounds(std::pair<FirstType, FirstType> firstBound,

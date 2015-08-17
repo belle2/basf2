@@ -26,11 +26,14 @@ namespace Belle2 {
     /** A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
      *  divisions in each coordinate up to a maximal level. */
     template<class ItemPtr,
-             class HoughBox,
+             class HoughBox_,
              size_t ... divisions>
     class BoxDivisionHoughTree {
 
     public:
+      /// Type of the box in the hough space
+      using HoughBox = HoughBox_;
+
       /// Type of the box division strategy
       using BoxDivision = LinearDivision<HoughBox, divisions...>;
 

@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/hough/perigee/DiscretePhi0.h>
-#include <tracking/trackFindingCDC/hough/perigee/DiscreteCurv.h>
 #include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
+#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <tuple>
 #include <array>
@@ -37,6 +36,10 @@ namespace Belle2 {
       /// Type of the fast hough tree structure
       using HoughTree = WeightedFastHoughTree<ItemPtr, HoughBox, BoxDivision>;
 
+      /// Type of the coordinate I.
+      template<size_t I>
+      using Type = typename HoughBox::template Type<I>;
+
       /// Type of the width in coordinate I.
       template<size_t I>
       using Width = typename HoughBox::template Width<I>;
@@ -49,8 +52,7 @@ namespace Belle2 {
       template<class ... RangeSpecOverlap>
       BoxDivisionHoughTree(size_t maxLevel) :
         m_maxLevel(maxLevel),
-        m_overlaps((divisions * 0) ...),
-        m_arrays{ { -PI, PI, static_cast<size_t>(std::pow(divisions, m_maxLevel))} ... }
+        m_overlaps((divisions * 0) ...)
       {;}
 
     private:
@@ -93,11 +95,10 @@ namespace Belle2 {
         std::get<I>(m_overlaps) = overlap;
 
         const Array<I>& array  = std::get<I>(m_arrays);
-        using ValueType = typename Array<I>::ValueType;
 
         B2INFO("Constructing array for coordinate " << I);
-        B2INFO("Lower value " << ValueType(array.front()));
-        B2INFO("Upper value " << ValueType(array.back()));
+        B2INFO("Lower value " << array.front());
+        B2INFO("Upper value " << array.back());
       }
 
       /// Provide an externally constructed array
@@ -153,7 +154,7 @@ namespace Belle2 {
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
       template<size_t ... Is>
       HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>&)
-      { return HoughBox{ HoughBox::template Type<Is>::getRange(getArray<Is>())... }; }
+      { return HoughBox(Type<Is>::getRange(getArray<Is>())...); }
 
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()

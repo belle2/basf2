@@ -11,6 +11,8 @@
 #include <valgrind/callgrind.h>
 #endif
 
+#include <framework/logging/Logger.h>
+
 #include <vector>
 #include <algorithm>
 #include <chrono>
@@ -27,13 +29,13 @@ namespace Belle2 {
       {;}
 
       /// Get the time of the individual executtions
-      double getSeconds(size_t iExecution)
+      double getSeconds(size_t iExecution) const
       {
         return m_timeSpans.at(iExecution).count();
       }
 
       /// Get the average execution time
-      double getAverageSeconds()
+      double getAverageSeconds() const
       {
         std::chrono::duration<double> sumTimeSpan =
           std::accumulate(m_timeSpans.begin(), m_timeSpans.end(), std::chrono::duration<double>());
@@ -43,8 +45,16 @@ namespace Belle2 {
       }
 
       /// Get number of executions
-      size_t getNExecutions()
+      size_t getNExecutions() const
       { return m_timeSpans.size(); }
+
+      /// Print a summary of the collected time to the console
+      void printSummary() const
+      {
+        B2INFO("First execution took " << getSeconds(0) << " seconds ");
+        B2INFO("On average execution took " << getAverageSeconds() << " seconds " <<
+               "in " << getNExecutions() << " executions.");
+      }
 
     private:
       /// Memory for the time spans a repeated execution took.

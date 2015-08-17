@@ -5,8 +5,8 @@
 # * Authors: Fernando Abudinen, Moritz Gelb  *
 # *.....     and Thomas Keck
 # * Contributor: Christian Roca
-# * This script is needed to test            *
-# * the previously trained flavor tagger.    *
+# * This script is needed to train           *
+# * and to test the flavor tagger.           *
 # ********************************************
 
 from basf2 import *
@@ -605,6 +605,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
                 signalClass=1,
                 method=methodsCombiner[0][0],
                 signalFraction=-1,
+                transformToProbability=False,
                 workingDirectory=workingDirectory,
                 path=path,
             )
@@ -650,6 +651,9 @@ def FlavorTagger(
 ):
     """
       Defines the whole flavor tagging process.
+      For each Rest of Event built in the steering file.
+      The flavor is predicted by Multivariate Methods trained with Variables and MetaVariables which use
+      Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
     """
 
     B2INFO('*** FLAVOR TAGGING ***')

@@ -66,5 +66,21 @@ namespace Belle2 {
     template<bool cond, class T>
     using EnableIf = typename std::enable_if<cond, T>::type;
 
+    /** Looks up, at which index the given Type can be found in a tuple.
+     *  Amounts to a type inheriting from std::integral_constant
+     */
+    template<class Type, class Tuple>
+    struct GetIndexInTuple {};
+
+    /// Specialisation for the case that the first type in the tuple is not the Type asked for. Recursion case.
+    template<class Type, class HeadType, class ... TailTypes>
+    struct GetIndexInTuple<Type, std::tuple<HeadType, TailTypes...> > :
+      std::integral_constant < std::size_t, GetIndexInTuple<Type, std::tuple<TailTypes...> >::value + 1 > {};
+
+    /// Specialisation for the case that the first type in the tuple is equal to the Type asked for. Recursion end.
+    template<class Type, class... TailTypes>
+    struct GetIndexInTuple <Type, std::tuple<Type, TailTypes...> > :
+      std::integral_constant< std::size_t, 0> {};
+
   } // end namespace TrackFindingCDC
 } // namespace Belle2

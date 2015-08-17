@@ -95,6 +95,12 @@ namespace Belle2 {
         return m_subordinaryBox.template getLowerBound < I - 1 > ();
       }
 
+      /// Get the lower bound of the box by the type of the coordinate.
+      template<class T>
+      const T& getLowerBound() const
+      { return getLowerBound< GetIndexInTuple<T, Point>::value > (); }
+
+
       /// Get the upper bound of the box in the coordinate I
       template<std::size_t I>
       const EnableIf<I == 0, Type<I> >& getUpperBound() const
@@ -108,6 +114,11 @@ namespace Belle2 {
                       "Accessed index exceeds number of coordinates");
         return m_subordinaryBox.template getUpperBound < I - 1 > ();
       }
+
+      /// Get the upper bound of the box by the type of the coordinate.
+      template<class T>
+      const T& getUpperBound() const
+      { return getUpperBound< GetIndexInTuple<T, Point>::value > (); }
 
       /// Get the difference of upper and lower bound
       template<std::size_t I>

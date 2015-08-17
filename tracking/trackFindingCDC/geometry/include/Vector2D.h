@@ -399,10 +399,15 @@ namespace Belle2 {
       void passiveMoveBy(const Vector2D& by)
       { subtract(by); }
 
-      /// Passivelly moves the vector inplace by the given vector
-      Vector2D passiveMovedBy(const Vector2D& by)
+      /// Returns a transformed vector passivelly moved by the given vector.
+      Vector2D passiveMovedBy(const Vector2D& by) const
       { return *this - by; }
 
+      /** Returns a transformed vector version rotated  by the given vector.
+       *  The rotated coordinates are such that the given phiVec becomes the new x axes.
+       *  @param phiVec *Unit* vector marking the x axes of the new rotated coordinate system*/
+      Vector2D passiveRotatedBy(const Vector2D& phiVec) const
+      { return Vector2D(unnormalizedParallelComp(phiVec), unnormalizedOrthogonalComp(phiVec)); }
 
 
       /// Getter for the x coordinate

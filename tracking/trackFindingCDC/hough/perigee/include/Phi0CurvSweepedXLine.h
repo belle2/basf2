@@ -66,33 +66,16 @@ namespace Belle2 {
 
         // Calculate (approximate) distances of the observed position to
         // the trajectories represented by the corners of the box
-        double dist[2][2];
+        float dist[2][2];
         dist[0][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[0] - signedDriftLength;
         dist[0][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[0] - signedDriftLength;
         dist[1][0] = rSquareTimesHalfCurv[0] + orthoToPhi0[1] - signedDriftLength;
         dist[1][1] = rSquareTimesHalfCurv[1] + orthoToPhi0[1] - signedDriftLength;
 
         // Ask if sinogram is completely outside the box.
-        const SignType passingSide = SameSignChecker::commonSign(dist[0][0], dist[0][1],
-                                                                 dist[1][0], dist[1][1]);
 
-        return passingSide;
-
-        // Currently disable and not ported to retain the sign.
-        // if (passingSide == ZERO) return ZERO;
-        // if (not m_refined) return passingSide;
-        // if (not m_refined) return false;
-        // // Continue to check if the extrema of the sinogram are in the box,
-        // // while only touching only one boundary of the box
-        // // (but not crossing two what the check above actually means).
-        // // Currently only checking the positive curvature branch correctly
-        // FloatType extremR = r - signedDriftLength;
-        // bool extremRInCurvRange = not SameSignChecker::sameSign(extremR * lowerCurv - 1, extremR * upperCurv - 1);
-        // if (not extremRInCurvRange) return false;
-
-        // Vector2D extremPhi0Vec = pos2D.orthogonal(CCW); // Not normalised but does not matter.
-        // bool extremPhi0VecInPhi0Range = extremPhi0Vec.isBetween(lowerPhi0Vec, upperPhi0Vec);
-        // return extremRInCurvRange and extremPhi0VecInPhi0Range;
+        return SameSignChecker::commonSign(SameSignChecker::commonSign(dist[0][0], dist[0][1]),
+                                           SameSignChecker::commonSign(dist[1][0], dist[1][1]));
       }
 
     public:

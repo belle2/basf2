@@ -203,10 +203,8 @@ namespace Belle2 {
                            const FloatType signedDriftLength)
       {
         const Vector2D& pos2D = wire.getRefPos2D();
-        //const FloatType& r = wire.getRefCylindricalR();
         const Vector2D& movePerZ = wire.getMovePerZ();
-        bool isIn = this->getDistanceSign(houghBox, pos2D, signedDriftLength, movePerZ) == ZERO; //c_ZeroSign;
-        //bool isIn = this->getDistanceSign(houghBox, pos2D, signedDriftLength) == ZERO;  //c_ZeroSign;
+        bool isIn = this->getDistanceSign(houghBox, pos2D, signedDriftLength, movePerZ) == ZERO;
         return isIn;
       }
 

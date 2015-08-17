@@ -179,7 +179,7 @@ namespace Belle2 {
       /// Sort the recoHits according to their perpS information
       void sortByPerpS()
       {
-        std::sort(m_items.begin(), m_items.end(), [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
+        std::stable_sort(m_items.begin(), m_items.end(), [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
           return recoHit.getPerpS() < otherRecoHit.getPerpS();
         });
       }

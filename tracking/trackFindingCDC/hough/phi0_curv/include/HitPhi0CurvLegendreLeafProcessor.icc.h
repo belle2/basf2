@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendreLeafProcessor.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/RLTagged.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/HitInPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 

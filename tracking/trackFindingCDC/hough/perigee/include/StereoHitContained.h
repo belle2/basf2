@@ -13,9 +13,9 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/RLTagged.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
-#include <tracking/trackFindingCDC/hough/phi0_curv/RLTagged.h>
 #include <tracking/trackFindingCDC/numerics/Sign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 

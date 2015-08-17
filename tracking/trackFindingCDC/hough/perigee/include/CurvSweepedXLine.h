@@ -55,10 +55,6 @@ namespace Belle2 {
         // Ask if sinogram is completely outside the box.
         return SameSignChecker::commonSign(lowerDist, upperDist);
       }
-
-    private:
-      /// The curvature above which the trajectory is considered a curler.
-      float m_curlCurv = NAN;
     };
 
   } // end namespace TrackFindingCDC

@@ -36,7 +36,7 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      SimpleHitBasedHough(size_t maxLevel, float curlCurv) :
+      SimpleHitBasedHough(size_t maxLevel, float curlCurv = NAN) :
         Super(maxLevel),
         m_curlCurv(curlCurv),
         m_stereoHitInSweeped(curlCurv)

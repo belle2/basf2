@@ -32,8 +32,8 @@ namespace Belle2 {
       // const double maxPhi0 = PI;
       // const double minPhi0 = -PI;
 
-      const size_t discretePhi0Overlap = 1;
-      const size_t discretePhi0Width = 3;
+      const size_t discretePhi0Overlap = 4;
+      const size_t discretePhi0Width = 5;
       const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
       const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                       discretePhi0Overlap,

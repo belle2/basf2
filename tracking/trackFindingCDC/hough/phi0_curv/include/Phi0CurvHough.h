@@ -76,11 +76,11 @@ namespace Belle2 {
         B2INFO("Curvature bin width " << discreteCurvs[m_discreteCurvWidth].getValue() - discreteCurvs[0].getValue());
         B2INFO("Curvature bin overlap " << discreteCurvs[m_discreteCurvOverlap].getValue() - discreteCurvs[0].getValue());
 
-        double phi0Width = discretePhi0s[m_discretePhi0Width].getAngle() - discretePhi0s[0].getAngle();
+        double phi0Width = discretePhi0s[m_discretePhi0Width]->phi() - discretePhi0s[0]->phi();
         // need modulo 2 * Pi because of the wrap around of the lowest bin.
         phi0Width = std::remainder(phi0Width, 2 * PI);
 
-        double phi0Overlap = discretePhi0s[m_discretePhi0Overlap].getAngleVec().phi() - discretePhi0s[0].getAngle();
+        double phi0Overlap = discretePhi0s[m_discretePhi0Overlap]->phi() - discretePhi0s[0]->phi();
         // need modulo 2 * Pi because of the wrap around of the lowest bin.
         phi0Overlap = std::remainder(phi0Overlap, 2 * PI);
 

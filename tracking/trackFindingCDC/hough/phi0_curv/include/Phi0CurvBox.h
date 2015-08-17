@@ -33,11 +33,11 @@ namespace Belle2 {
     public:
       /// Concise getter for the lower phi0 bound.
       const Vector2D& getLowerPhi0Vec() const
-      { return getLowerBound<0>().getAngleVec(); }
+      { return getLowerBound<0>().getValue(); }
 
       /// Concise getter for the upper phi0 bound.
       const Vector2D& getUpperPhi0Vec() const
-      { return getUpperBound<0>().getAngleVec(); }
+      { return getUpperBound<0>().getValue(); }
 
       /// Concise getter for the lower curvature bound.
       const float& getLowerCurv() const

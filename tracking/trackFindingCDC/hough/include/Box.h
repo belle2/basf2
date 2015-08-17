@@ -67,13 +67,6 @@ namespace Belle2 {
       typedef GenIndices<c_nTypes> Indices;
 
       /// Initialise the box with bound in each dimension.
-      Box(const std::array<FirstType, 2>& firstBound,
-          const std::array<SubordinaryTypes, 2>& ... subordinaryBounds) :
-        m_firstBounds{std::minmax(firstBound.front(), firstBound.back())},
-        m_subordinaryBox(subordinaryBounds...)
-      {;}
-
-      /// Initialise the box with bound in each dimension.
       Box(const std::pair<FirstType, FirstType>& firstBound,
           const std::pair<SubordinaryTypes, SubordinaryTypes>& ... subordinaryBounds) :
         m_firstBounds{std::minmax(firstBound.first, firstBound.second)},

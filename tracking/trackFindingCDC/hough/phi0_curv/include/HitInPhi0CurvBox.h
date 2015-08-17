@@ -9,20 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
-
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitIn.h>
 #include <tracking/trackFindingCDC/hough/perigee/Phi0CurvSweepedXLine.h>
-
-// #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
-// #include <tracking/trackFindingCDC/hough/phi0_curv/RLTagged.h>
-// #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
-
-#include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,7 +20,7 @@ namespace Belle2 {
      *  Note this part this code defines the performance of
      *  the search in the hough plain quite significantly and there is probably room for improvement.
      */
-    class HitInPhi0CurvBox : public StereoHitIn< Phi0CurvSweepedXLine > {
+    class HitInPhi0CurvBox : public StereoHitIn< OffOrigin<Phi0CurvSweepedXLine > > {
 
     public:
       /** Constructor taking a curvature below which the trajectory is specially treated as a non curler.
@@ -40,7 +29,7 @@ namespace Belle2 {
        *  Default is that arms are allowed to be joined together.
        */
       explicit HitInPhi0CurvBox(float curlCurv = NAN, float rlWeightGain = 0) :
-        StereoHitIn< Phi0CurvSweepedXLine >(fabs(curlCurv))
+        StereoHitIn< OffOrigin<Phi0CurvSweepedXLine > >(fabs(curlCurv))
       { setRLWeightGain(rlWeightGain); }
     };
 

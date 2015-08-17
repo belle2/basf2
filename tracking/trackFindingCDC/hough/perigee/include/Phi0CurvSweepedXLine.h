@@ -35,34 +35,31 @@ namespace Belle2 {
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
       inline SignType getDistanceSign(const HoughBox* phi0CurvBox,
-                                      const Vector2D& globalPos2D,
+                                      const Vector2D& pos2D,
                                       const double signedDriftLength,
                                       const Vector2D& /*movePerZ*/ = Vector2D(0.0, 0.0)) const
       {
-        const Vector2D localPos2D = globalPos2D - m_localOrigin;
-
         const Vector2D& lowerPhi0Vec(phi0CurvBox->getLowerBound<DiscretePhi0>());
         const Vector2D& upperPhi0Vec(phi0CurvBox->getUpperBound<DiscretePhi0>());
         const float& lowerCurv(phi0CurvBox->getLowerBound<DiscreteCurv>());
         const float& upperCurv(phi0CurvBox->getUpperBound<DiscreteCurv>());
 
-        const FloatType parallelToPhi0[2] = { localPos2D.dot(lowerPhi0Vec), localPos2D.dot(upperPhi0Vec) };
+        const FloatType parallelToPhi0[2] = { pos2D.dot(lowerPhi0Vec), pos2D.dot(upperPhi0Vec) };
         const bool isNonCurler = upperCurv <= m_curlCurv and lowerCurv >= -m_curlCurv;
         if (isNonCurler) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
           if (parallelToPhi0[0] < 0 and parallelToPhi0[1] < 0) return INVALID_SIGN;  //c_InvalidSign;
         }
 
-        //FloatType localRSquare = square(localR);
-        FloatType localRSquare = localPos2D.normSquared();
-        const FloatType rReducedSquared = localRSquare - square(signedDriftLength);
+        FloatType rSquare = pos2D.normSquared();
+        const FloatType rReducedSquared = rSquare - square(signedDriftLength);
 
         const FloatType rSquareTimesHalfCurv[2] = {
           rReducedSquared* (lowerCurv / 2),
           rReducedSquared* (upperCurv / 2)
         };
 
-        const FloatType orthoToPhi0[2] = { localPos2D.cross(lowerPhi0Vec), localPos2D.cross(upperPhi0Vec) };
+        const FloatType orthoToPhi0[2] = { pos2D.cross(lowerPhi0Vec), pos2D.cross(upperPhi0Vec) };
 
         // Calculate (approximate) distances of the observed position to
         // the trajectories represented by the corners of the box
@@ -77,23 +74,9 @@ namespace Belle2 {
         return SameSignChecker::commonSign(SameSignChecker::commonSign(dist[0][0], dist[0][1]),
                                            SameSignChecker::commonSign(dist[1][0], dist[1][1]));
       }
-
-    public:
-      /// Getter for the local origin relative to which the parameters of the hough space are understood
-      const Vector2D& getLocalOrigin() const
-      { return m_localOrigin; }
-
-      /// Setter for the local origin relative to which the parameters of the hough space are understood
-      void setLocalOrigin(const Vector2D& localOrigin)
-      { m_localOrigin = localOrigin; }
-
     private:
       /// The curvature above which the trajectory is considered a curler.
       float m_curlCurv = NAN;
-
-      /// A displaced origin to search for off origin circles
-      Vector2D m_localOrigin = Vector2D(0.0, 0.0);
-
     };
 
   } // end namespace TrackFindingCDC

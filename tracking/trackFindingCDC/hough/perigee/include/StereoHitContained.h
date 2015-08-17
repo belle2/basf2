@@ -205,10 +205,11 @@ namespace Belle2 {
         //const Vector2D& pos2D = wire.getRefPos2D();
         const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
         const Vector2D& movePerZ = wire.getMovePerZ();
+        //B2INFO("movePerZ = " << movePerZ);
         const SignType distSign = this->getDistanceSign(houghBox,
                                                         pos2D.x(),  pos2D.y(),
                                                         signedDriftLength,
-                                                        movePerZ.x(),  pos2D.y());
+                                                        movePerZ.x(), movePerZ.y());
         const bool isIn = distSign == ZERO;
         return isIn;
       }

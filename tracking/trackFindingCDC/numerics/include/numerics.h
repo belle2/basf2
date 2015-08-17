@@ -15,6 +15,7 @@
 #include <functional>
 #include <utility>
 #include <cmath>
+#include <assert.h>
 
 namespace Belle2 {
 
@@ -113,18 +114,27 @@ namespace Belle2 {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template<class OUT = double>
-    std::vector<OUT> linspace(const double& start, const double& end, const int n,
-                              const std::function<OUT(double)>& map = [](const double& in) -> OUT {return OUT(in);})
+    std::vector<OUT> linspace(const double& start, const double& final, const size_t n,
+                              const std::function<OUT(double)>& map)
     {
-      std::vector<OUT> result(n);
-      result[0] = map(start);
-      for (int i = 1; i < n - 1; ++i) {
-        result[i] = map((start * (n - 1 - i) + end * i) / (n - 1));
+      std::vector<OUT> result;
+      result.reserve(n);
+      result.push_back(map(start));
+      for (size_t i = 1; i < n - 1; ++i) {
+        result.push_back(map((start * (n - 1 - i) + final * i) / (n - 1)));
       }
-      result[n - 1] = map(end);
+      result.push_back(map(final));
+      assert(result.size() == n);
       return result;
     }
 
+    /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
+    template<class OUT = double>
+    std::vector<OUT> linspace(const double& start, const double& final, const size_t n)
+    {
+      auto map = [](const double & in) -> OUT {return OUT(in);};
+      return linspace<OUT>(start, final, n, map);
+    }
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
 

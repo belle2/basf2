@@ -34,7 +34,7 @@ namespace {
     CDCSimpleSimulation simpleSimulation(&wireHitTopology);
 
     Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 1, 0);
-    Helix higherCurvOriginHelix(0.027, 3.0718, 0, 1, 0);
+    Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0, 0);
 
     // Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
     // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);
@@ -191,7 +191,7 @@ namespace {
     CDCSimpleSimulation simpleSimulation(&wireHitTopology);
 
     Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 1, 0);
-    Helix higherCurvOriginHelix(0.027, 3.0718, 0, 1, 0);
+    Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0, 0);
 
     // Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
     // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);

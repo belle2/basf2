@@ -20,6 +20,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
+#include <tracking/trackFindingCDC/numerics/Sign.h>
+
 template<class Node>
 void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLeaf(Node* leaf)
 {
@@ -43,6 +45,15 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory2D = fitter.fit(*leaf);
   GeneralizedCircle circle = trajectory2D.getGlobalCircle();
+
+  {
+    const FloatType& curv = circle.curvature();
+    const float& lowerCurv(leaf->template getLowerBound<DiscreteCurv>());
+    const float& upperCurv(leaf->template getUpperBound<DiscreteCurv>());
+    if (Sign::sweep(lowerCurv, upperCurv) * curv < 0) {
+      circle.reverse();
+    }
+  }
 
   const FloatType& curv = circle.curvature();
   // const Vector2D& phi0Vec = circle.tangential();
@@ -84,13 +95,14 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   topNode.eraseIf(isMarked);
 
   // Collect all hits that are in the precision box
-  HitInPhi0CurvBox hitInPhi0CurvBox;
+  const float curlCurv = 0.018;
+  HitInPhi0CurvBox hitInPhi0CurvBox(curlCurv);
   hitInPhi0CurvBox.setLocalOrigin(perigee);
 
   std::vector<WithSharedMark<CDCRLTaggedWireHit> > hitsInPrecisionBox;
 
   for (const WithSharedMark<CDCRLTaggedWireHit>& markableRLTaggedWireHit : topNode) {
-    // Explicitly making a copy here to emphasise that we do not change the top node as of yet.
+    // Explicitly making a copy here to emphasise that we do not change the top node.
     WithSharedMark<CDCRLTaggedWireHit> copiedMarkableRLTaggedWireHit = markableRLTaggedWireHit;
 
     Weight weight = hitInPhi0CurvBox(copiedMarkableRLTaggedWireHit, &precisionPhi0CurvBox);

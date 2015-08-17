@@ -22,6 +22,9 @@ RunControlCallback::RunControlCallback()
 {
   setAutoReply(false);
   m_showall = false;
+  m_restarttime = -1;
+  m_starttime = -1;
+  m_restarting = false;
 }
 
 void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
@@ -192,6 +195,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
   }
+  m_starttime = Time().get();
 }
 
 void RunControlCallback::stop() throw(RCHandlerException)
@@ -224,6 +228,18 @@ void RunControlCallback::abort() throw(RCHandlerException)
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
+  if (m_restarttime > 0) {
+    if (!m_restarting) {
+      if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
+        stop();
+        m_restarting = true;
+      }
+    } else {
+      if (state == RCState::READY_S) {
+        start(0, 0);
+      }
+    }
+  }
   RCState state_new = state.next();
   bool failed = false;
   for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {

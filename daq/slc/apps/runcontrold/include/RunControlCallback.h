@@ -49,6 +49,7 @@ namespace Belle2 {
     void setLocalRunControls(const StringList& rc);
     void setLogTable(const std::string table) { m_logtable = table; }
     void setCallback(RCCallback* callback) { m_callback = callback; }
+    void setRestartTime(double restarttime) { m_restarttime = restarttime; }
 
   private:
     void distribute(NSMMessage msg) throw();
@@ -81,6 +82,9 @@ namespace Belle2 {
     StringList m_excluded_v;
     RCNodeList m_lrc_v;
     int m_port;
+    double m_restarttime;
+    double m_starttime;
+    bool m_restarting;
 
   private:
     class Distributor {

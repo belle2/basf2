@@ -20,31 +20,25 @@ namespace Belle2 {
     class Sign {
 
     public:
-      /// Instance for a negative sign
-      static const Sign c_Minus;
-
-      /// Instance for a unsigned
-      static const Sign c_Zero;
-
-      /// Instance for a positive sign
-      static const Sign c_Plus;
-
-      /// Instance for a invalid sign
-      static const Sign c_Invalid;
-
-    public:
       /// Implementing type of the sign
       typedef float SignType;
 
     public:
+      /// Default constructor
+      constexpr
+      Sign() : m_sign(0)
+      {;}
+
       /// Constructor from a float signed quantity
+      constexpr
       Sign(const float& s) :
-        m_sign(std::isnan(s) ? NAN : (s > 0) - (s < 0))
+        m_sign(s != s ? NAN : (s > 0) - (s < 0))
       {;}
 
       /// Constructor from a double signed quantity
+      constexpr
       Sign(const double& s) :
-        m_sign(std::isnan(s) ? NAN : (s > 0) - (s < 0))
+        m_sign(s != s ? NAN : (s > 0) - (s < 0))
       {;}
 
     public:
@@ -52,8 +46,10 @@ namespace Belle2 {
       static float fillnan(const float testValue, const float& defaultValue)
       { return std::isnan(testValue) ? defaultValue : testValue; }
 
-      /** Calculate the common sign between to signed expressions.
-       *  The common sign of
+      /** Calculate the common distance sign in a sweep operation over a geometric object.
+       *  If the sign changes in a sweep over a geometric object or was zero in the begining
+       *  the combined sign is zero. Forward the one sign if both are equal.
+       *  Invalid signs are ignored and overwritten by the other sign.
        *  * ZERO and PLUS   -> ZERO
        *  * ZERO and MINUS  -> ZERO
        *  * ZERO and ZERO   -> ZERO
@@ -61,9 +57,11 @@ namespace Belle2 {
        *  * MINUS and MINUS -> MINUS
        *  * PLUS and PLUS   -> PLUS
        *  * INVALID and ?   -> ?
+       *  * and ? INVALID   -> ?
        */
-      static Sign dominant(const Sign& sign0, const Sign& sign1)
+      static Sign sweep(const Sign& sign0, const Sign& sign1)
       { return Sign(std::round((fillnan(sign0.m_sign, sign1.m_sign) + fillnan(sign1.m_sign, sign0.m_sign)) / 4.0));}
+
       /// Investigates if two signs are identical.
       static bool same(const Sign& sign0, const Sign& sign1)
       { return sign0 == sign1; }
@@ -77,7 +75,7 @@ namespace Belle2 {
       Sign reversed()
       { return Sign(SignType(-m_sign)); }
 
-      /// Returns true if sign is c_Plus, c_Minus or c_Zero
+      /// Returns true if sign is equal to c_PlusSign, c_MinusSign or c_ZeroSign.
       inline bool isValid()
       { return std::abs(m_sign) <= 1; }
 
@@ -99,13 +97,20 @@ namespace Belle2 {
 
     private:
       /// Memory for the sign
-      SignType m_sign;
+      SignType m_sign = 0;
     };
 
-    const Sign Sign::c_Minus(-1.0);
-    const Sign Sign::c_Zero(0.0);
-    const Sign Sign::c_Plus(1.0);
-    const Sign Sign::c_Invalid(NAN);
+    /// Instance for a negative sign
+    constexpr const Sign c_MinusSign(-1.0);
+
+    /// Instance for zero sign
+    constexpr const Sign c_ZeroSign(0.0);
+
+    /// Instance for a positive sign
+    constexpr const Sign c_PlusSign(1.0);
+
+    /// Instance for a invalid sign
+    constexpr const Sign c_InvalidSign(NAN);
 
   } // namespace TrackFindingCDC
 

@@ -16,25 +16,25 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(TrackFindingCDCTest, numerics_Sign_dominant)
+TEST(TrackFindingCDCTest, numerics_Sign_sweep)
 {
-  EXPECT_EQ(Sign::c_Plus, Sign::dominant(Sign::c_Plus, Sign::c_Plus));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Plus, Sign::c_Zero));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Plus, Sign::c_Minus));
-  EXPECT_EQ(Sign::c_Plus, Sign::dominant(Sign::c_Plus, Sign::c_Invalid));
+  EXPECT_EQ(c_PlusSign, Sign::sweep(c_PlusSign, c_PlusSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_PlusSign, c_ZeroSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_PlusSign, c_MinusSign));
+  EXPECT_EQ(c_PlusSign, Sign::sweep(c_PlusSign, c_InvalidSign));
 
-  EXPECT_EQ(Sign::c_Minus, Sign::dominant(Sign::c_Minus, Sign::c_Minus));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Minus, Sign::c_Zero));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Minus, Sign::c_Plus));
-  EXPECT_EQ(Sign::c_Minus, Sign::dominant(Sign::c_Minus, Sign::c_Invalid));
+  EXPECT_EQ(c_MinusSign, Sign::sweep(c_MinusSign, c_MinusSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_MinusSign, c_ZeroSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_MinusSign, c_PlusSign));
+  EXPECT_EQ(c_MinusSign, Sign::sweep(c_MinusSign, c_InvalidSign));
 
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Zero, Sign::c_Zero));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Zero, Sign::c_Minus));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Zero, Sign::c_Plus));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Zero, Sign::c_Invalid));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_ZeroSign, c_ZeroSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_ZeroSign, c_MinusSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_ZeroSign, c_PlusSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_ZeroSign, c_InvalidSign));
 
-  EXPECT_EQ(Sign::c_Plus, Sign::dominant(Sign::c_Invalid, Sign::c_Plus));
-  EXPECT_EQ(Sign::c_Minus, Sign::dominant(Sign::c_Invalid, Sign::c_Minus));
-  EXPECT_EQ(Sign::c_Zero, Sign::dominant(Sign::c_Invalid, Sign::c_Zero));
-  EXPECT_FALSE(Sign::dominant(Sign::c_Invalid, Sign::c_Invalid).isValid());
+  EXPECT_EQ(c_PlusSign, Sign::sweep(c_InvalidSign, c_PlusSign));
+  EXPECT_EQ(c_MinusSign, Sign::sweep(c_InvalidSign, c_MinusSign));
+  EXPECT_EQ(c_ZeroSign, Sign::sweep(c_InvalidSign, c_ZeroSign));
+  EXPECT_FALSE(Sign::sweep(c_InvalidSign, c_InvalidSign).isValid());
 }

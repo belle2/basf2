@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    namespace PergieeBinSpec {
+    namespace PerigeeBinSpec {
 
       /// Hough tree depth and divisions
       const size_t maxLevel = 13;

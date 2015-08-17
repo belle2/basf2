@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace PergieeBinSpec;
+using namespace PerigeeBinSpec;
 
 namespace {
 

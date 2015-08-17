@@ -23,6 +23,9 @@ namespace Belle2 {
       /// Inheriting the constructor of the base class
       using DiscreteAngle::DiscreteAngle;
 
+      /// The type of the array which contains the underlying values.
+      using Array = DiscretePhi0Array;
+
     public:
       /// Extract the range from an array providing the discrete values.
       static std::pair<DiscretePhi0, DiscretePhi0> getRange(const DiscretePhi0Array& valueArray)

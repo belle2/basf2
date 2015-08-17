@@ -19,10 +19,12 @@ namespace Belle2 {
 
     /// Type for discrete float values
     class DiscreteCurv : public DiscreteValue<float> {
-
     public:
       /// Exposing the base class constructors
       using DiscreteValue<float>::DiscreteValue;
+
+      /// The type of the array which contains the underlying values.
+      using Array = DiscreteCurvArray;
 
     public:
       /// Extract the range from an array providing the discrete values.

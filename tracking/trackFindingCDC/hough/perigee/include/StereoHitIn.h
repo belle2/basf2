@@ -202,7 +202,8 @@ namespace Belle2 {
                            const CDCWire& wire,
                            const FloatType& signedDriftLength)
       {
-        const Vector2D& pos2D = wire.getRefPos2D();
+        //const Vector2D& pos2D = wire.getRefPos2D();
+        const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
         const Vector2D& movePerZ = wire.getMovePerZ();
         const SignType distSign = this->getDistanceSign(houghBox,
                                                         pos2D.x(),  pos2D.y(),

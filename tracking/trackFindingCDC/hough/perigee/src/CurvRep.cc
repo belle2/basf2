@@ -8,10 +8,38 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  float nvl(const float& value, const float& subs)
+  { return std::isnan(value) ? subs : value; }
+}
+
+CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
+  m_curv(curv),
+  m_arcLength2DByICLayer{{0}}
+{
+  CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+  for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
+    ILayerType iCLayer = wireLayer.getICLayer();
+    FloatType cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
+    FloatType factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
+
+    FloatType arcLength2D = cylindricalR * nvl(factor, PI);
+    FloatType r = 1.0 / fabs(m_curv);
+
+    m_arcLength2DByICLayer[iCLayer] = arcLength2D;
+    m_secondaryArcLength2DByICLayer[iCLayer] = 2 * PI * r - arcLength2D;
+  }
+}
 
 CurvBinsSpec::CurvBinsSpec(double lowerBound,
                            double upperBound,
@@ -31,8 +59,7 @@ CurvBinsSpec::CurvBinsSpec(double lowerBound,
            m_upperBound > m_lowerBound);
 }
 
-
-DiscreteCurv::Array CurvBinsSpec::constructArray() const
+DiscreteCurv::Array CurvBinsSpec::constructLinearArray() const
 {
   const size_t nPositions = getNPositions();
   if (m_lowerBound == 0) {
@@ -45,6 +72,50 @@ DiscreteCurv::Array CurvBinsSpec::constructArray() const
   } else {
     return linspace<float>(m_lowerBound, m_upperBound, nPositions);
   }
+}
+
+DiscreteCurv::Array CurvBinsSpec::constructInvLinearArray() const
+{
+  const size_t nPositions = getNPositions();
+
+  size_t nCurlingCurvs = 3 * nPositions / 10;
+
+  std::vector<float> curlingCurvs = linspace<float>(1 / fabs(m_upperBound),
+                                                    1 / fabs(m_lowerBound),
+                                                    nCurlingCurvs + 1,
+  [](float f) {return 1 / f;});
+
+  std::sort(curlingCurvs.begin(), curlingCurvs.end());
+  float minWidthCurling =  curlingCurvs[1] - curlingCurvs[0];
+
+
+  std::vector<float> nonCurlingCurvs = linspace<float>(-fabs(m_lowerBound),
+                                                       fabs(m_lowerBound),
+                                                       nPositions - nCurlingCurvs);
+
+  float widthNonCurling = nonCurlingCurvs[1] - nonCurlingCurvs[0];
+
+  B2INFO("Min Width curling" <<  minWidthCurling);
+  B2INFO("Width non curling" << widthNonCurling);
+  assert(minWidthCurling > widthNonCurling);
+
+  // ++ skips doublication of the identical curvature at m_lowerBound.
+  nonCurlingCurvs.insert(nonCurlingCurvs.end(), ++(curlingCurvs.begin()), curlingCurvs.end());
+  B2INFO(nonCurlingCurvs.size());
+  B2INFO(nPositions);
+
+  assert(nonCurlingCurvs.size() == nPositions);
+  assert(std::is_sorted(nonCurlingCurvs.begin(), nonCurlingCurvs.end()));
+  return nonCurlingCurvs;
+}
+
+DiscreteCurvWithArcLength2DCache::Array CurvBinsSpec::constructCacheArray() const
+{
+  std::vector<float> discreteCurvs = constructArray();
+  std::vector<CurvWithArcLength2DCache> result;
+  result.reserve(discreteCurvs.size());
+  result.insert(result.end(), discreteCurvs.begin(), discreteCurvs.end());
+  return result;
 }
 
 size_t CurvBinsSpec::getNPositions() const

@@ -10,8 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/DiscreteValue.h>
+#include <tracking/trackFindingCDC/topology/ILayerType.h>
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <array>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,6 +23,42 @@ namespace Belle2 {
 
     /// Type for discrete curv values
     using DiscreteCurv = DiscreteValue<float, CurvTag>;
+
+    /** Class representing a curvature value that also caches two dimensional arc length
+     *  to each layer in the CDC
+     */
+    class CurvWithArcLength2DCache {
+    public:
+      /// Make cache for one curvature value
+      CurvWithArcLength2DCache(const float& curv);
+
+      /// Unpack the curvature
+      explicit operator float() const
+      { return m_curv; }
+
+      /// Return the two dimensional arc length to the given layer id
+      float getArcLength2D(const ILayerType& iCLayer, bool secondArm = false) const
+      { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
+
+      /// Output operator for debugging
+      friend std::ostream& operator<<(std::ostream& output,
+                                      const CurvWithArcLength2DCache& value)
+      { return output << value.m_curv; }
+
+    private:
+      /// Memory for the curvature
+      float m_curv;
+
+      /// Memory for two dimensional arc length at each layer.
+      std::array<float, 55> m_arcLength2DByICLayer;
+
+      /// Memory for two dimensional arc length at each layer on the second arm.
+      std::array<float, 55> m_secondaryArcLength2DByICLayer;
+    };
+
+    /// Type for discrete curv values
+    using DiscreteCurvWithArcLength2DCache = DiscreteValue<CurvWithArcLength2DCache, CurvTag>;
+
 
     /// Strategy to construct discrete curv points from discrete overlap specifications.
     class CurvBinsSpec {
@@ -43,7 +81,17 @@ namespace Belle2 {
                    size_t nWidth);
 
       /// Constuct the array of discrete curv positions
-      DiscreteCurv::Array constructArray() const;
+      DiscreteCurv::Array constructArray() const
+      { return constructLinearArray(); }
+
+      /// Constuct the array of discrete curv positions such that the inverse curvatures are distributed equally
+      DiscreteCurv::Array constructInvLinearArray() const;
+
+      /// Constuct the array of discrete curv positions such that the curvatures are distributed equally
+      DiscreteCurv::Array constructLinearArray() const;
+
+      /// Constuct the array of discrete curv positions including cache for the two dimensional arc length
+      DiscreteCurvWithArcLength2DCache::Array constructCacheArray() const;
 
       /// Getter for the number of bounds
       size_t getNPositions() const;

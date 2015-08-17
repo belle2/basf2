@@ -20,7 +20,7 @@ namespace Belle2 {
      *  in the new dimension
      */
     template<class NewType, class Box>
-    class SweepBoxImpl;
+    struct SweepBoxImpl;
 
     /// Actual implementation pasting together the new dimension with the original box.
     template<class NewType, class... OldTypes>

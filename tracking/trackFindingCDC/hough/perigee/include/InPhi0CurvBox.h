@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Checker if a position is contained in a family of curves over phi0
+    /// Checker if a position is contained in a family of curves over phi0 and curvature
     class InPhi0CurvBox {
 
     public:

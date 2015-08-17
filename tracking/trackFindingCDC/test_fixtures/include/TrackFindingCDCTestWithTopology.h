@@ -13,8 +13,6 @@
 
 #include <framework/utilities/TestHelpers.h>
 
-using namespace std;
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /** This class provides the declaration of the common test fixture to all

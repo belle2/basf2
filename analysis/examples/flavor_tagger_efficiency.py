@@ -305,26 +305,30 @@ rr_subsample = array('d', [
 rr_size = len(rr_subsample)
 # individual categories
 eventLevelParticles = [
-    ('Electron', 'QrOfeElectronROEIsRightCategoryElectronIsRightTrackElectron'),
-    #    ('IntermediateElectron', 'QrOfeROEIsRightCategoryIntermediateElectronIsRightTrackIntermediateElectron'),
-    ('Muon', 'QrOfmuMuonROEIsRightCategoryMuonIsRightTrackMuon'),
-    #    ('IntermediateMuon', 'QrOfmuROEIsRightCategoryIntermediateMuonIsRightTrackIntermediateMuon'),
-    ('KinLepton', 'QrOfmuKinLeptonROEIsRightCategoryKinLeptonIsRightTrackKinLepton'),
-    ('Kaon', 'InputQrOfKKaonROEIsRightCategoryKaonIsRightTrackKaon'),
-    ('SlowPion', 'QrOfpiSlowPionROEIsRightCategorySlowPionIsRightTrackSlowPion'),
-    ('FastPion', 'QrOfpiFastPionROEIsRightCategoryFastPionIsRightTrackFastPion'),
-    ('KaonPion', 'QrOfKKaonROEIsRightCategoryKaonPionIsRightTrackKaon'),
-    ('MaximumP', 'QrOfpiMaximumPROEIsRightCategoryMaximumPIsRightTrackMaximumP'),
-    ('FSC', 'QrOfpiSlowPionROEIsRightCategoryFSCIsRightTrackSlowPion'),
-    ('Lambda', 'InputQrOfLambda0LambdaROEIsRightCategoryLambdaIsRightTrackLambda'),
+    ('Electron', 'QrOf__boe__pl__clElectronROE__cm__spIsRightCategory__boElectron__bc__cm__spIsRightTrack__boElectron__bc__bc'),
+    #    ('IntermediateElectron',
+    # 'QrOf__boe__pl__clROE__cm__spIsRightCategory__boIntermediateElectron__bc__cm__spIsRightTrack__boIntermediateElectron__bc__bc'),
+    ('Muon', 'QrOf__bomu__pl__clMuonROE__cm__spIsRightCategory__boMuon__bc__cm__spIsRightTrack__boMuon__bc__bc'),
+    #    ('IntermediateMuon',
+    # 'QrOf__bomu__pl__clROE__cm__spIsRightCategory__boIntermediateMuon__bc__cm__spIsRightTrack__boIntermediateMuon__bc__bc'),
+    ('KinLepton',
+     'QrOf__bomu__pl__clKinLeptonROE__cm__spIsRightCategory__boKinLepton__bc__cm__spIsRightTrack__boKinLepton__bc__bc'),
+    ('Kaon', 'InputQrOf__boK__pl__clKaonROE__cm__spIsRightCategory__boKaon__bc__cm__spIsRightTrack__boKaon__bc__bc'),
+    ('SlowPion', 'QrOf__bopi__pl__clSlowPionROE__cm__spIsRightCategory__boSlowPion__bc__cm__spIsRightTrack__boSlowPion__bc__bc'),
+    ('FastPion', 'QrOf__bopi__pl__clFastPionROE__cm__spIsRightCategory__boFastPion__bc__cm__spIsRightTrack__boFastPion__bc__bc'),
+    ('KaonPion', 'QrOf__boK__pl__clKaonROE__cm__spIsRightCategory__boKaonPion__bc__cm__spIsRightTrack__boKaon__bc__bc'),
+    ('MaximumP',
+     'QrOf__bopi__pl__clMaximumP__muROE__cm__spIsRightCategory__boMaximumP__mu__bc__cm__spIsRightTrack__boMaximumP__mu__bc__bc'),
+    ('FSC', 'QrOf__bopi__pl__clSlowPionROE__cm__spIsRightCategory__boSlowPion__bc__cm__spIsRightTrack__boSlowPion__bc__bc'),
+    ('Lambda', 'InputQrOf__boLambda0__clLambdaROE__cm__spIsRightCategory__boLambda__bc__cm__spIsRightTrack__boLambda__bc__bc'),
 ]
 
 # needs the B0Tagger.root-file from combiner teacher
 workingDirectory2 = \
     Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods')
 
-if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_1.root'):
-    rootfile2 = ROOT.TFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_1.root', 'UPDATE'
+if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA.root'):
+    rootfile2 = ROOT.TFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA.root', 'UPDATE'
                            )
     tree2 = rootfile2.Get('B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_tree')
     rootfile2.cd()

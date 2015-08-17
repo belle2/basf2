@@ -32,7 +32,7 @@ TEST(TrackFindingCDCTest, SumInfinities)
 
 TEST(TrackFindingCDCTest, LinearDivision_createBoxes)
 {
-  Box<float, float> box({0, 3}, {0, 2});
+  Box<float, float> box({{0, 3}}, {{0, 2}});
 
   size_t nSubNodes =  LinearDivision<Box<float, float>, 3, 3>::s_nSubBoxes;
   EXPECT_EQ(9, nSubNodes);

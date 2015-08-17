@@ -65,7 +65,7 @@ namespace Belle2 {
       /// Extract the range from an array providing the discrete values.
       static
       std::array<This, 2> getRange(Array& values)
-      { return { This(values.front()), This(values.back()) }; }
+      { return {{ This(values.front()), This(values.back()) }}; }
     };
 
   }

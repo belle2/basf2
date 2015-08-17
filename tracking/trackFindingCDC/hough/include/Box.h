@@ -77,8 +77,8 @@ namespace Belle2 {
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
           const std::array<SubordinaryTypes, 2>& ... subordinaryBounds) :
-        m_firstBounds{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])},
-        m_subordinaryBox(subordinaryBounds...)
+        m_firstBounds{{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])}},
+      m_subordinaryBox(subordinaryBounds...)
       {;}
 
       /// Output operator for debugging
@@ -183,7 +183,7 @@ namespace Belle2 {
       getDivisionBounds(size_t nDivisions, size_t iDivision) const
       {
         assert(nDivisions > iDivision);
-        return {getDivision<I>(nDivisions, iDivision), getDivision<I>(nDivisions, iDivision + 1)};
+        return {{getDivision<I>(nDivisions, iDivision), getDivision<I>(nDivisions, iDivision + 1)}};
       }
 
       /// Get for the distance between two division bounds with overlap.
@@ -219,8 +219,10 @@ namespace Belle2 {
                                    size_t iDivision) const
       {
         assert(nDivisions > iDivision);
-        return {getLowerDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision),
-                getUpperDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision)};
+        return {{
+            getLowerDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision),
+            getUpperDivisionBoundWithOverlap<I>(overlap, nDivisions, iDivision)
+          }};
       }
 
       /// Get the center of the box in the coordinate I

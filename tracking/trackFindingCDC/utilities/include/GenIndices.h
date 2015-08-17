@@ -9,6 +9,7 @@
 **************************************************************************/
 #pragma once
 
+#include <tuple>
 #include <stddef.h>
 
 namespace Belle2 {
@@ -40,6 +41,21 @@ namespace Belle2 {
     /// Short for the GenIndicesImpl that executes the expansion without the typename and ::Type
     template<size_t nIndices>
     using GenIndices = typename GenIndicesImpl<nIndices>::Type;
+
+
+    /// Apply the template function F to each element of the index sequence.
+    template< template<size_t> class F, class IndexSequence>
+    struct MapIndicesImpl {;};
+
+    /// Specialisation for concrete indices
+    template< template<size_t> class F, size_t ... Is>
+    struct MapIndicesImpl<F, IndexSequence<Is...> > {
+      typedef std::tuple<F<Is>...> Type;
+    };
+
+    /// Generate the first N indices and apply the template function to them.
+    template< template<size_t> class F, size_t N>
+    using MapGenIndices = typename MapIndicesImpl<F, GenIndices<N> >::Type;
 
   }
 }

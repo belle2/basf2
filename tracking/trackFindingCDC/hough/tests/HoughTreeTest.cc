@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
@@ -18,15 +17,7 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
-#include <tracking/trackFindingCDC/display/EventDataPlotter.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
-#include <tracking/trackFindingCDC/utilities/TimeIt.h>
-#include <set>
 #include <vector>
-
-#include <gtest/gtest.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -34,9 +25,12 @@ using namespace TrackFindingCDC;
 using namespace PerigeeBinSpec;
 
 namespace {
-
-  TEST_F(CDCLegendreTestFixture, hough_HitPhi0CurvLegendre)
+  TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_HitPhi0CurvLegendre)
   {
+    std::string svgFileName = "phi0_curv_on_prepared_event_hits_using_leaf_processing.svg";
+    loadPreparedEvent();
+    saveDisplay(svgFileName);
+
     // Prepare the hough algorithm
     using WireHitPhi0CurvQuadLegendre =
       SimpleRLTaggedWireHitHoughTree<InPhi0CurvBox, phi0Divisions, curvDivisions>;
@@ -50,22 +44,10 @@ namespace {
                                         curvBinsSpec.getNOverlap());
     houghTree.initialize();
 
-    // Get the hits form the test event
-    markAllHitsAsUnused();
-    std::set<TrackHit*>& hits_set = getHitSet();
-
-    EventDataPlotter plotter;
-    plotter.draw(CDCWireTopology::getInstance());
-    for (TrackHit* trackHit : hits_set) {
-      plotter.draw(*(trackHit->getUnderlayingCDCWireHit()));
-    }
-    plotter.save("org_legendre_event.svg");
-
-    std::vector<const CDCWireHit*> hitVector;
-    for (TrackHit* trackHit : hits_set) {
-      if (trackHit->getSuperlayerId() % 2 == 0)
-        hitVector.push_back(trackHit->getUnderlayingCDCWireHit());
-    }
+    const double minWeight = 30.0;
+    AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
+    leafProcessor.setMinWeight(minWeight);
+    leafProcessor.setMaxCurv(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     vector< pair<CDCTrajectory2D, vector<CDCRLTaggedWireHit> > > candidates;
@@ -74,112 +56,69 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-      houghTree.seed(hitVector);
+      houghTree.seed(m_axialWireHits);
+      leafProcessor.clear();
 
-      const double minWeight = 30.0;
-      const double maxCurv = 0.13;
-      AxialLegendreLeafProcessor<Node> m_leafProcessor(maxLevel);
-      m_leafProcessor.setMinWeight(minWeight);
-      m_leafProcessor.setMaxCurv(maxCurv);
-      houghTree.findUsing(m_leafProcessor);
-      candidates = m_leafProcessor.getCandidates();
+      houghTree.findUsing(leafProcessor);
+      candidates = leafProcessor.getCandidates();
 
-      // B2INFO("Execution " << iExecution);
-      /// Check if exactly two candidates have been found
-      ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
-
+      ASSERT_EQ(m_mcTracks.size(), candidates.size());
       // Check for the parameters of the track candidates
       // The actual hit numbers are more than 30, but this is somewhat a lower bound
-      EXPECT_GE(candidates[0].second.size(), 30);
-      EXPECT_GE(candidates[1].second.size(), 30);
-
+      for (size_t iCand = 0; iCand < candidates.size(); ++iCand) {
+        EXPECT_GE(candidates[iCand].second.size(), 30);
+      }
     });
 
     /// Test idiom to output statistics about the tree.
     std::size_t nNodes = houghTree.getTree()->getNNodes();
-    B2INFO("Tree generated " << nNodes << " nodes");
+    B2DEBUG(100, "Tree generated " << nNodes << " nodes");
     houghTree.fell();
     houghTree.raze();
 
+    size_t iColor = 0;
     for (std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
       const std::vector<CDCRLTaggedWireHit >& taggedHits = candidate.second;
 
-      B2INFO("Candidate");
-      B2INFO("size " << taggedHits.size());
-      B2INFO("Phi " << trajectory2D.getGlobalCircle().tangentialPhi());
-      B2INFO("Curv " << trajectory2D.getCurvature());
-      B2INFO("Tags of the hits");
+      B2DEBUG(100, "Candidate");
+      B2DEBUG(100, "size " << taggedHits.size());
+      B2DEBUG(100, "Phi0 " << trajectory2D.getGlobalCircle().tangentialPhi());
+      B2DEBUG(100, "Curv " << trajectory2D.getCurvature());
+      B2DEBUG(100, "Tags of the hits");
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        B2INFO("    rl = " << rlTaggedWireHit.getRLInfo() <<
-               " dl = " << rlTaggedWireHit->getRefDriftLength());
+        B2DEBUG(100, "    rl = " << rlTaggedWireHit.getRLInfo() <<
+                " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
-    }
 
-    for (const CDCRLTaggedWireHit& rlTaggedWireHit : candidates.at(0).second) {
-      const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
-      std::string color = "blue";
-      if (rlTaggedWireHit.getRLInfo() == RIGHT) {
-        color = "green";
-      } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
-        color = "red";
+      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+        const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
+        std::string color = "blue";
+        if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+          color = "green";
+        } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+          color = "red";
+        }
+        //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
+        EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
+        draw(*wireHit, strokeAttr);
       }
-      //EventDataPlotter::AttributeMap rl {{"stroke", color}};
-      EventDataPlotter::AttributeMap rl {{"stroke", "blue"}};
-      plotter.draw(*wireHit, rl);
+      draw(trajectory2D);
+      ++iColor;
     }
-
-    const CDCTrajectory2D& firstTrajectory = candidates.at(0).first;
-    plotter.draw(firstTrajectory);
-    plotter.save("org_legendre_event.svg");
-
-    for (const CDCRLTaggedWireHit& rlTaggedWireHit : candidates.at(1).second) {
-      const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
-      std::string color = "blue";
-      if (rlTaggedWireHit.getRLInfo() == RIGHT) {
-        color = "green";
-      } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
-        color = "red";
-      }
-      // EventDataPlotter::AttributeMap rl {{"stroke", color}};
-      EventDataPlotter::AttributeMap rl {{"stroke", "red"}};
-      plotter.draw(*wireHit, rl);
-    }
-    const CDCTrajectory2D& secondTrajectory = candidates.at(1).first;
-    plotter.draw(secondTrajectory);
-    plotter.save("org_legendre_event.svg");
-
-
-
-    B2INFO("First execution took " << timeItResult.getSeconds(0) << " seconds ");
-    B2INFO("On average execution took " << timeItResult.getAverageSeconds() << " seconds " <<
-           "in " << timeItResult.getNExecutions() << " executions.");
+    saveDisplay(svgFileName);
+    timeItResult.printSummary();
   }
 
-
-  TEST_F(CDCLegendreTestFixture, hough_phi0_curv_SimpleHitBasedPhi0CurvHough_onLegendreEvent)
+  TEST_F(TrackFindingCDCTestWithSimpleSimulation,  hough_phi0_curv_SimpleHitBasedPhi0CurvHough_onLegendreEvent)
   {
-    // Prepare event
-    // Get the hits form the test event
-    markAllHitsAsUnused();
-    std::set<TrackHit*>& hits_set = getHitSet();
+    std::string svgFileName = "phi0_curv_on_prepared_event_hits.svg";
+    loadPreparedEvent();
+    saveDisplay(svgFileName);
 
-    EventDataPlotter plotter;
-    plotter.draw(CDCWireTopology::getInstance());
-    for (TrackHit* trackHit : hits_set) {
-      plotter.draw(*(trackHit->getUnderlayingCDCWireHit()));
-    }
-    plotter.save("org_legendre_event2.svg");
-
-    std::vector<const CDCWireHit*> wireHits;
-    for (TrackHit* trackHit : hits_set) {
-      if (trackHit->getSuperlayerId() % 2 == 0)
-        wireHits.push_back(trackHit->getUnderlayingCDCWireHit());
-    }
-
-    using RLTaggedWireHitPhi0CurvHough = SimpleHitBasedHoughTree<CDCRLTaggedWireHit, InPhi0CurvBox, phi0Divisions, curvDivisions>;
-    using Phi0CurvBox = Box<DiscretePhi0, DiscreteCurv>;
+    using RLTaggedWireHitPhi0CurvHough = SimpleRLTaggedWireHitHoughTree<InPhi0CurvBox, phi0Divisions, curvDivisions>;
+    using Phi0CurvBox = RLTaggedWireHitPhi0CurvHough::HoughBox;
     RLTaggedWireHitPhi0CurvHough houghTree(maxLevel);
 
     houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(),
@@ -189,13 +128,7 @@ namespace {
                                         curvBinsSpec.getNOverlap());
 
     houghTree.initialize();
-
-    std::vector<const CDCWireHit*> axialWireHits;
-    for (const CDCWireHit* wireHit : wireHits) {
-      if (wireHit->isAxial()) {
-        axialWireHits.push_back(wireHit);
-      }
-    }
+    const double minWeight = 30.0;
 
     // Execute the finding a couple of time to find a stable execution time.
     vector< pair<Phi0CurvBox, vector<CDCRLTaggedWireHit> > > candidates;
@@ -204,49 +137,56 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-      houghTree.seed(axialWireHits);
+      houghTree.seed(m_axialWireHits);
 
-      const double minWeight = 30.0;
-      const double maxCurv = 0.13;
-      candidates = houghTree.find(minWeight, maxCurv);
-      //candidates = houghTree.findBest(minWeight, maxCurv);
+      candidates = houghTree.find(minWeight, maxCurvAcceptance);
+      //candidates = houghTree.findBest(minWeight, maxCurvAcceptance);
 
-      // B2INFO("Execution " << iExecution);
-      /// Check if exactly two candidates have been found
-      ASSERT_EQ(2, candidates.size());
-
+      ASSERT_EQ(m_mcTracks.size(), candidates.size());
       // Check for the parameters of the track candidates
       // The actual hit numbers are more than 30, but this is somewhat a lower bound
-      EXPECT_GE(candidates[0].second.size(), 30);
-      EXPECT_GE(candidates[1].second.size(), 30);
-
+      for (size_t iCand = 0; iCand < candidates.size(); ++iCand) {
+        EXPECT_GE(candidates[iCand].second.size(), 30);
+      }
     });
 
     /// Test idiom to output statistics about the tree.
     std::size_t nNodes = houghTree.getTree()->getNNodes();
-    B2INFO("Tree generated " << nNodes << " nodes");
+    B2DEBUG(100, "Tree generated " << nNodes << " nodes");
     houghTree.fell();
     houghTree.raze();
 
+    size_t iColor = 0;
     for (std::pair<Phi0CurvBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
       const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
 
-      B2INFO("Candidate");
-      B2INFO("size " << taggedHits.size());
-      B2INFO("Phi " << phi0CurvBox.getLowerBound<DiscretePhi0>()->phi());
-      B2INFO("Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
-      B2INFO("Tags of the hits");
+      B2DEBUG(100, "Candidate");
+      B2DEBUG(100, "size " << taggedHits.size());
+      B2DEBUG(100, "Phi0 " << phi0CurvBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
+      B2DEBUG(100, "Tags of the hits");
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        B2INFO("    rl = " << rlTaggedWireHit.getRLInfo() <<
-               " dl = " << rlTaggedWireHit->getRefDriftLength());
+        B2DEBUG(100, "    rl = " << rlTaggedWireHit.getRLInfo() <<
+                " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
+
+      for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
+        const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
+        std::string color = "blue";
+        if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+          color = "green";
+        } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+          color = "red";
+        }
+        //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
+        EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
+        draw(*wireHit, strokeAttr);
+      }
+      ++iColor;
     }
-
-    B2INFO("First execution took " << timeItResult.getSeconds(0) << " seconds ");
-    B2INFO("On average execution took " << timeItResult.getAverageSeconds() << " seconds " <<
-           "in " << timeItResult.getNExecutions() << " executions.");
-
+    saveDisplay(svgFileName);
+    timeItResult.printSummary();
   }
 }

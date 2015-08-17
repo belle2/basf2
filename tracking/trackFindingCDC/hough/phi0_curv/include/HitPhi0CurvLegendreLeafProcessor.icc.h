@@ -11,15 +11,16 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendreLeafProcessor.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/HitInPhi0CurvBox.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
+
+#include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
+#include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
+#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/WithSharedMark.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-
-#include <tracking/trackFindingCDC/numerics/Sign.h>
 
 template<class Node>
 void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLeaf(Node* leaf)
@@ -44,12 +45,11 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory2D = fitter.fit(*leaf);
   GeneralizedCircle circle = trajectory2D.getGlobalCircle();
-
   {
     const FloatType& curv = circle.curvature();
     const float& lowerCurv(leaf->template getLowerBound<DiscreteCurv>());
     const float& upperCurv(leaf->template getUpperBound<DiscreteCurv>());
-    if (Sign::sweep(lowerCurv, upperCurv) * curv < 0) {
+    if (SameSignChecker::commonSign(lowerCurv, upperCurv) * curv < 0) {
       circle.reverse();
     }
   }
@@ -75,6 +75,11 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   // Look for more hits near the found trajectory in all available hits
   /////////////////////////////////////////////////////////////////////////
 
+  const float curlCurv = 0.018;
+  StereoHitContained<OffOrigin<InPhi0CurvBox> > hitInPhi0CurvBox(curlCurv);
+  using HoughBox = StereoHitContained<OffOrigin<InPhi0CurvBox> >::HoughBox;
+  hitInPhi0CurvBox.setLocalOrigin(perigee);
+
   // Determine a precision that we expect to achieve at the fitted momentum
   double levelPrecision = 10.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(curv) + 2.74);
   double curvPrecision = 0.15 / (pow(2., levelPrecision));
@@ -85,8 +90,8 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   DiscretePhi0::Array phi0Bounds = linspace<Vector2D>(phi0 - phi0Precision, phi0 + phi0Precision, 2,
                                                       &(Vector2D::Phi));
 
-  Phi0CurvBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
-                                   DiscreteCurv::getRange(curvBounds));
+  HoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
+                                DiscreteCurv::getRange(curvBounds));
 
   // Acquire all available items
   Node& topNode = leaf->getTree()->getTopNode();
@@ -97,10 +102,6 @@ void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLea
   topNode.eraseIf(isMarked);
 
   // Collect all hits that are in the precision box
-  const float curlCurv = 0.018;
-  HitInPhi0CurvBox hitInPhi0CurvBox(curlCurv);
-  hitInPhi0CurvBox.setLocalOrigin(perigee);
-
   std::vector<WithSharedMark<CDCRLTaggedWireHit> > hitsInPrecisionBox;
 
   for (const WithSharedMark<CDCRLTaggedWireHit>& markableRLTaggedWireHit : topNode) {

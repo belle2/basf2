@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackFindingCDC/utilities/TimeIt.h>
 
 #include <array>
 
@@ -23,11 +24,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Equivalent to \sa TrackFindingCDCTestWithTopology for disabled tests.
-    class DISABLED_Long_TrackFindingCDCTestWithSimpleSimulation :
+    class TrackFindingCDCTestWithSimpleSimulation :
       public TrackFindingCDCTestWithTopology {
 
     public:
-      DISABLED_Long_TrackFindingCDCTestWithSimpleSimulation() :
+      TrackFindingCDCTestWithSimpleSimulation() :
         m_simpleSimulation(&(CDCWireHitTopology::getInstance()))
       {;}
 
@@ -41,6 +42,7 @@ namespace Belle2 {
         m_mcTracks.clear();
         m_mcTrajectories.clear();
         m_axialWireHits.clear();
+        m_wireHits.clear();
       }
 
       /// Populate the event with hits generated from the given helices.
@@ -101,7 +103,15 @@ namespace Belle2 {
           }
         }
 
+        // Pick up points for all hits
+        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+          m_wireHits.push_back(&wireHit);
+        }
+
         m_plotter.draw(CDCWireTopology::getInstance());
+        for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
+          m_plotter.draw(wireHit);
+        }
       }
 
       /// Add the Monte Carlo tracks to the event plot
@@ -116,6 +126,49 @@ namespace Belle2 {
         }
       }
 
+      /// Save content of the plotter to svg file only if running in unrestricted mode --gtest_also_run_disabled_tests
+      void saveDisplay(const std::string& svgFileName)
+      {
+        bool run_disabled = ::testing::GTEST_FLAG(also_run_disabled_tests);
+        if (run_disabled) {
+          m_plotter.save(svgFileName);
+        } else {
+          B2INFO("Not writing display file. To activate svg display output run with --gtest_also_run_disabled_tests");
+        }
+      }
+
+      /** Repeat a time critical simulation section a couple of times.
+       *
+       *  The repeated execution is only done if the test is run in unrestricted mode.
+       *  The default is to run it once.
+       */
+      template<class Function >
+      TimeItResult
+      timeIt(size_t nExecutions,
+             bool activateCallgrind,
+             const Function& function,
+             const std::function<void()>& setUp = doNothing,
+             const std::function<void()>& tearDown = doNothing)
+      {
+        bool run_disabled = ::testing::GTEST_FLAG(also_run_disabled_tests);
+        if (not run_disabled) {
+          nExecutions = 1;
+        }
+        return Belle2::TrackFindingCDC::timeIt(nExecutions,
+                                               activateCallgrind,
+                                               function,
+                                               setUp,
+                                               tearDown);
+
+      }
+
+      /// Forwarding draw class to the plotter instance
+      template <typename ... Arg>
+      void draw(Arg&& ... arg)
+      {
+        m_plotter.draw(std::forward<Arg>(arg) ...);
+      }
+
       /// Clean up after test
       virtual void TearDown() override
       {
@@ -125,11 +178,8 @@ namespace Belle2 {
         m_mcTracks.clear();
         m_mcTrajectories.clear();
         m_axialWireHits.clear();
+        m_wireHits.clear();
       }
-
-      /// Get the plotter instance
-      EventDataPlotter& getPlotter()
-      { return m_plotter; }
 
     protected:
       /// Some colors  to cycle for plotting
@@ -137,9 +187,6 @@ namespace Belle2 {
 
       /// Simple simulation generating the hits
       CDCSimpleSimulation m_simpleSimulation;
-
-      /// Plotter facility to generate visual representations
-      EventDataPlotter m_plotter;
 
       /// Memory for the Monte Carlo trajectories of the current event.
       std::vector<CDCTrajectory3D> m_mcTrajectories;
@@ -155,6 +202,14 @@ namespace Belle2 {
 
       /// Memory for the axial hits of the current event.
       std::vector<const CDCWireHit*> m_axialWireHits;
+
+      /// Memory for the hits of the current event.
+      std::vector<const CDCWireHit*> m_wireHits;
+
+    private:
+      /// Plotter facility to generate visual representations
+      EventDataPlotter m_plotter;
+
     };
 
   } //end namespace TrackFindingCDC

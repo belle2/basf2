@@ -44,7 +44,7 @@ namespace {
   using Phi0ImpactCurvSweeped = Phi0Sweeped<ImpactSweeped<CurvSweepedXLine> >;
 
 
-  TEST_F(DISABLED_Long_TrackFindingCDCTestWithSimpleSimulation, hough_perigee_SimpleHitBasedHough_phi0_impact_curv_onHits)
+  TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_SimpleHitBasedHough_phi0_impact_curv_onHits)
   {
     std::string svgFileName = "phi0_impact_curv_on_hits.svg";
 
@@ -52,7 +52,7 @@ namespace {
     Helix higherCurvHelix(0.027, 3.0718, 20, 0, 0);
 
     simulate({lowerCurvHelix, higherCurvHelix});
-    getPlotter().save(svgFileName);
+    saveDisplay(svgFileName);
 
     const size_t maxLevel = 13;
 
@@ -138,17 +138,17 @@ namespace {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLTaggedWireHit>& taggedHits = candidate.second;
 
-      B2INFO("Candidate");
-      B2INFO("size " << taggedHits.size());
-      B2INFO("Phi " << houghBox.getLowerBound<DiscretePhi0>());
-      B2INFO("Curv " << houghBox.getLowerBound<DiscreteCurv>());
-      B2INFO("Impact " << houghBox.getLowerBound<ContinuousImpact>());
+      B2DEBUG(100, "Candidate");
+      B2DEBUG(100, "size " << taggedHits.size());
+      B2DEBUG(100, "Phi " << houghBox.getLowerBound<DiscretePhi0>());
+      B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
+      B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
-      B2INFO("Tags of the hits");
+      B2DEBUG(100, "Tags of the hits");
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        B2INFO("    " <<
-               "rl = " << rlTaggedWireHit.getRLInfo() << " " <<
-               "dl = " << rlTaggedWireHit->getRefDriftLength());
+        B2DEBUG(100, "    " <<
+                "rl = " << rlTaggedWireHit.getRLInfo() << " " <<
+                "dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
@@ -161,18 +161,18 @@ namespace {
         }
         //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
         EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
-        getPlotter().draw(*wireHit, strokeAttr);
+        draw(*wireHit, strokeAttr);
       }
       ++iColor;
     }
-    getPlotter().save(svgFileName);
+    saveDisplay(svgFileName);
 
     timeItResult.printSummary();
   }
 }
 
 namespace {
-  TEST_F(DISABLED_Long_TrackFindingCDCTestWithSimpleSimulation, hough_perigee_SimpleHitBasedHough_phi0_impact_curv_onSegment)
+  TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_SimpleHitBasedHough_phi0_impact_curv_onSegment)
   {
     std::string svgFileName = "phi0_impact_curv_on_segments.svg";
 
@@ -180,7 +180,7 @@ namespace {
     Helix higherCurvHelix(0.027, 3.0718, 20, 0, 0);
 
     simulate({lowerCurvHelix, higherCurvHelix});
-    getPlotter().save(svgFileName);
+    saveDisplay(svgFileName);
 
     const size_t maxLevel = 13;
 
@@ -268,19 +268,19 @@ namespace {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCRecoSegment2D*>& segments = candidate.second;
 
-      B2INFO("Candidate");
-      B2INFO("size " << segments.size());
-      B2INFO("Phi " << houghBox.getLowerBound<DiscretePhi0>());
-      B2INFO("Curv " << houghBox.getLowerBound<DiscreteCurv>());
-      B2INFO("Impact " << houghBox.getLowerBound<ContinuousImpact>());
+      B2DEBUG(100, "Candidate");
+      B2DEBUG(100, "size " << segments.size());
+      B2DEBUG(100, "Phi " << houghBox.getLowerBound<DiscretePhi0>());
+      B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
+      B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
       for (const CDCRecoSegment2D* recoSegment2D : segments) {
         EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
-        getPlotter().draw(*recoSegment2D, strokeAttr);
+        draw(*recoSegment2D, strokeAttr);
       }
       ++iColor;
     }
-    getPlotter().save(svgFileName);
+    saveDisplay(svgFileName);
     timeItResult.printSummary();
   }
 }

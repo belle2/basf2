@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #ifdef HAS_CALLGRIND
 #include <valgrind/callgrind.h>
 #endif

@@ -68,10 +68,10 @@ namespace Belle2 {
 
         // Using binary notation encoding lower and upper box bounds to fill the flat array.
         std::array<float, 4> dist;
-        dist[0b00] = yRotPlusL[0] - impact[0];
-        dist[0b10] = yRotPlusL[1] - impact[0];
-        dist[0b01] = yRotPlusL[0] - impact[1];
-        dist[0b11] = yRotPlusL[1] - impact[1];
+        dist[0b00] = yRotPlusL[0] - static_cast<float>(impact[0]);
+        dist[0b10] = yRotPlusL[1] - static_cast<float>(impact[0]);
+        dist[0b01] = yRotPlusL[0] - static_cast<float>(impact[1]);
+        dist[0b11] = yRotPlusL[1] - static_cast<float>(impact[1]);
 
         return SameSignChecker::commonSign(dist);
       }

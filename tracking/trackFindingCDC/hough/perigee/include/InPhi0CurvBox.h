@@ -56,7 +56,7 @@ namespace Belle2 {
         xRot[0] = x * phi0Vec[0]->x() + y * phi0Vec[0]->y();
         xRot[1] = x * phi0Vec[1]->x() + y * phi0Vec[1]->y();
 
-        const bool isNonCurler = float(curv[1]) <= m_curlCurv and float(curv[0]) >= -m_curlCurv;
+        const bool isNonCurler = static_cast<float>(curv[1]) <= m_curlCurv and static_cast<float>(curv[0]) >= -m_curlCurv;
         const bool onlyPositiveArm = isNonCurler;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
@@ -69,8 +69,8 @@ namespace Belle2 {
 
         const float r2 =  x * x + y * y - l * l;
         std::array<float, 2> r2TimesHalfCurv;
-        r2TimesHalfCurv[0] = r2 * (float(curv[0]) / 2.0);
-        r2TimesHalfCurv[1] = r2 * (float(curv[1]) / 2.0);
+        r2TimesHalfCurv[0] = r2 * (static_cast<float>(curv[0]) / 2.0);
+        r2TimesHalfCurv[1] = r2 * (static_cast<float>(curv[1]) / 2.0);
 
         // Using binary notation encoding lower and upper box bounds to fill the flat array.
         std::array<float, 4> dist;

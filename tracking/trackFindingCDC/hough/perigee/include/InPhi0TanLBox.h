@@ -69,18 +69,18 @@ namespace Belle2 {
         }
 
         std::array<float, 4> xRotCor;
-        xRotCor[0b00] = xRot[0] + dxdzRot[0] * s[0] * float(tanL[0]);
-        xRotCor[0b01] = xRot[0] + dxdzRot[0] * s[0] * float(tanL[1]);
-        xRotCor[0b10] = xRot[1] + dxdzRot[1] * s[1] * float(tanL[0]);
-        xRotCor[0b11] = xRot[1] + dxdzRot[1] * s[1] * float(tanL[1]);
+        xRotCor[0b00] = xRot[0] + dxdzRot[0] * s[0] * static_cast<float>(tanL[0]);
+        xRotCor[0b01] = xRot[0] + dxdzRot[0] * s[0] * static_cast<float>(tanL[1]);
+        xRotCor[0b10] = xRot[1] + dxdzRot[1] * s[1] * static_cast<float>(tanL[0]);
+        xRotCor[0b11] = xRot[1] + dxdzRot[1] * s[1] * static_cast<float>(tanL[1]);
 
         const std::array<float, 4>& sCor = xRotCor;
 
         std::array<float, 4> dist;
-        dist[0b00] = -(yRot[0] + dydzRot[0] * sCor[0b00] * float(tanL[0]) + l);
-        dist[0b01] = -(yRot[0] + dydzRot[0] * sCor[0b01] * float(tanL[1]) + l);
-        dist[0b10] = -(yRot[1] + dydzRot[1] * sCor[0b10] * float(tanL[0]) + l);
-        dist[0b11] = -(yRot[1] + dydzRot[1] * sCor[0b11] * float(tanL[1]) + l);
+        dist[0b00] = -(yRot[0] + dydzRot[0] * sCor[0b00] * static_cast<float>(tanL[0]) + l);
+        dist[0b01] = -(yRot[0] + dydzRot[0] * sCor[0b01] * static_cast<float>(tanL[1]) + l);
+        dist[0b10] = -(yRot[1] + dydzRot[1] * sCor[0b10] * static_cast<float>(tanL[0]) + l);
+        dist[0b11] = -(yRot[1] + dydzRot[1] * sCor[0b11] * static_cast<float>(tanL[1]) + l);
 
         return SameSignChecker::commonSign(dist);
       }

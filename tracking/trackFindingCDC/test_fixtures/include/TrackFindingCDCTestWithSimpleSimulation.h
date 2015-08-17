@@ -36,6 +36,15 @@ namespace Belle2 {
       virtual
       void SetUp() override
       {
+
+        m_savedLogLevel = Belle2::LogSystem::Instance().getLogConfig()->getLogLevel();
+        m_savedDebugLogInfo = Belle2::LogSystem::Instance().getLogConfig()->getLogInfo(LogConfig::c_Debug);
+        bool run_disabled = ::testing::GTEST_FLAG(also_run_disabled_tests);
+        if (run_disabled) {
+          Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(LogConfig::ELogLevel::c_Debug);
+          Belle2::LogSystem::Instance().getLogConfig()->setLogInfo(LogConfig::c_Debug, LogConfig::c_Level + LogConfig::c_Message);
+        }
+
         m_plotter.clear();
         m_mcAxialSegment2Ds.clear();
         m_mcSegment2Ds.clear();
@@ -172,6 +181,9 @@ namespace Belle2 {
       /// Clean up after test
       virtual void TearDown() override
       {
+        Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(m_savedLogLevel);
+        Belle2::LogSystem::Instance().getLogConfig()->setLogInfo(LogConfig::c_Debug, m_savedDebugLogInfo);
+
         m_plotter.clear();
         m_mcAxialSegment2Ds.clear();
         m_mcSegment2Ds.clear();
@@ -182,6 +194,12 @@ namespace Belle2 {
       }
 
     protected:
+      /// Memory for the log level that was set before the test.
+      LogConfig::ELogLevel m_savedLogLevel;
+
+      /// Memory for the log info of debug that was set before the test.
+      unsigned int m_savedDebugLogInfo;
+
       /// Some colors  to cycle for plotting
       const std::array<std::string, 6> m_colors{{ "red", "blue", "green", "yellow", "violet", "cyan" }};
 

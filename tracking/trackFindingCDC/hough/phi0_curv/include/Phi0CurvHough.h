@@ -66,22 +66,24 @@ namespace Belle2 {
         const size_t nCurvBins = std::pow(curvDivisions, m_maxLevel);
         if (m_minCurv == 0) {
           m_discreteCurvs =
-            DiscreteCurvArray::forPositiveCurvBinsWithOverlap(m_maxCurv,
-                                                              nCurvBins,
-                                                              m_discreteCurvWidth,
-                                                              m_discreteCurvOverlap);
+          DiscreteCurvArray::forPositiveBinsWithOverlap([](double curv) { return curv;},
+          m_maxCurv,
+          nCurvBins,
+          m_discreteCurvWidth,
+          m_discreteCurvOverlap);
         } else {
           m_discreteCurvs =
-            DiscreteCurvArray::forCurvBinsWithOverlap(m_minCurv,
-                                                      m_maxCurv,
-                                                      nCurvBins,
-                                                      m_discreteCurvWidth,
-                                                      m_discreteCurvOverlap);
+          DiscreteCurvArray::forBinsWithOverlap([](double curv) { return curv;},
+          m_minCurv,
+          m_maxCurv,
+          nCurvBins,
+          m_discreteCurvWidth,
+          m_discreteCurvOverlap);
         }
 
         // Compose the hough space
-        Phi0CurvBox phi0CurvHoughPlain(m_discretePhi0s.getRange(), m_discreteCurvs.getRange());
-
+        Phi0CurvBox phi0CurvHoughPlain(DiscretePhi0::getRange(m_discretePhi0s),
+                                       DiscreteCurv::getRange(m_discreteCurvs));
 
         Phi0CurvBox::Delta phi0CurvOverlaps{m_discretePhi0Overlap, m_discreteCurvOverlap};
         Phi0CurvBoxDivision phi0CurvBoxDivision(phi0CurvOverlaps);

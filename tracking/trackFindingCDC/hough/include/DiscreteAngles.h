@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <tracking/trackFindingCDC/hough/DiscreteValues.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
@@ -74,22 +76,18 @@ namespace Belle2 {
       }
     };
 
-    class DiscreteAngleArray {
+    class DiscreteAngleArray : public DiscreteValueArray<Vector2D> {
 
     public:
       /** Create an evenly spaced range of angular values and precompute sin and cos.
        *  Note to get n bins you have to give  nPositions = nBins + 1 in this constructor
        *  Hence for a typical use case in a hough grid nPositions should be 2^(levels) + 1.
        */
-      DiscreteAngleArray(double lowerBound, double upperBound, size_t nPositions)
+      DiscreteAngleArray(double lowerBound, double upperBound, size_t nPositions) :
+        DiscreteValueArray(lowerBound, upperBound,
+                           nPositions,
+                           [](double phi) -> Vector2D {return Vector2D::Phi(phi);})
       {
-        m_angleVectors.reserve(nPositions);
-
-        for (double phi : linspace(lowerBound, upperBound, nPositions)) {
-          m_angleVectors.push_back(Vector2D::Phi(phi));
-        }
-
-        assert(m_angleVectors.size() == nPositions);
       }
 
       /** Create an evenly spaced range of angular values and precompute sin and cos.
@@ -117,23 +115,20 @@ namespace Belle2 {
 
       /// Get the first angle
       DiscreteAngle front() const
-      { return DiscreteAngle(m_angleVectors.begin()); }
+      { return DiscreteAngle(m_values.begin()); }
 
       /// Get the last angle
       DiscreteAngle back() const
-      { return DiscreteAngle(--(m_angleVectors.end())); }
+      { return DiscreteAngle(--(m_values.end())); }
 
       /// Get the  angle with the given index
       DiscreteAngle operator[](size_t i) const
-      { return DiscreteAngle(m_angleVectors.begin() + i); }
+      { return DiscreteAngle(m_values.begin() + i); }
 
       /// Get the full range of the discrete values
       std::pair<DiscreteAngle, DiscreteAngle> getRange() const
       { return std::make_pair(front(), back()); }
 
-    private:
-      /// Memory for the unit vectors representing the discrete angle.
-      std::vector<Vector2D> m_angleVectors;
     };
   }
 }

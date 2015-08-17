@@ -26,8 +26,8 @@ namespace Belle2 {
        */
       static inline SignType commonSign(double n1, double n2, double n3, double n4)
       {
-        return ((n1 > 0 and n2 > 0 and n3 > 0 and n4 > 0) -
-                (n1 < 0 and n2 < 0 and n3 < 0 and n4 < 0));
+        return ((not(n1 <= 0) and not(n2 <= 0) and not(n3 <= 0) and not(n4 <= 0)) -
+                (not(n1 >= 0) and not(n2 >= 0) and not(n3 >= 0) and not(n4 >= 0)));
       }
 
       /** Check if two values have a common sign.
@@ -37,7 +37,7 @@ namespace Belle2 {
        */
       static inline SignType commonSign(double n1, double n2)
       {
-        return ((n1 > 0 and n2 > 0) - (n1 < 0 and n2 < 0));
+        return ((not(n1 <= 0) and not(n2 <= 0)) - (not(n1 >= 0) and not(n2 >= 0)));
       }
 
       /// Check if four values have the same sign.

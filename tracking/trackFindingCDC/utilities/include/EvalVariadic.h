@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <type_traits>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -59,6 +61,10 @@ namespace Belle2 {
     /** Short cut meta function to take the first type of a variadic sequence */
     template<class... Types_>
     using FirstType = typename FirstTypeImpl<Types_...>::Type;
+
+    /** Short form for std::enable_f */
+    template<bool cond, class T>
+    using EnableIf = typename std::enable_if<cond, T>::type;
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2

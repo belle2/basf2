@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
+#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/logging/Logger.h>
 
@@ -22,13 +23,30 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     template<class... Types>
-    class Box {
+    class Box;
+    template<>
+
+    class Box<> {
     public:
+      /// Nothing to do on set bounds.
+      void setBounds() {;}
+    };
+
+    template<class FirstType_, class... SubordinaryTypes>
+    class Box<FirstType_, SubordinaryTypes...> {
+    public:
+      /// Type of the first coordinate
+      typedef FirstType_ FirstType;
+
+      /// Type of this box
+      typedef Box<FirstType_, SubordinaryTypes...> This;
+
       /// Tuple of the types of each coordinates
-      typedef std::tuple<Types...> Point;
+      typedef std::tuple<FirstType, SubordinaryTypes...> Point;
 
       /// Tuple of differencs in each coordinate
-      typedef std::tuple < decltype(Types() - Types())... > Delta;
+      typedef std::tuple < decltype(FirstType() - FirstType()),
+              decltype(SubordinaryTypes() - SubordinaryTypes())... > Delta;
 
       /// Accessor for the individual coordinate types.
       template<std::size_t I>
@@ -38,32 +56,58 @@ namespace Belle2 {
       template<std::size_t I>
       using Width = typename std::tuple_element<I, Delta>::type;
 
-      /// Get the number of coorinates
-      static std::size_t getNCoordinates()
-      { return std::tuple_size<Point>(); }
+      /// Number of coordinates of the box
+      static const size_t c_nTypes = std::tuple_size<Point>();
+
+      /// Helper class to iterate over the individual coordinates
+      typedef GenIndices<c_nTypes> Indices;
 
       /// Initialise the box with bound in each dimension.
-      Box(std::pair<Types, Types>... bounds) :
-        m_lowerBounds{std::min(bounds.first, bounds.second)...},
-        m_upperBounds{std::max(bounds.first, bounds.second)...}
+      Box(const std::pair<FirstType, FirstType>& firstBound,
+          const std::pair<SubordinaryTypes, SubordinaryTypes>& ... subordinaryBounds) :
+        m_firstBounds{std::minmax(firstBound.first, firstBound.second)},
+        m_subordinaryBox(subordinaryBounds...)
       {;}
 
       /// Set bounds of the box to new values
-      void setBounds(std::pair<Types, Types>... bounds)
+      void setBounds(std::pair<FirstType, FirstType> firstBound,
+                     std::pair<SubordinaryTypes, SubordinaryTypes>... subordinaryBounds)
       {
-        m_lowerBounds = {std::min(bounds.first, bounds.second)...};
-        m_upperBounds = {std::max(bounds.first, bounds.second)...};
+        m_firstBounds = std::minmax(firstBound.first, firstBound.second);
+        m_subordinaryBox.setBounds(subordinaryBounds...);
       }
 
-      /// Get the lower bound of the box in the coordinate I
+      /// Getter for the box in excluding the first coordinate
+      const Box<SubordinaryTypes...>& getSubordinaryBox() const
+      { return m_subordinaryBox; }
+
+      /// Get the lower bound of the box in the coordinate I - first coordinate case
       template<std::size_t I>
-      const Type<I>& getLowerBound() const
-      { return std::get<I>(m_lowerBounds); }
+      const EnableIf<I == 0, Type<I> >& getLowerBound() const
+      { return m_firstBounds.first; }
+
+      /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
+      template<std::size_t I>
+      const EnableIf < I != 0, Type<I> > & getLowerBound() const
+      {
+        static_assert(I < c_nTypes,
+                      "Accessed index exceeds number of coordinates");
+        return m_subordinaryBox.template getLowerBound < I - 1 > ();
+      }
 
       /// Get the upper bound of the box in the coordinate I
       template<std::size_t I>
-      const Type<I>& getUpperBound() const
-      { return std::get<I>(m_upperBounds); }
+      const EnableIf<I == 0, Type<I> >& getUpperBound() const
+      { return m_firstBounds.second; }
+
+      /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
+      template<std::size_t I>
+      const EnableIf < I != 0, Type<I> > & getUpperBound() const
+      {
+        static_assert(I < c_nTypes,
+                      "Accessed index exceeds number of coordinates");
+        return m_subordinaryBox.template getUpperBound < I - 1 > ();
+      }
 
       /// Get the difference of upper and lower bound
       template<std::size_t I>
@@ -147,8 +191,8 @@ namespace Belle2 {
       { return getDivisionBounds(2, 1); }
 
       /// Indicate if the given value is in the range of the coordinate I
-      template<std::size_t I, class OtherValue>
-      bool isIn(const OtherValue& value) const
+      template<std::size_t I, class SubordinaryValue>
+      bool isIn(const SubordinaryValue& value) const
       { return getLowerBound<I>() < value and not(getUpperBound<I>() < value); }
 
     private:
@@ -176,7 +220,7 @@ namespace Belle2 {
        *  Negation yields the desired result.
        */
       template<size_t ... Is>
-      bool intersectsImpl(const Box<Types...>& box, IndexSequence<Is...>) const
+      bool intersectsImpl(const This& box, IndexSequence<Is...>) const
       {
         return not(any({box.getUpperBound<Is>() < getLowerBound<Is>()... }) or
                    any({getUpperBound<Is>() < box.getLowerBound<Is>()... }));
@@ -186,24 +230,28 @@ namespace Belle2 {
        *  Implementation unroling the individual coordinates.
        */
       template<size_t ... Is>
-      bool isInImpl(const Types& ... values, IndexSequence<Is...>) const
-      { return not all({isIn<Is>(values) ... }); }
+      bool isInImpl(const Point& point, IndexSequence<Is...>) const
+      { return not all({isIn<Is>(std::get<Is>(point)) ... }); }
 
     public:
       /// Indicates if this box intersects with the other box
-      bool intersects(const Box<Types...>& box) const
-      { return intersectsImpl(box, GenIndices<sizeof...(Types)>());  }
+      bool intersects(const This& box) const
+      { return intersectsImpl(box, GenIndices<c_nTypes>());  }
 
       /// Indicate if all given values are in the range of their coordinates.
-      bool isIn(const Types& ... values) const
-      { return isInImpl(values..., GenIndices<sizeof...(Types)>()); }
+      bool isIn(const Point& point) const
+      { return isInImpl(point, GenIndices<c_nTypes>()); }
+
+      /// Indicate if all given values are in the range of their coordinates.
+      bool isIn(const FirstType& value, const SubordinaryTypes& ... values) const
+      { return isInImpl(Point(value, values...), GenIndices<c_nTypes>()); }
 
     private:
-      /// Lower bounds of the box in each direction
-      Point m_lowerBounds;
+      /// Bound in the first coordindate
+      std::pair<FirstType, FirstType> m_firstBounds;
 
-      /// Upper bounds of the box in each direction
-      Point m_upperBounds;
+      /// Box in the other coordinate
+      Box<SubordinaryTypes... > m_subordinaryBox;
     };
 
   }

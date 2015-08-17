@@ -56,6 +56,14 @@ namespace Belle2 {
       template<std::size_t I>
       using Type = typename std::tuple_element<I, Point>::type;
 
+      /// Accessor for the index of a certain coordinate which amounts to a std::integral_constant.
+      template<class T>
+      using TypeIndex = GetIndexInTuple<T, Point>;
+
+      /// Check if the type is a coordinate of the box which amounts to a std::integral_constant.
+      template<class T>
+      using HasType = TypeInTuple<T, Point>;
+
       /// Accessor for the individual coordinate difference types.
       template<std::size_t I>
       using Width = typename std::tuple_element<I, Delta>::type;
@@ -110,9 +118,9 @@ namespace Belle2 {
 
       /// Get the lower bound of the box by the type of the coordinate.
       template<class T>
-      const T& getLowerBound() const
-      { return getLowerBound< GetIndexInTuple<T, Point>::value > (); }
-
+      const EnableIf< HasType<T>::value, T>&
+      getLowerBound() const
+      { return getLowerBound< TypeIndex<T>::value > (); }
 
       /// Get the upper bound of the box in the coordinate I
       template<std::size_t I>
@@ -130,8 +138,9 @@ namespace Belle2 {
 
       /// Get the upper bound of the box by the type of the coordinate.
       template<class T>
-      const T& getUpperBound() const
-      { return getUpperBound< GetIndexInTuple<T, Point>::value > (); }
+      const EnableIf< HasType<T>::value, T>&
+      getUpperBound() const
+      { return getUpperBound< TypeIndex<T>::value > (); }
 
       /// Get the difference of upper and lower bound
       template<std::size_t I>

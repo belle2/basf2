@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 
 namespace Belle2 {
@@ -72,6 +73,11 @@ namespace Belle2 {
     template<class Type, class Tuple>
     struct GetIndexInTuple {};
 
+    /// Specialisation to terminate the recursion in case it was not found.
+    template<class Type>
+    struct GetIndexInTuple<Type, std::tuple<> > :
+      std::integral_constant<std::size_t, 0> {};
+
     /// Specialisation for the case that the first type in the tuple is not the Type asked for. Recursion case.
     template<class Type, class HeadType, class ... TailTypes>
     struct GetIndexInTuple<Type, std::tuple<HeadType, TailTypes...> > :
@@ -81,6 +87,11 @@ namespace Belle2 {
     template<class Type, class... TailTypes>
     struct GetIndexInTuple <Type, std::tuple<Type, TailTypes...> > :
       std::integral_constant< std::size_t, 0> {};
+
+    /// Looks in a tuple if the asked type can be found.
+    template<class T, class Tuple>
+    using TypeInTuple =
+      std::integral_constant < bool, (GetIndexInTuple<T, Tuple>::value < std::tuple_size<Tuple>::value) >;
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2

@@ -18,24 +18,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class HoughBox>
-    float getLowerCurv(const HoughBox& houghBoxWithOutCurv, long)
-    { return 0; }
-
-    template<class HoughBox>
-    auto getLowerCurv(const HoughBox& houghBoxWithCurv, int) ->
-    decltype(houghBoxWithCurv.template getLowerBound<DiscreteCurv>())
-    { return houghBoxWithCurv.template getLowerBound<DiscreteCurv>(); }
-
-    template<class HoughBox>
-    float getUpperCurv(const HoughBox& houghBoxWithOutCurv, long)
-    { return 0; }
-
-    template<class HoughBox>
-    auto getUpperCurv(const HoughBox& houghBoxWithCurv, int) ->
-    decltype(houghBoxWithCurv.template getUpperBound<DiscreteCurv>())
-    { return houghBoxWithCurv.template getUpperBound<DiscreteCurv>(); }
-
 
     /// Takes a basic object and sweeps it by some angle phi0 range a around the origin
     template<class T, class Phi0 = DiscretePhi0>
@@ -72,8 +54,8 @@ namespace Belle2 {
         const float lowerX = x * lowerPhi0Vec.x() + y * lowerPhi0Vec.y();
         const float upperX = x * upperPhi0Vec.x() + y * upperPhi0Vec.y();
 
-        const float& lowerCurv(getLowerCurv(houghBox, 0));
-        const float& upperCurv(getUpperCurv(houghBox, 0));
+        const float& lowerCurv(getLowerCurv(houghBox));
+        const float& upperCurv(getUpperCurv(houghBox));
 
         const bool lowerIsNonCurler = fabs(lowerCurv) < m_curlCurv;
         const bool upperIsNonCurler = fabs(upperCurv) < m_curlCurv;

@@ -48,42 +48,24 @@ namespace Belle2 {
       /// Initialise the algorithm by constructing the hough tree from the parameters
       virtual void initialize()
       {
-        {
-          size_t maxLevel = this->getMaxLevel();
+        size_t maxLevel = this->getMaxLevel();
+        // Setup the discrete values for phi0
+        const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
+        Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
+                                  m_discretePhi0Overlap,
+                                  m_discretePhi0Width);
 
-          // Setup the discrete values for phi0
-          const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
-          DiscretePhi0Array discretePhi0s =
-            DiscretePhi0Array::forBinsWithOverlaps(nPhi0Bins,
-                                                   m_discretePhi0Width,
-                                                   m_discretePhi0Overlap);
-          this-> template assignArray<0>(std::move(discretePhi0s), m_discretePhi0Overlap);
+        this->template assignArray<0>(phi0BinsSpec.constructArray(), m_discretePhi0Overlap);
 
-          // Setup the discrete values for the two dimensional curvature
-          assert(m_discreteCurvWidth > m_discreteCurvOverlap);
-          const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
-          if (m_minCurv == 0) {
-            DiscreteCurvArray discreteCurvs =
-            DiscreteCurvArray::forPositiveBinsWithOverlap([](double curv) { return curv;},
-            m_maxCurv,
-            nCurvBins,
-            m_discreteCurvWidth,
-            m_discreteCurvOverlap);
+        // Setup the discrete values for the two dimensional curvature
+        const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
+        CurvBinsSpec curvBinsSpec(m_minCurv,
+                                  m_maxCurv,
+                                  nCurvBins,
+                                  m_discreteCurvOverlap,
+                                  m_discreteCurvWidth);
 
-            this->template assignArray<1>(std::move(discreteCurvs), m_discreteCurvOverlap);
-
-          } else {
-            DiscreteCurvArray discreteCurvs =
-            DiscreteCurvArray::forBinsWithOverlap([](double curv) { return curv;},
-            m_minCurv,
-            m_maxCurv,
-            nCurvBins,
-            m_discreteCurvWidth,
-            m_discreteCurvOverlap);
-
-            this->template assignArray<1>(std::move(discreteCurvs), m_discreteCurvOverlap);
-          }
-        }
+        this->template assignArray<1>(curvBinsSpec.constructArray(), m_discreteCurvOverlap);
 
         const DiscretePhi0Array& discretePhi0s = this->template getArray<0>();
         const DiscreteCurvArray& discreteCurvs = this->template getArray<1>();

@@ -31,5 +31,43 @@ namespace Belle2 {
       static std::pair<DiscretePhi0, DiscretePhi0> getRange(const DiscretePhi0Array& valueArray)
       { return {DiscretePhi0(valueArray.front()), DiscretePhi0(valueArray.back())}; }
     };
+
+
+    /// Strategy to construct discrete phi0 points from discrete overlap specifications.
+    class Phi0BinsSpec {
+    public:
+      /** Constructor from fixed number of accessable bins and overlap specification
+       *  in discrete number of positions */
+      Phi0BinsSpec(size_t nBins, size_t nOverlap, size_t nWidth);
+
+      /// Constuct the array of discrete phi0 positions
+      DiscretePhi0Array constructArray() const;
+
+      /// Getter for the number of bounds
+      size_t getNPositions() const;
+
+      /** Getter for the bin width in real phi0 to investigate the value
+       *  that results from the discrete overlap specification*/
+      double getBinWidth() const;
+
+      /** Getter for the overlap in real phi0 to investigate the value
+       *  that results from the discrete overlap specification*/
+      double getOverlap() const;
+
+      /// Getter for the overlap in discrete number of positions
+      size_t getNOverlap() const
+      { return m_nOverlap; }
+
+    private:
+      ///  Number of accessable bins
+      size_t m_nBins;
+
+      /// Overlap of the leaves in phi0 counted in number of discrete values.
+      size_t m_nOverlap = 1;
+
+      /// Width of the leaves at the maximal level in phi0 counted in number of discrete values.
+      size_t m_nWidth = 3;
+    };
+
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

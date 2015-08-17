@@ -37,6 +37,11 @@ namespace Belle2 {
       /// Default copy constructor
       DiscreteAngle(const DiscreteAngle&) = default;
 
+      const Vector2D& getValue() const
+      {
+        return **this;
+      }
+
       const Vector2D& getAngleVec() const
       {
         return **this;
@@ -61,13 +66,14 @@ namespace Belle2 {
       operator const Vector2D& () const
       { return getAngleVec(); }
 
+      /// Advance to next discrete values
       DiscreteAngle operator+(const std::iterator_traits<Super>::difference_type& advance_by) const
       {
         DiscreteAngle result(*this);
         std::advance(result, advance_by);
         return result;
       }
-
+      /// Advance to previous discrete values
       DiscreteAngle operator-(const std::iterator_traits<Super>::difference_type& advance_by) const
       {
         DiscreteAngle result(*this);
@@ -87,8 +93,7 @@ namespace Belle2 {
        *  Hence for a typical use case in a hough grid nPositions should be 2^(levels) + 1.
        */
       DiscreteAngleArray(double lowerBound, double upperBound, size_t nPositions) :
-        DiscreteValueArray(lowerBound, upperBound,
-                           nPositions,
+        DiscreteValueArray(lowerBound, upperBound, nPositions,
                            [](double phi) -> Vector2D {return Vector2D::Phi(phi);})
       {
       }
@@ -101,21 +106,6 @@ namespace Belle2 {
       {;}
 
     public:
-      static DiscreteAngleArray forBinsWithOverlaps(size_t nBins,
-                                                    size_t nWidth = 1,
-                                                    size_t nOverlap = 0)
-      {
-        assert(nWidth > nOverlap);
-        const size_t nPositions = (nWidth - nOverlap) * nBins + nOverlap + 1;
-        const double overlap = 2.0 * PI * nOverlap / (nBins * (nWidth - nOverlap));
-
-        // Adjust the angle bounds such that overlap occures at the wrap around as well
-        const double lowerBound = -PI - overlap / 2;
-        const double upperBound = +PI + overlap / 2;
-
-        return DiscreteAngleArray(lowerBound, upperBound, nPositions);
-      }
-
       /// Get the first angle
       DiscreteAngle front() const
       { return DiscreteAngle(m_values.begin()); }

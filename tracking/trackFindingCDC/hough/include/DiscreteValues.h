@@ -27,6 +27,15 @@ namespace Belle2 {
     public:
       using Super::Super;
 
+      /// Default constructor for to obtain a valid object in all contexts.
+      DiscreteValue() = default;
+
+      /// Constructor from underlying iterator type
+      explicit DiscreteValue(const Super& iter) : Super(iter) {;}
+
+      /// Default copy constructor
+      DiscreteValue(const DiscreteValue<T>&) = default;
+
       /// Get the value
       const T& getValue() const
       { return **this; }
@@ -69,19 +78,19 @@ namespace Belle2 {
       {;}
 
       /// Get the first angle
-      DiscreteValue<T> front()
+      DiscreteValue<T> front() const
       { return DiscreteValue<T>(m_values.begin()); }
 
       /// Get the last angle
-      DiscreteValue<T> back()
+      DiscreteValue<T> back() const
       { return DiscreteValue<T>(--(m_values.end())); }
 
       /// Get the  angle with the given index
-      DiscreteValue<T> operator[](size_t i)
+      DiscreteValue<T> operator[](size_t i) const
       { return DiscreteValue<T>(m_values.begin() + i); }
 
       /// Get the full range of the discrete values
-      std::pair<DiscreteValue<T>, DiscreteValue<T> > getRange()
+      std::pair<DiscreteValue<T>, DiscreteValue<T> > getRange() const
       { return std::make_pair(front(), back()); }
 
     private:

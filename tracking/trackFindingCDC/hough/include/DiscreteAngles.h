@@ -26,6 +26,15 @@ namespace Belle2 {
 
       using Super::Super;
 
+      /// Default constructor for to obtain a valid object in all contexts.
+      DiscreteAngle() = default;
+
+      /// Constructor from underlying iterator type
+      explicit DiscreteAngle(const Super& iter) : Super(iter) {;}
+
+      /// Default copy constructor
+      DiscreteAngle(const DiscreteAngle&) = default;
+
       const Vector2D& getAngleVec() const
       {
         return **this;
@@ -107,19 +116,19 @@ namespace Belle2 {
       }
 
       /// Get the first angle
-      DiscreteAngle front()
+      DiscreteAngle front() const
       { return DiscreteAngle(m_angleVectors.begin()); }
 
       /// Get the last angle
-      DiscreteAngle back()
+      DiscreteAngle back() const
       { return DiscreteAngle(--(m_angleVectors.end())); }
 
       /// Get the  angle with the given index
-      DiscreteAngle operator[](size_t i)
+      DiscreteAngle operator[](size_t i) const
       { return DiscreteAngle(m_angleVectors.begin() + i); }
 
       /// Get the full range of the discrete values
-      std::pair<DiscreteAngle, DiscreteAngle> getRange()
+      std::pair<DiscreteAngle, DiscreteAngle> getRange() const
       { return std::make_pair(front(), back()); }
 
     private:

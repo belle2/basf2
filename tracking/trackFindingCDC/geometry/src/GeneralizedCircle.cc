@@ -346,12 +346,10 @@ FloatType GeneralizedCircle::arcLengthToCylindricalR(const FloatType& cylindrica
   return arcLength;
 }
 
-
-
-
-FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance) const
+FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance,
+                                             const FloatType& curvature)
 {
-  FloatType x = directDistance * curvature() / 2.0;
+  FloatType x = directDistance * curvature / 2.0;
 
   // Implementation of asin(x)/x
   // Inspired by BOOST's sinc

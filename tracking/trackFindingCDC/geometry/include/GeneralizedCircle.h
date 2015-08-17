@@ -564,7 +564,18 @@ namespace Belle2 {
       It enables better handling of the line limit compared to the former implementaiton
       which used the opening angle of the arc.
        */
-      FloatType arcLengthFactor(const FloatType& directDistance) const;
+      FloatType arcLengthFactor(const FloatType& directDistance) const
+      { return arcLengthFactor(directDistance, curvature()); }
+
+      /**
+      Helper function the calculate the factor between the length of a secant line and
+      the length on the arc.
+      Smooth function expressing the relation between arc length and direct length
+      only using the curvature of the circle as additional information.
+      It enables better handling of the line limit compared to the former implementaiton
+      which used the opening angle of the arc.
+       */
+      static FloatType arcLengthFactor(const FloatType& directDistance, const FloatType& curvature);
 
       /**
       Calculates the two points common to both circles.

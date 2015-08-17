@@ -19,7 +19,7 @@ namespace Belle2 {
     /** Takes a basic object and sweeps it by some d0 range in the y direction.
      *  The sweep in phi0 should be handled before
      */
-    template<class T, class Impact = DiscreteImpact>
+    template<class T, class Impact = ContinuousImpact>
     class ImpactSweeped : public T {
 
     public:

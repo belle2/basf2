@@ -40,6 +40,7 @@ namespace {
     SimpleHitBasedHough<const CDCRecoSegment2D*, SweepedThingy, divisions ... >;
 
   using Phi0CurvSweeped = Phi0Sweeped<CurvSweepedXLine>;
+
   using Phi0ImpactCurvSweeped = Phi0Sweeped<ImpactSweeped<CurvSweepedXLine> >;
 
 
@@ -100,7 +101,8 @@ namespace {
     using HoughBox = SimpleWireHitPhi0ImpactCurvHough::HoughBox;
 
     houghTree.assignArray<0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap());
+    //houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
+    houghTree.assignArray<1>({minImpact, maxImpact}, impactBinsSpec.getOverlap()); // Continuous
     houghTree.assignArray<2>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
     houghTree.initialize();
 
@@ -140,7 +142,7 @@ namespace {
       B2INFO("size " << taggedHits.size());
       B2INFO("Phi " << houghBox.getLowerBound<DiscretePhi0>());
       B2INFO("Curv " << houghBox.getLowerBound<DiscreteCurv>());
-      B2INFO("Impact " << houghBox.getLowerBound<DiscreteImpact>());
+      B2INFO("Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
       B2INFO("Tags of the hits");
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
@@ -226,7 +228,8 @@ namespace {
     using HoughBox = SimpleSegmentPhi0ImpactCurvHough::HoughBox;
 
     houghTree.assignArray<0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap());
+    //houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
+    houghTree.assignArray<1>({minImpact, maxImpact}, impactBinsSpec.getOverlap()); // Continuous
     houghTree.assignArray<2>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
     houghTree.initialize();
 
@@ -269,7 +272,7 @@ namespace {
       B2INFO("size " << segments.size());
       B2INFO("Phi " << houghBox.getLowerBound<DiscretePhi0>());
       B2INFO("Curv " << houghBox.getLowerBound<DiscreteCurv>());
-      B2INFO("Impact " << houghBox.getLowerBound<DiscreteImpact>());
+      B2INFO("Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
       for (const CDCRecoSegment2D* recoSegment2D : segments) {
         EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};

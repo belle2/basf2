@@ -20,7 +20,7 @@ namespace Belle2 {
     template<class HitPtr,
              class InBox,
              size_t ... divisions>
-    class SimpleHitBasedHough :
+    class SimpleHitBasedHoughTree :
       public BoxDivisionHoughTree<HitPtr, typename InBox::HoughBox, divisions...> {
 
     private:
@@ -36,7 +36,7 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      SimpleHitBasedHough(size_t maxLevel, float curlCurv = NAN) :
+      SimpleHitBasedHoughTree(size_t maxLevel, float curlCurv = NAN) :
         Super(maxLevel),
         m_curlCurv(curlCurv),
         m_stereoHitContainedInBox(curlCurv)

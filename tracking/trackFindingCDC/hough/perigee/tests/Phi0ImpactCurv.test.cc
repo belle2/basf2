@@ -9,40 +9,20 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/SimpleHitBasedHough.h>
+#include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
+#include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
+#include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/Phi0Sweeped.h>
-#include <tracking/trackFindingCDC/hough/perigee/ImpactSweeped.h>
-#include <tracking/trackFindingCDC/hough/perigee/CurvSweepedXLine.h>
-
-#include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
-#include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
-#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
-
-#include <tracking/trackFindingCDC/utilities/TimeIt.h>
+#include <tracking/trackFindingCDC/hough/perigee/InPhi0ImpactCurvBox.h>
 
 #include <vector>
-
-#include <gtest/gtest.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace PergieeBinSpec;
 
 namespace {
-
-  template<class SweepedThingy, size_t ... divisions>
-  using SimpleWireHitHough =
-    SimpleHitBasedHough<CDCRLTaggedWireHit, SweepedThingy, divisions ... >;
-
-  template<class SweepedThingy, size_t ... divisions>
-  using SimpleSegmentHough =
-    SimpleHitBasedHough<const CDCRecoSegment2D*, SweepedThingy, divisions ... >;
-
-  using Phi0CurvSweeped = Phi0Sweeped<CurvSweepedXLine>;
-
-  using Phi0ImpactCurvSweeped = Phi0Sweeped<ImpactSweeped<CurvSweepedXLine> >;
-
 
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_SimpleHitBasedHough_phi0_impact_curv_onHits)
   {
@@ -51,59 +31,25 @@ namespace {
     Helix lowerCurvHelix(0.015, 2.52033, -20, 0, 0);
     Helix higherCurvHelix(0.027, 3.0718, 20, 0, 0);
 
+    // Helix lowerCurvHelix(0.015, 2.52033, 0, 0, 0);
+    // Helix higherCurvHelix(0.027, 3.0718, 0, 0, 0);
+
+
     simulate({lowerCurvHelix, higherCurvHelix});
     saveDisplay(svgFileName);
 
-    const size_t maxLevel = 13;
+    using SimpleWireHitPhi0ImpactCurvHoughTree =
+      SimpleRLTaggedWireHitHoughTree<InPhi0ImpactCurvBox,  phi0Divisions, impactDivisions, curvDivisions>;
 
-    const size_t phi0Divisions = 2;
-    const size_t curvDivisions = 2;
-    const size_t impactDivisions = 2;
+    SimpleWireHitPhi0ImpactCurvHoughTree houghTree(maxLevel, curlCurv);
+    using HoughBox = SimpleWireHitPhi0ImpactCurvHoughTree::HoughBox;
 
+    const double minWeight = 70.0;
 
-    const size_t discretePhi0Overlap = 1;
-    const size_t discretePhi0Width = 3;
-    const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
-    Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
-                              discretePhi0Overlap,
-                              discretePhi0Width);
-
-    const double maxCurv = 0.13;
-    const double minCurv = -0.018;
-
-    const size_t discreteCurvOverlap = 2;
-    const size_t discreteCurvWidth = 5;
-    const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
-    CurvBinsSpec curvBinsSpec(minCurv,
-                              maxCurv,
-                              nCurvBins,
-                              discreteCurvOverlap,
-                              discreteCurvWidth);
-
-    const double maxImpact = 100;
-    const double minImpact = -100;
-
-    const size_t discreteImpactOverlap = 1;
-    const size_t discreteImpactWidth = 2;
-    const size_t nImpactBins = std::pow(impactDivisions, maxLevel);
-    ImpactBinsSpec impactBinsSpec(minImpact,
-                                  maxImpact,
-                                  nImpactBins,
-                                  discreteImpactOverlap,
-                                  discreteImpactWidth);
-
-    const double curlCurv = 0.018;
-
-    using SimpleWireHitPhi0ImpactCurvHough =
-      SimpleWireHitHough<Phi0ImpactCurvSweeped, phi0Divisions, impactDivisions, curvDivisions>;
-
-    SimpleWireHitPhi0ImpactCurvHough houghTree(maxLevel, curlCurv);
-    using HoughBox = SimpleWireHitPhi0ImpactCurvHough::HoughBox;
-
-    houghTree.assignArray<0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    //houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
-    houghTree.assignArray<1>({minImpact, maxImpact}, impactBinsSpec.getOverlap()); // Continuous
-    houghTree.assignArray<2>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
+    houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
+    //houghTree.assignArray<DiscreteImpact>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
+    houghTree.assignArray<ContinuousImpact>({{minImpact, maxImpact}}, impactBinsSpec.getOverlap()); // Continuous
+    houghTree.assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
@@ -114,10 +60,8 @@ namespace {
       houghTree.fell();
       houghTree.seed(m_axialWireHits);
 
-      const double minWeight = 70.0;
-      const double maxCurv = NAN;
-      candidates = houghTree.find(minWeight, maxCurv);
-      // candidates = houghTree.findBest(minWeight, maxCurv);
+      candidates = houghTree.find(minWeight, maxCurvAcceptance);
+      // candidates = houghTree.findBest(minWeight, maxCurvAcceptance);
 
       ASSERT_EQ(m_mcTracks.size(), candidates.size());
       // Check for the parameters of the track candidates
@@ -140,7 +84,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi " << houghBox.getLowerBound<DiscretePhi0>());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
@@ -182,55 +126,18 @@ namespace {
     simulate({lowerCurvHelix, higherCurvHelix});
     saveDisplay(svgFileName);
 
-    const size_t maxLevel = 13;
+    using SimpleSegmentPhi0ImpactCurvHoughTree =
+      SimpleSegmentHoughTree<InPhi0ImpactCurvBox, phi0Divisions, impactDivisions, curvDivisions>;
 
-    const size_t phi0Divisions = 2;
-    const size_t curvDivisions = 2;
-    const size_t impactDivisions = 2;
+    SimpleSegmentPhi0ImpactCurvHoughTree houghTree(maxLevel, curlCurv);
+    using HoughBox = SimpleSegmentPhi0ImpactCurvHoughTree::HoughBox;
 
-    const size_t discretePhi0Overlap = 1;
-    const size_t discretePhi0Width = 3;
-    const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
-    Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
-                              discretePhi0Overlap,
-                              discretePhi0Width);
+    const double minWeight = 70.0;
 
-    const double maxCurv = 0.13;
-    const double minCurv = -0.018;
-
-    const size_t discreteCurvOverlap = 2;
-    const size_t discreteCurvWidth = 5;
-    const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
-    CurvBinsSpec curvBinsSpec(minCurv,
-                              maxCurv,
-                              nCurvBins,
-                              discreteCurvOverlap,
-                              discreteCurvWidth);
-
-    const double maxImpact = 100;
-    const double minImpact = -100;
-
-    const size_t discreteImpactOverlap = 1;
-    const size_t discreteImpactWidth = 2;
-    const size_t nImpactBins = std::pow(impactDivisions, maxLevel);
-    ImpactBinsSpec impactBinsSpec(minImpact,
-                                  maxImpact,
-                                  nImpactBins,
-                                  discreteImpactOverlap,
-                                  discreteImpactWidth);
-
-    const double curlCurv = 0.018;
-
-    using SimpleSegmentPhi0ImpactCurvHough =
-      SimpleSegmentHough<Phi0ImpactCurvSweeped, phi0Divisions, impactDivisions, curvDivisions>;
-
-    SimpleSegmentPhi0ImpactCurvHough houghTree(maxLevel, curlCurv);
-    using HoughBox = SimpleSegmentPhi0ImpactCurvHough::HoughBox;
-
-    houghTree.assignArray<0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    //houghTree.assignArray<1>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
-    houghTree.assignArray<1>({minImpact, maxImpact}, impactBinsSpec.getOverlap()); // Continuous
-    houghTree.assignArray<2>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
+    houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
+    //houghTree.assignArray<DiscreteImpact>(impactBinsSpec.constructArray(), impactBinsSpec.getNOverlap()); // Discrete
+    houghTree.assignArray<ContinuousImpact>({{minImpact, maxImpact}}, impactBinsSpec.getOverlap()); // Continuous
+    houghTree.assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
@@ -243,10 +150,8 @@ namespace {
 
       houghTree.seed(m_mcAxialSegment2Ds);
 
-      const double minWeight = 70.0;
-      const double maxCurv = NAN;
-      candidates = houghTree.find(minWeight, maxCurv);
-      // candidates = houghTree.findBest(minWeight, maxCurv);
+      candidates = houghTree.find(minWeight, maxCurvAcceptance);
+      // candidates = houghTree.findBest(minWeight, maxCurvAcceptance);
 
       ASSERT_EQ(m_mcTracks.size(), candidates.size());
 
@@ -270,7 +175,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi " << houghBox.getLowerBound<DiscretePhi0>());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 

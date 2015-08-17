@@ -9,8 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/Phi0Sweeped.h>
-#include <tracking/trackFindingCDC/hough/perigee/CurvSweepedXLine.h>
+#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 
 
@@ -24,10 +23,8 @@ namespace {
 
   TEST(TrackFindingCDCTest, hough_perigee_StereoHitContained_compile)
   {
-    using Phi0SweepedXCircle = Phi0Sweeped<CurvSweepedXLine>;
-
     const float curlCurv = 0.013;
-    StereoHitContained<Phi0SweepedXCircle> stereoHitContained(curlCurv);
+    StereoHitContained<InPhi0CurvBox> stereoHitContained(curlCurv);
     stereoHitContained.setRLWeightGain(0.1);
   }
 }

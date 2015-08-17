@@ -42,12 +42,12 @@ namespace Belle2 {
       /// Curvature
       /////////////
 
-      //const double maxCurv = 0.13;
+      // const double maxCurv = 0.13;
       const double maxCurv = 0.75;
       const double minCurv = -0.018;
       const double maxCurvAcceptance = 0.13;
 
-      const size_t discreteCurvOverlap = 2;
+      const size_t discreteCurvOverlap = 4;
       const size_t discreteCurvWidth = 5;
       const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
       const CurvBinsSpec curvBinsSpec(minCurv,

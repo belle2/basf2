@@ -10,10 +10,13 @@
 
 #include <tracking/trackFindingCDC/legendre/tests_fixtures/CDCLegendreTestFixture.h>
 
-#include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendre.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendre.icc.h>
+#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
+#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
 
-#include <tracking/trackFindingCDC/hough/phi0_curv/SimpleHitBasedPhi0CurvHough.h>
+#include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
+
+#include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -28,25 +31,24 @@
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace PerigeeBinSpec;
 
 namespace {
 
   TEST_F(CDCLegendreTestFixture, hough_HitPhi0CurvLegendre)
   {
     // Prepare the hough algorithm
-    const size_t maxLevel = 13;
-    const size_t phi0Divisions = 2;
-    const size_t curvDivisions = 2;
-    const double maxCurv = 2.75;
-    const double minCurv = -0.018;
+    using WireHitPhi0CurvQuadLegendre =
+      SimpleRLTaggedWireHitHoughTree<InPhi0CurvBox, phi0Divisions, curvDivisions>;
+    using Node = typename WireHitPhi0CurvQuadLegendre::Node;
+    WireHitPhi0CurvQuadLegendre houghTree(maxLevel, curlCurv);
 
-    // const size_t maxLevel = 8;
-    // const size_t phiDivisions = 3;
-    // const size_t curvDivisions = 3;
+    houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(),
+                                        phi0BinsSpec.getNOverlap());
 
-    using WireHitPhi0CurvQuadLegendre = HitPhi0CurvLegendre<phi0Divisions, curvDivisions>;
-    WireHitPhi0CurvQuadLegendre wireHitPhi0CurvQuadLegendre(maxLevel, minCurv, maxCurv);
-    wireHitPhi0CurvQuadLegendre.initialize();
+    houghTree.assignArray<DiscreteCurv>(curvBinsSpec.constructArray(),
+                                        curvBinsSpec.getNOverlap());
+    houghTree.initialize();
 
     // Get the hits form the test event
     markAllHitsAsUnused();
@@ -71,14 +73,16 @@ namespace {
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
-      wireHitPhi0CurvQuadLegendre.fell();
-      wireHitPhi0CurvQuadLegendre.seed(hitVector);
+      houghTree.fell();
+      houghTree.seed(hitVector);
 
       const double minWeight = 30.0;
       const double maxCurv = 0.13;
-      wireHitPhi0CurvQuadLegendre.findWithCoprocessing(minWeight, maxCurv);
-
-      candidates = wireHitPhi0CurvQuadLegendre.getCandidates();
+      AxialLegendreLeafProcessor<Node> m_leafProcessor(maxLevel);
+      m_leafProcessor.setMinWeight(minWeight);
+      m_leafProcessor.setMaxCurv(maxCurv);
+      houghTree.findUsing(m_leafProcessor);
+      candidates = m_leafProcessor.getCandidates();
 
       // B2INFO("Execution " << iExecution);
       /// Check if exactly two candidates have been found
@@ -92,17 +96,10 @@ namespace {
     });
 
     /// Test idiom to output statistics about the tree.
-    std::size_t nNodes = 0;
-    using Node = WireHitPhi0CurvQuadLegendre::Node;
-    auto countNodes = [&nNodes](Node*) -> bool {
-      ++nNodes;
-      return true;
-    };
-    wireHitPhi0CurvQuadLegendre.getTree()->walk(countNodes);
+    std::size_t nNodes = houghTree.getTree()->getNNodes();
     B2INFO("Tree generated " << nNodes << " nodes");
-    wireHitPhi0CurvQuadLegendre.fell();
-    wireHitPhi0CurvQuadLegendre.raze();
-
+    houghTree.fell();
+    houghTree.raze();
 
     for (std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
@@ -181,16 +178,17 @@ namespace {
         wireHits.push_back(trackHit->getUnderlayingCDCWireHit());
     }
 
-    const size_t maxLevel = 13;
-    const size_t phi0Divisions = 2;
-    const size_t curvDivisions = 2;
-    const double maxCurv = 2.75;
-    const double minCurv = -0.018;
+    using RLTaggedWireHitPhi0CurvHough = SimpleHitBasedHoughTree<CDCRLTaggedWireHit, InPhi0CurvBox, phi0Divisions, curvDivisions>;
+    using Phi0CurvBox = Box<DiscretePhi0, DiscreteCurv>;
+    RLTaggedWireHitPhi0CurvHough houghTree(maxLevel);
 
-    using RLTaggedWireHitPhi0CurvHough =
-      SimpleHitBasedPhi0CurvHough<CDCRLTaggedWireHit, phi0Divisions, curvDivisions>;
-    RLTaggedWireHitPhi0CurvHough rlTaggedWireHitPhi0CurvHough(maxLevel, minCurv, maxCurv);
-    rlTaggedWireHitPhi0CurvHough.initialize();
+    houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(),
+                                        phi0BinsSpec.getNOverlap());
+
+    houghTree.assignArray<DiscreteCurv>(curvBinsSpec.constructArray(),
+                                        curvBinsSpec.getNOverlap());
+
+    houghTree.initialize();
 
     std::vector<const CDCWireHit*> axialWireHits;
     for (const CDCWireHit* wireHit : wireHits) {
@@ -205,13 +203,13 @@ namespace {
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
-      rlTaggedWireHitPhi0CurvHough.fell();
-      rlTaggedWireHitPhi0CurvHough.seed(axialWireHits);
+      houghTree.fell();
+      houghTree.seed(axialWireHits);
 
       const double minWeight = 30.0;
       const double maxCurv = 0.13;
-      candidates = rlTaggedWireHitPhi0CurvHough.find(minWeight, maxCurv);
-      //candidates = rlTaggedWireHitPhi0CurvHough.findBest(minWeight, maxCurv);
+      candidates = houghTree.find(minWeight, maxCurv);
+      //candidates = houghTree.findBest(minWeight, maxCurv);
 
       // B2INFO("Execution " << iExecution);
       /// Check if exactly two candidates have been found
@@ -225,16 +223,10 @@ namespace {
     });
 
     /// Test idiom to output statistics about the tree.
-    std::size_t nNodes = 0;
-    using Node = RLTaggedWireHitPhi0CurvHough::Node;
-    auto countNodes = [&nNodes](Node*) -> bool {
-      ++nNodes;
-      return true;
-    };
-    rlTaggedWireHitPhi0CurvHough.getTree()->walk(countNodes);
+    std::size_t nNodes = houghTree.getTree()->getNNodes();
     B2INFO("Tree generated " << nNodes << " nodes");
-    rlTaggedWireHitPhi0CurvHough.fell();
-    rlTaggedWireHitPhi0CurvHough.raze();
+    houghTree.fell();
+    houghTree.raze();
 
     for (std::pair<Phi0CurvBox, std::vector<CDCRLTaggedWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
@@ -242,8 +234,8 @@ namespace {
 
       B2INFO("Candidate");
       B2INFO("size " << taggedHits.size());
-      B2INFO("Phi " << phi0CurvBox.getLowerPhi0Vec());
-      B2INFO("Curv " << phi0CurvBox.getLowerCurv());
+      B2INFO("Phi " << phi0CurvBox.getLowerBound<DiscretePhi0>()->phi());
+      B2INFO("Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
       B2INFO("Tags of the hits");
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {

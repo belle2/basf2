@@ -10,10 +10,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/WeightedFastHoughTree.h>
-#include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
+
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,14 +27,14 @@ namespace Belle2 {
      *  after the walk over the tree has been completed.
      */
     template<class Node>
-    class HitPhi0CurvLegendreLeafProcessor {
+    class AxialLegendreLeafProcessor {
 
     public:
       /// Preliminary structure to save found hits and trajectory information
       using Candidate = std::pair<CDCTrajectory2D, std::vector<CDCRLTaggedWireHit> >;
 
     public:
-      HitPhi0CurvLegendreLeafProcessor(const size_t maxLevel) : m_maxLevel(maxLevel)
+      AxialLegendreLeafProcessor(const size_t maxLevel) : m_maxLevel(maxLevel)
       {;}
 
       /** Entry point for the WeightedHoughTree walk to ask
@@ -55,7 +56,7 @@ namespace Belle2 {
       bool skip(const Node* node)
       {
         bool tooLowWeight = not(node->getWeight() >= m_minWeight);
-        bool tooHighCurvature = node->getLowerCurv() > m_maxCurv;
+        bool tooHighCurvature = static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_maxCurv;
         return tooLowWeight or tooHighCurvature;
       }
 

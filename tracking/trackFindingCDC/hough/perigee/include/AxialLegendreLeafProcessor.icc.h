@@ -10,7 +10,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/phi0_curv/HitPhi0CurvLegendreLeafProcessor.h>
+#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
@@ -23,7 +23,7 @@
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 template<class Node>
-void Belle2::TrackFindingCDC::HitPhi0CurvLegendreLeafProcessor<Node>::processLeaf(Node* leaf)
+void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<Node>::processLeaf(Node* leaf)
 {
   // No special post processing version
   // const Phi0CurvBox& phi0CurvBox = *leaf;

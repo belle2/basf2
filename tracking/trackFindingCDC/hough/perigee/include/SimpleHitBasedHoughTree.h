@@ -69,6 +69,14 @@ namespace Belle2 {
                                                          skipHighCurvatureAndLowWeightNode);
       }
 
+      /// Fill and walk the tree using invoking the leaf processor on each encountered node.
+      template<class LeafProcessor>
+      void findUsing(LeafProcessor& leafProcessor)
+      {
+        return this->getTree()->fillWalk(m_stereoHitContainedInBox,
+                                         leafProcessor);
+      }
+
     private:
       /// Curvature below which a trajectory is considered non curling
       double m_curlCurv = 0.018;

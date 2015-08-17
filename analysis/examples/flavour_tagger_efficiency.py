@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # *************  Flavor Tagging   ************
-# * Author: Moritz Gelb                      *
+# * Author: Moritz Gelb & Fernando Abudinen  *
 # * Script for autmating reporting           *
 # * flavor tagging                           *
 #                                            *
@@ -31,14 +31,13 @@ import IPython
 
 ROOT.gROOT.SetBatch(True)
 
-# TODO: WRITE OUT EVERYTHING IN PDF PLOTS
-
-# working directory - Input file from flavor tagger
+# working directory 1 - Input file from flavor tagger
+# working directory 2 - TMVA output File after Training the Combiner
 # please note: two different input files are needed
 # specify file name, if necessary
 
 workingDirectory = \
-    Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods')
+    Belle2.FileSystem.findFile('/analysis/examples/tutorials')
 B2INFO('Working directory is: ' + workingDirectory)
 
 #
@@ -56,16 +55,16 @@ r_subsample = array('d', [
     0.75,
     0.875,
     1.0,
-    ])
+])
 r_size = len(r_subsample)
 overall_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
-if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
+if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.root'):
     # root-file
-    rootfile = ROOT.TFile(workingDirectory + '/B0_B0bar_final.root', 'UPDATE')
-    tree = rootfile.Get('TaggingInformation')
+    rootfile = ROOT.TFile(workingDirectory + '/B2A801-FlavorTaggerR20571.root', 'UPDATE')
+    tree = rootfile.Get('B0tree')
 
     mcstatus = array('d', [-511.5, 0.0, 511.5])
     rootfile.cd()
@@ -76,16 +75,13 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
                             r_subsample)
     # histogram with number of entries in for each bin
     histo_entries_per_bin = ROOT.TH1F('entries_per_bin',
-                                      'Events binned in r_subsample according to their r-value for B0 prob'
-                                      , 6, r_subsample)
+                                      'Events binned in r_subsample according to their r-value for B0 prob', 6, r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
     histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0',
-                                     'Combiner network output [not equal to r] for true B0 (binning 100)'
-                                     , 100, 0.0, 1.0)
+                                     'Combiner network output [not equal to r] for true B0 (binning 100)', 100, 0.0, 1.0)
     # histogram network output (not qr and not r) for true B0bar (background) - not necessary
     histo_Cnet_output_B0bar = ROOT.TH1F('Comb_Net_Output_B0bar',
-            'Combiner network output [not equal to r] for true B0bar (binning 100)'
-            , 100, 0.0, 1.0)
+                                        'Combiner network output [not equal to r] for true B0bar (binning 100)', 100, 0.0, 1.0)
     # histogram containing the belle paper plot (qr-tagger output for true B0)
     histo_belleplotB0 = ROOT.TH1F('BellePlot_B0',
                                   'BellePlot for true B0 (binning 50)', 50,
@@ -97,8 +93,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
-    histo_calib_B0 = ROOT.TH1F('Calibration_B0', 'CalibrationPlot for true B0'
-                               , 100, -1.0, 1.0)
+    histo_calib_B0 = ROOT.TH1F('Calibration_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
     # calibration plot for B0bar calibration plot
     histo_calib_B0bar = ROOT.TH1F('Calibration_B0Bar',
                                   'CalibrationPlot for true B0Bar', 100, -1.0,
@@ -123,29 +118,29 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # filling the histograms
 
     # filling with abs(qr) in one of 6 bins with its weight
-    tree.Project('Average_r', 'abs(extraInfoqrCombined)',
-                 'abs(extraInfoqrCombined)')
+    tree.Project('Average_r', 'abs(B0_qrCombined)',
+                 'abs(B0_qrCombined)')
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(extraInfoqrCombined)')
+    tree.Project('entries_per_bin', 'abs(B0_qrCombined)')
 
     # not necessary
-    tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0', 'McFlavorOfTagSide>0')
-    tree.Draw('extraInfoB0_prob>>Comb_Net_Output_B0bar', 'McFlavorOfTagSide<0')
+    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0', 'B0_qrMC>0')
+    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0bar', 'B0_qrMC<0')
 
-    tree.Draw('extraInfoqrCombined>>BellePlot_B0', 'McFlavorOfTagSide>0 ')
-    tree.Draw('extraInfoqrCombined>>BellePlot_B0Bar', 'McFlavorOfTagSide<0')
-    tree.Draw('extraInfoqrCombined>>BellePlot_NoCut')
+    tree.Draw('B0_qrCombined>>BellePlot_B0', 'B0_qrMC>0 ')
+    tree.Draw('B0_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0')
+    tree.Draw('B0_qrCombined>>BellePlot_NoCut')
 
-    tree.Draw('extraInfoqrCombined>>Calibration_B0', 'McFlavorOfTagSide>0')
-    tree.Draw('extraInfoqrCombined>>Calibration_B0Bar', 'McFlavorOfTagSide<0')
+    tree.Draw('B0_qrCombined>>Calibration_B0', 'B0_qrMC>0')
+    tree.Draw('B0_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m0',
-              'McFlavorOfTagSide>0 && extraInfoqrCombined>0')
-    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m1',
-              'McFlavorOfTagSide>0 && extraInfoqrCombined<0')
-    tree.Draw('extraInfoqrCombined>>BellePlot_B0_m2',
-              'McFlavorOfTagSide<0 && extraInfoqrCombined>0')
+    tree.Draw('B0_qrCombined>>BellePlot_B0_m0',
+              'B0_qrMC>0 && B0_qrCombined>0')
+    tree.Draw('B0_qrCombined>>BellePlot_B0_m1',
+              'B0_qrMC>0 && B0_qrCombined<0')
+    tree.Draw('B0_qrCombined>>BellePlot_B0_m2',
+              'B0_qrMC<0 && B0_qrCombined>0')
 
     # producing the average r histogram
     histo_avr_r.Divide(histo_entries_per_bin)
@@ -229,7 +224,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
         + '{:.3f}'.format(right_tag_fraction * 100) \
         + ' %                                                       *'
     print '*     wrong calculated eff all:     ' + '{:.3f}'.format(wrong_eff
-            * 100) \
+                                                                   * 100) \
         + ' %                                                       *'
     print '*                                                                                                  *'
 
@@ -274,7 +269,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0_B0bar_final.root'):
     # IPython.embed()
     Canvas1.SaveAs(workingDirectory + '/' + 'PIC_Belleplot_both.pdf')
 
-    ######produce the nice calibration plot
+    # produce the nice calibration plot
     Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
     Canvas2.cd()  # activate
     histo_calib_B0.SetFillColorAlpha(ROOT.kBlue, 0.2)
@@ -306,31 +301,32 @@ rr_subsample = array('d', [
     0.75,
     0.875,
     1.0,
-    ])
+])
 rr_size = len(rr_subsample)
 # individual categories
 eventLevelParticles = [
-    ('Electron', 'QrOfeROEIsRightClassElectronIsFromBElectron'),
-    ('IntermediateElectron',
-     'QrOfeROEIsRightClassIntermediateElectronIsFromBIntermediateElectron'),
-    ('Muon', 'QrOfmuROEIsRightClassMuonIsFromBMuon'),
-    ('IntermediateMuon',
-     'QrOfmuROEIsRightClassIntermediateMuonIsFromBIntermediateMuon'),
-    ('KinLepton', 'QrOfmuROEIsRightClassKinLeptonIsFromBKinLepton'),
-    ('Kaon', 'QrOfKROEIsRightClassKaonIsFromBKaon'),
-    ('SlowPion', 'QrOfpiROEIsRightClassSlowPionIsFromBSlowPion'),
-    ('FastPion', 'QrOfpiROEIsRightClassFastPionIsFromBFastPion'),
-    ('KaonPion', 'QrOfKROEIsRightClassKaonPionIsFromBKaon'),
-    ('MaximumP', 'QrOfpiROEIsRightClassMaximumPIsFromBMaximumP'),
-    ('FSC', 'QrOfpiROEIsRightClassFSCIsFromBSlowPion'),
-    ('Lambda', 'QrOfLambda0ROEIsRightClassLambdaIsFromBLambda'),
-    ]
+    ('Electron', 'QrOfeElectronROEIsRightCategoryElectronIsRightTrackElectron'),
+    #    ('IntermediateElectron', 'QrOfeROEIsRightCategoryIntermediateElectronIsRightTrackIntermediateElectron'),
+    ('Muon', 'QrOfmuMuonROEIsRightCategoryMuonIsRightTrackMuon'),
+    #    ('IntermediateMuon', 'QrOfmuROEIsRightCategoryIntermediateMuonIsRightTrackIntermediateMuon'),
+    ('KinLepton', 'QrOfmuKinLeptonROEIsRightCategoryKinLeptonIsRightTrackKinLepton'),
+    ('Kaon', 'InputQrOfKKaonROEIsRightCategoryKaonIsRightTrackKaon'),
+    ('SlowPion', 'QrOfpiSlowPionROEIsRightCategorySlowPionIsRightTrackSlowPion'),
+    ('FastPion', 'QrOfpiFastPionROEIsRightCategoryFastPionIsRightTrackFastPion'),
+    ('KaonPion', 'QrOfKKaonROEIsRightCategoryKaonPionIsRightTrackKaon'),
+    ('MaximumP', 'QrOfpiMaximumPROEIsRightCategoryMaximumPIsRightTrackMaximumP'),
+    ('FSC', 'QrOfpiSlowPionROEIsRightCategoryFSCIsRightTrackSlowPion'),
+    ('Lambda', 'InputQrOfLambda0LambdaROEIsRightCategoryLambdaIsRightTrackLambda'),
+]
 
 # needs the B0Tagger.root-file from combiner teacher
-if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
-    rootfile2 = ROOT.TFile(workingDirectory + '/B0Tagger_ROECUT.root', 'UPDATE'
+workingDirectory2 = \
+    Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods')
+
+if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_1.root'):
+    rootfile2 = ROOT.TFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_1.root', 'UPDATE'
                            )
-    tree2 = rootfile2.Get('B0Tagger_ROECUT_tree')
+    tree2 = rootfile2.Get('B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_tree')
     rootfile2.cd()
 
     print '****************** MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *************************'
@@ -363,8 +359,8 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
         # sorted into 6 bins
         hist_aver_r = ROOT.TH1F('AverageR_' + category, 'A good one'
                                 + category, 6, rr_subsample)
-        ###### TEST OF CALIBRATION ######
-        ## for calibration plot we want to have
+        # ****** TEST OF CALIBRATION ******
+        # for calibration plot we want to have
         hist_all = ROOT.TH1F('All_' + category,
                              'Input Signal (B0) and Background (B0Bar)'
                              + category + ' (binning 50)', 50, 0.0, 1.0)
@@ -381,7 +377,7 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
         tree2.Draw(categoryInput + '>>Background_' + category, 'qrCombined<0.5'
                    )
 
-        ##### produce the input plots from combiner level #####
+        # ****** produce the input plots from combiner level ******
 
         ROOT.gStyle.SetOptStat(0)
         Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
@@ -415,10 +411,10 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
         l.Draw()
 
         Canvas.Update()
-        Canvas.SaveAs(workingDirectory + '/' + 'PIC_' + category
+        Canvas.SaveAs(workingDirectory2 + '/' + 'PIC_' + category
                       + '_Input_Combiner.pdf')
 
-        ###### TEST OF CALIBRATION ######
+        # ***** TEST OF CALIBRATION ******
 
         # initialize some arrays
         purity = array('d', [0] * 51)
@@ -473,7 +469,9 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B0Tagger_ROECUT.root'):
             wvalue[i] = (1 - rvalue[i]) / 2
             entries[i] = hist_absqr.GetBinContent(i)
             event_fraction[i] = entries[i] / tot_entries
-            # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalue[i]), 'entries: ' + str(event_fraction[i] * 100) + ' % (' + str(entries[i]) + '/' + str(tot_entries) + ')'
+            # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalue[i]), 'entries: ' +
+            # str(event_fraction[i] * 100) + ' % (' + str(entries[i]) + '/' +
+            # str(tot_entries) + ')'
             tot_eff_eff = tot_eff_eff + event_fraction[i] * rvalue[i] \
                 * rvalue[i]
 

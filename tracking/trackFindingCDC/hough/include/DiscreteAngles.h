@@ -46,6 +46,10 @@ namespace Belle2 {
         return getAngleVec().y();
       }
 
+      /// Allow explicit casting to the angle vector
+      operator const Vector2D& () const
+      { return getAngleVec(); }
+
       DiscreteAngle operator+(const std::iterator_traits<Super>::difference_type& advance_by) const
       {
         DiscreteAngle result(*this);

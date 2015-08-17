@@ -19,6 +19,7 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 #include <functional>
 
 #include <map>
+#include <vector>
 
 
 using namespace std;
@@ -114,4 +115,35 @@ TEST(TrackFindingCDCTest, cpp_covariance_std_function)
 {
   auto funcWithConstPtrArgument = [](const int*) -> bool { return true;};
   std::function<bool(int*)> funcWithNonConstPtrArgument = funcWithConstPtrArgument;
+}
+
+
+
+namespace {
+
+  /// Demo vector which should behave like a normal vector, but with one more method.
+  class MyIntVector : public std::vector<int> {
+  public:
+    /// Type of the base class
+    using Super = std::vector<int>;
+
+    /// Inheriting all base constructors
+    using Super::Super;
+
+    /// The move constructor is not inherited - extra definition needed
+    MyIntVector(Super&& s) : Super(std::move(s)) {;}
+
+    /// The copy constructor is not inherited - extra definition needed
+    MyIntVector(const Super& s) : Super(s) {;}
+  };
+
+}
+
+TEST(TrackFindingCDCTest, cpp_inheriting_constructor)
+{
+  std::vector<int> someInts = {0, 1, 2};
+  MyIntVector mySomeInts(someInts);
+  MyIntVector mySomeInts2 = std::move(someInts);
+
+  mySomeInts = someInts;
 }

@@ -79,6 +79,9 @@ namespace Belle2 {
     class DiscreteAngleArray : public DiscreteValueArray<Vector2D> {
 
     public:
+      /// Default constructor
+      DiscreteAngleArray() = default;
+
       /** Create an evenly spaced range of angular values and precompute sin and cos.
        *  Note to get n bins you have to give  nPositions = nBins + 1 in this constructor
        *  Hence for a typical use case in a hough grid nPositions should be 2^(levels) + 1.

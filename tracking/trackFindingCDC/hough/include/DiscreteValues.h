@@ -72,6 +72,13 @@ namespace Belle2 {
     class DiscreteValueArray {
 
     public:
+      /// Type of the contained value
+      typedef T ValueType;
+
+      /// Default constructor
+      DiscreteValueArray() = default;
+
+    public:
       /** Create an evenly spaced range of floating point values.
        *  Note to get n bins you have to give  nPositions = nBins + 1 in this constructor
        *  Hence for a typical use case in a hough grid nPositions should be 2^(levels) + 1.

@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/Box.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
+#include <tracking/trackFindingCDC/topology/ILayerType.h>
 
 #include <array>
 #include <cmath>
@@ -45,7 +46,8 @@ namespace Belle2 {
                                       const float& y,
                                       const float& l,
                                       const float& /*dxdz*/ = 0,
-                                      const float& /*dydz*/ = 0) const
+                                      const float& /*dydz*/ = 0,
+                                      const ILayerType& /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.template getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.template getBounds<DiscreteCurv>();

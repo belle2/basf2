@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 #include <tracking/trackFindingCDC/hough/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
+#include <tracking/trackFindingCDC/topology/ILayerType.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -41,7 +42,8 @@ namespace Belle2 {
                                       const float& y,
                                       const float& signedDriftLength,
                                       const float& dxdz = 0,
-                                      const float& dydz = 0) const
+                                      const float& dydz = 0,
+                                      const ILayerType& iCLayer = -1) const
       {
         const float& lowerImpact(houghBox.template getLowerBound<Impact>());
         const float& upperImpact(houghBox.template getUpperBound<Impact>());
@@ -51,13 +53,15 @@ namespace Belle2 {
         const SignType lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                           x, lowerY,
                                                           signedDriftLength,
-                                                          dxdz, dydz);
+                                                          dxdz, dydz,
+                                                          iCLayer);
 
         const float upperY = y - upperImpact;
         const SignType upperDistSign = T::getDistanceSign(subordinaryHoughBox,
                                                           x, upperY,
                                                           signedDriftLength,
-                                                          dxdz, dydz);
+                                                          dxdz, dydz,
+                                                          iCLayer);
 
         return SameSignChecker::commonSign(lowerDistSign, upperDistSign);
       }

@@ -1000,7 +1000,7 @@ ccc additive form            sdif = sdif / prod/(1.d0+deltasv) * (1.d0+deltasv+d
 !          moved before any cross section calculation (TF)
          if (isnan(sdif)) then
            CALL babayaganlo_error_isnan2(sdif)
-           continue
+           CYCLE
          endif 
          
 !!         emtx = 1.d0 ! uncomment  for phase space integral

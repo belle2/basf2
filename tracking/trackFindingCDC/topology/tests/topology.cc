@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
@@ -133,12 +134,14 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
       EXPECT_NEAR(refCylindricalRByICLayer[iCLayer], wire.getRefCylindricalR(), 10e-6);
     }
 
-    B2INFO("ICLayer : " << iCLayer <<
-           " Skew : " << skewByICLayer[iCLayer] <<
-           " Stereo angle : " << stereoAngleByICLayer[iCLayer] <<
-           " Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]
-          );
-
+    B2INFO("ICLayer : " << iCLayer);
+    B2INFO("   Skew : " << skewByICLayer[iCLayer] <<
+           " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
+    B2INFO("   Z range : " << wireLayer.getBackwardZ() << " to " << wireLayer.getForwardZ());
+    B2INFO("   Phi spread : " <<
+           wireLayer.getForwardPhiToRef() - wireLayer.getBackwardPhiToRef() <<
+           " Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]);
+    B2INFO("   Max abs displacement : " << wireLayer.getWire(0).getWireVector().xy().norm());
   }
 
 }
@@ -176,10 +179,17 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
   FloatType outerCurlCurv = 1 / outerR;
 
   B2INFO("Maximal curvature reaching the CDC from IP : " << innerOriginCurv);
+  B2INFO("Minimal momentum reaching the CDC from IP : " << curvatureToAbsMom2D(innerOriginCurv, 1.5));
+
   B2INFO("Maximal curvature leaving the CDC from IP : " << outerOriginCurv);
+  B2INFO("Minimal momentum leaving the CDC from IP : " << curvatureToAbsMom2D(outerOriginCurv, 1.5));
+
 
   B2INFO("Minimal curvature not reaching the CDC from VXD : " << innerCurlCurv);
+  B2INFO("Maximal momentum not reaching the CDC from VXD : " << curvatureToAbsMom2D(innerCurlCurv, 1.5));
+
   B2INFO("Minimal curvature not leaving the CDC from inside the CDC : " << outerCurlCurv);
+  B2INFO("Maximal momentum not leaving the CDC from inside the CDC : " << curvatureToAbsMom2D(outerCurlCurv, 1.5));
 }
 
 

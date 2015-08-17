@@ -35,27 +35,39 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      inline SignType getDistanceSign(const HoughBox* houghBox,
-                                      const Vector2D& pos2D,
-                                      const double signedDriftLength,
-                                      const Vector2D& movePerZ = Vector2D(0.0, 0.0)) const
+      inline SignType getDistanceSign(const HoughBox& houghBox,
+                                      const float& x,
+                                      const float& y,
+                                      const float& signedDriftLength,
+                                      const float& dxdz = 0,
+                                      const float& dydz = 0) const
       {
-        Vector2D localPos2D = pos2D - m_localOrigin;
-        return Super::getDistanceSign(houghBox, localPos2D, signedDriftLength, movePerZ);
+        return Super::getDistanceSign(houghBox,
+                                      x - m_localOriginX,
+                                      y - m_localOriginY,
+                                      signedDriftLength,
+                                      dxdz,
+                                      dydz);
       }
 
     public:
       /// Getter for the local origin relative to which the parameters of the hough space are understood
-      const Vector2D& getLocalOrigin() const
-      { return m_localOrigin; }
+      Vector2D getLocalOrigin() const
+      { return Vector2D(m_localOriginX, m_localOriginY); }
 
       /// Setter for the local origin relative to which the parameters of the hough space are understood
       void setLocalOrigin(const Vector2D& localOrigin)
-      { m_localOrigin = localOrigin; }
-
+      {
+        m_localOriginX = localOrigin.x();
+        m_localOriginY = localOrigin.y();
+      }
     private:
-      /// The local origin to which the original plane is displaced.
-      Vector2D m_localOrigin = Vector2D(0.0, 0.0);
+      /// The local origin x to which the original plane is displaced.
+      float m_localOriginX = 0.0;
+
+      /// The local origin y to which the original plane is displaced.
+      float m_localOriginY = 0.0;
+
     };
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

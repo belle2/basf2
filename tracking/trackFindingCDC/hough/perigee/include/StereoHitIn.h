@@ -41,8 +41,8 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      inline Weight operator()(const CDCRecoSegment2D* recoSegment2D,
-                               const HoughBox* houghBox)
+      inline Weight operator()(const CDCRecoSegment2D* const& recoSegment2D,
+                               const HoughBox* const& houghBox)
       {
         size_t nHits = recoSegment2D->size();
         auto weightOfHit = [this, &houghBox](const Weight & totalWeight,
@@ -68,8 +68,8 @@ namespace Belle2 {
       /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const CDCRecoHit2D* recoHit2D,
-                               const HoughBox* houghBox)
+      inline Weight operator()(const CDCRecoHit2D* const& recoHit2D,
+                               const HoughBox* const& houghBox)
       {
         return operator()(&(recoHit2D->getRLWireHit()), houghBox);
       }
@@ -77,8 +77,8 @@ namespace Belle2 {
       /** Checks if the track hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const TrackHit* trackHit,
-                               const HoughBox* houghBox)
+      inline Weight operator()(const TrackHit* const& trackHit,
+                               const HoughBox* const& houghBox)
       {
         const CDCWireHit* wireHit = trackHit->getUnderlayingCDCWireHit();
         return operator()(wireHit, houghBox);
@@ -96,7 +96,7 @@ namespace Belle2 {
        *  is in the hough box.
        */
       inline Weight operator()(RLTagged<const TrackHit*>& rlTaggedTrackHit,
-                               const HoughBox* houghBox)
+                               const HoughBox* const& houghBox)
       {
         const CDCWireHit* wireHit = rlTaggedTrackHit->getUnderlayingCDCWireHit();
 
@@ -105,7 +105,7 @@ namespace Belle2 {
         const FloatType driftLength = wireHit->getRefDriftLength();
 
         RightLeftInfo newRLInfo =
-          containRightOrLeft(houghBox, wire, driftLength, rlInfo);
+          containRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedTrackHit.setRLInfo(newRLInfo);
         return isValidInfo(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
@@ -117,13 +117,13 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      inline Weight operator()(const CDCWireHit* wireHit,
-                               const HoughBox* houghBox)
+      inline Weight operator()(const CDCWireHit* const& wireHit,
+                               const HoughBox* const& houghBox)
       {
         const CDCWire& wire = wireHit->getWire();
         const FloatType driftLength = wireHit->getRefDriftLength();
 
-        RightLeftInfo rlInfo = containsRightOrLeft(houghBox, wire, driftLength);
+        RightLeftInfo rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
         return isValidInfo(rlInfo) ? 1.0 + std::abs(rlInfo) * m_rlWeightGain : NAN;
       }
 
@@ -139,14 +139,14 @@ namespace Belle2 {
        *  is in the hough box.
        */
       inline Weight operator()(CDCRLTaggedWireHit& rlTaggedWireHit,
-                               const HoughBox* houghBox)
+                               const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlTaggedWireHit->getWire();
         const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
         const FloatType driftLength = rlTaggedWireHit->getRefDriftLength();
 
         RightLeftInfo newRLInfo =
-          containsRightOrLeft(houghBox, wire, driftLength, rlInfo);
+          containsRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
         return isValidInfo(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
@@ -158,12 +158,12 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      inline Weight operator()(const CDCRLWireHit* rlWireHit,
-                               const HoughBox* houghBox)
+      inline Weight operator()(const CDCRLWireHit* const& rlWireHit,
+                               const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlWireHit->getWire();
         const FloatType signedDriftLength = rlWireHit->getSignedRefDriftLength();
-        bool isIn = contains(houghBox, wire, signedDriftLength);
+        bool isIn = contains(*houghBox, wire, signedDriftLength);
         return isIn ? 1.0 + m_rlWeightGain : NAN;
       }
 
@@ -178,10 +178,10 @@ namespace Belle2 {
        *      * RIGHT if only right is still possible.
        *      * INVALID_INFO if non of the orientations is possible.
        */
-      inline RightLeftInfo containsRightOrLeft(const HoughBox* houghBox,
+      inline RightLeftInfo containsRightOrLeft(const HoughBox& houghBox,
                                                const CDCWire& wire,
-                                               const FloatType driftLength,
-                                               const RightLeftInfo rlInfo = UNKNOWN)
+                                               const FloatType& driftLength,
+                                               const RightLeftInfo& rlInfo = UNKNOWN)
       {
         bool isRightIn = rlInfo != LEFT and contains(houghBox, wire, driftLength);
         bool isLeftIn = rlInfo != RIGHT and contains(houghBox, wire, -driftLength);
@@ -198,13 +198,17 @@ namespace Belle2 {
       }
 
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
-      inline bool contains(const HoughBox* houghBox,
+      inline bool contains(const HoughBox& houghBox,
                            const CDCWire& wire,
-                           const FloatType signedDriftLength)
+                           const FloatType& signedDriftLength)
       {
         const Vector2D& pos2D = wire.getRefPos2D();
         const Vector2D& movePerZ = wire.getMovePerZ();
-        bool isIn = this->getDistanceSign(houghBox, pos2D, signedDriftLength, movePerZ) == ZERO;
+        const SignType distSign = this->getDistanceSign(houghBox,
+                                                        pos2D.x(),  pos2D.y(),
+                                                        signedDriftLength,
+                                                        movePerZ.x(),  pos2D.y());
+        const bool isIn = distSign == ZERO;
         return isIn;
       }
 

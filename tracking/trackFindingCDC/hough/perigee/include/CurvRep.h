@@ -10,6 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/DiscreteValue.h>
+#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -75,48 +77,38 @@ namespace Belle2 {
       size_t m_nWidth = 3;
     };
 
-    /** Function to get the lower curvature bound of box.
-     *  Default implementation returning 0*/
-    template<class HoughBox>
-    float getLowerCurvImpl(const HoughBox& houghBoxWithOutCurv, long)
-    { return 0; }
+
+    /// Functor to get the lower curvature bound of a hough box.
+    struct GetLowerCurv {
+      /// Getter function for the lower curvature bound of a hough box.
+      template<class HoughBox>
+      EnableIf<HoughBox::template HasType<DiscreteCurv>::value, float>
+      operator()(const HoughBox& houghBox)
+      { return static_cast<float>(houghBox.template getLowerBound<DiscreteCurv>()); }
+    };
+
+    /// Functor to get the upper curvature bound of a hough box.
+    struct GetUpperCurv {
+      /// Getter function for the upper curvature bound of a hough box.
+      template<class HoughBox>
+      EnableIf<HoughBox::template HasType<DiscreteCurv>::value, float>
+      operator()(const HoughBox& houghBox)
+      { return static_cast<float>(houghBox.template getUpperBound<DiscreteCurv>()); }
+    };
 
     /** Function to get the lower curvature bound of box.
-     *  Implementation for boxes with a curvature coordinate returns
-     *  the lower curvature bound.
-     */
-    template<class HoughBox>
-    auto getLowerCurvImpl(const HoughBox& houghBoxWithCurv, int) ->
-    decltype(houghBoxWithCurv.template getLowerBound<DiscreteCurv>())
-    { return houghBoxWithCurv.template getLowerBound<DiscreteCurv>(); }
-
-    /** Function to get the lower curvature bound of box.
-     *  Returns 0 fo boxes that do not have a curvature coordinate*/
+     *  Returns 0 fo boxes that do not have a curvature coordinate */
     template<class HoughBox>
     float getLowerCurv(const HoughBox& houghBox)
-    { return float(getLowerCurvImpl(houghBox, 0)); }
-
-
-    /** Function to get the upper curvature bound of box.
-     *  Default implementation returning 0*/
-    template<class HoughBox>
-    float getUpperCurvImpl(const HoughBox& houghBoxWithOutCurv, long)
-    { return 0; }
+    //{ return GetLowerCurv()(houghBox); }
+    { return getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0); }
 
     /** Function to get the upper curvature bound of box.
-     *  Implementation for boxes with a curvature coordinate returns
-     *  the upper curvature bound.
-     */
-    template<class HoughBox>
-    auto getUpperCurvImpl(const HoughBox& houghBoxWithCurv, int) ->
-    decltype(houghBoxWithCurv.template getUpperBound<DiscreteCurv>())
-    { return houghBoxWithCurv.template getUpperBound<DiscreteCurv>(); }
-
-    /** Function to get the upper curvature bound of box.
-     *  Returns 0 fo boxes that do not have a curvature coordinate*/
+     *  Returns 0 fo boxes that do not have a curvature coordinate */
     template<class HoughBox>
     float getUpperCurv(const HoughBox& houghBox)
-    { return float(getUpperCurvImpl(houghBox, 0)); }
+    //{ return GetUpperCurv()(houghBox); }
+    { return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0); }
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

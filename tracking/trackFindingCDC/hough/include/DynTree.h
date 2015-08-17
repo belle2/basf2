@@ -225,6 +225,20 @@ namespace Belle2 {
       const Node& getTopNode() const
       { return m_topNode; }
 
+      /** Gets the number of nodes currently contained in the tree
+       *  Also demonstrates how to walk over the tree.*/
+      size_t getNNodes() const
+      {
+        std::size_t nNodes = 0;
+        auto countNodes = [&nNodes](const Node*) -> bool {
+          ++nNodes;
+          return true;
+        };
+        const_cast<DynTree&>(*this).walk(countNodes);
+        //walk(countNodes);
+        return nNodes;
+      }
+
     private:
       /// Create child nodes for the given parents.
       std::vector<Node>* createChildren(Node* parentNode)

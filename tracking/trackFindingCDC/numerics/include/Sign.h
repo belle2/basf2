@@ -32,13 +32,13 @@ namespace Belle2 {
       /// Constructor from a float signed quantity
       constexpr
       Sign(const float& s) :
-        m_sign(s != s ? NAN : (s > 0) - (s < 0))
+        m_sign(std::isnan(s) ? s : (s > 0) - (s < 0))
       {;}
 
       /// Constructor from a double signed quantity
       constexpr
       Sign(const double& s) :
-        m_sign(s != s ? NAN : (s > 0) - (s < 0))
+        m_sign(std::isnan(s) ? s : (s > 0) - (s < 0))
       {;}
 
     public:
@@ -60,8 +60,17 @@ namespace Belle2 {
        *  * and ? INVALID   -> ?
        */
       static Sign sweep(const Sign& sign0, const Sign& sign1)
-      { return Sign(std::round((fillnan(sign0.m_sign, sign1.m_sign) + fillnan(sign1.m_sign, sign0.m_sign)) / 4.0));}
-
+      {
+        if (sign0.m_sign == 0 or sign1.m_sign == 0) {
+          return Sign(0.0);
+        } else if (not sign0.isValid()) {
+          return sign1;
+        } else if (not sign1.isValid()) {
+          return sign0;
+        } else {
+          return (sign0.m_sign + sign1.m_sign) / 2;
+        }
+      }
       /// Investigates if two signs are identical.
       static bool same(const Sign& sign0, const Sign& sign1)
       { return sign0 == sign1; }
@@ -76,8 +85,8 @@ namespace Belle2 {
       { return Sign(SignType(-m_sign)); }
 
       /// Returns true if sign is equal to c_PlusSign, c_MinusSign or c_ZeroSign.
-      inline bool isValid()
-      { return std::abs(m_sign) <= 1; }
+      inline bool isValid() const
+      { return not std::isnan(m_sign); }
 
       /// Equality comparision
       bool operator==(const Sign& other) const

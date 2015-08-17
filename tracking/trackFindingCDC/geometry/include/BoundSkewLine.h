@@ -133,6 +133,13 @@ namespace Belle2 {
                         deltaZ * skew() * refX());
       }
 
+      /// Gives the positional move in the xy projection per unit z.
+      inline Vector2D movePerZ() const
+      {
+        return Vector2D(-skew() * refY(),
+                        skew() * refX());
+      }
+
       /// Gives the forward z coodinate
       inline FloatType forwardZ() const
       { return m_forwardZ; }

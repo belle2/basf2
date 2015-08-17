@@ -234,6 +234,9 @@ namespace Belle2 {
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
 
+      /// Getter for the vector describing the positional change in the xy plane per unit z.
+      Vector2D getMovePerZ() const { return getSkewLine().movePerZ(); }
+
       /// Getter for the cylindrical radius at the wire reference position
       FloatType getRefCylindricalR() const { return m_refCylindricalR; }
 

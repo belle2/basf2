@@ -172,7 +172,7 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
   if (not m_ptrMCMap) {
-    B2WARNING("CDCMCMap not set. Look up closest primary sim hit.")
+    B2WARNING("CDCMCMap not set. Look up closest primary sim hit.");
     return nullptr;
   }
   const CDCMCMap& mcMap = *m_ptrMCMap;

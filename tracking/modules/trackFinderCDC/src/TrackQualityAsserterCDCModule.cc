@@ -86,7 +86,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
       newTrack.setStartTrajectory3D(newTrajectory);
 
       newTracks.push_back(move(newTrack));
-      B2INFO("Adding new track")
+      B2INFO("Adding new track");
     }
   }
 

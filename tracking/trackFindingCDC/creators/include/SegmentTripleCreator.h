@@ -220,11 +220,11 @@ namespace Belle2 {
             segmentTriple.clearTrajectories();
 
             if (segmentTriple.getTrajectory2D().isFitted()) {
-              B2ERROR("Two dimensional trajectory of CDCAxialSegmentPair still fitted after clearing.")
+              B2ERROR("Two dimensional trajectory of CDCAxialSegmentPair still fitted after clearing.");
               continue;
             }
             if (segmentTriple.getTrajectorySZ().isFitted()) {
-              B2ERROR("SZ trajectory of CDCAxialSegmentPair still fitted after clearing.")
+              B2ERROR("SZ trajectory of CDCAxialSegmentPair still fitted after clearing.");
               continue;
             }
 

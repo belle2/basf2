@@ -61,7 +61,7 @@ NotAssignedHitsCombinerModule::NotAssignedHitsCombinerModule() : TrackFinderCDCF
 
 void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks)
 {
-  B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############")
+  B2DEBUG(100, "########## NotAssignedHitsCombinerModule ############");
 
   // Go through all the reco segments
   // There are three different cases for a segment:
@@ -168,7 +168,7 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<CDCRecoSegmen
     if (segments[counterOuter].getStereoType() == AXIAL) {
       if (numberOfPossibleFits > 0
           && highestChi2 > m_fittingMatrix.getParamMinimalChi2()) {
-        B2DEBUG(100, "Highest Chi2 is " << highestChi2)
+        B2DEBUG(100, "Highest Chi2 is " << highestChi2);
         m_fittingMatrix.addSegmentToResultTrack(counterOuter, bestFitIndex,
                                                 segments, tracks);
       }
@@ -263,12 +263,12 @@ void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegm
       }
     }
 
-    B2INFO("Above: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::ABOVE_TRACK; }))
-    B2INFO("Below: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::BENEATH_TRACK; }))
-    B2INFO("In: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::IN_TRACK; }))
-    B2INFO("Mix: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; }))
+    B2INFO("Above: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::ABOVE_TRACK; }));
+    B2INFO("Below: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::BENEATH_TRACK; }));
+    B2INFO("In: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::IN_TRACK; }));
+    B2INFO("Mix: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; }));
 
-    B2INFO("Axial: " << (recoSegment.getStereoType() == AXIAL))
+    B2INFO("Axial: " << (recoSegment.getStereoType() == AXIAL));
   }
 }
 
@@ -301,7 +301,7 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
     return TMath::ATan(trajectorySZ.getSZSlope());
   } else {
     // just a dummy value: this means the track is more or less axial only
-    B2WARNING("Axial only")
+    B2WARNING("Axial only");
     return 100;
   }
 }

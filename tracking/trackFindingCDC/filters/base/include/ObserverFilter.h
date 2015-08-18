@@ -32,7 +32,7 @@ namespace Belle2 {
       /// Terminate the filter after event processing.
       virtual void terminate() override
       {
-        B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.")
+        B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.");
         BaseFilter::terminate();
       }
 

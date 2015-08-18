@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Use this to set the parameters of the creator. Does nothing per default. */
     virtual void setParameter(const std::string& parameterName, const std::string& parameterValue)
     {
-      B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.")
+      B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.");
     }
   };
 }

@@ -57,7 +57,7 @@ namespace Belle2 {
       } else if (parameterName == "useTrackingSeeds") {
         m_useTrackingSeeds = std::stoi(parameterValue);
       } else {
-        B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.")
+        B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.");
       }
     }
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     {
       genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(coordinateMeasurement);
       if (planarMeasurement == nullptr) {
-        B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!")
+        B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!");
       }
 
       const TVector3& momentum = recoTrack.getMomentum();

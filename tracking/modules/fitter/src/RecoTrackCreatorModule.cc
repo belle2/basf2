@@ -83,7 +83,7 @@ void RecoTrackCreatorModule::event()
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
 
     if (trackCandidate.getNHits() < 3) {
-      B2WARNING("Number of hits of track candidate is smaller than 3. Not creating track out of it.")
+      B2WARNING("Number of hits of track candidate is smaller than 3. Not creating track out of it.");
       continue;
     }
 

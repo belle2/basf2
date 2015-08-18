@@ -53,7 +53,7 @@ void CDCLegendreDAFStereoAssigningModule::initialize()
 void CDCLegendreDAFStereoAssigningModule::event()
 {
 
-  B2FATAL("This module is currently under refactoring!")
+  B2FATAL("This module is currently under refactoring!");
   return;
 
 }

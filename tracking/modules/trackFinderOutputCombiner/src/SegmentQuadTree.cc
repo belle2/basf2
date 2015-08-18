@@ -56,7 +56,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
 
   Processor::CandidateProcessorLambda lmdCandidateProcessing = [&](const Processor::ReturnList & items,
   Processor::QuadTree * node) -> void {
-    B2DEBUG(90, "Found track with " << items.size() << " on level " << static_cast<unsigned int>(node->getLevel()))
+    B2DEBUG(90, "Found track with " << items.size() << " on level " << static_cast<unsigned int>(node->getLevel()));
     foundTracks.push_back(items);
   };
 
@@ -64,7 +64,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
   qtProcessor.provideItemsSet(hits_set);
   qtProcessor.fillGivenTree(lmdCandidateProcessing, m_param_minimumItems);
 
-  B2DEBUG(90, "Found " << foundTracks.size() << " tracks")
+  B2DEBUG(90, "Found " << foundTracks.size() << " tracks");
 
   for (const Processor::ReturnList& track : foundTracks) {
     tracks.emplace_back();

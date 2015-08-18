@@ -25,12 +25,12 @@ CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSeg
 
   if (is_stereo) {
     if (hit_distance > 10) {
-      B2DEBUG(120, "Hits too far away: " << hit_distance)
+      B2DEBUG(120, "Hits too far away: " << hit_distance);
       return NOT_A_CELL;
     }
   } else {
     if (hit_distance > 2) {
-      B2DEBUG(120, "Hits too far away: " << hit_distance)
+      B2DEBUG(120, "Hits too far away: " << hit_distance);
       return NOT_A_CELL;
     }
   }
@@ -45,10 +45,10 @@ CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSeg
   unsigned int segment_size = static_cast<unsigned int>(varSet.at("segment_size"));
 
   if (hits_in_same_region > 5) {
-    B2DEBUG(110, "Too many hits in the same region: " << hits_in_same_region)
+    B2DEBUG(110, "Too many hits in the same region: " << hits_in_same_region);
     return NOT_A_CELL;
   } else {
-    B2DEBUG(110, "Hits in the region: " << hits_in_same_region << " while hits in segment: " << segment_size)
+    B2DEBUG(110, "Hits in the region: " << hits_in_same_region << " while hits in segment: " << segment_size);
   }
 
   // Means: yes

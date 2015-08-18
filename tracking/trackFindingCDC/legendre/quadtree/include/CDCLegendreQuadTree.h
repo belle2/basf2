@@ -223,7 +223,7 @@ namespace Belle2 {
       void cleanUpItems(processor const& proc)
       {
         B2ASSERT("Deleting items on a the top level will lead to memory leaks! If you want to safely delete all items, use the methods provided by the processor.",
-                 m_level != 0)
+                 m_level != 0);
         proc.cleanUpItems(m_items);
       } ;
 

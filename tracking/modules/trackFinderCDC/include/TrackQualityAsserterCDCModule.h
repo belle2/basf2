@@ -35,7 +35,7 @@ namespace Belle2 {
 
     void terminate()
     {
-      B2INFO("Having deleted " << m_numberOfDeletedHits << " hits of " << m_numberOfHits << " hits in total.")
+      B2INFO("Having deleted " << m_numberOfDeletedHits << " hits of " << m_numberOfHits << " hits in total.");
       TrackFinderCDCBaseModule::terminate();
     }
 

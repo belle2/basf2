@@ -31,7 +31,7 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
       m_hitSegmentLookUp.insert(std::make_pair(cdcHit, newSegmentInformation));
     }
 
-    B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D())
+    B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D());
   }
 }
 
@@ -61,6 +61,6 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
       m_hitTrackLookUp.insert(std::make_pair(cdcHit, trackInformation));
     }
 
-    B2DEBUG(200, "Added new track to track lookup: " << trackCand.getStartTrajectory3D().getTrajectory2D())
+    B2DEBUG(200, "Added new track to track lookup: " << trackCand.getStartTrajectory3D().getTrajectory2D());
   }
 }

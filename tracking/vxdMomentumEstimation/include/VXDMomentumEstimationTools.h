@@ -131,7 +131,7 @@ namespace Belle2 {
      * This method is implemented for the two cluster types differently below. */
     TVector3 getEntryMomentumOfMCParticle(const ClusterType&) const
     {
-      B2FATAL("Can not deal with this cluster type!")
+      B2FATAL("Can not deal with this cluster type!");
       return TVector3();
     }
 
@@ -139,7 +139,7 @@ namespace Belle2 {
      * This method is implemented for the two cluster types differently below. */
     TVector3 getEntryPositionOfMCParticle(const ClusterType&) const
     {
-      B2FATAL("Can not deal with this cluster type!")
+      B2FATAL("Can not deal with this cluster type!");
       return TVector3();
     }
 

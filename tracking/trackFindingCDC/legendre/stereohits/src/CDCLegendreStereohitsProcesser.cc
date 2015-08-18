@@ -70,8 +70,9 @@ void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, st
   }), foundStereoHits.end());
 
   for (HitType* hit : foundStereoHits) {
-    if (hit->getWireHit().getAutomatonCell().hasTakenFlag()) B2FATAL("Adding already found hit")
-      track.push_back(*hit);
+    if (hit->getWireHit().getAutomatonCell().hasTakenFlag())
+      B2FATAL("Adding already found hit");
+    track.push_back(*hit);
     hit->getWireHit().getAutomatonCell().setTakenFlag();
   }
 
@@ -102,7 +103,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
 
   if (possibleStereoSegments.size() == 0) {
-    B2WARNING("Found no stereo segments!")
+    B2WARNING("Found no stereo segments!");
     return;
   }
 

@@ -111,9 +111,9 @@ namespace Belle2 {
        */
       void print()
       {
-        B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix)
-        B2DEBUG(100, "z Matrix:\n" << m_zMatrix)
-        B2DEBUG(100, "z Dist Matrix:\n" << m_zDistMatrix)
+        B2DEBUG(100, "Fitting Matrix:\n" << m_fittingMatrix);
+        B2DEBUG(100, "z Matrix:\n" << m_zMatrix);
+        B2DEBUG(100, "z Dist Matrix:\n" << m_zDistMatrix);
       }
 
       /**

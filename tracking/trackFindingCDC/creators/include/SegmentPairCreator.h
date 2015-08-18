@@ -138,7 +138,7 @@ namespace Belle2 {
             segmentPair.clearTrajectory3D();
 
             if (segmentPair.getTrajectory3D().isFitted()) {
-              B2ERROR("CDCSegmentPair still fitted after clearing.")
+              B2ERROR("CDCSegmentPair still fitted after clearing.");
               continue;
             }
 

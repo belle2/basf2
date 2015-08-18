@@ -132,7 +132,7 @@ std::set<TrackHit*> TrackProcessor::createHitSet() const
     if (trackHit->getHitUsage() != TrackHit::c_usedInTrack)
       it = hits_set.insert(it, trackHit);
   });
-  B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.")
+  B2DEBUG(90, "In hit set are " << hits_set.size() << " hits.");
   return hits_set;
 }
 

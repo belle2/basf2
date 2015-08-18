@@ -355,7 +355,7 @@ double TrackFitter::fitTrackCandidateFast(
       B2DEBUG(100, "chi2: " << chi2);
 
     //  chi2 = estimateChi2( hits, track_par, ref_point);
-      B2INFO("params: ---------")
+      B2INFO("params: ---------");
       B2INFO("rho*dist: " << rho*dist);
       B2INFO("x: " << x << "; y: " << y << "; xy: " << xy << "; acos(xy/x*y):" << asin(x*y/xy));
     */

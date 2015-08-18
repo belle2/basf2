@@ -186,12 +186,12 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackFilterSec
       std::list<TrainOfSegments> trainsOfSegments;
 
       // TODO: Be careful with curlers here!!!!
-      B2DEBUG(100, "Track matches to " << trackInformation->getMatches().size() << " segments before train creation.")
+      B2DEBUG(100, "Track matches to " << trackInformation->getMatches().size() << " segments before train creation.");
       createTrainsOfMatchedSegments(trainsOfSegments, trackInformation, segmentTrainFilter);
 
       if (trainsOfSegments.size() == 1) {
         // If there is only one matching segment/train, mark this as matched
-        B2DEBUG(100, "Only one train/segment which matches! Good!")
+        B2DEBUG(100, "Only one train/segment which matches! Good!");
         trackInformation->setGoodSegmentTrain(trainsOfSegments.front());
       } else if (trainsOfSegments.size() > 1) {
         // There are no good reasons why we should have more than one train/segment that matches. We have to find the best one.
@@ -208,7 +208,7 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackFilterSec
 
     // Go through the tracks and see if we can combine the remaining segment-track combinations
     for (TrackInformation* trackInformation : m_trackLookUp) {
-      B2DEBUG(100, "Looking for possible combinations..")
+      B2DEBUG(100, "Looking for possible combinations..");
       const TrainOfSegments& goodTrain = trackInformation->getGoodSegmentTrain();
       if (goodTrain.size() > 0)
         tryToCombineSegmentTrainAndMatchedTracks(goodTrain, segmentTrackFilter);
@@ -311,7 +311,7 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
     }
     trainsOfSegments.insert(trainsOfSegments.end(), innerSet.begin(), innerSet.end());
     if (trainsOfSegments.size() > 1000) {
-      B2ERROR("Too much trains: " << trainsOfSegments.size() << "!")
+      B2ERROR("Too much trains: " << trainsOfSegments.size() << "!");
       trainsOfSegments.clear();
       return;
     }
@@ -356,14 +356,14 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
 void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
     TrackFindingCDC::BaseSegmentInformationListTrackFilter& segmentTrackFilter)
 {
-  B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...")
+  B2DEBUG(100, "Trying to combine " << trainOfSegments.size() << " segment(s) with their track(s)...");
   for (SegmentInformation* segmentInformation : trainOfSegments) {
 
     std::vector<std::pair<TrackInformation*, double>>& matchingTracks = segmentInformation->getMatches();
-    B2DEBUG(100, "Segment has " << matchingTracks.size() << " partners.")
+    B2DEBUG(100, "Segment has " << matchingTracks.size() << " partners.");
 
     if (matchingTracks.size() == 0) {
-      B2DEBUG(100, "Match was deleted.")
+      B2DEBUG(100, "Match was deleted.");
       return;
     }
 
@@ -383,7 +383,7 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       double perpSBack = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
       if (perpSFront > possiblyMatch->getMaxPerpS() or perpSBack < possiblyMatch->getMinPerpS())
       {
-        B2DEBUG(120, "Segment is above or below track.")
+        B2DEBUG(120, "Segment is above or below track.");
         matchesAboveTrack.push_back(possiblyMatch);
         return true;
       } else {
@@ -393,9 +393,9 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
 
     if (matchingTracks.size() == 1) {
       bestMatch = matchingTracks[0].first;
-      B2DEBUG(100, "Combining segment with track: " << bestMatch->getTrackCand())
+      B2DEBUG(100, "Combining segment with track: " << bestMatch->getTrackCand());
     } else if (matchingTracks.size() > 1) {
-      B2DEBUG(100, matchingTracks.size() << " are too many possible partners! We choose the best one:")
+      B2DEBUG(100, matchingTracks.size() << " are too many possible partners! We choose the best one:");
 
       for (const std::pair<TrackInformation*, double>& pair : matchingTracks) {
         TrackInformation* trackInformation = pair.first;
@@ -409,14 +409,14 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       }
 
       if (bestMatch != nullptr and bestFitProb > m_param_minimalFitProbability) {
-        B2DEBUG(100, "Combining segment with track after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb)
+        B2DEBUG(100, "Combining segment with track after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb);
       } else {
-        B2DEBUG(100, "Found no segment with a good fit value in the track.")
+        B2DEBUG(100, "Found no segment with a good fit value in the track.");
         bestMatch = nullptr;
       }
     } else if (matchingTracks.size() == 0) {
       B2DEBUG(100, "None of the matches were in the track. Aborting. There are " << matchesAboveTrack.size() <<
-              " matches above the track.")
+              " matches above the track.");
 
       // Try to fit them to the track
       double bestFitProb = 0;
@@ -433,9 +433,9 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       }
 
       if (bestMatch != nullptr and bestFitProb > m_param_minimalFitProbability) {
-        B2DEBUG(100, "Combining segment with track above/below after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb)
+        B2DEBUG(100, "Combining segment with track above/below after fit test: " << bestMatch->getTrackCand() << " with: " << bestFitProb);
       } else {
-        B2DEBUG(100, "Found no segment with a good fit value above/below the track.")
+        B2DEBUG(100, "Found no segment with a good fit value above/below the track.");
         bestMatch = nullptr;
       }
     }
@@ -452,9 +452,9 @@ void SegmentTrackCombiner::matchTracksToSegment(SegmentInformation* segmentInfor
   for (TrackInformation* trackInformation : m_trackLookUp) {
     double filterResult = segmentTrackChooser(std::make_pair(segmentInformation->getSegment(), trackInformation->getTrackCand()));
     if (isNotACell(filterResult)) {
-      B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer())
+      B2DEBUG(110, "Found not matchable in " << segmentInformation->getSegment()->getISuperLayer());
     } else {
-      B2DEBUG(110, "Found matchable in " << segmentInformation->getSegment()->getISuperLayer())
+      B2DEBUG(110, "Found matchable in " << segmentInformation->getSegment()->getISuperLayer());
       trackInformation->addMatch(segmentInformation, filterResult);
       segmentInformation->addMatch(trackInformation, filterResult);
     }
@@ -472,6 +472,6 @@ void SegmentTrackCombiner::createTrainsOfMatchedSegments(std::list<TrainOfSegmen
   } else if (matchedSegments.size() > 1 and matchedSegments.size() <= 5) {
     makeAllCombinations(trainsOfSegments, trackInformation, segmentTrainFilter);
   } else if (matchedSegments.size() > 5) {
-    B2WARNING("Number of matched segments exceeds 5 with: " << matchedSegments.size())
+    B2WARNING("Number of matched segments exceeds 5 with: " << matchedSegments.size());
   }
 }

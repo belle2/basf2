@@ -1,6 +1,7 @@
 #include <tracking/modules/trackFinderCDC/TrackQualityAsserterCDCModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <framework/dataobjects/Helix.h>
 
 using namespace std;
 using namespace Belle2;
@@ -8,7 +9,7 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(TrackQualityAsserterCDC);
 
-unsigned int removeSecondHalfOfTrack(CDCTrack& track)
+void removeSecondHalfOfTrack(CDCTrack& track)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
@@ -38,14 +39,105 @@ unsigned int removeSecondHalfOfTrack(CDCTrack& track)
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
   }
+}
 
-  track.sortByPerpS();
+void removeHitsAfterLayerBreak(CDCTrack& track)
+{
+  ILayerType lastLayer = -1;
+  bool removeAfterThis = false;
 
-  if (negativeHitsAreMore) {
-    return hitsWithPositivePerpS;
-  } else {
-    return hitsWithNegativePerpS;
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      continue;
+    }
+
+    const ILayerType currentLayer = recoHit.getWire().getICLayer();
+    if (lastLayer != -1) {
+      const ILayerType delta = currentLayer - lastLayer;
+      if (abs(delta) > 5) {
+        removeAfterThis = true;
+        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      }
+    }
+
+    lastLayer = currentLayer;
   }
+}
+
+void removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
+{
+  ISuperLayerType lastLayer = -1;
+  bool deleteTrack = true;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    const ISuperLayerType currentLayer = recoHit.getISuperLayer();
+    if (lastLayer != -1 and lastLayer != currentLayer) {
+      deleteTrack = false;
+      break;
+    }
+
+    lastLayer = currentLayer;
+  }
+
+  if (deleteTrack) {
+    for (const CDCRecoHit3D& recoHit : track) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    }
+  }
+}
+
+void removeHitsIfSmall(CDCTrack& track)
+{
+  bool deleteTrack = track.size() < 3;
+
+  if (deleteTrack) {
+    for (const CDCRecoHit3D& recoHit : track) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    }
+  }
+}
+
+void resetTrack(CDCTrack& track)
+{
+  for (const CDCRecoHit3D& recoHit : track) {
+    recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
+  }
+}
+
+void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track)
+{
+  double lastAngle = std::nan("");
+  bool removeAfterThis = false;
+
+  for (const CDCRecoHit3D& recoHit : track.reverseRange()) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      continue;
+    }
+
+    const double currentAngle = recoHit.getRecoPos2D().phi();
+    if (not std::isnan(lastAngle)) {
+      const double delta = currentAngle - lastAngle;
+      const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
+      if (fabs(normalizedDelta) > 0.5) {
+
+        B2INFO(currentAngle << " " << lastAngle << " " << normalizedDelta)
+        removeAfterThis = true;
+        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      }
+    }
+
+    lastAngle = currentAngle;
+  }
+}
+
+void removeAllMarkedHits(CDCTrack& track)
+{
+  // Delete all hits that were marked
+  track.erase(std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & recoHit) -> bool {
+    return recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag();
+  }), track.end());
 }
 
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
@@ -54,40 +146,56 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
   for (CDCTrack& track : tracks) {
     // Reset all hits to not have a background hit (what they should not have anyway)
-    for (const CDCRecoHit3D& recoHit : track) {
-      recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
-    }
+    resetTrack(track);
 
-    unsigned int removableHits = removeSecondHalfOfTrack(track);
+    //removeSecondHalfOfTrack(track);
+    removeHitsAfterLayerBreak(track);
+    removeAllMarkedHits(track);
 
-    m_numberOfHits += track.size();
-    m_numberOfDeletedHits += removableHits;
+    removeHitsInTheBeginningIfAngleLarge(track);
+    removeAllMarkedHits(track);
+
+    removeHitsIfOnlyOneSuperLayer(track);
+    removeAllMarkedHits(track);
+    removeHitsIfSmall(track);
+    removeAllMarkedHits(track);
+
+    if (track.size() == 0)
+      continue;
+
+    track.sortByPerpS();
 
     SortableVector<CDCRecoHit3D> newTrackHits;
     newTrackHits.reserve(track.size());
 
-    // Delete all hits that were marked
-    track.erase(std::remove_if(track.begin(), track.end(), [&newTrackHits](const CDCRecoHit3D & recoHit) -> bool {
-      if (recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag())
-      {
-        newTrackHits.push_back(move(recoHit));
-        return true;
-      } else {
-        return false;
-      }
-    }), track.end());
 
-    if (newTrackHits.size() > 20) {
+
+    const CDCTrajectory3D& cdcTrajectory = track.getStartTrajectory3D();
+
+    const short charge = track.getStartChargeSign();
+    if (abs(charge) == 1) {
+      Helix trajectory(cdcTrajectory.getSupport(), cdcTrajectory.getMom3DAtSupport() , charge, 1.5);
+      const Vector2D& startPosition = track.front().getRecoPos2D();
+      const double perpSAtFront = trajectory.getArcLength2DAtXY(startPosition.x(), startPosition.y());
+      const TVector3& position = trajectory.getPositionAtArcLength2D(perpSAtFront);
+      const TVector3& momentum = trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5);
+
+
+      track.setStartTrajectory3D(CDCTrajectory3D(position, momentum, charge));
+    }
+
+
+    /*if (newTrackHits.size() > 20) {
       CDCTrack newTrack;
       newTrack.swap(newTrackHits);
 
-      CDCTrajectory3D newTrajectory = track.getStartTrajectory3D();
+      newTrajectory = track.getStartTrajectory3D();
       newTrajectory.setLocalOrigin(newTrack.front().getRecoPos3D());
       newTrack.setStartTrajectory3D(newTrajectory);
 
       newTracks.push_back(move(newTrack));
       B2INFO("Adding new track");
-    }
+    }*/
   }
 
   /*for(CDCTrack & newTrack : newTracks)
@@ -95,5 +203,5 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
     return track.size() < 3;
-  }));
+  }), tracks.end());
 }

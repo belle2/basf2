@@ -27,8 +27,13 @@ namespace Belle2 {
                "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
                double(0.001));
 
+      addParam("MinimumIterations", m_param_minimumIterations,
+               "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(2));
+      addParam("MaximumIterations", m_param_maximumIterations,
+               "Maximum number of iterations for the Kalman filter", static_cast<unsigned int>(4));
+
       addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
-               "Maximum number of failed hits before aborting the fit.", static_cast<unsigned int>(5));
+               "Maximum number of failed hits before aborting the fit.", static_cast<int>(-1));
     }
 
   protected:
@@ -36,15 +41,21 @@ namespace Belle2 {
     std::shared_ptr<genfit::AbsFitter> createFitter() const override
     {
       std::shared_ptr<genfit::DAF> fitter = std::make_shared<genfit::DAF>();
-      fitter->setProbCut(m_param_probabilityCut);
       fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+      fitter->setMinIterations(m_param_minimumIterations);
+      fitter->setMaxIterations(m_param_maximumIterations);
+
+      fitter->setProbCut(m_param_probabilityCut);
 
       return fitter;
     }
 
   private:
-    double m_param_probabilityCut; /**< Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001 */
+    unsigned int m_param_minimumIterations = 2; /**< Minimum number of iterations for the Kalman filter */
+    unsigned int m_param_maximumIterations = 4; /**< Maximum number of iterations for the Kalman filter */
+    /** Probability cut for the DAF. Any value between 0 and 1 possible. Common values are between 0.01 and 0.001 */
+    double m_param_probabilityCut;
     /** Maximum number of failed hits before aborting the fit */
-    unsigned int m_param_maxNumberOfFailedHits = 5;
+    int m_param_maxNumberOfFailedHits = -1;
   };
 }

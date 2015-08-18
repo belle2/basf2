@@ -14,7 +14,7 @@
 
 #include <TDatabasePDG.h>
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 

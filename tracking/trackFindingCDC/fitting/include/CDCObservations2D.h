@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #endif
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 #include <iterator>
 

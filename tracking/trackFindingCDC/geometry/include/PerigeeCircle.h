@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <TMatrixD.h>
 #include <TVectorD.h>

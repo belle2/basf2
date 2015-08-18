@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/typedefs/SignType.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/SignType.h>
 #include <vector>
 #include <functional>
 #include <utility>

@@ -11,7 +11,7 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>

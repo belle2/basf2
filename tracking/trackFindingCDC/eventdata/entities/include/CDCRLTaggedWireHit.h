@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

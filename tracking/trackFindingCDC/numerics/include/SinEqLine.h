@@ -14,9 +14,9 @@
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
-#include <tracking/trackFindingCDC/typedefs/SignType.h>
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/SignType.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <framework/logging/Logger.h>
 

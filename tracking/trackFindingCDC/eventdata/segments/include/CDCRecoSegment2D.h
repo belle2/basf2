@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>

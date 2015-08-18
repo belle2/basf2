@@ -12,7 +12,7 @@
 #include <cmath>
 #include <TMatrixD.h>
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 #include <tracking/trackFindingCDC/geometry/HelixCovariance.h>

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/typedefs/SignType.h>
+#include <tracking/trackFindingCDC/numerics/SignType.h>
 
 namespace Belle2 {
 

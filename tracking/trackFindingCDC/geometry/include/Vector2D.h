@@ -14,9 +14,9 @@
 #include <iostream>
 
 
-#include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
-#include <tracking/trackFindingCDC/typedefs/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

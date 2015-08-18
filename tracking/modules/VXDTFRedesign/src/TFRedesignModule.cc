@@ -3101,7 +3101,8 @@ int TFRedesignModule::cellularAutomaton(PassData* currentPass)
         }
 
       } else {
-        currentSeg->setActivationState(false); deadCells++;
+        currentSeg->setActivationState(false);
+        deadCells++;
 
         // Collector Cell died at CA
         if (m_PARAMdisplayCollector > 0) {
@@ -3144,6 +3145,8 @@ int TFRedesignModule::cellularAutomaton(PassData* currentPass)
       break;
     }
   }
+
+
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {
     countedSegments = 0;

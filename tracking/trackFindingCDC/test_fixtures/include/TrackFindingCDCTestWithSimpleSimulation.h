@@ -221,10 +221,10 @@ namespace Belle2 {
 
     protected:
       /// Memory for the log level that was set before the test.
-      LogConfig::ELogLevel m_savedLogLevel;
+      LogConfig::ELogLevel m_savedLogLevel = LogConfig::c_Info;
 
       /// Memory for the log info of debug that was set before the test.
-      unsigned int m_savedDebugLogInfo;
+      unsigned int m_savedDebugLogInfo = 100;
 
       /// Some colors  to cycle for plotting
       const std::array<std::string, 6> m_colors{{ "red", "blue", "green", "yellow", "violet", "cyan" }};

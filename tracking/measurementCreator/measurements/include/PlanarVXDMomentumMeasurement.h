@@ -27,6 +27,7 @@ namespace Belle2 {
 
   public:
     PlanarVXDMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit,
+                                 const double covariance,
                                  const typename VXDMomentumEstimation<HitType>::FitParameters& fitParameters,
                                  const typename VXDMomentumEstimation<HitType>::CorrectionFitParameters& correctionFitParameters,
                                  bool useTrackFinderSeeds, bool useThickness) :
@@ -35,7 +36,8 @@ namespace Belle2 {
       m_correctionFitParameters(correctionFitParameters),
       m_useTrackFinderSeeds(useTrackFinderSeeds),
       m_useThickness(useThickness),
-      m_hit(hit)
+      m_hit(hit),
+      m_covariance(covariance)
     {
       rawHitCoords_.ResizeTo(1);
       rawHitCov_.ResizeTo(1, 1);
@@ -55,7 +57,9 @@ namespace Belle2 {
     /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
     /** Underlaying hit/cluster */
-    HitType* m_hit;
+    HitType* m_hit = nullptr;
+    /** Value of the covariance */
+    double m_covariance = 0.03;
   };
 
   template <class HitType>
@@ -100,7 +104,7 @@ namespace Belle2 {
     }
 
     // TODO
-    rawHitCovariance(0, 0) = 0.23;
+    rawHitCovariance(0, 0) = m_covariance;
 
     genfit::MeasurementOnPlane* mop = new genfit::MeasurementOnPlane(rawHitCoordinates, rawHitCovariance,
         state.getPlane(), state.getRep(), constructHMatrix(state.getRep()));

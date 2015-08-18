@@ -52,6 +52,8 @@ namespace Belle2 {
         m_useTrackFinderSeeds = std::stoi(parameterValue);
       } else if (parameterName == "use_thickness") {
         m_useThickness = std::stoi(parameterValue);
+      } else if (parameterName == "covariance") {
+        m_covariance = std::stod(parameterValue);
       } else {
         B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.")
       }
@@ -77,7 +79,7 @@ namespace Belle2 {
       }
 
       PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
-          m_fitParameters, m_correctionFitParameters, m_useTrackFinderSeeds, m_useThickness);
+          m_covariance, m_fitParameters, m_correctionFitParameters, m_useTrackFinderSeeds, m_useThickness);
       return {momentumMeasurement};
     }
 
@@ -92,5 +94,7 @@ namespace Belle2 {
     bool m_useThickness = false;
     /** Minimal value for the momentum below the estimation is used */
     double m_minimumMomentum = 0.1;
+    /** Covariance of the measurement */
+    double m_covariance = 0.03;
   };
 }

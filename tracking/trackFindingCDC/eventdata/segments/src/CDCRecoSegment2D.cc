@@ -15,12 +15,61 @@
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
 #include <genfit/TrackCand.h>
 
+#include <numeric>
+#include <iterator>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
 namespace {
+
+  /** Makes adjacent pairs from an input range,
+   *  invoking the map with two arguments and writes to the output iterator
+   */
+  template<class InputIterator, class OutputIterator, class BinaryOperation>
+  OutputIterator transform_adjacent_pairs(InputIterator first, InputIterator last,
+                                          OutputIterator result, const BinaryOperation& map)
+  {
+    if (first == last) return result;
+
+    InputIterator second = first;
+    ++second;
+    while (second != last) {
+      *result = map(*first, *second);
+      ++result;
+      ++first;
+      ++second;
+    }
+    return result;
+  }
+
+  /** Makes adjacent triples from an input range,
+   *  invoking the map with three arguments and writes to the output iterator
+   */
+  template<class InputIterator, class OutputIterator, class TrinaryOperation>
+  OutputIterator transform_adjacent_triples(InputIterator first, InputIterator last,
+                                            OutputIterator result, const TrinaryOperation& map)
+  {
+    if (not(first != last)) return result;
+
+    InputIterator second{first};
+    ++second;
+    if (not(second != last)) return result;
+
+    InputIterator third{second};
+    ++third;
+    while (third != last) {
+      *result = map(*first, *second, *third);
+      ++result;
+      ++first;
+      ++second;
+      ++third;
+    }
+    return result;
+  }
+
   void createTangentSegment(const CDCRLWireHitSegment& rlWireHitSegment,
                             CDCTangentSegment& tangentSegment)
   {
@@ -29,20 +78,13 @@ namespace {
 
     tangentSegment.reserve(nRLWireHits - 1);
 
-    CDCRLWireHitSegment::const_iterator itRLWireHit = rlWireHitSegment.begin();
-
-    /// Setup for the following shifting operations
-    const CDCRLWireHit* firstRLWireHit = nullptr;         //recoRLWireHitSegment[-1];
-    const CDCRLWireHit* secondRLWireHit = *itRLWireHit++; //recoRLWireHitSegment[0];
-
-    const CDCRLWireHitSegment::const_iterator itEndRLWireHit = rlWireHitSegment.end();
-    while (itRLWireHit != itEndRLWireHit) {
-
-      firstRLWireHit = secondRLWireHit; //recoRLWireHitSegment[iRLWireHit];
-      secondRLWireHit = *itRLWireHit++;  //recoRLWireHitSegment[iRLWireHit+1];
-
-      tangentSegment.push_back(CDCTangent(firstRLWireHit, secondRLWireHit));
-    }
+    // Make tangents from pairs of hits along the segment.
+    transform_adjacent_pairs(rlWireHitSegment.begin(), rlWireHitSegment.end(),
+                             back_inserter(tangentSegment),
+                             [](const CDCRLWireHit * firstRLWireHit,
+    const CDCRLWireHit * secondRLWireHit) {
+      return CDCTangent(firstRLWireHit, secondRLWireHit);
+    });
 
     if (tangentSegment.size() + 1 != rlWireHitSegment.size()) {
       B2ERROR("Wrong number of tangents created.");
@@ -60,22 +102,14 @@ namespace {
 
     facetSegment.reserve(nRLWireHits - 2);
 
-    CDCRLWireHitSegment::const_iterator itRLWireHit = rlWireHitSegment.begin();
-
-    /// Setup for the following shifting operations
-    const CDCRLWireHit* firstRLWireHit = nullptr;         //recoRLWireHitSegment[-1];
-    const CDCRLWireHit* secondRLWireHit = *itRLWireHit++; //recoRLWireHitSegment[0];
-    const CDCRLWireHit* thirdRLWireHit = *itRLWireHit++;  //recoRLWireHitSegment[1];
-
-    const CDCRLWireHitSegment::const_iterator itEndRLWireHit = rlWireHitSegment.end();
-    while (itRLWireHit != itEndRLWireHit) {
-
-      firstRLWireHit = secondRLWireHit; //recoRLWireHitSegment[iRLWireHit];
-      secondRLWireHit = thirdRLWireHit; //recoRLWireHitSegment[iRLWireHit+1];
-      thirdRLWireHit = *itRLWireHit++;  //recoRLWireHitSegment[iRLWireHit+2];
-
-      facetSegment.push_back(CDCFacet(firstRLWireHit, secondRLWireHit, thirdRLWireHit));
-    }
+    // Make tangents from pairs of hits along the segment.
+    transform_adjacent_triples(rlWireHitSegment.begin(), rlWireHitSegment.end(),
+                               back_inserter(facetSegment),
+                               [](const CDCRLWireHit * firstRLWireHit,
+                                  const CDCRLWireHit * secondRLWireHit,
+    const CDCRLWireHit * thirdRLWireHit) {
+      return CDCFacet(firstRLWireHit, secondRLWireHit, thirdRLWireHit);
+    });
 
     if (facetSegment.size() + 2 != rlWireHitSegment.size()) {
       B2ERROR("Wrong number of facets created.");

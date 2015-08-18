@@ -66,13 +66,21 @@ class Basf2Calculation():
             process_bars = {process: viewer.ProgressBarViewer()
                             for process in self.process_list if process.path is not None}
 
-        number_of_finished_processes = 0
+        started_processes = filter(lambda p: p.path is not None, self.process_list)
+        running_processes = started_processes
         # Update all process bars as long as minimum one process is running
-        while number_of_finished_processes < len(self.process_list):
-            for process in self.process_list:
+        while len(running_processes) > 0:
+
+            running_processes = filter(lambda p: self.is_running(p), started_processes)
+
+            for process in running_processes:
+                # Check if the process does not have a path
+                if process.path is None:
+                    if display_bar:
+                        self.show_end_result(process, process_bars)
+
                 # Check if the process is still running. If not set the end result correctly.
-                if not self.is_running(process) or process.path is None:
-                    number_of_finished_processes += 1
+                elif not self.is_running(process):
                     if display_bar:
                         self.show_end_result(process, process_bars)
 
@@ -88,9 +96,9 @@ class Basf2Calculation():
 
             time.sleep(0.01)
 
-        if display_bar:
-            for process in self.process_list:
-                self.show_end_result(process, process_bars)
+        # if display_bar:
+        #    for process in self.process_list:
+        #        self.show_end_result(process, process_bars)
 
     def show_end_result(self, process, process_bars):
         """

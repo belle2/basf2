@@ -53,7 +53,7 @@ using namespace Belle2::SVD;
 
 #undef B2DEBUG
 #define B2DEBUG(level, streamText) \
-  B2LOGMESSAGE_IFENABLED(LogConfig::c_Debug, level, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__)
+  B2LOG(LogConfig::c_Debug, level, streamText)
 
 
 //-----------------------------------------------------------------

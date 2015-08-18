@@ -58,7 +58,7 @@ bool MultivariateNormalGenerator::setMeanCov(const Eigen::VectorXd& mean, const 
   auto ldlt = cov.ldlt();
   if (ldlt.info() != Eigen::Success) {
     B2ERROR("Cannot compute LDLT decomposition of covariance "
-            "matrix, maybe not positive semi-definite?")
+            "matrix, maybe not positive semi-definite?");
     return false;
   }
   Eigen::MatrixXd L = ldlt.matrixL();

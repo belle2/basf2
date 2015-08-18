@@ -69,7 +69,7 @@ namespace Belle2 {
       using Width = typename std::tuple_element<I, Delta>::type;
 
       /// Number of coordinates of the box
-      static const size_t c_nTypes = std::tuple_size<Point>();
+      static const size_t c_nTypes = std::tuple_size<Point>::value;
 
       /// Helper class to iterate over the individual coordinates
       typedef GenIndices<c_nTypes> Indices;

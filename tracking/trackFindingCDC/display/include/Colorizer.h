@@ -39,7 +39,7 @@ namespace Belle2 {
        * Constructor.
        * @param map A string to MethodPtr map assigning a ColorMap class to its name given as a string. \see m_listOfMappingNames
        */
-      Colorizer(std::map<std::string, MethodPtr> map): m_strokeSet(false), m_strokeWidthSet(false), m_strokeMethodPtr(nullptr),
+      explicit Colorizer(std::map<std::string, MethodPtr> map): m_strokeSet(false), m_strokeWidthSet(false), m_strokeMethodPtr(nullptr),
         m_strokeWidthMethodPtr(nullptr),
         m_listOfMappingNames(map) {}
 

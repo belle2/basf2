@@ -154,7 +154,7 @@ namespace Belle2 {
        *
        * @param input The string to be returned by the map() function.
        */
-      ReturnInputString(const std::string& input) : m_inputString(input) {};
+      explicit ReturnInputString(const std::string& input) : m_inputString(input) {};
 
       /**
        * Function call to map the object id and object to a color/stroke-width.
@@ -186,7 +186,7 @@ namespace Belle2 {
        *
        * @param input The string to be returned by the map() function.
        */
-      ReturnInputValue(const std::string& input) : m_inputValue(input) {};
+      explicit ReturnInputValue(const std::string& input) : m_inputValue(input) {};
 
       /**
        * Function call to map the object id and object to a color/stroke-width.

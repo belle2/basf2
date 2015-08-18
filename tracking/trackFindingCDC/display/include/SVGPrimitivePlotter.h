@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /// Constructor taking additional attributes that go into the toplevel svg tag.
       /** @param svgAttributes    A map of attributes that goes into the toplevel svg tag. */
-      SVGPrimitivePlotter(const AttributeMap& svgAttributes);
+      explicit SVGPrimitivePlotter(const AttributeMap& svgAttributes);
 
       /// Copy constructor
       SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter);

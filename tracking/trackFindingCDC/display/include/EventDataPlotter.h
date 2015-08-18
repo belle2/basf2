@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.
-      EventDataPlotter(bool animate = false);
+      explicit EventDataPlotter(bool animate = false);
 
       /** Constructor taking the specifc PrimitivePlotter instance as backend.
        *

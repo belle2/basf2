@@ -109,6 +109,8 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
     //std::for_each(m_node_v.begin(), m_node_v.end(),
     //              Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
     //setState(RCState::RECOVERING_RS);
+    //m_restarting = false;
+    //m_starttime = -1;
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -158,7 +160,16 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
     for (size_t i = 0; i < m_node_v.size(); i++) {
       RCNode& node(m_node_v[i]);
       std::string val;
-      get(node, "rcconfig", val);
+      int count = 0;
+      while (count < 10) {
+        try {
+          get(node, "rcconfig", val);
+        } catch (const TimeoutException& e) {
+          count++;
+          continue;
+        }
+        break;
+      }
       LogFile::info("%s config : %s", node.getName().c_str(), val.c_str());
       node.setConfig(val);
       std::string vname = StringUtil::form("node[%d]", (int)i);
@@ -202,11 +213,15 @@ void RunControlCallback::stop() throw(RCHandlerException)
 {
   postRun();
   distribute(NSMMessage(RCCommand::STOP));
+  m_restarting = false;
+  m_starttime = -1;
 }
 
 void RunControlCallback::recover(const DBObject&) throw(RCHandlerException)
 {
   distribute(NSMMessage(RCCommand::RECOVER));
+  m_restarting = false;
+  m_starttime = -1;
 }
 
 void RunControlCallback::pause() throw(RCHandlerException)
@@ -223,21 +238,41 @@ void RunControlCallback::abort() throw(RCHandlerException)
 {
   postRun();
   distribute_r(NSMMessage(RCCommand::ABORT));
+  m_restarting = false;
+  m_starttime = -1;
 }
 
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
   if (m_restarttime > 0) {
-    if (!m_restarting) {
-      if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
-        stop();
-        m_restarting = true;
+    try {
+      if (!m_restarting) {
+        if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
+          LogFile::info("Run automatically stopped due to eceeding run length");
+          stop();
+          m_restarting = true;
+        }
+      } else {
+        bool all_ready = true;
+        for (RCNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
+          RCNode& node(*it);
+          if (!node.isUsed()) continue;
+          RCState cstate(node.getState());
+          if (cstate != RCState::READY_S) {
+            all_ready = false;
+            break;
+          }
+        }
+        if (all_ready) {
+          m_restarting = false;
+          m_starttime = -1;
+          LogFile::info("Run automatically starting");
+          start(0, 0);
+        }
       }
-    } else {
-      if (state == RCState::READY_S) {
-        start(0, 0);
-      }
+    } catch (const IOException& e) {
+      LogFile::error("%s", e.what());
     }
   }
   RCState state_new = state.next();

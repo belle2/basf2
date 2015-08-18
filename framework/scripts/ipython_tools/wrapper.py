@@ -1,8 +1,6 @@
 # Nice display features imports
 from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
-from IPython.core.display import Image, display
 from tracking.validation.harvesting import HarvestingModule
-
 import os
 
 
@@ -47,6 +45,8 @@ class QueueDrawer(CDCSVGDisplayModule):
 
 def show_image(filename, show=True):
     """ Display an image file in ipython """
+    from IPython.core.display import Image, display
+
     os.system("convert " + filename + " " + filename[:-3] + str("png"))
     image = Image(filename[:-3] + str("png"))
     if show:

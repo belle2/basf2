@@ -1,18 +1,20 @@
-# Plotting imports
-import matplotlib.pyplot as plt
-import seaborn as sb
-sb.set()
-import pandas as pd
 import numpy as np
 import os
 from root_pandas import read_root
 
 
 class TrackingValidationResult:
+    # Plotting imports
+    import matplotlib.pyplot as plt
+    import seaborn as sb
+    import pandas as pd
+
     #: This class represents a loaded validation root file.
     #: It has methods for plotting the mostly needed graphs
 
     def __init__(self, filename, label=None, color_index=0, additional_information=None):
+        sb.set()
+
         #: The root filename
         self.filename = filename
         #: The pr data
@@ -108,14 +110,14 @@ class TrackingValidationResult:
     def plot_finding_efficiency(self, data=None):
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().is_matched, yerr=grouped.std().is_matched)
+        self.plot(grouped.median().pt_truth, grouped.mean().is_matched)
         plt.xlabel("pt")
         plt.ylabel("finding efficiency")
 
     def plot_hit_efficiency(self, data=None):
         grouped = self.grouped_by_pt_data(data)
 
-        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency, yerr=grouped.std().hit_efficiency)
+        self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency)
         plt.xlabel("pt")
         plt.ylabel("hit efficiency")
 

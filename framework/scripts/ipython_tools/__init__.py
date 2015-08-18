@@ -4,15 +4,11 @@ import calculation
 import queue
 
 # System imports
-import sys
-import time
 import os
 import tempfile
 
 # basf2 imports
 import basf2
-import ROOT
-from ROOT import Belle2
 
 # multiprocessing imports
 from multiprocessing import Process, Pipe
@@ -151,11 +147,11 @@ class IPythonHandler:
             all_seeds = [random_seeds] * len(all_paths)
 
         process_list = [Basf2Process(path=path,
-                                     result_queue=queue,
+                                     result_queue=q,
                                      random_seed=random_seed,
                                      parameters=parameters,
                                      log_file_name=self.next_log_file_name())
-                        for path, queue, random_seed, parameters in zip(all_paths, all_queues, all_seeds, all_parameters)]
+                        for path, q, random_seed, parameters in zip(all_paths, all_queues, all_seeds, all_parameters)]
         return calculation.Basf2Calculation(process_list)
 
     def next_log_file_name(self):
@@ -178,7 +174,8 @@ class IPythonHandler:
                 pass
         return next_log_file[1]
 
-    def create_queue(self):
+    @staticmethod
+    def create_queue():
         """
         Create a Basf2Calculation queue. You need to do this if you want to pass it to your modules
         and write to it while processing the events.

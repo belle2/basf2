@@ -1,6 +1,5 @@
 # basf2 imports
 import basf2
-import ROOT
 from ROOT import Belle2
 
 
@@ -28,8 +27,7 @@ class PrintCollections(basf2.Module):
         """
         Get the total number of events from C++
         """
-        import ROOT
-        self.total_number_of_events = ROOT.Belle2.Environment.Instance().getNumberOfEvents()
+        self.total_number_of_events = Belle2.Environment.Instance().getNumberOfEvents()
 
     def store_content(self):
         registered_store_arrays = Belle2.PyStoreArray.list()
@@ -93,8 +91,7 @@ class ProgressPython(basf2.Module):
 
         # Receive the total number of events
 
-        import ROOT
-        self.total_number_of_events = ROOT.Belle2.Environment.Instance().getNumberOfEvents()
+        self.total_number_of_events = Belle2.Environment.Instance().getNumberOfEvents()
 
     def event(self):
         """ Send the event number to the connection """

@@ -4,7 +4,7 @@ import inspect
 import time
 
 
-class Basf2Calculation():
+class Basf2Calculation:
 
     """
     Create a _Basf2Calculation from the given Basf2Process that handles
@@ -220,8 +220,6 @@ class Basf2Calculation():
         Create a overview widget for all processes or only one for the given process.
         """
 
-        widget = None
-
         if len(self.process_list) == 1:
             widget = widget_function(self.process_list[0])
         else:
@@ -276,7 +274,7 @@ class Basf2Calculation():
         self.create_widgets_for_all_processes(f, index)
 
 
-class Basf2CalculationList():
+class Basf2CalculationList:
 
     """
     Creates a whole list of paths by combining every list element in every list in lists with every other list in lists.
@@ -307,12 +305,12 @@ class Basf2CalculationList():
 
         all_queues = [queue.Basf2CalculationQueue() for combination in every_parameter_combination_with_names]
 
-        def f(queue, parameter_combination):
+        def f(q, param_combination):
             args, vargs, vwargs, defaults = inspect.getargspec(self.path_function)
             if "queue" in args:
-                parameter_combination.update({"queue": queue})
+                param_combination.update({"queue": q})
 
-            return self.path_function(**parameter_combination)
+            return self.path_function(**param_combination)
 
         all_paths = [f(q, parameter_combination)
                      for q, parameter_combination in zip(all_queues, list(every_parameter_combination_with_names))]

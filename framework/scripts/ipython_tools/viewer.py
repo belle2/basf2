@@ -1,12 +1,3 @@
-from IPython.core.display import display, Javascript
-from IPython.core.display import Image as display_Image
-
-# Widgets can change in future versions, I know
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=FutureWarning)
-    from IPython.html import widgets
-
 import random
 import string
 import os
@@ -30,6 +21,8 @@ class Basf2Widget(object):
         """
         Show the widget
         """
+        from IPython.core.display import display
+
         a = self.create()
         display(a)
 
@@ -51,12 +44,12 @@ class ComparisonImageViewer(Basf2Widget):
 
     def create(self):
         """ Create the widget """
+
+        from IPython.html import widgets
         a = widgets.Accordion()
 
         children = []
         for image1, image2 in zip(self.images1, self.images2):
-            html = widgets.Box()
-
             if not os.path.exists(image1) or not os.path.exists(image2):
                 continue
 
@@ -82,9 +75,7 @@ class ComparisonImageViewer(Basf2Widget):
             i2.value = open(image2_png).read()
 
             box = widgets.Box()
-            box.children = [i1, i2]
-
-            children.append(box)
+            box.children = [i1, i2, box]
 
         a.children = children
         return a
@@ -121,6 +112,9 @@ class PathViewer(Basf2Widget):
         """
         Create the widget
         """
+
+        from IPython.html import widgets
+
         if self.path is None:
             return widgets.HTML("")
 
@@ -156,6 +150,8 @@ class ProgressBarViewer(Basf2Widget):
     """
 
     def __init__(self):
+        from IPython.core.display import display
+
         #: Part of the name representating the object for javascript
         self.random_name = ''.join(random.choice(string.lowercase) for _ in range(10))
         #: The name representating the object for javascript
@@ -211,6 +207,8 @@ class ProgressBarViewer(Basf2Widget):
         Update the widget with a new event number
         """
 
+        from IPython.core.display import display, Javascript
+
         if isinstance(text_or_percentage, numbers.Number):
 
             current_percentage = float(text_or_percentage)
@@ -242,6 +240,8 @@ class ProgressBarViewer(Basf2Widget):
         """
         Display the widget
         """
+        from IPython.core.display import display
+
         display(self)
 
 
@@ -276,6 +276,8 @@ class CollectionsViewer(Basf2Widget):
         """
         Create the widget
         """
+
+        from IPython.html import widgets
 
         if self.collections is None:
             return widgets.HTML("")
@@ -335,6 +337,8 @@ class StatisticsViewer(Basf2Widget):
         """
         Create the widget
         """
+        from IPython.html import widgets
+
         if self.statistics is None:
             return widgets.HTML("")
 
@@ -376,6 +380,8 @@ class ProcessViewer(object):
         """
         Create the widget
         """
+        from IPython.html import widgets
+
         a = widgets.Tab()
         for i in xrange(len(self.children)):
             a.set_title(i, "Process " + str(i))
@@ -386,6 +392,10 @@ class ProcessViewer(object):
         """
         Show the widget
         """
+
+        from IPython.html import widgets
+        from IPython.core.display import display
+
         if len(self.children) > 0:
             a = self.create()
 

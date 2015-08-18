@@ -25,7 +25,6 @@ class TestIPythonHandler(unittest.TestCase):
         self.assertFalse(calculation.is_running())
         self.assertRaises(AssertionError, calculation.has_failed)
         self.assertFalse(calculation.is_finished())
-        self.assertRaises(AssertionError, calculation.wait_for_end)
         self.assertEqual(calculation.get_status(), "not started")
 
         # All the output should lead to nothing

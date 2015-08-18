@@ -177,10 +177,9 @@ std::string ReassignedSecondaryMap::map(const int&, const CDCHit& cdcHit)
 std::string MCParticleColorMap::map(const int&, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
-  int mcParticleId;
 
   if (mcParticle != nullptr) {
-    mcParticleId = mcParticle->getArrayIndex();
+    int mcParticleId = mcParticle->getArrayIndex();
     if (m_newColors.count(mcParticleId) == 1) return m_newColors[mcParticleId];
     else {
       ++m_iColor;
@@ -236,14 +235,13 @@ std::string MCPDGCodeColorMap::info()
 std::string MCPrimaryColorMap::map(const int&, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
-  MCParticle* motherMCParticle;
   std::vector<int> secondary_type;
   if (mcParticle != nullptr) {
     unsigned short int primaryFlag = 1;
     bool isPrimary = mcParticle->hasStatus(primaryFlag);
     int secondaryProcess = mcParticle->getSecondaryPhysicsProcess();
     if (secondaryProcess > 0) {
-      motherMCParticle = mcParticle->getMother();
+      MCParticle* motherMCParticle = mcParticle->getMother();
       secondary_type = {motherMCParticle->getPDG(), mcParticle->getPDG()};
     } else {
       //motherMCParticle = None;

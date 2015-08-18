@@ -366,7 +366,10 @@ void EventDataPlotter::draw(const CDCWireHit& wireHit, const AttributeMap& attri
   float x = refPos.x();
   float y = refPos.y();
   float radius = wireHit.getRefDriftLength();
-  primitivePlotter.drawCircle(x, y, radius, attributeMap);
+
+  if (fabs(radius) < 100) {
+    primitivePlotter.drawCircle(x, y, radius, attributeMap);
+  }
 
   primitivePlotter.endGroup();
 }

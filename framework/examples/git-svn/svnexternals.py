@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf8
+import pickle
 
 import sys
 import os
@@ -26,6 +27,9 @@ import re
 from subprocess import check_output, call, CalledProcessError
 
 
+svn_cache_file_name = os.path.join(LOCAL_DIR, ".git/svn_external_cache.pkl")
+
+
 def parse_external(line):
     """Parse svn:externals property.
 
@@ -47,24 +51,64 @@ def parse_external(line):
 
 
 def find_svnrevision(commit="HEAD"):
-    """Find the svn revision the current branch is based on.
-    git-svn history should be very linear but we need to now on which svn
-    revision the current branch is based. To do this, we traverse the parents
-    of the current commit until git svn finds a corresponding svn revision
-
-    return svn revision or None if none could be found
+    """ Finds the last svn commit by greping through the log list of git and searching for an git-svn-id.
+    The hash of the first element resturned is used to get the svn revision number
     """
-    revlist = check_output(["git", "rev-list", "--parents", commit])
-    for line in revlist.splitlines():
-        parents = line.split()
-        revision = check_output(["git", "svn", "find-rev", parents[0]])
+    last_svn_git_hash = check_output(["git", "log", "-n1", "--format=%H", '--grep=^\s*git-svn-id', commit]).splitlines()[0]
+    if len(last_svn_git_hash) == 0:
+        return None
+    last_svn_hash = check_output(["git", "svn", "find-rev", last_svn_git_hash]).splitlines()[0]
+
+    return int(last_svn_hash)
+
+
+def fetch_external_parameters(external, current_svn_revision):
+    """
+    Fetch the line describing the current externals with the current svn commit id
+    from the server or from the cache if already downloaded.
+    :param external: The name of the externals to use
+    :param current_svn_revision: The current svn id
+    :return: dirname, revision, url or None if there were an error
+    """
+    external_line = None
+
+    try:
+        with open(svn_cache_file_name, "r") as f:
+            svn_rev_to_externals_mapping = pickle.load(f)
+    except IOError:
+        svn_rev_to_externals_mapping = {}
+
+    if (current_svn_revision, external) in svn_rev_to_externals_mapping:
+        line = svn_rev_to_externals_mapping[(current_svn_revision, external)]
+        external_line = line
+    else:
+
         try:
-            revision = int(revision)
-            return revision
-        except ValueError:
+            prop = check_output(["git", "svn", "propget",
+                                 "-r%s" % current_revision, "svn:externals", e])
+        except CalledProcessError:
+            # Apparently no externals here, move on
+            return None
+
+        for line in prop.split("\n"):
+            if not line.strip():
+                continue
+            else:
+                external_line = line
+
+    if external_line is not None:
+        dirname, revision, url = parse_external(external_line)
+        svn_rev_to_externals_mapping.update({(current_svn_revision, external): external_line})
+
+        try:
+            with open(svn_cache_file_name, "w+") as f:
+                pickle.dump(svn_rev_to_externals_mapping, f)
+        except IOError:
             pass
 
-    return None
+        return dirname, revision, url
+    else:
+        return None
 
 
 # Checking all folders takes far to long, lets provide a list of dirs to check
@@ -115,47 +159,41 @@ print "Checking svn:externals for r%s" % current_revision
 
 for e in externals:
     print "directory '%s'" % e
-    try:
-        prop = check_output(["git", "svn", "propget",
-                             "-r%s" % current_revision, "svn:externals", e])
-    except CalledProcessError:
-        # Apparently no externals here, move on
-        continue
 
     # Fetch all externals
-    for line in prop.split("\n"):
-        if not line.strip():
-            continue
+    external_parameters = fetch_external_parameters(e, current_revision)
+    if external_parameters is None:
+        sys.exit(0)
 
-        dirname, revision, url = parse_external(line)
-        abspath = os.path.join(LOCAL_DIR, e, dirname)
-        # Build command line for svn
-        args = ["svn"]
-        if os.path.exists(abspath):
-            # Seems to exist already, so update to specified revision
-            print "Updating", os.path.join(e, dirname),
-            args.append("update")
-        else:
-            # Not there yet, checkout using svn
-            print "Fetching", os.path.join(e, dirname),
-            print "from", url,
-            args += ["checkout", url]
+    dirname, revision, url = external_parameters
+    abspath = os.path.join(LOCAL_DIR, e, dirname)
+    # Build command line for svn
+    args = ["svn"]
+    if os.path.exists(abspath):
+        # Seems to exist already, so update to specified revision
+        print "Updating", os.path.join(e, dirname),
+        args.append("update")
+    else:
+        # Not there yet, checkout using svn
+        print "Fetching", os.path.join(e, dirname),
+        print "from", url,
+        args += ["checkout", url]
 
-        # If revision is specified, add it after the svn command
-        if revision is not None:
-            print "r" + revision,
-            args.insert(2, "-r" + revision)
+    # If revision is specified, add it after the svn command
+    if revision is not None:
+        print "r" + revision,
+        args.insert(2, "-r" + revision)
 
-        # finish line
-        print
-        call(args + [abspath])
+    # finish line
+    print
+    call(args + [abspath])
 
-        # Check if it is already excluded
-        exclude = "/%s/" % os.path.join(e, dirname).strip("/")
-        if not any(e.strip() == exclude for e in gitignore):
-            # If not, add it to the gitignore
-            gitignore += ["# ignore directory containing svn:externals\n",
-                          exclude + "\n"]
+    # Check if it is already excluded
+    exclude = "/%s/" % os.path.join(e, dirname).strip("/")
+    if not any(e.strip() == exclude for e in gitignore):
+        # If not, add it to the gitignore
+        gitignore += ["# ignore directory containing svn:externals\n",
+                      exclude + "\n"]
 
 # Write gitignore file
 f = open(".gitignore", "w")

@@ -3,6 +3,8 @@ import unittest
 from ipython_tools.calculation import Basf2CalculationList
 import basf2
 
+# @cond internal_test
+
 
 class TestBasf2CalculationList(unittest.TestCase):
 
@@ -47,3 +49,5 @@ class TestBasf2CalculationList(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# @endcond

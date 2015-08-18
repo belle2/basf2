@@ -2,6 +2,8 @@ import unittest
 from ipython_tools import handler
 import basf2
 
+# @cond internal_test
+
 
 class TestIPythonHandler(unittest.TestCase):
 
@@ -68,3 +70,5 @@ class TestIPythonHandler(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# @endcond

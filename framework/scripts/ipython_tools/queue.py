@@ -2,7 +2,7 @@ from multiprocessing import Queue
 from Queue import Empty
 
 
-class Basf2CalculationQueue():
+class Basf2CalculationQueue:
 
     """
     This class is a wrapper around a multiprocessing.Queue
@@ -15,6 +15,9 @@ class Basf2CalculationQueue():
     """
 
     def __init__(self):
+        """
+        Create a queue.
+        """
         #: The multiprocessing queue to handle
         self.queue = Queue()
         #: The results to be filled in the end
@@ -57,7 +60,7 @@ class Basf2CalculationQueue():
         return self.results.keys()
 
 
-class Basf2CalculationQueueItem():
+class Basf2CalculationQueueItem:
 
     """
     A placeholder for a tuple string, object.
@@ -65,13 +68,16 @@ class Basf2CalculationQueueItem():
     """
 
     def __init__(self, name, item):
+        """
+        Create a new queue item
+        """
         #: Name of the item
         self.name = name
         #: Item to store
         self.item = item
 
 
-class ModuleStatistics():
+class ModuleStatistics:
 
     """
     Dictionary list holding the module statistics (like the C++ class ModuleStatistics)
@@ -95,7 +101,12 @@ class ModuleStatistics():
         #: Calls property
         self.calls = self.get_dict(stats.calls, categories)
 
-    def get_dict(self, function, categories):
+    @staticmethod
+    def get_dict(function, categories):
+        """
+        Call the function on each information in the categories and return a dict
+        name -> function(value)
+        """
         return {name: function(category) for name, category in categories}
 
 

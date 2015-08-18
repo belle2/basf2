@@ -25,10 +25,15 @@ class Basf2Information:
         """
         Get the variables from the environment variables.
         """
+        #: Externals version
         self.externals_version = os.environ.get("BELLE2_EXTERNALS_VERSION")
+        #: Compile options of externals
         self.externals_option = os.environ.get("BELLE2_EXTERNALS_OPTION")
+        #: Compile options of Belle2
         self.option = os.environ.get("BELLE2_OPTION")
+        #: OS
         self.architecture = os.environ.get("BELLE2_ARCH")
+        #: Release version
         self.release = os.environ.get("BELLE2_RELEASE")
 
     def __str__(self):
@@ -198,12 +203,19 @@ class Basf2Process(Process):
         if result_queue is None:
             raise ValueError("Invalid result_queue")
 
+        #: Result queue as a reference
         self.result_queue = result_queue
+        #: True if already started/run
         self.already_run = False
+        #: Name of the log file to use
         self.log_file_name = log_file_name
+        #: Random seed to set. None will not set it
         self.random_seed = random_seed
+        #: Saved log file content after the run
         self.log_file_content = None
+        #: Path to process
         self.path = path
+        #: Parameters in process_parameter_space
         self.parameters = parameters
 
         if path:

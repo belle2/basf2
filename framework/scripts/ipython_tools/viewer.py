@@ -150,6 +150,9 @@ class ProgressBarViewer(Basf2Widget):
     """
 
     def __init__(self):
+        """
+        Create a new progress bar viewer.
+        """
         from IPython.core.display import display
 
         #: Part of the name representating the object for javascript
@@ -165,6 +168,9 @@ class ProgressBarViewer(Basf2Widget):
         display(self)
 
     def _repr_html_(self):
+        """
+        The repr-html method is used to show html output.
+        """
         html = """
         <div id="{js_name}"><div class="progressbar"></div><span class="event_number">Event: not started</span></div>
         """.format(js_name=self.js_name)
@@ -373,6 +379,10 @@ class ProcessViewer(object):
     """
 
     def __init__(self, children):
+        """
+        Create a process viewer
+        """
+
         #: The children for each process
         self.children = children
 

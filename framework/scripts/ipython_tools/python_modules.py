@@ -30,6 +30,9 @@ class PrintCollections(basf2.Module):
         self.total_number_of_events = Belle2.Environment.Instance().getNumberOfEvents()
 
     def store_content(self):
+        """
+        Store the current content of the store array into the internal list.
+        """
         registered_store_arrays = Belle2.PyStoreArray.list()
         registered_store_objects = Belle2.PyStoreObj.list()
 

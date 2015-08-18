@@ -37,20 +37,20 @@ namespace Belle2 {
     private:
       /// Constructor from the internal representation
       constexpr
-      Sign(const SignType& s) :
+      explicit Sign(const SignType& s) :
         m_sign(s)
       {;}
 
     public:
       /// Constructor from a float signed quantity
       constexpr
-      Sign(const float& s) :
+      explicit Sign(const float& s) :
         m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
       {;}
 
       /// Constructor from a double signed quantity
       constexpr
-      Sign(const double& s) :
+      explicit Sign(const double& s) :
         m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
       {;}
 
@@ -71,7 +71,7 @@ namespace Belle2 {
       static Sign sweep(const Sign& sign0, const Sign& sign1)
       {
         if (sign0.m_sign == 0 or sign1.m_sign == 0) {
-          return 0.0;
+          return Sign(0.0);
         } else if (sign0.isnan()) {
           return sign1;
         } else if (sign1.isnan()) {

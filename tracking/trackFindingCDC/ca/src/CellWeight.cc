@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/algorithms/CellState.h>
+#include <tracking/trackFindingCDC/ca/CellWeight.h>
 
 #include <limits>
 
@@ -19,7 +19,6 @@ using namespace TrackFindingCDC;
 
 
 
-const CellState TrackFindingCDC::NO_CONTINUATION = -std::numeric_limits<Weight>::infinity();
-
+const CellWeight TrackFindingCDC::NOT_A_CELL = std::numeric_limits<Weight>::quiet_NaN();
 
 

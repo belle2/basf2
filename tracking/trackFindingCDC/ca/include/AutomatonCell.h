@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
-#include <tracking/trackFindingCDC/algorithms/CellState.h>
+#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/ca/CellState.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

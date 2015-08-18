@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
 
 #include <tracking/trackFindingCDC/creators/SegmentPairCreator.h>
-#include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 
 #include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/SimpleSegmentPairRelationFilter.h>
@@ -21,7 +21,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>

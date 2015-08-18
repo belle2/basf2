@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/varsets/PairVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/algorithms/Relation.h>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

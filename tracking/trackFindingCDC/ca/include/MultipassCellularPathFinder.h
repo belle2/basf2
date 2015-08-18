@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/algorithms/CellularAutomaton.h>
-#include <tracking/trackFindingCDC/algorithms/CellularPathFollower.h>
-#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
+#include <tracking/trackFindingCDC/ca/CellularPathFollower.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <framework/logging/Logger.h>
 

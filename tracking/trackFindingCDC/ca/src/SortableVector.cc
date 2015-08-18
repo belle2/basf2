@@ -7,9 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
 
-#include <limits>
+#include <tracking/trackFindingCDC/ca/SortableVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -17,5 +16,3 @@ using namespace TrackFindingCDC;
 
 
 
-
-const NeighborWeight TrackFindingCDC::NOT_A_NEIGHBOR = std::numeric_limits<Weight>::quiet_NaN();;

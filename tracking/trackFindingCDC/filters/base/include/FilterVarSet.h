@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
+#include <tracking/trackFindingCDC/ca/CellWeight.h>
 
 #include <memory>
 

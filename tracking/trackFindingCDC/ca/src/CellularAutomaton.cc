@@ -9,18 +9,13 @@
  **************************************************************************/
 
 
-#include <tracking/trackFindingCDC/algorithms/CellularPathFollower.h>
+#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 
-//#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
-
-#include<cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
 
 
 

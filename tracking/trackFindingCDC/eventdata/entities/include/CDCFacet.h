@@ -12,7 +12,7 @@
 #include <utility>
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
-#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitTriple.h>
 

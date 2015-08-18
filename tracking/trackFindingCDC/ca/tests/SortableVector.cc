@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/ca/SortableVector.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/Compare.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
@@ -58,7 +58,7 @@ TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_range)
   collection.push_back(largerGenHitOnFirstWire);
 
   int counter = 0;
-  for (CDCGenHit & genHit : collection) {
+  for (CDCGenHit& genHit : collection) {
     EXPECT_EQ(genHit, collection[counter]);
     ++counter;
   }
@@ -71,7 +71,7 @@ TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_range)
   SortableVector<CDCGenHit>::range range_for_item = collection.equal_range(lowestGenHit);
   EXPECT_EQ(4, std::distance(range_for_item.first, range_for_item.second));
 
-  for (CDCGenHit & genHit : range_for_item) {
+  for (CDCGenHit& genHit : range_for_item) {
     EXPECT_EQ(lowestGenHit, genHit);
   }
 
@@ -83,7 +83,7 @@ TEST_F(TrackFindingCDCTestWithTopology, algorithms_SortableVector_range)
 
   EXPECT_EQ(5, std::distance(range_for_item.first, range_for_item.second));
 
-  for (CDCGenHit & genHit : range_for_item) {
+  for (CDCGenHit& genHit : range_for_item) {
     EXPECT_EQ(firstWire, genHit.getWire());
   }
 

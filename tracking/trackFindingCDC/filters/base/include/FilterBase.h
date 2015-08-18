@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
+#include <tracking/trackFindingCDC/ca/CellWeight.h>
 
 #include <framework/logging/Logger.h>
 #include <string>

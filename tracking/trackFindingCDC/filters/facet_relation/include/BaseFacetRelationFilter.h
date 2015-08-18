@@ -14,8 +14,8 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
 
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
-#include <tracking/trackFindingCDC/algorithms/Relation.h>
+#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 #include <boost/range/iterator_range.hpp>

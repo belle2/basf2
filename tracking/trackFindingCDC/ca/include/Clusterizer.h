@@ -15,8 +15,8 @@
 #include <boost/type_traits.hpp>
 
 
-#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
-#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <framework/logging/Logger.h>
 

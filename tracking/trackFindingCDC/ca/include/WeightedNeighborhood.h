@@ -9,10 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/algorithms/Relation.h>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 #include <tracking/trackFindingCDC/typedefs/BasicTypes.h>
 
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
+#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 

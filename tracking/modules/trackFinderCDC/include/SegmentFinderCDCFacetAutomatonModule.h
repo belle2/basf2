@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
 #include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>

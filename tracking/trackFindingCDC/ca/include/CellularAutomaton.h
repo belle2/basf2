@@ -19,10 +19,10 @@
 #include <framework/logging/Logger.h>
 
 
-#include <tracking/trackFindingCDC/algorithms/CellWeight.h>
-#include <tracking/trackFindingCDC/algorithms/NeighborWeight.h>
-#include <tracking/trackFindingCDC/algorithms/AutomatonCell.h>
-#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 
 

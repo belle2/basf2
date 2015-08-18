@@ -11,8 +11,8 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/algorithms/WeightedNeighborhood.h>
-#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 

@@ -19,8 +19,8 @@
 
 #include <tracking/trackFindingCDC/filters/wirehit_relation/WireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/algorithms/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/algorithms/Clusterizer.h>
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
 
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 

@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-#include <tracking/trackFindingCDC/algorithms/SortableVector.h>
+#include <tracking/trackFindingCDC/ca/SortableVector.h>
 
 #include <framework/datastore/RelationsObject.h>
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>

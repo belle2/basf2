@@ -40,8 +40,8 @@ namespace Belle2 {
                                       const float& dydz,
                                       const ILayerType& /*iCLayer*/ = -1) const
       {
-        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.template getBounds<DiscretePhi0>();
-        const std::array<ContinuousTanL, 2>& tanL = houghBox.template getBounds<ContinuousTanL>();
+        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
+        const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();
 
         std::array<float, 2> xRot;
         xRot[0] = x * phi0Vec[0]->x() + y * phi0Vec[0]->y();

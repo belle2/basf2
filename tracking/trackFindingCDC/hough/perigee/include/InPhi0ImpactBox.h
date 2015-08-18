@@ -49,8 +49,8 @@ namespace Belle2 {
                                       const float& /*dydz*/ = 0,
                                       const ILayerType& /*iCLayer*/ = -1) const
       {
-        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.template getBounds<DiscretePhi0>();
-        const std::array<ContinuousImpact, 2>& impact = houghBox.template getBounds<ContinuousImpact>();
+        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
+        const std::array<ContinuousImpact, 2>& impact = houghBox.getBounds<ContinuousImpact>();
 
         std::array<float, 2> xRot;
         xRot[0] = x * phi0Vec[0]->x() + y * phi0Vec[0]->y();

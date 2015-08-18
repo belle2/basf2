@@ -50,8 +50,8 @@ namespace Belle2 {
                                       const float& /*dydz*/ = 0,
                                       const ILayerType& /*iCLayer*/ = -1) const
       {
-        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.template getBounds<DiscretePhi0>();
-        const std::array<DiscreteCurv, 2>& curv = houghBox.template getBounds<DiscreteCurv>();
+        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
+        const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();
 
         std::array<float, 2> xRot;
         xRot[0] = x * phi0Vec[0]->x() + y * phi0Vec[0]->y();
@@ -70,7 +70,7 @@ namespace Belle2 {
         yRot[0] = -x * phi0Vec[0]->y() + y * phi0Vec[0]->x();
         yRot[1] = -x * phi0Vec[1]->y() + y * phi0Vec[1]->x();
 
-        const std::array<ContinuousImpact, 2>& impact = houghBox.template getBounds<ContinuousImpact>();
+        const std::array<ContinuousImpact, 2>& impact = houghBox.getBounds<ContinuousImpact>();
 
         // Using binary notation encoding lower and upper box bounds to fill the flat array.
         std::array<float, 4> yRotMinusI;

@@ -53,10 +53,10 @@ namespace Belle2 {
                                       const float& dydz,
                                       const ILayerType& iCLayer = -1) const
       {
-        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.template getBounds<DiscretePhi0>();
+        const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurvWithArcLength2DCache, 2>& curv =
-          houghBox.template getBounds<DiscreteCurvWithArcLength2DCache>();
-        const std::array<ContinuousTanL, 2>& tanL = houghBox.template getBounds<ContinuousTanL>();
+          houghBox.getBounds<DiscreteCurvWithArcLength2DCache>();
+        const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();
 
         float r2 = x * x + y * y;
 

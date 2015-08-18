@@ -251,7 +251,7 @@ namespace Belle2 {
           result->clear();
         } else {
           // Initialize new elements with dummy property.
-          result->resize(subProperties.size(), subProperties.back());
+          result->resize(subProperties.size(), Node(subProperties.back()));
           size_t iSubNode = 0;
           for (auto& properties : subProperties) {
             clearIfApplicable(result->at(iSubNode));

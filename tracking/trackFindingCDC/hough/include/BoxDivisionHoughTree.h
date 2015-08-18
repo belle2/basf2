@@ -142,7 +142,7 @@ namespace Belle2 {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
         BoxDivision boxDivision(m_overlaps);
-        m_houghTree.reset(new HoughTree(houghPlane, boxDivision));
+        m_houghTree.reset(new HoughTree(std::move(houghPlane), std::move(boxDivision)));
       }
 
       /// Prepare the leave finding by filling the top node with given hits

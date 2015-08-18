@@ -21,7 +21,7 @@ namespace Belle2 {
     class Ptr {
     public:
       /// Wrap the object. Memory for the mark is provided from a shared position.
-      Ptr(T* obj) : m_obj(obj)
+      explicit Ptr(T* obj) : m_obj(obj)
       {;}
 
       /// Allow automatic unpacking.

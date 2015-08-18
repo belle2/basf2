@@ -23,7 +23,7 @@ namespace Belle2 {
       using T::T;
 
       /// Also forward the copy constructor form the base class object.
-      WithWeight(const T& t): T(t) {;}
+      explicit WithWeight(const T& t): T(t) {;}
 
       /// Getter for the weight
       Weight getWeight() const

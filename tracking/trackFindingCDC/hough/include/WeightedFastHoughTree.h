@@ -23,7 +23,18 @@ namespace Belle2 {
 
     /// Type of tree for paritioning the hough space
     template<class T, class Domain, class DomainDivsion>
-    using WeightedParititioningDynTree = DynTree< WithWeightedItems<Domain, T>, DomainDivsion>;
+    class  WeightedParititioningDynTree :
+      public DynTree<  WithWeightedItems<Domain, T>, DomainDivsion> {
+    private:
+      /// Type of the base class
+      using Super = DynTree<  WithWeightedItems<Domain, T>, DomainDivsion>;
+
+    public:
+      /// Constructor attaching a vector of the weigthed items to the top most node domain.
+      WeightedParititioningDynTree(Domain topDomain, DomainDivsion domainDivsion) :
+        Super(WithWeightedItems<Domain, T>(std::move(topDomain)), std::move(domainDivsion))
+      {;}
+    };
 
     /** Dynamic tree structure with weighted items in each node which are markable through out the tree.
      *  Used to build fast hough type algorithms, where objects are allowed to carry weights relative to

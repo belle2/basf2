@@ -65,9 +65,6 @@ namespace Belle2 {
     //! Module functions to be called from main process
     virtual void initialize();
 
-    //! Module functions to be called from main process
-    virtual void initializeNode();
-
     //! Module functions to be called from event process
     virtual void beginRun();
     virtual void event();
@@ -98,6 +95,9 @@ namespace Belle2 {
 
     //! print data contents
     void printData(int* buf, int nwords);
+
+    //! Check socket status
+    int CheckConnection(int socket);
 
     //! file descripter for shm
     int m_shmfd_cfg;

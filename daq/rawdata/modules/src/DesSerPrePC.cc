@@ -33,6 +33,8 @@ using namespace Belle2;
 DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
                          const std::string& nodename, int nodeid)
 {
+
+
   m_num_connections = 1;
 
   for (int i = 0 ; i < m_num_connections; i++) {
@@ -58,6 +60,12 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_exprunsubrun_no = 0; // will obtain info from data
 
   m_prev_exprunsubrun_no = 0xFFFFFFFF;
+
+#ifdef NONSTOP
+  m_run_stop = 0;
+
+  m_run_error = 0;
+#endif
 
   B2INFO("DeSerializerPrePC: Constructor done.");
 }
@@ -116,7 +124,10 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSerPrePC::initialize()
 {
-  B2INFO("DeSerializerPrePC: initialize() started.");
+  B2INFO("DesSerPrePC: initialize() started.");
+  //
+  // initialize Rx part from DeSerializer**.cc
+  //
 
   // allocate buffer
   for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
@@ -147,7 +158,26 @@ void DesSerPrePC::initialize()
   m_prev_copper_ctr = 0xFFFFFFFF;
   m_prev_evenum = 0xFFFFFFFF;
 
-  B2INFO("DeSerializerPrePC: initialize() done.");
+
+  //
+  // initialize Rx part from DeSerializer**.cc
+  //
+  m_start_flag = 0;
+  n_basf2evt = -1;
+  m_compressionLevel = 0;
+
+#ifdef DUMMY
+  m_buffer = new int[ BUF_SIZE_WORD ];
+#endif
+
+  Accept();
+
+#ifdef NONSTOP
+  openRunStopNshm();
+#endif
+
+  B2INFO("DesSerPrePC: initialize() was done.");
+
 }
 
 
@@ -182,7 +212,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
       sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf;
-      g_run_error = 1;
+      m_run_error = 1;
       throw (err_str);
 #endif
     } else {
@@ -665,7 +695,7 @@ void DesSerPrePC::DataAcquisition()
   unsigned int eve_copper_0 = 0;
   B2INFO("initializing...");
   initialize();
-  initialize2();
+
   B2INFO("Done.");
 
   if (m_start_flag == 0) {
@@ -685,13 +715,12 @@ void DesSerPrePC::DataAcquisition()
   // Main loop
   //
   while (1) {
-
     //
     // Stand-by loop
     //
 #ifdef NONSTOP
-    if (g_run_stop != 0 || g_run_error != 0) {
-      if (g_run_stop == 0) {
+    if (m_run_stop != 0 || m_run_error != 0) {
+      if (m_run_stop == 0) {
         while (true) {
           if (checkRunStop()) break;
 #ifdef NONSTOP_DEBUG
@@ -774,7 +803,7 @@ void DesSerPrePC::DataAcquisition()
 
 #ifdef NONSTOP
     // Goto Stand-by loop when run is paused or stopped by error
-    if (g_run_stop != 0 || g_run_error != 0) continue;
+    if (m_run_stop != 0 || m_run_error != 0) continue;
 #endif
 
 
@@ -814,7 +843,7 @@ void DesSerPrePC::DataAcquisition()
 
 #ifdef NONSTOP
     // Goto Stand-by loop when run is paused or stopped by error
-    if (g_run_stop != 0 || g_run_error != 0) continue;
+    if (m_run_stop != 0 || m_run_error != 0) continue;
 #endif
 
     //
@@ -853,7 +882,7 @@ void DesSerPrePC::DataAcquisition()
 
 
 #ifdef NONSTOP
-    if (g_run_stop == 1) {
+    if (m_run_stop == 1) {
       waitRestart();
     }
 #endif
@@ -871,155 +900,6 @@ void DesSerPrePC::DataAcquisition()
 /////////////////////////////////////////////////////
 //   From Serializer.cc
 /////////////////////////////////////////////////////
-
-
-
-void DesSerPrePC::event2()
-{
-
-#ifdef NONSTOP
-  if (g_run_restarting == 1) {
-    restartRun();
-  } else if (g_run_recovery == 1) {
-#ifdef NONSTOP_DEBUG
-    printf("\033[31m");
-    printf("###########(Ser) Go back to Deseializer()  ###############\n");
-    fflush(stdout);
-    printf("\033[0m");
-#endif
-    return; // Nothing to do here
-  }
-#endif
-  if (m_start_flag == 0) {
-    m_start_time = getTimeSec();
-    n_basf2evt = 0;
-  }
-
-  StoreArray<RawDataBlock> raw_dblkarray;
-  for (int j = 0; j < raw_dblkarray.getEntries(); j++) {
-    //
-    // Send data
-    //
-    if (m_start_flag == 0) {
-      B2INFO("SerializerPC: Sending the 1st packet...");
-    }
-
-    try {
-      m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
-      //      printf("Ser len %d numeve %d node %d\n", raw_dblkarray[ j ]->TotalBufNwords(), raw_dblkarray[ j ]->GetNumEvents(), raw_dblkarray[ j ]->GetNumNodes() );
-    } catch (string err_str) {
-#ifdef NONSTOP
-      if (err_str == "EAGAIN") {
-        pauseRun();
-        break;
-      }
-#endif
-      //      print_err.PrintError( &m_status, err_str);
-      exit(1);
-    }
-    if (m_start_flag == 0) {
-      B2INFO("Done. ");
-      m_start_flag = 1;
-    }
-  }
-
-#ifdef NONSTOP
-  if (g_run_stop == 1) {
-    waitRestart();
-  }
-#endif
-
-
-  //
-  // Print current status
-  //
-  if (n_basf2evt % 1000 == 0) {
-    //     double cur_time = getTimeSec();
-    //     double total_time = cur_time - m_start_time;
-    //     double interval = cur_time - m_prev_time;
-    //     if (n_basf2evt != 0) {
-    //       double multieve = (1. / interval);
-    //       if (multieve > 2.) multieve = 2.;
-    //     }
-    //     time_t timer;
-    //     struct tm* t_st;
-    //     time(&timer);
-    //     t_st = localtime(&timer);
-    //     printf( "[DEBUG] Event %d TotSent  %.1lf [MB] ElapsedTime %.1lf [s] RcvdRate %.2lf [MB/s] %s",
-    //            n_basf2evt, m_totbytes / 1.e6, total_time, (m_totbytes - m_prev_totbytes) / interval / 1.e6, asctime(t_st));
-    //     fflush(stderr);
-    //     m_prev_time = cur_time;
-    //     m_prev_totbytes = m_totbytes;
-    //     m_prev_nevt = n_basf2evt;
-  }
-  n_basf2evt++;
-  if (m_status.isAvailable()) {
-    m_status.setOutputNBytes(m_totbytes);
-    m_status.addOutputCount(raw_dblkarray.getEntries());
-  }
-
-}
-
-
-void DesSerPrePC::initialize2()
-{
-  printf("Checkinit2 1\n") ;
-  fflush(stdout);
-  //Set module properties
-  //  setDescription("Encode DataStore into RingBuffer");
-  //  addParam("DestPort", m_port_to, "Destination port", BASE_PORT_ROPC_COPPER);
-  //  addParam("LocalHostName", m_hostname_local, "local host", string(""));
-#ifdef DUMMY
-  //  addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
-#endif
-
-  m_start_flag = 0;
-  n_basf2evt = -1;
-  m_compressionLevel = 0;
-  //Parameter definition
-  B2INFO("Tx: Constructor done.");
-
-
-#ifdef DUMMY
-  m_buffer = new int[ BUF_SIZE_WORD ];
-#endif
-
-  /*
-  if (m_shmflag != 0) {
-    char temp_char1[100] = "/cpr_config";
-    char temp_char2[100] = "/cpr_status";
-    shmOpen(temp_char1, temp_char2);
-    // Status format : status_flag
-    m_cfg_buf = shmGet(m_shmfd_cfg, 4);
-    m_cfg_sta = shmGet(m_shmfd_sta, 4);
-    m_cfg_sta[ 0 ] = 1; // Status bit is 1 : ready before accept()
-  }
-  */
-
-  // Create Message Handler
-
-  printf("Checkinit2 2\n") ;
-  fflush(stdout);
-
-  Accept();
-
-
-
-#ifdef NONSTOP
-  openRunStopNshm();
-#ifdef NONSTOP_DEBUG
-
-  printf("###########(DesCpr) prepare shm  ###############\n");
-  fflush(stdout);
-#endif
-#endif
-
-  B2INFO("Tx initialized.");
-  printf("Checkinit2 3\n") ;
-  fflush(stdout);
-}
-
-
 
 void DesSerPrePC::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
                                         RawDataBlock* rawdblk)
@@ -1122,7 +1002,7 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         string err_str = err_buf;
-        g_run_error = 1;
+        m_run_error = 1;
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
 #else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -1198,7 +1078,7 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
 
 #ifdef NONSTOP
         string err_str = err_buf;
-        g_run_error = 1;
+        m_run_error = 1;
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
 #else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -1388,9 +1268,8 @@ void DesSerPrePC::restartRun()
   fflush(stdout);
   printf("\033[0m");
 #endif
-  g_run_error = 0;
-  g_run_stop = 0;
-  g_run_restarting = 0;
+  m_run_error = 0;
+  m_run_stop = 0;
 
   return;
 }
@@ -1398,7 +1277,7 @@ void DesSerPrePC::restartRun()
 
 void DesSerPrePC::pauseRun()
 {
-  g_run_stop = 1;
+  m_run_stop = 1;
 #ifdef NONSTOP_DEBUG
   printf("###########(Ser) Pause the run ###############\n");
   fflush(stdout);
@@ -1421,7 +1300,7 @@ void DesSerPrePC::waitRestart()
     printf("\033[0m");
 #endif
     if (checkRunRecovery()) {
-      g_run_stop = 0;
+      m_run_stop = 0;
       g_run_recovery = 1;
       break;
     }
@@ -1450,7 +1329,7 @@ void DesSerPrePC::callCheckRunStop(string& err_str)
     fflush(stdout);
     printf("\033[0m");
 #endif
-    g_run_stop = 1;
+    m_run_stop = 1;
     throw (err_str);
   }
   return;

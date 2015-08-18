@@ -71,9 +71,6 @@ namespace Belle2 {
     //! Module functions to be called from event process
     void DataAcquisition();
 
-    //! Module functions to be called from event process
-    void event2();
-
     //! dump error data
     void printData(int* buf, int nwords);
 
@@ -164,11 +161,6 @@ namespace Belle2 {
     //! Run info buffer
     RunInfoBuffer m_status;
 
-    //! run no.
-    int m_run_no;
-
-    //! run no.
-    int m_prev_run_no;
 
     //! run no.
     unsigned int m_exprunsubrun_no;
@@ -219,9 +211,6 @@ namespace Belle2 {
     ///////////////////////////////
 
     //! Module functions to be called from main process
-    void initialize2();
-
-    //! Module functions to be called from main process
     void initializeNode();
 
     //! Module functions to be called from event process
@@ -246,6 +235,12 @@ namespace Belle2 {
 
     //! buffer for shared memory
     int* m_cfg_sta;
+
+    //! flag to show that run-controller pauses a run
+    int m_run_stop;
+
+    //! flag to show that there is some errors with which DAQ cannot continue.
+    int m_run_error;
 
   protected :
     //! Accept connection
@@ -326,6 +321,12 @@ namespace Belle2 {
 #ifdef NONSTOP
     //! for nonstop DAQ
     int* m_ptr;
+
+    //! run no.
+    int m_run_no;
+
+    //! run no.
+    int m_prev_run_no;
 
     //! for nonstop DAQ
     int checkRunStop();

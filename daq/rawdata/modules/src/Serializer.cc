@@ -84,8 +84,6 @@ void SerializerModule::initialize()
 
   Accept();
 
-  initializeNode();
-
 #ifdef NONSTOP
   openRunStopNshm();
 #ifdef NONSTOP_DEBUG
@@ -126,10 +124,6 @@ void SerializerModule::terminate()
 // User defined functions
 //
 
-void SerializerModule::initializeNode()
-{
-
-}
 
 
 int* SerializerModule::shmGet(int fd, int size_words)
@@ -344,8 +338,8 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
         char err_buf[500];
 #ifdef NONSTOP
         g_run_error = 1;
-        sprintf(err_buf, "SEND ERROR1.(%s) ", strerror(errno));
-        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sprintf(err_buf, "SEND ERROR12.(%s) ", strerror(errno));
+
         string err_str = "ECONNRESET";
         throw (err_str);
 #else
@@ -543,10 +537,50 @@ void SerializerModule::restartRun()
   printf("\033[0m");
 #endif
   g_run_restarting = 0;
-  initializeNode();
+
+  if (!CheckConnection(m_socket) < 0) Accept();
+
   return;
 }
 
+
+
+int SerializerModule::CheckConnection(int socket)
+{
+  // Modify Yamagata-san's eb/iseof.cc
+
+
+  int ret;
+  char buffer[1];
+  while (true) {
+
+    //
+    // Extract data in the socket buffer of a peer
+    //
+    //    ret = recv( socket, buffer, sizeof(buffer), MSG_PEEK|MSG_DONTWAIT );
+    ret = recv(socket, buffer, sizeof(buffer), MSG_DONTWAIT);
+    switch (ret) {
+      case 0: /* EOF */
+        printf("EOF %d\n", socket); fflush(stdout);
+        close(socket);
+        return -1;
+      case -1:
+        if (errno == EAGAIN) {
+          printf("EAGAIN %d\n", socket); fflush(stdout);
+          /* not EOF, no data in queue */
+          return 0;
+        } else {
+          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          close(socket);
+          return -1;
+        }
+        break;
+      default:
+        printf("Reading data from socket %d\n", socket); fflush(stdout);
+    }
+  }
+
+}
 
 void SerializerModule::callCheckRunStop(string& err_str)
 {
@@ -655,7 +689,7 @@ void SerializerModule::event()
       m_totbytes += sendByWriteV(raw_dblkarray[ j ]);
       //    } catch (string err_str) {
     } catch (string err_str) {
-      printf("%s\n", err_str.c_str()); fflush(stdout);
+      printf("THROW************************************* %s\n", err_str.c_str()); fflush(stdout);
 #ifdef NONSTOP
       return; // Go to DeSerializer***() to wait for run-restart.
 #else

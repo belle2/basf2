@@ -11,8 +11,8 @@
 
 #define REDUCED_RAWCOPPER
 
-//#define NONSTOP
-//#define NONSTOP_DEBUG
+#define NONSTOP
+#define NONSTOP_DEBUG
 
 
 //#define RAWDATASIZE 1

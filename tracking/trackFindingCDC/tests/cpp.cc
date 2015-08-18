@@ -91,10 +91,10 @@ TEST(TrackFindingCDCTest, cpp_map_insert)
 }
 
 
-TEST(TrackFindingCDCTest, cpp_remainer)
+TEST(TrackFindingCDCTest, cpp_remainder)
 {
-  // Test if remainer brings a value to the range [-1, 1]
-  // Useful to transform
+  // Test if remainder brings a value to the range [-1, 1]
+  // proving that remainder is the best function to transform an angle to range [-PI, PI]
   {
     double value = 3.0 / 2.0;
     double reduced_value = std::remainder(value, 2.0);
@@ -109,41 +109,4 @@ TEST(TrackFindingCDCTest, cpp_remainer)
     EXPECT_FLOAT_EQ(1.0 / 2.0, reduced_value);
   }
 
-}
-
-TEST(TrackFindingCDCTest, cpp_covariance_std_function)
-{
-  auto funcWithConstPtrArgument = [](const int*) -> bool { return true;};
-  std::function<bool(int*)> funcWithNonConstPtrArgument = funcWithConstPtrArgument;
-}
-
-
-
-namespace {
-
-  /// Demo vector which should behave like a normal vector, but with one more method.
-  class MyIntVector : public std::vector<int> {
-  public:
-    /// Type of the base class
-    using Super = std::vector<int>;
-
-    /// Inheriting all base constructors
-    using Super::Super;
-
-    /// The move constructor is not inherited - extra definition needed
-    MyIntVector(Super&& s) : Super(std::move(s)) {;}
-
-    /// The copy constructor is not inherited - extra definition needed
-    MyIntVector(const Super& s) : Super(s) {;}
-  };
-
-}
-
-TEST(TrackFindingCDCTest, cpp_inheriting_constructor)
-{
-  std::vector<int> someInts = {0, 1, 2};
-  MyIntVector mySomeInts(someInts);
-  MyIntVector mySomeInts2 = std::move(someInts);
-
-  mySomeInts = someInts;
 }

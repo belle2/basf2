@@ -145,10 +145,10 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
                                                    primarySimHitsOnSameOrNeighborWire.end(),
     [&simHit](const CDCSimHit * primarySimHit, const CDCSimHit * otherPrimarySimHit) -> bool {
 
-      Vector3D primaryHitPos = primarySimHit->getPosTrack();
-      Vector3D otherPrimaryHitPos = otherPrimarySimHit->getPosTrack();
+      Vector3D primaryHitPos{primarySimHit->getPosTrack()};
+      Vector3D otherPrimaryHitPos{otherPrimarySimHit->getPosTrack()};
 
-      Vector3D secondaryHitPos = simHit.getPosTrack();
+      Vector3D secondaryHitPos{simHit.getPosTrack()};
 
       return primaryHitPos.distance(secondaryHitPos) < otherPrimaryHitPos.distance(secondaryHitPos);
 
@@ -217,7 +217,7 @@ Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
   const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
   //Take the momentum of the primary hit
-  Vector3D directionOfFlight = primarySimHit.getMomentum();
+  Vector3D directionOfFlight{primarySimHit.getMomentum()};
   return directionOfFlight;
 
 }
@@ -245,9 +245,7 @@ void CDCSimHitLookUp::fillRLInfo()
     if (directionOfFlight.isNull()) continue;
 
     // find out if the wire is right or left of the track ( view in flight direction )
-    Vector3D trackPosToWire =  simHit.getPosWire();
-    trackPosToWire.subtract(simHit.getPosTrack());
-
+    Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
     RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
     m_rightLeftInfos[ptrHit] = rlInfo;
 
@@ -282,7 +280,7 @@ Vector3D CDCSimHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
   }
 
   const CDCSimHit& simHit = *ptrSimHit;
-  return simHit.getPosTrack();
+  return Vector3D{simHit.getPosTrack()};
 }
 
 
@@ -291,7 +289,7 @@ Vector3D CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
   const CDCSimHit* ptrPrimarySimHit =  getClosestPrimarySimHit(ptrHit);
   if (ptrPrimarySimHit) {
     const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
-    return primarySimHit.getPosTrack();
+    return Vector3D{primarySimHit.getPosTrack()};
   } else {
     return getRecoPos3D(ptrHit);
   }

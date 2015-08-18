@@ -46,10 +46,8 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(
   if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simhit.getPosWire();
-  trackPosToWire.subtract(simhit.getPosTrack());
-
-  Vector3D directionOfFlight = simhit.getMomentum();
+  Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
+  Vector3D directionOfFlight{simhit.getMomentum()};
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 

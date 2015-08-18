@@ -202,8 +202,8 @@ double TrackMerger::doTracksFitTogether(TrackCandidate* cand1, TrackCandidate* c
   TrackFitter trackFitter;
 
   // Check if the two tracks do have something in common!
-  Vector2D deltaMomentum = cand1->getMomentumEstimation() - cand2->getMomentumEstimation();
-  Vector3D deltaPosition = cand1->getReferencePoint() - cand2->getReferencePoint();
+  Vector2D deltaMomentum{cand1->getMomentumEstimation() - cand2->getMomentumEstimation()};
+  Vector3D deltaPosition{cand1->getReferencePoint() - cand2->getReferencePoint()};
 
   // Quick processing: if we have two tracks with approximately the same parameters, they can be merged!
   if (deltaMomentum.norm() / cand1->getMomentumEstimation().norm() < 0.1 and

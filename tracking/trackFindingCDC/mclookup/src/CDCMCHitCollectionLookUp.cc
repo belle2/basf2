@@ -237,8 +237,8 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
   const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
-  Vector3D mom3D = primarySimHit.getMomentum();
-  Vector3D pos3D = primarySimHit.getPosTrack();
+  Vector3D mom3D{primarySimHit.getMomentum()};
+  Vector3D pos3D{primarySimHit.getPosTrack()};
 
   int pdgCode = primarySimHit.getPDGCode();
   const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);

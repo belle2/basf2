@@ -34,7 +34,7 @@ namespace Belle2 {
       Vector2D(): m_x(0.0), m_y(0.0) {;}
 
       /// Constructor translating from a TVector2 instance
-      Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) { ; }
+      explicit Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) { ; }
 
       /// Constructor from two coordinates
       Vector2D(const FloatType& x, const FloatType& y)  : m_x(x), m_y(y) { ; }
@@ -49,6 +49,15 @@ namespace Belle2 {
                const FloatType& orthoCoor) :
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
         m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
+
+      /// Assignment translating from a TVector3 instance
+      Vector2D& operator=(const TVector2& tvector)
+      {
+        setX(tvector.X());
+        setY(tvector.Y());
+        return *this;
+      }
+
 
       /// Constucts a unit vector with azimuth angle equal to phi
       static inline Vector2D Phi(const FloatType& phi)

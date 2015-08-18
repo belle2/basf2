@@ -78,8 +78,8 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     //find indices of the Hits
     std::vector<TrackHit*>& trackHitVector = trackCand->getTrackHits();
 
-    Vector3D position = trackCand->getReferencePoint();
-    Vector2D momentum = trackCand->getMomentumEstimation();
+    Vector3D position{trackCand->getReferencePoint()};
+    Vector2D momentum{trackCand->getMomentumEstimation()};
 
     //set the start parameters
     CDCTrajectory2D trajectory2D(position.xy(), momentum,

@@ -34,7 +34,7 @@ namespace Belle2 {
       Vector3D(): m_xy(0.0, 0.0), m_z(0.0) {;}
 
       /// Constructor translating from a TVector3 instance
-      Vector3D(TVector3 tvector) : m_xy(tvector.X(), tvector.Y()), m_z(tvector.Z()) { ; }
+      explicit Vector3D(const TVector3& tvector) : m_xy(tvector.X(), tvector.Y()), m_z(tvector.Z()) { ; }
 
       /// Constructor from three coordinates
       Vector3D(FloatType x, FloatType y, FloatType z)  : m_xy(x, y), m_z(z) { ; }
@@ -44,6 +44,15 @@ namespace Belle2 {
 
       /// Constructor augmeting a Vector2D to a Vector3D setting z explicitly
       Vector3D(const Vector2D& xy, FloatType z)  : m_xy(xy), m_z(z) { ; }
+
+      /// Assignment translating from a TVector3 instance
+      Vector3D& operator=(const TVector3& tvector)
+      {
+        m_xy.setX(tvector.X());
+        m_xy.setY(tvector.Y());
+        m_z = tvector.Z();
+        return *this;
+      }
 
       /// Constructs the average of two vectors
       /** Computes the average of two vectors.

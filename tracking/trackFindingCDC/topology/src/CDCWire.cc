@@ -80,8 +80,8 @@ void CDCWire::initialize()
   IWireType iWire = getIWire();
   ILayerType iCLayer = getICLayer();
 
-  TVector3 forwardPos = cdcgp.wireForwardPosition(iCLayer, iWire);
-  TVector3 backwardPos = cdcgp.wireBackwardPosition(iCLayer, iWire);
+  Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire)};
+  Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire)};
 
   m_skewLine = BoundSkewLine(forwardPos, backwardPos);
   m_refCylindricalR = getRefPos2D().norm();
@@ -97,8 +97,8 @@ void CDCWire::initialize()
       not isAxial()) {
 
     B2WARNING("Odd wire " << this);
-    B2WARNING("wireForwardPosition  " << Vector3D(forwardPos));
-    B2WARNING("wireBackwardPosition " << Vector3D(backwardPos));
+    B2WARNING("wireForwardPosition  " << forwardPos);
+    B2WARNING("wireBackwardPosition " << backwardPos);
     B2WARNING("forward              " << m_skewLine.forward3D());
     B2WARNING("backward             " << m_skewLine.backward3D());
     B2WARNING("ref                  " << m_skewLine.refPos3D());

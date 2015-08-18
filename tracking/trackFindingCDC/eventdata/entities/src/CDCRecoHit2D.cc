@@ -56,10 +56,8 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(
   }
 
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simHit.getPosWire();
-  trackPosToWire.subtract(simHit.getPosTrack());
-
-  Vector3D directionOfFlight = simHit.getMomentum();
+  Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
+  Vector3D directionOfFlight{simHit.getMomentum()};
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 

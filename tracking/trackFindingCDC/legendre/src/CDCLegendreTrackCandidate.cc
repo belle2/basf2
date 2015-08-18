@@ -87,7 +87,10 @@ TrackCandidate::TrackCandidate(const std::vector<QuadTreeLegendre*>& nodeList) :
 Vector2D TrackCandidate::getMomentumEstimation()
 {
   double pt = TrackCandidate::convertRhoToPt(m_r);
-  return TVector2(m_xc, m_yc).Rotate(TMath::Pi() / 2).Unit() * pt * getChargeSign();;
+  Vector2D p =  Vector2D(-m_yc, m_xc);
+  p.setCylindricalR(pt * getChargeSign());
+  return p;
+  //return TVector2(m_xc, m_yc).Rotate(TMath::Pi() / 2).Unit() * pt * getChargeSign();;
 }
 
 int TrackCandidate::getChargeAssumption(

@@ -53,16 +53,16 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ) :
-  CDCTrajectory3D(mcParticle.getProductionVertex(),
-                  mcParticle.getMomentum(),
+  CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+                  Vector3D{mcParticle.getMomentum()},
                   mcParticle.getCharge(),
                   bZ)
 {
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle) :
-  CDCTrajectory3D(mcParticle.getProductionVertex(),
-                  mcParticle.getMomentum(),
+  CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+                  Vector3D{mcParticle.getMomentum()},
                   mcParticle.getCharge())
 {
 }
@@ -83,13 +83,13 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
   CDCTrajectory3D(gfTrackCand,
-                  getBFieldZ(gfTrackCand.getPosSeed()))
+                  getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
 {
 }
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const FloatType& bZ) :
-  CDCTrajectory3D(gfTrackCand.getPosSeed(),
-                  gfTrackCand.getMomSeed(),
+  CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
+                  Vector3D{gfTrackCand.getMomSeed()},
                   gfTrackCand.getChargeSeed(),
                   bZ)
 {

@@ -56,7 +56,7 @@ void StereoHitFinderCDCVXDMergerModule::generate(std::vector<Belle2::TrackFindin
       // COPY IS INTENDED!
       genfit::MeasuredStateOnPlane measuredState = pair.second;
       if (extrapolateStateWithoutError(measuredState, innermostHitPosition.norm())) {
-        Vector2D extrapolatedPosition = measuredState.getPos().XYvector();
+        Vector2D extrapolatedPosition{measuredState.getPos().XYvector()};
         double distance = (extrapolatedPosition - innermostHitPosition).norm();
 
         if (distance < smallestDistance) {
@@ -68,8 +68,8 @@ void StereoHitFinderCDCVXDMergerModule::generate(std::vector<Belle2::TrackFindin
     }
 
     if (bestTrackMatch) {
-      Vector3D vxdMom = bestMeasuredStateOnPlane.getMom();
-      Vector3D vxdPos = bestMeasuredStateOnPlane.getPos();
+      Vector3D vxdMom{bestMeasuredStateOnPlane.getMom()};
+      Vector3D vxdPos{bestMeasuredStateOnPlane.getPos()};
       double angleBetweenTracks = std::abs(vxdMom.xy().angleWith(track.getStartFitMom3D().xy()));
       //B2INFO(angleBetweenTracks);
 

@@ -42,16 +42,15 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
   FloatType perpS = std::numeric_limits<FloatType>::quiet_NaN();
 
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire =  simHit.getPosWire();
-  trackPosToWire.subtract(simHit.getPosTrack());
+  Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
 
-  Vector3D directionOfFlight = simHit.getMomentum();
+  Vector3D directionOfFlight{simHit.getMomentum()};
 
   RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
   const CDCRLWireHit* rlWireHit = CDCWireHitTopology::getInstance().getRLWireHit(*wireHit, rlInfo);
 
-  return CDCRecoHit3D(rlWireHit, simHit.getPosTrack(), perpS);
+  return CDCRecoHit3D(rlWireHit, Vector3D{simHit.getPosTrack()}, perpS);
 
 }
 

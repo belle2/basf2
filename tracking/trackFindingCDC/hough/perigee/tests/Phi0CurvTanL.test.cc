@@ -90,7 +90,7 @@ namespace {
 
     using SimpleRLTaggedWireHitPhi0CurvHough =
       SimpleRLTaggedWireHitHoughTree<InPhi0CurvTanLBox, phi0Divisions, curvDivisions, tanLDivisions>;
-    SimpleRLTaggedWireHitPhi0CurvHough houghTree(maxLevel);
+    SimpleRLTaggedWireHitPhi0CurvHough houghTree(maxLevel, curlCurv);
     using HoughBox = SimpleRLTaggedWireHitPhi0CurvHough::HoughBox;
 
     const double minWeight = 50.0;
@@ -184,7 +184,7 @@ namespace {
 
     using SimpleSegmentPhi0CurvHoughTree =
       SimpleSegmentHoughTree<InPhi0CurvTanLBox, phi0Divisions, curvDivisions, tanLDivisions>;
-    SimpleSegmentPhi0CurvHoughTree houghTree(maxLevel);
+    SimpleSegmentPhi0CurvHoughTree houghTree(maxLevel, curlCurv);
     using HoughBox = SimpleSegmentPhi0CurvHoughTree::HoughBox;
 
     const double minWeight = 50.0;

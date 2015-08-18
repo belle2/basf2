@@ -31,9 +31,6 @@ namespace Belle2 {
       /// Type of this class
       using This = DiscreteValue<T, Tag>;
 
-      /// Disallow unpacking the underlying representations.
-      operator Super& () = delete;
-
     public:
       /// Inheriting the constructors from the base class
       using Super::Super;

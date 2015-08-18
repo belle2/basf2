@@ -30,7 +30,7 @@ namespace Belle2 {
     /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not */
     void setParameter(const std::string& parameterName, const std::string& parameterValue) override
     {
-      if (parameterName == "MinimumMomentum") {
+      if (parameterName == "minimumMomentum") {
         m_minimumMomentum = std::stod(parameterValue);
       } else if (parameterName == "aE") {
         m_fitParameters.aE = std::stod(parameterValue);
@@ -48,12 +48,14 @@ namespace Belle2 {
         m_correctionFitParameters.cM = std::stod(parameterValue);
       } else if (parameterName == "dM") {
         m_correctionFitParameters.dM = std::stod(parameterValue);
-      } else if (parameterName == "use_trackfinder_seeds") {
-        m_useTrackFinderSeeds = std::stoi(parameterValue);
-      } else if (parameterName == "use_thickness") {
+      } else if (parameterName == "useMCInformation") {
+        m_useMCInformation = std::stoi(parameterValue);
+      } else if (parameterName == "useThickness") {
         m_useThickness = std::stoi(parameterValue);
-      } else if (parameterName == "covariance") {
-        m_covariance = std::stod(parameterValue);
+      } else if (parameterName == "sigma") {
+        m_sigma = std::stod(parameterValue);
+      } else if (parameterName == "useTrackingSeeds") {
+        m_useTrackingSeeds = std::stoi(parameterValue);
       } else {
         B2FATAL("A parameter with the name " << parameterName << " and the value " << parameterValue << " could not be set.")
       }
@@ -79,7 +81,13 @@ namespace Belle2 {
       }
 
       PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
-          m_covariance, m_fitParameters, m_correctionFitParameters, m_useTrackFinderSeeds, m_useThickness);
+          &recoTrack);
+      momentumMeasurement->setCorrectionFitParameters(m_correctionFitParameters);
+      momentumMeasurement->setFitParameters(m_fitParameters);
+      momentumMeasurement->setSigma(m_sigma);
+      momentumMeasurement->setUseMCInformation(m_useMCInformation);
+      momentumMeasurement->setUseThickness(m_useThickness);
+      momentumMeasurement->setUseTrackingSeeds(m_useTrackingSeeds);
       return {momentumMeasurement};
     }
 
@@ -89,12 +97,14 @@ namespace Belle2 {
     /** Parameters for the correction function. Set them to zero to not use a correction function */
     typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
     /** Use the seeds of the track finder or the seeds of the MC particles */
-    bool m_useTrackFinderSeeds = true;
+    bool m_useMCInformation = true;
     /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
     /** Minimal value for the momentum below the estimation is used */
     double m_minimumMomentum = 0.1;
-    /** Covariance of the measurement */
-    double m_covariance = 0.03;
+    /** Sigma of the measurement */
+    double m_sigma = 0.03;
+    /** Use the tracking seeds in the origin for calculating the path length rather than the current state*/
+    bool m_useTrackingSeeds = false;
   };
 }

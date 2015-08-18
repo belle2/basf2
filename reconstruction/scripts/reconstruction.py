@@ -5,36 +5,6 @@ from basf2 import *
 from ROOT import Belle2
 
 
-class PruneGenfitTracks(Module):
-
-    """
-    Removes hits from all genfit::Track objects.
-    This needs to be done after the dE/dx PID.
-    """
-
-    #: See genfit::Track::prune() doc, empty string for no pruning
-    m_flags = 'FL'
-
-    def __init__(self):
-        """
-        Constructor to enable parallel processing for this module.
-        """
-
-        # need to call super() _if_ we reimplement the constructor
-        super(PruneGenfitTracks, self).__init__()
-
-        self.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
-
-    def event(self):
-        """
-        reimplement Module::event()
-        """
-
-        tracks = Belle2.PyStoreArray('GF2Tracks')
-        for t in tracks:
-            t.prune(self.m_flags)
-
-
 def add_posttracking_reconstruction(path, components=None):
     """
     This function adds the standard reconstruction modules after tracking
@@ -235,7 +205,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
 
     # prune genfit tracks
     if pruneTracks:
-        path.add_module(PruneGenfitTracks())
+        path.add_module("PruneGenfitTracks")
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=True):

@@ -42,8 +42,6 @@ namespace Belle2 {
     static bool isInputProcess();
     /** Return true if the process is a worker process */
     static bool isWorkerProcess();
-    /** Return true if the process is a worker process */
-    static bool isEventProcess() __attribute__((deprecated("Please use isWorkerProcess() instead."))) { return isWorkerProcess(); }
     /** Return true if the process is an output process */
     static bool isOutputProcess();
 

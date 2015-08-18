@@ -73,7 +73,7 @@ namespace Belle2 {
 
     public:
       /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
-      CDCSimpleSimulation(CDCWireHitTopology* wireHitTopology) :
+      explicit CDCSimpleSimulation(CDCWireHitTopology* wireHitTopology) :
         m_wireHitTopology(wireHitTopology)
       {;}
 

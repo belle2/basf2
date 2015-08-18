@@ -250,15 +250,15 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
         const CDCWire& closestWire =  wireLayer.getClosestWire(pos3DAtLayer);
 
         // Check again if the wire has been hit before
-        bool wireAllReadyHit = false;
+        bool wireAlreadyHit = false;
         for (const SimpleSimHit& simpleSimHit : simpleSimHits) {
           if (simpleSimHit.m_wireHit.hasWire(closestWire)) {
-            wireAllReadyHit = true;
+            wireAlreadyHit = true;
           }
         }
-        if (not wireAllReadyHit) {
+        if (not wireAlreadyHit) {
           std::vector<SimpleSimHit> secondSimpleSimHitsInLayer =
-            createHitsForLayer(closestWire, globalHelix, arcLength2DOffset);
+            createHitsForLayer(closestWire, globalHelix, secondArcLength2DOffset);
 
           for (SimpleSimHit& simpleSimHit : secondSimpleSimHitsInLayer) {
             if (simpleSimHit.m_arcLength2D < maxArcLength2D) {

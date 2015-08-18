@@ -15,6 +15,7 @@ except KeyError:
 
 # this script only works with python > 2.7,
 # but git can prepend /usr/bin to PATH!
+# note: even with this magic, the syntax must be ok in 2.4 (stupid SL5)
 if sys.hexversion < 0x02070600:
     # but we know where our python version should reside, so let's call
     # ourselves with the newer interpreter
@@ -73,8 +74,9 @@ def fetch_external_parameters(external, current_svn_revision):
     external_line = None
 
     try:
-        with open(svn_cache_file_name, "r") as f:
-            svn_rev_to_externals_mapping = pickle.load(f)
+        f = open(svn_cache_file_name, "r")
+        svn_rev_to_externals_mapping = pickle.load(f)
+        f.close()
     except IOError:
         svn_rev_to_externals_mapping = {}
 
@@ -101,8 +103,9 @@ def fetch_external_parameters(external, current_svn_revision):
         svn_rev_to_externals_mapping.update({(current_svn_revision, external): external_line})
 
         try:
-            with open(svn_cache_file_name, "w+") as f:
-                pickle.dump(svn_rev_to_externals_mapping, f)
+            f = open(svn_cache_file_name, "w+")
+            pickle.dump(svn_rev_to_externals_mapping, f)
+            f.close()
         except IOError:
             pass
 

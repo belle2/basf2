@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::AlignablePXDRecoHit+;
 #pragma link C++ class Belle2::AlignableSVDRecoHit+;
 #pragma link C++ class Belle2::AlignableSVDRecoHit2D+;
+#pragma link C++ class Belle2::BKLMRecoHit+;
 
 #endif

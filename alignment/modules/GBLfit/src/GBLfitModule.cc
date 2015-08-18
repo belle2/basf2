@@ -36,7 +36,7 @@
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 
 #include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMRecoHit.h>
+#include <alignment/reconstruction/BKLMRecoHit.h>
 
 #ifdef ALLOW_TELESCOPES_IN_GBLFITMODULE
 #include <testbeam/vxd/dataobjects/TelCluster.h>
@@ -836,6 +836,8 @@ void GBLfitModule::event()
             gfTracksToMCPart.add(trackCounter, aTrackCandPointer->getMcTrackId());
           }
 
+          gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
+
           if (!m_buildBelle2Tracks)
             continue;
 
@@ -905,7 +907,7 @@ void GBLfitModule::event()
 
             gfTracksToTrackFitResults.add(trackCounter, trackFitResultCounter);
             gfTrackCandidatesToTrackFitResults.add(iCand, trackFitResultCounter);
-            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
+            //gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
             trackFitResultCounter++;
 
 

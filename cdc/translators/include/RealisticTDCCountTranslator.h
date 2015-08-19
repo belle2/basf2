@@ -20,6 +20,7 @@ namespace Belle2 {
   namespace CDC {
     /** Translator mirroring the realistic Digitization. */
     class RealisticTDCCountTranslator : public TDCCountTranslatorBase {
+
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
       explicit RealisticTDCCountTranslator(bool useInWirePropagationDelay = false);
@@ -34,16 +35,16 @@ namespace Belle2 {
       }
 
       /**
-       * Get Drift length (cm).
-       * @parm tdcCount              TDC count (ns).
-       * @parm wireID                Encoded sense wire ID.
-       * @parm timeOfFlightEstimator Time of flight (ns).
-       * @parm leftRight             left/right flag.
-      *  @param z                    z-position on the wire (cm).
-       * @param alpha                Track incident angle in r-phi plane (rad).
-       * @param theta                Track incident angle in s-z plane (=polar angle) (rad).
+       * Get Drift length.
+       * @param tdcCount              TDC count (ns).
+       * @param wireID                Encoded sense wire ID.
+       * @param timeOfFlightEstimator Time of flight (ns).
+       * @param leftRight             left/right flag.
+       * @param z                     z-position on the wire (cm).
+       * @param alpha                 Track incident angle in r-phi plane (rad).
+       * @param theta                 Track incident angle in s-z plane (=polar angle) (rad).
+       * @return Drift length (cm) if drift time >= 0; v*(drift time) (i.e. negative value) otherwise, where v is nominal drift velocity (=getNominalDriftVelocity() of this class) (cm/ns).
        */
-
       float getDriftLength(unsigned short tdcCount,
                            const WireID& wireID        = WireID(),
                            float timeOfFlightEstimator = 0,
@@ -53,15 +54,15 @@ namespace Belle2 {
                            float = static_cast<float>(TMath::Pi() / 2.));
 
       /**
-       * Get position resolution^2 (cm^2) corresponding to drift length
+       * Get position resolution^2 corresponding to the drift length
        * from getDriftLength of this class.
-       * @parm  driftLength  Drift length (cm).
-       * @parm  wireID       Encoded sense wire ID.
-       * @parm  leftRight    Left/right flag.
-      *  @param z            z-position on the wire (cm).
-       * @param alpha        Track incident angle in r-phi plane (rad).
-       * @param theta        Track incident angle in s-z plane (=polar angle) (rad).
-       * @return Uncertainty on the drift length.
+       * @param  driftLength  Drift length (cm).
+       * @param  wireID       Encoded sense wire ID.
+       * @param  leftRight    Left/right flag.
+       * @param  z            z-position on the wire (cm).
+       * @param  alpha        Track incident angle in r-phi plane (rad).
+       * @param  theta        Track incident angle in s-z plane (=polar angle) (rad).
+       * @return Uncertainty^2 (cm^2) on the drift length.
        */
       float getDriftLengthResolution(float driftLength,
                                      const WireID& wireID = WireID(),
@@ -70,8 +71,15 @@ namespace Belle2 {
                                      float alpha = 0,
                                      float = static_cast<float>(TMath::Pi() / 2.));
 
-    private:
+      /**
+       * Get nominal drift velocity (cm/ns).
+       */
+      inline float getNominalDriftVelocity() const
+      {
+        return m_nominalDriftVelocity;
+      }
 
+    private:
       /**
        * Flag to activate the propagation delay of the sense wire.
        * true : activated, false : the propagation delay is not used.
@@ -91,9 +99,9 @@ namespace Belle2 {
       float m_eventTime;
 
       /**
-       * CDC Geometry parameters.
+       * Reference to CDC GeometryPar object.
        */
-      CDCGeometryPar& m_cdcp;
+      const CDCGeometryPar& m_cdcp;
 
       //      /**
       //       * Hit timing offset value.
@@ -101,10 +109,16 @@ namespace Belle2 {
       //      unsigned short m_tdcOffset;
 
       /**
-       * TDC bin width (1nsec).
+       * TDC bin width (ns).
+       * N.B. The declaration should be after m_cdcp for proper initialization.
        */
+      const float m_tdcBinWidth;
 
-      float m_tdcBinWidth;
+      /**
+       * Nominal drift velocity (cm/ns).
+       * N.B. The declaration should be after m_cdcp for proper initialization.
+       */
+      const float m_nominalDriftVelocity;
     };
   }
 }

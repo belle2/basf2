@@ -115,6 +115,10 @@ genfit::SharedPlanePtr CDCRecoHit::constructPlane(const genfit::StateOnPlane& st
   TVector3 dirInPoca = rep->getMom(st);
   dirInPoca.SetMag(1.);
   const TVector3& pocaOnWire = wire1 + wireDirection.Dot(poca - wire1) * wireDirection;
+  //temp
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).y() <<" "<< pocaOnWire.y() <<" " << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection - pocaOnWire).y() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).Perp() <<" "<< pocaOnWire.Perp() << std::endl;
+  //  std::cout << (noSagWire1 + noSagWireDirection.Dot(noSagPoca - noSagWire1) * noSagWireDirection).z() <<" "<< pocaOnWire.z() << std::endl;
 
   // check if direction is parallel to wire
   if (fabs(wireDirection.Angle(dirInPoca)) < 0.01) {
@@ -223,8 +227,9 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
   }
 
   // Ignore hits with negative drift times.  For these, the
-  // TDCCountTranslator returns a drift length of -999.
-  if (mL == -999 || mR == -999) {
+  // TDCCountTranslator returns a negative drift length.
+  //  if (mL == -999 || mR == -999) {
+  if (mL < 0. || mR < 0.) {
     B2DEBUG(150, "Ignoring hit with negative drift time.");
     mopL->setWeight(0);
     mopR->setWeight(0);

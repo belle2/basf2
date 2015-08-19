@@ -15,16 +15,19 @@ using namespace Belle2;
 using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0), m_cdcp(CDCGeometryPar::Instance())
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0), m_cdcp(CDCGeometryPar::Instance()),
+  m_tdcBinWidth(m_cdcp.getTdcBinWidth()), m_nominalDriftVelocity(m_cdcp.getNominalDriftV())
 {
   //  m_tdcOffset   = m_cdcp.getTdcOffset();
-  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
+  //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "RealisticTDCCountTranslator constructor" << endl;
   cout << "m_cdcp=" << &m_cdcp << endl;
   cout << "m_tdcBinWidth=" << m_tdcBinWidth << endl;
+  cout << "m_nominalDriftVelocity=" << m_nominalDriftVelocity << endl;
+  cout << "getNnominalDriftVelocity=" << this->getNominalDriftVelocity() << endl;
 #endif
 }
 
@@ -61,7 +64,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  float driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha, theta) : -999.;
+  float driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha,
+                                                           theta) : m_nominalDriftVelocity * driftTime;
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

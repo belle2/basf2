@@ -148,6 +148,10 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     // Reset all hits to not have a background hit (what they should not have anyway)
     resetTrack(track);
 
+    if (track.getStartTrajectory3D().getAbsMom3D() > 0.4)
+      continue;
+
+
     //removeSecondHalfOfTrack(track);
     removeHitsAfterLayerBreak(track);
     removeAllMarkedHits(track);

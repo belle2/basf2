@@ -13,11 +13,17 @@
 // For better readability we use z slope instead of inverse z slope everywhere!
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /// Tag for z0 direction
+    class Z0Tag;
+
     /// Type for discrete float values in z0 direction
-    typedef DiscreteValue<float> DiscreteZ0;
+    typedef DiscreteValue<float, Z0Tag> DiscreteZ0;
+
+    /// Tag for z slope direction.
+    class ZSlopeTag;
 
     /// Type for discrete float values in inverse z slope direction
-    typedef DiscreteValue<float> DiscreteZSlope;
+    typedef DiscreteValue<float, ZSlopeTag> DiscreteZSlope;
 
     /// Type for the container of the discrete values in z0 direction
     typedef DiscreteZ0::Array DiscreteZ0Array;
@@ -39,19 +45,20 @@ namespace Belle2 {
     public:
       /// Concise getter for the lower z0 bound.
       const float& getLowerZ0() const
-      { return static_cast<const float&>(getLowerBound<0>()); }
+      { return *(getLowerBound<DiscreteZ0>()); }
 
       /// Concise getter for the upper z0 bound.
       const float& getUpperZ0() const
-      { return  static_cast<const float&>(getUpperBound<0>()); }
+      { return *(getUpperBound<DiscreteZ0>()); }
 
       /// Concise getter for the lower inverse z0 slope bound.
       const float& getLowerZSlope() const
-      { return static_cast<const float&>(getLowerBound<1>()); }
+      { return *(getLowerBound<DiscreteZSlope>()); }
 
       /// Concise getter for the lower inverse z0 slope bound.
       const float& getUpperZSlope() const
-      { return static_cast<const float&>(getUpperBound<1>()); }
+      { return *(getUpperBound<DiscreteZSlope>()); }
+
     };
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

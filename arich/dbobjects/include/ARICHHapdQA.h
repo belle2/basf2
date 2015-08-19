@@ -15,7 +15,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <framework/logging/Logger.h>
-
+#include <TTimeStamp.h>
 #include <TGraph.h>
 
 namespace Belle2 {
@@ -76,6 +76,16 @@ namespace Belle2 {
      * @param serial serial number
      */
     void setHapdSerialNumber(const std::string& serial) {m_serial = serial; }
+
+    /** Return HAPD measurement date
+     * @return HAPD measurement date
+     */
+    TTimeStamp getHapdMeasurementDate() const {return m_measurementDate; }
+
+    /** Set HAPD measurement date
+     * @param HAPD measurement date
+     */
+    void setHapdMeasurementDate(TTimeStamp measurementDate) {m_measurementDate = measurementDate; }
 
     /**
      * Return Leakeage Current as a function of bias voltage
@@ -144,6 +154,7 @@ namespace Belle2 {
 
   private:
     std::string m_serial;                                /**< serial number of the sensor */
+    TTimeStamp m_measurementDate;                        /**< date of measurement */
     TGraph* m_leakCurrent[c_Measurement][c_NumOfChips];  /**< Leakege Current as a function of bias voltage */
     TH2F* m_hitData2D;                                   /**< 2D hit data */
     std::vector<TGraph*> m_noise;                        /**< Noise level vs. bias voltage for each channel */

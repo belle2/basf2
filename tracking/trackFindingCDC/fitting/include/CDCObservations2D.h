@@ -24,13 +24,32 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class serving as a storage of observed drift circles to present to the Riemann fitter
-    class CDCObservations2D  {
+    class CDCObservations2D {
+
+    public:
+      /** Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
+       *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
+       */
+      CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos) {;}
 
     public:
 #ifndef __CINT__
       /// Matrix type used to wrap the raw memory chunk of values generated from the various hit types for structured vectorized access.
       typedef Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
 #endif
+      /** Gets the pseudo variance.
+       *  The pseudo drift length variance is a measure that tries to incorporate the drift length
+       *  into the fit to drift circles where the right left passage ambiguity could not be resolved.
+       *  In such situations only the position of an hit can be used, however if only the position
+       *  that can be determined is the wire position the information of the drift length
+       *  should at least weaken the gravity of that wire in relation to the fitted trajectory.
+       *  The pseudo variance is therefore the square of the drift length itself (square for unit conformity)
+       *  plus its reference drift length variance.
+       */
+      static FloatType getPseudoDriftLengthVariance(const CDCWireHit& wireHit)
+      {
+        return square(wireHit.getRefDriftLength()) + wireHit.getRefDriftLengthVariance();
+      }
 
       /// Returns the number of observations stored
       size_t size() const
@@ -64,22 +83,23 @@ namespace Belle2 {
       FloatType getWeight(const int& iObservation) const
       { return m_observations[iObservation * 4 + 3]; }
 
-
-
-      /// Appends the observed position.
-      /** \note Observations are skipped, if one of the given variables is NAN.
-      @param x            X coordinate of the center of the observed circle.
-      @param y            Y coordinate of the center of the observed circle.
-      @param signedRadius The radius of the observed circle signed with right left passage hypotheses. Defaults to 0.
-      @param weight       The relative weight of the observation. In order to generate a unit less chi^2 measure the weight should be chosen as the inverse variance of the drift length. Defaults to 1.
-      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
-      */
+      /** Appends the observed position.
+       *  \note Observations are skipped, if one of the given variables is NAN.
+       *  @param x            X coordinate of the center of the observed circle.
+       *  @param y            Y coordinate of the center of the observed circle.
+       *  @param signedRadius The radius of the observed circle signed with right left passage hypotheses.
+       *                      Defaults to 0.
+       *  @param weight       The relative weight of the observation.
+       *                      In order to generate a unit less chi^2 measure the weight should be
+       *                      chosen as the inverse variance of the drift length. Defaults to 1.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
       size_t append(const FloatType& x,
                     const FloatType& y,
                     const FloatType& signedRadius = 0.0,
                     const FloatType& weight = 1.0)
       {
-
         if (std::isnan(x)) return 0;
         if (std::isnan(y)) return 0;
 
@@ -100,72 +120,76 @@ namespace Belle2 {
         return 1;
       }
 
-      /// Appends the observed position.
-      /** \note Observations are skipped, if one of the given variables is NAN.
-      @param pos2D        X, Y coordinate of the center of the observed circle.
-      @param signedRadius The radius of the observed circle signed with right left passage hypotheses. Defaults to 0.
-      @param weight       The relative weight of the observation. In order to generate a unit less chi^2 measure the weight should be chosen as the inverse variance of the drift length. Defaults to 1.
-      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
-      */
-      size_t append(const Belle2::TrackFindingCDC::Vector2D& pos2D, const FloatType& signedRadius = 0.0, const FloatType& weight = 1.0)
+      /** Appends the observed position.
+       *  \note Observations are skipped, if one of the given variables is NAN.
+       *  @param pos2D        X, Y coordinate of the center of the observed circle.
+       *  @param signedRadius The radius of the observed circle signed with right left passage hypotheses.
+       *                      Defaults to 0.
+       *  @param weight       The relative weight of the observation.
+       *                      In order to generate a unit less chi^2 measure the weight should be
+       *                      chosen as the inverse variance of the drift length. Defaults to 1.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
+      size_t append(const Belle2::TrackFindingCDC::Vector2D& pos2D,
+                    const FloatType& signedRadius = 0.0,
+                    const FloatType& weight = 1.0)
       { return append(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
-      /// Appends the hit circle at wire reference position without a right left passage hypotheses.
-      /** \note Observations are skipped, if one of the contained variables is NAN.
-      \note The left right passage information is always set to RIGHT, since on specific assumption can be made from the wire hit alone.
-      @param wireHit      Hit information to be appended as observation. XY position, drift length and inverse variance are taken at the wire reference position.
-      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
-      */
-      size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit, const RightLeftInfo& rlInfo = ZERO)
+      /** Appends the hit circle at wire reference position without a right left passage hypotheses.
+       *  \note Observations are skipped, if one of the contained variables is NAN.
+       *  \note The left right passage information is always set to RIGHT,
+       *  since on specific assumption can be made from the wire hit alone.
+       *  @param wireHit      Hit information to be appended as observation.
+       *                      XY position, drift length and inverse variance are taken at the wire reference position.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
+      size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
+                    const RightLeftInfo& rlInfo = ZERO)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
         const FloatType driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
-        const FloatType weight = 1.0 / wireHit.getRefDriftLengthVariance();
-        size_t appended_hit = append(wireRefPos2D, driftLength, weight);
-        // if (not appended_hit){
-        //   B2WARNING("CDCRLWireHit was not appended");
-        //   B2WARNING("Reference position: " << wireRefPos2D);
-        //   B2WARNING("Drift length:" << driftLength);
-        //   B2WARNING("Variance: " << wireHit.getRefDriftLengthVariance());
-        //   B2WARNING("Weight: " << weight << std::endl);
-        // }
-        return appended_hit;
+        const FloatType driftLengthVariance = (abs(rlInfo) == 1 ?
+                                               wireHit.getRefDriftLengthVariance() :
+                                               getPseudoDriftLengthVariance(wireHit));
+
+        const FloatType weight = 1.0 / driftLengthVariance;
+        size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
+        return nAppendedHits;
       }
 
-      /// Appends the hit circle at wire reference position with a right left passage hypotheses.
-      /** \note Observations are skipped, if one of the contained variables is NAN.
-      \note The left right passage information is always set to the right left passage hypotheses of the give hit.
-      @param wireHit      Hit information to be appended as observation. XY position, signed drift length and inverse variance are taken at the wire reference position.
-      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
-      */
+      /** Appends the hit circle at wire reference position with a right left passage hypotheses.
+       *  \note Observations are skipped, if one of the contained variables is NAN.
+       *  \note The left right passage information is always set to
+       *  the right left passage hypotheses of the give hit.
+       *  @param wireHit      Hit information to be appended as observation.
+       *                      XY position, signed drift length and inverse variance are taken at the wire reference position.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
       size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
       {
         const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
         const CDCWireHit* ptrWireHit = rlTaggedWireHit.getWireHit();
-        size_t appended_hit = append(*ptrWireHit, rlInfo);
-        return appended_hit;
+        return append(*ptrWireHit, rlInfo);
       }
 
-      /// Appends the hit circle at wire reference position with a right left passage hypotheses.
-      /** \note Observations are skipped, if one of the contained variables is NAN.
-      \note The left right passage information is always set to the right left passage hypotheses of the give hit.
-      @param wireHit      Hit information to be appended as observation. XY position, signed drift length and inverse variance are taken at the wire reference position.
-      @return             Number of observations added. One if the observation was added. Zero if one of the given variables is NAN.
-      */
+      /** Appends the hit circle at wire reference position with a right left passage hypotheses.
+       *  \note Observations are skipped, if one of the contained variables is NAN.
+       *  \note The left right passage information is always set to the right left passage hypotheses of the give hit.
+       *  @param wireHit      Hit information to be appended as observation.
+       *                      XY position, signed drift length and inverse variance
+       *                      are taken at the wire reference position.
+       *  @return             Number of observations added. One if the observation was added.
+       *                      Zero if one of the given variables is NAN.
+       */
       size_t append(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit)
       {
         const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
         const FloatType signedDriftLength = rlWireHit.getSignedRefDriftLength();
         const FloatType weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
-        size_t appended_hit = append(wireRefPos2D, signedDriftLength, weight);
-        // if (not appended_hit){
-        //   B2WARNING("CDCRLWireHit was not appended");
-        //   B2WARNING("Reference position: " << wireRefPos2D);
-        //   B2WARNING("Drift length:" << signedDriftLength);
-        //   B2WARNING("Variance: " << rlWireHit.getRefDriftLengthVariance());
-        //   B2WARNING("Weight: " << weight << std::endl);
-        // }
-        return appended_hit;
+        return append(wireRefPos2D, signedDriftLength, weight);
       }
 
       /// Appends the two observed position
@@ -180,164 +204,168 @@ namespace Belle2 {
                + append(rlWireHitTriple.getEndRLWireHit());
       }
 
-      /// Appends the observed position
-      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D, bool useRecoPos = false)
+      /// Appends the hit using the reconstructed position if useRecoPos indicates it
+      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D, bool useRecoPos)
       {
         if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
-          size_t appended_hit =  append(recoPos2D, driftLength, weight);
-          // if (not appended_hit) {
-          //   B2WARNING("CDCRecoHit2D was not appended");
-          //   B2WARNING("Reconstructed position: " << recoPos2D);
-          //   B2WARNING("Drift length:" << driftLength);
-          //   B2WARNING("Variance: " << recoHit2D.getRefDriftLengthVariance());
-          //   B2WARNING("Weight: " << weight << std::endl);
-          // }
-          return appended_hit;
+          return append(recoPos2D, driftLength, weight);
         } else {
           return append(recoHit2D.getRLWireHit());
         }
       }
 
+      /// Appends the hit using the reconstructed position if the property m_useRecoPos of this class indicates it
+      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D)
+      { return append(recoHit2D, m_useRecoPos); }
+
       /// Appends the observed position
-      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D, bool usePosition = false)
+      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D, bool useRecoPos)
       {
-        if (usePosition) {
+        if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-          size_t appended_hit = append(recoPos2D, driftLength, weight);
-          // if (not appended_hit){
-          //   B2WARNING("CDCRecoHit3D was not appended");
-          //   B2WARNING("Reconstructed position: " << recoPos2D);
-          //   B2WARNING("Drift length:" << driftLength);
-          //   B2WARNING("Variance: " << recoHit3D.getRecoDriftLengthVariance());
-          //   B2WARNING("Weight: " << weight << std::endl);
-          // }
-          return appended_hit;
+          return append(recoPos2D, driftLength, weight);
         } else {
           const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
           const FloatType driftLength = recoHit3D.getSignedRecoDriftLength();
           const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-          size_t appended_hit = append(recoWirePos2D, driftLength, weight);
-          // if (not appended_hit){
-          //   B2WARNING("CDCRecoHit3D was not appended");
-          //   B2WARNING("Reconstructed wire position: " << recoWirePos2D);
-          //   B2WARNING("Drift length:" << driftLength);
-          //   B2WARNING("Variance: " << recoHit3D.getRecoDriftLengthVariance());
-          //   B2WARNING("Weight: " << weight << std::endl);
-          // }
-          return appended_hit;
+          return append(recoWirePos2D, driftLength, weight);
         }
       }
 
+      /// Appends the hit using the reconstructed position if the property m_useRecoPos of this class indicates it
+      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D)
+      { return append(recoHit3D, m_useRecoPos); }
 
-      /// Appends all reconstructed hits from the two dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information
-      size_t appendRange(const CDCRecoSegment2D& recoSegment2D, bool usePosition = false)
+      /** Appends all reconstructed hits from the two dimensional segment.
+       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
+       *                    instead of the wire positon, right left passage information and drift length
+       */
+      size_t appendRange(const CDCRecoSegment2D& recoSegment2D, bool useRecoPos)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         for (const CDCRecoHit2D& recoHit2D :  recoSegment2D) {
-          result += append(recoHit2D, usePosition);
+          nAppendedHits += append(recoHit2D, useRecoPos);
         }
-        return result;
+        return nAppendedHits;
       }
 
-      /// Appends all reconstructed hits from the three dimensional segment, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information next to the reconstructed position
-      size_t appendRange(const CDCRecoSegment3D& recoSegment3D, bool usePosition = false)
+      /** Appends all reconstructed hits from the two dimensional segment. */
+      size_t appendRange(const CDCRecoSegment2D& recoSegment2D)
+      { return appendRange(recoSegment2D, m_useRecoPos); }
+
+      /** Appends all reconstructed hits from the three dimensional segment.
+       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
+       *                    instead of the wire positon, right left passage information and drift length
+       */
+      size_t appendRange(const CDCRecoSegment3D& recoSegment3D, bool useRecoPos)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         for (const CDCRecoHit3D& recoHit3D :  recoSegment3D) {
-          result += append(recoHit3D, usePosition);
+          nAppendedHits += append(recoHit3D, useRecoPos);
         }
-        return result;
+        return nAppendedHits;
       }
 
+      /** Appends all reconstructed hits from the two dimensional segment. */
+      size_t appendRange(const CDCRecoSegment3D& recoSegment3D)
+      { return appendRange(recoSegment3D, m_useRecoPos); }
 
-      /// Appends all reconstructed hits from the two axial segments, usePosition indicates whether the absolute position shall be used instead of the oriented wire hit information.
-      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair,
-                         bool usePosition = false)
+
+      /** Appends all reconstructed hits from the two axial segments,
+       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
+       *                    instead of the wire positon, right left passage information and drift length
+       */
+      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair, bool useRecoPos)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStart();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
-          result += appendRange(startSegment2D, usePosition);
+          nAppendedHits += appendRange(startSegment2D, useRecoPos);
         }
 
         const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEnd();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
-          result += appendRange(endSegment2D, usePosition);
+          nAppendedHits += appendRange(endSegment2D, useRecoPos);
         }
-        return result;
+        return nAppendedHits;
       }
 
-      /// Appends all the reference wire positions. Always use position since there is no other mode. For cross check to legendre finder.
-      size_t appendRange(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires,
-                         bool usePosition  __attribute__((__unused__)) = false)
+      /** Appends all reconstructed hits from the two axial segments */
+      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair)
+      { return appendRange(axialSegmentPair, m_useRecoPos); }
+
+      /** Appends all the reference wire positions.
+       *  @param useRecoPos Indicates whether the reconstructed position shall be used,
+       *                    instead of the wire positon, right left passage information and drift length
+       *                    Always use position since there is no other mode.
+       *  /note For cross check to legendre finder.
+       */
+      size_t appendRange(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         for (const CDCWire* ptrWire : wires) {
           if (not ptrWire) continue;
           const CDCWire& wire = *ptrWire;
           const Vector2D& wirePos = wire.getRefPos2D();
           const FloatType driftLength = 0.0;
           const FloatType weight = 1.0;
-          result += append(wirePos, driftLength, weight);
+          nAppendedHits += append(wirePos, driftLength, weight);
         }
-        return result;
+        return nAppendedHits;
       }
 
-      size_t appendRange(const CDCWireHitSegment& wireHits, bool usePosition  = false)
+      /** Appends all the wire hit reference positions with the pseudo variance.
+       *  @param useRecoPos Indicates whether the reconstructed position shall be used,
+       *                    instead of the wire positon, right left passage information and drift length
+       *                    Always use position since there is no other mode.
+       *  /note For cross check to legendre finder.
+       */
+      size_t appendRange(const CDCWireHitSegment& wireHits)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         for (const CDCWireHit* ptrWireHit : wireHits) {
           if (not ptrWireHit) continue;
           const CDCWireHit& wireHit = *ptrWireHit;
-          const Vector2D& wirePos = wireHit.getRefPos2D();
-          const FloatType driftLength = 0.0;
-          // Try out using weighting the observations by the squared drift length.
-          // Reduces the distance measure to a relative measure counting in drift lengths.
-          // Using the squared drift length makes the chi2 unitless.
-          // Limited at the bottom by the nominal uncertainty of the drift time (as introduced in CDC::SimpleTDCCountTranslator)
-          const FloatType pseudoVariance = (usePosition ? 0.0 : wireHit.getRefDriftLength() * wireHit.getRefDriftLength()) +
-                                           SIMPLE_DRIFT_LENGTH_VARIANCE;
-          const FloatType weight = 1 / pseudoVariance;
-          result += append(wirePos, driftLength, weight);
+          nAppendedHits += append(wireHit);
         }
-        return result;
+        return nAppendedHits;
       }
 
-
-
 #ifndef __CINT__
-      /// Appends all wire positions of the hits in the legendre track hits. Always use position since there is no other mode as long as there are no right left passage information available.
-      size_t appendRange(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits,
-                         bool usePosition  __attribute__((unused)) = false)
+      /** Appends all wire positions of the hits in the legendre track hits.
+       *  Always use position since there is no other mode as long as
+       *  there are no right left passage information available.
+       */
+      size_t appendRange(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         for (const TrackFindingCDC::TrackHit* ptrLegendreTrackHit : legendreTrackHits) {
           if (not ptrLegendreTrackHit) continue;
           const CDCWireHit* wireHit = ptrLegendreTrackHit->getUnderlayingCDCWireHit();
-          result += append(*wireHit);
+          nAppendedHits += append(*wireHit);
         }
-        return result;
+        return nAppendedHits;
       }
 #endif
 
       /// Append all hits from a generic range.
       template<class Range>
-      size_t appendRange(const Range& range, bool usePosition  __attribute__((unused)) = false)
+      size_t appendRange(const Range& range)
       {
-        size_t result = 0;
+        size_t nAppendedHits = 0;
         using std::begin;
         using std::end;
         for (const auto& item : range) {
-          result += append(item);
+          nAppendedHits += append(item);
         }
-        return result;
+        return nAppendedHits;
       }
 
       /// Get the postion of the first observation.
@@ -363,8 +391,6 @@ namespace Belle2 {
        */
       ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
       { return sign(getTotalPerpS(trajectory2D)); }
-
-
 
 
       /// Extracts the observation center that is at the index in the middle.
@@ -467,15 +493,31 @@ namespace Belle2 {
        *  * + symmetric.
        */
       Eigen::Matrix<FloatType, 3, 3> getWXYSumMatrix();
-
 #endif
 
+    public:
+      /// Getter for the indicator that the reconstructed position should be favoured.
+      bool getUseRecoPos() const
+      { return m_useRecoPos; }
+
+      /// Setter for the indicator that the reconstructed position should be favoured.
+      void setUseRecoPos(bool useRecoPos)
+      { m_useRecoPos = useRecoPos; }
+
     private:
-      std::vector<FloatType>
-      m_observations; ///< Memory for the individual observations. Arrangement of values is x,y, drift raduis, weight, x, y, .....
+      /** Memory for the individual observations.
+       *  Arrangement of values is x,y, drift raduis, weight, x, y, .....
+       */
+      std::vector<FloatType> m_observations;
 
+      /** Indicator if the reconstructed position of hits shall be used in favour
+       *  of the wire position and the drift length for hits where it is available
+       *  This only indicates the mode of adding the next hits. So you may change it
+       *  in between append() calls.
+       */
+      bool m_useRecoPos;
 
-    }; //class
+    }; // end class CDCObservations2D
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2

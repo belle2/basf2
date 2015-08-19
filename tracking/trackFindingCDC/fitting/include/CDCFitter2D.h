@@ -92,17 +92,21 @@ namespace Belle2 {
       {
         CDCObservations2D observations2D;
         if (m_usePosition) {
-          observations2D.appendRange(startHits, true);
+          observations2D.setUseRecoPos(true);
+          observations2D.appendRange(startHits);
         }
         if (m_useOrientation) {
-          observations2D.appendRange(startHits, false);
+          observations2D.setUseRecoPos(false);
+          observations2D.appendRange(startHits);
         }
 
         if (m_usePosition) {
-          observations2D.appendRange(endHits, true);
+          observations2D.setUseRecoPos(true);
+          observations2D.appendRange(endHits);
         }
         if (m_useOrientation) {
-          observations2D.appendRange(endHits, false);
+          observations2D.setUseRecoPos(false);
+          observations2D.appendRange(endHits);
         }
 
         if (observations2D.size() < 4) {
@@ -120,10 +124,12 @@ namespace Belle2 {
       {
         CDCObservations2D observations2D;
         if (m_usePosition) {
-          observations2D.appendRange(hits, true);
+          observations2D.setUseRecoPos(true);
+          observations2D.appendRange(hits);
         }
         if (m_useOrientation) {
-          observations2D.appendRange(hits, false);
+          observations2D.setUseRecoPos(false);
+          observations2D.appendRange(hits);
         }
 
         if (observations2D.size() < 4) {

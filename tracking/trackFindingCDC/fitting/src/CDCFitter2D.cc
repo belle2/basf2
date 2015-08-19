@@ -10,5 +10,3 @@
 #include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
 
 using namespace Belle2::TrackFindingCDC;
-
-

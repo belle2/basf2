@@ -17,6 +17,7 @@
 #pragma link C++ class Belle2::ARICHHapdChipInfo+;
 #pragma link C++ class Belle2::ARICHHapdInfo+;
 #pragma link C++ class Belle2::ARICHHapdMask+;
+#pragma link C++ class Belle2::ARICHHapdQA+;
 #pragma link C++ class Belle2::ARICHHighVoltageConfig+;
 #pragma link C++ class Belle2::ARICHMergerInfo+;
 #pragma link C++ class Belle2::ARICHMergerMap+;
@@ -24,5 +25,7 @@
 #pragma link C++ class Belle2::ARICHMirrorMap+;
 #pragma link C++ class Belle2::ARICHSensorModuleInfo+;
 #pragma link C++ class Belle2::ARICHSensorModuleMap+;
+
+
 
 #endif

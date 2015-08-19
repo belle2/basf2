@@ -153,8 +153,8 @@ void resetTrajectoryOfTrack(CDCTrack& track)
     Belle2::Helix trajectory(cdcTrajectory.getSupport(), cdcTrajectory.getMom3DAtSupport() , charge, 1.5);
     const Vector2D& startPosition = track.front().getRecoPos2D();
     const double perpSAtFront = trajectory.getArcLength2DAtXY(startPosition.x(), startPosition.y());
-    const Vector3D& position(trajectory.getPositionAtArcLength2D(perpSAtFront));
-    const Vector3D& momentum(trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5));
+    Vector3D position(trajectory.getPositionAtArcLength2D(perpSAtFront));
+    Vector3D momentum(trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5));
 
     track.setStartTrajectory3D(CDCTrajectory3D(position, momentum, charge));
   }

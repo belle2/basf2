@@ -109,27 +109,11 @@ namespace Belle2 {
       }
 
       /**
-       * Run reconstruction
-       * @param X track spatial position x
-       * @param Y track spatial position y
-       * @param Z track spatial position z
-       * @param Tlen track length from IP
-       * @param Px track momentum component x
-       * @param Py track momentum component y
-       * @param Pz track momentum component z
-       * @param Q track charge
-       * @param HYP true hypothesis (optional)
-       * @param barID bar ID (optional)
-       */
-      void reconstruct(double X, double Y, double Z, double Tlen,
-                       double Px, double Py, double Pz, int Q,
-                       int HYP = 0, int barID = 0);
-
-      /**
-       * Run reconstruction
+       * Run reconstruction for a given track
        * @param trk track
+       * @param pdg PDG code for which to compute pulls. If 0 use MC true PDG.
        */
-      void reconstruct(TOPtrack& trk);
+      void reconstruct(TOPtrack& trk, int pdg = 0);
 
       /**
        * Return status
@@ -254,6 +238,24 @@ namespace Belle2 {
 
 
     private:
+
+      /**
+       * Run reconstruction
+       * @param X track spatial position x
+       * @param Y track spatial position y
+       * @param Z track spatial position z
+       * @param Tlen track length from IP
+       * @param Px track momentum component x
+       * @param Py track momentum component y
+       * @param Pz track momentum component z
+       * @param Q track charge
+       * @param pdg PDG code for which to compute pulls
+       * @param barID bar ID (optional)
+       */
+      void reconstruct(double X, double Y, double Z, double Tlen,
+                       double Px, double Py, double Pz, int Q,
+                       int pdg = 0, int barID = 0);
+
       int m_hypID;    /**< true hypothesis ID */
       double m_beta;  /**< beta value, if set */
 

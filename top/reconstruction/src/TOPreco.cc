@@ -71,7 +71,6 @@ namespace Belle2 {
                               double Px, double Py, double Pz, int Q,
                               int HYP, int barID)
     {
-      m_hypID = HYP;
       float x = (float) X;
       float y = (float) Y;
       float z = (float) Z;
@@ -82,17 +81,18 @@ namespace Belle2 {
       int REF = 0;
       barID--; // 0-based ID used in fortran
       rtra_clear_();
-      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &m_hypID, &REF, &barID);
+      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &HYP, &REF, &barID);
       top_reco_();
     }
 
-    void TOPreco::reconstruct(TOPtrack& trk)
+    void TOPreco::reconstruct(TOPtrack& trk, int pdg)
     {
       m_hypID = abs(trk.getPDGcode());
+      if (pdg == 0) pdg = m_hypID;
       int barID = trk.getBarID();
       reconstruct(trk.getX(), trk.getY(), trk.getZ(), trk.getTrackLength(),
                   trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(),
-                  m_hypID, barID);
+                  pdg, barID);
     }
 
     int TOPreco::getFlag()

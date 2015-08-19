@@ -106,7 +106,6 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # Detector simulation

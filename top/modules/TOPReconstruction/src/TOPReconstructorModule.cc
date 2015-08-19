@@ -225,7 +225,7 @@ namespace Belle2 {
     for (const auto& track : tracks) {
 
       // construct TOPtrack from mdst track
-      TOPtrack trk(&track, Const::pion, m_PDGCode);
+      TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
       // optional track smearing (needed for some MC studies)
@@ -235,7 +235,7 @@ namespace Belle2 {
       }
 
       // reconstruct
-      reco.reconstruct(trk);
+      reco.reconstruct(trk, m_PDGCode);
       if (m_debugLevel > 1) {
         trk.dump();
         reco.dumpTrackHit(Local);

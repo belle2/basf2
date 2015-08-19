@@ -666,6 +666,7 @@ namespace Belle2 {
       G4LogicalVolume* vacuum = new G4LogicalVolume(box3, fillMaterial, "vacuum");
 
       // Reflective edge
+      /* removed due to overlap with sensitive area ...
       GearDir reflectiveEdge(content, "PMTs/Module/reflectiveEdge");
       if (!reflectiveEdge) B2FATAL("reflectiveEdge: definition is missing");
       double reflEdgeWidth = reflectiveEdge.getLength("width") / Unit::mm;
@@ -683,6 +684,7 @@ namespace Belle2 {
       Materials& materials = Materials::getInstance();
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("reflectiveEdgeSurface", reflEdge, optSurf);
+      */
 
       /*! Place PMT segments */
 
@@ -694,9 +696,11 @@ namespace Belle2 {
                                              - MWsizez + WThickness) / 2.);
       G4Transform3D tsens = G4Translate3D(0 , 0,
                                           (Msizez - 2 * Winthickness - Asizez) / 2.);
+      /*
       G4Transform3D trefl = G4Translate3D(0 , 0,
                                           (Msizez - 2 * Winthickness - reflEdgeThick)
                                           / 2.);
+      */
 
       //! Apply coloring and place alle parts into PMT
 
@@ -708,7 +712,7 @@ namespace Belle2 {
 
       new G4PVPlacement(tvacuum, vacuum, "TOP.vacuum", PMT, false, 1);
 
-      new G4PVPlacement(trefl, reflEdge, "TOP.reflEdge", PMT, false, 1);
+      //      new G4PVPlacement(trefl, reflEdge, "TOP.reflEdge", PMT, false, 1);
 
       setColor(*lmoduleSens, "rgb(0.0,0.0,0.0,1.0)");
       new G4PVPlacement(tsens, lmoduleSens, "TOP.moduleSensitive", PMT, false, 1);

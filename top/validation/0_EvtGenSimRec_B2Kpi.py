@@ -28,7 +28,6 @@ main.add_module(eventinfosetter)
 # generate events (B0 -> K+pi- + cc, other B0 generic)
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('top/validation/B2Kpi.dec'))
-evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detector simulation

@@ -51,7 +51,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~ARICHHapdChipInfo();
+    ~ARICHHapdChipInfo() {};
 
     /**
      * Return Chip Bias Voltage

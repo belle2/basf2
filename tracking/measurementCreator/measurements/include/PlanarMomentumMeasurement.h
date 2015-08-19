@@ -29,7 +29,7 @@ namespace Belle2 {
     PlanarMomentumMeasurement() : genfit::PlanarMeasurement(1) {}
 
     /** Copy from other planar measurement and resize the hit coords to one dimension */
-    PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) :
+    explicit PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) :
       genfit::PlanarMeasurement(parentElement)
     {
       rawHitCoords_.ResizeTo(1);

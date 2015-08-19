@@ -121,8 +121,6 @@ void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track)
       const double delta = currentAngle - lastAngle;
       const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
       if (fabs(normalizedDelta) > 0.5) {
-
-        B2INFO(currentAngle << " " << lastAngle << " " << normalizedDelta)
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       }
@@ -136,21 +134,39 @@ void removeAllMarkedHits(CDCTrack& track)
 {
   // Delete all hits that were marked
   track.erase(std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & recoHit) -> bool {
-    return recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag();
+    if (recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag())
+    {
+      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
+      return true;
+    } else {
+      return false;
+    }
   }), track.end());
+}
+
+void resetTrajectoryOfTrack(CDCTrack& track)
+{
+  const CDCTrajectory3D& cdcTrajectory = track.getStartTrajectory3D();
+
+  const short charge = track.getStartChargeSign();
+  if (abs(charge) == 1) {
+    Belle2::Helix trajectory(cdcTrajectory.getSupport(), cdcTrajectory.getMom3DAtSupport() , charge, 1.5);
+    const Vector2D& startPosition = track.front().getRecoPos2D();
+    const double perpSAtFront = trajectory.getArcLength2DAtXY(startPosition.x(), startPosition.y());
+    const Vector3D& position(trajectory.getPositionAtArcLength2D(perpSAtFront));
+    const Vector3D& momentum(trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5));
+
+    track.setStartTrajectory3D(CDCTrajectory3D(position, momentum, charge));
+  }
 }
 
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  std::vector<CDCTrack> newTracks;
-
   for (CDCTrack& track : tracks) {
     // Reset all hits to not have a background hit (what they should not have anyway)
     resetTrack(track);
-
-    if (track.getStartTrajectory3D().getAbsMom3D() > 0.4)
+    if (track.getStartTrajectory3D().getAbsMom3D() > m_param_minimalMomentum)
       continue;
-
 
     //removeSecondHalfOfTrack(track);
     removeHitsAfterLayerBreak(track);
@@ -161,6 +177,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
     removeHitsIfOnlyOneSuperLayer(track);
     removeAllMarkedHits(track);
+
     removeHitsIfSmall(track);
     removeAllMarkedHits(track);
 
@@ -169,40 +186,8 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
     track.sortByPerpS();
 
-    SortableVector<CDCRecoHit3D> newTrackHits;
-    newTrackHits.reserve(track.size());
-
-
-
-    const CDCTrajectory3D& cdcTrajectory = track.getStartTrajectory3D();
-
-    const short charge = track.getStartChargeSign();
-    if (abs(charge) == 1) {
-      Helix trajectory(cdcTrajectory.getSupport(), cdcTrajectory.getMom3DAtSupport() , charge, 1.5);
-      const Vector2D& startPosition = track.front().getRecoPos2D();
-      const double perpSAtFront = trajectory.getArcLength2DAtXY(startPosition.x(), startPosition.y());
-      const Vector3D& position{trajectory.getPositionAtArcLength2D(perpSAtFront)};
-      const Vector3D& momentum{trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5)};
-
-      track.setStartTrajectory3D(CDCTrajectory3D(position, momentum, charge));
-    }
-
-
-    /*if (newTrackHits.size() > 20) {
-      CDCTrack newTrack;
-      newTrack.swap(newTrackHits);
-
-      newTrajectory = track.getStartTrajectory3D();
-      newTrajectory.setLocalOrigin(newTrack.front().getRecoPos3D());
-      newTrack.setStartTrajectory3D(newTrajectory);
-
-      newTracks.push_back(move(newTrack));
-      B2INFO("Adding new track");
-    }*/
+    resetTrajectoryOfTrack(track);
   }
-
-  /*for(CDCTrack & newTrack : newTracks)
-    tracks.push_back(move(newTrack));*/
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
     return track.size() < 3;

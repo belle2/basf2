@@ -22,8 +22,7 @@ namespace Belle2 {
   public:
     TrackQualityAsserterCDCModule() : TrackFinderCDCBaseModule()
     {
-      setDescription("Many tracks in the cdc can not be fitted. For fitting them, we remove parts of the hits and maybe reverse them.");
-      addParam("MinimalPerpSCut", m_param_minimalPerpSCut, "The cut to the perpS distances above a track should be cut.", 0.0);
+      setDescription("Many tracks in the CDC can not be fitted. For fitting them, we remove parts of the hits or maybe the whole track.");
     }
 
   private:
@@ -33,18 +32,8 @@ namespace Belle2 {
      */
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    void terminate()
-    {
-      B2INFO("Having deleted " << m_numberOfDeletedHits << " hits of " << m_numberOfHits << " hits in total.");
-      TrackFinderCDCBaseModule::terminate();
-    }
-
-    double m_param_minimalPerpSCut; /**< The cut to the perpS distances above a track should be cut. */
-
-    /** Number of deleted hits */
-    unsigned int m_numberOfDeletedHits = 0;
-    /** Number of total hits */
-    unsigned int m_numberOfHits = 0;
+    /** Minimal Momentum under which to do the corrections. */
+    double m_param_minimalMomentum = 0.4;
   };
 
 }

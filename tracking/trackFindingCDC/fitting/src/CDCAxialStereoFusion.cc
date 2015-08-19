@@ -97,14 +97,14 @@ namespace {
     Vector3D localOrigin3D(localOrigin2D, 0.0);
 
     if (not startSegment.getTrajectory2D().isFitted()) {
-      if (startSegment.size() > 3) B2WARNING("Start segment not fitted.");
+      // if (startSegment.size() > 3) B2WARNING("Start segment not fitted.");
       CDCTrajectory3D result;
       result.setChi2(NAN);
       return result;
     }
 
     if (not endSegment.getTrajectory2D().isFitted()) {
-      if (endSegment.size() > 3) B2WARNING("End segment not fitted.");
+      // if (endSegment.size() > 3) B2WARNING("End segment not fitted.");
       CDCTrajectory3D result;
       result.setChi2(NAN);
       return result;
@@ -148,10 +148,7 @@ double CDCAxialStereoFusion::average(const TVectorD& startParameters,
   TVectorD weightedSumParameter = startInvCovMatrix * startParameters + endInvCovMatrix * endParameters;
 
   avgParameters = avgCovMatrix * weightedSumParameter;
-
-
   double chi2 = startInvCovMatrix.Similarity(startParameters) + endInvCovMatrix.Similarity(endParameters);
-
   return chi2;
 }
 
@@ -194,7 +191,6 @@ double CDCAxialStereoFusion::average(const TVectorD& startParameters,
     endAmbiguityMatrixTransposed * (endInvCovMatrix * endParameters);
 
   avgParameters = avgCovMatrix * weightedSum;
-
 
   TVectorD startPosteriorParameters = startAmbiguityMatrix * avgParameters;
   TVectorD endPosteriorParameters = endAmbiguityMatrix * avgParameters;

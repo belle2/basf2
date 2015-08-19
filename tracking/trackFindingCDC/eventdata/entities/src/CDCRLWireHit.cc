@@ -88,9 +88,8 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
     Vector2D recoPos2D = getRecoPos2D(trajectory2D);
 
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
-    // we set it to a not a number
-    FloatType z        = std::numeric_limits<FloatType>::quiet_NaN();
-
+    // we set it the basic assumption.
+    FloatType z = 0;
     return Vector3D(recoPos2D, z);
 
   } else {

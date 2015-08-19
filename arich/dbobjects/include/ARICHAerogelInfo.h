@@ -16,6 +16,10 @@
 #include <framework/logging/Logger.h>
 #include <vector>
 
+#include <TROOT.h>
+#include <TClass.h>
+
+
 namespace Belle2 {
 
   /**
@@ -24,18 +28,31 @@ namespace Belle2 {
 
   class ARICHAerogelInfo: public TObject {
   public:
+
     /**
      * Default constructor
      */
     ARICHAerogelInfo(): m_version(0.0), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0)
     {
-      for (int i = 0; i < 26; i++) m_lambda[i] = 200 + i * 20;
-      for (int i = 0; i < 26; i++) m_transmittance[i] = 0;
+      m_lambda = {};
+      m_transmittance = {};
     };
 
     /**
      * Constructor
      */
+    ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness,
+                     std::vector<double> transmittance)
+    {
+      m_version = version;
+      m_serial = serial;
+      m_id = id;
+      m_refractiveIndex = index;
+      m_transmissionLength = trlen;
+      m_thickness = thickness;
+      m_transmittance = transmittance;
+    }
+
     ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness,
                      std::vector<int> lambda, std::vector<double> transmittance)
     {
@@ -144,17 +161,17 @@ namespace Belle2 {
 
 
     /**
-     * Return Aerogel Transmittance
-     * @return Aerogel transmittance
+     * Return Aerogel Transmittance at lambda
+     * @return Aerogel transmittance at lambda
      */
 
     double getAerogelTransmittanceElement(int lambda) const
     {
-      if (lambda < 200 || lambda > 700) {
+      if (lambda < c_lambdaMin || lambda > c_lambdaMax) {
         B2INFO("lambda not in right interval!");
         return -1;
       }
-      int index = (int) round((lambda - 200.0) / 20.0);
+      int index = (int) round((lambda - c_lambdaMin) / c_lambdaStep);
       return m_transmittance[index];
     }
 
@@ -165,12 +182,19 @@ namespace Belle2 {
      */
     void setAerogelTransmittanceElement(int lambda, double transmittance)
     {
-      if (lambda < 200 || lambda > 700) {
+      if (lambda < c_lambdaMin || lambda > c_lambdaMax) {
         B2INFO("lambda not in right interval!");
       }
-      int index = (int) round((lambda - 200.0) / 20.0);
+      int index = (int) round((lambda - c_lambdaMin) / c_lambdaStep);
       m_transmittance[index] = transmittance;
     }
+
+    /**
+     * Return Aerogel Transmittance
+     * @return Aerogel transmittance
+     */
+
+    int getAerogelTransmittance(unsigned int i) const { if (i < m_transmittance.size()) return m_transmittance[i]; else return -1;}
 
 
     /**
@@ -194,6 +218,11 @@ namespace Belle2 {
 
   private:
 
+    double c_lambdaMin = 200.0;
+    double c_lambdaMax = 700.0;
+    double c_lambdaStep = 20.0;
+    int c_lambdaPts = 26;
+
     double m_version;                          /**< Aerogel version */
     std::string m_serial;                      /**< Aerogel Serial number */
     std::string m_id;                          /**< Aerogel Identifier */
@@ -205,9 +234,10 @@ namespace Belle2 {
     std::string m_comment;                     /**< optional comment */
 
 
-    ClassDef(ARICHAerogelInfo, 1);  /**< ClassDef */
+    ClassDef(ARICHAerogelInfo, 2);  /**< ClassDef */
   };
 } // end namespace Belle2
+
 
 
 

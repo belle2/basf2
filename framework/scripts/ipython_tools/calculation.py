@@ -72,6 +72,14 @@ class Basf2Calculation:
         while len(running_processes) > 0:
 
             running_processes = filter(lambda p: self.is_running(p), started_processes)
+            ended_processes = filter(lambda p: not self.is_running(p), started_processes)
+
+            for process in ended_processes:
+                if display_bar:
+                    self.show_end_result(process, process_bars)
+                    # Only update the process bar once
+                    if process in process_bars:
+                        del process_bars[process]
 
             for process in running_processes:
                 # Check if the process does not have a path
@@ -96,9 +104,9 @@ class Basf2Calculation:
 
             time.sleep(0.01)
 
-        # if display_bar:
-        #    for process in self.process_list:
-        #        self.show_end_result(process, process_bars)
+        if display_bar:
+            for process in self.process_list:
+                self.show_end_result(process, process_bars)
 
     def show_end_result(self, process, process_bars):
         """

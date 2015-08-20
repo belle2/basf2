@@ -127,11 +127,12 @@ if [ ! -d basf2 ]; then
 
 
   echo "Installing hooks to deal with svn:externals (e.g. genfit2 package)"
+  cp framework/examples/git-svn/svnexternals.sh .git/hooks/
   cp framework/examples/git-svn/svnexternals.py .git/hooks/
   pushd .git/hooks > /dev/null
-  chmod 755 svnexternals.py
-  ln -s svnexternals.py post-rewrite
-  ln -s svnexternals.py post-checkout
+  chmod 755 svnexternals.sh
+  ln -s svnexternals.sh post-rewrite
+  ln -s svnexternals.sh post-checkout
   popd > /dev/null
   popd > /dev/null
 
@@ -149,7 +150,7 @@ if wait $EXTERNALS_PID; then
   pushd basf2
   setuprel
   echo "Fetching svn:externals..."
-  ./.git/hooks/svnexternals.py
+  ./.git/hooks/svnexternals.sh
 
   popd > /dev/null
 else

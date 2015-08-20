@@ -57,13 +57,14 @@ r_subsample = array('d', [
     1.0,
 ])
 r_size = len(r_subsample)
-overall_eff = 0
+average_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
-if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.root'):
+workingFile = 'B2A801-FlavorTaggerR19795.root'
+if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     # root-file
-    rootfile = ROOT.TFile(workingDirectory + '/B2A801-FlavorTaggerR20571.root', 'UPDATE')
+    rootfile = ROOT.TFile(workingDirectory + '/' + workingFile, 'UPDATE')
     tree = rootfile.Get('B0tree')
 
     mcstatus = array('d', [-511.5, 0.0, 511.5])
@@ -71,11 +72,22 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
     ROOT.TH1.SetDefaultSumw2()
     # bekommt man mit GetBinError(), setzten mit SetBinError()
     # histogram contains the average r in each of 6 bins -> calculation see below
-    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins', 6,
+    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', 6,
                             r_subsample)
+    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', 6,
+                              r_subsample)
+    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', 6,
+                                 r_subsample)
     # histogram with number of entries in for each bin
-    histo_entries_per_bin = ROOT.TH1F('entries_per_bin',
-                                      'Events binned in r_subsample according to their r-value for B0 prob', 6, r_subsample)
+    histo_entries_per_bin = ROOT.TH1F(
+        'entries_per_bin',
+        'Events binned in r_subsample according to their r-value for B0 and B0bar prob',
+        6,
+        r_subsample)
+    histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0',
+                                        'Events binned in r_subsample according to their r-value for B0 prob', 6, r_subsample)
+    histo_entries_per_binB0bar = ROOT.TH1F('entries_per_binB0bar',
+                                           'Events binned in r_subsample according to their r-value for B0bar prob', 6, r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
     histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0',
                                      'Combiner network output [not equal to r] for true B0 (binning 100)', 100, 0.0, 1.0)
@@ -117,22 +129,16 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
 
     # filling the histograms
 
-    # filling with abs(qr) in one of 6 bins with its weight
-    tree.Project('Average_r', 'abs(B0_qrCombined)',
-                 'abs(B0_qrCombined)')
-    # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(B0_qrCombined)')
-
     # not necessary
     tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0', 'B0_qrMC>0')
-    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0bar', 'B0_qrMC<0')
+    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0bar', 'B0_qrMC<0 && B0_qrMC>-2')
 
     tree.Draw('B0_qrCombined>>BellePlot_B0', 'B0_qrMC>0 ')
-    tree.Draw('B0_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0')
-    tree.Draw('B0_qrCombined>>BellePlot_NoCut')
+    tree.Draw('B0_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0 && B0_qrMC>-2')
+    tree.Draw('B0_qrCombined>>BellePlot_NoCut', 'B0_qrMC>-2')
 
     tree.Draw('B0_qrCombined>>Calibration_B0', 'B0_qrMC>0')
-    tree.Draw('B0_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0')
+    tree.Draw('B0_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0 && B0_qrMC>-2')
 
     # filling histograms wrong efficiency calculation
     tree.Draw('B0_qrCombined>>BellePlot_B0_m0',
@@ -140,10 +146,28 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
     tree.Draw('B0_qrCombined>>BellePlot_B0_m1',
               'B0_qrMC>0 && B0_qrCombined<0')
     tree.Draw('B0_qrCombined>>BellePlot_B0_m2',
-              'B0_qrMC<0 && B0_qrCombined>0')
+              'B0_qrMC<0 && B0_qrCombined>0 && B0_qrMC>-2')
 
-    # producing the average r histogram
+    # filling with abs(qr) in one of 6 bins with its weight
+    # separate calculation for B0 and B0bar
+    treeB0 = tree.CopyTree('B0_qrMC>0 ')
+    treeB0bar = tree.CopyTree('B0_qrMC<0 && B0_qrMC>-2 ')
+    tree.Project('Average_r', 'abs(B0_qrCombined)',
+                 'abs(B0_qrCombined)')
+    treeB0.Project('Average_rB0', 'abs(B0_qrCombined)',
+                   'abs(B0_qrCombined)')
+    treeB0bar.Project('Average_rB0bar', 'abs(B0_qrCombined)',
+                      'abs(B0_qrCombined)')
+
+    # filling with abs(qr) in one of 6 bins
+    tree.Project('entries_per_bin', 'abs(B0_qrCombined)', 'B0_qrMC>-2')
+    tree.Project('entries_per_binB0', 'abs(B0_qrCombined)', 'B0_qrMC>0 ')
+    tree.Project('entries_per_binB0bar', 'abs(B0_qrCombined)', 'B0_qrMC<0 && B0_qrMC>-2 ')
+
+    # producing the average r histograms
     histo_avr_r.Divide(histo_entries_per_bin)
+    histo_avr_rB0.Divide(histo_entries_per_binB0)
+    histo_avr_rB0bar.Divide(histo_entries_per_binB0bar)
 
     # producing the calibration plots
     # Errors ok
@@ -161,37 +185,83 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
     print '****************** MEASURED EFFECTIVE EFFICIENCY ***************************************************'
     print '*                                                                                                  *'
     # get total number of entries
-    total_entries_B0 = histo_entries_per_bin.GetEntries()
-    tot_eff_eff_B0 = 0
-    event_fraction_B0 = array('f', [0] * r_size)
+    total_entries = histo_entries_per_bin.GetEntries()
+    total_entries_B0 = histo_entries_per_binB0.GetEntries()
+    total_entries_B0bar = histo_entries_per_binB0bar.GetEntries()
+    tot_eff_effB0 = 0
+    tot_eff_effB0bar = 0
+    event_fractionB0 = array('f', [0] * r_size)
+    event_fractionB0bar = array('f', [0] * r_size)
+    event_fractionTotal = array('f', [0] * r_size)
     rvalueB0 = array('f', [0] * r_size)
-    # wvalueB0 = array('f', [0]*7)
+    rvalueB0bar = array('f', [0] * r_size)
+    rvalueB0Average = array('f', [0] * r_size)
+    wvalue = array('f', [0] * r_size)
+    wvalueB0 = array('f', [0] * r_size)
+    wvalueB0bar = array('f', [0] * r_size)
+    wvalueDiff = array('f', [0] * r_size)
+    entries = array('f', [0] * r_size)
     entriesB0 = array('f', [0] * r_size)
+    entriesB0bar = array('f', [0] * r_size)
+    intervallEff = array('f', [0] * r_size)
     print '*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *'
     print '*                                                                                                  *'
+    print '* ------------------------------------------------------------------------------------------------ *'
+    print '*   r-interval        <r>        Efficiency        Event fraction         w         Delta_w        *'
+    print '* ------------------------------------------------------------------------------------------------ *'
     for i in range(1, r_size):
         # get the average r-value
-        rvalueB0[i] = histo_avr_r.GetBinContent(i)
+        rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
+        rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
+        rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
         # calculate the wrong tag fractin (only true if MC data good)
-        # wvalueB0[i] = (1 - rvalueB0[i])/2
-        entriesB0[i] = histo_entries_per_bin.GetBinContent(i)
+        wvalue[i] = (1 - rvalueB0Average[i]) / 2
+        wvalueB0[i] = (1 - rvalueB0[i]) / 2
+        wvalueB0bar[i] = (1 - rvalueB0bar[i]) / 2
+        wvalueDiff[i] = wvalueB0[i] - wvalueB0bar[i]
+        entries[i] = histo_entries_per_bin.GetBinContent(i)
+        entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
+        entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
         # fraction of events/all events
-        event_fraction_B0[i] = entriesB0[i] / total_entries_B0
-        print '*  Bin ' + str(i) + '    r-value: ' \
-            + '{:.3f}'.format(rvalueB0[i]), '    entries: ' \
-            + '{:.3f}'.format(event_fraction_B0[i] * 100) + ' %    (' \
-            + str(entriesB0[i]) + '/' + str(total_entries_B0) + ')'
+        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
+        event_fractionB0[i] = entriesB0[i] / total_entries_B0
+        event_fractionB0bar[i] = entriesB0bar[i] / total_entries_B0bar
+        intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] \
+            * rvalueB0Average[i]
+        print '* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' \
+            + '{:.3f}'.format(rvalueB0Average[i]) + '         ' \
+            + '{:.3f}'.format(intervallEff[i]) + '               ' \
+            + '{:.3f}'.format(event_fractionTotal[i]) + '            ' \
+            + '{:.3f}'.format(wvalue[i]) + '       ' \
+            + '{: .3f}'.format(wvalueDiff[i]) + '         *'
         # finally calculating the total effective efficiency
-        tot_eff_eff_B0 = tot_eff_eff_B0 + event_fraction_B0[i] * rvalueB0[i] \
+        tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] \
             * rvalueB0[i]
+        tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] \
+            * rvalueB0bar[i]
 
-    overall_eff = tot_eff_eff_B0
-    print '*'
-    print '*       ____________________________________________________________                               *'
-    print '*      |                                                            |                              *'
-    print '*        B0-TAGGER     TOTAL EFFECTIVE EFFICIENCY: ' \
-        + '{:.3f}'.format(tot_eff_eff_B0 * 100) + ' %   '
-    print '*      |____________________________________________________________|                              *'
+    average_eff = (tot_eff_effB0 + tot_eff_effB0bar) / 2
+    diff_eff = tot_eff_effB0 - tot_eff_effB0bar
+    print '* ------------------------------------------------------------------------------------------------ *'
+    print '*                                                                                                  *'
+    print '*    __________________________________________________________________________________________    *'
+    print '*   |                                                                                          |   *'
+    print '*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' \
+        + '{:.0f}'.format(total_entries) + '                                                 |   *'
+    print '*   |                                                                                          |   *'
+    print '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) \
+        + ' %                                              |   *'
+    print '*   |                                                                                          |   *'
+    print '*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' \
+        + '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' \
+        + '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1)  EffDiff=' \
+        + '{:^5.2f}'.format(diff_eff * 100) + ' % |   *'
+    print '*   |                                                                                          |   *'
+    print '*   | FLAVOR PERCENTAGE (MC):                  ' \
+        + '{:.2f}'.format(total_entries_B0 / total_entries * 100) + ' % (q=+1)  ' \
+        + '{:.2f}'.format(total_entries_B0bar / total_entries * 100) + ' % (q=-1)  Diff=' \
+        + '{:^5.2f}'.format((total_entries_B0 - total_entries_B0bar) / total_entries * 100) + ' %    |   *'
+    print '*   |__________________________________________________________________________________________|   *'
     print '*                                                                                                  *'
     print '****************************************************************************************************'
     print '*                                                                                                  *'
@@ -229,15 +299,15 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
     print '*                                                                                                  *'
 
     # write out the histograms
-    histo_avr_r.Write('', ROOT.TObject.kOverwrite)
-    histo_entries_per_bin.Write('', ROOT.TObject.kOverwrite)
+    # histo_avr_r.Write('', ROOT.TObject.kOverwrite)
+    # histo_entries_per_bin.Write('', ROOT.TObject.kOverwrite)
 
-    histo_Cnet_output_B0.Write('', ROOT.TObject.kOverwrite)
-    histo_Cnet_output_B0bar.Write('', ROOT.TObject.kOverwrite)
-    histo_belleplotB0.Write('', ROOT.TObject.kOverwrite)
-    histo_belleplotB0bar.Write('', ROOT.TObject.kOverwrite)
-    histo_calib_B0.Write('', ROOT.TObject.kOverwrite)
-    histo_calib_B0bar.Write('', ROOT.TObject.kOverwrite)
+    # histo_Cnet_output_B0.Write('', ROOT.TObject.kOverwrite)
+    # histo_Cnet_output_B0bar.Write('', ROOT.TObject.kOverwrite)
+    # histo_belleplotB0.Write('', ROOT.TObject.kOverwrite)
+    # histo_belleplotB0bar.Write('', ROOT.TObject.kOverwrite)
+    # histo_calib_B0.Write('', ROOT.TObject.kOverwrite)
+    # histo_calib_B0bar.Write('', ROOT.TObject.kOverwrite)
 
     # produce a pdf
     ROOT.gStyle.SetOptStat(0)
@@ -283,6 +353,8 @@ if Belle2.FileSystem.findFile(workingDirectory + '/B2A801-FlavorTaggerR20571.roo
     diag.Draw('SAME')
     Canvas2.Update()
     Canvas2.SaveAs(workingDirectory + '/' + 'PIC_Calibration_B0.pdf')
+
+    rootfile.Close()
 
 # **********************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
@@ -349,26 +421,35 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
 
         # per definiton that input is not comparable to the network output, this has to be transformed.
         # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
-        hist_prob = ROOT.TH1F('Probability_' + category,
-                              'Transformed to probability (' + category + ')',
-                              50, 0.0, 1.0)
+        hist_probB0 = ROOT.TH1F('ProbabilityB0_' + category,
+                                'Transformed to probability (B0) (' + category + ')',
+                                50, 0.0, 1.0)
+        hist_probB0bar = ROOT.TH1F('ProbabilityB0bar_' + category,
+                                   'Transformed to probability (B0bar) (' + category + ')',
+                                   50, 0.0, 1.0)
         # qr output from -1 to 1 -> transformation below
-        hist_qr = ROOT.TH1F('QR_' + category, 'Transformed to qr (' + category
-                            + ')', 50, -1.0, 1.0)
+        hist_qrB0 = ROOT.TH1F('QRB0_' + category, 'Transformed to qr (B0)(' + category
+                              + ')', 50, -1.0, 1.0)
+        hist_qrB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qr (B0bar) (' + category
+                                 + ')', 50, -1.0, 1.0)
         # histogram for abs(qr), i.e. this histogram contains the r-values -> transformation below
         # also used to get the number of entries, sorted into 6 bins
-        hist_absqr = ROOT.TH1F('AbsQR_' + category, 'Abs(qr) (' + category
-                               + ')', 6, rr_subsample)
+        hist_absqrB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qr)(B0) (' + category
+                                 + ')', 6, rr_subsample)
+        hist_absqrB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qr) (B0bar) (' + category
+                                    + ')', 6, rr_subsample)
         # histogram contains at the end the average r values -> calculation below
         # sorted into 6 bins
-        hist_aver_r = ROOT.TH1F('AverageR_' + category, 'A good one'
-                                + category, 6, rr_subsample)
+        hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)'
+                                  + category, 6, rr_subsample)
+        hist_aver_rB0bar = ROOT.TH1F('AverageRB0bar_' + category, 'A good one (B0bar)'
+                                     + category, 6, rr_subsample)
         # ****** TEST OF CALIBRATION ******
         # for calibration plot we want to have
         hist_all = ROOT.TH1F('All_' + category,
                              'Input Signal (B0) and Background (B0Bar)'
                              + category + ' (binning 50)', 50, 0.0, 1.0)
-        tree2.Draw(categoryInput + '>>All_' + category)
+        tree2.Draw(categoryInput + '>>All_' + category, 'qrCombined>-2')
         hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category,
                                   'Calibration Plot for true B0' + category
                                   + ' (binning 50)', 50, 0.0, 1.0)
@@ -378,7 +459,7 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         # fill signal
         tree2.Draw(categoryInput + '>>Signal_' + category, 'qrCombined>0.5')
         # fill background
-        tree2.Draw(categoryInput + '>>Background_' + category, 'qrCombined<0.5'
+        tree2.Draw(categoryInput + '>>Background_' + category, 'qrCombined>-2 && qrCombined<0.5'
                    )
 
         # ****** produce the input plots from combiner level ******
@@ -421,8 +502,10 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         # ***** TEST OF CALIBRATION ******
 
         # initialize some arrays
-        purity = array('d', [0] * 51)
-        purity2 = array('d', [0] * 51)
+        purityB0 = array('d', [0] * 51)
+        dilutionB02 = array('d', [0] * 51)
+        purityB0bar = array('d', [0] * 51)
+        dilutionB0bar2 = array('d', [0] * 51)
         signal = array('d', [0] * 51)
         back = array('d', [0] * 51)
         weight = array('d', [0] * 51)
@@ -436,65 +519,95 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
 
             # avoid dividing by zero
             if signal[i] + back[i] == 0:
-                purity[i] = 0
-                purity2[i] = 0
+                purityB0[i] = 0
+                dilutionB02[i] = 0
+                purityB0bar[i] = 0
+                dilutionB0bar2[i] = 0
             else:
-                purity[i] = signal[i] / (signal[i] + back[i])
-                purity2[i] = -1 + 2 * signal[i] / (signal[i] + back[i])
+                purityB0[i] = signal[i] / (signal[i] + back[i])
+                dilutionB02[i] = -1 + 2 * signal[i] / (signal[i] + back[i])
+
+                purityB0bar[i] = back[i] / (signal[i] + back[i])
+                dilutionB0bar2[i] = -1 + 2 * back[i] / (signal[i] + back[i])
 
             # filling histogram with probabilty from 0 to 1
-            hist_prob.Fill(purity[i], weight[i])
+            hist_probB0.Fill(purityB0[i], signal[i])
+            hist_probB0bar.Fill(purityB0bar[i], back[i])
+
             # filling histogram with qr from -1 to 1
-            hist_qr.Fill(purity2[i], weight[i])
+            hist_qrB0.Fill(dilutionB02[i], signal[i])
+            hist_qrB0bar.Fill(dilutionB0bar2[i], back[i])
 
             # filling histogram with abs(qr), i.e. this histogram contains the r-values (not qr)
-            hist_absqr.Fill(abs(purity2[i]), weight[i])
+            hist_absqrB0.Fill(abs(dilutionB02[i]), signal[i])
+            hist_absqrB0bar.Fill(abs(dilutionB0bar2[i]), back[i])
             # filling histogram with abs(qr) special weighted - needed for average r calculation
-            hist_aver_r.Fill(abs(purity2[i]), abs(purity2[i]) * weight[i])
+            hist_aver_rB0.Fill(abs(dilutionB02[i]), abs(dilutionB02[i]) * signal[i])
+            hist_aver_rB0bar.Fill(abs(dilutionB0bar2[i]), abs(dilutionB0bar2[i]) * back[i])
 
-        # hist_aver_r contains now the average r-value
-        hist_aver_r.Divide(hist_absqr)
-
+        # hist_aver_rB0bar contains now the average r-value
+        hist_aver_rB0.Divide(hist_absqrB0)
+        hist_aver_rB0bar.Divide(hist_absqrB0bar)
         # now calculating the efficiency
 
         # calculating number of events
-        tot_entries = 0
-        for i in range(1, 8):
-            tot_entries = tot_entries + hist_absqr.GetBinContent(i)
+        tot_entriesB0 = 0
+        tot_entriesB0bar = 0
+        for i in range(1, rr_size):
+            tot_entriesB0 = tot_entriesB0 + hist_absqrB0.GetBinContent(i)
+            tot_entriesB0bar = tot_entriesB0bar + hist_absqrB0bar.GetBinContent(i)
         # initializing some arrays
-        tot_eff_eff = 0
-        event_fraction = array('f', [0] * rr_size)
-        rvalue = array('f', [0] * rr_size)
-        wvalue = array('f', [0] * rr_size)
-        entries = array('f', [0] * rr_size)
+        tot_eff_effB0 = 0
+        tot_eff_effB0bar = 0
+        event_fractionB0 = array('f', [0] * rr_size)
+        event_fractionB0bar = array('f', [0] * rr_size)
+        rvalueB0 = array('f', [0] * rr_size)
+        rvalueB0bar = array('f', [0] * rr_size)
+        # wvalue = array('f', [0] * rr_size)
+        entriesB0 = array('f', [0] * rr_size)
+        entriesB0bar = array('f', [0] * rr_size)
 
         for i in range(1, rr_size):
-            rvalue[i] = hist_aver_r.GetBinContent(i)
-            wvalue[i] = (1 - rvalue[i]) / 2
-            entries[i] = hist_absqr.GetBinContent(i)
-            event_fraction[i] = entries[i] / tot_entries
-            # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalue[i]), 'entries: ' +
-            # str(event_fraction[i] * 100) + ' % (' + str(entries[i]) + '/' +
-            # str(tot_entries) + ')'
-            tot_eff_eff = tot_eff_eff + event_fraction[i] * rvalue[i] \
-                * rvalue[i]
+            rvalueB0[i] = hist_aver_rB0.GetBinContent(i)
+            rvalueB0bar[i] = hist_aver_rB0bar.GetBinContent(i)
+            # wvalue[i] = (1 - rvalueB0[i]) / 2
+            entriesB0[i] = hist_absqrB0.GetBinContent(i)
+            entriesB0bar[i] = hist_absqrB0bar.GetBinContent(i)
+            event_fractionB0[i] = entriesB0[i] / tot_entriesB0
+            event_fractionB0bar[i] = entriesB0bar[i] / tot_entriesB0bar
+            # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalueB0[i]), 'entriesB0: ' +
+            # str(event_fractionB0[i] * 100) + ' % (' + str(entriesB0[i]) + '/' +
+            # str(tot_entriesB0) + ')'
+            tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] \
+                * rvalueB0[i]
+            tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] \
+                * rvalueB0bar[i]
+        effDiff = tot_eff_effB0 - tot_eff_effB0bar
+        effAverage = (tot_eff_effB0 + tot_eff_effB0bar) / 2
 
-        print '*    ' + '{: > 8.3f}'.format(tot_eff_eff * 100) + ' %' \
-            + '{:>85}'.format(category + '                     *')
+        print '* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' \
+            + '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' \
+            + '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' \
+            + '   EffDiff=' + '{: 8.4f}'.format(effDiff * 100) + ' %' \
+            + '{:>13}'.format(category + ' *')
 
         hist_signal.Write('', ROOT.TObject.kOverwrite)
         hist_background.Write('', ROOT.TObject.kOverwrite)
-        hist_prob.Write('', ROOT.TObject.kOverwrite)
-        hist_qr.Write('', ROOT.TObject.kOverwrite)
-        hist_absqr.Write('', ROOT.TObject.kOverwrite)
-        hist_aver_r.Write('', ROOT.TObject.kOverwrite)
+        hist_probB0.Write('', ROOT.TObject.kOverwrite)
+        hist_probB0bar.Write('', ROOT.TObject.kOverwrite)
+        hist_qrB0.Write('', ROOT.TObject.kOverwrite)
+        hist_qrB0bar.Write('', ROOT.TObject.kOverwrite)
+        hist_absqrB0.Write('', ROOT.TObject.kOverwrite)
+        hist_absqrB0bar.Write('', ROOT.TObject.kOverwrite)
+        hist_aver_rB0.Write('', ROOT.TObject.kOverwrite)
+        hist_aver_rB0bar.Write('', ROOT.TObject.kOverwrite)
         hist_all.Write('', ROOT.TObject.kOverwrite)
         hist_calib_B0.Write('', ROOT.TObject.kOverwrite)
 
-    if overall_eff != 0:
-        print '*    -------------------------------------------------------------------------'
-        print '*    ' + '{: > 8.3f}'.format(overall_eff * 100) + ' %' \
-            + '{:>85}'.format('TOTAL' + '                     *')
+    # if average_eff != 0:
+        # print '*    -------------------------------------------------------------------------'
+        # print '*    ' + '{: > 8.2f}'.format(average_eff * 100) + ' %' \
+        # + '{:>85}'.format('TOTAL' + '                      *')
 
     print '*                                                                                                  *'
     print '****************************************************************************************************'

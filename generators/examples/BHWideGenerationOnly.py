@@ -44,6 +44,9 @@ bhwide.param('MinEnergy', 0.10)
 # Vacuum polarization switch: off, eidelman, bhlumi and burkhardt (default)
 bhwide.param('VacuumPolarization', 'burkhardt')
 
+# EW corrections on (default) or off
+bhwide.param('WeakCorrections', True)
+
 # Maximum weight, default=3.0, for <0: automatic search
 bhwide.param('WtMax', 3.0)
 

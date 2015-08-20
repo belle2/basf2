@@ -62,6 +62,7 @@ namespace Belle2 {
     std::vector<double>
     m_ScatteringAngleRangeElectron; /**< Min [0] and Max [1] value for the scattering angle [deg] of the electron. */
 
+    bool m_weakCorrections;  /**< EW corrections on/off*/
     std::string m_vacPolString; /**< Vacuum polarization as string*/
     BHWide::PhotonVacPolarization m_vacPol; /**< Vacuum polarization */
     double m_eMin; /**< Minimum energy for leptons in the final state, in GeV. */

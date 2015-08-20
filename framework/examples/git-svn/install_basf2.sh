@@ -45,22 +45,13 @@ echo " $EXTERNALS_VERSION."
 
 if [ ! -d basf2 ]; then
   echo "================================================================================"
-  echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history (.git requires about 900MB for storing the entire history, 220MB for the latest alone). Press Ctrl-c to abort."
+  echo "How much of the SVN history do you want to import? Select $CURRENT_REV for a quick checkout with history starting from the current revision, or 'all' for the entire history which will take a few hours. .git requires about 1GB for storing the entire history, or 200MB for only the latest revision. Press Ctrl-c to abort."
   select SVN_CLONE_FROM in "all" $CURRENT_REV; do
     echo "Selected: $SVN_CLONE_FROM"
     break
   done
 fi
 
-#echo "Looking for available externals..."
-#AVAILABLE_EXTERNALS=`get_externals.sh | head -n -1` #skip development, added manually
-#
-#echo "================================================================================"
-#echo "Please select your preferred externals version. Ctrl-c to abort."
-#select EXTERNALS_VERSION in $AVAILABLE_EXTERNALS development; do
-#  echo "Selected: $EXTERNALS_VERSION"
-#  break
-#done
 
 if [ ! -d externals/$EXTERNALS_VERSION ]
 then

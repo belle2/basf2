@@ -228,7 +228,6 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 
   // Ignore hits with negative drift times.  For these, the
   // TDCCountTranslator returns a negative drift length.
-  //  if (mL == -999 || mR == -999) {
   if (mL < 0. || mR < 0.) {
     B2DEBUG(150, "Ignoring hit with negative drift time.");
     mopL->setWeight(0);

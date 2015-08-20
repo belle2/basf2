@@ -5,18 +5,11 @@
 
 #include <TBase64.h>
 #include <TObject.h>
-#include <TBufferXML.h>
 #include <TMessage.h>
 
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace Belle2;
-
-std::string Stream::serializeXML(const TObject* obj)
-{
-  const TString& xmlString = TBufferXML::ConvertToXML(obj);
-  return std::string(xmlString.Data());
-}
 
 std::string Stream::serializeAndEncode(const TObject* obj)
 {
@@ -53,11 +46,6 @@ std::string Stream::escapeXML(const std::string& xmlString)
   std::string newString(xmlString);
   boost::replace_all(newString, "]]>", "]]]]><![CDATA[>");
   return "<![CDATA[" + newString + "]]>";
-}
-
-TObject* Stream::deserializeXML(const std::string& data)
-{
-  return TBufferXML::ConvertFromXML(data.c_str());
 }
 
 TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)

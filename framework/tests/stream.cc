@@ -56,39 +56,6 @@ namespace {
     checkObject(dynamic_cast<const RelationContainer*>(detector.getTObject("RelationContainer")));
   }
 
-
-  /** Check XML conversion. */
-  TEST(StreamTest, XML)
-  {
-    TVector3 v(1.0, 2.0, 3.0);
-    std::string vStr = Stream::serializeXML(&v);
-    //B2INFO(vStr);
-
-    //restore
-    TObject* obj = Stream::deserializeXML(vStr);
-    TVector3* v2 = dynamic_cast<TVector3*>(obj);
-    ASSERT_NE(v2, nullptr);
-    EXPECT_TRUE(*v2 == v);
-
-    //something more complex
-    RelationContainer* relCont = createObject();
-
-    std::string relStr = Stream::serializeXML(relCont);
-    //B2INFO(relStr);
-    obj = Stream::deserializeXML(relStr);
-    checkObject(dynamic_cast<const RelationContainer*>(obj));
-
-    //creating file for next test..
-    /*
-    std::ofstream file("object.xml");
-    file << Stream::escapeXML(relStr);
-    */
-
-    //try converting something broken
-    obj = Stream::deserializeXML("this is not actually XML!");
-    EXPECT_FALSE(obj != NULL);
-  }
-
   /** Check raw conversion. */
   TEST(StreamTest, raw)
   {
@@ -120,17 +87,6 @@ namespace {
     std::string truncated = vStr.substr(0, 10);
     TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
     EXPECT_TRUE(broken_obj == NULL);
-  }
-  /** Read things from gearbox. */
-  TEST(StreamTest, GearboxXML)
-  {
-    Gearbox& gb = Gearbox::getInstance();
-    vector<string> backends;
-    backends.push_back("file:/framework/tests/");
-    gb.setBackends(backends);
-    gb.open("object.xml");
-
-    checkGbContents();
   }
 
   /** Read things from gearbox. */

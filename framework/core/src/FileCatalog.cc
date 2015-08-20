@@ -10,44 +10,14 @@
 
 #include <framework/core/FileCatalog.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <boost/filesystem.hpp>
 #include <fstream>
-#include <chrono>
-#include <random>
-#include <sys/file.h>
 
 
 using namespace Belle2;
 namespace fs = boost::filesystem;
 
-
-FileCatalog::Lock::Lock(std::string fileName)
-{
-  m_file = open(fileName.c_str(), O_RDWR | O_CREAT, 0640);
-}
-
-FileCatalog::Lock::~Lock()
-{
-  if (m_file >= 0) close(m_file);
-}
-
-bool FileCatalog::Lock::lock(int timeout)
-{
-  if (m_file < 0) return false;
-
-  auto const maxtime = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
-  std::default_random_engine random;
-  std::uniform_int_distribution<int> uniform(1, 100);
-
-  while (std::chrono::steady_clock::now() < maxtime) {
-    int lock = flock(m_file, LOCK_EX | LOCK_NB);
-    if (lock == 0) return true;
-    auto next = std::chrono::steady_clock::now() + std::chrono::milliseconds(uniform(random));
-    while (std::chrono::steady_clock::now() < next);
-  }
-
-  return false;
-}
 
 
 FileCatalog& FileCatalog::Instance()
@@ -83,7 +53,7 @@ FileCatalog::FileCatalog() : m_fileName("")
   std::ifstream ifile(m_fileName.c_str());
   if (!ifile.good()) {
     B2INFO("Creating file catalog " << m_fileName);
-    Lock lock(m_fileName);
+    FileSystem::Lock lock(m_fileName);
     if (!lock.lock()) {
       B2ERROR("Creation of file catalog " << m_fileName << " failed.");
       m_fileName = "";
@@ -144,7 +114,7 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
   if (m_fileName.empty()) return false;
 
   // get lock for write access to file catalog
-  Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName);
   if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
@@ -193,7 +163,7 @@ bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
   if (m_fileName.empty()) return false;
 
   // get lock for read access to file catalog
-  Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName);
   if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
@@ -221,7 +191,7 @@ bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
   if (m_fileName.empty()) return false;
 
   // get lock for read access to file catalog
-  Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName);
   if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;
@@ -275,7 +245,7 @@ bool FileCatalog::getParentMetaData(int level, int id, FileMetaData& metaData, P
   if (level == 0) return true;
 
   // get lock for read access to file catalog
-  Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName);
   if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;

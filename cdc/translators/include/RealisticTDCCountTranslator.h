@@ -43,7 +43,7 @@ namespace Belle2 {
        * @param z                     z-position on the wire (cm).
        * @param alpha                 Track incident angle in r-phi plane (rad).
        * @param theta                 Track incident angle in s-z plane (=polar angle) (rad).
-       * @return Drift length (cm) if drift time >= 0; v*(drift time) (i.e. negative value) otherwise, where v is nominal drift velocity (=getNominalDriftVelocity() of this class) (cm/ns).
+       * @return Drift length (cm) if drift time >= 0; v*(drift time) (i.e. negative value) otherwise, where v is set to one (cm/ns) for simplicity.
        */
       float getDriftLength(unsigned short tdcCount,
                            const WireID& wireID        = WireID(),
@@ -70,14 +70,6 @@ namespace Belle2 {
                                      float z = 0,
                                      float alpha = 0,
                                      float = static_cast<float>(TMath::Pi() / 2.));
-
-      /**
-       * Get nominal drift velocity (cm/ns).
-       */
-      inline float getNominalDriftVelocity() const
-      {
-        return m_nominalDriftVelocity;
-      }
 
     private:
       /**
@@ -115,10 +107,9 @@ namespace Belle2 {
       const float m_tdcBinWidth;
 
       /**
-       * Nominal drift velocity (cm/ns).
-       * N.B. The declaration should be after m_cdcp for proper initialization.
+       * Conv. factor to 'drift length' (cm/ns) when drift time < 0.
        */
-      const float m_nominalDriftVelocity;
+      const float m_vFactor;
     };
   }
 }

@@ -13,7 +13,7 @@ namespace Belle2 {
   class SemaphoreLocker {
   public:
     /** Lock the given semaphore. */
-    SemaphoreLocker(int semId): m_id(semId) { lock(); }
+    explicit SemaphoreLocker(int semId): m_id(semId) { lock(); }
     /** Unlock. */
     ~SemaphoreLocker() { unlock(); }
 

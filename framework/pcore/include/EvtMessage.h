@@ -50,7 +50,7 @@ namespace Belle2 {
     const static unsigned int c_MaxEventSize = 200000000;
 
     /** build EvtMessage from existing buffer (does not take ownership). */
-    EvtMessage(char* buf = NULL);
+    explicit EvtMessage(char* buf = NULL);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
     /** Copy constructor (m_data is copied). */

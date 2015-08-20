@@ -23,7 +23,7 @@ namespace Belle2 {
   class MsgHandler {
   public:
     /** Constructor */
-    MsgHandler(int complevel);
+    explicit MsgHandler(int complevel);
     /** Destructor */
     virtual ~MsgHandler();
 

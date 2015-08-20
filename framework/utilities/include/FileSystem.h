@@ -52,7 +52,7 @@ namespace Belle2 {
        * Construct a Lock object for the given file
        * @param fileName  Name of the file to be locked
        */
-      Lock(std::string fileName);
+      explicit Lock(std::string fileName);
 
       /**
        * Destructor. Releases the lock

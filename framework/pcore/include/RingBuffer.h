@@ -39,7 +39,7 @@ namespace Belle2 {
      *
      * @param size Ring buffer size in integers (!)
      */
-    RingBuffer(int size = c_DefaultSize);
+    explicit RingBuffer(int size = c_DefaultSize);
     /** Constructor to create/attach named shared memory in global space */
     RingBuffer(const char* name, unsigned int size = 0);     // Create / Attach Ring buffer
     /** Constructor by attaching to an existing shared memory */

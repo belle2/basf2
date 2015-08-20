@@ -514,7 +514,6 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     info = (TStreamerInfo*)lnk->GetObject();
 
     int ovlap = 0;
-    vector<string>::iterator itr;
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;
@@ -548,7 +547,6 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     info = (TStreamerInfo*)lnk->GetObject();
 
     int ovlap = 0;
-    vector<string>::iterator itr;
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;

@@ -18,8 +18,6 @@
 
 namespace Belle2 {
   namespace ECL {
-
-
     /** The ECLDigitizer module.
      *
      * This module is responsible to digitize all hits found in the ECL from ECLHit
@@ -42,11 +40,7 @@ namespace Belle2 {
        \endcorrelationdiagram
 
      */
-
-
-
     class ECLDigitizerModule : public Module {
-
     public:
 
       /** Constructor.
@@ -76,27 +70,37 @@ namespace Belle2 {
       /** Free memory */
       virtual void terminate();
 
-      /** read Shaper-DSP data from root file */
-      void readDSPDB();
-
     private:
-      typedef boost::multi_array<double, 2> array2d;
+      static constexpr int        m_nch = 8736; // total number of electronic channels (crystals) in calorimeter
+      static constexpr double    m_tick = 24.*12. / 508.; // == 72/127 digitization clock tick (in microseconds ???)
+      static constexpr int       m_ntrg = 144; // number of trigger counts per ADC clock tick
 
-      /** Event number */
-      int    m_nEvent;
+      static constexpr int       m_nsmp = 31; // number of ADC measurements for signal fitting
+      static constexpr double    m_tmin = -15; // lower range of the signal fitting region in ADC clocks
 
-      std::vector<double> m_ft; // shape function looking up table
+      static constexpr int         m_nl = 48; // length of samples signal in number of ADC clocks
+      static constexpr int         m_ns = 32; // number of samples per ADC clock
 
-      // Lookup Table to get aux matrices used in WF fit algorithm
-      std::vector<int> m_funcTable;
-      std::vector<int> m_eclWaveformDataTable;
-      std::vector<int> m_eclWFAlgoParamsTable;
-      std::vector<int> m_eclNoiseDataTable;
-      std::vector<ECLWFAlgoParams> m_eclWFAlgoParams;
-      std::vector<ECLNoiseData> m_eclNoiseData;
+      static constexpr int        m_ndt = 96; // number of points per ADC tick where signal fit procedure parameters are evaluated
 
-      typedef int int_array_192x16_t[192][16];
-      typedef int int_array_24x16_t[24][16];
+      struct signalsample_t; // forward declaration
+
+      struct adccounts_t {
+        double total; // total deposition (sum of m_s array)
+        double c[m_nsmp]; // flash ADC measurements
+        void AddHit(const double a, const double t0, const signalsample_t& q);
+      };
+
+      struct signalsample_t {
+        double m_sumscale; // energy deposit in fitting window scale factor
+        double m_ft[m_nl * m_ns];
+
+        void InitSample(const float*);
+        double Accumulate(const double, const double, double*) const;
+      };
+
+      typedef int int_array_192x16_t[2 * m_ndt][16];
+      typedef int int_array_24x16_t[m_ndt / 4][16];
       typedef short int shortint_array_16_t[16];
       typedef std::pair<unsigned int, unsigned int> uint_pair_t;
 
@@ -109,12 +113,32 @@ namespace Belle2 {
         shortint_array_16_t id;
       };
 
-      /* Fit algorihtm parameters shared by group of crystals */
+      struct crystallinks_t { // offsets for storages of ECL channels
+        short unsigned int idn;
+        short unsigned int inoise;
+        short unsigned int ifunc;
+        short unsigned int iss;
+      };
+
+      std::vector<crystallinks_t> m_tbl;
+
+      // Fit algorihtm parameters shared by group of crystals
       std::vector<algoparams_t> m_idn;
       std::vector<fitparams_t> m_fitparams;
+      std::vector<ECLNoiseData> m_noise;
+      std::vector<signalsample_t> m_ss;
+
+      // Storage for adc hits from entire calorimeter (8736 crystals)
+      std::vector<adccounts_t> m_adc;
 
       void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
-                              int& m_lar, int& m_ltr, int& m_lq);
+                              int& m_lar, int& m_ltr, int& m_lq) const ;
+
+      /** read Shaper-DSP data from root file */
+      void readDSPDB();
+
+      /** Event number */
+      int    m_nEvent;
 
       /** Module parameters */
       bool m_background;

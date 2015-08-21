@@ -88,6 +88,7 @@ CKFCdcToVxdModule::CKFCdcToVxdModule() :
   addParam("MaxChi2Increment", m_maxChi2Increment, "maximum chi2 per added hit in the CKF", 10.0);
   addParam("HolePenalty", m_holePenalty, "Effective chi2/ndof penalty in CKF quality for a hole", 10.0);
   addParam("NMax", m_Nmax, "Maximum number of propagated candidates per step in CKF", 10);
+  addParam("HitMultiplier", m_hitMultiplier, "Extra weight multiplier for hits", 1.0);
 
   // Input
   addParam("GFTrackColName", m_GFTrackColName, "Name of genfit::Track collection (input)", std::string(""));
@@ -138,7 +139,8 @@ static bool extrapolateToCylinder(float radius, genfit::Track* track, TVector3& 
   return true;
 }
 
-bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, unsigned searchLayer, StoreArray<PXDCluster>& clusters,
+bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+                                              StoreArray<PXDCluster>& clusters,
                                               std::vector<genfit::AbsMeasurement*>& hits)
 {
   B2DEBUG(95, "<----> PXD extrapolateToLayer " << searchLayer << " <---->")
@@ -184,7 +186,8 @@ bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, unsigned sea
   return true;
 }
 
-bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, unsigned searchLayer, StoreArray<SVDCluster>& clusters,
+bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+                                              StoreArray<SVDCluster>& clusters,
                                               bool isU, std::vector<genfit::AbsMeasurement*>& hits)
 {
   B2DEBUG(95, "<----> extrapolateToLayer " << searchLayer << " <---->")
@@ -329,21 +332,22 @@ bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, unsigned sea
   return true;
 }
 
-bool CKFCdcToVxdModule::findHits(genfit::Track* track, unsigned counter, std::vector<genfit::AbsMeasurement*>& hits, void* data)
+bool CKFCdcToVxdModule::findHits(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned counter,
+                                 std::vector<genfit::AbsMeasurement*>& hits, void* data)
 {
   CKFCdcToVxdModule* module = (CKFCdcToVxdModule*) data;
   if ((counter == 0) || (counter == 1))
-    return module->extrapolateToSVDLayer(track, 6, *module->svdClusters, (counter % 2) == true, hits);
+    return module->extrapolateToSVDLayer(track, current, 6, *module->svdClusters, (counter % 2) == true, hits);
   if ((counter == 2) || (counter == 3))
-    return module->extrapolateToSVDLayer(track, 5, *module->svdClusters, (counter % 2) == true, hits);
+    return module->extrapolateToSVDLayer(track, current, 5, *module->svdClusters, (counter % 2) == true, hits);
   if ((counter == 4) || (counter == 5))
-    return module->extrapolateToSVDLayer(track, 4, *module->svdClusters, (counter % 2) == true, hits);
+    return module->extrapolateToSVDLayer(track, current, 4, *module->svdClusters, (counter % 2) == true, hits);
   if ((counter == 6) || (counter == 7))
-    return module->extrapolateToSVDLayer(track, 3, *module->svdClusters, (counter % 2) == true, hits);
+    return module->extrapolateToSVDLayer(track, current, 3, *module->svdClusters, (counter % 2) == true, hits);
   if (counter == 8)
-    return module->extrapolateToPXDLayer(track, 3, *module->pxdClusters, hits);
+    return module->extrapolateToPXDLayer(track, current, 2, *module->pxdClusters, hits);
   if (counter == 9)
-    return module->extrapolateToPXDLayer(track, 3, *module->pxdClusters, hits);
+    return module->extrapolateToPXDLayer(track, current, 1, *module->pxdClusters, hits);
   return false;
 }
 
@@ -489,7 +493,7 @@ void CKFCdcToVxdModule::event()
     if (isCdcOnly(crnt)) {
       trkInfo.cdconly = true;
       B2DEBUG(100, "<----> CDCOnly Track Found Running CKF " << " <--->");
-      CKF ckf(&crnt, findHits, (void*) this, m_maxChi2Increment, m_maxHoles, m_holePenalty, m_Nmax);
+      CKF ckf(&crnt, findHits, (void*) this, m_maxChi2Increment, m_maxHoles, m_holePenalty, m_Nmax, m_hitMultiplier);
       genfit::Track* newTrk = ckf.processTrack();
       if (newTrk) {
         storeTrack(*newTrk, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);
@@ -536,7 +540,7 @@ void CKFCdcToVxdModule::event()
               }
               stHitInfo.layer = cluster->getSensorID().getLayerNumber();
               stHitInfo.tru = truHit;
-              stHitInfo.isPxd = false;
+              stHitInfo.isPxd = true;
 
               HitInfo->Fill();
             }

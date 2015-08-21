@@ -28,8 +28,9 @@
 
 using namespace Belle2;
 
-CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*),
-         void* _data, double _maxChi2Increment, int _maxHoles, double _holePenalty, int _Nmax) :
+CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, std::vector<CKFPartialTrack*>&, unsigned,
+                                                  std::vector<genfit::AbsMeasurement*>&, void*),
+         void* _data, double _maxChi2Increment, int _maxHoles, double _holePenalty, int _Nmax, double _hitMultiplier) :
   seedTrack(_track),
   findHits(_findHits),
   data(_data),
@@ -37,13 +38,15 @@ CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, unsigned, std:
   maxHoles(_maxHoles),
   maxChi2Increment(_maxChi2Increment),
   holePenalty(_holePenalty),
-  Nmax(_Nmax)
+  Nmax(_Nmax),
+  hitMultiplier(_hitMultiplier),
+  tracks(0)
 {
 }
 
 genfit::Track* CKF::processTrack()
 {
-  auto tracks = new std::vector<CKFPartialTrack*>;
+  tracks = new std::vector<CKFPartialTrack*>;
   tracks->push_back(new CKFPartialTrack(*seedTrack));
 
   auto fitter = new genfit::KalmanFitter();
@@ -58,7 +61,7 @@ genfit::Track* CKF::processTrack()
     // only process steps where we find new hits, take it from the
     // seed track because we assume we have a very wide window.
     std::vector<genfit::AbsMeasurement*> newHits;
-    if (!findHits(seedTrack, step, newHits, data))
+    if (!findHits(seedTrack, *tracks, step, newHits, data))
       break;
 
     if (newHits.size() == 0) {
@@ -96,7 +99,6 @@ genfit::Track* CKF::processTrack()
       if (newHits.size() != 0) {
         for (auto& hit : newHits) {
           CKFPartialTrack* newtrack = new CKFPartialTrack(*track);
-          newtrack->addHit();
           auto newhit = hit->clone();
           newtrack->insertMeasurement(newhit, 0);
           try {
@@ -109,6 +111,7 @@ genfit::Track* CKF::processTrack()
               TVector3 pos, mom, pos2, mom2;
               track->getFittedState().getPosMomCov(pos, mom, cov);
               up0->getPosMomCov(pos2, mom2, cov2);
+              newtrack->addHit(up0->getChiSquareIncrement() / up0->getNdf());
 
               chi2Map[hit->getHitId()] = up0->getChiSquareIncrement();
               B2DEBUG(70, "--- In CKF::processTrack(): Added partial track step " << newtrack->getFitStatus(
@@ -152,6 +155,7 @@ genfit::Track* CKF::processTrack()
   for (unsigned i = 0; i < tracks->size(); ++i)
     delete tracks->at(i);
   delete tracks;
+  tracks = 0;
   delete fitter;
 
   // everything is deleted so i hope we can delete the hits!
@@ -232,19 +236,26 @@ double CKF::quality(CKFPartialTrack* track)
   // B2DEBUG(90, "----- In CKF::quailty(): @ " << " " << thisChi2);
   // return thisChi2;
 
-  double Q = (double) track->addedHits() - (double) track->trueHoles() - (1.0f / holePenalty) * thisChi2_Ndf;
+  double Q = (hitMultiplier * (double) track->addedHits()) - (double) track->trueHoles() - (1.0f / holePenalty) * thisChi2_Ndf;
   B2DEBUG(90, "-- In CKF::quality(): @ " << " " << thisChi2 << " " << ndf << " " << thisChi2 / ndf <<
           " sum(chi2/ndf) " << thisChi2_Ndf <<
           " Hole Penalty: " << track->trueHoles() * holePenalty << " Hits: " << track->addedHits() << " Q " << Q);
   return Q;
 }
 
+bool CKF::preBestQuality(CKFPartialTrack* track)
+{
+  if (track->lowestChi2() > 1)
+    return false;
+  return true;
+}
+
 CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
 {
   if (!tracks || tracks->size() == 0)
     return 0;
-  unsigned iBest = 0;
-  double QBest = quality(tracks->at(0));
+  int iBest = -1;
+  double QBest = quality(tracks->at(0)) - 1.;
   for (unsigned i = 1; i < tracks->size(); ++i) {
     double thisQ = quality(tracks->at(i));
     if (thisQ > QBest) {
@@ -254,18 +265,23 @@ CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
   }
   B2DEBUG(90, "-- In CKF::bestTrack(): Best track @ " << iBest);
 
+  if (iBest < 0)
+    return 0;
   return tracks->at(iBest);
 }
 
 void CKF::orderTracksAndTrim(std::vector<CKFPartialTrack*>*& tracks)
 {
+  std::sort(tracks->begin(), tracks->end(), [this](CKFPartialTrack * a, CKFPartialTrack * b) { return (quality(a) > quality(b)); });
   if (tracks->size() <= Nmax) return;
 
-  std::sort(tracks->begin(), tracks->end(), [this](CKFPartialTrack * a, CKFPartialTrack * b) { return (quality(a) > quality(b)); });
   for (unsigned i = 0; i < tracks->size(); ++i) {
     double Q = quality(tracks->at(i));
     B2DEBUG(80, "---- orderingTracksAndTrimming: @ " << i << " " << Q);
-    if (Q > tracks->at(i)->addedHits()) {
+    /// don't allow tracks without decent hits to continue
+    if (!preBestQuality(tracks->at(i)))
+      continue;
+    if (Q > (hitMultiplier * tracks->at(i)->addedHits())) {
       double chi2(0), chi2_ndf(0); int ndf(0);
       chiSqNdf(tracks->at(i), chi2, ndf, chi2_ndf);
       B2WARNING("---- orderingTracksAndTrimming: BAD TRACK @ " << i << " " << Q << " " << chi2_ndf << " " <<

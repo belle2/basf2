@@ -29,6 +29,7 @@ namespace Belle2 {
   class CDCHit;
   class PXDCluster;
   class PXDTrueHit;
+  class CKFPartialTrack;
 
   /**
    * Given a set of CDC-only tracks, uses the Combinatorial Kalman
@@ -63,13 +64,16 @@ namespace Belle2 {
   private:
 
     /// extrapolate the track to a SVD Layer and try to find compatible hits. Returns false if the extrapolation failed
-    bool extrapolateToSVDLayer(genfit::Track* track, unsigned searchLayer, StoreArray<SVDCluster>& clusters, bool isU,
+    bool extrapolateToSVDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+                               StoreArray<SVDCluster>& clusters, bool isU,
                                std::vector<genfit::AbsMeasurement*>&);
     /// extrapolate the track to a PXD Layer and try to find compatible hits. Returns false if the extrapolation failed
-    bool extrapolateToPXDLayer(genfit::Track* track, unsigned searchLayer, StoreArray<PXDCluster>& clusters,
+    bool extrapolateToPXDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+                               StoreArray<PXDCluster>& clusters,
                                std::vector<genfit::AbsMeasurement*>&);
     /// Adds found hits to the genfit track past in
-    static bool findHits(genfit::Track* track, unsigned counter, std::vector<genfit::AbsMeasurement*>&, void* data);
+    static bool findHits(genfit::Track* track, std::vector<CKFPartialTrack*>&, unsigned counter, std::vector<genfit::AbsMeasurement*>&,
+                         void* data);
 
     /// refit track, assumes a TrackRep for the track already exists
     bool refitTrack(genfit::Track* track);
@@ -87,6 +91,7 @@ namespace Belle2 {
     double m_maxChi2Increment; /**< maximum chi2 per added hit in the CKF */
     double m_holePenalty; /**< Effective chi2/ndof penalty in CKF quality for a hole */
     int m_Nmax; /** Maximum number of propagated candidates per step in CKF */
+    double m_hitMultiplier; /**< Extra weight multiplier for hits */
 
     // input
     std::string m_GFTrackColName; /**< genfit::Track input collection name */

@@ -37,17 +37,21 @@ namespace Belle2 {
      * representing the number of steps already processed. data will
      * be passed unmolested to each invocation of findHits.
      */
-    CKF(genfit::Track* track, bool (*findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*), void* data,
-        double _maxChi2Increment = 20, int _maxHoles = 3, double _holePenalty = 10, int _Nmax = 5);
+    CKF(genfit::Track* track, bool (*findHits)(genfit::Track*, std::vector<CKFPartialTrack*>&, unsigned,
+                                               std::vector<genfit::AbsMeasurement*>&, void*), void* data,
+        double _maxChi2Increment = 20, int _maxHoles = 3, double _holePenalty = 10, int _Nmax = 5, double _hitMultiplier = 1);
 
     /// find hits, run extrapolations, trim outputs, find a best track candidate
     genfit::Track* processTrack();
 
     double getChi2Inc(int hitId) {return chi2Map[hitId];}
 
+    /// return the list of track candidates that surivived processTrack(). they are deleted with the CKF
+    std::vector<CKFPartialTrack*>* trackCandidates() { return tracks; }
+
   private:
     genfit::Track* seedTrack;
-    bool (*findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*);
+    bool (*findHits)(genfit::Track*, std::vector<CKFPartialTrack*>&, unsigned, std::vector<genfit::AbsMeasurement*>&, void*);
 
     /// refit track, assumes a TrackRep for the track already exists
     bool refitTrack(genfit::Track* track);
@@ -66,6 +70,9 @@ namespace Belle2 {
     /// keep only the top Nmax tracks
     void orderTracksAndTrim(std::vector<CKFPartialTrack*>*&);
 
+    /// Require track to pass a "pre-quality" test before being allowed to participate in the best cand selection.
+    bool preBestQuality(CKFPartialTrack* track);
+
     /// data needed by the findHits functions
     void* data;
 
@@ -77,13 +84,19 @@ namespace Belle2 {
     /// maximum chi2 increment per added hit
     double maxChi2Increment;
 
-    /// maximum number of tracks to propagate through
-    int Nmax;
-
     /// Effective Chi2/Ndof a track is penalized for for having a
     /// "true" hole (a hole in the hits, followed by another hit, not
     /// just a string of hits at the end of the track)
     double holePenalty;
+
+    /// extra weight multiplier for hits
+    double hitMultiplier;
+
+    /// maximum number of tracks to propagate through
+    int Nmax;
+
+    /// container for the track candidates. can be accessed after the run to get more info/more tracks
+    std::vector<CKFPartialTrack*>* tracks;
 
     /// stores the chi2 increment of the added hit when it was added (i.e. not after refit)
     std::map<int, double> chi2Map;

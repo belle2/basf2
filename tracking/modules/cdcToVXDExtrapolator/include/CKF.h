@@ -44,6 +44,7 @@ namespace Belle2 {
     /// find hits, run extrapolations, trim outputs, find a best track candidate
     genfit::Track* processTrack();
 
+    /// return the value of the chi2 increment for a given hit id
     double getChi2Inc(int hitId) {return chi2Map[hitId];}
 
     /// return the list of track candidates that surivived processTrack(). they are deleted with the CKF

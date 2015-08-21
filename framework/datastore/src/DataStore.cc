@@ -390,7 +390,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& arra
     }
   } else if (arrayName == "ALL") {
     for (auto& mapEntry : m_storeEntryMap[durability]) {
-      if (mapEntry.second.ptr and mapEntry.second.isArray and mapEntry.second.objClass->InheritsFrom(arrayClass)) {
+      if (mapEntry.second.object and mapEntry.second.isArray and mapEntry.second.objClass->InheritsFrom(arrayClass)) {
         names.emplace_back(mapEntry.second.name);
       }
     }

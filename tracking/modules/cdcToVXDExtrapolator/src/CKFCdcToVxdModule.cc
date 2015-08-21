@@ -483,6 +483,7 @@ void CKFCdcToVxdModule::event()
             " nsvd " << svdClustersFromMC->size() << " ncdc " << cdcHitsFromMC->size());
 
     trkInfo.cdconly = trkInfo.refit = false;
+    trkInfo.nRec = 0;
     if (isCdcOnly(crnt)) {
       trkInfo.cdconly = true;
       B2DEBUG(100, "<----> CDCOnly Track Found Running CKF " << " <--->");

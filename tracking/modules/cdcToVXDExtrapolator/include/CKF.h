@@ -16,7 +16,7 @@
 namespace genfit { class Track; class AbsMeasurement; }
 
 namespace Belle2 {
-
+  class CKFPartialTrack;
   /**
    * Extrapolate a track, collect compatible hits, update, filter, refit
    *
@@ -35,10 +35,10 @@ namespace Belle2 {
      * Pass in an existing track to be fit, and a way to ask for new
      * hits. findHits should take in a track, and an integer
      * representing the number of steps already processed. data will
-     * be passed unmolested to each invocation of findHits
+     * be passed unmolested to each invocation of findHits.
      */
     CKF(genfit::Track* track, bool (*findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*), void* data,
-        double _maxChi2Increment = 20, int _maxHoles = 3);
+        double _maxChi2Increment = 20, int _maxHoles = 3, double _holePenalty = 10, int _Nmax = 5);
 
     /// find hits, run extrapolations, trim outputs, find a best track candidate
     genfit::Track* processTrack();
@@ -52,13 +52,19 @@ namespace Belle2 {
     /// refit track, assumes a TrackRep for the track already exists
     bool refitTrack(genfit::Track* track);
 
+    /// quality measure used by bestTrack and orderTracksAndTrim
+    double quality(CKFPartialTrack*);
+
     /// finds the best track of all the candidates
-    genfit::Track* bestTrack(std::vector<genfit::Track*>*);
+    CKFPartialTrack* bestTrack(std::vector<CKFPartialTrack*>*);
 
     /// after adding an additional hit but before updating, check that the track passes some selections (e.g. check for holes)
-    bool passPreUpdateTrim(genfit::Track*, unsigned step);
+    bool passPreUpdateTrim(CKFPartialTrack*, unsigned step);
     /// after adding an additional hit and updating, check that the track passes some selections (e.g. check the updates chi2 increment)
     bool passPostUpdateTrim(genfit::Track*, unsigned step);
+
+    /// keep only the top Nmax tracks
+    void orderTracksAndTrim(std::vector<CKFPartialTrack*>*&);
 
     /// data needed by the findHits functions
     void* data;
@@ -70,6 +76,14 @@ namespace Belle2 {
     int maxHoles;
     /// maximum chi2 increment per added hit
     double maxChi2Increment;
+
+    /// maximum number of tracks to propagate through
+    int Nmax;
+
+    /// Effective Chi2/Ndof a track is penalized for for having a
+    /// "true" hole (a hole in the hits, followed by another hit, not
+    /// just a string of hits at the end of the track)
+    double holePenalty;
 
     /// stores the chi2 increment of the added hit when it was added (i.e. not after refit)
     std::map<int, double> chi2Map;

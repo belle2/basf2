@@ -10,6 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/modules/cdcToVXDExtrapolator/CKF.h>
+#include <tracking/modules/cdcToVXDExtrapolator/CKFPartialTrack.h>
 
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
@@ -23,23 +24,27 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/Exception.h>
 
+#include<algorithm>
+
 using namespace Belle2;
 
 CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, unsigned, std::vector<genfit::AbsMeasurement*>&, void*),
-         void* _data, double _maxChi2Increment, int _maxHoles) :
+         void* _data, double _maxChi2Increment, int _maxHoles, double _holePenalty, int _Nmax) :
   seedTrack(_track),
   findHits(_findHits),
   data(_data),
   step(0),
   maxHoles(_maxHoles),
-  maxChi2Increment(_maxChi2Increment)
+  maxChi2Increment(_maxChi2Increment),
+  holePenalty(_holePenalty),
+  Nmax(_Nmax)
 {
 }
 
 genfit::Track* CKF::processTrack()
 {
-  auto tracks = new std::vector<genfit::Track*>;
-  tracks->push_back(new genfit::Track(*seedTrack));
+  auto tracks = new std::vector<CKFPartialTrack*>;
+  tracks->push_back(new CKFPartialTrack(*seedTrack));
 
   auto fitter = new genfit::KalmanFitter();
   fitter->setMinIterations(3);
@@ -58,6 +63,9 @@ genfit::Track* CKF::processTrack()
 
     if (newHits.size() == 0) {
       B2DEBUG(90, "-- In CKF::processTrack(): At step " << step << " no hits found, continuing search");
+      for (auto& track : *tracks) {
+        track->addHole();
+      }
       continue;
     }
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 90, PACKAGENAME()) == true) {
@@ -74,19 +82,21 @@ genfit::Track* CKF::processTrack()
     }
 
     bool any = false;
-    std::vector<genfit::Track*>* newtracks = new std::vector<genfit::Track*>;
+    std::vector<CKFPartialTrack*>* newtracks = new std::vector<CKFPartialTrack*>;
 
     for (auto& track : *tracks) {
-      // copy the no-added-hit case
-      newtracks->push_back(track);
       /// if the track is bad, don't try to add hits
       if (!passPreUpdateTrim(track, step)) {
+        // copy the no-added-hit case
+        track->addHole();
+        newtracks->push_back(track);
         continue;
       }
       any = true;
       if (newHits.size() != 0) {
         for (auto& hit : newHits) {
-          genfit::Track* newtrack = new genfit::Track(*track);
+          CKFPartialTrack* newtrack = new CKFPartialTrack(*track);
+          newtrack->addHit();
           auto newhit = hit->clone();
           newtrack->insertMeasurement(newhit, 0);
           try {
@@ -115,6 +125,10 @@ genfit::Track* CKF::processTrack()
           }
         }
       }
+
+      // copy the no-added-hit case
+      track->addHole();
+      newtracks->push_back(track);
     }
 
     if (!any) {
@@ -127,10 +141,11 @@ genfit::Track* CKF::processTrack()
     //   delete tracks->at(i);
     delete tracks;
     tracks = newtracks;
+    orderTracksAndTrim(tracks);
   }
 
   B2DEBUG(90, "- In CKF::processTrack(): Finished search, have " << tracks->size() << " track extrapolations");
-  genfit::Track* best = bestTrack(tracks);
+  CKFPartialTrack* best = bestTrack(tracks);
   genfit::Track* ret = 0;
   if (best)
     ret = new genfit::Track(*best);
@@ -159,16 +174,18 @@ genfit::Track* CKF::processTrack()
   }
 }
 
-bool CKF::passPreUpdateTrim(genfit::Track* track, unsigned step)
+bool CKF::passPreUpdateTrim(CKFPartialTrack* track, unsigned step)
 {
   // Check for holes
   int nadded = track->getNumPointsWithMeasurement() - seedTrack->getNumPointsWithMeasurement();
   int nholes = step - nadded;
-  if (nholes > maxHoles) {
-    B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
-            track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
-    return false;
-  }
+  if (nholes != track->totalHoles())
+    B2WARNING("Number of holes from CKFPartialTrack: " << track->totalHoles() << ", differs from what I think it should be: " << nholes)
+    if (nholes > maxHoles) {
+      B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
+              track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
+      return false;
+    }
   return true;
 }
 
@@ -198,25 +215,60 @@ void chiSqNdf(genfit::Track* track, double& chi2, int& ndf)
   }
 }
 
-genfit::Track* CKF::bestTrack(std::vector<genfit::Track*>* tracks)
+double CKF::quality(CKFPartialTrack* track)
+{
+  double thisChi2(0); int ndf(0);
+  chiSqNdf(track, thisChi2, ndf);
+  B2DEBUG(90, "-- In CKF::quality(): @ " << " " << thisChi2 << " " << ndf << " " << thisChi2 / ndf << " Hole Penalty: " <<
+          track->trueHoles() * holePenalty << " " << track->addedHits());
+  // thisChi2 += track->trueHoles() * holePenalty;
+  // ndf += track->trueHoles();
+  // thisChi2 = thisChi2 / ndf;
+  // B2DEBUG(90, "----- In CKF::quailty(): @ " << " " << thisChi2);
+  // return thisChi2;
+
+  double Q = (double) track->addedHits() - (double) track->trueHoles() - (1.0f / holePenalty) * (thisChi2 / (double) ndf);
+  return Q;
+}
+
+CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
 {
   if (!tracks || tracks->size() == 0)
     return 0;
   unsigned iBest = 0;
-  double chi2Best = tracks->at(0)->getFitStatus(tracks->at(0)->getCardinalRep())->getChi2();
-  for (unsigned i = 0; i < tracks->size(); ++i) {
-    double thisChi2(0); int ndf(0); // tracks->at(i)->getFitStatus(tracks->at(i)->getCardinalRep())->getChi2();
-    chiSqNdf(tracks->at(i), thisChi2, ndf);
-    B2DEBUG(90, "-- In CKF::bestTrack(): @ " << i << " " << thisChi2 << " " << ndf << " " << thisChi2 / ndf);
-    thisChi2 = thisChi2 / ndf;
-    if (thisChi2 < chi2Best) {
-      chi2Best = thisChi2;
+  double QBest = quality(tracks->at(0));
+  for (unsigned i = 1; i < tracks->size(); ++i) {
+    double thisQ = quality(tracks->at(i));
+    if (thisQ > QBest) {
+      QBest = thisQ;
       iBest = i;
     }
   }
   B2DEBUG(90, "-- In CKF::bestTrack(): Best track @ " << iBest);
 
   return tracks->at(iBest);
+}
+
+void CKF::orderTracksAndTrim(std::vector<CKFPartialTrack*>*& tracks)
+{
+  if (tracks->size() <= Nmax) return;
+
+  std::sort(tracks->begin(), tracks->end(), [this](CKFPartialTrack * a, CKFPartialTrack * b) { return (quality(a) > quality(b)); });
+  for (unsigned i = 0; i < tracks->size(); ++i) {
+    double Q = quality(tracks->at(i));
+    B2DEBUG(80, "---- orderingTracksAndTrimming: @ " << i << " " << Q);
+    if (Q > tracks->at(i)->addedHits()) {
+      double chi2(0); int ndf(0);
+      chiSqNdf(tracks->at(i), chi2, ndf);
+      B2WARNING("---- orderingTracksAndTrimming: BAD TRACK @ " << i << " " << Q << " " << tracks->at(
+                  i)->addedHits() << " " << chi2 << " " << ndf << " " << chi2 / ndf << " " << tracks->at(i)->trueHoles() << " " << tracks->at(
+                  i)->totalHoles() << " ");
+    }
+  }
+  for (unsigned i = Nmax; i < tracks->size(); ++i) {
+    delete tracks->at(i);
+  }
+  tracks->erase(tracks->begin() + Nmax, tracks->end());
 }
 
 bool CKF::refitTrack(genfit::Track* track)

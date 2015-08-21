@@ -252,10 +252,12 @@ bool CKF::preBestQuality(CKFPartialTrack* track)
 
 CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
 {
-  if (!tracks || tracks->size() == 0)
+  if (!tracks || tracks->size() == 0) {
+    B2DEBUG(90, "-- In CKF::bestTrack(): No tracks, no best.");
     return 0;
-  int iBest = -1;
-  double QBest = quality(tracks->at(0)) - 1.;
+  }
+  int iBest = 0;
+  double QBest = quality(tracks->at(0));
   for (unsigned i = 1; i < tracks->size(); ++i) {
     double thisQ = quality(tracks->at(i));
     if (thisQ > QBest) {
@@ -265,8 +267,6 @@ CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
   }
   B2DEBUG(90, "-- In CKF::bestTrack(): Best track @ " << iBest);
 
-  if (iBest < 0)
-    return 0;
   return tracks->at(iBest);
 }
 

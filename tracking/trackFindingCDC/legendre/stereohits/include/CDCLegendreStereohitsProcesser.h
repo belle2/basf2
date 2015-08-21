@@ -21,10 +21,10 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class CDCRecoHit3D;
 
+    /** Class handling the stereo hit adding */
     class StereohitsProcesser {
     public:
-
-      /** Simple Constructor */
+      /** Create a quad tree */
       explicit StereohitsProcesser(unsigned int level, bool debugOutput = false) :
         m_param_debugOutput(debugOutput), m_level(level), m_newQuadTree(level)
       {
@@ -32,6 +32,7 @@ namespace Belle2 {
         m_newQuadTree.initialize();
       }
 
+      /** Destructor razing the quad tree */
       ~StereohitsProcesser()
       {
         m_newQuadTree.raze();
@@ -52,6 +53,7 @@ namespace Belle2 {
        * and each hit is assigned to the track.
        * */
       void makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int m_param_minimumHits);
+
     private:
       /// We will use CDCRecoHits3D in the QuadTrees.
       typedef const CDCRecoHit3D HitType;
@@ -65,17 +67,14 @@ namespace Belle2 {
       void fillHitsVector(std::vector<HitType*>& hitsVector, const CDCTrack& track) const;
 
       /**
-       *
+       * Add only those hits to the track that are in the node with the maximum number of hits.
        */
       void addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
                                               const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const;
 
-
-
-
       bool m_param_debugOutput; /// Flag to turn on debug output
       unsigned int m_level; /// Maximum level of the quad tree search.
-      HitZ0ZSlopeLegendre<const HitType*> m_newQuadTree;
+      HitZ0ZSlopeLegendre<const HitType*> m_newQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
 
 
     };

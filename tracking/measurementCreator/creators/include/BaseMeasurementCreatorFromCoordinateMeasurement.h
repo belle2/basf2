@@ -12,7 +12,9 @@
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
 
 namespace Belle2 {
-  /** Class to create measurement track points based on the coordinate measurements.
+  /**
+  * Baseclass to create measurement track points based on the coordinate measurements.
+  * Use this class as a base class as in VXDMomentumEstimationMeasurementCreator.
   * All measurements that you create by overloading the createMeasurementFromCoordinateMeasurement
   * function get their own TrackPoint.
   */

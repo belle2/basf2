@@ -14,6 +14,7 @@
 
 namespace Belle2 {
 
+  /** Module turning trackCands to reco tracks (will be unneeded once we create reco tracks in the beginning) */
   class RecoTrackCreatorModule : public Module {
 
   public:

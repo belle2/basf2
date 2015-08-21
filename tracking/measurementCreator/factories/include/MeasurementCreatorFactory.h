@@ -23,7 +23,7 @@ namespace Belle2 {
    * module parameters.
    * You have to implement the createMeasurementCreatorFromName function - all other functions
    * are already implemented in this base class.
-   * See for example the CDCMeasurementCreatorFactory for an example.
+   * See the CDCMeasurementCreatorFactory for an example.
    */
 
   template <class BaseMeasurementCreatorType>

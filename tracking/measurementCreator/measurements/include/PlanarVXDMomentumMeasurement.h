@@ -18,10 +18,9 @@
 
 
 namespace Belle2 {
-
-
-  /** @brief Measurement class implementing a planar hit geometry (1 or 2D) with only a momentum measurement.
-   *
+  /**
+   * Measurement class implementing a planar hit geometry (1 or 2D) with a momentum measurement based on the VXD dEdX information
+   * with settable parameters (see VXDMomentumEstimationMeasurementCreator).
    */
   template <class HitType>
   class PlanarVXDMomentumMeasurement : public PlanarMomentumMeasurement {
@@ -167,7 +166,6 @@ namespace Belle2 {
       }
     }
 
-    // TODO
     rawHitCovariance(0, 0) = m_sigma;
 
     genfit::MeasurementOnPlane* mop = new genfit::MeasurementOnPlane(rawHitCoordinates, rawHitCovariance,

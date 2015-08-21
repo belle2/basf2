@@ -15,6 +15,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  /** Add all measurement creators related to SVD hits */
   class SVDMeasurementCreatorFactory : public
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedSVDHit, Const::SVD>> {
 

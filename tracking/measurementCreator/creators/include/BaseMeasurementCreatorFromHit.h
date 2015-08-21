@@ -22,6 +22,14 @@ namespace genfit {
 
 namespace Belle2 {
 
+  /**
+   * Base Class to create measurements based on a given hit related to the RecoTrack.
+   * Use this class as a base class if you want to add TrackPoints with measurements
+   * that are created for each svd/pxd/cdc hit.
+   * If you do not relate to a specific hit from the track finders (for example for ECL energy
+   * measurements as a TrackPoint) you should not use this class as a base class but rather use
+   * BaseMeasurementCreator directly.
+   */
   template <class HitType, Const::EDetector detector>
   class BaseMeasurementCreatorFromHit : public BaseMeasurementCreator {
   public:

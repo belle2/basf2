@@ -19,6 +19,13 @@ namespace genfit {
 namespace Belle2 {
   class RecoTrack;
 
+  /**
+   * Base class for all measurement creators. These creators are used for creating (possible single elemented)
+   * lists of TrackPoint-pointers for a given reco track. It is executed by the measurement creator factories used
+   * in the MeasurementCreatorModule. Examples for the TrackPoints are coordinate measurements with reconstructed hits
+   * or momentum estimations from dEdX in the VXD. For each of these TrackPpoint-Types you can implement a single
+   * MeasurementCreator.
+   */
   class BaseMeasurementCreator {
   public:
     /** Creates a MeasurementCreator which handles the creation of track points with measurements of a given kind **/

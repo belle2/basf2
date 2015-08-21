@@ -18,7 +18,6 @@
 
 namespace Belle2 {
 
-
   /**
    * Measurement class implementing a planar hit geometry (1 or 2D) with only a momentum measurement.
    */

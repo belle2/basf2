@@ -15,6 +15,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  /** Add all measurement creators related to PXD hits */
   class PXDMeasurementCreatorFactory : public
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>> {
 

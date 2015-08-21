@@ -9,11 +9,15 @@ namespace Belle2 {
     class CDCTrack;
   }
 
+  /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
   class StereoHitFinderCDCLegendreHistogrammingModule: public TrackFinderCDCBaseModule {
 
   public:
+    /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
     StereoHitFinderCDCLegendreHistogrammingModule() : TrackFinderCDCBaseModule(), m_stereohitsProcesser(nullptr)
     {
+      setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
+
       addParam("DebugOutput",
                m_param_debugOutput,
                "Flag to turn on debug output.",
@@ -35,6 +39,7 @@ namespace Belle2 {
                true);
     }
 
+    /** Initialize the stereo quad trees */
     void initialize() override
     {
       m_stereohitsProcesser = new TrackFindingCDC::StereohitsProcesser(m_param_quadTreeLevel, m_param_debugOutput);
@@ -42,6 +47,7 @@ namespace Belle2 {
       TrackFinderCDCBaseModule::initialize();
     }
 
+    /** Terminate the stereo quad trees */
     void terminate() override
     {
       delete m_stereohitsProcesser;
@@ -61,7 +67,7 @@ namespace Belle2 {
     unsigned int m_param_minimumHitsInQuadTree; /**< The minimum number of hits in a quad tree bin to be called as result. */
     bool m_param_useOldImplementation; /**< Whether to use the old implementation o the quad tree. */
 
-    TrackFindingCDC::StereohitsProcesser* m_stereohitsProcesser;
+    TrackFindingCDC::StereohitsProcesser* m_stereohitsProcesser; /**< The stereo quad tree processor to use */
   };
 
 }

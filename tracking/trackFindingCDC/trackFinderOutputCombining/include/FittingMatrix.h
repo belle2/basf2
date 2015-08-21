@@ -34,11 +34,13 @@ namespace Belle2 {
       typedef unsigned int SegmentCounter;
       typedef unsigned int TrackCounter;
 
+      /** Constructor */
       FittingMatrix() : m_param_maximum_theta(0), m_param_maximum_distance_z(0),
         m_param_minimal_theta_difference(0),
         m_param_minimal_z_difference(0), m_param_minimal_chi2(0),
         m_param_minimal_chi2_stereo(0) {}
 
+      /** Enum showing the fitting status of the segments to the track */
       enum SegmentStatus {
         ABOVE_TRACK, BENEATH_TRACK, IN_TRACK, MIX_WITH_TRACK, NAN_IN_CALCULATION
       };
@@ -101,6 +103,7 @@ namespace Belle2 {
       void addSegmentToResultTrack(FittingMatrix::SegmentCounter counterSegment, FittingMatrix::TrackCounter counterTrack,
                                    const std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& resultTrackCands);
 
+      /** Return true of segment is used already */
       bool isSegmentUsed(SegmentCounter segmentCounter)
       {
         return m_segmentIsUsed[segmentCounter];

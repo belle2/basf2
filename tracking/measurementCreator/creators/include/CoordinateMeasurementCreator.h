@@ -12,10 +12,11 @@
 #include <tracking/measurementCreator/creators/BaseMeasurementCreatorFromHit.h>
 
 namespace Belle2 {
-  /** A measurement creator for normal coordinate measurements */
+  /** A measurement creator for normal coordinate measurements out of cdc/svd/pxd hits. */
   template <class HitType, Const::EDetector detector>
   class CoordinateMeasurementCreator : public BaseMeasurementCreatorFromHit<HitType, detector> {
   public:
+    /** Constructor */
     explicit CoordinateMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 

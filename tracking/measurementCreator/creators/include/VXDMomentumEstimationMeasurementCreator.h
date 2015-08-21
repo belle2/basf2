@@ -18,10 +18,14 @@
 namespace Belle2 {
   /**
    * Creator for VXDMeasurements with momentum estimation based on the dEdX information.
+   * Can use different possibilities to calculate the path length needed for the dEdX calculation.
+   * Needs the transformation fit parameters fitParameters and correctionFitParameters
+   * which can be calculated using the IPython notebook Analyse_Hitwise.ipynb.
    */
   template <class HitType, Const::EDetector detector>
   class VXDMomentumEstimationMeasurementCreator : public BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector> {
   public:
+    /** Constructor */
     explicit VXDMomentumEstimationMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
 

@@ -14,6 +14,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  /** Add all measurement creators related to CDC hits */
   class CDCMeasurementCreatorFactory : public
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedCDCHit, Const::CDC>> {
 

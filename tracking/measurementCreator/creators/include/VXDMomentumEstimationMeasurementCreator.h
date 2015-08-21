@@ -97,7 +97,7 @@ namespace Belle2 {
     /** Parameters for the correction function. Set them to zero to not use a correction function */
     typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
     /** Use the seeds of the track finder or the seeds of the MC particles */
-    bool m_useMCInformation = true;
+    bool m_useMCInformation = false;
     /** Use the thickness of the clusters of the path length for estimating dX */
     bool m_useThickness = false;
     /** Minimal value for the momentum below the estimation is used */

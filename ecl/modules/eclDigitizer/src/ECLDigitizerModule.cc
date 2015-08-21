@@ -39,17 +39,24 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-void ECLDigitizerModule::signalsample_t::InitSample(const float* MP)
+void ECLDigitizerModule::signalsample_t::InitSample(const double* MP)
 {
   const int N = m_ns * m_nl;
   const double dt = m_tick / m_ns;
   double sum = 0;
   for (int i = 0; i < N; i++) {
-    double a = ShaperDSP_F(i * dt, (float*)MP);
+    double a = ShaperDSP(i * dt, MP);
     m_ft[i] = a;
     sum += a;
   }
   m_sumscale = m_ns / sum;
+}
+
+void ECLDigitizerModule::signalsample_t::InitSample(const float* MP)
+{
+  double MPd[10];
+  for (int i = 0; i < 10; i++) MPd[i] = MP[i];
+  InitSample(MPd);
 }
 
 void ECLDigitizerModule::adccounts_t::AddHit(const double a, const double t0, const ECLDigitizerModule::signalsample_t& s)
@@ -367,10 +374,12 @@ void ECLDigitizerModule::readDSPDB()
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
     const ECLWFAlgoParams& eclWFAlgo = eclWFAlgoParams[p.second];
 
-    float s[16][16], MP[10];
-
+    float s[16][16], MPf[10];
     eclWFData->getMatrix(s);
-    eclWFData->getWaveformParArray(MP);
+    eclWFData->getWaveformParArray(MPf);
+
+    double MPd[10];
+    for (int i = 0; i < 10; i++) MPd[i] = MPf[i]; // conversion float->double
 
     // shape function parameters
     int ia = 1 << eclWFAlgo.getka();
@@ -393,9 +402,9 @@ void ECLDigitizerModule::readDSPDB()
       for (int j = 0; j < 16; j++) {
         double t = j * m_tick - t0;
 
-        double fx = ShaperDSP_F(t      , MP);
-        double fp = ShaperDSP_F(t + eps, MP);
-        double fm = ShaperDSP_F(t - eps, MP);
+        double fx = ShaperDSP(t      , MPd);
+        double fp = ShaperDSP(t + eps, MPd);
+        double fm = ShaperDSP(t - eps, MPd);
         f0[j] =  fx;
         f1[j] = (fp - fm) / (2 * eps);
       }

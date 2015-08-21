@@ -96,6 +96,7 @@ namespace Belle2 {
         double m_ft[m_nl * m_ns];
 
         void InitSample(const float*);
+        void InitSample(const double*);
         double Accumulate(const double, const double, double*) const;
       };
 

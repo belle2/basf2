@@ -119,9 +119,10 @@ namespace Belle2 {
 
     // Copy the information from the mc particle (if there is one)
     MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
-    TVector3 mcMomentum = relatedMCParticle->getMomentum();
-    TVector3 mcPostion = relatedMCParticle->getProductionVertex();
-    short mcCharge = relatedMCParticle->getCharge();
+
+    TVector3 mcMomentum;
+    TVector3 mcPostion;
+    short mcCharge;
 
     if (relatedMCParticle == nullptr) {
       mcMomentum = trackMomentum;

@@ -282,7 +282,7 @@ void writeWF(int typ, char* dataFileDir, char* paramsDir)
   TTree* t =  new TTree("EclWF", "Waveform and covariance matrix");
   TTree* t2 = new TTree("EclAlgo", "Fitting algorithm parameters");
   TTree* t3 = new TTree("EclNoise", "Electronic noise matrix");
-  TTree* t4 = new TTree("EclSampledSignalWF", "Signal Waveform in fine bins");
+  //  TTree* t4 = new TTree("EclSampledSignalWF", "Signal Waveform in fine bins");
 
   ECLWaveformData* data = new ECLWaveformData;
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
@@ -313,9 +313,9 @@ void writeWF(int typ, char* dataFileDir, char* paramsDir)
   cout << " t3 "  << endl;
 
   //  Int_t nbins = par_shape.size();
-  auto shapeP = createDefSampledSignalWF();
-  t4->Branch("SignalShape", "std::vector<double>", &shapeP);
-  t4->Fill();
+  // auto shapeP = createDefSampledSignalWF();
+  // t4->Branch("SignalShape", "std::vector<double>", &shapeP);
+  // t4->Fill();
 
   for (int n = 0; n < nGroups; n++) {
     cout << " !n: " << n << endl;
@@ -376,7 +376,7 @@ void writeWF(int typ, char* dataFileDir, char* paramsDir)
   cout << " write 496 "  << endl;
   t3->Fill();
 
-  t->Write(); t2->Write(); t3->Write(); t4->Write();
+  t->Write(); t2->Write(); t3->Write();// t4->Write();
   f->Close();
 
 }

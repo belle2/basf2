@@ -139,7 +139,8 @@ TCTracker2D::packer(const TRGState & input,
     hitInformation(registers);
 
     //...Do core logic...
-    HoughMapping();
+    HoughMappingPlus();
+    HoughMappingMinus();
 
     //...Make output...
     logicStillActive = registers.active();

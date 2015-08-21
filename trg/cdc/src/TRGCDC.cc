@@ -2026,6 +2026,14 @@ TRGCDC::fastSimulation(void) {
     else
         _hFinder->doit(_trackList2D, _trackList2DFitted);
 
+int n_p = 0, n_m = 0;
+for (int i = 0; i < _trackList2D.size(); i++) {
+	if(_trackList2D[i]->charge() > 0) {n_p++;}
+	else {n_m++;}
+}
+
+cout << "n_test" << _trackList2D.size() << " n_p" << n_p << " n_m" <<n_m << endl;
+
     //...Check MC relations...
     // for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
     //     const TCRelation & trackRelation = trackList[iTrack]->relation();
@@ -2185,7 +2193,8 @@ TRGCDC::fastSimulation(void) {
         cout << TRGDebug::tab() << "Number of 3D tracks : "
              << _trackList3D.size() << endl;
     }
- 
+
+
 #ifdef TRGCDC_DISPLAY
 //  dump("hits");
     vector<const TCTrack*> t2;

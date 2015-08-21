@@ -648,29 +648,70 @@ void TRGCDCHoughFinder::rPhi(std::map<std::string, Belle2::TRGCDCJSignal> & mSig
     mSignalStorage["sumhc"] <= mSignalStorage["hcx2"] + mSignalStorage["hcy2"];
     //cout <<"<<<sumhc>>>"<<endl;
 //    mSignalStorage["sumhc"].dump();
-
+cout << "1"<<endl;
     {
-        mSignalStorage["rhoMin"] = Belle2::TRGCDCJSignal(4489, mSignalStorage["rho"].getToReal(), commonData);
-        mSignalStorage["rhoMax"] = Belle2::TRGCDCJSignal(2560000, mSignalStorage["rho"].getToReal(), commonData);
+        mSignalStorage["sumhcMin"] = Belle2::TRGCDCJSignal(4489, mSignalStorage["sumhc"].getToReal(), commonData);
+        mSignalStorage["sumhcMax"] = Belle2::TRGCDCJSignal(2560000, mSignalStorage["sumhc"].getToReal(), commonData);
     }
 //    mSignalStorage["rhoMin"].dump();
 //    mSignalStorage["rhoMax"].dump();
 
+   // Constrain den.
+    {
+        // Make ifElse data.
+        vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+        // Compare
+        Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["sumhc"], ">", mSignalStorage["sumhcMax"]);
+        // Assignments
+        vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+            make_pair(&mSignalStorage["sumhc_c"], mSignalStorage["sumhcMax"])
+        };
+        // Push to data.
+        t_data.push_back(make_pair(t_compare, t_assigns));
+        // Compare
+        t_compare = Belle2::TRGCDCJSignal::comp(mSignalStorage["sumhc"], ">", mSignalStorage["sumhcMin"]);
+        // Assignments
+        t_assigns = {
+            make_pair(&mSignalStorage["sumhc_c"], mSignalStorage["sumhc"].limit(mSignalStorage["sumhcMin"],mSignalStorage["sumhcMax"]))
+        };
+        // Push to data.
+        t_data.push_back(make_pair(t_compare, t_assigns));
+        // Compare
+        t_compare = Belle2::TRGCDCJSignal();
+        // Assignments
+        t_assigns = {
+            make_pair(&mSignalStorage["sumhc_c"], mSignalStorage["sumhcMin"])
+        };
+        // Push to data.
+        t_data.push_back(make_pair(t_compare, t_assigns));
+        Belle2::TRGCDCJSignal::ifElse(t_data);
+    }
+cout <<"2"<<endl;
+    {
+        unsigned long long t_int = mSignalStorage["sumhc_c"].getMaxInt();
+        double t_toReal = mSignalStorage["sumhc_c"].getToReal();
+        double t_actual = mSignalStorage["sumhc_c"].getMaxActual();
+        mSignalStorage["iRhoMax"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
+        t_int = mSignalStorage["sumhc_c"].getMinInt();
+        t_actual = mSignalStorage["sumhc_c"].getMinActual();
+        mSignalStorage["iRhoMin"] = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, commonData);
+    }
+cout <<"3"<<endl;
     // Generate sqrt LUT sqrt(hcx*hcx + hcy*hcy)
     if(mLutStorage.find("iRho") == mLutStorage.end()) {
         mLutStorage["iRho"] = new Belle2::TRGCDCJLUT("iRho");
         mLutStorage["iRho"]->setFloatFunction(
             [=](double aValue) -> double{return abs(sqrt(aValue));},
-            mSignalStorage["sumhc"],
-            mSignalStorage["rhoMin"], mSignalStorage["rhoMax"], mSignalStorage["sumhc"].getToReal(),
+            mSignalStorage["sumhc_c"],
+            mSignalStorage["iRhoMin"], mSignalStorage["iRhoMax"], mSignalStorage["sumhc"].getToReal(),
             24, 12);
     }
-
+cout <<"4"<<endl;
     // Operate using LUT(iRho = sqrt(sumhc))
-    mLutStorage["iRho"]->operate(mSignalStorage["sumhc"], mSignalStorage["iRho"]);
+    mLutStorage["iRho"]->operate(mSignalStorage["sumhc_c"], mSignalStorage["iRho"]);
 //  mLutStorage["iRho"]->makeCOE("iRho.coe");
-    //cout <<"<<<iRho>>>"<<endl;
-//    mSignalStorage["iRho"].dump();
+    cout <<"<<<iRho>>>"<<endl;
+    mSignalStorage["iRho"].dump();
 //  cout <<"<<<rho>>>" <<endl; mSignalStorage["rho"].dump();
 
 }//rphi
@@ -1073,21 +1114,6 @@ TRGCDCHoughFinder::doFinding2(std::vector<std::vector<unsigned>> peaks[],
     }
     _plane[0]->merge();
     _plane[1]->merge();
-
-#ifdef TRGCDC_DISPLAY_HOUGH
-    string stg = "2D : Hough";
-    string inf = "   ";
-    H0->stage(stg);
-    H0->information(inf);
-    H0->clear();
-    H0->area().append(_plane[0]);
-    H0->show();
-    H1->stage(stg);
-    H1->information(inf);
-    H1->clear();
-    H1->area().append(_plane[1]);
-    H1->show();
-#endif
 
     //...Look for peaks which have 5 hits...
 //  vector<vector<unsigned>> peaks[2];

@@ -71,7 +71,8 @@ class TRGCDCTracker2D
                            bool & logicStillActive);
 
     /// Do core logic simulation.
-    static void HoughMapping(void);
+    static void HoughMappingPlus(void);
+    static void HoughMappingMinus(void);
 
   public:// Configuration
 

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  template < class SpacePoint,
+  template < class HitType,
              class Filter2sp, class Filter3sp, class Filter4sp >
   class StaticSector {
 
@@ -66,24 +66,25 @@ namespace Belle2 {
       m_compactSecIDsMap = & compactSecIDsMap;
     }
 
+    /** Parameters: pass the ID of the next inner sector and the filters you like to attach */
     void assign2spFilter(FullSecID sector, const Filter2sp  filter)
     {
       m_2spFilters[ m_compactSecIDsMap->getCompactID(sector) ] = filter;
     }
 
+    /** Parameters: pass the ID of the inner sectors (sorted from outer(left) to inner(right) and the filters you like to attach */
     void assign3spFilter(FullSecID sector1, FullSecID sector2,
                          const Filter3sp  filter)
     {
       m_3spFilters[ m_compactSecIDsMap->getCompactID(sector1, sector2) ] = filter;
-
     }
 
-    void assign3spFilter(FullSecID sector1, FullSecID sector2, FullSecID sector3,
+    /** Parameters: pass the ID of the inner sectors (sorted from outer(left) to inner(right) and the filters you like to attach */
+    void assign4spFilter(FullSecID sector1, FullSecID sector2, FullSecID sector3,
                          const Filter3sp  filter)
     {
       m_4spFilters[ m_compactSecIDsMap->getCompactID(sector1, sector2, sector3) ] =
         filter;
-
     }
 
 
@@ -91,7 +92,7 @@ namespace Belle2 {
     /** returns innerSecIDs */
     const std::vector<Belle2::FullSecID>& getInnerSecIDs() const
     {
-      return m_innerSecIDs;
+      return m_innerSecIDs; // WARNING this is a dummy yet!
     }
 
     /** returns FullSecID of this sector */
@@ -101,8 +102,8 @@ namespace Belle2 {
     /// COMPARISON OPERATORS
 
     /** == -operator - compares if two StaticSectors are identical */
-    template< class StaticSectorDummy >
-    inline bool operator == (const StaticSectorDummy& b) const
+    template< class StaticSectorType >
+    inline bool operator == (const StaticSectorType& b) const
     {
       return (getFullSecID() == b.getFullSecID());
     }
@@ -116,21 +117,29 @@ namespace Belle2 {
 
 
 
-    /** applies all filters enabled for combination of sectors
-    (this Sector and sector with passed fullSecID on given spacePoints,
-    returns true if accepted */
-    bool accept(const FullSecID& outerSecID,
-                const SpacePoint& spOnThisSec,
-                const SpacePoint& spOnTheOuterSec) const
+    /** applies all filters enabled for given combination of sectors
+    * (this Sector and sector with passed fullSecID) on given hits,
+    * sorting of parameters: from outer to inner, independently for SecID and Hits
+    * returns true if accepted */
+    bool accept(const FullSecID& innerSecID,
+                const HitType& spOnThisSec,
+                const HitType& spOnInnerSec) const
     {
-      auto filter = m_2spFilters[ m_compactSecIDsMap->getCompactID(outerSecID) ].second;
-      return filter.accept(spOnTheOuterSec , spOnTheOuterSec);
+      auto filter = m_2spFilters[ m_compactSecIDsMap->getCompactID(innerSecID) ].second;
+      return filter.accept(spOnThisSec , spOnInnerSec);
     }
 
-    /** applies all filters enabled for combination of sectors (this Sector and sector with passed fullSecID on given spacePoints, returns true if accepted */
-    template<class HitType>
+    /** applies all filters enabled for given combination of sectors
+    * (this Sector and sector with passed fullSecID) on given hits,
+    * sorting of parameters: from outer to inner, independently for SecID and Hits
+    * returns true if accepted */
     bool accept(FullSecID, FullSecID, HitType&, HitType&, HitType&) const { return true; }
 
+    /** applies all filters enabled for given combination of sectors
+    * (this Sector and sector with passed fullSecID) on given hits,
+    * sorting of parameters: from outer to inner, independently for SecID and Hits
+    * returns true if accepted */
+    bool accept(FullSecID, FullSecID, FullSecID, HitType&, HitType&, HitType&, HitType&) const { return true; }
   };
 
 

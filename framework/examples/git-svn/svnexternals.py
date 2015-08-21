@@ -6,6 +6,8 @@ import os
 import re
 from subprocess import check_output, call, CalledProcessError
 
+# @cond internal_test
+
 # Get Belle2 environment variables
 try:
     LOCAL_DIR = os.environ["BELLE2_LOCAL_DIR"]
@@ -210,3 +212,5 @@ with SvnExternalsCache() as cache:
 f = open(".gitignore", "w")
 f.writelines(gitignore)
 f.close()
+
+# @endcond

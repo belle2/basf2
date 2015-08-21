@@ -246,9 +246,6 @@ namespace Belle2 {
     //! Accept connection
     int Connect();
 
-    //! Read data/check a connection
-    int CheckConnection(int socket);
-
     //! receive data
     int recvFD(int fd, char* buf, int data_size_byte, int flag);
 
@@ -348,6 +345,9 @@ namespace Belle2 {
 
     //! call checkrunstop
     void callCheckRunStop(std::string& err_str);
+
+    //! Read data/check a connection
+    int CheckConnection(int socket);
 #endif
 
     //! which format is used

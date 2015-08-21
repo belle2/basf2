@@ -257,6 +257,9 @@ namespace Belle2 {
     //! check RunStop
     void callCheckRunStop(std::string& err_str);
 
+    //! check connection status
+    int CheckConnection(int socket);
+
 #endif
 
   private:

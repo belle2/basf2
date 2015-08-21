@@ -191,8 +191,8 @@ namespace Belle2 {
     //! for nonstop DAQ
     virtual void restartRun();
 
-    /*     //! for nonstop DAQ */
-    /*     virtual int checkRunRecovery(); */
+    //! for nonstop DAQ
+    virtual int checkRunRecovery();
 
     /*     //! for nonstop DAQ */
     /*     virtual void pauseRun(); */

@@ -78,6 +78,11 @@ namespace Belle2 {
                            unsigned int* run_copper_0, unsigned int* subrun_copper_0,
                            unsigned int* eve_copper_0, int* error_bit_flag);
 
+#ifdef NONSTOP
+    //! wait for restart
+    virtual void waitRestart();
+#endif
+
 
     //! # of connections
     int m_num_connections;

@@ -126,6 +126,8 @@ void DeSerializerCOPPERModule::initialize()
 }
 
 
+
+
 void DeSerializerCOPPERModule::initializeCOPPER()
 {
 

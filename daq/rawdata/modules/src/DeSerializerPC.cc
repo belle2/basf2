@@ -50,6 +50,8 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("PortFrom", m_port_from, "port numbers of data sources");
 
   B2INFO("DeSerializerPC: Constructor done.");
+
+
 }
 
 
@@ -63,6 +65,11 @@ DeSerializerPCModule::~DeSerializerPCModule()
 void DeSerializerPCModule::initialize()
 {
   B2INFO("DeSerializerPC: initialize() started.");
+
+  // Set m_socket
+  for (int i = 0; i < m_num_connections; i++) {
+    m_socket.push_back(-1);
+  }
 
   // allocate buffer
   for (int i = 0 ; i < NUM_PREALLOC_BUF; i++) {
@@ -176,6 +183,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
 int DeSerializerPCModule::Connect()
 {
   for (int i = 0; i < m_num_connections; i++) {
+    if (m_socket[ i ] >= 0) continue;     // Already have an established socket
     //
     // Connect to a downstream node
     //
@@ -214,7 +222,9 @@ int DeSerializerPCModule::Connect()
         break;
       }
     }
-    m_socket.push_back(sd);
+
+    //    m_socket.push_back(sd);
+    m_socket[ i ] = sd;
 
     // check socket paramters
     int val, len;
@@ -621,7 +631,35 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
   return;
 }
 
+#ifdef NONSTOP
+void DeSerializerPCModule::waitRestart()
+{
 
+  for (int i = 0; i < m_num_connections; i++) {
+    if (CheckConnection(m_socket[ i ]) < 0)  m_socket[ i ] = -1;
+  }
+
+  while (true) {
+#ifdef NONSTOP_DEBUG
+    printf("\033[31m");
+    printf("###########(Ser) Waiting for Restart ###############\n");
+    fflush(stdout);
+    printf("\033[0m");
+#endif
+    if (checkRunRecovery()) {
+      g_run_stop = 0;
+      g_run_recovery = 1;
+      break;
+    }
+    sleep(1);
+  }
+
+  Connect();
+
+  return;
+
+}
+#endif
 
 void DeSerializerPCModule::event()
 {
@@ -656,7 +694,7 @@ void DeSerializerPCModule::event()
         if (checkRunStop()) break;
 #ifdef NONSTOP_DEBUG
         printf("\033[31m");
-        printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
+        printf("###########(DeserializerPC) Waiting for Runstop()  ###############\n");
         fflush(stdout);
         printf("\033[0m");
 #endif

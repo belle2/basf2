@@ -224,43 +224,6 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 }
 
 
-int DesSerPrePC::CheckConnection(int socket)
-{
-  // Modify Yamagata-san's eb/iseof.cc
-
-
-  int ret;
-  char buffer[1];
-  while (true) {
-
-    //
-    // Extract data in the socket buffer of a peer
-    //
-    //    ret = recv( socket, buffer, sizeof(buffer), MSG_PEEK|MSG_DONTWAIT );
-    ret = recv(socket, buffer, sizeof(buffer), MSG_DONTWAIT);
-    switch (ret) {
-      case 0: /* EOF */
-        printf("EOF %d\n", socket); fflush(stdout);
-        close(socket);
-        return -1;
-      case -1:
-        if (errno == EAGAIN) {
-          printf("EAGAIN %d\n", socket); fflush(stdout);
-          /* not EOF, no data in queue */
-          return 0;
-        } else {
-          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
-          close(socket);
-          return -1;
-        }
-        break;
-      default:
-        printf("Reading data from socket %d\n", socket); fflush(stdout);
-    }
-  }
-
-}
-
 int DesSerPrePC::Connect()
 {
 
@@ -1174,6 +1137,7 @@ void DesSerPrePC::Accept()
       exit(-1);
     }
   }
+  close(fd_listen);
 
   //   int flag = 1;
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
@@ -1333,6 +1297,55 @@ void DesSerPrePC::callCheckRunStop(string& err_str)
     throw (err_str);
   }
   return;
+}
+
+
+int DesSerPrePC::CheckConnection(int socket)
+{
+  // Modify Yamagata-san's eb/iseof.cc
+
+
+  int ret;
+  char buffer[100000];
+  int eagain_cnt = 0;
+  int tot_ret = 0;
+  while (true) {
+
+    //
+    // Extract data in the socket buffer of a peer
+    //
+    //    ret = recv( socket, buffer, sizeof(buffer), MSG_PEEK|MSG_DONTWAIT );
+    ret = recv(socket, buffer, sizeof(buffer), MSG_DONTWAIT);
+    switch (ret) {
+      case 0: /* EOF */
+        printf("EOF %d\n", socket); fflush(stdout);
+        close(socket);
+        return -1;
+      case -1:
+        if (errno == EAGAIN) {
+          printf("EAGAIN %d cnt %d recvd %d\n", socket, eagain_cnt, tot_ret); fflush(stdout);
+          /* not EOF, no data in queue */
+          if (eagain_cnt > 100) {
+            return 0;
+          }
+          usleep(10000);
+          eagain_cnt++;
+        } else {
+          printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+          close(socket);
+          return -1;
+        }
+        break;
+      default:
+        tot_ret += ret;
+        printf("Flushing data in socket buffer : sockid = %d %d bytes tot %d bytes\n", socket, ret, tot_ret); fflush(stdout);
+        if (checkRunRecovery()) {
+          printf("Run seems to be restarted while buffer has not been flushed yet. Exting...");
+          exit(1);
+        }
+    }
+  }
+
 }
 
 

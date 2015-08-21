@@ -444,6 +444,7 @@ void SerializerModule::Accept()
       exit(-1);
     }
   }
+  close(fd_listen);
 
   //   int flag = 1;
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
@@ -538,7 +539,7 @@ void SerializerModule::restartRun()
 #endif
   g_run_restarting = 0;
 
-  if (!CheckConnection(m_socket) < 0) Accept();
+  if (CheckConnection(m_socket) < 0) Accept();
 
   return;
 }
@@ -548,12 +549,9 @@ void SerializerModule::restartRun()
 int SerializerModule::CheckConnection(int socket)
 {
   // Modify Yamagata-san's eb/iseof.cc
-
-
   int ret;
   char buffer[1];
   while (true) {
-
     //
     // Extract data in the socket buffer of a peer
     //
@@ -576,7 +574,11 @@ int SerializerModule::CheckConnection(int socket)
         }
         break;
       default:
-        printf("Reading data from socket %d\n", socket); fflush(stdout);
+        printf("Flushing data in socket buffer : sockid = %d\n", socket); fflush(stdout);
+        if (checkRunRecovery()) {
+          printf("Run seems to be restarted while buffer has not been flushed yet. Exting...");
+          exit(1);
+        }
     }
   }
 
@@ -604,14 +606,14 @@ void SerializerModule::callCheckRunStop(string& err_str)
 }
 
 
-// int SerializerModule::checkRunRecovery()
-// {
-//   if (*m_ptr) {
-//     return 0;
-//   } else {
-//     return 1;
-//   }
-// }
+int SerializerModule::checkRunRecovery()
+{
+  if (*m_ptr) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
 
 
 // void SerializerModule::pauseRun()

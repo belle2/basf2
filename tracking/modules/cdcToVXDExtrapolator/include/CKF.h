@@ -85,13 +85,12 @@ namespace Belle2 {
     /// maximum chi2 increment per added hit
     double maxChi2Increment;
 
+    /// extra weight multiplier for hits
+    double hitMultiplier;
     /// Effective Chi2/Ndof a track is penalized for for having a
     /// "true" hole (a hole in the hits, followed by another hit, not
     /// just a string of hits at the end of the track)
     double holePenalty;
-
-    /// extra weight multiplier for hits
-    double hitMultiplier;
 
     /// maximum number of tracks to propagate through
     int Nmax;

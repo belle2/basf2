@@ -139,7 +139,7 @@ static bool extrapolateToCylinder(float radius, genfit::Track* track, TVector3& 
   return true;
 }
 
-bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>&, unsigned searchLayer,
                                               StoreArray<PXDCluster>& clusters,
                                               std::vector<genfit::AbsMeasurement*>& hits)
 {
@@ -186,7 +186,7 @@ bool CKFCdcToVxdModule::extrapolateToPXDLayer(genfit::Track* track, std::vector<
   return true;
 }
 
-bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>& current, unsigned searchLayer,
+bool CKFCdcToVxdModule::extrapolateToSVDLayer(genfit::Track* track, std::vector<CKFPartialTrack*>&, unsigned searchLayer,
                                               StoreArray<SVDCluster>& clusters,
                                               bool isU, std::vector<genfit::AbsMeasurement*>& hits)
 {

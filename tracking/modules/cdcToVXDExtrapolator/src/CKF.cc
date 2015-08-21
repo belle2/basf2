@@ -37,9 +37,9 @@ CKF::CKF(genfit::Track* _track, bool (*_findHits)(genfit::Track*, std::vector<CK
   step(0),
   maxHoles(_maxHoles),
   maxChi2Increment(_maxChi2Increment),
+  hitMultiplier(_hitMultiplier),
   holePenalty(_holePenalty),
   Nmax(_Nmax),
-  hitMultiplier(_hitMultiplier),
   tracks(0)
 {
 }
@@ -183,7 +183,7 @@ bool CKF::passPreUpdateTrim(CKFPartialTrack* track, unsigned step)
   // Check for holes
   int nadded = track->getNumPointsWithMeasurement() - seedTrack->getNumPointsWithMeasurement();
   int nholes = step - nadded;
-  if (nholes != track->totalHoles())
+  if (nholes != (int) track->totalHoles())
     B2WARNING("Number of holes from CKFPartialTrack: " << track->totalHoles() << ", differs from what I think it should be: " << nholes)
     if (nholes > maxHoles) {
       B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
@@ -273,7 +273,7 @@ CKFPartialTrack* CKF::bestTrack(std::vector<CKFPartialTrack*>* tracks)
 void CKF::orderTracksAndTrim(std::vector<CKFPartialTrack*>*& tracks)
 {
   std::sort(tracks->begin(), tracks->end(), [this](CKFPartialTrack * a, CKFPartialTrack * b) { return (quality(a) > quality(b)); });
-  if (tracks->size() <= Nmax) return;
+  if ((int) tracks->size() <= Nmax) return;
 
   for (unsigned i = 0; i < tracks->size(); ++i) {
     double Q = quality(tracks->at(i));

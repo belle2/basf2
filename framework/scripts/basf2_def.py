@@ -220,6 +220,7 @@ def print_all_modules(moduleList, package=''):
     """
 
     term_width = get_terminal_width()
+    fail = False
 
     modules = []
     for (moduleName, sharedLib) in sorted(moduleList.iteritems()):
@@ -230,6 +231,7 @@ def print_all_modules(moduleList, package=''):
         except:
             B2ERROR('The module could not be loaded. This is most likely ' +
                     'caused by a library with missing links.')
+            fail = True
 
     table = []
     current_package = ''
@@ -247,6 +249,10 @@ def print_all_modules(moduleList, package=''):
     print 'To show detailed information on a module, including its parameters,'
     print "type \'basf2 -m ModuleName\'. Use \'basf2 -m package\' to only list"
     print 'modules belonging to a given package.'
+
+    if fail:
+        B2FATAL("One or more modules could not be loaded. Please check the "
+                "following ERROR messages and contact the responsible authors.")
 
 
 def print_params(module, print_values=True, shared_lib_path=None):

@@ -102,6 +102,24 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   oldQuadTree.provideItemsSet(hitsVector);
   oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
 
+  /* DEBUG */
+  if (m_param_debugOutput) {
+    const auto& debugMap = oldQuadTree.getDebugInformation();
+
+    TFile file("quadtree_content.root", "RECREATE");
+    TH2F hist("hist", "QuadTreeContent", std::pow(2, m_level), childRanges.first.first, childRanges.first.second,
+              std::pow(2, m_level), childRanges.second.first, childRanges.second.second);
+
+    for (const auto& debug : debugMap) {
+      const auto& positionInformation = debug.first;
+      const auto& quadItemsVector = debug.second;
+      hist.Fill(positionInformation.first, positionInformation.second, quadItemsVector.size());
+    }
+
+    hist.Write();
+    file.Close();
+  }
+
   if (possibleStereoSegments.size() == 0) {
     B2WARNING("Found no stereo segments!");
     return;
@@ -135,6 +153,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
           doubledRecoHits.push_back(*innerIterator);
         }
       }
+
     }
   }
 

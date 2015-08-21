@@ -85,6 +85,8 @@ namespace Belle2 {
 
     int m_maxHoles; /**< maximum number of holes per added hit in the CKF */
     double m_maxChi2Increment; /**< maximum chi2 per added hit in the CKF */
+    double m_holePenalty; /**< Effective chi2/ndof penalty in CKF quality for a hole */
+    int m_Nmax; /** Maximum number of propagated candidates per step in CKF */
 
     // input
     std::string m_GFTrackColName; /**< genfit::Track input collection name */

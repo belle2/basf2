@@ -200,15 +200,22 @@ bool CKF::passPostUpdateTrim(genfit::Track* track, unsigned)
   return true;
 }
 
-void chiSqNdf(genfit::Track* track, double& chi2, int& ndf)
+void chiSqNdf(genfit::Track* track, double& chi2, int& ndf, double& chi2_ndof)
 {
-  chi2 = 0; ndf = 0;
+  chi2 = 0;
+  ndf = 0;
+  chi2_ndof = 0;
   for (unsigned i = 0; i < track->getNumPointsWithMeasurement(); ++i) {
     auto fi = track->getPointWithMeasurementAndFitterInfo(i, track->getCardinalRep());
     if (fi) {
       auto up = fi->getKalmanFitterInfo(0)->getUpdate(-1);
       chi2 += up->getChiSquareIncrement();
       ndf += up->getNdf();
+      if (std::isnan(up->getChiSquareIncrement() / up->getNdf())) {
+        B2DEBUG(40, "IsNAN: " << up->getChiSquareIncrement() << " " << up->getNdf());
+        chi2_ndof += 1.;
+      } else
+        chi2_ndof += up->getChiSquareIncrement() / up->getNdf();
     } else {
       B2WARNING("FitterInfo missing in track!");
     }
@@ -217,17 +224,18 @@ void chiSqNdf(genfit::Track* track, double& chi2, int& ndf)
 
 double CKF::quality(CKFPartialTrack* track)
 {
-  double thisChi2(0); int ndf(0);
-  chiSqNdf(track, thisChi2, ndf);
-  B2DEBUG(90, "-- In CKF::quality(): @ " << " " << thisChi2 << " " << ndf << " " << thisChi2 / ndf << " Hole Penalty: " <<
-          track->trueHoles() * holePenalty << " " << track->addedHits());
+  double thisChi2(0), thisChi2_Ndf(0); int ndf(0);
+  chiSqNdf(track, thisChi2, ndf, thisChi2_Ndf);
   // thisChi2 += track->trueHoles() * holePenalty;
   // ndf += track->trueHoles();
   // thisChi2 = thisChi2 / ndf;
   // B2DEBUG(90, "----- In CKF::quailty(): @ " << " " << thisChi2);
   // return thisChi2;
 
-  double Q = (double) track->addedHits() - (double) track->trueHoles() - (1.0f / holePenalty) * (thisChi2 / (double) ndf);
+  double Q = (double) track->addedHits() - (double) track->trueHoles() - (1.0f / holePenalty) * thisChi2_Ndf;
+  B2DEBUG(90, "-- In CKF::quality(): @ " << " " << thisChi2 << " " << ndf << " " << thisChi2 / ndf <<
+          " sum(chi2/ndf) " << thisChi2_Ndf <<
+          " Hole Penalty: " << track->trueHoles() * holePenalty << " Hits: " << track->addedHits() << " Q " << Q);
   return Q;
 }
 
@@ -258,11 +266,11 @@ void CKF::orderTracksAndTrim(std::vector<CKFPartialTrack*>*& tracks)
     double Q = quality(tracks->at(i));
     B2DEBUG(80, "---- orderingTracksAndTrimming: @ " << i << " " << Q);
     if (Q > tracks->at(i)->addedHits()) {
-      double chi2(0); int ndf(0);
-      chiSqNdf(tracks->at(i), chi2, ndf);
-      B2WARNING("---- orderingTracksAndTrimming: BAD TRACK @ " << i << " " << Q << " " << tracks->at(
-                  i)->addedHits() << " " << chi2 << " " << ndf << " " << chi2 / ndf << " " << tracks->at(i)->trueHoles() << " " << tracks->at(
-                  i)->totalHoles() << " ");
+      double chi2(0), chi2_ndf(0); int ndf(0);
+      chiSqNdf(tracks->at(i), chi2, ndf, chi2_ndf);
+      B2WARNING("---- orderingTracksAndTrimming: BAD TRACK @ " << i << " " << Q << " " << chi2_ndf << " " <<
+                tracks->at(i)->addedHits() << " " << chi2 << " " << ndf << " " << chi2 / ndf << " " <<
+                tracks->at(i)->trueHoles() << " " << tracks->at(i)->totalHoles() << " ");
     }
   }
   for (unsigned i = Nmax; i < tracks->size(); ++i) {

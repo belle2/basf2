@@ -84,8 +84,10 @@ CKFCdcToVxdModule::CKFCdcToVxdModule() :
   // Parameter definitions
   addParam("RootOutputFilename", m_rootOutputFilename,
            "Filename for the ROOT file of module information. If \"\" then won't output ROOT file.", std::string(""));
-  addParam("MaxHoles", m_maxHoles, "maximum number of holes per added hit in the CKF", 3);
+  addParam("MaxHoles", m_maxHoles, "maximum number of holes per added hit in the CKF", 2);
   addParam("MaxChi2Increment", m_maxChi2Increment, "maximum chi2 per added hit in the CKF", 10.0);
+  addParam("HolePenalty", m_holePenalty, "Effective chi2/ndof penalty in CKF quality for a hole", 10.0);
+  addParam("NMax", m_Nmax, "Maximum number of propagated candidates per step in CKF", 10);
 
   // Input
   addParam("GFTrackColName", m_GFTrackColName, "Name of genfit::Track collection (input)", std::string(""));
@@ -487,7 +489,7 @@ void CKFCdcToVxdModule::event()
     if (isCdcOnly(crnt)) {
       trkInfo.cdconly = true;
       B2DEBUG(100, "<----> CDCOnly Track Found Running CKF " << " <--->");
-      CKF ckf(&crnt, findHits, (void*) this, m_maxChi2Increment, m_maxHoles);
+      CKF ckf(&crnt, findHits, (void*) this, m_maxChi2Increment, m_maxHoles, m_holePenalty, m_Nmax);
       genfit::Track* newTrk = ckf.processTrack();
       if (newTrk) {
         storeTrack(*newTrk, outGfTracks, outGfTrackCands, gfTrackCandidatesTogfTracks, gfTracksToMCPart);

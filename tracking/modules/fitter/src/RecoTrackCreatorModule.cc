@@ -10,6 +10,7 @@
 #include <tracking/modules/fitter/RecoTrackCreatorModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,6 +47,11 @@ void RecoTrackCreatorModule::initialize()
   recoTracks.registerInDataStore();
   recoTracks.registerRelationTo(trackCandidates);
 
+  StoreArray<MCParticle> mcParticles;
+  if (mcParticles.isOptional()) {
+    recoTracks.registerRelationTo(mcParticles);
+  }
+
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
   recoHitInformations.registerInDataStore();
 
@@ -80,6 +86,8 @@ void RecoTrackCreatorModule::event()
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
   recoHitInformations.create();
 
+  StoreArray<MCParticle> mcParticles;
+
   for (const genfit::TrackCand& trackCandidate : trackCandidates) {
 
     if (trackCandidate.getNHits() < 3) {
@@ -92,5 +100,12 @@ void RecoTrackCreatorModule::event()
                                                              m_param_recoHitInformationStoreArrayName);
 
     newRecoTrack->addRelationTo(&trackCandidate);
+
+    // Add also the MC information
+    const int mcParticleID = trackCandidate.getMcTrackId();
+    if (mcParticleID > 0 and mcParticles.isOptional()) {
+      MCParticle* relatedMCParticle = mcParticles[mcParticleID];
+      newRecoTrack->addRelationTo(relatedMCParticle);
+    }
   }
 }

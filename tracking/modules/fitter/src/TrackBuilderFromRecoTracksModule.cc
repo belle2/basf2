@@ -15,6 +15,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -43,19 +44,21 @@ void TrackBuilderFromRecoTracksModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
 
-  StoreArray<Track> tracks(m_param_tracksStoreArrayName);
-  tracks.registerInDataStore();
-
-  tracks.registerRelationTo(recoTracks);
-
-  StoreArray<TrackFitResult> trackFitResults;
-  trackFitResults.registerInDataStore();
-
-  recoTracks.registerRelationTo(trackFitResults);
-
   StoreArray<genfit::TrackCand> trackCands(m_param_trackCandidatesStoreArrayName);
   trackCands.isRequired();
 
+  StoreArray<Track> tracks(m_param_tracksStoreArrayName);
+  tracks.registerInDataStore();
+  tracks.registerRelationTo(recoTracks);
+
+  StoreArray<MCParticle> mcParticles;
+  if (mcParticles.isOptional()) {
+    tracks.registerRelationTo(mcParticles);
+  }
+
+  StoreArray<TrackFitResult> trackFitResults;
+  trackFitResults.registerInDataStore();
+  recoTracks.registerRelationTo(trackFitResults);
   trackCands.registerRelationTo(trackFitResults);
 }
 
@@ -128,7 +131,7 @@ bool TrackBuilderFromRecoTracksModule::createTrackFitResult(const RecoTrack& rec
     // Add all relations
     recoTrack.addRelationTo(newTrackFitResult);
     genfit::TrackCand* relatedTrackCand = recoTrack.getRelated<genfit::TrackCand>(m_param_trackCandidatesStoreArrayName);
-    DataStore::Instance().addRelationFromTo(relatedTrackCand, newTrackFitResult);
+    DataStore::addRelationFromTo(relatedTrackCand, newTrackFitResult);
 
     return true;
   } catch (...) {
@@ -160,7 +163,12 @@ void TrackBuilderFromRecoTracksModule::event()
 
     if (hasTrackFitResult) {
       // Create a StoreArray entry from a copy.
-      tracks.appendNew(newBelleTrack);
+      Track* addedBelleTrack = tracks.appendNew(newBelleTrack);
+
+      MCParticle* relatedMCParticle = recoTrack.getRelated<MCParticle>();
+      if (relatedMCParticle != nullptr) {
+        addedBelleTrack->addRelationTo(relatedMCParticle);
+      }
 
       B2DEBUG(50, "Built Belle2::Track");
     }

@@ -12,11 +12,11 @@ std::string ParticleListName::antiParticleListName(const std::string& listName)
   DecayDescriptor decayDescriptor;
   bool valid = decayDescriptor.init(listName);
   if (!valid)
-    throw std::runtime_error("Invalid input listName: " + listName);
+    throw std::runtime_error("Invalid ParticleList name: '" + listName + "' Should be EVTPDLNAME[:LABEL], e.g. B+ or B+:mylist.");
 
   int nProducts = decayDescriptor.getNDaughters();
   if (nProducts > 0)
-    throw std::runtime_error("Invalid input listName " + listName
+    throw std::runtime_error("Invalid ParticleList name " + listName
                              + ". DecayString should not contain any daughters, only the mother particle.");
 
   const DecayDescriptorParticle* mother = decayDescriptor.getMother();

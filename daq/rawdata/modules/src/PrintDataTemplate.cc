@@ -129,6 +129,9 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 2)),
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 3))
         );
+  if (m_eventMetaDataPtr->getErrorFlag()) {
+    printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %d errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
+  }
 
   printBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords());
   //

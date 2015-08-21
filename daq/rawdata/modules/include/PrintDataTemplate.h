@@ -105,6 +105,9 @@ namespace Belle2 {
     //!
     int m_print_cnt;
 
+    // Event Meta Data
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
   };
 
 } // end namespace Belle2

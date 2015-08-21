@@ -14,11 +14,15 @@ template <>
 TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
-  const VxdID& vxdID = cluster.getSensorID();
-  const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
+  if (trueHit == nullptr) {
+    return TVector3();
+  } else {
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
 
-  return momentum;
+    return momentum;
+  }
 }
 
 /** We have to handle PXD and SVD differently here */
@@ -26,11 +30,15 @@ template <>
 TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const
 {
   SVDTrueHit* trueHit = cluster.getRelated<SVDTrueHit>("SVDTrueHits");
-  const VxdID& vxdID = cluster.getSensorID();
-  const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
+  if (trueHit == nullptr) {
+    return TVector3();
+  } else {
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
 
-  return momentum;
+    return momentum;
+  }
 }
 
 /** We have to handle PXD and SVD differently here */
@@ -38,11 +46,15 @@ template <>
 TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
-  const VxdID& vxdID = cluster.getSensorID();
-  const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
+  if (trueHit == nullptr) {
+    return TVector3();
+  } else {
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
 
-  return momentum;
+    return momentum;
+  }
 }
 
 /** We have to handle PXD and SVD differently here */
@@ -50,9 +62,13 @@ template <>
 TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("SVDTrueHits");
-  const VxdID& vxdID = cluster.getSensorID();
-  const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
+  if (trueHit == nullptr) {
+    return TVector3();
+  } else {
+    const VxdID& vxdID = cluster.getSensorID();
+    const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
 
-  return momentum;
+    return momentum;
+  }
 }

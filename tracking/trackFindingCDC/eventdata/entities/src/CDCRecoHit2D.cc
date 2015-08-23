@@ -12,6 +12,8 @@
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <cdc/dataobjects/CDCSimHit.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -23,9 +25,7 @@ CDCRecoHit2D::CDCRecoHit2D() :
 {;}
 
 
-CDCRecoHit2D::CDCRecoHit2D(
-  const CDCRLWireHit* rlWireHit
-) :
+CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit* rlWireHit) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(Vector2D::getLowest())
 {
@@ -33,10 +33,8 @@ CDCRecoHit2D::CDCRecoHit2D(
 }
 
 
-CDCRecoHit2D::CDCRecoHit2D(
-  const CDCRLWireHit* rlWireHit,
-  const Vector2D& recoDisp2D
-) :
+CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit* rlWireHit,
+                           const Vector2D& recoDisp2D) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(recoDisp2D)
 {
@@ -45,10 +43,8 @@ CDCRecoHit2D::CDCRecoHit2D(
 
 CDCRecoHit2D::~CDCRecoHit2D() {;}
 
-CDCRecoHit2D CDCRecoHit2D::fromSimHit(
-  const CDCWireHit* wireHit,
-  const CDCSimHit& simHit
-)
+CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
+                                      const CDCSimHit& simHit)
 {
   if (wireHit == nullptr) {
     B2ERROR("Recohit with nullptr as wire hit");
@@ -70,10 +66,8 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(
 }
 
 CDCRecoHit2D
-CDCRecoHit2D::average(
-  const CDCRecoHit2D& recoHit1,
-  const CDCRecoHit2D& recoHit2
-)
+CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
+                      const CDCRecoHit2D& recoHit2)
 {
 
   if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit())) {
@@ -87,16 +81,13 @@ CDCRecoHit2D::average(
   result.snapToDriftCircle();
 
   return result;
-
 }
 
 
 CDCRecoHit2D
-CDCRecoHit2D::average(
-  const CDCRecoHit2D& recoHit1,
-  const CDCRecoHit2D& recoHit2,
-  const CDCRecoHit2D& recoHit3
-)
+CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
+                      const CDCRecoHit2D& recoHit2,
+                      const CDCRecoHit2D& recoHit3)
 {
   if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit() and
           recoHit2.getRLWireHit() == recoHit3.getRLWireHit())) {
@@ -130,7 +121,8 @@ CDCRecoHit2D CDCRecoHit2D::fromAbsPos2D(
 
 void CDCRecoHit2D::reverse()
 {
-  const CDCRLWireHit* reverseRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());
+  const CDCRLWireHit* reverseRLWireHit =
+    CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());
   setRLWireHit(reverseRLWireHit);
 }
 
@@ -155,15 +147,5 @@ Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
     //we set it the basic assumption.
     FloatType z        = 0.0;
     return Vector3D(recoPos2D, z);
-
   }
-}
-
-
-Vector2D CDCRecoHit2D::getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-{
-  return trajectory2D.getClosest(getRecoPos2D());
-
-  /// FIXME: Think about if this is the correct behaviour.
-  //return reconstruct3D(trajectory2D).xy();
 }

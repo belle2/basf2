@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -29,11 +28,9 @@ CDCFacet::CDCFacet() :
 
 
 
-CDCFacet::CDCFacet(
-  const CDCRLWireHit* startRLWireHit,
-  const CDCRLWireHit* middleRLWireHit,
-  const CDCRLWireHit* endRLWireHit
-) :
+CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
+                   const CDCRLWireHit* middleRLWireHit,
+                   const CDCRLWireHit* endRLWireHit) :
   CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
   m_startToMiddle(),
   m_startToEnd(),
@@ -48,14 +45,12 @@ CDCFacet::CDCFacet(
 
 
 
-CDCFacet::CDCFacet(
-  const CDCRLWireHit* startRLWireHit,
-  const CDCRLWireHit* middleRLWireHit,
-  const CDCRLWireHit* endRLWireHit,
-  const ParameterLine2D& startToMiddle,
-  const ParameterLine2D& startToEnd,
-  const ParameterLine2D& middleToEnd
-) :
+CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
+                   const CDCRLWireHit* middleRLWireHit,
+                   const CDCRLWireHit* endRLWireHit,
+                   const ParameterLine2D& startToMiddle,
+                   const ParameterLine2D& startToEnd,
+                   const ParameterLine2D& middleToEnd) :
   CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
   m_startToMiddle(startToMiddle),
   m_startToEnd(startToEnd),
@@ -79,30 +74,23 @@ CDCFacet CDCFacet::reversed() const
 
 }
 
-
-
 void CDCFacet::adjustLines() const
 {
+  m_startToMiddle =
+    CDCTangent::constructTouchingLine(getStartWireHit().getRefPos2D(),
+                                      getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
+                                      getMiddleWireHit().getRefPos2D(),
+                                      getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength());
 
-  m_startToMiddle = CDCTangent::constructTouchingLine(
-                      getStartWireHit().getRefPos2D(),
-                      getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                      getMiddleWireHit().getRefPos2D(),
-                      getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength()
-                    );
+  m_startToEnd =
+    CDCTangent::constructTouchingLine(getStartWireHit().getRefPos2D(),
+                                      getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
+                                      getEndWireHit().getRefPos2D(),
+                                      getEndRLInfo() * getEndWireHit().getRefDriftLength());
 
-  m_startToEnd = CDCTangent::constructTouchingLine(
-                   getStartWireHit().getRefPos2D(),
-                   getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                   getEndWireHit().getRefPos2D(),
-                   getEndRLInfo() * getEndWireHit().getRefDriftLength()
-                 );
-
-  m_middleToEnd = CDCTangent::constructTouchingLine(
-                    getMiddleWireHit().getRefPos2D(),
-                    getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
-                    getEndWireHit().getRefPos2D(),
-                    getEndRLInfo() * getEndWireHit().getRefDriftLength()
-                  );
-
+  m_middleToEnd =
+    CDCTangent::constructTouchingLine(getMiddleWireHit().getRefPos2D(),
+                                      getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
+                                      getEndWireHit().getRefPos2D(),
+                                      getEndRLInfo() * getEndWireHit().getRefDriftLength());
 }

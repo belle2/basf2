@@ -26,20 +26,6 @@ namespace Belle2 {
 
     template<class T>
     class CDCGenHitVector : public SortableVector<T> {
-    public:
-      // typedef typename SortableVector<T>::iterator iterator; ///< Iterator type of this container
-      typedef typename SortableVector<T>::const_iterator const_iterator;    ///< Constant iterator type of this container
-
-      // typedef typename SortableVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
-      // typedef typename SortableVector<T>::const_reverse_iterator
-      // const_reverse_iterator;  ///< Constant reversed iterator type of this container
-
-
-      // typedef typename SortableVector<T>::range range; ///< Iterator type of this container
-      // typedef typename SortableVector<T>::const_range const_range; ///< Iterator type of this container
-
-      // typedef typename SortableVector<T>::input_iterator input_iterator;    ///< Constant iterator type of this container
-
 
     public:
       /// Default constructor for ROOT compatibility.

@@ -25,10 +25,8 @@ CDCRLWireHit::CDCRLWireHit() :
 {;}
 
 
-CDCRLWireHit::CDCRLWireHit(
-  const CDCWireHit* wirehit,
-  RightLeftInfo rlInfo
-) :
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
+                           RightLeftInfo rlInfo) :
   m_wirehit(wirehit),
   m_rlInfo(rlInfo)
 {
@@ -38,10 +36,8 @@ CDCRLWireHit::CDCRLWireHit(
 
 
 
-CDCRLWireHit CDCRLWireHit::fromSimHit(
-  const CDCWireHit* wirehit,
-  const CDCSimHit& simhit
-)
+CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
+                                      const CDCSimHit& simhit)
 {
   if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 
@@ -85,7 +81,9 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
     return Vector3D(recoPos2D, recoWirePos3D.z());
 
   } else if (stereoType == AXIAL) {
-    Vector2D recoPos2D = getRecoPos2D(trajectory2D);
+
+    const Vector2D& refPos2D = getRefPos2D();
+    Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
 
     const Vector2D& wirePos2D = getWire().getRefPos2D();
     const FloatType& driftLength = getRefDriftLength();

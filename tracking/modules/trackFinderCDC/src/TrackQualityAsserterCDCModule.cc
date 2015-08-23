@@ -21,7 +21,7 @@ void removeSecondHalfOfTrack(CDCTrack& track)
   unsigned int hitsWithNegativePerpS = 0;
 
   for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = recoHit.getPerpS(trajectory2D) - perpSOfOrigin;
+    const double currentPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D()) - perpSOfOrigin;
     recoHit.setPerpS(currentPerpS);
 
     if (currentPerpS > 0) {

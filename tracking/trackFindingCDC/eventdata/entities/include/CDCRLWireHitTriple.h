@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -51,14 +51,9 @@ namespace Belle2 {
       CDCRLWireHitTriple();
 
       /// Constructor taking three oriented wire hits
-      CDCRLWireHitTriple(
-        const CDCRLWireHit* startRLWireHit,
-        const CDCRLWireHit* middleRLWireHit,
-        const CDCRLWireHit* endRLWireHit
-      );
-
-      /// Empty destructor
-      ~CDCRLWireHitTriple() {;}
+      CDCRLWireHitTriple(const CDCRLWireHit* startRLWireHit,
+                         const CDCRLWireHit* middleRLWireHit,
+                         const CDCRLWireHit* endRLWireHit);
 
     public:
 
@@ -119,7 +114,8 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRLWireHitTriple* operator->() const { return this; }
+      const CDCRLWireHitTriple* operator->() const
+      { return this; }
 
 
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE

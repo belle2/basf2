@@ -22,15 +22,10 @@ CDCRLWireHitPair::CDCRLWireHitPair():
 {
 }
 
-
-
 CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair.m_fromRLWireHit, rlWireHitPair.m_toRLWireHit)
 {
-
 }
-
-
 
 CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit,
                                    const CDCRLWireHit* toRLWireHit):
@@ -41,8 +36,6 @@ CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit,
   assert(toRLWireHit);
 }
 
-
-
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -51,8 +44,6 @@ CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 
   return CDCRLWireHitPair(newFromRLWireHit, newToRLWireHit);
 }
-
-
 
 void CDCRLWireHitPair::reverse()
 {
@@ -64,16 +55,6 @@ void CDCRLWireHitPair::reverse()
   setToRLWireHit(newToRLWireHit);
 }
 
-
-const CDCWireHit* CDCRLWireHitPair::commonWireHit(const CDCRLWireHitPair& rlWireHitPair) const
-{
-  if (rlWireHitPair.hasWireHit(getFromWireHit())) return &(getFromWireHit());
-  else if (rlWireHitPair.hasWireHit(getToWireHit())) return &(getToWireHit());
-  else return nullptr;
-}
-
-
-
 void CDCRLWireHitPair::setFromRLInfo(const RightLeftInfo& fromRLInfo)
 {
   if (fromRLInfo != getFromRLInfo()) {
@@ -82,8 +63,6 @@ void CDCRLWireHitPair::setFromRLInfo(const RightLeftInfo& fromRLInfo)
     setFromRLWireHit(newFromRLWireHit);
   }
 }
-
-
 
 void CDCRLWireHitPair::setToRLInfo(const RightLeftInfo& toRLInfo)
 {

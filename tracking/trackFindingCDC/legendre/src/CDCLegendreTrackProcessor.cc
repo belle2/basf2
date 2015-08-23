@@ -113,7 +113,8 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
 
     // Recalculate the perpS of the hits
     for (CDCRecoHit3D& recoHit : newTrackCandidate) {
-      recoHit.setPerpS(recoHit.getPerpS(trajectory2D));
+      FloatType newPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
+      recoHit.setPerpS(newPerpS);
     }
 
   }

@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/dataobjects/CDCSimHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-
 namespace Belle2 {
+  class CDCSimHit;
+
   namespace TrackFindingCDC {
 
     /// Class representing a two dimensional reconstructed hit in the central drift chamber
@@ -34,7 +34,8 @@ namespace Belle2 {
       CDCRecoHit2D();
 
       /// Constructs a reconstructed hit based on the given oriented wire hit with the given displacement from the wire reference position.
-      CDCRecoHit2D(const CDCRLWireHit* rlWireHit, const Vector2D& recoDisp2D);
+      CDCRecoHit2D(const CDCRLWireHit* rlWireHit,
+                   const Vector2D& recoDisp2D);
 
 
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
@@ -46,7 +47,8 @@ namespace Belle2 {
        *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits \n
        *  assoziated with the same wire hit. If not all recostructed hits are on the same wire hit, the first hit \n
        *  is returned unchanged. Also averages the right left passage information with averageInfo(). */
-      static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1, const CDCRecoHit2D& recoHit2);
+      static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
+                                  const CDCRecoHit2D& recoHit2);
 
 
       /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle. \n
@@ -64,11 +66,9 @@ namespace Belle2 {
        *  @param pos2D the absolut position of the wire
        *  @param snap optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromAbsPos2D(
-        const CDCRLWireHit* rlWireHit,
-        const Vector2D& pos2D,
-        bool snap = true
-      );
+      static CDCRecoHit2D fromAbsPos2D(const CDCRLWireHit* rlWireHit,
+                                       const Vector2D& pos2D,
+                                       bool snap = true);
 
       /// Turns the orientation in place.
       /** Changes the sign of the right left passage information, since the position remains the same by this reversion.*/
@@ -109,16 +109,20 @@ namespace Belle2 {
       }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire) { return recoHit2D.getWire() < wire; }
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire)
+      { return recoHit2D.getWire() < wire; }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D) { return wire < recoHit2D.getWire(); }
+      friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D)
+      { return wire < recoHit2D.getWire(); }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit) { return recoHit2D.getWireHit() < wireHit; }
+      friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit)
+      { return recoHit2D.getWireHit() < wireHit; }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D) { return wireHit < recoHit2D.getWireHit(); }
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D)
+      { return wireHit < recoHit2D.getWireHit(); }
 
       /// Output operator. Help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
@@ -133,7 +137,8 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRecoHit2D* operator->() const { return this; }
+      const CDCRecoHit2D* operator->() const
+      { return this; }
 
 
       /// Return the skew line assoziated with the reconstructed  two dimensional hit
@@ -207,9 +212,6 @@ namespace Belle2 {
       /// For axial hits the point of closest approach on the trajectory is returned.
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
 
-      /// Projects the hit's reconstructed position onto the given trajectory
-      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const;
-
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const
       { return *m_rlWireHit; }
@@ -219,10 +221,11 @@ namespace Belle2 {
       { m_rlWireHit = rlWireHit; }
 
     private:
+      /// Memory for the reference to the assiziated wire hit
+      const CDCRLWireHit* m_rlWireHit;
 
-      const CDCRLWireHit* m_rlWireHit;  ///< Memory for the reference to the assiziated wire hit
-      Vector2D m_recoDisp2D; ///< Memory for the displacement fo the assoziated wire reference position
-
+      /// Memory for the displacement fo the assoziated wire reference position
+      Vector2D m_recoDisp2D;
 
     }; //class CDCRecoHit2D
 

@@ -10,7 +10,12 @@
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -121,11 +126,6 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
     return first;
   }
 }
-
-
-CDCRecoHit3D::~CDCRecoHit3D()
-{;}
-
 
 
 Vector2D CDCRecoHit3D::getRecoDisp2D() const

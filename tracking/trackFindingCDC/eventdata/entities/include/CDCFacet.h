@@ -9,16 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <utility>
-
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitTriple.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+
+#include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,24 +32,17 @@ namespace Belle2 {
       CDCFacet();
 
       /// Constructor taking three oriented wire hits
-      CDCFacet(
-        const CDCRLWireHit* startRLWireHit,
-        const CDCRLWireHit* middleRLWireHit,
-        const CDCRLWireHit* endRLWireHit
-      );
+      CDCFacet(const CDCRLWireHit* startRLWireHit,
+               const CDCRLWireHit* middleRLWireHit,
+               const CDCRLWireHit* endRLWireHit);
 
       /// Constructor taking three oriented wire hits and the tangent lines
-      CDCFacet(
-        const CDCRLWireHit* startRLWireHit,
-        const CDCRLWireHit* middleRLWireHit,
-        const CDCRLWireHit* endRLWireHit,
-        const ParameterLine2D& startToMiddle,
-        const ParameterLine2D& startToEnd = ParameterLine2D(),
-        const ParameterLine2D& middleToEnd = ParameterLine2D()
-      );
-
-      /// Empty destructor
-      ~CDCFacet() {;}
+      CDCFacet(const CDCRLWireHit* startRLWireHit,
+               const CDCRLWireHit* middleRLWireHit,
+               const CDCRLWireHit* endRLWireHit,
+               const ParameterLine2D& startToMiddle,
+               const ParameterLine2D& startToEnd = ParameterLine2D(),
+               const ParameterLine2D& middleToEnd = ParameterLine2D());
 
     public:
       /// Constructs the reverse tiple from this one - this ignores the tangent lines
@@ -66,12 +60,11 @@ namespace Belle2 {
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
       operator const Belle2::TrackFindingCDC::CDCFacet* () const
       { return this; }
-
-
 
       /// Getter for the tangential line from the first to the second hit
       const ParameterLine2D& getStartToMiddleLine() const
@@ -130,23 +123,6 @@ namespace Belle2 {
       { return CDCTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
 
 
-      /// Returns the start reconstucted position projected to the trajectory
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getStartRecoPos2D()); }
-
-      /// Returns the end reconstucted position projected to the trajectory
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getEndRecoPos2D()); }
-
-      /// Estimate the transvers travel distance on the given circle to the reconstructed position at the first hit
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getStartRecoPos2D()); }
-
-      /// Estimate the transvers travel distance on the given circle to the reconstructed position at the last hit
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
-
-
       /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits
       void unsetAndForwardMaskedFlag() const
       {
@@ -168,7 +144,6 @@ namespace Belle2 {
       /// If one of the contained wire hits is marked as masked this facet is set be masked as well.
       void receiveMaskedFlag() const
       {
-
         if (getStartWireHit().getAutomatonCell().hasMaskedFlag() or
             getMiddleWireHit().getAutomatonCell().hasMaskedFlag() or
             getEndWireHit().getAutomatonCell().hasMaskedFlag()) {
@@ -178,21 +153,25 @@ namespace Belle2 {
       }
 
       /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
+      AutomatonCell& getAutomatonCell()
+      { return m_automatonCell; }
 
       /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+      const AutomatonCell& getAutomatonCell() const
+      { return m_automatonCell; }
 
     private:
+      /// Memory for the tangential line between first and second hit
+      mutable ParameterLine2D m_startToMiddle;
 
-      mutable ParameterLine2D m_startToMiddle; ///< Memory for the tangential line between first and second hit
-      mutable ParameterLine2D m_startToEnd; ///< Memory for the tangential line between first and third hit
-      mutable ParameterLine2D m_middleToEnd; ///< Memory for the tangential line between second and third hit
+      /// Memory for the tangential line between first and third hit
+      mutable ParameterLine2D m_startToEnd;
 
-      AutomatonCell m_automatonCell; ///< Memory for the cellular automaton cell assoziated with the facet.
+      /// Memory for the tangential line between second and third hit
+      mutable ParameterLine2D m_middleToEnd;
 
-
-
+      /// Memory for the cellular automaton cell assoziated with the facet.
+      AutomatonCell m_automatonCell;
 
     }; //class
 

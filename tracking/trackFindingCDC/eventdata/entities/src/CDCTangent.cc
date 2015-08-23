@@ -10,21 +10,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 
-#include <cmath>
-
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
-
-
-CDCTangent::CDCTangent(): CDCRLWireHitPair(), m_line() {;}
-
-
+CDCTangent::CDCTangent() :
+  CDCRLWireHitPair(),
+  m_line() {;}
 
 CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair), m_line()
@@ -32,69 +27,58 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   adjustLine();
 }
 
-
-
-CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit):
+CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
+                       const CDCRLWireHit* toRLWireHit):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line()
 {
   adjustLine();
 }
 
-
-
-CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line):
-  CDCRLWireHitPair(rlWireHitPair), m_line(line)
+CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
+                       const ParameterLine2D& line):
+  CDCRLWireHitPair(rlWireHitPair),
+  m_line(line)
 {;}
 
 
 
-CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line):
-  CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line(line)
+CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
+                       const CDCRLWireHit* toRLWireHit,
+                       const ParameterLine2D& line):
+  CDCRLWireHitPair(fromRLWireHit, toRLWireHit),
+  m_line(line)
 {;}
 
 
 
-CDCTangent::CDCTangent(
-  const CDCRecoHit2D& fromRecoHit,
-  const CDCRecoHit2D& toRecoHit
-):
-  CDCRLWireHitPair(&(fromRecoHit.getRLWireHit()), &(toRecoHit.getRLWireHit())),
+CDCTangent::CDCTangent(const CDCRecoHit2D& fromRecoHit,
+                       const CDCRecoHit2D& toRecoHit):
+  CDCRLWireHitPair(&(fromRecoHit.getRLWireHit()),
+                   &(toRecoHit.getRLWireHit())),
   m_line(ParameterLine2D::throughPoints(fromRecoHit.getRecoPos2D(),
                                         toRecoHit.getRecoPos2D()))
 {;}
 
-
-
-CDCTangent::~CDCTangent() {;}
-
-
-
 void CDCTangent::adjustLine()
 {
-
-  m_line  = constructTouchingLine(
-              getFromWireHit().getRefPos2D(),
-              getFromRLInfo() * getFromWireHit().getRefDriftLength() ,
-              getToWireHit().getRefPos2D(),
-              getToRLInfo() * getToWireHit().getRefDriftLength()
-            );
+  m_line  = constructTouchingLine(getFromWireHit().getRefPos2D(),
+                                  getFromRLInfo() * getFromWireHit().getRefDriftLength() ,
+                                  getToWireHit().getRefPos2D(),
+                                  getToRLInfo() * getToWireHit().getRefDriftLength());
 
 }
 
 void CDCTangent::adjustRLInfo()
 {
-
   RightLeftInfo newFromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
   setFromRLInfo(newFromRLInfo);
 
   RightLeftInfo newToRLInfo = getLine().isRightOrLeft(getToWireHit()->getRefPos2D());
   setToRLInfo(newToRLInfo);
-
 }
 
 void CDCTangent::reverse()
 {
-
   CDCRLWireHitPair::reverse();
 
   //reverse the direction of flight
@@ -110,14 +94,11 @@ CDCTangent CDCTangent::reversed() const
                     ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
 }
 
-ParameterLine2D CDCTangent::constructTouchingLine(
-  const Vector2D& fromCenter,
-  const FloatType& fromSignedRadius,
-  const Vector2D& toCenter,
-  const FloatType& toSignedRadius
-)
+ParameterLine2D CDCTangent::constructTouchingLine(const Vector2D& fromCenter,
+                                                  const FloatType& fromSignedRadius,
+                                                  const Vector2D& toCenter,
+                                                  const FloatType& toSignedRadius)
 {
-
   Vector2D connecting = toCenter - fromCenter;
 
   //Normalize to the coordinate system vector, but keep the original norm
@@ -130,26 +111,7 @@ ParameterLine2D CDCTangent::constructTouchingLine(
   fromPos += fromCenter;
 
   Vector2D toPos   = Vector2D(connecting, kappa * toSignedRadius,   cokappa * toSignedRadius);
-  toPos   += toCenter;
-
-  // if ( isNAN(toPos.x()) or isNAN(toPos.y()) or isNAN(fromPos.x()) or isNAN(fromPos.y()) ){
-
-  //   cout << fromCenter << endl;
-  //   cout << fromSignedRadius << endl;
-  //   cout << toCenter << endl;
-  //   cout << toSignedRadius << endl << endl;
-
-  //   cout << toCenter - fromCenter << endl;
-  //   cout << norm << endl;
-  //   cout << ( fromSignedRadius - toSignedRadius ) << endl;
-  //   cout << kappa << endl;
-  //   cout << cokappa << endl << endl;
-
-  //   cout << fromPos << endl;
-  //   cout << toPos << endl << endl << endl;
-  // }
+  toPos += toCenter;
 
   return ParameterLine2D::throughPoints(fromPos, toPos);
-
 }
-

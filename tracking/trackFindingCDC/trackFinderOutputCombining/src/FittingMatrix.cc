@@ -94,9 +94,10 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
         CDCObservations2D observationsSZ;
 
         // Add the hits from the segment to the sz fit
+        const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
         for (const CDCRecoHit2D& recoHit2D : segment) {
-          const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory.getTrajectory2D());
-          double currentAngle = recoHit3D.getPerpS(trajectory.getTrajectory2D());
+          const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
+          double currentAngle = trajectory2D.calcPerpS(recoHit3D.getRecoPos2D());
           if (recoHit3D.isInCDC() and currentAngle < 1.5 * maximumAngle and currentAngle > 0.5 * minimumAngle) {
             observationsSZ.append(recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z());
           }
@@ -146,7 +147,7 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
   for (const CDCRecoHit3D& recoHit : resultTrackCand) {
     double perpS;
     if (recoHit.getStereoType() == AXIAL) {
-      perpS = recoHit.getPerpS(trajectory2D);
+      perpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
     } else {
       if (not recoHit.isInCDC())
         return SegmentStatus::NAN_IN_CALCULATION;

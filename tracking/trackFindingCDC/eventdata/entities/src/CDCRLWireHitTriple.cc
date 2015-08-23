@@ -25,8 +25,6 @@ CDCRLWireHitTriple::CDCRLWireHitTriple():
   B2WARNING("CDCRLWireHitTiple initialized with three nullptr");
 }
 
-
-
 CDCRLWireHitTriple::CDCRLWireHitTriple(
   const CDCRLWireHit* startRLWireHit,
   const CDCRLWireHit* middleRLWireHit,
@@ -40,7 +38,6 @@ CDCRLWireHitTriple::CDCRLWireHitTriple(
   assert(endRLWireHit);
 }
 
-
 CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -48,8 +45,6 @@ CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
                             wireHitTopology.getReverseOf(getMiddleRLWireHit()),
                             wireHitTopology.getReverseOf(getStartRLWireHit()));
 }
-
-
 
 void CDCRLWireHitTriple::reverse()
 {
@@ -63,8 +58,6 @@ void CDCRLWireHitTriple::reverse()
   setEndRLWireHit(newEndRLWireHit);
 
 }
-
-
 
 void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo& startRLInfo)
 {

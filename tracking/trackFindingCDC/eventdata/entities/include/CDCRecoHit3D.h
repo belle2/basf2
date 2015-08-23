@@ -11,20 +11,21 @@
 
 #include <cmath>
 
-#include <cdc/dataobjects/CDCSimHit.h>
-
-//#include <TVector3.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
-
 namespace Belle2 {
+
+  class CDCSimHit;
+
   namespace TrackFindingCDC {
+
+    /// Forward declaration
+    class CDCTrajectory2D;
+    class CDCTrajectorySZ;
 
     /// Class representing a three dimensional reconstructed hit.
     /** A recohit represents a likely point where the particle went through. It is always assoziated with a \n
@@ -75,7 +76,9 @@ namespace Belle2 {
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory2D& trajectory2D);
 
-      /// Reconstructs the three dimensional hit from the wire hit and the given right left passage information by shifting it to a z coordinate, where it touches the two dimensional trajectory from the side indicated by the right left passage.
+      /** Reconstructs the three dimensional hit from the wire hit and the given right left passage
+       *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
+       *  from the side indicated by the right left passage.*/
       static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
@@ -102,11 +105,6 @@ namespace Belle2 {
       static CDCRecoHit3D average(const CDCRecoHit3D& first,
                                   const CDCRecoHit3D& second);
 
-      /// Empty deconstructor
-      ~CDCRecoHit3D();
-
-
-
       /// Turns the orientation in place.
       /** Changes the sign of the right left passage information, since the position remains the same by this reversion.*/
       void reverse();
@@ -132,25 +130,26 @@ namespace Belle2 {
       /// Total ordering relation based on wire hit, right left passage information and position information in this order of importance.
       bool operator<(const CDCRecoHit3D& other) const
       {
-        return getRLWireHit() < other.getRLWireHit() or (
-                 getRLWireHit() == other.getRLWireHit() and
-                 getRecoPos3D() < other.getRecoPos3D());
+        return (getRLWireHit() < other.getRLWireHit() or
+                (getRLWireHit() == other.getRLWireHit() and
+                 getRecoPos3D() < other.getRecoPos3D()));
       }
 
-
+      /// Defines wires and the three dimensional reconstructed hits as coaligned
+      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWire& wire)
+      { return recoHit3D.getWire() < wire; }
 
       /// Defines wires and the three dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWire& wire) { return recoHit3D.getWire() < wire; }
-
-      /// Defines wires and the three dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCWire& wire, const CDCRecoHit3D& recoHit3D) { return wire < recoHit3D.getWire(); }
+      friend bool operator<(const CDCWire& wire, const CDCRecoHit3D& recoHit3D)
+      { return wire < recoHit3D.getWire(); }
 
       /// Defines wire hits and the three dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWireHit& wireHit) { return recoHit3D.getWireHit() < wireHit; }
+      friend bool operator<(const CDCRecoHit3D& recoHit3D, const CDCWireHit& wireHit)
+      { return recoHit3D.getWireHit() < wireHit; }
 
       /// Defines wire hits and the three dimensional reconstructed hits as coaligned
-      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D) { return wireHit < recoHit3D.getWireHit(); }
-
+      friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D)
+      { return wireHit < recoHit3D.getWireHit(); }
 
 
       /// Getter for the stereo type of the underlying wire.
@@ -179,16 +178,12 @@ namespace Belle2 {
       bool hasWireHit(const CDCWireHit& wireHit) const
       { return getRLWireHit().hasWireHit(wireHit); }
 
-
-
       /// Getter for the oriented wire hit
       const CDCRLWireHit& getRLWireHit() const { return *m_rlWireHit; }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
       void setRLWireHit(const CDCRLWireHit* rlWireHit)
       { m_rlWireHit = rlWireHit; }
-
-
 
       /// Getter for the right left passage information,
       /** Returns the right left passage information as see in the xy projection.
@@ -214,10 +209,6 @@ namespace Belle2 {
 
       /// Getter for the z coordinate of the reconstructed position
       const FloatType& getRecoZ() const { return getRecoPos3D().z(); }
-
-      /// Projects the hit's reconstructed position onto the given two dimensional trajectory
-      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getRecoPos2D()); }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position
       Vector2D getRecoDisp2D() const;
@@ -254,13 +245,6 @@ namespace Belle2 {
       void setPerpS(const FloatType& perpS)
       { m_perpS = perpS; }
 
-      /// Getter the travel distance on the given drift circle
-      /** Calculates the travel distance on the circle by taking the closest approach to the \n
-       *  reconstructed hit position as seen from the xy projection and taking the arc length \n
-       *  from the reference on the circle. */
-      FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getRecoPos2D()); }
-
       /** indicator if the hit is in the cdc or already outside its boundaries.
           Checks for z to be in the range of the wire. */
       bool isInCDC() const;
@@ -270,7 +254,8 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCRecoHit3D* operator->() const { return this; }
+      const CDCRecoHit3D* operator->() const
+      { return this; }
 
       /// Calculates the z slope with a given z0
       /**
@@ -285,12 +270,14 @@ namespace Belle2 {
       }
 
     private:
-      const CDCRLWireHit* m_rlWireHit;  ///< Memory for the oriented wire hit reference
+      /// Memory for the oriented wire hit reference
+      const CDCRLWireHit* m_rlWireHit;
 
-      Vector3D m_recoPos3D; ///< Memory for the reconstructed hit position
-      FloatType m_perpS; ///< Memory for the travel distance as see in the xy projection.
+      /// Memory for the reconstructed hit position
+      Vector3D m_recoPos3D;
 
-
+      /// Memory for the travel distance as see in the xy projection.
+      FloatType m_perpS;
     }; //class
 
   } //end namespace TrackFindingCDC

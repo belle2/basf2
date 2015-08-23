@@ -9,16 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/dataobjects/CDCHit.h>
-
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
+
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <assert.h>
 
@@ -169,17 +167,6 @@ namespace Belle2 {
       FloatType getSkew() const
       { return getWire().getSkew(); }
 
-      /// Estimate the transvers travel distance on the given circle.
-      /** Uses the point of closest approach on the circle and
-       *  calculates the arc length from the reference on the circle.
-       *  @return The arc length on the circle from the reference */
-      FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getRefPos2D()); }
-
-      /// Reconstuct the wire reference position onto the given trajectory
-      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getRefPos2D()); }
-
       /// Getter for the index  of the hit in the StoreArray holding this hit.
       Index getStoreIHit() const
       { return getHit() ? getHit()->getArrayIndex() : INVALID_INDEX; }
@@ -231,22 +218,6 @@ namespace Belle2 {
       /// Checks if the wire hit is equal to the wire hit given.
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return operator==(wirehit); }
-
-      /// Same as getPerpS().
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
       /**@}*/
 
       /// String output operator for wire hit objects to help debugging

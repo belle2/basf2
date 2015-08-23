@@ -49,9 +49,7 @@ namespace Belle2 {
 
       /// Equality comparision based on wire hit, left right passage information.
       bool operator==(const CDCRLWireHit& other) const
-      {
-        return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo();
-      }
+      { return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo(); }
 
       /** Total ordering relation based on
        *  wire hit and left right passage information in this order of importance.
@@ -86,7 +84,8 @@ namespace Belle2 {
 
 
       /// The two dimensional reference position of the underlying wire
-      const Vector2D& getRefPos2D() const { return getWireHit().getRefPos2D(); }
+      const Vector2D& getRefPos2D() const
+      { return getWireHit().getRefPos2D(); }
 
       /// The distance from the beam line at reference position of the underlying wire
       FloatType getRefCylindricalR() const
@@ -114,10 +113,6 @@ namespace Belle2 {
       /// Getter for the right left passage information.
       const RightLeftInfo& getRLInfo() const { return m_rlInfo; }
 
-      /// Reconstuct the wire reference position onto the given trajectory
-      Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getWireHit().getRecoPos2D(trajectory2D);}
-
       /** Reconstruct the three dimensional position (especially of stereo hits)
        *  by terminating the z coordinate assuming the drift circle touches
        *  the two dimensional trajectory in the xy projection.
@@ -130,7 +125,8 @@ namespace Belle2 {
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'
        */
-      const CDCRLWireHit* operator->() const { return this; }
+      const CDCRLWireHit* operator->() const
+      { return this; }
 
       /** @name Methods common to all tracking entities
        *  All entities ( track parts contained in a single superlayer ) share this interface to help

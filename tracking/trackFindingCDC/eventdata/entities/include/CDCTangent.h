@@ -9,16 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
 
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
-
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -46,13 +43,10 @@ namespace Belle2 {
        *  @param[in] toSignedRadius radius of the first circle multiplied with the right left passage information.
        *  @return the line being tangential to both circles.
        *  Note : the touch points reside at(0) for the first and at(1) for the second */
-      static ParameterLine2D constructTouchingLine(
-        const Vector2D& fromCenter,
-        const FloatType& fromSignedRadius,
-        const Vector2D& toCenter,
-        const FloatType& toSignedRadius
-      );
-
+      static ParameterLine2D constructTouchingLine(const Vector2D& fromCenter,
+                                                   const FloatType& fromSignedRadius,
+                                                   const Vector2D& toCenter,
+                                                   const FloatType& toSignedRadius);
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -62,20 +56,21 @@ namespace Belle2 {
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
-      CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit);
+      CDCTangent(const CDCRLWireHit* fromRLWireHit,
+                 const CDCRLWireHit* toRLWireHit);
 
       /// Construct a tangent from a pair of oriented wire hits taking the given tangential line instead of a computed one.
-      CDCTangent(const CDCRLWireHitPair& rlWireHitPair, const ParameterLine2D& line);
+      CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
+                 const ParameterLine2D& line);
 
       /// Construct a tangent from two oriented wire hits taking the given tangential line instead of a computed one.
-      CDCTangent(const CDCRLWireHit* fromRLWireHit, const CDCRLWireHit* toRLWireHit, const ParameterLine2D& line);
+      CDCTangent(const CDCRLWireHit* fromRLWireHit,
+                 const CDCRLWireHit* toRLWireHit,
+                 const ParameterLine2D& line);
 
       /// Construct a tangent from two reconstructed hits
-      CDCTangent(const CDCRecoHit2D& fromRecoHit, const CDCRecoHit2D& toRecoHit);
-
-      /// Empty deconstructor
-      ~CDCTangent();
-
+      CDCTangent(const CDCRecoHit2D& fromRecoHit,
+                 const CDCRecoHit2D& toRecoHit);
 
 
       /// Print tangent for debugging
@@ -92,13 +87,15 @@ namespace Belle2 {
        *  if one should use the dot '.' or operator '->' for method look up. \n
        *  So this function defines the -> operator for the object. \n
        *  No matter you have a pointer or an object access is given with '->'*/
-      const CDCTangent* operator->() const { return this; }
+      const CDCTangent* operator->() const
+      { return this; }
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to objects is a class of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication. */
-      operator const Belle2::TrackFindingCDC::CDCTangent* () const { return this; }
-
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication. */
+      operator const Belle2::TrackFindingCDC::CDCTangent* () const
+      { return this; }
 
       /// Getter for the touching point of the tangent to the first drift circle
       const Vector2D& getFromRecoPos2D() const
@@ -110,7 +107,7 @@ namespace Belle2 {
 
       /// Getter for the touching point of the tangent to the second drift circle
       Vector2D getToRecoPos2D() const
-      { return  getLine().at(1); }
+      { return getLine().at(1); }
 
       /// Getter for displacement of the touching point from the second wire in the reference plane
       Vector2D getToRecoDisp2D() const
@@ -139,21 +136,26 @@ namespace Belle2 {
       /// Adjusts the right left passage information according to the tangent line
       void adjustRLInfo();
 
-      /// Reverses the tangent inplace.
-      /** Swaps the to wire hits, reverses the left right informations and exchanges the two touch points of the line */
+      /** Reverses the tangent inplace.
+       *  Swaps the to wire hits, reverses the left right informations and
+       *  exchanges the two touch points of the line
+       */
       void reverse();
 
       /// Same as reverse but returns a copy.
       CDCTangent reversed() const;
 
     public:
-      /// Get for the line representation of the line
-      /** The line stretchs between the two the touch point. The first touch point is at(0) the second at(1). */
+      /** Get for the line representation of the line
+       *  The line stretchs between the two the touch point.
+       *  The first touch point is at(0) the second at(1).
+       */
       const ParameterLine2D& getLine() const
       { return m_line; }
 
     private:
-      ParameterLine2D m_line;///< Memory for the line between the two touching points. The first touch point at(0), second at(1).
+      /// Memory for the line between the two touching points. The first touch point at(0), second at(1).
+      ParameterLine2D m_line;
 
 
     }; //class

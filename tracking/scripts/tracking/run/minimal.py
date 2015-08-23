@@ -169,7 +169,7 @@ class MinimalRun(object):
     @classmethod
     def get_basf2_module(cls, module_or_module_name, **kwargs):
         if isinstance(module_or_module_name, list):
-            if kwargs is not None:
+            if kwargs:
                 raise ValueError("kwargs keyword is not supported for module lists.")
             modules = module_or_module_name
             modules = [cls.get_basf2_module(m) for m in modules]

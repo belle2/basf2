@@ -32,14 +32,12 @@ TEST(TrackFindingCDCTest, cpp_storeWrapper)
 {
   StoreObjPtr<StoreWrapper<CDCWireHit> > storedHit;
   StoreObjPtr<StoreWrapper<std::vector<CDCWireHit> > > stdVector;
-  StoreObjPtr<StoreWrapper<SortableVector<CDCWireHit> > > sortableVector;
 }
 
 TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 {
   StoreWrappedObjPtr<CDCWireHit> storedHit;
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
-  StoreWrappedObjPtr<SortableVector<CDCWireHit> > sortableVector;
 }
 
 template <typename T>
@@ -48,7 +46,6 @@ class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWith
 typedef ::testing::Types <
 CDCWireHit,
 std::vector<CDCWireHit>,
-SortableVector<CDCWireHit>,
 std::vector<CDCRecoSegment2D>
 > RootifiedTypes;
 
@@ -87,7 +84,8 @@ TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStor
   // Fetch the object from the DataStore and use it
   ASSERT_NE(-1, PyRun_SimpleString("pyStoreObj = Belle2.PyStoreObj(objectName)"));
   //ASSERT_NE(-1,PyRun_SimpleString("print 'pyStoreObj is',pyStoreObj"));
-  ASSERT_NE(-1, PyRun_SimpleString("if not pyStoreObj: raise ValueError('PyStoreObj does not point to a valid object on the DataStore')"));
+  ASSERT_NE(-1,
+            PyRun_SimpleString("if not pyStoreObj: raise ValueError('PyStoreObj does not point to a valid object on the DataStore')"));
   ASSERT_NE(-1, PyRun_SimpleString("print 'pyStoreObj.obj() is', pyStoreObj.obj()"));
   ASSERT_NE(-1, PyRun_SimpleString("print 'pyStoreObj.obj().unwrap() is', pyStoreObj.obj().unwrap()"));
 

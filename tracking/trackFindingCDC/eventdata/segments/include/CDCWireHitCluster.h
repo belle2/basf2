@@ -18,15 +18,6 @@ namespace Belle2 {
 
     /// An aggregation of CDCWireHits.
     class CDCWireHitCluster : public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCWireHit*> {
-    public:
-
-      /// Default constructor for ROOT compatibility.
-      CDCWireHitCluster() {;}
-
-      /// Empty deconstructor
-      ~CDCWireHitCluster() {;}
-
-    private:
 
 
 

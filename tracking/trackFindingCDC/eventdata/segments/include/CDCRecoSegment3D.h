@@ -9,9 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -20,23 +19,9 @@ namespace Belle2 {
     class CDCRecoSegment3D : public CDCRecoHit3DVector {
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCRecoSegment3D() {;}
-
-      /// Empty deconstructor
-      ~CDCRecoSegment3D() {;}
-
       /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
-      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D, const CDCTrajectory2D& trajectory2D)
-      {
-        CDCRecoSegment3D segment3D;
-        for (const CDCRecoHit2D& recoHit2D : segment2D) {
-          CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
-          segment3D.push_back(recoHit3D);
-        }
-        return segment3D;
-
-      }
+      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D,
+                                          const CDCTrajectory2D& trajectory2D);
 
       /** Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference postion.
        * Note : no fitting information is transported to the resulting segment.
@@ -54,9 +39,6 @@ namespace Belle2 {
     private:
       /// Memory for a two dimensional trajectory.
       CDCTrajectory2D m_trajectory2D;
-
-
-
     };
 
   }

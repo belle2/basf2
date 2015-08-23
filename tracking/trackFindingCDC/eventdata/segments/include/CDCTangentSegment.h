@@ -28,11 +28,6 @@ namespace Belle2 {
 
       /// Takes all distinct tangents from the facets in the path - Note! there is no particular order of the tangents in the segment.
       static CDCTangentSegment condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
-
-
-    private:
-
-
     };
 
   }

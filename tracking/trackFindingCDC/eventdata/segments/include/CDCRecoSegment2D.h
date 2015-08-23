@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace genfit {
   class TrackCand;
@@ -28,14 +28,6 @@ namespace Belle2 {
     /// A segment consisting of two dimensional reconsturcted hits
     class CDCRecoSegment2D : public CDCRecoHit2DVector {
     public:
-
-      /// Default constructor for ROOT compatibility.
-      CDCRecoSegment2D() {;}
-
-      /// Empty deconstructor
-      ~CDCRecoSegment2D() {;}
-
-
       /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent segment
       static CDCRecoSegment2D condense(const CDCTangentSegment& tangentSegment);
 
@@ -63,17 +55,6 @@ namespace Belle2 {
        */
       static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
-      ///Implements the standard swap idiom
-      friend void swap(CDCRecoSegment2D& lhs, CDCRecoSegment2D& rhs)
-      {
-        SortableVector<CDCRecoHit2D>& rawLHS = lhs;
-        SortableVector<CDCRecoHit2D>& rawRHS = rhs;
-        rawLHS.swap(rawRHS);
-        std::swap(lhs.m_trajectory2D, rhs.m_trajectory2D);
-        std::swap(lhs.m_automatonCell, rhs.m_automatonCell);
-        B2DEBUG(200, "CDCRecoSegment::swap");
-      }
-
       /// Defines segments and superlayers to be coaligned.
       friend bool operator<(const CDCRecoSegment2D& segment, const CDCWireSuperLayer& wireSuperLayer)
       { return segment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
@@ -90,73 +71,32 @@ namespace Belle2 {
       { return this; }
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const
-      {
-        std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          wireSegment.push_back(&(recoHit2D.getWire()));
-        }
-        return wireSegment;
-      }
+      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCWireHitSegment getWireHitSegment() const
-      {
-        CDCWireHitSegment wireHitSegment;
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          wireHitSegment.push_back(&(recoHit2D.getWireHit()));
-        }
-        return wireHitSegment;
-      }
+      CDCWireHitSegment getWireHitSegment() const;
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCRLWireHitSegment getRLWireHitSegment() const
-      {
-        CDCRLWireHitSegment rlWireHitSegment;
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          rlWireHitSegment.push_back(&(recoHit2D.getRLWireHit()));
-        }
-        return rlWireHitSegment;
-      }
+      CDCRLWireHitSegment getRLWireHitSegment() const;
 
-      /// Fill the hit content of this segment into a genfit::TrackCand. Return true, if the trajectory information is valid, false otherwise.
+      /** Fill the hit content of this segment into a genfit::TrackCand.
+       *  Return true, if the trajectory information is valid, false otherwise.
+       */
       bool fillInto(genfit::TrackCand& gfTrackCand) const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
-      CDCRecoSegment2D reversed() const
-      {
-
-        CDCRecoSegment2D reverseSegment;
-        reverseSegment.reserve(size());
-        for (const CDCRecoHit2D& recohit : reverseRange()) {
-          reverseSegment.push_back(recohit.reversed());
-        }
-
-        reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
-        reverseSegment.m_automatonCell = m_automatonCell;
-        return reverseSegment;
-      }
+      CDCRecoSegment2D reversed() const;
 
       /// Reverses the order of hits and their right left passage hypotheses inplace
-      void reverse()
-      {
-        // Reverse the trajectory
-        m_trajectory2D.reverse();
-
-        // Reverse the left right passage hypotheses
-        for (CDCRecoHit2D& recoHit2D : *this) {
-          recoHit2D.reverse();
-        }
-        // Reverse the arrangement of hits.
-        std::reverse(begin(), end());
-      }
+      void reverse();
 
       /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
+      AutomatonCell& getAutomatonCell()
+      { return m_automatonCell; }
 
       /// Constant getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
-
+      AutomatonCell& getAutomatonCell() const
+      { return m_automatonCell; }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const
@@ -190,18 +130,6 @@ namespace Belle2 {
         }
       }
 
-      /// Indicates if two segments share some wire hits
-      bool sharesWireHit(const CDCRecoSegment2D& segment) const
-      {
-        for (const CDCRecoHit2D& recoHit : segment) {
-          const CDCWireHit& wireHit = recoHit.getWireHit();
-          if (hasWireHit(wireHit)) {
-            return true;
-          }
-        }
-        return false;
-      }
-
       /// Getter for the two dimensional trajectory fitted to the segment
       CDCTrajectory2D& getTrajectory2D() const
       { return m_trajectory2D; }
@@ -230,11 +158,6 @@ namespace Belle2 {
 
       /// Memory for the global super cluster id.
       size_t m_iSuperCluster;
-
-    private:
-
-
-
     }; //end class CDCRecoSegment2D
 
   } // end namespace TrackFindingCDC

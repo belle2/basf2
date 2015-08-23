@@ -23,3 +23,14 @@ CDCRecoSegment2D CDCRecoSegment3D::projectXY() const
   }
   return result;
 }
+
+CDCRecoSegment3D CDCRecoSegment3D::reconstruct(const CDCRecoSegment2D& segment2D,
+                                               const CDCTrajectory2D& trajectory2D)
+{
+  CDCRecoSegment3D segment3D;
+  for (const CDCRecoHit2D& recoHit2D : segment2D) {
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
+    segment3D.push_back(recoHit3D);
+  }
+  return segment3D;
+}

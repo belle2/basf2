@@ -24,7 +24,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
 {
   // 1. Extract the hit content from the genfit track candidate.
@@ -71,5 +70,11 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
   m_trajectory2D = trajectory3D.getTrajectory2D();
 }
 
-
-
+vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const
+{
+  std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
+  for (const CDCRLWireHit* ptrRLWireHit : *this) {
+    ptrRLWireHit ? wireSegment.push_back(&(ptrRLWireHit->getWire())) : wireSegment.push_back(nullptr);
+  }
+  return wireSegment;
+}

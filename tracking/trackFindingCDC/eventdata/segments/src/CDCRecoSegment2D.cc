@@ -24,7 +24,6 @@ using namespace TrackFindingCDC;
 
 
 namespace {
-
   /** Makes adjacent pairs from an input range,
    *  invoking the map with two arguments and writes to the output iterator
    */
@@ -294,6 +293,33 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   return condense(facetSegment);
 }
 
+vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
+{
+  std::vector<const CDCWire*> wireSegment;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    wireSegment.push_back(&(recoHit2D.getWire()));
+  }
+  return wireSegment;
+}
+
+
+CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
+{
+  CDCWireHitSegment wireHitSegment;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    wireHitSegment.push_back(&(recoHit2D.getWireHit()));
+  }
+  return wireHitSegment;
+}
+
+CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
+{
+  CDCRLWireHitSegment rlWireHitSegment;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    rlWireHitSegment.push_back(&(recoHit2D.getRLWireHit()));
+  }
+  return rlWireHitSegment;
+}
 
 bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
@@ -307,4 +333,30 @@ bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
 
   fillHitsInto(*this, gfTrackCand);
   return trajectory3D.fillInto(gfTrackCand);
+}
+
+CDCRecoSegment2D CDCRecoSegment2D::reversed() const
+{
+  CDCRecoSegment2D reverseSegment;
+  reverseSegment.reserve(size());
+  for (const CDCRecoHit2D& recohit : reverseRange()) {
+    reverseSegment.push_back(recohit.reversed());
+  }
+
+  reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
+  reverseSegment.m_automatonCell = m_automatonCell;
+  return reverseSegment;
+}
+
+void CDCRecoSegment2D::reverse()
+{
+  // Reverse the trajectory
+  m_trajectory2D.reverse();
+
+  // Reverse the left right passage hypotheses
+  for (CDCRecoHit2D& recoHit2D : *this) {
+    recoHit2D.reverse();
+  }
+  // Reverse the arrangement of hits.
+  std::reverse(begin(), end());
 }

@@ -170,6 +170,10 @@ namespace Belle2 {
       size_t getMaxLevel() const
       { return m_maxLevel; }
 
+      /// Setter maximal level of the hough tree.
+      void setMaxLevel(size_t maxLevel)
+      { m_maxLevel = maxLevel; }
+
       /// Getter for the array of discrete value for coordinate I.
       template<size_t I>
       const Array<I>& getArray() const

@@ -117,30 +117,21 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
   // Write the created hits to the their storage place.
   CDCWireHitTopology& wireHitTopology = *m_wireHitTopology;
   {
-    wireHitTopology.clear();
+    std::vector<CDCWireHit> wireHits;
+    wireHits.reserve(simpleSimHits.size());
     for (SimpleSimHit& simpleSimHit : simpleSimHits) {
-      wireHitTopology.m_wireHits.push_back(simpleSimHit.m_wireHit);
+      wireHits.push_back(simpleSimHit.m_wireHit);
     }
 
-    if (not wireHitTopology.m_wireHits.checkSorted()) {
-      B2ERROR("Wire hits are not sorted after creation");
-    }
-
-    for (const CDCWireHit& wireHit : wireHitTopology.m_wireHits) {
-      wireHitTopology.m_rlWireHits.push_back(CDCRLWireHit(&wireHit, LEFT));
-      wireHitTopology.m_rlWireHits.push_back(CDCRLWireHit(&wireHit, RIGHT));
-    }
-
-    if (not wireHitTopology.m_rlWireHits.checkSorted()) {
-      B2ERROR("Oriented wire hits are not sorted after creation");
-    }
+    wireHitTopology.clear();
+    wireHitTopology.fill(std::move(wireHits));
     // TODO: Decide if the EventMeta should be incremented after write.
   }
 
   // Now construct the tracks.
   vector<CDCTrack> mcTracks;
   mcTracks.resize(nMCTracks);
-  const SortableVector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+  const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
   const size_t nWireHits = wireHits.size();
 
   for (size_t iWireHit = 0; iWireHit < nWireHits; ++iWireHit) {

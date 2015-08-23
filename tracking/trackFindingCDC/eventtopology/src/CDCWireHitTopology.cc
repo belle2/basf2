@@ -27,14 +27,10 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-namespace {
-  CDCWireHitTopology* g_wireHitTopology = nullptr;
-}
-
 CDCWireHitTopology& CDCWireHitTopology::getInstance()
 {
-  if (not g_wireHitTopology) g_wireHitTopology = new CDCWireHitTopology;
-  return *g_wireHitTopology;
+  static CDCWireHitTopology wireHitTopology;
+  return wireHitTopology;
 }
 
 namespace {
@@ -53,6 +49,23 @@ namespace {
     return true;
   }
 
+
+  /** Checks if the sougth item is in the range and jumps to it.
+   *  Falls back to std::lower_bound if not found like this
+   *  Assumes that the range has only unique items,
+   *  hence if it the item located in memory within the range
+   *  it is also the correct lower bound.
+   */
+  template<class It, class T>
+  It unique_lower_bound_fast(const It& first, const It& last, const T& t)
+  {
+    It itT(&t);
+    if (first <= itT and itT < last) {
+      return itT;
+    } else {
+      return std::lower_bound(first, last, t);
+    }
+  }
 }
 
 
@@ -86,7 +99,7 @@ size_t CDCWireHitTopology::event()
   StoreObjPtr<EventMetaData> storedEventMetaData;
 
   if (storedEventMetaData.isValid() and m_eventMetaData == *storedEventMetaData) {
-    return m_wireHits.size();
+    return getWireHits().size();
   } else {
     size_t nHits = fill("");
     m_eventMetaData = *storedEventMetaData;
@@ -101,11 +114,11 @@ size_t CDCWireHitTopology::useAll()
   event();
 
   // Unblock every wire hit
-  for (const CDCWireHit& wireHit : m_wireHits) {
+  for (const CDCWireHit& wireHit : getWireHits()) {
     wireHit.getAutomatonCell().unsetTakenFlag();
   }
 
-  return m_wireHits.size();
+  return getWireHits().size();
 }
 
 size_t CDCWireHitTopology::dontUse(const std::vector<int>& iHits)
@@ -151,7 +164,7 @@ size_t CDCWireHitTopology::useOnly(const std::vector<int>& iHits)
   event();
 
   // Block every wire hit first
-  for (const CDCWireHit& wireHit : m_wireHits) {
+  for (const CDCWireHit& wireHit : getWireHits()) {
     wireHit.getAutomatonCell().setTakenFlag();
   }
 
@@ -246,8 +259,18 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     }
   }
 
-  m_wireHits.ensureSorted();
-  if (not m_wireHits.checkSorted()) {
+  fill(m_wireHits);
+  return nHits;
+}
+
+void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
+{
+  // Copy the wire hits
+  m_wireHits = wireHits;
+
+  std::sort(m_wireHits.begin(), m_wireHits.end());
+
+  if (not std::is_sorted(m_wireHits.begin(), m_wireHits.end())) {
     B2ERROR("Wire hits are not sorted after creation");
   }
 
@@ -256,11 +279,9 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     m_rlWireHits.push_back(CDCRLWireHit(&wireHit, RIGHT));
   }
 
-  if (not m_rlWireHits.checkSorted()) {
+  if (not std::is_sorted(m_rlWireHits.begin(), m_rlWireHits.end())) {
     B2ERROR("Oriented wire hits are not sorted after creation");
   }
-
-  return nHits;
 }
 
 
@@ -271,26 +292,29 @@ void CDCWireHitTopology::clear()
 }
 
 
-const CDCRLWireHit* CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
+const CDCRLWireHit*
+CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
 {
+  auto itRLWireHit = unique_lower_bound_fast(m_rlWireHits.begin(),
+                                             m_rlWireHits.end(),
+                                             rlWireHit);
 
-  SortableVector<CDCRLWireHit>::const_iterator itFoundRLWireHit = m_rlWireHits.findFast(rlWireHit);
-  if (itFoundRLWireHit == m_rlWireHits.end()) {
+  if (itRLWireHit == m_rlWireHits.end()) {
     B2ERROR("An oriented wire hit can not be found in the CDCWireHitTopology.");
     return nullptr;
   }
   if (rlWireHit.getRLInfo() == RIGHT) {
     // The oriented wire hit with left passage is stored in the vector just before this one -- see above in fill()
-    --itFoundRLWireHit;
+    --itRLWireHit;
 
   } else if (rlWireHit.getRLInfo() == LEFT) {
     // The oriented wire hit with right passage is stored in the vector just after this one -- see above in fill()
-    ++itFoundRLWireHit;
+    ++itRLWireHit;
   } else {
     B2ERROR("An oriented wire hit does not have the right left passage variable assigned correctly.");
   }
 
-  return &*itFoundRLWireHit;
+  return &*itRLWireHit;
 
 }
 
@@ -316,29 +340,28 @@ const CDCWireHit* CDCWireHitTopology::getWireHit(const CDCHit* ptrHit) const
 
 
 
-std::pair<const CDCRLWireHit*, const CDCRLWireHit*> CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
+std::pair<const CDCRLWireHit*, const CDCRLWireHit*>
+CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
 {
+  auto itWireHit = unique_lower_bound_fast(m_wireHits.begin(), m_wireHits.end(), wireHit);
 
-  SortableVector<CDCWireHit>::const_iterator itFoundWireHit = m_wireHits.findFast(wireHit);
-
-  if (itFoundWireHit == m_wireHits.end()) {
+  if (itWireHit == m_wireHits.end()) {
     B2ERROR("A wire hit can not be found in the CDCWireHitTopology.");
     return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(nullptr, nullptr);
-  } else {
-
-    size_t idxWireHit = std::distance(m_wireHits.begin(), itFoundWireHit);
-
-    size_t idxLeftWireHit = 2 * idxWireHit;
-    size_t idxRightWireHit = idxLeftWireHit + 1;
-
-    const CDCRLWireHit& leftWireHit = m_rlWireHits[idxLeftWireHit];
-    const CDCRLWireHit& rightWireHit = m_rlWireHits[idxRightWireHit];
-    return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(&leftWireHit, &rightWireHit);
   }
+
+  size_t idxWireHit = std::distance(m_wireHits.begin(), itWireHit);
+
+  size_t idxLeftWireHit = 2 * idxWireHit;
+  size_t idxRightWireHit = idxLeftWireHit + 1;
+
+  const CDCRLWireHit& leftWireHit = m_rlWireHits[idxLeftWireHit];
+  const CDCRLWireHit& rightWireHit = m_rlWireHits[idxRightWireHit];
+  return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(&leftWireHit, &rightWireHit);
 }
 
-const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-    const RightLeftInfo& rlInfo) const
+const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
+                                                     const RightLeftInfo& rlInfo) const
 {
 
   std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
@@ -350,9 +373,8 @@ const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(co
 
 }
 
-
-const Belle2::TrackFindingCDC::CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
-    const RightLeftInfo& rlInfo) const
+const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
+                                                     const RightLeftInfo& rlInfo) const
 {
   const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
   return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;

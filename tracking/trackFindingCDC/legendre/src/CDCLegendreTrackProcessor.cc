@@ -164,7 +164,7 @@ void TrackProcessor::initializeHitListFromWireHitTopology()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-  const SortableVector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
+  const vector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
 
   B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
   if (cdcWireHits.size() == 0) {

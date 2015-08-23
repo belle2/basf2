@@ -55,7 +55,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
 
   // prepare lookup
   for (TrackInformation* track : m_trackLookUp) {
-    for (const CDCRecoHit3D& recoHit : track->getTrackCand()->items()) {
+    for (const CDCRecoHit3D& recoHit : * (track->getTrackCand())) {
       SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
 
       if (matchingSegment == nullptr) {
@@ -346,7 +346,7 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
 {
   addSegmentToTrack(*(segmentInformation->getSegment()), *(matchingTrack->getTrackCand()));
 
-  for (const CDCRecoHit3D& recoHit : matchingTrack->getTrackCand()->items()) {
+  for (const CDCRecoHit3D& recoHit : * (matchingTrack->getTrackCand())) {
     matchingTrack->getPerpSList().push_back(recoHit.getPerpS());
   }
   matchingTrack->calcPerpS();

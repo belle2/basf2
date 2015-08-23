@@ -44,7 +44,7 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
 
   double last_perp_s = std::nan("");
 
-  for (const CDCRecoHit3D& recoHit : track->items()) {
+  for (const CDCRecoHit3D& recoHit : *track) {
     // Drift circle information
     double driftLength = recoHit.getWireHit().getRefDriftLength();
     drift_length_sum += driftLength;

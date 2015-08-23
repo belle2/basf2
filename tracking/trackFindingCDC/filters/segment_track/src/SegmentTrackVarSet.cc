@@ -101,7 +101,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   double perpSMaximum = std::max(perpSOfFront, perpSOfBack);
 
   // Count number of hits in the same region
-  for (const CDCRecoHit3D& recoHit : track->items()) {
+  for (const CDCRecoHit3D& recoHit : *track) {
     if (recoHit.getPerpS() < 0.8 * perpSMinimum or recoHit.getPerpS() > 1.2 * perpSMaximum)
       continue;
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
@@ -119,7 +119,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
   // Count number of common hits
-  for (const CDCRecoHit3D& trackHit : track->items()) {
+  for (const CDCRecoHit3D& trackHit : *track) {
     if (std::find_if(segment->begin(), segment->end(), [&trackHit](const CDCRecoHit2D & segmentHit) {
     return segmentHit.getWireHit().getHit() == trackHit.getWireHit().getHit();
     }) != segment->end()) {
@@ -134,7 +134,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   // Collect the observations
   bool isAxialSegment = segment->getStereoType() != AXIAL;
 
-  for (const CDCRecoHit3D& recoHit : track->items()) {
+  for (const CDCRecoHit3D& recoHit : *track) {
     if (isAxialSegment and recoHit.getStereoType() == AXIAL) {
       observationsFull.append(recoHit.getWireHit().getRefPos2D());
       if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) < 3) {

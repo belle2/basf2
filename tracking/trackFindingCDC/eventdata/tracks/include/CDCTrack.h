@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+
 
 namespace genfit {
   class TrackCand;
@@ -26,7 +26,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class representing a sequence of three dimensional reconstructed hits
-    class CDCTrack : public CDCRecoHit3DVector {
+    class CDCTrack : public std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D> {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -39,9 +39,6 @@ namespace Belle2 {
       static
       Belle2::TrackFindingCDC::CDCTrack
       condense(const std::vector<const Belle2::TrackFindingCDC::CDCTrack*>& trackPath);
-
-      /// Empty destructor
-      ~CDCTrack() {;}
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
@@ -98,6 +95,7 @@ namespace Belle2 {
       Vector3D getEndFitPos3D() const
       { return getEndTrajectory3D().getSupport(); }
 
+
       /// Getter for the momentum at the start position.
       Vector3D getStartFitMom3D() const
       { return getStartTrajectory3D().getUnitMom3DAtSupport(); }
@@ -105,8 +103,6 @@ namespace Belle2 {
       /// Getter for the momentum at the end position.
       Vector3D getEndFitMom3D() const
       { return getEndTrajectory3D().getUnitMom3DAtSupport(); }
-
-
 
       /// Getter for the charge sign.
       SignType getStartChargeSign() const
@@ -116,8 +112,6 @@ namespace Belle2 {
       SignType getEndChargeSign() const
       { return getEndTrajectory3D().getChargeSign(); }
 
-
-
       /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
       void setStartTrajectory3D(const CDCTrajectory3D& startTrajectory3D)
       { m_startTrajectory3D = startTrajectory3D; }
@@ -125,8 +119,6 @@ namespace Belle2 {
       /// Setter for the three dimensional trajectory. The trajectory should start at the END of the track and *follow* its direction.
       void setEndTrajectory3D(const CDCTrajectory3D& endTrajectory3D)
       { m_endTrajectory3D = endTrajectory3D; }
-
-
 
       /// Getter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
       const CDCTrajectory3D& getStartTrajectory3D() const
@@ -145,44 +137,34 @@ namespace Belle2 {
       { return m_automatonCell; }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
-      void unsetAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().unsetMaskedFlag();
-        for (const CDCRecoHit3D& recoHit3D : *this) {
-          const CDCWireHit& wireHit = recoHit3D.getWireHit();
-          wireHit.getAutomatonCell().unsetMaskedFlag();
-        }
-      }
+      void unsetAndForwardMaskedFlag() const;
 
-      /// Set the masked flag of the automaton cell of this segment and forward the masked flag to all contained wire hits.
-      void setAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().setMaskedFlag();
-        for (const CDCRecoHit3D& recoHit3D : *this) {
-          const CDCWireHit& wireHit = recoHit3D.getWireHit();
-          wireHit.getAutomatonCell().setMaskedFlag();
-        }
-      }
+      /** Set the masked flag of the automaton cell of this segment and
+       *  forward the masked flag to all contained wire hits.
+       */
+      void setAndForwardMaskedFlag() const;
 
-      /// Check all contained wire hits if one has the masked flag. Set the masked flag of this segment in case at least one of the contained wire hits is flagged as masked.
-      void receiveMaskedFlag() const
-      {
-        for (const CDCRecoHit3D& recoHit3D : *this) {
-          const CDCWireHit& wireHit = recoHit3D.getWireHit();
-          if (wireHit.getAutomatonCell().hasMaskedFlag()) {
-            getAutomatonCell().setMaskedFlag();
-            return;
-          }
-        }
-      }
+      /** Check all contained wire hits if one has the masked flag.
+       *  Set the masked flag of this segment in case at least one
+       of the contained wire hits is flagged as masked.
+      */
+      void receiveMaskedFlag() const;
 
       /// Sort the recoHits according to their perpS information
       void sortByPerpS()
       {
-        std::stable_sort(m_items.begin(), m_items.end(), [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
+        std::stable_sort(begin(), end(),
+        [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
           return recoHit.getPerpS() < otherRecoHit.getPerpS();
         });
       }
+
+      /// Sort the CDCRecoHits by their CDCWireHit.
+      void sort() __attribute__((deprecated));
+
+      /// Legacy accessor for the CDCRecoHit3D of the track, still used in some corners of python scripts.
+      const std::vector<CDCRecoHit3D>& items() const
+      { return *this; }
 
       /// Reverse the track inplace
       void reverse();

@@ -116,3 +116,35 @@ CDCTrack CDCTrack::reversed() const
   reversedTrack.reverse();
   return reversedTrack;
 }
+
+void CDCTrack::unsetAndForwardMaskedFlag() const
+{
+  getAutomatonCell().unsetMaskedFlag();
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    wireHit.getAutomatonCell().unsetMaskedFlag();
+  }
+}
+
+void CDCTrack::setAndForwardMaskedFlag() const
+{
+  getAutomatonCell().setMaskedFlag();
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    wireHit.getAutomatonCell().setMaskedFlag();
+  }
+}
+
+void CDCTrack::receiveMaskedFlag() const
+{
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+      getAutomatonCell().setMaskedFlag();
+      return;
+    }
+  }
+}
+
+void CDCTrack::sort()
+{ std::sort(begin(), end()); }

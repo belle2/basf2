@@ -3,6 +3,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/dataobjects/Helix.h>
 
+#include <boost/range/adaptor/reversed.hpp>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -107,10 +109,10 @@ void resetTrack(CDCTrack& track)
 
 void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track)
 {
-  double lastAngle = std::nan("");
+  double lastAngle = NAN;
   bool removeAfterThis = false;
 
-  for (const CDCRecoHit3D& recoHit : track.reverseRange()) {
+  for (const CDCRecoHit3D& recoHit : boost::adaptors::reverse(track)) {
     if (removeAfterThis) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       continue;

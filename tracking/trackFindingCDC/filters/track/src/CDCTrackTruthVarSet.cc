@@ -35,7 +35,7 @@ bool CDCTrackTruthVarSet::extract(const CDCTrack* track)
   } else {
 
     unsigned int numberOfCorrectHits = 0;
-    for (const CDCRecoHit3D& recoHit : track->items()) {
+    for (const CDCRecoHit3D& recoHit : *track) {
       if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == trackMCMatch) {
         numberOfCorrectHits++;
       }

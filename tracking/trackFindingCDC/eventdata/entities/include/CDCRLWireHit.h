@@ -128,11 +128,6 @@ namespace Belle2 {
       const CDCRLWireHit* operator->() const
       { return this; }
 
-      /** @name Methods common to all tracking entities
-       *  All entities ( track parts contained in a single superlayer ) share this interface to help
-       *  definition of collections of them.
-       */
-      /**@{*/
       /// Checks if the oriented hit is assoziated with the give wire
       bool hasWire(const CDCWire& wire) const
       { return getWireHit().getWire() == wire; }

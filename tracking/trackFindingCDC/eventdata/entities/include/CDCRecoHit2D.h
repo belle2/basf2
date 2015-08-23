@@ -66,9 +66,9 @@ namespace Belle2 {
        *  @param pos2D the absolut position of the wire
        *  @param snap optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromAbsPos2D(const CDCRLWireHit* rlWireHit,
-                                       const Vector2D& pos2D,
-                                       bool snap = true);
+      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit* rlWireHit,
+                                        const Vector2D& recoPos2D,
+                                        bool snap = true);
 
       /// Turns the orientation in place.
       /** Changes the sign of the right left passage information, since the position remains the same by this reversion.*/
@@ -76,9 +76,6 @@ namespace Belle2 {
 
       /** Returns the recohit with the opposite right left information */
       CDCRecoHit2D reversed() const;
-
-      /// Empty deconstructor
-      ~CDCRecoHit2D();
 
       /// Constructs a two dimensional reconstructed hit from a sim hit and the assoziated wirehit.
       /** This translates the sim hit to a reconstructed hit mainly to be able to compare the \n

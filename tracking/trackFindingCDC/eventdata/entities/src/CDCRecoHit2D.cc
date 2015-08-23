@@ -41,8 +41,6 @@ CDCRecoHit2D::CDCRecoHit2D(const CDCRLWireHit* rlWireHit,
   if (rlWireHit == nullptr) B2ERROR("Initialization of two dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
-CDCRecoHit2D::~CDCRecoHit2D() {;}
-
 CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
                                       const CDCSimHit& simHit)
 {
@@ -106,7 +104,7 @@ CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
 
 }
 
-CDCRecoHit2D CDCRecoHit2D::fromAbsPos2D(
+CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(
   const CDCRLWireHit* rlWireHit,
   const Vector2D& pos2D,
   bool snap

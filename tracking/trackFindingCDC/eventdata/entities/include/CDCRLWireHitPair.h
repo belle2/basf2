@@ -80,16 +80,6 @@ namespace Belle2 {
       const CDCRLWireHitPair* operator->() const { return this; }
 
 
-
-      /// Estimate the transvers travel distance on the given circle to the first oriented wire hit
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getFromRLWireHit().getFrontPerpS(trajectory2D); }
-
-      /// Estimate the transvers travel distance on the given circle to the second oriented wire hit
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getToRLWireHit().getBackPerpS(trajectory2D); }
-
-
       /// Getter for the WireNeighborType of the two underlying wires - zero for none neighbors
       WireNeighborType getNeighborType() const { return getFromWire().isNeighborWith(getToWire()); }
 

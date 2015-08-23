@@ -203,57 +203,51 @@ namespace Belle2 {
       ISuperLayerType getMinimalISuperLayer() const;
 
     public:
-      /// Calculates the perpendicular travel distance from the last position of the fromEntity to the first position of the toEntity.
-      /** Entities can be all eventdata/entities , segments and tracks **/
-      template<class FromEntity, class ToEntity>
-      FloatType getPerpSGap(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      /// Calculates the perpendicular travel distance from the last position of the fromHits to the first position of the toHits.
+      template<class FromHits, class ToHits>
+      FloatType getPerpSGap(const FromHits& fromHits, const ToHits& toHits) const
       {
-        Vector2D fromRecoPos2D = fromEntity.getBackRecoPos2D(*this);
-        Vector2D toRecoPos2D = toEntity.getFrontRecoPos2D(*this);
+        const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
+        const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
       }
 
 
-      /// Calculates the perpendicular travel distance from the first position of the fromEntity to the first position of the toEntity.
-      /** Entities can be all eventdata/entities , segments and tracks **/
-      template<class FromEntity, class ToEntity>
-      FloatType getPerpSFrontOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      /// Calculates the perpendicular travel distance from the first position of the fromHits to the first position of the toHits.
+      template<class FromHits, class ToHits>
+      FloatType getPerpSFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
-        Vector2D fromRecoPos2D = fromEntity.getFrontRecoPos2D(*this);
-        Vector2D toRecoPos2D = toEntity.getFrontRecoPos2D(*this);
+        const Vector2D& fromRecoPos2D = fromHits.front().getRecoPos2D();
+        const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
       }
 
-      /// Calculates the perpendicular travel distance from the last position of the fromEntity to the last position of the toEntity.
-      /** Entities can be all eventdata/entities , segments and tracks **/
-      template<class FromEntity, class ToEntity>
-      FloatType getPerpSBackOffset(const FromEntity& fromEntity, const ToEntity& toEntity) const
+      /// Calculates the perpendicular travel distance from the last position of the fromHits to the last position of the toHits.
+      template<class FromHits, class ToHits>
+      FloatType getPerpSBackOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
-        Vector2D fromRecoPos2D = fromEntity.getBackRecoPos2D(*this);
-        Vector2D toRecoPos2D = toEntity.getBackRecoPos2D(*this);
+        const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
+        const Vector2D& toRecoPos2D = toHits.back().getRecoPos2D();
         return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
       }
 
-      /// Calculates the perpendicular travel distance from the first position of the entity to the last position of the entity.
-      /** Entities can be all eventdata/entities , segments and tracks **/
-      template<class Entity>
-      FloatType getTotalPerpS(const Entity& entity) const
+      /// Calculates the perpendicular travel distance from the first position of the hits to the last position of the hits.
+      template<class Hits>
+      FloatType getTotalPerpS(const Hits& hits) const
       {
-        Vector2D frontRecoPos2D = entity.getFrontRecoPos2D(*this);
-        Vector2D backRecoPos2D = entity.getBackRecoPos2D(*this);
+        Vector2D frontRecoPos2D = hits.front().getRecoPos2D();
+        Vector2D backRecoPos2D = hits.back().getRecoPos2D();
         return calcPerpSBetween(frontRecoPos2D, backRecoPos2D);
       }
 
-      /// Calculates if this trajectory and the entity are coaligned
-      /** Returns the sign of the total perpendicular travel distance of the trajectory */
-      template<class Entity>
-      ForwardBackwardInfo isForwardOrBackwardTo(const Entity& entity) const
-      {
-        FloatType totalPerpS = getTotalPerpS(entity);
-        if (totalPerpS > 0) return FORWARD;
-        else if (totalPerpS < 0) return BACKWARD;
-        else return UNKNOWN_INFO;
-      }
+      /** Calculates if this trajectory and the hits are coaligned
+       *  Returns:
+       *  * FORWARD if the last entity lies behind the first.
+       *  * BACKWARD if the last entity lies before the first.
+       */
+      template<class Hits>
+      ForwardBackwardInfo isForwardOrBackwardTo(const Hits& hits) const
+      { return sign(getTotalPerpS(hits)); }
 
     public:
       /// Gets the charge sign of the trajectory
@@ -398,6 +392,7 @@ namespace Belle2 {
 
     public:
       /// Output helper for debugging
+
       friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
       {
         return output << "Local origin : " << trajectory2D.getLocalOrigin() <<  ", "

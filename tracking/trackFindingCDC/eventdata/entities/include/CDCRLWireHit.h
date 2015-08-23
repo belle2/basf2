@@ -114,14 +114,6 @@ namespace Belle2 {
       /// Getter for the right left passage information.
       const RightLeftInfo& getRLInfo() const { return m_rlInfo; }
 
-      /// Estimate the transvers travel distance on the given circle.
-      /** Uses the point of closest approach to the wire hit position
-       *  on the circle and calculates the arc length from the reference on the circle.
-       *  @return The arc length on the circle from the reference */
-      FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getWireHit().getPerpS(trajectory2D); }
-
-
       /// Reconstuct the wire reference position onto the given trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getWireHit().getRecoPos2D(trajectory2D);}
@@ -160,22 +152,6 @@ namespace Belle2 {
       /// Getter for the superlayer id
       ILayerType getISuperLayer() const
       { return getWireHit().getISuperLayer(); }
-
-      /// Same as getPerpS().
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
 
       /// Output operator. Help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)

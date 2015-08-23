@@ -66,10 +66,14 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
         CDCObservations2D observationsCircle;
 
         // Add the hits from the segment to the circle fit
-        for (const CDCRecoHit2D& recoHit2D : segment) {
-          double currentAngle = recoHit2D.getPerpS(trajectory.getTrajectory2D());
-          if (currentAngle < 1.5 * maximumAngle and currentAngle > 0.5 * minimumAngle)
-            observationsCircle.append(recoHit2D);
+        {
+          const CDCTrajectory2D trajectory2D = trajectory.getTrajectory2D();
+          for (const CDCRecoHit2D& recoHit2D : segment) {
+
+            double currentAngle = trajectory2D.calcPerpS(recoHit2D.getRefPos2D());
+            if (currentAngle < 1.5 * maximumAngle and currentAngle > 0.5 * minimumAngle)
+              observationsCircle.append(recoHit2D);
+          }
         }
 
         if (observationsCircle.size() > 0) {
@@ -167,7 +171,7 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
   for (const CDCRecoHit2D& recoHit : segment) {
     double perpS;
     if (recoHit.getStereoType() == AXIAL) {
-      perpS = recoHit.getPerpS(trajectory2D);
+      perpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
       observationsCircle.append(recoHit);
     } else {
       TrackFindingCDC::CDCRecoHit3D recoHit3D = TrackFindingCDC::CDCRecoHit3D::reconstruct(recoHit, trajectory2D);

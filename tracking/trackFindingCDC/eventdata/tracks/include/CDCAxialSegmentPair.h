@@ -145,9 +145,8 @@ namespace Belle2 {
        */
       ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
       {
-        ForwardBackwardInfo startIsCoaligned = getStart()->isCoaligned(trajectory2D);
-        ForwardBackwardInfo endIsCoaligned = getEnd()->isCoaligned(trajectory2D);
-
+        ForwardBackwardInfo startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStart()));
+        ForwardBackwardInfo endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEnd()));
         if (startIsCoaligned == FORWARD and endIsCoaligned == FORWARD) return FORWARD;
         else if (startIsCoaligned == BACKWARD and endIsCoaligned == BACKWARD) return BACKWARD;
         else return INVALID_INFO;

@@ -132,31 +132,6 @@ namespace Belle2 {
       CDCRecoHit2D getToRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getToRLWireHit()), getToRecoPos2D()); }
 
-
-      /// Returns the start reconstucted position projected to the trajectory
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getFromRecoPos2D()); }
-
-      /// Returns the end reconstucted position projected to the trajectory
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getClosest(getToRecoPos2D()); }
-
-      /// Estimate the transvers travel distance on the given circle of the first touch point
-      /** Uses the point of closest approach on the circle
-       *  to the first touch point and
-       *  calculates the arc length from the reference point on the circle.
-       *  @return The arc length on the circle from the reference */
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getFromRecoPos2D()); }
-
-      /// Estimate the transvers travel distance on the given circle of the second touch point
-      /** Uses the point of closest approach on the circle
-       *  to the second touch point and
-       *  calculates the arc length from the reference point on the circle.
-       *  @return The arc length on the circle from the reference */
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getToRecoPos2D()); }
-
     public:
       /// Adjusts the line to touch the drift circles with the correct right left passage information
       void adjustLine();

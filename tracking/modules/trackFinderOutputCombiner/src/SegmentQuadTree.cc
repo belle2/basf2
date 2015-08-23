@@ -78,8 +78,10 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
 
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
     fitter.update(trajectory, observations);
-    //trajectory.setLocalOrigin(items.front()->getStartRecoPos2D());
-    trajectory.setLocalOrigin(track.front()->getFrontRecoPos2D());
+
+    const CDCRecoSegment2D* ptrFirstSegment = track.front();
+    const CDCRecoHit2D& firstRecoHit2D = ptrFirstSegment->front();
+    trajectory.setLocalOrigin(firstRecoHit2D.getRecoPos2D());
 
     CDCTrajectory3D trajectory3D(trajectory, CDCTrajectorySZ::basicAssumption());
 

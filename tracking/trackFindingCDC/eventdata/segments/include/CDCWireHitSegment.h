@@ -53,23 +53,6 @@ namespace Belle2 {
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
-      /// Reconstructs a point on the attached trajectory close to the front of the segment
-      Vector2D getFrontRecoPos2D() const
-      { return front()->getFrontRecoPos2D(getTrajectory2D()); }
-
-      /// Reconstructs a point on the given trajectory close to the front of the segment
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return front()->getFrontRecoPos2D(trajectory2D); }
-
-      /// Reconstructs a point on the attached trajectory close to the back of the segment
-      Vector2D getBackRecoPos2D() const
-      { return back()->getBackRecoPos2D(getTrajectory2D()); }
-
-      /// Reconstructs a point on the attached trajectory close to the back of the segment
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return back()->getBackRecoPos2D(trajectory2D); }
-
-
 
     private:
       mutable CDCTrajectory2D m_trajectory2D; ///< Memory for the two dimensional trajectory fitted to this segment

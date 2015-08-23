@@ -242,8 +242,6 @@ namespace Belle2 {
       FloatType getRecoDriftLengthVariance() const
       { return getRLWireHit().getRefDriftLengthVariance(); }
 
-
-
       /// Adjust the travel distance by the given value.
       void shiftPerpS(FloatType perpSOffSet)
       { m_perpS += perpSOffSet; }
@@ -274,22 +272,6 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'*/
       const CDCRecoHit3D* operator->() const { return this; }
 
-      /// Same as getRecoPos2D()
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
       /// Calculates the z slope with a given z0
       /**
        * We assume a line from the point (0, 0, z0) to the reco position. The slope of this line is returned.
@@ -301,7 +283,6 @@ namespace Belle2 {
 
         return radius / (z - z0);
       }
-
 
     private:
       const CDCRLWireHit* m_rlWireHit;  ///< Memory for the oriented wire hit reference

@@ -122,17 +122,8 @@ namespace Belle2 {
       const CDCRLWireHitTriple* operator->() const { return this; }
 
 
-
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
       Shape getShape() const;
-
-      /// Estimate the transvers travel distance on the given circle to the first oriented wire hit
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getStartRLWireHit().getFrontPerpS(trajectory2D); }
-
-      /// Estimate the transvers travel distance on the given circle to the third oriented wire hit
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getRearRLWireHitPair().getBackPerpS(trajectory2D); }
 
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const

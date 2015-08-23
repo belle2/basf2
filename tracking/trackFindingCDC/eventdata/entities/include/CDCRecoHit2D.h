@@ -156,7 +156,6 @@ namespace Belle2 {
       ILayerType getISuperLayer() const
       { return getRLWireHit().getISuperLayer(); }
 
-
       /// Getter for the wire the reconstructed hit assoziated to.
       const CDCWire& getWire() const
       { return getRLWireHit().getWire(); }
@@ -177,12 +176,9 @@ namespace Belle2 {
       bool hasWireHit(const CDCWireHit& wireHit) const
       { return getRLWireHit().hasWireHit(wireHit); }
 
-
-
       /// Getter for the right left passage information.
       const RightLeftInfo& getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
-
 
       /// Getter for the drift length at the wire reference position.
       FloatType getRefDriftLength() const
@@ -191,8 +187,6 @@ namespace Belle2 {
       /// Getter for the uncertainty in the drift length at the wire reference position.
       FloatType getRefDriftLengthVariance() const
       { return getRLWireHit().getRefDriftLengthVariance(); }
-
-
 
       /// Getter for the position in the reference plane
       Vector2D getRecoPos2D() const
@@ -215,29 +209,6 @@ namespace Belle2 {
 
       /// Projects the hit's reconstructed position onto the given trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const;
-
-      /// Estimate the transvers travel distance on the given circle.
-      /** Uses the point of closest approach to the reconstructed position
-       *  on the circle and calculates the arc length from the reference on the circle.
-       *  @return The arc length on the circle from the reference */
-      FloatType getPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpS(getRecoPos2D()); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getRecoPos2D()
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return getRecoPos2D(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
-
-      /// Same as getPerpS().
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return getPerpS(trajectory2D); }
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const

@@ -27,18 +27,18 @@ namespace Belle2 {
     template<class T>
     class CDCGenHitVector : public SortableVector<T> {
     public:
-      typedef typename SortableVector<T>::iterator iterator; ///< Iterator type of this container
+      // typedef typename SortableVector<T>::iterator iterator; ///< Iterator type of this container
       typedef typename SortableVector<T>::const_iterator const_iterator;    ///< Constant iterator type of this container
 
-      typedef typename SortableVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
-      typedef typename SortableVector<T>::const_reverse_iterator
-      const_reverse_iterator;  ///< Constant reversed iterator type of this container
+      // typedef typename SortableVector<T>::reverse_iterator reverse_iterator; ///< Reversed iterator type of this container
+      // typedef typename SortableVector<T>::const_reverse_iterator
+      // const_reverse_iterator;  ///< Constant reversed iterator type of this container
 
 
-      typedef typename SortableVector<T>::range range; ///< Iterator type of this container
-      typedef typename SortableVector<T>::const_range const_range; ///< Iterator type of this container
+      // typedef typename SortableVector<T>::range range; ///< Iterator type of this container
+      // typedef typename SortableVector<T>::const_range const_range; ///< Iterator type of this container
 
-      typedef typename SortableVector<T>::input_iterator input_iterator;    ///< Constant iterator type of this container
+      // typedef typename SortableVector<T>::input_iterator input_iterator;    ///< Constant iterator type of this container
 
 
     public:
@@ -103,14 +103,14 @@ namespace Belle2 {
       /// Checks if any stored tracking entity is assoziated with a specific wire.
       bool hasWire(const Belle2::TrackFindingCDC::CDCWire& wire) const
       {
-        const_iterator found = std::find_if(this->begin(), this->end(), HasWirePredicate(wire));
+        auto found = std::find_if(this->begin(), this->end(), HasWirePredicate(wire));
         return found != this->end();
       }
 
       /// Checks if any stored tracking entity is assoziated with a specific wire hit.
       bool hasWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit) const
       {
-        const_iterator found = std::find_if(this->begin(), this->end(), HasWireHitPredicate(wirehit));
+        auto found = std::find_if(this->begin(), this->end(), HasWireHitPredicate(wirehit));
         return found != this->end();
       }
 
@@ -128,51 +128,11 @@ namespace Belle2 {
       ILayerType getISuperLayer() const
       {
         if (this->empty()) return INVALID_ISUPERLAYER;
-        const_iterator itItem = this->begin();
-        const T& firstItem =  *itItem;
-        ILayerType iSuperLayer = firstItem->getISuperLayer();
-        for (++itItem; itItem != this->end(); ++itItem) {
-          if (iSuperLayer != (*itItem)->getISuperLayer()) return INVALID_ISUPERLAYER;
-        }
-        return iSuperLayer;
+        const T& firstItem = this->front();
+        const ILayerType iSuperLayer = firstItem->getISuperLayer();
+        auto sameSL = [iSuperLayer](const T & item) { return item->getISuperLayer() == iSuperLayer; };
+        return  std::all_of(this->begin(), this->end(), sameSL) ? iSuperLayer : INVALID_ISUPERLAYER;
       }
-
-      // Methodes that explicitly use the order of the items as a feature of the storing vector.
-      // meaning things that can not be done with the set
-
-      /// Getter for the first observed position projected to the given trajectory
-      Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return this->front()->getFrontRecoPos2D(trajectory2D); }
-
-      /// Getter for the last observed position projected to the given trajectory
-      Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      { return this->back()->getBackRecoPos2D(trajectory2D); }
-
-      /// Calculates the travel distance of the first track entity in the vector
-      FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return this->front()->getFrontPerpS(trajectory2D); }
-
-      /// Calculates the travel distance of the last track entity in the vector
-      FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return this->back()->getBackPerpS(trajectory2D); }
-
-      /// Calculate the total transvers travel distance traversed by this ordered sequence of hit entities
-      FloatType getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpSBetween(getFrontRecoPos2D(trajectory2D), getBackRecoPos2D(trajectory2D)); }
-
-      /// Checks if the last entity in the vector lies at greater travel distance than the first entity
-      bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
-      { return getTotalPerpS(trajectory2D) > 0.0; }
-
-      /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
-      /** Returns:
-       *  * FORWARD if the last entity lies behind the first.
-       *  * BACKWARD if the last entity lies before the first.
-       */
-      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
-      { return sign(getTotalPerpS(trajectory2D)); }
-
-    private:
 
     }; //class
 

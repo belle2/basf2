@@ -163,7 +163,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
     for (const CDCRecoHit2D& recoHit2D : segment->items()) {
       Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack);
-      double perpS = recoHit2D.getPerpS(trajectoryTrack);
+      const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
+      double perpS = trajectoryTrack.calcPerpS(recoPos2D);
 
 
       double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));

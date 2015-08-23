@@ -134,7 +134,8 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
   const CDCTrajectory2D& fit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
 
   // Check if the middle segment is actually coaligned with the trajectory
-  if (not middleSegment.isForwardTrajectory(fit)) return NOT_A_CELL;
+  ForwardBackwardInfo fbInfo = fit.isForwardOrBackwardTo(middleSegment);
+  if (fbInfo != FORWARD) return NOT_A_CELL;
 
   //Reconstruct the
   CDCRecoSegment3D reconstructedMiddle;

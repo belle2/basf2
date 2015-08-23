@@ -207,7 +207,8 @@ namespace Belle2 {
       /// given two dimensional trajectory as the reference reconstructed position is
       /// moved parallel to the stereo wire.
       /// For axial hits the point of closest approach on the trajectory is returned.
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const
+      { return getRLWireHit().reconstruct3D(trajectory2D); }
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <cmath>
 
 namespace Belle2 {
   /** Some utilities to help with writing unit tests.
@@ -249,6 +250,7 @@ namespace Belle2 {
     template<class T>
     bool allNear(const T& expected, const T& actual, double tolerance)
     {
+      using std::fabs;
       return fabs(expected - actual) < tolerance;
     }
 

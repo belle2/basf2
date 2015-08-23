@@ -21,6 +21,8 @@
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
 #include <genfit/TrackCand.h>
 
+
+#include <boost/range/adaptor/reversed.hpp>
 #include <numeric>
 #include <iterator>
 
@@ -238,7 +240,8 @@ namespace {
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegment)
 {
-  return ::condenseTangentSegment(tangentSegment.items());
+  const std::vector<CDCTangent>& tangents = tangentSegment;
+  return ::condenseTangentSegment(tangents);
 }
 
 
@@ -252,7 +255,8 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCTangent* 
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
 {
-  return ::condenseFacetSegment(facetSegment.items());
+  const std::vector<CDCFacet>& facets = facetSegment;
+  return ::condenseFacetSegment(facets);
 }
 
 
@@ -345,7 +349,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
 {
   CDCRecoSegment2D reverseSegment;
   reverseSegment.reserve(size());
-  for (const CDCRecoHit2D& recohit : reverseRange()) {
+  for (const CDCRecoHit2D& recohit : boost::adaptors::reverse(*this)) {
     reverseSegment.push_back(recohit.reversed());
   }
 

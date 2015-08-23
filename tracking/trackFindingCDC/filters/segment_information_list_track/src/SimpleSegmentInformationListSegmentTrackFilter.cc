@@ -42,7 +42,7 @@ CellWeight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<s
   }
 
   for (SegmentInformation* segmentInformation : train) {
-    for (const CDCRecoHit2D& recoHit : segmentInformation->getSegment()->items()) {
+    for (const CDCRecoHit2D& recoHit : * (segmentInformation->getSegment())) {
       if (isAxialSegment) {
         observations.append(recoHit.getRecoPos2D());
       } else {

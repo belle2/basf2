@@ -24,6 +24,9 @@ namespace Belle2 {
     class CDCRLWireHitSegment;
     class CDCWireHitSegment;
 
+    class CDCFacet;
+    class CDCTangent;
+
     /// A segment consisting of two dimensional reconsturcted hits
     class CDCRecoSegment2D : public CDCSegment<CDCRecoHit2D> {
     public:

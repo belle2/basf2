@@ -23,21 +23,19 @@ CDCTangentSegment CDCTangentSegment::condense(const std::vector<const CDCFacet* 
 {
   CDCTangentSegment tangentSegment;
 
-  tangentSegment.reserve(facetPath.size() * 3);
+  tangentSegment.reserve(facetPath.size() + 1);
+  if (not facetPath.empty()) {
+    for (const CDCFacet* ptrFacet : facetPath) {
+      if (not ptrFacet) continue;
 
-  for (const CDCFacet* ptrFacet : facetPath) {
-    if (not ptrFacet) continue;
+      const CDCFacet& facet = *ptrFacet;
 
-    const CDCFacet& facet = *ptrFacet;
-
-    //the alignement of the tangents does not play a major role here
-    tangentSegment.push_back(facet.getStartToMiddle());
-    tangentSegment.push_back(facet.getStartToEnd());
-    tangentSegment.push_back(facet.getMiddleToEnd());
-
+      tangentSegment.push_back(facet.getStartToMiddle());
+      //tangentSegment.push_back(facet.getStartToEnd());
+      //the alignement of the tangents does not play a major role here
+    }
+    tangentSegment.push_back(facetPath.back()->getMiddleToEnd());
   }
-  tangentSegment.ensureUnique();
-
   return tangentSegment;
 
 }

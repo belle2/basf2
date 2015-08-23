@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/SortableVector.h>
+// #include <tracking/trackFindingCDC/ca/SortableVector.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
 #include <tracking/trackFindingCDC/topology/StereoType.h>
 
-#include <algorithm>
 #include <vector>
 #include <assert.h>
 
@@ -26,7 +25,7 @@ namespace Belle2 {
 
     /// A sequence of hits limited to one superlayer.
     template<class T>
-    class CDCSegment : public SortableVector<T> {
+    class CDCSegment : public std::vector<T> {
 
     public:
       /// Defines segments and superlayers to be coaligned.
@@ -50,6 +49,10 @@ namespace Belle2 {
        *  is not shared among the tracking entities. */
       ISuperLayerType getISuperLayer() const
       { return TrackFindingCDC::getISuperLayer(*this); }
+
+      /// Legacy accessor for the items of the segments, still used in some corners of python scripts.
+      const std::vector<T>& items() const
+      { return *this; }
 
       /// Getter for the two dimensional trajectory fitted to the segment
       CDCTrajectory2D& getTrajectory2D() const

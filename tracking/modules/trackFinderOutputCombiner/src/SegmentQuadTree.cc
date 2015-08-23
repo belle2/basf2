@@ -88,7 +88,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
     foundTrack.setStartTrajectory3D(trajectory3D);
 
     for (Processor::ItemType::TypeData* recoSegment : track) {
-      for (const CDCRecoHit2D& recoHit : recoSegment->items()) {
+      for (const CDCRecoHit2D& recoHit : *recoSegment) {
         addHitToTrack(foundTrack, recoHit, trajectory3D);
       }
     }

@@ -40,7 +40,7 @@ bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
   // We have at most 8 layers per super layer. As one segment is only in one superlayer, we can assume 8 layers to save memory.
   std::vector<bool> layerIsHit(8, false);
 
-  for (const CDCRecoHit2D& recoHit : segment->items()) {
+  for (const CDCRecoHit2D& recoHit : *segment) {
     const CDCWireHit& wireHit = recoHit.getWireHit();
 
     if (wireHit.getAutomatonCell().hasTakenFlag()) {

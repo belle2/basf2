@@ -38,7 +38,7 @@ bool CDCRecoSegment2DTruthVarSet::extract(const CDCRecoSegment2D* segment)
 
 
     unsigned int numberOfCorrectHits = 0;
-    for (const CDCRecoHit2D& recoHit : segment->items()) {
+    for (const CDCRecoHit2D& recoHit : *segment) {
       if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }

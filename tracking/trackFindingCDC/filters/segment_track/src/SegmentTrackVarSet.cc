@@ -59,7 +59,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     }
   } else {
     CDCObservations2D observations;
-    for (const CDCRecoHit2D& recoHit : segment->items()) {
+    for (const CDCRecoHit2D& recoHit : *segment) {
       CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
       double s = recoHit3D.getPerpS();
@@ -161,7 +161,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   if (hasZInformation) {
     double thetaFirstSegmentHit = -10;
 
-    for (const CDCRecoHit2D& recoHit2D : segment->items()) {
+    for (const CDCRecoHit2D& recoHit2D : *segment) {
       Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack);
       const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
       double perpS = trajectoryTrack.calcPerpS(recoPos2D);
@@ -185,7 +185,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
 
-  for (const CDCRecoHit2D& recoHit : segment->items()) {
+  for (const CDCRecoHit2D& recoHit : *segment) {
     if (isAxialSegment) {
       observationsFull.append(recoHit.getRecoPos2D());
       observationsNeigh.append(recoHit.getRecoPos2D());

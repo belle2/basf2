@@ -29,7 +29,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
     for (SegmentInformation* segment : segments) {
       bool oneHitDoesNotHaveTakenFlag = false;
 
-      for (const CDCRecoHit2D& recoHit : segment->getSegment()->items()) {
+      for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
         if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
           oneHitDoesNotHaveTakenFlag = true;
           break;
@@ -39,7 +39,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
       if (not oneHitDoesNotHaveTakenFlag) {
         // Ensure that all hits belong to the same track!
         std::set<TrackInformation*> tracksWithHitsInCommon;
-        for (const CDCRecoHit2D& recoHit : segment->getSegment()->items()) {
+        for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
           TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
           if (trackWithHit != nullptr) {
             tracksWithHitsInCommon.insert(trackWithHit);

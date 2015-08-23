@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
@@ -17,6 +16,7 @@
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
+#include <vector>
 
 namespace genfit {
   class TrackCand;

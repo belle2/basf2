@@ -11,20 +11,5 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCCollections.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTracks.h>
-
-
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-
-
-    //some additional transient types for exchange between creator objects
-    typedef CDCFacetVector CDCFacetCollection;
-
-  }
-}
-
-

@@ -10,12 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
+
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCFacet;
 
     /// A segment consisting of adjacent tangents.
     class  CDCTangentSegment : public CDCSegment<CDCTangent> {

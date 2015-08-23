@@ -9,9 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
-
 #include <vector>
 
 namespace Belle2 {

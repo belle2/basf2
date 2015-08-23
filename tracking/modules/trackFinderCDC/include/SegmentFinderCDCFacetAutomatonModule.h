@@ -23,6 +23,8 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
+#include <tracking/trackFindingCDC/ca/SortableVector.h>
+
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCBySuperClusterModule.h>
@@ -257,7 +259,7 @@ namespace Belle2 {
     private:
       //object pools
       /// Memory for the constructed facets.
-      CDCFacetCollection m_facets;
+      SortableVector<CDCFacet> m_facets;
 
       /// Neighborhood type for facets.
       typedef WeightedNeighborhood<const CDCFacet> CDCFacetNeighborhood;

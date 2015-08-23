@@ -13,6 +13,8 @@
 
 #include <framework/utilities/TestHelpers.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     /** This class provides the declaration of the common test fixture to all
@@ -47,7 +49,16 @@ namespace Belle2 {
 
     /// Equivalent to \sa TrackFindingCDCTestWithTopology for disabled tests.
     class DISABLED_Long_TrackFindingCDCTestWithTopology : public TrackFindingCDCTestWithTopology {;};
-
   } //end namespace TrackFindingCDC
+
+
+  namespace TestHelpers {
+    /** Predicate checking that all three components of Vector3D are close by a maximal error of tolerance. */
+    template<>
+    bool allNear<TrackFindingCDC::Vector3D>(const TrackFindingCDC::Vector3D& expected,
+                                            const TrackFindingCDC::Vector3D& actual,
+                                            double tolerance);
+  }
+
 } //end namespace Belle2
 

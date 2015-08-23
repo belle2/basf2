@@ -19,9 +19,9 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 using namespace std;
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -43,3 +43,13 @@ void TrackFindingCDCTestWithTopology::TearDownTestCase()
 
 
 
+template<>
+bool Belle2::TestHelpers::allNear<Vector3D>(const Vector3D& expected,
+                                            const Vector3D& actual,
+                                            double tolerance)
+{
+  bool xNear = std::fabs(expected.x() - actual.x()) < tolerance;
+  bool yNear = std::fabs(expected.y() - actual.y()) < tolerance;
+  bool zNear = std::fabs(expected.z() - actual.z()) < tolerance;
+  return xNear and yNear and zNear;
+}

@@ -1,0 +1,34 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Oliver Frost <oliver.frost@desy.de>                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
+{
+  CDCWireHit wireHit(WireID(0, 0, 0), 0.01);
+  CDCRLWireHit rlWireHit(&wireHit, RIGHT);
+
+  FloatType perpS = 0;
+  CDCRecoHit3D recoHit3D(&rlWireHit, wireHit.getRefPos3D(), perpS);
+
+  CDCTrack track;
+  track.push_back(recoHit3D);
+
+  for (CDCRecoHit3D& recoHit3D : track) {
+    recoHit3D.setRecoPos3D(Vector3D(0.0, 0.0, 0.0));
+  }
+
+  EXPECT_ALL_NEAR(Vector3D(0.0, 0.0, 0.0), track[0].getRecoPos3D(), 1);
+}

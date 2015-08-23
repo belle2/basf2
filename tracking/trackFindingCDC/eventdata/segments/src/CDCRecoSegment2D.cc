@@ -10,6 +10,12 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
@@ -351,7 +357,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
 void CDCRecoSegment2D::reverse()
 {
   // Reverse the trajectory
-  m_trajectory2D.reverse();
+  getTrajectory2D().reverse();
 
   // Reverse the left right passage hypotheses
   for (CDCRecoHit2D& recoHit2D : *this) {
@@ -359,4 +365,33 @@ void CDCRecoSegment2D::reverse()
   }
   // Reverse the arrangement of hits.
   std::reverse(begin(), end());
+}
+
+void CDCRecoSegment2D::unsetAndForwardMaskedFlag() const
+{
+  getAutomatonCell().unsetMaskedFlag();
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    const CDCWireHit& wireHit = recoHit2D.getWireHit();
+    wireHit.getAutomatonCell().unsetMaskedFlag();
+  }
+}
+
+void CDCRecoSegment2D::setAndForwardMaskedFlag() const
+{
+  getAutomatonCell().setMaskedFlag();
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    const CDCWireHit& wireHit = recoHit2D.getWireHit();
+    wireHit.getAutomatonCell().setMaskedFlag();
+  }
+}
+
+void CDCRecoSegment2D::receiveMaskedFlag() const
+{
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    const CDCWireHit& wireHit = recoHit2D.getWireHit();
+    if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+      getAutomatonCell().setMaskedFlag();
+      return;
+    }
+  }
 }

@@ -9,11 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
-
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 
 namespace genfit {
   class TrackCand;
@@ -21,9 +17,11 @@ namespace genfit {
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRLWireHit;
+    class CDCWire;
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCRLWireHitSegment :  public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCRLWireHit*> {
+    class CDCRLWireHitSegment :  public CDCSegment<const Belle2::TrackFindingCDC::CDCRLWireHit*> {
     public:
       /// Default constructor for ROOT compatibility.
       CDCRLWireHitSegment() {;}
@@ -31,30 +29,9 @@ namespace Belle2 {
       /// Construct from a genfit track candidate.
       explicit CDCRLWireHitSegment(const genfit::TrackCand& trackCand);
 
-      /// Defines wire hit segments and superlayers to be coaligned.
-      friend bool operator<(const CDCRLWireHitSegment& rlWireHitSegment,
-                            const CDCWireSuperLayer& wireSuperLayer)
-      { return rlWireHitSegment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer,
-                            const CDCRLWireHitSegment& rlWireHitSegment)
-      { return wireSuperLayer.getISuperLayer() < rlWireHitSegment.getISuperLayer(); }
-
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 
-      /// Getter for the two dimensional trajectory fitted to the segment
-      CDCTrajectory2D& getTrajectory2D() const
-      { return m_trajectory2D; }
-
-      /// Setter for the two dimensional trajectory fitted to the segment
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
-      { m_trajectory2D =  trajectory2D; }
-
-    private:
-      /// Memory for the two dimensional trajectory fitted to this segment
-      mutable CDCTrajectory2D m_trajectory2D;
     }; //end class CDCRLWireHitSegment
 
   } // end namespace TrackFindingCDC

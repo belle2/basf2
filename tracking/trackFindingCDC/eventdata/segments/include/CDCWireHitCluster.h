@@ -9,18 +9,16 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
-
+    class CDCWireHit;
     /// An aggregation of CDCWireHits.
-    class CDCWireHitCluster : public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCWireHit*> {
-
-
-
+    class CDCWireHitCluster : public std::vector<const Belle2::TrackFindingCDC::CDCWireHit*> {
     }; //end class CDCWireHitCluster
 
   }

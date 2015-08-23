@@ -67,7 +67,7 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
 
   // 2. Extract the trajectory information
   CDCTrajectory3D trajectory3D(gfTrackCand);
-  m_trajectory2D = trajectory3D.getTrajectory2D();
+  setTrajectory2D(trajectory3D.getTrajectory2D());
 }
 
 vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const

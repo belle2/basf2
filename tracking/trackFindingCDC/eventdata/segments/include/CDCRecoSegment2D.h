@@ -9,14 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
-
-#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit2DVector.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
 
 namespace genfit {
   class TrackCand;
@@ -25,8 +19,13 @@ namespace genfit {
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    class CDCFacetSegment;
+    class CDCTangentSegment;
+    class CDCRLWireHitSegment;
+    class CDCWireHitSegment;
+
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCRecoSegment2D : public CDCRecoHit2DVector {
+    class CDCRecoSegment2D : public CDCSegment<CDCRecoHit2D> {
     public:
       /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent segment
       static CDCRecoSegment2D condense(const CDCTangentSegment& tangentSegment);
@@ -54,14 +53,6 @@ namespace Belle2 {
        *  by constructing facets between adjacent hits triples and averaging the reconstucted position.
        */
       static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCRecoSegment2D& segment, const CDCWireSuperLayer& wireSuperLayer)
-      { return segment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCRecoSegment2D& segment)
-      { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
@@ -95,48 +86,17 @@ namespace Belle2 {
       { return m_automatonCell; }
 
       /// Constant getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() const
+      const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
-      void unsetAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().unsetMaskedFlag();
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          const CDCWireHit& wireHit = recoHit2D.getWireHit();
-          wireHit.getAutomatonCell().unsetMaskedFlag();
-        }
-      }
+      void unsetAndForwardMaskedFlag() const;
 
       /// Set the masked flag of the automaton cell of this segment and forward the masked flag to all contained wire hits.
-      void setAndForwardMaskedFlag() const
-      {
-        getAutomatonCell().setMaskedFlag();
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          const CDCWireHit& wireHit = recoHit2D.getWireHit();
-          wireHit.getAutomatonCell().setMaskedFlag();
-        }
-      }
+      void setAndForwardMaskedFlag() const;
 
       /// Check all contained wire hits if one has the masked flag. Set the masked flag of this segment in case at least one of the contained wire hits is flagged as masked.
-      void receiveMaskedFlag() const
-      {
-        for (const CDCRecoHit2D& recoHit2D : *this) {
-          const CDCWireHit& wireHit = recoHit2D.getWireHit();
-          if (wireHit.getAutomatonCell().hasMaskedFlag()) {
-            getAutomatonCell().setMaskedFlag();
-            return;
-          }
-        }
-      }
-
-      /// Getter for the two dimensional trajectory fitted to the segment
-      CDCTrajectory2D& getTrajectory2D() const
-      { return m_trajectory2D; }
-
-      /// Setter for the two dimensional trajectory fitted to the segment
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
-      { m_trajectory2D =  trajectory2D; }
+      void receiveMaskedFlag() const;
 
       /// Getter for the global super cluster id.
       const size_t& getISuperCluster() const
@@ -151,10 +111,7 @@ namespace Belle2 {
        *  It is declared mutable because it can vary
        *  rather freely despite of the hit content might be required fixed.
        */
-      mutable AutomatonCell m_automatonCell;
-
-      /// Memory for the two dimensional trajectory fitted to this segment
-      mutable CDCTrajectory2D m_trajectory2D;
+      AutomatonCell m_automatonCell;
 
       /// Memory for the global super cluster id.
       size_t m_iSuperCluster;

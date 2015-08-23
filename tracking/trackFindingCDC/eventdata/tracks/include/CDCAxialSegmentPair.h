@@ -9,11 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,17 +26,13 @@ namespace Belle2 {
       CDCAxialSegmentPair();
 
       /// Constructor from two segments
-      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment);
+      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                          const CDCAxialRecoSegment2D* endSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCAxialSegmentPair(
-        const CDCAxialRecoSegment2D* startSegment,
-        const CDCAxialRecoSegment2D* endSegment,
-        const CDCTrajectory2D& trajectory2D
-      );
-
-      /// Empty destructor
-      ~CDCAxialSegmentPair();
+      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                          const CDCAxialRecoSegment2D* endSegment,
+                          const CDCTrajectory2D& trajectory2D);
 
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCAxialSegmentPair const& rhs) const
@@ -50,11 +46,13 @@ namespace Belle2 {
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(CDCAxialSegmentPair const& segmentTriple , const CDCAxialRecoSegment2D* axialSegment)
+      friend bool operator<(CDCAxialSegmentPair const& segmentTriple,
+                            const CDCAxialRecoSegment2D* axialSegment)
       { return segmentTriple.getStart() < axialSegment; }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment, CDCAxialSegmentPair const& segmentTriple)
+      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment,
+                            CDCAxialSegmentPair const& segmentTriple)
       { return axialSegment < segmentTriple.getStart(); }
 
       /// Allow automatic taking of the address.
@@ -159,13 +157,17 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
 
     private:
+      /// Reference to the start segment
+      const CDCAxialRecoSegment2D* m_startSegment;
 
-      const CDCAxialRecoSegment2D* m_startSegment; ///< Reference to the start segment
-      const CDCAxialRecoSegment2D* m_endSegment; ///< Reference to the end segment
+      /// Reference to the end segment
+      const CDCAxialRecoSegment2D* m_endSegment;
 
-      mutable CDCTrajectory2D m_trajectory2D; ///< Reference to the common trajectory
-      mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
+      /// Reference to the common trajectory
+      mutable CDCTrajectory2D m_trajectory2D;
 
+      /// Automaton cell assoziated with the pair of segments
+      mutable AutomatonCell m_automatonCell;
 
     }; //end class CDCAxialSegmentPair
 

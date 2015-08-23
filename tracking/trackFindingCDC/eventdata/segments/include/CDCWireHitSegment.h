@@ -9,42 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCGenHitVector.h>
-
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHit;
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCWireHitSegment :  public CDCGenHitVector<const Belle2::TrackFindingCDC::CDCWireHit*> {
+    class CDCWireHitSegment :  public CDCSegment<const Belle2::TrackFindingCDC::CDCWireHit*> {
 
     public:
-      /// Defines wire hit segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireHitSegment& wireHitSegment,
-                            const CDCWireSuperLayer& wireSuperLayer)
-      { return wireHitSegment.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer,
-                            const CDCWireHitSegment& wireHitSegment)
-      { return wireSuperLayer.getISuperLayer() < wireHitSegment.getISuperLayer(); }
-
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
-
-      /// Getter for the two dimensional trajectory fitted to the segment
-      CDCTrajectory2D& getTrajectory2D() const
-      { return m_trajectory2D; }
-
-      /// Setter for the two dimensional trajectory fitted to the segment
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
-      { m_trajectory2D =  trajectory2D; }
-
-    private:
-      /// Memory for the two dimensional trajectory fitted to this segment
-      mutable CDCTrajectory2D m_trajectory2D;
 
     }; //end class CDCWireHitSegment
 

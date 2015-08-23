@@ -32,7 +32,7 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
   if (not ptrCluster) return false;
   const CDCWireHitCluster& cluster = *ptrCluster;
 
-  unsigned int superlayerID = cluster.getISuperLayer();
+  unsigned int superlayerID = getISuperLayer(cluster);
   unsigned int size =  cluster.size();
 
   int totalNNeighbors = 0;
@@ -85,7 +85,7 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
     adcCountVariance = -1;
   }
 
-  var<named("is_stereo")>() = cluster.getStereoType() != AXIAL;
+  var<named("is_stereo")>() = getStereoType(cluster) != AXIAL;
   var<named("size")>() = size;
 
   var<named("total_number_of_neighbors")>() = totalNNeighbors;

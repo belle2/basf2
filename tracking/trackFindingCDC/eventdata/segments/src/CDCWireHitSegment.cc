@@ -1,25 +1,23 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-
-    // for now a typedef is enough
-    // may get additional methods if necessary
-    /// A segment consisting of adjacent tangents
-    class  CDCFacetSegment : public  CDCSegment<CDCFacet> {
-    };
-
+vector<const CDCWire*> CDCWireHitSegment::getWireSegment() const
+{
+  vector<const CDCWire*> wireSegment;
+  for (const CDCWireHit* ptrWireHit : *this) {
+    wireSegment.push_back(&(ptrWireHit->getWire()));
   }
+  return wireSegment;
 }

@@ -9,14 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCRecoHit3DVector.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    class CDCRecoSegment2D;
+
     /// A segment consisting of three dimensional reconstructed hits.
-    class CDCRecoSegment3D : public CDCRecoHit3DVector {
+    class CDCRecoSegment3D : public CDCSegment<CDCRecoHit3D> {
 
     public:
       /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
@@ -27,18 +29,6 @@ namespace Belle2 {
        * Note : no fitting information is transported to the resulting segment.
        */
       CDCRecoSegment2D projectXY() const;
-
-      /// Getter for the two dimensional trajectory.
-      const CDCTrajectory2D& getTrajectory2D() const
-      { return m_trajectory2D; }
-
-      /// Setter for the two dimensional trajectory.
-      void setTrajectory2D(const CDCTrajectory2D& trajectory2D)
-      { m_trajectory2D = trajectory2D; }
-
-    private:
-      /// Memory for a two dimensional trajectory.
-      CDCTrajectory2D m_trajectory2D;
     };
 
   }

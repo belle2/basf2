@@ -9,10 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+
 
 namespace Belle2 {
   namespace TrackFindingCDC {

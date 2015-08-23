@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#include <iterator>
 
 namespace Belle2 {
 
@@ -43,6 +44,25 @@ namespace Belle2 {
     ISuperLayerType isAxialISuperLayer(const ISuperLayerType& iSuperLayer);
 
 
+    /** Returns the common superlayer of hits in a container.
+     *  INVALID_ISUPERLAYER if there is no common super layer or the container is empty.
+     */
+    template<class Hits>
+    ISuperLayerType getISuperLayer(const Hits& hits)
+    {
+      using std::begin;
+      using std::end;
+      auto itBegin = begin(hits);
+      auto itEnd = end(hits);
+      if (itBegin == itEnd) return INVALID_ISUPERLAYER; // empty case
+      const ISuperLayerType iSuperLayer = (*itBegin)->getISuperLayer();
+      for (const auto& hit : hits) {
+        if (hit->getISuperLayer() != iSuperLayer) {
+          return INVALID_ISUPERLAYER;
+        };
+      }
+      return iSuperLayer;
+    }
 
 
   } // namespace TrackFindingCDC

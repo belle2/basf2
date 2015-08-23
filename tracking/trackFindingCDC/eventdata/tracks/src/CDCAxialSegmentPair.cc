@@ -15,16 +15,17 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
-
-CDCAxialSegmentPair::CDCAxialSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
+CDCAxialSegmentPair::CDCAxialSegmentPair() :
+  m_startSegment(nullptr),
+  m_endSegment(nullptr)
 {
 
 }
 
 
 
-CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment, const CDCAxialRecoSegment2D* endSegment) :
+CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                                         const CDCAxialRecoSegment2D* endSegment) :
   m_startSegment(startSegment), m_endSegment(endSegment)
 {
   if (not startSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as start segment");
@@ -33,11 +34,9 @@ CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegme
 
 
 
-CDCAxialSegmentPair::CDCAxialSegmentPair(
-  const CDCAxialRecoSegment2D* startSegment,
-  const CDCAxialRecoSegment2D* endSegment,
-  const CDCTrajectory2D& trajectory2D
-) :
+CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
+                                         const CDCAxialRecoSegment2D* endSegment,
+                                         const CDCTrajectory2D& trajectory2D) :
   m_startSegment(startSegment),
   m_endSegment(endSegment),
   m_trajectory2D(trajectory2D)
@@ -47,10 +46,3 @@ CDCAxialSegmentPair::CDCAxialSegmentPair(
   if (not endSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as end segment");
 
 }
-
-
-
-CDCAxialSegmentPair::~CDCAxialSegmentPair() {;}
-
-
-

@@ -9,23 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTangentVector.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
+#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
     /// A segment consisting of adjacent tangents.
-    class  CDCTangentSegment : public CDCTangentVector {
+    class  CDCTangentSegment : public CDCSegment<CDCTangent> {
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCTangentSegment() {;}
-
-      /// Empty deconstructor
-      ~CDCTangentSegment() {;}
-
       /// Takes all distinct tangents from the facets in the path - Note! there is no particular order of the tangents in the segment.
       static CDCTangentSegment condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
     };

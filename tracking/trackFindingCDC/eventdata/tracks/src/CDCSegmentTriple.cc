@@ -61,13 +61,3 @@ CDCSegmentTriple::CDCSegmentTriple(
   if (not middleSegment) B2ERROR("CDCSegmentTriple initialized with nullptr as middle segment");
   if (not endSegment) B2ERROR("CDCSegmentTriple initialized with nullptr as end segment");
 }
-
-
-
-CDCSegmentTriple::~CDCSegmentTriple()
-{
-
-}
-
-
-

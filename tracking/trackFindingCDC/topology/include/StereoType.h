@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/SignType.h>
+#include <iterator>
 
 namespace Belle2 {
 
@@ -29,6 +30,26 @@ namespace Belle2 {
 
     /// Constant for an invalid stereo information
     const StereoType INVALID_STEREOTYPE = -127;
+
+    /** Returns the common stereo type of hits in a container.
+     *  INVALID_STEREOTYPE if there is no common super layer or the container is empty.
+     */
+    template<class Hits>
+    StereoType getStereoType(const Hits& hits)
+    {
+      using std::begin;
+      using std::end;
+      auto itBegin = begin(hits);
+      auto itEnd = end(hits);
+      if (itBegin == itEnd) return INVALID_STEREOTYPE; // empty case
+      const StereoType stereoType = (*itBegin)->getStereoType();
+      for (const auto& hit : hits) {
+        if (hit->getStereoType() != stereoType) {
+          return INVALID_STEREOTYPE;
+        };
+      }
+      return stereoType;
+    }
 
   } // namespace TrackFindingCDC
 

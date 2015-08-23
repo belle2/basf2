@@ -108,16 +108,38 @@ namespace Belle2 {
       { return getWireHit().getRefDriftLengthVariance(); }
 
       /// Getter for the wire hit assoziated with the oriented hit.
-      const CDCWireHit& getWireHit() const { return *m_wirehit; }
+      const CDCWireHit& getWireHit() const
+      { return *m_wirehit; }
 
       /// Getter for the right left passage information.
-      const RightLeftInfo& getRLInfo() const { return m_rlInfo; }
+      const RightLeftInfo& getRLInfo() const
+      { return m_rlInfo; }
 
-      /** Reconstruct the three dimensional position (especially of stereo hits)
-       *  by terminating the z coordinate assuming the drift circle touches
-       *  the two dimensional trajectory in the xy projection.
+      /** Reconstructs a position of primary ionisation on the drift circle.
+       *
+       *  The result is the position of closest approach on the drift circle to the trajectory.
+       *
+       *  All positions and the trajectory are interpreted to lie at z=0.
+       *  Also the right left passage hypotheses does not play a role in
+       *  the reconstruction in any way.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
+      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const
+      { return getWireHit().reconstruct2D(trajectory2D); }
+
+      /** Attempts to reconstruct a three dimensional position (especially of stereo hits)
+       *
+       *  This method makes a distinct difference between axial and stereo hits:
+       *  * Stereo hits are moved out of the reference plane such that the
+       *    oriented drift circle meets the trajectory in one point. Therefore the
+       *    left right passage hypothese has to be taken into account
+       *  * For axial hits the reconstructed position is ambiguous in the z coordinate.
+       *    Also the drift circle cannot moved such that it would meet the
+       *    trajectory. Hence we default to the result of reconstruct2D, which
+       *    yield the closest approach of the drift circle to the trajectory
+       *    in the reference plane.
+       */
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const
+      { return getWireHit().reconstruct3D(trajectory2D, getRLInfo()); }
 
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference

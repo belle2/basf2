@@ -207,10 +207,7 @@ namespace Belle2 {
       { return this; }
       /**@}*/
 
-      /** @name Methods common to all tracking entities
-       *  All entities ( track parts contained in a single superlayer ) share this interface to help
-       *  the definition of collections of them. */
-      /**@{*/
+
       /// Checks of the wire hit is base on the wire given
       bool hasWire(const CDCWire& wire) const
       { return getWire() == wire; }
@@ -218,7 +215,31 @@ namespace Belle2 {
       /// Checks if the wire hit is equal to the wire hit given.
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return operator==(wirehit); }
-      /**@}*/
+
+      /** Reconstructs a position of primary ionisation on the drift circle.
+       *
+       *  The result is the position of closest approach on the drift circle to the trajectory.
+       *
+       *  All positions and the trajectory are interpreted to lie at z=0.
+       *  Also the right left passage hypotheses does not play a role in
+       *  the reconstruction in any way.
+       */
+      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
+
+      /** Attempts to reconstruct a three dimensional position (especially of stereo hits)
+       *
+       *  This method makes a distinct difference between axial and stereo hits:
+       *  * Stereo hits are moved out of the reference plane such that the
+       *    oriented drift circle meets the trajectory in one point. Therefore the
+       *    left right passage hypothese has to be taken into account
+       *  * For axial hits the reconstructed position is ambiguous in the z coordinate.
+       *    Also the drift circle cannot moved such that it would meet the
+       *    trajectory. Hence we default to the result of reconstruct2D, which
+       *    yield the closest approach of the drift circle to the trajectory
+       *    in the reference plane.
+       */
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo& rlInfo) const;
+
 
       /// String output operator for wire hit objects to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)

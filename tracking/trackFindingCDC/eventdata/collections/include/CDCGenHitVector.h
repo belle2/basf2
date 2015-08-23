@@ -114,43 +114,12 @@ namespace Belle2 {
         return found != this->end();
       }
 
-      /// Copy all entities in this collection assoziated with a specific wire to the given collection.
-      void collectForWire(const Belle2::TrackFindingCDC::CDCWire& wire, CDCGenHitVector<T>& collect) const
-      {
-        input_iterator inputTo = collect.input();
-        for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
-          if ((*itItem)->hasWire(wire)) inputTo = *itItem;
-        }
-      }
-      /// Copy all entities in this collection assoziated with a specific wire hit to the given collection.
-      void collectForWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wirehit, CDCGenHitVector<T>& collect) const
-      {
-        input_iterator inputTo = collect.input();
-        for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
-          if ((*itItem)->hasWireHit(wirehit)) inputTo = *itItem;
-        }
-      }
-
-      /// Calculates the average center of mass of all stored tracking entities.
-      Vector2D getCenterOfMass2D() const
-      {
-        Vector2D accumulate(0.0, 0.0);
-        //B2DEBUG(100,"getCenterOfMass");
-        for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
-          //B2DEBUG(100,(*itItem)->getCenterOfMass2D());
-          accumulate.add((*itItem)->getCenterOfMass2D());
-        }
-        accumulate.divide(this->size());
-        return accumulate;
-      }
-
       /// Returns the common stereo type of all tracking entities.
       /** This checks if all tracking entities are located in the same superlayer and \n
        *  returns the stereo type of the later. Returns INVALID_STEREOTYPE if the superlayer \n
        *  is not shared among the tracking entities. */
       StereoType getStereoType() const
       { return isValidISuperLayer(getISuperLayer()) ? this->front()->getStereoType() : INVALID_STEREOTYPE; }
-
 
       /// Returns the common super layer id of all stored tracking entities
       /** This checks if all tracking entities are located in the same superlayer and \n
@@ -166,19 +135,6 @@ namespace Belle2 {
           if (iSuperLayer != (*itItem)->getISuperLayer()) return INVALID_ISUPERLAYER;
         }
         return iSuperLayer;
-      }
-
-      /// Calculates the sum of all squared distances of the stored tracking entities to the circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      {
-
-        FloatType accumulate = 0;
-        for (const_iterator itItem = this->begin(); itItem != this->end(); ++itItem) {
-          const T& item = *itItem;
-          accumulate += item->getSquaredDist2D(trajectory2D);
-        }
-        return accumulate;
-
       }
 
       // Methodes that explicitly use the order of the items as a feature of the storing vector.

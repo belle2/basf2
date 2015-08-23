@@ -157,15 +157,17 @@ namespace Belle2 {
       { return getRLWireHit().getISuperLayer(); }
 
 
-
       /// Getter for the wire the reconstructed hit assoziated to.
-      const CDCWire& getWire() const { return getRLWireHit().getWire(); }
+      const CDCWire& getWire() const
+      { return getRLWireHit().getWire(); }
+
+      /// Getter for the reference position of the wire.
+      const Vector2D& getRefPos2D() const
+      { return getRLWireHit().getRefPos2D(); }
 
       /// Checks if the reconstructed hit is assoziated with the give wire
       bool hasWire(const CDCWire& wire) const
       { return getRLWireHit().hasWire(wire); }
-
-
 
       /// Getter for the wire hit assoziated with the reconstructed hit.
       const CDCWireHit& getWireHit() const
@@ -236,20 +238,6 @@ namespace Belle2 {
       /// Same as getPerpS().
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
-
-      /// Center of mass is just the reconstructed position
-      Vector2D getCenterOfMass2D() const
-      { return getRecoPos2D(); }
-
-      /// Calculates the simple distance of the reconstructed position to a circle trajectory
-      FloatType getDist2D(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.getDist2D(getRecoPos2D()); }
-
-
-      /// Calculates the squared distance of the reconstructed position to a circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      { FloatType distance = getDist2D(trajectory2D); return distance * distance; }
-
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const

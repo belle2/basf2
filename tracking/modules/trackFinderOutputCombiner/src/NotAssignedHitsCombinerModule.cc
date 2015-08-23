@@ -226,7 +226,8 @@ void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegm
         double meanDistanceToTrack = 0;
 
         for (const CDCRecoHit2D& recoHit : recoSegment) {
-          meanDistanceToTrack += recoHit.getSquaredDist2D(trajectory2D);
+          FloatType dist2D = trajectory2D.getDist2D(recoHit.getRefPos2D());
+          meanDistanceToTrack += square(dist2D);
         }
 
         if (meanDistanceToTrack / recoSegment.size() > 100) {

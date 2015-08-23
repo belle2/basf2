@@ -133,6 +133,18 @@ namespace Belle2 {
       const WireID& getWireID() const
       { return getWire().getWireID(); }
 
+      /// Getter for the stereo type of the underlying wire.
+      StereoType getStereoType() const
+      { return getWire().getStereoType(); }
+
+      /// Indicator if the underlying wire is axial.
+      bool isAxial() const
+      { return getWire().isAxial(); }
+
+      /// Getter for the super layer id
+      ILayerType getISuperLayer() const
+      { return getWire().getISuperLayer(); }
+
       /// The two dimensional reference position of the underlying wire
       const Vector2D& getRefPos2D() const
       { return getWire().getRefPos2D(); }
@@ -170,15 +182,7 @@ namespace Belle2 {
 
       /// Reconstuct the wire reference position onto the given trajectory
       Vector2D getRecoPos2D(const CDCTrajectory2D& trajectory2D) const
-      {
-        StereoType stereoType = getStereoType();
-        if (stereoType == AXIAL) {
-          return trajectory2D.getClosest(getRefPos2D());
-        } else {
-          // TODO replace with something better if at all possible
-          return trajectory2D.getCloseSameCylindricalR(getRefPos2D());
-        }
-      }
+      { return trajectory2D.getClosest(getRefPos2D()); }
 
       /// Getter for the index  of the hit in the StoreArray holding this hit.
       Index getStoreIHit() const
@@ -220,7 +224,6 @@ namespace Belle2 {
       { return this; }
       /**@}*/
 
-
       /** @name Methods common to all tracking entities
        *  All entities ( track parts contained in a single superlayer ) share this interface to help
        *  the definition of collections of them. */
@@ -232,21 +235,6 @@ namespace Belle2 {
       /// Checks if the wire hit is equal to the wire hit given.
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return operator==(wirehit); }
-
-      /// Center of mass is just the refernce position for wire hits.
-      const Vector2D& getCenterOfMass2D() const { return getRefPos2D(); }
-
-      /// Getter for the stereo type of the underlying wire.
-      StereoType getStereoType() const
-      { return getWire().getStereoType(); }
-
-      /// Indicator if the underlying wire is axial.
-      bool isAxial() const
-      { return getWire().isAxial(); }
-
-      /// Getter for the super layer id
-      ILayerType getISuperLayer() const
-      { return getWire().getISuperLayer(); }
 
       /// Same as getPerpS().
       FloatType getFrontPerpS(const CDCTrajectory2D& trajectory2D) const
@@ -263,23 +251,13 @@ namespace Belle2 {
       /// Same as getRecoPos2D()
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getRecoPos2D(trajectory2D); }
-
-      /// Calculates the squared distance of the wire hit to a circle as see from the transvers plane
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      {
-        FloatType distance = trajectory2D.getDist2D(getRefPos2D());
-        distance = distance > 0 ? distance - getRefDriftLength() : distance + getRefDriftLength();
-        return distance * distance;
-      }
       /**@}*/
 
-      /// Sting output operator for wire hit objects to help debugging
+      /// String output operator for wire hit objects to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
-      {
-        return output << "CDCWireHit(" << wirehit.getWire() << ",dl=" << wirehit.getRefDriftLength() << ")";
-      }
+      { return output << "CDCWireHit(" << wirehit.getWire() << ",dl=" << wirehit.getRefDriftLength() << ")"; }
 
-      /// Sting output operator for wire hit pointers to help debugging
+      /// String output operator for wire hit pointers to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit* wirehit)
       { return wirehit == nullptr ? output << "nullptr" : output << *wirehit; }
 

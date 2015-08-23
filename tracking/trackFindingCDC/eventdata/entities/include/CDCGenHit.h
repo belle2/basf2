@@ -81,10 +81,6 @@ namespace Belle2 {
       bool hasWireHit(const CDCWireHit&) const
       { return false; }
 
-      /// Center of mass is just the refernce position for wire hits.
-      const Vector2D& getCenterOfMass2D() const
-      { return getDummyPos2D(); }
-
       /// Getter for the stereo type of the underlying wire.
       StereoType getStereoType() const
       { return getWire().getStereoType(); }
@@ -108,13 +104,6 @@ namespace Belle2 {
       /// Same as getRecoPos2D()
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getRecoPos2D(trajectory2D); }
-
-      /// Calculates the squared distance of the wire hit to a circle as see from the transvers plane
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      {
-        FloatType distance = trajectory2D.getDist2D(getDummyPos2D());
-        return distance * distance;
-      }
       /**@}*/
 
       /// Estimate the transvers travel distance on the given circle to this hit.

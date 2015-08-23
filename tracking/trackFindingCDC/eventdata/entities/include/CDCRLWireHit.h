@@ -93,7 +93,8 @@ namespace Belle2 {
       { return getWire().getRefCylindricalR(); }
 
       /// Getter for the wire the oriented hit assoziated to.
-      const CDCWire& getWire() const { return getWireHit().getWire(); }
+      const CDCWire& getWire() const
+      { return getWireHit().getWire(); }
 
       /// Getter for the  drift length at the reference position of the wire
       FloatType getRefDriftLength() const
@@ -152,10 +153,6 @@ namespace Belle2 {
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return getWireHit() == wirehit; }
 
-      /// Center of mass is the refernce position for underlying wire hits.
-      Vector2D getCenterOfMass2D() const
-      { return getWireHit().getRefPos2D(); }
-
       /// Getter for the stereo type of the underlying wire.
       StereoType getStereoType() const
       { return getWireHit().getStereoType(); }
@@ -179,16 +176,6 @@ namespace Belle2 {
       /// Same as getRecoPos2D()
       Vector2D getBackRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getRecoPos2D(trajectory2D); }
-
-      /** Calculates the squared distance of the oriented hit to a circle
-       *  as see from the transvers plane.
-       */
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      {
-        FloatType wireDistance = trajectory2D.getDist2D(getRefPos2D());
-        FloatType correctedDistance = wireDistance - getRLInfo() * getRefDriftLength();
-        return  correctedDistance *  correctedDistance;
-      }
 
       /// Output operator. Help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)

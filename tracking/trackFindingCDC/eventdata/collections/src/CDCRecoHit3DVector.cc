@@ -13,16 +13,3 @@
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-FloatType CDCRecoHit3DVector::getSquaredZDist(const CDCTrajectorySZ& trajectorySZ) const
-{
-
-  FloatType accumulate = 0;
-  for (const_iterator itItem = begin(); itItem != end(); ++itItem) {
-    const Item& item = *itItem;
-    accumulate += item->getSquaredZDist(trajectorySZ);
-  }
-  return accumulate;
-
-}

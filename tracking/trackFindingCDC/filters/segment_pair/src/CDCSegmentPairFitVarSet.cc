@@ -40,6 +40,9 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
+  Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
+  Vector2D endFrontRecoPos2D = endSegment.front().getRecoPos2D();
+
   CDCTrajectory2D& startFit =  startSegment.getTrajectory2D();
   CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
 
@@ -111,24 +114,21 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("commonFit_perpSBackOffset")>() = commonFit.getPerpSBackOffset(startSegment, endSegment);
 
   // Proximity indicators
-  var<named("startFit_dist2DToCenter_endSegment")>() = startFit.getDist2DToCenter(endSegment);
-  var<named("endFit_dist2DToCenter_startSegment")>() = endFit.getDist2DToCenter(startSegment);
-
-  var<named("startFit_dist2DToFront_endSegment")>() = startFit.getDist2DToFront(endSegment);
-  var<named("endFit_dist2DToBack_startSegment")>() = endFit.getDist2DToBack(startSegment);
+  var<named("startFit_dist2DToFront_endSegment")>() = startFit.getDist2D(endFrontRecoPos2D);
+  var<named("endFit_dist2DToBack_startSegment")>() = endFit.getDist2D(startBackRecoPos2D);
 
   // Momentum agreement
   var<named("startFit_absMom2D")>() = startFit.getAbsMom2D();
   var<named("endFit_absMom2D")>() = endFit.getAbsMom2D();
 
-  Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
-  Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
+  Vector2D startMom2DAtStartBack = startFit.getUnitMom2D(startBackRecoPos2D);
+  Vector2D endMom2DAtEndFront = endFit.getUnitMom2D(endFrontRecoPos2D);
 
-  Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
-  Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
+  Vector2D startMom2DAtEndFront = startFit.getUnitMom2D(endFrontRecoPos2D);
+  Vector2D endMom2DAtStartBack = endFit.getUnitMom2D(startBackRecoPos2D);
 
-  var<named("momAngleAtCenter_startSegment")>() = startMomAtCenter.angleWith(endMomAtExtrapolation);
-  var<named("momAngleAtCenter_endSegment")>() = endMomAtCenter.angleWith(startMomAtExtrapolation);
+  var<named("momAngleAtStartBack")>() = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
+  var<named("momAngleAtEndFront")>() = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
 
   // Fit variance and chi2
   var<named("startFit_chi2")>() = startFit.getChi2();

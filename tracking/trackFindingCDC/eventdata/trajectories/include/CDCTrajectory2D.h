@@ -255,56 +255,6 @@ namespace Belle2 {
         else return UNKNOWN_INFO;
       }
 
-      /// Extrapolate to the closest approach to the front of the first point of the entity
-      template<class Entity>
-      Vector2D getClosestToFront(const Entity& entity) const
-      { return getClosest(entity.getFrontRecoPos2D()); }
-
-      /// Extrapolate to the closest approach to the front of the last point of the entity
-      template<class Entity>
-      Vector2D getClosestToBack(const Entity& entity) const
-      { return getClosest(entity.getBackRecoPos2D()); }
-
-      /// Extrapolate to center of entity and calculate the perpendicular distance.
-      template<class Entity>
-      Vector2D getClosestToCenter(const Entity& entity) const
-      { return getClosest(entity.getCenterRecoPos2D()); }
-
-
-
-      /// Get distance from the trajectory to the center of the entity
-      template<class Entity>
-      FloatType getDist2DToCenter(const Entity& entity) const
-      { return getDist2D(entity.getCenterRecoPos2D()); }
-
-      /// Get distance from the trajectory to the front of the entity
-      template<class Entity>
-      FloatType getDist2DToFront(const Entity& entity) const
-      { return getDist2D(entity.getFrontRecoPos2D()); }
-
-      /// Get distance from the trajectory to the back of the entity
-      template<class Entity>
-      FloatType getDist2DToBack(const Entity& entity) const
-      { return getDist2D(entity.getBackRecoPos2D()); }
-
-
-
-      /// Get the unit momentum of the trajectory at the center of the entity
-      template<class Entity>
-      Vector2D getUnitMom2DAtCenter(const Entity& entity) const
-      { return getUnitMom2D(entity.getCenterRecoPos2D()); }
-
-      /// Get the unit momentum of the trajectory at the front of the entity
-      template<class Entity>
-      Vector2D getUnitMom2DAtFront(const Entity& entity) const
-      { return getUnitMom2D(entity.getFrontRecoPos2D()); }
-
-      /// Get the unit momentum of the trajectory at the back of the entity
-      template<class Entity>
-      Vector2D getUnitMom2DAtBack(const Entity& entity) const
-      { return getUnitMom2D(entity.getBackRecoPos2D()); }
-
-
     public:
       /// Gets the charge sign of the trajectory
       SignType getChargeSign() const;

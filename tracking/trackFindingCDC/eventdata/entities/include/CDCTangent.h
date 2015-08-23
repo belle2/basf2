@@ -124,12 +124,6 @@ namespace Belle2 {
       double getCosFlightDifference(const CDCTangent& tangent) const
       { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
 
-      /// Gets the center of the tangent half way from one touch point to the other
-      Vector2D getCenterOfMass2D() const
-      { return getLine().at(0.5) ; }
-
-
-
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getFromRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getFromRLWireHit()), getFromRecoPos2D()); }
@@ -162,9 +156,6 @@ namespace Belle2 {
        *  @return The arc length on the circle from the reference */
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getToRecoPos2D()); }
-
-      /// Calculates the squared distance of the tangent to a circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
     public:
       /// Adjusts the line to touch the drift circles with the correct right left passage information

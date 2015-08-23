@@ -104,12 +104,6 @@ namespace Belle2 {
       Vector2D getEndRecoPos2D() const
       { return Vector2D::average(getStartToEndLine().at(1), getMiddleToEndLine().at(1)); }
 
-
-      /// Average of the three reconstructed positions.
-      Vector2D getCenterOfMass2D() const
-      { return Vector2D::average(getStartRecoPos2D(), getMiddleRecoPos2D(), getEndRecoPos2D()); }
-
-
       /// Getter for the recostructed position including the first hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getStartRecoHit2D() const
       { return CDCRecoHit2D::fromAbsPos2D(&(getStartRLWireHit()), getStartRecoPos2D()); }
@@ -151,9 +145,6 @@ namespace Belle2 {
       /// Estimate the transvers travel distance on the given circle to the reconstructed position at the last hit
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcPerpS(getEndRecoPos2D()); }
-
-      /// Calculates the sum of squared distances of the trajectory to the three hits.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const;
 
 
       /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits

@@ -519,8 +519,8 @@ void EventDataPlotter::draw(const CDCAxialSegmentPair& axialSegmentPair,
   const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
   const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  const Vector2D& fromPos = fromSegment.getCenterOfMass2D();
-  const Vector2D& toPos = toSegment.getCenterOfMass2D();
+  const Vector2D& fromPos = fromSegment.back().getWire().getRefPos2D();
+  const Vector2D& toPos = toSegment.front().getWire().getRefPos2D();
 
   if (fromPos.hasNAN()) {
     B2WARNING("Center of mass of first segment in a pair contains NAN values.");
@@ -556,8 +556,8 @@ void EventDataPlotter::draw(const CDCSegmentPair& segmentPair,
   const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
   const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  const Vector2D& fromPos = fromSegment.getCenterOfMass2D();
-  const Vector2D& toPos = toSegment.getCenterOfMass2D();
+  const Vector2D& fromPos = fromSegment.back().getWire().getRefPos2D();
+  const Vector2D& toPos = toSegment.front().getWire().getRefPos2D();
 
   if (fromPos.hasNAN()) {
     B2WARNING("Center of mass of first segment in a pair contains NAN values.");
@@ -594,36 +594,46 @@ void EventDataPlotter::draw(const CDCSegmentTriple& segmentTriple,
   const CDCRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
-  const Vector2D& startPos = startSegment.getCenterOfMass2D();
-  const Vector2D& middlePos = middleSegment.getCenterOfMass2D();
-  const Vector2D& endPos = endSegment.getCenterOfMass2D();
+  const Vector2D& startBackPos2D = startSegment.back().getRefPos2D();
+  const Vector2D& middleFrontPos2D = middleSegment.front().getRefPos2D();
+  const Vector2D& middleBackPos2D = middleSegment.back().getRefPos2D();
+  const Vector2D& endFrontPos2D = endSegment.front().getRefPos2D();
 
-  if (startPos.hasNAN()) {
-    B2WARNING("Center of mass of first segment in a pair contains NAN values.");
+  if (startBackPos2D.hasNAN()) {
+    B2WARNING("Back position of start segment in a triple contains NAN values.");
     return;
   }
 
-  if (middlePos.hasNAN()) {
-    B2WARNING("Center of mass of second segment in a pair contains NAN values.");
+  if (middleFrontPos2D.hasNAN()) {
+    B2WARNING("Front position of middle segment in a triple contains NAN values.");
     return;
   }
 
-  if (endPos.hasNAN()) {
-    B2WARNING("Center of mass of third segment in a pair contains NAN values.");
+  if (middleBackPos2D.hasNAN()) {
+    B2WARNING("Back position of middle segment in a triple contains NAN values.");
     return;
   }
 
-  const float startX = startPos.x();
-  const float startY = startPos.y();
+  if (endFrontPos2D.hasNAN()) {
+    B2WARNING("Front position of end segment in a triple contains NAN values.");
+    return;
+  }
 
-  const float middleX = middlePos.x();
-  const float middleY = middlePos.y();
+  const float startBackX = startBackPos2D.x();
+  const float startBackY = startBackPos2D.y();
 
-  const float endX = endPos.x();
-  const float endY = endPos.y();
+  const float middleFrontX = middleFrontPos2D.x();
+  const float middleFrontY = middleFrontPos2D.y();
 
-  primitivePlotter.drawArrow(startX, startY, middleX, middleY, attributeMap);
-  primitivePlotter.drawArrow(middleX, middleY, endX, endY, attributeMap);
+  primitivePlotter.drawArrow(startBackX, startBackY, middleFrontX, middleFrontY, attributeMap);
+
+  const float middleBackX = middleBackPos2D.x();
+  const float middleBackY = middleBackPos2D.y();
+
+  const float endFrontX = endFrontPos2D.x();
+  const float endFrontY = endFrontPos2D.y();
+
+  primitivePlotter.drawArrow(middleBackX, middleBackY, endFrontX, endFrontY, attributeMap);
 }
 
 void EventDataPlotter::draw(const genfit::TrackCand& gfTrackCand, const AttributeMap& attributeMap)

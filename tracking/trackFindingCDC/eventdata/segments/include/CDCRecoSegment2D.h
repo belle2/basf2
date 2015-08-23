@@ -210,10 +210,6 @@ namespace Belle2 {
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
-      /// Reconstructs a central point on the trajectory
-      Vector2D getCenterRecoPos2D() const
-      { return getTrajectory2D().getClosest(getCenterOfMass2D()); }
-
       /// Reconstructs a point on the attached trajectory close to the front of the segment
       Vector2D getFrontRecoPos2D() const
       { return front().getFrontRecoPos2D(getTrajectory2D()); }

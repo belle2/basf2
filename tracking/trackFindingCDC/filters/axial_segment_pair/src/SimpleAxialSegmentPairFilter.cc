@@ -59,23 +59,26 @@ CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& a
     return NOT_A_CELL;
   }
 
+  Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
+  Vector2D endFrontRecoPos2D = endSegment.front().getRecoPos2D();
+
   // Momentum agreement cut
-  Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
-  Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
+  Vector2D startMom2DAtStartBack = startFit.getUnitMom2D(startBackRecoPos2D);
+  Vector2D endMom2DAtEndFront = endFit.getUnitMom2D(endFrontRecoPos2D);
 
-  Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
-  Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
+  Vector2D startMom2DAtEndFront = startFit.getUnitMom2D(endFrontRecoPos2D);
+  Vector2D endMom2DAtStartBack = endFit.getUnitMom2D(startBackRecoPos2D);
 
-  FloatType momAngleAtStartCenter = startMomAtCenter.angleWith(endMomAtExtrapolation);
-  FloatType momAngleAtEndCenter = endMomAtCenter.angleWith(startMomAtExtrapolation);
+  FloatType momAngleAtStartBack = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
+  FloatType momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
 
-  if (momAngleAtEndCenter > 2 or momAngleAtStartCenter > 2) {
+  if (fabs(momAngleAtEndFront) > 2.0 or fabs(momAngleAtStartBack) > 2.0) {
     return NOT_A_CELL;
   }
 
   // Proximity cut
-  FloatType startFit_dist2DToFront_endSegment = startFit.getDist2DToFront(endSegment);
-  FloatType endFit_dist2DToBack_startSegment = endFit.getDist2DToBack(startSegment);
+  FloatType startFit_dist2DToFront_endSegment = startFit.getDist2D(endFrontRecoPos2D);
+  FloatType endFit_dist2DToBack_startSegment = endFit.getDist2D(startBackRecoPos2D);
 
   if (startFit_dist2DToFront_endSegment < 6 and  endFit_dist2DToBack_startSegment < 6)
     return startSegment.size() + endSegment.size();

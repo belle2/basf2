@@ -87,10 +87,17 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
   } else if (stereoType == AXIAL) {
     Vector2D recoPos2D = getRecoPos2D(trajectory2D);
 
+    const Vector2D& wirePos2D = getWire().getRefPos2D();
+    const FloatType& driftLength = getRefDriftLength();
+
+    Vector2D disp2D = recoPos2D - wirePos2D;
+    // Fix the displacement to lie on the drift circle.
+    disp2D.setCylindricalR(driftLength);
+
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
     FloatType z = 0;
-    return Vector3D(recoPos2D, z);
+    return Vector3D(wirePos2D + disp2D, z);
 
   } else {
     B2ERROR("Reconstruction on invalid wire");

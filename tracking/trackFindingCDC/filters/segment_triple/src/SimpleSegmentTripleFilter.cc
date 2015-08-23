@@ -151,9 +151,6 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
 
   const CDCTrajectorySZ& trajectorySZ = getFittedTrajectorySZ(segmentTriple);
 
-  FloatType squaredDistance = reconstructedMiddle.getSquaredZDist(trajectorySZ);
-  B2DEBUG(100, "  ZDistance of the middleSegment = " << squaredDistance);
-
   CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
   if (not isNotACell(result)) {

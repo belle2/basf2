@@ -110,16 +110,6 @@ CDCTangent CDCTangent::reversed() const
                     ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
 }
 
-/** This returns sum of the squared distances of the two touch points to the circle */
-FloatType CDCTangent::getSquaredDist2D(const  CDCTrajectory2D& trajectory2D) const
-{
-  FloatType fromDistance =  trajectory2D.getDist2D(getFromRecoPos2D());
-  FloatType toDistance   =  trajectory2D.getDist2D(getToRecoPos2D());
-  return fromDistance * fromDistance + toDistance * toDistance;
-}
-
-
-
 ParameterLine2D CDCTangent::constructTouchingLine(
   const Vector2D& fromCenter,
   const FloatType& fromSignedRadius,

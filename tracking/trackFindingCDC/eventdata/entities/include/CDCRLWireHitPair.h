@@ -89,17 +89,9 @@ namespace Belle2 {
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getToRLWireHit().getBackPerpS(trajectory2D); }
 
-      /// Calculates the squared distance of the two oriented wire hit to a circle as see from the transvers plane.
-      /** Returns the sum of the squared distances to the two oriented wire hits */
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      { return getFromRLWireHit().getSquaredDist2D(trajectory2D) + getToRLWireHit().getSquaredDist2D(trajectory2D);}
-
-
 
       /// Getter for the WireNeighborType of the two underlying wires - zero for none neighbors
       WireNeighborType getNeighborType() const { return getFromWire().isNeighborWith(getToWire()); }
-
-
 
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const

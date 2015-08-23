@@ -197,6 +197,10 @@ namespace Belle2 {
       RightLeftInfo getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
 
+      /// Getter for the reference position of the wire.
+      const Vector2D& getRefPos2D() const
+      { return getRLWireHit().getRefPos2D(); }
+
       /// Getter for the 3d position of the hit
       const Vector3D& getRecoPos3D() const
       { return m_recoPos3D; }
@@ -270,9 +274,6 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'*/
       const CDCRecoHit3D* operator->() const { return this; }
 
-      /// Getter for the center of mass. Center of mass is just the reconstructed position
-      Vector2D getCenterOfMass2D() const { return getRecoPos2D(); }
-
       /// Same as getRecoPos2D()
       Vector2D getFrontRecoPos2D(const CDCTrajectory2D& trajectory2D) const
       { return getRecoPos2D(trajectory2D); }
@@ -288,19 +289,6 @@ namespace Belle2 {
       /// Same as getPerpS().
       FloatType getBackPerpS(const CDCTrajectory2D& trajectory2D) const
       { return getPerpS(trajectory2D); }
-
-      /// Calculates the squared distance of the reconstructed position to a circle as see from the transvers plane.
-      FloatType getSquaredDist2D(const CDCTrajectory2D& trajectory2D) const
-      { FloatType distance = trajectory2D.getDist2D(getRecoPos2D()); return distance * distance; }
-
-      /// Calculates the squared distance in z direction.
-      /** Calculates the z position on the fitted sz line with the stored travel distance.\n
-       *  Returns the squared difference to the reconstructed position of this reconstructed hit.*/
-      FloatType getSquaredZDist(const CDCTrajectorySZ& szTrajectory) const
-      {
-        FloatType zDistance = szTrajectory.getZDist(getPerpS(), getRecoPos3D().z());
-        return zDistance * zDistance;
-      }
 
       /// Calculates the z slope with a given z0
       /**

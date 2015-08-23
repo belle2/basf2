@@ -18,7 +18,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
 CDCRLWireHit::CDCRLWireHit() :
   m_wirehit(nullptr),
   m_rlInfo(LEFT)
@@ -32,9 +31,6 @@ CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
 {
   if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
 }
-
-
-
 
 CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
                                       const CDCSimHit& simhit)

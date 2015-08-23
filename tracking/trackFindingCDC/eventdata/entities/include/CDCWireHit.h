@@ -119,9 +119,34 @@ namespace Belle2 {
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
       { return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer(); }
 
+      /** @name Mimic pointer
+        */
+      /// Access the object methods and methods from a pointer in the same way.
+      /** In situations where the type is not known to be a pointer or a reference
+       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
+       *  So this function defines the -> operator for the object.
+       *  No matter you have a pointer or an object access is given with '->'*/
+      /**@{*/
+      const CDCWireHit* operator->() const
+      { return this; }
+
+      /// Allow automatic taking of the address.
+      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.
+       *  \note Once reference qualifiers become available use an & after
+       *  the trailing const to constrain the cast to lvalues.*/
+      operator const Belle2::TrackFindingCDC::CDCWireHit* () const
+      { return this; }
+      /**@}*/
+
       /// Getter for the CDCHit pointer into the StoreArray
       const CDCHit* getHit() const
       { return m_hit; }
+
+      /// Getter for the index  of the hit in the StoreArray holding this hit.
+      Index getStoreIHit() const
+      { return getHit() ? getHit()->getArrayIndex() : INVALID_INDEX; }
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const
@@ -163,51 +188,6 @@ namespace Belle2 {
       FloatType getRefDriftLengthVariance() const
       { return m_refDriftLengthVariance; }
 
-      /// Getter for the skew of the wire.
-      FloatType getSkew() const
-      { return getWire().getSkew(); }
-
-      /// Getter for the index  of the hit in the StoreArray holding this hit.
-      Index getStoreIHit() const
-      { return getHit() ? getHit()->getArrayIndex() : INVALID_INDEX; }
-
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
-
-      /** Cast operator to the reference of the automaton cell.
-       *  Making AutomatonCell a constant pseudo base class of CDCWireHit
-       */
-      operator const Belle2::TrackFindingCDC::AutomatonCell& () const
-      { return m_automatonCell; }
-
-
-      /** @name Mimic pointer
-        */
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference
-       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'*/
-      /**@{*/
-      const CDCWireHit* operator->() const
-      { return this; }
-
-      /// Allow automatic taking of the address.
-      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms
-       *  that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after
-       *  the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCWireHit* () const
-      { return this; }
-      /**@}*/
-
-
       /// Checks of the wire hit is base on the wire given
       bool hasWire(const CDCWire& wire) const
       { return getWire() == wire; }
@@ -248,6 +228,21 @@ namespace Belle2 {
       /// String output operator for wire hit pointers to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit* wirehit)
       { return wirehit == nullptr ? output << "nullptr" : output << *wirehit; }
+
+
+      /** Cast operator to the reference of the automaton cell.
+       *  Making AutomatonCell a constant pseudo base class of CDCWireHit
+       */
+      operator const Belle2::TrackFindingCDC::AutomatonCell& () const
+      { return m_automatonCell; }
+
+      /// Getter for the automaton cell.
+      AutomatonCell& getAutomatonCell()
+      { return m_automatonCell; }
+
+      /// Constant getter for the automaton cell.
+      const AutomatonCell& getAutomatonCell() const
+      { return m_automatonCell; }
 
     private:
       /** Memory for the automaton cell. Marked as mutable since its content should be changeable

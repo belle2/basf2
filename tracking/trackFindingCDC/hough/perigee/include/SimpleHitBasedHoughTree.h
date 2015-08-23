@@ -70,6 +70,27 @@ namespace Belle2 {
                                                          skipHighCurvatureAndLowWeightNode);
       }
 
+      /// Find the best trajectory from the single heaviest bin heavier than minWeight
+      std::vector<std::pair<HoughBox,  std::vector<HitPtr> > >
+      findSingleBest(const Weight& minWeight, const double& maxCurv = NAN)
+      {
+        auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
+          const HoughBox& houghBox = *node;
+          return not(node->getWeight() >= minWeight and not(getLowerCurv(houghBox) > maxCurv));
+        };
+        std::unique_ptr<std::pair<HoughBox,  std::vector<HitPtr> > > found =
+          this->getTree()->findHeaviestLeafSingle(m_stereoHitContainedInBox,
+                                                  this->getMaxLevel(),
+                                                  skipHighCurvatureAndLowWeightNode);
+
+        std::vector<std::pair<HoughBox,  std::vector<HitPtr> > > result;
+        if (found) {
+          // Move the found content over. unique_ptr still destroys the left overs.
+          result.push_back(std::move(*found));
+        }
+        return result;
+      }
+
       /// Fill and walk the tree using invoking the leaf processor on each encountered node.
       template<class LeafProcessor>
       void findUsing(LeafProcessor& leafProcessor)

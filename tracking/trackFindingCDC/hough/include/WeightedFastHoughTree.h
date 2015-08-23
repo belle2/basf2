@@ -15,7 +15,8 @@
 
 #include <framework/logging/Logger.h>
 
-#include <deque>
+#include <memory>
+#include <vector>
 #include <assert.h>
 
 namespace Belle2 {
@@ -146,6 +147,25 @@ namespace Belle2 {
             markableItem.mark();
           }
           node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
+        }
+        return found;
+      }
+
+      template<class ItemInDomainMeasure, class SkipNodePredicate>
+      std::unique_ptr<std::pair<Domain,  std::vector<T> > >
+      findHeaviestLeafSingle(ItemInDomainMeasure& weightItemInDomain,
+                             const size_t maxLevel,
+                             SkipNodePredicate& skipNode)
+      {
+        using Result = std::pair<Domain,  std::vector<T> >;
+        std::unique_ptr<Result> found = nullptr;
+        Node* node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
+        if (node) {
+          const Domain* domain = node;
+          found.reset(new Result(*domain, std::vector<T>(node->begin(), node->end())));
+          for (WithSharedMark<T>& markableItem : *node) {
+            markableItem.mark();
+          }
         }
         return found;
       }

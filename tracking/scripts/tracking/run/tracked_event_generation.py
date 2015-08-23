@@ -71,7 +71,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     def determine_tracking_coverage(self, finder_module_or_name):
         finder_module_name = self.get_basf2_module_name(finder_module_or_name)
 
-        if finder_module_name in ('CDCLegendreTracking', 'TrackFinderCDCLegendreTracking'):
+        if (finder_module_name in ('CDCLegendreTracking', 'TrackFinderCDCLegendreTracking') or
+                finder_module_name.startswith("TrackFinderCDCAxial")):
             return {'UsePXDHits': False,
                     'UseSVDHits': False,
                     'UseCDCHits': True,

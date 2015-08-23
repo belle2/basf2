@@ -7,20 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <tracking/trackFindingCDC/creators/FacetCreator.h>
-
-//#include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/logging/Logger.h>
-#include <cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-
-
-
-

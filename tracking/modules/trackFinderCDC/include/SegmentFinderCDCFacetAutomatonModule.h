@@ -259,7 +259,7 @@ namespace Belle2 {
     private:
       //object pools
       /// Memory for the constructed facets.
-      SortableVector<CDCFacet> m_facets;
+      std::vector<CDCFacet> m_facets;
 
       /// Neighborhood type for facets.
       typedef WeightedNeighborhood<const CDCFacet> CDCFacetNeighborhood;
@@ -343,6 +343,7 @@ namespace Belle2 {
         B2DEBUG(100, "Creating the CDCFacets");
         m_facets.clear();
         m_facetCreator.createFacets(*m_ptrFacetFilter, cluster, m_wirehitNeighborhood, m_facets);
+        B2ASSERT("Facets have not been sorted", std::is_sorted(m_facets.begin(), m_facets.end()));
         B2DEBUG(100, "  Created " << m_facets.size()  << " CDCFacets");
 
         // Copy facets to the DataStore

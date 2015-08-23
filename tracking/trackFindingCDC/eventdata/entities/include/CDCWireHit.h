@@ -157,10 +157,6 @@ namespace Belle2 {
       FloatType getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }
 
-      /// Connection vector from the center of this wire hit to the other.
-      Vector2D getRefVecTo2D(const CDCWireHit& to) const
-      { return to.getRefPos2D() - getRefPos2D(); }
-
       /// Getter for the  drift length at the reference position of the wire.
       FloatType getRefDriftLength() const
       { return m_refDriftLength; }

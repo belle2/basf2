@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
 
-#include <tracking/trackFindingCDC/ca/SortableVector.h>
+#include <tracking/trackFindingCDC/utilities/SortableVector.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <framework/dataobjects/EventMetaData.h>

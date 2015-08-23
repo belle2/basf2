@@ -23,7 +23,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
-#include <tracking/trackFindingCDC/ca/SortableVector.h>
+#include <tracking/trackFindingCDC/utilities/SortableVector.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

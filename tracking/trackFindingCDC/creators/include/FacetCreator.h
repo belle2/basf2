@@ -7,16 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/utilities/SortableVector.h>
 
 #include <vector>
 #include <set>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <tracking/trackFindingCDC/ca/SortableVector.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

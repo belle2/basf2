@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-// #include <tracking/trackFindingCDC/ca/SortableVector.h>
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 

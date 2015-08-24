@@ -17,37 +17,43 @@ using namespace TrackFindingCDC;
 /// Constuctor for a skew line between forward and backward point
 BoundSkewLine::BoundSkewLine(const Vector3D& forwardIn,
                              const Vector3D& backwardIn) :
-  m_referencePosition(backwardIn),
+  m_refPos3D(backwardIn),
+  m_movePerZ((forwardIn.xy() - backwardIn.xy()) / (forwardIn.z() - backwardIn.z())),
   m_forwardZ(forwardIn.z()),
-  m_backwardZ(backwardIn.z()),
-  m_skew(0.0)
-
+  m_backwardZ(backwardIn.z())
 {
-
   //skew and reference position are not a one liner to be filled to the init list
   //make some highschool math to get them
 
   Vector3D vectorAlongLine = forwardIn - backwardIn;
 
-  FloatType weightForward   =  forwardIn.dotXY(vectorAlongLine);
-  FloatType weightBackward  = -backwardIn.dotXY(vectorAlongLine);
+  FloatType weightForward  = forwardIn.dotXY(vectorAlongLine);
+  FloatType weightBackward = -backwardIn.dotXY(vectorAlongLine);
 
   if (weightForward + weightBackward == 0) {
     //line is aligned along the z axes us the position in the xy plane as the reference
-
-    m_skew = 0.0;
-    //m_referencePosition was initialized as a copy of backwardIn so x, y are correct
-    m_referencePosition.setZ(0.0);
+    //m_refPos3D was initialized as a copy of backwardIn so x, y are correct
+    m_refPos3D.setZ(0.0);
 
   } else {
-
     vectorAlongLine *= (weightBackward / (weightForward + weightBackward));
-    //m_referencePosition was initialized as a copy of backwardIn
-    m_referencePosition += vectorAlongLine;
-
-    m_skew = (m_referencePosition.crossXY(vectorAlongLine.xy())) /
-             /*---------------------------------------------------------*/
-             (m_referencePosition.cylindricalRSquared() * vectorAlongLine.z());
-
+    //m_refPos3D was initialized as a copy of backwardIn
+    m_refPos3D += vectorAlongLine;
   }
+}
+
+BoundSkewLine BoundSkewLine::movedBy(const Vector3D& offset) const
+{
+  BoundSkewLine moved = *this;
+  moved.m_refPos3D += offset.xy() + movePerZ() * offset.z();
+  moved.m_forwardZ += offset.z();
+  moved.m_backwardZ += offset.z();
+  return moved;
+}
+
+BoundSkewLine BoundSkewLine::movedBy(const Vector2D& offset) const
+{
+  BoundSkewLine moved = *this;
+  moved.m_refPos3D += offset;
+  return moved;
 }

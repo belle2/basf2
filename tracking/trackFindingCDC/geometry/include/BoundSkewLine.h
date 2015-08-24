@@ -31,28 +31,27 @@ namespace Belle2 {
      * simplifies the retrival of the two dimensional track reference position, which is taken at
      * the closest approach to the beam z-axes.
      * @brief A three dimensional limited line
-     *
      */
     class BoundSkewLine  {
 
     public:
-
       /// Default constructor for ROOT compatibility.
-      BoundSkewLine() : m_referencePosition(), m_forwardZ(0.0) , m_backwardZ(0.0), m_skew(0.0) {;}
+      BoundSkewLine() :
+        m_refPos3D(),
+        m_movePerZ(),
+        m_forwardZ(0.0),
+        m_backwardZ(0.0)
+      {;}
 
+    public:
       /// Constuctor for a skew line between forward and backward point
       BoundSkewLine(const Vector3D& forwardIn , const Vector3D& backwardIn);
 
-      /// Empty deconstructor
-      ~BoundSkewLine() {;}
-
       /// Returns a copy of the skew line moved by a three dimensional offset
-      inline BoundSkewLine movedBy(const Vector3D& offset) const
-      { return BoundSkewLine(forward3D().add(offset), backward3D().add(offset)); }
+      BoundSkewLine movedBy(const Vector3D& offset) const;
 
       /// Returns a copy of the skew line moved by a two dimensional offset
-      inline BoundSkewLine movedBy(const Vector2D& offset) const
-      { return BoundSkewLine(forward3D().add(offset), backward3D().add(offset)); }
+      BoundSkewLine movedBy(const Vector2D& offset) const;
 
       /// Gives the three dimensional position of the line at the given z value
       inline Vector3D pos3DAtZ(const FloatType& z) const
@@ -88,24 +87,15 @@ namespace Belle2 {
 
       /// Gives the tangential vector to the line
       inline Vector3D tangential3D() const
-      {
-        FloatType deltaZ = forwardZ() - backwardZ();
-        return Vector3D(movePerZ() * deltaZ, deltaZ);
-      }
+      { return Vector3D(movePerZ() * deltaZ(), deltaZ()); }
 
       /// Gives the tangential xy vector to the line
       inline Vector2D tangential2D() const
-      {
-        FloatType deltaZ = forwardZ() - backwardZ();
-        return movePerZ() * deltaZ;
-      }
+      { return movePerZ() * deltaZ(); }
 
       /// Gives the positional move in the xy projection per unit z.
-      inline Vector2D movePerZ() const
-      {
-        return Vector2D(-m_skew * refY(),
-                        m_skew * refX());
-      }
+      inline const Vector2D& movePerZ() const
+      { return m_movePerZ; }
 
       /// Gives the forward z coodinate
       inline FloatType forwardZ() const
@@ -114,6 +104,10 @@ namespace Belle2 {
       /// Gives the backward z coodinate
       inline FloatType backwardZ() const
       { return m_backwardZ; }
+
+      /// Returns the difference between forward and backward z
+      inline FloatType deltaZ() const
+      { return forwardZ() - backwardZ(); }
 
       /// Gives the forward azimuth angle
       inline FloatType forwardPhi() const
@@ -133,7 +127,7 @@ namespace Belle2 {
 
       /// Gives the azimuth angle of the forward position relative to the reference position
       inline FloatType forwardPhiToRef() const
-      { return  forward2D().angleWith(refPos2D()); }
+      { return forward2D().angleWith(refPos2D()); }
 
       /// Gives the azimuth angle of the backward position relative to the reference position
       inline FloatType backwardPhiToRef() const
@@ -192,41 +186,40 @@ namespace Belle2 {
 
       /// Returns the the x coordinate of the reference point.
       inline const FloatType& refX() const
-      { return m_referencePosition.x(); }
+      { return m_refPos3D.x(); }
 
       /// Returns the the y coordinate of the reference point.
       inline const FloatType& refY() const
-      { return m_referencePosition.y(); }
+      { return m_refPos3D.y(); }
 
       /// Returns the the z coordinate of the reference point.
       inline const FloatType& refZ() const
-      { return m_referencePosition.z(); }
+      { return m_refPos3D.z(); }
 
       /// Returns the cylindrical radius of the reference position
       inline FloatType refCylindricalRSquared() const
-      { return m_referencePosition.cylindricalRSquared(); }
+      { return m_refPos3D.cylindricalRSquared(); }
 
       /// Returns the xy vector of the reference position
       inline const Vector2D& refPos2D() const
-      { return m_referencePosition.xy(); }
+      { return m_refPos3D.xy(); }
 
       /// Returns the reference position
       inline const Vector3D& refPos3D() const
-      { return m_referencePosition; }
+      { return m_refPos3D; }
 
     private:
       /// Memory for the reference postion
-      Vector3D m_referencePosition;
+      Vector3D m_refPos3D;
+
+      /// Memory for the reference postion
+      Vector2D m_movePerZ;
 
       /// Memory for the forward end z coordinate.
       FloatType m_forwardZ;
 
       /// Memory for the backward end z coordinate.
       FloatType m_backwardZ;
-
-      /// Memory for the skew parameter
-      FloatType m_skew;
-
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2

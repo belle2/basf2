@@ -13,6 +13,7 @@ from ROOT import Belle2
 from ROOT import TH1F, TH2F, TCanvas
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
 
 
 # ------------------------------------------------------------------------------
@@ -103,6 +104,9 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')

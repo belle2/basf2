@@ -12,7 +12,9 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
 from ROOT import Belle2
+import glob
 
 set_random_seed(123451)
 
@@ -25,13 +27,19 @@ eventinfosetter.param('runList', [2])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+
 # generate events (B0 -> K+pi- + cc, other B0 generic)
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('top/validation/B2Kpi.dec'))
 main.add_module(evtgeninput)
 
 # detector simulation
-add_simulation(main)
+bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+add_simulation(main, bkgfiles=bg)
 
 # reconstruction
 add_reconstruction(main)

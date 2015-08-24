@@ -9,10 +9,11 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include <framework/logging/Logger.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cmath>
 #include <cassert>
@@ -50,28 +51,6 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
 {
   m_localOrigin = pos2D;
   m_localPerigeeCircle = UncertainPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0);
-
-  // FloatType mom = mom2D.norm();
-  // FloatType r = momToRadius(mom, charge);
-
-  // SignType chargeSign = sign(charge);
-  // CCWInfo orientation = chargeSignToCCWInfo(chargeSign);
-
-  // // For counterclockwise travel the circle center is to the left viewed from the travel direction
-  // // For clockwise travel to the right
-  // // Use the correct orthogonal vector to the center
-  // Vector2D posToCenter = mom2D.orthogonal(orientation);
-
-  // // Scale to have the length of the radius to have it point exactly to the circle center
-  // posToCenter.scale(r / mom);
-
-  // //same memory different name
-  // Vector2D& circleCenter = posToCenter.add(pos2D);
-
-  // m_perigeeCircle = PerigeeCircle::fromCenterAndRadius(circleCenter, r, orientation);
-
-  // setStartPos2D(pos2D);
-
 }
 
 
@@ -99,26 +78,23 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
                                         const FloatType& distance) const
 {
   Vector2D globalRefPos2D = globalSkewLine.refPos2D();
-  PerigeeCircle globalCircle(getGlobalCircle());
+  Vector2D movePerZ = globalSkewLine.movePerZ();
 
-  // Translate the proper distance to the linearized distances measure
-  FloatType fastDistance = distance != 0.0 ? globalCircle.fastDistance(distance) : 0.0;
+  Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
+  const PerigeeCircle& localCircle = getLocalCircle();
 
-  FloatType firstOrder = globalCircle.fastDistance(globalRefPos2D) - fastDistance;
+  FloatType fastDistance = distance != 0.0 ? localCircle.fastDistance(distance) : 0.0;
 
-  FloatType crossComponent = globalRefPos2D.cross(globalCircle.n12());
-  FloatType quadraticComponent = globalRefPos2D.normSquared() * globalCircle.n3();
+  FloatType c = localCircle.fastDistance(localRefPos2D) - fastDistance;
+  FloatType b = localCircle.gradient(localRefPos2D).dot(movePerZ);
+  FloatType a = localCircle.n3() * movePerZ.normSquared();
 
-  const FloatType& a = quadraticComponent;
-  const FloatType& b = crossComponent;
-  const FloatType& c = firstOrder;
-
-  std::pair<FloatType, FloatType> solutionsSkewTimesDeltaZ = solveQuadraticABC(a, b, c);
+  std::pair<FloatType, FloatType> solutionsDeltaZ = solveQuadraticABC(a, b, c);
 
   // Take the solution with the smaller deviation from the reference position
-  const FloatType& smallerSolution = solutionsSkewTimesDeltaZ.second;
-
-  return globalSkewLine.pos3DAtDeltaZTimesSkew(smallerSolution);
+  const FloatType& deltaZ = solutionsDeltaZ.second;
+  const FloatType z = deltaZ + globalSkewLine.refZ();
+  return globalSkewLine.pos3DAtZ(z);
 }
 
 
@@ -293,10 +269,3 @@ ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
   FloatType minimalCylindricalR = getMinimalCylindricalR();
   return getISuperLayerAtCylindricalR(minimalCylindricalR);
 }
-
-
-
-
-
-
-

@@ -33,9 +33,10 @@ namespace Belle2 {
     class CDCTrajectory2D  {
 
     public:
-
       /// Default constructor for ROOT compatibility.
-      CDCTrajectory2D() : m_localOrigin(), m_localPerigeeCircle() {;}
+      CDCTrajectory2D() :
+        m_localOrigin(),
+        m_localPerigeeCircle() {;}
 
       /// Constructs a trajectory from a generalized circle.
       /** Constructs a trajectory which is described by the given circle \n
@@ -68,11 +69,7 @@ namespace Belle2 {
                       const Vector2D& startMomentum,
                       const FloatType& charge);
 
-      /// Empty destructor
-      ~CDCTrajectory2D() {;}
-
     public:
-
       /// Checks if the circle is already set to a valid value
       bool isFitted() const
       { return not getLocalCircle().isNull(); }
@@ -103,7 +100,8 @@ namespace Belle2 {
       /** This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
        *  skew line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
-      Vector3D reconstruct3D(const BoundSkewLine& skewLine, const FloatType& distance = 0.0) const;
+      Vector3D reconstruct3D(const BoundSkewLine& skewLine,
+                             const FloatType& distance = 0.0) const;
 
     public:
       /// Calculates the closest approach on the trajectory to the global origin
@@ -170,7 +168,8 @@ namespace Belle2 {
 
     private:
       /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
-      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
+      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer,
+                                          bool movingOutward,
                                           const ForwardBackwardInfo& forwardBackwardInfo) const;
       /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
       ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
@@ -384,21 +383,16 @@ namespace Belle2 {
         FloatType result = calcPerpS(localOrigin);
         m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
-        // cout << "New projTravelDistanceRef " << m_projTravelDistanceRef << endl;
         return result;
       }
 
-
-
     public:
       /// Output helper for debugging
-
       friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
       {
         return output << "Local origin : " << trajectory2D.getLocalOrigin() <<  ", "
                << "local circle : " << trajectory2D.getLocalCircle();
       }
-
 
     private:
       /// Memory for local coordinate origin of the circle representing the trajectory in global coordinates
@@ -406,11 +400,6 @@ namespace Belle2 {
 
       /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
       UncertainPerigeeCircle m_localPerigeeCircle;
-
-      /// Memory for the start position of the trajectory
-      //Vector2D m_startPos2D;
-
-
     }; //class
 
   } // namespace TrackFindingCDC

@@ -222,14 +222,11 @@ namespace Belle2 {
       const FloatType& getRefZ() const
       { return getSkewLine().refZ(); }
 
-      /// Getter for the skew of the wire
-      const FloatType& getSkew() const { return getSkewLine().skew(); }
-
       /// Getter for the tangents of the stereo angle of the wire.
-      FloatType getTanStereoAngle() const { return getSkew() * getMinCylindricalR(); }
+      FloatType getTanStereoAngle() const { return getSkewLine().tanTheta(); }
 
       /// Getter for the stereo angle of the wire.
-      FloatType getStereoAngle() const { return std::atan(getTanStereoAngle()); }
+      FloatType getStereoAngle() const { return getSkewLine().theta(); }
 
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
@@ -241,7 +238,7 @@ namespace Belle2 {
       FloatType getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the closest distance to the beamline ( z-axes )
-      FloatType getMinCylindricalR() const { return getRefPos2D().norm(); }
+      FloatType getMinCylindricalR() const { return getSkewLine().perigee2D().norm(); }
 
       ///Getter for the distance to the beamline ( z-axes ) at the forward joint point
       FloatType getForwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };

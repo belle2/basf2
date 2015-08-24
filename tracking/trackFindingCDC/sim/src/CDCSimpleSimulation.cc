@@ -344,7 +344,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
     double backwardZ = wire.getBackwardZ();
     // Position where wire has been hit
     Vector3D wirePos = wire.getClosest(correctedPos3D);
-    double distanceToBack = (wirePos.z() - backwardZ) * hypot(1, wire.getSkew() * wire.getRefCylindricalR());
+    double distanceToBack = (wirePos.z() - backwardZ) * hypot(1, wire.getTanStereoAngle());
 
     delayTime += distanceToBack / m_propSpeed;
   }

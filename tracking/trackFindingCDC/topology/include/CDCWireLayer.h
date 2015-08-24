@@ -52,9 +52,6 @@ namespace Belle2 {
       /// Constructor taking the range of wires the layer shall contain. Use rather getInstance() to avoid instance constructions.
       CDCWireLayer(const const_iterator& begin, const const_iterator& end);
 
-      /// Default destructor
-      ~CDCWireLayer();
-
       /** @name Static instance getters
        *  Getter for the already constructed instances from the CDCWireTopology::getInstance() object.
        */
@@ -198,11 +195,11 @@ namespace Belle2 {
        */
       StereoType getStereoType() const { return first().getStereoType(); }
 
-      /// Getter for the averaged skew of all wires in this layer
-      const FloatType& getSkew() const { return m_skew; }
+      /// Getter for the averaged tan stereo angle of all wires in this layer
+      const FloatType& getTanStereoAngle() const { return m_tanStereoAngle; }
 
       /// Getter for the average stereo angle of all wires in this layer
-      FloatType getStereoAngle() const { return std::atan(getSkew() * getMinCylindricalR()); }
+      FloatType getStereoAngle() const { return std::atan(getTanStereoAngle()); }
 
       /// Getter for the closest distance to the beamline ( z-axes ) of all wires in this layer
       const FloatType& getMinCylindricalR() const { return m_minCylindricalR; }
@@ -279,7 +276,7 @@ namespace Belle2 {
        *  on initialization of the CDCWireLayer.
        */
       //@{
-      FloatType m_skew; ///< Storage for average skew
+      FloatType m_tanStereoAngle; ///< Storage for average tan stereo angle
       FloatType m_minCylindricalR; ///< Storage for minimal distance from beamline
 
       FloatType m_refCylindricalR; ///< Storage for common (averaged) cylindrical radius of all wire reference positions.

@@ -111,11 +111,11 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
 }
 
 
-TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
+TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 {
   // Test if the all wires in the same superlayer have similar skew parameters.
 
-  FloatType skewByICLayer[CDCWireTopology::N_LAYERS];
+  FloatType tanThetaByICLayer[CDCWireTopology::N_LAYERS];
   FloatType stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
   FloatType refCylindricalRByICLayer[CDCWireTopology::N_LAYERS];
 
@@ -124,23 +124,22 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireSkew)
     const ILayerType iCLayer = wireLayer.getICLayer();
 
     const CDCWire& firstWire = wireLayer.first();
-    skewByICLayer[iCLayer] = firstWire.getSkew();
+    tanThetaByICLayer[iCLayer] = firstWire.getTanStereoAngle();
     stereoAngleByICLayer[iCLayer] = firstWire.getStereoAngle();
     refCylindricalRByICLayer[iCLayer] = firstWire.getRefCylindricalR();
 
     for (const CDCWire& wire : wireLayer) {
-      EXPECT_NEAR(skewByICLayer[iCLayer], wire.getSkew(), 10e-6);
+      EXPECT_NEAR(tanThetaByICLayer[iCLayer], wire.getTanStereoAngle(), 10e-6);
       EXPECT_NEAR(stereoAngleByICLayer[iCLayer], wire.getStereoAngle(), 10e-6);
       EXPECT_NEAR(refCylindricalRByICLayer[iCLayer], wire.getRefCylindricalR(), 10e-6);
     }
 
     B2INFO("ICLayer : " << iCLayer);
-    B2INFO("   Skew : " << skewByICLayer[iCLayer] <<
-           " Stereo angle : " << stereoAngleByICLayer[iCLayer]);
+    B2INFO("   Tan Theta : " << tanThetaByICLayer[iCLayer]);
+    B2INFO("   Stereo angle : " << stereoAngleByICLayer[iCLayer]);
     B2INFO("   Z range : " << wireLayer.getBackwardZ() << " to " << wireLayer.getForwardZ());
-    B2INFO("   Phi spread : " <<
-           wireLayer.getForwardPhiToRef() - wireLayer.getBackwardPhiToRef() <<
-           " Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]);
+    B2INFO("   Phi spread : " << wireLayer.getForwardPhiToRef() - wireLayer.getBackwardPhiToRef());
+    B2INFO("   Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]);
     B2INFO("   Max abs displacement : " << wireLayer.getWire(0).getWireVector().xy().norm());
   }
 

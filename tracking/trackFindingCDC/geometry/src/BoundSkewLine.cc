@@ -14,16 +14,14 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 /// Constuctor for a skew line between forward and backward point
-BoundSkewLine::BoundSkewLine(
-  const Vector3D& forwardIn,
-  const Vector3D& backwardIn
-) :
+BoundSkewLine::BoundSkewLine(const Vector3D& forwardIn,
+                             const Vector3D& backwardIn) :
+  m_referencePosition(backwardIn),
   m_forwardZ(forwardIn.z()),
   m_backwardZ(backwardIn.z()),
-  m_skew(0.0),
-  m_referencePosition(backwardIn)
+  m_skew(0.0)
+
 {
 
   //skew and reference position are not a one liner to be filled to the init list

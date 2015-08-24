@@ -102,17 +102,14 @@ void CDCWire::initialize()
     B2WARNING("forward              " << m_skewLine.forward3D());
     B2WARNING("backward             " << m_skewLine.backward3D());
     B2WARNING("ref                  " << m_skewLine.refPos3D());
-    B2WARNING("skew                 " << m_skewLine.skew());
+    B2WARNING("tan theta            " << m_skewLine.tanTheta());
     B2WARNING("m_forwardToRefAngle  " << m_forwardPhiToRef);
     B2WARNING("m_backwardToRefAngle " << m_backwardPhiToRef);
     //double d;
     //std::cin >> d;
   }
 
-  m_phiRangeToRef = m_forwardPhiToRef < m_backwardPhiToRef ?
-                    std::make_pair(m_forwardPhiToRef , m_backwardPhiToRef) :
-                    std::make_pair(m_backwardPhiToRef , m_forwardPhiToRef) ;
-
+  m_phiRangeToRef = std::minmax(m_forwardPhiToRef , m_backwardPhiToRef);
 }
 
 

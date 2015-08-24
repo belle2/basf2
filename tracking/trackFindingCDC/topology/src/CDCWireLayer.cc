@@ -23,7 +23,7 @@ CDCWireLayer::CDCWireLayer() :
 
 //averages of wire values
   m_shift(INVALID_INFO),
-  m_skew(0.0),
+  m_tanStereoAngle(0.0),
   m_minCylindricalR(1000000.0),
   m_refCylindricalR(0.0),
   m_refZ(0.0),
@@ -42,7 +42,7 @@ CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& en
 
 //averages of wire values
   m_shift(INVALID_INFO),
-  m_skew(0.0),
+  m_tanStereoAngle(0.0),
   m_minCylindricalR(1000000.0),
   m_refCylindricalR(0.0),
   m_refZ(0.0),
@@ -83,7 +83,7 @@ void CDCWireLayer::initialize()
 
 
   // average values from wires
-  m_skew = 0.0;
+  m_tanStereoAngle = 0.0;
   m_minCylindricalR = 1000000.0;
   m_refZ = 0.0;
   m_refCylindricalR = 0.0;
@@ -100,7 +100,7 @@ void CDCWireLayer::initialize()
 
     const CDCWire& wire = *itWire;
 
-    m_skew += wire.getSkew();
+    m_tanStereoAngle += wire.getTanStereoAngle();
 
     FloatType minROfWire = wire.getMinCylindricalR();
     m_minCylindricalR = std::min(minROfWire, m_minCylindricalR);
@@ -122,7 +122,7 @@ void CDCWireLayer::initialize()
 
   }
 
-  m_skew /= nWiresInLayer;
+  m_tanStereoAngle /= nWiresInLayer;
 
   m_refZ /= nWiresInLayer;
   m_refCylindricalR /= nWiresInLayer;
@@ -141,9 +141,6 @@ void CDCWireLayer::initialize()
                     std::make_pair(m_backwardPhiToRef , m_forwardPhiToRef) ;
 
 }
-
-CDCWireLayer::~CDCWireLayer() {;}
-
 
 const CDCWire* CDCWireLayer::nextWire(const CDCWire* wire) const
 {

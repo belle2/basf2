@@ -38,7 +38,7 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      BoundSkewLine() : m_forwardZ(0.0) , m_backwardZ(0.0), m_skew(0.0), m_referencePosition() {;}
+      BoundSkewLine() : m_referencePosition(), m_forwardZ(0.0) , m_backwardZ(0.0), m_skew(0.0) {;}
 
       /// Constuctor for a skew line between forward and backward point
       BoundSkewLine(const Vector3D& forwardIn , const Vector3D& backwardIn);
@@ -48,49 +48,19 @@ namespace Belle2 {
 
       /// Returns a copy of the skew line moved by a three dimensional offset
       inline BoundSkewLine movedBy(const Vector3D& offset) const
-      {
-        //simple but not optional in computation steps
-        return BoundSkewLine(forward3D().add(offset), backward3D().add(offset));
-      }
+      { return BoundSkewLine(forward3D().add(offset), backward3D().add(offset)); }
 
       /// Returns a copy of the skew line moved by a two dimensional offset
       inline BoundSkewLine movedBy(const Vector2D& offset) const
-      {
-        //simple but not optional in computation steps
-        return BoundSkewLine(forward3D().add(offset), backward3D().add(offset));
-      }
+      { return BoundSkewLine(forward3D().add(offset), backward3D().add(offset)); }
 
       /// Gives the three dimensional position of the line at the given z value
       inline Vector3D pos3DAtZ(const FloatType& z) const
-      {
-
-        FloatType deltaZTimesSkew = (z - refZ()) * skew();
-
-        return Vector3D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() + 1 * refY() ,
-                        z);
-
-      }
+      { return Vector3D(pos2DAtZ(z), z); }
 
       /// Gives the two dimensional position of the line at the given z value
       inline Vector2D pos2DAtZ(const FloatType& z) const
-      {
-
-        FloatType deltaZTimesSkew = (z - refZ()) * skew();
-
-        return Vector2D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() + 1 * refY());
-
-      }
-      /// Gives the three dimensional position of the line at the given ( z - reference z ) * skew value
-      inline Vector3D pos3DAtDeltaZTimesSkew(const FloatType& deltaZTimesSkew) const
-      {
-
-        return Vector3D(1 * refX() - deltaZTimesSkew * refY() ,
-                        deltaZTimesSkew * refX() + 1 * refY() ,
-                        deltaZTimesSkew / skew() + refZ());
-
-      }
+      { return refPos2D() + movePerZ() * (z - refZ()); }
 
       /// Gives the position of the forward point
       inline Vector3D forward3D() const
@@ -120,24 +90,21 @@ namespace Belle2 {
       inline Vector3D tangential3D() const
       {
         FloatType deltaZ = forwardZ() - backwardZ();
-        return Vector3D(- deltaZ * skew() * refY(),
-                        deltaZ * skew() * refX(),
-                        deltaZ);
+        return Vector3D(movePerZ() * deltaZ, deltaZ);
       }
 
       /// Gives the tangential xy vector to the line
       inline Vector2D tangential2D() const
       {
         FloatType deltaZ = forwardZ() - backwardZ();
-        return Vector2D(- deltaZ * skew() * refY(),
-                        deltaZ * skew() * refX());
+        return movePerZ() * deltaZ;
       }
 
       /// Gives the positional move in the xy projection per unit z.
       inline Vector2D movePerZ() const
       {
-        return Vector2D(-skew() * refY(),
-                        skew() * refX());
+        return Vector2D(-m_skew * refY(),
+                        m_skew * refX());
       }
 
       /// Gives the forward z coodinate
@@ -183,40 +150,45 @@ namespace Belle2 {
       inline Vector3D closest3D(const Vector3D& point) const
       { return  refPos3D() - (point - refPos3D()).parallelVector(tangential3D()); }
 
-      //   Vector3D unitLineVector = tangential3D();
-      //   unitLineVector.normalize();
-
-      //   FloatType parallelCompPoint = point.unnormalizedParallelComp(unitLineVector);
-      //   FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
-
-      //   //same memory , only different name
-      //   Vector3D& parallelVec = unitLineVector.scale(parallelCompPoint - parallelCompRef);
-
-      //   return refPos3D() - parallelVec;
-      // }
-
       /// Returns the point of closest approach to the origin on the line
       inline Vector3D closestToOrigin3D() const
       { return refPos3D() - refPos3D().parallelVector(tangential3D()); }
-      // {
-      //   Vector3D unitLineVector = tangential3D();
-      //   unitLineVector.normalize();
-
-      //   FloatType parallelCompRef = refPos3D().unnormalizedParallelComp(unitLineVector);
-
-      //   //same memory , only different name
-      //   Vector3D& parallelVecOfRef = unitLineVector.scale(parallelCompRef);
-
-      //   return refPos3D() - parallelVecOfRef;
-      // }
 
       /// Calculates the distance of the given point to the line
       inline FloatType distance(const Vector3D& pos3D) const
       { return (pos3D - refPos3D()).orthogonalComp(tangential3D()); }
 
-      /// Return the skew parameter
-      inline const FloatType& skew() const
-      { return m_skew; }
+      /** Returns the tan lambda of the line
+       *  Also know as dz / ds
+       */
+      inline FloatType tanLambda() const
+      { return 1 / movePerZ().norm(); }
+
+      /// Returns the lambda.
+      inline FloatType lambda() const
+      { return std::atan(tanLambda()); }
+
+      /** Returns the tangent of the opening angle between tangential vector and the z axes
+       *  Also know as ds / dz
+       */
+      inline FloatType tanTheta() const
+      { return std::atan(movePerZ().norm()); }
+
+      /// Returns the opening angle between tangential vector and the z axes.
+      inline FloatType theta() const
+      { return std::atan(movePerZ().norm()); }
+
+      /// Returns the z coordinate of the point of closest approach to the z axes.
+      inline FloatType perigeeZ() const
+      { return -refPos2D().dot(movePerZ()) / movePerZ().normSquared(); }
+
+      /// Returns the point of closest approach to the z axes.
+      inline Vector3D perigee3D() const
+      { return pos3DAtZ(perigeeZ()); }
+
+      /// Returns the point of closest approach to the z axes.
+      inline Vector2D perigee2D() const
+      { return refPos2D().orthogonalVector(movePerZ()); }
 
       /// Returns the the x coordinate of the reference point.
       inline const FloatType& refX() const
@@ -243,18 +215,18 @@ namespace Belle2 {
       { return m_referencePosition; }
 
     private:
+      /// Memory for the reference postion
+      Vector3D m_referencePosition;
 
-      FloatType m_forwardZ; ///< Memory for the forward end z coordinate.
-      FloatType m_backwardZ; ///< Memory for the backward end z coordinate.
+      /// Memory for the forward end z coordinate.
+      FloatType m_forwardZ;
 
-      FloatType m_skew; ///< Memory for the skew parameter
-      Vector3D m_referencePosition; ///< Memory for the reference postion
+      /// Memory for the backward end z coordinate.
+      FloatType m_backwardZ;
 
-    private:
-
-
+      /// Memory for the skew parameter
+      FloatType m_skew;
 
     }; //class
-
   } // namespace TrackFindingCDC
 } // namespace Belle2

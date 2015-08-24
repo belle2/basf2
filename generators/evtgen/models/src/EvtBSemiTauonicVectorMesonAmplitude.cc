@@ -20,6 +20,7 @@
 #include "EvtGenBase/EvtId.hh"
 #include "EvtGenBase/EvtAmp.hh"
 
+#include "framework/logging/Logger.h"
 #include "generators/evtgen/models/EvtBSemiTauonicVectorMesonAmplitude.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
 
@@ -27,8 +28,6 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
                                                   EvtAmp& amp,
                                                   EvtBSemiTauonicHelicityAmplitudeCalculator* CalcHelAmp)
 {
-//  std::cout<<"EvtBSemiTauonicVectorMesonAmplitude::CalcAmp() is called."<<std::endl;
-
   static EvtId EM = EvtPDL::getId("e-");
   static EvtId MUM = EvtPDL::getId("mu-");
   static EvtId TAUM = EvtPDL::getId("tau-");
@@ -152,30 +151,50 @@ void EvtBSemiTauonicVectorMesonAmplitude::CalcAmp(EvtParticle* p,
   double spinprob = abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1])
                     + abs2(spinamp[2][0]) + abs2(spinamp[2][1]);
   if (fabs(helprob - spinprob) / helprob > 1E-6 || !finite(helprob) || !finite(spinprob)) {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") <<
-                                         "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan."
-                                         << std::endl;
-    fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
-    fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
-    fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
-            w, costau, abs2(helamp[0][0]), abs2(helamp[0][1]), abs2(helamp[1][0]), abs2(helamp[1][1]), abs2(helamp[2][0]), abs2(helamp[2][1]),
-            abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1]));
+    B2ERROR("EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan.");
+    B2ERROR("helprob: " << helprob << " spinprob: " << spinprob);
+    B2ERROR("w: " << w << " costau: " << costau << " hel probs: "
+            << abs2(helamp[0][0]) << "\t" << abs2(helamp[0][1]) << "\t"
+            << abs2(helamp[1][0]) << "\t" << abs2(helamp[1][1]) << "\t"
+            << abs2(helamp[2][0]) << "\t" << abs2(helamp[2][1]) << "\t"
+            << abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1])
+           );
 
-    fprintf(stderr, "w: %g costau: %g probs: %g\t%g\t%g\t%g\t%g\t%g\ttot: %g\n",
-            w, costau, abs2(spinamp[0][0]), abs2(spinamp[0][1]), abs2(spinamp[1][0]), abs2(spinamp[1][1]), abs2(spinamp[2][0]),
-            abs2(spinamp[2][1]),
-            abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1]));
+    B2ERROR("w: " << w << " costau: " << costau << " spin probs: "
+            << abs2(spinamp[0][0]) << "\t" << abs2(spinamp[0][1]) << "\t"
+            << abs2(spinamp[1][0]) << "\t" << abs2(spinamp[1][1]) << "\t"
+            << abs2(spinamp[2][0]) << "\t" << abs2(spinamp[2][1]) << "\t"
+            << abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1])
+           );
+
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") <<
+//                                         "EvtBSemiTauonicVectorMesonAmplitude total helicity prob does not match with total spin prob, or nan."
+//                                         << std::endl;
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") "helprob: "<<helprob<<" spinprob: "<<spinprob<< std::endl;
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") "w: "<<w<<" costau: "<<costau<<" hel probs: "
+//            <<abs2(helamp[0][0])<<"\t"<<abs2(helamp[0][1])<<"\t"
+//            <<abs2(helamp[1][0])<<"\t"<<abs2(helamp[1][1])<<"\t"
+//            <<abs2(helamp[2][0])<<"\t"<<abs2(helamp[2][1])<<"\t"
+//            <<abs2(helamp[0][0]) + abs2(helamp[0][1]) + abs2(helamp[1][0]) + abs2(helamp[1][1]) + abs2(helamp[2][0]) + abs2(helamp[2][1])
+//      <<std::endl;
+//
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") "w: "<<w<<" costau: "<<costau<<" spin probs: "
+//            <<abs2(spinamp[0][0])<<"\t"<<abs2(spinamp[0][1])<<"\t"
+//            <<abs2(spinamp[1][0])<<"\t"<<abs2(spinamp[1][1])<<"\t"
+//            <<abs2(spinamp[2][0])<<"\t"<<abs2(spinamp[2][1])<<"\t"
+//            <<abs2(spinamp[0][0]) + abs2(spinamp[0][1]) + abs2(spinamp[1][0]) + abs2(spinamp[1][1]) + abs2(spinamp[2][0]) + abs2(spinamp[2][1])
+//      <<std::endl;
 
     // Debugging information
-    fprintf(stderr, "q2 by Helamp: %g\n", CalcHelAmp->q2(1, w));
-    fprintf(stderr, "helampSM by Helamp: %g\n", CalcHelAmp->helampSM(ml, 1, 1, w, costau));
-    fprintf(stderr, "Lep by Helamp: %g\n", CalcHelAmp->Lep(ml, 1, 1, CalcHelAmp->q2(1, w), costau));
-    fprintf(stderr, "HadV2 by Helamp: %g\n", CalcHelAmp->HadV2(1, 1, w));
-    fprintf(stderr, "v by Helamp: %g\n", CalcHelAmp->v(ml, CalcHelAmp->v(ml, CalcHelAmp->q2(1, w))));
-
-    fprintf(stderr, "B mass : %g \t nominal %g\n", gmB, EvtPDL::getMeanMass(p->getId()));
-    fprintf(stderr, "D mass : %g \t nominal %g\n", gmd, EvtPDL::getMeanMass(p->getDaug(0)->getId()));
-    fprintf(stderr, "lepton mass : %g \t nominal %g\n", ml, EvtPDL::getMeanMass(p->getDaug(1)->getId()));
+//    fprintf(stderr, "q2 by Helamp: %g\n", CalcHelAmp->q2(1, w));
+//    fprintf(stderr, "helampSM by Helamp: %g\n", CalcHelAmp->helampSM(ml, 1, 1, w, costau));
+//    fprintf(stderr, "Lep by Helamp: %g\n", CalcHelAmp->Lep(ml, 1, 1, CalcHelAmp->q2(1, w), costau));
+//    fprintf(stderr, "HadV2 by Helamp: %g\n", CalcHelAmp->HadV2(1, 1, w));
+//    fprintf(stderr, "v by Helamp: %g\n", CalcHelAmp->v(ml, CalcHelAmp->v(ml, CalcHelAmp->q2(1, w))));
+//
+//    fprintf(stderr, "B mass : %g \t nominal %g\n", gmB, EvtPDL::getMeanMass(p->getId()));
+//    fprintf(stderr, "D mass : %g \t nominal %g\n", gmd, EvtPDL::getMeanMass(p->getDaug(0)->getId()));
+//    fprintf(stderr, "lepton mass : %g \t nominal %g\n", ml, EvtPDL::getMeanMass(p->getDaug(1)->getId()));
 
     // abort();
   }

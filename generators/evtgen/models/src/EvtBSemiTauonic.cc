@@ -16,9 +16,10 @@
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtReport.hh"
 
-#include <string>
-using std::endl;
 
+#include <string>
+
+#include "framework/logging/Logger.h"
 #include <generators/evtgen/EvtGenModelRegister.h>
 #include "generators/evtgen/models/EvtBSemiTauonic.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
@@ -50,7 +51,6 @@ EvtDecayBase* EvtBSemiTauonic::clone()
 
 void EvtBSemiTauonic::decay(EvtParticle* p)
 {
-  //  std::cout<<"EvtBSemiTauonic::decay() is called."<<std::endl;
   p->initializePhaseSpace(getNDaug(), getDaugs());
   m_CalcAmp->CalcAmp(p, _amp2, m_CalcHelAmp);
 }
@@ -68,7 +68,7 @@ void EvtBSemiTauonic::initProbMax()
                                           lnum, nunum,
                                           m_CalcHelAmp);
 
-  std::cout << "EvtBSemiTauonic::initProbMax()>> maxprob: " << maxprob << std::endl;
+  B2INFO("EvtBSemiTauonic::initProbMax()>> maxprob: " << maxprob);
 
   setProbMax(maxprob);
 }
@@ -88,7 +88,7 @@ void EvtBSemiTauonic::init()
   EvtSpinType::spintype d1type = EvtPDL::getSpinType(getDaug(0));
 
   if (d1type == EvtSpinType::VECTOR) {
-    std::cout << "EvtBSemiTauonic::init()>> Initializing for decays to a vector type meson " << std::endl;
+    B2INFO("EvtBSemiTauonic::init()>> Initializing for decays to a vector type meson ");
     checkNArg(16);
     const double rhoa12 = getArg(0);
     const double R11 = getArg(1);
@@ -115,7 +115,7 @@ void EvtBSemiTauonic::init()
         EvtPDL::getMeanMass(getDaug(0)));
     m_CalcAmp = new EvtBSemiTauonicVectorMesonAmplitude();
   } else if (d1type == EvtSpinType::SCALAR) {
-    std::cout << "EvtBSemiTauonic::init()>> Initializing for decays to a scalar type meson " << std::endl;
+    B2INFO("EvtBSemiTauonic::init()>> Initializing for decays to a scalar type meson ");
     checkNArg(14);
     const double rho12 = getArg(0);
     const double aS1 = getArg(1);
@@ -142,7 +142,8 @@ void EvtBSemiTauonic::init()
         -1 /*dummy for D*mass*/);
     m_CalcAmp = new EvtBSemiTauonicScalarMesonAmplitude();
   } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BSemiTauonic model handles only scalar and vector meson daughters. Sorry." << endl;
+    B2ERROR("BSemiTauonic model handles only scalar and vector meson daughters.");
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BSemiTauonic model handles only scalar and vector meson daughters." << std::endl;
     ::abort();
   }
 }

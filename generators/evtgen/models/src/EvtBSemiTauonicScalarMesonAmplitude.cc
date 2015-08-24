@@ -10,16 +10,18 @@
 
 #include <cstdio>
 
+#include "EvtGenBase/EvtPatches.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtTensor4C.hh"
 #include "EvtGenBase/EvtVector4C.hh"
 #include "EvtGenBase/EvtScalarParticle.hh"
 #include "EvtGenBase/EvtDiracSpinor.hh"
 #include "EvtGenBase/EvtId.hh"
 #include "EvtGenBase/EvtAmp.hh"
+#include "EvtGenBase/EvtReport.hh"
 
+#include "framework/logging/Logger.h"
 #include "generators/evtgen/models/EvtBSemiTauonicScalarMesonAmplitude.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
 
@@ -27,7 +29,6 @@ void EvtBSemiTauonicScalarMesonAmplitude::CalcAmp(EvtParticle* p,
                                                   EvtAmp& amp,
                                                   EvtBSemiTauonicHelicityAmplitudeCalculator* CalcHelAmp)
 {
-//  std::cout<<"EvtBSemiTauonicScalarMesonAmplitude::CalcAmp() is called."<<std::endl;
 
   static EvtId EM = EvtPDL::getId("e-");
   static EvtId MUM = EvtPDL::getId("mu-");
@@ -113,16 +114,30 @@ void EvtBSemiTauonicScalarMesonAmplitude::CalcAmp(EvtParticle* p,
   // consistency check
   double helprob = abs2(helamp[0]) + abs2(helamp[1]);
   double spinprob = abs2(spinamp[0]) + abs2(spinamp[1]);
-  if (fabs(helprob - spinprob) / helprob > 1E-6) {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") <<
-                                         "EvtBSemiTauonicScalarMesonAmplitude total helicity prob does not match with total spin prob."
-                                         << std::endl;
-    fprintf(stderr, "helprob: %g spinprob: %g\n", helprob, spinprob);
-    fprintf(stderr, "w: %g costau: %g hel probs: %g\t%g\ttot: %g\n",
-            w, costau, abs2(helamp[0]), abs2(helamp[1]), abs2(helamp[0]) + abs2(helamp[1]));
+  if (fabs(helprob - spinprob) / helprob > 1E-6 || !finite(helprob) || !finite(spinprob)) {
+    B2ERROR("EvtBSemiTauonicScalarMesonAmplitude total helicity prob does not match with total spin prob.");
+    B2ERROR("helprob: " << helprob << " spinprob: " << spinprob);
+    B2ERROR("w: " << w << " costau: " << costau << " hel probs: " << abs2(helamp[0])
+            << "\t" << abs2(helamp[1])
+            << "\t" << abs2(helamp[0]) + abs2(helamp[1]));
 
-    fprintf(stderr, "w: %g costau: %g probs: %g\t%g\ttot: %g\n",
-            w, costau, abs2(spinamp[0]), abs2(spinamp[1]), abs2(spinamp[0]) + abs2(spinamp[1]));
+    B2ERROR("w: " << w << " costau: " << costau << " spin probs: " << abs2(spinamp[0])
+            << "\t" << abs2(spinamp[1])
+            << "\t" << abs2(spinamp[0]) + abs2(spinamp[1]));
+
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") <<
+//                                         "EvtBSemiTauonicScalarMesonAmplitude total helicity prob does not match with total spin prob."
+//                                         << std::endl;
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "helprob: "<<helprob<<" spinprob: "<<spinprob<<std::endl;
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "w: "<<w<<" costau: "<<costau
+//                                         <<" hel probs: "<<abs2(helamp[0])
+//                                         <<"\t"<<abs2(helamp[1])
+//                                   <<"\t"<<abs2(helamp[0])+abs2(helamp[1])<<std::endl;
+//
+//    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "w: "<<w<<" costau: "<<costau
+//                                         <<" spin probs: "<<abs2(spinamp[0])
+//                                         <<"\t"<<abs2(spinamp[1])
+//                                   <<"\t"<<abs2(spinamp[0])+abs2(spinamp[1])<<std::endl;
     // abort();
   }
 

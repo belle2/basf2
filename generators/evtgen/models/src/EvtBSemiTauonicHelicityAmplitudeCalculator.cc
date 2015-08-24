@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <cmath>
 #include <string>
-
+#include "framework/logging/Logger.h"
 #include "generators/evtgen/models/EvtBSemiTauonicHelicityAmplitudeCalculator.h"
 
 EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator()
@@ -35,23 +35,23 @@ EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalc
 
   m_CV1 = m_CV2 = m_CS1 = m_CS2 = m_CT = 0;
 
-  std::cout << "EvtBSemiTauonicHelicityAmplitudeCalculator initialized with the default values." << std::endl;
-  std::cout << "rho_1^2 : " << m_rho12 << std::endl;
-  std::cout << "rho_A1^22 : " << m_rhoA12 << std::endl;
-  std::cout << "R_1(1) : " << m_ffR11 << std::endl;
-  std::cout << "R_2(1) : " << m_ffR21 << std::endl;
-  std::cout << "a_S1: " << m_aS1 << std::endl;
-  std::cout << "a_R3: " << m_aR3 << std::endl;
-  std::cout << "bottom quark mass: " << m_mBottom << std::endl;
-  std::cout << "charm quark mass: " << m_mCharm << std::endl;
-  std::cout << "CV1 : " << m_CV1 << std::endl;
-  std::cout << "CV2 : " << m_CV2 << std::endl;
-  std::cout << "CS1 : " << m_CS1 << std::endl;
-  std::cout << "CS2 : " << m_CS2 << std::endl;
-  std::cout << "CT : " << m_CT << std::endl;
-  std::cout << "B meson mass: " << m_mB << std::endl;
-  std::cout << "D meson mass: " << m_mD << std::endl;
-  std::cout << "D* meson mass: " << m_mDst << std::endl;
+  B2INFO("EvtBSemiTauonicHelicityAmplitudeCalculator initialized with the default values.");
+  B2INFO("rho_1^2 : " << m_rho12);
+  B2INFO("rho_A1^22 : " << m_rhoA12);
+  B2INFO("R_1(1) : " << m_ffR11);
+  B2INFO("R_2(1) : " << m_ffR21);
+  B2INFO("a_S1: " << m_aS1);
+  B2INFO("a_R3: " << m_aR3);
+  B2INFO("bottom quark mass: " << m_mBottom);
+  B2INFO("charm quark mass: " << m_mCharm);
+  B2INFO("CV1 : " << m_CV1);
+  B2INFO("CV2 : " << m_CV2);
+  B2INFO("CS1 : " << m_CS1);
+  B2INFO("CS2 : " << m_CS2);
+  B2INFO("CT : " << m_CT);
+  B2INFO("B meson mass: " << m_mB);
+  B2INFO("D meson mass: " << m_mD);
+  B2INFO("D* meson mass: " << m_mDst);
 }
 
 EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalculator(const double rho12, const double rhoA12,
@@ -81,23 +81,23 @@ EvtBSemiTauonicHelicityAmplitudeCalculator::EvtBSemiTauonicHelicityAmplitudeCalc
   m_CS2 = CS2;
   m_CT = CT;
 
-  std::cout << "EvtBSemiTauonicHelicityAmplitudeCalculator initialized." << std::endl;
-  std::cout << "rho_1^2 : " << rho12 << std::endl;
-  std::cout << "rho_A1^2 : " << rhoA12 << std::endl;
-  std::cout << "R_1(1) : " << ffR11 << std::endl;
-  std::cout << "R_2(1) : " << ffR21 << std::endl;
-  std::cout << "a_S1: " << m_aS1 << std::endl;
-  std::cout << "a_R3: " << m_aR3 << std::endl;
-  std::cout << "bottom quark mass: " << m_mBottom << std::endl;
-  std::cout << "charm quark mass: " << m_mCharm << std::endl;
-  std::cout << "CV1 : " << m_CV1 << std::endl;
-  std::cout << "CV2 : " << m_CV2 << std::endl;
-  std::cout << "CS1 : " << m_CS1 << std::endl;
-  std::cout << "CS2 : " << m_CS2 << std::endl;
-  std::cout << "CT : " << m_CT << std::endl;
-  std::cout << "Parent meson mass: " << m_mB << std::endl;
-  std::cout << "D meson mass: " << m_mD << std::endl;
-  std::cout << "D* meson mass: " << m_mDst << std::endl;
+  B2INFO("EvtBSemiTauonicHelicityAmplitudeCalculator initialized.");
+  B2INFO("rho_1^2 : " << rho12);
+  B2INFO("rho_A1^2 : " << rhoA12);
+  B2INFO("R_1(1) : " << ffR11);
+  B2INFO("R_2(1) : " << ffR21);
+  B2INFO("a_S1: " << m_aS1);
+  B2INFO("a_R3: " << m_aR3);
+  B2INFO("bottom quark mass: " << m_mBottom);
+  B2INFO("charm quark mass: " << m_mCharm);
+  B2INFO("CV1 : " << m_CV1);
+  B2INFO("CV2 : " << m_CV2);
+  B2INFO("CS1 : " << m_CS1);
+  B2INFO("CS2 : " << m_CS2);
+  B2INFO("CT : " << m_CT);
+  B2INFO("Parent meson mass: " << m_mB);
+  B2INFO("D meson mass: " << m_mD);
+  B2INFO("D* meson mass: " << m_mDst);
 }
 
 // Total amplitude

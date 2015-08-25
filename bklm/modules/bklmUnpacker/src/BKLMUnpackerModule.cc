@@ -142,12 +142,11 @@ void BKLMUnpackerModule::event()
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
         int numHits = rawKLM[i]->GetDetectorNwords(j, finesse_num) / hitLength;
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
-        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,
-             finesse_num) << " words, " << numHits << " hits)" << endl;
-        if (numDetNwords > 0)
-          cout << "word counter is: " << ((buf_slot[numDetNwords - 1] >> 16) & 0xFFFF) << endl;
-        cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
-        cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
+        ////        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
+        //if (numDetNwords > 0)
+        //  cout << "word counter is: " << ((buf_slot[numDetNwords - 1] >> 16) & 0xFFFF) << endl;
+        ////        cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
+        ////        cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
         //we should get two words of 32 bits...
 
 
@@ -165,7 +164,7 @@ void BKLMUnpackerModule::event()
           sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
           sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
 
-          cout << buffer2 << buffer1;
+          ////          cout << buffer2 << buffer1;
 
           //          printf("%.8x\n", buf_slot[k]);
 
@@ -222,8 +221,8 @@ void BKLMUnpackerModule::event()
           //    cout <<"copperID: "<< copperId<<endl;
           B2INFO("copper: " << copperId << " finesse: " << finesse_num << ", ");
           //          B2INFO("Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge << endl);
-          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
-               " charge: " << charge << endl;
+          ////          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
+          ////               " charge: " << charge << endl;
 
           int electId = electCooToInt(copperId, finesse_num + 1, lane, axis);
           int layer = lane;
@@ -232,26 +231,30 @@ void BKLMUnpackerModule::event()
             if (!m_useDefaultModuleId) {
               char buffer[200];
               sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", copperId, finesse_num + 1, lane, axis);
+
               B2INFO(buffer);
               continue;
             } else {
               //        cout <<"calling default with axis: " << axis <<endl;
               moduleId = getDefaultModuleId(lane, axis);
+              //        cout <<"could not find copperid %d, finesse %d, lane %d, axis %d in mapping " <<  copperId  <<" fin: "<<  finesse_num + 1 <<" lane: " <<  lane <<" axis: "<< axis <<endl;
+              //      cout <<" Using lane: "<< lane <<" layer: "<< layer <<endl;
             }
           } else { //found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
             B2INFO(" electid: " << electId << " module: " << moduleId << endl);
 
             layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+            //      cout <<" looking at lane: "<< lane <<" layer: "<< layer <<endl;
             //plane should already be set
             //moduleId counts are zero based
 
             //only channel and inrpc flag is not set yet
           }
-          if (layer > 14)
+          if (layer > 15)
             continue;
           //still have to add the channel and axis
-          if (layer > 1)
+          if (layer > 2)
             moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
@@ -306,7 +309,7 @@ int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axi
 ///}
 ///
 ///
-void BKLMUnpackerModule::endRun()
+void BKLMUnpackerModule::intToElectCooendRun()
 {
 
 }
@@ -325,7 +328,7 @@ int BKLMUnpackerModule::getDefaultModuleId(int lane, int axis)
   //attention: lane is zero based, so do not subtract 1
   int  moduleId = (0)
                   | ((0) << BKLM_SECTOR_BIT)
-                  | ((lane) << BKLM_LAYER_BIT)
+                  | ((lane - 1) << BKLM_LAYER_BIT)
                   | ((axis) << BKLM_PLANE_BIT);
 
   return moduleId;

@@ -324,26 +324,8 @@ void ECLDigitizerModule::readDSPDB()
 
   // repack fitting algorithm parameters
   m_idn.resize(eclWFAlgoParams.size());
-  for (int i = 0, imax = eclWFAlgoParams.size(); i < imax; i++) {
-    const ECLWFAlgoParams& eclWFAlgo = eclWFAlgoParams[i];
-    shortint_array_16_t& a = m_idn[i].id;
-    a[ 0] = eclWFAlgo.getlAT() + 128;
-    a[ 1] = eclWFAlgo.getsT()  + 128;
-    a[ 2] = eclWFAlgo.gethT();
-    a[ 3] = 17952;
-    a[ 4] = 19529;
-    a[ 5] = 69;
-    a[ 6] = 0;
-    a[ 7] = 0;
-    a[ 8] = 257;
-    a[ 9] = -1;
-    a[10] = 0;
-    a[11] = 0;
-    a[12] = eclWFAlgo.getk2() + 256 * eclWFAlgo.getk1();
-    a[13] = eclWFAlgo.getka() + 256 * eclWFAlgo.getkb();
-    a[14] = eclWFAlgo.getkc() + 256 * (eclWFAlgo.gety0s() - 16);
-    a[15] = eclWFAlgo.getcT();
-  }
+  for (int i = 0, imax = eclWFAlgoParams.size(); i < imax; i++)
+    repack(eclWFAlgoParams[i], m_idn[i]);
 
   vector<uint_pair_t> pairIdx;
   for (int i = 0; i < m_nch; i++) {
@@ -370,108 +352,8 @@ void ECLDigitizerModule::readDSPDB()
 // fill parameters for each (Waveform x AlgoParams) parameter set
   for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
     const uint_pair_t& p = pairIdx[ip];
-
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
-    const ECLWFAlgoParams& eclWFAlgo = eclWFAlgoParams[p.second];
-
-    float s[16][16], MPf[10];
-    eclWFData->getMatrix(s);
-    eclWFData->getWaveformParArray(MPf);
-
-    double MPd[10];
-    for (int i = 0; i < 10; i++) MPd[i] = MPf[i]; // conversion float->double
-
-    // shape function parameters
-    int ia = 1 << eclWFAlgo.getka();
-    int ib = 1 << eclWFAlgo.getkb();
-    int ic = 1 << eclWFAlgo.getkc();
-
-    int_array_192x16_t& ref_f    = m_fitparams[ip].f;
-    int_array_192x16_t& ref_f1   = m_fitparams[ip].f1;
-    int_array_192x16_t& ref_fg31 = m_fitparams[ip].fg31;
-    int_array_192x16_t& ref_fg32 = m_fitparams[ip].fg32;
-    int_array_192x16_t& ref_fg33 = m_fitparams[ip].fg33;
-    int_array_24x16_t& ref_fg41 = m_fitparams[ip].fg41;
-    int_array_24x16_t& ref_fg43 = m_fitparams[ip].fg43;
-
-    for (int k = 0; k < 2 * m_ndt; k++) { // calculate fit parameters around 0 +- 1 ADC tick
-      double t0 = m_tick - (k + 1) * (m_tick / m_ndt); // range [-m_tick ... m_tick*(1-1/m_ndt)]
-
-      double f0[16], f1[16];
-      const double eps = 0.001 * m_tick; // for derivative calculation
-      for (int j = 0; j < 16; j++) {
-        double t = j * m_tick - t0;
-
-        double fx = ShaperDSP(t      , MPd);
-        double fp = ShaperDSP(t + eps, MPd);
-        double fm = ShaperDSP(t - eps, MPd);
-        f0[j] =  fx;
-        f1[j] = (fp - fm) / (2 * eps);
-      }
-
-      double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
-      double sg0[16], sg1[16], sg2[16];
-      for (int j = 0; j < 16; j++) {
-        sg0[j] = sg1[j] = sg2[j] = 0;
-        double fj0 = f0[j];
-        double fj1 = f1[j];
-        for (int i = 0; i < 16; i++) {
-          double fi0 = f0[i];
-          double fi1 = f1[i];
-          double sji = s[j][i];
-          sg0[j] += sji * fi0;
-          sg1[j] += sji * fi1;
-          sg2[j] += sji;
-          g0g0   += sji * fj0 * fi0;
-          g0g1   += sji * fj0 * fi1;
-          g1g1   += sji * fi1 * fj1;
-          g0g2   += sji * fj0;
-          g1g2   += sji * fj1;
-          g2g2   += sji;
-        }
-      }
-
-      double a00 = g1g1 * g2g2 - g1g2 * g1g2;
-      double a11 = g0g0 * g2g2 - g0g2 * g0g2;
-      double a22 = g0g0 * g1g1 - g0g1 * g0g1;
-      double a01 = g1g2 * g0g2 - g0g1 * g2g2;
-      double a02 = g0g1 * g1g2 - g1g1 * g0g2;
-      double a12 = g0g1 * g0g2 - g0g0 * g1g2;
-
-      double igg2 = 1 / (a11 * g1g1 + g0g1 * a01 + g1g2 * a12);
-
-      // to fixed point representation
-      const double isd = 3. / 4., sd = 1 / isd ; // conversion factor (???)
-      for (int i = 0; i < 16; i++) {
-        double w = i ? 1.0 : 1. / 16.;
-
-        ref_f   [k][i] = lrint(f0[i] * ia * w);
-        ref_f1  [k][i] = lrint(f1[i] * ia * w * sd);
-
-        double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
-        double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
-        double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
-
-        ref_fg31[k][i] = lrint(fg31 * ia * w);
-        ref_fg32[k][i] = lrint(fg32 * ib * w * isd);
-        ref_fg33[k][i] = lrint(fg33 * ic * w);
-      }
-
-      //first approximation without time correction
-      int jk = 24 - ((k + 3) >> 2);
-      if (jk >= 0 && jk < 24 && (k + 3) % 4 == 0) {
-        double igg1 = 1 / a11;
-        // to fixed point
-        for (int i = 0; i < 16; i++) {
-          double w = i ? 1.0 : 1. / 16.;
-
-          double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
-          double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-          ref_fg41[jk][i] = lrint(fg41 * ia * w);
-          ref_fg43[jk][i] = lrint(fg43 * ic * w);
-        }
-      }
-    }
+    getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
   }
   B2INFO("ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
 
@@ -486,4 +368,129 @@ void ECLDigitizerModule::readDSPDB()
   if (eclWFData) delete eclWFData;
 
   rootfile.Close();
+}
+
+void ECLDigitizerModule::repack(const ECLWFAlgoParams& eclWFAlgo, algoparams_t& t)
+{
+  // filling short int array
+  t.id[ 0] = eclWFAlgo.getlAT() + 128;
+  t.id[ 1] = eclWFAlgo.getsT()  + 128;
+  t.id[ 2] = eclWFAlgo.gethT();
+  t.id[ 3] = 17952;
+  t.id[ 4] = 19529;
+  t.id[ 5] = 69;
+  t.id[ 6] = 0;
+  t.id[ 7] = 0;
+  t.id[ 8] = 257;
+  t.id[ 9] = -1;
+  t.id[10] = 0;
+  t.id[11] = 0;
+
+  // filling unsigned char array
+  t.ic[12 * 2 + 0] = eclWFAlgo.getk1();
+  t.ic[12 * 2 + 1] = eclWFAlgo.getk2();
+  t.ic[13 * 2 + 0] = eclWFAlgo.getka();
+  t.ic[13 * 2 + 1] = eclWFAlgo.getkb();
+  t.ic[14 * 2 + 0] = eclWFAlgo.getkc();
+  t.ic[14 * 2 + 1] = eclWFAlgo.gety0s() - 16;
+
+  // again, filling short int array
+  t.id[15] = eclWFAlgo.getcT();
+}
+
+void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const ECLWFAlgoParams& eclWFAlgo, fitparams_t& p)
+{
+  double ssd[16][16], MPd[10];
+  eclWFData.getMatrix(ssd);
+  eclWFData.getWaveformParArray(MPd);
+
+  // shape function parameters
+  int ia = 1 << eclWFAlgo.getka();
+  int ib = 1 << eclWFAlgo.getkb();
+  int ic = 1 << eclWFAlgo.getkc();
+
+  int_array_192x16_t& ref_f    = p.f;
+  int_array_192x16_t& ref_f1   = p.f1;
+  int_array_192x16_t& ref_fg31 = p.fg31;
+  int_array_192x16_t& ref_fg32 = p.fg32;
+  int_array_192x16_t& ref_fg33 = p.fg33;
+  int_array_24x16_t&  ref_fg41 = p.fg41;
+  int_array_24x16_t&  ref_fg43 = p.fg43;
+
+  for (int k = 0; k < 2 * m_ndt; k++) { // calculate fit parameters around 0 +- 1 ADC tick
+    double t0 = m_tick - (k + 1) * (m_tick / m_ndt); // range [-m_tick ... m_tick*(1-1/m_ndt)]
+
+    double f0[16], f1[16];
+    const double eps = 0.001 * m_tick; // for derivative calculation
+    for (int j = 0; j < 16; j++) {
+      double t = j * m_tick - t0;
+
+      double fx = ShaperDSP(t      , MPd);
+      double fp = ShaperDSP(t + eps, MPd);
+      double fm = ShaperDSP(t - eps, MPd);
+      f0[j] =  fx;
+      f1[j] = (fp - fm) / (2 * eps);
+    }
+
+    double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
+    double sg0[16], sg1[16], sg2[16];
+    for (int j = 0; j < 16; j++) {
+      double g0 = 0, g1 = 0, g2 = 0;
+      for (int i = 0; i < 16; i++) {
+        g0 += ssd[j][i] * f0[i];
+        g1 += ssd[j][i] * f1[i];
+        g2 += ssd[j][i];
+      }
+      g0g0 += g0 * f0[j];
+      g0g1 += g1 * f0[j];
+      g1g1 += g1 * f1[j];
+      g0g2 += g0;
+      g1g2 += g1;
+      g2g2 += g2;
+      sg0[j] = g0;
+      sg1[j] = g1;
+      sg2[j] = g2;
+    }
+
+    double a00 = g1g1 * g2g2 - g1g2 * g1g2;
+    double a11 = g0g0 * g2g2 - g0g2 * g0g2;
+    double a22 = g0g0 * g1g1 - g0g1 * g0g1;
+    double a01 = g1g2 * g0g2 - g0g1 * g2g2;
+    double a02 = g0g1 * g1g2 - g1g1 * g0g2;
+    double a12 = g0g1 * g0g2 - g0g0 * g1g2;
+
+    double igg2 = 1 / (a11 * g1g1 + g0g1 * a01 + g1g2 * a12);
+
+    // to fixed point representation
+    const double isd = 3. / 4., sd = 1 / isd ; // conversion factor (???)
+    for (int i = 0; i < 16; i++) {
+      double w = i ? 1.0 : 1. / 16.;
+
+      ref_f   [k][i] = lrint(f0[i] * ia * w);
+      ref_f1  [k][i] = lrint(f1[i] * ia * w * sd);
+
+      double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
+      double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
+      double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
+
+      ref_fg31[k][i] = lrint(fg31 * ia * w);
+      ref_fg32[k][i] = lrint(fg32 * ib * w * isd);
+      ref_fg33[k][i] = lrint(fg33 * ic * w);
+    }
+
+    //first approximation without time correction
+    int jk = 24 - ((k + 3) >> 2);
+    if (jk >= 0 && jk < 24 && (k + 3) % 4 == 0) {
+      double igg1 = 1 / a11;
+      // to fixed point
+      for (int i = 0; i < 16; i++) {
+        double w = i ? 1.0 : 1. / 16.;
+
+        double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
+        double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
+        ref_fg41[jk][i] = lrint(fg41 * ia * w);
+        ref_fg43[jk][i] = lrint(fg43 * ic * w);
+      }
+    }
+  }
 }

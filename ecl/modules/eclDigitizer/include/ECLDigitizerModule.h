@@ -103,6 +103,7 @@ namespace Belle2 {
       typedef int int_array_192x16_t[2 * m_ndt][16];
       typedef int int_array_24x16_t[m_ndt / 4][16];
       typedef short int shortint_array_16_t[16];
+      typedef unsigned char uchar_array_32_t[32];
       typedef std::pair<unsigned int, unsigned int> uint_pair_t;
 
       struct fitparams_t {
@@ -111,7 +112,10 @@ namespace Belle2 {
       };
 
       struct algoparams_t {
-        shortint_array_16_t id;
+        union {
+          shortint_array_16_t id;
+          uchar_array_32_t    ic;
+        };
       };
 
       struct crystallinks_t { // offsets for storages of ECL channels
@@ -137,6 +141,9 @@ namespace Belle2 {
 
       /** read Shaper-DSP data from root file */
       void readDSPDB();
+
+      void repack(const ECLWFAlgoParams&, algoparams_t&);
+      void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
       /** Event number */
       int    m_nEvent;

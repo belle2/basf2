@@ -89,7 +89,8 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      ~Packet() {
+      ~Packet()
+      {
         if (m_data) delete [] m_data;
       }
 
@@ -110,7 +111,8 @@ namespace Belle2 {
        * Check sum
        * @return true if sum eq check-sum word
        */
-      bool checkSum() const {
+      bool checkSum() const
+      {
         unsigned sum = m_header + m_size + m_type;
         for (unsigned i = 0; i < m_size - 2; i++) sum += m_data[i];
         return (sum == m_checkSum);
@@ -132,7 +134,8 @@ namespace Belle2 {
        * Return number of allocated words for packet data
        * @return number of allocated words
        */
-      int getDataSize() const {
+      int getDataSize() const
+      {
         if (m_data) return m_size - 2;
         return 0;
       }
@@ -177,7 +180,8 @@ namespace Belle2 {
        * Return header packet body
        * @return pointer to header packet body or NULL
        */
-      const HeaderBody* getHeaderBody() const {
+      const HeaderBody* getHeaderBody() const
+      {
         if (!isHeaderPacket()) return 0;
         if ((int)(sizeof(HeaderBody) / sizeof(unsigned)) > getDataSize()) return 0;
         return (HeaderBody*) m_data;
@@ -187,7 +191,8 @@ namespace Belle2 {
        * Return waveform packet header
        * @return pointer to waveform header or NULL
        */
-      const WaveformHead* getWaveformHead() const {
+      const WaveformHead* getWaveformHead() const
+      {
         if (!isWaveformPacket()) return 0;
         if ((int)(sizeof(WaveformHead) / sizeof(unsigned)) > getDataSize()) return 0;
         return (WaveformHead*) m_data;
@@ -207,7 +212,8 @@ namespace Belle2 {
        * Allocate memory for packet data
        * @return number of allocated words
        */
-      int allocateData() {
+      int allocateData()
+      {
         int n = m_size - 2;
         if (m_data) return n;
         if (n > 0 and n < c_MaxSize) {
@@ -245,7 +251,8 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      ~ScrodData() {
+      ~ScrodData()
+      {
         if (m_data) {delete [] m_data;}
       }
 
@@ -293,7 +300,8 @@ namespace Belle2 {
        * Allocate memory for data
        * @return number of allocated words
        */
-      int allocateData(int n) {
+      int allocateData(int n)
+      {
         if (m_data) return m_dimension;
         if (n > 0) {
           m_data = new int[n];
@@ -307,7 +315,8 @@ namespace Belle2 {
        * Add data word to m_data
        * @return true on success
        */
-      bool add(unsigned dataWord) {
+      bool add(unsigned dataWord)
+      {
         if (m_size < m_dimension) {
           m_data[m_size] = dataWord;
           m_size++;

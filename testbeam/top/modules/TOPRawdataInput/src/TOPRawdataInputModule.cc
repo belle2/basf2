@@ -246,7 +246,7 @@ namespace Belle2 {
     int* buffer[4] = {0, 0, 0, 0};
     int bufferSize[4] = {0, 0, 0, 0};
     int k = 0;
-    for (auto & scrodData : event) {
+    for (auto& scrodData : event) {
       buffer[k] = scrodData->getData();
       bufferSize[k] = scrodData->getDataSize();
       k++;
@@ -275,7 +275,7 @@ namespace Belle2 {
     }
 
     m_eventsRead++;
-    for (auto & scrodData : event) delete scrodData;
+    for (auto& scrodData : event) delete scrodData;
     return 0;
 
   }

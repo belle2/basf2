@@ -158,14 +158,14 @@ namespace Belle2 {
         m_bytesRead += packet->getBytesRead();
         if (!ok) {
           delete packet;
-          for (auto & packet : packets) delete packet;
+          for (auto& packet : packets) delete packet;
           return false;
         }
         m_packetsRead++;
         if (packet->isHeaderPacket()) {
           B2ERROR("Expect waveform packet, got header packet");
           delete packet;
-          for (auto & packet : packets) delete packet;
+          for (auto& packet : packets) delete packet;
           return false;
         }
         if (packet->isWaveformPacket()) {
@@ -184,7 +184,7 @@ namespace Belle2 {
       // pack packets' data
 
       int dataSize = 1;
-      for (const auto & packet : packets) {
+      for (const auto& packet : packets) {
         dataSize +=  packet->getDataSize();
       }
       allocateData(dataSize);
@@ -199,7 +199,7 @@ namespace Belle2 {
       ok = add(header->triggerType);
       ok = add(header->flags);
       ok = add(packets.size() - 1);
-      for (auto & packet : packets) {
+      for (auto& packet : packets) {
         const WaveformHead* head = packet->getWaveformHead();
         if (!head) continue;
         ok = add(head->referenceASIC);
@@ -217,7 +217,7 @@ namespace Belle2 {
         B2FATAL("Bug: under-dimensioned array in ScrodData!")
       }
 
-      for (auto & packet : packets) delete packet;
+      for (auto& packet : packets) delete packet;
       return true;
     }
 

@@ -92,9 +92,7 @@ namespace Belle2 {
   {
     if (m_outputFileName.empty()) B2ERROR("TOPbetaScan: no output file name given");
 
-    char filename[m_outputFileName.size() + 1];
-    strcpy(filename, m_outputFileName.c_str());
-    m_file = new TFile(filename, "RECREATE");
+    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_betaHistogram = new TH1F("Hbeta", "reconstructed particle beta",
                                m_numBins, m_betaMin, m_betaMax);
 
@@ -219,12 +217,10 @@ namespace Belle2 {
   {
 
     // array to hold scan values
-
-    double logL[m_numPoints];
+    std::vector<double> logL(m_numPoints);
 
     // array to hold beta values
-
-    double beta[m_numPoints];
+    std::vector<double> beta(m_numPoints);
     double Dbeta = (m_betaMax - m_betaMin) / m_numPoints;
     beta[0] = m_betaMin + Dbeta / 2;
     for (int i = 1; i < m_numPoints; i++) beta[i] = beta[i - 1] + Dbeta;

@@ -47,7 +47,8 @@ namespace Belle2 {
      * @param scan steering parameters
      * @param Name name (optional)
      */
-    Scan(std::vector<double>& scan, std::string Name = std::string("")): name(Name) {
+    Scan(std::vector<double>& scan, std::string Name = std::string("")): name(Name)
+    {
       while (scan.size() < 4) scan.push_back(0.0);
       int np = int(scan[2]);
       if (np < 0) B2ERROR(name << ": np must be non-negative");
@@ -67,7 +68,8 @@ namespace Belle2 {
      * @param Xmax upper limit
      * @param np region extension to left and right
      */
-    Scan(int Nx, double Xmin, double Xmax, int np = 0) {
+    Scan(int Nx, double Xmin, double Xmax, int np = 0)
+    {
       nPoints = Nx + 2 * np;
       step = (Xmax - Xmin) / Nx;
       xmin = Xmin - step * np;
@@ -80,7 +82,8 @@ namespace Belle2 {
      * @param np half number of points
      * @param Step step size
      */
-    Scan(int np, double Step) {
+    Scan(int np, double Step)
+    {
       nPoints = 2 * np + 1;
       step = Step;
       double halfsize = step * (np + 0.5);
@@ -94,7 +97,8 @@ namespace Belle2 {
      * @param i 0-based index
      * @return point position
      */
-    double getPoint(int i) const {
+    double getPoint(int i) const
+    {
       return xmin + step * (i + 0.5);
     }
 
@@ -102,7 +106,8 @@ namespace Belle2 {
      * Return center of scan region
      * @return center
      */
-    double getCenter() const {
+    double getCenter() const
+    {
       return (xmin + xmax) / 2;
     }
 
@@ -167,7 +172,8 @@ namespace Belle2 {
      * @param ich 0-based channel index (e.g. TOPDigit::m_channelID - 1)
      * @return row-wise channel ID
      */
-    int rowWiseChannelID(int ich) {
+    int rowWiseChannelID(int ich)
+    {
       /*
       int Npad = m_numPADrows * m_numPADcols;
       int pmt = ich / Npad;
@@ -189,7 +195,8 @@ namespace Belle2 {
      * @param number
      * @return string
      */
-    std::string numberToString(int number) {
+    std::string numberToString(int number)
+    {
       std::stringstream ss;
       std::string str;
       ss << number;
@@ -203,7 +210,8 @@ namespace Belle2 {
      * @param number
      * @return string
      */
-    std::string numberToString(double number) {
+    std::string numberToString(double number)
+    {
       std::stringstream ss;
       std::string str;
       ss << number;

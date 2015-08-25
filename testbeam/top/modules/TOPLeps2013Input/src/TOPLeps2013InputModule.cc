@@ -89,10 +89,9 @@ namespace Belle2 {
   void TOPLeps2013InputModule::initialize()
   {
     if (m_inputFileName.empty()) B2FATAL("file name not given");
-    char filename[m_inputFileName.size() + 1];
-    strcpy(filename, m_inputFileName.c_str());
-    m_file = new TFile(filename);
-    if (!m_file->IsOpen()) B2FATAL("can't open file " << filename);
+
+    m_file = new TFile(m_inputFileName.c_str());
+    if (!m_file->IsOpen()) B2FATAL("can't open file " << m_inputFileName);
 
     m_treeTop = (TTree*)m_file->Get("top");
     if (!m_treeTop) B2FATAL("No top tree found in file " << m_inputFileName);
@@ -249,7 +248,7 @@ namespace Belle2 {
     // write track info to data store
     TVector3 momentum; momentum.SetMagThetaPhi(m_p, m_theta * Unit::deg, m_phi * Unit::deg);
     TVector3 position(m_x0, m_y0, m_z0);
-    TMatrixDSym dummyMatrix;
+    TMatrixDSym dummyMatrix(6);
     TrackFitResult* trackFitResult = trackFitResults.appendNew(
                                        position,
                                        momentum,

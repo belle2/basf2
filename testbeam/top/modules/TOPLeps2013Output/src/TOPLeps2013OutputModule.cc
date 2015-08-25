@@ -83,9 +83,7 @@ namespace Belle2 {
       return;
     }
 
-    char filename[m_outputFileName.size() + 1];
-    strcpy(filename, m_outputFileName.c_str());
-    m_file = new TFile(filename, "RECREATE");
+    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_treeTop = new TTree("top", "top data tree (simulation)");
 
     m_treeTop->Branch("runNum", &(m_top.runNum), "runNum/I");
@@ -161,7 +159,7 @@ namespace Belle2 {
     m_top.eventNum = evtMetaData->getEvent();
     m_top.eventflag = 1;
 
-    float TDC[m_numChannels];
+    float TDC[512]; // m_numChannels cannot exceed 512, see initialize()
     for (int i = 0; i < m_numChannels; i++) TDC[i] = m_tdcOverflow;
 
     StoreArray<TOPDigit> topDigits;

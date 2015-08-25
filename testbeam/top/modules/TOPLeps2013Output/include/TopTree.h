@@ -101,7 +101,8 @@ namespace Belle2 {
       /**
        * Clear the structure: set elements to zero
        */
-      void clear() {
+      void clear()
+      {
         runNum = 0;
         eventNum = 0;
         eventflag = 0;

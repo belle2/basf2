@@ -88,9 +88,7 @@ namespace Belle2 {
       return;
     }
 
-    char filename[m_outputFileName.size() + 1];
-    strcpy(filename, m_outputFileName.c_str());
-    m_file = new TFile(filename, "RECREATE");
+    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_tana = new TTree("ana", "ana");
 
     m_tana->Branch("adc", m_adc, "adc[36]/D");

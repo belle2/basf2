@@ -1,23 +1,28 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
+#pragma once
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <cmath>
 
-#include <limits>
+namespace Belle2 {
+  namespace TrackFindingCDC {
 
-using namespace std;
-using namespace Belle2;
-using namespace TrackFindingCDC;
+    /// An additive measure of quality
+    typedef double Weight;
 
+    /// Constant for the highest possible weight
+    extern const Weight HIGHEST_WEIGHT;
 
-const Weight TrackFindingCDC::HIGHEST_WEIGHT = std::numeric_limits<Weight>::infinity();
+    /// Constant for the lowest possible weight
+    extern const Weight LOWEST_WEIGHT;
 
-const Weight TrackFindingCDC::LOWEST_WEIGHT = -std::numeric_limits<Weight>::infinity();
+  } // namespace TrackFindingCDC
+
+} // namespace Belle2

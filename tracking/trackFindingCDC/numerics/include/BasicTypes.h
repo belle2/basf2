@@ -13,7 +13,6 @@
 #include <cstdlib> //for abs
 #include <math.h>
 
-
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -26,26 +25,16 @@ namespace Belle2 {
 
     /// Track id type
     typedef int ITrackType;
-    const ITrackType INVALID_ITRACK = -998; ///< Constant to mark an invalid track id
 
+    /// Constant to mark an invalid track id
+    const ITrackType INVALID_ITRACK = -998;
     /**@}*/
 
     /** @name Basic floatig point types*/
     /**@{*/
     /// The float type used by the algorithm. Just as necessary for speed.
     typedef double FloatType;
-
-    /// An additive measure of quality (e.g. logarithms of probabilities)
-    typedef double Weight;
-
-    /// Constant for the highest possible weight
-    extern const Weight HIGHEST_WEIGHT;
-
-    /// Constant for the lowest possible weight
-    extern const Weight LOWEST_WEIGHT;
     /**@}*/
-
-
 
   } // namespace TrackFindingCDC
 

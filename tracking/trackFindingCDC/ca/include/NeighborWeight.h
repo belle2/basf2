@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <cmath>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
 

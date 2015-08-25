@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/LinearDivision.h>
 #include <tracking/trackFindingCDC/hough/Box.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/logging/Logger.h>
 
@@ -22,11 +23,11 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, SumInfinities)
 {
-  EXPECT_EQ(HIGHEST_WEIGHT, HIGHEST_WEIGHT + HIGHEST_WEIGHT);
+  EXPECT_EQ(INFINITY, INFINITY + INFINITY);
 
-  std::array<Weight, 4> infinities{{HIGHEST_WEIGHT, HIGHEST_WEIGHT, HIGHEST_WEIGHT, HIGHEST_WEIGHT}};
+  std::array<Weight, 4> infinities{{INFINITY, INFINITY, INFINITY, INFINITY}};
   Weight weightSum = std::accumulate(std::begin(infinities), std::end(infinities), Weight(0));
-  EXPECT_EQ(HIGHEST_WEIGHT, weightSum);
+  EXPECT_EQ(INFINITY, weightSum);
 }
 
 

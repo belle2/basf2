@@ -34,7 +34,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   for (CDCTrack& track : tracks) {
     CDCObservations2D szObservations;
     for (const CDCRecoHit3D& recoHit : track) {
-      if (recoHit.getStereoType() != AXIAL) {
+      if (recoHit.getStereoType() != StereoType_c::Axial) {
         szObservations.append(recoHit.getPerpS(), recoHit.getRecoZ());
       }
     }

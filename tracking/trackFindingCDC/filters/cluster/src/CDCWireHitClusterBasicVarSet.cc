@@ -85,7 +85,7 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
     adcCountVariance = -1;
   }
 
-  var<named("is_stereo")>() = getStereoType(cluster) != AXIAL;
+  var<named("is_stereo")>() = getStereoType(cluster) != StereoType_c::Axial;
   var<named("size")>() = size;
 
   var<named("total_number_of_neighbors")>() = totalNNeighbors;

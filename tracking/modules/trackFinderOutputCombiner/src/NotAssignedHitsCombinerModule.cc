@@ -114,7 +114,7 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
   for (CDCTrack& track : tracks) {
 
     for (const CDCRecoHit3D& recoHit3D : track) {
-      if (recoHit3D.getStereoType() == AXIAL) {
+      if (recoHit3D.getStereoType() == StereoType_c::Axial) {
         axialObservations.append(recoHit3D.getWireHit().getRefPos2D());
       } else {
         stereoObservations.append(recoHit3D.getPerpS(), recoHit3D.getRecoZ());
@@ -165,7 +165,7 @@ void NotAssignedHitsCombinerModule::findEasyCandidates(std::vector<CDCRecoSegmen
     }
     // for axial hits we add the segment to the best fit partner
     // for stereo hits we add it to the track candidate, if we have only one possible fit partner. Then, we add all other segments sharing more or less the same parameters
-    if (segments[counterOuter].getStereoType() == AXIAL) {
+    if (segments[counterOuter].getStereoType() == StereoType_c::Axial) {
       if (numberOfPossibleFits > 0
           && highestChi2 > m_fittingMatrix.getParamMinimalChi2()) {
         B2DEBUG(100, "Highest Chi2 is " << highestChi2);
@@ -222,7 +222,7 @@ void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegm
       const CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
 
       // if it is axial, we can check the mean distance to the track in the xy-plane
-      if (stereoType == AXIAL) {
+      if (stereoType == StereoType_c::Axial) {
         double meanDistanceToTrack = 0;
 
         for (const CDCRecoHit2D& recoHit : recoSegment) {
@@ -241,7 +241,7 @@ void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegm
     }
 
     unsigned int numberOfInMatches = std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool { return s == FittingMatrix::SegmentStatus::IN_TRACK or s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; });
-    if (stereoType == AXIAL) {
+    if (stereoType == StereoType_c::Axial) {
       if (numberOfInMatches >= 1) {
 
         FittingMatrix::TrackCounter bestFitPartner = -1;
@@ -269,7 +269,7 @@ void NotAssignedHitsCombinerModule::findHarderCandidates(std::vector<CDCRecoSegm
     B2INFO("In: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::IN_TRACK; }));
     B2INFO("Mix: " << std::count_if(status.begin(), status.end(), [](FittingMatrix::SegmentStatus s) -> bool{ return s == FittingMatrix::SegmentStatus::MIX_WITH_TRACK; }));
 
-    B2INFO("Axial: " << (recoSegment.getStereoType() == AXIAL));
+    B2INFO("Axial: " << (recoSegment.getStereoType() == StereoType_c::Axial));
   }
 }
 
@@ -284,7 +284,7 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
 
   // Add the hits from the segment to the sz fit
   for (CDCRecoHit3D recoHit : trackCandidate) {
-    if (recoHit.getStereoType() != AXIAL) {
+    if (recoHit.getStereoType() != StereoType_c::Axial) {
       // we do not know the right-left information
       CDCWireHit cdcWireHit(recoHit.getWireHit());
       CDCRLWireHit cdcRLWireHit(cdcWireHit);

@@ -91,12 +91,12 @@ namespace Belle2 {
 
       /// Getter for the stereo type of the first segment.
       StereoType getStartStereoType() const
-      { return getStartSegment() == nullptr ? INVALID_STEREOTYPE : getStartSegment()->getStereoType(); }
+      { return getStartSegment() == nullptr ? StereoType_c::Invalid : getStartSegment()->getStereoType(); }
 
 
       /// Getter for the stereo type of the second segment.
       StereoType getEndStereoType() const
-      { return getEndSegment() == nullptr ? INVALID_STEREOTYPE : getEndSegment()->getStereoType(); }
+      { return getEndSegment() == nullptr ? StereoType_c::Invalid : getEndSegment()->getStereoType(); }
 
 
 

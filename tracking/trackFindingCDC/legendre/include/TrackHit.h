@@ -69,7 +69,7 @@ namespace Belle2 {
       inline double getSigmaDriftLength() const { return m_underlayingWireHit->getRefDriftLengthVariance(); }
 
       /** Returns true for a Hit in an axial layer, false for a Hit in a stereo layer. */
-      inline bool getIsAxial() const { return m_underlayingWireHit->getStereoType() == AXIAL; }
+      inline bool getIsAxial() const { return m_underlayingWireHit->getStereoType() == StereoType_c::Axial; }
 
       /** Returns position of forward wire end */
       inline Vector3D getForwardWirePosition() const { return m_underlayingWireHit->getWire().getSkewLine().forward3D(); }

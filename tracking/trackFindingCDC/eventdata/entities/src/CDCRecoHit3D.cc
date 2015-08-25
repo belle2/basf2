@@ -86,7 +86,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
 {
 
   StereoType stereoType = recoHit.getStereoType();
-  if (stereoType == AXIAL) {
+  if (stereoType == StereoType_c::Axial) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     FloatType perpS    = trajectory2D.calcPerpS(recoPos2D);
     FloatType z        = trajectorySZ.mapSToZ(perpS);
@@ -94,7 +94,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     Vector3D recoPos3D(recoPos2D, z);
     return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
 
-  } else if (stereoType == STEREO_U or stereoType == STEREO_V) {
+  } else if (stereoType == StereoType_c::StereoU or stereoType == StereoType_c::StereoV) {
     //the closest approach of a skew line to a helix
     //( in this case representated by the two trajectories )
     //can not be solved as a closed expression

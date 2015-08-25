@@ -112,12 +112,12 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo& rlInfo) const
 {
   const StereoType stereoType = getStereoType();
-  if (stereoType == STEREO_V or stereoType == STEREO_U) {
+  if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {
     const BoundSkewLine& skewLine = getWire().getSkewLine();
     const FloatType& signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(skewLine, signedDriftLength);
 
-  } else if (stereoType == AXIAL) {
+  } else if (stereoType == StereoType_c::Axial) {
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.

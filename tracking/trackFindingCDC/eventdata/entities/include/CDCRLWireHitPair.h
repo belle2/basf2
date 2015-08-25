@@ -88,7 +88,7 @@ namespace Belle2 {
 
       /// Getter for the common stereo type of the superlayer of the pair
       StereoType getStereoType() const
-      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoType() : INVALID_STEREOTYPE; }
+      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoType() : StereoType_c::Invalid; }
 
       /// Getter for the wire the first oriented wire hit is based on
       const CDCWire& getFromWire() const

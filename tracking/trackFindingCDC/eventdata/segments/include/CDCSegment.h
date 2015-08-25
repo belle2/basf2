@@ -36,7 +36,7 @@ namespace Belle2 {
 
       /// Returns the common stereo type of all tracking entities.
       /** This checks if all tracking entities are located in the same superlayer and \n
-       *  returns the stereo type of the later. Returns INVALID_STEREOTYPE if the superlayer \n
+       *  returns the stereo type of the later. Returns StereoType_c::Invalid if the superlayer \n
        *  is not shared among the tracking entities. */
       StereoType getStereoType() const
       { return TrackFindingCDC::getStereoType(*this); }

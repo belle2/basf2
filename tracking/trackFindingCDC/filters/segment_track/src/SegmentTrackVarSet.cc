@@ -51,7 +51,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("z_distance")>() = 0;
   var<named("theta_distance")>() = 0;
 
-  if (segment->getStereoType() == AXIAL) {
+  if (segment->getStereoType() == StereoType_c::Axial) {
     CDCTrajectory2D& trajectorySegment = segment->getTrajectory2D();
     if (not trajectoryTrack.isFitted()) {
       const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
@@ -83,7 +83,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack);
   Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack);
 
-  if (segment->getStereoType() != AXIAL) {
+  if (segment->getStereoType() != StereoType_c::Axial) {
     double forwardZ = front.getWire().getSkewLine().forwardZ();
     double backwardZ = front.getWire().getSkewLine().backwardZ();
 
@@ -132,15 +132,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   CDCObservations2D observationsNeigh;
 
   // Collect the observations
-  bool isAxialSegment = segment->getStereoType() != AXIAL;
+  bool isAxialSegment = segment->getStereoType() != StereoType_c::Axial;
 
   for (const CDCRecoHit3D& recoHit : *track) {
-    if (isAxialSegment and recoHit.getStereoType() == AXIAL) {
+    if (isAxialSegment and recoHit.getStereoType() == StereoType_c::Axial) {
       observationsFull.append(recoHit.getWireHit().getRefPos2D());
       if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) < 3) {
         observationsNeigh.append(recoHit.getWireHit().getRefPos2D());
       }
-    } else if (not isAxialSegment and recoHit.getStereoType() != AXIAL) {
+    } else if (not isAxialSegment and recoHit.getStereoType() != StereoType_c::Axial) {
       double s = recoHit.getPerpS();
       double z = recoHit.getRecoZ();
       observationsFull.append(s, z);
@@ -202,7 +202,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   // Do the fit
   var<named("fit_neigh")>() = 0;
   var<named("fit_full")>() = 0;
-  if (segment->getStereoType() == AXIAL) {
+  if (segment->getStereoType() == StereoType_c::Axial) {
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
     var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
   } else {
@@ -220,7 +220,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     var<named("fit_neigh")>() = -1;
   }
 
-  var<named("is_stereo")>() = segment->getStereoType() != AXIAL;
+  var<named("is_stereo")>() = segment->getStereoType() != StereoType_c::Axial;
   var<named("segment_size")>() = segment->size();
   var<named("track_size")>() = track->size();
   var<named("mean_hit_z_distance")>() = sum_hit_z_distance;

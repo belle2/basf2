@@ -29,7 +29,7 @@ CellWeight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<s
 
   CDCObservations2D observations;
 
-  bool isAxialSegment = train.front()->getSegment()->getStereoType() == AXIAL;
+  bool isAxialSegment = train.front()->getSegment()->getStereoType() == StereoType_c::Axial;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     if (isAxialSegment) {

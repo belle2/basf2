@@ -151,7 +151,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_RefCylindricalRVersusZInSuperLa
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireSuperLayer& wireSuperLayer : theWireTopology.getWireSuperLayers()) {
-    if (wireSuperLayer.getStereoType() == AXIAL) {
+    if (wireSuperLayer.getStereoType() == StereoType_c::Axial) {
       EXPECT_EQ(0.0, wireSuperLayer.getRefTanLambda());
     }
 

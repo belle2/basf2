@@ -129,12 +129,12 @@ namespace {
 }
 
 
-double CDCAxialStereoFusion::average(const TVectorD& startParameters,
-                                     const TMatrixDSym& startCovMatrix,
-                                     const TVectorD& endParameters,
-                                     const TMatrixDSym& endCovMatrix,
-                                     TVectorD& avgParameters,
-                                     TMatrixDSym& avgCovMatrix)
+FloatType CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                        const TMatrixDSym& startCovMatrix,
+                                        const TVectorD& endParameters,
+                                        const TMatrixDSym& endCovMatrix,
+                                        TVectorD& avgParameters,
+                                        TMatrixDSym& avgCovMatrix)
 {
   TMatrixDSym startInvCovMatrix = startCovMatrix;
   startInvCovMatrix.Invert();
@@ -153,14 +153,14 @@ double CDCAxialStereoFusion::average(const TVectorD& startParameters,
 }
 
 
-double CDCAxialStereoFusion::average(const TVectorD& startParameters,
-                                     const TMatrixDSym& startCovMatrix,
-                                     const TMatrixD& startAmbiguityMatrix,
-                                     const TVectorD& endParameters,
-                                     const TMatrixDSym& endCovMatrix,
-                                     const TMatrixD& endAmbiguityMatrix,
-                                     TVectorD& avgParameters,
-                                     TMatrixDSym& avgCovMatrix)
+FloatType CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                        const TMatrixDSym& startCovMatrix,
+                                        const TMatrixD& startAmbiguityMatrix,
+                                        const TVectorD& endParameters,
+                                        const TMatrixDSym& endCovMatrix,
+                                        const TMatrixD& endAmbiguityMatrix,
+                                        TVectorD& avgParameters,
+                                        TMatrixDSym& avgCovMatrix)
 {
   TMatrixD startAmbiguityMatrixTransposed = startAmbiguityMatrix;
   startAmbiguityMatrixTransposed.T();

@@ -55,6 +55,15 @@ namespace Belle2 {
       }
     }
 
+    void getMatrix(double M[16][16]) const
+    {
+      const float* A = m_matrixElement;
+      for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < i; j++) M[i][j] = M[j][i] = *A++;
+        M[i][i] = *A++;
+      }
+    }
+
     /** Setter method for waveform shape parameter */
 
     void setWaveformPar(size_t i, float value)
@@ -76,6 +85,13 @@ namespace Belle2 {
     {
       for (int i = 0; i < 10; i++)
         P[i] = (float) m_waveformPar[i];
+    }
+
+
+    void getWaveformParArray(double P[10]) const
+    {
+      for (int i = 0; i < 10; i++)
+        P[i] = m_waveformPar[i];
     }
 
 

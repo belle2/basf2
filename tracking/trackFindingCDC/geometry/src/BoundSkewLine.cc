@@ -14,32 +14,14 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-/// Constuctor for a skew line between forward and backward point
-BoundSkewLine::BoundSkewLine(const Vector3D& forwardIn,
-                             const Vector3D& backwardIn) :
-  m_refPos3D(backwardIn),
-  m_movePerZ((forwardIn.xy() - backwardIn.xy()) / (forwardIn.z() - backwardIn.z())),
-  m_forwardZ(forwardIn.z()),
-  m_backwardZ(backwardIn.z())
+BoundSkewLine::BoundSkewLine(const Vector3D& forward,
+                             const Vector3D& backward) :
+  m_refPos3D{(backward * forward.z() - forward * backward.z()) / (forward.z() - backward.z()) },
+  m_movePerZ{(forward.xy() - backward.xy()) / (forward.z() - backward.z())},
+  m_forwardZ{forward.z()},
+  m_backwardZ{backward.z()}
 {
-  //skew and reference position are not a one liner to be filled to the init list
-  //make some highschool math to get them
-
-  Vector3D vectorAlongLine = forwardIn - backwardIn;
-
-  FloatType weightForward  = forwardIn.dotXY(vectorAlongLine);
-  FloatType weightBackward = -backwardIn.dotXY(vectorAlongLine);
-
-  if (weightForward + weightBackward == 0) {
-    //line is aligned along the z axes us the position in the xy plane as the reference
-    //m_refPos3D was initialized as a copy of backwardIn so x, y are correct
-    m_refPos3D.setZ(0.0);
-
-  } else {
-    vectorAlongLine *= (weightBackward / (weightForward + weightBackward));
-    //m_refPos3D was initialized as a copy of backwardIn
-    m_refPos3D += vectorAlongLine;
-  }
+  B2ASSERT("Wire reference position is not at 0", m_refPos3D.z() == 0);
 }
 
 BoundSkewLine BoundSkewLine::movedBy(const Vector3D& offset) const

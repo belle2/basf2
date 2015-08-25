@@ -62,24 +62,26 @@ namespace Belle2 {
       int ng = m_topgp->getNgaussTTS();
       double sigmaTDC = m_topgp->getELjitter();
       if (ng > 0) {
-        double frac[ng], mean[ng], sigma[ng];
+        vector<float> frac, mean, sigma;
         for (int i = 0; i < ng; i++) {
-          frac[i] = m_topgp->getTTSfrac(i);
-          mean[i] = m_topgp->getTTSmean(i);
-          sigma[i] = m_topgp->getTTSsigma(i);
-          sigma[i] = sqrt(sigma[i] * sigma[i] + sigmaTDC * sigmaTDC);
+          frac.push_back((float) m_topgp->getTTSfrac(i));
+          mean.push_back((float) m_topgp->getTTSmean(i));
+          double sigmaTTS = m_topgp->getTTSsigma(i);
+          sigma.push_back((float) sqrt(sigmaTTS * sigmaTTS + sigmaTDC * sigmaTDC));
         }
-        setTTS(ng, frac, mean, sigma);
+        setTTS(ng, frac.data(), mean.data(), sigma.data());
       }
 
       int size = m_topgp->getNpointsQE();
       if (size > 0) {
-        double Wavelength[size], QE[size];
+        vector<float> Wavelength, QE;
         for (int i = 0; i < size; i++) {
-          QE[i] = m_topgp->getQE(i);
-          Wavelength[i] = m_topgp->getLambdaFirst() + m_topgp->getLambdaStep() * i;
+          QE.push_back((float) m_topgp->getQE(i));
+          float wl = m_topgp->getLambdaFirst() + m_topgp->getLambdaStep() * i;
+          Wavelength.push_back(wl);
         }
-        setQE(Wavelength, QE, size, m_topgp->getColEffi() * m_topgp->getELefficiency());
+        setQE(Wavelength.data(), QE.data(), size,
+              m_topgp->getColEffi() * m_topgp->getELefficiency());
       }
 
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth(), m_topgp->getTDCoffset());

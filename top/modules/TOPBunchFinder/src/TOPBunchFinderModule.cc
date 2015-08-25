@@ -155,12 +155,12 @@ namespace Belle2 {
 
     // create working variables
 
+    std::vector<double> t0;
+    std::vector<double> logL;
     int n = 2 * m_bunchHalfRange + 1;
-    double t0[n];
-    double logL[n];
     for (int i = 0; i < n; i++) {
-      t0[i] = (i - m_bunchHalfRange) * m_bunchTimeSep;
-      logL[i] = 0;
+      t0.push_back((i - m_bunchHalfRange) * m_bunchTimeSep);
+      logL.push_back(0);
     }
     int numTrk = 0;
     int usedTrk = 0;

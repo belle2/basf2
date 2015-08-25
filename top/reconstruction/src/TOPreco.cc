@@ -24,11 +24,11 @@ namespace Belle2 {
     {
       data_clear_();
       rtra_clear_();
-      float masses[Num];
+      std::vector<float> masses;
       for (int i = 0; i < Num; i++) {
-        masses[i] = (float) Masses[i];
+        masses.push_back((float) Masses[i]);
       }
-      rtra_set_hypo_(&Num, masses);
+      rtra_set_hypo_(&Num, masses.data());
       float b = (float) BkgPerQbar; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
       setPDFoption(c_Optimal); // default option
@@ -130,9 +130,9 @@ namespace Belle2 {
     void TOPreco::getLogL(int Size, double LogL[], double ExpNphot[], int& Nphot)
     {
       int K = 1;
-      float logl[Size], sfot[Size];
+      std::vector<float> logl(Size), sfot(Size);
       int Flag, MTRA, REF;
-      rtra_get_(&K, logl, sfot, &Size, &Nphot, &Flag, &MTRA, &REF);
+      rtra_get_(&K, logl.data(), sfot.data(), &Size, &Nphot, &Flag, &MTRA, &REF);
       for (int i = 0; i < Size; i++) {
         LogL[i] = logl[i];
         ExpNphot[i] = sfot[i];
@@ -155,11 +155,11 @@ namespace Belle2 {
 
     void TOPreco::dumpLogL(int Size)
     {
-      double logl[Size], sfot[Size];
-      int hypid[Size];
+      std::vector<double> logl(Size), sfot(Size);
+      std::vector<int> hypid(Size);
       int Nphot;
-      getLogL(Size, logl, sfot, Nphot);
-      rtra_get_hypid_(&Size, hypid);
+      getLogL(Size, logl.data(), sfot.data(), Nphot);
+      rtra_get_hypid_(&Size, hypid.data());
 
       int i_max = 0;
       double logl_max = logl[0];

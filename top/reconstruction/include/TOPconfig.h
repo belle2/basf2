@@ -94,15 +94,9 @@ namespace Belle2 {
      * @param Mean mean values of Gaussian terms
      * @param Sigma sigma values of Gaussian terms
      */
-    inline void setTTS(int ng, double Frac[], double Mean[], double Sigma[])
+    inline void setTTS(int ng, float Frac[], float Mean[], float Sigma[])
     {
-      float frac[ng], t0[ng], sig[ng];
-      for (int i = 0; i < ng; i++) {
-        frac[i] = (float) Frac[i];
-        t0[i] = (float) Mean[i];
-        sig[i] = (float) Sigma[i];
-      }
-      set_tts_(&ng, frac, t0, sig);
+      set_tts_(&ng, Frac, Mean, Sigma);
     }
 
     /**
@@ -123,15 +117,10 @@ namespace Belle2 {
      * @param Size array size
      * @param CE electron collection efficiency
      */
-    inline void setQE(double Wavelength[], double QE[], int Size, double CE)
+    inline void setQE(float Wavelength[], float QE[], int Size, double CE)
     {
-      float lam[Size], qef[Size];
-      for (int i = 0; i < Size; i++) {
-        lam[i] = (float) Wavelength[i];
-        qef[i] = (float) QE[i];
-      }
       float ce = (float) CE;
-      set_qeffi_(lam, qef, &Size, &ce);
+      set_qeffi_(Wavelength, QE, &Size, &ce);
     }
 
     /**

@@ -108,33 +108,20 @@ namespace Belle2 {
       sortedDigits[feemap->index].push_back(&digit);
     }
 
-    unsigned sortedDigitsMaxsize = 0;
-    for (int i = 0; i < mapSize; i++) {
-      unsigned size = sortedDigits[i].size();
-      if (size > sortedDigitsMaxsize) sortedDigitsMaxsize = size;
-    }
-
-    int bufferDim = 1 + sortedDigitsMaxsize; // 1 header word + 1 data word per digit
-    int buffer[4][bufferDim];
-
     for (const auto& copperID : mapper.getCopperIDs()) {
-      int bufferSize[4] = {0, 0, 0, 0};
+      vector<int> Buffer[4];
       for (int finesse = 0; finesse < 4; finesse++) {
-        auto* buf = buffer[finesse];
-        auto& i = bufferSize[finesse];
         const auto* feemap = mapper.getMapFromCopper(copperID, finesse);
         if (!feemap) continue;
         unsigned scrodID = feemap->scrodID;
         unsigned dataFormat = 1; // production data -> TODO: use enum
         unsigned version = 0;
-        buf[i] = scrodID + (version << 16) + (dataFormat << 24);
-        i++; // one header word
+        Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
         for (const auto& digit : sortedDigits[feemap->index]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
           unsigned chan = digit->getHardwareChannelID() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();
-          buf[i] = tdc + (chan << 16) + (flags << 24);
-          i++; // one data word per digit
+          Buffer[finesse].push_back(tdc + (chan << 16) + (flags << 24));
         }
       }
       RawCOPPERPackerInfo info;
@@ -151,10 +138,10 @@ namespace Belle2 {
       info.type_of_data = 0;
 
       auto* raw = rawData.appendNew();
-      raw->PackDetectorBuf(buffer[0], bufferSize[0],
-                           buffer[1], bufferSize[1],
-                           buffer[2], bufferSize[2],
-                           buffer[3], bufferSize[3],
+      raw->PackDetectorBuf(Buffer[0].data(), Buffer[0].size(),
+                           Buffer[1].data(), Buffer[1].size(),
+                           Buffer[2].data(), Buffer[2].size(),
+                           Buffer[3].data(), Buffer[3].size(),
                            info);
 
     }

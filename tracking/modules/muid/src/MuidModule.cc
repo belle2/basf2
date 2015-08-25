@@ -302,14 +302,20 @@ void MuidModule::initialize()
   StoreArray<Track> tracks(m_TracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
   StoreArray<MuidHit> muidHits(m_MuidHitsColName);
+  StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
+  StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
   StoreArray<ExtHit> extHits(m_ExtHitsColName);
   StoreArray<KLMCluster> klmClusters(m_KLMClustersColName);
   muids.registerInDataStore();
   muidHits.registerInDataStore();
+  bklmHits.registerInDataStore();
+  eklmHits.registerInDataStore();
   extHits.registerInDataStore();
   klmClusters.registerInDataStore();
   tracks.registerRelationTo(muids);
   tracks.registerRelationTo(muidHits);
+  tracks.registerRelationTo(bklmHits);
+  tracks.registerRelationTo(eklmHits);
   tracks.registerRelationTo(extHits);
   tracks.registerRelationTo(klmClusters);
 
@@ -727,7 +733,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     if (findBarrelIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
       point.covariance = fromG4eToPhasespace(state);
-      if (findMatchingBarrelHit(point)) {
+      if (findMatchingBarrelHit(point, track)) {
         m_ExtLayerPattern |= (0x00000001 << point.layer);
         if (m_LastBarrelExtLayer < point.layer) {
           m_LastBarrelExtLayer = point.layer;
@@ -761,7 +767,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     if (findEndcapIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
       point.covariance = fromG4eToPhasespace(state);
-      if (findMatchingEndcapHit(point)) {
+      if (findMatchingEndcapHit(point, track)) {
         m_ExtLayerPattern |= (0x00008000 << point.layer);
         if (m_LastEndcapExtLayer < point.layer) {
           m_LastEndcapExtLayer = point.layer;
@@ -880,7 +886,7 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
 
 }
 
-bool MuidModule::findMatchingBarrelHit(Point& point)
+bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
 
 {
 
@@ -942,13 +948,19 @@ bool MuidModule::findMatchingBarrelHit(Point& point)
       localVariance[1] = m_BarrelZStripVariance[point.layer];
     }
     adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
-    if (point.chi2 >= 0.0) hit->isOnTrack(true);
+    if (point.chi2 >= 0.0) {
+      hit->isOnTrack(true);
+      track->addRelationTo(hit);
+      const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
+      genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
+      tc->addHit(Const::EDetector::KLM, bestHit, hit->getLayer(), point.positionAtHitPlane.Mag());
+    }
   }
   return point.chi2 >= 0.0;
 
 }
 
-bool MuidModule::findMatchingEndcapHit(Point& point)
+bool MuidModule::findMatchingEndcapHit(Point& point, const Track* /* track */)
 {
 
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
@@ -983,7 +995,16 @@ bool MuidModule::findMatchingEndcapHit(Point& point)
     point.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
     adjustIntersection(point, localVariance, hit->getPosition(), point.position);
-    // DIVOT no such function! if (point.chi2 >= 0.0) hit->isOnTrack(true);
+    if (point.chi2 >= 0.0) {
+      // DIVOT no such function for EKLM! hit->isOnTrack(true);
+      /* DIVOT not yet for EKLM alignment!
+      StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
+      int nBarrelHits = bklmHits.getEntries();
+      const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
+      genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
+      tc->addHit(Const::EDetector::KLM, bestHit + nBarrelHits, hit->getLayer(), point.positionAtHitPlane.Mag());
+      */
+    }
   }
   return point.chi2 >= 0.0;
 

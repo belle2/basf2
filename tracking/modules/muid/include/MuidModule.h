@@ -178,10 +178,10 @@ namespace Belle2 {
     bool findEndcapIntersection(const TVector3&, Point&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
-    bool findMatchingBarrelHit(Point&);
+    bool findMatchingBarrelHit(Point&, const Track*);
 
     //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
-    bool findMatchingEndcapHit(Point&);
+    bool findMatchingEndcapHit(Point&, const Track*);
 
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&, const TVector3&);

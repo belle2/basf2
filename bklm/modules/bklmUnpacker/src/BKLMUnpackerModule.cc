@@ -308,8 +308,8 @@ int BKLMUnpackerModule::electCooToInt(int copper, int finesse, int lane, int axi
 ///
 ///}
 ///
-///
-void BKLMUnpackerModule::intToElectCooendRun()
+
+void BKLMUnpackerModule::endRun()
 {
 
 }

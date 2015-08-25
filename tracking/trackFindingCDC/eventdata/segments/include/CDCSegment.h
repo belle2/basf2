@@ -41,6 +41,10 @@ namespace Belle2 {
       StereoType getStereoType() const
       { return TrackFindingCDC::getStereoType(*this); }
 
+      /// Indicator if the underlying wires are axial.
+      bool isAxial() const
+      { return getStereoType() == StereoType_c::Axial; }
+
       /** Returns the common super layer id of all stored tracking entities
        *  This checks if all items are located in the same superlayer and
        *  returns the superlayer id of the later. Returns INVALID_ISUPERLAYER if the superlayer

@@ -132,6 +132,9 @@ namespace Belle2 {
       StereoType getStereoType() const
       { return isValidISuperLayer(getISuperLayer()) ? getStartRLWireHit().getStereoType() : StereoType_c::Invalid; }
 
+      /// Indicator if the underlying wires are axial.
+      bool isAxial() const
+      { return getStereoType() == StereoType_c::Axial; }
 
       /// Getter for the wire the first oriented wire hit is based on
       const CDCWire& getStartWire() const

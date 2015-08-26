@@ -4,7 +4,6 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
-
       SUBROUTINE TOP_RECO
 
       IMPLICIT NONE
@@ -608,13 +607,13 @@
 
       IF(BETA_RQ.GT.0) THEN
          IF(BETA_RQ.NE.BETA.OR..NOT.FORCE_SCAN) THEN
-            PRINT*,'construct PDF for Beta=',BETA_RQ
+cc            PRINT*,'construct PDF for Beta=',BETA_RQ
             CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
       ELSE
          IF(MASS.NE.MASS_HYP.OR..NOT.FORCE_SCAN) THEN
-            PRINT*,'construct PDF for Mass=',MASS
+cc            PRINT*,'construct PDF for Mass=',MASS
             CALL SET_PHTIMES(.TRUE.)
             CALL TOP_SET_PDF(MASS,RTRA_T0(1))
          ENDIF
@@ -646,5 +645,6 @@
       PDF_OPT=OPT
 
       END
+
 
 

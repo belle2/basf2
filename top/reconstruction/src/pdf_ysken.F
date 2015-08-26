@@ -4,7 +4,6 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
-
       SUBROUTINE PDF_YSKEN(I0,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
       
       IMPLICIT NONE

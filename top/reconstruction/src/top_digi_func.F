@@ -4,7 +4,6 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !-----------------------------------------------------------------------
 
-
       INTEGER FUNCTION ICH_DIGI(XH,YH,LR,M) ! chID from x,y,lr,m
 
       IMPLICIT NONE

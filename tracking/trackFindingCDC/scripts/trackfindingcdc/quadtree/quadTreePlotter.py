@@ -45,33 +45,23 @@ class QuadTreePlotter(basf2.Module):
         input_file = ROOT.TFile(self.file_name_of_quad_tree_content)
         hist = input_file.Get("hist")
 
-        xList = list()
-        yList = list()
-
         xAxis = hist.GetXaxis()
         yAxis = hist.GetYaxis()
 
-        length_list = []
-        width_list = []
-        height_list = []
-        x_list = []
-        y_list = []
+        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in xrange(1, xAxis.GetNbins() + 2)])
+        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in xrange(1, yAxis.GetNbins() + 2)])
 
-        for iX in xrange(1, xAxis.GetNbins() + 1):
-            for iY in xrange(1, yAxis.GetNbins() + 1):
-                length_list += [hist.GetBinContent(iX, iY)]
-                width_list += [xAxis.GetBinWidth(iX)]
-                height_list += [yAxis.GetBinWidth(iY)]
-                y_list += [yAxis.GetBinLowEdge(iY)]
-                x_list += [xAxis.GetBinLowEdge(iX)]
+        l = np.array([[hist.GetBinContent(iX, iY) for iY in xrange(1, yAxis.GetNbins() + 1)]
+                      for iX in xrange(1, xAxis.GetNbins() + 1)])
 
-        cm = plt.get_cmap('Blues')
-        cNorm = colors.Normalize(vmin=0, vmax=max(length_list))
-        scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+        cmap = sb.cubehelix_palette(8, start=2, rot=0, dark=0, light=1, reverse=False, as_cmap=True)
 
-        for length, height, width, x, y in zip(length_list, height_list, width_list, x_list, y_list):
-            patch = patches.Rectangle((x, y), width=width, height=height, facecolor=scalarMap.to_rgba(length), lw=1)
-            plt.gca().add_patch(patch)
+        plt.gca().pcolorfast(x_edges, y_edges, l.T, cmap=cmap)
+
+        x_labels = ["{1:0.{0}f}".format(int(not float(x).is_integer()), x) if i % 4 == 0 else "" for i, x in enumerate(x_edges)]
+        plt.xticks(x_edges, x_labels)
+        y_labels = ["{1:0.{0}f}".format(int(not float(y).is_integer()), y) if i % 4 == 0 else "" for i, y in enumerate(y_edges)]
+        plt.yticks(y_edges, y_labels)
 
     def save_and_show_file(self):
         """
@@ -87,12 +77,9 @@ class QuadTreePlotter(basf2.Module):
         Initialize the figure with the plot ranges
         We need to implement axes labels later!
         """
-
         plt.clf()
         plt.xlim(self.range_x_min, self.range_x_max)
         plt.ylim(self.range_y_min, self.range_y_max)
-        plt.xticks([])
-        plt.yticks([])
 
     def event(self):
         """
@@ -440,9 +427,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                 for recoHit in track.items():
                     self.plot_hit_line(recoHit, color=map[id % len(map)])
 
-        if self.draw_last_track:
-            if len(track_vector) == 0:
-                continue
+        if self.draw_last_track and len(track_vector) != 0:
 
             last_track = track_vector[-1]
             trajectory = last_track.getStartTrajectory3D().getTrajectory2D()
@@ -451,10 +436,9 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
                 recoHit = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(rlWireHit, trajectory)
 
-                if (recoHit.getStereoType() == 0 or
-                        (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) and
-                         self.delete_bad_hits) or
-                        (not recoHit.isInCDC() and self.delete_bad_hits)):
+                if (self.delete_bad_hits and
+                    (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
+                     not recoHit.isInCDC())):
                     continue
 
                 if recoHit in last_track.items():
@@ -466,4 +450,6 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                         color = "gray"
                 self.plot_hit_line(recoHit, color)
 
+        plt.xlabel(r"$\tan \ \lambda$")
+        plt.ylabel(r"$z_0$")
         self.save_and_show_file()

@@ -2,17 +2,19 @@ import numpy as np
 import os
 from root_pandas import read_root
 
+import matplotlib.pyplot as plt
+import pandas as pd
+
 
 class TrackingValidationResult:
     # Plotting imports
-    import matplotlib.pyplot as plt
-    import seaborn as sb
-    import pandas as pd
 
     #: This class represents a loaded validation root file.
     #: It has methods for plotting the mostly needed graphs
 
     def __init__(self, filename, label=None, color_index=0, additional_information=None):
+        import seaborn as sb
+
         sb.set()
 
         #: The root filename

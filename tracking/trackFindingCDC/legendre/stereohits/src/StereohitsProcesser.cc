@@ -105,7 +105,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   };
 
   StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
-                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-200, 200));
+                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-100, 100));
   StereoHitQuadTreeProcessor oldQuadTree(m_level, childRanges, m_param_debugOutput);
   oldQuadTree.provideItemsSet(hitsVector);
   oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);

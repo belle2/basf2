@@ -372,7 +372,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         self.range_x_min = -2 - np.sqrt(3)
         self.range_x_max = 2 + np.sqrt(3)
 
-        self.range_y_min = -200
+        self.range_y_min = -100
         self.range_y_max = -self.range_y_min
 
         self.init_plotting()

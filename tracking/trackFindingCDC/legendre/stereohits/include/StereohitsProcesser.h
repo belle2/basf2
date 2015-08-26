@@ -25,8 +25,8 @@ namespace Belle2 {
     class StereohitsProcesser {
     public:
       /** Create a quad tree */
-      explicit StereohitsProcesser(unsigned int level, bool debugOutput = false) :
-        m_param_debugOutput(debugOutput), m_level(level), m_newQuadTree(level)
+      explicit StereohitsProcesser(unsigned int level, bool debugOutput = false, bool checkForB2BTracks = true) :
+        m_param_debugOutput(debugOutput), m_level(level), m_checkForB2BTracks(checkForB2BTracks), m_newQuadTree(level)
       {
         // Prepare the hough algorithm
         m_newQuadTree.initialize();
@@ -74,6 +74,7 @@ namespace Belle2 {
 
       bool m_param_debugOutput; /// Flag to turn on debug output
       unsigned int m_level; /// Maximum level of the quad tree search.
+      bool m_checkForB2BTracks; /// Set to false to skip the B2B check (good for curlers)
       HitZ0TanLambdaLegendre<const HitType*> m_newQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
 
 

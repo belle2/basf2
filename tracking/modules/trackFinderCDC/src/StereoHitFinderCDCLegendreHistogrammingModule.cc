@@ -17,24 +17,28 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 {
   setDescription("Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.");
 
-  addParam("DebugOutput",
+  addParam("debugOutput",
            m_param_debugOutput,
            "Flag to turn on debug output.",
            false);
 
-  addParam("QuadTreeLevel",
+  addParam("quadTreeLevel",
            m_param_quadTreeLevel,
            "The number of levels for the quad tree search.",
            static_cast<unsigned int>(6));
 
-  addParam("MinimumHitsInQuadtree",
+  addParam("minimumHitsInQuadtree",
            m_param_minimumHitsInQuadTree,
            "The minimum number of hits in a quad tree bin to be called as result.",
            static_cast<unsigned int>(5));
 
-  addParam("UseOldImplementation",
+  addParam("useOldImplementation",
            m_param_useOldImplementation,
            "Whether to use the old implementation o the quad tree.",
+           true);
+
+  addParam("checkForB2BTracks", m_param_checkForB2BTracks,
+           "Set to false to skip the check for back-2-back tracks (good for cosmics)",
            true);
 }
 

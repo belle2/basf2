@@ -34,7 +34,7 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
     charge = -1;
 
   if (trajectory2D.getChargeSign() != charge)
-    return true;
+    return false;
 
   return true;
 }
@@ -48,7 +48,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
   hitsVector.reserve(wireHitTopology.getRLWireHits().size());
 
   for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
-    if (rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
+    if (not m_checkForB2BTracks or rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
       const CDCWire& wire = rlWireHit.getWire();
       const double forwardZ = wire.getSkewLine().forwardZ();
       const double backwardZ = wire.getSkewLine().backwardZ();

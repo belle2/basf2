@@ -17,7 +17,7 @@ scan = {
     'scanTheta': [90.0, 0.05, 10],
     'scanPhi': [0.0, 0.05, 10],
     'scanT0': 20,
-    }
+}
 t0 = 1.5  # offset added to photon times when reading ntuple
 bkg = 4  # number of background hits per event
 pdfRange = {'tMin': 10.0, 'tMax': 55.0, 'numBins': 900}
@@ -71,4 +71,3 @@ process(main)
 
 # Print call statistics
 print statistics
-

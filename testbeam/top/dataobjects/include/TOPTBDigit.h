@@ -30,7 +30,8 @@ namespace Belle2 {
       m_channelID(0),
       m_hardChannelID(0),
       m_TDC(0),
-      m_ADC(0) {
+      m_ADC(0)
+    {
     }
 
     /** Full constructor
@@ -48,7 +49,8 @@ namespace Belle2 {
       m_channelID(channelID),
       m_hardChannelID(hardchID),
       m_TDC(TDC),
-      m_ADC(ADC) {
+      m_ADC(ADC)
+    {
     }
 
     /** Get counter ID

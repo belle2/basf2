@@ -29,7 +29,7 @@ beam02 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0.5, 0.5],
     'zVertexParams': [125.25, 0.5],
-    }
+}
 
 # beam definition for experiment 3 (cosTheta=0.43)
 
@@ -47,7 +47,7 @@ beam03 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [1.31, 0.5],
     'zVertexParams': [55.40, 0.5],
-    }
+}
 
 # beam definition for experiment 4 (cosTheta=0.36)
 
@@ -65,7 +65,7 @@ beam04 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [-19.90, 0.5],
     'zVertexParams': [63.80, 0.5],
-    }
+}
 
 # specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------

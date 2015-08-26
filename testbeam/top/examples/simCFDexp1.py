@@ -43,7 +43,7 @@ beam = {
     'xVertexParams': [x0, x0],
     'yVertexParams': [y0 - dy, y0 + dy],
     'zVertexParams': [z0 - dz, z0 + dz],
-    }
+}
 
 outfile = 'LEPS-CFDbeamtest01.root'
 dbFile = 'testbeam/top/LEPS2013-6/TOP-CFD.xml'

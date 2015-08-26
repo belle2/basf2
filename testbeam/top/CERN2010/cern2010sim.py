@@ -21,11 +21,11 @@ beamRef = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0, 0.5],
     'zVertexParams': [87.5, 0.5],
-    }
+}
 
 # beam definition for cosTheta=0.5 runs (269 - 288)
 
-beam05 = {  #          'thetaParams': [60, 0],
+beam05 = {  # 'thetaParams': [60, 0],
             #          'phiParams': [0, 0],
             #          'zVertexParams': [78, 0.58]
     'pdgCodes': [211],
@@ -41,7 +41,7 @@ beam05 = {  #          'thetaParams': [60, 0],
     'xVertexParams': [0, 0],
     'yVertexParams': [0, 0.5],
     'zVertexParams': [76.21, 0.58],
-    }
+}
 
 # beam definition for cosTheta=0.3 runs (289 - 306)
 
@@ -59,7 +59,7 @@ beam03 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0, 0.5],
     'zVertexParams': [78, 0.52],
-    }
+}
 
 # beam definition for cosTheta=0.0 runs (307 - 312)
 
@@ -77,7 +77,7 @@ beam00 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0, 0.5],
     'zVertexParams': [78, 0.5],
-    }
+}
 
 # beam definition for cosTheta=0.0, x=-15 cm runs (307 - 312)
 
@@ -95,7 +95,7 @@ beam00_x15 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [15, 0.5],
     'zVertexParams': [78, 0.5],
-    }
+}
 
 # specify here beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------

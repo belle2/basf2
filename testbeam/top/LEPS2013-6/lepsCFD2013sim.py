@@ -38,7 +38,7 @@ beam01 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0.0, 0.15],
     'zVertexParams': [124.8, 0.15],
-    }
+}
 
 # beam definition for exp002 (cosTheta=0.39), new alignment with basf2 (2013/9/5)
 
@@ -56,7 +56,7 @@ beam02 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [0.0, 0.15],
     'zVertexParams': [73.4, 0.15],
-    }
+}
 
 # beam definition for exp003 (cosTheta=0.39, impact close to bar side)
 # new alignment with basf2 (2013/9/5)
@@ -75,7 +75,7 @@ beam03 = {
     'xVertexParams': [0, 0],
     'yVertexParams': [-19.2, 0.15],
     'zVertexParams': [74.6, 0.15],
-    }
+}
 
 # specify here the beam setup, number of events to simulate and output file
 # -------------------------------------------------------------------------

@@ -33,6 +33,7 @@
 #include <top/dataobjects/TOPDigit.h>
 
 #include <TVector3.h>
+#include <boost/multi_array.hpp>
 
 using namespace std;
 
@@ -297,8 +298,10 @@ namespace Belle2 {
 
     // fill 2D array of log Likelihoods
 
-    double logL[scanX.nPoints][scanY.nPoints];
-    double T0[scanX.nPoints][scanY.nPoints];
+    //    double logL[scanX.nPoints][scanY.nPoints];
+    //    double T0[scanX.nPoints][scanY.nPoints];
+    boost::multi_array<double, 2> logL(boost::extents[scanX.nPoints][scanY.nPoints]);
+    boost::multi_array<double, 2> T0(boost::extents[scanX.nPoints][scanY.nPoints]);
     for (int i = 0; i < scanX.nPoints; i++) {
       for (int j = 0; j < scanY.nPoints; j++) {
         X = scanX.getPoint(i);
@@ -402,7 +405,8 @@ namespace Belle2 {
     // make PDF
 
     Scan time(m_numBins, m_tMin, m_tMax, m_scanT0);
-    double pdf[m_numChannels][time.nPoints];
+    //    double pdf[m_numChannels][time.nPoints];
+    boost::multi_array<double, 2> pdf(boost::extents[m_numChannels][time.nPoints]);
     for (int ich = 0; ich < m_numChannels; ich++) {
       for (int i = 0; i < time.nPoints; i++) {
         double t = time.getPoint(i);
@@ -413,7 +417,7 @@ namespace Belle2 {
     // calculate normalizations
 
     Scan scanT0(m_scanT0, time.step);
-    double norm[scanT0.nPoints];
+    std::vector<double> norm(scanT0.nPoints);
 
     for (int k = 0; k < scanT0.nPoints; k++) {
       norm[k] = 0;
@@ -436,7 +440,7 @@ namespace Belle2 {
 
     // calculate log likelihood
 
-    double logL[scanT0.nPoints];
+    std::vector<double> logL(scanT0.nPoints);
 
     for (int k = 0; k < scanT0.nPoints; k++) {
       logL[k] = 0;
@@ -481,7 +485,8 @@ namespace Belle2 {
   double TOPbeamAlignmentModule::getLogLikelihood(TOP::TOPreco& reco, double t0)
   {
     Scan time(m_numBins, m_tMin, m_tMax);
-    double pdf[m_numChannels][time.nPoints];
+    //    double pdf[m_numChannels][time.nPoints];
+    boost::multi_array<double, 2> pdf(boost::extents[m_numChannels][time.nPoints]);
     double norm = 0;
     for (int ich = 0; ich < m_numChannels; ich++) {
       for (int i = 0; i < time.nPoints; i++) {

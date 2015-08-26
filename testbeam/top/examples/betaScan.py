@@ -27,7 +27,7 @@ beam = {  # for CFD runs of exp001
     'p': 2.12,
     'theta': 89.639,
     'phi': 0.057,
-    }
+}
 lepsInput.param(beam)
 lepsInput.param('t0', 1.51)  # for CFD runs of exp001
 # print_params(lepsInput)
@@ -70,4 +70,3 @@ process(main)
 
 # Print call statistics
 print statistics
-

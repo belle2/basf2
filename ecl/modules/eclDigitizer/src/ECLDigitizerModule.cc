@@ -10,6 +10,7 @@
 
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/shaperdsp.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
@@ -39,16 +40,16 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-void ECLDigitizerModule::signalsample_t::InitSample(const double* MP)
+void ECLDigitizerModule::signalsample_t::InitSample(const double* MPd)
 {
   const int N = m_ns * m_nl;
-  const double dt = m_tick / m_ns;
+  vector<double> MP(MPd, MPd + 10);
+  ShaperDSP_t dsp(MP);
+  dsp.settimestride(m_tick / m_ns);
+  dsp.fillarray(0.0, N, m_ft);
+
   double sum = 0;
-  for (int i = 0; i < N; i++) {
-    double a = ShaperDSP(i * dt, MP);
-    m_ft[i] = a;
-    sum += a;
-  }
+  for (int i = 0; i < N; i++) sum += m_ft[i];
   m_sumscale = m_ns / sum;
 }
 
@@ -400,9 +401,10 @@ void ECLDigitizerModule::repack(const ECLWFAlgoParams& eclWFAlgo, algoparams_t& 
 
 void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const ECLWFAlgoParams& eclWFAlgo, fitparams_t& p)
 {
-  double ssd[16][16], MPd[10];
+  double ssd[16][16];
   eclWFData.getMatrix(ssd);
-  eclWFData.getWaveformParArray(MPd);
+  vector<double> MP(10);
+  eclWFData.getWaveformParArray(MP.data());
 
   // shape function parameters
   int ia = 1 << eclWFAlgo.getka();
@@ -417,33 +419,26 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg41 = p.fg41;
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
-  for (int k = 0; k < 2 * m_ndt; k++) { // calculate fit parameters around 0 +- 1 ADC tick
-    double t0 = m_tick - (k + 1) * (m_tick / m_ndt); // range [-m_tick ... m_tick*(1-1/m_ndt)]
-
-    double f0[16], f1[16];
-    const double eps = 0.001 * m_tick; // for derivative calculation
-    for (int j = 0; j < 16; j++) {
-      double t = j * m_tick - t0;
-
-      double fx = ShaperDSP(t      , MPd);
-      double fp = ShaperDSP(t + eps, MPd);
-      double fm = ShaperDSP(t - eps, MPd);
-      f0[j] =  fx;
-      f1[j] = (fp - fm) / (2 * eps);
-    }
+  ShaperDSP_t dsp(MP);
+  dsp.settimestride(m_tick);
+  dsp.setseedoffset(m_tick / m_ndt);
+  dsp.settimeseed(-(m_tick - (m_tick / m_ndt)));
+  vector<dd_t> f(16);
+  for (int k = 0; k < 2 * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- 1 ADC tick
+    dsp.fillvector(f);
 
     double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
     double sg0[16], sg1[16], sg2[16];
     for (int j = 0; j < 16; j++) {
       double g0 = 0, g1 = 0, g2 = 0;
       for (int i = 0; i < 16; i++) {
-        g0 += ssd[j][i] * f0[i];
-        g1 += ssd[j][i] * f1[i];
+        g0 += ssd[j][i] * f[i].first;
+        g1 += ssd[j][i] * f[i].second;
         g2 += ssd[j][i];
       }
-      g0g0 += g0 * f0[j];
-      g0g1 += g1 * f0[j];
-      g1g1 += g1 * f1[j];
+      g0g0 += g0 * f[j].first;
+      g0g1 += g1 * f[j].first;
+      g1g1 += g1 * f[j].second;
       g0g2 += g0;
       g1g2 += g1;
       g2g2 += g2;
@@ -466,8 +461,8 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int i = 0; i < 16; i++) {
       double w = i ? 1.0 : 1. / 16.;
 
-      ref_f   [k][i] = lrint(f0[i] * ia * w);
-      ref_f1  [k][i] = lrint(f1[i] * ia * w * sd);
+      ref_f   [k][i] = lrint(f[i].first  * ia * w);
+      ref_f1  [k][i] = lrint(f[i].second * ia * w * sd);
 
       double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
       double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;

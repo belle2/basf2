@@ -520,7 +520,7 @@ void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>&
                                     const std::string& stroke,
                                     const std::string& strokeWidth)
 {
-  B2INFO("Drawing vector from DataStore: " << storeObjName)
+  B2INFO("Drawing vector from DataStore: " << storeObjName);
   if (storeVector) {
     std::vector<Item>& vector = *storeVector;
     B2INFO("with " << vector.size() << " entries");

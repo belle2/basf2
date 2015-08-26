@@ -121,16 +121,15 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         plot_dedx_data = np.linspace(data[self.dedx_column].min(), data[self.dedx_column].max(), 100)
         result_df = self.create_result_dataframe()
 
-        plt.plot(plot_dedx_data, self.dedx_estimator_function(plot_dedx_data), color="black", label="fitted")
-        plt.plot(result_df.dedx_bin_center, result_df.mu, marker="o", ls="", label="data points")
+        plt.plot(plot_dedx_data, self.dedx_estimator_function(plot_dedx_data), color="black", label="Fitted estimator")
         if self.use_sigma_for_result_fitting:
-            plt.plot(result_df.dedx_bin_center, result_df.mu + result_df.sigma, marker=".", ls="", color="green")
-            plt.plot(result_df.dedx_bin_center, result_df.mu - result_df.sigma, marker=".", ls="", color="green")
+            color = "black"
+            plt.errorbar(result_df.dedx_bin_center, result_df.mu, marker="o", ls="", label="Data Points", yerr=result_df.sigma)
 
         plt.ylim(0, 0.14)
         plt.xlabel("dEdX in ADC count/cm")
         plt.ylabel("p in GeV/c")
-        plt.legend()
+        plt.legend(frameon=True)
 
     def plot_grouped_result(self, data):
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)

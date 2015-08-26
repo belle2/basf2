@@ -40,6 +40,9 @@ namespace Belle2 {
       /// Constructor to taking a wire ID and a dummy position
       CDCGenHit(const WireID& wireID, const Vector2D& pos);
 
+      /// Constructor to taking a wire and a dummy position
+      CDCGenHit(const CDCWire* wire, const Vector2D& pos);
+
       /// Empty deconstructor
       ~CDCGenHit();
 
@@ -98,8 +101,11 @@ namespace Belle2 {
       const Vector2D& getDummyPos2D() const
       { return m_dummyPos; }
 
-    private:
+      /// The two dimensional dummy position
+      void setDummyPos2D(const Vector2D& dummyPos)
+      { m_dummyPos = dummyPos; }
 
+    private:
       const CDCWire* m_wire;  ///< Memory for the CDCWire reference
       Vector2D m_dummyPos; ///< Memory for the dummy position for distance measures
 

@@ -25,6 +25,12 @@ CDCGenHit::CDCGenHit(const WireID& wireID, const Vector2D& dummyPos):
   m_dummyPos(dummyPos)
 {;}
 
+CDCGenHit::CDCGenHit(const CDCWire* wire, const Vector2D& dummyPos):
+  m_wire(wire),
+  m_dummyPos(dummyPos)
+{;}
+
+
 
 CDCGenHit::~CDCGenHit()
 {

@@ -45,7 +45,8 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 /** Initialize the stereo quad trees */
 void StereoHitFinderCDCLegendreHistogrammingModule::initialize()
 {
-  m_stereohitsProcesser = new TrackFindingCDC::StereohitsProcesser(m_param_quadTreeLevel, m_param_debugOutput);
+  m_stereohitsProcesser = new TrackFindingCDC::StereohitsProcesser(m_param_quadTreeLevel, m_param_debugOutput,
+      m_param_checkForB2BTracks);
 
   TrackFinderCDCBaseModule::initialize();
 }

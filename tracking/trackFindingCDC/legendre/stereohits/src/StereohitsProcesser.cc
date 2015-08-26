@@ -19,6 +19,9 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
   if (rlWireHit.getStereoType() == StereoType_c::Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
 
+  if (not m_checkForB2BTracks)
+    return true;
+
   const Vector2D& center = trajectory2D.getGlobalCircle().center();
   double trackPhi = center.phi();
   double hitPhi = rlWireHit.getRefPos2D().phi();
@@ -48,7 +51,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
   hitsVector.reserve(wireHitTopology.getRLWireHits().size());
 
   for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
-    if (not m_checkForB2BTracks or rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
+    if (rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
       const CDCWire& wire = rlWireHit.getWire();
       const double forwardZ = wire.getSkewLine().forwardZ();
       const double backwardZ = wire.getSkewLine().backwardZ();

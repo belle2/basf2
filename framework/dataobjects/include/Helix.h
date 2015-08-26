@@ -251,6 +251,7 @@ namespace Belle2 {
 
 
   protected:
+  public:
     /** Calculate the jacobian matrix for the transport of the helix parameters,
      *  when moving the origin of the coordinate system to a new location.
      *  Does not update the helix parameters in any way.

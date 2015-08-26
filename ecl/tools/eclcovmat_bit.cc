@@ -389,11 +389,11 @@ void bit(int num, char* inputPath)
 
     if (0 == 0) {
       string filename(inputPath);
-      filename += "/corr";
+      //filename += "/corr";
       filename += to_string(num);
       filename += "/Binmcor";
       filename += to_string(ChN);
-
+      filename += "_L.dat";
       //      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", num, ChN);
 
       if ((BMcoIN = fopen(filename.c_str(), "rb")) == NULL) {

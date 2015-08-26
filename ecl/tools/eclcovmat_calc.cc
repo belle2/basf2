@@ -164,7 +164,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
   vector<double> inmt(mapmax, 0);
   int it;
   double A0;
-  cortyp = 43;
+  // cortyp = 43;
   double Nsigcut;
   Nsigcut = 3.5;
   delta = 0.;
@@ -244,7 +244,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
   for (Int_t i = 0; i < nevent; i++) {
     fChain.GetEntry(i);
-    if (i % 1000 == 0) { cout << " nevent=" << i << endl; }
+    if (i % 100 == 0) { cout << " nevent=" << i << endl; }
     for (icn = 0; icn < max; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
       index = 1;
       for (id = 0; id < 16; id++) {
@@ -314,7 +314,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
 
 //                  for(icn=0;icn<mapmax;icn++){  //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
-  for (icn = 0; icn < 12; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
+  for (icn = 0; icn < mapmax; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
 
 
     if (0 == 0) { // conventional comment
@@ -465,8 +465,8 @@ int main(int argc, char** argv)
   // second argument is input root file name
   // third argument is (existing) directory to put the output files (cor matrices)
   // fourth argument is the cut file name
-  assert(argc == 4);
-  matrix_cal(10, argv[1], argv[2], argv[3]);
+  assert(argc == 5);
+  matrix_cal(atoi(argv[1]), argv[2], argv[3], argv[4]);
 }
 
 

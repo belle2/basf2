@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/z0_zslope/HitZ0ZSlopeLegendre.h>
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
 
 #include <vector>
 
@@ -74,7 +74,7 @@ namespace Belle2 {
 
       bool m_param_debugOutput; /// Flag to turn on debug output
       unsigned int m_level; /// Maximum level of the quad tree search.
-      HitZ0ZSlopeLegendre<const HitType*> m_newQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
+      HitZ0TanLambdaLegendre<const HitType*> m_newQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
 
 
     };

@@ -20,23 +20,23 @@ namespace Belle2 {
     typedef DiscreteValue<float, Z0Tag> DiscreteZ0;
 
     /// Tag for z slope direction.
-    class ZSlopeTag;
+    class TanLambdaTag;
 
     /// Type for discrete float values in inverse z slope direction
-    typedef DiscreteValue<float, ZSlopeTag> DiscreteZSlope;
+    typedef DiscreteValue<float, TanLambdaTag> DiscreteTanLambda;
 
     /// Type for the container of the discrete values in z0 direction
     typedef DiscreteZ0::Array DiscreteZ0Array;
 
     /// Type for the container of the discrete values in inverse z slope direction
-    typedef DiscreteZSlope::Array DiscreteZSlopeArray;
+    typedef DiscreteTanLambda::Array DiscreteTanLambdaArray;
 
     /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    class Z0ZSlopeBox : public Box<DiscreteZ0, DiscreteZSlope> {
+    class Z0TanLambdaBox : public Box<DiscreteZ0, DiscreteTanLambda> {
 
     private:
       /// Type of the base class
-      using Super = Box<DiscreteZ0, DiscreteZSlope>;
+      using Super = Box<DiscreteZ0, DiscreteTanLambda>;
 
     public:
       /// Using the constructors of the base class
@@ -51,13 +51,13 @@ namespace Belle2 {
       const float& getUpperZ0() const
       { return *(getUpperBound<DiscreteZ0>()); }
 
-      /// Concise getter for the lower inverse z0 slope bound.
-      const float& getLowerZSlope() const
-      { return *(getLowerBound<DiscreteZSlope>()); }
+      /// Concise getter for the lower tan lambda bound.
+      const float& getLowerTanLambda() const
+      { return *(getLowerBound<DiscreteTanLambda>()); }
 
-      /// Concise getter for the lower inverse z0 slope bound.
-      const float& getUpperZSlope() const
-      { return *(getUpperBound<DiscreteZSlope>()); }
+      /// Concise getter for the lower tan lambda bound.
+      const float& getUpperTanLambda() const
+      { return *(getUpperBound<DiscreteTanLambda>()); }
 
     };
   } // end namespace TrackFindingCDC

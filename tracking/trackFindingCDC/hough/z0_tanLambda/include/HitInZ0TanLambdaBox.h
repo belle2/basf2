@@ -8,43 +8,39 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/hough/z0_zslope/Z0ZSlopeBox.h>
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
-// For better readability we use z slope instead of inverse z slope everywhere!
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Predicate class to check for the containment of hits in a z0 inverse z slope hough space part.
+    /** Predicate class to check for the containment of hits in a z0 tan lambda hough space part.
      *  Note this part this code defines the performance of
      *  the search in the hough plain quite significantly and there is probably room for improvement.
      */
-    class HitInZ0ZSlopeBox {
+    class HitInZ0TanLambdaBox {
     public:
-      /** Checks if the wire hit is contained in a z0 inverse z slope hough space.
+      /** Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
       inline Weight operator()(const CDCRecoHit3D* recoHit,
-                               const Z0ZSlopeBox* z0ZSlopeBox)
+                               const Z0TanLambdaBox* z0ZSlopeBox)
       {
         const float& lowerZ0 = z0ZSlopeBox->getLowerZ0();
         const float& upperZ0 = z0ZSlopeBox->getUpperZ0();
 
-        /*const float& inverseSlopeForMinimum = 1 / recoHit->calculateZSlopeWithZ0(lowerZ0);
-        const float& inverseSlopeForMaximum = 1 / recoHit->calculateZSlopeWithZ0(upperZ0);*/
-
-        const float& radius = recoHit->getRecoPos2D().norm();
+        const float& perpS = recoHit->getPerpS();
         const float& reconstructedZ = recoHit->getRecoZ();
 
-        const float& lowerZSlope = z0ZSlopeBox->getLowerZSlope();
-        const float& upperZSlope = z0ZSlopeBox->getUpperZSlope();
+        const float& lowerZSlope = z0ZSlopeBox->getLowerTanLambda();
+        const float& upperZSlope = z0ZSlopeBox->getUpperTanLambda();
 
         float dist[2][2];
-        dist[0][0] = radius * lowerZSlope - reconstructedZ + lowerZ0;
-        dist[0][1] = radius * lowerZSlope - reconstructedZ + upperZ0;
-        dist[1][0] = radius * upperZSlope - reconstructedZ + lowerZ0;
-        dist[1][1] = radius * upperZSlope - reconstructedZ + upperZ0;
+        dist[0][0] = perpS * lowerZSlope - reconstructedZ + lowerZ0;
+        dist[0][1] = perpS * lowerZSlope - reconstructedZ + upperZ0;
+        dist[1][0] = perpS * upperZSlope - reconstructedZ + lowerZ0;
+        dist[1][1] = perpS * upperZSlope - reconstructedZ + upperZ0;
 
         if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
           return 1.0;

@@ -1,8 +1,8 @@
-#include <tracking/trackFindingCDC/legendre/stereohits/CDCLegendreStereohitsProcesser.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/StereohitsProcesser.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/StereoHitQuadTreeProcessor.h>
 
 
 #include <TFile.h>
@@ -34,7 +34,7 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
     charge = -1;
 
   if (trajectory2D.getChargeSign() != charge)
-    return false;
+    return true;
 
   return true;
 }
@@ -42,6 +42,7 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
 void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, const CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  const double radius = fabs(trajectory2D.getGlobalCircle().radius());
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
   hitsVector.reserve(wireHitTopology.getRLWireHits().size());
@@ -55,6 +56,10 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       if (backwardZ < recoPos3D.z() and recoPos3D.z() < forwardZ) {
         FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
+        // It is very important that we have only positive values of the perpS here:
+        if (perpS < 0) {
+          perpS += 2 * TMath::Pi() * radius;
+        }
         hitsVector.push_back(new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS));
       }
     }
@@ -97,7 +102,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   };
 
   StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
-                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-20, 20));
+                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-200, 200));
   StereoHitQuadTreeProcessor oldQuadTree(m_level, childRanges, m_param_debugOutput);
   oldQuadTree.provideItemsSet(hitsVector);
   oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
@@ -121,7 +126,7 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   }
 
   if (possibleStereoSegments.size() == 0) {
-    B2WARNING("Found no stereo segments!");
+    B2WARNING("Found no stereo hits!");
     return;
   }
 
@@ -168,7 +173,7 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
 
   m_newQuadTree.seed(hitsVector);
 
-  typedef pair<Z0ZSlopeBox, vector<HitType*>> Result;
+  typedef pair<Z0TanLambdaBox, vector<HitType*>> Result;
   const std::vector<Result>& possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
 
   m_newQuadTree.fell();
@@ -193,7 +198,7 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
         const FloatType& lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
         const FloatType& lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
 
-        const FloatType& zSlopeMean = (node.getLowerZSlope() + node.getUpperZSlope()) / 2.0;
+        const FloatType& zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
           doubledRecoHits.push_back(*outerIterator);

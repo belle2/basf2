@@ -10,33 +10,11 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-bool StereoHitQuadTreeProcessor::insertItemInNode(QuadTree* node, const CDCRecoHit3D* hit, unsigned int /*slope_index*/,
-                                                  unsigned int /*z0_index*/) const
-{
-  float dist[2][2];
-
-  const float& radius = hit->getRecoPos2D().norm();
-  const float& reconstructedZ = hit->getRecoZ();
-
-  float inverseSlopeMin = node->getXMin();
-  float inverseSlopeMax = node->getXMax();
-  float zMin = node->getYMin();
-  float zMax = node->getYMax();
-
-  dist[0][0] = radius * inverseSlopeMin - reconstructedZ + zMin;
-  dist[0][1] = radius * inverseSlopeMin - reconstructedZ + zMax;
-  dist[1][0] = radius * inverseSlopeMax - reconstructedZ + zMin;
-  dist[1][1] = radius * inverseSlopeMax - reconstructedZ + zMax;
-
-  return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
-}
 
 bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCRecoSegment2D* recoItem, unsigned int /*t_index*/,
                                                  unsigned int /*r_index*/) const

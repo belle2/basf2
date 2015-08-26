@@ -7,7 +7,7 @@ import ROOT
 from tracking.validation.pr_side_module import PRSideTrackingValidationModule
 from tracking.validation.module import TrackingValidationModule
 
-from ipython_tools.wrapper import QueueHarvester
+from tracking.wrapper import QueueHarvester
 
 
 class VXDMomentumEnergyEstimator:
@@ -199,9 +199,11 @@ class VXDHarvester(QueueHarvester):
                     path_length = tools.getPathLength(cluster, track_helix)
                     cluster_thickness = tools.getThicknessOfCluster(cluster)
                     cluster_radius = tools.getRadiusOfCluster(cluster)
+                    cluster_width = tools.getWidthOfCluster(cluster)
+                    cluster_length = tools.getLengthOfCluster(cluster)
 
-                    perp_s_at_cluster_entry = track_helix.getArcLength2DAtCylindricalR(cluster_radius - cluster_thickness / 2.0)
-                    perp_s_at_cluster_exit = track_helix.getArcLength2DAtCylindricalR(cluster_radius + cluster_thickness / 2.0)
+                    perp_s_at_cluster_entry = track_helix.getArcLength2DAtCylindricalR(cluster_radius)
+                    perp_s_at_cluster_exit = track_helix.getArcLength2DAtCylindricalR(cluster_radius + cluster_thickness)
 
                     mc_momentum = tools.getEntryMomentumOfMCParticle(cluster)
                     mc_position = tools.getEntryPositionOfMCParticle(cluster)
@@ -232,6 +234,8 @@ class VXDHarvester(QueueHarvester):
                                         cluster_layer=cluster_layer,
                                         cluster_segment=cluster_segment,
                                         cluster_ladder=cluster_ladder,
+                                        cluster_width=cluster_width,
+                                        cluster_length=cluster_length,
                                         cluster_sensor=cluster_sensor)
 
                     mc_at_hit_dict = dict(mc_helix_perigee_x=mc_helix.getPerigeeX(),
@@ -317,6 +321,7 @@ class FitHarvester(QueueHarvester):
 
         related_reco_track = track_fit_result.getRelated("RecoTracks")
         cardinal_rep = related_reco_track.getCardinalRep()
+        kalman_fit_state = related_reco_track.getKalmanFitStatus()
 
         number_of_measurements_in_total = 0
         number_of_measurements_with_smaller_weight = 0
@@ -348,7 +353,8 @@ class FitHarvester(QueueHarvester):
         return dict(fit_momentum_x=fit_momentum.X(),
                     fit_momentum_y=fit_momentum.Y(),
                     fit_momentum_z=fit_momentum.Z(),
-                    p_value=track_fit_result.getPValue(),
+                    p_value=kalman_fit_state.getForwardPVal(),
+                    backward_p_value=kalman_fit_state.getBackwardPVal(),
                     true_momentum_x=true_momentum.X(),
                     true_momentum_y=true_momentum.Y(),
                     true_momentum_z=true_momentum.Z(),

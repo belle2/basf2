@@ -68,6 +68,22 @@ namespace Belle2 {
       return sensorInfoBase.getThickness();
     }
 
+    /** Return the thickness of a cluster */
+    double getWidthOfCluster(const ClusterType& cluster) const
+    {
+      const VxdID&   vxdID = cluster.getSensorID();
+      const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+      return sensorInfoBase.getWidth();
+    }
+
+    /** Return the thickness of a cluster */
+    double getLengthOfCluster(const ClusterType& cluster) const
+    {
+      const VxdID&   vxdID = cluster.getSensorID();
+      const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+      return sensorInfoBase.getLength();
+    }
+
     /** Returns the distance from the interaction point to the cluster in the r-phi-plane */
     double getRadiusOfCluster(const ClusterType& cluster) const
     {
@@ -75,10 +91,13 @@ namespace Belle2 {
 
       double radius = 0;
       if (spacePoint == nullptr) {
+        // Fallback function
         VxdID vxdID = cluster.getSensorID();
         VxdID::baseType layer = vxdID.getLayerNumber();
         radius = m_layerPositions[layer - 1] / 100.0;
+        B2WARNING("Could not determine SpacePoint for this cluster. Falling back to geometrical information.")
       } else {
+        // The positions is the one with w = 0 which is the one on the lowest detector plane.
         radius = spacePoint->getPosition().Perp();
       }
       return radius;
@@ -161,10 +180,13 @@ namespace Belle2 {
 
       const double thickness = getThicknessOfCluster(cluster);
       const double radius = getRadiusOfCluster(cluster);
+      const double width = getWidthOfCluster(cluster);
+      const double length = getLengthOfCluster(cluster);
 
       const double perp_s_at_cluster_entry = trajectory.getArcLength2DAtCylindricalR(radius);
 
       if (std::isnan(perp_s_at_cluster_entry)) {
+        // This case is really strange. I do not know how to deal with it probably.
         return thickness;
       }
 
@@ -173,7 +195,7 @@ namespace Belle2 {
       const double perp_s_at_cluster_exit = trajectory.getArcLength2DAtCylindricalR(radius + thickness);
 
       if (std::isnan(perp_s_at_cluster_exit)) {
-        return thickness;
+        return std::min(width, length);
       }
 
       const TVector3& position_at_outer_radius = trajectory.getPositionAtArcLength2D(perp_s_at_cluster_exit);

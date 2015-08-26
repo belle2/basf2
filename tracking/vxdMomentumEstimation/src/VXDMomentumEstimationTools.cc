@@ -6,7 +6,7 @@ using namespace Belle2;
 template<>
 double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const
 {
-  return 0.653382;
+  return 0.5658682413283911;
 }
 
 /** We have to handle PXD and SVD differently here */

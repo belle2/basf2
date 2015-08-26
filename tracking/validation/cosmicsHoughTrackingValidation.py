@@ -40,9 +40,10 @@ class CosmicsHough(TrackingValidationRun):
                                           TracksStoreObjNameIsInput=True,
                                           WriteGFTrackCands=True,
                                           TracksStoreObjName="AxialCDCTracks",
-                                          DebugOutput=True,
-                                          QuadTreeLevel=6,
-                                          MinimumHitsInQuadtree=20))
+                                          debugOutput=True,
+                                          quadTreeLevel=6,
+                                          minimumHitsInQuadtree=20,
+                                          useOldImplementation=False))
 
     finder_module = [segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
 
@@ -50,7 +51,7 @@ class CosmicsHough(TrackingValidationRun):
     del axial_hough_module  # do not let the names show up in the class name space
     del cdc_stereo_combiner_module  # do not let the names show up in the class name space
 
-    interactive_display = False
+    interactive_display = True
     if interactive_display:
         cdc_display_module = cdcdisplay.CDCSVGDisplayModule(os.getcwd(), interactive=True)
 

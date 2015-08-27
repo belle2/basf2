@@ -227,6 +227,15 @@ class CDCSVGDisplayModule(Module):
         # Name of the CDC Reco Segment Vector
         self.cdc_reco_segment_vector_store_obj_name = 'CDCRecoSegment2DVector'
 
+        # Current file's number (used for making output filename)
+        self.file_number = 1
+
+        # Filename prefix
+        self.filename_prefix = "CDCDisplay"
+
+        # Use time instead of prefix in filename
+        self.use_time_in_filename = True and False
+
     @property
     def drawoptions(self):
         """
@@ -278,7 +287,8 @@ class CDCSVGDisplayModule(Module):
             'draw_tracks',
             'draw_segmenttriple_trajectories',
             'draw_segment_trajectories',
-
+            'use_time_in_filename',
+            'filename_prefix',
         ]
 
         for name in result:
@@ -978,6 +988,8 @@ class CDCSVGDisplayModule(Module):
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])
             raw_input('Hit enter for next event')
 
+        self.file_number += 1
+
     def endRun(self):
         """
         endRun methode of the module. Empty here.
@@ -997,7 +1009,10 @@ class CDCSVGDisplayModule(Module):
         Generates a new unique name for the current event without the folder prefix
         """
 
-        output_basename = datetime.now().isoformat() + '.svg'
+        if self.use_time_in_filename:
+            output_basename = datetime.now().isoformat() + '.svg'
+        else:
+            output_basename = self.filename_prefix + str(self.file_number).zfill(4) + '.svg'
         return output_basename
 
     def new_output_filename(self):

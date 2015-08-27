@@ -9,12 +9,16 @@ from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 if len(sys.argv) < 4:
-    print 'Usage: basf2 GenDST.py experiment run num_events'
+    print 'Usage: basf2 GenDST.py experiment run num_events cosmics_run'
     sys.exit(1)
 
 experiment = int(sys.argv[1])
 run = int(sys.argv[2])
 nevents = int(sys.argv[3])
+cosmics_run = False
+
+if len(sys.argv) == 5:
+    cosmics_run = bool(sys.argv[4])
 
 
 class TrackFitCheck(Module):
@@ -28,7 +32,7 @@ class TrackFitCheck(Module):
             print 'Num points > 24 : ', str(track.getNumPointsWithMeasurement())
             return False
         if track.getNumPointsWithMeasurement() < 5:
-            print 'Num points < 6 : ', str(track.getNumPointsWithMeasurement())
+            print 'Num points < 5 : ', str(track.getNumPointsWithMeasurement())
             return False
         if track.getFitStatus().getPVal() < 0.001:
             print 'P-value < 0.001 : ', str(track.getFitStatus().getPVal())
@@ -52,12 +56,18 @@ class TrackFitCheck(Module):
 
 main = create_path()
 main.add_module('EventInfoSetter', expList=[experiment], runList=[run], evtNumList=[nevents])
-# main.add_module('Cosmics', ipRequirement=0)
-main.add_module('ParticleGun')
+
+if cosmics_run:
+    main.add_module('Cosmics', ipRequirement=0)
+else:
+    main.add_module('ParticleGun')
 
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
-# main.add_module('Geometry', components=['PXD', 'SVD'])
+
+if cosmics_run:
+    main.add_module('Geometry', components=['PXD', 'SVD'])
+else:
+    main.add_module('Geometry', components=['MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
 
 main.add_module('FullSim')
 main.add_module('TrackFinderMCTruth', UseClusters=False)

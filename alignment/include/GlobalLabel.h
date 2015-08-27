@@ -47,6 +47,7 @@ namespace Belle2 {
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
     static const gidTYPE vxdOffset  = 0;       /**< No offset for VXD (VxdID(0) is dummy) */
     static const gidTYPE cdcOffset  = 100000;  /**< Offset of 100000 in element ids for CDC. WireID(0) is a real wire */
+    static const gidTYPE klmOffset  = 300000;  /**< Offset of 300000 in element ids for KLM */
     /**
      * @brief Constructor from Pede label
      * Depends on registered time dependent parameters
@@ -69,6 +70,13 @@ namespace Belle2 {
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
     GlobalLabel(WireID cdcid, gidTYPE paramId);
+    /**
+     * @brief Constructor from KLMid (currently int) (depends on time internally)
+     * @param klmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
+     * @param paramId Numeric identificator of calibration/alignment parameter
+     *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
+     */
+    GlobalLabel(int klmid, gidTYPE paramId);
     /**
      * @brief Register this Detector element and parameter
      *        as time dependent with instance starting at
@@ -113,10 +121,14 @@ namespace Belle2 {
     VxdID   getVxdID()       const;
     //! Get the WireID (returns default if not CDC label)
     WireID  getWireID()      const;
+    //! Get the KlmID (returns 0 if not KLM label)
+    int     getKlmID()      const;
     //! Is this VXD label?
     bool    isVXD()          const {return (eid > vxdOffset && eid < cdcOffset);}
     //! Is this CDC label?
-    bool    isCDC()          const {return (eid >= cdcOffset && eid < maxEID);}
+    bool    isCDC()          const {return (eid >= cdcOffset && eid < klmOffset && eid < maxEID);}
+    //! Is this KLM label?
+    bool    isKLM()          const {return (eid >= klmOffset && eid < maxEID);}
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}
     //! Get time id

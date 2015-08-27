@@ -21,20 +21,19 @@ def exp_runs(exp, runs):
         expruns.append((exp, run))
     return expruns
 
-cal.setDstStoragePattern('alignment/examples/DST_Exp{experiment}_Run{run}.root')
-
 # Set path and format of DST files and runs, where magnet is off
 # If you don't, you should see plenty of failed extrapolations
-cal.setMagnetOffRuns(exp_runs(1, range(6, 15 + 1)))
+cal.setDstStoragePattern('alignment/examples/DST_Exp{experiment}_Run{run}.root')
+cal.setMagnetOffRuns(exp_runs(1, range(1, 101)))
 
 # createCalibration(name='tadeasTest1.root')#, importCalibration='database.root')
 
-cal.selectRange(1, 1, 1, 20)
+cal.selectRange(1, 1, 2, 100)
 
-cal.selectSample(exp_runs(1, [1, 2, 4]) +            # Exp 1, runs 1,2,4
-                 exp_runs(1, range(6, 11 + 1)) +     # Exp 1, runs 6,7,8,9,10,11
-                 [(1, 18), (1, 19)] +                # Exp 1, runs 18, 19
-                 exp_runs(1, 20))                    # Exp 1, run  20
+cal.selectSample(
+    exp_runs(1, range(1, 11)) +
+    exp_runs(2, range(1, 11))
+)
 
 cal.loadGeometry()
 
@@ -70,6 +69,8 @@ cal.createPedeSteering(name='PedeSteeringFine',
 cal.addMillepedeCalibration(name='Millepede',
                             granularity='data',
                             steering='PedeSteeringFine')
+
+# cal.calibration_path.add_module('GBLdiagnostics')
 """
 
 cal.addMillepedeCalibration(name='MP2_perrun',

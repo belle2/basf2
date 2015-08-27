@@ -126,7 +126,7 @@ def createCalibration(name, importCalibration=None):
 """
 
 
-def selectRange(expMin, runMin, expMax=None, runMax=None):
+def selectRange(expMin, runMin, expMax, runMax):
     global calibration_range
     calibration_range = [expMin, runMin, expMax, runMax]
 
@@ -196,8 +196,8 @@ def setMagnetOffRuns(expruns):
     global magnet_off_exp_list
     global magnet_off_run_list
     for exprun in expruns:
-        magnet_off_run_list.append(exprun[0])
-        magnet_off_exp_list.append(exprun[1])
+        magnet_off_exp_list.append(exprun[0])
+        magnet_off_run_list.append(exprun[1])
 
 
 def refitGBL(UseClusters=False):

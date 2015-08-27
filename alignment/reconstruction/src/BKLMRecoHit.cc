@@ -13,6 +13,7 @@
 #include <alignment/reconstruction/BKLMRecoHit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <alignment/GlobalLabel.h>
 
 #include <genfit/DetPlane.h>
 #include <TVector3.h>
@@ -87,6 +88,66 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
   return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
 }
+
+vector< int > BKLMRecoHit::labels()
+{
+  int barrel = 1;
+  int forward = m_bklmHit2d->isForward() ? 1 : 0;
+  int sector = m_bklmHit2d->getSector();
+  int layer = m_bklmHit2d->getLayer();
+
+  // Encode some KLM-unique id to identify alignable structure
+  // - it should be smaller than 1.000.000, which
+  // means moduleID cannot be used for this!
+  // This is Millepede limitation. One int must be enough to identify any
+  // single alignment parameter in the whole Belle 2 detector.
+  int klmid(layer + 100 * sector + 1000 * forward + 10000 * barrel);
+
+  std::vector<int> labGlobal;
+
+  labGlobal.push_back(GlobalLabel(klmid, 1)); // du
+  labGlobal.push_back(GlobalLabel(klmid, 2)); // dv
+  labGlobal.push_back(GlobalLabel(klmid, 3)); // dw
+  labGlobal.push_back(GlobalLabel(klmid, 4)); // dalpha
+  labGlobal.push_back(GlobalLabel(klmid, 5)); // dbeta
+  labGlobal.push_back(GlobalLabel(klmid, 6)); // dgamma
+
+  return labGlobal;
+}
+
+TMatrixD BKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
+{
+  // Matrix of global derivatives
+  TMatrixD derGlobal(2, 6);
+  derGlobal.Zero();
+
+  // track u-slope in local sensor system
+  double uSlope = sop->getState()[1];
+  // track v-slope in local sensor system
+  double vSlope = sop->getState()[2];
+  // Predicted track u-position in local sensor system
+  double uPos = sop->getState()[3];
+  // Predicted track v-position in local sensor system
+  double vPos = sop->getState()[4];
+
+  // Global derivatives for alignment in module local coordinates
+  derGlobal(0, 0) = 1.0;
+  derGlobal(0, 1) = 0.0;
+  derGlobal(0, 2) = - uSlope;
+  derGlobal(0, 3) = vPos * uSlope;
+  derGlobal(0, 4) = -uPos * uSlope;
+  derGlobal(0, 5) = vPos;
+
+  derGlobal(1, 0) = 0.0;
+  derGlobal(1, 1) = 1.0;
+  derGlobal(1, 2) = - vSlope;
+  derGlobal(1, 3) = vPos * vSlope;
+  derGlobal(1, 4) = -uPos * vSlope;
+  derGlobal(1, 5) = -uPos;
+
+  return derGlobal;
+}
+
 
 
 

@@ -19,12 +19,14 @@
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/HMatrixUV.h>
 #include <genfit/TrackCandHit.h>
+// Calibration/Alignment interface
+#include <genfit/ICalibrationParametersDerivatives.h>
 
 namespace Belle2 {
   /**
    * BKLMRecoHit
    */
-  class BKLMRecoHit: public genfit::PlanarMeasurement {
+  class BKLMRecoHit: public genfit::PlanarMeasurement, public genfit::ICalibrationParametersDerivatives {
   public:
 
     /** Default constructor for ROOT IO. */
@@ -49,6 +51,10 @@ namespace Belle2 {
     const BKLMHit2d* getBKLMHit2d() const { return m_bklmHit2d; }
 
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
+
+    virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
+
+    virtual std::vector< int > labels();
 
   private:
 

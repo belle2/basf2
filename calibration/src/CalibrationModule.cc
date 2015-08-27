@@ -138,12 +138,6 @@ void CalibrationModule::beginRun()
 {
   StoreObjPtr<EventMetaData> emd;
 
-  if ((long int)emd->getRun() <= m_lastRun) {
-    B2WARNING("beginRun for old run");
-    //return;
-  } else
-    m_lastRun = emd->getRun();
-
   // Get current calibration IOV index
   m_currentStateIndex = -1;
   for (unsigned int i = 0; i < m_states.size(); i++) {
@@ -159,12 +153,6 @@ void CalibrationModule::beginRun()
 
 void CalibrationModule::event()
 {
-  StoreObjPtr<EventMetaData> emd;
-  if ((long int)emd->getRun() != m_lastRun) {
-    B2WARNING("Event for old run");
-    //return;
-  }
-
   if (m_isCollector)
     if (getState() == CalibrationModule::c_Running)
       if (CalibrationManager::getInstance().doCollection())
@@ -174,11 +162,6 @@ void CalibrationModule::event()
 void CalibrationModule::endRun()
 {
   StoreObjPtr<EventMetaData> emd;
-
-  if ((long int)emd->getRun() != m_lastRun) {
-    B2WARNING("endRun from old run");
-    //return;
-  }
 
   if (m_currentStateIndex < 0)
     return;

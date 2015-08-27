@@ -35,7 +35,6 @@ geometry = register_module('Geometry')
 
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 
 # simulation
 g4sim = register_module('FullSim')
@@ -63,7 +62,7 @@ track_finder_mc_truth.param(param_track_finder_mc_truth)
 # fitting
 fitting = register_module('GBLfit')
 fitting.param('UseClusters', False)
-
+fitting.param('BuildBelle2Tracks', True)
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', 'MCFittingOutput.root')
@@ -76,6 +75,7 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module('BeamParameters')
 main.add_module(evtgeninput)
 main.add_module(g4sim)
 main.add_module(cdcDigitizer)

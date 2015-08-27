@@ -39,7 +39,8 @@ namespace Belle2 {
      * Constructor with ASIC window
      * @param asicWindow ASIC window ID
      */
-    TOPASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow), m_offset(0)
+    explicit TOPASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow),
+      m_offset(0)
     {
       for (unsigned i = 0; i < c_WindowSize; i++) m_pedestals[i] = 0;
     }

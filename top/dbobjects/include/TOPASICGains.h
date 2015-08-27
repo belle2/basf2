@@ -40,7 +40,7 @@ namespace Belle2 {
      * Constructor with ASIC window
      * @param asicWindow ASIC window ID
      */
-    TOPASICGains(unsigned short asicWindow):
+    explicit TOPASICGains(unsigned short asicWindow):
       m_asicWindow(asicWindow), m_unit(c_Unit), m_gainError(0)
     {
       for (unsigned i = 0; i < c_WindowSize; i++) m_gains[i] = c_Unit;

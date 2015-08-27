@@ -51,7 +51,8 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
-                   const std::vector<unsigned short>& data)
+                   const std::vector<unsigned short>& data):
+      m_data(data)
     {
       m_barID = barID;
       m_channelID = channelID;
@@ -63,7 +64,6 @@ namespace Belle2 {
       m_flags = flags;
       m_referenceASIC = referenceASIC;
       m_segmentASIC = segmentASIC;
-      m_data = data;
     }
 
     /**

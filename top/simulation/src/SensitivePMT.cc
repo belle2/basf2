@@ -80,8 +80,8 @@ namespace Belle2 {
       }
 
       // pmt and bar ID
-      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(1);
-      int barID = photon.GetTouchableHandle()->GetReplicaNumber(4);
+      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(2);
+      int barID = photon.GetTouchableHandle()->GetReplicaNumber(5);
 
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();

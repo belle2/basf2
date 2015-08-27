@@ -649,16 +649,18 @@ namespace Belle2 {
       G4Box* box1 = new G4Box("box1", Msizex / 2., Msizey / 2., Winthickness / 2.);
       G4LogicalVolume* window = new G4LogicalVolume(box1, winMaterial, "window");
 
-      //! The bottom material of the PMT
-      G4Box* box2 = new G4Box("box2", Msizex / 2., Msizey / 2., Botthickness / 2.);
-      G4LogicalVolume* bottom = new G4LogicalVolume(box2, botMaterial, "bottom");
-
-      //! The sensitive area of the PMT
+      //! The sensitive area of the PMT (placed into window bottom)
       G4Box* sensBox = new G4Box("sensbox", Asizex / 2., Asizey / 2., Asizez  / 2.);
       G4LogicalVolume* lmoduleSens = new G4LogicalVolume(sensBox, sensMaterial,
                                                          "SensitivePMT");
-      //! Activate the sensitive area - assignt to it m_sensitivePMT
-      lmoduleSens->SetSensitiveDetector(m_sensitivePMT);
+      lmoduleSens->SetSensitiveDetector(m_sensitivePMT); // Activate sensitive area
+      setColor(*lmoduleSens, "rgb(0.0,0.0,0.0,1.0)");
+      G4Transform3D tsens = G4Translate3D(0 , 0, -(Winthickness - Asizez) / 2.);
+      new G4PVPlacement(tsens, lmoduleSens, "TOP.moduleSensitive", window, false, 1);
+
+      //! The bottom material of the PMT
+      G4Box* box2 = new G4Box("box2", Msizex / 2., Msizey / 2., Botthickness / 2.);
+      G4LogicalVolume* bottom = new G4LogicalVolume(box2, botMaterial, "bottom");
 
       //! The vacuum gap inside the PMT
       G4Box* box3 = new G4Box("box3", Msizex / 2. - WThickness,
@@ -666,7 +668,6 @@ namespace Belle2 {
       G4LogicalVolume* vacuum = new G4LogicalVolume(box3, fillMaterial, "vacuum");
 
       // Reflective edge
-      /* removed due to overlap with sensitive area ...
       GearDir reflectiveEdge(content, "PMTs/Module/reflectiveEdge");
       if (!reflectiveEdge) B2FATAL("reflectiveEdge: definition is missing");
       double reflEdgeWidth = reflectiveEdge.getLength("width") / Unit::mm;
@@ -684,7 +685,6 @@ namespace Belle2 {
       Materials& materials = Materials::getInstance();
       G4OpticalSurface* optSurf = materials.createOpticalSurface(surface);
       new G4LogicalSkinSurface("reflectiveEdgeSurface", reflEdge, optSurf);
-      */
 
       /*! Place PMT segments */
 
@@ -694,15 +694,11 @@ namespace Belle2 {
       G4Transform3D tvacuum = G4Translate3D(0 , 0,
                                             (Msizez - 2 * Winthickness - 2 * WThickness
                                              - MWsizez + WThickness) / 2.);
-      G4Transform3D tsens = G4Translate3D(0 , 0,
-                                          (Msizez - 2 * Winthickness - Asizez) / 2.);
-      /*
       G4Transform3D trefl = G4Translate3D(0 , 0,
                                           (Msizez - 2 * Winthickness - reflEdgeThick)
                                           / 2.);
-      */
 
-      //! Apply coloring and place alle parts into PMT
+      //! Apply coloring and place all parts into PMT
 
       setColor(*window, "rgb(0.776,0.886,1.0,1.0)");
       new G4PVPlacement(twin, window, "TOP.window", PMT, false, 1);
@@ -712,10 +708,7 @@ namespace Belle2 {
 
       new G4PVPlacement(tvacuum, vacuum, "TOP.vacuum", PMT, false, 1);
 
-      //      new G4PVPlacement(trefl, reflEdge, "TOP.reflEdge", PMT, false, 1);
-
-      setColor(*lmoduleSens, "rgb(0.0,0.0,0.0,1.0)");
-      new G4PVPlacement(tsens, lmoduleSens, "TOP.moduleSensitive", PMT, false, 1);
+      new G4PVPlacement(trefl, reflEdge, "TOP.reflEdge", PMT, false, 1);
 
       setColor(*PMT, "rgb(0.47,0.47,0.47,1.0)");
 

@@ -35,7 +35,7 @@ namespace Belle2 {
       static CDCTrack& splitBack2BackTrack(CDCTrack& trackCandidate);
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static bool checkBack2CackTrack(CDCTrack& trackCandidate);
+      static bool checkBack2BackTrack(CDCTrack& trackCandidate);
 
       static SignType getChargeSign(CDCTrack& track) ;
 
@@ -43,6 +43,7 @@ namespace Belle2 {
 
       static double getPhi(const CDCRecoHit3D& hit) ;
 
+      static void deleteAllMarkedHits(CDCTrack& track);
 
     private:
 

@@ -25,7 +25,7 @@ void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag)
 template<>
 bool QuadTreeItem<LegendreHit>::isUsed() const
 {
-  return getPointer()->getUsedFlag();
+  return getPointer()->getUsedFlag() || getPointer()->getMaskedFlag();
 }
 
 template<>

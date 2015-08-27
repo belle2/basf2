@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
@@ -31,6 +33,7 @@ namespace Belle2 {
     class TrackDrawer;
     class TrackHit;
     class CDCTrack;
+    class CDCTrajectory2D;
 
     class TrackProcessorNew {
     public:
@@ -40,7 +43,7 @@ namespace Belle2 {
        * We use the fitter and the drawer as a pointer to have the possibility to use different classes.
        */
       TrackProcessorNew() :
-        m_cdcTracks() { }
+        m_cdcTracks(), m_trackFitter() { }
 
       /**
        * Do not copy this class
@@ -61,6 +64,10 @@ namespace Belle2 {
 
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
       void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) ;
+
+      void updateTrack(CDCTrack& track);
+
+      void assignNewHits(CDCTrack& track);
 
       int estimateCharge(double theta, double r, std::vector<TrackHit*>& trackHits);
 
@@ -102,7 +109,10 @@ namespace Belle2 {
       void resetMaskedHits()
       {
         doForAllHits([](LegendreHit & hit) {
-          hit.setMaskedFlag(false);
+          if (hit.getMaskedFlag()) {
+            hit.setMaskedFlag(false);
+            hit.setUsedFlag(false);
+          }
         });
       }
 
@@ -118,6 +128,7 @@ namespace Belle2 {
     private:
       std::vector<CDCTrack> m_cdcTracks; /**< List of track candidates. */
       std::vector<LegendreHit> m_legendreHits; /**< Vector which hold axial hits */
+      CDCRiemannFitter m_trackFitter;
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed

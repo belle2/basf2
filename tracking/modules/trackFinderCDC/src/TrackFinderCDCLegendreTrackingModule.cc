@@ -146,10 +146,10 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
   double rCDC = 113.;
 
-  if (increaseThreshold) {
+//  if (increaseThreshold) {
 //    m_cdcLegendreTrackProcessor.resetBadHits();
-    m_trackProcessor.resetMaskedHits();
-  }
+  m_trackProcessor.resetMaskedHits();
+//  }
 
   /*
     std::set<TrackHit*> hits_set = m_cdcLegendreTrackProcessor.createHitSet();

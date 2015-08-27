@@ -188,14 +188,19 @@ class CDCNaiveFinder(metamodules.PathModule):
 
         full_finder = CDCFullFinder(output_track_cands_store_array_name=None, **kwargs)
         modules = full_finder._path.modules()
-        modules.append(
-            StandardEventGenerationRun.get_basf2_module(
-                "NaiveCombiner",
-                SkipHitsPreparation=True,
-                TracksStoreObjNameIsInput=True,
-                WriteGFTrackCands=True,
-                GFTrackCandsStoreArrayName=output_track_cands_store_array_name,
-                UseMCInformation=use_mc_information))
+
+        naive_combiner = StandardEventGenerationRun.get_basf2_module(
+            "NaiveCombiner",
+            SkipHitsPreparation=True,
+            TracksStoreObjNameIsInput=True,
+            WriteGFTrackCands=False,
+            UseMCInformation=use_mc_information)
+
+        if output_track_cands_store_array_name is not None:
+            naive_combiner.param({'WriteGFTrackCands': True,
+                                  'GFTrackCandsStoreArrayName': output_track_cands_store_array_name})
+
+        modules.append(naive_combiner)
 
         metamodules.PathModule.__init__(self, modules=modules)
 
@@ -251,6 +256,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
                  output_track_cands_store_array_name=None,
                  output_track_cands_store_vector_name="CDCTrackVector",
                  assign_stereo_hits=True, debug_output=False,
+                 TracksStoreObjNameIsInput=False,
                  stereo_level=6, stereo_hits=5):
 
         module_list = []
@@ -258,6 +264,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
         legendre_tracking_module = StandardEventGenerationRun.get_basf2_module(
             'CDCLegendreTracking',
             WriteGFTrackCands=False,
+            TracksStoreObjNameIsInput=TracksStoreObjNameIsInput,
             TracksStoreObjName=output_track_cands_store_vector_name)
         if delete_hit_information:
             legendre_tracking_module.param('SkipHitsPreparation', False)
@@ -272,9 +279,9 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
             TracksStoreObjNameIsInput=True,
             WriteGFTrackCands=False,
             TracksStoreObjName=output_track_cands_store_vector_name,
-            DebugOutput=debug_output,
-            QuadTreeLevel=stereo_level,
-            MinimumHitsInQuadtree=stereo_hits)
+            debugOutput=debug_output,
+            quadTreeLevel=stereo_level,
+            minimumHitsInQuadtree=stereo_hits)
 
         if assign_stereo_hits:
             module_list.append(last_tracking_module)
@@ -490,7 +497,6 @@ class CDCTrackQualityAsserter(metamodules.WrapperModule):
 
         module = StandardEventGenerationRun.get_basf2_module(
             "TrackQualityAsserterCDC",
-            MinimalPerpSCut=minimal_perp_s_cut,
             WriteGFTrackCands=False,
             SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
@@ -529,8 +535,6 @@ class CDCValidation(metamodules.PathModule):
 
         from tracking.validation.module import SeparatedTrackingValidationModule
 
-        mc_track_finder_module_if_module = CDCMCFinder(use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)
-
         mc_track_matcher_module = CDCMCMatcher(track_cands_store_array_name=track_candidates_store_array_name,
                                                use_cdc=use_cdc, use_pxd=use_pxd, use_svd=use_svd)
 
@@ -541,10 +545,10 @@ class CDCValidation(metamodules.PathModule):
             trackCandidatesColumnName=track_candidates_store_array_name,
             expert_level=2)
 
-        super(CDCValidation, self).__init__(modules=[mc_track_finder_module_if_module, mc_track_matcher_module, validation_module])
+        super(CDCValidation, self).__init__(modules=[mc_track_matcher_module, validation_module])
 
 
-class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
+class CDCMCFinder(metamodules.WrapperModule):
 
     def __init__(
             self,
@@ -565,7 +569,7 @@ class CDCMCFinder(metamodules.IfStoreArrayNotPresentModule):
         else:
             mc_track_finder_module.param("WhichParticles", [])
 
-        metamodules.IfStoreArrayNotPresentModule.__init__(self, mc_track_finder_module, storearray_name="MCTrackCands")
+        metamodules.WrapperModule.__init__(self, mc_track_finder_module)
 
 
 class CDCRecoFitter(metamodules.PathModule):
@@ -607,6 +611,8 @@ class CDCRecoFitter(metamodules.PathModule):
         elif use_filter == "gbl":
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module("GBLRecoFitter",
                                                                              pdgCodeToUseForFitting=pdg_code)
+
+        reco_fitter_module.set_debug_level(basf2.LogLevel.DEBUG)
 
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
@@ -669,6 +675,8 @@ class CDCEventDisplay(metamodules.WrapperModule):
                                                                          hideObjects=["Unassigned RecoHits"])
         else:
             display_module = CDCSVGDisplayModule()
+            display_module.use_python = True
+            display_module.use_cpp = False
             display_module.draw_hits = True
             display_module.draw_track_trajectories = True
             display_module.draw_tracks = True

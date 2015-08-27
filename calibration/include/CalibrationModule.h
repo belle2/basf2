@@ -215,8 +215,6 @@ namespace Belle2 {
       bool m_isCalibrator = true;
 
       std::string m_baseName = "";
-
-      long int m_lastRun = -1;
     };
   }
 } //Belle2 namespace

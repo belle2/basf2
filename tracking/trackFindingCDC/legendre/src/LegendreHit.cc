@@ -35,7 +35,7 @@ void LegendreHit::performConformalTransformation()
 
   //transformation of the coordinates from normal to conformal plane
   //this is not the actual wire position but the transformed center of the drift circle
-  m_conformalPosition = 2 * twoDimensionalPosition.divided(dominator);
+  m_conformalPosition = twoDimensionalPosition.divided(dominator) * 2;
 
   //conformal drift time =  (x * x + y * y - m_driftTime * m_driftTime)
   m_conformalDriftLength = 2 * m_cdcWireHit->getRefDriftLength() / (dominator);
@@ -47,7 +47,7 @@ std::tuple<double, double, double> LegendreHit::performConformalTransformWithRes
   Vector2D twoDimensionalPosition = m_cdcWireHit->getRefPos2D() - Vector2D(x0, y0);
   double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
 
-  Vector2D conformalPosition = 2 * twoDimensionalPosition.divided(dominator);
+  Vector2D conformalPosition = twoDimensionalPosition.divided(dominator) * 2;
   double conformalDriftLength = 2 * m_cdcWireHit->getRefDriftLength() / (dominator);
 
   return std::make_tuple(conformalPosition.x(), conformalPosition.y(), conformalDriftLength);
@@ -59,7 +59,7 @@ bool LegendreHit::checkHitDriftLength()
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();
 
-  Vector3D wireBegin = cdcg.wireForwardPosition(m_cdcWireHit->getWireID().getICLayer(), m_cdcWireHit->getWireID().getIWire());
+  Vector3D wireBegin(cdcg.wireForwardPosition(m_cdcWireHit->getWireID().getICLayer(), m_cdcWireHit->getWireID().getIWire()));
 
   Vector3D wireBeginNeighbor;
 

@@ -265,8 +265,8 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   // hits belonging to found candidates will be marked as used and ignored for further
   // filling iterations
 
-  AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList&
-  /*hits*/, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+  AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
+  hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
 
     for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector())
     {

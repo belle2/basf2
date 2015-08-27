@@ -1,6 +1,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
+#include <tracking/trackFindingCDC/legendre/LegendreHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -19,6 +20,18 @@ void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag)
   } else {
     getPointer()->setHitUsage(TrackHit::c_notUsed);
   }
+}
+
+template<>
+bool QuadTreeItem<LegendreHit>::isUsed() const
+{
+  return getPointer()->getUsedFlag();
+}
+
+template<>
+void QuadTreeItem<LegendreHit>::setUsedFlag(bool usedFlag)
+{
+  getPointer()->setUsedFlag(usedFlag);
 }
 
 template<>

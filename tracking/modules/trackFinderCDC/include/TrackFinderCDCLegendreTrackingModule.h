@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
+#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 
 namespace Belle2 {
 
@@ -59,6 +60,7 @@ namespace Belle2 {
 
     TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
     TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
+    TrackFindingCDC::TrackProcessorNew m_trackProcessor; /**< Object for creating tracks */
 
     unsigned int m_param_threshold;         /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_param_stepScale;           /**< Scale of steps for SteppedHough*/
@@ -114,7 +116,8 @@ namespace Belle2 {
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
                       unsigned int);
 
-    void postprocessSingleNode(std::vector<TrackFindingCDC::TrackHit*>&, bool, TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);
+    void postprocessSingleNode(std::vector<TrackFindingCDC::LegendreHit*>&, bool,
+                               TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);
 
   };
 

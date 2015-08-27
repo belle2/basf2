@@ -17,13 +17,14 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/legendre/LegendreHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class TrackHit;
+    class LegendreHit;
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<int, float, TrackHit, 2, 2> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<int, float, LegendreHit, 2, 2> {
 
     public:
 
@@ -61,7 +62,8 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      inline bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int /*t_index*/, unsigned int /*r_index*/) const override final
+      inline bool insertItemInNode(QuadTree* node, LegendreHit* hit, unsigned int /*t_index*/,
+                                   unsigned int /*r_index*/) const override final
       {
         float dist_1[2][2];
         float dist_2[2][2];

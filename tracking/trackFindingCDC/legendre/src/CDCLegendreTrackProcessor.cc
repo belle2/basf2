@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>

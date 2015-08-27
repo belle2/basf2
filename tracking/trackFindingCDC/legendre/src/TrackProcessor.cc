@@ -51,17 +51,45 @@ CDCTrack& TrackProcessorNew::createLegendreTrackCandidateFromHits(std::vector<Le
 
     const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
     newTrackCandidate.push_back(std::move(cdcRecoHit3D));
+    cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
   }
+  /*
+    static int count(0);
+
+    TCanvas canv1(Form("canv1_%i", count), "canv", 600, 800);
+    TH1F hist1(Form("hist1_%i", count), "hist", 100, 0, 0.5);
+
+    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
+      hist1.Fill(trackTrajectory2D.getDist2D(recoHit.getRecoPos2D()));
+    }
+
+
+    hist1.Draw();
+    canv1.SaveAs(Form("tmp/distToHitBefore_%i.root", count));
+  */
 
   updateTrack(newTrackCandidate);
+  /*
+    TCanvas canv2(Form("canv2_%i", count), "canv", 600, 800);
+    TH1F hist2(Form("hist2_%i", count), "hist", 100, 0, 0.5);
 
+    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
+      hist2.Fill(newTrackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D()));
+    }
+
+
+    hist2.Draw();
+    canv2.SaveAs(Form("tmp/distToHitAfter_%i.root", count));
+
+    count++;
+  */
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
 
   updateTrack(newTrackCandidate);
 
   deleteBadHitsOfOneTrack(newTrackCandidate);
 
-//  assignNewHits(newTrackCandidate);
+  assignNewHits(newTrackCandidate);
 
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
 
@@ -84,9 +112,13 @@ void TrackProcessorNew::updateTrack(CDCTrack& track)
 
   CDCTrajectory2D trackTrajectory2D = m_trackFitter.fit(track);
 
+  for (CDCRecoHit3D& recoHit : track) {
+    recoHit.setRecoPos3D(recoHit.getRecoHit2D().getRLWireHit().reconstruct3D(trackTrajectory2D));
+  }
+
   // Recalculate the perpS of the hits
   for (CDCRecoHit3D& recoHit : track) {
-    recoHit.setPerpS(recoHit.getPerpS(trackTrajectory2D));
+    recoHit.setPerpS(trackTrajectory2D.calcPerpS(recoHit.getRecoPos2D()));
   }
 
   track.sortByPerpS();
@@ -139,7 +171,7 @@ void TrackProcessorNew::initializeLegendreHits()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-  const SortableVector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
+  const std::vector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
 
   B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
   if (cdcWireHits.size() == 0) {
@@ -179,7 +211,8 @@ void TrackProcessorNew::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
 {
 
   for (CDCRecoHit3D& recoHit : trackCandidate) {
-    if (recoHit.getSquaredDist2D(trackCandidate.getStartTrajectory3D().getTrajectory2D()) > 0.05)
+
+    if (trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D()) > 0.1)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
@@ -208,9 +241,11 @@ void TrackProcessorNew::assignNewHits(CDCTrack& track)
 //        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
 //          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
 
-    if (fabs(trackTrajectory2D.getDist2D(hit.getCDCWireHit()->getRefPos2D())) < 0.01) {
-      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+
+    if (trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D()) < 0.2) {
       track.push_back(std::move(cdcRecoHit3D));
+      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
     }
 
 

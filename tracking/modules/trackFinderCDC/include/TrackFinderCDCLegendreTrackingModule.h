@@ -55,9 +55,8 @@ namespace Belle2 {
     const double m_rMin = -0.15; /**< Minimum in r direction*/
     const double m_rMax = 0.15; /**< Maximum in r direction*/
     const int m_nbinsTheta =
-      8192; /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
+      pow(2, 15); /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
 
-    TrackFindingCDC::QuadTreeLegendre m_cdcLegendreQuadTree; /**< Object which holds quadtree structure */
     TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
     TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
 

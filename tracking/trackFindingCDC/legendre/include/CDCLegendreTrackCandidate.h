@@ -97,6 +97,9 @@ namespace Belle2 {
       /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
       static double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / fabs(rho); };
 
+      /** Pt (in GeV)convert  to rho (one of the axis in legendre phase-space) */
+      static double convertPtToRho(double pt) {return 1.5 * 0.00299792458 / fabs(pt); };
+
       /** Return Xc value of track - X projection of track's trajectory center.*/
       inline double getXc() const
       {

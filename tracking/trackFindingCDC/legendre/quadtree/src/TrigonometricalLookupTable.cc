@@ -26,7 +26,7 @@ TrigonometricalLookupTable& TrigonometricalLookupTable::Instance()
 
 
 TrigonometricalLookupTable::TrigonometricalLookupTable():
-  m_lookup_created(false), m_nbinsTheta(8192)
+  m_lookup_created(false), m_nbinsTheta(pow(2, 15))
 {
 
 }

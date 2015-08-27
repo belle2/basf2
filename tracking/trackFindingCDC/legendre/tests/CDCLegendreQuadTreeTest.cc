@@ -47,14 +47,31 @@ TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
     candidates.push_back(hits);
   };
 
+  std::function< double(double) > lmdFunctionResQTOrigin = [&](double r_qt) -> double {
+    double res;
+    //TODO: bug is here!
+    if ((TrackCandidate::convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+      r_qt = fabs(TrackCandidate::convertPtToRho(3.)) * r_qt / fabs(r_qt);
+
+    if (r_qt != 0)
+      res = exp(-16.1987 * TrackCandidate::convertRhoToPt(fabs(r_qt)) - 5.96206)
+      + 0.000190872 - 0.0000739319 * TrackCandidate::convertRhoToPt(fabs(r_qt));
+
+    else
+      res = 0.00005;
+
+    B2DEBUG(100, "origin: res = " << res << "; r = " << r_qt);
+    return res;
+  };
+
   auto now = std::chrono::high_resolution_clock::now();
-  AxialHitQuadTreeProcessor qtProcessor1(13, ranges);
+  AxialHitQuadTreeProcessor qtProcessor1(13, ranges, lmdFunctionResQTOrigin);
   qtProcessor1.provideItemsSet(hitVector);
 
   // actual filling of the hits into the quad tree structure
   qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
-  AxialHitQuadTreeProcessor qtProcessor2(11, ranges);
+  AxialHitQuadTreeProcessor qtProcessor2(11, ranges, lmdFunctionResQTOrigin);
   qtProcessor2.provideItemsSet(hitVector);
 
   // actual filling of the hits into the quad tree structure

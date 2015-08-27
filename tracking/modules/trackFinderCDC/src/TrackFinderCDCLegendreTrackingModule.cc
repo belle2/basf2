@@ -29,8 +29,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(CDCLegendreTracking)
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  TrackFinderCDCBaseModule(), m_cdcLegendreQuadTree(0, m_nbinsTheta, m_rMin, m_rMax, 0, nullptr),
-  m_cdcLegendreTrackProcessor(), m_cdcLegendreTrackDrawer(nullptr)
+  TrackFinderCDCBaseModule(), m_cdcLegendreTrackProcessor(), m_cdcLegendreTrackDrawer(nullptr)
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -108,6 +107,10 @@ void CDCLegendreTrackingModule::findTracks()
   if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
     postprocessTracks();
 
+  doTreeTrackFinding(50, 0.07, true);
+  if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
+    postprocessTracks();
+
   for (int counter = 1; counter < m_treeFindingNumber; counter++) {
     doTreeTrackFinding((m_treeFindingNumber - counter) * 20, 0.15, true);
     if (counter == m_treeFindingNumber - 1 || m_doPostprocessingOften)
@@ -150,12 +153,133 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   }
 
 
-  AxialHitQuadTreeProcessor::ChildRanges ranges(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 13)),
-                                                AxialHitQuadTreeProcessor::rangeY(-0.15, 0.15));
+  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  std::function< double(double) > lmdFunctionResQTD0 = [&](double d0) -> double {
+    double res;
+    res = 0.000127297 + 0.0000281511 * d0 + 0.000288808 * d0 * d0 - 0.0000541841 * d0 * d0 * d0 + 0.00000316108  * d0 * d0 * d0 * d0;
+
+    B2DEBUG(100, "origin: res = " << res << "; d0 = " << d0);
+    return res;
+  };
+
+
+
+  std::function< double(double) > lmdFunctionResQTOrigin = [&](double r_qt) -> double {
+    double res;
+    //TODO: bug is here!
+    if ((TrackCandidate::convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+      r_qt = fabs(TrackCandidate::convertPtToRho(3.)) * r_qt / fabs(r_qt);
+
+    if (r_qt != 0)
+      res = exp(-16.1987 * TrackCandidate::convertRhoToPt(fabs(r_qt)) - 5.96206)
+      + 0.000190872 - 0.0000739319 * TrackCandidate::convertRhoToPt(fabs(r_qt));
+
+    else
+      res = 0.00005;
+
+    B2DEBUG(100, "origin: res = " << res << "; r = " << r_qt);
+    return res;
+  };
+
+
+  std::function< double(double) > lmdFunctionResQTNonOrigin = [&](double r_qt) -> double {
+    double res;
+    if ((TrackCandidate::convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+      r_qt = fabs(TrackCandidate::convertPtToRho(3.)) * r_qt / fabs(r_qt);
+
+    if (r_qt != 0)
+      if (TrackCandidate::convertRhoToPt(fabs(r_qt)) < 0.36)
+        res = exp(-0.356965 - 0.00186066 * TrackCandidate::convertRhoToPt(fabs(r_qt))) - 0.697526;
+      else
+        res = exp(-0.357335 + 0.000438872 * TrackCandidate::convertRhoToPt(fabs(r_qt))) - 0.697786;
+    else
+      res = 0.00005;
+    B2DEBUG(100, "non origin: res = " << res << "; r = " << r_qt);
+    return res;
+  };
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
+
+  std::function< double(double) > currentFunct;
+
+  if (not increaseThreshold) currentFunct = lmdFunctionResQTOrigin;
+  else currentFunct = lmdFunctionResQTNonOrigin;
+
+
+
+  AxialHitQuadTreeProcessor::ChildRanges ranges(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 15)),
+                                                AxialHitQuadTreeProcessor::rangeY(m_rMin, m_rMax));
   std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
-  AxialHitQuadTreeProcessor qtProcessor(maxLevel, ranges);
+
+  AxialHitQuadTreeProcessor qtProcessor(maxLevel, ranges, currentFunct, (increaseThreshold and (rThreshold < 0.15)));
   qtProcessor.provideItemsSet(hitsVector);
+
+
+  AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdAdvancedProcessing = [&](const AxialHitQuadTreeProcessor::ReturnList &
+  hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+    double rRes = currentFunct(qt->getYMean());
+    int thetaRes = abs(m_nbinsTheta* rRes / 0.3);
+
+    int meanTheta = qt->getXMean();
+    double meanR = qt->getYMean();
+
+
+    std::vector< AxialHitQuadTreeProcessor::QuadTree*> nodesWithPossibleCands;
+
+    for (int ii = -1; ii <= 1; ii = +2)
+    {
+      for (int jj = -1; jj <= 1; jj = +2) {
+        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<int>((
+          ii - 1)*thetaRes / 2),
+        meanTheta + static_cast<int>((ii + 1)*thetaRes / 2)),
+        AxialHitQuadTreeProcessor::rangeY(meanR + (jj - 1)*rRes / 2.,
+        meanR + (jj + 1)*rRes / 2.));
+
+        nodesWithPossibleCands.push_back(qtProcessor.createSingleNode(rangesTmp));
+      }
+    }
+
+    for (int ii = -1; ii <= 1; ii++)
+    {
+      for (int jj = -1; jj <= 1; jj++) {
+        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<int>((
+                                                           2 * ii - 1)*thetaRes / 2),
+                                                         meanTheta + static_cast<int>((2 * ii + 1)*thetaRes / 2)),
+                                                         AxialHitQuadTreeProcessor::rangeY(meanR + (2 * jj - 1)*rRes / 2.,
+                                                             meanR + (2 * jj + 1)*rRes / 2.));
+
+        nodesWithPossibleCands.push_back(qtProcessor.createSingleNode(rangesTmp));
+      }
+    }
+
+
+    std::sort(nodesWithPossibleCands.begin(), nodesWithPossibleCands.end(), [](const AxialHitQuadTreeProcessor::QuadTree * a, const AxialHitQuadTreeProcessor::QuadTree * b)
+    {
+      return static_cast <bool>(a->getNItems() > b->getNItems());
+    });
+
+    qt->clearNode();
+    for (AxialHitQuadTreeProcessor::ItemType* hit : nodesWithPossibleCands.front()->getItemsVector())
+    {
+      qt->insertItem(hit);
+    }
+
+//    std::sort( qt->getItemsVector().begin(), qt->getItemsVector().end() );
+//    qt->getItemsVector().erase( std::unique( qt->getItemsVector().begin(), qt->getItemsVector().end() ), qt->getItemsVector().end() );
+
+
+//    std::set<AxialHitQuadTreeProcessor::ItemType*> s;
+//    unsigned size = qt->getItemsVector().size();
+//    for( unsigned i = 0; i < size; ++i ) s.insert( qt->getItemsVector()[i] );
+//    qt->getItemsVector().assign( s.begin(), s.end() );
+
+
+    for (AxialHitQuadTreeProcessor::QuadTree* node : nodesWithPossibleCands)
+    {
+      delete node;
+    }
+  };
+
 
 
   // this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -165,6 +289,11 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList&
   /*hits*/, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
 
+    for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector())
+    {
+      hit->setUsedFlag(TrackHit::c_notUsed);
+    }
+    lmdAdvancedProcessing(hits, qt);
 
     std::vector<TrackHit*> candidateHits;
 
@@ -173,6 +302,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
       hit->setUsedFlag(TrackHit::c_notUsed);
       candidateHits.push_back(hit->getPointer());
     }
+
 
     postprocessSingleNode(candidateHits, increaseThreshold, qt);
 
@@ -195,7 +325,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
     if (increaseThreshold) {
       rThreshold *= 2.;
-      if (rThreshold > 0.15) rThreshold = 0.15;
+      if (rThreshold > m_rMax) rThreshold = m_rMax;
     }
 
 
@@ -244,7 +374,7 @@ void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCD
     }
   }
 
-  double levelPrecision = 10.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
+  double levelPrecision = 10;//.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
 
   double precision_r, precision_theta;
   precision_theta = 3.1415 / (pow(2., levelPrecision + 1));
@@ -253,7 +383,7 @@ void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCD
   double B = -1.*track_par.second * (ref_point.first) - (1 - track_par.second * D) * cos(track_par.first);
   double C = track_par.second * (ref_point.second) + (1 - track_par.second * D) * sin(track_par.first);
   double theta_new = atan2(B, C) + boost::math::constants::pi<double>() / 2.;
-//    if(theta_new < 0) theta_new += boost::math::constants::pi<double>();
+  if (theta_new < 0) theta_new += boost::math::constants::pi<double>();
 
 
   AxialHitQuadTreeProcessorWithNewReferencePoint::ChildRanges
@@ -281,6 +411,8 @@ void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCD
 
   std::vector<TrackHit*> newAssignedHits = qtProcessor.getAssignedHits();
 
+//  if(newAssignedHits.size()>1)B2INFO("hits added: " << newAssignedHits.size());
+
   for (TrackHit* hit : candidateHits) {
     hit->setHitUsage(TrackHit::c_notUsed);
   }
@@ -304,7 +436,12 @@ void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCD
     }
   }
 
+
   TrackCandidate* trackCandidate = m_cdcLegendreTrackProcessor.createLegendreTrackCandidateFromHits(candidateHits);
+
+
+  m_cdcLegendreTrackProcessor.deleteBadHitsOfOneTrack(trackCandidate);
+
 
   // Postprocessing of one track candidate
   m_cdcLegendreTrackProcessor.fitOneTrack(trackCandidate);
@@ -331,11 +468,13 @@ void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCD
 
 void CDCLegendreTrackingModule::postprocessTracks()
 {
-  m_cdcLegendreTrackProcessor.fitAllTracks();
-
   if (m_deleteHitsInTheEnd) {
     m_cdcLegendreTrackProcessor.deleteHitsOfAllBadTracks();
   }
+
+  m_cdcLegendreTrackProcessor.fitAllTracks();
+
+
 
   if (m_mergeTracksInTheEnd) {
     m_cdcLegendreTrackProcessor.mergeAllTracks();

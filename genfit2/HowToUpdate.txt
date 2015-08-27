@@ -10,4 +10,5 @@ to set and commit the new version, type (replace XXXX with the version number wh
 
 cd $BASF2_DIR/genfit2
 svn propset svn:externals 'code2 -rXXXX https://belle2.cc.kek.jp/genfit/trunk' .
+svn up  #check if this works, otherwise check revision number, and call the website from above again
 svn ci -m "update genfit revision"

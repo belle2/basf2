@@ -66,6 +66,7 @@
 
 //#include <tracking/gfbfield/GFGeant4Field.h>
 #include <alignment/gfbfield/GFGeant4RecoField.h>
+#include <alignment/GblMultipleScatteringController.h>
 
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
@@ -247,7 +248,7 @@ void GBLfitModule::initialize()
   }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2WARNING("Material effects not set up, doing this myself with default values.");
+    B2WARNING("Material effects not set up, doing this myself with default values (noise is turned off).");
 
     if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
       geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
@@ -261,10 +262,10 @@ void GBLfitModule::initialize()
 
     // activate / deactivate material effects in genfit
     genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(false); // Noise matrix not used by GBL
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(false); // Noise matrix not used by GBL
     genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(false); // Noise matrix not used by GBL
 
     genfit::MaterialEffects::getInstance()->setMscModel("Highland");
   }
@@ -300,6 +301,8 @@ void GBLfitModule::initialize()
   // Set GBL parameters
   m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations,
                    m_recalcJacobians);
+  // Turn off MS in CDC. GblFitter takes ownership of the controller
+  m_gbl.setTrackSegmentController(new GblMultipleScatteringController());
 
   AlignablePXDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);
   AlignableSVDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);

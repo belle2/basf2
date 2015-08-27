@@ -25,7 +25,7 @@ namespace Belle2 {
 
       BasePrecisionFunction()
       {
-        m_function = [&](double r_qt) -> double {
+        m_function = [&](double __attribute__((unused)) r_qt) -> double {
           return 0.3 / pow(2, 13);
         };
       };

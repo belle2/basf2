@@ -1,7 +1,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
-#include <tracking/trackFindingCDC/legendre/LegendreHit.h>
+#include "../../include/QuadTreeHitWrapper.h"
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -23,13 +23,13 @@ void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag)
 }
 
 template<>
-bool QuadTreeItem<LegendreHit>::isUsed() const
+bool QuadTreeItem<QuadTreeHitWrapper>::isUsed() const
 {
   return getPointer()->getUsedFlag() || getPointer()->getMaskedFlag();
 }
 
 template<>
-void QuadTreeItem<LegendreHit>::setUsedFlag(bool usedFlag)
+void QuadTreeItem<QuadTreeHitWrapper>::setUsedFlag(bool usedFlag)
 {
   getPointer()->setUsedFlag(usedFlag);
 }

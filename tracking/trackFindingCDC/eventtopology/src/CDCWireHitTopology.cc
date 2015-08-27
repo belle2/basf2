@@ -72,10 +72,10 @@ namespace {
 CDCWireHitTopology::CDCWireHitTopology() :
   m_eventMetaData(-999, -999, -999),
   m_useSimpleTDCCountTranslator(false),
-  m_initialTDCCountTranslator(m_useSimpleTDCCountTranslator ?
-                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :
-                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator())
-                             )
+  m_initialTDCCountTranslator(/*m_useSimpleTDCCountTranslator ?
+                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :*/
+    static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator())
+  )
 {
 }
 
@@ -219,7 +219,7 @@ size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
     delete m_initialTDCCountTranslator;
     m_initialTDCCountTranslator = nullptr;
   }
-  if (m_useSimpleTDCCountTranslator) {
+  if (false/*m_useSimpleTDCCountTranslator*/) {
     m_initialTDCCountTranslator = new CDC::SimpleTDCCountTranslator();
   } else {
     m_initialTDCCountTranslator = new CDC::RealisticTDCCountTranslator();

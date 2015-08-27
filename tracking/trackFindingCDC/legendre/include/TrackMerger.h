@@ -39,13 +39,16 @@ namespace Belle2 {
 
       static SignType getChargeSign(CDCTrack& track) ;
 
-      static int getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
+      static SignType getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
 
       static double getPhi(const CDCRecoHit3D& hit) ;
 
       static void deleteAllMarkedHits(CDCTrack& track);
 
+      static bool mergeTwoTracks(CDCTrack& track1, CDCTrack& track2);
+
     private:
+
 
 
       /** Some typedefs for the results of the merging process */

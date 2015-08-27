@@ -116,7 +116,7 @@ namespace Belle2 {
     void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
                       unsigned int);
 
-    void postprocessSingleNode(std::vector<TrackFindingCDC::LegendreHit*>&, bool,
+    void postprocessSingleNode(std::vector<TrackFindingCDC::QuadTreeHitWrapper*>&, bool,
                                TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);
 
   };

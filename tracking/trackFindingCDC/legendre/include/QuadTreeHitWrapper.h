@@ -24,18 +24,18 @@ namespace Belle2 {
     class CDCWireHit;
 
     /** CDC Hit Class used for pattern recognition in the Legendre plain. */
-    class LegendreHit {
+    class QuadTreeHitWrapper {
     public:
 
       /** For root: */
-      LegendreHit() : m_cdcWireHit(nullptr), m_conformalPosition(),
+      QuadTreeHitWrapper() : m_cdcWireHit(nullptr), m_conformalPosition(),
         m_conformalDriftLength() { }
 
       /** Constructor to create a TrackHit from a CDCWireHit object.
        * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
-      explicit LegendreHit(const CDCWireHit* wireHit)
+      explicit QuadTreeHitWrapper(const CDCWireHit* wireHit)
       {
         initializeFromWireHit(wireHit);
       }

@@ -13,25 +13,105 @@
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/legendre/LegendreHit.h>
+#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <TMath.h>
+#include "../include/QuadTreeHitWrapper.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMergerNew::resetHits(CDCTrack& otherTrackCandidate)
+bool TrackMergerNew::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
 {
-  for (const CDCRecoHit3D& hit : otherTrackCandidate.items()) {
-    hit->getWireHit().getAutomatonCell().setTakenFlag(false);
+  CDCRiemannFitter trackFitter;
+
+  if ((track1.size() < 5) || (track2.size() < 5)) return false;
+
+  bool usePosition(false);
+
+
+  CDCTrajectory2D result1;
+  CDCObservations2D observations1;
+  observations1.setUseRecoPos(usePosition);
+  size_t nAppendedHits1 = 0;
+  for (const CDCRecoHit3D& item : track1.items()) {
+    nAppendedHits1 += observations1.append(item, usePosition);
   }
+  trackFitter.update(result1, observations1);
+
+
+
+  CDCTrajectory2D result2;
+  CDCObservations2D observations2;
+  observations2.setUseRecoPos(usePosition);
+  size_t nAppendedHits2 = 0;
+  for (const CDCRecoHit3D& item : track2.items()) {
+    nAppendedHits2 += observations2.append(item, usePosition);
+  }
+  trackFitter.update(result2, observations2);
+
+
+
+  CDCTrajectory2D resultMerge;
+  CDCObservations2D observationsMerge;
+  observationsMerge.setUseRecoPos(usePosition);
+  size_t nAppendedHitsMerge = 0;
+
+  for (const CDCRecoHit3D& item : track1.items()) {
+    nAppendedHitsMerge += observationsMerge.append(item, usePosition);
+  }
+
+  for (const CDCRecoHit3D& item : track2.items()) {
+    nAppendedHitsMerge += observationsMerge.append(item, usePosition);
+  }
+
+  trackFitter.update(resultMerge, observationsMerge);
+
+
+//  B2INFO("chi2_1: " << result1.getChi2() << "; chi2_2: " << result2.getChi2() << "; chi2_merge: " << resultMerge.getChi2());
+
+  FloatType distCriteria1(0);
+  for (CDCRecoHit3D& item : track1) {
+    HitProcessor::updateRecoHit3D(result1, item);
+    distCriteria1 += fabs(result1.getDist2D(item.getRecoPos2D()));
+  }
+  distCriteria1 = distCriteria1 / track1.size();
+
+  FloatType distCriteria2(0);
+  for (CDCRecoHit3D& item : track2) {
+    HitProcessor::updateRecoHit3D(result2, item);
+    distCriteria2 += fabs(result2.getDist2D(item.getRecoPos2D()));
+  }
+  distCriteria2 = distCriteria2 / track2.size();
+
+
+  FloatType distCriteriaMerge(0);
+  for (CDCRecoHit3D& item : track1) {
+    HitProcessor::updateRecoHit3D(resultMerge, item);
+    distCriteriaMerge += fabs(resultMerge.getDist2D(item.getRecoPos2D()));
+  }
+  for (CDCRecoHit3D& item : track2) {
+    HitProcessor::updateRecoHit3D(resultMerge, item);
+    distCriteriaMerge += fabs(resultMerge.getDist2D(item.getRecoPos2D()));
+  }
+  distCriteriaMerge = distCriteriaMerge / (track1.size() + track2.size());
+
+//  B2INFO("criteria1: " << distCriteria1 << "; criteria2: " << distCriteria2 << "; criteriaMerge: " << distCriteriaMerge);
+
+//  if(resultMerge.getChi2()*2./resultMerge.getNDF() <= (result1.getChi2()/result1.getNDF() + result2.getChi2()/result2.getNDF())) return true;
+
+  if (distCriteriaMerge < 0.3) return true;
+
+  return false;
 }
 
 CDCTrack& TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
 {
   assert(trackCandidate);
+  if (trackCandidate.size() < 5) return trackCandidate;
 
   // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
   // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
@@ -53,53 +133,6 @@ CDCTrack& TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
 
     deleteAllMarkedHits(trackCandidate);
 
-    /*
-    // TODO
-    std::sort(trackHits.begin(), trackHits.end(), [](TrackHit * hit1, TrackHit * hit2) {
-      return hit1->getWirePosition().Mag2() < hit2->getWirePosition().Mag2();
-    });
-
-    unsigned int number_of_hits_in_one_half = 0;
-    unsigned int number_of_hits_in_other_half = 0;
-
-    Vector2D momentum = trackCandidate->getMomentumEstimation();
-    double phiOfTrack = momentum.phi();
-
-    for (TrackHit* hit : trackHits) {
-      double phiOfHit = hit->getWirePosition().Phi();
-      if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
-        number_of_hits_in_one_half++;
-      } else {
-        number_of_hits_in_other_half++;
-      }
-    }
-
-    if (number_of_hits_in_one_half > 0 and number_of_hits_in_other_half > 0) {
-
-      TrackCandidate* secondTrackCandidate = new TrackCandidate(*trackCandidate);
-      std::vector<TrackHit*>& secondTrackHits = secondTrackCandidate->getTrackHits();
-      secondTrackHits.clear();
-
-      // Small trick: mark the hits which should belong to the other track candidate as bad,
-      // add them to the other track candidate and delete all marked hits from the first. Then unmark the hits again.
-
-      for (TrackHit* hit : trackHits) {
-        double phiOfHit = hit->getWirePosition().Phi();
-        if (std::abs(TVector2::Phi_mpi_pi(phiOfTrack - phiOfHit)) < TMath::PiOver2()) {
-          secondTrackHits.push_back(hit);
-          hit->setHitUsage(TrackHit::c_bad);
-        }
-      }
-
-      SimpleFilter::deleteAllMarkedHits(trackCandidate);
-
-      for (TrackHit* hit : secondTrackHits) {
-        hit->setHitUsage(TrackHit::c_usedInTrack);
-      }
-
-      return secondTrackCandidate;
-    }
-    */
   }
 
   return trackCandidate;
@@ -148,14 +181,28 @@ void TrackMergerNew::deleteAllMarkedHits(CDCTrack& track)
 
 }
 
+void TrackMergerNew::resetHits(CDCTrack& otherTrackCandidate)
+{
+  for (const CDCRecoHit3D& hit : otherTrackCandidate.items()) {
+    hit->getWireHit().getAutomatonCell().setTakenFlag(false);
+  }
+}
+
 
 SignType TrackMergerNew::getChargeSign(CDCTrack& track)
 {
   SignType trackCharge;
   int vote_pos(0), vote_neg(0);
 
+  Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
+
+  if (std::isnan(center.x())) {
+    B2WARNING("Trajectory is not setted or wrong!");
+    return track.getStartTrajectory3D().getLocalCircle().orientation();
+  }
+
   for (const CDCRecoHit3D& hit : track.items()) {
-    int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getGlobalCircle().center());
+    SignType curve_sign = getCurvatureSignWrt(hit, center);
 
     if (curve_sign == PLUS)
       ++vote_pos;
@@ -177,16 +224,16 @@ SignType TrackMergerNew::getChargeSign(CDCTrack& track)
   return trackCharge;
 }
 
-int TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
+SignType TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 {
   double phi_diff = atan2(xy.y(), xy.x()) - getPhi(hit);
 
-  while (phi_diff > 2 * TMath::Pi())
+  while (phi_diff > /*2 */ TMath::Pi())
     phi_diff -= 2 * TMath::Pi();
-  while (phi_diff < 0)
+  while (phi_diff < -1. * TMath::Pi())
     phi_diff += 2 * TMath::Pi();
 
-  if (phi_diff > TMath::Pi())
+  if (phi_diff > 0 /*TMath::Pi()*/)
     return PLUS;
   else
     return MINUS;
@@ -197,12 +244,12 @@ double TrackMergerNew::getPhi(const CDCRecoHit3D& hit)
 
 
   double phi = atan2(hit.getRecoPos2D().y() , hit.getRecoPos2D().x());
-
-  while (phi > 2 * TMath::Pi())
-    phi -= 2 * TMath::Pi();
-  while (phi < 0)
-    phi += 2 * TMath::Pi();
-
+  /*
+    while (phi > 2 * TMath::Pi())
+      phi -= 2 * TMath::Pi();
+    while (phi < 0)
+      phi += 2 * TMath::Pi();
+  */
   return phi;
   /*
     //the phi angle of the hit depends on the definition, so I try to use the wireId instead

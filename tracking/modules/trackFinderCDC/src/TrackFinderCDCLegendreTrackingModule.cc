@@ -100,7 +100,7 @@ void CDCLegendreTrackingModule::startNewEvent()
 
   B2DEBUG(100, "Initializing hits");
 //  m_cdcLegendreTrackProcessor.initializeHitListFromWireHitTopology();
-  m_trackProcessor.initializeLegendreHits();
+  m_trackProcessor.initializeQuadTreeHitWrappers();
 }
 
 void CDCLegendreTrackingModule::findTracks()
@@ -121,6 +121,9 @@ void CDCLegendreTrackingModule::findTracks()
 //    if (counter == m_treeFindingNumber - 1 || m_doPostprocessingOften)
 //      postprocessTracks();
   }
+
+//  m_trackProcessor.mergeTracks();
+//  m_trackProcessor.assignNewHits();
 }
 
 void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
@@ -161,7 +164,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     }
   */
 
-  std::vector<LegendreHit*> hitsVector = m_trackProcessor.createLegendreHitsForQT();
+  std::vector<QuadTreeHitWrapper*> hitsVector = m_trackProcessor.createQuadTreeHitWrappersForQT();
 
   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   std::function< double(double) > lmdFunctionResQTD0 = [&](double d0) -> double {
@@ -195,7 +198,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
 
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdAdvancedProcessing = [&](const AxialHitQuadTreeProcessor::ReturnList &
-  hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+  __attribute__((unused)) hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
     double rRes = currentFunct(qt->getYMean());
     int thetaRes = abs(m_nbinsTheta* rRes / 0.3);
 
@@ -275,7 +278,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     }
     lmdAdvancedProcessing(hits, qt);
 
-    std::vector<LegendreHit*> candidateHits;
+    std::vector<QuadTreeHitWrapper*> candidateHits;
 
     for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector())
     {
@@ -327,15 +330,15 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 }
 
 
-void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCDC::LegendreHit*>& candidateHits,
-                                                      bool increaseThreshold, AxialHitQuadTreeProcessor::QuadTree* qt)
+void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<TrackFindingCDC::QuadTreeHitWrapper*>& candidateHits,
+                                                      bool __attribute__((unused)) increaseThreshold, AxialHitQuadTreeProcessor::QuadTree* __attribute__((unused)) qt)
 {
 
-  for (LegendreHit* hit : candidateHits) {
+  for (QuadTreeHitWrapper* hit : candidateHits) {
     hit->setUsedFlag(false);// setHitUsage(TrackHit::c_notUsed);
   }
 
-  CDCTrack& trackCand = m_trackProcessor.createLegendreTrackCandidateFromHits(candidateHits);
+  /*CDCTrack& trackCand = */m_trackProcessor.createCDCTrackCandidates(candidateHits);
   return;
 
 //  m_cdcLegendreTrackProcessor.createLegendreTrackCandidateFromHits(candidateHits);
@@ -472,6 +475,7 @@ void CDCLegendreTrackingModule::postprocessTracks()
 
 void CDCLegendreTrackingModule::terminate()
 {
+//  m_trackProcessor.saveHist();
   delete m_cdcLegendreTrackDrawer;
 }
 

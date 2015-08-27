@@ -15,7 +15,9 @@
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/LegendreHit.h>
+#include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
+
+#include "TH1F.h"
 
 #include <list>
 #include <vector>
@@ -43,7 +45,11 @@ namespace Belle2 {
        * We use the fitter and the drawer as a pointer to have the possibility to use different classes.
        */
       TrackProcessorNew() :
-        m_cdcTracks(), m_trackFitter() { }
+        m_cdcTracks(), m_trackFitter(),
+        m_histChi2("h_chi2", "chi2", 100, 0., 300.),
+        m_histChi2NDF("h_chi2", "chi2", 100, 0., 300.),
+        m_histDist("h_dist", "dist", 100, 0., 2.) { }
+
 
       /**
        * Do not copy this class
@@ -58,18 +64,37 @@ namespace Belle2 {
       /**
        * Compile the hitList from the wire hit topology.
        */
-      void initializeLegendreHits();
+      void initializeQuadTreeHitWrappers();
 
-      CDCTrack& createLegendreTrackCandidateFromHits(std::vector<LegendreHit*>& trackHits);
+      /*CDCTrack&*/ void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
 
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
       void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) ;
 
       void updateTrack(CDCTrack& track);
 
+      bool checkTrack(CDCTrack& track);
+
       void assignNewHits(CDCTrack& track);
 
+      void assignNewHits();
+
       int estimateCharge(double theta, double r, std::vector<TrackHit*>& trackHits);
+
+      void mergeTracks();
+
+      void fillHist(CDCTrack& track);
+
+      void saveHist();
+
+      bool checkChi2(CDCTrack& track);
+
+      FloatType estimateChi2(CDCTrack& track);
+
+      FloatType getQuantile(FloatType alpha, FloatType n);
+
+      CDCTrajectory2D fit(CDCTrack& track);
+
 
       /**
        * Get the list with currently stored tracks.
@@ -82,16 +107,16 @@ namespace Belle2 {
       /**
        * Get the list with currently stored tracks.
        */
-      const std::vector<LegendreHit>& getLegendreHits()
+      const std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
       {
-        return m_legendreHits;
+        return m_QuadTreeHitWrappers;
       }
 
       /**
        * For the use in the QuadTree use this hit set.
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      std::vector<LegendreHit*> createLegendreHitsForQT();
+      std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT();
 
 
 
@@ -108,7 +133,7 @@ namespace Belle2 {
        */
       void resetMaskedHits()
       {
-        doForAllHits([](LegendreHit & hit) {
+        doForAllHits([](QuadTreeHitWrapper & hit) {
           if (hit.getMaskedFlag()) {
             hit.setMaskedFlag(false);
             hit.setUsedFlag(false);
@@ -121,13 +146,13 @@ namespace Belle2 {
        */
       void clearVectors()
       {
-        m_legendreHits.clear();
+        m_QuadTreeHitWrappers.clear();
         m_cdcTracks.clear();
       }
 
     private:
       std::vector<CDCTrack> m_cdcTracks; /**< List of track candidates. */
-      std::vector<LegendreHit> m_legendreHits; /**< Vector which hold axial hits */
+      std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits */
       CDCRiemannFitter m_trackFitter;
 
       /**
@@ -151,13 +176,16 @@ namespace Belle2 {
       /**
        * Do a certain function for each track in the track list
        */
-      void doForAllHits(std::function<void(LegendreHit& hit)> function)
+      void doForAllHits(std::function<void(QuadTreeHitWrapper& hit)> function)
       {
-        for (LegendreHit& hit : m_legendreHits) {
+        for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
           function(hit);
         }
       }
 
+      TH1F m_histChi2;
+      TH1F m_histChi2NDF;
+      TH1F m_histDist;
 
     };
   }

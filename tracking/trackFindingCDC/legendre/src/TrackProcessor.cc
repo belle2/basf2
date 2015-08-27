@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <tracking/trackFindingCDC/legendre/TrackMerger.h>
+#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>
@@ -24,8 +25,9 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCTrack& TrackProcessorNew::createLegendreTrackCandidateFromHits(std::vector<LegendreHit*>& trackHits)
+/*CDCTrack&*/void TrackProcessorNew::createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits)
 {
+//  B2INFO("create");
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
   m_cdcTracks.emplace_back();
@@ -33,7 +35,7 @@ CDCTrack& TrackProcessorNew::createLegendreTrackCandidateFromHits(std::vector<Le
 
 
   CDCObservations2D observations2DLegendre;
-  for (const LegendreHit* item : trackHits) {
+  for (const QuadTreeHitWrapper* item : trackHits) {
     observations2DLegendre.append(*item->getCDCWireHit());
   }
 
@@ -41,133 +43,145 @@ CDCTrack& TrackProcessorNew::createLegendreTrackCandidateFromHits(std::vector<Le
   m_trackFitter.update(trackTrajectory2D, observations2DLegendre);
 
 
-  for (LegendreHit* trackHit : trackHits) {
-    RightLeftInfo rlInfo = RIGHT;
-    if (trackTrajectory2D.getDist2D(trackHit->getCDCWireHit()->getRefPos2D()) < 0)
-      rlInfo = LEFT;
-    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(trackHit->getCDCWireHit()->getHit(), rlInfo);
-    if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
-      continue;
+  for (QuadTreeHitWrapper* trackHit : trackHits) {
+    if (trackHit->getUsedFlag() || trackHit->getMaskedFlag()) continue;
 
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+    const CDCRecoHit3D& cdcRecoHit3D  = HitProcessor::createRecoHit3D(trackTrajectory2D, trackHit);
     newTrackCandidate.push_back(std::move(cdcRecoHit3D));
     cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
   }
-  /*
-    static int count(0);
 
-    TCanvas canv1(Form("canv1_%i", count), "canv", 600, 800);
-    TH1F hist1(Form("hist1_%i", count), "hist", 100, 0, 0.5);
+  CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
+  newTrackCandidate.setStartTrajectory3D(trajectory3D);
 
-    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
-      hist1.Fill(trackTrajectory2D.getDist2D(recoHit.getRecoPos2D()));
-    }
-
-
-    hist1.Draw();
-    canv1.SaveAs(Form("tmp/distToHitBefore_%i.root", count));
-  */
-
+//  B2INFO("update");
   updateTrack(newTrackCandidate);
-  /*
-    TCanvas canv2(Form("canv2_%i", count), "canv", 600, 800);
-    TH1F hist2(Form("hist2_%i", count), "hist", 100, 0, 0.5);
 
-    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
-      hist2.Fill(newTrackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D()));
-    }
-
-
-    hist2.Draw();
-    canv2.SaveAs(Form("tmp/distToHitAfter_%i.root", count));
-
-    count++;
-  */
+//  B2INFO("split");
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
+  if (not checkTrack(newTrackCandidate)) {
+    m_cdcTracks.pop_back();
+    for (QuadTreeHitWrapper* hit : trackHits) {
+      hit->setMaskedFlag(true);
+    }
+    return;
+  }
 
+//  B2INFO("update");
   updateTrack(newTrackCandidate);
 
+//  B2INFO("delete");
   deleteBadHitsOfOneTrack(newTrackCandidate);
+  if (not checkTrack(newTrackCandidate)) {
+    m_cdcTracks.pop_back();
+    for (QuadTreeHitWrapper* hit : trackHits) {
+      hit->setMaskedFlag(true);
+    }
+    return;
+  }
 
   assignNewHits(newTrackCandidate);
 
+//  B2INFO("split");
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
-
-  updateTrack(newTrackCandidate);
-
-  deleteBadHitsOfOneTrack(newTrackCandidate);
-
-
-  for (LegendreHit* hit : trackHits) {
-    hit->setUsedFlag(true);
+  if (not checkTrack(newTrackCandidate)) {
+    m_cdcTracks.pop_back();
+    for (QuadTreeHitWrapper* hit : trackHits) {
+      hit->setMaskedFlag(true);
+    }
+    return;
   }
 
-  return newTrackCandidate;
+//  B2INFO("update");
+  updateTrack(newTrackCandidate);
+
+//  B2INFO("delete");
+  deleteBadHitsOfOneTrack(newTrackCandidate);
+  if (not checkTrack(newTrackCandidate)) {
+    m_cdcTracks.pop_back();
+    for (QuadTreeHitWrapper* hit : trackHits) {
+      hit->setMaskedFlag(true);
+    }
+    return;
+  }
+
+  //  B2INFO("update");
+  updateTrack(newTrackCandidate);
+
+  for (QuadTreeHitWrapper* hit : trackHits) {
+    hit->setUsedFlag(true);
+  }
+  /*
+    fillHist(newTrackCandidate);
+
+    checkChi2(newTrackCandidate);
+
+    if(not checkChi2(newTrackCandidate)) {
+      m_cdcTracks.pop_back();
+      for (QuadTreeHitWrapper* hit : trackHits) {
+        hit->setMaskedFlag(true);
+      }
+      return;
+    }
+  */
 }
 
 void TrackProcessorNew::updateTrack(CDCTrack& track)
 {
   // Set the start point of the trajectory to the first hit
-  track.sort();
+//  track.sort();
 
-  CDCTrajectory2D trackTrajectory2D = m_trackFitter.fit(track);
+  if (track.size() < 5) return;
 
+  CDCTrajectory2D trackTrajectory2D = /*m_trackFitter.*/fit(track);
+
+
+
+  if (trackTrajectory2D.getLocalCircle().orientation() != TrackMergerNew::getChargeSign(track)) trackTrajectory2D.reverse();
+
+  trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
+
+//  B2INFO("updated reco position:");
   for (CDCRecoHit3D& recoHit : track) {
-    recoHit.setRecoPos3D(recoHit.getRecoHit2D().getRLWireHit().reconstruct3D(trackTrajectory2D));
-  }
-
-  // Recalculate the perpS of the hits
-  for (CDCRecoHit3D& recoHit : track) {
-    recoHit.setPerpS(trackTrajectory2D.calcPerpS(recoHit.getRecoPos2D()));
+    HitProcessor::updateRecoHit3D(trackTrajectory2D, recoHit);
   }
 
   track.sortByPerpS();
 
-  trackTrajectory2D.setLocalOrigin(track.front().getRecoPos2D());
-
-  // Maybe we should reverse the trajectory here, is this right?
+//  trackTrajectory2D.setLocalOrigin(track.front().getRecoPos2D());
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
 
+  for (CDCRecoHit3D& hit : track) {
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  }
 
-  /*
-  static int count(0);
-
-    TCanvas canv(Form("canv_%i", count), "canv", 600, 800);
-    TH1F hist(Form("hist_%i", count), "hist", 100, 0, 0.5);
-
-    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
-      hist.Fill(recoHit.getSquaredDist2D(trackTrajectory2D));
-    }
+}
 
 
-    hist.Draw();
-    canv.SaveAs(Form("tmp/distToHit_%i.root", count));
-    count++;
-  */
+bool TrackProcessorNew::checkTrack(CDCTrack& track)
+{
+  if (track.size() < 5) return false;
 
-
+  return true;
 }
 
 
 
 void TrackProcessorNew::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-
-  tracks.clear();
-
+//  tracks.clear();
 
 //  std::copy(m_tracksVector.begin(), m_tracksVector.end(), tracks.begin());
 
   for (CDCTrack& track : m_cdcTracks) {
     if (track.size() > 5) tracks.push_back(std::move(track));
   }
-
-
 }
 
-void TrackProcessorNew::initializeLegendreHits()
+void TrackProcessorNew::initializeQuadTreeHitWrappers()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -178,19 +192,19 @@ void TrackProcessorNew::initializeLegendreHits()
     B2WARNING("cdcHitsCollection is empty!");
   }
 
-  m_legendreHits.reserve(cdcWireHits.size());
+  m_QuadTreeHitWrappers.reserve(cdcWireHits.size());
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
-    LegendreHit legendreHit(cdcWireHit);
-    if (legendreHit.checkHitDriftLength() and legendreHit.getCDCWireHit()->isAxial()) {
-      m_legendreHits.push_back(std::move(legendreHit));
+    QuadTreeHitWrapper QuadTreeHitWrapper(cdcWireHit);
+    if (QuadTreeHitWrapper.checkHitDriftLength() and QuadTreeHitWrapper.getCDCWireHit()->isAxial()) {
+      m_QuadTreeHitWrappers.push_back(std::move(QuadTreeHitWrapper));
     }
   }
-  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_legendreHits.size() << " axial.");
+  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_QuadTreeHitWrappers.size() << " axial.");
 
 }
 
-std::vector<LegendreHit*> TrackProcessorNew::createLegendreHitsForQT()
+std::vector<QuadTreeHitWrapper*> TrackProcessorNew::createQuadTreeHitWrappersForQT()
 {
   doForAllTracks([](CDCTrack & cand) {
     for (CDCRecoHit3D& recoHit : cand) {
@@ -198,13 +212,13 @@ std::vector<LegendreHit*> TrackProcessorNew::createLegendreHitsForQT()
     }
   });
 
-  std::vector<LegendreHit*> legendreHits;
-  doForAllHits([&legendreHits](LegendreHit & trackHit) {
+  std::vector<QuadTreeHitWrapper*> QuadTreeHitWrappers;
+  doForAllHits([&QuadTreeHitWrappers](QuadTreeHitWrapper & trackHit) {
     if (trackHit.getUsedFlag() || trackHit.getMaskedFlag()) return;
-    legendreHits.push_back(&trackHit);
+    QuadTreeHitWrappers.push_back(&trackHit);
   });
-  B2DEBUG(90, "In hit set are " << legendreHits.size() << " hits.")
-  return legendreHits;
+  B2DEBUG(90, "In hit set are " << QuadTreeHitWrappers.size() << " hits.")
+  return QuadTreeHitWrappers;
 }
 
 void TrackProcessorNew::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
@@ -212,7 +226,7 @@ void TrackProcessorNew::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
 
   for (CDCRecoHit3D& recoHit : trackCandidate) {
 
-    if (trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D()) > 0.1)
+    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.3)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
@@ -221,14 +235,35 @@ void TrackProcessorNew::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
   updateTrack(trackCandidate);
 }
 
+void TrackProcessorNew::assignNewHits()
+{
+  for (CDCTrack& track : m_cdcTracks) {
+
+    if (track.size() < 5) continue;
+
+    assignNewHits(track);
+
+    TrackMergerNew::splitBack2BackTrack(track);
+
+    //  B2INFO("update");
+    updateTrack(track);
+
+    //  B2INFO("delete");
+    deleteBadHitsOfOneTrack(track);
+
+  }
+}
+
 void TrackProcessorNew::assignNewHits(CDCTrack& track)
 {
+  if (track.size() < 5) return;
+
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  SignType trackCharge = TrackMergerNew::getChargeSign(track);
+//  SignType trackCharge = TrackMergerNew::getChargeSign(track);
   CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
 
-  for (LegendreHit& hit : m_legendreHits) {
+  for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
     if (hit.getUsedFlag() || hit.getMaskedFlag()) continue;
 
     RightLeftInfo rlInfo = RIGHT;
@@ -243,7 +278,7 @@ void TrackProcessorNew::assignNewHits(CDCTrack& track)
 
     const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
 
-    if (trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D()) < 0.2) {
+    if (fabs(trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D())) < 0.2) {
       track.push_back(std::move(cdcRecoHit3D));
       cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
     }
@@ -255,47 +290,121 @@ void TrackProcessorNew::assignNewHits(CDCTrack& track)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-int TrackProcessorNew::estimateCharge(double theta, double r, std::vector<TrackHit*>& trackHits)
+void TrackProcessorNew::mergeTracks()
 {
-  double yc = TMath::Sin(theta) / r;
-  double xc = TMath::Cos(theta) / r;
-  double rc = fabs(1. / r);
+  unsigned int outerCounter = 0;
+  for (CDCTrack& track1 : m_cdcTracks) {
+    unsigned int innerCounter = 0;
+//    CDCTrack& bestCandidate = nullptr;
+    for (CDCTrack& track2 : m_cdcTracks) {
+      if (innerCounter <= outerCounter) {
+        innerCounter++;
+        continue;
+      }
 
-  int vote_pos = 0;
-  int vote_neg = 0;
+      if (TrackMergerNew::mergeTwoTracks(track1, track2)) {
+        B2INFO("MERGE TRACKS!");
 
-  for (TrackHit* Hit : trackHits) {
-    int curve_sign = Hit->getCurvatureSignWrt(xc, yc);
+        for (const CDCRecoHit3D& hit : track2) {
+          track1.push_back(std::move(hit));
+        }
+        track2.clear();
 
-    if (curve_sign == TrackCandidate::charge_positive)
-      ++vote_pos;
-    else if (curve_sign == TrackCandidate::charge_negative)
-      ++vote_neg;
-    else {
-      B2ERROR(
-        "Strange behaviour of TrackHit::getCurvatureSignWrt");
-      exit(EXIT_FAILURE);
+        updateTrack(track1);
+      }
+
+
+      innerCounter++;
+
     }
+    outerCounter++;
+  }
+}
+
+CDCTrajectory2D TrackProcessorNew::fit(CDCTrack& track)
+{
+  bool m_usePosition(true);
+//  bool m_useOrientation(false);
+
+  CDCTrajectory2D result;
+  CDCObservations2D observations2D;
+  observations2D.setUseRecoPos(m_usePosition);
+  size_t nAppendedHits = 0;
+  for (const CDCRecoHit3D& item : track.items()) {
+    nAppendedHits += observations2D.append(item, m_usePosition);
   }
 
-  if (vote_pos > vote_neg)
-    return TrackCandidate::charge_positive;
+  m_trackFitter.update(result, observations2D);
 
-  else
-    return TrackCandidate::charge_negative;
+  return result;
+}
+
+
+
+void TrackProcessorNew::fillHist(CDCTrack& track)
+{
+  m_histChi2.Fill(track.getStartTrajectory3D().getChi2());
+  m_histChi2NDF.Fill(track.getStartTrajectory3D().getChi2() / track.getStartTrajectory3D().getNDF());
+
+  for (const CDCRecoHit3D& hit : track) {
+
+    m_histDist.Fill(fabs(track.getStartTrajectory3D().getTrajectory2D().getDist2D(hit.getRecoPos2D())));
+  }
+}
+
+void TrackProcessorNew::saveHist()
+{
+  TCanvas canv1("canv1", "canv1", 600, 800);
+  m_histChi2.Draw();
+  canv1.SaveAs("tmp/chi2.root");
+
+  TCanvas canv2("canv2", "canv2", 600, 800);
+  m_histDist.Draw();
+  canv2.SaveAs("tmp/dist.root");
+
+  TCanvas canv3("canv3", "canv3", 600, 800);
+  m_histChi2NDF.Draw();
+  canv3.SaveAs("tmp/chi2NDF.root");
 
 }
 
+
+
+bool TrackProcessorNew::checkChi2(CDCTrack& track)
+{
+  CDCTrajectory2D trackTrajectory2D = /*m_trackFitter.*/fit(track);
+
+
+  FloatType minChi2 = getQuantile(0.025, trackTrajectory2D.getNDF());
+  FloatType maxChi2 = getQuantile(0.975, trackTrajectory2D.getNDF());
+  FloatType Chi2 = trackTrajectory2D.getChi2();
+
+//  B2INFO("Chi2: " << Chi2 << "; min: " << minChi2 << "; max: " << maxChi2 << "; PVal: " << trackTrajectory2D.getPValue());
+
+  if ((Chi2 < minChi2) || (Chi2 > maxChi2)) return false;
+
+  return true;
+
+}
+
+
+FloatType TrackProcessorNew::getQuantile(FloatType alpha, FloatType n)
+{
+
+
+  double d;
+  if (alpha > 0.5) {
+    d = 2.0637 * pow(log(1. / (1. - alpha)) - 0.16, 0.4274) - 1.5774;
+  } else {
+    d = -2.0637 * pow(log(1. / alpha) - 0.16, 0.4274) + 1.5774;
+  }
+
+  double A = d * pow(2., 0.5);
+  double B = 2.*(d * d - 1.) / 3.;
+  double C = d * (d * d - 7) / (9. * pow(2., 0.5));
+  double D = (6.*d * d * d * d + 14 * d * d - 32) / 405.;
+  double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
+
+  return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
+
+}

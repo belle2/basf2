@@ -35,7 +35,7 @@ main.add_module(
 main.add_module('MillepedeCalibration')
 
 main.add_module('Progress')
-main.add_module('GBLdiagnostics')
+# main.add_module('GBLdiagnostics')
 process(main)
 
 # Print call statistics

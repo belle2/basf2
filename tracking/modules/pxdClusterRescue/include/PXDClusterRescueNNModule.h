@@ -16,7 +16,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 
 //#include "../../../externals/v00-05-03/include/neurobayes/NeuroBayesExpert.hh" // FIXME: how to include this path correctly?
-#include <NeuroBayesExpert.hh> // FIXME: how to include this path correctly?
+#include <neurobayes/NeuroBayesExpert.hh> // FIXME: how to include this path correctly?
 
 namespace Belle2 {
 

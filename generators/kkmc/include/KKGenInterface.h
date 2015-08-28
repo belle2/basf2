@@ -80,14 +80,14 @@ namespace Belle2 {
     ~KKGenInterface() {}
 
     /**
-     * Copy constructor (for cppcheck).
+     * Copy constructor, explicitly forbidden (for cppcheck).
      */
-    KKGenInterface(const KKGenInterface& m);
+    KKGenInterface(const KKGenInterface& m) = delete;
 
     /**
      * Assignment operator (for cppcheck).
      */
-    KKGenInterface& operator= (const KKGenInterface& m);
+    //KKGenInterface& operator= (const KKGenInterface& m);
 
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
               const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */

@@ -1,4 +1,3 @@
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/logging/Logger.h>
 

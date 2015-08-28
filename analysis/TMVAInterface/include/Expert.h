@@ -61,7 +61,7 @@ namespace Belle2 {
        */
       float _analyse();
 
-      float m_signalFraction; /**< Signal fraction in training */
+      double m_signalFraction; /**< Signal fraction in training */
       ExpertConfig m_config; /**< Expert config */
       bool m_transformToProbability; /**< Transform output of classifier to a probability */
 

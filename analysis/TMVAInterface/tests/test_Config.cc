@@ -36,10 +36,10 @@ namespace {
   TEST(ConfigTest, ExtraData)
   {
     Config config("prefix", "workingDirectory/");
-    config.addExtraData("Test", std::vector<float> {1.0, 2.0, 3.0});
+    config.addExtraData("Test", std::vector<double> {1.0, 2.0, 3.0});
     EXPECT_TRUE(config.hasExtraData("Test"));
     EXPECT_FALSE(config.hasExtraData("Missing"));
-    std::vector<float> vector = config.getExtraData("Test");
+    std::vector<double> vector = config.getExtraData("Test");
     EXPECT_FLOAT_EQ(vector.size(), 3);
     EXPECT_FLOAT_EQ(vector[0], 1.0f);
     EXPECT_FLOAT_EQ(vector[1], 2.0f);
@@ -204,8 +204,8 @@ namespace {
                                 Method("BoostedDecisionTrees2", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100")};
 
     TeacherConfig write("prefix", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
-    write.addExtraData("Test", std::vector<float> {1.0, 2.0, 3.0});
-    write.addExtraData("Test2", std::vector<float> { -1.0, 4.0});
+    write.addExtraData("Test", std::vector<double> {1.0, 2.0, 3.0});
+    write.addExtraData("Test2", std::vector<double> { -1.0, 4.0});
     write.save(2, 0.6f);
 
     ExpertConfig read("prefix", tempDirectory.getTempDir(), "BoostedDecisionTrees", 2);
@@ -213,13 +213,13 @@ namespace {
     EXPECT_TRUE(read.hasExtraData("Test"));
     EXPECT_TRUE(read.hasExtraData("Test2"));
     EXPECT_FALSE(read.hasExtraData("Missing"));
-    std::vector<float> vector1 = read.getExtraData("Test");
+    std::vector<double> vector1 = read.getExtraData("Test");
     EXPECT_FLOAT_EQ(vector1.size(), 3);
     EXPECT_FLOAT_EQ(vector1[0], 1.0f);
     EXPECT_FLOAT_EQ(vector1[1], 2.0f);
     EXPECT_FLOAT_EQ(vector1[2], 3.0f);
-    std::vector<float> vector2 = read.getExtraData("Test2");
-    EXPECT_FLOAT_EQ(vector2.size(), 2);
+    std::vector<double> vector2 = read.getExtraData("Test2");
+    EXPECT_EQ(vector2.size(), 2);
     EXPECT_FLOAT_EQ(vector2[0], -1.0f);
     EXPECT_FLOAT_EQ(vector2[1], 4.0f);
 

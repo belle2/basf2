@@ -35,7 +35,8 @@ namespace Belle2 {
        * @param workingDirectory where the config file and weight file directory is stored
        * @param extraData optional extra data
        */
-      Config(const std::string& prefix, const std::string& workingDirectory, const std::map<std::string, std::vector<float>>& extraData = {});
+      Config(const std::string& prefix, const std::string& workingDirectory,
+             const std::map<std::string, std::vector<double>>& extraData = {});
 
       /**
        * Load feature variables from VariableManager
@@ -62,7 +63,7 @@ namespace Belle2 {
        * @param key used to save this data
        * @param data as std::vector
        */
-      void addExtraData(const std::string& key, const std::vector<float>& data);
+      void addExtraData(const std::string& key, const std::vector<double>& data);
 
       /**
        * Checks if key is available in the extra data
@@ -73,13 +74,13 @@ namespace Belle2 {
       /**
        * Gets the extra data
        */
-      std::map<std::string, std::vector<float>> getExtraData() const { return m_extraData; }
+      std::map<std::string, std::vector<double>> getExtraData() const { return m_extraData; }
 
       /**
        * Gets the extra data stored under the given key
        * @param key of the extra data
        */
-      std::vector<float> getExtraData(const std::string& key) { return m_extraData[key]; }
+      std::vector<double> getExtraData(const std::string& key) { return m_extraData[key]; }
 
       /**
        * Return working directory
@@ -111,7 +112,7 @@ namespace Belle2 {
       std::string m_workingDirectory; /**< where the config file and weight file directory is stored */
       std::vector<std::string> m_variables; /**< input variables */
       std::vector<std::string> m_spectators; /**< input spectators */
-      std::map<std::string, std::vector<float>> m_extraData; /**< map of additional data */
+      std::map<std::string, std::vector<double>> m_extraData; /**< map of additional data */
 
     };
 
@@ -135,7 +136,7 @@ namespace Belle2 {
        */
       TeacherConfig(const std::string& prefix, const std::string& workingDirectory,
                     const std::vector<std::string>& variables, const std::vector<std::string>& spectators,
-                    const std::vector<Method>& methods, const std::map<std::string, std::vector<float>>& extraData = {});
+                    const std::vector<Method>& methods, const std::map<std::string, std::vector<double>>& extraData = {});
 
       /**
        * Return TMVA Methods
@@ -147,13 +148,13 @@ namespace Belle2 {
        * @param signalClass
        * @param signalFraction
        */
-      void save(int signalClass, float signalFraction) const;
+      void save(int signalClass, double signalFraction) const;
 
     private:
       /**
        * Save config to given property tree
        */
-      void saveToXML(int signalClass, float signalFraction) const;
+      void saveToXML(int signalClass, double signalFraction) const;
 
     private:
 
@@ -174,7 +175,7 @@ namespace Belle2 {
        * @param workingDirectory where the config file and weight file directory is stored
        */
       ExpertConfig(const std::string& prefix, const std::string& workingDirectory, const std::string& method, int signal_class,
-                   float signal_fraction = -1);
+                   double signal_fraction = -1);
 
       /**
        * Return TMVA Method
@@ -189,7 +190,7 @@ namespace Belle2 {
       /**
        * Return signal fraction
        */
-      float getSignalFraction() const;
+      double getSignalFraction() const;
 
       /**
        * Return signal class
@@ -207,12 +208,12 @@ namespace Belle2 {
       /**
        * Load extraData from config file
        */
-      std::map<std::string, std::vector<float>> getExtraDataFromXML(const boost::property_tree::ptree& pt) const;
+      std::map<std::string, std::vector<double>> getExtraDataFromXML(const boost::property_tree::ptree& pt) const;
 
       /**
        * Return Signal fraction from XML config file
        */
-      float getSignalFractionFromXML(const boost::property_tree::ptree& pt) const;
+      double getSignalFractionFromXML(const boost::property_tree::ptree& pt) const;
 
       /**
        * Load target from config file
@@ -233,7 +234,7 @@ namespace Belle2 {
       std::string m_method; /**< Used TMVA method */
       std::string m_weightfile; /**< Used TMVA method */
       int m_signal_class; /**< Signal class id */
-      float m_signal_fraction; /**< Signal class fraction in training or as provided by user */
+      double m_signal_fraction; /**< Signal class fraction in training or as provided by user */
 
     };
 

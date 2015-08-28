@@ -320,8 +320,9 @@ namespace Belle2 {
       addVariable("__weight__cdf__", splot.getCDFWeights());
       addVariable("__weight__pdf__", splot.getPDFWeights());
 
-      m_config.addExtraData("SPlotPriorValues", splot.getProbabilityBinned());
-      m_config.addExtraData("SPlotPriorBinning", splot.getProbabilityBins());
+      m_config.addExtraData("SPlotSignalPDF", splot.getSignalPDFBins());
+      m_config.addExtraData("SPlotBackgroundPDF", splot.getBackgroundPDFBins());
+      m_config.addExtraData("SPlotPDFBinning", splot.getPDFBinning());
 
       // Perform splot training with __weight__cdf__
       std::string signal_splot_weight = "__weight__ * __weight__splot__";
@@ -529,8 +530,8 @@ namespace Belle2 {
       factory.SetBackgroundWeightExpression(background_weight);
 
       factory.AddSignalTree(class_trees[signalClass]);
-      float sum_sig = sumOfFormula(signal_weight, class_trees[signalClass]);
-      float sum_bck = 0;
+      double sum_sig = sumOfFormula(signal_weight, class_trees[signalClass]);
+      double sum_bck = 0;
       for (const auto& pair : class_trees) {
         if (pair.first != signalClass) {
           factory.AddBackgroundTree(pair.second);
@@ -548,7 +549,7 @@ namespace Belle2 {
       factory.TestAllMethods();
       factory.EvaluateAllMethods();
 
-      float signalFraction = sum_sig / (sum_sig + sum_bck);
+      double signalFraction = sum_sig / (sum_sig + sum_bck);
       m_config.save(signalClass, signalFraction);
 
     }

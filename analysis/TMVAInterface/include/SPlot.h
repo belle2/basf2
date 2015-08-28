@@ -25,8 +25,10 @@
 #include <RooAbsArg.h>
 #include <RooConstVar.h>
 #include <RooWorkspace.h>
+#include <RooBinning.h>
 #include <Rtypes.h>
 #include <RooWorkspace.h>
+#include <RooGlobalFunc.h>
 
 #include <TIterator.h>
 #include <TROOT.h>
@@ -59,6 +61,7 @@ namespace Belle2 {
 
       /**
        * Destructor
+       * Leaks memory
        */
       ~SPlot();
 
@@ -78,14 +81,19 @@ namespace Belle2 {
       std::vector<float> getPDFWeights() const { return pdf_weights; }
 
       /**
-       * Returns calculated binned signal probability S/(S+B)
+       * Returns binning used to save signal and background pdf
        */
-      std::vector<float> getProbabilityBinned() const { return probability_binned; }
+      std::vector<double> getPDFBinning() const { return pdf_binning; }
 
       /**
-       * Returns bins of the signal probability S/(S+B)
+       * Returns bins of the signal pdf
        */
-      std::vector<float> getProbabilityBins() const { return probability_bins; }
+      std::vector<double> getSignalPDFBins() const { return signal_pdf_bins; }
+
+      /**
+       * Returns bins of the signal pdf
+       */
+      std::vector<double> getBackgroundPDFBins() const { return background_pdf_bins; }
 
       /**
        * Create plot of fitted signal and background yields
@@ -99,12 +107,14 @@ namespace Belle2 {
 
       std::unique_ptr<RooWorkspace> workspace;
       std::unique_ptr<RooDataSet> discriminating_values;
+      std::unique_ptr<RooStats::SPlot> sData;
       RooAbsPdf* model;
       std::vector<float> splot_weights;
       std::vector<float> cdf_weights;
       std::vector<float> pdf_weights;
-      std::vector<float> probability_bins;
-      std::vector<float> probability_binned;
+      std::vector<double> signal_pdf_bins;
+      std::vector<double> background_pdf_bins;
+      std::vector<double> pdf_binning;
 
       std::string m_modelObjectName; /**< Name of the RooAbsPdf object which represents the model. */
       std::vector<std::string>
@@ -112,8 +122,8 @@ namespace Belle2 {
       std::vector<std::string>
       m_modelPlotComponentNames; /**< Name of RooAbsPdf objects that are part of the model and should be plotted additionally in the control plot. */
 
-      TTree* temp_tree_data; /**< Temporary root tree */
-      TFile* modelFile; /**< Model file */
+      std::unique_ptr<TTree> temp_tree_data; /**< Temporary root tree */
+      std::unique_ptr<TFile> modelFile; /**< Model file */
 
     };
   }

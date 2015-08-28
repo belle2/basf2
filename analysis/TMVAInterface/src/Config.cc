@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TMVAInterface {
 
     Config::Config(const std::string& prefix, const std::string& workingDirectory,
-                   const std::map<std::string, std::vector<float>>& extraData) : m_prefix(prefix),
+                   const std::map<std::string, std::vector<double>>& extraData) : m_prefix(prefix),
       m_workingDirectory(workingDirectory), m_extraData(extraData)
     {
       if (m_workingDirectory.back() != '/') {
@@ -77,7 +77,7 @@ namespace Belle2 {
       return vars;
     }
 
-    void Config::addExtraData(const std::string& key, const std::vector<float>& data)
+    void Config::addExtraData(const std::string& key, const std::vector<double>& data)
     {
       m_extraData[key] = data;
     }
@@ -87,7 +87,7 @@ namespace Belle2 {
                                  const std::vector<std::string>& variables,
                                  const std::vector<std::string>& spectators,
                                  const std::vector<Method>& methods,
-                                 const std::map<std::string, std::vector<float>>& extraData) :
+                                 const std::map<std::string, std::vector<double>>& extraData) :
       Config(prefix, workingDirectory, extraData), m_methods(methods)
     {
       m_variables = variables;
@@ -100,12 +100,12 @@ namespace Belle2 {
       return m_methods;
     }
 
-    void TeacherConfig::save(int signalClass, float signalFraction) const
+    void TeacherConfig::save(int signalClass, double signalFraction) const
     {
       saveToXML(signalClass, signalFraction);
     }
 
-    void TeacherConfig::saveToXML(int signalClass, float signalFraction) const
+    void TeacherConfig::saveToXML(int signalClass, double signalFraction) const
     {
       boost::property_tree::ptree pt;
 
@@ -154,7 +154,7 @@ namespace Belle2 {
     }
 
     ExpertConfig::ExpertConfig(const std::string& prefix, const std::string& workingDirectory, const std::string& method,
-                               int signal_class, float signal_fraction) :
+                               int signal_class, double signal_fraction) :
       Config(prefix, workingDirectory), m_method(method), m_signal_class(signal_class), m_signal_fraction(signal_fraction)
     {
       std::string type;
@@ -229,14 +229,14 @@ namespace Belle2 {
         }
 
         if (m_signal_fraction < 0) {
-          std::map<int, float> classFractions;
+          std::map<int, double> classFractions;
           for (const auto& f : pt.get_child("Setup.Clusters")) {
 
             if (f.first.data() != std::string("Cluster"))
               continue;
 
             int id = f.second.get<float>("ID");
-            float fraction = f.second.get<float>("Fraction");
+            double fraction = f.second.get<double>("Fraction");
             classFractions[id] = fraction;
           }
           m_signal_fraction = classFractions[m_signal_class];
@@ -249,7 +249,7 @@ namespace Belle2 {
 
     }
 
-    float ExpertConfig::getSignalFraction() const
+    double ExpertConfig::getSignalFraction() const
     {
       return m_signal_fraction;
     }
@@ -270,9 +270,9 @@ namespace Belle2 {
       return m_weightfile;
     }
 
-    float ExpertConfig::getSignalFractionFromXML(const boost::property_tree::ptree& pt) const
+    double ExpertConfig::getSignalFractionFromXML(const boost::property_tree::ptree& pt) const
     {
-      return pt.get<float>("SignalFraction");
+      return pt.get<double>("SignalFraction");
     }
 
     std::vector<std::string> ExpertConfig::getVariablesFromXML(const boost::property_tree::ptree& pt) const
@@ -286,9 +286,9 @@ namespace Belle2 {
       return variables;
     }
 
-    std::map<std::string, std::vector<float>> ExpertConfig::getExtraDataFromXML(const boost::property_tree::ptree& pt) const
+    std::map<std::string, std::vector<double>> ExpertConfig::getExtraDataFromXML(const boost::property_tree::ptree& pt) const
     {
-      std::map<std::string, std::vector<float>> extraData;
+      std::map<std::string, std::vector<double>> extraData;
       boost::optional< const boost::property_tree::ptree& > child = pt.get_child_optional("ExtraData");
       if (!child)
         return extraData;
@@ -297,9 +297,9 @@ namespace Belle2 {
         if (f.first.data() != std::string("ExtraDatum"))
           continue;
         unsigned int size = f.second.get<int>("Size");
-        std::vector<float> temp(size, 0);
+        std::vector<double> temp(size, 0);
         for (unsigned int i = 0; i < size; ++i) {
-          temp[i] = f.second.get<float>(std::to_string(i));
+          temp[i] = f.second.get<double>(std::to_string(i));
         }
         std::string name = f.second.get<std::string>("Name");
         extraData[name] = temp;

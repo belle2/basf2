@@ -54,7 +54,7 @@ namespace Belle2 {
              "Class which is considered as signal. e.g. the pdg of the Particle which is considered signal if "
              "you trained the method with pdg as target variable. Or 1 if you trained with isSignal as target.", 1);
     addParam("signalFraction", m_signalFraction,
-             "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0f);
+             "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
     addParam("transformToProbability", m_transformToProbability,
              "Transform classifier output to a probability using given signalFraction."
              "WARNING: If you want to use this feature you have to set the options createMVAPDFs and NbinsMVAPdf in the method config string provided to TMVATeacher to reasonable values!"
@@ -79,17 +79,22 @@ namespace Belle2 {
     }
 
     TMVAInterface::ExpertConfig config(m_methodPrefix, m_workingDirectory, m_methodName, m_signalClass, m_signalFraction);
+    m_signalFraction = config.getSignalFraction();
     m_method = std::unique_ptr<TMVAInterface::Expert>(new TMVAInterface::Expert(config, m_transformToProbability));
 
     if (m_splotPrior != "") {
+      if (not m_transformToProbability) {
+        B2WARNING("Using sPlot mode, but don't transform the classifier output to a probability, which is important if you want to use the $x_total quantity!")
+      }
       Variable::Manager& manager = Variable::Manager::Instance();
       m_splotPrior_func = manager.getVariable(m_splotPrior);
-      if (not config.hasExtraData("SPlotPriorBinning"))
-        B2FATAL("Missing sPlotPrior binning in given config file, are you sure this was an sPlot training?");
-      m_splotPrior_binning = config.getExtraData("SPlotPriorBinning");
-      if (not config.hasExtraData("SPlotPriorValues"))
-        B2FATAL("Missing sPlotPrior values in given config file, are you sure this was an sPlot training?");
-      m_splotPrior_values = config.getExtraData("SPlotPriorValues");
+      if (not config.hasExtraData("SPlotPDFBinning"))
+        B2FATAL("Missing sPlot pdf binning in given config file, are you sure this was an sPlot training?");
+      m_pdf_binning = config.getExtraData("SPlotPDFBinning");
+      if (not config.hasExtraData("SPlotSignalPDFBins") or not config.hasExtraData("SPlotBackgroundPDFBins"))
+        B2FATAL("Missing sPlot pdf bin contents in given config file, are you sure this was an sPlot training?");
+      m_signal_pdf_bins = config.getExtraData("SPlotSignalPDFBins");
+      m_background_pdf_bins = config.getExtraData("SPlotBackgroundPDFBins");
     }
 
   }
@@ -99,15 +104,18 @@ namespace Belle2 {
     m_method.reset();
   }
 
-  float TMVAExpertModule::sPlotPrior(const Particle* p) const
+  double TMVAExpertModule::sPlotPrior(const Particle* p) const
   {
     float v = m_splotPrior_func->function(p);
-    if (v < m_splotPrior_binning[0] or v > m_splotPrior_binning[m_splotPrior_binning.size() - 1]) {
+    if (v < m_pdf_binning[0] or v > m_pdf_binning[m_pdf_binning.size() - 1]) {
       return 0.0;
     }
-    for (unsigned int i = 1; i < m_splotPrior_binning.size(); ++i) {
-      if (v >= m_splotPrior_binning[i - 1] and v <= m_splotPrior_binning[i]) {
-        return m_splotPrior_values[i - 1];
+    for (unsigned int i = 1; i < m_pdf_binning.size(); ++i) {
+      if (v >= m_pdf_binning[i - 1] and v <= m_pdf_binning[i]) {
+        // Calculate sPlotPrior using the signal and background pdfs of the discriminating variable,
+        // as well as the given signalFraction
+        return m_signalFraction * m_signal_pdf_bins[i - 1] / (m_signalFraction * m_signal_pdf_bins[i - 1] +
+                                                              (1.0 - m_signalFraction) * m_background_pdf_bins[i - 1]);
       }
     }
     return 0.0;
@@ -128,14 +136,27 @@ namespace Belle2 {
           particle->addExtraInfo(m_expertOutputName, targetValue);
         }
         if (m_splotPrior_func != nullptr) {
-          std::string name = m_expertOutputName + std::string("_") + m_splotPrior;
-          float prior = sPlotPrior(particle);
-          if (particle->hasExtraInfo(name)) {
+          std::string prior_name = m_expertOutputName + std::string("_") + m_splotPrior;
+          std::string combined_name = m_expertOutputName + std::string("_total");
+          double prior = sPlotPrior(particle);
+          // Combine both probabilities using correct formula given by Bayes' Statistics
+          // We have to correct again for the signal fraction in the opposite manner,
+          // otherwise the signal fraction would enter twice (in the targetValue and in the prior)
+          double total = (1 - m_signalFraction) * targetValue * prior / ((1 - m_signalFraction) * targetValue * prior + m_signalFraction *
+                         (1 - targetValue) * (1 - prior));
+          if (particle->hasExtraInfo(prior_name)) {
             B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-            particle->setExtraInfo(name, prior);
+            particle->setExtraInfo(prior_name, prior);
           } else {
-            particle->addExtraInfo(name, prior);
+            particle->addExtraInfo(prior_name, prior);
           }
+          if (particle->hasExtraInfo(combined_name)) {
+            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
+            particle->setExtraInfo(combined_name, total);
+          } else {
+            particle->addExtraInfo(combined_name, total);
+          }
+
         }
       }
     }

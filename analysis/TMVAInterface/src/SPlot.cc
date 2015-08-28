@@ -20,7 +20,7 @@ namespace Belle2 {
     {
 
       workspace = std::unique_ptr<RooWorkspace>(new RooWorkspace("SPlotWorkspace"));
-      modelFile = new TFile(modelFileName.c_str(), "UPDATE");
+      modelFile = std::unique_ptr<TFile>(new TFile(modelFileName.c_str(), "UPDATE"));
       modelFile->cd();
 
       // Check if it's derived from RooAbsPdf
@@ -43,7 +43,7 @@ namespace Belle2 {
         B2FATAL("SPlot supports only one discriminating variable at the moment, sorry.");
       }
 
-      temp_tree_data = new TTree("temp_data_tree", "beschreibung");
+      temp_tree_data = std::unique_ptr<TTree>(new TTree("temp_data_tree", "beschreibung"));
       std::string leaf_name = discriminatingVariables.begin()->first;
       auto vec = discriminatingVariables.begin()->second;
 
@@ -54,8 +54,12 @@ namespace Belle2 {
         current_fit_var = x;
         temp_tree_data->Fill();
       }
-      discriminating_values = std::unique_ptr<RooDataSet>(new RooDataSet("discriminating_values", "discriminating_values", temp_tree_data,
-                                                          vars));
+      discriminating_values = std::unique_ptr<RooDataSet>(new RooDataSet("discriminating_values", "discriminating_values",
+                                                          temp_tree_data.get(), vars));
+
+      if (discriminating_values->numEntries() != temp_tree_data->GetEntries()) {
+        B2FATAL("RooDataSet threw out some events, probably because they were outside the defined range of the RooRealVar")
+      }
 
       int numberOfEvents = vec.size();
 
@@ -79,7 +83,8 @@ namespace Belle2 {
 
       std::cout << "SPlot: number of entries: " << numberOfEvents << std::endl;
 
-      RooStats::SPlot* sData = new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *discriminating_values, model, *yields);
+      sData = std::unique_ptr<RooStats::SPlot>(new RooStats::SPlot("sData", "BASF2 SPlotTeacher", *discriminating_values, model,
+                                               *yields));
 
       RooArgList sWeightedVars = sData->GetSWeightVars();
       std::cout << "For the following " << sWeightedVars.getSize() << " classes sWeights were calculated: ";
@@ -119,27 +124,30 @@ namespace Belle2 {
       }
 
       TH1* signal_hist = signal_pdf->createHistogram(dim.c_str(), 1000);
-      TH1* bckgrd_hist = bckgrd_pdf->createHistogram(dim.c_str(), 1000);
-      bckgrd_hist->Add(signal_hist);
-      signal_hist->Divide(bckgrd_hist);
-
       unsigned int nbins = signal_hist->GetNbinsX();
-      probability_bins.resize(nbins + 1);
-      probability_binned.resize(nbins);
-      for (unsigned int i = 0; i < signal_hist->GetNbinsX(); ++i) {
-        probability_bins[i] = signal_hist->GetBinLowEdge(i + 1);
-        probability_binned[i] = signal_hist->GetBinContent(i + 1);
+
+      pdf_binning.resize(nbins + 1);
+      for (unsigned int i = 0; i < nbins; ++i) {
+        pdf_binning[i] = signal_hist->GetBinLowEdge(i + 1);
       }
-      probability_bins[nbins] = signal_hist->GetBinLowEdge(nbins + 1);
+      pdf_binning[nbins] = signal_hist->GetBinLowEdge(nbins + 1);
+
+      RooArgSet* bckgrd_vars = bckgrd_pdf->getVariables();
+      RooRealVar* xvar = (RooRealVar*) bckgrd_vars->find(dim.c_str());
+      TH1* bckgrd_hist = bckgrd_pdf->createHistogram("pdf", *xvar, RooFit::Binning(RooBinning(nbins, &pdf_binning[0])));
+      signal_pdf_bins.resize(nbins);
+      background_pdf_bins.resize(nbins);
+      for (unsigned int i = 0; i < nbins; ++i) {
+        signal_pdf_bins[i] = signal_hist->GetBinLowEdge(i + 1);
+        background_pdf_bins[i] = bckgrd_hist->GetBinContent(i + 1);
+      }
 
     }
 
     SPlot::~SPlot()
     {
-      discriminating_values.reset();
-      delete temp_tree_data;
-      modelFile->Close();
-      delete modelFile;
+      // This is usually a memory leak, but ROOT frees the tree somewhere else first ...
+      temp_tree_data.release();
     }
 
     void SPlot::plot(std::string prefix, std::string discriminatingVariable)

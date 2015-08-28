@@ -13,7 +13,7 @@ particles_hadronic = get_default_channnels(semileptonicB=False)
 particles_withextracut = get_default_channnels(BlevelExtraCut='Mbc > 5.27')
 
 particles_all = get_default_channnels()
-feistate = fullEventInterpretation(None, particles_all)
+feistate = fullEventInterpretation(None, None, particles_all)
 
 assert len(particles_all) > len(particles_charged)
 assert len(particles_all) > len(particles_neutral)

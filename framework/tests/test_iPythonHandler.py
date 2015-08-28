@@ -13,7 +13,7 @@ class TestIPythonHandler(unittest.TestCase):
         info_setter.param("evtNumList", [100])
         path.add_module(info_setter)
         path.add_module("Gearbox")
-        path.add_module("Geometry")
+        path.add_module("PrintCollections")
 
         return path
 

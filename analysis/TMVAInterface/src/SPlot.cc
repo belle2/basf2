@@ -138,7 +138,7 @@ namespace Belle2 {
       signal_pdf_bins.resize(nbins);
       background_pdf_bins.resize(nbins);
       for (unsigned int i = 0; i < nbins; ++i) {
-        signal_pdf_bins[i] = signal_hist->GetBinLowEdge(i + 1);
+        signal_pdf_bins[i] = signal_hist->GetBinContent(i + 1);
         background_pdf_bins[i] = bckgrd_hist->GetBinContent(i + 1);
       }
 

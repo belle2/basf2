@@ -91,10 +91,10 @@ namespace Belle2 {
       if (not config.hasExtraData("SPlotPDFBinning"))
         B2FATAL("Missing sPlot pdf binning in given config file, are you sure this was an sPlot training?");
       m_pdf_binning = config.getExtraData("SPlotPDFBinning");
-      if (not config.hasExtraData("SPlotSignalPDFBins") or not config.hasExtraData("SPlotBackgroundPDFBins"))
+      if (not config.hasExtraData("SPlotSignalPDF") or not config.hasExtraData("SPlotBackgroundPDF"))
         B2FATAL("Missing sPlot pdf bin contents in given config file, are you sure this was an sPlot training?");
-      m_signal_pdf_bins = config.getExtraData("SPlotSignalPDFBins");
-      m_background_pdf_bins = config.getExtraData("SPlotBackgroundPDFBins");
+      m_signal_pdf_bins = config.getExtraData("SPlotSignalPDF");
+      m_background_pdf_bins = config.getExtraData("SPlotBackgroundPDF");
     }
 
   }

@@ -16,3 +16,4 @@ assert 'extraInfo(SignalProbability)' == var.name
 # used in FEI
 import ROOT
 assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.Variable.makeROOTCompatible('extraInfo(SignalProbability)')
+assert 'extraInfo(SignalProbability)' == ROOT.Belle2.Variable.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')

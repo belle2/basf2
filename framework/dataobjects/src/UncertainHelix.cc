@@ -84,7 +84,7 @@ UncertainHelix::UncertainHelix(const TVector3& position,
   TMatrixD jacobianToHelixParameters(5, 6);
   jacobianToHelixParameters.Zero();
 
-  jacobianToHelixParameters(iD0, iY) = charge;
+  jacobianToHelixParameters(iD0, iY) = -1;
   jacobianToHelixParameters(iPhi0, iX) = charge * invPt / alpha;
   jacobianToHelixParameters(iPhi0, iPy) = invPt;
   jacobianToHelixParameters(iOmega, iPx) = charge * invPtSquared / alpha;
@@ -157,8 +157,8 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
   const double invSignedAlphaOmega2 = 1.0 / signedAlphaOmega2;
 
   // Position after the move.
-  jacobianInflate(iX, iPhi0) = 0.0; //charge * d0 == 0 after moving
-  jacobianInflate(iY, iD0) = boost::math::sign(omega);
+  jacobianInflate(iX, iPhi0) = 0.0; // d0 == 0 after moving
+  jacobianInflate(iY, iD0) = -1.0;
   jacobianInflate(iZ, iZ0) = 1.0;
 
   // Momentum

@@ -1,0 +1,15 @@
+Import('env')
+
+env['LIBS'] = [
+    '$ROOT_LIBS',
+    'framework',
+    'geometry',
+    'mdst_dataobjects',
+    'vxd', 'vxd_dataobjects',
+    'pxd', 'pxd_dataobjects',
+    'genfit2',
+    'tracking', 'tracking_dataobjects',
+    'NeuroBayesExpertCPP'
+    ]
+
+Return('env')

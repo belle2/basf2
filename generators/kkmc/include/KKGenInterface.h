@@ -87,7 +87,7 @@ namespace Belle2 {
     /**
      * Assignment operator (for cppcheck).
      */
-    //KKGenInterface& operator= (const KKGenInterface& m);
+    KKGenInterface& operator= (const KKGenInterface& m) = delete;
 
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
               const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */

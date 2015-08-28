@@ -278,7 +278,8 @@ void V0FinderModule::event()
         continue;
       }
       if (vertexVector.size() != 1)
-        continue;
+        B2ERROR("Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
+      continue;
 
       const genfit::GFRaveVertex& vert = *vertexVector[0];
       const TVector3& posVert(vert.getPos());

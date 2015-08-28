@@ -90,12 +90,18 @@ V0FinderModule::~V0FinderModule()
 
 void V0FinderModule::initialize()
 {
-  StoreArray<Track>::required(m_TrackColName);
-  StoreArray<genfit::Track>::required(m_GFTrackColName);
-  StoreArray<TrackFitResult>::required(m_TFRColName);
+  StoreArray<Track> tracks(m_TrackColName);
+  tracks.isRequired();
 
-  StoreArray<V0> V0s(m_V0ColName);
-  V0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
+  trackFitResults.isRequired();
+
+  StoreArray<genfit::Track> gfTracks(m_GFTrackColName);
+  gfTracks.isRequired();
+  gfTracks.registerRelationTo(trackFitResults);
+
+  StoreArray<V0> v0s(m_V0ColName);
+  v0s.registerInDataStore(DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
@@ -132,38 +138,29 @@ void V0FinderModule::beginRun()
 
 void V0FinderModule::event()
 {
-  //get tracks
-  StoreArray<Track> Tracks(m_TrackColName);
-  int nTracks = Tracks.getEntries();
+  StoreArray<Track> tracks(m_TrackColName);
+  const int nTracks = tracks.getEntries();
 
   if (nTracks == 0)
     return;
 
   B2DEBUG(200, nTracks << " tracks in event.");
 
-  StoreArray<genfit::Track> GFTracks(m_GFTrackColName);
+  StoreArray<genfit::Track> gfTracks(m_GFTrackColName);
   StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
-  RelationIndex<genfit::Track, TrackFitResult> gftracktotfr(GFTracks, trackFitResults);
+  StoreArray<V0> v0s(m_V0ColName);
 
-  StoreArray<V0> V0s(m_V0ColName);
-
-  RelationArray GFTracksToTrackFitResults(GFTracks, trackFitResults);
 
   // Group tracks into positive and negative tracks.
-  //
-  //  Since the genfit::Tracks are not RelationObjects, we have to
-  // keep a list of their indices to be able to form relations between
-  // the TrackFitResults in the V0s and the GFTracks
   typedef std::pair<Track*, genfit::Track*> trackPair;
   std::vector<trackPair> tracksPlus;
-  std::vector<int> gfTrackIndexPlus;
   tracksPlus.reserve(nTracks);
   std::vector<trackPair> tracksMinus;
-  std::vector<int> gfTrackIndexMinus;
   tracksMinus.reserve(nTracks);
 
-  for (int iTr = 0; iTr < nTracks; iTr++) {
-    const TrackFitResult* tfr = Tracks[iTr]->getTrackFitResult(Const::pion);
+  for (auto& track : tracks) {
+    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+
     if (!tfr) {
       B2WARNING("No TrackFitResult for track");
       continue;
@@ -174,36 +171,19 @@ void V0FinderModule::event()
     }
 
     genfit::Track* gfTrack = tfr->getRelatedFrom<genfit::Track>(m_GFTrackColName);
+
     if (!gfTrack) {
       B2ERROR("No genfit::Track for TrackFitResult");
       continue;
     }
 
-    // Find StoreArray index for GFTracks.  Quadratic in number of tracks.
-    int index = -1;
-    for (int iGfTr = 0; iGfTr < GFTracks.getEntries(); ++iGfTr) {
-      if (GFTracks[iGfTr] == gfTrack) {
-        index = iGfTr;
-        break;
-      }
-    }
-    if (index == -1) {
-      B2ERROR("genfit::Track not found in StoreArray.");
-      continue;
-    }
-
-    double charge = tfr->getChargeSign();
+    const double charge = tfr->getChargeSign();
     if (charge == +1) {
-      tracksPlus.push_back({Tracks[iTr], gfTrack});
-      gfTrackIndexPlus.push_back(index);
+      tracksPlus.push_back({&track, gfTrack});
     } else {
-      tracksMinus.push_back({Tracks[iTr], gfTrack});
-      gfTrackIndexMinus.push_back(index);
+      tracksMinus.push_back({&track, gfTrack});
     }
   }
-
-  assert(tracksPlus.size() == gfTrackIndexPlus.size()
-         && tracksMinus.size() == gfTrackIndexMinus.size());
 
   // Reject boring events.
   if (tracksPlus.size() == 0 || tracksMinus.size() == 0) {
@@ -214,21 +194,11 @@ void V0FinderModule::event()
   std::vector< std::pair< genfit::Track*, genfit::Track*> > vertices;
 
   // Pair up each positive track with each negative track.
-  for (size_t iTrPlus = 0; iTrPlus < tracksPlus.size(); ++iTrPlus) {
-    genfit::Track* gfTrackPlus = tracksPlus[iTrPlus].second;
+  for (auto& trackPlusPair : tracksPlus) {
+    genfit::Track* gfTrackPlus = trackPlusPair.second;
 
-    const TrackFitResult* tfrPlus = 0;
-    if (gftracktotfr.getFirstElementFrom(gfTrackPlus))
-      tfrPlus = gftracktotfr.getFirstElementFrom(gfTrackPlus)->to;
-    assert(tfrPlus);  // ensured above.
-
-    for (size_t iTrMinus = 0; iTrMinus < tracksMinus.size(); ++iTrMinus) {
-      genfit::Track* gfTrackMinus = tracksMinus[iTrMinus].second;
-
-      const TrackFitResult* tfrMinus = 0;
-      if (gftracktotfr.getFirstElementFrom(gfTrackMinus))
-        tfrMinus = gftracktotfr.getFirstElementFrom(gfTrackMinus)->to;
-      assert(tfrMinus);  // ensured above.
+    for (auto& trackMinusPair : tracksMinus) {
+      genfit::Track* gfTrackMinus = trackMinusPair.second;
 
       genfit::MeasuredStateOnPlane stPlus = gfTrackPlus->getFittedState();
       genfit::MeasuredStateOnPlane stMinus = gfTrackMinus->getFittedState();
@@ -245,7 +215,7 @@ void V0FinderModule::event()
       // -- while still being part of the V0.  Unlikely, I didn't find
       // a single example in MC.  On the other hand it rejects
       // impossible candidates.
-      double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
+      const double Rstart = std::min(posPlus.Perp(), posMinus.Perp());
       try {
         stPlus.extrapolateToCylinder(Rstart);
         stMinus.extrapolateToCylinder(Rstart);
@@ -315,7 +285,7 @@ void V0FinderModule::event()
         lv0.SetVectM(tr0->getMom(), Const::pionMass);
         lv1.SetVectM(tr1->getMom(), Const::pionMass);
 
-        double mReco = (lv0 + lv1).M();
+        const double mReco = (lv0 + lv1).M();
         if (fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
           B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
           continue;
@@ -361,12 +331,12 @@ void V0FinderModule::event()
                                     gfTrackMinus->getFitStatus()->getPVal(),
                                     Bz / 10., 0, 0);
 
-      GFTracksToTrackFitResults.add(gfTrackIndexPlus[iTrPlus], tfrPlusVtx->getArrayIndex());
-      GFTracksToTrackFitResults.add(gfTrackIndexMinus[iTrMinus], tfrMinusVtx->getArrayIndex());
+      DataStore::addRelationFromTo(gfTrackPlus, tfrPlusVtx);
+      DataStore::addRelationFromTo(gfTrackMinus, tfrMinusVtx);
 
       B2DEBUG(100, "Creating new V0.");
-      V0s.appendNew(std::make_pair(tracksPlus[iTrPlus].first, tfrPlusVtx),
-                    std::make_pair(tracksMinus[iTrMinus].first, tfrMinusVtx));
+      v0s.appendNew(std::make_pair(trackPlusPair.first, tfrPlusVtx),
+                    std::make_pair(trackMinusPair.first, tfrMinusVtx));
     }
   }
 }

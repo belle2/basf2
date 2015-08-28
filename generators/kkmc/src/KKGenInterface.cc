@@ -282,33 +282,33 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   return;
 }
 
-bool KKGenInterface::getPythiaCharge(int kf, double& c)
-{
-  // Get charge of asked particle from PYTHIA /PYDAT2/ common block
-  int kc = pycomp_(kf);
-  bool ret = (kc > 0 && kc < 500);
-  if (ret) {
-    c = (double)pydat2_.KCHG[0][kc - 1] / 3.;
-    if (c > 0 && kf < 0) c = -c;
-  }
-  return ret;
-}
-int KKGenInterface::getPythiaSpinType(int kf)
-{
-  // Calc. spin of asked particle from PYTHIA ID
-  int akf = abs(kf);
-  int ret = -1;
-  if (akf > 0 && akf < 20) {
-    ret = 1;
-  } else if ((akf > 20 && akf < 25) || (akf > 31 && akf < 35)) {
-    ret = 2;
-  } else if (akf == 25 || (akf >= 35 && akf <= 37)) {
-    ret = 0;
-  } else if (akf > 100) {
-    ret = akf % 10 - 1;
-  }
-  return ret;
-}
+// bool KKGenInterface::getPythiaCharge(int kf, double& c)
+// {
+//   // Get charge of asked particle from PYTHIA /PYDAT2/ common block
+//   int kc = pycomp_(kf);
+//   bool ret = (kc > 0 && kc < 500);
+//   if (ret) {
+//     c = (double)pydat2_.KCHG[0][kc - 1] / 3.;
+//     if (c > 0 && kf < 0) c = -c;
+//   }
+//   return ret;
+// }
+// int KKGenInterface::getPythiaSpinType(int kf)
+// {
+//   // Calc. spin of asked particle from PYTHIA ID
+//   int akf = abs(kf);
+//   int ret = -1;
+//   if (akf > 0 && akf < 20) {
+//     ret = 1;
+//   } else if ((akf > 20 && akf < 25) || (akf > 31 && akf < 35)) {
+//     ret = 2;
+//   } else if (akf == 25 || (akf >= 35 && akf <= 37)) {
+//     ret = 0;
+//   } else if (akf > 100) {
+//     ret = akf % 10 - 1;
+//   }
+//   return ret;
+// }
 
 void KKGenInterface::term()
 {

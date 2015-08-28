@@ -79,6 +79,16 @@ namespace Belle2 {
      */
     ~KKGenInterface() {}
 
+    /**
+     * Copy constructor (for cppcheck).
+     */
+    KKGenInterface(const KKGenInterface& m);
+
+    /**
+     * Assignment operator (for cppcheck).
+     */
+    KKGenInterface& operator= (const KKGenInterface& m);
+
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
               const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
 
@@ -97,8 +107,8 @@ namespace Belle2 {
     int addParticles2Graph(MCParticleGraph& graph, TVector3 vertex);  /**< Function to add particle decays */
     void updateGraphParticle(int, MCParticleGraph::GraphParticle* gParticle,
                              TVector3 vertex);  /**< Function to update particle decays */
-    bool getPythiaCharge(int, double&); /**< Function to get charge from Pythia ID. */
-    int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
+    // bool getPythiaCharge(int, double&); /**< Function to get charge from Pythia ID. */
+    // int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
 
   protected:
     EvtPDL* myevtpdl; /**<Variable needed for EvtPDL (just for translation from PYTHIA6 KF to PDG id). */

@@ -962,6 +962,22 @@ namespace Belle2 {
 
     }
 
+    double nRemainingTracksInEvent(const Particle* particle)
+    {
+
+      StoreArray<Track> tracks;
+      int event_tracks = tracks.getEntries();
+
+      int par_tracks = 0;
+      const auto& daughters = particle->getFinalStateDaughters();
+      for (const auto& daughter : daughters) {
+        int pdg = abs(daughter->getPDGCode());
+        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
+          par_tracks++;
+      }
+      return event_tracks - par_tracks;
+    }
+
 
     // Event ------------------------------------------------
     double eventType(const Particle*)
@@ -1179,6 +1195,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
+    REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
+                      "Number of tracks in the event - Number of tracks (= charged FSPs) of particle.");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi^2 probability of the fit");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType, "flavor type of decay (0=unflavored, 1=flavored)");

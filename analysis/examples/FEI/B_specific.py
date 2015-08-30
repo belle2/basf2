@@ -20,8 +20,14 @@ feistate = fullEventInterpretation('B+:sig', selection_path, particles)
 
 if feistate.is_trained:
     # Add your analysis path
-    feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
     open('FEI_finished_its_training', 'a').close()
+    import sys
+    # show constructed path
+    print feistate.path
+
+    process(feistate.path)
+    sys.exit(1)
+
 
 # show constructed path
 print feistate.path

@@ -10,4 +10,7 @@ cat "$f"
 chmod +x ./"$f"
 echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
 bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"
+# Print log files, so FEI finds MVA ranking
+cat "$f".log
+cat "$f".elog
 #rm $f

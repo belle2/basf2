@@ -132,7 +132,7 @@ TrgEcl::setPRS(int iBin)
         if (HitTC[iBin][iTCId][itime] == 1) {
           if (iTCThetaId == map ->getTCThetaIdFromTCId(iTCId + 1)) {
 
-            _PhiRingSum[iTCThetaId] += Energy[iTCId][iBin];
+            _PhiRingSum[iTCThetaId] += Energy[iTCId][itime];
           }
         }
       }

@@ -276,7 +276,7 @@ class TestReadRootScaled(unittest.TestCase):
                                                          'Mbc', 'cosThetaBetweenParticleAndTrueB']))
         sdf = df.sum()
         self.assertTrue(50 < sdf['isSignal'] * scale < 100)
-        self.assertTrue(sdf['cosThetaBetweenParticleAndTrueB'] * scale < -6000)
+        self.assertTrue(sdf['cosThetaBetweenParticleAndTrueB'] * scale < -3000)
 
 
 class TestLoadNTupleDataFrame(unittest.TestCase):

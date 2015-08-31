@@ -562,6 +562,8 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
                 applyCuts(signalParticleList, cut, path=path)
                 buildRestOfEvent(signalParticleList, path=path)
                 path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
+            else:
+                path.add_path(fei_path)
         else:
             if selection_path is not None:
                 path.add_module('RootInput')

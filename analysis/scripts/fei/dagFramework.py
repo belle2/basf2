@@ -296,9 +296,23 @@ class DAG(object):
         needed = [x for x in chain if x.needed and x.path is not None and x.path.modules() > 0]
         print "Done"
 
+        if self.env.get('verbose', False):
+            print "Needed modules before optimization"
+            for n in needed:
+                if n.path:
+                    for m in n.path.modules():
+                        print m.name()
+
         # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
         # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
         needed = self.optimizeForParallelProcessing(needed)
+
+        if self.env.get('verbose', False):
+            print "Needed modules after optimization"
+            for n in needed:
+                if n.path:
+                    for m in n.path.modules():
+                        print m.name()
 
         # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation
         # Therefore we add the filled path objects of the needed actors to the main basf2 path given as
@@ -311,12 +325,21 @@ class DAG(object):
                     cond_module.if_value(resource.condition[1], resource.path, basf2.AfterConditionPath.CONTINUE)
                     cond_module.set_name('VariableToReturnValue(' + resource.condition[0] + ')')
                     path.add_module(cond_module)
+                    if self.env.get('verbose', False):
+                        for m in resource.path.modules():
+                            print "Added conditional module", m.name()
                 else:
                     path.add_path(resource.path)
+                    if self.env.get('verbose', False):
+                        for m in resource.path.modules():
+                            print "Added module", m.name()
 
         if self.env.get('verbose', False):
             self.createDotGraphic(needed)
             self.printMissingDependencies([r for r in resources if r not in chain], results.keys())
+            print "Final path"
+            for m in path.modules():
+                print m.name()
 
         return (nDone == nResources) and all([i in results for i in self.user_flaged_needed])
 

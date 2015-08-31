@@ -173,19 +173,25 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     The Full Event Interpretation algorithm has to be executed multiple times, because of the dependencies between
     the MVCs among each other and PreCuts on Histograms.
     These dependencies are automatically solved and a basf2 path is returned containing all needed modules for this stage.
-        @param selection_path basf2 module path to execute before any tag-side reconstruction.
-               The path should load data, select a signal-side B and create a 'RestOfEvents' list.
+        @param signalParticleList name of ParticleList containing the signal-candidates of the signal-side,
                Use None to perform independent tag-side reconstruction (equivalent to old Belle I Full Reconstruction).
+        @param selection_path basf2 module path to execute before any tag-side reconstruction.
+               The path should load the data and perform skimming if needed
+               In addition it should select a signal-side B and create a 'RestOfEvents' list if signalParticleList is not None
+               Use None if you don't want to provide an selection path.
         @param particles list of particle objects which shall be reconstructed by this algorithm
         @return FeiState object containing basf2 path to execute, plus status information
     """
     args = getCommandLineOptions()
 
+    if signalParticleList and not selection_path:
+        B2FATAL("If you provide and signal particle list, you have to provide an selection path!")
+
     # Create a new directed acyclic graph
     dag = dagFramework.DAG()
 
     # Set environment variables
-    dag.env['ROE'] = str(signalParticleList) if selection_path is not None and not args.dumpPath else False
+    dag.env['ROE'] = str(signalParticleList) if signalParticleList is not None and not args.dumpPath else False
     dag.env['prune'] = args.prune
     dag.env['verbose'] = args.verbose
     dag.env['nThreads'] = args.nThreads
@@ -544,16 +550,18 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         path.add_path(fei_path)
     else:
         fei_path.add_module("RootOutput")
-        if is_first_run and selection_path is not None:
-            path.add_path(selection_path)
-            # TODO SignalMC with no correct signal-candidate will be still used as background component
-            # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
-            # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
-            cut = 'isSignalAcceptMissingNeutrino == 1'
-            cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
-            applyCuts(signalParticleList, cut, path=path)
-            buildRestOfEvent(signalParticleList, path=path)
-            path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
+        if is_first_run:
+            if selection_path is not None:
+                path.add_path(selection_path)
+            if signalParticleList:
+                # TODO SignalMC with no correct signal-candidate will be still used as background component
+                # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
+                # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
+                cut = 'isSignalAcceptMissingNeutrino == 1'
+                cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
+                applyCuts(signalParticleList, cut, path=path)
+                buildRestOfEvent(signalParticleList, path=path)
+                path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
         else:
             if selection_path is not None:
                 path.add_module('RootInput')

@@ -13,9 +13,10 @@ from basf2 import *
 def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
     """
     Determines the PreCuts for all the channels of a particle. The cuts are chosen as follows:
-        1. The ratio of signal/background child probability product preCut_Histogram is calculated and fitted with splines
-        2. A cut on the y-axis of S/B is performed, so that a certain signal efficiency is garantueed.
-        3. The cut on the y-axis is converted to a minimum cut on the x-axis for every channel.
+        1. The ratio signal/background over the cut variable is calculated from histograms
+        2. A cut on the y-axis of S/B is performed, so that a certain signal efficiency is guaranteed.
+        3. If the purity requirement in the config is not met, the y-axis cut is determined from purity instead.
+        4. The cut on the y-axis is converted to a minimum cut on the x-axis for every channel.
         @param channelNames list of the names of all the channels
         @param preCutConfig configuration for PreCut determination e.g. signal efficiency for this particle for every channel
         @param preCutHistograms filenames of the histogram files created for every channel by PreCutDistribution

@@ -57,24 +57,26 @@ def getCommandLineOptions():
 
 
 # Define classes at top level to make them pickable
-# Create new class called MVAConfiguration via namedtuple. namedtuples are like a struct in C
+# Creates new classs via namedtuple, which are like a struct in C
+# TODO: with python 3, __doc__ is writable for this things, so we can actually set it
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'name, type, config, variables, target, model')
 MVAConfiguration.__new__.__defaults__ = ('FastBDT', 'Plugin',
                                          '!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3',
                                          '', 'isSignal', None)
-# Create new class called PreCutConfiguration via namedtuple. namedtuples are like a struct in C
+# Pre-classifier configuration. Note that purity takes precedence over efficiency.
 PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'variable, binning, efficiency, purity')
 PreCutConfiguration.__new__.__defaults__ = ('M', (1000, 0, 6), None, None)
-# Create new class called UserCutConfiguration via namedtuple. namedtuples are like a struct in C
+
 UserCutConfiguration = collections.namedtuple('UserCutConfiguration', 'userCut, vertexCut')
 UserCutConfiguration.__new__.__defaults__ = ('', -2)
-# Create new class called PostCutConfiguration via namedtuple. namedtuples are like a struct in C
+
+# Adds a 'extraInfo(SignalProbability) > value' cut to a particle.
 PostCutConfiguration = collections.namedtuple('PostCutConfiguration', 'value')
 PostCutConfiguration.__new__.__defaults__ = (0.0,)
-# Create new class called PlotConfiguration via namedtuple. namedtuples are like a struct in C
+
 PlotConfiguration = collections.namedtuple('PlotConfiguration', 'Diagonal, ROC, M, Mbc, CosBDl, Correlation')
 PlotConfiguration.__new__.__defaults__ = (True, True, False, False, False, True)
-# Create new class called DecayChannel via namedtuple. namedtuples are like a struct in C
+
 DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, userCutConfig, decayModeID')
 
 

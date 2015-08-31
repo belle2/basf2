@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include <stdio.h>
 #include <stdlib.h>

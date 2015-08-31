@@ -229,48 +229,66 @@ namespace Belle2 {
 
     // load reconstructed V0s as Kshorts (pi-pi+ combination), Lambdas (p+pi- combinations), and converted photons (e-e+ combinations)
     for (int i = 0; i < V0s.getEntries(); i++) {
-      // TODO: make it const once V0 dataobject is corrected (const qualifier properly applied)
-      V0* v0 = V0s[i];
-
-      std::pair<Track*, Track*> v0Tracks = v0->getTracks();
-      std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
-
-      // load Kshort -> pi- pi+
-      Particle piP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, Const::pion);
-      Particle piM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, Const::pion);
-
-      const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
-      const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
-
-      const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
-      const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
-
-      // add V0 daughters to the Particle StoreArray
-      Particle* newPiP = particles.appendNew(piP);
-      if (pidP)
-        newPiP->addRelationTo(pidP);
-      if (mcParticleP)
-        newPiP->addRelationTo(mcParticleP);
-
-      Particle* newPiM = particles.appendNew(piM);
-      if (pidM)
-        newPiM->addRelationTo(pidM);
-      if (mcParticleM)
-        newPiM->addRelationTo(mcParticleM);
-
-      TLorentzVector v0Momentum = newPiP->get4Vector() + newPiM->get4Vector();
-
-      // TODO: avoid hard-coded values
-      Particle v0P(v0Momentum, Const::Kshort.getPDGCode());
-      v0P.appendDaughter(newPiP);
-      v0P.appendDaughter(newPiM);
-
-      Particle* newPart = particles.appendNew(v0P);
+      const V0* v0 = V0s[i];
+      Const::ParticleType v0Type = v0->getV0Hypothesis();
 
       for (auto v02Plist : m_V02Plists) {
-        int pdgCode = get<c_PListPDGCode>(v02Plist);
-        if (abs(Const::Kshort.getPDGCode()) != abs(pdgCode))
+        int listPDGCode = get<c_PListPDGCode>(v02Plist);
+
+        if (listPDGCode != v0Type.getPDGCode())
           continue;
+
+        Const::ChargedStable pTypeP(Const::pion);
+        Const::ChargedStable pTypeM(Const::pion);
+
+        if (v0Type.getPDGCode() == Const::Kshort.getPDGCode()) { // K0s -> pi+ pi-
+          pTypeP = Const::pion;
+          pTypeM = Const::pion;
+        } else if (v0Type.getPDGCode() == Const::lambda.getPDGCode()) { // Lambda -> p+ pi-
+          pTypeP = Const::proton;
+          pTypeM = Const::pion;
+        } else if (v0Type.getPDGCode() == Const::antiLambda.getPDGCode()) { // anti-Lambda -> pi+ anti-p-
+          pTypeP = Const::pion;
+          pTypeM = Const::proton;
+        } else if (v0Type.getPDGCode() == Const::photon.getPDGCode()) { // gamma -> e+ e-
+          pTypeP = Const::electron;
+          pTypeM = Const::electron;
+        } else {
+          B2WARNING("Unknown V0 hypothesis!");
+        }
+
+        std::pair<Track*, Track*> v0Tracks = v0->getTracks();
+        std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
+
+        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP);
+        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM);
+
+        const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
+        const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
+
+        const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
+        const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
+
+        // add V0 daughters to the Particle StoreArray
+        Particle* newDaugP = particles.appendNew(daugP);
+        if (pidP)
+          newDaugP->addRelationTo(pidP);
+        if (mcParticleP)
+          newDaugP->addRelationTo(mcParticleP);
+
+        Particle* newDaugM = particles.appendNew(daugM);
+        if (pidM)
+          newDaugM->addRelationTo(pidM);
+        if (mcParticleM)
+          newDaugM->addRelationTo(mcParticleM);
+
+        TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
+
+        Particle v0P(v0Momentum, v0Type.getPDGCode());
+        v0P.appendDaughter(newDaugP);
+        v0P.appendDaughter(newDaugM);
+
+        Particle* newPart = particles.appendNew(v0P);
 
         string listName = get<c_PListName>(v02Plist);
         auto& cut = get<c_CutPointer>(v02Plist);

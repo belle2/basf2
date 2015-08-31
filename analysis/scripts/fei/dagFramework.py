@@ -131,10 +131,13 @@ class Resource(object):
             @arguments dictionary of arguments which were required (addtional entries are ignored)
         """
         hash = create_hash([arguments[r] for r in self.requires])
-        if self.value is not None and self.hash == hash and not self.halt and not self.env.get('rerunCachedProviders', False):
-            if self.env.get('verbose', False):
-                basf2.B2INFO(self.identifier + " provided from cached value " + repr(self.value))
-            return self.value
+        if self.value is not None and not self.halt and not self.env.get('rerunCachedProviders', False):
+            if self.hash == hash:
+                if self.env.get('verbose', False):
+                    basf2.B2INFO(self.identifier + " provided from cached value " + repr(self.value))
+                return self.value
+            else:
+                basf2.B2WARNING(self.identifier + " cached value has different hash! I won't use it.")
         # Reset hash
         self.hash = hash
         # Reset halt flag

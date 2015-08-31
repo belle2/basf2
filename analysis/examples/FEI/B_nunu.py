@@ -9,7 +9,7 @@ from modularAnalysis import *
 # One should do a skim for events with <= 12 tracks before doing the training to speedup the training a lot!
 
 # Remove all candidates for training with remaining tracks in event
-particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInEvent == 0', neutralB=True)
+particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInEvent == 0', neutralB=True, chargedB=False)
 feistate = fullEventInterpretation(None, None, particles)
 
 if feistate.is_trained:

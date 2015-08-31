@@ -337,7 +337,7 @@ class TestFitVertex(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleVertexFitter for given ParticleList
         result.path.add_module('ParticleVertexFitter', listName='D0:generic -> K+ pi-', confidenceLevel=-2,
-                               vertexFitter='rave', fitType='vertex')
+                               vertexFitter='kfitter', fitType='vertex')
         self.assertEqual(self.resource, result)
 
     def test_FitVertexOtherConfidenceLevel(self):
@@ -347,7 +347,7 @@ class TestFitVertex(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleVertexFitter for given ParticleList
         result.path.add_module('ParticleVertexFitter', listName='D0:generic -> K+ pi-', confidenceLevel=0.001,
-                               vertexFitter='rave', fitType='vertex')
+                               vertexFitter='kfitter', fitType='vertex')
         self.assertEqual(self.resource, result)
 
     def test_FitVertexWithNone(self):

@@ -6,11 +6,18 @@ from fei import *
 from basf2 import *
 from modularAnalysis import *
 
-# One should do a skim for events with <= 12 tracks before doing the training to speedup the training a lot!
+# Use selection path to throw away events with more than 12 tracks,
+# because the FEI cannot reconstruct channels with more tracks
+selection_path = create_path()
+trash_path = create_path()
+skim = register_module('VariableToReturnValue')
+skim.param("variable", 'nTracks')
+skim.if_value('>12', trash_path, AfterConditionPath.END)
+selection_path.add_module(skim)
 
 # Remove all candidates for training with remaining tracks in event
 particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInEvent == 0', neutralB=True, chargedB=False)
-feistate = fullEventInterpretation(None, None, particles)
+feistate = fullEventInterpretation(None, selection_path, particles)
 
 if feistate.is_trained:
     # Add your analysis path

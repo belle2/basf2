@@ -45,7 +45,7 @@ class ComparisonImageViewer(Basf2Widget):
     def create(self):
         """ Create the widget """
 
-        from IPython.html import widgets
+        import ipywidgets as widgets
         a = widgets.Accordion()
 
         children = []
@@ -113,7 +113,7 @@ class PathViewer(Basf2Widget):
         Create the widget
         """
 
-        from IPython.html import widgets
+        import ipywidgets as widgets
 
         if self.path is None:
             return widgets.HTML("")
@@ -283,7 +283,7 @@ class CollectionsViewer(Basf2Widget):
         Create the widget
         """
 
-        from IPython.html import widgets
+        import ipywidgets as widgets
 
         if self.collections is None:
             return widgets.HTML("")
@@ -343,7 +343,7 @@ class StatisticsViewer(Basf2Widget):
         """
         Create the widget
         """
-        from IPython.html import widgets
+        import ipywidgets as widgets
 
         if self.statistics is None:
             return widgets.HTML("")
@@ -390,7 +390,7 @@ class ProcessViewer(object):
         """
         Create the widget
         """
-        from IPython.html import widgets
+        import ipywidgets as widgets
 
         a = widgets.Tab()
         for i in xrange(len(self.children)):
@@ -403,7 +403,7 @@ class ProcessViewer(object):
         Show the widget
         """
 
-        from IPython.html import widgets
+        import ipywidgets as widgets
         from IPython.core.display import display
 
         if len(self.children) > 0:

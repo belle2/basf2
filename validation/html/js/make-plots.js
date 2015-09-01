@@ -12,13 +12,13 @@
 // is complete.
 function install_plotting_progress(joined_revisions,progress_key, wait_time) {
 
-	var defaultWaitTime = 1000;
+	var defaultWaitTime = 2000;
 
 	setTimeout(function(){	
 		$.ajax({
 			url: "/validation/ajax/makeplots-status",
 			type: "POST",
-			timeout: 800,
+			timeout: 1600,
 			contentType: "application/json",
 			dataType: "json",
 			data: JSON.stringify( { "input": progress_key} ) 

@@ -35,8 +35,12 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   vector<string> emptylist;
-  addParam("particleList", m_particleList, "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)", std::string(""));
-  addParam("variables", m_variables, "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.", emptylist);
+  addParam("particleList", m_particleList,
+           "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
+           std::string(""));
+  addParam("variables", m_variables,
+           "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
@@ -67,7 +71,7 @@ void VariablesToNtupleModule::initialize()
   // root wants var1:var2:...
   string varlist;
   bool first = true;
-  for (const string & varStr : m_variables) {
+  for (const string& varStr : m_variables) {
     if (!first)
       varlist += ":";
     varlist += Variable::makeROOTCompatible(varStr);
@@ -116,6 +120,13 @@ void VariablesToNtupleModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file);
+
+    const bool writeError = m_file->TestBit(TFile::kWriteError);
+    if (writeError) {
+      //m_file deleted first so we have a chance of closing it (though that will probably fail)
+      delete m_file;
+      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+    }
 
     B2INFO("Closing file " << m_fileName);
     delete m_file;

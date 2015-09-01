@@ -132,6 +132,14 @@ namespace Belle2 {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
       m_file->cd();
       m_tree->get().Write("", TObject::kOverwrite);
+
+      const bool writeError = m_file->TestBit(TFile::kWriteError);
+      if (writeError) {
+        //m_file deleted first so we have a chance of closing it (though that will probably fail)
+        delete m_file;
+        B2FATAL("A write error occured while saving '" << m_config.getFileName()  << "', please check if enough disk space is available.");
+      }
+
       m_tree->get().SetDirectory(nullptr);
     }
 

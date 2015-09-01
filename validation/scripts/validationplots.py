@@ -13,18 +13,21 @@ import re
 import shutil
 import sys
 import time
+# Load ROOT
+import ROOT
+# The pretty printer. Print prettier :)
+import pprint
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 # Only execute the program if a basf2 release is set up!
 if os.environ.get('BELLE2_RELEASE', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
-# Load ROOT
-import ROOT
-
-
-# The pretty printer. Print prettier :)
-import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 # Token used to separate the package name from the plot name in strings
@@ -529,11 +532,13 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     return html
 
 
-def generate_new_plots(list_of_revisions):
+def generate_new_plots(list_of_revisions, process_pipe=None):
     """
     Creates the plots that
     contain the requested revisions. Each plot (or n-tuple, for that matter)
     is stored in an object of class Plot.
+    @param process_pipe: communication Pipe object, which is used in
+           multi-processing mode to report the progress of the plot creating.
     :return: No return value
     """
 
@@ -596,7 +601,9 @@ def generate_new_plots(list_of_revisions):
                       '\n\n'.format(created, json_revs))
 
     # for every package
+    i = 0
     for package in sorted(list_of_packages):
+        i = i + 1
 
         # Some information to be printed out while the plots are created
         print 'Now creating plots for package: {0}'.format(package)
@@ -652,7 +659,15 @@ def generate_new_plots(list_of_revisions):
 
             # Now loop over ALL keys (within a file, objects will be
             # sorted by key)
+            i_key = 0
             for key in sorted(list_of_keys):
+                i_key = i_key + 1
+
+                # report the progress over the Pipe object, if available
+                if process_pipe:
+                    process_pipe.send({"current_package": i, "total_package": len(list_of_packages),
+                                       "package_name": package, "file_name": fileName,
+                                       "current_item": i_key, "total_item": len(list_of_keys)})
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
@@ -1418,8 +1433,8 @@ class Plotuple:
                 title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
-                + self.package)
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
+                self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1568,8 +1583,8 @@ class Plotuple:
                     title.SetTextColor(style.GetLineColor())
 
         # Create the folder in which the plot is then stored
-        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions)))
-                + self.package)
+        path = ('./plots/{0}/'.format('_'.join(sorted(self.list_of_revisions))) +
+                self.package)
         if not os.path.isdir(path):
             os.makedirs(path)
 
@@ -1758,7 +1773,7 @@ class Plotuple:
 ##############################################################################
 
 
-def create_plots(revisions=None, force=False):
+def create_plots(revisions=None, force=False, process_pipe=None):
     """!
     This function generates the plots and html
     page for the requested revisions.
@@ -1768,6 +1783,8 @@ def create_plots(revisions=None, force=False):
     @param revisions: The revisions which should be taken into account.
     @param force: If True, plots are created even if there already is a version
         of them (which may me deprecated, though)
+    @param process_pipe: communication Pipe object, which is used in
+           multi-processing mode to report the progress of the plot creating.
     """
 
     # Initialize the list of revisions which we will plot
@@ -1806,7 +1823,7 @@ def create_plots(revisions=None, force=False):
         print 'Served existing plots.'
     # Otherwise: Create the requested plots
     else:
-        generate_new_plots(list_of_revisions)
+        generate_new_plots(list_of_revisions, process_pipe)
 
         # Check if we generated the default view (i.e. all available revisions
         # and the references). If this is the case, copy these files to the
@@ -1826,3 +1843,7 @@ def create_plots(revisions=None, force=False):
 
             print 'Copied generated content.html and packages.html to the ' \
                   'base directory! \n'
+
+    # signal the main process that the plot creation is complete
+    if process_pipe:
+        process_pipe.send({"status": "complete"})

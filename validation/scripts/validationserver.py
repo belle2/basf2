@@ -12,6 +12,10 @@ import webbrowser
 from urlparse import parse_qs
 from cgi import parse_header, parse_multipart
 from save import create_image_matrix, merge_multiple_plots
+from multiprocessing import Process, Pipe
+from urlparse import urlparse
+import time
+from functools import reduce
 
 try:
     import simplejson as json
@@ -68,6 +72,51 @@ def parse_cmd_line_arguments():
                         action='store_true')
     # Return the parsed arguments!
     return parser.parse_args()
+
+
+g_plottingProcesses = {}
+
+
+def create_revsion_key(revision_names):
+    return reduce(lambda x, y: x + "-" + y, revision_names, "")
+
+
+def check_plotting_status(progress_key):
+    if progress_key not in g_plottingProcesses:
+        return None
+
+    process, process_pipe, last_status = g_plottingProcesses[progress_key]
+
+    print "process is alive " + str(process.is_alive())
+    # read latest message
+    while process_pipe.poll():
+        msg = process_pipe.recv()
+
+        print "received : " + str(msg)
+        last_status = msg
+
+        # update the last status
+        g_plottingProcesses[progress_key] = (process, process_pipe, last_status)
+
+    return last_status
+
+
+def start_plotting_request(revision_names):
+    rev_key = create_revsion_key(revision_names)
+
+    # still running a plotting for this combination ?
+    if rev_key in g_plottingProcesses:
+        return rev_key
+
+    # create Pipe to stream progress
+    parent_conn, child_conn = Pipe()
+
+    # start a new process for creating the plots
+    p = Process(target=create_plots, args=(revision_names, False, child_conn))
+    p.start()
+    g_plottingProcesses[rev_key] = (p, parent_conn, None)
+
+    return rev_key
 
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -307,12 +356,26 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             (usually 'application/json')
         """
 
+        # parse the ajax command name which was requested
+        access_path = urlparse(self.path)
+        path_items = access_path.path.split("/")
+        if "ajax" not in path_items:
+            return 404, json.dumps({}), 'application/json'
+
+        # make sure there is at least one path item after the ajax one
+        ajax_location = path_items.index("ajax")
+        if (len(path_items) - 1) == ajax_location:
+            return 404, json.dumps({}), 'application/json'
+
+        ajax_command = path_items[ajax_location + 1]
+        print "got ajax command" + ajax_command
+
         # Used to check if a web server is running
-        if '/ajax/pingserver' in self.path:
+        if 'pingserver' == ajax_command:
             return 200, json.dumps({}), 'application/json'
 
         # Used to get a list of all log files
-        if '/ajax/listlogs' in self.path:
+        if 'listlogs' == ajax_command:
 
             # In this list we will store the HTML code that will be returned
             # to the requesting JavaScript application
@@ -403,7 +466,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             return 200, json.dumps('\n'.join(html)), 'application/json'
 
         # Get the number of scripts that had issues
-        if '/ajax/scriptcount' in self.path:
+        if 'scriptcount' == ajax_command:
 
             # Get a list of all folders in results and sort by mod. date
             folders = ['./results/' + __ for __ in os.listdir('./results')
@@ -430,10 +493,17 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             return 200, json.dumps(result), 'application/json'
 
         # Used to generate new plots
-        if '/ajax/makeplots' in self.path:
+        if 'makeplots' == ajax_command:
             log.debug('Creating plots for revisions: ' + str(data))
-            create_plots(revisions=data)
-            return 200, json.dumps({}), 'application/json'
+            progress_key = start_plotting_request(data)
+
+            return 200, json.dumps({"progress_key": progress_key}), 'application/json'
+
+        # Used to check for the status of plot creating
+        if 'makeplots-status' in self.path:
+            log.debug('Checking status for plot creation: ' + str(data))
+            status = check_plotting_status(data["progress_key"])
+            return 200, json.dumps(status), 'application/json'
 
 
 ###############################################################################

@@ -192,7 +192,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
         char err_buf[500];
-        sprintf(err_buf, "Failed toa receive data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
+        sprintf(err_buf, "Failed toa receive data(%s). %d %d.: %s %s %d", strerror(errno), read_size, errno, __FILE__,
                 __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf;
         callCheckRunStop(err_str);
@@ -253,6 +253,10 @@ int DesSerPrePC::Connect()
     int val1 = 0;
     setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &val1, sizeof(val1));
 
+    struct timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, (socklen_t)sizeof(timeout));
 
     B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
     while (1) {
@@ -1282,14 +1286,14 @@ void DesSerPrePC::callCheckRunStop(string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
-  printf("###########(Ser) TIMEOUT during send()  ###############\n");
+  printf("###########(DesSer) TIMEOUT.  ###############\n");
   fflush(stdout);
   printf("\033[0m");
 #endif
   if (checkRunStop()) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Ser) Stop is detected after return from send ###############\n");
+    printf("###########(DesSer) Stop is detected. ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif

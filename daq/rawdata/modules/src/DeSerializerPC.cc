@@ -654,7 +654,6 @@ void DeSerializerPCModule::waitRestart()
     sleep(1);
   }
 
-  Connect();
 
   return;
 
@@ -703,6 +702,8 @@ void DeSerializerPCModule::event()
     }
     waitRestart();
     restartRun();
+    m_eventMetaDataPtr.create(); // Otherwise endRun() is called.
+    return;
   }
 #endif
 

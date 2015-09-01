@@ -576,7 +576,9 @@ int SerializerModule::CheckConnection(int socket)
       default:
         printf("Flushing data in socket buffer : sockid = %d\n", socket); fflush(stdout);
         if (checkRunRecovery()) {
-          printf("Run seems to be restarted while buffer has not been flushed yet. Exting...");
+          char err_buf[500];
+          sprintf("Run seems to be restarted while buffer has not been flushed yet. Exting...: %s %s %d ",
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(1);
         }
     }
@@ -599,6 +601,7 @@ void SerializerModule::callCheckRunStop(string& err_str)
     fflush(stdout);
     printf("\033[0m");
 #endif
+    err_str = "RUN_PAUSE";
     g_run_stop = 1;
     throw (err_str);
   }
@@ -653,7 +656,14 @@ void SerializerModule::event()
 
 #ifdef NONSTOP
   if (g_run_restarting == 1) {
+#ifdef NONSTOP_DEBUG
+    printf("\033[31m");
+    printf("###########(Ser) Run restarting...()  ###############\n");
+    fflush(stdout);
+    printf("\033[0m");
+#endif
     restartRun();
+    return;
   } else if (g_run_stop == 1) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
@@ -692,6 +702,7 @@ void SerializerModule::event()
       //    } catch (string err_str) {
     } catch (string err_str) {
       printf("THROW************************************* %s\n", err_str.c_str()); fflush(stdout);
+
 #ifdef NONSTOP
       return; // Go to DeSerializer***() to wait for run-restart.
 #else

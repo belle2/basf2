@@ -469,7 +469,8 @@ void DeSerializerCOPPERModule::event()
 {
 
 #ifdef NONSTOP
-  if (g_run_stop + g_run_error > 0 || checkRunStop()) {
+  printf("g_run_stop %d\n", g_run_stop); fflush(stdout);
+  if (g_run_stop > 0 || g_run_error > 0 || checkRunStop()) {
     waitRestart();
     restartRun();
   }
@@ -512,12 +513,12 @@ void DeSerializerCOPPERModule::event()
       g_status.copyEventHeader(temp_buf);
     } catch (string err_str) {
 #ifdef NONSTOP
-      if (err_str == "EAGAIN") {
+      if (err_str == "RUN_PAUSE") {
 #ifdef NONSTOP_DEBUG
         printf("###########(DesCpr) caught Exception ###############\n");
         fflush(stdout);
 #endif
-        // Update EventMetaData otherwise basf2 stops.
+        // Create EventMetaData otherwise endRun() is called.
         m_eventMetaDataPtr.create();
         return;
       }

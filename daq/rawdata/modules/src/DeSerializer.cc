@@ -358,7 +358,7 @@ void DeSerializerModule::restartRun()
 {
 
 #ifdef NONSTOP_DEBUG
-  printf("###########(Des) Restart from PAUSE  ###############\n");
+  printf("###########(Des) Restart from PAUSE  ############### %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
   fflush(stdout);
 #endif
   //    initializeCOPPER();
@@ -374,7 +374,7 @@ void DeSerializerModule::pauseRun()
 {
   g_run_stop = 1;
 #ifdef NONSTOP_DEBUG
-  printf("###########(Ser) Pause the run ###############\n");
+  printf("###########(Des) Pause the run ###############\n");
   fflush(stdout);
 #endif
   return;
@@ -404,18 +404,19 @@ void DeSerializerModule::callCheckRunStop(string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
-  printf("###########(Ser) TIMEOUT during send()  ###############\n");
+  printf("###########(Des) TIMEOUT during recv()  ###############\n");
   fflush(stdout);
   printf("\033[0m");
 #endif
   if (checkRunStop()) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Ser) Stop is detected after return from send ###############\n");
+    printf("###########(Des) Stop is detected during recv(). ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
     g_run_stop = 1;
+    err_str = "RUN_PAUSE";
 
     throw (err_str);
   }

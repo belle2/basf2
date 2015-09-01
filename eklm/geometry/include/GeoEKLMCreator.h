@@ -736,10 +736,10 @@ namespace Belle2 {
       int m_nLayerBackward;
 
       /** Number of planes in one sector. */
-      int nPlane;
+      int m_nPlane;
 
       /** Number of readout boards in one sector. */
-      int nBoard;
+      int m_nBoard;
 
       /** Number of strip readout boards on one section readout board. */
       int m_nStripBoard;
@@ -748,7 +748,7 @@ namespace Belle2 {
       int m_nStrip;
 
       /** Number of sections is one plane. */
-      int nSection;
+      int m_nSection;
 
       /** True if geometry is constructed. */
       bool haveGeo;

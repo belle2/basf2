@@ -13,9 +13,6 @@
 #include <errno.h>
 #include <math.h>
 
-/* C++ headers. */
-#include <new>
-
 /* External headers. */
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -78,18 +75,20 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
   if (m_geoDat != NULL)
     delete m_geoDat;
   /* Free geometry data. */
-  for (i = 0; i < nPlane; i++) {
-    free(BoardPosition[i]);
+  for (i = 0; i < m_nPlane; i++) {
+    if (m_mode == EKLM_DETECTOR_BACKGROUND)
+      free(BoardPosition[i]);
     free(SectionSupportPosition[i]);
   }
   free(StripPosition);
-  free(StripBoardPosition);
+  if (m_mode == EKLM_DETECTOR_BACKGROUND)
+    free(StripBoardPosition);
   free(ESTRPar.z);
   free(ESTRPar.rmin);
   free(ESTRPar.rmax);
   if (haveGeo) {
-    for (i = 0; i < nPlane; i++) {
-      for (j = 0; j < nBoard; j++)
+    for (i = 0; i < m_nPlane; i++) {
+      for (j = 0; j < m_nBoard; j++)
         delete BoardTransform[i][j];
       free(BoardTransform[i]);
     }
@@ -107,14 +106,14 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 void EKLM::GeoEKLMCreator::mallocVolumes()
 {
   int i, nDiff;
-  solids.plane = (G4VSolid**)malloc(nPlane * sizeof(G4VSolid*));
+  solids.plane = (G4VSolid**)malloc(m_nPlane * sizeof(G4VSolid*));
   if (solids.plane == NULL)
     B2FATAL(MemErr);
-  solids.psheet = (G4VSolid**)malloc(nSection * sizeof(G4VSolid*));
+  solids.psheet = (G4VSolid**)malloc(m_nSection * sizeof(G4VSolid*));
   if (solids.psheet == NULL)
     B2FATAL(MemErr);
   logvol.psheet = (G4LogicalVolume**)
-                  malloc(nSection * sizeof(G4LogicalVolume*));
+                  malloc(m_nSection * sizeof(G4LogicalVolume*));
   if (logvol.psheet == NULL)
     B2FATAL(MemErr);
   nDiff = m_geoDat->getNStripsDifferentLength();
@@ -144,21 +143,21 @@ void EKLM::GeoEKLMCreator::mallocVolumes()
   if (logvol.scint == NULL)
     B2FATAL(MemErr);
   solids.sectionsup = (struct EKLM::SectionSupportSolids**)
-                      malloc(nPlane * sizeof(struct EKLM::SectionSupportSolids*));
+                      malloc(m_nPlane * sizeof(struct EKLM::SectionSupportSolids*));
   if (solids.sectionsup == NULL)
     B2FATAL(MemErr);
-  for (i = 0; i < nPlane; i++) {
+  for (i = 0; i < m_nPlane; i++) {
     solids.sectionsup[i] = (struct EKLM::SectionSupportSolids*)
-                           malloc((nSection + 1) *
+                           malloc((m_nSection + 1) *
                                   sizeof(struct EKLM::SectionSupportSolids));
     if (solids.sectionsup[i] == NULL)
       B2FATAL(MemErr);
   }
-  for (i = 0; i < nSection; i++)
+  for (i = 0; i < m_nSection; i++)
     logvol.psheet[i] = NULL;
-  for (i = 0; i < nPlane; i++)
+  for (i = 0; i < m_nPlane; i++)
     memset(solids.sectionsup[i], 0,
-           (nSection + 1) * sizeof(struct EKLM::SectionSupportSolids));
+           (m_nSection + 1) * sizeof(struct EKLM::SectionSupportSolids));
 }
 
 void EKLM::GeoEKLMCreator::freeVolumes()
@@ -175,7 +174,7 @@ void EKLM::GeoEKLMCreator::freeVolumes()
   free(logvol.groove);
   free(solids.scint);
   free(logvol.scint);
-  for (i = 0; i < nPlane; i++)
+  for (i = 0; i < m_nPlane; i++)
     free(solids.sectionsup[i]);
   free(solids.sectionsup);
 }
@@ -332,8 +331,8 @@ void EKLM::GeoEKLMCreator::readXMLData()
   readPositionData(&EndcapPosition, &EndCap);
   readSizeData(&EndcapPosition, &EndCap);
   m_nLayer = EndCap.getInt("nLayer");
-  if (m_nLayer <= 0 || m_nLayer > 14)
-    B2FATAL("Number of layers must be from 1 to 14");
+  if (m_nLayer < 1 || m_nLayer > 14)
+    B2FATAL("Number of layers must be from 1 to 14.");
   m_nLayerForward = EndCap.getInt("nLayerForward");
   if (m_nLayerForward < 0)
     B2FATAL("Number of detector layers in the forward endcap "
@@ -355,42 +354,49 @@ void EKLM::GeoEKLMCreator::readXMLData()
   GearDir Sector(Layer);
   Sector.append("/Sector");
   readSizeData(&SectorPosition, &Sector);
-  nPlane = Sector.getInt("nPlane");
-  nBoard = Sector.getInt("nBoard");
-  GearDir Boards(Sector);
-  Boards.append("/Boards");
-  BoardSize.length = Boards.getLength("Length") * CLHEP::cm;
-  BoardSize.width = Boards.getLength("Width") * CLHEP::cm;
-  BoardSize.height = Boards.getLength("Height") * CLHEP::cm;
-  BoardSize.base_width = Boards.getLength("BaseWidth") * CLHEP::cm;
-  BoardSize.base_height = Boards.getLength("BaseHeight") * CLHEP::cm;
-  BoardSize.strip_length = Boards.getLength("StripLength") * CLHEP::cm;
-  BoardSize.strip_width = Boards.getLength("StripWidth") * CLHEP::cm;
-  BoardSize.strip_height = Boards.getLength("StripHeight") * CLHEP::cm;
-  m_nStripBoard = Boards.getInt("nStripBoard");
-  for (j = 0; j < nPlane; j++) {
-    BoardPosition[j] = (struct EKLM::BoardPosition*)
-                       malloc(nBoard * sizeof(struct EKLM::BoardPosition));
-    if (BoardPosition[j] == NULL)
-      B2FATAL(MemErr);
-    for (i = 0; i < nBoard; i++) {
-      GearDir BoardContent(Boards);
-      BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
-      BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-      BoardPosition[j][i].phi = BoardContent.getLength("Phi") * CLHEP::rad;
-      BoardPosition[j][i].r = BoardContent.getLength("Radius") * CLHEP::cm;
+  m_nPlane = Sector.getInt("nPlane");
+  if (m_nPlane < 1 || m_nPlane > 2)
+    B2FATAL("Number of strip planes must be from 1 to 2.");
+  if (m_mode == EKLM_DETECTOR_BACKGROUND) {
+    m_nBoard = Sector.getInt("m_nBoard");
+    if (m_nBoard < 1 || m_nBoard > 5)
+      B2FATAL("Number of readout boards must be from 1 to 5.");
+    GearDir Boards(Sector);
+    Boards.append("/Boards");
+    BoardSize.length = Boards.getLength("Length") * CLHEP::cm;
+    BoardSize.width = Boards.getLength("Width") * CLHEP::cm;
+    BoardSize.height = Boards.getLength("Height") * CLHEP::cm;
+    BoardSize.base_width = Boards.getLength("BaseWidth") * CLHEP::cm;
+    BoardSize.base_height = Boards.getLength("BaseHeight") * CLHEP::cm;
+    BoardSize.strip_length = Boards.getLength("StripLength") * CLHEP::cm;
+    BoardSize.strip_width = Boards.getLength("StripWidth") * CLHEP::cm;
+    BoardSize.strip_height = Boards.getLength("StripHeight") * CLHEP::cm;
+    m_nStripBoard = Boards.getInt("nStripBoard");
+    for (j = 0; j < m_nPlane; j++) {
+      BoardPosition[j] = (struct EKLM::BoardPosition*)
+                         malloc(m_nBoard * sizeof(struct EKLM::BoardPosition));
+      if (BoardPosition[j] == NULL)
+        B2FATAL(MemErr);
+      for (i = 0; i < m_nBoard; i++) {
+        GearDir BoardContent(Boards);
+        BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
+        BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
+        BoardPosition[j][i].phi = BoardContent.getLength("Phi") * CLHEP::rad;
+        BoardPosition[j][i].r = BoardContent.getLength("Radius") * CLHEP::cm;
+      }
     }
-  }
-  StripBoardPosition = (struct EKLM::StripBoardPosition*)
-                       malloc(m_nStripBoard *
-                              sizeof(struct EKLM::StripBoardPosition));
-  if (StripBoardPosition == NULL)
-    B2FATAL(MemErr);
-  for (i = 0; i < m_nStripBoard; i++) {
-    GearDir StripBoardContent(Boards);
-    StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
-                              (i + 1)).str());
-    StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") * CLHEP::cm;
+    StripBoardPosition = (struct EKLM::StripBoardPosition*)
+                         malloc(m_nStripBoard *
+                                sizeof(struct EKLM::StripBoardPosition));
+    if (StripBoardPosition == NULL)
+      B2FATAL(MemErr);
+    for (i = 0; i < m_nStripBoard; i++) {
+      GearDir StripBoardContent(Boards);
+      StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
+                                (i + 1)).str());
+      StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") *
+                                CLHEP::cm;
+    }
   }
   GearDir SectorSupport(Sector);
   SectorSupport.append("/SectorSupport");
@@ -403,7 +409,9 @@ void EKLM::GeoEKLMCreator::readXMLData()
   readPositionData(&PlanePosition, &Plane);
   readSizeData(&PlanePosition, &Plane);
   readXMLDataStrips();
-  nSection = Plane.getInt("nSection");
+  m_nSection = Plane.getInt("nSection");
+  if (m_nSection <= 0)
+    B2FATAL("Number of sections must be positive.");
   PlasticSheetWidth = Plane.getLength("PlasticSheetWidth") * CLHEP::cm;
   PlasticSheetDeltaL = Plane.getLength("PlasticSheetDeltaL") * CLHEP::cm;
   GearDir Sections(Plane);
@@ -412,13 +420,13 @@ void EKLM::GeoEKLMCreator::readXMLData()
   SectionSupportTopThickness = Sections.getLength("TopThickness") * CLHEP::cm;
   SectionSupportMiddleWidth = Sections.getLength("MiddleWidth") * CLHEP::cm;
   SectionSupportMiddleThickness = Sections.getLength("MiddleThickness") * CLHEP::cm;
-  for (j = 0; j < nPlane; j++) {
+  for (j = 0; j < m_nPlane; j++) {
     SectionSupportPosition[j] =
       (struct EKLM::SectionSupportPosition*)
-      malloc((nSection + 1) * sizeof(struct EKLM::SectionSupportPosition));
+      malloc((m_nSection + 1) * sizeof(struct EKLM::SectionSupportPosition));
     if (SectionSupportPosition[j] == NULL)
       B2FATAL(MemErr);
-    for (i = 0; i <= nSection; i++) {
+    for (i = 0; i <= m_nSection; i++) {
       GearDir SectionSupportContent(Sections);
       SectionSupportContent.append((boost::format(
                                       "/SectionSupportData[%1%]") %
@@ -941,10 +949,10 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
     B2FATAL(MemErr);
   }
   for (i = 0; i < 2; i++) {
-    ss[i] = (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) * nBoard);
+    ss[i] = (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) * m_nBoard);
     if (ss[i] == NULL)
       B2FATAL(MemErr);
-    for (j = 0; j < nBoard; j++) {
+    for (j = 0; j < m_nBoard; j++) {
       t = *BoardTransform[i][j];
       if (n == 1)
         t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
@@ -955,7 +963,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
           prev_solid = ss[0][j - 1];
       } else {
         if (j == 0)
-          prev_solid = ss[0][nBoard - 1];
+          prev_solid = ss[0][m_nBoard - 1];
         else
           prev_solid = ss[1][j - 1];
       }
@@ -969,7 +977,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
       }
     }
   }
-  res = ss[1][nBoard - 1];
+  res = ss[1][m_nBoard - 1];
   for (i = 0; i < 2; i++)
     free(ss[i]);
   return res;
@@ -1009,7 +1017,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   snprintf(name, 128, "Plane_%d_Box_1", n + 1);
   box_x = SectorSupportPosition.X + m_SectorSupportData.Thickness;
   box_y = SectorSupportPosition.Y + m_SectorSupportData.Thickness;
-  box_lx =  PlanePosition.outerR;
+  box_lx = PlanePosition.outerR;
   try {
     b1 = new G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
                    0.5 * PlanePosition.length);
@@ -1217,8 +1225,9 @@ void EKLM::GeoEKLMCreator::createSolids()
   createSectorSupportCorner3Solid();
   createSectorSupportCorner4Solid();
   /* Plane. */
-  calcBoardTransform();
-  for (i = 0; i < nPlane; i++)
+  if (m_mode == EKLM_DETECTOR_BACKGROUND)
+    calcBoardTransform();
+  for (i = 0; i < m_nPlane; i++)
     createPlaneSolid(i);
   /* Strips. */
   n = m_geoDat->getNStripsDifferentLength();
@@ -1276,7 +1285,7 @@ void EKLM::GeoEKLMCreator::createSolids()
     }
   }
   /* Plastic sheet elements. */
-  for (i = 0; i < nSection; i++)
+  for (i = 0; i < m_nSection; i++)
     createPlasticSheetSolid(i);
   /* For background mode. */
   if (m_mode == EKLM_DETECTOR_BACKGROUND) {
@@ -1387,11 +1396,11 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
   if ((curvol.endcap == 1 && curvol.layer <= m_nLayerBackward) ||
       (curvol.endcap == 2 && curvol.layer <= m_nLayerForward)) {
     /* Detector layer. */
-    for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
+    for (curvol.plane = 1; curvol.plane <= m_nPlane; curvol.plane++)
       createPlane(logicSector);
     if (m_mode == EKLM_DETECTOR_BACKGROUND)
-      for (curvol.plane = 1; curvol.plane <= nPlane; curvol.plane++)
-        for (curvol.board = 1; curvol.board <= nBoard; curvol.board++)
+      for (curvol.plane = 1; curvol.plane <= m_nPlane; curvol.plane++)
+        for (curvol.board = 1; curvol.board <= m_nBoard; curvol.board++)
           createSectionReadoutBoard(logicSector);
   } else {
     /* Shield layer. */
@@ -1402,12 +1411,12 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
 {
   int i;
   int j;
-  for (i = 0; i < nPlane; i++) {
+  for (i = 0; i < m_nPlane; i++) {
     BoardTransform[i] = (G4Transform3D**)
-                        malloc(sizeof(G4Transform3D*) * nBoard);
+                        malloc(sizeof(G4Transform3D*) * m_nBoard);
     if (BoardTransform[i] == NULL)
       B2FATAL(MemErr);
-    for (j = 0; j < nBoard; j++) {
+    for (j = 0; j < m_nBoard; j++) {
       try {
         BoardTransform[i][j] = new G4Transform3D(
           G4RotateZ3D(BoardPosition[i][j].phi) *
@@ -1588,10 +1597,10 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 1; i <= nSection + 1; i++)
+  for (i = 1; i <= m_nSection + 1; i++)
     createSectionSupport(i, logicPlane);
   for (i = 1; i <= 2; i++)
-    for (j = 1; j <= nSection; j++)
+    for (j = 1; j <= m_nSection; j++)
       createPlasticSheetElement(i, j, logicPlane);
   if (curvol.endcap == 1 && curvol.layer == 1 && curvol.sector == 1 &&
       curvol.plane == 1)
@@ -1811,7 +1820,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane, int iSheet
   t = t * G4Translate3D(0, 0, z);
   try {
     new G4PVPlacement(t, logvol.psheet[iSheet - 1], Sheet_Name,
-                      mlv, false, (iSheetPlane - 1) * nSection + iSheet, false);
+                      mlv, false, (iSheetPlane - 1) * m_nSection + iSheet, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

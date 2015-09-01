@@ -106,8 +106,10 @@ namespace Belle2 {
         splot_weights[i] = sData->GetSWeight(i, yields->at(0)->GetName());
       }
 
-      pdf_weights.resize(numberOfEvents);
-      cdf_weights.resize(numberOfEvents);
+      signal_pdf_weights.resize(numberOfEvents);
+      signal_cdf_weights.resize(numberOfEvents);
+      background_pdf_weights.resize(numberOfEvents);
+      background_cdf_weights.resize(numberOfEvents);
       RooAbsPdf* signal_pdf = workspace->pdf("sig");
       RooAbsPdf* bckgrd_pdf = workspace->pdf("bkg");
       std::string dim = discriminatingVariables.begin()->first;
@@ -115,12 +117,15 @@ namespace Belle2 {
       RooArgSet row;
       row.add(v);
       RooAbsReal* signal_cdf = signal_pdf->createCdf(row);
+      RooAbsReal* bckgrd_cdf = bckgrd_pdf->createCdf(row);
       // For each event, a weight needs to be retrieved for each class
       auto vector = discriminatingVariables.begin()->second;
       for (int i = 0; i < numberOfEvents; i++) {
         v.setVal(vector[i]);
-        cdf_weights[i] = signal_cdf->getVal();
-        pdf_weights[i] = signal_pdf->getVal(&row);
+        signal_cdf_weights[i] = signal_cdf->getVal();
+        signal_pdf_weights[i] = signal_pdf->getVal(&row);
+        background_cdf_weights[i] = bckgrd_cdf->getVal();
+        background_pdf_weights[i] = bckgrd_pdf->getVal(&row);
       }
 
       TH1* signal_hist = signal_pdf->createHistogram(dim.c_str(), 1000);

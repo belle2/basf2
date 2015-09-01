@@ -73,12 +73,22 @@ namespace Belle2 {
       /**
        * Returns calculated CDF values of signal distribution
        */
-      std::vector<float> getCDFWeights() const { return cdf_weights; }
+      std::vector<float> getSignalCDFWeights() const { return signal_cdf_weights; }
 
       /**
        * Returns calculated PDF values of signal distribution
        */
-      std::vector<float> getPDFWeights() const { return pdf_weights; }
+      std::vector<float> getSignalPDFWeights() const { return signal_pdf_weights; }
+
+      /**
+       * Returns calculated CDF values of background distribution
+       */
+      std::vector<float> getBackgroundCDFWeights() const { return background_cdf_weights; }
+
+      /**
+       * Returns calculated PDF values of background distribution
+       */
+      std::vector<float> getBackgroundPDFWeights() const { return background_pdf_weights; }
 
       /**
        * Returns binning used to save signal and background pdf
@@ -110,8 +120,10 @@ namespace Belle2 {
       std::unique_ptr<RooStats::SPlot> sData;
       RooAbsPdf* model;
       std::vector<float> splot_weights;
-      std::vector<float> cdf_weights;
-      std::vector<float> pdf_weights;
+      std::vector<float> signal_cdf_weights;
+      std::vector<float> signal_pdf_weights;
+      std::vector<float> background_cdf_weights;
+      std::vector<float> background_pdf_weights;
       std::vector<double> signal_pdf_bins;
       std::vector<double> background_pdf_bins;
       std::vector<double> pdf_binning;

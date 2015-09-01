@@ -26,7 +26,7 @@ function install_plotting_progress(joined_revisions,progress_key, wait_time) {
 			.success(function(ajax_result) {
 				if (!ajax_result) {
 					// no status yet, keep on querying
-					install_plotting_progress(progress_key, defaultWaitTime);
+					install_plotting_progress(joined_revisions,progress_key, defaultWaitTime);
 				} else {
 					// is it only a status message or a message with detailed information
 					// on the current progress ?
@@ -51,7 +51,7 @@ function install_plotting_progress(joined_revisions,progress_key, wait_time) {
 						$("#plot_creation_package").text("Current Package: " + package_name);
 						
 						// re-install the timer to check back on the progress
-						install_plotting_progress(progress_key, defaultWaitTime);
+						install_plotting_progress(joined_revisions,progress_key, defaultWaitTime);
 					}
 				}
 				

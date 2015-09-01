@@ -386,10 +386,4 @@ namespace Belle2 {
 
   } // end of namespace ECL
 } // end of namespace Belle2
-
-namespace Belle2 {
-  /**  function of G4  VolumeName to Crystal CellID */
-  int ECLG4VolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
-} // end of namespace Belle2
-
 #endif

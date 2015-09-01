@@ -89,8 +89,6 @@ namespace Belle2 {
       int GetThetaID() {return mPar_thetaID;};
       /** Get Phi Id */
       int GetPhiID() {return mPar_phiID;};
-      /** Get Cell Id (LEP: old way) */
-      int ECLVolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
       /** Get Cell Id (LEP: new way)*/
       int ECLVolumeToCellID(const G4VTouchable*);//Mapping from G4VTouchable copyNumbers to Crystal CellID
 

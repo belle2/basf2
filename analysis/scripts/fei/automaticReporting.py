@@ -1014,11 +1014,11 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     itemize = b2latex.Itemize()
     for channelName, s in zip(channelNames, signalProbabilities):
         niceDecayChannel = format.decayDescriptor(channelName)
-        s = r"{name} BR: {BR:.4f}".format(name=niceDecayChannel, BR=df[channelName])
+        text = r"{name} BR: {BR:.4f}".format(name=niceDecayChannel, BR=df[channelName])
         if s is None:
-            itemize.add(s + ' \t was ignored')
+            itemize.add(text + ' \t was ignored')
         else:
-            itemize.add(s)
+            itemize.add(text)
     o += itemize.finish()
 
     o += b2latex.SubSection("Statistic").finish()

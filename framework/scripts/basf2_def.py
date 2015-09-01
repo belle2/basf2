@@ -4,6 +4,8 @@
 from basf2_env import *
 
 import os
+import sys
+import inspect
 
 
 def get_terminal_width():
@@ -506,3 +508,11 @@ def get_path_from_file(path_filename):
 def write_path_to_file(path, filename):
     import pickle
     pickle.dump(serialize_path(path), open(filename, 'w'))
+
+
+def is_mod_function(mod, func):
+    return inspect.isfunction(func) and inspect.getmodule(func) == mod
+
+
+def list_functions(mod):
+    return [func.__name__ for func in mod.__dict__.itervalues() if is_mod_function(mod, func)]

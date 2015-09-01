@@ -3,6 +3,8 @@
 
 from basf2 import *
 import os
+import sys
+import inspect
 
 analysis_main = create_path()
 
@@ -1110,3 +1112,13 @@ def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     mod = register_module('RemoveParticlesNotInLists')
     mod.param('particleLists', lists_to_keep)
     path.add_module(mod)
+
+
+if __name__ == '__main__':
+    desc_list = []
+    for function_name in sorted(list_functions(sys.modules[__name__])):
+        function = globals()[function_name]
+        signature = inspect.formatargspec(*inspect.getargspec(function))
+        signature = signature.replace(repr(analysis_main), 'analysis_main')
+        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
+    pretty_print_description_list(desc_list)

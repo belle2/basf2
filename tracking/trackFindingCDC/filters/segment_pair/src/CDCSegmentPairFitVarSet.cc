@@ -135,9 +135,9 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("endFit_chi2")>() = endFit.getChi2();
   var<named("commonFit_chi2")>() = commonFit3D.getChi2();
 
-  var<named("commonFit_szSlope")>() = commonFit3D.getSZSlope();
-  var<named("commonFit_szSlope_variance")>() = commonFit3D.getLocalVariance(iSZ);
-  var<named("szFit_szSlope")>() = szFit.getSZSlope();
+  var<named("commonFit_tanLambda")>() = commonFit3D.getTanLambda();
+  var<named("commonFit_tanLambda_variance")>() = commonFit3D.getLocalVariance(iTanL);
+  var<named("szFit_tanLambda")>() = szFit.getTanLambda();
 
   var<named("axialFit_curvatureXY")>() = axialFit.getCurvature();
   var<named("axialFit_curvatureXY_variance")>() = axialFit.getLocalVariance(iCurv);

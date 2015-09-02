@@ -25,7 +25,7 @@ void SZCovariance::reverse()
   // aquire a minus sign
 
   // receive a minus sign upon reversion.
-  m_matrix(iSZ, iZ0) = -m_matrix(iSZ, iZ0);
-  m_matrix(iZ0, iSZ) = -m_matrix(iZ0, iSZ);
+  m_matrix(iTanL, iZ0) = -m_matrix(iTanL, iZ0);
+  m_matrix(iZ0, iTanL) = -m_matrix(iZ0, iTanL);
 
 }

@@ -107,7 +107,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
           // Fit the sz trajectory
           CDCTrajectorySZ trajectorySZ;
           zFitter.update(trajectorySZ, observationsSZ);
-          m_zMatrix(counterSegment, counterTracks) = TMath::ATan(trajectorySZ.getSZSlope());
+          m_zMatrix(counterSegment, counterTracks) = TMath::ATan(trajectorySZ.getTanLambda());
           m_zDistMatrix(counterSegment, counterTracks) = trajectorySZ.getStartZ();
           m_fittingMatrix(counterSegment, counterTracks) = TMath::Prob(trajectorySZ.getChi2(), trajectorySZ.getNDF());
         }

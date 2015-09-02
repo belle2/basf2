@@ -39,18 +39,18 @@ namespace {
     Matrix< FloatType, 2, 1> nZOverWS = invSumMatrixWS * sumVectorZOverWS;
 
     FloatType z0Intercept = nZOverWS(0);
-    FloatType szSlope = nZOverWS(1);
+    FloatType tanLambda = nZOverWS(1);
 
     SZCovariance szCovariance;
 
-    szCovariance(iSZ, iSZ) = invSumMatrixWS(1, 1);
-    szCovariance(iZ0, iSZ) = invSumMatrixWS(0, 1); // Should be symmetric.
-    szCovariance(iSZ, iZ0) = invSumMatrixWS(1, 0); // Should be symmetric.
+    szCovariance(iTanL, iTanL) = invSumMatrixWS(1, 1);
+    szCovariance(iZ0, iTanL) = invSumMatrixWS(0, 1); // Should be symmetric.
+    szCovariance(iTanL, iZ0) = invSumMatrixWS(1, 0); // Should be symmetric.
     szCovariance(iZ0, iZ0) = invSumMatrixWS(0, 0);
 
-    FloatType chi2 = sumMatrixWSZ(2, 2) - z0Intercept * sumMatrixWSZ(0, 2) -  sumMatrixWSZ(1, 2) * szSlope;
+    FloatType chi2 = sumMatrixWSZ(2, 2) - z0Intercept * sumMatrixWSZ(0, 2) -  sumMatrixWSZ(1, 2) * tanLambda;
 
-    return UncertainSZLine(szSlope, z0Intercept, szCovariance, chi2);
+    return UncertainSZLine(tanLambda, z0Intercept, szCovariance, chi2);
   }
 
 
@@ -100,9 +100,9 @@ namespace {
 
     SZCovariance szCovariance;
 
-    szCovariance(iSZ, iSZ) = covInterceptSlope(1, 1);
-    szCovariance(iZ0, iSZ) = covInterceptSlope(0, 1); // Should be symmetric.
-    szCovariance(iSZ, iZ0) = covInterceptSlope(1, 0); // Should be symmetric.
+    szCovariance(iTanL, iTanL) = covInterceptSlope(1, 1);
+    szCovariance(iZ0, iTanL) = covInterceptSlope(0, 1); // Should be symmetric.
+    szCovariance(iTanL, iZ0) = covInterceptSlope(1, 0); // Should be symmetric.
     szCovariance(iZ0, iZ0) = covInterceptSlope(0, 0);
 
     FloatType chi2 = nWSZ.transpose() * sumMatrixWSZ * nWSZ;

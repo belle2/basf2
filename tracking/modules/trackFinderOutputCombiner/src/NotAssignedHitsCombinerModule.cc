@@ -299,7 +299,7 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
     // Fit the sz trajectory
     CDCTrajectorySZ trajectorySZ;
     zFitter.update(trajectorySZ, observationsSZ);
-    return TMath::ATan(trajectorySZ.getSZSlope());
+    return TMath::ATan(trajectorySZ.getTanLambda());
   } else {
     // just a dummy value: this means the track is more or less axial only
     B2WARNING("Axial only");

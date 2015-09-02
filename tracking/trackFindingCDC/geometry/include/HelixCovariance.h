@@ -110,7 +110,7 @@ namespace Belle2 {
       SZCovariance szCovariance() const
       {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return SZCovariance(matrix().GetSub(iSZ, iZ0, iSZ, iZ0));
+        return SZCovariance(matrix().GetSub(iTanL, iZ0, iTanL, iZ0));
       }
 
 

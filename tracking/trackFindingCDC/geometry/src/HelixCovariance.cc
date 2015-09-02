@@ -19,15 +19,15 @@ using namespace TrackFindingCDC;
 void HelixCovariance::reverse()
 {
 
-  // Sign of impact, curvature and szSlope are reversed by a reversion of the helix parameters,
+  // Sign of impact, curvature and tanLambda are reversed by a reversion of the helix parameters,
   // while the tangential phi0 gets only an offset by a constant and z0 is unchanged
   // Hence correlations between
   // * curvature and phi
   // * curvature and z0
   // * phi and impact
-  // * phi and szSlope
+  // * phi and tanLambda
   // * impact and z0
-  // * szSlope and z0
+  // * tanLambda and z0
   // aquire a minus sign
 
   // receive a minus sign upon reversion.
@@ -40,13 +40,13 @@ void HelixCovariance::reverse()
   m_matrix(iPhi0, iI) = -m_matrix(iPhi0, iI);
   m_matrix(iI, iPhi0) = -m_matrix(iI, iPhi0);
 
-  m_matrix(iPhi0, iSZ) = -m_matrix(iPhi0, iSZ);
-  m_matrix(iSZ, iPhi0) = -m_matrix(iSZ, iPhi0);
+  m_matrix(iPhi0, iTanL) = -m_matrix(iPhi0, iTanL);
+  m_matrix(iTanL, iPhi0) = -m_matrix(iTanL, iPhi0);
 
   m_matrix(iI, iZ0) = -m_matrix(iI, iZ0);
   m_matrix(iZ0, iI) = -m_matrix(iZ0, iI);
 
-  m_matrix(iSZ, iZ0) = -m_matrix(iSZ, iZ0);
-  m_matrix(iZ0, iSZ) = -m_matrix(iZ0, iSZ);
+  m_matrix(iTanL, iZ0) = -m_matrix(iTanL, iZ0);
+  m_matrix(iZ0, iTanL) = -m_matrix(iZ0, iTanL);
 
 }

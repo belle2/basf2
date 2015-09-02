@@ -62,10 +62,10 @@ namespace {
     result(iI, iI)       = 1.0;
 
     // result(iCurv,iSZ)    = -2.0 * dPhi0OverDZ0ByISuperLayer[iSuperLayer];
-    result(iCurv, iSZ)   = dCurvOverDSZByISuperLayer[iSuperLayer];
+    result(iCurv, iTanL)   = dCurvOverDSZByISuperLayer[iSuperLayer];
     result(iPhi0, iZ0)   = -dPhi0OverDZ0ByISuperLayer[iSuperLayer];
 
-    result(iPhi0, iSZ)   =   zeta;
+    result(iPhi0, iTanL)   =   zeta;
     result(iI, iZ0)      = - zeta;
 
     // result.Print();
@@ -520,19 +520,19 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   CDCTrajectory2D stereoTrajectory2D = riemannFitter.fit(stereoSegment3D);
   stereoSegment3D.setTrajectory2D(stereoTrajectory2D);
 
-  // Correct the values of szSlope and z0
+  // Correct the values of tanLambda and z0
   CDCTrajectory3D fusedTrajectory3D =
     startIsAxial ?
     fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(startSegment, stereoSegment3D) :
     fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, endSegment) ;
 
-  FloatType szSlopeShift = trajectorySZ.getSZSlope();
+  FloatType tanLambdaShift = trajectorySZ.getTanLambda();
 
   Vector3D fusedLocalOrigin = fusedTrajectory3D.getLocalOrigin();
   FloatType sOffset = axialTrajectory2D.calcArcLength2D(fusedLocalOrigin.xy());
   FloatType zShift = trajectorySZ.mapSToZ(sOffset);
 
-  fusedTrajectory3D.shiftSZSlopeIntercept(szSlopeShift, zShift);
+  fusedTrajectory3D.shiftTanLambdaIntercept(tanLambdaShift, zShift);
 
   return fusedTrajectory3D;
 

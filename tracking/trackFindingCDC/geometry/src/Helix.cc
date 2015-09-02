@@ -28,7 +28,7 @@ FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
   FloatType byArcLength2D = circleXY().arcLengthTo(point.xy());
 
   // Handle z coordinate
-  FloatType transformedZ0 = byArcLength2D * szSlope() + z0();
+  FloatType transformedZ0 = byArcLength2D * tanLambda() + z0();
   FloatType deltaZ = point.z() - transformedZ0;
   // FloatType iPeriod = floor(deltaZ / zPeriod());
 
@@ -42,18 +42,18 @@ FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
   FloatType denominator = 1 + curvatureXY() * d0;
   //B2INFO("denominator = " << denominator);
   if (denominator == 0) {
-    return deltaZ / szSlope() + byArcLength2D;
+    return deltaZ / tanLambda() + byArcLength2D;
   }
 
-  FloatType slope = - szSlope() * szSlope() / denominator;
-  FloatType intercept = - szSlope() * curvatureXY() * deltaZ / denominator;
+  FloatType slope = - tanLambda() * tanLambda() / denominator;
+  FloatType intercept = - tanLambda() * curvatureXY() * deltaZ / denominator;
 
   // B2INFO("slope = " << slope);
   // B2INFO("intercept = " << intercept);
 
   SinEqLine sinEqLineSolver(slope, intercept);
 
-  Index iHalfPeriod = sinEqLineSolver.getIHalfPeriod(deltaZ / szSlope() * curvatureXY());
+  Index iHalfPeriod = sinEqLineSolver.getIHalfPeriod(deltaZ / tanLambda() * curvatureXY());
 
   // B2INFO("iHalfPeriod : " << iHalfPeriod);
   // B2INFO("Basic solution : " << sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(-1));
@@ -73,8 +73,8 @@ FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
   Index iSmallestSol = 0;
 
   for (int iSol = 0; iSol < 4; ++iSol) {
-    distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + szSlope() * szSlope() * solutions[iSol] *
-                      solutions[iSol] + 2 * szSlope() * curvatureXY() * deltaZ * solutions[iSol];
+    distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + tanLambda() * tanLambda() * solutions[iSol] *
+                      solutions[iSol] + 2 * tanLambda() * curvatureXY() * deltaZ * solutions[iSol];
     // B2INFO("Solution : " << iSol);
     // B2INFO("arcLength * curvature = " << solutions[iSol]);
     // B2INFO("distance = " << distances[iSol]);
@@ -114,13 +114,13 @@ TMatrixD Helix::passiveMoveByJacobian(const Vector3D& by) const
   circleXY().passiveMoveByJacobian(by.xy(), jacobian);
 
   FloatType curv = curvatureXY();
-  FloatType m = szSlope();
+  FloatType m = tanLambda();
   FloatType sArc = circleXY().arcLengthTo(by.xy());
 
   jacobian(iZ0, iCurv) = m * (jacobian(iPhi0, iCurv) - sArc) / curv;
   jacobian(iZ0, iPhi0) = m * (jacobian(iPhi0, iPhi0) - 1.) / curv;
   jacobian(iZ0, iI)    = m *  jacobian(iPhi0, iI) / curv;
-  jacobian(iZ0, iSZ)   = sArc;
+  jacobian(iZ0, iTanL)   = sArc;
 
   return jacobian;
 }

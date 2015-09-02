@@ -128,7 +128,7 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
   //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
-  setVariableIfNotNaN<named("sz_slope")>(trajectorySZ.getSZSlope());
+  setVariableIfNotNaN<named("sz_slope")>(trajectorySZ.getTanLambda());
   setVariableIfNotNaN<named("drift_length_mean")>(drift_length_sum / size);
   setVariableIfNotNaN<named("drift_length_variance")>(drift_length_variance);
   setVariableIfNotNaN<named("drift_length_max")>(drift_length_max);

@@ -46,26 +46,26 @@ namespace Belle2 {
 
       explicit Helix(const TVectorD& parameters) :
         m_circleXY(parameters(iCurv), parameters(iPhi0), parameters(iI)),
-        m_lineSZ(Line2D::fromSlopeIntercept(parameters(iSZ), parameters(iZ0)))
+        m_lineSZ(Line2D::fromSlopeIntercept(parameters(iTanL), parameters(iZ0)))
       {;}
 
       Helix(const FloatType& curvature,
             const FloatType& tangentialPhi,
             const FloatType& impact,
-            const FloatType& szSlope,
+            const FloatType& tanLambda,
             const FloatType& z0) :
         m_circleXY(curvature, tangentialPhi, impact),
-        m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
+        m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
 
 
       Helix(const FloatType& curvature,
             const Vector2D& tangential,
             const FloatType& impact,
-            const FloatType& szSlope,
+            const FloatType& tanLambda,
             const FloatType& z0) :
         m_circleXY(curvature, tangential, impact),
-        m_lineSZ(Line2D::fromSlopeIntercept(szSlope, z0))
+        m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
 
 
@@ -140,12 +140,12 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
-      /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift)
+      /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
+      void shiftTanLambdaIntercept(const FloatType& tanLambdaShift, const FloatType& zShift)
       {
         FloatType z0 = m_lineSZ.intercept();
-        FloatType szSlope = m_lineSZ.slope();
-        m_lineSZ.setSlopeIntercept(szSlope + szSlopeShift, z0 + zShift);
+        FloatType tanLambda = m_lineSZ.slope();
+        m_lineSZ.setSlopeIntercept(tanLambda + tanLambdaShift, z0 + zShift);
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
@@ -193,16 +193,12 @@ namespace Belle2 {
       { return Vector3D(perigeeXY(), z0()); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
-      FloatType szSlope() const
+      FloatType tanLambda() const
       { return m_lineSZ.slope(); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
       FloatType cotTheta() const
-      { return szSlope(); }
-
-      /// Getter for the proportinality factor from arc length in xy space to z.
-      FloatType tanLambda() const
-      { return szSlope(); }
+      { return tanLambda(); }
 
       /// Getter for z coordinate at the support point of the helix.
       FloatType z0() const
@@ -223,7 +219,7 @@ namespace Belle2 {
       /// Getter for the unit three dimensional tangential vector at the support point of the helix.
       Vector3D tangential() const
       {
-        Vector3D result(tangentialXY(), szSlope());
+        Vector3D result(tangentialXY(), tanLambda());
         result.normalize();
         return result;
       }
@@ -247,7 +243,7 @@ namespace Belle2 {
         result(iCurv) = curvatureXY();
         result(iPhi0) = phi0();
         result(iI) = impactXY();
-        result(iSZ) = szSlope();
+        result(iTanL) = tanLambda();
         result(iZ0) = z0();
         return result;
       }

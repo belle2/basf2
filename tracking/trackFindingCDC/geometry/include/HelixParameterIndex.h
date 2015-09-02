@@ -23,8 +23,8 @@ namespace Belle2 {
     //const HelixParameterIndex iPhi0 = 1;
     //const HelixParameterIndex iI = 2;
 
-    /// Constant to address the szSlope in a vector or matrix assoziated with helix parameters
-    const HelixParameterIndex iSZ = 3;
+    /// Constant to address the tanLambda in a vector or matrix assoziated with helix parameters
+    const HelixParameterIndex iTanL = 3;
 
     /// Constant to address the z reference point in a vector or matrix assoziated with helix parameters
     const HelixParameterIndex iZ0 = 4;

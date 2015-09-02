@@ -25,22 +25,22 @@ namespace Belle2 {
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
       inline Weight operator()(const CDCRecoHit3D* recoHit,
-                               const Z0TanLambdaBox* z0ZSlopeBox)
+                               const Z0TanLambdaBox* z0TanLambdaBox)
       {
-        const float& lowerZ0 = z0ZSlopeBox->getLowerZ0();
-        const float& upperZ0 = z0ZSlopeBox->getUpperZ0();
+        const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
+        const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
 
         const float& perpS = recoHit->getArcLength2D();
         const float& reconstructedZ = recoHit->getRecoZ();
 
-        const float& lowerZSlope = z0ZSlopeBox->getLowerTanLambda();
-        const float& upperZSlope = z0ZSlopeBox->getUpperTanLambda();
+        const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
+        const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
         float dist[2][2];
-        dist[0][0] = perpS * lowerZSlope - reconstructedZ + lowerZ0;
-        dist[0][1] = perpS * lowerZSlope - reconstructedZ + upperZ0;
-        dist[1][0] = perpS * upperZSlope - reconstructedZ + lowerZ0;
-        dist[1][1] = perpS * upperZSlope - reconstructedZ + upperZ0;
+        dist[0][0] = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
+        dist[0][1] = perpS * lowerTanLambda - reconstructedZ + upperZ0;
+        dist[1][0] = perpS * upperTanLambda - reconstructedZ + lowerZ0;
+        dist[1][1] = perpS * upperTanLambda - reconstructedZ + upperZ0;
 
         if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
           return 1.0;

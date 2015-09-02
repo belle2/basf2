@@ -36,10 +36,10 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
     FloatType curvature = +1.0 / 2.0;
     FloatType phi0 = -PI / 2.0;
     FloatType impact = +1.0;
-    FloatType szSlope = 1.0 / 2.0;
+    FloatType tanLambda = 1.0 / 2.0;
     FloatType z0 = 0.0;
 
-    Helix helix(curvature, phi0, impact, szSlope, z0);
+    Helix helix(curvature, phi0, impact, tanLambda, z0);
     Vector3D point(0.0, 0.0, 0.0);
 
     Vector3D expectedClosest = helix.support();
@@ -62,10 +62,10 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
   FloatType curvature = -1.0;
   FloatType phi0 = +PI / 2.0;
   FloatType impact = -1.0;
-  FloatType szSlope = 1.0 / 2.0;
+  FloatType tanLambda = 1.0 / 2.0;
   FloatType z0 = 3.0;
 
-  Helix helix(curvature, phi0, impact, szSlope, z0);
+  Helix helix(curvature, phi0, impact, tanLambda, z0);
   EXPECT_EQ(-1, helix.radiusXY());
 
   FloatType closestArcLength2D = helix.arcLength2DToCylindricalR(1);
@@ -91,10 +91,10 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
   FloatType curvature = -1.0;
   FloatType phi0 = +PI / 2.0;
   FloatType impact = -1.0;
-  FloatType szSlope = 1.0 / 2.0;
+  FloatType tanLambda = 1.0 / 2.0;
   FloatType z0 = 3.0;
 
-  Helix helix(curvature, phi0, impact, szSlope, z0);
+  Helix helix(curvature, phi0, impact, tanLambda, z0);
 
   Vector2D origin(0.0, 0.0);
   FloatType closestArcLength2D = helix.arcLength2DToXY(origin);

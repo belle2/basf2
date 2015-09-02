@@ -28,7 +28,7 @@ namespace Belle2 {
     public:
       /// Default constructor for ROOT compatibility.
       SZCovariance() :
-        m_matrix(iSZ, iZ0) //From to indices
+        m_matrix(iTanL, iZ0) //From to indices
       { m_matrix.Zero(); }
 
 
@@ -54,13 +54,13 @@ namespace Belle2 {
       {
         if (matrix().GetNrows() != 2 or
             matrix().GetNcols() != 2 or
-            matrix().GetColLwb() != iSZ or
+            matrix().GetColLwb() != iTanL or
             matrix().GetColUpb() != iZ0) {
           B2ERROR("SZ covariance matrix is a  " <<
                   matrix().GetNrows() << "x" <<
                   matrix().GetNcols() << " matrix starting from " <<
                   matrix().GetColLwb() << ". " <<
-                  "Expected 2x2 matrix starting from "  << iSZ << "."
+                  "Expected 2x2 matrix starting from "  << iTanL << "."
                  );
         }
       }

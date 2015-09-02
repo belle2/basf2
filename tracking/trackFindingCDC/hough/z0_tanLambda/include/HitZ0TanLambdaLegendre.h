@@ -64,18 +64,18 @@ namespace Belle2 {
         assert(m_discreteTanLambdaWidth > m_discreteTanLambdaOverlap);
         const size_t nTanLambdaBins = std::pow(tanLambdaDivisions, m_maxLevel);
 
-        const size_t nDiscreteZSlopes = (m_discreteTanLambdaWidth - m_discreteTanLambdaOverlap) * nTanLambdaBins +
-                                        m_discreteTanLambdaOverlap + 1;
+        const size_t nDiscreteTanLambdas = (m_discreteTanLambdaWidth - m_discreteTanLambdaOverlap) * nTanLambdaBins +
+                                           m_discreteTanLambdaOverlap + 1;
 
 
-        const double zSlopeOverlap = 2 * m_maximumAbsTanLambda / (nTanLambdaBins * (static_cast<double>(m_discreteTanLambdaWidth) /
-                                                                  m_discreteTanLambdaOverlap - 1) + 1);
+        const double tanLambdaOverlap = 2 * m_maximumAbsTanLambda / (nTanLambdaBins * (static_cast<double>(m_discreteTanLambdaWidth) /
+                                        m_discreteTanLambdaOverlap - 1) + 1);
 
-        const double zSlopeLowerBound = -m_maximumAbsTanLambda - zSlopeOverlap;
-        const double zSlopeUpperBound = +m_maximumAbsTanLambda + zSlopeOverlap;
+        const double tanLambdaLowerBound = -m_maximumAbsTanLambda - tanLambdaOverlap;
+        const double tanLambdaUpperBound = +m_maximumAbsTanLambda + tanLambdaOverlap;
 
 
-        m_discreteTanLambdas = linspace<float>(zSlopeLowerBound, zSlopeUpperBound, nDiscreteZSlopes);
+        m_discreteTanLambdas = linspace<float>(tanLambdaLowerBound, tanLambdaUpperBound, nDiscreteTanLambdas);
         const std::array<DiscreteTanLambda, 2> tanLambdaRange(DiscreteTanLambda::getRange(m_discreteTanLambdas));
 
         // Compose the hough space
@@ -101,11 +101,11 @@ namespace Belle2 {
       findHighest(const Weight& minWeight)
       {
         std::vector<std::pair<Z0TanLambdaBox, std::vector<HitPointerType>>> found;
-        HitInZ0TanLambdaBox hitInZ0ZSlopeBox;
+        HitInZ0TanLambdaBox hitInZ0TanLambdaBox;
         auto skipLowWeightNode = [minWeight](const typename HitZ0TanLambdaFastHoughTree::Node * node) {
           return not(node->getWeight() >= minWeight);
         };
-        typename HitZ0TanLambdaFastHoughTree::Node* node = m_hitZ0TanLambdaFastHoughTree->findHeaviestLeaf(hitInZ0ZSlopeBox, m_maxLevel,
+        typename HitZ0TanLambdaFastHoughTree::Node* node = m_hitZ0TanLambdaFastHoughTree->findHeaviestLeaf(hitInZ0TanLambdaBox, m_maxLevel,
                                                            skipLowWeightNode);
 
         if (node) {

@@ -75,7 +75,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       double startZSegments = szTrajectorySegments.getStartZ();
 
       var<named("z_distance")>() = startZTrack - startZSegments;
-      var<named("theta_distance")>() = szTrajectoryTrack.getSZSlope() - szTrajectorySegments.getSZSlope();
+      var<named("theta_distance")>() = szTrajectoryTrack.getTanLambda() - szTrajectorySegments.getTanLambda();
     }
   }
 
@@ -151,9 +151,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
   const CDCTrajectorySZ& trajectorySZ = track->getStartTrajectory3D().getTrajectorySZ();
-  double szSlope = trajectorySZ.getSZSlope();
+  double tanLambda = trajectorySZ.getTanLambda();
 
-  bool hasZInformation = szSlope != 0;
+  bool hasZInformation = tanLambda != 0;
   double max_hit_z_distance = -1;
   double sum_hit_z_distance = 0;
   double stereo_quad_tree_distance = 0;

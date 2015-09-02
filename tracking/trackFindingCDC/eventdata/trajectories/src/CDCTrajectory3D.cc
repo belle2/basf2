@@ -143,8 +143,8 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const Flo
   jacobianReduce(iCurv, iPx) = charge * invPtSquared / alpha ;
   jacobianReduce(iPhi0, iPy) = invPt;
   jacobianReduce(iI, iY) = 1;
-  jacobianReduce(iSZ, iPx) = - pz * invPtSquared;
-  jacobianReduce(iSZ, iPz) = invPt;
+  jacobianReduce(iTanL, iPx) = - pz * invPtSquared;
+  jacobianReduce(iTanL, iPz) = invPt;
   jacobianReduce(iZ0, iZ) = 1;
   // Note the column corresponding to iX is completely zero as expectable.
 
@@ -242,12 +242,12 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& 
     jacobianInflate(iPx, iCurv) = 0;
     jacobianInflate(iPy, iPhi0) = momentum.cylindricalR();
     jacobianInflate(iPz, iCurv) = 0;
-    jacobianInflate(iPz, iSZ) = momentum.cylindricalR();
+    jacobianInflate(iPz, iTanL) = momentum.cylindricalR();
   } else {
     jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
     jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;
     jacobianInflate(iPz, iCurv) = tanLambda * invChargeAlphaCurv2;
-    jacobianInflate(iPz, iSZ) = - invChargeAlphaCurv;
+    jacobianInflate(iPz, iTanL) = - invChargeAlphaCurv;
   }
   // Transform
   TMatrixDSym cov6 = cov5; //copy
@@ -288,9 +288,9 @@ SignType CDCTrajectory3D::getChargeSign() const
 
 FloatType CDCTrajectory3D::getAbsMom3D(const FloatType& bZ) const
 {
-  FloatType szSlope = getLocalHelix().szSlope();
+  FloatType tanLambda = getLocalHelix().tanLambda();
 
-  FloatType factor2DTo3D = hypot(1, szSlope);
+  FloatType factor2DTo3D = hypot(1, tanLambda);
 
   FloatType curvatureXY = getLocalHelix().curvatureXY();
 
@@ -298,7 +298,7 @@ FloatType CDCTrajectory3D::getAbsMom3D(const FloatType& bZ) const
 
   return factor2DTo3D * absMom2D;
 
-  FloatType absMomZ = absMom2D * szSlope;
+  FloatType absMomZ = absMom2D * tanLambda;
 
   return hypot(absMom2D, absMomZ);
 }
@@ -307,9 +307,9 @@ FloatType CDCTrajectory3D::getAbsMom3D() const
 {
   Vector3D position = getSupport();
 
-  FloatType szSlope = getLocalHelix().szSlope();
+  FloatType tanLambda = getLocalHelix().tanLambda();
 
-  FloatType factor2DTo3D = hypot(1, szSlope);
+  FloatType factor2DTo3D = hypot(1, tanLambda);
 
   FloatType curvatureXY = getLocalHelix().curvatureXY();
 
@@ -317,7 +317,7 @@ FloatType CDCTrajectory3D::getAbsMom3D() const
 
   return factor2DTo3D * absMom2D;
 
-  FloatType absMomZ = absMom2D * szSlope;
+  FloatType absMomZ = absMom2D * tanLambda;
 
   return hypot(absMom2D, absMomZ);
 }

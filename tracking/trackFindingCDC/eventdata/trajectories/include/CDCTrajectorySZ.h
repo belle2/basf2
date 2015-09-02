@@ -49,9 +49,9 @@ namespace Belle2 {
 
 
       /// Constructs the trajectory with the given slope and start z.
-      CDCTrajectorySZ(const FloatType& szSlope,
+      CDCTrajectorySZ(const FloatType& tanLambda,
                       const FloatType& startZ) :
-        m_szLine(Line2D::fromSlopeIntercept(szSlope, startZ))
+        m_szLine(Line2D::fromSlopeIntercept(tanLambda, startZ))
       {;}
 
       /// Construct the sz line by its normal parameters ( used in least square fits )
@@ -120,7 +120,7 @@ namespace Belle2 {
 
 
       /// Gets the slope over the travel distance coordinate
-      inline  FloatType getSZSlope() const
+      inline  FloatType getTanLambda() const
       { return getSZLine().slope(); }
 
       /// Gets the z coordinate at zero travel distance
@@ -165,8 +165,8 @@ namespace Belle2 {
 
 
       /// Setter for slope and intercept of the line
-      void setSlopeIntercept(const FloatType& szSlope, const FloatType& startZ)
-      { m_szLine.setSlopeIntercept(szSlope, startZ); }
+      void setSlopeIntercept(const FloatType& tanLambda, const FloatType& startZ)
+      { m_szLine.setSlopeIntercept(tanLambda, startZ); }
 
       /// Setter for the normal parameters of the line.
       void setN(const FloatType& n0,

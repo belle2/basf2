@@ -71,9 +71,9 @@ namespace Belle2 {
       "startFit_chi2" ,
       "endFit_chi2" ,
       "commonFit_chi2" ,
-      "commonFit_szSlope",
-      "commonFit_szSlope_variance" ,
-      "szFit_szSlope",
+      "commonFit_tanLambda",
+      "commonFit_tanLambda_variance" ,
+      "szFit_tanLambda",
 
       "axialFit_curvatureXY" ,
       "axialFit_curvatureXY_variance" ,

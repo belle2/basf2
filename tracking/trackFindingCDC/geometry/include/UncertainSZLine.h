@@ -35,12 +35,12 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain sz line from the  perigee parameters and a 2x2 covariance matrix. Covariance matrix defaults to a zero matrix.
-      UncertainSZLine(const FloatType& szSlope,
+      UncertainSZLine(const FloatType& tanLambda,
                       const FloatType& z0,
                       const SZCovariance& szCovariance = SZCovariance(),
                       const FloatType chi2 = 0.0,
                       const size_t ndf = 0) :
-        Line2D(Line2D::fromSlopeIntercept(szSlope, z0)),
+        Line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
         m_szCovariance(szCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
@@ -126,9 +126,9 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       TMatrixD passiveMoveByJacobian(const Vector2D& bySZ) const
       {
-        TMatrixD result(iSZ, iZ0);
+        TMatrixD result(iTanL, iZ0);
         result.UnitMatrix();
-        result(iZ0, iSZ) = bySZ.first();
+        result(iZ0, iTanL) = bySZ.first();
         return result;
       }
 

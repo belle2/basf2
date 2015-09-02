@@ -40,12 +40,12 @@ namespace Belle2 {
       UncertainHelix(const FloatType& curvature,
                      const FloatType& tangentialPhi,
                      const FloatType& impact,
-                     const FloatType& szSlope,
+                     const FloatType& tanLambda,
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
                      const FloatType& chi2 = 0.0,
                      const size_t& ndf = 0) :
-        Helix(curvature, tangentialPhi, impact, szSlope, z0),
+        Helix(curvature, tangentialPhi, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
@@ -66,12 +66,12 @@ namespace Belle2 {
       UncertainHelix(const FloatType& curvature,
                      const Vector2D& tangential,
                      const FloatType& impact,
-                     const FloatType& szSlope,
+                     const FloatType& tanLambda,
                      const FloatType& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
                      const FloatType& chi2 = 0.0,
                      const size_t& ndf = 0) :
-        Helix(curvature, tangential, impact, szSlope, z0),
+        Helix(curvature, tangential, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)

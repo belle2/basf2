@@ -196,16 +196,12 @@ namespace Belle2 {
 
     public:
       /// Getter for the slope of z over the transverse travel distance s.
-      FloatType getSZSlope() const
-      { return getLocalHelix().szSlope(); }
-
-      /// Getter for tan lambda of the trajectory.
       FloatType getTanLambda() const
       { return getLocalHelix().tanLambda(); }
 
-      /// Shifts the szSlope and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftSZSlopeIntercept(const FloatType& szSlopeShift, const FloatType& zShift)
-      { m_localHelix.shiftSZSlopeIntercept(szSlopeShift, zShift); }
+      /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
+      void shiftTanLambdaIntercept(const FloatType& tanLambdaShift, const FloatType& zShift)
+      { m_localHelix.shiftTanLambdaIntercept(tanLambdaShift, zShift); }
 
 
 

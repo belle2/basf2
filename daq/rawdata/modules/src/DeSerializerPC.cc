@@ -124,10 +124,6 @@ void DeSerializerPCModule::initialize()
 
 #ifdef NONSTOP
   openRunPauseNshm();
-#ifdef NONSTOP_DEBUG
-  printf("###########(DeSerializerPC) prepare shm  ###############\n");
-  fflush(stdout);
-#endif
 #endif
 
   B2INFO("DeSerializerPC: initialize() done.");
@@ -143,35 +139,37 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-
-#ifdef NONSTOP
         // No data received within SO_RCVTIMEO
-        char err_buf[500];
-        sprintf(err_buf, "Failed to receive data(%s). %d %d. : %s %s %d", strerror(errno), read_size, errno, __FILE__,
-                __PRETTY_FUNCTION__, __LINE__);
-        printf("%s\n", err_buf); fflush(stdout);
-        string err_str = err_buf;
+#ifdef NONSTOP
+        string err_str;
         callCheckRunPause(err_str);
 #endif
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failed to receive data(%s). Exiting...", strerror(errno));
+        sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
+                read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifdef NONSTOP
+        g_run_error = 1;
+        B2ERROR(err_buf);
+        string err_str = "RUN_ERROR";
+        throw (err_str);
+#endif
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        sleep(1234567);
         exit(-1);
       }
-
     } else if (read_size == 0) {
-#ifdef NONSTOP
-      // Connection is closed ( error )
       char err_buf[500];
-      sprintf(err_buf, "Connection is closed by peer(%s). Move to standby-loop. readsize = %d %d. :  %s %s %d",
-              strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf;
+      sprintf(err_buf, "Connection is closed by peer(%s).:  %s %s %d",
+              strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifdef NONSTOP
       g_run_error = 1;
+      B2ERROR(err_buf);
+      string err_str = "RUN_ERROR";
       throw (err_str);
 #endif
+      print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -634,11 +632,6 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 #ifdef NONSTOP
 void DeSerializerPCModule::waitResume()
 {
-
-  for (int i = 0; i < m_num_connections; i++) {
-    if (CheckConnection(m_socket[ i ]) < 0)  m_socket[ i ] = -1;
-  }
-
   while (true) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
@@ -648,12 +641,14 @@ void DeSerializerPCModule::waitResume()
 #endif
     if (checkRunRecovery()) {
       g_run_pause = 0;
+      for (int i = 0; i < m_num_connections; i++) {
+        if (CheckConnection(m_socket[ i ]) < 0)  m_socket[ i ] = -1;
+      }
+      resumeRun();
       break;
     }
     sleep(1);
   }
-
-
   return;
 
 }
@@ -686,7 +681,7 @@ void DeSerializerPCModule::event()
 
 
 #ifdef NONSTOP
-  if (g_run_pause + g_run_error > 0 || checkRunPause()) {
+  if (g_run_pause > 0 ||  g_run_error > 0) {
     if (g_run_pause == 0) {
       while (true) {
         if (checkRunPause()) break;
@@ -700,7 +695,6 @@ void DeSerializerPCModule::event()
       }
     }
     waitResume();
-    resumeRun();
     m_eventMetaDataPtr.create(); // Otherwise endRun() is called.
     return;
   }
@@ -728,11 +722,15 @@ void DeSerializerPCModule::event()
       //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
       checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
     } catch (string err_str) {
-      printf("Going to somewhere. %s\n", err_str.c_str()); fflush(stdout);
-
+#ifdef NONSTOP
       // Update EventMetaData otherwise basf2 stops.
-      m_eventMetaDataPtr.create();
-      return;
+      if (err_str == "RUN_PAUSE" || err_str == "RUN_ERROR") {
+        m_eventMetaDataPtr.create();
+        return;
+      }
+#endif
+      print_err.PrintError((char*)err_str.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(1);
     }
 #ifndef USE_DESERIALIZER_PREPC
     PreRawCOPPERFormat_latest pre_rawcopper_latest;

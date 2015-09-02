@@ -361,10 +361,10 @@ void DeSerializerModule::resumeRun()
   printf("###########(Des) Resume from PAUSE  ############### %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
   fflush(stdout);
 #endif
-  //    initializeCOPPER();
   g_run_error = 0;
   g_run_resuming = 1;
   m_start_flag = 0;
+
   return;
 }
 
@@ -460,10 +460,6 @@ int DeSerializerModule::CheckConnection(int socket)
       default:
         tot_ret += ret;
         printf("Flushing data in socket buffer : sockid = %d %d bytes tot %d bytes\n", socket, ret, tot_ret); fflush(stdout);
-        if (checkRunRecovery()) {
-          printf("Run seems to be resumed while buffer has not been flushed yet. Exting...");
-          exit(1);
-        }
     }
   }
 }

@@ -191,20 +191,9 @@ namespace Belle2 {
     //! for nonstop DAQ
     virtual void resumeRun();
 
-    //! for nonstop DAQ
-    virtual int checkRunRecovery();
-
-    /*     //! for nonstop DAQ */
-    /*     virtual void pauseRun(); */
-
-    /*     //! for nonstop DAQ */
-    /*     virtual void waitResume(); */
-
     //! check RunPause
     void callCheckRunPause(std::string& err_str);
 
-    //! connection is reset or not
-    int m_conn_alive;
 #endif
 
     //! which format is used

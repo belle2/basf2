@@ -115,10 +115,6 @@ void DeSerializerCOPPERModule::initialize()
 
 #ifdef NONSTOP
   openRunPauseNshm();
-#ifdef NONSTOP_DEBUG
-  printf("###########(DesCpr) prepare shm  ###############\n");
-  fflush(stdout);
-#endif
 #endif
 
   B2INFO("DeSerializerCOPPER: initialize() done.");
@@ -199,7 +195,6 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
   //
 #ifndef DUMMY
   int recvd_byte = (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int);
-
   // Firstly, read data with an allocated buffer.
   while (1) {
     int read_size = 0;
@@ -214,11 +209,10 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
+
 #ifdef NONSTOP
-        char err_buf[500];
-        sprintf(err_buf, "Failed to read data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
-                __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf;
+        // Check run-pause request from SLC
+        string err_str;
         callCheckRunPause(err_str);
 #endif
         continue;
@@ -369,27 +363,31 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
-
 #ifdef NONSTOP
-        char err_buf[500];
-        sprintf(err_buf, "Failed to read data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
-                __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf;
+        // Check run-pause request from SLC
+        string err_str;
         try {
           callCheckRunPause(err_str);
         } catch (string err_str) {
           if (delete_flag) {
+            // Delete allocated buffer
             B2WARNING("Delete buffer before going to Run-pause state");
             delete buf;
           }
           throw (err_str);
         }
 #endif
-
         continue;
       } else {
         char err_buf[500];
-        sprintf("Failed to read data from COPPER(%s). Exting...", strerror(errno));
+        sprintf("Failed to read data from COPPER(%s). %s %s %d",
+                strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifdef NONSTOP
+        g_run_error = 1;
+        B2ERROR(err_buf);
+        string err_str = "RUN_ERROR";
+        throw (err_str);
+#endif
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
@@ -413,14 +411,16 @@ void DeSerializerCOPPERModule::resumeRun()
   fflush(stdout);
 #endif
   initializeCOPPER();
+  g_run_error = 0;
   g_run_resuming = 1;
   m_start_flag = 0;
+
+
   return;
 }
 
 void DeSerializerCOPPERModule::waitResume()
 {
-
   // First, wait for run_pause
   if (g_run_pause == 0 && g_run_error == 1) {
     while (true) {
@@ -441,6 +441,10 @@ void DeSerializerCOPPERModule::waitResume()
   while (true) {
     if (checkRunRecovery()) {
       g_run_pause = 0;
+      g_run_error = 0;
+      g_run_resuming = 1;
+      resumeRun();
+
 #ifdef NONSTOP_DEBUG
       printf("\033[31m");
       printf("###########(DesCpr) Resume detected  ###############\n");
@@ -466,10 +470,11 @@ void DeSerializerCOPPERModule::event()
 {
 
 #ifdef NONSTOP
-  printf("g_run_pause %d\n", g_run_pause); fflush(stdout);
-  if (g_run_pause > 0 || g_run_error > 0 || checkRunPause()) {
-    waitResume();
-    resumeRun();
+  // Check run-pause request
+  if (g_run_pause > 0 || g_run_error > 0) {
+    waitResume(); // Stand-by loop
+    m_eventMetaDataPtr.create(); // Otherwise endRun() is called.
+    return;
   }
 #endif
 
@@ -486,10 +491,7 @@ void DeSerializerCOPPERModule::event()
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
       g_status.reportRunning();
     }
-    //
-    // for DESY test
-    //
-    //    m_nodeid = SVD_ID | m_nodeid  ;
+
     m_start_time = getTimeSec();
     n_basf2evt = 0;
   }
@@ -509,12 +511,9 @@ void DeSerializerCOPPERModule::event()
       temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &m_size_word);
       g_status.copyEventHeader(temp_buf);
     } catch (string err_str) {
+
 #ifdef NONSTOP
-      if (err_str == "RUN_PAUSE") {
-#ifdef NONSTOP_DEBUG
-        printf("###########(DesCpr) caught Exception ###############\n");
-        fflush(stdout);
-#endif
+      if (err_str == "RUN_PAUSE" || err_str == "RUN_ERROR") {
         // Create EventMetaData otherwise endRun() is called.
         m_eventMetaDataPtr.create();
         return;
@@ -556,16 +555,13 @@ void DeSerializerCOPPERModule::event()
   }
 
 
-
-
   //
   // Update EventMetaData
   //
   m_eventMetaDataPtr.create();
-  m_eventMetaDataPtr->setExperiment(1234);
-  m_eventMetaDataPtr->setRun(105);
+  m_eventMetaDataPtr->setExperiment(0);
+  m_eventMetaDataPtr->setRun(0);
   m_eventMetaDataPtr->setEvent(n_basf2evt);
-
 
   //
   // Monitor

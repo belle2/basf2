@@ -125,6 +125,8 @@ int* DesSerPrePC::getNewBuffer(int nwords, int* delete_flag)
 void DesSerPrePC::initialize()
 {
   B2INFO("DesSerPrePC: initialize() started.");
+
+  signal(SIGPIPE , SIG_IGN);
   //
   // initialize Rx part from DeSerializer**.cc
   //
@@ -191,30 +193,36 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
-        char err_buf[500];
-        sprintf(err_buf, "Failed toa receive data(%s). %d %d.: %s %s %d", strerror(errno), read_size, errno, __FILE__,
-                __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf;
+        string err_str;
         callCheckRunPause(err_str);
 #endif
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failedbb to receive data(%s). %d %d. Exiting...", strerror(errno), read_size, errno);
+        sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
+                read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifdef NONSTOP
+        g_run_error = 1;
+        B2ERROR(err_buf);
+        string err_str = "RUN_ERROR";
+        throw (err_str);
+#endif
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        sleep(1234567);
         exit(-1);
       }
     } else if (read_size == 0) {
       // Connection is closed ( error )
-#ifdef NONSTOP
       char err_buf[500];
       sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf;
+#ifdef NONSTOP
       m_run_error = 1;
+      B2ERROR(err_buf);
+      string err_str = "RUN_ERROR";
       throw (err_str);
 #endif
+      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      exit(-1);
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -686,7 +694,7 @@ void DesSerPrePC::DataAcquisition()
     // Stand-by loop
     //
 #ifdef NONSTOP
-    if (m_run_pause != 0 || m_run_error != 0) {
+    if (m_run_pause > 0 || m_run_error > 0) {
       if (m_run_pause == 0) {
         while (true) {
           if (checkRunPause()) break;
@@ -700,7 +708,6 @@ void DesSerPrePC::DataAcquisition()
         }
       }
       waitResume();
-      resumeRun();
     }
 #endif
 
@@ -797,9 +804,9 @@ void DesSerPrePC::DataAcquisition()
         m_totbytes += sendByWriteV(&(raw_datablk[ j ]));
       } catch (string err_str) {
 #ifdef NONSTOP
-        printf("Error was detected while sending data.\n"); fflush(stdout);
         break;
 #endif
+        print_err.PrintError((char*)err_str.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
       }
       if (m_start_flag == 0) {
@@ -844,16 +851,8 @@ void DesSerPrePC::DataAcquisition()
       cur_time = getTimeSec();
     }
 
-
-
-
-
-#ifdef NONSTOP
-    if (m_run_pause == 1) {
-      waitResume();
-    }
-#endif
     n_basf2evt++;
+
     if (m_status.isAvailable()) {
       m_status.setInputNBytes(m_totbytes);
       m_status.setInputCount(n_basf2evt);
@@ -956,10 +955,7 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
-        char err_buf[500];
-        sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno),  errno, __FILE__, __PRETTY_FUNCTION__,
-                __LINE__);
-        string err_str = err_buf;
+        string err_str;
         callCheckRunPause(err_str);
 #endif
         continue;
@@ -968,14 +964,13 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
         sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d trailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
-        string err_str = err_buf;
         m_run_error = 1;
+        B2ERROR(err_buf);
+        string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
-#else
-        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        sleep(1234567);
-        exit(1);
 #endif
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(1);
       }
     }
     break;
@@ -1032,26 +1027,21 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
-        char err_buf[500];
-        sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno), errno, __FILE__, __PRETTY_FUNCTION__,
-                __LINE__);
-        string err_str = err_buf;
+        string err_str;
         callCheckRunPause(err_str);
 #endif
         continue;
       } else {
         char err_buf[500];
         sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
-
 #ifdef NONSTOP
-        string err_str = err_buf;
         m_run_error = 1;
+        B2ERROR(err_buf);
+        string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
-#else
-        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        sleep(1234567);
-        exit(1);
 #endif
+        print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        exit(1);
       }
     }
     sent_bytes += ret;
@@ -1238,7 +1228,6 @@ void DesSerPrePC::resumeRun()
 #endif
   m_run_error = 0;
   m_run_pause = 0;
-
   return;
 }
 
@@ -1257,9 +1246,6 @@ void DesSerPrePC::pauseRun()
 void DesSerPrePC::waitResume()
 {
 
-  for (int i = 0; i < m_num_connections; i++) {
-    if (CheckConnection(m_socket_recv[ i ]) < 0)  m_socket_recv[ i ] = -1;
-  }
   while (true) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
@@ -1274,9 +1260,21 @@ void DesSerPrePC::waitResume()
     sleep(1);
   }
 
-  Connect();
-  if (!CheckConnection(m_socket_send) < 0) Accept();
 
+  printf("Done!\n"); fflush(stdout);
+
+  if (CheckConnection(m_socket_send) < 0) {
+    printf("Trying Accept1\n"); fflush(stdout);
+    Accept();
+    printf("Trying Accept2\n"); fflush(stdout);
+  }
+
+  for (int i = 0; i < m_num_connections; i++) {
+    if (CheckConnection(m_socket_recv[ i ]) < 0)  m_socket_recv[ i ] = -1;
+  }
+  Connect();
+
+  resumeRun();
   return;
 }
 
@@ -1312,6 +1310,32 @@ int DesSerPrePC::CheckConnection(int socket)
   char buffer[100000];
   int eagain_cnt = 0;
   int tot_ret = 0;
+  printf("CC1\n"); fflush(stdout);
+  ret = send(socket, buffer, 0, MSG_DONTWAIT);
+  printf("CC2\n"); fflush(stdout);
+  switch (ret) {
+    case 0:
+      break;
+    case -1:
+      if (errno == EAGAIN) {
+        printf("EAGAIN %d cnt %d recvd %d\n", socket, eagain_cnt, tot_ret); fflush(stdout);
+        /* not EOF, no data in queue */
+        if (eagain_cnt > 100) {
+          return 0;
+        }
+        usleep(10000);
+        eagain_cnt++;
+      } else {
+        printf("ERROR %d errno %d err %s\n", socket , errno, strerror(errno)); fflush(stdout);
+        close(socket);
+        return -1;
+      }
+    default:
+      printf("Return value %d of send is strange. Exting...\n",  ret);
+      fflush(stdout);
+      exit(1);
+  }
+
   while (true) {
 
     //
@@ -1342,13 +1366,8 @@ int DesSerPrePC::CheckConnection(int socket)
       default:
         tot_ret += ret;
         printf("Flushing data in socket buffer : sockid = %d %d bytes tot %d bytes\n", socket, ret, tot_ret); fflush(stdout);
-        if (checkRunRecovery()) {
-          printf("Run seems to be resumed while buffer has not been flushed yet. Exting...");
-          exit(1);
-        }
     }
   }
-
 }
 
 

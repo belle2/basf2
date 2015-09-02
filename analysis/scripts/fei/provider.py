@@ -20,6 +20,13 @@ def removeJPsiSlash(string):
     return string.replace('/', '')
 
 
+def GetEntriesSave(tree, selection):
+    s = ROOT.TSelectorEntries(selection)
+    tree.Process(s, "", 1000000000000000)
+    tree.SetNotify(0)
+    return s.GetSelectedRows()
+
+
 import re
 import os
 import subprocess
@@ -344,8 +351,9 @@ def FSPDistribution(resource, inputList, mvaTarget):
 
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
-    return {'nSignal': int(distribution.GetEntries(mvaTarget + ' == 1')),
-            'nBackground': int(distribution.GetEntries(mvaTarget + ' == 0'))}
+
+    return {'nSignal': int(GetEntriesSave(distribution, mvaTarget + ' == 1')),
+            'nBackground': int(GetEntriesSave(distribution, mvaTarget + ' == 0'))}
 
 
 def CalculateInverseSamplingRate(resource, distribution):

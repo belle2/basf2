@@ -522,15 +522,13 @@ class MockTFile(object):
 
     def Get(self, branch):
         assert branch == 'distribution'
-        return self
-
-    def GetEntries(self, selection):
-        assert selection[:-1] == 'isSignal == '
-        if selection[-1] == '0':
-            return 23
-        if selection[-1] == '1':
-            return 42
-        return 0
+        ntuple = ROOT.TNtuple("temp", "test", "isSignal")
+        for i in range(23):
+            ntuple.Fill(0)
+            ntuple.Fill(1)
+        for i in range(42-23):
+            ntuple.Fill(1)
+        return ntuple
 
 
 # If you're afraid of black magic, ignore the following lines

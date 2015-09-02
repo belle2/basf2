@@ -19,13 +19,13 @@ namespace Belle2 {
 
   /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c.
    * */
-  template <typename PointType, typename VariableType >
-  class DeltaPt : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class DeltaPt : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: GeV/c */
-    static VariableType value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
-                              const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
+                        const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

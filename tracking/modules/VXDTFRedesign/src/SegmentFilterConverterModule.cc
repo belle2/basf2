@@ -250,25 +250,25 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 
           (
             min[ FilterID::distanceXY ] <
-            Distance2DXYSquared<VXDTFHit, double>() <
+            Distance2DXYSquared<VXDTFHit>() <
             max[ FilterID::distanceXY ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distanceXY, setupIndex)) &&
 
           (
             min[ FilterID::distanceZ ] <
-            Distance1DZ<VXDTFHit, double>() <
+            Distance1DZ<VXDTFHit>() <
             max[ FilterID::distanceZ ]
           )/*.observe(Observer())*/.enable(VariableEnable(FilterID::distanceZ, setupIndex)) &&
 
 
           (
             min[ FilterID::slopeRZ ] <
-            SlopeRZ<VXDTFHit, double>() <
+            SlopeRZ<VXDTFHit>() <
             max[ FilterID::slopeRZ ]
           ).observe(Observer()).enable(VariableEnable(FilterID::slopeRZ, setupIndex)) &&
 
           (
-            Distance3DNormed<VXDTFHit, double>() <
+            Distance3DNormed<VXDTFHit>() <
             max[ FilterID::normedDistance3D ]
           ).enable(VariableEnable(FilterID::normedDistance3D, setupIndex))
 
@@ -306,10 +306,10 @@ SegmentFilterConverterModule::endRun()
     i++;
     double dummyLim = 1.;
     auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit>() < -dummyLim  &&
-                          dummyLim < Distance2DXYSquared<VXDTFHit, double>() < -dummyLim &&
-                          dummyLim < Distance1DZ<VXDTFHit, double>() < -dummyLim &&
-                          dummyLim < SlopeRZ<VXDTFHit, double>() < -dummyLim &&
-                          Distance3DNormed<VXDTFHit, double>() < -dummyLim
+                          dummyLim < Distance2DXYSquared<VXDTFHit>() < -dummyLim &&
+                          dummyLim < Distance1DZ<VXDTFHit>() < -dummyLim &&
+                          dummyLim < SlopeRZ<VXDTFHit>() < -dummyLim &&
+                          Distance3DNormed<VXDTFHit>() < -dummyLim
                          );
 
 
@@ -344,18 +344,18 @@ SegmentFilterConverterModule::endRun()
                              max[ FilterID::distance3D ] &&
 
                              min[ FilterID::distanceXY ] <
-                             Distance2DXYSquared<VXDTFHit, double>() <
+                             Distance2DXYSquared<VXDTFHit>() <
                              max[ FilterID::distanceXY ] &&
 
                              min[ FilterID::distanceZ ] <
-                             Distance1DZ<VXDTFHit, double>() <
+                             Distance1DZ<VXDTFHit>() <
                              max[ FilterID::distanceZ ] &&
 
                              min[ FilterID::slopeRZ ] <
-                             SlopeRZ<VXDTFHit, double>() <
+                             SlopeRZ<VXDTFHit>() <
                              max[ FilterID::slopeRZ ] &&
 
-                             Distance3DNormed<VXDTFHit, double>() <
+                             Distance3DNormed<VXDTFHit>() <
                              max[ FilterID::normedDistance3D ]
 
                            );

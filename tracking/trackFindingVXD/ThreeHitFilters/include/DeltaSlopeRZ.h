@@ -21,12 +21,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class DeltaSlopeRZ : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class DeltaSlopeRZ : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

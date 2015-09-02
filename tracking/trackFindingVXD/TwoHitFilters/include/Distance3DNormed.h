@@ -16,8 +16,8 @@
 namespace Belle2 {
 
   /** This is the specialization for SpacePoints with returning floats, where value calculates the normed distance between two hits in 3D */
-  template <typename PointType, typename VariableType >
-  class Distance3DNormed : public SelectionVariable< PointType , float > {
+  template <typename PointType >
+  class Distance3DNormed : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the normed distance between the hits (3D), returning unit: none.
@@ -26,10 +26,10 @@ namespace Belle2 {
     *
     * ATTENTION: returns 0 if inf or nan is provoked (this is the behavior of the old code)
     */
-    static float value(const PointType& outerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& innerHit)
     {
 
-      float result =
+      double result =
         (std::pow(outerHit.X() - innerHit.X() , 2)
          + std::pow(outerHit.Y() - innerHit.Y() , 2))
         /

@@ -21,12 +21,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class DeltaSlopeZoverS : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class DeltaSlopeZoverS : public SelectionVariable< PointType , double > {
   public:
 
     /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

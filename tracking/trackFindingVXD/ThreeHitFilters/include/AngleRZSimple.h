@@ -22,12 +22,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class AngleRZSimple : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class AngleRZSimple : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleRZFull instead)  */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

@@ -21,12 +21,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class Angle3DSimple : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class Angle3DSimple : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the angle between the hits/vectors (3D), returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use Angle3DFull instead) */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

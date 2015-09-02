@@ -21,12 +21,12 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class CircleDist2IP : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class CircleDist2IP : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

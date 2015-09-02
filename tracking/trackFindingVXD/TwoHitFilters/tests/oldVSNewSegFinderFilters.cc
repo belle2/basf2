@@ -169,7 +169,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance2DXYSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
+    Filter< Distance2DXYSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -223,7 +223,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance1DZ<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(1., 2.));
+    Filter< Distance1DZ<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(1., 2.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -285,8 +285,8 @@ namespace VXDTFsegFinderTest {
     TwoHitFilters twoHitFilterBox(outerHit1, innerHit);
 
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< SlopeRZ<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
-    auto sRZ = SlopeRZ<SpacePoint, double>();
+    Filter< SlopeRZ<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(atan(2.), atan(3.)));
+    auto sRZ = SlopeRZ<SpacePoint>();
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());
@@ -382,8 +382,8 @@ namespace VXDTFsegFinderTest {
     TwoHitFilters twoHitFilterBox(outerHit1, innerHit);
 
     // Very verbose declaration, the old normed distance 3D has only an upper cut, no lower one:
-    Filter< Distance3DNormed<SpacePoint, double>, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
-    auto d3Dn = Distance3DNormed<SpacePoint, double>();
+    Filter< Distance3DNormed<SpacePoint>, UpperBoundedSet<float>, VoidObserver > filter(UpperBoundedSet<float>(1.));
+    auto d3Dn = Distance3DNormed<SpacePoint>();
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());

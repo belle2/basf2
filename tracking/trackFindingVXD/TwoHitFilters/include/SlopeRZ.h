@@ -20,14 +20,14 @@ namespace Belle2 {
    *
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class SlopeRZ : public SelectionVariable< PointType , float > {
+  template <typename PointType >
+  class SlopeRZ : public SelectionVariable< PointType , double > {
   public:
 
     /** value calculates the slope in R-Z for a given pair of hits. */
-    static float value(const PointType& outerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, float> Helper;
+      typedef SelVarHelper<PointType, double> Helper;
 
       return Helper::calcSlopeRZ(outerHit, innerHit);
     }

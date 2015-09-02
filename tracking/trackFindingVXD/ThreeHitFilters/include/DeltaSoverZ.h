@@ -19,13 +19,13 @@ namespace Belle2 {
 
   /** calculates the helixparameter describing the deviation in arc length per unit in z.
    * returning unit: radians*cm. */
-  template <typename PointType, typename VariableType >
-  class DeltaSoverZ : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class DeltaSoverZ : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the helixparameter describing the deviation in arc length per unit in z.
      * returning unit: radians*cm */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

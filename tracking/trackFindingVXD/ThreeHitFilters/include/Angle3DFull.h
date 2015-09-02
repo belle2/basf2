@@ -22,12 +22,12 @@ namespace Belle2 {
    * calculating with double precission no matter the resolution of the output.
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
-  template <typename PointType, typename VariableType >
-  class Angle3DFull : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class Angle3DFull : public SelectionVariable< PointType > {
   public:
 
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
-    static VariableType value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

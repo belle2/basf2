@@ -19,13 +19,13 @@ namespace Belle2 {
 
   /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm.
    * */
-  template <typename PointType, typename VariableType >
-  class DeltaDistCircleCenter : public SelectionVariable< PointType , VariableType > {
+  template <typename PointType >
+  class DeltaDistCircleCenter : public SelectionVariable< PointType , double > {
   public:
 
     /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm */
-    static VariableType value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
-                              const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
+                        const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 

@@ -99,10 +99,10 @@ namespace VXDTFfourHitFilterTest {
   /** shows the functionality of the auto naming capability of the Filter */
   TEST_F(FourHitFilterTest, SelectionVariableName)
   {
-    auto dDCircleCenter = DeltaDistCircleCenter<SpacePoint, double>();
-    EXPECT_EQ("Belle2__DeltaDistCircleCenter{Belle2__SpacePoint, double}" , dDCircleCenter.name());
-    auto dPt = DeltaPt<SpacePoint, double>();
-    EXPECT_EQ("Belle2__DeltaPt{Belle2__SpacePoint, double}" , dPt.name());
+    auto dDCircleCenter = DeltaDistCircleCenter<SpacePoint>();
+    EXPECT_EQ("Belle2__DeltaDistCircleCenter{Belle2__SpacePoint}" , dDCircleCenter.name());
+    auto dPt = DeltaPt<SpacePoint>();
+    EXPECT_EQ("Belle2__DeltaPt{Belle2__SpacePoint}" , dPt.name());
   }
 
 
@@ -114,12 +114,12 @@ namespace VXDTFfourHitFilterTest {
     SpacePoint innerSP = provideSpacePointDummy(2, 0, 0.);
 
 
-    Filter< DeltaDistCircleCenter<SpacePoint, double>, Range<double, double>, ResultsObserver > filterDeltaDistCircleCenter(
+    Filter< DeltaDistCircleCenter<SpacePoint>, Range<double, double>, ResultsObserver > filterDeltaDistCircleCenter(
       Range<double, double>(1.41, 1.42));
     EXPECT_TRUE(filterDeltaDistCircleCenter.accept(outerSP, outerCenterSP, innerCenterSP, innerSP));
     EXPECT_FLOAT_EQ(sqrt(2), lastResult);
 
-    Filter< DeltaPt<SpacePoint, double>, Range<double, double>, ResultsObserver > filteDeltaPt(Range<double, double>(0.002, 0.003));
+    Filter< DeltaPt<SpacePoint>, Range<double, double>, ResultsObserver > filteDeltaPt(Range<double, double>(0.002, 0.003));
     EXPECT_TRUE(filteDeltaPt.accept(outerSP, outerCenterSP, innerCenterSP, innerSP));
     EXPECT_FLOAT_EQ(0.00263349, lastResult);
 

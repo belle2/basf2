@@ -43,10 +43,10 @@ namespace Belle2 {
 
     typedef
     decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
-             (0. < Distance2DXYSquared<point_t, double>() < 0.).observe(Observer()).enable()&&
-             (0. < Distance1DZ<point_t, double>()         < 0.)/*.observe(Observer())*/.enable()&&
-             (0. < SlopeRZ<point_t, double>()             < 0.).observe(Observer()).enable()&&
-             (Distance3DNormed<point_t, double>()         < 0.).enable()) filter2sp_t;
+             (0. < Distance2DXYSquared<point_t>() < 0.).observe(Observer()).enable()&&
+             (0. < Distance1DZ<point_t>()         < 0.)/*.observe(Observer())*/.enable()&&
+             (0. < SlopeRZ<point_t>()             < 0.).observe(Observer()).enable()&&
+             (Distance3DNormed<point_t>()         < 0.).enable()) filter2sp_t;
 
 
 

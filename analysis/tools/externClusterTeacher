@@ -11,6 +11,10 @@ chmod +x ./"$f"
 echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
 bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"
 # Print log files, so FEI finds MVA ranking
+# It is possible that we have to wait for the log file,
+# because it may take some time to move the log file from the cluster to disk
+while [ ! -f "$f".log ]; do sleep 1; done
 cat "$f".log
+while [ ! -f "$f".elog ]; do sleep 1; done
 cat "$f".elog
 #rm $f

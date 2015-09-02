@@ -87,15 +87,15 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
   free(ESTRPar.rmin);
   free(ESTRPar.rmax);
   if (haveGeo) {
-    for (i = 0; i < m_nPlane; i++) {
-      for (j = 0; j < m_nBoard; j++)
-        delete BoardTransform[i][j];
-      free(BoardTransform[i]);
-    }
     delete m_sensitive[0];
     if (m_mode == EKLM_DETECTOR_BACKGROUND) {
       delete m_sensitive[1];
       delete m_sensitive[2];
+      for (i = 0; i < m_nPlane; i++) {
+        for (j = 0; j < m_nBoard; j++)
+          delete BoardTransform[i][j];
+        free(BoardTransform[i]);
+      }
     }
     freeVolumes();
   }

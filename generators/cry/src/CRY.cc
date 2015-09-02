@@ -58,6 +58,7 @@ CRY::CRY()
   m_newvtx[0] = 0.;
   m_newvtx[1] = 0.;
   m_newvtx[2] = 0.;
+  m_timeOffset = 0.;
 
   setDefaultSettings();
 }
@@ -335,9 +336,9 @@ void CRY::ProjectToTopVolume(const double vtx[], const double p[], double newvtx
   else if (dy < dz && dy < dx) d = dy;
   else if (dz < dx && dz < dy) d = dz;
 
-  // Make the step
+  // Make the step, reduced by 0.1% to avoid edge effects in GEANT
   for (int i = 0; i < 3; ++i) {
-    newvtx[i] = vtx[i] + p[i] * d;
+    newvtx[i] = vtx[i] + p[i] * d * 0.999;
   }
 
 }
@@ -430,8 +431,8 @@ void CRY::storeParticle(MCParticleGraph& mcGraph, const double* mom, const doubl
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
   part.setProductionVertex(TVector3(vertex[0], vertex[1], vertex[2]));
-  B2INFO("CRY: Production time of particle (" << ptime << " is ignored and set to 0.0")
-  part.setProductionTime(0.0);
+//   B2INFO("CRY: Production time of particle (" << ptime << " is ignored and set to 0.0)")
+  part.setProductionTime(0.0 + m_timeOffset);
 }
 
 

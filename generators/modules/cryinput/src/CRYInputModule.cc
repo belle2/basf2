@@ -55,10 +55,16 @@ CRYInputModule::CRYInputModule() : Module()
   addParam("keepHeight", m_keepHeight, "Height of the keepance box [m]", 10.);
   addParam("maxTrials", m_maxTrials, "Maximum number of trials per event", 1000);
   addParam("kineticEnergyThreshold", m_kineticEnergyThreshold, "Energy threshold [GeV]", 0.01);
+  addParam("timeOffset", m_timeOffset, "Time offset [s]", 0.0);
 
-  m_acceptLength = m_acceptWidth * Belle2::Unit::m;
+  m_keepLength = m_keepLength * Belle2::Unit::m;
+  m_keepWidth = m_keepWidth * Belle2::Unit::m;
+  m_keepLength = m_keepLength * Belle2::Unit::m;
+  m_acceptLength = m_acceptLength * Belle2::Unit::m;
   m_acceptWidth = m_acceptWidth * Belle2::Unit::m;
-  m_acceptHeight = m_acceptWidth * Belle2::Unit::m;
+  m_acceptHeight = m_acceptHeight * Belle2::Unit::m;
+  m_timeOffset = m_timeOffset * Belle2::Unit::s;
+  m_kineticEnergyThreshold = m_kineticEnergyThreshold * Belle2::Unit::GeV;
 }
 
 
@@ -82,6 +88,7 @@ void CRYInputModule::initialize()
   m_generator.setKeepHeight(m_keepHeight);
   m_generator.setMaxTrials(m_maxTrials);
   m_generator.setKineticEnergyThreshold(m_kineticEnergyThreshold);
+  m_generator.setTimeOffset(m_timeOffset);
 
   m_generator.init();
 

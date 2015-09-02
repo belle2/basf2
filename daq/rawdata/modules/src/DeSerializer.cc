@@ -363,7 +363,6 @@ void DeSerializerModule::restartRun()
 #endif
   //    initializeCOPPER();
   g_run_error = 0;
-  g_run_recovery = 0;
   g_run_restarting = 1;
   m_start_flag = 0;
   return;
@@ -386,7 +385,6 @@ void DeSerializerModule::waitRestart()
   while (true) {
     if (checkRunRecovery()) {
       g_run_stop = 0;
-      g_run_recovery = 1;
       break;
     }
 #ifdef NONSTOP_DEBUG

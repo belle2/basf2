@@ -27,7 +27,6 @@ using namespace std;
 using namespace Belle2;
 
 #ifdef NONSTOP
-int g_run_recovery = 0;
 int g_run_restarting = 0;
 int g_run_stop = 0;
 int g_run_error = 0;
@@ -414,7 +413,6 @@ void DeSerializerCOPPERModule::restartRun()
   fflush(stdout);
 #endif
   initializeCOPPER();
-  g_run_recovery = 0;
   g_run_restarting = 1;
   m_start_flag = 0;
   return;
@@ -443,7 +441,6 @@ void DeSerializerCOPPERModule::waitRestart()
   while (true) {
     if (checkRunRecovery()) {
       g_run_stop = 0;
-      g_run_recovery = 1;
 #ifdef NONSTOP_DEBUG
       printf("\033[31m");
       printf("###########(DesCpr) Resume detected  ###############\n");

@@ -641,7 +641,6 @@ int SerializerModule::checkRunRecovery()
 // #endif
 //     if (checkRunRecovery()) {
 //       g_run_stop = 0;
-//       g_run_recovery = 1;
 //       break;
 //     }
 //     sleep(1);

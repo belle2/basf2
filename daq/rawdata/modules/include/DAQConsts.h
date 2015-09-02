@@ -11,8 +11,8 @@
 
 #define REDUCED_RAWCOPPER
 
-//#define NONSTOP
-//#define NONSTOP_DEBUG
+#define NONSTOP
+#define NONSTOP_DEBUG
 
 
 //#define RAWDATASIZE 1
@@ -31,7 +31,6 @@
 #ifdef NONSTOP
 extern int g_run_restarting;
 extern int g_run_stop;
-extern int g_run_recovery;
 extern int g_run_error;
 #endif
 

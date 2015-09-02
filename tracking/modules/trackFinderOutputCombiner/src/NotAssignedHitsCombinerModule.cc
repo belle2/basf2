@@ -289,7 +289,7 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
       CDCWireHit cdcWireHit(recoHit.getWireHit());
       CDCRLWireHit cdcRLWireHit(cdcWireHit);
       const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
-      if (recoHit3D.isInCDC()) {
+      if (recoHit3D.isInCellZBounds()) {
         observationsSZ.append(recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z());
       }
     }

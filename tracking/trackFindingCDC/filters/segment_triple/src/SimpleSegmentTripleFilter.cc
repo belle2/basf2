@@ -142,7 +142,7 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
   for (CDCStereoRecoSegment2D::const_iterator itRecoHits = middleSegment.begin();
        itRecoHits != middleSegment.end(); ++itRecoHits) {
     reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(*itRecoHits, fit));
-    if (not reconstructedMiddle.back().isInCDC()) {
+    if (not reconstructedMiddle.back().isInCellZBounds()) {
       B2DEBUG(100, "  RecoHit out of CDC");
       //double d;
       //cin >> d;

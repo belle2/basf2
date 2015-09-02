@@ -252,14 +252,14 @@ namespace Belle2 {
       /// Getter for the z coordinate at the backward joint points of the wires
       FloatType getBackwardZ() const { return getSkewLine().backwardZ(); }
 
-      /** Indicator if the given position near the wire is already outside the CDC.
-       *  If one component of the vector is NaN false is returned.
-       */
-      bool isOutsideCDC(const Vector3D& recoPos3D) const
-      { return recoPos3D.z() > getForwardZ() or recoPos3D.z() < getBackwardZ(); }
-
       /// Checks whether the position is in the drift cell surrounding the wire
       bool isInCell(const Vector3D& pos3D) const;
+
+      /// Checks whether the position is in the z bounds of the drift cell surrounding the wire
+      bool isInCellZBounds(const Vector3D& pos3D) const
+      {
+        return getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
+      }
 
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
       const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }

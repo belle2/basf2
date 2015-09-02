@@ -251,7 +251,10 @@ namespace Belle2 {
 
       /** indicator if the hit is in the cdc or already outside its boundaries.
           Checks for z to be in the range of the wire. */
-      bool isInCDC() const;
+      bool isInCellZBounds() const
+      {
+        return getWire().isInCellZBounds(getRecoPos3D());
+      }
 
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n

@@ -141,19 +141,6 @@ Vector2D CDCRecoHit3D::getRecoDisp2D() const
 
 
 
-bool CDCRecoHit3D::isInCDC() const
-{
-
-  const CDCWire& wire = getWire();
-
-  const double forwardZ = wire.getSkewLine().forwardZ();
-  const double backwardZ = wire.getSkewLine().backwardZ();
-
-  return (backwardZ < getRecoPos3D().z() and getRecoPos3D().z() < forwardZ);
-}
-
-
-
 void CDCRecoHit3D::reverse()
 {
   const CDCRLWireHit* reverseRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());

@@ -29,9 +29,9 @@
 // global variables for non-stop DAQ
 
 #ifdef NONSTOP
-extern int g_run_restarting;
-extern int g_run_stop;
+extern int g_run_pause;
 extern int g_run_error;
+extern int g_run_resuming;
 #endif
 
 const int sp8test_run_starttime[93] = {

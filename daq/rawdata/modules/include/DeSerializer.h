@@ -236,26 +236,26 @@ namespace Belle2 {
     int* m_ptr;
 
     //! for nonstop DAQ
-    virtual void openRunStopNshm();
+    virtual void openRunPauseNshm();
 
     //! for nonstop DAQ
-    virtual int checkRunStop();
+    virtual int checkRunPause();
 
     //! for nonstop DAQ
     virtual int checkRunRecovery();
 
 
     //! for nonstop DAQ
-    virtual void restartRun();
+    virtual void resumeRun();
 
     //! for nonstop DAQ
     virtual void pauseRun();
 
     //! for nonstop DAQ
-    virtual void waitRestart();
+    virtual void waitResume();
 
-    //! check RunStop
-    void callCheckRunStop(std::string& err_str);
+    //! check RunPause
+    void callCheckRunPause(std::string& err_str);
 
     //! check connection status
     int CheckConnection(int socket);

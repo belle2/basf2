@@ -123,7 +123,7 @@ void DeSerializerPCModule::initialize()
   m_prev_evenum = 0xFFFFFFFF;
 
 #ifdef NONSTOP
-  openRunStopNshm();
+  openRunPauseNshm();
 #ifdef NONSTOP_DEBUG
   printf("###########(DeSerializerPC) prepare shm  ###############\n");
   fflush(stdout);
@@ -151,7 +151,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
                 __PRETTY_FUNCTION__, __LINE__);
         printf("%s\n", err_buf); fflush(stdout);
         string err_str = err_buf;
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -632,7 +632,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
 }
 
 #ifdef NONSTOP
-void DeSerializerPCModule::waitRestart()
+void DeSerializerPCModule::waitResume()
 {
 
   for (int i = 0; i < m_num_connections; i++) {
@@ -642,12 +642,12 @@ void DeSerializerPCModule::waitRestart()
   while (true) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Ser) Waiting for Restart ###############\n");
+    printf("###########(Ser) Waiting for Resume ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
     if (checkRunRecovery()) {
-      g_run_stop = 0;
+      g_run_pause = 0;
       break;
     }
     sleep(1);
@@ -686,21 +686,21 @@ void DeSerializerPCModule::event()
 
 
 #ifdef NONSTOP
-  if (g_run_stop + g_run_error > 0 || checkRunStop()) {
-    if (g_run_stop == 0) {
+  if (g_run_pause + g_run_error > 0 || checkRunPause()) {
+    if (g_run_pause == 0) {
       while (true) {
-        if (checkRunStop()) break;
+        if (checkRunPause()) break;
 #ifdef NONSTOP_DEBUG
         printf("\033[31m");
-        printf("###########(DeserializerPC) Waiting for Runstop()  ###############\n");
+        printf("###########(DeserializerPC) Waiting for Runpause()  ###############\n");
         fflush(stdout);
         printf("\033[0m");
 #endif
         sleep(1);
       }
     }
-    waitRestart();
-    restartRun();
+    waitResume();
+    resumeRun();
     m_eventMetaDataPtr.create(); // Otherwise endRun() is called.
     return;
   }

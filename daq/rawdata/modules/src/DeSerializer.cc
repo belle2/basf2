@@ -314,9 +314,9 @@ void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
 }
 
 #ifdef NONSTOP
-void DeSerializerModule::openRunStopNshm()
+void DeSerializerModule::openRunPauseNshm()
 {
-  char path_shm[100] = "/cpr_startstop";
+  char path_shm[100] = "/cpr_pause_resume";
   int fd = shm_open(path_shm, O_RDONLY, 0666);
   if (fd < 0) {
     printf("[DEBUG] %s\n", path_shm);
@@ -327,7 +327,7 @@ void DeSerializerModule::openRunStopNshm()
   return;
 }
 
-int DeSerializerModule::checkRunStop()
+int DeSerializerModule::checkRunPause()
 {
   if (m_ptr == NULL) {
     B2INFO("Shared memory is not assigned.");
@@ -354,16 +354,16 @@ int DeSerializerModule::checkRunRecovery()
 }
 
 
-void DeSerializerModule::restartRun()
+void DeSerializerModule::resumeRun()
 {
 
 #ifdef NONSTOP_DEBUG
-  printf("###########(Des) Restart from PAUSE  ############### %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("###########(Des) Resume from PAUSE  ############### %s %s %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__);
   fflush(stdout);
 #endif
   //    initializeCOPPER();
   g_run_error = 0;
-  g_run_restarting = 1;
+  g_run_resuming = 1;
   m_start_flag = 0;
   return;
 }
@@ -371,7 +371,7 @@ void DeSerializerModule::restartRun()
 
 void DeSerializerModule::pauseRun()
 {
-  g_run_stop = 1;
+  g_run_pause = 1;
 #ifdef NONSTOP_DEBUG
   printf("###########(Des) Pause the run ###############\n");
   fflush(stdout);
@@ -380,15 +380,15 @@ void DeSerializerModule::pauseRun()
 }
 
 
-void DeSerializerModule::waitRestart()
+void DeSerializerModule::waitResume()
 {
   while (true) {
     if (checkRunRecovery()) {
-      g_run_stop = 0;
+      g_run_pause = 0;
       break;
     }
 #ifdef NONSTOP_DEBUG
-    printf("###########(Des) Waiting for RESTART  ###############\n");
+    printf("###########(Des) Waiting for RESUME  ###############\n");
     fflush(stdout);
 #endif
     sleep(1);
@@ -398,7 +398,7 @@ void DeSerializerModule::waitRestart()
 
 
 
-void DeSerializerModule::callCheckRunStop(string& err_str)
+void DeSerializerModule::callCheckRunPause(string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
@@ -406,14 +406,14 @@ void DeSerializerModule::callCheckRunStop(string& err_str)
   fflush(stdout);
   printf("\033[0m");
 #endif
-  if (checkRunStop()) {
+  if (checkRunPause()) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Des) Stop is detected during recv(). ###############\n");
+    printf("###########(Des) Pause is detected during recv(). ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
-    g_run_stop = 1;
+    g_run_pause = 1;
     err_str = "RUN_PAUSE";
 
     throw (err_str);
@@ -461,7 +461,7 @@ int DeSerializerModule::CheckConnection(int socket)
         tot_ret += ret;
         printf("Flushing data in socket buffer : sockid = %d %d bytes tot %d bytes\n", socket, ret, tot_ret); fflush(stdout);
         if (checkRunRecovery()) {
-          printf("Run seems to be restarted while buffer has not been flushed yet. Exting...");
+          printf("Run seems to be resumed while buffer has not been flushed yet. Exting...");
           exit(1);
         }
     }

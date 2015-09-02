@@ -64,10 +64,10 @@ namespace Belle2 {
 
 #ifdef NONSTOP
     //! for nonstop DAQ
-    virtual void restartRun();
+    virtual void resumeRun();
 
     //! for nonstop DAQ
-    virtual void waitRestart();
+    virtual void waitResume();
 #endif
 
   protected:

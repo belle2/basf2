@@ -85,7 +85,7 @@ void SerializerModule::initialize()
   Accept();
 
 #ifdef NONSTOP
-  openRunStopNshm();
+  openRunPauseNshm();
 #ifdef NONSTOP_DEBUG
 
   printf("###########(DesCpr) prepare shm  ###############\n");
@@ -253,7 +253,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
         string err_str = "EAGAIN";
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -328,7 +328,7 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 #ifdef NONSTOP
         string err_str = "EAGAIN";
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -507,9 +507,9 @@ void SerializerModule::printData(int* buf, int nwords)
 
 
 #ifdef NONSTOP
-void SerializerModule::openRunStopNshm()
+void SerializerModule::openRunPauseNshm()
 {
-  char path_shm[100] = "/cpr_startstop";
+  char path_shm[100] = "/cpr_pause_resume";
   int fd = shm_open(path_shm, O_RDONLY, 0666);
   if (fd < 0) {
     printf("[DEBUG] %s\n", path_shm);
@@ -520,7 +520,7 @@ void SerializerModule::openRunStopNshm()
   return;
 }
 
-int SerializerModule::checkRunStop()
+int SerializerModule::checkRunPause()
 {
   if (*m_ptr) {
     return 1;
@@ -529,15 +529,15 @@ int SerializerModule::checkRunStop()
   }
 }
 
-void SerializerModule::restartRun()
+void SerializerModule::resumeRun()
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
-  printf("###########(Ser) the 1st event sicne the restart  ###############\n");
+  printf("###########(Ser) the 1st event sicne the resume  ###############\n");
   fflush(stdout);
   printf("\033[0m");
 #endif
-  g_run_restarting = 0;
+  g_run_resuming = 0;
 
   if (CheckConnection(m_socket) < 0) Accept();
 
@@ -577,7 +577,7 @@ int SerializerModule::CheckConnection(int socket)
         printf("Flushing data in socket buffer : sockid = %d\n", socket); fflush(stdout);
         if (checkRunRecovery()) {
           char err_buf[500];
-          sprintf("Run seems to be restarted while buffer has not been flushed yet. Exting...: %s %s %d ",
+          sprintf("Run seems to be resumeed while buffer has not been flushed yet. Exting...: %s %s %d ",
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(1);
         }
@@ -586,7 +586,7 @@ int SerializerModule::CheckConnection(int socket)
 
 }
 
-void SerializerModule::callCheckRunStop(string& err_str)
+void SerializerModule::callCheckRunPause(string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
@@ -594,7 +594,7 @@ void SerializerModule::callCheckRunStop(string& err_str)
   fflush(stdout);
   printf("\033[0m");
 #endif
-  if (checkRunStop()) {
+  if (checkRunPause()) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
     printf("###########(Ser) Stop is detected after return from send ###############\n");
@@ -602,7 +602,7 @@ void SerializerModule::callCheckRunStop(string& err_str)
     printf("\033[0m");
 #endif
     err_str = "RUN_PAUSE";
-    g_run_stop = 1;
+    g_run_pause = 1;
     throw (err_str);
   }
   return;
@@ -621,7 +621,7 @@ int SerializerModule::checkRunRecovery()
 
 // void SerializerModule::pauseRun()
 // {
-//   g_run_stop = 1;
+//   g_run_pause = 1;
 // #ifdef NONSTOP_DEBUG
 //   printf("###########(Ser) Pause the run ###############\n");
 //   fflush(stdout);
@@ -630,17 +630,17 @@ int SerializerModule::checkRunRecovery()
 // }
 
 
-// void SerializerModule::waitRestart()
+// void SerializerModule::waitResume()
 // {
 //   while (true) {
 // #ifdef NONSTOP_DEBUG
 //     printf("\033[31m");
-//     printf("###########(Ser) Waiting for Restart ###############\n");
+//     printf("###########(Ser) Waiting for Resume ###############\n");
 //     fflush(stdout);
 //     printf("\033[0m");
 // #endif
 //     if (checkRunRecovery()) {
-//       g_run_stop = 0;
+//       g_run_pause = 0;
 //       break;
 //     }
 //     sleep(1);
@@ -654,16 +654,16 @@ void SerializerModule::event()
 {
 
 #ifdef NONSTOP
-  if (g_run_restarting == 1) {
+  if (g_run_resuming == 1) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Ser) Run restarting...()  ###############\n");
+    printf("###########(Ser) Run resuming...()  ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
-    restartRun();
+    resumeRun();
     return;
-  } else if (g_run_stop == 1) {
+  } else if (g_run_pause == 1) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
     printf("###########(Ser) Go back to Deseializer()  ###############\n");
@@ -703,7 +703,7 @@ void SerializerModule::event()
       printf("THROW************************************* %s\n", err_str.c_str()); fflush(stdout);
 
 #ifdef NONSTOP
-      return; // Go to DeSerializer***() to wait for run-restart.
+      return; // Go to DeSerializer***() to wait for run-resume.
 #else
       exit(1);
 #endif

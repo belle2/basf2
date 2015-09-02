@@ -79,8 +79,8 @@ namespace Belle2 {
                            unsigned int* eve_copper_0, int* error_bit_flag);
 
 #ifdef NONSTOP
-    //! wait for restart
-    virtual void waitRestart();
+    //! wait for resume
+    virtual void waitResume();
 #endif
 
 

@@ -237,7 +237,7 @@ namespace Belle2 {
     int* m_cfg_sta;
 
     //! flag to show that run-controller pauses a run
-    int m_run_stop;
+    int m_run_pause;
 
     //! flag to show that there is some errors with which DAQ cannot continue.
     int m_run_error;
@@ -326,25 +326,25 @@ namespace Belle2 {
     int m_prev_run_no;
 
     //! for nonstop DAQ
-    int checkRunStop();
+    int checkRunPause();
 
     //! for nonstop DAQ
     int checkRunRecovery();
 
     //! for nonstop DAQ
-    void openRunStopNshm();
+    void openRunPauseNshm();
 
     //! for nonstop DAQ
-    void restartRun();
+    void resumeRun();
 
     //! for nonstop DAQ
     void pauseRun();
 
     //! for nonstop DAQ
-    void waitRestart();
+    void waitResume();
 
     //! call checkrunstop
-    void callCheckRunStop(std::string& err_str);
+    void callCheckRunPause(std::string& err_str);
 
     //! Read data/check a connection
     int CheckConnection(int socket);

@@ -62,7 +62,7 @@ DesSerPrePC::DesSerPrePC(string host_recv, int port_recv, string host_send, int 
   m_prev_exprunsubrun_no = 0xFFFFFFFF;
 
 #ifdef NONSTOP
-  m_run_stop = 0;
+  m_run_pause = 0;
 
   m_run_error = 0;
 #endif
@@ -173,7 +173,7 @@ void DesSerPrePC::initialize()
   Accept();
 
 #ifdef NONSTOP
-  openRunStopNshm();
+  openRunPauseNshm();
 #endif
 
   B2INFO("DesSerPrePC: initialize() was done.");
@@ -195,7 +195,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
         sprintf(err_buf, "Failed toa receive data(%s). %d %d.: %s %s %d", strerror(errno), read_size, errno, __FILE__,
                 __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf;
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -686,10 +686,10 @@ void DesSerPrePC::DataAcquisition()
     // Stand-by loop
     //
 #ifdef NONSTOP
-    if (m_run_stop != 0 || m_run_error != 0) {
-      if (m_run_stop == 0) {
+    if (m_run_pause != 0 || m_run_error != 0) {
+      if (m_run_pause == 0) {
         while (true) {
-          if (checkRunStop()) break;
+          if (checkRunPause()) break;
 #ifdef NONSTOP_DEBUG
           printf("\033[31m");
           printf("###########(DesSerPrePC) Waiting for Runstop()  ###############\n");
@@ -699,8 +699,8 @@ void DesSerPrePC::DataAcquisition()
           sleep(1);
         }
       }
-      waitRestart();
-      restartRun();
+      waitResume();
+      resumeRun();
     }
 #endif
 
@@ -770,7 +770,7 @@ void DesSerPrePC::DataAcquisition()
 
 #ifdef NONSTOP
     // Goto Stand-by loop when run is paused or stopped by error
-    if (m_run_stop != 0 || m_run_error != 0) continue;
+    if (m_run_pause != 0 || m_run_error != 0) continue;
 #endif
 
 
@@ -810,7 +810,7 @@ void DesSerPrePC::DataAcquisition()
 
 #ifdef NONSTOP
     // Goto Stand-by loop when run is paused or stopped by error
-    if (m_run_stop != 0 || m_run_error != 0) continue;
+    if (m_run_pause != 0 || m_run_error != 0) continue;
 #endif
 
     //
@@ -849,8 +849,8 @@ void DesSerPrePC::DataAcquisition()
 
 
 #ifdef NONSTOP
-    if (m_run_stop == 1) {
-      waitRestart();
+    if (m_run_pause == 1) {
+      waitResume();
     }
 #endif
     n_basf2evt++;
@@ -960,7 +960,7 @@ int DesSerPrePC::sendByWriteV(RawDataBlock* rawdblk)
         sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno),  errno, __FILE__, __PRETTY_FUNCTION__,
                 __LINE__);
         string err_str = err_buf;
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -1036,7 +1036,7 @@ int DesSerPrePC::Send(int socket, char* buf, int size_bytes)
         sprintf(err_buf, "Failed to send data(%s). %d. Exiting...: %s %s %d", strerror(errno), errno, __FILE__, __PRETTY_FUNCTION__,
                 __LINE__);
         string err_str = err_buf;
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
       } else {
@@ -1197,9 +1197,9 @@ void DesSerPrePC::printData(int* buf, int nwords)
 
 
 #ifdef NONSTOP
-void DesSerPrePC::openRunStopNshm()
+void DesSerPrePC::openRunPauseNshm()
 {
-  char path_shm[100] = "/cpr_startstop";
+  char path_shm[100] = "/cpr_pause_resume";
   int fd = shm_open(path_shm, O_RDONLY, 0666);
   if (fd < 0) {
     printf("[DEBUG] %s\n", path_shm);
@@ -1210,7 +1210,7 @@ void DesSerPrePC::openRunStopNshm()
   return;
 }
 
-int DesSerPrePC::checkRunStop()
+int DesSerPrePC::checkRunPause()
 {
   if (*m_ptr) {
     return 1;
@@ -1228,16 +1228,16 @@ int DesSerPrePC::checkRunRecovery()
   }
 }
 
-void DesSerPrePC::restartRun()
+void DesSerPrePC::resumeRun()
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
-  printf("###########(Ser) the 1st event sicne the restart  ###############\n");
+  printf("###########(Ser) the 1st event sicne the resume  ###############\n");
   fflush(stdout);
   printf("\033[0m");
 #endif
   m_run_error = 0;
-  m_run_stop = 0;
+  m_run_pause = 0;
 
   return;
 }
@@ -1245,7 +1245,7 @@ void DesSerPrePC::restartRun()
 
 void DesSerPrePC::pauseRun()
 {
-  m_run_stop = 1;
+  m_run_pause = 1;
 #ifdef NONSTOP_DEBUG
   printf("###########(Ser) Pause the run ###############\n");
   fflush(stdout);
@@ -1254,7 +1254,7 @@ void DesSerPrePC::pauseRun()
 }
 
 
-void DesSerPrePC::waitRestart()
+void DesSerPrePC::waitResume()
 {
 
   for (int i = 0; i < m_num_connections; i++) {
@@ -1263,12 +1263,12 @@ void DesSerPrePC::waitRestart()
   while (true) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(Ser) Waiting for Restart ###############\n");
+    printf("###########(Ser) Waiting for Resume ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
     if (checkRunRecovery()) {
-      m_run_stop = 0;
+      m_run_pause = 0;
       break;
     }
     sleep(1);
@@ -1281,7 +1281,7 @@ void DesSerPrePC::waitRestart()
 }
 
 
-void DesSerPrePC::callCheckRunStop(string& err_str)
+void DesSerPrePC::callCheckRunPause(string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");
@@ -1289,14 +1289,14 @@ void DesSerPrePC::callCheckRunStop(string& err_str)
   fflush(stdout);
   printf("\033[0m");
 #endif
-  if (checkRunStop()) {
+  if (checkRunPause()) {
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(DesSer) Stop is detected. ###############\n");
+    printf("###########(DesSer) Pause is detected. ###############\n");
     fflush(stdout);
     printf("\033[0m");
 #endif
-    m_run_stop = 1;
+    m_run_pause = 1;
     throw (err_str);
   }
   return;
@@ -1343,7 +1343,7 @@ int DesSerPrePC::CheckConnection(int socket)
         tot_ret += ret;
         printf("Flushing data in socket buffer : sockid = %d %d bytes tot %d bytes\n", socket, ret, tot_ret); fflush(stdout);
         if (checkRunRecovery()) {
-          printf("Run seems to be restarted while buffer has not been flushed yet. Exting...");
+          printf("Run seems to be resumed while buffer has not been flushed yet. Exting...");
           exit(1);
         }
     }

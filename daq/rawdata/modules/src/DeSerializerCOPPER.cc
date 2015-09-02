@@ -27,8 +27,8 @@ using namespace std;
 using namespace Belle2;
 
 #ifdef NONSTOP
-int g_run_restarting = 0;
-int g_run_stop = 0;
+int g_run_resuming = 0;
+int g_run_pause = 0;
 int g_run_error = 0;
 #endif
 
@@ -114,7 +114,7 @@ void DeSerializerCOPPERModule::initialize()
   }
 
 #ifdef NONSTOP
-  openRunStopNshm();
+  openRunPauseNshm();
 #ifdef NONSTOP_DEBUG
   printf("###########(DesCpr) prepare shm  ###############\n");
   fflush(stdout);
@@ -219,7 +219,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         sprintf(err_buf, "Failed to read data(%s). %d %d. Exiting...: %s %s %d", strerror(errno), read_size, errno, __FILE__,
                 __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf;
-        callCheckRunStop(err_str);
+        callCheckRunPause(err_str);
 #endif
         continue;
 
@@ -376,7 +376,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
                 __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf;
         try {
-          callCheckRunStop(err_str);
+          callCheckRunPause(err_str);
         } catch (string err_str) {
           if (delete_flag) {
             B2WARNING("Delete buffer before going to Run-pause state");
@@ -403,26 +403,26 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
 }
 
 #ifdef NONSTOP
-void DeSerializerCOPPERModule::restartRun()
+void DeSerializerCOPPERModule::resumeRun()
 {
 
 #ifdef NONSTOP_DEBUG
   printf("\033[31m");
-  printf("###########(DesCpr) Restart from PAUSE  ###############\n");
+  printf("###########(DesCpr) Resume from PAUSE  ###############\n");
   printf("\033[0m");
   fflush(stdout);
 #endif
   initializeCOPPER();
-  g_run_restarting = 1;
+  g_run_resuming = 1;
   m_start_flag = 0;
   return;
 }
 
-void DeSerializerCOPPERModule::waitRestart()
+void DeSerializerCOPPERModule::waitResume()
 {
 
-  // First, wait for run_stop
-  if (g_run_stop == 0 && g_run_error == 1) {
+  // First, wait for run_pause
+  if (g_run_pause == 0 && g_run_error == 1) {
     while (true) {
 #ifdef NONSTOP_DEBUG
       printf("\033[31m");
@@ -430,7 +430,7 @@ void DeSerializerCOPPERModule::waitRestart()
       printf("\033[0m");
       fflush(stdout);
 #endif
-      if (checkRunStop()) break;
+      if (checkRunPause()) break;
       sleep(1);
     }
   }
@@ -440,7 +440,7 @@ void DeSerializerCOPPERModule::waitRestart()
   m_cpr_fd = -1;
   while (true) {
     if (checkRunRecovery()) {
-      g_run_stop = 0;
+      g_run_pause = 0;
 #ifdef NONSTOP_DEBUG
       printf("\033[31m");
       printf("###########(DesCpr) Resume detected  ###############\n");
@@ -451,7 +451,7 @@ void DeSerializerCOPPERModule::waitRestart()
     }
 #ifdef NONSTOP_DEBUG
     printf("\033[31m");
-    printf("###########(DesCpr) Waiting for RESTART  ###############\n");
+    printf("###########(DesCpr) Waiting for RESUME  ###############\n");
     printf("\033[0m");
     fflush(stdout);
 #endif
@@ -466,10 +466,10 @@ void DeSerializerCOPPERModule::event()
 {
 
 #ifdef NONSTOP
-  printf("g_run_stop %d\n", g_run_stop); fflush(stdout);
-  if (g_run_stop > 0 || g_run_error > 0 || checkRunStop()) {
-    waitRestart();
-    restartRun();
+  printf("g_run_pause %d\n", g_run_pause); fflush(stdout);
+  if (g_run_pause > 0 || g_run_error > 0 || checkRunPause()) {
+    waitResume();
+    resumeRun();
   }
 #endif
 
@@ -573,7 +573,7 @@ void DeSerializerCOPPERModule::event()
   if (max_nevt >= 0 || max_seconds >= 0.) {
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC >= max_nevt && max_nevt > 0)
         || (getTimeSec() - m_start_time > max_seconds && max_seconds > 0.)) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
+      printf("[DEBUG] RunPause was detected. ( Setting:  Max event # %d MaxTime %lf ) Processed Event %d Elapsed Time %lf[s]\n",
              max_nevt , max_seconds, n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC, getTimeSec() - m_start_time);
       m_eventMetaDataPtr->setEndOfData();
     }

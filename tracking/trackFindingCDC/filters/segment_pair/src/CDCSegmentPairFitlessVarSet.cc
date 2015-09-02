@@ -155,11 +155,11 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("stereo_hits_min_dist_z_backward_wall")>() = nanmin(stereoFirstHitDistZBackwardWall,
                                                          stereoLastHitDistZBackwardWall);
 
-  var<named("start_arc_length_front_offset")>() = startFit.getPerpSFrontOffset(startSegment, endSegment);
-  var<named("end_arc_length_front_offset")>() = endFit.getPerpSFrontOffset(startSegment, endSegment);
+  var<named("start_arc_length_front_offset")>() = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
+  var<named("end_arc_length_front_offset")>() = endFit.getArcLength2DFrontOffset(startSegment, endSegment);
 
-  var<named("start_arc_length_back_offset")>() = startFit.getPerpSBackOffset(startSegment, endSegment);
-  var<named("end_arc_length_back_offset")>() = endFit.getPerpSBackOffset(startSegment, endSegment);
+  var<named("start_arc_length_back_offset")>() = startFit.getArcLength2DBackOffset(startSegment, endSegment);
+  var<named("end_arc_length_back_offset")>() = endFit.getArcLength2DBackOffset(startSegment, endSegment);
 
   return true;
   /*

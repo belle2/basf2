@@ -38,23 +38,23 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
 
   // Check if segments are coaligned
-  bool endSegmentIsCoaligned = startFit.getTotalPerpS(endSegment) >= 0.0;
-  bool startSegmentIsCoaligned = endFit.getTotalPerpS(startSegment) >= 0.0;
+  bool endSegmentIsCoaligned = startFit.getTotalArcLength2D(endSegment) >= 0.0;
+  bool startSegmentIsCoaligned = endFit.getTotalArcLength2D(startSegment) >= 0.0;
 
   if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
     return NOT_A_CELL;
   }
 
   // Check if there is a positive gap between start and end segment
-  FloatType startFitGap = startFit.getPerpSGap(startSegment, endSegment);
-  FloatType endFitGap = endFit.getPerpSGap(startSegment, endSegment);
+  FloatType startFitGap = startFit.getArcLength2DGap(startSegment, endSegment);
+  FloatType endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
 
   if (startFitGap < -5 or startFitGap > 50 or endFitGap < -5 or endFitGap > 50) {
     return NOT_A_CELL;
   }
 
-  FloatType startFitFrontOffset = startFit.getPerpSFrontOffset(startSegment, endSegment);
-  FloatType endFitBackOffset = endFit.getPerpSBackOffset(startSegment, endSegment);
+  FloatType startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
+  FloatType endFitBackOffset = endFit.getArcLength2DBackOffset(startSegment, endSegment);
 
   if (startFitFrontOffset < 0 or
       startFitFrontOffset > 50 or

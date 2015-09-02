@@ -48,9 +48,9 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
       CDCRLWireHit rlWireHit(segmentInformation->getSegment()->front().getWireHit(),
                              segmentInformation->getSegment()->front().getRLInfo());
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
-      perpSFront = recoHit3D.getPerpS();
+      perpSFront = recoHit3D.getArcLength2D();
     } else {
-      perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
+      perpSFront = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->front().getRecoPos2D());
     }
     if (std::isnan(perpSFront)) {
       var<named("maximum_perpS_overlap")>() = 0;
@@ -69,9 +69,9 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
     if (is_stereo) {
       CDCRLWireHit rlWireHit(segmentInformation->getSegment()->back().getWireHit(), segmentInformation->getSegment()->back().getRLInfo());
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
-      lastPerpS = recoHit3D.getPerpS();
+      lastPerpS = recoHit3D.getArcLength2D();
     } else {
-      lastPerpS = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
+      lastPerpS = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->back().getRecoPos2D());
     }
 
     if (std::isnan(lastPerpS)) {

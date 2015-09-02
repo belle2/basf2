@@ -19,7 +19,7 @@ bool StereoHitQuadTreeProcessor::insertItemInNode(QuadTree* node, const CDCRecoH
 {
   float dist[2][2];
 
-  const float& perpS = hit->getPerpS();
+  const float& perpS = hit->getArcLength2D();
   const float& reconstructedZ = hit->getRecoZ();
 
   float inverseSlopeMin = node->getXMin();

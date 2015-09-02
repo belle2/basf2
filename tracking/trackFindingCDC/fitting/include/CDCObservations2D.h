@@ -378,7 +378,7 @@ namespace Belle2 {
 
       /// Calculate the total transvers travel distance traversed by these observations comparing the travel distance of first and last position
       FloatType getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
-      { return trajectory2D.calcPerpSBetween(getFrontPos2D(), getBackPos2D()); }
+      { return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D()); }
 
       /// Checks if the last position of these observations lies at greater travel distance than the first
       bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const

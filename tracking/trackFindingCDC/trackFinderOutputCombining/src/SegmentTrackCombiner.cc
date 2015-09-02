@@ -302,8 +302,8 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
     for (std::vector<SegmentInformation*> x : trainsOfSegments) {
       x.push_back(segment);
       std::sort(x.begin(), x.end(), [&trajectory2D](SegmentInformation * first, SegmentInformation * second) {
-        return trajectory2D.calcPerpS(first->getSegment()->front().getRecoPos2D()) >
-               trajectory2D.calcPerpS(second->getSegment()->front().getRecoPos2D());
+        return trajectory2D.calcArcLength2D(first->getSegment()->front().getRecoPos2D()) >
+               trajectory2D.calcArcLength2D(second->getSegment()->front().getRecoPos2D());
       });
       segmentTrainFilter.clear();
       if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != NOT_A_CELL)
@@ -347,9 +347,9 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
   addSegmentToTrack(*(segmentInformation->getSegment()), *(matchingTrack->getTrackCand()));
 
   for (const CDCRecoHit3D& recoHit : * (matchingTrack->getTrackCand())) {
-    matchingTrack->getPerpSList().push_back(recoHit.getPerpS());
+    matchingTrack->getPerpSList().push_back(recoHit.getArcLength2D());
   }
-  matchingTrack->calcPerpS();
+  matchingTrack->calcArcLength2D();
 }
 
 
@@ -379,8 +379,8 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
     &matchesAboveTrack](const std::pair<TrackInformation*, double>& pair) -> bool {
       TrackInformation* possiblyMatch = pair.first;
       const CDCTrajectory2D& trajectory2D = possiblyMatch->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
-      double perpSFront = trajectory2D.calcPerpS(segmentInformation->getSegment()->front().getRecoPos2D());
-      double perpSBack = trajectory2D.calcPerpS(segmentInformation->getSegment()->back().getRecoPos2D());
+      double perpSFront = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->front().getRecoPos2D());
+      double perpSBack = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->back().getRecoPos2D());
       if (perpSFront > possiblyMatch->getMaxPerpS() or perpSBack < possiblyMatch->getMinPerpS())
       {
         B2DEBUG(120, "Segment is above or below track.");

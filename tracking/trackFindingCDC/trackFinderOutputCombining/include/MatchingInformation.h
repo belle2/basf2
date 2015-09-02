@@ -130,7 +130,7 @@ namespace Belle2 {
       /** Initialize with a track cand pointer. We do not have the ownership */
       explicit TrackInformation(TrackFindingCDC::CDCTrack* trackCand) :
         MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation>(trackCand),
-        m_perpSList(), m_goodFittingSegmentTrain(), m_minPerpS(0), m_maxPerpS(0)
+        m_arcLength2DList(), m_goodFittingSegmentTrain(), m_minArcLength2D(0), m_maxArcLength2D(0)
       {
       }
 
@@ -148,7 +148,7 @@ namespace Belle2 {
        */
       double getMaxPerpS() const
       {
-        return m_maxPerpS;
+        return m_maxArcLength2D;
       }
 
       /**
@@ -157,7 +157,7 @@ namespace Belle2 {
        */
       double getMinPerpS() const
       {
-        return m_minPerpS;
+        return m_minArcLength2D;
       }
 
       /**
@@ -166,7 +166,7 @@ namespace Belle2 {
        */
       std::vector<double>& getPerpSList()
       {
-        return m_perpSList;
+        return m_arcLength2DList;
       }
 
       /**
@@ -176,17 +176,17 @@ namespace Belle2 {
        */
       const std::vector<double>& getPerpSList() const
       {
-        return m_perpSList;
+        return m_arcLength2DList;
       }
 
       /**
        * Calculate the maximum and minimum perpS.
        */
-      void calcPerpS()
+      void calcArcLength2D()
       {
-        std::sort(m_perpSList.begin(), m_perpSList.end());
-        m_minPerpS = m_perpSList.front();
-        m_maxPerpS = m_perpSList.back();
+        std::sort(m_arcLength2DList.begin(), m_arcLength2DList.end());
+        m_minArcLength2D = m_arcLength2DList.front();
+        m_maxArcLength2D = m_arcLength2DList.back();
       }
 
       /**
@@ -216,10 +216,10 @@ namespace Belle2 {
       }
 
     private:
-      std::vector<double> m_perpSList; /**< The list of perpS. Must be provided by the user */
+      std::vector<double> m_arcLength2DList; /**< The list of perpS. Must be provided by the user */
       std::vector<SegmentInformation*> m_goodFittingSegmentTrain; /**< The cache for the best fitting segment train. */
-      double m_minPerpS; /**< The minimum perpS. Is calculated with calcPerpS */
-      double m_maxPerpS; /**< The maximum perpS. Is calculated with calcPerpS */
+      double m_minArcLength2D; /**< The minimum perpS. Is calculated with calcPerpS */
+      double m_maxArcLength2D; /**< The maximum perpS. Is calculated with calcPerpS */
     };
 
     /**

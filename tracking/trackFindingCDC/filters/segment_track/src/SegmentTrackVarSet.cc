@@ -62,7 +62,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     for (const CDCRecoHit2D& recoHit : *segment) {
       CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
-      double s = recoHit3D.getPerpS();
+      double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
       observations.append(s, z);
     }
@@ -94,15 +94,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   }
 
   // Get perpS of track in the beginning and the end
-  double perpSOfFront = trajectoryTrack.calcPerpS(segment->front().getRecoPos2D());
-  double perpSOfBack = trajectoryTrack.calcPerpS(segment->back().getRecoPos2D());
+  double perpSOfFront = trajectoryTrack.calcArcLength2D(segment->front().getRecoPos2D());
+  double perpSOfBack = trajectoryTrack.calcArcLength2D(segment->back().getRecoPos2D());
 
   double perpSMinimum = std::min(perpSOfFront, perpSOfBack);
   double perpSMaximum = std::max(perpSOfFront, perpSOfBack);
 
   // Count number of hits in the same region
   for (const CDCRecoHit3D& recoHit : *track) {
-    if (recoHit.getPerpS() < 0.8 * perpSMinimum or recoHit.getPerpS() > 1.2 * perpSMaximum)
+    if (recoHit.getArcLength2D() < 0.8 * perpSMinimum or recoHit.getArcLength2D() > 1.2 * perpSMaximum)
       continue;
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
@@ -141,7 +141,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
         observationsNeigh.append(recoHit.getWireHit().getRefPos2D());
       }
     } else if (not isAxialSegment and recoHit.getStereoType() != StereoType_c::Axial) {
-      double s = recoHit.getPerpS();
+      double s = recoHit.getArcLength2D();
       double z = recoHit.getRecoZ();
       observationsFull.append(s, z);
       if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) < 3) {
@@ -164,7 +164,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     for (const CDCRecoHit2D& recoHit2D : *segment) {
       Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack);
       const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
-      double perpS = trajectoryTrack.calcPerpS(recoPos2D);
+      double perpS = trajectoryTrack.calcArcLength2D(recoPos2D);
 
 
       double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
@@ -192,7 +192,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     } else {
       CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
-      double s = recoHit3D.getPerpS();
+      double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
       observationsFull.append(s, z);
       observationsNeigh.append(s, z);

@@ -51,9 +51,9 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
     std::vector<double>& perpSList = trackInformation->getPerpSList();
     perpSList.reserve(trackCand.size());
     for (const CDCRecoHit3D& recoHit : trackCand) {
-      perpSList.push_back(recoHit.getPerpS());
+      perpSList.push_back(recoHit.getArcLength2D());
     }
-    trackInformation->calcPerpS();
+    trackInformation->calcArcLength2D();
     m_lookup.push_back(trackInformation);
 
     for (const CDCRecoHit3D& recoHit : trackCand) {

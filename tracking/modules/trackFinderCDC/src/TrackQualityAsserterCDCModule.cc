@@ -17,14 +17,14 @@ void removeSecondHalfOfTrack(CDCTrack& track)
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
   const Vector2D origin(0, 0);
 
-  const double perpSOfOrigin = trajectory2D.calcPerpS(origin);
+  const double perpSOfOrigin = trajectory2D.calcArcLength2D(origin);
 
   unsigned int hitsWithPositivePerpS = 0;
   unsigned int hitsWithNegativePerpS = 0;
 
   for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D()) - perpSOfOrigin;
-    recoHit.setPerpS(currentPerpS);
+    const double currentPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) - perpSOfOrigin;
+    recoHit.setArcLength2D(currentPerpS);
 
     if (currentPerpS > 0) {
       hitsWithPositivePerpS++;
@@ -36,7 +36,7 @@ void removeSecondHalfOfTrack(CDCTrack& track)
   bool negativeHitsAreMore = hitsWithNegativePerpS > hitsWithPositivePerpS;
 
   for (const CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = recoHit.getPerpS();
+    const double currentPerpS = recoHit.getArcLength2D();
     if ((negativeHitsAreMore and currentPerpS > 0) or (not negativeHitsAreMore and currentPerpS < 0)) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
@@ -186,7 +186,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     if (track.size() == 0)
       continue;
 
-    track.sortByPerpS();
+    track.sortByArcLength2D();
 
     resetTrajectoryOfTrack(track);
   }

@@ -259,13 +259,13 @@ namespace Belle2 {
         // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
         // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values
         for (CDCRecoHit3D& recoHit : track) {
-          double currentPerpS = recoHit.getPerpS();
+          double currentPerpS = recoHit.getArcLength2D();
           if (currentPerpS < 0) {
-            recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
+            recoHit.setArcLength2D(2 * TMath::Pi() * radius + currentPerpS);
           }
         }
 
-        track.sortByPerpS();
+        track.sortByArcLength2D();
       }
 
       m_combiner.fillWith(tracks, segments);
@@ -285,13 +285,13 @@ namespace Belle2 {
         // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
         // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values
         for (CDCRecoHit3D& recoHit : track) {
-          double currentPerpS = recoHit.getPerpS();
+          double currentPerpS = recoHit.getArcLength2D();
           if (currentPerpS < 0) {
-            recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
+            recoHit.setArcLength2D(2 * TMath::Pi() * radius + currentPerpS);
           }
         }
 
-        track.sortByPerpS();
+        track.sortByArcLength2D();
       }
 
       // Delete all taken segments

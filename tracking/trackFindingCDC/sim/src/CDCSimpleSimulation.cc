@@ -148,7 +148,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
   /// Sort the hits by the order of their occurance
   for (CDCTrack& mcTrack : mcTracks) {
-    mcTrack.sortByPerpS();
+    mcTrack.sortByArcLength2D();
   }
 
   return mcTracks;

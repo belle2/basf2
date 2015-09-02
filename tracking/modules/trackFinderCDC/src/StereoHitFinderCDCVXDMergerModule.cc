@@ -76,7 +76,7 @@ void StereoHitFinderCDCVXDMergerModule::generate(std::vector<Belle2::TrackFindin
       if (angleBetweenTracks < m_param_maximumAllowedDeviationAngle) {
         CDCTrajectory2D trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
-        double slopeSZ = vxdMom.z() / trajectory2D.calcPerpSBetween(vxdPos.xy(), vxdPos.xy() + vxdMom.xy());
+        double slopeSZ = vxdMom.z() / trajectory2D.calcArcLength2DBetween(vxdPos.xy(), vxdPos.xy() + vxdMom.xy());
         CDCTrajectorySZ trajectorySZ(slopeSZ, vxdPos.z());
 
         CDCTrajectory3D trajectory3D(trajectory2D, trajectorySZ);

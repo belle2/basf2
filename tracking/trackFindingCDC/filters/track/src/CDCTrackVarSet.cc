@@ -35,7 +35,7 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   double adc_variance = 0;
   double adc_max = -1000;
   double adc_min = 1000;
-  double s_range = track->back().getPerpS() - track->front().getPerpS();
+  double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
   double empty_s_sum = 0;
   double empty_s_sum_squared = 0;
   double empty_s_variance = 0;
@@ -72,7 +72,7 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
     }
 
     // perpS Information
-    double currentPerpS = recoHit.getPerpS();
+    double currentPerpS = recoHit.getArcLength2D();
     if (not std::isnan(last_perp_s)) {
       double perp_s_difference = currentPerpS - last_perp_s;
       empty_s_sum += perp_s_difference;

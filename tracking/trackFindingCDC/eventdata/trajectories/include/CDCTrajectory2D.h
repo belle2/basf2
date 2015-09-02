@@ -80,7 +80,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcPerpS(const Vector2D& point) const
+      FloatType calcArcLength2D(const Vector2D& point) const
       { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
@@ -90,7 +90,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcPerpSBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      FloatType calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
       {
         return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(),
                                                  toPoint - getLocalOrigin());
@@ -204,39 +204,39 @@ namespace Belle2 {
     public:
       /// Calculates the perpendicular travel distance from the last position of the fromHits to the first position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getPerpSGap(const FromHits& fromHits, const ToHits& toHits) const
+      FloatType getArcLength2DGap(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
-        return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
+        return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
 
       /// Calculates the perpendicular travel distance from the first position of the fromHits to the first position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getPerpSFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
+      FloatType getArcLength2DFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.front().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
-        return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
+        return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
       /// Calculates the perpendicular travel distance from the last position of the fromHits to the last position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getPerpSBackOffset(const FromHits& fromHits, const ToHits& toHits) const
+      FloatType getArcLength2DBackOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.back().getRecoPos2D();
-        return calcPerpSBetween(fromRecoPos2D, toRecoPos2D);
+        return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
       /// Calculates the perpendicular travel distance from the first position of the hits to the last position of the hits.
       template<class Hits>
-      FloatType getTotalPerpS(const Hits& hits) const
+      FloatType getTotalArcLength2D(const Hits& hits) const
       {
         Vector2D frontRecoPos2D = hits.front().getRecoPos2D();
         Vector2D backRecoPos2D = hits.back().getRecoPos2D();
-        return calcPerpSBetween(frontRecoPos2D, backRecoPos2D);
+        return calcArcLength2DBetween(frontRecoPos2D, backRecoPos2D);
       }
 
       /** Calculates if this trajectory and the hits are coaligned
@@ -246,7 +246,7 @@ namespace Belle2 {
        */
       template<class Hits>
       ForwardBackwardInfo isForwardOrBackwardTo(const Hits& hits) const
-      { return sign(getTotalPerpS(hits)); }
+      { return sign(getTotalArcLength2D(hits)); }
 
     public:
       /// Gets the charge sign of the trajectory
@@ -380,7 +380,7 @@ namespace Belle2 {
        *  @return Travel distance from the old to the new origin point */
       FloatType setLocalOrigin(const Vector2D& localOrigin)
       {
-        FloatType result = calcPerpS(localOrigin);
+        FloatType result = calcArcLength2D(localOrigin);
         m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
         return result;

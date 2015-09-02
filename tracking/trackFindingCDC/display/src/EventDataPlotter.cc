@@ -476,7 +476,7 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
 
       // check if exit point is on the close or
       // on the far side of the circle
-      const bool longArc = (trajectory2D.calcPerpS(trajectoryExit) > 0) ? false : true;
+      const bool longArc = (trajectory2D.calcArcLength2D(trajectoryExit) > 0) ? false : true;
       primitivePlotter.drawCircleArc(startX,
                                      startY,
                                      endX,

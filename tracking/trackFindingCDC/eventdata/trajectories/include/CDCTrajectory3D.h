@@ -151,7 +151,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcPerpS(const Vector3D& point) const
+      FloatType calcArcLength2D(const Vector3D& point) const
       { return getLocalHelix().circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
 
 

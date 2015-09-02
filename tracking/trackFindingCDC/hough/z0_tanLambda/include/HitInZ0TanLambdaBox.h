@@ -30,7 +30,7 @@ namespace Belle2 {
         const float& lowerZ0 = z0ZSlopeBox->getLowerZ0();
         const float& upperZ0 = z0ZSlopeBox->getUpperZ0();
 
-        const float& perpS = recoHit->getPerpS();
+        const float& perpS = recoHit->getArcLength2D();
         const float& reconstructedZ = recoHit->getRecoZ();
 
         const float& lowerZSlope = z0ZSlopeBox->getLowerTanLambda();

@@ -38,7 +38,7 @@ CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
   for (const CDCRecoHit2D& recoHit2D : segment) {
     const CDCRLWireHit* ptrRLWireHit = &(recoHit2D.getRLWireHit());
     Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
-    FloatType perpS = m_startTrajectory3D.calcPerpS(recoPos3D);
+    FloatType perpS = m_startTrajectory3D.calcArcLength2D(recoPos3D);
     push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
   }
 
@@ -95,14 +95,14 @@ void CDCTrack::reverse()
   m_endTrajectory3D.reverse();
 
   const CDCRecoHit3D& lastRecoHit3D = back();
-  FloatType lastPerpS = lastRecoHit3D.getPerpS();
-  FloatType newLastPerpS = m_startTrajectory3D.calcPerpS(lastRecoHit3D.getRecoPos3D());
+  FloatType lastPerpS = lastRecoHit3D.getArcLength2D();
+  FloatType newLastPerpS = m_startTrajectory3D.calcArcLength2D(lastRecoHit3D.getRecoPos3D());
 
   // Reverse the left right passage hypotheses and reverse the measured travel distance
   for (CDCRecoHit3D& recoHit3D : *this) {
     recoHit3D.reverse();
-    FloatType perpS = recoHit3D.getPerpS();
-    recoHit3D.setPerpS(newLastPerpS + lastPerpS - perpS);
+    FloatType perpS = recoHit3D.getArcLength2D();
+    recoHit3D.setArcLength2D(newLastPerpS + lastPerpS - perpS);
   }
 
   // Reverse the arrangement of hits.

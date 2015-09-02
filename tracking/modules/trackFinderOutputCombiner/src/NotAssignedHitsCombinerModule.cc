@@ -117,7 +117,7 @@ void NotAssignedHitsCombinerModule::generate(std::vector<CDCRecoSegment2D>& segm
       if (recoHit3D.getStereoType() == StereoType_c::Axial) {
         axialObservations.append(recoHit3D.getWireHit().getRefPos2D());
       } else {
-        stereoObservations.append(recoHit3D.getPerpS(), recoHit3D.getRecoZ());
+        stereoObservations.append(recoHit3D.getArcLength2D(), recoHit3D.getRecoZ());
       }
     }
 
@@ -290,7 +290,7 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
       CDCRLWireHit cdcRLWireHit(cdcWireHit);
       const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
       if (recoHit3D.isInCDC()) {
-        observationsSZ.append(recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z());
+        observationsSZ.append(recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z());
       }
     }
   }

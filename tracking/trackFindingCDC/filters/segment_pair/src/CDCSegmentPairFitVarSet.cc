@@ -84,13 +84,13 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
 
   // Coalignment indicators
-  var<named("startFit_totalPerpS_startSegment")>() = startFit.getTotalPerpS(startSegment);
-  var<named("endFit_totalPerpS_startSegment")>() = endFit.getTotalPerpS(startSegment);
-  var<named("commonFit_totalPerpS_startSegment")>() = commonFit.getTotalPerpS(startSegment);
+  var<named("startFit_totalPerpS_startSegment")>() = startFit.getTotalArcLength2D(startSegment);
+  var<named("endFit_totalPerpS_startSegment")>() = endFit.getTotalArcLength2D(startSegment);
+  var<named("commonFit_totalPerpS_startSegment")>() = commonFit.getTotalArcLength2D(startSegment);
 
-  var<named("startFit_totalPerpS_endSegment")>() = startFit.getTotalPerpS(endSegment);
-  var<named("endFit_totalPerpS_endSegment")>() = endFit.getTotalPerpS(endSegment);
-  var<named("commonFit_totalPerpS_endSegment")>() = commonFit.getTotalPerpS(endSegment);
+  var<named("startFit_totalPerpS_endSegment")>() = startFit.getTotalArcLength2D(endSegment);
+  var<named("endFit_totalPerpS_endSegment")>() = endFit.getTotalArcLength2D(endSegment);
+  var<named("commonFit_totalPerpS_endSegment")>() = commonFit.getTotalArcLength2D(endSegment);
 
   var<named("startFit_isForwardOrBackwardTo_startSegment")>() = startFit.isForwardOrBackwardTo(startSegment);
   var<named("endFit_isForwardOrBackwardTo_startSegment")>() = endFit.isForwardOrBackwardTo(startSegment);
@@ -101,17 +101,17 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("commonFit_isForwardOrBackwardTo_endSegment")>() = commonFit.isForwardOrBackwardTo(endSegment);
 
 
-  var<named("startFit_perpSGap")>() = startFit.getPerpSGap(startSegment, endSegment);
-  var<named("endFit_perpSGap")>() = endFit.getPerpSGap(startSegment, endSegment);
-  var<named("commonFit_perpSGap")>() = commonFit.getPerpSGap(startSegment, endSegment);
+  var<named("startFit_perpSGap")>() = startFit.getArcLength2DGap(startSegment, endSegment);
+  var<named("endFit_perpSGap")>() = endFit.getArcLength2DGap(startSegment, endSegment);
+  var<named("commonFit_perpSGap")>() = commonFit.getArcLength2DGap(startSegment, endSegment);
 
-  var<named("startFit_perpSFrontOffset")>() = startFit.getPerpSFrontOffset(startSegment, endSegment);
-  var<named("endFit_perpSFrontOffset")>() = endFit.getPerpSFrontOffset(startSegment, endSegment);
-  var<named("commonFit_perpSFrontOffset")>() = commonFit.getPerpSFrontOffset(startSegment, endSegment);
+  var<named("startFit_perpSFrontOffset")>() = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
+  var<named("endFit_perpSFrontOffset")>() = endFit.getArcLength2DFrontOffset(startSegment, endSegment);
+  var<named("commonFit_perpSFrontOffset")>() = commonFit.getArcLength2DFrontOffset(startSegment, endSegment);
 
-  var<named("startFit_perpSBackOffset")>() = startFit.getPerpSBackOffset(startSegment, endSegment);
-  var<named("endFit_perpSBackOffset")>() = endFit.getPerpSBackOffset(startSegment, endSegment);
-  var<named("commonFit_perpSBackOffset")>() = commonFit.getPerpSBackOffset(startSegment, endSegment);
+  var<named("startFit_perpSBackOffset")>() = startFit.getArcLength2DBackOffset(startSegment, endSegment);
+  var<named("endFit_perpSBackOffset")>() = endFit.getArcLength2DBackOffset(startSegment, endSegment);
+  var<named("commonFit_perpSBackOffset")>() = commonFit.getArcLength2DBackOffset(startSegment, endSegment);
 
   // Proximity indicators
   var<named("startFit_dist2DToFront_endSegment")>() = startFit.getDist2D(endFrontRecoPos2D);

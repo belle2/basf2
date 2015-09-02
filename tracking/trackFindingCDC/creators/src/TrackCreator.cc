@@ -279,7 +279,7 @@ void TrackCreator::appendRecoHits3D(const CDCRecoSegment2D& segment,
     recohits3D.push_back(CDCRecoHit3D::reconstruct(recohit2D,
                                                    trajectory2D,
                                                    trajectorySZ));
-    recohits3D.back().shiftPerpS(perpSOffset);
+    recohits3D.back().shiftArcLength2D(perpSOffset);
 
   }
 }
@@ -373,7 +373,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                               trajectory2D,
                               trajectorySZ);
 
-  FloatType firstPerpS = firstRecoHit3D.getPerpS();
+  FloatType firstPerpS = firstRecoHit3D.getArcLength2D();
 
 
   CDCRecoHit3D followingFirstRecoHit3D =
@@ -381,7 +381,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                               followingTrajectory2D,
                               followingTrajectorySZ);
 
-  FloatType followingFirstPerpS = followingFirstRecoHit3D.getPerpS();
+  FloatType followingFirstPerpS = followingFirstRecoHit3D.getArcLength2D();
 
   FloatType followingPerpSOffSet = firstPerpS + perpSOffset - followingFirstPerpS;
 
@@ -392,7 +392,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                                 trajectory2D,
                                 trajectorySZ);
 
-    recoHit3D.shiftPerpS(perpSOffset);
+    recoHit3D.shiftArcLength2D(perpSOffset);
 
 
     CDCRecoHit3D followingRecoHit3D =
@@ -400,7 +400,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                                 followingTrajectory2D,
                                 followingTrajectorySZ);
 
-    followingRecoHit3D.shiftPerpS(followingPerpSOffSet);
+    followingRecoHit3D.shiftArcLength2D(followingPerpSOffSet);
 
     recoHits3D.push_back(CDCRecoHit3D::average(recoHit3D, followingRecoHit3D));
 
@@ -414,7 +414,7 @@ FloatType TrackCreator::appendAverage(const CDCRecoSegment2D& segment,
                               followingTrajectory2D,
                               followingTrajectorySZ);
 
-  FloatType newPrepSOffset = recoHits3D.back().getPerpS() - followingLastRecoHit3D.getPerpS();
+  FloatType newPrepSOffset = recoHits3D.back().getArcLength2D() - followingLastRecoHit3D.getArcLength2D();
 
   return newPrepSOffset;
 

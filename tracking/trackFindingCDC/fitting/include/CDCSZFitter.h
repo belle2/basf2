@@ -104,7 +104,7 @@ namespace Belle2 {
         //FloatType weight = 1.0;
         FloatType weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
 
-        size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getPerpS(), recoHit3D.getRecoPos3D().z(), weight);
+        size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z(), weight);
         // if (not appended_hit){
         //   B2WARNING("CDCRecoHit3D was not appended as SZ observation.");
         //   B2WARNING("S: " << recoHit3D.getPerpS());

@@ -194,7 +194,7 @@ namespace Belle2 {
             track.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D));
           }
         }
-        track.sortByPerpS();
+        track.sortByArcLength2D();
         // B2INFO("#Hits" << track.size());
 
         /// Setting trajectories

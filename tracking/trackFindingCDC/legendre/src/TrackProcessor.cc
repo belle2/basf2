@@ -146,7 +146,7 @@ void TrackProcessorNew::updateTrack(CDCTrack& track)
     HitProcessor::updateRecoHit3D(trackTrajectory2D, recoHit);
   }
 
-  track.sortByPerpS();
+  track.sortByArcLength2D();
 
 //  trackTrajectory2D.setLocalOrigin(track.front().getRecoPos2D());
 

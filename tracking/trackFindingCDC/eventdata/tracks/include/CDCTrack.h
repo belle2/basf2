@@ -151,11 +151,11 @@ namespace Belle2 {
       void receiveMaskedFlag() const;
 
       /// Sort the recoHits according to their perpS information
-      void sortByPerpS()
+      void sortByArcLength2D()
       {
         std::stable_sort(begin(), end(),
         [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
-          return recoHit.getPerpS() < otherRecoHit.getPerpS();
+          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
         });
       }
 

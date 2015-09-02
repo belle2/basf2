@@ -502,7 +502,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 
       const FloatType& oldZ = recoHit3D.getRecoZ();
 
-      const FloatType& s = recoHit3D.getPerpS();
+      const FloatType& s = recoHit3D.getArcLength2D();
       const FloatType newZ = trajectorySZ.mapSToZ(s);
 
       Vector3D recoPos3DCorrection = wire.getWireVector();
@@ -510,10 +510,10 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 
       Vector3D correctedRecoPos3D = recoHit3D.getRecoPos3D() + recoPos3DCorrection;
 
-      const FloatType correctedPerpS = axialTrajectory2D.calcPerpS(correctedRecoPos3D.xy());
+      const FloatType correctedPerpS = axialTrajectory2D.calcArcLength2D(correctedRecoPos3D.xy());
 
       recoHit3D.setRecoPos3D(correctedRecoPos3D);
-      recoHit3D.setPerpS(correctedPerpS);
+      recoHit3D.setArcLength2D(correctedPerpS);
     }
   }
 
@@ -529,7 +529,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   FloatType szSlopeShift = trajectorySZ.getSZSlope();
 
   Vector3D fusedLocalOrigin = fusedTrajectory3D.getLocalOrigin();
-  FloatType sOffset = axialTrajectory2D.calcPerpS(fusedLocalOrigin.xy());
+  FloatType sOffset = axialTrajectory2D.calcArcLength2D(fusedLocalOrigin.xy());
   FloatType zShift = trajectorySZ.mapSToZ(sOffset);
 
   fusedTrajectory3D.shiftSZSlopeIntercept(szSlopeShift, zShift);

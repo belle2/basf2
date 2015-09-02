@@ -238,16 +238,16 @@ namespace Belle2 {
       { return getRLWireHit().getRefDriftLengthVariance(); }
 
       /// Adjust the travel distance by the given value.
-      void shiftPerpS(FloatType perpSOffSet)
-      { m_perpS += perpSOffSet; }
+      void shiftArcLength2D(FloatType arcLength2DOffSet)
+      { m_arcLength2D += arcLength2DOffSet; }
 
       /// Getter for the travel distance in the xy projection
-      FloatType getPerpS() const
-      { return m_perpS; }
+      FloatType getArcLength2D() const
+      { return m_arcLength2D; }
 
       /// Setter for the travel distance in the xy projection
-      void setPerpS(const FloatType& perpS)
-      { m_perpS = perpS; }
+      void setArcLength2D(const FloatType& arcLength2D)
+      { m_arcLength2D = arcLength2D; }
 
       /** indicator if the hit is in the cdc or already outside its boundaries.
           Checks for z to be in the range of the wire. */
@@ -281,7 +281,7 @@ namespace Belle2 {
       Vector3D m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
-      FloatType m_perpS;
+      FloatType m_arcLength2D;
     }; //class
 
   } //end namespace TrackFindingCDC

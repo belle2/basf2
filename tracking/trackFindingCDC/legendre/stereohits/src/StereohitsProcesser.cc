@@ -58,7 +58,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       if (backwardZ < recoPos3D.z() and recoPos3D.z() < forwardZ) {
-        FloatType perpS = trajectory2D.calcPerpS(recoPos3D.xy());
+        FloatType perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
         // It is very important that we have only positive values of the perpS here:
         if (perpS < 0) {
           perpS += 2 * TMath::Pi() * radius;

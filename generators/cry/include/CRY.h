@@ -132,6 +132,11 @@ namespace Belle2 {
      */
     void setKeepWidth(double keepwidth) { m_keepWidth = keepwidth; }
 
+    /** Sets the time offset.
+     * @param timeoffset time offset for particles starting at the world box.
+     */
+    void setTimeOffset(double timeoffset) { m_timeOffset = timeoffset; }
+
     /** Sets the kinetic energy threshold, particles below that value will be ignored.
      * @param kineticenergythreshold kinetic energy threshold.
      */
@@ -158,6 +163,7 @@ namespace Belle2 {
     double m_keepLength;  /**< length of a box used to keep particles. */
     double m_keepWidth;  /**< width of a box used to keep particles. */
     double m_keepHeight;  /**< height of a box used to keep particles. */
+    double m_timeOffset;  /**< time offset in seconds. */
 
     double m_kineticEnergyThreshold;  /**< kinetic energy threshold. */
 

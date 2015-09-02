@@ -95,7 +95,7 @@ namespace VXDTFsegFinderTest {
   TEST_F(OldVSNewSegFinderFiltersTest, BasicFilter)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(0., 1.));
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(0., 1.));
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(0.5f , 0.0f, 0.0f);
@@ -120,7 +120,7 @@ namespace VXDTFsegFinderTest {
     SegFinderFilters segFinderBox(outerHit1, innerHit, &testSector, 11);
 
     // Very verbose declaration:
-    Filter< Distance3DSquared<SpacePoint, double>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
+    Filter< Distance3DSquared<SpacePoint>, Range<float, float>, VoidObserver > filter(Range<float, float>(2., 3.));
 
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(innerHit.X() , innerHit.Y(), innerHit.Z());

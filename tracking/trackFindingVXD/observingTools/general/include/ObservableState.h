@@ -149,5 +149,4 @@ namespace Belle2 {
     /** returns total number of observers ever added */
     unsigned int getNObserversTotal() const { return m_nObservers; }
   };
-
 } // end namespace Belle2

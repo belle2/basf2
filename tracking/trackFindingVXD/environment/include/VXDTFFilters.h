@@ -42,7 +42,7 @@ namespace Belle2 {
     typedef VXDTFHit point_t;
 
     typedef
-    decltype((0. < Distance3DSquared<point_t, double>()   < 0.).observe(Observer()).enable()&&
+    decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
              (0. < Distance2DXYSquared<point_t, double>() < 0.).observe(Observer()).enable()&&
              (0. < Distance1DZ<point_t, double>()         < 0.)/*.observe(Observer())*/.enable()&&
              (0. < SlopeRZ<point_t, double>()             < 0.).observe(Observer()).enable()&&

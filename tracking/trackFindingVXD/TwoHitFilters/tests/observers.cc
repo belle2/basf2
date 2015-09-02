@@ -816,11 +816,11 @@ namespace VXDTFObserversTest {
   /** tests possibility of accessing MCData */
   TEST_F(ObserversTest, TestMCDataAccess)
   {
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(2.5,
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(2.5,
         3.5));
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountAcceptedRejectedMCParticleObserver > observedFilter(
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountAcceptedRejectedMCParticleObserver > observedFilter(
       unobservedFilter);
-    auto mcCounter = counterMC< Distance3DSquared<SpacePoint, double> >();
+    auto mcCounter = counterMC< Distance3DSquared<SpacePoint> >();
 
     for (int i = 1 ; i < spacePointData.getEntries(); i++) {
       SpacePoint& spA = *spacePointData[i];
@@ -858,9 +858,9 @@ namespace VXDTFObserversTest {
 
 
     // now we set the filter using values which are too strict
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilterStrict(Range<double, double>
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilterStrict(Range<double, double>
         (3.1, 3.5));
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, CountAcceptedRejectedMCParticleObserver >
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, CountAcceptedRejectedMCParticleObserver >
     observedFilterStrict(
       unobservedFilterStrict);
 
@@ -901,15 +901,15 @@ namespace VXDTFObserversTest {
   TEST_F(ObserversTest, TestObserverFlexibility)
   {
     // Very verbose declaration, see below for convenient shortcuts
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0.,
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0.,
         1.));
 
     //     Filter< Distance3DSquared<SpacePoint>, Range<double, double>, VectorOfObservers<Distance3DSquared> > filter(unobservedFilter);
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, InfoObserver > observedFilter(unobservedFilter);
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, InfoObserver > observedFilter(unobservedFilter);
     SpacePoint x1 = provideSpacePointDummy(1, 0.0f , 0.0f, 0.0f);
     SpacePoint x2 = provideSpacePointDummy(1, 0.5f , 0.0f, 0.0f);
     SpacePoint x3 = provideSpacePointDummy(1, 2.0f , 0.0f, 0.0f);
-    auto myCounter = counter<Distance3DSquared<SpacePoint, double>>();
+    auto myCounter = counter<Distance3DSquared<SpacePoint>>();
     myCounter.resetCounter();
 
     /// variant A (doesn't work, because of static function(?)):
@@ -917,8 +917,8 @@ namespace VXDTFObserversTest {
     //  VectorOfObservers<Distance3DSquared>::sm_collectedObservers.push_back(storeFuncVariantA);
 
     /// variant B:
-    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint, double>>::CStyleFunctionPointer)
-                                        &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint, double>(),
+    auto storeFuncVariantB = std::bind(((VectorOfObservers<Distance3DSquared<SpacePoint>>::CStyleFunctionPointer)
+                                        &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(),
                                        std::placeholders::_3);
 
     char* realname(NULL);
@@ -942,7 +942,7 @@ namespace VXDTFObserversTest {
     observedFilter.accept(x3, x1);
     EXPECT_EQ(0 , myCounter.used);
 
-    Filter< Distance3DSquared<SpacePoint, double>, Range<double, double>, ProvideBasicInfoObserver > anotherObservedFilter(
+    Filter< Distance3DSquared<SpacePoint>, Range<double, double>, ProvideBasicInfoObserver > anotherObservedFilter(
       unobservedFilter);
 
     anotherObservedFilter.accept(x2, x1);

@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     typedef
-    decltype((0. < Distance3DSquared<VXDTFHit, double>()   < 0.).observe(Observer()).enable()&&
+    decltype((0. < Distance3DSquared<VXDTFHit>()   < 0.).observe(Observer()).enable()&&
              (0. < Distance2DXYSquared<VXDTFHit, double>() < 0.).observe(Observer()).enable()&&
              (0. < Distance1DZ<VXDTFHit, double>()         < 0.)/*.observe(Observer())*/.enable()&&
              (0. < SlopeRZ<VXDTFHit, double>()             < 0.).observe(Observer()).enable()&&

@@ -244,7 +244,7 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
         (
           (
             min[ FilterID::distance3D ] <
-            Distance3DSquared<VXDTFHit, double>() <
+            Distance3DSquared<VXDTFHit>() <
             max[ FilterID::distance3D ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distance3D, setupIndex)) &&
 
@@ -305,7 +305,7 @@ SegmentFilterConverterModule::endRun()
                             m_PARAMsectorSetup.at(i).c_str());
     i++;
     double dummyLim = 1.;
-    auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit, double>() < -dummyLim  &&
+    auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit>() < -dummyLim  &&
                           dummyLim < Distance2DXYSquared<VXDTFHit, double>() < -dummyLim &&
                           dummyLim < Distance1DZ<VXDTFHit, double>() < -dummyLim &&
                           dummyLim < SlopeRZ<VXDTFHit, double>() < -dummyLim &&
@@ -340,7 +340,7 @@ SegmentFilterConverterModule::endRun()
 
         filterPersistent = (
                              min[ FilterID::distance3D ] <
-                             Distance3DSquared<VXDTFHit, double>() <
+                             Distance3DSquared<VXDTFHit>() <
                              max[ FilterID::distance3D ] &&
 
                              min[ FilterID::distanceXY ] <

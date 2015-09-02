@@ -16,12 +16,12 @@
 namespace Belle2 {
 
   /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 3D */
-  template <typename PointType, typename VariableType >
-  class Distance3DSquared : public SelectionVariable< PointType , float > {
+  template <typename PointType>
+  class Distance3DSquared : public SelectionVariable< PointType, double > {
   public:
 
     /** calculates the squared distance between the hits (3D), returning unit: cm^2 for speed optimization */
-    static float value(const PointType& outerHit, const PointType& innerHit)
+    static double value(const PointType& outerHit, const PointType& innerHit)
     {
       return
         std::pow(outerHit.X() - innerHit.X() , 2) +

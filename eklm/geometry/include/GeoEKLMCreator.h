@@ -505,6 +505,47 @@ namespace Belle2 {
       void createSectorSupportCorner4Solid();
 
       /**
+       * Cut corner of a solid.
+       * @param[in] name           Name of resulting solid.
+       * @param[in] solid          Solid.
+       * @param[in] subtractionBox Box used for subtractions.
+       * @param[in] transf         Additional transformation of subtraction box.
+       * @param[in] largerAngles   If true then cut larger angles.
+       * @param[in] x1             First point x coordinate.
+       * @param[in] y1             First point y coordinate.
+       * @param[in] x2             Second point x coordinate.
+       * @param[in] y2             Second point y coordinate.
+       */
+      G4SubtractionSolid* cutSolidCorner(
+        char* name, G4VSolid* solid, G4Box* subtractionBox,
+        HepGeom::Transform3D& transf, bool largerAngles,
+        double x1, double y1, double x2, double y2);
+
+      /**
+       * Cut corner of a solid.
+       * @param[in] name           Name of resulting solid.
+       * @param[in] solid          Solid.
+       * @param[in] subtractionBox Box used for subtractions.
+       * @param[in] transf         Additional transformation of subtraction box.
+       * @param[in] largerAngles   If true then cut larger angles.
+       * @param[in] x              Initial point x coordinate.
+       * @param[in] y              Initial point y coordinate.
+       * @param[in] ang            Angle.
+       */
+      G4SubtractionSolid* cutSolidCorner(
+        char* name, G4VSolid* solid, G4Box* subtractionBox,
+        HepGeom::Transform3D& transf, bool largerAngles,
+        double x, double y, double ang);
+
+      /**
+       * Subtract board solids from planes.
+       * @param[in] plane Plane solid without boards subtracted.
+       * @param[in] n     Number of plane, from 0 to 1.
+       */
+      G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
+                                              int n);
+
+      /**
        * Create plane solid.
        * @param[in] n Number of plane, from 0 to 1.
        */
@@ -609,14 +650,6 @@ namespace Belle2 {
        * @param[in] mlv   Mother logical volume.
        */
       void createSectorSupportCorner4(G4LogicalVolume* mlv);
-
-      /**
-       * Subtract board solids from planes.
-       * @param[in] plane Plane solid without boards subtracted.
-       * @param[in] n     Number of plane, from 0 to 1.
-       */
-      G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
-                                              int n);
 
       /**
        * Create plane.

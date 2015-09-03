@@ -930,6 +930,43 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
 }
 
 G4SubtractionSolid* EKLM::GeoEKLMCreator::
+cutSolidCorner(char* name, G4VSolid* solid, G4Box* subtractionBox,
+               HepGeom::Transform3D& transf, bool largerAngles,
+               double x1, double y1, double x2, double y2)
+{
+  double ang;
+  ang = atan2(y2 - y1, x2 - x1);
+  return cutSolidCorner(name, solid, subtractionBox, transf, largerAngles,
+                        x1, y1, ang);
+}
+
+G4SubtractionSolid* EKLM::GeoEKLMCreator::
+cutSolidCorner(char* name, G4VSolid* solid, G4Box* subtractionBox,
+               HepGeom::Transform3D& transf, bool largerAngles,
+               double x, double y, double ang)
+{
+  double lx, ly;
+  HepGeom::Transform3D t;
+  G4SubtractionSolid* ss = NULL;
+  lx = subtractionBox->GetXHalfLength();
+  ly = subtractionBox->GetYHalfLength();
+  if (largerAngles)
+    t = HepGeom::Translate3D(x + lx * cos(ang) - ly * sin(ang),
+                             y + lx * sin(ang) + ly * cos(ang), 0) *
+        HepGeom::RotateZ3D(ang);
+  else
+    t = HepGeom::Translate3D(x + lx * cos(ang) + ly * sin(ang),
+                             y + lx * sin(ang) - ly * cos(ang), 0) *
+        HepGeom::RotateZ3D(ang);
+  try {
+    ss = new G4SubtractionSolid(name, solid, subtractionBox, transf * t);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  return ss;
+}
+
+G4SubtractionSolid* EKLM::GeoEKLMCreator::
 subtractBoardSolids(G4SubtractionSolid* plane, int n)
 {
   int i;
@@ -993,17 +1030,9 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   double box_lx;
   HepGeom::Transform3D t;
   HepGeom::Transform3D t1;
-  HepGeom::Transform3D t2;
-  HepGeom::Transform3D t3;
-  HepGeom::Transform3D t4;
-  HepGeom::Transform3D t5;
   char name[128];
   G4Tubs* tb = NULL;
   G4Box* b1 = NULL;
-  G4Box* b2 = NULL;
-  G4TriangularPrism* pr1 = NULL;
-  G4TriangularPrism* pr2 = NULL;
-  G4TriangularPrism* pr3 = NULL;
   G4IntersectionSolid* is = NULL;
   G4SubtractionSolid* ss1 = NULL;
   G4SubtractionSolid* ss2 = NULL;
@@ -1017,70 +1046,26 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  snprintf(name, 128, "Plane_%d_Box_1", n + 1);
+  snprintf(name, 128, "Plane_%d_Box", n + 1);
   box_x = SectorSupportPosition.X + m_SectorSupportData.Thickness;
   box_y = SectorSupportPosition.Y + m_SectorSupportData.Thickness;
   box_lx = PlanePosition.outerR;
   try {
     b1 = new G4Box(name, 0.5 * box_lx, 0.5 * box_lx,
-                   0.5 * PlanePosition.length);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  snprintf(name, 128, "Plane_%d_Triangular_Prism_1", n + 1);
-  try {
-    pr1 = new G4TriangularPrism(name, m_SectorSupportData.Corner2LY,
-                                90. * CLHEP::deg, m_SectorSupportData.Corner2LX,
-                                180. * CLHEP::deg, PlanePosition.length);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  snprintf(name, 128, "Plane_%d_Triangular_Prism_2", n + 1);
-  try {
-    pr2 = new G4TriangularPrism(name, m_SectorSupportData.Corner3LX, 0.,
-                                m_SectorSupportData.Corner3LY,
-                                90. * CLHEP::deg, PlanePosition.length);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  snprintf(name, 128, "Plane_%d_Triangular_Prism_3", n + 1);
-  try {
-    pr3 = new G4TriangularPrism(name, m_SectorSupportData.Corner4LX, 0.,
-                                m_SectorSupportData.Corner4LY,
-                                90. * CLHEP::deg, PlanePosition.length);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  snprintf(name, 128, "Plane_%d_Box_2", n + 1);
-  try {
-    b2 = new G4Box(name, 0.5 * box_lx, 0.5 * box_lx, PlanePosition.length);
+                   PlanePosition.length);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   /* Calculate transformations for boolean solids. */
   t1 = HepGeom::Translate3D(0.5 * PlanePosition.outerR + box_x,
                             0.5 * PlanePosition.outerR + box_y, 0.);
-  t2 = HepGeom::Translate3D(
-         m_SectorSupportData.Corner1AInner.X +
-         0.5 * box_lx * cos(m_SectorSupportData.CornerAngle) -
-         0.5 * box_lx * sin(m_SectorSupportData.CornerAngle),
-         m_SectorSupportData.Corner1AInner.Y +
-         0.5 * box_lx * cos(m_SectorSupportData.CornerAngle) +
-         0.5 * box_lx * sin(m_SectorSupportData.CornerAngle),
-         0.) * HepGeom::RotateZ3D(m_SectorSupportData.CornerAngle);
-  t3 = HepGeom::Translate3D(solids.sectorsup.c2x, solids.sectorsup.c2y, 0.);
-  t4 = HepGeom::Translate3D(solids.sectorsup.c3x, solids.sectorsup.c3y, 0.);
-  t5 = HepGeom::Translate3D(solids.sectorsup.c4x, solids.sectorsup.c4y, 0.);
   /* For rotated plane. */
   if (n == 1) {
     t = HepGeom::Rotate3D(180. * CLHEP::deg,
                           HepGeom::Vector3D<double>(1., 1., 0.));
     t1 = t * t1;
-    t2 = t * t2;
-    t3 = t * t3;
-    t4 = t * t4;
-    t5 = t * t5;
-  }
+  } else
+    t = HepGeom::Translate3D(0, 0, 0);
   /* Boolean solids. */
   snprintf(name, 128, "Plane_%d_Intersection", n + 1);
   try {
@@ -1089,34 +1074,27 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
     B2FATAL(MemErr);
   }
   snprintf(name, 128, "Plane_%d_Subtraction_1", n + 1);
-  try {
-    ss1 = new G4SubtractionSolid(name, is, b2, t2);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  ss1 = cutSolidCorner(name, is, b1, t, true,
+                       m_SectorSupportData.Corner1AInner.X,
+                       m_SectorSupportData.Corner1AInner.Y,
+                       m_SectorSupportData.CornerAngle);
   snprintf(name, 128, "Plane_%d_Subtraction_2", n + 1);
-  try {
-    ss2 = new G4SubtractionSolid(name, ss1, pr1->getSolid(), t3);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  ss2 = cutSolidCorner(name, ss1, b1, t, false,
+                       solids.sectorsup.c2x - m_SectorSupportData.Corner2LX,
+                       solids.sectorsup.c2y, solids.sectorsup.c2x,
+                       solids.sectorsup.c2y + m_SectorSupportData.Corner2LY);
   snprintf(name, 128, "Plane_%d_Subtraction_3", n + 1);
-  try {
-    ss3 = new G4SubtractionSolid(name, ss2, pr2->getSolid(), t4);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  ss3 = cutSolidCorner(name, ss2, b1, t, false, solids.sectorsup.c3x,
+                       solids.sectorsup.c3y + m_SectorSupportData.Corner3LY,
+                       solids.sectorsup.c3x + m_SectorSupportData.Corner3LX,
+                       solids.sectorsup.c3y);
   snprintf(name, 128, "Plane_%d_Subtraction_4", n + 1);
-  try {
-    ss4 = new G4SubtractionSolid(name, ss3, pr3->getSolid(), t5);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  ss4 = cutSolidCorner(name, ss3, b1, t, true,
+                       solids.sectorsup.c4x + m_SectorSupportData.Corner4LX,
+                       solids.sectorsup.c4y, solids.sectorsup.c4x,
+                       solids.sectorsup.c4y + m_SectorSupportData.Corner4LY);
   snprintf(name, 128, "Plane_%d", n + 1);
   solids.plane[n] = subtractBoardSolids(ss4, n);
-  delete pr1;
-  delete pr2;
-  delete pr3;
 }
 
 void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)

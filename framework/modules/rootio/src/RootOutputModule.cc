@@ -81,6 +81,10 @@ RootOutputModule::~RootOutputModule() { }
 
 void RootOutputModule::initialize()
 {
+  //ROOT has a default maximum size of 100GB for trees??? For larger trees it creates a new file and does other things that finally produce crashes.
+  //Let's set this to 100PB, that should last a bit longer.
+  TTree::SetMaxTreeSize(1000 * 1000 * 100000000000LL);
+
   //buffer size in bytes (default value used by root)
   const int bufsize = 32000;
 

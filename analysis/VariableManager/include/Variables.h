@@ -482,6 +482,20 @@ namespace Belle2 {
      */
     double False(const Particle*);
 
+    /**
+    * return experiment number
+    */
+    double expNum(const Particle*);
+
+    /**
+    * return event number
+    */
+    double evtNum(const Particle*);
+
+    /**
+    * return run number
+    */
+    double runNum(const Particle*);
   }
 } // Belle2 namespace
 

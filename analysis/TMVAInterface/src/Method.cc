@@ -35,8 +35,8 @@ namespace Belle2 {
         auto regexp1 = std::string(".*_") + m_name + std::string(".*");
         auto regexp2 = std::string(".*") + m_name + std::string(".*");
         auto className = std::string("TMVA::Method") + m_name;
-        auto ctor1 = std::string("Method") + m_name + std::string("(DataSetInfo&,TString)");
-        auto ctor2 = std::string("Method") + m_name + std::string("(TString&,TString&,DataSetInfo&,TString&)");
+        auto ctor1 = std::string("Method") + m_name + std::string("(TMVA::DataSetInfo&,TString)");
+        auto ctor2 = std::string("Method") + m_name + std::string("(TString&,TString&,TMVA::DataSetInfo&,TString&)");
         auto pluginName = (m_name == "MockPlugin") ? std::string("analysis_TMVA") + m_name : std::string("TMVA") + m_name;
 
         gPluginMgr->AddHandler(base.c_str(), regexp1.c_str(), className.c_str(), pluginName.c_str(), ctor1.c_str());

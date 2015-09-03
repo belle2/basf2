@@ -1633,6 +1633,10 @@ class ValidationPlot(object):
         additional_stats_tf1 = ROOT.TF1("Stats", formula_string, lower_bound, upper_bound)
 
         for (i, (label, value)) in enumerate(additional_stats.items()):
+            # root 6 does not like labels with spaces ..
+            # bug report:  https://sft.its.cern.ch/jira/browse/ROOT-7460
+            # therefor this workaround:
+            label = label.replace(" ", "-")
             additional_stats_tf1.SetParName(i, label)
             additional_stats_tf1.FixParameter(i, value)
 

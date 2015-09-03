@@ -152,7 +152,7 @@ void numberOfPhotons(TTree* top)
 		      100, 0, 200);
   h->GetXaxis()->SetTitle("number of photons");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("numPhot >> h201", evt_select); 
+  top->Draw("numPhot >> h201", evt_select);
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Number of detected photons per track."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -164,7 +164,7 @@ void numberOfPhotons(TTree* top)
 	       100, -0.6, 0.9, 100, 0, 100);
   h->GetXaxis()->SetTitle("cos #theta");
   h->GetYaxis()->SetTitle("number of photons");
-  top->Draw("numPhot:cth >> h202", evt_select); 
+  top->Draw("numPhot:cth >> h202", evt_select);
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Number of detected photons per track versus polar angle."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 

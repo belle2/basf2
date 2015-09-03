@@ -15,7 +15,7 @@
 #include <TCut.h>
 
 // basic event selection requirement
-TCut select = "primary == 1 && barHit.barID == extHit.barID && pValue > 0.001";
+TCut evt_select = "primary == 1 && barHit.barID == extHit.barID && pValue > 0.001";
 
 void kaonID(TTree* top);
 void numberOfPhotons(TTree* top);
@@ -38,7 +38,7 @@ void makePlots()
 double getEfficiency(TTree* top, TCut forWhat) 
 {
   TH1F* hh = new TH1F("hh", "", 2, 0, 2);
-  top->Draw("logL.K>logL.pi >> hh", select && forWhat);
+  top->Draw("logL.K>logL.pi >> hh", evt_select && forWhat);
   double efficiency = int(hh->GetBinContent(2)/hh->GetEntries()*1000+0.5)/10.0;
   delete hh;
   return efficiency;
@@ -74,7 +74,7 @@ void kaonID(TTree* top)
 		      100, -200, 200);
   h->GetXaxis()->SetTitle("log L_{K} - log L_{#pi}");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("logL.K-logL.pi >> h101", select && TCut("abs(PDG) == 211 && p < 2"));
+  top->Draw("logL.K-logL.pi >> h101", evt_select && TCut("abs(PDG) == 211 && p < 2"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods for true pions below 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -85,7 +85,7 @@ void kaonID(TTree* top)
 		      100, -200, 200);
   h->GetXaxis()->SetTitle("log L_{K} - log L_{#pi}");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("logL.K-logL.pi >> h102", select && TCut("abs(PDG) == 321 && p < 2"));
+  top->Draw("logL.K-logL.pi >> h102", evt_select && TCut("abs(PDG) == 321 && p < 2"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods for true kaons below 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -96,7 +96,7 @@ void kaonID(TTree* top)
 		      100, -100, 100);
   h->GetXaxis()->SetTitle("log L_{K} - log L_{#pi}");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("logL.K-logL.pi >> h103", select && TCut("abs(PDG) == 211 && p > 2"));
+  top->Draw("logL.K-logL.pi >> h103", evt_select && TCut("abs(PDG) == 211 && p > 2"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods for true pions above 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -107,7 +107,7 @@ void kaonID(TTree* top)
 		      100, -100, 100);
   h->GetXaxis()->SetTitle("log L_{K} - log L_{#pi}");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("logL.K-logL.pi >> h104", select && TCut("abs(PDG) == 321 && p > 2"));
+  top->Draw("logL.K-logL.pi >> h104", evt_select && TCut("abs(PDG) == 321 && p > 2"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods for true kaons above 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -118,7 +118,7 @@ void kaonID(TTree* top)
 		      100, 0, 4, 100, -200, 200);
   h->GetXaxis()->SetTitle("p [GeV/c]");
   h->GetYaxis()->SetTitle("log L_{K} - log L_{#pi}");
-  top->Draw("logL.K-logL.pi:p >> h105", select && TCut("abs(PDG) == 211"));
+  top->Draw("logL.K-logL.pi:p >> h105", evt_select && TCut("abs(PDG) == 211"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods versus momentum for true pions."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -129,7 +129,7 @@ void kaonID(TTree* top)
 		      100, 0, 4, 100, -200, 200);
   h->GetXaxis()->SetTitle("p [GeV/c]");
   h->GetYaxis()->SetTitle("log L_{K} - log L_{#pi}");
-  top->Draw("logL.K-logL.pi:p >> h106", select && TCut("abs(PDG) == 321"));
+  top->Draw("logL.K-logL.pi:p >> h106", evt_select && TCut("abs(PDG) == 321"));
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Difference between kaon and pion log likelihoods versus momentum for true kaons."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -152,7 +152,7 @@ void numberOfPhotons(TTree* top)
 		      100, 0, 200);
   h->GetXaxis()->SetTitle("number of photons");
   h->GetYaxis()->SetTitle("entries/bin");
-  top->Draw("numPhot >> h201", select); 
+  top->Draw("numPhot >> h201", evt_select); 
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Number of detected photons per track."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -164,7 +164,7 @@ void numberOfPhotons(TTree* top)
 	       100, -0.6, 0.9, 100, 0, 100);
   h->GetXaxis()->SetTitle("cos #theta");
   h->GetYaxis()->SetTitle("number of photons");
-  top->Draw("numPhot:cth >> h202", select); 
+  top->Draw("numPhot:cth >> h202", evt_select); 
   h->GetListOfFunctions()->Add(new TNamed("Description", 
     "Number of detected photons per track versus polar angle."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
@@ -186,7 +186,7 @@ void trackResolutions(TTree* top)
 
   // resolutions below 2 GeV/c
 
-  trackSelect = select && "abs(extHit.y - barHit.y) < 0.01 && p < 2";
+  trackSelect = evt_select && "abs(extHit.y - barHit.y) < 0.01 && p < 2";
 
   h = new TH1F("h301", "extrapolated track resolution in z for p < 2 GeV/c", 
 		      100, -10, 10);
@@ -256,7 +256,7 @@ void trackResolutions(TTree* top)
 
   // resolutions above 2 GeV/c
 
-  trackSelect = select && "abs(extHit.y - barHit.y) < 0.01 && p > 2";
+  trackSelect = evt_select && "abs(extHit.y - barHit.y) < 0.01 && p > 2";
 
   h = new TH1F("h306", "extrapolated track resolution in z for p > 2 GeV/c", 
 		      100, -10, 10);

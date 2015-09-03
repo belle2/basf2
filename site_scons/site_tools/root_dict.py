@@ -18,11 +18,22 @@ linkdef_class_re = \
 linkdef_implicit = \
     re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//\s*implicit\s*$', re.M)
 
+# custom generator for the Root dictionary builder
+# it will also generate the .rootmap files to allow ROOT
+# to auto-load libraries
+
+
+def rootcling_generator(source, target, env, for_signature):
+    # extract the name of the root library which is generated at this stage
+    # this variable will be set by the process_dir function
+    rootmap_libname = env["ROOTCLING_ROOTMAP_LIB"]
+    # use the .cc-dict file name (in target[0]) to generate the .rootmap file
+    cmd = 'rootcling -f $TARGET $CLINGFLAGS -rmf "{}.rootmap" -rml lib{}.so $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES' \
+        .format(str(target[0]).replace(".cc", ""), rootmap_libname)
+    return cmd
+
 
 def linkdef_emitter(target, source, env):
-    # emitter for linkdef files:
-    # add all header files for classes which are listed in the linkdef file
-
     # determine the right include directory
     source_dir = os.path.dirname(str(source[0]))
     include_dir = source_dir
@@ -80,9 +91,7 @@ def linkdef_emitter(target, source, env):
 
 
 # define builder for root dictionaries
-dict_action = \
-    'rootcling -f $TARGET $CLINGFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
-rootcint = Builder(action=dict_action, emitter=linkdef_emitter,
+rootcint = Builder(generator=rootcling_generator, emitter=linkdef_emitter,
                    source_scanner=CScanner())
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 

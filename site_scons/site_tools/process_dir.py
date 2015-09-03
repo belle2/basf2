@@ -240,6 +240,9 @@ def process_dir(
         # generate dictionaries
         dict_files = []
         for linkdef_file in env['LINKDEF_FILES']:
+            # set the name of library generated at this stage
+            # will be read by the RootDict builder
+            env["ROOTCLING_ROOTMAP_LIB"] = lib_name
             dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] \
                 + 'Dict.cc'
             dict_file = env.RootDict(os.path.join(env['BUILDDIR'],
@@ -253,7 +256,16 @@ def process_dir(
             pcm_name = os.path.basename(pcm_path)
             pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
                                        pcm_path)
+            # install corresponding rootmap files to support auto-loading of libraries
+            # once used via ROOT
+            rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
+            rootmap_name = os.path.basename(rootmap_path)
+
+            rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
+                                           rootmap_path)
+
             # Ensure InstallAs() comes after the dictionary build
+            env.Depends(rootmap_path, dict_file)
             env.Depends(pcm_path, dict_file)
 
         # build a shared library with all source and dictionary files

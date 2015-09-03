@@ -51,6 +51,7 @@ namespace Belle2 {
       //! Is index out of valid range?
       bool outOfBounds(int iparam) {if (iparam < 0) return true; if ((unsigned int)iparam >= data.size()) return true; return false;}
       //! Struct to hold data for a parameter
+    public:
       struct parameterData {
         //! Constructor
         parameterData() {}
@@ -82,6 +83,7 @@ namespace Belle2 {
         //! Weights of this param in eigenvectors
         vector<double> eigenweights;
       };
+    private:
       //! Vector with all the parameter data
       vector<parameterData> data;
       //! Vector of loaded eigennumbers

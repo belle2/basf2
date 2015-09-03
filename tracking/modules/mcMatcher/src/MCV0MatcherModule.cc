@@ -64,34 +64,35 @@ void MCV0MatcherModule::event()
   StoreArray<V0> v0s(m_V0ColName);
   B2DEBUG(200, (v0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
 
-  for (auto& v0 : v0s) {
+  for (const auto& v0 : v0s) {
     // Try to match the tracks of each V0 with the MC V0.
-    auto v0hypothesis = v0.getV0Hypothesis();
-    auto trackPtrs = v0.getTracks();
+    const Const::ParticleType v0hypothesis = v0.getV0Hypothesis();
+    const std::pair<Track*, Track*> trackPtrs = v0.getTracks();
 
-    const auto V0PartPlus = trackPtrs.first->getRelatedTo<MCParticle>();
-    const auto V0PartMinus = trackPtrs.second->getRelatedTo<MCParticle>();
+    const MCParticle* mcV0PartPlus = trackPtrs.first->getRelatedTo<MCParticle>(m_MCParticleColName);
+    const MCParticle* mcV0PartMinus = trackPtrs.second->getRelatedTo<MCParticle>(m_MCParticleColName);
 
-    if (V0PartPlus == nullptr or V0PartMinus == nullptr) {
+    if (mcV0PartPlus == nullptr or mcV0PartMinus == nullptr) {
       B2DEBUG(200, "At least one track of the V0 does not have a MC related particle. It will be skipped for matching.");
       continue;
     }
-    if (!V0PartPlus->getMother() or !V0PartMinus->getMother()) {
+
+    const MCParticle* mcV0PartPlusMother = mcV0PartPlus->getMother();
+    const MCParticle* mcV0PartMinusMother = mcV0PartMinus->getMother();
+
+    if (!mcV0PartPlus->getMother() or !mcV0PartMinusMother) {
       B2DEBUG(200, "At least one track of the V0 does not have a mother MCParticle, skipping.");
       continue;
     }
 
-    const auto V0PartPlusMotherParticleType = Const::ParticleType(V0PartPlus->getMother()->getPDG());
-    const auto V0PartMinusMotherParticleType = Const::ParticleType(V0PartMinus->getMother()->getPDG());
-
-    if (V0PartPlusMotherParticleType != V0PartMinusMotherParticleType) {
+    if (mcV0PartPlusMother != mcV0PartMinusMother) {
       B2DEBUG(200, "The V0 is most likely built up from combinatoric background, thus no MC relation can be set.");
       continue;
     }
 
-    if (V0PartPlusMotherParticleType == v0hypothesis) {
+    if (Const::ParticleType(mcV0PartPlusMother->getPDG()) == v0hypothesis) {
       B2DEBUG(200, "V0 successfully matched.");
-      v0.addRelationTo(V0PartPlus->getMother());
+      v0.addRelationTo(mcV0PartPlusMother);
     } else {
       B2DEBUG(200, "V0 did not match anything.");
     }

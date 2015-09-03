@@ -141,7 +141,7 @@ namespace Belle2 {
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaIntercept(const FloatType& tanLambdaShift, const FloatType& zShift)
+      void shiftTanLambdaZ0(const FloatType& tanLambdaShift, const FloatType& zShift)
       {
         FloatType z0 = m_lineSZ.intercept();
         FloatType tanLambda = m_lineSZ.slope();

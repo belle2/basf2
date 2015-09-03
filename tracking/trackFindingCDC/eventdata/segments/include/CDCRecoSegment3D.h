@@ -28,7 +28,7 @@ namespace Belle2 {
       /** Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference postion.
        * Note : no fitting information is transported to the resulting segment.
        */
-      CDCRecoSegment2D projectXY() const;
+      CDCRecoSegment2D stereoProjectToRef() const;
     };
 
   }

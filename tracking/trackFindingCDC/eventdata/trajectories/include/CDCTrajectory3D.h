@@ -201,7 +201,7 @@ namespace Belle2 {
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
       void shiftTanLambdaIntercept(const FloatType& tanLambdaShift, const FloatType& zShift)
-      { m_localHelix.shiftTanLambdaIntercept(tanLambdaShift, zShift); }
+      { m_localHelix.shiftTanLambdaZ0(tanLambdaShift, zShift); }
 
 
 

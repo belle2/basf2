@@ -113,7 +113,7 @@ namespace Belle2 {
         for (const CDCTrack& mcTrack : m_mcTracks) {
           std::vector<CDCRecoSegment3D> recoSegment3DsInTrack = mcTrack.splitIntoSegments();
           for (const CDCRecoSegment3D& recoSegment3D :  recoSegment3DsInTrack) {
-            m_mcSegment2Ds.push_back(recoSegment3D.projectXY());
+            m_mcSegment2Ds.push_back(recoSegment3D.stereoProjectToRef());
           }
         }
 

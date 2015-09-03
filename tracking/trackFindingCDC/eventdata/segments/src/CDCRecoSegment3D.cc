@@ -17,11 +17,11 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRecoSegment2D CDCRecoSegment3D::projectXY() const
+CDCRecoSegment2D CDCRecoSegment3D::stereoProjectToRef() const
 {
   CDCRecoSegment2D result;
   for (const CDCRecoHit3D&  recoHit3D : *this) {
-    result.push_back(recoHit3D.projectXY());
+    result.push_back(recoHit3D.stereoProjectToRef());
   }
   return result;
 }

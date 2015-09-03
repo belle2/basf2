@@ -40,7 +40,9 @@ if len(Flatten(source_files)) == 0:
   Exit(1)
 
 # builder for root dictionaries
-rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
+#rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
+from root_dict import dict_action
+rootcint = Builder(action=dict_action, source_scanner=CScanner())
 env['BUILDERS']['RootCint'] = rootcint
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
@@ -64,6 +66,14 @@ for dir in dirs:
         header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file))) for header_file in header_files]
         dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
         dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
+
+        # install corresponding pcm file in lib (for cling)
+        pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
+        pcm_name = os.path.basename(pcm_path)
+        pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
+                                   pcm_path)
+        # Ensure InstallAs() comes after the dictionary build
+        env.Depends(pcm_path, dict_file)
 
 # build library
 lib = env.SharedLibrary(os.path.join(env['LIBDIR'], 'libgenfit2.so'), [source_files, dict_files])

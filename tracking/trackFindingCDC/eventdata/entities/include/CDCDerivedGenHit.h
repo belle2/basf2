@@ -37,7 +37,8 @@ namespace Belle2 {
       /// Cast to the restrained constant base class
       operator const Belle2::TrackFindingCDC::CDCGenHit& () const { return m_impl; }
 
-    private:
+      // made public as a work around for ROOT6 transition
+      //private:
       /// Implementation of the restained base class
       class Impl : public CDCGenHit {
       public:

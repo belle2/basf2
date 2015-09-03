@@ -248,6 +248,14 @@ def process_dir(
             dict_files.append(env.SharedObject(dict_file, CPPPATH=['.']
                                                + env['CPPPATH']))
 
+            # install corresponding pcm file in lib (for cling)
+            pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
+            pcm_name = os.path.basename(pcm_path)
+            pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
+                                       pcm_path)
+            # Ensure InstallAs() comes after the dictionary build
+            env.Depends(pcm_path, dict_file)
+
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0:
 

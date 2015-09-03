@@ -584,11 +584,12 @@ void WriteHisto()
 }
 
 
-void CDCValidation()
+Int_t CDCValidation()
 {
   SetLayerID();
   FillHisto();
   if(kWriteHisto){
     WriteHisto();
   }
+  return 0;
 }

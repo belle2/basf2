@@ -22,7 +22,7 @@ main = create_path()
 
 # Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # random number for generation
@@ -33,18 +33,18 @@ intseed = random.randint(1, 10000000)
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
-    'nTracks': 2,
+    'nTracks': 1,
     'momentumGeneration': 'fixed',
-    'momentumParams': [0.5],
+    'momentumParams': [0.1],
     'thetaGeneration': 'uniform',
-    'thetaParams': [80., 80.1],
+    'thetaParams': [30., 40.],
     'phiGeneration': 'uniform',
-    'phiParams': [180., 180.1],
+    'phiParams': [0., 360.],
     'vertexGeneration': 'uniform',
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
-    }
+}
 
 pGun.param(param_pGun)
 main.add_module(pGun)
@@ -65,17 +65,17 @@ bkgFiles = [
     bkgdir + 'Touschek_LER_100us.root',
     bkgdir + 'Touschek_HER_100usECL.root',
     bkgdir + 'Touschek_LER_100usECL.root',
-    ]
+]
 
 add_simulation(main)
 add_reconstruction(main)
 
 display = register_module('Display')
-#main.add_module(display)
+# main.add_module(display)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Example_10evt.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Test_10000_Sibidanov.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

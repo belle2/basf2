@@ -12,13 +12,11 @@ linkdef_everything = \
 
 # regular expression to find class names in linkdef files
 linkdef_class_re = \
-    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::([\w]*::)?([\w]*).*[+-]?\!?;.*$'
-               , re.M)
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::([\w]*::)?([\w]*).*[+-]?\!?;.*$', re.M)
 
 # link requests with '// implicit' comment (doesn't require header file)
 linkdef_implicit = \
-    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//\s*implicit\s*$'
-               , re.M)
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//\s*implicit\s*$', re.M)
 
 
 def linkdef_emitter(target, source, env):
@@ -42,8 +40,12 @@ def linkdef_emitter(target, source, env):
 
         match = linkdef_class_re.search(line)
         if match is None:
-            raise RuntimeError("%s contains '%s' which we couldn't parse. The syntax may be incorrect, or the build system may lack support for the feature you're using."
-                                % (str(source[0]), line))
+            raise RuntimeError(
+                "%s contains '%s' which we couldn't parse. The syntax may be incorrect," +
+                " or the build system may lack support for the feature you're using." %
+                (str(
+                    source[0]),
+                    line))
 
         namespace = match.group(1)  # or possibly a class, but it might match the header file
         classname = match.group(2)
@@ -59,7 +61,7 @@ def linkdef_emitter(target, source, env):
         header_file = os.path.join(source_dir, include_base)
         if not os.path.isfile(header_file):
             header_file = os.path.join(os.environ.get('BELLE2_RELEASE_DIR', ''
-                                       ), header_file)
+                                                      ), header_file)
         if not os.path.isfile(header_file):
             if not namespace:
                 # no //implicit for suppression found...
@@ -70,7 +72,7 @@ def linkdef_emitter(target, source, env):
             # remove trailing '::', add '.h'
             include_base = namespace.split(':')[0] + '.h'
         include_file = os.path.join(include_dir, include_base)
-        if not include_file in sources:
+        if include_file not in sources:
             sources.append(include_file)
 
     sources.append(source[0])
@@ -78,9 +80,10 @@ def linkdef_emitter(target, source, env):
 
 
 # define builder for root dictionaries
-rootcint = \
-    Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
-            , emitter=linkdef_emitter, source_scanner=CScanner())
+dict_action = \
+    'rootcling -f $TARGET $CLINGFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES'
+rootcint = Builder(action=dict_action, emitter=linkdef_emitter,
+                   source_scanner=CScanner())
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
 
@@ -90,5 +93,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

@@ -493,7 +493,8 @@ void RootInputModule::readPersistentEntry(long fileEntry)
 
   int bytesRead = m_persistent->GetEntry(fileEntry);
   if (bytesRead <= 0) {
-    B2FATAL("Could not read 'persistent' TTree #" << fileEntry << " in file " << m_tree->GetCurrentFile()->GetName());
+    const char* name = m_tree->GetCurrentFile() ? m_tree->GetCurrentFile()->GetName() : "<unknown>";
+    B2FATAL("Could not read 'persistent' TTree #" << fileEntry << " in file " << name);
   }
 
   for (auto entry : m_persistentStoreEntries) {

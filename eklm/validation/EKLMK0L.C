@@ -42,8 +42,8 @@ void EKLMK0L()
   ppres->SetXTitle("rad");
   ppres->SetYTitle("Events");
   int n = tree->GetEntries();
-  TClonesArray *k0lArray;
-  TClonesArray *mcParticleArray;
+  TClonesArray *k0lArray = new TClonesArray("Belle2::KLMCluster");
+  TClonesArray *mcParticleArray = new TClonesArray("Belle2::MCParticle");
   tree->SetBranchAddress("KLMClusters", &k0lArray);
   tree->SetBranchAddress("MCParticles", &mcParticleArray);
   for (int i = 0; i < n; i++) {

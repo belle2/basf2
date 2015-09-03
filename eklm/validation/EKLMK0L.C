@@ -10,8 +10,6 @@
 void EKLMK0L()
 {
   TList *l;
-  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";
-  gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
   TFile* fin = new TFile("../EKLMK0LOutput.root");
   TTree* tree = (TTree*) fin->Get("tree");
   TFile* fout = new TFile("EKLMK0L.root", "recreate");

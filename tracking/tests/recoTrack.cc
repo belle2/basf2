@@ -88,8 +88,8 @@ namespace Belle2 {
     EXPECT_FALSE(m_recoTrack->hasCDCHits());
 
     // Add three cdc hits to the track
-    m_recoTrack->addCDCHit(cdcHits[0], 0.5);
-    m_recoTrack->addCDCHit(cdcHits[1], 0.2, RecoTrack::RightLeftInformation::right);
+    m_recoTrack->addCDCHit(cdcHits[0], 1);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoTrack::RightLeftInformation::right);
     m_recoTrack->addCDCHit(cdcHits[2], 2);
 
     EXPECT_TRUE(m_recoTrack->hasCDCHits());
@@ -121,7 +121,7 @@ namespace Belle2 {
     EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoTrack::TrackingDetector::CDC);
     EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoTrack::RightLeftInformation::undefinedRightLeftInformation);
     EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoTrack::OriginTrackFinder::undefinedTrackFinder);
-    EXPECT_EQ(recoHitInformation->getSortingParameter(), 0.5);
+    EXPECT_EQ(recoHitInformation->getSortingParameter(), 1);
 
     cdcHit = cdcHits[1];
     recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
@@ -137,39 +137,26 @@ namespace Belle2 {
     EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoTrack::TrackingDetector::CDC);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::undefinedRightLeftInformation);
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::undefinedTrackFinder);
-    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 0.5);
+    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 1);
 
-    EXPECT_TRUE(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoTrack::OriginTrackFinder::SegmentTrackCombiner));
-    EXPECT_TRUE(m_recoTrack->setRightLeftInformation(cdcHit, RecoTrack::RightLeftInformation::left));
-    EXPECT_TRUE(m_recoTrack->setSortingParameter(cdcHit, 0.55));
+    EXPECT_NO_THROW(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoTrack::OriginTrackFinder::SegmentTrackCombiner));
+    EXPECT_NO_THROW(m_recoTrack->setRightLeftInformation(cdcHit, RecoTrack::RightLeftInformation::left));
+    EXPECT_NO_THROW(m_recoTrack->setSortingParameter(cdcHit, 3));
 
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::SegmentTrackCombiner);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::left);
-    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 0.55);
+    EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 3);
 
     // with not added hits
     cdcHit = cdcHits[4];
 
-    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoTrack::TrackingDetector::invalidTrackingDetector);
-    EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoTrack::RightLeftInformation::invalidRightLeftInformation);
-    EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoTrack::OriginTrackFinder::invalidTrackFinder);
-    EXPECT_TRUE(std::isnan(m_recoTrack->getSortingParameter(cdcHit)));
+    EXPECT_THROW(m_recoTrack->getTrackingDetector(cdcHit), std::invalid_argument);
+    EXPECT_THROW(m_recoTrack->getRightLeftInformation(cdcHit), std::invalid_argument);
+    EXPECT_THROW(m_recoTrack->getFoundByTrackFinder(cdcHit), std::invalid_argument);
+    EXPECT_THROW(m_recoTrack->getSortingParameter(cdcHit), std::invalid_argument);
 
-    EXPECT_FALSE(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoTrack::OriginTrackFinder::SegmentTrackCombiner));
-    EXPECT_FALSE(m_recoTrack->setRightLeftInformation(cdcHit, RecoTrack::RightLeftInformation::left));
-
-
-    // Test the hit patterns
-
-    //Fill the arm into the hit pattern, that has actually hits.
-    const HitPatternCDC& hitPatternFull = m_recoTrack->getHitPatternCDC(1);
-    EXPECT_EQ(hitPatternFull.hasAxialLayer(),  true);
-    EXPECT_EQ(hitPatternFull.hasStereoLayer(), false);
-
-    //Now I fill the arm into the pattern, that doesn't have any hits.
-    const HitPatternCDC& hitPatternEmpty = m_recoTrack->getHitPatternCDC(-1);
-    EXPECT_EQ(hitPatternEmpty.hasAxialLayer(),  false);
-    EXPECT_EQ(hitPatternEmpty.hasStereoLayer(), false);
+    EXPECT_THROW(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoTrack::OriginTrackFinder::SegmentTrackCombiner), std::invalid_argument);
+    EXPECT_THROW(m_recoTrack->setRightLeftInformation(cdcHit, RecoTrack::RightLeftInformation::left), std::invalid_argument);
   }
 
   TEST_F(RecoTrackTest, testGenfitConversionOne)
@@ -214,8 +201,8 @@ namespace Belle2 {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
 
     // Add three cdc hits to the track
-    m_recoTrack->addCDCHit(cdcHits[0], 0.5);
-    m_recoTrack->addCDCHit(cdcHits[1], 0.2, RecoTrack::RightLeftInformation::right);
+    m_recoTrack->addCDCHit(cdcHits[0], 1);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoTrack::RightLeftInformation::right);
     m_recoTrack->addCDCHit(cdcHits[2], 2);
 
     EXPECT_TRUE(m_recoTrack->hasCDCHits());

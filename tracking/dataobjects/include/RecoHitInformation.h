@@ -20,12 +20,12 @@ namespace Belle2 {
   /**
    * This class stores additional information to every CDC/SVD/PXD hit stored in a RecoTrack.
    * Every hit information belongs to a single hit and a single RecoTrack (stored with relation).
-   * If one hits should belong to more than one track, you have to create more than one RecoHitInformation.
+   * If one hit should belong to more than one track, you have to create more than one RecoHitInformation.
    *
    * The RecoHitInformation stores information on:
    *   - the TrackFinder that added the hit to the track
-   *   - RL information for CDC hits
-   *   - the sorting parameter of the hit. This should be (something like if you can not calculate the correct value) the arc length between -pi and pi.
+   *   - RL information (valid for for CDC hits only)
+   *   - the sorting parameter of the hit. This is the index of this hit in the reco track.
    *   - additional flags
    *
    * The stored information can be used when transforming a RecoTrack into a genfit::Track or genfit::TrackCand
@@ -48,6 +48,7 @@ namespace Belle2 {
     /** Define, use of CDC hits as CDC hits (for symmetry). */
     typedef CDCHit UsedCDCHit;
 
+    /** The RightLeft information of the hit which is only valid for CDC hits */
     enum RightLeftInformation {
       undefinedRightLeftInformation,
       invalidRightLeftInformation,
@@ -55,6 +56,7 @@ namespace Belle2 {
       left
     };
 
+    /** The TrackFinder which has added the hit to the track */
     enum OriginTrackFinder {
       undefinedTrackFinder,
       invalidTrackFinder,
@@ -66,15 +68,17 @@ namespace Belle2 {
       other
     };
 
+    /** Another flag to be used (currently unused) */
     enum RecoHitFlag {
       undefinedRecoHitFlag
     };
 
+    /** The detector this hit comes from (which is of course also visible in the hit type) */
     enum TrackingDetector {
       undefinedTrackingDetector,
       invalidTrackingDetector,
       SVD,
-      PCD,
+      PXD,
       CDC
     };
 
@@ -92,112 +96,123 @@ namespace Belle2 {
     }
 
     /**
-     * Create hit information for a CDC hit with the given information.
-     * @param cdcHit
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
-     * @param travelS
-     * @param reconstructedPosition
+     * Create hit information for a CDC hit with the given information. Adds the relation to the hit automatically.
+     * @param cdcHit The hit to create this information for.
+     * @param rightLeftInformation The RL-information.
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
      */
     RecoHitInformation(UsedCDCHit* cdcHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
-                       double sortingParameter) :
+                       unsigned int sortingParameter) :
       RecoHitInformation(cdcHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
     /**
-     * Create hit information for a CDC hit with the given information.
-     * @param cdcHit
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
-     * @param travelS
-     * @param reconstructedPosition
+     * Create hit information for a PXD hit with the given information. Adds the relation to the hit automatically.
+     * @param pxdHit The hit to create this information for.
+     * @param rightLeftInformation The RL-information (which is probably invalid).
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
      */
     RecoHitInformation(UsedPXDHit* pxdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
-                       double sortingParameter) :
-      RecoHitInformation(pxdHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+                       unsigned int sortingParameter) :
+      RecoHitInformation(pxdHit, TrackingDetector::PXD, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
     /**
-     * Create hit information for a CDC hit with the given information.
-     * @param cdcHit
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
-     * @param travelS
-     * @param reconstructedPosition
+     * Create hit information for a SVD hit with the given information. Adds the relation to the hit automatically.
+     * @param cdcHit The hit to create this information for.
+     * @param rightLeftInformation The RL-information  (which is probably invalid).
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
      */
     RecoHitInformation(UsedSVDHit* svdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
-                       double sortingParameter) :
-      RecoHitInformation(svdHit, TrackingDetector::CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+                       unsigned int sortingParameter) :
+      RecoHitInformation(svdHit, TrackingDetector::SVD, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
+    /** Get the additional flag */
     RecoHitFlag getFlag() const
     {
       return m_flag;
     }
 
+    /** Set the additional flag */
     void setFlag(RecoHitFlag flag)
     {
       m_flag = flag;
     }
 
+    /** Get which track finder has found the track. */
     OriginTrackFinder getFoundByTrackFinder() const
     {
       return m_foundByTrackFinder;
     }
 
+    /** Set which track finder has found the track. */
     void setFoundByTrackFinder(OriginTrackFinder foundByTrackFinder)
     {
       m_foundByTrackFinder = foundByTrackFinder;
     }
 
-    double getSortingParameter() const
+    /** Get the sorting parameter */
+    unsigned int getSortingParameter() const
     {
       return m_sortingParameter;
     }
 
-    void setSortingParameter(double sortingParameter)
+    /** Set the sorting parameter */
+    void setSortingParameter(unsigned int sortingParameter)
     {
       m_sortingParameter = sortingParameter;
     }
 
+    /** Get the right-left-information. */
     RightLeftInformation getRightLeftInformation() const
     {
       return m_rightLeftInformation;
     }
 
+    /** Set the right-left-information. */
     void setRightLeftInformation(RightLeftInformation rightLeftInformation)
     {
       m_rightLeftInformation = rightLeftInformation;
     }
 
+    /** Get the detector this hit comes from. (can not be changed once created) */
     TrackingDetector getTrackingDetector() const
     {
       return m_trackingDetector;
     }
 
   private:
+    /// The tracking detector this hit comes from (can not be changed once created)
     TrackingDetector m_trackingDetector;
+    /// The right-left-information of the hit. Can be invalid (for VXD hits) or unknown.
     RightLeftInformation m_rightLeftInformation;
-    double m_sortingParameter; /**< From -pi to pi */
+    /// The sorting parameter as an index.
+    unsigned int m_sortingParameter;
+    /// Which track finder has found this hit and added it to the reco track.
+    /// Can only be used if creating the RecoTrack in the track finder.
     OriginTrackFinder m_foundByTrackFinder;
+    /// An additional flag to be used.
     RecoHitFlag m_flag;
 
     /**
-     * Create hit information for a generic hit hit with the given information.
-     * @param hit
-     * @param trackingDetektor
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
-     * @param travelS
-     * @param reconstructedPosition
+     * Create hit information for a generic hit with the given information. Adds the relation to the hit automatically.
+     * @param hit the hit to create a reco hit information for.
+     * @param trackingDetektor The detector the hit comes from.
+     * @param rightLeftInformation The right left information (can be invalid)
+     * @param foundByTrackFinder Which track finder has found the hit.
+     * @param sortingParameter The sorting parameter of the hit.
      */
     template <class HitType>
     RecoHitInformation(HitType* hit, TrackingDetector trackingDetecktor, RightLeftInformation rightLeftInformation,
                        OriginTrackFinder foundByTrackFinder,
-                       double sortingParameter) :
+                       unsigned int sortingParameter) :
       m_trackingDetector(trackingDetecktor),
       m_rightLeftInformation(rightLeftInformation),
       m_sortingParameter(sortingParameter),

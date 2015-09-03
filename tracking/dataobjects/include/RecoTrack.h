@@ -110,14 +110,14 @@ namespace Belle2 {
 
     /**
      * Adds a cdc hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param cdcHit The pointer to a stored CDCHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
-     * @param rightLeftInformation
-     * @param foundByTrackFinder
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
+     * @param rightLeftInformation The right left information (if you know it).
+     * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
-    bool addCDCHit(UsedCDCHit* cdcHit, const double sortingParameter,
+    bool addCDCHit(UsedCDCHit* cdcHit, const unsigned int sortingParameter,
                    RightLeftInformation rightLeftInformation = RightLeftInformation::undefinedRightLeftInformation,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
     {
@@ -126,13 +126,14 @@ namespace Belle2 {
 
     /**
      * Adds a pxd hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
-     * @param pxdHit The pointer to a stored PXDHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
-     * @param foundByTrackFinder
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
+     * @param pxdHit The pointer to a stored PXDHit/Cluster in the store array you provided earlier, which you want to add.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
+     * @param rightLeftInformation The right left information (if you know it).
+     * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
-    bool addPXDHit(UsedPXDHit* pxdHit, const double sortingParameter,
+    bool addPXDHit(UsedPXDHit* pxdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
     {
       return addHit(pxdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
@@ -146,16 +147,14 @@ namespace Belle2 {
      * @param foundByTrackFinder
      * @return True if the hit was not already added to the track.
      */
-    bool addSVDHit(UsedSVDHit* svdHit, const double sortingParameter,
+    bool addSVDHit(UsedSVDHit* svdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::undefinedTrackFinder) const
     {
       return addHit(svdHit, RightLeftInformation::undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
     }
 
     /**
-     * Return the reco hit information for a given cdc hit.
-     * @param cdcHit
-     * @return the reco hit information.
+     * Return the reco hit information for a given cdc hit or nullptr if there is none.
      */
     RecoHitInformation* getRecoHitInformation(UsedCDCHit* cdcHit) const
     {
@@ -163,9 +162,7 @@ namespace Belle2 {
     }
 
     /**
-     * Return the reco hit information for a given svd hit.
-     * @param svdHit
-     * @return the reco hit information.
+     * Return the reco hit information for a given svd hit or nullptr if there is none.
      */
     RecoHitInformation* getRecoHitInformation(UsedSVDHit* cdcHit) const
     {
@@ -173,9 +170,7 @@ namespace Belle2 {
     }
 
     /**
-     * Return the reco hit information for a given pxd hit.
-     * @param pxdHit
-     * @return the reco hit information.
+     * Return the reco hit information for a given pxd hit or nullptr if there is none.
      */
     RecoHitInformation* getRecoHitInformation(UsedPXDHit* cdcHit) const
     {
@@ -184,123 +179,78 @@ namespace Belle2 {
 
     // Hits Information Questioning
     /**
-     * Return the tracking detector of a given hit (every type).
-     * @param hit
-     * @return the tracking detector.
+     * Return the tracking detector of a given hit (every type) or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
     TrackingDetector getTrackingDetector(HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return TrackingDetector::invalidTrackingDetector;
-      else
-        return recoHitInformation->getTrackingDetector();
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      return recoHitInformation->getTrackingDetector();
     }
 
     /**
-     * Return the right left information of a given hit (every type).
-     * @param hit
-     * @return the right left information
+     * Return the right left information of a given hit (every type) or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
     RightLeftInformation getRightLeftInformation(HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return RightLeftInformation::invalidRightLeftInformation;
-      else
-        return recoHitInformation->getRightLeftInformation();
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      return recoHitInformation->getRightLeftInformation();
     }
 
     /**
-     * Return the found by track finder flag for the given hit (every type)
-     * @param hit
-     * @return the found by track finder flag
+     * Return the found by track finder flag for the given hit (every type) or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
     OriginTrackFinder getFoundByTrackFinder(HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return OriginTrackFinder::invalidTrackFinder;
-      else
-        return recoHitInformation->getFoundByTrackFinder();
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      return recoHitInformation->getFoundByTrackFinder();
     }
 
     /**
-     * Return the sorting parameter for a given hit (every type)
-     * @param hit
-     * @return the soring paramter
+     * Return the sorting parameter for a given hit (every type) or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
-    double getSortingParameter(HitType* hit) const
+    unsigned int getSortingParameter(HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return std::nan("");
-      else
-        return recoHitInformation->getSortingParameter();
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      return recoHitInformation->getSortingParameter();
     }
 
     /**
-     * Set the right left information.
-     * @param hit
-     * @param rightLeftInformation
-     * @return
+     * Set the right left information or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
-    bool setRightLeftInformation(HitType* hit, RightLeftInformation rightLeftInformation) const
+    void setRightLeftInformation(HitType* hit, RightLeftInformation rightLeftInformation) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setRightLeftInformation(rightLeftInformation);
-
-      return true;
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      recoHitInformation->setRightLeftInformation(rightLeftInformation);
     }
 
     /**
-     * Set the found by track finder flag
-     * @param hit
-     * @param originTrackFinder
-     * @return
+     * Set the found by track finder flag or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
-    bool setFoundByTrackFinder(HitType* hit, OriginTrackFinder originTrackFinder) const
+    void setFoundByTrackFinder(HitType* hit, OriginTrackFinder originTrackFinder) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setFoundByTrackFinder(originTrackFinder);
-
-      return true;
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      recoHitInformation->setFoundByTrackFinder(originTrackFinder);
     }
 
     /**
-     * Set the sorting paramter
-     * @param hit
-     * @param sortingParameter
-     * @return
+     * Set the sorting parameter or throws an exception of the hit is not related to the track.
      */
     template <class HitType>
-    bool setSortingParameter(HitType* hit, double sortingParameter) const
+    void setSortingParameter(HitType* hit, unsigned int sortingParameter) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
-      if (recoHitInformation == nullptr)
-        return false;
-      else
-        recoHitInformation->setSortingParameter(sortingParameter);
-
-      return true;
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      recoHitInformation->setSortingParameter(sortingParameter);
     }
 
     // Hits Added Questioning
     /**
      * Returns true if the track has cdc hits.
-     * @return
      */
     bool hasCDCHits() const
     {
@@ -309,7 +259,6 @@ namespace Belle2 {
 
     /**
      * Returns true if the track has svd hits.
-     * @return
      */
     bool hasSVDHits() const
     {
@@ -318,7 +267,6 @@ namespace Belle2 {
 
     /**
      * Returns true if the track has pxd hits.
-     * @return
      */
     bool hasPXDHits() const
     {
@@ -328,7 +276,6 @@ namespace Belle2 {
     /**
      * Returns true if the given hit is in the track.
      * @param hit
-     * @return
      */
     template <class HitType>
     bool hasHit(HitType* hit) const
@@ -342,7 +289,6 @@ namespace Belle2 {
     // Hits Questioning
     /**
      * Return the number of cdc hits.
-     * @return
      */
     unsigned int getNumberOfCDCHits() const
     {
@@ -351,7 +297,6 @@ namespace Belle2 {
 
     /**
      * Return the number of svd hits.
-     * @return
      */
     unsigned int getNumberOfSVDHits() const
     {
@@ -360,7 +305,6 @@ namespace Belle2 {
 
     /**
      * Return the number of pxd hits.
-     * @return
      */
     unsigned int getNumberOfPXDHits() const
     {
@@ -378,7 +322,6 @@ namespace Belle2 {
 
     /**
      * Return an unsorted list of cdc hits.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedCDCHit*> getCDCHitList() const
     {
@@ -387,7 +330,6 @@ namespace Belle2 {
 
     /**
      * Return an unsorted list of svd hits.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedSVDHit*> getSVDHitList() const
     {
@@ -396,7 +338,6 @@ namespace Belle2 {
 
     /**
      * Return an unsorted list of pxd hits.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedPXDHit*> getPXDHitList() const
     {
@@ -405,7 +346,6 @@ namespace Belle2 {
 
     /**
      * Return a sorted list of cdc hits. Sorted by the sortingParameter.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedCDCHit*> getSortedCDCHitList() const
     {
@@ -414,7 +354,6 @@ namespace Belle2 {
 
     /**
      * Return a sorted list of svd hits. Sorted by the sortingParameter.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedSVDHit*> getSortedSVDHitList() const
     {
@@ -423,7 +362,6 @@ namespace Belle2 {
 
     /**
      * Return a sorted list of pxd hits. Sorted by the sortingParameter.
-     * @return
      */
     std::vector<Belle2::RecoTrack::UsedPXDHit*> getSortedPXDHitList() const
     {
@@ -433,7 +371,6 @@ namespace Belle2 {
     // Helix Stuff
     /**
      * Return the position stored in the reco track.
-     * @return
      */
     TVector3 getPosition() const
     {
@@ -443,7 +380,6 @@ namespace Belle2 {
 
     /**
      * Return the momentum stored in the reco track.
-     * @return
      */
     TVector3 getMomentum() const
     {
@@ -453,7 +389,6 @@ namespace Belle2 {
 
     /**
      * Return the charge stored in the reco track.
-     * @return
      */
     short int getCharge() const
     {
@@ -463,33 +398,17 @@ namespace Belle2 {
     // Hit Pattern stuff
     /**
      * Return the hit pattern for the cdc hits.
-     * @param pseudoCharge
-     * @return
-     * TODO: For this the sorting parameter has to be the travel S. We should think about this.
+     * TODO
      */
-    HitPatternCDC getHitPatternCDC(const short pseudoCharge) const
+    HitPatternCDC getHitPatternCDC(const short /*pseudoCharge*/) const
     {
       HitPatternCDC hitPatternCDC;
-
-      mapOnHits<UsedCDCHit>(m_storeArrayNameOfCDCHits, [&hitPatternCDC](const RecoHitInformation&, const UsedCDCHit * const hit) -> void {
-        // I need to initialize a WireID with the ID from the CDCHit to get the continuous layer ID.
-        WireID wireID(hit->getID());
-        // Then I set the corresponding layer in the hit pattern.
-        hitPatternCDC.setLayer(wireID.getICLayer());
-      }, [&pseudoCharge](const RecoHitInformation & hitInformation, const UsedCDCHit * const) -> bool {
-        // Little trick: if we want the first half, we want the s to be 0 <= s <= pi,
-        // if we want the second half, we want the s to be -pi <= s <= 0. Because -pi <= s <= pi is assured
-        // by the RecoHitInformation, we only have to test of s > 0 or s < 0. For speed we test if s > 0 or -s > 0.
-        return pseudoCharge * hitInformation.getSortingParameter() > 0;
-      });
       return hitPatternCDC;
     }
 
     /**
      * Return the hit pattern for the vxd hits.
-     * @param pseudoCharge
-     * @return
-     * TODO: For this the sorting parameter has to be the travel S. We should think about this.
+     * TODO
      */
     HitPatternVXD getHitPatternVXD(const short /*pseudoCharge*/) const
     {
@@ -510,28 +429,31 @@ namespace Belle2 {
 
     /**
      * Was the last fit sucessful?
-     * @return
      */
     bool wasLastFitSucessfull() const
     {
       return m_lastFitSucessfull;
     }
 
+    /** Name of the store array of the cdc hits */
     const std::string& getStoreArrayNameOfCDCHits() const
     {
       return m_storeArrayNameOfCDCHits;
     }
 
+    /** Name of the store array of the svd hits */
     const std::string& getStoreArrayNameOfSVDHits() const
     {
       return m_storeArrayNameOfSVDHits;
     }
 
+    /** Name of the store array of the pxd hits */
     const std::string& getStoreArrayNameOfPXDHits() const
     {
       return m_storeArrayNameOfPXDHits;
     }
 
+    /** Name of the store array of the reco hit informations. */
     const std::string& getStoreArrayNameOfRecoHitInformation() const
     {
       return m_storeArrayNameOfRecoHitInformation;
@@ -551,7 +473,7 @@ namespace Belle2 {
      * Add a generic hit with the given parameters for the reco hit information.
      * @param hit a generic hit.
      * @param params for the constructor of the reco hit information.
-     * @return
+     * @return true of the hit was new.
      */
     template<class HitType, class ...Args>
     bool addHit(HitType* hit, Args&& ... params) const
@@ -572,8 +494,8 @@ namespace Belle2 {
   public:
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
-     * @param storeArrayNameOfHits
-     * @param mapFunction
+     * @param storeArrayNameOfHits The store array the hits should come from.
+     * @param mapFunction Call this function for every hit (with its reco hit information)
      * @param pickFunction Use only those hits where the function returns true.
      */
     template<class HitType>
@@ -594,8 +516,8 @@ namespace Belle2 {
 
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track. Const version.
-     * @param storeArrayNameOfHits
-     * @param mapFunction
+     * @param storeArrayNameOfHits The store array the hits should come from.
+     * @param mapFunction Call this function for every hit (with its reco hit information)
      * @param pickFunction Use only those hits where the function returns true.
      */
     template<class HitType>
@@ -616,8 +538,8 @@ namespace Belle2 {
 
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track.
-     * @param storeArrayNameOfHits
-     * @param mapFunction
+     * @param storeArrayNameOfHits The store array the hits should come from.
+     * @param mapFunction Call this function for every hit (with its reco hit information)
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
@@ -628,8 +550,8 @@ namespace Belle2 {
 
     /**
      * Call a function on all hits of the given type in the store array, that are related to this track. Const version.
-     * @param storeArrayNameOfHits
-     * @param mapFunction
+     * @param storeArrayNameOfHits The store array the hits should come from.
+     * @param mapFunction Call this function for every hit (with its reco hit information)
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
@@ -640,25 +562,22 @@ namespace Belle2 {
 
   private:
     /**
-     * Add a generic hit with the given hit information.
-     * @param hit
-     * @param recoHitInformation
-     * @return
+     * Add the needed relations for adding a generic hit with the given hit information.
+     * @param hit The hit to add
+     * @param recoHitInformation The reco hit information of the hit.
      */
     template <class HitType>
-    bool addHitWithHitInformation(HitType* hit, RecoHitInformation* recoHitInformation) const
+    void addHitWithHitInformation(HitType* hit, RecoHitInformation* recoHitInformation) const
     {
       hit->addRelationTo(this);
       addRelationTo(recoHitInformation);
-
-      return true;
     }
 
     /**
      * Return the reco hit information for a generic hit from the storeArray.
-     * @param hit
-     * @param storeArrayNameOfHits
-     * @return
+     * @param hit the hit to look for.
+     * @param storeArrayNameOfHits The name of the StoreArray the hit belongs to.
+     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
      */
     template<class HitType>
     RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
@@ -675,16 +594,26 @@ namespace Belle2 {
       return nullptr;
     }
 
+    /** Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track. */
+    template <class HitType>
+    RecoHitInformation* getRecoHitInformationSavely(HitType* hit) const
+    {
+      RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
+      if (recoHitInformation == nullptr)
+        throw std::invalid_argument("Hit is not in track.");
+      else
+        return recoHitInformation;
+    }
+
     /**
-     * Calculate the time seed before fitting.
+     * Calculate the time seed before fitting and set it correctly in the genfit::Track.
      * @param particleWithPDGCode the particle we use for calculating the time seed.
      */
     void calculateTimeSeed(TParticlePDG* particleWithPDGCode);
 
     /**
-     * Get the number of hits for thee given hit type in the store array that are related to this track.
-     * @param storeArrayNameOfHits
-     * @return
+     * Get the number of hits for the given hit type in the store array that are related to this track.
+     * @param storeArrayNameOfHits The StoreArray to look for.
      */
     template <class HitType>
     unsigned int getNumberOfHitsOfGivenType(const std::string& storeArrayNameOfHits) const
@@ -694,8 +623,7 @@ namespace Belle2 {
 
     /**
      * Return a sorted list of hits of the given type in the store array that are related to this track.
-     * @param storeArrayNameOfHits
-     * @return
+     * @param storeArrayNameOfHits The StoreArray to look for.
      */
     template<class HitType>
     std::vector<HitType*> getSortedHitList(const std::string& storeArrayNameOfHits) const
@@ -728,8 +656,7 @@ namespace Belle2 {
     // Maybe an iterator would be better!
     /**
      * Return an unsorted list of hits of the given type in the store array that are related to this track.
-     * @param storeArrayNameOfHits
-     * @return
+     * @param storeArrayNameOfHits The StoreArray to look for.
      */
     template<class HitType>
     std::vector<HitType*> getHitList(const std::string& storeArrayNameOfHits) const
@@ -746,6 +673,6 @@ namespace Belle2 {
 
     //-----------------------------------------------------------------------------------
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 3);
+    ClassDef(RecoTrack, 4);
   };
 }

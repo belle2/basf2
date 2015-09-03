@@ -38,7 +38,7 @@ double histogram_integral(const TH1F* h, double xmin, double xmax)
     xmin = xmax;
     xmax = z;
   }
-  TAxis* axis = h->GetXaxis();
+  TAxis const* axis = h->GetXaxis();
   int bmin = axis->FindBin(xmin);
   int bmax = axis->FindBin(xmax);
   double integral = h->Integral(bmin, bmax);

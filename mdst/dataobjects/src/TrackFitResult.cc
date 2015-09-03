@@ -15,6 +15,7 @@
 #include <framework/utilities/HTML.h>
 
 #include <sstream>
+#include <assert.h>
 
 using namespace Belle2;
 

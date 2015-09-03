@@ -49,7 +49,7 @@ namespace Belle2 {
     int m_countBackgroundValid;
     int m_countClusters; // count all clusters
 
-    ofstream m_fileLog;
+    std::ofstream m_fileLog;
 
   protected:
     std::string m_filenameLog; /**< Filename of output log file */

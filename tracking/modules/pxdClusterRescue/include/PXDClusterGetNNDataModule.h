@@ -50,7 +50,7 @@ namespace Belle2 {
 
   private:
     PXDClusterRescueNNModule m_PXDClusterRescueNN;
-    ofstream m_fileData, m_fileLog;
+    std::ofstream m_fileData, m_fileLog;
 
   protected:
     std::string m_filenameData; /**< Filename of output data file */

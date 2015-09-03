@@ -165,8 +165,8 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
     if not config.configure(global_env):
         Exit(1)
 
-# Copy flags for cint
-global_env['CINTFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']]
+#cling remembers include paths to be able to find them at run-time, so only use -I here
+global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']]
 
 special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
 explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and not '/' in p.rstrip('/') and os.path.isdir(p)]

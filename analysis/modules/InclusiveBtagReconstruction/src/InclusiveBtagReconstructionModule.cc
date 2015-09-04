@@ -42,7 +42,7 @@ InclusiveBtagReconstructionModule::InclusiveBtagReconstructionModule() : Module(
   addParam("upsilonListName", m_upsilonListName, "Name of the ParticleList to be filled with Upsilon(4S) -> B:sig anti-B:tag",
            std::string("Upsilon(4S)"));
   addParam("bsigListName", m_bsigListName, "Name of the Bsig ParticleList", std::string(""));
-  addParam("btagListName", m_btagListName, "Name of the Bsig ParticleList", std::string(""));
+  addParam("btagListName", m_btagListName, "Name of the Btag ParticleList", std::string(""));
   addParam("inputListsNames", m_inputListsNames, "List of names of the ParticleLists which are used to reconstruct Btag from");
 }
 

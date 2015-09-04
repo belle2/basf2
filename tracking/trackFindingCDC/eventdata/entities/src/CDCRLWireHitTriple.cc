@@ -59,7 +59,7 @@ void CDCRLWireHitTriple::reverse()
 
 }
 
-void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo& startRLInfo)
+void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo startRLInfo)
 {
   if (startRLInfo != getStartRLInfo()) {
     const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -70,14 +70,14 @@ void CDCRLWireHitTriple::setStartRLInfo(const RightLeftInfo& startRLInfo)
 
 
 
-void CDCRLWireHitTriple::setMiddleRLInfo(const RightLeftInfo& middleRLInfo)
+void CDCRLWireHitTriple::setMiddleRLInfo(const RightLeftInfo middleRLInfo)
 {
   getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
 }
 
 
 
-void CDCRLWireHitTriple::setEndRLInfo(const RightLeftInfo& endRLInfo)
+void CDCRLWireHitTriple::setEndRLInfo(const RightLeftInfo endRLInfo)
 {
   getRearRLWireHitPair().setToRLInfo(endRLInfo);
 }

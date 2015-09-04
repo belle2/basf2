@@ -170,12 +170,12 @@ namespace Belle2 {
       /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
       ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer,
                                           bool movingOutward,
-                                          const ForwardBackwardInfo& forwardBackwardInfo) const;
+                                          const ForwardBackwardInfo forwardBackwardInfo) const;
       /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
+      ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const;
 
       /// Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getAxialISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const;
+      ISuperLayerType getAxialISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const;
 
     public:
       /// Indicates which superlayer the trajectory traverses after the one, where the start point of the trajectory is located.

@@ -130,7 +130,7 @@ size_t CDCWireHitTopology::dontUse(const std::vector<int>& iHits)
   int nHits = storedHits.getEntries();
 
   size_t nBlockedHits = 0;
-  for (const int& iHit : iHits) {
+  for (const int iHit : iHits) {
     if (iHit >= 0 and iHit < nHits) {
       const CDCHit* ptrHit = storedHits[iHit];
       const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
@@ -171,7 +171,7 @@ size_t CDCWireHitTopology::useOnly(const std::vector<int>& iHits)
   StoreArray<CDCHit> storedHits;
   int nHits = storedHits.getEntries();
 
-  for (const int& iHit : iHits) {
+  for (const int iHit : iHits) {
     if (iHit >= 0 and iHit < nHits) {
       const CDCHit* ptrHit = storedHits[iHit];
       const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
@@ -361,7 +361,7 @@ CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
 }
 
 const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
-                                                     const RightLeftInfo& rlInfo) const
+                                                     const RightLeftInfo rlInfo) const
 {
 
   std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
@@ -374,7 +374,7 @@ const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
 }
 
 const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
-                                                     const RightLeftInfo& rlInfo) const
+                                                     const RightLeftInfo rlInfo) const
 {
   const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
   return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;

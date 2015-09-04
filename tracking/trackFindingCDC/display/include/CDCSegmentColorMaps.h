@@ -22,7 +22,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      virtual std::string map(const int&, const CDCRecoSegment2D&)
+      virtual std::string map(const int, const CDCRecoSegment2D&)
       {
         return "";
       }
@@ -51,7 +51,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
 
     private:
       ListColors m_listColors;
@@ -65,7 +65,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     };
 
     /**
@@ -76,7 +76,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     };
 
     /**
@@ -87,7 +87,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     };
 
     /**
@@ -98,7 +98,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     };
 
     /**
@@ -109,7 +109,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     };
 
     /**
@@ -120,7 +120,7 @@ namespace Belle2 {
       /**
        * Function call to map a segments object from the local finder to a color.
        */
-      std::string map(const int& iSegment, const CDCRecoSegment2D& segment) override;
+      std::string map(const int iSegment, const CDCRecoSegment2D& segment) override;
     private:
       ListColors m_listColors;
     };

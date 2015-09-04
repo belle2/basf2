@@ -31,7 +31,7 @@ namespace Belle2 {
       { return m_rlInfo; }
 
       /// Setter for the right left passage hypothesis
-      void setRLInfo(const RightLeftInfo& rlInfo)
+      void setRLInfo(const RightLeftInfo rlInfo)
       { m_rlInfo = rlInfo; }
 
     private:

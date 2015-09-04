@@ -21,7 +21,7 @@ namespace Belle2 {
 
     public:
       /// Constructor from a wire hit and the right left passage hypotheses.
-      CDCRLTaggedWireHit(const CDCWireHit* wireHit, const RightLeftInfo& rlInfo = UNKNOWN) :
+      CDCRLTaggedWireHit(const CDCWireHit* wireHit, const RightLeftInfo rlInfo = UNKNOWN) :
         m_wireHit(wireHit),
         m_rlInfo(rlInfo)
       {;}
@@ -39,7 +39,7 @@ namespace Belle2 {
       { return m_rlInfo; }
 
       /// Setter for the right left passage hypothesis
-      void setRLInfo(const RightLeftInfo& rlInfo)
+      void setRLInfo(const RightLeftInfo rlInfo)
       { m_rlInfo = rlInfo; }
 
     private:

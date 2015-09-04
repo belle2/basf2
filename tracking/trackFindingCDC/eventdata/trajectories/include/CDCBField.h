@@ -52,7 +52,7 @@ namespace Belle2 {
      *  Clockwise travel        <-> Bz > 0 \n
      *  and opposite for negatively charged. \n
      *  Hence the charge sign is -CCWInfo * sign(Bz) */
-    SignType ccwInfoToChargeSign(const CCWInfo& ccwInfo);
+    SignType ccwInfoToChargeSign(const CCWInfo ccwInfo);
 
     /// Conversion helper from the charge sign to clockwise or counterclockwise travel
     CCWInfo chargeSignToCCWInfo(const SignType& chargeSign);

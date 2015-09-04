@@ -151,7 +151,7 @@ namespace Belle2 {
       { return getWireHit().getRefDriftLengthVariance(); }
 
       /// Getter for the right left passage information.
-      const RightLeftInfo& getRLInfo() const
+      RightLeftInfo getRLInfo() const
       { return m_rlInfo; }
 
       /** Reconstructs a position of primary ionisation on the drift circle.

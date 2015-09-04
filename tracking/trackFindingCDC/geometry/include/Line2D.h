@@ -59,7 +59,7 @@ namespace Belle2 {
        */
       static Line2D fromSlopeIntercept(const double slope,
                                        const double intercept,
-                                       const ForwardBackwardInfo& orientation)
+                                       const ForwardBackwardInfo orientation)
       { return Line2D(intercept * orientation, slope * orientation, -orientation); }
 
       /// Constructs a line through the two given points
@@ -117,7 +117,7 @@ namespace Belle2 {
 
       /// Setter for the intercept and slope with explicit orientation
       /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
-      void setSlopeIntercept(const double slope, const double intercept, const ForwardBackwardInfo& orientation)
+      void setSlopeIntercept(const double slope, const double intercept, const ForwardBackwardInfo orientation)
       { setN0(intercept * orientation); setN1(slope * orientation); setN2(-orientation); normalize(); }
 
 

@@ -13,7 +13,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-std::string inTrackIdToColor(const int& inTrackId)
+std::string inTrackIdToColor(const int inTrackId)
 {
   double hue(50 * inTrackId % 360 / 360.);
   double saturation = 0.75;
@@ -25,7 +25,7 @@ std::string inTrackIdToColor(const int& inTrackId)
   return oss.str();
 }
 
-std::string SegmentMCTrackIdColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentMCTrackIdColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -38,7 +38,7 @@ std::string SegmentMCTrackIdColorMap::map(const int&, const CDCRecoSegment2D& se
   }
 }
 
-std::string SegmentFBInfoColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentFBInfoColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -55,7 +55,7 @@ std::string SegmentFBInfoColorMap::map(const int&, const CDCRecoSegment2D& segme
   }
 }
 
-std::string SegmentFirstInTrackIdColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentFirstInTrackIdColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -67,7 +67,7 @@ std::string SegmentFirstInTrackIdColorMap::map(const int&, const CDCRecoSegment2
   return inTrackIdToColor(firstInTrackId);
 }
 
-std::string SegmentLastInTrackIdColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentLastInTrackIdColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -79,7 +79,7 @@ std::string SegmentLastInTrackIdColorMap::map(const int&, const CDCRecoSegment2D
   return inTrackIdToColor(lastInTrackId);
 }
 
-std::string SegmentFirstNPassedSuperLayersColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentFirstNPassedSuperLayersColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -91,7 +91,7 @@ std::string SegmentFirstNPassedSuperLayersColorMap::map(const int&, const CDCRec
   return inTrackIdToColor(firstNPassedSuperLayers);
 }
 
-std::string SegmentLastNPassedSuperLayersColorMap::map(const int&, const CDCRecoSegment2D& segment)
+std::string SegmentLastNPassedSuperLayersColorMap::map(const int, const CDCRecoSegment2D& segment)
 {
   CDCMCSegmentLookUp mcSegmentLookUp;
   mcSegmentLookUp.getInstance();
@@ -103,7 +103,7 @@ std::string SegmentLastNPassedSuperLayersColorMap::map(const int&, const CDCReco
   return inTrackIdToColor(lastNPassedSuperLayers);
 }
 
-std::string SegmentListColorsColorMap::map(const int& iSegment, const CDCRecoSegment2D&)
+std::string SegmentListColorsColorMap::map(const int iSegment, const CDCRecoSegment2D&)
 {
   return (m_listColors[iSegment % m_listColors.size()]);
 }

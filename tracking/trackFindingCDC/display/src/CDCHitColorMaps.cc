@@ -17,21 +17,21 @@ using namespace TrackFindingCDC;
 
 
 
-std::string ZeroDriftLengthColorMap::map(const int&, const CDCHit& cdcHit)
+std::string ZeroDriftLengthColorMap::map(const int, const CDCHit& cdcHit)
 {
   TrackFindingCDC::CDCWireHit wirehit(&cdcHit);
   if (wirehit.getRefDriftLength() == 0) return ("red");
   else return (m_bkgHitColor);
 }
 
-std::string ZeroDriftLengthStrokeWidthMap::map(const int&, const CDCHit& cdcHit)
+std::string ZeroDriftLengthStrokeWidthMap::map(const int, const CDCHit& cdcHit)
 {
   CDCWireHit wirehit(&cdcHit, nullptr);
   if (wirehit.getRefDriftLength() == 0) return ("1");
   else return ("0.2");
 }
 
-std::string TakenFlagColorMap::map(const int&, const CDCHit& cdcHit)
+std::string TakenFlagColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCWireHitTopology wireHitTopology;
   const CDCHit* cdcHitptr = &cdcHit;
@@ -41,7 +41,7 @@ std::string TakenFlagColorMap::map(const int&, const CDCHit& cdcHit)
   } else return m_bkgHitColor;
 }
 
-std::string RLColorMap::map(const int&, const CDCHit& cdcHit)
+std::string RLColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCMCHitLookUp mcHitLookUp;
   mcHitLookUp.getInstance();
@@ -57,7 +57,7 @@ std::string RLColorMap::info()
 }
 
 
-std::string PosFlagColorMap::map(const int&, const CDCHit& cdcHit)
+std::string PosFlagColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   int posFlag = simHit->getPosFlag();
@@ -71,7 +71,7 @@ std::string PosFlagColorMap::info()
   return "PosFlag variable of the related CDCSimHit: green <-> 0 (Right), red <-> 1 (Left), orange <-> determinable.";
 }
 
-std::string BackgroundTagColorMap::map(const int&, const CDCHit& cdcHit)
+std::string BackgroundTagColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* cdcSimHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   short backgroundtag = cdcSimHit->getBackgroundTag();
@@ -120,7 +120,7 @@ std::string BackgroundTagColorMap::info()
          );
 }
 
-std::string MCSegmentIdColorMap::map(const int&, const CDCHit& cdcHit)
+std::string MCSegmentIdColorMap::map(const int, const CDCHit& cdcHit)
 {
   TrackFindingCDC::CDCMCHitLookUp mcHitLookUp;
   mcHitLookUp.getInstance();
@@ -140,7 +140,7 @@ std::string MCSegmentIdColorMap::map(const int&, const CDCHit& cdcHit)
   }
 }
 
-std::string TOFColorMap::map(const int&, const CDCHit& cdcHit)
+std::string TOFColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   double timeOfFlight = simHit->getFlightTime();
@@ -163,7 +163,7 @@ std::string TOFColorMap::timeOfFlightToColor(const double timeOfFlight)
   return (color);
 }
 
-std::string ReassignedSecondaryMap::map(const int&, const CDCHit& cdcHit)
+std::string ReassignedSecondaryMap::map(const int, const CDCHit& cdcHit)
 {
   RelationVector<MCParticle> relatedMCParticles = cdcHit.getRelationsWith<MCParticle>("MCParticles");
   if (relatedMCParticles.size() == 0) return m_bkgHitColor;
@@ -174,7 +174,7 @@ std::string ReassignedSecondaryMap::map(const int&, const CDCHit& cdcHit)
   }
 }
 
-std::string MCParticleColorMap::map(const int&, const CDCHit& cdcHit)
+std::string MCParticleColorMap::map(const int, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
 
@@ -192,7 +192,7 @@ std::string MCParticleColorMap::map(const int&, const CDCHit& cdcHit)
   }
 }
 
-std::string MCPDGCodeColorMap::map(const int&, const CDCHit& cdcHit)
+std::string MCPDGCodeColorMap::map(const int, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
   int pdgcode;
@@ -232,7 +232,7 @@ std::string MCPDGCodeColorMap::info()
   return oss.str();
 }
 
-std::string MCPrimaryColorMap::map(const int&, const CDCHit& cdcHit)
+std::string MCPrimaryColorMap::map(const int, const CDCHit& cdcHit)
 {
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
   std::vector<int> secondary_type;
@@ -265,7 +265,7 @@ std::string MCPrimaryColorMap::info()
           "orange->beam background");
 }
 
-std::string SimHitPDGCodeColorMap::map(const int&, const CDCHit& cdcHit)
+std::string SimHitPDGCodeColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   int pdgCode;
@@ -281,7 +281,7 @@ std::string SimHitPDGCodeColorMap::map(const int&, const CDCHit& cdcHit)
   return m_missingPDGColor;
 }
 
-std::string SimHitIsBkgColorMap::map(const int&, const CDCHit& cdcHit)
+std::string SimHitIsBkgColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   bool bkgTag = simHit->getBackgroundTag();

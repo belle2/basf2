@@ -217,7 +217,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo& rlInfo) const;
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo rlInfo) const;
 
 
       /// String output operator for wire hit objects to help debugging

@@ -68,19 +68,19 @@ namespace Belle2 {
       { m_observations.reserve(nObservations * 4); }
 
       /// Getter for the x value of the observation at the given index.
-      double getX(const int& iObservation) const
+      double getX(const int iObservation) const
       { return m_observations[iObservation * 4]; }
 
       /// Getter for the y value of the observation at the given index.
-      double getY(const int& iObservation) const
+      double getY(const int iObservation) const
       { return m_observations[iObservation * 4 + 1]; }
 
       /// Getter for the signed drift radius of the observation at the given index.
-      double getDriftLength(const int& iObservation) const
+      double getDriftLength(const int iObservation) const
       { return m_observations[iObservation * 4 + 2]; }
 
       /// Getter for the weight / inverse variance of the observation at the given index.
-      double getWeight(const int& iObservation) const
+      double getWeight(const int iObservation) const
       { return m_observations[iObservation * 4 + 3]; }
 
       /** Appends the observed position.
@@ -146,7 +146,7 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                    const RightLeftInfo& rlInfo = ZERO)
+                    const RightLeftInfo rlInfo = ZERO)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
         const double driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
@@ -170,7 +170,7 @@ namespace Belle2 {
        */
       size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
       {
-        const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
+        const RightLeftInfo rlInfo = rlTaggedWireHit.getRLInfo();
         const CDCWireHit* ptrWireHit = rlTaggedWireHit.getWireHit();
         return append(*ptrWireHit, rlInfo);
       }

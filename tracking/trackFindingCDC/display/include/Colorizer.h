@@ -46,7 +46,7 @@ namespace Belle2 {
       /**
        * Maps the object and its id to a color.
        */
-      std::string mapStroke(const int& objectID, const Object& object)
+      std::string mapStroke(const int objectID, const Object& object)
       {
         return m_strokeMethodPtr->map(objectID, object);
       }
@@ -54,7 +54,7 @@ namespace Belle2 {
       /**
        * Maps the object and its id to a StrokeWidth.
        */
-      std::string mapStrokeWidth(const int& objectID, const Object& object)
+      std::string mapStrokeWidth(const int objectID, const Object& object)
       {
         return m_strokeWidthMethodPtr->map(objectID, object);
       }

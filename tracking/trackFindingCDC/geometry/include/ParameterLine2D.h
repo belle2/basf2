@@ -51,7 +51,7 @@ namespace Belle2 {
        */
       static ParameterLine2D fromSlopeIntercept(const double slope,
                                                 const double intercept,
-                                                const ForwardBackwardInfo& orientation)
+                                                const ForwardBackwardInfo orientation)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(orientation, orientation * slope)); }
 
 

@@ -109,7 +109,7 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo& rlInfo) const
+Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo rlInfo) const
 {
   const StereoType stereoType = getStereoType();
   if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {

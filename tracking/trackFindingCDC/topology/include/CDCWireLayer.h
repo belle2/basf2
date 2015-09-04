@@ -100,10 +100,10 @@ namespace Belle2 {
        *  Watch out : The CDCGeometryPar class just grew a shift property. \n
        *  Check if that is the same as this.
        */
-      const CCWInfo& getShift() const { return m_shift; }
+      CCWInfo getShift() const { return m_shift; }
 
       /// Sets the shift of this wire layer
-      void setShift(const CCWInfo& shift) const { m_shift = shift; }
+      void setShift(const CCWInfo shift) const { m_shift = shift; }
       /**@}*/
 
 

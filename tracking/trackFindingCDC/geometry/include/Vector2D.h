@@ -218,7 +218,7 @@ namespace Belle2 {
       inline Vector2D orthogonal() const { return Vector2D(-y(), x()); }
 
       /// Orthogonal vector to the direction given by the counterclockwise info
-      inline Vector2D orthogonal(const CCWInfo& ccw_info) const { return Vector2D(-ccw_info * y(), ccw_info * x()); }
+      inline Vector2D orthogonal(const CCWInfo ccw_info) const { return Vector2D(-ccw_info * y(), ccw_info * x()); }
 
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n

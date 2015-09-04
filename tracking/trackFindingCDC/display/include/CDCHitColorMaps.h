@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      virtual std::string map(const int&, const CDCHit&) {return m_bkgHitColor;}
+      virtual std::string map(const int, const CDCHit&) {return m_bkgHitColor;}
 
       /**
        * Informal string summarizing the translation variables to colors.
@@ -96,7 +96,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     /**
@@ -107,7 +107,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a stroke width.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     /**
@@ -118,7 +118,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     /**
@@ -129,7 +129,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Informal string summarizing the translation from right left passage variable to colors.
        */
@@ -144,7 +144,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Informal string summarizing the translation from CDCSimHit::getPosFlag variable to colors.
        */
@@ -159,7 +159,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Informal string summarizing the translation from CDCSimHit::getBackgroundTag variable to colors.
        */
@@ -174,7 +174,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     /**
@@ -185,7 +185,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Translates the given floating point time of flight to a color.
        */
@@ -200,7 +200,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     class MCParticleColorMap : public CDCHitColorMap {
@@ -213,7 +213,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     private:
       ListColors m_listColors;
       std::map<int, std::string> m_newColors;
@@ -228,7 +228,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Informal string summarizing the translation from pdg codes to colors.
        */
@@ -247,7 +247,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
       /**
        * Informal string summarizing the translation from seconday process codes to colors.
        */
@@ -264,7 +264,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
     /**
@@ -275,7 +275,7 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      std::string map(const int& iCDCHit, const CDCHit& cdcHit) override;
+      std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
   }//namespace TrackFindingCDC

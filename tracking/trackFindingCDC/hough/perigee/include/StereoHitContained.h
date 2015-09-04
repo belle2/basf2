@@ -101,7 +101,7 @@ namespace Belle2 {
         const CDCWireHit* wireHit = rlTaggedTrackHit->getUnderlayingCDCWireHit();
 
         const CDCWire& wire = wireHit->getWire();
-        const RightLeftInfo& rlInfo = rlTaggedTrackHit.getRLInfo();
+        const RightLeftInfo rlInfo = rlTaggedTrackHit.getRLInfo();
         const double driftLength = wireHit->getRefDriftLength();
 
         RightLeftInfo newRLInfo =
@@ -142,7 +142,7 @@ namespace Belle2 {
                                const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlTaggedWireHit->getWire();
-        const RightLeftInfo& rlInfo = rlTaggedWireHit.getRLInfo();
+        const RightLeftInfo rlInfo = rlTaggedWireHit.getRLInfo();
         const double driftLength = rlTaggedWireHit->getRefDriftLength();
 
         RightLeftInfo newRLInfo =
@@ -181,7 +181,7 @@ namespace Belle2 {
       inline RightLeftInfo containsRightOrLeft(const HoughBox& houghBox,
                                                const CDCWire& wire,
                                                const double driftLength,
-                                               const RightLeftInfo& rlInfo = UNKNOWN)
+                                               const RightLeftInfo rlInfo = UNKNOWN)
       {
         bool isRightIn = rlInfo != LEFT and contains(houghBox, wire, driftLength);
         bool isLeftIn = rlInfo != RIGHT and contains(houghBox, wire, -driftLength);

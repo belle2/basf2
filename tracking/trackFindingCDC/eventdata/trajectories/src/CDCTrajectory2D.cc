@@ -150,7 +150,7 @@ Vector2D CDCTrajectory2D::getExit() const
 
 
 ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
-                                                     const ForwardBackwardInfo& forwardBackwardInfo) const
+                                                     const ForwardBackwardInfo forwardBackwardInfo) const
 {
   if (forwardBackwardInfo != FORWARD and forwardBackwardInfo != BACKWARD) return INVALID_ISUPERLAYER;
   if (fromISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
@@ -183,7 +183,7 @@ ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& from
   }
 }
 
-ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const
+ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const
 {
   bool movingOutward = isMovingOutward();
   ISuperLayerType startISuperLayer = getStartISuperLayer();
@@ -205,7 +205,7 @@ ISuperLayerType CDCTrajectory2D::getPreviousISuperLayer() const
 
 
 
-ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const ForwardBackwardInfo& forwardBackwardInfo) const
+ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const
 {
 
   ISuperLayerType startISuperLayer = getStartISuperLayer();

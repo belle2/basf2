@@ -40,7 +40,7 @@ namespace Belle2 {
       { ; }
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
-      Circle2D(const Vector2D& center, const double absRadius, const CCWInfo& ccwInfo):
+      Circle2D(const Vector2D& center, const double absRadius, const CCWInfo ccwInfo):
         m_center(center),
         m_radius(fabs(absRadius) * ccwInfo)
       { ; }

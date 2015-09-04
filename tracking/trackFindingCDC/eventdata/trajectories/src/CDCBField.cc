@@ -55,7 +55,7 @@ double TrackFindingCDC::getAlphaZ(const Vector3D& pos3D)
   return getAlphaFromBField(getBFieldZ(pos3D));
 }
 
-SignType TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo& ccwInfo)
+SignType TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo ccwInfo)
 {
   return - ccwInfo * getBFieldZSign();
 }

@@ -68,7 +68,7 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
 
 GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
                                                          const double absRadius,
-                                                         const CCWInfo& orientation)
+                                                         const CCWInfo orientation)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setCenterAndRadius(center, absRadius, orientation);
@@ -100,7 +100,7 @@ GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvatur
 
 void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
                                            const double absRadius,
-                                           const CCWInfo& orientation)
+                                           const CCWInfo orientation)
 {
   double curvature = orientation / fabs(absRadius);
   setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);

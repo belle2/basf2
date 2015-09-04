@@ -75,7 +75,7 @@ namespace Belle2 {
       */
       static GeneralizedCircle fromCenterAndRadius(const Vector2D& center,
                                                    const double absRadius,
-                                                   const CCWInfo& orientation = CCW);
+                                                   const CCWInfo orientation = CCW);
 
       /**
       Constructor of a generalized circle from perigee parameters.
@@ -147,7 +147,7 @@ namespace Belle2 {
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
                               const double absRadius,
-                              const CCWInfo& orientation = CCW);
+                              const CCWInfo orientation = CCW);
 
       /// Setter for the perigee parameters
       void setPerigeeParameters(const double curvature,

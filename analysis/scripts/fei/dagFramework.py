@@ -232,7 +232,11 @@ class DAG(object):
         Saves self.resources to cacheFile
         """
         if os.path.isfile(cacheFile):
-            shutil.copyfile(cacheFile, cacheFile + '.bkp')
+            backup_file = cacheFile + '.bkp'
+            version = 0
+            while os.path.isfile(backup_file + str(version)):
+                version += 1
+            shutil.copyfile(cacheFile, backup_file + str(version))
         with open(cacheFile, 'w') as f:
             cPickle.dump([resource for resource in self.resources.values() if resource.cache], f)
 

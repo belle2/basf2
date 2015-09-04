@@ -206,6 +206,7 @@ class TestMakeParticleList(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               maximumNumberOfCandidates=1000,
                                decayMode=23, cut='[1.5 < M < 2.0] and [p > 3]')
         self.assertEqual(self.resource, result)
 
@@ -216,6 +217,7 @@ class TestMakeParticleList(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               maximumNumberOfCandidates=1000,
                                decayMode=23, cut='1.5 < M < 2.0')
         self.assertEqual(self.resource, result)
 
@@ -226,6 +228,7 @@ class TestMakeParticleList(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               maximumNumberOfCandidates=1000,
                                decayMode=23, cut='p > 3')
         self.assertEqual(self.resource, result)
 
@@ -236,6 +239,7 @@ class TestMakeParticleList(unittest.TestCase):
         result = MockResource(cache=True)
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
+                               maximumNumberOfCandidates=1000,
                                decayMode=23, cut='')
         self.assertEqual(self.resource, result)
 
@@ -389,6 +393,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
         result.path.add_module('PreCutHistMaker', fileName='CutHistograms_UniqueChannelName:42.root',
                                decayString='D+:42 ==> pi+:1 K+:1', cut=self.userCut,
                                target='isSignal', variable=self.preCutConfig.variable,
+                               maximumNumberOfCandidates=1000,
                                histParams=self.preCutConfig.binning)
         self.assertEqual(self.resource, result)
 
@@ -404,6 +409,7 @@ class TestCreatePreCutHistogram(unittest.TestCase):
         result.path.add_module('PreCutHistMaker', fileName='CutHistograms_UniqueChannelName:42.root',
                                decayString='D+:42 ==> pi+:1 K+:1', cut=self.userCut,
                                target='isSignal', variable=self.preCutConfig.variable,
+                               maximumNumberOfCandidates=1000,
                                customBinning=self.preCutConfig.binning)
         self.assertEqual(self.resource, result)
 

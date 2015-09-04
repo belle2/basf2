@@ -152,7 +152,16 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, user
         cut = ''
     particleList = particleName + ':' + resource.hash
     decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
-    modularAnalysis.reconstructDecay(decayString, cut, decayModeID, writeOut=True, path=resource.path)
+
+    pmake = register_module('ParticleCombiner')
+    pmake.set_name('ParticleCombiner_' + decayString)
+    pmake.param('decayString', decayString)
+    pmake.param('cut', cut)
+    pmake.param('maximumNumberOfCandidates', 1000)
+    pmake.param('decayMode', decayModeID)
+    pmake.param('writeOut', True)
+    resource.path.add_module(pmake)
+
     return particleList
 
 
@@ -260,6 +269,7 @@ def CreatePreCutHistogram(resource, particleName, channelName, mvaTarget, preCut
     pmake.param('fileName', filename)
     pmake.param('decayString', outputList)
     pmake.param('cut', userCut)
+    pmake.param('maximumNumberOfCandidates', 1000)
     pmake.param('target', mvaTarget)
     pmake.param('variable', preCutConfig.variable)
     if isinstance(preCutConfig.binning, tuple):

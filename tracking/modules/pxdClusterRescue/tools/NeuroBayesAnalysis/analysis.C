@@ -1242,7 +1242,7 @@ void netplot(TFile* f, int HbookMode)
   if(h1!=NULL) {
     const int nbins = h1->GetNbinsX();
 
-    double* hsigni = new double [nbins];
+    auto hsigni = std::vector<double>(nbins);
     for (int i=0;i<nbins;i++)
       {
 	hsigni[i] = h1->GetBinContent(i+1); //0 is overflow, nbins+1 is overflow
@@ -1660,7 +1660,7 @@ struct myCorrelSigni{
   char prepro[100];
 };
 
-void bubblesort(myCorrelSigni *v, int n, string sortVal) {
+void bubblesort(std::vector<myCorrelSigni> & v, int n, string sortVal) {
 
   for (int i = n - 1; i >= 0; i--) {
     // innere Schleife abhängig von i (Korrelation)
@@ -2087,7 +2087,7 @@ void analysis( string FileName = "teacherHistos.root",
 	  
       // shaded area above the line which represent
       // the performance of the best possible selection
-      float x2[4] = {0.,PurEffGraph[2]->GetBinContent(nBins),0,0};
+      float x2[4] = {0.,float(PurEffGraph[2]->GetBinContent(nBins)),0,0};
       float y2[4] = {0.,1.,1.,0};
       lineMax = new TCutG("lineMax",4,x2,y2);
       lineMax->SetFillColor(14);
@@ -2214,7 +2214,7 @@ void analysis( string FileName = "teacherHistos.root",
   string line;
   string line2;
 
-  myCorrelSigni* correlSigni = new myCorrelSigni[numInputVars];
+  auto correlSigni = std::vector<myCorrelSigni>(numInputVars);
   bool found_num_signi_vars = false;
   int num_signi_vars;
 
@@ -2622,7 +2622,6 @@ void analysis( string FileName = "teacherHistos.root",
     }
   PSFile->Close();
 
-  delete [] correlSigni;
   delete lineMin;
   delete lineMax;
 

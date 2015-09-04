@@ -143,7 +143,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
 	const int nbinsvar = ++nbinsconv;
 	if ( verbose > 0)
 	  std::cerr << " with " << nbinsvar-1 << " bins " << std::endl;
-	float* binedge = new float[nbinsvar];
+	auto binedge = std::vector<float>(nbinsvar);
 	
 	sprintf(hName,"h%i",(int)histId);
 	j=0;
@@ -153,7 +153,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
 	    std::cerr << " binedge is " << binedge[j] << std::endl;
 	  j++;
 	}
-	TH1F* histo1xbin = new TH1F(hName,"",nbinsHist,binedge);
+	TH1F* histo1xbin = new TH1F(hName,"",nbinsHist,binedge.data());
 	i=1;
 	while(i<nbinsvar) {// read the bin content
 	  float tmp;
@@ -174,7 +174,6 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
 	if(allNulls) histo1xbin->SetEntries(0);
 	histo1xbin->Write();
 	
-	delete binedge;
 	delete histo1xbin;
 	
       }
@@ -185,6 +184,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
     std::cout<<"ERROR: histogram ascii file "<<filenameIn<<" not found"<<std::endl;
     return;
   }
+  fclose(teacherHistos);
   std::cout<<"... finished"<<endl;
   return;
 }

@@ -104,7 +104,7 @@ namespace Belle2 {
 
       /// Indicator if any of the two oriented wire hits is based on the given wire
       bool hasWire(const CDCWire& wire) const
-      { return getFromRLWireHit()->hasWire(wire) or getToRLWireHit()->hasWire(wire); }
+      { return getFromRLWireHit()->isOnWire(wire) or getToRLWireHit()->isOnWire(wire); }
 
 
       /// Getter for the hit wire of the first oriented wire hit

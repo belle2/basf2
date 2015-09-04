@@ -105,7 +105,7 @@ namespace Belle2 {
       { return getWireHit().getWire(); }
 
       /// Checks if the oriented hit is associated with the give wire
-      bool hasWire(const CDCWire& wire) const
+      bool isOnWire(const CDCWire& wire) const
       { return getWire() == wire; }
 
       /// Getter for the WireID of the wire the hit is located on.

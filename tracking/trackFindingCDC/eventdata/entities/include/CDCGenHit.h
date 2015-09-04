@@ -77,7 +77,7 @@ namespace Belle2 {
        *  All entities ( track parts contained in a single superlayer ) share this interface to help the definition of collections of them. */
       /**@{*/
       /// Checks of the generic hit is base on the wire given
-      bool hasWire(const CDCWire& wire) const
+      bool isOnWire(const CDCWire& wire) const
       { return getWire() == wire; }
 
       /// Checks of the generic wire hit

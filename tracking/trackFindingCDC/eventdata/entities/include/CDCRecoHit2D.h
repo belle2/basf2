@@ -171,8 +171,8 @@ namespace Belle2 {
       { return getRLWireHit().getRefPos2D(); }
 
       /// Checks if the reconstructed hit is assoziated with the give wire
-      bool hasWire(const CDCWire& wire) const
-      { return getRLWireHit().hasWire(wire); }
+      bool isOnWire(const CDCWire& wire) const
+      { return getRLWireHit().isOnWire(wire); }
 
       /// Getter for the wire hit assoziated with the reconstructed hit.
       const CDCWireHit& getWireHit() const

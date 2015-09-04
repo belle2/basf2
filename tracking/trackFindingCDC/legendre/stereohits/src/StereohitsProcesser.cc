@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const
+bool StereohitsProcesser::isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const
 {
   if (rlWireHit.getStereoType() == StereoType_c::Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
@@ -45,25 +45,20 @@ bool StereohitsProcesser::rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, c
 void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, const CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = fabs(trajectory2D.getGlobalCircle().radius());
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-  hitsVector.reserve(wireHitTopology.getRLWireHits().size());
+  const auto& rlWireHits = wireHitTopology.getRLWireHits();
+  hitsVector.reserve(rlWireHits.size());
 
-  for (const CDCRLWireHit& rlWireHit : wireHitTopology.getRLWireHits()) {
-    if (rlWireHitMatchesTrack(rlWireHit, trajectory2D)) {
-      const CDCWire& wire = rlWireHit.getWire();
-      const double forwardZ = wire.getSkewLine().forwardZ();
-      const double backwardZ = wire.getSkewLine().backwardZ();
+  for (const CDCRLWireHit& rlWireHit : rlWireHits) {
+    if (isValidHitTrajectoryMatch(rlWireHit, trajectory2D)) {
 
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
-      if (backwardZ < recoPos3D.z() and recoPos3D.z() < forwardZ) {
+      const CDCWire& wire = rlWireHit.getWire();
+      if (wire.isInCellZBounds(recoPos3D)) {
         FloatType perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
-        // It is very important that we have only positive values of the perpS here:
-        if (perpS < 0) {
-          perpS += 2 * TMath::Pi() * radius;
-        }
-        hitsVector.push_back(new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS));
+        CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS);
+        hitsVector.push_back(newRecoHit);
       }
     }
   }
@@ -72,6 +67,8 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
     const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const
 {
+  B2INFO("Number of doubled hits: " << doubledRecoHits.size());
+
   foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
   foundStereoHits.end(), [&doubledRecoHits](HitType * recoHit3D) -> bool {
     return std::find(doubledRecoHits.begin(), doubledRecoHits.end(), recoHit3D) != doubledRecoHits.end();
@@ -169,24 +166,24 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
 }
 
 
-void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int m_param_minimumHits)
+void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int minimumNumberOfHits)
 {
   std::vector<HitType*> hitsVector;
   fillHitsVector(hitsVector, track);
 
   m_newQuadTree.seed(hitsVector);
 
-  typedef pair<Z0TanLambdaBox, vector<HitType*>> Result;
-  const std::vector<Result>& possibleStereoSegments = m_newQuadTree.findHighest(m_param_minimumHits);
+  const std::vector<pair<Z0TanLambdaBox, vector<HitType*>>>& foundStereoHitsWithNode =
+    m_newQuadTree.findHighest(minimumNumberOfHits);
 
   m_newQuadTree.fell();
 
-  if (possibleStereoSegments.size() != 1)
+  if (foundStereoHitsWithNode.size() != 1)
     return;
 
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
-  auto foundStereoHits = possibleStereoSegments[0].second;
-  auto node = possibleStereoSegments[0].first;
+  auto foundStereoHits = foundStereoHitsWithNode[0].second;
+  auto node = foundStereoHitsWithNode[0].first;
 
   std::vector<HitType*> doubledRecoHits;
   doubledRecoHits.reserve(foundStereoHits.size() / 2);

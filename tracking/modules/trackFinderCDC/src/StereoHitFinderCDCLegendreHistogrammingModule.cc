@@ -61,38 +61,25 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  //create object which will add stereohits to tracks
-
-
   if (m_param_useOldImplementation) {
     for (CDCTrack& track : tracks) {
       m_stereohitsProcesser->makeHistogramming(track, m_param_minimumHitsInQuadTree);
-      track.sortByArcLength2D();
+
     }
   } else {
     for (CDCTrack& track : tracks) {
       m_stereohitsProcesser->makeHistogrammingWithNewQuadTree(track, m_param_minimumHitsInQuadTree);
-      track.sortByArcLength2D();
     }
   }
 
-  // Fit the tracks
-  const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-
+  // Postprocessing: sort by arc length, set all arc lengths to be positive and fit the tracks.
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
   for (CDCTrack& track : tracks) {
-    CDCObservations2D szObservations;
-    for (const CDCRecoHit3D& recoHit : track) {
-      if (recoHit.getStereoType() != StereoType_c::Axial) {
-        szObservations.append(recoHit.getArcLength2D(), recoHit.getRecoZ());
-      }
-    }
+    track.shiftToPositiveArcLengths2D();
+    track.sortByArcLength2D();
 
-    if (szObservations.size() > 2) {
-      CDCTrajectorySZ szTrajectory;
-      fitter.update(szTrajectory, track);
-
-      CDCTrajectory3D trajectory3D(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
-      track.setStartTrajectory3D(trajectory3D);
-    }
+    const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
+    CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
+    track.setStartTrajectory3D(newStartTrajectory);
   }
 }

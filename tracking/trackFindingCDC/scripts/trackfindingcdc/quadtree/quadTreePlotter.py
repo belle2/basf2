@@ -344,7 +344,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         a hit belongs to
         """
         z0 = [self.range_y_min, self.range_y_max]
-        l = np.array((np.array(recoHit.getRecoPos3D().z()) - z0) / recoHit.getPerpS())
+        l = np.array((np.array(recoHit.getRecoPos3D().z()) - z0) / recoHit.getArcLength2D())
         return l, z0
 
     def plot_hit_line(self, recoHit, color):
@@ -419,7 +419,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                     recoHit = self.create_reco_hit(cdcHit, trajectory, mcHitLookUp.getRLInfo(cdcHit))
 
                     if recoHit:
-                        l = (recoHit.getRecoPos3D().z() - z0) / recoHit.getPerpS()
+                        l = (recoHit.getRecoPos3D().z() - z0) / recoHit.getArcLength2D()
                         plt.plot(l, z0, marker="o", color=map[mcTrackID % len(map)], ls="", alpha=0.2)
 
         if self.draw_track_hits:
@@ -438,7 +438,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
                 if (self.delete_bad_hits and
                     (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
-                     not recoHit.isInCDC())):
+                     not recoHit.isInCellZBounds())):
                     continue
 
                 if recoHit in last_track.items():

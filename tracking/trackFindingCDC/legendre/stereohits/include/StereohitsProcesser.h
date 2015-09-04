@@ -44,7 +44,7 @@ namespace Belle2 {
        * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
        * and each hit is assigned to the track.
        * */
-      void makeHistogramming(CDCTrack& track, unsigned int m_param_minimumHits);
+      void makeHistogramming(CDCTrack& track, unsigned int minimumNumberOfHits);
 
       /**
        * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
@@ -52,14 +52,14 @@ namespace Belle2 {
        * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
        * and each hit is assigned to the track.
        * */
-      void makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int m_param_minimumHits);
+      void makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int minimumNumberOfHits);
 
     private:
       /// We will use CDCRecoHits3D in the QuadTrees.
       typedef const CDCRecoHit3D HitType;
 
       /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
-      bool rlWireHitMatchesTrack(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const;
+      bool isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const;
 
       /**
        * Fill the given vector with all not used rl wire hits that could match the given track as CDCRecoHits3D.

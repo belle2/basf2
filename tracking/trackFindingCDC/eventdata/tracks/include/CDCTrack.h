@@ -159,6 +159,10 @@ namespace Belle2 {
         });
       }
 
+      /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
+      /// This can only be done if the radius is not infinity (for example cosmics).
+      void shiftToPositiveArcLengths2D();
+
       /// Sort the CDCRecoHits by their CDCWireHit.
       void sort() __attribute__((deprecated));
 

@@ -130,6 +130,26 @@ namespace Belle2 {
       /// Update the trajectory with a fit to the observations.
       void update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const;
 
+      /// Returns the fitted sz trajectory of the track with the z-information of all stereo hits of the number
+      /// of stereo hits is big enough. Else return the basic assumption.
+      CDCTrajectorySZ fitWithStereoHits(CDCTrack& track) const
+      {
+        CDCObservations2D observationsSZ;
+        for (const CDCRecoHit3D& recoHit : track) {
+          if (recoHit.getStereoType() != StereoType_c::Axial) {
+            appendSZ(observationsSZ, recoHit);
+          }
+        }
+
+        if (observationsSZ.size() > 3) {
+          CDCTrajectorySZ szTrajectory;
+          update(szTrajectory, track);
+          return szTrajectory;
+        } else {
+          return CDCTrajectorySZ::basicAssumption();
+        }
+      }
+
     }; //class
   } // end namespace TrackFindingCDC
 } // namespace Belle2

@@ -148,3 +148,17 @@ void CDCTrack::receiveMaskedFlag() const
 
 void CDCTrack::sort()
 { std::sort(begin(), end()); }
+
+void CDCTrack::shiftToPositiveArcLengths2D()
+{
+  const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();
+  const FloatType radius = startTrajectory2D.getLocalCircle().radius();
+
+  if (not std::isinf(radius)) {
+    const FloatType shiftValue = 2 * TMath::Pi() * radius;
+    for (CDCRecoHit3D& recoHit : *this) {
+      if (recoHit.getArcLength2D() < 0)
+        recoHit.shiftArcLength2D(shiftValue);
+    }
+  }
+}

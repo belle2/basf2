@@ -107,7 +107,7 @@ void ProfileModule::event()
   m_nEvents++;
 }
 
-void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::string xAxisName,
+void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::string yAxisName,
                                      std::string imgOutput, MemoryExtractLambda lmdMemoryExtract)
 {
   // Create and save a plot of the memory usage vs. time
@@ -125,7 +125,7 @@ void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::s
     graph->Draw("ALP");
     TH1* histo = graph->GetHistogram();
     histo->SetTitle("");
-    histo->GetYaxis()->SetTitle(title.c_str());
+    histo->GetYaxis()->SetTitle(yAxisName.c_str());
     histo->GetXaxis()->SetTitle("Time [s]");
     can->Print(imgOutput.c_str());
     saveDir->cd();
@@ -138,7 +138,7 @@ void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::s
   profileHistogram.assign(new TH1D(name.c_str(), title.c_str(),  nPoints + 1, 0 - 0.5 * m_step, m_nEvents + 0.5 * m_step), true);
   profileHistogram->SetDirectory(0);
   profileHistogram->SetStats(0);
-  profileHistogram->GetYaxis()->SetTitle(xAxisName.c_str());
+  profileHistogram->GetYaxis()->SetTitle(yAxisName.c_str());
   profileHistogram->GetXaxis()->SetTitle("Event");
   profileHistogram->SetBinContent(1, lmdMemoryExtract(m_initializeInfo) * factorMB);
   for (int i = 0; i < nPoints; i++) {
@@ -163,8 +163,9 @@ void ProfileModule::terminate()
     B2INFO("Execution time per event [ms]   : " << 1000 * (m_endInfo.virtualMem - m_startInfo.time) / (m_nEvents - k_burnIn));
   }
 
+  // store the plots of ther memory consumption for virtual and rss memory
   storeMemoryGraph("VirtualMemoryProfile", "Virtual Memory usage", "Virtual Memory Usage [MB]",
-  m_outputFileName, [](MemTime const & m) { return m.virtualMem;});
+                   m_outputFileName, m_extractVirtualMem);
   storeMemoryGraph("RssMemoryProfile", "Rss Memory usage", "Rss Memory Usage [MB]",
-  m_rssOutputFileName, [](MemTime const & m) { return m.rssMem;});
+                   m_rssOutputFileName, m_extractRssMem);
 }

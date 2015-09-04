@@ -21,6 +21,21 @@ namespace Belle2 {
    *
    * This module adds a ProfileInfo object to the datastore and records
    * execution time and memory usage in it.
+   *
+   * Both the virtual memory and the resident set size (rss) of the process
+   * is reported. Both quantities are important and have a complementary meaning:
+   *
+   * virtual size (vsize): The memory region the kernal has reserved for the process
+   * in its memory management, included swapped pages (which are not in RAM, but on disk) and
+   * half-filled pages.
+   * It also includes files which get mapped into the memory region of the process, but are only
+   * loaded on-demand in RAM. All libraries loaded are memory-mapped and show up in the vsize.
+   *
+   * resident set size (rss): The Rss is the memory which is actually occupied by
+   * the process in the physical RAM of the machine. It usually is significantly smaller
+   * than the vsize. This is the quantity which should actually be used when checking
+   * and optimizing the memory consumption of the application.
+   *
    */
   class ProfileModule : public Module {
 
@@ -80,8 +95,36 @@ namespace Belle2 {
       double time;        /**< execution time */
     };
 
+    /**
+     * Signature of the lambda functions, which are used to extract the memory
+     * usage from teh MemTime structure.
+     * Depending on the type of memory usage (rss, vsize), this lamdba function
+     * can contain different statements.
+     */
     typedef std::function< unsigned long (MemTime const&) > MemoryExtractLambda;
 
+    /**
+     * Lambda expression to return the virtual memory from a MemTime data structure
+     */
+    const MemoryExtractLambda m_extractVirtualMem = [](MemTime const& m) { return m.virtualMem;};
+
+    /**
+     * Lambda expression to return the Rss memory from a MemTime data structure
+     */
+    const MemoryExtractLambda m_extractRssMem = [](MemTime const& m) { return m.rssMem;};
+
+    /**
+     * Stores the memory usage of the application over time in plots.
+     * @param name The name used to store the memory plot in the data store
+     * @param title The title displayed on the memory plot
+     * @param yAxisName Text displayed on the y-axis. Depending on the plotted quantitiy,
+     *                  either vsize or rss, this can vary.
+     * @param imgOutput If this string is not empty a plot of the memory consumption over
+     *                  time is also written to disk using imgOutput as file name (must include
+     *                  file extension)
+     * @param lmdMemoryExtract Lambda expression to extrat the plotted memory quantity from the MemTime
+     *                         data structure. Use either m_extractVirtualMem or m_extractRssMem here
+     */
     void storeMemoryGraph(std::string name, std::string title, std::string xAxisName, std::string imgOutput,
                           MemoryExtractLambda lmdMemoryExtract);
 

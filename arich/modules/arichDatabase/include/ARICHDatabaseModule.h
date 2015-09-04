@@ -12,12 +12,16 @@
 
 #include <framework/core/Module.h>
 
-// DB structures in arich/dbobjects/
+// DB structures in arich/dbobjects
 #include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHHapdQA.h>
 
 #include <string>
 #include <TFile.h>
-#include <TH1F.h>
+#include <TTimeStamp.h>
+#include <TH1S.h>
+#include <TH2F.h>
+#include <TGraph.h>
 #include <vector>
 
 namespace Belle2 {
@@ -79,10 +83,12 @@ namespace Belle2 {
 
   private:
 
-    enum {c_NumAgels = 357, c_NumTrans = 26};
-
     int m_runLow;
     int m_runHigh;
+    std::string m_wr;
+    std::vector<std::string> m_inputFileNames;
+
+    GearDir m_content;
     double m_version;
     std::string m_serial;
     std::string m_id;
@@ -93,8 +99,17 @@ namespace Belle2 {
     std::vector<double> m_transmittance;
     int lambda;
     double val;
-    GearDir m_content;
-    std::string m_wr;
+
+    std::string m_hapdSerial;
+    TTimeStamp m_measurementDate;
+    std::vector<TGraph*> m_leakCurrent;
+    TH2F* m_hitData2D;
+    std::vector<TGraph*> m_noise;
+    std::vector<TH1S*> m_hitCount;
+
+    std::string chipname;
+    std::string number;
+    std::string graphName;
   };
 
 } // Belle2 namespace

@@ -87,11 +87,11 @@ namespace {
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
                                                  "Fitter " << typeid(fitter).name() << " failed.";
 
-    const double& curv = fittedCircle.curvature();
-    const double& I = fittedCircle.impact();
-    const double& phi = fittedCircle.tangentialPhi();
+    const double curv = fittedCircle.curvature();
+    const double I = fittedCircle.impact();
+    const double phi = fittedCircle.tangentialPhi();
 
-    const double& chi2 = fittedCircle.chi2();
+    const double chi2 = fittedCircle.chi2();
 
     B2INFO("Curvature " << curv);
     B2INFO("Tangential phi " << phi);

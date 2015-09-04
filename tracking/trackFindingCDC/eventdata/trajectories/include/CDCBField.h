@@ -34,7 +34,7 @@ namespace Belle2 {
     double getBFieldZ(const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
 
     /// Translater from magnetic field strength in Tesla to the alpha value.
-    double getAlphaFromBField(const double& bField);
+    double getAlphaFromBField(const double bField);
 
     /// Getter for the signed alpha of the magnetic field in z direction
     double getAlphaZ(const Vector2D& pos2D);
@@ -58,33 +58,33 @@ namespace Belle2 {
     CCWInfo chargeSignToCCWInfo(const SignType& chargeSign);
 
     /// Conversion help for charges to clockwise or counterclockwise travel.
-    CCWInfo chargeToCCWInfo(const double& charge);
+    CCWInfo chargeToCCWInfo(const double charge);
 
     /// Conversion helper for momenta to two dimensional curvature
-    double absMom2DToCurvature(const double& absMom2D,
-                               const double& charge,
-                               const double& bZ);
+    double absMom2DToCurvature(const double absMom2D,
+                               const double charge,
+                               const double bZ);
 
     /// Conversion helper for momenta to two dimensional curvature
-    double absMom2DToCurvature(const double& absMom2D,
-                               const double& charge,
+    double absMom2DToCurvature(const double absMom2D,
+                               const double charge,
                                const Vector2D& pos2D);
 
     /// Conversion helper for momenta to two dimensional curvature
-    double absMom2DToCurvature(const double& absMom2D,
-                               const double& charge,
+    double absMom2DToCurvature(const double absMom2D,
+                               const double charge,
                                const Vector3D& pos3D);
 
     /// Conversion helper for two dimensional curvature to momenta
-    double curvatureToAbsMom2D(const double& curvature,
-                               const double& bZ);
+    double curvatureToAbsMom2D(const double curvature,
+                               const double bZ);
 
     /// Conversion helper for two dimensional curvature to momenta
-    double curvatureToAbsMom2D(const double& curvature,
+    double curvatureToAbsMom2D(const double curvature,
                                const Vector2D& pos2D);
 
     /// Conversion helper for two dimensional curvature to momenta
-    double curvatureToAbsMom2D(const double& curvature,
+    double curvatureToAbsMom2D(const double curvature,
                                const Vector3D& pos3D);
 
   } // namespace TrackFindingCDC

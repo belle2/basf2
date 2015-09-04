@@ -53,22 +53,22 @@ namespace Belle2 {
       {;}
 
       /// Constructor taking the slope and intercept of the line that shall be superimposed with the sin curve.
-      SinEqLine(const double& slope, const double& intercept) :
+      SinEqLine(const double slope, const double intercept) :
         m_slope(slope),
         m_intercept(intercept)
       {;}
 
 
       /// Interpreting as the function f this method carries out the translation from x to y coordinates.
-      double map(const double& x) const
+      double map(const double x) const
       { return sin(x) - getSlope() * x - getIntercept(); }
 
       /// Interpreting as the function f this method calculates the gradient as need in Newtons algorithms.
-      double gradient(const double& x) const
+      double gradient(const double x) const
       { return cos(x) - getSlope(); }
 
       /// Returns the half period index in which the x position is located.
-      Index getIHalfPeriod(const double& x) const
+      Index getIHalfPeriod(const double x) const
       { return floor(x / PI); }
 
       /* Computes the positive solution that has the smallest value of x.
@@ -152,11 +152,11 @@ namespace Belle2 {
       { return fabs(getSlope()) >= 1; }
 
       /// Getter for the slope
-      const double& getSlope() const
+      double getSlope() const
       { return m_slope; }
 
       /// Getter for the intercept
-      const double& getIntercept() const
+      double getIntercept() const
       { return m_intercept; }
 
     private:

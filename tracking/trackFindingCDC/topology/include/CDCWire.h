@@ -179,11 +179,11 @@ namespace Belle2 {
       }
 
       /// Gives the xy projected position of the wire at the given z coordinate
-      Vector2D getWirePos2DAtZ(const double& z) const
+      Vector2D getWirePos2DAtZ(const double z) const
       { return getSkewLine().pos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
-      Vector3D getWirePos3DAtZ(const double& z) const
+      Vector3D getWirePos3DAtZ(const double z) const
       { return getSkewLine().pos3DAtZ(z); }
 
       /// Calculates the distance from the position to the wire
@@ -219,7 +219,7 @@ namespace Belle2 {
       /// Getter for the wire reference z coordinate
       /** Gives the wire's reference z coordinate
        */
-      const double& getRefZ() const
+      double getRefZ() const
       { return getSkewLine().refZ(); }
 
       /// Getter for the tangents of the stereo angle of the wire.
@@ -262,10 +262,10 @@ namespace Belle2 {
       }
 
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
-      const double& getForwardPhiToRef() const { return m_forwardPhiToRef; }
+      double getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
       /// Getter for the azimuth angle of the backward joint point of the wire relativ to its reference
-      const double& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
+      double getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
       /// Getter for azimuth angle range covered by the wire relativ to the reference point.
       /** Gives the range of azimuth angles a stereo wires covers relativ to its reference position. \n

@@ -39,7 +39,7 @@ bool TrackFindingCDC::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 
 
 
-ISuperLayerType TrackFindingCDC::getISuperLayerAtCylindricalR(const double& cylindricalR)
+ISuperLayerType TrackFindingCDC::getISuperLayerAtCylindricalR(const double cylindricalR)
 {
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
   const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();

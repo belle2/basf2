@@ -46,7 +46,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<Node>::processLeaf(Node
   CDCTrajectory2D trajectory2D = fitter.fit(*leaf);
   GeneralizedCircle circle = trajectory2D.getGlobalCircle();
   {
-    const double& curv = circle.curvature();
+    const double curv = circle.curvature();
     std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
 
     const float& lowerCurv = *(curvs[0]);
@@ -56,10 +56,10 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<Node>::processLeaf(Node
     }
   }
 
-  const double& curv = circle.curvature();
+  const double curv = circle.curvature();
   // const Vector2D& phi0Vec = circle.tangential();
-  const double& phi0 = circle.tangentialPhi();
-  // const double& impact = circle.impact();
+  const double phi0 = circle.tangentialPhi();
+  // const double impact = circle.impact();
   const Vector2D& perigee = circle.perigee();
 
   // Next we reject high momentum tracks

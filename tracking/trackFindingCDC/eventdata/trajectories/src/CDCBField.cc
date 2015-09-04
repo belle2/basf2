@@ -40,7 +40,7 @@ double TrackFindingCDC::getBFieldZ(const Vector3D& pos3D)
   return mag3D.Z();
 }
 
-double TrackFindingCDC::getAlphaFromBField(const double& bField)
+double TrackFindingCDC::getAlphaFromBField(const double bField)
 {
   return 1.0 / (bField * TMath::C()) * 1E11;
 }
@@ -65,45 +65,45 @@ CCWInfo TrackFindingCDC::chargeSignToCCWInfo(const SignType& chargeSign)
   return - chargeSign * getBFieldZSign();
 }
 
-CCWInfo TrackFindingCDC::chargeToCCWInfo(const double& charge)
+CCWInfo TrackFindingCDC::chargeToCCWInfo(const double charge)
 {
   return chargeSignToCCWInfo(sign(charge));
 }
 
-double TrackFindingCDC::absMom2DToCurvature(const double& absMom2D,
-                                            const double& charge,
-                                            const double& bZ)
+double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
+                                            const double charge,
+                                            const double bZ)
 {
   return - charge * bZ * 0.00299792458 / absMom2D;
 }
 
-double TrackFindingCDC::absMom2DToCurvature(const double& absMom2D,
-                                            const double& charge,
+double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
+                                            const double charge,
                                             const Vector2D& pos2D)
 {
   return absMom2DToCurvature(absMom2D, charge, getBFieldZ(pos2D));
 }
 
-double TrackFindingCDC::absMom2DToCurvature(const double& absMom2D,
-                                            const double& charge,
+double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,
+                                            const double charge,
                                             const Vector3D& pos3D)
 {
   return absMom2DToCurvature(absMom2D, charge, getBFieldZ(pos3D));
 }
 
-double TrackFindingCDC::curvatureToAbsMom2D(const double& curvature,
-                                            const double& bZ)
+double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,
+                                            const double bZ)
 {
   return std::fabs(bZ * 0.00299792458 / curvature);
 }
 
-double TrackFindingCDC::curvatureToAbsMom2D(const double& curvature,
+double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,
                                             const Vector2D& pos2D)
 {
   return curvatureToAbsMom2D(curvature, getBFieldZ(pos2D));
 }
 
-double TrackFindingCDC::curvatureToAbsMom2D(const double& curvature,
+double TrackFindingCDC::curvatureToAbsMom2D(const double curvature,
                                             const Vector3D& pos3D)
 {
   return curvatureToAbsMom2D(curvature, getBFieldZ(pos3D));

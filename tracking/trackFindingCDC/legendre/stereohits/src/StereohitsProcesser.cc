@@ -193,12 +193,12 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
     const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
     for (auto innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
       if (currentHit == (*innerIterator)->getWireHit().getHit()) {
-        const double& lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
-        const double& lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
-        const double& lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
-        const double& lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
+        const double lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
+        const double lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
+        const double lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
+        const double lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
 
-        const double& zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
+        const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
           doubledRecoHits.push_back(*outerIterator);

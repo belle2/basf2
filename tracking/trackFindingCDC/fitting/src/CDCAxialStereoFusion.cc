@@ -500,9 +500,9 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     for (CDCRecoHit3D& recoHit3D : stereoSegment3D) {
       const CDCWire& wire = recoHit3D.getWire();
 
-      const double& oldZ = recoHit3D.getRecoZ();
+      const double oldZ = recoHit3D.getRecoZ();
 
-      const double& s = recoHit3D.getArcLength2D();
+      const double s = recoHit3D.getArcLength2D();
       const double newZ = trajectorySZ.mapSToZ(s);
 
       Vector3D recoPos3DCorrection = wire.getWireVector();

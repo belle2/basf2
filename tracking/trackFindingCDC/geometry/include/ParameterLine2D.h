@@ -41,16 +41,16 @@ namespace Belle2 {
       /** Orientation will be coaligned with the first axes.
        *  Tangential vector is normalized to have a unit in the first coordinate.
        */
-      static ParameterLine2D fromSlopeIntercept(const double& slope,
-                                                const double& intercept)
+      static ParameterLine2D fromSlopeIntercept(const double slope,
+                                                const double intercept)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(1.0, slope)); }
 
       /// Constructs a line with slope and intercept. Orientation means the alignment with the first axes.
       /** Orientation will be coaligned or antialigned as given.
        *  Tangential vector is normalized to have a unit in the first coordinate.
        */
-      static ParameterLine2D fromSlopeIntercept(const double& slope,
-                                                const double& intercept,
+      static ParameterLine2D fromSlopeIntercept(const double slope,
+                                                const double intercept,
                                                 const ForwardBackwardInfo& orientation)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(orientation, orientation * slope)); }
 
@@ -95,7 +95,7 @@ namespace Belle2 {
       const Vector2D& support() const { return m_support; }
 
       /// Evaluates the line formula at the parameter given
-      Vector2D at(const double& parameter) const
+      Vector2D at(const double parameter) const
       { return tangential() * parameter += support(); }
 
       ///Indicates if the tangential vector point in a commmon direction with the first coordinate axes
@@ -127,7 +127,7 @@ namespace Belle2 {
       /// Calculates the signed distance of the point given by its to coordinates to the line.
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      double distance(const double& first, const double& second) const
+      double distance(const double first, const double second) const
       { return distance(Vector2D(first, second)); }
 
       /// Gives the signed distance of the origin
@@ -210,18 +210,18 @@ namespace Belle2 {
       /** This moves the parameter by -delta and the following relation hold \n
        *  old at(p) = new at(p - delta) hence the coordinate at is diminished \n
        *  This corresponds to a passive movement of the coordinate system on the line */
-      void passiveMoveAtBy(const double& delta)
+      void passiveMoveAtBy(const double delta)
       { m_support += tangential() * delta; }
 
       /// Moves the line in the given direction in place. Corresponds to an active transformation.
       void moveBy(const Vector2D& by)
       { m_support += by; }
       /// Moves the line along the first coordinate axes in place. Corresponds to an active transformation.
-      void moveAlongFirst(const double& first)
+      void moveAlongFirst(const double first)
       { m_support.setFirst(m_support.first() + first); }
 
       /// Moves the line along the second coordinate axes in place. Corresponds to an active transformation.
-      void moveAlongSecond(const double& second)
+      void moveAlongSecond(const double second)
       { m_support.setSecond(m_support.second() + second); }
 
       /// Moves the coordinate system in the given direction  in place. Corresponds to a passive transformation.
@@ -229,11 +229,11 @@ namespace Belle2 {
       { m_support -= by; }
 
       /// Moves the coordinate system along the first coordinate axes in place. Corresponds to a passive transformation.
-      void passiveMoveAlongFirst(const double& first)
+      void passiveMoveAlongFirst(const double first)
       { m_support.setFirst(m_support.first() - first); }
 
       /// Moves the coordinate system along the second coordinate axes in place. Corresponds to a passive transformation.
-      void passiveMoveAlongSecond(const double& second)
+      void passiveMoveAlongSecond(const double second)
       { m_support.setSecond(m_support.second() - second); }
       /**@}*/
       /** @name Line as a function of the first coordinate
@@ -248,12 +248,12 @@ namespace Belle2 {
       /// First coordinate for second being zero
       double zero() const { return support().first() - inverseSlope() * support().second(); }
       /// Method mapping the first coordinate to the second according to the line
-      double map(const double& first) const { return  support().second() + slope() * (first - support().first()); }
+      double map(const double first) const { return  support().second() + slope() * (first - support().first()); }
       /// Operator mapping the first coordinate to the second according to the line
-      double operator()(const double& first) const { return  map(first); }
+      double operator()(const double first) const { return  map(first); }
 
       /// Method for the inverse mapping the second coordinate to the first according to the line
-      double inverseMap(const double& second) const { return  support().first() + inverseSlope() * (second - support().second()); }
+      double inverseMap(const double second) const { return  support().first() + inverseSlope() * (second - support().second()); }
 
       /// Turns the line into its inverse function in place. Orientation will be flipped as well
       void invert() { m_tangential.swapCoordinates(); m_support.swapCoordinates(); }

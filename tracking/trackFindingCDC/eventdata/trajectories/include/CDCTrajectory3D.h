@@ -63,17 +63,17 @@ namespace Belle2 {
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory3D(const Vector3D& startPoint,
                       const Vector3D& startMomentum,
-                      const double& charge);
+                      const double charge);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       /// Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
       CDCTrajectory3D(const Vector3D& startPoint,
                       const Vector3D& startMomentum,
-                      const double& charge,
-                      const double& bZ);
+                      const double charge,
+                      const double bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
-      CDCTrajectory3D(const MCParticle& mcParticle, const double& bZ);
+      CDCTrajectory3D(const MCParticle& mcParticle, const double bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       explicit CDCTrajectory3D(const MCParticle& mcParticle);
@@ -86,7 +86,7 @@ namespace Belle2 {
       explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
-      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double& bZ);
+      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
@@ -108,7 +108,7 @@ namespace Belle2 {
     public:
 
       /// Copies the trajectory information to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand, const double& bZ) const;
+      bool fillInto(genfit::TrackCand& trackCand, const double bZ) const;
 
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
@@ -161,13 +161,13 @@ namespace Belle2 {
       //{ return getLocalCircle().tangential(point - getLocalOrigin().xy()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
-      double getAbsMom3D(const double& bZ) const;
+      double getAbsMom3D(const double bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom3D() const;
 
       /// Get the momentum at the start point of the trajectory
-      inline Vector3D getMom3DAtSupport(const double& bZ) const
+      inline Vector3D getMom3DAtSupport(const double bZ) const
       { return  getUnitMom3DAtSupport() *= getAbsMom3D(bZ);  }
 
       /// Get the momentum at the start point of the trajectory
@@ -185,7 +185,7 @@ namespace Belle2 {
 
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const double& charge);
+      void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const double charge);
 
       /// Clears all information from this trajectoy
       void clear()
@@ -200,7 +200,7 @@ namespace Belle2 {
       { return getLocalHelix().tanLambda(); }
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaIntercept(const double& tanLambdaShift, const double& zShift)
+      void shiftTanLambdaIntercept(const double tanLambdaShift, const double zShift)
       { m_localHelix.shiftTanLambdaZ0(tanLambdaShift, zShift); }
 
 
@@ -242,7 +242,7 @@ namespace Belle2 {
       { return getLocalHelix().chi2(); }
 
       /// Setter for the chi square value of the helix fit
-      void setChi2(const double& chi2)
+      void setChi2(const double chi2)
       { return m_localHelix.setChi2(chi2); }
 
       /// Getter for the number of degrees of freedom of the helix fit.

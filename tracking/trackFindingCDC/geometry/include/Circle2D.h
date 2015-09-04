@@ -34,13 +34,13 @@ namespace Belle2 {
       { ; }
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
-      Circle2D(const Vector2D& center, const double& radius):
+      Circle2D(const Vector2D& center, const double radius):
         m_center(center),
         m_radius(radius)
       { ; }
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
-      Circle2D(const Vector2D& center, const double& absRadius, const CCWInfo& ccwInfo):
+      Circle2D(const Vector2D& center, const double absRadius, const CCWInfo& ccwInfo):
         m_center(center),
         m_radius(fabs(absRadius) * ccwInfo)
       { ; }
@@ -194,7 +194,7 @@ namespace Belle2 {
 
       /// Getter for the signed radius
       /** The sign encodes the orientation of the circle */
-      const double& radius() const
+      double radius() const
       { return m_radius; }
 
       /// Getter for the square radius
@@ -233,11 +233,11 @@ namespace Belle2 {
       { m_center += by; }
 
       /// Activelly moves the circle in the direction given in place along the first coordinate
-      void moveAlongFirst(const double& first)
+      void moveAlongFirst(const double first)
       { m_center.setFirst(m_center.first() + first); }
 
       /// Activelly moves the circle in the direction given in place along the second coordinate
-      void moveAlongSecond(const double& second)
+      void moveAlongSecond(const double second)
       { m_center.setSecond(m_center.second() + second); }
 
       /// Passivelly move the coordinate system  in place by the given vector
@@ -245,11 +245,11 @@ namespace Belle2 {
       { m_center -= by; }
 
       /// Passivelly move the coordinate system in place along the first coordinate
-      void passiveMoveAlongFirst(const double& first)
+      void passiveMoveAlongFirst(const double first)
       { m_center.setFirst(m_center.first() - first); }
 
       /// Passivelly move the coordinate system in place along the second coordinate
-      void passiveMoveAlongSecond(const double& second)
+      void passiveMoveAlongSecond(const double second)
       { m_center.setSecond(m_center.second() - second); }
       /**@}*/
 

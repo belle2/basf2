@@ -84,8 +84,8 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
 }
 
 CDCWireHit::CDCWireHit(const WireID& wireID,
-                       const double& driftLength,
-                       const double& driftLengthVariance):
+                       const double driftLength,
+                       const double driftLengthVariance):
   m_automatonCell(1),
   m_refDriftLength(driftLength),
   m_refDriftLengthVariance(driftLengthVariance),
@@ -100,7 +100,7 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
   Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
 
   const Vector2D& wirePos2D = getWire().getRefPos2D();
-  const double& driftLength = getRefDriftLength();
+  const double driftLength = getRefDriftLength();
 
   Vector2D disp2D = recoPos2D - wirePos2D;
 
@@ -114,7 +114,7 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const Ri
   const StereoType stereoType = getStereoType();
   if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {
     const BoundSkewLine& skewLine = getWire().getSkewLine();
-    const double& signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
+    const double signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(skewLine, signedDriftLength);
 
   } else if (stereoType == StereoType_c::Axial) {

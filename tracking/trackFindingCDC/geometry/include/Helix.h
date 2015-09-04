@@ -49,21 +49,21 @@ namespace Belle2 {
         m_lineSZ(Line2D::fromSlopeIntercept(parameters(iTanL), parameters(iZ0)))
       {;}
 
-      Helix(const double& curvature,
-            const double& tangentialPhi,
-            const double& impact,
-            const double& tanLambda,
-            const double& z0) :
+      Helix(const double curvature,
+            const double tangentialPhi,
+            const double impact,
+            const double tanLambda,
+            const double z0) :
         m_circleXY(curvature, tangentialPhi, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
 
 
-      Helix(const double& curvature,
+      Helix(const double curvature,
             const Vector2D& tangential,
-            const double& impact,
-            const double& tanLambda,
-            const double& z0) :
+            const double impact,
+            const double tanLambda,
+            const double z0) :
         m_circleXY(curvature, tangential, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
@@ -107,7 +107,7 @@ namespace Belle2 {
 
       /** Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
        *  Returns NAN if the radius cannot be reached.*/
-      double arcLength2DToCylindricalR(const double& cylindricalR) const
+      double arcLength2DToCylindricalR(const double cylindricalR) const
       { return circleXY().arcLengthToCylindricalR(cylindricalR); }
 
       /// Calculates the point of closest approach on the helix to the given point.
@@ -141,7 +141,7 @@ namespace Belle2 {
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaZ0(const double& tanLambdaShift, const double& zShift)
+      void shiftTanLambdaZ0(const double tanLambdaShift, const double zShift)
       {
         double z0 = m_lineSZ.intercept();
         double tanLambda = m_lineSZ.slope();
@@ -149,15 +149,15 @@ namespace Belle2 {
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector3D atArcLength2D(const double& s) const
+      Vector3D atArcLength2D(const double s) const
       { return Vector3D(circleXY().atArcLength(s), lineSZ().map(s)); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector3D atZ(const double& z) const
+      Vector3D atZ(const double z) const
       { return Vector3D(xyAtZ(z), z); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector2D xyAtZ(const double& z) const
+      Vector2D xyAtZ(const double z) const
       { return Vector2D(circleXY().atArcLength(lineSZ().inverseMap(z))); }
 
 
@@ -170,7 +170,7 @@ namespace Belle2 {
       { return circleXY().maximalCylindricalR(); }
 
       /// Getter for the signed curvature in the xy projection.
-      inline const double& curvatureXY() const
+      inline double curvatureXY() const
       { return circleXY().curvature(); }
 
       /// Getter for the signed distance to the z axes at the support point.
@@ -229,11 +229,11 @@ namespace Belle2 {
       { return circleXY().tangential(); }
 
       /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
-      const double& tangentialPhi() const
+      double tangentialPhi() const
       { return circleXY().tangentialPhi(); }
 
       /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
-      const  double& phi0() const
+      double phi0() const
       { return tangentialPhi(); }
 
       /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h

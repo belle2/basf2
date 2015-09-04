@@ -10,7 +10,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-double HLSToRGB::hueToRgb(const double& p, const double& q, double t)
+double HLSToRGB::hueToRgb(const double p, const double q, double t)
 {
   if (t < 0) t += 1;
   if (t > 1) t -= 1;
@@ -26,7 +26,7 @@ double HLSToRGB::hueToRgb(const double& p, const double& q, double t)
   return p;
 }
 
-std::vector<double> HLSToRGB::hlsToRgb(const double& h, const double& l, const double& s)
+std::vector<double> HLSToRGB::hlsToRgb(const double h, const double l, const double s)
 {
   std::vector<double> result;
 

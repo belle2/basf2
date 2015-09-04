@@ -95,10 +95,10 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const double& x,
-                    const double& y,
-                    const double& signedRadius = 0.0,
-                    const double& weight = 1.0)
+      size_t append(const double x,
+                    const double y,
+                    const double signedRadius = 0.0,
+                    const double weight = 1.0)
       {
         if (std::isnan(x)) return 0;
         if (std::isnan(y)) return 0;
@@ -132,8 +132,8 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::Vector2D& pos2D,
-                    const double& signedRadius = 0.0,
-                    const double& weight = 1.0)
+                    const double signedRadius = 0.0,
+                    const double weight = 1.0)
       { return append(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
       /** Appends the hit circle at wire reference position without a right left passage hypotheses.

@@ -158,7 +158,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHits(const Helix& globalHelix,
-                                const double& arcLength2DOffset) const
+                                const double arcLength2DOffset) const
 {
 
   vector<SimpleSimHit> simpleSimHits;
@@ -267,7 +267,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
                                         const Helix& globalHelix,
-                                        const double& arcLength2DOffset) const
+                                        const double arcLength2DOffset) const
 {
   std::vector<SimpleSimHit> result;
 
@@ -307,7 +307,7 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
 CDCSimpleSimulation::SimpleSimHit
 CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
                                       const Helix& globalHelix,
-                                      const double& arcLength2DOffset) const
+                                      const double arcLength2DOffset) const
 {
   double arcLength2D = globalHelix.arcLength2DToXY(wire.getRefPos2D());
   if ((arcLength2D + arcLength2DOffset) < 0) {

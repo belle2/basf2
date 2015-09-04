@@ -212,7 +212,7 @@ namespace Belle2 {
       const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
 
       /// Getter for the z coordinate of the reconstructed position
-      const double& getRecoZ() const { return getRecoPos3D().z(); }
+      double getRecoZ() const { return getRecoPos3D().z(); }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position
       Vector2D getRecoDisp2D() const;
@@ -246,7 +246,7 @@ namespace Belle2 {
       { return m_arcLength2D; }
 
       /// Setter for the travel distance in the xy projection
-      void setArcLength2D(const double& arcLength2D)
+      void setArcLength2D(const double arcLength2D)
       { m_arcLength2D = arcLength2D; }
 
       /** indicator if the hit is in the cdc or already outside its boundaries.

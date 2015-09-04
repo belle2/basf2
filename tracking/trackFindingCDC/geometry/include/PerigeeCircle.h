@@ -35,14 +35,14 @@ namespace Belle2 {
       PerigeeCircle();
 
       /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as vector.
-      PerigeeCircle(const double& curvature,
+      PerigeeCircle(const double curvature,
                     const Vector2D& tangential,
-                    const double& impact);
+                    const double impact);
 
       /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as azimuth angle
-      PerigeeCircle(const double& curvature,
-                    const double& tangentialPhi,
-                    const double& impact);
+      PerigeeCircle(const double curvature,
+                    const double tangentialPhi,
+                    const double impact);
 
       /// Constructor from the perigee parammeters.
       explicit PerigeeCircle(const TVectorD& parameters);
@@ -51,10 +51,10 @@ namespace Belle2 {
     private:
       /// Constructor taking all stored parameters for internal use.
       PerigeeCircle(const GeneralizedCircle& n0123,
-                    const double& curvature,
-                    const double& tangentialPhi,
+                    const double curvature,
+                    const double tangentialPhi,
                     const Vector2D& tangential,
-                    const double& impact);
+                    const double impact);
 
     public:
       /// Constructor from a two dimensional line
@@ -67,15 +67,15 @@ namespace Belle2 {
       explicit PerigeeCircle(const Circle2D& circle);
 
       /// Constructor with the four parameters of the generalized circle
-      static PerigeeCircle fromN(const double& n0,
-                                 const double& n1,
-                                 const double& n2,
-                                 const double& n3 = 0);
+      static PerigeeCircle fromN(const double n0,
+                                 const double n1,
+                                 const double n2,
+                                 const double n3 = 0);
 
       /// Constructor with the four parameters of the generalized circle
-      static PerigeeCircle fromN(const double& n0,
+      static PerigeeCircle fromN(const double n0,
                                  const Vector2D& n12,
-                                 const double& n3 = 0);
+                                 const double n3 = 0);
 
 
       /// Constructor from center, radius and a optional orientation
@@ -83,7 +83,7 @@ namespace Belle2 {
        *  This constructor makes an orientated representation from them. If not given the orientation defaults to
        *  mathematical positiv counterclockwise. */
       static PerigeeCircle fromCenterAndRadius(const Vector2D& center,
-                                               const double& absRadius,
+                                               const double absRadius,
                                                const CCWInfo& orientation = CCW);
 
       /// Empty deconstructor
@@ -104,7 +104,7 @@ namespace Belle2 {
     public:
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
-                              const double& absRadius,
+                              const double absRadius,
                               const CCWInfo& orientation = CCW)
       {
         GeneralizedCircle::setCenterAndRadius(center, absRadius, orientation);
@@ -112,9 +112,9 @@ namespace Belle2 {
       }
 
       /// Setter for the perigee parameters
-      void setPerigeeParameters(const double& curvature,
+      void setPerigeeParameters(const double curvature,
                                 const Vector2D& tangential,
-                                const double& impact)
+                                const double impact)
       {
         m_impact = impact;
         m_tangentialPhi = tangential.phi();
@@ -125,9 +125,9 @@ namespace Belle2 {
 
 
       /// Setter for the perigee parameters
-      inline void setPerigeeParameters(const double& curvature,
-                                       const double& tangentialPhi,
-                                       const double& impact)
+      inline void setPerigeeParameters(const double curvature,
+                                       const double tangentialPhi,
+                                       const double impact)
       {
         m_impact = impact;
         m_tangentialPhi = tangentialPhi;
@@ -138,7 +138,7 @@ namespace Belle2 {
 
       /// Setter for all four circle parameters.
       /// The normal representation of a line leave out the last parameter
-      void setN(const double& n0, const double& n1, const double& n2, const double& n3 = 0.0)
+      void setN(const double n0, const double n1, const double n2, const double n3 = 0.0)
       {
         GeneralizedCircle::setN(n0, n1, n2, n3);
         receivePerigeeParameters();
@@ -146,7 +146,7 @@ namespace Belle2 {
 
       /// Setter for all four circle parameters.
       /// The normal representation of a line leave out the last parameter
-      void setN(const double& n0, const Vector2D& n12, const double& n3 = 0.0)
+      void setN(const double n0, const Vector2D& n12, const double n3 = 0.0)
       {
         GeneralizedCircle::setN(n0, n12, n3);
         receivePerigeeParameters();
@@ -167,14 +167,14 @@ namespace Belle2 {
       }
 
       /// Setter for signed curvature.
-      inline void setCurvature(const double& curvature)
+      inline void setCurvature(const double curvature)
       {
         m_curvature = curvature;
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
       }
 
       /// Sets the azimuth angle of the direction of flight at the perigee.
-      inline void setTangentialPhi(const double& tangentialPhi)
+      inline void setTangentialPhi(const double tangentialPhi)
       {
         m_tangentialPhi = tangentialPhi;
         m_tangential = Vector2D::Phi(tangentialPhi);
@@ -190,7 +190,7 @@ namespace Belle2 {
       }
 
       /// Sets the impact parameter of the circle.
-      inline void setImpact(const double& impact)
+      inline void setImpact(const double impact)
       {
         m_impact = impact;
         GeneralizedCircle::setPerigeeParameters(m_curvature, m_tangential, m_impact);
@@ -229,7 +229,7 @@ namespace Belle2 {
 
     private:
       /// Returns the azimuth angle associated with the reverse vector
-      inline double reversedPhi(const double& phi) const
+      inline double reversedPhi(const double phi) const
       { return phi > 0 ? phi - PI : phi + PI; }
 
     public:
@@ -265,16 +265,16 @@ namespace Belle2 {
       void passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const;
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector2D atArcLength(const double& arcLength) const;
+      Vector2D atArcLength(const double arcLength) const;
 
       /** Calculates the two dimensional arc length till the cylindrical radius is reached
        *  If the radius can not be reached return NAN.
        *  Note that there are two solutions which have equivalent arc lengths with different sign
        *  Always return the positive solution. */
-      double arcLengthToCylindricalR(const double& cylindricalR) const;
+      double arcLengthToCylindricalR(const double cylindricalR) const;
 
       ///Getter for the signed curvature.
-      inline const double& curvature() const
+      inline double curvature() const
       { return m_curvature; }
 
       /// Gives the signed distance of the origin to the circle.
@@ -286,7 +286,7 @@ namespace Belle2 {
       { return -impact(); }
 
       /// Gets the azimuth angle of the direction of flight at the perigee
-      inline const double& tangentialPhi() const
+      inline double tangentialPhi() const
       { return m_tangentialPhi; }
 
       /// Getter for the tangtial vector at the perigee
@@ -294,7 +294,7 @@ namespace Belle2 {
       { return m_tangential; }
 
       /// Gets the azimuth angle of the direction of flight at the perigee
-      inline const double& phi0() const
+      inline double phi0() const
       { return tangentialPhi(); }
 
       /// Getter for the tangtial vector at the perigee

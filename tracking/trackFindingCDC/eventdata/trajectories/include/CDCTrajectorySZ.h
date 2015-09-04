@@ -49,15 +49,15 @@ namespace Belle2 {
 
 
       /// Constructs the trajectory with the given slope and start z.
-      CDCTrajectorySZ(const double& tanLambda,
-                      const double& startZ) :
+      CDCTrajectorySZ(const double tanLambda,
+                      const double startZ) :
         m_szLine(Line2D::fromSlopeIntercept(tanLambda, startZ))
       {;}
 
       /// Construct the sz line by its normal parameters ( used in least square fits )
-      CDCTrajectorySZ(const double& n0,
-                      const double& n1,
-                      const double& n2) :
+      CDCTrajectorySZ(const double n0,
+                      const double n1,
+                      const double n2) :
         m_szLine(Line2D(n0, n1, n2))
       { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to be forward with s ( important for the right sign of the distances)
 
@@ -69,14 +69,14 @@ namespace Belle2 {
 
 
       /// Translates the travel distance to the z coordinate
-      inline double mapSToZ(const double& s = 0) const
+      inline double mapSToZ(const double s = 0) const
       { return getSZLine().map(s); }
 
       /// Translates the absolute value of the transvers momentum to the momentum in z direction.
       /** Scales the absolute value of  the transvers momentum to the z component of the momentum
        *  vector. The z component comes with the correct sign as reflected by increasing or
       *   decreasing z component. Note : This assumes s to be the transvers travel distance.*/
-      inline double mapPtToPz(const double& pt) const
+      inline double mapPtToPz(const double pt) const
       { return getSZLine().slope() * pt; }
 
       /// Gets the vertical distance of the line
@@ -84,7 +84,7 @@ namespace Belle2 {
        *  The plus sign mean the point is below the line. For minus it is above.
        *  The later is naturally choosen as the direction of positiv advance is \n
        *  coaligned with the s axes */
-      inline double getZDist(const double& s, const  double& z) const
+      inline double getZDist(const double s, const double z) const
       { return mapSToZ(s) - z; }
 
       /// Gets the signed distance of the sz point to the line in the sz plane
@@ -94,7 +94,7 @@ namespace Belle2 {
        *  The plus sign mean the point is below the line. For minus it is above.
        *  The later is naturally choosen as the direction of positiv advance is \n
        *  coaligned with the s axes */
-      inline double getSZDist(const double& s, const double& z) const
+      inline double getSZDist(const double s, const double z) const
       { return getSZLine().distance(Vector2D(s, z)) ; }
 
       /// Passively Shift the s coordinate by the amount given.
@@ -104,7 +104,7 @@ namespace Belle2 {
        *  of s by deltaS. This can be used in conjunction with the return value of \n
        *  CDCTrajectory2D::setStartPos2D() in order to move the transvers travel distance \n
        *  by the same amount in both trajectories.*/
-      void passiveMoveS(const double& deltaS)
+      void passiveMoveS(const double deltaS)
       { m_szLine.passiveMoveAlongFirst(deltaS); }
 
 
@@ -139,7 +139,7 @@ namespace Belle2 {
       { return getSZLine().chi2(); }
 
       /// Setter for the chi square value of the line fit
-      void setChi2(const double& chi2)
+      void setChi2(const double chi2)
       { return m_szLine.setChi2(chi2); }
 
       /// Getter for the number of degrees of freedom of the line fit.
@@ -165,13 +165,13 @@ namespace Belle2 {
 
 
       /// Setter for slope and intercept of the line
-      void setSlopeIntercept(const double& tanLambda, const double& startZ)
+      void setSlopeIntercept(const double tanLambda, const double startZ)
       { m_szLine.setSlopeIntercept(tanLambda, startZ); }
 
       /// Setter for the normal parameters of the line.
-      void setN(const double& n0,
-                const double& n1,
-                const double& n2)
+      void setN(const double n0,
+                const double n1,
+                const double n2)
       {
         m_szLine.setN(n0, n1, n2);
         if (not getSZLine().alignedWithFirst()) m_szLine.reverse();

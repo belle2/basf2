@@ -22,7 +22,7 @@ size_t CDCObservations2D::getNObservationsWithDriftRadius() const
   Index nObservations = size();
 
   for (Index iObservation = 0; iObservation < nObservations; ++iObservation) {
-    const double& driftLength = getDriftLength(iObservation);
+    const double driftLength = getDriftLength(iObservation);
     bool hasDriftLength = (driftLength != 0.0);
     result += hasDriftLength ? 1 : 0;
   }

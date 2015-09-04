@@ -30,10 +30,10 @@ GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) {
 
 
 
-GeneralizedCircle::GeneralizedCircle(const double& n0,
-                                     const double& n1,
-                                     const double& n2,
-                                     const double& n3) :
+GeneralizedCircle::GeneralizedCircle(const double n0,
+                                     const double n1,
+                                     const double n2,
+                                     const double n3) :
   m_n3(n3), m_n12(n1, n2), m_n0(n0)
 {
   normalize();
@@ -41,9 +41,9 @@ GeneralizedCircle::GeneralizedCircle(const double& n0,
 
 
 
-GeneralizedCircle::GeneralizedCircle(const double& n0,
+GeneralizedCircle::GeneralizedCircle(const double n0,
                                      const Vector2D& n12,
-                                     const double& n3):
+                                     const double n3):
   m_n3(n3), m_n12(n12), m_n0(n0)
 {
   normalize();
@@ -67,7 +67,7 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
 
 
 GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
-                                                         const double& absRadius,
+                                                         const double absRadius,
                                                          const CCWInfo& orientation)
 {
   GeneralizedCircle generalizedCircle;
@@ -75,18 +75,18 @@ GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
   return generalizedCircle;
 }
 
-GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double& curvature,
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvature,
                                                            const Vector2D& tangential,
-                                                           const double& impact)
+                                                           const double impact)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setPerigeeParameters(curvature, tangential, impact);
   return generalizedCircle;
 }
 
-GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double& curvature,
-                                                           const double& tangentialPhi,
-                                                           const double& impact)
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvature,
+                                                           const double tangentialPhi,
+                                                           const double impact)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setPerigeeParameters(curvature, tangentialPhi, impact);
@@ -99,7 +99,7 @@ GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double& curvatu
 
 
 void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
-                                           const double& absRadius,
+                                           const double absRadius,
                                            const CCWInfo& orientation)
 {
   double curvature = orientation / fabs(absRadius);
@@ -112,9 +112,9 @@ void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
 
 
 
-void GeneralizedCircle::setPerigeeParameters(const double& curvature,
+void GeneralizedCircle::setPerigeeParameters(const double curvature,
                                              const Vector2D& tangential,
-                                             const double& impact)
+                                             const double impact)
 {
   double n0 = impact * (impact * curvature / 2.0 + 1.0);
   Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
@@ -154,8 +154,8 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     closestParallel = - (nOrthogonal * closestOrthogonal + n0()) / nParallel;
 
   } else {
-    const double& a = n3();
-    const double& b = nParallel;
+    const double a = n3();
+    const double b = nParallel;
     const double c = n0() + (nOrthogonal + n3() * closestOrthogonal) * closestOrthogonal;
 
     const pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
@@ -225,7 +225,7 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
 
 }
 
-pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const double& R) const
+pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const double R) const
 {
   //extraploted to r
   //solve
@@ -286,7 +286,7 @@ Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
 }
 
 Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint,
-                                                      const double& cylindricalR) const
+                                                      const double cylindricalR) const
 {
 
   pair<Vector2D, Vector2D> candidatePoints = sameCylindricalR(cylindricalR);
@@ -333,7 +333,7 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 }
 
 
-double GeneralizedCircle::arcLengthToCylindricalR(const double& cylindricalR) const
+double GeneralizedCircle::arcLengthToCylindricalR(const double cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
@@ -346,8 +346,8 @@ double GeneralizedCircle::arcLengthToCylindricalR(const double& cylindricalR) co
   return arcLength;
 }
 
-double GeneralizedCircle::arcLengthFactor(const double& directDistance,
-                                          const double& curvature)
+double GeneralizedCircle::arcLengthFactor(const double directDistance,
+                                          const double curvature)
 {
   double x = directDistance * curvature / 2.0;
 
@@ -397,7 +397,7 @@ double GeneralizedCircle::distance(const Vector2D& point) const
 
 
 
-double GeneralizedCircle::distance(const double& fastDistance) const
+double GeneralizedCircle::distance(const double fastDistance) const
 {
   if (fastDistance == 0.0 or isLine()) {
     //special case for unfitted state
@@ -423,13 +423,13 @@ std::pair<Vector2D, Vector2D>
 GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
 {
 
-  const double& m0 = generalizedCircle.n0();
+  const double m0 = generalizedCircle.n0();
   const Vector2D& m12 = generalizedCircle.n12();
-  const double& m3 = generalizedCircle.n3();
+  const double m3 = generalizedCircle.n3();
 
-  const double& n0 = this->n0();
+  const double n0 = this->n0();
   const Vector2D& n12 = this->n12();
-  const double& n3 = this->n3();
+  const double n3 = this->n3();
 
 
   Vector2D unitC = n12 * m3 - m12 * n3;
@@ -453,7 +453,7 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
 }
 
 
-Vector2D GeneralizedCircle::atArcLength(const double& arcLength) const
+Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
 {
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;

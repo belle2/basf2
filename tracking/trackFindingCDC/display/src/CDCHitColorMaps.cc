@@ -147,7 +147,7 @@ std::string TOFColorMap::map(const int&, const CDCHit& cdcHit)
   return (timeOfFlightToColor(timeOfFlight));
 }
 
-std::string TOFColorMap::timeOfFlightToColor(const double& timeOfFlight)
+std::string TOFColorMap::timeOfFlightToColor(const double timeOfFlight)
 {
   //values are all fractions of their respective scale
 

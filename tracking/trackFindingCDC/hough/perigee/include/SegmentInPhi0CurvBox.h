@@ -71,7 +71,7 @@ namespace Belle2 {
 
 
       inline bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
-                                    const double& curvature,
+                                    const double curvature,
                                     const Phi0CurvBox* phi0CurvBox)
       {
 

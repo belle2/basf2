@@ -38,7 +38,7 @@ SignType Belle2::TrackFindingCDC::sign(double x)
 }
 
 // std::vector<double>
-// Belle2::TrackFindingCDC::linspace(const double& start, const double& end, const int n)
+// Belle2::TrackFindingCDC::linspace(const double start, const double end, const int n)
 // {
 //   std::vector<double> result(n);
 //   result[0] = start;

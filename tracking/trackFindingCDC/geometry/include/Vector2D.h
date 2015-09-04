@@ -37,7 +37,7 @@ namespace Belle2 {
       explicit Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) { ; }
 
       /// Constructor from two coordinates
-      Vector2D(const double& x, const double& y)  : m_x(x), m_y(y) { ; }
+      Vector2D(const double x, const double y)  : m_x(x), m_y(y) { ; }
 
       /**
        * Constructs a vector from a unit coordinate system vector and the coordinates in that system.
@@ -45,8 +45,8 @@ namespace Belle2 {
        * See compose() for details.
        */
       Vector2D(const Vector2D& coordinateVec,
-               const double& parallelCoor,
-               const double& orthoCoor) :
+               const double parallelCoor,
+               const double orthoCoor) :
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
         m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
 
@@ -60,7 +60,7 @@ namespace Belle2 {
 
 
       /// Constucts a unit vector with azimuth angle equal to phi
-      static inline Vector2D Phi(const double& phi)
+      static inline Vector2D Phi(const double phi)
       { return isNAN(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
@@ -69,8 +69,8 @@ namespace Belle2 {
        *  to a vector in laboratory coordinates. The coordinate system vector \n
        *  is assumed the unit of the coordinate system */
       static inline Vector2D compose(const Vector2D& coordinateVec,
-                                     const double& parallelCoor,
-                                     const double& orthoCoor)
+                                     const double parallelCoor,
+                                     const double orthoCoor)
       { return Vector2D(coordinateVec , parallelCoor , orthoCoor); }
 
 
@@ -181,27 +181,27 @@ namespace Belle2 {
       }
 
       /// Scales the vector in place by the given factor
-      inline Vector2D& scale(const double& factor) { m_x *= factor; m_y *= factor; return *this; }
+      inline Vector2D& scale(const double factor) { m_x *= factor; m_y *= factor; return *this; }
       /// Same as scale()
-      inline Vector2D& operator*=(const double& factor) { return scale(factor); }
+      inline Vector2D& operator*=(const double factor) { return scale(factor); }
 
       /// Returns a scaled copy of the vector
-      inline Vector2D scaled(const double& factor) const { return Vector2D(x() * factor, y() * factor); }
+      inline Vector2D scaled(const double factor) const { return Vector2D(x() * factor, y() * factor); }
 
       /// Same as scaled()
-      inline friend Vector2D operator*(const Vector2D& vec2D, const double& factor)
+      inline friend Vector2D operator*(const Vector2D& vec2D, const double factor)
       { return vec2D.scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
-      inline Vector2D& divide(const double& denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
+      inline Vector2D& divide(const double denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
 
       /// Same as divide()
-      inline Vector2D& operator/=(const double& denominator) { return divide(denominator); }
+      inline Vector2D& operator/=(const double denominator) { return divide(denominator); }
 
       /// Returns a copy where all coordinates got divided by a common denominator
-      inline Vector2D divided(const double& denominator) const { return Vector2D(x() / denominator, y() / denominator); }
+      inline Vector2D divided(const double denominator) const { return Vector2D(x() / denominator, y() / denominator); }
       /// Same as divided()
-      inline Vector2D operator/(const double& denominator) const { return divided(denominator); }
+      inline Vector2D operator/(const double denominator) const { return divided(denominator); }
 
       /// Adds a vector to this in place
       inline Vector2D& add(const Vector2D& rhs) { m_x += rhs.x();  m_y += rhs.y(); return *this; }
@@ -229,7 +229,7 @@ namespace Belle2 {
       /// Normalizes the vector to the given length
       /** Normalizes the vector to the given length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline double normalizeTo(const double& toLength)
+      inline double normalizeTo(const double toLength)
       { double originalLength = norm(); if (originalLength != 0.0) scale(toLength / originalLength); return originalLength; }
 
       /// Returns a unit vector colaligned with this
@@ -396,7 +396,7 @@ namespace Belle2 {
       inline double cylindricalR() const { return hypot(x(), y()); }
 
       /// Set the cylindrical radius while keeping the azimuth angle phi the same
-      inline void setCylindricalR(const double& cylindricalR)
+      inline void setCylindricalR(const double cylindricalR)
       { scale(cylindricalR / norm()); }
 
       /// Gives the azimuth angle being the angle to the x axes ( range -PI to PI )
@@ -420,30 +420,30 @@ namespace Belle2 {
 
 
       /// Getter for the x coordinate
-      inline const double& x() const { return m_x; }
+      inline double x() const { return m_x; }
       /// Setter for the x coordinate
-      inline void setX(const double& x) { m_x = x; }
+      inline void setX(const double x) { m_x = x; }
       /// Getter for the y coordinate
-      inline const double& y() const { return m_y; }
+      inline double y() const { return m_y; }
       /// Setter for the y coordinate
-      inline void setY(const double& y) { m_y = y; }
+      inline void setY(const double y) { m_y = y; }
 
       /// Setter for both coordinate
-      inline void setXY(const double& x, const double& y) { setX(x); setY(y); }
+      inline void setXY(const double x, const double y) { setX(x); setY(y); }
       /// Setter for both coordinate by an other vector
       inline void setXY(const Vector2D& xy) { m_x = xy.x(); m_y = xy.y(); }
 
       /// Getter for the first coordinate
-      inline const double& first() const { return m_x; }
+      inline double first() const { return m_x; }
       /// Setter for the first coordinate
-      inline void setFirst(const double& first) { m_x = first; }
+      inline void setFirst(const double first) { m_x = first; }
       /// Getter for the second coordinate
-      inline const double& second() const { return m_y; }
+      inline double second() const { return m_y; }
       /// Setter for the second coordinate
-      inline void setSecond(const double& second) { m_y = second; }
+      inline void setSecond(const double second) { m_y = second; }
 
       /// Setter for both  coordinate
-      inline void set(const double& first, const double& second) { setX(first); setY(second); }
+      inline void set(const double first, const double second) { setX(first); setY(second); }
       /// Setter for both coordinate by an other vector
       inline void set(const Vector2D& both) { m_x = both.x(); m_y = both.y(); }
 

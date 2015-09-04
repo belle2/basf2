@@ -89,8 +89,8 @@ namespace Belle2 {
        *                     Usually this is counted in numbers of discrete values
        */
       template<size_t I>
-      void constructArray(const double& lowerBound,
-                          const double& upperBound,
+      void constructArray(const double lowerBound,
+                          const double upperBound,
                           const Width<I>& overlap = 0,
                           Width<I> width = 0)
       {

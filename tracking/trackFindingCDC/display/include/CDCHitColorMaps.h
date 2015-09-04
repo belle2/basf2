@@ -189,7 +189,7 @@ namespace Belle2 {
       /**
        * Translates the given floating point time of flight to a color.
        */
-      std::string timeOfFlightToColor(const double& timeOfFlight);
+      std::string timeOfFlightToColor(const double timeOfFlight);
     };
 
     /**

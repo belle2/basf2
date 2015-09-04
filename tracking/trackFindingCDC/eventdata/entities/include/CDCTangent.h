@@ -44,9 +44,9 @@ namespace Belle2 {
        *  @return the line being tangential to both circles.
        *  Note : the touch points reside at(0) for the first and at(1) for the second */
       static ParameterLine2D constructTouchingLine(const Vector2D& fromCenter,
-                                                   const double& fromSignedRadius,
+                                                   const double fromSignedRadius,
                                                    const Vector2D& toCenter,
-                                                   const double& toSignedRadius);
+                                                   const double toSignedRadius);
 
     public:
       /// Default constructor for ROOT compatibility.

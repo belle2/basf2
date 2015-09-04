@@ -23,7 +23,7 @@ namespace Belle2 {
       /**
        * Transforms a Color given in the HLS System to RGB.
        */
-      static double hueToRgb(const double& p, const double& q, double t);
+      static double hueToRgb(const double p, const double q, double t);
 
       /**
        * Transforms a Color given in the HLS System to RGB.
@@ -33,7 +33,7 @@ namespace Belle2 {
        * @param s Saturation.
        * @return Vector containing rgb-values in the order red, green, blue.
        */
-      static std::vector<double> hlsToRgb(const double& h, const double& l, const double& s);
+      static std::vector<double> hlsToRgb(const double h, const double l, const double s);
     };
 
     /**

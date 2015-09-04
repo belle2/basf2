@@ -120,8 +120,8 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
 
   ILayerType iCLayer = getICLayer();
   const CDCWireLayer& wireLayer = CDCWireTopology::getInstance().getWireLayer(iCLayer);
-  const double& innerCylindricalR = wireLayer.getInnerCylindricalR();
-  const double& outerCylindricalR = wireLayer.getOuterCylindricalR();
+  const double innerCylindricalR = wireLayer.getInnerCylindricalR();
+  const double outerCylindricalR = wireLayer.getOuterCylindricalR();
   double cylindricalR = pos3D.cylindricalR();
 
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;

@@ -30,9 +30,9 @@ PerigeeCircle::PerigeeCircle() : GeneralizedCircle()
   setNull();
 }
 
-PerigeeCircle::PerigeeCircle(const double& curvature,
+PerigeeCircle::PerigeeCircle(const double curvature,
                              const Vector2D& tangential,
-                             const double& impact) :
+                             const double impact) :
   GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangential, impact)),
   m_curvature(curvature),
   m_tangentialPhi(tangential.phi()),
@@ -41,9 +41,9 @@ PerigeeCircle::PerigeeCircle(const double& curvature,
 {
 }
 
-PerigeeCircle::PerigeeCircle(const double& curvature,
-                             const double& tangentialPhi,
-                             const double& impact) :
+PerigeeCircle::PerigeeCircle(const double curvature,
+                             const double tangentialPhi,
+                             const double impact) :
   GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
   m_curvature(curvature),
   m_tangentialPhi(tangentialPhi),
@@ -59,10 +59,10 @@ PerigeeCircle::PerigeeCircle(const TVectorD& parameters) :
 }
 
 PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123,
-                             const double& curvature,
-                             const double& tangentialPhi,
+                             const double curvature,
+                             const double tangentialPhi,
                              const Vector2D& tangential,
-                             const double& impact) :
+                             const double impact) :
   GeneralizedCircle(n0123),
   m_curvature(curvature),
   m_tangentialPhi(tangentialPhi),
@@ -97,10 +97,10 @@ PerigeeCircle::PerigeeCircle(const Circle2D& circle)
 
 
 
-PerigeeCircle PerigeeCircle::fromN(const double& n0,
-                                   const double& n1,
-                                   const double& n2,
-                                   const double& n3)
+PerigeeCircle PerigeeCircle::fromN(const double n0,
+                                   const double n1,
+                                   const double n2,
+                                   const double n3)
 {
   PerigeeCircle circle;
   circle.setN(n0, n1, n2, n3);
@@ -109,9 +109,9 @@ PerigeeCircle PerigeeCircle::fromN(const double& n0,
 
 
 
-PerigeeCircle PerigeeCircle::fromN(const double& n0,
+PerigeeCircle PerigeeCircle::fromN(const double n0,
                                    const Vector2D& n12,
-                                   const double& n3)
+                                   const double n3)
 {
   PerigeeCircle circle;
   circle.setN(n0, n12, n3);
@@ -121,7 +121,7 @@ PerigeeCircle PerigeeCircle::fromN(const double& n0,
 
 
 PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
-                                                 const double& absRadius,
+                                                 const double absRadius,
                                                  const CCWInfo& orientation)
 {
   PerigeeCircle circle;
@@ -130,7 +130,7 @@ PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
 }
 
 
-Vector2D PerigeeCircle::atArcLength(const double& arcLength) const
+Vector2D PerigeeCircle::atArcLength(const double arcLength) const
 {
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
@@ -216,7 +216,7 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
 
 }
 
-double PerigeeCircle::arcLengthToCylindricalR(const double& cylindricalR) const
+double PerigeeCircle::arcLengthToCylindricalR(const double cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee

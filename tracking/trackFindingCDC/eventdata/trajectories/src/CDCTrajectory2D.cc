@@ -26,8 +26,8 @@ using namespace TrackFindingCDC;
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
-                                 const double& charge,
-                                 const double& bZ) :
+                                 const double charge,
+                                 const double bZ) :
   m_localOrigin(pos2D),
   m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, bZ), mom2D.unit(), 0.0)
 
@@ -36,7 +36,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
-                                 const double& charge) :
+                                 const double charge) :
   m_localOrigin(pos2D),
   m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0)
 
@@ -47,7 +47,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 
 void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
                                   const Vector2D& mom2D,
-                                  const double& charge)
+                                  const double charge)
 {
   m_localOrigin = pos2D;
   m_localPerigeeCircle = UncertainPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0);
@@ -61,7 +61,7 @@ SignType CDCTrajectory2D::getChargeSign() const
 }
 
 
-double CDCTrajectory2D::getAbsMom2D(const double& bZ) const
+double CDCTrajectory2D::getAbsMom2D(const double bZ) const
 {
   return curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
 }
@@ -75,7 +75,7 @@ double CDCTrajectory2D::getAbsMom2D() const
 
 
 Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
-                                        const double& distance) const
+                                        const double distance) const
 {
   Vector2D globalRefPos2D = globalSkewLine.refPos2D();
   Vector2D movePerZ = globalSkewLine.movePerZ();
@@ -92,7 +92,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
   std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
 
   // Take the solution with the smaller deviation from the reference position
-  const double& deltaZ = solutionsDeltaZ.second;
+  const double deltaZ = solutionsDeltaZ.second;
   const double z = deltaZ + globalSkewLine.refZ();
   return globalSkewLine.pos3DAtZ(z);
 }

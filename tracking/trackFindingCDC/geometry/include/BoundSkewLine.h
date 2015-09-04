@@ -54,11 +54,11 @@ namespace Belle2 {
       BoundSkewLine movedBy(const Vector2D& offset) const;
 
       /// Gives the three dimensional position of the line at the given z value
-      inline Vector3D pos3DAtZ(const double& z) const
+      inline Vector3D pos3DAtZ(const double z) const
       { return Vector3D(pos2DAtZ(z), z); }
 
       /// Gives the two dimensional position of the line at the given z value
-      inline Vector2D pos2DAtZ(const double& z) const
+      inline Vector2D pos2DAtZ(const double z) const
       { return refPos2D() + movePerZ() * (z - refZ()); }
 
       /// Gives the position of the forward point
@@ -185,15 +185,15 @@ namespace Belle2 {
       { return refPos2D().orthogonalVector(movePerZ()); }
 
       /// Returns the the x coordinate of the reference point.
-      inline const double& refX() const
+      inline double refX() const
       { return m_refPos3D.x(); }
 
       /// Returns the the y coordinate of the reference point.
-      inline const double& refY() const
+      inline double refY() const
       { return m_refPos3D.y(); }
 
       /// Returns the the z coordinate of the reference point.
-      inline const double& refZ() const
+      inline double refZ() const
       { return m_refPos3D.z(); }
 
       /// Returns the cylindrical radius of the reference position

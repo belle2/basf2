@@ -227,7 +227,7 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
 
 double SinEqLine::computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const
 {
-  const double& slope = getSlope();
+  const double slope = getSlope();
   double extremumInFirstHalfPeriod = acos(slope);
 
   double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * PI - extremumInFirstHalfPeriod;

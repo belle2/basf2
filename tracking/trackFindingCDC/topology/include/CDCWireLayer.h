@@ -196,37 +196,37 @@ namespace Belle2 {
       StereoType getStereoType() const { return first().getStereoType(); }
 
       /// Getter for the averaged tan stereo angle of all wires in this layer
-      const double& getTanStereoAngle() const { return m_tanStereoAngle; }
+      double getTanStereoAngle() const { return m_tanStereoAngle; }
 
       /// Getter for the average stereo angle of all wires in this layer
       double getStereoAngle() const { return std::atan(getTanStereoAngle()); }
 
       /// Getter for the closest distance to the beamline ( z-axes ) of all wires in this layer
-      const double& getMinCylindricalR() const { return m_minCylindricalR; }
+      double getMinCylindricalR() const { return m_minCylindricalR; }
 
       /// Getter for the  common (averaged) cylindrical radius at the wire reference point
-      const double& getRefCylindricalR() const { return m_refCylindricalR; }
+      double getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the common (averaged) z component of the wire reference point
-      const double& getRefZ() const { return m_refZ; }
+      double getRefZ() const { return m_refZ; }
 
       /// Getter for the average distance to the beamline ( z-axes ) at the forward joint points of all wires in this layer
-      const double& getForwardCylindricalR() const { return m_forwardCylindricalR; };
+      double getForwardCylindricalR() const { return m_forwardCylindricalR; };
 
       /// Getter for the average distance to the beamline ( z-axes ) at the backward joint points of all wires in this layer
-      const double& getBackwardCylindricalR() const { return m_backwardCylindricalR; };
+      double getBackwardCylindricalR() const { return m_backwardCylindricalR; };
 
       /// Getter for the average z coordinate at the forward joint points of all wires in this layer
-      const double& getForwardZ() const { return m_forwardZ; }
+      double getForwardZ() const { return m_forwardZ; }
 
       /// Getter for the average z coordinate at the backward joint points of all wires in this layer
-      const double& getBackwardZ() const { return m_backwardZ; }
+      double getBackwardZ() const { return m_backwardZ; }
 
       /// Getter for the average azimuth angle of the forward joint points of the wires relativ to their references
-      const double& getForwardPhiToRef() const { return m_forwardPhiToRef; }
+      double getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
       /// Getter for the average azimuth angle of the backward joint points of the wires relativ to their references
-      const double& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
+      double getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
       /// Getter for the average azimuth angle range covered by the wires relativ to their respective reference points.
       /** Gives the range of azimuth angles the stereo wires cover relativ to their reference positions. \n
@@ -248,10 +248,10 @@ namespace Belle2 {
         */
       /**@{*/
       ///Getter for inner radius of the layer as taken from the CDCGeometryPar
-      const double& getInnerCylindricalR() const { return m_innerCylindricalR; }
+      double getInnerCylindricalR() const { return m_innerCylindricalR; }
 
       ///Getter for outer radius of the layer as taken from the CDCGeometryPar
-      const double& getOuterCylindricalR() const { return m_outerCylindricalR; }
+      double getOuterCylindricalR() const { return m_outerCylindricalR; }
       /**@}*/
 
     private:

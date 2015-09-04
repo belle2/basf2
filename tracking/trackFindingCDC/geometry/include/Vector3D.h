@@ -189,29 +189,29 @@ namespace Belle2 {
       }
 
       /// Scales the vector in place by the given factor
-      inline Vector3D& scale(const double& factor)
+      inline Vector3D& scale(const double factor)
       { m_xy.scale(factor); m_z *= factor; return *this; }
       /// Same as scale()
-      inline Vector3D& operator*=(const double& factor) { return scale(factor); }
+      inline Vector3D& operator*=(const double factor) { return scale(factor); }
 
       /// Returns a scaled copy of the vector
-      inline Vector3D scaled(const double& factor) const
+      inline Vector3D scaled(const double factor) const
       { return Vector3D(xy().scaled(factor), z() * factor); }
 
       /// Same as scaled()
-      inline Vector3D operator*(const double& factor) const { return scaled(factor); }
+      inline Vector3D operator*(const double factor) const { return scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
-      inline Vector3D& divide(const double& denominator)
+      inline Vector3D& divide(const double denominator)
       { m_xy.divide(denominator); m_z /= denominator; return *this; }
       /// Same as divide()
-      inline Vector3D& operator/=(const double& denominator) { return divide(denominator); }
+      inline Vector3D& operator/=(const double denominator) { return divide(denominator); }
 
       /// Returns a copy where all coordinates got divided by a common denominator
-      inline Vector3D divided(const double& denominator) const
+      inline Vector3D divided(const double denominator) const
       { return Vector3D(xy().divided(denominator), z() / denominator); }
       /// Same as divided()
-      inline Vector3D operator/(const double& denominator) const { return divided(denominator); }
+      inline Vector3D operator/(const double denominator) const { return divided(denominator); }
 
       /// Adds a vector to this in place
       inline Vector3D& add(const Vector3D& rhs)     { m_xy.add(rhs.xy()); m_z += rhs.z(); return *this;}
@@ -244,7 +244,7 @@ namespace Belle2 {
       /// Normalizes the vector to the given length
       /** Normalizes the vector to the given length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline double normalizeTo(const double& toLength)
+      inline double normalizeTo(const double toLength)
       { double result = norm(); if (result != 0.0) scale(toLength / result); return result; }
 
       /// Reverses the direction of the vector in place
@@ -307,22 +307,22 @@ namespace Belle2 {
       { return *this - by; }
 
       /// Getter for the x coordinate
-      inline const double& x() const { return m_xy.x(); }
+      inline double x() const { return m_xy.x(); }
 
       /// Setter for the x coordinate
-      inline void setX(const double& x) { m_xy.setX(x); }
+      inline void setX(const double x) { m_xy.setX(x); }
 
       /// Getter for the y coordinate
-      inline const double& y() const { return m_xy.y(); }
+      inline double y() const { return m_xy.y(); }
 
       /// Setter for the y coordinate
-      inline void setY(const double& y) { m_xy.setY(y); }
+      inline void setY(const double y) { m_xy.setY(y); }
 
       /// Getter for the z coordinate
-      inline const double& z() const { return m_z; }
+      inline double z() const { return m_z; }
 
       /// Setter for the z coordinate
-      inline void setZ(const double& z) { m_z = z; }
+      inline void setZ(const double z) { m_z = z; }
 
       /// Getter for the xy projected vector ( reference ! )
       inline const Vector2D& xy() const { return m_xy; }
@@ -331,9 +331,9 @@ namespace Belle2 {
       inline void setXY(const Vector2D& xy) { m_xy = xy; }
 
       /// Setter for all three coordinates.
-      inline void set(const double& first,
-                      const double& second,
-                      const double& third)
+      inline void set(const double first,
+                      const double second,
+                      const double third)
       { setX(first); setY(second); setZ(third);}
 
       /// Getter for the squared cylindrical radius ( xy projected squared norm )

@@ -105,19 +105,19 @@ namespace Belle2 {
       /// Generate hits for the given helix in starting from the two dimensional arc length.
       std::vector<SimpleSimHit>
       createHits(const Helix& globalHelix,
-                 const double& arcLength2DOffset) const;
+                 const double arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
       std::vector<SimpleSimHit>
       createHitsForLayer(const CDCWire& nearWire,
                          const Helix& globalHelix,
-                         const double& arcLength2DOffset) const;
+                         const double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
       SimpleSimHit
       createHitForCell(const CDCWire& wire,
                        const Helix& globalHelix,
-                       const double& arcLengthOffset) const;
+                       const double arcLengthOffset) const;
 
     public:
       /// Getter for a global event time offset
@@ -125,7 +125,7 @@ namespace Belle2 {
       { return m_eventTime; }
 
       /// Setter for a global event time offset
-      void setEventTime(const double& eventTime)
+      void setEventTime(const double eventTime)
       { m_eventTime = eventTime; }
 
       /// Activate the TOF time delay

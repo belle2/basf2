@@ -70,7 +70,7 @@ namespace {
   constexpr size_t iI = 2;
 
   /// Variant implementing Karimakis method without drift circles.
-  UncertainPerigeeCircle fitKarimaki(const double& /*sw*/,
+  UncertainPerigeeCircle fitKarimaki(const double /*sw*/,
                                      const Matrix< double, 4, 1 >& a,
                                      const Matrix< double, 4, 4 >& c,
                                      bool lineConstrained = false)
@@ -114,15 +114,15 @@ namespace {
 
   /// Variant without drift circles
   double calcChi2Karimaki(const PerigeeCircle& parameters,
-                          const double& sw,
+                          const double sw,
                           const Matrix< double, 4, 4 >& c,
                           bool lineConstrained = false)
   {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
 
-    const double& cosphi = vecPhi.x();
-    const double& sinphi = vecPhi.y();
+    const double cosphi = vecPhi.x();
+    const double sinphi = vecPhi.y();
 
 
     if (lineConstrained) {
@@ -130,8 +130,8 @@ namespace {
       return chi2;
     } else {
       // Terminology Karimaki used in the paper
-      const double& rho = parameters.curvature();
-      const double& d = parameters.impact();
+      const double rho = parameters.curvature();
+      const double d = parameters.impact();
 
       const double u = 1 + d * rho;
       const double kappa = 0.5 * rho / u;
@@ -151,23 +151,23 @@ namespace {
   {
     Matrix<double, 3, 3> invV;
 
-    const double& curv = parameters.curvature();
-    const double& I =  parameters.impact();
+    const double curv = parameters.curvature();
+    const double I =  parameters.impact();
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
 
 
     // Ternminology Karimaki using in the paper
-    const double& cosphi = vecPhi.x();
-    const double& sinphi = vecPhi.y();
+    const double cosphi = vecPhi.x();
+    const double sinphi = vecPhi.y();
 
     const double ssphi = sinphi * sinphi;
     const double scphi = sinphi * cosphi;
     const double ccphi = cosphi * cosphi;
 
     const double rho = curv;
-    const double& d = I;
+    const double d = I;
 
     const double u = 1. + rho * d;
 

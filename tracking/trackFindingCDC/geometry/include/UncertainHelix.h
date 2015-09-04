@@ -37,13 +37,13 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
-      UncertainHelix(const double& curvature,
-                     const double& tangentialPhi,
-                     const double& impact,
-                     const double& tanLambda,
-                     const double& z0,
+      UncertainHelix(const double curvature,
+                     const double tangentialPhi,
+                     const double impact,
+                     const double tanLambda,
+                     const double z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const double& chi2 = 0.0,
+                     const double chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(curvature, tangentialPhi, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
@@ -54,7 +54,7 @@ namespace Belle2 {
 
       explicit UncertainHelix(const TVectorD& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance(),
-                              const double& chi2 = 0.0,
+                              const double chi2 = 0.0,
                               const size_t& ndf = 0) :
         Helix(parameters),
         m_helixCovariance(helixCovariance),
@@ -63,13 +63,13 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
-      UncertainHelix(const double& curvature,
+      UncertainHelix(const double curvature,
                      const Vector2D& tangential,
-                     const double& impact,
-                     const double& tanLambda,
-                     const double& z0,
+                     const double impact,
+                     const double tanLambda,
+                     const double z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const double& chi2 = 0.0,
+                     const double chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(curvature, tangential, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const double& chi2 = 0.0,
+                     const double chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(helix),
         m_helixCovariance(helixCovariance),
@@ -135,11 +135,11 @@ namespace Belle2 {
       { return helixCovariance()(i, i); }
 
       /// Getter for the chi square value of the helix fit
-      const double& chi2() const
+      double chi2() const
       { return m_chi2; }
 
       /// Setter for the chi square value of the helix fit
-      void setChi2(const double& chi2)
+      void setChi2(const double chi2)
       { m_chi2 = chi2; }
 
       /// Getter for the number of degrees of freediom used in the helix fit

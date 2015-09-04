@@ -180,7 +180,7 @@ namespace Belle2 {
        */
       inline RightLeftInfo containsRightOrLeft(const HoughBox& houghBox,
                                                const CDCWire& wire,
-                                               const double& driftLength,
+                                               const double driftLength,
                                                const RightLeftInfo& rlInfo = UNKNOWN)
       {
         bool isRightIn = rlInfo != LEFT and contains(houghBox, wire, driftLength);
@@ -200,7 +200,7 @@ namespace Belle2 {
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
       inline bool contains(const HoughBox& houghBox,
                            const CDCWire& wire,
-                           const double& signedDriftLength)
+                           const double signedDriftLength)
       {
         const Vector2D& pos2D = wire.getRefPos2D();
         //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);

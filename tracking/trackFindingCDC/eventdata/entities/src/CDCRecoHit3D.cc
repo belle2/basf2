@@ -132,7 +132,7 @@ Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
   const BoundSkewLine& skewLine = wire.getSkewLine();
-  const double& recoPosZ = getRecoPos3D().z();
+  const double recoPosZ = getRecoPos3D().z();
 
   Vector2D wirePos = skewLine.pos2DAtZ(recoPosZ);
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;

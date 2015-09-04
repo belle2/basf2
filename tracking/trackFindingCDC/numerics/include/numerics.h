@@ -81,7 +81,7 @@ namespace Belle2 {
      *  The formula also handels the case a == 0 correctly. Here to only root of the linear \n
      *  form b*x + c = 0 is returned in the .second  of the pair, while the bigger 'solution' \n
      *  .first is infinity */
-    inline std::pair<double, double> solveQuadraticABC(const double& a, const double& b, const double& c)
+    inline std::pair<double, double> solveQuadraticABC(const double a, const double b, const double c)
     {
 
       std::pair<double, double> result;
@@ -114,7 +114,7 @@ namespace Belle2 {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template<class OUT = double>
-    std::vector<OUT> linspace(const double& start, const double& final, const size_t n,
+    std::vector<OUT> linspace(const double start, const double final, const size_t n,
                               const std::function<OUT(double)>& map)
     {
       std::vector<OUT> result;
@@ -130,9 +130,9 @@ namespace Belle2 {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template<class OUT = double>
-    std::vector<OUT> linspace(const double& start, const double& final, const size_t n)
+    std::vector<OUT> linspace(const double start, const double final, const size_t n)
     {
-      auto map = [](const double & in) -> OUT {return OUT(in);};
+      auto map = [](const double in) -> OUT {return OUT(in);};
       return linspace<OUT>(start, final, n, map);
     }
   } // end namespace TrackFindingCDC

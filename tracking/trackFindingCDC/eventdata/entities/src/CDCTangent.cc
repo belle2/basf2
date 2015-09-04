@@ -95,9 +95,9 @@ CDCTangent CDCTangent::reversed() const
 }
 
 ParameterLine2D CDCTangent::constructTouchingLine(const Vector2D& fromCenter,
-                                                  const double& fromSignedRadius,
+                                                  const double fromSignedRadius,
                                                   const Vector2D& toCenter,
-                                                  const double& toSignedRadius)
+                                                  const double toSignedRadius)
 {
   Vector2D connecting = toCenter - fromCenter;
 

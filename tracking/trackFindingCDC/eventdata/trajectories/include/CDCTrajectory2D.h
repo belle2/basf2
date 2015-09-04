@@ -61,13 +61,13 @@ namespace Belle2 {
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
-                      const double& charge,
-                      const double& bZ);
+                      const double charge,
+                      const double bZ);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
-                      const double& charge);
+                      const double charge);
 
     public:
       /// Checks if the circle is already set to a valid value
@@ -101,7 +101,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
        *  skew line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
       Vector3D reconstruct3D(const BoundSkewLine& skewLine,
-                             const double& distance = 0.0) const;
+                             const double distance = 0.0) const;
 
     public:
       /// Calculates the closest approach on the trajectory to the global origin
@@ -266,13 +266,13 @@ namespace Belle2 {
       { return getLocalCircle().tangential(point - getLocalOrigin()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
-      double getAbsMom2D(const double& bZ) const;
+      double getAbsMom2D(const double bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom2D() const;
 
       /// Get the momentum at the support point of the trajectory
-      inline Vector2D getMom2DAtSupport(const double& bZ) const
+      inline Vector2D getMom2DAtSupport(const double bZ) const
       { return  getStartUnitMom2D() *= getAbsMom2D(bZ);  }
 
       /// Get the momentum at the support point of the trajectory
@@ -288,7 +288,7 @@ namespace Belle2 {
       { return  getLocalCircle().tangential();  }
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double& charge);
+      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double charge);
 
       /// Get the support point of the trajectory in global coordinates
       inline Vector2D getSupport() const
@@ -348,7 +348,7 @@ namespace Belle2 {
       { return getLocalCircle().chi2(); }
 
       /// Setter for the chi square value of the circle fit
-      void setChi2(const double& chi2)
+      void setChi2(const double chi2)
       { return m_localPerigeeCircle.setChi2(chi2); }
 
       /// Getter for the number of degrees of freedom of the circle fit.

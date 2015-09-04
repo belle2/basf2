@@ -50,7 +50,7 @@ namespace Belle2 {
 
       /// Constructor from a double signed quantity
       constexpr
-      explicit Sign(const double& s) :
+      explicit Sign(const double s) :
         m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
       {;}
 
@@ -107,7 +107,7 @@ namespace Belle2 {
       { return isnan() ? NAN : m_sign * rhs; }
 
       /// Multiplication with another double
-      double operator*(const double& rhs) const
+      double operator*(const double rhs) const
       { return isnan() ? NAN : m_sign * rhs; }
 
       /// Printing operator

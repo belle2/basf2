@@ -34,8 +34,8 @@ copyinc:
 	@ make -C extra/mgt BELLE2_EXTERNALS_DIR=$(PWD)
 	@ mkdir -p include/ttrx
 	@ make -C extra/ttrx BELLE2_EXTERNALS_DIR=$(PWD)
-	@ mkdir -p include/ecl
-	@ make -C extra/ecl BELLE2_EXTERNALS_DIR=$(PWD)
+	@ mkdir -p include/ecldaq
+	@ make -C extra/ecldaq BELLE2_EXTERNALS_DIR=$(PWD)
 
 $(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@ NOT_USE_PSQL=$(NOT_USE_PSQL)

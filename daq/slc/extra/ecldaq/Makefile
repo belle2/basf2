@@ -6,7 +6,7 @@ CFLAGS   = -g -O3 -Wall -fPIC -D_REENTRANT
 SRCS     = $(wildcard *.c)
 OBJS     = $(SRCS:%.c=%.o)
 
-LIB  = libecl.so
+LIB  = libecldaq.so
 
 EXTDIR=$(BELLE2_EXTERNALS_DIR)
 EXTSRCDIR=$(EXTDIR)/src
@@ -16,8 +16,8 @@ EXTLIBDIR=$(EXTDIR)/lib/$(BELLE2_EXTERNALS_SUBDIR)
 EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
 
 all: $(OBJS) $(LIB)
-	@ mkdir -p $(EXTINCDIR)/ecl/
-	@ install -m 644 -p *.h $(EXTINCDIR)/ecl/
+	@ mkdir -p $(EXTINCDIR)/ecldaq/
+	@ install -m 644 -p *.h $(EXTINCDIR)/ecldaq/
 	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
 
 clean:

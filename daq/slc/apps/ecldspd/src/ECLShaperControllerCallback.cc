@@ -6,7 +6,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 extern "C" {
-#include <ecl/ecl_collector_lib.h>
+#include <ecldaq/ecl_collector_lib.h>
   const char* col_status(const char* ip_addr);
 }
 

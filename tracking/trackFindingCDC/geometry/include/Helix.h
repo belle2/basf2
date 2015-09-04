@@ -68,10 +68,6 @@ namespace Belle2 {
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
 
-
-      /// Empty deconstructor
-      ~Helix() {;}
-
       /// Sets all circle parameters to zero.
       void setNull()
       {

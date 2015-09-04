@@ -92,8 +92,8 @@ void CDCWire::initialize()
   /// used to check for odd stereo wires
   if ((m_forwardPhiToRef == 0 or
        m_backwardPhiToRef == 0 or
-       isNAN(m_forwardPhiToRef) or
-       isNAN(m_backwardPhiToRef)) and
+       std::isnan(m_forwardPhiToRef) or
+       std::isnan(m_backwardPhiToRef)) and
       not isAxial()) {
 
     B2WARNING("Odd wire " << this);

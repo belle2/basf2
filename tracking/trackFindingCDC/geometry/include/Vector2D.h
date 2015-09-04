@@ -61,7 +61,7 @@ namespace Belle2 {
 
       /// Constucts a unit vector with azimuth angle equal to phi
       static inline Vector2D Phi(const double phi)
-      { return isNAN(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
+      { return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
       /** Combines a coordinate system vector expressed in laboratory coordinates \n
@@ -141,7 +141,7 @@ namespace Belle2 {
       inline bool isNull() const { return x() == 0.0 and y() == 0.0; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return isNAN(x()) or isNAN(y()); }
+      inline bool hasNAN() const { return std::isnan(x()) or std::isnan(y()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector2D& vector)

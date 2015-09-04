@@ -127,7 +127,7 @@ namespace Belle2 {
       inline bool isNull() const { return x() == 0.0 and y() == 0.0 and z() == 0.0 ; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return isNAN(x()) or isNAN(y()) or isNAN(z()); }
+      inline bool hasNAN() const { return std::isnan(x()) or std::isnan(y()) or std::isnan(z()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector3D& vector)

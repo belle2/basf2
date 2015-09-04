@@ -150,7 +150,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_EQ(0., defaultCircle.n3());
 
   EXPECT_EQ(0., defaultCircle.curvature());
-  EXPECT_TRUE(isNAN(defaultCircle.tangentialPhi()));
+  EXPECT_TRUE(std::isnan(defaultCircle.tangentialPhi()));
   EXPECT_EQ(0., defaultCircle.tangential().x());
   EXPECT_EQ(0., defaultCircle.tangential().y());
   EXPECT_EQ(0., defaultCircle.impact());
@@ -172,7 +172,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_EQ(0., circle.n3());
 
   EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(isNAN(circle.tangentialPhi()));
+  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
   EXPECT_EQ(0., circle.tangential().x());
   EXPECT_EQ(0., circle.tangential().y());
   EXPECT_EQ(0., circle.impact());
@@ -188,7 +188,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_EQ(0., circle.n3());
 
   EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(isNAN(circle.tangentialPhi()));
+  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
   EXPECT_EQ(0., circle.tangential().x());
   EXPECT_EQ(0., circle.tangential().y());
   EXPECT_EQ(0., circle.impact());
@@ -204,7 +204,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_EQ(0., circle.n3());
 
   EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(isNAN(circle.tangentialPhi()));
+  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
   EXPECT_EQ(0., circle.tangential().x());
   EXPECT_EQ(0., circle.tangential().y());
   EXPECT_EQ(0., circle.impact());
@@ -222,7 +222,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_EQ(0., circle.n3());
 
   EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(isNAN(circle.tangentialPhi()));
+  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
   EXPECT_EQ(0., circle.tangential().x());
   EXPECT_EQ(0., circle.tangential().y());
   EXPECT_EQ(0., circle.impact());

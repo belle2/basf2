@@ -38,12 +38,6 @@ namespace Belle2 {
     template <class TNumber>
     inline auto square(TNumber t) -> decltype(t* t) {return t * t;}
 
-    ///Checks if a float is not a number
-    bool isNAN(const double x);
-
-    ///Checks if a float is not a number
-    bool isNAN(const float x);
-
     ///Returns the sign of an integer number
     inline SignType sign(int x)
     { return x > 0 ? PLUS : (x < 0 ? MINUS : ZERO); }

@@ -102,7 +102,7 @@ namespace Belle2 {
         }
 
         //double weight = 1.0;
-        double weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
+        double weight = zeta * zeta / c_simpleDriftLengthVariance;
 
         size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z(), weight);
         // if (not appended_hit){

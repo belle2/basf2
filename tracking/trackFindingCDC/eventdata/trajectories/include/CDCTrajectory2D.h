@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
+#include <tracking/trackFindingCDC/geometry/WireLine.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
@@ -100,7 +100,7 @@ namespace Belle2 {
       /** This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
        *  skew line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
-      Vector3D reconstruct3D(const BoundSkewLine& skewLine,
+      Vector3D reconstruct3D(const WireLine& wireLine,
                              const double distance = 0.0) const;
 
     public:

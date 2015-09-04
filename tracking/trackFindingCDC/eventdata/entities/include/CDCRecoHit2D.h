@@ -147,7 +147,7 @@ namespace Belle2 {
        *  Note : This is not optimal yet. In computation steps as well as the correctness of the line. \n
        *  It could be corrected for flight time and in wire delays. The effect of this adjustments might \n
        *  be worth while investigating */
-      BoundSkewLine getSkewLine() const
+      WireLine getSkewLine() const
       { return getWire().getSkewLine().movedBy(getRecoDisp2D()); }
 
       /// Getter for the stereo type of the underlying wire.

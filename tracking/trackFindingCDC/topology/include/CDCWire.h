@@ -27,7 +27,7 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
+#include <tracking/trackFindingCDC/geometry/WireLine.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -160,7 +160,7 @@ namespace Belle2 {
        */
       /**@{*/
       /// Getter for the skew line represenation of the wire.
-      const BoundSkewLine& getSkewLine() const { return m_skewLine; }
+      const WireLine& getSkewLine() const { return m_skewLine; }
 
       /// Indicates if the wire is axial or stereo
       inline bool isAxial() const { return getStereoType() == StereoType_c::Axial; }
@@ -383,7 +383,7 @@ namespace Belle2 {
 
       WireID m_wireID; ///< The wireID of the wire
 
-      BoundSkewLine m_skewLine; ///< The line representation of the wire
+      WireLine m_skewLine; ///< The line representation of the wire
       double m_refCylindricalR;  ///< Precomputed distance to the beam line at the reference position.
 
 

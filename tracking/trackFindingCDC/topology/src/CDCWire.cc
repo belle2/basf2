@@ -83,7 +83,7 @@ void CDCWire::initialize()
   Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire)};
   Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire)};
 
-  m_skewLine = BoundSkewLine(forwardPos, backwardPos);
+  m_skewLine = WireLine(forwardPos, backwardPos);
   m_refCylindricalR = getRefPos2D().norm();
 
   m_forwardPhiToRef = m_skewLine.forwardPhiToRef();

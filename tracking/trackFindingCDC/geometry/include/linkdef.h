@@ -31,7 +31,7 @@
 #pragma link C++ class Belle2::TrackFindingCDC::HelixCovariance-;
 #pragma link C++ class Belle2::TrackFindingCDC::UncertainHelix-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::BoundSkewLine-;
+#pragma link C++ class Belle2::TrackFindingCDC::WireLine-;
 
 #endif
 

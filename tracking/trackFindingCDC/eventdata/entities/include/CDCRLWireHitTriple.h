@@ -182,7 +182,7 @@ namespace Belle2 {
 
       /// Indicator if any of the three oriented wire hits is based on the given wire hit
       bool hasWireHit(const CDCWireHit& wirehit) const
-      { return getStartWireHit()->hasWireHit(wirehit) or getRearRLWireHitPair()->hasWireHit(wirehit); }
+      { return getStartWireHit() == wirehit or getRearRLWireHitPair()->hasWireHit(wirehit); }
 
 
 

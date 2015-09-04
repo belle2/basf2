@@ -18,8 +18,8 @@
 #include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 namespace Belle2 {

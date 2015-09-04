@@ -74,11 +74,11 @@ double CDCTrajectory2D::getAbsMom2D() const
 
 
 
-Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
+Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
                                         const double distance) const
 {
-  Vector2D globalRefPos2D = globalSkewLine.refPos2D();
-  Vector2D movePerZ = globalSkewLine.movePerZ();
+  Vector2D globalRefPos2D = wireLine.refPos2D();
+  Vector2D movePerZ = wireLine.movePerZ();
 
   Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
@@ -93,8 +93,8 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
 
   // Take the solution with the smaller deviation from the reference position
   const double deltaZ = solutionsDeltaZ.second;
-  const double z = deltaZ + globalSkewLine.refZ();
-  return globalSkewLine.pos3DAtZ(z);
+  const double z = deltaZ + wireLine.refZ();
+  return wireLine.pos3DAtZ(z);
 }
 
 

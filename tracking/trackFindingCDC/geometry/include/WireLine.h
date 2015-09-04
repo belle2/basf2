@@ -32,11 +32,11 @@ namespace Belle2 {
      * the closest approach to the beam z-axes.
      * @brief A three dimensional limited line
      */
-    class BoundSkewLine  {
+    class WireLine  {
 
     public:
       /// Default constructor for ROOT compatibility.
-      BoundSkewLine() :
+      WireLine() :
         m_refPos3D(),
         m_movePerZ(),
         m_forwardZ(0.0),
@@ -45,13 +45,13 @@ namespace Belle2 {
 
     public:
       /// Constuctor for a skew line between forward and backward point
-      BoundSkewLine(const Vector3D& forwardIn , const Vector3D& backwardIn);
+      WireLine(const Vector3D& forwardIn , const Vector3D& backwardIn);
 
       /// Returns a copy of the skew line moved by a three dimensional offset
-      BoundSkewLine movedBy(const Vector3D& offset) const;
+      WireLine movedBy(const Vector3D& offset) const;
 
       /// Returns a copy of the skew line moved by a two dimensional offset
-      BoundSkewLine movedBy(const Vector2D& offset) const;
+      WireLine movedBy(const Vector2D& offset) const;
 
       /// Gives the three dimensional position of the line at the given z value
       inline Vector3D pos3DAtZ(const double z) const

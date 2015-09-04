@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 #include <tracking/trackFindingCDC/geometry/Circle2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>

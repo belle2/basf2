@@ -34,7 +34,7 @@ namespace Belle2 {
         StereoU = 1,
 
         /// Constant for an invalid stereo information
-        Invalid = -127,
+        Invalid = -999,
       };
     };
 

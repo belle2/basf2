@@ -102,7 +102,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     //with the reconstruct methode above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
 
-    const BoundSkewLine skewLine = recoHit.getSkewLine();
+    const WireLine skewLine = recoHit.getSkewLine();
     Vector3D recoPos3D = trajectory2D.reconstruct3D(skewLine);
     double perpS    = trajectory2D.calcArcLength2D(recoPos3D.xy());
     double z        = trajectorySZ.mapSToZ(perpS);
@@ -131,7 +131,7 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
 Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
-  const BoundSkewLine& skewLine = wire.getSkewLine();
+  const WireLine& skewLine = wire.getSkewLine();
   const double recoPosZ = getRecoPos3D().z();
 
   Vector2D wirePos = skewLine.pos2DAtZ(recoPosZ);

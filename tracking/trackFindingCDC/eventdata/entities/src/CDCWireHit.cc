@@ -31,21 +31,11 @@ TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
 
 
 CDCWireHit::CDCWireHit() :
-  CDCWireHit(&(CDCWire::getLowest()))
-{;}
+  m_automatonCell(1)
+{}
 
-CDCWireHit::CDCWireHit(const CDCWire* wire):
+CDCWireHit::CDCWireHit(const CDCHit* const ptrHit, TDCCountTranslatorBase* ptrTranslator):
   m_automatonCell(1),
-  m_refDriftLength(0.0),
-  m_refDriftLengthVariance(0.0),
-  m_wire(wire),
-  m_hit(nullptr)
-{;}
-
-CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslator):
-  m_automatonCell(1),
-  m_refDriftLength(0.0),
-  m_refDriftLengthVariance(0.0),
   m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
   m_hit(ptrHit)
 {
@@ -59,7 +49,6 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
 
   float initialTOFEstimate = 0;
 
-  // TODO: check left right correspondence to bool
   float refDriftLengthRight = translator.getDriftLength(hit.getTDCCount(),
                                                         getWireID(),
                                                         initialTOFEstimate,
@@ -112,10 +101,11 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const RightLeftInfo rlInfo) const
 {
   const StereoType stereoType = getStereoType();
+
   if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {
-    const BoundSkewLine& skewLine = getWire().getSkewLine();
+    const WireLine& wireLine = getWire().getSkewLine();
     const double signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
-    return trajectory2D.reconstruct3D(skewLine, signedDriftLength);
+    return trajectory2D.reconstruct3D(wireLine, signedDriftLength);
 
   } else if (stereoType == StereoType_c::Axial) {
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
@@ -124,5 +114,6 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const Ri
     const double z = 0;
     return Vector3D(recoPos2D, z);
   }
-  B2ASSERT("Reconstructing on invalid stereo type " << stereoType, false);
+
+  B2FATAL("Reconstructing on invalid stereo type " << stereoType);
 }

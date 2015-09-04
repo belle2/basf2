@@ -243,7 +243,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
         // Check again if the wire has been hit before
         bool wireAlreadyHit = false;
         for (const SimpleSimHit& simpleSimHit : simpleSimHits) {
-          if (simpleSimHit.m_wireHit.hasWire(closestWire)) {
+          if (simpleSimHit.m_wireHit.isOnWire(closestWire)) {
             wireAlreadyHit = true;
           }
         }

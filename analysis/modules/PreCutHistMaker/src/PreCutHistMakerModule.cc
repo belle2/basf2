@@ -62,6 +62,9 @@ PreCutHistMakerModule::PreCutHistMakerModule():
   addParam("customBinning", m_customBinning,
            "Custom binning, which is used instead of histParams. Specify low-edges for each bin, with nbins+1 entries.", std::vector<float>());
   addParam("inverseSamplingRate", m_inverseSamplingRate, "Inverse sampling rate for 'all' histogram.", static_cast<unsigned int>(1));
+  addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
+           "Don't reconstruct channel if more candidates than given are produced.", -1);
+
 }
 
 void PreCutHistMakerModule::initialize()
@@ -136,12 +139,14 @@ void PreCutHistMakerModule::initialize()
   if (m_customBinning.size() > 0) {
     m_histogramSignal.construct(signalName.c_str(), "signal", m_customBinning.size() - 1, &m_customBinning[0]);
     m_histogramAll.construct(allName.c_str(), "all", m_customBinning.size() - 1, &m_customBinning[0]);
+    m_histogramTemp = new TH1D((allName + "_temp").c_str(), "all_temp", m_customBinning.size() - 1, &m_customBinning[0]);
   } else {
     int nbins;
     double xlow, xhigh;
     std::tie(nbins, xlow, xhigh) = m_histParams;
     m_histogramSignal.construct(signalName.c_str(), "signal", nbins, xlow, xhigh);
     m_histogramAll.construct(allName.c_str(), "all", nbins, xlow, xhigh);
+    m_histogramTemp = new TH1D((allName + "_temp").c_str(), "all_temp", nbins, xlow, xhigh);
   }
   m_withoutCut.construct(withoutCutName.c_str(), "WithoutCut", 2, -0.5, 1.5);
 
@@ -290,19 +295,30 @@ void PreCutHistMakerModule::saveCombinationsForSignal()
 
 }
 
-void PreCutHistMakerModule::saveAllCombinations()
+bool PreCutHistMakerModule::saveAllCombinations()
 {
   m_iEvent++;
   if (m_iEvent % m_inverseSamplingRate == 0) {
     m_generator_all->init();
+
+    int numberOfCandidates = 0;
+    m_histogramTemp->Reset();
     while (m_generator_all->loadNext()) {
       const Particle part = m_generator_all->getCurrentParticle();
       m_withoutCut->get().Fill(0);
       if (!m_cut->check(&part))
         continue;
-      m_histogramAll->get().Fill(m_var->function(&part), m_inverseSamplingRate);
+
+      numberOfCandidates++;
+
+      if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
+        return false;
+      }
+      m_histogramTemp->Fill(m_var->function(&part), m_inverseSamplingRate);
     }
+    m_histogramAll->get().Add(m_histogramTemp);
   }
+  return true;
 }
 
 void PreCutHistMakerModule::event()
@@ -328,7 +344,8 @@ void PreCutHistMakerModule::event()
   }
 
   //for signal + background
-  saveAllCombinations();
+  if (not saveAllCombinations())
+    return;
 
 
   //combinations for signal decays

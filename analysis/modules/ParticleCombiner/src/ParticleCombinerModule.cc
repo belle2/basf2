@@ -53,6 +53,8 @@ namespace Belle2 {
     addParam("decayString", m_decayString,
              "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
+    addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
+             "Don't reconstruct channel if more candidates than given are produced.", -1);
     addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
              0);
     addParam("writeOut", m_writeOut,
@@ -122,11 +124,20 @@ namespace Belle2 {
     }
 
     m_generator->init();
+
+    int numberOfCandidates = 0;
     while (m_generator->loadNext()) {
 
       const Particle& particle = m_generator->getCurrentParticle();
       if (!m_cut->check(&particle))
         continue;
+
+      numberOfCandidates++;
+
+      if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
+        outputList->clear();
+        break;
+      }
 
       Particle* newParticle = particles.appendNew(particle);
       int iparticle = particles.getEntries() - 1;

@@ -68,7 +68,7 @@ namespace Belle2 {
     /** Make Particle combinations using m_tmpLists, check MC truth and save true signals in histogram. */
     void saveCombinationsForSignal();
     /** Make all Particle combinations for given PDG and input lists, save into 'all' histogram. */
-    void saveAllCombinations();
+    bool saveAllCombinations();
 
     std::string m_decayString; /**< decay string. */
     int m_pdg;                /**< PDG code of combined particles */
@@ -91,6 +91,7 @@ namespace Belle2 {
     StoreObjPtr<RootMergeable<TH1D>> m_withoutCut; /**< histogram containing signal and background amount without previous cut */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramSignal; /**< signal histogram for combined particle. */
     StoreObjPtr<RootMergeable<TH1D>> m_histogramAll; /**< signal+background histogram for combined particle. */
+    TH1D* m_histogramTemp; /**< signal+background histogram temporary for combined particle. */
 
     std::unique_ptr<ParticleGenerator>
     m_generator_signal; /**< Combines particles for signal (not everything is signal, so we run MCMatching for the limited number of candidates produced). */
@@ -101,6 +102,7 @@ namespace Belle2 {
 
     std::string m_cutParameter;  /**< selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+    int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
 
   };
 

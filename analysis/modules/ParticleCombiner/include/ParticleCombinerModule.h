@@ -75,6 +75,8 @@ namespace Belle2 {
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
+    int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
+
   };
 
 } // Belle2 namespace

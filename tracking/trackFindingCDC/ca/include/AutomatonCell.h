@@ -72,9 +72,6 @@ namespace Belle2 {
         m_flags(initialFlags),
         m_state(0) {;}
 
-      /// Empty deconstructor
-      ~AutomatonCell() {;}
-
       /// Getter for the cell state
       const CellState& getCellState() const { return m_state; }
 

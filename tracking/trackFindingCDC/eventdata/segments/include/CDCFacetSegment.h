@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

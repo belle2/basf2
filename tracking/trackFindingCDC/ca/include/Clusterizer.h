@@ -42,14 +42,6 @@ namespace Belle2 {
     template<class Item, class Cluster>
     class Clusterizer {
 
-    public:
-
-      /** Constructor. */
-      Clusterizer() {;}
-
-      /** Destructor.*/
-      ~Clusterizer() {;}
-
     private:
       /// Type for the neighborhood of elements in the algorithm
       typedef WeightedNeighborhood<const Item> Neighborhood;

@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 

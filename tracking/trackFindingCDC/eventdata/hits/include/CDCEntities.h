@@ -10,15 +10,15 @@
 #pragma once
 
 //Convenience header
-#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCGenHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 

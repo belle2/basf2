@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>

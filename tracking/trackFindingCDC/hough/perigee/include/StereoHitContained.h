@@ -10,10 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/RLTagged.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/RLTagged.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <tracking/trackFindingCDC/numerics/Sign.h>

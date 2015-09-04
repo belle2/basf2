@@ -9,7 +9,7 @@
 #include <set>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <sstream>
 
 using namespace Belle2;

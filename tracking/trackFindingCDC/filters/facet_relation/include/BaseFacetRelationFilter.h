@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
 #include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>

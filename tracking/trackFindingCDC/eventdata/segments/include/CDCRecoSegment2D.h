@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
 namespace genfit {
   class TrackCand;

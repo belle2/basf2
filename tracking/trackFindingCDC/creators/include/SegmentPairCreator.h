@@ -35,12 +35,6 @@ namespace Belle2 {
 
 
     public:
-      /// Empty constructor.
-      SegmentPairCreator() {;}
-
-      /// Empty destructor.
-      ~SegmentPairCreator() {;}
-
       bool checkSegmentsSortedBySuperLayer(const std::vector<CDCRecoSegment2D>& segments) const
       {
         if (segments.empty()) return true;

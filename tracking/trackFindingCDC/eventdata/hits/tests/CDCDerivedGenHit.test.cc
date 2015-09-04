@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCDerivedGenHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCDerivedGenHit.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
@@ -25,7 +25,7 @@ namespace {
   template<class T>
   void unused(const T&) {}
 
-  TEST_F(TrackFindingCDCTestWithTopology, eventdata_entities_CDCDerivedGenHit_methodAccess)
+  TEST_F(TrackFindingCDCTestWithTopology, eventdata_hits_CDCDerivedGenHit_methodAccess)
   {
     // CDCDerivedGenHit has all methods of its restrained base accessable with ->.
     CDCDerivedGenHit derivedGenHit;
@@ -37,7 +37,7 @@ namespace {
     EXPECT_TRUE(derivedGenHit->getFlag());
   }
 
-  TEST_F(TrackFindingCDCTestWithTopology, eventdata_entities_CDCDerivedGenHit_hiddenBase)
+  TEST_F(TrackFindingCDCTestWithTopology, eventdata_hits_CDCDerivedGenHit_hiddenBase)
   {
     // But unlike normal inheritance you may never obtain a non constant reference of the base.
     CDCDerivedGenHit derivedGenHit;

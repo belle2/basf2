@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 #include <assert.h>

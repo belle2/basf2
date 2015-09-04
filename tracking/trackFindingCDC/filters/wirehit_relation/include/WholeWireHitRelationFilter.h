@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>

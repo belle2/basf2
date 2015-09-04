@@ -8,31 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
-
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
-
-#include <gtest/gtest.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCGenHit.h>
 
 using namespace std;
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-// Tests if CDCGenHitVector can handle CDCWireHits
-TEST_F(TrackFindingCDCTestWithTopology, eventdata_entities_CDCGenHit_totalOrdering)
-{
-  CDCGenHit lowestGenHit;
-  CDCGenHit secondLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 0.0));
-  CDCGenHit thirdLowestGenHit(WireID(0, 0, 1), Vector2D(0.0, 1.0));
 
-  ASSERT_LT(lowestGenHit, secondLowestGenHit);
-  ASSERT_LT(secondLowestGenHit, thirdLowestGenHit);
-  ASSERT_LT(lowestGenHit, thirdLowestGenHit);
+CDCGenHit::CDCGenHit():
+  m_wire(&(CDCWire::getLowest())),
+  m_dummyPos(0.0, 0.0)
+{;}
+
+CDCGenHit::CDCGenHit(const WireID& wireID, const Vector2D& dummyPos):
+  m_wire(CDCWire::getInstance(wireID)),
+  m_dummyPos(dummyPos)
+{;}
+
+CDCGenHit::CDCGenHit(const CDCWire* wire, const Vector2D& dummyPos):
+  m_wire(wire),
+  m_dummyPos(dummyPos)
+{;}
+
+
+
+CDCGenHit::~CDCGenHit()
+{
 
 }
-
-
-
-
 

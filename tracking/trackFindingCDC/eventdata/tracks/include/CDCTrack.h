@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>

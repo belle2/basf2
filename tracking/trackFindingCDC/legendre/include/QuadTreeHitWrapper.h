@@ -14,7 +14,7 @@
 #include <tuple>
 #endif
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
   class CDCHit;

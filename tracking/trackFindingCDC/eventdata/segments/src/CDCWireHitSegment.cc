@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

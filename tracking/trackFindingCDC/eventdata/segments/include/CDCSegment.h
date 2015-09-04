@@ -34,10 +34,10 @@ namespace Belle2 {
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCSegment<T>& segment)
       { return wireSuperLayer.getISuperLayer() < segment.getISuperLayer(); }
 
-      /// Returns the common stereo type of all tracking entities.
-      /** This checks if all tracking entities are located in the same superlayer and \n
+      /// Returns the common stereo type of all tracking hits.
+      /** This checks if all tracking hits are located in the same superlayer and \n
        *  returns the stereo type of the later. Returns StereoType_c::Invalid if the superlayer \n
-       *  is not shared among the tracking entities. */
+       *  is not shared among the tracking hits. */
       StereoType getStereoType() const
       { return TrackFindingCDC::getStereoType(*this); }
 
@@ -45,10 +45,10 @@ namespace Belle2 {
       bool isAxial() const
       { return getStereoType() == StereoType_c::Axial; }
 
-      /** Returns the common super layer id of all stored tracking entities
+      /** Returns the common super layer id of all stored tracking hits
        *  This checks if all items are located in the same superlayer and
        *  returns the superlayer id of the later. Returns INVALID_ISUPERLAYER if the superlayer
-       *  is not shared among the tracking entities. */
+       *  is not shared among the tracking hits. */
       ISuperLayerType getISuperLayer() const
       { return TrackFindingCDC::getISuperLayer(*this); }
 

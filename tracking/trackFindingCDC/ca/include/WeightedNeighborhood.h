@@ -131,12 +131,6 @@ namespace Belle2 {
       /// Iterator range type for a pair of iterators representing all the neighbors of a specific item.
       using range = Range<iterator>;
 
-      /// Default constructor
-      WeightedNeighborhood() {;}
-
-      /// Empty destructor
-      ~WeightedNeighborhood() {;}
-
     private:
       /// Operator to compare key types WeightedItemPtr to the relations in the vector for lookup.
       friend bool operator<(const WeightedItemPtr& weightedItemPtr,
@@ -314,13 +308,13 @@ namespace Belle2 {
        *  same kind. To find suitable neighbors in a general container it would take an amount of time \n
        *  proportional to n*n to compare all available elements to each other, which is often to long. \n
        *  However if we can sort the sequence we can improve look up speed to an element by a great deal. \n
-       *  All tracking entities we want to build neighborhoods for are therefore already made sortable. \n
+       *  All tracking hits we want to build neighborhoods for are therefore already made sortable. \n
        *  But the improved look up speed only helps if the neighbors are not scattered around randomly over \n
        *  the sorted range but are close together in a specific section of the range. The time complexity drops \n
        *  than to n*log n + n * m where n is the number of elements in the collection and m the expected number \n
        *  of neighbors.
        *
-       *  Since we already sorted out the arrangement of entities during their creation, we have to define \n
+       *  Since we already sorted out the arrangement of hits during their creation, we have to define \n
        *  the region where to look for neighbors. We keep the general logic for look up the same \n
        *  but vary the definition of what a neighborhood is supposed to be we factor the later out into \n
        *  a strategy object called the RelationFilter with the following interface methods : \n

@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
 
 namespace Belle2 {

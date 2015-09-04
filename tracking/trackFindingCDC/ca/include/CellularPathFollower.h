@@ -43,17 +43,6 @@ namespace Belle2 {
       /// Resulting path type to be generated
       typedef std::vector<const Item*> Path;
 
-
-
-    public:
-      /// Empty constructor
-      CellularPathFollower() {;}
-
-      /// Empty destructor
-      ~CellularPathFollower() {;}
-
-
-
     public:
 
       /// Follow paths from all start items marked with the start flag

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/filters/facet/CDCFacetFitlessVarSet.h>
 

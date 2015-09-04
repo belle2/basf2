@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/perigee/SimpleHitBasedHoughTree.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLTaggedWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

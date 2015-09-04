@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 #include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 

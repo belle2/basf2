@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>

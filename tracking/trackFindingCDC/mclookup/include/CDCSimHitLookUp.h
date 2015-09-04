@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

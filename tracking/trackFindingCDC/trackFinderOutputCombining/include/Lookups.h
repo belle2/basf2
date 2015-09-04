@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <vector>

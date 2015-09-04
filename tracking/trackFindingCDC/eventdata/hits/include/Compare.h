@@ -10,15 +10,15 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCGenHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCGenHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
 
 
@@ -26,7 +26,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** @name Definition of coalignment with wires
-     *  The following methods define wires and several entities that support the getWire method as coaligned.
+     *  The following methods define wires and several hits that support the getWire method as coaligned.
      *  Which is true for
      *    - CDCGenHit
      *    - CDCWireHit
@@ -41,7 +41,7 @@ namespace Belle2 {
     /* /\**@}*\/ */
 
     /* /\** @name Definition of coalignment with wire hits */
-    /*  *  The following methods define wires and several entities that support the getWireHit method as coaligned. */
+    /*  *  The following methods define wires and several hits that support the getWireHit method as coaligned. */
     /*  *  Which is true for */
     /*  *    - CDCRLWireHit */
     /*  *\/ */

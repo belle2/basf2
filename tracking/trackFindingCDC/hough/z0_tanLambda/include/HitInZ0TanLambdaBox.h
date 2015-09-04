@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>

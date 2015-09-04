@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHitTriple.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>

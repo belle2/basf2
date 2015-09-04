@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <boost/range/iterator_range.hpp>
 #include <cmath>

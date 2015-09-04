@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 
 namespace Belle2 {
@@ -73,8 +73,8 @@ namespace Belle2 {
       /**@}*/
 
 
-      /** @name Methods common to all tracking entities
-       *  All entities ( track parts contained in a single superlayer ) share this interface to help the definition of collections of them. */
+      /** @name Methods common to all tracking hits
+       *  All hits ( track parts contained in a single superlayer ) share this interface to help the definition of collections of them. */
       /**@{*/
       /// Checks of the generic hit is base on the wire given
       bool isOnWire(const CDCWire& wire) const

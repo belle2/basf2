@@ -11,9 +11,9 @@
 
 #include <cmath>
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/entities/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

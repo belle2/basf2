@@ -10,6 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
-#include <tracking/trackFindingCDC/eventdata/entities/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTracks.h>

@@ -34,12 +34,9 @@ const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
   }
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    if (createVariable(name)) {
-      mapIter = m_variables.find(name);
-      if (mapIter == m_variables.end()) {
-        return nullptr;
-      }
-    }
+    if (!createVariable(name)) return nullptr;
+    mapIter = m_variables.find(name);
+    if (mapIter == m_variables.end()) return nullptr;
   }
   return mapIter->second.get();
 }

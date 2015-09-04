@@ -25,7 +25,7 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
   addParam("quadTreeLevel",
            m_param_quadTreeLevel,
            "The number of levels for the quad tree search.",
-           static_cast<unsigned int>(6));
+           static_cast<unsigned int>(5));
 
   addParam("minimumHitsInQuadtree",
            m_param_minimumHitsInQuadTree,
@@ -35,7 +35,7 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
   addParam("useOldImplementation",
            m_param_useOldImplementation,
            "Whether to use the old implementation o the quad tree.",
-           true);
+           false);
 
   addParam("checkForB2BTracks", m_param_checkForB2BTracks,
            "Set to false to skip the check for back-2-back tracks (good for cosmics)",

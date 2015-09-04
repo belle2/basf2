@@ -19,25 +19,8 @@ bool StereohitsProcesser::isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHi
   if (rlWireHit.getStereoType() == StereoType_c::Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
 
-  if (not m_checkForB2BTracks)
-    return true;
 
-  const Vector2D& center = trajectory2D.getGlobalCircle().center();
-  double trackPhi = center.phi();
-  double hitPhi = rlWireHit.getRefPos2D().phi();
-
-
-  double phi_diff = trackPhi - hitPhi;
-  if (not std::isnan(phi_diff)) {
-    phi_diff = TVector2::Phi_0_2pi(phi_diff);
-  }
-
-  int charge = 1;
-  if (phi_diff <= TMath::Pi())
-    charge = -1;
-
-  if (trajectory2D.getChargeSign() != charge)
-    return false;
+  // Check for number of layers in between
 
   return true;
 }
@@ -46,6 +29,8 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  const double radius = trajectory2D.getGlobalCircle().radius();
+  const bool isCurler = trajectory2D.getOuterExit().hasNAN();
 
   const auto& rlWireHits = wireHitTopology.getRLWireHits();
   hitsVector.reserve(rlWireHits.size());
@@ -57,6 +42,13 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
       const CDCWire& wire = rlWireHit.getWire();
       if (wire.isInCellZBounds(recoPos3D)) {
         double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+        if (perpS < 0) {
+          if (isCurler) {
+            perpS += 2 * TMath::Pi() * radius;
+          } else if (m_checkForB2BTracks) {
+            continue;
+          }
+        }
         CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS);
         hitsVector.push_back(newRecoHit);
       }

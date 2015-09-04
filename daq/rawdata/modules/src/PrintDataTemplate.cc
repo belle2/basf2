@@ -105,7 +105,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         tv.tv_sec, tv.tv_usec
+         tv.tv_sec, (int)(tv.tv_usec)
         );
 
 

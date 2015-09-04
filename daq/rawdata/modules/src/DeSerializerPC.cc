@@ -372,7 +372,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       int this_length = *((int*)((char*)temp_buf + total_recvd_byte - each_buf_nwords[ i ] * sizeof(int) + temp_length));
       temp_length += this_length * sizeof(int);
     }
-    if (temp_length != each_buf_nwords[ i ] * sizeof(int)) {
+    if (temp_length != (int)(each_buf_nwords[ i ] * sizeof(int))) {
       printf("[DEBUG]*******SENDHDR*********** \n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       printf("[DEBUG]*******BODY***********\n ");
@@ -459,8 +459,8 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
                                      unsigned int* subrun_copper_0, unsigned int* eve_copper_0, int* error_bit_flag)
 {
 
-  int data_size_copper_0 = -1;
-  int data_size_copper_1 = -1;
+  //  int data_size_copper_0 = -1;
+  //  int data_size_copper_1 = -1;
 
   //
   // Data check
@@ -546,13 +546,14 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         //
         // RawCOPPER
         //
-        int block_id = 0;
+
 
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
+        int block_id = 0;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTUTIME ] = utime_ftsw;
@@ -576,14 +577,14 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
 
         if (cpr_num == 0) {
-          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
+          //          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
           //          *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
           *eve_copper_0 = temp_rawcopper->GetEveNo(0);
           *exp_copper_0 = temp_rawcopper->GetExpNo(0);
           *run_copper_0 = temp_rawcopper->GetRunNo(0);
           *subrun_copper_0 = temp_rawcopper->GetSubRunNo(0);
         } else if (cpr_num == 1) {
-          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
+          //          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
         }
         cpr_num++;
 

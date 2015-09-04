@@ -189,7 +189,7 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
       return 0x0;
     }
     char err_buf[500];
-    sprintf("Failed to read header(%s). Exiting...", strerror(errno));
+    sprintf(err_buf, "Failed to read header. Exiting...");
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -272,7 +272,7 @@ void DeSerializerFILEModule::event()
 
 
         unsigned int temp_cur_evenum = 0, temp_cur_copper_ctr = 0;
-        unsigned temp_utime, temp_ctime_trgtype;
+
         try {
           temp_rawcopper.CheckData(0,
                                    m_dummy_evenum - 2, &temp_cur_evenum,

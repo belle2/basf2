@@ -53,7 +53,7 @@ void DeSerializerPXDModule::initialize()
   }
 
   // Open receiver sockets
-  for (int i = 0; i < m_hosts.size(); i++) {
+  for (int i = 0; i < (int)(m_hosts.size()); i++) {
     m_recvs.push_back(new EvtSocketSend(m_hosts[i], m_ports[i]));
   }
 

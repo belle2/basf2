@@ -409,7 +409,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
       int this_length = *((int*)((char*)temp_buf + total_recvd_byte - each_buf_nwords[ i ] * sizeof(int) + temp_length));
       temp_length += this_length * sizeof(int);
     }
-    if (temp_length != each_buf_nwords[ i ] * sizeof(int)) {
+    if (temp_length != (int)(each_buf_nwords[ i ] * sizeof(int))) {
       printf("[DEBUG]*******SENDHDR*********** \n");
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       printf("[DEBUG]*******BODY***********\n ");
@@ -495,8 +495,8 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_fla
 
 void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0)
 {
-  int data_size_copper_0 = -1;
-  int data_size_copper_1 = -1;
+  //  int data_size_copper_0 = -1;
+  //  int data_size_copper_1 = -1;
 
   //
   // Data check
@@ -586,12 +586,13 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         //
         // RawCOPPER
         //
-        int block_id = 0;
+
         RawCOPPER* temp_rawcopper = new RawCOPPER;
         temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB
+        int block_id = 0;
         "do not use the following for actual DAQ"
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_EXP_RUN_NO ] = exp_run_ftsw;
         (temp_rawcopper->GetBuffer(block_id))[ RawHeader_latest::POS_TTCTIME_TRGTYPE ] = ctime_trgtype_ftsw;
@@ -617,10 +618,10 @@ void DesSerPrePC::checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_
         ctime_type_array[ entry_id ] = temp_rawcopper->GetTTCtimeTRGType(0);
 
         if (cpr_num == 0) {
-          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
+          //          data_size_copper_0 = raw_datablk->GetBlockNwords(entry_id);
           *eve_copper_0 = (raw_datablk->GetBuffer(entry_id))[ 3 ];
         } else if (cpr_num == 1) {
-          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
+          //          data_size_copper_1 = raw_datablk->GetBlockNwords(entry_id);
         }
         cpr_num++;
         delete temp_rawcopper;

@@ -203,9 +203,9 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
 
-        if (recvd_byte > (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int)) {
+        if (recvd_byte > (int)((m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int))) {
           char err_buf[500];
-          sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
+          sprintf(err_buf, "EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...");
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
@@ -219,7 +219,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
       } else {
         char err_buf[500];
-        sprintf("Failed to read data from COPPER(%s). Exiting...", strerror(errno));
+        sprintf(err_buf, "Failed to read data from COPPER. Exiting...");
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
@@ -320,7 +320,7 @@ void DeSerializerCOPPERModule::openCOPPER()
   //
   if ((m_cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char err_buf[500];
-    sprintf("Failed to open Finesse(%s). Exiting... ", strerror(errno));
+    sprintf(err_buf, "Failed to open /dev/copper/copper. Exiting... ");
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -359,7 +359,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
         if (n > 0) {
           char err_buf[500];
-          sprintf("EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...", strerror(errno));
+          sprintf(err_buf, "Return due to EAGAIN in the middle of an event( COPPER driver would't do this.). Exting...");
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
@@ -380,8 +380,8 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
         continue;
       } else {
         char err_buf[500];
-        sprintf("Failed to read data from COPPER(%s). %s %s %d",
-                strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sprintf(err_buf, "Failed to read data from COPPER. %s %s %d",
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
         B2ERROR(err_buf);

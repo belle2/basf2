@@ -186,7 +186,7 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         tv.tv_sec, tv.tv_usec
+         tv.tv_sec, (int)(tv.tv_usec)
         );
 
 
@@ -277,14 +277,14 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
 
     // 1
     for (int i = 0; i < prev_tv_pos ; i++) {
-      if (eve - prev_tv_eve[ i ] == 1) {
+      if ((int)(eve - prev_tv_eve[ i ]) == 1) {
         float diff = (float)(tv.tv_sec - prev_tv[ i ].tv_sec) + (float)(tv.tv_usec - prev_tv[ i ].tv_usec) * 1.e-6 ;
         hist[ 4 ]->Fill(diff);
         hist[ 5 ]->Fill(diff);
         tv_flag[ i ] |= 0x2;
         tv_flag[ prev_tv_pos - 1 ] |= 0x1;
       }
-      if (eve - prev_tv_eve[ i ] == -1) {
+      if ((int)(eve - prev_tv_eve[ i ]) == -1) {
         float diff = (float)(tv.tv_sec - prev_tv[ i ].tv_sec) + (float)(tv.tv_usec - prev_tv[ i ].tv_usec) * 1.e-6 ;
         hist[ 4 ]->Fill(-diff);
         hist[ 5 ]->Fill(-diff);
@@ -304,7 +304,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
       }
     }
 
-    if (eve % 10000 == 0)   printf("1 %d %d\n", tv.tv_sec - 1422134556, eve);
+    if (eve % 10000 == 0)   printf("1 %d %d\n", tv.tv_sec - 1422134556, (int)eve);
     if (prev_tv_pos > 100) {
       for (int i = 0; i < prev_tv_pos ; i++) {
         printf(" a %d %d %d\n", i, prev_tv_eve[i ], tv_flag[ i ]);

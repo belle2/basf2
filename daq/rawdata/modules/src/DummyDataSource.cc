@@ -226,7 +226,7 @@ void DummyDataSourceModule::event()
   // Monitor
   //
   if (max_nevt >= 0) {
-    if (n_basf2evt >= max_nevt && max_nevt > 0) {
+    if ((int)n_basf2evt >= max_nevt && max_nevt > 0) {
       printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
              max_nevt , n_basf2evt);
       fflush(stdout);

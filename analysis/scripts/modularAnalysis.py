@@ -1114,6 +1114,24 @@ def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
     path.add_module(mod)
 
 
+def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path=analysis_main):
+    """
+    Reconstructs Btag from particles in given ParticleLists which does not share any final state particles (mdstSource) with Bsig.
+
+    @param upsilon_list_name Name of the ParticleList to be filled with `Upsilon(4S) -> B:sig anti-B:tag`
+    @param bsig_list_name Name of the Bsig ParticleList
+    @param btag_list_name Name of the Bsig ParticleList
+    @param input_lists_names List of names of the ParticleLists which are used to reconstruct Btag from
+    """
+    btag = register_module('InclusiveBtagReconstruction')
+    btag.set_name('InclusiveBtagReconstruction_' + bsig_list_name)
+    btag.param('upsilonListName', upsilon_list_name)
+    btag.param('bsigListName', bsig_list_name)
+    btag.param('btagListName', btag_list_name)
+    btag.param('inputListsNames', input_lists_names)
+    path.add_module(btag)
+
+
 if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):

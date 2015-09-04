@@ -72,6 +72,9 @@ void InclusiveBtagReconstructionModule::event()
   StoreObjPtr<ParticleList> bsigList(m_bsigListName);
 
   bool valid = m_decaydescriptor.init(m_bsigListName);
+  if (!valid)
+    B2ERROR("Invalid Bsig list name: " << m_bsigListName);
+
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
   int pdgCode  = mother->getPDGCode();
 

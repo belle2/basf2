@@ -17,7 +17,6 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-//#include <tracking/trackFindingCDC/geometry/BoundSkewLine.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -98,12 +97,12 @@ namespace Belle2 {
 
     public:
       /// Checks if the trajectory is already set to a valid value.
-      bool isNull() const
-      { return m_localHelix.isNull(); }
+      bool isInvalid() const
+      { return m_localHelix.isInvalid(); }
 
       /// Checks if the trajectory has already been set to a valid value.
       bool isFitted() const
-      { return not isNull(); }
+      { return not isInvalid(); }
 
     public:
 
@@ -191,7 +190,7 @@ namespace Belle2 {
       void clear()
       {
         m_localOrigin.set(0.0, 0.0, 0.0);
-        m_localHelix.setNull();
+        m_localHelix.invalidate();
       }
 
     public:

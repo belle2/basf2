@@ -148,10 +148,10 @@ namespace Belle2 {
 
 
       /// Sets all circle parameters to zero including the covariance matrix
-      inline void setNull()
+      inline void invalidate()
       {
-        PerigeeCircle::setNull();
-        m_perigeeCovariance.setNull();
+        PerigeeCircle::invalidate();
+        m_perigeeCovariance.invalidate();
         m_chi2 = 0.0;
       }
 

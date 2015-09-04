@@ -66,23 +66,23 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
   Line2D lineSZ = helix.lineSZ();
 
   trajectory3D.clear();
-  EXPECT_TRUE(trajectory3D.isNull());
+  EXPECT_TRUE(trajectory3D.isInvalid());
   EXPECT_FALSE(trajectory3D.isFitted());
 
-  uncertainHelix.setNull();
-  EXPECT_TRUE(uncertainHelix.isNull());
+  uncertainHelix.invalidate();
+  EXPECT_TRUE(uncertainHelix.isInvalid());
 
-  helix.setNull();
-  EXPECT_TRUE(helix.isNull());
+  helix.invalidate();
+  EXPECT_TRUE(helix.isInvalid());
 
-  perigeeCircle.setNull();
-  EXPECT_TRUE(perigeeCircle.isNull());
+  perigeeCircle.invalidate();
+  EXPECT_TRUE(perigeeCircle.isInvalid());
 
-  generalizedCircle.setNull();
-  EXPECT_TRUE(generalizedCircle.isNull());
+  generalizedCircle.invalidate();
+  EXPECT_TRUE(generalizedCircle.isInvalid());
 
-  lineSZ.setNull();
-  EXPECT_TRUE(lineSZ.isNull());
+  lineSZ.invalidate();
+  EXPECT_TRUE(lineSZ.isInvalid());
 }
 
 

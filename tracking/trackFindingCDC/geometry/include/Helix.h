@@ -69,14 +69,14 @@ namespace Belle2 {
       {;}
 
       /// Sets all circle parameters to zero.
-      void setNull()
+      void invalidate()
       {
-        m_circleXY.setNull();
-        m_lineSZ.setNull();
+        m_circleXY.invalidate();
+        m_lineSZ.invalidate();
       }
 
-      bool isNull() const
-      { return circleXY().isNull() and lineSZ().isNull(); }
+      bool isInvalid() const
+      { return circleXY().isInvalid() and lineSZ().isInvalid(); }
 
       /// Flips the travel direction of the helix in place, pivot point is unchanged.
       inline void reverse()

@@ -27,7 +27,7 @@ using namespace TrackFindingCDC;
 
 PerigeeCircle::PerigeeCircle() : GeneralizedCircle()
 {
-  setNull();
+  invalidate();
 }
 
 PerigeeCircle::PerigeeCircle(const double curvature,

@@ -106,7 +106,7 @@ namespace Belle2 {
       { setN0(n0) ; setN12(n1, n2); normalize();}
 
       /// Sets all line parameters to zero.
-      void setNull()
+      void invalidate()
       { setN(0.0, 0.0, 0.0); }
 
       /// Setter for the intercept and slope.
@@ -124,7 +124,7 @@ namespace Belle2 {
       /// Updates the parameters to obey the normalization condition
       void normalize()
       {
-        if (not isNull()) {
+        if (not isInvalid()) {
           scaleN(1.0 / normalization());
         }
       }
@@ -201,7 +201,7 @@ namespace Belle2 {
 
 
       /// Indicates if all circle parameters are zero
-      inline bool isNull() const
+      inline bool isInvalid() const
       { return n0() == 0.0 and n12().isNull(); }
 
 

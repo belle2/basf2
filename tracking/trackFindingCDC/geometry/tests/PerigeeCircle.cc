@@ -138,11 +138,11 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 
 
 
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
 {
 
   PerigeeCircle defaultCircle;
-  EXPECT_TRUE(defaultCircle.isNull());
+  EXPECT_TRUE(defaultCircle.isInvalid());
 
   EXPECT_EQ(0., defaultCircle.n0());
   EXPECT_EQ(0., defaultCircle.n1());
@@ -162,9 +162,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 
   PerigeeCircle circle(curvature, tangentialPhi, impact);
 
-  circle.setNull();
+  circle.invalidate();
 
-  EXPECT_TRUE(circle.isNull());
+  EXPECT_TRUE(circle.isInvalid());
 
   EXPECT_EQ(0., circle.n0());
   EXPECT_EQ(0., circle.n1());
@@ -180,7 +180,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 
   circle.reverse();
 
-  EXPECT_TRUE(circle.isNull());
+  EXPECT_TRUE(circle.isInvalid());
 
   EXPECT_EQ(0., circle.n0());
   EXPECT_EQ(0., circle.n1());
@@ -196,7 +196,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 
   circle =  circle.reversed();
 
-  EXPECT_TRUE(circle.isNull());
+  EXPECT_TRUE(circle.isInvalid());
 
   EXPECT_EQ(0., circle.n0());
   EXPECT_EQ(0., circle.n1());
@@ -211,10 +211,10 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 
 
   GeneralizedCircle generalizedCircle;
-  generalizedCircle.setNull();
+  generalizedCircle.invalidate();
   circle.setN(generalizedCircle);
 
-  EXPECT_TRUE(circle.isNull());
+  EXPECT_TRUE(circle.isInvalid());
 
   EXPECT_EQ(0., circle.n0());
   EXPECT_EQ(0., circle.n1());

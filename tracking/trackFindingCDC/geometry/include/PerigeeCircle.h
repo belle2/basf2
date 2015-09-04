@@ -197,9 +197,9 @@ namespace Belle2 {
       }
 
       /// Sets all circle parameters to zero
-      void setNull()
+      void invalidate()
       {
-        GeneralizedCircle::setNull();
+        GeneralizedCircle::invalidate();
         m_curvature = 0.0;
         m_tangentialPhi = NAN;
         m_tangential = Vector2D(0.0, 0.0);

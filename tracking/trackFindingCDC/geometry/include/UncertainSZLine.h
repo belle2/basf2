@@ -97,10 +97,10 @@ namespace Belle2 {
 
 
       /// Sets all line parameters to zero including the covariance matrix
-      inline void setNull()
+      inline void invalidate()
       {
-        Line2D::setNull();
-        m_szCovariance.setNull();
+        Line2D::invalidate();
+        m_szCovariance.invalidate();
         m_chi2 = 0.0;
         m_ndf = 0;
       }

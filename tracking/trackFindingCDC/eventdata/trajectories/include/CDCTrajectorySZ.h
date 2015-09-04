@@ -111,11 +111,11 @@ namespace Belle2 {
 
       /// Indicates if the line has been fitted
       bool isFitted() const
-      { return m_szLine.isNull(); }
+      { return m_szLine.isInvalid(); }
 
       /// Clears all information from this trajectory line
       void clear()
-      { m_szLine.setNull(); }
+      { m_szLine.invalidate(); }
 
 
 

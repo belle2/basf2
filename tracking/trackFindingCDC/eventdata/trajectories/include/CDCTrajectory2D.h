@@ -73,7 +73,7 @@ namespace Belle2 {
     public:
       /// Checks if the circle is already set to a valid value.
       bool isFitted() const
-      { return not getLocalCircle().isNull(); }
+      { return not getLocalCircle().isInvalid(); }
 
       /// Calculate the travel distance from the start position of the trajectory.
       /** Returns the travel distance on the trajectory from the start point to \n
@@ -305,7 +305,7 @@ namespace Belle2 {
       void clear()
       {
         m_localOrigin.set(0.0, 0.0);
-        m_localPerigeeCircle.setNull();
+        m_localPerigeeCircle.invalidate();
       }
 
 

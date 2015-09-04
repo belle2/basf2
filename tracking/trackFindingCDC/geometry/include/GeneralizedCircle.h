@@ -189,7 +189,7 @@ namespace Belle2 {
       { setN(n0123.n0(), n0123.n12(), n0123.n3()); }
 
       /// Sets all circle parameters to zero
-      void setNull()
+      void invalidate()
       { setN(0.0, 0.0, 0.0, 0.0); }
 
       /// Flips the orientation of the circle in place
@@ -256,12 +256,12 @@ namespace Belle2 {
 
     public:
       /// Indicates if all circle parameters are zero
-      inline bool isNull() const
+      inline bool isInvalid() const
       { return n0() == 0 and n12().isNull() and n3() == 0; }
 
       /// Indicates if the combination of the circle parameters makes up a valid circle
       inline bool isValid() const
-      { return normalizationSquared() > 0; }
+      { return not isInvalid(); }
 
       /**
       Calculates the generalized circle specific squared norm.

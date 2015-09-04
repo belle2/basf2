@@ -151,10 +151,10 @@ namespace Belle2 {
       { m_ndf = ndf; }
 
       /// Sets all circle parameters to zero including the covariance matrix
-      inline void setNull()
+      inline void invalidate()
       {
-        Helix::setNull();
-        m_helixCovariance.setNull();
+        Helix::invalidate();
+        m_helixCovariance.invalidate();
         m_chi2 = 0.0;
         m_ndf = 0;
       }

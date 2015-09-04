@@ -130,7 +130,7 @@ namespace Belle2 {
 
 
       /// Sets the covariance matrix to zero.
-      void setNull()
+      void invalidate()
       { m_matrix.Zero(); }
 
 

@@ -50,9 +50,9 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   const CDCWireHit& endWireHit = rlWireHitTriple.getEndWireHit();
 
   //First check if the track ids are in agreement
-  ITrackType startMCTrackId = mcHitLookUp.getMCTrackId(startWireHit);
-  ITrackType middleMCTrackId = mcHitLookUp.getMCTrackId(middleWireHit);
-  ITrackType endMCTrackId = mcHitLookUp.getMCTrackId(endWireHit);
+  ITrackType startMCTrackId = mcHitLookUp.getMCTrackId(startWireHit.getHit());
+  ITrackType middleMCTrackId = mcHitLookUp.getMCTrackId(middleWireHit.getHit());
+  ITrackType endMCTrackId = mcHitLookUp.getMCTrackId(endWireHit.getHit());
 
   if (not(startMCTrackId == middleMCTrackId and middleMCTrackId == endMCTrackId) or startMCTrackId == INVALID_ITRACK) {
     return false;
@@ -61,17 +61,17 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
 
   //Maybe be a bit more permissive for reassigned hits
-  bool startIsReassigned = mcHitLookUp.isReassignedSecondary(startWireHit);
-  bool middleIsReassigned = mcHitLookUp.isReassignedSecondary(middleWireHit);
-  bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit);
+  bool startIsReassigned = mcHitLookUp.isReassignedSecondary(startWireHit.getHit());
+  bool middleIsReassigned = mcHitLookUp.isReassignedSecondary(middleWireHit.getHit());
+  bool endIsReassigned = mcHitLookUp.isReassignedSecondary(endWireHit.getHit());
 
 
   //Now check the alignement in track
   bool distanceInTrackIsSufficientlyLow = true;
 
-  int startInTrackId = mcHitLookUp.getInTrackId(startWireHit);
-  int middleInTrackId = mcHitLookUp.getInTrackId(middleWireHit);
-  int endInTrackId = mcHitLookUp.getInTrackId(endWireHit);
+  int startInTrackId = mcHitLookUp.getInTrackId(startWireHit.getHit());
+  int middleInTrackId = mcHitLookUp.getInTrackId(middleWireHit.getHit());
+  int endInTrackId = mcHitLookUp.getInTrackId(endWireHit.getHit());
 
   int startToMiddleInTrackDistance =  middleInTrackId - startInTrackId;
   int middleToEndInTrackDistance =  endInTrackId - middleInTrackId;
@@ -122,9 +122,9 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   RightLeftInfo endRLInfo = rlWireHitTriple.getEndRLInfo();
 
 
-  RightLeftInfo mcStartRLInfo = mcHitLookUp.getRLInfo(startWireHit);
-  RightLeftInfo mcMiddleRLInfo = mcHitLookUp.getRLInfo(middleWireHit);
-  RightLeftInfo mcEndRLInfo = mcHitLookUp.getRLInfo(endWireHit);
+  RightLeftInfo mcStartRLInfo = mcHitLookUp.getRLInfo(startWireHit.getHit());
+  RightLeftInfo mcMiddleRLInfo = mcHitLookUp.getRLInfo(middleWireHit.getHit());
+  RightLeftInfo mcEndRLInfo = mcHitLookUp.getRLInfo(endWireHit.getHit());
 
 
 
@@ -136,9 +136,9 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
 
 
-  const CDCSimHit* startSimHit = mcHitLookUp.getSimHit(startWireHit);
-  const CDCSimHit* middleSimHit = mcHitLookUp.getSimHit(middleWireHit);
-  const CDCSimHit* endSimHit = mcHitLookUp.getSimHit(endWireHit);
+  const CDCSimHit* startSimHit = mcHitLookUp.getSimHit(startWireHit.getHit());
+  const CDCSimHit* middleSimHit = mcHitLookUp.getSimHit(middleWireHit.getHit());
+  const CDCSimHit* endSimHit = mcHitLookUp.getSimHit(endWireHit.getHit());
 
   if (not startSimHit) {
     B2WARNING("Start wire hit of an oriented wire hit triple has no related sim hit");

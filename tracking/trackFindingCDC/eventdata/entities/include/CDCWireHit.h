@@ -60,10 +60,6 @@ namespace Belle2 {
                  const double driftLength,
                  const double driftlengthVariance = c_simpleDriftLengthVariance);
 
-      /// Make the wire hit automatically castable to its underlying cdcHit.
-      operator const Belle2::CDCHit* () const
-      { return m_hit; }
-
       /// Equality comparison based on the wire and the hit id.
       bool operator==(const CDCWireHit& rhs) const
       { return getWire() == rhs.getWire() and getRefDriftLength() == rhs.getRefDriftLength(); }
@@ -129,7 +125,7 @@ namespace Belle2 {
       /// Allow automatic taking of the address.
       /** In places where a pointer is expected the object is implicitly casted to a
        *  pointer to itself.*/
-      operator const Belle2::TrackFindingCDC::CDCWireHit* () const
+      operator const Belle2::TrackFindingCDC::CDCWireHit* () const&
       { return this; }
       /**@}*/
 

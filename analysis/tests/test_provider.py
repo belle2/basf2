@@ -1170,12 +1170,12 @@ class TestCountParticleLists(unittest.TestCase):
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Add VariablestoNtuple module for statistics
         result.path.add_module('VariablesToHistogram', fileName='listCounts.root',
-                               variables=[('countInList(e+:1)', 100, -0.5, 99.5),
-                                          ('countInList(mu+:2)', 100, -0.5, 99.5),
-                                          ('countInList(e+:1, isSignal == 1)', 100, -0.5, 99.5),
-                                          ('countInList(mu+:2, isSignal2 == 1)', 100, -0.5, 99.5),
-                                          ('countInList(e+:1, isSignal == 0)', 100, -0.5, 99.5),
-                                          ('countInList(mu+:2, isSignal2 == 0)', 100, -0.5, 99.5)])
+                               variables=[('countInList(e+:1)', 1000, -0.5, 999.5),
+                                          ('countInList(mu+:2)', 1000, -0.5, 999.5),
+                                          ('countInList(e+:1, isSignal == 1)', 1000, -0.5, 999.5),
+                                          ('countInList(mu+:2, isSignal2 == 1)', 1000, -0.5, 999.5),
+                                          ('countInList(e+:1, isSignal == 0)', 1000, -0.5, 999.5),
+                                          ('countInList(mu+:2, isSignal2 == 0)', 1000, -0.5, 999.5)])
         self.assertEqual(self.resource, result)
 
     def test_CountParticlesListsWithFile(self):

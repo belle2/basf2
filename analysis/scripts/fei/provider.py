@@ -706,11 +706,11 @@ def CountParticleLists(resource, targets, lists):
     if not os.path.isfile(filename):
         output = register_module('VariablesToHistogram')
         output.set_name("VariablesToHistogram_ListCount")
-        output.param('variables', [('countInList({l})'.format(l=l), 100, -0.5, 99.5)
+        output.param('variables', [('countInList({l})'.format(l=l), 1000, -0.5, 999.5)
                                    for l in lists if l is not None] +
-                                  [('countInList({l}, {t} == 1)'.format(l=l, t=target), 100, -0.5, 99.5)
+                                  [('countInList({l}, {t} == 1)'.format(l=l, t=target), 1000, -0.5, 999.5)
                                    for l, target in zip(lists, targets) if l is not None] +
-                                  [('countInList({l}, {t} == 0)'.format(l=l, t=target), 100, -0.5, 99.5)
+                                  [('countInList({l}, {t} == 0)'.format(l=l, t=target), 1000, -0.5, 999.5)
                                    for l, target in zip(lists, targets) if l is not None])
         output.param('fileName', filename)
         resource.path.add_module(output)

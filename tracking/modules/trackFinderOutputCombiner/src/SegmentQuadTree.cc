@@ -18,7 +18,7 @@ void SegmentQuadTreeModule::addHitToTrack(CDCTrack& track, const CDCRecoHit2D& h
 {
   const CDCRLWireHit* ptrRLWireHit = &(hit.getRLWireHit());
   Vector3D recoPos3D(hit.getRecoPos2D(), 0.0);
-  FloatType perpS = trajectory3D.calcArcLength2D(recoPos3D);
+  double perpS = trajectory3D.calcArcLength2D(recoPos3D);
   track.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
 }
 

@@ -51,8 +51,8 @@ NeighborWeight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
   const ParameterLine2D& toStartToEnd   = toFacet.getStartToEndLine();
   const ParameterLine2D& toMiddleToEnd  = toFacet.getMiddleToEndLine();
 
-  const FloatType fromMiddleCos = fromStartToMiddle.tangential().cosWith(toStartToEnd.tangential());
-  const FloatType toMiddleCos = fromStartToEnd.tangential().cosWith(toMiddleToEnd.tangential());
+  const double fromMiddleCos = fromStartToMiddle.tangential().cosWith(toStartToEnd.tangential());
+  const double toMiddleCos = fromStartToEnd.tangential().cosWith(toMiddleToEnd.tangential());
 
   // check both
   if (fromMiddleCos > m_param_deviationCosCut and toMiddleCos > m_param_deviationCosCut) {

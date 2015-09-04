@@ -95,17 +95,17 @@ CDCTangent CDCTangent::reversed() const
 }
 
 ParameterLine2D CDCTangent::constructTouchingLine(const Vector2D& fromCenter,
-                                                  const FloatType& fromSignedRadius,
+                                                  const double& fromSignedRadius,
                                                   const Vector2D& toCenter,
-                                                  const FloatType& toSignedRadius)
+                                                  const double& toSignedRadius)
 {
   Vector2D connecting = toCenter - fromCenter;
 
   //Normalize to the coordinate system vector, but keep the original norm
-  const FloatType norm = connecting.normalize();
+  const double norm = connecting.normalize();
 
-  FloatType kappa = (fromSignedRadius - toSignedRadius) / norm;
-  FloatType cokappa = sqrt(1 - kappa * kappa);
+  double kappa = (fromSignedRadius - toSignedRadius) / norm;
+  double cokappa = sqrt(1 - kappa * kappa);
 
   Vector2D fromPos = Vector2D(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
   fromPos += fromCenter;

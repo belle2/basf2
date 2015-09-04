@@ -20,9 +20,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FloatType dCurvOverDSZByISuperLayer[NSUPERLAYERS] = {0.0, 0.0027, 0.0, -0.0017, 0.0, 0.00116, 0.0, -0.000791};
+double dCurvOverDSZByISuperLayer[NSUPERLAYERS] = {0.0, 0.0027, 0.0, -0.0017, 0.0, 0.00116, 0.0, -0.000791};
 
-FloatType dPhi0OverDZ0ByISuperLayer[NSUPERLAYERS] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
+double dPhi0OverDZ0ByISuperLayer[NSUPERLAYERS] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
 
 namespace {
 
@@ -36,7 +36,7 @@ namespace {
     size_t nHits = segment.size();
     ISuperLayerType iSuperLayer = segment.getISuperLayer();
 
-    FloatType zeta = 0;
+    double zeta = 0;
 
     const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
     const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
@@ -129,12 +129,12 @@ namespace {
 }
 
 
-FloatType CDCAxialStereoFusion::average(const TVectorD& startParameters,
-                                        const TMatrixDSym& startCovMatrix,
-                                        const TVectorD& endParameters,
-                                        const TMatrixDSym& endCovMatrix,
-                                        TVectorD& avgParameters,
-                                        TMatrixDSym& avgCovMatrix)
+double CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                     const TMatrixDSym& startCovMatrix,
+                                     const TVectorD& endParameters,
+                                     const TMatrixDSym& endCovMatrix,
+                                     TVectorD& avgParameters,
+                                     TMatrixDSym& avgCovMatrix)
 {
   TMatrixDSym startInvCovMatrix = startCovMatrix;
   startInvCovMatrix.Invert();
@@ -153,14 +153,14 @@ FloatType CDCAxialStereoFusion::average(const TVectorD& startParameters,
 }
 
 
-FloatType CDCAxialStereoFusion::average(const TVectorD& startParameters,
-                                        const TMatrixDSym& startCovMatrix,
-                                        const TMatrixD& startAmbiguityMatrix,
-                                        const TVectorD& endParameters,
-                                        const TMatrixDSym& endCovMatrix,
-                                        const TMatrixD& endAmbiguityMatrix,
-                                        TVectorD& avgParameters,
-                                        TMatrixDSym& avgCovMatrix)
+double CDCAxialStereoFusion::average(const TVectorD& startParameters,
+                                     const TMatrixDSym& startCovMatrix,
+                                     const TMatrixD& startAmbiguityMatrix,
+                                     const TVectorD& endParameters,
+                                     const TMatrixDSym& endCovMatrix,
+                                     const TMatrixD& endAmbiguityMatrix,
+                                     TVectorD& avgParameters,
+                                     TMatrixDSym& avgCovMatrix)
 {
   TMatrixD startAmbiguityMatrixTransposed = startAmbiguityMatrix;
   startAmbiguityMatrixTransposed.T();
@@ -500,17 +500,17 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     for (CDCRecoHit3D& recoHit3D : stereoSegment3D) {
       const CDCWire& wire = recoHit3D.getWire();
 
-      const FloatType& oldZ = recoHit3D.getRecoZ();
+      const double& oldZ = recoHit3D.getRecoZ();
 
-      const FloatType& s = recoHit3D.getArcLength2D();
-      const FloatType newZ = trajectorySZ.mapSToZ(s);
+      const double& s = recoHit3D.getArcLength2D();
+      const double newZ = trajectorySZ.mapSToZ(s);
 
       Vector3D recoPos3DCorrection = wire.getWireVector();
       recoPos3DCorrection *= (newZ - oldZ) / wire.getWireVector().z();
 
       Vector3D correctedRecoPos3D = recoHit3D.getRecoPos3D() + recoPos3DCorrection;
 
-      const FloatType correctedPerpS = axialTrajectory2D.calcArcLength2D(correctedRecoPos3D.xy());
+      const double correctedPerpS = axialTrajectory2D.calcArcLength2D(correctedRecoPos3D.xy());
 
       recoHit3D.setRecoPos3D(correctedRecoPos3D);
       recoHit3D.setArcLength2D(correctedPerpS);
@@ -526,11 +526,11 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(startSegment, stereoSegment3D) :
     fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, endSegment) ;
 
-  FloatType tanLambdaShift = trajectorySZ.getTanLambda();
+  double tanLambdaShift = trajectorySZ.getTanLambda();
 
   Vector3D fusedLocalOrigin = fusedTrajectory3D.getLocalOrigin();
-  FloatType sOffset = axialTrajectory2D.calcArcLength2D(fusedLocalOrigin.xy());
-  FloatType zShift = trajectorySZ.mapSToZ(sOffset);
+  double sOffset = axialTrajectory2D.calcArcLength2D(fusedLocalOrigin.xy());
+  double zShift = trajectorySZ.mapSToZ(sOffset);
 
   fusedTrajectory3D.shiftTanLambdaIntercept(tanLambdaShift, zShift);
 

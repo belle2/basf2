@@ -375,9 +375,9 @@ bool TrackProcessorNew::checkChi2(CDCTrack& track)
   CDCTrajectory2D trackTrajectory2D = /*m_trackFitter.*/fit(track);
 
 
-  FloatType minChi2 = getQuantile(0.025, trackTrajectory2D.getNDF());
-  FloatType maxChi2 = getQuantile(0.975, trackTrajectory2D.getNDF());
-  FloatType Chi2 = trackTrajectory2D.getChi2();
+  double minChi2 = getQuantile(0.025, trackTrajectory2D.getNDF());
+  double maxChi2 = getQuantile(0.975, trackTrajectory2D.getNDF());
+  double Chi2 = trackTrajectory2D.getChi2();
 
 //  B2INFO("Chi2: " << Chi2 << "; min: " << minChi2 << "; max: " << maxChi2 << "; PVal: " << trackTrajectory2D.getPValue());
 
@@ -388,7 +388,7 @@ bool TrackProcessorNew::checkChi2(CDCTrack& track)
 }
 
 
-FloatType TrackProcessorNew::getQuantile(FloatType alpha, FloatType n)
+double TrackProcessorNew::getQuantile(double alpha, double n)
 {
 
 

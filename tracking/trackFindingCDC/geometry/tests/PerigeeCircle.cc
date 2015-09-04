@@ -24,9 +24,9 @@ using namespace TrackFindingCDC;
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
-  FloatType curvature = 1.0;
-  FloatType tangentialPhi = PI / 4.0;
-  FloatType impact = 1.0;
+  double curvature = 1.0;
+  double tangentialPhi = PI / 4.0;
+  double impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangentialPhi, impact);
@@ -63,9 +63,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
-  FloatType curvature = 1.0 / 2.0;
-  FloatType tangtialPhi = PI / 4.0;
-  FloatType impact = -1.0;
+  double curvature = 1.0 / 2.0;
+  double tangtialPhi = PI / 4.0;
+  double impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
@@ -76,9 +76,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
-  FloatType curvature = 1.0 / 2.0;
-  FloatType tangtialPhi = PI / 4.0;
-  FloatType impact = -1.0;
+  double curvature = 1.0 / 2.0;
+  double tangtialPhi = PI / 4.0;
+  double impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangtialPhi, impact);
@@ -93,7 +93,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
   PerigeeCircle circle;
   Vector2D center(0.5, 0.0);
-  FloatType radius = 1.5;
+  double radius = 1.5;
   circle.setCenterAndRadius(center, radius, CCW);
 
   EXPECT_TRUE(circle.isCircle());
@@ -108,9 +108,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
 
-  FloatType curvature = -1.;
-  FloatType tangentialPhi = 3. * PI / 4.;
-  FloatType impact = 1. - sqrt(2.);
+  double curvature = -1.;
+  double tangentialPhi = 3. * PI / 4.;
+  double impact = 1. - sqrt(2.);
 
   PerigeeCircle circle(curvature, tangentialPhi, impact);
 
@@ -156,9 +156,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
   EXPECT_EQ(0., defaultCircle.impact());
 
 
-  FloatType curvature = -1.;
-  FloatType tangentialPhi = 3. * PI / 4.;
-  FloatType impact = 1. - sqrt(2.0);
+  double curvature = -1.;
+  double tangentialPhi = 3. * PI / 4.;
+  double impact = 1. - sqrt(2.0);
 
   PerigeeCircle circle(curvature, tangentialPhi, impact);
 
@@ -232,7 +232,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setNull)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
-  FloatType radius = 5.0;
+  double radius = 5.0;
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
   circle.passiveMoveBy(Vector2D(4.0, 0.0));
@@ -248,15 +248,15 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
 
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
-  FloatType smallAngle = PI / 100;
+  double smallAngle = PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
 
   Vector2D atNear = circle.atArcLength(nearArcLength);
 
@@ -265,7 +265,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 
 
   Vector2D down(2.0, -1.0);
-  FloatType downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
@@ -276,42 +276,42 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
 
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
   {
-    FloatType closestArcLength = circle.arcLengthToCylindricalR(1);
+    double closestArcLength = circle.arcLengthToCylindricalR(1);
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
-    FloatType widestArcLength = circle.arcLengthToCylindricalR(3);
+    double widestArcLength = circle.arcLengthToCylindricalR(3);
     EXPECT_NEAR(PI, widestArcLength, 10e-7);
 
-    FloatType halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
+    double halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
     EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
 
-    FloatType unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
+    double unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
 
-    FloatType unreachableLowArcLength = circle.arcLengthToCylindricalR(0.5);
+    double unreachableLowArcLength = circle.arcLengthToCylindricalR(0.5);
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
 
   PerigeeCircle reversedCircle = circle.reversed();
   {
-    FloatType closestArcLength = reversedCircle.arcLengthToCylindricalR(1);
+    double closestArcLength = reversedCircle.arcLengthToCylindricalR(1);
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
-    FloatType widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
+    double widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
     EXPECT_NEAR(PI, widestArcLength, 10e-7);
 
-    FloatType halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
+    double halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
     EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
 
-    FloatType unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
+    double unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
 
-    FloatType unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
+    double unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
 }
@@ -319,9 +319,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
 {
-  FloatType expectedCurvature = 1.0 / 2.0;
-  FloatType expectedPhi0 = PI / 4.0;
-  FloatType impact = 0;
+  double expectedCurvature = 1.0 / 2.0;
+  double expectedPhi0 = PI / 4.0;
+  double impact = 0;
 
   // Checks if the normal parameters n follow the same sign convention
   const PerigeeCircle perigeeCircle(expectedCurvature,
@@ -329,11 +329,11 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
                                     impact);
   const Vector2D& expectedPhi0Vec = perigeeCircle.tangential();
 
-  FloatType randomArcLength = 2.0;
+  double randomArcLength = 2.0;
   Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);
   Vector2D phiVec = perigeeCircle.tangential(pos2D);
 
-  FloatType curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
+  double curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
   Vector2D phi0Vec = phiVec.flippedOver(pos2D);
 
   EXPECT_NEAR(expectedCurvature, curvature, 10e-7);

@@ -179,7 +179,7 @@ namespace Belle2 {
         // Check if the circle has been fitted reverse to the hough box by accident
         {
           GeneralizedCircle circle = trajectory2D.getGlobalCircle();
-          const FloatType& curv = circle.curvature();
+          const double& curv = circle.curvature();
           const std::array<DiscreteCurv, 2>& curvs = foundHoughBox.getBounds<DiscreteCurv>();
           const float& lowerCurv = *(curvs[0]);
           const float& upperCurv = *(curvs[1]);

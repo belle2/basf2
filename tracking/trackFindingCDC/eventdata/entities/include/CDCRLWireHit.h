@@ -125,7 +125,7 @@ namespace Belle2 {
       { return getWire().getRefPos2D(); }
 
       /// The distance from the beam line at reference position of the underlying wire
-      FloatType getRefCylindricalR() const
+      double getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }
 
 
@@ -139,15 +139,15 @@ namespace Belle2 {
       { return getWireHit() == wirehit; }
 
       /// Getter for the  drift length at the reference position of the wire
-      FloatType getRefDriftLength() const
+      double getRefDriftLength() const
       { return getWireHit().getRefDriftLength(); }
 
       /// Getter for the  drift length at the reference position of the wire
-      FloatType getSignedRefDriftLength() const
+      double getSignedRefDriftLength() const
       { return ((SignType)(getRLInfo())) * getRefDriftLength(); }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
-      FloatType getRefDriftLengthVariance() const
+      double getRefDriftLengthVariance() const
       { return getWireHit().getRefDriftLengthVariance(); }
 
       /// Getter for the right left passage information.

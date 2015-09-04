@@ -35,10 +35,10 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain sz line from the  perigee parameters and a 2x2 covariance matrix. Covariance matrix defaults to a zero matrix.
-      UncertainSZLine(const FloatType& tanLambda,
-                      const FloatType& z0,
+      UncertainSZLine(const double& tanLambda,
+                      const double& z0,
                       const SZCovariance& szCovariance = SZCovariance(),
-                      const FloatType chi2 = 0.0,
+                      const double chi2 = 0.0,
                       const size_t ndf = 0) :
         Line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
         m_szCovariance(szCovariance),
@@ -50,7 +50,7 @@ namespace Belle2 {
       /// Augments a plain two dimensional line with a covariance matrix. Covariance defaults to zero.
       UncertainSZLine(const Line2D& line2D,
                       const SZCovariance& szCovariance = SZCovariance(),
-                      const FloatType chi2 = 0.0,
+                      const double chi2 = 0.0,
                       const size_t ndf = 0) :
         Line2D(line2D),
         m_szCovariance(szCovariance),
@@ -72,19 +72,19 @@ namespace Belle2 {
       { return m_szCovariance; }
 
       /// Getter for individual elements of the covariance matrix
-      FloatType covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      double covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
       { return szCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
-      FloatType variance(const HelixParameterIndex& i) const
+      double variance(const HelixParameterIndex& i) const
       { return szCovariance()(i, i); }
 
       /// Getter for the chi square value of the line fit
-      const FloatType& chi2() const
+      const double& chi2() const
       { return m_chi2; }
 
       /// Setter for the chi square value of the line fit
-      void setChi2(const FloatType& chi2)
+      void setChi2(const double& chi2)
       { m_chi2 = chi2; }
 
       /// Getter for the number of degrees of freediom used in the line fit
@@ -155,7 +155,7 @@ namespace Belle2 {
       SZCovariance m_szCovariance;
 
       /// Memory for the chi square value of the fit of this line.
-      FloatType m_chi2;
+      double m_chi2;
 
       /// Memory for the number of degrees of freedim of the fit of this line.
       size_t m_ndf;

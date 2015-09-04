@@ -46,15 +46,15 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   }
 
   // Check if there is a positive gap between start and end segment
-  FloatType startFitGap = startFit.getArcLength2DGap(startSegment, endSegment);
-  FloatType endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
+  double startFitGap = startFit.getArcLength2DGap(startSegment, endSegment);
+  double endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
 
   if (startFitGap < -5 or startFitGap > 50 or endFitGap < -5 or endFitGap > 50) {
     return NOT_A_CELL;
   }
 
-  FloatType startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
-  FloatType endFitBackOffset = endFit.getArcLength2DBackOffset(startSegment, endSegment);
+  double startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
+  double endFitBackOffset = endFit.getArcLength2DBackOffset(startSegment, endSegment);
 
   if (startFitFrontOffset < 0 or
       startFitFrontOffset > 50 or
@@ -73,16 +73,16 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   Vector2D startMom2DAtEndFront = startFit.getUnitMom2D(endFrontRecoPos2D);
   Vector2D endMom2DAtStartBack = endFit.getUnitMom2D(startBackRecoPos2D);
 
-  FloatType momAngleAtStartBack = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
-  FloatType momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
+  double momAngleAtStartBack = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
+  double momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
 
   if (fabs(momAngleAtEndFront) > 1.0 or fabs(momAngleAtStartBack) > 1.0) {
     return NOT_A_CELL;
   }
 
   // Proximity cut
-  FloatType startFit_dist2DToFront_endSegment = startFit.getDist2D(endSegment.front().getRecoPos2D());
-  FloatType endFit_dist2DToBack_startSegment = endFit.getDist2D(startSegment.back().getRecoPos2D());
+  double startFit_dist2DToFront_endSegment = startFit.getDist2D(endSegment.front().getRecoPos2D());
+  double endFit_dist2DToBack_startSegment = endFit.getDist2D(startSegment.back().getRecoPos2D());
 
   if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10) {
     getFittedTrajectory3D(segmentPair);

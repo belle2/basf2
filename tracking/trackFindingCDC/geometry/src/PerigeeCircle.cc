@@ -30,9 +30,9 @@ PerigeeCircle::PerigeeCircle() : GeneralizedCircle()
   setNull();
 }
 
-PerigeeCircle::PerigeeCircle(const FloatType& curvature,
+PerigeeCircle::PerigeeCircle(const double& curvature,
                              const Vector2D& tangential,
-                             const FloatType& impact) :
+                             const double& impact) :
   GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangential, impact)),
   m_curvature(curvature),
   m_tangentialPhi(tangential.phi()),
@@ -41,9 +41,9 @@ PerigeeCircle::PerigeeCircle(const FloatType& curvature,
 {
 }
 
-PerigeeCircle::PerigeeCircle(const FloatType& curvature,
-                             const FloatType& tangentialPhi,
-                             const FloatType& impact) :
+PerigeeCircle::PerigeeCircle(const double& curvature,
+                             const double& tangentialPhi,
+                             const double& impact) :
   GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, tangentialPhi, impact)),
   m_curvature(curvature),
   m_tangentialPhi(tangentialPhi),
@@ -59,10 +59,10 @@ PerigeeCircle::PerigeeCircle(const TVectorD& parameters) :
 }
 
 PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123,
-                             const FloatType& curvature,
-                             const FloatType& tangentialPhi,
+                             const double& curvature,
+                             const double& tangentialPhi,
                              const Vector2D& tangential,
-                             const FloatType& impact) :
+                             const double& impact) :
   GeneralizedCircle(n0123),
   m_curvature(curvature),
   m_tangentialPhi(tangentialPhi),
@@ -97,10 +97,10 @@ PerigeeCircle::PerigeeCircle(const Circle2D& circle)
 
 
 
-PerigeeCircle PerigeeCircle::fromN(const FloatType& n0,
-                                   const FloatType& n1,
-                                   const FloatType& n2,
-                                   const FloatType& n3)
+PerigeeCircle PerigeeCircle::fromN(const double& n0,
+                                   const double& n1,
+                                   const double& n2,
+                                   const double& n3)
 {
   PerigeeCircle circle;
   circle.setN(n0, n1, n2, n3);
@@ -109,9 +109,9 @@ PerigeeCircle PerigeeCircle::fromN(const FloatType& n0,
 
 
 
-PerigeeCircle PerigeeCircle::fromN(const FloatType& n0,
+PerigeeCircle PerigeeCircle::fromN(const double& n0,
                                    const Vector2D& n12,
-                                   const FloatType& n3)
+                                   const double& n3)
 {
   PerigeeCircle circle;
   circle.setN(n0, n12, n3);
@@ -121,7 +121,7 @@ PerigeeCircle PerigeeCircle::fromN(const FloatType& n0,
 
 
 PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
-                                                 const FloatType& absRadius,
+                                                 const double& absRadius,
                                                  const CCWInfo& orientation)
 {
   PerigeeCircle circle;
@@ -130,15 +130,15 @@ PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
 }
 
 
-Vector2D PerigeeCircle::atArcLength(const FloatType& arcLength) const
+Vector2D PerigeeCircle::atArcLength(const double& arcLength) const
 {
-  FloatType chi = arcLength * curvature();
-  FloatType chiHalf = chi / 2.0;
+  double chi = arcLength * curvature();
+  double chiHalf = chi / 2.0;
 
   using boost::math::sinc_pi;
 
-  FloatType atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
-  FloatType atY =  -arcLength * sinc_pi(chi);
+  double atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  double atY =  -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
 }
 
@@ -162,43 +162,43 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
   //Vector2D delta = perigee() - by;
   Vector2D delta = by - perigee();
 
-  FloatType deltaParallel = coordinateVector.unnormalizedParallelComp(delta);
-  FloatType deltaOrthogonal = coordinateVector.unnormalizedOrthogonalComp(delta);
+  double deltaParallel = coordinateVector.unnormalizedParallelComp(delta);
+  double deltaOrthogonal = coordinateVector.unnormalizedOrthogonalComp(delta);
 
-  FloatType halfA = fastDistance(by);
-  FloatType A = 2 * halfA;
+  double halfA = fastDistance(by);
+  double A = 2 * halfA;
 
   //B2INFO("A = " << A);
   //B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
 
   Vector2D CB = gradient(by).orthogonal();
-  //FloatType C = CB.first();
-  //FloatType B = CB.second();
+  //double C = CB.first();
+  //double B = CB.second();
 
   //B2INFO("B = " << B);
   //B2INFO("C = " << C);
 
-  FloatType u = 1 + curvature() * impact(); //= n12().cylindricalR()
+  double u = 1 + curvature() * impact(); //= n12().cylindricalR()
 
-  FloatType U = sqrt(1 + curvature() * A);
+  double U = sqrt(1 + curvature() * A);
 
   //B2INFO("U = " << U);
 
-  FloatType nu = 1 + curvature() * deltaOrthogonal;
+  double nu = 1 + curvature() * deltaOrthogonal;
 
   //B2INFO("nu = " << nu);
 
-  FloatType xi = 1.0 / CB.normSquared();
+  double xi = 1.0 / CB.normSquared();
 
   //B2INFO("xi = " << xi);
 
-  FloatType lambda = halfA / ((1 + U) * (1 + U) * U);
-  FloatType mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
+  double lambda = halfA / ((1 + U) * (1 + U) * U);
+  double mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
 
   //B2INFO("lambda = " << lambda);
   //B2INFO("mu = " << mu);
 
-  FloatType zeta = delta.normSquared();
+  double zeta = delta.normSquared();
 
   //B2INFO("zeta = " << zeta);
 
@@ -216,15 +216,15 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
 
 }
 
-FloatType PerigeeCircle::arcLengthToCylindricalR(const FloatType& cylindricalR) const
+double PerigeeCircle::arcLengthToCylindricalR(const double& cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
   // and the origin as the point to extrapolate to.
   // We know the distance of the origin to the circle, which is just d0
   // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
-  const FloatType dr = d0();
-  const FloatType directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
-  const FloatType arcLength = arcLengthFactor(directDistance) * directDistance;
+  const double dr = d0();
+  const double directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
+  const double arcLength = arcLengthFactor(directDistance) * directDistance;
   return arcLength;
 }

@@ -30,10 +30,10 @@ GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) {
 
 
 
-GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
-                                     const FloatType& n1,
-                                     const FloatType& n2,
-                                     const FloatType& n3) :
+GeneralizedCircle::GeneralizedCircle(const double& n0,
+                                     const double& n1,
+                                     const double& n2,
+                                     const double& n3) :
   m_n3(n3), m_n12(n1, n2), m_n0(n0)
 {
   normalize();
@@ -41,9 +41,9 @@ GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
 
 
 
-GeneralizedCircle::GeneralizedCircle(const FloatType& n0,
+GeneralizedCircle::GeneralizedCircle(const double& n0,
                                      const Vector2D& n12,
-                                     const FloatType& n3):
+                                     const double& n3):
   m_n3(n3), m_n12(n12), m_n0(n0)
 {
   normalize();
@@ -67,7 +67,7 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
 
 
 GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
-                                                         const FloatType& absRadius,
+                                                         const double& absRadius,
                                                          const CCWInfo& orientation)
 {
   GeneralizedCircle generalizedCircle;
@@ -75,18 +75,18 @@ GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
   return generalizedCircle;
 }
 
-GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const FloatType& curvature,
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double& curvature,
                                                            const Vector2D& tangential,
-                                                           const FloatType& impact)
+                                                           const double& impact)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setPerigeeParameters(curvature, tangential, impact);
   return generalizedCircle;
 }
 
-GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const FloatType& curvature,
-                                                           const FloatType& tangentialPhi,
-                                                           const FloatType& impact)
+GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double& curvature,
+                                                           const double& tangentialPhi,
+                                                           const double& impact)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setPerigeeParameters(curvature, tangentialPhi, impact);
@@ -99,10 +99,10 @@ GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const FloatType& curv
 
 
 void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
-                                           const FloatType& absRadius,
+                                           const double& absRadius,
                                            const CCWInfo& orientation)
 {
-  FloatType curvature = orientation / fabs(absRadius);
+  double curvature = orientation / fabs(absRadius);
   setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
   setN1(-center.x() * curvature);
   setN2(-center.y() * curvature);
@@ -112,13 +112,13 @@ void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
 
 
 
-void GeneralizedCircle::setPerigeeParameters(const FloatType& curvature,
+void GeneralizedCircle::setPerigeeParameters(const double& curvature,
                                              const Vector2D& tangential,
-                                             const FloatType& impact)
+                                             const double& impact)
 {
-  FloatType n0 = impact * (impact * curvature / 2.0 + 1.0);
+  double n0 = impact * (impact * curvature / 2.0 + 1.0);
   Vector2D n12 = -tangential.orthogonal() * (1 + curvature * impact);
-  FloatType n3 = curvature / 2.0;
+  double n3 = curvature / 2.0;
   setN(n0, n12, n3);
 }
 
@@ -143,28 +143,28 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   Vector2D coordinateSystem = gradientAtPoint.unit();
 
   // component of closest approach orthogonal to coordinateSystem
-  FloatType closestOrthogonal =  n12().cross(point) / gradientAtPoint.norm();
+  double closestOrthogonal =  n12().cross(point) / gradientAtPoint.norm();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
-  FloatType nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
-  FloatType nParallel = n12().unnormalizedParallelComp(coordinateSystem);
+  double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
+  double nParallel = n12().unnormalizedParallelComp(coordinateSystem);
 
-  FloatType closestParallel = 0.0;
+  double closestParallel = 0.0;
   if (isLine()) {
     closestParallel = - (nOrthogonal * closestOrthogonal + n0()) / nParallel;
 
   } else {
-    const FloatType& a = n3();
-    const FloatType& b = nParallel;
-    const FloatType c = n0() + (nOrthogonal + n3() * closestOrthogonal) * closestOrthogonal;
+    const double& a = n3();
+    const double& b = nParallel;
+    const double c = n0() + (nOrthogonal + n3() * closestOrthogonal) * closestOrthogonal;
 
-    const pair<FloatType, FloatType> closestParallel12 = solveQuadraticABC(a, b, c);
+    const pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
 
     // take the solution with smaller distance to point
-    const FloatType pointParallel = point.unnormalizedParallelComp(coordinateSystem);
+    const double pointParallel = point.unnormalizedParallelComp(coordinateSystem);
 
-    const FloatType criterion1 = closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
-    const FloatType criterion2 = closestParallel12.second * (closestParallel12.second - 2 * pointParallel);
+    const double criterion1 = closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
+    const double criterion2 = closestParallel12.second * (closestParallel12.second - 2 * pointParallel);
 
     closestParallel = criterion1 < criterion2 ? closestParallel12.first : closestParallel12.second;
 
@@ -192,8 +192,8 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
                                                 const Vector2D& end2) const
 {
 
-  FloatType lengthOnCurve1 = arcLengthBetween(start, end1);
-  FloatType lengthOnCurve2 = arcLengthBetween(start, end2);
+  double lengthOnCurve1 = arcLengthBetween(start, end1);
+  double lengthOnCurve2 = arcLengthBetween(start, end2);
 
   if (lengthOnCurve1 >= 0.0) {
 
@@ -225,7 +225,7 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
 
 }
 
-pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const FloatType& R) const
+pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const double& R) const
 {
   //extraploted to r
   //solve
@@ -237,10 +237,10 @@ pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const FloatType& R)
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   //orthogonal component
-  const FloatType sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
+  const double sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
   Vector2D sameCylindricalR1 = Vector2D::compose(nUnit,
@@ -259,7 +259,7 @@ pair<Vector2D, Vector2D> GeneralizedCircle::sameCylindricalR(const FloatType& R)
 
 Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
 {
-  const FloatType R = point.norm();
+  const double R = point.norm();
 
   // extraploted to r
   // solve
@@ -271,13 +271,13 @@ Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const FloatType sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
   // orthogonal component
-  const FloatType pointOrthogonal = point.unnormalizedOrthogonalComp(nUnit);
+  const double pointOrthogonal = point.unnormalizedOrthogonalComp(nUnit);
 
   // orthoganal component of the solution takes to sign of the orthogonal component of the point
-  const FloatType sameCylindricalROrthogonal =
+  const double sameCylindricalROrthogonal =
     copysign(sqrt(square(R) - square(sameCylindricalRParallel)), pointOrthogonal);
 
   // combine parallel and orthogonal components
@@ -286,7 +286,7 @@ Vector2D GeneralizedCircle::sameCylindricalR(const Vector2D& point) const
 }
 
 Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint,
-                                                      const FloatType& cylindricalR) const
+                                                      const double& cylindricalR) const
 {
 
   pair<Vector2D, Vector2D> candidatePoints = sameCylindricalR(cylindricalR);
@@ -296,8 +296,8 @@ Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint
 
 
 
-FloatType GeneralizedCircle::arcLengthBetween(const Vector2D& from,
-                                              const Vector2D& to) const
+double GeneralizedCircle::arcLengthBetween(const Vector2D& from,
+                                           const Vector2D& to) const
 {
   ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
   if (lengthSign == INVALID_INFO) return NAN;
@@ -307,14 +307,14 @@ FloatType GeneralizedCircle::arcLengthBetween(const Vector2D& from,
 
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
-  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+  double directDistance = closestAtFrom.distance(closestAtTo);
 
   return lengthSign * arcLengthFactor(directDistance) * directDistance;
 }
 
 
 
-FloatType GeneralizedCircle::arcLengthTo(const Vector2D& to) const
+double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 {
   const Vector2D from = perigee();
 
@@ -326,51 +326,51 @@ FloatType GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 
   const Vector2D& closestAtFrom = from;
   Vector2D closestAtTo = closest(to);
-  FloatType directDistance = closestAtFrom.distance(closestAtTo);
+  double directDistance = closestAtFrom.distance(closestAtTo);
 
   return lengthSign * arcLengthFactor(directDistance) * directDistance;
 
 }
 
 
-FloatType GeneralizedCircle::arcLengthToCylindricalR(const FloatType& cylindricalR) const
+double GeneralizedCircle::arcLengthToCylindricalR(const double& cylindricalR) const
 {
   // Slight trick here
   // Since the sought point is on the helix we treat it as the perigee
   // and the origin as the point to extrapolate to.
   // We know the distance of the origin to the circle, which is just d0
   // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
-  const FloatType dr = d0();
-  const FloatType directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
-  const FloatType arcLength = arcLengthFactor(directDistance) * directDistance;
+  const double dr = d0();
+  const double directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
+  const double arcLength = arcLengthFactor(directDistance) * directDistance;
   return arcLength;
 }
 
-FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance,
-                                             const FloatType& curvature)
+double GeneralizedCircle::arcLengthFactor(const double& directDistance,
+                                          const double& curvature)
 {
-  FloatType x = directDistance * curvature / 2.0;
+  double x = directDistance * curvature / 2.0;
 
   // Implementation of asin(x)/x
   // Inspired by BOOST's sinc
   BOOST_MATH_STD_USING;
 
-  FloatType const taylor_n_bound = tools::forth_root_epsilon<FloatType>();
+  double const taylor_n_bound = tools::forth_root_epsilon<double>();
 
   if (abs(x) >= taylor_n_bound) {
     return  asin(x) / x;
 
   } else {
     // approximation by taylor series in x at 0 up to order 0
-    FloatType result = 1.0;
+    double result = 1.0;
 
-    FloatType const taylor_0_bound = tools::epsilon<FloatType>();
+    double const taylor_0_bound = tools::epsilon<double>();
     if (abs(x) >= taylor_0_bound) {
-      FloatType x2 = x * x;
+      double x2 = x * x;
       // approximation by taylor series in x at 0 up to order 2
       result += x2 / 6.0;
 
-      FloatType const taylor_2_bound = tools::root_epsilon<FloatType>();
+      double const taylor_2_bound = tools::root_epsilon<double>();
       if (abs(x) >= taylor_2_bound) {
         // approximation by taylor series in x at 0 up to order 4
         result += x2 * x2 * (3.0 / 40.0);
@@ -385,11 +385,11 @@ FloatType GeneralizedCircle::arcLengthFactor(const FloatType& directDistance,
 
 
 
-FloatType GeneralizedCircle::distance(const Vector2D& point) const
+double GeneralizedCircle::distance(const Vector2D& point) const
 {
   //this is the approximated distance also used for the fit
   //can be correct for second order deviations if nessecary
-  const FloatType fastD = fastDistance(point);
+  const double fastD = fastDistance(point);
   return distance(fastD);
 }
 
@@ -397,7 +397,7 @@ FloatType GeneralizedCircle::distance(const Vector2D& point) const
 
 
 
-FloatType GeneralizedCircle::distance(const FloatType& fastDistance) const
+double GeneralizedCircle::distance(const double& fastDistance) const
 {
   if (fastDistance == 0.0 or isLine()) {
     //special case for unfitted state
@@ -405,11 +405,11 @@ FloatType GeneralizedCircle::distance(const FloatType& fastDistance) const
     return fastDistance;
   } else {
 
-    const FloatType a = n3();
-    const FloatType b = 1;
-    const FloatType c = -fastDistance;
+    const double a = n3();
+    const double b = 1;
+    const double c = -fastDistance;
 
-    std::pair<FloatType, FloatType> distance12 = solveQuadraticABC(a, b, c);
+    std::pair<double, double> distance12 = solveQuadraticABC(a, b, c);
 
     //take the small solution which has always the same sign of the fastDistance
     return distance12.second;
@@ -423,44 +423,44 @@ std::pair<Vector2D, Vector2D>
 GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
 {
 
-  const FloatType& m0 = generalizedCircle.n0();
+  const double& m0 = generalizedCircle.n0();
   const Vector2D& m12 = generalizedCircle.n12();
-  const FloatType& m3 = generalizedCircle.n3();
+  const double& m3 = generalizedCircle.n3();
 
-  const FloatType& n0 = this->n0();
+  const double& n0 = this->n0();
   const Vector2D& n12 = this->n12();
-  const FloatType& n3 = this->n3();
+  const double& n3 = this->n3();
 
 
   Vector2D unitC = n12 * m3 - m12 * n3;
-  FloatType absC = unitC.normalize();
+  double absC = unitC.normalize();
 
-  FloatType xParallel = (m0 * n3 - m3 * n0) / absC;
+  double xParallel = (m0 * n3 - m3 * n0) / absC;
 
   // Use symmetric solution and use all input parameters
   Vector2D mn12 = n12 + m12;
-  FloatType mn12Parallel = unitC.unnormalizedParallelComp(mn12);
-  FloatType mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
+  double mn12Parallel = unitC.unnormalizedParallelComp(mn12);
+  double mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
 
-  FloatType a = m3 + n3;
-  FloatType b = mn12Orthogonal;
-  FloatType c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
+  double a = m3 + n3;
+  double b = mn12Orthogonal;
+  double c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
 
-  pair<FloatType, FloatType> xOrthogonal = solveQuadraticABC(a, b, c);
+  pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 
   return make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
                    Vector2D::compose(unitC, xParallel, xOrthogonal.second));
 }
 
 
-Vector2D GeneralizedCircle::atArcLength(const FloatType& arcLength) const
+Vector2D GeneralizedCircle::atArcLength(const double& arcLength) const
 {
-  FloatType chi = arcLength * curvature();
-  FloatType chiHalf = chi / 2.0;
+  double chi = arcLength * curvature();
+  double chiHalf = chi / 2.0;
 
   using boost::math::sinc_pi;
 
-  FloatType atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
-  FloatType atY =  -arcLength * sinc_pi(chi);
+  double atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  double atY =  -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
 }

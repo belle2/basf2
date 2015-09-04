@@ -40,7 +40,7 @@ namespace Belle2 {
       inline Weight operator()(const CDCTrajectory2D* trajectory2D,
                                const Phi0CurvBox* phi0CurvBox)
       {
-        FloatType curvature = trajectory2D->getCurvature();
+        double curvature = trajectory2D->getCurvature();
         const Vector2D& phi0Vec = trajectory2D->getStartUnitMom2D();
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
@@ -57,7 +57,7 @@ namespace Belle2 {
 
         // Calculate the curvature and phi0 of the circle through the origin
         // that touches the position pos2D under the angle phiVec.
-        FloatType curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
+        double curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
         Vector2D phi0Vec = phiVec.flippedOver(pos2D);
 
         bool in = isPhi0CurvPointIn(phi0Vec, curvature, phi0CurvBox);
@@ -71,7 +71,7 @@ namespace Belle2 {
 
 
       inline bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
-                                    const FloatType& curvature,
+                                    const double& curvature,
                                     const Phi0CurvBox* phi0CurvBox)
       {
 

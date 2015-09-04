@@ -59,9 +59,9 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
   if (isLineConstrained()) {
 
     //do a normal line fit
-    Matrix<FloatType, Dynamic, 2> points = eigenObservation.leftCols<2>();
+    Matrix<double, Dynamic, 2> points = eigenObservation.leftCols<2>();
 
-    Matrix<FloatType, 1, 2> pointMean;
+    Matrix<double, 1, 2> pointMean;
     //RowVector2d pointMean;
     pointMean << 0.0, 0.0;
     if (!(isOriginConstrained())) {
@@ -70,18 +70,18 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
 
       points = points.rowwise() - pointMean;
     }
-    Matrix<FloatType, 2, 2> covarianceMatrix = points.transpose() * points;
+    Matrix<double, 2, 2> covarianceMatrix = points.transpose() * points;
 
-    SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(covarianceMatrix);
+    SelfAdjointEigenSolver< Matrix<double, 2, 2> > eigensolver(covarianceMatrix);
 
     if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
 
     //the eigenvalues are generated in increasing order
     //we are interested in the lowest one since we want to compute the normal vector of the plane
 
-    Matrix<FloatType, 2, 1> normalToLine = eigensolver.eigenvectors().col(0);
+    Matrix<double, 2, 1> normalToLine = eigensolver.eigenvectors().col(0);
 
-    FloatType offset = -pointMean * normalToLine;
+    double offset = -pointMean * normalToLine;
 
     // set the generalized circle parameters
     // last set to zero constrains to a line
@@ -90,14 +90,14 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
   } else {
 
     //lift the points to the projection space
-    Matrix<FloatType, Dynamic, 3> projectedPoints(nObservations, 3);
+    Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);
 
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
     projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm();
 
 
-    Matrix<FloatType, 1, 3> pointMean;
+    Matrix<double, 1, 3> pointMean;
     pointMean << 0.0, 0.0, 0.0;
     if (!(isOriginConstrained())) {
       // subtract the offset from the origin
@@ -106,18 +106,18 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
       projectedPoints = projectedPoints.rowwise() - pointMean;
     }
 
-    Matrix<FloatType, 3, 3> covarianceMatrix = projectedPoints.transpose() * projectedPoints;
+    Matrix<double, 3, 3> covarianceMatrix = projectedPoints.transpose() * projectedPoints;
 
-    SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(covarianceMatrix);
+    SelfAdjointEigenSolver< Matrix<double, 3, 3> > eigensolver(covarianceMatrix);
 
     if (eigensolver.info() != Success) B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
 
     //the eigenvalues are generated in increasing order
     //we are interested in the lowest one since we want to compute the normal vector of the plane
 
-    Matrix<FloatType, 3, 1> normalToPlane = eigensolver.eigenvectors().col(0);
+    Matrix<double, 3, 1> normalToPlane = eigensolver.eigenvectors().col(0);
 
-    FloatType offset = -pointMean * normalToPlane;
+    double offset = -pointMean * normalToPlane;
 
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(offset, normalToPlane(0), normalToPlane(1), normalToPlane(2)));
     //fit.setParameters();
@@ -130,8 +130,8 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDC
 
   size_t voteForChangeSign = 0;
   for (size_t iPoint = 0; iPoint < nObservations; ++iPoint) {
-    FloatType pointInSameDirection = eigenObservation(iPoint, 0) * directionAtCenter.x() +
-                                     eigenObservation(iPoint, 1) * directionAtCenter.y();
+    double pointInSameDirection = eigenObservation(iPoint, 0) * directionAtCenter.x() +
+                                  eigenObservation(iPoint, 1) * directionAtCenter.y();
     if (pointInSameDirection < 0) ++voteForChangeSign;
   }
 
@@ -155,52 +155,52 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
   observables[0][2] == desired distance of first point
   */
 
-  Matrix< FloatType, Dynamic, 1 > distances = eigenObservation.col(2);
+  Matrix< double, Dynamic, 1 > distances = eigenObservation.col(2);
 
   //cout << "distances : " << endl << distances << endl;
 
   if ((isLineConstrained()) && (isOriginConstrained())) {
 
 
-    Matrix< FloatType, Dynamic, Dynamic > projectedPoints(nObservations, 2);
+    Matrix< double, Dynamic, Dynamic > projectedPoints(nObservations, 2);
 
     //all coordiates
-    //projectedPoints.col(0) = Matrix<FloatType,Dynamic,1>::Constant(nObservations,1.0);
+    //projectedPoints.col(0) = Matrix<double,Dynamic,1>::Constant(nObservations,1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
     //projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
-    Matrix< FloatType, 2, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
+    Matrix< double, 2, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), 0.0));
   }
 
   else if ((! isLineConstrained()) && (isOriginConstrained())) {
 
-    Matrix< FloatType, Dynamic, Dynamic > projectedPoints(nObservations, 3);
+    Matrix< double, Dynamic, Dynamic > projectedPoints(nObservations, 3);
 
     //all coordiates
-    //projectedPoints.col(0) = Matrix<FloatType,Dynamic,1>::Constant(1.0);
+    //projectedPoints.col(0) = Matrix<double,Dynamic,1>::Constant(1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
     projectedPoints.col(2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
-    Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
+    Matrix< double, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(0.0, parameters(0), parameters(1), parameters(2)));
   }
 
   else if ((isLineConstrained()) && (! isOriginConstrained())) {
 
-    Matrix< FloatType, Dynamic, Dynamic > projectedPoints(nObservations, 3);
+    Matrix< double, Dynamic, Dynamic > projectedPoints(nObservations, 3);
 
     //all coordiates
-    projectedPoints.col(0) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+    projectedPoints.col(0) = Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0);
     projectedPoints.col(1) = eigenObservation.col(0);
     projectedPoints.col(2) = eigenObservation.col(1);
     //projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm()- distances.rowwise().squaredNorm();
 
-    Matrix< FloatType, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
+    Matrix< double, 3, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), 0.0));
     //fit.setParameters(parameters(0),parameters(1),parameters(2),0.0);
@@ -209,17 +209,17 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
 
   else if ((! isLineConstrained()) && (! isOriginConstrained())) {
 
-    Matrix< FloatType, Dynamic, Dynamic > projectedPoints(nObservations, 4);
+    Matrix< double, Dynamic, Dynamic > projectedPoints(nObservations, 4);
 
     //all coordiates
-    projectedPoints.col(0) = Matrix<FloatType, Dynamic, 1>::Constant(nObservations, 1.0);
+    projectedPoints.col(0) = Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0);
     projectedPoints.col(1) = eigenObservation.col(0);
     projectedPoints.col(2) = eigenObservation.col(1);
     projectedPoints.col(3) = eigenObservation.leftCols<2>().rowwise().squaredNorm() - distances.rowwise().squaredNorm();
 
     //cout << "points : " << endl << projectedPoints << endl;
 
-    Matrix< FloatType, 4, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
+    Matrix< double, 4, 1> parameters = projectedPoints.jacobiSvd(ComputeThinU | ComputeThinV).solve(distances);
 
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), parameters(3)));
 

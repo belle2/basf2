@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 Vector2D Line2D::intersection(const Line2D& line) const
 {
 
-  FloatType determinant = n12().cross(line.n12());
+  double determinant = n12().cross(line.n12());
   Vector2D result(-n0() * line.n2() + line.n0() * n2(),
                   n0() * line.n1() - line.n0() * n1());
 

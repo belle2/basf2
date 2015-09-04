@@ -41,15 +41,15 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 
   UncertainPerigeeCircle perigeeCircle = fitInternal(observations2D);
 
-  FloatType frontX = observations2D.getX(0);
-  FloatType frontY = observations2D.getY(0);
+  double frontX = observations2D.getX(0);
+  double frontY = observations2D.getY(0);
   Vector2D frontPos(frontX, frontY);
 
-  FloatType backX = observations2D.getX(nObservations - 1);
-  FloatType backY = observations2D.getY(nObservations - 1);
+  double backX = observations2D.getX(nObservations - 1);
+  double backY = observations2D.getY(nObservations - 1);
   Vector2D backPos(backX, backY);
 
-  FloatType totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
+  double totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
     perigeeCircle.reverse();
   }
@@ -88,37 +88,37 @@ namespace {
 
 
   /// Variant with drift circles
-  PerigeeCircle fit(const Matrix< FloatType, 5, 5 >& sumMatrix,
+  PerigeeCircle fit(const Matrix< double, 5, 5 >& sumMatrix,
                     bool lineConstrained = false,
                     bool originConstrained = false)
   {
     // Solve the normal equation X * n = y
     if (lineConstrained) {
       if (originConstrained) {
-        Matrix< FloatType, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
-        Matrix< FloatType, 2, 1> y = sumMatrix.block<2, 1>(1, iL);
-        Matrix< FloatType, 2, 1> n = X.ldlt().solve(y);
+        Matrix< double, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
+        Matrix< double, 2, 1> y = sumMatrix.block<2, 1>(1, iL);
+        Matrix< double, 2, 1> n = X.ldlt().solve(y);
         return PerigeeCircle::fromN(0.0, n(0), n(1), 0.0);
 
       } else {
-        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
-        Matrix< FloatType, 3, 1> y = sumMatrix.block<3, 1>(0, iL);
-        Matrix< FloatType, 3, 1> n = X.ldlt().solve(y);
+        Matrix< double, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
+        Matrix< double, 3, 1> y = sumMatrix.block<3, 1>(0, iL);
+        Matrix< double, 3, 1> n = X.ldlt().solve(y);
         return PerigeeCircle::fromN(n(iW), n(iX), n(iY), 0.0);
 
       }
 
     } else {
       if (originConstrained) {
-        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
-        Matrix< FloatType, 3, 1> y = sumMatrix.block<3, 1>(1, iL);
-        Matrix< FloatType, 3, 1> n = X.ldlt().solve(y);
+        Matrix< double, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
+        Matrix< double, 3, 1> y = sumMatrix.block<3, 1>(1, iL);
+        Matrix< double, 3, 1> n = X.ldlt().solve(y);
         return PerigeeCircle::fromN(0.0, n(0), n(1), n(2));
 
       } else {
-        Matrix< FloatType, 4, 4> X = sumMatrix.block<4, 4>(0, 0);
-        Matrix< FloatType, 4, 1> y = sumMatrix.block<4, 1>(0, iL);
-        Matrix< FloatType, 4, 1> n = X.ldlt().solve(y);
+        Matrix< double, 4, 4> X = sumMatrix.block<4, 4>(0, 0);
+        Matrix< double, 4, 1> y = sumMatrix.block<4, 1>(0, iL);
+        Matrix< double, 4, 1> n = X.ldlt().solve(y);
         return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
 
       }
@@ -127,7 +127,7 @@ namespace {
 
 
   /// Variant without drift circles
-  PerigeeCircle fit(Matrix< FloatType, 4, 4 > sumMatrix,
+  PerigeeCircle fit(Matrix< double, 4, 4 > sumMatrix,
                     bool lineConstrained = false,
                     bool originConstrained = false)
   {
@@ -136,18 +136,18 @@ namespace {
 
     if (lineConstrained) {
       if (originConstrained) {
-        Matrix< FloatType, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
-        SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(X);
-        Matrix<FloatType, 2, 1> n = eigensolver.eigenvectors().col(0);
+        Matrix< double, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
+        SelfAdjointEigenSolver< Matrix<double, 2, 2> > eigensolver(X);
+        Matrix<double, 2, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
         return PerigeeCircle::fromN(0.0, n(0), n(1), 0.0);
 
       } else {
-        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
-        SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
-        Matrix<FloatType, 3, 1> n = eigensolver.eigenvectors().col(0);
+        Matrix< double, 3, 3> X = sumMatrix.block<3, 3>(0, 0);
+        SelfAdjointEigenSolver< Matrix<double, 3, 3> > eigensolver(X);
+        Matrix<double, 3, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
@@ -156,18 +156,18 @@ namespace {
       }
     } else {
       if (originConstrained) {
-        Matrix< FloatType, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
-        SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
-        Matrix<FloatType, 3, 1> n = eigensolver.eigenvectors().col(0);
+        Matrix< double, 3, 3> X = sumMatrix.block<3, 3>(1, 1);
+        SelfAdjointEigenSolver< Matrix<double, 3, 3> > eigensolver(X);
+        Matrix<double, 3, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
         return PerigeeCircle::fromN(0.0, n(0), n(1), n(2));
 
       } else {
-        Matrix< FloatType, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
-        SelfAdjointEigenSolver< Matrix<FloatType, 4, 4> > eigensolver(X);
-        Matrix<FloatType, 4, 1> n = eigensolver.eigenvectors().col(0);
+        Matrix< double, 4, 4 > X = sumMatrix.block<4, 4>(0, 0);
+        SelfAdjointEigenSolver< Matrix<double, 4, 4> > eigensolver(X);
+        Matrix<double, 4, 1> n = eigensolver.eigenvectors().col(0);
         if (eigensolver.info() != Success) {
           B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
         }
@@ -178,13 +178,13 @@ namespace {
   }
 
   // Declare function as currently unused to avoid compiler warning
-  PerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
-                                  Matrix< FloatType, 4, 4 > c,
+  PerigeeCircle fitSeperateOffset(Matrix< double, 4, 1 > means,
+                                  Matrix< double, 4, 4 > c,
                                   bool lineConstrained) __attribute__((__unused__));
 
   /// Variant without drift circles and seperating the offset before the matrix solving
-  PerigeeCircle fitSeperateOffset(Matrix< FloatType, 4, 1 > means,
-                                  Matrix< FloatType, 4, 4 > c,
+  PerigeeCircle fitSeperateOffset(Matrix< double, 4, 1 > means,
+                                  Matrix< double, 4, 4 > c,
                                   bool lineConstrained = false)
   {
     // Solve the normal equation min_n  n^T * c * n
@@ -192,30 +192,30 @@ namespace {
     // n is the smallest eigenvector
 
     if (lineConstrained) {
-      Matrix< FloatType, 2, 2> X = c.block<2, 2>(1, 1);
-      SelfAdjointEigenSolver< Matrix<FloatType, 2, 2> > eigensolver(X);
+      Matrix< double, 2, 2> X = c.block<2, 2>(1, 1);
+      SelfAdjointEigenSolver< Matrix<double, 2, 2> > eigensolver(X);
       if (eigensolver.info() != Success) {
         B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
       }
 
       //the eigenvalues are generated in increasing order
       //we are interested in the lowest one since we want to compute the normal vector of the plane
-      Matrix<FloatType, 4, 1> n;
+      Matrix<double, 4, 1> n;
       n.middleRows<2>(iX) = eigensolver.eigenvectors().col(0);
       n(iW) = -means.middleRows<2>(iX).transpose() * n.middleRows<2>(iX);
       n(iR2) = 0.;
       return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
 
     } else {
-      Matrix< FloatType, 3, 3> X = c.block<3, 3>(1, 1);
-      SelfAdjointEigenSolver< Matrix<FloatType, 3, 3> > eigensolver(X);
+      Matrix< double, 3, 3> X = c.block<3, 3>(1, 1);
+      SelfAdjointEigenSolver< Matrix<double, 3, 3> > eigensolver(X);
       if (eigensolver.info() != Success) {
         B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
       }
 
       //the eigenvalues are generated in increasing order
       //we are interested in the lowest one since we want to compute the normal vector of the plane
-      Matrix<FloatType, 4, 1> n;
+      Matrix<double, 4, 1> n;
       n.middleRows<3>(iX) = eigensolver.eigenvectors().col(0);
       n(iW) = -means.middleRows<3>(iX).transpose() * n.middleRows<3>(iX);
       return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
@@ -226,58 +226,58 @@ namespace {
 
 
   /// Variant with drift circles
-  FloatType calcChi2(const PerigeeCircle& parameters,
-                     const Matrix< FloatType, 5, 5 >& s)
+  double calcChi2(const PerigeeCircle& parameters,
+                  const Matrix< double, 5, 5 >& s)
   {
 
-    Matrix<FloatType, 5, 1> n;
+    Matrix<double, 5, 1> n;
     n(0) = parameters.n0();
     n(1) = parameters.n1();
     n(2) = parameters.n2();
     n(3) = parameters.n3();
     n(4) = -1;
 
-    FloatType chi2 = n.transpose() * s * n;
+    double chi2 = n.transpose() * s * n;
     return chi2;
 
   }
 
 
   /// Variant without drift circles
-  FloatType calcChi2(const PerigeeCircle& parameters,
-                     const Matrix< FloatType, 4, 4 >& s)
+  double calcChi2(const PerigeeCircle& parameters,
+                  const Matrix< double, 4, 4 >& s)
   {
 
-    Matrix<FloatType, 4, 1> n;
+    Matrix<double, 4, 1> n;
     n(0) = parameters.n0();
     n(1) = parameters.n1();
     n(2) = parameters.n2();
     n(3) = parameters.n3();
 
-    FloatType chi2 = n.transpose() * s * n;
+    double chi2 = n.transpose() * s * n;
 
     return chi2;
   }
 
 
-  Matrix<FloatType, 3, 3> calcCovariance(const PerigeeCircle& parameters,
-                                         const Matrix< FloatType, 4, 4 >& s,
-                                         bool lineConstrained = false,
-                                         bool originConstrained = false)
+  Matrix<double, 3, 3> calcCovariance(const PerigeeCircle& parameters,
+                                      const Matrix< double, 4, 4 >& s,
+                                      bool lineConstrained = false,
+                                      bool originConstrained = false)
   {
-    const FloatType n0 = parameters.n0();
+    const double n0 = parameters.n0();
 
     Vector2D n12 = parameters.n12();
-    const FloatType n3 = parameters.n3();
+    const double n3 = parameters.n3();
 
     // 1. Passive rotation such that n12 = (n1, 0);
 
     // n12 in the rotated system will be:
-    const FloatType rotN1 = n12.normalize();
-    const FloatType rotN2 = 0.0;
+    const double rotN1 = n12.normalize();
+    const double rotN2 = 0.0;
 
     // Setup passive rotation matrix.
-    Matrix< FloatType, 4, 4 > rot = Matrix< FloatType, 4, 4 >::Identity();
+    Matrix< double, 4, 4 > rot = Matrix< double, 4, 4 >::Identity();
     rot(iX, iX) = n12.x();
     rot(iX, iY) = n12.y();
 
@@ -290,7 +290,7 @@ namespace {
     // The rotation is needed because to assure n1 != 0 at the point the constraint needs to be inverted.
     // In case n12 = (0, 0) this breaks down.
     // However this correspondes to the case when the circle is centered on the origin, where the perigee parameterization is ill conditioned in the first place.
-    Matrix< FloatType, 3, 4 > reduce = Matrix< FloatType, 3, 4 >::Zero();
+    Matrix< double, 3, 4 > reduce = Matrix< double, 3, 4 >::Zero();
     reduce(iReducedN0, iN0) = 1.;
     reduce(iReducedN2, iN2) = 1.;
     reduce(iReducedN3, iN3) = 1.;
@@ -302,26 +302,26 @@ namespace {
 
     // Instead of doing the two transformations seperatly we combine the matrices and apply a single transformation.
     // This saves one matrix multiplication.
-    // Matrix<FloatType, 4, 4> rotS = rot * s * rot.transpose();
-    // Matrix<FloatType, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
+    // Matrix<double, 4, 4> rotS = rot * s * rot.transpose();
+    // Matrix<double, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
 
-    Matrix< FloatType, 3, 4 > rotAndReduce = reduce * rot;
-    Matrix< FloatType, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
+    Matrix< double, 3, 4 > rotAndReduce = reduce * rot;
+    Matrix< double, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
 
     //Zero out the unconsidered parameters before inversion. Keep one on the diagonal.
     if (lineConstrained) {
-      reducedNInvCov.row(iReducedN3) = Matrix<FloatType, 1, 3>::Zero();
-      reducedNInvCov.col(iReducedN3) = Matrix<FloatType, 3, 1>::Zero();
+      reducedNInvCov.row(iReducedN3) = Matrix<double, 1, 3>::Zero();
+      reducedNInvCov.col(iReducedN3) = Matrix<double, 3, 1>::Zero();
       reducedNInvCov(iReducedN0, iReducedN3) = 1.;
     }
 
     if (originConstrained) {
-      reducedNInvCov.row(iReducedN0) = Matrix<FloatType, 1, 3>::Zero();
-      reducedNInvCov.col(iReducedN0) = Matrix<FloatType, 3, 1>::Zero();
+      reducedNInvCov.row(iReducedN0) = Matrix<double, 1, 3>::Zero();
+      reducedNInvCov.col(iReducedN0) = Matrix<double, 3, 1>::Zero();
       reducedNInvCov(iReducedN0, iReducedN0) = 1.;
     }
 
-    Matrix< FloatType, 3, 3> reducedNCov = reducedNInvCov.inverse();
+    Matrix< double, 3, 3> reducedNCov = reducedNInvCov.inverse();
 
     if (lineConstrained) {
       reducedNCov(iReducedN3, iReducedN3) = 0.;
@@ -332,10 +332,10 @@ namespace {
     }
 
     // 3. Translate to perigee
-    Matrix< FloatType, 3, 3 > perigeeJ;
+    Matrix< double, 3, 3 > perigeeJ;
 
-    FloatType normN12 = fabs(rotN1); // = hypot(n1, n2);
-    FloatType denominator = (1 + normN12) * (1 + normN12) * normN12;
+    double normN12 = fabs(rotN1); // = hypot(n1, n2);
+    double denominator = (1 + normN12) * (1 + normN12) * normN12;
     perigeeJ(iCurv, iReducedN0) = 0;
     perigeeJ(iCurv, iReducedN2) = 0;
     perigeeJ(iCurv, iReducedN3) = 2;
@@ -348,7 +348,7 @@ namespace {
     perigeeJ(iI, iReducedN2) = 0;
     perigeeJ(iI, iReducedN3) =  -4 * n0 * n0 /  denominator;
 
-    Matrix< FloatType, 3, 3 > perigeeCov = perigeeJ * reducedNCov * perigeeJ.transpose();
+    Matrix< double, 3, 3 > perigeeCov = perigeeJ * reducedNCov * perigeeJ.transpose();
 
     return perigeeCov;
 
@@ -361,18 +361,18 @@ namespace {
 UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
-  Matrix< FloatType, 5, 5 > s = observations2D.getWXYRLSumMatrix();
+  Matrix< double, 5, 5 > s = observations2D.getWXYRLSumMatrix();
 
   // The same as above without drift lengths
-  Matrix<FloatType, 4, 4> sNoL = s.block<4, 4>(0, 0);
+  Matrix<double, 4, 4> sNoL = s.block<4, 4>(0, 0);
 
   // Determine NDF : Circle fit eats up 3 degrees of freedom.
   size_t ndf = observations2D.size() - 3;
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
-  FloatType chi2;
-  Matrix< FloatType, 3, 3> perigeeCovariance;
+  double chi2;
+  Matrix< double, 3, 3> perigeeCovariance;
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
@@ -386,11 +386,11 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     if (not isOriginConstrained()) {
       // Alternative implementation for comparision
       // Matrix of averages
-      Matrix< FloatType, 4, 4> aNoL = sNoL / sNoL(iW);
+      Matrix< double, 4, 4> aNoL = sNoL / sNoL(iW);
       // Measurement means
-      Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
+      Matrix< double, 4, 1> meansNoL = aNoL.row(iW);
       // Covariance matrix
-      Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+      Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
       resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
 
     } else {

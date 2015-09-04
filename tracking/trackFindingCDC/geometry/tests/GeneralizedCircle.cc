@@ -73,7 +73,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
 
 
   // This tests for point which is on the circle
-  FloatType smallAngle = PI / 100;
+  double smallAngle = PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
 
@@ -88,10 +88,10 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
-  FloatType smallAngle = PI / 100;
+  double smallAngle = PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType expectedArcLengthFactor = smallAngle / near.cylindricalR();
+  double expectedArcLengthFactor = smallAngle / near.cylindricalR();
   EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.cylindricalR()), 10e-7);
 
 }
@@ -108,7 +108,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
   Vector2D down(1.0, -2.0);
   Vector2D far(4.0, 0.0);
 
-  FloatType smallAngle = PI / 100;
+  double smallAngle = PI / 100;
   Vector2D close(1.0 - cos(smallAngle), sin(smallAngle));
 
   EXPECT_NEAR(-PI / 2.0, circle.arcLengthBetween(origin, up), 10e-7);
@@ -140,7 +140,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
-  FloatType radius = 5.0;
+  double radius = 5.0;
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
   circle.passiveMoveBy(Vector2D(3.0, 3.0));
@@ -176,15 +176,15 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-  FloatType smallAngle = PI / 100;
+  double smallAngle = PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  FloatType nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
 
   Vector2D atNear = circle.atArcLength(nearArcLength);
 
@@ -193,7 +193,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 
 
   Vector2D down(2.0, -1.0);
-  FloatType downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
@@ -204,42 +204,42 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
   {
-    FloatType closestArcLength = circle.arcLengthToCylindricalR(1);
+    double closestArcLength = circle.arcLengthToCylindricalR(1);
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
-    FloatType widestArcLength = circle.arcLengthToCylindricalR(3);
+    double widestArcLength = circle.arcLengthToCylindricalR(3);
     EXPECT_NEAR(PI, widestArcLength, 10e-7);
 
-    FloatType halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
+    double halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
     EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
 
-    FloatType unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
+    double unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
 
-    FloatType unreachableLowArcLength = circle.arcLengthToCylindricalR(0.5);
+    double unreachableLowArcLength = circle.arcLengthToCylindricalR(0.5);
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
 
   GeneralizedCircle reversedCircle = circle.reversed();
   {
-    FloatType closestArcLength = reversedCircle.arcLengthToCylindricalR(1);
+    double closestArcLength = reversedCircle.arcLengthToCylindricalR(1);
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
-    FloatType widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
+    double widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
     EXPECT_NEAR(PI, widestArcLength, 10e-7);
 
-    FloatType halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
+    double halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
     EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
 
-    FloatType unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
+    double unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
 
-    FloatType unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
+    double unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
 
@@ -248,7 +248,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
@@ -265,7 +265,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
 {
-  FloatType radius = 1;
+  double radius = 1;
   Vector2D center = Vector2D(2.0, 0.0);
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 

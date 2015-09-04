@@ -92,17 +92,17 @@ namespace Belle2 {
         const Vector3D& wireVector = wire.getWireVector();
         const Vector2D disp2D = recoHit3D.getRecoDisp2D();
 
-        FloatType dispNorm = disp2D.norm();
+        double dispNorm = disp2D.norm();
 
-        FloatType zeta = 1.0;
+        double zeta = 1.0;
         if (dispNorm == 0.0) {
           zeta = wireVector.xy().norm() / wireVector.z();
         } else {
           zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
         }
 
-        //FloatType weight = 1.0;
-        FloatType weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
+        //double weight = 1.0;
+        double weight = zeta * zeta / SIMPLE_DRIFT_LENGTH_VARIANCE;
 
         size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z(), weight);
         // if (not appended_hit){
@@ -123,7 +123,7 @@ namespace Belle2 {
       }
 
       /// Appends the s and z value of the given hit to the observation matrix
-      size_t appendSZ(CDCObservations2D& observationsSZ, const FloatType& s, const FloatType& z, const FloatType& weight = 1.0) const
+      size_t appendSZ(CDCObservations2D& observationsSZ, const double& s, const double& z, const double& weight = 1.0) const
       { return observationsSZ.append(s, z, 0.0, weight); }
 
     public:

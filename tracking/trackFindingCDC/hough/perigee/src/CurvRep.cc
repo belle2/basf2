@@ -30,11 +30,11 @@ CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     ILayerType iCLayer = wireLayer.getICLayer();
-    FloatType cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
-    FloatType factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
+    double cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
+    double factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
 
-    FloatType arcLength2D = cylindricalR * nvl(factor, PI);
-    FloatType r = 1.0 / fabs(m_curv);
+    double arcLength2D = cylindricalR * nvl(factor, PI);
+    double r = 1.0 / fabs(m_curv);
 
     m_arcLength2DByICLayer[iCLayer] = arcLength2D;
     m_secondaryArcLength2DByICLayer[iCLayer] = 2 * PI * r - arcLength2D;

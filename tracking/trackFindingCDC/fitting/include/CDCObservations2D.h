@@ -35,7 +35,7 @@ namespace Belle2 {
     public:
 #ifndef __CINT__
       /// Matrix type used to wrap the raw memory chunk of values generated from the various hit types for structured vectorized access.
-      typedef Eigen::Map< Eigen::Matrix< FloatType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
+      typedef Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
 #endif
       /** Gets the pseudo variance.
        *  The pseudo drift length variance is a measure that tries to incorporate the drift length
@@ -46,7 +46,7 @@ namespace Belle2 {
        *  The pseudo variance is therefore the square of the drift length itself (square for unit conformity)
        *  plus its reference drift length variance.
        */
-      static FloatType getPseudoDriftLengthVariance(const CDCWireHit& wireHit)
+      static double getPseudoDriftLengthVariance(const CDCWireHit& wireHit)
       {
         return square(wireHit.getRefDriftLength()) + wireHit.getRefDriftLengthVariance();
       }
@@ -68,19 +68,19 @@ namespace Belle2 {
       { m_observations.reserve(nObservations * 4); }
 
       /// Getter for the x value of the observation at the given index.
-      FloatType getX(const int& iObservation) const
+      double getX(const int& iObservation) const
       { return m_observations[iObservation * 4]; }
 
       /// Getter for the y value of the observation at the given index.
-      FloatType getY(const int& iObservation) const
+      double getY(const int& iObservation) const
       { return m_observations[iObservation * 4 + 1]; }
 
       /// Getter for the signed drift radius of the observation at the given index.
-      FloatType getDriftLength(const int& iObservation) const
+      double getDriftLength(const int& iObservation) const
       { return m_observations[iObservation * 4 + 2]; }
 
       /// Getter for the weight / inverse variance of the observation at the given index.
-      FloatType getWeight(const int& iObservation) const
+      double getWeight(const int& iObservation) const
       { return m_observations[iObservation * 4 + 3]; }
 
       /** Appends the observed position.
@@ -95,10 +95,10 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const FloatType& x,
-                    const FloatType& y,
-                    const FloatType& signedRadius = 0.0,
-                    const FloatType& weight = 1.0)
+      size_t append(const double& x,
+                    const double& y,
+                    const double& signedRadius = 0.0,
+                    const double& weight = 1.0)
       {
         if (std::isnan(x)) return 0;
         if (std::isnan(y)) return 0;
@@ -132,8 +132,8 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::Vector2D& pos2D,
-                    const FloatType& signedRadius = 0.0,
-                    const FloatType& weight = 1.0)
+                    const double& signedRadius = 0.0,
+                    const double& weight = 1.0)
       { return append(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
       /** Appends the hit circle at wire reference position without a right left passage hypotheses.
@@ -149,12 +149,12 @@ namespace Belle2 {
                     const RightLeftInfo& rlInfo = ZERO)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
-        const FloatType driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
-        const FloatType driftLengthVariance = (abs(rlInfo) == 1 ?
-                                               wireHit.getRefDriftLengthVariance() :
-                                               getPseudoDriftLengthVariance(wireHit));
+        const double driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
+        const double driftLengthVariance = (abs(rlInfo) == 1 ?
+                                            wireHit.getRefDriftLengthVariance() :
+                                            getPseudoDriftLengthVariance(wireHit));
 
-        const FloatType weight = 1.0 / driftLengthVariance;
+        const double weight = 1.0 / driftLengthVariance;
         size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
         return nAppendedHits;
       }
@@ -187,8 +187,8 @@ namespace Belle2 {
       size_t append(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit)
       {
         const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
-        const FloatType signedDriftLength = rlWireHit.getSignedRefDriftLength();
-        const FloatType weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
+        const double signedDriftLength = rlWireHit.getSignedRefDriftLength();
+        const double weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
         return append(wireRefPos2D, signedDriftLength, weight);
       }
 
@@ -209,8 +209,8 @@ namespace Belle2 {
       {
         if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
-          const FloatType driftLength = 0.0;
-          const FloatType weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
+          const double driftLength = 0.0;
+          const double weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
           return append(recoPos2D, driftLength, weight);
         } else {
           return append(recoHit2D.getRLWireHit());
@@ -226,13 +226,13 @@ namespace Belle2 {
       {
         if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
-          const FloatType driftLength = 0.0;
-          const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+          const double driftLength = 0.0;
+          const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
           return append(recoPos2D, driftLength, weight);
         } else {
           const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
-          const FloatType driftLength = recoHit3D.getSignedRecoDriftLength();
-          const FloatType weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+          const double driftLength = recoHit3D.getSignedRecoDriftLength();
+          const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
           return append(recoWirePos2D, driftLength, weight);
         }
       }
@@ -314,8 +314,8 @@ namespace Belle2 {
           if (not ptrWire) continue;
           const CDCWire& wire = *ptrWire;
           const Vector2D& wirePos = wire.getRefPos2D();
-          const FloatType driftLength = 0.0;
-          const FloatType weight = 1.0;
+          const double driftLength = 0.0;
+          const double weight = 1.0;
           nAppendedHits += append(wirePos, driftLength, weight);
         }
         return nAppendedHits;
@@ -377,7 +377,7 @@ namespace Belle2 {
       { return empty() ? Vector2D() : Vector2D(getX(size() - 1), getY(size() - 1)); }
 
       /// Calculate the total transvers travel distance traversed by these observations comparing the travel distance of first and last position
-      FloatType getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
+      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
       { return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D()); }
 
       /// Checks if the last position of these observations lies at greater travel distance than the first
@@ -435,7 +435,7 @@ namespace Belle2 {
        *  * \f$ s_{44} = \sum l * l * w \f$
        *  * + symmetric.
        */
-      Eigen::Matrix<FloatType, 5, 5> getWXYRLSumMatrix();
+      Eigen::Matrix<double, 5, 5> getWXYRLSumMatrix();
 
       /// Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line fits.
       /** Cumulates weights, x positions, y positions and signed drift legnths and products thereof
@@ -455,7 +455,7 @@ namespace Belle2 {
        *  * \f$ s_{33} = \sum (r^2 - l^2) * l * w \f$
        *  * + symmetric
        */
-      Eigen::Matrix<FloatType, 4, 4> getWXYLSumMatrix();
+      Eigen::Matrix<double, 4, 4> getWXYLSumMatrix();
 
       /// Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
       /** Cumulates weights, x positions, y positions, quadratic cylindrical radii and products thereof
@@ -476,7 +476,7 @@ namespace Belle2 {
        *  * \f$ s_{33} = \sum (r^2 - l^2) * (r^2 - l^2) * w \f$
        *  * + symmetric.
        */
-      Eigen::Matrix<FloatType, 4, 4> getWXYRSumMatrix();
+      Eigen::Matrix<double, 4, 4> getWXYRSumMatrix();
 
 
       /// Constructs a symmetric matrix of weighted sums of x, y as relevant for line fits.
@@ -492,7 +492,7 @@ namespace Belle2 {
        *  * \f$ s_{22} = \sum y * y * w \f$
        *  * + symmetric.
        */
-      Eigen::Matrix<FloatType, 3, 3> getWXYSumMatrix();
+      Eigen::Matrix<double, 3, 3> getWXYSumMatrix();
 #endif
 
     public:
@@ -508,7 +508,7 @@ namespace Belle2 {
       /** Memory for the individual observations.
        *  Arrangement of values is x,y, drift raduis, weight, x, y, .....
        */
-      std::vector<FloatType> m_observations;
+      std::vector<double> m_observations;
 
       /** Indicator if the reconstructed position of hits shall be used in favour
        *  of the wire position and the drift length for hits where it is available

@@ -150,28 +150,28 @@ namespace Belle2 {
 
       /** Determines the angle between the last reconstructed position of the start segment and
        *  the first reconstructed position of the end segment.*/
-      FloatType computeDeltaPhiAtSuperLayerBound() const;
+      double computeDeltaPhiAtSuperLayerBound() const;
 
       /** Indicator if the start segment lies before the end segment */
-      FloatType computeStartIsBeforeEnd() const
+      double computeStartIsBeforeEnd() const
       { return computeStartIsBeforeEndFitless(); }
 
       /** Indicator if the start segment lies before the end segment */
-      FloatType computeEndIsAfterStart() const
+      double computeEndIsAfterStart() const
       { return computeEndIsAfterStartFitless(); }
 
       /** Indicator if the start segment and the end segment have roughly the same travel direction.*/
-      FloatType computeIsCoaligned() const
+      double computeIsCoaligned() const
       { return computeIsCoalignedFitless(); }
 
       /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
-      FloatType computeStartIsBeforeEndFitless() const;
+      double computeStartIsBeforeEndFitless() const;
 
       /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
-      FloatType computeEndIsAfterStartFitless() const;
+      double computeEndIsAfterStartFitless() const;
 
       /** Indicator if the start segment and the end segment have roughly the same travel direction without using the common fit*/
-      FloatType computeIsCoalignedFitless() const;
+      double computeIsCoalignedFitless() const;
 
       /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
       /** Returns:

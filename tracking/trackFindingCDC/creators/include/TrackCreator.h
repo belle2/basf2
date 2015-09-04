@@ -68,29 +68,29 @@ namespace Belle2 {
 
       ///Reconstruct the start segment of a triple and append it to the track
       void appendStartRecoHits3D(const CDCSegmentTriple& triple,
-                                 FloatType perpSOffset,
+                                 double perpSOffset,
                                  CDCTrack& recohits3D) const;
 
       /// Reconstruct the middle segment of a triple and append it to the track
       void appendMiddleRecoHits3D(const CDCSegmentTriple& triple,
-                                  FloatType perpSOffset,
+                                  double perpSOffset,
                                   CDCTrack& recohits3D) const;
 
       /// Reconstruct the end segment of a triple and append it to the track
       void appendEndRecoHits3D(const CDCSegmentTriple& triple,
-                               FloatType perpSOffset,
+                               double perpSOffset,
                                CDCTrack& recohits3D) const;
 
 
 
       ///Reconstruct the start segment of a pair and append it to the track
       void appendStartRecoHits3D(const CDCSegmentPair& pair,
-                                 FloatType perpSOffset,
+                                 double perpSOffset,
                                  CDCTrack& recohits3D) const;
 
       ///Reconstruct the last segment of a pair and append it to the track
       void appendEndRecoHits3D(const CDCSegmentPair& pair,
-                               FloatType perpSOffset,
+                               double perpSOffset,
                                CDCTrack& recohits3D) const;
 
 
@@ -99,26 +99,26 @@ namespace Belle2 {
       void appendRecoHits3D(const CDCRecoSegment2D& segment,
                             const CDCTrajectory2D& trajectory2D,
                             const CDCTrajectorySZ& trajectorySZ,
-                            FloatType perpSOffset,
+                            double perpSOffset,
                             CDCTrack& recohits3D) const;
 
 
 
       /// Average overlapping segments of two triples and append it to the track
       /** @return the travel distance offset  for the following segment triple. */
-      FloatType appendAverageStartEnd(const CDCSegmentTriple& triple,
-                                      const CDCSegmentTriple& followingTriple,
-                                      FloatType perpSOffset,
-                                      CDCTrack& recohits3D) const;
+      double appendAverageStartEnd(const CDCSegmentTriple& triple,
+                                   const CDCSegmentTriple& followingTriple,
+                                   double perpSOffset,
+                                   CDCTrack& recohits3D) const;
 
 
 
       /// Average overlapping segments of two pairs and append it to the track
       /** @return the travel distance offset for the following segment pairs. */
-      FloatType appendAverageStartEnd(const CDCSegmentPair& pair,
-                                      const CDCSegmentPair& followingPair,
-                                      FloatType perpSOffset,
-                                      CDCTrack& recohits3D) const;
+      double appendAverageStartEnd(const CDCSegmentPair& pair,
+                                   const CDCSegmentPair& followingPair,
+                                   double perpSOffset,
+                                   CDCTrack& recohits3D) const;
 
       /** Append the three dimensional reconstructed hits from the given segments averaged over two possible trajectories.
        *  In case of overlapping segments in segment triple or segment pairs segment usually participate in two trajectory fits.
@@ -130,13 +130,13 @@ namespace Belle2 {
        *  on other previous parts of the whole track.
        *  Return value is the travel distance by which the following trajectories have to be shifted to match the overall track travel distance scale
        *  on the last hit of the given segment.*/
-      FloatType appendAverage(const CDCRecoSegment2D& segment,
-                              const CDCTrajectory2D& trajectory2D,
-                              const CDCTrajectorySZ& trajectorySZ,
-                              FloatType perpSOffset,
-                              const CDCTrajectory2D& followingTrajectory2D,
-                              const CDCTrajectorySZ& followingTrajectorySZ,
-                              CDCTrack& recohits3D) const;
+      double appendAverage(const CDCRecoSegment2D& segment,
+                           const CDCTrajectory2D& trajectory2D,
+                           const CDCTrajectorySZ& trajectorySZ,
+                           double perpSOffset,
+                           const CDCTrajectory2D& followingTrajectory2D,
+                           const CDCTrajectorySZ& followingTrajectorySZ,
+                           CDCTrack& recohits3D) const;
 
 
     }; // end class TrackCreator

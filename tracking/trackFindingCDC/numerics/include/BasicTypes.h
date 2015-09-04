@@ -33,7 +33,7 @@ namespace Belle2 {
     /** @name Basic floatig point types*/
     /**@{*/
     /// The float type used by the algorithm. Just as necessary for speed.
-    typedef double FloatType;
+    typedef double FloatType __attribute__((deprecated));
     /**@}*/
 
   } // namespace TrackFindingCDC

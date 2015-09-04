@@ -68,8 +68,8 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
     Vector2D firstReconstructed = startFit.getCloseSameCylindricalR(firstPosition);
     Vector2D lastReconstructed = endFit.getCloseSameCylindricalR(lastPosition);
 
-    FloatType first_refToReconstructedAngle = firstPosition.angleWith(firstReconstructed);
-    FloatType last_refToReconstructedAngle = lastPosition.angleWith(lastReconstructed);
+    double first_refToReconstructedAngle = firstPosition.angleWith(firstReconstructed);
+    double last_refToReconstructedAngle = lastPosition.angleWith(lastReconstructed);
 
     const CDCWire& firstWire = firstHit.getWire();
     const CDCWire& lastWire  = lastHit.getWire();
@@ -77,10 +77,10 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
     //Both wires are stereo wires by construction
     //So they have both non zero twist
     //check if the first and last are within the acceptable twist bounds
-    const std::pair<FloatType, FloatType>& first_phiRangeToRef = firstWire.getPhiRangeToRef();
-    const std::pair<FloatType, FloatType>& last_phiRangeToRef  = lastWire.getPhiRangeToRef();
+    const std::pair<double, double>& first_phiRangeToRef = firstWire.getPhiRangeToRef();
+    const std::pair<double, double>& last_phiRangeToRef  = lastWire.getPhiRangeToRef();
 
-    const FloatType tolerance = 0.0;
+    const double tolerance = 0.0;
 
     const bool agrees = (first_phiRangeToRef.first - tolerance) < first_refToReconstructedAngle and
                         first_refToReconstructedAngle < (first_phiRangeToRef.second + tolerance) and

@@ -53,8 +53,8 @@ namespace Belle2 {
                      size_t iMCTrack,
                      RightLeftInfo rlInfo,
                      Vector3D pos3D,
-                     FloatType arcLength2D = NAN,
-                     FloatType trueDriftLength = NAN) :
+                     double arcLength2D = NAN,
+                     double trueDriftLength = NAN) :
           m_wireHit(wireHit),
           m_iMCTrack(iMCTrack),
           m_rlInfo(rlInfo),
@@ -67,8 +67,8 @@ namespace Belle2 {
         size_t m_iMCTrack;
         RightLeftInfo m_rlInfo;
         Vector3D m_pos3D  = m_wireHit.getRefPos3D();
-        FloatType m_arcLength2D = NAN;
-        FloatType m_trueDriftLength = NAN;
+        double m_arcLength2D = NAN;
+        double m_trueDriftLength = NAN;
       };
 
     public:
@@ -105,19 +105,19 @@ namespace Belle2 {
       /// Generate hits for the given helix in starting from the two dimensional arc length.
       std::vector<SimpleSimHit>
       createHits(const Helix& globalHelix,
-                 const FloatType& arcLength2DOffset) const;
+                 const double& arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
       std::vector<SimpleSimHit>
       createHitsForLayer(const CDCWire& nearWire,
                          const Helix& globalHelix,
-                         const FloatType& arcLength2DOffset) const;
+                         const double& arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
       SimpleSimHit
       createHitForCell(const CDCWire& wire,
                        const Helix& globalHelix,
-                       const FloatType& arcLengthOffset) const;
+                       const double& arcLengthOffset) const;
 
     public:
       /// Getter for a global event time offset

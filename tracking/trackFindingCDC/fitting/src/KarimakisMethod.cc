@@ -37,15 +37,15 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
 
   UncertainPerigeeCircle perigeeCircle = fitInternal(observations2D);
 
-  FloatType frontX = observations2D.getX(0);
-  FloatType frontY = observations2D.getY(0);
+  double frontX = observations2D.getX(0);
+  double frontY = observations2D.getY(0);
   Vector2D frontPos(frontX, frontY);
 
-  FloatType backX = observations2D.getX(nObservations - 1);
-  FloatType backY = observations2D.getY(nObservations - 1);
+  double backX = observations2D.getX(nObservations - 1);
+  double backY = observations2D.getY(nObservations - 1);
   Vector2D backPos(backX, backY);
 
-  FloatType totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
+  double totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
     perigeeCircle.reverse();
   }
@@ -70,9 +70,9 @@ namespace {
   constexpr size_t iI = 2;
 
   /// Variant implementing Karimakis method without drift circles.
-  UncertainPerigeeCircle fitKarimaki(const FloatType& /*sw*/,
-                                     const Matrix< FloatType, 4, 1 >& a,
-                                     const Matrix< FloatType, 4, 4 >& c,
+  UncertainPerigeeCircle fitKarimaki(const double& /*sw*/,
+                                     const Matrix< double, 4, 1 >& a,
+                                     const Matrix< double, 4, 4 >& c,
                                      bool lineConstrained = false)
   {
     double q1, q2 = 0.0;
@@ -113,31 +113,31 @@ namespace {
 
 
   /// Variant without drift circles
-  FloatType calcChi2Karimaki(const PerigeeCircle& parameters,
-                             const FloatType& sw,
-                             const Matrix< FloatType, 4, 4 >& c,
-                             bool lineConstrained = false)
+  double calcChi2Karimaki(const PerigeeCircle& parameters,
+                          const double& sw,
+                          const Matrix< double, 4, 4 >& c,
+                          bool lineConstrained = false)
   {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
 
-    const FloatType& cosphi = vecPhi.x();
-    const FloatType& sinphi = vecPhi.y();
+    const double& cosphi = vecPhi.x();
+    const double& sinphi = vecPhi.y();
 
 
     if (lineConstrained) {
-      FloatType chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
+      double chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
       return chi2;
     } else {
       // Terminology Karimaki used in the paper
-      const FloatType& rho = parameters.curvature();
-      const FloatType& d = parameters.impact();
+      const double& rho = parameters.curvature();
+      const double& d = parameters.impact();
 
-      const FloatType u = 1 + d * rho;
-      const FloatType kappa = 0.5 * rho / u;
+      const double u = 1 + d * rho;
+      const double kappa = 0.5 * rho / u;
 
-      FloatType chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY,
-                                      iY) - kappa * kappa * c(iR2, iR2));
+      double chi2 =  sw * u * u * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY,
+                                   iY) - kappa * kappa * c(iR2, iR2));
       return chi2;
     }
 
@@ -145,29 +145,29 @@ namespace {
 
 
 
-  Matrix<FloatType, 3, 3> calcCovarianceKarimaki(const PerigeeCircle& parameters,
-                                                 const Matrix< FloatType, 4, 4 >& s,
-                                                 bool lineConstrained = false)
+  Matrix<double, 3, 3> calcCovarianceKarimaki(const PerigeeCircle& parameters,
+                                              const Matrix< double, 4, 4 >& s,
+                                              bool lineConstrained = false)
   {
-    Matrix<FloatType, 3, 3> invV;
+    Matrix<double, 3, 3> invV;
 
-    const FloatType& curv = parameters.curvature();
-    const FloatType& I =  parameters.impact();
+    const double& curv = parameters.curvature();
+    const double& I =  parameters.impact();
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
 
 
     // Ternminology Karimaki using in the paper
-    const FloatType& cosphi = vecPhi.x();
-    const FloatType& sinphi = vecPhi.y();
+    const double& cosphi = vecPhi.x();
+    const double& sinphi = vecPhi.y();
 
-    const FloatType ssphi = sinphi * sinphi;
-    const FloatType scphi = sinphi * cosphi;
-    const FloatType ccphi = cosphi * cosphi;
+    const double ssphi = sinphi * sinphi;
+    const double scphi = sinphi * cosphi;
+    const double ccphi = cosphi * cosphi;
 
-    const FloatType rho = curv;
-    const FloatType& d = I;
+    const double rho = curv;
+    const double& d = I;
 
     const double u = 1. + rho * d;
 
@@ -183,7 +183,7 @@ namespace {
       invV(iI, iPhi) = invV(iPhi, iI);
       invV(iI, iI) = s(iW);
 
-      Matrix<FloatType, 3, 3> V = invV.inverse();
+      Matrix<double, 3, 3> V = invV.inverse();
       V(iCurv, iCurv) = 0.;
       return V;
     } else {
@@ -222,24 +222,24 @@ namespace {
 UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
-  Matrix< FloatType, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
+  Matrix< double, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
 
   // Matrix of averages
-  Matrix< FloatType, 4, 4> aNoL = sNoL / sNoL(iW);
+  Matrix< double, 4, 4> aNoL = sNoL / sNoL(iW);
 
   // Measurement means
-  Matrix< FloatType, 4, 1> meansNoL = aNoL.row(iW);
+  Matrix< double, 4, 1> meansNoL = aNoL.row(iW);
 
   // Covariance matrix
-  Matrix< FloatType, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+  Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
   // Determine NDF : Circle fit eats up 3 degrees of freedom.
   size_t ndf = observations2D.size() - 3;
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
-  FloatType chi2;
-  Matrix< FloatType, 3, 3> perigeeCovariance;
+  double chi2;
+  Matrix< double, 3, 3> perigeeCovariance;
 
   resultCircle = fitKarimaki(sNoL(iW), meansNoL, cNoL, isLineConstrained());
   chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);

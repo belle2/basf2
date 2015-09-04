@@ -143,24 +143,24 @@ namespace Belle2 {
       StereoType getStereoType() const { return first().getStereoType(); }
 
       /// Getter for the inner radius of the layer as retrived from the CDCGeometryPar by the inner most layer
-      FloatType getInnerCylindricalR() const { return first().getInnerCylindricalR(); }
+      double getInnerCylindricalR() const { return first().getInnerCylindricalR(); }
 
       /// Getter for the outer radius of the layer as retrived from the CDCGeometryPar by the outer most layer
-      FloatType getOuterCylindricalR() const { return last().getOuterCylindricalR(); }
+      double getOuterCylindricalR() const { return last().getOuterCylindricalR(); }
 
       /// Getter for the radius in the middle of the layer.
-      FloatType getMiddleCylindricalR() const
+      double getMiddleCylindricalR() const
       { return (getOuterCylindricalR() + getInnerCylindricalR()) / 2.0; }
 
 
       /// Getter for the (fitted) z of the reference wire reference points at the inner cylindricalR of this super layer.
-      FloatType getInnerRefZ() const { return m_innerRefZ; }
+      double getInnerRefZ() const { return m_innerRefZ; }
 
       /// Getter for the (fitted) z of the reference wire reference points at the outer cylindricalR of this super layer.
-      FloatType getOuterRefZ() const { return m_outerRefZ; }
+      double getOuterRefZ() const { return m_outerRefZ; }
 
       /// Getter for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
-      FloatType getRefTanLambda() const { return m_refTanLambda; }
+      double getRefTanLambda() const { return m_refTanLambda; }
       /**@}*/
 
       /** @name Closest neighborhood
@@ -302,13 +302,13 @@ namespace Belle2 {
       const_iterator m_end;
 
       /// Memory for the (fitted) z of the reference wire reference points at the inner cylindricalR of this super layer.
-      FloatType m_innerRefZ;
+      double m_innerRefZ;
 
       /// Memory for the (fitted) z of the reference wire reference points at the outer cylindricalR of this super layer.
-      FloatType m_outerRefZ;
+      double m_outerRefZ;
 
       /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
-      FloatType m_refTanLambda;
+      double m_refTanLambda;
 
 
     }; //class

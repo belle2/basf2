@@ -187,11 +187,11 @@ namespace Belle2 {
       { return getRLWireHit().getRLInfo(); }
 
       /// Getter for the drift length at the wire reference position.
-      FloatType getRefDriftLength() const
+      double getRefDriftLength() const
       { return getRLWireHit().getRefDriftLength(); }
 
       /// Getter for the uncertainty in the drift length at the wire reference position.
-      FloatType getRefDriftLengthVariance() const
+      double getRefDriftLengthVariance() const
       { return getRLWireHit().getRefDriftLengthVariance(); }
 
       /// Getter for the position in the reference plane

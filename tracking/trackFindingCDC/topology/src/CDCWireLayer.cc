@@ -102,7 +102,7 @@ void CDCWireLayer::initialize()
 
     m_tanStereoAngle += wire.getTanStereoAngle();
 
-    FloatType minROfWire = wire.getMinCylindricalR();
+    double minROfWire = wire.getMinCylindricalR();
     m_minCylindricalR = std::min(minROfWire, m_minCylindricalR);
 
     m_refZ += wire.getRefZ();

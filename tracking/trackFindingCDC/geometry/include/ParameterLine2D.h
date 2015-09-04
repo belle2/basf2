@@ -41,16 +41,16 @@ namespace Belle2 {
       /** Orientation will be coaligned with the first axes.
        *  Tangential vector is normalized to have a unit in the first coordinate.
        */
-      static ParameterLine2D fromSlopeIntercept(const FloatType& slope,
-                                                const FloatType& intercept)
+      static ParameterLine2D fromSlopeIntercept(const double& slope,
+                                                const double& intercept)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(1.0, slope)); }
 
       /// Constructs a line with slope and intercept. Orientation means the alignment with the first axes.
       /** Orientation will be coaligned or antialigned as given.
        *  Tangential vector is normalized to have a unit in the first coordinate.
        */
-      static ParameterLine2D fromSlopeIntercept(const FloatType& slope,
-                                                const FloatType& intercept,
+      static ParameterLine2D fromSlopeIntercept(const double& slope,
+                                                const double& intercept,
                                                 const ForwardBackwardInfo& orientation)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(orientation, orientation * slope)); }
 
@@ -95,7 +95,7 @@ namespace Belle2 {
       const Vector2D& support() const { return m_support; }
 
       /// Evaluates the line formula at the parameter given
-      Vector2D at(const FloatType& parameter) const
+      Vector2D at(const double& parameter) const
       { return tangential() * parameter += support(); }
 
       ///Indicates if the tangential vector point in a commmon direction with the first coordinate axes
@@ -121,21 +121,21 @@ namespace Belle2 {
       /// Gives the signed distance of a point to the line
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      FloatType distance(const Vector2D& point) const
+      double distance(const Vector2D& point) const
       { return distanceToOrigin() - point.orthogonalComp(tangential()) ; }
 
       /// Calculates the signed distance of the point given by its to coordinates to the line.
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      FloatType distance(const FloatType& first, const FloatType& second) const
+      double distance(const double& first, const double& second) const
       { return distance(Vector2D(first, second)); }
 
       /// Gives the signed distance of the origin
-      FloatType distanceToOrigin() const
+      double distanceToOrigin() const
       { return support().orthogonalComp(tangential()); }
 
       /// Gives the unsigned distance of a point to the line
-      FloatType absoluteDistance(const Vector2D& point) const
+      double absoluteDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
 
       /// Return if the point given is right or left of the line
@@ -153,13 +153,13 @@ namespace Belle2 {
       /// Gives the position at the closest approach on the line to point
       Vector2D closest(const Vector2D& point) const
       {
-        FloatType norm_squared = tangential().normSquared();
+        double norm_squared = tangential().normSquared();
         return Vector2D(tangential() , tangential().dot(point)       / norm_squared,
                         tangential().cross(support()) / norm_squared);
       }
 
       /// Gives the line parameter at the closest approach to point
-      FloatType closestAt(const Vector2D& point) const
+      double closestAt(const Vector2D& point) const
       { return (tangential().dot(point) - tangential().dot(support())) / tangential().normSquared(); }
 
       /// Gives the position of closest approach to the origin
@@ -167,30 +167,30 @@ namespace Belle2 {
       { return tangential().orthogonal() *= (tangential().cross(support()) / tangential().normSquared()); }
 
       /// Gives the line parameter at the closest approach to the origin
-      FloatType closestToOriginAt() const
+      double closestToOriginAt() const
       { return -tangential().dot(support()) / tangential().normSquared(); }
 
       /// Denotes the length on the line between the two points
-      FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       { return (to.dot(tangential()) - from.dot(tangential())) / tangential().norm(); }
 
       /// Gives the line parameter where the two lines meet. Infinity for parallels.
-      FloatType intersectionAt(const Line2D& line) const
+      double intersectionAt(const Line2D& line) const
       { return -(line.n0() + support().dot(line.normal())) / tangential().dot(line.normal()); }
 
       /// Gives the line parameter of this line where the two lines meet. Infinity for parallels.
-      FloatType intersectionAt(const ParameterLine2D& line) const
+      double intersectionAt(const ParameterLine2D& line) const
       { return (line.tangential().cross(support()) - line.tangential().cross(line.support())) / tangential().cross(line.tangential()) ;}
 
       /// Gives the line parameters of this line, where it intersects with the generalized circle
       /** Calculates the two line parameters of the intersections with the circle as a pair.
       The second of the pair is always the small of the two solutions, which is closer to the support point.
       */
-      std::pair<FloatType, FloatType> intersectionsAt(const GeneralizedCircle& genCircle) const
+      std::pair<double, double> intersectionsAt(const GeneralizedCircle& genCircle) const
       {
-        FloatType a = genCircle.n3() * tangential().normSquared();
-        FloatType b = tangential().dot(genCircle.gradient(support()));
-        FloatType c = genCircle.fastDistance(support());
+        double a = genCircle.n3() * tangential().normSquared();
+        double b = tangential().dot(genCircle.gradient(support()));
+        double c = genCircle.fastDistance(support());
 
         return solveQuadraticABC(a, b, c);
       }
@@ -210,18 +210,18 @@ namespace Belle2 {
       /** This moves the parameter by -delta and the following relation hold \n
        *  old at(p) = new at(p - delta) hence the coordinate at is diminished \n
        *  This corresponds to a passive movement of the coordinate system on the line */
-      void passiveMoveAtBy(const FloatType& delta)
+      void passiveMoveAtBy(const double& delta)
       { m_support += tangential() * delta; }
 
       /// Moves the line in the given direction in place. Corresponds to an active transformation.
       void moveBy(const Vector2D& by)
       { m_support += by; }
       /// Moves the line along the first coordinate axes in place. Corresponds to an active transformation.
-      void moveAlongFirst(const FloatType& first)
+      void moveAlongFirst(const double& first)
       { m_support.setFirst(m_support.first() + first); }
 
       /// Moves the line along the second coordinate axes in place. Corresponds to an active transformation.
-      void moveAlongSecond(const FloatType& second)
+      void moveAlongSecond(const double& second)
       { m_support.setSecond(m_support.second() + second); }
 
       /// Moves the coordinate system in the given direction  in place. Corresponds to a passive transformation.
@@ -229,31 +229,31 @@ namespace Belle2 {
       { m_support -= by; }
 
       /// Moves the coordinate system along the first coordinate axes in place. Corresponds to a passive transformation.
-      void passiveMoveAlongFirst(const FloatType& first)
+      void passiveMoveAlongFirst(const double& first)
       { m_support.setFirst(m_support.first() - first); }
 
       /// Moves the coordinate system along the second coordinate axes in place. Corresponds to a passive transformation.
-      void passiveMoveAlongSecond(const FloatType& second)
+      void passiveMoveAlongSecond(const double& second)
       { m_support.setSecond(m_support.second() - second); }
       /**@}*/
       /** @name Line as a function of the first coordinate
        * The next couple of methods are to interpret the line as a function mapping from first to second coordinate */
       /**@{*/
       /// The line slope
-      FloatType slope() const { return tangential().second() / tangential().first(); }
+      double slope() const { return tangential().second() / tangential().first(); }
       /// The inveres line slope
-      FloatType inverseSlope() const { return tangential().first() / tangential().second(); }
+      double inverseSlope() const { return tangential().first() / tangential().second(); }
       /// Second coordinate for first being zero
-      FloatType intercept() const { return support().second() - slope() * support().first(); }
+      double intercept() const { return support().second() - slope() * support().first(); }
       /// First coordinate for second being zero
-      FloatType zero() const { return support().first() - inverseSlope() * support().second(); }
+      double zero() const { return support().first() - inverseSlope() * support().second(); }
       /// Method mapping the first coordinate to the second according to the line
-      FloatType map(const FloatType& first) const { return  support().second() + slope() * (first - support().first()); }
+      double map(const double& first) const { return  support().second() + slope() * (first - support().first()); }
       /// Operator mapping the first coordinate to the second according to the line
-      FloatType operator()(const FloatType& first) const { return  map(first); }
+      double operator()(const double& first) const { return  map(first); }
 
       /// Method for the inverse mapping the second coordinate to the first according to the line
-      FloatType inverseMap(const FloatType& second) const { return  support().first() + inverseSlope() * (second - support().second()); }
+      double inverseMap(const double& second) const { return  support().first() + inverseSlope() * (second - support().second()); }
 
       /// Turns the line into its inverse function in place. Orientation will be flipped as well
       void invert() { m_tangential.swapCoordinates(); m_support.swapCoordinates(); }

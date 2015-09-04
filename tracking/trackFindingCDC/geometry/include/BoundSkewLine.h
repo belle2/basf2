@@ -54,11 +54,11 @@ namespace Belle2 {
       BoundSkewLine movedBy(const Vector2D& offset) const;
 
       /// Gives the three dimensional position of the line at the given z value
-      inline Vector3D pos3DAtZ(const FloatType& z) const
+      inline Vector3D pos3DAtZ(const double& z) const
       { return Vector3D(pos2DAtZ(z), z); }
 
       /// Gives the two dimensional position of the line at the given z value
-      inline Vector2D pos2DAtZ(const FloatType& z) const
+      inline Vector2D pos2DAtZ(const double& z) const
       { return refPos2D() + movePerZ() * (z - refZ()); }
 
       /// Gives the position of the forward point
@@ -98,45 +98,45 @@ namespace Belle2 {
       { return m_movePerZ; }
 
       /// Gives the forward z coodinate
-      inline FloatType forwardZ() const
+      inline double forwardZ() const
       { return m_forwardZ; }
 
       /// Gives the backward z coodinate
-      inline FloatType backwardZ() const
+      inline double backwardZ() const
       { return m_backwardZ; }
 
       /// Returns the difference between forward and backward z
-      inline FloatType deltaZ() const
+      inline double deltaZ() const
       { return forwardZ() - backwardZ(); }
 
       /// Gives the forward azimuth angle
-      inline FloatType forwardPhi() const
+      inline double forwardPhi() const
       { return  forward2D().phi(); }
 
       /// Gives the backward azimuth angle
-      inline FloatType backwardPhi() const
+      inline double backwardPhi() const
       { return backward2D().phi(); }
 
       /// Gives the cylindrical radius of the forward position
-      inline FloatType forwardCylindricalR() const
+      inline double forwardCylindricalR() const
       { return  forward2D().cylindricalR(); }
 
       /// Gives the cylindrical radius of the backward position
-      inline FloatType backwardCylindricalR() const
+      inline double backwardCylindricalR() const
       { return backward2D().cylindricalR(); }
 
       /// Gives the azimuth angle of the forward position relative to the reference position
-      inline FloatType forwardPhiToRef() const
+      inline double forwardPhiToRef() const
       { return forward2D().angleWith(refPos2D()); }
 
       /// Gives the azimuth angle of the backward position relative to the reference position
-      inline FloatType backwardPhiToRef() const
+      inline double backwardPhiToRef() const
       { return backward2D().angleWith(refPos2D()); }
 
       /// Gives the azimuth angle difference from backward to forward position
       /* backwardToForwardAngle means how far the backward position has to be rotated in the xy projection
          in the mathematical positiv sense that it seems to be coaligned with the forward position. */
-      inline FloatType backwardToForwardAngle() const
+      inline double backwardToForwardAngle() const
       { return backward2D().angleWith(forward2D()) ; }
 
       /// Returns the closest approach to the give point
@@ -149,31 +149,31 @@ namespace Belle2 {
       { return refPos3D() - refPos3D().parallelVector(tangential3D()); }
 
       /// Calculates the distance of the given point to the line
-      inline FloatType distance(const Vector3D& pos3D) const
+      inline double distance(const Vector3D& pos3D) const
       { return (pos3D - refPos3D()).orthogonalComp(tangential3D()); }
 
       /** Returns the tan lambda of the line
        *  Also know as dz / ds
        */
-      inline FloatType tanLambda() const
+      inline double tanLambda() const
       { return 1 / movePerZ().norm(); }
 
       /// Returns the lambda.
-      inline FloatType lambda() const
+      inline double lambda() const
       { return std::atan(tanLambda()); }
 
       /** Returns the tangent of the opening angle between tangential vector and the z axes
        *  Also know as ds / dz
        */
-      inline FloatType tanTheta() const
+      inline double tanTheta() const
       { return std::atan(movePerZ().norm()); }
 
       /// Returns the opening angle between tangential vector and the z axes.
-      inline FloatType theta() const
+      inline double theta() const
       { return std::atan(movePerZ().norm()); }
 
       /// Returns the z coordinate of the point of closest approach to the z axes.
-      inline FloatType perigeeZ() const
+      inline double perigeeZ() const
       { return -refPos2D().dot(movePerZ()) / movePerZ().normSquared(); }
 
       /// Returns the point of closest approach to the z axes.
@@ -185,19 +185,19 @@ namespace Belle2 {
       { return refPos2D().orthogonalVector(movePerZ()); }
 
       /// Returns the the x coordinate of the reference point.
-      inline const FloatType& refX() const
+      inline const double& refX() const
       { return m_refPos3D.x(); }
 
       /// Returns the the y coordinate of the reference point.
-      inline const FloatType& refY() const
+      inline const double& refY() const
       { return m_refPos3D.y(); }
 
       /// Returns the the z coordinate of the reference point.
-      inline const FloatType& refZ() const
+      inline const double& refZ() const
       { return m_refPos3D.z(); }
 
       /// Returns the cylindrical radius of the reference position
-      inline FloatType refCylindricalRSquared() const
+      inline double refCylindricalRSquared() const
       { return m_refPos3D.cylindricalRSquared(); }
 
       /// Returns the xy vector of the reference position
@@ -216,10 +216,10 @@ namespace Belle2 {
       Vector2D m_movePerZ;
 
       /// Memory for the forward end z coordinate.
-      FloatType m_forwardZ;
+      double m_forwardZ;
 
       /// Memory for the backward end z coordinate.
-      FloatType m_backwardZ;
+      double m_backwardZ;
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2

@@ -33,7 +33,7 @@ SimpleFacetFilter::SimpleFacetFilter():
 
 
 
-SimpleFacetFilter::SimpleFacetFilter(FloatType deviationCosCut):
+SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut):
   m_fitlessFacetFilter(true),
   m_param_deviationCosCut(deviationCosCut)
 {
@@ -68,9 +68,9 @@ CellWeight SimpleFacetFilter::operator()(const CDCFacet& facet)
   const ParameterLine2D& startToEnd    = facet.getStartToEndLine();
   const ParameterLine2D& middleToEnd   = facet.getMiddleToEndLine();
 
-  const FloatType startCos  = startToMiddle.tangential().cosWith(startToEnd.tangential());
-  // const FloatType middleCos = startToMiddle.tangential().cosWith(middleToEnd.tangential());
-  const FloatType endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
+  const double startCos  = startToMiddle.tangential().cosWith(startToEnd.tangential());
+  // const double middleCos = startToMiddle.tangential().cosWith(middleToEnd.tangential());
+  const double endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
 
   /* cut on the angle of */
   if (startCos > m_param_deviationCosCut and endCos > m_param_deviationCosCut) {

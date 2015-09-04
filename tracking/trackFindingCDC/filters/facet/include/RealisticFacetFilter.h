@@ -27,7 +27,7 @@ namespace Belle2 {
       RealisticFacetFilter();
 
       /// Constructor using given direction of flight deviation cut off.
-      explicit RealisticFacetFilter(FloatType phiPullCut);
+      explicit RealisticFacetFilter(double phiPullCut);
 
     public:
       /** Set the parameter with key to value.
@@ -58,7 +58,7 @@ namespace Belle2 {
       FitlessFacetFilter m_fitlessFacetFilter;
 
       /// Memory for the pull cu
-      FloatType m_param_phiPullCut;
+      double m_param_phiPullCut;
 
     }; // end class RealisticFacetFilter
   } //end namespace TrackFindingCDC

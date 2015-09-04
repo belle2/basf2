@@ -50,7 +50,7 @@ namespace Belle2 {
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCRLWireHit* rlWireHit,
                    const Vector3D& position,
-                   FloatType perpS = 0);
+                   double perpS = 0);
 
     public:
 
@@ -212,7 +212,7 @@ namespace Belle2 {
       const Vector2D& getRecoPos2D() const { return getRecoPos3D().xy(); }
 
       /// Getter for the z coordinate of the reconstructed position
-      const FloatType& getRecoZ() const { return getRecoPos3D().z(); }
+      const double& getRecoZ() const { return getRecoPos3D().z(); }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position
       Vector2D getRecoDisp2D() const;
@@ -230,23 +230,23 @@ namespace Belle2 {
       { return getWire().getWirePos2DAtZ(getRecoZ()); }
 
       /// Returns the drift length next to the reconstructed position. Dummy implemented as the reference drift length
-      FloatType getSignedRecoDriftLength() const
+      double getSignedRecoDriftLength() const
       { return getRLWireHit().getSignedRefDriftLength(); }
 
       /// Returns the drift length variance next to the reconstructed position. Dummy implemented as the reference drift length
-      FloatType getRecoDriftLengthVariance() const
+      double getRecoDriftLengthVariance() const
       { return getRLWireHit().getRefDriftLengthVariance(); }
 
       /// Adjust the travel distance by the given value.
-      void shiftArcLength2D(FloatType arcLength2DOffSet)
+      void shiftArcLength2D(double arcLength2DOffSet)
       { m_arcLength2D += arcLength2DOffSet; }
 
       /// Getter for the travel distance in the xy projection
-      FloatType getArcLength2D() const
+      double getArcLength2D() const
       { return m_arcLength2D; }
 
       /// Setter for the travel distance in the xy projection
-      void setArcLength2D(const FloatType& arcLength2D)
+      void setArcLength2D(const double& arcLength2D)
       { m_arcLength2D = arcLength2D; }
 
       /** indicator if the hit is in the cdc or already outside its boundaries.
@@ -268,10 +268,10 @@ namespace Belle2 {
       /**
        * We assume a line from the point (0, 0, z0) to the reco position. The slope of this line is returned.
        */
-      FloatType calculateZSlopeWithZ0(FloatType z0) const
+      double calculateZSlopeWithZ0(double z0) const
       {
-        FloatType z = getRecoZ();
-        FloatType radius = getRecoPos2D().norm();
+        double z = getRecoZ();
+        double radius = getRecoPos2D().norm();
 
         return radius / (z - z0);
       }
@@ -284,7 +284,7 @@ namespace Belle2 {
       Vector3D m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
-      FloatType m_arcLength2D;
+      double m_arcLength2D;
     }; //class
 
   } //end namespace TrackFindingCDC

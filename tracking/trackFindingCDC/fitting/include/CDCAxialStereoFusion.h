@@ -24,21 +24,21 @@ namespace Belle2 {
     class CDCAxialStereoFusion {
 
     public:
-      static FloatType average(const TVectorD& startParameters,
-                               const TMatrixDSym& startCovMatrix,
-                               const TVectorD& endParameters,
-                               const TMatrixDSym& endCovMatrix,
-                               TVectorD& avgParameters,
-                               TMatrixDSym& avgCovMatrix);
+      static double average(const TVectorD& startParameters,
+                            const TMatrixDSym& startCovMatrix,
+                            const TVectorD& endParameters,
+                            const TMatrixDSym& endCovMatrix,
+                            TVectorD& avgParameters,
+                            TMatrixDSym& avgCovMatrix);
 
-      static FloatType average(const TVectorD& startParameters,
-                               const TMatrixDSym& startCovMatrix,
-                               const TMatrixD& startAmbiguityMatrix,
-                               const TVectorD& endParameters,
-                               const TMatrixDSym& endCovMatrix,
-                               const TMatrixD& endAmbiguityMatrix,
-                               TVectorD& avgParameters,
-                               TMatrixDSym& avgCovMatrix);
+      static double average(const TVectorD& startParameters,
+                            const TMatrixDSym& startCovMatrix,
+                            const TMatrixD& startAmbiguityMatrix,
+                            const TVectorD& endParameters,
+                            const TMatrixDSym& endCovMatrix,
+                            const TMatrixD& endAmbiguityMatrix,
+                            TVectorD& avgParameters,
+                            TMatrixDSym& avgCovMatrix);
 
     public:
       static UncertainPerigeeCircle fuse(const UncertainPerigeeCircle& startPerigeeCircle,

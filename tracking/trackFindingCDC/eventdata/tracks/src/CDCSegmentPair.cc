@@ -54,7 +54,7 @@ CDCSegmentPair::~CDCSegmentPair()
 
 
 
-FloatType CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
+double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -87,7 +87,7 @@ FloatType CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 
 
 
-FloatType CDCSegmentPair::computeStartIsBeforeEndFitless() const
+double CDCSegmentPair::computeStartIsBeforeEndFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -125,7 +125,7 @@ FloatType CDCSegmentPair::computeStartIsBeforeEndFitless() const
 
 
 
-FloatType CDCSegmentPair::computeEndIsAfterStartFitless() const
+double CDCSegmentPair::computeEndIsAfterStartFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
@@ -162,7 +162,7 @@ FloatType CDCSegmentPair::computeEndIsAfterStartFitless() const
 }
 
 
-FloatType CDCSegmentPair::computeIsCoalignedFitless() const
+double CDCSegmentPair::computeIsCoalignedFitless() const
 {
   const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = getEndSegment();

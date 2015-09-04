@@ -89,9 +89,9 @@ namespace Belle2 {
 
       bool checkChi2(CDCTrack& track);
 
-      FloatType estimateChi2(CDCTrack& track);
+      double estimateChi2(CDCTrack& track);
 
-      FloatType getQuantile(FloatType alpha, FloatType n);
+      double getQuantile(double alpha, double n);
 
       CDCTrajectory2D fit(CDCTrack& track);
 

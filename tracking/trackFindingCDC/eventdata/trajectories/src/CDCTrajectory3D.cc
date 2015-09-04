@@ -28,7 +28,7 @@ using namespace TrackFindingCDC;
 
 CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
-                                 const FloatType& charge) :
+                                 const double& charge) :
   m_localOrigin(pos3D),
   m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
                mom3D.xy().unit(),
@@ -41,8 +41,8 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 
 CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
-                                 const FloatType& charge,
-                                 const FloatType& bZ) :
+                                 const double& charge,
+                                 const double& bZ) :
   m_localOrigin(pos3D),
   m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
                mom3D.xy().unit(),
@@ -52,7 +52,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ) :
+CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const double& bZ) :
   CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
                   Vector3D{mcParticle.getMomentum()},
                   mcParticle.getCharge(),
@@ -87,7 +87,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const FloatType& bZ) :
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double& bZ) :
   CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
                   Vector3D{gfTrackCand.getMomSeed()},
                   gfTrackCand.getChargeSeed(),
@@ -158,7 +158,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const Flo
 
 void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
                                   const Vector3D& mom3D,
-                                  const FloatType& charge)
+                                  const double& charge)
 {
   m_localOrigin = pos3D;
   m_localHelix = UncertainHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
@@ -178,7 +178,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
   return fillInto(gfTrackCand, getBFieldZ(position));
 }
 
-bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& bZ) const
+bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double& bZ) const
 {
   // Set the start parameters
   Vector3D position = getSupport();
@@ -199,14 +199,14 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const FloatType& 
   // Now translate and set the covariance matrix.
   const UncertainHelix& localHelix = getLocalHelix();
 
-  const FloatType& impactXY = localHelix.impactXY();
+  const double& impactXY = localHelix.impactXY();
   const Vector2D& tangentialXY = localHelix.tangentialXY();
 
-  const FloatType& cosPhi0 = tangentialXY.x();
-  const FloatType& sinPhi0 = tangentialXY.y();
+  const double& cosPhi0 = tangentialXY.x();
+  const double& sinPhi0 = tangentialXY.y();
 
-  const FloatType& curvatureXY = localHelix.curvatureXY();
-  const FloatType& tanLambda = localHelix.tanLambda();
+  const double& curvatureXY = localHelix.curvatureXY();
+  const double& tanLambda = localHelix.tanLambda();
 
   // 0. Define indices
   // Maybe push these out of this function:
@@ -286,38 +286,38 @@ SignType CDCTrajectory3D::getChargeSign() const
   return ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
 }
 
-FloatType CDCTrajectory3D::getAbsMom3D(const FloatType& bZ) const
+double CDCTrajectory3D::getAbsMom3D(const double& bZ) const
 {
-  FloatType tanLambda = getLocalHelix().tanLambda();
+  double tanLambda = getLocalHelix().tanLambda();
 
-  FloatType factor2DTo3D = hypot(1, tanLambda);
+  double factor2DTo3D = hypot(1, tanLambda);
 
-  FloatType curvatureXY = getLocalHelix().curvatureXY();
+  double curvatureXY = getLocalHelix().curvatureXY();
 
-  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY, bZ);
+  double absMom2D =  curvatureToAbsMom2D(curvatureXY, bZ);
 
   return factor2DTo3D * absMom2D;
 
-  FloatType absMomZ = absMom2D * tanLambda;
+  double absMomZ = absMom2D * tanLambda;
 
   return hypot(absMom2D, absMomZ);
 }
 
-FloatType CDCTrajectory3D::getAbsMom3D() const
+double CDCTrajectory3D::getAbsMom3D() const
 {
   Vector3D position = getSupport();
 
-  FloatType tanLambda = getLocalHelix().tanLambda();
+  double tanLambda = getLocalHelix().tanLambda();
 
-  FloatType factor2DTo3D = hypot(1, tanLambda);
+  double factor2DTo3D = hypot(1, tanLambda);
 
-  FloatType curvatureXY = getLocalHelix().curvatureXY();
+  double curvatureXY = getLocalHelix().curvatureXY();
 
-  FloatType absMom2D =  curvatureToAbsMom2D(curvatureXY, position);
+  double absMom2D =  curvatureToAbsMom2D(curvatureXY, position);
 
   return factor2DTo3D * absMom2D;
 
-  FloatType absMomZ = absMom2D * tanLambda;
+  double absMomZ = absMom2D * tanLambda;
 
   return hypot(absMom2D, absMomZ);
 }

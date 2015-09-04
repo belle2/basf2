@@ -14,8 +14,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <assert.h>
@@ -24,29 +24,28 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    const FloatType SIMPLE_DRIFT_LENGTH_VARIANCE  = 0.000169;
+    const double SIMPLE_DRIFT_LENGTH_VARIANCE  = 0.000169;
 
-    /** Class representing a hit wire in the central drift chamber
-     *  This class combines the measurement informations from a CDCHit
-     *  with the geometry informations.
+    /** Class representing a hit wire in the central drift chamber.
+     *
+     *  This class combines the measurement information from a CDCHit
+     *  with the geometry information.
      *  It forms the basis of all other higher level tracking objects.
-     *  It contains an AutomataCell since we want to use it
-     *  with the Clusterizer which makes use of the cell state.
-     *  Additionally contains references to both the CDCWire instance from the CDCTopology and
+     *  It contains an AutomatonCell which defines the flags of usage etc.
+     *  Additionally it contains references to both the CDCWire instance from the CDCWireTopology and
      *  the CDCHit from the StoreArray of the event.
      */
     class CDCWireHit {
 
     public:
+      /// Return an instance of the used TDC count translator.
       static CDC::TDCCountTranslatorBase& getTDCCountTranslator();
-
-    public:
 
       /// Default constructor for ROOT compatibility.
       CDCWireHit();
 
     private:
-      /// Constructor for interal use
+      /// Constructor for internal use
       /** Construct for a dummy CDCWireHit. The wire hit is still assoziated with a wire
       but has no hit attached to it.
           The getHit() will yield nullptr. The getStoreIHit() yields -1 for this case. */
@@ -66,8 +65,8 @@ namespace Belle2 {
 
       /// Constructor to taking a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
-                 const FloatType& driftLength,
-                 const FloatType& driftlengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE);
+                 const double& driftLength,
+                 const double& driftlengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE);
 
     public:
       /// Make the wire hit automatically castable to its underlying cdcHit
@@ -177,15 +176,15 @@ namespace Belle2 {
       { return getWire().getRefPos3D(); }
 
       /// The distance from the beam line at reference position of the underlying wire
-      FloatType getRefCylindricalR() const
+      double getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }
 
       /// Getter for the  drift length at the reference position of the wire.
-      FloatType getRefDriftLength() const
+      double getRefDriftLength() const
       { return m_refDriftLength; }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
-      FloatType getRefDriftLengthVariance() const
+      double getRefDriftLengthVariance() const
       { return m_refDriftLengthVariance; }
 
       /// Checks of the wire hit is base on the wire given
@@ -250,10 +249,10 @@ namespace Belle2 {
       AutomatonCell m_automatonCell;
 
       /// Memory for the drift length at the wire reference point
-      FloatType m_refDriftLength = 0;
+      double m_refDriftLength = 0;
 
       /// Memory for the variance of the drift length at the wire reference point
-      FloatType m_refDriftLengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE;
+      double m_refDriftLengthVariance = SIMPLE_DRIFT_LENGTH_VARIANCE;
 
       /// Memory for the CDCWire reference
       const CDCWire* m_wire = nullptr;

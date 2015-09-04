@@ -584,11 +584,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the outer radius of the outer most wire layer.
-      FloatType getOuterCylindricalR() const
+      double getOuterCylindricalR() const
       { return m_wireLayers.back().getOuterCylindricalR(); }
 
       /// Getter for the inner radius of the inner most wire layer.
-      FloatType getInnerCylindricalR() const
+      double getInnerCylindricalR() const
       { return m_wireLayers.front().getInnerCylindricalR(); }
 
     private:

@@ -61,13 +61,13 @@ namespace Belle2 {
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
-                      const FloatType& charge,
-                      const FloatType& bZ);
+                      const double& charge,
+                      const double& bZ);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
-                      const FloatType& charge);
+                      const double& charge);
 
     public:
       /// Checks if the circle is already set to a valid value
@@ -80,7 +80,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcArcLength2D(const Vector2D& point) const
+      double calcArcLength2D(const Vector2D& point) const
       { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
@@ -90,7 +90,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
       {
         return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(),
                                                  toPoint - getLocalOrigin());
@@ -101,7 +101,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
        *  skew line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
       Vector3D reconstruct3D(const BoundSkewLine& skewLine,
-                             const FloatType& distance = 0.0) const;
+                             const double& distance = 0.0) const;
 
     public:
       /// Calculates the closest approach on the trajectory to the global origin
@@ -143,7 +143,7 @@ namespace Belle2 {
       Vector2D getExit() const;
 
       /// Calculates the distance from point the trajectory as seen from the xy projection
-      FloatType getDist2D(const Vector2D& point) const
+      double getDist2D(const Vector2D& point) const
       {  return getLocalCircle().distance(point - getLocalOrigin()); }
 
       /// Checks if the given point is to the right or to the left of the trajectory
@@ -151,15 +151,15 @@ namespace Belle2 {
       { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
-      FloatType getMaximalCylindricalR() const
+      double getMaximalCylindricalR() const
       { return  getGlobalCircle().maximalCylindricalR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
-      FloatType getMinimalCylindricalR() const
+      double getMinimalCylindricalR() const
       { return  getGlobalCircle().minimalCylindricalR(); }
 
       /// Getter for the signed impact parameter of the trajectory
-      FloatType getGlobalImpact() const
+      double getGlobalImpact() const
       { return  getGlobalCircle().impact(); }
 
       /// Indicates if the trajectory is moving outwards or inwards (to or away from the origin) from the start point on
@@ -204,7 +204,7 @@ namespace Belle2 {
     public:
       /// Calculates the perpendicular travel distance from the last position of the fromHits to the first position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getArcLength2DGap(const FromHits& fromHits, const ToHits& toHits) const
+      double getArcLength2DGap(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
@@ -214,7 +214,7 @@ namespace Belle2 {
 
       /// Calculates the perpendicular travel distance from the first position of the fromHits to the first position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getArcLength2DFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
+      double getArcLength2DFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.front().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
@@ -223,7 +223,7 @@ namespace Belle2 {
 
       /// Calculates the perpendicular travel distance from the last position of the fromHits to the last position of the toHits.
       template<class FromHits, class ToHits>
-      FloatType getArcLength2DBackOffset(const FromHits& fromHits, const ToHits& toHits) const
+      double getArcLength2DBackOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.back().getRecoPos2D();
@@ -232,7 +232,7 @@ namespace Belle2 {
 
       /// Calculates the perpendicular travel distance from the first position of the hits to the last position of the hits.
       template<class Hits>
-      FloatType getTotalArcLength2D(const Hits& hits) const
+      double getTotalArcLength2D(const Hits& hits) const
       {
         Vector2D frontRecoPos2D = hits.front().getRecoPos2D();
         Vector2D backRecoPos2D = hits.back().getRecoPos2D();
@@ -266,13 +266,13 @@ namespace Belle2 {
       { return getLocalCircle().tangential(point - getLocalOrigin()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
-      FloatType getAbsMom2D(const FloatType& bZ) const;
+      double getAbsMom2D(const double& bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
-      FloatType getAbsMom2D() const;
+      double getAbsMom2D() const;
 
       /// Get the momentum at the support point of the trajectory
-      inline Vector2D getMom2DAtSupport(const FloatType& bZ) const
+      inline Vector2D getMom2DAtSupport(const double& bZ) const
       { return  getStartUnitMom2D() *= getAbsMom2D(bZ);  }
 
       /// Get the momentum at the support point of the trajectory
@@ -288,7 +288,7 @@ namespace Belle2 {
       { return  getLocalCircle().tangential();  }
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const FloatType& charge);
+      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double& charge);
 
       /// Get the support point of the trajectory in global coordinates
       inline Vector2D getSupport() const
@@ -306,15 +306,15 @@ namespace Belle2 {
 
     public:
       /// Getter for the curvature as seen from the xy projection.
-      FloatType getCurvature() const
+      double getCurvature() const
       { return getLocalCircle().curvature(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
-      FloatType getLocalCovariance(PerigeeParameterIndex iRow, PerigeeParameterIndex iCol) const
+      double getLocalCovariance(PerigeeParameterIndex iRow, PerigeeParameterIndex iCol) const
       { return getLocalCircle().covariance(iRow, iCol); }
 
       /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
-      FloatType getLocalVariance(PerigeeParameterIndex i) const
+      double getLocalVariance(PerigeeParameterIndex i) const
       { return getLocalCircle().variance(i); }
 
 
@@ -340,15 +340,15 @@ namespace Belle2 {
       { return m_localPerigeeCircle; }
 
       ///  Getter for p-value
-      FloatType getPValue() const
+      double getPValue() const
       { return TMath::Prob(getChi2(), getNDF()); }
 
       /// Getter for the chi2 value of the circle fit
-      FloatType getChi2() const
+      double getChi2() const
       { return getLocalCircle().chi2(); }
 
       /// Setter for the chi square value of the circle fit
-      void setChi2(const FloatType& chi2)
+      void setChi2(const double& chi2)
       { return m_localPerigeeCircle.setChi2(chi2); }
 
       /// Getter for the number of degrees of freedom of the circle fit.
@@ -378,9 +378,9 @@ namespace Belle2 {
        *  (if they are not to far away from the reference points, up to the discontinuity at the \n
        *  far point on the circle) \n
        *  @return Travel distance from the old to the new origin point */
-      FloatType setLocalOrigin(const Vector2D& localOrigin)
+      double setLocalOrigin(const Vector2D& localOrigin)
       {
-        FloatType result = calcArcLength2D(localOrigin);
+        double result = calcArcLength2D(localOrigin);
         m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
         return result;

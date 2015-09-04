@@ -21,7 +21,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     /// The famous number
-    const FloatType PI = 3.141592653589793238462;
+    const double PI = 3.141592653589793238462;
 
     ///Checks if an integer is even
     template<class IntNumber>
@@ -60,7 +60,7 @@ namespace Belle2 {
      *  The first value of the returned pair is the solution with the bigger absolut value. \n
      *  If you ask for the roots of a*x*x + b*x + c = 0, do not your formula to the pq from but use \n
      *  the better behaved solveQuadraticABC */
-    inline std::pair<FloatType, FloatType> solveQuadraticPQ(FloatType p, FloatType q)
+    inline std::pair<double, double> solveQuadraticPQ(double p, double q)
     {
       //solves the quadratic equation x*x + p*x + q == 0 in a rather stable manner (see book numerical recipes in c++)
       //the result has only float precision though, if the discriminant phalf*phalf - q is small
@@ -72,7 +72,7 @@ namespace Belle2 {
       const double solutionOne = (p > 0) ?  -phalf  - sqrt(discriminant)  : -phalf  + sqrt(discriminant) ;
 
       //second solution by vieta identity
-      return std::pair<FloatType, FloatType>(solutionOne, q / solutionOne);
+      return std::pair<double, double>(solutionOne, q / solutionOne);
     }
 
     /// Returns the two roots of abc formula
@@ -81,13 +81,13 @@ namespace Belle2 {
      *  The formula also handels the case a == 0 correctly. Here to only root of the linear \n
      *  form b*x + c = 0 is returned in the .second  of the pair, while the bigger 'solution' \n
      *  .first is infinity */
-    inline std::pair<FloatType, FloatType> solveQuadraticABC(const FloatType& a, const FloatType& b, const FloatType& c)
+    inline std::pair<double, double> solveQuadraticABC(const double& a, const double& b, const double& c)
     {
 
-      std::pair<FloatType, FloatType> result;
+      std::pair<double, double> result;
 
-      FloatType& bigSolution = result.first;
-      FloatType& smallSolution = result.second;
+      double& bigSolution = result.first;
+      double& smallSolution = result.second;
 
       /*if ( a == 0 ){
         //this distinction must not be made since the else block gives the same result
@@ -96,7 +96,7 @@ namespace Belle2 {
 
         //essentially this is the zero position of a line
         smallSolution = - c / b
-        bigSolution = std::numeric_limits<FloatType>::infinity() ;
+        bigSolution = std::numeric_limits<double>::infinity() ;
       return result;
       }
       */

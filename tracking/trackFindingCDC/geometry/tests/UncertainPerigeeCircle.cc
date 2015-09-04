@@ -59,15 +59,15 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   TMatrixD moveByTwoYJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, -2.0));
 
   // Hand caluclated intermediate quantities;
-  FloatType deltaParallel = 2;
-  FloatType A = 4;
-  FloatType u = 1;
+  double deltaParallel = 2;
+  double A = 4;
+  double u = 1;
 
-  FloatType nu = 1;
-  //FloatType xi = 1.0 / 5.0;
-  FloatType lambda = 1.0 / (5.0 + 3.0 * sqrt(5.0));
-  FloatType mu = sqrt(5.0) / 10.0;
-  FloatType zeta = 4;
+  double nu = 1;
+  //double xi = 1.0 / 5.0;
+  double lambda = 1.0 / (5.0 + 3.0 * sqrt(5.0));
+  double mu = sqrt(5.0) / 10.0;
+  double zeta = 4;
 
   EXPECT_NEAR(1.0, moveByTwoYJacobian(0, 0), 10e-7);
   EXPECT_NEAR(0.0, moveByTwoYJacobian(0, 1), 10e-7);

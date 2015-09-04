@@ -37,13 +37,13 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
-      UncertainHelix(const FloatType& curvature,
-                     const FloatType& tangentialPhi,
-                     const FloatType& impact,
-                     const FloatType& tanLambda,
-                     const FloatType& z0,
+      UncertainHelix(const double& curvature,
+                     const double& tangentialPhi,
+                     const double& impact,
+                     const double& tanLambda,
+                     const double& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0,
+                     const double& chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(curvature, tangentialPhi, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
@@ -54,7 +54,7 @@ namespace Belle2 {
 
       explicit UncertainHelix(const TVectorD& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance(),
-                              const FloatType& chi2 = 0.0,
+                              const double& chi2 = 0.0,
                               const size_t& ndf = 0) :
         Helix(parameters),
         m_helixCovariance(helixCovariance),
@@ -63,13 +63,13 @@ namespace Belle2 {
       {;}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
-      UncertainHelix(const FloatType& curvature,
+      UncertainHelix(const double& curvature,
                      const Vector2D& tangential,
-                     const FloatType& impact,
-                     const FloatType& tanLambda,
-                     const FloatType& z0,
+                     const double& impact,
+                     const double& tanLambda,
+                     const double& z0,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0,
+                     const double& chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(curvature, tangential, impact, tanLambda, z0),
         m_helixCovariance(helixCovariance),
@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixCovariance(),
-                     const FloatType& chi2 = 0.0,
+                     const double& chi2 = 0.0,
                      const size_t& ndf = 0) :
         Helix(helix),
         m_helixCovariance(helixCovariance),
@@ -127,19 +127,19 @@ namespace Belle2 {
       { return m_helixCovariance; }
 
       /// Getter for individual elements of the covariance matrix
-      FloatType covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      double covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
       { return helixCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
-      FloatType variance(const HelixParameterIndex& i) const
+      double variance(const HelixParameterIndex& i) const
       { return helixCovariance()(i, i); }
 
       /// Getter for the chi square value of the helix fit
-      const FloatType& chi2() const
+      const double& chi2() const
       { return m_chi2; }
 
       /// Setter for the chi square value of the helix fit
-      void setChi2(const FloatType& chi2)
+      void setChi2(const double& chi2)
       { m_chi2 = chi2; }
 
       /// Getter for the number of degrees of freediom used in the helix fit
@@ -186,7 +186,7 @@ namespace Belle2 {
       HelixCovariance m_helixCovariance;
 
       /// Memory for the chi square value of the fit of this helix.
-      FloatType m_chi2;
+      double m_chi2;
 
       /// Memory for the number of degrees of freedim of the fit of this helix.
       size_t m_ndf;

@@ -38,9 +38,9 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHi
 {
   hit.setRecoPos3D(hit.getRecoHit2D().getRLWireHit().reconstruct3D(trackTrajectory2D));
 
-  FloatType perpS = trackTrajectory2D.calcArcLength2D(hit.getRecoPos2D());
+  double perpS = trackTrajectory2D.calcArcLength2D(hit.getRecoPos2D());
   if (perpS < 0.) {
-    FloatType perimeter = fabs(trackTrajectory2D.getGlobalCircle().perimeter()) / 2.;
+    double perimeter = fabs(trackTrajectory2D.getGlobalCircle().perimeter()) / 2.;
     perpS += perimeter;
   }
   // Recalculate the perpS of the hits

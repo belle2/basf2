@@ -56,7 +56,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       const CDCWire& wire = rlWireHit.getWire();
       if (wire.isInCellZBounds(recoPos3D)) {
-        FloatType perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+        double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
         CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS);
         hitsVector.push_back(newRecoHit);
       }
@@ -147,10 +147,10 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
     const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
     for (auto innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
       if (currentHit == (*innerIterator)->getWireHit().getHit()) {
-        FloatType lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMin());
-        FloatType lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMax());
-        FloatType lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMin());
-        FloatType lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMax());
+        double lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMin());
+        double lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMax());
+        double lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMin());
+        double lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMax());
 
         if (fabs((lambda11 + lambda12) / 2 - node->getXMean()) < fabs((lambda21 + lambda22) / 2 - node->getXMean())) {
           doubledRecoHits.push_back(*outerIterator);
@@ -193,12 +193,12 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
     const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
     for (auto innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
       if (currentHit == (*innerIterator)->getWireHit().getHit()) {
-        const FloatType& lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
-        const FloatType& lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
-        const FloatType& lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
-        const FloatType& lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
+        const double& lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
+        const double& lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
+        const double& lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
+        const double& lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
 
-        const FloatType& zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
+        const double& zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
           doubledRecoHits.push_back(*outerIterator);

@@ -33,7 +33,7 @@ namespace Belle2 {
       {;}
 
       /// Constructor using given direction of flight deviation cut off.
-      SimpleFacetRelationFilter(FloatType deviationCosCut) :
+      SimpleFacetRelationFilter(double deviationCosCut) :
         m_param_deviationCosCut(deviationCosCut)
       {;}
 
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the used direction of flight deviation.
-      FloatType m_param_deviationCosCut;
+      double m_param_deviationCosCut;
 
     }; // end class
 

@@ -30,7 +30,7 @@ using namespace Belle2::TrackFindingCDC;
 
 namespace {
   const Vector2D generalCenter(6.0, 0);
-  const FloatType generalRadius = 5.0;
+  const double generalRadius = 5.0;
 
   const Circle2D generalCircle(generalCenter, generalRadius);
 
@@ -39,8 +39,8 @@ namespace {
     vector<Vector2D> observationCenters;
     // Setting up a trajectory traveling clockwise
     for (int iObservation = 11; iObservation > -12; --iObservation) {
-      FloatType y = iObservation / 2.0;
-      FloatType x = fabs(y);
+      double y = iObservation / 2.0;
+      double x = fabs(y);
       observationCenters.emplace_back(x, y);
     }
     return observationCenters;
@@ -53,7 +53,7 @@ namespace {
     CDCObservations2D observations2D;
     if (withDriftLength) {
       for (const Vector2D& observationCenter : observationCenters) {
-        FloatType distance = generalCircle.distance(observationCenter);
+        double distance = generalCircle.distance(observationCenter);
         observations2D.append(observationCenter, distance);
       }
     } else {
@@ -87,11 +87,11 @@ namespace {
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
                                                  "Fitter " << typeid(fitter).name() << " failed.";
 
-    const FloatType& curv = fittedCircle.curvature();
-    const FloatType& I = fittedCircle.impact();
-    const FloatType& phi = fittedCircle.tangentialPhi();
+    const double& curv = fittedCircle.curvature();
+    const double& I = fittedCircle.impact();
+    const double& phi = fittedCircle.tangentialPhi();
 
-    const FloatType& chi2 = fittedCircle.chi2();
+    const double& chi2 = fittedCircle.chi2();
 
     B2INFO("Curvature " << curv);
     B2INFO("Tangential phi " << phi);

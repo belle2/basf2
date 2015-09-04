@@ -84,8 +84,8 @@ CDCWireHit::CDCWireHit(const CDCHit* ptrHit, TDCCountTranslatorBase* ptrTranslat
 }
 
 CDCWireHit::CDCWireHit(const WireID& wireID,
-                       const FloatType& driftLength,
-                       const FloatType& driftLengthVariance):
+                       const double& driftLength,
+                       const double& driftLengthVariance):
   m_automatonCell(1),
   m_refDriftLength(driftLength),
   m_refDriftLengthVariance(driftLengthVariance),
@@ -100,7 +100,7 @@ Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
   Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
 
   const Vector2D& wirePos2D = getWire().getRefPos2D();
-  const FloatType& driftLength = getRefDriftLength();
+  const double& driftLength = getRefDriftLength();
 
   Vector2D disp2D = recoPos2D - wirePos2D;
 
@@ -114,14 +114,14 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const Ri
   const StereoType stereoType = getStereoType();
   if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {
     const BoundSkewLine& skewLine = getWire().getSkewLine();
-    const FloatType& signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
+    const double& signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(skewLine, signedDriftLength);
 
   } else if (stereoType == StereoType_c::Axial) {
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    const FloatType z = 0;
+    const double z = 0;
     return Vector3D(recoPos2D, z);
   }
   B2ASSERT("Reconstructing on invalid stereo type " << stereoType, false);

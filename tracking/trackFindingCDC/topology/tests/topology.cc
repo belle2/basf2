@@ -115,9 +115,9 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 {
   // Test if the all wires in the same superlayer have similar skew parameters.
 
-  FloatType tanThetaByICLayer[CDCWireTopology::N_LAYERS];
-  FloatType stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
-  FloatType refCylindricalRByICLayer[CDCWireTopology::N_LAYERS];
+  double tanThetaByICLayer[CDCWireTopology::N_LAYERS];
+  double stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
+  double refCylindricalRByICLayer[CDCWireTopology::N_LAYERS];
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
@@ -168,14 +168,14 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
 {
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  FloatType outerR = theWireTopology.getOuterCylindricalR();
-  FloatType innerR = theWireTopology.getInnerCylindricalR();
+  double outerR = theWireTopology.getOuterCylindricalR();
+  double innerR = theWireTopology.getInnerCylindricalR();
 
-  FloatType innerOriginCurv = 1 / (innerR / 2);
-  FloatType outerOriginCurv = 1 / (outerR / 2);
+  double innerOriginCurv = 1 / (innerR / 2);
+  double outerOriginCurv = 1 / (outerR / 2);
 
-  FloatType innerCurlCurv = 1 / innerR;
-  FloatType outerCurlCurv = 1 / outerR;
+  double innerCurlCurv = 1 / innerR;
+  double outerCurlCurv = 1 / outerR;
 
   B2INFO("Maximal curvature reaching the CDC from IP : " << innerOriginCurv);
   B2INFO("Minimal momentum reaching the CDC from IP : " << curvatureToAbsMom2D(innerOriginCurv, 1.5));

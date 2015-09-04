@@ -73,14 +73,14 @@ bool TrackMergerNew::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
 
 //  B2INFO("chi2_1: " << result1.getChi2() << "; chi2_2: " << result2.getChi2() << "; chi2_merge: " << resultMerge.getChi2());
 
-  FloatType distCriteria1(0);
+  double distCriteria1(0);
   for (CDCRecoHit3D& item : track1) {
     HitProcessor::updateRecoHit3D(result1, item);
     distCriteria1 += fabs(result1.getDist2D(item.getRecoPos2D()));
   }
   distCriteria1 = distCriteria1 / track1.size();
 
-  FloatType distCriteria2(0);
+  double distCriteria2(0);
   for (CDCRecoHit3D& item : track2) {
     HitProcessor::updateRecoHit3D(result2, item);
     distCriteria2 += fabs(result2.getDist2D(item.getRecoPos2D()));
@@ -88,7 +88,7 @@ bool TrackMergerNew::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
   distCriteria2 = distCriteria2 / track2.size();
 
 
-  FloatType distCriteriaMerge(0);
+  double distCriteriaMerge(0);
   for (CDCRecoHit3D& item : track1) {
     HitProcessor::updateRecoHit3D(resultMerge, item);
     distCriteriaMerge += fabs(resultMerge.getDist2D(item.getRecoPos2D()));

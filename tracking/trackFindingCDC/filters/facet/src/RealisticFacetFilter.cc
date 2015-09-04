@@ -32,7 +32,7 @@ RealisticFacetFilter::RealisticFacetFilter():
 {
 }
 
-RealisticFacetFilter::RealisticFacetFilter(FloatType phiPullCut):
+RealisticFacetFilter::RealisticFacetFilter(double phiPullCut):
   m_fitlessFacetFilter(true),
   m_param_phiPullCut(phiPullCut)
 {
@@ -88,9 +88,9 @@ CellWeight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const double startToEndLength = startToEndTangentialVector.norm();
   const double middleToEndLength = middleToEndTangentialVector.norm();
 
-  const FloatType startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
-  const FloatType middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
-  const FloatType endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
+  const double startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
+  const double middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
+  const double endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
 
   const double startPhi = acos(startCos);
   const double middlePhi = acos(middleCos);

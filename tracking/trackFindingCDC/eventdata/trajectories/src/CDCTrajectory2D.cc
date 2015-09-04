@@ -26,8 +26,8 @@ using namespace TrackFindingCDC;
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
-                                 const FloatType& charge,
-                                 const FloatType& bZ) :
+                                 const double& charge,
+                                 const double& bZ) :
   m_localOrigin(pos2D),
   m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, bZ), mom2D.unit(), 0.0)
 
@@ -36,7 +36,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
-                                 const FloatType& charge) :
+                                 const double& charge) :
   m_localOrigin(pos2D),
   m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0)
 
@@ -47,7 +47,7 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 
 void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
                                   const Vector2D& mom2D,
-                                  const FloatType& charge)
+                                  const double& charge)
 {
   m_localOrigin = pos2D;
   m_localPerigeeCircle = UncertainPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0);
@@ -61,12 +61,12 @@ SignType CDCTrajectory2D::getChargeSign() const
 }
 
 
-FloatType CDCTrajectory2D::getAbsMom2D(const FloatType& bZ) const
+double CDCTrajectory2D::getAbsMom2D(const double& bZ) const
 {
   return curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
 }
 
-FloatType CDCTrajectory2D::getAbsMom2D() const
+double CDCTrajectory2D::getAbsMom2D() const
 {
   Vector2D position = getSupport();
   return curvatureToAbsMom2D(getLocalCircle().curvature(), position);
@@ -75,7 +75,7 @@ FloatType CDCTrajectory2D::getAbsMom2D() const
 
 
 Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
-                                        const FloatType& distance) const
+                                        const double& distance) const
 {
   Vector2D globalRefPos2D = globalSkewLine.refPos2D();
   Vector2D movePerZ = globalSkewLine.movePerZ();
@@ -83,17 +83,17 @@ Vector3D CDCTrajectory2D::reconstruct3D(const BoundSkewLine& globalSkewLine,
   Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
 
-  FloatType fastDistance = distance != 0.0 ? localCircle.fastDistance(distance) : 0.0;
+  double fastDistance = distance != 0.0 ? localCircle.fastDistance(distance) : 0.0;
 
-  FloatType c = localCircle.fastDistance(localRefPos2D) - fastDistance;
-  FloatType b = localCircle.gradient(localRefPos2D).dot(movePerZ);
-  FloatType a = localCircle.n3() * movePerZ.normSquared();
+  double c = localCircle.fastDistance(localRefPos2D) - fastDistance;
+  double b = localCircle.gradient(localRefPos2D).dot(movePerZ);
+  double a = localCircle.n3() * movePerZ.normSquared();
 
-  std::pair<FloatType, FloatType> solutionsDeltaZ = solveQuadraticABC(a, b, c);
+  std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
 
   // Take the solution with the smaller deviation from the reference position
-  const FloatType& deltaZ = solutionsDeltaZ.second;
-  const FloatType z = deltaZ + globalSkewLine.refZ();
+  const double& deltaZ = solutionsDeltaZ.second;
+  const double z = deltaZ + globalSkewLine.refZ();
   return globalSkewLine.pos3DAtZ(z);
 }
 
@@ -102,7 +102,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 {
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
-  FloatType innerCylindricalR = innerMostLayer.getInnerCylindricalR();
+  double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
 
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();
@@ -124,7 +124,7 @@ Vector2D CDCTrajectory2D::getOuterExit() const
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
 
-  FloatType outerCylindricalR = outerMostLayer.getOuterCylindricalR();
+  double outerCylindricalR = outerMostLayer.getOuterCylindricalR();
 
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();
@@ -251,14 +251,14 @@ ISuperLayerType CDCTrajectory2D::getPreviousAxialISuperLayer() const
 
 ISuperLayerType CDCTrajectory2D::getMaximalISuperLayer() const
 {
-  FloatType maximalCylindricalR = getMaximalCylindricalR();
+  double maximalCylindricalR = getMaximalCylindricalR();
   return getISuperLayerAtCylindricalR(maximalCylindricalR);
 }
 
 
 ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
 {
-  FloatType startCylindricalR = getLocalOrigin().cylindricalR();
+  double startCylindricalR = getLocalOrigin().cylindricalR();
   return getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
@@ -266,6 +266,6 @@ ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
 
 ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
 {
-  FloatType minimalCylindricalR = getMinimalCylindricalR();
+  double minimalCylindricalR = getMinimalCylindricalR();
   return getISuperLayerAtCylindricalR(minimalCylindricalR);
 }

@@ -34,13 +34,13 @@ namespace Belle2 {
       { ; }
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
-      Circle2D(const Vector2D& center, const FloatType& radius):
+      Circle2D(const Vector2D& center, const double& radius):
         m_center(center),
         m_radius(radius)
       { ; }
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
-      Circle2D(const Vector2D& center, const FloatType& absRadius, const CCWInfo& ccwInfo):
+      Circle2D(const Vector2D& center, const double& absRadius, const CCWInfo& ccwInfo):
         m_center(center),
         m_radius(fabs(absRadius) * ccwInfo)
       { ; }
@@ -65,7 +65,7 @@ namespace Belle2 {
        **/
       inline void conformalTransform()
       {
-        FloatType denominator = center().normSquared() - radius() * radius();
+        double denominator = center().normSquared() - radius() * radius();
         m_center /= denominator;
         m_radius /= denominator;
       }
@@ -77,7 +77,7 @@ namespace Belle2 {
        **/
       inline Circle2D conformalTransformed() const
       {
-        FloatType denominator = center().normSquared() - radius() * radius();
+        double denominator = center().normSquared() - radius() * radius();
         return Circle2D(center() / denominator, radius() / denominator);
       }
 
@@ -85,16 +85,16 @@ namespace Belle2 {
       /// Calculates the signed distance of the point to the circle line.
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      FloatType distance(const Vector2D& point) const
+      double distance(const Vector2D& point) const
       { return copysign(center().distance(point), radius()) - radius(); }
 
       /// Returns the signed distance to the origin
       /** The distance to the origin is equivalent to the first line parameter*/
-      FloatType impact() const
+      double impact() const
       { return copysign(center().norm(), radius()) - radius(); }
 
       /// Returns the euclidian distance of the point to the circle line
-      FloatType absDistance(const Vector2D& point) const
+      double absDistance(const Vector2D& point) const
       { return fabs(center().distance(point) - absRadius()); }
 
       /// Return if the point given is right or left of the line
@@ -133,7 +133,7 @@ namespace Belle2 {
 
 
       /// Gives to azimuth phi of the direction of flight at the perigee
-      inline FloatType tangentialPhi() const
+      inline double tangentialPhi() const
       { return tangential().phi(); }
 
       /// Gradient of the distance field
@@ -178,7 +178,7 @@ namespace Belle2 {
        * before we take the opening angle as seen from the circle center.
        * The angle will zero if the generalized circle was line.
        */
-      inline FloatType openingAngle(const Vector2D& from, const Vector2D& to) const
+      inline double openingAngle(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //can be optimized in the number of computations
 
 
@@ -189,21 +189,21 @@ namespace Belle2 {
        * before we take the length on the curve.
        * For the line case the length is the distance component parallel to the line.
        */
-      inline FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      inline double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       { return openingAngle(from, to) * radius(); }
 
       /// Getter for the signed radius
       /** The sign encodes the orientation of the circle */
-      const FloatType& radius() const
+      const double& radius() const
       { return m_radius; }
 
       /// Getter for the square radius
       /** The sign encodes the orientation of the circle */
-      FloatType radiusSquared() const { return radius() * radius(); }
+      double radiusSquared() const { return radius() * radius(); }
 
       /// Getter for the absolute radius
       /** The absolute radius is the absolute value of the signed Radius */
-      FloatType absRadius() const
+      double absRadius() const
       { return fabs(radius()); }
 
       /// Indicates if the circle is oriented counterclockwise
@@ -233,11 +233,11 @@ namespace Belle2 {
       { m_center += by; }
 
       /// Activelly moves the circle in the direction given in place along the first coordinate
-      void moveAlongFirst(const FloatType& first)
+      void moveAlongFirst(const double& first)
       { m_center.setFirst(m_center.first() + first); }
 
       /// Activelly moves the circle in the direction given in place along the second coordinate
-      void moveAlongSecond(const FloatType& second)
+      void moveAlongSecond(const double& second)
       { m_center.setSecond(m_center.second() + second); }
 
       /// Passivelly move the coordinate system  in place by the given vector
@@ -245,17 +245,17 @@ namespace Belle2 {
       { m_center -= by; }
 
       /// Passivelly move the coordinate system in place along the first coordinate
-      void passiveMoveAlongFirst(const FloatType& first)
+      void passiveMoveAlongFirst(const double& first)
       { m_center.setFirst(m_center.first() - first); }
 
       /// Passivelly move the coordinate system in place along the second coordinate
-      void passiveMoveAlongSecond(const FloatType& second)
+      void passiveMoveAlongSecond(const double& second)
       { m_center.setSecond(m_center.second() - second); }
       /**@}*/
 
     private:
       Vector2D  m_center; ///< Memory for the central point
-      FloatType m_radius; ///< Memory for the signed radius
+      double m_radius; ///< Memory for the signed radius
 
     private:
 

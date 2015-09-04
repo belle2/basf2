@@ -71,8 +71,8 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_simple)
   // Simple sin.
   SinEqLine sinEqLine(0.0, 0.0);
 
-  FloatType rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
-  FloatType rootY = sinEqLine.map(rootX);
+  double rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double rootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(PI, rootX, 10e-7);
   EXPECT_NEAR(0.0, rootY, 10e-7);
@@ -87,8 +87,8 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_const)
   // Constant sin.
   SinEqLine sinEqLine(0.0, 1.0 / 2.0);
 
-  FloatType rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
-  FloatType rootY = sinEqLine.map(rootX);
+  double rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double rootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(150.0 * Unit::deg, rootX, 10e-7);
   EXPECT_NEAR(0.0, rootY, 10e-7);
@@ -100,14 +100,14 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_complex)
 {
 
   // Setup a line that is a
-  FloatType rootX = 150.0 * Unit::deg;
+  double rootX = 150.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(1.0 / 2.0, 1.0 / 2.0);
   line.moveAlongFirst(rootX);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
@@ -119,13 +119,13 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfP
 {
 
   // Setup a line that is a
-  FloatType rootX = 0.0 * Unit::deg;
+  double rootX = 0.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(-1.0 / 2.0, 0);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeRootLargerThanExtemumInHalfPeriod(-1);
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeRootLargerThanExtemumInHalfPeriod(-1);
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
@@ -137,14 +137,14 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootLargerThanExtemumInHalfP
 {
 
   // Setup a line that is a
-  FloatType rootX = 150.0 * Unit::deg;
+  double rootX = 150.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(1.0 / 2.0, 1.0 / 2.0);
   line.moveAlongFirst(rootX);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeRootLargerThanExtemumInHalfPeriod(0);
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeRootLargerThanExtemumInHalfPeriod(0);
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
@@ -156,14 +156,14 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot)
 {
 
   // Setup a line that is a
-  FloatType rootX = 150.0 * Unit::deg;
+  double rootX = 150.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(1.0 / 2.0, 1.0 / 2.0);
   line.moveAlongFirst(rootX);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeSmallestPositiveRoot();
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeSmallestPositiveRoot();
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
@@ -176,14 +176,14 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSl
 {
 
   // Setup a line that is a
-  FloatType rootX = 150.0 * Unit::deg;
+  double rootX = 150.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(2.0, 1.0 / 2.0);
   line.moveAlongFirst(rootX);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeSmallestPositiveRoot();
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeSmallestPositiveRoot();
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
@@ -195,14 +195,14 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeSmallestPositiveRoot_largeSl
 TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
 {
   // Setup a line that is a
-  FloatType rootX = 150.0 * Unit::deg;
+  double rootX = 150.0 * Unit::deg;
   Line2D line = Line2D::fromSlopeIntercept(2.0, 1.0 / 2.0);
   line.moveAlongFirst(rootX);
 
   SinEqLine sinEqLine(line);
 
-  FloatType solvedRootX = sinEqLine.computeRootForLargeSlope();
-  FloatType solvedRootY = sinEqLine.map(rootX);
+  double solvedRootX = sinEqLine.computeRootForLargeSlope();
+  double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);

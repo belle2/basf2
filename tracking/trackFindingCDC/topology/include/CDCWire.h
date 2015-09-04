@@ -179,15 +179,15 @@ namespace Belle2 {
       }
 
       /// Gives the xy projected position of the wire at the given z coordinate
-      Vector2D getWirePos2DAtZ(const FloatType& z) const
+      Vector2D getWirePos2DAtZ(const double& z) const
       { return getSkewLine().pos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
-      Vector3D getWirePos3DAtZ(const FloatType& z) const
+      Vector3D getWirePos3DAtZ(const double& z) const
       { return getSkewLine().pos3DAtZ(z); }
 
       /// Calculates the distance from the position to the wire
-      FloatType getDistance(const Vector3D& pos3D) const
+      double getDistance(const Vector3D& pos3D) const
       { return getSkewLine().distance(pos3D); }
 
       /// Calculates the closest approach in the wire to the position
@@ -200,7 +200,7 @@ namespace Belle2 {
        *  * the position is outside of the CDC
        *  * the position is outside of the drift cell
        */
-      FloatType getDriftLength(const Vector3D& pos3D) const
+      double getDriftLength(const Vector3D& pos3D) const
       { return isInCell(pos3D) ? getDistance(pos3D) : NAN; }
 
       /// Getter for the wire reference position.
@@ -219,14 +219,14 @@ namespace Belle2 {
       /// Getter for the wire reference z coordinate
       /** Gives the wire's reference z coordinate
        */
-      const FloatType& getRefZ() const
+      const double& getRefZ() const
       { return getSkewLine().refZ(); }
 
       /// Getter for the tangents of the stereo angle of the wire.
-      FloatType getTanStereoAngle() const { return getSkewLine().tanTheta(); }
+      double getTanStereoAngle() const { return getSkewLine().tanTheta(); }
 
       /// Getter for the stereo angle of the wire.
-      FloatType getStereoAngle() const { return getSkewLine().theta(); }
+      double getStereoAngle() const { return getSkewLine().theta(); }
 
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
@@ -235,22 +235,22 @@ namespace Belle2 {
       Vector2D getMovePerZ() const { return getSkewLine().movePerZ(); }
 
       /// Getter for the cylindrical radius at the wire reference position
-      FloatType getRefCylindricalR() const { return m_refCylindricalR; }
+      double getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the closest distance to the beamline ( z-axes )
-      FloatType getMinCylindricalR() const { return getSkewLine().perigee2D().norm(); }
+      double getMinCylindricalR() const { return getSkewLine().perigee2D().norm(); }
 
       ///Getter for the distance to the beamline ( z-axes ) at the forward joint point
-      FloatType getForwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
+      double getForwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
 
       ///Getter for the distance to the beamline ( z-axes ) at the backward joint point
-      FloatType getBackwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
+      double getBackwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
 
       /// Getter for the z coordinate at the forward joint points of the wires
-      FloatType getForwardZ() const { return getSkewLine().forwardZ(); }
+      double getForwardZ() const { return getSkewLine().forwardZ(); }
 
       /// Getter for the z coordinate at the backward joint points of the wires
-      FloatType getBackwardZ() const { return getSkewLine().backwardZ(); }
+      double getBackwardZ() const { return getSkewLine().backwardZ(); }
 
       /// Checks whether the position is in the drift cell surrounding the wire
       bool isInCell(const Vector3D& pos3D) const;
@@ -262,10 +262,10 @@ namespace Belle2 {
       }
 
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference
-      const FloatType& getForwardPhiToRef() const { return m_forwardPhiToRef; }
+      const double& getForwardPhiToRef() const { return m_forwardPhiToRef; }
 
       /// Getter for the azimuth angle of the backward joint point of the wire relativ to its reference
-      const FloatType& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
+      const double& getBackwardPhiToRef() const { return m_backwardPhiToRef; }
 
       /// Getter for azimuth angle range covered by the wire relativ to the reference point.
       /** Gives the range of azimuth angles a stereo wires covers relativ to its reference position. \n
@@ -278,7 +278,7 @@ namespace Belle2 {
        *  The bigger value is positiv and gets stored as .second of the pair. \n
        *  For axial wires both values or zero since axial wires form a point in the xy projection.
        */
-      const std::pair<FloatType, FloatType>& getPhiRangeToRef() const
+      const std::pair<double, double>& getPhiRangeToRef() const
       { return m_phiRangeToRef; }
       /**@}*/
 
@@ -384,12 +384,12 @@ namespace Belle2 {
       WireID m_wireID; ///< The wireID of the wire
 
       BoundSkewLine m_skewLine; ///< The line representation of the wire
-      FloatType m_refCylindricalR;  ///< Precomputed distance to the beam line at the reference position.
+      double m_refCylindricalR;  ///< Precomputed distance to the beam line at the reference position.
 
 
-      FloatType m_forwardPhiToRef; ///< Storage of the angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
-      FloatType m_backwardPhiToRef;///< Storage of the angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
-      std::pair<FloatType, FloatType>
+      double m_forwardPhiToRef; ///< Storage of the angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
+      double m_backwardPhiToRef;///< Storage of the angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
+      std::pair<double, double>
       m_phiRangeToRef; ///< Storage of the angle range to ref position in the xy projection (see getPhiRangeToRef() for details)
 
     private:

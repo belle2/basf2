@@ -31,7 +31,7 @@ namespace Belle2 {
       SimpleFacetFilter();
 
       /// Constructor using given direction of flight deviation cut off.
-      explicit SimpleFacetFilter(FloatType deviationCosCut);
+      explicit SimpleFacetFilter(double deviationCosCut);
 
     public:
       /** Set the parameter with key to value.
@@ -61,7 +61,7 @@ namespace Belle2 {
       FitlessFacetFilter m_fitlessFacetFilter;
 
       /// Memory for the used direction of flight deviation.
-      FloatType m_param_deviationCosCut;
+      double m_param_deviationCosCut;
 
     }; // end class SimpleFacetFilter
   } //end namespace TrackFindingCDC

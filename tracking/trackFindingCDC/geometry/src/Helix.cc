@@ -20,33 +20,33 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
+double Helix::arcLength2DToClosest(const Vector3D& point) const
 {
   // TODO: Introduce special case for curvatureXY == 0
 
 
-  FloatType byArcLength2D = circleXY().arcLengthTo(point.xy());
+  double byArcLength2D = circleXY().arcLengthTo(point.xy());
 
   // Handle z coordinate
-  FloatType transformedZ0 = byArcLength2D * tanLambda() + z0();
-  FloatType deltaZ = point.z() - transformedZ0;
-  // FloatType iPeriod = floor(deltaZ / zPeriod());
+  double transformedZ0 = byArcLength2D * tanLambda() + z0();
+  double deltaZ = point.z() - transformedZ0;
+  // double iPeriod = floor(deltaZ / zPeriod());
 
   // Sign ?
   //CCWInfo ccwInfo = circleXY().orientation();
   //if (ccwInfo != CCW and ccwInfo != CW) return NAN;
 
-  //FloatType d0 = ccwInfo * circleXY().distance(point.xy());
-  FloatType d0 = circleXY().distance(point.xy());
+  //double d0 = ccwInfo * circleXY().distance(point.xy());
+  double d0 = circleXY().distance(point.xy());
 
-  FloatType denominator = 1 + curvatureXY() * d0;
+  double denominator = 1 + curvatureXY() * d0;
   //B2INFO("denominator = " << denominator);
   if (denominator == 0) {
     return deltaZ / tanLambda() + byArcLength2D;
   }
 
-  FloatType slope = - tanLambda() * tanLambda() / denominator;
-  FloatType intercept = - tanLambda() * curvatureXY() * deltaZ / denominator;
+  double slope = - tanLambda() * tanLambda() / denominator;
+  double intercept = - tanLambda() * curvatureXY() * deltaZ / denominator;
 
   // B2INFO("slope = " << slope);
   // B2INFO("intercept = " << intercept);
@@ -60,16 +60,16 @@ FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
 
   // There are 4 candidate solutions
   // Note: Two of them are local maxima of the distance to the helix and could be abolished before further consideration as an optimization.
-  FloatType solutions[4] = { NAN, NAN, NAN, NAN };
+  double solutions[4] = { NAN, NAN, NAN, NAN };
 
   solutions[0] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod - 2);
   solutions[1] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod - 1);
   solutions[2] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod);
   solutions[3] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod + 1);
 
-  FloatType distances[4] = { NAN, NAN, NAN, NAN };
+  double distances[4] = { NAN, NAN, NAN, NAN };
 
-  FloatType smallestDistance = NAN;
+  double smallestDistance = NAN;
   Index iSmallestSol = 0;
 
   for (int iSol = 0; iSol < 4; ++iSol) {
@@ -91,9 +91,9 @@ FloatType Helix::arcLength2DToClosest(const Vector3D& point) const
   // B2INFO("arcLength * curvature = " << solutions[iSmallestSol]);
   // B2INFO("distance = " << distances[iSmallestSol]);
 
-  FloatType curvatureXYTimesArcLength2D = solutions[iSmallestSol] ;
+  double curvatureXYTimesArcLength2D = solutions[iSmallestSol] ;
 
-  FloatType arcLength2D = curvatureXYTimesArcLength2D / curvatureXY();
+  double arcLength2D = curvatureXYTimesArcLength2D / curvatureXY();
 
   // Correct for the periods off set before
   arcLength2D += byArcLength2D;
@@ -113,9 +113,9 @@ TMatrixD Helix::passiveMoveByJacobian(const Vector3D& by) const
   // Fills the upper left 3x3 corner.
   circleXY().passiveMoveByJacobian(by.xy(), jacobian);
 
-  FloatType curv = curvatureXY();
-  FloatType m = tanLambda();
-  FloatType sArc = circleXY().arcLengthTo(by.xy());
+  double curv = curvatureXY();
+  double m = tanLambda();
+  double sArc = circleXY().arcLengthTo(by.xy());
 
   jacobian(iZ0, iCurv) = m * (jacobian(iPhi0, iCurv) - sArc) / curv;
   jacobian(iZ0, iPhi0) = m * (jacobian(iPhi0, iPhi0) - 1.) / curv;

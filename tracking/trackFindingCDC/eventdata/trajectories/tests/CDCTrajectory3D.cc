@@ -28,7 +28,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosM
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
   SignType newChargeSign = PLUS;
-  FloatType bZ = 2.0;
+  double bZ = 2.0;
 
   CDCTrajectory3D trajectory(newPos3D, newMom3D, newChargeSign, bZ);;
 
@@ -91,7 +91,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
   Vector3D expectedMomentum(1.0, 0.0, 0.0);
   Vector3D expectedPosition(0.0, 1.0, 0.0);
   SignType expectedCharge = PLUS;
-  FloatType bZ = 2;
+  double bZ = 2;
 
   genfit::TrackCand expectedGFTrackCand;
   expectedGFTrackCand.setPosMomSeed(expectedPosition,

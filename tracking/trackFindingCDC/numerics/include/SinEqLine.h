@@ -53,48 +53,48 @@ namespace Belle2 {
       {;}
 
       /// Constructor taking the slope and intercept of the line that shall be superimposed with the sin curve.
-      SinEqLine(const FloatType& slope, const FloatType& intercept) :
+      SinEqLine(const double& slope, const double& intercept) :
         m_slope(slope),
         m_intercept(intercept)
       {;}
 
 
       /// Interpreting as the function f this method carries out the translation from x to y coordinates.
-      FloatType map(const FloatType& x) const
+      double map(const double& x) const
       { return sin(x) - getSlope() * x - getIntercept(); }
 
       /// Interpreting as the function f this method calculates the gradient as need in Newtons algorithms.
-      FloatType gradient(const FloatType& x) const
+      double gradient(const double& x) const
       { return cos(x) - getSlope(); }
 
       /// Returns the half period index in which the x position is located.
-      Index getIHalfPeriod(const FloatType& x) const
+      Index getIHalfPeriod(const double& x) const
       { return floor(x / PI); }
 
       /* Computes the positive solution that has the smallest value of x.
       The additional parameter serves as a criterion to abbort the search if the solutions is further away than the specified half period.
       */
-      FloatType computeSmallestPositiveRoot(const Index& maxIHalfPeriod = 5) const;
+      double computeSmallestPositiveRoot(const Index& maxIHalfPeriod = 5) const;
 
 
       /// Computes the solution that is addressed by the given half period index.
-      FloatType computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const;
+      double computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const;
 
       /// Compute single solution in the case that fabs(slope) >= 1.
-      FloatType computeRootForLargeSlope() const;
+      double computeRootForLargeSlope() const;
 
       /// Computes the solution in between the given x values. The x values are generally choosen consecutive local extermas.
-      FloatType computeRootInInterval(FloatType lowerX, FloatType upperX) const;
+      double computeRootInInterval(double lowerX, double upperX) const;
 
     private:
       /// Shrinking method of the newton algorithm return the next candidate root.
-      FloatType newtonX(const Vector2D& pos) const;
+      double newtonX(const Vector2D& pos) const;
 
       /// Fall back shrinking method to the secant algorithm
-      static FloatType secantX(const Vector2D& lower, const Vector2D& upper);
+      static double secantX(const Vector2D& lower, const Vector2D& upper);
 
       /// Simple fall back shrinking method using trivial devision of the intervall.
-      static FloatType middleX(const Vector2D& lower, const Vector2D& upper);
+      static double middleX(const Vector2D& lower, const Vector2D& upper);
 
       /// Replaces the lower or upper bound inplace if the next candidate position is valid and within the intervall. Returns true on success.
       static bool updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next);
@@ -110,7 +110,7 @@ namespace Belle2 {
       }
 
       /// Returns the better solution x from the bounds of the intervall.
-      static FloatType getConvergedBound(const Vector2D& lower, const Vector2D& upper)
+      static double getConvergedBound(const Vector2D& lower, const Vector2D& upper)
       {
         if (fabs(lower.y()) <= fabs(upper.y())) {
           return lower.x();
@@ -140,7 +140,7 @@ namespace Belle2 {
 
     public:
       /// Get the local extermum that is located in the half period indicated by the given index.
-      FloatType computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const;
+      double computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const;
 
       /// Helper function to translate the index of the half period to index of the containing period.
       static Index getIPeriodFromIHalfPeriod(const Index& iHalfPeriod)
@@ -152,19 +152,19 @@ namespace Belle2 {
       { return fabs(getSlope()) >= 1; }
 
       /// Getter for the slope
-      const FloatType& getSlope() const
+      const double& getSlope() const
       { return m_slope; }
 
       /// Getter for the intercept
-      const FloatType& getIntercept() const
+      const double& getIntercept() const
       { return m_intercept; }
 
     private:
       /// Memory for the slope.
-      FloatType m_slope;
+      double m_slope;
 
       /// Memory for the intercept.
-      FloatType m_intercept;
+      double m_intercept;
 
 
     };

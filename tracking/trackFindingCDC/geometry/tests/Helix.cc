@@ -33,11 +33,11 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
 
 
   for (const Vector3D& by : bys) {
-    FloatType curvature = +1.0 / 2.0;
-    FloatType phi0 = -PI / 2.0;
-    FloatType impact = +1.0;
-    FloatType tanLambda = 1.0 / 2.0;
-    FloatType z0 = 0.0;
+    double curvature = +1.0 / 2.0;
+    double phi0 = -PI / 2.0;
+    double impact = +1.0;
+    double tanLambda = 1.0 / 2.0;
+    double z0 = 0.0;
 
     Helix helix(curvature, phi0, impact, tanLambda, z0);
     Vector3D point(0.0, 0.0, 0.0);
@@ -59,28 +59,28 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
 
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
 {
-  FloatType curvature = -1.0;
-  FloatType phi0 = +PI / 2.0;
-  FloatType impact = -1.0;
-  FloatType tanLambda = 1.0 / 2.0;
-  FloatType z0 = 3.0;
+  double curvature = -1.0;
+  double phi0 = +PI / 2.0;
+  double impact = -1.0;
+  double tanLambda = 1.0 / 2.0;
+  double z0 = 3.0;
 
   Helix helix(curvature, phi0, impact, tanLambda, z0);
   EXPECT_EQ(-1, helix.radiusXY());
 
-  FloatType closestArcLength2D = helix.arcLength2DToCylindricalR(1);
+  double closestArcLength2D = helix.arcLength2DToCylindricalR(1);
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
-  FloatType widestArcLength2D = helix.arcLength2DToCylindricalR(3);
+  double widestArcLength2D = helix.arcLength2DToCylindricalR(3);
   EXPECT_NEAR(PI, widestArcLength2D, 10e-7);
 
-  FloatType halfArcLength2D = helix.arcLength2DToCylindricalR(sqrt(5.0));
+  double halfArcLength2D = helix.arcLength2DToCylindricalR(sqrt(5.0));
   EXPECT_NEAR(PI / 2, halfArcLength2D, 10e-7);
 
-  FloatType unreachableHighArcLength2D = helix.arcLength2DToCylindricalR(4);
+  double unreachableHighArcLength2D = helix.arcLength2DToCylindricalR(4);
   EXPECT_TRUE(std::isnan(unreachableHighArcLength2D));
 
-  FloatType unreachableLowArcLength2D = helix.arcLength2DToCylindricalR(0.5);
+  double unreachableLowArcLength2D = helix.arcLength2DToCylindricalR(0.5);
   EXPECT_TRUE(std::isnan(unreachableLowArcLength2D));
 }
 
@@ -88,24 +88,24 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
 
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
 {
-  FloatType curvature = -1.0;
-  FloatType phi0 = +PI / 2.0;
-  FloatType impact = -1.0;
-  FloatType tanLambda = 1.0 / 2.0;
-  FloatType z0 = 3.0;
+  double curvature = -1.0;
+  double phi0 = +PI / 2.0;
+  double impact = -1.0;
+  double tanLambda = 1.0 / 2.0;
+  double z0 = 3.0;
 
   Helix helix(curvature, phi0, impact, tanLambda, z0);
 
   Vector2D origin(0.0, 0.0);
-  FloatType closestArcLength2D = helix.arcLength2DToXY(origin);
+  double closestArcLength2D = helix.arcLength2DToXY(origin);
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
-  FloatType widestArcLength2D = helix.arcLength2DToXY(Vector2D(5.0, 0.0));
+  double widestArcLength2D = helix.arcLength2DToXY(Vector2D(5.0, 0.0));
   EXPECT_NEAR(PI, widestArcLength2D, 10e-7);
 
-  FloatType halfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, 5.0));
+  double halfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, 5.0));
   EXPECT_NEAR(PI / 2, halfArcLength2D, 10e-7);
 
-  FloatType otherHalfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, -5.0));
+  double otherHalfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, -5.0));
   EXPECT_NEAR(-PI / 2, otherHalfArcLength2D, 10e-7);
 }

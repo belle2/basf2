@@ -35,11 +35,11 @@ namespace Belle2 {
       Line2D(): m_n0(0.0), m_n12(0.0, 0.0) { ; }
 
       ///Constructs taking all three line parameters
-      Line2D(const FloatType& n0, const FloatType& n1, const FloatType& n2):
+      Line2D(const double& n0, const double& n1, const double& n2):
         m_n0(n0), m_n12(n1, n2) { normalize(); }
 
       ///Constructs taking the distance to the origin ( n0 ) and the normal vector
-      Line2D(const FloatType& n0, const Vector2D& n12):
+      Line2D(const double& n0, const Vector2D& n12):
         m_n0(n0), m_n12(n12) { normalize(); }
 
       ///Constructs a line from its slope and intercept over the first coordinate (default forward orientation).
@@ -47,8 +47,8 @@ namespace Belle2 {
        *  The Line2D has an additional orientation in contrast to y = slope *x + intercept.
        *  The default orientation for the line is forward with the positiv x axes.
        */
-      static Line2D fromSlopeIntercept(const FloatType& slope,
-                                       const FloatType& intercept)
+      static Line2D fromSlopeIntercept(const double& slope,
+                                       const double& intercept)
       { return Line2D(intercept, slope, -FORWARD); }
 
       /// Constructs a line from its slope and intercept over the first coordinate with the given orientation.
@@ -57,8 +57,8 @@ namespace Belle2 {
        *  The forward backward info sets if the constructed line shall have the direction with increasing or \n
        *  decreasing x respectivly.
        */
-      static Line2D fromSlopeIntercept(const FloatType& slope,
-                                       const FloatType& intercept,
+      static Line2D fromSlopeIntercept(const double& slope,
+                                       const double& intercept,
                                        const ForwardBackwardInfo& orientation)
       { return Line2D(intercept * orientation, slope * orientation, -orientation); }
 
@@ -73,11 +73,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the first line parameter
-      const FloatType& n0() const { return m_n0; }
+      const double& n0() const { return m_n0; }
       /// Getter for the second line parameter
-      const FloatType& n1() const { return m_n12.first(); }
+      const double& n1() const { return m_n12.first(); }
       /// Getter for the third line parameter
-      const FloatType& n2() const { return m_n12.second(); }
+      const double& n2() const { return m_n12.second(); }
       /// Getter for the unit normal vector to the line
       const Vector2D& n12() const { return m_n12; }
 
@@ -86,23 +86,23 @@ namespace Belle2 {
       /** This sets the signed distance of the line to the origin.
        *  Its not involved in the normalization hence it can be  \n
        *  exported as a public function. */
-      void setN0(const FloatType& n0) { m_n0 = n0; }
+      void setN0(const double& n0) { m_n0 = n0; }
 
     private:
       ///Setter for the second line parameter. May violate the normlization.
-      void setN1(const FloatType& n1) { m_n12.setFirst(n1); }
+      void setN1(const double& n1) { m_n12.setFirst(n1); }
       ///Setter for the third line parameter. May violate the normlization.
-      void setN2(const FloatType& n2) { m_n12.setSecond(n2); }
+      void setN2(const double& n2) { m_n12.setSecond(n2); }
 
       ///Setter for the normal vector by its coordinates.
-      void setN12(const FloatType& n1, const FloatType& n2) { m_n12.set(n1, n2);}
+      void setN12(const double& n1, const double& n2) { m_n12.set(n1, n2);}
       ///Setter for the normal vector.
       void setN12(const Vector2D& n12) { m_n12.set(n12);  }
 
     public:
       ///Setter for all line parameters. Normalizes correctly.
       /** Setter the for the line parameters which takes care of the correct normalization of the normal vector. */
-      void setN(const FloatType& n0, const FloatType& n1, const FloatType& n2)
+      void setN(const double& n0, const double& n1, const double& n2)
       { setN0(n0) ; setN12(n1, n2); normalize();}
 
       /// Sets all line parameters to zero.
@@ -111,13 +111,13 @@ namespace Belle2 {
 
       /// Setter for the intercept and slope.
       /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
-      void setSlopeIntercept(const FloatType& slope, const FloatType& intercept)
+      void setSlopeIntercept(const double& slope, const double& intercept)
       { setN0(intercept); setN1(slope); setN2(-1.0); normalize(); }
 
 
       /// Setter for the intercept and slope with explicit orientation
       /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
-      void setSlopeIntercept(const FloatType& slope, const FloatType& intercept, const ForwardBackwardInfo& orientation)
+      void setSlopeIntercept(const double& slope, const double& intercept, const ForwardBackwardInfo& orientation)
       { setN0(intercept * orientation); setN1(slope * orientation); setN2(-orientation); normalize(); }
 
 
@@ -137,36 +137,36 @@ namespace Belle2 {
 
     private:
       /// Scales all parameters. Helper for normalize.
-      void scaleN(const FloatType& factor) { m_n0 *= factor; m_n12 *= factor; }
+      void scaleN(const double& factor) { m_n0 *= factor; m_n12 *= factor; }
 
       /// Calculates the squared normalization. Helper for normalize.
-      FloatType normalizationSquared() const
+      double normalizationSquared() const
       { return n12().normSquared(); }
 
       /// Calculates the normalization. Helper for normalize.
-      FloatType normalization() const
+      double normalization() const
       { return sqrt(normalizationSquared()); }
 
     public:
       /// Calculates the signed distance of the point to the line.
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      FloatType distance(const Vector2D& point) const
+      double distance(const Vector2D& point) const
       { return n0() + point.dot(n12()); }
 
       /// Calculates the signed distance of the point given by its to coordinates to the line.
       /** Returns the signed distance of the point to the line. The sign is positiv \n
        *  for the right side of the line and negativ for the left side. */
-      FloatType distance(const FloatType& first, const FloatType& second) const
+      double distance(const double& first, const double& second) const
       { return n0() + first * n1() + second * n2(); }
 
       /// Returns the distance to the origin
       /** The distance to the origin is equivalent to the first line parameter*/
-      FloatType distanceToOrigin() const
+      double distanceToOrigin() const
       { return n0(); }
 
       /// Returns the absolute value of distance(point)
-      FloatType absoluteDistance(const Vector2D& point) const
+      double absoluteDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
 
       /// Return if the point given is right or left of the line
@@ -184,8 +184,8 @@ namespace Belle2 {
       /// Calculates the point of closest approach on the line to the point
       Vector2D closest(const Vector2D& point) const
       {
-        const FloatType closestParallel = -n0();
-        const FloatType closestOrthgonal = point.unnormalizedOrthogonalComp(n12());
+        const double closestParallel = -n0();
+        const double closestOrthgonal = point.unnormalizedOrthogonalComp(n12());
         return Vector2D(n12(), closestParallel, closestOrthgonal);
       }
 
@@ -196,7 +196,7 @@ namespace Belle2 {
       /** Takes to two point to their closest approach to the origin \n
        *  and calculates the distance between them. The length is signed \n
        *  take relativ to the direction of positiv advance. */
-      FloatType lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       { return to.unnormalizedOrthogonalComp(n12()) - from.unnormalizedOrthogonalComp(n12()); }
 
 
@@ -238,19 +238,19 @@ namespace Belle2 {
       { m_n0 -= by.unnormalizedParallelComp(n12()); }
 
       /// Activelly moves the line in the direction given in place along the first coordinate
-      void moveAlongFirst(const FloatType& first)
+      void moveAlongFirst(const double& first)
       { m_n0 -= n1() * first; }
 
       /// Activelly moves the line in the direction given in place along the second coordinate
-      void moveAlongSecond(const FloatType& second)
+      void moveAlongSecond(const double& second)
       { m_n0 -= n2() * second; }
 
       /// Return a copy of the line activally moved long the first coordinate
-      Line2D movedAlongFirst(const FloatType& first) const
+      Line2D movedAlongFirst(const double& first) const
       { return Line2D(n0() - n1() * first, n1(), n2()); }
 
       /// Return a copy of the line activally moved long the first coordinate
-      Line2D movedAlongSecond(const FloatType& second) const
+      Line2D movedAlongSecond(const double& second) const
       { return Line2D(n0() - n2() * second, n1(), n2()); }
 
 
@@ -260,19 +260,19 @@ namespace Belle2 {
       { m_n0 += by.unnormalizedParallelComp(n12()); }
 
       /// Passively move the coordinate system in place along the first coordinate
-      void passiveMoveAlongFirst(const FloatType& first)
+      void passiveMoveAlongFirst(const double& first)
       { m_n0 += n1() * first; }
 
       /// Passively move the coordinate system in place along the second coordinate
-      void passiveMoveAlongSecond(const FloatType& second)
+      void passiveMoveAlongSecond(const double& second)
       { m_n0 += n2() * second; }
 
       /// Return a copy of the line passively moved long the first coordinate
-      Line2D passiveMovedAlongFirst(const FloatType& first) const
+      Line2D passiveMovedAlongFirst(const double& first) const
       { return Line2D(n0() + n1() * first, n1(), n2()); }
 
       /// Return a copy of the line passively moved long the first coordinate
-      Line2D passiveMovedAlongSecond(const FloatType& second) const
+      Line2D passiveMovedAlongSecond(const double& second) const
       { return Line2D(n0() + n2() * second, n1(), n2()); }
 
 
@@ -300,24 +300,24 @@ namespace Belle2 {
        */
       /**@{*/
       /// Returns the slope over the first coordinate
-      FloatType slope() const { return - n1() / n2(); }
+      double slope() const { return - n1() / n2(); }
 
       /// Returns the slope over the second coordinate
-      FloatType inverseSlope() const { return - n2() / n1(); }
+      double inverseSlope() const { return - n2() / n1(); }
 
       /// Returns the intercept over the first coordinate
-      FloatType intercept() const { return - n0() / n2(); }
+      double intercept() const { return - n0() / n2(); }
 
       /// Returns the root of the line
-      FloatType zero() const { return -n0() / n1(); }
+      double zero() const { return -n0() / n1(); }
 
       /// Maps the first coordinate to the second
-      FloatType map(const FloatType& first) const { return  -(n0() + n1() * first) / n2(); }
+      double map(const double& first) const { return  -(n0() + n1() * first) / n2(); }
       /// Maps the first coordinate to the second
-      FloatType operator()(const FloatType& first) const { return  map(first); }
+      double operator()(const double& first) const { return  map(first); }
 
       /// Maps the second coordinate to the first
-      FloatType inverseMap(const FloatType& second) const { return  -(n0() + n2() * second) / n1(); }
+      double inverseMap(const double& second) const { return  -(n0() + n2() * second) / n1(); }
 
       /// Turns the line function into its inverse function in place
       void invert() { m_n12.swapCoordinates(); reverse(); }
@@ -329,7 +329,7 @@ namespace Belle2 {
 
 
     private:
-      FloatType m_n0; ///< Memory for the first line parameter
+      double m_n0; ///< Memory for the first line parameter
       Vector2D  m_n12; ///< Memory for the second line parameter
 
     private:

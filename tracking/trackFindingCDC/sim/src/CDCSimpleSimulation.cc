@@ -53,7 +53,7 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     const Vector3D& localOrigin = trajectory3D.getLocalOrigin();
 
     Helix globalHelix = localHelix;
-    const FloatType arcLength2DOffset = globalHelix.passiveMoveBy(-localOrigin);
+    const double arcLength2DOffset = globalHelix.passiveMoveBy(-localOrigin);
     vector<SimpleSimHit> simpleSimHitsForTrajectory = createHits(globalHelix, arcLength2DOffset);
 
     for (SimpleSimHit& simpleSimHit : simpleSimHitsForTrajectory) {
@@ -158,7 +158,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHits(const Helix& globalHelix,
-                                const FloatType& arcLength2DOffset) const
+                                const double& arcLength2DOffset) const
 {
 
   vector<SimpleSimHit> simpleSimHits;
@@ -166,8 +166,8 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   const double outerWallCylinderR = wireTopology.getOuterCylindricalR();
 
-  const FloatType minR = globalHelix.minimalCylindricalR();
-  const FloatType maxR = globalHelix.maximalCylindricalR();
+  const double minR = globalHelix.minimalCylindricalR();
+  const double maxR = globalHelix.maximalCylindricalR();
 
   const double globalArcLength2DToOuterWall = globalHelix.arcLength2DToCylindricalR(outerWallCylinderR);
   const double localArcLength2DToOuterWall = arcLength2DOffset + globalArcLength2DToOuterWall;
@@ -191,18 +191,18 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
   }
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
-    FloatType outerR = wireLayer.getOuterCylindricalR();
-    FloatType innerR = wireLayer.getInnerCylindricalR();
+    double outerR = wireLayer.getOuterCylindricalR();
+    double innerR = wireLayer.getInnerCylindricalR();
 
     if ((maxR < innerR) or (outerR < minR)) {
       // Trajectory does not reaching the layer
       continue;
     }
 
-    FloatType centerR = (min(outerR, maxR) + max(innerR, minR)) / 2;
+    double centerR = (min(outerR, maxR) + max(innerR, minR)) / 2;
 
-    FloatType globalArcLength2D = globalHelix.arcLength2DToCylindricalR(centerR);
-    FloatType localArcLength2D = arcLength2DOffset + globalArcLength2D;
+    double globalArcLength2D = globalHelix.arcLength2DToCylindricalR(centerR);
+    double localArcLength2D = arcLength2DOffset + globalArcLength2D;
 
 
     vector<SimpleSimHit> simpleSimHitsInLayer;
@@ -267,7 +267,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
                                         const Helix& globalHelix,
-                                        const FloatType& arcLength2DOffset) const
+                                        const double& arcLength2DOffset) const
 {
   std::vector<SimpleSimHit> result;
 
@@ -307,7 +307,7 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
 CDCSimpleSimulation::SimpleSimHit
 CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
                                       const Helix& globalHelix,
-                                      const FloatType& arcLength2DOffset) const
+                                      const double& arcLength2DOffset) const
 {
   double arcLength2D = globalHelix.arcLength2DToXY(wire.getRefPos2D());
   if ((arcLength2D + arcLength2DOffset) < 0) {

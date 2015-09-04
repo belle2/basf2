@@ -17,10 +17,10 @@ using namespace TrackFindingCDC;
 
 
 
-FloatType SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) const
+double SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) const
 {
   /// Smallest positive root might before the first positive extermum
-  FloatType root = computeRootLargerThanExtemumInHalfPeriod(-1);
+  double root = computeRootLargerThanExtemumInHalfPeriod(-1);
   if (root > 0) return root;
 
   /// Most of the time to should be sufficient to look for the root in the first two half periods.
@@ -43,14 +43,14 @@ FloatType SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) co
 
 
 
-FloatType SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const
+double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const
 {
   if (hasLargeSlope()) {
     return computeRootForLargeSlope();
 
   } else {
-    FloatType lowerX = computeExtremumXInHalfPeriod(iHalfPeriod);
-    FloatType upperX = computeExtremumXInHalfPeriod(iHalfPeriod + 1);
+    double lowerX = computeExtremumXInHalfPeriod(iHalfPeriod);
+    double upperX = computeExtremumXInHalfPeriod(iHalfPeriod + 1);
     return computeRootInInterval(lowerX, upperX);
 
   }
@@ -60,12 +60,12 @@ FloatType SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const Index& iHalf
 
 
 
-FloatType SinEqLine::computeRootForLargeSlope() const
+double SinEqLine::computeRootForLargeSlope() const
 {
   if (not hasLargeSlope()) return NAN;
 
-  FloatType xLineIsPlusOne = (1.0 - getIntercept()) / getSlope();
-  FloatType xLineIsMinusOne = (-1.0 - getIntercept()) / getSlope();
+  double xLineIsPlusOne = (1.0 - getIntercept()) / getSlope();
+  double xLineIsMinusOne = (-1.0 - getIntercept()) / getSlope();
 
   if (xLineIsPlusOne > xLineIsMinusOne) {
     return computeRootInInterval(xLineIsMinusOne, xLineIsPlusOne);
@@ -82,7 +82,7 @@ FloatType SinEqLine::computeRootForLargeSlope() const
 
 
 
-FloatType SinEqLine::computeRootInInterval(FloatType lowerX, FloatType upperX) const
+double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 {
   if (not(lowerX < upperX)) return NAN;
 
@@ -156,7 +156,7 @@ FloatType SinEqLine::computeRootInInterval(FloatType lowerX, FloatType upperX) c
 
 
 
-FloatType SinEqLine::middleX(const Vector2D& lower, const  Vector2D& upper)
+double SinEqLine::middleX(const Vector2D& lower, const  Vector2D& upper)
 {
   return (lower.x() + upper.x()) / 2.0;
 }
@@ -165,7 +165,7 @@ FloatType SinEqLine::middleX(const Vector2D& lower, const  Vector2D& upper)
 
 
 
-FloatType SinEqLine::secantX(const Vector2D& lower, const Vector2D& upper)
+double SinEqLine::secantX(const Vector2D& lower, const Vector2D& upper)
 {
   return (lower.x() * upper.y() - upper.x() * lower.y()) / (upper.y() - lower.y());
 }
@@ -174,7 +174,7 @@ FloatType SinEqLine::secantX(const Vector2D& lower, const Vector2D& upper)
 
 
 
-FloatType SinEqLine::newtonX(const Vector2D& pos) const
+double SinEqLine::newtonX(const Vector2D& pos) const
 {
   return pos.x() - pos.y() / gradient(pos.x());
 }
@@ -225,12 +225,12 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
 
 
 
-FloatType SinEqLine::computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const
+double SinEqLine::computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const
 {
-  const FloatType& slope = getSlope();
-  FloatType extremumInFirstHalfPeriod = acos(slope);
+  const double& slope = getSlope();
+  double extremumInFirstHalfPeriod = acos(slope);
 
-  FloatType extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * PI - extremumInFirstHalfPeriod;
+  double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * PI - extremumInFirstHalfPeriod;
 
   Index iPeriod = getIPeriodFromIHalfPeriod(iHalfPeriod);
   return extremumInFirstPeriod + 2 * PI * iPeriod;

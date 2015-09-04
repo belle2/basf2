@@ -49,15 +49,15 @@ namespace Belle2 {
       GeneralizedCircle();
 
       /// Constructor with the four parameters of the generalized circle
-      GeneralizedCircle(const FloatType& n0,
-                        const FloatType& n1,
-                        const FloatType& n2,
-                        const FloatType& n3 = 0);
+      GeneralizedCircle(const double& n0,
+                        const double& n1,
+                        const double& n2,
+                        const double& n3 = 0);
 
       /// Constructor with the four parameters of the generalized circle
-      GeneralizedCircle(const FloatType& n0,
+      GeneralizedCircle(const double& n0,
                         const Vector2D& n12,
-                        const FloatType& n3 = 0);
+                        const double& n3 = 0);
 
       /// Constructor from a two dimensional line
       explicit GeneralizedCircle(const Line2D& n012);
@@ -74,24 +74,24 @@ namespace Belle2 {
       mathematical positiv counterclockwise.
       */
       static GeneralizedCircle fromCenterAndRadius(const Vector2D& center,
-                                                   const FloatType& absRadius,
+                                                   const double& absRadius,
                                                    const CCWInfo& orientation = CCW);
 
       /**
       Constructor of a generalized circle from perigee parameters.
       Tangential at perigee given as two dimensional vector.
       */
-      static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
+      static GeneralizedCircle fromPerigeeParameters(const double& curvature,
                                                      const Vector2D& tangential,
-                                                     const FloatType& impact);
+                                                     const double& impact);
 
       /**
       Constructor of a generalized circle from perigee parameters.
       Tangential at perigee given as azimuth angle.
       */
-      static GeneralizedCircle fromPerigeeParameters(const FloatType& curvature,
-                                                     const FloatType& tangentialPhi,
-                                                     const FloatType& impact);
+      static GeneralizedCircle fromPerigeeParameters(const double& curvature,
+                                                     const double& tangentialPhi,
+                                                     const double& impact);
 
     protected:
       /**
@@ -99,7 +99,7 @@ namespace Belle2 {
       Makes _no_ normalization after setting.
       Use is discouraged.
       */
-      inline void setN0(const FloatType& n0)
+      inline void setN0(const double& n0)
       { m_n0 = n0; }
 
       /**
@@ -107,7 +107,7 @@ namespace Belle2 {
       Makes _no_ normalization after setting.
       Use is discouraged.
       */
-      inline void setN1(const FloatType& n1)
+      inline void setN1(const double& n1)
       { m_n12.setX(n1); }
 
       /**
@@ -115,7 +115,7 @@ namespace Belle2 {
       Makes _no_ normalization after setting.
       Use is discouraged.
       */
-      inline void setN2(const FloatType& n2)
+      inline void setN2(const double& n2)
       { m_n12.setY(n2); }
 
       /**
@@ -123,7 +123,7 @@ namespace Belle2 {
       Makes _no_ normalization after setting.
       Use is discouraged.
       */
-      inline void setN12(const FloatType& n1, const FloatType& n2)
+      inline void setN12(const double& n1, const double& n2)
       { m_n12.setXY(n1, n2); }
 
       /**
@@ -139,25 +139,25 @@ namespace Belle2 {
       Makes _no_ normalization after setting.
       Use is discouraged.
       */
-      inline void setN3(const FloatType& n3)
+      inline void setN3(const double& n3)
       { m_n3 = n3; }
 
 
     public:
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
-                              const FloatType& absRadius,
+                              const double& absRadius,
                               const CCWInfo& orientation = CCW);
 
       /// Setter for the perigee parameters
-      void setPerigeeParameters(const FloatType& curvature,
+      void setPerigeeParameters(const double& curvature,
                                 const Vector2D& tangential,
-                                const FloatType& impact);
+                                const double& impact);
 
       /// Setter for the perigee parameters
-      inline void setPerigeeParameters(const FloatType& curvature,
-                                       const FloatType& tangentialPhi,
-                                       const FloatType& impact)
+      inline void setPerigeeParameters(const double& curvature,
+                                       const double& tangentialPhi,
+                                       const double& impact)
       { setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact); }
 
       /**
@@ -165,10 +165,10 @@ namespace Belle2 {
       Makes a normalization after setting.
       The normal representation of a line leave out the last parameter.
       */
-      void setN(const FloatType& n0,
-                const FloatType& n1,
-                const FloatType& n2,
-                const FloatType& n3 = 0.0)
+      void setN(const double& n0,
+                const double& n1,
+                const double& n2,
+                const double& n3 = 0.0)
       { setN0(n0); setN12(n1, n2); setN3(n3); normalize(); }
 
       /**
@@ -176,9 +176,9 @@ namespace Belle2 {
       Makes a normalization after setting.
       The normal representation of a line leave out the last parameter.
       */
-      void setN(const FloatType& n0,
+      void setN(const double& n0,
                 const Vector2D& n12,
-                const FloatType& n3 = 0.0)
+                const double& n3 = 0.0)
       { setN0(n0); setN12(n12); setN3(n3); normalize(); }
 
       /// Setter for all four circle parameters from another circle
@@ -224,27 +224,27 @@ namespace Belle2 {
       */
       inline void normalize()
       {
-        FloatType normalization_squared = normalizationSquared();
+        double normalization_squared = normalizationSquared();
         if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
       }
 
     private:
       /// Scales the circle parameters by a common factor.
-      inline void scaleN(const FloatType& factor)
+      inline void scaleN(const double& factor)
       { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
 
 
     public:
       /// Getter for the first circle parameter
-      inline const FloatType& n0() const
+      inline const double& n0() const
       { return m_n0; }
 
       /// Getter for the second circle parameter
-      inline const FloatType& n1() const
+      inline const double& n1() const
       { return m_n12.x(); }
 
       /// Getter for the third circle parameter
-      inline const FloatType& n2() const
+      inline const double& n2() const
       { return m_n12.y(); }
 
       /// Getter for the second and third circle parameter which natuarally from a vector
@@ -252,7 +252,7 @@ namespace Belle2 {
       { return m_n12; }
 
       /// Getter for the fourth circle parameter
-      inline const FloatType& n3() const
+      inline const double& n3() const
       { return m_n3; }
 
     public:
@@ -268,7 +268,7 @@ namespace Belle2 {
       Calculates the generalized circle specific squared norm.
       Correctly normalized this should give one.
        */
-      inline FloatType normalizationSquared() const
+      inline double normalizationSquared() const
       { return n12().normSquared() - 4 * n0() * n3(); }
 
 
@@ -375,7 +375,7 @@ namespace Belle2 {
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
       std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D>
-      sameCylindricalR(const FloatType& cylindricalR) const;
+      sameCylindricalR(const double& cylindricalR) const;
 
       /**
       Approach with the same cylindrical radius on the circle to the point.
@@ -402,7 +402,7 @@ namespace Belle2 {
          @return Close point in forward direction with same cylindrical radius on the circle.
        */
       Vector2D sameCylindricalRForwardOf(const Vector2D& startPoint,
-                                         const FloatType& cylindricalR) const;
+                                         const double& cylindricalR) const;
 
       /**
          Approximate distance.
@@ -412,39 +412,39 @@ namespace Belle2 {
          The sign of the fast distance indicates if the point is to the right or to the left of the
          circle.
        */
-      inline FloatType fastDistance(const Vector2D& point) const
+      inline double fastDistance(const Vector2D& point) const
       { return n0() + point.dot(n12()) + point.normSquared() * n3(); }
 
       /// Approximate distance to the origin
-      inline FloatType fastImpact() const
+      inline double fastImpact() const
       { return n0(); }
 
       /**
       Gives the proper distance of the point to the circle line
           retaining the sign of the fast distance.
        */
-      FloatType distance(const Vector2D& point) const;
+      double distance(const Vector2D& point) const;
 
       /**
       Helper function to translate the fast linearized distance measure
           of the generalized circle to the proper distance from the circle
           retaining the sign of the distance.
        */
-      FloatType distance(const FloatType& fastDistance) const;
+      double distance(const double& fastDistance) const;
 
       /**
       Helper function to translate the proper distance to the linearized distance measure of
       the generalized circle retaining the sign of the distance.
        */
-      FloatType fastDistance(const FloatType& distance) const
+      double fastDistance(const double& distance) const
       { return (distance * n3() + 1.0) * distance; }
 
       /// Gives the signed distance of the origin to the circle
-      inline FloatType impact() const
+      inline double impact() const
       { return distance(fastImpact()); }
 
       /// Getter for the absolute distance to the z axes at the support point
-      FloatType d0() const
+      double d0() const
       { return -impact(); }
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
@@ -452,19 +452,19 @@ namespace Belle2 {
       { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
       /// Gives to azimuth angle phi of the direction of flight at the perigee
-      inline FloatType tangentialPhi() const
+      inline double tangentialPhi() const
       { return tangential().phi(); }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
-      inline FloatType minimalCylindricalR() const
+      inline double minimalCylindricalR() const
       { return std::fabs(impact()); }
 
       /// Gives the maximal cylindrical radius the circle reaches
-      inline FloatType maximalCylindricalR() const
+      inline double maximalCylindricalR() const
       { return std::fabs(impact() + 2 * radius()); }
 
       /// Gives the proper absolute distance of the point to the circle line.
-      inline FloatType absDistance(const Vector2D& point) const
+      inline double absDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
 
       /**
@@ -491,22 +491,22 @@ namespace Belle2 {
       { return n3() != 0.0; }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline FloatType radius() const
+      inline double radius() const
       { return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline FloatType absRadius() const
+      inline double absRadius() const
       { return fabs(radius()); }
 
       /// Gives the signed curvature of the generalized circle
-      inline FloatType curvature() const
+      inline double curvature() const
       { return 2 * n3(); }
 
       /**
       Gives the omega parameter as used by the framework helix.
       It is the signed curvature of the generalized circle with the opposite sign.
       */
-      inline FloatType omega() const
+      inline double omega() const
       { return -curvature(); }
 
       /// Gives the center of the circle. If it was a line both components will be infinity
@@ -514,7 +514,7 @@ namespace Belle2 {
       { return n12().divided(-2 * n3()); }
 
       /// Gives the perimeter of the circle.
-      inline FloatType perimeter() const
+      inline double perimeter() const
       { return 2 * PI * radius(); }
 
       /**
@@ -532,7 +532,7 @@ namespace Belle2 {
          before we take the opening angle as seen from the circle center.
          The angle will zero if the generalized circle was line.
        */
-      inline FloatType openingAngleBetween(const Vector2D& from, const Vector2D& to) const
+      inline double openingAngleBetween(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
 
 
@@ -545,16 +545,16 @@ namespace Belle2 {
          before we take the length on the curve.
          For the line case the length is the distance component parallel to the line.
        */
-      FloatType arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
+      double arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
 
       /// Calculates the arc length between the perigee and the given point.
-      FloatType arcLengthTo(const Vector2D& point) const;
+      double arcLengthTo(const Vector2D& point) const;
 
       /** Calculates the two dimensional arc length till the cylindrical radius is reached
        *  If the radius can not be reached return NAN.
        *  Note that there are two solutions which have equivalent arc lengths with different sign
        *  Always return the positive solution. */
-      FloatType arcLengthToCylindricalR(const FloatType& cylindricalR) const;
+      double arcLengthToCylindricalR(const double& cylindricalR) const;
 
       /**
       Helper function the calculate the factor between the length of a secant line and
@@ -564,7 +564,7 @@ namespace Belle2 {
       It enables better handling of the line limit compared to the former implementaiton
       which used the opening angle of the arc.
        */
-      FloatType arcLengthFactor(const FloatType& directDistance) const
+      double arcLengthFactor(const double& directDistance) const
       { return arcLengthFactor(directDistance, curvature()); }
 
       /**
@@ -575,7 +575,7 @@ namespace Belle2 {
       It enables better handling of the line limit compared to the former implementaiton
       which used the opening angle of the arc.
        */
-      static FloatType arcLengthFactor(const FloatType& directDistance, const FloatType& curvature);
+      static double arcLengthFactor(const double& directDistance, const double& curvature);
 
       /**
       Calculates the two points common to both circles.
@@ -589,7 +589,7 @@ namespace Belle2 {
       Calculates the point, which lies at the give perpendicular travel distance
       (counted from the perigee)
       */
-      Vector2D atArcLength(const FloatType& arcLength) const;
+      Vector2D atArcLength(const double& arcLength) const;
 
 
     public:
@@ -610,13 +610,13 @@ namespace Belle2 {
       // Order of this parameters make them easier to initialize
 
       /// Memory for the fourth parameter
-      FloatType m_n3;
+      double m_n3;
 
       /// Memory for the second and third parameter
       Vector2D m_n12;
 
       /// Memory for the first parameter
-      FloatType m_n0;
+      double m_n0;
 
     }; //class
 

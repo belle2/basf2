@@ -49,21 +49,21 @@ namespace Belle2 {
         m_lineSZ(Line2D::fromSlopeIntercept(parameters(iTanL), parameters(iZ0)))
       {;}
 
-      Helix(const FloatType& curvature,
-            const FloatType& tangentialPhi,
-            const FloatType& impact,
-            const FloatType& tanLambda,
-            const FloatType& z0) :
+      Helix(const double& curvature,
+            const double& tangentialPhi,
+            const double& impact,
+            const double& tanLambda,
+            const double& z0) :
         m_circleXY(curvature, tangentialPhi, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
 
 
-      Helix(const FloatType& curvature,
+      Helix(const double& curvature,
             const Vector2D& tangential,
-            const FloatType& impact,
-            const FloatType& tanLambda,
-            const FloatType& z0) :
+            const double& impact,
+            const double& tanLambda,
+            const double& z0) :
         m_circleXY(curvature, tangential, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
       {;}
@@ -96,40 +96,40 @@ namespace Belle2 {
 
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
-      FloatType arcLength2DToClosest(const Vector3D& point) const;
+      double arcLength2DToClosest(const Vector3D& point) const;
 
       /** Calculates the two dimensional arc length that is closest to two dimensional point
        *  in the xy projection.
        *  Always gives a solution in the first half period in the positive or negative direction
        */
-      FloatType arcLength2DToXY(const Vector2D& point) const
+      double arcLength2DToXY(const Vector2D& point) const
       { return circleXY().arcLengthTo(point); }
 
       /** Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
        *  Returns NAN if the radius cannot be reached.*/
-      FloatType arcLength2DToCylindricalR(const FloatType& cylindricalR) const
+      double arcLength2DToCylindricalR(const double& cylindricalR) const
       { return circleXY().arcLengthToCylindricalR(cylindricalR); }
 
       /// Calculates the point of closest approach on the helix to the given point.
       Vector3D closest(const Vector3D& point) const
       {
-        FloatType arcLength2D = arcLength2DToClosest(point);
+        double arcLength2D = arcLength2DToClosest(point);
         return atArcLength2D(arcLength2D);
       }
 
       /// Calculates the distance of the point to the point of closest approach on the helix.
-      FloatType distance(const Vector3D& point) const
+      double distance(const Vector3D& point) const
       { return point.distance(closest(point));}
 
-      //FloatType lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
+      //double lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
 
       /** Moves the coordinates system by the given vector. Updates support point in place.
        *  @return arcLength2D that has to be traversed to the new origin
        */
-      FloatType passiveMoveBy(const Vector3D& by)
+      double passiveMoveBy(const Vector3D& by)
       {
         // First keep the necessary shift of the perpendicular travel distance to the new support point.
-        FloatType byS = circleXY().arcLengthTo(by.xy());
+        double byS = circleXY().arcLengthTo(by.xy());
         m_circleXY.passiveMoveBy(by.xy());
         Vector2D bySZ(byS, by.z());
         m_lineSZ.passiveMoveBy(bySZ);
@@ -141,44 +141,44 @@ namespace Belle2 {
       TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaZ0(const FloatType& tanLambdaShift, const FloatType& zShift)
+      void shiftTanLambdaZ0(const double& tanLambdaShift, const double& zShift)
       {
-        FloatType z0 = m_lineSZ.intercept();
-        FloatType tanLambda = m_lineSZ.slope();
+        double z0 = m_lineSZ.intercept();
+        double tanLambda = m_lineSZ.slope();
         m_lineSZ.setSlopeIntercept(tanLambda + tanLambdaShift, z0 + zShift);
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector3D atArcLength2D(const FloatType& s) const
+      Vector3D atArcLength2D(const double& s) const
       { return Vector3D(circleXY().atArcLength(s), lineSZ().map(s)); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector3D atZ(const FloatType& z) const
+      Vector3D atZ(const double& z) const
       { return Vector3D(xyAtZ(z), z); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector2D xyAtZ(const FloatType& z) const
+      Vector2D xyAtZ(const double& z) const
       { return Vector2D(circleXY().atArcLength(lineSZ().inverseMap(z))); }
 
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
-      inline FloatType minimalCylindricalR() const
+      inline double minimalCylindricalR() const
       { return circleXY().minimalCylindricalR(); }
 
       /// Gives the maximal cylindrical radius the circle reaches
-      inline FloatType maximalCylindricalR() const
+      inline double maximalCylindricalR() const
       { return circleXY().maximalCylindricalR(); }
 
       /// Getter for the signed curvature in the xy projection.
-      inline const FloatType& curvatureXY() const
+      inline const double& curvatureXY() const
       { return circleXY().curvature(); }
 
       /// Getter for the signed distance to the z axes at the support point.
-      FloatType impactXY() const
+      double impactXY() const
       { return circleXY().impact(); }
 
       /// Getter for the signed distance to the z axes at the support point
-      FloatType d0() const
+      double d0() const
       { return circleXY().d0(); }
 
       /// Getter for the perigee point in the xy projection.
@@ -193,27 +193,27 @@ namespace Belle2 {
       { return Vector3D(perigeeXY(), z0()); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
-      FloatType tanLambda() const
+      double tanLambda() const
       { return m_lineSZ.slope(); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
-      FloatType cotTheta() const
+      double cotTheta() const
       { return tanLambda(); }
 
       /// Getter for z coordinate at the support point of the helix.
-      FloatType z0() const
+      double z0() const
       { return m_lineSZ.intercept(); }
 
       /// Getter for the distance in z at which the two points on the helix coincide in the xy projection
-      FloatType zPeriod() const
+      double zPeriod() const
       { return lineSZ().map(perimeterXY()); }
 
       /// Getter for the perimeter of the circle in the xy projection
-      FloatType perimeterXY() const
+      double perimeterXY() const
       { return circleXY().perimeter(); }
 
       /// Getter for the radius of the circle in the xy projection
-      FloatType radiusXY() const
+      double radiusXY() const
       { return circleXY().radius(); }
 
       /// Getter for the unit three dimensional tangential vector at the support point of the helix.
@@ -229,11 +229,11 @@ namespace Belle2 {
       { return circleXY().tangential(); }
 
       /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
-      const FloatType& tangentialPhi() const
+      const double& tangentialPhi() const
       { return circleXY().tangentialPhi(); }
 
       /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
-      const  FloatType& phi0() const
+      const  double& phi0() const
       { return tangentialPhi(); }
 
       /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h

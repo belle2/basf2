@@ -63,17 +63,17 @@ namespace Belle2 {
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory3D(const Vector3D& startPoint,
                       const Vector3D& startMomentum,
-                      const FloatType& charge);
+                      const double& charge);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       /// Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
       CDCTrajectory3D(const Vector3D& startPoint,
                       const Vector3D& startMomentum,
-                      const FloatType& charge,
-                      const FloatType& bZ);
+                      const double& charge,
+                      const double& bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
-      CDCTrajectory3D(const MCParticle& mcParticle, const FloatType& bZ);
+      CDCTrajectory3D(const MCParticle& mcParticle, const double& bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       explicit CDCTrajectory3D(const MCParticle& mcParticle);
@@ -86,7 +86,7 @@ namespace Belle2 {
       explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
-      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const FloatType& bZ);
+      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double& bZ);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
@@ -108,7 +108,7 @@ namespace Belle2 {
     public:
 
       /// Copies the trajectory information to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand, const FloatType& bZ) const;
+      bool fillInto(genfit::TrackCand& trackCand, const double& bZ) const;
 
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
@@ -120,15 +120,15 @@ namespace Belle2 {
       { return getGlobalCircle().perigee(); }
 
       /// Getter for the maximal distance from the origin
-      FloatType getMaximalCylindricalR() const
+      double getMaximalCylindricalR() const
       { return  getGlobalCircle().maximalCylindricalR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
-      FloatType getMinimalCylindricalR() const
+      double getMinimalCylindricalR() const
       { return  getGlobalCircle().minimalCylindricalR(); }
 
       /// Getter for the signed impact parameter of the trajectory
-      FloatType getGlobalImpact() const
+      double getGlobalImpact() const
       { return  getGlobalCircle().impact(); }
 
 
@@ -151,7 +151,7 @@ namespace Belle2 {
        *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
-      FloatType calcArcLength2D(const Vector3D& point) const
+      double calcArcLength2D(const Vector3D& point) const
       { return getLocalHelix().circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
 
 
@@ -161,13 +161,13 @@ namespace Belle2 {
       //{ return getLocalCircle().tangential(point - getLocalOrigin().xy()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
-      FloatType getAbsMom3D(const FloatType& bZ) const;
+      double getAbsMom3D(const double& bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
-      FloatType getAbsMom3D() const;
+      double getAbsMom3D() const;
 
       /// Get the momentum at the start point of the trajectory
-      inline Vector3D getMom3DAtSupport(const FloatType& bZ) const
+      inline Vector3D getMom3DAtSupport(const double& bZ) const
       { return  getUnitMom3DAtSupport() *= getAbsMom3D(bZ);  }
 
       /// Get the momentum at the start point of the trajectory
@@ -185,7 +185,7 @@ namespace Belle2 {
 
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const FloatType& charge);
+      void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const double& charge);
 
       /// Clears all information from this trajectoy
       void clear()
@@ -196,25 +196,25 @@ namespace Belle2 {
 
     public:
       /// Getter for the slope of z over the transverse travel distance s.
-      FloatType getTanLambda() const
+      double getTanLambda() const
       { return getLocalHelix().tanLambda(); }
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaIntercept(const FloatType& tanLambdaShift, const FloatType& zShift)
+      void shiftTanLambdaIntercept(const double& tanLambdaShift, const double& zShift)
       { m_localHelix.shiftTanLambdaZ0(tanLambdaShift, zShift); }
 
 
 
       /// Getter for the curvature as seen from the xy projection.
-      FloatType getCurvatureXY() const
+      double getCurvatureXY() const
       { return getLocalHelix().curvatureXY(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
-      FloatType getLocalCovariance(HelixParameterIndex iRow, HelixParameterIndex iCol) const
+      double getLocalCovariance(HelixParameterIndex iRow, HelixParameterIndex iCol) const
       { return getLocalHelix().covariance(iRow, iCol); }
 
       /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
-      FloatType getLocalVariance(HelixParameterIndex i) const
+      double getLocalVariance(HelixParameterIndex i) const
       { return getLocalHelix().variance(i); }
 
 
@@ -234,15 +234,15 @@ namespace Belle2 {
       { return getLocalHelix().uncertainCircleXY(); }
 
       ///  Getter for p-value
-      FloatType getPValue() const
+      double getPValue() const
       { return TMath::Prob(getChi2(), getNDF()); }
 
       /// Getter for the chi2 value of the fit
-      FloatType getChi2() const
+      double getChi2() const
       { return getLocalHelix().chi2(); }
 
       /// Setter for the chi square value of the helix fit
-      void setChi2(const FloatType& chi2)
+      void setChi2(const double& chi2)
       { return m_localHelix.setChi2(chi2); }
 
       /// Getter for the number of degrees of freedom of the helix fit.

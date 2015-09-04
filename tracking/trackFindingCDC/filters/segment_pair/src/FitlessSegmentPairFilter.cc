@@ -28,6 +28,6 @@ CellWeight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPai
   const CDCRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
-  FloatType weight = startSegment.size() + endSegment.size();
+  double weight = startSegment.size() + endSegment.size();
   return Super::operator()(segmentPair) * weight;
 }

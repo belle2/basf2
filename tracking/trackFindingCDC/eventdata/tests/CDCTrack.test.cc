@@ -20,7 +20,7 @@ TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
   CDCWireHit wireHit(WireID(0, 0, 0), 0.01);
   CDCRLWireHit rlWireHit(&wireHit, RIGHT);
 
-  FloatType perpS = 0;
+  double perpS = 0;
   CDCRecoHit3D recoHit3D(&rlWireHit, wireHit.getRefPos3D(), perpS);
 
   CDCTrack track;

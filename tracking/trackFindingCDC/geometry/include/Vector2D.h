@@ -37,7 +37,7 @@ namespace Belle2 {
       explicit Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) { ; }
 
       /// Constructor from two coordinates
-      Vector2D(const FloatType& x, const FloatType& y)  : m_x(x), m_y(y) { ; }
+      Vector2D(const double& x, const double& y)  : m_x(x), m_y(y) { ; }
 
       /**
        * Constructs a vector from a unit coordinate system vector and the coordinates in that system.
@@ -45,8 +45,8 @@ namespace Belle2 {
        * See compose() for details.
        */
       Vector2D(const Vector2D& coordinateVec,
-               const FloatType& parallelCoor,
-               const FloatType& orthoCoor) :
+               const double& parallelCoor,
+               const double& orthoCoor) :
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
         m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
 
@@ -60,7 +60,7 @@ namespace Belle2 {
 
 
       /// Constucts a unit vector with azimuth angle equal to phi
-      static inline Vector2D Phi(const FloatType& phi)
+      static inline Vector2D Phi(const double& phi)
       { return isNAN(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
@@ -69,8 +69,8 @@ namespace Belle2 {
        *  to a vector in laboratory coordinates. The coordinate system vector \n
        *  is assumed the unit of the coordinate system */
       static inline Vector2D compose(const Vector2D& coordinateVec,
-                                     const FloatType& parallelCoor,
-                                     const FloatType& orthoCoor)
+                                     const double& parallelCoor,
+                                     const double& orthoCoor)
       { return Vector2D(coordinateVec , parallelCoor , orthoCoor); }
 
 
@@ -148,15 +148,15 @@ namespace Belle2 {
       { output << "Vector2D(" << vector.x() << "," << vector.y() << ")"; return output; }
 
       /// Calculates the two dimensional dot product.
-      inline FloatType dot(const Vector2D& rhs) const { return x() * rhs.x() + y() * rhs.y(); }
+      inline double dot(const Vector2D& rhs) const { return x() * rhs.x() + y() * rhs.y(); }
       /// Calculated the two dimensional cross product.
-      inline FloatType cross(const Vector2D& rhs)const { return x() * rhs.y() - y() * rhs.x(); }
+      inline double cross(const Vector2D& rhs)const { return x() * rhs.y() - y() * rhs.x(); }
 
       /// Calculates \f$ x^2 + y^2 \f$ .
-      inline FloatType normSquared() const { return x() * x() + y() * y(); }
+      inline double normSquared() const { return x() * x() + y() * y(); }
 
       /// Calculates the length of the vector.
-      inline FloatType norm() const { return hypot(x(), y()); }
+      inline double norm() const { return hypot(x(), y()); }
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs
@@ -165,43 +165,43 @@ namespace Belle2 {
        */
       ///@{
       ///Cosine of the angle between this and rhs
-      inline FloatType cosWith(const Vector2D& rhs) const { return dot(rhs) / (norm() * rhs.norm());  }
+      inline double cosWith(const Vector2D& rhs) const { return dot(rhs) / (norm() * rhs.norm());  }
       ///Sine of the angle between this and rhs
-      inline FloatType sinWith(const Vector2D& rhs) const { return cross(rhs) / (norm() * rhs.norm());  }
+      inline double sinWith(const Vector2D& rhs) const { return cross(rhs) / (norm() * rhs.norm());  }
       ///The angle between this and rhs
-      inline FloatType angleWith(const Vector2D& rhs) const { return atan2(sinWith(rhs), cosWith(rhs)); }
+      inline double angleWith(const Vector2D& rhs) const { return atan2(sinWith(rhs), cosWith(rhs)); }
       ///@}
 
       /// Calculates the distance of this point to the rhs
-      inline FloatType distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
+      inline double distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
       {
-        FloatType deltaX = x() - rhs.x();
-        FloatType deltaY = y() - rhs.y();
+        double deltaX = x() - rhs.x();
+        double deltaY = y() - rhs.y();
         return hypot(deltaX, deltaY);
       }
 
       /// Scales the vector in place by the given factor
-      inline Vector2D& scale(const FloatType& factor) { m_x *= factor; m_y *= factor; return *this; }
+      inline Vector2D& scale(const double& factor) { m_x *= factor; m_y *= factor; return *this; }
       /// Same as scale()
-      inline Vector2D& operator*=(const FloatType& factor) { return scale(factor); }
+      inline Vector2D& operator*=(const double& factor) { return scale(factor); }
 
       /// Returns a scaled copy of the vector
-      inline Vector2D scaled(const FloatType& factor) const { return Vector2D(x() * factor, y() * factor); }
+      inline Vector2D scaled(const double& factor) const { return Vector2D(x() * factor, y() * factor); }
 
       /// Same as scaled()
-      inline friend Vector2D operator*(const Vector2D& vec2D, const FloatType& factor)
+      inline friend Vector2D operator*(const Vector2D& vec2D, const double& factor)
       { return vec2D.scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
-      inline Vector2D& divide(const FloatType& denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
+      inline Vector2D& divide(const double& denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
 
       /// Same as divide()
-      inline Vector2D& operator/=(const FloatType& denominator) { return divide(denominator); }
+      inline Vector2D& operator/=(const double& denominator) { return divide(denominator); }
 
       /// Returns a copy where all coordinates got divided by a common denominator
-      inline Vector2D divided(const FloatType& denominator) const { return Vector2D(x() / denominator, y() / denominator); }
+      inline Vector2D divided(const double& denominator) const { return Vector2D(x() / denominator, y() / denominator); }
       /// Same as divided()
-      inline Vector2D operator/(const FloatType& denominator) const { return divided(denominator); }
+      inline Vector2D operator/(const double& denominator) const { return divided(denominator); }
 
       /// Adds a vector to this in place
       inline Vector2D& add(const Vector2D& rhs) { m_x += rhs.x();  m_y += rhs.y(); return *this; }
@@ -223,14 +223,14 @@ namespace Belle2 {
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline FloatType normalize()
-      { FloatType originalLength = norm(); if (originalLength != 0.0) divide(originalLength); return originalLength; }
+      inline double normalize()
+      { double originalLength = norm(); if (originalLength != 0.0) divide(originalLength); return originalLength; }
 
       /// Normalizes the vector to the given length
       /** Normalizes the vector to the given length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline FloatType normalizeTo(const FloatType& toLength)
-      { FloatType originalLength = norm(); if (originalLength != 0.0) scale(toLength / originalLength); return originalLength; }
+      inline double normalizeTo(const double& toLength)
+      { double originalLength = norm(); if (originalLength != 0.0) scale(toLength / originalLength); return originalLength; }
 
       /// Returns a unit vector colaligned with this
       inline Vector2D unit() const
@@ -285,7 +285,7 @@ namespace Belle2 {
       { return Vector2D(x() - rhs.x(), y() - rhs.y()); }
 
       /// Calculates the component parallel to the given vector
-      inline FloatType parallelComp(const Vector2D& relativTo) const
+      inline double parallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this) / relativTo.norm(); }
 
       /// Calculates the part of this vector that is parallel to the given vector
@@ -295,12 +295,12 @@ namespace Belle2 {
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType unnormalizedParallelComp(const Vector2D& relativTo) const
+      inline double unnormalizedParallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this); }
 
       /// Calculates the component orthogonal to the given vector
       /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
-      inline FloatType orthogonalComp(const Vector2D& relativTo) const
+      inline double orthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this) / relativTo.norm(); }
 
       /// Calculates the part of this vector that is parallel to the given vector
@@ -310,7 +310,7 @@ namespace Belle2 {
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline FloatType unnormalizedOrthogonalComp(const Vector2D& relativTo) const
+      inline double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this); }
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of this vector.
@@ -374,15 +374,15 @@ namespace Belle2 {
         // Check whether this transformation is orientation conserving
         // If yes this vector must lie in the first quadrant to be between lower and upper
         // If no it must lie in some other quadrant.
-        FloatType det = lower.cross(upper);
+        double det = lower.cross(upper);
         if (det == 0) {
           // lower and upper are coaligned
           return isRightOf(lower) and isLeftOf(upper);
         } else {
           bool flipsOrientation = det < 0;
 
-          FloatType transformedX = cross(upper);
-          FloatType transformedY = -cross(lower);
+          double transformedX = cross(upper);
+          double transformedY = -cross(lower);
           bool inFirstQuadrant = sameSign(det, transformedX, transformedY);
 
           return inFirstQuadrant xor flipsOrientation;
@@ -393,14 +393,14 @@ namespace Belle2 {
       inline void swapCoordinates() { std::swap(m_x, m_y); }
 
       /// Gives the cylindrical radius of the vector. Same as norm()
-      inline FloatType cylindricalR() const { return hypot(x(), y()); }
+      inline double cylindricalR() const { return hypot(x(), y()); }
 
       /// Set the cylindrical radius while keeping the azimuth angle phi the same
-      inline void setCylindricalR(const FloatType& cylindricalR)
+      inline void setCylindricalR(const double& cylindricalR)
       { scale(cylindricalR / norm()); }
 
       /// Gives the azimuth angle being the angle to the x axes ( range -PI to PI )
-      inline FloatType phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
+      inline double phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
 
 
@@ -420,39 +420,39 @@ namespace Belle2 {
 
 
       /// Getter for the x coordinate
-      inline const FloatType& x() const { return m_x; }
+      inline const double& x() const { return m_x; }
       /// Setter for the x coordinate
-      inline void setX(const FloatType& x) { m_x = x; }
+      inline void setX(const double& x) { m_x = x; }
       /// Getter for the y coordinate
-      inline const FloatType& y() const { return m_y; }
+      inline const double& y() const { return m_y; }
       /// Setter for the y coordinate
-      inline void setY(const FloatType& y) { m_y = y; }
+      inline void setY(const double& y) { m_y = y; }
 
       /// Setter for both coordinate
-      inline void setXY(const FloatType& x, const FloatType& y) { setX(x); setY(y); }
+      inline void setXY(const double& x, const double& y) { setX(x); setY(y); }
       /// Setter for both coordinate by an other vector
       inline void setXY(const Vector2D& xy) { m_x = xy.x(); m_y = xy.y(); }
 
       /// Getter for the first coordinate
-      inline const FloatType& first() const { return m_x; }
+      inline const double& first() const { return m_x; }
       /// Setter for the first coordinate
-      inline void setFirst(const FloatType& first) { m_x = first; }
+      inline void setFirst(const double& first) { m_x = first; }
       /// Getter for the second coordinate
-      inline const FloatType& second() const { return m_y; }
+      inline const double& second() const { return m_y; }
       /// Setter for the second coordinate
-      inline void setSecond(const FloatType& second) { m_y = second; }
+      inline void setSecond(const double& second) { m_y = second; }
 
       /// Setter for both  coordinate
-      inline void set(const FloatType& first, const FloatType& second) { setX(first); setY(second); }
+      inline void set(const double& first, const double& second) { setX(first); setY(second); }
       /// Setter for both coordinate by an other vector
       inline void set(const Vector2D& both) { m_x = both.x(); m_y = both.y(); }
 
     private:
       /// Memory for the first coordinate
-      FloatType m_x;
+      double m_x;
 
       /// Memory for the second coordinate
-      FloatType m_y;
+      double m_y;
 
     }; // class
 

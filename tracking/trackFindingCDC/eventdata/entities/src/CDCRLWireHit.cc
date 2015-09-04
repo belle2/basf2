@@ -21,7 +21,7 @@ using namespace TrackFindingCDC;
 CDCRLWireHit::CDCRLWireHit() :
   m_wirehit(nullptr),
   m_rlInfo(LEFT)
-{;}
+{}
 
 
 CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
@@ -29,14 +29,12 @@ CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
   m_wirehit(wirehit),
   m_rlInfo(rlInfo)
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
+  B2ASSERT("Recohit with nullptr as wire hit", wirehit != nullptr);
 }
 
 CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
                                       const CDCSimHit& simhit)
 {
-  if (wirehit == nullptr) B2WARNING("Recohit with nullptr as wire hit");
-
   // find out if the wire is right or left of the track ( view in flight direction )
   Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
   Vector3D directionOfFlight{simhit.getMomentum()};

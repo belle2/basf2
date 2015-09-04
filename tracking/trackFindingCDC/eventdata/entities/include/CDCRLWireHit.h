@@ -19,7 +19,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** Class representing an oriented hit wire including a hypotheses
-     *  whether the causing track passes left or right
+     *  whether the causing track passes left or right.
+     *  More than one CDCRLWireHit can point to one CDCWireHit.
+     *  For more information see @sa CDCWireHit.
      */
     class CDCRLWireHit {
     public:
@@ -27,34 +29,33 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCRLWireHit();
 
-      /// Constructs an oriented wire hit
-      /** Constructs an oriented wire hit
-       *  @param wireHit the wire hit the oriented hit is assoziated with.
-       *  @param rlInfo the right left passage information the _wire_ relativ to the track */
+      /** Constructs an oriented wire hit.
+       *  @param wireHit the wire hit the oriented hit is associated with.
+       *  @param rlInfo the right left passage information of the _wire_ relative to the track */
       CDCRLWireHit(const CDCWireHit* wireHit, RightLeftInfo rlInfo = 0);
 
-      /// Constructs an oriented wire hit from a sim hit and the assoziated wirehit.
-      /** This translates the sim hit to an oriented wire hit mainly to be able to compare the \n
-       *  reconstructed values from the algorithm with the Monte Carlo information. \n
-       *  It merely evalutates, if the true trajectory passes right or left of the wire. */
+      /// Constructs an oriented wire hit from a CDCSimHit and the associated wirehit.
+      /** This translates the sim hit to an oriented wire hit mainly to be able to compare the
+       *  reconstructed values from the algorithm with the Monte Carlo information.
+       *  It merely evaluates, if the true trajectory passes right or left of the wire. */
       static CDCRLWireHit fromSimHit(const CDCWireHit* wirehit, const CDCSimHit& simhit);
 
       /// Returns the oriented wire hit with the opposite right left information.
       const CDCRLWireHit* reversed() const;
 
     public:
-      /// Equality comparision based on wire hit, left right passage information.
-      bool operator==(const CDCRLWireHit& other) const
-      { return getWireHit() == other.getWireHit() and getRLInfo() == other.getRLInfo(); }
+      /// Equality comparison based on wire hit, left right passage information.
+      bool operator==(const CDCRLWireHit& rhs) const
+      { return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo(); }
 
       /** Total ordering relation based on
        *  wire hit and left right passage information in this order of importance.
        */
-      bool operator<(const CDCRLWireHit& other) const
+      bool operator<(const CDCRLWireHit& rhs) const
       {
-        return getWireHit() <  other.getWireHit() or (
-                 getWireHit() == other.getWireHit() and (
-                   getRLInfo() < other.getRLInfo()));
+        return getWireHit() <  rhs.getWireHit() or (
+                 getWireHit() == rhs.getWireHit() and (
+                   getRLInfo() < rhs.getRLInfo()));
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
@@ -62,6 +63,7 @@ namespace Belle2 {
       { return rlWireHit.getWire() < wire; }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
+      // Same as above but the other way round.
       friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
       { return wire < rlWireHit.getWire(); }
 
@@ -74,14 +76,16 @@ namespace Belle2 {
       /** Defines wire hits and oriented wire hits to be coaligned on the wire hit
        * on which they are based.
        */
+      // Same as above but the other way round.
       friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
       { return wireHit < rlWireHit.getWireHit(); }
 
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference
        *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object. \n
+       *  So this function defines the -> operator for the object.
        *  No matter you have a pointer or an object access is given with '->'
+       *  The object is effectively equal to a pointer to itself.
        */
       const CDCRLWireHit* operator->() const
       { return this; }
@@ -96,11 +100,11 @@ namespace Belle2 {
 
 
 
-      /// Getter for the wire the oriented hit assoziated to.
+      /// Getter for the wire the oriented hit associated to.
       const CDCWire& getWire() const
       { return getWireHit().getWire(); }
 
-      /// Checks if the oriented hit is assoziated with the give wire
+      /// Checks if the oriented hit is associated with the give wire
       bool hasWire(const CDCWire& wire) const
       { return getWire() == wire; }
 
@@ -130,11 +134,11 @@ namespace Belle2 {
 
 
 
-      /// Getter for the wire hit assoziated with the oriented hit.
+      /// Getter for the wire hit associated with the oriented hit.
       const CDCWireHit& getWireHit() const
       { return *m_wirehit; }
 
-      /// Checks if the oriented hit is assoziated with the give wire hit
+      /// Checks if the oriented hit is associated with the give wire hit
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return getWireHit() == wirehit; }
 
@@ -170,7 +174,7 @@ namespace Belle2 {
        *  This method makes a distinct difference between axial and stereo hits:
        *  * Stereo hits are moved out of the reference plane such that the
        *    oriented drift circle meets the trajectory in one point. Therefore the
-       *    left right passage hypothese has to be taken into account
+       *    left right passage hypothesis has to be taken into account
        *  * For axial hits the reconstructed position is ambiguous in the z coordinate.
        *    Also the drift circle cannot moved such that it would meet the
        *    trajectory. Hence we default to the result of reconstruct2D, which

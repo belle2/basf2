@@ -29,48 +29,49 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Particle trajectory as it is seen in xy projection
+    /// Particle trajectory as it is seen in xy projection represented as a circle.
     class CDCTrajectory2D  {
 
     public:
       /// Default constructor for ROOT compatibility.
       CDCTrajectory2D() :
         m_localOrigin(),
-        m_localPerigeeCircle() {;}
+        m_localPerigeeCircle() {}
 
       /// Constructs a trajectory from a generalized circle.
-      /** Constructs a trajectory which is described by the given circle \n
-       *  The start point is set to the closest approach to the origin */
+      /** Constructs a trajectory which is described by the given line or circle.
+       *  The start point is set to the closest approach to the origin. */
       explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle) :
         m_localOrigin(0.0, 0.0),
         m_localPerigeeCircle(perigeeCircle)
-      {;}
+      {}
 
-      /// Constructs a trajectory from a generalized circle and a start point
-      /** Constructs a trajectory which is described by the given circle and \n
-       *  starts in the given point. To point is taken to the closest appoach \n
-       *  on the circle. */
+      /// Constructs a trajectory from a generalized circle and a start point.
+      /** Constructs a trajectory which is described by the given line or circle and
+       *  starts in the given point. The point is taken to be the closest approach
+       *  to the circle. */
       CDCTrajectory2D(
         const Vector2D& localOrigin,
         const UncertainPerigeeCircle& localPerigeeCircle
       ) :
         m_localOrigin(localOrigin),
         m_localPerigeeCircle(localPerigeeCircle)
-      {;}
+      {}
 
-      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      /** Construct a trajectory with given start point, transverse momentum at the start point, the given charge and the
+       *  magnetic field value in z direction. */
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
                       const double charge,
                       const double bZ);
 
-      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      /// Construct a trajectory with given start point, transverse momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
                       const Vector2D& startMomentum,
                       const double charge);
 
     public:
-      /// Checks if the circle is already set to a valid value
+      /// Checks if the circle is already set to a valid value.
       bool isFitted() const
       { return not getLocalCircle().isNull(); }
 
@@ -112,7 +113,7 @@ namespace Belle2 {
       Vector2D getClosest(const Vector2D& point) const
       { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
-      /// Calculates the close point with the same cylindricalR on the trajectory to the given point
+      /// Calculates the closest point with the same cylindricalR on the trajectory to the given point
       /** This returns the point where the trajectory reaches as certain distance from the origin \n
        *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
        *  specific wire layer. */
@@ -142,7 +143,7 @@ namespace Belle2 {
        */
       Vector2D getExit() const;
 
-      /// Calculates the distance from point the trajectory as seen from the xy projection
+      /// Calculates the distance from the point to the trajectory as seen from the xy projection.
       double getDist2D(const Vector2D& point) const
       {  return getLocalCircle().distance(point - getLocalOrigin()); }
 
@@ -202,7 +203,8 @@ namespace Belle2 {
       ISuperLayerType getMinimalISuperLayer() const;
 
     public:
-      /// Calculates the perpendicular travel distance from the last position of the fromHits to the first position of the toHits.
+      /** Calculates the perpendicular travel distance from the last position of the fromHits
+        * to the first position of the toHits. */
       template<class FromHits, class ToHits>
       double getArcLength2DGap(const FromHits& fromHits, const ToHits& toHits) const
       {
@@ -212,7 +214,9 @@ namespace Belle2 {
       }
 
 
-      /// Calculates the perpendicular travel distance from the first position of the fromHits to the first position of the toHits.
+      /** Calculates the perpendicular travel distance from the first position
+       * of the fromHits to the first position of the toHits.
+       */
       template<class FromHits, class ToHits>
       double getArcLength2DFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
       {
@@ -221,7 +225,9 @@ namespace Belle2 {
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
-      /// Calculates the perpendicular travel distance from the last position of the fromHits to the last position of the toHits.
+      /** Calculates the perpendicular travel distance from the last position
+       *  of the fromHits to the last position of the toHits.
+       */
       template<class FromHits, class ToHits>
       double getArcLength2DBackOffset(const FromHits& fromHits, const ToHits& toHits) const
       {

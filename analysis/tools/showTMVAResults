@@ -31,4 +31,4 @@ then
 fi
 
 #set TMVASYS to avoid some (noncritical) errors
-TMVASYS="$ROOTSYS" root -l "$BELLE2_EXTERNALS_DIR/share/root/tmva/TMVAGui.C(\"$FILE\")"
+TMVASYS="$ROOTSYS" root -e "TMVA::TMVAGui(\"$FILE\")"

@@ -700,12 +700,14 @@ namespace Belle2 {
                                                               (format("eclBarrelCrystalLogical_%1%") % iCry).str(), 0, 0, 0);
         crystalLogical->SetSensitiveDetector(m_sensitive);
         new G4PVPlacement(0, noMove, crystalLogical, (format("eclBarrelCrystalPhysical_%1%") % iCry).str(),
-                          foilLogical, false, iCry, overlaps);
+                          foilLogical, false, 72 + 9 * (iCry - 1), overlaps);
 
         G4Transform3D BrR = TrSectorInverse * G4RotateZ3D(0.0) * Tr;
         G4Transform3D BrRR = TrSectorInverse * G4RotateZ3D(-2.488555 * CLHEP::deg) * Tr; // replace 2.494688
-        new G4PVPlacement(BrR,  foilLogical, (format("eclBarrelFoilPhysical_%1%") % iCry).str(), crystalSectorLogical, false, 0, overlaps);
-        new G4PVPlacement(BrRR, foilLogical, (format("eclBarrelFoilPhysical_%1%") % iCry).str(), crystalSectorLogical, false, 1, overlaps);
+        new G4PVPlacement(BrR,  foilLogical, (format("eclBarrelFoilPhysical_0_%1%") % iCry).str(), crystalSectorLogical, false, 0,
+                          overlaps);
+        new G4PVPlacement(BrRR, foilLogical, (format("eclBarrelFoilPhysical_1_%1%") % iCry).str(), crystalSectorLogical, false, 1,
+                          overlaps);
 
         if (isBeamBkgStudy) {
           int diodeId = (iCry - 1) * k_barNPhiSegs + 1152;
@@ -1185,7 +1187,7 @@ namespace Belle2 {
           crystalLogical->SetSensitiveDetector(m_sensitive);
 
           new G4PVPlacement(0, noMove, crystalLogical, (format("eclFwdCrystalPhysical_%1%") % iCry).str(),
-                            foilLogical, false, iCry, overlaps);
+                            foilLogical, false, (iCry - 1), overlaps);
           new G4PVPlacement(Tr, foilLogical, (format("eclFwdFoilPhysical_%1%") % iCry).str(), crystalSectorLogical, false, 0, overlaps);
 
         } // End of Pentagon
@@ -1206,7 +1208,7 @@ namespace Belle2 {
           crystalLogical->SetSensitiveDetector(m_sensitive);
 
           new G4PVPlacement(0, noMove, crystalLogical, (format("eclFwdCrystalPhysical_%1%") % iCry).str(),
-                            foilLogical, false, iCry, overlaps);
+                            foilLogical, false, (iCry - 1), overlaps);
           new G4PVPlacement(Tr, foilLogical, (format("eclFwdFoilPhysical_%1%") % iCry).str(), crystalSectorLogical, false, 0, overlaps);
 
         } // End of Trapezoids
@@ -1474,7 +1476,7 @@ namespace Belle2 {
                                                               (format("eclBwdCrystalLogical_%1%") % iCry).str(), 0, 0, 0);
         crystalLogical->SetSensitiveDetector(m_sensitive);
         new G4PVPlacement(0, noMove, crystalLogical, (format("eclBwdCrystalPhysical_%1%") % iCry).str(),
-                          foilLogical, false, iCry, overlaps);
+                          foilLogical, false, (1152 + 6624) / 16 + (iCry - 73), overlaps);
         new G4PVPlacement(Tr, foilLogical, (format("eclBwdFoilPhysical_%1%") % iCry).str(),
                           crystalSectorLogical, false, 0, overlaps);
 

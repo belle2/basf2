@@ -41,7 +41,7 @@ gROOT.ProcessLine('struct EventData {\
     float cluster_charge;\
     float cluster_seedCharge;\
     float cluster_size;\
-    float cluster_eta;\
+    float cluster_interstripPosition;\
     float cluster_pull;\
     float truehit_position;\
     float truehit_deposEnergy;\
@@ -114,7 +114,7 @@ class SVDValidationTTree(Module):
                 self.data.cluster_charge = cluster.getCharge()
                 self.data.cluster_seedCharge = cluster.getSeedCharge()
                 self.data.cluster_size = cluster.getSize()
-                # Eta calculations
+                # Interstrip position calculations
                 if cluster.isUCluster():
                     strip_dir = 0
                     strip_pitch = sensorInfo.getUPitch(cluster.getPosition())
@@ -123,8 +123,8 @@ class SVDValidationTTree(Module):
                     strip_pitch = sensorInfo.getVPitch(cluster.getPosition())
                 self.data.strip_dir = strip_dir
                 self.data.strip_pitch = strip_pitch
-                cluster_eta = cluster.getPosition() % strip_pitch / strip_pitch
-                self.data.cluster_eta = cluster_eta
+                cluster_interstripPosition = cluster.getPosition() % strip_pitch / strip_pitch
+                self.data.cluster_interstripPosition = cluster_interstripPosition
                 # theta and phi definitions
                 if cluster.isUCluster():
                     uPos = cluster.getPosition()

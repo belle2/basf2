@@ -76,7 +76,7 @@ void SVDValidation()
 
 //------------------------------------------------------------------  
   // Histograms declarations
-  TH1F *hValidEta[nLayers][nTypes][nSides]; 
+  TH1F *hValidInterstripPos[nLayers][nTypes][nSides]; 
   TH1F *hValidClusterSize[nLayers][nTypes][nSides]; 
   TH1F *hValidPull[nLayers][nTypes][nSides]; 
   TH1F *hValidClusterCharge[nLayers][nTypes][nSides];
@@ -92,50 +92,50 @@ void SVDValidation()
 //********************************PLOTS********************************
   
 //---------------------------------------------------------------------
-// Clusters: Eta plots 
+// Clusters: InterstripPos plots 
    
-  int etaBins = 50;
-  float minEta = 0;
-  float maxEta = 1;
+  int InterstripPosBins = 50;
+  float minInterstripPos = 0;
+  float maxInterstripPos = 1;
 
   for (int layer=layerMin; layer<=layerMax; layer++) { // loop on layers  
       int layerIndex = layerToIndex(layer);
       // build canvas name
-      TString canvasName(Form("cValidEtaDistributionLayer%d", layer));
-      TString canvasTitle(Form("Eta Distributions, Layer %d", layer));
-      TCanvas *cValidEtaDist;
-      cValidEtaDist = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
-      cValidEtaDist->Divide(2,2);
-      cValidEtaDist->Draw();
+      TString canvasName(Form("cValidInterstripPosDistributionLayer%d", layer));
+      TString canvasTitle(Form("Interstrip Position Distributions, Layer %d", layer));
+      TCanvas *cValidInterstripPosDist;
+      cValidInterstripPosDist = new TCanvas(canvasName,canvasTitle,canvasWidth,canvasHeight);
+      cValidInterstripPosDist->Divide(2,2);
+      cValidInterstripPosDist->Draw();
       int k=0;	    
       for (int m=1; m>=0; m--) { // loop over types
           for (int i=0; i<=1; i++) { //loop over sides
-              TString histoTitle(Form("Validation: Eta, layer %d, %s, %s side", layer,Type[m],Side[i]));
-              TString histoName(Form("hValidEta%s_Layer%d_%s",Side[i], layer,Type[m]));
+              TString histoTitle(Form("Validation: InterstripPos, layer %d, %s, %s side", layer,Type[m],Side[i]));
+              TString histoName(Form("hValidInterstripPos%s_Layer%d_%s",Side[i], layer,Type[m]));
               k=k+1;
-              cValidEtaDist->cd(k);
+              cValidInterstripPosDist->cd(k);
               if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
               // build histogram
-              hValidEta[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minEta,maxEta);
+              hValidInterstripPos[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minInterstripPos,maxInterstripPos);
               // set axes labels
-              hValidEta[layerIndex][m][i]->GetXaxis()->SetTitle("Eta");
-              hValidEta[layerIndex][m][i]->GetYaxis()->SetTitle("counts");
+              hValidInterstripPos[layerIndex][m][i]->GetXaxis()->SetTitle("InterstripPos");
+              hValidInterstripPos[layerIndex][m][i]->GetYaxis()->SetTitle("counts");
               // draw histograms
               TString expr(Form("cluster_eta>>%s",histoName.Data()));
               TString cond(Form("layer==%d&&strip_dir==%d&&sensor_type==%d", layer, i, m)); 
 
       	      tree->Draw(expr,cond);
 
-              hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
-                      TNamed("Description", "Validation: Eta = (cluster_pos %% pitch / pitch) distributions"));
-              hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
-                      TNamed("Check", "In ideal world should be a uniform distribution"));
-              hValidEta[layerIndex][m][i]->GetListOfFunctions()->Add(new
+              hValidInterstripPos[layerIndex][m][i]->GetListOfFunctions()->Add(new
+                      TNamed("Description", "Validation: InterstripPos = (cluster_pos %% pitch / pitch) distributions"));
+              hValidInterstripPos[layerIndex][m][i]->GetListOfFunctions()->Add(new
+                      TNamed("Check", ""));
+              hValidInterstripPos[layerIndex][m][i]->GetListOfFunctions()->Add(new
                       TNamed("Contact", "G.Caria, gcaria@student.unimelb.edu.au"));
-              hValidEta[layerIndex][m][i]->Write(histoName);
+              hValidInterstripPos[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
-         cValidEtaDist->Write(canvasName);
+         cValidInterstripPosDist->Write(canvasName);
   } // layers loop ends
 
 //---------------------------------------------------------------------

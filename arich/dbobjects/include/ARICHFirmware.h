@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Return comment
      * @return comment
      */
-    std::string getFirmwareComment();
+    std::string getFirmwareComment() const {return m_comment; }
 
     /** Set comment
      * @param comment
@@ -59,7 +59,7 @@ namespace Belle2 {
     /** Return FPGA bitfile
      * @return FPGA bitfile
      */
-    std::string getFPGA();
+    std::string getFPGA() const {return m_firmware; }
 
     /** Set FPGA bitfile
      * @param FPGA bitfile

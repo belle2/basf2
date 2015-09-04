@@ -25,14 +25,15 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHFEBoardInfo(): m_id(0), m_timeStamp(0, 0, 0, kTRUE, 0) {};
+    ARICHFEBoardInfo(): m_id(0), m_asicInfo(), m_timeStamp(0, 0, 0, kTRUE, 0) {};
 
     /**
      * Constructor
      */
-    ARICHFEBoardInfo(int id, TTimeStamp timeStamp)
+    ARICHFEBoardInfo(int id, ARICHAsicInfo* asicInfo, TTimeStamp timeStamp)
     {
       m_id = id;
+      m_asicInfo = asicInfo;
       m_timeStamp = timeStamp;
     }
 

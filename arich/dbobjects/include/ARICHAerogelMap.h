@@ -53,12 +53,12 @@ namespace Belle2 {
     /** Return Aerogel Identifier
      * @return Aerogel Identifier
      */
-    std::string getAerogelID();
+    std::string getAerogelID() const {return m_id; }
 
     /** Set Aerogel Identifier
      * @param Aerogel Identifier
      */
-    void setAerogelIdentifier(const std::string& agelid) {m_id = agelid; }
+    void setAerogelID(const std::string& agelid) {m_id = agelid; }
 
     /**
       * Return Aerogel Ring Identifier
@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Return comment
      * @return comment
      */
-    std::string getAerogelMapComment();
+    std::string getAerogelMapComment() const {return m_comment; }
 
     /** Set comment
      * @param comment

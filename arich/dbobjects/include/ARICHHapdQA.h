@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #include <TObject.h>
-#include <TH1F.h>
+#include <TH1S.h>
 #include <TH2F.h>
 #include <framework/logging/Logger.h>
 #include <TTimeStamp.h>
@@ -26,39 +26,42 @@ namespace Belle2 {
   public:
 
     /**
-     * Various constants
-     */
-    enum {c_NumOfChips = 4,      /**< number of HAPD Chips on the sensor */
-          c_NumOfChannels = 144, /**< number of channels on the sensors */
-          c_Measurement = 3,      /**< number of measurements */
-          c_Voltage = 2,          /**< measurements at 2 different voltages */
-         };
-
-    /**
      * Default constructor
      */
     ARICHHapdQA(): m_hitData2D(NULL)
     {
-      for (unsigned i = 0; i < c_Measurement; i++) {
-        for (unsigned j = 0; j < c_NumOfChips; j++) {
-          m_leakCurrent[i][j] = NULL;
-        }
-      }
-      m_noise = {};
-      m_hitCount = {};
+      m_leakCurrent.clear();
+      m_noise.clear();
+      m_hitCount.clear();
     };
 
-    ARICHHapdQA(TGraph** * leakCurrent, TH2F* hitData2D, std::vector<TGraph*> noise, std::vector<TH1F*> hitCount)
+    /**
+     * Constructor
+     */
+
+    ARICHHapdQA(std::string serial, TTimeStamp measurementDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
+                std::vector<TGraph*> noise, std::vector<TH1S*> hitCount)
     {
-      for (unsigned i = 0; i < c_Measurement; i++) {
-        for (unsigned j = 0; j < c_NumOfChips; j++) {
-          m_leakCurrent[i][j] = leakCurrent[i][j];
-        }
-      }
+      m_serial = serial;
+      m_measurementDate = measurementDate;
+      m_leakCurrent = leakCurrent;
       m_hitData2D = hitData2D;
       m_noise = noise;
       m_hitCount = hitCount;
     };
+
+    /**
+     * Constructor
+     */
+
+    ARICHHapdQA(std::vector<TGraph*> leakCurrent, TH2F* hitData2D, std::vector<TGraph*> noise, std::vector<TH1S*> hitCount)
+    {
+      m_leakCurrent = leakCurrent;
+      m_hitData2D = hitData2D;
+      m_noise = noise;
+      m_hitCount = hitCount;
+    };
+
 
     /**
      * Destructor
@@ -91,13 +94,16 @@ namespace Belle2 {
      * Return Leakeage Current as a function of bias voltage
      * @return chip gain
      */
-    TGraph* getHapdLeakCurrent(unsigned int j, unsigned int i) { if (j < c_Measurement && i < c_NumOfChips) return m_leakCurrent[j][i]; else return NULL;}
+    TGraph* getHapdLeakCurrent(unsigned int i) const { if (i < m_leakCurrent.size()) return m_leakCurrent[i]; else return NULL;}
 
     /**
      * set Leakeage Current as a function of bias voltage
      * @param current Leakeage current
      */
-    void setHapdLeakCurrent(unsigned int j, unsigned int i,  TGraph* leakCurrent) { if (j < c_Measurement && i < c_NumOfChips) m_leakCurrent[j][i] = leakCurrent; }
+    void setHapdLeakCurrent(std::vector<TGraph*> leakCurrent)
+    {
+      for (unsigned int i = 0; i < leakCurrent.size(); i++) m_leakCurrent.push_back(leakCurrent[i]);
+    }
 
     /**
      * Return 2D hit data
@@ -115,7 +121,7 @@ namespace Belle2 {
      * Return Noise level vs. bias voltage for each channel
      * @return noise level
      */
-    TGraph* getHapdNoise(unsigned int i) { if (i < m_noise.size()) return m_noise[i]; else return NULL;}
+    TGraph* getHapdNoise(unsigned int i) const { if (i < m_noise.size()) return m_noise[i]; else return NULL;}
 
     /**
      * set Noise level vs. bias voltage for each channel
@@ -130,13 +136,13 @@ namespace Belle2 {
      * Return Hit count vs. threshold
      * @return Hit count vs. threshold
      */
-    TH1F* getHapdHitCount(unsigned int i) { if (i < m_hitCount.size()) return m_hitCount[i]; else return NULL;}
+    TH1S* getHapdHitCount(unsigned int i) const { if (i < m_hitCount.size()) return m_hitCount[i]; else return NULL;}
 
     /**
      * set Hit count vs. threshold
      * @param Hit count vs. threshold
      */
-    void setHapdHitCount(std::vector<TH1F*> hitCount)
+    void setHapdHitCount(std::vector<TH1S*> hitCount)
     {
       for (unsigned int i = 0; i < hitCount.size(); i++)  m_hitCount.push_back(hitCount[i]);
     }
@@ -144,29 +150,23 @@ namespace Belle2 {
     /** Return comment
      * @return comment
      */
-    std::string getHapdComment();
+    std::string getHapdComment() const {return m_comment; }
 
     /** Set comment
      * @param comment
      */
-    void setHapdComment();
+    void setHapdComment(const std::string& comment) {m_comment = comment; }
 
 
   private:
-    std::string m_serial;                                /**< serial number of the sensor */
-    TTimeStamp m_measurementDate;                        /**< date of measurement */
-    TGraph* m_leakCurrent[c_Measurement][c_NumOfChips];  /**< Leakege Current as a function of bias voltage */
-    TH2F* m_hitData2D;                                   /**< 2D hit data */
-    std::vector<TGraph*> m_noise;                        /**< Noise level vs. bias voltage for each channel */
-    std::vector<TH1F*> m_hitCount;                       /**< Hit count vs. threshold for sampling 5 channels/chip at 2 voltages */
-    std::string m_comment;                               /**< Optional comment */
+    std::string m_serial;                 /**< serial number of the sensor */
+    TTimeStamp m_measurementDate;         /**< date of measurement */
+    std::vector<TGraph*> m_leakCurrent;   /**< Leakege Current as a function of bias voltage */
+    TH2F* m_hitData2D;                    /**< 2D hit data */
+    std::vector<TGraph*> m_noise;         /**< Noise level vs. bias voltage for each channel */
+    std::vector<TH1S*> m_hitCount;        /**< Hit count vs. threshold for sampling 5 channels/chip at 2 voltages */
+    std::string m_comment;                /**< Optional comment */
 
     ClassDef(ARICHHapdQA, 1);  /**< ClassDef */
   };
 } // end namespace Belle2
-
-
-
-
-
-

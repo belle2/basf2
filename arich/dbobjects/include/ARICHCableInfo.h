@@ -46,35 +46,35 @@ namespace Belle2 {
      */
     int getCableID() const {return m_id; }
 
-    /** Return Cable Type
-     * @return Cable Type
-     */
-    int getCableType() const {return m_type; }
-
-    /** Return Cable Type
-     * @return Cable Type
-     */
-    float getCableLength() const {return m_length; }
-
-    /** Return comment
-     * @return comment
-     */
-    std::string getCableComment();
-
     /** Set Cable Identifier
      * @param Cable Identifier
      */
     void setCableID(int id) {m_id = id; }
+
+    /** Return Cable Type
+     * @return Cable Type
+     */
+    int getCableType() const {return m_type; }
 
     /** Set Cable Type
      * @param Cable Type
      */
     void setCableType(int type) {m_type = type; }
 
+    /** Return Cable Type
+     * @return Cable Type
+     */
+    float getCableLength() const {return m_length; }
+
     /** Set Cable Length
      * @param Cable Length
      */
     void setCableLength(double length) {m_length = length; }
+
+    /** Return comment
+     * @return comment
+     */
+    std::string getCableComment() const {return m_comment; }
 
     /** Set comment
      * @param comment

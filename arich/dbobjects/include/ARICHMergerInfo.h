@@ -43,33 +43,33 @@ namespace Belle2 {
      */
     int getMergerID() const {return m_id; }
 
-    /** Get Merger Type
-     * @return Merger Type
-     */
-    int getMergerType() const {return m_type; }
-
-    /** Get comment
-     * @return comment
-     */
-    std::string getMergerComment();
-
     /** Set Merger Identifier
      * @param Merger Identifier
      */
     void setMergerID(int id) {m_id = id; }
+
+    /** Get Merger Type
+     * @return Merger Type
+     */
+    int getMergerType() const {return m_type; }
 
     /** Set Merger Type
      * @param Merger Type
      */
     void setMergerType(int type) {m_type = type; }
 
+    /** Get comment
+     * @return comment
+     */
+    std::string getMergerComment() const {return m_comment; }
+
     /** Set comment
      * @param comment
      */
-    void setMergerComment();
+    void setMergerComment(const std::string& comment) {m_comment = comment; }
 
   private:
-    int m_id;             /**< Merger Identifier */
+    int m_id;               /**< Merger Identifier */
     int m_type;             /**< Merger Type */
     std::string m_comment;  /**< Optional comment */
 

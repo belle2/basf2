@@ -88,12 +88,12 @@ namespace Belle2 {
     /** Get comment
      * @return comment
      */
-    std::string getSensorModuleComment();
+    std::string getSensorModuleComment() const {return m_comment; }
 
     /** Set comment
      * @param comment
      */
-    void setSensorModuleComment();
+    void setSensorModuleComment(const std::string& comment) {m_comment = comment; }
 
   private:
     int m_id;                    /**< Sensor Module identifier */

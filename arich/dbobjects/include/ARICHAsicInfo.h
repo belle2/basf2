@@ -24,17 +24,20 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAsicInfo(): m_timeStamp(0, 0, 0, kTRUE, 0), m_quality(0)
-    {
-    };
+    ARICHAsicInfo(): m_id(""), m_timeStamp(0, 0, 0, kTRUE, 0), m_quality(0), m_deadChannel(), m_cutChannel(), m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHAsicInfo(TTimeStamp timeStamp, int quality)
+    ARICHAsicInfo(std::string id, TTimeStamp timeStamp, int quality, std::vector<std::string> deadChannel,
+                  std::vector<std::string> cutChannel, std::string comment)
     {
+      m_id = id;
       m_timeStamp = timeStamp;
       m_quality = quality;
+      m_deadChannel = deadChannel;
+      m_cutChannel = cutChannel;
+      m_comment = comment;
     }
 
     /**
@@ -45,12 +48,12 @@ namespace Belle2 {
     /** Return Asic Identifier
      * @return Asic Identifier
      */
-    std::string getAsicID();
+    std::string getAsicID() const {return m_id; }
 
     /** Set Asic Identifier
      * @param Asic Identifier
      */
-    void setAsicID();
+    void setAsicID(const std::string& id) {m_id = id; }
 
     /** Return Test date
      * @return Test date
@@ -71,16 +74,6 @@ namespace Belle2 {
      * @param Quality of the chip
      */
     void setChipQuality(int quality) {m_quality = quality; }
-
-    /** Return Commment
-     * @return Commment
-     */
-    std::string getCommment();
-
-    /** Set Commment
-     * @param Commment
-     */
-    void setCommment();
 
     /**
      * Return a channel number from the list of dead channels
@@ -120,14 +113,24 @@ namespace Belle2 {
      */
     int getCutChannelsSize() const {return m_cutChannel.size();}
 
+    /** Return Commment
+     * @return Commment
+     */
+    std::string getComment() const {return m_comment; }
+
+    /** Set comment
+     * @param comment
+     */
+    void setComment(const std::string& comment) {m_comment = comment; }
+
 
   private:
     std::string m_id;        /**< Asic Identifier */
     TTimeStamp m_timeStamp;  /**< Test Date of the measurement */
     int m_quality;           /**< Quality class of the chip */
-    std::string m_comment;   /**< Comment */
     std::vector<std::string> m_deadChannel;   /**< List of dead channels on the ASIC chip */
     std::vector<std::string> m_cutChannel;    /**< List of cut channels on the ASIC chip */
+    std::string m_comment;   /**< Comment */
 
     ClassDef(ARICHAsicInfo, 1);  /**< ClassDef */
   };

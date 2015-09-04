@@ -32,11 +32,8 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAerogelInfo(): m_version(0.0), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0)
-    {
-      m_lambda = {};
-      m_transmittance = {};
-    };
+    ARICHAerogelInfo(): m_version(0.0), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0), m_lambda(),
+      m_transmittance() {};
 
     /**
      * Constructor
@@ -53,6 +50,9 @@ namespace Belle2 {
       m_transmittance = transmittance;
     }
 
+    /**
+     * Constructor
+     */
     ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness,
                      std::vector<int> lambda, std::vector<double> transmittance)
     {
@@ -80,20 +80,9 @@ namespace Belle2 {
     }
 
     /**
-     * Constructor
-     */
-    ARICHAerogelInfo(double refractiveIndex, double transmissionLength)
-    {
-      m_refractiveIndex = refractiveIndex;
-      m_transmissionLength = transmissionLength;
-    }
-
-    /**
      * Destructor
      */
     ~ARICHAerogelInfo() {};
-
-
 
     /** Return Aerogel Version
      * @return Aerogel Version
@@ -109,7 +98,7 @@ namespace Belle2 {
     /** Return Aerogel Serial number
      * @return Aerogel Serial number
      */
-    std::string getAerogelSerial();
+    std::string getAerogelSerial() const {return m_serial; };
 
     /** Set Aerogel Serial number
      * @param Aerogel Serial number
@@ -119,7 +108,7 @@ namespace Belle2 {
     /** Return Aerogel Identifier
      * @return Aerogel Identifier
      */
-    std::string getAerogelID();
+    std::string getAerogelID() const {return m_id; };
 
     /** Set Aerogel Identifier
      * @param Aerogel Identifier
@@ -150,7 +139,6 @@ namespace Belle2 {
     /** Return Aerogel Thickness
      * @return Aerogel Thickness
      */
-
     double getAerogelThickness() const {return m_thickness; }
 
     /** Set Aerogel Thickness
@@ -158,13 +146,10 @@ namespace Belle2 {
      */
     void setAerogelThickness(double thickness) {m_thickness = thickness; }
 
-
-
     /**
      * Return Aerogel Transmittance at lambda
      * @return Aerogel transmittance at lambda
      */
-
     double getAerogelTransmittanceElement(int lambda) const
     {
       if (lambda < c_lambdaMin || lambda > c_lambdaMax) {
@@ -193,9 +178,7 @@ namespace Belle2 {
      * Return Aerogel Transmittance
      * @return Aerogel transmittance
      */
-
     int getAerogelTransmittance(unsigned int i) const { if (i < m_transmittance.size()) return m_transmittance[i]; else return -1;}
-
 
     /**
      * Set Aerogel Transmittance
@@ -209,7 +192,7 @@ namespace Belle2 {
     /** Return comment
      * @return comment
      */
-    std::string getAerogelComment();
+    std::string getAerogelComment() const {return m_comment; }
 
     /** Set comment
      * @param comment
@@ -220,10 +203,9 @@ namespace Belle2 {
 
     double c_lambdaMin = 200.0;
     double c_lambdaMax = 700.0;
-    double c_lambdaStep = 20.0;
-    int c_lambdaPts = 26;
+    double c_lambdaStep = 10.0;
 
-    double m_version;                          /**< Aerogel version */
+    double m_version;                          /**< Aerogel data version (measurement number) */
     std::string m_serial;                      /**< Aerogel Serial number */
     std::string m_id;                          /**< Aerogel Identifier */
     double m_refractiveIndex;                  /**< Refractive Index of the aerogel */
@@ -237,8 +219,3 @@ namespace Belle2 {
     ClassDef(ARICHAerogelInfo, 2);  /**< ClassDef */
   };
 } // end namespace Belle2
-
-
-
-
-

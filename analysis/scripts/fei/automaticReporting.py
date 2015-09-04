@@ -616,7 +616,7 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
     table = b2latex.LongTable(columnspecs=r'lrcrr',
                               caption='Total CPU time spent in event() calls for each channel. Bars show ' +
                                       ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
-                                      ', in this order. Does not include I/O, initalisation, training, post-cuts etc.',
+                                      ', in this order. Does not include I/O, initialisation, training, post-cuts etc.',
                               head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
                               format_string=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
     for name, time, timePerModule, trueCandidates, allCandidates in statTable:

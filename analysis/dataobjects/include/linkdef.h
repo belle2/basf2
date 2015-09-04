@@ -18,6 +18,7 @@
 #pragma link C++ class vector<const Belle2::Particle*>-;
 
 #pragma link C++ class Belle2::ParticleExtraInfoMap+;
+#pragma link C++ class Belle2::ParticleExtraInfoMap::IndexMap+;
 #pragma link C++ class map<string, unsigned int>+;
 #pragma link C++ class vector<map<string, unsigned int> >+;
 

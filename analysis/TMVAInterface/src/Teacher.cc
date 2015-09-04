@@ -352,13 +352,11 @@ namespace Belle2 {
        * SAC sPlot anti-correlation training
        * The idea is to use the probabilities from the cdf training as boost weights
        * for another splot training, using only the orthogonal part of the data.
-       *
-       * At the moment this doesn't work sadly.
        */
-      /*
+
       // Perform splot training with __weight__cdf__
-      std::string signal_cdf_weight = "__weight__ * __weight__signal__cdf__ / __weight__background__pdf__";
-      std::string background_cdf_weight = "__weight__ * (1 - __weight__signal__cdf__) / __weight__background__pdf__";
+      std::string signal_cdf_weight = "__weight__ * __weight__signal__cdf__ / (__weight__background__pdf__ + 0.001 )";
+      std::string background_cdf_weight = "__weight__ * (1 - __weight__signal__cdf__) / (__weight__background__pdf__ + 0.001)";
 
       if (weight != "") {
         signal_cdf_weight += " * (" + weight + ")";
@@ -386,21 +384,16 @@ namespace Belle2 {
       unsigned int nEvents = splot.getSPlotWeights().size();
       std::vector<float> probability(nEvents);
       for (unsigned int i = 0; i < nEvents; ++i) {
-        probability[i] = expert->analyse(getRow(i));
+        probability[i] = expert->analyse(getRow(i)) * 0.99 + 0.005;
       }
       addVariable("__weight__probability__", probability);
 
       //SAC sPlot anti-correlation training
       // Michael's Formula?
-      std::string signal_sac_weight = "__weight__ *  __weight__splot__ / __weight__probability__ * __weight__cdf__";
-      std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) / (1 - __weight__probability__) * (1 - __weight__cdf__)";
-      // Naiv ansatz
-      //std::string signal_sac_weight = "__weight__ *  __weight__splot__ * __weight__probability__ / (1 - __weight__probability__)";
-      //std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) * __weight__probability__ / (1 - __weight__probability__)";
-      // Educated guess
-      //std::string signal_sac_weight = "__weight__ *  __weight__splot__ * __weight__probability__ * (1 - __weight__probability__) * 4";
-      //std::string background_sac_weight =
-      //  "__weight__ *  (1 - __weight__splot__) * __weight__probability__ * (1 - __weight__probability__) * 4";
+      std::string boost_weight =
+        "(__weight__signal__cdf__ / __weight__probability__ + (1.0 - __weight__signal__cdf__) / (1.0 - __weight__probability__)) / 2.0";
+      std::string signal_sac_weight = "__weight__ *  __weight__splot__ * " + boost_weight;
+      std::string background_sac_weight = "__weight__ *  (1 - __weight__splot__) * " + boost_weight;
 
       if (weight != "") {
         signal_sac_weight += " * (" + weight + ")";
@@ -412,7 +405,6 @@ namespace Belle2 {
       std::cerr << "Use following weight " << signal_sac_weight << " " << background_sac_weight << std::endl;
       train(factoryOption, prepareOption, "", signal_sac_weight, background_sac_weight);
 
-      */
       // Enable all branches
       // Otherwise the __weight__splot__ branch seems to be not available in the file.
       m_tree->get().SetBranchStatus("*", 1);

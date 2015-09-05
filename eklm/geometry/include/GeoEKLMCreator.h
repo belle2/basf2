@@ -552,6 +552,16 @@ namespace Belle2 {
       void createPlaneSolid(int n);
 
       /**
+       * Unify a group of solids.
+       * @param[in] solids  Solids.
+       * @param[in] transf  Transformations.
+       * @param[in] nSolids Number of solids.
+       * @param[in] name    First part of solid names.
+       */
+      G4UnionSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
+                                int nSolids, std::string name);
+
+      /**
        * Create plastic sheet solids.
        * @param[in] n Number of sector, from 0 to 4.
        */

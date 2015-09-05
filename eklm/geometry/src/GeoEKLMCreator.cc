@@ -1097,6 +1097,82 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   solids.plane[n] = subtractBoardSolids(ss4, n);
 }
 
+G4UnionSolid* EKLM::GeoEKLMCreator::
+unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
+            int nSolids, std::string name)
+{
+  G4UnionSolid** u;
+  G4UnionSolid* res;
+  G4VSolid** solidArray;
+  HepGeom::Transform3D* inverseTransf;
+  HepGeom::Transform3D t;
+  char str[128];
+  int n, nUnions, i, i1, i2, k, k1, k2, l, dl;
+  if (nSolids <= 1)
+    B2FATAL("Number of solids to be unified must be greater than 1.");
+  try {
+    inverseTransf = new HepGeom::Transform3D[nSolids];
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  for (i = 0; i < nSolids; i++)
+    inverseTransf[i] = transf[i].inverse();
+  n = nSolids;
+  nUnions = 0;
+  while (n > 1) {
+    if (n % 2 == 0)
+      n = n / 2;
+    else
+      n = n / 2 + 1;
+    nUnions = nUnions + n;
+  }
+  u = (G4UnionSolid**)malloc(sizeof(G4UnionSolid*) * nUnions);
+  if (u == NULL)
+    B2FATAL(MemErr);
+  n = nSolids;
+  i2 = 0;
+  solidArray = solids;
+  k1 = 0;
+  k2 = nSolids;
+  dl = 1;
+  while (n > 1) {
+    i1 = i2;
+    if (n % 2 == 0)
+      n = n / 2;
+    else
+      n = n / 2 + 1;
+    i2 = i1 + n;
+    k = k1;
+    l = 0;
+    for (i = i1; i < i2; i++) {
+      if (k != k2 - 1) {
+        /* Unify k and k + 1 -> i */
+        t = inverseTransf[l] * transf[l + dl];
+        try {
+          snprintf(str, 128, "_Union_%d", i + 1);
+          u[i] = new G4UnionSolid(name + str, solidArray[k],
+                                  solidArray[k + 1], t);
+        } catch (std::bad_alloc& ba) {
+          B2FATAL(MemErr);
+        }
+      } else {
+        /* Copy k -> i */
+        u[i] = (G4UnionSolid*)solids[k];
+      }
+      k = k + 2;
+      l = l + dl * 2;
+    }
+    solidArray = (G4VSolid**)u;
+    k1 = i1;
+    k2 = i2;
+    dl = dl * 2;
+  }
+  res = u[nUnions - 1];
+  free(u);
+  delete[] inverseTransf;
+  return res;
+}
+
 void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
 {
   int i;
@@ -1104,17 +1180,11 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
   double ly;
   char name[128];
   G4Box* b[15];
-  G4UnionSolid* u1[8];
-  G4UnionSolid* u2[4];
-  G4UnionSolid* u3[2];
-  HepGeom::Transform3D tl[15];
-  HepGeom::Transform3D tli[15];
-  HepGeom::Transform3D t;
+  HepGeom::Transform3D t[15];
   /* Transformations. */
   for (i = 0; i < 15; i++) {
     m = 15 * n + i;
-    getSheetTransform(&(tl[i]), m);
-    tli[i] = tl[i].inverse();
+    getSheetTransform(&(t[i]), m);
   }
   /* Sheet elements. */
   for (i = 0; i < 15; i++) {
@@ -1130,45 +1200,9 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
       B2FATAL(MemErr);
     }
   }
-  /* First level unions (7 * 2 + 1). */
-  for (i = 0; i < 7; i++) {
-    snprintf(name, 128, "PlasticSheet_%d_Union1_%d", n + 1, i + 1);
-    t = tli[2 * i] * tl[2 * i + 1];
-    try {
-      u1[i] = new G4UnionSolid(name, b[2 * i], b[2 * i + 1], t);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-  }
-  u1[7] = (G4UnionSolid*)b[14];
-  /* Second level unions (3 * 4 + 1 * 3). */
-  for (i = 0; i < 4; i++) {
-    snprintf(name, 128, "PlasticSheet_%d_Union2_%d", n + 1, i + 1);
-    t = tli[4 * i] * tl[4 * i + 2];
-    try {
-      u2[i] = new G4UnionSolid(name, u1[2 * i], u1[2 * i + 1], t);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-  }
-  /* Third level unions (1 * 8 + 1 * 7). */
-  for (i = 0; i < 2; i++) {
-    snprintf(name, 128, "PlasticSheet_%d_Union3_%d", n + 1, i + 1);
-    t = tli[8 * i] * tl[8 * i + 4];
-    try {
-      u3[i] = new G4UnionSolid(name, u2[2 * i], u2[2 * i + 1], t);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-  }
-  /* Plastic sheet. */
-  snprintf(name, 128, "PlasticSheet_%d", n + 1);
-  t = tli[0] * tl[8];
-  try {
-    solids.psheet[n] = new G4UnionSolid(name, u3[0], u3[1], t);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  /* Union. */
+  snprintf(name, 128, "PlasticSheet_%d_", n + 1);
+  solids.psheet[n] = unifySolids((G4VSolid**)b, t, 15, name);
 }
 
 void EKLM::GeoEKLMCreator::createSolids()

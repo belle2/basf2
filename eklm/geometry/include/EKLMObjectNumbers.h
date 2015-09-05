@@ -48,6 +48,19 @@ namespace Belle2 {
     int planeNumber(int endcap, int layer, int sector, int plane);
 
     /**
+     * Get segment number.
+     * @param[in] endcap  Endcap number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in] plane   Plane number.
+     * @param[in] segment Segment number.
+     * @return Number of strip.
+     * @details
+     * Number is from 1 to 5*2*4*14*2 = 1120.
+     */
+    int segmentNumber(int endcap, int layer, int sector, int plane, int strip);
+
+    /**
      * Get strip number.
      * @param[in] endcap Endcap number.
      * @param[in] layer  Layer number.

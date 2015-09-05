@@ -28,6 +28,12 @@ int EKLM::planeNumber(int endcap, int layer, int sector, int plane)
   return 2 * (4 * (14 * (endcap - 1) + (layer - 1)) + (sector - 1)) + plane;
 }
 
+int EKLM::segmentNumber(int endcap, int layer, int sector, int plane,
+                        int segment)
+{
+  return 5 * (2 * (4 * (14 * (endcap - 1) + (layer - 1)) +
+                   (sector - 1)) + (plane - 1)) + segment;
+}
 int EKLM::stripNumber(int endcap, int layer, int sector, int plane, int strip)
 {
   return 75 * (2 * (4 * (14 * (endcap - 1) + (layer - 1)) +

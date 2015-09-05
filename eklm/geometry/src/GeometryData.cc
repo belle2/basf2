@@ -9,7 +9,10 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMAlignment.h>
+#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -44,44 +47,44 @@ EKLM::GeometryData::~GeometryData()
     free(m_StripAllToLen);
 }
 
-int EKLM::GeometryData::save(const char* file)
-{
-  int res;
-  FILE* f;
-  /* Create file. */
-  f = fopen(file, "w");
-  if (f == NULL)
-    return -1;
-  /* Fill transformation data. */
-  EKLM::fillTransforms(&transf);
-  /* Write and close file. */
-  res = writeTransforms(f, &transf);
-  if (res != 0)
-    return res;
-  fclose(f);
-  return 0;
-}
-
-int EKLM::GeometryData::read(const char* file)
+void EKLM::GeometryData::read()
 {
   const char err[] = "Strip sorting algorithm error.";
-  int i, res;
+  int i, iEndcap, iLayer, iSector, iPlane, iSegment, segment;
+  int maxLayer[2];
   char str[32];
-  FILE* f;
   double l, solenoidZ, endcapZ, endcapLength;
   std::vector<double> strips;
   std::vector<double>::iterator it;
   std::map<double, int> mapLengthStrip;
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
-  /* Read transformations. */
-  f = fopen(file, "r");
-  if (f == NULL)
-    return -1;
-  res = readTransforms(f, &transf);
-  if (res != 0)
-    return res;
-  fclose(f);
+  EKLMAlignmentData* alignmentData;
+  EKLM::fillTransforms(&transf);
+  /* Read alignment data from the database and modify transformations. */
+  DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
+  if (alignment.isValid()) {
+    GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap");
+    maxLayer[0] = gd.getInt("nLayerForward");
+    maxLayer[1] = gd.getInt("nLayerBackward");
+    for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
+      for (iLayer = 1; iLayer <= maxLayer[iEndcap - 1]; iLayer++) {
+        for (iSector = 1; iSector <= 4; iSector++) {
+          for (iPlane = 1; iPlane <= 2; iPlane++) {
+            for (iSegment = 1; iSegment <= 5; iSegment++) {
+              segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                            iSegment);
+              alignmentData = alignment->getAlignmentData(segment);
+              if (alignmentData == NULL)
+                B2FATAL("Incomplete alignment data in the database.");
+            }
+          }
+        }
+      }
+    }
+  } else
+    B2INFO("Could not read alignment data from the database, "
+           "using default positions.");
   /* Read position data. */
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   solenoidZ = gd.getLength("SolenoidZ");
@@ -144,7 +147,6 @@ int EKLM::GeometryData::read(const char* file)
       B2FATAL(err);
     m_StripAllToLen[i] = itm->second;
   }
-  return 0;
 }
 
 double EKLM::GeometryData::getStripLength(int strip)

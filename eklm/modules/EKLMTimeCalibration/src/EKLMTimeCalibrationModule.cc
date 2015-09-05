@@ -93,8 +93,7 @@ void EKLMTimeCalibrationModule::Prepare()
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
-  if (m_geoDat.read() != 0)
-    B2FATAL("Cannot read geometry data file.");
+  m_geoDat.read();
   EKLM::transformsToGlobal(&m_geoDat.transf);
   m_outputFile = new TFile(m_dataOutputFileName.c_str(), "recreate");
   if (m_outputFile->IsZombie())

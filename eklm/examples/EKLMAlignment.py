@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Regeneration of EKLM alignment and transformation data.
+# Generates default EKLM alignment data (zero misalignemnts).
 
 import os
 import random
 from basf2 import *
+
+use_local_database('db/database.txt', '', LogLevel.WARNING)
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
@@ -18,8 +20,7 @@ eventinfosetter.param('evtNumList', [1])
 xmldata = register_module('Gearbox')
 
 # EKLM alignment
-eklmalign = register_module('EKLMAlignment')
-eklmalign.param('OutputFile', 'eklm_alignment.dat')
+eklmalignment = register_module('EKLMAlignment')
 
 # Create main path
 main = create_path()
@@ -27,7 +28,7 @@ main = create_path()
 # Add modules to main path
 main.add_module(eventinfosetter)
 main.add_module(xmldata)
-main.add_module(eklmalign)
+main.add_module(eklmalignment)
 
 # Run
 process(main)

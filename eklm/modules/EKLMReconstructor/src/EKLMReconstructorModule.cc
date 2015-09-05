@@ -34,8 +34,7 @@ void EKLMReconstructorModule::initialize()
   hit2ds.registerInDataStore();
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
-  if (m_geoDat.read() != 0)
-    B2FATAL("Cannot read geometry data file.");
+  m_geoDat.read();
   EKLM::transformsToGlobal(&m_geoDat.transf);
 }
 

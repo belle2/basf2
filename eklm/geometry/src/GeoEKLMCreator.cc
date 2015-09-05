@@ -54,8 +54,7 @@ void EKLM::GeoEKLMCreator::constructor(bool geo)
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
-    if (m_geoDat->read() != 0)
-      B2FATAL("Cannot read geometry data file.");
+    m_geoDat->read();
   }
 }
 

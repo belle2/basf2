@@ -39,8 +39,7 @@ void EKLMDigitizerModule::initialize()
 {
   StoreArray<EKLMSim2Hit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
-  if (m_geoDat.read() != 0)
-    B2FATAL("Cannot read geometry data file.");
+  m_geoDat.read();
   EKLM::transformsToGlobal(&m_geoDat.transf);
   EKLM::setDefDigitizationParams(&m_digPar);
 }

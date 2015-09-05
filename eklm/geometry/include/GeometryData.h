@@ -42,22 +42,9 @@ namespace Belle2 {
       ~GeometryData();
 
       /**
-       * Create geometry data and write it to file.
-       * @param[in] file  Name of file.
-       * @return 0    Successful.
-       * @return != 0 Error.
+       * Read geometry data.
        */
-      int save(const char* file);
-
-      /**
-       * Read geometry data from file.
-       * @param[in] file  Name of file.
-       * @return 0    Successful.
-       * @return != 0 Error.
-       */
-      int read(
-        const char* file =
-          FileSystem::findFile("/data/eklm/eklm_alignment.dat").c_str());
+      void read();
 
       /**
        * Get strip length.

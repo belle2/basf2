@@ -5,6 +5,7 @@ import os
 import re
 from SCons.Builder import Builder
 from SCons.Scanner.C import CScanner
+from SCons.Action import CommandGeneratorAction
 
 # everything that has #pragma link C++ .* Belle2::.*
 linkdef_everything = \
@@ -91,9 +92,8 @@ def linkdef_emitter(target, source, env):
 
 
 # define builder for root dictionaries
-rootcint = Builder(generator=rootcling_generator, emitter=linkdef_emitter,
-                   source_scanner=CScanner())
-rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
+rootcint = Builder(action=CommandGeneratorAction(rootcling_generator, {'cmdstr': '${ROOTCINTCOMSTR}'}),
+                   emitter=linkdef_emitter, source_scanner=CScanner())
 
 
 def generate(env):

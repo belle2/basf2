@@ -40,8 +40,8 @@ void EKLMAlignmentModule::initialize()
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
   int maxLayer[2];
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap");
-  maxLayer[0] = gd.getInt("nLayerForward");
-  maxLayer[1] = gd.getInt("nLayerBackward");
+  maxLayer[0] = gd.getInt("nLayerBackward");
+  maxLayer[1] = gd.getInt("nLayerForward");
   for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
     for (iLayer = 1; iLayer <= maxLayer[iEndcap - 1]; iLayer++) {
       for (iSector = 1; iSector <= 4; iSector++) {

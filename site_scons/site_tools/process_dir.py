@@ -239,6 +239,7 @@ def process_dir(
 
         # generate dictionaries
         dict_files = []
+        aux_dict_targets = []
         for linkdef_file in env['LINKDEF_FILES']:
             # set the name of library generated at this stage
             # will be read by the RootDict builder
@@ -268,6 +269,9 @@ def process_dir(
             env.Depends(rootmap_path, dict_file)
             env.Depends(pcm_path, dict_file)
 
+            aux_dict_targets.append(pcm_target)
+            aux_dict_targets.append(rootmap_target)
+
         # build a shared library with all source and dictionary files
         if len(env['SRC_FILES']) > 0:
 
@@ -285,7 +289,8 @@ def process_dir(
             # create library and map for modules
             lib = env.SharedLibrary(os.path.join(lib_dir_name, lib_name),
                                     [env['SRC_FILES'], dict_files])
-            lib_files = [lib]
+
+            lib_files = [lib] + aux_dict_targets
             if is_module_dir:
                 map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.map')
                 # Adding lib_files is important to ensure we load local module

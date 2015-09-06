@@ -36,7 +36,7 @@ void EKLMAlignment::setAlignmentData(uint16_t segment,
     B2WARNING("Alignment data for the segment already exists.");
 }
 
-struct EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)
+EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)
 {
   std::map<uint16_t, EKLMAlignmentData>::iterator it;
   it = m_data.find(segment);

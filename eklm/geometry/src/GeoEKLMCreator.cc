@@ -487,12 +487,12 @@ void EKLM::GeoEKLMCreator::getPlaneTransform(HepGeom::Transform3D* t, int n)
 {
   if (n == 0)
     *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
-                              PlanePosition.Z);
-  else
-    *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
-                              -PlanePosition.Z) *
+                              PlanePosition.Z) *
          HepGeom::Rotate3D(180. * CLHEP::deg,
                            HepGeom::Vector3D<double>(1., 1., 0.));
+  else
+    *t = HepGeom::Translate3D(PlanePosition.X, PlanePosition.Y,
+                              -PlanePosition.Z);
 }
 
 void EKLM::GeoEKLMCreator::getStripTransform(HepGeom::Transform3D* t, int n)
@@ -993,7 +993,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
       B2FATAL(MemErr);
     for (j = 0; j < m_nBoard; j++) {
       t = *BoardTransform[i][j];
-      if (n == 1)
+      if (n == 0)
         t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
       if (i == 0) {
         if (j == 0)
@@ -1059,7 +1059,7 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   t1 = HepGeom::Translate3D(0.5 * PlanePosition.outerR + box_x,
                             0.5 * PlanePosition.outerR + box_y, 0.);
   /* For rotated plane. */
-  if (n == 1) {
+  if (n == 0) {
     t = HepGeom::Rotate3D(180. * CLHEP::deg,
                           HepGeom::Vector3D<double>(1., 1., 0.));
     t1 = t * t1;

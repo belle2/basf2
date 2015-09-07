@@ -18,32 +18,35 @@
 namespace Belle2 {
 
 
-// ----------------------------------------------------------------------
-// CleoCones
-// ----------------------------------------------------------------------
   class CleoCones {
   public:
-    CleoCones(std::vector<TVector3> p3_cms_all,
-              std::vector<TVector3> p3_cms_roe,
-              TVector3 thrustB,
-              bool calc_CleoCones_with_all,
+
+    /**
+     * Constructor
+     */
+    CleoCones(std::vector<TVector3> p3_cms_all, std::vector<TVector3> p3_cms_roe, TVector3 thrustB, bool calc_CleoCones_with_all,
               bool calc_CleoCones_with_roe);
 
+    /**
+     * Destructor
+     */
     ~CleoCones() {};
 
-    std::vector<float> cleo_cone_with_all()
-    {
-      return m_cleo_cone_with_all;
-    }
+    /**
+     * Returns calculated Cleo Cones constructed from all tracks
+     */
+    std::vector<float> cleo_cone_with_all() { return m_cleo_cone_with_all; }
 
-    std::vector<float> cleo_cone_with_roe()
-    {
-      return m_cleo_cone_with_roe;
-    }
+    /**
+     * Returns calculated Cleo Cones constructed from only ROE tracks
+     */
+    std::vector<float> cleo_cone_with_roe() { return m_cleo_cone_with_roe; }
 
   private:
-    std::vector<float> m_cleo_cone_with_all;
-    std::vector<float> m_cleo_cone_with_roe;
+
+    std::vector<float> m_cleo_cone_with_all;  /** Cleo Cones calculated from all tracks */
+    std::vector<float> m_cleo_cone_with_roe;  /** Cleo Cones calculated from only ROE tracks */
+
   };
 
 } // Belle2 namespace

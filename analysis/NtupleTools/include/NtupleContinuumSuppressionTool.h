@@ -26,19 +26,18 @@ namespace Belle2 {
   class NtupleContinuumSuppressionTool : public NtupleFlatTool {
   private:
 
-    /** flag to calculate KSFW moments using B final state particles (FS1) */
-    bool m_useFS1;
+    bool m_useFS1;    /** Flag to calculate KSFW moments using B final state particles (FS1). Default is set to calculate from B daughters (FS0). */
 
-    float m_fThrustB; /** magnitude of B thrust axis */
-    float m_fThrustO; /** magnitude of ROE thrust axis */
+    float m_fThrustB; /** Magnitude of B thrust axis */
+    float m_fThrustO; /** Magnitude of ROE thrust axis */
 
-    float m_fCosTBTO; /** cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
-    float m_fCosTBz;  /** cosine of the angle between the thrust axis of the B and the z-axis */
+    float m_fCosTBTO; /** Cosine of the angle between the thrust axis of the B and the thrust axis of the ROE */
+    float m_fCosTBz;  /** Cosine of the angle between the thrust axis of the B and the z-axis */
 
-    float m_fR2;      /** reduced Fox-Wolfram moment R2 */
+    float m_fR2;      /** Reduced Fox-Wolfram moment R2 */
 
-    float m_fmm2;     /** missing mass squared */
-    float m_fet;      /** transverse energy */
+    float m_fmm2;     /** Missing mass squared */
+    float m_fet;      /** Transverse energy */
     float m_fhso00;   /** Hso(0,0) */
     float m_fhso01;   /** Hso(0,1) */
     float m_fhso02;   /** Hso(0,2) */
@@ -70,7 +69,9 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constructor. */
-    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree, decaydescriptor, strOptions) {
+    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+          decaydescriptor, strOptions)
+    {
       m_useFS1 = false;
       setupTree();
     }

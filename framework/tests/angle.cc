@@ -15,7 +15,6 @@ namespace {
     class TestBaseAngle : public BaseAngle {
     public:
       TestBaseAngle(double angle, double error) : BaseAngle(angle, error) {};
-      virtual bool contains(const TestBaseAngle& angle) const { return false; }
     };
 
     const double angle = TMath::PiOver2();

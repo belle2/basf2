@@ -18,6 +18,9 @@
 
 namespace Belle2 {
 
+  /**
+   * Class to compare if two angles are compatible withing a given error range.
+   */
   class BaseAngle {
   public:
     /** Constructor
@@ -62,7 +65,7 @@ namespace Belle2 {
     double getUpperIntervalBoundary(double sigma = 1) const { return m_angle + sigma * m_error; }
 
   protected:
-    typedef std::pair<double, double> Interval;
+    typedef std::pair<double, double> Interval;  /**< Shortcut for std::pair used as interval. */
 
     double m_angle; /**< Angle in rad */
     double m_error; /**< Error in rad */
@@ -99,6 +102,10 @@ namespace Belle2 {
   };
 
 
+  /**
+   * @sa BaseAngle
+   * Theta specific.
+   */
   class ThetaAngle : public BaseAngle {
   public:
     /**
@@ -138,6 +145,10 @@ namespace Belle2 {
   };
 
 
+  /**
+   * @sa BaseAngle
+   * Phi specific.
+   */
   class PhiAngle : public BaseAngle {
   public:
     /**

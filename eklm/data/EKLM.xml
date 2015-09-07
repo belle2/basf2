@@ -243,15 +243,15 @@
                 </SectionSupport>
                 <SectionSupport id="5">
                   <Length     desc="Length"      unit="mm">1985.5</Length>
-                  <PositionX  desc="X position"  unit="mm">1079.3</PositionX>
+                  <PositionX  desc="X position"  unit="mm">1079.4</PositionX>
                   <PositionY  desc="Y position"  unit="mm">2524.0</PositionY>
                   <PositionZ  desc="Z position"  unit="mm">0.0</PositionZ>
                   <DeltaLRight unit="mm">22.0</DeltaLRight>
                   <DeltaLLeft  unit="mm">0.0</DeltaLLeft>
                 </SectionSupport>
                 <SectionSupport id="6">
-                  <Length     desc="Length"      unit="mm">602.6</Length>
-                  <PositionX  desc="X position"  unit="mm">604.3</PositionX>
+                  <Length     desc="Length"      unit="mm">819.0</Length>
+                  <PositionX  desc="X position"  unit="mm">496.1</PositionX>
                   <PositionY  desc="Y position"  unit="mm">3130.0</PositionY>
                   <PositionZ  desc="Z position"  unit="mm">0.0</PositionZ>
                   <DeltaLRight unit="mm">12.0</DeltaLRight>
@@ -293,15 +293,15 @@
                 </SectionSupport>
                 <SectionSupport id="5">
                   <Length     desc="Length"      unit="mm">1985.5</Length>
-                  <PositionX  desc="X position"  unit="mm">1079.4</PositionX>
+                  <PositionX  desc="X position"  unit="mm">1079.3</PositionX>
                   <PositionY  desc="Y position"  unit="mm">2524.0</PositionY>
                   <PositionZ  desc="Z position"  unit="mm">0.0</PositionZ>
                   <DeltaLRight unit="mm">22.0</DeltaLRight>
                   <DeltaLLeft  unit="mm">0.0</DeltaLLeft>
                 </SectionSupport>
                 <SectionSupport id="6">
-                  <Length     desc="Length"      unit="mm">819.0</Length>
-                  <PositionX  desc="X position"  unit="mm">496.1</PositionX>
+                  <Length     desc="Length"      unit="mm">602.6</Length>
+                  <PositionX  desc="X position"  unit="mm">604.3</PositionX>
                   <PositionY  desc="Y position"  unit="mm">3130.0</PositionY>
                   <PositionZ  desc="Z position"  unit="mm">0.0</PositionZ>
                   <DeltaLRight unit="mm">12.0</DeltaLRight>

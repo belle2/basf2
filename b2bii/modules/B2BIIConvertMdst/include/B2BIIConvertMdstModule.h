@@ -21,6 +21,8 @@
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
 
+#include "belle_legacy/helix/Helix.h"
+
 // Belle2 objects
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -99,6 +101,11 @@ namespace Belle2 {
     // false = mc
     bool m_realData;
 
+    //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
+    // true = use 6x6 (position, momentum) covariance matrix
+    // false = use 5x5 (helix parameters) covaraince matrix
+    bool m_use6x6CovarianceMatrix4Tracks;
+
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
@@ -158,6 +165,7 @@ namespace Belle2 {
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
     void convertMdstChargedObjectAlternative(const Belle::Mdst_charged& belleTrack, Track* track);
+    void convertMdstChargedObjectAlternative2(const Belle::Mdst_charged& belleTrack, Track* track);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -172,16 +180,52 @@ namespace Belle2 {
                                         const uint32_t hitPatternVXDInitializer);
 
     /**
+     * Fills Helix parameters (converted to Belle II version), 5x5 error matrix, 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
+     */
+    int getHelixParameters(const Belle::Mdst_trk_fit& trk_fit,
+                           const double mass,
+                           const HepPoint3D& newPivot,
+                           std::vector<float>& helixParams,
+                           HepSymMatrix& error5x5,
+                           HepLorentzVector& momentum,
+                           HepPoint3D& position,
+                           HepSymMatrix& error7x7,
+                           const double dPhi = 0.0);
+
+    /**
+     * Converts Belle's Helix parameters and it's covariance matrix to Belle II's version.
+     */
+    void convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, HepSymMatrix& error5x5);
+
+    /**
+     * Converts Belle's Helix parameters and it's covariance matrix to Belle II's version.
+     */
+    void convertHelix(const Belle::Mdst_trk_fit& trk_fit, const HepPoint3D& newPivot, std::vector<float>& helixParams,
+                      std::vector<float>& helixError);
+
+    /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
      */
     int belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
-                              HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+                              HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error, double dPhi = 0.0);
+
+    /**
+     * obtains the helix parameters from trk_fit and moves the pivot to 0,0,0
+     */
+    void belleHelixToHelix(const Belle::Mdst_trk_fit& trk_fit,
+                           std::vector<float>& helixParam, std::vector<float>& helixError);
 
     /**
      * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.
      */
     void belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge, const Const::ParticleType& pType,
                                      HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+
+    /**
+     * obtains the helix parameters of the vee daughters
+     */
+    void belleVeeDaughterHelix(const Belle::Mdst_vee2& vee, const int charge, std::vector<float>& helixParam,
+                               std::vector<float>& helixError);
 
     /** Get PID information for belleTrack and add it to PIDLikelihood (with relation from track). */
     void convertPIDData(const Belle::Mdst_charged& belleTrack, const Track* track);
@@ -225,8 +269,8 @@ namespace Belle2 {
     /**
      * Compares the track momentum and position values for pion hypothesis.
      */
-    void testTrackConversion(const HepLorentzVector& momentum, const HepPoint3D& position, const HepSymMatrix& error,
-                             const int belle_charge, const TrackFitResult* trackFit);
+    int testTrackConversion(const HepLorentzVector& momentum, const HepPoint3D& position, const HepSymMatrix& error,
+                            const int belle_charge, const TrackFitResult* trackFit);
 
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
@@ -259,6 +303,9 @@ namespace Belle2 {
 
     /** B filed in TESLA */
     const double BFIELD = 1.5;
+
+    /** Conversion factor for Kappa -> Omega helix parameters */
+    const double KAPPA2OMEGA = 1.5 * TMath::C() * 1E-11;
   };
 
 } // end namespace Belle2

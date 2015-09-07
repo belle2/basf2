@@ -195,21 +195,6 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
-    // Continuum Suppression --------------------------------------------------
-    double CleoCones(const Particle* particle, const std::vector<double>& cone)
-    {
-      if (!particle)
-        return -999;
-
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return -999;
-
-      const auto& cleoCones = qq->getCleoCones();
-      return cleoCones.at(cone[0] - 1);
-    }
-
-    // Continuum Suppression --------------------------------------------------
     double Constant(const Particle*, const std::vector<double>& constant)
     {
       return constant[0];
@@ -241,11 +226,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("constant(float i)", Constant,
                       "Returns i.\n"
                       "Useful for debugging purposes and in conjunction with the formula meta-variable.");
-    REGISTER_VARIABLE("CleoCone(integer i)", CleoCones,
-                      "Returns i-th cleo cones.\n"
-                      "Useful for ContinuumSuppression.\n"
-                      "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
 
 
   }

@@ -76,17 +76,5 @@ namespace Belle2 {
      */
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
 
-
-    /**
-     * Returns the value of et, mm2, or one of the 16 KSFW moments, as requested by the user.
-     */
-    Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the transformed network output C->C' via: C'=log((C-low)/(high-C)).
-     * First argument in the argument vector must be the name of the extra info, i.e., the TMVA method (e.g., NeuroBayes, FastBDT, etc.).
-     * Second (third) argument is the lower (upper) cut on the network output.
-     */
-    Manager::FunctionPtr transformedNetworkOutputNB(const std::vector<std::string>& arguments);
   }
 }

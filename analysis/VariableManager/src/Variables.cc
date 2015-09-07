@@ -1071,77 +1071,6 @@ namespace Belle2 {
       return run_no;
     }
 
-// Continuum Suppression related ------------------------
-
-    double thrustBm(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ContinuumSuppression* qq =
-        particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return result;
-
-      result = qq->getThrustBm();
-
-      return result;
-    }
-
-    double thrustOm(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ContinuumSuppression* qq =
-        particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return result;
-
-      result = qq->getThrustOm();
-
-      return result;
-    }
-
-    double cosTBTO(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ContinuumSuppression* qq =
-        particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return result;
-
-      result = qq->getCosTBTO();
-
-      return result;
-    }
-
-    double cosTBz(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ContinuumSuppression* qq =
-        particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return result;
-
-      result = qq->getCosTBz();
-
-      return result;
-    }
-
-    double R2(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ContinuumSuppression* qq =
-        particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return result;
-
-      result = qq->getR2();
-
-      return result;
-    }
 
     double False(const Particle*)
     {
@@ -1311,13 +1240,5 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
                       "number of charged track matched to this cluster");
 
-    VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("cosTBTO", cosTBTO,
-                      "cosine of angle between thrust axis of B and thrust axis of ROE");
-    REGISTER_VARIABLE("cosTBz", cosTBz,
-                      "cosine of angle between thrust axis of B and z-axis");
-    REGISTER_VARIABLE("thrustBm", thrustBm, "magnitude of the B thrust axis");
-    REGISTER_VARIABLE("thrustOm", thrustOm, "magnitude of the ROE thrust axis");
-    REGISTER_VARIABLE("R2", R2, "reduced Fox-Wolfram moment R2");
   }
 }

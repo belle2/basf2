@@ -205,7 +205,7 @@ bool ParticleGun::setParameters(const Parameters& p)
 
   //Make an enum -> name mapping for nice error messages
   std::map<EDistribution, std::string> distributionNames = {
-    {c_fixedValue,              "fixedValue"},
+    {c_fixedValue,              "fixed"},
     {c_uniformDistribution,     "uniform"},
     {c_uniformPtDistribution,   "uniformPt"},
     {c_uniformCosDistribution,  "uniformCos"},

@@ -90,7 +90,7 @@ namespace {
       B2DEBUG(100, "Tags of the hits");
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
-                "rl = " << rlTaggedWireHit.getRLInfo() << " " <<
+                "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
                 "dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
@@ -253,7 +253,7 @@ namespace {
       B2DEBUG(100, "Tags of the hits");
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        B2DEBUG(100, "    rl = " << rlTaggedWireHit.getRLInfo() <<
+        B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
                 " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 
@@ -333,7 +333,7 @@ namespace {
       B2DEBUG(100, "Tags of the hits");
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        B2DEBUG(100, "    rl = " << rlTaggedWireHit.getRLInfo() <<
+        B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
                 " dl = " << rlTaggedWireHit->getRefDriftLength());
       }
 

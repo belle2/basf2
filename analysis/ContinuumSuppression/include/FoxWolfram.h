@@ -24,23 +24,38 @@ namespace Belle2 {
 
   class FoxWolfram {
   public:
+
+    /**
+     * Constructor
+     */
     FoxWolfram();
+
+    /**
+     * Destructor
+     */
     ~FoxWolfram() {};
 
-    // H(i) = i-th Fox-Wolfram moment
-    double H(int i)
-    {
-      return (i < 0 || i > 4) ? 0 : sum[i];
-    }
-    // R(i) = i-th normalized Fox-Wolfram moment
-    double R(int i)
-    {
-      return (i < 0 || i > 4 || sum[0] == 0) ? 0 : sum[i] / sum[0];
-    }
+    /**
+     * Returns the i-th Fox-Wolfram moment
+     */
+    double H(int i) { return (i < 0 || i > 4) ? 0 : sum[i]; }
+
+    /**
+     * Returns the i-th normalized Fox-Wolfram moment
+     */
+    double R(int i) { return (i < 0 || i > 4 || sum[0] == 0) ? 0 : sum[i] / sum[0]; }
+
+    /**
+     * Utility function for Fox-Wolfram moment calculation
+     */
     void add(const double mag, const double costh);
+
   protected:
-    double sum[5];
+
+    double sum[5]; /** Fox-Wolfram moments */
+
   };
+
 
   FoxWolfram::FoxWolfram()
   {

@@ -21,11 +21,11 @@ namespace Belle2 {
 
     private:
       /// Implementing type of the sign
-      typedef signed short SignType;
-      //typedef signed char SignType; // This can be used to tighten memory
+      typedef signed short ESign;
+      //typedef signed char ESign; // This can be used to tighten memory
 
       /// Constant for an invalid sign
-      static const SignType c_NaNSign = -32768;
+      static const ESign c_NaNSign = -32768;
 
 
     public:
@@ -37,7 +37,7 @@ namespace Belle2 {
     private:
       /// Constructor from the internal representation
       constexpr
-      explicit Sign(const SignType& s) :
+      explicit Sign(const ESign& s) :
         m_sign(s)
       {;}
 
@@ -59,12 +59,12 @@ namespace Belle2 {
        *  If the sign changes in a sweep over a geometric object or was zero in the begining
        *  the combined sign is zero. Forward the one sign if both are equal.
        *  Invalid signs are ignored and overwritten by the other sign.
-       *  * ZERO and PLUS   -> ZERO
-       *  * ZERO and MINUS  -> ZERO
-       *  * ZERO and ZERO   -> ZERO
-       *  * MINUS and PLUS  -> ZERO
-       *  * MINUS and MINUS -> MINUS
-       *  * PLUS and PLUS   -> PLUS
+       *  * ESign::c_Zero and ESign::c_Plus   -> ESign::c_Zero
+       *  * ESign::c_Zero and ESign::c_Minus  -> ESign::c_Zero
+       *  * ESign::c_Zero and ESign::c_Zero   -> ESign::c_Zero
+       *  * ESign::c_Minus and ESign::c_Plus  -> ESign::c_Zero
+       *  * ESign::c_Minus and ESign::c_Minus -> ESign::c_Minus
+       *  * ESign::c_Plus and ESign::c_Plus   -> ESign::c_Plus
        *  * INVALID and ?   -> ?
        *  * and ? INVALID   -> ?
        */
@@ -77,18 +77,18 @@ namespace Belle2 {
         } else if (sign1.isnan()) {
           return sign0;
         } else {
-          return Sign(static_cast<SignType>((sign0.m_sign + sign1.m_sign) / 2));
+          return Sign(static_cast<ESign>((sign0.m_sign + sign1.m_sign) / 2));
         }
       }
 
     public:
       /// Change the sign inplace to its opposite.
       void reverse()
-      { m_sign = static_cast<SignType>(-m_sign); }
+      { m_sign = static_cast<ESign>(-m_sign); }
 
       /// Return a copy with the reversed sign
       Sign reversed() const
-      { return Sign(static_cast<SignType>(-m_sign)); }
+      { return Sign(static_cast<ESign>(-m_sign)); }
 
       /// Returns true if sign is equal to c_PlusSign, c_MinusSign or c_ZeroSign.
       inline bool isfinite() const
@@ -116,7 +116,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the sign implementation
-      SignType m_sign = 0;
+      ESign m_sign = 0;
     };
 
     /// Instance for a negative sign

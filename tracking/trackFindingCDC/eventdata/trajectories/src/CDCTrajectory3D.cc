@@ -183,7 +183,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   // Set the start parameters
   Vector3D position = getSupport();
   Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
-  SignType charge = getChargeSign();
+  ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
   if (not isValidSign(charge) or momentum.hasNAN() or position.hasNAN()) {
@@ -281,7 +281,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 
 
 
-SignType CDCTrajectory3D::getChargeSign() const
+ESign CDCTrajectory3D::getChargeSign() const
 {
   return ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
 }

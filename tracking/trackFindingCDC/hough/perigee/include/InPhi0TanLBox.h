@@ -32,13 +32,13 @@ namespace Belle2 {
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.
-      inline SignType getDistanceSign(const HoughBox& houghBox,
-                                      const float& x,
-                                      const float& y,
-                                      const float& l,
-                                      const float& dxdz,
-                                      const float& dydz,
-                                      const ILayerType& /*iCLayer*/ = -1) const
+      inline ESign getDistanceSign(const HoughBox& houghBox,
+                                   const float& x,
+                                   const float& y,
+                                   const float& l,
+                                   const float& dxdz,
+                                   const float& dydz,
+                                   const ILayerType& /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();
@@ -65,7 +65,7 @@ namespace Belle2 {
         const bool onlyPositiveArm = 0 < m_curlCurv;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (xRot[0] < 0 and xRot[1] < 0) return INVALID_SIGN;
+          if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
         }
 
         std::array<float, 4> xRotCor;

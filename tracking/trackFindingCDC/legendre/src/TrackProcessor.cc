@@ -259,7 +259,7 @@ void TrackProcessorNew::assignNewHits(CDCTrack& track)
   if (track.size() < 5) return;
 
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-//  SignType trackCharge = TrackMergerNew::getChargeSign(track);
+//  ESign trackCharge = TrackMergerNew::getChargeSign(track);
   CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
 

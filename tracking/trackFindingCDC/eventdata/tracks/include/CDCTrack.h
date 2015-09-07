@@ -105,11 +105,11 @@ namespace Belle2 {
       { return getEndTrajectory3D().getUnitMom3DAtSupport(); }
 
       /// Getter for the charge sign.
-      SignType getStartChargeSign() const
+      ESign getStartChargeSign() const
       { return getStartTrajectory3D().getChargeSign(); }
 
       /// Getter for the charge sign.
-      SignType getEndChargeSign() const
+      ESign getEndChargeSign() const
       { return getEndTrajectory3D().getChargeSign(); }
 
       /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.

@@ -207,12 +207,12 @@ namespace Belle2 {
         const Vector2D& movePerZ = wire.getMovePerZ();
         const ILayerType& iCLayer(wire.getICLayer());
         //B2INFO("movePerZ = " << movePerZ);
-        const SignType distSign = this->getDistanceSign(houghBox,
-                                                        pos2D.x(),  pos2D.y(),
-                                                        signedDriftLength,
-                                                        movePerZ.x(), movePerZ.y(),
-                                                        iCLayer);
-        const bool isIn = distSign == ZERO;
+        const ESign distSign = this->getDistanceSign(houghBox,
+                                                     pos2D.x(),  pos2D.y(),
+                                                     signedDriftLength,
+                                                     movePerZ.x(), movePerZ.y(),
+                                                     iCLayer);
+        const bool isIn = distSign == ESign::c_Zero;
         return isIn;
       }
 

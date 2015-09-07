@@ -24,7 +24,7 @@ double TrackFindingCDC::getBFieldZMagnitude(const Vector2D& pos2D)
   return std::fabs(TrackFindingCDC::getBFieldZ(pos2D));
 }
 
-SignType TrackFindingCDC::getBFieldZSign()
+ESign TrackFindingCDC::getBFieldZSign()
 {
   return sign(TrackFindingCDC::getBFieldZ());
 }
@@ -55,12 +55,12 @@ double TrackFindingCDC::getAlphaZ(const Vector3D& pos3D)
   return getAlphaFromBField(getBFieldZ(pos3D));
 }
 
-SignType TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo ccwInfo)
+ESign TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo ccwInfo)
 {
-  return - ccwInfo * getBFieldZSign();
+  return static_cast<ESign>(- ccwInfo * getBFieldZSign());
 }
 
-CCWInfo TrackFindingCDC::chargeSignToCCWInfo(const SignType& chargeSign)
+CCWInfo TrackFindingCDC::chargeSignToCCWInfo(const ESign& chargeSign)
 {
   return - chargeSign * getBFieldZSign();
 }

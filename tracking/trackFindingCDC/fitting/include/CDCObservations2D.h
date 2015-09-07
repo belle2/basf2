@@ -146,7 +146,7 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                    const RightLeftInfo rlInfo = ZERO)
+                    const RightLeftInfo rlInfo = ESign::c_Zero)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
         const double driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;

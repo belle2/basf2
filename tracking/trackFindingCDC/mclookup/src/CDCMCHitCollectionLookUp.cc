@@ -252,11 +252,11 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
   double charge = tPDGParticle.Charge() / 3.0;
 
-  SignType chargeSign = sign(charge);
+  ESign chargeSign = sign(charge);
 
   trajectory3D.setPosMom3D(pos3D, mom3D, charge);
 
-  SignType settedChargeSign = trajectory3D.getChargeSign();
+  ESign settedChargeSign = trajectory3D.getChargeSign();
 
   if (chargeSign != settedChargeSign) {
     B2WARNING("Charge sign of mc particle is not the same as the one of the fit");

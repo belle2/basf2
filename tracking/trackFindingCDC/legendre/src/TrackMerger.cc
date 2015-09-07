@@ -120,7 +120,7 @@ CDCTrack& TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
 
   if (checkBack2BackTrack(trackCandidate)) {
 
-    SignType trackCharge = getChargeSign(trackCandidate);
+    ESign trackCharge = getChargeSign(trackCandidate);
 
     for (const CDCRecoHit3D& hit : trackCandidate.items()) {
 
@@ -147,9 +147,9 @@ bool TrackMergerNew::checkBack2BackTrack(CDCTrack& track)
   for (const CDCRecoHit3D& hit : track.items()) {
     int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center());
 
-    if (curve_sign == PLUS)
+    if (curve_sign == ESign::c_Plus)
       ++vote_pos;
-    else if (curve_sign == MINUS)
+    else if (curve_sign == ESign::c_Minus)
       ++vote_neg;
     else {
       B2ERROR(
@@ -189,24 +189,24 @@ void TrackMergerNew::resetHits(CDCTrack& otherTrackCandidate)
 }
 
 
-SignType TrackMergerNew::getChargeSign(CDCTrack& track)
+ESign TrackMergerNew::getChargeSign(CDCTrack& track)
 {
-  SignType trackCharge;
+  ESign trackCharge;
   int vote_pos(0), vote_neg(0);
 
   Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
 
   if (std::isnan(center.x())) {
     B2WARNING("Trajectory is not setted or wrong!");
-    return track.getStartTrajectory3D().getLocalCircle().orientation();
+    return track.getStartTrajectory3D().getChargeSign();
   }
 
   for (const CDCRecoHit3D& hit : track.items()) {
-    SignType curve_sign = getCurvatureSignWrt(hit, center);
+    ESign curve_sign = getCurvatureSignWrt(hit, center);
 
-    if (curve_sign == PLUS)
+    if (curve_sign == ESign::c_Plus)
       ++vote_pos;
-    else if (curve_sign == MINUS)
+    else if (curve_sign == ESign::c_Minus)
       ++vote_neg;
     else {
       B2ERROR(
@@ -216,15 +216,15 @@ SignType TrackMergerNew::getChargeSign(CDCTrack& track)
   }
 
   if (vote_pos > vote_neg)
-    trackCharge = PLUS;
+    trackCharge = ESign::c_Plus;
   else
-    trackCharge = MINUS;
+    trackCharge = ESign::c_Minus;
 
 
   return trackCharge;
 }
 
-SignType TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
+ESign TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 {
   double phi_diff = atan2(xy.y(), xy.x()) - getPhi(hit);
 
@@ -234,9 +234,9 @@ SignType TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D x
     phi_diff += 2 * TMath::Pi();
 
   if (phi_diff > 0 /*TMath::Pi()*/)
-    return PLUS;
+    return ESign::c_Plus;
   else
-    return MINUS;
+    return ESign::c_Minus;
 }
 
 double TrackMergerNew::getPhi(const CDCRecoHit3D& hit)

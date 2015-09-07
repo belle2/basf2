@@ -37,31 +37,31 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      inline SignType getDistanceSign(const HoughBox& houghBox,
-                                      const float& x,
-                                      const float& y,
-                                      const float& signedDriftLength,
-                                      const float& dxdz = 0,
-                                      const float& dydz = 0,
-                                      const ILayerType& iCLayer = -1) const
+      inline ESign getDistanceSign(const HoughBox& houghBox,
+                                   const float& x,
+                                   const float& y,
+                                   const float& signedDriftLength,
+                                   const float& dxdz = 0,
+                                   const float& dydz = 0,
+                                   const ILayerType& iCLayer = -1) const
       {
         const float& lowerImpact(houghBox.template getLowerBound<Impact>());
         const float& upperImpact(houghBox.template getUpperBound<Impact>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerY = y - lowerImpact;
-        const SignType lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
-                                                          x, lowerY,
-                                                          signedDriftLength,
-                                                          dxdz, dydz,
-                                                          iCLayer);
+        const ESign lowerDistSign = T::getDistanceSign(subordinaryHoughBox,
+                                                       x, lowerY,
+                                                       signedDriftLength,
+                                                       dxdz, dydz,
+                                                       iCLayer);
 
         const float upperY = y - upperImpact;
-        const SignType upperDistSign = T::getDistanceSign(subordinaryHoughBox,
-                                                          x, upperY,
-                                                          signedDriftLength,
-                                                          dxdz, dydz,
-                                                          iCLayer);
+        const ESign upperDistSign = T::getDistanceSign(subordinaryHoughBox,
+                                                       x, upperY,
+                                                       signedDriftLength,
+                                                       dxdz, dydz,
+                                                       iCLayer);
 
         return SameSignChecker::commonSign(lowerDistSign, upperDistSign);
       }

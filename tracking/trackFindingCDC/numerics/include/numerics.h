@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/numerics/SignType.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <vector>
 #include <functional>
 #include <utility>
@@ -39,15 +39,15 @@ namespace Belle2 {
     inline auto square(TNumber t) -> decltype(t* t) {return t * t;}
 
     ///Returns the sign of an integer number
-    inline SignType sign(int x)
-    { return x > 0 ? PLUS : (x < 0 ? MINUS : ZERO); }
+    inline int sign(int x)
+    { return (x > 0) - (x < 0); }
 
     ///Returns the sign of a floating point number.
     /** Essentially return the signbit of the float.
-     *  This means 0.0 has sign PLUS while -0.0 has sign MINUS
-     *  NAN is treat specially and returns an INVALID_SIGN
+     *  This means 0.0 has sign ESign::c_Plus while -0.0 has sign ESign::c_Minus
+     *  NAN is treat specially and returns an ESign::c_Invalid
      */
-    SignType sign(double x);
+    ESign sign(double x);
 
     /// Returns the two roots in pq formula
     /** Calculates the two roots of the parabola x*x + p*x + q = 0 in a rather stable manner \n

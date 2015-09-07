@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/numerics/SignType.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
 namespace Belle2 {
@@ -59,7 +59,7 @@ namespace Belle2 {
      *  ( 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
     inline OrientationInfo averageInfo(const OrientationInfo& one, const OrientationInfo& two)
-    { return isValidInfo(one) and isValidInfo(two) ? sign(one + two) : INVALID_INFO; }
+    { return isValidInfo(one) and isValidInfo(two) ? static_cast<signed short>(sign(one + two)) : INVALID_INFO; }
 
     /// Combines three orientation informations to their most likely common one
     /** Returns the average of two orientation information like. \n
@@ -70,13 +70,12 @@ namespace Belle2 {
      *  ( 1, 0, -1) -> 0 \n
      *  ( 0, 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
-    inline OrientationInfo averageInfo(
-      const OrientationInfo& one,
-      const OrientationInfo& two,
-      const OrientationInfo& three)
+    inline OrientationInfo averageInfo(const OrientationInfo& one,
+                                       const OrientationInfo& two,
+                                       const OrientationInfo& three)
     {
       return isValidInfo(one) and isValidInfo(two) and isValidInfo(three) ?
-             sign(one + two + three) :
+             static_cast<signed short>(sign(one + two + three)) :
              INVALID_INFO;
     }
     /**@}*/

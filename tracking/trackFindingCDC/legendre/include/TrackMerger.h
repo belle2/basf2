@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/SignType.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <list>
 #include <vector>
@@ -37,9 +37,9 @@ namespace Belle2 {
       /** Tries to split back-to-back tracks into two different tracks */
       static bool checkBack2BackTrack(CDCTrack& trackCandidate);
 
-      static SignType getChargeSign(CDCTrack& track) ;
+      static ESign getChargeSign(CDCTrack& track) ;
 
-      static SignType getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
+      static ESign getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
 
       static double getPhi(const CDCRecoHit3D& hit) ;
 

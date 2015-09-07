@@ -36,18 +36,18 @@ namespace Belle2 {
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the familiy of curves
        *  @returns
-       *   * PLUS if the drift circle is always on the positive / right site
-       *   * MINUS means the drift circle is always on the negative / left site
-       *   * ZERO if the dirft circle lies on any of the curves
-       *   * INVALID_SIGN if the drift cirlce is on the the wrong arm of the curve.
+       *   * ESign::c_Plus if the drift circle is always on the positive / right site
+       *   * ESign::c_Minus means the drift circle is always on the negative / left site
+       *   * ESign::c_Zero if the dirft circle lies on any of the curves
+       *   * ESign::c_Invalid if the drift cirlce is on the the wrong arm of the curve.
        */
-      inline SignType getDistanceSign(const HoughBox& houghBox,
-                                      const float& x,
-                                      const float& y,
-                                      const float& l,
-                                      const float& /*dxdz*/ = 0,
-                                      const float& /*dydz*/ = 0,
-                                      const ILayerType& /*iCLayer*/ = -1) const
+      inline ESign getDistanceSign(const HoughBox& houghBox,
+                                   const float& x,
+                                   const float& y,
+                                   const float& l,
+                                   const float& /*dxdz*/ = 0,
+                                   const float& /*dydz*/ = 0,
+                                   const ILayerType& /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();
@@ -60,7 +60,7 @@ namespace Belle2 {
         const bool onlyPositiveArm = isNonCurler;
         if (onlyPositiveArm) {
           // Reject hit if it is on the inward going branch but the curvature suggest it is no curler
-          if (xRot[0] < 0 and xRot[1] < 0) return INVALID_SIGN;
+          if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
         }
 
         std::array<float, 2> yRotPlusL;

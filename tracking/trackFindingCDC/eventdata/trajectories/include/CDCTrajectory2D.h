@@ -148,7 +148,7 @@ namespace Belle2 {
       {  return getLocalCircle().distance(point - getLocalOrigin()); }
 
       /// Checks if the given point is to the right or to the left of the trajectory
-      SignType isRightOrLeft(const Vector2D& point) const
+      RightLeftInfo isRightOrLeft(const Vector2D& point) const
       { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
@@ -256,7 +256,7 @@ namespace Belle2 {
 
     public:
       /// Gets the charge sign of the trajectory
-      SignType getChargeSign() const;
+      ESign getChargeSign() const;
 
       /// Reverses the trajectory in place
       void reverse()

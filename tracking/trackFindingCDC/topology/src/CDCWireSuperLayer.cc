@@ -54,7 +54,7 @@ void CDCWireSuperLayer::initialize()
   for (const CDCWireLayer& layer : *this) {
     // Set the numbering shift of each layer within this superlayer
     if (isEven(layer.getILayer())) {
-      layer.setShift(ZERO);
+      layer.setShift(ESign::c_Zero);
     } else {
       const Vector3D& layerRefPos3D = layer.first().getRefPos3D();
       const Vector2D& layerRefPos2D = layerRefPos3D.xy();

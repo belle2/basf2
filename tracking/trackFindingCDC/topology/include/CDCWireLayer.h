@@ -93,7 +93,7 @@ namespace Belle2 {
        *  is more clockwise or counterclockwise than \n
        *  the zero wire in the zero layer within this superlayer. \n
        *  This can be used to speed up the lookup inward and outward neighbors \n
-       *  of the wires in this layer. For even layers the shift should be ZERO. \n
+       *  of the wires in this layer. For even layers the shift should be ESign::c_Zero. \n
        *  The shift is not set by this layer since it can not know the shift by its \n
        *  own wires alone, but it is set by the CDCWireSuperLayer. \n
        *  The later is the main user of this property. \n

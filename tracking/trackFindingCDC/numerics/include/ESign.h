@@ -10,38 +10,36 @@
 #pragma once
 
 #include <cstdlib> //for abs
-//#include <math.h>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Type transporting a sign
-    typedef signed short SignType;
-    //typedef signed char SignType; // This can be used for performance maximization but makes lousy output
+    namespace SignT {
 
-    /// Constant for plus sign.
-    const SignType PLUS = 1;
+      enum Enum : signed short {
+        /// Constant for plus sign.
+        c_Plus = 1,
 
-    /// Constant for minus sign.
-    const SignType MINUS = -1;
+        /// Constant for minus sign.
+        c_Minus = -1,
 
-    /// Constant for undefined sign.
-    const SignType ZERO = 0;
+        /// Constant for undefined sign.
+        c_Zero = 0,
 
-    /// Constant for invalid.
-    const SignType INVALID_SIGN = -32768;
+        /// Constant for invalid.
+        c_Invalid = -32768
+      };
+    }
 
+    typedef SignT::Enum ESign;
 
+    /// Return the opposite sign. Leaves ESign::c_Invalid the same.
+    inline ESign oppositeSign(ESign s)
+    { return static_cast<ESign>(-s); }
 
-    /// Return the opposite sign. Leaves INVALID_SIGN the same.
-    inline SignType oppositeSign(const SignType& s)
-    { return SignType(-s); }
-
-
-
-    /// Returns true if sign is PLUS, MINUS or ZERO
-    inline bool isValidSign(const SignType& s)
+    /// Returns true if sign is ESign::c_Plus, ESign::c_Minus or ESign::c_Zero
+    inline bool isValidSign(ESign s)
     { return std::abs(s) <= 1; }
 
 

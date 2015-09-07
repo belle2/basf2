@@ -25,7 +25,7 @@ namespace Belle2 {
     double getBFieldZMagnitude(const Vector2D& pos2D);
 
     /// Getter for the sign of the magnetic field in z direction
-    SignType getBFieldZSign();
+    ESign getBFieldZSign();
 
     /// Getter for the signed magnetic field stength in z direction ( in Tesla )
     double getBFieldZ(const Vector2D& pos2D);
@@ -52,10 +52,10 @@ namespace Belle2 {
      *  Clockwise travel        <-> Bz > 0 \n
      *  and opposite for negatively charged. \n
      *  Hence the charge sign is -CCWInfo * sign(Bz) */
-    SignType ccwInfoToChargeSign(const CCWInfo ccwInfo);
+    ESign ccwInfoToChargeSign(const CCWInfo ccwInfo);
 
     /// Conversion helper from the charge sign to clockwise or counterclockwise travel
-    CCWInfo chargeSignToCCWInfo(const SignType& chargeSign);
+    CCWInfo chargeSignToCCWInfo(const ESign& chargeSign);
 
     /// Conversion help for charges to clockwise or counterclockwise travel.
     CCWInfo chargeToCCWInfo(const double charge);

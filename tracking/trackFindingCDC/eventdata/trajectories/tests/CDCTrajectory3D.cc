@@ -27,14 +27,14 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosM
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
-  SignType newChargeSign = PLUS;
+  ESign newChargeSign = ESign::c_Plus;
   double bZ = 2.0;
 
   CDCTrajectory3D trajectory(newPos3D, newMom3D, newChargeSign, bZ);;
 
   Vector3D mom3D = trajectory.getMom3DAtSupport(bZ);
   Vector3D pos3D = trajectory.getSupport();
-  SignType chargeSign = trajectory.getChargeSign();
+  ESign chargeSign = trajectory.getChargeSign();
 
 
   EXPECT_NEAR(newMom3D.x(), mom3D.x(), 10e-7);
@@ -54,7 +54,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
-  SignType newChargeSign = PLUS;
+  ESign newChargeSign = ESign::c_Plus;
 
   CDCTrajectory3D trajectory3D(newPos3D, newMom3D, newChargeSign);
   UncertainHelix uncertainHelix = trajectory3D.getLocalHelix();
@@ -90,7 +90,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
 {
   Vector3D expectedMomentum(1.0, 0.0, 0.0);
   Vector3D expectedPosition(0.0, 1.0, 0.0);
-  SignType expectedCharge = PLUS;
+  ESign expectedCharge = ESign::c_Plus;
   double bZ = 2;
 
   genfit::TrackCand expectedGFTrackCand;
@@ -116,7 +116,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
 
   Vector3D position(gfTrackCand.getPosSeed());
   Vector3D momentum(gfTrackCand.getMomSeed());
-  SignType charge = gfTrackCand.getChargeSeed();
+  ESign charge = sign(gfTrackCand.getChargeSeed());
   TMatrixDSym cov6 = gfTrackCand.getCovSeed();
 
 

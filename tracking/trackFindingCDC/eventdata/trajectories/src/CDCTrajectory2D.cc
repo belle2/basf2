@@ -55,7 +55,7 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
 
 
 
-SignType CDCTrajectory2D::getChargeSign() const
+ESign CDCTrajectory2D::getChargeSign() const
 {
   return ccwInfoToChargeSign(getLocalCircle().orientation());
 }

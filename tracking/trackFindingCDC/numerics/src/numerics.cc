@@ -17,7 +17,7 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SignType Belle2::TrackFindingCDC::sign(double x)
+ESign Belle2::TrackFindingCDC::sign(double x)
 {
-  return std::isnan(x) ? INVALID_SIGN : (std::signbit(x) ? MINUS : PLUS);
+  return std::isnan(x) ? ESign::c_Invalid : (std::signbit(x) ? ESign::c_Minus : ESign::c_Plus);
 }

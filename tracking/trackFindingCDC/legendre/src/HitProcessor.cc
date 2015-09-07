@@ -57,7 +57,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     if (trackCandidate.size() < 5) continue;
 
     const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-//    SignType trackCharge = TrackMergerNew::getChargeSign(trackCandidate);
+//    ESign trackCharge = TrackMergerNew::getChargeSign(trackCandidate);
     CDCTrajectory2D trackTrajectory2D = trackCandidate.getStartTrajectory3D().getTrajectory2D();
 
 

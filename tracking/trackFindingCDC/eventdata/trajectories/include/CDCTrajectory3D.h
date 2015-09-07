@@ -133,7 +133,7 @@ namespace Belle2 {
 
     public:
       /// Gets the charge sign of the trajectory.
-      SignType getChargeSign() const;
+      ESign getChargeSign() const;
 
       /// Reverses the trajectory in place.
       void reverse()

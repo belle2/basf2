@@ -24,25 +24,25 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, numerics_sign)
 {
-  EXPECT_EQ(PLUS, sign(INFINITY));
-  EXPECT_EQ(PLUS, sign(2));
-  EXPECT_EQ(PLUS, sign(0.0));
-  EXPECT_EQ(MINUS, sign(-0.0));
-  EXPECT_EQ(MINUS, sign(-2));
-  EXPECT_EQ(MINUS, sign(-INFINITY));
-  EXPECT_EQ(INVALID_SIGN, sign(NAN));
+  EXPECT_EQ(ESign::c_Plus, sign(INFINITY));
+  EXPECT_EQ(ESign::c_Plus, sign(2));
+  EXPECT_EQ(ESign::c_Plus, sign(0.0));
+  EXPECT_EQ(ESign::c_Minus, sign(-0.0));
+  EXPECT_EQ(ESign::c_Minus, sign(-2));
+  EXPECT_EQ(ESign::c_Minus, sign(-INFINITY));
+  EXPECT_EQ(ESign::c_Invalid, sign(NAN));
 
-  EXPECT_TRUE(isValidSign(PLUS));
-  EXPECT_TRUE(isValidSign(MINUS));
-  EXPECT_TRUE(isValidSign(ZERO));
+  EXPECT_TRUE(isValidSign(ESign::c_Plus));
+  EXPECT_TRUE(isValidSign(ESign::c_Minus));
+  EXPECT_TRUE(isValidSign(ESign::c_Zero));
 
-  EXPECT_FALSE(isValidSign(INVALID_SIGN));
-  EXPECT_FALSE(isValidSign(7));
+  EXPECT_FALSE(isValidSign(ESign::c_Invalid));
+  EXPECT_FALSE(isValidSign(static_cast<ESign>(7)));
 
-  EXPECT_EQ(MINUS, oppositeSign(PLUS));
-  EXPECT_EQ(PLUS, oppositeSign(MINUS));
-  EXPECT_EQ(ZERO, oppositeSign(ZERO));
-  EXPECT_EQ(INVALID_SIGN, oppositeSign(INVALID_SIGN));
+  EXPECT_EQ(ESign::c_Minus, oppositeSign(ESign::c_Plus));
+  EXPECT_EQ(ESign::c_Plus, oppositeSign(ESign::c_Minus));
+  EXPECT_EQ(ESign::c_Zero, oppositeSign(ESign::c_Zero));
+  EXPECT_EQ(ESign::c_Invalid, oppositeSign(ESign::c_Invalid));
 }
 
 

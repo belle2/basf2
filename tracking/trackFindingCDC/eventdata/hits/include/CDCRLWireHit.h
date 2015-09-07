@@ -148,7 +148,7 @@ namespace Belle2 {
 
       /// Getter for the  drift length at the reference position of the wire
       double getSignedRefDriftLength() const
-      { return ((SignType)(getRLInfo())) * getRefDriftLength(); }
+      { return ((ESign)(getRLInfo())) * getRefDriftLength(); }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
       double getRefDriftLengthVariance() const

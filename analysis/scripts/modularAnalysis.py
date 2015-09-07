@@ -727,6 +727,33 @@ def massVertexKFit(
     )
 
 
+def massVertexKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'massvertex',
+        '',
+        True,
+        path,
+    )
+
+
 def massKFit(
     list_name,
     conf_level,
@@ -750,6 +777,33 @@ def massKFit(
         'mass',
         '',
         False,
+        path,
+    )
+
+
+def massKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'mass',
+        '',
+        True,
         path,
     )
 

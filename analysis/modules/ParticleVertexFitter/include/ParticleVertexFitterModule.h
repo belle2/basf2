@@ -178,7 +178,7 @@ namespace Belle2 {
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      * Pi0 particles are treated separately so they are filled to another vector.
      */
-    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
+    bool fillFitParticles(const Particle* mother, std::vector<unsigned>& fitChildren, std::vector<unsigned>& pi0Children);
 
     /**
      * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.

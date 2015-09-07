@@ -163,7 +163,6 @@ namespace Belle2 {
       dauCopy->copyRelations(oldDaughters[iOld]);
       mother->removeDaughter(oldDaughters[iOld]);
       mother->appendDaughter(dauCopy);
-
     }
 
   }
@@ -252,8 +251,8 @@ namespace Belle2 {
   }
 
 
-  bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
-                                                    std::vector<const Particle*>& pi0Children)
+  bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<unsigned>& fitChildren,
+                                                    std::vector<unsigned>& pi0Children)
   {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
@@ -268,9 +267,9 @@ namespace Belle2 {
           isPi0 = true;
 
       if (!isPi0)
-        fitChildren.push_back(child);
+        fitChildren.push_back(ichild);
       else
-        pi0Children.push_back(child);
+        pi0Children.push_back(ichild);
     }
 
     return true;
@@ -331,8 +330,8 @@ namespace Belle2 {
     if (ipTubeConstraint)
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] ipTubeConstraint is not supported yet!");
 
-    std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
+    std::vector<unsigned> fitChildren;
+    std::vector<unsigned> pi0Children;
 
     bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
 
@@ -353,7 +352,7 @@ namespace Belle2 {
     kv.setMagneticField(m_Bfield);
 
     for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      addParticleToKfitter(kv, fitChildren[iChild]);
+      addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
 
     if (ipProfileConstraint)
       addIPProfileToKFitter(kv);
@@ -372,8 +371,9 @@ namespace Belle2 {
       // 1. refit pi0 to previously determined vertex
       // 2. redo the fit using all particles (including pi0 this time)
 
-      Particle pi0Temp(pi0Children[0]->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0Children[0], kv) ;
+      const Particle* pi0 = mother->getDaughter(pi0Children[0]);
+      Particle pi0Temp(pi0->get4Vector(), 111);
+      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
       if (!ok)
         return false;
 
@@ -381,9 +381,18 @@ namespace Belle2 {
       analysis::VertexFitKFit kv2;
       kv2.setMagneticField(m_Bfield);
 
-      for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kv2, fitChildren[iChild]);
-      addParticleToKfitter(kv2, &pi0Temp);
+      for (unsigned iChild = 0; iChild < mother->getNDaughters(); iChild++) {
+        const Particle* child = mother->getDaughter(iChild);
+        bool isPi0 = false;
+        if (child->getPDGCode() == 111 && child->getNDaughters() == 2)
+          if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22)
+            isPi0 = true;
+
+        if (!isPi0)
+          addParticleToKfitter(kv2, child);
+        else
+          addParticleToKfitter(kv2, &pi0Temp);
+      }
 
       if (ipProfileConstraint)
         addIPProfileToKFitter(kv2);
@@ -403,8 +412,8 @@ namespace Belle2 {
   {
     if (mother->getNDaughters() < 2) return false;
 
-    std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
+    std::vector<unsigned> fitChildren;
+    std::vector<unsigned> pi0Children;
 
     bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
 
@@ -427,7 +436,7 @@ namespace Belle2 {
       kmv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kmv, fitChildren[iChild]);
+        addParticleToKfitter(kmv, mother->getDaughter(fitChildren[iChild]));
 
       kmv.setInvariantMass(mother->getPDGMass());
       int err = kmv.doFit();
@@ -445,15 +454,16 @@ namespace Belle2 {
       kv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kv, fitChildren[iChild]);
+        addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
 
       // Perform vertex fit using only the particles with valid error matrices
       int err = kv.doFit();
       if (err != 0)
         return false;
 
-      Particle pi0Temp(pi0Children[0]->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0Children[0], kv) ;
+      const Particle* pi0 = mother->getDaughter(pi0Children[0]);
+      Particle pi0Temp(pi0->get4Vector(), 111);
+      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
       if (!ok)
         return false;
 
@@ -461,9 +471,18 @@ namespace Belle2 {
       analysis::MassVertexFitKFit kmv2;
       kmv2.setMagneticField(m_Bfield);
 
-      for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kmv2, fitChildren[iChild]);
-      addParticleToKfitter(kmv2, &pi0Temp);
+      for (unsigned iChild = 0; iChild < mother->getNDaughters(); iChild++) {
+        const Particle* child = mother->getDaughter(iChild);
+        bool isPi0 = false;
+        if (child->getPDGCode() == 111 && child->getNDaughters() == 2)
+          if (child->getDaughter(0)->getPDGCode() == 22 && child->getDaughter(1)->getPDGCode() == 22)
+            isPi0 = true;
+
+        if (!isPi0)
+          addParticleToKfitter(kmv2, child);
+        else
+          addParticleToKfitter(kmv2, &pi0Temp);
+      }
 
       kmv2.setInvariantMass(mother->getPDGMass());
       err = kmv2.doFit();
@@ -557,6 +576,41 @@ namespace Belle2 {
 
     mother->updateMomentum(mom, pos, errMatrix, prob);
 
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter momenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      unsigned n = kv.getTrackCount();
+      if (daughters.size() != n)
+        return false;
+
+      for (unsigned iChild = 0; iChild < n; iChild++) {
+        TLorentzVector childMom(kv.getTrackMomentum(iChild).px(),
+                                kv.getTrackMomentum(iChild).py(),
+                                kv.getTrackMomentum(iChild).pz(),
+                                kv.getTrackMomentum(iChild).e());
+
+        TVector3 childPos(kv.getTrackPosition(iChild).x(),
+                          kv.getTrackPosition(iChild).y(),
+                          kv.getTrackPosition(iChild).z());
+
+        CLHEP::HepSymMatrix childCovMatrix = kv.getTrackError(iChild);
+
+        TMatrixFSym childErrMatrix(7);
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            childErrMatrix[i][j] = childCovMatrix[i][j];
+          }
+        }
+
+        daughters[iChild]->set4Vector(childMom);
+        daughters[iChild]->setVertex(childPos);
+        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+      }
+    }
+
     return true;
   }
 
@@ -611,6 +665,41 @@ namespace Belle2 {
     double prob = TMath::Prob(chi2, ndf);
 
     mother->updateMomentum(mom, pos, errMatrix, prob);
+
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter moenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      unsigned n = kmv.getTrackCount();
+      if (daughters.size() != n)
+        return false;
+
+      for (unsigned iChild = 0; iChild < n; iChild++) {
+        TLorentzVector childMom(kmv.getTrackMomentum(iChild).px(),
+                                kmv.getTrackMomentum(iChild).py(),
+                                kmv.getTrackMomentum(iChild).pz(),
+                                kmv.getTrackMomentum(iChild).e());
+
+        TVector3 childPos(kmv.getTrackPosition(iChild).x(),
+                          kmv.getTrackPosition(iChild).y(),
+                          kmv.getTrackPosition(iChild).z());
+
+        CLHEP::HepSymMatrix childCovMatrix = kmv.getTrackError(iChild);
+
+        TMatrixFSym childErrMatrix(7);
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            childErrMatrix[i][j] = childCovMatrix[i][j];
+          }
+        }
+
+        daughters[iChild]->set4Vector(childMom);
+        daughters[iChild]->setVertex(childPos);
+        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+      }
+    }
 
     return true;
   }
@@ -667,6 +756,41 @@ namespace Belle2 {
     double prob = TMath::Prob(chi2, ndf);
 
     mother->updateMomentum(mom, pos, errMatrix, prob);
+
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter moenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      unsigned n = km.getTrackCount();
+      if (daughters.size() != n)
+        return false;
+
+      for (unsigned iChild = 0; iChild < n; iChild++) {
+        TLorentzVector childMom(km.getTrackMomentum(iChild).px(),
+                                km.getTrackMomentum(iChild).py(),
+                                km.getTrackMomentum(iChild).pz(),
+                                km.getTrackMomentum(iChild).e());
+
+        TVector3 childPos(km.getTrackPosition(iChild).x(),
+                          km.getTrackPosition(iChild).y(),
+                          km.getTrackPosition(iChild).z());
+
+        CLHEP::HepSymMatrix childCovMatrix = km.getTrackError(iChild);
+
+        TMatrixFSym childErrMatrix(7);
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            childErrMatrix[i][j] = childCovMatrix[i][j];
+          }
+        }
+
+        daughters[iChild]->set4Vector(childMom);
+        daughters[iChild]->setVertex(childPos);
+        daughters[iChild]->setMomentumVertexErrorMatrix(childErrMatrix);
+      }
+    }
 
     return true;
   }

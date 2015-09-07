@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 
 bool StereohitsProcesser::isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const
 {
-  if (rlWireHit.getStereoType() == StereoType_c::Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
+  if (rlWireHit.getStereoType() == StereoType::c_Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
 
 

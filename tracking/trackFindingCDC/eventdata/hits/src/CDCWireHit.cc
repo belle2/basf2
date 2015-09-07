@@ -102,12 +102,12 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const Ri
 {
   const StereoType stereoType = getStereoType();
 
-  if (stereoType == StereoType_c::StereoV or stereoType == StereoType_c::StereoU) {
+  if (stereoType == StereoType::c_StereoV or stereoType == StereoType::c_StereoU) {
     const WireLine& wireLine = getWire().getSkewLine();
     const double signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength);
 
-  } else if (stereoType == StereoType_c::Axial) {
+  } else if (stereoType == StereoType::c_Axial) {
     const Vector2D recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
@@ -115,5 +115,5 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const Ri
     return Vector3D(recoPos2D, z);
   }
 
-  B2FATAL("Reconstructing on invalid stereo type " << stereoType);
+  B2FATAL("Reconstructing on invalid stereo type " << static_cast<int>(stereoType));
 }

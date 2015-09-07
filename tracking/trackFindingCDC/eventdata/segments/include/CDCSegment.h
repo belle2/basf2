@@ -36,14 +36,14 @@ namespace Belle2 {
 
       /// Returns the common stereo type of all tracking hits.
       /** This checks if all tracking hits are located in the same superlayer and \n
-       *  returns the stereo type of the later. Returns StereoType_c::Invalid if the superlayer \n
+       *  returns the stereo type of the later. Returns StereoType::c_Invalid if the superlayer \n
        *  is not shared among the tracking hits. */
       StereoType getStereoType() const
       { return TrackFindingCDC::getStereoType(*this); }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
-      { return getStereoType() == StereoType_c::Axial; }
+      { return getStereoType() == StereoType::c_Axial; }
 
       /** Returns the common super layer id of all stored tracking hits
        *  This checks if all items are located in the same superlayer and

@@ -49,7 +49,7 @@ void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSe
   Processor::ReturnList hits_set;
 
   for (Processor::ItemType::TypeData& reco : recoSegments) {
-    if (reco.getStereoType() == StereoType_c::Axial) {
+    if (reco.getStereoType() == StereoType::c_Axial) {
       hits_set.push_back(&reco);
     }
   }

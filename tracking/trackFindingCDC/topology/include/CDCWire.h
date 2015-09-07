@@ -163,19 +163,19 @@ namespace Belle2 {
       const WireLine& getSkewLine() const { return m_skewLine; }
 
       /// Indicates if the wire is axial or stereo
-      inline bool isAxial() const { return getStereoType() == StereoType_c::Axial; }
+      inline bool isAxial() const { return getStereoType() == StereoType::c_Axial; }
 
       /// Getter for the stereo type of the wire
       /** Gives the stereo type of the wire.
-       *  Result is one of StereoType_c::Axial, StereoType_c::StereoU and StereoType_c::StereoV
+       *  Result is one of StereoType::c_Axial, StereoType::c_StereoU and StereoType::c_StereoV
        *  The stereo type is shared by all wires in the same superlayer
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
       inline StereoType getStereoType() const
       {
-        if ((getISuperLayer() % 2) == 0)  return StereoType_c::Axial;
-        else if ((getISuperLayer() % 4) == 1)  return StereoType_c::StereoU;
-        else return StereoType_c::StereoV;
+        if ((getISuperLayer() % 2) == 0)  return StereoType::c_Axial;
+        else if ((getISuperLayer() % 4) == 1)  return StereoType::c_StereoU;
+        else return StereoType::c_StereoV;
       }
 
       /// Gives the xy projected position of the wire at the given z coordinate

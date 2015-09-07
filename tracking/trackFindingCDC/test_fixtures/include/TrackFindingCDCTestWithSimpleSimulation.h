@@ -119,7 +119,7 @@ namespace Belle2 {
 
         // Filter the axial segments
         for (const CDCRecoSegment2D& recoSegment2D : m_mcSegment2Ds) {
-          if (recoSegment2D.getStereoType() == StereoType_c::Axial) {
+          if (recoSegment2D.getStereoType() == StereoType::c_Axial) {
             m_mcAxialSegment2Ds.push_back(&recoSegment2D);
           }
         }

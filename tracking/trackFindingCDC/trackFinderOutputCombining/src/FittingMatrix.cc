@@ -62,7 +62,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
       // For the reconstructed segment there are only two possible cases:
       // (1) the segment is full axial. We fit the hits of the segment together with the axial hits of the track.
       // (2) the segment is full stereo. We pull the hits of the segment to the track trajectory and fit the z direction
-      if (segment.getStereoType() == StereoType_c::Axial) {
+      if (segment.getStereoType() == StereoType::c_Axial) {
         CDCObservations2D observationsCircle;
 
         // Add the hits from the segment to the circle fit
@@ -79,7 +79,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
         if (observationsCircle.size() > 0) {
           // Add the hits from the TrackCand to the circle fit
           for (const CDCRecoHit3D& recoHit : trackCand) {
-            if (recoHit.getStereoType() == StereoType_c::Axial) {
+            if (recoHit.getStereoType() == StereoType::c_Axial) {
               observationsCircle.append(recoHit.getWireHit().getRefPos2D());
             }
           }
@@ -90,7 +90,7 @@ void FittingMatrix::calculateMatrices(const std::vector<CDCRecoSegment2D>& recoS
           m_fittingMatrix(counterSegment, counterTracks) = trajectory2D.getPValue();
           // we do not set the z-Matrix or the zDistMatrix here
         }
-      } else if (segment.getStereoType() == StereoType_c::StereoU or segment.getStereoType() == StereoType_c::StereoV) {
+      } else if (segment.getStereoType() == StereoType::c_StereoU or segment.getStereoType() == StereoType::c_StereoV) {
         CDCObservations2D observationsSZ;
 
         // Add the hits from the segment to the sz fit
@@ -146,7 +146,7 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
   // calculate all circle segments lengths
   for (const CDCRecoHit3D& recoHit : resultTrackCand) {
     double perpS;
-    if (recoHit.getStereoType() == StereoType_c::Axial) {
+    if (recoHit.getStereoType() == StereoType::c_Axial) {
       perpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
     } else {
       if (not recoHit.isInCellZBounds())
@@ -171,7 +171,7 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
   CDCObservations2D observationsCircle;
   for (const CDCRecoHit2D& recoHit : segment) {
     double perpS;
-    if (recoHit.getStereoType() == StereoType_c::Axial) {
+    if (recoHit.getStereoType() == StereoType::c_Axial) {
       perpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
       observationsCircle.append(recoHit);
     } else {
@@ -220,13 +220,13 @@ FittingMatrix::SegmentStatus FittingMatrix::calculateSegmentStatus(const CDCReco
       iter++;
     }
 
-    if (segment.getStereoType() == StereoType_c::Axial) {
+    if (segment.getStereoType() == StereoType::c_Axial) {
       beginningIndex = std::max(static_cast<std::list<double>::size_type>(0), beginningIndex - 5);
       endIndex = std::min(perpSList.size(), endIndex + 5);
 
       for (unsigned int counter = beginningIndex; counter < endIndex; counter++) {
         const CDCRecoHit3D& recoHit = resultTrackCand[counter];
-        if (recoHit.getStereoType() == StereoType_c::Axial) {
+        if (recoHit.getStereoType() == StereoType::c_Axial) {
           observationsCircle.append(recoHit.getWireHit().getRefPos2D());
         } else {
           observationsCircle.append(recoHit.getRecoPos2D());

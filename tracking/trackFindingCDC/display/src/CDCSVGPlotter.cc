@@ -339,7 +339,7 @@ void CDCSVGPlotter::drawMCAxialAxialPairs(const std::string& storeObjName, const
 
     std::vector<CDCAxialRecoSegment2D> axialSegments;
     for (const CDCAxialRecoSegment2D& segment : recoSegments) {
-      if (segment.getStereoType() == 0) axialSegments.push_back(segment);
+      if (segment.getStereoType() == StereoType::c_Axial) axialSegments.push_back(segment);
     }
 
     std::vector<CDCAxialSegmentPair> axialAxialSegmentPairs;
@@ -385,7 +385,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     std::vector<CDCAxialRecoSegment2D> axialSegments;
     std::vector<CDCStereoRecoSegment2D> stereoSegments;
     for (const CDCRecoSegment2D& segment : recoSegments) {
-      if (segment.getStereoType() == 0) axialSegments.push_back(segment);
+      if (segment.getStereoType() == StereoType::c_Axial) axialSegments.push_back(segment);
       else stereoSegments.push_back(segment);
     }
 

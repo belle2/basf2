@@ -37,14 +37,14 @@
 
 namespace Belle2 {
 
-// ----------------------------------------------------------------------
-// KsfwMoments
-// ----------------------------------------------------------------------
   class KsfwMoments {
   public:
+
+    /**
+     * Initialize KSFW moments, et, and mm2 to 0
+     */
     KsfwMoments() : m_uf(0)
     {
-
       for (int i = 0; i < 2; i++)
         for (int j = 0; j < 3; j++)
           for (int k = 0; k < 5; k++)
@@ -60,6 +60,9 @@ namespace Belle2 {
       }
     };
 
+    /**
+     * Constructor
+     */
     KsfwMoments(double Hso0_max,
                 std::vector<std::pair<TVector3, int>> p3_cms_q_sigA,
                 std::vector<std::pair<TVector3, int>> p3_cms_q_sigB,
@@ -68,21 +71,43 @@ namespace Belle2 {
                 TLorentzVector p_cms_missB,
                 double et[2]
                );
+
+    /**
+     * Destructor
+     */
     ~KsfwMoments() {};
 
+    /**
+     *
+     */
     int usefinal(int uf) { if (uf == 0 || uf == 1) m_uf = uf; return m_uf; }
 
+    /**
+     *
+     */
     int usefinal() const { return m_uf; }
+
+    /**
+     * Returns calculated missing mass squared
+     */
     double mm2(int uf = -1) const { return m_mm2[uf < 0 ? m_uf : uf]; }
+
+    /**
+     * Returns calculated transverse energy
+     */
     double et(int uf = -1) const { return m_et[uf < 0 ? m_uf : uf]; }
-    double Hoo(int i, int uf = -1) const
-    {
-      return m_Hoo[uf < 0 ? m_uf : uf][i];
-    }
-    double Hso(int i, int j, int uf = -1) const
-    {
-      return m_Hso[uf < 0 ? m_uf : uf][i][j];
-    }
+
+    /**
+     * Returns calculated KSFW Moments
+     */
+    double Hoo(int i, int uf = -1) const { return m_Hoo[uf < 0 ? m_uf : uf][i]; }
+
+    /**
+     * Returns calculated KSFW Moments
+     */
+    double Hso(int i, int j, int uf = -1) const { return m_Hso[uf < 0 ? m_uf : uf][i][j]; }
+
+
     double var(int i)   // the same order as the original k_sfw.cc
     {
       if (i < 0)  return 0;
@@ -97,11 +122,11 @@ namespace Belle2 {
     }
 
   private:
-    int m_uf;
-    double m_Hso[2][3][5];
-    double m_Hoo[2][5];
-    double m_et[2];
-    double m_mm2[2];
+    int m_uf;              /**  */
+    double m_Hso[2][3][5]; /** KSFW moments */
+    double m_Hoo[2][5];    /** KSFW moments */
+    double m_et[2];        /** Transverse energy */
+    double m_mm2[2];       /** Missing mass squared */
   };
 
 } // Belle2 namespace

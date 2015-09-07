@@ -1935,7 +1935,8 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
   n = m_geoDat->getStripLengthIndex(curvol.strip - 1);
   t = m_geoDat->transf.strip[curvol.endcap - 1][curvol.layer - 1]
       [curvol.sector - 1][curvol.plane - 1][curvol.strip - 1] *
-      G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0);
+      G4Translate3D(0.5 * StripSize.rss_size, 0.0, 0.0) *
+      HepGeom::RotateX3D(180.0 * CLHEP::deg);
   lv = logvol.stripvol[n];
   try {
     new G4PVPlacement(t, lv, lv->GetName(), mlv, false, curvol.strip, false);

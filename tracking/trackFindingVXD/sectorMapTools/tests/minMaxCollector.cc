@@ -164,7 +164,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_TRUE(newCollector.empty());
 
 
-    for (unsigned i = 0 ; i < 50 ; i++) { // fill up to 50
+    for (unsigned i = 1 ; i < 51 ; i++) { // fill up to 50
       double val = gRandom->Uniform(1.);
       newCollector.append(val);
       vectorCollector.push_back(val);
@@ -183,7 +183,7 @@ namespace VXDTFMinMaxCollectorTest {
 
 
 
-    for (unsigned i = 50 ; i < 200 ; i++) { // fill up to 200
+    for (unsigned i = 1 ; i < 151 ; i++) { // fill up to 200
       double val = gRandom->Uniform(1.);
       newCollector.append(val);
       vectorCollector.push_back(val);
@@ -204,7 +204,7 @@ namespace VXDTFMinMaxCollectorTest {
 
 
 
-    for (unsigned i = 200 ; i < 1000 ; i++) { // fill up to 1000
+    for (unsigned i = 1 ; i < 801 ; i++) { // fill up to 1000
       double val = gRandom->Uniform(1.);
       newCollector.append(val);
       vectorCollector.push_back(val);
@@ -220,14 +220,12 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    // New approach estimates the lower quatiles similar but they may be off by one index.
-    EXPECT_TRUE(vectorCollector.at(getIndex(0.022)) == newCollector.getMinMax(0.022, 0.978).first or
-                vectorCollector.at(getIndex(0.022) + 1) == newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 
 
-    for (unsigned i = 1000 ; i < 10000 ; i++) { // fill up to 10000
+    for (unsigned i = 1 ; i < 9001 ; i++) { // fill up to 10000
       double val = gRandom->Uniform(1.);
       newCollector.append(val);
       vectorCollector.push_back(val);
@@ -243,16 +241,14 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    // New approach estimates the lower quatiles similar but they may be off by one index.
-    EXPECT_TRUE(vectorCollector.at(getIndex(0.022)) == newCollector.getMinMax(0.022, 0.978).first or
-                vectorCollector.at(getIndex(0.022) + 1) == newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 
 
     // starting now a second collector to be merged afterwards:
     auto secondCollector = MinMaxCollector<double>();
-    for (unsigned i = 10000 ; i < 20000 ; i++) { // fill up to 20000
+    for (unsigned i = 1 ; i < 10001 ; i++) { // fill up to 10000
       double val = gRandom->Uniform(1.);
       secondCollector.append(val);
       vectorCollector.push_back(val);
@@ -267,14 +263,12 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    // New approach estimates the lower quatiles similar but they may be off by one index.
-    EXPECT_TRUE(vectorCollector.at(getIndex(0.022)) == newCollector.getMinMax(0.022, 0.978).first or
-                vectorCollector.at(getIndex(0.022) + 1) == newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.0001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 
 
-    for (unsigned i = 20000 ; i < 50000 ; i++) { // fill up to 50,000
+    for (unsigned i = 1 ; i < 30001 ; i++) { // fill up to 50,000
       double val = gRandom->Uniform(1.);
       newCollector.append(val);
       vectorCollector.push_back(val);
@@ -290,9 +284,7 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    // New approach estimates the quatile similar but may be off by one index.
-    EXPECT_TRUE(vectorCollector.at(getIndex(0.022)) == newCollector.getMinMax(0.022, 0.978).first or
-                vectorCollector.at(getIndex(0.022) + 1) == newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.0001);
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
   }
 }

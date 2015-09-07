@@ -137,7 +137,7 @@ void TrackProcessorNew::updateTrack(CDCTrack& track)
 
 
 
-  if (trackTrajectory2D.getLocalCircle().orientation() != TrackMergerNew::getChargeSign(track)) trackTrajectory2D.reverse();
+  if (trackTrajectory2D.getChargeSign() != TrackMergerNew::getChargeSign(track)) trackTrajectory2D.reverse();
 
   trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
 

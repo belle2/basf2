@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding: utf8
+# coding: utf8
 
 """\
 Utility to measure the memory consumption of a process hierarchy on Linux.
@@ -267,7 +267,7 @@ def find_children(rootpid):
 def get_memory_usage(pid):
     """Return the memory usage of a given process id."""
     try:
-        #Open the smaps file and look for all defined fields
+        # Open the smaps file and look for all defined fields
         sizes = np.zeros(ntypes)
         with open("/proc/%s/smaps" % pid) as smaps:
             # there are a lot of memory segments in smaps, add them all up
@@ -280,7 +280,7 @@ def get_memory_usage(pid):
 
         return sizes
     except IOError:
-        #IOError can happen if the process ends while reading, return 0 then
+        # IOError can happen if the process ends while reading, return 0 then
         return np.zeros(ntypes)
 
 
@@ -356,14 +356,14 @@ if do_record:
         runtime = timer.wait()
         diff.append(runtime - lasttime)
         lasttime = runtime
-        #check if child is still running
+        # check if child is still running
         if child.poll() is not None:
             break
-        #if so, find all processes and obtain memory usage for each
+        # if so, find all processes and obtain memory usage for each
         pids = find_children(child.pid)
         total = np.zeros(ntypes)
         for i, pid in enumerate(pids):
-            if not pid in process_memory:
+            if pid not in process_memory:
                 cmdline = get_cmdline(pid)
                 if not cmdline:
                     continue
@@ -372,16 +372,16 @@ if do_record:
 
             mem = get_memory_usage(pid)
             total += mem
-            #remember the values for this process
+            # remember the values for this process
             process_memory[pid].append([runtime] + list(mem))
 
-        #and remember the total as well
+        # and remember the total as well
         total_memory.append([runtime] + list(total))
         if options.system:
             system_memory.append([runtime,
                                   get_system_memory() - system_offset])
 
-    #convert lists to numpy arrays
+    # convert lists to numpy arrays
     total_memory = np.array(total_memory)
     if options.system:
         system_memory = np.array(system_memory)
@@ -466,9 +466,9 @@ def plot_memory(data, label, color, marker=True):
 if do_plotting:
     figures = [pl.figure(figsize=(12, 8)) for i in range(ntypes)]
     # create axes for all memory "types"
-    axes = [f.add_subplot(1, 1, 1) for f in figures]
+    axes = [fig.add_subplot(1, 1, 1) for fig in figures]
 
-    #plot total memory if we saw more than one process
+    # plot total memory if we saw more than one process
     if len(process_memory) > 1:
         plot_memory(total_memory, "Total", "k")
 
@@ -511,7 +511,7 @@ if do_plotting:
 
 # finally, print values, first we get the values formated correctly in MB for
 # max, mean and standard deviation and that for each memory type
-values = np.array([["%.2f" % (fct(mem)/1000) for mem in total_memory.T[1:]]
+values = np.array([["%.2f" % (fct(m)/1000) for m in total_memory.T[1:]]
                    for fct in(np.max, np.mean, np.std)])
 # now lets find out how many digits we need for each type of value
 digits = [max(map(len, v)) for v in values]

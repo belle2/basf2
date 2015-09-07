@@ -40,7 +40,6 @@ FilterFactory<Filter<Relation<CDCFacet> > >::getValidFilterNamesAndDescriptions(
 
   filterNames.insert({
     {"all", "all facet relations are valid"},
-    {"mc", "depricated alias for 'truth'"},
     {"truth", "facet relations from monte carlo truth"},
     {"none", "no facet relation is valid, stop at facet creation."},
     {"recording", "record the encountered instances of facet relations"},
@@ -59,9 +58,6 @@ FilterFactory<Filter<Relation<CDCFacet> > >::create(const std::string& filterNam
   } else if (filterName == string("all")) {
     return std::unique_ptr<Filter<Relation<CDCFacet> > >(new AllFacetRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new MCFacetRelationFilter());
-  } else if (filterName == string("mc")) {
-    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
     return std::unique_ptr<Filter<Relation<CDCFacet> > >(new MCFacetRelationFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<Relation<CDCFacet> > >(new SimpleFacetRelationFilter());

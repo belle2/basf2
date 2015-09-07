@@ -41,7 +41,6 @@ FilterFactory<Filter<CDCFacet> >::getValidFilterNamesAndDescriptions() const
   filterNames.insert({
     {"all", "all facets are valid"},
     {"fitless", "only checking the feasability of right left passage information"},
-    {"mc", "depricated alias for 'truth'"},
     {"truth", "monte carlo truth"},
     {"none", "no facet is valid, stop at cluster generation."},
     {"realistic", "mc free with more realistic criteria"},
@@ -60,9 +59,6 @@ FilterFactory<Filter<CDCFacet> >::create(const std::string& filterName) const
   } else if (filterName == string("all")) {
     return std::unique_ptr<Filter<CDCFacet> >(new AllFacetFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
-  } else if (filterName == string("mc")) {
-    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
     return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
   } else if (filterName == string("fitless")) {
     return std::unique_ptr<Filter<CDCFacet> >(new FitlessFacetFilter());

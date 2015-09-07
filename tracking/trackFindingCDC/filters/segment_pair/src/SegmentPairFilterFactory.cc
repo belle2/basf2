@@ -40,7 +40,6 @@ FilterFactory<Filter<CDCSegmentPair> >::getValidFilterNamesAndDescriptions() con
 
   filterNames.insert({
     {"all", "all segment pairs are valid"},
-    {"mc", "depricated alias for 'truth'"},
     {"truth", "monte carlo truth"},
     {"none", "no segment pair is valid"},
     {"recording", "record the encountered instances of segment pairs"},
@@ -59,9 +58,6 @@ FilterFactory<Filter<CDCSegmentPair> >::create(const std::string& filterName) co
   } else if (filterName == string("all")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
-  } else if (filterName == string("mc")) {
-    B2WARNING("Filter name 'mc' is depricated in favour of 'truth'");
     return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());

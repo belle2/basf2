@@ -37,7 +37,7 @@ SegmentPairRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"all", "all segment pair relations are valid"},
-    {"mc", "segment pair relations from monte carlo truth"},
+    {"truth", "segment pair relations from monte carlo truth"},
     {"none", "no segment pair relation is valid, stop at segment pair creation"},
     {"simple", "mc free with simple criteria"},
   };
@@ -50,7 +50,7 @@ SegmentPairRelationFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<BaseSegmentPairRelationFilter>(new BaseSegmentPairRelationFilter());
   } else if (filterName == string("all")) {
     return std::unique_ptr<BaseSegmentPairRelationFilter>(new AllSegmentPairRelationFilter());
-  } else if (filterName == string("mc")) {
+  } else if (filterName == string("truth")) {
     return std::unique_ptr<BaseSegmentPairRelationFilter>(new MCSegmentPairRelationFilter());
   } else if (filterName == string("simple")) {
     return std::unique_ptr<BaseSegmentPairRelationFilter>(new SimpleSegmentPairRelationFilter());

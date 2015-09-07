@@ -42,7 +42,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
-        "SegmentPairFilter": "mc",
+        "SegmentPairFilter": "truth",
         "SegmentPairRelationFilter": "none",
     })
     fit_method_name = "fuse-xy"

@@ -52,7 +52,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_isIncreasing)
   Vector2D lower(0.0, 1.0);
   Vector2D upper(1.0, 2.0);
 
-  EXPECT_EQ(INCREASING, SinEqLine::getIncDecInfo(lower, upper));
+  EXPECT_EQ(EIncDec::c_Increasing, SinEqLine::getEIncDec(lower, upper));
 
 }
 

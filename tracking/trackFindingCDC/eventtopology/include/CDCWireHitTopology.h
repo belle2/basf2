@@ -137,12 +137,12 @@ namespace Belle2 {
       /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses.
       const Belle2::TrackFindingCDC::CDCRLWireHit*
       getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                   const RightLeftInfo rlInfo) const;
+                   const ERightLeft rlInfo) const;
 
       /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passage hypotheses.
       const Belle2::TrackFindingCDC::CDCRLWireHit*
       getRLWireHit(const Belle2::CDCHit* ptrHit,
-                   const RightLeftInfo rlInfo) const;
+                   const ERightLeft rlInfo) const;
 
       /// Getter for a coaligned subrange of wire hits.
       template<class Coaligned>

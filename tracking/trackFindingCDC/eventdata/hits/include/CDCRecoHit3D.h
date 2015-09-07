@@ -193,7 +193,7 @@ namespace Belle2 {
       /** Returns the right left passage information as see in the xy projection.
        *  It gives if the wire lies on the right or on the left side of the track \n
        *  as you at the xy projection. */
-      RightLeftInfo getRLInfo() const
+      ERightLeft getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
 
       /// Getter for the reference position of the wire.

@@ -25,9 +25,9 @@ const CDCRecoHit3D HitProcessor::createRecoHit3D(CDCTrajectory2D& trackTrajector
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
-  RightLeftInfo rlInfo = RIGHT;
+  ERightLeft rlInfo = ERightLeft::c_Right;
   if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-    rlInfo = LEFT;
+    rlInfo = ERightLeft::c_Left;
   const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
 
   return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
@@ -64,9 +64,9 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     for (const QuadTreeHitWrapper* hit : axialHitList) {
       if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
 
-      RightLeftInfo rlInfo = RIGHT;
+      ERightLeft rlInfo = ERightLeft::c_Right;
       if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-        rlInfo = LEFT;
+        rlInfo = ERightLeft::c_Left;
       const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
       if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
         continue;

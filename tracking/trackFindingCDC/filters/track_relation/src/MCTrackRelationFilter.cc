@@ -22,10 +22,10 @@ NeighborWeight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
   const CDCMCTrackLookUp& mcTrackLookUp = CDCMCTrackLookUp::getInstance();
 
   // Check if the tracks are aligned correctly along the Monte Carlo track
-  ForwardBackwardInfo pairFBInfo = mcTrackLookUp.areAlignedInMCTrack(&fromTrack, &toTrack);
-  if (pairFBInfo == INVALID_INFO) return NOT_A_CELL;
+  EForwardBackward pairFBInfo = mcTrackLookUp.areAlignedInMCTrack(&fromTrack, &toTrack);
+  if (pairFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
 
-  if (pairFBInfo == FORWARD or (getAllowReverse() and pairFBInfo == BACKWARD)) {
+  if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the track
     Index fromNPassedSuperLayers = mcTrackLookUp.getLastNPassedSuperLayers(&fromTrack);
     if (fromNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;

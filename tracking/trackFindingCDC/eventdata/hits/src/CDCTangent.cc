@@ -70,10 +70,10 @@ void CDCTangent::adjustLine()
 
 void CDCTangent::adjustRLInfo()
 {
-  RightLeftInfo newFromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
+  ERightLeft newFromRLInfo = getLine().isRightOrLeft(getFromWireHit()->getRefPos2D());
   setFromRLInfo(newFromRLInfo);
 
-  RightLeftInfo newToRLInfo = getLine().isRightOrLeft(getToWireHit()->getRefPos2D());
+  ERightLeft newToRLInfo = getLine().isRightOrLeft(getToWireHit()->getRefPos2D());
   setToRLInfo(newToRLInfo);
 }
 

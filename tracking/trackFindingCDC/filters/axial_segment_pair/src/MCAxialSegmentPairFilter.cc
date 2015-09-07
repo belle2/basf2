@@ -40,10 +40,11 @@ CellWeight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  ForwardBackwardInfo pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
-  if (pairFBInfo == INVALID_INFO) return NOT_A_CELL;
+  EForwardBackward pairFBInfo =
+    mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
+  if (pairFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
 
-  if (pairFBInfo == FORWARD or (getAllowReverse() and pairFBInfo == BACKWARD)) {
+  if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
     if (startNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;

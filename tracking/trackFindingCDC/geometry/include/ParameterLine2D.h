@@ -51,7 +51,7 @@ namespace Belle2 {
        */
       static ParameterLine2D fromSlopeIntercept(const double slope,
                                                 const double intercept,
-                                                const ForwardBackwardInfo orientation)
+                                                const EForwardBackward orientation)
       { return ParameterLine2D(Vector2D(0.0, intercept), Vector2D(orientation, orientation * slope)); }
 
 
@@ -89,7 +89,7 @@ namespace Belle2 {
       /// Gives the tangential vector of the line.
       const Vector2D& tangential() const { return m_tangential; }
       /// Gives the normal vector of the line.
-      Vector2D normal() const { return tangential().orthogonal(CW); }
+      Vector2D normal() const { return tangential().orthogonal(ERotation::c_Clockwise); }
 
       /// Gives the support vector of the line.
       const Vector2D& support() const { return m_support; }
@@ -99,10 +99,12 @@ namespace Belle2 {
       { return tangential() * parameter += support(); }
 
       ///Indicates if the tangential vector point in a commmon direction with the first coordinate axes
-      ForwardBackwardInfo alignedWithFirst() const { return sign(tangential().first()); }
+      EForwardBackward alignedWithFirst() const
+      { return static_cast<EForwardBackward>(sign(tangential().first())); }
 
       ///Indicates if the tangential vector point in a commmon direction with the second coordinate axes
-      ForwardBackwardInfo alignedWithSecond() const { return sign(tangential().second()); }
+      EForwardBackward alignedWithSecond() const
+      { return static_cast<EForwardBackward>(sign(tangential().second())); }
 
       ///Normalizes the tangential vector inplace
       /** Normalizes the line representation such that the parameter is indentical with the distance
@@ -139,22 +141,23 @@ namespace Belle2 {
       { return fabs(distance(point)); }
 
       /// Return if the point given is right or left of the line
-      RightLeftInfo isRightOrLeft(const Vector2D& point) const
-      { return sign(distance(point)); }
+      ERightLeft isRightOrLeft(const Vector2D& point) const
+      { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the line
       inline bool isLeft(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == LEFT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
       inline bool isRight(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == RIGHT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Gives the position at the closest approach on the line to point
       Vector2D closest(const Vector2D& point) const
       {
         double norm_squared = tangential().normSquared();
-        return Vector2D(tangential() , tangential().dot(point)       / norm_squared,
+        return Vector2D(tangential(),
+                        tangential().dot(point) / norm_squared,
                         tangential().cross(support()) / norm_squared);
       }
 

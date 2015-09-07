@@ -114,7 +114,7 @@ const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) c
 
 
 
-RightLeftInfo CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
+ERightLeft CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getSimHitLookUp().getRLInfo(ptrHit);
 }

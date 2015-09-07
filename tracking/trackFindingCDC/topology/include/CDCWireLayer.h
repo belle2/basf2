@@ -100,10 +100,10 @@ namespace Belle2 {
        *  Watch out : The CDCGeometryPar class just grew a shift property. \n
        *  Check if that is the same as this.
        */
-      CCWInfo getShift() const { return m_shift; }
+      ERotation getShift() const { return m_shift; }
 
       /// Sets the shift of this wire layer
-      void setShift(const CCWInfo shift) const { m_shift = shift; }
+      void setShift(const ERotation shift) const { m_shift = shift; }
       /**@}*/
 
 
@@ -269,7 +269,7 @@ namespace Belle2 {
        *  This can be used to speed up the lookup inward and outward \n
        *  neighbors of the wires in this layer. For even layers the shift should be 0.
        */
-      mutable CCWInfo m_shift;
+      mutable ERotation m_shift;
 
       /** @name Property averages from the contained CDCWires
        *  The following variables are calculated from the contained CDCWire

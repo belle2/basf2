@@ -27,16 +27,16 @@ namespace Belle2 {
       using Super::Super;
 
       /// Getter for the right left passage hypothesis
-      RightLeftInfo getRLInfo() const
+      ERightLeft getRLInfo() const
       { return m_rlInfo; }
 
       /// Setter for the right left passage hypothesis
-      void setRLInfo(const RightLeftInfo rlInfo)
+      void setRLInfo(const ERightLeft rlInfo)
       { m_rlInfo = rlInfo; }
 
     private:
       /// Memory for the right left passage hypotheses assoziated with the hit.
-      RightLeftInfo m_rlInfo = UNKNOWN;
+      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
 
     };
   } // end namespace TrackFindingCDC

@@ -40,7 +40,7 @@ namespace Belle2 {
       { ; }
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
-      Circle2D(const Vector2D& center, const double absRadius, const CCWInfo ccwInfo):
+      Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo):
         m_center(center),
         m_radius(fabs(absRadius) * ccwInfo)
       { ; }
@@ -98,16 +98,16 @@ namespace Belle2 {
       { return fabs(center().distance(point) - absRadius()); }
 
       /// Return if the point given is right or left of the line
-      RightLeftInfo isRightOrLeft(const Vector2D& point) const
-      { return sign(distance(point)); }
+      ERightLeft isRightOrLeft(const Vector2D& point) const
+      { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the circle line
       inline bool isLeft(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == LEFT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the circle line
       inline bool isRight(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == RIGHT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Calculates the point of closest approach on the line to the point
       Vector2D closest(const Vector2D& point) const
@@ -207,20 +207,20 @@ namespace Belle2 {
       { return fabs(radius()); }
 
       /// Indicates if the circle is oriented counterclockwise
-      // bool isCCW() const
-      // { return isCCWOrCW == CCW; }
+      // bool isERotation::c_CounterClockwise() const
+      // { return isERotation::c_CounterClockwiseOrERotation::c_Clockwise == ERotation::c_CounterClockwise; }
 
       // /// Indicates if the circle is oriented clockwise
-      // bool isCW() const
-      // { return isCCWOrCW() == CW; }
+      // bool isERotation::c_Clockwise() const
+      // { return isERotation::c_CounterClockwiseOrERotation::c_Clockwise() == ERotation::c_Clockwise; }
 
       // /// Indicates if the circle is oriented counterclockwise or clockwise
-      // CCWInfo isCCWOrCW() const
+      // ERotation isERotation::c_CounterClockwiseOrERotation::c_Clockwise() const
       // { return sign(radius()); }
 
       /// Indicates if the circle is to be interpreted counterclockwise or clockwise
-      CCWInfo orientation() const
-      { return sign(radius()); }
+      ERotation orientation() const
+      { return static_cast<ERotation>(sign(radius())); }
 
       /// Getter for the central point of the circle
       Vector2D center() const

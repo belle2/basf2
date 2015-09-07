@@ -51,9 +51,9 @@ CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 {
   CDCFacet::Shape shape = facet.getShape();
 
-  const RightLeftInfo startRLInfo = facet.getStartRLInfo();
-  const RightLeftInfo middleRLInfo = facet.getMiddleRLInfo();
-  const RightLeftInfo endRLInfo = facet.getEndRLInfo();
+  const ERightLeft startRLInfo = facet.getStartRLInfo();
+  const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
+  const ERightLeft endRLInfo = facet.getEndRLInfo();
 
   bool selectFitless = true;
 

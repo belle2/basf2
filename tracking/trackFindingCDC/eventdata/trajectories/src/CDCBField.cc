@@ -55,19 +55,19 @@ double TrackFindingCDC::getAlphaZ(const Vector3D& pos3D)
   return getAlphaFromBField(getBFieldZ(pos3D));
 }
 
-ESign TrackFindingCDC::ccwInfoToChargeSign(const CCWInfo ccwInfo)
+ESign TrackFindingCDC::ccwInfoToChargeSign(const ERotation ccwInfo)
 {
   return static_cast<ESign>(- ccwInfo * getBFieldZSign());
 }
 
-CCWInfo TrackFindingCDC::chargeSignToCCWInfo(const ESign& chargeSign)
+ERotation TrackFindingCDC::chargeSignToERotation(const ESign& chargeSign)
 {
-  return - chargeSign * getBFieldZSign();
+  return static_cast<ERotation>(- chargeSign * getBFieldZSign());
 }
 
-CCWInfo TrackFindingCDC::chargeToCCWInfo(const double charge)
+ERotation TrackFindingCDC::chargeToERotation(const double charge)
 {
-  return chargeSignToCCWInfo(sign(charge));
+  return chargeSignToERotation(sign(charge));
 }
 
 double TrackFindingCDC::absMom2DToCurvature(const double absMom2D,

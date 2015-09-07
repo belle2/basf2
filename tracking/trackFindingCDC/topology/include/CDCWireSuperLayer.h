@@ -35,6 +35,10 @@ namespace Belle2 {
     class CDCWireSuperLayer  {
 
 
+    private:
+      static ERotation getShiftDelta(ERotation rhs, ERotation lhs)
+      { return static_cast<ERotation>(rhs - lhs); }
+
     public:
       /// The underlying container type storing range of layers referenced by this class
       typedef std::vector<Belle2::TrackFindingCDC::CDCWireLayer> Container;
@@ -187,13 +191,11 @@ namespace Belle2 {
        *  The values are choosen to have an assoziation with the numbers on a regular clock.
        *  ( compare secondary neighborhood ) */
       WireNeighborType
-      areNeighbors(
-        const ILayerType& iLayer,
-        const IWireType& iWire,
+      areNeighbors(const ILayerType& iLayer,
+                   const IWireType& iWire,
 
-        const ILayerType& iOtherLayer,
-        const IWireType& iOtherWire
-      ) const;
+                   const ILayerType& iOtherLayer,
+                   const IWireType& iOtherWire) const;
 
       /// Getter for the two closest neighbors in the layer outwards of the given on
       NeighborPair getNeighborsOutwards(const ILayerType& iLayer, const IWireType& iWire) const;

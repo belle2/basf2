@@ -266,9 +266,9 @@ void TrackProcessorNew::assignNewHits(CDCTrack& track)
   for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
     if (hit.getUsedFlag() || hit.getMaskedFlag()) continue;
 
-    RightLeftInfo rlInfo = RIGHT;
+    ERightLeft rlInfo = ERightLeft::c_Right;
     if (trackTrajectory2D.getDist2D(hit.getCDCWireHit()->getRefPos2D()) < 0)
-      rlInfo = LEFT;
+      rlInfo = ERightLeft::c_Left;
     const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit.getCDCWireHit()->getHit(), rlInfo);
     if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
       continue;

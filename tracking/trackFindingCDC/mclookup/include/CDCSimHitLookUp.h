@@ -71,7 +71,7 @@ namespace Belle2 {
 
     public:
       /// Look up the Monte Carlo right left passage information for the given hit.
-      RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
+      ERightLeft getRLInfo(const CDCHit* ptrHit) const;
 
       /// Look up the position of the primary ionisation from related simulated hit.
       Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
@@ -105,7 +105,7 @@ namespace Belle2 {
       std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
 
       /// Memory for the look up relation of the right left passage information as defined in tracking.
-      std::map<const CDCHit*, RightLeftInfo> m_rightLeftInfos;
+      std::map<const CDCHit*, ERightLeft> m_rightLeftInfos;
 
     }; //class
   } // end namespace TrackFindingCDC

@@ -68,7 +68,7 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
 
 GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
                                                          const double absRadius,
-                                                         const CCWInfo orientation)
+                                                         const ERotation orientation)
 {
   GeneralizedCircle generalizedCircle;
   generalizedCircle.setCenterAndRadius(center, absRadius, orientation);
@@ -100,7 +100,7 @@ GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvatur
 
 void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
                                            const double absRadius,
-                                           const CCWInfo orientation)
+                                           const ERotation orientation)
 {
   double curvature = orientation / fabs(absRadius);
   setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
@@ -299,11 +299,11 @@ Vector2D GeneralizedCircle::sameCylindricalRForwardOf(const Vector2D& startPoint
 double GeneralizedCircle::arcLengthBetween(const Vector2D& from,
                                            const Vector2D& to) const
 {
-  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
-  if (lengthSign == INVALID_INFO) return NAN;
+  EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
+  if (not isValidInfo(lengthSign)) return NAN;
 
   // Handling the rare case that from and to correspond to opposing points on the circle
-  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+  if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
 
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
@@ -318,11 +318,11 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
 {
   const Vector2D from = perigee();
 
-  ForwardBackwardInfo lengthSign = isForwardOrBackwardOf(from, to);
-  if (lengthSign == INVALID_INFO) return NAN;
+  EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
+  if (not isValidInfo(lengthSign)) return NAN;
 
   // Handling the rare case that from and to correspond to opposing points on the circle
-  if (lengthSign == UNKNOWN_INFO) lengthSign = 1;
+  if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
 
   const Vector2D& closestAtFrom = from;
   Vector2D closestAtTo = closest(to);

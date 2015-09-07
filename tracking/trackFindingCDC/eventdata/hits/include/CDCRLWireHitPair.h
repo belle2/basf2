@@ -121,11 +121,11 @@ namespace Belle2 {
 
 
       /// Getter for the right left passage information of the first oriented wire hit
-      RightLeftInfo getFromRLInfo() const
+      ERightLeft getFromRLInfo() const
       { return getFromRLWireHit()->getRLInfo(); }
 
       /// Getter for the right left passage information of the second oriented wire hit
-      RightLeftInfo getToRLInfo() const
+      ERightLeft getToRLInfo() const
       { return getToRLWireHit()->getRLInfo(); }
 
 
@@ -151,10 +151,10 @@ namespace Belle2 {
 
     public:
       /// Setter for the right left passage information of the first oriented wire hit
-      void setFromRLInfo(const RightLeftInfo fromRLInfo);
+      void setFromRLInfo(const ERightLeft fromRLInfo);
 
       /// Setter for the right left passage information of the second oriented wire hit
-      void setToRLInfo(const RightLeftInfo toRLInfo);
+      void setToRLInfo(const ERightLeft toRLInfo);
 
     protected:
       /// Memory for the reference to the first oriented wire hit

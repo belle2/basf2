@@ -101,13 +101,14 @@ namespace Belle2 {
       /// Standard output operator for debugging purposes
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple)
       {
-        return output << "Start : "  << rlWireHitTriple.getStartWireHit() << " with rl " << rlWireHitTriple.getStartRLInfo() <<
-               " Middle : " << rlWireHitTriple.getMiddleWireHit() << " with rl " << rlWireHitTriple.getMiddleRLInfo() <<
-               " End : "    << rlWireHitTriple.getEndWireHit()  << " with rl " << rlWireHitTriple.getEndRLInfo() ;
+        return (output <<
+                "Start : "  << rlWireHitTriple.getStartWireHit() <<
+                " with rl " << static_cast<int>(rlWireHitTriple.getStartRLInfo()) <<
+                " Middle : " << rlWireHitTriple.getMiddleWireHit() <<
+                " with rl " << static_cast<int>(rlWireHitTriple.getMiddleRLInfo()) <<
+                " End : "    << rlWireHitTriple.getEndWireHit()  <<
+                " with rl " << static_cast<int>(rlWireHitTriple.getEndRLInfo()));
       }
-
-
-
 
       /// Access the object methods and methods from a pointer in the same way.
       /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
@@ -155,15 +156,15 @@ namespace Belle2 {
 
 
       /// Getter for the right left passage information of the first oriented wire hit
-      RightLeftInfo getStartRLInfo() const
+      ERightLeft getStartRLInfo() const
       { return getStartRLWireHit().getRLInfo(); }
 
       /// Getter for the right left passage information of the second oriented wire hit
-      RightLeftInfo getMiddleRLInfo() const
+      ERightLeft getMiddleRLInfo() const
       { return getMiddleRLWireHit().getRLInfo(); }
 
       /// Getter for the right left passage information of the third oriented wire hit
-      RightLeftInfo getEndRLInfo() const
+      ERightLeft getEndRLInfo() const
       { return getEndRLWireHit().getRLInfo(); }
 
 
@@ -224,13 +225,13 @@ namespace Belle2 {
 
     public:
       /// Setter for the right left passage information of the first oriented wire hit
-      void setStartRLInfo(const RightLeftInfo startRLInfo);
+      void setStartRLInfo(const ERightLeft startRLInfo);
 
       /// Setter for the right left passage information of the second oriented wire hit
-      void setMiddleRLInfo(const RightLeftInfo middleRLInfo);
+      void setMiddleRLInfo(const ERightLeft middleRLInfo);
 
       /// Setter for the right left passage information of the third oriented wire hit
-      void setEndRLInfo(const RightLeftInfo endRLInfo);
+      void setEndRLInfo(const ERightLeft endRLInfo);
 
 
 

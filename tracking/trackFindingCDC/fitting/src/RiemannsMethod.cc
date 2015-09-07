@@ -43,8 +43,8 @@ void RiemannsMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& ob
     updateWithoutDriftLength(trajectory2D, observations2D);
   }
 
-  ForwardBackwardInfo isCoaligned = observations2D.isCoaligned(trajectory2D);
-  if (isCoaligned == BACKWARD) trajectory2D.reverse();
+  EForwardBackward isCoaligned = observations2D.isCoaligned(trajectory2D);
+  if (isCoaligned == EForwardBackward::c_Backward) trajectory2D.reverse();
 }
 
 

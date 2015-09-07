@@ -47,9 +47,11 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
         signed char gfLeftRight = wireTrackCandHit.getLeftRightResolution();
         B2INFO(gfLeftRight);
 
-        RightLeftInfo rlInfo = gfLeftRight > 0 ? RIGHT : (gfLeftRight < 0 ? LEFT : INVALID_INFO);
+        ERightLeft rlInfo = (gfLeftRight > 0 ?
+                             ERightLeft::c_Right :
+                             (gfLeftRight < 0 ? ERightLeft::c_Left : ERightLeft::c_Invalid));
 
-        if (rlInfo == INVALID_INFO) {
+        if (rlInfo == ERightLeft::c_Invalid) {
           B2WARNING("Invalid right left passage information " << gfLeftRight << " received from genfit.");
           continue;
         }

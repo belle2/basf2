@@ -20,12 +20,12 @@ using namespace TrackFindingCDC;
 
 CDCRLWireHit::CDCRLWireHit() :
   m_wirehit(nullptr),
-  m_rlInfo(LEFT)
+  m_rlInfo(ERightLeft::c_Left)
 {}
 
 
 CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
-                           RightLeftInfo rlInfo) :
+                           ERightLeft rlInfo) :
   m_wirehit(wirehit),
   m_rlInfo(rlInfo)
 {
@@ -39,7 +39,7 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
   Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
   Vector3D directionOfFlight{simhit.getMomentum()};
 
-  RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
   CDCRLWireHit rlWireHit(wirehit, rlInfo);
 

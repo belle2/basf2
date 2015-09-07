@@ -94,7 +94,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
   PerigeeCircle circle;
   Vector2D center(0.5, 0.0);
   double radius = 1.5;
-  circle.setCenterAndRadius(center, radius, CCW);
+  circle.setCenterAndRadius(center, radius, ERotation::c_CounterClockwise);
 
   EXPECT_TRUE(circle.isCircle());
   EXPECT_FALSE(circle.isLine());

@@ -175,17 +175,23 @@ namespace Belle2 {
 
       /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
       /** Returns:
-       *  * FORWARD if the last entity lies behind the first.
-       *  * BACKWARD if the last entity lies before the first.
+       *  * EForwardBackward::c_Forward if the last entity lies behind the first.
+       *  * EForwardBackward::c_Backward if the last entity lies before the first.
        */
-      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
       {
-        ForwardBackwardInfo startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStartSegment()));
-        ForwardBackwardInfo endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEndSegment()));
+        EForwardBackward startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStartSegment()));
+        EForwardBackward endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEndSegment()));
 
-        if (startIsCoaligned == FORWARD and endIsCoaligned == FORWARD) return FORWARD;
-        else if (startIsCoaligned == BACKWARD and endIsCoaligned == BACKWARD) return BACKWARD;
-        else return INVALID_INFO;
+        if (startIsCoaligned == EForwardBackward::c_Forward and
+            endIsCoaligned == EForwardBackward::c_Forward) {
+          return EForwardBackward::c_Forward;
+        } else if (startIsCoaligned == EForwardBackward::c_Backward and
+                   endIsCoaligned == EForwardBackward::c_Backward) {
+          return EForwardBackward::c_Backward;
+        } else {
+          return EForwardBackward::c_Invalid;
+        }
       }
 
       /// Setter for the three dimensional trajectory

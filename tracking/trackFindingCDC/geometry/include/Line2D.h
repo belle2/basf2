@@ -49,7 +49,7 @@ namespace Belle2 {
        */
       static Line2D fromSlopeIntercept(const double slope,
                                        const double intercept)
-      { return Line2D(intercept, slope, -FORWARD); }
+      { return Line2D(intercept, slope, -EForwardBackward::c_Forward); }
 
       /// Constructs a line from its slope and intercept over the first coordinate with the given orientation.
       /** Constucts a line of the points fullfilling y = slope *x + intercept.
@@ -59,7 +59,7 @@ namespace Belle2 {
        */
       static Line2D fromSlopeIntercept(const double slope,
                                        const double intercept,
-                                       const ForwardBackwardInfo orientation)
+                                       const EForwardBackward orientation)
       { return Line2D(intercept * orientation, slope * orientation, -orientation); }
 
       /// Constructs a line through the two given points
@@ -117,7 +117,7 @@ namespace Belle2 {
 
       /// Setter for the intercept and slope with explicit orientation
       /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
-      void setSlopeIntercept(const double slope, const double intercept, const ForwardBackwardInfo orientation)
+      void setSlopeIntercept(const double slope, const double intercept, const EForwardBackward orientation)
       { setN0(intercept * orientation); setN1(slope * orientation); setN2(-orientation); normalize(); }
 
 
@@ -170,16 +170,16 @@ namespace Belle2 {
       { return fabs(distance(point)); }
 
       /// Return if the point given is right or left of the line
-      RightLeftInfo isRightOrLeft(const Vector2D& point) const
-      { return sign(distance(point)); }
+      ERightLeft isRightOrLeft(const Vector2D& point) const
+      { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the line
       inline bool isLeft(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == LEFT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
       inline bool isRight(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == RIGHT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Calculates the point of closest approach on the line to the point
       Vector2D closest(const Vector2D& point) const
@@ -223,10 +223,12 @@ namespace Belle2 {
       Vector2D support() const { return closestToOrigin(); }
 
       /// Returns if the direction of positiv advance has a common component aligned or anti aligned with the first coordinate.
-      ForwardBackwardInfo alignedWithFirst() const { return -sign(n2()); }
+      EForwardBackward alignedWithFirst() const
+      { return static_cast<EForwardBackward>(-sign(n2())); }
 
       /// Returns if the direction of positiv advance has a common component aligned or anti aligned with the second coordinate.
-      ForwardBackwardInfo alignedWithSecond() const { return sign(n1()); }
+      EForwardBackward alignedWithSecond() const
+      { return static_cast<EForwardBackward>(sign(n1())); }
 
       /// Calculates the intersection point of two line. Infinity for parallels
       Vector2D intersection(const Line2D& line) const;

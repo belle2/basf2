@@ -122,7 +122,7 @@ PerigeeCircle PerigeeCircle::fromN(const double n0,
 
 PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
                                                  const double absRadius,
-                                                 const CCWInfo orientation)
+                                                 const ERotation orientation)
 {
   PerigeeCircle circle;
   circle.setCenterAndRadius(center, absRadius, orientation);

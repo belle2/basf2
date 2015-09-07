@@ -275,8 +275,8 @@ void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
   }
 
   for (const CDCWireHit& wireHit : m_wireHits) {
-    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, LEFT));
-    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, RIGHT));
+    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Left));
+    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Right));
   }
 
   if (not std::is_sorted(m_rlWireHits.begin(), m_rlWireHits.end())) {
@@ -303,11 +303,11 @@ CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
     B2ERROR("An oriented wire hit can not be found in the CDCWireHitTopology.");
     return nullptr;
   }
-  if (rlWireHit.getRLInfo() == RIGHT) {
+  if (rlWireHit.getRLInfo() == ERightLeft::c_Right) {
     // The oriented wire hit with left passage is stored in the vector just before this one -- see above in fill()
     --itRLWireHit;
 
-  } else if (rlWireHit.getRLInfo() == LEFT) {
+  } else if (rlWireHit.getRLInfo() == ERightLeft::c_Left) {
     // The oriented wire hit with right passage is stored in the vector just after this one -- see above in fill()
     ++itRLWireHit;
   } else {
@@ -361,11 +361,11 @@ CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
 }
 
 const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
-                                                     const RightLeftInfo rlInfo) const
+                                                     const ERightLeft rlInfo) const
 {
 
   std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
-  if (rlInfo == LEFT) {
+  if (rlInfo == ERightLeft::c_Left) {
     return rlWireHitPair.first;
   } else {
     return rlWireHitPair.second;
@@ -374,7 +374,7 @@ const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
 }
 
 const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
-                                                     const RightLeftInfo rlInfo) const
+                                                     const ERightLeft rlInfo) const
 {
   const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
   return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;

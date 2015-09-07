@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 CDCWireLayer::CDCWireLayer() :
 
 //averages of wire values
-  m_shift(INVALID_INFO),
+  m_shift(ERotation::c_Invalid),
   m_tanStereoAngle(0.0),
   m_minCylindricalR(1000000.0),
   m_refCylindricalR(0.0),
@@ -41,7 +41,7 @@ CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& en
   m_begin(begin), m_end(end),
 
 //averages of wire values
-  m_shift(INVALID_INFO),
+  m_shift(ERotation::c_Invalid),
   m_tanStereoAngle(0.0),
   m_minCylindricalR(1000000.0),
   m_refCylindricalR(0.0),

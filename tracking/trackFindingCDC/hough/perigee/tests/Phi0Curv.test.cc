@@ -97,9 +97,9 @@ namespace {
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
-        if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+        if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
           color = "green";
-        } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+        } else if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Left) {
           color = "red";
         }
         //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
@@ -260,9 +260,9 @@ namespace {
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
-        if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+        if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
           color = "green";
-        } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+        } else if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Left) {
           color = "red";
         }
         //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
@@ -340,9 +340,9 @@ namespace {
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
         const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
-        if (rlTaggedWireHit.getRLInfo() == RIGHT) {
+        if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
           color = "green";
-        } else if (rlTaggedWireHit.getRLInfo() == LEFT) {
+        } else if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Left) {
           color = "red";
         }
         //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};

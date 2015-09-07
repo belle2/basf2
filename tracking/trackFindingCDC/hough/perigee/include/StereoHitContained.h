@@ -101,10 +101,10 @@ namespace Belle2 {
         const CDCWireHit* wireHit = rlTaggedTrackHit->getUnderlayingCDCWireHit();
 
         const CDCWire& wire = wireHit->getWire();
-        const RightLeftInfo rlInfo = rlTaggedTrackHit.getRLInfo();
+        const ERightLeft rlInfo = rlTaggedTrackHit.getRLInfo();
         const double driftLength = wireHit->getRefDriftLength();
 
-        RightLeftInfo newRLInfo =
+        ERightLeft newRLInfo =
           containRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedTrackHit.setRLInfo(newRLInfo);
@@ -123,7 +123,7 @@ namespace Belle2 {
         const CDCWire& wire = wireHit->getWire();
         const double driftLength = wireHit->getRefDriftLength();
 
-        RightLeftInfo rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
+        ERightLeft rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
         return isValidInfo(rlInfo) ? 1.0 + std::abs(rlInfo) * m_rlWeightGain : NAN;
       }
 
@@ -142,10 +142,10 @@ namespace Belle2 {
                                const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlTaggedWireHit->getWire();
-        const RightLeftInfo rlInfo = rlTaggedWireHit.getRLInfo();
+        const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
         const double driftLength = rlTaggedWireHit->getRefDriftLength();
 
-        RightLeftInfo newRLInfo =
+        ERightLeft newRLInfo =
           containsRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
@@ -173,27 +173,27 @@ namespace Belle2 {
        *  when one passage hypothese could already be ruled out.
        *
        *  @returns
-       *      * UNKNOWN if both right and left are still possible.
-       *      * LEFT if only left is still possible.
-       *      * RIGHT if only right is still possible.
-       *      * INVALID_INFO if non of the orientations is possible.
+       *      * ERightLeft::c_Unknown if both right and left are still possible.
+       *      * ERightLeft::c_Left if only left is still possible.
+       *      * ERightLeft::c_Right if only right is still possible.
+       *      * ERightLeft::c_Invalid if non of the orientations is possible.
        */
-      inline RightLeftInfo containsRightOrLeft(const HoughBox& houghBox,
-                                               const CDCWire& wire,
-                                               const double driftLength,
-                                               const RightLeftInfo rlInfo = UNKNOWN)
+      inline ERightLeft containsRightOrLeft(const HoughBox& houghBox,
+                                            const CDCWire& wire,
+                                            const double driftLength,
+                                            const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
-        bool isRightIn = rlInfo != LEFT and contains(houghBox, wire, driftLength);
-        bool isLeftIn = rlInfo != RIGHT and contains(houghBox, wire, -driftLength);
+        bool isRightIn = rlInfo != ERightLeft::c_Left and contains(houghBox, wire, driftLength);
+        bool isLeftIn = rlInfo != ERightLeft::c_Right and contains(houghBox, wire, -driftLength);
 
         if (isRightIn and isLeftIn) {
-          return UNKNOWN;
+          return ERightLeft::c_Unknown;
         } else if (isRightIn) {
-          return RIGHT;
+          return ERightLeft::c_Right;
         } else if (isLeftIn) {
-          return LEFT;
+          return ERightLeft::c_Left;
         } else {
-          return INVALID_INFO;
+          return ERightLeft::c_Invalid;
         }
       }
 

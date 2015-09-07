@@ -183,7 +183,7 @@ namespace Belle2 {
       { return getRLWireHit().hasWireHit(wireHit); }
 
       /// Getter for the right left passage information.
-      RightLeftInfo getRLInfo() const
+      ERightLeft getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
 
       /// Getter for the drift length at the wire reference position.

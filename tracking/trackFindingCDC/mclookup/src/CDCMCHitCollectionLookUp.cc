@@ -126,83 +126,83 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 template<class CDCHitCollection>
-ForwardBackwardInfo
+EForwardBackward
 CDCMCHitCollectionLookUp<CDCHitCollection>
 ::isForwardOrBackwardToMCTrack(const CDCHitCollection* ptrHits) const
 {
   Index firstInTrackId = getFirstInTrackId(ptrHits);
   Index lastInTrackId = getLastInTrackId(ptrHits);
-  if (firstInTrackId == INVALID_INDEX or lastInTrackId == INVALID_INDEX) return INVALID_INFO;
-  else if (firstInTrackId < lastInTrackId) return FORWARD;
-  else if (firstInTrackId > lastInTrackId) return BACKWARD;
-  else if (firstInTrackId == lastInTrackId) return INVALID_INFO;
-  return INVALID_ITRACK;
+  if (firstInTrackId == INVALID_INDEX or lastInTrackId == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  else if (firstInTrackId < lastInTrackId) return EForwardBackward::c_Forward;
+  else if (firstInTrackId > lastInTrackId) return EForwardBackward::c_Backward;
+  else if (firstInTrackId == lastInTrackId) return EForwardBackward::c_Unknown;
+  return EForwardBackward::c_Invalid;
 }
 
 
 
 
 template<class CDCHitCollection>
-ForwardBackwardInfo
+EForwardBackward
 CDCMCHitCollectionLookUp<CDCHitCollection>
 ::areAlignedInMCTrack(const CDCHitCollection* ptrStartSegment2D,
                       const CDCHitCollection* ptrEndSegment2D) const
 {
 
   // Check if the segments are sensable on their own
-  ForwardBackwardInfo startFBInfo = isForwardOrBackwardToMCTrack(ptrStartSegment2D);
-  if (startFBInfo == INVALID_INFO) return INVALID_INFO;
+  EForwardBackward startFBInfo = isForwardOrBackwardToMCTrack(ptrStartSegment2D);
+  if (startFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
 
-  ForwardBackwardInfo endFBInfo = isForwardOrBackwardToMCTrack(ptrEndSegment2D);
-  if (endFBInfo == INVALID_INFO) return INVALID_INFO;
+  EForwardBackward endFBInfo = isForwardOrBackwardToMCTrack(ptrEndSegment2D);
+  if (endFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
 
-  if (startFBInfo != endFBInfo) return INVALID_INFO;
+  if (startFBInfo != endFBInfo) return EForwardBackward::c_Invalid;
 
 
   /// Check if the segments are in the same track
   ITrackType startMCTrackId = getMCTrackId(ptrStartSegment2D);
-  if (startMCTrackId == INVALID_ITRACK) return INVALID_INFO;
+  if (startMCTrackId == INVALID_ITRACK) return EForwardBackward::c_Invalid;
 
   ITrackType endMCTrackId = getMCTrackId(ptrEndSegment2D);
-  if (endMCTrackId == INVALID_ITRACK) return INVALID_INFO;
+  if (endMCTrackId == INVALID_ITRACK) return EForwardBackward::c_Invalid;
 
-  if (startMCTrackId != endMCTrackId) return INVALID_INFO;
+  if (startMCTrackId != endMCTrackId) return EForwardBackward::c_Invalid;
 
 
   // Now check are aligned with their common track
   // Examine if they are in the same super layer
 
   Index lastNPassedSuperLayersOfStartSegment = getLastNPassedSuperLayers(ptrStartSegment2D);
-  if (lastNPassedSuperLayersOfStartSegment == INVALID_INDEX) return INVALID_INFO;
+  if (lastNPassedSuperLayersOfStartSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
 
   Index firstNPassedSuperLayersOfEndSegment = getFirstNPassedSuperLayers(ptrEndSegment2D);
-  if (firstNPassedSuperLayersOfEndSegment == INVALID_INDEX) return INVALID_INFO;
+  if (firstNPassedSuperLayersOfEndSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
 
   if (lastNPassedSuperLayersOfStartSegment < firstNPassedSuperLayersOfEndSegment) {
-    if (startFBInfo == FORWARD and  endFBInfo == FORWARD) return FORWARD;
-    else return INVALID_INFO;
+    if (startFBInfo == EForwardBackward::c_Forward and  endFBInfo == EForwardBackward::c_Forward) return EForwardBackward::c_Forward;
+    else return EForwardBackward::c_Invalid;
   } else if (lastNPassedSuperLayersOfStartSegment > firstNPassedSuperLayersOfEndSegment) {
-    if (startFBInfo == BACKWARD and endFBInfo == BACKWARD) return BACKWARD;
-    else return INVALID_INFO;
+    if (startFBInfo == EForwardBackward::c_Backward and endFBInfo == EForwardBackward::c_Backward) return EForwardBackward::c_Backward;
+    else return EForwardBackward::c_Invalid;
   }
 
   // Now we are in the same passed super layer with both segments
   Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
-  if (lastInTrackIdOfStartSegment == INVALID_INDEX) return INVALID_INFO;
+  if (lastInTrackIdOfStartSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
 
   Index firstInTrackIdOfEndSegment = getFirstInTrackId(ptrEndSegment2D);
-  if (firstInTrackIdOfEndSegment == INVALID_INDEX) return INVALID_INFO;
+  if (firstInTrackIdOfEndSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
 
-  if (startFBInfo == FORWARD and endFBInfo == FORWARD) {
-    if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return FORWARD;
-    else return INVALID_INFO;
-  } else if (startFBInfo == BACKWARD and endFBInfo == BACKWARD) {
+  if (startFBInfo == EForwardBackward::c_Forward and endFBInfo == EForwardBackward::c_Forward) {
+    if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return EForwardBackward::c_Forward;
+    else return EForwardBackward::c_Invalid;
+  } else if (startFBInfo == EForwardBackward::c_Backward and endFBInfo == EForwardBackward::c_Backward) {
     // Test if end segment lies before in the mc track
     // Hence the whole pair of segments is reverse to the track direction of flight
-    if (lastInTrackIdOfStartSegment > firstInTrackIdOfEndSegment) return BACKWARD;
-    else return INVALID_INFO;
+    if (lastInTrackIdOfStartSegment > firstInTrackIdOfEndSegment) return EForwardBackward::c_Backward;
+    else return EForwardBackward::c_Invalid;
   }
-  return INVALID_INFO;
+  return EForwardBackward::c_Invalid;
 
 }
 

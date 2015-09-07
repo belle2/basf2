@@ -54,7 +54,7 @@ void CDCWireSuperLayer::initialize()
   for (const CDCWireLayer& layer : *this) {
     // Set the numbering shift of each layer within this superlayer
     if (isEven(layer.getILayer())) {
-      layer.setShift(ESign::c_Zero);
+      layer.setShift(ERotation::c_Unknown);
     } else {
       const Vector3D& layerRefPos3D = layer.first().getRefPos3D();
       const Vector2D& layerRefPos2D = layerRefPos3D.xy();
@@ -146,19 +146,19 @@ CDCWireSuperLayer::areNeighbors(
 
     const CDCWireLayer& layer = getWireLayer(iLayer);
     const CDCWireLayer& otherLayer = getWireLayer(iOtherLayer);
-    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const ERotation deltaShift = getShiftDelta(otherLayer.getShift(), layer.getShift());
 
     if (iWire == iOtherWire) {
-      if (deltaShift == CW) return CW_IN_NEIGHBOR;
-      else if (deltaShift == CCW) return CCW_IN_NEIGHBOR;
+      if (deltaShift == ERotation::c_Clockwise) return CW_IN_NEIGHBOR;
+      else if (deltaShift == ERotation::c_CounterClockwise) return CCW_IN_NEIGHBOR;
       else  return 0;
 
     } else if (iWire == (iOtherWire + 1) % otherLayer.size()) {
-      if (deltaShift == CCW) return CW_IN_NEIGHBOR;
+      if (deltaShift == ERotation::c_CounterClockwise) return CW_IN_NEIGHBOR;
       else return 0;
 
     } else if ((iWire + 1) % layer.size()  ==  iOtherWire) {
-      if (deltaShift == CW) return CCW_IN_NEIGHBOR;
+      if (deltaShift == ERotation::c_Clockwise) return CCW_IN_NEIGHBOR;
       else return 0;
 
     } else return 0;
@@ -169,19 +169,19 @@ CDCWireSuperLayer::areNeighbors(
 
     const CDCWireLayer& layer = getWireLayer(iLayer);
     const CDCWireLayer& otherLayer = getWireLayer(iOtherLayer);
-    const CCWInfo deltaShift = otherLayer.getShift() - layer.getShift();
+    const ERotation deltaShift = getShiftDelta(otherLayer.getShift(), layer.getShift());
 
     if (iWire == iOtherWire) {
-      if (deltaShift == CW) return CW_OUT_NEIGHBOR;
-      else if (deltaShift == CCW) return CCW_OUT_NEIGHBOR;
+      if (deltaShift == ERotation::c_Clockwise) return CW_OUT_NEIGHBOR;
+      else if (deltaShift == ERotation::c_CounterClockwise) return CCW_OUT_NEIGHBOR;
       else  return 0;
 
     } else if (iWire == (iOtherWire + 1) % otherLayer.size()) {
-      if (deltaShift == CCW) return CW_OUT_NEIGHBOR;
+      if (deltaShift == ERotation::c_CounterClockwise) return CW_OUT_NEIGHBOR;
       else return 0;
 
     } else if ((iWire + 1) % layer.size()  ==  iOtherWire) {
-      if (deltaShift == CW) return CCW_OUT_NEIGHBOR;
+      if (deltaShift == ERotation::c_Clockwise) return CCW_OUT_NEIGHBOR;
       else return 0;
 
     } else return 0;
@@ -197,14 +197,14 @@ CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsInwards(const ILa
 
   const CDCWireLayer& layer = getWireLayer(iLayer);
   const CDCWireLayer& neighborLayer = getWireLayer(iLayer - 1);
-  const CCWInfo deltaShift = neighborLayer.getShift() - layer.getShift();
+  const ERotation deltaShift = getShiftDelta(neighborLayer.getShift(), layer.getShift());
 
-  if (deltaShift == CCW) {
+  if (deltaShift == ERotation::c_CounterClockwise) {
     return NeighborPair(&(neighborLayer.getWireSafe(iWire)) , &(neighborLayer.getWireSafe(iWire - 1)));
-  } else if (deltaShift == CW) {
+  } else if (deltaShift == ERotation::c_Clockwise) {
     return NeighborPair(&(neighborLayer.getWireSafe(iWire + 1)) , &(neighborLayer.getWireSafe(iWire)));
   } else {
-    B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << deltaShift);
+    B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << static_cast<int>(deltaShift));
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer - 1);
     return NeighborPair(nullptr , nullptr);
   }
@@ -218,19 +218,16 @@ CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsOutwards(const IL
 
   const CDCWireLayer& layer = getWireLayer(iLayer);
   const CDCWireLayer& neighborLayer = getWireLayer(iLayer + 1);
-  const CCWInfo deltaShift = neighborLayer.getShift() - layer.getShift();
+  const ERotation deltaShift = getShiftDelta(neighborLayer.getShift(), layer.getShift());
 
-  if (deltaShift == CCW) {
+  if (deltaShift == ERotation::c_CounterClockwise) {
     return NeighborPair(&(neighborLayer.getWireSafe(iWire)), &(neighborLayer.getWireSafe(iWire - 1)));
-  } else if (deltaShift == CW) {
+  } else if (deltaShift == ERotation::c_Clockwise) {
     return NeighborPair(&(neighborLayer.getWireSafe(iWire + 1)), &(neighborLayer.getWireSafe(iWire)));
   } else {
-    B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << deltaShift);
+    B2WARNING("Wire numbering shift bigger than one in magnitude. Adjust getNeighbor functions " << static_cast<int>(deltaShift));
     B2WARNING("From iLayer " << iLayer << " and wire " << iWire << " to iLayer " << iLayer + 1);
     return NeighborPair(nullptr , nullptr);
   }
 
 }
-
-
-

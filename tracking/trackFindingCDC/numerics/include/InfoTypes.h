@@ -13,42 +13,108 @@
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
+#include <climits>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
     /** @name Orientation types*/
     /**@{*/
-    /// Type for orientation informations
-    typedef signed short OrientationInfo;
 
-    const OrientationInfo INVALID_INFO = -32768; ///< Constant for invalid orientation for all InfoTypes
-    const OrientationInfo UNKNOWN_INFO = 0; ///<Constant for unknown orientation for all InfoTypes
-    const OrientationInfo UNKNOWN = UNKNOWN_INFO; ///< Legacy constant for unknown orientation for all InfoTypes
+    /// Namespace hiding the constants of the enum
+    namespace RightLeftOrientation {
+      /// Enumeration to represent the distinct possibilities of the right left passage information
+      enum ERightLeft : signed short {
+        /// Constant for right passage information
+        c_Right = 1,
+        /// Constant for an not yet determined right left passage information
+        c_Unknown = 0,
+        /// Constant for left passage
+        c_Left = -1,
+        /// Constant for an invalid passage information
+        c_Invalid = SHRT_MIN,
+      };
+    }
 
-    typedef OrientationInfo RightLeftInfo ; ///< Indicator for right or left orientation
-    const RightLeftInfo RIGHT = 1;  ///< Constant for right orientation
-    const RightLeftInfo LEFT = -1;  ///< Constant for left orientation
+    /// Importing only the enum but not the constants
+    using ERightLeft = RightLeftOrientation::ERightLeft;
 
-    typedef OrientationInfo ForwardBackwardInfo; ///< Indicator for forward or backward orientation
-    const ForwardBackwardInfo FORWARD = 1; ///< Constant for forward orientation
-    const ForwardBackwardInfo BACKWARD = -1; ///< Constant for backward orientation
+    /// Namespace hiding the constants of the enum
+    namespace ForwardBackwardOrientation {
+      /// Enumeration to represent the distinct possibilities of the right left passage information
+      enum EForwardBackward : signed short {
+        /// Constant for a situation where something is more forward
+        c_Forward = 1,
 
-    typedef OrientationInfo IncDecInfo; ///< Indicator for increasing or decreasing
-    const IncDecInfo INCREASING = 1; ///< Constant for increasing quantity
-    const IncDecInfo CONSTANT = 0; ///< Constant for constant quantity
-    const IncDecInfo DECREASING = -1; ///< Constant for decreasing quantity
+        /// Constant for an not yet determined forward or backward arrangement
+        c_Unknown = 0,
 
-    typedef OrientationInfo CCWInfo; ///< Indicator for clockwise or counterclockwise orientation
-    const CCWInfo CCW = 1;    ///< Constant for counterclockwise orientation
-    const CCWInfo CW = -1;    ///< Constant for clockwise orientation
+        /// Constant for a situation where something is more backward
+        c_Backward = -1,
+
+        /// Constant for an invalid information
+        c_Invalid = SHRT_MIN,
+
+      };
+    }
+
+    /// Importing only the enum but not the constants
+    using EForwardBackward = ForwardBackwardOrientation::EForwardBackward;
+
+
+    /// Namespace hiding the constants of the enum
+    namespace IncDecOrientation {
+      /// Enumeration to represent the distinct possibilities of the right left passage information
+      enum EIncDec : signed short {
+        /// Constant for a variable that increases
+        c_Increasing = 1,
+
+        /// Constant for a variable that is constant
+        c_Constant = 0,
+
+        /// Constant for a variable that decreases
+        c_Decreasing = -1,
+
+        /// Constant for an invalid information
+        c_Invalid = SHRT_MIN,
+      };
+    }
+
+    /// Importing only the enum but not the constants
+    using EIncDec = IncDecOrientation::EIncDec;
+
+
+    /// Namespace hiding the constants of the enum
+    namespace RotationOrientation {
+      /// Enumeration to represent the distinct possibilities of the right left passage information
+      enum ERotation : signed short {
+        /// Constant for counter clockwise oriented circle
+        c_CounterClockwise = 1,
+
+        /// For the orientation of a line
+        c_Unknown = 0,
+
+        /// Constant for clockwise oriented circle
+        c_Clockwise = -1,
+
+        /// Constant for an invalid information
+        c_Invalid = SHRT_MIN,
+      };
+    }
+
+    /// Importing only the enum but not the constants
+    using ERotation = RotationOrientation::ERotation;
+
 
     /// Return the reversed orientation info. Leaves invalid infos the same.
-    inline OrientationInfo reversedInfo(const OrientationInfo& info)
-    { return OrientationInfo(-info); }
+    template<class EOrientation>
+    inline EOrientation reversedInfo(const EOrientation& info)
+    { return static_cast<EOrientation>(-info); }
 
     /// Return the reversed orientation info. Leaves invalid infos the same.
-    inline OrientationInfo isValidInfo(const OrientationInfo& info)
+    template<class EOrientation>
+    inline bool isValidInfo(const EOrientation& info)
     { return std::abs(info) <= 1; }
 
     /// Combines two orientation informations to their most likely common one
@@ -58,8 +124,13 @@ namespace Belle2 {
      *  ( 1, -1 ) -> 0 \n
      *  ( 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
-    inline OrientationInfo averageInfo(const OrientationInfo& one, const OrientationInfo& two)
-    { return isValidInfo(one) and isValidInfo(two) ? static_cast<signed short>(sign(one + two)) : INVALID_INFO; }
+    template<class EOrientation>
+    inline EOrientation averageInfo(const EOrientation& one, const EOrientation& two)
+    {
+      return ((isValidInfo(one) and isValidInfo(two)) ?
+              static_cast<EOrientation>(sign(one + two)) :
+              EOrientation::c_Invalid);
+    }
 
     /// Combines three orientation informations to their most likely common one
     /** Returns the average of two orientation information like. \n
@@ -70,13 +141,14 @@ namespace Belle2 {
      *  ( 1, 0, -1) -> 0 \n
      *  ( 0, 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
-    inline OrientationInfo averageInfo(const OrientationInfo& one,
-                                       const OrientationInfo& two,
-                                       const OrientationInfo& three)
+    template<class EOrientation>
+    inline EOrientation averageInfo(const EOrientation& one,
+                                    const EOrientation& two,
+                                    const EOrientation& three)
     {
-      return isValidInfo(one) and isValidInfo(two) and isValidInfo(three) ?
-             static_cast<signed short>(sign(one + two + three)) :
-             INVALID_INFO;
+      return (isValidInfo(one) and isValidInfo(two) and isValidInfo(three) ?
+              static_cast<EOrientation>(sign(one + two + three)) :
+              EOrientation::c_Invalid);
     }
     /**@}*/
 

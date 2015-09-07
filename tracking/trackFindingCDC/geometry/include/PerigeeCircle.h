@@ -84,7 +84,7 @@ namespace Belle2 {
        *  mathematical positiv counterclockwise. */
       static PerigeeCircle fromCenterAndRadius(const Vector2D& center,
                                                const double absRadius,
-                                               const CCWInfo orientation = CCW);
+                                               const ERotation orientation = ERotation::c_CounterClockwise);
 
       /// Empty deconstructor
       ~PerigeeCircle() {;}
@@ -105,7 +105,7 @@ namespace Belle2 {
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
                               const double absRadius,
-                              const CCWInfo orientation = CCW)
+                              const ERotation orientation = ERotation::c_CounterClockwise)
       {
         GeneralizedCircle::setCenterAndRadius(center, absRadius, orientation);
         receivePerigeeParameters();

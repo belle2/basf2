@@ -32,7 +32,7 @@ namespace Belle2 {
       /** Constructs an oriented wire hit.
        *  @param wireHit the wire hit the oriented hit is associated with.
        *  @param rlInfo the right left passage information of the _wire_ relative to the track */
-      CDCRLWireHit(const CDCWireHit* wireHit, RightLeftInfo rlInfo = 0);
+      CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
 
       /// Constructs an oriented wire hit from a CDCSimHit and the associated wirehit.
       /** This translates the sim hit to an oriented wire hit mainly to be able to compare the
@@ -155,7 +155,7 @@ namespace Belle2 {
       { return getWireHit().getRefDriftLengthVariance(); }
 
       /// Getter for the right left passage information.
-      RightLeftInfo getRLInfo() const
+      ERightLeft getRLInfo() const
       { return m_rlInfo; }
 
       /** Reconstructs a position of primary ionisation on the drift circle.
@@ -188,7 +188,7 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
       {
         output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
-               << rlWireHit.getRLInfo() << ")" ;
+               << static_cast<typename std::underlying_type<ERightLeft>::type>(rlWireHit.getRLInfo()) << ")" ;
         return output;
       }
 
@@ -197,7 +197,7 @@ namespace Belle2 {
       const CDCWireHit* m_wirehit;
 
       /// Memory for the right left passage information of the oriented wire hit.
-      RightLeftInfo m_rlInfo;
+      ERightLeft m_rlInfo;
 
     }; //class CDCRLWireHit
 

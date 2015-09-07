@@ -46,9 +46,9 @@ std::string SegmentFBInfoColorMap::map(const int, const CDCRecoSegment2D& segmen
   //Just to look at matched segments
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
   if (mcTrackId < 0) return m_bkgSegmentColor;
-  ForwardBackwardInfo fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(&segment);
-  if (fbInfo == FORWARD) return "green";
-  else if (fbInfo == BACKWARD) return "red";
+  EForwardBackward fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(&segment);
+  if (fbInfo == EForwardBackward::c_Forward) return "green";
+  else if (fbInfo == EForwardBackward::c_Backward) return "red";
   else {
     B2INFO("Segment not orientable to match track");
     return m_bkgSegmentColor;

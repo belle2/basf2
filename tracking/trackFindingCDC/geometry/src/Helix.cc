@@ -33,8 +33,8 @@ double Helix::arcLength2DToClosest(const Vector3D& point) const
   // double iPeriod = floor(deltaZ / zPeriod());
 
   // Sign ?
-  //CCWInfo ccwInfo = circleXY().orientation();
-  //if (ccwInfo != CCW and ccwInfo != CW) return NAN;
+  //ERotation ccwInfo = circleXY().orientation();
+  //if (ccwInfo != ERotation::c_CounterClockwise and ccwInfo != ERotation::c_Clockwise) return NAN;
 
   //double d0 = ccwInfo * circleXY().distance(point.xy());
   double d0 = circleXY().distance(point.xy());

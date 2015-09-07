@@ -21,7 +21,8 @@ namespace Belle2 {
 
     public:
       /// Constructor from a wire hit and the right left passage hypotheses.
-      CDCRLTaggedWireHit(const CDCWireHit* wireHit, const RightLeftInfo rlInfo = UNKNOWN) :
+      CDCRLTaggedWireHit(const CDCWireHit* wireHit,
+                         const ERightLeft rlInfo = ERightLeft::c_Unknown) :
         m_wireHit(wireHit),
         m_rlInfo(rlInfo)
       {;}
@@ -35,11 +36,11 @@ namespace Belle2 {
       { return m_wireHit; }
 
       /// Getter for the right left passage hypothesis
-      RightLeftInfo getRLInfo() const
+      ERightLeft getRLInfo() const
       { return m_rlInfo; }
 
       /// Setter for the right left passage hypothesis
-      void setRLInfo(const RightLeftInfo rlInfo)
+      void setRLInfo(const ERightLeft rlInfo)
       { m_rlInfo = rlInfo; }
 
     private:
@@ -47,7 +48,7 @@ namespace Belle2 {
       const CDCWireHit* m_wireHit;
 
       /// Memory for the right left passage hypotheses assoziated with the hit.
-      RightLeftInfo m_rlInfo = UNKNOWN;
+      ERightLeft m_rlInfo = ERightLeft::c_Unknown;
 
     };
   } // end namespace TrackFindingCDC

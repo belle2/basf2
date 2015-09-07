@@ -117,14 +117,14 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
 
   //Now check the right left information in track
-  RightLeftInfo startRLInfo = rlWireHitTriple.getStartRLInfo();
-  RightLeftInfo middleRLInfo = rlWireHitTriple.getMiddleRLInfo();
-  RightLeftInfo endRLInfo = rlWireHitTriple.getEndRLInfo();
+  ERightLeft startRLInfo = rlWireHitTriple.getStartRLInfo();
+  ERightLeft middleRLInfo = rlWireHitTriple.getMiddleRLInfo();
+  ERightLeft endRLInfo = rlWireHitTriple.getEndRLInfo();
 
 
-  RightLeftInfo mcStartRLInfo = mcHitLookUp.getRLInfo(startWireHit.getHit());
-  RightLeftInfo mcMiddleRLInfo = mcHitLookUp.getRLInfo(middleWireHit.getHit());
-  RightLeftInfo mcEndRLInfo = mcHitLookUp.getRLInfo(endWireHit.getHit());
+  ERightLeft mcStartRLInfo = mcHitLookUp.getRLInfo(startWireHit.getHit());
+  ERightLeft mcMiddleRLInfo = mcHitLookUp.getRLInfo(middleWireHit.getHit());
+  ERightLeft mcEndRLInfo = mcHitLookUp.getRLInfo(endWireHit.getHit());
 
 
 

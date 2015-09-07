@@ -138,7 +138,7 @@ namespace Belle2 {
 
       /** Appends the hit circle at wire reference position without a right left passage hypotheses.
        *  \note Observations are skipped, if one of the contained variables is NAN.
-       *  \note The left right passage information is always set to RIGHT,
+       *  \note The left right passage information is always set to ERightLeft::c_Right,
        *  since on specific assumption can be made from the wire hit alone.
        *  @param wireHit      Hit information to be appended as observation.
        *                      XY position, drift length and inverse variance are taken at the wire reference position.
@@ -146,7 +146,7 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                    const RightLeftInfo rlInfo = ESign::c_Zero)
+                    const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
         const double driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
@@ -170,7 +170,7 @@ namespace Belle2 {
        */
       size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
       {
-        const RightLeftInfo rlInfo = rlTaggedWireHit.getRLInfo();
+        const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
         const CDCWireHit* ptrWireHit = rlTaggedWireHit.getWireHit();
         return append(*ptrWireHit, rlInfo);
       }
@@ -386,11 +386,11 @@ namespace Belle2 {
 
       /// Checks if the last observation in the vector lies greater or lower travel distance than the last observation.
       /** Returns:
-       *  * FORWARD if the last observation lies behind the first.
-       *  * BACKWARD if the last observation lies before the first.
+       *  * EForwardBackward::c_Forward if the last observation lies behind the first.
+       *  * EForwardBackward::c_Backward if the last observation lies before the first.
        */
-      ForwardBackwardInfo isCoaligned(const CDCTrajectory2D& trajectory2D) const
-      { return sign(getTotalPerpS(trajectory2D)); }
+      EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
+      { return static_cast<EForwardBackward>(sign(getTotalPerpS(trajectory2D))); }
 
 
       /// Extracts the observation center that is at the index in the middle.

@@ -83,7 +83,7 @@ namespace Belle2 {
       Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
       /// Returns the true right left passage information
-      RightLeftInfo getRLInfo(const CDCHit* ptrHit) const;
+      ERightLeft getRLInfo(const CDCHit* ptrHit) const;
 
     }; //class
   } // end namespace TrackFindingCDC

@@ -50,14 +50,14 @@ namespace Belle2 {
         unsigned int planeId = wire.getEWire();
 
         // Right left ambiguity resolution
-        RightLeftInfo rlInfo = rlWireHit.getRLInfo();
+        ERightLeft rlInfo = rlWireHit.getRLInfo();
 
         // Check if reversion is requested
         if (reverseRLInfo) {
           rlInfo = reversedInfo(rlInfo);
         }
 
-        // Note:  rlInfo < 0 means LEFT,   rlInfo > 0 means RIGHT,  which is the same as in Genfit
+        // Note:  rlInfo < 0 means ERightLeft::c_Left,   rlInfo > 0 means ERightLeft::c_Right,  which is the same as in Genfit
         signed char genfitLeftRight = rlInfo;
 
         //do not delete! the genfit::TrackCand has ownership

@@ -148,7 +148,7 @@ namespace Belle2 {
       {  return getLocalCircle().distance(point - getLocalOrigin()); }
 
       /// Checks if the given point is to the right or to the left of the trajectory
-      RightLeftInfo isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const Vector2D& point) const
       { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
@@ -171,12 +171,12 @@ namespace Belle2 {
       /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
       ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer,
                                           bool movingOutward,
-                                          const ForwardBackwardInfo forwardBackwardInfo) const;
+                                          const EForwardBackward forwardBackwardInfo) const;
       /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const;
+      ISuperLayerType getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
       /// Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getAxialISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const;
+      ISuperLayerType getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
     public:
       /// Indicates which superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
@@ -247,12 +247,12 @@ namespace Belle2 {
 
       /** Calculates if this trajectory and the hits are coaligned
        *  Returns:
-       *  * FORWARD if the last entity lies behind the first.
-       *  * BACKWARD if the last entity lies before the first.
+       *  * EForwardBackward::c_Forward if the last entity lies behind the first.
+       *  * EForwardBackward::c_Backward if the last entity lies before the first.
        */
       template<class Hits>
-      ForwardBackwardInfo isForwardOrBackwardTo(const Hits& hits) const
-      { return sign(getTotalArcLength2D(hits)); }
+      EForwardBackward isForwardOrBackwardTo(const Hits& hits) const
+      { return static_cast<EForwardBackward>(sign(getTotalArcLength2D(hits))); }
 
     public:
       /// Gets the charge sign of the trajectory

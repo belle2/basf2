@@ -48,16 +48,16 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
 {
   GeneralizedCircle circle(1.0, 0.0, 0.0, 1.0);
-  EXPECT_EQ(CCW, circle.orientation());
+  EXPECT_EQ(ERotation::c_CounterClockwise, circle.orientation());
 
   GeneralizedCircle reversedCircle(1.0, 0.0, 0.0, -1.0);
-  EXPECT_EQ(CW, reversedCircle.orientation());
+  EXPECT_EQ(ERotation::c_Clockwise, reversedCircle.orientation());
 
   GeneralizedCircle line(1.0, 0.0, 0.0, 0.0);
-  EXPECT_EQ(CCW, line.orientation());
+  EXPECT_EQ(ERotation::c_CounterClockwise, line.orientation());
 
   GeneralizedCircle reversedLine(1.0, 0.0, 0.0, -0.0);
-  EXPECT_EQ(CW, reversedLine.orientation());
+  EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
 }
 
 

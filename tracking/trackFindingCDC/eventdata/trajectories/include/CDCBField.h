@@ -51,14 +51,14 @@ namespace Belle2 {
      *  Counterclockwise travel <-> Bz < 0 \n
      *  Clockwise travel        <-> Bz > 0 \n
      *  and opposite for negatively charged. \n
-     *  Hence the charge sign is -CCWInfo * sign(Bz) */
-    ESign ccwInfoToChargeSign(const CCWInfo ccwInfo);
+     *  Hence the charge sign is -ERotation * sign(Bz) */
+    ESign ccwInfoToChargeSign(const ERotation ccwInfo);
 
     /// Conversion helper from the charge sign to clockwise or counterclockwise travel
-    CCWInfo chargeSignToCCWInfo(const ESign& chargeSign);
+    ERotation chargeSignToERotation(const ESign& chargeSign);
 
     /// Conversion help for charges to clockwise or counterclockwise travel.
-    CCWInfo chargeToCCWInfo(const double charge);
+    ERotation chargeToERotation(const double charge);
 
     /// Conversion helper for momenta to two dimensional curvature
     double absMom2DToCurvature(const double absMom2D,

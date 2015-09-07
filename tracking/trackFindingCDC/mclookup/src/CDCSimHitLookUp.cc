@@ -246,7 +246,7 @@ void CDCSimHitLookUp::fillRLInfo()
 
     // find out if the wire is right or left of the track ( view in flight direction )
     Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
-    RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+    ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
     m_rightLeftInfos[ptrHit] = rlInfo;
 
   }
@@ -255,12 +255,10 @@ void CDCSimHitLookUp::fillRLInfo()
 
 
 
-RightLeftInfo CDCSimHitLookUp::getRLInfo(const CDCHit* ptrHit) const
+ERightLeft CDCSimHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 {
-
   auto itFoundHit = m_rightLeftInfos.find(ptrHit);
-  return itFoundHit == m_rightLeftInfos.end() ?  INVALID_INFO : itFoundHit->second;
-
+  return itFoundHit == m_rightLeftInfos.end() ? ERightLeft::c_Invalid : itFoundHit->second;
 }
 
 
@@ -300,7 +298,7 @@ const CDCRLWireHit* CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit) const
 {
   if (not ptrHit) return nullptr;
 
-  RightLeftInfo rlInfo = getRLInfo(ptrHit);
+  ERightLeft rlInfo = getRLInfo(ptrHit);
 
   const CDCWireHitTopology& theWireHitTopology = CDCWireHitTopology::getInstance();
   const CDCRLWireHit* ptrRLWireHit = theWireHitTopology.getRLWireHit(ptrHit, rlInfo);

@@ -31,7 +31,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_high)
   simulate({lowCurvOriginHelix});
 
   for (const CDCRecoHit3D& recoHit3D : m_mcTracks[0]) {
-    EventDataPlotter::AttributeMap rl {{"stroke", recoHit3D.getRLInfo() == RIGHT ? "green" : "red"}};
+    EventDataPlotter::AttributeMap rl {{"stroke", recoHit3D.getRLInfo() == ERightLeft::c_Right ? "green" : "red"}};
     draw(recoHit3D, rl);
   }
 
@@ -117,9 +117,9 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_prepared_event_rl_flags)
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCRLWireHit& rlWireHit = recoHit3D.getRLWireHit();
       std::string color = "blue";
-      if (rlWireHit.getRLInfo() == RIGHT) {
+      if (rlWireHit.getRLInfo() == ERightLeft::c_Right) {
         color = "green";
-      } else if (rlWireHit.getRLInfo() == LEFT) {
+      } else if (rlWireHit.getRLInfo() == ERightLeft::c_Left) {
         color = "red";
       }
       EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};

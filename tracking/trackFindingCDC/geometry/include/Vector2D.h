@@ -218,7 +218,7 @@ namespace Belle2 {
       inline Vector2D orthogonal() const { return Vector2D(-y(), x()); }
 
       /// Orthogonal vector to the direction given by the counterclockwise info
-      inline Vector2D orthogonal(const CCWInfo ccw_info) const { return Vector2D(-ccw_info * y(), ccw_info * x()); }
+      inline Vector2D orthogonal(const ERotation ccw_info) const { return Vector2D(-ccw_info * y(), ccw_info * x()); }
 
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
@@ -314,42 +314,42 @@ namespace Belle2 {
       { return relativTo.cross(*this); }
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of this vector.
-      inline RightLeftInfo isRightOrLeftOf(const Vector2D& rhs) const
-      { return -TrackFindingCDC::sign(unnormalizedOrthogonalComp(rhs)); }
+      inline ERightLeft isRightOrLeftOf(const Vector2D& rhs) const
+      { return static_cast<ERightLeft>(-sign(unnormalizedOrthogonalComp(rhs))); }
 
       /// Indicates if the given vector is more left if you looked in the direction of this vector.
       inline bool isLeftOf(const Vector2D& rhs) const
-      { return isRightOrLeftOf(rhs) == LEFT; }
+      { return isRightOrLeftOf(rhs) == ERightLeft::c_Left; }
 
       /// Indicates if the given vector is more right if you looked in the direction of this vector.
       inline bool isRightOf(const Vector2D& rhs) const
-      { return isRightOrLeftOf(rhs) == RIGHT; }
+      { return isRightOrLeftOf(rhs) == ERightLeft::c_Right; }
 
 
       /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in the direction of this vector.
-      inline CCWInfo isCCWOrCWOf(const Vector2D& rhs) const
-      { return TrackFindingCDC::sign(unnormalizedOrthogonalComp(rhs)); }
+      inline ERotation isCCWOrCWOf(const Vector2D& rhs) const
+      { return static_cast<ERotation>(sign(unnormalizedOrthogonalComp(rhs))); }
 
       /// Indicates if the given vector is more counterclockwise if you looked in the direction of this vector.
       inline bool isCCWOf(const Vector2D& rhs) const
-      { return isCCWOrCWOf(rhs) == CCW; }
+      { return isCCWOrCWOf(rhs) == ERotation::c_CounterClockwise; }
 
       /// Indicates if the given vector is more clockwise if you looked in the direction of this vector.
       inline bool isCWOf(const Vector2D& rhs) const
-      { return isCCWOrCWOf(rhs) == CW; }
+      { return isCCWOrCWOf(rhs) == ERotation::c_Clockwise; }
 
 
       /// Indicates if the given vector is more coaligned or reverse if you looked in the direction of this vector.
-      inline ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& rhs) const
-      { return TrackFindingCDC::sign(unnormalizedParallelComp(rhs)); }
+      inline EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const
+      { return static_cast<EForwardBackward>(sign(unnormalizedParallelComp(rhs))); }
 
       /// Indicates if the given vector is more coaligned if you looked in the direction of this vector.
       inline bool isForwardOf(const Vector2D& rhs) const
-      { return isForwardOrBackwardOf(rhs) == FORWARD; }
+      { return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Forward; }
 
       /// Indicates if the given vector is more Reverse if you looked in the direction of this vector.
       inline bool isBackwardOf(const Vector2D& rhs) const
-      { return isForwardOrBackwardOf(rhs) == BACKWARD; }
+      { return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Backward; }
 
 
     private:

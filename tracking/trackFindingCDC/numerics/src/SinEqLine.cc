@@ -188,8 +188,8 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
   /// Only update if the current point is inbetween the lower and upper bound
   if (not isBetween(lower, current, upper)) return false;
 
-  IncDecInfo incDecInfo = getIncDecInfo(lower, upper);
-  if (incDecInfo == INCREASING) {
+  EIncDec incDecInfo = getEIncDec(lower, upper);
+  if (incDecInfo == EIncDec::c_Increasing) {
     if (current.y() > 0.0 and upper.y() > 0.0) {
       upper.set(current);
       return true;
@@ -203,7 +203,7 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
 
     }
 
-  } else if (incDecInfo == DECREASING) {
+  } else if (incDecInfo == EIncDec::c_Decreasing) {
     if (current.y() >= 0 and lower.y() >= 0.0) {
       lower.set(current);
       return true;

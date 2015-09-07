@@ -53,7 +53,7 @@ CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
   Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
   Vector3D directionOfFlight{simHit.getMomentum()};
 
-  RightLeftInfo rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
   const CDCRLWireHit* rlWireHit = CDCWireHitTopology::getInstance().getRLWireHit(*wireHit, rlInfo);
 

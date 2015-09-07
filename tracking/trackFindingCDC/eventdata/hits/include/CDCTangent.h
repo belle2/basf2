@@ -27,8 +27,8 @@ namespace Belle2 {
      *  Generally maximal four tangents are possible. So to uniquely define a tangent we have \n
      *  to give additional information how it passes relativ to the drift circles. This right left \n
      *  passage inforamtion indicates if the related wire hit should lie to the right of to the left \n
-     *  of the tangent. The four possible combinations are then ( RIGHT , RIGHT ), ( RIGHT , LEFT ), \n
-     *  ( LEFT , RIGHT ), ( LEFT , LEFT ). \n
+     *  of the tangent. The four possible combinations are then ( ERightLeft::c_Right , ERightLeft::c_Right ), ( ERightLeft::c_Right , ERightLeft::c_Left ), \n
+     *  ( ERightLeft::c_Left , ERightLeft::c_Right ), ( ERightLeft::c_Left , ERightLeft::c_Left ). \n
      *  To represent the tangent this class uses a ParameterLine2D. The touch points to the two drift circles \n
      *  are located at(0) for the first and at(1) for the second. \n
      *  The tangent has therefor a sense of what is forward and can be reversed if necessary \n

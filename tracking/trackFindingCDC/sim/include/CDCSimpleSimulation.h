@@ -43,7 +43,7 @@ namespace Belle2 {
       struct SimpleSimHit {
         SimpleSimHit(CDCWireHit wireHit,
                      size_t iMCTrack,
-                     RightLeftInfo rlInfo) :
+                     ERightLeft rlInfo) :
           m_wireHit(wireHit),
           m_iMCTrack(iMCTrack),
           m_rlInfo(rlInfo)
@@ -51,7 +51,7 @@ namespace Belle2 {
 
         SimpleSimHit(CDCWireHit wireHit,
                      size_t iMCTrack,
-                     RightLeftInfo rlInfo,
+                     ERightLeft rlInfo,
                      Vector3D pos3D,
                      double arcLength2D = NAN,
                      double trueDriftLength = NAN) :
@@ -65,7 +65,7 @@ namespace Belle2 {
 
         CDCWireHit m_wireHit;
         size_t m_iMCTrack;
-        RightLeftInfo m_rlInfo;
+        ERightLeft m_rlInfo;
         Vector3D m_pos3D  = m_wireHit.getRefPos3D();
         double m_arcLength2D = NAN;
         double m_trueDriftLength = NAN;

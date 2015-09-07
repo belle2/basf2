@@ -130,12 +130,12 @@ namespace Belle2 {
       { return (lower.y() > 0 and upper.y() < 0) or (lower.y() < 0 and upper.y() > 0); }
 
       /// Determines if the function is increasing or decreasing in the intervall.
-      static IncDecInfo getIncDecInfo(const Vector2D& lower, const Vector2D& upper)
+      static EIncDec getEIncDec(const Vector2D& lower, const Vector2D& upper)
       {
-        if (lower.y() < upper.y()) return INCREASING;
-        else if (lower.y() > upper.y()) return DECREASING;
-        else if (lower.y() == upper.y()) return CONSTANT;
-        else return INVALID_INFO;
+        if (lower.y() < upper.y()) return EIncDec::c_Increasing;
+        else if (lower.y() > upper.y()) return EIncDec::c_Decreasing;
+        else if (lower.y() == upper.y()) return EIncDec::c_Constant;
+        else return EIncDec::c_Invalid;
       }
 
     public:

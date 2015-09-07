@@ -120,7 +120,8 @@ public:
   }
 };
 
-void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName, const std::string& stroke,
+void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName,
+                                               const std::string& stroke,
                                                const std::string& strokeWidth)
 {
   B2INFO("Drawing simulated hits connected by tof");
@@ -157,8 +158,8 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
           CDCWireHit fromWireHit(fromHit);
           CDCWireHit toWireHit(toHit);
 
-          CDCRLWireHit fromRLWireHit(fromWireHit, 0);
-          CDCRLWireHit toRLWireHit(toWireHit, 0);
+          CDCRLWireHit fromRLWireHit(fromWireHit, ERightLeft::c_Unknown);
+          CDCRLWireHit toRLWireHit(toWireHit, ERightLeft::c_Unknown);
 
           Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
           Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());

@@ -29,9 +29,9 @@ bool CDCFacetFitlessVarSet::extract(const CDCFacet* ptrFacet)
   CDCFacet::Shape shape = facet.getShape();
   ISuperLayerType superlayerID = facet.getISuperLayer();
 
-  const RightLeftInfo startRLInfo = facet.getStartRLInfo();
-  const RightLeftInfo middleRLInfo = facet.getMiddleRLInfo();
-  const RightLeftInfo endRLInfo = facet.getEndRLInfo();
+  const ERightLeft startRLInfo = facet.getStartRLInfo();
+  const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
+  const ERightLeft endRLInfo = facet.getEndRLInfo();
 
   const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getRefDriftLength();

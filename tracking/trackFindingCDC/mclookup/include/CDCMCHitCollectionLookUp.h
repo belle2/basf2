@@ -140,25 +140,25 @@ namespace Belle2 {
 
 
       /** Returns the orientation of the collection of hits relative to its matched track.
-       *  * Returns INVALID_INFO if the collection of hits is not matched to anz hit.
-       *  * Returns FORWARD if the collection of hits is coaligned with the matched track.
-       *  * Returns BACKWARD if the collection of hits is coaligned with the matched track interpreted in reverse.
-       *  * Returns INVALID_INFO if the collection of hits has only a single hit.
+       *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched to anz hit.
+       *  * Returns EForwardBackward::c_Forward if the collection of hits is coaligned with the matched track.
+       *  * Returns EForwardBackward::c_Backward if the collection of hits is coaligned with the matched track interpreted in reverse.
+       *  * Returns EForwardBackward::c_Invalid if the collection of hits has only a single hit.
        */
-      ForwardBackwardInfo isForwardOrBackwardToMCTrack(const CDCHitCollection* ptrHits) const;
+      EForwardBackward isForwardOrBackwardToMCTrack(const CDCHitCollection* ptrHits) const;
 
       /** Returns if the second collection of hits
        *  follows the first collection of hits in their common Monte Carlo track.
-       *  * Returns INVALID_INFO if the collection of hits is not matched in the same Monte Carlo track.
-       *  * Returns FORWARD  if both collections of hits are coaligned
+       *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched in the same Monte Carlo track.
+       *  * Returns EForwardBackward::c_Forward  if both collections of hits are coaligned
        *                     with the Monte Carlo track and the second collection of hits
        *                     comes after the first.
-       *  * Returns BACKWARD if both collections of hits are anticoaligned
+       *  * Returns EForwardBackward::c_Backward if both collections of hits are anticoaligned
        *                     with the Monte Carlo track and the second collection of hits
        *                     comes after the first in the reversed sense.
        */
-      ForwardBackwardInfo areAlignedInMCTrack(const CDCHitCollection* ptrFromHits,
-                                              const CDCHitCollection* ptrToHits) const;
+      EForwardBackward areAlignedInMCTrack(const CDCHitCollection* ptrFromHits,
+                                           const CDCHitCollection* ptrToHits) const;
 
 
 

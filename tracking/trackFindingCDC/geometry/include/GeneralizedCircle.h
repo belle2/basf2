@@ -74,7 +74,7 @@ namespace Belle2 {
       */
       static GeneralizedCircle fromCenterAndRadius(const Vector2D& center,
                                                    const double absRadius,
-                                                   const CCWInfo orientation = CCW);
+                                                   const ERotation orientation = ERotation::c_CounterClockwise);
 
       /**
       Constructor of a generalized circle from perigee parameters.
@@ -146,7 +146,7 @@ namespace Belle2 {
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
                               const double absRadius,
-                              const CCWInfo orientation = CCW);
+                              const ERotation orientation = ERotation::c_CounterClockwise);
 
       /// Setter for the perigee parameters
       void setPerigeeParameters(const double curvature,
@@ -343,11 +343,11 @@ namespace Belle2 {
       Calculates if the to vector is closer to the from vector
       following the along orientation of the circle or against.
       Returns:
-      * FORWARD in case the to vector is closer following the along the orientation
-      * BACKWARD in case the to vector is closer against the orientation.
-      * UNKNOWN_INFO if neither can be determined.
+      * EForwardBackward::c_Forward in case the to vector is closer following the along the orientation
+      * EForwardBackward::c_Backward in case the to vector is closer against the orientation.
+      * EForwardBackward::c_Unknown if neither can be determined.
       */
-      ForwardBackwardInfo isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
+      EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
       {
         Vector2D difference = to - from;
         Vector2D tangentialAtFrom = tangential(from);
@@ -470,16 +470,16 @@ namespace Belle2 {
       Indicates if the point is on the right or left side of the circle.
       This is also refered to as alpha.
       */
-      RightLeftInfo isRightOrLeft(const Vector2D& point) const
-      { return sign(fastDistance(point)); }
+      ERightLeft isRightOrLeft(const Vector2D& point) const
+      { return static_cast<ERightLeft>(sign(fastDistance(point))); }
 
       /// Return if the point given is left of the line
       inline bool isLeft(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == LEFT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
       inline bool isRight(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == RIGHT; }
+      { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Indicates if the generalized circle is actually a line
       inline bool isLine() const
@@ -519,10 +519,10 @@ namespace Belle2 {
       /**
       Gives the orientation of the circle.
          The circle can be either orientated counterclockwise or clockwise.
-         @return CCW for counterclockwise travel, CW for clockwise.
+         @return ERotation::c_CounterClockwise for counterclockwise travel, ERotation::c_Clockwise for clockwise.
        */
-      inline CCWInfo orientation() const
-      {  return sign(n3()); }
+      inline ERotation orientation() const
+      { return static_cast<ERotation>(sign(n3())); }
 
       /**
       Calculates the angle between two points of closest approach on the circle.

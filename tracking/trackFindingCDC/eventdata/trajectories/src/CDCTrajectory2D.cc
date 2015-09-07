@@ -150,9 +150,10 @@ Vector2D CDCTrajectory2D::getExit() const
 
 
 ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
-                                                     const ForwardBackwardInfo forwardBackwardInfo) const
+                                                     const EForwardBackward forwardBackwardInfo) const
 {
-  if (forwardBackwardInfo != FORWARD and forwardBackwardInfo != BACKWARD) return INVALID_ISUPERLAYER;
+  if (forwardBackwardInfo != EForwardBackward::c_Forward
+      and forwardBackwardInfo != EForwardBackward::c_Backward) return INVALID_ISUPERLAYER;
   if (fromISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
 
   if (fromISuperLayer == INNER_ISUPERLAYER or fromISuperLayer == OUTER_ISUPERLAYER) {
@@ -183,7 +184,7 @@ ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& from
   }
 }
 
-ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const
+ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
 {
   bool movingOutward = isMovingOutward();
   ISuperLayerType startISuperLayer = getStartISuperLayer();
@@ -193,19 +194,19 @@ ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const ForwardBackwardI
 
 ISuperLayerType CDCTrajectory2D::getNextISuperLayer() const
 {
-  return getISuperLayerAfterStart(FORWARD);
+  return getISuperLayerAfterStart(EForwardBackward::c_Forward);
 }
 
 
 
 ISuperLayerType CDCTrajectory2D::getPreviousISuperLayer() const
 {
-  return getISuperLayerAfterStart(BACKWARD);
+  return getISuperLayerAfterStart(EForwardBackward::c_Backward);
 }
 
 
 
-ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const ForwardBackwardInfo forwardBackwardInfo) const
+ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
 {
 
   ISuperLayerType startISuperLayer = getStartISuperLayer();
@@ -237,14 +238,14 @@ ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const ForwardBack
 
 ISuperLayerType CDCTrajectory2D::getNextAxialISuperLayer() const
 {
-  return getAxialISuperLayerAfterStart(FORWARD);
+  return getAxialISuperLayerAfterStart(EForwardBackward::c_Forward);
 }
 
 
 
 ISuperLayerType CDCTrajectory2D::getPreviousAxialISuperLayer() const
 {
-  return getAxialISuperLayerAfterStart(BACKWARD);
+  return getAxialISuperLayerAfterStart(EForwardBackward::c_Backward);
 }
 
 

@@ -84,18 +84,18 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  ForwardBackwardInfo startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
-  if (startToMiddleFBInfo == INVALID_INFO) return NOT_A_CELL;
+  EForwardBackward startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
+  if (startToMiddleFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
 
-  ForwardBackwardInfo middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
-  if (middleToEndFBInfo == INVALID_INFO) return NOT_A_CELL;
+  EForwardBackward middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
+  if (middleToEndFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
 
 
   if (startToMiddleFBInfo != middleToEndFBInfo) return NOT_A_CELL;
 
 
-  if ((startToMiddleFBInfo == FORWARD and middleToEndFBInfo == FORWARD) or
-      (getAllowReverse() and startToMiddleFBInfo == BACKWARD and middleToEndFBInfo == BACKWARD)) {
+  if ((startToMiddleFBInfo == EForwardBackward::c_Forward and middleToEndFBInfo == EForwardBackward::c_Forward) or
+      (getAllowReverse() and startToMiddleFBInfo == EForwardBackward::c_Backward and middleToEndFBInfo == EForwardBackward::c_Backward)) {
 
     // Do fits
     setTrajectoryOf(segmentTriple);

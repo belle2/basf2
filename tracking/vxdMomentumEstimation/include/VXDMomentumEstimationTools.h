@@ -207,7 +207,7 @@ namespace Belle2 {
 
   private:
     /** the layer positions in the case we do not have a SpacePoint we can look at */
-    static constexpr double m_layerPositions[6] = {1.42, 2.18, 3.81, 8.0, 10.51, 13.51};
+    const double m_layerPositions[6] = {1.42, 2.18, 3.81, 8.0, 10.51, 13.51};
 
     /** For SVD the calibration is 1, for PXD (see below) it is ~0.6 */
     double getCalibration() const

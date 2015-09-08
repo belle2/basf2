@@ -12,7 +12,7 @@ fillParticleList('gamma', 'goodGamma > 0.5 and E > 0.5 and nTracks <= 12', write
 reconstructDecay('B0:sig -> gamma', '', writeOut=True, path=selection_path)
 matchMCTruth('B0:sig', path=selection_path)
 
-particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=True, chargedB=False)
+particles = get_default_channels(BlevelExtraCut='nRemainingTracksInRestOfEvent == 0', neutralB=True, chargedB=False)
 feistate = fullEventInterpretation('B0:sig', selection_path, particles)
 
 if feistate.is_trained:

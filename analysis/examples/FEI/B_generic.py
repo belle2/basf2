@@ -6,7 +6,7 @@ from fei import *
 from basf2 import *
 from modularAnalysis import *
 
-particles = get_default_channnels()
+particles = get_default_channels()
 feistate = fullEventInterpretation(None, None, particles)
 
 if feistate.is_trained:

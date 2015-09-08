@@ -7,12 +7,12 @@ from basf2 import *
 from modularAnalysis import *
 
 # test wether we can actually get the default channels
-particles_charged = get_default_channnels(neutralB=False)
-particles_neutral = get_default_channnels(chargedB=False)
-particles_hadronic = get_default_channnels(semileptonicB=False)
-particles_withextracut = get_default_channnels(BlevelExtraCut='Mbc > 5.27')
+particles_charged = get_default_channels(neutralB=False)
+particles_neutral = get_default_channels(chargedB=False)
+particles_hadronic = get_default_channels(semileptonicB=False)
+particles_withextracut = get_default_channels(BlevelExtraCut='Mbc > 5.27')
 
-particles_all = get_default_channnels()
+particles_all = get_default_channels()
 feistate = fullEventInterpretation(None, None, particles_all)
 
 assert len(particles_all) > len(particles_charged)

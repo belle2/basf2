@@ -16,7 +16,7 @@ skim.if_value('>12', trash_path, AfterConditionPath.END)
 selection_path.add_module(skim)
 
 # Remove all candidates for training with remaining tracks in event
-particles = get_default_channnels(BlevelExtraCut='nRemainingTracksInEvent == 0', neutralB=True, chargedB=False)
+particles = get_default_channels(BlevelExtraCut='nRemainingTracksInEvent == 0', neutralB=True, chargedB=False)
 feistate = fullEventInterpretation(None, selection_path, particles)
 
 if feistate.is_trained:

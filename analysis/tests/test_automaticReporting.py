@@ -421,7 +421,7 @@ class TestLoadBranchingFractionsDataFrame(unittest.TestCase):
 
     def test_loadCoveredBranchingFractionsDataFrame(self):
         from fei import default_channels
-        particles = default_channels.get_default_channnels()
+        particles = default_channels.get_default_channels()
         df = automaticReporting.loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
 
         self.assertListEqual(sorted(df.columns), sorted(['particle', 'channel', 'channelName', 'fraction']))

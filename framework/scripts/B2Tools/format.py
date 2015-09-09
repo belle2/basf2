@@ -36,41 +36,44 @@ def decayDescriptor(decay_string):
         @return string latex version of the decay descriptor
     """
     decay_string = decay_string.replace(':generic', '')
-    substitutes = {
-        '==>': '$\\to$',
-        'gamma': r'$\gamma$',
-        'pi+': r'$\pi^+$',
-        'pi-': r'$\pi^-$',
-        'pi0': r'$\pi^0$',
-        'K_S0': r'$K^0_S$',
-        'mu+': r'$\mu^+$',
-        'mu-': r'$\mu^-$',
-        'tau+': r'$\tau^+$',
-        'tau-': r'$\tau^-$',
-        'nu': r'$\nu$',
-        'K+': r'$K^+$',
-        'K-': r'$K^-$',
-        'e+': r'$e^+$',
-        'e-': r'$e^-$',
-        'J/psi': r'$J/\psi$',
-        'D+': r'$D^+$',
-        'D-': r'$D^-$',
-        'D0': r'$D^0$',
-        'D*+': r'$D^{+*}$',
-        'D*-': r'$D^{-*}$',
-        'D*0': r'$D^{0*}$',
-        'D_s+': r'$D^+_s$',
-        'D_s-': r'$D^-_s$',
-        'D_s*+': r'$D^{+*}_s$',
-        'D_s*-': r'$D^{-*}_s$',
-        'anti-D0': r'$\bar{D^0}$',
-        'anti-D*0': r'$\bar{D^{0*}}$',
-        'B+': r'$B^+$',
-        'B-': r'$B^-$',
-        'B0': r'$B^0$',
-        'anti-B0': r'$\bar{B^0}$'}
+    # Note: these are applied from top to bottom, so if you have
+    # both B0 and anti-B0, put anti-B0 first.
+    substitutes = [
+        ('==>', '$\\to$'),
+        ('gamma', r'$\gamma$'),
+        ('pi+', r'$\pi^+$'),
+        ('pi-', r'$\pi^-$'),
+        ('pi0', r'$\pi^0$'),
+        ('K_S0', r'$K^0_S$'),
+        ('mu+', r'$\mu^+$'),
+        ('mu-', r'$\mu^-$'),
+        ('tau+', r'$\tau^+$'),
+        ('tau-', r'$\tau^-$'),
+        ('nu', r'$\nu$'),
+        ('K+', r'$K^+$'),
+        ('K-', r'$K^-$'),
+        ('e+', r'$e^+$'),
+        ('e-', r'$e^-$'),
+        ('J/psi', r'$J/\psi$'),
+        ('anti-D0*', r'$\overline{D^{0*}}$'),
+        ('anti-D*0', r'$\overline{D^{0*}}$'),
+        ('anti-D0', r'$\overline{D^0}$'),
+        ('anti-B0', r'$\overline{B^0}$'),
+        ('D+', r'$D^+$'),
+        ('D-', r'$D^-$'),
+        ('D0', r'$D^0$'),
+        ('D*+', r'$D^{+*}$'),
+        ('D*-', r'$D^{-*}$'),
+        ('D*0', r'$D^{0*}$'),
+        ('D_s+', r'$D^+_s$'),
+        ('D_s-', r'$D^-_s$'),
+        ('D_s*+', r'$D^{+*}_s$'),
+        ('D_s*-', r'$D^{-*}_s$'),
+        ('B+', r'$B^+$'),
+        ('B-', r'$B^-$'),
+        ('B0', r'$B^0$'), ]
     tex_string = decay_string
-    for key, value in substitutes.iteritems():
+    for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)
     return '\\texorpdfstring{%s}{%s}' % (tex_string, string(decay_string))
 

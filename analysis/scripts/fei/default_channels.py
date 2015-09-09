@@ -77,7 +77,8 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
 # ################# PI0 ###############################
     mva_pi0 = MVAConfiguration(
-        variables=['M', 'daughter({},extraInfo(SignalProbability))', 'daughterAngle(0,1)'],
+        variables=['M', 'daughter({},extraInfo(SignalProbability))', 'daughterAngle(0,1)',
+                   'pt', 'pz', 'E'],
         target='isSignal',
     )
 

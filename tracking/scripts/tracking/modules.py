@@ -124,10 +124,7 @@ class CDCFullFinder(metamodules.PathModule):
                  use_pair_finder=False):
 
         modules = [
-            CDCBackgroundHitFinder(
-                tmva_cut=tmva_cut), CDCLocalTrackFinder(), CDCBackgroundHitFinder(
-                tmva_cut=tmva_cut), CDCLegendreTrackFinder(
-                debug_output=False)
+            CDCLocalTrackFinder(tmva_cut=tmva_cut), CDCLegendreTrackFinder(debug_output=False)
         ]
 
         filter_parameters_for_combiner = dict(segment_track_filter_first_step_cut=first_tmva_cut,
@@ -180,7 +177,6 @@ class CDCNaiveFinder(metamodules.PathModule):
 
         naive_combiner = StandardEventGenerationRun.get_basf2_module(
             "NaiveCombiner",
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             WriteGFTrackCands=False,
             UseMCInformation=use_mc_information)
@@ -241,8 +237,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
     in this vector will be deleted before executing this module!
     """
 
-    def __init__(self, delete_hit_information=False,
-                 output_track_cands_store_array_name=None,
+    def __init__(self, output_track_cands_store_array_name=None,
                  output_track_cands_store_vector_name="CDCTrackVector",
                  assign_stereo_hits=True, debug_output=False,
                  TracksStoreObjNameIsInput=False,
@@ -255,16 +250,11 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
             WriteGFTrackCands=False,
             TracksStoreObjNameIsInput=TracksStoreObjNameIsInput,
             TracksStoreObjName=output_track_cands_store_vector_name)
-        if delete_hit_information:
-            legendre_tracking_module.param('SkipHitsPreparation', False)
-        else:
-            legendre_tracking_module.param('SkipHitsPreparation', True)
 
         last_tracking_module = legendre_tracking_module
 
         cdc_stereo_combiner = StandardEventGenerationRun.get_basf2_module(
             'StereoHitFinderCDCLegendreHistogramming',
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             WriteGFTrackCands=False,
             TracksStoreObjName=output_track_cands_store_vector_name,
@@ -295,7 +285,6 @@ class CDCSegmentPairAutomatonFinder(metamodules.WrapperModule):
             "TrackFinderCDCSegmentPairAutomatonDev",
             SegmentsStoreObjName=input_segments_store_vector_name,
             WriteGFTrackCands=False,
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             TracksStoreObjName=input_track_cands_store_vector_name
         )
@@ -322,21 +311,19 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
     The vector with _Temp gets registered but not created
     """
 
-    def __init__(self, delete_hit_information=False,
-                 output_track_cands_store_array_name=None,
+    def __init__(self, output_track_cands_store_array_name=None,
+                 tmva_cut=0.2,
                  output_segments_store_vector_name="CDCRecoSegment2DVector"):
 
         local_track_finder_module = StandardEventGenerationRun.get_basf2_module(
-            'SegmentFinderCDCFacetAutomaton',
+            "SegmentFinderCDCFacetAutomatonDev",
+            ClusterFilter="tmva",
+            ClusterFilterParameters={
+                "cut": str(tmva_cut)},
             SegmentsStoreObjName=output_segments_store_vector_name,
             WriteGFTrackCands=False,
             FitSegments=True,
             TracksStoreObjName="__TempCDCTracksVector")
-
-        if delete_hit_information:
-            local_track_finder_module.param('SkipHitsPreparation', False)
-        else:
-            local_track_finder_module.param('SkipHitsPreparation', True)
 
         if output_track_cands_store_array_name is not None:
             local_track_finder_module.param({'WriteGFTrackCands': True,
@@ -366,7 +353,6 @@ class CDCNotAssignedHitsCombiner(metamodules.WrapperModule):
 
         not_assigned_hits_combiner_module = StandardEventGenerationRun.get_basf2_module(
             "NotAssignedHitsCombiner",
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             WriteGFTrackCands=False,
             SegmentsStoreObjName=segments_store_vector_name,
@@ -428,7 +414,6 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
             SegmentInformationListTrackFilter=segment_information_list_track_filter,
             TrackFilter=track_filter,
             WriteGFTrackCands=False,
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             SegmentsStoreObjName=segments_store_vector_name,
             TracksStoreObjName=track_cands_store_vector_name)
@@ -487,7 +472,6 @@ class CDCTrackQualityAsserter(metamodules.WrapperModule):
         module = StandardEventGenerationRun.get_basf2_module(
             "TrackQualityAsserterCDC",
             WriteGFTrackCands=False,
-            SkipHitsPreparation=True,
             TracksStoreObjNameIsInput=True,
             TracksStoreObjName=track_cands_store_vector_name)
 

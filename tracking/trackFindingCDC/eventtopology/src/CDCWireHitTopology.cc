@@ -13,43 +13,44 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+
 
 #include <framework/logging/Logger.h>
 
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
-#include<unordered_set>
+#include <unordered_set>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+ClassImp(CDCWireHitTopology);
 
 CDCWireHitTopology& CDCWireHitTopology::getInstance()
 {
-  static CDCWireHitTopology wireHitTopology;
-  return wireHitTopology;
+  static StoreObjPtr<CDCWireHitTopology> instance("", DataStore::c_Persistent);
+  if (not instance.isValid()) {
+    B2FATAL("CDCWireHitTopology could not by found in the StoreArray! Have you added the WireHitPreparer module?");
+  }
+
+  return *instance;
+}
+
+void CDCWireHitTopology::initialize()
+{
+  StoreObjPtr<CDCWireHitTopology> wireHitTopology("", DataStore::c_Persistent);
+  if (wireHitTopology.isValid()) {
+    return;
+  }
+  wireHitTopology.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  if (not wireHitTopology.create(false)) {
+    B2FATAL("Could not create the StoreObject for the Wire Hit Topology properly!");
+  }
 }
 
 namespace {
-  bool maximalOneHitPerWire(StoreArray<CDCHit>& storedHits)
-  {
-    unordered_set<unsigned short> hitEWires;
-
-    for (const CDCHit& hit : storedHits) {
-      unsigned short eWire = hit.getID();
-      if (hitEWires.count(eWire)) {
-        return false;
-      } else {
-        hitEWires.insert(eWire);
-      }
-    }
-    return true;
-  }
-
-
   /** Checks if the sougth item is in the range and jumps to it.
    *  Falls back to std::lower_bound if not found like this
    *  Assumes that the range has only unique items,
@@ -70,12 +71,7 @@ namespace {
 
 
 CDCWireHitTopology::CDCWireHitTopology() :
-  m_eventMetaData(-999, -999, -999),
-  m_useSimpleTDCCountTranslator(false),
-  m_initialTDCCountTranslator(/*m_useSimpleTDCCountTranslator ?
-                              static_cast<CDC::TDCCountTranslatorBase*>(new CDC::SimpleTDCCountTranslator()) :*/
-    static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator())
-  )
+  m_initialTDCCountTranslator(static_cast<CDC::TDCCountTranslatorBase*>(new CDC::RealisticTDCCountTranslator()))
 {
 }
 
@@ -87,32 +83,8 @@ CDCWireHitTopology::~CDCWireHitTopology()
   }
 }
 
-void CDCWireHitTopology::initialize()
-{
-  StoreObjPtr<EventMetaData>::required();
-  StoreArray<CDCHit>::required();
-}
-
-
-size_t CDCWireHitTopology::event()
-{
-  StoreObjPtr<EventMetaData> storedEventMetaData;
-
-  if (storedEventMetaData.isValid() and m_eventMetaData == *storedEventMetaData) {
-    return getWireHits().size();
-  } else {
-    size_t nHits = fill("");
-    m_eventMetaData = *storedEventMetaData;
-    return nHits;
-  }
-
-}
-
 size_t CDCWireHitTopology::useAll()
 {
-  // Ensure the store array is filled with the basic hits.
-  event();
-
   // Unblock every wire hit
   for (const CDCWireHit& wireHit : getWireHits()) {
     wireHit.getAutomatonCell().unsetTakenFlag();
@@ -123,9 +95,6 @@ size_t CDCWireHitTopology::useAll()
 
 size_t CDCWireHitTopology::dontUse(const std::vector<int>& iHits)
 {
-  // Ensure the store array is filled with the basic hits.
-  event();
-
   StoreArray<CDCHit> storedHits;
   int nHits = storedHits.getEntries();
 
@@ -160,9 +129,6 @@ size_t CDCWireHitTopology::useAllBut(const std::vector<int>& iHits)
 
 size_t CDCWireHitTopology::useOnly(const std::vector<int>& iHits)
 {
-  // Ensure the store array is filled with the basic hits.
-  event();
-
   // Block every wire hit first
   for (const CDCWireHit& wireHit : getWireHits()) {
     wireHit.getAutomatonCell().setTakenFlag();
@@ -209,60 +175,6 @@ std::vector<int> CDCWireHitTopology::getIHitsRelatedFrom(const std::string& stor
   return iHits;
 }
 
-size_t CDCWireHitTopology::fill(const std::string& cdcHitsStoreArrayName)
-{
-  // clear all wire hits and oriented wire hits that might be left over from the last event
-  clear();
-
-  // Refresh the TDC count translator?
-  if (m_initialTDCCountTranslator) {
-    delete m_initialTDCCountTranslator;
-    m_initialTDCCountTranslator = nullptr;
-  }
-  if (false/*m_useSimpleTDCCountTranslator*/) {
-    m_initialTDCCountTranslator = new CDC::SimpleTDCCountTranslator();
-  } else {
-    m_initialTDCCountTranslator = new CDC::RealisticTDCCountTranslator();
-  }
-
-
-  // get the relevant cdc hits from the datastore
-  StoreArray<CDCHit> cdcHits(cdcHitsStoreArrayName);
-
-  assert(maximalOneHitPerWire(cdcHits));
-
-  //create the wirehits into a collection
-  Index nHits = cdcHits.getEntries();
-  m_wireHits.reserve(nHits);
-  m_rlWireHits.reserve(2 * nHits);
-
-  for (Index iHit = 0; iHit < nHits; ++iHit) {
-    CDCHit* ptrHit = cdcHits[iHit];
-    CDCHit& hit = *ptrHit;
-    if (iHit != hit.getArrayIndex()) {
-      B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
-    }
-
-    m_wireHits.push_back(CDCWireHit(ptrHit, m_initialTDCCountTranslator));
-
-    const WireID wireID(hit.getID());
-    if (wireID.getEWire() != hit.getID()) {
-      B2ERROR("WireID.getEWire() differs from CDCHit.getID()");
-    }
-
-    const CDCWireHit& wireHit = m_wireHits.back();
-    if (hit.getID() != wireHit.getWire().getEWire()) {
-      B2ERROR("CDCHit.getID() differs from CDCWireHit.getWire().getEWire()");
-    }
-    if (hit.getArrayIndex() != wireHit.getStoreIHit()) {
-      B2ERROR("CDCHit.getArrayIndex() differs from CDCWireHit.getStoreIHit");
-    }
-  }
-
-  fill(m_wireHits);
-  return nHits;
-}
-
 void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
 {
   // Copy the wire hits
@@ -274,6 +186,7 @@ void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
     B2ERROR("Wire hits are not sorted after creation");
   }
 
+  m_rlWireHits.reserve(m_rlWireHits.size() + 2 * wireHits.size());
   for (const CDCWireHit& wireHit : m_wireHits) {
     m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Left));
     m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Right));

@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
@@ -33,6 +34,8 @@ void TrackFindingCDCTestWithTopology::SetUpTestCase()
 
   //Also preload the CDCGeometry
   const CDCWireTopology& wireTopology __attribute__((unused)) = CDCWireTopology::getInstance();
+
+  CDCWireHitTopology::initialize();
 }
 
 void TrackFindingCDCTestWithTopology::TearDownTestCase()

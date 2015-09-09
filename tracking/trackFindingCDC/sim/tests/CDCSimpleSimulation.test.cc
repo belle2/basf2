@@ -85,11 +85,8 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_photon_c
 
 TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic_with_delay)
 {
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  CDCSimpleSimulation simpleSimulation(&wireHitTopology);
-  simpleSimulation.activateTOFDelay();
-  simpleSimulation.activateInWireSignalDelay();
+  m_simpleSimulation.activateTOFDelay();
+  m_simpleSimulation.activateInWireSignalDelay();
 
   Helix straightOffOriginLine(0, 1, 20, 1, 50);
   double outerWallR = CDCWireTopology::getInstance().getOuterCylindricalR();
@@ -101,7 +98,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic_w
   cosmicTrajectory.setLocalOrigin(startPoint);
 
 
-  CDCTrack mcTrack = simpleSimulation.simulate(cosmicTrajectory);
+  CDCTrack mcTrack = m_simpleSimulation.simulate(cosmicTrajectory);
   draw(CDCWireTopology::getInstance());
   draw(mcTrack);
   saveDisplay("cosmic_with_delay.svg");

@@ -26,11 +26,11 @@ namespace Belle2 {
 
       void initialize()
       {
-        const size_t nXBins = std::pow(divisionX, Super::template getMaxLevel());
+        const size_t nXBins = std::pow(divisionX, Super::getMaxLevel());
         const size_t nDiscreteXs = nXBins + 1;
         const auto xBins = linspace<float>(-m_maximumX, m_maximumX, nDiscreteXs);
 
-        const size_t nYBins = std::pow(divisionY, Super::template getMaxLevel());
+        const size_t nYBins = std::pow(divisionY, Super::getMaxLevel());
         const size_t nDiscreteYs = nYBins + 1;
         const auto yBins = linspace<float>(-m_maximumY, m_maximumY, nDiscreteYs);
 

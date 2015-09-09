@@ -11,19 +11,14 @@
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
-
 //in type
-#include <cdc/dataobjects/CDCHit.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 //out type
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <genfit/TrackCand.h>
 
 using namespace std;
@@ -32,28 +27,14 @@ using namespace TrackFindingCDC;
 
 TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrientation) :
   Module(),
-  m_param_useOnlyCDCHitsRelatedFromStoreArrayName(""),
-  m_param_dontUseCDCHitsRelatedFromStoreArrayName(""),
   m_param_trackOrientationString(""),
   m_param_tracksStoreObjName("CDCTrackVector"),
   m_param_tracksStoreObjNameIsInput(false),
   m_param_gfTrackCandsStoreArrayName(""),
   m_param_writeGFTrackCands(true),
-  m_param_remainingCDCHitsStoreArrayName(""),
   m_trackOrientation(trackOrientation)
 {
   setDescription("This a base module for all track finders in the CDC");
-  addParam("UseOnlyCDCHitsRelatedFrom",
-           m_param_useOnlyCDCHitsRelatedFromStoreArrayName,
-           "Full name of a StoreArray that has a Relation to the CDCHits StoreArray. "
-           "Only CDCHits that have a relation will be used in this track finder.",
-           string(""));
-
-  addParam("DontUseCDCHitsRelatedFrom",
-           m_param_dontUseCDCHitsRelatedFromStoreArrayName,
-           "Full name of a StoreArray that has a Relation to the CDCHits StoreArray. "
-           "CDCHits that have a relation will be blocked in this track finder.",
-           string(""));
 
   addParam("TrackOrientation",
            m_param_trackOrientationString,
@@ -79,34 +60,10 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrient
            m_param_writeGFTrackCands,
            "Flag to output genfit tracks to store array.",
            true);
-
-  addParam("RemainingCDCHitsStoreArrayName",
-           m_param_remainingCDCHitsStoreArrayName,
-           "Name of the StoreArray of CDCHits that are still unblocked at the end of the module. "
-           "A copy for each CDCHit is created into the new StoreArray and a relation to the main CDCHits"
-           " is constructed. The default value '' means no StoreArray and no copies are created.",
-           std::string(""));
-
-  addParam("SkipHitsPreparation",
-           m_param_skipHitsPreparation,
-           "Flag to skip wire hits generation, because other modules have done so before.",
-           false);
-}
-
-TrackFinderCDCBaseModule::~TrackFinderCDCBaseModule()
-{
 }
 
 void TrackFinderCDCBaseModule::initialize()
 {
-  // Preload geometry during initialization
-  // Marked as unused intentionally to avoid a compile warning
-  CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
-  CDCWireTopology& wireTopology  __attribute__((unused)) = CDCWireTopology::getInstance();
-
-  // Input StoreArray of CDCHits
-  CDCWireHitTopology::getInstance().initialize();
-
   // Output StoreArray
   if (m_param_writeGFTrackCands) {
     StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandsStoreArrayName);
@@ -115,15 +72,6 @@ void TrackFinderCDCBaseModule::initialize()
     StoreWrappedObjPtr< std::vector<CDCTrack> >::required(m_param_tracksStoreObjName);
   } else {
     StoreWrappedObjPtr< std::vector<CDCTrack> >::registerTransient(m_param_tracksStoreObjName);
-  }
-
-  // Output StoreArray for the remaining CDCHits
-  if (m_param_remainingCDCHitsStoreArrayName != "") {
-    StoreArray<CDCHit> storedRemainingCDCHits(m_param_remainingCDCHitsStoreArrayName);
-    storedRemainingCDCHits.registerInDataStore();
-
-    StoreArray<CDCHit> storedCDCHits("");
-    storedRemainingCDCHits.registerRelationTo(storedCDCHits);
   }
 
   if (m_param_trackOrientationString == string("")) {
@@ -143,70 +91,8 @@ void TrackFinderCDCBaseModule::initialize()
   }
 }
 
-void TrackFinderCDCBaseModule::beginRun()
-{
-}
-
-
-size_t TrackFinderCDCBaseModule::prepareHits()
-{
-  CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  // Create the wirehits - translate the CDCHits and attach the geometry.
-  B2DEBUG(100, "Creating all CDCWireHits");
-  size_t nHits = wireHitTopology.event();
-  size_t useNHits = nHits;
-
-  if (not m_param_skipHitsPreparation) {
-    if (m_param_useOnlyCDCHitsRelatedFromStoreArrayName != std::string("")) {
-      B2DEBUG(100, "  Use only CDCHits related from " << m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
-      useNHits = wireHitTopology.useOnlyRelatedFrom(m_param_useOnlyCDCHitsRelatedFromStoreArrayName);
-    } else {
-      useNHits = wireHitTopology.useAll();
-    }
-
-    if (m_param_dontUseCDCHitsRelatedFromStoreArrayName != std::string("")) {
-      B2DEBUG(100, "  Don't use CDCHits related from " << m_param_dontUseCDCHitsRelatedFromStoreArrayName);
-      useNHits -= wireHitTopology.dontUseRelatedFrom(m_param_dontUseCDCHitsRelatedFromStoreArrayName);
-    }
-
-    B2DEBUG(100, "  Created number of CDCWireHits == " << nHits);
-    B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);
-
-    if (nHits == 0) {
-      B2WARNING("Event with no hits");
-    }
-  }
-
-  return nHits;
-}
-
-
-size_t TrackFinderCDCBaseModule::copyRemainingHits()
-{
-  if (m_param_remainingCDCHitsStoreArrayName == "") return 0;
-
-  StoreArray<CDCHit> storedRemainingCDCHits(m_param_remainingCDCHitsStoreArrayName);
-  storedRemainingCDCHits.create(true); //override if filled by the first stage.
-
-  for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
-    const AutomatonCell& automatonCell = wireHit.getAutomatonCell();
-    if (not automatonCell.hasTakenFlag()) {
-      const CDCHit* hit = wireHit.getHit();
-      if (hit) {
-        const CDCHit* newAddedCDCHit = storedRemainingCDCHits.appendNew(*hit);
-        newAddedCDCHit->addRelationTo(hit);
-      }
-    }
-  }
-  return storedRemainingCDCHits.getEntries();
-}
-
-
 void TrackFinderCDCBaseModule::event()
 {
-  prepareHits();
-
   // Now aquire the store vector
   StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
   if (not m_param_tracksStoreObjNameIsInput) {
@@ -275,19 +161,9 @@ void TrackFinderCDCBaseModule::event()
       }
     }
   }
-
-  copyRemainingHits();
 }
 
 void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>&)
 {
 
-}
-
-void TrackFinderCDCBaseModule::endRun()
-{
-}
-
-void TrackFinderCDCBaseModule::terminate()
-{
 }

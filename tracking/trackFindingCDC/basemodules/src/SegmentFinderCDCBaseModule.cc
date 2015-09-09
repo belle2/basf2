@@ -82,9 +82,6 @@ void SegmentFinderCDCBaseModule::initialize()
 
 void SegmentFinderCDCBaseModule::event()
 {
-  size_t nHits = prepareHits();
-  if (nHits == 0) return;
-
   // Generate the segments
   std::vector<CDCRecoSegment2D> generatedSegments;
   generatedSegments.reserve(90);
@@ -154,8 +151,6 @@ void SegmentFinderCDCBaseModule::event()
       }
     }
   }
-
-  copyRemainingHits();
 }
 
 

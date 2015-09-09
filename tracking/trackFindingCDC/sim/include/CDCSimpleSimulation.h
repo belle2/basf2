@@ -73,9 +73,13 @@ namespace Belle2 {
 
     public:
       /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
-      explicit CDCSimpleSimulation(CDCWireHitTopology* wireHitTopology) :
-        m_wireHitTopology(wireHitTopology)
+      explicit CDCSimpleSimulation() : m_wireHitTopology(nullptr)
       {;}
+
+      void setWireHitTopology(CDCWireHitTopology* wireHitTopology)
+      {
+        m_wireHitTopology = wireHitTopology;
+      }
 
     public:
       /** Propagates the trajectories through the CDC as without energy loss until they first leave the CDC

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
 #include <string>
@@ -23,11 +22,10 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoHit2D;
     class CDCTrajectory2D;
+    class CDCTrajectory3D;
   }
 
   class SegmentQuadTreeModule : public TrackFinderCDCFromSegmentsModule {
-
-    typedef TrackFindingCDC::QuadTreeProcessorSegments Processor; /**< The used quad tree processor */
 
   public:
 

@@ -9,13 +9,14 @@
  **************************************************************************/
 #pragma once
 
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 // Basf2 module
 #include <framework/core/Module.h>
 
 namespace Belle2 {
+
+  namespace TrackFindingCDC {
+    class CDCTrack;
+  }
 
   /// A base class for track finders in the CDC.
   /** This module defines / handles
@@ -40,34 +41,25 @@ namespace Belle2 {
     TrackFinderCDCBaseModule(ETrackOrientation trackOrientation = c_None);
 
     /// Destructor of the module.
-    virtual ~TrackFinderCDCBaseModule();
+    virtual ~TrackFinderCDCBaseModule() { }
 
     ///  Initialize the Module before event processing
     virtual void initialize();
 
     /// Called when entering a new run.
-    virtual void beginRun();
+    virtual void beginRun() { }
 
     /// Processes the event and generates track candidates
     virtual void event();
-
-    /// Load the hits from the StoreArray and blocks the already used ones.
-    size_t prepareHits();
-
-    /** Copies the CDCHits that are not blocked at the end of the processing
-     *  to a StoreArray if requested by the RemainingCDCHitsStoreArray parameter.
-     *  @returns The number of remaining CDCHits.
-     */
-    size_t copyRemainingHits();
 
     /// Generates the tracks into the output argument. To be overriden in a concrete subclass.
     virtual void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
     /// Called at the end of a run.
-    virtual void endRun();
+    virtual void endRun() { }
 
     /// Terminate and free resources after last event has been processed
-    virtual void terminate();
+    virtual void terminate() { }
 
   public:
     /**
@@ -106,13 +98,6 @@ namespace Belle2 {
     }
 
   protected:
-
-    /// Parameter: Full name of a StoreArray that has a Relation to the CDCHits StoreArray. Only CDCHits that have a relation will be used in this track finder.
-    std::string m_param_useOnlyCDCHitsRelatedFromStoreArrayName;
-
-    /// Parameter: Full name of a StoreArray that has a Relation to the CDCHits StoreArray. CDCHits that have a relation will be blocked in this track finder.
-    std::string m_param_dontUseCDCHitsRelatedFromStoreArrayName;
-
     /// Parameter: String that states the desired track orientation. Valid orientations are "none" (as generated), "symmetric", "outwards", "downwards".
     std::string m_param_trackOrientationString;
 
@@ -128,15 +113,8 @@ namespace Belle2 {
     /// Parameter: Flag to output genfit tracks to store array
     bool m_param_writeGFTrackCands;
 
-    /// Parameter: Name of the output StoreArray for copies of the original CDCHits that are still unblocked at the end of the module.
-    std::string m_param_remainingCDCHitsStoreArrayName;
-
     /// Encoded desired track orientation. Valid orientations are "c_None" (as generated), "c_Symmetric", "c_Outwards", "c_downwards.
     ETrackOrientation m_trackOrientation;
-
-    /// Parameter: Flag to skip wire hits generation, because other modules have done so before
-    bool m_param_skipHitsPreparation;
-
   }; // end class
 
 

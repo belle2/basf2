@@ -15,7 +15,9 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereohitsProcesser::isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const
+
+/** Returns a bool if the rlWire can be matched to a track. */
+bool isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit)
 {
   if (rlWireHit.getStereoType() == StereoType::c_Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag())
     return false;
@@ -37,7 +39,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
   hitsVector.reserve(rlWireHits.size());
 
   for (const CDCRLWireHit& rlWireHit : rlWireHits) {
-    if (isValidHitTrajectoryMatch(rlWireHit, trajectory2D)) {
+    if (isValidHitTrajectoryMatch(rlWireHit)) {
 
       Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
       const CDCWire& wire = rlWireHit.getWire();
@@ -60,8 +62,6 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
     const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const
 {
-  B2INFO("Number of doubled hits: " << doubledRecoHits.size());
-
   foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
   foundStereoHits.end(), [&doubledRecoHits](HitType * recoHit3D) -> bool {
     return std::find(doubledRecoHits.begin(), doubledRecoHits.end(), recoHit3D) != doubledRecoHits.end();

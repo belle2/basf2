@@ -67,9 +67,6 @@ namespace Belle2 {
       /// We will use CDCRecoHits3D in the QuadTrees.
       typedef const CDCRecoHit3D HitType;
 
-      /** Returns a bool if the rlWire can be matched to a track. This is calculated with the track charge and the superlayer information */
-      bool isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit, const CDCTrajectory2D& trajectory2D) const;
-
       /**
        * Fill the given vector with all not used rl wire hits that could match the given track as CDCRecoHits3D.
        */

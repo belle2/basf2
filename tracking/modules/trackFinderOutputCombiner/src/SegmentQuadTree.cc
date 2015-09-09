@@ -41,6 +41,8 @@ void SegmentQuadTreeModule::generate(std::vector<CDCRecoSegment2D>& segments, st
 
 void SegmentQuadTreeModule::quadTreeSearch(std::vector<CDCRecoSegment2D>& recoSegments, std::vector<CDCTrack>& tracks)
 {
+  typedef TrackFindingCDC::QuadTreeProcessorSegments Processor; /**< The used quad tree processor */
+
   std::vector<Processor::ReturnList> foundTracks;
 
   Processor::ChildRanges ranges(Processor::rangeX(0, m_nbinsTheta),

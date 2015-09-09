@@ -24,7 +24,10 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
-#include <framework/dataobjects/EventMetaData.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -41,7 +44,7 @@ namespace Belle2 {
      *  (and their right left passage hypothese in case of
      *  So they can be retieved by their respective (super) layer as a range.
      */
-    class CDCWireHitTopology  {
+    class CDCWireHitTopology : public TObject {
 
     public:
       /// A Range of const CDCWireHits - usable with range based for
@@ -53,19 +56,20 @@ namespace Belle2 {
       /// Getter of the singletone instance
       static CDCWireHitTopology& getInstance();
 
-    public:
+      /// Create the StoreObject for the WireHitTopology.
+      static void initialize();
+
       /// Default constructor for ROOT compatibility.
       CDCWireHitTopology();
 
-      /// Empty deconstructor
+      /// Deconstructor
       ~CDCWireHitTopology();
 
-    public:
-      /// Initialize the wire hit topology at the begin of the run. Requires the StoreArray of CDCHits.
-      void initialize();
+      /** Fill the topology with preconstructed wire hits*/
+      void fill(const std::vector<CDCWireHit>& wireHits);
 
-      /// Fill the topology from the raw cdc hits.
-      size_t event();
+      /// Clear content of the topology after the event is processed.
+      void clear();
 
       /// Use all cdc hits
       size_t useAll();
@@ -100,27 +104,6 @@ namespace Belle2 {
         return useAllBut(iHits);
       }
 
-    private:
-      /// Returns all indices of cdc hits that have a relation from the StoreArray given by its full name.
-      std::vector<int> getIHitsRelatedFrom(const std::string& storeArrayName) const;
-
-    private:
-      /**
-       * Fill the topology from the raw cdc hits
-       * Note this methode should only called once per event,
-       * since it is likely that pointers to the translated hits are keep through out the reconstruction procedure.
-       *
-       * @param  cdcHitsStoreArrayName  Name of the store array the raw cdc hits shall be used for tracking.
-       */
-      size_t fill(const std::string& cdcHitsStoreArrayName);
-
-      /** Fill the topology with preconstructed wire hits*/
-      void fill(const std::vector<CDCWireHit>& wireHits);
-
-      /// Clear content of the topology after the event is processed.
-      void clear();
-
-    public:
       /// Getter for the oriented wire hit with the opposite orientation.
       const Belle2::TrackFindingCDC::CDCRLWireHit*
       getReverseOf(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
@@ -168,25 +151,23 @@ namespace Belle2 {
 
     private:
 
-      /// Memory for the event, run and experminent number corresponding to the currently stored data.
-      EventMetaData m_eventMetaData;
-
       /// Memory for the wire hits to be stored
       std::vector<CDCWireHit> m_wireHits;
 
       /// Memory for the oriented wire hits to be stored
       std::vector<CDCRLWireHit> m_rlWireHits;
 
-      /// Switch whether the simple or the realistic tdc count translator shall be used.
-      bool m_useSimpleTDCCountTranslator;
-
       /// Reference of the tdc count translator used at the beginning of this event.
       CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator;
 
-    private:
       /// Allow the simple simulation to manipulate the objects directly
       friend CDCSimpleSimulation;
 
+      /// Returns all indices of cdc hits that have a relation from the StoreArray given by its full name.
+      std::vector<int> getIHitsRelatedFrom(const std::string& storeArrayName) const;
+
+
+      ClassDef(CDCWireHitTopology, 1);
     }; //class
 
 

@@ -30,9 +30,10 @@ namespace Belle2 {
       public TrackFindingCDCTestWithTopology {
 
     public:
-      TrackFindingCDCTestWithSimpleSimulation() :
-        m_simpleSimulation(&(CDCWireHitTopology::getInstance()))
-      {;}
+      TrackFindingCDCTestWithSimpleSimulation() : m_simpleSimulation()
+      {
+        m_simpleSimulation.setWireHitTopology(&(CDCWireHitTopology::getInstance()));
+      }
 
       /// Preparations before the test
       virtual

@@ -11,7 +11,7 @@
 
 """
 <header>
-  <input>../EvtGenSimRec.root</input>
+  <input>EvtGenSimRec.root</input>
   <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeDigit.root</output>

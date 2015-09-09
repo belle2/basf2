@@ -45,6 +45,9 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     particles = []
 
+    import variables as v
+    v.variables.addAlias('isPrimarySignal', 'passesCut(isSignal > 0.5 and mcPrimary > 0.5)')
+
 # ################## Charged FSP ###############################
     mva_chargedFSP = MVAConfiguration(
         variables=['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
@@ -53,7 +56,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
                    'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
                    'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)',
                    'dr', 'dz', 'chiProb'],
-        target='isSignal',
+        target='isPrimarySignal',
     )
 
     particles.append(Particle('pi+', mva_chargedFSP, postCutConfig=postCut))

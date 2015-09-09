@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
@@ -21,11 +22,15 @@ namespace Belle2 {
      */
     class HitInZ0TanLambdaBox {
     public:
+
+      /// Use a Z0TanLambdaBox
+      typedef Z0TanLambdaBox HoughBox;
+
       /** Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
       inline Weight operator()(const CDCRecoHit3D* recoHit,
-                               const Z0TanLambdaBox* z0TanLambdaBox)
+                               const HoughBox* z0TanLambdaBox)
       {
         const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
         const float& upperZ0 = z0TanLambdaBox->getUpperZ0();

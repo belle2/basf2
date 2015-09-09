@@ -3,6 +3,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/StereoHitQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
 
 #include <TFile.h>
@@ -157,7 +158,6 @@ void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_para
   addMaximumNodeToTrackAndDeleteHits(track, foundStereoHits, doubledRecoHits, hitsVector);
 }
 
-
 void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int minimumNumberOfHits)
 {
   std::vector<HitType*> hitsVector;
@@ -166,7 +166,7 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   m_newQuadTree.seed(hitsVector);
 
   const std::vector<pair<Z0TanLambdaBox, vector<HitType*>>>& foundStereoHitsWithNode =
-    m_newQuadTree.findHighest(minimumNumberOfHits);
+    m_newQuadTree.findSingleBest(minimumNumberOfHits);
 
   m_newQuadTree.fell();
 
@@ -202,4 +202,92 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   }
 
   addMaximumNodeToTrackAndDeleteHits(track, foundStereoHits, doubledRecoHits, hitsVector);
+}
+
+void StereohitsProcesser::makeHistogrammingWithSegments(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments,
+                                                        unsigned int minimumNumberOfHits)
+{
+  // Reconstruct the segments
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  const double radius = trajectory2D.getGlobalCircle().radius();
+  const bool isCurler = trajectory2D.getOuterExit().hasNAN();
+
+  const double maximumPerpS = track.back().getArcLength2D();
+
+  std::vector<const CDCRecoSegment3D*> recoSegments;
+  for (const CDCRecoSegment2D& segment : segments) {
+    // Skip axial segments
+    if (segment.getStereoType() == StereoType::c_Axial) {
+      continue;
+    }
+
+    // Skip fully taken segments
+    if (segment.isFullyTaken()) {
+      continue;
+    }
+
+    CDCRecoSegment3D newRecoSegment = CDCRecoSegment3D::reconstruct(segment, trajectory2D);
+
+    // Skip segments out of the CDC
+    unsigned int numberOfHitsNotInCDC = 0;
+    for (const CDCRecoHit3D& recoHit : newRecoSegment) {
+      if (not recoHit.isInCellZBounds(1.5)) {
+        numberOfHitsNotInCDC++;
+      }
+    }
+    if (numberOfHitsNotInCDC > 0.7 * newRecoSegment.size()) {
+      continue;
+    }
+
+    // Skip segments with hits on the wrong side (of not curlers)
+    bool oneHitIsOnWrongSide = false;
+    bool oneHitIsTooFarAway = false;
+    for (CDCRecoHit3D& recoHit : newRecoSegment) {
+      const double currentArcLength2D = recoHit.getArcLength2D();
+      if (currentArcLength2D < 0) {
+        oneHitIsOnWrongSide = true;
+        recoHit.setArcLength2D(currentArcLength2D + 2 * TMath::Pi() * radius);
+      }
+
+      if (recoHit.getArcLength2D() - maximumPerpS > 30) {
+        oneHitIsTooFarAway = true;
+      }
+    }
+
+    if (oneHitIsTooFarAway) {
+      continue;
+    }
+
+    if (not isCurler and m_checkForB2BTracks and oneHitIsOnWrongSide) {
+      continue;
+    }
+
+    recoSegments.push_back(new CDCRecoSegment3D(newRecoSegment));
+  }
+
+  // Do the tree finding
+  m_segmentQuadTree.seed(recoSegments);
+  const auto& foundStereoSegmentsWithNode = m_segmentQuadTree.findSingleBest(minimumNumberOfHits);
+  m_segmentQuadTree.fell();
+
+  if (foundStereoSegmentsWithNode.size() == 1) {
+    // Add the hits of the segments to the track
+    const auto& foundStereoSegmentWithNode = foundStereoSegmentsWithNode[0];
+    const std::vector<const CDCRecoSegment3D*>& foundSegments = foundStereoSegmentWithNode.second;
+
+    for (const CDCRecoSegment3D* segment : foundSegments) {
+      for (const CDCRecoHit3D& recoHit : *segment) {
+        if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+          B2WARNING("Adding already found hit");
+          continue;
+        }
+        track.push_back(recoHit);
+        recoHit.getWireHit().getAutomatonCell().setTakenFlag();
+      }
+    }
+  }
+
+  for (const CDCRecoSegment3D* recoSegment : recoSegments) {
+    delete recoSegment;
+  }
 }

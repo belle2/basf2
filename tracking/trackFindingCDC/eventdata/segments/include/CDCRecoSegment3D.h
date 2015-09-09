@@ -29,6 +29,9 @@ namespace Belle2 {
        * Note : no fitting information is transported to the resulting segment.
        */
       CDCRecoSegment2D stereoProjectToRef() const;
+
+      /// Returns true of there is one hit in the range which has a reconstructed position in the CDC (scaled by the factor).
+      bool atLeastOneHitIsNotInCDCZBounds(const double factor = 1) const;
     };
 
   }

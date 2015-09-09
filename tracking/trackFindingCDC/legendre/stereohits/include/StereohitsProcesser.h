@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/SegmentZ0TanLambdaLegendre.h>
 
 #include <vector>
 
@@ -20,22 +21,27 @@ namespace Belle2 {
     class CDCRLWireHit;
     class CDCTrajectory2D;
     class CDCRecoHit3D;
+    class CDCRecoSegment2D;
 
     /** Class handling the stereo hit adding */
     class StereohitsProcesser {
     public:
       /** Create a quad tree */
       explicit StereohitsProcesser(unsigned int level, bool debugOutput = false, bool checkForB2BTracks = true) :
-        m_param_debugOutput(debugOutput), m_level(level), m_checkForB2BTracks(checkForB2BTracks), m_newQuadTree(level)
+        m_param_debugOutput(debugOutput), m_level(level), m_checkForB2BTracks(checkForB2BTracks),
+        m_newQuadTree(level),
+        m_segmentQuadTree(level)
       {
         // Prepare the hough algorithm
         m_newQuadTree.initialize();
+        m_segmentQuadTree.initialize();
       }
 
       /** Destructor razing the quad tree */
       ~StereohitsProcesser()
       {
         m_newQuadTree.raze();
+        m_segmentQuadTree.raze();
       }
 
       /**
@@ -53,6 +59,9 @@ namespace Belle2 {
        * and each hit is assigned to the track.
        * */
       void makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int minimumNumberOfHits);
+
+      void makeHistogrammingWithSegments(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments,
+                                         unsigned int minimumNumberOfHits);
 
     private:
       /// We will use CDCRecoHits3D in the QuadTrees.
@@ -76,6 +85,7 @@ namespace Belle2 {
       unsigned int m_level; /// Maximum level of the quad tree search.
       bool m_checkForB2BTracks; /// Set to false to skip the B2B check (good for curlers)
       HitZ0TanLambdaLegendre<const HitType*> m_newQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
+      SegmentZ0TanLambdaLegendre<2, 2> m_segmentQuadTree; /// Handler for the new quad tree (the old one is getting created every event)
 
 
     };

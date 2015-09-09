@@ -399,3 +399,14 @@ void CDCRecoSegment2D::receiveMaskedFlag() const
     }
   }
 }
+
+bool CDCRecoSegment2D::isFullyTaken() const
+{
+  for (const CDCRecoHit2D& recoHit : items()) {
+    if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
+      return false;
+    }
+  }
+
+  return true;
+}

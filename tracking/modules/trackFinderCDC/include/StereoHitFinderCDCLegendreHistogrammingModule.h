@@ -33,6 +33,7 @@ namespace Belle2 {
     unsigned int m_param_quadTreeLevel; /**< The number of levels for the quad tree search */
     unsigned int m_param_minimumHitsInQuadTree; /**< The minimum number of hits in a quad tree bin to be called as result. */
     bool m_param_useOldImplementation; /**< Whether to use the old implementation o the quad tree. */
+    bool m_param_useSegments; /**< Whether to use the segments or the hits in the quad tree. */
     bool m_param_checkForB2BTracks; /**< Set to false to skip the check for back-2-back tracks (good for cosmics) */
 
     TrackFindingCDC::StereohitsProcesser* m_stereohitsProcesser; /**< The stereo quad tree processor to use */

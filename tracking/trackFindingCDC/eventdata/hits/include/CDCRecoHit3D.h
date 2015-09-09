@@ -249,11 +249,11 @@ namespace Belle2 {
       void setArcLength2D(const double arcLength2D)
       { m_arcLength2D = arcLength2D; }
 
-      /** indicator if the hit is in the cdc or already outside its boundaries.
+      /** indicator if the hit is in the cdc (scaled by the factor) or already outside its boundaries.
           Checks for z to be in the range of the wire. */
-      bool isInCellZBounds() const
+      bool isInCellZBounds(const double factor = 1) const
       {
-        return getWire().isInCellZBounds(getRecoPos3D());
+        return getWire().isInCellZBounds(getRecoPos3D(), factor);
       }
 
       /// Access the object methods and methods from a pointer in the same way.

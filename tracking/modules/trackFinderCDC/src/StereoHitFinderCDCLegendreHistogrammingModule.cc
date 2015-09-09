@@ -4,6 +4,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -37,6 +39,11 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
            "Whether to use the old implementation o the quad tree.",
            false);
 
+  addParam("useSegments",
+           m_param_useSegments,
+           "Whether to use the segments or the hits in the quad tree.",
+           false);
+
   addParam("checkForB2BTracks", m_param_checkForB2BTracks,
            "Set to false to skip the check for back-2-back tracks (good for cosmics)",
            true);
@@ -61,14 +68,24 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  if (m_param_useOldImplementation) {
-    for (CDCTrack& track : tracks) {
-      m_stereohitsProcesser->makeHistogramming(track, m_param_minimumHitsInQuadTree);
 
+  if (m_param_useSegments) {
+    StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments("CDCRecoSegment2DVector");
+    std::vector<CDCRecoSegment2D>& segments = *storedRecoSegments;
+
+    for (CDCTrack& track : tracks) {
+      m_stereohitsProcesser->makeHistogrammingWithSegments(track, segments, m_param_minimumHitsInQuadTree);
     }
   } else {
-    for (CDCTrack& track : tracks) {
-      m_stereohitsProcesser->makeHistogrammingWithNewQuadTree(track, m_param_minimumHitsInQuadTree);
+    if (m_param_useOldImplementation) {
+      for (CDCTrack& track : tracks) {
+        m_stereohitsProcesser->makeHistogramming(track, m_param_minimumHitsInQuadTree);
+
+      }
+    } else {
+      for (CDCTrack& track : tracks) {
+        m_stereohitsProcesser->makeHistogrammingWithNewQuadTree(track, m_param_minimumHitsInQuadTree);
+      }
     }
   }
 

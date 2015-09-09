@@ -109,6 +109,9 @@ namespace Belle2 {
       void setISuperCluster(const size_t& iSuperCluster)
       { m_iSuperCluster = iSuperCluster; }
 
+      /// Returns false of there is one hit in the range which does not have a taken flag.
+      bool isFullyTaken() const;
+
     private:
       /** Memory for the automaton cell.
        *  It is declared mutable because it can vary

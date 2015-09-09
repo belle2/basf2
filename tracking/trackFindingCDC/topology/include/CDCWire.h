@@ -255,10 +255,10 @@ namespace Belle2 {
       /// Checks whether the position is in the drift cell surrounding the wire
       bool isInCell(const Vector3D& pos3D) const;
 
-      /// Checks whether the position is in the z bounds of the drift cell surrounding the wire
-      bool isInCellZBounds(const Vector3D& pos3D) const
+      /// Checks whether the position is in the z bounds of the drift cell (scaled by the factor) surrounding the wire
+      bool isInCellZBounds(const Vector3D& pos3D, const double factor = 1) const
       {
-        return getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
+        return getBackwardZ() * factor < pos3D.z() and pos3D.z() < getForwardZ() * factor;
       }
 
       /// Getter for the azimuth angle of the forward joint point of the wire relativ to its reference

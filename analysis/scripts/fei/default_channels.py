@@ -54,7 +54,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
                    'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
                    'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                    'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-                   'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)',
+                   'p', 'pt', 'pz',
                    'dr', 'dz', 'chiProb'],
         target='isPrimarySignal',
     )
@@ -68,9 +68,9 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     mva_gamma = MVAConfiguration(
         variables=['clusterReg', 'goodGamma', 'goodGammaUnCal',
-                   'clusterNHits', 'clusterTrackMatch', 'clusterE9E25',
-                   'useCMSFrame(p)', 'useCMSFrame(pt)', 'useCMSFrame(E)', 'useCMSFrame(pz)'],
-        target='isSignal',
+                   'clusterNHits', 'clusterTiming', 'clusterE9E25',
+                   'pt', 'E', 'pz'],
+        target='isPrimarySignal',
     )
 
     particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))

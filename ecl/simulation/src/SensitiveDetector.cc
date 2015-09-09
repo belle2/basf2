@@ -120,7 +120,7 @@ int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4doub
     const TVector3& VecCell = eclp->GetCrystalVec(cellId);        // vector of crystal axis
     double z = 15. - (position - PosCell) * VecCell;       // position along the vector of crystal axis
     double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
-    tsen = tof;
+
     int TimeIndex = tof * (1. / 100);                      // Hit Time of StoreArray
     int hitNum = m_ECLHitIndex[cellId][TimeIndex];
     if (hitNum == -1) {

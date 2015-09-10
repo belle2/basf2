@@ -1025,6 +1025,27 @@ def variablesToNTuple(
     path.add_module(output)
 
 
+def variablesToExtraInfo(
+    particleList,
+    variables,
+    path=analysis_main,
+):
+    """
+    For each particle in the input list the selected variables are saved in an extra-info field '${variable}_previous'.
+    Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
+
+    @param particleList  The input ParticleList
+    @param variables      Variable to order Particles by.
+    @param path          modules are added to this path
+    """
+
+    bcs = register_module('VariablesToExtraInfo')
+    bcs.set_name('VariablesToExtraInfo_' + particleList)  # + '_' + variables)
+    bcs.param('particleList', particleList)
+    bcs.param('variables', variables)
+    path.add_module(bcs)
+
+
 def findMCDecay(
     list_name,
     decay,

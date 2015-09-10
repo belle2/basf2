@@ -116,7 +116,7 @@ void SVDValidation()
               cValidInterstripPosDist->cd(k);
               if ((layer == 3) && (m == 0)){continue;} // skip slanted histos for layer 3 
               // build histogram
-              hValidInterstripPos[layerIndex][m][i] = new TH1F(histoName, histoTitle, bins,minInterstripPos,maxInterstripPos);
+              hValidInterstripPos[layerIndex][m][i] = new TH1F(histoName, histoTitle, InterstripPosBins ,minInterstripPos,maxInterstripPos);
               // set axes labels
               hValidInterstripPos[layerIndex][m][i]->GetXaxis()->SetTitle("InterstripPos");
               hValidInterstripPos[layerIndex][m][i]->GetYaxis()->SetTitle("counts");
@@ -135,7 +135,7 @@ void SVDValidation()
               hValidInterstripPos[layerIndex][m][i]->Write(histoName);
           } // sides loop ends
       } // types loop ends
-         cValidInterstripPosDist->Write(canvasName);
+  cValidInterstripPosDist->Write(canvasName);
   } // layers loop ends
 
 //---------------------------------------------------------------------
@@ -510,7 +510,7 @@ void SVDValidation()
     int k=0;        
     for (int  m=1; m>=0; m--) { // loop over types
         for (int i=0; i<=1; i++) { // loop over sides
-            TString histoTitle(Form("Validation: Digits: Signal to Noise Ratio, Layer %d, %s side", layer,Type[m],Side[i]));
+            TString histoTitle(Form("Validation: Digits: Signal to Noise Ratio, Layer %d, %s, %s side", layer,Type[m],Side[i]));
             TString histoName(Form("hValidDigitSignalToNoise%s_Layer%d_%s",Side[i], layer,Type[m]));
             k=k+1;            
             cValidSN->cd(k);

@@ -28,8 +28,6 @@ using namespace TrackFindingCDC;
 /*CDCTrack&*/void TrackProcessorNew::createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits)
 {
 //  B2INFO("create");
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
   m_cdcTracks.emplace_back();
   CDCTrack& newTrackCandidate = m_cdcTracks.back();
 

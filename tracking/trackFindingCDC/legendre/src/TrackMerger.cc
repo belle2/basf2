@@ -234,9 +234,10 @@ ESign TrackMergerNew::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
     phi_diff += 2 * TMath::Pi();
 
   if (phi_diff > 0 /*TMath::Pi()*/)
-    return ESign::c_Plus;
-  else
     return ESign::c_Minus;
+  else
+    return ESign::c_Plus;
+
 }
 
 double TrackMergerNew::getPhi(const CDCRecoHit3D& hit)

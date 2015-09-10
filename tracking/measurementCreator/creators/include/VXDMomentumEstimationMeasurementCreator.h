@@ -77,7 +77,7 @@ namespace Belle2 {
       if (planarMeasurement == nullptr) {
         B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!");
         // Make CPP check happy
-        return;
+        return {};
       }
 
       const TVector3& momentum = recoTrack.getMomentum();

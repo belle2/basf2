@@ -181,8 +181,6 @@ namespace Belle2 {
         return -999;
 
       int nDaughters = static_cast<int>(particle->getNDaughters());
-      if (nDaughters != 2)
-        return -999;
 
       long daughter1 = std::lround(daughters[0]);
       long daughter2 = std::lround(daughters[1]);

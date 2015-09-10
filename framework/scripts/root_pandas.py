@@ -1,4 +1,4 @@
-from root_numpy import root2array, list_trees, list_branches, list_structures
+from root_numpy import root2array, list_trees, list_branches, list_structures, array2root
 import os
 import pandas as pd
 import numpy as np
@@ -20,9 +20,10 @@ def _get_pandas_branches(filename, tree, branches):
     TODO: Are there more possibilities for "wrong" branches?
     """
 
-    usable_column_types = [u"int", u"float", u"double", u"char"]
+    usable_column_types = [u"int", u"float", u"double", u"char", u"long", u"long long"]
 
     structure = list_structures(filename, tree)
+
     if branches is None or len(branches) == 0:
         used_branches = structure
     else:
@@ -119,3 +120,37 @@ def read_root(filename, branches=None, tree_key=None, chunksize=None):
         return result_dataframes.values()[0]
     else:
         return result_dataframes
+
+
+def to_root(df, path, tree_key="default", mode='w', *kargs, **kwargs):
+    """
+    Write DataFrame to a ROOT file.
+    Coded after the root_pandas project on github.
+
+    Arguments
+    ----------
+    path: string
+        File path to new ROOT file (will be overwritten)
+    tree_key: string
+        Name of tree that the DataFrame will be saved as
+    mode: string, {'w', 'a'}
+        Mode that the file should be opened in (default: 'w')
+
+    Notes
+    -----
+    Further *kargs and *kwargs are passed to root_numpy's array2root.
+    >>> df = DataFrame({'x': [1,2,3], 'y': [4,5,6]})
+    >>> df.to_root('test.root')
+
+    The DataFrame index will be saved as a branch called 'index'.
+    """
+
+    if mode == 'a':
+        mode = 'update'
+    elif mode == 'w':
+        mode = 'recreate'
+    else:
+        raise ValueError('Unknown mode: {}. Must be "a" or "w".'.format(mode))
+
+    arr = df.to_records()
+    array2root(arr, path, tree_key, mode=mode, *kargs, **kwargs)

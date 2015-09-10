@@ -76,6 +76,8 @@ namespace Belle2 {
       genfit::PlanarMeasurement* planarMeasurement = dynamic_cast<genfit::PlanarMeasurement*>(coordinateMeasurement);
       if (planarMeasurement == nullptr) {
         B2FATAL("Can only add VXD hits which are based on PlanarMeasurements with momentum estimation!");
+        // Make CPP check happy
+        return;
       }
 
       const TVector3& momentum = recoTrack.getMomentum();

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/koralwinput/KoralWInputModule.h>
-#include <generators/utilities/cm2LabBoost.h>
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
@@ -34,13 +33,12 @@ REG_MODULE(KoralWInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-KoralWInputModule::KoralWInputModule() : Module()
+KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("Generates four fermion final state events with KoralW.");
 
   //Parameter definition
-  addParam("BoostMode", m_boostMode, "The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle)", 0);
   addParam("DataPath",  m_dataPath, "The path to the KoralW input data files.",
            FileSystem::findFile("/data/generators/koralw"));
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
@@ -59,38 +57,30 @@ void KoralWInputModule::initialize()
 {
   StoreArray<MCParticle>::registerPersistent();
 
+  //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
+  m_initial.initialize();
+  const BeamParameters& nominal = m_initial.getBeamParameters();
+  double ecm = nominal.getMass();
+  m_generator.setCMSEnergy(ecm);
+
   m_generator.init(m_dataPath, m_userDataFile, m_seed);
 
-  //Depending on the settings use the Belle II or Belle boost
-  if (m_boostMode == 1) {
-    GearDir ler("/Detector/SuperKEKB/LER/");
-    GearDir her("/Detector/SuperKEKB/HER/");
-
-    m_generator.setBoost(getBoost(her.getDouble("energy"), ler.getDouble("energy"),
-                                  her.getDouble("angle") - ler.getDouble("angle"), her.getDouble("angle")));
-  } else {
-    if (m_boostMode == 2) {
-
-      //electron and positron beam energies (magic numbers from Jeremy)
-      double electronBeamEnergy = 7.998213; // [GeV]
-      double positronBeamEnergy = 3.499218; // [GeV]
-      double crossingAngle = 22.0; //[mrad]
-
-      double pzP = sqrt(positronBeamEnergy * positronBeamEnergy - 0.000510998918 * 0.000510998918);
-      double pE  = sqrt(electronBeamEnergy * electronBeamEnergy - 0.000510998918 * 0.000510998918);
-      TLorentzVector boostVector(pE * sin(crossingAngle * 0.001), 0., pE * cos(crossingAngle * 0.001) - pzP, electronBeamEnergy + positronBeamEnergy);
-      m_generator.setBoost(boostVector.BoostVector());
-    }
-  }
-
-  m_generator.enableBoost(m_boostMode > 0);
 }
 
 
 void KoralWInputModule::event()
 {
+  // initial particle from beam parameters
+  MCInitialParticles& initial = m_initial.generate();
+
+  // true boost
+  TLorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
+  TVector3 vertex = initial.getVertex();
+
   m_mcGraph.clear();
-  m_generator.generateEvent(m_mcGraph);
+  m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 }
 

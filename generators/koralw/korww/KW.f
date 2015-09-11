@@ -45,7 +45,7 @@
       WRITE (path,'(250a)') (data_path(i),i=1,path_len)
       END
 
-      SUBROUTINE KW_Initialize(xpar_input)
+      SUBROUTINE KW_Initialize(ecm, xpar_input)
 *////////////////////////////////////////////////////////////////////////////////
 *//                                                                            //
 *//   Compulsory initialization of KoralW Mote Carlo Generator                 //
@@ -54,6 +54,7 @@
       IMPLICIT DOUBLE PRECISION  (A-H,O-Z)
       SAVE
       INCLUDE   'KW.inc'
+      REAL*8 ecm
       REAL*8  xpar_input( 10000) ! in main program
 *////////////////////////////////////////////////////////////////////////////////
 *//    Common blocks sorted in alphabetic order!!!!                            //
@@ -280,8 +281,15 @@
       ifhadm = NINT(m_Xpar(1075))
       ifhadp = NINT(m_Xpar(1076))
 
-      cmsene = m_Xpar(1)      
-      gmu    = m_Xpar(2)   
+!       cmsene = m_Xpar(1)      
+      print *, m_Xpar(1)
+      print *, ecm
+      IF ((m_Xpar(1).gt.0d0).and.(abs(m_Xpar(1)-ecm).gt.0.1d0)) THEN
+        CALL koralw_warning_ecm(m_Xpar(1), ecm)
+      ENDIF
+      cmsene = ecm
+      
+      gmu    = m_Xpar(2)
       alfwin = m_Xpar(3)
       amaz   = m_Xpar(4)
       gammz  = m_Xpar(5)

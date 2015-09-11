@@ -17,6 +17,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
+#include <generators/utilities/InitialParticleGeneration.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -59,6 +61,9 @@ namespace Belle2 {
     /** Variables */
     KoralW m_generator;        /**< The KoralW generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
+
+  private:
+    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
   };
 

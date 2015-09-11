@@ -50,13 +50,20 @@ extern"C" {
 
   void kw_setdatapath_(const char* filename, size_t* length);
   void kw_readatax_(const char* filename, size_t* length, int* reset, int* max, double* xpar);
-  void kw_initialize_(double* xpar);
+  void kw_initialize_(double* ecm, double* xpar);
   void marini_(int* mar1, int* mar2, int* mar3);
   void rmarin_(int* mar1, int* mar2, int* mar3);
   void kw_make_();
   void kw_finalize_();
   void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
   void kw_getxsecmc_(double* xSecMC, double* xErrMC);
+
+  void koralw_warning_ecm_(double* ecmconfig, double* ecm)
+  {
+    B2WARNING("KORALW: Different center of mass energy in config file (obsolete), E=" << *ecmconfig << ", and from beam parameters, E="
+              << *ecm);
+  }
+
 }
 
 
@@ -87,7 +94,7 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile, 
   kw_readatax_(userDataFile.c_str(), &pathLength, &reset, &numXPar, m_xpar);
 
   //Initialize KoralW
-  kw_initialize_(m_xpar);
+  kw_initialize_(&m_cmsEnergy, m_xpar);
 
   //Initialize random number generator
   int mar1 = randomSeed;
@@ -98,16 +105,16 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile, 
 }
 
 
-void KoralW::generateEvent(MCParticleGraph& mcGraph)
+void KoralW::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
 {
   kw_make_();
 
   //Store the particles with status id 3 and 2 as virtual particles, the particles with status id 1 as real particles
   for (int iPart = 0; iPart < hepevt_.nhep; ++iPart) {
     if (hepevt_.isthep[iPart] > 1) {
-      storeParticle(mcGraph, hepevt_.phep[iPart], hepevt_.vhep[iPart], hepevt_.idhep[iPart], true);
+      storeParticle(mcGraph, hepevt_.phep[iPart], hepevt_.vhep[iPart], hepevt_.idhep[iPart], vertex, boost, true);
     } else {
-      storeParticle(mcGraph, hepevt_.phep[iPart], hepevt_.vhep[iPart], hepevt_.idhep[iPart]);
+      storeParticle(mcGraph, hepevt_.phep[iPart], hepevt_.vhep[iPart], hepevt_.idhep[iPart], vertex, boost);
     }
   }
 }
@@ -127,7 +134,8 @@ void KoralW::term()
 //                       Protected methods
 //=========================================================================
 
-void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual, bool isInitial)
+void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex,
+                           TLorentzRotation boost, bool isVirtual, bool isInitial)
 {
   // //Create particle
   //MCParticleGraph::GraphParticle& part = mcGraph.addParticle();
@@ -143,20 +151,30 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
     part.setStatus(MCParticle::c_IsVirtual);
   } else if (isInitial) {
     part.setStatus(MCParticle::c_Initial);
-  } else {
-    part.setStatus(MCParticle::c_PrimaryParticle);
   }
+
+  //every particle from a generator is primary, TF
+  part.addStatus(MCParticle::c_PrimaryParticle);
+
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
   part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
   part.setEnergy(mom[3]);
   part.setMass(mom[4]);
-  part.setDecayVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
+  part.setProductionVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
+//   part.setDecayVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
 
-  //If boosting is enable boost the particles to the lab frame
+  //boost, TF
   TLorentzVector p4 = part.get4Vector();
-  //p4.SetPz(-1.0*p4.Pz());
-  if (m_applyBoost) p4 = m_boostVector * p4;
+  p4 = boost * p4;
   part.set4Vector(p4);
+
+  //set vertex, TF
+  if (!isInitial) {
+    TVector3 v3 = part.getProductionVertex();
+    v3 = v3 + vertex;
+    part.setProductionVertex(v3);
+    part.setValidVertex(true);
+  }
 }

@@ -28,24 +28,17 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    KoralW() : m_applyBoost(0.0), m_crossSection(0.0), m_crossSectionError(0.0)
+    KoralW() : m_crossSection(0.0), m_crossSectionError(0.0)
     {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
 
-
-    //KoralW() : m_applyBoost(0.0), m_crossSection(0.0), m_crossSectionError(0.0) {};
 
     /** Destructor. */
     ~KoralW() {};
 
-    /** Sets the Lorentz boost vector which should be applied to the generated particles.
-     * @param boostVector The Lorentz boost vector which is applied to the generated particles.
+    /** Sets the CMS energy.
+     * @param cmsEnergy The CMS energy in [GeV].
      */
-    void setBoost(TLorentzRotation boostVector) { m_boostVector = boostVector; }
-
-    /** Enables the boost of the generated particles.
-     * @param applyBoost Set to true to enabled the boost. Also make sure you have set the boost vector using setBoost().
-     */
-    void enableBoost(bool applyBoost = true) { m_applyBoost = applyBoost; }
+    void setCMSEnergy(double cmsEnergy) { m_cmsEnergy = cmsEnergy; }
 
     /** Initializes the generator.
      * @param dataPath The path to the default input data file for KoralW.
@@ -56,8 +49,10 @@ namespace Belle2 {
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
+     * @param vertex generated vertex.
+     * @param boost generated boost.
      */
-    void generateEvent(MCParticleGraph& mcGraph);
+    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -78,11 +73,9 @@ namespace Belle2 {
 
   protected:
 
-    bool m_applyBoost;              /**< Apply a boost to the MCParticles. */
-    TLorentzRotation m_boostVector; /**< The Lorentz boost vector for the transformation CMS to LAB frame. */
-
     double m_crossSection;      /**< The cross section of the generated KoralW events. */
     double m_crossSectionError; /**< The error on the cross section of the generated KoralW events. */
+    double m_cmsEnergy; /**< CMS Energy = 2*Ebeam [GeV]. */
 
     /** Store a single generated particle into the MonteCarlo graph.
      * @param mcGraph Reference to the MonteCarlo graph into which the particle should be stored.
@@ -94,7 +87,8 @@ namespace Belle2 {
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
 
-    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, bool isVirtual = false, bool isInitial = false);
+    void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex, TLorentzRotation boost,
+                       bool isVirtual = false, bool isInitial = false);
 
   private:
 

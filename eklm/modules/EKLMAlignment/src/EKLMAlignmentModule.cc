@@ -11,12 +11,12 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/gearbox/GearDir.h>
 
 using namespace Belle2;
 
@@ -38,12 +38,8 @@ void EKLMAlignmentModule::initialize()
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentData(0., 0., 0.);
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
-  int maxLayer[2];
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap");
-  maxLayer[0] = gd.getInt("nLayerBackward");
-  maxLayer[1] = gd.getInt("nLayerForward");
   for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-    for (iLayer = 1; iLayer <= maxLayer[iEndcap - 1]; iLayer++) {
+    for (iLayer = 1; iLayer <= EKLM::Geometry::getNLayers(iEndcap); iLayer++) {
       for (iSector = 1; iSector <= 4; iSector++) {
         for (iPlane = 1; iPlane <= 2; iPlane++) {
           for (iSegment = 1; iSegment <= 5; iSegment++) {

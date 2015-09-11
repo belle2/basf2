@@ -25,7 +25,20 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Geometry data.
+     * Standalone functions.
+     */
+    namespace Geometry {
+
+      /**
+       * Get number of layers.
+       * @param[in] endcap Endcap number (1 - backward, 2 - forward).
+       */
+      int getNLayers(int endcap);
+
+    }
+
+    /**
+     * Geometry data class.
      */
     class GeometryData {
 

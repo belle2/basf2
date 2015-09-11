@@ -328,20 +328,8 @@ void EKLM::GeoEKLMCreator::readXMLData()
   m_nLayer = EndCap.getInt("nLayer");
   if (m_nLayer < 1 || m_nLayer > 14)
     B2FATAL("Number of layers must be from 1 to 14.");
-  m_nLayerForward = EndCap.getInt("nLayerForward");
-  if (m_nLayerForward < 0)
-    B2FATAL("Number of detector layers in the forward endcap "
-            "must be nonnegative.");
-  if (m_nLayerForward > m_nLayer)
-    B2FATAL("Number of detector layers in the forward endcap "
-            "must be less than or equal to the number of layers.");
-  m_nLayerBackward = EndCap.getInt("nLayerBackward");
-  if (m_nLayerBackward < 0)
-    B2FATAL("Number of detector layers in the backward endcap "
-            "must be nonnegative.");
-  if (m_nLayerBackward > m_nLayer)
-    B2FATAL("Number of detector layers in the backward endcap "
-            "must be less than or equal to the number of layers.");
+  m_nLayerBackward = EKLM::Geometry::getNLayers(1);
+  m_nLayerForward = EKLM::Geometry::getNLayers(2);
   GearDir Layer(EndCap);
   Layer.append("/Layer");
   readSizeData(&LayerPosition, &Layer);

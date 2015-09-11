@@ -1,31 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################## This steering file
+# ####################################################### This steering file
 # shows all options for the generation of four fermion final state events.
 #
 # 100 four fermion final state QED events are generated using the KoralW
 # Fortran generator and some plots are shown at the end.
 #
 # Example steering file - 2011 Belle II Collaboration
-########################################################
+# #######################################################
 
 import sys
 import math
 from basf2 import *
+from beamparameters import add_beamparameters
 
 # reenable GUI thread for our canvas
 from ROOT import PyConfig
 PyConfig.StartGuiThread = True
 
-## Set the global log level
+# Set the global log level
 logging.log_level = LogLevel.WARNING
 
-## Load the required libraries
+# Load the required libraries
 import ROOT
 from ROOT import Belle2
 
-## Create some histograms to be filled
+# Create some histograms to be filled
 h_nTracks = ROOT.TH1D('nTracks', 'Number of Tracks per Event;#', 20, 0, 20)
 h_pdg = ROOT.TH1D('pid', 'Particle code of particles', 100, -50, 50)
 h_momentum = ROOT.TH1D('momentum', 'Momentum of particles', 200, 0, 8)
@@ -69,16 +70,21 @@ class ShowMCParticles(Module):
                 h_vertex.Fill(mc.getProductionVertex().X(),
                               mc.getProductionVertex().Y())
 
+main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+# event info setter
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-## Register the BHWideInput module
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters.param("smearVertex", True)
+# beamparameters.param("generateCMS", True)
+# print_params(beamparameters)
+
+# Register the BHWideInput module
 koralw = register_module('KoralWInput')
 
 # Set the mode for the boost of the generated particles 0 = no boost 1 = BELLE
-# II 2 = BELLE
-koralw.param('BoostMode', 1)
 
 # Set a random seed for the event generation
 koralw.param('RandomSeed', 2710)
@@ -87,14 +93,12 @@ koralw.param('RandomSeed', 2710)
 # cross section
 koralw.set_log_level(LogLevel.INFO)
 
-## Register the Progress module and the Python histogram module
+# Register the Progress module and the Python histogram module
 progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 showMCPart = ShowMCParticles()
 
-## Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
+# Create the main path and add the modules
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(koralw)

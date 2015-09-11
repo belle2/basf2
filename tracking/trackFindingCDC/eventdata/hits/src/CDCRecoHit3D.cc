@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 #include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace std;
@@ -29,34 +27,24 @@ CDCRecoHit3D::CDCRecoHit3D():
 {;}
 
 
-CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit* rlWireHit,
+CDCRecoHit3D::CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
                            const Vector3D& recoPos3D,
                            double perpS) :
   m_rlWireHit(rlWireHit),
   m_recoPos3D(recoPos3D),
   m_arcLength2D(perpS)
 {
-  if (rlWireHit == nullptr) B2ERROR("Initialization of three dimensional reconstructed hit with nullptr as oriented wire hit");
 }
 
 CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
                                       const CDCSimHit& simHit)
 {
-
-  //prepS cannot be deduced from the flightTime in this context
+  // prepS cannot be deduced from the flightTime in this context
   double perpS = std::numeric_limits<double>::quiet_NaN();
 
-  // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
-
-  Vector3D directionOfFlight{simHit.getMomentum()};
-
-  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
-
-  const CDCRLWireHit* rlWireHit = CDCWireHitTopology::getInstance().getRLWireHit(*wireHit, rlInfo);
-
-  return CDCRecoHit3D(rlWireHit, Vector3D{simHit.getPosTrack()}, perpS);
-
+  return CDCRecoHit3D(CDCRLTaggedWireHit::fromSimHit(wireHit, simHit),
+                      Vector3D{simHit.getPosTrack()},
+                      perpS);
 }
 
 
@@ -66,16 +54,16 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
 {
   Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
   double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
-  return CDCRecoHit3D(&(recoHit2D.getRLWireHit()), recoPos3D, perpS);
+  return CDCRecoHit3D(recoHit2D.getRLWireHit(), recoPos3D, perpS);
 }
 
 
-CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                        const CDCTrajectory2D& trajectory2D)
 {
   Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
   double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
-  return CDCRecoHit3D(&rlWireHit, recoPos3D, perpS);
+  return CDCRecoHit3D(rlWireHit, recoPos3D, perpS);
 }
 
 
@@ -92,7 +80,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     double z        = trajectorySZ.mapSToZ(perpS);
 
     Vector3D recoPos3D(recoPos2D, z);
-    return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
+    return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
 
   } else if (stereoType == StereoType::c_StereoU or stereoType == StereoType::c_StereoV) {
     //the closest approach of a skew line to a helix
@@ -107,7 +95,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     double perpS    = trajectory2D.calcArcLength2D(recoPos3D.xy());
     double z        = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
-    return CDCRecoHit3D(&(recoHit.getRLWireHit()), recoPos3D, perpS);
+    return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
 
   } else {
     B2ERROR("Reconstruction on invalid wire");
@@ -118,7 +106,7 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
 CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D& second)
 {
   if (first.getRLWireHit() == second.getRLWireHit()) {
-    return CDCRecoHit3D(&(first.getRLWireHit()),
+    return CDCRecoHit3D(first.getRLWireHit(),
                         Vector3D::average(first.getRecoPos3D(), second.getRecoPos3D()),
                         (first.getArcLength2D() + second.getArcLength2D()) / 2);
   } else {
@@ -139,17 +127,12 @@ Vector2D CDCRecoHit3D::getRecoDisp2D() const
   return disp2D;
 }
 
-
-
 void CDCRecoHit3D::reverse()
 {
-  const CDCRLWireHit* reverseRLWireHit = CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit());
-  setRLWireHit(reverseRLWireHit);
+  m_rlWireHit.reverse();
 }
-
-
 
 CDCRecoHit3D CDCRecoHit3D::reversed() const
 {
-  return CDCRecoHit3D(CDCWireHitTopology::getInstance().getReverseOf(getRLWireHit()), getRecoPos3D(), getArcLength2D());
+  return CDCRecoHit3D(getRLWireHit().reversed(), getRecoPos3D(), -getArcLength2D());
 }

@@ -49,16 +49,6 @@ CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
   m_line(line)
 {;}
 
-
-
-CDCTangent::CDCTangent(const CDCRecoHit2D& fromRecoHit,
-                       const CDCRecoHit2D& toRecoHit):
-  CDCRLWireHitPair(&(fromRecoHit.getRLWireHit()),
-                   &(toRecoHit.getRLWireHit())),
-  m_line(ParameterLine2D::throughPoints(fromRecoHit.getRecoPos2D(),
-                                        toRecoHit.getRecoPos2D()))
-{;}
-
 void CDCTangent::adjustLine()
 {
   m_line  = constructTouchingLine(getFromWireHit().getRefPos2D(),

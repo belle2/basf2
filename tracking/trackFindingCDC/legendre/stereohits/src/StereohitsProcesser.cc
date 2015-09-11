@@ -52,7 +52,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
             continue;
           }
         }
-        CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(&(rlWireHit), recoPos3D, perpS);
+        CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(rlWireHit, recoPos3D, perpS);
         hitsVector.push_back(newRecoHit);
       }
     }

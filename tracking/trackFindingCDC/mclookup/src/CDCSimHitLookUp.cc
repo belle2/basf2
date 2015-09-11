@@ -314,7 +314,7 @@ CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit) const
 
   Vector3D recoPos3D = getRecoPos3D(ptrHit);
 
-  return CDCRecoHit3D(ptrRLWireHit, recoPos3D);
+  return CDCRecoHit3D(*ptrRLWireHit, recoPos3D);
 }
 
 
@@ -326,7 +326,7 @@ CDCRecoHit3D CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) c
 
   Vector3D recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
 
-  return CDCRecoHit3D(ptrRLWireHit, recoPos3D);
+  return CDCRecoHit3D(*ptrRLWireHit, recoPos3D);
 }
 
 

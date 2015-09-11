@@ -71,7 +71,11 @@ namespace Belle2 {
       inline Weight operator()(const CDCRecoHit2D* const& recoHit2D,
                                const HoughBox* const& houghBox)
       {
-        return operator()(&(recoHit2D->getRLWireHit()), houghBox);
+        const CDCWire& wire = recoHit2D->getWire();
+        const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
+        bool isIn = contains(*houghBox, wire, signedDriftLength);
+        ERightLeft rlInfo = recoHit2D->getRLInfo();
+        return isIn ? 1.0 + isValidInfo(rlInfo) * m_rlWeightGain : NAN;
       }
 
       /** Checks if the track hit is contained in a phi0 curv hough space.

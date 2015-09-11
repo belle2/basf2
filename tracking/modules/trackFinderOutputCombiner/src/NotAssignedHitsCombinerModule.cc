@@ -277,20 +277,23 @@ double NotAssignedHitsCombinerModule::calculateThetaOfTrackCandidate(const Track
 {
   const CDCSZFitter& zFitter = CDCSZFitter::getFitter();
 
-  const CDCTrajectory3D& trajectory = trackCandidate.getStartTrajectory3D();
+  const CDCTrajectory3D& trajectory3D = trackCandidate.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
   CDCObservations2D observationsSZ;
 
   // TODO: Is it the same if adding the already fitted values??
 
   // Add the hits from the segment to the sz fit
-  for (CDCRecoHit3D recoHit : trackCandidate) {
+  for (const CDCRecoHit3D& recoHit : trackCandidate) {
     if (recoHit.getStereoType() != StereoType::c_Axial) {
       // we do not know the right-left information
-      CDCWireHit cdcWireHit(recoHit.getWireHit());
-      CDCRLWireHit cdcRLWireHit(cdcWireHit);
-      const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(cdcRLWireHit, trajectory.getTrajectory2D());
-      if (recoHit3D.isInCellZBounds()) {
-        observationsSZ.append(recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z());
+      const CDCWireHit& wireHit = recoHit.getWireHit();
+      Vector3D recoPos3D = wireHit.reconstruct3D(trajectory2D, ERightLeft::c_Unknown);
+      double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+
+      const CDCWire& wire = recoHit.getWire();
+      if (wire.isInCellZBounds(recoPos3D)) {
+        observationsSZ.append(perpS, recoPos3D.z());
       }
     }
   }

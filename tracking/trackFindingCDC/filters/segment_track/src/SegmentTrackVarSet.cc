@@ -60,7 +60,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   } else {
     CDCObservations2D observations;
     for (const CDCRecoHit2D& recoHit : *segment) {
-      CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
+      const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
@@ -190,7 +190,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       observationsFull.append(recoHit.getRecoPos2D());
       observationsNeigh.append(recoHit.getRecoPos2D());
     } else {
-      CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
+      const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();

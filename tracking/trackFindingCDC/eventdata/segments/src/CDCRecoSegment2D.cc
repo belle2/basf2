@@ -100,7 +100,6 @@ namespace {
   }
 
 
-
   void createFacetSegment(const CDCRLWireHitSegment& rlWireHitSegment,
                           CDCFacetSegment& facetSegment)
   {
@@ -322,14 +321,6 @@ CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
   return wireHitSegment;
 }
 
-CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
-{
-  CDCRLWireHitSegment rlWireHitSegment;
-  for (const CDCRecoHit2D& recoHit2D : *this) {
-    rlWireHitSegment.push_back(&(recoHit2D.getRLWireHit()));
-  }
-  return rlWireHitSegment;
-}
 
 bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
 {

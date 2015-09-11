@@ -99,15 +99,15 @@ namespace Belle2 {
 
       /// Getter for the recostructed position including the first hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getStartRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(&(getStartRLWireHit()), getStartRecoPos2D()); }
+      { return CDCRecoHit2D::fromRecoPos2D(getStartRLWireHit(), getStartRecoPos2D()); }
 
       /// Getter for the recostructed position including the second hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getMiddleRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(&(getMiddleRLWireHit()), getMiddleRecoPos2D()); }
+      { return CDCRecoHit2D::fromRecoPos2D(getMiddleRLWireHit(), getMiddleRecoPos2D()); }
 
       /// Getter for the recostructed position including the third hit averaged from the two touching points of the tangential lines
       CDCRecoHit2D getEndRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(&(getEndRLWireHit()), getEndRecoPos2D()); }
+      { return CDCRecoHit2D::fromRecoPos2D(getEndRLWireHit(), getEndRecoPos2D()); }
 
 
       /// Getter for the tangential line including the hits from the first to the second hit

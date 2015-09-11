@@ -18,10 +18,10 @@ using namespace TrackFindingCDC;
 TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
 {
   CDCWireHit wireHit(WireID(0, 0, 0), 0.01);
-  CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right);
+  CDCRLTaggedWireHit rlWireHit(&wireHit, ERightLeft::c_Right);
 
   double perpS = 0;
-  CDCRecoHit3D recoHit3D(&rlWireHit, wireHit.getRefPos3D(), perpS);
+  CDCRecoHit3D recoHit3D(rlWireHit, wireHit.getRefPos3D(), perpS);
 
   CDCTrack track;
   track.push_back(recoHit3D);

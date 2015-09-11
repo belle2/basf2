@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
@@ -34,12 +34,12 @@ namespace Belle2 {
       CDCRecoHit2D();
 
       /// Constructs a reconstructed hit based on the given oriented wire hit with the given displacement from the wire reference position.
-      CDCRecoHit2D(const CDCRLWireHit* rlWireHit,
+      CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit,
                    const Vector2D& recoDisp2D);
 
 
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
-      explicit CDCRecoHit2D(const CDCRLWireHit* rlWireHit);
+      explicit CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit);
 
 
       /// Constructs the average of two reconstructed hit positions and snaps it to the drift circle. \n
@@ -66,7 +66,7 @@ namespace Belle2 {
        *  @param pos2D the absolut position of the wire
        *  @param snap optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit* rlWireHit,
+      static CDCRecoHit2D fromRecoPos2D(const CDCRLTaggedWireHit& rlWireHit,
                                         const Vector2D& recoPos2D,
                                         bool snap = true);
 
@@ -186,9 +186,17 @@ namespace Belle2 {
       ERightLeft getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
 
+      /// Setter the right left passage information
+      void setRLInfo(ERightLeft& rlInfo)
+      { m_rlWireHit.setRLInfo(rlInfo); }
+
       /// Getter for the drift length at the wire reference position.
       double getRefDriftLength() const
       { return getRLWireHit().getRefDriftLength(); }
+
+      /// Getter for the drift length at the wire reference position signed with the right left passage hypotheses
+      double getSignedRefDriftLength() const
+      { return getRLWireHit().getSignedRefDriftLength(); }
 
       /// Getter for the uncertainty in the drift length at the wire reference position.
       double getRefDriftLengthVariance() const
@@ -215,16 +223,16 @@ namespace Belle2 {
       { return getRLWireHit().reconstruct3D(trajectory2D); }
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
-      const CDCRLWireHit& getRLWireHit() const
-      { return *m_rlWireHit; }
+      const CDCRLTaggedWireHit& getRLWireHit() const
+      { return m_rlWireHit; }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
-      void setRLWireHit(const CDCRLWireHit* rlWireHit)
+      void setRLWireHit(const CDCRLTaggedWireHit& rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
     private:
       /// Memory for the reference to the assiziated wire hit
-      const CDCRLWireHit* m_rlWireHit;
+      CDCRLTaggedWireHit m_rlWireHit;
 
       /// Memory for the displacement fo the assoziated wire reference position
       Vector2D m_recoDisp2D;

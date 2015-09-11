@@ -9,43 +9,18 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRLWireHit::CDCRLWireHit() :
-  m_wirehit(nullptr),
-  m_rlInfo(ERightLeft::c_Left)
-{}
-
-
-CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wirehit,
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
                            ERightLeft rlInfo) :
-  m_wirehit(wirehit),
-  m_rlInfo(rlInfo)
+  CDCRLTaggedWireHit(wireHit, rlInfo)
 {
-  B2ASSERT("Recohit with nullptr as wire hit", wirehit != nullptr);
 }
 
-CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
-                                      const CDCSimHit& simhit)
-{
-  // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
-  Vector3D directionOfFlight{simhit.getMomentum()};
-
-  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
-
-  CDCRLWireHit rlWireHit(wirehit, rlInfo);
-
-  return rlWireHit;
-
-}
 
 const CDCRLWireHit* CDCRLWireHit::reversed() const
 {

@@ -1,7 +1,6 @@
 #ifdef __CINT__
 
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
-//#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -31,8 +30,10 @@
 /// Some dictionaries for vectors that will be needed
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCWireHit>-;
 #pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCWireHit*>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>-;
+#pragma link C++ class const std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>-;
 #pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCRLWireHit*>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRLTaggedWireHit>-;
+#pragma link C++ class std::vector<const Belle2::TrackFindingCDC::CDCRLTaggedWireHit*>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit2D>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCTangent>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCFacet>-;

@@ -142,7 +142,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
     const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(wireHit, simpleSimHit.m_rlInfo);
 
-    CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
+    CDCRecoHit3D recoHit3D(*rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
     mcTrack.push_back(recoHit3D);
   }
 

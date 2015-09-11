@@ -132,7 +132,7 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
       simHitsRelatedToCDCHit.push_back(cdcHit.getRelated<CDCSimHit>("CDCSimHits"));
     }
 
-//    group them by their mcparticle id
+    //    group them by their mcparticle id
     std::map<int, std::multiset<CDCSimHit*, comp>> simHitsByMcParticleId;
     for (CDCSimHit * const& simHit : simHitsRelatedToCDCHit) {
       MCParticle* mcParticle = simHit->getRelated<MCParticle>("MCParticles");
@@ -158,17 +158,27 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
           CDCWireHit fromWireHit(fromHit);
           CDCWireHit toWireHit(toHit);
 
-          CDCRLWireHit fromRLWireHit(fromWireHit, ERightLeft::c_Unknown);
-          CDCRLWireHit toRLWireHit(toWireHit, ERightLeft::c_Unknown);
+          CDCRLTaggedWireHit fromRLWireHit(fromWireHit, ERightLeft::c_Unknown);
+          CDCRLTaggedWireHit toRLWireHit(toWireHit, ERightLeft::c_Unknown);
 
           Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
           Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
-          CDCRecoHit2D fromRecoHit2D(&fromRLWireHit, fromDisplacement.xy());
-          CDCRecoHit2D toRecoHit2D(&toRLWireHit, toDisplacement.xy());
+          CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
+          CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
 
-          CDCTangent recoTangent(fromRecoHit2D, toRecoHit2D);
-          draw(recoTangent, stylingMap);
+          draw(fromRecoHit2D, stylingMap);
+          draw(toRecoHit2D, stylingMap);
+
+          const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
+          const float fromX =  fromPos.x();
+          const float fromY =  fromPos.y();
+
+          const Vector2D toPos = toRecoHit2D.getRecoPos2D();
+          const float toX =  toPos.x();
+          const float toY =  toPos.y();
+
+          m_eventdataPlotter.drawLine(fromX, fromY, toX, toY, stylingMap);
         }
       }
     }

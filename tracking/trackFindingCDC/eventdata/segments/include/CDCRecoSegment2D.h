@@ -70,9 +70,6 @@ namespace Belle2 {
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       CDCWireHitSegment getWireHitSegment() const;
 
-      /// Getter for the vector of wires the hits of this segment are based on in the same order
-      CDCRLWireHitSegment getRLWireHitSegment() const;
-
       /** Fill the hit content of this segment into a genfit::TrackCand.
        *  Return true, if the trajectory information is valid, false otherwise.
        */

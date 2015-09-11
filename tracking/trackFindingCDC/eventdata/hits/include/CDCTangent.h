@@ -68,11 +68,6 @@ namespace Belle2 {
                  const CDCRLWireHit* toRLWireHit,
                  const ParameterLine2D& line);
 
-      /// Construct a tangent from two reconstructed hits
-      CDCTangent(const CDCRecoHit2D& fromRecoHit,
-                 const CDCRecoHit2D& toRecoHit);
-
-
       /// Print tangent for debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCTangent& tangent)
       {
@@ -123,11 +118,11 @@ namespace Belle2 {
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getFromRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(&(getFromRLWireHit()), getFromRecoPos2D()); }
+      { return CDCRecoHit2D::fromRecoPos2D(getFromRLWireHit(), getFromRecoPos2D()); }
 
       /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position
       CDCRecoHit2D getToRecoHit2D() const
-      { return CDCRecoHit2D::fromRecoPos2D(&(getToRLWireHit()), getToRecoPos2D()); }
+      { return CDCRecoHit2D::fromRecoPos2D(getToRLWireHit(), getToRecoPos2D()); }
 
     public:
       /// Adjusts the line to touch the drift circles with the correct right left passage information

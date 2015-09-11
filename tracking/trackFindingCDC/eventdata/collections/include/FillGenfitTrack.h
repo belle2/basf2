@@ -35,7 +35,7 @@ namespace Belle2 {
       for (const auto& genHit : hits) {
         ++sortingParameter;
 
-        const CDCRLWireHit& rlWireHit = genHit->getRLWireHit();
+        const CDCRLTaggedWireHit rlWireHit = genHit->getRLWireHit();
         const CDCWireHit& wireHit = rlWireHit.getWireHit();
         const CDCWire& wire = rlWireHit.getWire();
 

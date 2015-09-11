@@ -12,7 +12,7 @@
 #include <cmath>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
@@ -48,7 +48,7 @@ namespace Belle2 {
       CDCRecoHit3D();
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit* rlWireHit,
+      CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
                    const Vector3D& position,
                    double perpS = 0);
 
@@ -79,7 +79,7 @@ namespace Belle2 {
       /** Reconstructs the three dimensional hit from the wire hit and the given right left passage
        *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
        *  from the side indicated by the right left passage.*/
-      static CDCRecoHit3D reconstruct(const CDCRLWireHit& rlWireHit,
+      static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
 
@@ -183,10 +183,10 @@ namespace Belle2 {
       { return getRLWireHit().hasWireHit(wireHit); }
 
       /// Getter for the oriented wire hit
-      const CDCRLWireHit& getRLWireHit() const { return *m_rlWireHit; }
+      const CDCRLTaggedWireHit& getRLWireHit() const { return m_rlWireHit; }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
-      void setRLWireHit(const CDCRLWireHit* rlWireHit)
+      void setRLWireHit(const CDCRLTaggedWireHit& rlWireHit)
       { m_rlWireHit = rlWireHit; }
 
       /// Getter for the right left passage information,
@@ -195,6 +195,10 @@ namespace Belle2 {
        *  as you at the xy projection. */
       ERightLeft getRLInfo() const
       { return getRLWireHit().getRLInfo(); }
+
+      /// Setter the right left passage information
+      void setRLInfo(ERightLeft& rlInfo)
+      { m_rlWireHit.setRLInfo(rlInfo); }
 
       /// Getter for the reference position of the wire.
       const Vector2D& getRefPos2D() const
@@ -278,7 +282,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the oriented wire hit reference
-      const CDCRLWireHit* m_rlWireHit;
+      CDCRLTaggedWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position
       Vector3D m_recoPos3D;

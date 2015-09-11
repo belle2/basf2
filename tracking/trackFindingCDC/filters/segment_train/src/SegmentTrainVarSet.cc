@@ -45,8 +45,7 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
   for (const SegmentInformation* segmentInformation : segmentTrain) {
     double perpSFront = 0;
     if (is_stereo) {
-      CDCRLWireHit rlWireHit(segmentInformation->getSegment()->front().getWireHit(),
-                             segmentInformation->getSegment()->front().getRLInfo());
+      const CDCRLTaggedWireHit& rlWireHit = segmentInformation->getSegment()->front().getRLWireHit();
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
       perpSFront = recoHit3D.getArcLength2D();
     } else {
@@ -67,7 +66,8 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
     }
     alreadySet = true;
     if (is_stereo) {
-      CDCRLWireHit rlWireHit(segmentInformation->getSegment()->back().getWireHit(), segmentInformation->getSegment()->back().getRLInfo());
+      const CDCRLTaggedWireHit& rlWireHit =
+        segmentInformation->getSegment()->back().getRLWireHit();
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory);
       lastPerpS = recoHit3D.getArcLength2D();
     } else {

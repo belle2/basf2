@@ -21,4 +21,3 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-

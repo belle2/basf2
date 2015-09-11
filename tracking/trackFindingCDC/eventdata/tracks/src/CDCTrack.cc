@@ -36,10 +36,10 @@ CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
   m_endTrajectory3D.setLocalOrigin(endPos3D);
 
   for (const CDCRecoHit2D& recoHit2D : segment) {
-    const CDCRLWireHit* ptrRLWireHit = &(recoHit2D.getRLWireHit());
+    const CDCRLTaggedWireHit& rlWireHit = recoHit2D.getRLWireHit();
     Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
     double perpS = m_startTrajectory3D.calcArcLength2D(recoPos3D);
-    push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+    push_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS));
   }
 
   // TODO: Maybe enhance the estimation of the z coordinate with the superlayer slopes.

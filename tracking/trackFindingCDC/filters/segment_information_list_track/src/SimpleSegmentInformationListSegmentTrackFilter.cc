@@ -46,7 +46,7 @@ CellWeight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<s
       if (isAxialSegment) {
         observations.append(recoHit.getRecoPos2D());
       } else {
-        CDCRLWireHit rlWireHit(recoHit.getWireHit(), recoHit.getRLInfo());
+        const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
         CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
         double s = recoHit3D.getArcLength2D();
         double z = recoHit3D.getRecoZ();

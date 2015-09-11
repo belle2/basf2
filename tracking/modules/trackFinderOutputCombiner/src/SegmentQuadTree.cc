@@ -16,10 +16,10 @@ REG_MODULE(SegmentQuadTree);
 
 void SegmentQuadTreeModule::addHitToTrack(CDCTrack& track, const CDCRecoHit2D& hit, const CDCTrajectory3D& trajectory3D)
 {
-  const CDCRLWireHit* ptrRLWireHit = &(hit.getRLWireHit());
+  const CDCRLTaggedWireHit& rlWireHit = hit.getRLWireHit();
   Vector3D recoPos3D(hit.getRecoPos2D(), 0.0);
   double perpS = trajectory3D.calcArcLength2D(recoPos3D);
-  track.push_back(CDCRecoHit3D(ptrRLWireHit, recoPos3D, perpS));
+  track.push_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS));
 }
 
 SegmentQuadTreeModule::SegmentQuadTreeModule() : TrackFinderCDCFromSegmentsModule()

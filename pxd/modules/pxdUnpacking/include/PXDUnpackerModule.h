@@ -60,8 +60,6 @@ namespace Belle2 {
       bool m_ignoreDATCON;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      /** Event Number and compare mask grabbed from FTSW for now */
-      unsigned int ftsw_evt_nr, ftsw_evt_mask;
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr;
       /** Run Number from MetaInfo */

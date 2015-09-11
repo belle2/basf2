@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
+ * Contributors: Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,13 +25,15 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawCluster():
-      m_length(0), m_cluster(0), m_vxdID(0) {};
+      m_length(0), m_cluster(0), m_vxdID() {};
 
     /**
      * @param length  //length of cluster frame in shorts
      * @param data  //pointer to the first word in cluster frame
      * @param vxdID //Vertex Detector ID of the half ladder the cluster originates
      */
+
+    ~PXDRawCluster();
 
     PXDRawCluster(unsigned short* data, unsigned int length, VxdID vxdID);
 
@@ -60,11 +62,11 @@ namespace Belle2 {
   protected:
     unsigned int m_length;
     unsigned short* m_cluster; // [m_length] /**< Buffer of size m_length shorts  */
-    unsigned short m_vxdID;
+    VxdID m_vxdID;
 
     // ~PXDRawCluster();
 
-    ClassDef(PXDRawCluster, 3);
+    ClassDef(PXDRawCluster, 4);
   };
 
 

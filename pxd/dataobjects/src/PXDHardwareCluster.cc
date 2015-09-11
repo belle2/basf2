@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach
+ * Contributors: Klemens Lautenbach
  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -29,6 +29,13 @@ PXDHardwareCluster::PXDHardwareCluster(unsigned short* pixelU, unsigned short* p
     m_pixelV[i] = pixelV[i]; //We have to do 16bit endian swap, TODO VERIFY this!
     m_pixelQ[i] = pixelQ[i]; //We have to do 16bit endian swap, TODO VERIFY this!
   }
+};
+
+PXDHardwareCluster::~PXDHardwareCluster()
+{
+  delete m_pixelU;
+  delete m_pixelV;
+  delete m_pixelQ;
 };
 
 ClassImp(PXDHardwareCluster)

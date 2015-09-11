@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach
+ * Contributors: Klemens Lautenbach
  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -23,6 +23,11 @@ PXDRawCluster::PXDRawCluster(unsigned short* data, unsigned int length,  VxdID v
   for (unsigned int i = 0 ; i < m_length ; i++) {
     m_cluster[i] = d[i]; //We have to do 16bit endian swap, TODO VERIFY this!
   }
+};
+
+PXDRawCluster::~PXDRawCluster()
+{
+  delete m_cluster;
 };
 
 ClassImp(PXDRawCluster)

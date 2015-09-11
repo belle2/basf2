@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
+ * Contributors: Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -123,6 +123,10 @@ void PXDHardwareClusterUnpackerModule::unpack_event(PXDRawCluster& cl)
     data[i] = cl.getData(i);
   }
 
+  if ((data[fullsize - 1] & 0xFFFF) == 0) {
+    fullsize = fullsize - 1;
+  }
+
   unpack_fce(&data[0], fullsize, vxdID);
   B2INFO("unpack Cluster frame with size " << fullsize);
 }
@@ -162,7 +166,6 @@ PXDHardwareClusterUnpackerModule::seed_pixel PXDHardwareClusterUnpackerModule::f
       }
     }
   }
-//   col = (data[index] & 0x3F00) >> 8;
   if (dhp_id == 0) {
     col = (data[index] & 0x3F00) >> 8;
   }
@@ -199,6 +202,7 @@ void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_wo
   unsigned int dhp_id = 0;
   unsigned int index[nr_words];
   seed_pixel addr;
+  bool start_of_row = false;
 
   for (unsigned int i = 1; i < nr_words ; i++) {
     rows[i] = 0;
@@ -207,15 +211,19 @@ void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_wo
     index[i] = 0;
   }
 
-  for (unsigned int i = 0; i < nr_words; i++) {
 
+  for (unsigned int i = 0; i < nr_words; i++) {
     if ((dhe_fce[i] & 0x8000) == 0 && i != nr_words - 1) {
+      if (i > 0 && start_of_row == true) { B2ERROR("Start of row words with now pixelswords in between"); }
+      if (i == 0 && (((dhe_fce[i] & 0x4000) >> 14) == 0)) { B2ERROR("Cluster has no start of cluster flag"); }
       //Start Of Row
       row_address = (dhe_fce[i] & 0x3FF);
       dhp_id = (dhe_fce[i] & 0xC00) >> 10;
-//    B2INFO("DHP ID : " << dhp_id);
       index[i] = i;
+      if (i == 0) {start_of_row = true;}
     } else {
+      if (i == 0) { B2ERROR("First word is no Start of row word"); }
+      start_of_row = false;
       //Pixel word
       nrPixel++;
       increment_row_flag = (dhe_fce[i] & 0x4000) >> 14;
@@ -238,21 +246,14 @@ void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_wo
       rows[i] = row_address;
     }
   }
-
   //checks that the arrays adcs, cols, rows do not have entry 0 which would
   //correspond to a Start of Row word from the previous loop
   for (unsigned int j = 1 ; j < nr_words ; j++) {
-//      B2INFO(" COL ADRESS [" << j << "] = " << cols[j]);
-//      B2INFO(" ROW ADRESS [" << j << "] = " << rows[j]);
-//      B2INFO(" ADC [" << j << "] = " << adcs[j]);
     if (index[j] != 0 /*&& j!=0*/) {
       for (unsigned int l = j ; l < nr_words; l++) {
         cols[l] = cols[l + 1];
-//  B2INFO(" NEW/SHIFTET COL ADRESS [" << l << "] = " << cols[l]);
         rows[l] = rows[l + 1];
-//  B2INFO(" NEW/SHIFTET ROW ADRESS [" << l << "] = " << rows[l]);
         adcs[l] = adcs[l + 1];
-//  B2INFO(" NEW/SHIFTET ADC [" << l << "] = " << adcs[l]);
       }
     }
   }
@@ -267,15 +268,10 @@ void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_wo
     r[k - 1] = rows[k];
     c[k - 1] = cols[k];
     q[k - 1] = adcs[k];
-//      B2INFO(" r[" << k-1 << "] : " << r[k-1]);
-//      B2INFO(" c[" << k-1 << "] : " << c[k-1]);
-//      B2INFO(" q[" << k-1 << "] : " << dec << q[k-1]);
-//      B2INFO("NUMBER OF PIXEL : " << nrPixel);
   }
 
   all = calc_cluster_charge(dhe_fce, nr_words);
   addr = find_seed_pixel(dhe_fce, nr_words, dhp_id);
-  //B2INFO("Seed Pixel Address : Row : " << addr.row << " COL : " << addr.col << " Charge : " << addr.charge);
 
   if (!m_doNotStore) m_storeHardwareCluster.appendNew(&r[0], &c[0], &q[0], nrPixel, addr.charge, addr.row, addr.col, all, vxdID,
                                                         dhp_id);

@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdUnpacking/PXDUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -53,7 +52,6 @@ using namespace boost::spirit::endian;
 REG_MODULE(PXDUnpacker)
 
 /// If you change this list, change the NAMEs in the terminate function, too
-#define ONSEN_ERR_FLAG_FTSW_DHC_MM 0x00000001ul
 #define ONSEN_ERR_FLAG_DHC_DHE_MM  0x00000002ul
 //#define ONSEN_ERR_FLAG_DHC_DHP_MM  0x00000004ul // unsused
 #define ONSEN_ERR_FLAG_ONSEN_TRG_FIRST 0x00000008ul
@@ -566,6 +564,10 @@ public:
     return 0;
   };
 
+  unsigned int getDHPid(void)
+  {
+    return ((ubig16_t*)data)[0] & 0xF;
+  };
 
   unsigned int getFixedSize(void)
   {
@@ -672,7 +674,7 @@ void PXDUnpackerModule::initialize()
 void PXDUnpackerModule::terminate()
 {
   const string error_name[ONSEN_MAX_TYPE_ERR] = {
-    "FTSW/DHC mismatch", "DHC/DHE mismatch", "-unused-", "ONSEN Trigger is not first frame",
+    "NULL", "DHC/DHE mismatch", "-unused-", "ONSEN Trigger is not first frame",
     "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
     "DHC_START is not second frame", "-unused-", "Fixed size frame wrong size", "DHE CRC Error:",
     "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
@@ -703,7 +705,6 @@ void PXDUnpackerModule::terminate()
 void PXDUnpackerModule::event()
 {
   StoreArray<RawPXD> storeRaws(m_RawPXDsName);
-  StoreArray<RawFTSW> storeFTSW;
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 
   int nRaws = storeRaws.getEntries();
@@ -712,14 +713,6 @@ void PXDUnpackerModule::event()
   };
 
   m_errorMask = 0;
-  ftsw_evt_nr = 0;
-  ftsw_evt_mask = 0;
-  for (auto& it : storeFTSW) {
-    ftsw_evt_nr = it.GetEveNo(0);
-    ftsw_evt_mask = 0x7FFF;
-    B2INFO("PXD Unpacker --> FTSW Event Number: $" << hex << ftsw_evt_nr);
-    break;
-  }
 
 
   m_meta_event_nr = evtPtr->getEvent();
@@ -881,29 +874,32 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 };
 
-uint16_t swap_uint16(uint16_t val)
-{
-  return (val << 8) | (val >> 8);
-}
-
 void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
-//   for(unsigned int j=0; j < length ; j++){
   ubig16_t* cluster = (ubig16_t*)data;
-//   }
   int nr_words; //words in dhp frame
-  unsigned int words_in_cluster = 0; //counts words in cluster
+  unsigned int words_in_cluster = 0; //counts 16bit words in cluster
   nr_words = length / 2;
-  B2INFO("nr_words : " << nr_words);
+  ubig16_t sor;
+
   for (int i = 2 ; i < nr_words ; i++) {
-    if (i != 2) { //skip header
+    if (i != 2) {
       if ((((cluster[i] & 0x8000) == 0)
            && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
         if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
         words_in_cluster = 0;
       }
     }
+    if ((cluster[i] & 0x8000) == 0) {
+      sor = cluster[i];
+    }
     words_in_cluster++;
+
+    if ((cluster[nr_words - 1] & 0xFFFF) == (sor &
+                                             0xFFFF)) {//if frame is not 32bit aligned last word will be the last start of row word
+      cluster[nr_words - 1] = 0x0000;//overwrites the last redundant word with zero to make checking easier in PXDHardwareClusterUnpacker
+    }
+
     if (i == nr_words - 1) {
       if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster + 1], words_in_cluster, vxd_id);
     }
@@ -1100,26 +1096,6 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
 
 
-
-  if ((eventNrOfThisFrame & ftsw_evt_mask) != (ftsw_evt_nr & ftsw_evt_mask)) {
-    if (isFakedData_event) {
-      /// If ist a start, check if its a fake event, if its not a start, the fake flag is already (re)set. As long as the data structure is not messed up completly.
-      /// no need to explicitly check the DHC_END or HLT/ROI
-      /// We have a fake and should set the trigger nr by hand to prevent further errors
-      eventNrOfThisFrame = ftsw_evt_nr & ftsw_evt_mask; // masking might be a problem as we cannore recover all bits
-    } else {
-      B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << ftsw_evt_nr << "(FTSW) mask $" <<
-              ftsw_evt_mask);
-      m_errorMask |= ONSEN_ERR_FLAG_FTSW_DHC_MM;
-    }
-  }
-
-  if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
-    B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
-            "(MetaInfo) mask");
-    m_errorMask |= ONSEN_ERR_FLAG_FTSW_DHC_MM;
-  }
-
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
     if (countedDHEStartFrames != countedDHEEndFrames + 1)
       if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
@@ -1181,16 +1157,15 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       countedDHCFrames++;
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
-        B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
-                dhc.data_direct_readout_frame_raw->getDHEId());
+//         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
+//                 dhc.data_direct_readout_frame_raw->getDHEId());
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc();
-      found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
+      found_mask_active_dhp |= 15 << dhc.data_direct_readout_frame->getDHPPort();
+//       B2INFO("UNPACK FCE FRAME with len " << hex << len);
 
-      B2INFO("UNPACK FCE FRAME with len " << hex << len)
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
-
 
       break;
     };

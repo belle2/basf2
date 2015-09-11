@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Bjoern Spruck / Klemens Lautenbach                       *
+ * Contributors: Klemens Lautenbach                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDHardwareCluster():
-      m_nrPixel(0), m_pixelU(0), m_pixelV(0), m_pixelQ(0), m_seedCharge(0), m_seedU(0), m_seedV(0), m_clusterCharge(0), m_vxdID(0),
+      m_nrPixel(0), m_pixelU(0), m_pixelV(0), m_pixelQ(0), m_seedCharge(0), m_seedU(0), m_seedV(0), m_clusterCharge(0), m_vxdID(),
       m_chipID(0) {};
 
     /**
@@ -41,6 +41,8 @@ namespace Belle2 {
      * @param vxdID   //Vertex Detector ID of the half ladder from which the cluster originates
      * @param chipID //ID of dhp chip the cluster originates from
      */
+
+    ~PXDHardwareCluster();
 
     PXDHardwareCluster(unsigned short* pixelU, unsigned short* pixelV, unsigned char* pixelQ, unsigned int nrPixel,
                        unsigned char seedCharge,
@@ -139,11 +141,11 @@ namespace Belle2 {
     unsigned short m_seedU;
     unsigned short m_seedV;
     unsigned int m_clusterCharge;
-    unsigned short m_vxdID;
+    VxdID m_vxdID;
     unsigned int m_chipID;
     // ~PXDHardwareCluster();
 
-    ClassDef(PXDHardwareCluster, 10);
+    ClassDef(PXDHardwareCluster, 11);
   };
 
 

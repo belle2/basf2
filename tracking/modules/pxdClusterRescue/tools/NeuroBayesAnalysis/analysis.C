@@ -1695,10 +1695,11 @@ void bubblesort(std::vector<myCorrelSigni> & v, int n, string sortVal) {
   }
 } 
 
-void plot_diag_fits(int ihisto,int outputNodes,TPad* graphPad,
+TPad* plot_diag_fits(int ihisto,int outputNodes,
     TCanvas* canvas,bool pdfOutput,TFile* f,bool HbookMode,
     const char* correlSigniFile,TVirtualPS* PSFile,bool interactive) {
   int pages;
+  TPad* localGraphPad = nullptr;
   if(pdfOutput) canvas->Clear();
   if (outputNodes>=1)
     {
@@ -1710,22 +1711,26 @@ void plot_diag_fits(int ihisto,int outputNodes,TPad* graphPad,
       for (Int_t j=0; j< pages; ++j) {
 	//      cout<<"page "<<j<<endl;
 
-	if(ihisto == 2110000) graphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile,"Final Diag Fit");
-	else graphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile,"First Round Diag Fit");
+	if(ihisto == 2110000) {
+	  localGraphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile,"Final Diag Fit");
+	}
+	else {
+	  localGraphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile,"First Round Diag Fit");
+	}
 
 	if(outputNodes==1)
-	  graphPad->Divide(1,1,0,0);
+	  localGraphPad->Divide(1,1,0,0);
 	else
-	  graphPad->Divide(4,5,0,0);
+	  localGraphPad->Divide(4,5,0,0);
 	
 	if (outputNodes==1)
 	  j++;
 
 	for (Int_t i=1+j*nodesperpage; i<= (j+1)*nodesperpage; ++i) {
 
-	  graphPad->GetPad(i-j*nodesperpage)->cd();
-	  graphPad->GetPad(i-j*nodesperpage)->SetGridx(1);
-	  graphPad->GetPad(i-j*nodesperpage)->SetGridy(1);
+	  localGraphPad->GetPad(i-j*nodesperpage)->cd();
+	  localGraphPad->GetPad(i-j*nodesperpage)->SetGridx(1);
+	  localGraphPad->GetPad(i-j*nodesperpage)->SetGridy(1);
 
 	  int IDh1 = ihisto+i;
 	  int IDh2 = ihisto+100000+i;
@@ -1769,7 +1774,7 @@ void plot_diag_fits(int ihisto,int outputNodes,TPad* graphPad,
 
 
     }
-
+  return localGraphPad;
 
 }
 
@@ -2122,7 +2127,7 @@ void analysis( string FileName = "teacherHistos.root",
     int ihisto=2110000 + i*1000000;
     hdummy = loadHisto(f,ihisto+2,"ERROR LEARNSAMPLE",HbookMode);
     if(hdummy != NULL) 
-      plot_diag_fits(ihisto,outputNodes,graphPad,canvas,pdfOutput,f
+      plot_diag_fits(ihisto,outputNodes,canvas,pdfOutput,f
 	  ,HbookMode,correlSigniFile,PSFile,interactive);
     else 
       delete hdummy;
@@ -2315,6 +2320,7 @@ void analysis( string FileName = "teacherHistos.root",
   TPaveTextNB *pt1 = 0;
   for (int it=1; it<=numInputVars; it++) 
     {
+      TPad * loopInternalGraphPad = nullptr;
       int i = correlSigni[it-1].index; //Index of Variable
       //       cout << "i = " << i << "; position = " << correlSigni[it-1].position;
       //       cout << "; aloneSigni = " << correlSigni[it-1].aloneSigni;
@@ -2323,7 +2329,7 @@ void analysis( string FileName = "teacherHistos.root",
       if(verbose_analysis()) cout<<"node "<<i+1<<endl;
 
       canvas->Clear();
-      graphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile);
+      loopInternalGraphPad=printGlobalTitle(canvas,pdfOutput,correlSigniFile);
 
       if(signi)
 	{
@@ -2433,9 +2439,9 @@ void analysis( string FileName = "teacherHistos.root",
 
       canvas->Update();
       // make graphPad smaller due to the stats box 
-      graphPad->SetPad(0.,0.,1.,0.88);
+      loopInternalGraphPad->SetPad(0.,0.,1.,0.88);
 
-      graphPad->Divide(1,4);
+      loopInternalGraphPad->Divide(1,4);
       canvas->Update();
 
       //
@@ -2443,13 +2449,13 @@ void analysis( string FileName = "teacherHistos.root",
       //
       TH1F* hSig = loadHisto(f,1025000+i+1,"Check: Input variables",HbookMode); 
       TH1F* hBG = loadHisto(f,1015000+i+1,"Check: Input variables",HbookMode); 
-      graphPad->GetPad(1)->cd();
-      graphPad->GetPad(1)->SetTopMargin(0.1);
+      loopInternalGraphPad->GetPad(1)->cd();
+      loopInternalGraphPad->GetPad(1)->SetTopMargin(0.1);
       //      graphPad->GetPad(1)->SetTopMargin(0.15);
       //      graphPad->GetPad(1)->SetBottomMargin(0.15);
-      graphPad->GetPad(1)->SetBottomMargin(0.25);
-      graphPad->GetPad(1)->SetGridx();
-      graphPad->GetPad(1)->SetGridy();
+      loopInternalGraphPad->GetPad(1)->SetBottomMargin(0.25);
+      loopInternalGraphPad->GetPad(1)->SetGridx();
+      loopInternalGraphPad->GetPad(1)->SetGridy();
       if(verbose_analysis()) cout<<"distribsingle"<<endl;
       distribsingle5(hSig,hBG,i);
       // write the original values of this variable	  
@@ -2459,12 +2465,12 @@ void analysis( string FileName = "teacherHistos.root",
       //
       // second plot: purity vs. netout
       //
-      graphPad->GetPad(2)->cd();
+      loopInternalGraphPad->GetPad(2)->cd();
       //      graphPad->GetPad(2)->SetTopMargin(0.05);
-      graphPad->GetPad(2)->SetTopMargin(0.05);
-      graphPad->GetPad(2)->SetBottomMargin(0.15);
-      graphPad->GetPad(2)->SetGridx();
-      graphPad->GetPad(2)->SetGridy();
+      loopInternalGraphPad->GetPad(2)->SetTopMargin(0.05);
+      loopInternalGraphPad->GetPad(2)->SetBottomMargin(0.15);
+      loopInternalGraphPad->GetPad(2)->SetGridx();
+      loopInternalGraphPad->GetPad(2)->SetGridy();
       if(verbose_analysis()) cout<<"spline or map"<<endl;
       hSig->Sumw2();    // have correct error treatment:
       hBG->Sumw2();
@@ -2507,10 +2513,10 @@ void analysis( string FileName = "teacherHistos.root",
       //
       // third plot
       //
-      graphPad->GetPad(3)->cd();
-      graphPad->GetPad(3)->SetTopMargin(0.1);
-      graphPad->GetPad(3)->SetGridx();
-      graphPad->GetPad(3)->SetGridy();
+      loopInternalGraphPad->GetPad(3)->cd();
+      loopInternalGraphPad->GetPad(3)->SetTopMargin(0.1);
+      loopInternalGraphPad->GetPad(3)->SetGridx();
+      loopInternalGraphPad->GetPad(3)->SetGridy();
       gStyle->SetOptStat("oun");
       ID1 = 1016000 + i+1;
       TH1F* h1 = loadHisto(f,ID1,"Check: Input variables",HbookMode); 
@@ -2566,14 +2572,14 @@ void analysis( string FileName = "teacherHistos.root",
       //
       // lower plot: purity vs efficiency
       //
-      graphPad->GetPad(4)->cd();
-      graphPad->GetPad(4)->Clear(); 
+      loopInternalGraphPad->GetPad(4)->cd();
+      loopInternalGraphPad->GetPad(4)->Clear();
       //      graphPad->GetPad(4)->SetTopMargin(0.05);
       //      graphPad->GetPad(4)->SetBottomMargin(0.15);
-      graphPad->GetPad(4)->SetTopMargin(0.05);
-      graphPad->GetPad(4)->SetBottomMargin(0.2);
-      graphPad->GetPad(4)->SetGridx();
-      graphPad->GetPad(4)->SetGridy();
+      loopInternalGraphPad->GetPad(4)->SetTopMargin(0.05);
+      loopInternalGraphPad->GetPad(4)->SetBottomMargin(0.2);
+      loopInternalGraphPad->GetPad(4)->SetGridx();
+      loopInternalGraphPad->GetPad(4)->SetGridy();
 
       NullGraph->SetMaximum(maxGraph+0.05);
       NullGraph->SetMinimum(minGraph-0.05);

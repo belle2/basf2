@@ -36,8 +36,6 @@ namespace {
 
 void WireHitTopologyPreparerModule::initialize()
 {
-  setDescription("Combine the CDCHits from the DataStore with the geometry information to have them both at hand in the CDC tracking modules."
-                 "Also set all CDCWireHits as unused.");
   StoreArray<CDCHit>::required();
   CDCWireHitTopology::initialize();
 

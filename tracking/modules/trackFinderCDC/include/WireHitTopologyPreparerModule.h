@@ -15,7 +15,11 @@ namespace Belle2 {
   class WireHitTopologyPreparerModule : public Module {
 
   public:
-    WireHitTopologyPreparerModule() : Module() {}
+    WireHitTopologyPreparerModule() : Module()
+    {
+      setDescription("Combine the CDCHits from the DataStore with the geometry information to have them both at hand in the CDC tracking modules. "
+                     "Also set all CDCWireHits as unused.");
+    }
 
     /// Create the StoreObject.
     void initialize();

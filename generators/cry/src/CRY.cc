@@ -431,7 +431,8 @@ void CRY::storeParticle(MCParticleGraph& mcGraph, const double* mom, const doubl
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
   part.setProductionVertex(TVector3(vertex[0], vertex[1], vertex[2]));
-//   B2INFO("CRY: Production time of particle (" << ptime << " is ignored and set to 0.0)")
+
+  B2INFO("CRY: Production time of particle (" << ptime + m_timeOffset << " is ignored and set to " << 0.0 + m_timeOffset << ")")
   part.setProductionTime(0.0 + m_timeOffset);
 }
 

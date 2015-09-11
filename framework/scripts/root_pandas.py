@@ -1,10 +1,11 @@
-from root_numpy import root2array, list_trees, list_branches, list_structures, array2root
+from root_numpy import root2array, list_trees, list_branches, list_structures, array2root, tree2array
 import os
 import pandas as pd
 import numpy as np
+import ROOT
 
 
-def _get_pandas_branches(filename, tree, branches):
+def _get_pandas_branches(filename, tree, t, branches):
     """
     Get all branches which are int or float from the given tree in the given filename.
     If branches is given, use only those branches.
@@ -34,7 +35,7 @@ def _get_pandas_branches(filename, tree, branches):
 
     # Filter out the branches which are not one dimensional in the first column. We assume here that the root tree looks
     # the same on each row.
-    first_row = root2array(filenames=filename, treename=tree, branches=all_numerical_branches, start=0, stop=1, step=1)[0]
+    first_row = tree2array(t, branches=all_numerical_branches, start=0, stop=1, step=1)[0]
     good_indices = map(lambda x: x[0], filter(lambda element_with_index: element_with_index[1].size == 1, enumerate(first_row)))
     good_branches = [all_numerical_branches[b] for b in good_indices]
     if len(good_branches) == 0:
@@ -48,13 +49,13 @@ class RootReader():
 
     """ An interator class to read out root files in chunks of data. See read_root for usage"""
 
-    def __init__(self, filename, tree, branches, chunksize):
+    def __init__(self, root_file, tree, branches, chunksize):
         """ Construcor with the filename, the tree and the branches (for reference) and the chunksize """
 
-        #: Filename of the root file to handle
-        self.filename = filename
+        #: Pointer to the root file (we must keep it because otherwise python cleans it up)
+        self.root_file = root_file
 
-        #: Treename of the root TTree to handle
+        #: TTree to handle
         self.tree = tree
 
         #: List of branches to handle
@@ -76,7 +77,7 @@ class RootReader():
 
     def next(self):
         """ The next function """
-        root_array = root2array(self.filename, self.tree, self.branches,
+        root_array = tree2array(self.tree, self.branches,
                                 start=self.current_chunk * self.chunksize, stop=(self.current_chunk + 1) * self.chunksize, step=1)
         if len(root_array) == 0:
             raise StopIteration()
@@ -106,13 +107,15 @@ def read_root(filename, branches=None, tree_key=None, chunksize=None):
     else:
         trees = list_trees(filename)
     result_dataframes = {}
+    root_file = ROOT.TFile(filename)
     for tree in trees:
-        good_branches = _get_pandas_branches(filename=filename, tree=tree, branches=branches)
+        t = root_file.Get(tree)
+        good_branches = _get_pandas_branches(filename=filename, tree=tree, t=t, branches=branches)
 
         if chunksize is not None:
-            result_dataframes.update({tree: RootReader(filename, tree, good_branches, chunksize)})
+            result_dataframes.update({tree: RootReader(root_file, t, good_branches, chunksize)})
         else:
-            root_array = root2array(filename, tree, good_branches)
+            root_array = tree2array(t, good_branches)
             dataframe = pd.DataFrame(root_array)
             result_dataframes.update({tree: dataframe})
 

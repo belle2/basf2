@@ -28,7 +28,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    KoralW() : m_crossSection(0.0), m_crossSectionError(0.0)
+    KoralW() : m_crossSection(0.0), m_crossSectionError(0.0), m_cmsEnergy(0.0)
     {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
 
 

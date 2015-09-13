@@ -20,7 +20,11 @@ def removeJPsiSlash(string):
     return string.replace('/', '')
 
 
-def GetEntriesSave(tree, selection):
+def GetEntriesSafe(tree, selection):
+    """
+    Replacement for TTree::GetEntries(const char* selection) that
+    doesn't stop after a 1 billion entries or so.
+    """
     s = ROOT.TSelectorEntries(selection)
     tree.Process(s, "", 1000000000000000)
     tree.SetNotify(0)
@@ -362,8 +366,8 @@ def FSPDistribution(resource, inputList, mvaTarget):
     rootfile = ROOT.TFile(filename)
     distribution = rootfile.Get('distribution')
 
-    return {'nSignal': int(GetEntriesSave(distribution, mvaTarget + ' == 1')),
-            'nBackground': int(GetEntriesSave(distribution, mvaTarget + ' == 0'))}
+    return {'nSignal': int(GetEntriesSafe(distribution, mvaTarget + ' == 1')),
+            'nBackground': int(GetEntriesSafe(distribution, mvaTarget + ' == 0'))}
 
 
 def CalculateInverseSamplingRate(resource, distribution):
@@ -484,8 +488,8 @@ def GenerateSPlotModel(resource, name, mvaConfig, distribution):
         # Add signal and background
         # initial value and maximal value will be set inside TMVASPlotTeacher
         total = float(distribution['nBackground'] + distribution['nSignal'])
-        bkgfrac = RooRealVar("background", "fraction of background", distribution['nBackground']/total)
-        sigfrac = RooRealVar("signal", "fraction of background", distribution['nSignal']/total)
+        bkgfrac = RooRealVar("background", "fraction of background", distribution['nBackground'] / total)
+        sigfrac = RooRealVar("signal", "fraction of background", distribution['nSignal'] / total)
 
         bkgfrac.setConstant(kFALSE)
         sigfrac.setConstant(kFALSE)

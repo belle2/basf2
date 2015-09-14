@@ -45,7 +45,7 @@ namespace Belle2 {
         };
       };
 
-      ~OriginPrecisionFunction() {};
+
 
     };
   }

@@ -18,25 +18,10 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
-
-CDCMCHitLookUp::CDCMCHitLookUp()
-{
-}
-
-
-
-CDCMCHitLookUp::~CDCMCHitLookUp()
-{
-}
-
-
-
 const CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 {
   return CDCMCManager::getMCHitLookUp();
 }
-
 
 
 void CDCMCHitLookUp::fill() const
@@ -45,12 +30,10 @@ void CDCMCHitLookUp::fill() const
 }
 
 
-
 const Belle2::CDCSimHit* CDCMCHitLookUp::getSimHit(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCMap().getSimHit(ptrHit);
 }
-
 
 
 const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit) const
@@ -113,12 +96,10 @@ const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) c
 }
 
 
-
 ERightLeft CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getSimHitLookUp().getRLInfo(ptrHit);
 }
-
 
 
 bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit) const
@@ -128,13 +109,11 @@ bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit) const
 }
 
 
-
 ITrackType CDCMCHitLookUp::getMCTrackId(const CDCHit* ptrHit) const
 {
   const MCParticle* ptrMCParticle = getMCParticle(ptrHit);
   return ptrMCParticle ? ptrMCParticle->getArrayIndex() : INVALID_ITRACK;
 }
-
 
 
 Index CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
@@ -143,12 +122,10 @@ Index CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
 }
 
 
-
 Index CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCTrackStore().getInTrackSegmentId(ptrHit);
 }
-
 
 
 Index CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const

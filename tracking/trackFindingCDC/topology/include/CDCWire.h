@@ -61,8 +61,8 @@ namespace Belle2 {
               const ILayerType& iLayer,
               const IWireType& iWire);
 
-      /// Empty deconstructor
-      ~CDCWire() {}
+
+
 
       /** @name Static instance getters
        *  Getter for the already constructed instances form the CDCWireTopology::getInstance() object.

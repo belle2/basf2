@@ -27,13 +27,6 @@ namespace Belle2 {
     class CDCMCManager  {
 
     public:
-      /// Empty constructor
-      CDCMCManager();
-
-      /// Empty deconstructor
-      ~CDCMCManager();
-
-    public:
       ///Getter for the singletone instance
       static CDCMCManager& getInstance();
 
@@ -70,7 +63,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the event, run and experminent number corresponding to the currently stored data.
-      EventMetaData m_eventMetaData;
+      EventMetaData m_eventMetaData = EventMetaData(-999, -999, -999);
 
       /// Memory for the singletone CDCMCMap
       CDCMCMap m_mcMap;

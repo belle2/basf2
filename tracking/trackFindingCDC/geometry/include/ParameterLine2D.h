@@ -70,8 +70,8 @@ namespace Belle2 {
       explicit ParameterLine2D(const Line2D& line) : m_support(line.support()), m_tangential(line.tangential()) {}
 
 
-      /// Empty Destructor.
-      ~ParameterLine2D() {}
+
+
 
       /// Downcast the line to the normal representation.
       /** Downcasting the parameter line to the line representation using the normal vector.

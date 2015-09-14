@@ -277,7 +277,7 @@ double TrackFitter::fitTrackCandidateFast(
 
     double x(0), x2(0), y(0), y2(0), xy(0), r2(0), r4(0), xr2(0), yr2(0), sum_w(0);
     for (TrackHit* hit : hits) {
-      ;
+
       TVector3 hitPosition = hit->getWirePosition();
 
       double w = hit->getDriftLength();
@@ -371,7 +371,7 @@ double TrackFitter::fitTrackCandidateFast(
     y2 = 0;
     sum_w = 0;
     for (TrackHit* hit : hits) {
-      ;
+
       TVector3 hitPosition = hit->getWirePosition();
 
       double w = hit->getDriftLength();
@@ -409,7 +409,7 @@ double TrackFitter::fitTrackCandidateFast(
     r4 = 0;
     sum_w = 0;
     for (TrackHit* hit : hits) {
-      ;
+
       TVector3 hitPosition = hit->getWirePosition();
 
       double w = hit->getDriftLength();

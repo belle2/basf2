@@ -32,7 +32,7 @@ namespace Belle2 {
       /// Default constructor
       CDCMCTrackStore();
 
-      /// Empty destructor
+
       ~CDCMCTrackStore();
 
     public:

@@ -59,8 +59,8 @@ namespace Belle2 {
       {}
 
 
-      /// Empty destructor
-      ~UncertainSZLine() {}
+
+
 
     public:
       /// Setter for the whole covariance matrix of the sz line parameters

@@ -40,8 +40,8 @@ namespace Belle2 {
 
 
 
-      /// Empty destructor
-      ~SZCovariance() {}
+
+
 
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const

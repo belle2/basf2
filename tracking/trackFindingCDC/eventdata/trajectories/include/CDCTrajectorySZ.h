@@ -61,8 +61,8 @@ namespace Belle2 {
         m_szLine(Line2D(n0, n1, n2))
       { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to be forward with s ( important for the right sign of the distances)
 
-      /// Empty destructor
-      ~CDCTrajectorySZ() {}
+
+
 
       /// Constucts a basic assumption, what the z start position and the sz slope are, including some broad values for the covariance matrix.
       static CDCTrajectorySZ basicAssumption();

@@ -27,13 +27,6 @@ namespace Belle2 {
     class CDCMCHitLookUp {
 
     public:
-      /// Empty constructor
-      CDCMCHitLookUp();
-
-      /// Empty deconstructor
-      ~CDCMCHitLookUp();
-
-    public:
       /// Getter for the singletone instance
       static const CDCMCHitLookUp& getInstance();
 

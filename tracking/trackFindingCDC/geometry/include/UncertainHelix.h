@@ -105,8 +105,8 @@ namespace Belle2 {
 
 
 
-      /// Empty destructor
-      ~UncertainHelix() {}
+
+
 
 
     public:

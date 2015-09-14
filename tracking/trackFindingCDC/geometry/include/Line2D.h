@@ -67,8 +67,8 @@ namespace Belle2 {
       { return Line2D(end.cross(start), (start - end).orthogonal()); }
 
 
-      /// Empty deconstructor
-      ~Line2D() {}
+
+
 
 
     public:

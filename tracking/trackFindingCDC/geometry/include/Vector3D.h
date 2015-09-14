@@ -93,9 +93,6 @@ namespace Belle2 {
 
       }
 
-      /// Empty Destructor.
-      ~Vector3D() {}
-
       /// Casting the back to TVector3 seamlessly
       inline operator const TVector3() const { return TVector3(x(), y(), z()); }
 
@@ -121,32 +118,36 @@ namespace Belle2 {
 
       /// Getter for the lowest possible vector
       /** The lowest possilbe vector according to the comparision is the null vector */
-      inline static Vector3D getLowest() { return Vector3D(0.0, 0.0, 0.0); }
+      inline static Vector3D getLowest()
+      { return Vector3D(0.0, 0.0, 0.0); }
 
       /// Checks if the vector is the null vector.
-      inline bool isNull() const { return x() == 0.0 and y() == 0.0 and z() == 0.0 ; }
+      inline bool isNull() const
+      { return x() == 0.0 and y() == 0.0 and z() == 0.0 ; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return std::isnan(x()) or std::isnan(y()) or std::isnan(z()); }
+      inline bool hasNAN() const
+      { return std::isnan(x()) or std::isnan(y()) or std::isnan(z()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector3D& vector)
-      { output << "Vector3D(" << vector.x() << "," << vector.y() << "," << vector.z() << ")"; return output; }
+      { return output << "Vector3D(" << vector.x() << "," << vector.y() << "," << vector.z() << ")"; }
 
       /// Calculates the three dimensional dot product.
-      inline double dot(const Vector3D& rhs) const { return x() * rhs.x() + y() * rhs.y() + z() * rhs.z(); }
+      inline double dot(const Vector3D& rhs) const
+      { return x() * rhs.x() + y() * rhs.y() + z() * rhs.z(); }
 
       /// Calculates the two dimensional dot product in xy projection.
-      inline double dotXY(const Vector3D& rhs) const { return x() * rhs.x() + y() * rhs.y() ; }
+      inline double dotXY(const Vector3D& rhs) const
+      { return x() * rhs.x() + y() * rhs.y() ; }
 
       /// Calculated the three dimensional cross product.
       inline Vector3D cross(const Vector3D& rhs)const
       {
-        return Vector3D(
-                 y() * rhs.z() - z() * rhs.y(),
-                 z() * rhs.x() - x() * rhs.z(),
-                 x() * rhs.y() - y() * rhs.x())
-               ;
+        return Vector3D(y() * rhs.z() - z() * rhs.y(),
+                        z() * rhs.x() - x() * rhs.z(),
+                        x() * rhs.y() - y() * rhs.x());
+
       }
 
       /// Calculates the two dimensional cross product in xy projection.
@@ -158,10 +159,12 @@ namespace Belle2 {
       { return xy().cross(rhs); }
 
       /// Calculates the squared length of the vector
-      inline double normSquared() const { return x() * x() + y() * y() + z() * z(); }
+      inline double normSquared() const
+      { return x() * x() + y() * y() + z() * z(); }
 
       /// Calculates the length of the vector
-      inline double norm() const { return hypot(hypot(x(), y()), z()); }
+      inline double norm() const
+      { return hypot(hypot(x(), y()), z()); }
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs. \n
@@ -170,12 +173,17 @@ namespace Belle2 {
        *  vectors are always positiv and so is the sine of the angle. The angle is bound by PI.
        */
       ///@{
-      ///Cosine of the angle between this and rhs
-      inline double cosWith(const Vector3D& rhs) const { return dot(rhs) / (norm() * rhs.norm());  }
-      ///Sine of the angle between this and rhs
-      inline double sinWith(const Vector3D& rhs) const { return cross(rhs).norm() / (norm() * rhs.norm());  }
-      ///The angle between this and rhs
-      inline double angleWith(const Vector3D& rhs) const { return atan2(sinWith(rhs), cosWith(rhs)); }
+      /// Cosine of the angle between this and rhs
+      inline double cosWith(const Vector3D& rhs) const
+      { return dot(rhs) / (norm() * rhs.norm()); }
+
+      /// Sine of the angle between this and rhs
+      inline double sinWith(const Vector3D& rhs) const
+      { return cross(rhs).norm() / (norm() * rhs.norm()); }
+
+      /// The angle between this and rhs
+      inline double angleWith(const Vector3D& rhs) const
+      { return atan2(sinWith(rhs), cosWith(rhs)); }
       ///@}
 
 
@@ -191,50 +199,71 @@ namespace Belle2 {
       /// Scales the vector in place by the given factor
       inline Vector3D& scale(const double factor)
       { m_xy.scale(factor); m_z *= factor; return *this; }
+
       /// Same as scale()
-      inline Vector3D& operator*=(const double factor) { return scale(factor); }
+      inline Vector3D& operator*=(const double factor)
+      { return scale(factor); }
 
       /// Returns a scaled copy of the vector
       inline Vector3D scaled(const double factor) const
       { return Vector3D(xy().scaled(factor), z() * factor); }
 
       /// Same as scaled()
-      inline Vector3D operator*(const double factor) const { return scaled(factor); }
+      inline Vector3D operator*(const double factor) const
+      { return scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
       inline Vector3D& divide(const double denominator)
       { m_xy.divide(denominator); m_z /= denominator; return *this; }
+
       /// Same as divide()
-      inline Vector3D& operator/=(const double denominator) { return divide(denominator); }
+      inline Vector3D& operator/=(const double denominator)
+      { return divide(denominator); }
 
       /// Returns a copy where all coordinates got divided by a common denominator
       inline Vector3D divided(const double denominator) const
       { return Vector3D(xy().divided(denominator), z() / denominator); }
+
       /// Same as divided()
-      inline Vector3D operator/(const double denominator) const { return divided(denominator); }
+      inline Vector3D operator/(const double denominator) const
+      { return divided(denominator); }
 
       /// Adds a vector to this in place
-      inline Vector3D& add(const Vector3D& rhs)     { m_xy.add(rhs.xy()); m_z += rhs.z(); return *this;}
+      inline Vector3D& add(const Vector3D& rhs)
+      { m_xy.add(rhs.xy()); m_z += rhs.z(); return *this;}
+
       /// Adds a two dimensional vector to this in place taking z of the given vector as zero
-      inline Vector3D& add(const Vector2D& rhs)     { m_xy.add(rhs); return *this; }
+      inline Vector3D& add(const Vector2D& rhs)
+      { m_xy.add(rhs); return *this; }
 
       /// Same as add()
-      inline Vector3D& operator+=(const Vector3D& rhs) { return add(rhs); }
+      inline Vector3D& operator+=(const Vector3D& rhs)
+      { return add(rhs); }
+
       /// Same as add()
-      inline Vector3D& operator+=(const Vector2D& rhs) { return add(rhs); }
+      inline Vector3D& operator+=(const Vector2D& rhs)
+      { return add(rhs); }
 
       /// Subtracts a vector to this in place
-      inline Vector3D& subtract(const Vector3D& rhs) { m_xy.subtract(rhs.xy()); m_z -= rhs.z(); return *this;}
+      inline Vector3D& subtract(const Vector3D& rhs)
+      { m_xy.subtract(rhs.xy()); m_z -= rhs.z(); return *this;}
+
       /// Subtracts a two dimensional vector from this in place taking z of the given vector as zero
-      inline Vector3D& subtract(const Vector2D& rhs) { m_xy.subtract(rhs); return *this;}
+      inline Vector3D& subtract(const Vector2D& rhs)
+      { m_xy.subtract(rhs); return *this;}
 
       /// Same as subtract()
-      inline Vector3D& operator-=(const Vector3D& rhs) { return subtract(rhs); }
+      inline Vector3D& operator-=(const Vector3D& rhs)
+      { return subtract(rhs); }
+
       /// Same as subtract()
-      inline Vector3D& operator-=(const Vector2D& rhs) { return subtract(rhs); }
+      inline Vector3D& operator-=(const Vector2D& rhs)
+      { return subtract(rhs); }
 
       /// Returns a unit vector colaligned with this
-      inline Vector3D unit() const { return isNull() ? Vector3D(0.0, 0.0, 0.0) : divided(norm()); }
+      inline Vector3D unit() const
+      { return isNull() ? Vector3D(0.0, 0.0, 0.0) : divided(norm()); }
+
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
@@ -248,13 +277,16 @@ namespace Belle2 {
       { double result = norm(); if (result != 0.0) scale(toLength / result); return result; }
 
       /// Reverses the direction of the vector in place
-      inline Vector3D& reverse() { scale(-1.0); return *this; }
+      inline Vector3D& reverse()
+      { scale(-1.0); return *this; }
 
       /// Returns a vector pointing in the opposite direction
-      inline Vector3D reversed() const { return scaled(-1.0); }
+      inline Vector3D reversed() const
+      { return scaled(-1.0); }
 
       /// Same as reversed()
-      inline Vector3D operator-() const { return reversed(); }
+      inline Vector3D operator-() const
+      { return reversed(); }
 
       /// Returns a new vector as sum of this and rhs
       inline Vector3D operator+(const Vector3D& rhs) const
@@ -296,8 +328,6 @@ namespace Belle2 {
       inline double unnormalizedOrthogonalComp(const Vector3D& relativTo) const
       { return relativTo.cross(*this).norm(); }
 
-
-
       /// Passivelly moves the vector inplace by the given vector
       void passiveMoveBy(const Vector3D& by)
       { subtract(by); }
@@ -307,28 +337,36 @@ namespace Belle2 {
       { return *this - by; }
 
       /// Getter for the x coordinate
-      inline double x() const { return m_xy.x(); }
+      inline double x() const
+      { return m_xy.x(); }
 
       /// Setter for the x coordinate
-      inline void setX(const double x) { m_xy.setX(x); }
+      inline void setX(const double x)
+      { m_xy.setX(x); }
 
       /// Getter for the y coordinate
-      inline double y() const { return m_xy.y(); }
+      inline double y() const
+      { return m_xy.y(); }
 
       /// Setter for the y coordinate
-      inline void setY(const double y) { m_xy.setY(y); }
+      inline void setY(const double y)
+      { m_xy.setY(y); }
 
       /// Getter for the z coordinate
-      inline double z() const { return m_z; }
+      inline double z() const
+      { return m_z; }
 
       /// Setter for the z coordinate
-      inline void setZ(const double z) { m_z = z; }
+      inline void setZ(const double z)
+      { m_z = z; }
 
       /// Getter for the xy projected vector ( reference ! )
-      inline const Vector2D& xy() const { return m_xy; }
+      inline const Vector2D& xy() const
+      { return m_xy; }
 
       /// Setter for the xy projected vector
-      inline void setXY(const Vector2D& xy) { m_xy = xy; }
+      inline void setXY(const Vector2D& xy)
+      { m_xy = xy; }
 
       /// Setter for all three coordinates.
       inline void set(const double first,
@@ -337,25 +375,32 @@ namespace Belle2 {
       { setX(first); setY(second); setZ(third);}
 
       /// Getter for the squared cylindrical radius ( xy projected squared norm )
-      inline double cylindricalRSquared() const { return xy().normSquared() ; }
+      inline double cylindricalRSquared() const
+      { return xy().normSquared() ; }
 
       /// Getter for the cylindrical radius ( xy projected norm )
-      inline double cylindricalR() const { return xy().norm(); }
+      inline double cylindricalR() const
+      { return xy().norm(); }
 
       /// Getter for the azimuth angle
-      inline double phi() const { return xy().phi(); }
+      inline double phi() const
+      { return xy().phi(); }
 
       /// Getter for the polar angle
-      inline double theta() const { return atan2(cylindricalR(), z()); }
+      inline double theta() const
+      { return atan2(cylindricalR(), z()); }
 
       /// Getter for lambda
-      inline double lambda() const { return atan2(z(), cylindricalR()); }
+      inline double lambda() const
+      { return atan2(z(), cylindricalR()); }
 
       /// Getter for the cotangent of the polar angle
-      inline double cotTheta() const { return z() / cylindricalR(); }
+      inline double cotTheta() const
+      { return z() / cylindricalR(); }
 
       /// Getter for the tangent of lambda equivalent to cotTheta()
-      inline double tanLambda() const { return z() / cylindricalR(); }
+      inline double tanLambda() const
+      { return z() / cylindricalR(); }
 
     private:
       /// Memory for the first and second coordinate available as a vector
@@ -363,8 +408,6 @@ namespace Belle2 {
 
       /// Memory for the third coordinate
       double m_z;
-
-    private:
 
     }; //class
 

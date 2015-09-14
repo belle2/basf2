@@ -94,7 +94,7 @@ namespace Belle2 {
       /// Empty constructor
       CDCMCMap();
 
-      /// Empty destructor
+
       ~CDCMCMap();
 
       /// Delete the assignement operator in order to avoid accidental copies.

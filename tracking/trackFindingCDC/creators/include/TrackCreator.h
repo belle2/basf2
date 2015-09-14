@@ -29,8 +29,8 @@ namespace Belle2 {
       /// Empty constructor.
       TrackCreator() {}
 
-      /// Empty destructor.
-      ~TrackCreator() {}
+
+
 
 
 

@@ -109,8 +109,8 @@ namespace Belle2 {
       {}
 
 
-      /// Empty destructor
-      ~UncertainPerigeeCircle() {}
+
+
 
     public:
       /// Setter for the whole covariance matrix of the perigee parameters

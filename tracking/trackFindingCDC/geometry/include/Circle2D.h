@@ -45,10 +45,6 @@ namespace Belle2 {
         m_radius(fabs(absRadius) * ccwInfo)
       {}
 
-      /// Empty deconstructor
-      ~Circle2D()
-      {}
-
     public:
       /// Flips orientation the circle in place
       void reverse()

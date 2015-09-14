@@ -109,8 +109,8 @@ namespace Belle2 {
         }
       }
 
-      /// Empty Destructor.
-      ~Vector2D() {}
+
+
 
       /// Casting the back to TVector2 seamlessly
       inline operator const TVector2() { return TVector2(x(), y()); }

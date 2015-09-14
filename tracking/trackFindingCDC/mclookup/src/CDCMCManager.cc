@@ -22,20 +22,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-
-}
-
-
-CDCMCManager::CDCMCManager() : m_eventMetaData(-999, -999, -999)
-{
-}
-
-
-CDCMCManager::~CDCMCManager()
-{
-}
-
 
 CDCMCManager& CDCMCManager::getInstance()
 {

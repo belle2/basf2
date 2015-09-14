@@ -62,8 +62,8 @@ namespace Belle2 {
       CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end);
 
 
-      /// Empty deconstructor
-      ~CDCWireSuperLayer() {}
+
+
 
     public:
       /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.

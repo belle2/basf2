@@ -52,8 +52,8 @@ namespace Belle2 {
 
 
 
-      /// Empty destructor
-      ~HelixCovariance() {}
+
+
 
 
 

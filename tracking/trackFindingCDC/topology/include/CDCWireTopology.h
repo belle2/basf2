@@ -58,8 +58,8 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility. Use rather getInstance to get the shared singleton instance.
       CDCWireTopology() { initialize(); }
 
-      /// Empty destructor
-      ~CDCWireTopology() {}
+
+
 
     public:
       /// Total number of wires

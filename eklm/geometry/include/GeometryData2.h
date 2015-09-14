@@ -11,13 +11,16 @@
 #ifndef EKLM_GEOMETRYDATA2_H
 #define EKLM_GEOMETRYDATA2_H
 
+/* External headers. */
+#include <CLHEP/Geometry/Transform3D.h>
+
+/* Belle2 headers. */
+#include <eklm/geometry/GeoEKLMTypes.h>
+
 /**
  * @file
  * EKLM geometry data.
  */
-
-/* Belle2 headers. */
-#include <eklm/geometry/GeoEKLMTypes.h>
 
 namespace Belle2 {
 
@@ -408,6 +411,62 @@ namespace Belle2 {
        * Get strip geometry data.
        */
       const struct StripGeometry* getStripGeometry() const;
+
+      /**
+       * Get endcap transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of endcap.
+       * @details
+       * Numbers start from 0.
+       */
+      void getEndcapTransform(HepGeom::Transform3D* t, int n) const;
+
+      /**
+       * Get layer transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of layer.
+       * @details
+       * Numbers start from 0.
+       */
+      void getLayerTransform(HepGeom::Transform3D* t, int n) const;
+
+      /**
+       * Get sector transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of sector.
+       * @details
+       * Numbers start from 0.
+       */
+      void getSectorTransform(HepGeom::Transform3D* t, int n) const;
+
+      /**
+       * Get plane transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of plane.
+       * @details
+       * Numbers start from 0.
+       */
+      void getPlaneTransform(HepGeom::Transform3D* t, int n) const;
+
+      /**
+       * Get strip transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of strip.
+       * @details
+       * Numbers start from 0.
+       */
+      void getStripTransform(HepGeom::Transform3D* t, int n) const;
+
+      /**
+       * Get plastic sheet element transformation.
+       * @param[out] t Transformation.
+       * @param[in]  n Number of list.
+       * @details
+       * Numbers start from 0.
+       * This function is intended for construction of the list solids, so
+       * the transformation does not include z shift.
+       */
+      void getSheetTransform(HepGeom::Transform3D* t, int n) const;
 
     private:
 

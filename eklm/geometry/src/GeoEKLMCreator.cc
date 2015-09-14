@@ -192,82 +192,6 @@ void EKLM::GeoEKLMCreator::createMaterials()
   mat.silicon = geometry::Materials::get("EKLMSilicon");
 }
 
-/****************************** TRANSFORMATIONS ******************************/
-/**
- * Note that numbers of elements are 0-based for all transformation functions.
- */
-
-void EKLM::GeoEKLMCreator::getEndcapTransform(HepGeom::Transform3D* t, int n)
-{
-  const struct ElementPosition* endcapPos = m_geoDat2->getEndcapPosition();
-  if (n == 0)
-    *t = HepGeom::Translate3D(endcapPos->X, endcapPos->Y,
-                              -endcapPos->Z + m_geoDat2->getSolenoidZ());
-  else
-    *t = HepGeom::Translate3D(endcapPos->X, endcapPos->Y,
-                              endcapPos->Z + m_geoDat2->getSolenoidZ()) *
-         HepGeom::RotateY3D(180.*CLHEP::deg);
-}
-
-void EKLM::GeoEKLMCreator::getLayerTransform(HepGeom::Transform3D* t, int n)
-{
-  const struct ElementPosition* endcapPos = m_geoDat2->getEndcapPosition();
-  const struct ElementPosition* layerPos = m_geoDat2->getLayerPosition();
-  *t = HepGeom::Translate3D(0.0, 0.0, endcapPos->length / 2.0 -
-                            (n + 1) * m_geoDat2->getLayerShiftZ() +
-                            0.5 * layerPos->length);
-}
-
-void EKLM::GeoEKLMCreator::getSectorTransform(HepGeom::Transform3D* t, int n)
-{
-  switch (n) {
-    case 0:
-      *t = HepGeom::Translate3D(0., 0., 0.);
-      break;
-    case 1:
-      *t = HepGeom::RotateY3D(180.0 * CLHEP::deg);
-      break;
-    case 2:
-      *t = HepGeom::RotateZ3D(90.0 * CLHEP::deg) *
-           HepGeom::RotateY3D(180.0 * CLHEP::deg);
-      break;
-    case 3:
-      *t = HepGeom::RotateZ3D(-90.0 * CLHEP::deg);
-      break;
-  }
-}
-
-void EKLM::GeoEKLMCreator::getPlaneTransform(HepGeom::Transform3D* t, int n)
-{
-  const struct ElementPosition* planePos = m_geoDat2->getPlanePosition();
-  if (n == 0)
-    *t = HepGeom::Translate3D(planePos->X, planePos->Y, planePos->Z) *
-         HepGeom::Rotate3D(180. * CLHEP::deg,
-                           HepGeom::Vector3D<double>(1., 1., 0.));
-  else
-    *t = HepGeom::Translate3D(planePos->X, planePos->Y, -planePos->Z);
-}
-
-void EKLM::GeoEKLMCreator::getStripTransform(HepGeom::Transform3D* t, int n)
-{
-  const struct ElementPosition* stripPos = m_geoDat2->getStripPosition(n + 1);
-  *t = HepGeom::Translate3D(stripPos->X, stripPos->Y, 0.0);
-}
-
-void EKLM::GeoEKLMCreator::getSheetTransform(HepGeom::Transform3D* t, int n)
-{
-  double y;
-  const struct PlasticSheetGeometry* plasticSheetGeometry =
-    m_geoDat2->getPlasticSheetGeometry();
-  const struct ElementPosition* stripPos = m_geoDat2->getStripPosition(n + 1);
-  y = stripPos->Y;
-  if (n % 15 == 0)
-    y = y + 0.5 * plasticSheetGeometry->DeltaL;
-  else if (n % 15 == 14)
-    y = y - 0.5 * plasticSheetGeometry->DeltaL;
-  *t = HepGeom::Translate3D(stripPos->X, y, 0.0);
-}
-
 /*************************** CREATION OF SOLIDS ******************************/
 
 void EKLM::GeoEKLMCreator::createEndcapSolid()
@@ -994,7 +918,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
   /* Transformations. */
   for (i = 0; i < 15; i++) {
     m = 15 * n + i;
-    getSheetTransform(&(t[i]), m);
+    m_geoDat2->getSheetTransform(&(t[i]), m);
   }
   /* Sheet elements. */
   for (i = 0; i < 15; i++) {
@@ -1674,7 +1598,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane,
   z = 0.5 * (stripGeometry->thickness + plasticSheetGeometry->Width);
   if (iSheetPlane == 2)
     z = -z;
-  getSheetTransform(&t, (iSheet - 1) * 15);
+  m_geoDat2->getSheetTransform(&t, (iSheet - 1) * 15);
   t = t * G4Translate3D(0, 0, z);
   try {
     new G4PVPlacement(t, logvol.psheet[iSheet - 1], Sheet_Name, mlv, false,

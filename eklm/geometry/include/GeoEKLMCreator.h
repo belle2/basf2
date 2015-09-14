@@ -178,51 +178,6 @@ namespace Belle2 {
       void create(const GearDir& content, G4LogicalVolume& topVolume,
                   geometry::GeometryTypes type);
 
-      /**
-       * Get endcap transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of endcap.
-       * @details
-       * Numbers start from 0.
-       */
-      void getEndcapTransform(HepGeom::Transform3D* t, int n);
-
-      /**
-       * Get layer transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of layer.
-       * @details
-       * Numbers start from 0.
-       */
-      void getLayerTransform(HepGeom::Transform3D* t, int n);
-
-      /**
-       * Get sector transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of sector.
-       * @details
-       * Numbers start from 0.
-       */
-      void getSectorTransform(HepGeom::Transform3D* t, int n);
-
-      /**
-       * Get plane transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of plane.
-       * @details
-       * Numbers start from 0.
-       */
-      void getPlaneTransform(HepGeom::Transform3D* t, int n);
-
-      /**
-       * Get strip transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of strip.
-       * @details
-       * Numbers start from 0.
-       */
-      void getStripTransform(HepGeom::Transform3D* t, int n);
-
     private:
 
       /**
@@ -240,17 +195,6 @@ namespace Belle2 {
        * Read strip parameters from XML database.
        */
       void readXMLDataStrips();
-
-      /**
-       * Get plastic sheet element transformation.
-       * @param[out] t Transformation.
-       * @param[in]  n Number of list.
-       * @details
-       * Numbers start from 0.
-       * This function is intended for construction of the list solids, so
-       * the transformation does not include z shift.
-       */
-      void getSheetTransform(HepGeom::Transform3D* t, int n);
 
       /**
        * Create endcap solid.

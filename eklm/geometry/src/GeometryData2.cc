@@ -458,3 +458,77 @@ const EKLM::StripGeometry* EKLM::GeometryData2::getStripGeometry() const
   return &m_StripGeometry;
 }
 
+/*
+ * Note that numbers of elements are 0-based for all transformation functions.
+ */
+void
+EKLM::GeometryData2::getEndcapTransform(HepGeom::Transform3D* t, int n) const
+{
+  if (n == 0)
+    *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
+                              -m_EndcapPosition.Z + m_solenoidZ);
+  else
+    *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
+                              m_EndcapPosition.Z + m_solenoidZ) *
+         HepGeom::RotateY3D(180.*CLHEP::deg);
+}
+
+void
+EKLM::GeometryData2::getLayerTransform(HepGeom::Transform3D* t, int n) const
+{
+  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.length / 2.0 -
+                            (n + 1) * m_LayerShiftZ +
+                            0.5 * m_LayerPosition.length);
+}
+
+void
+EKLM::GeometryData2::getSectorTransform(HepGeom::Transform3D* t, int n) const
+{
+  switch (n) {
+    case 0:
+      *t = HepGeom::Translate3D(0., 0., 0.);
+      break;
+    case 1:
+      *t = HepGeom::RotateY3D(180.0 * CLHEP::deg);
+      break;
+    case 2:
+      *t = HepGeom::RotateZ3D(90.0 * CLHEP::deg) *
+           HepGeom::RotateY3D(180.0 * CLHEP::deg);
+      break;
+    case 3:
+      *t = HepGeom::RotateZ3D(-90.0 * CLHEP::deg);
+      break;
+  }
+}
+
+void
+EKLM::GeometryData2::getPlaneTransform(HepGeom::Transform3D* t, int n) const
+{
+  if (n == 0)
+    *t = HepGeom::Translate3D(m_PlanePosition.X, m_PlanePosition.Y,
+                              m_PlanePosition.Z) *
+         HepGeom::Rotate3D(180. * CLHEP::deg,
+                           HepGeom::Vector3D<double>(1., 1., 0.));
+  else
+    *t = HepGeom::Translate3D(m_PlanePosition.X, m_PlanePosition.Y,
+                              -m_PlanePosition.Z);
+}
+
+void
+EKLM::GeometryData2::getStripTransform(HepGeom::Transform3D* t, int n) const
+{
+  *t = HepGeom::Translate3D(m_StripPosition[n].X, m_StripPosition[n].Y, 0.0);
+}
+
+void
+EKLM::GeometryData2::getSheetTransform(HepGeom::Transform3D* t, int n) const
+{
+  double y;
+  y = m_StripPosition[n].Y;
+  if (n % 15 == 0)
+    y = y + 0.5 * m_PlasticSheetGeometry.DeltaL;
+  else if (n % 15 == 14)
+    y = y - 0.5 * m_PlasticSheetGeometry.DeltaL;
+  *t = HepGeom::Translate3D(m_StripPosition[n].X, y, 0.0);
+}
+

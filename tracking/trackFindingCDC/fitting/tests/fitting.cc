@@ -65,8 +65,8 @@ namespace {
     return observations2D;
   }
 
-  template<class Fitter>
-  CDCTrajectory2D testGeneralCircleFitter(const Fitter& fitter, const bool withDriftLenght)
+  template<class AFitter>
+  CDCTrajectory2D testGeneralCircleFitter(const AFitter& fitter, const bool withDriftLenght)
   {
     // Setup a test circle
     CDCObservations2D observations2D = createGeneralCircleObservations(withDriftLenght);
@@ -77,15 +77,15 @@ namespace {
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
     EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle.perigee().x(), 10e-7) <<
-        "Fitter " << typeid(fitter).name() << " failed.";
+        "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(generalCircle.perigee().y(), fittedCircle.perigee().y(), 10e-7) <<
-        "Fitter " << typeid(fitter).name() << " failed.";
+        "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7) <<
-        "Fitter " << typeid(fitter).name() << " failed.";
+        "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle.tangentialPhi(), 10e-7) <<
-        "Fitter " << typeid(fitter).name() << " failed.";
+        "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
-                                                 "Fitter " << typeid(fitter).name() << " failed.";
+                                                 "AFitter " << typeid(fitter).name() << " failed.";
 
     const double curv = fittedCircle.curvature();
     const double I = fittedCircle.impact();
@@ -107,8 +107,8 @@ namespace {
 
   Line2D line(-0.5, 0.0, -1.0);
 
-  template<class Fitter>
-  CDCTrajectory2D testLineFitter(const Fitter& fitter)
+  template<class AFitter>
+  CDCTrajectory2D testLineFitter(const AFitter& fitter)
   {
 
     CDCObservations2D observations2D;
@@ -123,7 +123,7 @@ namespace {
     trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
-    EXPECT_EQ(0.0, fittedCircle.curvature()) << "Fitter " << typeid(fitter).name() << " failed.";
+    EXPECT_EQ(0.0, fittedCircle.curvature()) << "AFitter " << typeid(fitter).name() << " failed.";
 
     Vector2D perigee = trajectory2D.getGlobalPerigee();
     EXPECT_NEAR(0.0, perigee.x(), 10e-7);

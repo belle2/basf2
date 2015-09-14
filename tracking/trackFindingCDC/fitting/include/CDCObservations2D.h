@@ -365,8 +365,8 @@ namespace Belle2 {
 #endif
 
       /// Append all hits from a generic range.
-      template<class Range>
-      size_t appendRange(const Range& range)
+      template<class ARange>
+      size_t appendRange(const ARange& range)
       {
         size_t nAppendedHits = 0;
         using std::begin;

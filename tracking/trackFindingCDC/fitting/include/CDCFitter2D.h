@@ -19,13 +19,13 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class implementing a fit for two dimensional trajectory circle using a generic fitting backend.
-    template<class FitMethod>
-    class CDCFitter2D : public FitMethod {
+    template<class AFitMethod>
+    class CDCFitter2D : public AFitMethod {
 
     public:
       /// Empty constructor
       CDCFitter2D() :
-        FitMethod(),
+        AFitMethod(),
         m_usePosition(false),
         m_useOrientation(true)
       {}
@@ -39,8 +39,8 @@ namespace Belle2 {
       }
 
       /// Fits a collection of hit typs which are convertable to observation circles.
-      template<class Hits>
-      CDCTrajectory2D fit(const Hits& hits) const
+      template<class AHits>
+      CDCTrajectory2D fit(const AHits& hits) const
       {
         CDCTrajectory2D result;
         update(result, hits);
@@ -48,8 +48,8 @@ namespace Belle2 {
       }
 
       /// Fits together two collections of hit types which are convertable to observation circles.
-      template<class StartHits, class EndHits>
-      CDCTrajectory2D fit(const StartHits& startHits, const EndHits& endHits) const
+      template<class AStartHits, class AEndHits>
+      CDCTrajectory2D fit(const AStartHits& startHits, const AEndHits& endHits) const
       {
         CDCTrajectory2D result;
         update(result, startHits, endHits);
@@ -83,10 +83,10 @@ namespace Belle2 {
       /** Updates a given trajectory with a fit to two collection of hit types,
        * which are convertable to observation circles.
        */
-      template<class StartHits, class EndHits>
+      template<class AStartHits, class AEndHits>
       void update(CDCTrajectory2D& trajectory2D,
-                  const StartHits& startHits,
-                  const EndHits& endHits) const
+                  const AStartHits& startHits,
+                  const AEndHits& endHits) const
       {
         CDCObservations2D observations2D;
         if (m_usePosition) {
@@ -110,15 +110,15 @@ namespace Belle2 {
         if (observations2D.size() < 4) {
           trajectory2D.clear();
         } else {
-          FitMethod::update(trajectory2D, observations2D);
+          AFitMethod::update(trajectory2D, observations2D);
         }
       }
 
       /** Updates a given trajectory with a fit to a collection of hits types,
        *  which are convertable to observation circles.
        */
-      template<class Hits>
-      void update(CDCTrajectory2D& trajectory2D, const Hits& hits) const
+      template<class AHits>
+      void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
       {
         CDCObservations2D observations2D;
         if (m_usePosition) {
@@ -133,13 +133,13 @@ namespace Belle2 {
         if (observations2D.size() < 4) {
           trajectory2D.clear();
         } else {
-          FitMethod::update(trajectory2D, observations2D);
+          AFitMethod::update(trajectory2D, observations2D);
         }
       }
 
       /// Update the trajectory with a fit to the observations.
       void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
-      { FitMethod::update(trajectory2D, observations2D); }
+      { AFitMethod::update(trajectory2D, observations2D); }
 
       //set which information should be used from the recohits
       //useOnlyOrientation is standard

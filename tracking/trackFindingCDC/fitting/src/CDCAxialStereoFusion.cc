@@ -28,8 +28,8 @@ namespace {
 
   const bool useResidualParameters = true;
 
-  template<class RecoHit, class RecoHitSegment>
-  TMatrixD calcAmbiguityImpl(const RecoHitSegment& segment,
+  template<class ARecoHit, class ARecoHitSegment>
+  TMatrixD calcAmbiguityImpl(const ARecoHitSegment& segment,
                              const CDCTrajectory2D& trajectory2D)
   {
 
@@ -41,7 +41,7 @@ namespace {
     const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
     const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
 
-    for (const RecoHit& recoHit : segment) {
+    for (const ARecoHit& recoHit : segment) {
       const Vector2D& recoPos2D = recoHit.getRecoPos2D();
       const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
       //const Vector2D tangential = localCircle.tangential(localRecoPos2D);
@@ -74,9 +74,9 @@ namespace {
 
   }
 
-  template<class StartRecoHit, class EndRecoHit, class StartRecoHitSegment, class EndRecoHitSegment>
-  CDCTrajectory3D fuseTrajectoriesImpl(const StartRecoHitSegment& startSegment,
-                                       const EndRecoHitSegment& endSegment)
+  template<class AStartRecoHit, class AEndRecoHit, class AStartRecoHitSegment, class AEndRecoHitSegment>
+  CDCTrajectory3D fuseTrajectoriesImpl(const AStartRecoHitSegment& startSegment,
+                                       const AEndRecoHitSegment& endSegment)
   {
     if (startSegment.empty()) {
       B2WARNING("Start segment is empty.");
@@ -88,8 +88,8 @@ namespace {
       return CDCTrajectory3D();
     }
 
-    StartRecoHit lastHitOfStartSegment = startSegment.back();
-    EndRecoHit firstHitOfEndSegment = endSegment.front();
+    AStartRecoHit lastHitOfStartSegment = startSegment.back();
+    AEndRecoHit firstHitOfEndSegment = endSegment.front();
 
     Vector2D localOrigin2D = Vector2D::average(lastHitOfStartSegment.getRecoPos2D(),
                                                firstHitOfEndSegment.getRecoPos2D());
@@ -120,8 +120,8 @@ namespace {
     const UncertainPerigeeCircle& startCircle = startTrajectory2D.getLocalCircle();
     const UncertainPerigeeCircle& endCircle = endTrajectory2D.getLocalCircle();
 
-    TMatrixD startH = calcAmbiguityImpl<StartRecoHit>(startSegment, startTrajectory2D);
-    TMatrixD endH = calcAmbiguityImpl<EndRecoHit>(endSegment, endTrajectory2D);
+    TMatrixD startH = calcAmbiguityImpl<AStartRecoHit>(startSegment, startTrajectory2D);
+    TMatrixD endH = calcAmbiguityImpl<AEndRecoHit>(endSegment, endTrajectory2D);
 
     UncertainHelix resultHelix = CDCAxialStereoFusion::fuse(startCircle, startH, endCircle, endH);
     return CDCTrajectory3D(localOrigin3D, resultHelix);

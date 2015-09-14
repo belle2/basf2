@@ -12,6 +12,7 @@
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/database/Database.h>
@@ -39,7 +40,8 @@ void EKLMAlignmentModule::initialize()
   EKLMAlignmentData alignmentData(0., 0., 0.);
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
   for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-    for (iLayer = 1; iLayer <= EKLM::Geometry::getNLayers(iEndcap); iLayer++) {
+    for (iLayer = 1; iLayer <= EKLM::GeometryData2::Instance().
+         getNDetectorLayers(iEndcap); iLayer++) {
       for (iSector = 1; iSector <= 4; iSector++) {
         for (iPlane = 1; iPlane <= 2; iPlane++) {
           for (iSegment = 1; iSegment <= 5; iSegment++) {

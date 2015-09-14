@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Galina Pakhlova, Timofey Uglov, Kirill Chilikin          *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOEKLMBELLEII_H
-#define GEOEKLMBELLEII_H
+#ifndef EKLM_GEOEKLMCREATOR_H
+#define EKLM_GEOEKLMCREATOR_H
 
 /* System headers. */
 #include <sys/types.h>
@@ -34,6 +34,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
@@ -46,214 +47,6 @@
 namespace Belle2 {
 
   namespace EKLM {
-
-    /**
-     * @struct Point2D
-     * 2D point.
-     *
-     * @var Point2D::X
-     * X coordinate.
-     *
-     * @var Point2D::Y
-     * Y coordinate.
-     */
-    struct Point2D {
-      double X;
-      double Y;
-    };
-
-    /**
-     * @struct ElementPosition
-     * Position information for the elements of detector.
-     *
-     * @var ElementPosition::innerR
-     * Inner radius.
-     *
-     * @var ElementPosition::outerR
-     * Outer radius.
-     *
-     * @var ElementPosition::length
-     * Length.
-     *
-     * @var ElementPosition::X
-     * X coordinate.
-     *
-     * @var ElementPosition::Y
-     * Y coordinate.
-     *
-     * @var ElementPosition::Z
-     * Z coordinate.
-     *
-     */
-    struct ElementPosition {
-      double innerR;
-      double outerR;
-      double length;
-      double X;
-      double Y;
-      double Z;
-    };
-
-    /**
-     * @struct SectorSupportGeometry
-     * Sector support geometry data.
-     *
-     * @var SectorSupportGeometry::Thickness
-     * Thickness.
-     *
-     * @var SectorSupportGeometry::DeltaLY
-     * outerR - Y of upper edge of BoxY.
-     *
-     * @var SectorSupportGeometry::CornerX
-     * Coordinate X of corner 1.
-     *
-     * @var SectorSupportGeometry::Corner1LX
-     * Corner 1 X length.
-     *
-     * @var SectorSupportGeometry::Corner1Width
-     * Corner 1 width.
-     *
-     * @var SectorSupportGeometry::Corner1Thickness
-     * Corner 1 thickness.
-     *
-     * @var SectorSupportGeometry::Corner1Z
-     * Corner 1 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner2LX
-     * Corner 2 X length.
-     *
-     * @var SectorSupportGeometry::Corner2LY
-     * Corner 2 Y length.
-     *
-     * @var SectorSupportGeometry::Corner2Thickness
-     * Corner 2 thickness.
-     *
-     * @var SectorSupportGeometry::Corner2Z
-     * Corner 2 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner3LX
-     * Corner 3 X length.
-     *
-     * @var SectorSupportGeometry::Corner3LY
-     * Corner 3 Y length.
-     *
-     * @var SectorSupportGeometry::Corner3Thickness
-     * Corner 3 thickness.
-     *
-     * @var SectorSupportGeometry::Corner3Z
-     * Corner 3 Z coordinate.
-     *
-     * @var SectorSupportGeometry::Corner4LX
-     * Corner 4 X length.
-     *
-     * @var SectorSupportGeometry::Corner4LY
-     * Corner 4 Y length.
-     *
-     * @var SectorSupportGeometry::Corner4Thickness
-     * Corner 4 thickness.
-     *
-     * @var SectorSupportGeometry::Corner4Z
-     * Corner 4 Z coordinate.
-     *
-     * @var SectorSupportGeometry::CornerAngle
-     * Corner 1 angle.
-     *
-     * @var SectorSupportGeometry::Corner1A
-     * Corner 1A coordinates.
-     *
-     * @var SectorSupportGeometry::Corner1AInner
-     * Corner 1A coordinates (inner side).
-     *
-     * @var SectorSupportGeometry::Corner1B
-     * Corner 1B coordinates.
-     *
-     * @var SectorSupportGeometry::Corner3
-     * Corner 3 coordinates.
-     *
-     * @var SectorSupportGeometry::Corner4
-     * Corner 4 coordinates.
-     *
-     */
-    struct SectorSupportGeometry {
-      double Thickness;
-      double DeltaLY;
-      double CornerX;
-      double Corner1LX;
-      double Corner1Width;
-      double Corner1Thickness;
-      double Corner1Z;
-      double Corner2LX;
-      double Corner2LY;
-      double Corner2Thickness;
-      double Corner2Z;
-      double Corner3LX;
-      double Corner3LY;
-      double Corner3Thickness;
-      double Corner3Z;
-      double Corner4LX;
-      double Corner4LY;
-      double Corner4Thickness;
-      double Corner4Z;
-      double CornerAngle;
-      Point2D Corner1A;
-      Point2D Corner1AInner;
-      Point2D Corner1B;
-      Point2D Corner3;
-      Point2D Corner4;
-    };
-
-    /**
-     * Readout board size data.
-     */
-    struct BoardSize {
-      double length;       /**< Length. */
-      double width;        /**< Width. */
-      double height;       /**< Height. */
-      double base_width;   /**< Width of base board. */
-      double base_height;  /**< Height of base board. */
-      double strip_length; /**< Length of strip readout board. */
-      double strip_width;  /**< Width of strip readout board. */
-      double strip_height; /**< Height of strip readout board. */
-    };
-
-    /**
-     * Strip readout board position data.
-     */
-    struct StripBoardPosition {
-      double x;         /**< X coordinate. */
-    };
-
-    /**
-     * Readout board position data.
-     */
-    struct BoardPosition {
-      double r;      /**< Radius of far edge of the board. */
-      double phi;    /**< Angle. */
-    };
-
-    /**
-     * Section support position.
-     */
-    struct SectionSupportPosition {
-      double deltal_right;  /**< Right (X-plane) delta L. */
-      double deltal_left;   /**< Left (X-plane) delta L. */
-      double length;        /**< Length */
-      double x;             /**< X coordinate. */
-      double y;             /**< Y coordinate. */
-      double z;             /**< Z coordinate. */
-    };
-
-    /**
-     * Strip size data.
-     */
-    struct StripSize {
-      double width;                      /**< Width. */
-      double thickness;                  /**< Thickness. */
-      double groove_depth;               /**< Groove depth. */
-      double groove_width;               /**< Groove width. */
-      double no_scintillation_thickness; /**< Non-scintillating layer. */
-      double rss_size;                   /**< Radiation study SiPM size. */
-    };
 
     /**
      * Sector support solids.
@@ -275,14 +68,14 @@ namespace Belle2 {
     };
 
     /**
-     * Section support solids.
+     * Segment support solids.
      */
-    struct SectionSupportSolids {
+    struct SegmentSupportSolids {
       G4VSolid* topbox; /**< Top box. */
       G4VSolid* midbox; /**< Middle box. */
       G4VSolid* botbox; /**< Bottom box. */
       G4VSolid* us;     /**< Top box + middle box. */
-      G4VSolid* secsup; /**< Section support. */
+      G4VSolid* secsup; /**< Segment support. */
     };
 
     /**
@@ -313,7 +106,7 @@ namespace Belle2 {
       G4VSolid* stripboard;                     /**< Readout board for 1 strip. */
       struct SectorSupportSolids sectorsup;     /**< Sector support. */
       struct ScintillatorSolids* scint;         /**< Scintillator. */
-      struct SectionSupportSolids** sectionsup; /**< Section support. */
+      struct SegmentSupportSolids** segmentsup; /**< Segment support. */
     };
 
     /**
@@ -444,19 +237,9 @@ namespace Belle2 {
       void createMaterials();
 
       /**
-       * Calculate sector support geometry data.
-       */
-      void calculateSectorSupportData();
-
-      /**
        * Read strip parameters from XML database.
        */
       void readXMLDataStrips();
-
-      /**
-       * Read parameters from XML database.
-       */
-      void readXMLData();
 
       /**
        * Get plastic sheet element transformation.
@@ -671,10 +454,10 @@ namespace Belle2 {
        * Create readout board.
        * @param[in] mlv    Mother logical volume.
        */
-      void createSectionReadoutBoard(G4LogicalVolume* mlv);
+      void createSegmentReadoutBoard(G4LogicalVolume* mlv);
 
       /**
-       * Create base board of section readout board.
+       * Create base board of segment readout board.
        * @param[in] mlv   Mother logical volume.
        */
       void createBaseBoard(G4LogicalVolume* mlv);
@@ -687,11 +470,11 @@ namespace Belle2 {
       void createStripBoard(int iBoard, G4LogicalVolume* mlv);
 
       /**
-       * Create section support.
-       * @param[in] iSectionSupport Number of section support.
+       * Create segment support.
+       * @param[in] iSegmentSupport Number of segment support.
        * @param[in] mlv             Mother logical volume.
        */
-      void createSectionSupport(int iSectionSupport, G4LogicalVolume* mlv);
+      void createSegmentSupport(int iSegmentSupport, G4LogicalVolume* mlv);
 
       /**
        * Create plastic list element.
@@ -769,101 +552,17 @@ namespace Belle2 {
       /** Geometry data. */
       GeometryData* m_geoDat;
 
-      /** Number of layers. */
-      int m_nLayer;
-
-      /** Number of detector layers in the forward endcap. */
-      int m_nLayerForward;
-
-      /** Number of detector layers in the backward endcap. */
-      int m_nLayerBackward;
-
-      /** Number of planes in one sector. */
-      int m_nPlane;
-
-      /** Number of readout boards in one sector. */
-      int m_nBoard;
-
-      /** Number of strip readout boards on one section readout board. */
-      int m_nStripBoard;
-
-      /** Number of strips in one plane. */
-      int m_nStrip;
-
-      /** Number of sections is one plane. */
-      int m_nSection;
+      /** Geometry data. */
+      const GeometryData2* m_geoDat2;
 
       /** True if geometry is constructed. */
       bool haveGeo;
 
-      /** Solenoid center Z coordinate. */
-      double m_solenoidZ;
-
       /** ESTR Geometry data. */
       struct ESTRGeometryParams ESTRPar;
 
-      /** Position data for endcaps. */
-      struct ElementPosition EndcapPosition;
-
-      /** Position data for layers. */
-      struct ElementPosition LayerPosition;
-
-      /** Z distance between two layers. */
-      double Layer_shiftZ;
-
-      /** Position data for sectors. */
-      struct ElementPosition SectorPosition;
-
-      /** Position data for sector support structure. */
-      struct ElementPosition SectorSupportPosition;
-
-      /** Sector support size data. */
-      struct SectorSupportGeometry m_SectorSupportData;
-
-      /** Readout board size data. */
-      struct BoardSize BoardSize;
-
-      /** Positions of readout boards. */
-      struct BoardPosition* BoardPosition[2];
-
       /** Transformations of boards from sector reference frame. */
       G4Transform3D** BoardTransform[2];
-
-      /** Positions of strip readout boards. */
-      struct StripBoardPosition* StripBoardPosition;
-
-      /** Position data for planes. */
-      struct ElementPosition PlanePosition;
-
-      /** Position data for section support structure. */
-      struct SectionSupportPosition* SectionSupportPosition[2];
-
-      /** Section support structure top box width. */
-      double SectionSupportTopWidth;
-
-      /** Section support structure top box thickness. */
-      double SectionSupportTopThickness;
-
-      /** Section support structure middle box width. */
-      double SectionSupportMiddleWidth;
-
-      /** Section support structure middle box thickness. */
-      double SectionSupportMiddleThickness;
-
-      /** Plastic list width. */
-      double PlasticSheetWidth;
-
-      /** Distance from edge of last strip to edge of plastic list. */
-      double PlasticSheetDeltaL;
-
-      /** Position data for strips. */
-      struct ElementPosition* StripPosition;
-
-      /** Strip size data. */
-      struct StripSize StripSize;
-
-      /** Detector mode. */
-      enum EKLMDetectorMode m_mode;
 
       /** Sensitive detectors. */
       EKLMSensitiveDetector* m_sensitive[3];

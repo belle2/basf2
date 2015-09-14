@@ -12,6 +12,7 @@
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -24,34 +25,6 @@ static const char MemErr[] = "Memory allocation error.";
 static bool compareLength(double a, double b)
 {
   return a < b;
-}
-
-int EKLM::Geometry::getNLayers(int endcap)
-{
-  static int maxLayer[2] = {0, 0};
-  if (endcap <= 0 || endcap > 2)
-    B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
-  if (maxLayer[0] == 0) {
-    GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap");
-    int nLayer = gd.getInt("nLayer");
-    maxLayer[0] = gd.getInt("nLayerBackward");
-    maxLayer[1] = gd.getInt("nLayerForward");
-    if (nLayer < 1 || nLayer > 14)
-      B2FATAL("Number of layers must be from 1 to 14.");
-    if (maxLayer[0] < 0)
-      B2FATAL("Number of detector layers in the backward endcap "
-              "must be nonnegative.");
-    if (maxLayer[0] > nLayer)
-      B2FATAL("Number of detector layers in the backward endcap "
-              "must be less than or equal to the number of layers.");
-    if (maxLayer[1] < 0)
-      B2FATAL("Number of detector layers in the forward endcap "
-              "must be nonnegative.");
-    if (maxLayer[1] > nLayer)
-      B2FATAL("Number of detector layers in the forward endcap "
-              "must be less than or equal to the number of layers.");
-  }
-  return maxLayer[endcap - 1];
 }
 
 EKLM::GeometryData::GeometryData()
@@ -92,8 +65,8 @@ void EKLM::GeometryData::read()
   DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
   if (alignment.isValid()) {
     for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-      for (iLayer = 1; iLayer <= EKLM::Geometry::getNLayers(iEndcap);
-           iLayer++) {
+      for (iLayer = 1; iLayer <= EKLM::GeometryData2::Instance().
+           getNDetectorLayers(iEndcap); iLayer++) {
         for (iSector = 1; iSector <= 4; iSector++) {
           for (iPlane = 1; iPlane <= 2; iPlane++) {
             for (iSegment = 1; iSegment <= 5; iSegment++) {

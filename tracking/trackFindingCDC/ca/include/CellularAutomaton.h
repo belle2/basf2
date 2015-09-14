@@ -30,12 +30,12 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     /** Implements the weighted cellular automaton algorithm */
-    template<class Item>
+    template<class AItem>
     class CellularAutomaton {
 
     private:
       /// Type for the neighborhood of elements in the algorithm
-      typedef WeightedNeighborhood<const Item> Neighborhood;
+      typedef WeightedNeighborhood<const AItem> Neighborhood;
 
       /// Type for the very basic exception signal used in the detection of cycles.
       typedef int CycleDetectionMarker;
@@ -52,9 +52,9 @@ namespace Belle2 {
       /** Applies the cellular automaton algorithm to the collection where the connections are given by
        *  the neighborhood.
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
-       *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
-      template<class ItemRange>
-      const Item*  applyTo(const ItemRange& itemRange, const Neighborhood& neighborhood) const
+       *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const AItem> */
+      template<class AItemRange>
+      const AItem*  applyTo(const AItemRange& itemRange, const Neighborhood& neighborhood) const
       {
         return applyWithRecursion(itemRange, neighborhood);
       }
@@ -64,17 +64,17 @@ namespace Belle2 {
       /** Applies the cellular automaton algorithm to the collection where the connections are given by
        *  the neighborhood.
        *  @param itemRange the range based iterable containing the items that should acquire the cell states
-       *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const Item> */
-      template<class ItemRange>
-      const Item* applyWithRecursion(const ItemRange& itemRange,
-                                     const Neighborhood& neighborhood) const
+       *  @param neighborhood the weighted neighborhood of type WeightedNeighborhood<const AItem> */
+      template<class AItemRange>
+      const AItem* applyWithRecursion(const AItemRange& itemRange,
+                                      const Neighborhood& neighborhood) const
       {
         // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(itemRange);
 
-        const Item* ptrHighestItem = nullptr;
+        const AItem* ptrHighestItem = nullptr;
 
-        for (const Item& item : itemRange) {
+        for (const AItem& item : itemRange) {
           const AutomatonCell& automatonCell = item.getAutomatonCell();
           if (automatonCell.hasMaskedFlag()) continue;
           if (automatonCell.hasCycleFlag()) continue;
@@ -111,7 +111,7 @@ namespace Belle2 {
     private:
 
       /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CYCLE_DETECTED if it encounters a cycle in the graph.
-      const CellState& getFinalCellState(const Item& item, const Neighborhood& neighborhood) const
+      const CellState& getFinalCellState(const AItem& item, const Neighborhood& neighborhood) const
       {
         const AutomatonCell& automatonCell = item.getAutomatonCell();
         // Throw if this cell has already been traversed in this recursion cycle
@@ -139,7 +139,7 @@ namespace Belle2 {
 
 
       /// Updates the state of a cell considering all continuations recursively
-      const CellState& updateState(const Item& item, const Neighborhood& neighborhood) const
+      const CellState& updateState(const AItem& item, const Neighborhood& neighborhood) const
       {
         //--- blocked cells do not contribute a continuation ---
         if (item.getAutomatonCell().hasMaskedFlag()) {
@@ -155,10 +155,10 @@ namespace Belle2 {
         // Check neighbors now
         for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(&item)) {
           //advance to valid neighbor
-          const Item* ptrNeighbor = getNeighbor(relation);
+          const AItem* ptrNeighbor = getNeighbor(relation);
           if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasMaskedFlag()) {
 
-            const Item& neighbor = *ptrNeighbor;
+            const AItem& neighbor = *ptrNeighbor;
 
             // Invalidate a possible start flag since the neighbor has an ancestors
             neighbor.getAutomatonCell().unsetStartFlag();
@@ -309,10 +309,10 @@ namespace Belle2 {
     private:
       /// Helper function to prepare the stats
       /** Clears all flags but DO_NOT_USE and sets the cell state to minus infinity. */
-      template<class ItemRange>
-      void prepareCellFlags(const ItemRange& itemRange) const
+      template<class AItemRange>
+      void prepareCellFlags(const AItemRange& itemRange) const
       {
-        for (const Item& item : itemRange) {
+        for (const AItem& item : itemRange) {
 
           item.getAutomatonCell().unsetTemporaryFlags();
           item.getAutomatonCell().setCellState(-std::numeric_limits<CellState>::infinity());

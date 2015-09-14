@@ -39,38 +39,38 @@ namespace Belle2 {
      *  The collection container must support BOOST_FOREACH for iteration over its ::value_type.
      *  Cluster can be anything that is default constructable and supports .insert(end(),const value_type *item).
      * The neighborhood given to the clusterizer must be of type WeightedNeighborhood<const value_type>*/
-    template<class Item, class Cluster>
+    template<class AItem, class ACluster>
     class Clusterizer {
 
     private:
       /// Type for the neighborhood of elements in the algorithm
-      typedef WeightedNeighborhood<const Item> Neighborhood;
+      typedef WeightedNeighborhood<const AItem> Neighborhood;
 
     public:
 
       /// Creates the clusters.
       /** Take the collection and its assoziated neighborhood and appends the clusters to the cluster vector give by non const reference*/
-      template<class ItemRange>
-      void create(const ItemRange& items,
+      template<class AItemRange>
+      void create(const AItemRange& items,
                   const Neighborhood& neighborhood,
-                  std::vector<Cluster>& clusters) const
+                  std::vector<ACluster>& clusters) const
       {
 
         clusters.reserve(30);
 
         //Prepare states
         m_cellStates.clear();
-        for (Item const& item : items) {
+        for (AItem const& item : items) {
           setCellState(item, -1);
         }
 
         int iCluster = -1;
-        for (Item const& item : items) {
+        for (AItem const& item : items) {
 
           if (getCellState(item) == -1) {
 
-            clusters.push_back(Cluster());
-            Cluster& newCluster = clusters.back();
+            clusters.push_back(ACluster());
+            ACluster& newCluster = clusters.back();
             ++iCluster;
 
             startCluster(neighborhood, newCluster, iCluster, item);
@@ -83,10 +83,10 @@ namespace Belle2 {
       /** Creates the clusters.
        *  This is a variation of create() taking pointers to objects as vertices instead of references
        */
-      template<class PtrItemRange>
-      void createFromPointers(const PtrItemRange& ptrItems,
+      template<class APtrItemRange>
+      void createFromPointers(const APtrItemRange& ptrItems,
                               const Neighborhood& neighborhood,
-                              std::vector<Cluster>& clusters) const
+                              std::vector<ACluster>& clusters) const
       {
 
 
@@ -94,29 +94,29 @@ namespace Belle2 {
 
         //Prepare states
         m_cellStates.clear();
-        for (Item const* ptrItem : ptrItems) {
+        for (AItem const* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
             continue;
           }
-          const Item& item = *ptrItem;
+          const AItem& item = *ptrItem;
           setCellState(item, -1);
         }
 
         int iCluster = -1;
-        for (const Item* ptrItem : ptrItems) {
+        for (const AItem* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
             continue;
           }
-          const Item& item = *ptrItem;
+          const AItem& item = *ptrItem;
 
           if (getCellState(item) == -1) {
 
-            clusters.push_back(Cluster());
-            Cluster& newCluster = clusters.back();
+            clusters.push_back(ACluster());
+            ACluster& newCluster = clusters.back();
             ++iCluster;
 
             startCluster(neighborhood, newCluster, iCluster, item);
@@ -126,81 +126,81 @@ namespace Belle2 {
       }
 
 
-      /// Setter for the cell state if the Item inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
-      template<class ConvertableToAutomaton>
+      /// Setter for the cell state if the AItem inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
+      template<class AConvertableToAutomaton>
       typename boost::enable_if <
-      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-            setCellState(const ConvertableToAutomaton& item, const CellState& cellState) const
+            setCellState(const AConvertableToAutomaton& item, const CellState& cellState) const
       {
         const AutomatonCell& automatonCell = item;
         automatonCell.setCellState(cellState);
       }
 
-      /// Getter for the cell state if the Item inherits from Automaton cell - use the cell state internal to the AutomtonCell.
-      template<class ConvertableToAutomaton>
+      /// Getter for the cell state if the AItem inherits from Automaton cell - use the cell state internal to the AutomtonCell.
+      template<class AConvertableToAutomaton>
       typename boost::enable_if <
-      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
             CellState >::type
-            getCellState(const ConvertableToAutomaton& item) const
+            getCellState(const AConvertableToAutomaton& item) const
       {
         const AutomatonCell& automatonCell = item;
         return automatonCell.getCellState();
       }
 
-      /// Setter for the cell state if the Item does not inherit from AutomatonCell.
-      template<class NotConvertableToAutomaton>
+      /// Setter for the cell state if the AItem does not inherit from AutomatonCell.
+      template<class ANotConvertableToAutomaton>
       typename boost::disable_if <
-      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-            setCellState(const NotConvertableToAutomaton& item, const CellState& cellState) const
+            setCellState(const ANotConvertableToAutomaton& item, const CellState& cellState) const
       { m_cellStates[&item] = cellState; }
 
-      /// Getter for the cell state if the Item does not inherit from AutomatonCell.
-      template<class NotConvertableToAutomaton>
+      /// Getter for the cell state if the AItem does not inherit from AutomatonCell.
+      template<class ANotConvertableToAutomaton>
       typename boost::disable_if <
-      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
             CellState >::type
-            getCellState(const NotConvertableToAutomaton& item) const
+            getCellState(const ANotConvertableToAutomaton& item) const
       { return m_cellStates[&item]; }
 
-      /// Setter for the cell weight if the Item inherits from AutomatonCell - use the cell weight internal to the AutomtonCell.
-      template<class ConvertableToAutomaton>
+      /// Setter for the cell weight if the AItem inherits from AutomatonCell - use the cell weight internal to the AutomtonCell.
+      template<class AConvertableToAutomaton>
       typename boost::enable_if <
-      boost::is_convertible<ConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-            setCellWeight(const ConvertableToAutomaton& item, const CellWeight& cellWeight) const
+            setCellWeight(const AConvertableToAutomaton& item, const CellWeight& cellWeight) const
       {
         const AutomatonCell& automatonCell = item;
         automatonCell.setCellWeight(cellWeight);
       }
 
-      /// Setter for the cell weight representing the number of neighbor, if the Item does not inherit from AutomatonCell.
-      template<class NotConvertableToAutomaton>
+      /// Setter for the cell weight representing the number of neighbor, if the AItem does not inherit from AutomatonCell.
+      template<class ANotConvertableToAutomaton>
       typename boost::disable_if <
-      boost::is_convertible<NotConvertableToAutomaton, const AutomatonCell& >,
+      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
             void >::type
-            setCellWeight(const NotConvertableToAutomaton& item, const CellWeight& cellWeight) const
+            setCellWeight(const ANotConvertableToAutomaton& item, const CellWeight& cellWeight) const
       { m_cellWeights[&item] = cellWeight; }
 
 
     private:
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
       inline void startCluster(const Neighborhood& neighborhood,
-                               Cluster& newCluster,
+                               ACluster& newCluster,
                                int iCluster,
-                               const Item& seedItem) const
+                               const AItem& seedItem) const
       {
 
-        //Cluster uses pointers as items instead of objects
-        const Item* ptrSeedItem = &seedItem;
+        //ACluster uses pointers as items instead of objects
+        const AItem* ptrSeedItem = &seedItem;
 
         setCellState(*ptrSeedItem, iCluster);
         newCluster.insert(newCluster.end(), ptrSeedItem);
 
         //grow the cluster
-        std::vector<const Item*> itemsToCheckNow;
-        std::vector<const Item*> itemsToCheckNext;
+        std::vector<const AItem*> itemsToCheckNow;
+        std::vector<const AItem*> itemsToCheckNext;
 
         itemsToCheckNow.reserve(10);
         itemsToCheckNext.reserve(10);
@@ -212,14 +212,14 @@ namespace Belle2 {
           itemsToCheckNow.swap(itemsToCheckNext);
           itemsToCheckNext.clear();
           // Check registered items for neighbors
-          BOOST_FOREACH(const Item *  clusterItem, itemsToCheckNow) {
+          BOOST_FOREACH(const AItem *  clusterItem, itemsToCheckNow) {
             size_t nNeighbors = 0;
 
             // Consider each neighbor
             for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(clusterItem)) {
               ++nNeighbors;
 
-              const Item* neighborItem = getNeighbor(relation);
+              const AItem* neighborItem = getNeighbor(relation);
 
               CellState neighborICluster = getCellState(*neighborItem);
               if (neighborICluster == -1) {
@@ -247,11 +247,11 @@ namespace Belle2 {
       } // end  startCluster(...)
 
     private:
-      mutable std::map<const Item*, CellState>
-      m_cellStates; ///< Memory for the cell state, if the Item does not inherit from AutomatonCell.
+      mutable std::map<const AItem*, CellState>
+      m_cellStates; ///< Memory for the cell state, if the AItem does not inherit from AutomatonCell.
 
-      mutable std::map<const Item*, CellWeight>
-      m_cellWeights; ///< Memory for the cell weight, if the Item does not inherit from AutomatonCell.
+      mutable std::map<const AItem*, CellWeight>
+      m_cellWeights; ///< Memory for the cell weight, if the AItem does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

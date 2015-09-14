@@ -15,8 +15,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for two related objects of the same type.
-    template<class Object_>
-    using Relation = std::pair<const Object_*, const Object_*>;
+    template<class AObject>
+    using Relation = std::pair<const AObject*, const AObject*>;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

@@ -33,22 +33,22 @@ namespace Belle2 {
      *  including this path. If there are many disjoint paths this is the way to get them. However you most
      *  certainly pick up a lot of elements twice if there are many start culminating into a common long
      *  path segment. This is carried out recursively by followAll over the start items marked with IS_START.*/
-    template<class Item>
+    template<class AItem>
     class CellularPathFollower {
 
     private:
       /// Neighborhood type for the graph edges
-      typedef WeightedNeighborhood<const Item> Neighborhood;
+      typedef WeightedNeighborhood<const AItem> Neighborhood;
 
       /// Resulting path type to be generated
-      typedef std::vector<const Item*> Path;
+      typedef std::vector<const AItem*> Path;
 
     public:
 
       /// Follow paths from all start items marked with the start flag
-      template<class ItemRange>
-      std::vector<Path> followAll(const ItemRange& itemRange,
-                                  const WeightedNeighborhood<const Item>& neighborhood,
+      template<class AItemRange>
+      std::vector<Path> followAll(const AItemRange& itemRange,
+                                  const WeightedNeighborhood<const AItem>& neighborhood,
                                   CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
       {
 
@@ -57,7 +57,7 @@ namespace Belle2 {
         // Segment to work on
         Path path;
 
-        for (const Item& item : itemRange) {
+        for (const AItem& item : itemRange) {
           const AutomatonCell& cell = item.getAutomatonCell();
 
           if (validStartCell(cell, minStateToFollow)) {
@@ -86,8 +86,8 @@ namespace Belle2 {
 
 
       /// Follows a single maximal path starting with the given start item. If the start item is nullptr or has a state lower than the minimum state to follow an empty vector is returned.
-      Path followSingle(const Item* ptrStartItem,
-                        const WeightedNeighborhood<const Item>& neighborhood,
+      Path followSingle(const AItem* ptrStartItem,
+                        const WeightedNeighborhood<const AItem>& neighborhood,
                         CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
       {
 
@@ -95,7 +95,7 @@ namespace Belle2 {
 
         if (ptrStartItem == nullptr) return path;
 
-        const Item& startItem = *ptrStartItem;
+        const AItem& startItem = *ptrStartItem;
         const AutomatonCell& startCell = startItem.getAutomatonCell();
 
         if (validStartCell(startCell, minStateToFollow)) {
@@ -124,13 +124,13 @@ namespace Belle2 {
                     bool growMany = false) const
       {
 
-        const Item* lastItem = path.back();
+        const AItem* lastItem = path.back();
 
         bool grew = false;
         for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(lastItem)) {
           if (isHighestContinuation(relation)) {
 
-            const Item* ptrNeighbor = getNeighbor(relation);
+            const AItem* ptrNeighbor = getNeighbor(relation);
             path.push_back(ptrNeighbor);
 
             growPath(path, neighborhood, growMany);
@@ -168,15 +168,15 @@ namespace Belle2 {
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
       static bool isHighestContinuation(const typename Neighborhood::WeightedRelation& relation)
       {
-        const Item* ptrItem = getItem(relation);
-        const Item* ptrNeighbor = getNeighbor(relation);
+        const AItem* ptrItem = getItem(relation);
+        const AItem* ptrNeighbor = getNeighbor(relation);
 
         if (not ptrItem or not ptrNeighbor) return false;
 
         const NeighborWeight& weight = getWeight(relation);
 
-        const Item& item = *ptrItem;
-        const Item& neighbor = *ptrNeighbor;
+        const AItem& item = *ptrItem;
+        const AItem& neighbor = *ptrNeighbor;
 
         return isHighestContinuation(item, weight, neighbor);
       }
@@ -184,7 +184,7 @@ namespace Belle2 {
 
 
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const Item& item, const NeighborWeight& weight, const Item& neighbor)
+      static bool isHighestContinuation(const AItem& item, const NeighborWeight& weight, const AItem& neighbor)
       {
         const AutomatonCell& itemCell = item.getAutomatonCell();
         const AutomatonCell& neighborCell = neighbor.getAutomatonCell();

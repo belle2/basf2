@@ -35,7 +35,7 @@ namespace Belle2 {
      *  the \a same objects for retrival of neighbors and not just one comparing equal \n
      *  to it. Internally the neighbor relations are sorted by their pointer address first and \n
      *  by the weight second.*/
-    template<class Item>
+    template<class AItem>
     class WeightedNeighborhood {
 
     private:
@@ -48,7 +48,7 @@ namespace Belle2 {
       struct WeightedItemPtr {
 
         /// Constructor bundeling the original item and the weight of a relation
-        WeightedItemPtr(const Item* itemPtr , const NeighborWeight& weight) :
+        WeightedItemPtr(const AItem* itemPtr , const NeighborWeight& weight) :
           m_itemPtr(itemPtr), m_weight(weight) {}
 
         /// Comparison operator establishing a total ordering considering the pointer first and the weight second
@@ -56,7 +56,7 @@ namespace Belle2 {
         { return m_itemPtr < other.m_itemPtr or (m_itemPtr == other.m_itemPtr and m_weight < other.m_weight); }
 
         /// Getter for the pointer to the original item
-        const Item* getItemPtr() const
+        const AItem* getItemPtr() const
         { return m_itemPtr; }
 
         /// Getter for the weight
@@ -64,7 +64,7 @@ namespace Belle2 {
         { return m_weight; }
 
       private:
-        const Item* m_itemPtr; ///< Member to store the pointer to the item
+        const AItem* m_itemPtr; ///< Member to store the pointer to the item
         NeighborWeight m_weight; ///< Member to store the weight of the neighbor relation
 
       };
@@ -72,7 +72,7 @@ namespace Belle2 {
 
     private:
       /// Container type that stores the neighborhood relations
-      typedef std::vector<std::pair<WeightedItemPtr, const Item*>> Container;
+      typedef std::vector<std::pair<WeightedItemPtr, const AItem*>> Container;
 
 
     public:
@@ -85,7 +85,7 @@ namespace Belle2 {
     public:
       /// Extracts the item from which the relation points.
       /// Handy in range based for loops in the neighborhood which iterates the relations.
-      friend const Item* getItem(const WeightedRelation& relation)
+      friend const AItem* getItem(const WeightedRelation& relation)
       { return relation.first.getItemPtr(); }
 
       /// Extracts the weight of the relation.
@@ -95,7 +95,7 @@ namespace Belle2 {
 
       /// Extracts the item to which the relation points.
       /// Handy in range based for loops in the neighborhood which iterates the relations.
-      friend const Item* getNeighbor(const WeightedRelation& relation)
+      friend const AItem* getNeighbor(const WeightedRelation& relation)
       { return relation.second; }
 
 
@@ -116,7 +116,7 @@ namespace Belle2 {
         iterator(const container_const_iterator& it) : container_const_iterator(it) {}
 
         /// Getter to the pointer to the original item
-        const Item* getItem()
+        const AItem* getItem()
         { return (*this)->first.getItemPtr(); }
 
         /// Getter for the weight assoziated with the neighborhood relation
@@ -124,7 +124,7 @@ namespace Belle2 {
         { return (*this)->first.getWeight(); }
 
         /// Getter to the pointer to the neighboring item
-        const Item* getNeighbor()
+        const AItem* getNeighbor()
         { return (*this)->second; }
       };
 
@@ -158,8 +158,8 @@ namespace Belle2 {
        *  Copys of the pointers are stored in the underlying container. \n
        *  Additionally a weight can be given. If omited the weight defaults to one. \n
        */
-      inline void insert(const Item* itemPtr,
-                         const Item* neighborPtr,
+      inline void insert(const AItem* itemPtr,
+                         const AItem* neighborPtr,
                          const NeighborWeight& weight = 1)
       {
         insert(itemPtr, weight, neighborPtr);
@@ -170,9 +170,9 @@ namespace Belle2 {
        *  Copys of the pointers are stored in the underlying container. \n
        *  Additionally a weight must be given in the middle.
        */
-      inline void insert(const Item* itemPtr,
+      inline void insert(const AItem* itemPtr,
                          const NeighborWeight& weight,
-                         const Item* neighborPtr)
+                         const AItem* neighborPtr)
       {
         if (not isNotANeighbor(weight)) {
           WeightedRelation newRelation(WeightedItemPtr(itemPtr, weight), neighborPtr);
@@ -193,14 +193,14 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the item given by pointers has neighbors in the neighborhood
-      bool hasNeighbors(const Item* itemPtr) const
+      bool hasNeighbors(const AItem* itemPtr) const
       { return getLightestNeighbor(itemPtr) != m_neighbors.end(); }
 
       /// Returns an iterator to the neighbor with the least weight by pointer
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the smallest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getLightestNeighbor(const Item* itemPtr) const
+      iterator getLightestNeighbor(const AItem* itemPtr) const
       {
         iterator lowerBound = std::lower_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
         return lowerBound.getItem() == itemPtr ? lowerBound : m_neighbors.end();
@@ -211,7 +211,7 @@ namespace Belle2 {
       /** If the item given by pointer has neighbors in the neighborhood return \n
        *  an iterator pointing to the one with the highest weight. \n
        *  If their are no neighbors to the item given return the end() of the neighborhood. */
-      iterator getHeaviestNeighbor(const Item* itemPtr) const
+      iterator getHeaviestNeighbor(const AItem* itemPtr) const
       {
         iterator upperBound = std::upper_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
         if (upperBound == m_neighbors.begin()) return m_neighbors.end();
@@ -221,7 +221,7 @@ namespace Belle2 {
       }
 
       /// Same as equal_range()
-      range getNeighborRange(const Item* itemPtr) const
+      range getNeighborRange(const AItem* itemPtr) const
       { return equal_range(itemPtr); }
 
       /// Returns an iterator range representing all neighbors.
@@ -229,14 +229,14 @@ namespace Belle2 {
        *  The range is sorted internally by the weight of the neighbor from smallest to biggest. \n
        *  If there are no neighbor an empty range will be returned.
        *  @return a pair of iterators for the range of neighbors */
-      range equal_range(const Item* itemPtr) const
+      range equal_range(const AItem* itemPtr) const
       {
         iterator lowerBound = std::lower_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, LOWEST_WEIGHT));
         iterator upperBound = std::upper_bound(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, HIGHEST_WEIGHT));
         return range(lowerBound, upperBound);
       }
 
-      range equal_range(const Item* itemPtr, const NeighborWeight& weight) const
+      range equal_range(const AItem* itemPtr, const NeighborWeight& weight) const
       { return range(std::equal_range(std::begin(m_neighbors), std::end(m_neighbors), WeightedItemPtr(itemPtr, weight))); }
       /**@}*/
 
@@ -257,9 +257,9 @@ namespace Belle2 {
       { m_neighbors.clear(); }
 
       /// Checks if the two given elements are registered as neighbors with the given weight.
-      bool areNeighborsWithWeight(const Item* itemPtr,
+      bool areNeighborsWithWeight(const AItem* itemPtr,
                                   const NeighborWeight& weight,
-                                  const Item* neighborPtr) const
+                                  const AItem* neighborPtr) const
       {
         for (const WeightedRelation& relation : equal_range(itemPtr, weight)) {
           if (getNeighbor(relation) == neighborPtr) {
@@ -270,7 +270,7 @@ namespace Belle2 {
       }
 
       /// Checks if the two given elements are registered as neighbors with any weight.
-      bool areNeighbors(const Item* itemPtr, const Item* neighborPtr) const
+      bool areNeighbors(const AItem* itemPtr, const AItem* neighborPtr) const
       {
         for (const WeightedRelation& relation : equal_range(itemPtr)) {
           if (getNeighbor(relation) == neighborPtr) {
@@ -287,9 +287,9 @@ namespace Belle2 {
       {
         bool result = true;
         for (const WeightedRelation& relation : *this) {
-          const Item* itemPtr = getItem(relation);
+          const AItem* itemPtr = getItem(relation);
           const NeighborWeight& weight = getWeight(relation);
-          const Item* neighborPtr = getNeighbor(relation);
+          const AItem* neighborPtr = getNeighbor(relation);
 
           if (not areNeighborsWithWeight(neighborPtr, weight, itemPtr)) {
             B2WARNING(" Neighborhood is not symmetric in " << *itemPtr <<
@@ -325,36 +325,36 @@ namespace Belle2 {
        */
       /**@{*/
       /// Clears the neighborhood and creates relations between elements in the given range using an instance of the RelationFilter given as first template argument.
-      template<class RelationFilter, class ItemRange>
-      void createUsing(const ItemRange& itemRange)
+      template<class ARelationFilter, class AItemRange>
+      void createUsing(const AItemRange& itemRange)
       {
         clear();
-        appendUsing<RelationFilter>(itemRange);
+        appendUsing<ARelationFilter>(itemRange);
       }
 
-      /// Clears the neighborhood and creates relations between elements in the given range using the RelationFilter given as first function argument.
-      template<class RelationFilter, class ItemRange>
-      void createUsing(RelationFilter& relationFilter, const ItemRange& itemRange)
+      /// Clears the neighborhood and creates relations between elements in the given range using the ARelationFilter given as first function argument.
+      template<class ARelationFilter, class AItemRange>
+      void createUsing(ARelationFilter& relationFilter, const AItemRange& itemRange)
       {
         clear();
         appendUsing(relationFilter, itemRange);
       }
 
-      /// Appends relations between elements in the given range using an instance of the RelationFilter given as first template argument to the existing neighborhood.
-      template<class RelationFilter, class ItemRange>
-      void appendUsing(const ItemRange& itemRange)
+      /// Appends relations between elements in the given range using an instance of the ARelationFilter given as first template argument to the existing neighborhood.
+      template<class ARelationFilter, class AItemRange>
+      void appendUsing(const AItemRange& itemRange)
       {
-        RelationFilter relationFilter;
+        ARelationFilter relationFilter;
         appendUsing(relationFilter, itemRange);
       }
 
-      /// Appends relations between elements in the given range using the RelationFilter given as first function argument to the existing neighborhood.
-      template<class RelationFilter, class ItemRange>
-      void appendUsing(RelationFilter& relationFilter, const ItemRange& itemRange)
+      /// Appends relations between elements in the given range using the ARelationFilter given as first function argument to the existing neighborhood.
+      template<class ARelationFilter, class AItemRange>
+      void appendUsing(ARelationFilter& relationFilter, const AItemRange& itemRange)
       {
         //forget everything from former creations
         relationFilter.clear();
-        Relation<Item> neighborRelation;
+        Relation<AItem> neighborRelation;
         for (const auto& item : itemRange) {
           neighborRelation.first = item;
           for (const auto& possibleNeighbor : relationFilter.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
@@ -385,9 +385,9 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const WeightedNeighborhood& neighborhood)
       {
         for (const WeightedRelation& relation : neighborhood) {
-          const Item* ptrItem = getItem(relation);
+          const AItem* ptrItem = getItem(relation);
           const NeighborWeight weight = getWeight(relation);
-          const Item* ptrNeighbor = getNeighbor(relation);
+          const AItem* ptrNeighbor = getNeighbor(relation);
 
           output <<
                  ptrItem << " " <<

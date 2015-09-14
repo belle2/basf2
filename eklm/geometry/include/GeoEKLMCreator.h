@@ -154,15 +154,9 @@ namespace Belle2 {
     public:
 
       /**
-       * Default constructor.
+       * Constructor.
        */
       GeoEKLMCreator();
-
-      /**
-       * Constructor with optional geometry data loading.
-       * @param[in] geo True to load transfomation data.
-       */
-      GeoEKLMCreator(bool geo);
 
       /**
        * Destructor.
@@ -179,12 +173,6 @@ namespace Belle2 {
                   geometry::GeometryTypes type);
 
     private:
-
-      /**
-       * Constructor actions.
-       * @param[in] geo True to load transfomation data.
-       */
-      void constructor(bool geo);
 
       /**
        * Creation of materials.

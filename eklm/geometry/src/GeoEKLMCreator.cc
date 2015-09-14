@@ -43,38 +43,24 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 /******************************* CONSTRUCTORS ********************************/
 
-void EKLM::GeoEKLMCreator::constructor(bool geo)
+EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
   haveGeo = false;
-  m_geoDat = NULL;
   m_geoDat2 = &(EKLM::GeometryData2::Instance());
   if (readESTRData(&ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
-  if (geo) {
-    try {
-      m_geoDat = new EKLM::GeometryData;
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    m_geoDat->read();
+  try {
+    m_geoDat = new EKLM::GeometryData;
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
   }
-}
-
-EKLM::GeoEKLMCreator::GeoEKLMCreator()
-{
-  constructor(true);
-}
-
-EKLM::GeoEKLMCreator::GeoEKLMCreator(bool geo)
-{
-  constructor(geo);
+  m_geoDat->read();
 }
 
 EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
   int i, j;
-  if (m_geoDat != NULL)
-    delete m_geoDat;
+  delete m_geoDat;
   /* Free geometry data. */
   free(ESTRPar.z);
   free(ESTRPar.rmin);

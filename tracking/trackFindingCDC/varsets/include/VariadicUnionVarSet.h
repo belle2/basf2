@@ -30,12 +30,12 @@ namespace Belle2 {
        Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
        the types of all nested variable sets are known at compile time.
     */
-    template<class... VarSets_>
-    class VariadicUnionVarSet : public BaseVarSet<typename FirstType<VarSets_...>::Object> {
+    template<class... AVarSets>
+    class VariadicUnionVarSet : public BaseVarSet<typename FirstType<AVarSets...>::Object> {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<typename FirstType<VarSets_...>::Object> Super;
+      typedef BaseVarSet<typename FirstType<AVarSets...>::Object> Super;
 
     public:
       /// Object type from which variables shall be extracted.
@@ -50,10 +50,10 @@ namespace Belle2 {
       explicit VariadicUnionVarSet(const std::string& prefix = "")
       {
         EvalVariadic{
-          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new VarSets_(prefix))) , true)...
+          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new AVarSets(prefix))) , true)...
         };
 
-        assert(m_multiVarSet.size() == sizeof...(VarSets_));
+        assert(m_multiVarSet.size() == sizeof...(AVarSets));
 
       }
 

@@ -21,8 +21,8 @@ namespace Belle2 {
     /**
        A sentinal variable set that does not contain variables and does no extraction.
      */
-    template<class Object_>
-    class EmptyVarSet IF_NOT_CINT(final) : public BaseVarSet<Object_> {
+    template<class AObject>
+    class EmptyVarSet IF_NOT_CINT(final) : public BaseVarSet<AObject> {
 
     private:
       /// Number of floating point values represented by this class.

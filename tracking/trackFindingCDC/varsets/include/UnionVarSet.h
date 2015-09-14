@@ -24,16 +24,16 @@ namespace Belle2 {
     /**
        Class that accomodates many variable sets and presents them as on set of variables
     */
-    template<class Object_>
-    class UnionVarSet : public BaseVarSet<Object_> {
+    template<class AObject>
+    class UnionVarSet : public BaseVarSet<AObject> {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<Object_> Super;
+      typedef BaseVarSet<AObject> Super;
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef Object_ Object;
+      typedef AObject Object;
 
       /// Type of the contained variable sets
       typedef BaseVarSet<Object> ContainedVarSet;

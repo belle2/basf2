@@ -89,12 +89,12 @@ namespace Belle2 {
      *  nNames - Number of parts that will be peeled from the complex object.
      *  names - Array of names which contain the nNames names of the float values.
      **/
-    template<class Names>
+    template<class ANames>
     class FixedSizeNamedFloatTuple : public NamedFloatTuple {
 
     private:
       /// Number of floating point values represented by this class.
-      static const size_t nNames = Names::nNames;
+      static const size_t nNames = ANames::nNames;
 
     protected:
       /** Static getter for the index from the name.
@@ -109,7 +109,7 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static int named(const char* const name)
       {
-        return index<nNames>(Names::getName, name);
+        return index<nNames>(ANames::getName, name);
       }
 
     public:
@@ -121,7 +121,7 @@ namespace Belle2 {
       /// Getter for number of floating point values represented by this class.
       virtual size_t size() const override final
       {
-        return Names::nNames;
+        return ANames::nNames;
       }
 
       /** Getter for the index from a name.
@@ -141,7 +141,7 @@ namespace Belle2 {
       {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
-        return Names::getName(iValue);
+        return ANames::getName(iValue);
       }
 
     public:

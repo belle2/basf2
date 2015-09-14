@@ -21,12 +21,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /** Generic class that generates the same variables from a each of a pair of instances.
      **/
-    template<class BaseVarSet>
+    template<class ABaseVarSet>
     class PairVarSet {
 
     public:
       /// Object type from which the variables shall be extracted
-      typedef typename BaseVarSet::Object BaseObject;
+      typedef typename ABaseVarSet::Object BaseObject;
 
       /// Object type from which variables shall be extracted.
       typedef typename std::pair<const BaseObject*, const BaseObject*> Object;
@@ -115,10 +115,10 @@ namespace Belle2 {
 
     private:
       /// VarSet for the first element of the set.
-      BaseVarSet m_firstVarSet;
+      ABaseVarSet m_firstVarSet;
 
       /// VarSet for the second element of the set.
-      BaseVarSet m_secondVarSet;
+      ABaseVarSet m_secondVarSet;
 
     }; //end class
   } //end namespace TrackFindingCDC

@@ -17,12 +17,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class that specifies the names of the variables.
-    template<class Object_>
+    template<class AObject>
     class VarNames {
 
     public:
       /// Basic type from which the variables are generated.
-      typedef Object_ Object;
+      typedef AObject Object;
 
       /// Number of variables to be generated.
       static const size_t nNames = 0;

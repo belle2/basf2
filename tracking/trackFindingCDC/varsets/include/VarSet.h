@@ -32,12 +32,12 @@ namespace Belle2 {
      *  nNames - Number of variables that will be extracted from the complex object.
      *  names - Array of names which contain the nNames names of the float values.
      **/
-    template<class ObjectVarNames>
-    class VarSet : public BaseVarSet<typename ObjectVarNames::Object> {
+    template<class AObjectVarNames>
+    class VarSet : public BaseVarSet<typename AObjectVarNames::Object> {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<typename ObjectVarNames::Object> Super;
+      typedef BaseVarSet<typename AObjectVarNames::Object> Super;
 
     public:
       /// Type from which variables should be extracted
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     private:
       /// Number of floating point values represented by this class.
-      static const size_t nVars = ObjectVarNames::nNames;
+      static const size_t nVars = AObjectVarNames::nNames;
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
@@ -58,7 +58,7 @@ namespace Belle2 {
       /// Extract the nested variables next
       bool extractNested(const Object* obj)
       {
-        return m_nestedVarSet.extract(ObjectVarNames::getNested(obj));
+        return m_nestedVarSet.extract(AObjectVarNames::getNested(obj));
       }
 
       using Super::extract;
@@ -124,7 +124,7 @@ namespace Belle2 {
       IF_NOT_CINT(constexpr)
       static int named(const char* const name)
       {
-        return index<nVars>(ObjectVarNames::getName, name);
+        return index<nVars>(AObjectVarNames::getName, name);
       }
 
       /// Getter for the value of the ith variable. Static version.
@@ -172,10 +172,10 @@ namespace Belle2 {
 
     public:
       /// Memory for nNames floating point values.
-      FixedSizeNamedFloatTuple<ObjectVarNames> m_variables;
+      FixedSizeNamedFloatTuple<AObjectVarNames> m_variables;
 
       /// Nested VarSet implementing a chain of sets until EmptyVarSet terminates the sequence.
-      typename ObjectVarNames::NestedVarSet m_nestedVarSet;
+      typename AObjectVarNames::NestedVarSet m_nestedVarSet;
 
     }; //end class
   } //end namespace TrackFindingCDC

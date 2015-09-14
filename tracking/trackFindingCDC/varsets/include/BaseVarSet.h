@@ -24,12 +24,12 @@ namespace Belle2 {
 
     Base class defining the interface for various different implementation of sets of variables.
      **/
-    template<class Object_>
+    template<class AObject>
     class BaseVarSet {
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef Object_ Object;
+      typedef AObject Object;
 
     public:
       /// Making destructor virtual

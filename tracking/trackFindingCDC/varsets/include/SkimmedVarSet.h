@@ -15,15 +15,15 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /** Generic class that generates the same variables from a each of a pair of instances.
      **/
-    template<class BaseVarSet>
-    class SkimmedVarSet : public BaseVarSet {
+    template<class ABaseVarSet>
+    class SkimmedVarSet : public ABaseVarSet {
 
     private:
-      typedef BaseVarSet Super;
+      typedef ABaseVarSet Super;
 
     public:
       /// Object type from which the variables shall be extracted
-      typedef typename BaseVarSet::Object Object;
+      typedef typename ABaseVarSet::Object Object;
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.

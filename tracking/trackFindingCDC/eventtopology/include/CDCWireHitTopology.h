@@ -128,13 +128,13 @@ namespace Belle2 {
                    const ERightLeft rlInfo) const;
 
       /// Getter for a coaligned subrange of wire hits.
-      template<class Coaligned>
-      CDCWireHitRange getWireHits(const Coaligned& coaligned) const
+      template<class ACoaligned>
+      CDCWireHitRange getWireHits(const ACoaligned& coaligned) const
       { return std::equal_range(getWireHits().begin(), getWireHits().end(), coaligned); }
 
       /// Getter for a coaligned subrange of oriented wire hits
-      template<class Coaligned>
-      CDCRLWireHitRange getRLWireHits(const Coaligned& coaligned) const
+      template<class ACoaligned>
+      CDCRLWireHitRange getRLWireHits(const ACoaligned& coaligned) const
       { return std::equal_range(getRLWireHits().begin(), getRLWireHits().end(), coaligned); }
 
       /// Getter for the wire hits

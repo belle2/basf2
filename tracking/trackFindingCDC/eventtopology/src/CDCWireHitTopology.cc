@@ -57,10 +57,10 @@ namespace {
    *  hence if it the item located in memory within the range
    *  it is also the correct lower bound.
    */
-  template<class It, class T>
-  It unique_lower_bound_fast(const It& first, const It& last, const T& t)
+  template<class AIt, class T>
+  AIt unique_lower_bound_fast(const AIt& first, const AIt& last, const T& t)
   {
-    It itT(&t);
+    AIt itT(&t);
     if (first <= itT and itT < last) {
       return itT;
     } else {

@@ -77,6 +77,10 @@ void SetupGenfitExtrapolationModule::initialize()
     return;
   }
 
+  if (!geometry::GeometryManager::getInstance().getTopVolume()) {
+    B2FATAL("No geometry set up so far. Load the geometry module.");
+  }
+
   if (m_geometry == "TGeo") {
     if (!gGeoManager) {
       B2INFO("Building TGeo representation.");

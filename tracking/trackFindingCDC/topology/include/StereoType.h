@@ -34,8 +34,8 @@ namespace Belle2 {
     /** Returns the common stereo type of hits in a container.
      *  INVALID_STEREOTYPE if there is no common super layer or the container is empty.
      */
-    template<class Hits>
-    StereoType getStereoType(const Hits& hits)
+    template<class AHits>
+    StereoType getStereoType(const AHits& hits)
     {
       using std::begin;
       using std::end;

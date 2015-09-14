@@ -47,8 +47,8 @@ namespace Belle2 {
     /** Returns the common superlayer of hits in a container.
      *  INVALID_ISUPERLAYER if there is no common super layer or the container is empty.
      */
-    template<class Hits>
-    ISuperLayerType getISuperLayer(const Hits& hits)
+    template<class AHits>
+    ISuperLayerType getISuperLayer(const AHits& hits)
     {
       using std::begin;
       using std::end;

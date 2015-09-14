@@ -177,11 +177,11 @@ namespace Belle2 {
        *  The repeated execution is only done if the test is run in unrestricted mode.
        *  The default is to run it once.
        */
-      template<class Function >
+      template<class AFunction >
       TimeItResult
       timeIt(size_t nExecutions,
              bool activateCallgrind,
-             const Function& function,
+             const AFunction& function,
              const std::function<void()>& setUp = doNothing,
              const std::function<void()>& tearDown = doNothing)
       {

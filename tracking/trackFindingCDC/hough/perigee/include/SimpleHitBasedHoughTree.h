@@ -18,15 +18,15 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class HitPtr,
+    template<class AHitPtr,
              class InBox,
              size_t ... divisions>
     class SimpleHitBasedHoughTree :
-      public BoxDivisionHoughTree<HitPtr, typename InBox::HoughBox, divisions...> {
+      public BoxDivisionHoughTree<AHitPtr, typename InBox::HoughBox, divisions...> {
 
     private:
       /// Type of the base class.
-      using Super = BoxDivisionHoughTree<HitPtr, typename InBox::HoughBox, divisions...>;
+      using Super = BoxDivisionHoughTree<AHitPtr, typename InBox::HoughBox, divisions...>;
 
     public:
       /// Type of the node in the hough tree.
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     public:
       /// Find disjoint leaves heavier than minWeight
-      std::vector<std::pair<HoughBox,  std::vector<HitPtr> > >
+      std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
       find(const Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
@@ -58,7 +58,7 @@ namespace Belle2 {
       }
 
       /// Find the best trajectory and repeat the process until no bin heavier than minWeight can be found
-      std::vector<std::pair<HoughBox,  std::vector<HitPtr> > >
+      std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
       findBest(const Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
@@ -71,19 +71,19 @@ namespace Belle2 {
       }
 
       /// Find the best trajectory from the single heaviest bin heavier than minWeight
-      std::vector<std::pair<HoughBox,  std::vector<HitPtr> > >
+      std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > >
       findSingleBest(const Weight& minWeight, const double maxCurv = NAN)
       {
         auto skipHighCurvatureAndLowWeightNode = [minWeight, maxCurv](const Node * node) {
           const HoughBox& houghBox = *node;
           return not(node->getWeight() >= minWeight and not(getLowerCurv(houghBox) > maxCurv));
         };
-        std::unique_ptr<std::pair<HoughBox,  std::vector<HitPtr> > > found =
+        std::unique_ptr<std::pair<HoughBox,  std::vector<AHitPtr> > > found =
           this->getTree()->findHeaviestLeafSingle(m_stereoHitContainedInBox,
                                                   this->getMaxLevel(),
                                                   skipHighCurvatureAndLowWeightNode);
 
-        std::vector<std::pair<HoughBox,  std::vector<HitPtr> > > result;
+        std::vector<std::pair<HoughBox,  std::vector<AHitPtr> > > result;
         if (found) {
           // Move the found content over. unique_ptr still destroys the left overs.
           result.push_back(std::move(*found));
@@ -92,8 +92,8 @@ namespace Belle2 {
       }
 
       /// Fill and walk the tree using invoking the leaf processor on each encountered node.
-      template<class LeafProcessor>
-      void findUsing(LeafProcessor& leafProcessor)
+      template<class ALeafProcessor>
+      void findUsing(ALeafProcessor& leafProcessor)
       {
         return this->getTree()->fillWalk(m_stereoHitContainedInBox,
                                          leafProcessor);

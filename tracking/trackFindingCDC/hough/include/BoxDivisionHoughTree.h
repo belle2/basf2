@@ -25,20 +25,18 @@ namespace Belle2 {
 
     /** A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
      *  divisions in each coordinate up to a maximal level. */
-    template<class ItemPtr,
-             class HoughBox_,
-             size_t ... divisions>
+    template<class AItemPtr, class AHoughBox, size_t ... divisions>
     class BoxDivisionHoughTree {
 
     public:
       /// Type of the box in the hough space
-      using HoughBox = HoughBox_;
+      using HoughBox = AHoughBox;
 
       /// Type of the box division strategy
       using BoxDivision = LinearDivision<HoughBox, divisions...>;
 
       /// Type of the fast hough tree structure
-      using HoughTree = WeightedFastHoughTree<ItemPtr, HoughBox, BoxDivision>;
+      using HoughTree = WeightedFastHoughTree<AItemPtr, HoughBox, BoxDivision>;
 
       /// Type of the coordinate I.
       template<size_t I>
@@ -146,8 +144,8 @@ namespace Belle2 {
       }
 
       /// Prepare the leave finding by filling the top node with given hits
-      template<class ItemPtrs>
-      void seed(ItemPtrs& items)
+      template<class AItemPtrs>
+      void seed(AItemPtrs& items)
       {
         if (not m_houghTree) { initialize(); }
         m_houghTree->seed(items);

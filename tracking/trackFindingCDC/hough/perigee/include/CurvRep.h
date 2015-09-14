@@ -129,32 +129,32 @@ namespace Belle2 {
     /// Functor to get the lower curvature bound of a hough box.
     struct GetLowerCurv {
       /// Getter function for the lower curvature bound of a hough box.
-      template<class HoughBox>
-      EnableIf<HoughBox::template HasType<DiscreteCurv>::value, float>
-      operator()(const HoughBox& houghBox)
+      template<class AHoughBox>
+      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float>
+      operator()(const AHoughBox& houghBox)
       { return static_cast<float>(houghBox.template getLowerBound<DiscreteCurv>()); }
     };
 
     /// Functor to get the upper curvature bound of a hough box.
     struct GetUpperCurv {
       /// Getter function for the upper curvature bound of a hough box.
-      template<class HoughBox>
-      EnableIf<HoughBox::template HasType<DiscreteCurv>::value, float>
-      operator()(const HoughBox& houghBox)
+      template<class AHoughBox>
+      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float>
+      operator()(const AHoughBox& houghBox)
       { return static_cast<float>(houghBox.template getUpperBound<DiscreteCurv>()); }
     };
 
     /** Function to get the lower curvature bound of box.
      *  Returns 0 fo boxes that do not have a curvature coordinate */
-    template<class HoughBox>
-    float getLowerCurv(const HoughBox& houghBox)
+    template<class AHoughBox>
+    float getLowerCurv(const AHoughBox& houghBox)
     //{ return GetLowerCurv()(houghBox); }
     { return getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0); }
 
     /** Function to get the upper curvature bound of box.
      *  Returns 0 fo boxes that do not have a curvature coordinate */
-    template<class HoughBox>
-    float getUpperCurv(const HoughBox& houghBox)
+    template<class AHoughBox>
+    float getUpperCurv(const AHoughBox& houghBox)
     //{ return GetUpperCurv()(houghBox); }
     { return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0); }
 

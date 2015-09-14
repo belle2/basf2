@@ -24,7 +24,7 @@ namespace Belle2 {
      *  The number of divisions in each dimension are given as template parameters such
      *  that the total number is know at compile time.
      */
-    template<class Box_, std::size_t... divisions>
+    template<class ABox, std::size_t... divisions>
     class LinearDivision {
 
     public:
@@ -37,13 +37,13 @@ namespace Belle2 {
 
     public:
       /// Initialise the sub box factory with specific overlaps.
-      LinearDivision(const typename Box_::Delta& overlaps = typename Box_::Delta()) :
+      LinearDivision(const typename ABox::Delta& overlaps = typename ABox::Delta()) :
         m_overlaps(overlaps)
       {}
 
     public:
       /// Factory method to construct the subboxes with overlap from the given box.
-      std::array<Box_, s_nSubBoxes> operator()(const Box_& box)
+      std::array<ABox, s_nSubBoxes> operator()(const ABox& box)
       {
         return makeSubBoxes(box, GenIndices<s_nSubBoxes>());
       }
@@ -51,8 +51,8 @@ namespace Belle2 {
       /// Make all subboxs with overlap of the given box.
       template<std::size_t... Is>
       inline
-      std::array<Box_, s_nSubBoxes>
-      makeSubBoxes(const Box_& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
+      std::array<ABox, s_nSubBoxes>
+      makeSubBoxes(const ABox& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
       {
         return {{ makeSubBox(box, Is, GenIndices<sizeof...(divisions)>())... }};
       }
@@ -61,7 +61,7 @@ namespace Belle2 {
       /// Make the subbox with overlaps of the given box at global index.
       template<std::size_t... Is>
       inline
-      Box_ makeSubBox(const Box_& box,
+      ABox makeSubBox(const ABox& box,
                       std::size_t globalISubBox,
                       IndexSequence<Is...> /*coordinatesIndex*/)
       {
@@ -71,19 +71,19 @@ namespace Belle2 {
           globalISubBox /= s_divisions[iIndex];
         }
         assert(globalISubBox == 0);
-        return Box_(box.template getDivisionBoundsWithOverlap<Is>(std::get<Is>(m_overlaps),
+        return ABox(box.template getDivisionBoundsWithOverlap<Is>(std::get<Is>(m_overlaps),
                                                                   s_divisions[Is],
                                                                   indices[Is]) ...);
       }
 
     private:
       /// Custom overlaps of the bounds at each division for each dimension.
-      typename Box_::Delta m_overlaps;
+      typename ABox::Delta m_overlaps;
 
     };
 
     // Extra mention of the constexpr such that it aquires external linkage.
-    template<class Box_, std::size_t... divisions>
-    constexpr std::size_t LinearDivision<Box_, divisions...>::s_divisions[sizeof...(divisions)];
+    template<class ABox, std::size_t... divisions>
+    constexpr std::size_t LinearDivision<ABox, divisions...>::s_divisions[sizeof...(divisions)];
   }
 }

@@ -15,10 +15,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type to have values *not* based on discrete positions from an array
-    template<class T, class Tag = T>
+    template<class T, class ATag = T>
     class ContinuousValue {
     public:
-      using This = ContinuousValue<T, Tag>;
+      using This = ContinuousValue<T, ATag>;
 
       /// Allow default construction
       ContinuousValue() = default;

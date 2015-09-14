@@ -20,8 +20,8 @@ namespace Belle2 {
     /** Takes a basic object and sweeps it by some d0 range in the y direction.
      *  The sweep in phi0 should be handled before
      */
-    template<class T, class Impact = ContinuousImpact>
-    class ImpactSweeped : public T {
+    template<class T, class AImpact = ContinuousImpact>
+    class AImpactSweeped : public T {
 
     public:
       /// Using the constructor of the base class.
@@ -29,7 +29,7 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<Impact, typename T::HoughBox> HoughBox;
+      typedef SweepBox<AImpact, typename T::HoughBox> HoughBox;
 
       /// The hough box without the sweep in d0
       typedef typename T::HoughBox SubordinaryHoughBox;
@@ -45,8 +45,8 @@ namespace Belle2 {
                                    const float& dydz = 0,
                                    const ILayerType& iCLayer = -1) const
       {
-        const float& lowerImpact(houghBox.template getLowerBound<Impact>());
-        const float& upperImpact(houghBox.template getUpperBound<Impact>());
+        const float& lowerImpact(houghBox.template getLowerBound<AImpact>());
+        const float& upperImpact(houghBox.template getUpperBound<AImpact>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerY = y - lowerImpact;

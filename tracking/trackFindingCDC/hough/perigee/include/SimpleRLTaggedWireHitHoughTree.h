@@ -16,9 +16,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A simple hough tree taking rl tagable wire hits as smallest units.
-    template<class InBox, size_t ... divisions>
+    template<class AInBox, size_t ... divisions>
     using SimpleRLTaggedWireHitHoughTree =
-      SimpleHitBasedHoughTree<CDCRLTaggedWireHit, InBox, divisions ... >;
+      SimpleHitBasedHoughTree<CDCRLTaggedWireHit, AInBox, divisions ... >;
 
   }
 }

@@ -28,15 +28,15 @@ namespace Belle2 {
      *  The hough space is parameterised as a template parameter and is a basic
      *  objected that has been broadened by a sweep in the directions of interested.
      */
-    template<class InBox>
-    class StereoHitContained : public InBox {
+    template<class AInBox>
+    class StereoHitContained : public AInBox {
 
     public:
       /// Exposing the base constructor
-      using InBox::InBox;
+      using AInBox::AInBox;
 
       /// The hough box which represents the hough space part to be investigated
-      using HoughBox = typename InBox::HoughBox;
+      using HoughBox = typename AInBox::HoughBox;
 
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space

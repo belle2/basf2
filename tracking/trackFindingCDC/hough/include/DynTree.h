@@ -20,21 +20,21 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class Properties_, class SubPropertiesFactory_>
+    template<class AProperties, class ASubPropertiesFactory>
     class DynTree {
 
       /// Type of this class
-      typedef DynTree<Properties_, SubPropertiesFactory_> This;
+      typedef DynTree<AProperties, ASubPropertiesFactory> This;
 
       /// Type of the Properties
-      typedef Properties_ Properties;
+      typedef AProperties Properties;
 
       /// Type of the factory for the sub node properties
-      typedef SubPropertiesFactory_ SubPropertiesFactory;
+      typedef ASubPropertiesFactory SubPropertiesFactory;
 
     public:
       /// Class for a node in the tree
-      class Node : public Properties_ {
+      class Node : public AProperties {
 
       public:
         /// Type of the tree containing this node.
@@ -44,7 +44,7 @@ namespace Belle2 {
         friend Tree;
 
         /// Type of the Properties
-        typedef Properties_ Properties;
+        typedef AProperties Properties;
 
         /// Type of the container of the children of the node
         typedef std::vector<Node> Children;
@@ -54,10 +54,10 @@ namespace Belle2 {
          *  construct nodes as property objects.
          *  Only the top level node is constructed this way.
          */
-        using Properties_::Properties_;
+        using AProperties::AProperties;
 
       public:
-        using Properties_::operator=;
+        using AProperties::operator=;
 
       public:
         /** Getter for the children.
@@ -105,8 +105,8 @@ namespace Belle2 {
         /** Calls the walker with each node starting with the top node and continues depth first
          *  The walker can signal to skip the children if false is returned.
          */
-        template<class Walker>
-        void walk(Walker& walker)
+        template<class AWalker>
+        void walk(AWalker& walker)
         {
           bool walkChildren = walker(this);
           Children* children = getChildren();
@@ -122,8 +122,8 @@ namespace Belle2 {
          *  Additionally this version allows for a priority measure that determines which child is
          *  traversed first.
          */
-        template<class Walker, class PriorityMeasure>
-        void walk(Walker& walker, PriorityMeasure& priority)
+        template<class AWalker, class APriorityMeasure>
+        void walk(AWalker& walker, APriorityMeasure& priority)
         {
           bool walkChildren = walker(this);
           Children* children = getChildren();
@@ -274,13 +274,13 @@ namespace Belle2 {
 
     public:
       /// Forward walk to the top node
-      template<class Walker>
-      void walk(Walker& walker)
+      template<class AWalker>
+      void walk(AWalker& walker)
       { getTopNode().walk(walker); }
 
       /// Forward walk to the top node
-      template<class Walker, class PriorityMeasure>
-      void walk(Walker& walker, PriorityMeasure& priority)
+      template<class AWalker, class APriorityMeasure>
+      void walk(AWalker& walker, APriorityMeasure& priority)
       { getTopNode().walk(walker, priority); }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.

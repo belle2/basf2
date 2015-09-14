@@ -23,37 +23,37 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type of tree for paritioning the hough space
-    template<class T, class Domain, class DomainDivsion>
+    template<class T, class ADomain, class ADomainDivsion>
     class  WeightedParititioningDynTree :
-      public DynTree<  WithWeightedItems<Domain, T>, DomainDivsion> {
+      public DynTree<  WithWeightedItems<ADomain, T>, ADomainDivsion> {
     private:
       /// Type of the base class
-      using Super = DynTree<  WithWeightedItems<Domain, T>, DomainDivsion>;
+      using Super = DynTree<  WithWeightedItems<ADomain, T>, ADomainDivsion>;
 
     public:
       /// Constructor attaching a vector of the weigthed items to the top most node domain.
-      WeightedParititioningDynTree(Domain topDomain, DomainDivsion domainDivsion) :
-        Super(WithWeightedItems<Domain, T>(std::move(topDomain)), std::move(domainDivsion))
+      WeightedParititioningDynTree(ADomain topDomain, ADomainDivsion domainDivsion) :
+        Super(WithWeightedItems<ADomain, T>(std::move(topDomain)), std::move(domainDivsion))
       {}
     };
 
     /** Dynamic tree structure with weighted items in each node which are markable through out the tree.
      *  Used to build fast hough type algorithms, where objects are allowed to carry weights relative to
-     *  the hough space part (here called a Domain) they are contained in.
+     *  the hough space part (here called a ADomain) they are contained in.
      *  The shared marks allow for interrative extraction of hough peaks such that other areas of the
      *  hough space notice that certain element have already been consumed.
      */
-    template<class T, class Domain, class DomainDivsion>
+    template<class T, class ADomain, class ADomainDivsion>
     class WeightedFastHoughTree :
-      public WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion> {
+      public WeightedParititioningDynTree<WithSharedMark<T>, ADomain, ADomainDivsion> {
 
     private:
       /// Type of the Tree the partitions using markable items the hough space
-      using Super = WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>;
+      using Super = WeightedParititioningDynTree<WithSharedMark<T>, ADomain, ADomainDivsion>;
 
     public:
       /// Inheriting the constructor from the base class.
-      using WeightedParititioningDynTree<WithSharedMark<T>, Domain, DomainDivsion>::WeightedParititioningDynTree;
+      using WeightedParititioningDynTree<WithSharedMark<T>, ADomain, ADomainDivsion>::WeightedParititioningDynTree;
 
       /// Type of the node in the tree.
       using Node = typename Super::Node;
@@ -73,9 +73,9 @@ namespace Belle2 {
         }
       }
 
-      template<class ItemInDomainMeasure>
-      std::vector<std::pair<Domain,  std::vector<T> > >
-      findHeavyLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure>
+      std::vector<std::pair<ADomain, std::vector<T> > >
+      findHeavyLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
                               const size_t maxLevel,
                               const double minWeight)
       {
@@ -85,13 +85,13 @@ namespace Belle2 {
         return findLeavesDisjoint(weightItemInDomain, maxLevel, skipLowWeightNode);
       }
 
-      template<class ItemInDomainMeasure, class SkipNodePredicate>
-      std::vector<std::pair<Domain,  std::vector<T> > >
-      findLeavesDisjoint(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::vector<std::pair<ADomain,  std::vector<T> > >
+      findLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
                          const size_t maxLevel,
-                         SkipNodePredicate& skipNode)
+                         ASkipNodePredicate& skipNode)
       {
-        std::vector<std::pair<Domain,  std::vector<T> > > found;
+        std::vector<std::pair<ADomain,  std::vector<T> > > found;
         auto isLeaf = [&](Node * node) {
           // Skip the expansion and the filling of the children
           if (skipNode(node)) {
@@ -102,7 +102,7 @@ namespace Belle2 {
           // Save its content
           // Do not walk children
           if (node->getLevel() >= maxLevel) {
-            const Domain* domain = node;
+            const ADomain* domain = node;
             found.emplace_back(*domain, std::vector<T>(node->begin(), node->end()));
             for (WithSharedMark<T>& markableItem : *node) {
               markableItem.mark();
@@ -120,9 +120,9 @@ namespace Belle2 {
       }
 
 
-      template<class ItemInDomainMeasure>
-      std::vector<std::pair<Domain,  std::vector<T> > >
-      findHeaviestLeafRepeated(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure>
+      std::vector<std::pair<ADomain,  std::vector<T> > >
+      findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
                                const size_t maxLevel,
                                const Weight minWeight = NAN)
       {
@@ -132,16 +132,16 @@ namespace Belle2 {
         return findHeaviestLeafRepeated(weightItemInDomain, maxLevel, skipLowWeightNode);
       }
 
-      template<class ItemInDomainMeasure, class SkipNodePredicate>
-      std::vector<std::pair<Domain,  std::vector<T> > >
-      findHeaviestLeafRepeated(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::vector<std::pair<ADomain,  std::vector<T> > >
+      findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
                                const size_t maxLevel,
-                               SkipNodePredicate& skipNode)
+                               ASkipNodePredicate& skipNode)
       {
-        std::vector<std::pair<Domain,  std::vector<T> > > found;
+        std::vector<std::pair<ADomain,  std::vector<T> > > found;
         Node* node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
         while (node) {
-          const Domain* domain = node;
+          const ADomain* domain = node;
           found.emplace_back(*domain, std::vector<T>(node->begin(), node->end()));
           for (WithSharedMark<T>& markableItem : *node) {
             markableItem.mark();
@@ -151,17 +151,17 @@ namespace Belle2 {
         return found;
       }
 
-      template<class ItemInDomainMeasure, class SkipNodePredicate>
-      std::unique_ptr<std::pair<Domain,  std::vector<T> > >
-      findHeaviestLeafSingle(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::unique_ptr<std::pair<ADomain,  std::vector<T> > >
+      findHeaviestLeafSingle(AItemInDomainMeasure& weightItemInDomain,
                              const size_t maxLevel,
-                             SkipNodePredicate& skipNode)
+                             ASkipNodePredicate& skipNode)
       {
-        using Result = std::pair<Domain,  std::vector<T> >;
+        using Result = std::pair<ADomain,  std::vector<T> >;
         std::unique_ptr<Result> found = nullptr;
         Node* node = findHeaviestLeaf(weightItemInDomain, maxLevel, skipNode);
         if (node) {
-          const Domain* domain = node;
+          const ADomain* domain = node;
           found.reset(new Result(*domain, std::vector<T>(node->begin(), node->end())));
           for (WithSharedMark<T>& markableItem : *node) {
             markableItem.mark();
@@ -171,10 +171,10 @@ namespace Belle2 {
       }
 
 
-      template<class ItemInDomainMeasure, class SkipNodePredicate>
-      Node* findHeaviestLeaf(ItemInDomainMeasure& weightItemInDomain,
+      template<class AItemInDomainMeasure, class ASkipNodePredicate>
+      Node* findHeaviestLeaf(AItemInDomainMeasure& weightItemInDomain,
                              const size_t maxLevel,
-                             SkipNodePredicate& skipNode)
+                             ASkipNodePredicate& skipNode)
       {
         Node* heaviestNode = nullptr;
         Weight heighestWeigth = NAN;
@@ -205,9 +205,9 @@ namespace Belle2 {
       }
 
     public:
-      template<class ItemInDomainMeasure, class IsLeafPredicate>
-      void fillWalk(ItemInDomainMeasure& weightItemInDomain,
-                    IsLeafPredicate& isLeaf)
+      template<class AItemInDomainMeasure, class AIsLeafPredicate>
+      void fillWalk(AItemInDomainMeasure& weightItemInDomain,
+                    AIsLeafPredicate& isLeaf)
       {
         auto walker = [&weightItemInDomain, &isLeaf](Node * node) {
           // Check if node is a leaf
@@ -243,8 +243,8 @@ namespace Belle2 {
       }
 
       /// Walk the tree investigating the heaviest children with priority.
-      template<class TreeWalker>
-      void walkHeighWeightFirst(TreeWalker& walker)
+      template<class ATreeWalker>
+      void walkHeighWeightFirst(ATreeWalker& walker)
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.

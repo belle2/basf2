@@ -20,8 +20,8 @@ namespace Belle2 {
 
 
     /// Takes a basic object and sweeps it by some angle phi0 range a around the origin
-    template<class T, class Phi0 = DiscretePhi0>
-    class Phi0Sweeped : public T {
+    template<class T, class APhi0 = DiscretePhi0>
+    class APhi0Sweeped : public T {
 
     public:
       /// Using the constructor of the base class.
@@ -29,13 +29,13 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<Phi0, typename T::HoughBox> HoughBox;
+      typedef SweepBox<APhi0, typename T::HoughBox> HoughBox;
 
       /// The hough box without the sweep in phi0
       typedef typename T::HoughBox SubordinaryHoughBox;
 
       /// Constructor taking the curling curvature.
-      Phi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {}
+      APhi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {}
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
@@ -48,8 +48,8 @@ namespace Belle2 {
                                    const float& dydz = 0,
                                    const ILayerType& iCLayer = -1) const
       {
-        const Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<Phi0>());
-        const Vector2D& upperPhi0Vec(houghBox.template getUpperBound<Phi0>());
+        const Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
+        const Vector2D& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerX = x * lowerPhi0Vec.x() + y * lowerPhi0Vec.y();

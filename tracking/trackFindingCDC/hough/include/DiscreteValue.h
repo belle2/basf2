@@ -21,7 +21,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Representation for a discrete position in an array of discrete positions.
-    template<class T, class Tag = T>
+    template<class T, class ATag = T>
     class DiscreteValue : public std::vector<T>::const_iterator {
 
     private:
@@ -29,7 +29,7 @@ namespace Belle2 {
       using Super = typename std::vector<T>::const_iterator;
 
       /// Type of this class
-      using This = DiscreteValue<T, Tag>;
+      using This = DiscreteValue<T, ATag>;
 
     public:
       /// Inheriting the constructors from the base class

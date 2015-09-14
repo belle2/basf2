@@ -22,8 +22,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
-template<class Node>
-void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<Node>::processLeaf(Node* leaf)
+template<class ANode>
+void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANode* leaf)
 {
   // No special post processing version
   // const Phi0CurvBox& phi0CurvBox = *leaf;
@@ -96,7 +96,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<Node>::processLeaf(Node
                                 DiscreteCurv::getRange(curvBounds));
 
   // Acquire all available items
-  Node& topNode = leaf->getTree()->getTopNode();
+  ANode& topNode = leaf->getTree()->getTopNode();
   // Make sure that all items we have used somewhere else are removed from the available items.
   auto isMarked = [](const WithSharedMark<CDCRLTaggedWireHit>& item) -> bool {
     return item.isMarked();

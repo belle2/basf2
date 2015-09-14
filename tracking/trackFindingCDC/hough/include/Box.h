@@ -22,7 +22,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class... Types>
+    template<class... ATypes>
     class Box;
     template<>
 
@@ -36,21 +36,21 @@ namespace Belle2 {
       { return output; }
     };
 
-    template<class FirstType_, class... SubordinaryTypes>
-    class Box<FirstType_, SubordinaryTypes...> {
+    template<class AFirstType, class... ASubordinaryTypes>
+    class Box<AFirstType, ASubordinaryTypes...> {
     public:
       /// Type of the first coordinate
-      typedef FirstType_ FirstType;
+      typedef AFirstType FirstType;
 
       /// Type of this box
-      typedef Box<FirstType_, SubordinaryTypes...> This;
+      typedef Box<AFirstType, ASubordinaryTypes...> This;
 
       /// Tuple of the types of each coordinates
-      typedef std::tuple<FirstType, SubordinaryTypes...> Point;
+      typedef std::tuple<FirstType, ASubordinaryTypes...> Point;
 
       /// Tuple of differencs in each coordinate
       typedef std::tuple < decltype(FirstType() - FirstType()),
-              decltype(SubordinaryTypes() - SubordinaryTypes())... > Delta;
+              decltype(ASubordinaryTypes() - ASubordinaryTypes())... > Delta;
 
       /// Accessor for the individual coordinate types.
       template<std::size_t I>
@@ -76,7 +76,7 @@ namespace Belle2 {
 
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
-          const std::array<SubordinaryTypes, 2>& ... subordinaryBounds) :
+          const std::array<ASubordinaryTypes, 2>& ... subordinaryBounds) :
         m_firstBounds{{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])}},
       m_subordinaryBox(subordinaryBounds...)
       {}
@@ -92,7 +92,7 @@ namespace Belle2 {
 
       /// Set bounds of the box to new values
       void setBounds(std::array<FirstType, 2> firstBounds,
-                     std::array<SubordinaryTypes, 2>... subordinaryBounds)
+                     std::array<ASubordinaryTypes, 2>... subordinaryBounds)
       {
         m_firstBounds[0] = std::min(firstBounds[0], firstBounds[1]);
         m_firstBounds[1] = std::max(firstBounds[0], firstBounds[1]);
@@ -100,7 +100,7 @@ namespace Belle2 {
       }
 
       /// Getter for the box in excluding the first coordinate
-      const Box<SubordinaryTypes...>& getSubordinaryBox() const
+      const Box<ASubordinaryTypes...>& getSubordinaryBox() const
       { return m_subordinaryBox; }
 
       /// Get the lower bound of the box in the coordinate I - first coordinate case
@@ -241,8 +241,8 @@ namespace Belle2 {
       { return getDivisionBounds(2, 1); }
 
       /// Indicate if the given value is in the range of the coordinate I
-      template<std::size_t I, class SubordinaryValue>
-      bool isIn(const SubordinaryValue& value) const
+      template<std::size_t I, class ASubordinaryValue>
+      bool isIn(const ASubordinaryValue& value) const
       { return getLowerBound<I>() < value and not(getUpperBound<I>() < value); }
 
     private:
@@ -293,7 +293,7 @@ namespace Belle2 {
       { return isInImpl(point, GenIndices<c_nTypes>()); }
 
       /// Indicate if all given values are in the range of their coordinates.
-      bool isIn(const FirstType& value, const SubordinaryTypes& ... values) const
+      bool isIn(const FirstType& value, const ASubordinaryTypes& ... values) const
       { return isInImpl(Point(value, values...), GenIndices<c_nTypes>()); }
 
     private:
@@ -301,7 +301,7 @@ namespace Belle2 {
       std::array<FirstType, 2> m_firstBounds;
 
       /// Box in the other coordinate
-      Box<SubordinaryTypes... > m_subordinaryBox;
+      Box<ASubordinaryTypes... > m_subordinaryBox;
     };
 
   }

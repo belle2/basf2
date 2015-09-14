@@ -19,18 +19,18 @@ namespace Belle2 {
      *  It *sweeps* the original box over a finite range
      *  in the new dimension
      */
-    template<class NewType, class Box>
+    template<class ANewType, class ABox>
     struct SweepBoxImpl;
 
     /// Actual implementation pasting together the new dimension with the original box.
-    template<class NewType, class... OldTypes>
-    struct SweepBoxImpl<NewType, Box<OldTypes...> > {
-      typedef Box<NewType, OldTypes...> Type;
+    template<class ANewType, class... AOldTypes>
+    struct SweepBoxImpl<ANewType, ABox<AOldTypes...> > {
+      typedef ABox<ANewType, AOldTypes...> Type;
     };
 
     /// Short hand for SweepBoxImpl
-    template<class NewType, class Box>
-    using SweepBox = typename SweepBoxImpl<NewType, Box>::Type;
+    template<class ANewType, class ABox>
+    using SweepBox = typename SweepBoxImpl<ANewType, ABox>::Type;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

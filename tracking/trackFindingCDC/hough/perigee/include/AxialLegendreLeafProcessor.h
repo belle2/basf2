@@ -26,7 +26,7 @@ namespace Belle2 {
      *  It accumulates the tracks in a member vector from where they can be taken
      *  after the walk over the tree has been completed.
      */
-    template<class Node>
+    template<class ANode>
     class AxialLegendreLeafProcessor {
 
     public:
@@ -40,7 +40,7 @@ namespace Belle2 {
       /** Entry point for the WeightedHoughTree walk to ask
        *  if a node is a leaf that should not be further divided into sub nodes.
        */
-      bool operator()(Node* node)
+      bool operator()(ANode* node)
       {
         if (skip(node)) {
           return true;
@@ -53,7 +53,7 @@ namespace Belle2 {
       }
 
       /// Decide if the node should be expanded further or marks an end point of the depth search
-      bool skip(const Node* node)
+      bool skip(const ANode* node)
       {
         bool tooLowWeight = not(node->getWeight() >= m_minWeight);
         bool tooHighCurvature = static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_maxCurv;
@@ -61,7 +61,7 @@ namespace Belle2 {
       }
 
       /// Decide when a leaf node is reached that should be processed further
-      bool isLeaf(const Node* node)
+      bool isLeaf(const ANode* node)
       {
         return node->getLevel() >= m_maxLevel;
       }
@@ -69,7 +69,7 @@ namespace Belle2 {
       /** A valuable leaf has been found in the hough tree walk extract its content
        *  It may pull more hits from the whole tree.
        */
-      void processLeaf(Node* node);
+      void processLeaf(ANode* node);
 
     public:
       /// Getter for the candidates

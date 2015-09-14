@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// A mixin class to attach a set of weighted items to a class
-    template<class T, class Item>
+    template<class T, class AItem>
     class WithWeightedItems : public T {
 
     private:
@@ -26,7 +26,7 @@ namespace Belle2 {
       typedef T Super;
 
       /// Type of this class
-      typedef WithWeightedItems<T, Item> This;
+      typedef WithWeightedItems<T, AItem> This;
 
     public:
       /// Make the constructor of the base type available
@@ -42,32 +42,32 @@ namespace Belle2 {
       Weight getWeight() const
       {
         return std::accumulate(m_items.begin(), m_items.end(), static_cast<Weight>(0.0),
-        [](Weight accumulatedWeight, const WithWeight<Item>& weightedItem) {
+        [](Weight accumulatedWeight, const WithWeight<AItem>& weightedItem) {
           return accumulatedWeight + weightedItem.getWeight();
         });
       }
 
       /// Erase items from this node that satisfy the predicate.
-      template<class Predicate>
-      void eraseIf(Predicate& predicate)
+      template<class APredicate>
+      void eraseIf(APredicate& predicate)
       {
         auto itFirstToRemove = std::remove_if(m_items.begin(), m_items.end(), predicate);
         m_items.erase(itFirstToRemove, m_items.end());
       }
 
       /// Add an item with weight.
-      void insert(const Item& item, Weight weight = 1.0)
+      void insert(const AItem& item, Weight weight = 1.0)
       {
-        m_items.push_back(WithWeight<Item>(item));
+        m_items.push_back(WithWeight<AItem>(item));
         m_items.back().setWeight(weight);
       }
 
       /// Add the items from another item range assigning a weight from the predicate.
-      template<class Measure>
+      template<class AMeasure>
       void insert(const This& items,
-                  Measure& measure)
+                  AMeasure& measure)
       {
-        for (Item item : items) {
+        for (AItem item : items) {
           const Weight weight = measure(item);
           if (not std::isnan(weight)) {
             insert(item, weight);
@@ -76,22 +76,22 @@ namespace Belle2 {
       }
 
       /// Begin iterator of the contained items.
-      typename std::vector< WithWeight<Item> >::iterator
+      typename std::vector< WithWeight<AItem> >::iterator
       begin()
       { return m_items.begin(); }
 
       /// Begin iterator of the contained items.
-      typename std::vector< WithWeight<Item> >::const_iterator
+      typename std::vector< WithWeight<AItem> >::const_iterator
       begin() const
       { return m_items.begin(); }
 
       /// End iterator of the contained items.
-      typename std::vector< WithWeight<Item> >::iterator
+      typename std::vector< WithWeight<AItem> >::iterator
       end()
       { return m_items.end(); }
 
       /// End iterator of the contained items.
-      typename std::vector< WithWeight<Item> >::const_iterator
+      typename std::vector< WithWeight<AItem> >::const_iterator
       end() const
       { return m_items.end(); }
 
@@ -110,7 +110,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the weighted items.
-      std::vector< WithWeight<Item> > m_items;
+      std::vector< WithWeight<AItem> > m_items;
     };
   }
 }

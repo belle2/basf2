@@ -16,9 +16,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A simple hough tree taking segments as smallest units.
-    template<class InBox, size_t ... divisions>
+    template<class AInBox, size_t ... divisions>
     using SimpleSegmentHoughTree =
-      SimpleHitBasedHoughTree<const CDCRecoSegment2D*, InBox, divisions ... >;
+      SimpleHitBasedHoughTree<const CDCRecoSegment2D*, AInBox, divisions ... >;
 
   }
 }

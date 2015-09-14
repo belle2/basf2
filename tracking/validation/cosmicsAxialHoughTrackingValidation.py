@@ -28,11 +28,13 @@ class CosmicsAxialHough(TrackingValidationRun):
     generator_module = 'Cosmics'
     components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
 
+    wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
+
     segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton')
     segment_finder_module.param("SegmentOrientation", "downwards")
 
     axial_hough_module = basf2.register_module('TrackFinderCDCAxialSegmentHough')
-    finder_module = [segment_finder_module, axial_hough_module, ]
+    finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, ]
 
     del segment_finder_module  # do not let the names show up in the class name space
     del axial_hough_module  # do not let the names show up in the class name space

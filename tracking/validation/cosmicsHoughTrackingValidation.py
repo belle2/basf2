@@ -28,6 +28,8 @@ class CosmicsHough(TrackingValidationRun):
     generator_module = 'Cosmics'
     components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
 
+    wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
+
     segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton')
     segment_finder_module.param("SegmentOrientation", "downwards")
 
@@ -36,8 +38,7 @@ class CosmicsHough(TrackingValidationRun):
                                   TracksStoreObjName="AxialCDCTracks"))
 
     cdc_stereo_combiner_module = basf2.register_module('StereoHitFinderCDCLegendreHistogramming')
-    cdc_stereo_combiner_module.param(dict(SkipHitsPreparation=True,
-                                          TracksStoreObjNameIsInput=True,
+    cdc_stereo_combiner_module.param(dict(TracksStoreObjNameIsInput=True,
                                           WriteGFTrackCands=True,
                                           TracksStoreObjName="AxialCDCTracks",
                                           debugOutput=True,
@@ -45,13 +46,13 @@ class CosmicsHough(TrackingValidationRun):
                                           minimumHitsInQuadtree=20,
                                           useOldImplementation=False))
 
-    finder_module = [segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
+    finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
 
     del segment_finder_module  # do not let the names show up in the class name space
     del axial_hough_module  # do not let the names show up in the class name space
     del cdc_stereo_combiner_module  # do not let the names show up in the class name space
 
-    interactive_display = True
+    interactive_display = False
     if interactive_display:
         cdc_display_module = cdcdisplay.CDCSVGDisplayModule(os.getcwd(), interactive=True)
 

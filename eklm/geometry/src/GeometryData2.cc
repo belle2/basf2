@@ -453,6 +453,11 @@ EKLM::GeometryData2::getStripPosition(int strip) const
   return &m_StripPosition[strip - 1];
 }
 
+double EKLM::GeometryData2::getStripLength(int strip) const
+{
+  return m_StripPosition[strip - 1].length;
+}
+
 const EKLM::StripGeometry* EKLM::GeometryData2::getStripGeometry() const
 {
   return &m_StripGeometry;

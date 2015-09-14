@@ -408,6 +408,12 @@ namespace Belle2 {
       const struct ElementPosition* getStripPosition(int strip) const;
 
       /**
+       * Get strip length.
+       * @param[in] strip Strip number.
+       */
+      double getStripLength(int strip) const;
+
+      /**
        * Get strip geometry data.
        */
       const struct StripGeometry* getStripGeometry() const;

@@ -47,11 +47,9 @@ void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
   digPar->timeResolution = dig.getDouble("TimeResolution");
 }
 
-EKLM::Digitizer::Digitizer(EKLM::GeometryData* geoDat,
-                           struct EKLM::DigitizationParams* digPar) :
+EKLM::Digitizer::Digitizer(struct EKLM::DigitizationParams* digPar) :
   m_fitter(digPar->nDigitizations)
 {
-  m_geoDat = geoDat;
   m_digPar = digPar;
 }
 
@@ -213,7 +211,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
     ub = m_HitStripMap.upper_bound(it->first);
     // create fes entry
     try {
-      fes = new FiberAndElectronics(it, ub, m_geoDat, m_digPar, &m_fitter);
+      fes = new FiberAndElectronics(it, ub, m_digPar, &m_fitter);
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }

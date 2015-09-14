@@ -39,8 +39,6 @@ void EKLMDigitizerModule::initialize()
 {
   StoreArray<EKLMSim2Hit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
-  m_geoDat.read();
-  EKLM::transformsToGlobal(&m_geoDat.transf);
   EKLM::setDefDigitizationParams(&m_digPar);
 }
 
@@ -50,7 +48,7 @@ void EKLMDigitizerModule::beginRun()
 
 void EKLMDigitizerModule::event()
 {
-  EKLM::Digitizer digi(&m_geoDat, &m_digPar);
+  EKLM::Digitizer digi(&m_digPar);
   digi.readAndSortSimHits();
   digi.makeSimHits();
   digi.readAndSortSim2Hits();

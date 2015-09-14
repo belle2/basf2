@@ -14,6 +14,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
+#include <eklm/geometry/GeometryData2.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/GearDir.h>
@@ -27,12 +28,10 @@ static const char MemErr[] = "Memory allocation error.";
 EKLM::FiberAndElectronics::FiberAndElectronics(
   std::multimap<int, EKLMSim2Hit*>::iterator& it,
   std::multimap<int, EKLMSim2Hit*>::iterator& end,
-  EKLM::GeometryData* geoDat,
   struct EKLM::DigitizationParams* digPar,
   FPGAFitter* fitter)
 {
   m_digPar = digPar;
-  m_geoDat = geoDat;
   m_fitter = fitter;
   m_hit = it;
   m_hitEnd = end;
@@ -78,7 +77,8 @@ void EKLM::FiberAndElectronics::processEntry()
     /* Poisson mean for number of photoelectrons. */
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */
-    l = m_geoDat->getStripLength(hit->getStrip());
+    l = GeometryData2::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
+        Unit::mm;
     d = 0.5 * l - hit->getLocalPosition().x();
     t = hit->getTime() + d / m_digPar->fiberLightSpeed;
     if (m_MCTime < 0)

@@ -22,7 +22,6 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -127,8 +126,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Digitizer(EKLM::GeometryData* geoDat,
-                struct EKLM::DigitizationParams* digPar);
+      Digitizer(struct EKLM::DigitizationParams* digPar);
 
       /**
        * Destructor.
@@ -156,9 +154,6 @@ namespace Belle2 {
       void mergeSimHitsToStripHits(double);
 
     private:
-
-      /** Geometry data. */
-      EKLM::GeometryData* m_geoDat;
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;

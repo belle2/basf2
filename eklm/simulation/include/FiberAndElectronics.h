@@ -14,7 +14,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FPGAFitter.h>
 
@@ -51,7 +50,6 @@ namespace Belle2 {
        */
       FiberAndElectronics(std::multimap<int, EKLMSim2Hit*>::iterator& it,
                           std::multimap<int, EKLMSim2Hit*>::iterator& end,
-                          EKLM::GeometryData* geoDat,
                           struct EKLM::DigitizationParams* digPar,
                           FPGAFitter* fitter);
 
@@ -87,9 +85,6 @@ namespace Belle2 {
       int getGeneratedNPE();
 
     private:
-
-      /** Geometry data. */
-      EKLM::GeometryData* m_geoDat;
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;

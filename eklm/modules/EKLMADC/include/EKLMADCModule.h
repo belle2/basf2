@@ -15,7 +15,6 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/Module.h>
 
@@ -87,9 +86,6 @@ namespace Belle2 {
 
     /** Digitization parameters. */
     struct EKLM::DigitizationParams m_digPar;
-
-    /** Geometry data. */
-    EKLM::GeometryData m_geoDat;
 
     /** Direct histogram. */
     float* m_hDir;

@@ -13,7 +13,6 @@
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
 
 namespace Belle2 {
@@ -66,9 +65,6 @@ namespace Belle2 {
 
     /** Strip hits with npe lower this value will be marked as bad. */
     double m_discriminatorThreshold;
-
-    /** Transformation data. */
-    EKLM::GeometryData m_geoDat;
 
     /** Digitization parameters. */
     struct EKLM::DigitizationParams m_digPar;

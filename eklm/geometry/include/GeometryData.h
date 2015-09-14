@@ -26,6 +26,7 @@ namespace Belle2 {
 
     /**
      * Geometry data class.
+     * All data and function results are in CLHEP units.
      */
     class GeometryData {
 
@@ -45,13 +46,6 @@ namespace Belle2 {
        * Read geometry data.
        */
       void read();
-
-      /**
-       * Get strip length.
-       * @param[in] strip Number of strip (numbers start from 1).
-       * @return Strip length (cm).
-       */
-      double getStripLength(int strip);
 
       /**
        * Get number of strips with different lengths.
@@ -96,9 +90,6 @@ namespace Belle2 {
       struct TransformData transf;
 
     private:
-
-      /** Strip lengths. */
-      double* m_StripLen;
 
       /** Number of strips in one plane. */
       int m_nStrip;

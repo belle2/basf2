@@ -21,6 +21,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHit2d.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationModule.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/RelationArray.h>
@@ -110,7 +111,9 @@ void EKLMTimeCalibrationModule::Prepare()
   t->Branch("n", &m_nStripDifferent, "n/I");
   len = new float[m_nStripDifferent];
   for (i = 0; i < m_nStripDifferent; i++)
-    len[i] = m_geoDat.getStripLength(m_geoDat.getStripPositionIndex(i) + 1);
+    len[i] = EKLM::GeometryData2::Instance().
+             getStripLength(m_geoDat.getStripPositionIndex(i) + 1) /
+             CLHEP::mm * Unit::mm;
   t->Branch("len", &len, "len[n]/F");
   t->Fill();
   m_outputFile->cd();
@@ -188,7 +191,8 @@ void EKLMTimeCalibrationModule::CollectData()
       hitTime = 0.5 * (entryHit[j]->getTOF() + exitHit[j]->getTOF());
       hitPosition = 0.5 * (entryHit[j]->getPosition() +
                            exitHit[j]->getPosition());
-      l = m_geoDat.getStripLength(digits[j]->getStrip());
+      l = EKLM::GeometryData2::Instance().getStripLength(digits[j]->getStrip())
+          / CLHEP::mm * Unit::mm;
       hitGlobal.setX(hitPosition.X() / Unit::mm * CLHEP::mm);
       hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
       hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);

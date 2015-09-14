@@ -31,7 +31,6 @@ EKLM::GeometryData::GeometryData()
 {
   m_nStrip = -1;
   m_nStripDifferent = -1;
-  m_StripLen = NULL;
   m_StripLenToAll = NULL;
   m_StripAllToLen = NULL;
   m_MinZForward = 0;
@@ -40,8 +39,6 @@ EKLM::GeometryData::GeometryData()
 
 EKLM::GeometryData::~GeometryData()
 {
-  if (m_StripLen != NULL)
-    free(m_StripLen);
   if (m_StripLenToAll != NULL)
     free(m_StripLenToAll);
   if (m_StripAllToLen != NULL)
@@ -54,6 +51,7 @@ void EKLM::GeometryData::read()
   int i, iEndcap, iLayer, iSector, iPlane, iSegment, segment;
   char str[32];
   double l, solenoidZ, endcapZ, endcapLength;
+  double* stripLen;
   std::vector<double> strips;
   std::vector<double>::iterator it;
   std::map<double, int> mapLengthStrip;
@@ -95,16 +93,16 @@ void EKLM::GeometryData::read()
   GearDir gd2("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
               "Layer/Sector/Plane/Strips");
   m_nStrip = gd2.getNumberNodes("Strip");
-  m_StripLen = (double*)malloc(m_nStrip * sizeof(double));
-  if (m_StripLen == NULL)
+  stripLen = (double*)malloc(m_nStrip * sizeof(double));
+  if (stripLen == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < m_nStrip; i++) {
     GearDir gds(gd2);
     snprintf(str, 32, "/Strip[%d]", i + 1);
     gds.append(str);
-    m_StripLen[i] = gds.getLength("Length");
-    strips.push_back(m_StripLen[i]);
-    mapLengthStrip.insert(std::pair<double, int>(m_StripLen[i], i));
+    stripLen[i] = gds.getLength("Length");
+    strips.push_back(stripLen[i]);
+    mapLengthStrip.insert(std::pair<double, int>(stripLen[i], i));
   }
   sort(strips.begin(), strips.end(), compareLength);
   l = strips[0];
@@ -140,16 +138,12 @@ void EKLM::GeometryData::read()
   if (m_StripAllToLen == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < m_nStrip; i++) {
-    itm = mapLengthStrip2.find(m_StripLen[i]);
+    itm = mapLengthStrip2.find(stripLen[i]);
     if (itm == mapLengthStrip2.end())
       B2FATAL(err);
     m_StripAllToLen[i] = itm->second;
   }
-}
-
-double EKLM::GeometryData::getStripLength(int strip)
-{
-  return m_StripLen[strip - 1];
+  free(stripLen);
 }
 
 int EKLM::GeometryData::getStripLengthIndex(int positionIndex)
@@ -182,14 +176,15 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   if (hit1->getPlane() == hit2->getPlane())
     return false;
   /* Coordinates of strip 1 ends. */
-  double l1 = getStripLength(hit1->getStrip()) / Unit::mm * CLHEP::mm;
+  const GeometryData2& geoDat = GeometryData2::Instance();
+  double l1 = geoDat.getStripLength(hit1->getStrip());
   HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
   HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);
   HepGeom::Transform3D* tr1 = getStripLocalToGlobal(&transf, hit1);
   HepGeom::Point3D<double> s1_1g = (*tr1) * s1_1;
   HepGeom::Point3D<double> s1_2g = (*tr1) * s1_2;
   /* Coordinates of strip 2 ends. */
-  double l2 = getStripLength(hit2->getStrip()) / Unit::mm * CLHEP::mm;
+  double l2 = geoDat.getStripLength(hit2->getStrip());
   HepGeom::Point3D<double> s2_1(-0.5 * l2, 0.0, 0.0);
   HepGeom::Point3D<double> s2_2(0.5 * l2, 0.0, 0.0);
   HepGeom::Transform3D* tr2 = getStripLocalToGlobal(&transf, hit2);

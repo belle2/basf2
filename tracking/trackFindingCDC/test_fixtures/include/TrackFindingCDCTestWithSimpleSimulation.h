@@ -198,10 +198,10 @@ namespace Belle2 {
       }
 
       /// Forwarding draw class to the plotter instance
-      template <typename ... Arg>
-      void draw(Arg&& ... arg)
+      template<class... Ts>
+      void draw(Ts&& ... args)
       {
-        m_plotter.draw(std::forward<Arg>(arg) ...);
+        m_plotter.draw(std::forward<Ts>(args) ...);
       }
 
       /// Clean up after test

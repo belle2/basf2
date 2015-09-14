@@ -39,7 +39,7 @@ TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
 }
 
-template <typename T>
+template<class T>
 class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {};
 
 typedef ::testing::Types <

@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Base MC Filter
-    template <class TruthVarSet>
+    template<class TruthVarSet>
     class MCFilter : public FilterOnVarSet<TruthVarSet> {
 
     public:

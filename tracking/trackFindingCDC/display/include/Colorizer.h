@@ -23,7 +23,7 @@ namespace Belle2 {
      * the mapping from the colormapping-method name given as a string to the actual ColorMap class.
      * It needs to now the type of the Object to be drawn and the base ColorMap class for this Object (defaults to CDCHitColorMap).
      */
-    template <class Object, class ColorMap = CDCHitColorMap>
+    template<class Object, class ColorMap = CDCHitColorMap>
     class Colorizer {
       typedef std::unique_ptr<ColorMap>(Colorizer::*MethodPtr)();
     public:
@@ -152,7 +152,7 @@ namespace Belle2 {
     /**
      * Class template for coloring objects with colors defined manually with a string.
      */
-    template <class Object>
+    template<class Object>
     class InputValueColorizer : public Colorizer<Object, ReturnInputValue<Object>> {
     public:
       /**

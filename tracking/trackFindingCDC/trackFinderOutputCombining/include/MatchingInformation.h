@@ -27,7 +27,7 @@ namespace Belle2 {
      * It has capabilities of storing the matches together
      * with the probability of a match.
      */
-    template <class OwnType, class MatchingType>
+    template<class OwnType, class MatchingType>
     class MatchingInformation {
     public:
       /** Vector of pairs: object, probability of match */

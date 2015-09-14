@@ -6,7 +6,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template <class T>
+    template<class T>
     class StoreWrappedObjPtr;
 
     /**
@@ -194,7 +194,7 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
-      template <class Colorizer, class Object>
+      template<class Colorizer, class Object>
       void drawStoreArray(const StoreArray<Object>& storeArray, const std::string& storeArrayName, const std::string& stroke = "",
                           const std::string& strokeWidth = "");
 
@@ -205,7 +205,7 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
-      template <class Colorizer, class Item>
+      template<class Colorizer, class Item>
       void drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>& storeVector, const std::string& storeObjName,
                            const std::string& stroke = "",
                            const std::string& strokeWidth = "");

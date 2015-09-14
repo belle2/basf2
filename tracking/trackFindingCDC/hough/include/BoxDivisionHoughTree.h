@@ -59,7 +59,7 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      template<class ... RangeSpecOverlap>
+      template<class...  RangeSpecOverlap>
       BoxDivisionHoughTree(size_t maxLevel) :
         m_maxLevel(maxLevel),
         m_overlaps((divisions * 0) ...)

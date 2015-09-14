@@ -494,7 +494,7 @@ const std::string CDCSVGPlotter::saveSVGFile(const std::string& svgFileName)
   return (m_eventdataPlotter.save(svgFileName));
 }
 
-template <class AColorizer, class Object>
+template<class AColorizer, class Object>
 void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
@@ -526,7 +526,7 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const s
   }
 }
 
-template <class AColorizer, class Item>
+template<class AColorizer, class Item>
 void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>& storeVector, const std::string& storeObjName,
                                     const std::string& stroke,
                                     const std::string& strokeWidth)

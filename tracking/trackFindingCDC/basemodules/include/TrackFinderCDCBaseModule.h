@@ -66,7 +66,7 @@ namespace Belle2 {
      * @param name The unique name of the parameter.
      * @return True if the parameter is present, false otherwise
      */
-    template<typename T>
+    template<class T>
     bool hasParam(const std::string& name) const;
 
     /**
@@ -77,14 +77,14 @@ namespace Belle2 {
      * @param name The unique name of the parameter.
      * @return The current value of the parameter.
      */
-    template<typename T>
+    template<class T>
     const T& getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
                                                                 ModuleParamList::ModuleParameterTypeError);
 
     /**
        Same as in base Module class but public
     */
-    template<typename T>
+    template<class T>
     void addParam(const std::string& name,
                   T& paramVariable,
                   const std::string& description,
@@ -114,7 +114,7 @@ namespace Belle2 {
   }; // end class
 
 
-  template<typename T>
+  template<class T>
   bool TrackFinderCDCBaseModule::hasParam(const std::string& name) const
   {
     try {
@@ -125,7 +125,7 @@ namespace Belle2 {
     return true;
   }
 
-  template<typename T>
+  template<class T>
   const T& TrackFinderCDCBaseModule::getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
       ModuleParamList::ModuleParameterTypeError)
   {

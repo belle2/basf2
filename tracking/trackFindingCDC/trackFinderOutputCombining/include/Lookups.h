@@ -22,7 +22,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /** Abstract base class for a list of objects which could be filled (more or less a vector) */
-    template <class ItemType, class ListType>
+    template<class ItemType, class ListType>
     class LookUpBase {
     public:
       /** Should be overloaded. Fill the vector with the given elements */

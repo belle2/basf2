@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template <class Type>
+    template<class Type>
     class AllFilter : public Type {
     public:
       /** Accept all segment track combinations */

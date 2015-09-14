@@ -17,7 +17,7 @@ namespace Belle2 {
      *  Note this part this code defines the performance of
      *  the search in the hough plain quite significantly and there is probably room for improvement.
      */
-    template <class AHitInBoxAlgorithm>
+    template<class AHitInBoxAlgorithm>
     class RangeInBox {
     public:
       /// The type of the underlaying HoughBox (copied from the udnerlaying hit algorithm)
@@ -27,7 +27,7 @@ namespace Belle2 {
       *  HitInBox algorithm passed as a template argument. If there is a certain amount of items of the range
       *  in the box, it returns the number of items as a weight, otherwise it returns NAN;
       */
-      template <class ARangeObject>
+      template<class ARangeObject>
       inline Weight operator()(const ARangeObject& rangeObject,
                                const HoughBox* box)
       {

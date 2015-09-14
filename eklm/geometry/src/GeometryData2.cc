@@ -20,7 +20,7 @@ using namespace Belle2;
 
 static const char c_MemErr[] = "Memory allocation error.";
 static const char c_ModeErr[] =
-  "Requested data are defined only for EKLM_DETECTOR_BACKGROUND mode.";
+  "Requested data are defined only for c_DetectorBackground mode.";
 static const char c_PlaneErr[] = "Number of plane must be from 1 to 2.";
 static const char c_SegmentErr[] = "Number of segment must be from 1 to 5.";
 static const char c_SupportErr[] =
@@ -160,7 +160,7 @@ EKLM::GeometryData2::GeometryData2()
   int i;
   int j;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
+  m_mode = (enum DetectorMode)gd.getInt("Mode");
   if (m_mode < 0 || m_mode > 2)
     B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
   m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
@@ -195,7 +195,7 @@ EKLM::GeometryData2::GeometryData2()
   m_nPlane = Sector.getInt("nPlane");
   if (m_nPlane < 1 || m_nPlane > 2)
     B2FATAL("Number of strip planes must be from 1 to 2.");
-  if (m_mode == EKLM_DETECTOR_BACKGROUND) {
+  if (m_mode == c_DetectorBackground) {
     m_nBoard = Sector.getInt("m_nBoard");
     if (m_nBoard < 1 || m_nBoard > 5)
       B2FATAL("Number of readout boards must be from 1 to 5.");
@@ -297,14 +297,14 @@ EKLM::GeometryData2::~GeometryData2()
   int i;
   for (i = 0; i < m_nPlane; i++)
     free(m_SegmentSupportPosition[i]);
-  if (m_mode == EKLM_DETECTOR_BACKGROUND) {
+  if (m_mode == c_DetectorBackground) {
     for (i = 0; i < m_nPlane; i++)
       free(m_BoardPosition[i]);
     free(m_StripBoardPosition);
   }
 }
 
-EKLM::EKLMDetectorMode EKLM::GeometryData2::getDetectorMode() const
+EKLM::DetectorMode EKLM::GeometryData2::getDetectorMode() const
 {
   return m_mode;
 }
@@ -330,14 +330,14 @@ int EKLM::GeometryData2::getNPlanes() const
 
 int EKLM::GeometryData2::getNBoards() const
 {
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+  if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return m_nBoard;
 }
 
 int EKLM::GeometryData2::getNStripBoards() const
 {
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+  if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return m_nStripBoard;
 }
@@ -391,7 +391,7 @@ EKLM::GeometryData2::getSectorSupportGeometry() const
 
 const EKLM::BoardGeometry* EKLM::GeometryData2::getBoardGeometry() const
 {
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+  if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return &m_BoardGeometry;
 }
@@ -399,7 +399,7 @@ const EKLM::BoardGeometry* EKLM::GeometryData2::getBoardGeometry() const
 const EKLM::BoardPosition*
 EKLM::GeometryData2::getBoardPosition(int plane, int segment) const
 {
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+  if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   if (plane <= 0 || plane > 2)
     B2FATAL(c_PlaneErr);
@@ -411,7 +411,7 @@ EKLM::GeometryData2::getBoardPosition(int plane, int segment) const
 const EKLM::StripBoardPosition*
 EKLM::GeometryData2::getStripBoardPosition(int board) const
 {
-  if (m_mode != EKLM_DETECTOR_BACKGROUND)
+  if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   if (board <= 0 || board > 15)
     B2FATAL(c_BoardErr);

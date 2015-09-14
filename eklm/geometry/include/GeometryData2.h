@@ -286,7 +286,7 @@ namespace Belle2 {
       /**
        * Get EKLM detector mode.
        */
-      EKLMDetectorMode getDetectorMode() const;
+      DetectorMode getDetectorMode() const;
 
       /**
        * Get number of layers.
@@ -563,7 +563,7 @@ namespace Belle2 {
       struct StripGeometry m_StripGeometry;
 
       /** Detector mode. */
-      enum EKLMDetectorMode m_mode;
+      enum DetectorMode m_mode;
 
     };
 

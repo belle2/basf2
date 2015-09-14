@@ -34,7 +34,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type);
+      EKLMSensitiveDetector(G4String name, enum SensitiveType type);
 
       /**
        * Destructor.
@@ -63,12 +63,12 @@ namespace Belle2 {
       /**
        * Sensitive detector type.
        */
-      enum EKLMSensitiveType m_type;
+      enum SensitiveType m_type;
 
       /**
        * Sensitive detector operation mode.
        */
-      enum EKLM::EKLMDetectorMode m_mode;
+      enum EKLM::DetectorMode m_mode;
 
     };
 

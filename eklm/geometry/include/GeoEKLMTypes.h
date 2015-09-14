@@ -21,26 +21,26 @@ namespace Belle2 {
   namespace EKLM {
 
     /** Type of sensitive detector corresponding to this volume. */
-    enum EKLMSensitiveType {
+    enum SensitiveType {
       /** Strip. */
-      EKLM_SENSITIVE_STRIP = 0,
+      c_SensitiveStrip = 0,
       /** SiPM. */
-      EKLM_SENSITIVE_SIPM = 1,
+      c_SensitiveSiPM = 1,
       /** Readout boards. */
-      EKLM_SENSITIVE_BOARD = 2,
+      c_SensitiveBoard = 2,
     };
 
     /** Mode of detector operation. */
-    enum EKLMDetectorMode {
+    enum DetectorMode {
       /** Normal mode. */
-      EKLM_DETECTOR_NORMAL = 0,
+      c_DetectorNormal = 0,
       /** Background study. */
-      EKLM_DETECTOR_BACKGROUND = 1,
+      c_DetectorBackground = 1,
       /**
        * Debug mode.
        * When constructing geometry, print masses of all volumes and exit.
        */
-      EKLM_DETECTOR_PRINTMASSES = 2,
+      c_DetectorPrintMasses = 2,
     };
 
   }

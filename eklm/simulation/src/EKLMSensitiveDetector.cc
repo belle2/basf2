@@ -22,12 +22,12 @@
 using namespace Belle2;
 
 EKLM::EKLMSensitiveDetector::
-EKLMSensitiveDetector(G4String name, enum EKLMSensitiveType type)
+EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  m_mode = (enum EKLMDetectorMode)gd.getInt("Mode");
+  m_mode = (enum DetectorMode)gd.getInt("Mode");
   gd.append("/SensitiveDetector");
   m_ThresholdEnergyDeposit =
     Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
@@ -62,7 +62,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
    * Background studies m_mode=1 accepts all tracks
    */
-  if (eDep <= m_ThresholdEnergyDeposit && m_mode == EKLM_DETECTOR_NORMAL)
+  if (eDep <= m_ThresholdEnergyDeposit && m_mode == c_DetectorNormal)
     return false;
 
   /**
@@ -109,7 +109,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setTime(hitTime);
   /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {
-    case EKLM_SENSITIVE_STRIP:
+    case c_SensitiveStrip:
       hit->setStrip(hist->GetVolume(2)->GetCopyNo());
       hit->setPlane(hist->GetVolume(3)->GetCopyNo());
       hit->setSector(hist->GetVolume(4)->GetCopyNo());
@@ -119,7 +119,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                                    hit->getSector(), hit->getPlane(),
                                    hit->getStrip()));
       break;
-    case EKLM_SENSITIVE_SIPM:
+    case c_SensitiveSiPM:
       hit->setStrip(hist->GetVolume(1)->GetCopyNo());
       hit->setPlane(hist->GetVolume(2)->GetCopyNo());
       hit->setSector(hist->GetVolume(3)->GetCopyNo());
@@ -129,7 +129,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
                                    hit->getSector(), hit->getPlane(),
                                    hit->getStrip()) + 100000);
       break;
-    case EKLM_SENSITIVE_BOARD:
+    case c_SensitiveBoard:
       int brd = hist->GetVolume(1)->GetCopyNo() - 1;
       hit->setStrip((brd - 1) % 5 + 1); /* Board number, not strip. */
       hit->setPlane((brd - 1) / 5 + 1);

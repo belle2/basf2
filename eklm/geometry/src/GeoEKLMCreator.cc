@@ -67,7 +67,7 @@ EKLM::GeoEKLMCreator::~GeoEKLMCreator()
   free(ESTRPar.rmax);
   if (haveGeo) {
     delete m_sensitive[0];
-    if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND) {
+    if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
       delete m_sensitive[1];
       delete m_sensitive[2];
       for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
@@ -687,7 +687,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   const struct ElementPosition* planePos = m_geoDat2->getPlanePosition();
   const struct BoardGeometry* boardGeometry;
   /* If there are no boards, it is not necessary to subtract their solids. */
-  if (m_geoDat2->getDetectorMode() != EKLM_DETECTOR_BACKGROUND)
+  if (m_geoDat2->getDetectorMode() != c_DetectorBackground)
     return plane;
   boardGeometry = m_geoDat2->getBoardGeometry();
   /* Subtraction. */
@@ -963,7 +963,7 @@ void EKLM::GeoEKLMCreator::createSolids()
   createSectorSupportCorner3Solid();
   createSectorSupportCorner4Solid();
   /* Plane. */
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND)
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
     calcBoardTransform();
   for (i = 0; i < m_geoDat2->getNPlanes(); i++)
     createPlaneSolid(i);
@@ -1027,7 +1027,7 @@ void EKLM::GeoEKLMCreator::createSolids()
   for (i = 0; i < m_geoDat2->getNSegments(); i++)
     createPlasticSheetSolid(i);
   /* For background mode. */
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND) {
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
     boardGeometry = m_geoDat2->getBoardGeometry();
     /* Readout board. */
     try {
@@ -1145,7 +1145,7 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
     for (curvol.plane = 1; curvol.plane <= m_geoDat2->getNPlanes();
          curvol.plane++)
       createPlane(logicSector);
-    if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND)
+    if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
       for (curvol.plane = 1; curvol.plane <= m_geoDat2->getNPlanes();
            curvol.plane++)
         for (curvol.board = 1; curvol.board <= m_geoDat2->getNBoards();
@@ -1673,7 +1673,7 @@ void EKLM::GeoEKLMCreator::createStripPhysicalVolumes(int iStrip)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND)
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
     createSiPM(logvol.stripvol[iStrip]);
 }
 
@@ -1722,7 +1722,7 @@ void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv)
 {
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_PRINTMASSES)
+  if (m_geoDat2->getDetectorMode() == c_DetectorPrintMasses)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
            lv->GetMass() / CLHEP::g);
 }
@@ -1736,22 +1736,22 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   try {
     m_sensitive[0] =
       new EKLMSensitiveDetector("EKLMSensitiveStrip",
-                                EKLM_SENSITIVE_STRIP);
+                                c_SensitiveStrip);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_BACKGROUND) {
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
     try {
       m_sensitive[1] =
         new EKLMSensitiveDetector("EKLMSensitiveSiPM",
-                                  EKLM_SENSITIVE_SIPM);
+                                  c_SensitiveSiPM);
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
     try {
       m_sensitive[2] =
         new EKLMSensitiveDetector("EKLMSensitiveBoard",
-                                  EKLM_SENSITIVE_BOARD);
+                                  c_SensitiveBoard);
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
@@ -1761,8 +1761,8 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   createSolids();
   for (curvol.endcap = 1; curvol.endcap <= 2; curvol.endcap++)
     createEndcap(&topVolume);
-  if (m_geoDat2->getDetectorMode() == EKLM_DETECTOR_PRINTMASSES) {
-    printf("EKLM started in mode EKLM_DETECTOR_PRINTMASSES. Exiting now.\n");
+  if (m_geoDat2->getDetectorMode() == c_DetectorPrintMasses) {
+    printf("EKLM started in mode c_DetectorPrintMasses. Exiting now.\n");
     exit(0);
   }
   haveGeo = true;

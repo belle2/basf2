@@ -20,12 +20,12 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 void
-CDCMCHitCollectionLookUp<CDCHitCollection>
+CDCMCHitCollectionLookUp<ACDCHitCollection>
 ::clear()
 {
-  B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<CDCHitCollection>");
+  B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
   m_mcTrackIds.clear();
   B2DEBUG(100, "m_mcTrackIds.size(): " <<  m_mcTrackIds.size());
 }
@@ -33,22 +33,22 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 const float
-CDCMCHitCollectionLookUp<CDCHitCollection>
+CDCMCHitCollectionLookUp<ACDCHitCollection>
 ::s_minimalMatchPurity = 0.5;
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 ITrackType
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::getMCTrackId(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::getMCTrackId(const ACDCHitCollection* ptrHits) const
 {
 
   if (not ptrHits) return INVALID_ITRACK;
 
-  const CDCHitCollection& hits = *ptrHits;
+  const ACDCHitCollection& hits = *ptrHits;
   auto itFound = m_mcTrackIds.find(ptrHits);
 
   if (itFound == m_mcTrackIds.end()) {
@@ -67,10 +67,10 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 }
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 const MCParticle*
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::getMCParticle(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::getMCParticle(const ACDCHitCollection* ptrHits) const
 {
   const CDCHit* ptrHit = getFirstHit(ptrHits);
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
@@ -78,13 +78,13 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 }
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 const CDCHit*
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::getFirstHit(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::getFirstHit(const ACDCHitCollection* ptrHits) const
 {
   if (not ptrHits) return nullptr;
-  const CDCHitCollection& hits = *ptrHits;
+  const ACDCHitCollection& hits = *ptrHits;
 
   ITrackType mcTrackId = getMCTrackId(ptrHits);
   if (mcTrackId == INVALID_ITRACK) return nullptr;
@@ -101,14 +101,14 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 const CDCHit*
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::getLastHit(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::getLastHit(const ACDCHitCollection* ptrHits) const
 {
 
   if (not ptrHits) return nullptr;
-  const CDCHitCollection& hits = *ptrHits;
+  const ACDCHitCollection& hits = *ptrHits;
 
   ITrackType mcTrackId = getMCTrackId(ptrHits);
   if (mcTrackId == INVALID_ITRACK) return nullptr;
@@ -125,10 +125,10 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 EForwardBackward
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::isForwardOrBackwardToMCTrack(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const
 {
   Index firstInTrackId = getFirstInTrackId(ptrHits);
   Index lastInTrackId = getLastInTrackId(ptrHits);
@@ -142,11 +142,11 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 EForwardBackward
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::areAlignedInMCTrack(const CDCHitCollection* ptrStartSegment2D,
-                      const CDCHitCollection* ptrEndSegment2D) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::areAlignedInMCTrack(const ACDCHitCollection* ptrStartSegment2D,
+                      const ACDCHitCollection* ptrEndSegment2D) const
 {
 
   // Check if the segments are sensable on their own
@@ -209,10 +209,10 @@ CDCMCHitCollectionLookUp<CDCHitCollection>
 
 
 
-template<class CDCHitCollection>
+template<class ACDCHitCollection>
 CDCTrajectory3D
-CDCMCHitCollectionLookUp<CDCHitCollection>
-::getTrajectory3D(const CDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>
+::getTrajectory3D(const ACDCHitCollection* ptrHits) const
 {
   CDCTrajectory3D trajectory3D;
 

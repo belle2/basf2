@@ -22,7 +22,7 @@ namespace Belle2 {
     class CDCTrajectory3D;
 
     /// Interface class to the Monte Carlo information for collections of hits
-    template<class CDCHitCollection>
+    template<class ACDCHitCollection>
     class CDCMCHitCollectionLookUp  {
 
     public:
@@ -53,7 +53,7 @@ namespace Belle2 {
 
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
-      std::map<ITrackType, size_t> getHitCountByMCTrackId(const CDCHitCollection& hits) const
+      std::map<ITrackType, size_t> getHitCountByMCTrackId(const ACDCHitCollection& hits) const
       {
         const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
@@ -67,7 +67,7 @@ namespace Belle2 {
       }
 
       /// Get the track id with the highest corresponding purity.
-      MCTrackIdPurityPair getHighestPurity(const CDCHitCollection& hits) const
+      MCTrackIdPurityPair getHighestPurity(const ACDCHitCollection& hits) const
       {
         std::map<ITrackType, size_t> hitCountByMCTrackId = getHitCountByMCTrackId(hits);
 
@@ -94,46 +94,46 @@ namespace Belle2 {
        *  The match is valid if the highest purity exceeds the s_minimalMatchPurity threshold.
        *  In case the highest purity is to low to result will be INVALID_ITRACK. To result is stored
        *  in member map object for fast look up for repeated calls.*/
-      ITrackType getMCTrackId(const CDCHitCollection* ptrHits) const;
+      ITrackType getMCTrackId(const ACDCHitCollection* ptrHits) const;
 
       /// Getter for the mc particle matched to this collection of hits
-      const MCParticle* getMCParticle(const CDCHitCollection* ptrHits) const;
+      const MCParticle* getMCParticle(const ACDCHitCollection* ptrHits) const;
 
 
       /// Getter for the first hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      const CDCHit* getFirstHit(const CDCHitCollection* ptrHits) const;
+      const CDCHit* getFirstHit(const ACDCHitCollection* ptrHits) const;
 
       /// Getter for the last hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      const CDCHit* getLastHit(const CDCHitCollection* ptrHits) const;
+      const CDCHit* getLastHit(const ACDCHitCollection* ptrHits) const;
 
 
 
       /// Getter for in track id for the first hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstInTrackId(const CDCHitCollection* ptrHits) const
+      Index getFirstInTrackId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackId(getFirstHit(ptrHits)); }
 
       /// Getter for in track id for the last hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastInTrackId(const CDCHitCollection* ptrHits) const
+      Index getLastInTrackId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackId(getLastHit(ptrHits)); }
 
 
 
       /// Getter for in track collection of hits id for the first hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstInTrackSegmentId(const CDCHitCollection* ptrHits) const
+      Index getFirstInTrackSegmentId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackSegmentId(getFirstHit(ptrHits)); }
 
       /// Getter for in track collection of hits id for the last hit in the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastInTrackSegmentId(const CDCHitCollection* ptrHits) const
+      Index getLastInTrackSegmentId(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getInTrackSegmentId(getLastHit(ptrHits)); }
 
 
 
       /// Getter for number of passed superlayer till the first hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getFirstNPassedSuperLayers(const CDCHitCollection* ptrHits) const
+      Index getFirstNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getFirstHit(ptrHits)); }
 
       /// Getter for number of passed superlayer till the last hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
-      Index getLastNPassedSuperLayers(const CDCHitCollection* ptrHits) const
+      Index getLastNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getLastHit(ptrHits)); }
 
 
@@ -144,7 +144,7 @@ namespace Belle2 {
        *  * Returns EForwardBackward::c_Backward if the collection of hits is coaligned with the matched track interpreted in reverse.
        *  * Returns EForwardBackward::c_Invalid if the collection of hits has only a single hit.
        */
-      EForwardBackward isForwardOrBackwardToMCTrack(const CDCHitCollection* ptrHits) const;
+      EForwardBackward isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const;
 
       /** Returns if the second collection of hits
        *  follows the first collection of hits in their common Monte Carlo track.
@@ -156,17 +156,17 @@ namespace Belle2 {
        *                     with the Monte Carlo track and the second collection of hits
        *                     comes after the first in the reversed sense.
        */
-      EForwardBackward areAlignedInMCTrack(const CDCHitCollection* ptrFromHits,
-                                           const CDCHitCollection* ptrToHits) const;
+      EForwardBackward areAlignedInMCTrack(const ACDCHitCollection* ptrFromHits,
+                                           const ACDCHitCollection* ptrToHits) const;
 
 
 
       /** Returns the trajectory of the collection of hits */
-      CDCTrajectory3D getTrajectory3D(const CDCHitCollection* ptrHits) const;
+      CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
     private:
       /// Storage for the map from reconstructed collections of hits to their matched Monte Carlo Track Id
-      mutable std::map<const CDCHitCollection*, ITrackType> m_mcTrackIds;
+      mutable std::map<const ACDCHitCollection*, ITrackType> m_mcTrackIds;
 
 
     }; //class

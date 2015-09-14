@@ -44,18 +44,18 @@ namespace Belle2 {
 
 
     /// Apply the template function F to each element of the index sequence.
-    template< template<size_t> class F, class IndexSequence>
+    template< template<size_t> class AFunction, class AIndexSequence>
     struct MapIndicesImpl {};
 
     /// Specialisation for concrete indices
-    template< template<size_t> class F, size_t ... Is>
-    struct MapIndicesImpl<F, IndexSequence<Is...> > {
-      typedef std::tuple<F<Is>...> Type;
+    template< template<size_t> class AFunction, size_t ... Is>
+    struct MapIndicesImpl<AFunction, IndexSequence<Is...> > {
+      typedef std::tuple<AFunction<Is>...> Type;
     };
 
     /// Generate the first N indices and apply the template function to them.
-    template< template<size_t> class F, size_t N>
-    using MapGenIndices = typename MapIndicesImpl<F, GenIndices<N> >::Type;
+    template< template<size_t> class AFunction, size_t N>
+    using MapGenIndices = typename MapIndicesImpl<AFunction, GenIndices<N> >::Type;
 
   }
 }

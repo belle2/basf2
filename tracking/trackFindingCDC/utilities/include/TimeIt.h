@@ -68,11 +68,11 @@ namespace Belle2 {
     const std::function<void()> doNothing = []() {};
 
     /// Execute a function n time and collect timing information about the duration of the execution.
-    template<class Function >
+    template<class AFunction >
     TimeItResult
     timeIt(size_t nExecutions,
            bool activateCallgrind,
-           const Function& function,
+           const AFunction& function,
            const std::function<void()>& setUp = doNothing,
            const std::function<void()>& tearDown = doNothing)
     {

@@ -17,22 +17,22 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A pair of iterators usable with the range base for loop.
-    template<class Iterator>
-    class Range : public std::pair<Iterator, Iterator> {
+    template<class AIterator>
+    class Range : public std::pair<AIterator, AIterator> {
 
     public:
       /// Inheriting the constructor of the base class
-      using std::pair<Iterator, Iterator>::pair;
+      using std::pair<AIterator, AIterator>::pair;
 
       /// The type the iterator references
-      typedef typename std::iterator_traits<Iterator>::reference ReferenceType;
+      typedef typename std::iterator_traits<AIterator>::reference ReferenceType;
 
       /// Begin of the range for range based for.
-      const Iterator& begin() const
+      const AIterator& begin() const
       { return this->first; }
 
       /// End of the range for range based for.
-      const Iterator& end() const
+      const AIterator& end() const
       { return this->second; }
 
       /// Checks if the begin equals the end iterator, hence if the range is empty.
@@ -53,7 +53,7 @@ namespace Belle2 {
 
       /// Returns the object at index i
       ReferenceType operator[](size_t pos) const
-      { return *std::advance(Iterator(begin()), pos); }
+      { return *std::advance(AIterator(begin()), pos); }
 
     };
   }

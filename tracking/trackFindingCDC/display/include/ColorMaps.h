@@ -70,7 +70,7 @@ namespace Belle2 {
        */
       std::string operator[](const int index) const
       {
-        return m_listColors[index];
+        return m_listColors[index % size()];
       }
 
       /**

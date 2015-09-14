@@ -54,8 +54,8 @@ namespace Belle2 {
 
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
-      template<class SegmentPairFilter>
-      inline void create(SegmentPairFilter& segmentPairFilter,
+      template<class ASegmentPairFilter>
+      inline void create(ASegmentPairFilter& segmentPairFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
                          std::vector<CDCSegmentPair>& segmentPairs) const
       {
@@ -78,8 +78,8 @@ namespace Belle2 {
 
     private:
       /// Creates the axial stereo segment pairs from the segments, which have been grouped by their superlayer id.
-      template<class SegmentPairFilter>
-      inline void create(SegmentPairFilter& segmentPairFilter,
+      template<class ASegmentPairFilter>
+      inline void create(ASegmentPairFilter& segmentPairFilter,
                          const SegmentRangesBySuperLayer& segmentRangesBySuperLayer,
                          std::vector<CDCSegmentPair>& segmentPairs) const
       {
@@ -115,8 +115,8 @@ namespace Belle2 {
 
 
       /// Creates segment tiples from a combination of start segment, middle segments and end segments.
-      template<class SegmentPairFilter>
-      inline void create(SegmentPairFilter& segmentPairFilter,
+      template<class ASegmentPairFilter>
+      inline void create(ASegmentPairFilter& segmentPairFilter,
                          const CDCRecoSegmentRange& startSegments,
                          const CDCRecoSegmentRange& endSegments,
                          std::vector<CDCSegmentPair>& segmentPairs) const

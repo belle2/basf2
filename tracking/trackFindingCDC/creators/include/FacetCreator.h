@@ -28,9 +28,9 @@ namespace Belle2 {
       /// The neighborhood type used to generate wire hit triples
       typedef WeightedNeighborhood<const CDCWireHit> Neighborhood;
 
-      template<class FacetFilter, class CDCWireHitMayBePtrRange>
-      void createFacets(FacetFilter& facetFilter,
-                        const CDCWireHitMayBePtrRange& wirehits,
+      template<class AFacetFilter, class ACDCWireHitMayBePtrRange>
+      void createFacets(AFacetFilter& facetFilter,
+                        const ACDCWireHitMayBePtrRange& wirehits,
                         const Neighborhood& neighborhood,
                         std::vector<CDCFacet>& facets) const
       {
@@ -42,9 +42,9 @@ namespace Belle2 {
       /** Generates facets on the given wire hits generating neighboring triples of hits.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
-      template<class FacetFilter, class CDCWireHitMayBePtrRange>
-      void createFacetsGeneric(FacetFilter& facetFilter,
-                               const CDCWireHitMayBePtrRange& wirehits,
+      template<class AFacetFilter, class ACDCWireHitMayBePtrRange>
+      void createFacetsGeneric(AFacetFilter& facetFilter,
+                               const ACDCWireHitMayBePtrRange& wirehits,
                                const Neighborhood& neighborhood,
                                std::vector<CDCFacet>& facets) const
       {
@@ -96,8 +96,8 @@ namespace Belle2 {
        *  over the 8 left right passage combinations.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
-      template<class FacetFilter>
-      void createFacetsForHitTriple(FacetFilter& facetFilter,
+      template<class AFacetFilter>
+      void createFacetsForHitTriple(AFacetFilter& facetFilter,
                                     const CDCWireHit& startWireHit,
                                     const CDCWireHit& middleWireHit,
                                     const CDCWireHit& endWireHit,

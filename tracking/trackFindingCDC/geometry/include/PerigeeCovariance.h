@@ -41,7 +41,7 @@ namespace Belle2 {
 
 
       /// Empty destructor
-      ~PerigeeCovariance() {;}
+      ~PerigeeCovariance() {}
 
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const

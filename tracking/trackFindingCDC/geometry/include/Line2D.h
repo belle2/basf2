@@ -32,7 +32,7 @@ namespace Belle2 {
 
 
       /// Default constructor for ROOT compatibility.
-      Line2D(): m_n0(0.0), m_n12(0.0, 0.0) { ; }
+      Line2D(): m_n0(0.0), m_n12(0.0, 0.0) {}
 
       ///Constructs taking all three line parameters
       Line2D(const double n0, const double n1, const double n2):
@@ -68,7 +68,7 @@ namespace Belle2 {
 
 
       /// Empty deconstructor
-      ~Line2D() { ; }
+      ~Line2D() {}
 
 
     public:

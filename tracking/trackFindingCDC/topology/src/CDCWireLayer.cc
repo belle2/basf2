@@ -35,7 +35,7 @@ CDCWireLayer::CDCWireLayer() :
   m_innerCylindricalR(0.0),
   m_outerCylindricalR(0.0)
 
-{;}
+{}
 
 CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& end) :
   m_begin(begin), m_end(end),

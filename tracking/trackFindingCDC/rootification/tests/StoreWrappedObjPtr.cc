@@ -40,7 +40,7 @@ TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 }
 
 template <typename T>
-class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {;};
+class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {};
 
 typedef ::testing::Types <
 CDCWireHit,

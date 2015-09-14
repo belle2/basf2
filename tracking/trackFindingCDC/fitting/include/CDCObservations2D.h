@@ -39,7 +39,7 @@ namespace Belle2 {
       /** Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
-      CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos) {;}
+      CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos) {}
 
     public:
 #ifndef __CINT__

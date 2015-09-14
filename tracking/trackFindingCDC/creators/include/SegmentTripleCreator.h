@@ -24,10 +24,10 @@ namespace Belle2 {
     public:
 
       /// Empty constructor.
-      SegmentTripleCreator() {;}
+      SegmentTripleCreator() {}
 
       /// Empty destructor.
-      ~SegmentTripleCreator() {;}
+      ~SegmentTripleCreator() {}
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
       template<class AxialSegmentPairFilter, class SegmentTripleFilter>

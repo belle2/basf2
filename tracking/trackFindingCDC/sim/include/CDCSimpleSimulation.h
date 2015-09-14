@@ -47,7 +47,7 @@ namespace Belle2 {
           m_wireHit(wireHit),
           m_iMCTrack(iMCTrack),
           m_rlInfo(rlInfo)
-        {;}
+        {}
 
         SimpleSimHit(CDCWireHit wireHit,
                      size_t iMCTrack,
@@ -61,7 +61,7 @@ namespace Belle2 {
           m_pos3D(pos3D),
           m_arcLength2D(arcLength2D),
           m_trueDriftLength(trueDriftLength)
-        {;}
+        {}
 
         CDCWireHit m_wireHit;
         size_t m_iMCTrack;
@@ -74,7 +74,7 @@ namespace Belle2 {
     public:
       /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
       explicit CDCSimpleSimulation() : m_wireHitTopology(nullptr)
-      {;}
+      {}
 
       void setWireHitTopology(CDCWireHitTopology* wireHitTopology)
       {

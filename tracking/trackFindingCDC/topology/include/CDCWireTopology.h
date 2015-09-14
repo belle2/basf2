@@ -59,7 +59,7 @@ namespace Belle2 {
       CDCWireTopology() { initialize(); }
 
       /// Empty destructor
-      ~CDCWireTopology() {;}
+      ~CDCWireTopology() {}
 
     public:
       /// Total number of wires

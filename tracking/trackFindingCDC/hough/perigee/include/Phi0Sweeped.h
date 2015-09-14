@@ -35,7 +35,7 @@ namespace Belle2 {
       typedef typename T::HoughBox SubordinaryHoughBox;
 
       /// Constructor taking the curling curvature.
-      Phi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {;}
+      Phi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {}
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object

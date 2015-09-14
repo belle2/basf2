@@ -36,7 +36,7 @@ namespace Belle2 {
       using T::operator=;
 
       /// Also forward the copy constructor form the base class object.
-      explicit WithWeightedItems(const T& t): T(t) {;}
+      explicit WithWeightedItems(const T& t): T(t) {}
 
       /// Cumulated weight of the contained items.
       Weight getWeight() const

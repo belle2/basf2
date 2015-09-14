@@ -28,7 +28,7 @@ namespace Belle2 {
       /// Constructor from a series of timings.
       explicit TimeItResult(std::vector<std::chrono::duration<double> >& timeSpans) :
         m_timeSpans(timeSpans)
-      {;}
+      {}
 
       /// Get the time of the individual executtions
       double getSeconds(size_t iExecution) const
@@ -65,7 +65,7 @@ namespace Belle2 {
     };
 
     /// Placeholder for function call that should do nothing.
-    const std::function<void()> doNothing = []() {;};
+    const std::function<void()> doNothing = []() {};
 
     /// Execute a function n time and collect timing information about the duration of the execution.
     template<class Function >

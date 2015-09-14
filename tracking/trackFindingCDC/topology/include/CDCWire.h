@@ -51,7 +51,7 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCWire() {;}
+      CDCWire() {}
 
       /// Constructor taking the WireID convenience object. Use rather getInstance() to avoid instance constructions.
       explicit CDCWire(const WireID& wireID);
@@ -62,7 +62,7 @@ namespace Belle2 {
               const IWireType& iWire);
 
       /// Empty deconstructor
-      ~CDCWire() {;}
+      ~CDCWire() {}
 
       /** @name Static instance getters
        *  Getter for the already constructed instances form the CDCWireTopology::getInstance() object.

@@ -34,7 +34,7 @@ namespace Belle2 {
         Super(),
         m_param_cut(NAN),
         m_expert("data/tracking", defaultTrainingName)
-      {;}
+      {}
 
       /// Initialize the expert before event processing.
       virtual void initialize() override

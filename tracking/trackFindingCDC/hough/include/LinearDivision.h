@@ -39,7 +39,7 @@ namespace Belle2 {
       /// Initialise the sub box factory with specific overlaps.
       LinearDivision(const typename Box_::Delta& overlaps = typename Box_::Delta()) :
         m_overlaps(overlaps)
-      {;}
+      {}
 
     public:
       /// Factory method to construct the subboxes with overlap from the given box.

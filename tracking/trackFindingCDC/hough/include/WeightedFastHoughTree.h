@@ -34,7 +34,7 @@ namespace Belle2 {
       /// Constructor attaching a vector of the weigthed items to the top most node domain.
       WeightedParititioningDynTree(Domain topDomain, DomainDivsion domainDivsion) :
         Super(WithWeightedItems<Domain, T>(std::move(topDomain)), std::move(domainDivsion))
-      {;}
+      {}
     };
 
     /** Dynamic tree structure with weighted items in each node which are markable through out the tree.

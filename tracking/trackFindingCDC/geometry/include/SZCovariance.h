@@ -41,7 +41,7 @@ namespace Belle2 {
 
 
       /// Empty destructor
-      ~SZCovariance() {;}
+      ~SZCovariance() {}
 
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const

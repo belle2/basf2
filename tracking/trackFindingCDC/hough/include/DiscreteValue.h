@@ -39,11 +39,11 @@ namespace Belle2 {
       DiscreteValue() = default;
 
       /// Constructor from underlying iterator type
-      explicit DiscreteValue(const Super& iter) : Super(iter) {;}
+      explicit DiscreteValue(const Super& iter) : Super(iter) {}
 
       /** Constructor from a reference to the underlying type
        *  Care must be taken to feed it a reference that comes from a vector*/
-      explicit DiscreteValue(T& value) : Super(&value) {;}
+      explicit DiscreteValue(T& value) : Super(&value) {}
 
       /// Default copy constructor
       DiscreteValue(const This&) = default;

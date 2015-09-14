@@ -22,7 +22,7 @@ using namespace CDC;
 using namespace TrackFindingCDC;
 
 
-CDCWireSuperLayer::CDCWireSuperLayer() {;}
+CDCWireSuperLayer::CDCWireSuperLayer() {}
 
 CDCWireSuperLayer::CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end):
   m_begin(begin),

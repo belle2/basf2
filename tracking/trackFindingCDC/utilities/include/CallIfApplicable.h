@@ -28,7 +28,7 @@ namespace Belle2 {
      */
     template<class Function, class T>
     void callIfApplicableImpl(Function&&, T&&, long)
-    {;}
+    {}
 
     /** Invokes a function with one argument obj, but only if the call is allowed.
      *

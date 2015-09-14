@@ -53,7 +53,7 @@ namespace Belle2 {
         m_superLayerCenters(),
         m_variables(prefix),
         m_nestedVarSet(prefix)
-      {;}
+      {}
 
       /// Extract the nested variables next
       bool extractNested(const Object* obj)

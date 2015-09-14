@@ -87,7 +87,7 @@ namespace Belle2 {
                                                const ERotation orientation = ERotation::c_CounterClockwise);
 
       /// Empty deconstructor
-      ~PerigeeCircle() {;}
+      ~PerigeeCircle() {}
 
 
     protected:

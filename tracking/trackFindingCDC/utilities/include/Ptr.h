@@ -22,7 +22,7 @@ namespace Belle2 {
     public:
       /// Wrap the object. Memory for the mark is provided from a shared position.
       explicit Ptr(T* obj) : m_obj(obj)
-      {;}
+      {}
 
       /// Allow automatic unpacking.
       operator T*& ()

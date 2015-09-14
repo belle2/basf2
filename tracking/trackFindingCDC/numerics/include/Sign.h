@@ -32,27 +32,27 @@ namespace Belle2 {
       /// Default constructor
       constexpr
       Sign() : m_sign(0)
-      {;}
+      {}
 
     private:
       /// Constructor from the internal representation
       constexpr
       explicit Sign(const ESign& s) :
         m_sign(s)
-      {;}
+      {}
 
     public:
       /// Constructor from a float signed quantity
       constexpr
       explicit Sign(const float& s) :
         m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
-      {;}
+      {}
 
       /// Constructor from a double signed quantity
       constexpr
       explicit Sign(const double s) :
         m_sign(std::isnan(s) ? c_NaNSign : (s > 0) - (s < 0))
-      {;}
+      {}
 
     public:
       /** Calculate the common distance sign in a sweep operation over a geometric object.

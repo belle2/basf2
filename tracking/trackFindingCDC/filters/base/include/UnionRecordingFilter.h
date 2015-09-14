@@ -37,7 +37,7 @@ namespace Belle2 {
                            const std::string& defaultTreeName = "records") :
         Super(defaultRootFileName, defaultTreeName),
         m_filterFactory("truth")
-      {;}
+      {}
 
       /// Initialize the recorder before event processing.
       virtual void initialize() override

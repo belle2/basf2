@@ -48,7 +48,7 @@ namespace Belle2 {
     }; //end class
 
     /// Equivalent to \sa TrackFindingCDCTestWithTopology for disabled tests.
-    class DISABLED_Long_TrackFindingCDCTestWithTopology : public TrackFindingCDCTestWithTopology {;};
+    class DISABLED_Long_TrackFindingCDCTestWithTopology : public TrackFindingCDCTestWithTopology {};
   } //end namespace TrackFindingCDC
 
 

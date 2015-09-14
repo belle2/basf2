@@ -44,20 +44,20 @@ namespace Belle2 {
       CDCTrajectory3D() :
         m_localOrigin(),
         m_localHelix()
-      {;}
+      {}
 
       /// Constructs a trajectory from a helix with reference point equivalent to the origin.
       explicit CDCTrajectory3D(const UncertainHelix& helix) :
         m_localOrigin(0.0, 0.0, 0.0),
         m_localHelix(helix)
-      {;}
+      {}
 
       /// Constructs a trajectory from a local helix taken as relative to the given origin.
       CDCTrajectory3D(const Vector3D& localOrigin,
                       const UncertainHelix& localHelix) :
         m_localOrigin(localOrigin),
         m_localHelix(localHelix)
-      {;}
+      {}
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
       CDCTrajectory3D(const Vector3D& startPoint,
@@ -91,7 +91,7 @@ namespace Belle2 {
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
 
       /// Empty destructor
-      ~CDCTrajectory3D() {;}
+      ~CDCTrajectory3D() {}
 
 
 

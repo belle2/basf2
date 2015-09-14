@@ -36,10 +36,10 @@ namespace Belle2 {
       explicit PairVarSet(const std::string& prefix = "") :
         m_firstVarSet(prefix + "first_"),
         m_secondVarSet(prefix + "second_")
-      {;}
+      {}
 
       /// Virtual destructor
-      virtual ~PairVarSet() {;}
+      virtual ~PairVarSet() {}
 
       /// Main method that extracts the variable values from the complex object.
       virtual bool extract(const std::pair<const BaseObject*, const BaseObject*>* obj)

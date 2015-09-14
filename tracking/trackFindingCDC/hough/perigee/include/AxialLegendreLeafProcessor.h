@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       AxialLegendreLeafProcessor(const size_t maxLevel) : m_maxLevel(maxLevel)
-      {;}
+      {}
 
       /** Entry point for the WeightedHoughTree walk to ask
        *  if a node is a leaf that should not be further divided into sub nodes.

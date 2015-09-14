@@ -37,7 +37,7 @@ namespace Belle2 {
         m_rootFileName(defaultRootFileName),
         m_treeName(defaultTreeName),
         m_returnedCellWeight(NOT_A_CELL)
-      {;}
+      {}
 
       /// Initialize the recorder before event processing.
       virtual void initialize() override

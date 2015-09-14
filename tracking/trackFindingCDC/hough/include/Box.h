@@ -29,7 +29,7 @@ namespace Belle2 {
     class Box<> {
     public:
       /// Nothing to do on set bounds.
-      void setBounds() {;}
+      void setBounds() {}
 
       /// Nothing to do on printing
       friend std::ostream& operator<<(std::ostream& output, const Box<>&)
@@ -79,7 +79,7 @@ namespace Belle2 {
           const std::array<SubordinaryTypes, 2>& ... subordinaryBounds) :
         m_firstBounds{{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])}},
       m_subordinaryBox(subordinaryBounds...)
-      {;}
+      {}
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const This& box)

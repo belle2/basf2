@@ -116,7 +116,7 @@ namespace Belle2 {
       /// Constructure taking a optional prefix that can be attached to the names if request.
       explicit FixedSizeNamedFloatTuple(const std::string& prefix = "") :
         NamedFloatTuple(prefix)
-      {;}
+      {}
 
       /// Getter for number of floating point values represented by this class.
       virtual size_t size() const override final

@@ -31,7 +31,7 @@ namespace Belle2 {
 
         /// Constructor taking the Monte Carlo track id and the purity to be stored
         MCTrackIdPurityPair(ITrackType mcTrackId, float purity):
-          std::pair<ITrackType, float>(mcTrackId, purity) {;}
+          std::pair<ITrackType, float>(mcTrackId, purity) {}
 
         /// Getter for the Monte Carlo track Id
         ITrackType getMCTrackId() const

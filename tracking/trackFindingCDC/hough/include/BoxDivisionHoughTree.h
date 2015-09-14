@@ -65,7 +65,7 @@ namespace Belle2 {
       BoxDivisionHoughTree(size_t maxLevel) :
         m_maxLevel(maxLevel),
         m_overlaps((divisions * 0) ...)
-      {;}
+      {}
 
     private:
       /// Type of the discrete value array to coordinate index I.

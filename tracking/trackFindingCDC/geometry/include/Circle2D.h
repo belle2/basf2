@@ -31,23 +31,23 @@ namespace Belle2 {
       Circle2D():
         m_center(0.0, 0.0),
         m_radius(0.0)
-      { ; }
+      {}
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
       Circle2D(const Vector2D& center, const double radius):
         m_center(center),
         m_radius(radius)
-      { ; }
+      {}
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
       Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo):
         m_center(center),
         m_radius(fabs(absRadius) * ccwInfo)
-      { ; }
+      {}
 
       /// Empty deconstructor
       ~Circle2D()
-      { ; }
+      {}
 
     public:
       /// Flips orientation the circle in place

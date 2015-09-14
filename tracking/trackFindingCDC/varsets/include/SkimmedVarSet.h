@@ -29,7 +29,7 @@ namespace Belle2 {
       /// Constructure taking a optional prefix that can be attached to the names if request.
       explicit SkimmedVarSet(const std::string& prefix = "") :
         Super(prefix)
-      {;}
+      {}
 
       /// Main method that extracts the variable values from the complex object.
       virtual bool extract(const Object* obj)

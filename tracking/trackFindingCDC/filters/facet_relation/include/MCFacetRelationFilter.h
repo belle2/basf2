@@ -32,7 +32,7 @@ namespace Belle2 {
        *  (in comparision to MC truth) shall be accepted.
        */
       MCFacetRelationFilter(bool allowReverse = true) :
-        Super(allowReverse), m_mcFacetFilter(allowReverse) {;}
+        Super(allowReverse), m_mcFacetFilter(allowReverse) {}
 
     public:
       /// May be used to clear information from former events. Currently unused.

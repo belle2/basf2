@@ -24,7 +24,7 @@ namespace Belle2 {
     public:
       /// Mixin class Wraps an object including r the mark is provided from a shared position.
       WithSharedMark(const T& obj, bool* isMarked) : Super(obj), m_isMarked(isMarked)
-      {;}
+      {}
 
       /// Check if the object has been marked
       bool isMarked() const { return *m_isMarked; }

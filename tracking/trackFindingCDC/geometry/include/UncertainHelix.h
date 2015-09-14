@@ -34,7 +34,7 @@ namespace Belle2 {
         m_helixCovariance(),
         m_chi2(0.0),
         m_ndf(0)
-      {;}
+      {}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainHelix(const double curvature,
@@ -49,7 +49,7 @@ namespace Belle2 {
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
       explicit UncertainHelix(const TVectorD& parameters,
@@ -60,7 +60,7 @@ namespace Belle2 {
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainHelix(const double curvature,
@@ -75,7 +75,7 @@ namespace Belle2 {
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
 
@@ -88,7 +88,7 @@ namespace Belle2 {
         m_helixCovariance(helixCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
@@ -99,14 +99,14 @@ namespace Belle2 {
         m_helixCovariance(uncertainPerigeeCircle.perigeeCovariance(), uncertainSZLine.szCovariance()),
         m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2()),
         m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
-      {;}
+      {}
 
 
 
 
 
       /// Empty destructor
-      ~UncertainHelix() {;}
+      ~UncertainHelix() {}
 
 
     public:

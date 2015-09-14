@@ -34,7 +34,7 @@ namespace Belle2 {
         m_perigeeCovariance(),
         m_chi2(0.0),
         m_ndf(0)
-      {;}
+      {}
 
       /**
       Composes an uncertain perigee circle from the perigee parameters
@@ -51,7 +51,7 @@ namespace Belle2 {
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
 
@@ -70,7 +70,7 @@ namespace Belle2 {
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
 
@@ -83,7 +83,7 @@ namespace Belle2 {
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero.
@@ -95,7 +95,7 @@ namespace Belle2 {
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
       explicit
       UncertainPerigeeCircle(const TVectorD& parameters,
@@ -106,11 +106,11 @@ namespace Belle2 {
         m_perigeeCovariance(perigeeCovariance),
         m_chi2(chi2),
         m_ndf(ndf)
-      {;}
+      {}
 
 
       /// Empty destructor
-      ~UncertainPerigeeCircle() {;}
+      ~UncertainPerigeeCircle() {}
 
     public:
       /// Setter for the whole covariance matrix of the perigee parameters

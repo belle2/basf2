@@ -41,7 +41,7 @@ namespace Belle2 {
         m_movePerZ(),
         m_forwardZ(0.0),
         m_backwardZ(0.0)
-      {;}
+      {}
 
     public:
       /// Constuctor for a skew line between forward and backward point

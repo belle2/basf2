@@ -28,7 +28,7 @@ namespace Belle2 {
         m_bottom(NAN),
         m_right(NAN),
         m_top(NAN)
-      {;}
+      {}
 
       /// Initialises the bounds of the rectangle to the given values. Automatically swaps the x or y values if they are given in a decreasing.
       BoundingBox(const float& x1, const float& y1, const float& x2, const float& y2) :
@@ -36,7 +36,7 @@ namespace Belle2 {
         m_bottom(std::min(y1, y2)),
         m_right(std::max(x1, x2)),
         m_top(std::max(y1, y2))
-      {;}
+      {}
 
       /// Expands the bounding box such that it also covers the given bounding box
       void operator&=(const BoundingBox& other)

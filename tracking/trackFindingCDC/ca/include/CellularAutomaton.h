@@ -46,7 +46,7 @@ namespace Belle2 {
     public:
 
       /// Empty constructor
-      CellularAutomaton() {;}
+      CellularAutomaton() {}
 
       /// Applies the cellular automaton to the collection and its neighborhood
       /** Applies the cellular automaton algorithm to the collection where the connections are given by

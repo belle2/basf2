@@ -19,7 +19,7 @@ using namespace TrackFindingCDC;
 CDCRecoHit2D::CDCRecoHit2D() :
   m_rlWireHit(nullptr),
   m_recoDisp2D(Vector2D::getLowest())
-{;}
+{}
 
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit) :

@@ -28,7 +28,7 @@ namespace Belle2 {
       /// Constructor
       MCSegmentRelationFilter(bool allowReverse = true) :
         Super(allowReverse)
-      {;}
+      {}
 
       /// Checks if a segment relation is a good combination.
       virtual NeighborWeight operator()(const CDCRecoSegment2D& fromSegment,

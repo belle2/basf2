@@ -33,26 +33,26 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCTrajectorySZ() {;}
+      CDCTrajectorySZ() {}
 
 
       /// Constructs the trajectory from the given two dimensional sz line.
       explicit CDCTrajectorySZ(const UncertainSZLine& szLine) :
         m_szLine(szLine)
-      {;}
+      {}
 
 
       /// Constructs the trajectory from the given two dimensional sz line.
       explicit CDCTrajectorySZ(const Line2D& szLine) :
         m_szLine(szLine)
-      {;}
+      {}
 
 
       /// Constructs the trajectory with the given slope and start z.
       CDCTrajectorySZ(const double tanLambda,
                       const double startZ) :
         m_szLine(Line2D::fromSlopeIntercept(tanLambda, startZ))
-      {;}
+      {}
 
       /// Construct the sz line by its normal parameters ( used in least square fits )
       CDCTrajectorySZ(const double n0,
@@ -62,7 +62,7 @@ namespace Belle2 {
       { if (not getSZLine().alignedWithFirst()) m_szLine.reverse();}   // make the orientation to be forward with s ( important for the right sign of the distances)
 
       /// Empty destructor
-      ~CDCTrajectorySZ() {;}
+      ~CDCTrajectorySZ() {}
 
       /// Constucts a basic assumption, what the z start position and the sz slope are, including some broad values for the covariance matrix.
       static CDCTrajectorySZ basicAssumption();

@@ -24,7 +24,7 @@ namespace Belle2 {
     public:
       /// Mixin class to make an object unmarkable (the mark information is saved - but never used in the tree by intention)
       Unmarkable(const T& obj, bool* isMarked) : Super(obj), m_isMarked(isMarked)
-      {;}
+      {}
 
       /// Check if the object has been marked. As we do not want this object to be marked, just return false.
       bool isMarked() const { return false; }

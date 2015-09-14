@@ -32,10 +32,10 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      ParameterLine2D(): m_support(0.0, 0.0), m_tangential(0.0, 0.0) { ; }
+      ParameterLine2D(): m_support(0.0, 0.0), m_tangential(0.0, 0.0) {}
 
       /// Standard constructor taking the support point and the tangential vector
-      ParameterLine2D(const Vector2D& support, const Vector2D& tangential): m_support(support), m_tangential(tangential) { ; }
+      ParameterLine2D(const Vector2D& support, const Vector2D& tangential): m_support(support), m_tangential(tangential) {}
 
       /// Constructs a line with slope and intercept.
       /** Orientation will be coaligned with the first axes.
@@ -67,11 +67,11 @@ namespace Belle2 {
        *  The support is set the point closest to the origin. The tangential is of unit length.
        *  Note the orientation of the line remains the same.
         */
-      explicit ParameterLine2D(const Line2D& line) : m_support(line.support()), m_tangential(line.tangential()) { ; }
+      explicit ParameterLine2D(const Line2D& line) : m_support(line.support()), m_tangential(line.tangential()) {}
 
 
       /// Empty Destructor.
-      ~ParameterLine2D() { ; }
+      ~ParameterLine2D() {}
 
       /// Downcast the line to the normal representation.
       /** Downcasting the parameter line to the line representation using the normal vector.

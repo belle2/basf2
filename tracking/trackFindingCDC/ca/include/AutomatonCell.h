@@ -58,19 +58,19 @@ namespace Belle2 {
       AutomatonCell() :
         m_weight(0),
         m_flags(0),
-        m_state(0) {;}
+        m_state(0) {}
 
       /// Constructor with a certain cell weight
       explicit AutomatonCell(const CellState& weight) :
         m_weight(weight),
         m_flags(0),
-        m_state(0) {;}
+        m_state(0) {}
 
       /// Constructor with a certain cell weight and initial flags to be set.
       AutomatonCell(const CellState& weight, const CellFlags& initialFlags) :
         m_weight(weight),
         m_flags(initialFlags),
-        m_state(0) {;}
+        m_state(0) {}
 
       /// Getter for the cell state
       const CellState& getCellState() const { return m_state; }

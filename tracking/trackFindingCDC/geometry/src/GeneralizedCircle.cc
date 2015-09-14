@@ -26,7 +26,7 @@ using namespace TrackFindingCDC;
 
 
 
-GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) { ; }
+GeneralizedCircle::GeneralizedCircle() : m_n3(0.0), m_n12(0.0, 0.0), m_n0(0.0) {}
 
 
 
@@ -63,7 +63,7 @@ GeneralizedCircle::GeneralizedCircle(const Circle2D& circle):
   m_n12(- circle.center().x() * (m_n3 * 2.0)  ,
         - circle.center().y() * (m_n3 * 2.0)),
   m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
-{ ; }
+{}
 
 
 GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,

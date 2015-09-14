@@ -82,7 +82,7 @@ namespace Belle2 {
        */
       StoreWrappedObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) :
         StoreObjPtr<StoreWrapper<T> >(name, durability)
-      {;}
+      {}
 
 
       /** Register the object/array in the DataStore.

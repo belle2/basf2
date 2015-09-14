@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      ObserverFilter() : BaseFilter() {;}
+      ObserverFilter() : BaseFilter() {}
 
       /// Terminate the filter after event processing.
       virtual void terminate() override

@@ -24,7 +24,7 @@ CDCRecoHit3D::CDCRecoHit3D():
   m_rlWireHit(nullptr),
   m_recoPos3D(Vector3D::getLowest()),
   m_arcLength2D(0.0)
-{;}
+{}
 
 
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,

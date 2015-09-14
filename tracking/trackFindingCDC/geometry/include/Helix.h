@@ -35,19 +35,19 @@ namespace Belle2 {
       Helix() :
         m_circleXY(),
         m_lineSZ()
-      {;}
+      {}
 
       /// Constructor taking all stored parameters for internal use.
       Helix(const PerigeeCircle& circleXY,
             const Line2D& lineSZ) :
         m_circleXY(circleXY),
         m_lineSZ(lineSZ)
-      {;}
+      {}
 
       explicit Helix(const TVectorD& parameters) :
         m_circleXY(parameters(iCurv), parameters(iPhi0), parameters(iI)),
         m_lineSZ(Line2D::fromSlopeIntercept(parameters(iTanL), parameters(iZ0)))
-      {;}
+      {}
 
       Helix(const double curvature,
             const double tangentialPhi,
@@ -56,7 +56,7 @@ namespace Belle2 {
             const double z0) :
         m_circleXY(curvature, tangentialPhi, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
-      {;}
+      {}
 
 
       Helix(const double curvature,
@@ -66,7 +66,7 @@ namespace Belle2 {
             const double z0) :
         m_circleXY(curvature, tangential, impact),
         m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
-      {;}
+      {}
 
       /// Sets all circle parameters to zero.
       void invalidate()

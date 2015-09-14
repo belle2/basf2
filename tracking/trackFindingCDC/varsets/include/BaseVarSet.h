@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Making destructor virtual
-      virtual ~BaseVarSet() {;}
+      virtual ~BaseVarSet() {}
 
       /**
       Main method that extracts the variable values from the complex object.
@@ -52,14 +52,14 @@ namespace Belle2 {
          Can be specialised if the derived variable set has setup work to do.
        */
       virtual void initialize()
-      { ; }
+      {}
 
       /**
       Terminate the variable set after event processing.
       Can be specialised if the derived variable set has to tear down aquired resources.
        */
       virtual void terminate()
-      { ; }
+      {}
 
       /**
       Getter for the named tuples storing the values of all the (possibly nested) VarSets

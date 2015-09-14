@@ -31,19 +31,19 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      Vector3D(): m_xy(0.0, 0.0), m_z(0.0) {;}
+      Vector3D(): m_xy(0.0, 0.0), m_z(0.0) {}
 
       /// Constructor translating from a TVector3 instance
-      explicit Vector3D(const TVector3& tvector) : m_xy(tvector.X(), tvector.Y()), m_z(tvector.Z()) { ; }
+      explicit Vector3D(const TVector3& tvector) : m_xy(tvector.X(), tvector.Y()), m_z(tvector.Z()) {}
 
       /// Constructor from three coordinates
-      Vector3D(double x, double y, double z)  : m_xy(x, y), m_z(z) { ; }
+      Vector3D(double x, double y, double z)  : m_xy(x, y), m_z(z) {}
 
       /// Constructor augmeting a Vector2D to a Vector3D setting z to zero
-      explicit Vector3D(const Vector2D& xy)  : m_xy(xy), m_z(0.0) { ; }
+      explicit Vector3D(const Vector2D& xy)  : m_xy(xy), m_z(0.0) {}
 
       /// Constructor augmeting a Vector2D to a Vector3D setting z explicitly
-      Vector3D(const Vector2D& xy, double z)  : m_xy(xy), m_z(z) { ; }
+      Vector3D(const Vector2D& xy, double z)  : m_xy(xy), m_z(z) {}
 
       /// Assignment translating from a TVector3 instance
       Vector3D& operator=(const TVector3& tvector)
@@ -94,7 +94,7 @@ namespace Belle2 {
       }
 
       /// Empty Destructor.
-      ~Vector3D() {;}
+      ~Vector3D() {}
 
       /// Casting the back to TVector3 seamlessly
       inline operator const TVector3() const { return TVector3(x(), y(), z()); }

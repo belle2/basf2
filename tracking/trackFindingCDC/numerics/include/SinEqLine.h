@@ -43,20 +43,20 @@ namespace Belle2 {
       SinEqLine() :
         m_slope(0.0),
         m_intercept(0.0)
-      {;}
+      {}
 
 
       /// Constructor taking the line that shall be superimposed with the sin curve.
       explicit SinEqLine(const Line2D& line2D) :
         m_slope(line2D.slope()),
         m_intercept(line2D.intercept())
-      {;}
+      {}
 
       /// Constructor taking the slope and intercept of the line that shall be superimposed with the sin curve.
       SinEqLine(const double slope, const double intercept) :
         m_slope(slope),
         m_intercept(intercept)
-      {;}
+      {}
 
 
       /// Interpreting as the function f this method carries out the translation from x to y coordinates.

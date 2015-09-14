@@ -19,7 +19,7 @@ using namespace TrackFindingCDC;
 
 CDCTangent::CDCTangent() :
   CDCRLWireHitPair(),
-  m_line() {;}
+  m_line() {}
 
 CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair), m_line()
@@ -38,7 +38,7 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
                        const ParameterLine2D& line):
   CDCRLWireHitPair(rlWireHitPair),
   m_line(line)
-{;}
+{}
 
 
 
@@ -47,7 +47,7 @@ CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
                        const ParameterLine2D& line):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit),
   m_line(line)
-{;}
+{}
 
 void CDCTangent::adjustLine()
 {

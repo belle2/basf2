@@ -32,7 +32,7 @@ namespace Belle2 {
       FilterOnVarSet() :
         Filter<Object>(),
         m_varSet()
-      {;}
+      {}
 
       /// Initialize the filter before event processing.
       virtual void initialize() override

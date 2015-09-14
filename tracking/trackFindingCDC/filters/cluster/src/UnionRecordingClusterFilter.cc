@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 UnionRecordingClusterFilter::UnionRecordingClusterFilter() : Super("BackgroundHitFinder.root")
-{;}
+{}
 
 std::vector<std::string> UnionRecordingClusterFilter::getValidVarSetNames() const
 {

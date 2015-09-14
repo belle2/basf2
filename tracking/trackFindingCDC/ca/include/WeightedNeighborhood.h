@@ -49,7 +49,7 @@ namespace Belle2 {
 
         /// Constructor bundeling the original item and the weight of a relation
         WeightedItemPtr(const Item* itemPtr , const NeighborWeight& weight) :
-          m_itemPtr(itemPtr), m_weight(weight) {;}
+          m_itemPtr(itemPtr), m_weight(weight) {}
 
         /// Comparison operator establishing a total ordering considering the pointer first and the weight second
         inline bool operator<(const WeightedItemPtr& other) const
@@ -113,7 +113,7 @@ namespace Belle2 {
       public:
 
         /// Constructor taking the raw iterator to be wrapped
-        iterator(const container_const_iterator& it) : container_const_iterator(it) {;}
+        iterator(const container_const_iterator& it) : container_const_iterator(it) {}
 
         /// Getter to the pointer to the original item
         const Item* getItem()

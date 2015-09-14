@@ -80,7 +80,7 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
   m_refDriftLengthVariance(driftLengthVariance),
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr)
-{;}
+{}
 
 
 Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const

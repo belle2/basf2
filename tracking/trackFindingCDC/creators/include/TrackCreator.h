@@ -27,10 +27,10 @@ namespace Belle2 {
     public:
 
       /// Empty constructor.
-      TrackCreator() {;}
+      TrackCreator() {}
 
       /// Empty destructor.
-      ~TrackCreator() {;}
+      ~TrackCreator() {}
 
 
 

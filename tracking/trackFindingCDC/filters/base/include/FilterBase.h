@@ -28,19 +28,19 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      FilterBase() {;}
+      FilterBase() {}
 
       /// Making destructor virtual
-      virtual ~FilterBase() {;}
+      virtual ~FilterBase() {}
 
       /// Clears information from former events
-      virtual void clear() {;}
+      virtual void clear() {}
 
       /// Initialize the filter before event processing.
-      virtual void initialize() {;}
+      virtual void initialize() {}
 
       /// Terminate the filter after event processing.
-      virtual void terminate() {;}
+      virtual void terminate() {}
 
       /** Set a map of parameter key and string values.
        *  Meaning depends on the specific filter class implementation.

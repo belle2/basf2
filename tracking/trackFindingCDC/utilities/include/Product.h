@@ -22,13 +22,13 @@ namespace Belle2 {
      *  Recursion case. */
     template<std::size_t factor, std::size_t... factors>
     struct Product<factor, factors...> :
-      std::integral_constant<std::size_t, factor* Product<factors...>::value > {;};
+      std::integral_constant<std::size_t, factor* Product<factors...>::value > {};
 
     /** Template class specilisation for compile time computation of products.
      *  Terminating case. */
     template<>
     struct Product<> :
-      std::integral_constant<std::size_t, 1> {;};
+      std::integral_constant<std::size_t, 1> {};
 
   }
 }

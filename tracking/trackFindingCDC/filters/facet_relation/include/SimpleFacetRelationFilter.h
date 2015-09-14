@@ -30,12 +30,12 @@ namespace Belle2 {
     public:
       /// Constructor using default direction of flight deviation cut off.
       SimpleFacetRelationFilter() : m_param_deviationCosCut(cos(0.4))
-      {;}
+      {}
 
       /// Constructor using given direction of flight deviation cut off.
       SimpleFacetRelationFilter(double deviationCosCut) :
         m_param_deviationCosCut(deviationCosCut)
-      {;}
+      {}
 
     public:
       /** Set the parameter with key to value.

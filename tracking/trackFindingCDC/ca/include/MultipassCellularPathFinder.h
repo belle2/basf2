@@ -42,7 +42,7 @@ namespace Belle2 {
     public:
       /// Empty constructor
       explicit MultipassCellularPathFinder(const CellState& minStateToFollow = -std::numeric_limits<CellState>::infinity()):
-        m_minStateToFollow(minStateToFollow) {;}
+        m_minStateToFollow(minStateToFollow) {}
 
       /// Applies the cellular automaton to the collection and its neighborhood
       template<class ItemRange>

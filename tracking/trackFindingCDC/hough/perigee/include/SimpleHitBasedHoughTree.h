@@ -41,7 +41,7 @@ namespace Belle2 {
         Super(maxLevel),
         m_curlCurv(curlCurv),
         m_stereoHitContainedInBox(curlCurv)
-      {;}
+      {}
 
     public:
       /// Find disjoint leaves heavier than minWeight

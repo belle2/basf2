@@ -19,7 +19,7 @@ namespace Belle2 {
      *  Helps in looping over std::tuple objects.
      */
     template<size_t... indices>
-    struct IndexSequence {;};
+    struct IndexSequence {};
 
     /** Template to generate a continuous sequence of indices
      *  Implementation accumulates already generated indices on the right hand side
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     /// Apply the template function F to each element of the index sequence.
     template< template<size_t> class F, class IndexSequence>
-    struct MapIndicesImpl {;};
+    struct MapIndicesImpl {};
 
     /// Specialisation for concrete indices
     template< template<size_t> class F, size_t ... Is>

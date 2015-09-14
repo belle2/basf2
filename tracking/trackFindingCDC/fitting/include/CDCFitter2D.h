@@ -28,11 +28,11 @@ namespace Belle2 {
         FitMethod(),
         m_usePosition(false),
         m_useOrientation(true)
-      {;}
+      {}
 
       /// Empty destructor
       ~CDCFitter2D()
-      {;}
+      {}
 
       /// Fits a collection of observation drift circles.
       CDCTrajectory2D fit(CDCObservations2D observations2D) const

@@ -31,13 +31,13 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      Vector2D(): m_x(0.0), m_y(0.0) {;}
+      Vector2D(): m_x(0.0), m_y(0.0) {}
 
       /// Constructor translating from a TVector2 instance
-      explicit Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) { ; }
+      explicit Vector2D(const TVector2& tvector) : m_x(tvector.X()), m_y(tvector.Y()) {}
 
       /// Constructor from two coordinates
-      Vector2D(const double x, const double y)  : m_x(x), m_y(y) { ; }
+      Vector2D(const double x, const double y)  : m_x(x), m_y(y) {}
 
       /**
        * Constructs a vector from a unit coordinate system vector and the coordinates in that system.
@@ -48,7 +48,7 @@ namespace Belle2 {
                const double parallelCoor,
                const double orthoCoor) :
         m_x(coordinateVec.x() * parallelCoor - coordinateVec.y() * orthoCoor),
-        m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {;}
+        m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor) {}
 
       /// Assignment translating from a TVector3 instance
       Vector2D& operator=(const TVector2& tvector)
@@ -110,7 +110,7 @@ namespace Belle2 {
       }
 
       /// Empty Destructor.
-      ~Vector2D() {;}
+      ~Vector2D() {}
 
       /// Casting the back to TVector2 seamlessly
       inline operator const TVector2() { return TVector2(x(), y()); }

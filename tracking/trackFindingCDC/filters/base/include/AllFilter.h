@@ -13,11 +13,11 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template<class Type>
-    class AllFilter : public Type {
+    template<class AType>
+    class AllFilter : public AType {
     public:
       /** Accept all segment track combinations */
-      virtual CellWeight operator()(const typename Type::Object&) override final
+      virtual CellWeight operator()(const typename AType::Object&) override final
       {
         return 1;
       }

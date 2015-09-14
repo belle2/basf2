@@ -494,8 +494,8 @@ const std::string CDCSVGPlotter::saveSVGFile(const std::string& svgFileName)
   return (m_eventdataPlotter.save(svgFileName));
 }
 
-template<class AColorizer, class Object>
-void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const std::string& storeArrayName,
+template<class AColorizer, class AObject>
+void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray, const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
 {
@@ -526,14 +526,14 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const s
   }
 }
 
-template<class AColorizer, class Item>
-void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>& storeVector, const std::string& storeObjName,
+template<class AColorizer, class AItem>
+void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector, const std::string& storeObjName,
                                     const std::string& stroke,
                                     const std::string& strokeWidth)
 {
   B2INFO("Drawing vector from DataStore: " << storeObjName);
   if (storeVector) {
-    std::vector<Item>& vector = *storeVector;
+    std::vector<AItem>& vector = *storeVector;
     B2INFO("with " << vector.size() << " entries");
     AColorizer colorizer;
     B2INFO("Attributes are");

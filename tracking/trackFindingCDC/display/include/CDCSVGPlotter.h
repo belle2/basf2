@@ -194,8 +194,8 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
-      template<class Colorizer, class Object>
-      void drawStoreArray(const StoreArray<Object>& storeArray, const std::string& storeArrayName, const std::string& stroke = "",
+      template<class AColorizer, class AObject>
+      void drawStoreArray(const StoreArray<AObject>& storeArray, const std::string& storeArrayName, const std::string& stroke = "",
                           const std::string& strokeWidth = "");
 
       /**
@@ -205,8 +205,8 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
        */
-      template<class Colorizer, class Item>
-      void drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>& storeVector, const std::string& storeObjName,
+      template<class AColorizer, class AItem>
+      void drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector, const std::string& storeObjName,
                            const std::string& stroke = "",
                            const std::string& strokeWidth = "");
 
@@ -221,7 +221,7 @@ namespace Belle2 {
       /**
        * Draw every element of an iterable object.
        * @param iterable An iterable object (StoreArray, std::vector...).
-       * @param colorizer The Colorizer class, in which the drawing attributes are stored.
+       * @param colorizer The AColorizer class, in which the drawing attributes are stored.
        */
       template<class AIterable, class AColorizer>
       void drawIterable(const AIterable& iterable, AColorizer& colorizer);

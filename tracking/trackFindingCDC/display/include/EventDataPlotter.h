@@ -243,8 +243,8 @@ namespace Belle2 {
       }
 
       /// Draws a range iterable collection of drawable elements
-      template<class Range>
-      void drawRange(const Range& range, const AttributeMap& attributeMap = AttributeMap())
+      template<class ARange>
+      void drawRange(const ARange& range, const AttributeMap& attributeMap = AttributeMap())
       {
         if (not m_ptrPrimitivePlotter) return;
         PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;

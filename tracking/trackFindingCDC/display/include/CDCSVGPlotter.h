@@ -215,16 +215,16 @@ namespace Belle2 {
        * @param obj
        * @param obj_attributes
        */
-      template<typename Object>
-      void draw(const Object& obj, const std::map<std::string, std::string>& obj_attributes);
+      template<class AObject>
+      void draw(const AObject& obj, const std::map<std::string, std::string>& obj_attributes);
 
       /**
        * Draw every element of an iterable object.
        * @param iterable An iterable object (StoreArray, std::vector...).
        * @param colorizer The Colorizer class, in which the drawing attributes are stored.
        */
-      template<typename Iterable, class Colorizer>
-      void drawIterable(const Iterable& iterable, Colorizer& colorizer);
+      template<class AIterable, class AColorizer>
+      void drawIterable(const AIterable& iterable, AColorizer& colorizer);
 
       bool m_animate = false;
       TrackFindingCDC::EventDataPlotter m_eventdataPlotter;

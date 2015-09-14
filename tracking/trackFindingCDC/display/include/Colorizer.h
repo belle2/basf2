@@ -205,19 +205,19 @@ namespace Belle2 {
     /**
      * Class template for coloring objects with colors from ListColorsColorMap.
      */
-    template<class Object>
-    class ListColorsColorizer : public Colorizer<Object, ListColorsColorMap<Object>> {
+    template<class AObject>
+    class ListColorsColorizer : public Colorizer<AObject, ListColorsColorMap<AObject>> {
     public:
       /**
        * Constructor.
        *
        * Sets the Method on how to match a color to a stroke to ListColorsColorMap.
        */
-      ListColorsColorizer() : Colorizer<Object, ListColorsColorMap<Object>>()
+      ListColorsColorizer() : Colorizer<AObject, ListColorsColorMap<AObject>>()
       {
-        Colorizer<Object, ListColorsColorMap<Object>>::m_strokeMethodPtr = std::unique_ptr<ListColorsColorMap<Object>>
-                                                   (new ListColorsColorMap<Object>());
-        Colorizer<Object, ListColorsColorMap<Object>>::m_strokeSet = true;
+        Colorizer<AObject, ListColorsColorMap<AObject>>::m_strokeMethodPtr = std::unique_ptr<ListColorsColorMap<AObject>>
+                                                     (new ListColorsColorMap<AObject>());
+        Colorizer<AObject, ListColorsColorMap<AObject>>::m_strokeSet = true;
       }
     };
   }//TrackFindingCDC

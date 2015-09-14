@@ -54,8 +54,8 @@ CDCSVGPlotter::CDCSVGPlotter(bool animate)
   m_eventdataPlotter.setCanvasWidth(default_width);
 }
 
-template<typename Iterable, class Colorizer>
-void CDCSVGPlotter::drawIterable(const Iterable& iterable, Colorizer& colorizer)
+template<class AIterable, class AColorizer>
+void CDCSVGPlotter::drawIterable(const AIterable& iterable, AColorizer& colorizer)
 {
   unsigned int iItem = 0;
   std::map<std::string, std::string>obj_styling;
@@ -465,8 +465,8 @@ void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName, con
     B2INFO(storeObjName << "does not exist in current DataStore");
 }
 
-template<typename Object>
-void CDCSVGPlotter::draw(const Object& obj, const std::map<std::string, std::string>& obj_attributes)
+template<class AObject>
+void CDCSVGPlotter::draw(const AObject& obj, const std::map<std::string, std::string>& obj_attributes)
 {
   m_eventdataPlotter.draw(obj, obj_attributes);
 }
@@ -494,7 +494,7 @@ const std::string CDCSVGPlotter::saveSVGFile(const std::string& svgFileName)
   return (m_eventdataPlotter.save(svgFileName));
 }
 
-template <class Colorizer, class Object>
+template <class AColorizer, class Object>
 void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
@@ -502,7 +502,7 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const s
   B2INFO("Drawing StoreArray: " << storeArrayName);
   if (storeArray) {
     B2INFO("with " << storeArray.getEntries() << " entries");
-    Colorizer colorizer;
+    AColorizer colorizer;
     B2INFO("Attributes are");
     if (stroke != "")
       colorizer.setStroke(stroke);
@@ -526,7 +526,7 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<Object>& storeArray, const s
   }
 }
 
-template <class Colorizer, class Item>
+template <class AColorizer, class Item>
 void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>& storeVector, const std::string& storeObjName,
                                     const std::string& stroke,
                                     const std::string& strokeWidth)
@@ -535,7 +535,7 @@ void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<Item>>&
   if (storeVector) {
     std::vector<Item>& vector = *storeVector;
     B2INFO("with " << vector.size() << " entries");
-    Colorizer colorizer;
+    AColorizer colorizer;
     B2INFO("Attributes are");
     if (stroke != "")
       colorizer.setStroke(stroke);

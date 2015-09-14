@@ -107,15 +107,15 @@ namespace Belle2 {
      *
      * This Class uses the color list defined in the ListColors class.
      */
-    template<class Object>
+    template<class AObject>
     class ListColorsColorMap {
     public:
       virtual ~ListColorsColorMap() = default;
 
       /**
-       * Function call to map the Object id and object to a color.
+       * Function call to map the AObject id and object to a color.
        */
-      virtual std::string map(const int index, const Object&)
+      virtual std::string map(const int index, const AObject&)
       {
         return m_listColors[index % m_listColors.size()];
       }
@@ -146,8 +146,8 @@ namespace Belle2 {
      *
      * Template arguments define the object-type and the Base ColorMapClass used for this object.
      */
-    template<class Object, class ColorMap>
-    class ReturnInputString : public ColorMap {
+    template<class AObject, class AColorMap>
+    class ReturnInputString : public AColorMap {
     public:
       /**
        * Constructor initializes m_inputString with the given string.
@@ -159,7 +159,7 @@ namespace Belle2 {
       /**
        * Function call to map the object id and object to a color/stroke-width.
        */
-      std::string map(const int, const Object&) override
+      std::string map(const int, const AObject&) override
       {
         return m_inputString;
       }
@@ -178,7 +178,7 @@ namespace Belle2 {
      *
      * Template argument defines the type of the object that is drawn.
      */
-    template<class Object>
+    template<class AObject>
     class ReturnInputValue {
     public:
       /**
@@ -191,7 +191,7 @@ namespace Belle2 {
       /**
        * Function call to map the object id and object to a color/stroke-width.
        */
-      std::string map(const int, const Object&) const
+      std::string map(const int, const AObject&) const
       {
         return m_inputValue;
       }

@@ -9,14 +9,10 @@
  **************************************************************************/
 #pragma once
 
-// Basf2 module
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
-
-  namespace TrackFindingCDC {
-    class CDCTrack;
-  }
 
   /// A base class for track finders in the CDC.
   /** This module defines / handles

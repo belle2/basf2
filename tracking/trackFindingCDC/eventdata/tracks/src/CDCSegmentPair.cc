@@ -15,43 +15,34 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
-
-CDCSegmentPair::CDCSegmentPair() : m_startSegment(nullptr),  m_endSegment(nullptr)
+CDCSegmentPair::CDCSegmentPair() :
+  m_startSegment(nullptr),
+  m_endSegment(nullptr)
 {
-
 }
 
 
 
-CDCSegmentPair::CDCSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                               const CDCAxialRecoSegment2D* endSegment):
+CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* startSegment,
+                               const CDCRecoSegment2D* endSegment):
   m_startSegment(startSegment),
   m_endSegment(endSegment)
 {
-  if (not startSegment) B2ERROR("CDCSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCSegmentPair initialized with nullptr as end segment");
+  B2ASSERT("CDCSegmentPair initialized with nullptr as start segment", startSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as end segment", endSegment);
 }
 
 
-
-CDCSegmentPair::CDCSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                               const CDCAxialRecoSegment2D* endSegment,
+CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* startSegment,
+                               const CDCRecoSegment2D* endSegment,
                                const CDCTrajectory3D& trajectory3D) :
   m_startSegment(startSegment),
   m_endSegment(endSegment),
   m_trajectory3D(trajectory3D)
 {
-  if (not startSegment) B2ERROR("CDCSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCSegmentPair initialized with nullptr as end segment");
+  B2ASSERT("CDCSegmentPair initialized with nullptr as start segment", startSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as end segment", endSegment);
 }
-
-
-
-CDCSegmentPair::~CDCSegmentPair()
-{
-}
-
 
 
 double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const

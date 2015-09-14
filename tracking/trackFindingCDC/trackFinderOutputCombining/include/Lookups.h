@@ -7,10 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <vector>
@@ -18,8 +15,10 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCRecoHit3D;
+    class CDCRecoHit2D;
     class CDCRecoSegment2D;
+
+    class CDCRecoHit3D;
     class CDCTrack;
 
     /** Abstract base class for a list of objects which could be filled (more or less a vector) */
@@ -30,26 +29,31 @@ namespace Belle2 {
       virtual void fillWith(std::vector<ItemType>& items) = 0;
       virtual ~LookUpBase() { }
 
+      /// Constant iterator type of this container
+      typedef typename std::vector<ListType>::const_iterator const_iterator;
+      /// Constant iterator type of this container
+      typedef typename std::vector<ListType>::iterator iterator;
+
       /** STL: begin */
-      typename std::vector<ListType>::const_iterator begin() const
+      const_iterator begin() const
       {
         return m_lookup.begin();
       }
 
       /** STL: begin */
-      typename std::vector<ListType>::iterator begin()
+      iterator begin()
       {
         return m_lookup.begin();
       }
 
       /** STL: end */
-      typename std::vector<ListType>::const_iterator end() const
+      const_iterator end() const
       {
         return m_lookup.end();
       }
 
       /** STL: end */
-      typename std::vector<ListType>::iterator end()
+      iterator end()
       {
         return m_lookup.end();
       }
@@ -68,29 +72,14 @@ namespace Belle2 {
       void fillWith(std::vector<CDCRecoSegment2D>& segments) override;
 
       /** Clear all pointer vectors */
-      void clear()
-      {
-        for (std::vector<SegmentInformation*>& segmentList : m_lookup) {
-          for (SegmentInformation* segmentInformation : segmentList) {
-            delete segmentInformation;
-          }
-        }
-      }
+      void clear();
 
       /** Return the segment that has this hit */
-      SegmentInformation* findSegmentForHit(const CDCRecoHit3D& recoHit)
-      {
-        const CDCHit* cdcHit = recoHit.getWireHit().getHit();
-        auto foundElement = m_hitSegmentLookUp.find(cdcHit);
-        if (foundElement == m_hitSegmentLookUp.end()) {
-          return nullptr;
-        } else {
-          return foundElement->second;
-        }
-      }
+      SegmentInformation* findSegmentForHit(const CDCRecoHit3D& recoHit);
 
     private:
-      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp; /**< The added hit -> segment lookup */
+      /// The added hit -> segment lookup
+      std::map<const CDCHit*, SegmentInformation*> m_hitSegmentLookUp;
     };
 
     /** And we use this class for storing our Track Information
@@ -102,27 +91,14 @@ namespace Belle2 {
       void fillWith(std::vector<CDCTrack>& tracks) override;
 
       /** Clear all pointer vectors */
-      void clear()
-      {
-        for (TrackInformation* trackInformation : m_lookup) {
-          delete trackInformation;
-        }
-      }
+      void clear();
 
       /** Return the track that has this hit */
-      TrackInformation* findTrackForHit(const CDCRecoHit2D& recoHit)
-      {
-        const CDCHit* cdcHit = recoHit.getWireHit().getHit();
-        auto foundElement = m_hitTrackLookUp.find(cdcHit);
-        if (foundElement == m_hitTrackLookUp.end()) {
-          return nullptr;
-        } else {
-          return foundElement->second;
-        }
-      }
+      TrackInformation* findTrackForHit(const CDCRecoHit2D& recoHit);
 
     private:
-      std::map<const CDCHit*, TrackInformation*> m_hitTrackLookUp; /**< The added hit -> track lookup */
+      /// The added hit -> track lookup
+      std::map<const CDCHit*, TrackInformation*> m_hitTrackLookUp;
     };
   }
 }

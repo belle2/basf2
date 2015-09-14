@@ -14,22 +14,15 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+
+
 #include <vector>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-CDCSimHitLookUp::CDCSimHitLookUp()
-{
-}
-
-
-
-CDCSimHitLookUp::~CDCSimHitLookUp()
-{
-}
 
 
 const CDCSimHitLookUp& CDCSimHitLookUp::getInstance()

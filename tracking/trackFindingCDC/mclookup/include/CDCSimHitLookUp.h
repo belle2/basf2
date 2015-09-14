@@ -9,22 +9,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 #include <map>
 
 namespace Belle2 {
+
+  class CDCHit;
+  class CDCSimHit;
+
   namespace TrackFindingCDC {
 
+    class CDCMCMap;
 
     /// Singletone class to gather local information about the hits.
     /** Because of the reassignment of secondary hits and the different definition of the right
@@ -33,13 +35,6 @@ namespace Belle2 {
      *  left right passage information.
      */
     class CDCSimHitLookUp {
-
-    public:
-      /// Default constructor
-      CDCSimHitLookUp();
-
-      /// Empty destructor
-      ~CDCSimHitLookUp();
 
     public:
       /// Getter for the singletone instance

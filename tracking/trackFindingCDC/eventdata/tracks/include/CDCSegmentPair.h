@@ -9,12 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,9 +33,6 @@ namespace Belle2 {
       CDCSegmentPair(const CDCRecoSegment2D* startSegment,
                      const CDCRecoSegment2D* endSegment,
                      const CDCTrajectory3D& trajectory3D);
-
-      /// Empty destructor
-      ~CDCSegmentPair();
 
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCSegmentPair const& rhs) const
@@ -131,11 +127,11 @@ namespace Belle2 {
 
 
       /// Getter for the stereo segment
-      const CDCAxialRecoSegment2D* getStereoSegment() const
+      const CDCRecoSegment2D* getStereoSegment() const
       { return getStartStereoType() != StereoType::c_Axial ? getStartSegment() : getEndSegment(); }
 
       /// Getter for the axial segment
-      const CDCAxialRecoSegment2D* getAxialSegment() const
+      const CDCRecoSegment2D* getAxialSegment() const
       { return getStartStereoType() == StereoType::c_Axial ? getStartSegment() : getEndSegment(); }
 
 
@@ -203,11 +199,11 @@ namespace Belle2 {
       { return m_trajectory3D; }
 
       /// Getter for the two dimensional projection of the common three dimensional trajectory.
-      const CDCTrajectory2D getTrajectory2D() const
+      CDCTrajectory2D getTrajectory2D() const
       { return getTrajectory3D().getTrajectory2D(); }
 
       /// Getter for the sz projection of the common three dimensional trajectory.
-      const CDCTrajectorySZ getTrajectorySZ() const
+      CDCTrajectorySZ getTrajectorySZ() const
       { return getTrajectory3D().getTrajectorySZ(); }
 
       /// Invalides the currently stored trajectory information.
@@ -251,17 +247,18 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
-
-
     private:
-      const CDCRecoSegment2D* m_startSegment; ///< Reference to the start segment
-      const CDCRecoSegment2D* m_endSegment; ///< Reference to the end segment
+      /// Reference to the start segment
+      const CDCRecoSegment2D* m_startSegment;
+
+      /// Reference to the end segment
+      const CDCRecoSegment2D* m_endSegment;
 
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;
 
-      mutable AutomatonCell m_automatonCell; ///< Automaton cell assoziated with the pair of segments
-
+      /// Automaton cell assoziated with the pair of segments
+      mutable AutomatonCell m_automatonCell;
 
     }; //end class CDCSegmentPair
 

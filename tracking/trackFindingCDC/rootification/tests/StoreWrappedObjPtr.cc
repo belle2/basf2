@@ -11,7 +11,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
 

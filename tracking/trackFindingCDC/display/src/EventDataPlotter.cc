@@ -12,6 +12,19 @@
 
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -423,6 +436,13 @@ void EventDataPlotter::draw(const CDCTangent& tangent, const AttributeMap& attri
   const Circle2D toTouchPoint(toPos, touchPointRadius);
   draw(toTouchPoint, attributeMap);
 }
+
+void EventDataPlotter::draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
+                            const AttributeMap& attributeMap)
+{
+  draw(recoHit3D.getRecoHit2D(), attributeMap);
+}
+
 
 /// --------------------- Draw CDCTrajectory2D ------------------------
 void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap)

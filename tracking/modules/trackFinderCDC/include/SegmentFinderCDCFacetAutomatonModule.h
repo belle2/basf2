@@ -19,9 +19,11 @@
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
+
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

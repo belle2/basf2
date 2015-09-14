@@ -10,13 +10,14 @@
 
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 
-#include <framework/logging/Logger.h>
-
-#include <TDatabasePDG.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <framework/logging/Logger.h>
+
+#include <TDatabasePDG.h>
 
 using namespace std;
 using namespace Belle2;

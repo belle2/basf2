@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>

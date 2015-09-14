@@ -16,8 +16,17 @@
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #endif
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 #include <iterator>
 
 namespace Belle2 {

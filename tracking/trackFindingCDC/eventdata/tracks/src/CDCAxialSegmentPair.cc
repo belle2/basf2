@@ -19,7 +19,6 @@ CDCAxialSegmentPair::CDCAxialSegmentPair() :
   m_startSegment(nullptr),
   m_endSegment(nullptr)
 {
-
 }
 
 
@@ -28,8 +27,8 @@ CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegme
                                          const CDCAxialRecoSegment2D* endSegment) :
   m_startSegment(startSegment), m_endSegment(endSegment)
 {
-  if (not startSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as end segment");
+  B2ASSERT("CDCAxialSegmentPair initialized with nullptr as start segment", startSegment);
+  B2ASSERT("CDCAxialSegmentPair initialized with nullptr as end segment", endSegment);
 }
 
 
@@ -41,8 +40,6 @@ CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegme
   m_endSegment(endSegment),
   m_trajectory2D(trajectory2D)
 {
-
-  if (not startSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as start segment");
-  if (not endSegment) B2ERROR("CDCAxialSegmentPair initialized with nullptr as end segment");
-
+  B2ASSERT("CDCAxialSegmentPair initialized with nullptr as start segment", startSegment);
+  B2ASSERT("CDCAxialSegmentPair initialized with nullptr as end segment", endSegment);
 }

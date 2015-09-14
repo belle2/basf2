@@ -9,10 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
@@ -24,13 +22,15 @@ namespace genfit {
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+    class CDCRecoSegment3D;
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D> {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCTrack() {;}
+      CDCTrack() {}
 
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
       explicit CDCTrack(const CDCRecoSegment2D& segment);

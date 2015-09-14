@@ -9,7 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -23,6 +29,20 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class Circle2D;
+
+    class CDCTrajectory2D;
+    class CDCTrajectory3D;
+
+    class CDCWireHit;
+    class CDCTangent;
+    class CDCFacet;
+    class CDCRecoHit2D;
+    class CDCRecoHit3D;
+
+    class CDCSegmentPair;
+    class CDCAxialSegmentPair;
+    class CDCSegmentTriple;
 
     /// A class that can plot event related data types.
     class EventDataPlotter {
@@ -158,10 +178,7 @@ namespace Belle2 {
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
       void draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
-                const AttributeMap& attributeMap = AttributeMap())
-      {
-        draw(recoHit3D.getRecoHit2D(), attributeMap);
-      }
+                const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCRecoHit3D as a drift circle at the two dimensional reference wire position and a point at the reconstructed position"""
       void draw(const Belle2::TrackFindingCDC::CDCTangent& tangent,

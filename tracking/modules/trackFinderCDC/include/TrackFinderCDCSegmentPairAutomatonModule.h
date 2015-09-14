@@ -19,8 +19,6 @@
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/SimpleSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/track_relation/BaseTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

@@ -14,8 +14,6 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/InPhi0ImpactCurvBox.h>
 
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
-
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 

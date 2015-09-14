@@ -35,6 +35,30 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
   }
 }
 
+
+void SegmentLookUp::clear()
+{
+  for (std::vector<SegmentInformation*>& segmentList : m_lookup) {
+    for (SegmentInformation* segmentInformation : segmentList) {
+      delete segmentInformation;
+    }
+  }
+}
+
+SegmentInformation* SegmentLookUp::findSegmentForHit(const CDCRecoHit3D& recoHit)
+{
+  const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+  auto foundElement = m_hitSegmentLookUp.find(cdcHit);
+  if (foundElement == m_hitSegmentLookUp.end()) {
+    return nullptr;
+  } else {
+    return foundElement->second;
+  }
+}
+
+
+
+
 void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
 {
   // Calculate a lookup for Tracks
@@ -62,5 +86,25 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
     }
 
     B2DEBUG(200, "Added new track to track lookup: " << trackCand.getStartTrajectory3D().getTrajectory2D());
+  }
+}
+
+
+void TrackLookUp::clear()
+{
+  for (TrackInformation* trackInformation : m_lookup) {
+    delete trackInformation;
+  }
+}
+
+
+TrackInformation* TrackLookUp::findTrackForHit(const CDCRecoHit2D& recoHit)
+{
+  const CDCHit* cdcHit = recoHit.getWireHit().getHit();
+  auto foundElement = m_hitTrackLookUp.find(cdcHit);
+  if (foundElement == m_hitTrackLookUp.end()) {
+    return nullptr;
+  } else {
+    return foundElement->second;
   }
 }

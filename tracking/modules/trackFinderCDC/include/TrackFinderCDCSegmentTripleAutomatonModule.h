@@ -18,7 +18,6 @@
 #include <tracking/trackFindingCDC/filters/axial_segment_pair/SimpleAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple/SimpleSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple_relation/SimpleSegmentTripleRelationFilter.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 

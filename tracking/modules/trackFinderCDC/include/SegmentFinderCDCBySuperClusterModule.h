@@ -15,9 +15,7 @@
 #include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_relation/BaseSegmentRelationFilter.h>
 
-
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>

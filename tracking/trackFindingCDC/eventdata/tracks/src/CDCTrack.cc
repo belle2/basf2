@@ -10,6 +10,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
 #include <genfit/TrackCand.h>
 

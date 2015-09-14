@@ -23,14 +23,14 @@ namespace Belle2 {
       virtual
       CellWeight operator()(const CDCSegmentPair& segmentPair) override final
       {
-        const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-        const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+        const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
+        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
         assert(ptrStartSegment);
         assert(ptrEndSegment);
 
-        const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-        const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+        const CDCRecoSegment2D& startSegment = *ptrStartSegment;
+        const CDCRecoSegment2D& endSegment = *ptrEndSegment;
         return startSegment.size() + endSegment.size();
       }
 

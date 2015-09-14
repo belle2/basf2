@@ -10,9 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegments.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCEntities.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>

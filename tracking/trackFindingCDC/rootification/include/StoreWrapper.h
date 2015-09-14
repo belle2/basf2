@@ -11,7 +11,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/eventdata/CDCEventData.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <framework/datastore/RelationsObject.h>
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>

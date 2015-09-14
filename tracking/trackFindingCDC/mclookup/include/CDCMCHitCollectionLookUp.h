@@ -9,18 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
-
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrajectory3D;
 
     /// Interface class to the Monte Carlo information for collections of hits
     template<class CDCHitCollection>

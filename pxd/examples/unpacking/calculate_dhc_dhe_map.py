@@ -21,7 +21,7 @@ def main():
             6,
             7,
             8,
-            ]:
+        ]:
             det = layer * 32 + nr * 2 + updown
             inner.append(det)
 
@@ -39,14 +39,14 @@ def main():
             10,
             11,
             12,
-            ]:
+        ]:
             det = layer * 32 + nr * 2 + updown
             outer.append(det)
 
     inner.reverse()
     outer.reverse()
 
-    print "packer.param('dhh_to_dhhc', ["
+    print "packer.param('dhe_to_dhc', ["
     for i in xrange(0, 8):
         print '  [', i, ',', inner.pop(), ',', inner.pop(), ',', outer.pop(), \
             ',', outer.pop(), ',', outer.pop(), '] ,'
@@ -54,4 +54,3 @@ def main():
 
 
 main()
-

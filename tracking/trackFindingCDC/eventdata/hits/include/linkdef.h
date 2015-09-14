@@ -9,10 +9,6 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCGenHit-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCDerivedGenHit-;
-#pragma link C++ class Belle2::TrackFindingCDC::CDCDerivedGenHit::Impl-;
-
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHit-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHit-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLTaggedWireHit-;

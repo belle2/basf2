@@ -10,15 +10,15 @@
 
 /* External headers. */
 #include <boost/lexical_cast.hpp>
-#include <TRandom.h>
 #include <TH1D.h>
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeoEKLMCreator.h>
 #include <eklm/simulation/FiberAndElectronics.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

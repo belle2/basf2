@@ -35,13 +35,13 @@ namespace {
   /** Makes adjacent pairs from an input range,
    *  invoking the map with two arguments and writes to the output iterator
    */
-  template<class InputIterator, class OutputIterator, class BinaryOperation>
-  OutputIterator transform_adjacent_pairs(InputIterator first, InputIterator last,
-                                          OutputIterator result, const BinaryOperation& map)
+  template<class AInputIterator, class AOutputIterator, class ABinaryOperation>
+  AOutputIterator transform_adjacent_pairs(AInputIterator first, AInputIterator last,
+                                           AOutputIterator result, const ABinaryOperation& map)
   {
     if (first == last) return result;
 
-    InputIterator second = first;
+    AInputIterator second = first;
     ++second;
     while (second != last) {
       *result = map(*first, *second);
@@ -55,17 +55,17 @@ namespace {
   /** Makes adjacent triples from an input range,
    *  invoking the map with three arguments and writes to the output iterator
    */
-  template<class InputIterator, class OutputIterator, class TrinaryOperation>
-  OutputIterator transform_adjacent_triples(InputIterator first, InputIterator last,
-                                            OutputIterator result, const TrinaryOperation& map)
+  template<class AInputIterator, class AOutputIterator, class ATrinaryOperation>
+  AOutputIterator transform_adjacent_triples(AInputIterator first, AInputIterator last,
+                                             AOutputIterator result, const ATrinaryOperation& map)
   {
     if (not(first != last)) return result;
 
-    InputIterator second{first};
+    AInputIterator second{first};
     ++second;
     if (not(second != last)) return result;
 
-    InputIterator third{second};
+    AInputIterator third{second};
     ++third;
     while (third != last) {
       *result = map(*first, *second, *third);
@@ -125,8 +125,8 @@ namespace {
 
 
 
-  template<class MaybePtrTangent>
-  CDCRecoSegment2D condenseTangentSegment(const std::vector<MaybePtrTangent>& tangentSegment)
+  template<class AMaybePtrTangent>
+  CDCRecoSegment2D condenseTangentSegment(const std::vector<AMaybePtrTangent>& tangentSegment)
   {
     CDCRecoSegment2D result;
     result.reserve(tangentSegment.size() + 1);
@@ -140,7 +140,7 @@ namespace {
       result.push_back(tangent->getToRecoHit2D());
 
     } else { // nTangents > 2
-      typename std::vector<MaybePtrTangent>::const_iterator itTangent = tangentSegment.begin();
+      typename std::vector<AMaybePtrTangent>::const_iterator itTangent = tangentSegment.begin();
 
       const CDCTangent* firstTangent = *itTangent++;  // tangentSegment[0];
       const CDCTangent* secondTangent = *itTangent++;  // tangentSegment[1];
@@ -166,8 +166,8 @@ namespace {
 
 
 
-  template<class MaybePtrFacet>
-  CDCRecoSegment2D condenseFacetSegment(const std::vector<MaybePtrFacet>& facetSegment)
+  template<class AMaybePtrFacet>
+  CDCRecoSegment2D condenseFacetSegment(const std::vector<AMaybePtrFacet>& facetSegment)
   {
     CDCRecoSegment2D result;
     size_t nFacets = facetSegment.size();
@@ -182,7 +182,7 @@ namespace {
       result.push_back(onlyFacet->getEndRecoHit2D());
 
     } else if (nFacets == 2) {
-      typename std::vector<MaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
+      typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
       const CDCFacet* firstFacet = *itFacet++;
       const CDCFacet* secondFacet = *itFacet;
 
@@ -196,7 +196,7 @@ namespace {
       result.push_back(secondFacet->getEndRecoHit2D());
 
     } else { // nFacets > 2
-      typename std::vector<MaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
+      typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
       const CDCFacet* firstFacet  = *itFacet++;  // facetSegment[0];
       const CDCFacet* secondFacet = *itFacet++;  // facetSegment[1];
       const CDCFacet* thirdFacet  = *itFacet++;  // facetSegment[2];

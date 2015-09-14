@@ -15,12 +15,12 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class HitPtr>
-    class RLTagged : public StarToPtr<HitPtr> {
+    template<class AHitPtr>
+    class RLTagged : public StarToPtr<AHitPtr> {
 
     private:
       /// Type of the base class
-      using Super = StarToPtr<HitPtr>;
+      using Super = StarToPtr<AHitPtr>;
 
     public:
       /// Inheriting the constructor of the base class

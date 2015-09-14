@@ -205,8 +205,8 @@ namespace Belle2 {
     public:
       /** Calculates the perpendicular travel distance from the last position of the fromHits
         * to the first position of the toHits. */
-      template<class FromHits, class ToHits>
-      double getArcLength2DGap(const FromHits& fromHits, const ToHits& toHits) const
+      template<class AFromHits, class AToHits>
+      double getArcLength2DGap(const AFromHits& fromHits, const AToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
@@ -217,8 +217,8 @@ namespace Belle2 {
       /** Calculates the perpendicular travel distance from the first position
        * of the fromHits to the first position of the toHits.
        */
-      template<class FromHits, class ToHits>
-      double getArcLength2DFrontOffset(const FromHits& fromHits, const ToHits& toHits) const
+      template<class AFromHits, class AToHits>
+      double getArcLength2DFrontOffset(const AFromHits& fromHits, const AToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.front().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.front().getRecoPos2D();
@@ -228,8 +228,8 @@ namespace Belle2 {
       /** Calculates the perpendicular travel distance from the last position
        *  of the fromHits to the last position of the toHits.
        */
-      template<class FromHits, class ToHits>
-      double getArcLength2DBackOffset(const FromHits& fromHits, const ToHits& toHits) const
+      template<class AFromHits, class AToHits>
+      double getArcLength2DBackOffset(const AFromHits& fromHits, const AToHits& toHits) const
       {
         const Vector2D& fromRecoPos2D = fromHits.back().getRecoPos2D();
         const Vector2D& toRecoPos2D = toHits.back().getRecoPos2D();
@@ -237,8 +237,8 @@ namespace Belle2 {
       }
 
       /// Calculates the perpendicular travel distance from the first position of the hits to the last position of the hits.
-      template<class Hits>
-      double getTotalArcLength2D(const Hits& hits) const
+      template<class AHits>
+      double getTotalArcLength2D(const AHits& hits) const
       {
         Vector2D frontRecoPos2D = hits.front().getRecoPos2D();
         Vector2D backRecoPos2D = hits.back().getRecoPos2D();
@@ -250,8 +250,8 @@ namespace Belle2 {
        *  * EForwardBackward::c_Forward if the last entity lies behind the first.
        *  * EForwardBackward::c_Backward if the last entity lies before the first.
        */
-      template<class Hits>
-      EForwardBackward isForwardOrBackwardTo(const Hits& hits) const
+      template<class AHits>
+      EForwardBackward isForwardOrBackwardTo(const AHits& hits) const
       { return static_cast<EForwardBackward>(sign(getTotalArcLength2D(hits))); }
 
     public:

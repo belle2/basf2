@@ -77,15 +77,17 @@ namespace Belle2 {
       void getXMLData();
 
       /** Produces the pixelization */
-      bool Pixelization(int);
+      //bool Pixelization(int);
+      void Pixelization();
 
       /** Drift ionization
        * Make the ionization drifting from (x,y,z) to GEM1 top plane
        * */
-      TLorentzVector Drift(
+      /*TLorentzVector Drift(
         double x1, double y1, double z1,
         double st, double sl, double vd
-      );
+      );*/
+      virtual void Drift(double, double, double, double&, double&, double&, double&, double, double, double);
 
       /** GEMazition of GEM1 */
       TVector2 GEMGeo1(double x1, double y1);
@@ -174,8 +176,9 @@ namespace Belle2 {
       /** Absorption in gas */
       double m_GasAbs;
       /** chip store arrays */
-//      int m_dchip[10][80][336][MAXtSIZE];
-      std::map<std::tuple<int, int, int, int>, int> m_dchip;
+      int m_dchip[10][80][336][MAXtSIZE];
+      //std::map<std::tuple<int, int, int, int>, int> m_dchip;
+      std::map<std::tuple<int, int, int>, int> m_dchip_map;
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;
       /** number of detectors. Read from MICROTPC.xml*/

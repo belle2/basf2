@@ -77,6 +77,16 @@ void TpcDigitizerModule::initialize()
   fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
+  for (int i = 0; i < m_nTPC; i++) {
+    for (int j = 0; j < 80; j++) {
+      for (int k = 0; k < 336; k++) {
+        for (int l = 0; l < MAXtSIZE; l++) {
+          m_dchip[i][j][k][l] = 0;
+          //dchip[j][k][l] = 0;
+        }
+      }
+    }
+  }
 }
 
 void TpcDigitizerModule::beginRun()
@@ -156,7 +166,12 @@ void TpcDigitizerModule::event()
         for (int ie = 0; ie < (int)NbEle_real; ie++) {
 
           //drift ionization to GEM 1 plane
-          const TLorentzVector driftGap(Drift(chipPosition.X(), chipPosition.Y(), chipPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
+          //const TLorentzVector driftGap(Drift(chipPosition.X(), chipPosition.Y(), chipPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
+          double x_DG, y_DG, z_DG, t_DG;
+          Drift(chipPosition.X(),
+                chipPosition.Y(),
+                chipPosition.Z(),
+                x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
 
           //calculate and scale 1st GEM gain
           const double GEM_gain1 = gRandom->Gaus(m_GEMGain1, m_GEMGain1 * m_GEMGainRMS1) / m_ScaleGain1;
@@ -168,24 +183,38 @@ void TpcDigitizerModule::event()
           // start loop on amplification
           for (int ig1 = 0; ig1 < (int)GEM_gain1; ig1++) {
             //1st GEM geometrical effect
-            const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
+            //const TVector2 GEM1(GEMGeo1(driftGap.X(), driftGap.Y()));
+            const TVector2 GEM1(GEMGeo1(x_DG, y_DG));
             //drift 1st amplication to 2nd GEM
-            const TLorentzVector transferGap(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
+            //const TLorentzVector transferGap(Drift(GEM1.X(), GEM1.Y(), m_z_TG, m_Dt_TG, m_Dl_TG, m_v_TG));
+            double x_TG, y_TG, z_TG, t_TG;
+            Drift(GEM1.X(), GEM1.Y(), m_z_TG, x_TG, y_TG, z_TG, t_TG, m_Dt_TG, m_Dl_TG, m_v_TG);
 
             ///////////////////////////////
             // start loop on amplification
             for (int ig2 = 0; ig2 < (int)GEM_gain2; ig2++) {
               //2nd GEN geometrical effect
-              const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
+              //const TVector2 GEM2(GEMGeo2(transferGap.X(), transferGap.Y()));
+              const TVector2 GEM2(GEMGeo2(x_TG, y_TG));
               //drift 2nd amplification to chip
-              const TLorentzVector collectionGap(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
+              //const TLorentzVector collectionGap(Drift(GEM2.X(), GEM2.Y(), m_z_CG, m_Dt_CG, m_Dl_CG, m_v_CG));
+              double x_CG, y_CG, z_CG, t_CG;
+              Drift(GEM2.X(), GEM2.Y(), m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
 
               //determine col, row, and bc
+              /*
               const int col = (int)((collectionGap.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
               const int row = (int)((collectionGap.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
               const int pix = col +  m_ChipColumnNb * row;
               const int quT = gRandom->Uniform(-1, 1);
               int bci = (int)((driftGap.T() + transferGap.T() + collectionGap.T() - T0[detNb]) / (double)m_PixelTimeBin) + quT;
+              if (bci < 0)bci = 0;
+              */
+              int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
+              int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
+              int pix = col +  m_ChipColumnNb * row;
+              int quT = gRandom->Uniform(-1, 1);
+              int bci = (int)((t_DG + t_TG + t_CG - T0[detNb]) / (double)m_PixelTimeBin) + quT;
               if (bci < 0)bci = 0;
 
               //check if amplified drifted electron are within pixel boundaries
@@ -195,8 +224,9 @@ void TpcDigitizerModule::event()
                   (0 <= bci && bci < MAXtSIZE)) {
                 PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
-//                m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
-                m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                m_dchip_map[std::tuple<int, int, int>(detNb, col, row)] = 1;
+                //m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
               }
             }
           }
@@ -206,14 +236,26 @@ void TpcDigitizerModule::event()
   }
 
   //Pixelization of the 3D ionization cloud
-  for (int i = 0; i < m_nTPC; i++) {
+  /*for (int i = 0; i < m_nTPC; i++) {
     if (m_lowerTimingCut < T0[i] && T0[i] < m_upperTimingCut && PixelFired[i]) {
       Pixelization(i);
+
+      for (int j = 0; j < 80; j++) {
+        for (int k = 0; k < 336; k++) {
+          for (int l = 0; l < MAXtSIZE; l++) {
+            m_dchip[i][j][k][l] = 0;
+          }
+        }
+      }
+
     }
   }
-  m_dchip.clear();
+  */
+  if (m_dchip_map.size() > 0) Pixelization();
+  //m_dchip.clear();
+  m_dchip_map.clear();
 }
-
+/*
 TLorentzVector TpcDigitizerModule::Drift(
   double x1, double y1, double z1,
   double st, double sl, double vd
@@ -237,7 +279,24 @@ TLorentzVector TpcDigitizerModule::Drift(
   }
   return TLorentzVector(x2, y2, z2, t2);
 }
-
+*/
+void TpcDigitizerModule::Drift(double x1, double y1, double z1, double& x2, double& y2, double& z2, double& t2, double st,
+                               double sl, double vd)
+{
+  //check if
+  if (z1 > 0.) {
+    //transverse diffusion
+    x2 = x1 + gRandom->Gaus(0., sqrt(z1) * st);
+    //transverse diffusion
+    y2 = y1 + gRandom->Gaus(0., sqrt(z1) * st);
+    //longitidinal diffusion
+    z2 = z1 + gRandom->Gaus(0., sqrt(z1) * sl);
+    //time to diffuse
+    t2 = z2 / vd;
+  } else {
+    x2 = -1000; y2 = -1000; z2 = -1000; t2 = -1000;
+  }
+}
 TVector2 TpcDigitizerModule::GEMGeo1(double x1, double y1)
 {
   static const double sqrt3o4 = std::sqrt(3. / 4.);
@@ -268,6 +327,107 @@ TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
   return TVector2(x2, y2);
 }
 
+
+
+
+
+//bool TpcDigitizerModule::Pixelization(int detNb)
+void TpcDigitizerModule::Pixelization()
+{
+  std::vector<int> t0[10];
+  std::vector<int> col[10];
+  std::vector<int> row[10];
+  std::vector<int> ToT[10];
+  std::vector<int> bci[10];
+
+  StoreArray<MicrotpcHit> microtpcHits;
+
+  for (auto& keyValuePair : m_dchip_map) {
+    const auto& key = keyValuePair.first;
+    //detector number
+    int detNb = std::get<0>(key);
+    //column
+    int i = std::get<1>(key);
+    //raw
+    int j = std::get<2>(key);
+
+    if (m_dchip_map[std::tuple<int, int, int>(detNb, i, j)] == 1) {
+
+      int k0 = -10;
+      const int quE = gRandom->Uniform(0, 2);
+      const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
+      //determined t0 ie first time above pixel threshold
+      for (int k = 0; k < MAXtSIZE; k++) {
+        //if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
+        if (m_dchip[detNb][i][j][k] > thresEl) {
+          k0 = k;
+          break;
+        }
+      }
+      //determined nb of bc per pixel
+
+      //if good t0
+      if (k0 != -10) {
+        int ik = 0;
+        int NbOfEl = 0;
+        for (int k = k0; k < MAXtSIZE; k++) {
+          //sum up charge with 16 cycles
+          if (ik < 16) {
+            //NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
+            NbOfEl += m_dchip[detNb][i][j][k];
+          } else {
+            //calculate ToT
+            int tot = -1;
+            if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1) {
+              tot = (int)fctToT_Calib1->Eval((double)NbOfEl) + quE;
+            } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
+              tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
+            } else if (NbOfEl > 800.*m_TOTQ1) {
+              tot = 14;
+            }
+            if (tot > 13) {
+              tot = 14;
+            }
+            if (tot >= 0) {
+              ToT[detNb].push_back(tot);
+              t0[detNb].push_back(k0);
+              col[detNb].push_back(i);
+              row[detNb].push_back(j);
+              bci[detNb].push_back(k0);
+            }
+            ik = 0;
+            NbOfEl = 0;
+          }
+          ik++;
+        }
+      }
+    } //end loop on row
+    for (int k = 0; k < MAXtSIZE; k++) m_dchip[detNb][i][j][k] = 0;
+  } // end loop on col
+
+  //bool PixHit = false;
+  for (int i = 0; i < 10 ; i++) {
+    //if entry
+    if (bci[i].size() > 0) {
+      //PixHit = true;
+      //find start time
+      sort(t0[i].begin(), t0[i].end());
+
+      //loop on nb of hit
+      for (int j = 0; j < (int)bci[i].size(); j++) {
+        if ((bci[i][j] - t0[i][0]) > (m_PixelTimeBinNb - 1)) {
+          continue;
+        }
+        //create MicrotpcHit
+        microtpcHits.appendNew(MicrotpcHit(col[i][j], row[i][j], bci[i][j] - t0[i][0], ToT[i][j], i));
+      } //end on loop nb of hit
+    } //end if entry
+  }
+  //return PixHit;
+}
+
+/*
+
 bool TpcDigitizerModule::Pixelization(int detNb)
 {
   std::vector<int> t0;
@@ -287,7 +447,8 @@ bool TpcDigitizerModule::Pixelization(int detNb)
       const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
       //determined t0 ie first time above pixel threshold
       for (int k = 0; k < MAXtSIZE; k++) {
-        if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
+        //if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
+  if (m_dchip[detNb][i][j][k] > thresEl) {
           k0 = k;
           break;
         }
@@ -301,7 +462,8 @@ bool TpcDigitizerModule::Pixelization(int detNb)
         for (int k = k0; k < MAXtSIZE; k++) {
           //sum up charge with 16 cycles
           if (ik < 16) {
-            NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
+            //NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
+      NbOfEl += m_dchip[detNb][i][j][k];
           } else {
             //calculate ToT
             int tot = -1;
@@ -350,7 +512,7 @@ bool TpcDigitizerModule::Pixelization(int detNb)
 
   return PixHit;
 }
-
+*/
 //read tube centers, impulse response, and garfield drift data filename from MICROTPC.xml
 void TpcDigitizerModule::getXMLData()
 {

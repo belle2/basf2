@@ -26,7 +26,7 @@ namespace Belle2 {
        It knows about all available filters and their parameters.
        Can collaborate with a Module and expose these parameters to the user in steering file.
     */
-    template<class Filter_>
+    template<class AFilter>
     class FilterFactoryBase {
 
     public:
@@ -84,7 +84,7 @@ namespace Belle2 {
 
           filterParametersDescription << "\"" << filterName << "\"" << " :\n";
 
-          std::unique_ptr<Filter_> filter = create(filterName);
+          std::unique_ptr<AFilter> filter = create(filterName);
           if (not filter) {
             B2WARNING("Could not create a " << prefix << "Filter for name " << filterName);
             continue;
@@ -124,11 +124,11 @@ namespace Belle2 {
       }
 
       /** Create the filter with the currently stored parameters. */
-      std::unique_ptr<Filter_> create();
+      std::unique_ptr<AFilter> create();
 
       /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter_> create(const std::string& /*name*/) const
-      {return std::unique_ptr<Filter_>(nullptr); }
+      virtual std::unique_ptr<AFilter> create(const std::string& /*name*/) const
+      {return std::unique_ptr<AFilter>(nullptr); }
 
       /** Getter for a descriptive purpose of the filter.*/
       virtual std::string getFilterPurpose() const
@@ -157,8 +157,8 @@ namespace Belle2 {
 
 
 
-    template<class Filter_>
-    void FilterFactoryBase<Filter_>::exposeParameters(TrackFinderCDCBaseModule* module)
+    template<class AFilter>
+    void FilterFactoryBase<AFilter>::exposeParameters(TrackFinderCDCBaseModule* module)
     {
       assert(module);
 
@@ -177,10 +177,10 @@ namespace Belle2 {
     }
 
 
-    template<class Filter_>
-    std::unique_ptr<Filter_> FilterFactoryBase<Filter_>::create()
+    template<class AFilter>
+    std::unique_ptr<AFilter> FilterFactoryBase<AFilter>::create()
     {
-      std::unique_ptr<Filter_> ptrFilter = create(m_filterName);
+      std::unique_ptr<AFilter> ptrFilter = create(m_filterName);
 
       if (not ptrFilter) {
         // Filter not valid

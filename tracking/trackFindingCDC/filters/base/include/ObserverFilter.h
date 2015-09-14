@@ -19,21 +19,21 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Observer listening to the number of yes and no answers from the filter
-    template<class BaseFilter>
-    class ObserverFilter : public BaseFilter {
+    template<class ABaseFilter>
+    class ObserverFilter : public ABaseFilter {
     public:
-      using BaseFilter::BaseFilter;
-      typedef typename BaseFilter::Object Object;
+      using ABaseFilter::BaseFilter;
+      typedef typename ABaseFilter::Object Object;
 
     public:
       /// Constructor of the filter.
-      ObserverFilter() : BaseFilter() {}
+      ObserverFilter() : ABaseFilter() {}
 
       /// Terminate the filter after event processing.
       virtual void terminate() override
       {
         B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.");
-        BaseFilter::terminate();
+        ABaseFilter::terminate();
       }
 
     public:
@@ -46,7 +46,7 @@ namespace Belle2 {
        */
       virtual CellWeight operator()(const Object& object)
       {
-        CellWeight result = BaseFilter::operator()(object);
+        CellWeight result = ABaseFilter::operator()(object);
         if (isNotACell(result)) {
           m_noAnswers += 1;
         } else {

@@ -92,22 +92,22 @@ namespace Belle2 {
       /** Returns a two iterator range covering the range of possible neighboring wire hits of the
        *  given facet out of the sorted range given by the two other argumets.
        */
-      template<class CDCWireHitIterator>
-      boost::iterator_range<CDCWireHitIterator>
+      template<class ACDCWireHitIterator>
+      boost::iterator_range<ACDCWireHitIterator>
       getPossibleNeighbors(const CDCWireHit& wireHit,
-                           const CDCWireHitIterator& itBegin,
-                           const CDCWireHitIterator& itEnd) const
+                           const ACDCWireHitIterator& itBegin,
+                           const ACDCWireHitIterator& itEnd) const
       {
 
         const CDCWire& wire = wireHit.getWire();
         const CDCWire* ptrNeighborWire = NeighborWireGetter<ConcreteNeighborType>::get(wire);
 
         if (ptrNeighborWire == nullptr) {
-          return boost::iterator_range<CDCWireHitIterator>(itEnd, itEnd);
+          return boost::iterator_range<ACDCWireHitIterator>(itEnd, itEnd);
         } else {
           const CDCWire& neighborWire = *ptrNeighborWire;
-          std::pair<CDCWireHitIterator, CDCWireHitIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, neighborWire);
-          return boost::iterator_range<CDCWireHitIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+          std::pair<ACDCWireHitIterator, ACDCWireHitIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, neighborWire);
+          return boost::iterator_range<ACDCWireHitIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
         }
       }
 

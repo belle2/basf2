@@ -20,16 +20,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class Object_>
-    class UnionRecordingFilter: public RecordingFilter<UnionVarSet<Object_>> {
+    template<class AObject>
+    class UnionRecordingFilter: public RecordingFilter<UnionVarSet<AObject>> {
 
     private:
       /// Type of the super class
-      typedef RecordingFilter<UnionVarSet<Object_>> Super;
+      typedef RecordingFilter<UnionVarSet<AObject>> Super;
 
     public:
       /// Type of the object to be analysed.
-      typedef Object_ Object;
+      typedef AObject Object;
 
     public:
       /// Constructor of the filter.

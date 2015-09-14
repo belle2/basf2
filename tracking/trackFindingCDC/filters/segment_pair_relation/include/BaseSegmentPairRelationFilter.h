@@ -29,19 +29,19 @@ namespace Belle2 {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
-      template<class CDCSegmentPairIterator>
-      boost::iterator_range<CDCSegmentPairIterator>
+      template<class ACDCSegmentPairIterator>
+      boost::iterator_range<ACDCSegmentPairIterator>
       getPossibleNeighbors(const CDCSegmentPair& segmentPair,
-                           const CDCSegmentPairIterator& itBegin,
-                           const CDCSegmentPairIterator& itEnd) const
+                           const ACDCSegmentPairIterator& itBegin,
+                           const ACDCSegmentPairIterator& itEnd) const
       {
 
         const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
-        if (not ptrEndSegment) boost::iterator_range<CDCSegmentPairIterator>(itEnd, itEnd);
+        if (not ptrEndSegment) boost::iterator_range<ACDCSegmentPairIterator>(itEnd, itEnd);
 
-        std::pair<CDCSegmentPairIterator, CDCSegmentPairIterator> itPairPossibleNeighbors = std::equal_range(itBegin,
+        std::pair<ACDCSegmentPairIterator, ACDCSegmentPairIterator> itPairPossibleNeighbors = std::equal_range(itBegin,
             itEnd, ptrEndSegment);
-        return boost::iterator_range<CDCSegmentPairIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+        return boost::iterator_range<ACDCSegmentPairIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

@@ -18,12 +18,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Mixin for filters that use Monte Carlo information.
-    template<class Filter_>
-    class MCSymmetricFilterMixin : public Filter_ {
+    template<class AFilter>
+    class MCSymmetricFilterMixin : public AFilter {
 
     private:
       /// Type of the super class
-      typedef Filter_ Super;
+      typedef AFilter Super;
 
     public:
       /// Constructor

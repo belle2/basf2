@@ -17,16 +17,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class VarSet_>
-    class RecordingFilter: public FilterOnVarSet<VarSet_> {
+    template<class AVarSet>
+    class RecordingFilter: public FilterOnVarSet<AVarSet> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<VarSet_> Super;
+      typedef FilterOnVarSet<AVarSet> Super;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename VarSet_::Object Object;
+      typedef typename AVarSet::Object Object;
 
     public:
       /// Constructor of the filter.
@@ -43,7 +43,7 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
-        VarSet_& varSet = Super::getVarSet();
+        AVarSet& varSet = Super::getVarSet();
         m_recorder.reset(new Recorder(varSet.getAllVariables(), m_rootFileName, m_treeName));
       }
 

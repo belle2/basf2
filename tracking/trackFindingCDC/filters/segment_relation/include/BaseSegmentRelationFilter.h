@@ -29,13 +29,13 @@ namespace Belle2 {
 
     public:
       /// Returns the full range of segments.
-      template<class CDCRecoSegment2DIterator>
-      boost::iterator_range<CDCRecoSegment2DIterator>
+      template<class ACDCRecoSegment2DIterator>
+      boost::iterator_range<ACDCRecoSegment2DIterator>
       getPossibleNeighbors(const CDCRecoSegment2D& /* segment */,
-                           const CDCRecoSegment2DIterator& itBegin,
-                           const CDCRecoSegment2DIterator& itEnd) const
+                           const ACDCRecoSegment2DIterator& itBegin,
+                           const ACDCRecoSegment2DIterator& itEnd) const
       {
-        return boost::iterator_range<CDCRecoSegment2DIterator>(itBegin, itEnd);
+        return boost::iterator_range<ACDCRecoSegment2DIterator>(itBegin, itEnd);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

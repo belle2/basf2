@@ -15,8 +15,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class for filters on a generic object type.
-    template<class Object_>
-    class Filter : public FilterBase<Object_> {
+    template<class AObject>
+    class Filter : public FilterBase<AObject> {
 
     };
   }

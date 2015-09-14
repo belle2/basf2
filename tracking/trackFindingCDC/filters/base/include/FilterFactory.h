@@ -25,15 +25,15 @@ namespace Belle2 {
      * The construction enables automatic collaboration with depending constructs
      * such as the UnionRecordingFilter.
      */
-    template<class Filter_>
-    class FilterFactory : public FilterFactoryBase<Filter_> {
+    template<class AFilter>
+    class FilterFactory : public FilterFactoryBase<AFilter> {
 
     public:
       /** Fill the default filter name and parameter values*/
       FilterFactory(std::string filterName,
                     std::map<std::string, std::string> filterParameters
                     = std::map<std::string, std::string>()) :
-        FilterFactoryBase<Filter_>(filterName, filterParameters)
+        FilterFactoryBase<AFilter>(filterName, filterParameters)
       {
       }
     };

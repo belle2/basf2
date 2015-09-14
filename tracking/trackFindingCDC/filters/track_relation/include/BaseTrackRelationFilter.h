@@ -28,13 +28,13 @@ namespace Belle2 {
 
     public:
       /// Returns the full range of tracks.
-      template<class CDCTrackIterator>
-      boost::iterator_range<CDCTrackIterator>
+      template<class ACDCTrackIterator>
+      boost::iterator_range<ACDCTrackIterator>
       getPossibleNeighbors(const CDCTrack& /* track */,
-                           const CDCTrackIterator& itBegin,
-                           const CDCTrackIterator& itEnd) const
+                           const ACDCTrackIterator& itBegin,
+                           const ACDCTrackIterator& itEnd) const
       {
-        return boost::iterator_range<CDCTrackIterator>(itBegin, itEnd);
+        return boost::iterator_range<ACDCTrackIterator>(itBegin, itEnd);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

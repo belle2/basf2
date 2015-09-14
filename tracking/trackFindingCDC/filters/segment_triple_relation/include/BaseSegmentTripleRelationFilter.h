@@ -31,17 +31,17 @@ namespace Belle2 {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
-      template<class CDCSegmentTripleIterator>
-      boost::iterator_range<CDCSegmentTripleIterator>
+      template<class ACDCSegmentTripleIterator>
+      boost::iterator_range<ACDCSegmentTripleIterator>
       getPossibleNeighbors(const CDCSegmentTriple& triple,
-                           const CDCSegmentTripleIterator& itBegin,
-                           const CDCSegmentTripleIterator& itEnd)
+                           const ACDCSegmentTripleIterator& itBegin,
+                           const ACDCSegmentTripleIterator& itEnd)
       {
 
         const CDCAxialRecoSegment2D* endSegment = triple.getEnd();
-        std::pair<CDCSegmentTripleIterator,  CDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
+        std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
             endSegment);
-        return boost::iterator_range<CDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+        return boost::iterator_range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
 
       }
 

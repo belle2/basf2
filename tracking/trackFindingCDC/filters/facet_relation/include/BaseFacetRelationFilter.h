@@ -34,19 +34,19 @@ namespace Belle2 {
     public:
       /** Returns a two iterator range covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.*/
-      template<class CDCFacetIterator>
-      boost::iterator_range<CDCFacetIterator>
+      template<class ACDCFacetIterator>
+      boost::iterator_range<ACDCFacetIterator>
       getPossibleNeighbors(const CDCFacet& facet,
-                           const CDCFacetIterator& itBegin,
-                           const CDCFacetIterator& itEnd) const
+                           const ACDCFacetIterator& itBegin,
+                           const ACDCFacetIterator& itEnd) const
       {
 
         const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();
 
-        std::pair<CDCFacetIterator, CDCFacetIterator> rangePossibleNeighbors =
+        std::pair<ACDCFacetIterator, ACDCFacetIterator> rangePossibleNeighbors =
           std::equal_range(itBegin, itEnd, rearRLWireHitPair);
-        return boost::iterator_range<CDCFacetIterator>(rangePossibleNeighbors.first,
-                                                       rangePossibleNeighbors.second);
+        return boost::iterator_range<ACDCFacetIterator>(rangePossibleNeighbors.first,
+                                                        rangePossibleNeighbors.second);
       }
 
       /** Legacy method */

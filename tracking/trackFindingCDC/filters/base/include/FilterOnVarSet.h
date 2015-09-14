@@ -16,16 +16,16 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class VarSet_>
-    class FilterOnVarSet: public Filter<typename VarSet_::Object> {
+    template<class AVarSet>
+    class FilterOnVarSet: public Filter<typename AVarSet::Object> {
 
     private:
       /// Type of the super class
-      typedef Filter<typename VarSet_::Object> Super;
+      typedef Filter<typename AVarSet::Object> Super;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename VarSet_::Object Object;
+      typedef typename AVarSet::Object Object;
 
     public:
       /// Constructor of the filter.
@@ -75,12 +75,12 @@ namespace Belle2 {
 
     protected:
       /// Getter for the set of variables
-      VarSet_& getVarSet()
+      AVarSet& getVarSet()
       { return m_varSet; }
 
     private:
       /// VarSet to generate the variables from the object
-      VarSet_ m_varSet;
+      AVarSet m_varSet;
     };
   }
 }

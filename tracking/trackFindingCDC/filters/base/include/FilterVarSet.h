@@ -27,8 +27,8 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a segment pair.
      */
-    template<class Filter_>
-    class FilterVarNames : public VarNames<typename Filter_::Object> {
+    template<class AFilter>
+    class FilterVarNames : public VarNames<typename AFilter::Object> {
 
     public:
       /// Number of variables to be generated.
@@ -45,16 +45,16 @@ namespace Belle2 {
     /** Class that computes floating point variables from segment pair.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    template<class Filter_>
-    class  FilterVarSet : public VarSet<FilterVarNames<Filter_> > {
+    template<class AFilter>
+    class  FilterVarSet : public VarSet<FilterVarNames<AFilter> > {
 
     private:
       /// Type of the base class
-      typedef VarSet<FilterVarNames<Filter_> > Super;
+      typedef VarSet<FilterVarNames<AFilter> > Super;
 
     public:
       /// Type of the filter
-      typedef Filter_ Filter;
+      typedef AFilter Filter;
 
       /// Type of the object from which the filter judgement should be extracted.
       typedef typename Filter::Object Object;
@@ -110,8 +110,8 @@ namespace Belle2 {
     };
 
 
-    // template<class Filter_>
-    // bool FilterVarSet<Filter_>::extract(const Object* obj)
+    // template<class AFilter>
+    // bool FilterVarSet<AFilter>::extract(const Object* obj)
     // {
 
     // }

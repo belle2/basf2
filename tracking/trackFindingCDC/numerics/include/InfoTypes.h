@@ -108,13 +108,13 @@ namespace Belle2 {
 
 
     /// Return the reversed orientation info. Leaves invalid infos the same.
-    template<class EOrientation>
-    inline EOrientation reversedInfo(const EOrientation& info)
-    { return static_cast<EOrientation>(-info); }
+    template<class AEOrientation>
+    inline AEOrientation reversedInfo(const AEOrientation& info)
+    { return static_cast<AEOrientation>(-info); }
 
     /// Return the reversed orientation info. Leaves invalid infos the same.
-    template<class EOrientation>
-    inline bool isValidInfo(const EOrientation& info)
+    template<class AEOrientation>
+    inline bool isValidInfo(const AEOrientation& info)
     { return std::abs(info) <= 1; }
 
     /// Combines two orientation informations to their most likely common one
@@ -124,12 +124,12 @@ namespace Belle2 {
      *  ( 1, -1 ) -> 0 \n
      *  ( 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
-    template<class EOrientation>
-    inline EOrientation averageInfo(const EOrientation& one, const EOrientation& two)
+    template<class AEOrientation>
+    inline AEOrientation averageInfo(const AEOrientation& one, const AEOrientation& two)
     {
       return ((isValidInfo(one) and isValidInfo(two)) ?
-              static_cast<EOrientation>(sign(one + two)) :
-              EOrientation::c_Invalid);
+              static_cast<AEOrientation>(sign(one + two)) :
+              AEOrientation::c_Invalid);
     }
 
     /// Combines three orientation informations to their most likely common one
@@ -141,14 +141,14 @@ namespace Belle2 {
      *  ( 1, 0, -1) -> 0 \n
      *  ( 0, 0, 0 ) -> 0 \n
      *  plus the inverse and permutation cases. */
-    template<class EOrientation>
-    inline EOrientation averageInfo(const EOrientation& one,
-                                    const EOrientation& two,
-                                    const EOrientation& three)
+    template<class AEOrientation>
+    inline AEOrientation averageInfo(const AEOrientation& one,
+                                     const AEOrientation& two,
+                                     const AEOrientation& three)
     {
       return (isValidInfo(one) and isValidInfo(two) and isValidInfo(three) ?
-              static_cast<EOrientation>(sign(one + two + three)) :
-              EOrientation::c_Invalid);
+              static_cast<AEOrientation>(sign(one + two + three)) :
+              AEOrientation::c_Invalid);
     }
     /**@}*/
 

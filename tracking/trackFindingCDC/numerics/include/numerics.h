@@ -24,19 +24,19 @@ namespace Belle2 {
     const double PI = 3.141592653589793238462;
 
     ///Checks if an integer is even
-    template<class IntNumber>
-    inline bool isEven(const IntNumber& x)
+    template<class AInt>
+    inline bool isEven(const AInt& x)
     { return (x % 2) == 0; }
 
     ///Checks if an integer is odd
-    template<class IntNumber>
-    inline bool isOdd(const IntNumber& x)
+    template<class AInt>
+    inline bool isOdd(const AInt& x)
     { return (x % 2) != 0; }
 
     /// Computes the square of an input value, and allows for operations like
     /// TVector3 * TVector3, which results in a double return type
-    template <class TNumber>
-    inline auto square(TNumber t) -> decltype(t* t) {return t * t;}
+    template<class ANumber>
+    inline auto square(ANumber t) -> decltype(t* t) {return t * t;}
 
     ///Returns the sign of an integer number
     inline int sign(int x)
@@ -107,11 +107,11 @@ namespace Belle2 {
     }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class OUT = double>
-    std::vector<OUT> linspace(const double start, const double final, const size_t n,
-                              const std::function<OUT(double)>& map)
+    template<class AResultType = double>
+    std::vector<AResultType> linspace(const double start, const double final, const size_t n,
+                                      const std::function<AResultType(double)>& map)
     {
-      std::vector<OUT> result;
+      std::vector<AResultType> result;
       result.reserve(n);
       result.push_back(map(start));
       for (size_t i = 1; i < n - 1; ++i) {
@@ -123,11 +123,11 @@ namespace Belle2 {
     }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class OUT = double>
-    std::vector<OUT> linspace(const double start, const double final, const size_t n)
+    template<class AResultType = double>
+    std::vector<AResultType> linspace(const double start, const double final, const size_t n)
     {
-      auto map = [](const double in) -> OUT {return OUT(in);};
-      return linspace<OUT>(start, final, n, map);
+      auto map = [](const double in) -> AResultType {return AResultType(in);};
+      return linspace<AResultType>(start, final, n, map);
     }
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

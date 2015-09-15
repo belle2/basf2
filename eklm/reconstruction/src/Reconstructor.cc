@@ -20,6 +20,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 using namespace Belle2;
 
@@ -48,14 +49,14 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
           (d1->getSector() == d2->getSector()));
 }
 
-EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
+EKLM::Reconstructor::Reconstructor(TransformData* transformData)
 {
   int i, n;
   float p0, p1;
   TFile* f;
   TTree* t;
   setDefDigitizationParams(&m_digPar);
-  m_geoDat = geoDat;
+  m_TransformData = transformData;
   n = EKLM::GeometryData2::Instance().getNStripsDifferentLength();
   m_TimeParams = new struct TimeParams[n];
   f = new TFile(FileSystem::findFile(
@@ -128,8 +129,8 @@ void EKLM::Reconstructor::create2dHits()
     for (it4 = it; it4 != it2; ++it4) {
       for (it5 = it2; it5 != it3; ++it5) {
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_geoDat->m_TransformData.intersection(*it4, *it5, &crossPoint,
-                                                    &d1, &d2, &sd))
+        if (!m_TransformData->intersection(*it4, *it5, &crossPoint, &d1, &d2,
+                                           &sd))
           continue;
         t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
         t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;

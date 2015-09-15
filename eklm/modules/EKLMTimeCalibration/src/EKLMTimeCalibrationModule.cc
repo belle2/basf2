@@ -75,14 +75,14 @@ EKLMTimeCalibrationModule::EKLMTimeCalibrationModule() :
   m_nStripDifferent = -1;
   m_Tree = NULL;
   m_ev = {0, 0};
-  m_geoDat = NULL;
+  m_TransformData = NULL;
   m_geoDat2 = NULL;
 }
 
 EKLMTimeCalibrationModule::~EKLMTimeCalibrationModule()
 {
-  if (m_geoDat != NULL)
-    delete m_geoDat;
+  if (m_TransformData != NULL)
+    delete m_TransformData;
 }
 
 void EKLMTimeCalibrationModule::Prepare()
@@ -97,7 +97,7 @@ void EKLMTimeCalibrationModule::Prepare()
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
-  m_geoDat = new EKLM::GeometryData(true);
+  m_TransformData = new EKLM::TransformData(true);
   m_geoDat2 = &(EKLM::GeometryData2::Instance());
   m_outputFile = new TFile(m_dataOutputFileName.c_str(), "recreate");
   if (m_outputFile->IsZombie())
@@ -198,7 +198,7 @@ void EKLMTimeCalibrationModule::CollectData()
       hitGlobal.setX(hitPosition.X() / Unit::mm * CLHEP::mm);
       hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
       hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
-      tr = m_geoDat->m_TransformData.getStripGlobalToLocal(digits[j]);
+      tr = m_TransformData->getStripGlobalToLocal(digits[j]);
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;

@@ -33,11 +33,11 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeometryData2.h>
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
+#include <eklm/geometry/TransformData.h>
 
 /**
  * @file
@@ -501,8 +501,8 @@ namespace Belle2 {
       /** Current volumes. */
       struct VolumeNumbers curvol;
 
-      /** Geometry data. */
-      GeometryData* m_geoDat;
+      /** Transformation data. */
+      TransformData* m_TransformData;
 
       /** Geometry data. */
       const GeometryData2* m_geoDat2;

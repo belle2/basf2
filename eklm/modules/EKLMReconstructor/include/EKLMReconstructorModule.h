@@ -12,7 +12,7 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/TransformData.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/core/Module.h>
 
@@ -64,8 +64,8 @@ namespace Belle2 {
 
   private:
 
-    /** Geometry data. */
-    EKLM::GeometryData* m_geoDat;
+    /** Transformation data. */
+    EKLM::TransformData* m_TransformData;
 
     /** Reconstructor. */
     EKLM::Reconstructor* m_rec;

@@ -20,7 +20,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/TransformData.h>
 #include <eklm/simulation/Digitizer.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Reconstructor(GeometryData* geoDat);
+      Reconstructor(TransformData* transformData);
 
       /**
        * Destructor.
@@ -77,8 +77,8 @@ namespace Belle2 {
       /** Digitization parameters. */
       struct DigitizationParams m_digPar;
 
-      /** Geometry data. */
-      GeometryData* m_geoDat;
+      /** Transformation data. */
+      TransformData* m_TransformData;
 
       /** Time calibration data. */
       struct TimeParams* m_TimeParams;

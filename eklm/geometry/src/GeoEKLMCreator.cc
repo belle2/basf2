@@ -49,7 +49,7 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   if (readESTRData(&ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
   try {
-    m_geoDat = new EKLM::GeometryData(false);
+    m_TransformData = new EKLM::TransformData(false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -60,7 +60,7 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
 
 EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
-  delete m_geoDat;
+  delete m_TransformData;
   free(ESTRPar.z);
   free(ESTRPar.rmin);
   free(ESTRPar.rmax);
@@ -1126,7 +1126,7 @@ void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
   }
   geometry::setVisibility(*logicEndcap, true);
   geometry::setColor(*logicEndcap, "#ffffff22");
-  t = m_geoDat->m_TransformData.getEndcapTransform(curvol.endcap);
+  t = m_TransformData->getEndcapTransform(curvol.endcap);
   try {
     new G4PVPlacement(*t, logicEndcap, Endcap_Name, mlv, false,
                       curvol.endcap, false);
@@ -1151,7 +1151,7 @@ void EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicLayer, false);
-  t = m_geoDat->m_TransformData.getLayerTransform(curvol.endcap, curvol.layer);
+  t = m_TransformData->getLayerTransform(curvol.endcap, curvol.layer);
   try {
     new G4PVPlacement(*t, logicLayer, Layer_Name, mlv, false,
                       curvol.layer, false);
@@ -1176,8 +1176,8 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicSector, false);
-  t = m_geoDat->m_TransformData.getSectorTransform(curvol.endcap, curvol.layer,
-                                                   curvol.sector);
+  t = m_TransformData->getSectorTransform(curvol.endcap, curvol.layer,
+                                          curvol.sector);
   try {
     new G4PVPlacement(*t, logicSector, Sector_Name, mlv, false,
                       curvol.sector, false);
@@ -1398,8 +1398,8 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicPlane, false);
-  t = m_geoDat->m_TransformData.getPlaneTransform(curvol.endcap, curvol.layer,
-                                                  curvol.sector, curvol.plane);
+  t = m_TransformData->getPlaneTransform(curvol.endcap, curvol.layer,
+                                         curvol.sector, curvol.plane);
   try {
     new G4PVPlacement(*t, logicPlane, Plane_Name, mlv, false,
                       curvol.plane, false);
@@ -1727,9 +1727,9 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
   G4LogicalVolume* lv;
   const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
   n = m_geoDat2->getStripLengthIndex(curvol.strip - 1);
-  t = m_geoDat->m_TransformData.getStripTransform(curvol.endcap, curvol.layer,
-                                                  curvol.sector, curvol.plane,
-                                                  curvol.strip);
+  t = m_TransformData->getStripTransform(curvol.endcap, curvol.layer,
+                                         curvol.sector, curvol.plane,
+                                         curvol.strip);
   t2 = (*t) * G4Translate3D(0.5 * stripGeometry->rss_size, 0.0, 0.0) *
        HepGeom::RotateX3D(180.0 * CLHEP::deg);
   lv = logvol.stripvol[n];

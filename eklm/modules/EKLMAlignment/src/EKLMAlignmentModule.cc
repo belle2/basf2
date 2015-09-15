@@ -11,7 +11,6 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeometryData2.h>
 #include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
 #include <framework/core/ModuleManager.h>

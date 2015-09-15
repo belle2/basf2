@@ -20,8 +20,8 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationModule.h>
-#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/TransformData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -101,8 +101,8 @@ namespace Belle2 {
     /** Output file */
     TFile* m_outputFile;
 
-    /** Geometry data. */
-    EKLM::GeometryData* m_geoDat;
+    /** Transformation data. */
+    EKLM::TransformData* m_TransformData;
 
     /** Geometry data. */
     const EKLM::GeometryData2* m_geoDat2;

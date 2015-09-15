@@ -11,9 +11,6 @@
 #ifndef EKLMTRANSFORMDATA_H
 #define EKLMTRANSFORMDATA_H
 
-/* System headers. */
-#include <stdio.h>
-
 /* External headers. */
 #include <CLHEP/Geometry/Transform3D.h>
 
@@ -59,25 +56,6 @@ namespace Belle2 {
       HepGeom::Transform3D strip[2][14][4][2][75];
       HepGeom::Transform3D stripInverse[2][14][4][2][75];
     };
-
-    /**
-     * Write transformations to file.
-     * @param[in] f    File.
-     * @param[in] dat  Transformation data.
-     * @return 0  Successful.
-     * @return -1 Error.
-     */
-    int writeTransforms(FILE* f, struct TransformData* dat);
-
-    /**
-     * Read transformations from file.
-     * @param[in]  f    File.
-     * @param[out] dat  Transformation data.
-     * @param[in]  file Name of file.
-     * @return 0  Successful.
-     * @return -1 Error.
-     */
-    int readTransforms(FILE* f, struct TransformData* dat);
 
     /**
      * Fill transformations.

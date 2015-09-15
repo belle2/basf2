@@ -14,6 +14,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h>
@@ -55,7 +56,7 @@ EKLM::Reconstructor::Reconstructor(GeometryData* geoDat)
   TTree* t;
   setDefDigitizationParams(&m_digPar);
   m_geoDat = geoDat;
-  n = m_geoDat->getNStripsDifferentLength();
+  n = EKLM::GeometryData2::Instance().getNStripsDifferentLength();
   m_TimeParams = new struct TimeParams[n];
   f = new TFile(FileSystem::findFile(
                   "/data/eklm/TimeCalibration.root").c_str());
@@ -86,7 +87,7 @@ bool EKLM::Reconstructor::fastHit(HepGeom::Point3D<double>& pos, double time)
 double EKLM::Reconstructor::getTime(EKLMDigit* d, double dist)
 {
   int n;
-  n = m_geoDat->getStripLengthIndex(d->getStrip() - 1);
+  n = EKLM::GeometryData2::Instance().getStripLengthIndex(d->getStrip() - 1);
   return d->getTime() - (dist * m_TimeParams[n].p0 + m_TimeParams[n].p1);
 }
 

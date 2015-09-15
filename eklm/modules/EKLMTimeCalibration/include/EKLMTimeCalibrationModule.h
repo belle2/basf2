@@ -21,6 +21,7 @@
 /* Belle2 headers. */
 #include <calibration/CalibrationModule.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/GeometryData2.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -102,6 +103,9 @@ namespace Belle2 {
 
     /** Geometry data. */
     EKLM::GeometryData* m_geoDat;
+
+    /** Geometry data. */
+    const EKLM::GeometryData2* m_geoDat2;
 
     /** Number of strips with different lengths. */
     int m_nStripDifferent;

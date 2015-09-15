@@ -420,6 +420,23 @@ namespace Belle2 {
       const struct StripGeometry* getStripGeometry() const;
 
       /**
+       * Get number of strips with different lengths.
+       */
+      int getNStripsDifferentLength() const;
+
+      /**
+       * Get index in length-based array.
+       * @param[in] positionIndex index in position-based array.
+       */
+      int getStripLengthIndex(int positionIndex) const;
+
+      /**
+       * Get index in position-based array.
+       * @param[in] positionIndex index in position-based array.
+       */
+      int getStripPositionIndex(int lengthIndex) const;
+
+      /**
        * Check if z coordinate may be in EKLM.
        * @param[in] z Z coordinate (cm).
        *
@@ -501,6 +518,11 @@ namespace Belle2 {
       void calculateSectorSupportGeometry();
 
       /**
+       * Fill strip index arrays.
+       */
+      void fillStripIndexArrays();
+
+      /**
        * Read strip parameters from XML database.
        */
       void readXMLDataStrips();
@@ -525,6 +547,15 @@ namespace Belle2 {
 
       /** Number of strips in one plane. */
       int m_nStrip;
+
+      /** Number of strips with different lengths in one plane. */
+      int m_nStripDifferent;
+
+      /** Number of strip in length-based array. */
+      int* m_StripAllToLen;
+
+      /** Number of strip in position-based array. */
+      int* m_StripLenToAll;
 
       /** Number of segments is one plane. */
       int m_nSegment;

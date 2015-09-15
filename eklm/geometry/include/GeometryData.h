@@ -42,44 +42,10 @@ namespace Belle2 {
        */
       ~GeometryData();
 
-      /**
-       * Read geometry data.
-       */
-      void read();
-
-      /**
-       * Get number of strips with different lengths.
-       */
-      int getNStripsDifferentLength();
-
-      /**
-       * Get index in length-based array.
-       * @param[in] positionIndex index in position-based array.
-       */
-      int getStripLengthIndex(int positionIndex);
-
-      /**
-       * Get index in position-based array.
-       * @param[in] positionIndex index in position-based array.
-       */
-      int getStripPositionIndex(int lengthIndex);
-
       /** Transformations. */
       TransformData m_TransformData;
 
     private:
-
-      /** Number of strips in one plane. */
-      int m_nStrip;
-
-      /** Number of strips with different lengths in one plane. */
-      int m_nStripDifferent;
-
-      /** Number of strip in length-based array. */
-      int* m_StripAllToLen;
-
-      /** Number of strip in position-based array. */
-      int* m_StripLenToAll;
 
     };
 

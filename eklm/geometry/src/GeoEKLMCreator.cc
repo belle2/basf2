@@ -53,7 +53,6 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  m_geoDat->read();
   newVolumes();
   newTransforms();
   newSensitive();
@@ -87,7 +86,7 @@ void EKLM::GeoEKLMCreator::newVolumes()
                   malloc(m_geoDat2->getNSegments() * sizeof(G4LogicalVolume*));
   if (logvol.psheet == NULL)
     B2FATAL(MemErr);
-  nDiff = m_geoDat->getNStripsDifferentLength();
+  nDiff = m_geoDat2->getNStripsDifferentLength();
   solids.stripvol = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
   if (solids.stripvol == NULL)
     B2FATAL(MemErr);
@@ -1017,9 +1016,9 @@ void EKLM::GeoEKLMCreator::createSolids()
   for (i = 0; i < m_geoDat2->getNPlanes(); i++)
     createPlaneSolid(i);
   /* Strips. */
-  n = m_geoDat->getNStripsDifferentLength();
+  n = m_geoDat2->getNStripsDifferentLength();
   for (i = 0; i < n; i++) {
-    iPos = m_geoDat->getStripPositionIndex(i);
+    iPos = m_geoDat2->getStripPositionIndex(i);
     stripPos = m_geoDat2->getStripPosition(iPos + 1);
     /* Strip volumes. */
     snprintf(name, 128, "StripVolume_%d", i + 1);
@@ -1414,7 +1413,7 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
       createPlasticSheetElement(i, j, logicPlane);
   if (curvol.endcap == 1 && curvol.layer == 1 && curvol.sector == 1 &&
       curvol.plane == 1)
-    for (i = 0; i < m_geoDat->getNStripsDifferentLength(); i++) {
+    for (i = 0; i < m_geoDat2->getNStripsDifferentLength(); i++) {
       createStripLogicalVolumes(i, logicPlane);
       createStripPhysicalVolumes(i);
     }
@@ -1727,7 +1726,7 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
   HepGeom::Transform3D t2;
   G4LogicalVolume* lv;
   const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
-  n = m_geoDat->getStripLengthIndex(curvol.strip - 1);
+  n = m_geoDat2->getStripLengthIndex(curvol.strip - 1);
   t = m_geoDat->m_TransformData.getStripTransform(curvol.endcap, curvol.layer,
                                                   curvol.sector, curvol.plane,
                                                   curvol.strip);

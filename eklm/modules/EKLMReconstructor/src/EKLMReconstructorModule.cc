@@ -36,7 +36,6 @@ void EKLMReconstructorModule::initialize()
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
   m_geoDat = new EKLM::GeometryData(true);
-  m_geoDat->read();
 }
 
 void EKLMReconstructorModule::beginRun()

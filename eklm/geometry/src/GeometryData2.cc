@@ -128,6 +128,66 @@ void EKLM::GeometryData2::calculateSectorSupportGeometry()
          m_SectorSupportPosition.X * m_SectorSupportPosition.X);
 }
 
+static bool compareLength(double a, double b)
+{
+  return a < b;
+}
+
+void EKLM::GeometryData2::fillStripIndexArrays()
+{
+  const char err[] = "Strip sorting algorithm error.";
+  int i;
+  double l;
+  std::vector<double> strips;
+  std::vector<double>::iterator it;
+  std::map<double, int> mapLengthStrip;
+  std::map<double, int> mapLengthStrip2;
+  std::map<double, int>::iterator itm;
+  for (i = 0; i < m_nStrip; i++) {
+    strips.push_back(m_StripPosition[i].length);
+    mapLengthStrip.insert(std::pair<double, int>(m_StripPosition[i].length, i));
+  }
+  sort(strips.begin(), strips.end(), compareLength);
+  l = strips[0];
+  m_nStripDifferent = 1;
+  for (it = strips.begin(); it != strips.end(); ++it) {
+    if ((*it) != l) {
+      l = (*it);
+      m_nStripDifferent++;
+    }
+  }
+  m_StripLenToAll = (int*)malloc(m_nStripDifferent * sizeof(int));
+  if (m_StripLenToAll == NULL)
+    B2FATAL(c_MemErr);
+  i = 0;
+  l = strips[0];
+  itm = mapLengthStrip.find(l);
+  if (itm == mapLengthStrip.end())
+    B2FATAL(err);
+  m_StripLenToAll[i] = itm->second;
+  mapLengthStrip2.insert(std::pair<double, int>(l, i));
+  for (it = strips.begin(); it != strips.end(); ++it) {
+    if ((*it) != l) {
+      l = (*it);
+      i++;
+      itm = mapLengthStrip.find(l);
+      if (itm == mapLengthStrip.end())
+        B2FATAL(err);
+      m_StripLenToAll[i] = itm->second;
+      mapLengthStrip2.insert(std::pair<double, int>(l, i));
+    }
+  }
+  m_StripAllToLen = (int*)malloc(m_nStrip * sizeof(int));
+  if (m_StripAllToLen == NULL)
+    B2FATAL(c_MemErr);
+  for (i = 0; i < m_nStrip; i++) {
+    itm = mapLengthStrip2.find(m_StripPosition[i].length);
+    if (itm == mapLengthStrip2.end())
+      B2FATAL(err);
+    m_StripAllToLen[i] = itm->second;
+  }
+}
+
 void EKLM::GeometryData2::readXMLDataStrips()
 {
   int i;
@@ -251,6 +311,7 @@ EKLM::GeometryData2::GeometryData2()
   readPositionData(&m_PlanePosition, &Plane);
   readSizeData(&m_PlanePosition, &Plane);
   readXMLDataStrips();
+  fillStripIndexArrays();
   m_nSegment = Plane.getInt("nSegment");
   if (m_nSegment <= 0)
     B2FATAL("Number of segments must be positive.");
@@ -306,6 +367,8 @@ EKLM::GeometryData2::~GeometryData2()
       free(m_BoardPosition[i]);
     free(m_StripBoardPosition);
   }
+  free(m_StripLenToAll);
+  free(m_StripAllToLen);
 }
 
 EKLM::DetectorMode EKLM::GeometryData2::getDetectorMode() const
@@ -465,6 +528,21 @@ double EKLM::GeometryData2::getStripLength(int strip) const
 const EKLM::StripGeometry* EKLM::GeometryData2::getStripGeometry() const
 {
   return &m_StripGeometry;
+}
+
+int EKLM::GeometryData2::getStripLengthIndex(int positionIndex) const
+{
+  return m_StripAllToLen[positionIndex];
+}
+
+int EKLM::GeometryData2::getStripPositionIndex(int lengthIndex) const
+{
+  return m_StripLenToAll[lengthIndex];
+}
+
+int EKLM::GeometryData2::getNStripsDifferentLength() const
+{
+  return m_nStripDifferent;
 }
 
 bool EKLM::GeometryData2::hitInEKLM(double z) const

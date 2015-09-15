@@ -30,8 +30,6 @@ EKLM::GeometryData::GeometryData(bool global) : m_TransformData(global)
   m_nStripDifferent = -1;
   m_StripLenToAll = NULL;
   m_StripAllToLen = NULL;
-  m_MinZForward = 0;
-  m_MaxZBackward = 0;
 }
 
 EKLM::GeometryData::~GeometryData()
@@ -47,21 +45,13 @@ void EKLM::GeometryData::read()
   const char err[] = "Strip sorting algorithm error.";
   int i;
   char str[32];
-  double l, solenoidZ, endcapZ, endcapLength;
+  double l;
   double* stripLen;
   std::vector<double> strips;
   std::vector<double>::iterator it;
   std::map<double, int> mapLengthStrip;
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
-  /* Read position data. */
-  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  solenoidZ = gd.getLength("SolenoidZ");
-  gd.append("/Endcap");
-  endcapZ = gd.getLength("PositionZ");
-  endcapLength = gd.getLength("Length");
-  m_MinZForward = solenoidZ + endcapZ - 0.5 * endcapLength;
-  m_MaxZBackward = solenoidZ - endcapZ + 0.5 * endcapLength;
   /* Fill strip data. */
   GearDir gd2("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
               "Layer/Sector/Plane/Strips");
@@ -132,10 +122,5 @@ int EKLM::GeometryData::getStripPositionIndex(int lengthIndex)
 int EKLM::GeometryData::getNStripsDifferentLength()
 {
   return m_nStripDifferent;
-}
-
-bool EKLM::GeometryData::hitInEKLM(double z)
-{
-  return (z > m_MinZForward) || (z < m_MaxZBackward);
 }
 

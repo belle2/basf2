@@ -273,7 +273,7 @@ namespace Belle2 {
 
     /**
      * EKLM geometry data.
-     * All data and function results are in CLHEP units.
+     * All data and function results are in CLHEP units unless noted otherwise.
      */
     class GeometryData2 {
 
@@ -420,6 +420,14 @@ namespace Belle2 {
       const struct StripGeometry* getStripGeometry() const;
 
       /**
+       * Check if z coordinate may be in EKLM.
+       * @param[in] z Z coordinate (cm).
+       *
+       * Warning: this is not a complete check!
+       */
+      bool hitInEKLM(double z) const;
+
+      /**
        * Get endcap transformation.
        * @param[out] t Transformation.
        * @param[in]  n Number of endcap.
@@ -523,6 +531,12 @@ namespace Belle2 {
 
       /** Solenoid center Z coordinate. */
       double m_solenoidZ;
+
+      /** Minimal z coordinate of the forward endcap. */
+      double m_MinZForward;
+
+      /** Maximal z coordinate of the backward endcap. */
+      double m_MaxZBackward;
 
       /** Position data for endcaps. */
       struct ElementPosition m_EndcapPosition;

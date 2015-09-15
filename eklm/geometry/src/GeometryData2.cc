@@ -168,6 +168,10 @@ EKLM::GeometryData2::GeometryData2()
   EndCap.append("/Endcap");
   readPositionData(&m_EndcapPosition, &EndCap);
   readSizeData(&m_EndcapPosition, &EndCap);
+  m_MinZForward = m_solenoidZ + m_EndcapPosition.Z -
+                  0.5 * m_EndcapPosition.length;
+  m_MaxZBackward = m_solenoidZ - m_EndcapPosition.Z +
+                   0.5 * m_EndcapPosition.length;
   m_nLayer = EndCap.getInt("nLayer");
   if (m_nLayer < 1 || m_nLayer > 14)
     B2FATAL("Number of layers must be from 1 to 14.");
@@ -461,6 +465,13 @@ double EKLM::GeometryData2::getStripLength(int strip) const
 const EKLM::StripGeometry* EKLM::GeometryData2::getStripGeometry() const
 {
   return &m_StripGeometry;
+}
+
+bool EKLM::GeometryData2::hitInEKLM(double z) const
+{
+  double zMm;
+  zMm = z / Unit::cm * CLHEP::cm;
+  return (zMm > m_MinZForward) || (zMm < m_MaxZBackward);
 }
 
 /*

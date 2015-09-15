@@ -146,7 +146,8 @@ void EKLMTimeCalibrationModule::CollectData()
     for (j = 0; j < n2; j++) {
       if (extHits[j]->getDetectorID() != Const::EDetector::KLM)
         continue;
-      if (!m_geoDat->hitInEKLM(extHits[j]->getPosition().Z()))
+      if (!EKLM::GeometryData2::Instance().hitInEKLM(
+            extHits[j]->getPosition().Z()))
         continue;
       mapExtHit.insert(std::pair<int, ExtHit*>(extHits[j]->getCopyID(),
                                                extHits[j]));

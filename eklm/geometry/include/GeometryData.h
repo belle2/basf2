@@ -64,12 +64,6 @@ namespace Belle2 {
        */
       int getStripPositionIndex(int lengthIndex);
 
-      /**
-       * Check if z coordinate may be in EKLM.
-       * Warning: this is not a complete check!
-       */
-      bool hitInEKLM(double z);
-
       /** Transformations. */
       TransformData m_TransformData;
 
@@ -86,12 +80,6 @@ namespace Belle2 {
 
       /** Number of strip in position-based array. */
       int* m_StripLenToAll;
-
-      /** Minimal z coordinate of the forward endcap. */
-      double m_MinZForward;
-
-      /** Maximal z coordinate of the backward endcap. */
-      double m_MaxZBackward;
 
     };
 

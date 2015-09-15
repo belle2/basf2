@@ -73,6 +73,12 @@ void BaseRecoFitterModule::event()
   const std::shared_ptr<genfit::AbsFitter>& fitter = createFitter();
 
   for (RecoTrack& recoTrack : recoTracks) {
+
+    if (recoTrack.getNumPointsWithMeasurement() == 0) {
+      B2WARNING("No points with measurement.")
+      continue;
+    }
+
     B2DEBUG(100, "Fitting reco track candidate number " << recoTrackCounter);
     B2DEBUG(100, "Reco track candidate has start values: ");
     B2DEBUG(100, "Momentum: " << recoTrack.getMomentum().X() << " " << recoTrack.getMomentum().Y() << " " <<

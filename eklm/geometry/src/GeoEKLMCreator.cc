@@ -49,7 +49,7 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   if (readESTRData(&ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
   try {
-    m_geoDat = new EKLM::GeometryData;
+    m_geoDat = new EKLM::GeometryData(false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1117,7 +1117,7 @@ void EKLM::GeoEKLMCreator::createSolids()
 void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicEndcap = NULL;
-  G4Transform3D* t;
+  const HepGeom::Transform3D* t;
   std::string Endcap_Name = "Endcap_" +
                             boost::lexical_cast<std::string>(curvol.endcap);
   try {
@@ -1127,7 +1127,7 @@ void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
   }
   geometry::setVisibility(*logicEndcap, true);
   geometry::setColor(*logicEndcap, "#ffffff22");
-  t = &m_geoDat->transf.endcap[curvol.endcap - 1];
+  t = m_geoDat->m_TransformData.getEndcapTransform(curvol.endcap);
   try {
     new G4PVPlacement(*t, logicEndcap, Endcap_Name, mlv, false,
                       curvol.endcap, false);
@@ -1142,6 +1142,7 @@ void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicLayer = NULL;
+  const HepGeom::Transform3D* t;
   std::string Layer_Name = "Layer_" +
                            boost::lexical_cast<std::string>(curvol.layer) +
                            "_" + mlv->GetName();
@@ -1151,10 +1152,10 @@ void EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicLayer, false);
+  t = m_geoDat->m_TransformData.getLayerTransform(curvol.endcap, curvol.layer);
   try {
-    new G4PVPlacement(
-      m_geoDat->transf.layer[curvol.endcap - 1][curvol.layer - 1],
-      logicLayer, Layer_Name, mlv, false, curvol.layer, false);
+    new G4PVPlacement(*t, logicLayer, Layer_Name, mlv, false,
+                      curvol.layer, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1165,6 +1166,7 @@ void EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* mlv)
 void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
 {
   int i;
+  const HepGeom::Transform3D* t;
   G4LogicalVolume* logicSector = NULL;
   std::string Sector_Name = "Sector_" +
                             boost::lexical_cast<std::string>(curvol.sector) +
@@ -1175,10 +1177,10 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicSector, false);
+  t = m_geoDat->m_TransformData.getSectorTransform(curvol.endcap, curvol.layer,
+                                                   curvol.sector);
   try {
-    new G4PVPlacement(m_geoDat->transf.sector[curvol.endcap - 1]
-                      [curvol.layer - 1][curvol.sector - 1],
-                      logicSector, Sector_Name, mlv, false,
+    new G4PVPlacement(*t, logicSector, Sector_Name, mlv, false,
                       curvol.sector, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1385,6 +1387,7 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
 {
   int i;
   int j;
+  const HepGeom::Transform3D* t;
   G4LogicalVolume* logicPlane = NULL;
   std::string Plane_Name =
     "Plane_" + boost::lexical_cast<std::string>(curvol.plane) + "_" +
@@ -1396,11 +1399,11 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*logicPlane, false);
+  t = m_geoDat->m_TransformData.getPlaneTransform(curvol.endcap, curvol.layer,
+                                                  curvol.sector, curvol.plane);
   try {
-    new G4PVPlacement(
-      m_geoDat->transf.plane[curvol.endcap - 1][curvol.layer - 1]
-      [curvol.sector - 1][curvol.plane - 1],
-      logicPlane, Plane_Name, mlv, false, curvol.plane, false);
+    new G4PVPlacement(*t, logicPlane, Plane_Name, mlv, false,
+                      curvol.plane, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1720,17 +1723,19 @@ void EKLM::GeoEKLMCreator::createStripPhysicalVolumes(int iStrip)
 void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
 {
   int n;
-  G4Transform3D t;
+  const HepGeom::Transform3D* t;
+  HepGeom::Transform3D t2;
   G4LogicalVolume* lv;
   const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
   n = m_geoDat->getStripLengthIndex(curvol.strip - 1);
-  t = m_geoDat->transf.strip[curvol.endcap - 1][curvol.layer - 1]
-      [curvol.sector - 1][curvol.plane - 1][curvol.strip - 1] *
-      G4Translate3D(0.5 * stripGeometry->rss_size, 0.0, 0.0) *
-      HepGeom::RotateX3D(180.0 * CLHEP::deg);
+  t = m_geoDat->m_TransformData.getStripTransform(curvol.endcap, curvol.layer,
+                                                  curvol.sector, curvol.plane,
+                                                  curvol.strip);
+  t2 = (*t) * G4Translate3D(0.5 * stripGeometry->rss_size, 0.0, 0.0) *
+       HepGeom::RotateX3D(180.0 * CLHEP::deg);
   lv = logvol.stripvol[n];
   try {
-    new G4PVPlacement(t, lv, lv->GetName(), mlv, false, curvol.strip, false);
+    new G4PVPlacement(t2, lv, lv->GetName(), mlv, false, curvol.strip, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

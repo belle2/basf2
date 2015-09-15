@@ -9,29 +9,86 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMAlignment.h>
+#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData2.h>
 #include <eklm/geometry/TransformData.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-void EKLM::fillTransforms(struct TransformData* dat)
+EKLM::TransformData::TransformData(bool global)
 {
-  int i1;
-  int i2;
-  int i3;
-  int i4;
-  int i5;
+  int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
+  EKLMAlignmentData* alignmentData;
   const GeometryData2& geoDat = GeometryData2::Instance();
-  for (i1 = 0; i1 < 2; i1++) {
-    geoDat.getEndcapTransform(&(dat->endcap[i1]), i1);
-    for (i2 = 0; i2 < 14; i2++) {
-      geoDat.getLayerTransform(&(dat->layer[i1][i2]), i2);
-      for (i3 = 0; i3 < 4; i3++) {
-        geoDat.getSectorTransform(&(dat->sector[i1][i2][i3]), i3);
-        for (i4 = 0; i4 < 2; i4++) {
-          geoDat.getPlaneTransform(&(dat->plane[i1][i2][i3][i4]), i4);
-          for (i5 = 0; i5 < 75; i5++) {
-            geoDat.getStripTransform(&(dat->strip[i1][i2][i3][i4][i5]), i5);
+  for (iEndcap = 0; iEndcap < 2; iEndcap++) {
+    geoDat.getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
+    for (iLayer = 0; iLayer < 14; iLayer++) {
+      geoDat.getLayerTransform(&m_Layer[iEndcap][iLayer], iLayer);
+      for (iSector = 0; iSector < 4; iSector++) {
+        geoDat.getSectorTransform(&m_Sector[iEndcap][iLayer][iSector], iSector);
+        for (iPlane = 0; iPlane < 2; iPlane++) {
+          geoDat.getPlaneTransform(&m_Plane[iEndcap][iLayer][iSector][iPlane],
+                                   iPlane);
+          for (iStrip = 0; iStrip < 75; iStrip++) {
+            geoDat.getStripTransform(
+              &m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip], iStrip);
+          }
+        }
+      }
+    }
+  }
+  /* Read alignment data from the database and modify transformations. */
+  DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
+  if (alignment.isValid()) {
+    for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
+      for (iLayer = 1; iLayer <= EKLM::GeometryData2::Instance().
+           getNDetectorLayers(iEndcap); iLayer++) {
+        for (iSector = 1; iSector <= 4; iSector++) {
+          for (iPlane = 1; iPlane <= 2; iPlane++) {
+            for (iSegment = 1; iSegment <= 5; iSegment++) {
+              segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                            iSegment);
+              alignmentData = alignment->getAlignmentData(segment);
+              if (alignmentData == NULL)
+                B2FATAL("Incomplete alignment data in the database.");
+            }
+          }
+        }
+      }
+    }
+  } else
+    B2INFO("Could not read alignment data from the database, "
+           "using default positions.");
+  if (global)
+    transformsToGlobal();
+}
+
+EKLM::TransformData::~TransformData()
+{
+}
+
+void EKLM::TransformData::transformsToGlobal()
+{
+  int iEndcap, iLayer, iSector, iPlane, iStrip;
+  for (iEndcap = 0; iEndcap < 2; iEndcap++) {
+    for (iLayer = 0; iLayer < 14; iLayer++) {
+      m_Layer[iEndcap][iLayer] = m_Endcap[iEndcap] * m_Layer[iEndcap][iLayer];
+      for (iSector = 0; iSector < 4; iSector++) {
+        m_Sector[iEndcap][iLayer][iSector] =
+          m_Layer[iEndcap][iLayer] * m_Sector[iEndcap][iLayer][iSector];
+        for (iPlane = 0; iPlane < 2; iPlane++) {
+          m_Plane[iEndcap][iLayer][iSector][iPlane] =
+            m_Sector[iEndcap][iLayer][iSector] *
+            m_Plane[iEndcap][iLayer][iSector][iPlane];
+          for (iStrip = 0; iStrip < 75; iStrip++) {
+            m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
+              m_Plane[iEndcap][iLayer][iSector][iPlane] *
+              m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip];
+            m_StripInverse[iEndcap][iLayer][iSector][iPlane][iStrip] =
+              m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip].inverse();
           }
         }
       }
@@ -39,46 +96,47 @@ void EKLM::fillTransforms(struct TransformData* dat)
   }
 }
 
-void EKLM::transformsToGlobal(struct EKLM::TransformData* dat)
+const HepGeom::Transform3D*
+EKLM::TransformData::getEndcapTransform(int endcap) const
 {
-  int i1;
-  int i2;
-  int i3;
-  int i4;
-  int i5;
-  for (i1 = 0; i1 < 2; i1++) {
-    for (i2 = 0; i2 < 14; i2++) {
-      dat->layer[i1][i2] = dat->endcap[i1] * dat->layer[i1][i2];
-      for (i3 = 0; i3 < 4; i3++) {
-        dat->sector[i1][i2][i3] = dat->layer[i1][i2] * dat->sector[i1][i2][i3];
-        for (i4 = 0; i4 < 2; i4++) {
-          dat->plane[i1][i2][i3][i4] = dat->sector[i1][i2][i3] *
-                                       dat->plane[i1][i2][i3][i4];
-          for (i5 = 0; i5 < 75; i5++) {
-            dat->strip[i1][i2][i3][i4][i5] = dat->plane[i1][i2][i3][i4] *
-                                             dat->strip[i1][i2][i3][i4][i5];
-            dat->stripInverse[i1][i2][i3][i4][i5] =
-              dat->strip[i1][i2][i3][i4][i5].inverse();
-          }
-        }
-      }
-    }
-  }
+  return &m_Endcap[endcap - 1];
 }
 
-HepGeom::Transform3D* EKLM::getStripLocalToGlobal(
-  struct EKLM::TransformData* dat, EKLMDigit* hit)
+const HepGeom::Transform3D*
+EKLM::TransformData::getLayerTransform(int endcap, int layer) const
 {
-  return &(dat->strip[hit->getEndcap() - 1][hit->getLayer() - 1]
+  return &m_Layer[endcap - 1][layer - 1];
+}
+
+const HepGeom::Transform3D* EKLM::TransformData::
+getSectorTransform(int endcap, int layer, int sector) const
+{
+  return &m_Sector[endcap - 1][layer - 1][sector - 1];
+}
+
+const HepGeom::Transform3D* EKLM::TransformData::
+getPlaneTransform(int endcap, int layer, int sector, int plane) const
+{
+  return &m_Plane[endcap - 1][layer - 1][sector - 1][plane - 1];
+}
+
+const HepGeom::Transform3D* EKLM::TransformData::
+getStripTransform(int endcap, int layer, int sector, int plane, int strip) const
+{
+  return &m_Strip[endcap - 1][layer - 1][sector - 1][plane - 1][strip - 1];
+}
+
+const HepGeom::Transform3D*
+EKLM::TransformData::getStripLocalToGlobal(EKLMDigit* hit) const
+{
+  return &(m_Strip[hit->getEndcap() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 
-
-HepGeom::Transform3D* EKLM::getStripGlobalToLocal(
-  struct EKLM::TransformData* dat, EKLMDigit* hit)
+const HepGeom::Transform3D*
+EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
 {
-  return &(dat->stripInverse[hit->getEndcap() - 1][hit->getLayer() - 1]
+  return &(m_StripInverse[hit->getEndcap() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
-
 

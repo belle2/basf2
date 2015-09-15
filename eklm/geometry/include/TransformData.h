@@ -27,69 +27,110 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * @struct TransformData
-     * @brief Transformations.
-     *
-     * @var TransformData::endcap
-     * Endcap transformations.
-     *
-     * @var TransformData::layer
-     * Layer transformations.
-     *
-     * @var TransformData::sector
-     * Sector transformations.
-     *
-     * @var TransformData::plane
-     * Plane transformations.
-     *
-     * @var TransformData::strip
-     * Strip transformations.
-     *
-     * @var TransformData::stripInverse
-     * Inverse strip transformations.
+     * Transformation data.
+     * All data and function results are in CLHEP units.
      */
-    struct TransformData {
-      HepGeom::Transform3D endcap[2];
-      HepGeom::Transform3D layer[2][14];
-      HepGeom::Transform3D sector[2][14][4];
-      HepGeom::Transform3D plane[2][14][4][2];
-      HepGeom::Transform3D strip[2][14][4][2][75];
-      HepGeom::Transform3D stripInverse[2][14][4][2][75];
+    class TransformData {
+
+    public:
+
+      /**
+       * Constructor.
+       * @param[in] global If true, load global transformations (false - local).
+       */
+      TransformData(bool global);
+
+      /**
+       * Destructor.
+       */
+      ~TransformData();
+
+      /**
+       * Get endcap transformation.
+       * @param[in] endcap Endcap number.
+       */
+      const HepGeom::Transform3D* getEndcapTransform(int endcap) const;
+
+      /**
+       * Get layer transformation.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       */
+      const HepGeom::Transform3D*
+      getLayerTransform(int endcap, int layer) const;
+
+      /**
+       * Get sector transformation.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       */
+      const HepGeom::Transform3D*
+      getSectorTransform(int endcap, int layer, int sector) const;
+
+      /**
+       * Get plane transformation.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       */
+      const HepGeom::Transform3D*
+      getPlaneTransform(int endcap, int layer, int sector, int plane) const;
+
+      /**
+       * Get strip transformation.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @param[in] strip  Strip number.
+       */
+      const HepGeom::Transform3D*
+      getStripTransform(int endcap, int layer, int sector, int plane,
+                        int strip) const;
+
+      /**
+       * Get strip local to global transformation by hit.
+       * @param[in] hit Hit.
+       * @return Transformation.
+       */
+      const HepGeom::Transform3D* getStripLocalToGlobal(EKLMDigit* hit) const;
+
+      /**
+       * Get strip global to local transformation by hit.
+       * @param[in] hit Hit.
+       * @return Transformation.
+       */
+      const HepGeom::Transform3D* getStripGlobalToLocal(EKLMDigit* hit) const;
+
+    private:
+
+      /**
+       * Make transformations global from local.
+       * @param[in,out] dat Transformation data.
+       */
+      void transformsToGlobal();
+
+      /** Endcap transformations. */
+      HepGeom::Transform3D m_Endcap[2];
+
+      /** Layer transformations. */
+      HepGeom::Transform3D m_Layer[2][14];
+
+      /** Sector transformations. */
+      HepGeom::Transform3D m_Sector[2][14][4];
+
+      /** Plane transformations. */
+      HepGeom::Transform3D m_Plane[2][14][4][2];
+
+      /** Strip transformations. */
+      HepGeom::Transform3D m_Strip[2][14][4][2][75];
+
+      /** Inverse strip transformations. */
+      HepGeom::Transform3D m_StripInverse[2][14][4][2][75];
+
     };
-
-    /**
-     * Fill transformations.
-     * @param[out] dat Transformation data.
-     */
-    void fillTransforms(struct TransformData* dat);
-
-    /**
-     * Make transformations global from local.
-     * @param[in,out] dat Transformation data.
-     */
-    void transformsToGlobal(struct TransformData* dat);
-
-    /**
-     * Get strip local to global transformation by hit.
-     * @param[in] dat Transformation data.
-     * @param[in] hit Hit.
-     * @return Transformation.
-     * @details
-     * The transformation uses GEANT/CLHEP units (mm)!.
-     */
-    HepGeom::Transform3D* getStripLocalToGlobal(struct TransformData* dat,
-                                                EKLMDigit* hit);
-
-    /**
-     * Get strip global to local transformation by hit.
-     * @param[in] dat Transformation data.
-     * @param[in] hit Hit.
-     * @return Transformation.
-     * @details
-     * The transformation uses GEANT/CLHEP units (mm)!
-     */
-    HepGeom::Transform3D* getStripGlobalToLocal(struct TransformData* dat,
-                                                EKLMDigit* hit);
 
   }
 

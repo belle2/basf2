@@ -273,6 +273,7 @@ namespace Belle2 {
 
     /**
      * EKLM geometry data.
+     * All data and function results are in CLHEP units.
      */
     class GeometryData2 {
 

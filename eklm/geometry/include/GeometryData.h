@@ -26,7 +26,6 @@ namespace Belle2 {
 
     /**
      * Geometry data class.
-     * All data and function results are in CLHEP units.
      */
     class GeometryData {
 
@@ -34,8 +33,9 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] global If true, load global transformations (false - local).
        */
-      GeometryData();
+      GeometryData(bool global);
 
       /**
        * Destructor.
@@ -87,7 +87,7 @@ namespace Belle2 {
       bool hitInEKLM(double z);
 
       /** Transformations. */
-      struct TransformData transf;
+      TransformData m_TransformData;
 
     private:
 

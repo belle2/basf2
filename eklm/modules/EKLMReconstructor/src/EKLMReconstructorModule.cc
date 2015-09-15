@@ -21,6 +21,7 @@ EKLMReconstructorModule::EKLMReconstructorModule() : Module()
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  m_geoDat = NULL;
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()
@@ -34,13 +35,13 @@ void EKLMReconstructorModule::initialize()
   hit2ds.registerInDataStore();
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
-  m_geoDat.read();
-  EKLM::transformsToGlobal(&m_geoDat.transf);
+  m_geoDat = new EKLM::GeometryData(true);
+  m_geoDat->read();
 }
 
 void EKLMReconstructorModule::beginRun()
 {
-  m_rec = new EKLM::Reconstructor(&m_geoDat);
+  m_rec = new EKLM::Reconstructor(m_geoDat);
 }
 
 void EKLMReconstructorModule::event()
@@ -55,4 +56,5 @@ void EKLMReconstructorModule::endRun()
 
 void EKLMReconstructorModule::terminate()
 {
+  delete m_geoDat;
 }

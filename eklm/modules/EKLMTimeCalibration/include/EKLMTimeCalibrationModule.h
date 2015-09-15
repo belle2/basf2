@@ -101,7 +101,7 @@ namespace Belle2 {
     TFile* m_outputFile;
 
     /** Geometry data. */
-    EKLM::GeometryData m_geoDat;
+    EKLM::GeometryData* m_geoDat;
 
     /** Number of strips with different lengths. */
     int m_nStripDifferent;

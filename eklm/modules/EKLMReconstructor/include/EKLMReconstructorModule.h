@@ -65,7 +65,7 @@ namespace Belle2 {
   private:
 
     /** Geometry data. */
-    EKLM::GeometryData m_geoDat;
+    EKLM::GeometryData* m_geoDat;
 
     /** Reconstructor. */
     EKLM::Reconstructor* m_rec;

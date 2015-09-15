@@ -9,11 +9,8 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMAlignment.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeometryData2.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -27,7 +24,7 @@ static bool compareLength(double a, double b)
   return a < b;
 }
 
-EKLM::GeometryData::GeometryData()
+EKLM::GeometryData::GeometryData(bool global) : m_TransformData(global)
 {
   m_nStrip = -1;
   m_nStripDifferent = -1;
@@ -48,7 +45,7 @@ EKLM::GeometryData::~GeometryData()
 void EKLM::GeometryData::read()
 {
   const char err[] = "Strip sorting algorithm error.";
-  int i, iEndcap, iLayer, iSector, iPlane, iSegment, segment;
+  int i;
   char str[32];
   double l, solenoidZ, endcapZ, endcapLength;
   double* stripLen;
@@ -57,30 +54,6 @@ void EKLM::GeometryData::read()
   std::map<double, int> mapLengthStrip;
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
-  EKLMAlignmentData* alignmentData;
-  EKLM::fillTransforms(&transf);
-  /* Read alignment data from the database and modify transformations. */
-  DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
-  if (alignment.isValid()) {
-    for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-      for (iLayer = 1; iLayer <= EKLM::GeometryData2::Instance().
-           getNDetectorLayers(iEndcap); iLayer++) {
-        for (iSector = 1; iSector <= 4; iSector++) {
-          for (iPlane = 1; iPlane <= 2; iPlane++) {
-            for (iSegment = 1; iSegment <= 5; iSegment++) {
-              segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                            iSegment);
-              alignmentData = alignment->getAlignmentData(segment);
-              if (alignmentData == NULL)
-                B2FATAL("Incomplete alignment data in the database.");
-            }
-          }
-        }
-      }
-    }
-  } else
-    B2INFO("Could not read alignment data from the database, "
-           "using default positions.");
   /* Read position data. */
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   solenoidZ = gd.getLength("SolenoidZ");
@@ -180,14 +153,14 @@ bool EKLM::GeometryData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   double l1 = geoDat.getStripLength(hit1->getStrip());
   HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
   HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);
-  HepGeom::Transform3D* tr1 = getStripLocalToGlobal(&transf, hit1);
+  const HepGeom::Transform3D* tr1 = m_TransformData.getStripLocalToGlobal(hit1);
   HepGeom::Point3D<double> s1_1g = (*tr1) * s1_1;
   HepGeom::Point3D<double> s1_2g = (*tr1) * s1_2;
   /* Coordinates of strip 2 ends. */
   double l2 = geoDat.getStripLength(hit2->getStrip());
   HepGeom::Point3D<double> s2_1(-0.5 * l2, 0.0, 0.0);
   HepGeom::Point3D<double> s2_2(0.5 * l2, 0.0, 0.0);
-  HepGeom::Transform3D* tr2 = getStripLocalToGlobal(&transf, hit2);
+  const HepGeom::Transform3D* tr2 = m_TransformData.getStripLocalToGlobal(hit2);
   HepGeom::Point3D<double> s2_1g = (*tr2) * s2_1;
   HepGeom::Point3D<double> s2_2g = (*tr2) * s2_2;
   /**

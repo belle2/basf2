@@ -76,10 +76,13 @@ EKLMTimeCalibrationModule::EKLMTimeCalibrationModule() :
   m_nStripDifferent = -1;
   m_Tree = NULL;
   m_ev = {0, 0};
+  m_geoDat = NULL;
 }
 
 EKLMTimeCalibrationModule::~EKLMTimeCalibrationModule()
 {
+  if (m_geoDat != NULL)
+    delete m_geoDat;
 }
 
 void EKLMTimeCalibrationModule::Prepare()
@@ -94,12 +97,12 @@ void EKLMTimeCalibrationModule::Prepare()
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
-  m_geoDat.read();
-  EKLM::transformsToGlobal(&m_geoDat.transf);
+  m_geoDat = new EKLM::GeometryData(true);
+  m_geoDat->read();
   m_outputFile = new TFile(m_dataOutputFileName.c_str(), "recreate");
   if (m_outputFile->IsZombie())
     B2FATAL("Cannot open output file.");
-  m_nStripDifferent = m_geoDat.getNStripsDifferentLength();
+  m_nStripDifferent = m_geoDat->getNStripsDifferentLength();
   m_Tree = new TTree*[m_nStripDifferent];
   for (i = 0; i < m_nStripDifferent; i++) {
     snprintf(str, 128, "t%d", i);
@@ -112,7 +115,7 @@ void EKLMTimeCalibrationModule::Prepare()
   len = new float[m_nStripDifferent];
   for (i = 0; i < m_nStripDifferent; i++)
     len[i] = EKLM::GeometryData2::Instance().
-             getStripLength(m_geoDat.getStripPositionIndex(i) + 1) /
+             getStripLength(m_geoDat->getStripPositionIndex(i) + 1) /
              CLHEP::mm * Unit::mm;
   t->Branch("len", &len, "len[n]/F");
   t->Fill();
@@ -135,7 +138,7 @@ void EKLMTimeCalibrationModule::CollectData()
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
   ExtHit* extHit, *entryHit[2], *exitHit[2];
-  HepGeom::Transform3D* tr;
+  const HepGeom::Transform3D* tr;
   n = tracks.getEntries();
   for (i = 0; i < n; i++) {
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
@@ -143,7 +146,7 @@ void EKLMTimeCalibrationModule::CollectData()
     for (j = 0; j < n2; j++) {
       if (extHits[j]->getDetectorID() != Const::EDetector::KLM)
         continue;
-      if (!m_geoDat.hitInEKLM(extHits[j]->getPosition().Z()))
+      if (!m_geoDat->hitInEKLM(extHits[j]->getPosition().Z()))
         continue;
       mapExtHit.insert(std::pair<int, ExtHit*>(extHits[j]->getCopyID(),
                                                extHits[j]));
@@ -196,11 +199,11 @@ void EKLMTimeCalibrationModule::CollectData()
       hitGlobal.setX(hitPosition.X() / Unit::mm * CLHEP::mm);
       hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
       hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
-      tr = getStripGlobalToLocal(&m_geoDat.transf, digits[j]);
+      tr = m_geoDat->m_TransformData.getStripGlobalToLocal(digits[j]);
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
-      k = m_geoDat.getStripLengthIndex(digits[j]->getStrip() - 1);
+      k = m_geoDat->getStripLengthIndex(digits[j]->getStrip() - 1);
       m_Tree[k]->Fill();
     }
   }

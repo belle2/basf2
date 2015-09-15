@@ -45,7 +45,6 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
-  haveGeo = false;
   m_geoDat2 = &(EKLM::GeometryData2::Instance());
   if (readESTRData(&ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
@@ -55,34 +54,25 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
     B2FATAL(MemErr);
   }
   m_geoDat->read();
+  newVolumes();
+  newTransforms();
+  newSensitive();
 }
 
 EKLM::GeoEKLMCreator::~GeoEKLMCreator()
 {
-  int i, j;
   delete m_geoDat;
-  /* Free geometry data. */
   free(ESTRPar.z);
   free(ESTRPar.rmin);
   free(ESTRPar.rmax);
-  if (haveGeo) {
-    delete m_sensitive[0];
-    if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
-      delete m_sensitive[1];
-      delete m_sensitive[2];
-      for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
-        for (j = 0; j < m_geoDat2->getNBoards(); j++)
-          delete BoardTransform[i][j];
-        free(BoardTransform[i]);
-      }
-    }
-    freeVolumes();
-  }
+  deleteVolumes();
+  deleteTransforms();
+  deleteSensitive();
 }
 
 /***************************** MEMORY ALLOCATION *****************************/
 
-void EKLM::GeoEKLMCreator::mallocVolumes()
+void EKLM::GeoEKLMCreator::newVolumes()
 {
   int i, nDiff;
   solids.plane =
@@ -146,7 +136,48 @@ void EKLM::GeoEKLMCreator::mallocVolumes()
            sizeof(struct EKLM::SegmentSupportSolids));
 }
 
-void EKLM::GeoEKLMCreator::freeVolumes()
+void EKLM::GeoEKLMCreator::newTransforms()
+{
+  int i;
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+    for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
+      try {
+        BoardTransform[i] = new G4Transform3D[m_geoDat2->getNBoards()];
+      } catch (std::bad_alloc& ba) {
+        B2FATAL(MemErr);
+      }
+    }
+  }
+}
+
+void EKLM::GeoEKLMCreator::newSensitive()
+{
+  try {
+    m_sensitive[0] =
+      new EKLMSensitiveDetector("EKLMSensitiveStrip",
+                                c_SensitiveStrip);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+    try {
+      m_sensitive[1] =
+        new EKLMSensitiveDetector("EKLMSensitiveSiPM",
+                                  c_SensitiveSiPM);
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
+    try {
+      m_sensitive[2] =
+        new EKLMSensitiveDetector("EKLMSensitiveBoard",
+                                  c_SensitiveBoard);
+    } catch (std::bad_alloc& ba) {
+      B2FATAL(MemErr);
+    }
+  }
+}
+
+void EKLM::GeoEKLMCreator::deleteVolumes()
 {
   int i;
   free(solids.plane);
@@ -163,6 +194,24 @@ void EKLM::GeoEKLMCreator::freeVolumes()
   for (i = 0; i < m_geoDat2->getNPlanes(); i++)
     free(solids.segmentsup[i]);
   free(solids.segmentsup);
+}
+
+void EKLM::GeoEKLMCreator::deleteTransforms()
+{
+  int i;
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+    for (i = 0; i < m_geoDat2->getNPlanes(); i++)
+      delete[] BoardTransform[i];
+  }
+}
+
+void EKLM::GeoEKLMCreator::deleteSensitive()
+{
+  delete m_sensitive[0];
+  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+    delete m_sensitive[1];
+    delete m_sensitive[2];
+  }
 }
 
 /********************************** XML DATA *********************************/
@@ -705,7 +754,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
     if (ss[i] == NULL)
       B2FATAL(MemErr);
     for (j = 0; j < m_geoDat2->getNBoards(); j++) {
-      t = *BoardTransform[i][j];
+      t = BoardTransform[i][j];
       if (n == 0)
         t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
       if (i == 0) {
@@ -1163,21 +1212,12 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
   const struct BoardGeometry* boardGeometry = m_geoDat2->getBoardGeometry();
   const struct BoardPosition* boardPos;
   for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
-    BoardTransform[i] = (G4Transform3D**)
-                        malloc(sizeof(G4Transform3D*) *
-                               m_geoDat2->getNBoards());
-    if (BoardTransform[i] == NULL)
-      B2FATAL(MemErr);
     for (j = 0; j < m_geoDat2->getNBoards(); j++) {
       boardPos = m_geoDat2->getBoardPosition(i + 1, j + 1);
-      try {
-        BoardTransform[i][j] = new G4Transform3D(
-          G4RotateZ3D(boardPos->phi) *
-          G4Translate3D(boardPos->r - 0.5 * boardGeometry->height, 0., 0.) *
-          G4RotateZ3D(90.0 * CLHEP::deg));
-      } catch (std::bad_alloc& ba) {
-        B2FATAL(MemErr);
-      }
+      BoardTransform[i][j] = G4Transform3D(
+                               G4RotateZ3D(boardPos->phi) *
+                               G4Translate3D(boardPos->r - 0.5 * boardGeometry->height, 0., 0.) *
+                               G4RotateZ3D(90.0 * CLHEP::deg));
     }
   }
 }
@@ -1396,7 +1436,7 @@ void EKLM::GeoEKLMCreator::createSegmentReadoutBoard(G4LogicalVolume* mlv)
   }
   geometry::setVisibility(*logicSegmentReadoutBoard, false);
   try {
-    new G4PVPlacement(*BoardTransform[curvol.plane - 1][curvol.board - 1],
+    new G4PVPlacement(BoardTransform[curvol.plane - 1][curvol.board - 1],
                       logicSegmentReadoutBoard, Board_Name, mlv, false,
                       (curvol.plane - 1) * 5 + curvol.board, false);
   } catch (std::bad_alloc& ba) {
@@ -1733,31 +1773,7 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
 {
   (void)content;
   (void)type;
-  try {
-    m_sensitive[0] =
-      new EKLMSensitiveDetector("EKLMSensitiveStrip",
-                                c_SensitiveStrip);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
-    try {
-      m_sensitive[1] =
-        new EKLMSensitiveDetector("EKLMSensitiveSiPM",
-                                  c_SensitiveSiPM);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    try {
-      m_sensitive[2] =
-        new EKLMSensitiveDetector("EKLMSensitiveBoard",
-                                  c_SensitiveBoard);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-  }
   createMaterials();
-  mallocVolumes();
   createSolids();
   for (curvol.endcap = 1; curvol.endcap <= 2; curvol.endcap++)
     createEndcap(&topVolume);
@@ -1765,6 +1781,5 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
     printf("EKLM started in mode c_DetectorPrintMasses. Exiting now.\n");
     exit(0);
   }
-  haveGeo = true;
 }
 

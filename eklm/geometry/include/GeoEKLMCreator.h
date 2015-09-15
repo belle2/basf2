@@ -449,14 +449,34 @@ namespace Belle2 {
       void printVolumeMass(G4LogicalVolume* lv);
 
       /**
-       * Allocate memory for volumes and set contents to zero where necessary.
+       * Create new volumes.
        */
-      void mallocVolumes();
+      void newVolumes();
 
       /**
-       * Deallocate memory for volumes.
+       * Create new transformations.
        */
-      void freeVolumes();
+      void newTransforms();
+
+      /**
+       * Create new sensitive detectors.
+       */
+      void newSensitive();
+
+      /**
+       * Delete volumes.
+       */
+      void deleteVolumes();
+
+      /**
+       * Delete transformations.
+       */
+      void deleteTransforms();
+
+      /**
+       * Delete sensitive detectors.
+       */
+      void deleteSensitive();
 
       /**
        * Get cutted corner angle.
@@ -487,14 +507,11 @@ namespace Belle2 {
       /** Geometry data. */
       const GeometryData2* m_geoDat2;
 
-      /** True if geometry is constructed. */
-      bool haveGeo;
-
       /** ESTR Geometry data. */
       struct ESTRGeometryParams ESTRPar;
 
       /** Transformations of boards from sector reference frame. */
-      G4Transform3D** BoardTransform[2];
+      G4Transform3D* BoardTransform[2];
 
       /** Sensitive detectors. */
       EKLMSensitiveDetector* m_sensitive[3];

@@ -15,6 +15,7 @@
 #include <eklm/geometry/TransformData.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
 
@@ -138,5 +139,71 @@ EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
 {
   return &(m_StripInverse[hit->getEndcap() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
+}
+
+bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+                                       HepGeom::Point3D<double>* cross,
+                                       double* d1, double* d2, double* sd)
+{
+  /* Hits must be from the same sector, */
+  if (hit1->getEndcap() != hit2->getEndcap())
+    return false;
+  if (hit1->getLayer() != hit2->getLayer())
+    return false;
+  if (hit1->getSector() != hit2->getSector())
+    return false;
+  /* but different planes. */
+  if (hit1->getPlane() == hit2->getPlane())
+    return false;
+  /* Coordinates of strip 1 ends. */
+  const GeometryData2& geoDat = GeometryData2::Instance();
+  double l1 = geoDat.getStripLength(hit1->getStrip());
+  HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
+  HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);
+  const HepGeom::Transform3D* tr1 = getStripLocalToGlobal(hit1);
+  HepGeom::Point3D<double> s1_1g = (*tr1) * s1_1;
+  HepGeom::Point3D<double> s1_2g = (*tr1) * s1_2;
+  /* Coordinates of strip 2 ends. */
+  double l2 = geoDat.getStripLength(hit2->getStrip());
+  HepGeom::Point3D<double> s2_1(-0.5 * l2, 0.0, 0.0);
+  HepGeom::Point3D<double> s2_2(0.5 * l2, 0.0, 0.0);
+  const HepGeom::Transform3D* tr2 = getStripLocalToGlobal(hit2);
+  HepGeom::Point3D<double> s2_1g = (*tr2) * s2_1;
+  HepGeom::Point3D<double> s2_2g = (*tr2) * s2_2;
+  /**
+   * Line parametric equations:
+   * (s1_1g) + (s1_2g - s1_1g) * t1 = a1 + v1 * t1,
+   * (s2_1g) + (s2_2g - s2_1g) * t2 = a2 + v2 * t2.
+   * Points of closest approach:
+   * t1 = ((v1,v2)*(d,v2) - v2^2*(d,v1)) / (v1^2*v2^2 - (v1,v2)^2)
+   * t2 = - ((v1,v2)*(d,v1) - v1^2*(d,v2)) / (v1^2*v2^2 - (v1,v2)^2)
+   * where d = a1 - a2.
+   */
+  HepGeom::Vector3D<double> v1 = s1_2g - s1_1g;
+  HepGeom::Vector3D<double> v2 = s2_2g - s2_1g;
+  HepGeom::Vector3D<double> d = s1_1g - s2_1g;
+  double v1sq = v1.mag2();
+  double v2sq = v2.mag2();
+  double v1dv2 = v1.dot(v2);
+  double ddv1 = d.dot(v1);
+  double ddv2 = d.dot(v2);
+  double den = v1sq * v2sq - v1dv2 * v1dv2;
+  double t1 = (v1dv2 * ddv2 - v2sq * ddv1) / den;
+  double t2 = (- v1dv2 * ddv1 + v1sq * ddv2) / den;
+  /* Segments do not intersect. */
+  if (t1 < 0.0 || t1 > 1.0)
+    return false;
+  if (t2 < 0.0 || t2 > 1.0)
+    return false;
+  /* Segments intersect, set return values. */
+  HepGeom::Point3D<double> s1_cg = s1_1g + v1 * t1;
+  HepGeom::Point3D<double> s2_cg = s2_1g + v2 * t2;
+  *d1 = s1_2g.distance(s1_cg) / CLHEP::mm * Unit::mm;
+  *d2 = s2_2g.distance(s2_cg) / CLHEP::mm * Unit::mm;
+  *cross = 0.5 * (s1_cg + s2_cg) / CLHEP::mm * Unit::mm;
+  *sd = s1_cg.distance(s2_cg) / CLHEP::mm * Unit::mm;
+  if (s2_cg.mag2() < s1_cg.mag2())
+    *sd = - *sd;
+  return true;
 }
 

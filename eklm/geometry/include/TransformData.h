@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /**
      * Transformation data.
-     * All data and function results are in CLHEP units.
+     * All data and function results are in CLHEP units unless noted otherwise.
      */
     class TransformData {
 
@@ -79,18 +79,6 @@ namespace Belle2 {
       getPlaneTransform(int endcap, int layer, int sector, int plane) const;
 
       /**
-       * Get strip transformation.
-       * @param[in] endcap Endcap number.
-       * @param[in] layer  Layer number.
-       * @param[in] sector Sector number.
-       * @param[in] plane  Plane number.
-       * @param[in] strip  Strip number.
-       */
-      const HepGeom::Transform3D*
-      getStripTransform(int endcap, int layer, int sector, int plane,
-                        int strip) const;
-
-      /**
        * Get strip local to global transformation by hit.
        * @param[in] hit Hit.
        * @return Transformation.
@@ -103,6 +91,34 @@ namespace Belle2 {
        * @return Transformation.
        */
       const HepGeom::Transform3D* getStripGlobalToLocal(EKLMDigit* hit) const;
+
+      /**
+       * Get strip transformation.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @param[in] strip  Strip number.
+       */
+      const HepGeom::Transform3D*
+      getStripTransform(int endcap, int layer, int sector, int plane,
+                        int strip) const;
+
+      /**
+       * Check if strips intersect, and find intersection point if yes.
+       * @param[in] hit1   First hit.
+       * @param[in] hit2   Second hit.
+       * @param[out] cross Crossing point (coordinate unit is cm).
+       * @param[out] d1    Distance from hit to SiPM of strip 1, cm.
+       * @param[out] d2    Distance from hit to SiPM of strip 2, cm.
+       * @param[out] sd    Shortest distance between strips, cm.
+       *                   Or if second strip is closer to interaction point,
+       *                   then (- shortest distance).
+       * @return True if strips intersect.
+       */
+      bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+                        HepGeom::Point3D<double>* cross,
+                        double* d1, double* d2, double* sd);
 
     private:
 

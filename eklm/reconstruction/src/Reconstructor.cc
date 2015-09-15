@@ -127,7 +127,8 @@ void EKLM::Reconstructor::create2dHits()
     for (it4 = it; it4 != it2; ++it4) {
       for (it5 = it2; it5 != it3; ++it5) {
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_geoDat->intersection(*it4, *it5, &crossPoint, &d1, &d2, &sd))
+        if (!m_geoDat->m_TransformData.intersection(*it4, *it5, &crossPoint,
+                                                    &d1, &d2, &sd))
           continue;
         t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
         t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;

@@ -53,9 +53,9 @@ static void readPositionData(struct EKLM::ElementPosition* epos, GearDir* gd)
  */
 static void readSizeData(struct EKLM::ElementPosition* epos, GearDir* gd)
 {
-  epos->innerR = gd->getLength("InnerR") * CLHEP::cm;
-  epos->outerR = gd->getLength("OuterR") * CLHEP::cm;
-  epos->length = gd->getLength("Length") * CLHEP::cm;
+  epos->InnerR = gd->getLength("InnerR") * CLHEP::cm;
+  epos->OuterR = gd->getLength("OuterR") * CLHEP::cm;
+  epos->Length = gd->getLength("Length") * CLHEP::cm;
 }
 
 /**
@@ -95,12 +95,12 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
 {
   /* Corner 1. */
   m_SectorSupportGeometry.Corner1A.X = m_SectorSupportPosition.X;
-  m_SectorSupportGeometry.Corner1A.Y = m_SectorSupportPosition.outerR -
+  m_SectorSupportGeometry.Corner1A.Y = m_SectorSupportPosition.OuterR -
                                        m_SectorSupportGeometry.DeltaLY;
   m_SectorSupportGeometry.Corner1B.X = m_SectorSupportPosition.X +
                                        m_SectorSupportGeometry.CornerX;
   m_SectorSupportGeometry.Corner1B.Y =
-    sqrt(m_SectorSupportPosition.outerR * m_SectorSupportPosition.outerR -
+    sqrt(m_SectorSupportPosition.OuterR * m_SectorSupportPosition.OuterR -
          m_SectorSupportGeometry.Corner1B.X *
          m_SectorSupportGeometry.Corner1B.X);
   m_SectorSupportGeometry.CornerAngle =
@@ -118,13 +118,13 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
      tan(m_SectorSupportGeometry.CornerAngle));
   /* Corner 3. */
   m_SectorSupportGeometry.Corner3.X =
-    sqrt(m_SectorSupportPosition.innerR * m_SectorSupportPosition.innerR -
+    sqrt(m_SectorSupportPosition.InnerR * m_SectorSupportPosition.InnerR -
          m_SectorSupportPosition.Y * m_SectorSupportPosition.Y);
   m_SectorSupportGeometry.Corner3.Y = m_SectorSupportPosition.Y;
   /* Corner 4. */
   m_SectorSupportGeometry.Corner4.X = m_SectorSupportPosition.X;
   m_SectorSupportGeometry.Corner4.Y =
-    sqrt(m_SectorSupportPosition.innerR * m_SectorSupportPosition.innerR -
+    sqrt(m_SectorSupportPosition.InnerR * m_SectorSupportPosition.InnerR -
          m_SectorSupportPosition.X * m_SectorSupportPosition.X);
 }
 
@@ -144,8 +144,8 @@ void EKLM::GeometryData::fillStripIndexArrays()
   std::map<double, int> mapLengthStrip2;
   std::map<double, int>::iterator itm;
   for (i = 0; i < m_nStrip; i++) {
-    strips.push_back(m_StripPosition[i].length);
-    mapLengthStrip.insert(std::pair<double, int>(m_StripPosition[i].length, i));
+    strips.push_back(m_StripPosition[i].Length);
+    mapLengthStrip.insert(std::pair<double, int>(m_StripPosition[i].Length, i));
   }
   sort(strips.begin(), strips.end(), compareLength);
   l = strips[0];
@@ -181,7 +181,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
   if (m_StripAllToLen == NULL)
     B2FATAL(c_MemErr);
   for (i = 0; i < m_nStrip; i++) {
-    itm = mapLengthStrip2.find(m_StripPosition[i].length);
+    itm = mapLengthStrip2.find(m_StripPosition[i].Length);
     if (itm == mapLengthStrip2.end())
       B2FATAL(err);
     m_StripAllToLen[i] = itm->second;
@@ -194,13 +194,13 @@ void EKLM::GeometryData::readXMLDataStrips()
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
                  "Layer/Sector/Plane/Strips");
   m_nStrip = Strips.getNumberNodes("Strip");
-  m_StripGeometry.width  = Strips.getLength("Width") * CLHEP::cm;
-  m_StripGeometry.thickness = Strips.getLength("Thickness") * CLHEP::cm;
-  m_StripGeometry.groove_depth = Strips.getLength("GrooveDepth") * CLHEP::cm;
-  m_StripGeometry.groove_width = Strips.getLength("GrooveWidth") * CLHEP::cm;
-  m_StripGeometry.no_scintillation_thickness =
+  m_StripGeometry.Width  = Strips.getLength("Width") * CLHEP::cm;
+  m_StripGeometry.Thickness = Strips.getLength("Thickness") * CLHEP::cm;
+  m_StripGeometry.GrooveDepth = Strips.getLength("GrooveDepth") * CLHEP::cm;
+  m_StripGeometry.GrooveWidth = Strips.getLength("GrooveWidth") * CLHEP::cm;
+  m_StripGeometry.NoScintillationThickness =
     Strips.getLength("NoScintillationThickness") * CLHEP::cm;
-  m_StripGeometry.rss_size = Strips.getLength("RSSSize") * CLHEP::cm;
+  m_StripGeometry.RSSSize = Strips.getLength("RSSSize") * CLHEP::cm;
   m_StripPosition = (struct EKLM::ElementPosition*)
                     malloc(m_nStrip * sizeof(struct EKLM::ElementPosition));
   if (m_StripPosition == NULL)
@@ -208,7 +208,7 @@ void EKLM::GeometryData::readXMLDataStrips()
   for (i = 0; i < m_nStrip; i++) {
     GearDir StripContent(Strips);
     StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
-    m_StripPosition[i].length = StripContent.getLength("Length") * CLHEP::cm;
+    m_StripPosition[i].Length = StripContent.getLength("Length") * CLHEP::cm;
     m_StripPosition[i].X = StripContent.getLength("PositionX") * CLHEP::cm;
     m_StripPosition[i].Y = StripContent.getLength("PositionY") * CLHEP::cm;
     m_StripPosition[i].Z = StripContent.getLength("PositionZ") * CLHEP::cm;
@@ -229,9 +229,9 @@ EKLM::GeometryData::GeometryData()
   readPositionData(&m_EndcapPosition, &EndCap);
   readSizeData(&m_EndcapPosition, &EndCap);
   m_MinZForward = m_solenoidZ + m_EndcapPosition.Z -
-                  0.5 * m_EndcapPosition.length;
+                  0.5 * m_EndcapPosition.Length;
   m_MaxZBackward = m_solenoidZ - m_EndcapPosition.Z +
-                   0.5 * m_EndcapPosition.length;
+                   0.5 * m_EndcapPosition.Length;
   m_nLayer = EndCap.getInt("nLayer");
   if (m_nLayer < 1 || m_nLayer > 14)
     B2FATAL("Number of layers must be from 1 to 14.");
@@ -265,14 +265,14 @@ EKLM::GeometryData::GeometryData()
       B2FATAL("Number of readout boards must be from 1 to 5.");
     GearDir Boards(Sector);
     Boards.append("/Boards");
-    m_BoardGeometry.length = Boards.getLength("Length") * CLHEP::cm;
-    m_BoardGeometry.width = Boards.getLength("Width") * CLHEP::cm;
-    m_BoardGeometry.height = Boards.getLength("Height") * CLHEP::cm;
-    m_BoardGeometry.base_width = Boards.getLength("BaseWidth") * CLHEP::cm;
-    m_BoardGeometry.base_height = Boards.getLength("BaseHeight") * CLHEP::cm;
-    m_BoardGeometry.strip_length = Boards.getLength("StripLength") * CLHEP::cm;
-    m_BoardGeometry.strip_width = Boards.getLength("StripWidth") * CLHEP::cm;
-    m_BoardGeometry.strip_height = Boards.getLength("StripHeight") * CLHEP::cm;
+    m_BoardGeometry.Length = Boards.getLength("Length") * CLHEP::cm;
+    m_BoardGeometry.Width = Boards.getLength("Width") * CLHEP::cm;
+    m_BoardGeometry.Height = Boards.getLength("Height") * CLHEP::cm;
+    m_BoardGeometry.BaseWidth = Boards.getLength("BaseWidth") * CLHEP::cm;
+    m_BoardGeometry.BaseHeight = Boards.getLength("BaseHeight") * CLHEP::cm;
+    m_BoardGeometry.StripLength = Boards.getLength("StripLength") * CLHEP::cm;
+    m_BoardGeometry.StripWidth = Boards.getLength("StripWidth") * CLHEP::cm;
+    m_BoardGeometry.StripHeight = Boards.getLength("StripHeight") * CLHEP::cm;
     m_nStripBoard = Boards.getInt("nStripBoard");
     for (j = 0; j < m_nPlane; j++) {
       m_BoardPosition[j] = (struct BoardPosition*)
@@ -283,8 +283,8 @@ EKLM::GeometryData::GeometryData()
         GearDir BoardContent(Boards);
         BoardContent.append((boost::format("/BoardData[%1%]") % (j + 1)).str());
         BoardContent.append((boost::format("/Board[%1%]") % (i + 1)).str());
-        m_BoardPosition[j][i].phi = BoardContent.getLength("Phi") * CLHEP::rad;
-        m_BoardPosition[j][i].r = BoardContent.getLength("Radius") * CLHEP::cm;
+        m_BoardPosition[j][i].Phi = BoardContent.getLength("Phi") * CLHEP::rad;
+        m_BoardPosition[j][i].R = BoardContent.getLength("Radius") * CLHEP::cm;
       }
     }
     m_StripBoardPosition = (struct StripBoardPosition*)
@@ -296,7 +296,7 @@ EKLM::GeometryData::GeometryData()
       GearDir StripBoardContent(Boards);
       StripBoardContent.append((boost::format("/StripBoardData/Board[%1%]") %
                                 (i + 1)).str());
-      m_StripBoardPosition[i].x = StripBoardContent.getLength("PositionX") *
+      m_StripBoardPosition[i].X = StripBoardContent.getLength("PositionX") *
                                   CLHEP::cm;
     }
   }
@@ -340,18 +340,18 @@ EKLM::GeometryData::GeometryData()
       SegmentSupportContent.append(
         (boost::format("/SegmentSupportData[%1%]") % (j + 1)).str());
       SegmentSupportContent.append(
-        (boost::format("/SegmentSupport[%1%]") % (i +  1)).str());
-      m_SegmentSupportPosition[j][i].length =
+        (boost::format("/SegmentSupport[%1%]") % (i + 1)).str());
+      m_SegmentSupportPosition[j][i].Length =
         SegmentSupportContent.getLength("Length") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].x =
+      m_SegmentSupportPosition[j][i].X =
         SegmentSupportContent.getLength("PositionX") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].y =
+      m_SegmentSupportPosition[j][i].Y =
         SegmentSupportContent.getLength("PositionY") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].z =
+      m_SegmentSupportPosition[j][i].Z =
         SegmentSupportContent.getLength("PositionZ") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].deltal_right =
+      m_SegmentSupportPosition[j][i].DeltaLRight =
         SegmentSupportContent.getLength("DeltaLRight") * CLHEP::cm;
-      m_SegmentSupportPosition[j][i].deltal_left =
+      m_SegmentSupportPosition[j][i].DeltaLLeft =
         SegmentSupportContent.getLength("DeltaLLeft") * CLHEP::cm;
     }
   }
@@ -522,7 +522,7 @@ EKLM::GeometryData::getStripPosition(int strip) const
 
 double EKLM::GeometryData::getStripLength(int strip) const
 {
-  return m_StripPosition[strip - 1].length;
+  return m_StripPosition[strip - 1].Length;
 }
 
 const EKLM::StripGeometry* EKLM::GeometryData::getStripGeometry() const
@@ -570,9 +570,9 @@ EKLM::GeometryData::getEndcapTransform(HepGeom::Transform3D* t, int n) const
 void
 EKLM::GeometryData::getLayerTransform(HepGeom::Transform3D* t, int n) const
 {
-  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.length / 2.0 -
+  *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.Length / 2.0 -
                             (n + 1) * m_LayerShiftZ +
-                            0.5 * m_LayerPosition.length);
+                            0.5 * m_LayerPosition.Length);
 }
 
 void

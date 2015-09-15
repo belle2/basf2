@@ -65,9 +65,9 @@ namespace Belle2 {
      *
      */
     struct ElementPosition {
-      double innerR;
-      double outerR;
-      double length;
+      double InnerR;
+      double OuterR;
+      double Length;
       double X;
       double Y;
       double Z;
@@ -184,29 +184,29 @@ namespace Belle2 {
      * Readout board geometry data.
      */
     struct BoardGeometry {
-      double length;       /**< Length. */
-      double width;        /**< Width. */
-      double height;       /**< Height. */
-      double base_width;   /**< Width of base board. */
-      double base_height;  /**< Height of base board. */
-      double strip_length; /**< Length of strip readout board. */
-      double strip_width;  /**< Width of strip readout board. */
-      double strip_height; /**< Height of strip readout board. */
+      double Length;      /**< Length. */
+      double Width;       /**< Width. */
+      double Height;      /**< Height. */
+      double BaseWidth;   /**< Width of base board. */
+      double BaseHeight;  /**< Height of base board. */
+      double StripLength; /**< Length of strip readout board. */
+      double StripWidth;  /**< Width of strip readout board. */
+      double StripHeight; /**< Height of strip readout board. */
     };
 
     /**
      * Strip readout board position data.
      */
     struct StripBoardPosition {
-      double x;         /**< X coordinate. */
+      double X;         /**< X coordinate. */
     };
 
     /**
      * Readout board position data.
      */
     struct BoardPosition {
-      double r;      /**< Radius of far edge of the board. */
-      double phi;    /**< Angle. */
+      double R;      /**< Radius of far edge of the board. */
+      double Phi;    /**< Angle. */
     };
 
     /**
@@ -236,12 +236,12 @@ namespace Belle2 {
      * Segment support position.
      */
     struct SegmentSupportPosition {
-      double deltal_right;  /**< Right (X-plane) delta L. */
-      double deltal_left;   /**< Left (X-plane) delta L. */
-      double length;        /**< Length */
-      double x;             /**< X coordinate. */
-      double y;             /**< Y coordinate. */
-      double z;             /**< Z coordinate. */
+      double DeltaLRight; /**< Right (X-plane) delta L. */
+      double DeltaLLeft;  /**< Left (X-plane) delta L. */
+      double Length;      /**< Length */
+      double X;           /**< X coordinate. */
+      double Y;           /**< Y coordinate. */
+      double Z;           /**< Z coordinate. */
     };
 
     /**
@@ -263,12 +263,12 @@ namespace Belle2 {
      * Strip size data.
      */
     struct StripGeometry {
-      double width;                      /**< Width. */
-      double thickness;                  /**< Thickness. */
-      double groove_depth;               /**< Groove depth. */
-      double groove_width;               /**< Groove width. */
-      double no_scintillation_thickness; /**< Non-scintillating layer. */
-      double rss_size;                   /**< Radiation study SiPM size. */
+      double Width;                    /**< Width. */
+      double Thickness;                /**< Thickness. */
+      double GrooveDepth;              /**< Groove depth. */
+      double GrooveWidth;              /**< Groove width. */
+      double NoScintillationThickness; /**< Non-scintillating layer. */
+      double RSSSize;                  /**< Radiation study SiPM size. */
     };
 
     /**

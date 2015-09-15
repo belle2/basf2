@@ -33,7 +33,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoESTRCreator.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
@@ -505,7 +505,7 @@ namespace Belle2 {
       TransformData* m_TransformData;
 
       /** Geometry data. */
-      const GeometryData2* m_geoDat2;
+      const GeometryData* m_GeoDat;
 
       /** ESTR Geometry data. */
       struct ESTRGeometryParams ESTRPar;

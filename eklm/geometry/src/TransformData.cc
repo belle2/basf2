@@ -11,7 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
-#include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -23,7 +23,7 @@ EKLM::TransformData::TransformData(bool global)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
   EKLMAlignmentData* alignmentData;
-  const GeometryData2& geoDat = GeometryData2::Instance();
+  const GeometryData& geoDat = GeometryData::Instance();
   for (iEndcap = 0; iEndcap < 2; iEndcap++) {
     geoDat.getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
     for (iLayer = 0; iLayer < 14; iLayer++) {
@@ -45,7 +45,7 @@ EKLM::TransformData::TransformData(bool global)
   DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
   if (alignment.isValid()) {
     for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
-      for (iLayer = 1; iLayer <= EKLM::GeometryData2::Instance().
+      for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
            getNDetectorLayers(iEndcap); iLayer++) {
         for (iSector = 1; iSector <= 4; iSector++) {
           for (iPlane = 1; iPlane <= 2; iPlane++) {
@@ -156,7 +156,7 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   if (hit1->getPlane() == hit2->getPlane())
     return false;
   /* Coordinates of strip 1 ends. */
-  const GeometryData2& geoDat = GeometryData2::Instance();
+  const GeometryData& geoDat = GeometryData::Instance();
   double l1 = geoDat.getStripLength(hit1->getStrip());
   HepGeom::Point3D<double> s1_1(-0.5 * l1, 0.0, 0.0);
   HepGeom::Point3D<double> s1_2(0.5 * l1, 0.0, 0.0);

@@ -14,7 +14,7 @@
 #include <TFile.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/GearDir.h>
@@ -77,7 +77,7 @@ void EKLM::FiberAndElectronics::processEntry()
     /* Poisson mean for number of photoelectrons. */
     npe = hit->getEDep() * m_digPar->nPEperMeV;
     /* Fill histograms. */
-    l = GeometryData2::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
+    l = GeometryData::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
         Unit::mm;
     d = 0.5 * l - hit->getLocalPosition().x();
     t = hit->getTime() + d / m_digPar->fiberLightSpeed;

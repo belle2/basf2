@@ -45,7 +45,7 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
-  m_geoDat2 = &(EKLM::GeometryData2::Instance());
+  m_GeoDat = &(EKLM::GeometryData::Instance());
   if (readESTRData(&ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
   try {
@@ -75,18 +75,18 @@ void EKLM::GeoEKLMCreator::newVolumes()
 {
   int i, nDiff;
   solids.plane =
-    (G4VSolid**)malloc(m_geoDat2->getNPlanes() * sizeof(G4VSolid*));
+    (G4VSolid**)malloc(m_GeoDat->getNPlanes() * sizeof(G4VSolid*));
   if (solids.plane == NULL)
     B2FATAL(MemErr);
   solids.psheet =
-    (G4VSolid**)malloc(m_geoDat2->getNSegments() * sizeof(G4VSolid*));
+    (G4VSolid**)malloc(m_GeoDat->getNSegments() * sizeof(G4VSolid*));
   if (solids.psheet == NULL)
     B2FATAL(MemErr);
   logvol.psheet = (G4LogicalVolume**)
-                  malloc(m_geoDat2->getNSegments() * sizeof(G4LogicalVolume*));
+                  malloc(m_GeoDat->getNSegments() * sizeof(G4LogicalVolume*));
   if (logvol.psheet == NULL)
     B2FATAL(MemErr);
-  nDiff = m_geoDat2->getNStripsDifferentLength();
+  nDiff = m_GeoDat->getNStripsDifferentLength();
   solids.stripvol = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
   if (solids.stripvol == NULL)
     B2FATAL(MemErr);
@@ -106,7 +106,7 @@ void EKLM::GeoEKLMCreator::newVolumes()
   if (logvol.groove == NULL)
     B2FATAL(MemErr);
   solids.scint = (struct EKLM::ScintillatorSolids*)
-                 malloc(m_geoDat2->getNStrips() *
+                 malloc(m_GeoDat->getNStrips() *
                         sizeof(struct EKLM::ScintillatorSolids));
   if (solids.scint == NULL)
     B2FATAL(MemErr);
@@ -115,33 +115,33 @@ void EKLM::GeoEKLMCreator::newVolumes()
     B2FATAL(MemErr);
   solids.segmentsup =
     (struct EKLM::SegmentSupportSolids**)
-    malloc(m_geoDat2->getNPlanes() *
+    malloc(m_GeoDat->getNPlanes() *
            sizeof(struct EKLM::SegmentSupportSolids*));
   if (solids.segmentsup == NULL)
     B2FATAL(MemErr);
-  for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
     solids.segmentsup[i] =
       (struct EKLM::SegmentSupportSolids*)
-      malloc((m_geoDat2->getNSegments() + 1) *
+      malloc((m_GeoDat->getNSegments() + 1) *
              sizeof(struct EKLM::SegmentSupportSolids));
     if (solids.segmentsup[i] == NULL)
       B2FATAL(MemErr);
   }
-  for (i = 0; i < m_geoDat2->getNSegments(); i++)
+  for (i = 0; i < m_GeoDat->getNSegments(); i++)
     logvol.psheet[i] = NULL;
-  for (i = 0; i < m_geoDat2->getNPlanes(); i++)
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++)
     memset(solids.segmentsup[i], 0,
-           (m_geoDat2->getNSegments() + 1) *
+           (m_GeoDat->getNSegments() + 1) *
            sizeof(struct EKLM::SegmentSupportSolids));
 }
 
 void EKLM::GeoEKLMCreator::newTransforms()
 {
   int i;
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
-    for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
+    for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
       try {
-        BoardTransform[i] = new G4Transform3D[m_geoDat2->getNBoards()];
+        BoardTransform[i] = new G4Transform3D[m_GeoDat->getNBoards()];
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
       }
@@ -158,7 +158,7 @@ void EKLM::GeoEKLMCreator::newSensitive()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
     try {
       m_sensitive[1] =
         new EKLMSensitiveDetector("EKLMSensitiveSiPM",
@@ -190,7 +190,7 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
   free(logvol.groove);
   free(solids.scint);
   free(logvol.scint);
-  for (i = 0; i < m_geoDat2->getNPlanes(); i++)
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++)
     free(solids.segmentsup[i]);
   free(solids.segmentsup);
 }
@@ -198,8 +198,8 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
 void EKLM::GeoEKLMCreator::deleteTransforms()
 {
   int i;
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
-    for (i = 0; i < m_geoDat2->getNPlanes(); i++)
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
+    for (i = 0; i < m_GeoDat->getNPlanes(); i++)
       delete[] BoardTransform[i];
   }
 }
@@ -207,7 +207,7 @@ void EKLM::GeoEKLMCreator::deleteTransforms()
 void EKLM::GeoEKLMCreator::deleteSensitive()
 {
   delete m_sensitive[0];
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
     delete m_sensitive[1];
     delete m_sensitive[2];
   }
@@ -261,12 +261,12 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
   G4Box* solidCoverBox = NULL;
   G4Box* box = NULL;
   G4IntersectionSolid* is = NULL;
-  const struct ElementPosition* sectorPos = m_geoDat2->getSectorPosition();
+  const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
-  const struct ElementPosition* planePos = m_geoDat2->getPlanePosition();
+    m_GeoDat->getSectorSupportGeometry();
+  const struct ElementPosition* planePos = m_GeoDat->getPlanePosition();
   lz = 0.5 * (sectorPos->length - sectorSupportPos->length);
   try {
     solidCoverTube = new G4Tubs("Cover_Tube", sectorSupportPos->innerR,
@@ -319,9 +319,9 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(G4Transform3D& t)
   double x;
   G4Box* res = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   x = sqrt(sectorSupportPos->outerR * sectorSupportPos->outerR -
            sectorSupportPos->Y * sectorSupportPos->Y);
   t = G4Translate3D(0.5 * (x + sectorSupportGeometry->Corner3.X),
@@ -342,9 +342,9 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(G4Transform3D& t)
 {
   G4Box* res = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   t = G4Translate3D(sectorSupportPos->X +
                     0.5 * sectorSupportGeometry->Thickness,
                     0.5 * (sectorSupportGeometry->Corner4.Y +
@@ -368,9 +368,9 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxTop(G4Transform3D& t)
   double dy;
   G4Box* res = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   t = G4Translate3D(0.5 * (sectorSupportGeometry->Corner1A.X +
                            sectorSupportGeometry->Corner1B.X +
                            sectorSupportGeometry->Thickness *
@@ -398,9 +398,9 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube()
   double ang2;
   G4Tubs* res = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   ang1 = atan2(sectorSupportGeometry->Corner3.Y,
                sectorSupportGeometry->Corner3.X);
   ang2 = atan2(sectorSupportGeometry->Corner4.Y,
@@ -425,9 +425,9 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube()
   double r;
   G4Tubs* res = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   r = sectorSupportPos->outerR - sectorSupportGeometry->Thickness;
   x = sqrt(r * r - sectorSupportPos->Y * sectorSupportPos->Y);
   ang1 = atan2(sectorSupportPos->Y, x);
@@ -455,9 +455,9 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
   G4Transform3D t1;
   G4Transform3D t2;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   lx = sectorSupportGeometry->CornerX + sectorSupportGeometry->Corner1LX -
        sectorSupportGeometry->Thickness;
   try {
@@ -517,9 +517,9 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2Solid()
   G4TriangularPrism* solidCorner2Prism = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   r = sectorSupportPos->outerR - sectorSupportGeometry->Thickness;
   solids.sectorsup.c2y = sectorSupportPos->Y +
                          sectorSupportGeometry->Thickness;
@@ -555,9 +555,9 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3Solid()
   G4TriangularPrism* solidCorner3Prism = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   r = sectorSupportPos->innerR + sectorSupportGeometry->Thickness;
   y = sectorSupportPos->Y + sectorSupportGeometry->Thickness +
       sectorSupportGeometry->Corner3LY;
@@ -593,9 +593,9 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4Solid()
   G4TriangularPrism* solidCorner4Prism = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   r = sectorSupportPos->innerR + sectorSupportGeometry->Thickness;
   x = sectorSupportPos->X + sectorSupportGeometry->Thickness +
       sectorSupportGeometry->Corner4LX;
@@ -638,7 +638,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
   G4Transform3D tby;
   G4Transform3D tbt;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   solidBoxX = createSectorSupportBoxX(tbx);
   solidBoxY = createSectorSupportBoxY(tby);
   solidBoxTop = createSectorSupportBoxTop(tbt);
@@ -732,12 +732,12 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   G4SubtractionSolid** ss[2];
   G4SubtractionSolid* prev_solid = NULL;
   G4SubtractionSolid* res = NULL;
-  const struct ElementPosition* planePos = m_geoDat2->getPlanePosition();
+  const struct ElementPosition* planePos = m_GeoDat->getPlanePosition();
   const struct BoardGeometry* boardGeometry;
   /* If there are no boards, it is not necessary to subtract their solids. */
-  if (m_geoDat2->getDetectorMode() != c_DetectorBackground)
+  if (m_GeoDat->getDetectorMode() != c_DetectorBackground)
     return plane;
-  boardGeometry = m_geoDat2->getBoardGeometry();
+  boardGeometry = m_GeoDat->getBoardGeometry();
   /* Subtraction. */
   try {
     solidBoardBox = new G4Box("PlateBox", 0.5 * boardGeometry->length,
@@ -749,10 +749,10 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
   for (i = 0; i < 2; i++) {
     ss[i] =
       (G4SubtractionSolid**)malloc(sizeof(G4SubtractionSolid*) *
-                                   m_geoDat2->getNBoards());
+                                   m_GeoDat->getNBoards());
     if (ss[i] == NULL)
       B2FATAL(MemErr);
-    for (j = 0; j < m_geoDat2->getNBoards(); j++) {
+    for (j = 0; j < m_GeoDat->getNBoards(); j++) {
       t = BoardTransform[i][j];
       if (n == 0)
         t = G4Rotate3D(180. * CLHEP::deg, G4ThreeVector(1., 1., 0.)) * t;
@@ -763,7 +763,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
           prev_solid = ss[0][j - 1];
       } else {
         if (j == 0)
-          prev_solid = ss[0][m_geoDat2->getNBoards() - 1];
+          prev_solid = ss[0][m_GeoDat->getNBoards() - 1];
         else
           prev_solid = ss[1][j - 1];
       }
@@ -777,7 +777,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
       }
     }
   }
-  res = ss[1][m_geoDat2->getNBoards() - 1];
+  res = ss[1][m_GeoDat->getNBoards() - 1];
   for (i = 0; i < 2; i++)
     free(ss[i]);
   return res;
@@ -799,10 +799,10 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   G4SubtractionSolid* ss3 = NULL;
   G4SubtractionSolid* ss4 = NULL;
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
-  const struct ElementPosition* planePos = m_geoDat2->getPlanePosition();
+    m_GeoDat->getSectorSupportGeometry();
+  const struct ElementPosition* planePos = m_GeoDat->getPlanePosition();
   /* Basic solids. */
   snprintf(name, 128, "Plane_%d_Tube", n + 1);
   try {
@@ -946,13 +946,13 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
   G4Box* b[15];
   HepGeom::Transform3D t[15];
   const struct PlasticSheetGeometry* plasticSheetGeometry =
-    m_geoDat2->getPlasticSheetGeometry();
+    m_GeoDat->getPlasticSheetGeometry();
   const struct ElementPosition* stripPos;
-  const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   /* Transformations. */
   for (i = 0; i < 15; i++) {
     m = 15 * n + i;
-    m_geoDat2->getSheetTransform(&(t[i]), m);
+    m_GeoDat->getSheetTransform(&(t[i]), m);
   }
   /* Sheet elements. */
   for (i = 0; i < 15; i++) {
@@ -961,7 +961,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
     if (i == 0 || i == 14)
       ly = ly - plasticSheetGeometry->DeltaL;
     m = 15 * n + i;
-    stripPos = m_geoDat2->getStripPosition(m + 1);
+    stripPos = m_GeoDat->getStripPosition(m + 1);
     try {
       b[i] = new G4Box(name, 0.5 * stripPos->length, 0.5 * ly,
                        0.5 * plasticSheetGeometry->Width);
@@ -979,11 +979,11 @@ void EKLM::GeoEKLMCreator::createSolids()
   int i, iPos, n;
   char name[128];
   HepGeom::Transform3D t;
-  const struct ElementPosition* layerPos = m_geoDat2->getLayerPosition();
-  const struct ElementPosition* sectorPos = m_geoDat2->getSectorPosition();
+  const struct ElementPosition* layerPos = m_GeoDat->getLayerPosition();
+  const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct BoardGeometry* boardGeometry;
   const struct ElementPosition* stripPos;
-  const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   /* Endcap. */
   createEndcapSolid();
   /* Layer. */
@@ -1011,15 +1011,15 @@ void EKLM::GeoEKLMCreator::createSolids()
   createSectorSupportCorner3Solid();
   createSectorSupportCorner4Solid();
   /* Plane. */
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
     calcBoardTransform();
-  for (i = 0; i < m_geoDat2->getNPlanes(); i++)
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++)
     createPlaneSolid(i);
   /* Strips. */
-  n = m_geoDat2->getNStripsDifferentLength();
+  n = m_GeoDat->getNStripsDifferentLength();
   for (i = 0; i < n; i++) {
-    iPos = m_geoDat2->getStripPositionIndex(i);
-    stripPos = m_geoDat2->getStripPosition(iPos + 1);
+    iPos = m_GeoDat->getStripPositionIndex(i);
+    stripPos = m_GeoDat->getStripPosition(iPos + 1);
     /* Strip volumes. */
     snprintf(name, 128, "StripVolume_%d", i + 1);
     try {
@@ -1072,11 +1072,11 @@ void EKLM::GeoEKLMCreator::createSolids()
     }
   }
   /* Plastic sheet elements. */
-  for (i = 0; i < m_geoDat2->getNSegments(); i++)
+  for (i = 0; i < m_GeoDat->getNSegments(); i++)
     createPlasticSheetSolid(i);
   /* For background mode. */
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground) {
-    boardGeometry = m_geoDat2->getBoardGeometry();
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
+    boardGeometry = m_GeoDat->getBoardGeometry();
     /* Readout board. */
     try {
       solids.board = new G4Box("Board", 0.5 * boardGeometry->length,
@@ -1133,7 +1133,7 @@ void EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* mlv)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (curvol.layer = 1; curvol.layer <= m_geoDat2->getNLayers();
+  for (curvol.layer = 1; curvol.layer <= m_GeoDat->getNLayers();
        curvol.layer++)
     createLayer(logicEndcap);
 }
@@ -1188,17 +1188,17 @@ void EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* mlv)
   for (i = 1; i <= 2; i++)
     createSectorCover(i, logicSector);
   if ((curvol.endcap == 1 &&
-       curvol.layer <= m_geoDat2->getNDetectorLayers(1)) ||
+       curvol.layer <= m_GeoDat->getNDetectorLayers(1)) ||
       (curvol.endcap == 2 &&
-       curvol.layer <= m_geoDat2->getNDetectorLayers(2))) {
+       curvol.layer <= m_GeoDat->getNDetectorLayers(2))) {
     /* Detector layer. */
-    for (curvol.plane = 1; curvol.plane <= m_geoDat2->getNPlanes();
+    for (curvol.plane = 1; curvol.plane <= m_GeoDat->getNPlanes();
          curvol.plane++)
       createPlane(logicSector);
-    if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
-      for (curvol.plane = 1; curvol.plane <= m_geoDat2->getNPlanes();
+    if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
+      for (curvol.plane = 1; curvol.plane <= m_GeoDat->getNPlanes();
            curvol.plane++)
-        for (curvol.board = 1; curvol.board <= m_geoDat2->getNBoards();
+        for (curvol.board = 1; curvol.board <= m_GeoDat->getNBoards();
              curvol.board++)
           createSegmentReadoutBoard(logicSector);
   } else {
@@ -1210,11 +1210,11 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
 {
   int i;
   int j;
-  const struct BoardGeometry* boardGeometry = m_geoDat2->getBoardGeometry();
+  const struct BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
   const struct BoardPosition* boardPos;
-  for (i = 0; i < m_geoDat2->getNPlanes(); i++) {
-    for (j = 0; j < m_geoDat2->getNBoards(); j++) {
-      boardPos = m_geoDat2->getBoardPosition(i + 1, j + 1);
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
+    for (j = 0; j < m_GeoDat->getNBoards(); j++) {
+      boardPos = m_GeoDat->getBoardPosition(i + 1, j + 1);
       BoardTransform[i][j] = G4Transform3D(
                                G4RotateZ3D(boardPos->phi) *
                                G4Translate3D(boardPos->r - 0.5 * boardGeometry->height, 0., 0.) *
@@ -1228,9 +1228,9 @@ void EKLM::GeoEKLMCreator::createSectorCover(int iCover, G4LogicalVolume* mlv)
   double z;
   G4LogicalVolume* logicCover = NULL;
   G4Transform3D t;
-  const struct ElementPosition* sectorPos = m_geoDat2->getSectorPosition();
+  const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   std::string Cover_Name = "Cover_" +
                            boost::lexical_cast<std::string>(iCover) + "_" +
                            mlv->GetName();
@@ -1258,7 +1258,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1(G4LogicalVolume* mlv)
   G4LogicalVolume* logicCorner1 = NULL;
   G4Transform3D t;
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   std::string Corner1_Name = "Corner1_" + mlv->GetName();
   try {
     logicCorner1 =
@@ -1282,7 +1282,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2(G4LogicalVolume* mlv)
   G4LogicalVolume* logicCorner2 = NULL;
   G4Transform3D t;
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   std::string Corner2_Name = "Corner2_" + mlv->GetName();
   try {
     logicCorner2 = new G4LogicalVolume(solids.sectorsup.corn2, mat.duralumin,
@@ -1307,7 +1307,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3(G4LogicalVolume* mlv)
   G4LogicalVolume* logicCorner3 = NULL;
   G4Transform3D t;
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   std::string Corner3_Name = "Corner3_" + mlv->GetName();
   try {
     logicCorner3 = new G4LogicalVolume(solids.sectorsup.corn3, mat.duralumin,
@@ -1332,7 +1332,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4(G4LogicalVolume* mlv)
   G4LogicalVolume* logicCorner4 = NULL;
   G4Transform3D t;
   const struct SectorSupportGeometry* sectorSupportGeometry =
-    m_geoDat2->getSectorSupportGeometry();
+    m_GeoDat->getSectorSupportGeometry();
   std::string Corner4_Name = "Corner4_" + mlv->GetName();
   try {
     logicCorner4 = new G4LogicalVolume(solids.sectorsup.corn4, mat.duralumin,
@@ -1358,7 +1358,7 @@ void EKLM::GeoEKLMCreator::createSectorSupport(G4LogicalVolume* mlv)
   G4Transform3D t;
   std::string SectorSupportName = "Support_" + mlv->GetName();
   const struct ElementPosition* sectorSupportPos =
-    m_geoDat2->getSectorSupportPosition();
+    m_GeoDat->getSectorSupportPosition();
   t = G4Translate3D(0., 0., sectorSupportPos->Z);
   try {
     logicSectorSupport = new G4LogicalVolume(solids.sectorsup.supp,
@@ -1406,18 +1406,18 @@ void EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* mlv)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 1; i <= m_geoDat2->getNSegments() + 1; i++)
+  for (i = 1; i <= m_GeoDat->getNSegments() + 1; i++)
     createSegmentSupport(i, logicPlane);
   for (i = 1; i <= 2; i++)
-    for (j = 1; j <= m_geoDat2->getNSegments(); j++)
+    for (j = 1; j <= m_GeoDat->getNSegments(); j++)
       createPlasticSheetElement(i, j, logicPlane);
   if (curvol.endcap == 1 && curvol.layer == 1 && curvol.sector == 1 &&
       curvol.plane == 1)
-    for (i = 0; i < m_geoDat2->getNStripsDifferentLength(); i++) {
+    for (i = 0; i < m_GeoDat->getNStripsDifferentLength(); i++) {
       createStripLogicalVolumes(i, logicPlane);
       createStripPhysicalVolumes(i);
     }
-  for (curvol.strip = 1; curvol.strip <= m_geoDat2->getNStrips();
+  for (curvol.strip = 1; curvol.strip <= m_GeoDat->getNStrips();
        curvol.strip++)
     createStripVolume(logicPlane);
 }
@@ -1445,7 +1445,7 @@ void EKLM::GeoEKLMCreator::createSegmentReadoutBoard(G4LogicalVolume* mlv)
     B2FATAL(MemErr);
   }
   createBaseBoard(logicSegmentReadoutBoard);
-  for (i = 1; i <= m_geoDat2->getNStripBoards(); i++)
+  for (i = 1; i <= m_GeoDat->getNStripBoards(); i++)
     createStripBoard(i, logicSegmentReadoutBoard);
 }
 
@@ -1453,7 +1453,7 @@ void EKLM::GeoEKLMCreator::createBaseBoard(G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicBaseBoard = NULL;
   G4Transform3D t;
-  const struct BoardGeometry* boardGeometry = m_geoDat2->getBoardGeometry();
+  const struct BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
   std::string Board_Name = "BaseBoard_" + mlv->GetName();
   try {
     logicBaseBoard = new G4LogicalVolume(solids.baseboard, mat.silicon,
@@ -1477,9 +1477,9 @@ void EKLM::GeoEKLMCreator::createStripBoard(int iBoard, G4LogicalVolume* mlv)
 {
   G4LogicalVolume* logicStripBoard = NULL;
   G4Transform3D t;
-  const struct BoardGeometry* boardGeometry = m_geoDat2->getBoardGeometry();
+  const struct BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
   const struct StripBoardPosition* stripBoardPos =
-    m_geoDat2->getStripBoardPosition(iBoard);
+    m_GeoDat->getStripBoardPosition(iBoard);
   std::string Board_Name = "StripBoard_" +
                            boost::lexical_cast<std::string>(iBoard) + "_" +
                            mlv->GetName();
@@ -1511,9 +1511,9 @@ void EKLM::GeoEKLMCreator::createSegmentSupport(int iSegmentSupport,
   G4LogicalVolume* logicSegmentSupport = NULL;
   std::string SegmentSupportName;
   const struct SegmentSupportPosition* segmentSupportPos =
-    m_geoDat2->getSegmentSupportPosition(curvol.plane, iSegmentSupport);
+    m_GeoDat->getSegmentSupportPosition(curvol.plane, iSegmentSupport);
   const struct SegmentSupportGeometry* segmentSupportGeometry =
-    m_geoDat2->getSegmentSupportGeometry();
+    m_GeoDat->getSegmentSupportGeometry();
   SegmentSupportName = "SegmentSupport_" +
                        boost::lexical_cast<std::string>(iSegmentSupport) +
                        "_" + mlv->GetName();
@@ -1606,8 +1606,8 @@ void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane,
   double z;
   G4Transform3D t;
   const struct PlasticSheetGeometry* plasticSheetGeometry =
-    m_geoDat2->getPlasticSheetGeometry();
-  const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
+    m_GeoDat->getPlasticSheetGeometry();
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   std::string Sheet_Name =
     "Sheet_" + boost::lexical_cast<std::string>(iSheet) +
     "_SheetPlane_" + boost::lexical_cast<std::string>(iSheetPlane) +
@@ -1626,11 +1626,11 @@ void EKLM::GeoEKLMCreator::createPlasticSheetElement(int iSheetPlane,
   z = 0.5 * (stripGeometry->thickness + plasticSheetGeometry->Width);
   if (iSheetPlane == 2)
     z = -z;
-  m_geoDat2->getSheetTransform(&t, (iSheet - 1) * 15);
+  m_GeoDat->getSheetTransform(&t, (iSheet - 1) * 15);
   t = t * G4Translate3D(0, 0, z);
   try {
     new G4PVPlacement(t, logvol.psheet[iSheet - 1], Sheet_Name, mlv, false,
-                      (iSheetPlane - 1) * m_geoDat2->getNSegments() + iSheet,
+                      (iSheetPlane - 1) * m_GeoDat->getNSegments() + iSheet,
                       false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1690,7 +1690,7 @@ void EKLM::GeoEKLMCreator::createStripPhysicalVolumes(int iStrip)
   G4Transform3D t;
   G4LogicalVolume* lv;
   G4LogicalVolume* lvm;
-  const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   t = G4Translate3D(-0.5 * stripGeometry->rss_size, 0., 0.);
   lvm = logvol.stripvol[iStrip];
   lv = logvol.strip[iStrip];
@@ -1715,7 +1715,7 @@ void EKLM::GeoEKLMCreator::createStripPhysicalVolumes(int iStrip)
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  if (m_geoDat2->getDetectorMode() == c_DetectorBackground)
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
     createSiPM(logvol.stripvol[iStrip]);
 }
 
@@ -1725,8 +1725,8 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* mlv)
   const HepGeom::Transform3D* t;
   HepGeom::Transform3D t2;
   G4LogicalVolume* lv;
-  const struct StripGeometry* stripGeometry = m_geoDat2->getStripGeometry();
-  n = m_geoDat2->getStripLengthIndex(curvol.strip - 1);
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  n = m_GeoDat->getStripLengthIndex(curvol.strip - 1);
   t = m_TransformData->getStripTransform(curvol.endcap, curvol.layer,
                                          curvol.sector, curvol.plane,
                                          curvol.strip);
@@ -1745,7 +1745,7 @@ void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* mlv)
   G4LogicalVolume* logicSiPM = NULL;
   G4Transform3D t;
   const struct ElementPosition* stripPos =
-    m_geoDat2->getStripPosition(curvol.strip);
+    m_GeoDat->getStripPosition(curvol.strip);
   std::string SiPM_Name = "SiPM_" + mlv->GetName();
   try {
     logicSiPM = new G4LogicalVolume(solids.sipm, mat.silicon, SiPM_Name, 0,
@@ -1766,7 +1766,7 @@ void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* mlv)
 
 void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv)
 {
-  if (m_geoDat2->getDetectorMode() == c_DetectorPrintMasses)
+  if (m_GeoDat->getDetectorMode() == c_DetectorPrintMasses)
     printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
            lv->GetMass() / CLHEP::g);
 }
@@ -1781,7 +1781,7 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   createSolids();
   for (curvol.endcap = 1; curvol.endcap <= 2; curvol.endcap++)
     createEndcap(&topVolume);
-  if (m_geoDat2->getDetectorMode() == c_DetectorPrintMasses) {
+  if (m_GeoDat->getDetectorMode() == c_DetectorPrintMasses) {
     printf("EKLM started in mode c_DetectorPrintMasses. Exiting now.\n");
     exit(0);
   }

@@ -275,14 +275,14 @@ namespace Belle2 {
      * EKLM geometry data.
      * All data and function results are in CLHEP units unless noted otherwise.
      */
-    class GeometryData2 {
+    class GeometryData {
 
     public:
 
       /**
        * Instantiation.
        */
-      static const GeometryData2& Instance();
+      static const GeometryData& Instance();
 
       /**
        * Get EKLM detector mode.
@@ -505,12 +505,12 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      GeometryData2();
+      GeometryData();
 
       /**
        * Destructor.
        */
-      ~GeometryData2();
+      ~GeometryData();
 
       /**
        * Calculate sector support geometry data.

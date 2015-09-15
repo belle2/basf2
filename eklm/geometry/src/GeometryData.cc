@@ -12,7 +12,7 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -28,9 +28,9 @@ static const char c_SupportErr[] =
 static const char c_BoardErr[] = "Number of board must be from 1 to 15.";
 static const char c_StripErr[] = "Number of strip must be from 1 to 75.";
 
-const EKLM::GeometryData2& EKLM::GeometryData2::Instance()
+const EKLM::GeometryData& EKLM::GeometryData::Instance()
 {
-  static EKLM::GeometryData2 gd;
+  static EKLM::GeometryData gd;
   return gd;
 }
 
@@ -91,7 +91,7 @@ static void readSectorSupportGeometry(struct EKLM::SectorSupportGeometry* ssg,
  * Calculate sector support geometry data.
  * @param ssg Sector support geometry data.
  */
-void EKLM::GeometryData2::calculateSectorSupportGeometry()
+void EKLM::GeometryData::calculateSectorSupportGeometry()
 {
   /* Corner 1. */
   m_SectorSupportGeometry.Corner1A.X = m_SectorSupportPosition.X;
@@ -133,7 +133,7 @@ static bool compareLength(double a, double b)
   return a < b;
 }
 
-void EKLM::GeometryData2::fillStripIndexArrays()
+void EKLM::GeometryData::fillStripIndexArrays()
 {
   const char err[] = "Strip sorting algorithm error.";
   int i;
@@ -188,7 +188,7 @@ void EKLM::GeometryData2::fillStripIndexArrays()
   }
 }
 
-void EKLM::GeometryData2::readXMLDataStrips()
+void EKLM::GeometryData::readXMLDataStrips()
 {
   int i;
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Endcap/"
@@ -215,7 +215,7 @@ void EKLM::GeometryData2::readXMLDataStrips()
   }
 }
 
-EKLM::GeometryData2::GeometryData2()
+EKLM::GeometryData::GeometryData()
 {
   int i;
   int j;
@@ -357,7 +357,7 @@ EKLM::GeometryData2::GeometryData2()
   }
 }
 
-EKLM::GeometryData2::~GeometryData2()
+EKLM::GeometryData::~GeometryData()
 {
   int i;
   for (i = 0; i < m_nPlane; i++)
@@ -371,17 +371,17 @@ EKLM::GeometryData2::~GeometryData2()
   free(m_StripAllToLen);
 }
 
-EKLM::DetectorMode EKLM::GeometryData2::getDetectorMode() const
+EKLM::DetectorMode EKLM::GeometryData::getDetectorMode() const
 {
   return m_mode;
 }
 
-int EKLM::GeometryData2::getNLayers() const
+int EKLM::GeometryData::getNLayers() const
 {
   return m_nLayer;
 }
 
-int EKLM::GeometryData2::getNDetectorLayers(int endcap) const
+int EKLM::GeometryData::getNDetectorLayers(int endcap) const
 {
   if (endcap <= 0 || endcap > 2)
     B2FATAL("Number of endcap must be 1 (backward) or 2 (forward).");
@@ -390,73 +390,73 @@ int EKLM::GeometryData2::getNDetectorLayers(int endcap) const
   return m_nLayerForward;
 }
 
-int EKLM::GeometryData2::getNPlanes() const
+int EKLM::GeometryData::getNPlanes() const
 {
   return m_nPlane;
 }
 
-int EKLM::GeometryData2::getNBoards() const
+int EKLM::GeometryData::getNBoards() const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return m_nBoard;
 }
 
-int EKLM::GeometryData2::getNStripBoards() const
+int EKLM::GeometryData::getNStripBoards() const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
   return m_nStripBoard;
 }
 
-int EKLM::GeometryData2::getNStrips() const
+int EKLM::GeometryData::getNStrips() const
 {
   return m_nStrip;
 }
 
-int EKLM::GeometryData2::getNSegments() const
+int EKLM::GeometryData::getNSegments() const
 {
   return m_nSegment;
 }
 
-double EKLM::GeometryData2::getSolenoidZ() const
+double EKLM::GeometryData::getSolenoidZ() const
 {
   return m_solenoidZ;
 }
 
-const EKLM::ElementPosition* EKLM::GeometryData2::getEndcapPosition() const
+const EKLM::ElementPosition* EKLM::GeometryData::getEndcapPosition() const
 {
   return &m_EndcapPosition;
 }
 
-const EKLM::ElementPosition* EKLM::GeometryData2::getLayerPosition() const
+const EKLM::ElementPosition* EKLM::GeometryData::getLayerPosition() const
 {
   return &m_LayerPosition;
 }
 
-double EKLM::GeometryData2::getLayerShiftZ() const
+double EKLM::GeometryData::getLayerShiftZ() const
 {
   return m_LayerShiftZ;
 }
 
-const EKLM::ElementPosition* EKLM::GeometryData2::getSectorPosition() const
+const EKLM::ElementPosition* EKLM::GeometryData::getSectorPosition() const
 {
   return &m_SectorPosition;
 }
 
 const EKLM::ElementPosition*
-EKLM::GeometryData2::getSectorSupportPosition() const
+EKLM::GeometryData::getSectorSupportPosition() const
 {
   return &m_SectorSupportPosition;
 }
 
 const EKLM::SectorSupportGeometry*
-EKLM::GeometryData2::getSectorSupportGeometry() const
+EKLM::GeometryData::getSectorSupportGeometry() const
 {
   return &m_SectorSupportGeometry;
 }
 
-const EKLM::BoardGeometry* EKLM::GeometryData2::getBoardGeometry() const
+const EKLM::BoardGeometry* EKLM::GeometryData::getBoardGeometry() const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
@@ -464,7 +464,7 @@ const EKLM::BoardGeometry* EKLM::GeometryData2::getBoardGeometry() const
 }
 
 const EKLM::BoardPosition*
-EKLM::GeometryData2::getBoardPosition(int plane, int segment) const
+EKLM::GeometryData::getBoardPosition(int plane, int segment) const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
@@ -476,7 +476,7 @@ EKLM::GeometryData2::getBoardPosition(int plane, int segment) const
 }
 
 const EKLM::StripBoardPosition*
-EKLM::GeometryData2::getStripBoardPosition(int board) const
+EKLM::GeometryData::getStripBoardPosition(int board) const
 {
   if (m_mode != c_DetectorBackground)
     B2FATAL(c_ModeErr);
@@ -485,13 +485,13 @@ EKLM::GeometryData2::getStripBoardPosition(int board) const
   return &m_StripBoardPosition[board - 1];
 }
 
-const EKLM::ElementPosition* EKLM::GeometryData2::getPlanePosition() const
+const EKLM::ElementPosition* EKLM::GeometryData::getPlanePosition() const
 {
   return &m_PlanePosition;
 }
 
 const EKLM::SegmentSupportPosition*
-EKLM::GeometryData2::getSegmentSupportPosition(int plane, int support) const
+EKLM::GeometryData::getSegmentSupportPosition(int plane, int support) const
 {
   if (plane <= 0 || plane > 2)
     B2FATAL(c_PlaneErr);
@@ -501,51 +501,51 @@ EKLM::GeometryData2::getSegmentSupportPosition(int plane, int support) const
 }
 
 const EKLM::SegmentSupportGeometry*
-EKLM::GeometryData2::getSegmentSupportGeometry() const
+EKLM::GeometryData::getSegmentSupportGeometry() const
 {
   return &m_SegmentSupportGeometry;
 }
 
 const EKLM::PlasticSheetGeometry*
-EKLM::GeometryData2::getPlasticSheetGeometry() const
+EKLM::GeometryData::getPlasticSheetGeometry() const
 {
   return &m_PlasticSheetGeometry;
 }
 
 const EKLM::ElementPosition*
-EKLM::GeometryData2::getStripPosition(int strip) const
+EKLM::GeometryData::getStripPosition(int strip) const
 {
   if (strip <= 0 || strip > 75)
     B2FATAL(c_StripErr);
   return &m_StripPosition[strip - 1];
 }
 
-double EKLM::GeometryData2::getStripLength(int strip) const
+double EKLM::GeometryData::getStripLength(int strip) const
 {
   return m_StripPosition[strip - 1].length;
 }
 
-const EKLM::StripGeometry* EKLM::GeometryData2::getStripGeometry() const
+const EKLM::StripGeometry* EKLM::GeometryData::getStripGeometry() const
 {
   return &m_StripGeometry;
 }
 
-int EKLM::GeometryData2::getStripLengthIndex(int positionIndex) const
+int EKLM::GeometryData::getStripLengthIndex(int positionIndex) const
 {
   return m_StripAllToLen[positionIndex];
 }
 
-int EKLM::GeometryData2::getStripPositionIndex(int lengthIndex) const
+int EKLM::GeometryData::getStripPositionIndex(int lengthIndex) const
 {
   return m_StripLenToAll[lengthIndex];
 }
 
-int EKLM::GeometryData2::getNStripsDifferentLength() const
+int EKLM::GeometryData::getNStripsDifferentLength() const
 {
   return m_nStripDifferent;
 }
 
-bool EKLM::GeometryData2::hitInEKLM(double z) const
+bool EKLM::GeometryData::hitInEKLM(double z) const
 {
   double zMm;
   zMm = z / Unit::cm * CLHEP::cm;
@@ -556,7 +556,7 @@ bool EKLM::GeometryData2::hitInEKLM(double z) const
  * Note that numbers of elements are 0-based for all transformation functions.
  */
 void
-EKLM::GeometryData2::getEndcapTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getEndcapTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
     *t = HepGeom::Translate3D(m_EndcapPosition.X, m_EndcapPosition.Y,
@@ -568,7 +568,7 @@ EKLM::GeometryData2::getEndcapTransform(HepGeom::Transform3D* t, int n) const
 }
 
 void
-EKLM::GeometryData2::getLayerTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getLayerTransform(HepGeom::Transform3D* t, int n) const
 {
   *t = HepGeom::Translate3D(0.0, 0.0, m_EndcapPosition.length / 2.0 -
                             (n + 1) * m_LayerShiftZ +
@@ -576,7 +576,7 @@ EKLM::GeometryData2::getLayerTransform(HepGeom::Transform3D* t, int n) const
 }
 
 void
-EKLM::GeometryData2::getSectorTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getSectorTransform(HepGeom::Transform3D* t, int n) const
 {
   switch (n) {
     case 0:
@@ -596,7 +596,7 @@ EKLM::GeometryData2::getSectorTransform(HepGeom::Transform3D* t, int n) const
 }
 
 void
-EKLM::GeometryData2::getPlaneTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getPlaneTransform(HepGeom::Transform3D* t, int n) const
 {
   if (n == 0)
     *t = HepGeom::Translate3D(m_PlanePosition.X, m_PlanePosition.Y,
@@ -609,13 +609,13 @@ EKLM::GeometryData2::getPlaneTransform(HepGeom::Transform3D* t, int n) const
 }
 
 void
-EKLM::GeometryData2::getStripTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getStripTransform(HepGeom::Transform3D* t, int n) const
 {
   *t = HepGeom::Translate3D(m_StripPosition[n].X, m_StripPosition[n].Y, 0.0);
 }
 
 void
-EKLM::GeometryData2::getSheetTransform(HepGeom::Transform3D* t, int n) const
+EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
 {
   double y;
   y = m_StripPosition[n].Y;

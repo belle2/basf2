@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
 #include <framework/gearbox/Unit.h>
-#include <eklm/geometry/GeometryData2.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/EKLMADC/EKLMADCModule.h>
 
 using namespace Belle2;
@@ -76,7 +76,7 @@ void EKLMADCModule::initialize()
   }
   if (m_mode.compare("Strips") == 0) {
     for (i = 1; i <= 75; i++) {
-      l = EKLM::GeometryData2::Instance().getStripLength(i) / CLHEP::mm *
+      l = EKLM::GeometryData::Instance().getStripLength(i) / CLHEP::mm *
           Unit::mm;
       snprintf(str, 32, "h%d_near", i);
       generateHistogram(str, l, 0, 10000);

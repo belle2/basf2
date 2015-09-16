@@ -87,26 +87,78 @@ namespace Belle2 {
     };
 
     /**
+     * @struct Solids
      * All solids of EKLM.
+     *
+     * @var Solids::endcap
+     * Endcap.
+     *
+     * @var Solids::layer
+     * Layer.
+     *
+     * @var Solids::sector
+     * Sector.
+     *
+     * @var Solids::cover
+     * Sector cover.
+     *
+     * @var Solids::secsupp
+     * Sector support.
+     *
+     * @var Solids::plane
+     * Palne.
+     *
+     * @var Solids::psheet
+     * Element of plastic sheet.
+     *
+     * @var Solids::stripvol
+     * Strip + SiPM volume.
+     *
+     * @var Solids::strip
+     * Strips.
+     *
+     * @var Solids::groove
+     * Strip grooves.
+     *
+     * @var Solids::board
+     * SiPM.
+     *
+     * @var Solids::board
+     * Readout board.
+     *
+     * @var Solids::baseboard
+     * Readout board base.
+     *
+     * @var Solids::stripboard
+     * Readout board for 1 strip.
+     *
+     * @var Solids::sectorsup
+     * Sector support.
+     *
+     * @var Solids::scint
+     * Scintillator.
+     *
+     * @var Solids::segmentsup
+     * Segment support.
      */
     struct Solids {
-      G4VSolid* endcap;                         /**< Endcap. */
-      G4VSolid* layer;                          /**< Layer. */
-      G4VSolid* sector;                         /**< Sector. */
-      G4VSolid* cover;                          /**< Sector cover. */
-      G4VSolid* secsupp;                        /**< Sector support. */
-      G4VSolid** plane;                         /**< Plane. */
-      G4VSolid** psheet;                        /**< Element of plastic sheet. */
-      G4VSolid** stripvol;                      /**< Strip + SiPM volume. */
-      G4VSolid** strip;                         /**< Strips. */
-      G4VSolid** groove;                        /**< Strip grooves. */
-      G4VSolid* sipm;                           /**< SiPM. */
-      G4VSolid* board;                          /**< Readout board. */
-      G4VSolid* baseboard;                      /**< Readout board base. */
-      G4VSolid* stripboard;                     /**< Readout board for 1 strip. */
-      struct SectorSupportSolids sectorsup;     /**< Sector support. */
-      struct ScintillatorSolids* scint;         /**< Scintillator. */
-      struct SegmentSupportSolids** segmentsup; /**< Segment support. */
+      G4VSolid* endcap;
+      G4VSolid* layer;
+      G4VSolid* sector;
+      G4VSolid* cover;
+      G4VSolid* secsupp;
+      G4VSolid** plane;
+      G4VSolid** psheet;
+      G4VSolid** stripvol;
+      G4VSolid** strip;
+      G4VSolid** groove;
+      G4VSolid* sipm;
+      G4VSolid* board;
+      G4VSolid* baseboard;
+      G4VSolid* stripboard;
+      struct SectorSupportSolids sectorsup;
+      struct ScintillatorSolids* scint;
+      struct SegmentSupportSolids** segmentsup;
     };
 
     /**
@@ -505,16 +557,16 @@ namespace Belle2 {
       void calcBoardTransform();
 
       /** Solids. */
-      struct Solids solids;
+      struct Solids m_Solids;
 
       /** Logical volumes. */
-      struct LogicalVolumes logvol;
+      struct LogicalVolumes m_LogVol;
 
       /** Materials. */
-      struct Materials mat;
+      struct Materials m_Materials;
 
       /** Current volumes. */
-      struct VolumeNumbers curvol;
+      struct VolumeNumbers m_CurVol;
 
       /** Transformation data. */
       TransformData* m_TransformData;
@@ -523,13 +575,13 @@ namespace Belle2 {
       const GeometryData* m_GeoDat;
 
       /** ESTR Geometry data. */
-      struct ESTRGeometryParams ESTRPar;
+      struct ESTRGeometryParams m_ESTRPar;
 
       /** Transformations of boards from sector reference frame. */
-      G4Transform3D* BoardTransform[2];
+      G4Transform3D* m_BoardTransform[2];
 
       /** Sensitive detectors. */
-      EKLMSensitiveDetector* m_sensitive[3];
+      EKLMSensitiveDetector* m_Sensitive[3];
 
     };
 

@@ -195,6 +195,40 @@ namespace Belle2 {
       void createSectorCoverSolid();
 
       /**
+       * Create inner tube of sector support structure.
+       */
+      G4Tubs* createSectorSupportInnerTube();
+
+      /**
+       * Create outer tube of sector support structure.
+       */
+      G4Tubs* createSectorSupportOuterTube();
+
+      /**
+       * Create X side of sector support structure.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxX(G4Transform3D& t);
+
+      /**
+       * Create Y side of sector support structure.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxY(G4Transform3D& t);
+
+      /**
+       * Create box in the cutted corner of sector support structure.
+       * @param[out] t     Transformation.
+       * @details
+       * Sets t to the transformation of the box.
+       */
+      G4Box* createSectorSupportBoxTop(G4Transform3D& t);
+
+      /**
        * Create sector support solid.
        */
       void createSectorSupportSolid();
@@ -288,165 +322,146 @@ namespace Belle2 {
       void createSolids();
 
       /**
-       * Create endcap.
-       * @param[in] mlv     Mother logical volume.
+       * Check if a given layer is a detector layer.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @return True if this layer is a detector layer.
        */
-      void createEndcap(G4LogicalVolume* mlv);
+      bool detectorLayer(int endcap, int layer) const;
+
+      /**
+       * Create endcap.
+       * @param[in] topVolume Geant world volume.
+       * @return Endcap logical volume.
+       */
+      G4LogicalVolume* createEndcap(G4LogicalVolume* topVolume) const;
 
       /**
        * Create layer.
-       * @param[in] mlv     Mother logical volume.
+       * @param[in] endcap Endcap logical volume.
+       * @return Layer logical volume.
        */
-      void createLayer(G4LogicalVolume* mlv);
+      G4LogicalVolume* createLayer(G4LogicalVolume* endcap) const;
 
       /**
        * Create sector.
-       * @param[in] mlv     Mother logical volume.
+       * @param[in] layer Layer logical volume.
+       * @return Sector logical volume.
        */
-      void createSector(G4LogicalVolume* mlv);
+      G4LogicalVolume* createSector(G4LogicalVolume* layer) const;
 
       /**
        * Create sector cover.
        * @param[in] iCover Number of cover.
-       * @param[in] mlv    Mother logical volume.
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorCover(int iCover, G4LogicalVolume* mlv);
+      void createSectorCover(int iCover, G4LogicalVolume* sector) const;
 
       /**
-       * Create sector support structure.
-       * @param[in] mlv   Mother logical volume.
+       * Create sector support structure (main part without corners).
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorSupport(G4LogicalVolume* mlv);
-
-      /**
-       * Create inner tube of sector support structure.
-       */
-      G4Tubs* createSectorSupportInnerTube();
-
-      /**
-       * Create outer tube of sector support structure.
-       */
-      G4Tubs* createSectorSupportOuterTube();
-
-      /**
-       * Create X side of sector support structure.
-       * @param[out] t     Transformation.
-       * @details
-       * Sets t to the transformation of the box.
-       */
-      G4Box* createSectorSupportBoxX(G4Transform3D& t);
-
-      /**
-       * Create Y side of sector support structure.
-       * @param[out] t     Transformation.
-       * @details
-       * Sets t to the transformation of the box.
-       */
-      G4Box* createSectorSupportBoxY(G4Transform3D& t);
-
-      /**
-       * Create box in the cutted corner of sector support structure.
-       * @param[out] t     Transformation.
-       * @details
-       * Sets t to the transformation of the box.
-       */
-      G4Box* createSectorSupportBoxTop(G4Transform3D& t);
+      void createSectorSupport(G4LogicalVolume* mlv) const;
 
       /**
        * Create sector support corner 1.
-       * @param[in] mlv   Mother logical volume.
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorSupportCorner1(G4LogicalVolume* mlv);
+      void createSectorSupportCorner1(G4LogicalVolume* sector) const;
 
       /**
        * Create sector support corner 2.
-       * @param[in] mlv   Mother logical volume.
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorSupportCorner2(G4LogicalVolume* mlv);
+      void createSectorSupportCorner2(G4LogicalVolume* sector) const;
 
       /**
        * Create sector support corner 3.
-       * @param[in] mlv   Mother logical volume.
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorSupportCorner3(G4LogicalVolume* mlv);
+      void createSectorSupportCorner3(G4LogicalVolume* sector) const;
 
       /**
        * Create sector support corner 4.
-       * @param[in] mlv   Mother logical volume.
+       * @param[in] sector Sector logical volume.
        */
-      void createSectorSupportCorner4(G4LogicalVolume* mlv);
+      void createSectorSupportCorner4(G4LogicalVolume* sector) const;
 
       /**
        * Create plane.
-       * @param[in] mlv    Mother logical volume.
+       * @param[in] sector Sector logical volume.
+       * @return Plane logical volume.
        */
-      void createPlane(G4LogicalVolume* mlv);
+      G4LogicalVolume* createPlane(G4LogicalVolume* sector) const;
 
       /**
-       * Create readout board.
-       * @param[in] mlv    Mother logical volume.
+       * Create segment readout board.
+       * @param[in] sector Sector logical volume.
+       * @return Segment readout board logical volume.
        */
-      void createSegmentReadoutBoard(G4LogicalVolume* mlv);
+      G4LogicalVolume* createSegmentReadoutBoard(G4LogicalVolume* sector) const;
 
       /**
        * Create base board of segment readout board.
-       * @param[in] mlv   Mother logical volume.
+       * @param[in] segmentReadoutBoard Segment readout board logical volume.
        */
-      void createBaseBoard(G4LogicalVolume* mlv);
+      void createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const;
 
       /**
        * Create strip readout board.
-       * @param[in] iBoard Number of board.
-       * @param[in] mlv    Mother logical volume.
+       * @param[in] iBoard              Number of board.
+       * @param[in] segmentReadoutBoard Segment readout board logical volume.
        */
-      void createStripBoard(int iBoard, G4LogicalVolume* mlv);
+      void createStripBoard(int iBoard,
+                            G4LogicalVolume* segmentReadoutBoard) const;
 
       /**
        * Create segment support.
        * @param[in] iSegmentSupport Number of segment support.
-       * @param[in] mlv             Mother logical volume.
+       * @param[in] plane           Plane logical volume.
        */
-      void createSegmentSupport(int iSegmentSupport, G4LogicalVolume* mlv);
+      void createSegmentSupport(int iSegmentSupport,
+                                G4LogicalVolume* plane) const;
 
       /**
-       * Create plastic list element.
-       * @param[in] iSheetPlane Number of list plane.
-       * @param[in] iSheet      Number of list.
-       * @param[in] mlv         Mother logical volume.
+       * Create plastic sheet element.
+       * @param[in] iSheetPlane Number of sheet plane.
+       * @param[in] iSheet      Number of sheet.
+       * @param[in] plane       Plane logical volume.
        */
       void createPlasticSheetElement(int iSheetPlane, int iSheet,
-                                     G4LogicalVolume* mlv);
+                                     G4LogicalVolume* plane) const;
 
       /**
        * Create strip logical volumes.
        * @param[in] iStrip Number of strip in the length-based array.
-       * @param[in] mlv    Mother logical volume.
+       * @param[in] plane  Plane logical volume.
        */
-      void createStripLogicalVolumes(int iStrip, G4LogicalVolume* mlv);
+      void createStripLogicalVolumes(int iStrip, G4LogicalVolume* plane) const;
 
       /**
        * Create strip volume.
-       * @param[in] mlv    Mother logical volume.
+       * @param[in] plane Plane logical volume.
        */
-      void createStripVolume(G4LogicalVolume* mlv);
+      void createStripVolume(G4LogicalVolume* mlv) const;
 
       /**
        * Create strip physical volumes.
        * @param[in] iStrip Number of strip in the length-based array.
        */
-      void createStripPhysicalVolumes(int iStrip);
+      void createStripPhysicalVolumes(int iStrip) const;
 
       /**
        * Create silicon cube in the place of SiPM for radiation study.
-       * @param[in] mlv Mother logical volume.
+       * @param[in] stripVolume "Strip volume" logical volume.
        */
-      void createSiPM(G4LogicalVolume* mlv);
+      void createSiPM(G4LogicalVolume* stripVolume) const;
 
       /**
-       * Print mass of volume if m_mode == 2.
+       * Print mass of volume if mode == c_DetectorPrintMasses.
        * @param[in] lv  Logical volume.
        */
-      void printVolumeMass(G4LogicalVolume* lv);
+      void printVolumeMass(G4LogicalVolume* lv) const;
 
       /**
        * Create new volumes.

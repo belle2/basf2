@@ -74,19 +74,6 @@ namespace Belle2 {
     int stripNumber(int endcap, int layer, int sector, int plane, int strip);
 
     /**
-     * Get board number.
-     * @param[in] endcap Endcap number.
-     * @param[in] layer  Layer number.
-     * @param[in] sector Sector number.
-     * @param[in] plane  Plane number.
-     * @param[in] board  Board number.
-     * @return Number of board.
-     * @details
-     * Number is from 1 to 5*2*4*14*2 = 1200.
-     */
-    int boardNumber(int endcap, int layer, int sector, int plane, int board);
-
-    /**
      * Get layer local number.
      * @param[in] gnum Layer global number.
      * @return Local number.

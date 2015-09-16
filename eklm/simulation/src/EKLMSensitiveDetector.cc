@@ -136,9 +136,9 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
       hit->setSector(hist->GetVolume(2)->GetCopyNo());
       hit->setLayer(hist->GetVolume(3)->GetCopyNo());
       hit->setEndcap(hist->GetVolume(4)->GetCopyNo());
-      hit->setVolumeID(boardNumber(hit->getEndcap(), hit->getLayer(),
-                                   hit->getSector(), hit->getPlane(),
-                                   hit->getStrip()) + 200000);
+      hit->setVolumeID(segmentNumber(hit->getEndcap(), hit->getLayer(),
+                                     hit->getSector(), hit->getPlane(),
+                                     hit->getStrip()) + 200000);
       break;
   }
   /* Relation. */

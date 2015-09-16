@@ -40,12 +40,6 @@ int EKLM::stripNumber(int endcap, int layer, int sector, int plane, int strip)
                     (sector - 1)) + (plane - 1)) + strip;
 }
 
-int EKLM::boardNumber(int endcap, int layer, int sector, int plane, int board)
-{
-  return 5 * (2 * (4 * (14 * (endcap - 1) + (layer - 1)) +
-                   (sector - 1)) + (plane - 1)) + board;
-}
-
 int EKLM::layerLocalNumber(int gnum)
 {
   return (gnum - 1) % 14 + 1;

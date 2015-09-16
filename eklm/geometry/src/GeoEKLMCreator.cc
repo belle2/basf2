@@ -1760,11 +1760,6 @@ void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv) const
            lv->GetMass() / CLHEP::g);
 }
 
-/**
- * Check if given layer is a detector layer.
- * @param[in] endcap Endcap number.
- * @param[in] layer  Layer number.
- */
 bool EKLM::GeoEKLMCreator::detectorLayer(int endcap, int layer) const
 {
   return ((endcap == 1 && layer <= m_GeoDat->getNDetectorLayers(1)) ||

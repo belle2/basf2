@@ -45,13 +45,13 @@ namespace Belle2 {
      * @struct ElementPosition
      * Position information for the elements of detector.
      *
-     * @var ElementPosition::innerR
+     * @var ElementPosition::InnerR
      * Inner radius.
      *
-     * @var ElementPosition::outerR
+     * @var ElementPosition::OuterR
      * Outer radius.
      *
-     * @var ElementPosition::length
+     * @var ElementPosition::Length
      * Length.
      *
      * @var ElementPosition::X

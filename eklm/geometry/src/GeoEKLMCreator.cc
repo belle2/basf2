@@ -114,26 +114,20 @@ void EKLM::GeoEKLMCreator::newVolumes()
   m_LogVol.scint = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.scint == NULL)
     B2FATAL(MemErr);
-  m_Solids.segmentsup =
-    (struct EKLM::SegmentSupportSolids**)
-    malloc(m_GeoDat->getNPlanes() *
-           sizeof(struct EKLM::SegmentSupportSolids*));
-  if (m_Solids.segmentsup == NULL)
+  m_LogVol.segmentsup =
+    (G4LogicalVolume***)malloc(m_GeoDat->getNPlanes() *
+                               sizeof(G4LogicalVolume**));
+  if (m_LogVol.segmentsup == NULL)
     B2FATAL(MemErr);
   for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
-    m_Solids.segmentsup[i] =
-      (struct EKLM::SegmentSupportSolids*)
-      malloc((m_GeoDat->getNSegments() + 1) *
-             sizeof(struct EKLM::SegmentSupportSolids));
-    if (m_Solids.segmentsup[i] == NULL)
+    m_LogVol.segmentsup[i] =
+      (G4LogicalVolume**)malloc((m_GeoDat->getNSegments() + 1) *
+                                sizeof(G4LogicalVolume*));
+    if (m_LogVol.segmentsup[i] == NULL)
       B2FATAL(MemErr);
   }
   for (i = 0; i < m_GeoDat->getNSegments(); i++)
     m_LogVol.psheet[i] = NULL;
-  for (i = 0; i < m_GeoDat->getNPlanes(); i++)
-    memset(m_Solids.segmentsup[i], 0,
-           (m_GeoDat->getNSegments() + 1) *
-           sizeof(struct EKLM::SegmentSupportSolids));
 }
 
 void EKLM::GeoEKLMCreator::newTransforms()
@@ -192,8 +186,8 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
   free(m_Solids.scint);
   free(m_LogVol.scint);
   for (i = 0; i < m_GeoDat->getNPlanes(); i++)
-    free(m_Solids.segmentsup[i]);
-  free(m_Solids.segmentsup);
+    free(m_LogVol.segmentsup[i]);
+  free(m_LogVol.segmentsup);
 }
 
 void EKLM::GeoEKLMCreator::deleteTransforms()
@@ -253,7 +247,7 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
   }
 }
 
-void EKLM::GeoEKLMCreator::createSectorCoverSolid()
+void EKLM::GeoEKLMCreator::createSectorCoverLogicalVolume()
 {
   double lz;
   G4Transform3D t1;
@@ -262,6 +256,7 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
   G4Box* solidCoverBox = NULL;
   G4Box* box = NULL;
   G4IntersectionSolid* is = NULL;
+  G4SubtractionSolid* solidCover = NULL;
   const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
@@ -309,10 +304,19 @@ void EKLM::GeoEKLMCreator::createSectorCoverSolid()
     B2FATAL(MemErr);
   }
   try {
-    m_Solids.cover = new G4SubtractionSolid("Cover", is, box, t2);
+    solidCover = new G4SubtractionSolid("Cover", is, box, t2);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
+  try {
+    m_LogVol.cover =
+      new G4LogicalVolume(solidCover, m_Materials.duralumin, "Cover");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.cover, false);
+  geometry::setColor(*m_LogVol.cover, "#ff000022");
+  printVolumeMass(m_LogVol.cover);
 }
 
 G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(G4Transform3D& t)
@@ -445,7 +449,7 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube()
   return res;
 }
 
-void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
+void EKLM::GeoEKLMCreator::createSectorSupportCorner1LogicalVolume()
 {
   double lx;
   double x;
@@ -453,6 +457,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
   G4Box* solidCorner1Box1 = NULL;
   G4Box* solidCorner1Box2 = NULL;
   G4IntersectionSolid* is1 = NULL;
+  G4IntersectionSolid* solidCorner1 = NULL;
   G4Transform3D t1;
   G4Transform3D t2;
   const struct ElementPosition* sectorSupportPos =
@@ -504,18 +509,27 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1Solid()
     B2FATAL(MemErr);
   }
   try {
-    m_Solids.sectorsup.corn1 =
-      new G4IntersectionSolid("SectorSupport_Corner1", is1,
-                              solidCorner1Box2, t2);
+    solidCorner1 = new G4IntersectionSolid("SectorSupport_Corner1", is1,
+                                           solidCorner1Box2, t2);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
+  try {
+    m_LogVol.sectorsup.corn1 =
+      new G4LogicalVolume(solidCorner1, m_Materials.duralumin, "Corner1");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.sectorsup.corn1, true);
+  geometry::setColor(*m_LogVol.sectorsup.corn1, "#ff0000ff");
+  printVolumeMass(m_LogVol.sectorsup.corn1);
 }
 
-void EKLM::GeoEKLMCreator::createSectorSupportCorner2Solid()
+void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
 {
   double r;
   G4TriangularPrism* solidCorner2Prism = NULL;
+  G4SubtractionSolid* solidCorner2 = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
@@ -539,21 +553,30 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2Solid()
   }
   t1 = G4Translate3D(-m_Solids.sectorsup.c2x, -m_Solids.sectorsup.c2y, 0.);
   try {
-    m_Solids.sectorsup.corn2 =
-      new G4SubtractionSolid("SectorSupport_Corner2",
-                             solidCorner2Prism->getSolid(),
-                             m_Solids.sectorsup.otube, t1);
+    solidCorner2 = new G4SubtractionSolid("SectorSupport_Corner2",
+                                          solidCorner2Prism->getSolid(),
+                                          m_Solids.sectorsup.otube, t1);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   delete solidCorner2Prism;
+  try {
+    m_LogVol.sectorsup.corn2 =
+      new G4LogicalVolume(solidCorner2, m_Materials.duralumin, "Corner2");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.sectorsup.corn2, true);
+  geometry::setColor(*m_LogVol.sectorsup.corn2, "#ff0000ff");
+  printVolumeMass(m_LogVol.sectorsup.corn2);
 }
 
-void EKLM::GeoEKLMCreator::createSectorSupportCorner3Solid()
+void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
 {
   double r;
   double y;
   G4TriangularPrism* solidCorner3Prism = NULL;
+  G4SubtractionSolid* solidCorner3 = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
@@ -577,21 +600,30 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3Solid()
   }
   t1 = G4Translate3D(-m_Solids.sectorsup.c3x, -m_Solids.sectorsup.c3y, 0.);
   try {
-    m_Solids.sectorsup.corn3 =
-      new G4SubtractionSolid("SectorSupport_Corner3",
-                             solidCorner3Prism->getSolid(),
-                             m_Solids.sectorsup.itube, t1);
+    solidCorner3 = new G4SubtractionSolid("SectorSupport_Corner3",
+                                          solidCorner3Prism->getSolid(),
+                                          m_Solids.sectorsup.itube, t1);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   delete solidCorner3Prism;
+  try {
+    m_LogVol.sectorsup.corn3 =
+      new G4LogicalVolume(solidCorner3, m_Materials.duralumin, "Corner3");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.sectorsup.corn3, true);
+  geometry::setColor(*m_LogVol.sectorsup.corn3, "#ff0000ff");
+  printVolumeMass(m_LogVol.sectorsup.corn3);
 }
 
-void EKLM::GeoEKLMCreator::createSectorSupportCorner4Solid()
+void EKLM::GeoEKLMCreator::createSectorSupportCorner4LogicalVolume()
 {
   double r;
   double x;
   G4TriangularPrism* solidCorner4Prism = NULL;
+  G4SubtractionSolid* solidCorner4 = NULL;
   G4Transform3D t1;
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
@@ -615,17 +647,25 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4Solid()
   }
   t1 = G4Translate3D(-m_Solids.sectorsup.c4x, -m_Solids.sectorsup.c4y, 0.);
   try {
-    m_Solids.sectorsup.corn4 =
-      new G4SubtractionSolid("SectorSupport_Corner4",
-                             solidCorner4Prism->getSolid(),
-                             m_Solids.sectorsup.itube, t1);
+    solidCorner4 = new G4SubtractionSolid("SectorSupport_Corner4",
+                                          solidCorner4Prism->getSolid(),
+                                          m_Solids.sectorsup.itube, t1);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   delete solidCorner4Prism;
+  try {
+    m_LogVol.sectorsup.corn4 =
+      new G4LogicalVolume(solidCorner4, m_Materials.duralumin, "Corner4");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.sectorsup.corn4, true);
+  geometry::setColor(*m_LogVol.sectorsup.corn4, "#ff0000ff");
+  printVolumeMass(m_LogVol.sectorsup.corn4);
 }
 
-void EKLM::GeoEKLMCreator::createSectorSupportSolid()
+void EKLM::GeoEKLMCreator::createSectorSupportLogicalVolume()
 {
   G4Box* solidBoxX;
   G4Box* solidBoxY;
@@ -635,6 +675,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
   G4UnionSolid* us2 = NULL;
   G4UnionSolid* us3 = NULL;
   G4UnionSolid* us4 = NULL;
+  G4IntersectionSolid* solidSectorSupport = NULL;
   G4Transform3D tbx;
   G4Transform3D tby;
   G4Transform3D tbt;
@@ -678,12 +719,21 @@ void EKLM::GeoEKLMCreator::createSectorSupportSolid()
     B2FATAL(MemErr);
   }
   try {
-    m_Solids.sectorsup.supp =
+    solidSectorSupport =
       new G4IntersectionSolid("SectorSupport", us4, solidLimitationTube,
                               G4Translate3D(0., 0., 0.));
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
+  try {
+    m_LogVol.sectorsup.supp =
+      new G4LogicalVolume(solidSectorSupport, m_Materials.duralumin, "Support");
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.sectorsup.supp, true);
+  geometry::setColor(*m_LogVol.sectorsup.supp, "#ff0000ff");
+  printVolumeMass(m_LogVol.sectorsup.supp);
 }
 
 G4SubtractionSolid* EKLM::GeoEKLMCreator::
@@ -865,6 +915,80 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   m_Solids.plane[n] = subtractBoardSolids(ss4, n);
 }
 
+void EKLM::GeoEKLMCreator::
+createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
+{
+  HepGeom::Transform3D t1, t2;
+  G4Box* topBox = NULL;
+  G4Box* midBox = NULL;
+  G4Box* botBox = NULL;
+  G4UnionSolid* us = NULL;
+  G4UnionSolid* solidSegmentSupport = NULL;
+  std::string segmentSupportName =
+    "SegmentSupport_" + boost::lexical_cast<std::string>(iSegmentSupport) +
+    "Plane_" + boost::lexical_cast<std::string>(iPlane);
+  const struct SegmentSupportPosition* segmentSupportPos =
+    m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
+  const struct SegmentSupportGeometry* segmentSupportGeometry =
+    m_GeoDat->getSegmentSupportGeometry();
+  try {
+    topBox = new G4Box("BoxTop_" + segmentSupportName,
+                       0.5 * (segmentSupportPos->Length -
+                              segmentSupportPos->DeltaLLeft -
+                              segmentSupportPos->DeltaLRight),
+                       0.5 * segmentSupportGeometry->TopWidth,
+                       0.5 * segmentSupportGeometry->TopThickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    midBox = new G4Box("BoxMiddle_" + segmentSupportName,
+                       0.5 * (segmentSupportPos->Length -
+                              segmentSupportPos->DeltaLLeft -
+                              segmentSupportPos->DeltaLRight),
+                       0.5 * segmentSupportGeometry->MiddleWidth,
+                       0.5 * segmentSupportGeometry->MiddleThickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    botBox = new G4Box("BoxBottom_" + segmentSupportName,
+                       0.5 * segmentSupportPos->Length,
+                       0.5 * segmentSupportGeometry->TopWidth,
+                       0.5 * segmentSupportGeometry->TopThickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  t1 = G4Translate3D(0., 0., 0.5 * (segmentSupportGeometry->MiddleThickness +
+                                    segmentSupportGeometry->TopThickness));
+  t2 = G4Translate3D(0.5 * (segmentSupportPos->DeltaLRight -
+                            segmentSupportPos->DeltaLLeft),
+                     0., -0.5 * (segmentSupportGeometry->MiddleThickness +
+                                 segmentSupportGeometry->TopThickness));
+  try {
+    us = new G4UnionSolid("Union1_" + segmentSupportName, midBox, topBox, t1);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    solidSegmentSupport = new G4UnionSolid(segmentSupportName, us, botBox, t2);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1] =
+      new G4LogicalVolume(solidSegmentSupport, m_Materials.duralumin,
+                          segmentSupportName);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1],
+                          true);
+  geometry::setColor(*m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1],
+                     "#ff0000ff");
+  printVolumeMass(m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1]);
+}
+
 G4UnionSolid* EKLM::GeoEKLMCreator::
 unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
             int nSolids, std::string name)
@@ -980,7 +1104,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
 
 void EKLM::GeoEKLMCreator::createSolids()
 {
-  int i, iPos, n;
+  int i, j, iPos, n;
   char name[128];
   HepGeom::Transform3D t;
   const struct ElementPosition* layerPos = m_GeoDat->getLayerPosition();
@@ -1005,21 +1129,25 @@ void EKLM::GeoEKLMCreator::createSolids()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  createSectorCoverSolid();
-  createSectorSupportSolid();
+  createSectorCoverLogicalVolume();
+  createSectorSupportLogicalVolume();
   /**
    * createSectorSupportCornerXSolid() must be called after
    * createSectorSupportSolid()
    */
-  createSectorSupportCorner1Solid();
-  createSectorSupportCorner2Solid();
-  createSectorSupportCorner3Solid();
-  createSectorSupportCorner4Solid();
+  createSectorSupportCorner1LogicalVolume();
+  createSectorSupportCorner2LogicalVolume();
+  createSectorSupportCorner3LogicalVolume();
+  createSectorSupportCorner4LogicalVolume();
   /* Plane. */
   if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
     calcBoardTransform();
-  for (i = 0; i < m_GeoDat->getNPlanes(); i++)
+  for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
     createPlaneSolid(i);
+    /* Segment support. */
+    for (j = 1; j <= m_GeoDat->getNSegments() + 1; j++)
+      createSegmentSupportLogicalVolume(i + 1, j);
+  }
   /* Strips. */
   n = m_GeoDat->getNStripsDifferentLength();
   for (i = 0; i < n; i++) {
@@ -1217,165 +1345,104 @@ void EKLM::GeoEKLMCreator::
 createSectorCover(int iCover, G4LogicalVolume* sector) const
 {
   double z;
-  G4LogicalVolume* logicCover = NULL;
   G4Transform3D t;
+  G4LogicalVolume* lv = m_LogVol.cover;
   const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
-  std::string coverName = "Cover_" +
-                          boost::lexical_cast<std::string>(iCover) + "_" +
-                          sector->GetName();
-  try {
-    logicCover = new G4LogicalVolume(m_Solids.cover, m_Materials.duralumin,
-                                     coverName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicCover, false);
-  geometry::setColor(*logicCover, "#ff000022");
   z = 0.25 * (sectorPos->Length + sectorSupportPos->Length);
   if (iCover == 2)
     z = -z;
   t = G4Translate3D(0., 0., z);
   try {
-    new G4PVPlacement(t, logicCover, coverName, sector, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicCover);
 }
 
 void EKLM::GeoEKLMCreator::
 createSectorSupportCorner1(G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicCorner1 = NULL;
   G4Transform3D t;
+  G4LogicalVolume* lv = m_LogVol.sectorsup.corn1;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  std::string corner1Name = "Corner1_" + sector->GetName();
-  try {
-    logicCorner1 =
-      new G4LogicalVolume(m_Solids.sectorsup.corn1, m_Materials.duralumin,
-                          corner1Name);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicCorner1, true);
-  geometry::setColor(*logicCorner1, "#ff0000ff");
   t = G4Translate3D(0., 0., sectorSupportGeometry->Corner1Z);
   try {
-    new G4PVPlacement(t, logicCorner1, corner1Name, sector, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicCorner1);
 }
 
 void EKLM::GeoEKLMCreator::
 createSectorSupportCorner2(G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicCorner2 = NULL;
   G4Transform3D t;
+  G4LogicalVolume* lv = m_LogVol.sectorsup.corn2;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  std::string corner2Name = "Corner2_" + sector->GetName();
-  try {
-    logicCorner2 =
-      new G4LogicalVolume(m_Solids.sectorsup.corn2, m_Materials.duralumin,
-                          corner2Name);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicCorner2, true);
-  geometry::setColor(*logicCorner2, "#ff0000ff");
   t = G4Translate3D(m_Solids.sectorsup.c2x, m_Solids.sectorsup.c2y,
                     sectorSupportGeometry->Corner2Z);
   try {
-    new G4PVPlacement(t, logicCorner2, corner2Name, sector, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicCorner2);
 }
 
 void EKLM::GeoEKLMCreator::
 createSectorSupportCorner3(G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicCorner3 = NULL;
   G4Transform3D t;
+  G4LogicalVolume* lv = m_LogVol.sectorsup.corn3;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  std::string corner3Name = "Corner3_" + sector->GetName();
-  try {
-    logicCorner3 = new G4LogicalVolume(m_Solids.sectorsup.corn3, m_Materials.duralumin,
-                                       corner3Name);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicCorner3, true);
-  geometry::setColor(*logicCorner3, "#ff0000ff");
   t = G4Translate3D(m_Solids.sectorsup.c3x, m_Solids.sectorsup.c3y,
                     sectorSupportGeometry->Corner3Z);
   try {
-    new G4PVPlacement(t, logicCorner3, corner3Name, sector, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicCorner3);
 }
 
 void EKLM::GeoEKLMCreator::
 createSectorSupportCorner4(G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicCorner4 = NULL;
   G4Transform3D t;
+  G4LogicalVolume* lv = m_LogVol.sectorsup.corn4;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  std::string corner4Name = "Corner4_" + sector->GetName();
-  try {
-    logicCorner4 =
-      new G4LogicalVolume(m_Solids.sectorsup.corn4, m_Materials.duralumin,
-                          corner4Name);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicCorner4, true);
-  geometry::setColor(*logicCorner4, "#ff0000ff");
   t = G4Translate3D(m_Solids.sectorsup.c4x, m_Solids.sectorsup.c4y,
                     sectorSupportGeometry->Corner4Z);
   try {
-    new G4PVPlacement(t, logicCorner4, corner4Name, sector, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicCorner4);
 }
 
 void EKLM::GeoEKLMCreator::
 createSectorSupport(G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicSectorSupport = NULL;
   G4Transform3D t;
-  std::string sectorSupportName = "Support_" + sector->GetName();
+  G4LogicalVolume* lv = m_LogVol.sectorsup.supp;
   const struct ElementPosition* sectorSupportPos =
     m_GeoDat->getSectorSupportPosition();
   t = G4Translate3D(0., 0., sectorSupportPos->Z);
   try {
-    logicSectorSupport = new G4LogicalVolume(m_Solids.sectorsup.supp,
-                                             m_Materials.duralumin,
-                                             sectorSupportName);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  geometry::setVisibility(*logicSectorSupport, true);
-  geometry::setColor(*logicSectorSupport, "#ff0000ff");
-  try {
-    new G4PVPlacement(t, logicSectorSupport, sectorSupportName,
-                      sector, false, 1, false);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  printVolumeMass(logicSectorSupport);
 }
 
 G4LogicalVolume*
@@ -1492,98 +1559,20 @@ void EKLM::GeoEKLMCreator::
 createSegmentSupport(int iSegmentSupport, G4LogicalVolume* plane) const
 {
   G4Transform3D t;
-  G4Transform3D t1;
-  G4Transform3D t2;
-  G4LogicalVolume* logicSegmentSupport = NULL;
-  std::string segmentSupportName;
+  G4LogicalVolume* lv =
+    m_LogVol.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1];
   const struct SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(m_CurVol.plane, iSegmentSupport);
-  const struct SegmentSupportGeometry* segmentSupportGeometry =
-    m_GeoDat->getSegmentSupportGeometry();
-  segmentSupportName = "SegmentSupport_" +
-                       boost::lexical_cast<std::string>(iSegmentSupport) +
-                       "_" + plane->GetName();
-  if (m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].secsup ==
-      NULL) {
-    try {
-      m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].topbox =
-        new G4Box("BoxTop_" + segmentSupportName,
-                  0.5 * (segmentSupportPos->Length -
-                         segmentSupportPos->DeltaLLeft -
-                         segmentSupportPos->DeltaLRight),
-                  0.5 * segmentSupportGeometry->TopWidth,
-                  0.5 * segmentSupportGeometry->TopThickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    try {
-      m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].midbox =
-        new G4Box("BoxMiddle_" + segmentSupportName,
-                  0.5 * (segmentSupportPos->Length -
-                         segmentSupportPos->DeltaLLeft -
-                         segmentSupportPos->DeltaLRight),
-                  0.5 * segmentSupportGeometry->MiddleWidth,
-                  0.5 * segmentSupportGeometry->MiddleThickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    try {
-      m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].botbox =
-        new G4Box("BoxBottom_" + segmentSupportName,
-                  0.5 * segmentSupportPos->Length,
-                  0.5 * segmentSupportGeometry->TopWidth,
-                  0.5 * segmentSupportGeometry->TopThickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    t1 = G4Translate3D(0., 0., 0.5 * (segmentSupportGeometry->MiddleThickness +
-                                      segmentSupportGeometry->TopThickness));
-    t2 = G4Translate3D(0.5 * (segmentSupportPos->DeltaLRight -
-                              segmentSupportPos->DeltaLLeft),
-                       0., -0.5 * (segmentSupportGeometry->MiddleThickness +
-                                   segmentSupportGeometry->TopThickness));
-    try {
-      m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].us =
-        new G4UnionSolid(
-        "Union1_" + segmentSupportName,
-        m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].midbox,
-        m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].topbox,
-        t1);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    try {
-      m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].secsup =
-        new G4UnionSolid(
-        segmentSupportName,
-        m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].us,
-        m_Solids.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1].botbox,
-        t2);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-  }
-  try {
-    logicSegmentSupport =
-      new G4LogicalVolume(m_Solids.segmentsup[m_CurVol.plane - 1]
-                          [iSegmentSupport - 1].secsup,
-                          m_Materials.duralumin, segmentSupportName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicSegmentSupport, true);
-  geometry::setColor(*logicSegmentSupport, "#ff0000ff");
   t = G4Translate3D(
         0.5 * (segmentSupportPos->DeltaLLeft -
                segmentSupportPos->DeltaLRight) +
         segmentSupportPos->X, segmentSupportPos->Y, segmentSupportPos->Z);
   try {
-    new G4PVPlacement(t, logicSegmentSupport, segmentSupportName,
-                      plane, false, 1, false);
+    new G4PVPlacement(t, lv, lv->GetName() + "_" + plane->GetName(), plane,
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicSegmentSupport);
 }
 
 void EKLM::GeoEKLMCreator::

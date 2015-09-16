@@ -60,22 +60,17 @@ namespace Belle2 {
       double c4y;      /**< Corner 4 Y. */
       G4VSolid* itube; /**< Inner tube. */
       G4VSolid* otube; /**< Outer tube. */
-      G4VSolid* corn1; /**< Corner 1. */
-      G4VSolid* corn2; /**< Corner 2. */
-      G4VSolid* corn3; /**< Corner 3. */
-      G4VSolid* corn4; /**< Corner 4. */
-      G4VSolid* supp;  /**< Support. */
     };
 
     /**
-     * Segment support solids.
+     * Sector support logical volumes.
      */
-    struct SegmentSupportSolids {
-      G4VSolid* topbox; /**< Top box. */
-      G4VSolid* midbox; /**< Middle box. */
-      G4VSolid* botbox; /**< Bottom box. */
-      G4VSolid* us;     /**< Top box + middle box. */
-      G4VSolid* secsup; /**< Segment support. */
+    struct SectorSupportLogicalVolumes {
+      G4LogicalVolume* corn1; /**< Corner 1. */
+      G4LogicalVolume* corn2; /**< Corner 2. */
+      G4LogicalVolume* corn3; /**< Corner 3. */
+      G4LogicalVolume* corn4; /**< Corner 4. */
+      G4LogicalVolume* supp;  /**< Support. */
     };
 
     /**
@@ -98,9 +93,6 @@ namespace Belle2 {
      *
      * @var Solids::sector
      * Sector.
-     *
-     * @var Solids::cover
-     * Sector cover.
      *
      * @var Solids::secsupp
      * Sector support.
@@ -137,15 +129,11 @@ namespace Belle2 {
      *
      * @var Solids::scint
      * Scintillator.
-     *
-     * @var Solids::segmentsup
-     * Segment support.
      */
     struct Solids {
       G4VSolid* endcap;
       G4VSolid* layer;
       G4VSolid* sector;
-      G4VSolid* cover;
       G4VSolid* secsupp;
       G4VSolid** plane;
       G4VSolid** psheet;
@@ -158,18 +146,45 @@ namespace Belle2 {
       G4VSolid* stripboard;
       struct SectorSupportSolids sectorsup;
       struct ScintillatorSolids* scint;
-      struct SegmentSupportSolids** segmentsup;
     };
 
     /**
+     * @struct LogicalVolumes
      * Logical volumes of EKLM.
+     *
+     * @var LogicalVolumes::cover
+     * Sector cover.
+     *
+     * @var LogicalVolumes::stripvol
+     * Strip volumes.
+     *
+     * @var LogicalVolumes::strip
+     * Strips.
+     *
+     * @var LogicalVolumes::groove
+     * Strip grooves.
+     *
+     * @var LogicalVolumes::scint
+     * Scintillator.
+     *
+     * @var LogicalVolumes::psheet
+     * Plastic sheet.
+     *
+     * @var Solids::segmentsup
+     * Segment support.
+     *
+     * @var LogicalVolumes::sectorsup
+     * Sector support.
      */
     struct LogicalVolumes {
-      G4LogicalVolume** stripvol;    /**< Strip volumes. */
-      G4LogicalVolume** strip;       /**< Strips. */
-      G4LogicalVolume** groove;      /**< Strip grooves. */
-      G4LogicalVolume** scint;       /**< Scintillator. */
-      G4LogicalVolume** psheet;      /**< Plastic sheet. */
+      G4LogicalVolume* cover;
+      G4LogicalVolume** stripvol;
+      G4LogicalVolume** strip;
+      G4LogicalVolume** groove;
+      G4LogicalVolume** scint;
+      G4LogicalVolume** psheet;
+      G4LogicalVolume*** segmentsup;
+      struct SectorSupportLogicalVolumes sectorsup;
     };
 
     /**
@@ -244,7 +259,7 @@ namespace Belle2 {
       /**
        * Create sector cover solid.
        */
-      void createSectorCoverSolid();
+      void createSectorCoverLogicalVolume();
 
       /**
        * Create inner tube of sector support structure.
@@ -281,29 +296,29 @@ namespace Belle2 {
       G4Box* createSectorSupportBoxTop(G4Transform3D& t);
 
       /**
-       * Create sector support solid.
+       * Create sector support logical volume.
        */
-      void createSectorSupportSolid();
+      void createSectorSupportLogicalVolume();
 
       /**
-       * Create sector support corner 1 solid.
+       * Create sector support corner 1 logical volume.
        */
-      void createSectorSupportCorner1Solid();
+      void createSectorSupportCorner1LogicalVolume();
 
       /**
-       * Create sector support corner 2 solid.
+       * Create sector support corner 2 logical volume.
        */
-      void createSectorSupportCorner2Solid();
+      void createSectorSupportCorner2LogicalVolume();
 
       /**
-       * Create sector support corner 3 solid.
+       * Create sector support corner 3 logical volume.
        */
-      void createSectorSupportCorner3Solid();
+      void createSectorSupportCorner3LogicalVolume();
 
       /**
-       * Create sector support corner 4 solid.
+       * Create sector support corner 4 logical volume.
        */
-      void createSectorSupportCorner4Solid();
+      void createSectorSupportCorner4LogicalVolume();
 
       /**
        * Cut corner of a solid.
@@ -353,6 +368,13 @@ namespace Belle2 {
       void createPlaneSolid(int n);
 
       /**
+       * Create segment support logical volume.
+       * @param[in] iPlane          Number of plane.
+       * @param[in] iSegmentSupport Number of segment support.
+       */
+      void createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport);
+
+      /**
        * Unify a group of solids.
        * @param[in] solids  Solids.
        * @param[in] transf  Transformations.
@@ -369,7 +391,7 @@ namespace Belle2 {
       void createPlasticSheetSolid(int n);
 
       /**
-       * Create solids.
+       * Create solids (or logical volumes which must be created only once).
        */
       void createSolids();
 

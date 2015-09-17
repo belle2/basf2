@@ -11,7 +11,7 @@
 #ifndef TOPDIGIT_H
 #define TOPDIGIT_H
 
-#include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
 
@@ -20,7 +20,7 @@ namespace Belle2 {
    * relations to TOPSimHits, MCParticles
    */
 
-  class TOPDigit : public RelationsObject {
+  class TOPDigit : public DigitBase {
   public:
 
     /**
@@ -57,60 +57,87 @@ namespace Belle2 {
       m_quality(c_Good)
     {}
 
-    /** Set digitized pulse height or integrated charge
+    /**
+     * Set digitized pulse height or integrated charge
      * @param ADC pulse heigth or integrated charge
      */
     void setADC(int ADC) {m_ADC = ADC;}
 
-    /** Set digitized pulse width
+    /**
+     * Set digitized pulse width
      * @param width pulse width
      */
     void setPulseWidth(int width) {m_pulseWidth = width;}
 
-    /** Set hardware channel ID (0-based)
+    /**
+     * Set hardware channel ID (0-based)
      * @param chID hardware channel ID
      */
     void setHardwareChannelID(unsigned int chID) {m_hardChannelID = chID;}
 
-    /** Set hit quality
+    /**
+     * Set hit quality
      * @param quality hit quality
      */
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
 
-    /** Get hit quality
+    /**
+     * Get hit quality
      * @return hit quality
      */
     EHitQuality getHitQuality() const {return m_quality; }
 
-    /** Get bar ID
+    /**
+     * Get bar ID
      * @return bar ID
      */
     int getBarID() const { return m_barID; }
 
-    /** Get channel ID
+    /**
+     * Get channel ID
      * @return software channel ID
      */
     int getChannelID() const { return m_channelID; }
 
-    /** Get digitized time
+    /**
+     * Get digitized time
      * @return digitized time
      */
     int getTDC() const { return m_TDC; }
 
-    /** Get digitized pulse height or integrated charge
+    /**
+     * Get digitized pulse height or integrated charge
      * @return digitized pulse height or integrated charge
      */
     int getADC() const { return m_ADC; }
 
-    /** Get digitized pulse width
+    /**
+     * Get digitized pulse width
      * @return digitized pulse width
      */
     int getPulseWidth() const { return m_pulseWidth; }
 
-    /** Get hardware channel ID
+    /**
+     * Get hardware channel ID
      * @return hardware channel ID
      */
     unsigned int getHardwareChannelID() const { return m_hardChannelID; }
+
+    /**
+     * Implementation of the base class function.
+     * Enables BG overlay module to identify uniquely the physical channel of this Digit.
+     * @return unique channel ID, composed of channel ID (1-512) and bar ID (1-16)
+     */
+    unsigned int getUniqueChannelID() const {return m_channelID + (m_barID << 16);}
+
+    /**
+     * Implementation fo the base class function.
+     * Pile-up method.
+     * @param bg BG digit
+     * @return true, if BG digit has to be appended to Digits
+     */
+    bool addBGDigit(const DigitBase* /*bg*/) {return true;}
+
 
   private:
     int m_barID;               /**< bar ID (1-based) */

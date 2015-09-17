@@ -24,7 +24,7 @@ namespace Belle2 {
    *
    * `upsilonListName` ParticleList is filled with `upsilonListName -> bsigListName btagListName`,
    * where `anti-B:tag` Particle is inclusively reconstructed from particles in input ParticleLists,
-   * which does not share any final state particles (mdstSource) with `B:sig`.
+   * which do not share any final state particles (mdstSource) with `B:sig`.
    *
    * Input ParticleLists are passed as std::vector containing their names (`inputListsNames`).
    */

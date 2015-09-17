@@ -1191,7 +1191,7 @@ def removeParticlesNotInLists(lists_to_keep, path=analysis_main):
 
 def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path=analysis_main):
     """
-    Reconstructs Btag from particles in given ParticleLists which does not share any final state particles (mdstSource) with Bsig.
+    Reconstructs Btag from particles in given ParticleLists which do not share any final state particles (mdstSource) with Bsig.
 
     @param upsilon_list_name Name of the ParticleList to be filled with `Upsilon(4S) -> B:sig anti-B:tag`
     @param bsig_list_name Name of the Bsig ParticleList

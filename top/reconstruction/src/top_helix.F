@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Helix
-! M. Staric, oct-2008, jan-2010 (added B=0 case), 
+! M. Staric, oct-2008, jan-2010 (added B=0 case), avg-2015, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 !
 ! Helix along z-axis; t'=t*beta is running parameter
@@ -115,6 +115,81 @@
       END
 
 
+      SUBROUTINE XSEC_PLANE(HLX,RP,NORM,T,OK)
+
+!     cross-section of helix and plane nearly paralel to z-axis (norm(3) << 1)
+
+      IMPLICIT NONE
+      REAL HLX(10)              ! helix [in]
+      REAL RP(3), NORM(3)       ! plane: point, normal [in]
+      REAL T                    ! t' of nearest x-section in the flight direction [out]
+      LOGICAL OK                ! existance of x-sections [out]
+#include "TOP_CONS.fi"
+
+      REAL R(3), V(3), S, ALFA, AA, T1, T2, T_PREV, DT, DT_PREV
+      REAL S_PROD, FIRST_PERIOD
+      INTEGER I
+      
+      T=0
+      IF(HLX(4).NE.0) THEN
+         R(1)=RP(1)-HLX(2)
+         R(2)=RP(2)-HLX(3)
+         R(3)=RP(3)-HLX(7)
+         ALFA=ATAN2(NORM(2), NORM(1))
+         S=S_PROD(R,NORM)
+         DT=0
+         DO I=1,100
+            T_PREV=T
+            DT_PREV=DT
+            AA=(S-HLX(5)*T*NORM(3))/HLX(1)
+            OK=ABS(AA).LE.1
+            IF(.NOT.OK) RETURN
+            AA=ACOS(AA)
+            T1=FIRST_PERIOD((ALFA-HLX(6)-AA)/HLX(4),HLX(10))
+            T2=FIRST_PERIOD((ALFA-HLX(6)+AA)/HLX(4),HLX(10))
+            T=MIN(T1,T2)
+            DT=T-T_PREV
+            IF(DT.EQ.0) RETURN
+            IF(DT+DT_PREV.eq.0) RETURN
+         ENDDO
+         OK=.FALSE.
+         PRINT*,'*** Error in TOP reconstruction (xsec_plane): ',
+     &        'not converged'
+      ELSE
+         R(1)=RP(1)-HLX(2)
+         R(2)=RP(2)-HLX(3)
+         R(3)=RP(3)-HLX(1)
+         V(1)=HLX(6)
+         V(2)=HLX(7)
+         V(3)=HLX(5)
+         S=S_PROD(V,NORM)
+         OK=ABS(S).GT.1E-10
+         IF(.NOT.OK) RETURN
+         T=S_PROD(R,NORM)/S
+         OK=T.GE.0
+      ENDIF
+
+      END
+
+
+      REAL FUNCTION FIRST_PERIOD(T,T0)
+
+      IMPLICIT NONE
+      REAL T, T0
+      REAL TT
+
+      TT=T
+      DO WHILE(TT.GE.T0)
+         TT=TT-T0
+      ENDDO
+      DO WHILE(TT.LT.0)
+         TT=TT+T0
+      ENDDO
+      FIRST_PERIOD=TT
+      
+      END
+
+      
       SUBROUTINE XSEC_PLANE_X(HLX,X0,T1,T2,OK)
 
 !     cross-section of helix and plane at x=X0
@@ -326,4 +401,3 @@
 
 
 
-      

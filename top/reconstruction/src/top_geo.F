@@ -87,6 +87,7 @@ c--   returns module ID or -1 (=failure)
       REAL FI                   ! Q-bar angle [rad]
       INTEGER LSIDE, RSIDE      ! type of left exit, right exit
 #include "TOP_GEO.fi"
+#include "TOP_DGEO.fi"
       INTEGER K, LR
       REAL C
 
@@ -136,10 +137,82 @@ c--   returns module ID or -1 (=failure)
          QBAR_EXT(LR,K)=0
          CALL ARRANGE_PMT(K,LR,A,B,0.,0.)
       ENDDO
+      DGEO_FLAG(K)=.FALSE.
       TOP_Z1=MIN(TOP_Z1,MIN(Z1,Z2))
       TOP_Z2=MAX(TOP_Z2,MAX(Z1,Z2))
       SET_QBAR=K
 
+      END
+
+
+      SUBROUTINE SET_ALIGNMENT(ID,DX,DY,DZ,ALFA,BETA,GAMA)
+
+      IMPLICIT NONE
+      INTEGER ID                ! module ID
+      REAL DX, DY, DZ           ! translations
+      REAL ALFA, BETA, GAMA     ! rotation angles around x, y, z
+      
+#include "TOP_GEO.fi"
+#include "TOP_DGEO.fi"
+      REAL RX(3,3), RY(3,3), RZ(3,3), RR(3,3), S
+      REAL CFI, SFI
+      INTEGER I,J,K
+      
+      IF(ID.LT.0.OR.ID.GE.NUM_MOD) RETURN
+
+      DGEO_FLAG(ID)=.TRUE.
+      
+      QBAR_TRS(1,ID)=DX
+      QBAR_TRS(2,ID)=DY
+      QBAR_TRS(3,ID)=DZ
+      
+      RX=0
+      CFI=COS(ALFA)
+      SFI=SIN(ALFA)
+      RX(1,1)=1
+      RX(2,2)=CFI
+      RX(2,3)=-SFI
+      RX(3,2)=SFI
+      RX(3,3)=CFI
+      
+      RY=0
+      CFI=COS(BETA)
+      SFI=SIN(BETA)
+      RY(1,1)=CFI
+      RY(1,3)=SFI
+      RY(2,2)=1
+      RY(3,1)=-SFI
+      RY(3,3)=CFI
+      
+      RZ=0
+      CFI=COS(GAMA)
+      SFI=SIN(GAMA)
+      RZ(1,1)=CFI
+      RZ(1,2)=-SFI
+      RZ(2,1)=SFI
+      RZ(2,2)=CFI
+      RZ(3,3)=1
+      
+      DO K=1,3
+         DO I=1,3
+            S=0
+            DO J=1,3
+               S=S+RY(I,J)*RX(J,K)
+            ENDDO
+            RR(I,K)=S
+         ENDDO
+      ENDDO
+
+      DO K=1,3
+         DO I=1,3
+            S=0
+            DO J=1,3
+               S=S+RZ(I,J)*RR(J,K)
+            ENDDO
+            QBAR_ROT(I,K,ID)=S
+         ENDDO
+      ENDDO
+      
       END
 
 
@@ -801,14 +874,20 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
 
       SUBROUTINE TO_GLOBAL(R,DIR,M)
 
+c--   transformation from local (bar) to global (Belle II) frame
+      
       IMPLICIT NONE
-      REAL R(3), DIR(3)
-      INTEGER M
+      REAL R(3), DIR(3)         ! point, direction (or momentum vector)
+      INTEGER M                 ! bar ID
 #include "TOP_GEO.fi"
       REAL X, Y
 
       IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
 
+      CALL LOCAL_TO_NOMINAL(R,DIR,M)
+
+!     nominal to global: translation by (dx,r,dz) then rotation around z by phi
+      
       X=R(1)+QBAR_DX(M)
       Y=R(2)+QBAR_R(M)
       R(1)=X*QBAR_CFI(M)-Y*QBAR_SFI(M)
@@ -824,13 +903,17 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
 
       SUBROUTINE TO_LOCAL(R,DIR,M)
 
+c--   transformation from global (Belle II) to local (bar) frame
+
       IMPLICIT NONE
-      REAL R(3), DIR(3)
-      INTEGER M
+      REAL R(3), DIR(3)         ! point, direction (or momentum vector)
+      INTEGER M                 ! bar ID
 #include "TOP_GEO.fi"
       REAL X, Y
 
       IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
+
+!     global to nominal: rotation around z by -phi then translation by (-dx,-r,-dz)
 
       X=R(1)*QBAR_CFI(M)+R(2)*QBAR_SFI(M)
       Y=R(2)*QBAR_CFI(M)-R(1)*QBAR_SFI(M)
@@ -842,9 +925,86 @@ c-- utility functions (moved from top_mcgen.F + new) -------------------
       DIR(1)=X*QBAR_CFI(M)+Y*QBAR_SFI(M)
       DIR(2)=Y*QBAR_CFI(M)-X*QBAR_SFI(M)
 
+      CALL NOMINAL_TO_LOCAL(R,DIR,M)
+
       END
 
 
+      SUBROUTINE LOCAL_TO_NOMINAL(R,DIR,M)
+
+c--   transformation from local to nominal bar frame
+c--   rotation first then translation
+      
+      IMPLICIT NONE
+      REAL R(3), DIR(3)         ! point, direction (or momentum vector)
+      INTEGER M                 ! bar ID
+#include "TOP_GEO.fi"
+#include "TOP_DGEO.fi"
+      REAL RR(3), S
+      INTEGER I,J
+      
+      IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
+      IF(.NOT.DGEO_FLAG(M)) RETURN
+
+      DO I=1,3
+         S=0
+         DO J=1,3
+            S=S+QBAR_ROT(I,J,M)*R(J)
+         ENDDO      
+         RR(I)=S+QBAR_TRS(I,M)
+      ENDDO
+      R=RR
+
+      DO I=1,3
+         S=0
+         DO J=1,3
+            S=S+QBAR_ROT(I,J,M)*DIR(J)
+         ENDDO      
+         RR(I)=S
+      ENDDO
+      DIR=RR
+
+      END
+      
+
+      SUBROUTINE NOMINAL_TO_LOCAL(R,DIR,M)
+
+c--   transformation from nominal to local bar frame
+
+      IMPLICIT NONE
+      REAL R(3), DIR(3)         ! point, direction (or momentum vector)
+      INTEGER M                 ! bar ID
+#include "TOP_GEO.fi"
+#include "TOP_DGEO.fi"
+      REAL RR(3), S
+      INTEGER I,J
+      
+      IF(M.LT.0.OR.M.GE.NUM_MOD) RETURN
+      IF(.NOT.DGEO_FLAG(M)) RETURN
+
+      DO I=1,3
+         R(I)=R(I)-QBAR_TRS(I,M)
+      ENDDO
+      DO I=1,3
+         S=0
+         DO J=1,3
+            S=S+QBAR_ROT(J,I,M)*R(J)
+         ENDDO      
+         RR(I)=S
+      ENDDO
+      R=RR
+      
+      DO I=1,3
+         S=0
+         DO J=1,3
+            S=S+QBAR_ROT(J,I,M)*DIR(J)
+         ENDDO      
+         RR(I)=S
+      ENDDO
+      DIR=RR
+      
+      END
+      
 
       SUBROUTINE PRESEK_HELIX_TOP(HLX,RHO,T1,T2,OK)
 

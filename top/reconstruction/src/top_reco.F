@@ -41,9 +41,9 @@
          PMOM=RTRA_P(ITRA)
          CALL SET_HELIX(RTRA_R0(1,ITRA),RTRA_DIR(1,ITRA),RTRA_P(ITRA),
      &        RTRA_CHARGE(ITRA),HLX)
-         CALL RECO_TRACK_TO_TOP(HLX,RTRA_R0(1,ITRA),RTRA_FLAG(ITRA),OK)
+         CALL SET_TRACK_PAR(HLX,OK)
          IF(.NOT.OK) CYCLE
-         RTRA_MOD(ITRA)=MODUL
+         RTRA_FLAG(ITRA)=1
          DO I=1,3
             RTRA_TR(I,ITRA)=T_R0(I)
             RTRA_TDIR(I,ITRA)=T_DIR(I)
@@ -59,129 +59,122 @@
       END
 
 
-      SUBROUTINE RECO_TRACK_TO_TOP(HLX0,R0,FLAG,OK)
+      SUBROUTINE SET_TRACK_PAR(HLX,OK)
 
       IMPLICIT NONE
-      REAL HLX0(10)
-      REAL R0(3)
-      INTEGER FLAG
+      REAL HLX(10)
       LOGICAL OK
 #include "TOP_GEO.fi"     
 #include "TOP_TRACK.fi"     
 #include "TOP_CONS.fi"     
-      INTEGER I
-      REAL RR, HLX(10)
-      REAL HLX_LOC(10), Y, T0, T1, T2, T3, T4, TMI, FI, R(3), DIR(3)
-      LOGICAL OK1
+      REAL T1, T2, T, FI
+      REAL HLX_LOC(10), R(3), DIR(3)
       LOGICAL INSIDE_QBAR
+      INTEGER I, K
       
-      FLAG=0
-      DO I=1,10
-         HLX(I)=HLX0(I)
-      ENDDO
-
-      IF(MODUL.LT.0) THEN
-
-!     move starting point to TOP_R1
-         RR=R0(1)**2+R0(2)**2
-         IF(RR.NE.TOP_R1**2) THEN
-            CALL XSEC_CYL(HLX,TOP_R1,T1,T2,OK)
-            IF(.NOT.OK) RETURN
-            IF(RR.LT.TOP_R1**2) THEN
-               T0=T1
-            ELSE
-               T0=T2-HLX(10)
-            ENDIF
-            CALL MOVE_PIVOT(HLX,T0)
-         ENDIF
-
-!     find, which TOP module is intersected 
-         TMI=1.E10
-         DO I=0,NUM_MOD-1
-            CALL HLX_TO_LOCAL(HLX,I,HLX_LOC)
-            Y=0.
-            CALL XSEC_PLANE_Y(HLX_LOC,Y,T1,T2,OK)
-            IF(.NOT.OK) CYCLE
-            TMI=MIN(TMI,T1)
-            CALL GET_HLX_RDIR(HLX_LOC,T1,T_R0,T_DIR)
-            OK=ABS(T_R0(1)).LT.QBAR_A(I)/2.
-            IF(.NOT.OK) CYCLE
-            OK=ABS(T_R0(3)).LT.QBAR_C(I)/2.
-            IF(.NOT.OK) CYCLE
-            OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),I)
-            IF(.NOT.OK) CYCLE
-            MODUL=I
-            EXIT
-         ENDDO
-
-         IF(.NOT.OK) THEN
-            IF(TMI.LT.(1.E10)) THEN
-               CALL GET_HLX_RDIR(HLX,TMI,R,DIR)
-               IF(R(3).GT.TOP_Z1.AND.R(3).LT.TOP_Z2) FLAG=-1
-            ENDIF
-            RETURN
-         ENDIF
-      ELSE
-         T0=-10.0/C0
-         CALL MOVE_PIVOT(HLX,T0) ! ensure that both bar surfaces are infront of track
-         CALL HLX_TO_LOCAL(HLX,MODUL,HLX_LOC)
-         Y=0.
-         CALL XSEC_PLANE_Y(HLX_LOC,Y,T1,T2,OK)
-         IF(.NOT.OK) RETURN
-         CALL GET_HLX_RDIR(HLX_LOC,T1,T_R0,T_DIR)
-         OK=ABS(T_R0(1)).LT.QBAR_A(MODUL)/2.
-         IF(.NOT.OK) RETURN
-         OK=ABS(T_R0(3)).LT.QBAR_C(MODUL)/2.
-         IF(.NOT.OK) RETURN
-         OK=INSIDE_QBAR(T_R0(1),T_R0(2),T_R0(3),MODUL)
-         IF(.NOT.OK) RETURN
-      ENDIF
-
-!     module is found
-      TOF_C0=T1
-      Y=-QBAR_B(MODUL)/2.
-      CALL XSEC_PLANE_Y(HLX_LOC,Y,T1,T2,OK)
+      OK=MODUL.GE.0.AND.MODUL.LT.NUM_MOD
       IF(.NOT.OK) RETURN
-      Y=-Y
-      CALL XSEC_PLANE_Y(HLX_LOC,Y,T3,T4,OK1)
-      IF(OK1) T2=T3
-      T_LEN=ABS(T2-T1)*C0
-      SIG_TLEN=T_LEN/SQRT(12.)
+      
+      CALL XSEC_QBAR(HLX,MODUL,T1,T2,OK)
+      IF(.NOT.OK) RETURN
 
-!     additional info
-      T_CTH(0)=T_DIR(3)
-      T_STH(0)=SQRT(1-T_CTH(0)**2)
-      FI=ATAN2(T_DIR(2),T_DIR(1))
-      T_CFI(0)=COS(FI)
-      T_SFI(0)=SIN(FI)
+      TOF_C0=(T1+T2)/2
+      T_LEN=ABS(T2-T1)*C0
+      OK=T_LEN.GT.QBAR_B(MODUL)/2
+      IF(.NOT.OK) RETURN
+      SIG_TLEN=T_LEN/SQRT(12.)
+      
+      CALL HLX_TO_LOCAL(HLX,MODUL,HLX_LOC) ! helix is in nominal frame
 
       T_H=0.1                   ! [cm]
-      T1=TOF_C0+T_H/C0
-      CALL GET_HLX_RDIR(HLX_LOC,T1,T_R1,DIR)
-      OK=INSIDE_QBAR(T_R1(1),T_R1(2),T_R1(3),MODUL)
-      IF(.NOT.OK) RETURN
-      T_CTH(1)=DIR(3)
-      T_STH(1)=SQRT(1-T_CTH(1)**2)
-      FI=ATAN2(DIR(2),DIR(1))
-      T_CFI(1)=COS(FI)
-      T_SFI(1)=SIN(FI)
+      DO I=-1,1
+         T=TOF_C0+T_H/C0*I
+         CALL GET_HLX_RDIR(HLX_LOC,T,R,DIR) ! get in nominal frame
+         CALL NOMINAL_TO_LOCAL(R,DIR,MODUL) ! transform to local (bar) frame
+         OK=INSIDE_QBAR(R(1),R(2),R(3),MODUL)
+         IF(.NOT.OK) RETURN
 
-      T1=TOF_C0-T_H/C0
-      CALL GET_HLX_RDIR(HLX_LOC,T1,T_R2,DIR)
-      OK=INSIDE_QBAR(T_R2(1),T_R2(2),T_R2(3),MODUL)
-      IF(.NOT.OK) RETURN
-      T_CTH(-1)=DIR(3)
-      T_STH(-1)=SQRT(1-T_CTH(1)**2)
-      FI=ATAN2(DIR(2),DIR(1))
-      T_CFI(-1)=COS(FI)
-      T_SFI(-1)=SIN(FI)
+         T_CTH(I)=DIR(3)
+         T_STH(I)=SQRT(1-DIR(3)**2)
+         FI=ATAN2(DIR(2),DIR(1))
+         T_CFI(I)=COS(FI)
+         T_SFI(I)=SIN(FI)
+         DO K=1,3
+            T_R(K,I)=R(K)
+         ENDDO
+         IF(I.EQ.0) T_DIR=DIR
+      ENDDO
+      
+      END
+      
 
-      TOF_C0=TOF_C0+T0
-      FLAG=1
+      SUBROUTINE XSEC_QBAR(HLX,MDN,T1,T2,OK)
 
+      REAL HLX(10)              ! helix in global frame [in]
+      INTEGER MDN               ! valid bar ID [in]
+      REAL T1, T2               ! entrance and exit times (for beta=1) [out]
+      LOGICAL OK                ! true if x-section exists
+#include "TOP_GEO.fi"     
+#include "TOP_CONS.fi"     
+      REAL HLX_LOC(10), T0
+      integer NPL
+      PARAMETER (NPL=4)         ! number of bar surfaces (planes)
+      REAL RP(3,NPL)            ! point defining plane
+      REAL NORM(3,NPL)          ! normal defining plane
+      INTEGER I, K
+      REAL AH, BH, R(3), DIR(3), H, T
+      REAL S_PROD
+      LOGICAL FL1, FL2
+      
+      T1=0
+      T2=0
+      AH=QBAR_A(MDN)/2
+      BH=QBAR_B(MDN)/2
+      
+      RP=0
+      RP(2,1)=-BH
+      RP(2,2)=BH
+      RP(1,3)=-AH
+      RP(1,4)=AH
+      NORM=0
+      NORM(2,1)=-1.
+      NORM(2,2)=1.
+      NORM(1,3)=-1.
+      NORM(1,4)=1.
+
+      CALL HLX_TO_LOCAL(HLX,MDN,HLX_LOC) ! helix is in nominal frame
+      T0=-10.0/C0
+      CALL MOVE_PIVOT(HLX_LOC,T0)   ! ensure that bar surfaces are infront of track
+
+      FL1=.FALSE.
+      FL2=.FALSE.
+      DO I=1,NPL
+         CALL LOCAL_TO_NOMINAL(RP(1,I),NORM(1,I),MDN) ! planes in nominal frame
+         CALL XSEC_PLANE(HLX_LOC,RP(1,I),NORM(1,I),T,OK)
+         IF(.NOT.OK) CYCLE
+         CALL GET_HLX_RDIR(HLX_LOC,T,R,DIR)
+         H=-SIGN(0.01, S_PROD(DIR,NORM(1,I)))
+         DO K=1,3
+            R(K)=R(K)+H*DIR(K)  ! error compensation: move by 100 microns toward bar
+         ENDDO
+         CALL NOMINAL_TO_LOCAL(R,DIR,MDN) ! transform to local (bar) frame
+         IF(ABS(R(1)).GT.AH) CYCLE
+         IF(ABS(R(2)).GT.BH) CYCLE
+         IF(H.GT.0) THEN
+            T1=T+T0
+            FL1=.TRUE.
+         ELSE
+            T2=T+T0
+            FL2=.TRUE.
+         ENDIF
+         OK=FL1.AND.FL2
+         IF(OK) RETURN
+      ENDDO
+      OK=FL1.AND.FL2
+      
       END
 
-
+      
       SUBROUTINE TRESHOLD_TEST(P,NHYP,MASS,OK)
 
       IMPLICIT NONE
@@ -286,7 +279,7 @@
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
-
+      
       END
 
 

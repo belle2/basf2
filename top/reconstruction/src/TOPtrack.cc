@@ -45,7 +45,9 @@ namespace Belle2 {
       m_trackLength(Tlen), m_charge(Q), m_pdg(pdg),
       m_atTop(false), m_barID(0),
       m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
-    {}
+    {
+      m_barID = findBar();
+    }
 
 
     TOPtrack::TOPtrack(const Track* track,
@@ -177,6 +179,23 @@ namespace Belle2 {
       cout << "  atTop=" << m_atTop;
       cout << "  barID=" << m_barID;
       cout << endl;
+    }
+
+    int TOPtrack::findBar()
+    {
+      float r[3] = {(float) m_position.X(),
+                    (float) m_position.Y(),
+                    (float) m_position.Z()
+                   };
+      float p[3] = {(float) m_momentum.X(),
+                    (float) m_momentum.Y(),
+                    (float) m_momentum.Z()
+                   };
+      float q = (float) m_charge;
+      float t;
+      int m;
+      track2top_(r, p, &q, &t, &m);
+      return m + 1;
     }
 
   } // end top namespace

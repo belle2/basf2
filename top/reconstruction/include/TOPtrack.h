@@ -248,6 +248,13 @@ namespace Belle2 {
       void dump() const;
 
     private:
+
+      /**
+       * Finds barID the track is crossing
+       * @return bar ID, if track hits the bar, otherwise 0
+       */
+      int findBar();
+
       bool m_valid;           /**< true for properly defined track */
       TVector3 m_position;    /**< position vector*/
       TVector3 m_momentum;    /**< momentum vector */

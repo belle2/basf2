@@ -112,7 +112,7 @@ namespace Belle2 {
      * @var Solids::groove
      * Strip grooves.
      *
-     * @var Solids::board
+     * @var Solids::sipm
      * SiPM.
      *
      * @var Solids::board
@@ -170,7 +170,7 @@ namespace Belle2 {
      * @var LogicalVolumes::psheet
      * Plastic sheet.
      *
-     * @var Solids::segmentsup
+     * @var LogicalVolumes::segmentsup
      * Segment support.
      *
      * @var LogicalVolumes::sectorsup

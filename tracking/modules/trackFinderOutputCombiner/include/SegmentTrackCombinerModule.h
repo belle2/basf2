@@ -254,7 +254,7 @@ namespace Belle2 {
       for (CDCTrack& track : tracks) {
         const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
         const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-        const double radius = fabs(trajectory2D.getGlobalCircle().radius());
+        const double radius = trajectory2D.getGlobalCircle().absRadius();
 
         // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
         // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values
@@ -280,7 +280,7 @@ namespace Belle2 {
       for (CDCTrack& track : tracks) {
         const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
         const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-        const double radius = fabs(trajectory2D.getGlobalCircle().radius());
+        const double radius = trajectory2D.getGlobalCircle().absRadius();
 
         // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
         // especially for curlers. For this, we go through all hits and look for negative perpS. If we have found one, we shift it to positive values

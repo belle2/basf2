@@ -43,7 +43,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   // Calculate distances
   const CDCTrajectory2D& trajectoryTrack = track->getStartTrajectory3D().getTrajectory2D();
   const CDCTrajectorySZ& szTrajectoryTrack = track->getStartTrajectory3D().getTrajectorySZ();
-  double radius = trajectoryTrack.getGlobalCircle().radius();
+  double radius = trajectoryTrack.getGlobalCircle().absRadius();
 
   maxmimumTrajectoryDistanceFront = trajectoryTrack.getDist2D(front.getWireHit().getRefPos2D());
   maxmimumTrajectoryDistanceBack = trajectoryTrack.getDist2D(back.getWireHit().getRefPos2D());

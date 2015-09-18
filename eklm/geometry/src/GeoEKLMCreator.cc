@@ -1741,7 +1741,8 @@ createSegmentSupport(int iSegmentSupport, G4LogicalVolume* plane) const
   t = HepGeom::Translate3D(
         0.5 * (segmentSupportPos->DeltaLLeft -
                segmentSupportPos->DeltaLRight) +
-        segmentSupportPos->X, segmentSupportPos->Y, segmentSupportPos->Z);
+        segmentSupportPos->X, segmentSupportPos->Y, segmentSupportPos->Z) *
+      HepGeom::RotateX3D(180.0 * CLHEP::deg);
   try {
     new G4PVPlacement(t, lv, lv->GetName() + "_" + plane->GetName(), plane,
                       false, 1, false);

@@ -12,6 +12,32 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace std;
 
+CDCTrack TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track) const
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+  const double radius = trajectory2D.getLocalCircle().absRadius();
+  const Vector2D& apogee = trajectory2D.getGlobalCircle().apogee();
+  double arcLength2DOfApogee = trajectory2D.calcArcLength2D(apogee);
+  if (arcLength2DOfApogee < 0) {
+    arcLength2DOfApogee += 2 * TMath::Pi() * radius;
+  }
+
+  CDCTrack splittedCDCTrack;
+  splittedCDCTrack.setStartTrajectory3D(trajectory3D);
+
+  for (CDCRecoHit3D& recoHit : track) {
+    double currentArcLength2D = recoHit.getArcLength2D();
+    if (currentArcLength2D < 0) B2INFO("Below 0");
+    if (currentArcLength2D > arcLength2DOfApogee) {
+      splittedCDCTrack.push_back(CDCRecoHit3D(recoHit));
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+    }
+  }
+
+  return splittedCDCTrack;
+}
+
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
 {
   if (track.size() <= 1) {
@@ -44,24 +70,29 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
       numberOfPositiveHits++;
     }
   }
-  // We reset the trajectory here to start at the newStartPosition of the first hit
-  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size();
+  // ... or by looking at the arcLength of the origin
+  const double arcLength2DOfOrigin = currentTrajectory2D.calcArcLength2D(Vector2D(0, 0));
 
+  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size() or arcLength2DOfOrigin > 0;
+
+  // We reset the trajectory here to start at the newStartPosition of the first hit
   if (reverseTrajectory)
     track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, -newStartMomentum, -charge));
   else
     track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, newStartMomentum, charge));
 
+  track.setEndTrajectory3D(track.getStartTrajectory3D());
+
   for (CDCRecoHit3D& recoHit : track) {
     recoHit.setArcLength2D(currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D()));
-    recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
+    recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
 
   // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
   // especially for curlers. For this, we go through all hits and look for negative perpS.
   // If we have found one, we shift it to positive values
-  track.shiftToPositiveArcLengths2D();
+  track.shiftToPositiveArcLengths2D(true);
 
   // We can now sort by perpS
   track.sortByArcLength2D();
@@ -73,7 +104,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
 void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().radius();
+  const double radius = trajectory2D.getLocalCircle().absRadius();
 
   // Curler are allowed to have hits on both arms
   if (trajectory2D.isCurler(m_outerCylindricalRFactor)) {
@@ -143,7 +174,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track) const
     for (const std::vector<const CDCRecoHit3D*>& tracklet : trackletList) {
       if (tracklet.size() < 5) {
         for (const CDCRecoHit3D* recoHit : tracklet) {
-          recoHit->getWireHit().getAutomatonCell().setBackgroundFlag();
+          recoHit->getWireHit().getAutomatonCell().setAssignedFlag();
         }
       }
     }
@@ -157,7 +188,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track) const
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().radius();
+  const double radius = trajectory2D.getLocalCircle().absRadius();
 
   if (std::isnan(radius)) {
     return;
@@ -290,7 +321,7 @@ void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track) const
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().radius();
+  const double radius = trajectory2D.getLocalCircle().absRadius();
 
   if (std::isnan(radius)) {
     return;
@@ -308,7 +339,7 @@ void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track) const
     const double currentArcLength2D = recoHit.getArcLength2D();
     if (not std::isnan(lastArcLength2D)) {
       const double delta = (currentArcLength2D - lastArcLength2D) / radius;
-      if (delta > m_maximumArcLength2DDistance) {
+      if (fabs(delta) > m_maximumArcLength2DDistance) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
         continue;

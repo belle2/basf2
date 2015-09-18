@@ -54,6 +54,8 @@ namespace Belle2 {
 
       void removeArcLength2DHoles(CDCTrack& track) const;
 
+      CDCTrack splitSecondHalfOfTrack(CDCTrack& track) const;
+
     private:
       const double m_outerCylindricalRFactor = 1.1;
       const unsigned int m_minimalHits = 7;

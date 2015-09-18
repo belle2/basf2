@@ -11,8 +11,7 @@
 #ifndef EKLMHITMCTIME_H
 #define EKLMHITMCTIME_H
 
-/* Extrenal headers. */
-#include <CLHEP/Vector/LorentzVector.h>
+/* External headers. */
 #include <TObject.h>
 
 namespace Belle2 {

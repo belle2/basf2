@@ -11,9 +11,6 @@
 #ifndef EKLMDIGIT_H
 #define EKLMDIGIT_H
 
-/* External headers. */
-#include <CLHEP/Vector/ThreeVector.h>
-
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitMCTime.h>

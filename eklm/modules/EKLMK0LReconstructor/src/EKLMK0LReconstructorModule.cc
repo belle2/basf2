@@ -11,6 +11,10 @@
 /* C++ headers. */
 #include <map>
 
+/* External headers. */
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Vector/LorentzVector.h>
+
 /* Belle2 headers. */
 #include <framework/core/ModuleManager.h>
 #include <framework/datastore/RelationArray.h>
@@ -71,6 +75,7 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
   int clust[2][2];
   double e, de;
   struct HitData dat;
+  TVector3 newPosition;
   /* Nothing to do. */
   if (hits.size() <= 1)
     return;
@@ -144,9 +149,9 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
           de = it2->hit->getEDep();
           dat.hit->setEDep(e + de);
           dat.hit->setTime(std::min(dat.hit->getTime(), it2->hit->getTime()));
-          dat.hit->setGlobalPosition((dat.hit->getGlobalPosition() * e +
-                                      it2->hit->getGlobalPosition() * de) /
-                                     (e + de));
+          newPosition = (dat.hit->getPosition() * e +
+                         it2->hit->getPosition() * de) * (1.0 / (e + de));
+          dat.hit->setPosition(newPosition);
         }
       } while (add);
       if (dat.hit != NULL)
@@ -177,13 +182,15 @@ static void findAssociatedHits(struct HitData* hit,
   std::vector<struct HitData*> cluster;
   std::vector<struct HitData*>::iterator itClust;
   std::vector<EKLMHit2d*>::iterator itHit;
-  HepGeom::Point3D<double> hitPos;
+  HepGeom::Point3D<double> hitPos, hitPos2;
   CLHEP::Hep3Vector p;
   float mt, t, m;
   double v;
   /* Initially fill the cluster with the hit in question. */
   cluster.push_back(hit);
-  hitPos = hit->hit->getGlobalPosition();
+  hitPos.setX(hit->hit->getPositionX());
+  hitPos.setY(hit->hit->getPositionY());
+  hitPos.setZ(hit->hit->getPositionZ());
   /* Collect other hits. */
   n = hits.size();
   for (i = 0; i < n; i++) {
@@ -191,7 +198,10 @@ static void findAssociatedHits(struct HitData* hit,
       continue;
     if (hits[i].stat != c_Unknown)
       continue;
-    if (hits[i].hit->getGlobalPosition().angle(hitPos) < 0.1) {
+    hitPos2.setX(hits[i].hit->getPositionX());
+    hitPos2.setY(hits[i].hit->getPositionY());
+    hitPos2.setZ(hits[i].hit->getPositionZ());
+    if (hitPos2.angle(hitPos) < 0.1) {
       hits[i].stat = c_Cluster;
       cluster.push_back(&hits[i]);
     }
@@ -224,7 +234,9 @@ static void findAssociatedHits(struct HitData* hit,
       continue;
     de = (*itClust)->hit->getEDep();
     e = e + de;
-    hitPos = hitPos + de * (*itClust)->hit->getGlobalPosition();
+    hitPos.setX(hitPos.x() + de * (*itClust)->hit->getPositionX());
+    hitPos.setY(hitPos.y() + de * (*itClust)->hit->getPositionY());
+    hitPos.setZ(hitPos.z() + de * (*itClust)->hit->getPositionZ());
   }
   hitPos = hitPos / e;
   /* Calculate momentum. */

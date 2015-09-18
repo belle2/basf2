@@ -139,7 +139,7 @@ void EKLM::Reconstructor::create2dHits()
           continue;
         EKLMHit2d* hit2d = hit2ds.appendNew(*it4);
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
-        hit2d->setGlobalPosition(crossPoint);
+        hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
                         m_digPar.timeResolution / m_digPar.timeResolution);
         hit2d->setTime(t);

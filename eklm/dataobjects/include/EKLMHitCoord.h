@@ -11,9 +11,9 @@
 #ifndef EKLMHITCOORD_H
 #define EKLMHITCOORD_H
 
-/* Extrenal headers. */
-#include <CLHEP/Geometry/Point3D.h>
+/* External headers. */
 #include <TObject.h>
+#include <TVector3.h>
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitGlobalCoord.h>
@@ -38,16 +38,36 @@ namespace Belle2 {
     virtual ~EKLMHitCoord();
 
     /**
-     * Get local position of the particle hit.
-     * @return Hit coordinates.
+     * Set hit local position.
+     * @param[in] x Hit x coordinate.
+     * @param[in] y Hit y coordinate.
+     * @param[in] z Hit z coordinate.
      */
-    HepGeom::Point3D<double> getLocalPosition() const;
+    void setLocalPosition(float x, float y, float z);
 
     /**
-     * Set local position of the particle hit.
-     * @param[in] lpos Hit coordinates.
+     * Get hit local position x coordinate.
+     * @return Hit x coordinate.
      */
-    void setLocalPosition(HepGeom::Point3D<double> lpos);
+    float getLocalPositionX() const;
+
+    /**
+     * Get hit local position y coordinate.
+     * @return Hit y coordinate.
+     */
+    float getLocalPositionY() const;
+
+    /**
+     * Get hit local position z coordinate.
+     * @return Hit z coordinate.
+     */
+    float getLocalPositionZ() const;
+
+    /**
+     * Get ihit local position.
+     * @return Hit coordinates.
+     */
+    TVector3 getLocalPosition() const;
 
   protected:
 

@@ -177,8 +177,12 @@ void EKLM::Digitizer::makeSimHits()
           // new hit is ancestor,  modify everything
           current->second->setEDep(current->second->getEDep() +
                                    simHit->getEDep());
-          current->second->setGlobalPosition(simHit->getGlobalPosition());
-          current->second->setLocalPosition(simHit->getLocalPosition());
+          current->second->setPosition(simHit->getPositionX(),
+                                       simHit->getPositionY(),
+                                       simHit->getPositionZ());
+          current->second->setLocalPosition(simHit->getLocalPositionX(),
+                                            simHit->getLocalPositionY(),
+                                            simHit->getLocalPositionZ());
           current->second->setTime(simHit->getTime());
           current->second->setPDG(simHit->getPDG());
           current->second->setMomentum(simHit->getMomentum());
@@ -226,7 +230,7 @@ void EKLM::Digitizer::mergeSimHitsToStripHits(double threshold)
 
     stripHit->setMCTime(simHit->getTime());
     stripHit->setSiPMMCTime(fes->getMCTime());
-    stripHit->setGlobalPosition(simHit->getGlobalPosition());
+    stripHit->setPosition(simHit->getPosition());
     stripHit->setGeneratedNPE(fes->getGeneratedNPE());
     if (!fes->getFitStatus()) {
       stripHit->setTime(fes->getFitResults()->startTime);

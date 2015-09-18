@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* External headers. */
+#include <CLHEP/Geometry/Point3D.h>
 #include <G4Step.hh>
 
 /* Belle2 headers. */
@@ -98,12 +99,17 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /* Create step hit and store in to DataStore */
   StoreArray<EKLMSimHit> simHits;
   EKLMSimHit* hit = simHits.appendNew();
-  hit->setMomentum(CLHEP::HepLorentzVector(track.GetMomentum(),
-                                           track.GetTotalEnergy()));
+  CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
+  hit->setMomentum(TLorentzVector(trackMomentum.x(), trackMomentum.y(),
+                                  trackMomentum.z(), track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());
   hit->setParentTrackID(track.GetParentID());
-  hit->setLocalPosition(lpos * Unit::mm);
-  hit->setGlobalPosition(gpos * Unit::mm);
+  hit->setLocalPosition(lpos.x() / CLHEP::mm * Unit::mm,
+                        lpos.y() / CLHEP::mm * Unit::mm,
+                        lpos.z() / CLHEP::mm * Unit::mm);
+  hit->setPosition(gpos.x() / CLHEP::mm * Unit::mm,
+                   gpos.y() / CLHEP::mm * Unit::mm,
+                   gpos.z() / CLHEP::mm * Unit::mm);
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);

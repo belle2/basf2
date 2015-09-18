@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitCoord.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -27,15 +26,30 @@ EKLMHitCoord::~EKLMHitCoord()
 {
 }
 
-HepGeom::Point3D<double> EKLMHitCoord::getLocalPosition() const
+void EKLMHitCoord::setLocalPosition(float x, float y, float z)
 {
-  return HepGeom::Point3D<double>(m_localX, m_localY, m_localZ);
+  m_localX = x;
+  m_localY = y;
+  m_localZ = z;
 }
 
-void EKLMHitCoord::setLocalPosition(HepGeom::Point3D<double> lpos)
+float EKLMHitCoord::getLocalPositionX() const
 {
-  m_localX = lpos.x();
-  m_localY = lpos.y();
-  m_localZ = lpos.z();
+  return m_localX;
+}
+
+float EKLMHitCoord::getLocalPositionY() const
+{
+  return m_localY;
+}
+
+float EKLMHitCoord::getLocalPositionZ() const
+{
+  return m_localZ;
+}
+
+TVector3 EKLMHitCoord::getLocalPosition() const
+{
+  return TVector3(m_localX, m_localY, m_localZ);
 }
 

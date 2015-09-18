@@ -11,10 +11,9 @@
 #ifndef EKLMHITMOMENTUM_H
 #define EKLMHITMOMENTUM_H
 
-/* Extrenal headers. */
-#include <CLHEP/Vector/LorentzVector.h>
-#include <TObject.h>
+/* External headers. */
 #include <TLorentzVector.h>
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -39,19 +38,13 @@ namespace Belle2 {
      * Set momentum.
      * @param[in] p momentum
      */
-    void setMomentum(CLHEP::HepLorentzVector p);
+    void setMomentum(const TLorentzVector& p);
 
     /**
      * Get momentum.
      * @return Momentum.
      */
-    CLHEP::HepLorentzVector getMomentum() const;
-
-    /**
-     * Get momentum, TLorentzVector version.
-     * @return Momentum.
-     */
-    TLorentzVector getMomentumRoot() const;
+    TLorentzVector getMomentum() const;
 
   protected:
 

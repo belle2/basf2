@@ -10,7 +10,6 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitGlobalCoord.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -27,16 +26,33 @@ EKLMHitGlobalCoord::~EKLMHitGlobalCoord()
 {
 }
 
-HepGeom::Point3D<double> EKLMHitGlobalCoord::getGlobalPosition() const
+void EKLMHitGlobalCoord::setPosition(float x, float y, float z)
 {
-  return HepGeom::Point3D<double>(m_globalX, m_globalY, m_globalZ);
+  m_globalX = x;
+  m_globalY = y;
+  m_globalZ = z;
 }
 
-void EKLMHitGlobalCoord::setGlobalPosition(HepGeom::Point3D<double> gpos)
+void EKLMHitGlobalCoord::setPosition(const TVector3& pos)
 {
-  m_globalX = gpos.x();
-  m_globalY = gpos.y();
-  m_globalZ = gpos.z();
+  m_globalX = pos.X();
+  m_globalY = pos.Y();
+  m_globalZ = pos.Z();
+}
+
+float EKLMHitGlobalCoord::getPositionX() const
+{
+  return m_globalX;
+}
+
+float EKLMHitGlobalCoord::getPositionY() const
+{
+  return m_globalY;
+}
+
+float EKLMHitGlobalCoord::getPositionZ() const
+{
+  return m_globalZ;
 }
 
 TVector3 EKLMHitGlobalCoord::getPosition() const

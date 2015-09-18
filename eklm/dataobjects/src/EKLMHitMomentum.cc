@@ -27,20 +27,15 @@ EKLMHitMomentum::~EKLMHitMomentum()
 {
 }
 
-void EKLMHitMomentum::setMomentum(CLHEP::HepLorentzVector p)
+void EKLMHitMomentum::setMomentum(const TLorentzVector& p)
 {
-  m_e = p.e();
-  m_pX = p.px();
-  m_pY = p.py();
-  m_pZ = p.pz();
+  m_e = p.E();
+  m_pX = p.Px();
+  m_pY = p.Py();
+  m_pZ = p.Pz();
 }
 
-CLHEP::HepLorentzVector EKLMHitMomentum::getMomentum() const
-{
-  return CLHEP::HepLorentzVector(m_pX, m_pY, m_pZ, m_e);
-}
-
-TLorentzVector EKLMHitMomentum::getMomentumRoot() const
+TLorentzVector EKLMHitMomentum::getMomentum() const
 {
   return TLorentzVector(m_pX, m_pY, m_pZ, m_e);
 }

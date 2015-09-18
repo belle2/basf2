@@ -11,6 +11,9 @@
 #ifndef EKLMSIMHIT_H
 #define EKLMSIMHIT_H
 
+/* External headers. */
+#include <TObject.h>
+
 /* Belle2 headers. */
 #include <simulation/dataobjects/SimHitBase.h>
 #include <eklm/dataobjects/EKLMHitBase.h>

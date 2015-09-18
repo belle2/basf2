@@ -11,8 +11,7 @@
 #ifndef EKLMHITBASE_H
 #define EKLMHITBASE_H
 
-/* Extrenal headers. */
-#include <CLHEP/Geometry/Point3D.h>
+/* External headers. */
 #include <TObject.h>
 
 namespace Belle2 {

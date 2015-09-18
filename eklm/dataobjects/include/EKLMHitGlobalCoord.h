@@ -11,8 +11,7 @@
 #ifndef EKLMHITGLOBALCOORD_H
 #define EKLMHITGLOBALCOORD_H
 
-/* Extrenal headers. */
-#include <CLHEP/Geometry/Point3D.h>
+/* External headers. */
 #include <TObject.h>
 #include <TVector3.h>
 
@@ -36,19 +35,39 @@ namespace Belle2 {
     virtual ~EKLMHitGlobalCoord();
 
     /**
-     * Get global position of the particle hit.
-     * @return Hit coordinates.
+     * Set hit global position.
+     * @param[in] x Hit x coordinate.
+     * @param[in] y Hit y coordinate.
+     * @param[in] z Hit z coordinate.
      */
-    HepGeom::Point3D<double> getGlobalPosition() const;
+    void setPosition(float x, float y, float z);
 
     /**
-     * Set global position of the particle hit.
-     * @param[in] gpos Hit coordinates.
+     * Set hit global position.
+     * @param[in] pos Position.
      */
-    void setGlobalPosition(HepGeom::Point3D<double> gpos);
+    void setPosition(const TVector3& pos);
 
     /**
-     * Get global position (TVector3 version, for visualization).
+     * Get hit global position x coordinate.
+     * @return Hit x coordinate.
+     */
+    float getPositionX() const;
+
+    /**
+     * Get hit global position y coordinate.
+     * @return Hit y coordinate.
+     */
+    float getPositionY() const;
+
+    /**
+     * Get hit global position z coordinate.
+     * @return Hit z coordinate.
+     */
+    float getPositionZ() const;
+
+    /**
+     * Get hit global position.
      * @return Hit coordinates.
      */
     TVector3 getPosition() const;

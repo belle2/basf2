@@ -93,17 +93,17 @@ long read_nsm2_data_longin(longinRecord* record)
 
 long init_nsm2_vget_ai(aiRecord* record)
 {
-  return g_nsm.init_vget_in(record);
+  return g_nsm.init_vget_in(record, "float");
 }
 
 long init_nsm2_vget_longin(longinRecord* record)
 {
-  return g_nsm.init_vget_in(record);
+  return g_nsm.init_vget_in(record, "int");
 }
 
 long init_nsm2_vget_stringin(stringinRecord* record)
 {
-  return g_nsm.init_vget_in(record);
+  return g_nsm.init_vget_in(record, "text");
 }
 
 long read_nsm2_vget_ai(aiRecord* record)

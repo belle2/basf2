@@ -68,6 +68,14 @@ void RunControlCallback::setState(NSMNode& node, const RCState& state) throw()
   node.setState(state);
   std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
   set(vname, state.getLabel());
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& rcnode(m_node_v[i]);
+    if (rcnode.getName() == node.getName()) {
+      std::string vname = StringUtil::form("node[%d].rcstate", (int)i);
+      set(vname, state.getLabel());
+      return;
+    }
+  }
 }
 
 void RunControlCallback::setConfig(RCNode& node, const std::string& config) throw()
@@ -184,6 +192,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         m_runno = RunNumberTable(db).add(m_runno.getConfig(), expno, runno, 0);
         expno = m_runno.getExpNumber();
         runno = m_runno.getRunNumber();
+        std::cout << "record_time : " << m_runno.getRecordTime() << std::endl;
         set("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
         std::string comment;
@@ -272,7 +281,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
         }
       }
     } catch (const IOException& e) {
-      LogFile::error("%s", e.what());
+      LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
     }
   }
   RCState state_new = state.next();
@@ -477,7 +486,8 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
             } catch (const TimeoutException& e) {
               continue;
             } catch (const IOException& e) {
-              LogFile::error(e.what());
+              LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
+              //LogFile::error(e.what());
               m_enabled = false;
               return;
             }
@@ -501,7 +511,8 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
         LogFile::fatal("Failed to NSM2 request");
         m_enabled = false;
       } catch (const IOException& e) {
-        LogFile::error(e.what());
+        LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
+        //LogFile::error(e.what());
         m_enabled = false;
         m_callback.setState(RCState::NOTREADY_S);
       }

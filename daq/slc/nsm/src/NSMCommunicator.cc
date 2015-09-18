@@ -32,6 +32,7 @@ using namespace Belle2;
 
 NSMCommunicatorList NSMCommunicator::g_comm;
 Mutex NSMCommunicator::g_mutex;
+Mutex NSMCommunicator::g_mutex_select;
 
 NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
 {
@@ -39,6 +40,7 @@ NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
   int ret;
   FD_ZERO(&fds);
   int highest = 0;
+  g_mutex_select.lock();
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
     NSMCommunicator& com(*(*it));
@@ -60,7 +62,10 @@ NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
     }
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
   }
-  if (ret < 0) throw (NSMHandlerException("Failed to select"));
+  if (ret < 0) {
+    g_mutex_select.unlock();
+    throw (NSMHandlerException("Failed to select"));
+  }
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
     NSMCommunicator& com(*(*it));
@@ -69,10 +74,12 @@ NSMCommunicator& NSMCommunicator::select(double usec) throw(IOException)
         com.m_message.read(com.m_nsmc);
         com.m_message.setRequestName();
         b2nsm_context(com.m_nsmc);
+        g_mutex_select.unlock();
         return com;
       }
     }
   }
+  g_mutex_select.unlock();
   throw (TimeoutException("NSMCommunicator::select was timed out"));
 }
 
@@ -102,6 +109,7 @@ throw(NSMHandlerException)
       if (node != NULL && req != NULL &&
           strlen(node) > 0 && strlen(req) > 0) {
         b2nsm_context(com.m_nsmc);
+        //LogFile::notice("%s >> %s ", node, req);
         if (b2nsm_sendany(node, req, msg.getNParams(), (int*)msg.getParams(),
                           msg.getLength(), msg.getData(), NULL) < 0) {
           g_mutex.unlock();

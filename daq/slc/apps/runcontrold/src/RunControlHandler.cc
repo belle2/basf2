@@ -15,8 +15,9 @@ bool NSMVHandlerRCConfig::handleGetText(std::string& val)
   try {
     m_callback.get(m_rcnode, "rcconfig", val);
     m_rcnode.setConfig(val);
+    //val = m_rcnode.getConfig();
   } catch (const IOException& e) {
-    LogFile::error(e.what());
+    LogFile::error("%s : %s rcconfig", e.what(), m_rcnode.getName().c_str());
     return false;
   }
   return true;

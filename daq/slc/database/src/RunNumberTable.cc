@@ -7,6 +7,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <sstream>
+#include <iostream>
 
 using namespace Belle2;
 
@@ -25,13 +26,13 @@ RunNumber RunNumberTable::add(const std::string& config,
     }
     m_db.execute("insert into runnumber (config, expno, runno, subno, isstart) "
                  "values ('%s', %d, %d, %d, %s) "
-                 "returning id, extract(epoch from record_time);",
+                 "returning id, extract(epoch from record_time) as tstart;",
                  config.c_str(), expno, runno, subno, (isstart ? "true" : "false"));
     DBRecordList record_v(m_db.loadRecords());
     if (record_v.size() > 0) {
       int id = record_v[0].getInt("id");
-      long long record_time = record_v[0].getInt("record_time");
-      return RunNumber(config, expno, runno, subno, id, record_time);
+      int record_time = record_v[0].getInt("tstart");
+      return RunNumber(config, expno, runno, subno, isstart, id, record_time);
     }
   } catch (const DBHandlerException& e) {
     LogFile::error("DB access error : %s", e.what());

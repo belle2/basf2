@@ -25,6 +25,7 @@
 #include <map>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <unistd.h>
 
 #define CAPITAL "B2_nsm"
@@ -48,7 +49,7 @@ namespace Belle2 {
     long read_data_in(aiRecord* record);
     long read_data_in(longinRecord* record);
     template <typename T>
-    long init_vget_in(T* record);
+    long init_vget_in(T* record, const std::string& type);
     long read_vget_in(aiRecord* record);
     long read_vget_in(longinRecord* record);
     long read_vget_in(stringinRecord* record);
@@ -128,6 +129,7 @@ namespace Belle2 {
   inline long NSM2CA::init_data_in(T* record)
   {
     StringList str = StringUtil::split(record->name, ':');
+    LogFile::error("%s %d", record->name, (int)str.size());
     if (str.size() >= 3 || str[0] == CAPITAL) {
       IOSCANPVT* pvt = new IOSCANPVT;
       std::string name = StringUtil::toupper(str[1]);
@@ -200,7 +202,7 @@ namespace Belle2 {
         return read_in(record, *(const uint64*)buf);
       }
     }
-    LogFile::error(StringUtil::join(str, ".", 3));
+    LogFile::error(StringUtil::join(str, ".", 4));
     return 0;
   }
 
@@ -216,16 +218,15 @@ namespace Belle2 {
     return false;
   }
 
-  //nsm2:$(node):$(nsmv)
-  //nsm2:$(node):rcrequest
   template <typename T>
-  inline long NSM2CA::init_vget_in(T* record)
+  inline long NSM2CA::init_vget_in(T* record, const std::string& type)
   {
     std::string node, vname;
     if (find(record->name, "get", node, vname)) {
       IOSCANPVT* pvt = new IOSCANPVT;
       try {
-        NSM2CACallback::get().add(new NSMVHandler2CA(node, vname, *pvt));
+        NSMVHandler2CA* handler = new NSMVHandler2CA(node, vname, *pvt, type);
+        NSM2CACallback::get().add(handler);
         NSMCommunicator::send(NSMMessage(NSMNode(node), NSMCommand::VGET, vname));
       } catch (const NSMHandlerException& e) {
         LogFile::error(e.what());
@@ -274,7 +275,6 @@ namespace Belle2 {
   {
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
-      //write_vset_out(record);
       return init_out(record);
     }
     return 0;
@@ -282,7 +282,7 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(aoRecord* record)
   {
-    LogFile::debug("%s << %f", record->name, record->val);
+    LogFile::debug("write a %s << %f", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);
@@ -294,7 +294,7 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(longoutRecord* record)
   {
-    LogFile::debug("%s << %d", record->name, record->val);
+    LogFile::debug("write long %s << %d", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);
@@ -309,11 +309,12 @@ namespace Belle2 {
 
   inline long NSM2CA::write_vset_out(stringoutRecord* record)
   {
-    LogFile::debug("%s << %s", record->name, record->val);
+    LogFile::debug("write string %s << %s", record->name, record->val);
     std::string nodename, vname;
     if (find(record->name, "set", nodename, vname)) {
       NSMNode node(nodename);
       if (vname == "rcrequest") {
+        LogFile::info("rcrequest : %s", record->val);
         std::string s = StringUtil::toupper(StringUtil::replace(record->val, ":", "_"));
         if (!StringUtil::find(s, "RC_")) s = "RC_" + s;
         RCCommand command(s);
@@ -325,11 +326,18 @@ namespace Belle2 {
       } else if (vname == "rcstate") {
         NSM2CACallback::get().set(vname, record->val);
       } else {
-        NSM2CACallback::get().set(node, vname, record->val);
+        LogFile::error("%s set %s %s %s", record->name, nodename.c_str(), vname.c_str(), record->val);
+        try {
+          NSM2CACallback::get().set(NSMNode(node), vname, record->val);
+        } catch (const IOException& e) {
+          LogFile::error(e.what());
+        }
       }
       return 0;
+    } else {
+      LogFile::error("error : %s set %s %s", record->name, nodename.c_str(), vname.c_str());
     }
-    return 1;
+    return 0;
   }
 
 }

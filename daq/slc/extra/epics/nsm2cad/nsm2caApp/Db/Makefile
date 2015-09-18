@@ -12,7 +12,7 @@ include $(TOP)/configure/CONFIG
 # databases, templates, substitutions like this
 #DB += xxx.db
 DB += nsmnode.db
-DB += nsmdata_storage.db
+DB += store_ecl_status.db
 DB += ropc.db
 
 #----------------------------------------------------

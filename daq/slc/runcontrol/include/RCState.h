@@ -38,7 +38,7 @@ namespace Belle2 {
 
   public:
     bool isStable() const throw() { return getId() > 1 && getId() <= 5; }
-    bool isTransition() const throw() { return getId() > 5 && getId() <= 8; }
+    bool isTransition() const throw() { return getId() > 5 && getId() <= 9; }
     bool isError() const throw() { return getId() > 9 && getId() <= 11; }
     bool isRecovering() const throw() { return getId() > 11 && getId() <= 13; }
     RCState next() const throw();

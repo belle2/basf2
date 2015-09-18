@@ -6,6 +6,7 @@ using namespace Belle2;
 
 RCTemplateCallback::RCTemplateCallback()
 {
+  m_showall = false;
 }
 
 RCTemplateCallback::~RCTemplateCallback() throw()
@@ -28,6 +29,7 @@ void RCTemplateCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
 */
 void RCTemplateCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
+  /*
   // check if an object "value" exsits
   if (obj.hasObject("value")) {
     // get object "value"
@@ -49,6 +51,7 @@ void RCTemplateCallback::configure(const DBObject& obj) throw(RCHandlerException
       LogFile::debug("text=%s", o_value.getText("text").c_str());
     }
   }
+  */
 }
 
 /*

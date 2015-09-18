@@ -13,6 +13,7 @@ using namespace Belle2;
 
 bool NSMVHandler2CA::handleSet(const NSMVar& var)
 {
+  LogFile::info("%s.%s", var.getNode().c_str(), var.getName().c_str());
   NSMVHandler::handleSet(var);
   scanIoRequest(m_pvt);
   return true;
@@ -33,29 +34,18 @@ void NSM2CACallback::timeout(NSMCommunicator&) throw()
 {
   NSMVHandlerList& handlers(getHandlers());
   static unsigned long long count = 0;
-  for (NSMVHandlerList::iterator it = handlers.begin();
-       it != handlers.end(); it++ ) {
-    NSMVHandler& handler(*(*it));
-    std::string nodename = handler.getNode();
-    if (handler.getName() == "rcstate" && nodename.size() > 0 ) {
-      std::string s = handler.get().getText();
+  if (count % 20 == 0){
+    for (NSMVHandlerList::iterator it = handlers.begin();
+	 it != handlers.end(); it++ ) {
+      NSMVHandler& handler(*(*it));
+      std::string nodename = handler.getNode();
       try {
-	RCState state(s);
-	NSMCommunicator::connected(nodename);
-	if (state == RCState::UNKNOWN) {
-	  get(NSMNode(nodename), "rcstate", s);
-	  LogFile::info("%s got up (%s)", nodename.c_str(), s.c_str());
- 	}
-      } catch (const NSMNotConnectedException& e) {
-	if (s != "UNKNOWN") {
-	  LogFile::warning("%s got down", nodename.c_str());
-	  handler.handleSet(NSMVar(nodename, std::string("UNKNOWN")));
-	}
-      } catch (const TimeoutException& e) {
+	NSMNode node(nodename);
+	NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, handler.getName()));
+	perform(wait(node, NSMCommand::VSET, 5));
+      } catch (const IOException& e) {
 	LogFile::warning(e.what());
-      } 
-    } else if (count % 10 == 0){
-      NSMCommunicator::send(NSMMessage(NSMNode(nodename), NSMCommand::VGET, handler.getName()));
+      }
     }
   }
   count++;
@@ -78,7 +68,9 @@ void NSM2CACallback::ok(const char* nodename, const char* data) throw()
     LogFile::debug("ok from %s (%s)", nodename, data);
     std::string s;
     try {
-      getHandler(nodename, "rcstate").handleSet(NSMVar("rcstate", data));
+      NSMVar var("rcstate", data);
+      var.setNode(nodename);
+      getHandler(nodename, "rcstate").handleSet(var);
     } catch (const std::out_of_range& e) {
       LogFile::error(e.what());
     }

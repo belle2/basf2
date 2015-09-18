@@ -342,6 +342,70 @@ record(stringin, "B2_nsm:get:$(nodename):node[0]:rcrequest")
   field(DTYP, "nsm2_vget_stringin")
 }
 
+record(stringin, "B2_nsm:get:$(nodename):store_cdc:dbtable")
+{
+  field(DESC, "get value from store_cdc:dbtable")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):store_cdc:rcconfig")
+{
+  field(DESC, "set value to store_cdc:rcconfig")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):store_cdc:rcconfig")
+{
+  field(DESC, "get value from store_cdc:rcconfig")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):store_cdc:rcstate")
+{
+  field(DESC, "get value from store_cdc:rcstate")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):store_cdc:rcrequest")
+{
+  field(DESC, "set value to store_cdc:rcrequest")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):store_cdc:rcrequest")
+{
+  field(DESC, "get value from store_cdc:rcrequest")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(longout, "B2_nsm:set:$(nodename):store_cdc:used")
+{
+  field(DESC, "set value to store_cdc:used")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vset_longout")
+}
+
+record(longin, "B2_nsm:get:$(nodename):store_cdc:used")
+{
+  field(DESC, "get value from store_cdc:used")
+  field(SCAN, "I/O Intr")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vget_longin")
+}
+
 record(stringout, "B2_nsm:set:$(nodename):node[1]:rcconfig")
 {
   field(DESC, "set value to node[1]:rcconfig")
@@ -380,6 +444,70 @@ record(stringin, "B2_nsm:get:$(nodename):node[1]:rcrequest")
   field(SCAN, "I/O Intr")
   field(VAL, "")
   field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):hlt_cdc:dbtable")
+{
+  field(DESC, "get value from hlt_cdc:dbtable")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):hlt_cdc:rcconfig")
+{
+  field(DESC, "set value to hlt_cdc:rcconfig")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):hlt_cdc:rcconfig")
+{
+  field(DESC, "get value from hlt_cdc:rcconfig")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):hlt_cdc:rcstate")
+{
+  field(DESC, "get value from hlt_cdc:rcstate")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):hlt_cdc:rcrequest")
+{
+  field(DESC, "set value to hlt_cdc:rcrequest")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):hlt_cdc:rcrequest")
+{
+  field(DESC, "get value from hlt_cdc:rcrequest")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(longout, "B2_nsm:set:$(nodename):hlt_cdc:used")
+{
+  field(DESC, "set value to hlt_cdc:used")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vset_longout")
+}
+
+record(longin, "B2_nsm:get:$(nodename):hlt_cdc:used")
+{
+  field(DESC, "get value from hlt_cdc:used")
+  field(SCAN, "I/O Intr")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vget_longin")
 }
 
 record(stringout, "B2_nsm:set:$(nodename):node[2]:rcconfig")
@@ -422,6 +550,70 @@ record(stringin, "B2_nsm:get:$(nodename):node[2]:rcrequest")
   field(DTYP, "nsm2_vget_stringin")
 }
 
+record(stringin, "B2_nsm:get:$(nodename):cdc03:dbtable")
+{
+  field(DESC, "get value from cdc03:dbtable")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):cdc03:rcconfig")
+{
+  field(DESC, "set value to cdc03:rcconfig")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):cdc03:rcconfig")
+{
+  field(DESC, "get value from cdc03:rcconfig")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):cdc03:rcstate")
+{
+  field(DESC, "get value from cdc03:rcstate")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):cdc03:rcrequest")
+{
+  field(DESC, "set value to cdc03:rcrequest")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):cdc03:rcrequest")
+{
+  field(DESC, "get value from cdc03:rcrequest")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(longout, "B2_nsm:set:$(nodename):cdc03:used")
+{
+  field(DESC, "set value to cdc03:used")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vset_longout")
+}
+
+record(longin, "B2_nsm:get:$(nodename):cdc03:used")
+{
+  field(DESC, "get value from cdc03:used")
+  field(SCAN, "I/O Intr")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vget_longin")
+}
+
 record(stringout, "B2_nsm:set:$(nodename):node[3]:rcconfig")
 {
   field(DESC, "set value to node[3]:rcconfig")
@@ -460,6 +652,70 @@ record(stringin, "B2_nsm:get:$(nodename):node[3]:rcrequest")
   field(SCAN, "I/O Intr")
   field(VAL, "")
   field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):ttd_cdc:dbtable")
+{
+  field(DESC, "get value from ttd_cdc:dbtable")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):ttd_cdc:rcconfig")
+{
+  field(DESC, "set value to ttd_cdc:rcconfig")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):ttd_cdc:rcconfig")
+{
+  field(DESC, "get value from ttd_cdc:rcconfig")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):ttd_cdc:rcstate")
+{
+  field(DESC, "get value from ttd_cdc:rcstate")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(stringout, "B2_nsm:set:$(nodename):ttd_cdc:rcrequest")
+{
+  field(DESC, "set value to ttd_cdc:rcrequest")
+  field(SCAN, "Passive")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+
+record(stringin, "B2_nsm:get:$(nodename):ttd_cdc:rcrequest")
+{
+  field(DESC, "get value from ttd_cdc:rcrequest")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(longout, "B2_nsm:set:$(nodename):ttd_cdc:used")
+{
+  field(DESC, "set value to ttd_cdc:used")
+  field(SCAN, "Passive")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vset_longout")
+}
+
+record(longin, "B2_nsm:get:$(nodename):ttd_cdc:used")
+{
+  field(DESC, "get value from ttd_cdc:used")
+  field(SCAN, "I/O Intr")
+  field(VAL, "0")
+  field(DTYP, "nsm2_vget_longin")
 }
 
 record(stringin, "B2_nsm:get:$(nodename):log:dbtable")

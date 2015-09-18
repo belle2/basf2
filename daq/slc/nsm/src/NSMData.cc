@@ -470,7 +470,7 @@ void NSMData::printPV(const std::string& name_in) const throw()
         }
       } else {
         for (size_t i = 0; i < length; i++) {
-          printf("record(%s, \"nsm2:%s[%d]\")\n"
+          printf("record(%s, \"B2_nsm:%s[%d]\")\n"
                  "{\n"
                  "  field(SCAN, \".1 second\")\n"
                  "  field(DTYP, \"nsm2_data_%s\")\n"
@@ -482,7 +482,7 @@ void NSMData::printPV(const std::string& name_in) const throw()
         const NSMDataList& data_v(getObjects(name));
         data_v[0].print(name_out);
       } else {
-        printf("record(%s, \"nsm2:%s\")\n"
+        printf("record(%s, \"B2_nsm2:%s\")\n"
                "{\n"
                "  field(SCAN, \".1 second\")\n"
                "  field(DTYP, \"nsm2_data_%s\")\n"

@@ -44,6 +44,7 @@ namespace Belle2 {
   private:
     static NSMCommunicatorList g_comm;
     static Mutex g_mutex;
+    static Mutex g_mutex_select;
 
   public:
     NSMCommunicator(const std::string& host = "", int port = -1) throw();

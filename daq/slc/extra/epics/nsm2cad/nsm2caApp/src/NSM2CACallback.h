@@ -12,13 +12,19 @@ namespace Belle2 {
 
   public:
     NSMVHandler2CA(const std::string& node,
-                   const std::string& name, IOSCANPVT& pvt)
-      : NSMVHandler(node, name, true, true), m_pvt(pvt) {}
+                   const std::string& name, IOSCANPVT& pvt,
+                   const std::string& type)
+      : NSMVHandler(node, name, true, true),
+        m_pvt(pvt), m_type(type) {}
     virtual ~NSMVHandler2CA() throw() {}
     virtual bool handleSet(const NSMVar& var);
 
+  public:
+    const std::string& getType() const { return m_type; }
+
   private:
     IOSCANPVT& m_pvt;
+    std::string m_type;
 
   };
 

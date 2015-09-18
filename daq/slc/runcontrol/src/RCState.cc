@@ -66,5 +66,6 @@ RCState RCState::next() const throw()
   else if (*this == STOPPING_TS) return READY_S;
   else if (*this == RECOVERING_RS) return READY_S;
   else if (*this == ABORTING_RS) return NOTREADY_S;
+  else if (*this == CONFIGURING_TS) return NOTREADY_S;
   else return Enum::UNKNOWN;
 }

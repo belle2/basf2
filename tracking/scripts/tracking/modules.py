@@ -549,6 +549,7 @@ class CDCRecoFitter(metamodules.PathModule):
 
     def __init__(self, setup_geometry=True, fit_geometry="Geant4",
                  input_track_cands_store_array_name="TrackCands",
+                 output_tracks_store_array_name="GF2Tracks",
                  pdg_code=211, vxdParams=None, use_filter="kalman"):
 
         setup_genfit_extrapolation_module = StandardEventGenerationRun.get_basf2_module('SetupGenfitExtrapolation',
@@ -556,6 +557,7 @@ class CDCRecoFitter(metamodules.PathModule):
 
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
+            RecoTracksStoreArrayName=output_tracks_store_array_name,
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
         usedCDCMeasurementCreators = {"RecoHitCreator": {}}
@@ -572,23 +574,32 @@ class CDCRecoFitter(metamodules.PathModule):
             usedCDCMeasurementCreators=usedCDCMeasurementCreators,
             usedSVDMeasurementCreators=usedSVDMeasurementCreators,
             usedPXDMeasurementCreators=usedPXDMeasurementCreators,
+            recoTracksStoreArrayName=output_tracks_store_array_name,
             usedAdditionalMeasurementCreators=usedAdditionalMeasurementCreators)
 
         if use_filter == "daf":
-            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("DAFRecoFitter", resortHits=True,
-                                                                             numberOfFailedHits=2,
-                                                                             pdgCodeToUseForFitting=pdg_code)
+            reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
+                "DAFRecoFitter",
+                resortHits=True,
+                RecoTracksStoreArrayName=output_tracks_store_array_name,
+                numberOfFailedHits=2,
+                pdgCodeToUseForFitting=pdg_code)
         elif use_filter == "kalman":
-            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("KalmanRecoFitter",
-                                                                             pdgCodeToUseForFitting=pdg_code)
+            reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
+                "KalmanRecoFitter",
+                RecoTracksStoreArrayName=output_tracks_store_array_name,
+                pdgCodeToUseForFitting=pdg_code)
         elif use_filter == "gbl":
-            reco_fitter_module = StandardEventGenerationRun.get_basf2_module("GBLRecoFitter",
-                                                                             pdgCodeToUseForFitting=pdg_code)
+            reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
+                "GBLRecoFitter",
+                RecoTracksStoreArrayName=output_tracks_store_array_name,
+                pdgCodeToUseForFitting=pdg_code)
 
         reco_fitter_module.set_debug_level(basf2.LogLevel.DEBUG)
 
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
+            RecoTracksStoreArrayName=output_tracks_store_array_name,
             TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
         module_list = []

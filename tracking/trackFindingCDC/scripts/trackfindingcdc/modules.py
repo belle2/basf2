@@ -13,6 +13,58 @@ from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 from ROOT import Belle2
 
 
+def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
+    """
+    Convenience function for adding all cdc track finder modules
+    to the path
+
+    Arguments
+    ---------
+    path: basf2 path
+    cdc_trackcands: Name of the output genfit TrackCands. Defaults to TrackCands.
+    """
+
+    # Init the geometry for cdc tracking and the hits
+    path.add_module("WireHitTopologyPreparer")
+
+    # Find segments and reduce background hits
+    path.add_module("SegmentFinderCDCFacetAutomatonDev",
+                    ClusterFilter="tmva",
+                    ClusterFilterParameters={
+                        "cut": str(0.1)},
+                    WriteGFTrackCands=False,
+                    TracksStoreObjName="__TempCDCTracksVector")
+
+    # Find axial tracks
+    path.add_module("CDCLegendreTracking",
+                    WriteGFTrackCands=False)
+
+    # Improve the quality of the axial tracks
+    path.add_module("TrackQualityAsserterCDC",
+                    WriteGFTrackCands=False,
+                    TracksStoreObjNameIsInput=True,
+                    corrections=["B2B"])
+
+    # Find the stereo hits to those axial tracks
+    path.add_module('StereoHitFinderCDCLegendreHistogramming',
+                    TracksStoreObjNameIsInput=True,
+                    WriteGFTrackCands=False)
+
+    # Combine segments with axial tracks
+    path.add_module('SegmentTrackCombinerDev',
+                    TracksStoreObjNameIsInput=True,
+                    WriteGFTrackCands=False,
+                    SegmentTrackFilterFirstStepFilter="tmva",
+                    SegmentTrackFilterFirstStepFilterParameters={"cut": str(0.75)})
+
+    # Improve the quality of all tracks and output
+    path.add_module("TrackQualityAsserterCDC",
+                    GFTrackCandsStoreArrayName=cdc_trackcands,
+                    WriteGFTrackCands=True,
+                    TracksStoreObjNameIsInput=True,
+                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+
+
 class CDCHitUniqueAssumer(basf2.Module):
 
     """

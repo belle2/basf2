@@ -241,7 +241,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
                  output_track_cands_store_vector_name="CDCTrackVector",
                  assign_stereo_hits=True, debug_output=False,
                  TracksStoreObjNameIsInput=False,
-                 stereo_level=6, stereo_hits=5):
+                 stereo_level=5, stereo_hits=5):
 
         module_list = []
 

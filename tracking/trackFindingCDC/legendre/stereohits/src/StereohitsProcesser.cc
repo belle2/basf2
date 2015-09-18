@@ -33,7 +33,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const double radius = trajectory2D.getGlobalCircle().radius();
+  const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.getOuterExit().hasNAN();
 
   const auto& rlWireHits = wireHitTopology.getRLWireHits();
@@ -205,14 +205,57 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   addMaximumNodeToTrackAndDeleteHits(track, foundStereoHits, doubledRecoHits, hitsVector);
 }
 
+void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment, std::vector<const CDCRecoSegment3D*>& recoSegments,
+                                             const CDCTrajectory2D& trackTrajectory, const double maximumPerpS) const
+{
+  const double radius = trackTrajectory.getGlobalCircle().absRadius();
+  const bool isCurler = trackTrajectory.isCurler();
+
+  CDCRecoSegment3D newRecoSegment = CDCRecoSegment3D::reconstruct(segment, trackTrajectory);
+
+  // Skip segments out of the CDC
+  unsigned int numberOfHitsNotInCDC = 0;
+  for (const CDCRecoHit3D& recoHit : newRecoSegment) {
+    if (not recoHit.isInCellZBounds(1.1)) {
+      numberOfHitsNotInCDC++;
+    }
+  }
+  if (numberOfHitsNotInCDC > newRecoSegment.size() - 1) {
+    return;
+  }
+
+  // Skip segments with hits on the wrong side (of not curlers)
+  bool oneHitIsOnWrongSide = false;
+  bool oneHitIsTooFarAway = false;
+  for (CDCRecoHit3D& recoHit : newRecoSegment) {
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (currentArcLength2D < 0) {
+      oneHitIsOnWrongSide = true;
+      recoHit.setArcLength2D(currentArcLength2D + 2 * TMath::Pi() * radius);
+    }
+
+    if (recoHit.getArcLength2D() - maximumPerpS > 30) {
+      oneHitIsTooFarAway = true;
+      break;
+    }
+  }
+
+  //if (oneHitIsTooFarAway) {
+  //  return;
+  //}
+
+  if (not isCurler and m_checkForB2BTracks and oneHitIsOnWrongSide) {
+    return;
+  }
+
+  recoSegments.push_back(new CDCRecoSegment3D(newRecoSegment));
+}
+
 void StereohitsProcesser::makeHistogrammingWithSegments(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments,
                                                         unsigned int minimumNumberOfHits)
 {
   // Reconstruct the segments
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = trajectory2D.getGlobalCircle().radius();
-  const bool isCurler = trajectory2D.getOuterExit().hasNAN();
-
   const double maximumPerpS = track.back().getArcLength2D();
 
   std::vector<const CDCRecoSegment3D*> recoSegments;
@@ -227,43 +270,12 @@ void StereohitsProcesser::makeHistogrammingWithSegments(CDCTrack& track, const s
       continue;
     }
 
-    CDCRecoSegment3D newRecoSegment = CDCRecoSegment3D::reconstruct(segment, trajectory2D);
-
-    // Skip segments out of the CDC
-    unsigned int numberOfHitsNotInCDC = 0;
-    for (const CDCRecoHit3D& recoHit : newRecoSegment) {
-      if (not recoHit.isInCellZBounds(1.5)) {
-        numberOfHitsNotInCDC++;
-      }
-    }
-    if (numberOfHitsNotInCDC > 0.7 * newRecoSegment.size()) {
-      continue;
+    if (segment.getTrajectory2D().getChargeSign() == trajectory2D.getChargeSign()) {
+      reconstructSegment(segment, recoSegments, trajectory2D, maximumPerpS);
+    } else {
+      reconstructSegment(std::move(segment.reversed()), recoSegments, trajectory2D, maximumPerpS);
     }
 
-    // Skip segments with hits on the wrong side (of not curlers)
-    bool oneHitIsOnWrongSide = false;
-    bool oneHitIsTooFarAway = false;
-    for (CDCRecoHit3D& recoHit : newRecoSegment) {
-      const double currentArcLength2D = recoHit.getArcLength2D();
-      if (currentArcLength2D < 0) {
-        oneHitIsOnWrongSide = true;
-        recoHit.setArcLength2D(currentArcLength2D + 2 * TMath::Pi() * radius);
-      }
-
-      if (recoHit.getArcLength2D() - maximumPerpS > 30) {
-        oneHitIsTooFarAway = true;
-      }
-    }
-
-    if (oneHitIsTooFarAway) {
-      continue;
-    }
-
-    if (not isCurler and m_checkForB2BTracks and oneHitIsOnWrongSide) {
-      continue;
-    }
-
-    recoSegments.push_back(new CDCRecoSegment3D(newRecoSegment));
   }
 
   // Do the tree finding

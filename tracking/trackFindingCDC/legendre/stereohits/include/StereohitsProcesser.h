@@ -78,6 +78,9 @@ namespace Belle2 {
       void addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
                                               const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const;
 
+      void reconstructSegment(const CDCRecoSegment2D& segment, std::vector<const CDCRecoSegment3D*>& recoSegments,
+                              const CDCTrajectory2D& trackTrajectory, const double maximumPerpS) const;
+
       bool m_param_debugOutput; /// Flag to turn on debug output
       unsigned int m_level; /// Maximum level of the quad tree search.
       bool m_checkForB2BTracks; /// Set to false to skip the B2B check (good for curlers)

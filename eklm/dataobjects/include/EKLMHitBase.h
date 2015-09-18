@@ -117,13 +117,6 @@ namespace Belle2 {
      */
     void setPDG(int PDG);
 
-    /**
-     * Operator to find duplicated (or just similar) hits.
-     * Should be overloaded for each type of hits (?)
-     */
-    bool operator==(const EKLMHitBase& right) const;
-
-
   protected:
 
     /** PDG code of the (leading) particle. */
@@ -150,8 +143,6 @@ namespace Belle2 {
     ClassDef(Belle2::EKLMHitBase, 2);
 
   };
-
-
 
 }
 

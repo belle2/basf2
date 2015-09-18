@@ -82,6 +82,16 @@ namespace Belle2 {
     };
 
     /**
+     * Shield logical volumes.
+     */
+    struct ShieldLogicalVolumes {
+      G4LogicalVolume* detailA; /* Detail A. */
+      G4LogicalVolume* detailB; /* Detail B. */
+      G4LogicalVolume* detailC; /* Detail C. */
+      G4LogicalVolume* detailD; /* Detail D. */
+    };
+
+    /**
      * @struct Solids
      * All solids of EKLM.
      *
@@ -98,7 +108,7 @@ namespace Belle2 {
      * Sector support.
      *
      * @var Solids::plane
-     * Palne.
+     * Plane.
      *
      * @var Solids::psheet
      * Element of plastic sheet.
@@ -124,6 +134,9 @@ namespace Belle2 {
      * @var Solids::stripboard
      * Readout board for 1 strip.
      *
+     * @var Solids::subtractionBox
+     * Box used for subtractions.
+     *
      * @var Solids::sectorsup
      * Sector support.
      *
@@ -144,6 +157,7 @@ namespace Belle2 {
       G4VSolid* board;
       G4VSolid* baseboard;
       G4VSolid* stripboard;
+      G4Box* subtractionBox;
       struct SectorSupportSolids sectorsup;
       struct ScintillatorSolids* scint;
     };
@@ -175,6 +189,9 @@ namespace Belle2 {
      *
      * @var LogicalVolumes::sectorsup
      * Sector support.
+     *
+     * @var LogicalVolumes::shield
+     * Shield.
      */
     struct LogicalVolumes {
       G4LogicalVolume* cover;
@@ -185,19 +202,21 @@ namespace Belle2 {
       G4LogicalVolume** psheet;
       G4LogicalVolume*** segmentsup;
       struct SectorSupportLogicalVolumes sectorsup;
+      struct ShieldLogicalVolumes shield;
     };
 
     /**
      * Materials for EKLM.
      */
     struct Materials {
-      G4Material* air;         /**< Air. */
-      G4Material* polystyrene; /**< Polystyrene. */
-      G4Material* polystyrol;  /**< Polystyrol. */
-      G4Material* iron;        /**< Iron. */
-      G4Material* duralumin;   /**< Duralumin. */
-      G4Material* silicon;     /**< Silicon. */
-      G4Material* gel;         /**< Gel. */
+      G4Material* air;          /**< Air. */
+      G4Material* polyethylene; /**< Polyethylene. */
+      G4Material* polystyrene;  /**< Polystyrene. */
+      G4Material* polystyrol;   /**< Polystyrol. */
+      G4Material* iron;         /**< Iron. */
+      G4Material* duralumin;    /**< Duralumin. */
+      G4Material* silicon;      /**< Silicon. */
+      G4Material* gel;          /**< Gel. */
     };
 
     /**
@@ -321,6 +340,11 @@ namespace Belle2 {
       void createSectorSupportCorner4LogicalVolume();
 
       /**
+       * Create subtraction box solid.
+       */
+      void createSubtractionBoxSolid();
+
+      /**
        * Cut corner of a solid.
        * @param[in] name           Name of resulting solid.
        * @param[in] solid          Solid.
@@ -333,7 +357,7 @@ namespace Belle2 {
        * @param[in] y2             Second point y coordinate.
        */
       G4SubtractionSolid* cutSolidCorner(
-        char* name, G4VSolid* solid, G4Box* subtractionBox,
+        const char* name, G4VSolid* solid, G4Box* subtractionBox,
         HepGeom::Transform3D& transf, bool largerAngles,
         double x1, double y1, double x2, double y2);
 
@@ -349,7 +373,7 @@ namespace Belle2 {
        * @param[in] ang            Angle.
        */
       G4SubtractionSolid* cutSolidCorner(
-        char* name, G4VSolid* solid, G4Box* subtractionBox,
+        const char* name, G4VSolid* solid, G4Box* subtractionBox,
         HepGeom::Transform3D& transf, bool largerAngles,
         double x, double y, double ang);
 
@@ -389,6 +413,26 @@ namespace Belle2 {
        * @param[in] n Number of sector, from 0 to 4.
        */
       void createPlasticSheetSolid(int n);
+
+      /**
+       * Create shield detail A logical volume.
+       */
+      void createShieldDetailALogicalVolume();
+
+      /**
+       * Create shield detail B logical volume.
+       */
+      void createShieldDetailBLogicalVolume();
+
+      /**
+       * Create shield detail C logical volume.
+       */
+      void createShieldDetailCLogicalVolume();
+
+      /**
+       * Create shield detail D logical volume.
+       */
+      void createShieldDetailDLogicalVolume();
 
       /**
        * Create solids (or logical volumes which must be created only once).
@@ -530,6 +574,12 @@ namespace Belle2 {
        * @param[in] stripVolume "Strip volume" logical volume.
        */
       void createSiPM(G4LogicalVolume* stripVolume) const;
+
+      /**
+       * Create shield.
+       * @param[in] sector Sector logical volume.
+       */
+      void createShield(G4LogicalVolume* sector) const;
 
       /**
        * Print mass of volume if mode == c_DetectorPrintMasses.

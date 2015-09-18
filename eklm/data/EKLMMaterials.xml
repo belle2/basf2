@@ -3,6 +3,13 @@
 <Materials>
 	<Description>EKLM material definitions</Description>
 	<Version>0</Version>
+        <Material name="EKLMPolyethylene">
+	       	<density unit="g/cm3">0.96</density>
+        	<Components>
+                	<Element fraction="0.66667">H</Element>
+                        <Element fraction="0.33333">C</Element>
+		</Components>
+	</Material>
         <Material name="EKLMPolystyrene">
 	       	<density unit="g/cm3">1.05</density>
         	<Components>

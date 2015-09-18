@@ -260,7 +260,7 @@ namespace Belle2 {
     };
 
     /**
-     * Strip size data.
+     * Strip geometry data.
      */
     struct StripGeometry {
       double Width;                    /**< Width. */
@@ -269,6 +269,29 @@ namespace Belle2 {
       double GrooveWidth;              /**< Groove width. */
       double NoScintillationThickness; /**< Non-scintillating layer. */
       double RSSSize;                  /**< Radiation study SiPM size. */
+    };
+
+    /**
+     * Shield layer detail geometry data.
+     */
+    struct ShieldDetailGeometry {
+      double LengthX;         /**< X length. */
+      double LengthY;         /**< Y length. */
+      struct Point2D* Points; /**< Points. */
+    };
+
+    /**
+     * Shield layer geometry data.
+     */
+    struct ShieldGeometry {
+      double Thickness;                    /**< Thickness. */
+      Point2D DetailACenter;               /**< Detail A center. */
+      Point2D DetailBCenter;               /**< Detail B center. */
+      Point2D DetailCCenter;               /**< Detail C center. */
+      struct ShieldDetailGeometry DetailA; /**< Detail A. */
+      struct ShieldDetailGeometry DetailB; /**< Detail B. */
+      struct ShieldDetailGeometry DetailC; /**< Detail C. */
+      struct ShieldDetailGeometry DetailD; /**< Detail D. */
     };
 
     /**
@@ -420,6 +443,11 @@ namespace Belle2 {
       const struct StripGeometry* getStripGeometry() const;
 
       /**
+       * Get shield layer details geometry data.
+       */
+      const struct ShieldGeometry* getShieldGeometry() const;
+
+      /**
        * Get number of strips with different lengths.
        */
       int getNStripsDifferentLength() const;
@@ -527,6 +555,11 @@ namespace Belle2 {
        */
       void readXMLDataStrips();
 
+      /**
+       * Calculate shield geometry data.
+       */
+      void calculateShieldGeometry();
+
       /** Number of layers. */
       int m_nLayer;
 
@@ -613,6 +646,9 @@ namespace Belle2 {
 
       /** Strip size data. */
       struct StripGeometry m_StripGeometry;
+
+      /** Shield layer details geometry data. */
+      struct ShieldGeometry m_ShieldGeometry;
 
       /** Detector mode. */
       enum DetectorMode m_mode;

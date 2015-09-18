@@ -768,6 +768,97 @@
               </Strip>
             </Strips>
 	  </Plane>
+          <Shield>
+            <Thickness unit="mm">34.0</Thickness>
+            <Detail id="A">
+              <LengthX desc="X length" unit="mm">1000</LengthX>
+              <LengthY desc="Y length" unit="mm">2000</LengthY>
+              <Point id="1">
+                <X unit="mm">0</X>
+                <Y unit="mm">563</Y>
+              </Point>
+              <Point id="2">
+                <X unit="mm">563</X>
+                <Y unit="mm">0</Y>
+              </Point>
+              <Point id="3">
+                <X unit="mm">713</X>
+                <Y unit="mm">0</Y>
+              </Point>
+              <Point id="4">
+                <X unit="mm">846</X>
+                <Y unit="mm">98</Y>
+              </Point>
+              <Point id="5">
+                <X unit="mm">1000</X>
+                <Y unit="mm">161</Y>
+              </Point>
+              <Point id="6">
+                <X unit="mm">354</X>
+                <Y unit="mm">2000</Y>
+              </Point>
+              <Point id="7">
+                <X unit="mm">0</X>
+                <Y unit="mm">1843</Y>
+              </Point>
+            </Detail>
+            <Detail id="B">
+              <LengthX desc="X length" unit="mm">1000</LengthX>
+              <LengthY desc="Y length" unit="mm">1929</LengthY>
+              <Point id="1">
+                <X unit="mm">1000</X>
+                <Y unit="mm">1900</Y>
+              </Point>
+              <Point id="2">
+                <X unit="mm">751</X>
+                <Y unit="mm">1929</Y>
+              </Point>
+              <Point id="3">
+                <X unit="mm">249</X>
+                <Y unit="mm">1929</Y>
+              </Point>
+              <Point id="4">
+                <X unit="mm">0</X>
+                <Y unit="mm">1900</Y>
+              </Point>
+            </Detail>
+            <Detail id="C">
+              <LengthX desc="X length" unit="mm">1000</LengthX>
+              <LengthY desc="Y length" unit="mm">2000</LengthY>
+              <Point id="1">
+                <X unit="mm">0</X>
+                <Y unit="mm">556</Y>
+              </Point>
+              <Point id="2">
+                <X unit="mm">556</X>
+                <Y unit="mm">0</Y>
+              </Point>
+              <Point id="3">
+                <X unit="mm">704</X>
+                <Y unit="mm">0</Y>
+              </Point>
+              <Point id="4">
+                <X unit="mm">841</X>
+                <Y unit="mm">103</Y>
+              </Point>
+              <Point id="5">
+                <X unit="mm">1000</X>
+                <Y unit="mm">167</Y>
+              </Point>
+              <Point id="6">
+                <X unit="mm">337</X>
+                <Y unit="mm">2000</Y>
+              </Point>
+              <Point id="7">
+                <X unit="mm">0</X>
+                <Y unit="mm">1850</Y>
+              </Point>
+            </Detail>
+            <Detail id="D">
+              <LengthX desc="X length" unit="mm">265</LengthX>
+              <LengthY desc="Y length" unit="mm">108</LengthY>
+            </Detail>
+          </Shield>
  	</Sector>
       </Layer>
     </Endcap>

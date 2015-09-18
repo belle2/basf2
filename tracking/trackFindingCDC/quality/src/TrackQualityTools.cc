@@ -34,7 +34,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   // with positive an with negative perpS
   unsigned int numberOfPositiveHits = 0;
   for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = currentTrajectory2D.calcPerpS(recoHit.getRecoPos2D());
+    const double currentPerpS = currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
     if (currentPerpS > 0) {
       numberOfPositiveHits++;
     }
@@ -47,23 +47,16 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   else
     track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, newStartMomentum, charge));
 
-  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = fabs(trajectory2D.getGlobalCircle().radius());
-
   // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
   // especially for curlers. For this, we go through all hits and look for negative perpS.
   // If we have found one, we shift it to positive values
+  track.shiftToPositiveArcLengths2D();
+
   for (CDCRecoHit3D& recoHit : track) {
     recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
-    double currentPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
-    if (currentPerpS < 0) {
-      recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
-    } else {
-      recoHit.setPerpS(currentPerpS);
-    }
   }
 
   // We can now sort by perpS
-  track.sortByPerpS();
+  track.sortByArcLength2D();
 }

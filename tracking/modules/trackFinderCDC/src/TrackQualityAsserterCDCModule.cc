@@ -3,6 +3,7 @@
 #include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/dataobjects/Helix.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -18,27 +19,27 @@ void removeSecondHalfOfTrack(CDCTrack& track)
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
   const Vector2D origin(0, 0);
 
-  const double perpSOfOrigin = trajectory2D.calcArcLength2D(origin);
+  const double ArcLength2DOfOrigin = trajectory2D.calcArcLength2D(origin);
 
-  unsigned int hitsWithPositivePerpS = 0;
-  unsigned int hitsWithNegativePerpS = 0;
+  unsigned int hitsWithPositiveArcLength2D = 0;
+  unsigned int hitsWithNegativeArcLength2D = 0;
 
   for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) - perpSOfOrigin;
-    recoHit.setArcLength2D(currentPerpS);
+    const double currentArcLength2D = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) - ArcLength2DOfOrigin;
+    recoHit.setArcLength2D(currentArcLength2D);
 
-    if (currentPerpS > 0) {
-      hitsWithPositivePerpS++;
+    if (currentArcLength2D > 0) {
+      hitsWithPositiveArcLength2D++;
     } else {
-      hitsWithNegativePerpS++;
+      hitsWithNegativeArcLength2D++;
     }
   }
 
-  bool negativeHitsAreMore = hitsWithNegativePerpS > hitsWithPositivePerpS;
+  bool negativeHitsAreMore = hitsWithNegativeArcLength2D > hitsWithPositiveArcLength2D;
 
   for (const CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = recoHit.getArcLength2D();
-    if ((negativeHitsAreMore and currentPerpS > 0) or (not negativeHitsAreMore and currentPerpS < 0)) {
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if ((negativeHitsAreMore and currentArcLength2D > 0) or (not negativeHitsAreMore and currentArcLength2D < 0)) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
   }
@@ -48,12 +49,16 @@ void removeHitsAfterLayerBreak(CDCTrack& track)
 {
   ILayerType lastLayer = -1;
   Vector2D lastWirePosition;
-  bool removeAfterThis = false;
+
+  std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
+  trackletList.reserve(3);
+
+  std::vector<const CDCRecoHit3D*>* currentTracklet = nullptr;
 
   for (const CDCRecoHit3D& recoHit : track) {
-    if (removeAfterThis) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      continue;
+    if (currentTracklet == nullptr) {
+      trackletList.emplace_back();
+      currentTracklet = &(trackletList.back());
     }
 
     const ILayerType currentLayer = recoHit.getWire().getICLayer();
@@ -62,13 +67,25 @@ void removeHitsAfterLayerBreak(CDCTrack& track)
       const ILayerType delta = currentLayer - lastLayer;
       const double distance = (currentPosition - lastWirePosition).norm();
       if (abs(delta) > 4 or distance > 50) {
-        removeAfterThis = true;
-        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+        trackletList.emplace_back();
+        currentTracklet = &(trackletList.back());
       }
     }
 
     lastWirePosition = currentPosition;
     lastLayer = currentLayer;
+
+    currentTracklet->push_back(&recoHit);
+  }
+
+  if (trackletList.size() > 1) {
+    for (const std::vector<const CDCRecoHit3D*>& tracklet : trackletList) {
+      if (tracklet.size() < 5) {
+        for (const CDCRecoHit3D* recoHit : tracklet) {
+          recoHit->getWireHit().getAutomatonCell().setBackgroundFlag();
+        }
+      }
+    }
   }
 }
 
@@ -84,19 +101,19 @@ void removeBack2BackStuff(CDCTrack& track)
   }
 
   track.sort();
-  double perpSOfInnermostHit = track.front().getPerpS();
-  track.sortByPerpS();
+  double ArcLength2DOfInnermostHit = track.front().getArcLength2D();
+  track.sortByArcLength2D();
 
   for (const CDCRecoHit3D& recoHit : track) {
-    if (recoHit.getPerpS() - perpSOfInnermostHit < 0) {
+    if (recoHit.getArcLength2D() - ArcLength2DOfInnermostHit < 0) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
   }
 }
 
-void removePerpSHoles(CDCTrack& track)
+void removeArcLength2DHoles(CDCTrack& track)
 {
-  double lastPerpS = std::nan("");
+  double lastArcLength2D = std::nan("");
 
   bool removeAfterThis = false;
 
@@ -106,16 +123,16 @@ void removePerpSHoles(CDCTrack& track)
       continue;
     }
 
-    const double currentPerpS = recoHit.getPerpS();
-    if (not std::isnan(lastPerpS)) {
-      const double delta = currentPerpS - lastPerpS;
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (not std::isnan(lastArcLength2D)) {
+      const double delta = currentArcLength2D - lastArcLength2D;
       if (delta > 100) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       }
     }
 
-    lastPerpS = currentPerpS;
+    lastArcLength2D = currentArcLength2D;
   }
 }
 
@@ -159,35 +176,52 @@ void revertTrajectoriesPointingToTheCenter(CDCTrack& track)
   const Vector2D& outerExit = trajectory2D.getOuterExit();
   const double radius = trajectory2D.getLocalCircle().radius();
 
-  const Vector2D& innerExit = trajectory2D.getInnerExit();
+
+
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
+  const double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
+  const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
+  const double outerCylindricalR = outerMostLayer.getOuterCylindricalR();
+
+  const Vector2D support = trajectory2D.getSupport();
+  const GeneralizedCircle globalCircle = trajectory2D.getGlobalCircle();
+  // Trick: If the hit is too near to the inner circle, we scale it away a bit
+  const Vector2D& innerExit = globalCircle.sameCylindricalRForwardOf(support, innerCylindricalR);
   if (innerExit.hasNAN()) {
-    // Huh?
-    B2WARNING("Strange track...")
+    return;
+  }
+  const Vector2D& nextInnerExit = globalCircle.sameCylindricalRForwardOf(innerExit, innerCylindricalR);
+
+  if (nextInnerExit.hasNAN()) {
     return;
   }
 
-  const double perpSOfFirstInnerExit = trajectory2D.calcPerpS(innerExit);
+  B2INFO("Here")
 
-  if (perpSOfFirstInnerExit > 0.2 * radius) {
-    return;
-  }
+  const double ArcLength2DOfInnerExit = trajectory2D.calcArcLength2D(innerExit);
+  const double ArcLength2DOfNextInnerExit = trajectory2D.calcArcLength2D(nextInnerExit);
 
-  // We want to determine the entry into the cdc
-  const CDCTrajectory2D reversedTrajectory(trajectory2D.getSupport(), -trajectory2D.getMom2DAtSupport(),
-                                           -trajectory2D.getChargeSign());
-  const Vector2D& reentry = reversedTrajectory.getInnerExit();
-  if (reentry.hasNAN()) {
-    // The track seems to touch the border of the inner CDC. This is probably ok.
-    return;
-  }
-
-  const double perpSOfSecondExit = trajectory2D.calcPerpS(reentry);
-
-
+  // Count the number of clusters from the beginning to the first inner exit
+  unsigned int numberOfHitsBeforeVXD = 0;
+  unsigned int numberOfHitsAfterVXD = 0;
   for (const CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = recoHit.getPerpS();
-    if (currentPerpS < perpSOfSecondExit and currentPerpS >= perpSOfFirstInnerExit) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (currentArcLength2D < ArcLength2DOfInnerExit) {
+      numberOfHitsBeforeVXD++;
+    }
+
+    else if (currentArcLength2D > ArcLength2DOfNextInnerExit) {
+      numberOfHitsAfterVXD++;
+    }
+  }
+
+  if (numberOfHitsBeforeVXD > 0) {
+    for (const CDCRecoHit3D& recoHit : track) {
+      const double currentArcLength2D = recoHit.getArcLength2D();
+      if (currentArcLength2D < ArcLength2DOfInnerExit) {
+        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      }
     }
   }
 }
@@ -240,7 +274,7 @@ void removeHitsAfterCDCWall(CDCTrack& track)
     return;
   }
 
-  const double perpSOfExit = trajectory2D.calcPerpS(outerExit);
+  const double ArcLength2DOfExit = trajectory2D.calcArcLength2D(outerExit);
   bool removeAfterThis = false;
 
   for (const CDCRecoHit3D& recoHit : track) {
@@ -249,8 +283,8 @@ void removeHitsAfterCDCWall(CDCTrack& track)
       continue;
     }
 
-    const double currentPerpS = recoHit.getPerpS();
-    if (currentPerpS > perpSOfExit) {
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (currentArcLength2D > ArcLength2DOfExit) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       removeAfterThis = true;
     }
@@ -276,10 +310,8 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
         removeHitsIfOnlyOneSuperLayer(track);
       } else if (correctorFunction == "Small") {
         removeHitsIfSmall(track);
-      } else if (correctorFunction == "B2B") {
-        removeBack2BackStuff(track);
-      } else if (correctorFunction == "PerpS") {
-        removePerpSHoles(track);
+      } else if (correctorFunction == "ArcLength2D") {
+        removeArcLength2DHoles(track);
       } else if (correctorFunction == "CDCEnd") {
         removeHitsAfterCDCWall(track);
       } else if (correctorFunction == "CenterPointing") {
@@ -295,9 +327,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     if (track.size() == 0)
       continue;
 
-    track.sortByArcLength2D();
-
-    resetTrajectoryOfTrack(track);
+    trackQualityTools.normalizeHitsAndResetTrajectory(track);
   }
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {

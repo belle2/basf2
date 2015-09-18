@@ -1,5 +1,6 @@
 #include <tracking/modules/trackFinderCDC/TrackQualityAsserterCDCModule.h>
 
+#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/dataobjects/Helix.h>
 
@@ -46,6 +47,7 @@ void removeSecondHalfOfTrack(CDCTrack& track)
 void removeHitsAfterLayerBreak(CDCTrack& track)
 {
   ILayerType lastLayer = -1;
+  Vector2D lastWirePosition;
   bool removeAfterThis = false;
 
   for (const CDCRecoHit3D& recoHit : track) {
@@ -55,15 +57,71 @@ void removeHitsAfterLayerBreak(CDCTrack& track)
     }
 
     const ILayerType currentLayer = recoHit.getWire().getICLayer();
+    const Vector2D& currentPosition = recoHit.getRecoPos2D();
     if (lastLayer != -1) {
       const ILayerType delta = currentLayer - lastLayer;
-      if (abs(delta) > 5) {
+      const double distance = (currentPosition - lastWirePosition).norm();
+      if (abs(delta) > 4 or distance > 50) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       }
     }
 
+    lastWirePosition = currentPosition;
     lastLayer = currentLayer;
+  }
+}
+
+void removeBack2BackStuff(CDCTrack& track)
+{
+  const Vector2D origin(0, 0);
+
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+
+  if (trajectory2D.getOuterExit().hasNAN()) {
+    return;
+  }
+
+  track.sort();
+  double perpSOfInnermostHit = track.front().getPerpS();
+  track.sortByPerpS();
+
+  B2INFO("New Track")
+  for (const CDCRecoHit3D& recoHit : track) {
+    B2INFO(recoHit.getPerpS())
+    if (recoHit.getPerpS() - perpSOfInnermostHit < 0) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    }
+  }
+}
+
+void removePerpSHoles(CDCTrack& track)
+{
+  double lastPerpS = std::nan("");
+
+  bool removeAfterThis = false;
+
+  B2INFO("Track:")
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      continue;
+    }
+
+    const double currentPerpS = recoHit.getPerpS();
+    if (not std::isnan(lastPerpS)) {
+      B2INFO(recoHit.getPerpS())
+      const double delta = currentPerpS - lastPerpS;
+      if (delta > 100) {
+        B2INFO("Deleting after this")
+        removeAfterThis = true;
+        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      }
+    }
+
+    lastPerpS = currentPerpS;
   }
 }
 
@@ -91,19 +149,12 @@ void removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
 
 void removeHitsIfSmall(CDCTrack& track)
 {
-  bool deleteTrack = track.size() < 3;
+  bool deleteTrack = track.size() < 5;
 
   if (deleteTrack) {
     for (const CDCRecoHit3D& recoHit : track) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
-  }
-}
-
-void resetTrack(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& recoHit : track) {
-    recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
   }
 }
 
@@ -122,7 +173,7 @@ void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track)
     if (not std::isnan(lastAngle)) {
       const double delta = currentAngle - lastAngle;
       const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
-      if (fabs(normalizedDelta) > 0.5) {
+      if (fabs(normalizedDelta) > 0.7) {
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       }
@@ -146,42 +197,36 @@ void removeAllMarkedHits(CDCTrack& track)
   }), track.end());
 }
 
-void resetTrajectoryOfTrack(CDCTrack& track)
-{
-  const CDCTrajectory3D& cdcTrajectory = track.getStartTrajectory3D();
-
-  const short charge = track.getStartChargeSign();
-  if (abs(charge) == 1) {
-    Belle2::Helix trajectory(cdcTrajectory.getSupport(), cdcTrajectory.getMom3DAtSupport() , charge, 1.5);
-    const Vector2D& startPosition = track.front().getRecoPos2D();
-    const double perpSAtFront = trajectory.getArcLength2DAtXY(startPosition.x(), startPosition.y());
-    Vector3D position(trajectory.getPositionAtArcLength2D(perpSAtFront));
-    Vector3D momentum(trajectory.getMomentumAtArcLength2D(perpSAtFront, 1.5));
-
-    track.setStartTrajectory3D(CDCTrajectory3D(position, momentum, charge));
-  }
-}
-
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
+
   for (CDCTrack& track : tracks) {
     // Reset all hits to not have a background hit (what they should not have anyway)
-    resetTrack(track);
+    trackQualityTools.normalizeHitsAndResetTrajectory(track);
     if (track.getStartTrajectory3D().getAbsMom3D() > m_param_minimalMomentum)
       continue;
 
-    //removeSecondHalfOfTrack(track);
-    removeHitsAfterLayerBreak(track);
-    removeAllMarkedHits(track);
+    for (const std::string& correctorFunction : m_param_corrections) {
+      if (correctorFunction == "LayerBreak") {
+        removeHitsAfterLayerBreak(track);
+      } else if (correctorFunction == "LargeAngle") {
+        removeHitsInTheBeginningIfAngleLarge(track);
+      } else if (correctorFunction == "OneSuperlayer") {
+        removeHitsIfOnlyOneSuperLayer(track);
+      } else if (correctorFunction == "Small") {
+        removeHitsIfSmall(track);
+      } else if (correctorFunction == "B2B") {
+        removeBack2BackStuff(track);
+      } else if (correctorFunction == "PerpS") {
+        removePerpSHoles(track);
+      } else {
+        B2FATAL("Do not know corrector function " << correctorFunction);
+      }
 
-    removeHitsInTheBeginningIfAngleLarge(track);
-    removeAllMarkedHits(track);
-
-    removeHitsIfOnlyOneSuperLayer(track);
-    removeAllMarkedHits(track);
-
-    removeHitsIfSmall(track);
-    removeAllMarkedHits(track);
+      removeAllMarkedHits(track);
+      trackQualityTools.normalizeHitsAndResetTrajectory(track);
+    }
 
     if (track.size() == 0)
       continue;

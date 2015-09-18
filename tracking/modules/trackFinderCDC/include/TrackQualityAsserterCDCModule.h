@@ -23,6 +23,12 @@ namespace Belle2 {
     TrackQualityAsserterCDCModule() : TrackFinderCDCBaseModule()
     {
       setDescription("Many tracks in the CDC can not be fitted. For fitting them, we remove parts of the hits or maybe the whole track.");
+
+      addParam("minimalMomentum", m_param_minimalMomentum,
+               "The minimal momentum under which the corrections take place. Use an arbitrary high value (like 10) to use all tracks.", 10.0);
+      addParam("corrections", m_param_corrections,
+               "The list of corrections to apply. Choose from LayerBreak, LargeAngle, OneSuperlayer, Small.",
+      {std::string("LayerBreak"), std::string("LargeAngle"), std::string("OneSuperlayer"), std::string("Small")});
     }
 
   private:
@@ -34,6 +40,9 @@ namespace Belle2 {
 
     /** Minimal Momentum under which to do the corrections. */
     double m_param_minimalMomentum = 0.4;
+
+    /** The corrections to use */
+    std::vector<std::string> m_param_corrections;
   };
 
 }

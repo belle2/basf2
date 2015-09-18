@@ -5,14 +5,13 @@
 #include <framework/dataobjects/Helix.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-#include <boost/range/adaptor/reversed.hpp>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 REG_MODULE(TrackQualityAsserterCDC);
 
+/* Corrector functions */
 void removeSecondHalfOfTrack(CDCTrack& track)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
@@ -40,134 +39,11 @@ void removeSecondHalfOfTrack(CDCTrack& track)
   for (const CDCRecoHit3D& recoHit : track) {
     const double currentArcLength2D = recoHit.getArcLength2D();
     if ((negativeHitsAreMore and currentArcLength2D > 0) or (not negativeHitsAreMore and currentArcLength2D < 0)) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
     }
   }
 }
 
-void removeHitsAfterLayerBreak(CDCTrack& track)
-{
-  ILayerType lastLayer = -1;
-  Vector2D lastWirePosition;
-
-  std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
-  trackletList.reserve(3);
-
-  std::vector<const CDCRecoHit3D*>* currentTracklet = nullptr;
-
-  for (const CDCRecoHit3D& recoHit : track) {
-    if (currentTracklet == nullptr) {
-      trackletList.emplace_back();
-      currentTracklet = &(trackletList.back());
-    }
-
-    const ILayerType currentLayer = recoHit.getWire().getICLayer();
-    const Vector2D& currentPosition = recoHit.getRecoPos2D();
-    if (lastLayer != -1) {
-      const ILayerType delta = currentLayer - lastLayer;
-      const double distance = (currentPosition - lastWirePosition).norm();
-      if (abs(delta) > 4 or distance > 50) {
-        trackletList.emplace_back();
-        currentTracklet = &(trackletList.back());
-      }
-    }
-
-    lastWirePosition = currentPosition;
-    lastLayer = currentLayer;
-
-    currentTracklet->push_back(&recoHit);
-  }
-
-  if (trackletList.size() > 1) {
-    for (const std::vector<const CDCRecoHit3D*>& tracklet : trackletList) {
-      if (tracklet.size() < 5) {
-        for (const CDCRecoHit3D* recoHit : tracklet) {
-          recoHit->getWireHit().getAutomatonCell().setBackgroundFlag();
-        }
-      }
-    }
-  }
-}
-
-void removeBack2BackStuff(CDCTrack& track)
-{
-  const Vector2D origin(0, 0);
-
-  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
-  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-
-  if (trajectory2D.getOuterExit().hasNAN()) {
-    return;
-  }
-
-  track.sort();
-  double ArcLength2DOfInnermostHit = track.front().getArcLength2D();
-  track.sortByArcLength2D();
-
-  for (const CDCRecoHit3D& recoHit : track) {
-    if (recoHit.getArcLength2D() - ArcLength2DOfInnermostHit < 0) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-    }
-  }
-}
-
-void removeArcLength2DHoles(CDCTrack& track)
-{
-  double lastArcLength2D = std::nan("");
-
-  bool removeAfterThis = false;
-
-  for (const CDCRecoHit3D& recoHit : track) {
-    if (removeAfterThis) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      continue;
-    }
-
-    const double currentArcLength2D = recoHit.getArcLength2D();
-    if (not std::isnan(lastArcLength2D)) {
-      const double delta = currentArcLength2D - lastArcLength2D;
-      if (delta > 100) {
-        removeAfterThis = true;
-        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      }
-    }
-
-    lastArcLength2D = currentArcLength2D;
-  }
-}
-
-void removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
-{
-  ISuperLayerType lastLayer = -1;
-  bool deleteTrack = true;
-
-  for (const CDCRecoHit3D& recoHit : track) {
-    const ISuperLayerType currentLayer = recoHit.getISuperLayer();
-    if (lastLayer != -1 and lastLayer != currentLayer) {
-      deleteTrack = false;
-      break;
-    }
-
-    lastLayer = currentLayer;
-  }
-
-  if (deleteTrack) {
-    for (const CDCRecoHit3D& recoHit : track) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-    }
-  }
-}
-
-void removeHitsIfSmall(CDCTrack& track)
-{
-  bool deleteTrack = track.size() < 7;
-
-  if (deleteTrack) {
-    for (const CDCRecoHit3D& recoHit : track) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-    }
-  }
-}
 
 void revertTrajectoriesPointingToTheCenter(CDCTrack& track)
 {
@@ -220,76 +96,12 @@ void revertTrajectoriesPointingToTheCenter(CDCTrack& track)
     for (const CDCRecoHit3D& recoHit : track) {
       const double currentArcLength2D = recoHit.getArcLength2D();
       if (currentArcLength2D < ArcLength2DOfInnerExit) {
-        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+        recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
       }
     }
   }
 }
 
-void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track)
-{
-  double lastAngle = NAN;
-  bool removeAfterThis = false;
-
-  for (const CDCRecoHit3D& recoHit : boost::adaptors::reverse(track)) {
-    if (removeAfterThis) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      continue;
-    }
-
-    const double currentAngle = recoHit.getRecoPos2D().phi();
-    if (not std::isnan(lastAngle)) {
-      const double delta = currentAngle - lastAngle;
-      const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
-      if (fabs(normalizedDelta) > 0.7) {
-        removeAfterThis = true;
-        recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      }
-    }
-
-    lastAngle = currentAngle;
-  }
-}
-
-void removeAllMarkedHits(CDCTrack& track)
-{
-  // Delete all hits that were marked
-  track.erase(std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & recoHit) -> bool {
-    if (recoHit.getWireHit().getAutomatonCell().hasBackgroundFlag())
-    {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    } else {
-      return false;
-    }
-  }), track.end());
-}
-
-void removeHitsAfterCDCWall(CDCTrack& track)
-{
-  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const Vector2D& outerExit = trajectory2D.getOuterExit();
-
-  if (outerExit.hasNAN()) {
-    return;
-  }
-
-  const double ArcLength2DOfExit = trajectory2D.calcArcLength2D(outerExit);
-  bool removeAfterThis = false;
-
-  for (const CDCRecoHit3D& recoHit : track) {
-    if (removeAfterThis) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      continue;
-    }
-
-    const double currentArcLength2D = recoHit.getArcLength2D();
-    if (currentArcLength2D > ArcLength2DOfExit) {
-      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
-      removeAfterThis = true;
-    }
-  }
-}
 
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
@@ -303,24 +115,34 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
     for (const std::string& correctorFunction : m_param_corrections) {
       if (correctorFunction == "LayerBreak") {
-        removeHitsAfterLayerBreak(track);
+        trackQualityTools.removeHitsAfterLayerBreak(track);
       } else if (correctorFunction == "LargeAngle") {
-        removeHitsInTheBeginningIfAngleLarge(track);
+        trackQualityTools.removeHitsInTheBeginningIfAngleLarge(track);
+      } else if (correctorFunction == "LargeBreak2") {
+        trackQualityTools.removeHitsAfterLayerBreak2(track);
       } else if (correctorFunction == "OneSuperlayer") {
-        removeHitsIfOnlyOneSuperLayer(track);
+        trackQualityTools.removeHitsIfOnlyOneSuperLayer(track);
       } else if (correctorFunction == "Small") {
-        removeHitsIfSmall(track);
-      } else if (correctorFunction == "ArcLength2D") {
-        removeArcLength2DHoles(track);
-      } else if (correctorFunction == "CDCEnd") {
-        removeHitsAfterCDCWall(track);
+        trackQualityTools.removeHitsIfSmall(track);
+      } else if (correctorFunction == "B2B") {
+        trackQualityTools.removeHitsOnTheWrongSide(track);
+      } else if (correctorFunction == "None") {
+        ;
+      }
+
+      else if (correctorFunction == "ArcLength2D") {
+        trackQualityTools.removeArcLength2DHoles(track);
+      } else if (correctorFunction == "CDCWall") {
+        B2FATAL("Do not use this function as it is not working probably.");
+        trackQualityTools.removeHitsAfterCDCWall(track);
       } else if (correctorFunction == "CenterPointing") {
+        B2FATAL("Do not use this function as it is not working probably.");
         revertTrajectoriesPointingToTheCenter(track);
       } else {
         B2FATAL("Do not know corrector function " << correctorFunction);
       }
 
-      removeAllMarkedHits(track);
+      track.removeAllAssignedMarkedHits();
       trackQualityTools.normalizeHitsAndResetTrajectory(track);
     }
 

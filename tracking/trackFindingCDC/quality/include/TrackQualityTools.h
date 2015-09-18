@@ -38,6 +38,28 @@ namespace Belle2 {
        */
       void normalizeHitsAndResetTrajectory(CDCTrack& track) const;
 
+      void removeHitsAfterCDCWall(CDCTrack& track) const;
+
+      void removeHitsIfSmall(CDCTrack& track) const;
+
+      void removeHitsAfterLayerBreak(CDCTrack& track) const;
+
+      void removeHitsAfterLayerBreak2(CDCTrack& track) const;
+
+      void removeHitsInTheBeginningIfAngleLarge(CDCTrack& track) const;
+
+      void removeHitsIfOnlyOneSuperLayer(CDCTrack& track) const;
+
+      void removeHitsOnTheWrongSide(CDCTrack& track) const;
+
+      void removeArcLength2DHoles(CDCTrack& track) const;
+
+    private:
+      const double m_outerCylindricalRFactor = 1.1;
+      const unsigned int m_minimalHits = 7;
+      const int m_maximalLayerDelta = 7;
+      const double m_maximalAngle = 0.7;
+      const double m_maximumArcLength2DDistance = 10;
     };
   }
 }

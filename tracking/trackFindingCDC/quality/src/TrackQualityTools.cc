@@ -1,7 +1,12 @@
 #include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectories.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <framework/dataobjects/Helix.h>
+
+#include <boost/range/adaptor/reversed.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -47,16 +52,269 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   else
     track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, newStartMomentum, charge));
 
+  for (CDCRecoHit3D& recoHit : track) {
+    recoHit.setArcLength2D(currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D()));
+    recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
+    recoHit.getWireHit().getAutomatonCell().setTakenFlag();
+  }
+
   // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
   // especially for curlers. For this, we go through all hits and look for negative perpS.
   // If we have found one, we shift it to positive values
   track.shiftToPositiveArcLengths2D();
 
-  for (CDCRecoHit3D& recoHit : track) {
-    recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
-    recoHit.getWireHit().getAutomatonCell().setTakenFlag();
-  }
-
   // We can now sort by perpS
   track.sortByArcLength2D();
+}
+
+
+// Remove all hits which can not belong to the track, as the particle can not exit and enter the CDC again.
+// Works not very good
+void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track) const
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  const double radius = trajectory2D.getLocalCircle().radius();
+
+  // Curler are allowed to have hits on both arms
+  if (trajectory2D.isCurler(m_outerCylindricalRFactor)) {
+    return;
+  }
+
+  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(m_outerCylindricalRFactor);
+
+  double arcLength2DOfExitWithFactor = trajectory2D.calcArcLength2D(outerExitWithFactor);
+  if (arcLength2DOfExitWithFactor < 0) {
+    arcLength2DOfExitWithFactor += 2 * TMath::Pi() * radius;
+  }
+  bool removeAfterThis = false;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      continue;
+    }
+
+    double currentArcLength2D = recoHit.getArcLength2D();
+    if (currentArcLength2D < 0) {
+      currentArcLength2D += 2 * TMath::Pi() * radius;
+    }
+
+    if (currentArcLength2D > arcLength2DOfExitWithFactor) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      removeAfterThis = true;
+    }
+  }
+}
+
+void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track) const
+{
+  ILayerType lastLayer = -1;
+  Vector2D lastWirePosition;
+
+  std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
+  trackletList.reserve(3);
+
+  std::vector<const CDCRecoHit3D*>* currentTracklet = nullptr;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (currentTracklet == nullptr) {
+      trackletList.emplace_back();
+      currentTracklet = &(trackletList.back());
+    }
+
+    const ILayerType currentLayer = recoHit.getWire().getICLayer();
+    const Vector2D& currentPosition = recoHit.getRecoPos2D();
+    if (lastLayer != -1) {
+      const ILayerType delta = currentLayer - lastLayer;
+      const double distance = (currentPosition - lastWirePosition).norm();
+      if (abs(delta) > 4 or distance > 50) {
+        trackletList.emplace_back();
+        currentTracklet = &(trackletList.back());
+      }
+    }
+
+    lastWirePosition = currentPosition;
+    lastLayer = currentLayer;
+
+    currentTracklet->push_back(&recoHit);
+  }
+
+  if (trackletList.size() > 1) {
+    for (const std::vector<const CDCRecoHit3D*>& tracklet : trackletList) {
+      if (tracklet.size() < 5) {
+        for (const CDCRecoHit3D* recoHit : tracklet) {
+          recoHit->getWireHit().getAutomatonCell().setBackgroundFlag();
+        }
+      }
+    }
+  }
+}
+
+
+// Search for consecutive hits with 2D-distance below 50 and layer-delta below 4. If the number of consecutive hits is below 7, remove them.
+// Works quite well for finding large "breaks" in the track.
+void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track) const
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+  const double radius = trajectory2D.getLocalCircle().radius();
+
+  if (std::isnan(radius)) {
+    return;
+  }
+
+  std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
+
+  double lastArcLength2D = std::nan("");
+
+  std::vector<const CDCRecoHit3D*>* currentTracklet = nullptr;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (currentTracklet == nullptr) {
+      trackletList.emplace_back();
+      currentTracklet = &(trackletList.back());
+    }
+
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (not std::isnan(lastArcLength2D)) {
+      const double delta = (currentArcLength2D - lastArcLength2D);
+      if (abs(delta) > m_maximumArcLength2DDistance) {
+        trackletList.emplace_back();
+        currentTracklet = &(trackletList.back());
+      }
+    }
+
+    lastArcLength2D = currentArcLength2D;
+
+    currentTracklet->push_back(&recoHit);
+  }
+
+  if (trackletList.size() > 1) {
+    // Throw away the ends if they are too small
+    while (trackletList.back().size() < 5 and trackletList.size() > 0) {
+      for (const CDCRecoHit3D* recoHit : trackletList.back()) {
+        recoHit->getWireHit().getAutomatonCell().setAssignedFlag();
+      }
+
+      trackletList.pop_back();
+    }
+
+    std::reverse(trackletList.begin(), trackletList.end());
+
+    while (trackletList.back().size() < 5 and trackletList.size() > 0) {
+      for (const CDCRecoHit3D* recoHit : trackletList.back()) {
+        recoHit->getWireHit().getAutomatonCell().setAssignedFlag();
+      }
+
+      trackletList.pop_back();
+    }
+  }
+}
+
+void TrackQualityTools::removeHitsIfSmall(CDCTrack& track) const
+{
+  const bool deleteTrack = track.size() < m_minimalHits;
+
+  if (deleteTrack) {
+    for (const CDCRecoHit3D& recoHit : track) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+    }
+  }
+}
+
+void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track) const
+{
+  double lastAngle = NAN;
+  bool removeAfterThis = false;
+
+  for (const CDCRecoHit3D& recoHit : boost::adaptors::reverse(track)) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      continue;
+    }
+
+    const double currentAngle = recoHit.getRecoPos2D().phi();
+    if (not std::isnan(lastAngle)) {
+      const double delta = currentAngle - lastAngle;
+      const double normalizedDelta = std::min(TVector2::Phi_0_2pi(delta), TVector2::Phi_0_2pi(-delta));
+      if (fabs(normalizedDelta) > m_maximalAngle) {
+        removeAfterThis = true;
+        recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      }
+    }
+
+    lastAngle = currentAngle;
+  }
+}
+
+
+void TrackQualityTools::removeHitsIfOnlyOneSuperLayer(CDCTrack& track) const
+{
+  ISuperLayerType lastLayer = -1;
+  bool deleteTrack = true;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    const ISuperLayerType currentLayer = recoHit.getISuperLayer();
+    if (lastLayer != -1 and lastLayer != currentLayer) {
+      deleteTrack = false;
+      break;
+    }
+
+    lastLayer = currentLayer;
+  }
+
+  if (deleteTrack) {
+    for (const CDCRecoHit3D& recoHit : track) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+    }
+  }
+}
+
+void TrackQualityTools::removeHitsOnTheWrongSide(CDCTrack& track) const
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+
+  // Curler are allowed to have negative arc lengths
+  if (trajectory2D.isCurler()) {
+    return;
+  }
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) < 0) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+    }
+  }
+}
+
+void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track) const
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+  const double radius = trajectory2D.getLocalCircle().radius();
+
+  if (std::isnan(radius)) {
+    return;
+  }
+
+  double lastArcLength2D = std::nan("");
+  bool removeAfterThis = false;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+      continue;
+    }
+
+    const double currentArcLength2D = recoHit.getArcLength2D();
+    if (not std::isnan(lastArcLength2D)) {
+      const double delta = (currentArcLength2D - lastArcLength2D) / radius;
+      if (delta > m_maximumArcLength2DDistance) {
+        removeAfterThis = true;
+        recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+        continue;
+      }
+    }
+
+    lastArcLength2D = currentArcLength2D;
+  }
 }

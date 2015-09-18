@@ -87,9 +87,7 @@ void removeBack2BackStuff(CDCTrack& track)
   double perpSOfInnermostHit = track.front().getPerpS();
   track.sortByPerpS();
 
-  B2INFO("New Track")
   for (const CDCRecoHit3D& recoHit : track) {
-    B2INFO(recoHit.getPerpS())
     if (recoHit.getPerpS() - perpSOfInnermostHit < 0) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
@@ -102,8 +100,6 @@ void removePerpSHoles(CDCTrack& track)
 
   bool removeAfterThis = false;
 
-  B2INFO("Track:")
-
   for (const CDCRecoHit3D& recoHit : track) {
     if (removeAfterThis) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
@@ -112,10 +108,8 @@ void removePerpSHoles(CDCTrack& track)
 
     const double currentPerpS = recoHit.getPerpS();
     if (not std::isnan(lastPerpS)) {
-      B2INFO(recoHit.getPerpS())
       const double delta = currentPerpS - lastPerpS;
       if (delta > 100) {
-        B2INFO("Deleting after this")
         removeAfterThis = true;
         recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
       }
@@ -149,10 +143,50 @@ void removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
 
 void removeHitsIfSmall(CDCTrack& track)
 {
-  bool deleteTrack = track.size() < 5;
+  bool deleteTrack = track.size() < 7;
 
   if (deleteTrack) {
     for (const CDCRecoHit3D& recoHit : track) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+    }
+  }
+}
+
+void revertTrajectoriesPointingToTheCenter(CDCTrack& track)
+{
+  const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
+  const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
+  const Vector2D& outerExit = trajectory2D.getOuterExit();
+  const double radius = trajectory2D.getLocalCircle().radius();
+
+  const Vector2D& innerExit = trajectory2D.getInnerExit();
+  if (innerExit.hasNAN()) {
+    // Huh?
+    B2WARNING("Strange track...")
+    return;
+  }
+
+  const double perpSOfFirstInnerExit = trajectory2D.calcPerpS(innerExit);
+
+  if (perpSOfFirstInnerExit > 0.2 * radius) {
+    return;
+  }
+
+  // We want to determine the entry into the cdc
+  const CDCTrajectory2D reversedTrajectory(trajectory2D.getSupport(), -trajectory2D.getMom2DAtSupport(),
+                                           -trajectory2D.getChargeSign());
+  const Vector2D& reentry = reversedTrajectory.getInnerExit();
+  if (reentry.hasNAN()) {
+    // The track seems to touch the border of the inner CDC. This is probably ok.
+    return;
+  }
+
+  const double perpSOfSecondExit = trajectory2D.calcPerpS(reentry);
+
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    const double currentPerpS = recoHit.getPerpS();
+    if (currentPerpS < perpSOfSecondExit and currentPerpS >= perpSOfFirstInnerExit) {
       recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
     }
   }
@@ -197,6 +231,32 @@ void removeAllMarkedHits(CDCTrack& track)
   }), track.end());
 }
 
+void removeHitsAfterCDCWall(CDCTrack& track)
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  const Vector2D& outerExit = trajectory2D.getOuterExit();
+
+  if (outerExit.hasNAN()) {
+    return;
+  }
+
+  const double perpSOfExit = trajectory2D.calcPerpS(outerExit);
+  bool removeAfterThis = false;
+
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (removeAfterThis) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      continue;
+    }
+
+    const double currentPerpS = recoHit.getPerpS();
+    if (currentPerpS > perpSOfExit) {
+      recoHit.getWireHit().getAutomatonCell().setBackgroundFlag();
+      removeAfterThis = true;
+    }
+  }
+}
+
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
@@ -220,6 +280,10 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
         removeBack2BackStuff(track);
       } else if (correctorFunction == "PerpS") {
         removePerpSHoles(track);
+      } else if (correctorFunction == "CDCEnd") {
+        removeHitsAfterCDCWall(track);
+      } else if (correctorFunction == "CenterPointing") {
+        revertTrajectoriesPointingToTheCenter(track);
       } else {
         B2FATAL("Do not know corrector function " << correctorFunction);
       }

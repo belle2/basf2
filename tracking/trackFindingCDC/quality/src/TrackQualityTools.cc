@@ -32,7 +32,6 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
 
   // Check if we have to reverse the trajectory. This is done by counting the number of hits
   // with positive an with negative perpS
-  bool reverseTrajectory = false;
   unsigned int numberOfPositiveHits = 0;
   for (CDCRecoHit3D& recoHit : track) {
     const double currentPerpS = currentTrajectory2D.calcPerpS(recoHit.getRecoPos2D());
@@ -41,7 +40,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
     }
   }
   // We reset the trajectory here to start at the newStartPosition of the first hit
-  reverseTrajectory = 2 * numberOfPositiveHits < track.size();
+  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size();
 
   if (reverseTrajectory)
     track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, -newStartMomentum, -charge));

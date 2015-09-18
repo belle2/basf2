@@ -35,7 +35,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   bool reverseTrajectory = false;
   unsigned int numberOfPositiveHits = 0;
   for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = recoHit.getPerpS(currentTrajectory2D);
+    const double currentPerpS = currentTrajectory2D.calcPerpS(recoHit.getRecoPos2D());
     if (currentPerpS > 0) {
       numberOfPositiveHits++;
     }
@@ -57,7 +57,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   for (CDCRecoHit3D& recoHit : track) {
     recoHit.getWireHit().getAutomatonCell().unsetBackgroundFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
-    double currentPerpS = recoHit.getPerpS(trajectory2D);
+    double currentPerpS = trajectory2D.calcPerpS(recoHit.getRecoPos2D());
     if (currentPerpS < 0) {
       recoHit.setPerpS(2 * TMath::Pi() * radius + currentPerpS);
     } else {

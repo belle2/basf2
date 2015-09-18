@@ -241,7 +241,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
                  output_track_cands_store_vector_name="CDCTrackVector",
                  assign_stereo_hits=True, debug_output=False,
                  TracksStoreObjNameIsInput=False,
-                 stereo_level=5, stereo_hits=5):
+                 stereo_level=6, stereo_hits=5):
 
         module_list = []
 
@@ -251,7 +251,13 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
             TracksStoreObjNameIsInput=TracksStoreObjNameIsInput,
             TracksStoreObjName=output_track_cands_store_vector_name)
 
-        last_tracking_module = legendre_tracking_module
+        module_list.append(legendre_tracking_module)
+
+        quality_module = StandardEventGenerationRun.get_basf2_module("TrackQualityAsserterCDC", WriteGFTrackCands=False,
+                                                                     TracksStoreObjNameIsInput=True,
+                                                                     corrections=["B2B"])
+
+        last_tracking_module = quality_module
 
         cdc_stereo_combiner = StandardEventGenerationRun.get_basf2_module(
             'StereoHitFinderCDCLegendreHistogramming',

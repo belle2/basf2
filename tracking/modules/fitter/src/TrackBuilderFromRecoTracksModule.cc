@@ -50,6 +50,7 @@ void TrackBuilderFromRecoTracksModule::initialize()
   StoreArray<Track> tracks(m_param_tracksStoreArrayName);
   tracks.registerInDataStore();
   tracks.registerRelationTo(recoTracks);
+  tracks.registerRelationTo(trackCands);
 
   StoreArray<MCParticle> mcParticles;
   if (mcParticles.isOptional()) {
@@ -168,6 +169,11 @@ void TrackBuilderFromRecoTracksModule::event()
       MCParticle* relatedMCParticle = recoTrack.getRelated<MCParticle>();
       if (relatedMCParticle != nullptr) {
         addedBelleTrack->addRelationTo(relatedMCParticle);
+      }
+
+      genfit::TrackCand* relatedTrackCand = recoTrack.getRelated<genfit::TrackCand>();
+      if (relatedTrackCand != nullptr) {
+        addedBelleTrack->addRelationTo(relatedTrackCand);
       }
 
       B2DEBUG(50, "Built Belle2::Track");

@@ -5,6 +5,10 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
+
+#include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/translators/RealisticCDCGeometryTranslator.h>
+#include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/gearbox/Const.h>
 
 using namespace Belle2;
@@ -61,6 +65,12 @@ void MeasurementCreatorModule::initialize()
   StoreArray<RecoTrack::UsedPXDHit> pxdHits(m_param_storeArrayNameOfPXDHits);
   StoreArray<RecoTrack::UsedSVDHit> svdHits(m_param_storeArrayNameOfSVDHits);
   StoreArray<RecoTrack::UsedCDCHit> cdcHits(m_param_storeArrayNameOfCDCHits);
+
+  // Create new Translators and give them to the CDCRecoHits.
+  CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
+                             new CDC::RealisticCDCGeometryTranslator(true),
+                             new CDC::RealisticTDCCountTranslator(true),
+                             true);
 
   // Create the related measurement factory
   if (pxdHits.isOptional())

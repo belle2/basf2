@@ -46,6 +46,7 @@ void RecoTrackCreatorModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.registerInDataStore();
   recoTracks.registerRelationTo(trackCandidates);
+  trackCandidates.registerRelationTo(recoTracks);
 
   StoreArray<MCParticle> mcParticles;
   if (mcParticles.isOptional()) {
@@ -100,6 +101,7 @@ void RecoTrackCreatorModule::event()
                                                              m_param_recoHitInformationStoreArrayName);
 
     newRecoTrack->addRelationTo(&trackCandidate);
+    DataStore::Instance().addRelationFromTo(&trackCandidate, newRecoTrack);
 
     // Add also the MC information
     const int mcParticleID = trackCandidate.getMcTrackId();

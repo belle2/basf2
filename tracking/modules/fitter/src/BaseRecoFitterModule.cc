@@ -15,11 +15,6 @@
 #include <genfit/MaterialEffects.h>
 #include <genfit/FieldManager.h>
 
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/translators/LinearGlobalADCCountTranslator.h>
-#include <cdc/translators/RealisticCDCGeometryTranslator.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/modules/fitter/BaseRecoFitterModule.h>
@@ -54,12 +49,6 @@ void BaseRecoFitterModule::initialize()
   if (!genfit::FieldManager::getInstance()->isInitialized()) {
     B2FATAL("Magnetic field not set up. Please use SetupGenfitExtrapolationModule.");
   }
-
-  // Create new Translators and give them to the CDCRecoHits.
-  CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
-                             new CDC::RealisticCDCGeometryTranslator(true),
-                             new CDC::RealisticTDCCountTranslator(true),
-                             true);
 }
 
 

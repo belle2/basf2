@@ -152,16 +152,32 @@ void CDCTrack::receiveMaskedFlag() const
 void CDCTrack::sort()
 { std::sort(begin(), end()); }
 
-void CDCTrack::shiftToPositiveArcLengths2D()
+void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {
   const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();
-  const double radius = startTrajectory2D.getLocalCircle().radius();
+  if (doForAllTracks or startTrajectory2D.isCurler(1.1)) {
+    const double radius = startTrajectory2D.getLocalCircle().radius();
 
-  if (not std::isinf(radius)) {
-    const double shiftValue = 2 * TMath::Pi() * radius;
-    for (CDCRecoHit3D& recoHit : *this) {
-      if (recoHit.getArcLength2D() < 0)
-        recoHit.shiftArcLength2D(shiftValue);
+    if (not std::isinf(radius)) {
+      const double shiftValue = 2 * TMath::Pi() * radius;
+      for (CDCRecoHit3D& recoHit : *this) {
+        if (recoHit.getArcLength2D() < 0)
+          recoHit.shiftArcLength2D(shiftValue);
+      }
     }
   }
+}
+
+void CDCTrack::removeAllAssignedMarkedHits()
+{
+  // Delete all hits that were marked
+  erase(std::remove_if(begin(), end(), [](const CDCRecoHit3D & recoHit) -> bool {
+    if (recoHit.getWireHit().getAutomatonCell().hasAssignedFlag())
+    {
+      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
+      return true;
+    } else {
+      return false;
+    }
+  }), end());
 }

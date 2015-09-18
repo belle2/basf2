@@ -124,8 +124,9 @@ namespace Belle2 {
       /** This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the outer radius of the outer most layer.
        *  If the trajectory does not meet the CDC by the outer wall this will return Vector2D(nan,nan)
+       *  The factor can be used to virtually resize the CDC.
        */
-      Vector2D getOuterExit() const;
+      Vector2D getOuterExit(double factor = 1) const;
 
 
       /// Calculates the point where the trajectory meets the inner wall of the CDC.
@@ -390,6 +391,14 @@ namespace Belle2 {
         m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
         return result;
+      }
+
+      /// Checks if the trajectory describes a curler by looking at the outerExit of the trajectory.
+      /// If it contains a NaN, the trajectory is a curler.
+      bool isCurler(double factor = 1) const
+      {
+        const Vector2D& outerExit = getOuterExit(factor);
+        return outerExit.hasNAN();
       }
 
     public:

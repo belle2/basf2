@@ -118,13 +118,13 @@ Vector2D CDCTrajectory2D::getInnerExit() const
   }
 }
 
-Vector2D CDCTrajectory2D::getOuterExit() const
+Vector2D CDCTrajectory2D::getOuterExit(double factor) const
 {
 
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
 
-  double outerCylindricalR = outerMostLayer.getOuterCylindricalR();
+  double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
 
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();

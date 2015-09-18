@@ -150,6 +150,9 @@ namespace Belle2 {
       */
       void receiveMaskedFlag() const;
 
+      /** Remove all hits from the track which have an assigned flag */
+      void removeAllAssignedMarkedHits();
+
       /// Sort the recoHits according to their perpS information
       void sortByArcLength2D()
       {
@@ -161,7 +164,8 @@ namespace Belle2 {
 
       /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
       /// This can only be done if the radius is not infinity (for example cosmics).
-      void shiftToPositiveArcLengths2D();
+      /// The flag can be used to do this for all tracks (default is to do this only for curlers)
+      void shiftToPositiveArcLengths2D(bool doForAllTracks = false);
 
       /// Sort the CDCRecoHits by their CDCWireHit.
       void sort() __attribute__((deprecated));

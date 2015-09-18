@@ -244,8 +244,8 @@ void EKLM::GeometryData::readXMLDataStrips()
  * @param[in]  eklm  EKLM point.
  * @param[out] clhep CLHEP point.
  */
-void setCLHEPPointByEKLMPoint(EKLM::Point2D& eklm,
-                              HepGeom::Point3D<double>& clhep)
+static void setCLHEPPointByEKLMPoint(EKLM::Point2D& eklm,
+                                     HepGeom::Point3D<double>& clhep)
 {
   clhep.setX(eklm.X);
   clhep.setY(eklm.Y);

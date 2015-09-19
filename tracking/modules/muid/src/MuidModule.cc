@@ -24,7 +24,6 @@
 #include <genfit/Exception.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <bklm/dataobjects/BKLMStatus.h>
@@ -33,7 +32,9 @@
 #include <simulation/kernel/ExtManager.h>
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
+#include <bklm/geometry/Module.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/geometry/GeometryData.h>
 
 #include <cmath>
 #include <vector>
@@ -55,19 +56,15 @@
 #include <globals.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4VPhysicalVolume.hh>
-// not needed #include <G4RunManager.hh>
 #include <G4ParticleTable.hh>
 #include <G4RegionStore.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorTrajErr.hh>
 #include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
-// not needed #include <G4TransportationManager.hh>
-// not needed #include <G4FieldManager.hh>
 #include <G4UImanager.hh>
 
 using namespace std;
-using namespace CLHEP;
 using namespace Belle2;
 
 #define TWOPI 6.283185482025146484375
@@ -199,49 +196,49 @@ void MuidModule::initialize()
   // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
   // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
   // *NOTE* If module ext runs after this, its G4UImanager commands will override these.
-  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * cm;
+  G4double maxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * CLHEP::cm;
   char line[80];
   std::sprintf(line, "/geant4e/limits/stepLength %8.2f mm", maxStep);
   G4UImanager::GetUIpointer()->ApplyCommand(line);
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
   G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
 
-  GearDir strContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double rMaxCoil = strContent.getLength("Cryostat/Rmin") * cm;
-  m_MinRadiusSq = (rMaxCoil * 0.25) * (rMaxCoil * 0.25); // roughly 40 cm
-
-  GearDir bklmContent = GearDir("/Detector/DetectorComponent[@name=\"BKLM\"]/Content/");
-  GearDir eklmContent = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/");
-  m_BarrelHalfLength = bklmContent.getLength("HalfLength") * cm; // in G4 units (mm)
-  m_EndcapHalfLength = 0.5 * eklmContent.getLength("Endcap/Length") * cm; // in G4 units (mm)
-  m_OffsetZ = bklmContent.getLength("OffsetZ") * cm; // in G4 units (mm)
+  bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
+  const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
+  m_MinRadiusSq = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
+  m_MinRadiusSq *= m_MinRadiusSq;
+  m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
+  m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->Length; // in G4 units (mm)
+  m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
-  m_BarrelMaxR = bklmContent.getLength("OuterRadius") * cm / cos(M_PI / bklmContent.getNumberNodes("Sectors/Forward/Sector"));
+  m_BarrelMaxR = bklmGeometry->getOuterRadius() * CLHEP::cm / cos(M_PI / bklmGeometry->getNSector()); // in G4 units (mm)
   m_Target = new Simulation::ExtCylSurfaceTarget(m_BarrelMaxR, minZ, maxZ);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
 
-  m_BarrelHalfLength /= cm;  // in G4e units (cm)
-  m_EndcapHalfLength /= cm;  // in G4e units (cm)
-  m_OffsetZ /= cm;           // in G4e units (cm)
-  m_BarrelMinR = bklmContent.getLength("Layers/InnerRadius");  // in G4e units (cm)
-  m_BarrelMaxR /= cm;                                          // in G4e units (cm)
-  m_EndcapMinR = eklmContent.getLength("Endcap/InnerR");       // in G4e units (cm)
-  m_EndcapMaxR = eklmContent.getLength("Endcap/OuterR");       // in G4e units (cm)
+  m_BarrelHalfLength /= CLHEP::cm;  // now in G4e units (cm)
+  m_EndcapHalfLength /= CLHEP::cm;  // now in G4e units (cm)
+  m_OffsetZ /= CLHEP::cm;           // now in G4e units (cm)
+  m_BarrelMinR = bklmGeometry->getGap1InnerRadius(); // in G4e units (cm)
+  m_BarrelMaxR /= CLHEP::cm;                                          // now in G4e units (cm)
+  m_EndcapMinR = eklmGeometry.getEndcapPosition()->InnerR / CLHEP::cm;     // in G4e units (cm)
+
+  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->OuterR / CLHEP::cm;     // in G4e units (cm)
   m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;   // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
-  double width = eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Width");
+  double width = eklmGeometry.getStripGeometry()->Width / CLHEP::cm;
   m_EndcapScintVariance = width * width / 12.0;
-  width = bklmContent.getLength("Module/Scintillator/Width"); // in G4e units (cm)
+  width = bklmGeometry->getScintHalfWidth() * 2.0; // in G4e units (cm)
   m_BarrelScintVariance = width * width / 12.0;
-  int nBarrelLayers = bklmContent.getNumberNodes("Layers/Layer");
+  int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
+    const bklm::Module* module = bklmGeometry->findModule(layer, false);
+    width = module->getPhiStripWidth(); // in G4e units (cm)
     std::sprintf(line, "Layers/Layer[@layer=\"%d\"]/PhiStrips/Width", layer);
-    width = bklmContent.getLength(line); // in G4e units (cm)
     m_BarrelPhiStripVariance[layer - 1] = width * width / 12.0;
+    width = module->getZStripWidth(); // in G4e units (cm)
     std::sprintf(line, "Layers/Layer[@layer=\"%d\"]/ZStrips/Width", layer);
-    width = bklmContent.getLength(line); // in G4e units (cm)
     m_BarrelZStripVariance[layer - 1] = width * width / 12.0;
   }
 
@@ -249,16 +246,16 @@ void MuidModule::initialize()
 
   m_OutermostActiveBarrelLayer = nBarrelLayers - 1; // zero-based counting
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-    m_BarrelModuleMiddleRadius[layer - 1] = bklm::GeometryPar::instance()->getActiveMiddleRadius(layer); // in G4e units (cm)
+    m_BarrelModuleMiddleRadius[layer - 1] = bklmGeometry->getActiveMiddleRadius(layer); // in G4e units (cm)
   }
-  double dz(eklmContent.getLength("Endcap/Layer/ShiftZ")); // in G4e units (cm)
-  double z0(eklmContent.getLength("Endcap/PositionZ") + dz
-            - 0.5 * eklmContent.getLength("Endcap/Length")
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Length")
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/Strips/Thickness")
-            - 0.5 * eklmContent.getLength("Endcap/Layer/Sector/Plane/PlasticSheetWidth")); // in G4e units (cm)
+  double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
+  double z0((eklmGeometry.getEndcapPosition()->Z + eklmGeometry.getLayerShiftZ()
+             - 0.5 * eklmGeometry.getEndcapPosition()->Length
+             - 0.5 * eklmGeometry.getLayerPosition()->Length
+             - 0.5 * eklmGeometry.getStripGeometry()->Thickness
+             - 0.5 * eklmGeometry.getPlasticSheetGeometry()->Width) / CLHEP::cm); // in G4e units (cm)
 
-  int nEndcapLayers = eklmContent.getInt("Endcap/nLayer");
+  int nEndcapLayers = eklmGeometry.getNLayers();
   m_OutermostActiveEndcapLayer = nEndcapLayers - 1; // zero-based counting
   for (int layer = 1; layer <= nEndcapLayers; ++layer) {
     m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1); // in G4e units (cm)

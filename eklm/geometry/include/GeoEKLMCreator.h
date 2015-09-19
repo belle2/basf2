@@ -163,6 +163,12 @@ namespace Belle2 {
      * @struct LogicalVolumes
      * Logical volumes of EKLM.
      *
+     * @var LogicalVolumes::shieldLayer
+     * Shield layer.
+     *
+     * @var LogicalVolumes::shieldLayerSector
+     * Shield layer sector.
+     *
      * @var LogicalVolumes::cover
      * Sector cover.
      *
@@ -191,6 +197,8 @@ namespace Belle2 {
      * Shield.
      */
     struct LogicalVolumes {
+      G4LogicalVolume* shieldLayer;
+      G4LogicalVolume* shieldLayerSector;
       G4LogicalVolume* cover;
       G4LogicalVolume** stripvol;
       G4LogicalVolume** strip;
@@ -271,6 +279,30 @@ namespace Belle2 {
        * Create endcap solid.
        */
       void createEndcapSolid();
+
+      /**
+       * Create layer logical volume.
+       * @param[in] name Layer logical volume name.
+       * @return Layer logical volume.
+       */
+      G4LogicalVolume* createLayerLogicalVolume(const char* name) const;
+
+      /**
+       * Create layer solid and shield layer logical volume.
+       */
+      void createLayerLogicalVolume();
+
+      /**
+       * Create sector logical volume.
+       * @param[in] name Sector logical volume name.
+       * @return Sector logical volume.
+       */
+      G4LogicalVolume* createSectorLogicalVolume(const char* name) const;
+
+      /**
+       * Create sector solid and shield layer sector logical volume.
+       */
+      void createSectorLogicalVolume();
 
       /**
        * Create sector cover solid.
@@ -454,16 +486,28 @@ namespace Belle2 {
       /**
        * Create layer.
        * @param[in] endcap Endcap logical volume.
+       * @param[in] layer  Layer logical volume.
        * @return Layer logical volume.
+       *
+       * If layer == NULL, then new layer logical volume is created
+       * (for detector layers). If layer != NULL, then the existing
+       * logical volume is used (for shield layers).
        */
-      G4LogicalVolume* createLayer(G4LogicalVolume* endcap) const;
+      G4LogicalVolume* createLayer(G4LogicalVolume* endcap,
+                                   G4LogicalVolume* layer) const;
 
       /**
        * Create sector.
-       * @param[in] layer Layer logical volume.
+       * @param[in] layer  Layer logical volume.
+       * @param[in] sector Sector logical volume.
        * @return Sector logical volume.
+       *
+       * If sector == NULL, then new sector logical volume is created
+       * (for detector layers). If sector != NULL, then the existing
+       * logical volume is used (for shield layers).
        */
-      G4LogicalVolume* createSector(G4LogicalVolume* layer) const;
+      G4LogicalVolume* createSector(G4LogicalVolume* layer,
+                                    G4LogicalVolume* sector) const;
 
       /**
        * Create sector cover.

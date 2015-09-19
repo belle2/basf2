@@ -248,6 +248,57 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
   }
 }
 
+G4LogicalVolume*
+EKLM::GeoEKLMCreator::createLayerLogicalVolume(const char* name) const
+{
+  G4LogicalVolume* logicLayer = NULL;
+  try {
+    logicLayer = new G4LogicalVolume(m_Solids.layer, m_Materials.air, name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*logicLayer, false);
+  return logicLayer;
+}
+
+void EKLM::GeoEKLMCreator::createLayerLogicalVolume()
+{
+  const struct ElementPosition* layerPos = m_GeoDat->getLayerPosition();
+  try {
+    m_Solids.layer = new G4Tubs("Layer", layerPos->InnerR, layerPos->OuterR,
+                                layerPos->Length / 2.0, 0.0, 360. * CLHEP::deg);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  m_LogVol.shieldLayer = createLayerLogicalVolume("ShieldLayer");
+}
+
+G4LogicalVolume*
+EKLM::GeoEKLMCreator::createSectorLogicalVolume(const char* name) const
+{
+  G4LogicalVolume* logicSector = NULL;
+  try {
+    logicSector = new G4LogicalVolume(m_Solids.sector, m_Materials.air, name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*logicSector, false);
+  return logicSector;
+}
+
+void EKLM::GeoEKLMCreator::createSectorLogicalVolume()
+{
+  const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
+  try {
+    m_Solids.sector =
+      new G4Tubs("Sector", sectorPos->InnerR, sectorPos->OuterR,
+                 0.5 * sectorPos->Length, 0.0, 90. * CLHEP::deg);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  m_LogVol.shieldLayerSector = createSectorLogicalVolume("ShieldLayerSector");
+}
+
 void EKLM::GeoEKLMCreator::createSectorCoverLogicalVolume()
 {
   double lz;
@@ -1276,28 +1327,13 @@ void EKLM::GeoEKLMCreator::createSolids()
   int i, j, iPos, n;
   char name[128];
   HepGeom::Transform3D t;
-  const struct ElementPosition* layerPos = m_GeoDat->getLayerPosition();
-  const struct ElementPosition* sectorPos = m_GeoDat->getSectorPosition();
   const struct BoardGeometry* boardGeometry;
   const struct ElementPosition* stripPos;
   const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
-  /* Endcap. */
+  /* Endcap, layer, sector. */
   createEndcapSolid();
-  /* Layer. */
-  try {
-    m_Solids.layer = new G4Tubs("Layer", layerPos->InnerR, layerPos->OuterR,
-                                layerPos->Length / 2.0, 0.0, 360. * CLHEP::deg);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  /* Sector. */
-  try {
-    m_Solids.sector =
-      new G4Tubs("Sector", sectorPos->InnerR, sectorPos->OuterR,
-                 0.5 * sectorPos->Length, 0.0, 90. * CLHEP::deg);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
+  createLayerLogicalVolume();
+  createSectorLogicalVolume();
   createSectorCoverLogicalVolume();
   createSectorSupportLogicalVolume();
   /**
@@ -1447,24 +1483,21 @@ EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* topVolume) const
   return logicEndcap;
 }
 
-G4LogicalVolume*
-EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* endcap) const
+G4LogicalVolume* EKLM::GeoEKLMCreator::
+createLayer(G4LogicalVolume* endcap, G4LogicalVolume* layer) const
 {
-  G4LogicalVolume* logicLayer = NULL;
+  G4LogicalVolume* logicLayer;
   const HepGeom::Transform3D* t;
-  std::string layerName = "Layer_" +
-                          boost::lexical_cast<std::string>(m_CurVol.layer) +
-                          "_" + endcap->GetName();
-  try {
-    logicLayer = new G4LogicalVolume(m_Solids.layer, m_Materials.air,
-                                     layerName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicLayer, false);
+  if (layer == NULL) {
+    std::string layerName = "Layer_" +
+                            boost::lexical_cast<std::string>(m_CurVol.layer) +
+                            "_" + endcap->GetName();
+    logicLayer = createLayerLogicalVolume(layerName.c_str());
+  } else
+    logicLayer = layer;
   t = m_TransformData->getLayerTransform(m_CurVol.endcap, m_CurVol.layer);
   try {
-    new G4PVPlacement(*t, logicLayer, layerName, endcap, false,
+    new G4PVPlacement(*t, logicLayer, logicLayer->GetName(), endcap, false,
                       m_CurVol.layer, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1472,25 +1505,22 @@ EKLM::GeoEKLMCreator::createLayer(G4LogicalVolume* endcap) const
   return logicLayer;
 }
 
-G4LogicalVolume*
-EKLM::GeoEKLMCreator::createSector(G4LogicalVolume* layer) const
+G4LogicalVolume* EKLM::GeoEKLMCreator::
+createSector(G4LogicalVolume* layer, G4LogicalVolume* sector) const
 {
-  G4LogicalVolume* logicSector = NULL;
+  G4LogicalVolume* logicSector;
   const HepGeom::Transform3D* t;
-  std::string sectorName = "Sector_" +
-                           boost::lexical_cast<std::string>(m_CurVol.sector) +
-                           "_" + layer->GetName();
-  try {
-    logicSector = new G4LogicalVolume(m_Solids.sector, m_Materials.air,
-                                      sectorName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*logicSector, false);
+  if (sector == NULL) {
+    std::string sectorName = "Sector_" +
+                             boost::lexical_cast<std::string>(m_CurVol.sector) +
+                             "_" + layer->GetName();
+    logicSector = createSectorLogicalVolume(sectorName.c_str());
+  } else
+    logicSector = sector;
   t = m_TransformData->getSectorTransform(m_CurVol.endcap, m_CurVol.layer,
                                           m_CurVol.sector);
   try {
-    new G4PVPlacement(*t, logicSector, sectorName, layer, false,
+    new G4PVPlacement(*t, logicSector, logicSector->GetName(), layer, false,
                       m_CurVol.sector, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -2004,18 +2034,18 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
     endcap = createEndcap(&topVolume);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();
          m_CurVol.layer++) {
-      layer = createLayer(endcap);
-      for (m_CurVol.sector = 1; m_CurVol.sector <= 4; m_CurVol.sector++) {
-        sector = createSector(layer);
-        createSectorSupport(sector);
-        createSectorSupportCorner1(sector);
-        createSectorSupportCorner2(sector);
-        createSectorSupportCorner3(sector);
-        createSectorSupportCorner4(sector);
-        for (i = 1; i <= 2; i++)
-          createSectorCover(i, sector);
-        if (detectorLayer(m_CurVol.endcap, m_CurVol.layer)) {
-          /* Detector layer. */
+      if (detectorLayer(m_CurVol.endcap, m_CurVol.layer)) {
+        /* Detector layer. */
+        layer = createLayer(endcap, NULL);
+        for (m_CurVol.sector = 1; m_CurVol.sector <= 4; m_CurVol.sector++) {
+          sector = createSector(layer, NULL);
+          createSectorSupport(sector);
+          createSectorSupportCorner1(sector);
+          createSectorSupportCorner2(sector);
+          createSectorSupportCorner3(sector);
+          createSectorSupportCorner4(sector);
+          for (i = 1; i <= 2; i++)
+            createSectorCover(i, sector);
           for (m_CurVol.plane = 1; m_CurVol.plane <= m_GeoDat->getNPlanes();
                m_CurVol.plane++) {
             plane = createPlane(sector);
@@ -2050,10 +2080,20 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
               }
             }
           }
-        } else {
-          /* Shield layer. */
-          createShield(sector);
         }
+      } else {
+        /* Shield layer. */
+        layer = createLayer(endcap, m_LogVol.shieldLayer);
+        for (m_CurVol.sector = 1; m_CurVol.sector <= 4; m_CurVol.sector++)
+          sector = createSector(layer, m_LogVol.shieldLayerSector);
+        createSectorSupport(m_LogVol.shieldLayerSector);
+        createSectorSupportCorner1(m_LogVol.shieldLayerSector);
+        createSectorSupportCorner2(m_LogVol.shieldLayerSector);
+        createSectorSupportCorner3(m_LogVol.shieldLayerSector);
+        createSectorSupportCorner4(m_LogVol.shieldLayerSector);
+        for (i = 1; i <= 2; i++)
+          createSectorCover(i, m_LogVol.shieldLayerSector);
+        createShield(m_LogVol.shieldLayerSector);
       }
     }
   }

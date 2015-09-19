@@ -89,11 +89,17 @@ namespace Belle2 {
       //! Get the radial offset of the scintillator detector module's active envelope due to difference in polystyrene-sheet thicknesses
       double getPolystyreneOffsetX(void) const;
 
-      //! Get the height of the active volume of a scintillator strip
-      double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight - m_ScintTiO2ThicknessTop; }
+      //! Get the thickness of the inactive TiO2-polystyrene coating on top (broad) surface of a scintillator strip
+      double getScintTiO2ThicknessTop(void) const { return m_ScintTiO2ThicknessTop; }
 
-      //! Get the height of the active volume of a scintillator strip
-      double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth - m_ScintTiO2ThicknessSide; }
+      //! Get the thickness of the inactive TiO2-polystyrene coating on side (short) surface of a scintillator strip
+      double getScintTiO2ThicknessSide(void) const { return m_ScintTiO2ThicknessSide; }
+
+      //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+      double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight; }
+
+      //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
+      double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth; }
 
       //! Get the radius of the cylindrical central bore in a scintillator strip
       double getScintBoreRadius(void) const { return m_ScintBoreRadius; }

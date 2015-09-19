@@ -84,7 +84,7 @@ namespace Belle2 {
     GeoBKLMCreator::~GeoBKLMCreator()
     {
       delete m_Sensitive;
-      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
     }
 
@@ -938,12 +938,19 @@ namespace Belle2 {
       }
       char name[80] = "";
       sprintf(name, "BKLM.ScintType%dSolid", newLvol);
-      G4Box* box = new G4Box(name, dx, dy, dz);
+      G4Box* scintBox = new G4Box(name, dx, dy, dz);
       G4LogicalVolume* scintLogical =
-        new G4LogicalVolume(box, Materials::get("G4_POLYSTYRENE"), logicalName(box), 0, m_Sensitive, 0);
+        new G4LogicalVolume(scintBox, Materials::get("G4_POLYSTYRENE"), logicalName(scintBox));
       m_ScintLogicals.push_back(scintLogical);
+      scintLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
+      double dxTiO2 = m_GeoPar->getScintTiO2ThicknessTop() * cm;
+      double dyTiO2 = m_GeoPar->getScintTiO2ThicknessSide() * cm;
+      sprintf(name, "BKLM.ScintActiveType%dSolid", newLvol);
+      G4Box* activeBox = new G4Box(name, dx - dxTiO2, dy - dyTiO2, dz);
+      G4LogicalVolume* activeLogical =
+        new G4LogicalVolume(activeBox, Materials::get("G4_POLYSTYRENE"), logicalName(activeBox), 0, m_Sensitive, 0);
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(1.0, 0.5, 0.0)));
-      scintLogical->SetVisAttributes(m_VisAttributes.back());
+      activeLogical->SetVisAttributes(m_VisAttributes.back());
       sprintf(name, "BKLM.ScintBoreType%dSolid", newLvol);
       G4Tubs* boreTube = new G4Tubs(name, 0.0, m_GeoPar->getScintBoreRadius() * cm, dz, 0.0, 2.0 * M_PI);
       G4LogicalVolume* scintBoreLogical =
@@ -965,6 +972,14 @@ namespace Belle2 {
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         scintBoreLogical,
                         physicalName(scintBoreLogical),
+                        activeLogical,
+                        false,
+                        1,
+                        m_GeoPar->doOverlapCheck()
+                       );
+      new G4PVPlacement(G4TranslateZ3D(0.0),
+                        activeLogical,
+                        physicalName(activeLogical),
                         scintLogical,
                         false,
                         1,

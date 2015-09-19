@@ -37,7 +37,7 @@
 #include "G4Neutron.hh"
 
 #define DEPTH_RPC 9
-#define DEPTH_SCINT 10
+#define DEPTH_SCINT 11
 
 using namespace std;
 
@@ -110,7 +110,7 @@ namespace Belle2 {
         const G4VTouchable* hist = preStep->GetTouchable();
         int baseDepth = hist->GetHistoryDepth() - DEPTH_RPC;
         if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
-          B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 10=scint)")
+          B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 11=scint)")
           return false;
         }
         int plane = hist->GetCopyNumber(baseDepth);
@@ -154,7 +154,7 @@ namespace Belle2 {
             simHitPosition->addRelationTo(simHit);
           }
         } else {
-          int scint = hist->GetCopyNumber(0);
+          int scint = hist->GetCopyNumber(1);
           moduleID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
           double propTime = propagationTimes.z();
           if (plane == BKLM_INNER) {

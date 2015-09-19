@@ -107,7 +107,7 @@ namespace Belle2 {
       int getPhiStripMax() const { return m_PhiStripMax; }
 
       //! Get phi-strip width
-      int getPhiStripWidth() const { return m_PhiStripWidth; }
+      double getPhiStripWidth() const { return m_PhiStripWidth; }
 
       //! Get module's z-strip minimum index
       int getZStripMin() const { return m_ZStripMin; }
@@ -116,7 +116,7 @@ namespace Belle2 {
       int getZStripMax() const { return m_ZStripMax; }
 
       //! Get z-strip width
-      int getZStripWidth() const { return m_ZStripWidth; }
+      double getZStripWidth() const { return m_ZStripWidth; }
 
       //! Add one phi-measuring scintillator strip to the module
       void addPhiScint(int scint, double length, double offset, double position);

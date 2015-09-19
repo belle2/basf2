@@ -85,10 +85,10 @@ namespace Belle2 {
      * Shield logical volumes.
      */
     struct ShieldLogicalVolumes {
-      G4LogicalVolume* detailA; /* Detail A. */
-      G4LogicalVolume* detailB; /* Detail B. */
-      G4LogicalVolume* detailC; /* Detail C. */
-      G4LogicalVolume* detailD; /* Detail D. */
+      G4LogicalVolume* detailA; /**< Detail A. */
+      G4LogicalVolume* detailB; /**< Detail B. */
+      G4LogicalVolume* detailC; /**< Detail C. */
+      G4LogicalVolume* detailD; /**< Detail D. */
     };
 
     /**

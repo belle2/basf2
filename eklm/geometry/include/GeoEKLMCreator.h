@@ -11,9 +11,6 @@
 #ifndef EKLM_GEOEKLMCREATOR_H
 #define EKLM_GEOEKLMCREATOR_H
 
-/* System headers. */
-#include <sys/types.h>
-
 /* C++ headers. */
 #include <string>
 #include <vector>

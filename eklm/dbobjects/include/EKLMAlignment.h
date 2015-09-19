@@ -12,7 +12,7 @@
 #define EKLMALIGNMENT_H
 
 /* System headers. */
-#include <sys/types.h>
+#include <stdint.h>
 
 /* C++ headers. */
 #include <map>

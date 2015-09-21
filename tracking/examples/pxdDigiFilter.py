@@ -17,6 +17,7 @@
 import os
 from basf2 import *
 from simulation import add_simulation
+from beamparameters import add_beamparameters
 
 seed = 1
 numEvents = 100
@@ -114,8 +115,17 @@ vxd_trackfinder_post.param('tuneCutoffs', 0.22)
 
 rootOutput = register_module('RootOutput')
 
+
 # Create paths
 main = create_path()
+
+# beam parameters
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
 
 # Add modules to paths
 main.add_module(eventinfosetter)

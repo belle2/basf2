@@ -72,8 +72,9 @@
 #include <TGLLogicalShape.h>
 #include <TParticle.h>
 #include <TMath.h>
-#include <TMatrixT.h>
-#include <TMatrixDEigen.h>
+#include <TVectorD.h>
+#include <TMatrixD.h>
+#include <TMatrixDSymEigen.h>
 
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -546,13 +547,13 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             } else {
               //pixel hit
               // calculate eigenvalues to draw error-ellipse ----------------------------
-              TMatrixDEigen eigen_values(hit_cov);
+              TMatrixDSymEigen eigen_values(hit_cov);
               TEveGeoShape* cov_shape = new TEveGeoShape("PXDRecoHit");
               cov_shape->IncDenyDestroy();
-              TMatrixT<double> ev = eigen_values.GetEigenValues();
-              TMatrixT<double> eVec = eigen_values.GetEigenVectors();
-              double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
-              double pseudo_res_1 = m_errorScale * std::sqrt(ev(1, 1));
+              const TVectorD& ev = eigen_values.GetEigenValues();
+              const TMatrixD& eVec = eigen_values.GetEigenVectors();
+              double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
+              double pseudo_res_1 = m_errorScale * std::sqrt(ev(1));
               // finished calcluating, got the values -----------------------------------
 
               // calculate the semiaxis of the error ellipse ----------------------------
@@ -582,12 +583,12 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           if (space_hit) {
 
             // get eigenvalues of covariance to know how to draw the ellipsoid ------------
-            TMatrixDEigen eigen_values(m->getRawHitCov());
+            TMatrixDSymEigen eigen_values(m->getRawHitCov());
             TEveGeoShape* cov_shape = new TEveGeoShape("SpacePoint Hit");
             cov_shape->IncDenyDestroy();
             cov_shape->SetShape(new TGeoSphere(0., 1.));
-            TMatrixT<double> ev = eigen_values.GetEigenValues();
-            TMatrixT<double> eVec = eigen_values.GetEigenVectors();
+            const TVectorD& ev = eigen_values.GetEigenValues();
+            const TMatrixD& eVec = eigen_values.GetEigenVectors();
             TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
             TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
             TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
@@ -600,9 +601,9 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                                  (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
 
             // set the scaled eigenvalues -------------------------------------------------
-            double pseudo_res_0 = m_errorScale * std::sqrt(ev(0, 0));
-            double pseudo_res_1 = m_errorScale * std::sqrt(ev(1, 1));
-            double pseudo_res_2 = m_errorScale * std::sqrt(ev(2, 2));
+            double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
+            double pseudo_res_1 = m_errorScale * std::sqrt(ev(1));
+            double pseudo_res_2 = m_errorScale * std::sqrt(ev(2));
             // finished scaling -----------------------------------------------------------
 
             // rotate and translate -------------------------------------------------------
@@ -677,25 +678,25 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
 {
   TEveBox* box = new TEveBox;
   box->SetPickable(true);
-  float vertices[24];
 
   TVector3 norm = u.Cross(v);
   u *= (0.5 * ud);
   v *= (0.5 * vd);
   norm *= (0.5 * depth);
 
-  for (int i = 0; i < 3; i++) {
-    vertices[i + 0]  = (float)(o(i) - u(i) - v(i) - norm(i));
-    vertices[i + 3]  = (float)(o(i) + u(i) - v(i) - norm(i));
-    vertices[i + 6]  = (float)(o(i) + u(i) - v(i) + norm(i));
-    vertices[i + 9]  = (float)(o(i) - u(i) - v(i) + norm(i));
-    vertices[i + 12] = (float)(o(i) - u(i) + v(i) - norm(i));
-    vertices[i + 15] = (float)(o(i) + u(i) + v(i) - norm(i));
-    vertices[i + 18] = (float)(o(i) + u(i) + v(i) + norm(i));
-    vertices[i + 21] = (float)(o(i) - u(i) + v(i) + norm(i));
+
+  for (int k = 0; k < 8; ++k) {
+    // Coordinates for all eight corners of the box.
+    int signU = (k & 4) ? -1 : 1;
+    int signV = (k & 2) ? -1 : 1;
+    int signN = (k & 1) ? -1 : 1;
+    float vertex[3];
+    for (int i = 0; i < 3; ++i) {
+      vertex[i] = o(i) + signU * u(i) + signV * v(i) + signN * norm(i);
+    }
+    box->SetVertex(k, vertex);
   }
 
-  box->SetVertices(vertices);
   return box;
 }
 
@@ -747,15 +748,15 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
       rep->getPosMomCov(*measuredState, position, direction, cov);
 
       // get eigenvalues & -vectors
-      TMatrixDEigen eigen_values(cov.GetSub(0, 2, 0, 2));
-      TMatrixT<double> ev = eigen_values.GetEigenValues();
-      TMatrixT<double> eVec = eigen_values.GetEigenVectors();
+      TMatrixDSymEigen eigen_values(cov.GetSub(0, 2, 0, 2));
+      const TVectorD& ev = eigen_values.GetEigenValues();
+      const TMatrixD& eVec = eigen_values.GetEigenVectors();
       TVector3 eVec1, eVec2;
       // limit
       static const double maxErr = 1000.;
-      double ev0 = std::min(ev(0, 0), maxErr);
-      double ev1 = std::min(ev(1, 1), maxErr);
-      double ev2 = std::min(ev(2, 2), maxErr);
+      double ev0 = std::min(ev(0), maxErr);
+      double ev1 = std::min(ev(1), maxErr);
+      double ev2 = std::min(ev(2), maxErr);
 
       // get two largest eigenvalues/-vectors
       if (ev0 < ev1 && ev0 < ev2) {
@@ -779,8 +780,8 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
         eVec2 *= -1;
       //assert(eVec1.Cross(eVec2)*eval > 0);
 
-      const TVector3 oldEVec1(eVec1);
-      const TVector3 oldEVec2(eVec2);
+      const TVector3& oldEVec1(eVec1);
+      const TVector3& oldEVec2(eVec2);
 
       const int nEdges = 24;
       std::vector<TVector3> vertices;
@@ -795,12 +796,12 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
 
 
-      DetPlane* newPlane = new DetPlane(*(measuredState->getPlane()));
+      SharedPlanePtr newPlane(new DetPlane(*(measuredState->getPlane())));
       newPlane->setO(position + eval);
 
       MeasuredStateOnPlane stateCopy(*measuredState);
       try {
-        rep->extrapolateToPlane(stateCopy, SharedPlanePtr(newPlane));
+        rep->extrapolateToPlane(stateCopy, newPlane);
       } catch (Exception& e) {
         B2ERROR(e.what());
         return;
@@ -810,30 +811,31 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
       rep->getPosMomCov(stateCopy, position, direction, cov);
 
       // get eigenvalues & -vectors
-      TMatrixDEigen eigen_values2(cov.GetSub(0, 2, 0, 2));
-      ev = eigen_values2.GetEigenValues();
-      eVec = eigen_values2.GetEigenVectors();
-      // limit
-      ev0 = std::min(ev(0, 0), maxErr);
-      ev1 = std::min(ev(1, 1), maxErr);
-      ev2 = std::min(ev(2, 2), maxErr);
+      {
+        TMatrixDSymEigen eigen_values2(cov.GetSub(0, 2, 0, 2));
+        const TVectorD& ev = eigen_values2.GetEigenValues();
+        const TMatrixD& eVec = eigen_values2.GetEigenVectors();
+        // limit
+        ev0 = std::min(ev(0), maxErr);
+        ev1 = std::min(ev(1), maxErr);
+        ev2 = std::min(ev(2), maxErr);
 
-      // get two largest eigenvalues/-vectors
-      if (ev0 < ev1 && ev0 < ev2) {
-        eVec1.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
-        eVec1 *= sqrt(ev1);
-        eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-        eVec2 *= sqrt(ev2);
-      } else if (ev1 < ev0 && ev1 < ev2) {
-        eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
-        eVec1 *= sqrt(ev0);
-        eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-        eVec2 *= sqrt(ev2);
-      } else {
-        eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
-        eVec1 *= sqrt(ev0);
-        eVec2.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
-        eVec2 *= sqrt(ev1);
+        // get two largest eigenvalues/-vectors
+        if (ev0 < ev1 && ev0 < ev2) {
+          eVec1.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+          eVec1 *= sqrt(ev1);
+          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2 *= sqrt(ev2);
+        } else if (ev1 < ev0 && ev1 < ev2) {
+          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1 *= sqrt(ev0);
+          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2 *= sqrt(ev2);
+        } else {
+          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1 *= sqrt(ev0);
+          eVec2.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+        } eVec2 *= sqrt(ev1);
       }
 
       if (eVec1.Cross(eVec2)*eval < 0)
@@ -1173,12 +1175,12 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   vertexPoint->SetMainColor(c_recoHitColor);
   vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
 
-  TMatrixDEigen eigen_values(vertex->getCov());
+  TMatrixDSymEigen eigen_values(vertex->getCov());
   TEveGeoShape* det_shape = new TEveGeoShape(ObjectInfo::getInfo(vertex) + " Error");
   det_shape->IncDenyDestroy();
   det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
-  TMatrixT<double> ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
-  TMatrixT<double> eVec = eigen_values.GetEigenValues();  //Assigns the eigenvalues into the "eVec" matrix.
+  const TVectorD& ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
+  const TMatrixD& eVec = eigen_values.GetEigenVectors();  //Assigns the eigenvalues into the "eVec" matrix.
   TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2,
                                               0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
   TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2,
@@ -1192,10 +1194,10 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
                        (eVec3.Theta() * 180) / TMath::Pi(), (eVec3.Phi() * 180) / TMath::Pi()); // the rotation is already clear
 
   // set the scaled eigenvalues -------------------------------------------------
-  double pseudo_res_0 = std::sqrt(ev(0, 0));
-  double pseudo_res_1 = std::sqrt(ev(1, 1));
-  double pseudo_res_2 = std::sqrt(ev(2,
-                                     2));    //"Scaled" eigenvalues pseudo_res (lengths of the semi axis) are the sqrt of the real eigenvalues.
+  //"Scaled" eigenvalues pseudo_res (lengths of the semi axis) are the sqrt of the eigenvalues.
+  double pseudo_res_0 = std::sqrt(ev(0));
+  double pseudo_res_1 = std::sqrt(ev(1));
+  double pseudo_res_2 = std::sqrt(ev(2));
 
   //B2INFO("The pseudo_res_0/1/2 are " << pseudo_res_0 << "," << pseudo_res_1 << "," << pseudo_res_2); //shows the scaled eigenvalues
 

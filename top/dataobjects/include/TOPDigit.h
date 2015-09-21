@@ -148,7 +148,7 @@ namespace Belle2 {
     unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
     EHitQuality m_quality;     /**< hit quality */
 
-    ClassDef(TOPDigit, 4); /**< ClassDef */
+    ClassDef(TOPDigit, 5); /**< ClassDef */
 
   };
 

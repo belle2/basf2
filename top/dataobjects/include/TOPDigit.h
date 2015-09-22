@@ -134,9 +134,12 @@ namespace Belle2 {
      * Implementation fo the base class function.
      * Pile-up method.
      * @param bg BG digit
-     * @return true, if BG digit has to be appended to Digits
+     * @return append status
      */
-    bool addBGDigit(const DigitBase* /*bg*/) {return true;}
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* /*bg*/)
+    {
+      return DigitBase::c_Append;
+    }
 
 
   private:

@@ -19,13 +19,20 @@ namespace Belle2 {
   /**
    * Class DigitBase - A common base for subdetector Digits.
    *
-   * This is a base class from which other Digit classes have to be derived
+   * This is an abstract base class from which other Digit classes must be derived
    * to be usable for background overlay.
    * Each derived class has to implement two virtual methods defined below.
    */
   class DigitBase : public RelationsObject {
 
   public:
+    /**
+     * Enum for return state of addBGDigit function
+     */
+    enum EAppendStatus { c_DontAppend = 0, /**< do not append BG digit to digits */
+                         c_Append     = 1  /**< append BG digit to digits */
+                       };
+
     /**
      * Constructor
      */
@@ -34,7 +41,7 @@ namespace Belle2 {
     /**
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * Must be implemented by the derived class.
-     * @return unique channel ID (usually composed of superlayer, layer and channel number)
+     * @return unique channel ID
      */
     virtual unsigned int getUniqueChannelID() const = 0;
 
@@ -43,13 +50,13 @@ namespace Belle2 {
      * Must be implemented by the derived class.
      * Return state signals whether BG digit has to be appended to Digits or not.
      * @param bg BG digit
-     * @return true, if BG digit has to be appended to Digits
+     * @return append status (see enum)
      */
-    virtual bool addBGDigit(const DigitBase* bg) = 0;
+    virtual EAppendStatus addBGDigit(const DigitBase* bg) = 0;
 
   private:
 
-    ClassDef(DigitBase, 1);
+    ClassDef(DigitBase, 2); /**< ClassDef */
 
   };
 

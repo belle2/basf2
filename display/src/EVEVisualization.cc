@@ -193,7 +193,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   double dPVal_ = 1.E-3;
   int nMaxIter_ = 4;
   bool resort_ = true;
-  int i = 0; //just for printing
 
   // We loop over all points (scattering non-measurement points for GBL)
   // and for Kalman we skip those with no measurements, which should
@@ -462,7 +461,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             hit_v = hit_coords(1);
           }
         } else {
-          B2ERROR("Track " << i << ", Hit " << j << ", Measurement " << iMeasurement << ": Unknown measurement type: skipping hit!");
+          B2ERROR("Hit " << j << ", Measurement " << iMeasurement << ": Unknown measurement type: skipping hit!");
           break;
         }
 
@@ -780,8 +779,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
         eVec2 *= -1;
       //assert(eVec1.Cross(eVec2)*eval > 0);
 
-      const TVector3& oldEVec1(eVec1);
-      const TVector3& oldEVec2(eVec2);
+      TVector3 oldEVec1(eVec1);
 
       const int nEdges = 24;
       std::vector<TVector3> vertices;

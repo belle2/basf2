@@ -390,11 +390,11 @@ namespace Belle2 {
     //...3...
     //(x on, . off, return O)
     // . .   . .   . .   x .   . x   x .   . x
-    // x .   . x   x x   O .   O .   . O   . O
-    // O x   O x   O .   x .   x .   x .   x .
+    // x .   . x   O x   O .   O .   . O   . O
+    // O x   x O   x .   x .   x .   x .   x .
     if (a[0] == 1 && a[1] == 1 && a[3] == 1 && a[4] == 0 && a[6] == 0 && a[7] == 0) {center = 0;}
-    if (a[0] == 1 && a[1] == 1 && a[3] == 0 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
-    if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 0;}
+    if (a[0] == 1 && a[1] == 1 && a[3] == 0 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 1;}
+    if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 1 && a[6] == 0 && a[7] == 0) {center = 3;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 0 && a[6] == 1 && a[7] == 0) {center = 3;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 1 && a[4] == 0 && a[6] == 0 && a[7] == 1) {center = 3;}
     if (a[0] == 1 && a[1] == 0 && a[3] == 0 && a[4] == 1 && a[6] == 1 && a[7] == 0) {center = 4;}
@@ -482,10 +482,10 @@ namespace Belle2 {
     }
     //...4...
     //(x on, . off, return O)
-    // O x
     // x x
+    // O x
     if (hits == 4) {
-      if (a[1] == 1 && a[2] == 1 && a[3] == 1 && a[4] == 1) {center = 3;}
+      if (a[1] == 1 && a[2] == 1 && a[3] == 1 && a[4] == 1) {center = 1;}
 
     }
 
@@ -1115,7 +1115,8 @@ namespace Belle2 {
     // only upper half of hough plane is used here (iy >= 11)
     // TODO: implications on limits should be checked carefully
     // can this be avoided?
-    for (unsigned j = 11; j < hp.nY(); j++) {
+    unsigned yOffset = 10;
+    for (unsigned j = yOffset; j < hp.nY(); j++) {
       //minus x direction ,  plus  -x direction
       if ((hp.name()) == "circle hough minus")
         for (unsigned i = 0; i < hp.nX(); i++) {
@@ -1158,7 +1159,7 @@ namespace Belle2 {
         //...find 4 cells...begin
         for (unsigned j = 0; j < 2; j++) {
           unsigned yy = 0;
-          yy = 11 + b + j; // again offset of 11
+          yy = yOffset + b + j; // again offset of 11
           for (unsigned k = 0; k < 2; k++) {
             unsigned xx = 0;
             xx = a + k;
@@ -1457,7 +1458,7 @@ namespace Belle2 {
       unsigned short fcpn = 0;  // number of peak 2x2 square (start: 1)
       unsigned short fcpx = 0;  // x index in original hough plane (start: 0)
       unsigned short fcpxs = 0; // x index in 2x2 square (0, 1)
-      unsigned short fcpy = 11; // y index in original hough plane (start: 11)
+      unsigned short fcpy = yOffset; // y index in original hough plane (start: 11)
       unsigned short fcpys = 0; // y index in 2x2 square (0, 1)
 
       // p2_state:               vector of on/off flags for 3x3 square

@@ -268,6 +268,7 @@ NeuroTrigger::getInputVector(unsigned isector)
     if (inputVector.size() <= 3 * iSL) continue;
     int priority = hits[ihit]->getPriorityPosition();
     int t = hits[ihit]->getTDCCountWithoutOffset();
+    if (t < 0) continue;
     int LR = hits[ihit]->getLeftRight();
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL) && t <= expert.getTMax()) {

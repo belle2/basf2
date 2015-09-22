@@ -107,17 +107,21 @@ namespace Belle2 {
       std::string name(realname);
       free(realname);
       boost::regex colon("(:)");      // matches ":" because root does not like it
-      // we are going to substitute : with _
+      // we are going to substitute ':' with'_'
       auto name1 = boost::regex_replace(name, colon, std::string("_"));
       boost::regex lesser("(<)");     // matches "<" because root does not like it
-      // we are going to substitute : with {
+      // we are going to substitute '<' with '{'
       auto name2 = boost::regex_replace(name1, lesser, std::string("{"));
 
-      boost::regex greather("(>)");   // matches ">" because root does not like it
-      // we are going to substitute : with }
-      auto name3 = boost::regex_replace(name2, greather, std::string("}"));
+      boost::regex greater("(> )");   // matches "> " because root does not like it
+      // we are going to substitute '> ' with '}'
+      auto name3 = boost::regex_replace(name2, greater, std::string("}"));
 
-      return name3;
+      boost::regex greater2("(>)");   // matches ">" because root does not like it
+      // we are going to substitute '>' with '}'
+      auto name4 = boost::regex_replace(name3, greater2, std::string("}"));
+
+      return name4;
 
     }
 

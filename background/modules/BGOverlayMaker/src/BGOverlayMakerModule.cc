@@ -1,0 +1,110 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Staric                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// Own include
+#include <background/modules/BGOverlayMaker/BGOverlayMakerModule.h>
+
+#include <framework/core/ModuleManager.h>
+
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// framework aux
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
+// detector Digits, Clusters or waveforms
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <arich/dataobjects/ARICHDigit.h>
+#include <ecl/dataobjects/ECLDigit.h> // or waveform, not yet clear
+#include <bklm/dataobjects/BKLMDigit.h>
+#include <eklm/dataobjects/EKLMDigit.h>
+
+using namespace std;
+
+namespace Belle2 {
+
+  //-----------------------------------------------------------------
+  //                 Register module
+  //-----------------------------------------------------------------
+
+  REG_MODULE(BGOverlayMaker)
+
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
+
+  BGOverlayMakerModule::BGOverlayMakerModule() : Module()
+
+  {
+    // module description
+    setDescription("Overlay of measured background with simulated data");
+    setPropertyFlags(c_ParallelProcessingCertified);
+
+    // Add parameters
+
+  }
+
+  BGOverlayMakerModule::~BGOverlayMakerModule()
+  {
+  }
+
+  void BGOverlayMakerModule::initialize()
+  {
+
+    // registration in datastore (all as optional input - see template function)
+    registerDigits<PXDCluster>();
+    registerDigits<SVDCluster>();
+    registerDigits<CDCHit>();
+    registerDigits<TOPDigit>();
+    registerDigits<ARICHDigit>();
+    registerDigits<ECLDigit>(); // not yet clear which one
+    registerDigits<BKLMDigit>();
+    registerDigits<EKLMDigit>();
+
+  }
+
+  void BGOverlayMakerModule::beginRun()
+  {
+  }
+
+  void BGOverlayMakerModule::event()
+  {
+    // add BG: dataobject must inherit from DigitBase
+
+    //    addBGDigits<PXDCluster>();
+    //    addBGDigits<SVDCluster>();
+    //    addBGDigits<CDCHit>();
+    addBGDigits<TOPDigit>();
+    //    addBGDigits<ARICHDigit>();
+    //    addBGDigits<ECLDigit>(); // not yet clear which one
+    //    addBGDigits<BKLMDigit>();
+    //    addBGDigits<EKLMDigit>();
+
+  }
+
+
+  void BGOverlayMakerModule::endRun()
+  {
+  }
+
+  void BGOverlayMakerModule::terminate()
+  {
+  }
+
+
+} // end Belle2 namespace
+

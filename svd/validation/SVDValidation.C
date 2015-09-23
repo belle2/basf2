@@ -121,7 +121,7 @@ void SVDValidation()
               hValidInterstripPos[layerIndex][m][i]->GetXaxis()->SetTitle("InterstripPos");
               hValidInterstripPos[layerIndex][m][i]->GetYaxis()->SetTitle("counts");
               // draw histograms
-              TString expr(Form("cluster_eta>>%s",histoName.Data()));
+              TString expr(Form("cluster_interstripPosition>>%s",histoName.Data()));
               TString cond(Form("layer==%d&&strip_dir==%d&&sensor_type==%d", layer, i, m)); 
 
       	      tree->Draw(expr,cond);

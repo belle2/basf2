@@ -20,18 +20,19 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Class representating a linear track piece between two oriented wire hits \n
-    /** A tangent is an approximation of the possible trajectory between two oriented wire hits. \n
-     *  The approximation is obtained by constructing a tangent between two drift circles of the wire hits  \n
-     *  ( in the reference xy projection ) \n
-     *  Generally maximal four tangents are possible. So to uniquely define a tangent we have \n
-     *  to give additional information how it passes relativ to the drift circles. This right left \n
-     *  passage inforamtion indicates if the related wire hit should lie to the right of to the left \n
-     *  of the tangent. The four possible combinations are then ( ERightLeft::c_Right , ERightLeft::c_Right ), ( ERightLeft::c_Right , ERightLeft::c_Left ), \n
-     *  ( ERightLeft::c_Left , ERightLeft::c_Right ), ( ERightLeft::c_Left , ERightLeft::c_Left ). \n
-     *  To represent the tangent this class uses a ParameterLine2D. The touch points to the two drift circles \n
-     *  are located at(0) for the first and at(1) for the second. \n
-     *  The tangent has therefor a sense of what is forward and can be reversed if necessary \n
+    /// Class representating a linear track piece between two oriented wire hits.
+    /** A tangent is an approximation of the possible trajectory between two oriented wire hits.
+     *  The approximation is obtained by constructing a tangent between two drift circles of the wire hits
+     *  (in the reference xy projection).\n
+     *  Generally maximal four tangents are possible. So to uniquely define a tangent we have
+     *  to give additional information how it passes relativ to the drift circles. This right left
+     *  passage inforamtion indicates if the related wire hit should lie to the right of to the left
+     *  of the tangent. The four possible combinations are then
+     *  (ERightLeft::c_Right, ERightLeft::c_Right), (ERightLeft::c_Right, ERightLeft::c_Left),\n
+     *  (ERightLeft::c_Left, ERightLeft::c_Right), (ERightLeft::c_Left,ERightLeft::c_Left).\n
+     *  To represent the tangent this class uses a ParameterLine2D. The touch points to the two drift circles
+     *  are located at(0) for the first and at(1) for the second.
+     *  The tangent has therefor a sense of what is forward and can be reversed if necessary.
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
     class CDCTangent : public CDCRLWireHitPair {
     public:
@@ -78,10 +79,10 @@ namespace Belle2 {
       }
 
       /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
-       *  if one should use the dot '.' or operator '->' for method look up. \n
-       *  So this function defines the -> operator for the object. \n
-       *  No matter you have a pointer or an object access is given with '->'*/
+      /** In situations where the type is not known to be a pointer or a reference there is no way to tell
+       *  if one should use the dot '.' or operator '->' for method look up.
+       *  So this function defines the -> operator for the object.
+       *  No matter you have a pointer or an object access is given with '->'.*/
       const CDCTangent* operator->() const
       { return this; }
 

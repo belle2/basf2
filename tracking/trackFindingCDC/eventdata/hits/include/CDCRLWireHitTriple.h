@@ -16,14 +16,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** Class representing a triple of neighboring wire hits.
-     *  The first is taken as a single, while the second and the third are group into a pair.
+     *  The first is taken as a single, while the second and the third are grouped into a pair.
      *  In this way we can save some object creations during lookups of a triple following this one,
      *  since the projection to the last pair can be done by reference.*/
     class CDCRLWireHitTriple {
 
     public:
       /** Type for the different shapes of three neighboring hits
-       *  (up to mirror and rotational symmetries)
+       *  (up to mirror and rotational symmetries).
        *  Note: The names are inspired by the xylene molecules. */
       typedef signed int Shape;
 

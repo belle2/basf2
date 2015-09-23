@@ -206,7 +206,7 @@ namespace Belle2 {
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const ERightLeft rlInfo) const;
 
 
-      /// String output operator for wire hit objects to help debugging
+      /// String output operator for wire hit objects to help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
       { return output << "CDCWireHit(" << wirehit.getWire() << ", drift length=" << wirehit.getRefDriftLength() << ")"; }
 

@@ -99,11 +99,11 @@ namespace Belle2 {
       const CDCRLTaggedWireHit* operator->() const
       { return this; }
 
-      /// Make the wire hit automatically castable to its underlying cdcHit
+      /// Make the wire hit automatically castable to its underlying cdcHit.
       operator const Belle2::CDCHit* () const
       { return getWireHit().getHit(); }
 
-      /// Getter for the CDCHit pointer into the StoreArray
+      /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
       { return getWireHit().getHit(); }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
       const CDCWire& getWire() const
       { return getWireHit().getWire(); }
 
-      /// Checks if the oriented hit is associated with the give wire
+      /// Checks if the oriented hit is associated with the give wire.
       bool isOnWire(const CDCWire& wire) const
       { return getWire() == wire; }
 
@@ -121,7 +121,7 @@ namespace Belle2 {
       const WireID& getWireID() const
       { return getWire().getWireID(); }
 
-      /// Getter for the superlayer id
+      /// Getter for the superlayer id.
       ILayerType getISuperLayer() const
       { return getWire().getISuperLayer(); }
 
@@ -133,11 +133,11 @@ namespace Belle2 {
       bool isAxial() const
       { return getWire().isAxial(); }
 
-      /// The two dimensional reference position of the underlying wire
+      /// The two dimensional reference position of the underlying wire.
       const Vector2D& getRefPos2D() const
       { return getWire().getRefPos2D(); }
 
-      /// The distance from the beam line at reference position of the underlying wire
+      /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }
 
@@ -147,15 +147,15 @@ namespace Belle2 {
       const CDCWireHit& getWireHit() const
       { return *m_wireHit; }
 
-      /// Checks if the oriented hit is associated with the give wire hit
+      /// Checks if the oriented hit is associated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return getWireHit() == wirehit; }
 
-      /// Getter for the  drift length at the reference position of the wire
+      /// Getter for the  drift length at the reference position of the wire.
       double getRefDriftLength() const
       { return getWireHit().getRefDriftLength(); }
 
-      /// Getter for the  drift length at the reference position of the wire
+      /// Getter for the  drift length at the reference position of the wire.
       double getSignedRefDriftLength() const
       { return ((ESign)(getRLInfo())) * getRefDriftLength(); }
 
@@ -182,7 +182,7 @@ namespace Belle2 {
       Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const
       { return getWireHit().reconstruct2D(trajectory2D); }
 
-      /** Attempts to reconstruct a three dimensional position (especially of stereo hits)
+      /** Attempts to reconstruct a three dimensional position (especially of stereo hits).
        *
        *  This method makes a distinct difference between axial and stereo hits:
        *  * Stereo hits are moved out of the reference plane such that the
@@ -206,7 +206,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Memory for the reference to the assiziated wire hit
+      /// Memory for the reference to the assiziated wire hit.
       const CDCWireHit* m_wireHit;
 
       /// Memory for the right left passage information of the oriented wire hit.

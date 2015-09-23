@@ -53,14 +53,15 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCTangent();
 
-      /// Construct a tangent from a pair of oriented wire hits
+      /// Construct a tangent from a pair of oriented wire hits.
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
       CDCTangent(const CDCRLWireHit* fromRLWireHit,
                  const CDCRLWireHit* toRLWireHit);
 
-      /// Construct a tangent from a pair of oriented wire hits taking the given tangential line instead of a computed one.
+      /// Construct a tangent from a pair of oriented wire hits taking the given
+      /// tangential line instead of a computed one.
       CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
                  const ParameterLine2D& line);
 
@@ -69,7 +70,7 @@ namespace Belle2 {
                  const CDCRLWireHit* toRLWireHit,
                  const ParameterLine2D& line);
 
-      /// Print tangent for debugging
+      /// Print tangent for debuggin.
       friend std::ostream& operator<<(std::ostream& output, const CDCTangent& tangent)
       {
         output << "Tangent" << std::endl;
@@ -93,19 +94,19 @@ namespace Belle2 {
       operator const Belle2::TrackFindingCDC::CDCTangent* () const
       { return this; }
 
-      /// Getter for the touching point of the tangent to the first drift circle
+      /// Getter for the touching point of the tangent to the first drift circle.
       const Vector2D& getFromRecoPos2D() const
       { return getLine().support(); }
 
-      /// Getter for displacement of the touching point from the first wire in the reference plane
+      /// Getter for displacement of the touching point from the first wire in the reference plane.
       Vector2D getFromRecoDisp2D() const
       { return getFromRecoPos2D() - getFromWireHit()->getRefPos2D(); }
 
-      /// Getter for the touching point of the tangent to the second drift circle
+      /// Getter for the touching point of the tangent to the second drift circle.
       Vector2D getToRecoPos2D() const
       { return getLine().at(1); }
 
-      /// Getter for displacement of the touching point from the second wire in the reference plane
+      /// Getter for displacement of the touching point from the second wire in the reference plane.
       Vector2D getToRecoDisp2D() const
       { return getToRecoPos2D() - getToWireHit()->getRefPos2D(); }
 
@@ -117,19 +118,19 @@ namespace Belle2 {
       double getCosFlightDifference(const CDCTangent& tangent) const
       { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
 
-      /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position
+      /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position.
       CDCRecoHit2D getFromRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getFromRLWireHit(), getFromRecoPos2D()); }
 
-      /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position
+      /// Getter for the reconstructed hit on the second oriented wire hit using reconstructed touch point as position.
       CDCRecoHit2D getToRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getToRLWireHit(), getToRecoPos2D()); }
 
     public:
-      /// Adjusts the line to touch the drift circles with the correct right left passage information
+      /// Adjusts the line to touch the drift circles with the correct right left passage information.
       void adjustLine();
 
-      /// Adjusts the right left passage information according to the tangent line
+      /// Adjusts the right left passage information according to the tangent line.
       void adjustRLInfo();
 
       /** Reverses the tangent inplace.
@@ -142,7 +143,7 @@ namespace Belle2 {
       CDCTangent reversed() const;
 
     public:
-      /** Get for the line representation of the line
+      /** Getter for the line representation of the line.
        *  The line stretchs between the two the touch point.
        *  The first touch point is at(0) the second at(1).
        */

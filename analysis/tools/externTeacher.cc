@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 
   std::string weight = "";
   if (vm.count("weight") == 1) {
-    target = vm["weight"].as<std::string>();
+    weight = vm["weight"].as<std::string>();
   }
 
   std::string prefix = "TMVA";

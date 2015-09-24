@@ -36,11 +36,6 @@ namespace Belle2 {
       c_DetectorNormal = 0,
       /** Background study. */
       c_DetectorBackground = 1,
-      /**
-       * Debug mode.
-       * When constructing geometry, print masses of all volumes and exit.
-       */
-      c_DetectorPrintMasses = 2,
     };
 
   }

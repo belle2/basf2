@@ -354,7 +354,6 @@ void EKLM::GeoEKLMCreator::createSectorCoverLogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.cover, false);
   geometry::setColor(*m_LogVol.cover, "#ff000022");
-  printVolumeMass(m_LogVol.cover);
 }
 
 G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(HepGeom::Transform3D& t)
@@ -560,7 +559,6 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1LogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.sectorsup.corn1, true);
   geometry::setColor(*m_LogVol.sectorsup.corn1, "#ff0000ff");
-  printVolumeMass(m_LogVol.sectorsup.corn1);
 }
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
@@ -606,7 +604,6 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.sectorsup.corn2, true);
   geometry::setColor(*m_LogVol.sectorsup.corn2, "#ff0000ff");
-  printVolumeMass(m_LogVol.sectorsup.corn2);
 }
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
@@ -653,7 +650,6 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.sectorsup.corn3, true);
   geometry::setColor(*m_LogVol.sectorsup.corn3, "#ff0000ff");
-  printVolumeMass(m_LogVol.sectorsup.corn3);
 }
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner4LogicalVolume()
@@ -700,7 +696,6 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4LogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.sectorsup.corn4, true);
   geometry::setColor(*m_LogVol.sectorsup.corn4, "#ff0000ff");
-  printVolumeMass(m_LogVol.sectorsup.corn4);
 }
 
 void EKLM::GeoEKLMCreator::createSectorSupportLogicalVolume()
@@ -771,7 +766,6 @@ void EKLM::GeoEKLMCreator::createSectorSupportLogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.sectorsup.supp, true);
   geometry::setColor(*m_LogVol.sectorsup.supp, "#ff0000ff");
-  printVolumeMass(m_LogVol.sectorsup.supp);
 }
 
 void EKLM::GeoEKLMCreator::createSubtractionBoxSolid()
@@ -1028,7 +1022,6 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
                           true);
   geometry::setColor(*m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1],
                      "#ff0000ff");
-  printVolumeMass(m_LogVol.segmentsup[iPlane - 1][iSegmentSupport - 1]);
 }
 
 G4UnionSolid* EKLM::GeoEKLMCreator::
@@ -1195,7 +1188,6 @@ void EKLM::GeoEKLMCreator::createStripLogicalVolume(int iStrip)
   }
   geometry::setVisibility(*m_LogVol.strip[iStrip], true);
   geometry::setColor(*m_LogVol.strip[iStrip], "#ffffffff");
-  printVolumeMass(m_LogVol.strip[iStrip]);
 }
 
 void EKLM::GeoEKLMCreator::createStripGrooveLogicalVolume(int iStrip)
@@ -1223,7 +1215,6 @@ void EKLM::GeoEKLMCreator::createStripGrooveLogicalVolume(int iStrip)
   }
   geometry::setVisibility(*m_LogVol.groove[iStrip], true);
   geometry::setColor(*m_LogVol.groove[iStrip], "#00ff00ff");
-  printVolumeMass(m_LogVol.groove[iStrip]);
 }
 
 void EKLM::GeoEKLMCreator::createScintillatorLogicalVolume(int iStrip)
@@ -1267,7 +1258,6 @@ void EKLM::GeoEKLMCreator::createScintillatorLogicalVolume(int iStrip)
   }
   geometry::setVisibility(*m_LogVol.scint[iStrip], false);
   geometry::setColor(*m_LogVol.scint[iStrip], "#ffffffff");
-  printVolumeMass(m_LogVol.scint[iStrip]);
 }
 
 void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
@@ -1317,7 +1307,6 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.shield.detailA, true);
   geometry::setColor(*m_LogVol.shield.detailA, "#00ff00ff");
-  printVolumeMass(m_LogVol.shield.detailA);
 }
 
 void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
@@ -1355,7 +1344,6 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.shield.detailB, true);
   geometry::setColor(*m_LogVol.shield.detailB, "#00ff00ff");
-  printVolumeMass(m_LogVol.shield.detailB);
 }
 
 void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
@@ -1405,7 +1393,6 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.shield.detailC, true);
   geometry::setColor(*m_LogVol.shield.detailC, "#00ff00ff");
-  printVolumeMass(m_LogVol.shield.detailC);
 }
 
 void EKLM::GeoEKLMCreator::createShieldDetailDLogicalVolume()
@@ -1430,7 +1417,6 @@ void EKLM::GeoEKLMCreator::createShieldDetailDLogicalVolume()
   }
   geometry::setVisibility(*m_LogVol.shield.detailD, true);
   geometry::setColor(*m_LogVol.shield.detailD, "#00ff00ff");
-  printVolumeMass(m_LogVol.shield.detailD);
   delete solidDetailDPrism;
 }
 
@@ -1786,7 +1772,6 @@ createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicBaseBoard);
 }
 
 void EKLM::GeoEKLMCreator::
@@ -1818,7 +1803,6 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicStripBoard);
 }
 
 void EKLM::GeoEKLMCreator::
@@ -1878,7 +1862,6 @@ createPlasticSheetElement(int iSheetPlane, int iSheet,
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(m_LogVol.psheet[iSheet - 1]);
 }
 
 void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* plane) const
@@ -1972,7 +1955,6 @@ void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* stripVolume) const
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  printVolumeMass(logicSiPM);
 }
 
 void EKLM::GeoEKLMCreator::createShield(G4LogicalVolume* sector) const
@@ -2032,13 +2014,6 @@ void EKLM::GeoEKLMCreator::createShield(G4LogicalVolume* sector) const
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-}
-
-void EKLM::GeoEKLMCreator::printVolumeMass(G4LogicalVolume* lv) const
-{
-  if (m_GeoDat->getDetectorMode() == c_DetectorPrintMasses)
-    printf("Volume %s: mass = %g g\n", lv->GetName().c_str(),
-           lv->GetMass() / CLHEP::g);
 }
 
 bool EKLM::GeoEKLMCreator::detectorLayer(int endcap, int layer) const
@@ -2123,10 +2098,6 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
         createShield(m_LogVol.shieldLayerSector);
       }
     }
-  }
-  if (m_GeoDat->getDetectorMode() == c_DetectorPrintMasses) {
-    printf("EKLM started in mode c_DetectorPrintMasses. Exiting now.\n");
-    exit(0);
   }
 }
 

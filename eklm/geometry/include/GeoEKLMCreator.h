@@ -632,12 +632,6 @@ namespace Belle2 {
       void createShield(G4LogicalVolume* sector) const;
 
       /**
-       * Print mass of volume if mode == c_DetectorPrintMasses.
-       * @param[in] lv  Logical volume.
-       */
-      void printVolumeMass(G4LogicalVolume* lv) const;
-
-      /**
        * Create new volumes.
        */
       void newVolumes();

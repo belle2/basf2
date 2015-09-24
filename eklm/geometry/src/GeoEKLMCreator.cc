@@ -1453,7 +1453,8 @@ void EKLM::GeoEKLMCreator::createSolids()
   /* Strips. */
   n = m_GeoDat->getNStripsDifferentLength();
   for (i = 0; i < n; i++) {
-    createStripVolumeLogicalVolume(i);
+    if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
+      createStripVolumeLogicalVolume(i);
     createStripLogicalVolume(i);
     createStripGrooveLogicalVolume(i);
     createScintillatorLogicalVolume(i);
@@ -1886,6 +1887,26 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* plane) const
   }
 }
 
+void EKLM::GeoEKLMCreator::createStrip(G4LogicalVolume* plane) const
+{
+  int n;
+  const HepGeom::Transform3D* t;
+  HepGeom::Transform3D t2;
+  G4LogicalVolume* lv;
+  n = m_GeoDat->getStripLengthIndex(m_CurVol.strip - 1);
+  t = m_TransformData->getStripTransform(m_CurVol.endcap, m_CurVol.layer,
+                                         m_CurVol.sector, m_CurVol.plane,
+                                         m_CurVol.strip);
+  t2 = (*t) * HepGeom::RotateX3D(180.0 * CLHEP::deg);
+  lv = m_LogVol.strip[n];
+  try {
+    new G4PVPlacement(t2, lv, lv->GetName(), plane, false, m_CurVol.strip,
+                      false);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+}
+
 void EKLM::GeoEKLMCreator::createStrip(int iStrip) const
 {
   HepGeom::Transform3D t;
@@ -2034,9 +2055,10 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   createSolids();
   /* Create physical volumes which are used only once. */
   for (i = 0; i < m_GeoDat->getNStripsDifferentLength(); i++) {
-    if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
+    if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
       createSiPM(m_LogVol.stripvol[i]);
-    createStrip(i);
+      createStrip(i);
+    }
     createStripGroove(i);
     createScintillator(i);
   }
@@ -2068,7 +2090,14 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
             }
             for (m_CurVol.strip = 1; m_CurVol.strip <= m_GeoDat->getNStrips();
                  m_CurVol.strip++)
-              createStripVolume(plane);
+              switch (m_GeoDat->getDetectorMode()) {
+                case c_DetectorNormal:
+                  createStrip(plane);
+                  break;
+                case c_DetectorBackground:
+                  createStripVolume(plane);
+                  break;
+              }
           }
           if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
             for (m_CurVol.plane = 1; m_CurVol.plane <= m_GeoDat->getNPlanes();

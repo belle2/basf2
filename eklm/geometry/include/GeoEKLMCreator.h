@@ -599,10 +599,16 @@ namespace Belle2 {
        * Create strip volume.
        * @param[in] plane Plane logical volume.
        */
-      void createStripVolume(G4LogicalVolume* mlv) const;
+      void createStripVolume(G4LogicalVolume* plane) const;
 
       /**
-       * Create strip.
+       * Create strip (version for normal mode).
+       * @param[in] plane Plane logical volume.
+       */
+      void createStrip(G4LogicalVolume* plane) const;
+
+      /**
+       * Create strip (version for background study mode).
        * @param[in] iStrip Number of strip in the length-based array.
        */
       void createStrip(int iStrip) const;

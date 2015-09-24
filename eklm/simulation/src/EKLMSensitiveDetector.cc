@@ -14,6 +14,7 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/GearDir.h>
@@ -48,6 +49,7 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
 //-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  int stripLevel;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->
                            GetTouchableHandle();
@@ -113,14 +115,22 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
+  switch (GeometryData::Instance().getDetectorMode()) {
+    case c_DetectorNormal:
+      stripLevel = 1;
+      break;
+    case c_DetectorBackground:
+      stripLevel = 2;
+      break;
+  }
   /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {
     case c_SensitiveStrip:
-      hit->setStrip(hist->GetVolume(2)->GetCopyNo());
-      hit->setPlane(hist->GetVolume(3)->GetCopyNo());
-      hit->setSector(hist->GetVolume(4)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(5)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(6)->GetCopyNo());
+      hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());
+      hit->setPlane(hist->GetVolume(stripLevel + 1)->GetCopyNo());
+      hit->setSector(hist->GetVolume(stripLevel + 2)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(stripLevel + 3)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(stripLevel + 4)->GetCopyNo());
       hit->setVolumeID(stripNumber(hit->getEndcap(), hit->getLayer(),
                                    hit->getSector(), hit->getPlane(),
                                    hit->getStrip()));

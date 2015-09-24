@@ -56,4 +56,9 @@ else:
         comp_size = convert_bytes(branch.GetZipBytes('*'))
         print "%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size)
     print "===================================================================="
-    print "\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tree.GetTotBytes()), convert_bytes(tree.GetZipBytes()))
+    tot = tree.GetTotBytes()
+    totzip = tree.GetZipBytes()
+    nentries = tree.GetEntries()
+    print "\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tot), convert_bytes(totzip))
+    print "\t%30s\t%7s\t%7s" % ("Per entry", convert_bytes(tot/nentries), convert_bytes(totzip/nentries))
+    print "'%s' contains %d entries." % (args.TREENAME, nentries)

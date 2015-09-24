@@ -71,14 +71,6 @@ namespace Belle2 {
     };
 
     /**
-     * Scintillator solids.
-     */
-    struct ScintillatorSolids {
-      G4Box* box;               /**< Box (auxiliary). */
-      G4SubtractionSolid* sens; /**< Sensitive area. */
-    };
-
-    /**
      * Shield logical volumes.
      */
     struct ShieldLogicalVolumes {
@@ -110,12 +102,6 @@ namespace Belle2 {
      * @var Solids::psheet
      * Element of plastic sheet.
      *
-     * @var Solids::stripvol
-     * Strip + SiPM volume.
-     *
-     * @var Solids::strip
-     * Strips.
-     *
      * @var Solids::groove
      * Strip grooves.
      *
@@ -136,9 +122,6 @@ namespace Belle2 {
      *
      * @var Solids::sectorsup
      * Sector support.
-     *
-     * @var Solids::scint
-     * Scintillator.
      */
     struct Solids {
       G4VSolid* endcap;
@@ -147,8 +130,6 @@ namespace Belle2 {
       G4VSolid* secsupp;
       G4VSolid** plane;
       G4VSolid** psheet;
-      G4VSolid** stripvol;
-      G4VSolid** strip;
       G4VSolid** groove;
       G4VSolid* sipm;
       G4VSolid* board;
@@ -156,7 +137,6 @@ namespace Belle2 {
       G4VSolid* stripboard;
       G4Box* subtractionBox;
       struct SectorSupportSolids sectorsup;
-      struct ScintillatorSolids* scint;
     };
 
     /**
@@ -444,6 +424,30 @@ namespace Belle2 {
       void createPlasticSheetSolid(int n);
 
       /**
+       * Create strip volume logical volume.
+       * @param[in] iStrip Number of strip in length-based array.
+       */
+      void createStripVolumeLogicalVolume(int iStrip);
+
+      /**
+       * Create strip logical volume.
+       * @param[in] iStrip Number of strip in length-based array.
+       */
+      void createStripLogicalVolume(int iStrip);
+
+      /**
+       * Create strip groove logical volume.
+       * @param[in] iStrip Number of strip in length-based array.
+       */
+      void createStripGrooveLogicalVolume(int iStrip);
+
+      /**
+       * Create scintillator logical volume.
+       * @param[in] iStrip Number of strip in length-based array.
+       */
+      void createScintillatorLogicalVolume(int iStrip);
+
+      /**
        * Create shield detail A logical volume.
        */
       void createShieldDetailALogicalVolume();
@@ -592,23 +596,28 @@ namespace Belle2 {
                                      G4LogicalVolume* plane) const;
 
       /**
-       * Create strip logical volumes.
-       * @param[in] iStrip Number of strip in the length-based array.
-       * @param[in] plane  Plane logical volume.
-       */
-      void createStripLogicalVolumes(int iStrip, G4LogicalVolume* plane) const;
-
-      /**
        * Create strip volume.
        * @param[in] plane Plane logical volume.
        */
       void createStripVolume(G4LogicalVolume* mlv) const;
 
       /**
-       * Create strip physical volumes.
+       * Create strip.
        * @param[in] iStrip Number of strip in the length-based array.
        */
-      void createStripPhysicalVolumes(int iStrip) const;
+      void createStrip(int iStrip) const;
+
+      /**
+       * Create strip groove.
+       * @param[in] iStrip Number of strip in the length-based array.
+       */
+      void createStripGroove(int iStrip) const;
+
+      /**
+       * Create scintillator.
+       * @param[in] iStrip Number of strip in the length-based array.
+       */
+      void createScintillator(int iStrip) const;
 
       /**
        * Create silicon cube in the place of SiPM for radiation study.

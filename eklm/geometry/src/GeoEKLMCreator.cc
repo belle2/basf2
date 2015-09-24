@@ -87,15 +87,9 @@ void EKLM::GeoEKLMCreator::newVolumes()
   if (m_LogVol.psheet == NULL)
     B2FATAL(MemErr);
   nDiff = m_GeoDat->getNStripsDifferentLength();
-  m_Solids.stripvol = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
-  if (m_Solids.stripvol == NULL)
-    B2FATAL(MemErr);
   m_LogVol.stripvol = (G4LogicalVolume**)
                       malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.stripvol == NULL)
-    B2FATAL(MemErr);
-  m_Solids.strip = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
-  if (m_Solids.strip == NULL)
     B2FATAL(MemErr);
   m_LogVol.strip = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.strip == NULL)
@@ -105,11 +99,6 @@ void EKLM::GeoEKLMCreator::newVolumes()
     B2FATAL(MemErr);
   m_LogVol.groove = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.groove == NULL)
-    B2FATAL(MemErr);
-  m_Solids.scint = (struct EKLM::ScintillatorSolids*)
-                   malloc(m_GeoDat->getNStrips() *
-                          sizeof(struct EKLM::ScintillatorSolids));
-  if (m_Solids.scint == NULL)
     B2FATAL(MemErr);
   m_LogVol.scint = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.scint == NULL)
@@ -177,13 +166,10 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
   free(m_Solids.plane);
   free(m_Solids.psheet);
   free(m_LogVol.psheet);
-  free(m_Solids.stripvol);
   free(m_LogVol.stripvol);
-  free(m_Solids.strip);
   free(m_LogVol.strip);
   free(m_Solids.groove);
   free(m_LogVol.groove);
-  free(m_Solids.scint);
   free(m_LogVol.scint);
   for (i = 0; i < m_GeoDat->getNPlanes(); i++)
     free(m_LogVol.segmentsup[i]);
@@ -1158,6 +1144,132 @@ void EKLM::GeoEKLMCreator::createPlasticSheetSolid(int n)
   m_Solids.psheet[n] = unifySolids((G4VSolid**)b, t, 15, name);
 }
 
+void EKLM::GeoEKLMCreator::createStripVolumeLogicalVolume(int iStrip)
+{
+  int iPos;
+  char name[128];
+  const struct ElementPosition* stripPos;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  G4Box* stripVolumeSolid;
+  iPos = m_GeoDat->getStripPositionIndex(iStrip);
+  stripPos = m_GeoDat->getStripPosition(iPos + 1);
+  snprintf(name, 128, "StripVolume_%d", iStrip + 1);
+  try {
+    stripVolumeSolid =
+      new G4Box(name, 0.5 * (stripPos->Length + stripGeometry->RSSSize),
+                0.5 * stripGeometry->Width, 0.5 * stripGeometry->Thickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    m_LogVol.stripvol[iStrip] =
+      new G4LogicalVolume(stripVolumeSolid, m_Materials.air, name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.stripvol[iStrip], false);
+}
+
+void EKLM::GeoEKLMCreator::createStripLogicalVolume(int iStrip)
+{
+  int iPos;
+  char name[128];
+  const struct ElementPosition* stripPos;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  G4Box* stripSolid;
+  iPos = m_GeoDat->getStripPositionIndex(iStrip);
+  stripPos = m_GeoDat->getStripPosition(iPos + 1);
+  snprintf(name, 128, "Strip_%d", iStrip + 1);
+  try {
+    stripSolid = new G4Box(name, 0.5 * stripPos->Length,
+                           0.5 * stripGeometry->Width,
+                           0.5 * stripGeometry->Thickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    m_LogVol.strip[iStrip] =
+      new G4LogicalVolume(stripSolid, m_Materials.polystyrene, name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.strip[iStrip], true);
+  geometry::setColor(*m_LogVol.strip[iStrip], "#ffffffff");
+  printVolumeMass(m_LogVol.strip[iStrip]);
+}
+
+void EKLM::GeoEKLMCreator::createStripGrooveLogicalVolume(int iStrip)
+{
+  int iPos;
+  char name[128];
+  const struct ElementPosition* stripPos;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  iPos = m_GeoDat->getStripPositionIndex(iStrip);
+  stripPos = m_GeoDat->getStripPosition(iPos + 1);
+  snprintf(name, 128, "Groove_%d", iStrip + 1);
+  try {
+    m_Solids.groove[iStrip] = new G4Box(name, 0.5 * stripPos->Length,
+                                        0.5 * stripGeometry->GrooveWidth,
+                                        0.5 * stripGeometry->GrooveDepth);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    m_LogVol.groove[iStrip] =
+      new G4LogicalVolume(m_Solids.groove[iStrip], m_Materials.gel,
+                          name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.groove[iStrip], true);
+  geometry::setColor(*m_LogVol.groove[iStrip], "#00ff00ff");
+  printVolumeMass(m_LogVol.groove[iStrip]);
+}
+
+void EKLM::GeoEKLMCreator::createScintillatorLogicalVolume(int iStrip)
+{
+  int iPos;
+  char name[128];
+  const struct ElementPosition* stripPos;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  HepGeom::Transform3D t;
+  G4Box* b;
+  G4SubtractionSolid* scintillatorSolid;
+  iPos = m_GeoDat->getStripPositionIndex(iStrip);
+  stripPos = m_GeoDat->getStripPosition(iPos + 1);
+  snprintf(name, 128, "StripSensitive_%d_Box", iStrip + 1);
+  try {
+    b = new G4Box(name,
+                  0.5 * stripPos->Length -
+                  stripGeometry->NoScintillationThickness,
+                  0.5 * stripGeometry->Width -
+                  stripGeometry->NoScintillationThickness,
+                  0.5 * stripGeometry->Thickness -
+                  stripGeometry->NoScintillationThickness);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  snprintf(name, 128, "StripSensitive_%d", iStrip + 1);
+  t = HepGeom::Translate3D(0., 0., 0.5 * (stripGeometry->Thickness -
+                                          stripGeometry->GrooveDepth));
+  try {
+    scintillatorSolid =
+      new G4SubtractionSolid(name, b, m_Solids.groove[iStrip], t);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  try {
+    m_LogVol.scint[iStrip] =
+      new G4LogicalVolume(scintillatorSolid, m_Materials.polystyrene,
+                          name, 0, m_Sensitive[0], 0);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.scint[iStrip], false);
+  geometry::setColor(*m_LogVol.scint[iStrip], "#ffffffff");
+  printVolumeMass(m_LogVol.scint[iStrip]);
+}
+
 void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
 {
   G4Box* box = NULL;
@@ -1324,11 +1436,9 @@ void EKLM::GeoEKLMCreator::createShieldDetailDLogicalVolume()
 
 void EKLM::GeoEKLMCreator::createSolids()
 {
-  int i, j, iPos, n;
-  char name[128];
+  int i, j, n;
   HepGeom::Transform3D t;
   const struct BoardGeometry* boardGeometry;
-  const struct ElementPosition* stripPos;
   const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   /* Endcap, layer, sector. */
   createEndcapSolid();
@@ -1357,59 +1467,10 @@ void EKLM::GeoEKLMCreator::createSolids()
   /* Strips. */
   n = m_GeoDat->getNStripsDifferentLength();
   for (i = 0; i < n; i++) {
-    iPos = m_GeoDat->getStripPositionIndex(i);
-    stripPos = m_GeoDat->getStripPosition(iPos + 1);
-    /* Strip volumes. */
-    snprintf(name, 128, "StripVolume_%d", i + 1);
-    try {
-      m_Solids.stripvol[i] =
-        new G4Box(name, 0.5 * (stripPos->Length + stripGeometry->RSSSize),
-                  0.5 * stripGeometry->Width, 0.5 * stripGeometry->Thickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    /* Strips. */
-    snprintf(name, 128, "Strip_%d", i + 1);
-    try {
-      m_Solids.strip[i] = new G4Box(name, 0.5 * stripPos->Length,
-                                    0.5 * stripGeometry->Width,
-                                    0.5 * stripGeometry->Thickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    /* Strip grooves. */
-    snprintf(name, 128, "Groove_%d", i + 1);
-    try {
-      m_Solids.groove[i] = new G4Box(name, 0.5 * stripPos->Length,
-                                     0.5 * stripGeometry->GrooveWidth,
-                                     0.5 * stripGeometry->GrooveDepth);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    /* Strip sensitive volumes (scintillator). */
-    snprintf(name, 128, "StripSensitive_%d_Box", i + 1);
-    try {
-      m_Solids.scint[i].box =
-        new G4Box(name,
-                  0.5 * stripPos->Length -
-                  stripGeometry->NoScintillationThickness,
-                  0.5 * stripGeometry->Width -
-                  stripGeometry->NoScintillationThickness,
-                  0.5 * stripGeometry->Thickness -
-                  stripGeometry->NoScintillationThickness);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
-    snprintf(name, 128, "StripSensitive_%d", i + 1);
-    t = HepGeom::Translate3D(0., 0., 0.5 * (stripGeometry->Thickness -
-                                            stripGeometry->GrooveDepth));
-    try {
-      m_Solids.scint[i].sens =
-        new G4SubtractionSolid(name, m_Solids.scint[i].box,
-                               m_Solids.groove[i], t);
-    } catch (std::bad_alloc& ba) {
-      B2FATAL(MemErr);
-    }
+    createStripVolumeLogicalVolume(i);
+    createStripLogicalVolume(i);
+    createStripGrooveLogicalVolume(i);
+    createScintillatorLogicalVolume(i);
   }
   /* Plastic sheet elements. */
   for (i = 0; i < m_GeoDat->getNSegments(); i++)
@@ -1820,88 +1881,6 @@ createPlasticSheetElement(int iSheetPlane, int iSheet,
   printVolumeMass(m_LogVol.psheet[iSheet - 1]);
 }
 
-void EKLM::GeoEKLMCreator::
-createStripLogicalVolumes(int iStrip, G4LogicalVolume* plane) const
-{
-  std::string stripVolumeName = "StripVolume_" +
-                                boost::lexical_cast<std::string>(iStrip)
-                                + "_" + plane->GetName();
-  std::string stripName = "Strip_" + stripVolumeName;
-  std::string grooveName = "Groove_" + stripName;
-  std::string sensitiveName = "Sensitive_" + stripName;
-  try {
-    m_LogVol.stripvol[iStrip] =
-      new G4LogicalVolume(m_Solids.stripvol[iStrip], m_Materials.air,
-                          stripVolumeName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    m_LogVol.strip[iStrip] =
-      new G4LogicalVolume(m_Solids.strip[iStrip], m_Materials.polystyrene,
-                          stripName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    m_LogVol.groove[iStrip] =
-      new G4LogicalVolume(m_Solids.groove[iStrip], m_Materials.gel,
-                          grooveName);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  try {
-    m_LogVol.scint[iStrip] =
-      new G4LogicalVolume(m_Solids.scint[iStrip].sens,
-                          m_Materials.polystyrene, sensitiveName,
-                          0, m_Sensitive[0], 0);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  geometry::setVisibility(*m_LogVol.stripvol[iStrip], false);
-  geometry::setVisibility(*m_LogVol.strip[iStrip], true);
-  geometry::setColor(*m_LogVol.strip[iStrip], "#ffffffff");
-  geometry::setVisibility(*m_LogVol.groove[iStrip], true);
-  geometry::setColor(*m_LogVol.groove[iStrip], "#00ff00ff");
-  geometry::setVisibility(*m_LogVol.scint[iStrip], false);
-  geometry::setColor(*m_LogVol.scint[iStrip], "#ffffffff");
-  printVolumeMass(m_LogVol.strip[iStrip]);
-  printVolumeMass(m_LogVol.groove[iStrip]);
-  printVolumeMass(m_LogVol.scint[iStrip]);
-}
-
-void EKLM::GeoEKLMCreator::createStripPhysicalVolumes(int iStrip) const
-{
-  HepGeom::Transform3D t;
-  G4LogicalVolume* lv;
-  G4LogicalVolume* lvm;
-  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
-  t = HepGeom::Translate3D(-0.5 * stripGeometry->RSSSize, 0., 0.);
-  lvm = m_LogVol.stripvol[iStrip];
-  lv = m_LogVol.strip[iStrip];
-  try {
-    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  t = HepGeom::Translate3D(0., 0., 0.5 * (stripGeometry->Thickness -
-                                          stripGeometry->GrooveDepth));
-  lvm = lv;
-  lv = m_LogVol.groove[iStrip];
-  try {
-    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-  t = HepGeom::Translate3D(0., 0., 0.);
-  lv = m_LogVol.scint[iStrip];
-  try {
-    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(MemErr);
-  }
-}
-
 void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* plane) const
 {
   int n;
@@ -1919,6 +1898,54 @@ void EKLM::GeoEKLMCreator::createStripVolume(G4LogicalVolume* plane) const
   try {
     new G4PVPlacement(t2, lv, lv->GetName(), plane, false, m_CurVol.strip,
                       false);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+}
+
+void EKLM::GeoEKLMCreator::createStrip(int iStrip) const
+{
+  HepGeom::Transform3D t;
+  G4LogicalVolume* lv;
+  G4LogicalVolume* lvm;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  t = HepGeom::Translate3D(-0.5 * stripGeometry->RSSSize, 0., 0.);
+  lvm = m_LogVol.stripvol[iStrip];
+  lv = m_LogVol.strip[iStrip];
+  try {
+    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+}
+
+void EKLM::GeoEKLMCreator::createStripGroove(int iStrip) const
+{
+  HepGeom::Transform3D t;
+  G4LogicalVolume* lv;
+  G4LogicalVolume* lvm;
+  const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
+  t = HepGeom::Translate3D(0., 0., 0.5 * (stripGeometry->Thickness -
+                                          stripGeometry->GrooveDepth));
+  lvm = m_LogVol.strip[iStrip];
+  lv = m_LogVol.groove[iStrip];
+  try {
+    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+}
+
+void EKLM::GeoEKLMCreator::createScintillator(int iStrip) const
+{
+  HepGeom::Transform3D t;
+  G4LogicalVolume* lv;
+  G4LogicalVolume* lvm;
+  t = HepGeom::Translate3D(0., 0., 0.);
+  lvm = m_LogVol.strip[iStrip];
+  lv = m_LogVol.scint[iStrip];
+  try {
+    new G4PVPlacement(t, lv, lv->GetName(), lvm, false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -2030,6 +2057,15 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   G4LogicalVolume* endcap, *layer, *sector, *plane, *segmentReadoutBoard;
   createMaterials();
   createSolids();
+  /* Create physical volumes which are used only once. */
+  for (i = 0; i < m_GeoDat->getNStripsDifferentLength(); i++) {
+    if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
+      createSiPM(m_LogVol.stripvol[i]);
+    createStrip(i);
+    createStripGroove(i);
+    createScintillator(i);
+  }
+  /* Create other volumes. */
   for (m_CurVol.endcap = 1; m_CurVol.endcap <= 2; m_CurVol.endcap++) {
     endcap = createEndcap(&topVolume);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();
@@ -2054,15 +2090,6 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
             for (i = 1; i <= 2; i++) {
               for (j = 1; j <= m_GeoDat->getNSegments(); j++)
                 createPlasticSheetElement(i, j, plane);
-            }
-            if (m_CurVol.endcap == 1 && m_CurVol.layer == 1 &&
-                m_CurVol.sector == 1 && m_CurVol.plane == 1) {
-              for (i = 0; i < m_GeoDat->getNStripsDifferentLength(); i++) {
-                createStripLogicalVolumes(i, plane);
-                if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
-                  createSiPM(m_LogVol.stripvol[i]);
-                createStripPhysicalVolumes(i);
-              }
             }
             for (m_CurVol.strip = 1; m_CurVol.strip <= m_GeoDat->getNStrips();
                  m_CurVol.strip++)

@@ -425,12 +425,12 @@ void EKLM::GeometryData::calculateShieldGeometry()
 
 EKLM::GeometryData::GeometryData()
 {
-  int i;
-  int j;
+  int i, j, mode;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  m_mode = (enum DetectorMode)gd.getInt("Mode");
-  if (m_mode < 0 || m_mode > 2)
-    B2FATAL("EKLM started with unknown geometry mode " << m_mode << ".");
+  mode = gd.getInt("Mode");
+  if (mode < 0 || mode > 1)
+    B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
+  m_mode = (enum DetectorMode)mode;
   m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   GearDir EndCap(gd);
   EndCap.append("/Endcap");

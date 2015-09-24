@@ -78,30 +78,24 @@ namespace Belle2 {
   void TOPDigitizerModule::initialize()
   {
     // input
-
-    StoreArray<TOPSimHit> topSimHits;
-    topSimHits.isRequired();
-
+    StoreArray<TOPSimHit> simHits;
+    simHits.isRequired();
     StoreArray<MCParticle> mcParticles;
     mcParticles.isOptional();
 
     // output
-
-    StoreArray<TOPDigit> topDigits;
-    topDigits.registerInDataStore();
-    topDigits.registerRelationTo(topSimHits);
-    topDigits.registerRelationTo(mcParticles);
-
+    StoreArray<TOPDigit> digits;
+    digits.registerInDataStore();
+    digits.registerRelationTo(simHits);
+    digits.registerRelationTo(mcParticles);
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
 
     // store electronics jitter and efficiency to make it known to reconstruction
-
     m_topgp->setELjitter(m_electronicJitter);
     m_topgp->setELefficiency(m_electronicEfficiency);
 
     // bunch separation in time
-
     if (m_trigT0Sigma > 0) {
       GearDir superKEKB("/Detector/SuperKEKB/");
       double circumference = superKEKB.getLength("circumference");
@@ -120,10 +114,10 @@ namespace Belle2 {
   {
 
     // input: simulated hits
-    StoreArray<TOPSimHit> topSimHits;
+    StoreArray<TOPSimHit> simHits;
 
     // output: digitized hits
-    StoreArray<TOPDigit> topDigits;
+    StoreArray<TOPDigit> digits;
 
     // output: simulated bunch values
     StoreObjPtr<TOPRecBunch> recBunch;
@@ -132,7 +126,6 @@ namespace Belle2 {
     m_topgp->setBasfUnits();
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
-
     double trigT0 = 0;
     if (m_trigT0Sigma > 0) {
       trigT0 = gRandom->Gaus(0., m_trigT0Sigma);
@@ -147,35 +140,31 @@ namespace Belle2 {
     // TDC
     int overflow = m_topgp->TDCoverflow();
 
-    int nHits = topSimHits.getEntries();
-    for (int iHit = 0; iHit < nHits; iHit++) {
+    for (const auto& simHit : simHits) {
 
       // simulate electronic efficiency
       if (gRandom->Rndm() > m_electronicEfficiency) continue;
 
-      // take simulated hit
-      const TOPSimHit* simHit = topSimHits[iHit];
-
       // Do spatial digitization
-      double x = simHit->getX();
-      double y = simHit->getY();
-      int pmtID = simHit->getPmtID();
+      double x = simHit.getX();
+      double y = simHit.getY();
+      int pmtID = simHit.getPmtID();
       int channelID = m_topgp->getChannelID(x, y, pmtID);
       if (channelID == 0) continue;
 
       // add TTS and electronic jitter to photon time and make it relative to start time
-      double tts = PMT_TTS();
+      double tts = generateTTS();
       double tel = gRandom->Gaus(0., m_electronicJitter);
-      double time = simHit->getTime() + tts + tel - startTime;
+      double time = simHit.getTime() + tts + tel - startTime;
 
       // convert to TDC count
       int TDC = m_topgp->getTDCcount(time);
       if (TDC == overflow) continue;
 
       // store result and add relations
-      TOPDigit* digit = topDigits.appendNew(simHit->getBarID(), channelID, TDC);
-      digit->addRelationTo(simHit);
-      RelationVector<MCParticle> particles = simHit->getRelationsFrom<MCParticle>();
+      TOPDigit* digit = digits.appendNew(simHit.getBarID(), channelID, TDC);
+      digit->addRelationTo(&simHit);
+      RelationVector<MCParticle> particles = simHit.getRelationsFrom<MCParticle>();
       for (unsigned k = 0; k < particles.size(); ++k) {
         digit->addRelationTo(particles[k], particles.weight(k));
       }
@@ -185,23 +174,23 @@ namespace Belle2 {
     // add randomly distributed electronic noise
 
     if (m_darkNoise > 0) {
-      int Nbars = m_topgp->getNbars();
-      int Nchannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
-                      m_topgp->getNpadx() * m_topgp->getNpady();
+      int numBars = m_topgp->getNbars();
+      int numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
+                        m_topgp->getNpadx() * m_topgp->getNpady();
 
-      for (int barID = 1; barID < Nbars + 1; barID++) {
-        int NoiseHits = gRandom->Poisson(m_darkNoise);
-        for (int i = 0; i < NoiseHits; i++) {
-          int channelID = int(gRandom->Rndm() * Nchannels) + 1;
+      for (int barID = 1; barID <= numBars; barID++) {
+        int numHits = gRandom->Poisson(m_darkNoise);
+        for (int i = 0; i < numHits; i++) {
+          int channelID = int(gRandom->Rndm() * numChannels) + 1;
           int TDC = int(gRandom->Rndm() * overflow);
-          topDigits.appendNew(barID, channelID, TDC);
+          digits.appendNew(barID, channelID, TDC);
         }
       }
     }
 
     // set hardware channel ID
 
-    for (auto& digit : topDigits) {
+    for (auto& digit : digits) {
       unsigned chan = m_topgp->getHardwareChannelID(digit.getChannelID());
       digit.setHardwareChannelID(chan);
     }
@@ -223,7 +212,7 @@ namespace Belle2 {
   {
   }
 
-  double TOPDigitizerModule::PMT_TTS()
+  double TOPDigitizerModule::generateTTS()
   {
     double prob = gRandom->Rndm();
     double s = 0;

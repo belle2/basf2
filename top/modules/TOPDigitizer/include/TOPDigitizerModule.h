@@ -80,7 +80,7 @@ namespace Belle2 {
      * Returns random number according to TTS distribution
      * @return random number according to TTS distribution
      */
-    double PMT_TTS();
+    double generateTTS();
 
     double m_timeZeroJitter;       /**< r.m.s of T0 jitter */
     double m_electronicJitter;     /**< r.m.s of electronic jitter */

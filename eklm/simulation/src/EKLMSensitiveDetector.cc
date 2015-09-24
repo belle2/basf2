@@ -49,7 +49,7 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
 //-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
-  int stripLevel;
+  int stripLevel = 1;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->
                            GetTouchableHandle();
@@ -115,14 +115,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  switch (GeometryData::Instance().getDetectorMode()) {
-    case c_DetectorNormal:
-      stripLevel = 1;
-      break;
-    case c_DetectorBackground:
-      stripLevel = 2;
-      break;
-  }
+  if (GeometryData::Instance().getDetectorMode() == c_DetectorBackground)
+    stripLevel = 2;
   /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {
     case c_SensitiveStrip:

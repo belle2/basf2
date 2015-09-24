@@ -79,7 +79,7 @@ namespace Belle2 {
       std::string name = digits.getName() + "_BG";
       StoreArray<Digit> bgDigits(name);
       bgDigits.isOptional();
-      B2DEBUG(100, "registration: " << digits.getName() << " " << bgDigits.getName());
+      B2DEBUG(100, "optional input: " << digits.getName() << " " << bgDigits.getName());
     }
 
     /**
@@ -108,7 +108,8 @@ namespace Belle2 {
       std::multimap<unsigned, Digit*> multimap;
       for (auto& digit : digits) {
         unsigned id = digit.getUniqueChannelID();
-        multimap.emplace(id, &digit);
+        // multimap.emplace(id, &digit); /* Clang doesn't know this member! */
+        multimap.insert(std::pair<unsigned, Digit*>(id, &digit));
       }
 
       int size = digits.getEntries(); // for debug print
@@ -124,7 +125,7 @@ namespace Belle2 {
           pileup = digit->addBGDigit(&bgDigit) == DigitBase::c_DontAppend;
           if (pileup) break; // BG digit merged with simulated one
         }
-        if (!pileup) digits.appendNew(bgDigit); // BG digit not merged therefore append
+        if (!pileup) digits.appendNew(bgDigit); // BG digit not merged, therefore append
       }
 
       // debug printout
@@ -132,7 +133,7 @@ namespace Belle2 {
       B2DEBUG(100, digits.getName() << ": before " << size
               << " + " << bgDigits.getEntries() << "(BG)"
               << ", after " << digits.getEntries()
-              << ", pileup " << diff);
+              << ", merged " << diff);
 
     }
 

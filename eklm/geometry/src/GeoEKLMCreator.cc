@@ -45,6 +45,8 @@ geometry::CreatorFactory<EKLM::GeoEKLMCreator> GeoEKLMFactory("EKLMCreator");
 
 EKLM::GeoEKLMCreator::GeoEKLMCreator()
 {
+  m_Materials.air = NULL;
+  m_CurVol.endcap = 1;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (readESTRData(&m_ESTRPar) == ENOMEM)
     B2FATAL(MemErr);

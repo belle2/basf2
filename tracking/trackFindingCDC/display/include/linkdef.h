@@ -1,4 +1,3 @@
-#ifdef __CINT__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -14,4 +13,3 @@
 #pragma link C++ class Belle2::TrackFindingCDC::EventDataPlotter-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSVGPlotter-;
 
-#endif

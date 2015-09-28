@@ -1,4 +1,3 @@
-#ifdef __CINT__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -11,4 +10,3 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitClusterBasicVarSet-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitClusterBkgTruthVarSet-;
 
-#endif

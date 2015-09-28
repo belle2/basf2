@@ -1,4 +1,3 @@
-#ifdef __CINT__
 
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
@@ -28,4 +27,3 @@
 
 #endif
 
-#endif

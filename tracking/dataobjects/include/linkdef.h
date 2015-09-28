@@ -1,4 +1,3 @@
-#ifdef __CINT__
 #include <framework/gearbox/Const.h>
 
 #pragma link off all globals;
@@ -59,6 +58,3 @@
 
 // #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
 // #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;
-
-
-#endif

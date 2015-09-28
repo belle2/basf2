@@ -35,6 +35,10 @@ namespace Belle2 {
     using Iterator = typename std::vector<BoxEntry>::iterator;
 
 
+    /** typedef for more readable iterator-type */
+    using ConstIterator = typename std::vector<BoxEntry>::const_iterator;
+
+
     /** for given key a pointer to the value is returned. If key was invalid, a NULL-ptr will be returned */
     ValueType* find(const KeyType& aKey)
     {
@@ -44,7 +48,7 @@ namespace Belle2 {
                             [&](const BoxEntry & entry) -> bool
       { return entry.first == aKey; }
                           );
-      return (foundPos == m_container.end() ? NULL : &foundPos->second);
+      return (foundPos == m_container.end() ? nullptr : &foundPos->second);
     }
 
 
@@ -60,8 +64,16 @@ namespace Belle2 {
     Iterator begin() { return m_container.begin(); }
 
 
+    /** returns iterator for container: begin */
+    ConstIterator begin() const { return m_container.begin(); }
+
+
     /** returns iterator for container: end */
     Iterator end() { return m_container.end(); }
+
+
+    /** returns iterator for container: end */
+    ConstIterator end() const { return m_container.end(); }
 
 
     /** returns number of entries in container: */

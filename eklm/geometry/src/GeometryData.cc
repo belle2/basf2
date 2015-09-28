@@ -13,7 +13,9 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 
 /* Belle2 headers. */
+#include <eklm/geometry/Circle2D.h>
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/geometry/Line2D.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -117,6 +119,10 @@ static void readShieldDetailGeometry(struct EKLM::ShieldDetailGeometry* sdg,
 
 void EKLM::GeometryData::calculateSectorSupportGeometry()
 {
+  Line2D line41(m_SectorSupportPosition.X, 0, 0, 1);
+  Line2D line23(0, m_SectorSupportPosition.Y, 1, 0);
+  Circle2D innerCircle(0, 0, m_SectorSupportPosition.InnerR);
+  HepGeom::Point3D<double> intersections[2];
   /* Corner 1. */
   m_SectorSupportGeometry.Corner1A.X = m_SectorSupportPosition.X;
   m_SectorSupportGeometry.Corner1A.Y = m_SectorSupportPosition.OuterR -
@@ -141,15 +147,13 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
     (1.0 / cos(m_SectorSupportGeometry.CornerAngle) -
      tan(m_SectorSupportGeometry.CornerAngle));
   /* Corner 3. */
-  m_SectorSupportGeometry.Corner3.X =
-    sqrt(m_SectorSupportPosition.InnerR * m_SectorSupportPosition.InnerR -
-         m_SectorSupportPosition.Y * m_SectorSupportPosition.Y);
-  m_SectorSupportGeometry.Corner3.Y = m_SectorSupportPosition.Y;
+  line23.findIntersection(innerCircle, intersections);
+  m_SectorSupportGeometry.Corner3.X = intersections[1].X();
+  m_SectorSupportGeometry.Corner3.Y = intersections[1].Y();
   /* Corner 4. */
-  m_SectorSupportGeometry.Corner4.X = m_SectorSupportPosition.X;
-  m_SectorSupportGeometry.Corner4.Y =
-    sqrt(m_SectorSupportPosition.InnerR * m_SectorSupportPosition.InnerR -
-         m_SectorSupportPosition.X * m_SectorSupportPosition.X);
+  line41.findIntersection(innerCircle, intersections);
+  m_SectorSupportGeometry.Corner4.X = intersections[1].X();
+  m_SectorSupportGeometry.Corner4.X = intersections[1].X();
 }
 
 static bool compareLength(double a, double b)

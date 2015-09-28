@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs the externTeacher tool as a job on the cluster
 
-rf=`mktemp`
+rf=`mktemp -u`
 f=$(basename $rf)
 echo "Use $f as temporary file"
 printf " %q" externTeacher "$@" > "$f" 

@@ -30,7 +30,7 @@ namespace Belle2 {
       explicit CDCSegmentPairSkimmedFitlessVarSet(const std::string& prefix = "");
 
       /// Implement the skim cut.
-      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
+      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
     };
   }
 }

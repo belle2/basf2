@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const filterVarNames[] = {
       "is_cell",
       "cell_weight",
@@ -35,7 +35,7 @@ namespace Belle2 {
       static const size_t nNames = size(filterVarNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return filterVarNames[iName];

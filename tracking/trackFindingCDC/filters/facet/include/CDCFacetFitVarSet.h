@@ -31,7 +31,7 @@ namespace Belle2 {
     class CDCFacet;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const facetFitNames[] = {
       "start_phi",
       "start_phi_sigma",
@@ -56,7 +56,7 @@ namespace Belle2 {
       static const size_t nNames = size(facetFitNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return facetFitNames[iName];
@@ -76,7 +76,7 @@ namespace Belle2 {
       explicit CDCFacetFitVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
-      virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCFacet* facet) override final;
 
     private:
       /// Fitless filter for the feasibility cut of the right left passage information.

@@ -183,12 +183,12 @@ def show_tmva_results(file_path):
         "share",
         "root",
         "tmva"
-        )
+    )
 
     tmva_gui_script_file_path = os.path.join(
         tmva_gui_script_dir_path,
         "TMVAGui.C"
-        )
+    )
 
     file_path = os.path.realpath(file_path)
 

@@ -31,7 +31,7 @@ namespace Belle2 {
       /// TODO implement something sensable here.
       virtual
       NeighborWeight operator()(const CDCSegmentPair& fromPair,
-                                const CDCSegmentPair& toPair) IF_NOT_CINT(override final);
+                                const CDCSegmentPair& toPair) override final;
 
     }; // end class
 

@@ -31,16 +31,16 @@ namespace Belle2 {
 
     public:
       /// May be used to clear information from former events. Currently unused.
-      virtual void clear() IF_NOT_CINT(override final);
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() IF_NOT_CINT(override final);
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() IF_NOT_CINT(override final);
+      virtual void terminate() override final;
 
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      virtual CellWeight operator()(const CDCSegmentTriple& triple) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCSegmentTriple& triple) override final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.

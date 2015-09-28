@@ -17,7 +17,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const facetTruthNames[] = {
       "truth"
     };
@@ -32,7 +32,7 @@ namespace Belle2 {
       static const size_t nNames = size(facetTruthNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return facetTruthNames[iName];
@@ -49,13 +49,13 @@ namespace Belle2 {
       explicit CDCFacetTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet
-      virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCFacet* facet) override final;
 
       /// Initialize the varset before event processing
-      virtual void initialize() IF_NOT_CINT(override final);
+      virtual void initialize() override final;
 
       /// Initialize the varset before event processing
-      virtual void terminate() IF_NOT_CINT(override final);
+      virtual void terminate() override final;
 
     public:
       /// Facet filter that gives if the facet is a true facet.

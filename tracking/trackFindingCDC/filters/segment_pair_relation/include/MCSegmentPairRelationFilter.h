@@ -35,17 +35,17 @@ namespace Belle2 {
 
     public:
       /// May be used to clear information from former events. Currently unused.
-      virtual void clear() IF_NOT_CINT(override final);
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() IF_NOT_CINT(override final);
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() IF_NOT_CINT(override final);
+      virtual void terminate() override final;
 
       /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
       virtual NeighborWeight operator()(const CDCSegmentPair& fromSegmentPair,
-                                        const CDCSegmentPair& toSegmentPair) IF_NOT_CINT(override final);
+                                        const CDCSegmentPair& toSegmentPair) override final;
 
     public:
       /// Setter for the allow reverse parameter

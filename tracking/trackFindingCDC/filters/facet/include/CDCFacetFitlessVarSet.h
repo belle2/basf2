@@ -29,7 +29,7 @@ namespace Belle2 {
     class CDCFacet;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const facetFitlessNames[] = {
       "superlayer_id",
       "shape",
@@ -55,7 +55,7 @@ namespace Belle2 {
       static const size_t nNames = size(facetFitlessNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return facetFitlessNames[iName];
@@ -72,7 +72,7 @@ namespace Belle2 {
       explicit CDCFacetFitlessVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCFacet* facet) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCFacet* facet) override final;
 
     };
   }

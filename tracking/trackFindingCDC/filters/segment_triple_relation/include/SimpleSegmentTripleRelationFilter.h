@@ -30,7 +30,7 @@ namespace Belle2 {
     public:
       /// Implementation currently accepts all combinations
       virtual NeighborWeight operator()(const CDCSegmentTriple&,
-                                        const CDCSegmentTriple& neighborTriple) IF_NOT_CINT(override final);
+                                        const CDCSegmentTriple& neighborTriple) override final;
 
     }; // end class
 

@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Constructor
       MCFilter() : Super() { }
 
-      virtual CellWeight operator()(const Object& object) IF_NOT_CINT(override)
+      virtual CellWeight operator()(const Object& object) override
       {
         Super::operator()(object);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();

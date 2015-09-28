@@ -32,7 +32,7 @@ namespace Belle2 {
 
     public:
       virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>&
-                                    testPair) IF_NOT_CINT(override final);
+                                    testPair) override final;
 
     private:
 

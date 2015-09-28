@@ -121,7 +121,7 @@ namespace Belle2 {
        *  @param name       Name of the sought variable
        *  @return           Index of the name, nVars if not found.
        */
-      IF_NOT_CINT(constexpr)
+      constexpr
       static int named(const char* const name)
       {
         return index<nVars>(AObjectVarNames::getName, name);
@@ -131,8 +131,8 @@ namespace Belle2 {
       template<int iVar>
       Float_t get() const
       {
-        IF_NOT_CINT(static_assert(iVar < nVars,
-                                  "Requested variable index exceeds number variables.");)
+        static_assert(iVar < nVars,
+                      "Requested variable index exceeds number variables.");
         return m_variables.get(iVar);
       }
 
@@ -140,8 +140,8 @@ namespace Belle2 {
       template<int iVar>
       Float_t& var()
       {
-        IF_NOT_CINT(static_assert(iVar < nVars,
-                                  "Requested variable index exceeds number variables.");)
+        static_assert(iVar < nVars,
+                      "Requested variable index exceeds number variables.");
         return m_variables[iVar];
       }
 

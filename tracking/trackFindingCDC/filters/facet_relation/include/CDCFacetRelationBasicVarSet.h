@@ -32,7 +32,7 @@ namespace Belle2 {
     class CDCFacet;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const facetRelationBasicNames[] = {
       "from_middle_phi",
       "to_middle_phi"
@@ -48,7 +48,7 @@ namespace Belle2 {
       static const size_t nNames = size(facetRelationBasicNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return facetRelationBasicNames[iName];
@@ -72,7 +72,7 @@ namespace Belle2 {
       explicit CDCFacetRelationBasicVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) IF_NOT_CINT(override final);
+      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) override final;
     };
   }
 }

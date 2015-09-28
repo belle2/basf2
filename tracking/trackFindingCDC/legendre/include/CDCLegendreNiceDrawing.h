@@ -234,7 +234,8 @@ namespace Belle2 {
       std::string getQualityEstimationOfPTTrackCandidate(const genfit::TrackCand* TrackCand);
 
       /** Draw the quality estimation as a describing text in the same color as the track. */
-      void drawDescribingQualityText(std::stringstream& drawString, std::string& qualityEstimation, std::string& trackColor, double yPosition);
+      void drawDescribingQualityText(std::stringstream& drawString, std::string& qualityEstimation, std::string& trackColor,
+                                     double yPosition);
 
     };
   }

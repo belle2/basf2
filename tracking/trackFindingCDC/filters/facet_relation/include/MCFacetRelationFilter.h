@@ -36,13 +36,13 @@ namespace Belle2 {
 
     public:
       /// May be used to clear information from former events. Currently unused.
-      virtual void clear() IF_NOT_CINT(override final);
+      virtual void clear() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() IF_NOT_CINT(override final);
+      virtual void initialize() override final;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() IF_NOT_CINT(override final);
+      virtual void terminate() override final;
 
     public:
       /** Main filter method returning the weight of the neighborhood relation.

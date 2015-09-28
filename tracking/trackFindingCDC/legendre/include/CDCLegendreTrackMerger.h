@@ -55,7 +55,8 @@ namespace Belle2 {
        * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.
        * @param factor gives a number how far the hit is allowed to be.
        */
-      static void removeStrangeHits(double factor, std::vector<TrackHit*>& trackHits, std::pair<double, double>& track_par, std::pair<double , double>& ref_point);
+      static void removeStrangeHits(double factor, std::vector<TrackHit*>& trackHits, std::pair<double, double>& track_par,
+                                    std::pair<double , double>& ref_point);
 
       /** Try to merge the two tracks
        * For this, build a common hit list and do a fast fit.
@@ -71,7 +72,8 @@ namespace Belle2 {
        * @param start_iterator the iterator where to start searching (this element included)
        * @return a pointer to the best fit candidate.
        */
-      static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged, std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator);
+      static BestMergePartner calculateBestTrackToMerge(TrackCandidate* trackCandidateToBeMerged,
+                                                        std::list<TrackCandidate*>::iterator start_iterator, std::list<TrackCandidate*>::iterator end_iterator);
 
       /**
        * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.

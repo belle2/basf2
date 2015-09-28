@@ -31,7 +31,7 @@ namespace Belle2 {
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
       virtual
       NeighborWeight operator()(const CDCSegmentPair& fromPair,
-                                const CDCSegmentPair& toPair) IF_NOT_CINT(override final);
+                                const CDCSegmentPair& toPair) override final;
 
     }; // end class
   } //end namespace TrackFindingCDC

@@ -106,7 +106,7 @@ namespace Belle2 {
        *  @param name   The sough name.
        *  @return       Index of the name, nNames if not found.
        */
-      IF_NOT_CINT(constexpr)
+      constexpr
       static int named(const char* const name)
       {
         return index<nNames>(ANames::getName, name);
@@ -149,7 +149,7 @@ namespace Belle2 {
       template<int iValue>
       void set(Float_t value)
       {
-        IF_NOT_CINT(static_assert(nNames != iValue, "Requested name not found in names.");)
+        static_assert(nNames != iValue, "Requested name not found in names.");
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
         m_values[iValue] = value;
@@ -173,8 +173,8 @@ namespace Belle2 {
       template<int iValue>
       Float_t get() const
       {
-        IF_NOT_CINT(static_assert(nNames != iValue,
-                                  "Requested name not found in names.");)
+        static_assert(nNames != iValue,
+                      "Requested name not found in names.");
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
         return m_values[iValue];
@@ -198,8 +198,8 @@ namespace Belle2 {
       template<int iValue>
       Float_t& value()
       {
-        IF_NOT_CINT(static_assert(nNames != iValue,
-                                  "Requested name not found in names.");)
+        static_assert(nNames != iValue,
+                      "Requested name not found in names.");
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
         return m_values[iValue];

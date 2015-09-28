@@ -28,10 +28,10 @@ namespace Belle2 {
       static const size_t nNames = 0;
 
       /// Names of the variables to be generated.
-      //IF_NOT_CINT(constexpr)
+      //constexpr
       //static char const* const names[nNames] = {};
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int /*iName*/)
       { return ""; }
 

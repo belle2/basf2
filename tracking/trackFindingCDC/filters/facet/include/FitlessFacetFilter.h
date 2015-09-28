@@ -34,7 +34,7 @@ namespace Belle2 {
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCFacet& facet) override final;
 
     public:
       /** Set the parameter with key to value.
@@ -45,12 +45,12 @@ namespace Belle2 {
        *                      Allowed values "true", "false". Default is "true".
        */
       virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+      void setParameter(const std::string& key, const std::string& value) override;
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
       virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+      std::map<std::string, std::string> getParameterDescription() override;
 
 
     public:

@@ -33,7 +33,7 @@ namespace Belle2 {
       /** Main filter method returning the weight of the facet.
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const CDCFacet& facet) override final;
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses

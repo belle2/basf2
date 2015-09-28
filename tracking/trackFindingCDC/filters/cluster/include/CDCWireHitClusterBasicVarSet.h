@@ -27,7 +27,7 @@ namespace Belle2 {
 
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const clusterBasicNames[14] = {
       "is_stereo",
       "superlayer_id",
@@ -59,7 +59,7 @@ namespace Belle2 {
       static const size_t nNames = 14;
 
       /// Names of the variables to be generated.
-      // IF_NOT_CINT(constexpr)
+      // constexpr
       // static char const* const clusterNames[11] = {
       //  "avg_n_neignbors", // TODO: correct name and ordering once we can retrain the analysis.
       //  "distance_to_superlayer_center",
@@ -74,7 +74,7 @@ namespace Belle2 {
       //  "variance_drift_length",
       // };
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return clusterBasicNames[iName];
@@ -91,10 +91,10 @@ namespace Belle2 {
       explicit CDCWireHitClusterBasicVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCWireHitCluster* cluster) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCWireHitCluster* cluster) override final;
 
       /// Initialize the peeler before event processing
-      virtual void initialize() IF_NOT_CINT(override final)
+      virtual void initialize() override final
       {
         prepareSuperLayerCenterArray();
       }

@@ -28,7 +28,7 @@ namespace Belle2 {
 
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const segmentTrackNames[] = {
       "is_stereo",
       "segment_size",
@@ -65,7 +65,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 24;
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return segmentTrackNames[iName];
@@ -82,7 +82,7 @@ namespace Belle2 {
       explicit SegmentTrackVarSet(const std::string& prefix = "") : VarSet<SegmentTrackVarNames>(prefix) { }
 
       /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) IF_NOT_CINT(override final);
+      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) override final;
     };
   }
 }

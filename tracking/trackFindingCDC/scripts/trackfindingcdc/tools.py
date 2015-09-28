@@ -10,7 +10,7 @@ import argparse
 
 class DefaultHelpArgumentParser(argparse.ArgumentParser):
 
-    """An argparse.Argument parse slightly changed such 
+    """An argparse.Argument parse slightly changed such
     that it always prints an extended help message incase of a parsing error."""
 
     def error(self, message):
@@ -25,10 +25,10 @@ class DefaultHelpArgumentParser(argparse.ArgumentParser):
 
 class ChDirContext(object):
 
-    """Helper object that temporarily changes the current working. 
+    """Helper object that temporarily changes the current working.
     Creates the folder if it is not present.
     Implements the context manager and function decorator interface.
-    
+
     Use like:
     @ChDirContext("myfolder")
     def function_that_writes_output_to_folder():
@@ -64,7 +64,7 @@ class ChDirContext(object):
         err_type,
         err_obj,
         err_traceback,
-        ):
+    ):
         """Exits the context. Changes the working directory back to the value before."""
 
         os.chdir(self.saved_folder_name)
@@ -99,7 +99,7 @@ def is_iterable_collection(obj):
 
     Targets the duck typing of container types.
     Stings are not considered iterable by this definition.
-    
+
     Parameters
     ----------
     obj : any type
@@ -107,17 +107,15 @@ def is_iterable_collection(obj):
     """
 
     return isinstance(obj, collections.Iterable) and not isinstance(obj,
-            basestring)
+                                                                    basestring)
 
 
 def is_primary(mcParticle):
     """Indicates if the given MCParticle is primary.
-    
+
     Parameters
     ----------
     mcParticle : Belle2.MCParticle
         MCParticle to be checked"""
 
     return mcParticle.hasStatus(1)
-
-

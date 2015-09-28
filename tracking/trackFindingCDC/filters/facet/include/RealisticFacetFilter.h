@@ -40,18 +40,18 @@ namespace Belle2 {
        *                      drift circles.
        */
       virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+      void setParameter(const std::string& key, const std::string& value) override;
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
       virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+      std::map<std::string, std::string> getParameterDescription() override;
 
       /** Main filter method returning the weight of the facet
        *  Returns NOT_A_CELL if the cell shall be rejected.
        */
       virtual
-      CellWeight operator()(const CDCFacet& facet) IF_NOT_CINT(override final);
+      CellWeight operator()(const CDCFacet& facet) override final;
 
     private:
       /// Basic filter to implement a fitless preselection.

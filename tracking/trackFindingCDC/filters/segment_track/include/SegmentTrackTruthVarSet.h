@@ -20,7 +20,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const segmentTrackTruthNames[5] = {
       "belongs_to_same_track_truth",
       "segment_is_fake_truth",
@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 5;
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return segmentTrackTruthNames[iName];
@@ -55,7 +55,7 @@ namespace Belle2 {
       explicit SegmentTrackTruthVarSet(const std::string& prefix = "") : VarSet<SegmentTrackTruthVarNames>(prefix) { }
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) IF_NOT_CINT(override final);
+      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) override final;
 
     };
   }

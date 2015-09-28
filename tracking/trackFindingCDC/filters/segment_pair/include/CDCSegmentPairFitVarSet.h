@@ -27,7 +27,7 @@ namespace Belle2 {
     class CDCSegmentPair;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const segmentPairVarNames[] = {
       "startFit_startISuperLayer",
       "endFit_startISuperLayer",
@@ -92,7 +92,7 @@ namespace Belle2 {
       static const size_t nNames = size(segmentPairVarNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return segmentPairVarNames[iName];
@@ -120,7 +120,7 @@ namespace Belle2 {
       explicit CDCSegmentPairFitVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override final;
 
 
     private:

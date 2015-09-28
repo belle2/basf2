@@ -22,7 +22,7 @@ namespace Belle2 {
        A sentinal variable set that does not contain variables and does no extraction.
      */
     template<class AObject>
-    class EmptyVarSet IF_NOT_CINT(final) : public BaseVarSet<AObject> {
+    class EmptyVarSet final : public BaseVarSet<AObject> {
 
     private:
       /// Number of floating point values represented by this class.
@@ -30,7 +30,7 @@ namespace Belle2 {
 
     public:
       /// Constructure taking a optional prefix that can be attached to the names if request.
-      explicit EmptyVarSet(const std::string & /*prefix*/ = "") {}
+      explicit EmptyVarSet(const std::string& /*prefix*/ = "") {}
 
     }; //end class
 

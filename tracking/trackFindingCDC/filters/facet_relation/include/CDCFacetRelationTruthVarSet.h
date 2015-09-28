@@ -30,7 +30,7 @@ namespace Belle2 {
     class CDCFacet;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const facetRelationTruthNames[] = {
       "truth"
     };
@@ -45,7 +45,7 @@ namespace Belle2 {
       static const size_t nNames = size(facetRelationTruthNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return facetRelationTruthNames[iName];
@@ -63,13 +63,13 @@ namespace Belle2 {
       explicit CDCFacetRelationTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) IF_NOT_CINT(override final);
+      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) override final;
 
       /// Initialize the varset before event processing
-      virtual void initialize() IF_NOT_CINT(override final);
+      virtual void initialize() override final;
 
       /// Initialize the varset before event processing
-      virtual void terminate() IF_NOT_CINT(override final);
+      virtual void terminate() override final;
 
     public:
       /// Facet filter that gives if the facet is a true facet.

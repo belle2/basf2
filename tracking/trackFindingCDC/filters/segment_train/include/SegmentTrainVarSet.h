@@ -26,7 +26,7 @@ namespace Belle2 {
     class SegmentInformation;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const segmentTrainNames[5] = {
       "is_stereo",
       "maximum_perpS_overlap",
@@ -45,7 +45,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 5;
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return segmentTrainNames[iName];
@@ -65,7 +65,7 @@ namespace Belle2 {
 
       /// Generate and assign the variables from the pair
       virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
-      IF_NOT_CINT(override final);
+      override final;
     };
   }
 }

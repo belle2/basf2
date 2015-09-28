@@ -31,7 +31,7 @@ namespace Belle2 {
       SimpleSegmentTrackFilter() : Super() { }
 
     public:
-      virtual CellWeight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) IF_NOT_CINT(override final);
+      virtual CellWeight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) override final;
 
     private:
 

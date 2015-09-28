@@ -26,7 +26,7 @@ namespace Belle2 {
 
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const advancedCDCRecoSegment2DVarNames[] = {
       "is_stereo",
       "superlayer_id",
@@ -65,7 +65,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 18;
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return advancedCDCRecoSegment2DVarNames[iName];
@@ -82,10 +82,10 @@ namespace Belle2 {
       explicit AdvancedCDCRecoSegment2DVarSet(const std::string& prefix = "") : VarSet<AdvancedCDCRecoSegment2DVarNames>(prefix) { }
 
       /// Generate and assign the variables from the pair
-      virtual bool extract(const CDCRecoSegment2D* segment) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCRecoSegment2D* segment) override final;
 
       /// Initialize the peeler before event processing
-      virtual void initialize() IF_NOT_CINT(override final)
+      virtual void initialize() override final
       {
         prepareSuperLayerCenterArray();
       }

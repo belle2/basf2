@@ -48,12 +48,14 @@ namespace Belle2 {
        */
       static TrigonometricalLookupTable& Instance();
 
-      inline float sinTheta(int bin) {
+      inline float sinTheta(int bin)
+      {
         if (not m_lookup_created) initialize();
         return m_sin_theta[bin];
       };
 
-      inline float cosTheta(int bin) {
+      inline float cosTheta(int bin)
+      {
         if (not m_lookup_created) initialize();
         return m_cos_theta[bin];
       };

@@ -25,7 +25,7 @@ namespace Belle2 {
     class CDCWireHitCluster;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const clusterBkgTruthNames[4] = {
       "n_background_hits_truth",
       "background_fraction_truth",
@@ -42,7 +42,7 @@ namespace Belle2 {
       /// Number of variables to be generated.
       static const size_t nNames = 4;
 
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return clusterBkgTruthNames[iName];
@@ -59,7 +59,7 @@ namespace Belle2 {
       explicit CDCWireHitClusterBkgTruthVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCWireHitCluster* cluster) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCWireHitCluster* cluster) override final;
 
     };
   }

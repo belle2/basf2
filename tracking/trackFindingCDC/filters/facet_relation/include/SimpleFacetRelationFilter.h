@@ -45,12 +45,12 @@ namespace Belle2 {
        *                      drift circles.
        */
       virtual
-      void setParameter(const std::string& key, const std::string& value) IF_NOT_CINT(override);
+      void setParameter(const std::string& key, const std::string& value) override;
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
       virtual
-      std::map<std::string, std::string> getParameterDescription() IF_NOT_CINT(override);
+      std::map<std::string, std::string> getParameterDescription() override;
 
 
     public:

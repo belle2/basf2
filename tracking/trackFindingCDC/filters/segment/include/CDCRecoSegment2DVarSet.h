@@ -21,7 +21,7 @@ namespace Belle2 {
     class CDCRecoSegment2D;
 
     /// Names of the variables to be generated.
-    IF_NOT_CINT(constexpr)
+    constexpr
     static char const* const segmentVarNames[] = {
       "size",
       "superlayer_id",
@@ -38,7 +38,7 @@ namespace Belle2 {
       static const size_t nNames = size(segmentVarNames);
 
       /// Getter for the name a the given index
-      IF_NOT_CINT(constexpr)
+      constexpr
       static char const* getName(int iName)
       {
         return segmentVarNames[iName];
@@ -56,7 +56,7 @@ namespace Belle2 {
       explicit CDCRecoSegment2DVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const CDCRecoSegment2D* ptrSegment) IF_NOT_CINT(override final);
+      virtual bool extract(const CDCRecoSegment2D* ptrSegment) override final;
     };
   }
 }

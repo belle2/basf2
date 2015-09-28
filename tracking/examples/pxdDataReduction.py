@@ -16,10 +16,16 @@
 
 import os
 from basf2 import *
+from simulation import add_simulation
+from beamparameters import add_beamparameters
 
 numEvents = 10
 
-##first register the modules
+# first register the modules
+
+eventCounter = register_module('EventCounter')
+eventCounter.logging.log_level = LogLevel.INFO
+eventCounter.param('stepSize', 25)
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
@@ -28,34 +34,30 @@ eventinfosetter.param('evtNumList', [numEvents])
 
 eventinfoprinter = register_module('EventInfoPrinter')
 gearbox = register_module('Gearbox')
-pxdDigitizer = register_module('PXDDigitizer')
-svdDigitizer = register_module('SVDDigitizer')
-pxdClusterizer = register_module('PXDClusterizer')
-svdClusterizer = register_module('SVDClusterizer')
 
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.WARNING
+evtgeninput.logging.log_level = LogLevel.INFO
 
 geometry = register_module('Geometry')
-geometry.param('Components', ['MagneticField', 'PXD', 'SVD'])
+# geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
 track_finder_mc_truth = register_module('TrackFinderMCTruth')
 track_finder_mc_truth.logging.log_level = LogLevel.INFO
-track_finder_mc_truth.logging.debug_level = 101
+# track_finder_mc_truth.logging.debug_level = 101
 
 # select which detectors you would like to use
 param_track_finder_mc_truth = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
-    'MinimalNDF': 1,
+    'MinimalNDF': 6,
     'UseClusters': 1,
     'WhichParticles': ['PXD', 'SVD'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 eventCounter = register_module('EventCounter')
@@ -76,7 +78,7 @@ param_pxdDataRed = {
     'numSigmaTotV': 10,
     'maxWidthU': 0.5,
     'maxWidthV': 0.5,
-    }
+}
 pxdDataRed.param(param_pxdDataRed)
 
 pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
@@ -87,24 +89,25 @@ param_pxdDataRedAnalysis = {
     'ROIListName': 'ROIs',
     'writeToRoot': True,
     'rootFileName': 'pxdDataRedAnalysis',
-    }
+}
 pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
 
 # Create paths
 main = create_path()
 
+beamparameters = add_beamparameters(main, "Y4S")
+# beamparameters = add_beamparameters(main, "Y1S")
+# beamparameters.param("generateCMS", True)
+# beamparameters.param("smearVertex", False)
+# beamparameters.param("smearEnergy", False)
+# print_params(beamparameters)
+
 # Add modules to paths
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
-main.add_module(gearbox)
-main.add_module(geometry)
+main.add_module(beamparameters)
 main.add_module(evtgeninput)
-main.add_module(g4sim)
-main.add_module(eventCounter)
-main.add_module(pxdDigitizer)
-main.add_module(pxdClusterizer)
-main.add_module(svdDigitizer)
-main.add_module(svdClusterizer)
+add_simulation(main)
 main.add_module(track_finder_mc_truth)
 main.add_module(pxdDataRed)
 main.add_module(pxdDataRedAnalysis)

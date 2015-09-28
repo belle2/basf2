@@ -148,12 +148,12 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
      tan(m_SectorSupportGeometry.CornerAngle));
   /* Corner 3. */
   line23.findIntersection(innerCircle, intersections);
-  m_SectorSupportGeometry.Corner3.X = intersections[1].X();
-  m_SectorSupportGeometry.Corner3.Y = intersections[1].Y();
+  m_SectorSupportGeometry.Corner3.X = intersections[1].x();
+  m_SectorSupportGeometry.Corner3.Y = intersections[1].y();
   /* Corner 4. */
   line41.findIntersection(innerCircle, intersections);
-  m_SectorSupportGeometry.Corner4.X = intersections[1].X();
-  m_SectorSupportGeometry.Corner4.X = intersections[1].X();
+  m_SectorSupportGeometry.Corner4.X = intersections[1].x();
+  m_SectorSupportGeometry.Corner4.X = intersections[1].y();
 }
 
 static bool compareLength(double a, double b)

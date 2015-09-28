@@ -45,8 +45,10 @@ namespace Belle2 {
      * 2) has relations weigth greater than m_minRelationWeight
      * 3) has pt less than m_maxPt
      */
-    virtual bool PXDClusterIsType(PXDCluster* pxdCluster, const float& maxPt, const float& minRelationWeight,
-                                  const std::vector<int>& particleInclude, const std::string& dataType);
+    virtual bool PXDClusterIsType(PXDCluster const& pxdCluster, float const maxPt,
+                                  float const minRelationWeight,
+                                  std::vector<int> const& particleInclude,
+                                  std::string const& dataType);
 
   private:
     PXDClusterRescueNNModule m_PXDClusterRescueNN;

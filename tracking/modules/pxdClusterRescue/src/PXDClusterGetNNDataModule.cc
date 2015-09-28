@@ -82,21 +82,20 @@ void PXDClusterGetNNDataModule::event()
 {
   // load PXDClusters from DataStore
   StoreArray<PXDCluster> pxdClusters;
-  int pxdClustersEntries = pxdClusters.getEntries();
 
   // go through clusters
   int NumTrainingVariables = m_PXDClusterRescueNN.getNumTrainingVariables();
   float pxdClusterVariables[NumTrainingVariables];
   bool isValid;
 
-  for (int k = 0; k < pxdClustersEntries; k++) {
+  for (auto && pxdCluster : pxdClusters) {
     // check PXDCluster on being valid for used in neural network training
-    isValid = PXDClusterIsType(pxdClusters[k], m_maxPt, m_minRelationWeight, m_particleInclude, m_dataType);
+    isValid = PXDClusterIsType(pxdCluster, m_maxPt, m_minRelationWeight, m_particleInclude, m_dataType);
 
     // if PXCluster is valid save training variables to file
     if (isValid) {
       // load trainings variables from PXDCluster
-      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(pxdClusters[k], pxdClusterVariables);
+      m_PXDClusterRescueNN.getPXDClusterTrainingVariables(&pxdCluster, pxdClusterVariables);
 
       // write training variables to file
       for (int p = 0; p < NumTrainingVariables; p++) {
@@ -108,8 +107,10 @@ void PXDClusterGetNNDataModule::event()
   }
 }
 
-bool PXDClusterGetNNDataModule::PXDClusterIsType(PXDCluster* pxdCluster, const float& maxPt, const float& minRelationWeight,
-                                                 const std::vector<int>& particleInclude, const std::string& dataType)
+bool PXDClusterGetNNDataModule::PXDClusterIsType(PXDCluster const& pxdCluster, float const maxPt,
+                                                 float const minRelationWeight,
+                                                 std::vector<int> const& particleInclude,
+                                                 std::string const& dataType)
 {
   // if given data is background, do not make any selections and return PXDCluster type as background
   if (dataType == "background") return true;
@@ -117,7 +118,7 @@ bool PXDClusterGetNNDataModule::PXDClusterIsType(PXDCluster* pxdCluster, const f
   // if given data is signal data, check if at least one particle is on the pdg number include list
 
   // get related MC particle and go through particles
-  RelationVector<MCParticle> particles = pxdCluster->getRelationsTo<MCParticle>();
+  RelationVector<MCParticle> particles = pxdCluster.getRelationsTo<MCParticle>();
 
   for (unsigned int k = 0; k < particles.size(); k++) {
     // check if particle pdg number is matching an included pdg number

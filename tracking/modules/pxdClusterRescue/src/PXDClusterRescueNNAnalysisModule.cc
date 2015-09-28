@@ -89,10 +89,10 @@ void PXDClusterRescueNNAnalysisModule::event()
   for (int k = 0; k < pxdClustersEntries; k++) {
     // get classification by particle (exactly same result as PXDClusterGetNNData module for same input)
     if (m_dataType == "background") {
-      isSignalParticle = !(m_PXDClusterGetNNData.PXDClusterIsType(pxdClusters[k], m_maxPt, m_minRelationWeight, m_particleInclude,
+      isSignalParticle = !(m_PXDClusterGetNNData.PXDClusterIsType(*(pxdClusters[k]), m_maxPt, m_minRelationWeight, m_particleInclude,
                                                                   m_dataType));
     } else {
-      isSignalParticle = m_PXDClusterGetNNData.PXDClusterIsType(pxdClusters[k], m_maxPt, m_minRelationWeight, m_particleInclude,
+      isSignalParticle = m_PXDClusterGetNNData.PXDClusterIsType(*(pxdClusters[k]), m_maxPt, m_minRelationWeight, m_particleInclude,
                                                                 m_dataType);
     }
 

@@ -335,9 +335,10 @@ namespace Belle2 {
 
     /**
      * get the indices of the Clusters related to the SpacePoint. size of returned vector is <= 2!
+     * NOTE: only the StoreArray of Clusters with name storeArrayName will be searched!
      */
     template<typename ClusterType>
-    std::vector<int> getClusterIndices(const Belle2::SpacePoint* spacePoint);
+    std::vector<int> getClusterIndices(const Belle2::SpacePoint* spacePoint, std::string storeArrayName);
 
     /**
      * get the NDF of a SpacePoint

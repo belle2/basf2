@@ -153,7 +153,7 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
   /* Corner 4. */
   line41.findIntersection(innerCircle, intersections);
   m_SectorSupportGeometry.Corner4.X = intersections[1].x();
-  m_SectorSupportGeometry.Corner4.X = intersections[1].y();
+  m_SectorSupportGeometry.Corner4.Y = intersections[1].y();
 }
 
 static bool compareLength(double a, double b)

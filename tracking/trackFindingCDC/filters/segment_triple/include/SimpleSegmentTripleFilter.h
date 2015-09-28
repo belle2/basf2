@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/filters/segment_triple/BaseSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/filters/axial_segment_pair/SimpleAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

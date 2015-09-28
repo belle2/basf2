@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segment_pair_relation/BaseSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

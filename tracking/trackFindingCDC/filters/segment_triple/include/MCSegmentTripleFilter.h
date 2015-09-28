@@ -10,11 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axial_segment_pair/MCAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+#include <tracking/trackFindingCDC/filters/segment_triple/BaseSegmentTripleFilter.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/trackFindingCDC/filters/segment_triple/BaseSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

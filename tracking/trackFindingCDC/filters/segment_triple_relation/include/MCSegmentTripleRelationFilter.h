@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/filters/segment_triple_relation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_triple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 
 namespace Belle2 {

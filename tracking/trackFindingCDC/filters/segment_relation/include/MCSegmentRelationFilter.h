@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/segment_relation/BaseSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

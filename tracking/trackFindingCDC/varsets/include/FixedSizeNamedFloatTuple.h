@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 #include <vector>
 #include <string>

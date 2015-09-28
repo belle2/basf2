@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/facet_relation/BaseFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

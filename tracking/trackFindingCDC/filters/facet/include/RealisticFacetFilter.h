@@ -9,13 +9,10 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
-
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
 

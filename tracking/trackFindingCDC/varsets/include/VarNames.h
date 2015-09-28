@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 
-#include <tracking/trackFindingCDC/rootification/IfNotCint.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

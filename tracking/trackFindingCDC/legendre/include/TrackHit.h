@@ -10,9 +10,7 @@
 
 #pragma once
 
-#ifndef __CINT__
 #include <tuple>
-#endif
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <TVector3.h>
@@ -106,10 +104,11 @@ namespace Belle2 {
       /** Check hit drift lenght; if it's greater than cell size return false */
       bool checkHitDriftLength();
 
-#ifndef __CINT__
-      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
+      /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates.
+       *
+       *  Returns (x',y',driftLength)
+       */
       std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
-#endif
 
 
     private:

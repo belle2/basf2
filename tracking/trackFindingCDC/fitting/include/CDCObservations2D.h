@@ -9,12 +9,9 @@
  **************************************************************************/
 #pragma once
 
-
-#ifndef __CINT__
 #include <Eigen/Dense>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
 #include <tracking/trackFindingCDC/legendre/TrackHit.h>
-#endif
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
@@ -42,10 +39,10 @@ namespace Belle2 {
       CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos) {}
 
     public:
-#ifndef __CINT__
-      /// Matrix type used to wrap the raw memory chunk of values generated from the various hit types for structured vectorized access.
+      /// Matrix type used to wrap the raw memory chunk of values
+      //  generated from the various hit types for structured vectorized access.
       typedef Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
-#endif
+
       /** Gets the pseudo variance.
        *  The pseudo drift length variance is a measure that tries to incorporate the drift length
        *  into the fit to drift circles where the right left passage ambiguity could not be resolved.
@@ -347,7 +344,6 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-#ifndef __CINT__
       /** Appends all wire positions of the hits in the legendre track hits.
        *  Always use position since there is no other mode as long as
        *  there are no right left passage information available.
@@ -362,7 +358,6 @@ namespace Belle2 {
         }
         return nAppendedHits;
       }
-#endif
 
       /// Append all hits from a generic range.
       template<class ARange>
@@ -414,8 +409,6 @@ namespace Belle2 {
       /// Returns the number of observations having a drift radius radius
       size_t getNObservationsWithDriftRadius() const;
 
-#ifndef __CINT__
-      //Hide this methods from CINT since it does not like the Eigen Library to much
       /// Returns the observations structured as an Eigen matrix
       /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
       EigenObservationMatrix getObservationMatrix();
@@ -502,7 +495,6 @@ namespace Belle2 {
        *  * + symmetric.
        */
       Eigen::Matrix<double, 3, 3> getWXYSumMatrix();
-#endif
 
     public:
       /// Getter for the indicator that the reconstructed position should be favoured.

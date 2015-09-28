@@ -468,7 +468,7 @@ EKLM::GeometryData::GeometryData()
   if (m_nPlane < 1 || m_nPlane > 2)
     B2FATAL("Number of strip planes must be from 1 to 2.");
   if (m_mode == c_DetectorBackground) {
-    m_nBoard = Sector.getInt("m_nBoard");
+    m_nBoard = Sector.getInt("nBoard");
     if (m_nBoard < 1 || m_nBoard > 5)
       B2FATAL("Number of readout boards must be from 1 to 5.");
     GearDir Boards(Sector);

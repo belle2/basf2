@@ -627,9 +627,9 @@ namespace Belle2 {
 
       /**
        * Create silicon cube in the place of SiPM for radiation study.
-       * @param[in] stripVolume "Strip volume" logical volume.
+       * @param[in] iStrip Number of strip in the length-based array.
        */
-      void createSiPM(G4LogicalVolume* stripVolume) const;
+      void createSiPM(int iStrip) const;
 
       /**
        * Create shield.

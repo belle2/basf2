@@ -1957,13 +1957,13 @@ void EKLM::GeoEKLMCreator::createScintillator(int iStrip) const
   }
 }
 
-void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* stripVolume) const
+void EKLM::GeoEKLMCreator::createSiPM(int iStrip) const
 {
   G4LogicalVolume* logicSiPM = NULL;
   HepGeom::Transform3D t;
   const struct ElementPosition* stripPos =
-    m_GeoDat->getStripPosition(m_CurVol.strip);
-  std::string sipmName = "SiPM_" + stripVolume->GetName();
+    m_GeoDat->getStripPosition(m_GeoDat->getStripPositionIndex(iStrip) + 1);
+  std::string sipmName = "SiPM_" + m_LogVol.stripvol[iStrip]->GetName();
   try {
     logicSiPM = new G4LogicalVolume(m_Solids.sipm, m_Materials.silicon,
                                     sipmName, 0, m_Sensitive[1], 0);
@@ -1974,7 +1974,8 @@ void EKLM::GeoEKLMCreator::createSiPM(G4LogicalVolume* stripVolume) const
   geometry::setColor(*logicSiPM, "#0000ffff");
   t = HepGeom::Translate3D(0.5 * stripPos->Length, 0., 0.);
   try {
-    new G4PVPlacement(t, logicSiPM, sipmName, stripVolume, false, 1, false);
+    new G4PVPlacement(t, logicSiPM, sipmName, m_LogVol.stripvol[iStrip],
+                      false, 1, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -2058,7 +2059,7 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   /* Create physical volumes which are used only once. */
   for (i = 0; i < m_GeoDat->getNStripsDifferentLength(); i++) {
     if (m_GeoDat->getDetectorMode() == c_DetectorBackground) {
-      createSiPM(m_LogVol.stripvol[i]);
+      createSiPM(i);
       createStrip(i);
     }
     createStripGroove(i);

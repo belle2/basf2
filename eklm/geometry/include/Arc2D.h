@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_CIRCLE2D_H
-#define EKLM_CIRCLE2D_H
+#ifndef EKLM_ARC2D_H
+#define EKLM_ARC2D_H
 
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
+/* Belle2 headers. */
+#include <eklm/geometry/Circle2D.h>
 
 namespace Belle2 {
 
   namespace EKLM {
 
     /**
-     * 2D circle.
+     * 2D arc.
      */
-    class Circle2D {
+    class Arc2D : public Circle2D {
 
     public:
 
@@ -30,31 +30,23 @@ namespace Belle2 {
        * @param[in] x      Center X coordinate.
        * @param[in] y      Center Y coordinate.
        * @param[in] radius Radius.
+       * @param[in] angle1 Angle 1.
+       * @param[in] angle2 Angle 2.
        */
-      Circle2D(double x, double y, double radius);
+      Arc2D(double x, double y, double radius, double angle1, double angle2);
 
       /**
        * Destructor.
        */
-      ~Circle2D();
+      ~Arc2D();
 
-      /**
-       * Get center.
-       */
-      const HepGeom::Point3D<double>& getCenter() const;
+    private:
 
-      /**
-       * Get radius.
-       */
-      double getRadius() const;
+      /** Angle 1. */
+      double m_Angle1;
 
-    protected:
-
-      /** Center. */
-      HepGeom::Point3D<double> m_Center;
-
-      /** Radius. */
-      double m_Radius;
+      /** Angle 2. */
+      double m_Angle2;
 
     };
 

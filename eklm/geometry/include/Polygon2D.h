@@ -8,53 +8,58 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_CIRCLE2D_H
-#define EKLM_CIRCLE2D_H
+#ifndef EKLM_POLYGON2D_H
+#define EKLM_POLYGON2D_H
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
+
+/* Belle2 headers. */
+#include <eklm/geometry/Arc2D.h>
+#include <eklm/geometry/LineSegment2D.h>
 
 namespace Belle2 {
 
   namespace EKLM {
 
     /**
-     * 2D circle.
+     * 2D polygon.
      */
-    class Circle2D {
+    class Polygon2D {
 
     public:
 
       /**
        * Constructor.
-       * @param[in] x      Center X coordinate.
-       * @param[in] y      Center Y coordinate.
-       * @param[in] radius Radius.
+       * @param[in] points Points.
+       * @param[in] n      Number of points.
        */
-      Circle2D(double x, double y, double radius);
+      Polygon2D(const HepGeom::Point3D<double>* points, int n);
 
       /**
        * Destructor.
        */
-      ~Circle2D();
+      ~Polygon2D();
 
       /**
-       * Get center.
+       * Check whether polygon has an intersection with a line segment.
+       * @param[in] lineSegment Line segment.
        */
-      const HepGeom::Point3D<double>& getCenter() const;
+      bool hasIntersection(const LineSegment2D& lineSegment) const;
 
       /**
-       * Get radius.
+       * Check whether polygon has an intersection with an arc.
+       * @param[in] arc Arc.
        */
-      double getRadius() const;
+      bool hasIntersection(const Arc2D& arc) const;
 
-    protected:
+    private:
 
-      /** Center. */
-      HepGeom::Point3D<double> m_Center;
+      /** Number of points. */
+      int m_nPoints;
 
-      /** Radius. */
-      double m_Radius;
+      /** Line segments. */
+      LineSegment2D** m_LineSegments;
 
     };
 

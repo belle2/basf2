@@ -8,43 +8,41 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_LINE2D_H
-#define EKLM_LINE2D_H
+#ifndef EKLM_LINESEGMENT2D_H
+#define EKLM_LINESEGMENT2D_H
 
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Geometry/Vector3D.h>
 
-/* belle2 headers. */
-#include <eklm/geometry/Circle2D.h>
+/* Belle2 headers. */
+#include <eklm/geometry/Line2D.h>
 
 namespace Belle2 {
 
   namespace EKLM {
 
     /**
-     * 2D line. Equation: m_Point + m_Vector * t
+     * 2D line segment. Equation: m_Point + m_Vector * t, t = [0, 1].
      */
-    class Line2D {
+    class LineSegment2D : public Line2D {
 
     public:
 
       /**
        * Constructor.
-       * @param[in] x    Initial point X coordinate.
-       * @param[in] y    Initial point y coordinate.
-       * @param[in] vecx Vector X component.
-       * @param[in] vecy Vector Y component.
+       * @param[in] point1 First point.
+       * @param[in] point2 Second point.
        */
-      Line2D(double x, double y, double vecx, double vecy);
+      LineSegment2D(const HepGeom::Point3D<double>& point1,
+                    const HepGeom::Point3D<double>& point2);
 
       /**
        * Destructor.
        */
-      ~Line2D();
+      ~LineSegment2D();
 
       /**
-       * Find intersections with a circle.
+       * Find intersection(s) with a circle.
        * @param[in]  circle        Circle.
        * @param[out] intersections Intersections.
        * @return Number of intersections (0, 1 or 2).
@@ -52,24 +50,12 @@ namespace Belle2 {
       int findIntersection(const Circle2D& circle,
                            HepGeom::Point3D<double> intersections[2]) const;
 
-    protected:
+    private:
 
       /**
-       * Find intersections with a circle.
-       * @param[in]  circle        Circle.
-       * @param[out] intersections Intersections.
-       * @param[out] t             Values of t for intersection points.
-       * @return Number of intersections (0, 1 or 2).
+       * Check if t is within the line segment (0 <= t <= 1).
        */
-      int findIntersection(const Circle2D& circle,
-                           HepGeom::Point3D<double> intersections[2],
-                           double t[2]) const;
-
-      /** Initial point. */
-      HepGeom::Point3D<double> m_Point;
-
-      /** Vector. */
-      HepGeom::Vector3D<double> m_Vector;
+      bool tWithinSegment(double t) const;
 
     };
 

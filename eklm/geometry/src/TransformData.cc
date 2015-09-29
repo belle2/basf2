@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
+#include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
@@ -23,6 +24,7 @@ EKLM::TransformData::TransformData(bool global)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
   EKLMAlignmentData* alignmentData;
+  AlignmentChecker alignmentChecker;
   const GeometryData& geoDat = GeometryData::Instance();
   for (iEndcap = 0; iEndcap < 2; iEndcap++) {
     geoDat.getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
@@ -44,6 +46,8 @@ EKLM::TransformData::TransformData(bool global)
   /* Read alignment data from the database and modify transformations. */
   DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
   if (alignment.isValid()) {
+    if (!alignmentChecker.checkAlignment(&(*alignment)))
+      B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
     for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
       for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
            getNDetectorLayers(iEndcap); iLayer++) {
@@ -53,8 +57,6 @@ EKLM::TransformData::TransformData(bool global)
               segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                             iSegment);
               alignmentData = alignment->getAlignmentData(segment);
-              if (alignmentData == NULL)
-                B2FATAL("Incomplete alignment data in the database.");
             }
           }
         }

@@ -28,6 +28,14 @@ EKLM::Line2D::~Line2D()
 {
 }
 
+int EKLM::Line2D::
+findIntersection(const Circle2D& circle,
+                 HepGeom::Point3D<double> intersections[2]) const
+{
+  double t[2];
+  return findIntersection(circle, intersections, t);
+}
+
 /*
  * Equation: (m_Point.x() + m_Vector.x() * t - circle.getCenter().x())^2 +
  * (m_Point.y() + m_Vector.y() * t - circle.getCenter().y())^2 =
@@ -35,10 +43,11 @@ EKLM::Line2D::~Line2D()
  */
 int EKLM::Line2D::
 findIntersection(const Circle2D& circle,
-                 HepGeom::Point3D<double> intersections[2]) const
+                 HepGeom::Point3D<double> intersections[2],
+                 double t[2]) const
 {
   int i;
-  double a, b, c, d, x0, y0, t[2];
+  double a, b, c, d, x0, y0;
   const HepGeom::Point3D<double>& circleCenter = circle.getCenter();
   x0 = m_Point.x() - circleCenter.x();
   y0 = m_Point.y() - circleCenter.y();

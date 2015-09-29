@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/geometry/PerigeeCovariance.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EPerigeeParameter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,10 +26,11 @@ void PerigeeCovariance::reverse()
   // aquire a minus sign
 
   // receive a minus sign upon reversion.
-  m_matrix(iCurv, iPhi0) = -m_matrix(iCurv, iPhi0);
-  m_matrix(iPhi0, iCurv) = -m_matrix(iPhi0, iCurv);
+  using namespace NPerigeeParameter;
+  m_matrix(c_Curv, c_Phi0) = -m_matrix(c_Curv, c_Phi0);
+  m_matrix(c_Phi0, c_Curv) = -m_matrix(c_Phi0, c_Curv);
 
-  m_matrix(iPhi0, iI) = -m_matrix(iPhi0, iI);
-  m_matrix(iI, iPhi0) = -m_matrix(iI, iPhi0);
+  m_matrix(c_Phi0, c_I) = -m_matrix(c_Phi0, c_I);
+  m_matrix(c_I, c_Phi0) = -m_matrix(c_I, c_Phi0);
 
 }

@@ -66,9 +66,9 @@ namespace Belle2 {
                       IndexSequence<Is...> /*coordinatesIndex*/)
       {
         std::array<std::size_t, sizeof...(divisions)> indices;
-        for (size_t iIndex = 0 ; iIndex <  sizeof...(divisions); ++iIndex) {
-          indices[iIndex] = globalISubBox % s_divisions[iIndex];
-          globalISubBox /= s_divisions[iIndex];
+        for (size_t c_Index = 0 ; c_Index <  sizeof...(divisions); ++c_Index) {
+          indices[c_Index] = globalISubBox % s_divisions[c_Index];
+          globalISubBox /= s_divisions[c_Index];
         }
         assert(globalISubBox == 0);
         return ABox(box.template getDivisionBoundsWithOverlap<Is>(std::get<Is>(m_overlaps),

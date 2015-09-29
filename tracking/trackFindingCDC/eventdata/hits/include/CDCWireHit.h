@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/dataobjects/CDCHit.h>

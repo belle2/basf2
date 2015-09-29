@@ -89,14 +89,14 @@ namespace Belle2 {
 
         // Using binary notation encoding lower and upper box bounds to fill the flat array.
         std::array<ESign, 2> distSign;
-        for (int iCurv = 0; iCurv < 2; ++iCurv) {
+        for (int c_Curv = 0; c_Curv < 2; ++c_Curv) {
           std::array<float, 4> dist;
-          float curvHalf  = static_cast<float>(curv[iCurv]) / 2;
+          float curvHalf  = static_cast<float>(curv[c_Curv]) / 2;
           dist[0b00] = - yRotMinusI[0b00] + r2MinusI[0b00] * curvHalf - l;
           dist[0b01] = - yRotMinusI[0b01] + r2MinusI[0b01] * curvHalf - l;
           dist[0b10] = - yRotMinusI[0b10] + r2MinusI[0b10] * curvHalf - l;
           dist[0b11] = - yRotMinusI[0b11] + r2MinusI[0b11] * curvHalf - l;
-          distSign[iCurv] = SameSignChecker::commonSign(dist);
+          distSign[c_Curv] = SameSignChecker::commonSign(dist);
         }
 
         return SameSignChecker::commonSign(distSign[0], distSign[1]);

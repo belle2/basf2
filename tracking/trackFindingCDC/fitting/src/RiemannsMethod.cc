@@ -34,7 +34,8 @@ RiemannsMethod::~RiemannsMethod()
 
 
 
-void RiemannsMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
+void RiemannsMethod::update(CDCTrajectory2D& trajectory2D,
+                            CDCObservations2D& observations2D) const
 {
 
   if (observations2D.getNObservationsWithDriftRadius() > 0) {
@@ -49,7 +50,8 @@ void RiemannsMethod::update(CDCTrajectory2D& trajectory2D, CDCObservations2D& ob
 
 
 
-void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
+void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
+                                              CDCObservations2D& observations2D) const
 {
 
   CDCObservations2D::EigenObservationMatrix eigenObservation = observations2D.getObservationMatrix();

@@ -66,7 +66,7 @@ namespace {
 
   /// Helper indices for meaningfull matrix access to the perigee covariance matrices
   constexpr size_t iCurv = 0;
-  constexpr size_t iPhi = 1;
+  constexpr size_t iPhi0 = 1;
   constexpr size_t iI = 2;
 
   /// Variant implementing Karimakis method without drift circles.
@@ -173,14 +173,14 @@ namespace {
 
     if (lineConstrained) {
       invV(iCurv, iCurv) = 1.;
-      invV(iCurv, iPhi) = 0.;
+      invV(iCurv, iPhi0) = 0.;
       invV(iCurv, iI) = 0.;
-      invV(iPhi, iCurv) = 0.;
+      invV(iPhi0, iCurv) = 0.;
       invV(iI, iCurv) = 0.;
 
-      invV(iPhi, iPhi) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
-      invV(iPhi, iI) = -(cosphi * s(iX) + sinphi * s(iY));
-      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iPhi0, iPhi0) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      invV(iPhi0, iI) = -(cosphi * s(iX) + sinphi * s(iY));
+      invV(iI, iPhi0) = invV(iPhi0, iI);
       invV(iI, iI) = s(iW);
 
       Matrix<double, 3, 3> V = invV.inverse();
@@ -200,14 +200,14 @@ namespace {
       double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
 
       invV(iCurv, iCurv) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
-      invV(iCurv, iPhi) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
-      invV(iPhi, iCurv) = invV(iCurv, iPhi);
-      invV(iPhi, iPhi) = u * u * sbb;
+      invV(iCurv, iPhi0) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      invV(iPhi0, iCurv) = invV(iCurv, iPhi0);
+      invV(iPhi0, iPhi0) = u * u * sbb;
 
       invV(iCurv, iI) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
       invV(iI, iCurv) = invV(iCurv, iI);
-      invV(iPhi, iI) = u * (rho * sc - u * sb);
-      invV(iI, iPhi) = invV(iPhi, iI);
+      invV(iPhi0, iI) = u * (rho * sc - u * sb);
+      invV(iI, iPhi0) = invV(iPhi0, iI);
       invV(iI, iI) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
       return invV.inverse();
     }
@@ -250,13 +250,13 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
 
-  PerigeeCovariance tPerigeeCovariance;
+  TMatrixDSym tPerigeeCovariance(3);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
     }
   }
 
-  resultCircle.setPerigeeCovariance(tPerigeeCovariance);
+  resultCircle.setPerigeeCovariance(PerigeeCovariance(tPerigeeCovariance));
   return resultCircle;
 }

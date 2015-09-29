@@ -142,12 +142,13 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
   const double alpha = getAlphaFromBField(bZ);
   const double charge = gfTrackCand.getChargeSeed();
 
-  jacobianReduce(iCurv, iPx) = charge * invPtSquared / alpha ;
-  jacobianReduce(iPhi0, iPy) = invPt;
-  jacobianReduce(iI, iY) = 1;
-  jacobianReduce(iTanL, iPx) = - pz * invPtSquared;
-  jacobianReduce(iTanL, iPz) = invPt;
-  jacobianReduce(iZ0, iZ) = 1;
+  using namespace NHelixParameter;
+  jacobianReduce(c_Curv, iPx) = charge * invPtSquared / alpha ;
+  jacobianReduce(c_Phi0, iPy) = invPt;
+  jacobianReduce(c_I, iY) = 1;
+  jacobianReduce(c_TanL, iPx) = - pz * invPtSquared;
+  jacobianReduce(c_TanL, iPz) = invPt;
+  jacobianReduce(c_Z0, iZ) = 1;
   // Note the column corresponding to iX is completely zero as expectable.
 
   cov6.Similarity(jacobianReduce);
@@ -234,22 +235,24 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   const double invChargeAlphaCurv = 1.0 / chargeAlphaCurv;
   const double invChargeAlphaCurv2 = 1.0 / chargeAlphaCurv2;
 
+
+  using namespace NHelixParameter;
   // Position
-  jacobianInflate(iX, iPhi0) = -impactXY;
-  jacobianInflate(iY, iI) = 1.0;
-  jacobianInflate(iZ, iZ0) = 1.0;
+  jacobianInflate(iX, c_Phi0) = -impactXY;
+  jacobianInflate(iY, c_I) = 1.0;
+  jacobianInflate(iZ, c_Z0) = 1.0;
 
   // Momentum
   if (bZ == 0) {
-    jacobianInflate(iPx, iCurv) = 0;
-    jacobianInflate(iPy, iPhi0) = momentum.cylindricalR();
-    jacobianInflate(iPz, iCurv) = 0;
-    jacobianInflate(iPz, iTanL) = momentum.cylindricalR();
+    jacobianInflate(iPx, c_Curv) = 0;
+    jacobianInflate(iPy, c_Phi0) = momentum.cylindricalR();
+    jacobianInflate(iPz, c_Curv) = 0;
+    jacobianInflate(iPz, c_TanL) = momentum.cylindricalR();
   } else {
-    jacobianInflate(iPx, iCurv) = invChargeAlphaCurv2;
-    jacobianInflate(iPy, iPhi0) = - invChargeAlphaCurv;
-    jacobianInflate(iPz, iCurv) = tanLambda * invChargeAlphaCurv2;
-    jacobianInflate(iPz, iTanL) = - invChargeAlphaCurv;
+    jacobianInflate(iPx, c_Curv) = invChargeAlphaCurv2;
+    jacobianInflate(iPy, c_Phi0) = - invChargeAlphaCurv;
+    jacobianInflate(iPz, c_Curv) = tanLambda * invChargeAlphaCurv2;
+    jacobianInflate(iPz, c_TanL) = - invChargeAlphaCurv;
   }
   // Transform
   TMatrixDSym cov6 = cov5; //copy

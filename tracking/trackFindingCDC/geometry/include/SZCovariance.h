@@ -16,7 +16,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
 
 namespace Belle2 {
 
@@ -28,39 +28,33 @@ namespace Belle2 {
     public:
       /// Default constructor for ROOT compatibility.
       SZCovariance() :
-        m_matrix(iTanL, iZ0) //From to indices
+        m_matrix(EHelixParameter::c_TanL,
+                 EHelixParameter::c_Z0) //From to indices
       { m_matrix.Zero(); }
-
-
 
       /// Setup the covariance with the given covariance matrx
       explicit SZCovariance(const TMatrixDSym& covarianceMatrix) :
         m_matrix(covarianceMatrix)
       { checkMatrix(); }
 
-
-
-
-
-
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const
       { return m_matrix; }
-
 
     private:
       /// Checks the covariance matrix for consistence
       inline void checkMatrix() const
       {
+        using namespace NHelixParameter;
         if (matrix().GetNrows() != 2 or
             matrix().GetNcols() != 2 or
-            matrix().GetColLwb() != iTanL or
-            matrix().GetColUpb() != iZ0) {
+            matrix().GetColLwb() != c_TanL or
+            matrix().GetColUpb() != c_Z0) {
           B2ERROR("SZ covariance matrix is a  " <<
                   matrix().GetNrows() << "x" <<
                   matrix().GetNcols() << " matrix starting from " <<
                   matrix().GetColLwb() << ". " <<
-                  "Expected 2x2 matrix starting from "  << iTanL << "."
+                  "Expected 2x2 matrix starting from "  << c_TanL << "."
                  );
         }
       }
@@ -76,19 +70,17 @@ namespace Belle2 {
       }
 
 
-
       /// Getter for the whole covariance matrix of the sz parameters
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
       /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
-      double& operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol)
+      double& operator()(const EHelixParameter& iRow, const EHelixParameter& iCol)
       { return m_matrix(iRow, iCol); }
 
       /// Constant access to the matrix elements.
-      double operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      double operator()(const EHelixParameter& iRow, const EHelixParameter& iCol) const
       { return m_matrix(iRow, iCol); }
-
 
 
       /// Modifies to sz covariance matrix inplace to represent the reverse travel direction.

@@ -16,7 +16,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EPerigeeParameter.h>
 
 namespace Belle2 {
 
@@ -31,22 +31,14 @@ namespace Belle2 {
         m_matrix(3)
       { m_matrix.Zero(); }
 
-
-
       /// Setup the covariance with the given covariance matrx
       explicit PerigeeCovariance(const TMatrixDSym& covarianceMatrix) :
         m_matrix(covarianceMatrix)
       { checkMatrix(); }
 
-
-
-
-
-
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const
       { return m_matrix; }
-
 
     private:
       /// Checks the covariance matrix for consistence
@@ -61,8 +53,6 @@ namespace Belle2 {
         }
       }
 
-
-
     public:
       /// Setter for the whole covariance matrix of the perigee parameters.
       inline void setMatrix(const TMatrixDSym& covarianceMatrix)
@@ -71,25 +61,20 @@ namespace Belle2 {
         m_matrix = covarianceMatrix;
       }
 
-
-
       /// Getter for the whole covariance matrix of the perigee parameters.
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
       /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
-      double& operator()(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol)
+      double& operator()(const EPerigeeParameter& iRow, const EPerigeeParameter& iCol)
       { return m_matrix(iRow, iCol); }
 
       /// Constant access to the matrix elements.
-      double operator()(const PerigeeParameterIndex& iRow, const PerigeeParameterIndex& iCol) const
+      double operator()(const EPerigeeParameter& iRow, const EPerigeeParameter& iCol) const
       { return m_matrix(iRow, iCol); }
-
-
 
       /// Modifies to perigee covariance matrix inplace to represent the reverse travel direction.
       void reverse();
-
 
       /// Returns the perigee covariance for the reversed travel direction as a copy.
       PerigeeCovariance reversed() const
@@ -99,18 +84,13 @@ namespace Belle2 {
         return result;
       }
 
-
-
       /// Sets the covariance matrix to zero.
       void invalidate()
       { m_matrix.Zero(); }
 
-
-
       /// Sets the covariance matrix to a unit matrix.
       void setUnit()
       { m_matrix.UnitMatrix(); }
-
 
       /// Transforms the covariance by the given jacobian matrix in place.
       void similarityTransform(const TMatrixD& jacobian)
@@ -124,8 +104,6 @@ namespace Belle2 {
         m_matrix.Similarity(jacobian);
       }
 
-
-
       /// Transforms a copy the covariance by the given jacobian matrix.
       TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
       {
@@ -134,12 +112,9 @@ namespace Belle2 {
         return matrix;
       }
 
-
-
     private:
       /// Memory for the 3x3 matrix presentation of the covariance.
       TMatrixDSym m_matrix;
-
 
     }; //class
 

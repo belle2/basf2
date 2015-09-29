@@ -21,11 +21,11 @@ CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
 {
   // Dummy error estimates
   SZCovariance szCovariance;
-
-  szCovariance(iTanL, iTanL) = 2.0; // Error in pz double the error in pt, good estimate?
-  szCovariance(iZ0, iTanL) = 0.0;
-  szCovariance(iTanL, iZ0) = 0.0;
-  szCovariance(iZ0, iZ0) = 2.0;
+  using namespace NHelixParameter;
+  szCovariance(c_TanL, c_TanL) = 2.0; // Error in pz double the error in pt, good estimate?
+  szCovariance(c_Z0, c_TanL) = 0.0;
+  szCovariance(c_TanL, c_Z0) = 0.0;
+  szCovariance(c_Z0, c_Z0) = 2.0;
 
   // A dummy line with no increasing z coordinate
   double tanLambda = 0.0;

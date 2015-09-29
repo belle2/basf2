@@ -52,9 +52,6 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
 
-  assert(ptrStartSegment);
-  assert(ptrEndSegment);
-
   const CDCRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;
 
@@ -219,7 +216,7 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
 
     var<named("axialFit_curvatureXY")>() = axialFit.getCurvature();
-    var<named("axialFit_curvatureXY_variance")>() = axialFit.getLocalVariance(iCurv);
+    var<named("axialFit_curvatureXY_variance")>() = axialFit.getLocalVariance(c_Curv);
 
     return true;
   */

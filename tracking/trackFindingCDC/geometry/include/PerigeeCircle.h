@@ -14,7 +14,7 @@
 
 #include <TMatrixD.h>
 #include <TVectorD.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EPerigeeParameter.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
@@ -304,13 +304,14 @@ namespace Belle2 {
       inline Vector2D perigee() const
       { return tangential().orthogonal() * impact(); }
 
-      /// Getter for the three perigee parameters in the order defined by PerigeeParameterIndex.h
+      /// Getter for the three perigee parameters in the order defined by EPerigeeParameter.h
       TVectorD parameters() const
       {
-        TVectorD result(iCurv, iI);
-        result(iCurv) = curvature();
-        result(iPhi0) = phi0();
-        result(iI) = impact();
+        using namespace NPerigeeParameter;
+        TVectorD result(c_Curv, c_I);
+        result(c_Curv) = curvature();
+        result(c_Phi0) = phi0();
+        result(c_I) = impact();
         return result;
       }
 

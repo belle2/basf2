@@ -204,11 +204,11 @@ namespace Belle2 {
       { return getLocalHelix().curvatureXY(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
-      double getLocalCovariance(HelixParameterIndex iRow, HelixParameterIndex iCol) const
+      double getLocalCovariance(EHelixParameter iRow, EHelixParameter iCol) const
       { return getLocalHelix().covariance(iRow, iCol); }
 
       /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
-      double getLocalVariance(HelixParameterIndex i) const
+      double getLocalVariance(EHelixParameter i) const
       { return getLocalHelix().variance(i); }
 
 

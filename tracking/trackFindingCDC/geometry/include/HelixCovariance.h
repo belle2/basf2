@@ -51,17 +51,9 @@ namespace Belle2 {
       { checkMatrix(); }
 
 
-
-
-
-
-
-
       /// Down cast operator to symmetric matrix
       operator const TMatrixDSym& () const
       { return m_matrix; }
-
-
 
     private:
       /// Checks the covariance matrix for consistence
@@ -76,48 +68,41 @@ namespace Belle2 {
         }
       }
 
-
-
     public:
       /// Setter for the whole covariance matrix of the helix parameters
       inline void setMatrix(const TMatrixDSym& covarianceMatrix)
       { m_matrix = covarianceMatrix; checkMatrix(); }
-
-
 
       /// Getter for the whole covariance matrix of the helix parameters
       const TMatrixDSym& matrix() const
       { return m_matrix; }
 
       /// Non constant access to the matrix elements return a reference to the underlying matrix entry.
-      double& operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol)
+      double& operator()(const EHelixParameter& iRow, const EHelixParameter& iCol)
       { return m_matrix(iRow, iCol); }
 
       /// Constant access to the matrix elements.
-      double operator()(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      double operator()(const EHelixParameter& iRow, const EHelixParameter& iCol) const
       { return m_matrix(iRow, iCol); }
-
-
 
       /// Getter for the perigee subcovariance
       PerigeeCovariance perigeeCovariance() const
       {
-        //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return PerigeeCovariance(matrix().GetSub(iCurv, iI, iCurv, iI));
+        // Note upper bound is inclusive (not exclusive like in e.g. Python)
+        using namespace NHelixParameter;
+        return PerigeeCovariance(matrix().GetSub(c_Curv, c_I, c_Curv, c_I));
       }
 
       /// Getter for the sz subcovariance
       SZCovariance szCovariance() const
       {
         //Note upper bound is inclusive (not exclusive like in e.g. Python)
-        return SZCovariance(matrix().GetSub(iTanL, iZ0, iTanL, iZ0));
+        using namespace NHelixParameter;
+        return SZCovariance(matrix().GetSub(c_TanL, c_Z0, c_TanL, c_Z0));
       }
-
 
       /// Modifies to helix covariance matrix inplace to represent the reverse travel direction.
       void reverse();
-
-
 
       /// Returns the helix covariance for the reversed travel direction as a copy.
       HelixCovariance reversed() const
@@ -127,19 +112,13 @@ namespace Belle2 {
         return result;
       }
 
-
-
       /// Sets the covariance matrix to zero.
       void invalidate()
       { m_matrix.Zero(); }
 
-
-
       /// Sets the covariance matrix to a unit matrix.
       void setUnit()
       { m_matrix.UnitMatrix(); }
-
-
 
       /// Transforms the covariance by the given jacobian matrix in place.
       void similarityTransform(const TMatrixD& jacobian)
@@ -153,8 +132,6 @@ namespace Belle2 {
         m_matrix.Similarity(jacobian);
       }
 
-
-
       /// Transforms a copy the covariance by the given jacobian matrix.
       TMatrixDSym similarityTransformed(const TMatrixD& jacobian) const
       {
@@ -163,12 +140,9 @@ namespace Belle2 {
         return matrix;
       }
 
-
-
     private:
       /// Memory for the 5x5 matrix presentation of the covariance.
       TMatrixDSym m_matrix;
-
 
     }; //class
 

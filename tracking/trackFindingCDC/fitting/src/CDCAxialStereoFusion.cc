@@ -57,16 +57,17 @@ namespace {
     TMatrixD result(3, 5);
     result.Zero();
 
-    result(iCurv, iCurv) = 1.0;
-    result(iPhi0, iPhi0) = 1.0;
-    result(iI, iI)       = 1.0;
+    using namespace NHelixParameter;
+    result(c_Curv, c_Curv) = 1.0;
+    result(c_Phi0, c_Phi0) = 1.0;
+    result(c_I, c_I)       = 1.0;
 
-    // result(iCurv,iSZ)    = -2.0 * dPhi0OverDZ0ByISuperLayer[iSuperLayer];
-    result(iCurv, iTanL)   = dCurvOverDSZByISuperLayer[iSuperLayer];
-    result(iPhi0, iZ0)   = -dPhi0OverDZ0ByISuperLayer[iSuperLayer];
+    // result(c_Curv,iSZ)    = -2.0 * dPhi0OverDZ0ByISuperLayer[iSuperLayer];
+    result(c_Curv, c_TanL)   = dCurvOverDSZByISuperLayer[iSuperLayer];
+    result(c_Phi0, c_Z0)   = -dPhi0OverDZ0ByISuperLayer[iSuperLayer];
 
-    result(iPhi0, iTanL)   =   zeta;
-    result(iI, iZ0)      = - zeta;
+    result(c_Phi0, c_TanL)   =   zeta;
+    result(c_I, c_Z0)      = - zeta;
 
     // result.Print();
 
@@ -277,9 +278,10 @@ UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPer
                    avgParameters,
                    avgCovMatrix);
 
-    avgParameters(iCurv) += refParameters(iCurv);
-    avgParameters(iPhi0) += refParameters(iPhi0);
-    avgParameters(iI) += refParameters(iI);
+    using namespace NPerigeeParameter;
+    avgParameters(c_Curv) += refParameters(c_Curv);
+    avgParameters(c_Phi0) += refParameters(c_Phi0);
+    avgParameters(c_I) += refParameters(c_I);
 
   } else {
     // Chi2 value
@@ -330,9 +332,10 @@ UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPer
     startParameters -= refParameters;
 
     // Only first three coordinates are effected by a change of the reference (expansion) point
-    endParameters(iCurv) -= refParameters(iCurv);
-    endParameters(iPhi0) -= refParameters(iPhi0);
-    endParameters(iI) -= refParameters(iI);
+    using namespace NPerigeeParameter;
+    endParameters(c_Curv) -= refParameters(c_Curv);
+    endParameters(c_Phi0) -= refParameters(c_Phi0);
+    endParameters(c_I) -= refParameters(c_I);
 
     // Chi2 value
     chi2 = average(startParameters,
@@ -344,9 +347,10 @@ UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& startPer
                    avgParameters,
                    avgCovMatrix);
 
-    avgParameters(iCurv) += refParameters(iCurv);
-    avgParameters(iPhi0) += refParameters(iPhi0);
-    avgParameters(iI) += refParameters(iI);
+    using namespace NPerigeeParameter;
+    avgParameters(c_Curv) += refParameters(c_Curv);
+    avgParameters(c_Phi0) += refParameters(c_Phi0);
+    avgParameters(c_I) += refParameters(c_I);
 
   } else {
     // Chi2 value

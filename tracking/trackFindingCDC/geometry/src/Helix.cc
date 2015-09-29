@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
 
 
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
@@ -18,7 +18,6 @@ using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 double Helix::arcLength2DToClosest(const Vector3D& point) const
 {
@@ -53,7 +52,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point) const
 
   SinEqLine sinEqLineSolver(slope, intercept);
 
-  Index iHalfPeriod = sinEqLineSolver.getIHalfPeriod(deltaZ / tanLambda() * curvatureXY());
+  int iHalfPeriod = sinEqLineSolver.getIHalfPeriod(deltaZ / tanLambda() * curvatureXY());
 
   // B2INFO("iHalfPeriod : " << iHalfPeriod);
   // B2INFO("Basic solution : " << sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(-1));
@@ -70,7 +69,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point) const
   double distances[4] = { NAN, NAN, NAN, NAN };
 
   double smallestDistance = NAN;
-  Index iSmallestSol = 0;
+  int iSmallestSol = 0;
 
   for (int iSol = 0; iSol < 4; ++iSol) {
     distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + tanLambda() * tanLambda() * solutions[iSol] *
@@ -117,15 +116,11 @@ TMatrixD Helix::passiveMoveByJacobian(const Vector3D& by) const
   double m = tanLambda();
   double sArc = circleXY().arcLengthTo(by.xy());
 
-  jacobian(iZ0, iCurv) = m * (jacobian(iPhi0, iCurv) - sArc) / curv;
-  jacobian(iZ0, iPhi0) = m * (jacobian(iPhi0, iPhi0) - 1.) / curv;
-  jacobian(iZ0, iI)    = m *  jacobian(iPhi0, iI) / curv;
-  jacobian(iZ0, iTanL)   = sArc;
+  using namespace NHelixParameter;
+  jacobian(c_Z0, c_Curv) = m * (jacobian(c_Phi0, c_Curv) - sArc) / curv;
+  jacobian(c_Z0, c_Phi0) = m * (jacobian(c_Phi0, c_Phi0) - 1.) / curv;
+  jacobian(c_Z0, c_I)    = m *  jacobian(c_Phi0, c_I) / curv;
+  jacobian(c_Z0, c_TanL)   = sArc;
 
   return jacobian;
 }
-
-
-
-
-

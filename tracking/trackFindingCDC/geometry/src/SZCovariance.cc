@@ -25,7 +25,8 @@ void SZCovariance::reverse()
   // aquire a minus sign
 
   // receive a minus sign upon reversion.
-  m_matrix(iTanL, iZ0) = -m_matrix(iTanL, iZ0);
-  m_matrix(iZ0, iTanL) = -m_matrix(iZ0, iTanL);
+  using namespace NHelixParameter;
+  m_matrix(c_TanL, c_Z0) = -m_matrix(c_TanL, c_Z0);
+  m_matrix(c_Z0, c_TanL) = -m_matrix(c_Z0, c_TanL);
 
 }

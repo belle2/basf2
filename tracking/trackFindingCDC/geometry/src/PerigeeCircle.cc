@@ -54,7 +54,9 @@ PerigeeCircle::PerigeeCircle(const double curvature,
 
 
 PerigeeCircle::PerigeeCircle(const TVectorD& parameters) :
-  PerigeeCircle(parameters(iCurv), parameters(iPhi0), parameters(iI))
+  PerigeeCircle(parameters(EPerigeeParameter::c_Curv),
+                parameters(EPerigeeParameter::c_Phi0),
+                parameters(EPerigeeParameter::c_I))
 {
 }
 
@@ -202,17 +204,18 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
 
   //B2INFO("zeta = " << zeta);
 
-  jacobian(iCurv, iCurv) = 1;
-  jacobian(iCurv, iPhi0) = 0;
-  jacobian(iCurv, iI) = 0;
+  using namespace NPerigeeParameter;
+  jacobian(c_Curv, c_Curv) = 1;
+  jacobian(c_Curv, c_Phi0) = 0;
+  jacobian(c_Curv, c_I) = 0;
 
-  jacobian(iPhi0, iCurv) = xi * deltaParallel;
-  jacobian(iPhi0, iPhi0) = xi * u * nu;
-  jacobian(iPhi0, iI) = -xi * curvature() * curvature() * deltaParallel;
+  jacobian(c_Phi0, c_Curv) = xi * deltaParallel;
+  jacobian(c_Phi0, c_Phi0) = xi * u * nu;
+  jacobian(c_Phi0, c_I) = -xi * curvature() * curvature() * deltaParallel;
 
-  jacobian(iI, iCurv) = mu * zeta - lambda * A;
-  jacobian(iI, iPhi0) = 2 * mu * u * deltaParallel;
-  jacobian(iI, iI) = 2 * mu * nu;
+  jacobian(c_I, c_Curv) = mu * zeta - lambda * A;
+  jacobian(c_I, c_Phi0) = 2 * mu * u * deltaParallel;
+  jacobian(c_I, c_I) = 2 * mu * nu;
 
 }
 

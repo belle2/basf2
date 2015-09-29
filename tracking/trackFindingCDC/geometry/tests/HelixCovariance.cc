@@ -33,30 +33,34 @@ TEST(TrackFindingCDCTest, geometry_HelixCovariance_perigeeCovariance)
 TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
 {
   PerigeeCovariance perigeeCovariance;
+  {
+    using namespace NPerigeeParameter;
+    perigeeCovariance(c_Curv, c_Curv) = 1;
+    perigeeCovariance(c_Curv, c_I) = 1;
+    perigeeCovariance(c_I, c_Curv) = 1;
+    perigeeCovariance(c_I, c_I) = 1;
+  }
+
   SZCovariance szCovariance;
-
-  perigeeCovariance(iCurv, iCurv) = 1;
-  perigeeCovariance(iCurv, iI) = 1;
-  perigeeCovariance(iI, iCurv) = 1;
-  perigeeCovariance(iI, iI) = 1;
-
-
-  szCovariance(iTanL, iTanL) = 1;
-  szCovariance(iZ0, iZ0) = 1;
-
+  {
+    using namespace NHelixParameter;
+    szCovariance(c_TanL, c_TanL) = 1;
+    szCovariance(c_Z0, c_Z0) = 1;
+  }
 
   HelixCovariance helixCovariance(perigeeCovariance, szCovariance);
+  {
+    using namespace NHelixParameter;
+    EXPECT_EQ(1, helixCovariance(c_Curv, c_Curv));
+    EXPECT_EQ(1, helixCovariance(c_I, c_I));
+    EXPECT_EQ(1, helixCovariance(c_Curv, c_I));
+    EXPECT_EQ(1, helixCovariance(c_I, c_Curv));
 
-  EXPECT_EQ(1, helixCovariance(iCurv, iCurv));
-  EXPECT_EQ(1, helixCovariance(iI, iI));
-  EXPECT_EQ(1, helixCovariance(iCurv, iI));
-  EXPECT_EQ(1, helixCovariance(iI, iCurv));
-
-  EXPECT_EQ(1, helixCovariance(iTanL, iTanL));
-  EXPECT_EQ(1, helixCovariance(iZ0, iZ0));
+    EXPECT_EQ(1, helixCovariance(c_TanL, c_TanL));
+    EXPECT_EQ(1, helixCovariance(c_Z0, c_Z0));
 
 
-  EXPECT_EQ(0, helixCovariance(iPhi0, iPhi0));
-  EXPECT_EQ(0, helixCovariance(iTanL, iCurv));
-
+    EXPECT_EQ(0, helixCovariance(c_Phi0, c_Phi0));
+    EXPECT_EQ(0, helixCovariance(c_TanL, c_Curv));
+  }
 }

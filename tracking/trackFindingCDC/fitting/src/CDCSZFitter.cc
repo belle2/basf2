@@ -43,10 +43,11 @@ namespace {
 
     SZCovariance szCovariance;
 
-    szCovariance(iTanL, iTanL) = invSumMatrixWS(1, 1);
-    szCovariance(iZ0, iTanL) = invSumMatrixWS(0, 1); // Should be symmetric.
-    szCovariance(iTanL, iZ0) = invSumMatrixWS(1, 0); // Should be symmetric.
-    szCovariance(iZ0, iZ0) = invSumMatrixWS(0, 0);
+    using namespace NHelixParameter;
+    szCovariance(c_TanL, c_TanL) = invSumMatrixWS(1, 1);
+    szCovariance(c_Z0, c_TanL) = invSumMatrixWS(0, 1); // Should be symmetric.
+    szCovariance(c_TanL, c_Z0) = invSumMatrixWS(1, 0); // Should be symmetric.
+    szCovariance(c_Z0, c_Z0) = invSumMatrixWS(0, 0);
 
     double chi2 = sumMatrixWSZ(2, 2) - z0Intercept * sumMatrixWSZ(0, 2) -  sumMatrixWSZ(1, 2) * tanLambda;
 
@@ -100,10 +101,11 @@ namespace {
 
     SZCovariance szCovariance;
 
-    szCovariance(iTanL, iTanL) = covInterceptSlope(1, 1);
-    szCovariance(iZ0, iTanL) = covInterceptSlope(0, 1); // Should be symmetric.
-    szCovariance(iTanL, iZ0) = covInterceptSlope(1, 0); // Should be symmetric.
-    szCovariance(iZ0, iZ0) = covInterceptSlope(0, 0);
+    using namespace NHelixParameter;
+    szCovariance(c_TanL, c_TanL) = covInterceptSlope(1, 1);
+    szCovariance(c_Z0, c_TanL) = covInterceptSlope(0, 1); // Should be symmetric.
+    szCovariance(c_TanL, c_Z0) = covInterceptSlope(1, 0); // Should be symmetric.
+    szCovariance(c_Z0, c_Z0) = covInterceptSlope(0, 0);
 
     double chi2 = nWSZ.transpose() * sumMatrixWSZ * nWSZ;
 
@@ -112,9 +114,6 @@ namespace {
   }
 
 }
-
-
-
 
 void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 {

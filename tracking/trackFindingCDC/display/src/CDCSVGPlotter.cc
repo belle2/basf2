@@ -57,27 +57,27 @@ CDCSVGPlotter::CDCSVGPlotter(bool animate)
 template<class AIterable, class AColorizer>
 void CDCSVGPlotter::drawIterable(const AIterable& iterable, AColorizer& colorizer)
 {
-  unsigned int iItem = 0;
+  unsigned int c_Item = 0;
   std::map<std::string, std::string>obj_styling;
   if (colorizer.isStrokeSet()) {
     if (!colorizer.isStrokeWidthSet()) {
       for (const auto& item : iterable) {
-        obj_styling["stroke"] = colorizer.mapStroke(iItem, item);
+        obj_styling["stroke"] = colorizer.mapStroke(c_Item, item);
         draw(item, obj_styling);
-        ++iItem;
+        ++c_Item;
       }
     } else
       for (const auto& item : iterable) {
-        obj_styling["stroke"] = colorizer.mapStroke(iItem, item);
-        obj_styling["stroke-width"] = colorizer.mapStrokeWidth(iItem, item);
+        obj_styling["stroke"] = colorizer.mapStroke(c_Item, item);
+        obj_styling["stroke-width"] = colorizer.mapStrokeWidth(c_Item, item);
 
         draw(item, obj_styling);
-        iItem++;
+        c_Item++;
       }
   } else
     for (const auto& item : iterable) {
       draw(item, obj_styling);
-      ++iItem;
+      ++c_Item;
     }
 }
 

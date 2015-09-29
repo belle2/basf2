@@ -321,7 +321,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
   Vector2D correctedWirePos(wire.getWirePos2DAtZ(correctedPos3D.z()));
   double correctedArcLength2D = arcLength2D;
 
-  for (int iIter = 0; iIter < 2; iIter++) {
+  for (int c_Iter = 0; c_Iter < 2; c_Iter++) {
     // Iterate the extrapolation to the stereo shifted position.
     correctedWirePos = wire.getWirePos2DAtZ(correctedPos3D.z());
     correctedArcLength2D = globalHelix.arcLength2DToXY(correctedWirePos);

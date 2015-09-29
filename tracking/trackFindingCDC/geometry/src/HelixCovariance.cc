@@ -9,12 +9,11 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/geometry/HelixCovariance.h>
-#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 void HelixCovariance::reverse()
 {
@@ -31,22 +30,23 @@ void HelixCovariance::reverse()
   // aquire a minus sign
 
   // receive a minus sign upon reversion.
-  m_matrix(iCurv, iPhi0) = -m_matrix(iCurv, iPhi0);
-  m_matrix(iPhi0, iCurv) = -m_matrix(iPhi0, iCurv);
+  using namespace NHelixParameter;
+  m_matrix(c_Curv, c_Phi0) = -m_matrix(c_Curv, c_Phi0);
+  m_matrix(c_Phi0, c_Curv) = -m_matrix(c_Phi0, c_Curv);
 
-  m_matrix(iCurv, iZ0) = -m_matrix(iCurv, iZ0);
-  m_matrix(iZ0, iCurv) = -m_matrix(iZ0, iCurv);
+  m_matrix(c_Curv, c_Z0) = -m_matrix(c_Curv, c_Z0);
+  m_matrix(c_Z0, c_Curv) = -m_matrix(c_Z0, c_Curv);
 
-  m_matrix(iPhi0, iI) = -m_matrix(iPhi0, iI);
-  m_matrix(iI, iPhi0) = -m_matrix(iI, iPhi0);
+  m_matrix(c_Phi0, c_I) = -m_matrix(c_Phi0, c_I);
+  m_matrix(c_I, c_Phi0) = -m_matrix(c_I, c_Phi0);
 
-  m_matrix(iPhi0, iTanL) = -m_matrix(iPhi0, iTanL);
-  m_matrix(iTanL, iPhi0) = -m_matrix(iTanL, iPhi0);
+  m_matrix(c_Phi0, c_TanL) = -m_matrix(c_Phi0, c_TanL);
+  m_matrix(c_TanL, c_Phi0) = -m_matrix(c_TanL, c_Phi0);
 
-  m_matrix(iI, iZ0) = -m_matrix(iI, iZ0);
-  m_matrix(iZ0, iI) = -m_matrix(iZ0, iI);
+  m_matrix(c_I, c_Z0) = -m_matrix(c_I, c_Z0);
+  m_matrix(c_Z0, c_I) = -m_matrix(c_Z0, c_I);
 
-  m_matrix(iTanL, iZ0) = -m_matrix(iTanL, iZ0);
-  m_matrix(iZ0, iTanL) = -m_matrix(iZ0, iTanL);
+  m_matrix(c_TanL, c_Z0) = -m_matrix(c_TanL, c_Z0);
+  m_matrix(c_Z0, c_TanL) = -m_matrix(c_Z0, c_TanL);
 
 }

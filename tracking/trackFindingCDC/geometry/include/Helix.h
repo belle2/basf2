@@ -14,7 +14,7 @@
 #include <TVectorD.h>
 
 
-#include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
+#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -44,8 +44,11 @@ namespace Belle2 {
       {}
 
       explicit Helix(const TVectorD& parameters) :
-        m_circleXY(parameters(iCurv), parameters(iPhi0), parameters(iI)),
-        m_lineSZ(Line2D::fromSlopeIntercept(parameters(iTanL), parameters(iZ0)))
+        m_circleXY(parameters(EHelixParameter::c_Curv),
+                   parameters(EHelixParameter::c_Phi0),
+                   parameters(EHelixParameter::c_I)),
+        m_lineSZ(Line2D::fromSlopeIntercept(parameters(EHelixParameter::c_TanL),
+                                            parameters(EHelixParameter::c_Z0)))
       {}
 
       Helix(const double curvature,
@@ -231,15 +234,16 @@ namespace Belle2 {
       double phi0() const
       { return tangentialPhi(); }
 
-      /// Getter for the five helix parameters in the order defined by HelixParameterIndex.h and PerigeeParameterIndex.h
+      /// Getter for the five helix parameters in the order defined by EHelixParameter.h and EPerigeeParameter.h
       TVectorD parameters() const
       {
-        TVectorD result(iCurv, iZ0);
-        result(iCurv) = curvatureXY();
-        result(iPhi0) = phi0();
-        result(iI) = impactXY();
-        result(iTanL) = tanLambda();
-        result(iZ0) = z0();
+        using namespace NHelixParameter;
+        TVectorD result(c_Curv, c_Z0);
+        result(c_Curv) = curvatureXY();
+        result(c_Phi0) = phi0();
+        result(c_I) = impactXY();
+        result(c_TanL) = tanLambda();
+        result(c_Z0) = z0();
         return result;
       }
 

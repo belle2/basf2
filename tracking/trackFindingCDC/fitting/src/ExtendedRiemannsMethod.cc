@@ -82,7 +82,7 @@ namespace {
 
   /// Helper indices for meaningfull matrix access to the perigee covariance matrices
   constexpr size_t iCurv = 0;
-  constexpr size_t iPhi = 1;
+  constexpr size_t iPhi0 = 1;
   constexpr size_t iI = 2;
 
 
@@ -340,9 +340,9 @@ namespace {
     perigeeJ(iCurv, iReducedN2) = 0;
     perigeeJ(iCurv, iReducedN3) = 2;
 
-    perigeeJ(iPhi, iReducedN0) = 0;
-    perigeeJ(iPhi, iReducedN2) = -1 / normN12;
-    perigeeJ(iPhi, iReducedN3) = 0;
+    perigeeJ(iPhi0, iReducedN0) = 0;
+    perigeeJ(iPhi0, iReducedN2) = -1 / normN12;
+    perigeeJ(iPhi0, iReducedN3) = 0;
 
     perigeeJ(iI, iReducedN0) = 2 * (normN12 * (1 + 2 * normN12) - 1) / denominator;
     perigeeJ(iI, iReducedN2) = 0;
@@ -404,13 +404,13 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
 
-  PerigeeCovariance tPerigeeCovariance;
+  TMatrixDSym tPerigeeCovariance(3);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
     }
   }
 
-  resultCircle.setPerigeeCovariance(tPerigeeCovariance);
+  resultCircle.setPerigeeCovariance(PerigeeCovariance(tPerigeeCovariance));
   return resultCircle;
 }

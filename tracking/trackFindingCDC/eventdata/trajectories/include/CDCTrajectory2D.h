@@ -311,11 +311,11 @@ namespace Belle2 {
       { return getLocalCircle().curvature(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
-      double getLocalCovariance(PerigeeParameterIndex iRow, PerigeeParameterIndex iCol) const
+      double getLocalCovariance(EPerigeeParameter iRow, EPerigeeParameter iCol) const
       { return getLocalCircle().covariance(iRow, iCol); }
 
       /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
-      double getLocalVariance(PerigeeParameterIndex i) const
+      double getLocalVariance(EPerigeeParameter i) const
       { return getLocalCircle().variance(i); }
 
 

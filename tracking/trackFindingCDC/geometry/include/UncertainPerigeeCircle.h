@@ -121,12 +121,12 @@ namespace Belle2 {
       { return m_perigeeCovariance; }
 
       /// Getter for individual elements of the covariance matrix
-      double covariance(const PerigeeParameterIndex& iRow,
-                        const PerigeeParameterIndex& iCol) const
+      double covariance(const EPerigeeParameter& iRow,
+                        const EPerigeeParameter& iCol) const
       { return perigeeCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
-      double variance(const PerigeeParameterIndex& i) const
+      double variance(const EPerigeeParameter& i) const
       { return perigeeCovariance()(i, i); }
 
       /// Getter for the chi square value of the circle fit

@@ -71,11 +71,11 @@ namespace Belle2 {
       { return m_szCovariance; }
 
       /// Getter for individual elements of the covariance matrix
-      double covariance(const HelixParameterIndex& iRow, const HelixParameterIndex& iCol) const
+      double covariance(const EHelixParameter& iRow, const EHelixParameter& iCol) const
       { return szCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
-      double variance(const HelixParameterIndex& i) const
+      double variance(const EHelixParameter& i) const
       { return szCovariance()(i, i); }
 
       /// Getter for the chi square value of the line fit
@@ -125,9 +125,10 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       TMatrixD passiveMoveByJacobian(const Vector2D& bySZ) const
       {
-        TMatrixD result(iTanL, iZ0);
+        using namespace NHelixParameter;
+        TMatrixD result(c_TanL, c_Z0);
         result.UnitMatrix();
-        result(iZ0, iTanL) = bySZ.first();
+        result(c_Z0, c_TanL) = bySZ.first();
         return result;
       }
 

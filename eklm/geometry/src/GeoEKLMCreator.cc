@@ -368,12 +368,12 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxX(HepGeom::Transform3D& t)
     m_GeoDat->getSectorSupportGeometry();
   x = sqrt(sectorSupportPos->OuterR * sectorSupportPos->OuterR -
            sectorSupportPos->Y * sectorSupportPos->Y);
-  t = HepGeom::Translate3D(0.5 * (x + sectorSupportGeometry->Corner3.X),
+  t = HepGeom::Translate3D(0.5 * (x + sectorSupportGeometry->Corner3.x()),
                            sectorSupportPos->Y +
                            0.5 * sectorSupportGeometry->Thickness, 0.);
   try {
     res = new G4Box("SectorSupport_BoxX",
-                    0.5 * (x - sectorSupportGeometry->Corner3.X),
+                    0.5 * (x - sectorSupportGeometry->Corner3.x()),
                     0.5 * sectorSupportGeometry->Thickness,
                     0.5 * sectorSupportPos->Length);
   } catch (std::bad_alloc& ba) {
@@ -391,13 +391,13 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxY(HepGeom::Transform3D& t)
     m_GeoDat->getSectorSupportGeometry();
   t = HepGeom::Translate3D(sectorSupportPos->X +
                            0.5 * sectorSupportGeometry->Thickness,
-                           0.5 * (sectorSupportGeometry->Corner4.Y +
-                                  sectorSupportGeometry->Corner1A.Y), 0.) *
+                           0.5 * (sectorSupportGeometry->Corner4.y() +
+                                  sectorSupportGeometry->Corner1A.y()), 0.) *
       HepGeom::RotateZ3D(90. * CLHEP::deg);
   try {
     res = new G4Box("SectorSupport_BoxY",
-                    0.5 * (sectorSupportGeometry->Corner1A.Y -
-                           sectorSupportGeometry->Corner4.Y),
+                    0.5 * (sectorSupportGeometry->Corner1A.y() -
+                           sectorSupportGeometry->Corner4.y()),
                     0.5 * sectorSupportGeometry->Thickness,
                     0.5 * sectorSupportPos->Length);
   } catch (std::bad_alloc& ba) {
@@ -415,17 +415,19 @@ G4Box* EKLM::GeoEKLMCreator::createSectorSupportBoxTop(HepGeom::Transform3D& t)
     m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  t = HepGeom::Translate3D(0.5 * (sectorSupportGeometry->Corner1A.X +
-                                  sectorSupportGeometry->Corner1B.X +
+  t = HepGeom::Translate3D(0.5 * (sectorSupportGeometry->Corner1A.x() +
+                                  sectorSupportGeometry->Corner1B.x() +
                                   sectorSupportGeometry->Thickness *
                                   sin(sectorSupportGeometry->CornerAngle)),
-                           0.5 * (sectorSupportGeometry->Corner1A.Y +
-                                  sectorSupportGeometry->Corner1B.Y -
+                           0.5 * (sectorSupportGeometry->Corner1A.y() +
+                                  sectorSupportGeometry->Corner1B.y() -
                                   sectorSupportGeometry->Thickness *
                                   cos(sectorSupportGeometry->CornerAngle)),
                            0.) * HepGeom::RotateZ3D(sectorSupportGeometry->CornerAngle);
-  dx = sectorSupportGeometry->Corner1B.X - sectorSupportGeometry->Corner1A.X;
-  dy = sectorSupportGeometry->Corner1B.Y - sectorSupportGeometry->Corner1B.Y;
+  dx = sectorSupportGeometry->Corner1B.x() -
+       sectorSupportGeometry->Corner1A.x();
+  dy = sectorSupportGeometry->Corner1B.y() -
+       sectorSupportGeometry->Corner1B.y();
   try {
     res = new G4Box("SectorSupport_BoxTop", 0.5 * sqrt(dx * dx + dy * dy),
                     0.5 * sectorSupportGeometry->Thickness,
@@ -445,10 +447,10 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportInnerTube()
     m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  ang1 = atan2(sectorSupportGeometry->Corner3.Y,
-               sectorSupportGeometry->Corner3.X);
-  ang2 = atan2(sectorSupportGeometry->Corner4.Y,
-               sectorSupportGeometry->Corner4.X);
+  ang1 = atan2(sectorSupportGeometry->Corner3.y(),
+               sectorSupportGeometry->Corner3.x());
+  ang2 = atan2(sectorSupportGeometry->Corner4.y(),
+               sectorSupportGeometry->Corner4.x());
   try {
     res = new G4Tubs("SectorSupport_InnerTube", sectorSupportPos->InnerR,
                      sectorSupportPos->InnerR +
@@ -475,8 +477,8 @@ G4Tubs* EKLM::GeoEKLMCreator::createSectorSupportOuterTube()
   r = sectorSupportPos->OuterR - sectorSupportGeometry->Thickness;
   x = sqrt(r * r - sectorSupportPos->Y * sectorSupportPos->Y);
   ang1 = atan2(sectorSupportPos->Y, x);
-  ang2 = atan2(sectorSupportGeometry->Corner1B.Y,
-               sectorSupportGeometry->Corner1B.X);
+  ang2 = atan2(sectorSupportGeometry->Corner1B.y(),
+               sectorSupportGeometry->Corner1B.x());
   try {
     res = new G4Tubs("SectorSupport_OuterTube", r,
                      sectorSupportPos->OuterR,
@@ -536,7 +538,7 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1LogicalVolume()
                                    sectorSupportGeometry->Corner1LX +
                                    sectorSupportGeometry->Thickness);
   t1 = HepGeom::Translate3D(x, 0.5 * sectorSupportPos->OuterR, 0.);
-  t2 = HepGeom::Translate3D(x, sectorSupportGeometry->Corner1AInner.Y -
+  t2 = HepGeom::Translate3D(x, sectorSupportGeometry->Corner1AInner.y() -
                             0.5 * sectorSupportGeometry->Corner1Width /
                             cos(sectorSupportGeometry->CornerAngle) +
                             0.5 * lx * tan(sectorSupportGeometry->CornerAngle), 0.) *
@@ -565,19 +567,11 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner1LogicalVolume()
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
 {
-  double r;
   G4TriangularPrism* solidCorner2Prism = NULL;
   G4SubtractionSolid* solidCorner2 = NULL;
   HepGeom::Transform3D t1;
-  const struct ElementPosition* sectorSupportPos =
-    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  r = sectorSupportPos->OuterR - sectorSupportGeometry->Thickness;
-  m_Solids.sectorsup.c2y = sectorSupportPos->Y +
-                           sectorSupportGeometry->Thickness;
-  m_Solids.sectorsup.c2x =
-    sqrt(r * r - m_Solids.sectorsup.c2y * m_Solids.sectorsup.c2y);
   try {
     solidCorner2Prism = new G4TriangularPrism("SectorSupport_Corner2_Prism",
                                               sectorSupportGeometry->Corner2LY,
@@ -589,7 +583,8 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  t1 = HepGeom::Translate3D(-m_Solids.sectorsup.c2x, -m_Solids.sectorsup.c2y, 0.);
+  t1 = HepGeom::Translate3D(-sectorSupportGeometry->Corner2Inner.x(),
+                            -sectorSupportGeometry->Corner2Inner.y(), 0);
   try {
     solidCorner2 = new G4SubtractionSolid("SectorSupport_Corner2",
                                           solidCorner2Prism->getSolid(),
@@ -610,21 +605,11 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner2LogicalVolume()
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
 {
-  double r;
-  double y;
   G4TriangularPrism* solidCorner3Prism = NULL;
   G4SubtractionSolid* solidCorner3 = NULL;
   HepGeom::Transform3D t1;
-  const struct ElementPosition* sectorSupportPos =
-    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  r = sectorSupportPos->InnerR + sectorSupportGeometry->Thickness;
-  y = sectorSupportPos->Y + sectorSupportGeometry->Thickness +
-      sectorSupportGeometry->Corner3LY;
-  m_Solids.sectorsup.c3x = sqrt(r * r - y * y);
-  m_Solids.sectorsup.c3y = sectorSupportPos->Y +
-                           sectorSupportGeometry->Thickness;
   try {
     solidCorner3Prism =
       new G4TriangularPrism("SectorSupport_Corner3_Prism",
@@ -635,7 +620,8 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  t1 = HepGeom::Translate3D(-m_Solids.sectorsup.c3x, -m_Solids.sectorsup.c3y, 0.);
+  t1 = HepGeom::Translate3D(-sectorSupportGeometry->Corner3Prism.x(),
+                            -sectorSupportGeometry->Corner3Prism.y(), 0.);
   try {
     solidCorner3 = new G4SubtractionSolid("SectorSupport_Corner3",
                                           solidCorner3Prism->getSolid(),
@@ -656,21 +642,11 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner3LogicalVolume()
 
 void EKLM::GeoEKLMCreator::createSectorSupportCorner4LogicalVolume()
 {
-  double r;
-  double x;
   G4TriangularPrism* solidCorner4Prism = NULL;
   G4SubtractionSolid* solidCorner4 = NULL;
   HepGeom::Transform3D t1;
-  const struct ElementPosition* sectorSupportPos =
-    m_GeoDat->getSectorSupportPosition();
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  r = sectorSupportPos->InnerR + sectorSupportGeometry->Thickness;
-  x = sectorSupportPos->X + sectorSupportGeometry->Thickness +
-      sectorSupportGeometry->Corner4LX;
-  m_Solids.sectorsup.c4y = sqrt(r * r - x * x);
-  m_Solids.sectorsup.c4x = sectorSupportPos->X +
-                           sectorSupportGeometry->Thickness;
   try {
     solidCorner4Prism =
       new G4TriangularPrism("SectorSupport_Corner4_Prism",
@@ -681,7 +657,8 @@ void EKLM::GeoEKLMCreator::createSectorSupportCorner4LogicalVolume()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  t1 = HepGeom::Translate3D(-m_Solids.sectorsup.c4x, -m_Solids.sectorsup.c4y, 0.);
+  t1 = HepGeom::Translate3D(-sectorSupportGeometry->Corner4Prism.x(),
+                            -sectorSupportGeometry->Corner4Prism.y(), 0.);
   try {
     solidCorner4 = new G4SubtractionSolid("SectorSupport_Corner4",
                                           solidCorner4Prism->getSolid(),
@@ -928,27 +905,36 @@ void EKLM::GeoEKLMCreator::createPlaneSolid(int n)
   }
   snprintf(name, 128, "Plane_%d_Subtraction_1", n + 1);
   ss1 = cutSolidCorner(name, is, m_Solids.subtractionBox, t, true,
-                       sectorSupportGeometry->Corner1AInner.X,
-                       sectorSupportGeometry->Corner1AInner.Y,
+                       sectorSupportGeometry->Corner1AInner.x(),
+                       sectorSupportGeometry->Corner1AInner.y(),
                        sectorSupportGeometry->CornerAngle);
   snprintf(name, 128, "Plane_%d_Subtraction_2", n + 1);
   ss2 = cutSolidCorner(
           name, ss1, m_Solids.subtractionBox, t, false,
-          m_Solids.sectorsup.c2x - sectorSupportGeometry->Corner2LX,
-          m_Solids.sectorsup.c2y, m_Solids.sectorsup.c2x,
-          m_Solids.sectorsup.c2y + sectorSupportGeometry->Corner2LY);
+          sectorSupportGeometry->Corner2Inner.x() -
+          sectorSupportGeometry->Corner2LX,
+          sectorSupportGeometry->Corner2Inner.y(),
+          sectorSupportGeometry->Corner2Inner.x(),
+          sectorSupportGeometry->Corner2Inner.y() +
+          sectorSupportGeometry->Corner2LY);
   snprintf(name, 128, "Plane_%d_Subtraction_3", n + 1);
   ss3 = cutSolidCorner(
-          name, ss2, m_Solids.subtractionBox, t, false, m_Solids.sectorsup.c3x,
-          m_Solids.sectorsup.c3y + sectorSupportGeometry->Corner3LY,
-          m_Solids.sectorsup.c3x + sectorSupportGeometry->Corner3LX,
-          m_Solids.sectorsup.c3y);
+          name, ss2, m_Solids.subtractionBox, t, false,
+          sectorSupportGeometry->Corner3Prism.x(),
+          sectorSupportGeometry->Corner3Prism.y() +
+          sectorSupportGeometry->Corner3LY,
+          sectorSupportGeometry->Corner3Prism.x() +
+          sectorSupportGeometry->Corner3LX,
+          sectorSupportGeometry->Corner3Prism.y());
   snprintf(name, 128, "Plane_%d_Subtraction_4", n + 1);
   ss4 = cutSolidCorner(
           name, ss3, m_Solids.subtractionBox, t, true,
-          m_Solids.sectorsup.c4x + sectorSupportGeometry->Corner4LX,
-          m_Solids.sectorsup.c4y, m_Solids.sectorsup.c4x,
-          m_Solids.sectorsup.c4y + sectorSupportGeometry->Corner4LY);
+          sectorSupportGeometry->Corner4Prism.x() +
+          sectorSupportGeometry->Corner4LX,
+          sectorSupportGeometry->Corner4Prism.y(),
+          sectorSupportGeometry->Corner4Prism.x(),
+          sectorSupportGeometry->Corner4Prism.y() +
+          sectorSupportGeometry->Corner4LY);
   snprintf(name, 128, "Plane_%d", n + 1);
   m_Solids.plane[n] = subtractBoardSolids(ss4, n);
 }
@@ -1278,28 +1264,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailA_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailA.Points[0].X - lx,
-                       shieldGeometry->DetailA.Points[0].Y - ly,
-                       shieldGeometry->DetailA.Points[1].X - lx,
-                       shieldGeometry->DetailA.Points[1].Y - ly);
+                       shieldGeometry->DetailA.Points[0].x() - lx,
+                       shieldGeometry->DetailA.Points[0].y() - ly,
+                       shieldGeometry->DetailA.Points[1].x() - lx,
+                       shieldGeometry->DetailA.Points[1].y() - ly);
   ss2 = cutSolidCorner("ShieldDetailA_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       shieldGeometry->DetailA.Points[3].X - lx,
-                       shieldGeometry->DetailA.Points[3].Y - ly,
-                       shieldGeometry->DetailA.Points[2].X - lx,
-                       shieldGeometry->DetailA.Points[2].Y - ly);
+                       shieldGeometry->DetailA.Points[3].x() - lx,
+                       shieldGeometry->DetailA.Points[3].y() - ly,
+                       shieldGeometry->DetailA.Points[2].x() - lx,
+                       shieldGeometry->DetailA.Points[2].y() - ly);
   ss3 = cutSolidCorner("ShieldDetailA_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailA.Points[3].X - lx,
-                       shieldGeometry->DetailA.Points[3].Y - ly,
-                       shieldGeometry->DetailA.Points[4].X - lx,
-                       shieldGeometry->DetailA.Points[4].Y - ly);
+                       shieldGeometry->DetailA.Points[3].x() - lx,
+                       shieldGeometry->DetailA.Points[3].y() - ly,
+                       shieldGeometry->DetailA.Points[4].x() - lx,
+                       shieldGeometry->DetailA.Points[4].y() - ly);
   solidDetailA = cutSolidCorner("ShieldDetailA", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailA.Points[5].X - lx,
-                                shieldGeometry->DetailA.Points[5].Y - ly,
-                                shieldGeometry->DetailA.Points[6].X - lx,
-                                shieldGeometry->DetailA.Points[6].Y - ly);
+                                shieldGeometry->DetailA.Points[5].x() - lx,
+                                shieldGeometry->DetailA.Points[5].y() - ly,
+                                shieldGeometry->DetailA.Points[6].x() - lx,
+                                shieldGeometry->DetailA.Points[6].y() - ly);
   try {
     m_LogVol.shield.detailA =
       new G4LogicalVolume(solidDetailA, m_Materials.polyethylene,
@@ -1327,16 +1313,16 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailB_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailB.Points[0].X - lx,
-                       shieldGeometry->DetailB.Points[0].Y - ly,
-                       shieldGeometry->DetailB.Points[1].X - lx,
-                       shieldGeometry->DetailB.Points[1].Y - ly);
+                       shieldGeometry->DetailB.Points[0].x() - lx,
+                       shieldGeometry->DetailB.Points[0].y() - ly,
+                       shieldGeometry->DetailB.Points[1].x() - lx,
+                       shieldGeometry->DetailB.Points[1].y() - ly);
   solidDetailB = cutSolidCorner("ShieldDetailB", ss1,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailB.Points[2].X - lx,
-                                shieldGeometry->DetailB.Points[2].Y - ly,
-                                shieldGeometry->DetailB.Points[3].X - lx,
-                                shieldGeometry->DetailB.Points[3].Y - ly);
+                                shieldGeometry->DetailB.Points[2].x() - lx,
+                                shieldGeometry->DetailB.Points[2].y() - ly,
+                                shieldGeometry->DetailB.Points[3].x() - lx,
+                                shieldGeometry->DetailB.Points[3].y() - ly);
   try {
     m_LogVol.shield.detailB =
       new G4LogicalVolume(solidDetailB, m_Materials.polyethylene,
@@ -1364,28 +1350,28 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   }
   ss1 = cutSolidCorner("ShieldDetailC_Subtraction_1", box,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailC.Points[0].X - lx,
-                       shieldGeometry->DetailC.Points[0].Y - ly,
-                       shieldGeometry->DetailC.Points[1].X - lx,
-                       shieldGeometry->DetailC.Points[1].Y - ly);
+                       shieldGeometry->DetailC.Points[0].x() - lx,
+                       shieldGeometry->DetailC.Points[0].y() - ly,
+                       shieldGeometry->DetailC.Points[1].x() - lx,
+                       shieldGeometry->DetailC.Points[1].y() - ly);
   ss2 = cutSolidCorner("ShieldDetailC_Subtraction_2", ss1,
                        m_Solids.subtractionBox, t, true,
-                       shieldGeometry->DetailC.Points[3].X - lx,
-                       shieldGeometry->DetailC.Points[3].Y - ly,
-                       shieldGeometry->DetailC.Points[2].X - lx,
-                       shieldGeometry->DetailC.Points[2].Y - ly);
+                       shieldGeometry->DetailC.Points[3].x() - lx,
+                       shieldGeometry->DetailC.Points[3].y() - ly,
+                       shieldGeometry->DetailC.Points[2].x() - lx,
+                       shieldGeometry->DetailC.Points[2].y() - ly);
   ss3 = cutSolidCorner("ShieldDetailC_Subtraction_3", ss2,
                        m_Solids.subtractionBox, t, false,
-                       shieldGeometry->DetailC.Points[3].X - lx,
-                       shieldGeometry->DetailC.Points[3].Y - ly,
-                       shieldGeometry->DetailC.Points[4].X - lx,
-                       shieldGeometry->DetailC.Points[4].Y - ly);
+                       shieldGeometry->DetailC.Points[3].x() - lx,
+                       shieldGeometry->DetailC.Points[3].y() - ly,
+                       shieldGeometry->DetailC.Points[4].x() - lx,
+                       shieldGeometry->DetailC.Points[4].y() - ly);
   solidDetailC = cutSolidCorner("ShieldDetailC", ss3,
                                 m_Solids.subtractionBox, t, false,
-                                shieldGeometry->DetailC.Points[5].X - lx,
-                                shieldGeometry->DetailC.Points[5].Y - ly,
-                                shieldGeometry->DetailC.Points[6].X - lx,
-                                shieldGeometry->DetailC.Points[6].Y - ly);
+                                shieldGeometry->DetailC.Points[5].x() - lx,
+                                shieldGeometry->DetailC.Points[5].y() - ly,
+                                shieldGeometry->DetailC.Points[6].x() - lx,
+                                shieldGeometry->DetailC.Points[6].y() - ly);
   try {
     m_LogVol.shield.detailC =
       new G4LogicalVolume(solidDetailC, m_Materials.polyethylene,
@@ -1640,7 +1626,8 @@ createSectorSupportCorner2(G4LogicalVolume* sector) const
   G4LogicalVolume* lv = m_LogVol.sectorsup.corn2;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  t = HepGeom::Translate3D(m_Solids.sectorsup.c2x, m_Solids.sectorsup.c2y,
+  t = HepGeom::Translate3D(sectorSupportGeometry->Corner2Inner.x(),
+                           sectorSupportGeometry->Corner2Inner.y(),
                            sectorSupportGeometry->Corner2Z);
   try {
     new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
@@ -1657,7 +1644,8 @@ createSectorSupportCorner3(G4LogicalVolume* sector) const
   G4LogicalVolume* lv = m_LogVol.sectorsup.corn3;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  t = HepGeom::Translate3D(m_Solids.sectorsup.c3x, m_Solids.sectorsup.c3y,
+  t = HepGeom::Translate3D(sectorSupportGeometry->Corner3Prism.x(),
+                           sectorSupportGeometry->Corner3Prism.y(),
                            sectorSupportGeometry->Corner3Z);
   try {
     new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
@@ -1674,7 +1662,8 @@ createSectorSupportCorner4(G4LogicalVolume* sector) const
   G4LogicalVolume* lv = m_LogVol.sectorsup.corn4;
   const struct SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
-  t = HepGeom::Translate3D(m_Solids.sectorsup.c4x, m_Solids.sectorsup.c4y,
+  t = HepGeom::Translate3D(sectorSupportGeometry->Corner4Prism.x(),
+                           sectorSupportGeometry->Corner4Prism.y(),
                            sectorSupportGeometry->Corner4Z);
   try {
     new G4PVPlacement(t, lv, lv->GetName() + "_" + sector->GetName(), sector,
@@ -1990,24 +1979,24 @@ void EKLM::GeoEKLMCreator::createShield(G4LogicalVolume* sector) const
   const struct ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
   lx = shieldGeometry->DetailB.LengthX / 2;
   ly = shieldGeometry->DetailB.LengthY / 2;
-  ta = HepGeom::Translate3D(shieldGeometry->DetailACenter.X,
-                            shieldGeometry->DetailACenter.Y, 0) *
+  ta = HepGeom::Translate3D(shieldGeometry->DetailACenter.x(),
+                            shieldGeometry->DetailACenter.y(), 0) *
        HepGeom::RotateZ3D(-45.0 * CLHEP::deg);
-  tb = HepGeom::Translate3D(shieldGeometry->DetailBCenter.X,
-                            shieldGeometry->DetailBCenter.Y, 0) *
+  tb = HepGeom::Translate3D(shieldGeometry->DetailBCenter.x(),
+                            shieldGeometry->DetailBCenter.y(), 0) *
        HepGeom::RotateZ3D(-45.0 * CLHEP::deg);
-  tc = HepGeom::Translate3D(shieldGeometry->DetailCCenter.X,
-                            shieldGeometry->DetailCCenter.Y, 0) *
+  tc = HepGeom::Translate3D(shieldGeometry->DetailCCenter.x(),
+                            shieldGeometry->DetailCCenter.y(), 0) *
        HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
        HepGeom::RotateY3D(180.0 * CLHEP::deg);
   td = HepGeom::Translate3D(
-         shieldGeometry->DetailBCenter.X + asqrt2 * (-lx - ly),
-         shieldGeometry->DetailBCenter.Y + asqrt2 * (lx - ly), 0) *
+         shieldGeometry->DetailBCenter.x() + asqrt2 * (-lx - ly),
+         shieldGeometry->DetailBCenter.y() + asqrt2 * (lx - ly), 0) *
        HepGeom::RotateZ3D(-45.0 * CLHEP::deg) *
        HepGeom::RotateX3D(180.0 * CLHEP::deg);
   te = HepGeom::Translate3D(
-         shieldGeometry->DetailBCenter.X + asqrt2 * (lx - ly),
-         shieldGeometry->DetailBCenter.Y + asqrt2 * (-lx - ly), 0) *
+         shieldGeometry->DetailBCenter.x() + asqrt2 * (lx - ly),
+         shieldGeometry->DetailBCenter.y() + asqrt2 * (-lx - ly), 0) *
        HepGeom::RotateZ3D(135.0 * CLHEP::deg);
   lv = m_LogVol.shield.detailA;
   try {

@@ -49,12 +49,6 @@ namespace Belle2 {
      * Sector support solids.
      */
     struct SectorSupportSolids {
-      double c2x;      /**< Corner 2 X. */
-      double c2y;      /**< Corner 2 Y. */
-      double c3x;      /**< Corner 3 X. */
-      double c3y;      /**< Corner 3 Y. */
-      double c4x;      /**< Corner 4 X. */
-      double c4y;      /**< Corner 4 Y. */
       G4VSolid* itube; /**< Inner tube. */
       G4VSolid* otube; /**< Outer tube. */
     };

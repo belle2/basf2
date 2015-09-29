@@ -27,21 +27,6 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * @struct Point2D
-     * 2D point.
-     *
-     * @var Point2D::X
-     * X coordinate.
-     *
-     * @var Point2D::Y
-     * Y coordinate.
-     */
-    struct Point2D {
-      double X;
-      double Y;
-    };
-
-    /**
      * @struct ElementPosition
      * Position information for the elements of detector.
      *
@@ -146,11 +131,26 @@ namespace Belle2 {
      * @var SectorSupportGeometry::Corner1B
      * Corner 1B coordinates.
      *
+     * @var SectorSupportGeometry::Corner2Inner
+     * Corner 2 coordinates (inner side) (corner of prism, too).
+     *
      * @var SectorSupportGeometry::Corner3
      * Corner 3 coordinates.
      *
+     * @var SectorSupportGeometry::Corner3Inner
+     * Corner 3 coordinates (inner side).
+     *
+     * @var SectorSupportGeometry::Corner3Prism
+     * Coordinates of the corner of corner 3 prism.
+     *
      * @var SectorSupportGeometry::Corner4
      * Corner 4 coordinates.
+     *
+     * @var SectorSupportGeometry::Corner4Inner
+     * Corner 4 coordinates (inner side).
+     *
+     * @var SectorSupportGeometry::Corner4Prism
+     * Coordinates of the corner of corner 4 prism.
      */
     struct SectorSupportGeometry {
       double Thickness;
@@ -173,11 +173,16 @@ namespace Belle2 {
       double Corner4Thickness;
       double Corner4Z;
       double CornerAngle;
-      Point2D Corner1A;
-      Point2D Corner1AInner;
-      Point2D Corner1B;
-      Point2D Corner3;
-      Point2D Corner4;
+      HepGeom::Point3D<double> Corner1A;
+      HepGeom::Point3D<double> Corner1AInner;
+      HepGeom::Point3D<double> Corner1B;
+      HepGeom::Point3D<double> Corner2Inner;
+      HepGeom::Point3D<double> Corner3;
+      HepGeom::Point3D<double> Corner3Inner;
+      HepGeom::Point3D<double> Corner3Prism;
+      HepGeom::Point3D<double> Corner4;
+      HepGeom::Point3D<double> Corner4Inner;
+      HepGeom::Point3D<double> Corner4Prism;
     };
 
     /**
@@ -275,23 +280,23 @@ namespace Belle2 {
      * Shield layer detail geometry data.
      */
     struct ShieldDetailGeometry {
-      double LengthX;         /**< X length. */
-      double LengthY;         /**< Y length. */
-      struct Point2D* Points; /**< Points. */
+      double LengthX;                   /**< X length. */
+      double LengthY;                   /**< Y length. */
+      HepGeom::Point3D<double>* Points; /**< Points. */
     };
 
     /**
      * Shield layer geometry data.
      */
     struct ShieldGeometry {
-      double Thickness;                    /**< Thickness. */
-      Point2D DetailACenter;               /**< Detail A center. */
-      Point2D DetailBCenter;               /**< Detail B center. */
-      Point2D DetailCCenter;               /**< Detail C center. */
-      struct ShieldDetailGeometry DetailA; /**< Detail A. */
-      struct ShieldDetailGeometry DetailB; /**< Detail B. */
-      struct ShieldDetailGeometry DetailC; /**< Detail C. */
-      struct ShieldDetailGeometry DetailD; /**< Detail D. */
+      double Thickness;                       /**< Thickness. */
+      HepGeom::Point3D<double> DetailACenter; /**< Detail A center. */
+      HepGeom::Point3D<double> DetailBCenter; /**< Detail B center. */
+      HepGeom::Point3D<double> DetailCCenter; /**< Detail C center. */
+      struct ShieldDetailGeometry DetailA;    /**< Detail A. */
+      struct ShieldDetailGeometry DetailB;    /**< Detail B. */
+      struct ShieldDetailGeometry DetailC;    /**< Detail C. */
+      struct ShieldDetailGeometry DetailD;    /**< Detail D. */
     };
 
     /**

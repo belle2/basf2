@@ -131,6 +131,9 @@ namespace Belle2 {
      * @var SectorSupportGeometry::Corner1B
      * Corner 1B coordinates.
      *
+     * @var SectorSupportGeometry::Corner1BInner
+     * Corner 1B coordinates (inner side).
+     *
      * @var SectorSupportGeometry::Corner2Inner
      * Corner 2 coordinates (inner side) (corner of prism, too).
      *
@@ -176,6 +179,7 @@ namespace Belle2 {
       HepGeom::Point3D<double> Corner1A;
       HepGeom::Point3D<double> Corner1AInner;
       HepGeom::Point3D<double> Corner1B;
+      HepGeom::Point3D<double> Corner1BInner;
       HepGeom::Point3D<double> Corner2Inner;
       HepGeom::Point3D<double> Corner3;
       HepGeom::Point3D<double> Corner3Inner;

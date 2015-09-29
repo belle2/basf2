@@ -134,22 +134,22 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
   Line2D line41Prism(m_SectorSupportPosition.X +
                      m_SectorSupportGeometry.Thickness +
                      m_SectorSupportGeometry.Corner4LX, 0, 0, 1);
+  Line2D line41Corner1B(m_SectorSupportPosition.X +
+                        m_SectorSupportGeometry.CornerX, 0, 0, 1);
   Circle2D circleInnerOuter(0, 0, m_SectorSupportPosition.InnerR);
   Circle2D circleInnerInner(0, 0, m_SectorSupportPosition.InnerR +
                             m_SectorSupportGeometry.Thickness);
   Circle2D circleOuterInner(0, 0, m_SectorSupportPosition.OuterR -
                             m_SectorSupportGeometry.Thickness);
+  Circle2D circleOuterOuter(0, 0, m_SectorSupportPosition.OuterR);
   HepGeom::Point3D<double> intersections[2];
   /* Corner 1. */
   m_SectorSupportGeometry.Corner1A.setX(m_SectorSupportPosition.X);
   m_SectorSupportGeometry.Corner1A.setY(m_SectorSupportPosition.OuterR -
                                         m_SectorSupportGeometry.DeltaLY);
-  m_SectorSupportGeometry.Corner1B.setX(m_SectorSupportPosition.X +
-                                        m_SectorSupportGeometry.CornerX);
-  m_SectorSupportGeometry.Corner1B.setY(
-    sqrt(m_SectorSupportPosition.OuterR * m_SectorSupportPosition.OuterR -
-         m_SectorSupportGeometry.Corner1B.x() *
-         m_SectorSupportGeometry.Corner1B.x()));
+  m_SectorSupportGeometry.Corner1A.setZ(0);
+  line41Corner1B.findIntersection(circleOuterOuter, intersections);
+  m_SectorSupportGeometry.Corner1B = intersections[1];
   m_SectorSupportGeometry.CornerAngle =
     atan2(m_SectorSupportGeometry.Corner1B.y() -
           m_SectorSupportGeometry.Corner1A.y(),
@@ -163,6 +163,15 @@ void EKLM::GeometryData::calculateSectorSupportGeometry()
     m_SectorSupportGeometry.Thickness *
     (1.0 / cos(m_SectorSupportGeometry.CornerAngle) -
      tan(m_SectorSupportGeometry.CornerAngle)));
+  m_SectorSupportGeometry.Corner1AInner.setZ(0);
+  Line2D lineCorner1(m_SectorSupportGeometry.Corner1AInner.x(),
+                     m_SectorSupportGeometry.Corner1AInner.y(),
+                     m_SectorSupportGeometry.Corner1B.x() -
+                     m_SectorSupportGeometry.Corner1A.x(),
+                     m_SectorSupportGeometry.Corner1B.y() -
+                     m_SectorSupportGeometry.Corner1A.y());
+  lineCorner1.findIntersection(circleOuterInner, intersections);
+  m_SectorSupportGeometry.Corner1BInner = intersections[1];
   /* Corner 2. */
   line23Inner.findIntersection(circleOuterInner, intersections);
   m_SectorSupportGeometry.Corner2Inner = intersections[1];

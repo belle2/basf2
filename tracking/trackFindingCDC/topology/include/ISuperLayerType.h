@@ -49,10 +49,8 @@ namespace Belle2 {
     template<class AHits>
     ISuperLayerType getISuperLayer(const AHits& hits)
     {
-      using std::begin;
-      using std::end;
-      auto itBegin = begin(hits);
-      auto itEnd = end(hits);
+      auto itBegin = std::begin(hits);
+      auto itEnd   = std::end(hits);
       if (itBegin == itEnd) return INVALID_ISUPERLAYER; // empty case
       const ISuperLayerType iSuperLayer = (*itBegin)->getISuperLayer();
       for (const auto& hit : hits) {

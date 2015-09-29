@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <limits>
@@ -17,27 +16,15 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
-
-
 bool TrackFindingCDC::isValidISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return 0 <= iSuperLayer and iSuperLayer < NSUPERLAYERS;
 }
 
-
-
-
-
 bool TrackFindingCDC::isLogicISuperLayer(const ISuperLayerType& iSuperLayer)
 {
   return INNER_ISUPERLAYER <= iSuperLayer and iSuperLayer <= OUTER_ISUPERLAYER;
 }
-
-
-
-
 
 ISuperLayerType TrackFindingCDC::getISuperLayerAtCylindricalR(const double cylindricalR)
 {
@@ -55,12 +42,7 @@ ISuperLayerType TrackFindingCDC::getISuperLayerAtCylindricalR(const double cylin
   }
 
   return OUTER_ISUPERLAYER;
-
 }
-
-
-
-
 
 ISuperLayerType TrackFindingCDC::isAxialISuperLayer(const ISuperLayerType& iSuperLayer)
 {

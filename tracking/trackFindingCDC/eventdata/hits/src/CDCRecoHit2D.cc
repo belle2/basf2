@@ -15,26 +15,16 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-CDCRecoHit2D::CDCRecoHit2D() :
-  m_rlWireHit(nullptr),
-  m_recoDisp2D(Vector2D::getLowest())
-{}
-
-
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(Vector2D::getLowest())
-{
-}
-
+{}
 
 CDCRecoHit2D::CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit,
                            const Vector2D& recoDisp2D) :
   m_rlWireHit(rlWireHit),
   m_recoDisp2D(recoDisp2D)
-{
-}
+{}
 
 CDCRecoHit2D CDCRecoHit2D::fromSimHit(const CDCWireHit* wireHit,
                                       const CDCSimHit& simHit)
@@ -52,11 +42,8 @@ CDCRecoHit2D
 CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                       const CDCRecoHit2D& recoHit2)
 {
-
-  if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit())) {
-    B2ERROR("Average of two CDCRecoHit2Ds with different oriented wire hits requested, returning first given RecoHit");
-    return recoHit1;
-  }
+  B2ASSERT("Average of two CDCRecoHit2Ds with different oriented wire hits requested",
+           recoHit1.getRLWireHit() == recoHit2.getRLWireHit());
 
   Vector2D displacement = Vector2D::average(recoHit1.getRecoDisp2D(), recoHit2.getRecoDisp2D());
 
@@ -66,17 +53,14 @@ CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
   return result;
 }
 
-
 CDCRecoHit2D
 CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
                       const CDCRecoHit2D& recoHit2,
                       const CDCRecoHit2D& recoHit3)
 {
-  if (not(recoHit1.getRLWireHit() == recoHit2.getRLWireHit() and
-          recoHit2.getRLWireHit() == recoHit3.getRLWireHit())) {
-    B2ERROR("Average of three CDCRecoHit2Ds with different wirehits requested, returning first given RecoHit");
-    return recoHit1;
-  }
+  B2ASSERT("Average of three CDCRecoHit2Ds with different wirehits requested.",
+           recoHit1.getRLWireHit() == recoHit2.getRLWireHit() and
+           recoHit2.getRLWireHit() == recoHit3.getRLWireHit())
 
   Vector2D displacement = Vector2D::average(recoHit1.getRecoDisp2D() ,
                                             recoHit2.getRecoDisp2D() ,
@@ -86,7 +70,6 @@ CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
   result.snapToDriftCircle();
 
   return result;
-
 }
 
 CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLTaggedWireHit& rlWireHit,
@@ -98,14 +81,10 @@ CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLTaggedWireHit& rlWireHit,
   return result;
 }
 
-
-
 void CDCRecoHit2D::reverse()
 {
   m_rlWireHit.reverse();
 }
-
-
 
 CDCRecoHit2D CDCRecoHit2D::reversed() const
 {

@@ -39,10 +39,8 @@ namespace Belle2 {
      *  ( perpS ) it took to get to hit. This variable can be calculated from the trajectory circle fitted in
      *  the two dimensional tracking as the arc length.
      */
-
     class CDCRecoHit3D  {
     public:
-
       /// Default constructor for ROOT compatibility.
       CDCRecoHit3D();
 
@@ -50,8 +48,6 @@ namespace Belle2 {
       CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
                    const Vector3D& position,
                    double perpS = 0);
-
-    public:
 
       /// Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
       /** This translates the sim hit to a reconstructed hit mainly to be able to compare the
@@ -117,7 +113,6 @@ namespace Belle2 {
       operator const Belle2::CDCHit* () const
       { return static_cast<const CDCHit*>(getRLWireHit()); }
 
-
       /// Equality comparision based on wire hit, right left passage information and reconstructed position.
       bool operator==(const CDCRecoHit3D& other) const
       {
@@ -125,8 +120,6 @@ namespace Belle2 {
                getRLInfo() == other.getRLInfo() and
                getRecoPos3D() == other.getRecoPos3D();
       }
-
-
 
       /// Total ordering relation based on wire hit, right left passage
       /// information and position information in this order of importance.
@@ -153,7 +146,6 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit3D& recoHit3D)
       { return wireHit < recoHit3D.getWireHit(); }
 
-
       /// Getter for the stereo type of the underlying wire.
       StereoType getStereoType() const
       { return getRLWireHit().getStereoType(); }
@@ -166,16 +158,12 @@ namespace Belle2 {
       ILayerType getISuperLayer() const
       { return getRLWireHit().getISuperLayer(); }
 
-
-
       /// Getter for the wire.
       const CDCWire& getWire() const { return getRLWireHit().getWire(); }
 
       /// Checks if the reconstructed hit is assoziated with the give wire.
       bool isOnWire(const CDCWire& wire) const
       { return getRLWireHit().isOnWire(wire); }
-
-
 
       /// Getter for the wire hit.
       const CDCWireHit& getWireHit() const { return getRLWireHit().getWireHit(); }
@@ -296,6 +284,5 @@ namespace Belle2 {
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D;
     }; //class
-
   } //end namespace TrackFindingCDC
 } // namespace Belle2

@@ -24,13 +24,12 @@ CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
   m_middleToEnd(),
   m_automatonCell()
 {
-  if (startRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as first oriented wire hit");
-  if (middleRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as second oriented wire hit");
-  if (endRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as third oriented wire hit");
+  B2ASSERT("CDCFacet initialized with nullptr as first oriented wire hit.", startRLWireHit);
+  B2ASSERT("CDCFacet initialized with nullptr as second oriented wire hit", middleRLWireHit);
+  B2ASSERT("CDCFacet initialized with nullptr as third oriented wire hit",  endRLWireHit);
+
   adjustLines();
 }
-
-
 
 CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
                    const CDCRLWireHit* middleRLWireHit,
@@ -44,12 +43,10 @@ CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
   m_middleToEnd(middleToEnd),
   m_automatonCell()
 {
-  if (startRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as first oriented wire hit");
-  if (middleRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as second oriented wire hit");
-  if (endRLWireHit == nullptr) B2ERROR("CDCFacet initialized with nullptr as third oriented wire hit");
+  B2ASSERT("CDCFacet initialized with nullptr as first oriented wire hit.", startRLWireHit);
+  B2ASSERT("CDCFacet initialized with nullptr as second oriented wire hit", middleRLWireHit);
+  B2ASSERT("CDCFacet initialized with nullptr as third oriented wire hit",  endRLWireHit);
 }
-
-
 
 CDCFacet CDCFacet::reversed() const
 {
@@ -58,7 +55,6 @@ CDCFacet CDCFacet::reversed() const
   return CDCFacet(wireHitTopology.getReverseOf(getEndRLWireHit()),
                   wireHitTopology.getReverseOf(getMiddleRLWireHit()),
                   wireHitTopology.getReverseOf(getStartRLWireHit()));
-
 }
 
 void CDCFacet::adjustLines() const

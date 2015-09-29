@@ -24,7 +24,6 @@ namespace Belle2 {
 
     /// Class representing a triple of neighboring wire hits.
     class CDCFacet : public CDCRLWireHitTriple {
-
     public:
       /// Constructor taking three oriented wire hits.
       CDCFacet(const CDCRLWireHit* startRLWireHit,
@@ -39,16 +38,13 @@ namespace Belle2 {
                const ParameterLine2D& startToEnd = ParameterLine2D(),
                const ParameterLine2D& middleToEnd = ParameterLine2D());
 
-    public:
       /// Constructs the reverse tiple from this one - this ignores the tangent lines.
       CDCFacet reversed() const;
 
-    public:
-
       /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
-       *  if one should use the dot '.' or operator '->' for method look up. \n
-       *  So this function defines the -> operator for the object. \n
+      /** In situations where the type is not known to be a pointer or a reference there is no way to tell
+       *  if one should use the dot '.' or operator '->' for method look up.
+       *  So this function defines the -> operator for the object.
        *  No matter you have a pointer or an object access is given with '->'.*/
       const CDCFacet* operator->() const
       { return this; }
@@ -56,7 +52,7 @@ namespace Belle2 {
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
        *  This method activally exposes this inheritance to be able to write algorithms
-       *  that work for objects and poiinters alike without code duplication.
+       *  that work for objects and pointers alike without code duplication.
        *  \note Once reference qualifiers become available use an & after the
        *  trailing const to constrain the cast to lvalues.*/
       operator const Belle2::TrackFindingCDC::CDCFacet* () const
@@ -74,12 +70,8 @@ namespace Belle2 {
       const ParameterLine2D& getMiddleToEndLine() const
       { return m_middleToEnd; }
 
-
-
       /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
       void adjustLines() const;
-
-
 
       /// Getter for the recostructed position at the first hit averaged
       /// from the two touching points of the tangential lines.
@@ -102,15 +94,14 @@ namespace Belle2 {
       { return CDCRecoHit2D::fromRecoPos2D(getStartRLWireHit(), getStartRecoPos2D()); }
 
       /// Getter for the recostructed position including the second hit averaged
-      ///from the two touching points of the tangential lines.
+      /// from the two touching points of the tangential lines.
       CDCRecoHit2D getMiddleRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getMiddleRLWireHit(), getMiddleRecoPos2D()); }
 
       /// Getter for the recostructed position including the third hit averaged
-      ///from the two touching points of the tangential lines.
+      /// from the two touching points of the tangential lines.
       CDCRecoHit2D getEndRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getEndRLWireHit(), getEndRecoPos2D()); }
-
 
       /// Getter for the tangential line including the hits from the first to the second hit.
       CDCTangent getStartToMiddle() const
@@ -123,7 +114,6 @@ namespace Belle2 {
       /// Getter for the tangential line including the hits from the second to the third hit.
       CDCTangent getMiddleToEnd() const
       { return CDCTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
-
 
       /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits.
       void unsetAndForwardMaskedFlag() const
@@ -174,7 +164,6 @@ namespace Belle2 {
 
       /// Memory for the cellular automaton cell assoziated with the facet.
       AutomatonCell m_automatonCell;
-
     }; //class
 
   } // namespace TrackFindingCDC

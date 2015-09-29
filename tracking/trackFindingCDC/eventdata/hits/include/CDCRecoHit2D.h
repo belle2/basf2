@@ -22,36 +22,32 @@ namespace Belle2 {
     /** A recohit represents a likely point where the particle went through. It is always assoziated with a
      *  wire hit it seeks to reconstruct. The reconstructed point is stored as a displacement from the
      *  wire reference position assoziated with the hit. The displacement generally is as long as the drift length
-     *  but must not. In addition the reconstructed hit takes a right left passage information which indicates if
+     *  but must not.\n
+     *  In addition the reconstructed hit takes a right left passage information which indicates if
      *  the hit wire lies to the right or to the left of the particle trajectory causing the hit. The later readily
-     *  indicates a flight direction from the reconstructed it, if a tangential approch of the trajectory to the
-     *  drift circle is assumed. */
+     *  indicates a flight direction from the reconstructed hit, if a tangential approach of the trajectory to the
+     *  drift circle is assumed.*/
     class CDCRecoHit2D  {
     public:
-
-      /// Default constructor for ROOT compatibility.
-      CDCRecoHit2D();
-
       /// Constructs a reconstructed hit based on the given oriented wire hit with the given
       /// displacement from the wire reference position.
       CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit,
                    const Vector2D& recoDisp2D);
 
-
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
       explicit CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit);
 
-      /// Constructs the average of two reconstructed hit positions and snaps it to the drift circle. \n
-      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the \n
-       *  displacement to snap onto the drift circle again. The function averages only reconstructed hits \n
-       *  assoziated with the same right left oriented wire hit.
+      /// Constructs the average of two reconstructed hit positions and snaps it to the drift circle.
+      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the
+       *  displacement to snap onto the drift circle again. The function averages only reconstructed hits
+       *  assoziated with the same right left oriented wire hit.\n
        *  If not all recostructed hits are on the same wire hit, the first hit is used.*/
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
                                   const CDCRecoHit2D& recoHit2);
 
-      /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle. \n
-      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the \n
-       *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits \n
+      /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle.
+      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the
+       *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits
        *  assoziated with the same wire hit.
        *  If not all recostructed hits are on the same wire, the first hit is used.*/
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
@@ -79,7 +75,7 @@ namespace Belle2 {
       /** This translates the sim hit to a reconstructed hit mainly to be able to compare the
        *  reconstructed values from the algorithm with the Monte Carlo information.
        *  It merely takes the displacement from the wire, projects it to the reference plane and
-       *  scales it onto the drift circle defined by the wire. */
+       *  scales it onto the drift circle defined by the wire.*/
       static CDCRecoHit2D fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit);
 
 
@@ -135,7 +131,6 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'.*/
       const CDCRecoHit2D* operator->() const
       { return this; }
-
 
       /// Return the skew line assoziated with the reconstructed  two dimensional hit.
       /** The two dimensional reconstructed hit stores only the displacement at the reference position.

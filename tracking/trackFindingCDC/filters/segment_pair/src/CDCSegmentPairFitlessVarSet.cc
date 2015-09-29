@@ -95,11 +95,11 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCRecoHit2D& stereoLastHit = stereoSegment.back();
 
   // Reconstructed position
-  const Vector2D startFristRecoPos2D = startFirstHit.getRecoPos2D();
+  // const Vector2D startFirstRecoPos2D = startFirstHit.getRecoPos2D();
   const Vector2D startLastRecoPos2D = startLastHit.getRecoPos2D();
 
   const Vector2D endFirstRecoPos2D = endFirstHit.getRecoPos2D();
-  const Vector2D endLastRecoPos2D = endLastHit.getRecoPos2D();
+  // const Vector2D endLastRecoPos2D = endLastHit.getRecoPos2D();
 
   // Wires
   // const CDCWire& startFirstWire = startFirstHit.getWire();

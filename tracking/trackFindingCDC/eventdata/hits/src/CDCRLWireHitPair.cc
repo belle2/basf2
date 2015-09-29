@@ -26,8 +26,8 @@ CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit,
   m_fromRLWireHit(fromRLWireHit),
   m_toRLWireHit(toRLWireHit)
 {
-  assert(fromRLWireHit);
-  assert(toRLWireHit);
+  B2ASSERT("fromRLWireHit is a nullptr", fromRLWireHit);
+  B2ASSERT("toRLWireHit is a nullptr",   toRLWireHit);
 }
 
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const

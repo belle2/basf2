@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle.
       /** Averages the hit positions first. But the result will not lie on the circle, so we scale the
        *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits
-       *  assoziated with the same wire hit.
+       *  assoziated with the same wire hit.\n
        *  If not all recostructed hits are on the same wire, the first hit is used.*/
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
                                   const CDCRecoHit2D& recoHit2 ,
@@ -65,7 +65,8 @@ namespace Belle2 {
                                         bool snap = true);
 
       /// Turns the orientation in place.
-      /** Changes the sign of the right left passage information, since the position remains the same by this reversion.*/
+      /** Changes the sign of the right left passage information,
+       *  since the position remains the same by this reversion.*/
       void reverse();
 
       /** Returns the recohit with the opposite right left information. */

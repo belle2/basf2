@@ -60,7 +60,7 @@ CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
 {
   B2ASSERT("Average of three CDCRecoHit2Ds with different wirehits requested.",
            recoHit1.getRLWireHit() == recoHit2.getRLWireHit() and
-           recoHit2.getRLWireHit() == recoHit3.getRLWireHit())
+           recoHit2.getRLWireHit() == recoHit3.getRLWireHit());
 
   Vector2D displacement = Vector2D::average(recoHit1.getRecoDisp2D() ,
                                             recoHit2.getRecoDisp2D() ,

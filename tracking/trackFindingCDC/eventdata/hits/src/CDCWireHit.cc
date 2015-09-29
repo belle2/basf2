@@ -27,9 +27,6 @@ TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
   return CDCWireHitTopology::getInstance().getTDCCountTranslator();
 }
 
-
-
-
 CDCWireHit::CDCWireHit() :
   m_automatonCell(1)
 {}
@@ -68,8 +65,6 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit, TDCCountTranslatorBase* ptrTr
                              getWireID(),
                              false, //bool leftRight ?
                              getWire().getRefZ());
-
-
 }
 
 CDCWireHit::CDCWireHit(const WireID& wireID,
@@ -81,7 +76,6 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
   m_wire(CDCWire::getInstance(wireID)),
   m_hit(nullptr)
 {}
-
 
 Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 {

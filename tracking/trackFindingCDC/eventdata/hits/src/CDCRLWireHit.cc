@@ -14,13 +14,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
                            ERightLeft rlInfo) :
   CDCRLTaggedWireHit(wireHit, rlInfo)
 {
 }
-
 
 const CDCRLWireHit* CDCRLWireHit::reversed() const
 {

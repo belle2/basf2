@@ -17,8 +17,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
 CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
                                        ERightLeft rlInfo) :
   m_wireHit(wireHit),
@@ -39,5 +37,4 @@ CDCRLTaggedWireHit CDCRLTaggedWireHit::fromSimHit(const CDCWireHit* wirehit,
   CDCRLTaggedWireHit rlWireHit(wirehit, rlInfo);
 
   return rlWireHit;
-
 }

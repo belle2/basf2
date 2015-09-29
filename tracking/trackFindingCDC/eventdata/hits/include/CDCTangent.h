@@ -26,7 +26,7 @@ namespace Belle2 {
      *  Generally maximal four tangents are possible. So to uniquely define a tangent we have
      *  to give additional information how it passes relativ to the drift circles. This right left
      *  passage inforamtion indicates if the related wire hit should lie to the right of to the left
-     *  of the tangent. The four possible combinations are then
+     *  of the tangent. The four possible combinations are then\n
      *  (ERightLeft::c_Right, ERightLeft::c_Right), (ERightLeft::c_Right, ERightLeft::c_Left),\n
      *  (ERightLeft::c_Left, ERightLeft::c_Right), (ERightLeft::c_Left,ERightLeft::c_Left).\n
      *  To represent the tangent this class uses a ParameterLine2D. The touch points to the two drift circles
@@ -35,7 +35,6 @@ namespace Belle2 {
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
     class CDCTangent : public CDCRLWireHitPair {
     public:
-
       /// Constructs a line touching two circles in one point each.
       /** @param[in] fromCenter first circle center
        *  @param[in] fromSignedRadius radius of the first circle multiplied with the right left passage information
@@ -48,7 +47,6 @@ namespace Belle2 {
                                                    const Vector2D& toCenter,
                                                    const double toSignedRadius);
 
-    public:
       /// Construct a tangent from a pair of oriented wire hits.
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
@@ -122,7 +120,6 @@ namespace Belle2 {
       CDCRecoHit2D getToRecoHit2D() const
       { return CDCRecoHit2D::fromRecoPos2D(getToRLWireHit(), getToRecoPos2D()); }
 
-    public:
       /// Adjusts the line to touch the drift circles with the correct right left passage information.
       void adjustLine();
 
@@ -138,7 +135,6 @@ namespace Belle2 {
       /// Same as reverse but returns a copy.
       CDCTangent reversed() const;
 
-    public:
       /** Getter for the line representation of the line.
        *  The line stretchs between the two the touch point.
        *  The first touch point is at(0) the second at(1).

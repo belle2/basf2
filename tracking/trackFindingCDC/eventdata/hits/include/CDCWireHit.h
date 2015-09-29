@@ -37,7 +37,6 @@ namespace Belle2 {
      *  the CDCHit from the StoreArray of the event.
      */
     class CDCWireHit {
-
     public:
       /// Return an instance of the used TDC count translator.
       static CDC::TDCCountTranslatorBase& getTDCCountTranslator();

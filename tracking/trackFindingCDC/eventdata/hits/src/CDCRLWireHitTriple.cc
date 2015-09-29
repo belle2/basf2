@@ -25,9 +25,9 @@ CDCRLWireHitTriple::CDCRLWireHitTriple(
   m_startRLWireHit(startRLWireHit),
   m_rearRLWireHitPair(middleRLWireHit, endRLWireHit)
 {
-  assert(startRLWireHit);
-  assert(middleRLWireHit);
-  assert(endRLWireHit);
+  B2ASSERT("startRLWireHit is a nullptr",  startRLWireHit);
+  B2ASSERT("middleRLWireHit is a nullptr", middleRLWireHit);
+  B2ASSERT("endRLWireHit is a nullptr",    endRLWireHit);
 }
 
 CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
@@ -60,21 +60,15 @@ void CDCRLWireHitTriple::setStartRLInfo(const ERightLeft startRLInfo)
   }
 }
 
-
-
 void CDCRLWireHitTriple::setMiddleRLInfo(const ERightLeft middleRLInfo)
 {
   getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
 }
 
-
-
 void CDCRLWireHitTriple::setEndRLInfo(const ERightLeft endRLInfo)
 {
   getRearRLWireHitPair().setToRLInfo(endRLInfo);
 }
-
-
 
 CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {

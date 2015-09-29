@@ -36,8 +36,6 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
   m_line(line)
 {}
 
-
-
 CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
                        const CDCRLWireHit* toRLWireHit,
                        const ParameterLine2D& line):
@@ -51,7 +49,6 @@ void CDCTangent::adjustLine()
                                   getFromRLInfo() * getFromWireHit().getRefDriftLength() ,
                                   getToWireHit().getRefPos2D(),
                                   getToRLInfo() * getToWireHit().getRefDriftLength());
-
 }
 
 void CDCTangent::adjustRLInfo()

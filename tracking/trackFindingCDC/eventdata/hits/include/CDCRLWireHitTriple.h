@@ -20,7 +20,6 @@ namespace Belle2 {
      *  In this way we can save some object creations during lookups of a triple following this one,
      *  since the projection to the last pair can be done by reference.*/
     class CDCRLWireHitTriple {
-
     public:
       /** Type for the different shapes of three neighboring hits
        *  (up to mirror and rotational symmetries).
@@ -45,13 +44,10 @@ namespace Belle2 {
       /// Constant for ortho arrangement with counterclockwise twist
       static const Shape ORTHO_CCW = 4;
 
-    public:
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLWireHit* startRLWireHit,
                          const CDCRLWireHit* middleRLWireHit,
                          const CDCRLWireHit* endRLWireHit);
-
-    public:
 
       /// Constructs the reverse tiple from this one.
       CDCRLWireHitTriple reversed() const;
@@ -59,21 +55,21 @@ namespace Belle2 {
       /// Reverses the triple inplace.
       void reverse();
 
-
-    public:
-
       /// Equality comparision considering all three oriented wire hits.
       bool operator==(const CDCRLWireHitTriple& other) const
-      { return getStartRLWireHit() == other.getStartRLWireHit() and getRearRLWireHitPair() == other.getRearRLWireHitPair(); }
+      {
+        return getStartRLWireHit() == other.getStartRLWireHit() and
+               getRearRLWireHitPair() == other.getRearRLWireHitPair();
+      }
 
 
       /// Establish a total ordering  based on the three oriented wire hits.
       bool operator< (const CDCRLWireHitTriple& other) const
       {
         return getStartRLWireHit() <  other.getStartRLWireHit() or
-               (getStartRLWireHit() == other.getStartRLWireHit() and getRearRLWireHitPair() < other.getRearRLWireHitPair());
+               (getStartRLWireHit() == other.getStartRLWireHit() and
+                getRearRLWireHitPair() < other.getRearRLWireHitPair());
       }
-
 
       /// Define oriented wire hit pairs to be coaligned with oriented wire hit
       /// triples on the first two oriented wire hits.
@@ -95,7 +91,6 @@ namespace Belle2 {
                 rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit());
       }
 
-
       /// Standard output operator for debugging purposes.
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple)
       {
@@ -115,7 +110,6 @@ namespace Belle2 {
        *  No matter you have a pointer or an object access is given with '->'.*/
       const CDCRLWireHitTriple* operator->() const
       { return this; }
-
 
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
       Shape getShape() const;
@@ -151,8 +145,6 @@ namespace Belle2 {
       bool hasWire(const CDCWire& wire) const
       { return getStartRLWireHit()->isOnWire(wire) or getRearRLWireHitPair()->hasWire(wire); }
 
-
-
       /// Getter for the right left passage information of the first oriented wire hit.
       ERightLeft getStartRLInfo() const
       { return getStartRLWireHit().getRLInfo(); }
@@ -164,8 +156,6 @@ namespace Belle2 {
       /// Getter for the right left passage information of the third oriented wire hit.
       ERightLeft getEndRLInfo() const
       { return getEndRLWireHit().getRLInfo(); }
-
-
 
       /// Getter for the hit wire of the first oriented wire hit.
       const CDCWireHit& getStartWireHit() const
@@ -182,8 +172,6 @@ namespace Belle2 {
       /// Indicator if any of the three oriented wire hits is based on the given wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
       { return getStartWireHit() == wirehit or getRearRLWireHitPair()->hasWireHit(wirehit); }
-
-
 
       /// Getter for the first oriented wire hit.
       const CDCRLWireHit& getStartRLWireHit() const
@@ -205,8 +193,6 @@ namespace Belle2 {
       CDCRLWireHitPair& getRearRLWireHitPair()
       { return m_rearRLWireHitPair; }
 
-
-
       /// Setter for the first oriented wire hit.
       void setStartRLWireHit(const CDCRLWireHit* startRLWireHit)
       { m_startRLWireHit = startRLWireHit; }
@@ -219,9 +205,6 @@ namespace Belle2 {
       void setEndRLWireHit(const CDCRLWireHit* endRLWireHit)
       { m_rearRLWireHitPair.setToRLWireHit(endRLWireHit); }
 
-
-
-    public:
       /// Setter for the right left passage information of the first oriented wire hit.
       void setStartRLInfo(const ERightLeft startRLInfo);
 
@@ -231,15 +214,12 @@ namespace Belle2 {
       /// Setter for the right left passage information of the third oriented wire hit.
       void setEndRLInfo(const ERightLeft endRLInfo);
 
-
-
     protected:
       /// Memory for the reference to the start oriented wire hit.
       const CDCRLWireHit* m_startRLWireHit;
 
       /// Memory for the reference to the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;
-
     }; //end class CDCRLWireHitTriple
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

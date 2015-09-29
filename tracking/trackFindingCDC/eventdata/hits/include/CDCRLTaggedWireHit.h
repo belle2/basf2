@@ -26,7 +26,6 @@ namespace Belle2 {
      *  For more information see @sa CDCWireHit.
      */
     class CDCRLTaggedWireHit {
-
     public:
       /** Constructs an oriented wire hit.
        *  @param wireHit the wire hit the oriented hit is associated with.
@@ -48,7 +47,6 @@ namespace Belle2 {
       void reverse()
       { m_rlInfo = NRightLeft::reversed(m_rlInfo); }
 
-    public:
       /// Equality comparison based on wire hit, left right passage information.
       bool operator==(const CDCRLTaggedWireHit& rhs) const
       { return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo(); }
@@ -103,8 +101,6 @@ namespace Belle2 {
       const CDCHit* getHit() const
       { return getWireHit().getHit(); }
 
-
-
       /// Getter for the wire the oriented hit associated to.
       const CDCWire& getWire() const
       { return getWireHit().getWire(); }
@@ -136,8 +132,6 @@ namespace Belle2 {
       /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const
       { return getWire().getRefCylindricalR(); }
-
-
 
       /// Getter for the wire hit associated with the oriented hit.
       const CDCWireHit& getWireHit() const

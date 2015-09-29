@@ -74,8 +74,6 @@ namespace Belle2 {
       static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
-
-
       /// Reconstructs the three dimensional hit from the two dimensional,
       /// the two dimensional trajectory and sz trajectory.
       /** For two dimensional reconstructed hits on axial wires this reconstructs

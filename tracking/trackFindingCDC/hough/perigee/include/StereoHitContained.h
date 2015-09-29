@@ -75,7 +75,7 @@ namespace Belle2 {
         const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
         bool isIn = contains(*houghBox, wire, signedDriftLength);
         ERightLeft rlInfo = recoHit2D->getRLInfo();
-        return isIn ? 1.0 + isValidInfo(rlInfo) * m_rlWeightGain : NAN;
+        return isIn ? 1.0 + isValid(rlInfo) * m_rlWeightGain : NAN;
       }
 
       /** Checks if the track hit is contained in a phi0 curv hough space.
@@ -112,7 +112,7 @@ namespace Belle2 {
           containRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedTrackHit.setRLInfo(newRLInfo);
-        return isValidInfo(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
+        return isValid(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
       }
 
 
@@ -128,7 +128,7 @@ namespace Belle2 {
         const double driftLength = wireHit->getRefDriftLength();
 
         ERightLeft rlInfo = containsRightOrLeft(*houghBox, wire, driftLength);
-        return isValidInfo(rlInfo) ? 1.0 + std::abs(rlInfo) * m_rlWeightGain : NAN;
+        return isValid(rlInfo) ? 1.0 + std::abs(rlInfo) * m_rlWeightGain : NAN;
       }
 
       /** Checks if the wire hit is contained in a phi0 curv hough space.
@@ -153,7 +153,7 @@ namespace Belle2 {
           containsRightOrLeft(*houghBox, wire, driftLength, rlInfo);
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
-        return isValidInfo(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
+        return isValid(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
       }
 
 

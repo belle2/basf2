@@ -85,11 +85,11 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("previous_superlayer_id_difference")>() = endFit.getPreviousISuperLayer() - startFitISuperLayer;
 
   // Hits
-  const CDCRecoHit2D& startFirstHit = startSegment.front();
+  //const CDCRecoHit2D& startFirstHit = startSegment.front();
   const CDCRecoHit2D& startLastHit = startSegment.back();
 
   const CDCRecoHit2D& endFirstHit = endSegment.front();
-  const CDCRecoHit2D& endLastHit = endSegment.back();
+  //const CDCRecoHit2D& endLastHit = endSegment.back();
 
   const CDCRecoHit2D& stereoFirstHit = stereoSegment.front();
   const CDCRecoHit2D& stereoLastHit = stereoSegment.back();

@@ -23,7 +23,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <iterator>
 
 namespace Belle2 {
@@ -155,7 +154,7 @@ namespace Belle2 {
                     const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
-        const double driftLength = isValidInfo(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
+        const double driftLength = isValid(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
         const double driftLengthVariance = (abs(rlInfo) == 1 ?
                                             wireHit.getRefDriftLengthVariance() :
                                             getPseudoDriftLengthVariance(wireHit));

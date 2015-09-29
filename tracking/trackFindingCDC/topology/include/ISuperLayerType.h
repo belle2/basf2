@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <iterator>
 
 namespace Belle2 {

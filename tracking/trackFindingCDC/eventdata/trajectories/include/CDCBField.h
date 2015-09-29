@@ -9,13 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <cmath>
 
 namespace Belle2 {
 

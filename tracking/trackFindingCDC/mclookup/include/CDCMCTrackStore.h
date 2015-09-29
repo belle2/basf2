@@ -9,10 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/mclookup/ITrackType.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <map>
@@ -27,13 +26,6 @@ namespace Belle2 {
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
       typedef std::vector<const CDCHit*> CDCHitVector;
-
-    public:
-      /// Default constructor
-      CDCMCTrackStore();
-
-
-      ~CDCMCTrackStore();
 
     public:
       /// Getter for the singletone instance
@@ -108,13 +100,13 @@ namespace Belle2 {
       std::map<ITrackType, std::vector<CDCHitVector>> m_mcSegmentsByMCParticleIdx;
 
       /// Look up table for index of the hit within its track
-      std::map<const CDCHit*, Index> m_inTrackIds;
+      std::map<const CDCHit*, int> m_inTrackIds;
 
       /// Look up table for index of the segment of the hits within their respective tracks
-      std::map<const CDCHit*, Index> m_inTrackSegmentIds;
+      std::map<const CDCHit*, int> m_inTrackSegmentIds;
 
       /// Look up table for the number of super layers the particle traversed before making the individual hit
-      std::map<const CDCHit*, Index> m_nPassedSuperLayers;
+      std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
     }; //class CDCMCTrackStore
   } // end namespace TrackFindingCDC

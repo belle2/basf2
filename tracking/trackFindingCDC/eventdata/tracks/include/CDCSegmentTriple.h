@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

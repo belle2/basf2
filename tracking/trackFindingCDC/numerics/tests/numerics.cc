@@ -59,8 +59,8 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_isIncreasing)
 
 TEST(TrackFindingCDCTest, numerics_SinEqLine_getIPeriodFromIHalfPeriod)
 {
-  Index iHalfPeriod = -1;
-  Index iPeriod = SinEqLine::getIPeriodFromIHalfPeriod(iHalfPeriod);
+  int iHalfPeriod = -1;
+  int iPeriod = SinEqLine::getIPeriodFromIHalfPeriod(iHalfPeriod);
   EXPECT_EQ(-1, iPeriod);
 }
 

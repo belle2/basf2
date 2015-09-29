@@ -27,10 +27,10 @@ NeighborWeight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromS
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(&fromSegment);
-    if (fromNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     Index toNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(&toSegment);
-    if (toNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (toNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     if (fromNPassedSuperLayers == toNPassedSuperLayers) return NOT_A_CELL;
 

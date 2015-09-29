@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/Relation.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 

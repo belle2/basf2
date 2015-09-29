@@ -11,11 +11,12 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

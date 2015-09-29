@@ -13,7 +13,6 @@
 #include <cmath>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 

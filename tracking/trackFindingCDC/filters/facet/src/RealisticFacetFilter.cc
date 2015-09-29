@@ -13,7 +13,6 @@
 #include <cmath>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 using namespace std;
 using namespace Belle2;

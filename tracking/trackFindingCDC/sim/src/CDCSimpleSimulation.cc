@@ -23,6 +23,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TRandom.h>

@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 
 
-double SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) const
+double SinEqLine::computeSmallestPositiveRoot(const int& maxIHalfPeriod) const
 {
   /// Smallest positive root might before the first positive extermum
   double root = computeRootLargerThanExtemumInHalfPeriod(-1);
@@ -28,7 +28,7 @@ double SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) const
   root = computeRootLargerThanExtemumInHalfPeriod(0);
   if (root > 0) return root;
 
-  for (Index iHalfPeriod = 1; iHalfPeriod <= maxIHalfPeriod; ++iHalfPeriod) {
+  for (int iHalfPeriod = 1; iHalfPeriod <= maxIHalfPeriod; ++iHalfPeriod) {
     root = computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod);
 
     /// Check if the solution returned is positiv, that implies that it is not NAN.
@@ -43,7 +43,7 @@ double SinEqLine::computeSmallestPositiveRoot(const Index& maxIHalfPeriod) const
 
 
 
-double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const
+double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const int& iHalfPeriod) const
 {
   if (hasLargeSlope()) {
     return computeRootForLargeSlope();
@@ -225,13 +225,13 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
 
 
 
-double SinEqLine::computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const
+double SinEqLine::computeExtremumXInHalfPeriod(const int& iHalfPeriod) const
 {
   const double slope = getSlope();
   double extremumInFirstHalfPeriod = acos(slope);
 
   double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * PI - extremumInFirstHalfPeriod;
 
-  Index iPeriod = getIPeriodFromIHalfPeriod(iHalfPeriod);
+  int iPeriod = getIPeriodFromIHalfPeriod(iHalfPeriod);
   return extremumInFirstPeriod + 2 * PI * iPeriod;
 }

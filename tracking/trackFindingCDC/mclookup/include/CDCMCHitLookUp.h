@@ -9,12 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+#include <tracking/trackFindingCDC/mclookup/ITrackType.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

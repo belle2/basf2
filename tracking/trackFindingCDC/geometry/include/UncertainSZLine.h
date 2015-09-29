@@ -11,7 +11,6 @@
 
 #include <cmath>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>

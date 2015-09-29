@@ -9,32 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <cstddef> //for size_t
-#include <cstdlib> //for abs
-#include <math.h>
+#include <climits>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /** @name Basic integer types*/
-    /**@{*/
-
+    /// A positive index which may indicate an invalid by returning a negative number
     typedef int Index;
-    const Index INVALID_INDEX = -999;
 
-    /// Track id type
-    typedef int ITrackType;
+    /// An invalid index that can be return if no proper solution exists.
+    static const Index c_InvalidIndex = INT_MIN;
 
-    /// Constant to mark an invalid track id
-    const ITrackType INVALID_ITRACK = -998;
-    /**@}*/
-
-    /** @name Basic floatig point types*/
-    /**@{*/
-    /// The float type used by the algorithm. Just as necessary for speed.
-    typedef double FloatType __attribute__((deprecated));
-    /**@}*/
+    /// Check if an index is valid, hence whether it is bigger than zero.
+    inline bool isValidIndex(Index index)
+    { return index >= 0; }
 
   } // namespace TrackFindingCDC
 

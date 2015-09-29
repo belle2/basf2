@@ -28,10 +28,10 @@ NeighborWeight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the track
     Index fromNPassedSuperLayers = mcTrackLookUp.getLastNPassedSuperLayers(&fromTrack);
-    if (fromNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     Index toNPassedSuperLayers = mcTrackLookUp.getFirstNPassedSuperLayers(&toTrack);
-    if (toNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (toNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     if (fromNPassedSuperLayers == toNPassedSuperLayers) return NOT_A_CELL;
 

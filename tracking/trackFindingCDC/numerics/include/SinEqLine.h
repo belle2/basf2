@@ -14,9 +14,8 @@
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/EIncDec.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <framework/logging/Logger.h>
 
@@ -68,17 +67,17 @@ namespace Belle2 {
       { return cos(x) - getSlope(); }
 
       /// Returns the half period index in which the x position is located.
-      Index getIHalfPeriod(const double x) const
+      int getIHalfPeriod(const double x) const
       { return floor(x / PI); }
 
       /* Computes the positive solution that has the smallest value of x.
       The additional parameter serves as a criterion to abbort the search if the solutions is further away than the specified half period.
       */
-      double computeSmallestPositiveRoot(const Index& maxIHalfPeriod = 5) const;
+      double computeSmallestPositiveRoot(const int& maxIHalfPeriod = 5) const;
 
 
       /// Computes the solution that is addressed by the given half period index.
-      double computeRootLargerThanExtemumInHalfPeriod(const Index& iHalfPeriod) const;
+      double computeRootLargerThanExtemumInHalfPeriod(const int& iHalfPeriod) const;
 
       /// Compute single solution in the case that fabs(slope) >= 1.
       double computeRootForLargeSlope() const;
@@ -140,10 +139,10 @@ namespace Belle2 {
 
     public:
       /// Get the local extermum that is located in the half period indicated by the given index.
-      double computeExtremumXInHalfPeriod(const Index& iHalfPeriod) const;
+      double computeExtremumXInHalfPeriod(const int& iHalfPeriod) const;
 
       /// Helper function to translate the index of the half period to index of the containing period.
-      static Index getIPeriodFromIHalfPeriod(const Index& iHalfPeriod)
+      static int getIPeriodFromIHalfPeriod(const int& iHalfPeriod)
       { return isEven(iHalfPeriod) ? iHalfPeriod / 2 : (iHalfPeriod - 1) / 2; }
 
     public:

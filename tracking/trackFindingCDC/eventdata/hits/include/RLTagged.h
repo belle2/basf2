@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/Ptr.h>
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

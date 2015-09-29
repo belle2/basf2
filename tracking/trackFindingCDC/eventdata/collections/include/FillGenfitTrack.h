@@ -54,7 +54,7 @@ namespace Belle2 {
 
         // Check if reversion is requested
         if (reverseRLInfo) {
-          rlInfo = reversedInfo(rlInfo);
+          rlInfo = reversed(rlInfo);
         }
 
         // Note:  rlInfo < 0 means ERightLeft::c_Left,   rlInfo > 0 means ERightLeft::c_Right,  which is the same as in Genfit

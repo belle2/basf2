@@ -104,7 +104,7 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const ER
 
   if (stereoType == StereoType::c_StereoV or stereoType == StereoType::c_StereoU) {
     const WireLine& wireLine = getWire().getSkewLine();
-    const double signedDriftLength = isValidInfo(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
+    const double signedDriftLength = isValid(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength);
 
   } else if (stereoType == StereoType::c_Axial) {

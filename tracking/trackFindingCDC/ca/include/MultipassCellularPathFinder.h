@@ -16,7 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <vector>
 
 namespace Belle2 {

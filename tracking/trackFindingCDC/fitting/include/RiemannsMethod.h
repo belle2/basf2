@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 namespace Belle2 {

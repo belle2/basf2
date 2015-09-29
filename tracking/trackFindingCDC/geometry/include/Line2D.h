@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 

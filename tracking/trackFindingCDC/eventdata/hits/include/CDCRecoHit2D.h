@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -42,21 +41,19 @@ namespace Belle2 {
       /// Constructs a reconstructed hit based on the oriented wire hit with no displacement.
       explicit CDCRecoHit2D(const CDCRLTaggedWireHit& rlWireHit);
 
-
-      /// Constructs the average of two reconstructed hit positions and snaps it to the drift circle.
-      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the
-       *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits
-       *  assoziated with the same wire hit. If not all recostructed hits are on the same wire hit, the first hit
-       *  is returned unchanged. Also averages the right left passage information with averageInfo(). */
+      /// Constructs the average of two reconstructed hit positions and snaps it to the drift circle. \n
+      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the \n
+       *  displacement to snap onto the drift circle again. The function averages only reconstructed hits \n
+       *  assoziated with the same right left oriented wire hit.
+       *  If not all recostructed hits are on the same wire hit, the first hit is used.*/
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
                                   const CDCRecoHit2D& recoHit2);
 
-
-      /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle.
-      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the
-       *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits
-       *  assoziated with the same wire hit. If not all recostructed hits are on the same wire, the first hit
-       *  is returned unchanged. Also averages the right left passage information with averageInfo(). */
+      /// Constructs the average of three reconstructed hit positions and snaps it to the drift circle. \n
+      /** Averages the hit positions first. But the result will not lie on the circle, so we scale the \n
+       *  the displacement to snap onto the drift circle again. The function averages only reconstructed hits \n
+       *  assoziated with the same wire hit.
+       *  If not all recostructed hits are on the same wire, the first hit is used.*/
       static CDCRecoHit2D average(const CDCRecoHit2D& recoHit1,
                                   const CDCRecoHit2D& recoHit2 ,
                                   const CDCRecoHit2D& recoHit3);

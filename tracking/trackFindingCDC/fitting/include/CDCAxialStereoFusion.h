@@ -17,7 +17,6 @@
 #include <TMatrixD.h>
 #include <TVectorD.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

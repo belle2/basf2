@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCStereoRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

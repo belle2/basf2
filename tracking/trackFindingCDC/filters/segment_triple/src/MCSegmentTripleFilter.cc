@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <framework/logging/Logger.h>
 

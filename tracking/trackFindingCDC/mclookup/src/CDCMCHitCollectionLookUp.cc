@@ -9,8 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <TDatabasePDG.h>
 #include <boost/range/adaptor/reversed.hpp>
@@ -21,9 +21,7 @@ using namespace TrackFindingCDC;
 
 
 template<class ACDCHitCollection>
-void
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::clear()
+void CDCMCHitCollectionLookUp<ACDCHitCollection>::clear()
 {
   B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
   m_mcTrackIds.clear();
@@ -132,7 +130,7 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
 {
   Index firstInTrackId = getFirstInTrackId(ptrHits);
   Index lastInTrackId = getLastInTrackId(ptrHits);
-  if (firstInTrackId == INVALID_INDEX or lastInTrackId == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  if (firstInTrackId == c_InvalidIndex or lastInTrackId == c_InvalidIndex) return EForwardBackward::c_Invalid;
   else if (firstInTrackId < lastInTrackId) return EForwardBackward::c_Forward;
   else if (firstInTrackId > lastInTrackId) return EForwardBackward::c_Backward;
   else if (firstInTrackId == lastInTrackId) return EForwardBackward::c_Unknown;
@@ -173,10 +171,10 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
   // Examine if they are in the same super layer
 
   Index lastNPassedSuperLayersOfStartSegment = getLastNPassedSuperLayers(ptrStartSegment2D);
-  if (lastNPassedSuperLayersOfStartSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  if (lastNPassedSuperLayersOfStartSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
   Index firstNPassedSuperLayersOfEndSegment = getFirstNPassedSuperLayers(ptrEndSegment2D);
-  if (firstNPassedSuperLayersOfEndSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  if (firstNPassedSuperLayersOfEndSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
   if (lastNPassedSuperLayersOfStartSegment < firstNPassedSuperLayersOfEndSegment) {
     if (startFBInfo == EForwardBackward::c_Forward and  endFBInfo == EForwardBackward::c_Forward) return EForwardBackward::c_Forward;
@@ -188,10 +186,10 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
 
   // Now we are in the same passed super layer with both segments
   Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
-  if (lastInTrackIdOfStartSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  if (lastInTrackIdOfStartSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
   Index firstInTrackIdOfEndSegment = getFirstInTrackId(ptrEndSegment2D);
-  if (firstInTrackIdOfEndSegment == INVALID_INDEX) return EForwardBackward::c_Invalid;
+  if (firstInTrackIdOfEndSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
   if (startFBInfo == EForwardBackward::c_Forward and endFBInfo == EForwardBackward::c_Forward) {
     if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return EForwardBackward::c_Forward;

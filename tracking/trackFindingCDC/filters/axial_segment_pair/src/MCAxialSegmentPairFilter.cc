@@ -47,10 +47,10 @@ CellWeight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
-    if (startNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (startNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     Index endNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrEndSegment);
-    if (endNPassedSuperLayers == INVALID_INDEX) return NOT_A_CELL;
+    if (endNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
 
     if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 2) return NOT_A_CELL;
 

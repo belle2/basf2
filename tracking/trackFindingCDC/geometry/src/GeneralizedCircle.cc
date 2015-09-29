@@ -300,7 +300,7 @@ double GeneralizedCircle::arcLengthBetween(const Vector2D& from,
                                            const Vector2D& to) const
 {
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
-  if (not isValidInfo(lengthSign)) return NAN;
+  if (not NForwardBackward::isValid(lengthSign)) return NAN;
 
   // Handling the rare case that from and to correspond to opposing points on the circle
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
@@ -319,7 +319,7 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
   const Vector2D from = perigee();
 
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
-  if (not isValidInfo(lengthSign)) return NAN;
+  if (not NForwardBackward::isValid(lengthSign)) return NAN;
 
   // Handling the rare case that from and to correspond to opposing points on the circle
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;

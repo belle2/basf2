@@ -14,7 +14,6 @@
 
 #include <TVector3.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>

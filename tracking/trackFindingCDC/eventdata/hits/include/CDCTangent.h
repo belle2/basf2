@@ -14,7 +14,6 @@
 
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <vector>
 
 namespace Belle2 {

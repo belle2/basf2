@@ -135,7 +135,7 @@ namespace Belle2 {
 
       /// Getter for the index of the hit in the StoreArray holding this hit.
       Index getStoreIHit() const
-      { return getHit() ? getHit()->getArrayIndex() : INVALID_INDEX; }
+      { return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex; }
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const

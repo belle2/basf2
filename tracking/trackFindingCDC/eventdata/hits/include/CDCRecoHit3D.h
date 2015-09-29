@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 namespace Belle2 {
 

@@ -8,5 +8,3 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
-
-using namespace Belle2::TrackFindingCDC;

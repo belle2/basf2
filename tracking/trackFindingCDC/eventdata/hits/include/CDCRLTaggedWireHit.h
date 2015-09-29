@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -46,11 +46,11 @@ namespace Belle2 {
 
       /// Returns the oriented wire hit with the opposite right left information.
       CDCRLTaggedWireHit reversed() const
-      { return CDCRLTaggedWireHit(m_wireHit, reversedInfo(m_rlInfo)); }
+      { return CDCRLTaggedWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo)); }
 
       /// Swiches the right left passage to its opposite inplace.
       void reverse()
-      { m_rlInfo = reversedInfo(m_rlInfo); }
+      { m_rlInfo = NRightLeft::reversed(m_rlInfo); }
 
     public:
       /// Equality comparison based on wire hit, left right passage information.
@@ -210,7 +210,7 @@ namespace Belle2 {
       const CDCWireHit* m_wireHit;
 
       /// Memory for the right left passage information of the oriented wire hit.
-      ERightLeft m_rlInfo;
+      NRightLeft::ERightLeft m_rlInfo;
 
     }; //class CDCRLTaggedWireHit
   } // end namespace TrackFindingCDC

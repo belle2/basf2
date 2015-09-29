@@ -25,18 +25,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCMCTrackStore::CDCMCTrackStore()
-{
-}
-
-
-
-CDCMCTrackStore::~CDCMCTrackStore()
-{
-}
-
-
-
 const CDCMCTrackStore& CDCMCTrackStore::getInstance()
 {
   return CDCMCManager::getMCTrackStore();
@@ -223,7 +211,7 @@ void CDCMCTrackStore::fillInTrackId()
     const CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
 
     //Fill the in track ids
-    Index iHit = -1;
+    int iHit = -1;
     for (const CDCHit* ptrHit : mcTrack) {
       ++iHit;
       m_inTrackIds[ptrHit] = iHit;
@@ -237,7 +225,7 @@ void CDCMCTrackStore::fillInTrackSegmentId()
   for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
-    Index iSegment = -1;
+    int iSegment = -1;
     for (const CDCHitVector&   mcSegment : mcSegments) {
       ++iSegment;
       for (const CDCHit* ptrHit : mcSegment) {
@@ -256,7 +244,7 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
     const CDCHitVector* ptrLastMCSegment = nullptr;
-    Index nPassedSuperLayers = 0;
+    int nPassedSuperLayers = 0;
 
     for (const CDCHitVector& mcSegment : mcSegments) {
 
@@ -305,7 +293,7 @@ Index CDCMCTrackStore::getInTrackId(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_inTrackIds.find(ptrHit);
-  return itFoundHit == m_inTrackIds.end() ? INVALID_INDEX : itFoundHit->second;
+  return itFoundHit == m_inTrackIds.end() ? c_InvalidIndex : itFoundHit->second;
 
 }
 
@@ -315,7 +303,7 @@ Index CDCMCTrackStore::getInTrackSegmentId(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_inTrackSegmentIds.find(ptrHit);
-  return itFoundHit == m_inTrackSegmentIds.end() ? INVALID_INDEX : itFoundHit->second;
+  return itFoundHit == m_inTrackSegmentIds.end() ? c_InvalidIndex : itFoundHit->second;
 
 }
 
@@ -324,6 +312,6 @@ Index CDCMCTrackStore::getNPassedSuperLayers(const CDCHit* ptrHit) const
 {
 
   auto itFoundHit = m_nPassedSuperLayers.find(ptrHit);
-  return itFoundHit == m_nPassedSuperLayers.end() ? INVALID_INDEX : itFoundHit->second;
+  return itFoundHit == m_nPassedSuperLayers.end() ? c_InvalidIndex : itFoundHit->second;
 
 }

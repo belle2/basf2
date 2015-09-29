@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
-#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <vector>
 #include <functional>
 #include <utility>
@@ -37,17 +35,6 @@ namespace Belle2 {
     /// TVector3 * TVector3, which results in a double return type
     template<class ANumber>
     inline auto square(ANumber t) -> decltype(t* t) {return t * t;}
-
-    ///Returns the sign of an integer number
-    inline int sign(int x)
-    { return (x > 0) - (x < 0); }
-
-    ///Returns the sign of a floating point number.
-    /** Essentially return the signbit of the float.
-     *  This means 0.0 has sign ESign::c_Plus while -0.0 has sign ESign::c_Minus
-     *  NAN is treat specially and returns an ESign::c_Invalid
-     */
-    ESign sign(double x);
 
     /// Returns the two roots in pq formula
     /** Calculates the two roots of the parabola x*x + p*x + q = 0 in a rather stable manner \n
@@ -108,13 +95,13 @@ namespace Belle2 {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const size_t n,
+    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n,
                                       const std::function<AResultType(double)>& map)
     {
       std::vector<AResultType> result;
       result.reserve(n);
       result.push_back(map(start));
-      for (size_t i = 1; i < n - 1; ++i) {
+      for (std::size_t i = 1; i < n - 1; ++i) {
         result.push_back(map((start * (n - 1 - i) + final * i) / (n - 1)));
       }
       result.push_back(map(final));
@@ -124,7 +111,7 @@ namespace Belle2 {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const size_t n)
+    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n)
     {
       auto map = [](const double in) -> AResultType {return AResultType(in);};
       return linspace<AResultType>(start, final, n, map);

@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <utility>
 

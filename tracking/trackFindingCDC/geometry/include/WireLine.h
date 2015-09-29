@@ -10,7 +10,6 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <cmath>

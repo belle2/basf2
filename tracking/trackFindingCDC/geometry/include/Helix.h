@@ -13,7 +13,6 @@
 
 #include <TVectorD.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <tracking/trackFindingCDC/geometry/HelixParameterIndex.h>
 

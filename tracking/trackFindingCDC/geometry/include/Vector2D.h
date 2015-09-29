@@ -9,14 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <TVector2.h>
-#include <math.h>
-#include <iostream>
-
-
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <TVector2.h>
+#include <cmath>
+#include <iostream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

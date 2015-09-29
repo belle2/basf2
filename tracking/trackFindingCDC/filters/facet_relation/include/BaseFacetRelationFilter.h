@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 #include <boost/range/iterator_range.hpp>
 
 namespace Belle2 {

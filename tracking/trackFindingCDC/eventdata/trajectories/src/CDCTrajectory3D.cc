@@ -17,6 +17,8 @@
 
 #include <genfit/TrackCand.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <cmath>
 #include <cassert>
 

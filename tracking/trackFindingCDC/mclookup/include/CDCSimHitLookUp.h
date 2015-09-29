@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/numerics/InfoTypes.h>
 
 #include <map>
 

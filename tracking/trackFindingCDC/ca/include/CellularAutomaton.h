@@ -14,7 +14,6 @@
 #include <boost/foreach.hpp>
 #include <limits>
 
-#include <tracking/trackFindingCDC/numerics/BasicTypes.h>
 
 #include <framework/logging/Logger.h>
 

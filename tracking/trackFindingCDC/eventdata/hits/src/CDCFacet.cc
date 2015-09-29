@@ -15,19 +15,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-CDCFacet::CDCFacet() :
-  CDCRLWireHitTriple(nullptr, nullptr, nullptr),
-  m_startToMiddle(),
-  m_startToEnd(),
-  m_middleToEnd(),
-  m_automatonCell()
-{
-  B2ERROR("CDCFacet initialized with nullptr for all oriented wire hit");
-}
-
-
-
 CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
                    const CDCRLWireHit* middleRLWireHit,
                    const CDCRLWireHit* endRLWireHit) :

@@ -10,11 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
@@ -27,9 +26,6 @@ namespace Belle2 {
     class CDCFacet : public CDCRLWireHitTriple {
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCFacet();
-
       /// Constructor taking three oriented wire hits.
       CDCFacet(const CDCRLWireHit* startRLWireHit,
                const CDCRLWireHit* middleRLWireHit,

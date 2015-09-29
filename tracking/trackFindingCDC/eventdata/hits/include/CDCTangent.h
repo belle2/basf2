@@ -49,9 +49,6 @@ namespace Belle2 {
                                                    const double toSignedRadius);
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCTangent();
-
       /// Construct a tangent from a pair of oriented wire hits.
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 

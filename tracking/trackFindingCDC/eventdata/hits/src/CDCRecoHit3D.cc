@@ -20,13 +20,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRecoHit3D::CDCRecoHit3D():
-  m_rlWireHit(nullptr),
-  m_recoPos3D(Vector3D::getLowest()),
-  m_arcLength2D(0.0)
-{}
-
-
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
                            const Vector3D& recoPos3D,
                            double perpS) :
@@ -96,11 +89,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     double z        = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
     return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
-
-  } else {
-    B2ERROR("Reconstruction on invalid wire");
-    return CDCRecoHit3D();
   }
+  B2FATAL("Reconstruction on invalid wire");
 }
 
 CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D& second)

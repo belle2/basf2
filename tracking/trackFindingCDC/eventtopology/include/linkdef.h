@@ -8,6 +8,7 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRLTaggedWireHit->-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitTopology+;
 
 #endif

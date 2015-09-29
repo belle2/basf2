@@ -18,9 +18,6 @@ namespace Belle2 {
     class CDCRLWireHitPair {
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCRLWireHitPair();
-
       /// Copy constructor
       CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair);
 

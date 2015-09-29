@@ -289,7 +289,7 @@ Vector3D CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
 
 const CDCRLWireHit* CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit) const
 {
-  if (not ptrHit) return nullptr;
+  B2ASSERT("Asked to get SimHit from CDCHit ptr, that is null", ptrHit);
 
   ERightLeft rlInfo = getRLInfo(ptrHit);
 
@@ -303,7 +303,7 @@ const CDCRLWireHit* CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit) const
 CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit) const
 {
   const CDCRLWireHit* ptrRLWireHit = getRLWireHit(ptrHit);
-  if (not ptrRLWireHit) return CDCRecoHit3D();
+  B2ASSERT("Returned ptrRLWireHit is nullptr", ptrRLWireHit);
 
   Vector3D recoPos3D = getRecoPos3D(ptrHit);
 
@@ -315,7 +315,7 @@ CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit) const
 CDCRecoHit3D CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) const
 {
   const CDCRLWireHit* ptrRLWireHit = getRLWireHit(ptrHit);
-  if (not ptrRLWireHit) return CDCRecoHit3D();
+  B2ASSERT("Returned ptrRLWireHit is nullptr", ptrRLWireHit);
 
   Vector3D recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
 

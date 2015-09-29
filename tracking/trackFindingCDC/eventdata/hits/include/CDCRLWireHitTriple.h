@@ -46,10 +46,6 @@ namespace Belle2 {
       static const Shape ORTHO_CCW = 4;
 
     public:
-
-      /// Default constructor for ROOT compatibility.
-      CDCRLWireHitTriple();
-
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLWireHit* startRLWireHit,
                          const CDCRLWireHit* middleRLWireHit,

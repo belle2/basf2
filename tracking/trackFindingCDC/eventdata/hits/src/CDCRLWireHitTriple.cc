@@ -17,14 +17,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-CDCRLWireHitTriple::CDCRLWireHitTriple():
-  m_startRLWireHit(nullptr),
-  m_rearRLWireHitPair(nullptr, nullptr)
-{
-  B2WARNING("CDCRLWireHitTiple initialized with three nullptr");
-}
-
 CDCRLWireHitTriple::CDCRLWireHitTriple(
   const CDCRLWireHit* startRLWireHit,
   const CDCRLWireHit* middleRLWireHit,

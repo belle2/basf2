@@ -28,10 +28,6 @@ namespace Belle2 {
     class CDCRLTaggedWireHit {
 
     public:
-
-      /// Default constructor for ROOT compatibility.
-      CDCRLTaggedWireHit();
-
       /** Constructs an oriented wire hit.
        *  @param wireHit the wire hit the oriented hit is associated with.
        *  @param rlInfo the right left passage information of the _wire_ relative to the track */

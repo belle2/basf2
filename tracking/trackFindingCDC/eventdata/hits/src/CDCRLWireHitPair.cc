@@ -16,12 +16,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHitPair::CDCRLWireHitPair():
-  m_fromRLWireHit(nullptr),
-  m_toRLWireHit(nullptr)
-{
-}
-
 CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair.m_fromRLWireHit, rlWireHitPair.m_toRLWireHit)
 {

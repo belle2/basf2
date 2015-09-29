@@ -18,11 +18,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRLTaggedWireHit::CDCRLTaggedWireHit() :
-  m_wireHit(nullptr),
-  m_rlInfo(ERightLeft::c_Left)
-{}
-
 
 CDCRLTaggedWireHit::CDCRLTaggedWireHit(const CDCWireHit* wireHit,
                                        ERightLeft rlInfo) :

@@ -17,10 +17,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCTangent::CDCTangent() :
-  CDCRLWireHitPair(),
-  m_line() {}
-
 CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   CDCRLWireHitPair(rlWireHitPair), m_line()
 {

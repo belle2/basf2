@@ -25,18 +25,18 @@ namespace Belle2 {
      *  Instances can only be obtained from it with a decided orientation c_Right or c_Left.
      */
     class CDCRLWireHit : public CDCRLTaggedWireHit {
-
-
     public:
-      /// Default constructor for ROOT compatibility - if you need an unmanaged instance use CDCRLTaggedWireHit
-      CDCRLWireHit() {}
-
+      CDCRLWireHit(): CDCRLTaggedWireHit(nullptr, ERightLeft::c_Unknown)
+      {}
     private:
       /// Only the wire hit topology is allowed to create wire hits
       friend class CDCWireHitTopology;
 
       /** Constructs an oriented wire hit.
-       *  @param wireHit the wire hit the oriented hit is associated with.
+       *
+       *  @param wireHit the wire hit the oriented hit is associated with;
+       *                 Defaulting to nullptr is necessary because of ROOT dictionaries,
+       *                 that are needed for the WireHitTopology.
        *  @param rlInfo the right left passage information of the _wire_ relative to the track */
       CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
 

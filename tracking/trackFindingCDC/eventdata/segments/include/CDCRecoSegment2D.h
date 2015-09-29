@@ -27,19 +27,23 @@ namespace Belle2 {
     class CDCFacet;
     class CDCTangent;
 
-    /// A segment consisting of two dimensional reconsturcted hits
+    /// A segment consisting of two dimensional reconsturcted hits.
     class CDCRecoSegment2D : public CDCSegment<CDCRecoHit2D> {
     public:
-      /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent segment
+      /// Averages the reconstructed positions from hits that overlap
+      /// in adjacent tangents in the given tangent segment.
       static CDCRecoSegment2D condense(const CDCTangentSegment& tangentSegment);
 
-      /// Averages the reconstructed positions from hits that overlap in adjacent tangents in the given tangent path
+      /// Averages the reconstructed positions from hits that overlap
+      /// in adjacent tangents in the given tangent path.
       static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCTangent* >& tangentPath);
 
-      /// Averages the reconstructed positions from hits that overlap in adjacent facets in the given facet segment.
+      /// Averages the reconstructed positions from hits that overlap
+      /// in adjacent facets in the given facet segment.
       static CDCRecoSegment2D condense(const CDCFacetSegment& facetSegment);
 
-      /// Averages the reconstructed positions from hits that overlap in adjacent facet in the given facet path.
+      /// Averages the reconstructed positions from hits that overlap
+      /// in adjacent facet in the given facet path.
       static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
 
       /** Flattens a series of segments to one segment.
@@ -59,26 +63,26 @@ namespace Belle2 {
 
       /// Allow automatic taking of the address.
       /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after the trailing const to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCRecoSegment2D* () const
+       *  This method activally exposes this inheritance to be able to write algorithms
+       *  that work for objects and poiinters alike without code duplication.*/
+      operator const Belle2::TrackFindingCDC::CDCRecoSegment2D* () const&
       { return this; }
 
-      /// Getter for the vector of wires the hits of this segment are based on in the same order
+      /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 
-      /// Getter for the vector of wires the hits of this segment are based on in the same order
+      /// Getter for the vector of wires the hits of this segment are based on in the same order.
       CDCWireHitSegment getWireHitSegment() const;
 
       /** Fill the hit content of this segment into a genfit::TrackCand.
-       *  Return true, if the trajectory information is valid, false otherwise.
+       *  @return true, if the trajectory information is valid, false otherwise.
        */
       bool fillInto(genfit::TrackCand& gfTrackCand) const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
       CDCRecoSegment2D reversed() const;
 
-      /// Reverses the order of hits and their right left passage hypotheses inplace
+      /// Reverses the order of hits and their right left passage hypotheses inplace.
       void reverse();
 
       /// Getter for the automaton cell.
@@ -89,13 +93,17 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
-      /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
+      /// Unset the masked flag of the automaton cell of this segment
+      /// and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
 
-      /// Set the masked flag of the automaton cell of this segment and forward the masked flag to all contained wire hits.
+      /// Set the masked flag of the automaton cell of this segment
+      /// and forward the masked flag to all contained wire hits.
       void setAndForwardMaskedFlag() const;
 
-      /// Check all contained wire hits if one has the masked flag. Set the masked flag of this segment in case at least one of the contained wire hits is flagged as masked.
+      /// Check all contained wire hits if one has the masked flag.
+      /** Set the masked flag of this segment in case at least one of
+       *  the contained wire hits is flagged as masked.*/
       void receiveMaskedFlag() const;
 
       /// Getter for the global super cluster id.
@@ -106,7 +114,7 @@ namespace Belle2 {
       void setISuperCluster(const size_t& iSuperCluster)
       { m_iSuperCluster = iSuperCluster; }
 
-      /// Returns false of there is one hit in the range which does not have a taken flag.
+      /// Returns false, if there is one hit in the range which does not have a taken flag.
       bool isFullyTaken() const;
 
     private:
@@ -119,6 +127,5 @@ namespace Belle2 {
       /// Memory for the global super cluster id.
       size_t m_iSuperCluster;
     }; //end class CDCRecoSegment2D
-
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

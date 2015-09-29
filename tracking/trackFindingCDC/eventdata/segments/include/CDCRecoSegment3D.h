@@ -33,7 +33,6 @@ namespace Belle2 {
       /// Returns true of there is one hit in the range which has a reconstructed position in the CDC (scaled by the factor).
       bool atLeastOneHitIsNotInCDCZBounds(const double factor = 1) const;
     };
-
   }
 }
 

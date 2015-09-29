@@ -230,8 +230,8 @@ double SinEqLine::computeExtremumXInHalfPeriod(const int& iHalfPeriod) const
   const double slope = getSlope();
   double extremumInFirstHalfPeriod = acos(slope);
 
-  double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * PI - extremumInFirstHalfPeriod;
+  double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * M_PI - extremumInFirstHalfPeriod;
 
   int iPeriod = getIPeriodFromIHalfPeriod(iHalfPeriod);
-  return extremumInFirstPeriod + 2 * PI * iPeriod;
+  return extremumInFirstPeriod + 2 * M_PI * iPeriod;
 }

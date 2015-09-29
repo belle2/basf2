@@ -68,7 +68,7 @@ namespace Belle2 {
 
       /// Returns the half period index in which the x position is located.
       int getIHalfPeriod(const double x) const
-      { return floor(x / PI); }
+      { return floor(x / M_PI); }
 
       /* Computes the positive solution that has the smallest value of x.
       The additional parameter serves as a criterion to abbort the search if the solutions is further away than the specified half period.

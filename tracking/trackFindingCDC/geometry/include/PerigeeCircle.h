@@ -229,7 +229,7 @@ namespace Belle2 {
     private:
       /// Returns the azimuth angle associated with the reverse vector
       inline double reversedPhi(const double phi) const
-      { return phi > 0 ? phi - PI : phi + PI; }
+      { return phi > 0 ? phi - M_PI : phi + M_PI; }
 
     public:
 

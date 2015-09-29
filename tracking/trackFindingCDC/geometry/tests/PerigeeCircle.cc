@@ -25,7 +25,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
   double curvature = 1.0;
-  double tangentialPhi = PI / 4.0;
+  double tangentialPhi = M_PI / 4.0;
   double impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
@@ -64,7 +64,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
-  double tangtialPhi = PI / 4.0;
+  double tangtialPhi = M_PI / 4.0;
   double impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
@@ -77,7 +77,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
-  double tangtialPhi = PI / 4.0;
+  double tangtialPhi = M_PI / 4.0;
   double impact = -1.0;
 
   // Checks if the normal parameters n follow the same sign convention
@@ -109,7 +109,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
 
   double curvature = -1.;
-  double tangentialPhi = 3. * PI / 4.;
+  double tangentialPhi = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.);
 
   PerigeeCircle circle(curvature, tangentialPhi, impact);
@@ -157,7 +157,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
 
 
   double curvature = -1.;
-  double tangentialPhi = 3. * PI / 4.;
+  double tangentialPhi = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.0);
 
   PerigeeCircle circle(curvature, tangentialPhi, impact);
@@ -253,7 +253,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
-  double smallAngle = PI / 100;
+  double smallAngle = M_PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
   double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
@@ -265,7 +265,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 
 
   Vector2D down(2.0, -1.0);
-  double downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength = +M_PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
@@ -285,10 +285,10 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
     double widestArcLength = circle.arcLengthToCylindricalR(3);
-    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+    EXPECT_NEAR(M_PI, widestArcLength, 10e-7);
 
     double halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
-    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+    EXPECT_NEAR(M_PI / 2, halfArcLength, 10e-7);
 
     double unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
@@ -303,10 +303,10 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
     double widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
-    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+    EXPECT_NEAR(M_PI, widestArcLength, 10e-7);
 
     double halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
-    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+    EXPECT_NEAR(M_PI / 2, halfArcLength, 10e-7);
 
     double unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
@@ -320,7 +320,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
 {
   double expectedCurvature = 1.0 / 2.0;
-  double expectedPhi0 = PI / 4.0;
+  double expectedPhi0 = M_PI / 4.0;
   double impact = 0;
 
   // Checks if the normal parameters n follow the same sign convention

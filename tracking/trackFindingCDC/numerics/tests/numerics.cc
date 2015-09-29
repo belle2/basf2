@@ -71,10 +71,10 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_simple)
   // Simple sin.
   SinEqLine sinEqLine(0.0, 0.0);
 
-  double rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double rootX = sinEqLine.computeRootInInterval(M_PI / 2, 3 * M_PI / 2);
   double rootY = sinEqLine.map(rootX);
 
-  EXPECT_NEAR(PI, rootX, 10e-7);
+  EXPECT_NEAR(M_PI, rootX, 10e-7);
   EXPECT_NEAR(0.0, rootY, 10e-7);
 
 }
@@ -87,7 +87,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_const)
   // Constant sin.
   SinEqLine sinEqLine(0.0, 1.0 / 2.0);
 
-  double rootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double rootX = sinEqLine.computeRootInInterval(M_PI / 2, 3 * M_PI / 2);
   double rootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(150.0 * Unit::deg, rootX, 10e-7);
@@ -106,7 +106,7 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootInInterval_complex)
 
   SinEqLine sinEqLine(line);
 
-  double solvedRootX = sinEqLine.computeRootInInterval(PI / 2, 3 * PI / 2);
+  double solvedRootX = sinEqLine.computeRootInInterval(M_PI / 2, 3 * M_PI / 2);
   double solvedRootY = sinEqLine.map(rootX);
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);

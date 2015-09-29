@@ -158,7 +158,7 @@ TMatrixD PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
 void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const
 {
 
-  // In this frame of reference we have d=0,  phi= + or - PI
+  // In this frame of reference we have d=0,  phi= + or - M_PI
   Vector2D coordinateVector = tangential();
 
   //Vector2D delta = perigee() - by;

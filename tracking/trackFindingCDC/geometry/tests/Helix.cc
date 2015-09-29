@@ -34,7 +34,7 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
 
   for (const Vector3D& by : bys) {
     double curvature = +1.0 / 2.0;
-    double phi0 = -PI / 2.0;
+    double phi0 = -M_PI / 2.0;
     double impact = +1.0;
     double tanLambda = 1.0 / 2.0;
     double z0 = 0.0;
@@ -60,7 +60,7 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
 {
   double curvature = -1.0;
-  double phi0 = +PI / 2.0;
+  double phi0 = +M_PI / 2.0;
   double impact = -1.0;
   double tanLambda = 1.0 / 2.0;
   double z0 = 3.0;
@@ -72,10 +72,10 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
   double widestArcLength2D = helix.arcLength2DToCylindricalR(3);
-  EXPECT_NEAR(PI, widestArcLength2D, 10e-7);
+  EXPECT_NEAR(M_PI, widestArcLength2D, 10e-7);
 
   double halfArcLength2D = helix.arcLength2DToCylindricalR(sqrt(5.0));
-  EXPECT_NEAR(PI / 2, halfArcLength2D, 10e-7);
+  EXPECT_NEAR(M_PI / 2, halfArcLength2D, 10e-7);
 
   double unreachableHighArcLength2D = helix.arcLength2DToCylindricalR(4);
   EXPECT_TRUE(std::isnan(unreachableHighArcLength2D));
@@ -89,7 +89,7 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
 {
   double curvature = -1.0;
-  double phi0 = +PI / 2.0;
+  double phi0 = +M_PI / 2.0;
   double impact = -1.0;
   double tanLambda = 1.0 / 2.0;
   double z0 = 3.0;
@@ -101,11 +101,11 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
   double widestArcLength2D = helix.arcLength2DToXY(Vector2D(5.0, 0.0));
-  EXPECT_NEAR(PI, widestArcLength2D, 10e-7);
+  EXPECT_NEAR(M_PI, widestArcLength2D, 10e-7);
 
   double halfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, 5.0));
-  EXPECT_NEAR(PI / 2, halfArcLength2D, 10e-7);
+  EXPECT_NEAR(M_PI / 2, halfArcLength2D, 10e-7);
 
   double otherHalfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, -5.0));
-  EXPECT_NEAR(-PI / 2, otherHalfArcLength2D, 10e-7);
+  EXPECT_NEAR(-M_PI / 2, otherHalfArcLength2D, 10e-7);
 }

@@ -18,9 +18,6 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    /// The famous number
-    const double PI = 3.141592653589793238462;
-
     ///Checks if an integer is even
     template<class AInt>
     inline bool isEven(const AInt& x)

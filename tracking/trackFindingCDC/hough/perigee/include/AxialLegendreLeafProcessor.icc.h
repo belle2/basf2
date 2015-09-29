@@ -85,7 +85,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   // Determine a precision that we expect to achieve at the fitted momentum
   double levelPrecision = 10.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(curv) + 2.74);
   double curvPrecision = 0.15 / (pow(2., levelPrecision));
-  double phi0Precision = PI / (pow(2., levelPrecision + 1));
+  double phi0Precision = M_PI / (pow(2., levelPrecision + 1));
 
   // Make a hough space box with the determined precision
   DiscreteCurv::Array curvBounds = linspace<float>(curv - curvPrecision, curv + curvPrecision, 2);

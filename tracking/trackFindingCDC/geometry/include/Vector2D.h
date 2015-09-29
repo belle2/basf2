@@ -401,7 +401,7 @@ namespace Belle2 {
       inline void setCylindricalR(const double cylindricalR)
       { scale(cylindricalR / norm()); }
 
-      /// Gives the azimuth angle being the angle to the x axes ( range -PI to PI )
+      /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
       inline double phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
 

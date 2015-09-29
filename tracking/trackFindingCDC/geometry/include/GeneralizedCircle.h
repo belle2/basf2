@@ -514,7 +514,7 @@ namespace Belle2 {
 
       /// Gives the perimeter of the circle.
       inline double perimeter() const
-      { return 2 * PI * radius(); }
+      { return 2 * M_PI * radius(); }
 
       /**
       Gives the orientation of the circle.
@@ -538,7 +538,7 @@ namespace Belle2 {
       /**
       Calculates the arc length between two points of closest approach on the circle.
          The arc length is signed positiv for travel in orientation direction.
-         In the circle case the arc length is between -PI*radius and PI*radius,
+         In the circle case the arc length is between -pi*radius and pi*radius,
          hence the discontinuity is on the far side of the circle relative to the given from point.
          The points are essentially first taken to their closest approach
          before we take the length on the curve.

@@ -169,7 +169,7 @@ namespace Belle2 {
        *  These functions measure the angle between two vectors from *this* to rhs. \n
        *  Because the three dimensional space does not have a unique orientation available, \n
        *  the sign of the angle is not well defined. Therefore angles between three dimensional \n
-       *  vectors are always positiv and so is the sine of the angle. The angle is bound by PI.
+       *  vectors are always positiv and so is the sine of the angle. The angle is bound by M_PI.
        */
       ///@{
       /// Cosine of the angle between this and rhs

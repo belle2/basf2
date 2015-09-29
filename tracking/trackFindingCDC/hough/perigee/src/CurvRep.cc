@@ -33,11 +33,11 @@ CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
     double cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
     double factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
 
-    double arcLength2D = cylindricalR * nvl(factor, PI);
+    double arcLength2D = cylindricalR * nvl(factor, M_PI);
     double r = 1.0 / fabs(m_curv);
 
     m_arcLength2DByICLayer[iCLayer] = arcLength2D;
-    m_secondaryArcLength2DByICLayer[iCLayer] = 2 * PI * r - arcLength2D;
+    m_secondaryArcLength2DByICLayer[iCLayer] = 2 * M_PI * r - arcLength2D;
   }
 }
 

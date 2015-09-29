@@ -24,7 +24,7 @@ using namespace TrackFindingCDC;
 
 SimpleFacetFilter::SimpleFacetFilter():
   m_fitlessFacetFilter(true),
-  m_param_deviationCosCut(cos(PI / 180.0 * 9))
+  m_param_deviationCosCut(cos(M_PI / 180.0 * 9))
 {
 }
 

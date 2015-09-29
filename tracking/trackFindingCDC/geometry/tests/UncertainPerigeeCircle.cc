@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
-  UncertainPerigeeCircle circle(1.0, -PI / 2, 0);
+  UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
 
   TMatrixD moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
@@ -41,7 +41,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
-  UncertainPerigeeCircle circle(1.0, -PI / 2, 0);
+  UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
 
   TMatrixD moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(-1.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
@@ -102,7 +102,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   perigeeVariance(2, 1) = 0.0;
   perigeeVariance(2, 2) = 0.0;
 
-  UncertainPerigeeCircle circle(1.0, -PI / 2, 0.0, PerigeeCovariance(perigeeVariance));
+  UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0.0, PerigeeCovariance(perigeeVariance));
 
   {
     TMatrixDSym noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
@@ -210,7 +210,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
   perigeeVariance(2, 1) = 0.6;
   perigeeVariance(2, 2) = 1;
 
-  UncertainPerigeeCircle circle(1.0, -PI / 4, 1.0, PerigeeCovariance(perigeeVariance));
+  UncertainPerigeeCircle circle(1.0, -M_PI / 4, 1.0, PerigeeCovariance(perigeeVariance));
 
   //circle.perigeeCovariance().Print();
 

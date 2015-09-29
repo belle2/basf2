@@ -29,8 +29,8 @@ namespace Belle2 {
       ////////
 
       // Fixed implicit phi0 range
-      // const double maxPhi0 = PI;
-      // const double minPhi0 = -PI;
+      // const double maxPhi0 = M_PI;
+      // const double minPhi0 = -M_PI;
 
       const size_t discretePhi0Overlap = 4;
       const size_t discretePhi0Width = 5;

@@ -94,7 +94,7 @@ TEST(TrackFindingCDCTest, cpp_map_insert)
 TEST(TrackFindingCDCTest, cpp_remainder)
 {
   // Test if remainder brings a value to the range [-1, 1]
-  // proving that remainder is the best function to transform an angle to range [-PI, PI]
+  // proving that remainder is the best function to transform an angle to range [-M_PI, M_PI]
   {
     double value = 3.0 / 2.0;
     double reduced_value = std::remainder(value, 2.0);

@@ -72,7 +72,7 @@ namespace Belle2 {
       /// Calculate the travel distance from the start position of the trajectory.
       /** Returns the travel distance on the trajectory from the start point to \n
        *  the given point. This is subjected to a discontinuity at the far point \n
-       *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
+       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       double calcArcLength2D(const Vector2D& point) const
@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Calculate the travel distance between the two given positions
       /** Returns the travel distance on the trajectory from the first given point to \n
        *  the second given point. This is subjected to a discontinuity at the far point \n
-       *  of the circle. Hence the value return is in the range from -PI*radius to PI*radius \n
+       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
        *  calculation. */
       double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const

@@ -37,7 +37,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
   EXPECT_NEAR(2.0 * n3, circle.curvature(), absError);
   EXPECT_NEAR(1.0 / (2.0 * n3), circle.radius(), absError);
 
-  EXPECT_NEAR(PI / 2.0, circle.tangentialPhi(), absError);
+  EXPECT_NEAR(M_PI / 2.0, circle.tangentialPhi(), absError);
 
   EXPECT_NEAR(0, circle.impact(), absError);
 
@@ -73,7 +73,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
 
 
   // This tests for point which is on the circle
-  double smallAngle = PI / 100;
+  double smallAngle = M_PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
 
@@ -88,7 +88,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
   GeneralizedCircle circle(0.0, -1.0, 0.0, 1.0 / 2.0);
-  double smallAngle = PI / 100;
+  double smallAngle = M_PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
   double expectedArcLengthFactor = smallAngle / near.cylindricalR();
@@ -108,17 +108,17 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
   Vector2D down(1.0, -2.0);
   Vector2D far(4.0, 0.0);
 
-  double smallAngle = PI / 100;
+  double smallAngle = M_PI / 100;
   Vector2D close(1.0 - cos(smallAngle), sin(smallAngle));
 
-  EXPECT_NEAR(-PI / 2.0, circle.arcLengthBetween(origin, up), 10e-7);
-  EXPECT_NEAR(PI / 2.0, circle.arcLengthBetween(origin, down), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, circle.arcLengthBetween(origin, up), 10e-7);
+  EXPECT_NEAR(M_PI / 2.0, circle.arcLengthBetween(origin, down), 10e-7);
 
-  EXPECT_NEAR(PI / 2.0, circle.arcLengthBetween(up, origin), 10e-7);
-  EXPECT_NEAR(-PI / 2.0, circle.arcLengthBetween(down, origin), 10e-7);
+  EXPECT_NEAR(M_PI / 2.0, circle.arcLengthBetween(up, origin), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, circle.arcLengthBetween(down, origin), 10e-7);
 
   // Sign of the length at the far end is unstable, which is why fabs is taken here
-  EXPECT_NEAR(PI, fabs(circle.arcLengthBetween(origin, far)), 10e-7);
+  EXPECT_NEAR(M_PI, fabs(circle.arcLengthBetween(origin, far)), 10e-7);
 
   EXPECT_NEAR(-smallAngle, circle.arcLengthBetween(origin, close), 10e-7);
 
@@ -181,7 +181,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
 
-  double smallAngle = PI / 100;
+  double smallAngle = M_PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
   double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
@@ -193,7 +193,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 
 
   Vector2D down(2.0, -1.0);
-  double downArcLength = +PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength = +M_PI / 2.0 * radius; //Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
@@ -213,10 +213,10 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
     double widestArcLength = circle.arcLengthToCylindricalR(3);
-    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+    EXPECT_NEAR(M_PI, widestArcLength, 10e-7);
 
     double halfArcLength = circle.arcLengthToCylindricalR(sqrt(5.0));
-    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+    EXPECT_NEAR(M_PI / 2, halfArcLength, 10e-7);
 
     double unreachableHighArcLength = circle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
@@ -231,10 +231,10 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
     EXPECT_NEAR(0, closestArcLength, 10e-7);
 
     double widestArcLength = reversedCircle.arcLengthToCylindricalR(3);
-    EXPECT_NEAR(PI, widestArcLength, 10e-7);
+    EXPECT_NEAR(M_PI, widestArcLength, 10e-7);
 
     double halfArcLength = reversedCircle.arcLengthToCylindricalR(sqrt(5.0));
-    EXPECT_NEAR(PI / 2, halfArcLength, 10e-7);
+    EXPECT_NEAR(M_PI / 2, halfArcLength, 10e-7);
 
     double unreachableHighArcLength = reversedCircle.arcLengthToCylindricalR(4);
     EXPECT_TRUE(std::isnan(unreachableHighArcLength));
@@ -255,7 +255,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
   EXPECT_FALSE(circle.isLine());
 
   float curvature = 0;
-  float phi0 = PI / 2;
+  float phi0 = M_PI / 2;
   float impact = -1;
   GeneralizedCircle line = GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact);
 
@@ -272,7 +272,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
   EXPECT_TRUE(circle.isCircle());
 
   float curvature = 0;
-  float phi0 = PI / 2;
+  float phi0 = M_PI / 2;
   float impact = -1;
   GeneralizedCircle line = GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact);
 

@@ -103,7 +103,7 @@ namespace {
     }
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
-    phi += phi > 0 ? -PI : PI;
+    phi += phi > 0 ? -M_PI : M_PI;
     return PerigeeCircle::fromPerigeeParameters(curv, phi, I);
 
   }

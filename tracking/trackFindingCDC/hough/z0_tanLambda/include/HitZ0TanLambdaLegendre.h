@@ -24,7 +24,7 @@ namespace Belle2 {
       typedef SimpeBoxDivisionHoughTree<AHitPointerType, HitInZ0TanLambdaBox, z0Divisions, tanLambdaDivisions> Super;
     public:
       /// Constructor using the given maximal level setting the maximal values.
-      HitZ0TanLambdaLegendre(size_t maxLevel) : Super(maxLevel, 120, std::tan(75.0 * PI / 180.0)) {}
+      HitZ0TanLambdaLegendre(size_t maxLevel) : Super(maxLevel, 120, std::tan(75.0 * M_PI / 180.0)) {}
     };
   }
 }

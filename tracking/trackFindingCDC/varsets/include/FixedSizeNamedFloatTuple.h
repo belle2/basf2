@@ -145,13 +145,13 @@ namespace Belle2 {
 
     public:
       /// Setter for the ith values. Static index version.
-      template<int iValue>
+      template<int I>
       void set(Float_t value)
       {
-        static_assert(nNames != iValue, "Requested name not found in names.");
-        assert(iValue < (int)nNames);
-        assert(iValue >= 0);
-        m_values[iValue] = value;
+        static_assert(nNames != I, "Requested name not found in names.");
+        assert(I < (int)nNames);
+        assert(I >= 0);
+        m_values[I] = value;
       }
 
       /// Setter for the ith value.
@@ -169,14 +169,13 @@ namespace Belle2 {
       }
 
       /// Getter for the ith value. Static index version.
-      template<int iValue>
+      template<int I>
       Float_t get() const
       {
-        static_assert(nNames != iValue,
-                      "Requested name not found in names.");
-        assert(iValue < (int)nNames);
-        assert(iValue >= 0);
-        return m_values[iValue];
+        static_assert(nNames != I, "Requested name not found in names.");
+        assert(I < (int)nNames);
+        assert(I >= 0);
+        return m_values[I];
       }
 
       /// Getter for the ith value.
@@ -194,14 +193,13 @@ namespace Belle2 {
       }
 
       /// Reference getter for the ith value. Static index version.
-      template<int iValue>
+      template<int I>
       Float_t& value()
       {
-        static_assert(nNames != iValue,
-                      "Requested name not found in names.");
-        assert(iValue < (int)nNames);
-        assert(iValue >= 0);
-        return m_values[iValue];
+        static_assert(nNames != I, "Requested name not found in names.");
+        assert(I < (int)nNames);
+        assert(I >= 0);
+        return m_values[I];
       }
 
       /// Reference getter for the ith value.

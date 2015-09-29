@@ -127,31 +127,29 @@ namespace Belle2 {
       }
 
       /// Getter for the value of the ith variable. Static version.
-      template<int iVar>
+      template<int I>
       Float_t get() const
       {
-        static_assert(iVar < nVars,
-                      "Requested variable index exceeds number variables.");
-        return m_variables.get(iVar);
+        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        return m_variables.get(I);
       }
 
       /// Reference getter for the value of the ith variable. Static version.
-      template<int iVar>
+      template<int I>
       Float_t& var()
       {
-        static_assert(iVar < nVars,
-                      "Requested variable index exceeds number variables.");
-        return m_variables[iVar];
+        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        return m_variables[I];
       }
 
       /// Set the given variable to the value if the value is not NaN els set it to valueIfNaN.
-      template<int iVar>
+      template<int I>
       void setVariableIfNotNaN(const Float_t& value, const Float_t& valueIfNaN = 0)
       {
         if (std::isnan(value)) {
-          var<iVar>() = valueIfNaN;
+          var<I>() = valueIfNaN;
         } else {
-          var<iVar>() = value;
+          var<I>() = value;
         }
       }
 

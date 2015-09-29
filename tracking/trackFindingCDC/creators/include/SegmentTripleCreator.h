@@ -30,8 +30,8 @@ namespace Belle2 {
 
 
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
-      template<class AxialSegmentPairFilter, class ASegmentTripleFilter>
-      inline void create(AxialSegmentPairFilter& axialSegmentPairFilter,
+      template<class AAxialSegmentPairFilter, class ASegmentTripleFilter>
+      inline void create(AAxialSegmentPairFilter& axialSegmentPairFilter,
                          ASegmentTripleFilter& segmentTripleFilter,
                          const std::vector<CDCRecoSegment2D>& segments,
                          std::set<CDCSegmentTriple>& segmentTriples) const
@@ -84,8 +84,8 @@ namespace Belle2 {
       typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
 
       /// Creates the segment triples from the segments, which have been grouped by their superlayer id.
-      template<class AxialSegmentPairFilter, class ASegmentTripleFilter>
-      inline void create(AxialSegmentPairFilter& axialSegmentPairFilter,
+      template<class AAxialSegmentPairFilter, class ASegmentTripleFilter>
+      inline void create(AAxialSegmentPairFilter& axialSegmentPairFilter,
                          ASegmentTripleFilter& segmentTripleFilter,
                          const AxialSegmentsBySuperLayer& axialSegmentsBySL,
                          const StereoSegmentsBySuperLayer& stereoSegmentsBySL,
@@ -198,8 +198,8 @@ namespace Belle2 {
 
 
       /// Creates segment tiples from a combination of start segment, middle segments and end segments.
-      template<class AxialSegmentPairFilter, class ASegmentTripleFilter>
-      inline void createForAxialSuperLayerPair(AxialSegmentPairFilter& axialSegmentPairFilter,
+      template<class AAxialSegmentPairFilter, class ASegmentTripleFilter>
+      inline void createForAxialSuperLayerPair(AAxialSegmentPairFilter& axialSegmentPairFilter,
                                                ASegmentTripleFilter& segmentTripleFilter,
                                                const std::vector<const CDCAxialRecoSegment2D* >& startSegments,
                                                const std::vector<const CDCStereoRecoSegment2D* >& middleSegments,

@@ -269,11 +269,8 @@ namespace Belle2 {
       ///@}
 
     private:
-
       Vector2D  m_support; ///< Support vector of the line
       Vector2D  m_tangential; ///< Tangential vector of the line
-
-    private:
 
     }; //class
   } // namespace TrackFindingCDC

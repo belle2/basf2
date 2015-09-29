@@ -38,7 +38,6 @@ namespace Belle2 {
     class WeightedNeighborhood {
 
     private:
-
       /// Structure keeping a pointer to the item and the weight
       /** Structure that is used as key of the neighbor relations
        *  It keeps a pointer to the item to be stored and uses the pointer address to sort for.

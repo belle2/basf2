@@ -33,8 +33,6 @@ namespace Belle2 {
       virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>&
                                     testPair) override final;
 
-    private:
-
     };
   }
 }

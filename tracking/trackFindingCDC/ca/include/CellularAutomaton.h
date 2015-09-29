@@ -108,7 +108,6 @@ namespace Belle2 {
       }
 
     private:
-
       /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CYCLE_DETECTED if it encounters a cycle in the graph.
       const CellState& getFinalCellState(const AItem& item, const Neighborhood& neighborhood) const
       {
@@ -196,7 +195,6 @@ namespace Belle2 {
 
 
     private:
-
       //non recusive version not yet ported to support cell flags
       /*
       void CellularAutomat::applyToNoRecursion(const Collection & collection, const Neighborhood & neighborhood) const{

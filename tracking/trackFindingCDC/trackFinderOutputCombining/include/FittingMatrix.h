@@ -195,7 +195,6 @@ namespace Belle2 {
                                                   const CDCTrack& resultTrackCand);
 
     private:
-
       Eigen::MatrixXf
       m_fittingMatrix;  /**< The matrix with the chi2. One column corresponds to one track candiate and one row to a reco segement. */
       Eigen::MatrixXf m_zMatrix;        /**< The matrix with the theta values */

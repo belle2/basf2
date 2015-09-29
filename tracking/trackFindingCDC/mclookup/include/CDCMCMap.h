@@ -46,7 +46,6 @@ namespace Belle2 {
             > MCParticleByCDCHitMap;
 
     private:
-
       /// Iterator type for an iteration over several CDCHit <-> MCParticle relations as view from the MCParticle side.
       typedef MCParticleByCDCHitMap::map_by<MCParticle>::const_iterator CDCHitByMCParticleRelationIterator;
 
@@ -219,7 +218,6 @@ namespace Belle2 {
       { return m_mcParticlesBySimHit; }
 
     private:
-
       /// Memory for a one to one relation form CDCHits to CDCSimHits
       CDCSimHitByCDCHitMap m_simHitByHit;
 

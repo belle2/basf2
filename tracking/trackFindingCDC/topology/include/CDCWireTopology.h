@@ -611,8 +611,6 @@ namespace Belle2 {
       }
 
 
-    private:
-
     }; //class
 
 

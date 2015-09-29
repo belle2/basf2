@@ -149,7 +149,6 @@ namespace Belle2 {
       { return *m_initialTDCCountTranslator; }
 
     private:
-
       /// Memory for the wire hits to be stored
       std::vector<CDCWireHit> m_wireHits;
 

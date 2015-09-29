@@ -65,7 +65,6 @@ namespace Belle2 {
 
 
     private:
-
       ///Reconstruct the start segment of a triple and append it to the track
       void appendStartRecoHits3D(const CDCSegmentTriple& triple,
                                  double perpSOffset,

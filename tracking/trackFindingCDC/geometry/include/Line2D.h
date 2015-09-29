@@ -333,8 +333,6 @@ namespace Belle2 {
       double m_n0; ///< Memory for the first line parameter
       Vector2D  m_n12; ///< Memory for the second line parameter
 
-    private:
-
     }; //class
   } // namespace TrackFindingCDC
 } // namespace Belle2

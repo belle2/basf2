@@ -186,7 +186,6 @@ namespace Belle2 {
       const std::string saveSVGFile(const std::string& svgFileName = "display.svg");
 
     private:
-
       /**
        * Function Template for drawing the elements of a given StoreArray. Needs to know the type of the objects in the StoreArray and the right colorizer for these objects.
        * @param storeArray The StoreArray containing the objects.

@@ -188,7 +188,6 @@ namespace Belle2 {
       }
 
     private:
-
       /** getter and setter for the cell flags */
       /// Getter for the additional cell flags to mark some status of the cell
       /** Give the sum of all cell flags, therefor providing a bit pattern. \n

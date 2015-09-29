@@ -32,8 +32,6 @@ namespace Belle2 {
     public:
       virtual CellWeight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) override final;
 
-    private:
-
     };
   }
 }

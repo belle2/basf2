@@ -52,7 +52,6 @@ namespace Belle2 {
       { return  m_mcSegmentsByMCParticleIdx;}
 
     private:
-
       /// Construct the tracks by grouping the hits by the mc particle id and sorted them for the FlightTime of the related CDCSimHits.
       void fillMCTracks();
 

@@ -379,7 +379,6 @@ namespace Belle2 {
       //{ if (wire == nullptr) output << "nullptr"; else output << *wire;  return output; }
 
     private:
-
       WireID m_wireID; ///< The wireID of the wire
 
       WireLine m_skewLine; ///< The line representation of the wire
@@ -390,9 +389,6 @@ namespace Belle2 {
       double m_backwardPhiToRef;///< Storage of the angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
       std::pair<double, double>
       m_phiRangeToRef; ///< Storage of the angle range to ref position in the xy projection (see getPhiRangeToRef() for details)
-
-    private:
-
 
     }; //class
 

@@ -12,6 +12,7 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/FourHitFilters/DeltaPt.h>
+#include <tracking/trackFindingVXD/FourHitFilters/DeltaCircleRadius.h>
 #include <tracking/trackFindingVXD/FourHitFilters/DeltaDistCircleCenter.h>
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
 
@@ -123,6 +124,10 @@ namespace VXDTFfourHitFilterTest {
     EXPECT_TRUE(filteDeltaPt.accept(outerSP, outerCenterSP, innerCenterSP, innerSP));
     EXPECT_FLOAT_EQ(0.00263349, lastResult);
 
+    Filter< DeltaCircleRadius<SpacePoint>, Range<double, double>, ResultsObserver > filteDeltaCircleRadius(Range<double, double>(-0.59,
+        -0.58));
+    EXPECT_TRUE(filteDeltaCircleRadius.accept(outerSP, outerCenterSP, innerCenterSP, innerSP));
+    EXPECT_FLOAT_EQ(-0.58578646, lastResult); // outerRad = 1.41..., innerRad = 2 -> outer - inner
   }
 
 }

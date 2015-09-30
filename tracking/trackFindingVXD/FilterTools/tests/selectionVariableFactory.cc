@@ -15,6 +15,8 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/vectorTools/B2Vector3.h>
 
+#include <tracking/vxdCaTracking/XHitFilterFactory.h>
+
 using namespace std;
 
 using namespace Belle2;
@@ -50,55 +52,6 @@ namespace SelFarFactoryTests {
   };
 
 
-  /** tests if raw-names are converted accordingly */
-  TEST_F(SelVarFactoryTest, TestNamesWithB2Vector3)
-  {
-    auto d3Ds = Distance3DSquared<Belle2::B2Vector3D>();
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__B2Vector3{double}}" , d3Ds.name());
-
-    auto aFactory = SelectionVariableFactory<Belle2::B2Vector3D>();
-    auto selVarName = aFactory.getFullVariableName("Distance3DSquared");
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__B2Vector3{double}}" , selVarName);
-
-    // full return type written down
-    std::unique_ptr<SelectionVariable<B2Vector3D, double> > newSelVariable = aFactory.getSelectionVariable("Distance3DSquared");
-    EXPECT_EQ(newSelVariable->name() , d3Ds.name());
-  }
-
-
-  /** tests if raw-names are converted accordingly */
-  TEST_F(SelVarFactoryTest, TestNamesWithDummyHit)
-  {
-    auto d3Ds = Distance3DSquared<DummyHit>();
-    auto aFactory = SelectionVariableFactory<DummyHit>();
-
-    EXPECT_EQ("Belle2__Distance3DSquared{SelFarFactoryTests__DummyHit}", d3Ds.name());
-    EXPECT_EQ(d3Ds.name() , aFactory.getFullVariableName("Distance3DSquared"));
-
-    // shortcut written down
-    auto dummyVariable = aFactory.getSelectionVariable("Distance3DSquared");
-    EXPECT_EQ(dummyVariable->name() , d3Ds.name());
-  }
-
-
-  /** tests if raw-names are converted accordingly */
-  TEST_F(SelVarFactoryTest, TestNamesWithSpacePoint)
-  {
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint}",
-              SelectionVariableFactory<SpacePoint>().getFullVariableName("Distance3DSquared"));
-
-    auto d3Ds = Distance3DSquared<SpacePoint>();
-    auto aFactory = SelectionVariableFactory<SpacePoint>();
-
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint}", d3Ds.name());
-    EXPECT_EQ(d3Ds.name() , aFactory.getFullVariableName("Distance3DSquared"));
-
-    // shortcut written down
-    auto dummyVariable = aFactory.getSelectionVariable("Distance3DSquared");
-    EXPECT_EQ(dummyVariable->name() , d3Ds.name());
-  }
-
-
   /** tests if I can get the correct results from a SelectionVariable I asked for */
   TEST_F(SelVarFactoryTest, TestFactory)
   {
@@ -107,31 +60,51 @@ namespace SelFarFactoryTests {
     auto hit2 = DummyHit(2, 2, 3);
     auto hit3 = DummyHit(2, 3, 4);
     auto hit4 = DummyHit(23, 42, 5);
+    auto hitIP = DummyHit(0, 0, 0);
     // some SelectionVariables:
     auto d3D = Distance3DSquared<DummyHit>();
+//  auto sRZ = SlopeRZ<DummyHit>();
     auto a3D = Angle3DSimple<DummyHit>();
-    auto dPT = DeltaPt<DummyHit>();
+//  auto pT = Pt<DummyHit>();
+    auto dcRad = DeltaCircleRadius<DummyHit>();
+    auto dDcc = DeltaDistCircleCenter<DummyHit>();
 
     auto aFactory = SelectionVariableFactory<DummyHit>();
 
-    // get my selectionVariables via factory:
-//  auto d3D_uptr = aFactory.getSelectionVariable("Distance3DSquared");
-//  auto a3D_uptr = aFactory.getSelectionVariable("Angle3DSimple");
-//  auto dPT_uptr = aFactory.getSelectionVariable("DeltaPt");
+//     EXPECT_DOUBLE_EQ(aFactory.getResult2Hit("Distance3DSquared", hit1, hit2) , d3D.value(hit1, hit2));
+//  EXPECT_DOUBLE_EQ(aFactory.getResult2Hit("SlopeRZ", hit1, hit2) , sRZ.value(hit1, hit2));
+//     EXPECT_DOUBLE_EQ(aFactory.getResult3Hit("Angle3DSimple", hit1, hit2, hit3), a3D.value(hit1, hit2, hit3));
+//  EXPECT_DOUBLE_EQ(aFactory.getResult3Hit("Pt", hit1, hit2, hit3), pT.value(hit1, hit2, hit3));
+//     EXPECT_DOUBLE_EQ(aFactory.getResult4Hit("DeltaPt", hit1, hit2, hit3, hit4), dPT.value(hit1, hit2, hit3, hit4));
+//  EXPECT_DOUBLE_EQ(aFactory.getResult4Hit("DeltaDistCircleCenter", hit1, hit2, hit3, hit4), dDcc.value(hit1, hit2, hit3, hit4));
 
-    // check identical name:
-//  EXPECT_EQ(d3D_uptr->name() , d3D.name());
-//  EXPECT_EQ(a3D_uptr->name() , a3D.name());
-//  EXPECT_EQ(dPT_uptr->name() , dPT.name());
+    // 2 hits:
+    auto dist3D = aFactory.get2HitInterface("Distance3DSquared");
+    EXPECT_DOUBLE_EQ(dist3D(hit1, hit2) , d3D.value(hit1, hit2));
+    auto a3DHiOc = aFactory.get2HitInterface("Angle3DSimpleHighOccupancy");
+    EXPECT_DOUBLE_EQ(a3DHiOc(hit1, hit2) , a3D.value(hit1, hit2, hitIP));
+    auto notExisting2 = aFactory.get2HitInterface("bla");
+    EXPECT_DOUBLE_EQ(notExisting2(hit1, hit2) , 0.0);
+    // 3 hits:
+    auto ang3D = aFactory.get3HitInterface("Angle3DSimple");
+    EXPECT_DOUBLE_EQ(ang3D(hit1, hit2, hit3) , a3D.value(hit1, hit2, hit3));
+    auto cRadHiOc = aFactory.get3HitInterface("DeltaCircleRadiusHighOccupancy");
+    EXPECT_DOUBLE_EQ(cRadHiOc(hit1, hit2, hit3) , dcRad.value(hit1, hit2, hit3, hitIP));
+    auto notExisting3 = aFactory.get3HitInterface("bla");
+    EXPECT_DOUBLE_EQ(notExisting3(hit1, hit2, hit3) , 0.0);
+    // 4 hits:
+    auto ddcc = aFactory.get4HitInterface("DeltaDistCircleCenter");
+    EXPECT_DOUBLE_EQ(ddcc(hit1, hit2, hit3, hit4) , dDcc.value(hit1, hit2, hit3, hit4));
+    auto notExisting4 = aFactory.get4HitInterface("bla");
+    EXPECT_DOUBLE_EQ(notExisting4(hit1, hit2, hit3, hit4) , 0.0);
 
-    // check identical results:
-//  EXPECT_DOUBLE_EQ(d3D_uptr->value(hit1, hit2) , d3D.value(hit1, hit2));
-//  EXPECT_DOUBLE_EQ(a3D_uptr->value(hit1, hit2, hit3), a3D.value(hit1, hit2, hit3));
-//  EXPECT_DOUBLE_EQ(dPT_uptr->value(hit1, hit2, hit3, hit4), dPT.value(hit1, hit2, hit3, hit4));
 
-    EXPECT_DOUBLE_EQ(aFactory.getResult2Hit("Distance3DSquared", hit1, hit2) , d3D.value(hit1, hit2));
-    EXPECT_DOUBLE_EQ(aFactory.getResult3Hit("Angle3DSimple", hit1, hit2, hit3), a3D.value(hit1, hit2, hit3));
-    EXPECT_DOUBLE_EQ(aFactory.getResult4Hit("DeltaPt", hit1, hit2, hit3, hit4), dPT.value(hit1, hit2, hit3, hit4));
+
+    auto oldFilterFactory = XHitFilterFactory<DummyHit>();
+    auto dist3Dold = oldFilterFactory.get2HitInterface("distance3D");
+    auto distXYold = oldFilterFactory.get2HitInterface("distanceXY");
+    EXPECT_NE(dist3Dold(hit1, hit2) , distXYold(hit1, hit2));
+
   }
 
 }

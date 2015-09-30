@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <tracking/dataobjects/FullSecID.h>
+
 #include <tracking/vectorTools/B2Vector3.h>
 
 #include <string>
@@ -22,10 +24,15 @@ namespace Belle2 {
   /** simple Hit class used for sectorMap-training. */
   class SecMapTrainerHit {
   public:
-    /** Constructor of class SecMapTrainerHit*/
+    /** Constructor of class SecMapTrainerHit. */
     SecMapTrainerHit(const std::string& fullSecID, const B2Vector3D& hit):
       m_secID(fullSecID),
       m_hitPos(hit) {}
+
+    /** constructor for cases where simply a Hit is needed. */
+    SecMapTrainerHit(double x, double y, double z) :
+      m_secID(FullSecID().getFullSecString()),
+      m_hitPos(B2Vector3D(x, y, z)) {}
 
     /** returns global hit position of current hit. */
     B2Vector3D getHitPosition() const { return m_hitPos; }

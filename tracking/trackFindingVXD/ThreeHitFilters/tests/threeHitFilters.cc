@@ -23,6 +23,7 @@
 #include <tracking/trackFindingVXD/ThreeHitFilters/DeltaSoverZ.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/HelixParameterFit.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/Pt.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/CircleRadius.h>
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/FilterTools/Shortcuts.h>
@@ -285,9 +286,9 @@ namespace VXDTFthreeHitFilterTest {
     SpacePoint centerSP2 = provideSpacePointDummy(3., 3., 0.);
     SpacePoint innerSP2 = provideSpacePointDummy(1., 1., 0.);
 
-    double ptTrue = 0;
-
-    ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
+    double ptTrue = 0,
+           rawRadius = 1.414213562373095048801688724209698078570;
+    ptTrue = Helper::calcPt(rawRadius);
     Filter< Pt<SpacePoint>, Range<double, double>, ResultsObserver > filterPt(Range<double, double>(0.005, 0.05));
     EXPECT_TRUE(filterPt.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(ptTrue, lastResult);
@@ -301,7 +302,7 @@ namespace VXDTFthreeHitFilterTest {
 
     Helper::resetMagneticField(0.976);
     double ptTrue1p5 = ptTrue;
-    ptTrue = Helper::calcPt(1.414213562373095048801688724209698078570);
+    ptTrue = Helper::calcPt(rawRadius);
     EXPECT_FALSE(filterPt.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(ptTrue, lastResult);
     EXPECT_LT(ptTrue, ptTrue1p5);
@@ -310,6 +311,24 @@ namespace VXDTFthreeHitFilterTest {
   }
 
 
+  /** test calculation of circle radius */
+  TEST_F(ThreeHitFilterTest, TestCircleRadius)
+  {
+    SpacePoint outerSP = provideSpacePointDummy(3., 4., 3.);
+    SpacePoint centerSP = provideSpacePointDummy(3., 2., 1.);
+    SpacePoint innerSP = provideSpacePointDummy(1., 2., 0.);
+
+    double rawRadius = 1.414213562373095048801688724209698078570;
+    Filter< CircleRadius<SpacePoint>, Range<double, double>, ResultsObserver > filterCrad(Range<double, double>(1.4, 1.42));
+    EXPECT_TRUE(filterCrad.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(rawRadius, lastResult);
+
+    //B2WARNING("MUST produce errors: 2 hits are the same:");
+    EXPECT_ANY_THROW(filterCrad.accept(outerSP, outerSP, innerSP));
+
+//  EXPECT_FALSE(filterCrad.accept(outerSP, centerSP, innerSP));
+    EXPECT_FLOAT_EQ(rawRadius, lastResult); // after fail result is not changed
+  }
 
   /** Test CircleDist2IP. */
   TEST_F(ThreeHitFilterTest, TestCircleDist2IP)

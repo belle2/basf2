@@ -10,6 +10,9 @@
 
 #pragma once
 
+
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableType.h>
+
 // 2-hit:
 #include <tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h>
 #include <tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h>
@@ -30,319 +33,353 @@
 #include <tracking/trackFindingVXD/ThreeHitFilters/DeltaSoverZ.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/HelixParameterFit.h>
 #include <tracking/trackFindingVXD/ThreeHitFilters/Pt.h>
+#include <tracking/trackFindingVXD/ThreeHitFilters/CircleRadius.h>
 // 4-hit:
 #include <tracking/trackFindingVXD/FourHitFilters/DeltaPt.h>
 #include <tracking/trackFindingVXD/FourHitFilters/DeltaDistCircleCenter.h>
+#include <tracking/trackFindingVXD/FourHitFilters/DeltaCircleRadius.h>
 
 #include <framework/logging/Logger.h>
 
 #include <typeinfo>
-#include <boost/regex.hpp>
 #include <cxxabi.h>
 
 #include <memory>       // std::unique_ptr
-#include <utility>      // std::move
-#include <string>       // std::string
+#include <utility>      // std::move, std::replace
+#include <string>
+#include <unordered_map>
 
-
+#include <functional>
 
 namespace Belle2 {
 
-  /** The factory serves as an interface between all selectionVariables and a user only knowing their name (in string), but not their type */
+  /** The factory serves as an interface between all selectionVariables and a user only knowing their name (in string), but not their type. */
   template<class PointType>
   class SelectionVariableFactory {
   public:
-    /** creates the full typeName using the easy-to-read-one as an input */
-    std::string getFullVariableName(std::string variableName)
+    /** constructor where virtual IP has been passed */
+    SelectionVariableFactory(double x = 0, double y = 0, double z = 0) :
+      m_virtualIP(PointType(x, y, z)) {}
+
+
+    /** shortCut for better readability. */
+    typedef SelectionVariableType::Type SelVarType;
+
+    /** typedef for more readable function-type - to be used for 2-hit-selectionVariables. */
+    using TwoHitFunction = typename std::function<double(const PointType&, const PointType&)>;
+
+    /** typedef for more readable function-type - to be used for 3-hit-selectionVariables. */
+    using ThreeHitFunction = typename std::function<double(const PointType&, const PointType&, const PointType&)>;
+
+    /** typedef for more readable function-type - to be used for 4-hit-selectionVariables. */
+    using FourHitFunction = typename std::function<double(const PointType&, const PointType&, const PointType&, const PointType&)>;
+
+
+
+    /** For given name of a variableType a function for the corresponding SelectionVariable is returned. */
+    TwoHitFunction get2HitInterface(std::string variableName)
     {
-      char* realname(nullptr);
-      int status(0);
-      auto typeName = typeid(PointType).name();
-      realname = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
-      std::string name(realname);
-      free(realname);
-      // some formatting because of root:
-      boost::regex colon("(:)");
-      auto name1 = boost::regex_replace(name, colon, std::string("_"));
-      boost::regex lesser("(<)");
-      auto name2 = boost::regex_replace(name1, lesser, std::string("{"));
-      boost::regex greater("(>)");
-      auto name3 = boost::regex_replace(name2, greater, std::string("}"));
-
-      return "Belle2__" + variableName + "{" + name3 + "}";
-    }
-
-
-    /** WARNING does currently not work, since the value-functions of the base class are not virtual! */
-    std::unique_ptr<SelectionVariable<PointType, double>> getSelectionVariable(std::string variableName)
-    {
-      /// 2-hit:
-      if (getFullVariableName(variableName) == Distance3DSquared<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Distance3DSquared<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Distance2DXYSquared<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Distance2DXYSquared<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Distance1DZ<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Distance1DZ<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Distance1DZTemplate<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Distance1DZTemplate<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == SlopeRZ<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new SlopeRZ<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Distance3DNormed<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Distance3DNormed<PointType>())
-               );
-      }
-
-
-      /// 3-hit:
-      if (getFullVariableName(variableName) == Angle3DSimple<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Angle3DSimple<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Angle3DFull<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Angle3DFull<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == AngleXYSimple<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new AngleXYSimple<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == AngleXYFull<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new AngleXYFull<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == AngleRZSimple<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new AngleRZSimple<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == AngleRZFull<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new AngleRZFull<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == CircleDist2IP<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new CircleDist2IP<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == DeltaSlopeRZ<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new DeltaSlopeRZ<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == DeltaSlopeZoverS<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new DeltaSlopeZoverS<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == DeltaSoverZ<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new DeltaSoverZ<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == HelixParameterFit<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new HelixParameterFit<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == Pt<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new Pt<PointType>())
-               );
-      }
-
-
-      /// 4-hit:
-      if (getFullVariableName(variableName) == DeltaPt<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new DeltaPt<PointType>())
-               );
-      }
-
-      if (getFullVariableName(variableName) == DeltaDistCircleCenter<PointType>().name()) {
-        return std::move(
-                 std::unique_ptr<SelectionVariable<PointType, double> >
-                 (new DeltaDistCircleCenter<PointType>())
-               );
-      }
-
-      B2ERROR(" SelectionVariableFactory: given name (raw/full): " << variableName <<
-              "/" << getFullVariableName(variableName) <<
-              " is not known, returning non-functioning base-class instead!")
-
-      return std::move(
-               std::unique_ptr<SelectionVariable<PointType, double> >
-               (new SelectionVariable<PointType, double>())
-             );
+      SelVarType varType = SelectionVariableType::getTypeEnum(variableName);
+      return get2HitInterface(varType);
     }
 
 
 
-    /** for given SelectionVariable-name and pair of hits, result is calculated if SelectionVariable exists */
-    double getResult2Hit(
-      std::string variableName,
-      const PointType& outerHit,
-      const PointType& innerHit)
+    /** For given variableType a function for the corresponding SelectionVariable is returned. */
+    TwoHitFunction get2HitInterface(SelVarType variableType)
     {
-      /// 2-hit:
-      if (getFullVariableName(variableName) == Distance3DSquared<PointType>().name())
-      { return Distance3DSquared<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::Distance3DSquared) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Distance3DSquared<PointType>::value(outerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == Distance2DXYSquared<PointType>().name())
-      { return Distance2DXYSquared<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::Distance2DXYSquared) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Distance2DXYSquared<PointType>::value(outerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == Distance1DZ<PointType>().name())
-      { return Distance1DZ<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::Distance1DZ) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Distance1DZ<PointType>::value(outerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == Distance1DZTemplate<PointType>().name())
-      { return Distance1DZTemplate<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::Distance1DZTemplate) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Distance1DZTemplate<PointType>::value(outerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == SlopeRZ<PointType>().name())
-      { return SlopeRZ<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::SlopeRZ) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return SlopeRZ<PointType>::value(outerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == Distance3DNormed<PointType>().name())
-      { return Distance3DNormed<PointType>::value(outerHit, innerHit); }
+      if (variableType == SelectionVariableType::Distance3DNormed) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Distance3DNormed<PointType>::value(outerHit, innerHit); };
+      }
 
-      B2ERROR(" SelectionVariableFactory-2Hit: given name (raw/full): " << variableName <<
-              "/" << getFullVariableName(variableName) <<
-              " is not known, returning '0' as a result instead!")
+      // 2+1 hits:
 
-      return 0.0;
+      if (variableType == SelectionVariableType::Angle3DSimpleHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Angle3DSimple<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::Angle3DFullHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Angle3DFull<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::AngleXYSimpleHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return AngleXYSimple<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::AngleXYFullHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return AngleXYFull<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::AngleRZSimpleHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return AngleRZSimple<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::AngleRZFullHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return AngleRZFull<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::CircleDist2IPHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return CircleDist2IP<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSlopeRZHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return DeltaSlopeRZ<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSlopeZoverSHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return DeltaSlopeZoverS<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSoverZHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return DeltaSoverZ<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::HelixParameterFitHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return HelixParameterFit<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::PtHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return Pt<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::CircleRadiusHighOccupancy) {
+        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
+        { return CircleRadius<PointType>::value(outerHit, innerHit, m_virtualIP); };
+      }
+
+
+      B2ERROR(" SelectionVariableFactory-2Hit: given name (raw/full): " << variableType <<
+              "/" << SelectionVariableType::getTypeName(variableType) <<
+              " is not known, returning dummy function with 0.0 as return value!")
+
+      return [&](const PointType&, const PointType&) -> double { return 0.0; };
     }
 
 
 
-    /** for given SelectionVariable-name and triplet of hits, result is calculated if SelectionVariable exists */
-    double getResult3Hit(
-      std::string variableName,
-      const PointType& outerHit,
-      const PointType& centerHit,
-      const PointType& innerHit)
+
+    /** For given name of a variableType a function for the corresponding SelectionVariable is returned. */
+    ThreeHitFunction get3HitInterface(std::string variableName)
     {
-
-      /// 3-hit:
-      if (getFullVariableName(variableName) == Angle3DSimple<PointType>().name())
-      { return Angle3DSimple<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == Angle3DFull<PointType>().name())
-      { return Angle3DFull<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == AngleXYSimple<PointType>().name())
-      { return AngleXYSimple<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == AngleXYFull<PointType>().name())
-      { return AngleXYFull<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == AngleRZSimple<PointType>().name())
-      { return AngleRZSimple<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == AngleRZFull<PointType>().name())
-      { return AngleRZFull<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == CircleDist2IP<PointType>().name())
-      { return CircleDist2IP<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == DeltaSlopeRZ<PointType>().name())
-      { return DeltaSlopeRZ<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == DeltaSlopeZoverS<PointType>().name())
-      { return DeltaSlopeZoverS<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == DeltaSoverZ<PointType>().name())
-      { return DeltaSoverZ<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == HelixParameterFit<PointType>().name())
-      { return HelixParameterFit<PointType>::value(outerHit, centerHit, innerHit); }
-
-      if (getFullVariableName(variableName) == Pt<PointType>().name())
-      { return Pt<PointType>::value(outerHit, centerHit, innerHit); }
-
-      B2ERROR(" SelectionVariableFactory-3Hit: given name (raw/full): " << variableName <<
-              "/" << getFullVariableName(variableName) <<
-              " is not known, returning '0' as a result instead!")
-
-      return 0.0;
+      SelVarType varType = SelectionVariableType::getTypeEnum(variableName);
+      return get3HitInterface(varType);
     }
 
 
 
-    /** for given SelectionVariable-name and quadruplet of hits, result is calculated if SelectionVariable exists */
-    double getResult4Hit(
-      std::string variableName,
-      const PointType& outerHit,
-      const PointType& outerCenterHit,
-      const PointType& innerCenterHit,
-      const PointType& innerHit)
+    /** For given variableType a function for the corresponding SelectionVariable is returned. */
+    ThreeHitFunction get3HitInterface(SelVarType variableType)
     {
+      if (variableType == SelectionVariableType::Angle3DSimple) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return Angle3DSimple<PointType>::value(outerHit, centerHit, innerHit); };
+      }
 
-      /// 4-hit:
-      if (getFullVariableName(variableName) == DeltaPt<PointType>().name())
-      { return DeltaPt<PointType>::value(outerHit, outerCenterHit, innerCenterHit, innerHit); }
+      if (variableType == SelectionVariableType::Angle3DFull) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return Angle3DFull<PointType>::value(outerHit, centerHit, innerHit); };
+      }
 
-      if (getFullVariableName(variableName) == DeltaDistCircleCenter<PointType>().name())
-      { return DeltaDistCircleCenter<PointType>::value(outerHit, outerCenterHit, innerCenterHit, innerHit); }
+      if (variableType == SelectionVariableType::AngleXYSimple) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return AngleXYSimple<PointType>::value(outerHit, centerHit, innerHit); };
+      }
 
-      B2ERROR(" SelectionVariableFactory-4Hit: given name (raw/full): " << variableName <<
-              "/" << getFullVariableName(variableName) <<
-              " is not known, returning '0' as a result instead!")
+      if (variableType == SelectionVariableType::AngleXYFull) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return AngleXYFull<PointType>::value(outerHit, centerHit, innerHit); };
+      }
 
-      return 0.0;
+      if (variableType == SelectionVariableType::AngleRZSimple) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return AngleRZSimple<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::AngleRZFull) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return AngleRZFull<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::CircleDist2IP) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return CircleDist2IP<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSlopeRZ) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaSlopeRZ<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSlopeZoverS) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaSlopeZoverS<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaSoverZ) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaSoverZ<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::HelixParameterFit) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return HelixParameterFit<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::Pt) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return Pt<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::CircleRadius) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return CircleRadius<PointType>::value(outerHit, centerHit, innerHit); };
+      }
+
+
+      // 3+1 hits:
+
+      if (variableType == SelectionVariableType::DeltaPtHighOccupancy) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaPt<PointType>::value(outerHit, centerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaDistCircleCenterHighOccupancy) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaDistCircleCenter<PointType>::value(outerHit, centerHit, innerHit, m_virtualIP); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaCircleRadiusHighOccupancy) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & centerHit,
+                     const PointType & innerHit) -> double
+        { return DeltaCircleRadius<PointType>::value(outerHit, centerHit, innerHit, m_virtualIP); };
+      }
+      B2ERROR(" SelectionVariableFactory-3Hit: given name (raw/full): " << variableType <<
+              "/" << SelectionVariableType::getTypeName(variableType) <<
+              " is not known, returning dummy function with 0.0 as return value!")
+
+      return [&](const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
     }
+
+
+
+    /** For given name of a variableType a function for the corresponding SelectionVariable is returned. */
+    FourHitFunction get4HitInterface(std::string variableName)
+    {
+      SelVarType varType = SelectionVariableType::getTypeEnum(variableName);
+      return get4HitInterface(varType);
+    }
+
+
+
+    /** For given variableType a function for the corresponding SelectionVariable is returned. */
+    FourHitFunction get4HitInterface(SelVarType variableType)
+    {
+      if (variableType == SelectionVariableType::DeltaPt) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & outerCenterHit,
+                     const PointType & innerCenterHit,
+                     const PointType & innerHit) -> double
+        { return DeltaPt<PointType>::value(outerHit, outerCenterHit, innerCenterHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaDistCircleCenter) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & outerCenterHit,
+                     const PointType & innerCenterHit,
+                     const PointType & innerHit) -> double
+        { return DeltaDistCircleCenter<PointType>::value(outerHit, outerCenterHit, innerCenterHit, innerHit); };
+      }
+
+      if (variableType == SelectionVariableType::DeltaCircleRadius) {
+        return [ & ](const PointType & outerHit,
+                     const PointType & outerCenterHit,
+                     const PointType & innerCenterHit,
+                     const PointType & innerHit) -> double
+        { return DeltaCircleRadius<PointType>::value(outerHit, outerCenterHit, innerCenterHit, innerHit); };
+      }
+
+
+      B2ERROR(" SelectionVariableFactory-4Hit: given name (raw/full): " << variableType <<
+              "/" << SelectionVariableType::getTypeName(variableType) <<
+              " is not known, returning dummy function with 0.0 as return value!")
+
+      return [&](const PointType&, const PointType&, const PointType&, const PointType&) -> double { return 0.0; };
+    }
+
+
+  protected:
+
+    /** stores the virtual interaction point for the HiOC-filters. */
+    PointType m_virtualIP;
   };
-
 }
+

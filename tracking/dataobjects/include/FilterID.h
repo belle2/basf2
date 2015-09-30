@@ -207,9 +207,11 @@ namespace Belle2 {
 
 
 
-    const static boost::array<std::string, numFilters> nameVector; /**< array storing all the strings where the enums can be used to access their position */
+    const static boost::array<std::string, numFilters>
+    nameVector; /**< array storing all the strings where the enums can be used to access their position */
 
-    const static boost::array<FilterID::filterTypes, FilterID::numFilters> enumVector; /**< array storing all the enums where ints can be used to access their position (this is needed since enums can be converted to int but not otherwise)*/
+    const static boost::array<FilterID::filterTypes, FilterID::numFilters>
+    enumVector; /**< array storing all the enums where ints can be used to access their position (this is needed since enums can be converted to int but not otherwise)*/
 
     /** Constructor. */
     FilterID() {}
@@ -229,6 +231,11 @@ namespace Belle2 {
     /** converts int value into suitable string with name of filter type (if int value is equal to values of enum). */
     static std::string getFilterString(int filterType);
 
+    /** returns name of given type, needed for compatibility with other modules */
+    static std::string getTypeName(filterTypes filterType) { return getFilterString(filterType); }
+
+    /** returns type of given name, needed for compatibility with other modules. */
+    static filterTypes getTypeEnum(std::string filterString) {return getFilterType(filterString); }
   protected:
   }; //end class FilterID
 } //end namespace Belle2

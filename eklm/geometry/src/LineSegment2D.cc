@@ -28,34 +28,29 @@ int EKLM::LineSegment2D::
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2]) const
 {
-  int n;
-  double t[2];
-  n = Line2D::findIntersection(circle, intersections, t);
-  if (n == 2) {
-    if (tWithinSegment(t[0])) {
-      if (tWithinSegment(t[1]))
-        return 2;
-      else
-        return 1;
-    } else {
-      if (tWithinSegment(t[1])) {
-        intersections[0] = intersections[1];
-        t[0] = t[1];
-        return 1;
-      } else
-        return 0;
-    }
-  }
-  if (n == 1) {
-    if (tWithinSegment(t[0]))
-      return 1;
-    else
-      return 0;
-  }
-  return 0;
+  int i, n;
+  double t[2], angles[2];
+  bool condition[2];
+  n = Line2D::findIntersection(circle, intersections, t, angles);
+  for (i = 0; i < n; i++)
+    condition[i] = tWithinRange(t[i]);
+  return selectIntersections(intersections, condition, n);
 }
 
-bool EKLM::LineSegment2D::tWithinSegment(double t) const
+int EKLM::LineSegment2D::
+findIntersection(const Arc2D& arc,
+                 HepGeom::Point3D<double> intersections[2]) const
+{
+  int i, n;
+  double t[2], angles[2];
+  bool condition[2];
+  n = Line2D::findIntersection(arc, intersections, t, angles);
+  for (i = 0; i < n; i++)
+    condition[i] = tWithinRange(t[i]) && arc.angleWithinRange(angles[i]);
+  return selectIntersections(intersections, condition, n);
+}
+
+bool EKLM::LineSegment2D::tWithinRange(double t) const
 {
   return (t >= 0 && t <= 1);
 }

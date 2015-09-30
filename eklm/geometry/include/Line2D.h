@@ -17,6 +17,7 @@
 
 /* belle2 headers. */
 #include <eklm/geometry/Circle2D.h>
+#include <eklm/geometry/Arc2D.h>
 
 namespace Belle2 {
 
@@ -52,6 +53,15 @@ namespace Belle2 {
       int findIntersection(const Circle2D& circle,
                            HepGeom::Point3D<double> intersections[2]) const;
 
+      /**
+       * Find intersections with an arc.
+       * @param[in]  arc          Arc.
+       * @param[out] intersection Intersections.
+       * @return Number of intersections (0, 1 or 2).
+       */
+      int findIntersection(const Arc2D& arc,
+                           HepGeom::Point3D<double> intersections[2]) const;
+
     protected:
 
       /**
@@ -59,11 +69,22 @@ namespace Belle2 {
        * @param[in]  circle        Circle.
        * @param[out] intersections Intersections.
        * @param[out] t             Values of t for intersection points.
+       * @param[out] angles        Values of angles for intersection points.
        * @return Number of intersections (0, 1 or 2).
        */
       int findIntersection(const Circle2D& circle,
                            HepGeom::Point3D<double> intersections[2],
-                           double t[2]) const;
+                           double t[2], double angles[2]) const;
+
+      /**
+       * Select intersections.
+       * @param[in,out] intersections Intersections.
+       * @param[in]     condition     Selection condition.
+       * @param[in]     n             Number of intersections.
+       * @return Number of selected intersections.
+       */
+      int selectIntersections(HepGeom::Point3D<double>* intersections,
+                              bool* condition, int n) const;
 
       /** Initial point. */
       HepGeom::Point3D<double> m_Point;

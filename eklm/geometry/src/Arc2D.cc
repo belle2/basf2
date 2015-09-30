@@ -24,3 +24,10 @@ EKLM::Arc2D::~Arc2D()
 {
 }
 
+bool EKLM::Arc2D::angleWithinRange(double angle) const
+{
+  if (m_Angle2 > m_Angle1)
+    return (angle <= m_Angle2 && angle >= m_Angle1);
+  return (angle >= m_Angle1 || angle <= m_Angle2);
+}
+

@@ -32,6 +32,8 @@ namespace Belle2 {
        * @param[in] radius Radius.
        * @param[in] angle1 Angle 1.
        * @param[in] angle2 Angle 2.
+       *
+       * Values of angles must be from -M_PI to M_PI (as returned by atan2()).
        */
       Arc2D(double x, double y, double radius, double angle1, double angle2);
 
@@ -39,6 +41,12 @@ namespace Belle2 {
        * Destructor.
        */
       ~Arc2D();
+
+      /**
+       * Check if angle is within the arc.
+       * @param[in] angle Angle from -M_PI to M_PI.
+       */
+      bool angleWithinRange(double angle) const;
 
     private:
 

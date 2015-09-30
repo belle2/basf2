@@ -32,8 +32,21 @@ int EKLM::Line2D::
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2]) const
 {
-  double t[2];
-  return findIntersection(circle, intersections, t);
+  double t[2], angles[2];
+  return findIntersection(circle, intersections, t, angles);
+}
+
+int EKLM::Line2D::
+findIntersection(const Arc2D& arc,
+                 HepGeom::Point3D<double> intersections[2]) const
+{
+  int i, n;
+  double t[2], angles[2];
+  bool condition[2];
+  n = findIntersection(arc, intersections, t, angles);
+  for (i = 0; i < n; i++)
+    condition[i] = arc.angleWithinRange(angles[i]);
+  return selectIntersections(intersections, condition, n);
 }
 
 /*
@@ -44,7 +57,7 @@ findIntersection(const Circle2D& circle,
 int EKLM::Line2D::
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2],
-                 double t[2]) const
+                 double t[2], double angles[2]) const
 {
   int i;
   double a, b, c, d, x0, y0;
@@ -62,6 +75,8 @@ findIntersection(const Circle2D& circle,
     intersections[0].setX(m_Point.x() + m_Vector.x() * t[0]);
     intersections[0].setY(m_Point.y() + m_Vector.y() * t[1]);
     intersections[0].setZ(0);
+    angles[0] = atan2(intersections[0].y() - circleCenter.y(),
+                      intersections[0].x() - circleCenter.x());
     return 1;
   }
   t[0] = (-b - sqrt(d)) / (2.0 * a);
@@ -70,7 +85,24 @@ findIntersection(const Circle2D& circle,
     intersections[i].setX(m_Point.x() + m_Vector.x() * t[i]);
     intersections[i].setY(m_Point.y() + m_Vector.y() * t[i]);
     intersections[i].setZ(0);
+    angles[i] = atan2(intersections[i].y() - circleCenter.y(),
+                      intersections[i].x() - circleCenter.x());
   }
   return 2;
+}
+
+int EKLM::Line2D::selectIntersections(HepGeom::Point3D<double>* intersections,
+                                      bool* condition, int n) const
+{
+  int i, j;
+  j = 0;
+  for (i = 0; i < n; i++) {
+    if (condition[i]) {
+      if (i != j)
+        intersections[j] = intersections[i];
+      j++;
+    }
+  }
+  return j;
 }
 

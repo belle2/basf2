@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
+#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 
@@ -131,37 +132,57 @@ void CDCMCTrackStore::fillMCSegments()
 
     if (mcTrack.empty()) continue;
 
+    std::vector<WithAutomatonCell<const CDCHit*> > hitsWithCells;
+    hitsWithCells.insert(hitsWithCells.end(), mcTrack.begin(), mcTrack.end());
+
     //Safest way is to cluster the elements in the track for their nearest neighbors
-    WeightedNeighborhood<const CDCHit> hitNeighborhood;
+    WeightedNeighborhood<const WithAutomatonCell<const CDCHit*> > hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (const CDCHit* ptrHit : mcTrack) {
-
+    for (WithAutomatonCell<const CDCHit*>& hitWithCell : hitsWithCells) {
+      const CDCHit* ptrHit = hitWithCell;
       const CDCHit& hit = *ptrHit;
-      WireID wireID(hit.getISuperLayer(), hit.getILayer(), hit.getIWire());
 
-      for (const CDCHit* ptrNeighborHit : mcTrack) {
+      WireID wireID(hit.getISuperLayer(),
+                    hit.getILayer(),
+                    hit.getIWire());
 
+      for (WithAutomatonCell<const CDCHit*>& neighborHitWithCell : hitsWithCells) {
+
+        const CDCHit* ptrNeighborHit = neighborHitWithCell;
         if (ptrHit == ptrNeighborHit) continue;
 
         const CDCHit& neighborHit = *ptrNeighborHit;
-        WireID neighborWireID(neighborHit.getISuperLayer(), neighborHit.getILayer(), neighborHit.getIWire());
+        WireID neighborWireID(neighborHit.getISuperLayer(),
+                              neighborHit.getILayer(),
+                              neighborHit.getIWire());
 
         if (wireTopology.areNeighbors(wireID, neighborWireID) or wireID == neighborWireID) {
-          hitNeighborhood.insert(ptrHit, ptrNeighborHit);
+          const WithAutomatonCell<const CDCHit* >* ptrHitWithCell = &hitWithCell;
+          const WithAutomatonCell<const CDCHit* >* ptrNeighborHitWithCell = &neighborHitWithCell;
+          hitNeighborhood.insert(ptrHitWithCell, ptrNeighborHitWithCell);
         }
 
       }
 
     }
 
-    Clusterizer<CDCHit, CDCHitVector> hitClusterizer;
-    hitClusterizer.createFromPointers(mcTrack, hitNeighborhood, mcSegments);
+    typedef std::vector<const WithAutomatonCell<const CDCHit*>* > CDCHitCluster;
+    Clusterizer<WithAutomatonCell<const CDCHit*>, CDCHitCluster> hitClusterizer;
+    std::vector<CDCHitCluster> hitClusters;
+    hitClusterizer.create(hitsWithCells, hitNeighborhood, hitClusters);
     // mcSegments are not sorted for their time of flight internally, but they are in the right order
 
     // Lets sort them along for the time of flight.
-    for (CDCHitVector& mcSegment : mcSegments) {
+    for (CDCHitCluster& hitCluster : hitClusters) {
+      CDCHitVector mcSegment;
+      mcSegment.reserve(hitCluster.size());
+      for (const WithAutomatonCell<const CDCHit*>* hitWithCell : hitCluster) {
+        const CDCHit* hit = *hitWithCell;
+        mcSegment.push_back(hit);
+      }
       arrangeMCTrack(mcSegment);
+      mcSegments.push_back(std::move(mcSegment));
     }
   }
 

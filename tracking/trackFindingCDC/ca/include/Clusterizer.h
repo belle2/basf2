@@ -59,7 +59,6 @@ namespace Belle2 {
         clusters.reserve(30);
 
         //Prepare states
-        m_cellStates.clear();
         for (AItem const& item : items) {
           setCellState(item, -1);
         }
@@ -93,7 +92,6 @@ namespace Belle2 {
         clusters.reserve(30);
 
         //Prepare states
-        m_cellStates.clear();
         for (AItem const* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
@@ -125,63 +123,26 @@ namespace Belle2 {
         }
       }
 
-
       /// Setter for the cell state if the AItem inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
-      template<class AConvertableToAutomaton>
-      typename boost::enable_if <
-      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
-            void >::type
-            setCellState(const AConvertableToAutomaton& item, const CellState& cellState) const
+      void setCellState(const AItem& item, CellState cellState) const
       {
-        const AutomatonCell& automatonCell = item;
+        const AutomatonCell& automatonCell = item.getAutomatonCell();
         automatonCell.setCellState(cellState);
       }
 
       /// Getter for the cell state if the AItem inherits from Automaton cell - use the cell state internal to the AutomtonCell.
-      template<class AConvertableToAutomaton>
-      typename boost::enable_if <
-      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
-            CellState >::type
-            getCellState(const AConvertableToAutomaton& item) const
+      CellState getCellState(const AItem& item) const
       {
-        const AutomatonCell& automatonCell = item;
+        const AutomatonCell& automatonCell = item.getAutomatonCell();
         return automatonCell.getCellState();
       }
 
-      /// Setter for the cell state if the AItem does not inherit from AutomatonCell.
-      template<class ANotConvertableToAutomaton>
-      typename boost::disable_if <
-      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
-            void >::type
-            setCellState(const ANotConvertableToAutomaton& item, const CellState& cellState) const
-      { m_cellStates[&item] = cellState; }
-
-      /// Getter for the cell state if the AItem does not inherit from AutomatonCell.
-      template<class ANotConvertableToAutomaton>
-      typename boost::disable_if <
-      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
-            CellState >::type
-            getCellState(const ANotConvertableToAutomaton& item) const
-      { return m_cellStates[&item]; }
-
-      /// Setter for the cell weight if the AItem inherits from AutomatonCell - use the cell weight internal to the AutomtonCell.
-      template<class AConvertableToAutomaton>
-      typename boost::enable_if <
-      boost::is_convertible<AConvertableToAutomaton, const AutomatonCell& >,
-            void >::type
-            setCellWeight(const AConvertableToAutomaton& item, const CellWeight& cellWeight) const
+      // Set the cell weight - use the cell weight internal to the AutomtonCell.
+      void setCellWeight(const AItem& item, CellWeight cellWeight) const
       {
-        const AutomatonCell& automatonCell = item;
+        const AutomatonCell& automatonCell = item.getAutomatonCell();
         automatonCell.setCellWeight(cellWeight);
       }
-
-      /// Setter for the cell weight representing the number of neighbor, if the AItem does not inherit from AutomatonCell.
-      template<class ANotConvertableToAutomaton>
-      typename boost::disable_if <
-      boost::is_convertible<ANotConvertableToAutomaton, const AutomatonCell& >,
-            void >::type
-            setCellWeight(const ANotConvertableToAutomaton& item, const CellWeight& cellWeight) const
-      { m_cellWeights[&item] = cellWeight; }
 
 
     private:
@@ -191,7 +152,6 @@ namespace Belle2 {
                                int iCluster,
                                const AItem& seedItem) const
       {
-
         //ACluster uses pointers as items instead of objects
         const AItem* ptrSeedItem = &seedItem;
 
@@ -207,12 +167,12 @@ namespace Belle2 {
 
         itemsToCheckNext.push_back(ptrSeedItem);
 
-        while (! itemsToCheckNext.empty()) {
+        while (not itemsToCheckNext.empty()) {
 
           itemsToCheckNow.swap(itemsToCheckNext);
           itemsToCheckNext.clear();
           // Check registered items for neighbors
-          BOOST_FOREACH(const AItem *  clusterItem, itemsToCheckNow) {
+          for (AItem const* clusterItem : itemsToCheckNow) {
             size_t nNeighbors = 0;
 
             // Consider each neighbor
@@ -245,13 +205,6 @@ namespace Belle2 {
         } // end while  !itemsToCheckNext.empty()
 
       } // end  startCluster(...)
-
-    private:
-      mutable std::map<const AItem*, CellState>
-      m_cellStates; ///< Memory for the cell state, if the AItem does not inherit from AutomatonCell.
-
-      mutable std::map<const AItem*, CellWeight>
-      m_cellWeights; ///< Memory for the cell weight, if the AItem does not inherit from AutomatonCell.
 
     }; // end class Clusterizer
 

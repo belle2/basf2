@@ -174,6 +174,7 @@ def draw_hit_counts(data_tree, pt_values):
 
         hists[det].GetListOfFunctions().Add(TNamed('Description', description))
         hists[det].GetListOfFunctions().Add(TNamed('Check', check))
+        hists[det].GetListOfFunctions().Add(TNamed('MetaOptions', 'expert'))
 
     hNweights = TH1F('hNweights', 'number of weights stored', 201, 0, 201)
     hWeightsProfile = TProfile('hWeightsProfile', 'profile of weights', 201,
@@ -237,6 +238,7 @@ def draw_pvalue(data_tree):
 
     hist_pvalue.GetListOfFunctions().Add(TNamed('Description', description))
     hist_pvalue.GetListOfFunctions().Add(TNamed('Check', check))
+    hist_pvalue.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert'))
 
     hist_pvalue.Write()
 

@@ -119,6 +119,17 @@ namespace Belle2 {
      */
     static double convertValue(double value, const std::string& unitString);
 
+    /**
+     * Converts a floating point value from the standard framework unit to the given unit.
+     *
+     * If the given unit is not found, the value is returned unchanged (and an error printed).
+     *
+     * @param value The value which should be converted.
+     * @param unitString The string of the unit of the specified value.
+     * @return The value converted to the given unit.
+     */
+    static double convertValueToUnit(double value, const std::string& unitString);
+
   protected:
     /** registers the name and value of a conversion in s_conversionFactors. */
     static double registerConversion(const std::string& name, double value);

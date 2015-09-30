@@ -53,4 +53,33 @@ namespace {
     EXPECT_B2ERROR(EXPECT_DOUBLE_EQ(5e3, Unit::convertValue(5e3, "nonexistingunit")));
   }
 
+  /** check conversions from standard units to different units. */
+  TEST(UnitTest, ConvertValueToUnit)
+  {
+    //check standard units
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "cm"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "ns"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "rad"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "GeV"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "K"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1e-4, "T"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "e"));
+    EXPECT_DOUBLE_EQ(1.0, Unit::convertValueToUnit(1.0, "g/cm3"));
+
+    //different orders of magnitude
+    EXPECT_DOUBLE_EQ(1e-2, Unit::convertValueToUnit(1.0, "m"));
+    EXPECT_DOUBLE_EQ(1e-5, Unit::convertValueToUnit(1.0, "km"));
+    EXPECT_DOUBLE_EQ(1e1, Unit::convertValueToUnit(1.0, "mm"));
+    EXPECT_DOUBLE_EQ(1e4, Unit::convertValueToUnit(1.0, "um"));
+    EXPECT_DOUBLE_EQ(1e7, Unit::convertValueToUnit(1.0, "nm"));
+
+    //convert some actual values
+    EXPECT_DOUBLE_EQ(5e3 * 1e-2, Unit::convertValueToUnit(5e3, "m"));
+    EXPECT_DOUBLE_EQ(5e-3 * 1e-2, Unit::convertValueToUnit(5e-3, "m"));
+    EXPECT_DOUBLE_EQ(180.0, Unit::convertValueToUnit(M_PI, "deg"));
+
+    //test fall-back behaviour (return value unchanged, throw B2ERROR)
+    EXPECT_B2ERROR(EXPECT_DOUBLE_EQ(5e3, Unit::convertValueToUnit(5e3, "nonexistingunit")));
+  }
+
 }  // namespace

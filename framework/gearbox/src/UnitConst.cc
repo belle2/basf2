@@ -307,6 +307,16 @@ namespace Belle2 {
     return it->second * value;
   }
 
+  double Unit::convertValueToUnit(double value, const std::string& unitString)
+  {
+    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    if (it == s_conversionFactors.end()) {
+      B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
+      return value;
+    }
+    return value / it->second;
+  }
+
   double Unit::registerConversion(const string& name, double value)
   {
     if (!s_conversionFactors.insert(make_pair(name, value)).second) {

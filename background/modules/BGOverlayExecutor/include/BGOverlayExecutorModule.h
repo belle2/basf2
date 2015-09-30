@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BGOVERLAYMAKERMODULE_H
-#define BGOVERLAYMAKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -23,19 +22,19 @@ namespace Belle2 {
   /**
    * Overlay of measured background with simulated data (Digits or Clusters)
    */
-  class BGOverlayMakerModule : public Module {
+  class BGOverlayExecutorModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    BGOverlayMakerModule();
+    BGOverlayExecutorModule();
 
     /**
      * Destructor
      */
-    virtual ~BGOverlayMakerModule();
+    virtual ~BGOverlayExecutorModule();
 
     /**
      * Initialize the Module.
@@ -141,4 +140,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

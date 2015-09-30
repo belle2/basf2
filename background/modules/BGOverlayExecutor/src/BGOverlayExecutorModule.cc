@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <background/modules/BGOverlayMaker/BGOverlayMakerModule.h>
+#include <background/modules/BGOverlayExecutor/BGOverlayExecutorModule.h>
 
 #include <framework/core/ModuleManager.h>
 
@@ -41,13 +41,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(BGOverlayMaker)
+  REG_MODULE(BGOverlayExecutor)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  BGOverlayMakerModule::BGOverlayMakerModule() : Module()
+  BGOverlayExecutorModule::BGOverlayExecutorModule() : Module()
 
   {
     // module description
@@ -58,11 +58,11 @@ namespace Belle2 {
 
   }
 
-  BGOverlayMakerModule::~BGOverlayMakerModule()
+  BGOverlayExecutorModule::~BGOverlayExecutorModule()
   {
   }
 
-  void BGOverlayMakerModule::initialize()
+  void BGOverlayExecutorModule::initialize()
   {
 
     // registration in datastore (all as optional input - see template function)
@@ -77,13 +77,13 @@ namespace Belle2 {
 
   }
 
-  void BGOverlayMakerModule::beginRun()
+  void BGOverlayExecutorModule::beginRun()
   {
   }
 
-  void BGOverlayMakerModule::event()
+  void BGOverlayExecutorModule::event()
   {
-    // add BG: dataobject must inherit from DigitBase
+    /* note: dataobject must inherit from DigitBase */
 
     //    addBGDigits<PXDCluster>();
     //    addBGDigits<SVDCluster>();
@@ -97,11 +97,11 @@ namespace Belle2 {
   }
 
 
-  void BGOverlayMakerModule::endRun()
+  void BGOverlayExecutorModule::endRun()
   {
   }
 
-  void BGOverlayMakerModule::terminate()
+  void BGOverlayExecutorModule::terminate()
   {
   }
 

@@ -57,6 +57,14 @@ EKLM::TransformData::TransformData(bool global)
               segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                             iSegment);
               alignmentData = alignment->getAlignmentData(segment);
+              for (iStrip = 1; iStrip <= 15; iStrip++) {
+                m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
+                  HepGeom::Translate3D(alignmentData->getDx(),
+                                       alignmentData->getDy(), 0) *
+                  m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] *
+                  HepGeom::RotateZ3D(alignmentData->getDalpha());
+              }
+
             }
           }
         }

@@ -164,6 +164,15 @@ namespace Belle2 {
       return pid->getProbability(Const::muon, Const::pion, set);
     }
 
+    double particleMuonKLMId(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      Const::PIDDetectorSet set = Const::KLM;
+      return pid->getProbability(Const::muon, Const::pion, set);
+    }
+
     double particlePionId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getRelatedTo<PIDLikelihood>();
@@ -308,6 +317,129 @@ namespace Belle2 {
       return 0;
     }
 
+    double particleKaonIdBelle(const Particle* part)
+    {
+      float accs = particleKaonARICHId(part);
+      float tofs = particleKaonTOPId(part);
+      float cdcs = particleKaondEdxId(part);
+
+      if (tofs > 0.999) tofs = 0.999;
+      if (tofs < 0.001) tofs = 0.001;
+      if (cdcs > 0.999) cdcs = 0.999;
+      if (cdcs < 0.001) cdcs = 0.001;
+
+      float s = accs * tofs * cdcs;
+      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
+
+      float r = s / (b + s);
+
+      return r;
+    }
+
+    // converts Belle numbering scheme for charged final state particles
+    // to Belle II ChargedStable
+    Const::ChargedStable hypothesisConversion(const int hypothesis)
+    {
+      switch (hypothesis) {
+        case 0:
+          return Const::electron;
+        case 1:
+          return Const::muon;
+        case 2:
+          return Const::pion;
+        case 3:
+          return Const::kaon;
+        case 4:
+          return Const::proton;
+      }
+
+      return Const::pion;
+    }
+
+    double atcPIDBelle(const Particle* particle,  const std::vector<double>& sigAndBkgHyp)
+    {
+      int sigHyp = int(std::lround(sigAndBkgHyp[0]));
+      int bkgHyp = int(std::lround(sigAndBkgHyp[1]));
+
+      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      // ACC = ARICH
+      Const::PIDDetectorSet set = Const::ARICH;
+      double acc_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
+      double acc_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
+      double acc = 0.5;
+      if (acc_sig + acc_bkg  > 0.0)
+        acc = acc_sig / (acc_sig + acc_bkg);
+
+      // TOF = TOP
+      set = Const::TOP;
+      double tof_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
+      double tof_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
+      double tof = 0.5;
+      double tof_all = tof_sig + tof_bkg;
+      if (tof_all != 0) {
+        tof = tof_sig / tof_all;
+        if (tof < 0.001) tof = 0.001;
+        if (tof > 0.999) tof = 0.999;
+      }
+
+      // dE/dx = CDC
+      set = Const::CDC;
+      double cdc_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
+      double cdc_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
+      double cdc = 0.5;
+      double cdc_all = cdc_sig + cdc_bkg;
+      if (cdc_all != 0) {
+        cdc = cdc_sig / cdc_all;
+        if (cdc < 0.001) cdc = 0.001;
+        if (cdc > 0.999) cdc = 0.999;
+      }
+
+      // Combined
+      double pid_sig = acc * tof * cdc;
+      double pid_bkg = (1. - acc) * (1. - tof) * (1. - cdc);
+
+      return pid_sig / (pid_sig + pid_bkg);
+    }
+
+    /*
+    double electronIDBelle(const Particle* particle)
+    {
+      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      // ACC = ARICH
+      Const::PIDDetectorSet set = Const::ARICH;
+      double acc_sig = exp(pid->getLogL(hypothesisConversion(Const::electron), set));
+      double acc_bkg = exp(pid->getLogL(hypothesisConversion(Const::pion), set));
+      double acc = 0.5;
+      if( acc_sig + acc_bkg  > 0.0 )
+    acc = acc_sig/(acc_sig+acc_bkg);
+
+      // TOF = TOP
+      double tof = 0.5;
+
+      // dE/dx = CDC
+      set = Const::CDC;
+      double cdc_sig = exp(pid->getLogL(hypothesisConversion(Const::electron), set));
+      double cdc_bkg = exp(pid->getLogL(hypothesisConversion(Const::pion), set));
+      double cdc = 0.5;
+      double cdc_all = cdc_sig + cdc_bkg;
+      if(cdc_all != 0) {
+    cdc = cdc_sig/cdc_all;
+    if(cdc < 0.001) cdc = 0.001;
+    if(cdc > 0.999) cdc = 0.999;
+      }
+
+      // Combined atc
+      double pid_sig = acc*tof*cdc;
+      double pid_bkg = (1.-acc)*(1.-tof)*(1.-cdc);
+      double atc     = pid_sig/(pid_sig+pid_bkg);
+
+    }
+    */
+
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("DLLPion", particleDeltaLogLPion,     "Delta Log L = L(particle's hypothesis) - L(pion)");
     REGISTER_VARIABLE("DLLKaon", particleDeltaLogLKaon,     "Delta Log L = L(particle's hypothesis) - L(kaon)");
@@ -319,6 +451,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
     REGISTER_VARIABLE("piid", particlePionId, "pion identification probability");
     REGISTER_VARIABLE("Kid", particleKaonId, "kaon identification probability");
+    REGISTER_VARIABLE("Kid_belle", particleKaonIdBelle, "kaon identification probability bellestyle");
     REGISTER_VARIABLE("prid", particleProtonId, "proton identification probability");
 
     REGISTER_VARIABLE("K_vs_piid", particleKaonId, "kaon vs pion identification probability");
@@ -346,7 +479,21 @@ namespace Belle2 {
     REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
     REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
 
+    REGISTER_VARIABLE("muid_KLM", particleMuonKLMId, "muon identification probability from KLM");
+
     REGISTER_VARIABLE("eid_ECL", particleElectronECLId, "electron identification probability from ECL");
     REGISTER_VARIABLE("missing_ECL", particleMissingECLId, "1.0 if identification probability from ECL is missing");
+
+    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
+                      "returns Belle's PID atc variable: atc_pid(3,1,5,i,j).prob().\n"
+                      "To be used only when analysing converted Belle samples.");
+
+    REGISTER_VARIABLE("muIDBelle", particleMuonKLMId,
+                      "returns Belle's PID Muon_likelihood() variable.\n"
+                      "To be used only when analysing converted Belle samples.");
+
+    REGISTER_VARIABLE("eIDBelle", particleElectronECLId,
+                      "returns Belle's electron ID (eid(3,-1,5).prob()) variable.\n"
+                      "To be used only when analysing converted Belle samples.");
   }
 }

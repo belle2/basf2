@@ -188,6 +188,14 @@ namespace Belle2 {
      * return 1 if ECLId is missing
      */
     double particleMissingECLId(const Particle* part);
+
+    /**
+     * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()
+     * Additional arguments are intigers for signal and background hypothesis:
+     * (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)
+     * This variable should only be used to analyse converted Belle samples. Do not use to analyse Belle II samples.
+     */
+    double atcPIDBelle(const Particle*, const std::vector<double>& sigAndBkgHyp);
   }
 } // Belle2 namespace
 

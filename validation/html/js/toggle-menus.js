@@ -69,6 +69,19 @@ $(document).ready(function() {
 			});
 		}
 	});
+	
+	// Hide/how the expert plots
+	$('input[type="checkbox"][name="showexpert"]').click(function() {
+		if (!$(this).prop("checked")) {
+			$(".expert_plot").each(function() {
+				$(this).css("display", "none");
+			});
+		} else {
+			$(".expert_plot").each(function() {
+				$(this).css("display", "block");
+			});
+		}
+	});
 
 	// End inheritance of the click-event
 	$('[name=selectall]').click(function(e) {

@@ -56,10 +56,10 @@ def generateTestPlots(prefix):
     exp_fn = TF1("exp_fn", "exp(-x)", 0, 10)
     gausH.FillRandom("exp_fn", 5000)
 
-    gausH.GetListOfFunctions().Add(TNamed('Description', "ylog"))
+    gausH.GetListOfFunctions().Add(TNamed('Description', "Expert Validation Plot"))
     gausH.GetListOfFunctions().Add(TNamed('Check', "Exp Histogram Check"))
     gausH.GetListOfFunctions().Add(TNamed('Contact', "Exp Histogram Contact"))
-    gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logy, nostats, C"))
+    gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logy, nostats, C, expert"))
 
     gausH.Write()
 

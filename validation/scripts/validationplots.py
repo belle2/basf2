@@ -342,10 +342,13 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     # it is better to search the existing images than loop over plots
     desc = {}
     p_value = {}
+    is_expert = {}
     for item in list_of_plotuples:
         mod_key = '{0}_{1}'.format(strip_ext(item.rootfile), item.key)
         desc[mod_key] = item.description
         p_value[mod_key] = item.pvalue
+        print "item.metaoptions - " + str(item.metaoptions)
+        is_expert[mod_key] = "expert" in item.metaoptions
 
     ident = []
     html = []
@@ -410,6 +413,8 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                     classes.append('p_value_leq_1')
                 if p_value[plts] <= 0.01:
                     classes.append('p_value_leq_0_01')
+                if is_expert[plts]:
+                    classes.append('expert_plot')
                 # the code for the actual plots
                 pre = (package + "_" + plts.replace(".", "_")).strip()
                 pre1 = (package + "__" + plts.replace(".", "_")).strip()
@@ -1694,10 +1699,18 @@ class Plotuple:
             classes.append('p_value_leq_1')
         if self.pvalue <= 0.01:
             classes.append('p_value_leq_0_01')
+        # dont do this, because it will hide both ...
+        # if "expert" in self.metaoptions:
+        #    classes.append('expert_plot')
         prmn = (self.package + "_" +
                 self.file.split("/")[-1].replace(".", "_")).strip()
         html.append('<div class="{0}" id="{1}">\n'.format(' '.join(classes),
                                                           prmn))
+
+        # add a new div which will only be used to hide entries with the expert plot
+        # qualification
+        if "expert" in self.metaoptions:
+            html.append('<div class="expert_plot">')
 
         html.append('<div class="object">\n')
 
@@ -1762,6 +1775,9 @@ class Plotuple:
                         '<input type="text" class="meta-options" '
                         'value="{0}" size="50" onClick="this.select();"></p>'
                         .format(self.metaoptions))
+
+        if "expert" in self.metaoptions:
+            html.append('</div>\n')
 
         html.append('</div>\n</div>\n\n')
 

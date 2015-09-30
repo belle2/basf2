@@ -384,6 +384,13 @@ textarea {
     text-align:center;
 }
 
+/* Expert validation plots are hidden by default
+*/
+.expert_plot
+{
+    display: none;
+}
+
 .loglink
 {
     cursor:pointer;

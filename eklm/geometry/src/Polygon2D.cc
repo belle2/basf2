@@ -36,6 +36,12 @@ EKLM::Polygon2D::~Polygon2D()
 
 bool EKLM::Polygon2D::hasIntersection(const LineSegment2D& lineSegment) const
 {
+  int i;
+  HepGeom::Point3D<double> intersection;
+  for (i = 0; i < m_nPoints; i++) {
+    if (m_LineSegments[i]->findIntersection(lineSegment, &intersection) > 0)
+      return true;
+  }
   return false;
 }
 

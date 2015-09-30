@@ -25,6 +25,35 @@ EKLM::LineSegment2D::~LineSegment2D()
 }
 
 int EKLM::LineSegment2D::
+findIntersection(const Line2D& line,
+                 HepGeom::Point3D<double>* intersection) const
+{
+  int n;
+  double t[2];
+  bool condition;
+  n = Line2D::findIntersection(line, intersection, t);
+  if (n == 0)
+    return 0;
+  condition = tWithinRange(t[0]);
+  return selectIntersections(intersection, &condition, 1);
+}
+
+
+int EKLM::LineSegment2D::
+findIntersection(const LineSegment2D& lineSegment,
+                 HepGeom::Point3D<double>* intersection) const
+{
+  int n;
+  double t[2];
+  bool condition;
+  n = Line2D::findIntersection(lineSegment, intersection, t);
+  if (n == 0)
+    return 0;
+  condition = tWithinRange(t[0]) && lineSegment.tWithinRange(t[1]);
+  return selectIntersections(intersection, &condition, 1);
+}
+
+int EKLM::LineSegment2D::
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2]) const
 {

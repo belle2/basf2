@@ -28,6 +28,24 @@ EKLM::Line2D::~Line2D()
 {
 }
 
+const HepGeom::Point3D<double>& EKLM::Line2D::getInitialPoint() const
+{
+  return m_Point;
+}
+
+const HepGeom::Vector3D<double>& EKLM::Line2D::getVector() const
+{
+  return m_Vector;
+}
+
+int EKLM::Line2D::
+findIntersection(const Line2D& line,
+                 HepGeom::Point3D<double>* intersection) const
+{
+  double t[2];
+  return findIntersection(line, intersection, t);
+}
+
 int EKLM::Line2D::
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2]) const
@@ -47,6 +65,40 @@ findIntersection(const Arc2D& arc,
   for (i = 0; i < n; i++)
     condition[i] = arc.angleWithinRange(angles[i]);
   return selectIntersections(intersections, condition, n);
+}
+
+/*
+ * System of equations:
+ * m_Point.x() + m_Vector.x() * t[0] =
+ * line.getInitialPoint().x() + line.getVector().x() * t[1],
+ * m_Point.y() + m_Vector.y() * t[0] =
+ * line.getInitialPoint().y() + line.getVector().y() * t[1].
+ * Other form:
+ * a1 * t[0] + b1 * t[1] + c1 = 0, a2 * t[0] + b2 * t[1] + c2 = 0.
+ */
+int EKLM::Line2D::
+findIntersection(const Line2D& line,
+                 HepGeom::Point3D<double>* intersection, double t[2]) const
+{
+  double a1, a2, b1, b2, c1, c2, d, dt[2];
+  a1 = m_Vector.x();
+  a2 = m_Vector.y();
+  b1 = -line.getVector().x();
+  b2 = -line.getVector().y();
+  c1 = m_Point.x() - line.getInitialPoint().x();
+  c2 = m_Point.y() - line.getInitialPoint().y();
+  d = a1 * b2 - a2 * b1;
+  /* Same line (d == 0, dt[i] == 0) considered as no intersection! */
+  if (d == 0)
+    return 0;
+  dt[0] = c1 * b2 - c2 * b1;
+  dt[1] = a1 * c2 - a2 * c1;
+  t[0] = -dt[0] / d;
+  t[1] = -dt[1] / d;
+  intersection->setX(m_Point.x() + m_Vector.x() * t[0]);
+  intersection->setY(m_Point.y() + m_Vector.y() * t[0]);
+  intersection->setZ(0);
+  return 1;
 }
 
 /*

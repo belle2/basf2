@@ -45,6 +45,25 @@ namespace Belle2 {
       ~Line2D();
 
       /**
+       * Get initial point.
+       */
+      const HepGeom::Point3D<double>& getInitialPoint() const;
+
+      /**
+       * Get vector.
+       */
+      const HepGeom::Vector3D<double>& getVector() const;
+
+      /**
+       * Find intersection with a line.
+       * @param[in]  line         Line.
+       * @param[out] intersection Intersection.
+       * @return Number of intersections (0 or 1).
+       */
+      int findIntersection(const Line2D& line,
+                           HepGeom::Point3D<double>* intersection) const;
+
+      /**
        * Find intersections with a circle.
        * @param[in]  circle        Circle.
        * @param[out] intersections Intersections.
@@ -63,6 +82,20 @@ namespace Belle2 {
                            HepGeom::Point3D<double> intersections[2]) const;
 
     protected:
+
+      /**
+       * Find intersection with a line.
+       * @param[in]  line         Line.
+       * @param[out] intersection Intersection.
+       * @param[out] t            Values of t for intersection point
+       *                          (t[0] - this line, t[1] - line from argument).
+       * @return Number of intersections (0 or 1).
+       *
+       * If (*this) and line are the same line then 0 is returned.
+       */
+      int findIntersection(const Line2D& line,
+                           HepGeom::Point3D<double>* intersection,
+                           double t[2]) const;
 
       /**
        * Find intersections with a circle.

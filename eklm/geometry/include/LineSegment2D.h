@@ -42,6 +42,24 @@ namespace Belle2 {
       ~LineSegment2D();
 
       /**
+       * Find intersection with a line.
+       * @param[in]  line         Line.
+       * @param[out] intersection Intersection.
+       * @return Number of intersections (0 or 1).
+       */
+      int findIntersection(const Line2D& line,
+                           HepGeom::Point3D<double>* intersection) const;
+
+      /**
+       * Find intersection with a line segment.
+       * @param[in]  lineSegment  Line segment.
+       * @param[out] intersection Intersection.
+       * @return Number of intersections (0 or 1).
+       */
+      int findIntersection(const LineSegment2D& lineSegment,
+                           HepGeom::Point3D<double>* intersection) const;
+
+      /**
        * Find intersections with a circle.
        * @param[in]  circle        Circle.
        * @param[out] intersections Intersections.

@@ -313,6 +313,18 @@ namespace Belle2 {
       double getTDCoffset() const {return m_TDCoffset; }
 
       /**
+       * Return pile-up time relevant for CF discriminator
+       * @return pile-up time
+       */
+      double getPileupTime() const {return m_pileupTime;}
+
+      /**
+       * Return double-hit resolution relevant for CF discriminator
+       * @return double-hit resolution time
+       */
+      double getDoubleHitResolution() const {return m_doubleHitResolution;}
+
+      /**
        * Return TDC overflow value
        * @return overflow value
        */
@@ -661,6 +673,8 @@ namespace Belle2 {
       int m_NTDC;                 /**< number of TDC bits */
       double m_TDCwidth;          /**< width of a bit in [ns] */
       double m_TDCoffset;         /**< offset to be subtracted [ns] */
+      double m_pileupTime;        /**< pile-up time [ns] */
+      double m_doubleHitResolution; /**< double hit resolution time [ns] */
 
       //! electronics jitter
       double m_ELjitter;          /**< rms of electronic jitter */

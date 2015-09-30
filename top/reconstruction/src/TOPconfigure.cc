@@ -85,6 +85,7 @@ namespace Belle2 {
       }
 
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth(), m_topgp->getTDCoffset());
+      setCFD(m_topgp->getPileupTime(), m_topgp->getDoubleHitResolution());
 
       int n = m_topgp->getNbars();           // number of bars in phi
       double Dphi = 2 * M_PI / n;

@@ -103,6 +103,8 @@ namespace Belle2 {
       m_NTDC = 0;
       m_TDCwidth = 0;
       m_TDCoffset = 0;
+      m_pileupTime = 0;
+      m_doubleHitResolution = 0;
 
       //! electronics jitter and efficiency (not in xml!)
       m_ELjitter = 0;
@@ -211,6 +213,8 @@ namespace Belle2 {
       m_NTDC = detParams.getInt("Module/TDCbits");
       m_TDCwidth = detParams.getTime("Module/TDCbitwidth");
       m_TDCoffset = detParams.getTime("Module/TDCoffset", 0);
+      m_pileupTime = detParams.getTime("Module/TDCpileupTime", 0);
+      m_doubleHitResolution = detParams.getTime("Module/TDCdoubleHitResolution", 0);
 
       //! TTS
 

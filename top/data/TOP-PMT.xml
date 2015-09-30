@@ -54,6 +54,8 @@
     <TDCbits desc="Number of TDC bits">12</TDCbits>
     <TDCbitwidth desc="Width of TDC bit" unit="ps">25</TDCbitwidth>
     <TDCoffset desc="Offset" unit="ns">20</TDCoffset>
+    <TDCpileupTime desc="pile-up time" unit="ns">0.5</TDCpileupTime>
+    <TDCdoubleHitResolution unit="ns">5.0</TDCdoubleHitResolution>
   </Module>
 
   <TTS>

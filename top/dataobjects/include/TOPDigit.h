@@ -12,6 +12,9 @@
 #define TOPDIGIT_H
 
 #include <framework/dataobjects/DigitBase.h>
+#include <framework/logging/Logger.h>
+#include <iostream>
+
 
 namespace Belle2 {
 
@@ -82,6 +85,18 @@ namespace Belle2 {
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
 
     /**
+     * Set double hit resolution
+     * @param tdcBins double hit resolving time in TDC bins
+     */
+    static void setDoubleHitResolution(int tdcBins) {s_doubleHitResolution = tdcBins;}
+
+    /**
+     * Set pile-up time
+     * @param tdcBins pile-up time in TDC bins
+     */
+    static void setPileupTime(int tdcBins) {s_pileupTime = tdcBins;}
+
+    /**
      * Get hit quality
      * @return hit quality
      */
@@ -131,15 +146,12 @@ namespace Belle2 {
     unsigned int getUniqueChannelID() const {return m_channelID + (m_barID << 16);}
 
     /**
-     * Implementation fo the base class function.
+     * Implementation of the base class function.
      * Pile-up method.
      * @param bg BG digit
      * @return append status
      */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* /*bg*/)
-    {
-      return DigitBase::c_Append;
-    }
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
 
 
   private:
@@ -151,7 +163,10 @@ namespace Belle2 {
     unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
     EHitQuality m_quality;     /**< hit quality */
 
-    ClassDef(TOPDigit, 5); /**< ClassDef */
+    static int s_doubleHitResolution; /**< double hit resolving time in TDC units */
+    static int s_pileupTime; /**< pile-up time in TDC units */
+
+    ClassDef(TOPDigit, 6); /**< ClassDef */
 
   };
 

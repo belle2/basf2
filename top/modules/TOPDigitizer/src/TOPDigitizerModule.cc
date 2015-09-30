@@ -9,9 +9,9 @@
  **************************************************************************/
 // Own include
 #include <top/modules/TOPDigitizer/TOPDigitizerModule.h>
+#include <top/modules/TOPDigitizer/TimeDigitizer.h>
 
 #include <framework/core/ModuleManager.h>
-#include <time.h>
 
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
@@ -31,8 +31,9 @@
 // ROOT
 #include <TRandom3.h>
 
+#include <map>
+
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 
@@ -103,6 +104,12 @@ namespace Belle2 {
       m_bunchTimeSep = circumference / Const::speedOfLight / numofBunches;
     }
 
+    // set pile-up and double hit resolution times (needed for BG overlay)
+    int delt = int(m_topgp->getDoubleHitResolution() / m_topgp->getTDCbitwidth() + 0.5);
+    TOPDigit::setDoubleHitResolution(delt);
+    int dt = int(m_topgp->getPileupTime() / m_topgp->getTDCbitwidth() + 0.5);
+    TOPDigit::setPileupTime(dt);
+
   }
 
   void TOPDigitizerModule::beginRun()
@@ -137,11 +144,12 @@ namespace Belle2 {
     // simulate start time (bunch time given by trigger smeared according to T0 jitter)
     double startTime = gRandom->Gaus(trigT0, m_timeZeroJitter);
 
-    // TDC
-    int overflow = m_topgp->TDCoverflow();
+    // channels with time digitizers
+    std::map<unsigned, TimeDigitizer> channels;
+    typedef std::map<unsigned, TimeDigitizer>::iterator Iterator;
 
+    // add simulated hits
     for (const auto& simHit : simHits) {
-
       // simulate electronic efficiency
       if (gRandom->Rndm() > m_electronicEfficiency) continue;
 
@@ -152,47 +160,39 @@ namespace Belle2 {
       int channelID = m_topgp->getChannelID(x, y, pmtID);
       if (channelID == 0) continue;
 
-      // add TTS and electronic jitter to photon time and make it relative to start time
-      double tts = generateTTS();
-      double tel = gRandom->Gaus(0., m_electronicJitter);
-      double time = simHit.getTime() + tts + tel - startTime;
+      // add TTS to photon time and make it relative to start time
+      double time = simHit.getTime() + generateTTS() - startTime;
 
-      // convert to TDC count
-      int TDC = m_topgp->getTDCcount(time);
-      if (TDC == overflow) continue;
-
-      // store result and add relations
-      TOPDigit* digit = digits.appendNew(simHit.getBarID(), channelID, TDC);
-      digit->addRelationTo(&simHit);
-      RelationVector<MCParticle> particles = simHit.getRelationsFrom<MCParticle>();
-      for (unsigned k = 0; k < particles.size(); ++k) {
-        digit->addRelationTo(particles[k], particles.weight(k));
-      }
-
+      // add time to digitizer of a given channel
+      TimeDigitizer digitizer(simHit.getBarID(), channelID);
+      unsigned id = digitizer.getUniqueID();
+      Iterator it = channels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
+      it->second.addTimeOfHit(time, &simHit);
     }
 
-    // add randomly distributed electronic noise
-
+    // add randomly distributed dark noise
     if (m_darkNoise > 0) {
       int numBars = m_topgp->getNbars();
       int numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
                         m_topgp->getNpadx() * m_topgp->getNpady();
-
+      double timeMin = m_topgp->getTime(0);
+      double timeMax = m_topgp->getTime(m_topgp->TDCoverflow() - 1);
       for (int barID = 1; barID <= numBars; barID++) {
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int channelID = int(gRandom->Rndm() * numChannels) + 1;
-          int TDC = int(gRandom->Rndm() * overflow);
-          digits.appendNew(barID, channelID, TDC);
+          double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
+          TimeDigitizer digitizer(barID, channelID);
+          unsigned id = digitizer.getUniqueID();
+          Iterator it = channels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
+          it->second.addTimeOfHit(time);
         }
       }
     }
 
-    // set hardware channel ID
-
-    for (auto& digit : digits) {
-      unsigned chan = m_topgp->getHardwareChannelID(digit.getChannelID());
-      digit.setHardwareChannelID(chan);
+    // digitize in time
+    for (auto& channel : channels) {
+      channel.second.digitize(digits, m_electronicJitter);
     }
 
   }

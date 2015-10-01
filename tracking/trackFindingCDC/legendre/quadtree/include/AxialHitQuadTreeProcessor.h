@@ -144,7 +144,6 @@ namespace Belle2 {
         if (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1])) valueToReturn = true;
         else if (! sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1])) valueToReturn = true;
         else {
-          bool extremumInside(false);
 
           float rHitMinExtr = -1.*hit->getConformalX() * sinThetaMin + hit->getConformalY() * cosThetaMin;
           float rHitMaxExtr = -1.*hit->getConformalX() * sinThetaMax + hit->getConformalY() * cosThetaMax;
@@ -168,7 +167,7 @@ namespace Belle2 {
               unsigned long theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
               unsigned long theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
 
-              if (theta1 < 0)
+              if (theta1 <= 0)
                 theta1 = node->getXBin(i);
               if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);
@@ -180,7 +179,7 @@ namespace Belle2 {
               unsigned long theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
               unsigned long theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
 
-              if (theta1 < 0)
+              if (theta1 <= 0)
                 theta1 = node->getXBin(i);
               if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);

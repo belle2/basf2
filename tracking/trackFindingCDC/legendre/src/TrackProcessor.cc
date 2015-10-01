@@ -187,8 +187,8 @@ void TrackProcessorNew::removeBadSLayers(CDCTrack& track)
   int currentSLayer(startSLayer);
   int nHitsInSL(0);
 
-  FloatType startArcLength(track.front().getArcLength2D());
-  FloatType stopArcLength(track.back().getArcLength2D());
+//  double startArcLength(track.front().getArcLength2D());
+  double stopArcLength(track.back().getArcLength2D());
 
   std::vector<CDCRecoHit3D>::iterator lastHit;
   /*

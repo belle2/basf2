@@ -53,7 +53,7 @@ namespace Belle2 {
 
   private:
 
-    const double m_rMin = 0.;/*-0.075; /**< Minimum in r direction*/
+    const double m_rMin = 0.; /**< Minimum in r direction*/
     const double m_rMax = 0.075; /**< Maximum in r direction*/
     const unsigned long m_nbinsTheta =
       pow(2, 16); /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */

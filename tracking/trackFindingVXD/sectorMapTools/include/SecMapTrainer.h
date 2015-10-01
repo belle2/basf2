@@ -142,7 +142,7 @@ namespace Belle2 {
       for (; innerIt == aTC.innerEnd();) {
         XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
         hitBundle.sectorIDs = {outerIt->getSectorID(), centerIt->getSectorID(), innerIt->getSectorID()};
-        hitBundle.hits = {outerIt, centerIt, innerIt};
+        hitBundle.hits = {&(*outerIt), &(*centerIt), &(*innerIt)};
         m_dataSet.sectorIDs = hitBundle.sectorIDs;
         m_filterMill.grindData(hitBundle, collectedResults);
 

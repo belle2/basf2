@@ -27,7 +27,7 @@ namespace Belle2 {
     std::vector<SecIDType> sectorIDs;
 
     /** hits (must have an equal or greater number of entries as for the sectorIDs. */
-    std::vector<HitType*> hits;
+    std::vector<const HitType*> hits;
 
 //  /** TrackID. */
 //  unsigned trackID;

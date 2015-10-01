@@ -28,13 +28,13 @@ namespace Belle2 {
     public:
 
       /**
-       * constructor
+       * Constructor
        */
       TimeDigitizer(int barID, int channelID): m_barID(barID), m_channelID(channelID)
       {}
 
       /**
-       * add time of simulated hit
+       * Add time of simulated hit
        * @param t time of simulated hit
        * @param simHit pointer to simulated hit or NULL
        */
@@ -44,19 +44,20 @@ namespace Belle2 {
       }
 
       /**
-       * Get bar ID
+       * Return bar ID
        * @return bar ID
        */
       int getBarID() const { return m_barID; }
 
       /**
-       * Get channel ID
+       * Return channel ID
        * @return software channel ID
        */
       int getChannelID() const { return m_channelID; }
 
       /**
-       *
+       * Return unique channel ID
+       * @return unique channel ID
        */
       unsigned getUniqueID() const {return m_channelID + (m_barID << 16);}
 

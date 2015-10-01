@@ -156,7 +156,7 @@ NeuroTrigger::initialize(const Parameters& p)
   }
   // load some values from the geometry that will be needed for the input
   CDCGeometryPar& cdc = CDCGeometryPar::Instance();
-  int layerId = 2;
+  int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {
     m_TSoffset[iSL] = nTS;
@@ -165,7 +165,7 @@ NeuroTrigger::initialize(const Parameters& p)
     for (int priority = 0; priority < 2; ++ priority) {
       m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
     }
-    layerId += (iSL > 0 ? 6 : 8);
+    layerId += (iSL > 0 ? 6 : 7);
   }
 }
 
@@ -365,7 +365,7 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
 
   // load some values from the geometry that will be needed for the input
   CDCGeometryPar& cdc = CDCGeometryPar::Instance();
-  int layerId = 2;
+  int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {
     m_TSoffset[iSL] = nTS;
@@ -374,7 +374,7 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
     for (int priority = 0; priority < 2; ++ priority) {
       m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
     }
-    layerId += (iSL > 0 ? 6 : 8);
+    layerId += (iSL > 0 ? 6 : 7);
   }
   return true;
 }

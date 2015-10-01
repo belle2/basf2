@@ -56,8 +56,8 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
         m_anglest[stSuperLayer]=2*m_rr[stSuperLayer]*sin(m_Trg_PI*cdcp.nShifts(12*stSuperLayer+10)/(2*cdcp.nWiresInLayer(12*stSuperLayer+10)))/(cdcp.senseWireFZ(12*stSuperLayer+10)-cdcp.senseWireBZ(12*stSuperLayer+10))/0.01;
         m_nWires[stSuperLayer]=cdcp.nWiresInLayer(12*stSuperLayer+10)*2;
     }
-    m_axR[0] = cdcp.senseWireR(2)*0.01;
-    m_axNWires[0]=cdcp.nWiresInLayer(2)*2;
+    m_axR[0] = cdcp.senseWireR(3)*0.01;
+    m_axNWires[0]=cdcp.nWiresInLayer(3)*2;
     for(int axSuperLayer=0;axSuperLayer<4;axSuperLayer++){
         m_axR[axSuperLayer+1]=cdcp.senseWireR(12*axSuperLayer+16)*0.01;
         m_axNWires[axSuperLayer+1]=cdcp.nWiresInLayer(12*axSuperLayer+16)*2;

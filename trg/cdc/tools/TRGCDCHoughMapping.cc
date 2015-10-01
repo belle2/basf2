@@ -146,7 +146,7 @@ superLayer(const unsigned id) {
     int tmpj = 0;
 
     if (id == 0) {
-        tmp = 18.8;
+        tmp = 19.8;
         tmpi = 160;
         tmpj = 0;
     }

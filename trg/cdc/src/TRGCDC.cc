@@ -439,36 +439,36 @@ namespace Belle2 {
     const unsigned nWiresInTS[2] = {15, 11};
     const int shape[2][30] = {
       {
-        //-2, 0, // relative layer id, relative wire id
-        //-1, -1, // assuming layer offset 0.0, not 0.5
-        //-1, 0,
-        //0, -1,
-        //0, 0,
-        //0, 1,
-        //1, -2,
-        //1, -1,
-        //1, 0,
-        //1, 1,
-        //2, -2,
-        //2, -1,
-        //2, 0,
-        //2, 1,
-        //2, 2
         -2, 0, // relative layer id, relative wire id
-        -1, 0, // assuming layer offset 0.5, not 0.0
-        -1, 1,
+        -1, -1, // assuming layer offset 0.0, not 0.5
+        -1, 0,
         0, -1,
         0, 0,
         0, 1,
+        1, -2,
         1, -1,
-        1, -0,
+        1, 0,
         1, 1,
-        1, 2,
         2, -2,
         2, -1,
         2, 0,
         2, 1,
         2, 2
+        //-2, 0, // relative layer id, relative wire id
+        //-1, 0, // assuming layer offset 0.5, not 0.0
+        //-1, 1,
+        //0, -1,
+        //0, 0,
+        //0, 1,
+        //1, -1,
+        //1, -0,
+        //1, 1,
+        //1, 2,
+        //2, -2,
+        //2, -1,
+        //2, 0,
+        //2, 1,
+        //2, 2
       },
       {
         -2, -1,
@@ -488,7 +488,7 @@ namespace Belle2 {
         0, 0
       }
     };
-    const int layerOffset[2] = {4, 2};
+    const int layerOffset[2] = {5, 2};
     unsigned id = 0;
     unsigned idTS = 0;
     for (unsigned i = 0; i < nSuperLayers(); i++) {

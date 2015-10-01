@@ -4,6 +4,7 @@
 # Generation of 1000 ee->mumu(ISR) events using PHOKHARA.
 
 from basf2 import *
+from beamparameters import add_beamparameters
 import sys
 
 # Set the global log level
@@ -29,8 +30,6 @@ phokhara.set_log_level(LogLevel.INFO)
 # mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6),
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
-# Set the mode for the boost of the generated particles: 0 = no boost, 1 = BELLE II, 2 = BELLE
-phokhara.param('BoostMode', 1)
 
 # soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
 # photon multiplicity (and exclusive cross sections depent on that parameter)
@@ -120,6 +119,7 @@ output.param('outputFileName', sys.argv[1])
 # Create the main path and add the modules
 main = create_path()
 main.add_module(eventinfosetter)
+add_beamparameters(main, "Y4S")
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(phokhara)

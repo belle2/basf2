@@ -7,27 +7,38 @@ from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
 import glob
+import sys
 
 # ----------------------------------------------------------------------------------
-# Example of simulation/reconstruction of generic BBbar events with beam background.
+# Example of simulation/reconstruction of generic BBbar events with BG overlay.
 #
-# This example generates BBbar events using EvtGenInput module, runs full simulation
-# with BG mixing using BeamBkgMixer module, then runs full reconstruction and finaly
-# writes the results to mdst file.
+# This example generates BBbar events using EvtGenInput module,
+# runs full simulation and digitization,
+# then adds measured BG to simulated data using BGOverlayExecutor module,
+# the runs full reconstruction and finaly writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.ERROR)
 
-# background (collision) files
-bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
+# Define a file with measured BG for overlay
+bg = 'BGforOverlay.root'
+if not os.path.exists(bg):
+    print bg + ' not found'
+    print 'You can prepare the sample by: basf2 makeBGOverlayFile.py'
+    sys.exit(1)
 
 # Create path
 main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
+
+# Overlay input (before process forking!)
+bginput = register_module('BGOverlayInput')
+bginput.param('inputFileNames', [bg])
+main.add_module(bginput)
 
 # beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
@@ -37,7 +48,13 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # Simulation
-add_simulation(main, bkgfiles=bg)
+add_simulation(main)
+
+# BG Overlay (after digitizers)
+overlay = register_module('BGOverlayExecutor')
+overlay.logging.log_level = LogLevel.DEBUG  # comment or remove to turn off
+overlay.logging.debug_level = 100
+main.add_module(overlay)
 
 # Reconstruction
 add_reconstruction(main)

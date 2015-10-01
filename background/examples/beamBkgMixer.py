@@ -23,8 +23,6 @@ set_log_level(LogLevel.INFO)
 bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
 
 # alternative: you can specify files explicitely
-#   wildcards can be used if there are several files of the same BG type
-#   example: 'Coulomb_HER_*.root' if there are several files for Coulomb_HER
 #
 # dir = '/sw/belle2/bkg/'  # change the directory name if you don't run on KEKCC
 # bg = [
@@ -62,8 +60,8 @@ bkgmixer.param('components', ['CDC', 'TOP', 'ECL'])  # mix BG only for those com
 bkgmixer.param('minTime', -5000)  # set time window start time [ns]
 bkgmixer.param('maxTime', 10000)  # set time window stop time [ns]
 bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER', 1.08),
-               ('RBB_LER', 0.8)])
-               # scale rates of some backgrounds
+                                ('RBB_LER', 0.8)])
+# scale rates of some backgrounds
 main.add_module(bkgmixer)
 
 # FullSim, digitizers, clusterizers and reconstruction modules can be put here

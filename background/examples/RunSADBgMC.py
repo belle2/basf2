@@ -154,7 +154,7 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='EKLM']//Mode", '1', ''),
-        ])
+    ])
 else:
     gearbox.param('override', [('/Global/length', '40.0', 'm')])  # needed for FarBeamLine
 main.add_module(gearbox)

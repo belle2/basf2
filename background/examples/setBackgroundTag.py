@@ -61,7 +61,7 @@ output.param('branchNames', [
     'ECLHits',
     'BKLMSimHits',
     'EKLMSimHits',
-    ])
+])
 main.add_module(output)
 
 # Show progress of processing

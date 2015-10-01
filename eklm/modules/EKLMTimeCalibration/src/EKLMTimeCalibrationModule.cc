@@ -87,22 +87,20 @@ EKLMTimeCalibrationModule::~EKLMTimeCalibrationModule()
 
 void EKLMTimeCalibrationModule::Prepare()
 {
+  m_GeoDat = &(EKLM::GeometryData::Instance());
+  m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
   if (!m_performDataCollection)
     return;
   int i;
   char str[128];
-  float* len;
-  TTree* t;
   StoreArray<EKLMHit2d>::required();
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
   m_TransformData = new EKLM::TransformData(true);
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   m_outputFile = new TFile(m_dataOutputFileName.c_str(), "recreate");
   if (m_outputFile->IsZombie())
     B2FATAL("Cannot open output file.");
-  m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
   m_Tree = new TTree*[m_nStripDifferent];
   for (i = 0; i < m_nStripDifferent; i++) {
     snprintf(str, 128, "t%d", i);
@@ -110,18 +108,6 @@ void EKLMTimeCalibrationModule::Prepare()
     m_Tree[i]->Branch("time", &m_ev.time, "time/F");
     m_Tree[i]->Branch("dist", &m_ev.dist, "dist/F");
   }
-  t = new TTree("t_strips", "");
-  t->Branch("n", &m_nStripDifferent, "n/I");
-  len = new float[m_nStripDifferent];
-  for (i = 0; i < m_nStripDifferent; i++)
-    len[i] = m_GeoDat->getStripLength(m_GeoDat->getStripPositionIndex(i) + 1)
-             / CLHEP::mm * Unit::mm;
-  t->Branch("len", &len, "len[n]/F");
-  t->Fill();
-  m_outputFile->cd();
-  t->Write();
-  delete[] len;
-  delete t;
 }
 
 void EKLMTimeCalibrationModule::CollectData()
@@ -227,31 +213,29 @@ EKLMTimeCalibrationModule::Calibrate()
   }
   if (m_performCalibration) {
     TFile* fIn = new TFile(m_dataOutputFileName.c_str());
-    TTree* t1 = (TTree*)fIn->Get("t_strips");
     TFile* fOut = new TFile(m_calibrationOutputFileName.c_str(), "recreate");
     TTree* tOut = new TTree("t_calibration", "recreate");
     const int maxbins = 40;
     const int nbins = 25;
-    int i, j, n, n2, bin;
-    float len[50], mint[maxbins], time, dist, *timeArray, *distArray;
+    int i, j, n2, bin;
+    float mint[maxbins], time, dist, *timeArray, *distArray;
     float p0, p1, maxval;
     char str[128];
+    double len;
     TH1F* h[50], *h2[maxbins], *h3;
     TF1* fcn, *fcn2;
     TTree* t2;
     TCanvas* c1 = new TCanvas();
-    t1->SetBranchAddress("n", &n);
-    t1->SetBranchAddress("len", &len);
-    t1->GetEntry(0);
     tOut->Branch("p0", &p0, "p0/F");
     tOut->Branch("p1", &p1, "p1/F");
     fcn = new TF1("fcn", CrystalBall, 0, 10, 6);
     fcn2 = new TF1("fcn2", Pol1, 0, 10, 2);
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < m_nStripDifferent; i++) {
+      len = m_GeoDat->getStripLength(m_GeoDat->getStripLengthIndex(i) + 1);
       for (j = 0; j < nbins; j++) {
         mint[j] = 200;
       }
-      h[i] = new TH1F("h", "", nbins, 0, len[i]);
+      h[i] = new TH1F("h", "", nbins, 0, len);
       snprintf(str, 128, "t%d", i);
       t2 = (TTree*)fIn->Get(str);
       t2->SetBranchAddress("time", &time);
@@ -265,9 +249,9 @@ EKLMTimeCalibrationModule::Calibrate()
         distArray[j] = dist;
       }
       for (j = 0; j < n2; j++) {
-        if (distArray[j] >= len[i] || distArray[j] < 0)
+        if (distArray[j] >= len || distArray[j] < 0)
           continue;
-        bin = floor(distArray[j] / len[i] * nbins);
+        bin = floor(distArray[j] / len * nbins);
         if (mint[bin] > timeArray[j])
           mint[bin] = timeArray[j];
       }
@@ -276,9 +260,9 @@ EKLMTimeCalibrationModule::Calibrate()
         h2[j] = new TH1F(str, "", 100, mint[j], mint[j] + 10);
       }
       for (j = 0; j < n2; j++) {
-        if (distArray[j] >= len[i] || distArray[j] < 0)
+        if (distArray[j] >= len || distArray[j] < 0)
           continue;
-        bin = floor(distArray[j] / len[i] * nbins);
+        bin = floor(distArray[j] / len * nbins);
         h2[bin]->Fill(timeArray[j]);
       }
       for (j = 0; j < nbins; j++) {
@@ -307,7 +291,7 @@ EKLMTimeCalibrationModule::Calibrate()
        */
       h3 = new TH1F("h3", "", 130, -3., 10.);
       for (j = 0; j < n2; j++) {
-        if (distArray[j] >= len[i] || distArray[j] < 0)
+        if (distArray[j] >= len || distArray[j] < 0)
           continue;
         h3->Fill(timeArray[j] - distArray[j] * p0);
       }
@@ -330,7 +314,6 @@ EKLMTimeCalibrationModule::Calibrate()
     tOut->Write();
     delete tOut;
     delete fOut;
-    delete t1;
     delete fIn;
   }
   return calibration::CalibrationModule::c_Success;

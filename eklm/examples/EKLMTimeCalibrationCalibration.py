@@ -22,6 +22,7 @@ eklmtimecalibration.param('DataOutputFile', sys.argv[1])
 # Create the main path and add the modules
 main = create_path()
 main.add_module(eventinfosetter)
+main.add_module(gearbox)
 main.add_module(eklmtimecalibration)
 
 # generate events

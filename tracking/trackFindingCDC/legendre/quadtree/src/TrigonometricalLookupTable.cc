@@ -26,7 +26,7 @@ TrigonometricalLookupTable& TrigonometricalLookupTable::Instance()
 
 
 TrigonometricalLookupTable::TrigonometricalLookupTable():
-  m_lookup_created(false), m_nbinsTheta(pow(2, 15))
+  m_lookup_created(false), m_nbinsTheta(pow(2, 16))
 {
 
 }
@@ -60,13 +60,13 @@ void TrigonometricalLookupTable::initialize(bool forced)
       clearTable();
     }
 
-    float bin_width = s_PI / m_nbinsTheta;
+    float bin_width = 2.*s_PI / m_nbinsTheta;
     m_sin_theta = new float[m_nbinsTheta + 1];
     m_cos_theta = new float[m_nbinsTheta + 1];
 
-    for (int i = 0; i <= m_nbinsTheta; ++i) {
-      m_sin_theta[i] = sin(i * bin_width);
-      m_cos_theta[i] = cos(i * bin_width);
+    for (unsigned long i = 0; i <= m_nbinsTheta; ++i) {
+      m_sin_theta[i] = sin(i * bin_width - s_PI + bin_width / 2.);
+      m_cos_theta[i] = cos(i * bin_width - s_PI + bin_width / 2.);
     }
 
     m_lookup_created = true;

@@ -9,7 +9,7 @@
 **************************************************************************/
 
 /*
- * Object which can store pointers to hits while processing FastHogh algorithm
+ * Object which can store pounsigned longers to hits while processing FastHogh algorithm
  *
  * TODO: check if it's possible to store in each hit list of nodes in which we can meet it.
  *
@@ -48,21 +48,21 @@ namespace Belle2 {
        */
       static TrigonometricalLookupTable& Instance();
 
-      inline float sinTheta(int bin)
+      inline float sinTheta(unsigned long bin)
       {
         if (not m_lookup_created) initialize();
         return m_sin_theta[bin];
       };
 
-      inline float cosTheta(int bin)
+      inline float cosTheta(unsigned long bin)
       {
         if (not m_lookup_created) initialize();
         return m_cos_theta[bin];
       };
 
-      inline int getNBinsTheta() const {return m_nbinsTheta;};
+      inline unsigned long getNBinsTheta() const {return m_nbinsTheta;};
 
-      void setNBinsTheta(int nbins) {m_nbinsTheta = nbins;};
+      void setNBinsTheta(unsigned long nbins) {m_nbinsTheta = nbins;};
 
     private:
 
@@ -71,7 +71,7 @@ namespace Belle2 {
       float* m_sin_theta; /**< Lookup array for calculation of sin */
       float* m_cos_theta; /**< Lookup array for calculation of cos */
       bool m_lookup_created; /**< Allows to use the same lookup table for sin and cos */
-      int m_nbinsTheta; /**< Number of theta bins */
+      unsigned long m_nbinsTheta; /**< Number of theta bins */
 
       static TrigonometricalLookupTable* s_trigonometricalLookupTable;
 

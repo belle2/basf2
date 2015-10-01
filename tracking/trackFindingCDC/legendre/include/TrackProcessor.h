@@ -66,6 +66,8 @@ namespace Belle2 {
        */
       void initializeQuadTreeHitWrappers();
 
+      void removeBadSLayers(CDCTrack& track);
+
       /*CDCTrack&*/ void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
 
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
@@ -134,11 +136,24 @@ namespace Belle2 {
       void resetMaskedHits()
       {
         doForAllHits([](QuadTreeHitWrapper & hit) {
-          if (hit.getMaskedFlag()) {
-            hit.setMaskedFlag(false);
-            hit.setUsedFlag(false);
+          hit.setMaskedFlag(false);
+          hit.setUsedFlag(false);
+        });
+
+        doForAllTracks([](CDCTrack & track) {
+          for (CDCRecoHit3D& hit : track) {
+            hit.getWireHit().getAutomatonCell().setTakenFlag(true);
           }
         });
+        /*
+
+                doForAllHits([](QuadTreeHitWrapper & hit) {
+                  if (hit.getMaskedFlag()) {
+                    hit.setMaskedFlag(false);
+                    hit.setUsedFlag(false);
+                  }
+                });
+        */
       }
 
       /**
@@ -153,7 +168,7 @@ namespace Belle2 {
     private:
       std::vector<CDCTrack> m_cdcTracks; /**< List of track candidates. */
       std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits */
-      CDCRiemannFitter m_trackFitter;
+      CDCKarimakiFitter m_trackFitter;
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed

@@ -54,7 +54,7 @@ using namespace TrackFindingCDC;
 
 //  B2INFO("update");
   updateTrack(newTrackCandidate);
-
+//return;
 //  B2INFO("split");
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
   if (not checkTrack(newTrackCandidate)) {
@@ -68,6 +68,9 @@ using namespace TrackFindingCDC;
 //  B2INFO("update");
   updateTrack(newTrackCandidate);
 
+//  removeBadSLayers(newTrackCandidate);
+
+
 //  B2INFO("delete");
   deleteBadHitsOfOneTrack(newTrackCandidate);
   if (not checkTrack(newTrackCandidate)) {
@@ -77,9 +80,13 @@ using namespace TrackFindingCDC;
     }
     return;
   }
+
+  updateTrack(newTrackCandidate);
 
   assignNewHits(newTrackCandidate);
 
+  removeBadSLayers(newTrackCandidate);
+
 //  B2INFO("split");
   TrackMergerNew::splitBack2BackTrack(newTrackCandidate);
   if (not checkTrack(newTrackCandidate)) {
@@ -102,6 +109,14 @@ using namespace TrackFindingCDC;
     }
     return;
   }
+
+  removeBadSLayers(newTrackCandidate);
+
+
+  //  B2INFO("update");
+  updateTrack(newTrackCandidate);
+
+  assignNewHits(newTrackCandidate);
 
   //  B2INFO("update");
   updateTrack(newTrackCandidate);
@@ -133,7 +148,7 @@ void TrackProcessorNew::updateTrack(CDCTrack& track)
 
   CDCTrajectory2D trackTrajectory2D = /*m_trackFitter.*/fit(track);
 
-
+  //B2INFO("orientation: " << trackTrajectory2D.getLocalCircle().orientation() << "; charge: " << trackTrajectory2D.getChargeSign() << "; charge2: " << TrackMergerNew::getChargeSign(track));
 
   if (trackTrajectory2D.getChargeSign() != TrackMergerNew::getChargeSign(track)) trackTrajectory2D.reverse();
 
@@ -158,6 +173,71 @@ void TrackProcessorNew::updateTrack(CDCTrack& track)
 
 }
 
+void TrackProcessorNew::removeBadSLayers(CDCTrack& track)
+{
+  return;
+  track.sortByArcLength2D();
+  /*
+    B2INFO("track:")
+    for(const CDCRecoHit3D& hit: track){
+      B2INFO("  ArcLength2D: " <<  hit.getArcLength2D());
+    }
+  */
+  int startSLayer = track.front().getISuperLayer();
+  int currentSLayer(startSLayer);
+  int nHitsInSL(0);
+
+  FloatType startArcLength(track.front().getArcLength2D());
+  FloatType stopArcLength(track.back().getArcLength2D());
+
+  std::vector<CDCRecoHit3D>::iterator lastHit;
+  /*
+    for(const CDCRecoHit3D& hit: track)
+    {
+      if(currentSLayer == hit.getISuperLayer()) nHitsInSL ++;
+      else if(((currentSLayer == (hit.getISuperLayer() + 2)) || (currentSLayer == (hit.getISuperLayer() - 2))) && (nHitsInSL <= 3)) {
+        nHitsInSL = 0;
+        currentSLayer = hit.getISuperLayer();
+      } else {
+        startArcLength = hit.getArcLength2D();
+        break;
+      }
+    }
+
+    track.erase(std::remove_if(track.begin(), track.end(), [&startArcLength](CDCRecoHit3D& hit){
+      return hit.getArcLength2D() < startArcLength;
+    }), track.end());
+  */
+  currentSLayer = track.front().getISuperLayer();
+  nHitsInSL = 0;
+  currentSLayer = 2;
+  for (const CDCRecoHit3D& hit : track) {
+    if (hit.getISuperLayer() < 2) continue;
+    if (currentSLayer == hit.getISuperLayer()) nHitsInSL ++;
+    else if (((currentSLayer == (hit.getISuperLayer() + 2)) || (currentSLayer == (hit.getISuperLayer() - 2))) && (nHitsInSL >= 4)) {
+      nHitsInSL = 0;
+      currentSLayer = hit.getISuperLayer();
+    } else {
+      stopArcLength = hit.getArcLength2D();
+      break;
+//      lastHit = hit;
+    }
+  }
+
+  if ((stopArcLength > track.back().getArcLength2D())
+      || (stopArcLength < track.front().getArcLength2D()))B2WARNING("wrong stop ArcLength");
+
+  track.erase(std::remove_if(track.begin(), track.end(), [&stopArcLength](CDCRecoHit3D & hit) {
+    if (hit.getArcLength2D() > stopArcLength) {
+      hit.getWireHit()->getAutomatonCell().setTakenFlag(false);
+      hit.getWireHit()->getAutomatonCell().setMaskedFlag(false);
+      return true;
+    } else return false;
+
+//    return hit.getArcLength2D() > stopArcLength;
+  }), track.end());
+
+}
 
 bool TrackProcessorNew::checkTrack(CDCTrack& track)
 {
@@ -202,6 +282,7 @@ void TrackProcessorNew::initializeQuadTreeHitWrappers()
 
 }
 
+
 std::vector<QuadTreeHitWrapper*> TrackProcessorNew::createQuadTreeHitWrappersForQT()
 {
   doForAllTracks([](CDCTrack & cand) {
@@ -224,7 +305,7 @@ void TrackProcessorNew::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
 
   for (CDCRecoHit3D& recoHit : trackCandidate) {
 
-    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.3)
+    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.2)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
@@ -301,12 +382,14 @@ void TrackProcessorNew::mergeTracks()
       }
 
       if (TrackMergerNew::mergeTwoTracks(track1, track2)) {
-        B2INFO("MERGE TRACKS!");
+//        B2INFO("MERGE TRACKS!");
 
         for (const CDCRecoHit3D& hit : track2) {
           track1.push_back(std::move(hit));
         }
         track2.clear();
+
+        TrackMergerNew::splitBack2BackTrack(track1);
 
         updateTrack(track1);
       }

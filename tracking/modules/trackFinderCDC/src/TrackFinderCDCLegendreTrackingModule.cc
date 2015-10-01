@@ -83,6 +83,11 @@ void CDCLegendreTrackingModule::initialize()
 
   // set parameters of track processor
   m_cdcLegendreTrackProcessor.setTrackDrawer(m_cdcLegendreTrackDrawer);
+
+  m_track1Run = 0;
+  m_track2Run = 0;
+  m_track3Run = 0;
+
 }
 
 void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
@@ -107,20 +112,36 @@ void CDCLegendreTrackingModule::findTracks()
 {
   B2DEBUG(100, "Perform track finding");
 
+  int nTracksBefore = m_trackProcessor.getTracks().size();
   // The first case is somewhat special
   doTreeTrackFinding(50, 0.07, false);
 //  if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
 //    postprocessTracks();
+  int nTracksAfter = m_trackProcessor.getTracks().size();
+//  m_trackProcessor.mergeTracks();
 
+  m_track1Run += nTracksAfter - nTracksBefore;
+
+  nTracksBefore = nTracksAfter;
   doTreeTrackFinding(50, 0.07, true);
 //  if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
 //    postprocessTracks();
+  nTracksAfter = m_trackProcessor.getTracks().size();
+//  m_trackProcessor.mergeTracks();
 
+  m_track2Run += nTracksAfter - nTracksBefore;
+
+  nTracksBefore = nTracksAfter;
   for (int counter = 1; counter < m_treeFindingNumber; counter++) {
     doTreeTrackFinding((m_treeFindingNumber - counter) * 20, 0.15, true);
 //    if (counter == m_treeFindingNumber - 1 || m_doPostprocessingOften)
 //      postprocessTracks();
   }
+  nTracksAfter = m_trackProcessor.getTracks().size();
+//  m_trackProcessor.mergeTracks();
+
+  m_track3Run += nTracksAfter - nTracksBefore;
+
 
 //  m_trackProcessor.mergeTracks();
 //  m_trackProcessor.assignNewHits();
@@ -144,7 +165,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   int maxLevel = 1;
 
   if (not increaseThreshold) maxLevel = m_maxLevel;
-  else maxLevel = m_maxLevel - 2;
+  else maxLevel = m_maxLevel - 3;
 
 
   double rCDC = 113.;
@@ -182,27 +203,40 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
 
   BasePrecisionFunction::PrecisionFunction currentFunct;
+//  currentFunct = originPrecisionFunction.getFunction();
+//  if (*not increaseThreshold) currentFunct = originPrecisionFunction.getFunction();
+//  else currentFunct = nonOriginPrecisionFunction.getFunction();
+  currentFunct = originPrecisionFunction.getFunction();
 
-  if (not increaseThreshold) currentFunct = originPrecisionFunction.getFunction();
-  else currentFunct = nonOriginPrecisionFunction.getFunction();
+  AxialHitQuadTreeProcessor::ChildRanges ranges;
+//  ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 15)), AxialHitQuadTreeProcessor::rangeY(m_rMin, m_rMax));
+  ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0,  0.3));
 
 
-
-  AxialHitQuadTreeProcessor::ChildRanges ranges(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 15)),
-                                                AxialHitQuadTreeProcessor::rangeY(m_rMin, m_rMax));
+  if ((rThreshold == 0.07) and (not increaseThreshold)) {
+    currentFunct = originPrecisionFunction.getFunction();
+    ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.075));
+  } else if ((rThreshold == 0.07) and increaseThreshold) {
+    currentFunct = nonOriginPrecisionFunction.getFunction();
+    ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15));
+  } else { /*if(rThreshold == 0.15)*/
+    currentFunct = nonOriginPrecisionFunction.getFunction();
+    ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0, 0.15));
+  }
   std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
 
   AxialHitQuadTreeProcessor qtProcessor(maxLevel, ranges, currentFunct, (increaseThreshold and (rThreshold < 0.15)));
   qtProcessor.provideItemsSet(hitsVector);
+//  qtProcessor.drawNode();
 
 
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdAdvancedProcessing = [&](const AxialHitQuadTreeProcessor::ReturnList &
   __attribute__((unused)) hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
     double rRes = currentFunct(qt->getYMean());
-    int thetaRes = abs(m_nbinsTheta* rRes / 0.3);
+    unsigned long thetaRes = abs(m_nbinsTheta* rRes / 0.3);
 
-    int meanTheta = qt->getXMean();
+    unsigned long meanTheta = qt->getXMean();
     double meanR = qt->getYMean();
 
 
@@ -211,9 +245,9 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     for (int ii = -1; ii <= 1; ii = +2)
     {
       for (int jj = -1; jj <= 1; jj = +2) {
-        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<int>((
+        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<unsigned long>((
           ii - 1)*thetaRes / 2),
-        meanTheta + static_cast<int>((ii + 1)*thetaRes / 2)),
+        meanTheta + static_cast<unsigned long>((ii + 1)*thetaRes / 2)),
         AxialHitQuadTreeProcessor::rangeY(meanR + (jj - 1)*rRes / 2.,
         meanR + (jj + 1)*rRes / 2.));
 
@@ -224,9 +258,9 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
     for (int ii = -1; ii <= 1; ii++)
     {
       for (int jj = -1; jj <= 1; jj++) {
-        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<int>((
+        AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<unsigned long>((
                                                            2 * ii - 1)*thetaRes / 2),
-                                                         meanTheta + static_cast<int>((2 * ii + 1)*thetaRes / 2)),
+                                                         meanTheta + static_cast<unsigned long>((2 * ii + 1)*thetaRes / 2)),
                                                          AxialHitQuadTreeProcessor::rangeY(meanR + (2 * jj - 1)*rRes / 2.,
                                                              meanR + (2 * jj + 1)*rRes / 2.));
 
@@ -309,7 +343,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
     if (increaseThreshold) {
       rThreshold *= 2.;
-      if (rThreshold > m_rMax) rThreshold = m_rMax;
+      if (rThreshold > ranges.second.second) rThreshold = ranges.second.second;
     }
 
 
@@ -475,6 +509,12 @@ void CDCLegendreTrackingModule::postprocessTracks()
 
 void CDCLegendreTrackingModule::terminate()
 {
+  B2INFO("Tracks in runs:");
+  B2INFO("	run 1: " << m_track1Run);
+  B2INFO("	run 2: " << m_track2Run);
+  B2INFO("	run 3: " << m_track3Run);
+
+
 //  m_trackProcessor.saveHist();
   delete m_cdcLegendreTrackDrawer;
 }

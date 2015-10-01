@@ -498,17 +498,16 @@ void MuidModule::registerVolumes()
     const G4String name = (*iVol)->GetName();
     // see belle2/run/volname3.txt:
     // Barrel KLM: BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
-    //             BKLM.ScintType*Physical for scintillator strips
+    //             BKLM.ScintActiveType*Physical for scintillator strips
     if (name.compare(0, 5, "BKLM.") == 0) {
-      if ((name.find("ScintType") != string::npos) ||
+      if ((name.find("ScintActiveType") != string::npos) ||
           (name.find("GasPhysical") != string::npos)) {
         m_BKLMVolumes->push_back(*iVol);
         m_EnterExit->push_back(*iVol);
       }
     }
     // Endcap KLM:
-    // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
-    if (name.compare(0, 27, "Sensitive_Strip_StripVolume") == 0) {
+    if (name.compare(0, 14, "StripSensitive") == 0) {
       m_EKLMVolumes->push_back(*iVol);
       m_EnterExit->push_back(*iVol);
     }
@@ -631,9 +630,9 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
   G4String name = touch->GetVolume(0)->GetName();
 
   // BKLM.Layer**GasPhysical or BKLM.Layer**ChimneyGasPhysical for barrel KLM RPCs
-  // BKLM.ScintType*Physical for barrel KLM scintillator strips
+  // BKLM.ScintActiveType*Physical for barrel KLM scintillator strips
   if (name.compare(0, 5, "BKLM.") == 0) {
-    if ((name.find("ScintType") != string::npos) ||
+    if ((name.find("ScintActiveType") != string::npos) ||
         (name.find("GasPhysical") != string::npos)) {
       detID = Const::EDetector::KLM;
       int baseDepth = touch->GetHistoryDepth() - DEPTH_RPC;
@@ -662,14 +661,13 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
   }
 
   // Endcap KLM scintillators:
-  // Sensitive_Strip_StripVolume_{1..75}_Plane_{1,2}_Sector_{1..4}_Layer_{1..14}_Endcap_{1,2}
-  if (name.compare(0, 27, "Sensitive_Strip_StripVolume") == 0) {
+  if (name.compare(0, 14, "StripSensitive") == 0) {
     detID = Const::EDetector::KLM;
-    copyID = EKLM::stripNumber(touch->GetVolume(6)->GetCopyNo(),
-                               touch->GetVolume(5)->GetCopyNo(),
+    copyID = EKLM::stripNumber(touch->GetVolume(5)->GetCopyNo(),
                                touch->GetVolume(4)->GetCopyNo(),
                                touch->GetVolume(3)->GetCopyNo(),
-                               touch->GetVolume(2)->GetCopyNo());
+                               touch->GetVolume(2)->GetCopyNo(),
+                               touch->GetVolume(1)->GetCopyNo());
   }
 
 }

@@ -226,16 +226,17 @@ namespace Belle2 {
     static filterTypes getFilterType(int filterInt);
 
     /** converts existing enum value into suitable string with name of filter type. */
-    static std::string getFilterString(filterTypes filterType) { return nameVector[filterType]; }
+    static std::string getFilterString(filterTypes filterType) { return getTypeName(filterType); }
 
     /** converts int value into suitable string with name of filter type (if int value is equal to values of enum). */
     static std::string getFilterString(int filterType);
 
     /** returns name of given type, needed for compatibility with other modules */
-    static std::string getTypeName(filterTypes filterType) { return getFilterString(filterType); }
+    static std::string getTypeName(filterTypes filterType);
 
     /** returns type of given name, needed for compatibility with other modules. */
     static filterTypes getTypeEnum(std::string filterString) {return getFilterType(filterString); }
+
   protected:
   }; //end class FilterID
 } //end namespace Belle2

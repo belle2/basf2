@@ -186,10 +186,10 @@ namespace Belle2 {
           innerIt->getSectorID()
         };
         hitBundle.hits = {
-          outerIt,
-          outerCenterIt,
-          innerCenterIt,
-          innerIt
+          &(*outerIt),
+          &(*outerCenterIt),
+          &(*innerCenterIt),
+          &(*innerIt)
         };
         m_dataSet.sectorIDs = hitBundle.sectorIDs;
         m_filterMill.grindData(hitBundle, collectedResults);

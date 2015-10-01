@@ -347,7 +347,6 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         mod_key = '{0}_{1}'.format(strip_ext(item.rootfile), item.key)
         desc[mod_key] = item.description
         p_value[mod_key] = item.pvalue
-        print "item.metaoptions - " + str(item.metaoptions)
         is_expert[mod_key] = "expert" in item.metaoptions
 
     ident = []

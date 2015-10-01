@@ -2,10 +2,7 @@ Import('env')
 env['TOOLS_LIBS']['wave_test'] = ['svd','vxd','$ROOT_LIBS']
 env['TOOLS_LIBS']['wave_single'] = ['svd', 'vxd', '$ROOT_LIBS']
 env['TOOLS_LIBS']['wavestats_single'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['p_calibration'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['lr_calibration'] = ['svd', 'vxd', '$ROOT_LIBS']
 env['TOOLS_LIBS']['p_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
 env['TOOLS_LIBS']['b_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
 env['TOOLS_LIBS']['ci_efficiency'] = ['svd', 'vxd', '$ROOT_LIBS']
-env['TOOLS_LIBS']['a_calibration'] = ['svd', 'vxd', '$ROOT_LIBS']
 Return('env')

@@ -9,11 +9,13 @@
 """
 from basf2 import *
 from simulation import add_simulation
+from beamparameters import add_beamparameters
 import glob
 
 set_random_seed(12345)
 
 main = create_path()
+add_beamparameters(main, "Y4S")
 
 # specify number of events to be generated.
 eventinfosetter = register_module('EventInfoSetter')
@@ -24,7 +26,6 @@ main.add_module(eventinfosetter)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
 main.add_module(evtgeninput)
 
 # detector simulation

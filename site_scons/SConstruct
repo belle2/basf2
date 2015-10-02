@@ -3,6 +3,7 @@
 
 import os
 import config
+import subprocess
 
 
 # determine whether we have an analysis or a local release
@@ -131,7 +132,24 @@ elif option == 'clang':
     # So we compile c files with gcc and only c++ with clang for now
     # global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
-    global_env.Append(CCFLAGS = ['-O2'])
+    global_env.Append(CCFLAGS=['-O2'])
+    # make sure clang uses the correct paths to the gcc std c++ and not the
+    # system ones. First we disable the default c++ include path
+    global_env.Append(CXXFLAGS=["-nostdinc++"])
+    # now let's look what gcc uses as includes. Let's call the g++ to give us
+    # the search path
+    gcc_search_path = subprocess.check_output(["g++", "-v", "-x", "c++", "--syntax-only", "/dev/null"], stderr=subprocess.STDOUT)
+    is_search_path = False
+    for line in gcc_search_path.splitlines():
+        if line.startswith("End of search list"):
+            break
+        # ok, here we process all lines in the g++ default include path. If they
+        # have c++ in the name we take them
+        if is_search_path and line.find("c++") >= 0:
+            global_env.Append(CXXFLAGS=["-isystem%s" % line.strip()])
+        # search path starts after this line
+        if line.startswith("#include <...> search starts here:"):
+            is_search_path = True
 else:
     print 'Aborted because of unknown build option:', option
     Exit(1)

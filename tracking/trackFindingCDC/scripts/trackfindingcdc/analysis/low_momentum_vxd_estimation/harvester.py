@@ -319,7 +319,7 @@ class FitHarvester(QueueHarvester):
         fit_momentum = track_fit_result.getMomentum()
         true_momentum = mc_particle.getMomentum()
 
-        related_reco_track = track_fit_result.getRelated("RecoTracks")
+        related_reco_track = track_fit_result.getRelated("GF2Tracks")
         cardinal_rep = related_reco_track.getCardinalRep()
         kalman_fit_state = related_reco_track.getKalmanFitStatus()
 

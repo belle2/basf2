@@ -24,25 +24,25 @@ namespace Belle2 {
     {
       setDescription("Many tracks in the CDC can not be fitted. For fitting them, we remove parts of the hits or maybe the whole track.");
 
-      addParam("minimalMomentum", m_param_minimalMomentum,
-               "The minimal momentum under which the corrections take place. Use an arbitrary high value (like 10) to use all tracks.", 10.0);
       addParam("corrections", m_param_corrections,
                "The list of corrections to apply. Choose from LayerBreak, LargeAngle, OneSuperlayer, Small.",
       {std::string("LayerBreak"), std::string("LargeAngle"), std::string("OneSuperlayer"), std::string("Small")});
+
+      addParam("onlyNotFittedTracks", m_param_onlyNotFittedTracks,
+               "Flag to use the corrections only for not fitted tracks", false);
     }
 
   private:
     /**
-     * Go through all tracks and edit them to better fitable.
-     * @param tracks
+     * Go through all tracks and correct them to be better fitable.
      */
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    /** Minimal Momentum under which to do the corrections. */
-    double m_param_minimalMomentum = 0.4;
-
-    /** The corrections to use */
+    /// The corrections to use
     std::vector<std::string> m_param_corrections;
+
+    /// Flag to use the corrections only for not fitted tracks
+    bool m_param_onlyNotFittedTracks = false;
   };
 
 }

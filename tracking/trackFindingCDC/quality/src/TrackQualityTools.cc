@@ -12,7 +12,19 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace std;
 
-CDCTrack TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track) const
+
+void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track) const
+{
+  for (const CDCRecoHit3D& recoHit : track) {
+    if (recoHit.getStereoType() == StereoType::c_Axial) {
+      break;
+    } else {
+      recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
+    }
+  }
+}
+
+void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCTrack>& tracks) const
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
@@ -30,12 +42,14 @@ CDCTrack TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track) const
     double currentArcLength2D = recoHit.getArcLength2D();
     if (currentArcLength2D < 0) B2INFO("Below 0");
     if (currentArcLength2D > arcLength2DOfApogee) {
-      splittedCDCTrack.push_back(CDCRecoHit3D(recoHit));
+      splittedCDCTrack.push_back(recoHit);
       recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
     }
   }
 
-  return splittedCDCTrack;
+  if (splittedCDCTrack.size() > 0) {
+    tracks.push_back(splittedCDCTrack);
+  }
 }
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const

@@ -5,6 +5,8 @@
 #include <framework/dataobjects/Helix.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -15,21 +17,44 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 {
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
+  // Only use the not fitted tracks if set
+  if (m_param_onlyNotFittedTracks) {
+    tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) {
+      const genfit::TrackCand* trackCand = track.getRelatedGenfitTrackCandidate();
+      if (trackCand == nullptr) {
+        B2WARNING("Can not decide whether to correct this track or not, as it has no related genfit::TrackCand. Skipping.");
+        return true;
+      }
+      RecoTrack* recoTrack = DataStore::Instance().getRelated<RecoTrack>(trackCand, "GF2Tracks");
+      if (recoTrack == nullptr) {
+        B2WARNING("Can not decide whether to correct this track or not, as it has no related RecoTrack. Skipping.");
+        return true;
+      }
+
+      if (recoTrack->wasLastFitSucessfull()) {
+        return true;
+      }
+
+      return false;
+    }), tracks.end());
+  }
+
+  std::vector<CDCTrack> splittedTracks;
+
   for (CDCTrack& track : tracks) {
     // Reset all hits to not have a background hit (what they should not have anyway)
     trackQualityTools.normalizeHitsAndResetTrajectory(track);
-    /*if (track.getStartTrajectory3D().getAbsMom3D() > m_param_minimalMomentum)
-      continue;*/
+
 
     for (const std::string& correctorFunction : m_param_corrections) {
       if (correctorFunction == "LayerBreak") {
-        // more or less GOOD
+        // GOOD
         trackQualityTools.removeHitsAfterLayerBreak(track);
       } else if (correctorFunction == "LargeAngle") {
-        // more or less GOOD
+        // GOOD
         trackQualityTools.removeHitsInTheBeginningIfAngleLarge(track);
       } else if (correctorFunction == "LargeBreak2") {
-        // more or less GOOD
+        // GOOD
         trackQualityTools.removeHitsAfterLayerBreak2(track);
       } else if (correctorFunction == "OneSuperlayer") {
         // GOOD
@@ -40,14 +65,15 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
       } else if (correctorFunction == "B2B") {
         // GOOD
         trackQualityTools.removeHitsOnTheWrongSide(track);
-      } else if (correctorFunction == "None") {
+      } else if (correctorFunction == "MoveToNextAxial") {
         // GOOD
+        trackQualityTools.moveToNextAxialLayer(track);
+      } else if (correctorFunction == "None") {
+        // GOOD :-)
         ;
       } else if (correctorFunction == "Split") {
-        CDCTrack newSplittedTrack = trackQualityTools.splitSecondHalfOfTrack(track);
-        /*if(newSplittedTrack.size() > 0) {
-          tracks.push_back(newSplittedTrack);
-        }*/
+        // Working, but makes it not better
+        trackQualityTools.splitSecondHalfOfTrack(track, splittedTracks);
       } else if (correctorFunction == "ArcLength2D") {
         // ???
         trackQualityTools.removeArcLength2DHoles(track);
@@ -65,11 +91,13 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
 
     if (track.size() == 0)
       continue;
-
-    trackQualityTools.normalizeHitsAndResetTrajectory(track);
   }
 
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
     return track.size() < 3;
   }), tracks.end());
+
+  for (const CDCTrack& splittedTrack : splittedTracks) {
+    tracks.push_back(splittedTrack);
+  }
 }

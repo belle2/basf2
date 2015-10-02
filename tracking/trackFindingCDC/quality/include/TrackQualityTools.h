@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -54,7 +56,9 @@ namespace Belle2 {
 
       void removeArcLength2DHoles(CDCTrack& track) const;
 
-      CDCTrack splitSecondHalfOfTrack(CDCTrack& track) const;
+      void splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCTrack>& tracks) const;
+
+      void moveToNextAxialLayer(CDCTrack& track) const;
 
     private:
       const double m_outerCylindricalRFactor = 1.1;

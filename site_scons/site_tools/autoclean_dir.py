@@ -25,10 +25,12 @@ def autoclean_dir(env, dirname):
 
     # Now delete all files found in the directory which are not in the target set
     for (dirname, dirs, files) in os.walk(str(directory)):
+        if "__pycache__" in dirs:
+            dirs.remove("__pycache__")
         for filename in files:
             fullname = os.path.join(dirname, filename)
-            if not fullname in targets and not (fullname.endswith('.pyc')
-                    and fullname[:-1] in targets):
+            if fullname not in targets and not \
+                    (fullname.endswith('.pyc') and fullname[:-1] in targets):
                 print env['CLEANUPCOMSTR'] % fullname
                 os.remove(fullname)
 
@@ -39,5 +41,3 @@ def generate(env):
 
 def exists(env):
     return True
-
-

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-# coding:utf8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 This script determines the time spent in each part of the simulation. It does
 that by assigning regions to the geometry created by each creator and then

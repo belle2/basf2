@@ -15,13 +15,13 @@ def _avoidPyRootHang():
     """
     import subprocess
     ldd_ver = subprocess.check_output(['ldd', '--version'])
-    sl5_libc_string = "ldd (GNU libc) 2.5"
+    sl5_libc_string = b"ldd (GNU libc) 2.5"
     if sl5_libc_string in ldd_ver:
         try:
             from ROOT import PyConfig
             PyConfig.StartGuiThread = False
         except:
-            print "PyRoot not set up, this will cause problems."
+            print("PyRoot not set up, this will cause problems.")
 
 
 _avoidPyRootHang()

@@ -206,7 +206,7 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
 }
 
 void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment, std::vector<const CDCRecoSegment3D*>& recoSegments,
-                                             const CDCTrajectory2D& trackTrajectory, const double maximumPerpS) const
+                                             const CDCTrajectory2D& trackTrajectory, const double /*maximumPerpS unused in the moment*/) const
 {
   const double radius = trackTrajectory.getGlobalCircle().absRadius();
   const bool isCurler = trackTrajectory.isCurler();
@@ -226,23 +226,13 @@ void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment, st
 
   // Skip segments with hits on the wrong side (of not curlers)
   bool oneHitIsOnWrongSide = false;
-  bool oneHitIsTooFarAway = false;
   for (CDCRecoHit3D& recoHit : newRecoSegment) {
     const double currentArcLength2D = recoHit.getArcLength2D();
     if (currentArcLength2D < 0) {
       oneHitIsOnWrongSide = true;
       recoHit.setArcLength2D(currentArcLength2D + 2 * TMath::Pi() * radius);
     }
-
-    if (recoHit.getArcLength2D() - maximumPerpS > 30) {
-      oneHitIsTooFarAway = true;
-      break;
-    }
   }
-
-  //if (oneHitIsTooFarAway) {
-  //  return;
-  //}
 
   if (not isCurler and m_checkForB2BTracks and oneHitIsOnWrongSide) {
     return;

@@ -10,13 +10,15 @@ import subprocess
 analysis = 'BELLE2_ANALYSIS_DIR' in os.environ
 
 # build options
-AddOption('--color', dest = 'color', nargs = 1, default = 'off', action = 'store', help = 'Enable color output. Possible values are: off, light, dark')
-AddOption('--verbose', dest = 'verbose', action = 'store_true', default = False, help='Enable verbose output')
+AddOption('--color', dest='color', nargs=1, default='off', action='store',
+          help='Enable color output. Possible values are: off, light, dark')
+AddOption('--verbose', dest='verbose', action='store_true', default=False, help='Enable verbose output')
 if not analysis:
-    AddOption('--local', dest = 'local', action = 'store_true', default = False, help='Enable faster build of local code. No code in the central release should depend on the local code!')
-AddOption('--no-symlink', dest = 'no-symlink', action = 'store_true', default = False, help='Use copies instead of symbolic links')
-AddOption('--extra-libpath', dest = 'extralibpath', action = 'store', help = 'Additional library path')
-AddOption('--extra-ccflags', dest = 'extraccflags', action = 'store', help = 'Additional compiler flags')
+    AddOption('--local', dest='local', action='store_true', default=False,
+              help='Enable faster build of local code. No code in the central release should depend on the local code!')
+AddOption('--no-symlink', dest='no-symlink', action='store_true', default=False, help='Use copies instead of symbolic links')
+AddOption('--extra-libpath', dest='extralibpath', action='store', help='Additional library path')
+AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
 
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
@@ -30,51 +32,53 @@ if analysis:
     setup_message = '-> Execute "setupana" in your local analysis directory.'
 
 # get the sub directory name for architecture and build option dependent files
-if not 'BELLE2_SUBDIR' in os.environ:
+if 'BELLE2_SUBDIR' not in os.environ:
     print 'Belle II software environment is not set up.'
     print setup_message
     Exit(1)
 subdir = os.environ['BELLE2_SUBDIR']
 
 # check for the externals
-if not 'BELLE2_EXTERNALS_DIR' in os.environ:
+if 'BELLE2_EXTERNALS_DIR' not in os.environ:
     print 'externals are not set up.'
     print setup_message
     Exit(1)
 extsubdir = os.environ.get('BELLE2_EXTERNALS_SUBDIR', subdir)
 
 # check for root
-if not 'ROOTSYS' in os.environ:
+if 'ROOTSYS' not in os.environ:
     print 'root is not set up.'
     print setup_message
     Exit(1)
 
 # create construction environment
-global_env = Environment(ENV = os.environ,
-                         tools = ['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
-                         BUILDERS = {},
-                         BUILDDIR = os.path.join('#build', subdir),
-                         INCDIR = '#include',
-                         LIBDIR = os.path.join('#lib', subdir),
-                         BINDIR = os.path.join('#bin', subdir),
-                         MODDIR = os.path.join('#modules', subdir),
-                         DATADIR = '#data',
-                         EXTDIR = os.environ['BELLE2_EXTERNALS_DIR'],
-                         EXTINCDIR = os.path.join('$EXTDIR', 'include'),
-                         EXTLIBDIR = os.path.join('$EXTDIR', 'lib', extsubdir),
-                         EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
-                         LINK='g++',
-                         SHLINK='g++',
-                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR'],
-                         CXXFLAGS = ['-std=c++11'],
-                         CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
-                         CPPPATH = ['include'],
-                         LIBPATH = ['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
-                         DATAOBJECT_LIBS = [],
-                         TOOLS_LIBS = {},
-                         TOOLS_LIBPATH = {},
-                         TEST_LIBS = [],
-                         TEST_FILES = [])
+global_env = Environment(
+    ENV=os.environ,
+    tools=['default', 'root_dict', 'sym_link', 'process_dir', 'reg_map', 'output', 'autoclean_dir'],
+    BUILDERS={},
+    BUILDDIR=os.path.join('#build', subdir),
+    INCDIR='#include',
+    LIBDIR=os.path.join('#lib', subdir),
+    BINDIR=os.path.join('#bin', subdir),
+    MODDIR=os.path.join('#modules', subdir),
+    DATADIR='#data',
+    EXTDIR=os.environ['BELLE2_EXTERNALS_DIR'],
+    EXTINCDIR=os.path.join('$EXTDIR', 'include'),
+    EXTLIBDIR=os.path.join('$EXTDIR', 'lib', extsubdir),
+    EXTBINDIR=os.path.join('$EXTDIR', 'bin', extsubdir),
+    LINK='g++',
+    SHLINK='g++',
+    CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
+    CXXFLAGS=['-std=c++11'],
+    CPPDEFINES={'_PACKAGE_': '\\"$PACKAGE\\"'},
+    CPPPATH=['include'],
+    LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
+    DATAOBJECT_LIBS=[],
+    TOOLS_LIBS={},
+    TOOLS_LIBPATH={},
+    TEST_LIBS=[],
+    TEST_FILES=[]
+)
 
 # recalculate MD5 sums only if the time stamp differs
 global_env.Decider('MD5-timestamp')
@@ -84,18 +88,18 @@ SetOption('implicit_cache', 1)
 
 # include extra library paths and compiler flags
 if GetOption('extralibpath'):
-    global_env.Append(LIBPATH = GetOption('extralibpath').split(':'))
+    global_env.Append(LIBPATH=GetOption('extralibpath').split(':'))
 if GetOption('extraccflags'):
-    global_env.Append(CCFLAGS = GetOption('extraccflags').split())
+    global_env.Append(CCFLAGS=GetOption('extraccflags').split())
 
 # check for debug flag
 option = os.environ['BELLE2_OPTION']
 if option == 'debug':
-    global_env.Append(CCFLAGS = ['-Wextra', '-Wstack-usage=50000', '-g', '-Og'])
-    global_env.Append(FORTRANFLAGS = '-g')
+    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=50000', '-g', '-Og'])
+    global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS = ['-Wextra', '-Wstack-usage=50000', '-O3'])
-    global_env.Append(FORTRANFLAGS = '-O3')
+    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=50000', '-O3'])
+    global_env.Append(FORTRANFLAGS='-O3')
 elif option == 'intel':
     intel_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -117,7 +121,7 @@ elif option == 'intel':
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpc'
     global_env['SHLINK'] = 'icpc'
-    global_env.Append(CCFLAGS = ['-wd383,981,1419'])
+    global_env.Append(CCFLAGS=['-wd383,981,1419'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -155,18 +159,18 @@ else:
     Exit(1)
 
 
-#allow overriding some things from command line (e.g. to enable scan-build)
+# allow overriding some things from command line (e.g. to enable scan-build)
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
-  if v in os.environ:
-    print "Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v])
-    global_env[v] = os.environ[v]
+    if v in os.environ:
+        print "Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v])
+        global_env[v] = os.environ[v]
 
 # central release
 repository = None
 if analysis:
-    global_env.Append(CCFLAGS = ['-I' + os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'include')])
-    global_env.Append(LIBPATH = [os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
+    global_env.Append(CCFLAGS=['-I' + os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'include')])
+    global_env.Append(LIBPATH=[os.path.join(os.environ['BELLE2_RELEASE_DIR'], 'lib', subdir)])
 else:
     # use central release as repository if it is set up
     if 'BELLE2_RELEASE_DIR' in os.environ:
@@ -174,7 +178,7 @@ else:
         global_env.Repository(repository)
 
 # set variant directory for object files
-VariantDir(global_env['BUILDDIR'], '.', duplicate = 0)
+VariantDir(global_env['BUILDDIR'], '.', duplicate=0)
 
 
 # check for required packages and configure the environment
@@ -182,14 +186,14 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
     if not config.configure(global_env):
         Exit(1)
 
-#cling remembers include paths to be able to find them at run-time, so only use -I here
-#remove all compiler-specfic warnings, which are not understood by rootcling
+# cling remembers include paths to be able to find them at run-time, so only use -I here
+# remove all compiler-specfic warnings, which are not understood by rootcling
 global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
-                            if not (s.startswith("-Wstack-usage") or s.startswith('-wd')
-                                    or s in ["-Og"])]
+                            if not (s.startswith("-Wstack-usage") or s.startswith('-wd') or s in ["-Og"])]
 
 special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
-explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and not '/' in p.rstrip('/') and os.path.isdir(p)]
+explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and
+                            '/' not in p.rstrip('/') and os.path.isdir(p)]
 
 # process the analysis directory
 if analysis:
@@ -237,14 +241,14 @@ if analysis:
             release_libs.append(entry[len(global_env.subst('$SHLIBPREFIX')): -len(global_env.subst('$SHLIBSUFFIX'))])
 
 lib = global_env.SharedLibrary(os.path.join(global_env['LIBDIR'], 'dataobjects'), empty_file,
-                               LIBS = global_env['DATAOBJECT_LIBS'] + ['framework'] + release_libs,
-                               LINKFLAGS = '-Wl,--no-as-needed')
+                               LIBS=global_env['DATAOBJECT_LIBS'] + ['framework'] + release_libs,
+                               LINKFLAGS='-Wl,--no-as-needed')
 global_env.Alias('lib', lib)
 
 # build global test executable
 if len(global_env['TEST_FILES']) > 0:
     test = global_env.Program(os.path.join(global_env['BINDIR'], 'test_all'),
-                              global_env['TEST_FILES'], LIBS = global_env['TEST_LIBS'])
+                              global_env['TEST_FILES'], LIBS=global_env['TEST_LIBS'])
     global_env.Alias('test_all', test)
     global_env.Alias('tests', test)
 
@@ -258,13 +262,14 @@ if len(global_env['TEST_FILES']) > 0:
 # built/installed by scons
 
 if explicit_package_targets:
-  print "Performing a quick build for given packages. Note that any removed targets (e.g. modules, include files) will remain until you run a full build without any explicit target packages."
+    print "Performing a quick build for given packages. Note that any removed targets " \
+        "(e.g. modules, include files) will remain until you run a full build without any explicit target packages."
 else:
-  global_env.RemoveNonTargets(global_env["INCDIR"])
-  global_env.RemoveNonTargets(global_env["MODDIR"])
-  global_env.RemoveNonTargets(global_env["LIBDIR"])
-  global_env.RemoveNonTargets(global_env["BINDIR"])
-  global_env.RemoveNonTargets(global_env["DATADIR"])
+    global_env.RemoveNonTargets(global_env["INCDIR"])
+    global_env.RemoveNonTargets(global_env["MODDIR"])
+    global_env.RemoveNonTargets(global_env["LIBDIR"])
+    global_env.RemoveNonTargets(global_env["BINDIR"])
+    global_env.RemoveNonTargets(global_env["DATADIR"])
 
 
 from SCons.Script.Main import OptionsParser

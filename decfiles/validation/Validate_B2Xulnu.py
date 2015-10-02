@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -58,4 +58,4 @@ findMCDecay('anti-B0', 'anti-B0')
 summaryOfLists(['B+', 'B0', 'anti-B0', 'B-'])
 
 process(analysis_main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -22,4 +22,4 @@ toolsTruth += ['SL', '^B+ -> anti-D0 ^tau+ ^nu_tau']
 ntupleTree('TruthTree', 'B+:sig', toolsTruth)
 
 process(analysis_main)
-print statistics
+print(statistics)

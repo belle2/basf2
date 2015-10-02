@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # --------------------------------------
@@ -65,11 +65,12 @@ if not settings.enable_colours:
 # --------------------------------------
 
 def query(string):
-
-# print a query, wait, at the end of the dots for either fail() or done()
+    """
+    print a query, wait, at the end of the dots for either fail() or done()
+    """
 
     string = str(string) + (60 - len(str(string))) * '.'
-    print string,
+    print(string, end=' ')
 
     # try to log it
     try:
@@ -81,8 +82,9 @@ def query(string):
 
 
 def openlog():
-
-# open the logfile manually again after it has been closed
+    """
+    open the logfile manually again after it has been closed
+    """
 
     globals()['log'] = open(logfile, 'a')
     query('Opening logfile <' + logfile + '>')
@@ -93,29 +95,32 @@ query('Opening logfile <' + logfile + '> and loading colours')
 
 
 def mesg(string):
-
-# Simple announcing information debug function, in white
+    """
+    Simple announcing information debug function, in white
+    """
 
     string = str(string)
-    print string
+    print(string)
     log.write(string + '\n')
 
 
 def stop(string):
-
-# Most serious error announcing function, in red
+    """
+    Most serious error announcing function, in red
+    """
 
     string = str(string)
-    print bcolours.FAIL + string + bcolours.ENDC
-            # log it
+    print(bcolours.FAIL + string + bcolours.ENDC)
+    # log it
     log.write(string + '\n')
 
 
 def done():
+    """
+    Prints DONE in green letters - to be used in conjunction with query() above
+    """
 
-# Prints DONE in green letters - to be used in conjunction with query() above
-
-    print bcolours.OKGREEN + 'DONE' + bcolours.ENDC
+    print(bcolours.OKGREEN + 'DONE' + bcolours.ENDC)
 
     # try to log it
     try:
@@ -125,38 +130,42 @@ def done():
 
 
 def fail(list):
+    """
+    Prints FAIL in red letters and follows with debug information if they were
+    passed in the list[strings] as an argument, to be used in conjunction with
+    query() above
+    """
 
-# Prints FAIL in red letters and follows with debug information if they were passed in the list[strings] as an argument, to be used in conjunction with query() above
-
-    print bcolours.FAIL + 'FAIL' + bcolours.ENDC
+    print(bcolours.FAIL + 'FAIL' + bcolours.ENDC)
     log.write('FAIL\n')
 
     # print the debug info
     if list != []:
-        print bcolours.WARNING + 'Printing debug info:\n'
+        print(bcolours.WARNING + 'Printing debug info:\n')
 
         # log it
         log.write('Debug info:\n')
         for foo in list:
-            print foo
+            print(foo)
             log.write(str(foo) + '\n')
-        print bcolours.ENDC
+        print(bcolours.ENDC)
 
 
 def warning(string):
-
-# Prints a yellow warning string that is passed as the argument, moderate problem
+    """
+    Prints a yellow warning string that is passed as the argument, moderate problem
+    """
 
     string = str(string)
     # print if runlevel is 1 or higher
-    print bcolours.WARNING + string + bcolours.ENDC
+    print(bcolours.WARNING + string + bcolours.ENDC)
     log.write(string + '\n')
 
 
 def closeLog():
-
-# closes log after it's been opened manually
-
+    """
+    closes log after it's been opened manually
+    """
     log.close()
 
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -94,4 +94,4 @@ nickslation = {'B0': 'Bd', 'B+': 'Bu', 'D*+': 'Dst'}
 
 # Obsolete
 descripslation = {'D*+': 'D*(2010)+'}
-                   # "K_S0" : "KS0"
+# "K_S0" : "KS0"

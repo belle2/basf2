@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # --------------------------------------
@@ -77,8 +77,7 @@ def postProcess(list_base):
                             i -= 1
                     else:
                         list_base[i] = list_base[i][0]
-                        warning("You have a lone particle enclosed in '()' or some such stuff: "
-                                 + list_base[i])
+                        warning("You have a lone particle enclosed in '()' or some such stuff: " + list_base[i])
                 else:
                     list_base[i] = '(' + list_base[i][0] + ')'
             else:
@@ -101,8 +100,7 @@ def cleanList(stringA, list_base):
                 start_index = i
             if tag2 == list_base[i]:
                 newlist = list_base[start_index + 1:i]
-                list_base = list_base[:start_index] + [newlist] + list_base[i
-                    + 1:]
+                list_base = list_base[:start_index] + [newlist] + list_base[i + 1:]
                 break
     return list_base
 
@@ -113,8 +111,7 @@ def convertPart(partA):
     if partA in partdict:
         return partdict[partA]
     else:
-        if partA not in [partdict[x] for x in partdict] and not partA.lower() \
-            == 'cc' and not partA == '->':
+        if partA not in [partdict[x] for x in partdict] and not partA.lower() == 'cc' and not partA == '->':
             # mesgdict+=["Particle "+partA+" not recognised!"]
             pass
     return partA
@@ -146,5 +143,3 @@ def comparePart(partA, partB):
         if convertPart(partA) == convertPart(partB):
             return True
     return False
-
-

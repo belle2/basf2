@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##
-## Decay File Parser to check whether a decay file is correctly defined before committing to svn
-## P. Urquijo
+"""
+Decay File Parser to check whether a decay file is correctly defined before committing to svn
+P. Urquijo
+"""
 
 import sys
 import settings
@@ -143,8 +144,7 @@ for line in file:
             order += ['cuts']
             test_cuts = ['None', 'DaughtersInBelleII']
             if cuts not in test_cuts:
-                warning('Unknown cuts <' + cuts + '> on line '
-                        + str(linecount) + '. Please check.')
+                warning('Unknown cuts <' + cuts + '> on line ' + str(linecount) + '. Please check.')
 
         tmp = getfield(line, 'FullEventCuts')
         if tmp:
@@ -199,15 +199,14 @@ for line in file:
             try:
                 date = int(tmp)
                 if not date / 10000 == time.gmtime().tm_year:
-                    warning('Date is not from this year. Please use YYYYMMDD for date field. YYYY parsed:'
-                             + str(date / 10000) + ' vs. current year: '
-                            + str(time.gmtime().tm_year))
+                    warning('Date is not from this year. Please use YYYYMMDD for date field. YYYY parsed:' +
+                            str(date / 10000) + ' vs. current year: ' + str(time.gmtime().tm_year))
                 if date - 10000 * (date / 10000) > 1231:
-                    warning('Cannot parse date. Please use YYYYMMDD for date field. MMDD parsed:'
-                             + str(date - 10000 * (date / 10000)))
+                    warning('Cannot parse date. Please use YYYYMMDD for date field. MMDD parsed:' +
+                            str(date - 10000 * (date / 10000)))
                 if date - 100 * (date / 100) > 31:
-                    warning('Cannot parse date. Please use YYYYMMDD for date field. DD parsed:'
-                             + str(date - 100 * (date / 100)))
+                    warning('Cannot parse date. Please use YYYYMMDD for date field. DD parsed:' +
+                            str(date - 100 * (date / 100)))
             except:
                 warning('Cannot parse date. Please use YYYYMMDD for date field.'
                         )
@@ -256,16 +255,15 @@ for line in file:
                     try:
                         bf = float(bf)
                     except:
-                        warning('Branching fraction not a number on line: '
-                                + str(linecount) + '. Skipping.')
+                        warning('Branching fraction not a number on line: ' +
+                                str(linecount) + '. Skipping.')
                         continue
                     for daug in line[1:-1]:
                         if daug.strip(';') in settings.terminators:
                             # mesg("Terminator found, ending decay line.")
                             break
                         elif daug.endswith(';'):
-                            warning('A new terminator found: ' + daug.strip(';'
-                                    ) + '. Adding to list')
+                            warning('A new terminator found: ' + daug.strip(';') + '. Adding to list')
                             settings.terminators += [daug.strip(';')]
                             break
                         if daug in alias:
@@ -276,18 +274,16 @@ for line in file:
                             if daug in alias:
                                 daug = alias[daug]
                             else:
-                                warning("You defined a charge conjugation without either particle being an alias. Are you sure you know what you're doing on line "
-                                         + str(linecount) + '?')
+                                warning("You defined a charge conjugation without either particle being an alias. "
+                                        "Are you sure you know what you're doing on line " + str(linecount) + '?')
                         else:
                             for k in alias:
                                 if daug == alias[k]:
-                                    warning('You defined an alias to particle '
-         + daug + ' called ' + k + ' but on line ' + str(linecount)
-        + ' you use the original particle. Is this what you want?')
+                                    warning('You defined an alias to particle ' + daug + ' called ' + k + ' but on line ' +
+                                            str(linecount) + ' you use the original particle. Is this what you want?')
                         dec += [daug]
                     if not line[-1].endswith(';'):
-                        warning('Line ' + str(linecount)
-                                + ' does not end with a ;')
+                        warning('Line ' + str(linecount) + ' does not end with a ;')
                     current_decay += [(bf, dec)]
 
 mesg('File parsed successfully.')
@@ -324,27 +320,21 @@ else:
     elif nickname.startswith('charm'):
         flag = 2
     else:
-        fail(['Cannot find the signal particle and cannot determine the inclusive mode.'
-             ])
+        fail(['Cannot find the signal particle and cannot determine the inclusive mode.'])
         sys.exit()
     done()
 if mother:
-    if 'B' in mother or 'b0' in mother or 'Upsilon' in mother or 'chi_b' \
-        in mother:
+    if 'B' in mother or 'b0' in mother or 'Upsilon' in mother or 'chi_b' in mother:
         flag = 1
-    elif 'D' in mother or 'psi' in mother or 'chi_c' in mother or 'c+' \
-        in mother:
+    elif 'D' in mother or 'psi' in mother or 'chi_c' in mother or 'c+' in mother:
         flag = 2
-    elif 'K_S0' in mother or 'Lambda' in mother or 'Sigma' in mother or 'tau' \
-        in mother:
+    elif 'K_S0' in mother or 'Lambda' in mother or 'Sigma' in mother or 'tau' in mother:
         flag = 3
     else:
-        warning("Didn't recognise the mother particle. Check general flag manually."
-                )
+        warning("Didn't recognise the mother particle. Check general flag manually.")
         flag = general
     if not flag == general:
-        fail(['General flag not compliant. Should be ' + str(flag)
-             + '.Please check.'])
+        fail(['General flag not compliant. Should be ' + str(flag) + '.Please check.'])
     else:
         done()
 newevtype += str(flag)
@@ -365,15 +355,14 @@ elif mother == 'J/psi':
     flag = 4
 elif mother == 'Lambda_b0' or mother == 'Lambda_c+':
     flag = 5
-elif ('Sigma_b' in mother or 'chi_b' in mother or 'Omega_b' in mother) \
-    and general == 1:
+elif ('Sigma_b' in mother or 'chi_b' in mother or 'Omega_b' in mother) and general == 1:
     flag = 6
 elif ('Upsilon' in mother or 'chi_b' in mother) and general == 1:
     flag = 8
 elif ('D' in mother and '*' in mother or 'D_s1' in mother) and general == 2:
     flag = 7
-elif ('psi(2S)' in mother or 'X_1(3872)' in mother or 'h_c' in mother
-      or 'chi_c' in mother or mother == 'eta_c') and general == 2:
+elif ('psi(2S)' in mother or 'X_1(3872)' in mother or 'h_c' in mother or
+      'chi_c' in mother or mother == 'eta_c') and general == 2:
 
     flag = 8
 elif general == 3:
@@ -394,8 +383,7 @@ else:
     warning('Cannot determine selection flag. Please check manually.')
     flag = selection
 if not flag == selection:
-    warning('Selection flag is not compliant, should be ' + str(flag)
-            + '. Please check.')
+    warning('Selection flag is not compliant, should be ' + str(flag) + '. Please check.')
 else:
     done()
 newevtype += str(flag)
@@ -508,8 +496,7 @@ if neutrinos:
     flag += 4
 
 if not decayflag == flag:
-    fail(['Decay flag is not compliant. Should be ' + str(flag)
-         + '. Please check'])
+    fail(['Decay flag is not compliant. Should be ' + str(flag) + '. Please check'])
 else:
     done()
 newevtype += str(flag)
@@ -531,8 +518,7 @@ if not mother:
             electron = True
         if 'mu' in field or 'Mu' in field:
             muon = True
-        if 'D0' in field or 'Dmu' in field or 'Ds' in field or 'DS' in field \
-            or 'DMass' in field or 'DMu' in field:
+        if 'D0' in field or 'Dmu' in field or 'Ds' in field or 'DS' in field or 'DMass' in field or 'DMu' in field:
             opencharm = True
         if 'Jpsi' in field:
             closedcharm = True
@@ -550,7 +536,7 @@ for dec in main_decay:
         if daug == 'mu-' or daug == 'mu+':
             muon = True
             continue
-        if ('D' in daug or '_c' in daug) and not 'chi_c' in daug:
+        if ('D' in daug or '_c' in daug) and 'chi_c' not in daug:
             if caughtopen:
                 doubleopen = True
                 caughtopen = False
@@ -574,8 +560,7 @@ if doubleopen:
     flag = 9
 
 if not flag == charmflag:
-    fail(['Charm flag is not compliant. Should be :' + str(flag)
-         + '. Please check'])
+    fail(['Charm flag is not compliant. Should be :' + str(flag) + '. Please check'])
 else:
     done()
 newevtype += str(flag)
@@ -589,8 +574,7 @@ maxtracks = 0
 if not mother:
     warning('Inclusive decay: Problem with settings the track flag. Check manually.'
             )
-    if 'DiLepton' in fulleventcuts or 'DiLepton' in cuts or 'DiLepton' \
-        in extraopts:
+    if 'DiLepton' in fulleventcuts or 'DiLepton' in cuts or 'DiLepton' in extraopts:
         maxtracks = 2
 for dec in main_decay:
     for daug in dec:
@@ -606,8 +590,7 @@ for dec in main_decay:
             maxtracks = tracks
 
 if not trackflag == maxtracks:
-    fail(['Track flag not compliant. Should be: ' + str(maxtracks)
-         + '. Please check.'])
+    fail(['Track flag not compliant. Should be: ' + str(maxtracks) + '. Please check.'])
 else:
     done()
 newevtype += str(maxtracks)
@@ -625,8 +608,7 @@ for dec in main_decay:
     for daug in dec:
         if daug in alias:
             daug = alias[daug]
-        if daug == 'K_S0' or daug == 'Lambda0' or mother == 'K_S0' or mother \
-            == 'Lambda0':
+        if daug == 'K_S0' or daug == 'Lambda0' or mother == 'K_S0' or mother == 'Lambda0':
             Kslambda = True
         elif daug == 'pi0' or daug == 'eta':
             pi0eta = True
@@ -661,8 +643,7 @@ else:
         flag += 4
 
 if not flag == neutrals:
-    fail(['Neutrals flag not compliant. Should be ' + str(flag)
-         + '. Please check.'])
+    fail(['Neutrals flag not compliant. Should be ' + str(flag) + '. Please check.'])
 else:
     done()
 newevtype += str(flag)
@@ -675,21 +656,16 @@ if settings.use_url:
         settings.use_url = False
     else:
         for (k, v) in zippednos:
-            if filename.partition('=')[0] == v.partition('=')[0] \
-                and not eventtype / 10 == k / 10:
-                warning('The decfile: ' + v + ':' + str(k)
-                        + ' should contain the same decay, therefore the first 7 digits of the eventtype should match. Please check and use the same extra flag.'
-                        )
+            if filename.partition('=')[0] == v.partition('=')[0] and not eventtype / 10 == k / 10:
+                warning('The decfile: ' + v + ':' + str(k) + ' should contain the same decay, therefore the first 7 '
+                        'digits of the eventtype should match. Please check and use the same extra flag.')
                 failed = True
             if k == eventtype:
                 warning('Error: ' + v + ' has this eventtype already.')
                 failed = True
-            if k / 10 == eventtype / 10 \
-                and not os.path.basename(filename).partition('=')[0] \
-                == v.partition('=')[0]:
-                warning('The decfile: ' + v + ':' + str(k)
-                        + ' uses this extra flag, but the decay seems different. Please check and use a unique extra flag.'
-                        )
+            if k / 10 == eventtype / 10 and not os.path.basename(filename).partition('=')[0] == v.partition('=')[0]:
+                warning('The decfile: ' + v + ':' + str(k) + ' uses this extra flag, but the decay seems different. '
+                        'Please check and use a unique extra flag.')
                 failed = True
 
     if settings.obs_url:
@@ -699,9 +675,9 @@ if settings.use_url:
             settings.use_url = False
         else:
             if str(eventtype) in obsnos:
-                warning('The eventtype is obsolete on the line '
-                        + str(obsnos.index(str(eventtype)) + 1) + ' in: '
-                        + settings.obs_url)
+                warning('The eventtype is obsolete on the line ' +
+                        str(obsnos.index(str(eventtype)) + 1) + ' in: ' +
+                        settings.obs_url)
                 failed = True
 
 if not settings.use_url:
@@ -720,9 +696,8 @@ if not settings.use_url:
                         break
             if filen.partition('=')[0] == filename.partition('='):
                 if not newtype / 10 == eventtype / 10:
-                    warning('The decfile: ' + filen + ':' + str(newtype)
-                            + ' should contain the same decay, therefore the first 7 digits of the eventtype should match. Please check and use the same extra flag.'
-                            )
+                    warning('The decfile: ' + filen + ':' + str(newtype) + ' should contain the same decay, therefore the first 7 '
+                            'digits of the eventtype should match. Please check and use the same extra flag.')
                     failed = True
 #            if newtype == eventtype and not os.path.basename(filename) == v:
             if newtype == eventtype:
@@ -733,10 +708,8 @@ if not settings.use_url:
         obsfile = open(settings.obsoletepath + '/table_obsolete.sql')
         if obsfile:
             for line in obsfile:
-                if int(line.partition('EVTTYPEID = '
-                       )[2].partition(', DESCRIPTION')[0]) == eventtype:
-                    warning('The eventtype is obsolete on the following line in: '
-                             + settings.obsoletepath + '/table_obsolete.sql')
+                if int(line.partition('EVTTYPEID = ')[2].partition(', DESCRIPTION')[0]) == eventtype:
+                    warning('The eventtype is obsolete on the following line in: ' + settings.obsoletepath + '/table_obsolete.sql')
                     mesg(line)
                     failed = True
 
@@ -770,7 +743,7 @@ if not nick[1] == '=' and not cuts == []:
     warning('The = sign not found in the nickname while cuts are present. Check nickname conventions and fix.'
             )
     # failed = True
-if 'DaughtersInBelleII' in cuts and not 'DecProdCut' in nick[2].split(','):
+if 'DaughtersInBelleII' in cuts and 'DecProdCut' not in nick[2].split(','):
     faillist += \
         ['You have decay angular acceptance cut in Cuts but not in the nickname.'
          ]
@@ -790,8 +763,7 @@ if len(nick[2].split(',')) < len(cuts.split(',')):
 
 query('Checking the Physics WG.')
 if physicswg not in settings.groups:
-    fail(['The group /' + physicswg
-         + '/ is not known. Please use one of the following:',
+    fail(['The group /' + physicswg + '/ is not known. Please use one of the following:',
          settings.groups])
 else:
     done()
@@ -824,8 +796,8 @@ if mother:
                 ind = descript.index(daug)
                 descript.remove(daug)
                 if daug not in alias:
-                    warning('You decay a particle: [' + daug
-                            + '] without aliasing it first. Step aborted.')
+                    warning('You decay a particle: [' + daug +
+                            '] without aliasing it first. Step aborted.')
                     notclean = False
                     break
                 else:
@@ -867,10 +839,10 @@ if mother:
             warning(mes)
 
     for daug in decay:
-        print daug, decay[daug]
+        print(daug, decay[daug])
 
-    print 'Main decay chain:'
+    print('Main decay chain:')
     for dec in main_decay:
-        print dec
+        print(dec)
 
 sys.exit('Decfile check complete.')

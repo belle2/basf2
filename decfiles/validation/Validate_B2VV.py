@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -22,4 +22,4 @@ toolsTruth += ['VVAngles', '^B+ -> [rho0 -> ^pi+ ^pi-] [rho+ -> ^pi0 ^pi+]']
 ntupleTree('TruthTree', 'B+:sig', toolsTruth)
 
 process(analysis_main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -16,15 +16,7 @@ sql_first = True
 eventid_insql = []
 list_of_obsoletes = []
 exit_status = 0
-list_of_wg = [
-    'SL',
-    'EWP',
-    'TCPV',
-    'HAD',
-    'CHARM',
-    'ONIA',
-    'TAU',
-    ]
+list_of_wg = ['SL', 'EWP', 'TCPV', 'HAD', 'CHARM', 'ONIA', 'TAU']
 
 import os
 import re
@@ -72,12 +64,11 @@ class GenericOptionFile(object):
     def WriteHeader(self, eventtype, descriptor):
         lines = [
             '{0} file {1} generated: {2}'.format(self.comment, self.filename,
-                    time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())),
+                                                 time.strftime('%a, %d %b %Y %H:%M:%S', time.localtime())),
             '{0}'.format(self.comment),
             '{0} Event Type: {1}'.format(self.comment, eventtype),
             '{0}'.format(self.comment),
-            '{0} ASCII decay Descriptor: {1}'.format(self.comment,
-                    descriptor),
+            '{0} ASCII decay Descriptor: {1}'.format(self.comment, descriptor),
             '{0}'.format(self.comment),
             ]
         self.Write(lines)
@@ -93,11 +84,10 @@ class GenericOptionFile(object):
                             '"$DECFILESROOT/dec/{0}.dec"'.format(eventtype.DecayName()))
 
     def AddDecayOptions(self, eventtype):
-
-        [self.AddOptionValue('ToolSvc.{0}Decay.{1}'.format(eventtype.DecayEngine(),
-         eventtype.DecayOptions().split()[2 * i]),
-         eventtype.DecayOptions().split()[2 * i + 1]) for i in
-         range(len(eventtype.DecayOptions().split()) / 2)]
+        [self.AddOptionValue('ToolSvc.{0}Decay.{1}'.format(
+            eventtype.DecayEngine(), eventtype.DecayOptions().split()[2 * i]),
+            eventtype.DecayOptions().split()[2 * i + 1])
+         for i in range(len(eventtype.DecayOptions().split()) / 2)]
 
 
 class TextOptionFile(GenericOptionFile):
@@ -108,13 +98,7 @@ class TextOptionFile(GenericOptionFile):
     list_begin = '{'
     list_end = '}'
 
-    def AddOptionValue(
-        self,
-        option,
-        value,
-        substitute=False,
-        ):
-
+    def AddOptionValue(self, option, value, substitute=False):
         self.Write(['{0} = {1};'.format(option, value)])
 
     def AddInclude(self, filename):
@@ -137,13 +121,7 @@ class PythonOptionFile(GenericOptionFile):
         self.list_tool = []
         super(PythonOptionFile, self).__init__()
 
-    def AddOptionValue(
-        self,
-        option,
-        value,
-        substitute=False,
-        ):
-
+    def AddOptionValue(self, option, value, substitute=False):
         value = value.replace('{', '[')
         value = value.replace('}', ']')
         if substitute:
@@ -191,12 +169,7 @@ class EventType:
         'InsertPythonCode',
         ]
 
-    def __init__(
-        self,
-        filename,
-        remove,
-        technology,
-        ):
+    def __init__(self, filename, remove, technology):
         """ filename is the name of the decay file
             remove is set to yes to force removing the option file and create a new one
             technology is Text for text option file and Python for python options
@@ -238,7 +211,7 @@ class EventType:
                 for matchobj in matchObj:
                     keystodelete.append(matchobj[0])
         # remove leading and ending spaces, except for python code
-        for (k, v) in self.KeywordDictionary.iteritems():
+        for (k, v) in self.KeywordDictionary.items():
             if k != 'InsertPythonCode':
                 self.KeywordDictionary[k] = v.rstrip(' \n').lstrip(' \n')
                 if self.KeywordDictionary[k] == '':
@@ -263,8 +236,8 @@ class EventType:
 
         # check if the nickname is correct
         if self.NickName() != self.DecayName():
-            logging.error('In %s, the nickname %s is not equal to the name of the file %s.'
-                          , self.DecayFileName,
+            logging.error('In %s, the nickname %s is not equal to the name of the file %s.',
+                          self.DecayFileName,
                           self.KeywordDictionary['NickName'], self.DecayName())
             raise UserWarning
 
@@ -272,8 +245,8 @@ class EventType:
         try:
             thetime = time.strptime(self.Date(), '%Y%m%d')
         except ValueError:
-            logging.error('In %s, the date format is not correct, it should be YYYYMMDD instead of %s.'
-                          , self.DecayFileName, self.Date())
+            logging.error('In %s, the date format is not correct, it should be YYYYMMDD instead of %s.',
+                          self.DecayFileName, self.Date())
             raise UserWarning
 
         # check physics wg name
@@ -297,17 +270,13 @@ class EventType:
 
         # check if the event is obsolete
         if self.EventTypeNumber() in obsoletes:
-            logging.error('The EventType %s is in use in the obsolete list, please change it.'
-                          , self.EventTypeNumber())
+            logging.error('The EventType %s is in use in the obsolete list, please change it.', self.EventTypeNumber())
             raise UserWarning
 
         # check Tested is equal to Yes or No
-        self.KeywordDictionary['Tested'] = self.KeywordDictionary['Tested'
-                ].lower()
-        if self.KeywordDictionary['Tested'] != 'yes' \
-            and self.KeywordDictionary['Tested'] != 'no':
-            logging.error('In %s, Tested should be equal to Yes or No',
-                          self.DecayName())
+        self.KeywordDictionary['Tested'] = self.KeywordDictionary['Tested'].lower()
+        if self.KeywordDictionary['Tested'] != 'yes' and self.KeywordDictionary['Tested'] != 'no':
+            logging.error('In %s, Tested should be equal to Yes or No', self.DecayName())
             raise UserWarning
 
         # check that the file has been tested (check can be disabled with --force option)
@@ -355,8 +324,8 @@ class EventType:
             self.OptionFile = PythonOptionFile()
 
         if not filename:
-            filename = '{0}/prod/{1}'.format(os.environ['DECFILESROOT'],
-                    self.EventTypeNumber())
+            filename = '{0}/prod/{1}'.format(os.environ['DECFILESROOT'], self.EventTypeNumber())
+
         self.OptionFile.SetFileName(filename)
         if os.path.exists(self.OptionFile.OptionFileName()):
             if self.remove:
@@ -373,61 +342,61 @@ class EventType:
         return self.KeywordDictionary['Descriptor']
 
     def HasPythonCodeToInsert(self):
-        return 'InsertPythonCode' in self.KeywordDictionary.keys()
+        return 'InsertPythonCode' in self.KeywordDictionary
 
     def PythonCodeToInsert(self):
         return self.KeywordDictionary['InsertPythonCode']
 
     def HasExtraOptions(self):
-        return 'ExtraOptions' in self.KeywordDictionary.keys()
+        return 'ExtraOptions' in self.KeywordDictionary
 
     def ExtraOptions(self):
         return self.KeywordDictionary['ExtraOptions']
 
     def HasDecayEngine(self):
-        return 'DecayEngine' in self.KeywordDictionary.keys()
+        return 'DecayEngine' in self.KeywordDictionary
 
     def DecayEngine(self):
         return self.KeywordDictionary['DecayEngine']
 
     def HasDecayOptions(self):
-        return 'DecayOptions' in self.KeywordDictionary.keys()
+        return 'DecayOptions' in self.KeywordDictionary
 
     def DecayOptions(self):
         return self.KeywordDictionary['DecayOptions']
 
     def HasParticleTable(self):
-        return 'ParticleTable' in self.KeywordDictionary.keys()
+        return 'ParticleTable' in self.KeywordDictionary
 
     def ParticleTable(self):
         return self.KeywordDictionary['ParticleTable']
 
     def HasParticleValue(self):
-        return 'ParticleValue' in self.KeywordDictionary.keys()
+        return 'ParticleValue' in self.KeywordDictionary
 
     def ParticleValue(self):
         return self.KeywordDictionary['ParticleValue']
 
     def HasConfiguration(self):
-        return 'Configuration' in self.KeywordDictionary.keys()
+        return 'Configuration' in self.KeywordDictionary
 
     def Configuration(self):
         return self.KeywordDictionary['Configuration'].split()
 
     def HasParticleType(self):
-        return 'ParticleType' in self.KeywordDictionary.keys()
+        return 'ParticleType' in self.KeywordDictionary
 
     def ParticleType(self):
         return self.KeywordDictionary['ParticleType'].split()
 
     def HasMomentum(self):
-        return 'Momentum' in self.KeywordDictionary.keys()
+        return 'Momentum' in self.KeywordDictionary
 
     def Momentum(self):
         return self.KeywordDictionary['Momentum'].split()
 
     def HasMomentumRange(self):
-        return 'MomentumRange' in self.KeywordDictionary.keys()
+        return 'MomentumRange' in self.KeywordDictionary
 
     def MomentumRange(self):
         return self.KeywordDictionary['MomentumRange'].split()
@@ -446,20 +415,19 @@ class EventType:
 
     def Sample(self):
         # Check if overriden
-        if 'Sample' in self.KeywordDictionary.keys():
+        if 'Sample' in list(self.KeywordDictionary.keys()):
             return self.KeywordDictionary['Sample']
         sample = 'otherTreatment'
         if int(self.EventTypeNumber()[0]) in (1, 2, 3, 7):
             if int(self.EventTypeNumber()[1]) in (0, 9):
                 sample = 'Inclusive'
-            elif int(self.EventTypeNumber()[0]) == 1 \
-                and int(self.EventTypeNumber()[1]) in (1, 2, 3, 6, 7):
+            elif int(self.EventTypeNumber()[0]) == 1 and int(self.EventTypeNumber()[1]) in (1, 2, 3, 6, 7):
                 sample = 'Signal'
         return sample
 
     def Production(self):
         production = 'Pythia'
-        if 'Production' in self.KeywordDictionary.keys():
+        if 'Production' in self.KeywordDictionary:
             production = self.KeywordDictionary['Production']
         return production
 
@@ -521,9 +489,7 @@ def writeSQLTable(evttypeid, descriptor, nickname):
         nick = nickname[:255]
         desc = descriptor[:255]
         with open(TableName, 'a+') as f:
-            line = \
-                'EVTTYPEID = {0}, DESCRIPTION = "{1}", PRIMARY = "{2}"\n'.format(evttypeid,
-                    nick, desc)
+            line = 'EVTTYPEID = {0}, DESCRIPTION = "{1}", PRIMARY = "{2}"\n'.format(evttypeid, nick, desc)
             f.write(line)
 
 
@@ -544,12 +510,7 @@ def readObsoleteTypeTable():
         pass
 
 
-def run_create(
-    dkfile,
-    remove,
-    python,
-    force,
-    ):
+def run_create(dkfile, remove, python, force):
     """ create an options file corresponding to a single Decay file
     """
 
@@ -599,28 +560,34 @@ def run_create(
     # if Inclusive
     if 'Inclusive' in eventtype.Sample():
         if eventtype.G() == '1':
-            pidlist = \
-                '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5222, -5222, 5212, -5212, 5112, -5112, 5312, -5312, 5322, -5322, 5332, -5332, 5132, -5132, 5232, -5232'
+            pidlist = '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5222, -5222, 5212, -5212, 5112, -5112, ' \
+                '5312, -5312, 5322, -5322, 5332, -5332, 5132, -5132, 5232, -5232'
         elif int(eventtype.G()) in (2, 7):
-            pidlist = \
-                '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, -4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, -4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, 4444, -4444, 14122, -14122,  14124, -14124, 100441'
+            pidlist = '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, ' \
+                '-4312, 4322, -4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, ' \
+                '4224, -4224, 4314, -4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, ' \
+                '-4432, 4434, -4434, 4444, -4444, 14122, -14122,  14124, -14124, 100441'
         eventtype.OptionFile.AddInclusivePIDList(eventtype, pidlist)
     else:
-    # if Type Signal
+        # if Type Signal
         listing = {  # tau
                      # Sigma
                      # Lambda
                      # Ks
                      # Xi
                      # Omega
-            '10': '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5222, -5222, 5212, -5212, 5112, -5112, 5312, -5312, 5322, -5322, 5332, -5332, 5132, -5132, 5232, -5232',
+            '10': '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5222, -5222, 5212, -5212, 5112, -5112, 5312, -5312, '
+                  '5322, -5322, 5332, -5332, 5132, -5132, 5232, -5232',
             '11': '511,-511',
             '12': '521,-521',
             '13': '531,-531',
             '14': '541,-541',
             '15': '5122,-5122',
             '19': '521, -521, 511, -511, 531, -531, 541, -541, 5122, -5122, 5332, -5332, 5132, -5132, 5232, -5232',
-            '20': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, -4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, -4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, 4444, -4444, 14122, -14122,  14124, -14124, 100441',
+            '20': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, '
+                  '-4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, '
+                  '-4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, '
+                  '4444, -4444, 14122, -14122,  14124, -14124, 100441',
             '21': '411,-411',
             '22': '421,-421',
             '23': '431,-431',
@@ -632,7 +599,10 @@ def run_create(
             '34': '310',
             '35': '3312,-3312',
             '36': '3334,-3334',
-            '70': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, -4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, -4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, 4444, -4444, 14122, -14122,  14124, -14124, 100441',
+            '70': '421, -421, 411, -411, 431, -431, 4122, -4122, 443, 4112, -4112, 4212, -4212, 4222, -4222, 4312, -4312, 4322, '
+                  '-4322, 4332, -4332, 4132, -4132, 4232, -4232, 100443, 441, 10441, 20443, 445, 4214, -4214, 4224, -4224, 4314, '
+                  '-4314, 4324, -4324, 4334, -4334, 4412, -4412, 4414,-4414, 4422, -4422, 4424, -4424, 4432, -4432, 4434, -4434, '
+                  '4444, -4444, 14122, -14122,  14124, -14124, 100441',
             '71': '411,-411',
             '72': '421,-421',
             '73': '431,-431',
@@ -715,20 +685,14 @@ def run_loop(remove, python, force):
             pass
 
 
-def CheckFile(
-    option,
-    opt_str,
-    value,
-    parser,
-    ):
+def CheckFile(option, opt_str, value, parser):
     """ Check if file exists
     """
 
     if not os.path.exists('{0}/dec/{1}.dec'.format(os.environ['DECFILESROOT'],
                           value)):
-        raise OptionValueError('Decay file %s.dec ' % value + 'does not '
-                               + 'exist in the $DECFILESROOT/dec '
-                               + 'directory')
+        raise OptionValueError('Decay file %s.dec ' % value + 'does not ' +
+                               'exist in the $DECFILESROOT/dec directory')
     setattr(parser.values, option.dest, value)
 
 
@@ -745,7 +709,7 @@ def CheckFile(
     MAGENTA,
     CYAN,
     WHITE,
-    ) = range(8)
+) = list(range(8))
 
 # The background is set with 40 plus the number of the color, and the foreground with 30
 
@@ -773,8 +737,7 @@ class ColoredFormatter(logging.Formatter):
         levelname = record.levelname
         color = COLOR_SEQ % (30 + COLORS[levelname])
         message = logging.Formatter.format(self, record)
-        message = message.replace('$RESET', RESET_SEQ).replace('$BOLD',
-                BOLD_SEQ).replace('$COLOR', color)
+        message = message.replace('$RESET', RESET_SEQ).replace('$BOLD', BOLD_SEQ).replace('$COLOR', color)
         return message + RESET_SEQ
 
 
@@ -784,11 +747,10 @@ class ColoredFormatter(logging.Formatter):
 
 def main():
     global exit_status
-    ## logging.basicConfig(level=logging.DEBUG)
+    #: logging.basicConfig(level=logging.DEBUG)
     mylog = logging.StreamHandler()
     logging.getLogger().setLevel(logging.DEBUG)
-    mylog.setFormatter(ColoredFormatter('$COLOR$BOLD[%(levelname)-10s]$RESET$COLOR  %(message)s'
-                       , True))
+    mylog.setFormatter(ColoredFormatter('$COLOR$BOLD[%(levelname)-10s]$RESET$COLOR  %(message)s', True))
     logging.getLogger().addHandler(mylog)
     usage = 'usage: %prog [options]'
     parser = OptionParser(usage=usage, version=version)
@@ -803,16 +765,16 @@ def main():
     parser.add_option('--remove', dest='remove', default=False,
                       action='store_true',
                       help='force the delete of the option file before '
-                      + 'creating a new one, by default existing option '
-                      + 'files are not overwritten')
+                      'creating a new one, by default existing option '
+                      'files are not overwritten')
     parser.add_option(
         '-d',
         '--decay',
         type='string',
         dest='NickName',
         help='name of the nick name of the decay to create option '
-            + 'for, if not specified, loop over all decay files in the '
-            + 'dec directory',
+        'for, if not specified, loop over all decay files in the '
+        'dec directory',
         action='callback',
         callback=CheckFile,
         )
@@ -823,10 +785,10 @@ def main():
     parser.add_option('--force', dest='force', default=False,
                       action='store_true',
                       help='force create of option file even when the decay file '
-                       + 'syntax is not correct')
+                      'syntax is not correct')
 
-    ## Check that the environment variable DECFILESROOT exist otherwise
-    ## set it to ../dec
+    # Check that the environment variable DECFILESROOT exist otherwise
+    # set it to ../dec
     if 'DECFILESROOT' not in os.environ:
         logging.warning('')
         logging.warning('The variable DECFILESROOT is not defined.')

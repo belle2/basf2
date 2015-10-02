@@ -169,6 +169,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-type', respContentType)
         self.send_header('Content-length', len(respContent))
         self.end_headers()
+        if isinstance(respContent, str):
+            respContent = respContent.encode()
         self.wfile.write(respContent)
 
     def parse_POST(self):
@@ -209,8 +211,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 self.send_response(404)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"error":
-                                             "Missing input parameter"}))
+                self.wfile.write(json.dumps({"error": "Missing input parameter"}).encode())
                 return
 
             try:
@@ -225,6 +226,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-length', len(respContent))
             self.end_headers()
 
+            if isinstance(respContent, str):
+                respContent = respContent.encode()
             self.wfile.write(respContent)
 
             return
@@ -277,7 +280,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     else:
                         log.debug("POST: Plot matrix could not be created.")
                         self.wfile.write("Error: Requested plot matrix "
-                                         "could not be created.")
+                                         "could not be created.".encode())
                 except ImportError:
                     log.debug("ImportError - the module 'pillow' is missing. "
                               "Please install it by running commands"
@@ -291,8 +294,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json
-                             .dumps({"error": "ContentType not supported"}))
+            self.wfile.write(json.dumps({"error": "ContentType not supported"}).encode())
             return
 
     def do_GET_FILE(self):
@@ -323,21 +325,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if self.path.startswith('../'):
             log.debug('GET: "%s" trying to escape from the sandbox' % self
                       .path)
-            docFile = open(errorPath, 'r')
+            docFile = open(errorPath, 'rb')
             code = 404
         elif docPath.endswith('/') and os.path.exists("%sindex.html" %
                                                       docPath):
             log.debug('GET: Serving %sindex.html for %s' % (docPath,
                                                             self.path))
-            docFile = open("%sindex.html" % docPath, 'r')
+            docFile = open("%sindex.html" % docPath, 'rb')
             code = 200
         elif os.path.exists(docPath):
             log.debug('GET: Serving %s' % self.path)
-            docFile = open(docPath, 'r')
+            docFile = open(docPath, 'rb')
             code = 200
         else:
             log.debug('GET: No document found for %s' % self.path)
-            docFile = open(errorPath, 'r')
+            docFile = open(errorPath, 'rb')
             code = 404
 
         doc = docFile.read()

@@ -13,6 +13,7 @@ import re
 import shutil
 import sys
 import time
+import numbers
 # Load ROOT
 import ROOT
 # The pretty printer. Print prettier :)
@@ -48,8 +49,8 @@ def largest_name(name):
 
 
 def nPvLT(pValDict, number):
-    for element in pValDict:
-        if pValDict[element] <= number:
+    for pval in pValDict.values():
+        if isinstance(pval, numbers.Number) and pval <= number:
             return 0
     return 1
 
@@ -408,10 +409,11 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                     desc[plts] = "n/a"
                 # setting up our filters
                 classes = ["imidzes_" + rootfile, "fltr"]
-                if p_value[plts] <= 1:
-                    classes.append('p_value_leq_1')
-                if p_value[plts] <= 0.01:
-                    classes.append('p_value_leq_0_01')
+                if isinstance(p_value[plts], numbers.Number):
+                    if p_value[plts] <= 1:
+                        classes.append('p_value_leq_1')
+                    if p_value[plts] <= 0.01:
+                        classes.append('p_value_leq_0_01')
                 if is_expert[plts]:
                     classes.append('expert_plot')
                 # the code for the actual plots
@@ -489,10 +491,11 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
             # also we can't forget our classes,
             # we don't want a name without a plot to be shown
             classes = ["fltr", "matrix-img"]
-            if p_value[plts] <= 1:
-                classes.append('p_value_leq_1')
-            if p_value[plts] <= 0.01:
-                classes.append('p_value_leq_0_01')
+            if isinstance(p_value[plts], numbers.Number):
+                if p_value[plts] <= 1:
+                    classes.append('p_value_leq_1')
+                if p_value[plts] <= 0.01:
+                    classes.append('p_value_leq_0_01')
             # the code for the actual name table
             pre = "_".join(el.split(PackageSeperatorToken)).replace(".", "_")
             html.append("<td style='width:{5}%' class='{4}'>"
@@ -1689,9 +1692,9 @@ class Plotuple:
         fxstle = (self.package + "__" +
                   self.file.split("/")[-1].replace(".", "_")).strip()
         classes = ['object_wrap', "nomatrix", fxstle, 'fltr']
-        if self.pvalue <= 1:
+        if isinstance(self.pvalue, numbers.Number) and self.pvalue <= 1:
             classes.append('p_value_leq_1')
-        if self.pvalue <= 0.01:
+        if isinstance(self.pvalue, numbers.Number) and self.pvalue <= 0.01:
             classes.append('p_value_leq_0_01')
         # dont do this, because it will hide both ...
         # if "expert" in self.metaoptions:

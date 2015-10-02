@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -----------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ argvs = sys.argv
 if len(argvs) > 1:
     fileName = argvs[1]
 else:
-    print 'usage: basf2 top/examples/showRawWaveforms.py <file_name>'
+    print('usage: basf2 top/examples/showRawWaveforms.py <file_name>')
     sys.exit()
 
 fileType = ''
@@ -29,7 +29,7 @@ if fileName.rfind('.dat') + len('.dat') == len(fileName):
 elif fileName.rfind('.root') + len('.root') == len(fileName):
     fileType = 'root'
 else:
-    print 'unknown file extension'
+    print('unknown file extension')
     sys.exit()
 
 
@@ -39,7 +39,7 @@ def wait():
     try:
         q = 0
         Q = 0
-        abc = input('Type <CR> to continue or Q to quit ')
+        abc = eval(input('Type <CR> to continue or Q to quit '))
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
         evtMetaData.obj().setEndOfData()
         return True
@@ -163,4 +163,4 @@ progress = register_module('Progress')
 main.add_module(progress)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # avoid race conditions beetween pyroot and GUI thread
@@ -80,7 +80,7 @@ class TOPDisplay(Module):
         try:
             q = 0
             Q = 0
-            abc = input('Type <CR> to continue or Q to quit ')
+            abc = eval(input('Type <CR> to continue or Q to quit '))
             evtMetaData = Belle2.PyStoreObj('EventMetaData')
             evtMetaData.obj().setEndOfData()
         except:
@@ -89,9 +89,9 @@ class TOPDisplay(Module):
 
 # Check if the display is set (needed for canvas)
 if 'DISPLAY' not in os.environ:
-    print 'DISPLAY variable is not set'
-    print '- to set it in bash: export DISPLAY=:0'
-    print '- to set it in csh:  setenv DISPLAY :0'
+    print('DISPLAY variable is not set')
+    print('- to set it in bash: export DISPLAY=:0')
+    print('- to set it in csh:  setenv DISPLAY :0')
     sys.exit()
 
 # Suppress messages other than errors
@@ -132,4 +132,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

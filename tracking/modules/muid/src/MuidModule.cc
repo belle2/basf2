@@ -70,7 +70,7 @@ using namespace Belle2;
 #define TWOPI 6.283185482025146484375
 #define M_PI_8 0.3926990926265716552734
 #define DEPTH_RPC 9
-#define DEPTH_SCINT 10
+#define DEPTH_SCINT 11
 
 REG_MODULE(Muid)
 
@@ -637,7 +637,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
       detID = Const::EDetector::KLM;
       int baseDepth = touch->GetHistoryDepth() - DEPTH_RPC;
       if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
-        B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 10=scint)")
+        B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 11=scint)")
       } else {
         int plane = touch->GetCopyNumber(baseDepth);
         int layer = touch->GetCopyNumber(baseDepth + 4);
@@ -650,7 +650,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
         if (baseDepth == 0) {
           copyID |= BKLM_INRPC_MASK;
         } else {
-          int scint = touch->GetCopyNumber(0);
+          int scint = touch->GetCopyNumber(1);
           copyID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
           if (plane == BKLM_INNER) {
             copyID |= BKLM_PLANE_MASK;
@@ -955,7 +955,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
 
 }
 
-bool MuidModule::findMatchingEndcapHit(Point& point, const Track* /* track */)
+bool MuidModule::findMatchingEndcapHit(Point& point, const Track* track)
 {
 
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
@@ -992,12 +992,11 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track* /* track */)
     adjustIntersection(point, localVariance, hit->getPosition(), point.position);
     if (point.chi2 >= 0.0) {
       // DIVOT no such function for EKLM! hit->isOnTrack(true);
+      track->addRelationTo(hit);
       /* DIVOT not yet for EKLM alignment!
-      StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
-      int nBarrelHits = bklmHits.getEntries();
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::KLM, bestHit + nBarrelHits, hit->getLayer(), point.positionAtHitPlane.Mag());
+      tc->addHit(Const::EDetector::KLM, bestHit, hit->getLayer(), point.positionAtHitPlane.Mag());
       */
     }
   }

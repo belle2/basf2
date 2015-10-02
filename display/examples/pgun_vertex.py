@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This example uses a python module to show the ParticleGun vertex
@@ -39,14 +39,14 @@ class VisualizeVertex(Module):
         displayData.obj().addLabel("Origin", TVector3(0, 0, 0))
         displayData.obj().addLabel("0,0,10", TVector3(0, 0, 10))
 
-        #visualize extent of vertex
+        # visualize extent of vertex
         global vertexparams
         displayData.obj().addPoint("Vertex", TVector3(vertexparams[0][0],
                                                       vertexparams[1][0],
                                                       vertexparams[2][0]))
         for d in range(3):
             sigma = vertexparams[d][1]
-            #add points at +-sigma on both sides of Vertex
+            # add points at +-sigma on both sides of Vertex
             vertexparams[d][0] -= sigma
             displayData.obj().addPoint("Width", TVector3(vertexparams[0][0],
                                                          vertexparams[1][0],
@@ -90,7 +90,7 @@ main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
-#main.add_module(g4sim)
+# main.add_module(g4sim)
 
 main.add_module(VisualizeVertex())
 
@@ -100,4 +100,4 @@ display.param('showAllPrimaries', True)
 main.add_module(display)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # example steering file to generate B \bar B events and show the result,
@@ -43,4 +43,4 @@ display = register_module('Display')
 main.add_module(display)
 
 process(main)
-print statistics
+print(statistics)

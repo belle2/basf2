@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # example steering file to produce events and show them in the display
@@ -67,4 +67,4 @@ display.param('discardOldEvents', True)
 main.add_module(display)
 
 process(main)
-print statistics
+print(statistics)

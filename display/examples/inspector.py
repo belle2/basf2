@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 
 import os
 import random
@@ -35,7 +34,7 @@ class InspectorModule(Module):
 
         self.info.newEvent()
 
-        print "Press Ctrl+D to exit."
+        print("Press Ctrl+D to exit.")
         import interactive
         interactive.embed()
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Creates two histograms and adds them to the 'Histogram' tab in the display
@@ -18,9 +18,9 @@ from ROOT import TVector3
 class GenerateHist(Module):
     """Generate some histograms to pass to the display."""
 
-    ## histogram for SimHit energy deposition
+    #: histogram for SimHit energy deposition
     edep_hist = TH1F("CDC_edep", "Energy deposition from CDCSimHits", 100, 0.0, 10e-6)
-    ## histogram for SimHit positions
+    #: histogram for SimHit positions
     pos_hist = TH3F("CDC_pos", "Positions of CDCSimHits",
                     100, -150.0, 150.0,
                     100, -150.0, 150.0,
@@ -82,4 +82,4 @@ display = register_module('Display')
 main.add_module(display)
 
 process(main)
-print statistics
+print(statistics)

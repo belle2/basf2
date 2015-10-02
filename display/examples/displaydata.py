@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This example demonstrates showing user-defined things using DisplayData
@@ -78,7 +78,7 @@ main.add_module(eventinfosetter)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(particlegun)
-#main.add_module(g4sim)
+# main.add_module(g4sim)
 
 main.add_module(DisplayDataTest())
 
@@ -88,4 +88,4 @@ display.param('showAllPrimaries', True)
 main.add_module(display)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # given a DST file as input, this example reconstructs D*+ candidates
@@ -31,7 +31,7 @@ class HighlighterModule(Module):
         for p in particles:
             if abs(p.getPDGCode()) == 413:
                 B2WARNING("highlighting D*+ candidate")
-                #displayData.obj().select(p)
+                # displayData.obj().select(p)
                 daughters = p.getFinalStateDaughters()
                 for d in daughters:
                     # selecting the MCParticle also gets the tracks

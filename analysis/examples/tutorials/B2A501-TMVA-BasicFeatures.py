@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -61,7 +61,7 @@ teacher.param('listNames', 'e-')
 main.add_module(teacher)
 
 process(main)
-print statistics
+print(statistics)
 
 # Now we use the created sample stored in the output/Basic.root file to do a TMVA training.
 # We pass the configuration for method we want to use, the target variable, and the feature variables.
@@ -95,4 +95,4 @@ main.add_module(expert)
 variablesToNTuple('e-', ['extraInfo(SignalProbability)', 'isSignal'], filename='TMVA/BasicOutput.root', path=main)
 
 process(main)
-print statistics
+print(statistics)

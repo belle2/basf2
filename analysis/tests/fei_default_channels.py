@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 # Christian Pulvermacher 2015
 
 from fei import *
@@ -22,6 +23,6 @@ assert len(particles_all) == len(particles_withextracut)
 
 
 # show constructed path
-print feistate.path
+print(feistate.path)
 
 # no actual basf2 execution

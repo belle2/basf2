@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -73,4 +73,4 @@ ntupleTree('dsttree', 'D*+', toolsDST)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

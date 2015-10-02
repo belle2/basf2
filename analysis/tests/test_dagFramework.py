@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from fei.dagFramework import *
 import os
-import cPickle
+import pickle
 from basf2 import *
 import unittest
 
@@ -11,6 +11,7 @@ import unittest
 
 
 class TestCreateHash(unittest.TestCase):
+
     def test_create_hash(self):
         self.assertEqual(create_hash([1, 2]), create_hash([1, 2, None]))
         self.assertEqual(create_hash([1, 2.0]), create_hash([1, 2.000001]))
@@ -45,6 +46,7 @@ def test_cache(resource):
 
 
 class TestResource(unittest.TestCase):
+
     def test_value_resource(self):
         environment = {'Test': True}
         identifier = 'Identifier'
@@ -68,8 +70,8 @@ class TestResource(unittest.TestCase):
         self.assertEqual(a.hash, create_hash([1, 2, 3, 4]))
         self.assertEqual(a.value, 42)
 
-        serialized_resource = cPickle.dumps(a)
-        deserialized_resource = cPickle.loads(serialized_resource)
+        serialized_resource = pickle.dumps(a)
+        deserialized_resource = pickle.loads(serialized_resource)
 
         self.assertEqual(deserialized_resource.identifier, identifier)
         self.assertDictEqual(deserialized_resource.env, environment)
@@ -113,8 +115,8 @@ class TestResource(unittest.TestCase):
         self.assertEqual(a.path.modules()[0].name(), 'RootInput')
         self.assertEqual(a.condition, ('EventType', '==0'))
 
-        serialized_resource = cPickle.dumps(a)
-        deserialized_resource = cPickle.loads(serialized_resource)
+        serialized_resource = pickle.dumps(a)
+        deserialized_resource = pickle.loads(serialized_resource)
 
         self.assertEqual(deserialized_resource.identifier, identifier)
         self.assertDictEqual(deserialized_resource.env, environment)
@@ -193,6 +195,7 @@ class TestResource(unittest.TestCase):
 
 
 class MockModule(Module):
+
     def __init__(self, name='NoName', isParallelCertified=True):
         super(MockModule, self).__init__()
         self.name = name
@@ -203,6 +206,7 @@ class MockModule(Module):
 
 
 class TestDAG(unittest.TestCase):
+
     def setUp(self):
         self.s = DAG()
 

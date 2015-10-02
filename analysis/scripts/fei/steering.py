@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 # Thomas Keck 2014-2015
 
 # FEI defines own command line options, therefore we disable
@@ -155,7 +156,7 @@ class Particle(object):
         mvaVars = []
         for v in mvaConfig.variables:
             if v.count('{}') <= len(daughters):
-                mvaVars += [v.format(*c) for c in itertools.combinations(range(0, len(daughters)), v.count('{}'))]
+                mvaVars += [v.format(*c) for c in itertools.combinations(list(range(0, len(daughters))), v.count('{}'))]
         mvaConfig = mvaConfig._replace(variables=mvaVars)
         # Add new channel
         self.channels.append(DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
@@ -471,7 +472,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
 
         # automatic Reporting
         from fei import automaticReporting
-        from automaticReporting import loadCoveredBranchingFractionsDataFrame
+        from .automaticReporting import loadCoveredBranchingFractionsDataFrame
         df = loadCoveredBranchingFractionsDataFrame(particles, include_daughter_fractions=True)
         dag.add('CoveredBranchingFractions', df)
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -129,4 +129,4 @@ analysis_main.add_module(progress)
 process(analysis_main)
 
 # Print out the summary
-print statistics
+print(statistics)

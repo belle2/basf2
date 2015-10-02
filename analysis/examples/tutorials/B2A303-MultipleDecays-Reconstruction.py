@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -37,8 +37,8 @@ from modularAnalysis import ntupleTree
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. Please run B2A101-Y4SEventGeneration.py tutorial script first.'
-             )
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
+             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
@@ -83,4 +83,4 @@ ntupleTree('bp', 'B+:D0pi', toolsB)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

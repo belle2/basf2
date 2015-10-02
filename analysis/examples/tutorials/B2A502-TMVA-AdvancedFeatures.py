@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 # This file describes the inverseSamplingRate feature
 # and howto normalise event weights using TMVA
@@ -67,7 +68,7 @@ teacher.param('inverseSamplingRates', {0: 5})
 teacher.param('maxSamples', int(1e6))
 
 process(main)
-print statistics
+print(statistics)
 
 # Now we train the sampled data.
 # In addition we pass an configuration string which is given to TMVA's Factory::PrepareTrainingAndTestTree -- the prepareOption
@@ -126,4 +127,4 @@ main.add_module(expert)
 variablesToNTuple('e-', ['extraInfo(SignalProbability)', 'isSignal'], filename='TMVA/SamplingOutput.root', path=main)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -84,4 +84,4 @@ outputMdst('D0+rho0_skim.mdst.root')
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

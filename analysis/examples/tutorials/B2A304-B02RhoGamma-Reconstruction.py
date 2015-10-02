@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -85,4 +85,4 @@ ntupleTree('b0', 'B0', toolsB0)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

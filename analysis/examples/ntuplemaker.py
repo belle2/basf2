@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##########################################################
@@ -29,8 +29,8 @@ from modularAnalysis import *  # analysis_main path
 # ---------------------------------------------------------------
 # EvtGen
 # use specified user decay file
-generateY4S(nOfEvents, os.environ['BELLE2_LOCAL_DIR']
-            + '/analysis/examples/exampleEvtgenDecayFiles/BtoDpi.dec')
+generateY4S(nOfEvents, os.environ['BELLE2_LOCAL_DIR'] +
+            '/analysis/examples/exampleEvtgenDecayFiles/BtoDpi.dec')
 
 # ---------------------------------------------------------------
 # Offical simulation setup
@@ -68,4 +68,4 @@ ntupleTree('test1', 'B+:dpi', toolsB)
 process(analysis_main)
 
 # ----> Print call statistics
-print statistics
+print(statistics)

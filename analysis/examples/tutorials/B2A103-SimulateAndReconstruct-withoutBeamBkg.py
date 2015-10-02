@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################                                                                                     #
+######################################################
 # This tutorial demonstrates how to perform detector simulation
 # and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events.
@@ -13,7 +13,7 @@
 # The processed events are saved to the output ROOT file that
 # now contain in addition to the generated particles
 # (MCParticle objects stored in the StoreArray<MCParticle>) also
-# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).                                                                              #
+# reconstructed MDST objects (Track/ECLCluster/KLMCluster/...).
 # Contributors: A. Zupanc (June 2014)
 #
 ######################################################
@@ -29,8 +29,8 @@ from reconstruction import add_mdst_output
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. Please run B2A101-Y4SEventGeneration.py tutorial script first.'
-             )
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
+             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
@@ -53,4 +53,4 @@ analysis_main.add_module(progress)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

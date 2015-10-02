@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -20,7 +20,7 @@ class TestModule(Module):
         if ievent > 50:
             return
 
-        print "PIDLikelihoods:"
+        print("PIDLikelihoods:")
         partList = [Belle2.Const.electron, Belle2.Const.muon, Belle2.Const.pion, Belle2.Const.kaon, Belle2.Const.proton]
         detList = [
             Belle2.Const.PIDDetectorSet(d) for d in (
@@ -31,25 +31,25 @@ class TestModule(Module):
 
         ll = Belle2.PyStoreArray('PIDLikelihoods')
         for l in ll:
-            print "index: %d" % (l.getArrayIndex())
+            print("index: %d" % (l.getArrayIndex()))
             for det in detList:
-                logls = [str(l.getLogL(part, det)) for part in partList]
-                print str(l.isAvailable(det)) + "\t" + " ".join(logls)
+                logls = ["{:.12g}".format(l.getLogL(part, det)) for part in partList]
+                print(str(l.isAvailable(det)) + "\t" + " ".join(logls))
 
-        print "TrackFitResults:"
+        print("TrackFitResults:")
         trackfitresults = Belle2.PyStoreArray('TrackFitResults')
         for t in trackfitresults:
-            print t.getInfo()
-            print t.getCotTheta()
+            print(t.getInfo())
+            print("{:.12g}".format(t.getCotTheta()))
 
         if ievent < 10:  # limit output
-            print "MCParticles:"
+            print("MCParticles:")
             mcparticles = Belle2.PyStoreArray('MCParticles')
             for m in mcparticles:
-                print m.getInfo()
+                print(m.getInfo())
 
         if ievent < 10:  # limit output
-            print "ECLClusters:"
+            print("ECLClusters:")
             clusters = Belle2.PyStoreArray('ECLClusters')
             for cluster in clusters:
                 cluster.getError3x3().Print()

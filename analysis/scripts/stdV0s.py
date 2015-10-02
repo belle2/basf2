@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -15,5 +15,3 @@ def stdKshorts(path=analysis_main):
     fillParticleList('K_S0:all', '0.3 < M < 0.7', True, path)
     vertexKFit('K_S0:all', 0.0, '', '', path)
     applyCuts('K_S0:all', '0.450 < M < 0.550', path)
-
-

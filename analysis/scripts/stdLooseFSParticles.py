@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -9,11 +9,11 @@ from modularAnalysis import *
 
 def stdLooseFSParticles(path=analysis_main):
 
-  # No PID
+    # No PID
     stdVeryLooseK(path)
     stdVeryLoosePi(path)
 
-  # Loose PID
+    # Loose PID
     stdLooseK(path)
     stdLoosePi(path)
     stdLooseMu(path)
@@ -35,8 +35,8 @@ def stdLoosePi(path=analysis_main):
 def stdLooseK(path=analysis_main):
     fillParticleList('K+:loose', 'Kid > 0.1 and chiProb > 0.001', True, path)
 
+    # Add a loose PID here when Mu is available
 
-   # Add a loose PID here when Mu is available
 
 def stdLooseMu(path=analysis_main):
     fillParticleList('mu+:loose', 'chiProb > 0.001', True, path)

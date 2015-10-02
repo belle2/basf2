@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Meant to be run after analysis/examples/teacher_per_event.py, attaches expert
@@ -29,4 +29,4 @@ output.param('treeName', 'variables')
 main.add_module(output)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -13,7 +13,7 @@ inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root')
 steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_specific_steeringfile.internal')
 
 tempdir = tempfile.mkdtemp()
-print tempdir
+print(tempdir)
 os.chdir(tempdir)
 
 shutil.copy(inputFile, "inputdata.root")

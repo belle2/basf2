@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -29,12 +29,12 @@ bkg = sys.argv[2]
 stream = sys.argv[3]
 fileNo = sys.argv[4]
 
-inputFiles = ['/group/belle2/MC/generic/' + mcType + '/mcprod1405/' + bkg
-              + '/*' + stream + '/' + mcType + '_e0001r0' + fileNo + '*.root']
+inputFiles = ['/group/belle2/MC/generic/' + mcType + '/mcprod1405/' + bkg +
+              '/*' + stream + '/' + mcType + '_e0001r0' + fileNo + '*.root']
 # there is no r000 file, so include r1000 in it's place
 if int(fileNo) == 0:
-    inputFiles += ['/group/belle2/MC/generic/' + mcType + '/mcprod1405/' + bkg
-                   + '/*' + stream + '/' + mcType + '_e0001r1000*.root']
+    inputFiles += ['/group/belle2/MC/generic/' + mcType + '/mcprod1405/' + bkg +
+                   '/*' + stream + '/' + mcType + '_e0001r1000*.root']
 
 directory = 'rootFiles/'
 if not os.path.exists(directory):
@@ -59,4 +59,4 @@ printDataStore()
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

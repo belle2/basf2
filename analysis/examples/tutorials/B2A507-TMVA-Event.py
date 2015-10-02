@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -48,7 +48,7 @@ teacher.param(
 main.add_module(teacher)
 
 process(main)
-print statistics
+print(statistics)
 
 # We create another path, and apply the training on the same data,
 # usually one wants to use an independent data set for this step.
@@ -72,4 +72,4 @@ ntuple.param('variables', ['extraInfo(SignalProbability)', 'passesCut(KLMEnergy 
 main.add_module(ntuple)
 
 process(main)
-print statistics
+print(statistics)

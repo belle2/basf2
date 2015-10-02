@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################                                                                                     #
+#######################################################
 # This tutorial demonstrates how to print out the
 # contents of the StoreArray<MCParticle>.
 #
@@ -21,8 +21,8 @@ from modularAnalysis import analysis_main
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. Please run B2A101-Y4SEventGeneration.py tutorial script first.'
-             )
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. '
+             'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-evtgen.root')
@@ -34,4 +34,4 @@ printPrimaryMCParticles()
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

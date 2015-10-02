@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 # Thomas Keck 2015
 #
@@ -31,7 +32,7 @@ class Effect(object):
     def __init__(self, **modulation):
         self.speed = SigTo(0.5, init=0.5, time=1.0, mul=0.1, add=0.08)
         self.volume = SigTo(0.5, init=0.5, time=1.0)
-        self.modulation = {key: SigTo(0.5, init=0.5, **value) for key, value in modulation.items()}
+        self.modulation = {key: SigTo(0.5, init=0.5, **value) for key, value in list(modulation.items())}
 
 
 class Drums(Effect):
@@ -78,7 +79,7 @@ class Bells(Effect):
         self.fhz = Snap(self.mid, choice=[0, 2, 3, 5, 7, 8, 10], scale=1)
         envelope = LinTable([(0, .3), (20, .85), (300, .7), (1000, .5), (8191, .3)])
         self.env = TrigEnv(self.trg, table=envelope, dur=self.trg['dur'])
-        self.rat = Snap(self.modulation['ratio'], choice=range(2, 9), scale=0)
+        self.rat = Snap(self.modulation['ratio'], choice=list(range(2, 9)), scale=0)
         self.osc = SumOsc(
             freq=self.fhz,
             ratio=[
@@ -133,12 +134,12 @@ class Sonic(Module):
         plist = Belle2.PyStoreObj('e+')
         ntracks = plist.obj().getListSize()
         self.voice.modulation['purity'].setValue(normalise(ntracks, 2, 20))
-        print "#Tracks", ntracks, normalise(ntracks, 2, 20)
+        print("#Tracks", ntracks, normalise(ntracks, 2, 20))
 
         energy = variables.evaluate('ECLEnergy', 0) + variables.evaluate('KLMEnergy', 0)
         self.instr.volume.setValue(normalise(energy, 0, 20))
         self.bells.volume.setValue(1 - normalise(energy, 0, 20))
-        print "Energy", energy, normalise(energy, 0, 20)
+        print("Energy", energy, normalise(energy, 0, 20))
 
         trackprob = 0
         pidprob = 0
@@ -153,10 +154,10 @@ class Sonic(Module):
             pidprob += max([eid, kid, prid, muid])
             trackprob += variables.evaluate('chiProb', p)
         self.instr.modulation['sharpness'].setValue(normalise(pidprob, 0, ntracks))
-        print "PIDProb", pidprob, normalise(pidprob, 0, ntracks)
+        print("PIDProb", pidprob, normalise(pidprob, 0, ntracks))
 
         self.drums.modulation['depth'].setValue(normalise(trackprob, 0, ntracks))
-        print"TrackProb", trackprob, normalise(trackprob, 0, ntracks)
+        print("TrackProb", trackprob, normalise(trackprob, 0, ntracks))
 
         gammaprob = 0
         plist = Belle2.PyStoreObj('gamma')
@@ -166,7 +167,7 @@ class Sonic(Module):
             gammaprob += variables.evaluate('goodGamma', p)
 
         self.bells.modulation['ratio'].setValue(normalise(gammaprob, 0, ngammas))
-        print"GammaProb", gammaprob, normalise(gammaprob, 0, ngammas)
+        print("GammaProb", gammaprob, normalise(gammaprob, 0, ngammas))
 
         time.sleep(5)
 

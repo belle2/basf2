@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 # Thomas Keck 2015
 #
@@ -67,13 +68,13 @@ class Sonic(Module):
         amount_of_baryons = variables.variables.evaluate('NumberOfMCParticlesInEvent(2212, 2112)', 0)
         amount_of_gammas = variables.variables.evaluate('NumberOfMCParticlesInEvent(22)', 0)
 
-        print amount_of_leptons, amount_of_mesons, amount_of_baryons, amount_of_gammas
+        print(amount_of_leptons, amount_of_mesons, amount_of_baryons, amount_of_gammas)
 
         # Check if it's a Y4S Event
         # On real data: could be replaced by FEI or continuum suppresion
         isY4SEvent = not bool(variables.variables.evaluate('isContinuumEvent', 0))
 
-        print isY4SEvent
+        print(isY4SEvent)
 
         # Amount of tracks, ecl and klm clusters
         amount_of_tracks = variables.variables.evaluate('nTracks', 0)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -116,4 +116,4 @@ ntupleTree('btagbsig', 'Upsilon(4S)', tools4S)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

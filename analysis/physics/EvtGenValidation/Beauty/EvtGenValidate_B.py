@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -39,7 +39,9 @@ if len(sys.argv) != 4:
     sys.exit('Must provide enough arguments: [input file] [output file] [0/1]')
 
 # input parameters: e.g. basf2 VA101-BBValidate.py input.root output.root 0/1
-# this loads selected input file(s) and created an output file with reconstructed particles. For only common decays use argument 0, otherwise use 1.
+# this loads selected input file(s) and created an output file with
+# reconstructed particles. For only common decays use argument 0,
+# otherwise use 1.
 inputName = sys.argv[1]
 outputName = sys.argv[2]
 recLong = sys.argv[3]
@@ -153,4 +155,4 @@ ntupleTree('b0gen', 'B0:gen', toolsB0gen)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

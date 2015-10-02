@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -31,6 +31,6 @@ for x in range(1, nJobs + 1):
     command = 'bsub -q s -o ' + logFile + ' basf2 skimCharmlessSL.py ' + \
         str(nEvents) + ' ' + outputDir + ' ' + outputName + '-' + str(x) + '.root' + ' ' + simrec
     # Print out the command
-    print command
+    print(command)
     # Evaluate the command
     os.system(command)

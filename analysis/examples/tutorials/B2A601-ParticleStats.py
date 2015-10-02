@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -38,27 +38,14 @@ from stdLooseFSParticles import stdLoosePi
 from stdLooseFSParticles import stdLooseK
 from stdFSParticles import stdPi0
 
-filelistMIX = \
-    ['/hsm/belle2/bdata/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s01/mixed_e0001r0010_s01_BGx1.mdst.root'
-     ]
-filelistCHG = \
-    ['/hsm/belle2/bdata/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s01/charged_e0001r0010_s01_BGx1.mdst.root'
-     ]
-filelistCC = \
-    ['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx1/mc35_ccbar_BGx1_s01/ccbar_e0001r0010_s01_BGx1.mdst.root'
-     ]
-filelistSS = \
-    ['/hsm/belle2/bdata/MC/generic/ssbar/mcprod1405/BGx1/mc35_ssbar_BGx1_s01/ssbar_e0001r0010_s01_BGx1.mdst.root'
-     ]
-filelistDD = \
-    ['/hsm/belle2/bdata/MC/generic/ddbar/mcprod1405/BGx1/mc35_ddbar_BGx1_s01/ddbar_e0001r0010_s01_BGx1.mdst.root'
-     ]
-filelistUU = \
-    ['/hsm/belle2/bdata/MC/generic/uubar/mcprod1405/BGx1/mc35_uubar_BGx1_s01/uubar_e0001r0010_s01_BGx1.mdst.root'
-     ]
+filelistMIX = ['/hsm/belle2/bdata/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s01/mixed_e0001r0010_s01_BGx1.mdst.root']
+filelistCHG = ['/hsm/belle2/bdata/MC/generic/charged/mcprod1405/BGx1/mc35_charged_BGx1_s01/charged_e0001r0010_s01_BGx1.mdst.root']
+filelistCC = ['/hsm/belle2/bdata/MC/generic/ccbar/mcprod1405/BGx1/mc35_ccbar_BGx1_s01/ccbar_e0001r0010_s01_BGx1.mdst.root']
+filelistSS = ['/hsm/belle2/bdata/MC/generic/ssbar/mcprod1405/BGx1/mc35_ssbar_BGx1_s01/ssbar_e0001r0010_s01_BGx1.mdst.root']
+filelistDD = ['/hsm/belle2/bdata/MC/generic/ddbar/mcprod1405/BGx1/mc35_ddbar_BGx1_s01/ddbar_e0001r0010_s01_BGx1.mdst.root']
+filelistUU = ['/hsm/belle2/bdata/MC/generic/uubar/mcprod1405/BGx1/mc35_uubar_BGx1_s01/uubar_e0001r0010_s01_BGx1.mdst.root']
 
-inputMdstList(filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD
-              + filelistUU)
+inputMdstList(filelistMIX + filelistCHG + filelistCC + filelistSS + filelistDD + filelistUU)
 
 # create and fill final state ParticleLists
 # use standard lists
@@ -102,4 +89,4 @@ summaryOfLists(['D0:all', 'D+:kpipi', 'D_s+:kkpi'])
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

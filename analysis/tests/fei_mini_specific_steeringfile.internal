@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -65,9 +65,9 @@ if feistate.is_trained:
     feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
 
 # show constructed path
-print feistate.path
+print(feistate.path)
 
 if len(glob.glob('FEIsummary.tex')) == 0:
     process(feistate.path)
 
-print statistics
+print(statistics)

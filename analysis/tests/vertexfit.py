@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 
 import os
 from basf2 import *
@@ -39,7 +38,7 @@ main.add_module(ntupler)
 
 process(main)
 
-print statistics
+print(statistics)
 
 #
 from ROOT import TFile
@@ -57,7 +56,7 @@ def check():
     if ntuple.GetEntries() == 0:
         B2FATAL("No D0s saved")
 
-#these are empty?
+# these are empty?
 #    if ntuple.GetEntries("pValue < 0") > 0:
 #        B2FATAL("Some entries have negative pValue?")
 #
@@ -69,12 +68,12 @@ def check():
 
     if ntuple.GetEntries("significanceOfDistance > 0") == 0:
         B2FATAL("significanceOfDistance never positive?")
-    #TODO what else to check?
+    # TODO what else to check?
 
 
 check()
 
-print "Test passed, cleaning up."
+print("Test passed, cleaning up.")
 
-#cleanup
+# cleanup
 os.remove('test_vertexfit.root')

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 # Thomas Keck 2015
 #
@@ -316,13 +317,13 @@ def PreCutDetermination(resource, channelNames, preCutConfig, preCutHistograms):
 
     # Remove all channelsNames and PreCutHistograms which are ignored
     results = {c: None for c in channelNames}
-    channelNames, preCutHistograms = zip(*[(c, p) for c, p in zip(channelNames, preCutHistograms) if p is not None])
+    channelNames, preCutHistograms = list(zip(*[(c, p) for c, p in zip(channelNames, preCutHistograms) if p is not None]))
 
     # Calculate common PreCuts
     # !! You probabily do NOT want to change the next line, otherwise you're probabily going to break the corresponding test
     #    of this function.
     commonPreCuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
-    for (channelName, cut) in commonPreCuts.iteritems():
+    for (channelName, cut) in commonPreCuts.items():
         results[channelName] = None if cut['isIgnored'] else cut
     return results
 

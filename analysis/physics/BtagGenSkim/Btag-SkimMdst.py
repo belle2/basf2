@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -127,4 +127,4 @@ summaryOfLists(['B0:all'])
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

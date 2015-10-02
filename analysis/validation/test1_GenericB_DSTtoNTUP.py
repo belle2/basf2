@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -167,4 +167,4 @@ ntupleTree('eventtuple', '', eventtools)
 process(analysis_main)
 
 # ----> Print call statistics
-print statistics
+print(statistics)

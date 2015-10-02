@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -6,11 +6,11 @@ import ROOT
 
 
 def printUsage():
-    print 'Usage: b2add OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]'
-    print ''
-    print ' Like hadd for most .root files,  but if a file only contains persistent.ProcessStatistics'
-    print ' (and possibly FileMetaData, EventMetaData), these objects are merged into a single'
-    print ' statistics object in the output file, other branches are discarded.'
+    print('Usage: b2add OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
+    print('')
+    print(' Like hadd for most .root files,  but if a file only contains persistent.ProcessStatistics')
+    print(' (and possibly FileMetaData, EventMetaData), these objects are merged into a single')
+    print(' statistics object in the output file, other branches are discarded.')
 
 
 def is_statistics_file(tfile):
@@ -35,7 +35,7 @@ def is_statistics_file(tfile):
 def doMerge(outFile, inFiles):
     out = ROOT.TFile.Open(outFile, 'NEW')
     if not out:
-        print 'Error: output file "%s" already exists!' % (outFile)
+        print('Error: output file "%s" already exists!' % outFile)
         sys.exit(1)
 
     inTree = ROOT.TChain('persistent')
@@ -48,11 +48,11 @@ def doMerge(outFile, inFiles):
 
     # merge statistics from all persistent trees into 'stats'
     numEntries = inTree.GetEntries()
-    print "Merging %d files into %s..." % (numEntries, outFile)
+    print("Merging %d files into %s..." % (numEntries, outFile))
     for i in range(1, numEntries):
         inTree.GetEntry(i)
         stats.merge(inTree.ProcessStatistics)
-    print "done, saving."
+    print("done, saving.")
 
     #print stats.getStatisticsString()
     out.cd()

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #
 # Thomas Keck 2014
 #
@@ -36,12 +37,12 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         axis = hist.GetXaxis()
         if hist.GetBinContent(minimum) > cut:
             return [axis.GetBinLowEdge(1), axis.GetBinUpEdge(hist.GetNbinsX())]
-        low = [bin for bin in xrange(1, maximum + 1) if hist.GetBinContent(bin) < cut]
-        high = [bin for bin in xrange(maximum, hist.GetNbinsX() + 1) if hist.GetBinContent(bin) < cut]
+        low = [bin for bin in range(1, maximum + 1) if hist.GetBinContent(bin) < cut]
+        high = [bin for bin in range(maximum, hist.GetNbinsX() + 1) if hist.GetBinContent(bin) < cut]
         return [axis.GetBinLowEdge(max(low) + 1 if low else 1), axis.GetBinUpEdge(min(high) - 1 if high else hist.GetNbinsX())]
 
-    print "Total number of signals", sum([value.GetEntries() for value in signal.values()])
-    print "Total number of background", sum([value.GetEntries() for value in bckgrd.values()])
+    print("Total number of signals", sum([value.GetEntries() for value in list(signal.values())]))
+    print("Total number of background", sum([value.GetEntries() for value in list(bckgrd.values())]))
 
     result = {}
     redo_cuts = True
@@ -49,31 +50,33 @@ def CalculatePreCuts(preCutConfig, channelNames, preCutHistograms):
         redo_cuts = False
 
         cuts = GetCuts(signal, bckgrd, preCutConfig.efficiency, preCutConfig.purity, ycut_to_xcuts)
-        for (channel, range) in cuts.iteritems():
-            result[channel] = {'range': range, 'isIgnored': False,
-                               'cutstring': str(range[0]) + " <= " + preCutConfig.variable + " <= " + str(range[1]),
-                               'nBackground': GetNumberOfEventsInRange(bckgrd[channel], range),
-                               'nSignal': GetNumberOfEventsInRange(signal[channel], range),
-                               'signalPeak': signal[channel].GetMean(),
-                               'signalWidth': signal[channel].GetRMS(),
-                               'variable': preCutConfig.variable}
+        for (channel, channel_range) in cuts.items():
+            result[channel] = {
+                'range': channel_range, 'isIgnored': False,
+                'cutstring': str(channel_range[0]) + " <= " + preCutConfig.variable + " <= " + str(channel_range[1]),
+                'nBackground': GetNumberOfEventsInRange(bckgrd[channel], channel_range),
+                'nSignal': GetNumberOfEventsInRange(signal[channel], channel_range),
+                'signalPeak': signal[channel].GetMean(),
+                'signalWidth': signal[channel].GetRMS(),
+                'variable': preCutConfig.variable
+            }
 
         for ignoredChannel in GetIgnoredChannels(signal, bckgrd, cuts):
             redo_cuts = True
             result[ignoredChannel]['isIgnored'] = True
             B2WARNING("Ignoring channel " + ignoredChannel + "!")
 
-        signal = {channel: hist for (channel, hist) in signal.iteritems() if not result[channel]['isIgnored']}
-        bckgrd = {channel: hist for (channel, hist) in bckgrd.iteritems() if not result[channel]['isIgnored']}
+        signal = {channel: hist for (channel, hist) in signal.items() if not result[channel]['isIgnored']}
+        bckgrd = {channel: hist for (channel, hist) in bckgrd.items() if not result[channel]['isIgnored']}
 
     signalsum = 0
     backgroundsum = 0
-    for k, v in result.iteritems():
+    for k, v in result.items():
         signalsum += v['nSignal']
         backgroundsum += v['nBackground']
-        print k, ': ', v['cutstring']
-    print "Total number of signals after cut", signalsum
-    print "Total number of background after cut", backgroundsum
+        print(k, ': ', v['cutstring'])
+    print("Total number of signals after cut", signalsum)
+    print("Total number of background after cut", backgroundsum)
 
     return result
 
@@ -91,11 +94,11 @@ def LoadHistogramsFromFiles(files, variable, channelNames, preCutHistograms):
     all = dict([(channel, file.GetKey('all' + key).ReadObj())
                 for (_, key), channel, file in zip(preCutHistograms, channelNames, files)])
 
-    if any([hist is None for hist in signal.values() + all.values()]):
+    if any(hist is None for hist in list(signal.values()) + list(all.values())):
         raise RuntimeError('Error while opening ROOT file with preCut Histograms')
 
-    bckgrd = dict([(channel, value.Clone('bckgrd' + channel)) for (channel, value) in all.iteritems()])
-    ratio = dict([(channel, value.Clone('ratio' + channel)) for (channel, value) in signal.iteritems()])
+    bckgrd = dict([(channel, value.Clone('bckgrd' + channel)) for (channel, value) in all.items()])
+    ratio = dict([(channel, value.Clone('ratio' + channel)) for (channel, value) in signal.items()])
 
     for channel, file in zip(channelNames, files):
         file.cd()
@@ -118,20 +121,20 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
     @param ycut_to_xcuts function which calculates xcuts from a given cut on the y-axis
     """
 
-    nSignal = sum([value.GetEntries() for value in signal.values()])
+    nSignal = sum([value.GetEntries() for value in list(signal.values())])
 
     if nSignal == 0:
-        channels = [channel for channel in signal.iterkeys()]
+        channels = [channel for channel in signal.keys()]
         B2WARNING("No signal present in any of these channels: " + (", ".join(channels)))
-        return {channel: [0, 0] for channel in signal.iterkeys()}
+        return {channel: [0, 0] for channel in signal.keys()}
 
     def pythonEfficiencyFunc(ycut):
         return sum([GetNumberOfEventsInRange(s, ycut_to_xcuts(channel, ycut[0]))
-                    for (channel, s) in signal.iteritems()]) / float(nSignal)
+                    for (channel, s) in signal.items()]) / float(nSignal)
 
     def pythonPurityFunc(ycut):
-        s = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in signal.iteritems()])
-        b = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in bckgrd.iteritems()])
+        s = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in signal.items()])
+        b = sum([GetNumberOfEventsInRange(h, ycut_to_xcuts(channel, ycut[0])) for (channel, h) in bckgrd.items()])
         if s == 0:
             return 0
         if b == 0:
@@ -147,7 +150,7 @@ def GetCuts(signal, bckgrd, efficiency, purity, ycut_to_xcuts):
         rootPurityFunc = ROOT.TF1('PurityFunction', pythonPurityFunc, 0, 1, 0)
         ycut = rootPurityFunc.GetX(purity, 0.0, 1.0)
 
-    return {channel: ycut_to_xcuts(channel, ycut) for channel in signal.iterkeys()}
+    return {channel: ycut_to_xcuts(channel, ycut) for channel in signal.keys()}
 
 
 def GetNumberOfEventsInRange(histogram, rangeTuple):
@@ -186,6 +189,6 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return (GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000
-                or GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000)
-    return [channel for channel in signal.iterkeys() if isIgnored(channel)]
+        return (GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000 or
+                GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000)
+    return [channel for channel in signal.keys() if isIgnored(channel)]

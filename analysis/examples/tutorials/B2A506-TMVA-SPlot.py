@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -58,7 +58,7 @@ teacher.param('listNames', 'D0')
 main.add_module(teacher)
 
 process(main)
-print statistics
+print(statistics)
 
 # Now one needs to define a sPlot model with RooFit
 from ROOT import (RooRealVar, RooGaussian, RooChebychev, RooAddPdf, RooArgList, RooFit, RooAbsReal, TFile, kFALSE)
@@ -137,4 +137,4 @@ variablesToNTuple('D0', ['extraInfo(SPlotProbability)',  'isSignal'], filename='
 #                   expertOutputName='SPlotProbability', workingDirectory="TMVA", path=main)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -68,7 +68,7 @@ ntupleFile('TMVA/NtupleTools.root', path=main)
 ntupleTree('elec_tree', 'e-', tools, path=main)
 
 process(main)
-print statistics
+print(statistics)
 
 # Now we use the created sample stored in the root file to do a TMVA training.
 # You will get a warning due to a missing __weight__ branch, this branch is automatically added.
@@ -133,4 +133,4 @@ variablesToNTuple('e-', ['extraInfo(VariablesToNtupleProbability)', 'extraInfo(N
                   filename='TMVA/NtupleOutput.root', path=main)
 
 process(main)
-print statistics
+print(statistics)

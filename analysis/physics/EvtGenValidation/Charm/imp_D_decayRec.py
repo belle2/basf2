@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -19,12 +19,7 @@ from modularAnalysis import cutAndCopyList
 
 # define function for easier manipulation of copyLists
 
-def copyListFun(
-    mmin,
-    mmax,
-    part,
-    listname,
-    ):
+def copyListFun(mmin, mmax, part, listname):
 
     mlist = 'copyLists(\'' + listname + '\', ['
     for i in range(mmin, mmax):
@@ -58,8 +53,7 @@ def reconstructD0():  # reconstruct D0 decays
     reconstructDecay('D0:15 -> K_S0:all K-:all K+:all', '1.8 < M < 1.92', 15)
 
     # rest of events
-    reconstructDecay('D0:16 -> K-:all K+:all pi-:all pi+:all', '1.8 < M < 1.92'
-                     , 16)
+    reconstructDecay('D0:16 -> K-:all K+:all pi-:all pi+:all', '1.8 < M < 1.92', 16)
     mmin = 1
     mmax = 16
 
@@ -74,11 +68,9 @@ def reconstructD0():  # reconstruct D0 decays
 def reconstructDP():  # reconstruct D+ decays
     # decay modes in Full Event Interpretation Report (2014)
     reconstructDecay('D+:1 -> K-:all pi+:all pi+:all', '1.8 < M < 1.92', 1)
-    reconstructDecay('D+:2 -> K-:all pi+:all pi+:all pi0:all', '1.8 < M < 1.92'
-                     , 2)
+    reconstructDecay('D+:2 -> K-:all pi+:all pi+:all pi0:all', '1.8 < M < 1.92', 2)
     reconstructDecay('D+:3 -> K-:all K+:all pi+:all', '1.8 < M < 1.92', 3)
-    reconstructDecay('D+:4 -> K-:all K+:all pi+:all pi0:all', '1.8 < M < 1.92'
-                     , 4)
+    reconstructDecay('D+:4 -> K-:all K+:all pi+:all pi0:all', '1.8 < M < 1.92', 4)
     reconstructDecay('D+:5 -> pi+:all pi0:all', '1.8 < M < 1.92', 5)
     reconstructDecay('D+:6 -> pi+:all pi+:all pi-:all', '1.8 < M < 1.92', 6)
     reconstructDecay('D+:7 -> pi+:all pi+:all pi-:all pi0:all',
@@ -163,8 +155,7 @@ def reconstructDSSTP():  # reconstruct D_s*+ decays
     # decay modes in Full Event Interpretation Report (2014)
     reconstructDecay('D_s*+:1 -> D_s+:gen gamma:all',
                      'massDifference(0) < 0.16', 1)
-    reconstructDecay('D_s*+:2 -> D_s+:gen pi0:all', 'massDifference(0) < 0.16'
-                     , 2)
+    reconstructDecay('D_s*+:2 -> D_s+:gen pi0:all', 'massDifference(0) < 0.16', 2)
     mmin = 1
     mmax = 2
 
@@ -174,5 +165,3 @@ def reconstructDSSTP():  # reconstruct D_s*+ decays
     matchMCTruth('D_s*+:all')
     # taking only correctly reconstructed
     applyCuts('D_s*+:all', 'isSignal>0.5')
-
-

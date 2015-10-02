@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -36,6 +36,7 @@ class BinnedData(object):
     but to return the result of the defined operations sum, count, ... as if they were
     executed on the unbinned pandas.DataFrame.
     """
+
     def __init__(self, array, patch):
         """
         BinnedData contains an array with bin content values and patches defining the bin centers
@@ -145,7 +146,7 @@ def loadHistsFromRootFile(filename):
 
     # Put arrays and patches into own Hist class to simplify usage
     binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
-    return dict(zip(keys_str, binnedDataList))
+    return dict(list(zip(keys_str, binnedDataList)))
 
 
 def loadMCCountsDictionary(filename):
@@ -160,7 +161,7 @@ def loadMCCountsDictionary(filename):
         old_name = Belle2.Variable.invertMakeROOTCompatible(name)
         return old_name[len('NumberOfMCParticlesInEvent('):-len(")")]
 
-    return {rename(key): hist for key, hist in hists.iteritems()}
+    return {rename(key): hist for key, hist in hists.items()}
 
 
 def loadListCountsDictionary(filename):
@@ -183,7 +184,7 @@ def loadListCountsDictionary(filename):
         else:
             return old_name[len('countInList('):-1] + '_All'
 
-    return {rename(key): hist for key, hist in hists.iteritems()}
+    return {rename(key): hist for key, hist in hists.items()}
 
 
 def loadPreCutDictionary(filename):
@@ -211,7 +212,7 @@ def loadPreCutDictionary(filename):
             B2ERROR("Unkown histogram encountered in preCut file " + old_name + ' ' + filename)
             return old_name
 
-    return {rename(key): hist for key, hist in hists.iteritems()}
+    return {rename(key): hist for key, hist in hists.items()}
 
 
 def loadMCCountsDataFrame(filename):
@@ -228,7 +229,7 @@ def loadMCCountsDataFrame(filename):
         old_name = Belle2.Variable.invertMakeROOTCompatible(name)
         return old_name[len('NumberOfMCParticlesInEvent('):-len(")")]
 
-    df.columns = map(rename, df.columns)
+    df.columns = list(map(rename, df.columns))
     return df
 
 
@@ -253,7 +254,7 @@ def loadListCountsDataFrame(filename):
         else:
             return old_name[len('countInList('):-1] + '_All'
 
-    df.columns = map(rename, df.columns)
+    df.columns = list(map(rename, df.columns))
     return df
 
 
@@ -307,7 +308,7 @@ def loadNTupleDataFrame(filename):
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)
 
-    df.columns = map(rename, df.columns)
+    df.columns = list(map(rename, df.columns))
     return df, scale
 
 
@@ -324,8 +325,8 @@ def loadTMVADataFrame(filename):
     def rename(name):
         return Belle2.Variable.invertMakeROOTCompatible(name)
 
-    train_df.columns = map(rename, train_df.columns)
-    test_df.columns = map(rename, test_df.columns)
+    train_df.columns = list(map(rename, train_df.columns))
+    test_df.columns = list(map(rename, test_df.columns))
     train_df['__isTrain__'] = True
     test_df['__isTrain__'] = False
     df = train_df.append(test_df, ignore_index=True)
@@ -395,7 +396,7 @@ def loadBranchingFractionsDataFrame(filename=None):
     with open(filename, 'r') as f:
         for line in f:
             fields = line.split(' ')
-            fields = filter(lambda x: x != '', fields)
+            fields = [x for x in fields if x != '']
             if len(fields) < 2:
                 continue
             if fields[0][0] == '#':
@@ -546,7 +547,7 @@ def createSummary(resource, finalStateSummaries, combinedSummaries, particles, m
                               """,
                            add_table_of_contents=True).finish()
 
-    channelSummaries = sum(map(lambda x: x['channels'], combinedSummaries), [])
+    channelSummaries = sum([x['channels'] for x in combinedSummaries], [])
 
     o += b2latex.Section("Summary").finish()
     o += b2latex.String(r"""
@@ -1071,7 +1072,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
     recon_bckgrd = 0
     user_signal = 0
     user_bckgrd = 0
-    for channelName, df in preCutDf.iteritems():
+    for channelName, df in preCutDf.items():
         recon_signal += df['WithoutCut'].array[2]
         recon_bckgrd += df['WithoutCut'].array[1]
         user_signal += df['Signal'].count()

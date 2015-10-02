@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ################################################################################
@@ -83,4 +83,4 @@ skimMdst.if_true(save_path)
 outputMdst(outSkim, path=save_path)
 
 process(analysis_main)
-print statistics
+print(statistics)

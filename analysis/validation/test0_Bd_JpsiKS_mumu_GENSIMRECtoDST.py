@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -53,4 +53,4 @@ add_mdst_output(main, True, '../Bd_JpsiKS_mumu_GENSIMRECtoMDST.mdst.root')
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

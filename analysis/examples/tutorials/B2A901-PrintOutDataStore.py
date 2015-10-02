@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################                                                                                     #
+#######################################################
 # This tutorial demonstrates how to print out the
 # contents of the DataStore for each event.
 # This is useful for debugging purposes, e.g. to check if
@@ -20,8 +20,9 @@ from modularAnalysis import analysis_main
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-gsim-BKGx0.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py tutorial scripts first.'
-             )
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. '
+             'Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py '
+             'tutorial scripts first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx0.root')
@@ -33,4 +34,4 @@ printDataStore()
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

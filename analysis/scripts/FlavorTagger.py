@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # *************  Flavor Tagging   ************
@@ -52,7 +52,8 @@ class FlavorTaggerInfoFiller(Module):
                 continue
             plist = Belle2.PyStoreObj(particleList)
 
-            if plist.obj().getListSize() == 0:  # From the likelihood it is possible to have Kaon category with no actual kaons
+            # From the likelihood it is possible to have Kaon category with no actual kaons
+            if plist.obj().getListSize() == 0:
                 FlavorTaggerInfo.setTrack(None)
                 FlavorTaggerInfo.setCategories(category)
                 FlavorTaggerInfo.setCatProb(0)
@@ -69,10 +70,10 @@ class FlavorTaggerInfoFiller(Module):
                                                                  particle)
                     categoryProb = 0.0
                 else:
-                    targetProb = particle.getExtraInfo('IsRightTrack(' + category
-                                                       + ')')  # Prob of being the right target
-                    categoryProb = particle.getExtraInfo('IsRightCategory('
-                                                         + category + ')')  # Prob of belonging to a cat
+                    # Prob of being the right target
+                    targetProb = particle.getExtraInfo('IsRightTrack(' + category + ')')
+                    # Prob of belonging to a cat
+                    categoryProb = particle.getExtraInfo('IsRightCategory(' + category + ')')
 
     # Save information in the FlavorTagInfo DataObject
                 FlavorTaggerInfo.setTrack(track)
@@ -129,7 +130,8 @@ class RemoveExtraInfoModule(Module):
 class MoveTaggerInformationToBExtraInfoModule(Module):
 
     """
-    Adds the flavor tagging information (q*r) from the MC and from the Combiner as ExtraInfo to the reconstructed B0 particle.
+    Adds the flavor tagging information (q*r) from the MC and from the Combiner
+    as ExtraInfo to the reconstructed B0 particle.
     """
 
     def event(self):
@@ -177,18 +179,17 @@ def GetModeCode():
         return 0
 
 # Directory where the weights of the trained Methods are saved
-workingDirectory = os.environ['BELLE2_LOCAL_DIR'] \
-    + '/analysis/data/FlavorTagging/TrainedMethods'
+workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data/FlavorTagging/TrainedMethods'
 
 # Methods for Track and Event Levels
-methods = [('FastBDT', 'Plugin',
-            'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-            )]
+methods = [
+    ('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
+]
 
 # Methods for Combiner Level
-methodsCombiner = [('FastBDT', 'Plugin',
-                    'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-                    )]
+methodsCombiner = [
+    ('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=300:!H:!V:NTrees=300:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
+]
 
 # SignalFraction: TMVA feature
 # For smooth output set to -1, this will break the calibration.
@@ -317,15 +318,13 @@ def WhichCategories(categories=[
                 variablesCombinerLevel.append(AvailableCategories[category][3])
                 categoriesCombination.append(AvailableCategories[category][4])
             else:
-                B2FATAL('Flavor Tagger: ' + category
-                        + ' has been already given')
+                B2FATAL('Flavor Tagger: ' + category + ' has been already given')
                 return False
         else:
-            B2FATAL('Flavor Tagger: ' + category
-                    + ' is not a valid category name given')
-            B2FATAL(
-                'Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
-                '"KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumP*" or "KaonPion" ')
+            B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
+            B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
+                    '"Muon", "IntermediateMuon", "KinLepton", "Kaon", "SlowPion", "FastPion", '
+                    '"Lambda", "FSC", "MaximumP*" or "KaonPion" ')
             return False
     global categoriesCombinationCode
     for code in sorted(categoriesCombination):
@@ -472,7 +471,8 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=path)
         # Check if there is K short in this event
         if particleList == 'K+:KaonROE':
-            applyCuts(particleList, '0.1<Kid', path=path)  # Precut done to prevent from overtraining, might be redundant
+            # Precut done to prevent from overtraining, might be redundant
+            applyCuts(particleList, '0.1<Kid', path=path)
             fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
@@ -492,11 +492,9 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
-        if not isTMVAMethodAvailable(workingDirectory + '/'
-                                     + methodPrefixTrackLevel):
+        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixTrackLevel):
             if mode == 'Expert':
-                B2FATAL('Flavor Tagger: ' + particleList
-                        + ' Tracklevel was not trained. Stopped')
+                B2FATAL('Flavor Tagger: ' + particleList + ' Tracklevel was not trained. Stopped')
             else:
                 B2INFO('PROCESSING: trainTMVAMethod on track level')
                 trainTMVAMethod(
@@ -534,11 +532,9 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
         targetVariable = 'IsRightCategory(' + category + ')'
 
-        if not isTMVAMethodAvailable(workingDirectory + '/'
-                                     + methodPrefixEventLevel):
+        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixEventLevel):
             if mode == 'Expert':
-                B2FATAL('Flavor Tagger: ' + particleList
-                        + ' Eventlevel was not trained. Stopped')
+                B2FATAL('Flavor Tagger: ' + particleList + ' Eventlevel was not trained. Stopped')
             else:
                 B2INFO('PROCESSING: trainTMVAMethod on event level')
                 trainTMVAMethod(
@@ -577,8 +573,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
     B2INFO('COMBINER LEVEL')
     methodPrefixCombinerLevel = weightFiles + 'CombinerLevel' \
         + categoriesCombinationCode + 'TMVA'
-    if not isTMVAMethodAvailable(workingDirectory + '/'
-                                 + methodPrefixCombinerLevel):
+    if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel):
         if mode == 'Expert':
             B2FATAL('Flavor Tagger: Combinerlevel was not trained with this combination of categories. Stopped'
                     )
@@ -594,8 +589,8 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
                 path=path,
             )
     else:
-        B2INFO('Flavor Tagger: Ready to be used with weightFiles'
-               + weightFiles + '. The training process has been finished.')
+        B2INFO('Flavor Tagger: Ready to be used with weightFiles' +
+               weightFiles + '. The training process has been finished.')
         if mode == 'Expert':
             B2INFO('Apply TMVAMethod on combiner level')
             applyTMVAMethod(
@@ -617,17 +612,17 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
                 targetVariable = 'IsRightCategory(' + category + ')'
 
                 if category == 'KaonPion':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                              + 'IsRightTrack(Kaon)) > 0.5', path=path)
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
+                              'IsRightTrack(Kaon)) > 0.5', path=path)
                 elif category == 'FSC':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                              + 'IsRightTrack(SlowPion)) > 0.5', path=path)
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
+                              'IsRightTrack(SlowPion)) > 0.5', path=path)
                 elif category == 'Lambda':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                              + 'IsRightTrack(Lambda)) > 0.5', path=path)
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
+                              'IsRightTrack(Lambda)) > 0.5', path=path)
                 else:
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ','
-                              + 'IsRightTrack(' + category + ')) > 0.5', path=path)
+                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
+                              'IsRightTrack(' + category + ')) > 0.5', path=path)
 
         return True
 
@@ -686,6 +681,7 @@ def FlavorTagger(
         path.add_module(FlavorTagInfoBuilder)
         roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
 
-    roe_path.add_module(RemoveExtraInfoModule())  # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+    # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+    roe_path.add_module(RemoveExtraInfoModule())
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

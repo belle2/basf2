@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from fei.provider import *
@@ -563,7 +563,7 @@ class TestFSPDistribution(unittest.TestCase):
 
     def test_FSPDistributionWithFile(self):
         # I call upon the mighty god of Python!
-        exec compile(InjectMockTFile().visit(ast.parse(inspect.getsource(FSPDistribution))), '<string>', 'exec')
+        exec(compile(InjectMockTFile().visit(ast.parse(inspect.getsource(FSPDistribution))), '<string>', 'exec'))
         with temporary_file('e+:generic_42.root'):
             # Returns dictionary with nSignal and nBackground if Histogram does exists
             self.assertDictEqual(FSPDistribution(self.resource, 'e+:generic', 'isSignal'),
@@ -717,6 +717,7 @@ class TestGenerateTrainingData(unittest.TestCase):
 
 
 class MockTFileForSPlotModel(object):
+
     def __init__(self, filename, recreate):
         assert recreate == "RECREATE"
         assert filename == "model_Name_42.root"
@@ -745,7 +746,7 @@ class TestGenerateSPlotModel(unittest.TestCase):
                              'signalPeak': 1.8, 'signalWidth': 0.1, 'range': (1.4, 1.9)}
 
     def test_GenerateSPlotModel(self):
-        exec compile(InjectMockTFileForSPlotModel().visit(ast.parse(inspect.getsource(GenerateSPlotModel))), '<string>', 'exec')
+        exec(compile(InjectMockTFileForSPlotModel().visit(ast.parse(inspect.getsource(GenerateSPlotModel))), '<string>', 'exec'))
         mvaConfig = MVAConfiguration(name='FastBDT', type='Plugin',
                                           config='TMVAConfigString',
                                           variables=['p', 'pt'],
@@ -925,8 +926,8 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
 
     def test_TrainMultivariateClassifierTrainingFailed(self):
         # I call upon the mighty god of Python!
-        exec compile(InjectMockSubprocessFail().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
-                     '<string>', 'exec')
+        exec(compile(InjectMockSubprocessFail().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
+                     '<string>', 'exec'))
         # Returns None if training was did not create correct file
         # with self.assertRaises(RuntimeError):
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
@@ -934,8 +935,8 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
 
     def test_TrainMultivariateClassifierTrainingSuccessfull(self):
         # I call upon the mighty god of Python!
-        exec compile(InjectMockSubprocessSuccess().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
-                     '<string>', 'exec')
+        exec(compile(InjectMockSubprocessSuccess().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
+                     '<string>', 'exec'))
         # Returns config filename if training was did not create correct file
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
                                                      'trainingData.root'), 'trainingData_1.config')

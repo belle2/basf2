@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -78,5 +78,3 @@ def reconstructChi_cy():
     applyCuts('chi_c0:all', 'isSignal>0.5')
     applyCuts('chi_c1:all', 'isSignal>0.5')
     applyCuts('chi_c2:all', 'isSignal>0.5')
-
-

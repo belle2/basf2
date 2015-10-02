@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 # Thomas Keck 2015
 
 from fei import *
@@ -24,15 +25,15 @@ if feistate.is_trained:
     open('FEI_finished_its_training', 'a').close()
     import sys
     # show constructed path
-    print feistate.path
+    print(feistate.path)
 
     process(feistate.path)
     sys.exit(1)
 
 
 # show constructed path
-print feistate.path
+print(feistate.path)
 
 process(feistate.path)
 B2WARNING('event() statistics:')
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # *************  Flavor Tagging   ************
@@ -418,7 +418,7 @@ if combinerLevelReady:
 
 main.add_module('ProgressBar')
 process(main)
-print statistics
+print(statistics)
 
 B2INFO('')
 B2INFO("Training completed. Run 'show_tmva_results TMVA_1_vs_0.root' to view detailed information about the trained methods.")

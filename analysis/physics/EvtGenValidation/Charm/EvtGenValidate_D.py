@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -125,4 +125,4 @@ ntupleTree('dsstpgen', 'D_s*+:gen', toolsDSSTPgen)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

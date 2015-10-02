@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -79,4 +79,4 @@ ntupleTree('btag', 'B-:tag', toolsB, myMain)
 ntupleTree('btagbsig', 'Upsilon(4S)', tools4S, myMain)
 
 process(myMain)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ############################################
@@ -35,6 +35,5 @@ for x in range(0, 5):
             command = 'bsub -q l -o ' + logFile \
                 + ' basf2 JS101-SteeringFile.py ' + mcType + ' ' + str(bkg) \
                 + ' ' + stream + ' ' + str(z)
-            print command
+            print(command)
             os.system(command)
-

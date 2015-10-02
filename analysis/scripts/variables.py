@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
@@ -12,7 +15,7 @@ def printVars():
     Print list of all available variables.
     """
 
-    print 'Available variables in Variable::Manager:'
+    print('Available variables in Variable::Manager:')
     allVars = variables.getVariables()
     vars = []
     for v in allVars:

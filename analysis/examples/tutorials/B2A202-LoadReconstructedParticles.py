@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################                                                                                     #
+################################################################################
 # This tutorial demonstrates how to load reconstructed
 # final state particles as Particles:
 # - Tracks are loaded as e/mu/pi/K/p Particles
@@ -13,7 +13,7 @@
 #
 # Contributors: A. Zupanc (June 2014)
 #
-######################################################
+################################################################################
 
 from basf2 import *
 from modularAnalysis import inputMdst
@@ -31,8 +31,9 @@ from stdFSParticles import stdPi0
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-gsim-BKGx0.root'):
-    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py tutorial scripts first.'
-             )
+    sys.exit('Required input file (B2A101-Y4SEventGeneration-gsim-BKGx0.root) does not exist. '
+             'Please run B2A101-Y4SEventGeneration.py and B2A103-SimulateAndReconstruct-withoutBeamBkg.py '
+             'tutorial scripts first.')
 
 # load input ROOT file
 inputMdst('B2A101-Y4SEventGeneration-gsim-BKGx0.root')
@@ -42,7 +43,7 @@ printDataStore()
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
-#fillParticleList('gamma:all', '')
+# fillParticleList('gamma:all', '')
 fillParticleList('e-:all', '')
 fillParticleList('mu-:all', '')
 fillParticleList('pi-:all', '')
@@ -160,4 +161,4 @@ ntupleTree('kshort', 'K_S0:all', toolsK0)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -50,7 +50,7 @@ teacher.param('listNames', 'e-')
 main.add_module(teacher)
 
 process(main)
-print statistics
+print(statistics)
 
 # The extern teachers automatically trains each class against the rest if there are more than 2 clusters
 # identified in the target variable. The different trainings can be distinguished by the signalClass-id
@@ -73,4 +73,4 @@ variablesToNTuple('e-', ['extraInfo(ElectronProbability)', 'extraInfo(PionProbab
                   filename='TMVA/MulticlassOutput.root', path=main)
 
 process(main)
-print statistics
+print(statistics)

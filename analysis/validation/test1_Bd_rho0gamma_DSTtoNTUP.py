@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -70,4 +70,4 @@ summaryOfLists(['rho0', 'B0'])
 process(analysis_main)
 
 # ----> Print call statistics
-print statistics
+print(statistics)

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Full Event Interpretation framework for Belle II
 Thomas Keck, Christian Pulvermacher 2013-2015

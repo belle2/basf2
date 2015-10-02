@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -75,4 +75,4 @@ outputMdst('test_bck.mdst.root', path=myRhoGammaskim_path)
 process(analysis_main)
 
 # print out the summary
-print statistics
+print(statistics)

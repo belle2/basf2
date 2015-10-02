@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -25,5 +25,3 @@ def stdRho(path=analysis_main):
 def stdKstar(path=analysis_main):
     reconstructDecay('K*0:loose -> pi-:loose K+:loose', '0.8 < M < 1.1', 1,
                      True, path)
-
-

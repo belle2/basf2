@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -56,7 +56,7 @@ teacher.param('target', 'isSignal')
 main.add_module(teacher)
 
 process(main)
-print statistics
+print(statistics)
 
 
 # Now lets apply the methods as usual
@@ -83,4 +83,4 @@ variablesToNTuple('e-', ['extraInfo(FastBDTProbability)', 'extraInfo(TMVABDTProb
                   filename='TMVA/OnTheFlyOutput.root', path=main)
 
 process(main)
-print statistics
+print(statistics)

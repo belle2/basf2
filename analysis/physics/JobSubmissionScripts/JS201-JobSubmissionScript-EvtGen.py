@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ############################################
@@ -44,5 +44,5 @@ for x in range(0, noJobs):
     command = 'bsub -q s -o ' + logFile \
         + ' basf2 JS101-SteeringFile-EvtGen.py ' + str(noEvents) + ' ' \
         + decFile + ' ' + directory + outputName + '-' + str(x) + '.root'
-    print command  # this prints out the command
+    print(command)  # this prints out the command
     os.system(command)  # this evaluates it in the terminal

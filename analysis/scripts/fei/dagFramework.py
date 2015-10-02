@@ -1,14 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-# Thomas Keck 2015
-#
-# The DAG (directed acyclic graph) framework automatically resolves dependencies between given Resources.
-# A Resource consists of an unique identifier, a function (or in the simplest case just a value),
-# and (automatic, positional, keyword) requirements.
-# All Resources in a DAG object are called in the correct order, the parameters of the functions are fixed
-# by the given keyword-requirements. The first parameter is always the Resource object itself.
-#
+
+"""
+Thomas Keck 2015
+
+The DAG (directed acyclic graph) framework automatically resolves dependencies
+between given Resources.  A Resource consists of an unique identifier, a
+function (or in the simplest case just a value), and (automatic, positional,
+keyword) requirements.  All Resources in a DAG object are called in the correct
+order, the parameters of the functions are fixed by the given
+keyword-requirements. The first parameter is always the Resource object itself.
+"""
 
 import hashlib
 import basf2
@@ -17,7 +19,7 @@ import copy
 import inspect
 import threading
 import sys
-import cPickle
+import pickle
 import os
 import shutil
 import decimal
@@ -36,7 +38,7 @@ def create_hash(arguments):
         if isinstance(x, float):
             return decimal.Decimal(x).quantize(decimal.Decimal('.0001'), rounding=decimal.ROUND_DOWN)
         elif isinstance(x, dict):
-            items = [(makeNonAmbiguous(k), makeNonAmbiguous(v)) for k, v in sorted(x.items(), key=lambda t: t[0])]
+            items = [(makeNonAmbiguous(k), makeNonAmbiguous(v)) for k, v in sorted(list(x.items()), key=lambda t: t[0])]
             return collections.OrderedDict(items)
         elif isinstance(x, list):
             return list(makeNonAmbiguous(v) for v in x)
@@ -44,28 +46,36 @@ def create_hash(arguments):
             return tuple(makeNonAmbiguous(v) for v in x)
         else:
             return x
-    return hashlib.sha1(str([str(makeNonAmbiguous(v)) for v in arguments if v is not None])).hexdigest()
+    return hashlib.sha1(str([str(makeNonAmbiguous(v)) for v in arguments if v is not None]).encode()).hexdigest()
 
 
 class Resource(object):
     """
     A Resource is the basic building block of a DAG.
-    It consists of an unique identifier, a function and (positional, keyword) requirements.
-    Positional and keyword requirements have to be fullfilled before the function of the Resource can be called.
-    A requirement can be fullfilled by the return value of another Resource and is defined by the identifier of the Resource.
-    Each requirement can be either a single identifier which corresponds to another Resource or a list of identifiers.
-    The keyword requirements are passed to the function as keyword arguments. The first argument is always the object itself.
+    It consists of an unique identifier, a function and (positional, keyword)
+    requirements.  Positional and keyword requirements have to be fullfilled
+    before the function of the Resource can be called.  A requirement can be
+    fullfilled by the return value of another Resource and is defined by the
+    identifier of the Resource.  Each requirement can be either a single
+    identifier which corresponds to another Resource or a list of identifiers.
+    The keyword requirements are passed to the function as keyword arguments.
+    The first argument is always the object itself.
+
     The function can modify the following members of the Resource object:
         - path (basf2.Path): The path associated with this Resource
-        - needed (bool): The path of the Resource is only passed to the final path if the Resource is marked as needed
-                         or required by a needed Resource.
-        - cache (bool): The Resource is automatically cached, which is useful if the basf2 steering file is run multiple times
+        - needed (bool): The path of the Resource is only passed to the final
+          path if the Resource is marked as needed or required by a needed
+          Resource.
+        - cache (bool): The Resource is automatically cached, which is useful if
+          the basf2 steering file is run multiple times
         - condition (tuple(string, value)): The path is run in as a conditional path.
         - halt (bool): Resource cannot be provided right now, maybe next turn!
+
     Additionally the function can read the following members:
-        - hash (string): A unique hash of all requirements including positional requirements, which are not passed to the function.
-        - env (dictionary): The dag environment, which contains steering variables,
-                            which should not be included in the dependency graph.
+        - hash (string): A unique hash of all requirements including positional
+          requirements, which are not passed to the function.
+        - env (dictionary): The dag environment, which contains steering
+          variables, which should not be included in the dependency graph.
     """
 
     def __init__(self, env, identifier, provider, *args, **kwargs):
@@ -83,7 +93,7 @@ class Resource(object):
         self.keyword_requirements = kwargs
 
         self.automatic_requirements = []
-        if callable(self.provider):
+        if isinstance(self.provider, collections.Callable):
             #    try:
             argspec = inspect.getargspec(self.provider)
             for arg in argspec.args[1:]:
@@ -92,9 +102,17 @@ class Resource(object):
         # except Exception as e:
         #    pass
 
+        # FIXME: compare the objects in a python2 like way: first lists then str
+        def key_cmp(x):
+            if isinstance(x, list):
+                return (0, repr(x))
+            else:
+                return (1, x)
+
         self.requires = []
-        for v in list(self.positional_requirements) + sorted(list(self.keyword_requirements.values()) +
-                                                             list(self.automatic_requirements)):
+        for v in list(self.positional_requirements) + \
+                sorted(list(self.keyword_requirements.values()) +
+                       self.automatic_requirements, key=key_cmp):
             if isinstance(v, str):
                 self.requires.append(v)
             else:
@@ -114,9 +132,11 @@ class Resource(object):
         self.loaded_from_cache = False
 
     def __getstate__(self):
-        return (self.value, basf2.serialize_path(self.path) if self.path is not None else None, self.condition, self.env,
-                self.halt, self.needed, self.cache, self.identifier, self.provider, self.positional_requirements,
-                self.keyword_requirements, self.automatic_requirements, self.requires, self.hash)
+        return (self.value, basf2.serialize_path(self.path) if self.path is not
+                None else None, self.condition, self.env, self.halt,
+                self.needed, self.cache, self.identifier, self.provider,
+                self.positional_requirements, self.keyword_requirements,
+                self.automatic_requirements, self.requires, self.hash)
 
     def __setstate__(self, state):
         (self.value, serialized_path, self.condition, self.env, self.halt, self.needed, self.cache,
@@ -145,11 +165,11 @@ class Resource(object):
         # Reset load from cache
         self.loaded_from_cache = False
 
-        if callable(self.provider):
+        if isinstance(self.provider, collections.Callable):
             parameters = {}
             for key in self.automatic_requirements:
                 parameters[key] = arguments[key]
-            for (key, value) in self.keyword_requirements.iteritems():
+            for (key, value) in self.keyword_requirements.items():
                 if isinstance(value, str):
                     parameters[key] = arguments[value]
                 else:
@@ -183,12 +203,13 @@ class DAG(object):
     DAG (directed acyclic graph) used to model dependencies between basf2 reconstruction steps.
     Useful to implement complicated algorithms like FEI or FlavourTagging
     """
+
     def __init__(self):
         """
         Creates a new DAG object
         """
         #: dictionary containing all Resource objects
-        self.resources = {}
+        self.resources = collections.OrderedDict()
         #: dictionary containing environment variables
         self.env = {}
         #: All original needed resources
@@ -217,8 +238,8 @@ class DAG(object):
         Fills self.resources from given cache file
         """
         if os.path.isfile(cacheFile):
-            with open(cacheFile, 'r') as f:
-                cache = cPickle.load(f)
+            with open(cacheFile, 'rb') as f:
+                cache = pickle.load(f)
                 for resource in cache:
                     resource.env = self.env
                     # if 'listCounts' in resource.identifier:
@@ -237,8 +258,8 @@ class DAG(object):
             while os.path.isfile(backup_file + str(version)):
                 version += 1
             shutil.copyfile(cacheFile, backup_file + str(version))
-        with open(cacheFile, 'w') as f:
-            cPickle.dump([resource for resource in self.resources.values() if resource.cache], f)
+        with open(cacheFile, 'wb') as f:
+            pickle.dump([resource for resource in list(self.resources.values()) if resource.cache], f)
 
     def showProgress(self, total, done, ready):
         """ Print progress """
@@ -282,7 +303,7 @@ class DAG(object):
             if nThreads > 1:
                 ready = p.map(call_resource, ready)
             else:
-                ready = map(call_resource, ready)
+                ready = list(map(call_resource, ready))
 
             nDone += nReady
             self.showProgress(nResources, nDone, nReady)
@@ -300,29 +321,32 @@ class DAG(object):
                 requirements += x.requires
             needed = [x for x in resources if x.identifier in requirements and not x.needed]
         # But finally needed are only resources which are in the chain!
-        needed = [x for x in chain if x.needed and x.path is not None and x.path.modules() > 0]
-        print "Done"
+        needed = [x for x in chain if x.needed and x.path is not None and len(x.path.modules()) > 0]
+        print("Done")
 
         if self.env.get('verbose', False):
-            print "Needed modules before optimization"
+            print("Needed modules before optimization")
             for n in needed:
                 if n.path:
                     for m in n.path.modules():
-                        print m.name()
+                        print(m.name())
 
-        # Some modules are certified for parallel processing. Modules which aren't certified should run as late as possible!
-        # Otherwise they slow down all following modules! Therefore we try to move these modules to the end of the needed list.
+        # Some modules are certified for parallel processing. Modules which
+        # aren't certified should run as late as possible!  Otherwise they slow
+        # down all following modules! Therefore we try to move these modules to
+        # the end of the needed list.
         needed = self.optimizeForParallelProcessing(needed)
 
         if self.env.get('verbose', False):
-            print "Needed modules after optimization"
+            print("Needed modules after optimization")
             for n in needed:
                 if n.path:
                     for m in n.path.modules():
-                        print m.name()
+                        print(m.name())
 
-        # The modules in the basf2 path added by the actors are crucial to the FullEventInterpretation
-        # Therefore we add the filled path objects of the needed actors to the main basf2 path given as
+        # The modules in the basf2 path added by the actors are crucial to the
+        # FullEventInterpretation Therefore we add the filled path objects of
+        # the needed actors to the main basf2 path given as
         # an argument to this function
         for resource in needed:
             if not resource.loaded_from_cache and resource.path is not None and len(resource.path.modules()) > 0:
@@ -334,19 +358,19 @@ class DAG(object):
                     path.add_module(cond_module)
                     if self.env.get('verbose', False):
                         for m in resource.path.modules():
-                            print "Added conditional module", m.name()
+                            print("Added conditional module", m.name())
                 else:
                     path.add_path(resource.path)
                     if self.env.get('verbose', False):
                         for m in resource.path.modules():
-                            print "Added module", m.name()
+                            print("Added module", m.name())
 
         if self.env.get('verbose', False):
             self.createDotGraphic(needed)
-            self.printMissingDependencies([r for r in resources if r not in chain], results.keys())
-            print "Final path"
+            self.printMissingDependencies([r for r in resources if r not in chain], list(results.keys()))
+            print("Final path")
             for m in path.modules():
-                print m.name()
+                print(m.name())
 
         return (nDone == nResources) and all([i in results for i in self.user_flaged_needed])
 
@@ -360,12 +384,12 @@ class DAG(object):
             return all([module.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
                         for module in resource.path.modules()])
 
-        pp = filter(isPPC, needed)
+        pp = list(filter(isPPC, needed))
         if(len(pp) == len(needed)):
             return needed
 
         while True:
-            firstSingleCoreResource = filter(lambda x: not isPPC(x), needed)[0]
+            firstSingleCoreResource = next(x for x in needed if not isPPC(x))
             firstSingleCoreIndex = needed.index(firstSingleCoreResource)
 
             def canActorRunBeforeFirstSingleCoreResource(resource):
@@ -377,8 +401,8 @@ class DAG(object):
                 provides = [other.identifier for other in needed[firstSingleCoreIndex:index]]
                 return not any([r in provides for r in resource.requires])
 
-            optimized = filter(lambda resource: canActorRunBeforeFirstSingleCoreResource(resource), needed)
-            optimized += filter(lambda resource: resource not in optimized, needed)
+            optimized = [resource for resource in needed if canActorRunBeforeFirstSingleCoreResource(resource)]
+            optimized += [resource for resource in needed if resource not in optimized]
             if optimized == needed:
                 break
             needed = optimized
@@ -392,11 +416,11 @@ class DAG(object):
         @param provided provided values
         """
         if len(unresolved) == 0:
-            print "All functor dependencies could be fulfilled."
+            print("All functor dependencies could be fulfilled.")
         else:
-            print "The following functors have missing dependencies:"
+            print("The following functors have missing dependencies:")
             for resource in unresolved:
-                print resource.identifier, 'needs', [r for r in resource.requires if r not in provided]
+                print(resource.identifier, 'needs', [r for r in resource.requires if r not in provided])
 
     def createDotGraphic(self, needed):
         """
@@ -404,20 +428,13 @@ class DAG(object):
         @param needed the needed actors
         """
 
-        print "Saving dependency graph to FEIgraph.dot"
+        print("Saving dependency graph to FEIgraph.dot")
         dotfile = open("FEIgraph.dot", "w")
         dotfile.write("digraph FRdependencies {\n")
         excludeList = [
-            'None',
-            'path',
-            'hash',
-            'Geometry',
-            'Label_',
-            'Name_',
-            'Identifier_',
-            'MVAConfig_',
-            'PreCutConfig_',
-            'PostCutConfig_']
+            'None', 'path', 'hash', 'Geometry', 'Label_', 'Name_',
+            'Identifier_', 'MVAConfig_', 'PreCutConfig_', 'PostCutConfig_'
+        ]
 
         for resource in needed:
             if resource.identifier.startswith('SignalProbability') or resource.identifier.startswith('Probability'):

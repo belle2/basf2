@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #######################################################
@@ -41,26 +41,20 @@ def reconstructBPD0YPS0(q):  # reconstruct B+ -> anti-D0 Y+(S=0) decays
     # decay modes in the top ~98 % most frequent of all included
     reconstructDecay('B+:4  -> anti-D0:all pi+:all pi+:all pi-:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 4)
-    reconstructDecay('B+:5  -> anti-D0:all pi+:all pi-:all pi0:all pi0:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 5)
+    reconstructDecay('B+:5  -> anti-D0:all pi+:all pi-:all pi0:all pi0:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 5)
     reconstructDecay('B+:6  -> anti-D0:all pi+:all pi0:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 6)
-    reconstructDecay('B+:7  -> anti-D0:all pi+:all pi-:all pi+:all pi-:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 7)
+    reconstructDecay('B+:7  -> anti-D0:all pi+:all pi-:all pi+:all pi-:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 7)
     reconstructDecay('B+:8  -> anti-D0:all pi+:all K+:all K-:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 8)
     reconstructDecay('B+:9  -> anti-D0:all K+:all K-:all pi+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 9)
-    reconstructDecay('B+:10 -> anti-D0:all pi+:all K+:all K-:all pi0:all pi0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 10)
-    reconstructDecay('B+:11 -> anti-D0:all pi+:all pi-:all K+:all K-:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 11)
+    reconstructDecay('B+:10 -> anti-D0:all pi+:all K+:all K-:all pi0:all pi0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 10)
+    reconstructDecay('B+:11 -> anti-D0:all pi+:all pi-:all K+:all K-:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 11)
     reconstructDecay('B+:12 -> anti-D0:all pi+:all K_S0:all K_S0:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 12)
-    reconstructDecay('B+:13 -> anti-D0:all pi+:all pi-:all K_S0:all K_S0:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 13)
-    reconstructDecay('B+:14 -> anti-D0:all pi+:all pi0:all pi0:all K_S0:all K_S0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 14)
+    reconstructDecay('B+:13 -> anti-D0:all pi+:all pi-:all K_S0:all K_S0:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 13)
+    reconstructDecay('B+:14 -> anti-D0:all pi+:all pi0:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 14)
     reconstructDecay('B+:15 -> anti-D0:all pi+:all K_S0:all K_S0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 15)
     mmin = 1
@@ -68,8 +62,7 @@ def reconstructBPD0YPS0(q):  # reconstruct B+ -> anti-D0 Y+(S=0) decays
 
     if q == 1:
         # rest of decay modes (less frequent)
-        reconstructDecay('B+:16 -> anti-D0:all pi+:all K+:all K-:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 16)
+        reconstructDecay('B+:16 -> anti-D0:all pi+:all K+:all K-:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 16)
         mmax = 16
 
     # merge individual B+ lists into one list
@@ -90,14 +83,12 @@ def reconstructBPD0YPS1(q):  # reconstruct B+ -> anti-D0 Y+(S=1) decays
     # decay modes in the top ~98 % most frequent of all included
     reconstructDecay('B+:18 -> anti-D0:all pi+:all pi-:all K+:all pi0:all ',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 18)
-    reconstructDecay('B+:19 -> anti-D0:all pi+:all pi+:all pi-:all pi0:all K_S0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 19)
+    reconstructDecay('B+:19 -> anti-D0:all pi+:all pi+:all pi-:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 19)
     reconstructDecay('B+:20 -> anti-D0:all pi+:all pi-:all K+:all ',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 20)
     reconstructDecay('B+:21 -> anti-D0:all K+:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 21)
-    reconstructDecay('B+:22 -> anti-D0:all pi+:all pi+:all pi-:all pi-:all K+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 22)
+    reconstructDecay('B+:22 -> anti-D0:all pi+:all pi+:all pi-:all pi-:all K+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 22)
     reconstructDecay('B+:23 -> anti-D0:all pi+:all K_S0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 23)
     reconstructDecay('B+:24 -> anti-D0:all pi+:all pi0:all K_S0:all',
@@ -109,36 +100,25 @@ def reconstructBPD0YPS1(q):  # reconstruct B+ -> anti-D0 Y+(S=1) decays
 
     if q == 1:
         # rest of decay modes (less frequent)
-        reconstructDecay('B+:26 -> anti-D0:all pi+:all K+:all K-:all pi0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 26)
-        reconstructDecay('B+:27 -> anti-D0:all pi+:all pi-:all K+:all K+:all K-:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 27)
+        reconstructDecay('B+:26 -> anti-D0:all pi+:all K+:all K-:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 26)
+        reconstructDecay('B+:27 -> anti-D0:all pi+:all pi-:all K+:all K+:all K-:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 27)
         reconstructDecay('B+:28 -> anti-D0:all K+:all pi0:all pi0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 28)
-        reconstructDecay('B+:29 -> anti-D0:all pi+:all K+:all K-:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 29)
-        reconstructDecay('B+:30 -> anti-D0:all K+:all pi0:all pi0:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 30)
-        reconstructDecay('B+:31 -> anti-D0:all pi-:all K+:all K+:all pi0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 31)
+        reconstructDecay('B+:29 -> anti-D0:all pi+:all K+:all K-:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 29)
+        reconstructDecay('B+:30 -> anti-D0:all K+:all pi0:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 30)
+        reconstructDecay('B+:31 -> anti-D0:all pi-:all K+:all K+:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 31)
         reconstructDecay('B+:32 -> anti-D0:all K+:all K+:all K-:all pi0:all ',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 32)
-        reconstructDecay('B+:33 -> anti-D0:all pi+:all pi-:all K+:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 33)
+        reconstructDecay('B+:33 -> anti-D0:all pi+:all pi-:all K+:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 33)
         reconstructDecay('B+:34 -> anti-D0:all K+:all K+:all K-:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 34)
-        reconstructDecay('B+:35 -> anti-D0:all K+:all K+:all K-:all pi0:all pi0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 35)
-        reconstructDecay('B+:36 -> anti-D0:all pi-:all K+:all K+:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 36)
-        reconstructDecay('B+:37 -> anti-D0:all K+:all pi0:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 37)
-        reconstructDecay('B+:38 -> anti-D0:all K+:all pi0:all pi0:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 38)
+        reconstructDecay('B+:35 -> anti-D0:all K+:all K+:all K-:all pi0:all pi0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 35)
+        reconstructDecay('B+:36 -> anti-D0:all pi-:all K+:all K+:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 36)
+        reconstructDecay('B+:37 -> anti-D0:all K+:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 37)
+        reconstructDecay('B+:38 -> anti-D0:all K+:all pi0:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 38)
         reconstructDecay('B+:39 -> anti-D0:all K+:all K_S0:all K_S0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 39)
-        reconstructDecay('B+:40 -> anti-D0:all K+:all K+:all K-:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 40)
+        reconstructDecay('B+:40 -> anti-D0:all K+:all K+:all K-:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 40)
         mmax = 40
 
     # merge individual B+ lists into one list
@@ -167,24 +147,17 @@ def reconstructBPDST0YPS0(q):  # reconstruct B+ -> anti-D*0 Y+(S=0) decays
     # decay modes in the top ~98 % most frequent of all included
     reconstructDecay('B+:45  -> anti-D*0:all pi+:all pi0:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 45)
-    reconstructDecay('B+:46  -> anti-D*0:all pi+:all pi-:all pi0:all pi0:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 46)
-    reconstructDecay('B+:47  -> anti-D*0:all pi+:all pi-:all pi+:all pi-:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 47)
+    reconstructDecay('B+:46  -> anti-D*0:all pi+:all pi-:all pi0:all pi0:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 46)
+    reconstructDecay('B+:47  -> anti-D*0:all pi+:all pi-:all pi+:all pi-:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 47)
     reconstructDecay('B+:48  -> anti-D*0:all pi+:all K+:all K-:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 48)
     reconstructDecay('B+:49  -> anti-D*0:all K+:all K-:all pi+:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 49)
-    reconstructDecay('B+:50  -> anti-D*0:all pi+:all K+:all K-:all pi0:all pi0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 50)
-    reconstructDecay('B+:51  -> anti-D*0:all pi+:all pi-:all K+:all K-:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 51)
-    reconstructDecay('B+:52  -> anti-D*0:all pi+:all K_S0:all K_S0:all pi0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 52)
-    reconstructDecay('B+:53  -> anti-D*0:all pi+:all pi0:all pi0:all K_S0:all K_S0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 53)
-    reconstructDecay('B+:54  -> anti-D*0:all pi+:all pi-:all K_S0:all K_S0:all pi+:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 54)
+    reconstructDecay('B+:50  -> anti-D*0:all pi+:all K+:all K-:all pi0:all pi0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 50)
+    reconstructDecay('B+:51  -> anti-D*0:all pi+:all pi-:all K+:all K-:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 51)
+    reconstructDecay('B+:52  -> anti-D*0:all pi+:all K_S0:all K_S0:all pi0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 52)
+    reconstructDecay('B+:53  -> anti-D*0:all pi+:all pi0:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 53)
+    reconstructDecay('B+:54  -> anti-D*0:all pi+:all pi-:all K_S0:all K_S0:all pi+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 54)
     reconstructDecay('B+:55  -> anti-D*0:all pi+:all K_S0:all K_S0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 55)
     mmin = 41
@@ -192,8 +165,7 @@ def reconstructBPDST0YPS0(q):  # reconstruct B+ -> anti-D*0 Y+(S=0) decays
 
     if q == 1:
         # rest of decay modes (less frequent)
-        reconstructDecay('B+:56  -> anti-D*0:all pi+:all K+:all K-:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 56)
+        reconstructDecay('B+:56  -> anti-D*0:all pi+:all K+:all K-:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 56)
         mmax = 56
 
     # merge individual B+ lists into one list
@@ -214,8 +186,7 @@ def reconstructBPDST0YPS1(q):  # reconstruct B+ -> anti-D*0 Y+(S=1) decays
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 58)
     reconstructDecay('B+:59 -> anti-D*0:all K+:all pi0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 59)
-    reconstructDecay('B+:60 -> anti-D*0:all pi+:all pi+:all pi-:all pi0:all K_S0:all'
-                     , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 60)
+    reconstructDecay('B+:60 -> anti-D*0:all pi+:all pi+:all pi-:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 60)
     reconstructDecay('B+:61 -> anti-D*0:all pi+:all K_S0:all',
                      'Mbc>5.24 and -0.1 < deltaE < 0.1', 61)
     reconstructDecay('B+:62 -> anti-D*0:all pi+:all pi-:all K+:all ',
@@ -227,40 +198,26 @@ def reconstructBPDST0YPS1(q):  # reconstruct B+ -> anti-D*0 Y+(S=1) decays
         # rest of decay modes (less frequent)
         reconstructDecay('B+:63 -> anti-D*0:all pi+:all pi0:all K_S0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 63)
-        reconstructDecay('B+:64 -> anti-D*0:all pi+:all pi0:all pi0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 64)
-        reconstructDecay('B+:65 -> anti-D*0:all pi+:all pi+:all pi-:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 65)
-        reconstructDecay('B+:66 -> anti-D*0:all pi+:all pi+:all pi-:all pi-:all K+:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 66)
-        reconstructDecay('B+:67 -> anti-D*0:all pi+:all K+:all K-:all pi0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 67)
+        reconstructDecay('B+:64 -> anti-D*0:all pi+:all pi0:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 64)
+        reconstructDecay('B+:65 -> anti-D*0:all pi+:all pi+:all pi-:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 65)
+        reconstructDecay('B+:66 -> anti-D*0:all pi+:all pi+:all pi-:all pi-:all K+:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 66)
+        reconstructDecay('B+:67 -> anti-D*0:all pi+:all K+:all K-:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 67)
         reconstructDecay('B+:68 -> anti-D*0:all K+:all pi0:all pi0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 68)
-        reconstructDecay('B+:69 -> anti-D*0:all pi+:all K+:all K-:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 69)
-        reconstructDecay('B+:70 -> anti-D*0:all pi+:all pi-:all K+:all K+:all K-:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 70)
-        reconstructDecay('B+:71 -> anti-D*0:all K+:all K+:all K-:all pi0:all '
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 71)
-        reconstructDecay('B+:72 -> anti-D*0:all pi-:all K+:all K+:all pi0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 72)
-        reconstructDecay('B+:73 -> anti-D*0:all K+:all K+:all K-:all pi0:all pi0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 73)
+        reconstructDecay('B+:69 -> anti-D*0:all pi+:all K+:all K-:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 69)
+        reconstructDecay('B+:70 -> anti-D*0:all pi+:all pi-:all K+:all K+:all K-:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 70)
+        reconstructDecay('B+:71 -> anti-D*0:all K+:all K+:all K-:all pi0:all ', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 71)
+        reconstructDecay('B+:72 -> anti-D*0:all pi-:all K+:all K+:all pi0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 72)
+        reconstructDecay('B+:73 -> anti-D*0:all K+:all K+:all K-:all pi0:all pi0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 73)
         reconstructDecay('B+:74 -> anti-D*0:all K+:all K+:all K-:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 74)
-        reconstructDecay('B+:75 -> anti-D*0:all pi+:all pi-:all K+:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 75)
-        reconstructDecay('B+:76 -> anti-D*0:all pi-:all K+:all K+:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 76)
-        reconstructDecay('B+:77 -> anti-D*0:all K+:all pi0:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 77)
-        reconstructDecay('B+:78 -> anti-D*0:all K+:all pi0:all pi0:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 78)
+        reconstructDecay('B+:75 -> anti-D*0:all pi+:all pi-:all K+:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 75)
+        reconstructDecay('B+:76 -> anti-D*0:all pi-:all K+:all K+:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 76)
+        reconstructDecay('B+:77 -> anti-D*0:all K+:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 77)
+        reconstructDecay('B+:78 -> anti-D*0:all K+:all pi0:all pi0:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 78)
         reconstructDecay('B+:79 -> anti-D*0:all K+:all K_S0:all K_S0:all',
                          'Mbc>5.24 and -0.1 < deltaE < 0.1', 79)
-        reconstructDecay('B+:80 -> anti-D*0:all K+:all K+:all K-:all K_S0:all K_S0:all'
-                         , 'Mbc>5.24 and -0.1 < deltaE < 0.1', 80)
+        reconstructDecay('B+:80 -> anti-D*0:all K+:all K+:all K-:all K_S0:all K_S0:all', 'Mbc>5.24 and -0.1 < deltaE < 0.1', 80)
         mmax = 80
 
     # merge individual B+ lists into one list
@@ -388,5 +345,3 @@ def reconstructBPmisc(q):  # miscellaneous modes
     matchMCTruth('B+:misc')
     # taking only correctly reconstructed B+
     applyCuts('B+:misc', 'isSignal>0.5')
-
-

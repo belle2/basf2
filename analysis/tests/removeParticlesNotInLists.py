@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 
 import os
 from basf2 import *
@@ -56,7 +55,7 @@ main.add_module(output)
 
 process(main)
 
-print statistics
+print(statistics)
 
 statfull = os.stat('removeparticlesnotinlists_full.root').st_size
 statreduced = os.stat('removeparticlesnotinlists_reduced.root').st_size

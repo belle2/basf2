@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ############################################
@@ -41,6 +41,5 @@ for fileName in os.listdir(inputDir):
         logFile = logDirectory + 'nTuple-' + logName + '.log'
         command = 'bsub -q l -o ' + logFile + ' basf2 EvtGenValidate_D.py ' \
             + inputDir + fileName + ' ' + rootDirectory + 'nTuple-' + fileName
-        print command  # this prints out the command
+        print(command)  # this prints out the command
         os.system(command)  # this evaluates it in the terminal
-

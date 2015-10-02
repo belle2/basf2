@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # *************  Flavor Tagging   ************
@@ -84,16 +84,17 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
         'Events binned in r_subsample according to their r-value for B0 and B0bar prob',
         6,
         r_subsample)
-    histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0',
-                                        'Events binned in r_subsample according to their r-value for B0 prob', 6, r_subsample)
+    histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0', 'Events binned in r_subsample according '
+                                        'to their r-value for B0 prob', 6, r_subsample)
     histo_entries_per_binB0bar = ROOT.TH1F('entries_per_binB0bar',
-                                           'Events binned in r_subsample according to their r-value for B0bar prob', 6, r_subsample)
+                                           'Events binned in r_subsample according to their r-value '
+                                           'for B0bar prob', 6, r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
-    histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0',
-                                     'Combiner network output [not equal to r] for true B0 (binning 100)', 100, 0.0, 1.0)
+    histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0', 'Combiner network output [not equal to r] '
+                                     'for true B0 (binning 100)', 100, 0.0, 1.0)
     # histogram network output (not qr and not r) for true B0bar (background) - not necessary
-    histo_Cnet_output_B0bar = ROOT.TH1F('Comb_Net_Output_B0bar',
-                                        'Combiner network output [not equal to r] for true B0bar (binning 100)', 100, 0.0, 1.0)
+    histo_Cnet_output_B0bar = ROOT.TH1F('Comb_Net_Output_B0bar', 'Combiner network output [not equal to r] '
+                                        'for true B0bar (binning 100)', 100, 0.0, 1.0)
     # histogram containing the belle paper plot (qr-tagger output for true B0)
     histo_belleplotB0 = ROOT.TH1F('BellePlot_B0',
                                   'BellePlot for true B0 (binning 50)', 50,
@@ -175,15 +176,15 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     histo_calib_B0bar.Divide(hallo12)
 
     # Fit for calibration plot
-    print ' '
-    print '****************** CALIBRATION CHECK ****************************************************************'
-    print ' '
-    print 'Fit ploynomial of first order to the calibration plot. Expected value ~0.5'
-    print ' '
+    print(' ')
+    print('****************** CALIBRATION CHECK ****************************************************************')
+    print(' ')
+    print('Fit ploynomial of first order to the calibration plot. Expected value ~0.5')
+    print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
-    print '       '
-    print '****************** MEASURED EFFECTIVE EFFICIENCY ***************************************************'
-    print '*                                                                                                  *'
+    print('       ')
+    print('****************** MEASURED EFFECTIVE EFFICIENCY ***************************************************')
+    print('*                                                                                                  *')
     # get total number of entries
     total_entries = histo_entries_per_bin.GetEntries()
     total_entries_B0 = histo_entries_per_binB0.GetEntries()
@@ -204,11 +205,11 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     entriesB0 = array('f', [0] * r_size)
     entriesB0bar = array('f', [0] * r_size)
     intervallEff = array('f', [0] * r_size)
-    print '*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *'
-    print '*                                                                                                  *'
-    print '* ------------------------------------------------------------------------------------------------ *'
-    print '*   r-interval        <r>        Efficiency        Event fraction         w         Delta_w        *'
-    print '* ------------------------------------------------------------------------------------------------ *'
+    print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
+    print('*                                                                                                  *')
+    print('* ------------------------------------------------------------------------------------------------ *')
+    print('*   r-interval        <r>        Efficiency        Event fraction         w         Delta_w        *')
+    print('* ------------------------------------------------------------------------------------------------ *')
     for i in range(1, r_size):
         # get the average r-value
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
@@ -226,50 +227,47 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
         event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
         event_fractionB0[i] = entriesB0[i] / total_entries_B0
         event_fractionB0bar[i] = entriesB0bar[i] / total_entries_B0bar
-        intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] \
-            * rvalueB0Average[i]
-        print '* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' \
-            + '{:.3f}'.format(rvalueB0Average[i]) + '         ' \
-            + '{:.3f}'.format(intervallEff[i]) + '               ' \
-            + '{:.3f}'.format(event_fractionTotal[i]) + '            ' \
-            + '{:.3f}'.format(wvalue[i]) + '       ' \
-            + '{: .3f}'.format(wvalueDiff[i]) + '         *'
+        intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
+        print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' +
+              '{:.3f}'.format(rvalueB0Average[i]) + '         ' +
+              '{:.3f}'.format(intervallEff[i]) + '               ' +
+              '{:.3f}'.format(event_fractionTotal[i]) + '            ' +
+              '{:.3f}'.format(wvalue[i]) + '       ' +
+              '{: .3f}'.format(wvalueDiff[i]) + '         *')
         # finally calculating the total effective efficiency
-        tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] \
-            * rvalueB0[i]
-        tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] \
-            * rvalueB0bar[i]
+        tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] * rvalueB0[i]
+        tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]
 
     average_eff = (tot_eff_effB0 + tot_eff_effB0bar) / 2
     diff_eff = tot_eff_effB0 - tot_eff_effB0bar
-    print '* ------------------------------------------------------------------------------------------------ *'
-    print '*                                                                                                  *'
-    print '*    __________________________________________________________________________________________    *'
-    print '*   |                                                                                          |   *'
-    print '*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' \
-        + '{:.0f}'.format(total_entries) + '                                                 |   *'
-    print '*   |                                                                                          |   *'
-    print '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) \
-        + ' %                                              |   *'
-    print '*   |                                                                                          |   *'
-    print '*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' \
-        + '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' \
-        + '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1)  EffDiff=' \
-        + '{:^5.2f}'.format(diff_eff * 100) + ' % |   *'
-    print '*   |                                                                                          |   *'
-    print '*   | FLAVOR PERCENTAGE (MC):                  ' \
-        + '{:.2f}'.format(total_entries_B0 / total_entries * 100) + ' % (q=+1)  ' \
-        + '{:.2f}'.format(total_entries_B0bar / total_entries * 100) + ' % (q=-1)  Diff=' \
-        + '{:^5.2f}'.format((total_entries_B0 - total_entries_B0bar) / total_entries * 100) + ' %    |   *'
-    print '*   |__________________________________________________________________________________________|   *'
-    print '*                                                                                                  *'
-    print '****************************************************************************************************'
-    print '*                                                                                                  *'
+    print('* ------------------------------------------------------------------------------------------------ *')
+    print('*                                                                                                  *')
+    print('*    __________________________________________________________________________________________    *')
+    print('*   |                                                                                          |   *')
+    print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
+          '{:.0f}'.format(total_entries) + '                                                 |   *')
+    print('*   |                                                                                          |   *')
+    print('*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) +
+          ' %                                              |   *')
+    print('*   |                                                                                          |   *')
+    print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
+          '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' +
+          '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1)  EffDiff=' +
+          '{:^5.2f}'.format(diff_eff * 100) + ' % |   *')
+    print('*   |                                                                                          |   *')
+    print('*   | FLAVOR PERCENTAGE (MC):                  ' +
+          '{:.2f}'.format(total_entries_B0 / total_entries * 100) + ' % (q=+1)  ' +
+          '{:.2f}'.format(total_entries_B0bar / total_entries * 100) + ' % (q=-1)  Diff=' +
+          '{:^5.2f}'.format((total_entries_B0 - total_entries_B0bar) / total_entries * 100) + ' %    |   *')
+    print('*   |__________________________________________________________________________________________|   *')
+    print('*                                                                                                  *')
+    print('****************************************************************************************************')
+    print('*                                                                                                  *')
 
     # not that imortant
-    print '* ---------------------------------                                                                *'
-    print '* Efficiency Determination - easiest way                                                           *'
-    print '* ---------------------------------                                                                *'
+    print('* ---------------------------------                                                                *')
+    print('* Efficiency Determination - easiest way                                                           *')
+    print('* ---------------------------------                                                                *')
     total_entries_B0 = histo_belleplotB0.GetEntries()
     total_entries_B0Bar = histo_belleplotB0bar.GetEntries()
     total_entries_B0_wrong = histo_m1.GetEntries()
@@ -287,16 +285,15 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     wrong_eff_B0Bar = right_tag_fraction_B0Bar * right_tag_fraction_B0Bar
     wrong_eff = right_tag_fraction * right_tag_fraction
 
-    print '*     wrong_tag_fraction for all:   ' \
-        + '{:.3f}'.format(wrong_tag_fraction * 100) \
-        + ' %                                                       *'
-    print '*     right_tag_fraction for all:   ' \
-        + '{:.3f}'.format(right_tag_fraction * 100) \
-        + ' %                                                       *'
-    print '*     wrong calculated eff all:     ' + '{:.3f}'.format(wrong_eff
-                                                                   * 100) \
-        + ' %                                                       *'
-    print '*                                                                                                  *'
+    print('*     wrong_tag_fraction for all:   ' +
+          '{:.3f}'.format(wrong_tag_fraction * 100) +
+          ' %                                                       *')
+    print('*     right_tag_fraction for all:   ' +
+          '{:.3f}'.format(right_tag_fraction * 100) +
+          ' %                                                       *')
+    print('*     wrong calculated eff all:     ' + '{:.3f}'.format(wrong_eff * 100) +
+          ' %                                                       *')
+    print('*                                                                                                  *')
 
     # write out the histograms
     # histo_avr_r.Write('', ROOT.TObject.kOverwrite)
@@ -364,18 +361,9 @@ if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
 # the individual efficiency is determind on basis of the combiner training.
 # Whereas the efficiency is determined on basis of the final expert output.
 
-rr_subsample = array('d', [
-    0.0,
-    0.1,
-    0.25,
-    0.5,
-    0.625,
-    0.75,
-    0.875,
-    1.0,
-])
+rr_subsample = array('d', [0.0, 0.1, 0.25, 0.5, 0.625, 0.75, 0.875, 1.0])
 rr_size = len(rr_subsample)
-# individual categories
+
 eventLevelParticles = [
     ('Electron', 'QrOf__boe__pl__clElectronROE__cm__spIsRightCategory__boElectron__bc__cm__spIsRightTrack__boElectron__bc__bc'),
     #    ('IntermediateElectron',
@@ -405,19 +393,18 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
     tree2 = rootfile2.Get('B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_tree')
     rootfile2.cd()
 
-    print '****************** MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *************************'
-    print '*                                                                                                  *'
+    print('****************** MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *************************')
+    print('*                                                                                                  *')
     # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
     # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
     for (category, categoryInput) in eventLevelParticles:
         # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
-        hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)'
-                                + category + ' (binning 50)', 50, -1.0, 1.0)
+        hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
+                                category + ' (binning 50)', 50, -1.0, 1.0)
         # histogram of input variable (only background) - not yet a probability! It's a classifier plot!
-        hist_background = ROOT.TH1F('Background_' + category,
-                                    'Input Background (B0bar)' + category
-                                    + ' (binning 50)', 50, -1.0, 1.0)
+        hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar)' +
+                                    category + ' (binning 50)', 50, -1.0, 1.0)
 
         # per definiton that input is not comparable to the network output, this has to be transformed.
         # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
@@ -428,31 +415,27 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
                                    'Transformed to probability (B0bar) (' + category + ')',
                                    50, 0.0, 1.0)
         # qr output from -1 to 1 -> transformation below
-        hist_qrB0 = ROOT.TH1F('QRB0_' + category, 'Transformed to qr (B0)(' + category
-                              + ')', 50, -1.0, 1.0)
-        hist_qrB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qr (B0bar) (' + category
-                                 + ')', 50, -1.0, 1.0)
+        hist_qrB0 = ROOT.TH1F('QRB0_' + category, 'Transformed to qr (B0)(' +
+                              category + ')', 50, -1.0, 1.0)
+        hist_qrB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qr (B0bar) (' +
+                                 category + ')', 50, -1.0, 1.0)
         # histogram for abs(qr), i.e. this histogram contains the r-values -> transformation below
         # also used to get the number of entries, sorted into 6 bins
-        hist_absqrB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qr)(B0) (' + category
-                                 + ')', 6, rr_subsample)
-        hist_absqrB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qr) (B0bar) (' + category
-                                    + ')', 6, rr_subsample)
+        hist_absqrB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qr)(B0) (' + category + ')', 6, rr_subsample)
+        hist_absqrB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qr) (B0bar) (' + category + ')', 6, rr_subsample)
         # histogram contains at the end the average r values -> calculation below
         # sorted into 6 bins
-        hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)'
-                                  + category, 6, rr_subsample)
-        hist_aver_rB0bar = ROOT.TH1F('AverageRB0bar_' + category, 'A good one (B0bar)'
-                                     + category, 6, rr_subsample)
+        hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)' +
+                                  category, 6, rr_subsample)
+        hist_aver_rB0bar = ROOT.TH1F('AverageRB0bar_' + category, 'A good one (B0bar)' +
+                                     category, 6, rr_subsample)
         # ****** TEST OF CALIBRATION ******
         # for calibration plot we want to have
-        hist_all = ROOT.TH1F('All_' + category,
-                             'Input Signal (B0) and Background (B0Bar)'
-                             + category + ' (binning 50)', 50, 0.0, 1.0)
+        hist_all = ROOT.TH1F('All_' + category, 'Input Signal (B0) and Background (B0Bar)' +
+                             category + ' (binning 50)', 50, 0.0, 1.0)
         tree2.Draw(categoryInput + '>>All_' + category, 'qrCombined>-2')
-        hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category,
-                                  'Calibration Plot for true B0' + category
-                                  + ' (binning 50)', 50, 0.0, 1.0)
+        hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category, 'Calibration Plot for true B0' +
+                                  category + ' (binning 50)', 50, 0.0, 1.0)
         tree2.Draw(categoryInput + '>>Calib_B0_' + category, 'qrCombined>0.5')
         hist_calib_B0.Divide(hist_all)
 
@@ -481,8 +464,7 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         hist_background.SetFillStyle(3005)
         hist_background.SetLineColor(ROOT.kRed)
 
-        hist_signal.SetTitle(category
-                             + ' category input; Network output ; Events')
+        hist_signal.SetTitle(category + ' category input; Network output ; Events')
         # hist_signal.SetMinimum(0)
         # hist_signal.SetMaximum(10000)
 
@@ -496,8 +478,7 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         l.Draw()
 
         Canvas.Update()
-        Canvas.SaveAs(workingDirectory2 + '/' + 'PIC_' + category
-                      + '_Input_Combiner.pdf')
+        Canvas.SaveAs(workingDirectory2 + '/' + 'PIC_' + category + '_Input_Combiner.pdf')
 
         # ***** TEST OF CALIBRATION ******
 
@@ -585,11 +566,11 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         effDiff = tot_eff_effB0 - tot_eff_effB0bar
         effAverage = (tot_eff_effB0 + tot_eff_effB0bar) / 2
 
-        print '* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' \
-            + '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' \
-            + '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' \
-            + '   EffDiff=' + '{: 8.4f}'.format(effDiff * 100) + ' %' \
-            + '{:>13}'.format(category + ' *')
+        print('* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' +
+              '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' +
+              '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' +
+              '   EffDiff=' + '{: 8.4f}'.format(effDiff * 100) + ' %' +
+              '{:>13}'.format(category + ' *'))
 
         hist_signal.Write('', ROOT.TObject.kOverwrite)
         hist_background.Write('', ROOT.TObject.kOverwrite)
@@ -609,8 +590,8 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         # print '*    ' + '{: > 8.2f}'.format(average_eff * 100) + ' %' \
         # + '{:>85}'.format('TOTAL' + '                      *')
 
-    print '*                                                                                                  *'
-    print '****************************************************************************************************'
+    print('*                                                                                                  *')
+    print('****************************************************************************************************')
 
     # close root-file and goodbye
     rootfile2.Close()

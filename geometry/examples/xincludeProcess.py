@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This script processes the input.xml , processes the xinclude statements and outputs the merged xml
@@ -14,8 +14,8 @@ dir = os.getenv('BELLE2_LOCAL_DIR')
 if dir is None:
     dir = os.getenv('BELLE2_RELEASE_DIR')
 if dir is None:
-    print 'BELLE2_LOCAL_DIR or BELLE2_RELEASE_DIR is not set\n'
-    print 'Set option arguyment -i FILE \n'
+    print('BELLE2_LOCAL_DIR or BELLE2_RELEASE_DIR is not set\n')
+    print('Set option arguyment -i FILE \n')
 
 URI = dir + '/' + uri
 
@@ -42,19 +42,19 @@ parser.add_option(
 log = open(options.filename, 'w')
 
 try:
-    print 'Reading %s' % options.xmluri
+    print('Reading %s' % options.xmluri)
     doc = libxml2.parseFile(options.xmluri)
 except:
     doc = None
 
-if doc != None:
+if doc is not None:
     res = doc.xincludeProcess()
     if res >= 0:
         result = doc.serialize()
         log.write('%s' % doc)
         doc.freeDoc()
-        print 'Writing to %s ' % options.filename
+        print('Writing to %s ' % options.filename)
     else:
-        print 'Failed to parse %s' % options.xmluri
+        print('Failed to parse %s' % options.xmluri)
 
 log.close()

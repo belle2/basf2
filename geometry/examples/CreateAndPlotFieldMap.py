@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -17,10 +17,10 @@ try:
     import matplotlib as mpl
     mpl.use("Agg")
 except ImportError:
-    print """\
+    print("""\
 Could not find matplotlib which is required to create the charts. Please
 install it using
-    pip install matplotlib"""
+    pip install matplotlib""")
     sys.exit(1)
 
 mpl.use("Agg")
@@ -165,7 +165,7 @@ cmap_material = mpl.cm.get_cmap('binary')
 # create pdf file and fill with plots
 pdf = PdfPages(filename)
 for component in ["Bx", "By", "Bz", "Br"]:
-    print "Create %s fieldmap plot" % component
+    print("Create %s fieldmap plot" % component)
     h = rfieldmap_file.Get(component)
     data, extent = get_hist_data(h)
     # we need the scale to be symmetric so find out what is the maximal

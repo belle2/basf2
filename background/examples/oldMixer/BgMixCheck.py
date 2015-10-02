@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -116,8 +116,8 @@ def decodeBg(tag):
             return ('Coulomb', 'HER')
         else:
             raise Exception(tag)
-    except Exception, badBgTag:
-        print 'Wrong background tag encountered: ' + badBgTag
+    except Exception as badBgTag:
+        print('Wrong background tag encountered: ' + badBgTag)
         return ('unknown', 'unknown')
 
 
@@ -145,55 +145,49 @@ for file_name in sys.argv[1:n_files]:
             generator = 'LER'
         else:
             generator = 'HER'
-    print file_name + ':' + '\tDetector: ' + str(detector) + '\tComponent: ' \
-        + str(component) + '\tGenerator: ' + str(generator)
+    print(file_name + ':' + '\tDetector: ' + str(detector) + '\tComponent: ' + str(component) + '\tGenerator: ' + str(generator))
     # Add this beauty to the background structure
-    if detector in backgrounds.keys():
-        if component in backgrounds[detector].keys():
-            backgrounds[detector][component][generator] = {'ROF': array('L'),
-                    'MIX': array('L')}
+    if detector in list(backgrounds.keys()):
+        if component in list(backgrounds[detector].keys()):
+            backgrounds[detector][component][generator] = {'ROF': array('L'), 'MIX': array('L')}
         else:
-            backgrounds[detector][component] = {generator: {'ROF': array('L'),
-                    'MIX': array('L')}}
+            backgrounds[detector][component] = {generator: {'ROF': array('L'), 'MIX': array('L')}}
     else:
-        backgrounds[detector] = {component: {generator: {'ROF': array('L'),
-                                 'MIX': array('L')}}}
+        backgrounds[detector] = {component: {generator: {'ROF': array('L'), 'MIX': array('L')}}}
     rtree = f.Get('ROFTree')
     nFrames = min(nFrames, rtree.GetEntries())
     for record in rtree:
+        backgrounds[detector][component][generator]['ROF'].append(record.ReadoutFrames.GetEntries())
 
-        backgrounds[detector][component][generator]['ROF'
-                ].append(record.ReadoutFrames.GetEntries())
     f.Close()
 
-print 'Background data structure:'
-for (detector, components) in backgrounds.iteritems():
-    print detector
-    for (component, generators) in components.iteritems():
-        print '    ' + component
-        for (generator, simhitArrays) in generators.iteritems():
-            print '        ' + generator
-            for (arrayname, data) in simhitArrays.iteritems():
-                print '            ' + arrayname + ': ' + str(len(data))
+print('Background data structure:')
+for (detector, components) in backgrounds.items():
+    print(detector)
+    for (component, generators) in components.items():
+        print('    ' + component)
+        for (generator, simhitArrays) in generators.items():
+            print('        ' + generator)
+            for (arrayname, data) in simhitArrays.items():
+                print('            ' + arrayname + ': ' + str(len(data)))
 
 # Now run the basf2 script to produce root output.
-subprocess.call(['basf2', 'background/examples/OnlyBackground.py']
-                + [str(nFrames)] + sys.argv[1:n_files])
+subprocess.call(['basf2', 'background/examples/OnlyBackground.py'] + [str(nFrames)] + sys.argv[1:n_files])
 # ... and analyze the output file
 outf = ROOT.TFile('OnlyBackgroundOutput.root', 'READ')
 tree = outf.Get('tree')
 # We have to explicitly initialize the bgmixer simhitArrays
 n_entries = tree.GetEntries()
-for (detector, components) in backgrounds.iteritems():
-    for (component, generators) in components.iteritems():
-        for (generator, simhitArrays) in generators.iteritems():
+for (detector, components) in backgrounds.items():
+    for (component, generators) in components.items():
+        for (generator, simhitArrays) in generators.items():
             simhitArrays['MIX'] = array('L', n_entries * [0])
 
 # We need to refer to SimHit simhitArrays by names, so we need
 # a more laborious approach.
 # Initialize and activate the SimHit branches:
 reader = dict([])
-for detector in backgrounds.keys():
+for detector in list(backgrounds.keys()):
     simhitName = detector.upper() + 'SimHit'
     if detector == 'ECL':
         simhitName = 'ECLHit'
@@ -205,34 +199,30 @@ for detector in backgrounds.keys():
     reader[detector] = (simhitArray, simhitBranch)
 
 for i_record in range(n_entries):
-    for detector in backgrounds.keys():
+    for detector in list(backgrounds.keys()):
         (simhitArray, simhitBranch) = reader[detector]
         simhitBranch.GetEntry(i_record)
         for simhit in simhitArray:
             tag = simhit.getBackgroundTag()
-            if tag == bg_codes['bg_none'] or tag == bg_codes['bg_other'] \
-                or tag == bg_codes['bg_twoPhoton']:
-                print 'ERROR: background tag {tag} should not appear here.'.format(tag=tag)
+            if tag == bg_codes['bg_none'] or tag == bg_codes['bg_other'] or tag == bg_codes['bg_twoPhoton']:
+                print('ERROR: background tag {tag} should not appear here.'.format(tag=tag))
             else:
                 (component, generator) = decodeBg(tag)
+                backgrounds[detector][component][generator]['MIX'][i_record] += 1
 
-                backgrounds[detector][component][generator]['MIX'
-                        ][i_record] += 1
 f.Close()
 # Now print a nice summary of the results
-for (detector, components) in backgrounds.iteritems():
-    print detector
-    for (component, generators) in components.iteritems():
-        print '    ' + component
-        for (generator, arrays) in generators.iteritems():
-            print '        ' + generator
+for (detector, components) in backgrounds.items():
+    print(detector)
+    for (component, generators) in components.items():
+        print('    ' + component)
+        for (generator, arrays) in generators.items():
+            print('        ' + generator)
             sum = 0
             diffs = 0
             for i in range(len(arrays['MIX'])):
                 sum += arrays['ROF'][i]
                 if arrays['MIX'][i] != arrays['ROF'][i]:
                     diffs += 1
-                    print '                {i} {mix} {rof}'.format(i=i,
-                            mix=arrays['MIX'][i], rof=arrays['ROF'][i])
-            print '            {d} differences in {sum} simhits.'.format(d=diffs,
-                    sum=sum)
+                    print('                {i} {mix} {rof}'.format(i=i, mix=arrays['MIX'][i], rof=arrays['ROF'][i]))
+            print('            {d} differences in {sum} simhits.'.format(d=diffs, sum=sum))

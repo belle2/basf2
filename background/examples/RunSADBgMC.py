@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -------------------------------------------------------------------------
@@ -17,7 +17,7 @@ import datetime
 from background import add_output
 
 d = datetime.datetime.today()
-print d.strftime('job start: %Y-%m-%d %H:%M:%S\n')
+print(d.strftime('job start: %Y-%m-%d %H:%M:%S\n'))
 
 # read parameters
 
@@ -33,7 +33,7 @@ elif argc == 4:
     num = argvs[2]
     sampleType = argvs[3]
 else:
-    print './RunSADBgMC.py [(RBB,Touschek,Coulomb)_(HER,LER)(,_far)] [num] [(study,usual,ECL,PXD)]'
+    print('./RunSADBgMC.py [(RBB,Touschek,Coulomb)_(HER,LER)(,_far)] [num] [(study,usual,ECL,PXD)]')
     sys.exit()
 
 # set accring (0:LER, 1:HER)
@@ -42,7 +42,7 @@ if name.find('LER') != -1:
 elif name.find('HER') != -1:
     accring = 1
 else:
-    print 'name should include either of HER or LER'
+    print('name should include either of HER or LER')
     sys.exit()
 
 if name.find('far') != -1:
@@ -103,7 +103,7 @@ elif name == 'Touschek_HER_far':
     readouttime = 100  # 0.1us
     seed = seed + '10'
 else:
-    print 'Unknown name! (' + name + ')'
+    print('Unknown name! (' + name + ')')
     sys.exit()
 
 if sampleType == 'study':
@@ -115,20 +115,20 @@ elif sampleType == 'ECL':
 elif sampleType == 'PXD':
     seed = seed + '4'
 else:
-    print 'Unknown sample type! (' + sampleType + ')'
+    print('Unknown sample type! (' + sampleType + ')')
     sys.exit()
 
-print 'accring: ', accring, '(0:LER, 1:HER)'
-print 'input:   ', inputfilename
-print 'output:  ', outputfilename
-print 'range:   ', range
-print 'nevent:  ', nevent
-print 'readmode: ', readmode
-print 'readouttime:', readouttime
-print 'bgType: ', bgType
-print 'sampleType: ', sampleType
-print 'realTime: ', realTime, 'ns'
-print 'seed: ', seed
+print('accring: ', accring, '(0:LER, 1:HER)')
+print('input:   ', inputfilename)
+print('output:  ', outputfilename)
+print('range:   ', range)
+print('nevent:  ', nevent)
+print('readmode: ', readmode)
+print('readouttime:', readouttime)
+print('bgType: ', bgType)
+print('sampleType: ', sampleType)
+print('realTime: ', realTime, 'ns')
+print('seed: ', seed)
 
 # --- put modules into path ---------------------------------------------------
 
@@ -185,8 +185,8 @@ add_output(main, bgType, realTime, sampleType, outputfilename)
 
 process(main)
 
-print 'Event Statistics:'
-print statistics
+print('Event Statistics:')
+print(statistics)
 
 d = datetime.datetime.today()
-print d.strftime('job finish: %Y-%m-%d %H:%M:%S\n')
+print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

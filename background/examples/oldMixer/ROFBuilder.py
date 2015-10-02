@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -50,13 +50,11 @@ bgGenerator = 'SAD'
 # Replace this with paths on your own system!
 inputDir = '/data/belle2/BG/summer2012'
 # A single background file !
-inputName = '{d}/output_{t}_{s}_*.root'.format(d=inputDir, t=bgType,
-        s=bgSource)
+inputName = '{d}/output_{t}_{s}_*.root'.format(d=inputDir, t=bgType, s=bgSource)
 bgTime = 80  # us
 
 outputDir = '.'
-outputName = '{d}/rof_{det}_{t}_{s}.root'.format(d=outputDir,
-        det=subdetectorName, t=bgType, s=bgSource)
+outputName = '{d}/rof_{det}_{t}_{s}.root'.format(d=outputDir, det=subdetectorName, t=bgType, s=bgSource)
 windowStart = -150  # ns
 windowSize = 330  # ns
 
@@ -108,5 +106,5 @@ main.add_module(rofbuilder)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)
 #

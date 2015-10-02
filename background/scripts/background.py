@@ -1,23 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
 
 
-def add_output(
-    path,
-    bgType,
-    realTime,
-    sampleType,
-    fileName='output.root',
-    ):
+def add_output(path, bgType, realTime, sampleType, fileName='output.root'):
     '''
     A function to be used for output of BG simulation.
     @param path path name
     @param bgType background type, to get available types: basf2 -m BeamBkgTagSetter
     @param realTime equivalent time of superKEKB running in [ns]
     @param sampleType 'study' (for BG studies) or 'usual', 'PXD', 'ECL' (for BG mixer)
-    @param fileName optional file name, can be overridden by basf2 -o 
+    @param fileName optional file name, can be overridden by basf2 -o
     '''
 
     if sampleType == 'study':
@@ -64,5 +58,3 @@ def add_output(
     output.param('outputFileName', fileName)
     output.param('branchNames', branches)
     path.add_module(output)
-
-

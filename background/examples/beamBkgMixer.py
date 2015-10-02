@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -59,9 +59,7 @@ bkgmixer.param('backgroundFiles', bg)  # specify BG files
 bkgmixer.param('components', ['CDC', 'TOP', 'ECL'])  # mix BG only for those components
 bkgmixer.param('minTime', -5000)  # set time window start time [ns]
 bkgmixer.param('maxTime', 10000)  # set time window stop time [ns]
-bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER', 1.08),
-                                ('RBB_LER', 0.8)])
-# scale rates of some backgrounds
+bkgmixer.param('scaleFactors', [('Coulomb_LER', 1.05), ('Coulomb_HER', 1.08), ('RBB_LER', 0.8)])  # scale rates of some backgrounds
 main.add_module(bkgmixer)
 
 # FullSim, digitizers, clusterizers and reconstruction modules can be put here
@@ -79,4 +77,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

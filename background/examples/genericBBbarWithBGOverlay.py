@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -23,8 +23,8 @@ set_log_level(LogLevel.ERROR)
 # Define a file with measured BG for overlay
 bg = 'BGforOverlay.root'
 if not os.path.exists(bg):
-    print bg + ' not found'
-    print 'You can prepare the sample by: basf2 makeBGOverlayFile.py'
+    print(bg + ' not found')
+    print('You can prepare the sample by: basf2 makeBGOverlayFile.py')
     sys.exit(1)
 
 # Create path
@@ -70,4 +70,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

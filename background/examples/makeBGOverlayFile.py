@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -15,13 +15,12 @@ import sys
 set_log_level(LogLevel.ERROR)
 
 if 'BELLE2_BACKGROUND_DIR' not in os.environ:
-    print 'BELLE2_BACKGROUND_DIR variable is not set - ',\
-        'it must contain the path to BG samples'
+    print('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
     sys.exit()
 
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 if len(bg) == 0:
-    print 'No files found in ', os.environ['BELLE2_BACKGROUND_DIR']
+    print('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
     sys.exit()
 
 # Create path
@@ -50,4 +49,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

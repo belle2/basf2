@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -36,17 +36,15 @@ for file_name in sys.argv[1:n_files]:
     h = ROOT.gDirectory.Get('htemp')
     component = h.GetYaxis().GetLabels().First().GetName()
     generator = h.GetXaxis().GetLabels().First().GetName()
-    print file_name + ':' + '\tDetector: ' + detector + '\tComponent: ' \
-        + component + '\tGenerator: ' + generator
+    print(file_name + ':' + '\tDetector: ' + detector + '\tComponent: ' + component + '\tGenerator: ' + generator)
     if (detector, component, generator) in ids:
-        print 'The combination ' + detector + ' + ' + component + ' + ' \
-            + generator + ' is duplicated!'
+        print('The combination ' + detector + ' + ' + component + ' + ' + generator + ' is duplicated!')
         n_conflicts += 1
     else:
         ids.add((detector, component, generator))
     f.Close()
 
 if n_conflicts < 1:
-    print 'No conflicts discovered.'
+    print('No conflicts discovered.')
 else:
-    print 'Discovered {cnfs} conflicts.'.format(cnfs=n_conflicts)
+    print('Discovered {cnfs} conflicts.'.format(cnfs=n_conflicts))

@@ -1,8 +1,15 @@
-/* VXDCDCMergerSinglePartTruthFinder.C 
- * ROOT macro for ECL validation plots 
- * Author: Benjamin Oberhof 
+/* VXDCDCMergerSinglePartTruthFinder.C
+ * ROOT macro for ECL validation plots
+ * Author: Benjamin Oberhof
  * 2014
 */
+
+#include <TROOT.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1F.h>
+#include <TStyle.h>
+#include <TPad.h>
 
 /*
 <header>
@@ -14,7 +21,7 @@
 
 void VXDCDCMergerSinglePartTruthFinderBkg(){
 
-  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
+  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
 
   TFile* inputFile = TFile::Open("../VXDCDCMergerSinglePartTruthFinderBkg.root");
@@ -28,9 +35,9 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
 
   //TH1F *h1 = new TH1F("h1","Merged Tracks Truth Track Finder with Bkg",10,0,10);
   //h1->GetXaxis()->SetTitle("# of merged tracks");
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon"));
   //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   //tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
   //tree->Draw("MergedTracks>>h1");
   //h1->Write();
@@ -53,16 +60,16 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
 
   //TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
   //tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2"));
   //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   //c1->SaveAs("plots/Chi2_5GeV_muons_1000_Theta.jpg");
   //h5->Write();
 
   //TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual"));
   //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
   //tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
   //h6->Write();
@@ -81,9 +88,9 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
 
 
   //TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual"));
   //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   //tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   //h10->Write();
 
@@ -151,9 +158,9 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
   //TLegend *leg1= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. Pt");
   eff_ptsptt_bkg->GetXaxis()->SetTitle("Pt (GeV)");
   eff_ptsptt_bkg->GetYaxis()->SetTitle("Efficiency");
-  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
+  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon"));
   eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Check","Should be -> 1 above 0.3 GeV"));
-  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_ptsptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   eff_pt_bkg=eff_ptsptt_bkg;
   eff_pt_bkg->Divide(eff_ptsptt_bkg, h22, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");
@@ -172,7 +179,7 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
   h24->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>h24","TruthTag==1");
   h24->Sumw2();
-  TH1F *eff_thetasptt = new TH1F("eff_thetasptt_bkg","Eff vs Theta Truth Track Finder Single Muon with Bkg",50, -1, 1.);
+  TH1F *eff_thetasptt_bkg = new TH1F("eff_thetasptt_bkg","Eff vs Theta Truth Track Finder Single Muon with Bkg",50, -1, 1.);
   eff_thetasptt_bkg->SetMaximum(1.1);
   tree->Draw("(Pz/(P))>>eff_thetasptt_bkg","TruthTag==1&&GoodTag==1");
   eff_thetasptt_bkg->Sumw2();
@@ -184,9 +191,9 @@ void VXDCDCMergerSinglePartTruthFinderBkg(){
   //TLegend *leg2= new TLegend(0.6,0.1,0.9,0.3,"Eff vs. theta");
   eff_thetasptt_bkg->GetXaxis()->SetTitle("Polar Angle (rad)");
   eff_thetasptt_bkg->GetYaxis()->SetTitle("Efficiency");
-  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 
+  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta"));
   eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Check","Should be (ideally) flat"));
-  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  eff_thetasptt_bkg->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp"));
   eff_theta_bkg=eff_thetasptt_bkg;
   eff_theta_bkg->Divide(eff_thetasptt_bkg, h24, 1.0, 1.0, "B");
   //TPaveStats *st = (TPaveStats*)h->FindObject("stats");

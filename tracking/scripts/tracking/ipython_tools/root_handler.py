@@ -2,7 +2,6 @@ import numpy as np
 import os
 from root_pandas import read_root
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -13,10 +12,6 @@ class TrackingValidationResult:
     #: It has methods for plotting the mostly needed graphs
 
     def __init__(self, filename, label=None, color_index=0, additional_information=None):
-        import seaborn as sb
-
-        sb.set()
-
         #: The root filename
         self.filename = filename
         #: The pr data
@@ -85,6 +80,7 @@ class TrackingValidationResult:
         return latex_string
 
     def plot_efficiency_point(self):
+        import matplotlib.pyplot as plt
         self.plot(100 * self.finding_efficiency, 100 * self.hit_efficiency, loc=3)
         plt.xlabel("finding efficiency")
         plt.ylabel("hit efficiency")
@@ -99,6 +95,7 @@ class TrackingValidationResult:
         return grouped
 
     def plot(self, data_x, data_y, loc=4, yerr=None):
+        import matplotlib.pyplot as plt
         if yerr is not None:
             plt.errorbar(data_x, data_y, ls="-", marker="o",
                          color=self.color, label=self.label, yerr=yerr)
@@ -110,6 +107,7 @@ class TrackingValidationResult:
             plt.legend(loc=loc)
 
     def plot_finding_efficiency(self, data=None):
+        import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
         self.plot(grouped.median().pt_truth, grouped.mean().is_matched)
@@ -117,6 +115,7 @@ class TrackingValidationResult:
         plt.ylabel("finding efficiency")
 
     def plot_hit_efficiency(self, data=None):
+        import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
         self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency)

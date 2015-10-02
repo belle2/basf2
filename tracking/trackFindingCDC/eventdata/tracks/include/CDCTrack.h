@@ -179,6 +179,18 @@ namespace Belle2 {
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
 
+      /// Return the pointer to the track candidate which was created from this CDCrack
+      genfit::TrackCand* getRelatedGenfitTrackCandidate() const
+      {
+        return m_relatedGenfitTrackCandidate;
+      }
+
+      /// Set the pointer to the track candidate which was created from this CDCrack
+      void setRelatedGenfitTrackCandidate(genfit::TrackCand* relatedTrackCand)
+      {
+        m_relatedGenfitTrackCandidate = relatedTrackCand;
+      }
+
     private:
       /// Memory for the automaton cell.
       AutomatonCell m_automatonCell;
@@ -188,6 +200,9 @@ namespace Belle2 {
 
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
+
+      /// Related genfit track cand
+      genfit::TrackCand* m_relatedGenfitTrackCandidate = nullptr;
 
     }; //class
 

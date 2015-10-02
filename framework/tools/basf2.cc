@@ -225,12 +225,6 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    //Check for steering option
-    if (varMap.count("steering")) {
-      pythonFile = varMap["steering"].as<string>();
-      B2INFO("Steering file: " << pythonFile);
-    }
-
     //Check for version option
     if (varMap.count("version")) {
       pythonFile = "version.py";
@@ -239,8 +233,20 @@ int main(int argc, char* argv[])
     //Check for modules option (-m)
     if (varMap.count("modules")) {
       string modArgs = varMap["modules"].as<string>();
-      if (!modArgs.empty()) arguments.push_back(modArgs);
+      if (!modArgs.empty()) {
+        arguments.insert(arguments.begin(), modArgs);
+      }
+      // recent boost program_options will not consume extra tokens for
+      // implicit options. In this case the module/package name gets consumed
+      // in tyhe steering file so we just use that.
+      if (varMap.count("steering")) {
+        arguments.insert(arguments.begin(), varMap["steering"].as<string>());
+      }
       pythonFile = "modules.py";
+    } else if (varMap.count("steering")) {
+      // steering file not misused as module name, so print it's name :D
+      pythonFile = varMap["steering"].as<string>();
+      B2INFO("Steering file: " << pythonFile);
     }
 
     // -n

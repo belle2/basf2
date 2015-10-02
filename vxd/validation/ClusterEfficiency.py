@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-# coding:utf8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 <header>
   <contact>ritter</contact>
@@ -194,4 +195,4 @@ main.add_module(clusterefficiency)
 main.add_module("Progress")
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -25,15 +25,15 @@ class SetVXDSensitiveThreshold(Module):
         """Initialize the module"""
 
         super(SetVXDSensitiveThreshold, self).__init__()
-        ## The threshold value to be set.
+        #: The threshold value to be set.
         self.threshold = threshold
-        ## The current pxd threshold value.
+        #: The current pxd threshold value.
         self.old_pxd_threshold = 0.0
-        ## The current svd threshold value.
+        #: The current svd threshold value.
         self.old_svd_threshold = 0.0
-        ## Filesystem path to the .xml file
+        #: Filesystem path to the .xml file
         self.path = 'data/{comp}/{COMP}.xml'
-        ## XML path to the threshold setting.
+        #: XML path to the threshold setting.
         self.xmlpath = 'Content/SensitiveThreshold'
 
     def set_threshold(self, component, value):
@@ -156,4 +156,4 @@ main.add_module(output)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

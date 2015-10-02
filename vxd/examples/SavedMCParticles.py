@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -17,17 +17,17 @@ class CheckMCParticles(Module):
         """Initialize the module"""
 
         super(CheckMCParticles, self).__init__()
-        ## Number of secondaries that generated a PXDTrueHit
+        #: Number of secondaries that generated a PXDTrueHit
         self.nSecondariesPXD = 0
-        ## Number of secondaries that generated an SVD TrueHit
+        #: Number of secondaries that generated an SVD TrueHit
         self.nSecondariesSVD = 0
-        ## Total number of MCParticles
+        #: Total number of MCParticles
         self.nMCParticles = 0
-        ## Total number of secondary MCParticles
+        #: Total number of secondary MCParticles
         self.nSecondaries = 0
-        ## List of processes that generated secondaries in PXD
+        #: List of processes that generated secondaries in PXD
         self.processesPXD = []
-        ## List of processes that generated secondaries in SVD
+        #: List of processes that generated secondaries in SVD
         self.processesSVD = []
 
     def initialize(self):
@@ -121,4 +121,4 @@ main.add_module(printParticles)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

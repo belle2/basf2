@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -17,14 +17,14 @@ class CheckTrueHits(Module):
         """Initialize the module"""
 
         super(CheckTrueHits, self).__init__()
-        ## TrueHit statistics for the PXD
+        #: TrueHit statistics for the PXD
         self.truehit_stats_pxd = {
             'through': {'total': 0, 'secondary': 0, 'remapped': 0},
             'into': {'total': 0, 'secondary': 0, 'remapped': 0},
             'out': {'total': 0, 'secondary': 0, 'remapped': 0},
             'inside': {'total': 0, 'secondary': 0, 'remapped': 0}
         }
-        ## Truehit statistics for the SVD
+        #: Truehit statistics for the SVD
         self.truehit_stats_svd = {
             'through': {'total': 0, 'secondary': 0, 'remapped': 0},
             'into': {'total': 0, 'secondary': 0, 'remapped': 0},
@@ -100,7 +100,7 @@ class CheckTrueHits(Module):
                 particle_type_text = 'secondary'
                 simhit_weight = 0.0
                 particle_index = -1
-                ## get the sign of relation to MCParticle
+                #: get the sign of relation to MCParticle
                 simhit_relations = simhit.getRelationsFrom('MCParticles')
                 if simhit_relations.size() == 0:
                     particle_type_text = 'none'
@@ -215,7 +215,7 @@ class CheckTrueHits(Module):
                 particle_type_text = 'secondary'
                 simhit_weight = 0.0
                 particle_index = -1
-                ## get the sign of relation to MCParticle
+                #: get the sign of relation to MCParticle
                 simhit_relations = simhit.getRelationsFrom('MCParticles')
                 if simhit_relations.size() == 0:
                     particle_type_text = 'none'
@@ -342,4 +342,4 @@ main.add_module(printParticles)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

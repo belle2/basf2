@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
@@ -50,17 +50,15 @@ class PrintPXDHits(Module):
             if id != cluster.getSensorID():  # next sensor
                 id = cluster.getSensorID()
                 info = geoCache.get(id)
-                B2INFO("Layer: {layer}, Ladder: {ladder}, Sensor: {sensor}"\
-                    .format(layer=id.getLayerNumber(),
-                            ladder=id.getLadderNumber(),
-                            sensor=id.getSensorNumber()
-                        ))
+                B2INFO("Layer: {layer}, Ladder: {ladder}, Sensor: {sensor}"
+                       .format(layer=id.getLayerNumber(),
+                               ladder=id.getLadderNumber(),
+                               sensor=id.getSensorNumber()))
 
             r_local = ROOT.TVector3(cluster.getU(), cluster.getV(), 0)
             r_global = info.pointToGlobal(r_local)
-            B2INFO('PXD hit: {x:10.5f} {y:10.5f} {z:10.5f}'\
-                   .format(x=r_global.X(), y=r_global.Y(), z=r_global.Z()
-                    ))
+            B2INFO('PXD hit: {x:10.5f} {y:10.5f} {z:10.5f}'
+                   .format(x=r_global.X(), y=r_global.Y(), z=r_global.Z()))
 
     def terminate(self):
         """ Do nothing """
@@ -138,4 +136,4 @@ main.add_module(printHits)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

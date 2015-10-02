@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -21,14 +21,14 @@ class CheckNegativeWeights(Module):
         """Initialize the module"""
 
         super(CheckNegativeWeights, self).__init__()
-        ## Relation sign statistics for PXDClusters
+        #: Relation sign statistics for PXDClusters
         self.sign_stats_pxd = {
             'primary': {'positive': 0, 'negative': 0},
             'secondary': {'positive': 0, 'negative': 0},
             'remapped': {'positive': 0, 'negative': 0},
             'none': {'positive': 0, 'negative': 0}
         }
-        ## Relation sign statistics for PXDClusters
+        #: Relation sign statistics for PXDClusters
         self.sign_stats_svd = {
             'primary': {'positive': 0, 'negative': 0},
             'secondary': {'positive': 0, 'negative': 0},
@@ -218,4 +218,4 @@ main.add_module(printWeights)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

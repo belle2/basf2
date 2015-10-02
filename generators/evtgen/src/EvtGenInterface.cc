@@ -20,7 +20,7 @@
 
 #include <EvtGenExternal/EvtExternalGenList.hh>
 #include <EvtGenBase/EvtAbsRadCorr.hh>
-#include <evtgen/EvtGenBase/EvtDecayTable.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
 
 #include <TLorentzVector.h>

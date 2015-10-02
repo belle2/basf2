@@ -11,7 +11,7 @@
 #ifndef EVTGENFWRANDENGINE_H
 #define EVTGENFWRANDENGINE_H
 
-#include <evtgen/EvtGenBase/EvtRandomEngine.hh>
+#include <EvtGenBase/EvtRandomEngine.hh>
 #include <TRandom3.h>
 
 //! Evtgen random generator
@@ -19,7 +19,8 @@ class EvtGenFwRandEngine : public EvtRandomEngine {
 public:
 
   /* Constructor. */
-  virtual double random() {
+  virtual double random()
+  {
     return gRandom->Uniform(1.0);  /**< Function random */
   } //! end of random()
 }; //! end of EvtRandomEngine

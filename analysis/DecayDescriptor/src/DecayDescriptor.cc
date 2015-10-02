@@ -9,8 +9,8 @@
 
 #include <framework/logging/Logger.h>
 
-#include <evtgen/EvtGenBase/EvtPDL.hh>
-#include <evtgen/EvtGenBase/EvtId.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtId.hh>
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>

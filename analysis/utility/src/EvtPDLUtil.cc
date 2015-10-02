@@ -10,8 +10,8 @@
 
 #include <analysis/utility/EvtPDLUtil.h>
 
-#include <evtgen/EvtGenBase/EvtPDL.hh>
-#include <evtgen/EvtGenBase/EvtId.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtId.hh>
 
 #include <framework/core/Environment.h>
 

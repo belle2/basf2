@@ -15,7 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <evtgen/EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtPDL.hh>
 
 #include <string>
 #include <fstream>

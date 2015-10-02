@@ -2,8 +2,8 @@
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
-#include <evtgen/EvtGenBase/EvtPDL.hh>
-#include <evtgen/EvtGenBase/EvtId.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtId.hh>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 

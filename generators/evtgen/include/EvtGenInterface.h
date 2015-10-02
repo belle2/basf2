@@ -15,13 +15,13 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <evtgen/EvtGen/EvtGen.hh>
-#include <evtgen/EvtGenBase/EvtCPUtil.hh>
-#include <evtgen/EvtGenBase/EvtParticle.hh>
-#include <evtgen/EvtGenBase/EvtParticleFactory.hh>
-#include <evtgen/EvtGenBase/EvtPDL.hh>
-#include <evtgen/EvtGenBase/EvtRandom.hh>
-#include <evtgen/EvtGenBase/EvtVector4R.hh>
+#include <EvtGen/EvtGen.hh>
+#include <EvtGenBase/EvtCPUtil.hh>
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtParticleFactory.hh>
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtRandom.hh>
+#include <EvtGenBase/EvtVector4R.hh>
 #include <generators/evtgen/EvtGenFwRandEngine.h>
 
 #include <string>

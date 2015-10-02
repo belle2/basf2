@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf8
 
 """\
@@ -247,7 +247,7 @@ def find_children(rootpid):
             # stat has ppid in the fourth field but the process name (second
             # field) might contain spaces. It is enclosed in () so we split at
             # the last ')' and then it's the second field.
-            ppid = stat.rsplit(")", 1)[-1].split(None, 2)[1]
+            ppid = stat.decode().rsplit(")", 1)[-1].split(None, 2)[1]
             ppids[int(ppid)].append(pid)
         except OSError:
             continue
@@ -310,11 +310,11 @@ def get_system_memory():
 def check_output():
     """check for the B2INFO output to determine process role"""
     prochandler = re.compile(r"ProcHandler:\s*(.*?)\s*forked."
-                             "\s*pid\s*=\s*([0-9]*)")
+                             r"\s*pid\s*=\s*([0-9]*)")
     while True:
         if child.poll() is not None:
             return
-        line = child.stdout.readline()
+        line = child.stdout.readline().decode()
         # see if we have a ProcHandler message
         forkmessage = prochandler.search(line)
         if forkmessage:
@@ -337,7 +337,7 @@ if do_record:
     # run the program
     try:
         child = subprocess.Popen(args, stdout=subprocess.PIPE)
-    except OSError, e:
+    except OSError as e:
         print("Problem running '%s': %s" % (" ".join(args), e),
               file=sys.stderr)
         sys.exit(1)
@@ -456,10 +456,10 @@ def plot_memory(data, label, color, marker=True):
     """Plot memory usage over time"""
     for i in range(ntypes):
         # plot the line
-        axes[i].plot(data[:, 0], data[:, i + 1] / 1000, label=label, c=color)
+        axes[i].plot(data[:, 0], data[:, i + 1] / 1000, label=label, color=color)
         # and add start and end marker
-        axes[i].plot(data[0, 0], data[0, i + 1] / 1000, c=color, marker=".")
-        axes[i].plot(data[-1, 0], data[-1, i + 1] / 1000, c=color, marker=".")
+        axes[i].plot(data[0, 0], data[0, i + 1] / 1000, color=color, marker=".")
+        axes[i].plot(data[-1, 0], data[-1, i + 1] / 1000, color=color, marker=".")
 
 
 # start plotting

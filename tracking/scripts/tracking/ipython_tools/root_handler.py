@@ -28,8 +28,9 @@ class TrackingValidationResult:
         #: the pr prompt data
         self.pr_prompts = self.pr_data[self.pr_data.is_prompt == 1]
 
-        colors = [(.64, .69, .83), (1, 199.0 / 256, 128.0 / 256),
-                  (255.0 / 256, 128.0 / 256, 128.0 / 256), "red", "green", "blue", "black", "gray", "lightgreen"]
+        import seaborn as sb
+
+        colors = sb.color_palette()
 
         #: the label
         self.label = label
@@ -48,6 +49,23 @@ class TrackingValidationResult:
 
         #: the additional information
         self.additional_information = additional_information
+
+    @staticmethod
+    def from_calculations(calculations, key="output_file_name", parameter_part=None):
+        if parameter_part:
+            return [
+                TrackingValidationResult(
+                    c.get(key),
+                    label=c.get_parameters()[parameter_part],
+                    color_index=i) for i,
+                c in enumerate(calculations)]
+        else:
+            return [
+                TrackingValidationResult(
+                    c.get(key),
+                    label=c.get_parameters(),
+                    color_index=i) for i,
+                c in enumerate(calculations)]
 
     def get_figure_of_merits(self):
         if self.finding_efficiency is None:
@@ -98,29 +116,29 @@ class TrackingValidationResult:
         import matplotlib.pyplot as plt
         if yerr is not None:
             plt.errorbar(data_x, data_y, ls="-", marker="o",
-                         color=self.color, label=self.label, yerr=yerr)
+                         color=self.color, label=self.label, yerr=yerr, lw=4)
         else:
             plt.plot(data_x, data_y, ls="-", marker="o",
-                     color=self.color, label=self.label)
+                     color=self.color, label=self.label, lw=4)
 
         if self.label is not None:
-            plt.legend(loc=loc)
+            plt.legend(loc=loc, frameon=True)
 
     def plot_finding_efficiency(self, data=None):
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
         self.plot(grouped.median().pt_truth, grouped.mean().is_matched)
-        plt.xlabel("pt")
-        plt.ylabel("finding efficiency")
+        plt.xlabel(r"$p_T$ of the MC tracks (in GeV)")
+        plt.ylabel("Finding Efficiency")
 
     def plot_hit_efficiency(self, data=None):
         import matplotlib.pyplot as plt
         grouped = self.grouped_by_pt_data(data)
 
         self.plot(grouped.median().pt_truth, grouped.mean().hit_efficiency)
-        plt.xlabel("pt")
-        plt.ylabel("hit efficiency")
+        plt.xlabel(r"$p_T$ of the MC tracks (in GeV)")
+        plt.ylabel("Hit Efficiency")
 
     def print_useful_information(self):
         pr_data = self.pr_data

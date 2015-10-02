@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This script does full TB MC simulation
@@ -22,7 +22,7 @@ event_tracks = 1
 momentum = 4.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -118,7 +118,7 @@ param_mctrackfinder = {
     'UseClusters': False,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctf.param(param_mctrackfinder)
 mctf.logging.log_level = LogLevel.ERROR
 
@@ -128,7 +128,7 @@ dataWriter.param('outputFileName', 'SimulatedDigits.root')
 # Using this branches, you remove Monte Carlo information and the resulting
 # file will look exactly as merged digits from real testbeam data
 dataWriter.param('branchNames', ['EventMetaData', 'TelEventInfo', 'PXDDigits',
-                 'SVDDigits', 'TelDigits'])
+                                 'SVDDigits', 'TelDigits'])
 
 progress = register_module('Progress')
 
@@ -160,4 +160,4 @@ main.add_module(dataWriter)
 main.add_module(progress)
 
 process(main)
-print statistics
+print(statistics)

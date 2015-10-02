@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will simulate several testbeam events, reconstruct
@@ -177,7 +177,7 @@ param_vxdtf = {  # normally we don't know the particleID, but in the case of the
     'activateZigZagRZ': [False],
     'activateDeltaPt': [False],
     'activateCircleFit': [False],
-    }
+}
 vxdtf.param(param_vxdtf)
 
 # VXDTF DQM module
@@ -201,7 +201,7 @@ param_mctrackfinder = {
     'MinimalNDF': 5,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
@@ -245,4 +245,4 @@ main.add_module(trackfit_dqm)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

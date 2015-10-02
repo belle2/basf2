@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -14,7 +14,7 @@ inputFile = 'lepsdata/exp001_merge.root'  # file with the "top" tree
 outputFile = 'betaScan.root'  # histogram of reconstructed beta
 
 if not os.path.exists(inputFile):
-    print '*** Input file ' + inputFile + ' not found'
+    print('*** Input file ' + inputFile + ' not found')
     sys.exit(1)
 
 # Input
@@ -69,4 +69,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

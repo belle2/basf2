@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # TestBeam 2009 Simulation & Analysis
@@ -91,4 +91,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

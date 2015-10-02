@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -10,7 +10,7 @@ fieldOn = False  # Turn field on or off (changes geometry components and digi/cl
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -66,7 +66,7 @@ geometry = register_module('Geometry')
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
 else:
-  # To turn off magnetic field:
+    # To turn off magnetic field:
     geometry.param('components', ['TB'])
 
 # Full simulation module
@@ -126,7 +126,7 @@ param_mctrackfinder = {
     'Smearing': 0,
     'UseClusters': True,
     'WhichParticles': ['SVD'],
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
@@ -176,4 +176,4 @@ main.add_module(alignment)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

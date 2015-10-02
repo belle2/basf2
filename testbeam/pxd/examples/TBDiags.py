@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # TestBeam 2009 Simulation & Analysis
@@ -23,21 +23,19 @@ class PXDHitErrors(Module):
         """Initialize the module"""
 
         super(PXDHitErrors, self).__init__()
-        ## Output file object
+        #: Output file object
         self.file = open('PXDHitErrorOutput.txt', 'w')
-        ## Factors for decoding of VxdId's
+        #: Factors for decoding of VxdId's
         self.vxdid_factors = (8192, 256, 32)
 
     def beginRun(self):
         """ Write legend """
 
         self.file.write('LEGEND TO COLUMNS: \n')
-        self.file.write('SensorID Layer Ladder Sensor Truehit_index '
-                        + 'Cluster_index \n')
-        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, '
-                        + 'theta_v \n')
+        self.file.write('SensorID Layer Ladder Sensor Truehit_index Cluster_index \n')
+        self.file.write('TrueHit: u[cm], v[cm], charge[GeV], theta_u, theta_v \n')
         self.file.write('Cluster: u[cm], v[cm], charge[e-], '
-                        + 'seed charge[e-], size, size_u, size_v \n')
+                        'seed charge[e-], size, size_u, size_v \n')
         self.file.write('Digits: n_digits {u[cm] v[cm] charge[e-]} \n')
         self.file.write('\n')
 
@@ -77,12 +75,12 @@ class PXDHitErrors(Module):
                 s_id = \
                     '{sID} {layer} {ladder} {sensor} {indexT:4d} {indexC:4d} '\
                     .format(
-                    sID=sensorID,
-                    layer=layer,
-                    ladder=ladder,
-                    sensor=sensor,
-                    indexT=truehit_index,
-                    indexC=cluster_index,
+                        sID=sensorID,
+                        layer=layer,
+                        ladder=ladder,
+                        sensor=sensor,
+                        indexT=truehit_index,
+                        indexC=cluster_index,
                     )
                 s += s_id
                 # TrueHit information
@@ -95,14 +93,14 @@ class PXDHitErrors(Module):
                         uTH=truehit.getU(),
                         vTH=truehit.getV(), eTH=truehit.getEnergyDep()) \
                     + '{thetaU:6.3f} {thetaV:6.3f} '.format(thetaU=thetaU,
-                        thetaV=thetaV)
+                                                            thetaV=thetaV)
                 s += s_th
                 # Cluster information
                 s_cl = \
                     '{uCL:10.5f} {vCL:10.5f} {eCL:10.1f} {eSeed:10.1f} '\
                     .format(uCL=cluster.getU(), vCL=cluster.getV(),
-                        eCL=cluster.getCharge(),
-                        eSeed=cluster.getSeedCharge()) \
+                            eCL=cluster.getCharge(),
+                            eSeed=cluster.getSeedCharge()) \
                     + '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
                         size=cluster.getSize(),
                         sizeU=cluster.getUSize(),
@@ -223,4 +221,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

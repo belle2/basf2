@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -11,7 +11,7 @@ fieldOn = False  # Turn field on or off (changes geometry components and digi/cl
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -46,17 +46,17 @@ setupFileNamevxd = setupFileName + 'PXDSVD'
 # setupFileName = 'testBeamFine'
 # secConfigU = [0., 0.25, 0.5, 0.75, 1.0]
 # secConfigV = [
-    # 0.,
-    # 0.2,
-    # 0.4,
-    # 0.6,
-    # 0.8,
-    # 1.0,
-    # ]
+# 0.,
+# 0.2,
+# 0.4,
+# 0.6,
+# 0.8,
+# 1.0,
+# ]
 
 # allows steering initial value and numEvents by sript file
 if len(argv) is 1:
-    print ' no arguments given, using standard values'
+    print(' no arguments given, using standard values')
 elif len(argv) is 2:
     initialValue = int(argv[1])
 else:
@@ -82,7 +82,7 @@ geometry = register_module('Geometry')
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
 else:
-  # To turn off magnetic field:
+    # To turn off magnetic field:
     geometry.param('components', ['TB'])
 
 # ParticleGun
@@ -119,11 +119,14 @@ g4sim.param('StoreAllSecondaries', True)
 # Show progress of processing
 progress = register_module('Progress')
 
-print ''
-print 'entering createSecMapForVXDTF.py'
-print 'starting {events:} events, analyzing {numTracks:} track(s) per event by using pGseed {theSeed:}. '.format(events=numEvents,
-        numTracks=numTracks, theSeed=initialValue)
-print ''
+print('')
+print('entering createSecMapForVXDTF.py')
+print(
+    'starting {events:} events, analyzing {numTracks:} track(s) per event by using pGseed {theSeed:}. '.format(
+        events=numEvents,
+        numTracks=numTracks,
+        theSeed=initialValue))
+print('')
 
 filterCalc = register_module('FilterCalculator')
 filterCalc.logging.log_level = LogLevel.INFO
@@ -149,7 +152,7 @@ param_fCalc = {  # currently accepted: PXD, SVD, TEL
     'smearHits': 1,
     'uniSigma': 0.3,
     'noCurler': 1,
-    }
+}
 filterCalc.param(param_fCalc)
 
 filterCalc2 = register_module('FilterCalculator')
@@ -175,7 +178,7 @@ param_fCalc2 = {
     'smearHits': 1,
     'uniSigma': 0.3,
     'noCurler': 1,
-    }
+}
 filterCalc2.param(param_fCalc2)
 
 # using one export module only
@@ -207,4 +210,4 @@ main.add_module(exportXML)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -15,7 +15,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
 from ROOT import PyConfig
-#from ROOT import EventData
+# from ROOT import EventData
 PyConfig.StartGuiThread = False
 
 from ROOT import TVector3
@@ -26,7 +26,7 @@ ShowPlane = -1
 
 argvs = sys.argv
 argc = len(argvs)
-print "Number of arguments: ", argc - 1
+print("Number of arguments: ", argc - 1)
 if argc >= 2:
     ShowLocal = argvs[1]
 if argc >= 3:
@@ -34,18 +34,18 @@ if argc >= 3:
 if argc >= 4:
     ShowPlane = argvs[3]
 if argc >= 5:
-    print argvs[4]
+    print(argvs[4])
 
 GeometryFileName = 'testbeam/vxd/FullTelescopeVXDTB_v2.xml'
 
-print "*****************************************************************"
-print "first arg: Show local coordinates:                 ", ShowLocal
-print "second arg: Show pixel/strip counting coordinates: ", ShowCounting
-print "third arg: Show plane [Tel:1-3,PXD:4,5,SVD:6-9,Tel:10-12]:", ShowPlane
-print "        plane = -1: all planes"
-print "        Defaults: local = 1, counting = 1, plane = -1 (all planes)"
-print "Geometry File Name:", GeometryFileName
-print "*****************************************************************"
+print("*****************************************************************")
+print("first arg: Show local coordinates:                 ", ShowLocal)
+print("second arg: Show pixel/strip counting coordinates: ", ShowCounting)
+print("third arg: Show plane [Tel:1-3,PXD:4,5,SVD:6-9,Tel:10-12]:", ShowPlane)
+print("        plane = -1: all planes")
+print("        Defaults: local = 1, counting = 1, plane = -1 (all planes)")
+print("Geometry File Name:", GeometryFileName)
+print("*****************************************************************")
 
 # Important parameters of the simulation:
 events = 1  # Number of events to simulate
@@ -63,6 +63,7 @@ beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 
 class DisplayAxis(Module):
+
     """Test DisplayData"""
 
     def initialize(self):
@@ -161,14 +162,14 @@ class DisplayAxis(Module):
                     displayData.obj().addArrow(
                         LableV, pixelDir0, pixelDirV, ROOT.kYellow)
 
-                    print str(PlaneOK) + ':' + SensorID + ', dir U, pitch ' \
-                        + str(info.getUPitch() * 10000) + 'um, size ' + \
-                        str(info.getUSize() * 10) + ' mm, pixels ' + \
-                        str(info.getUCells())
-                    print str(PlaneOK) + ':' + SensorID + ', dir V, pitch ' + \
-                        str(info.getVPitch() * 10000) + 'um, size ' + \
-                        str(info.getVSize() * 10) + ' mm, pixels ' + \
-                        str(info.getVCells())
+                    print(str(PlaneOK) + ':' + SensorID + ', dir U, pitch ' +
+                          str(info.getUPitch() * 10000) + 'um, size ' +
+                          str(info.getUSize() * 10) + ' mm, pixels ' +
+                          str(info.getUCells()))
+                    print(str(PlaneOK) + ':' + SensorID + ', dir V, pitch ' +
+                          str(info.getVPitch() * 10000) + 'um, size ' +
+                          str(info.getVSize() * 10) + ' mm, pixels ' +
+                          str(info.getVCells()))
             Plane += 1
 
 # ParticleGun
@@ -211,7 +212,7 @@ progress = register_module('Progress')
 # Load parameters from xml
 gearbox = register_module('Gearbox')
 # This file contains the VXD (no Telescopes) beam test geometry including
-#the real PCMAG magnetic field
+# the real PCMAG magnetic field
 gearbox.param('fileName', GeometryFileName)
 
 # Create geometry
@@ -239,7 +240,7 @@ PXDDigi = register_module('PXDDigitizer')
 SVDDigi = register_module('SVDDigitizer')
 # PXD/SVD clusterizer
 PXDClust = register_module('PXDClusterizer')
-#PXDClust.param('ClusterCacheSize', 576)
+# PXDClust.param('ClusterCacheSize', 576)
 SVDClust = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')
@@ -331,4 +332,4 @@ main.add_module(display)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

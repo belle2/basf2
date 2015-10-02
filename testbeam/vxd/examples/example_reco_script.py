@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Example steering file for reconstruction of Testbeam data.
@@ -108,10 +108,10 @@ SVD_DQM = register_module('SVDDQM')
 # Depending on whether we have the PXD, we include it in trackfinding or don't
 if havePXD:
     vxdtf = setup_vxdtf('caTracks', ['testBeamMini6GeVVXD-moreThan1500MeV_VXD'
-                        ])
+                                     ])
 else:
     vxdtf = setup_vxdtf('caTracks', ['testBeamMini6GeVSVD-moreThan1500MeV_SVD'
-                        ])
+                                     ])
 
 # VXDTF DQM module
 vxdtf_dqm = register_module('VXDTFDQM')
@@ -138,13 +138,13 @@ main = create_path()
 input = register_module('RootInput')
 input.param('inputFileName', inputFileName)
 input.param('excludeBranchNames', [
-        'SVDClusters',
-        'SVDDigits',
-        'SVDClustersToSVDDigits',
-        'TrackCands',
-        'TrackFitResults',
-        'Tracks',
-        ])
+    'SVDClusters',
+    'SVDDigits',
+    'SVDClustersToSVDDigits',
+    'TrackCands',
+    'TrackFitResults',
+    'Tracks',
+])
 main.add_module(input)
 
 hman = register_module('HistoManager')

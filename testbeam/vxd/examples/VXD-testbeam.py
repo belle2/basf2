@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -9,7 +9,7 @@ events = 100  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -113,4 +113,4 @@ main.add_module(geosaver)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

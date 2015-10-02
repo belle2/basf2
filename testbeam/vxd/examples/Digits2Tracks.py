@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This script (despite its name) contains the whole
@@ -146,7 +146,7 @@ telvxd_dqm = register_module('TelxVXD')
 if PCMAG_ON:
     VXDTF = setup_vxdtf1T('caTracks', sectormap, cellMinState=4)
 else:
-  # VXDTF = setup_vxdtf('caTracks', sectormap, cellMinState = 4)
+    # VXDTF = setup_vxdtf('caTracks', sectormap, cellMinState = 4)
     qiType = 'straightLine'  # straightLine, circleFit
     filterOverlaps = 'hopfield'
 
@@ -204,12 +204,12 @@ else:
         'activateZigZagRZ': [False],
         'activateDeltaPt': [False],
         'activateCircleFit': [False],
-        }
+    }
 
-      # 'tuneCircleFit': [0.0000000001],
-      # 'tuneAngles3D': [0.1],
-      # 'tuneDistance3D': [0.1],
-      # 'tuneDistanceZ': [0.2],
+    # 'tuneCircleFit': [0.0000000001],
+    # 'tuneAngles3D': [0.1],
+    # 'tuneDistance3D': [0.1],
+    # 'tuneDistanceZ': [0.2],
     VXDTF.param(param_vxdtf)
 
 # Track finding DQM
@@ -265,7 +265,7 @@ dataWriter.param('branchNames', [
     'TrackFitResults',
     'GF2Tracks',
     'caTracksToGF2Tracks',
-    ])
+])
 
 # Display progress of processing
 progress = register_module('Progress')
@@ -341,4 +341,3 @@ process(main)
 
 # Or in this case (if you run MP2-module, you will have
 # the corrections as xml), you can use this:
-

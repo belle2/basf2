@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -28,8 +28,8 @@ progress = register_module('Progress')
 svdUnpacker = register_module('SVDUnpacker')
 svdUnpacker.param('rawSVDListName', 'RawSVDs')
 svdUnpacker.param('svdDigitListName', 'SVDDigits')
-svdUnpacker.param('xmlMapFileName',\
-    'testbeam/vxd/data/SVD-OnlineOfflineMap.xml')
+svdUnpacker.param('xmlMapFileName',
+                  'testbeam/vxd/data/SVD-OnlineOfflineMap.xml')
 
 output = register_module('RootOutput')
 output.param('outputFileName', '/path/to/unpacked/datafile.root')
@@ -48,5 +48,5 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)
 #

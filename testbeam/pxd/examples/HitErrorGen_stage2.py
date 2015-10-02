@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -24,4 +24,4 @@ main.add_module(PXDHitErrors())
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

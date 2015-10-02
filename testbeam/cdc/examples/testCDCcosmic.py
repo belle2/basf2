@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -95,8 +95,8 @@ main.add_module(trackfitter)
 
 # display
 # display = main.add_module('Display') # or AsyncDisplay
-#display.param('showCDCHits', True)
-#display.param('fullGeometry', True)
+# display.param('showCDCHits', True)
+# display.param('fullGeometry', True)
 
 # Output
 output = register_module('RootOutput')
@@ -111,4 +111,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

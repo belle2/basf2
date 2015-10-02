@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This script refits a file produced by Digits2Tracks.py
@@ -109,7 +109,7 @@ branchNames = [
     'TelDigits',
     'TelClusters',
     'TelClustersToTelDigits',
-    ]
+]
 # ... and caTracks if we do not want to repeat track finding (=hit matching + mom. seed)
 if not redo_trackfinding:
     branchNames.append('caTracks')
@@ -176,7 +176,7 @@ dataWriter.param('branchNames', [
     'TrackFitResults',
     'GF2Tracks',
     'caTracksToGF2Tracks',
-    ])
+])
 
 # Display progress of processing
 progress = register_module('Progress')
@@ -230,8 +230,7 @@ process(main)
 #
 if do_alignment:
     write_alignment(sum_xmltxt_alignment(alignment_xml_path=alignment,
-                    alignment_txt_path='millepede.res'), output_alignment)
+                                         alignment_txt_path='millepede.res'), output_alignment)
 
 # Or in this case (if you run MP2-module, you will have
 # the corrections as xml), you can use this:
-

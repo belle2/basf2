@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -103,7 +103,7 @@ param_mctrackfinder = {
     'UsePXDHits': 1,
     'Smearing': 0,
     'UseClusters': True,
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
@@ -145,4 +145,4 @@ main.add_module(geosaver)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

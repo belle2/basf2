@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -19,9 +19,9 @@ class PXDHitErrors(Module):
 
         super(PXDHitErrors, self).__init__()
         self.setName('PXDHitErrors')
-        ## Name of output file
+        #: Name of output file
         self.file = open('PXDHitErrorOutput.txt', 'w')
-        ## Factors to decode VXDids
+        #: Factors to decode VXDids
         self.vxdid_factors = (8192, 256, 32)  # For decoding VxdID's
 
     def beginRun(self):
@@ -65,11 +65,9 @@ class PXDHitErrors(Module):
                 # Sesnor identification
                 sensorID = truehit.getRawSensorID()
                 [layer, ladder, sensor] = self.decode(sensorID)
-                s_id = \
-                    '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '\
+                s_id = '{sID} {layer} {ladder} {sensor} {iTH:4d} {iCL:4d} '\
                     .format(sID=sensorID, layer=layer, ladder=ladder,
-                    sensor=sensor, iTH=truehit_index, iCL=cluster_index,
-                    )
+                            sensor=sensor, iTH=truehit_index, iCL=cluster_index)
                 s += s_id
                 # TrueHit information
                 thetaU = math.atan2(truehit.getExitU() - truehit.getEntryU(),
@@ -89,9 +87,9 @@ class PXDHitErrors(Module):
                             eCL=cluster.getCharge(),
                             eSeed=cluster.getSeedCharge()) \
                     + '{size:5d} {sizeU:5d} {sizeV:5d} '.format(
-                            size=cluster.getSize(),
-                            sizeU=cluster.getUSize(),
-                            sizeV=cluster.getVSize())
+                        size=cluster.getSize(),
+                        sizeU=cluster.getUSize(),
+                        sizeV=cluster.getVSize())
                 s += s_cl
                 # We can add some digits, too.
                 digit_indices = relClustersToDigits.getToIndices(cluster_index)

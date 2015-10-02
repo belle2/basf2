@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -127,4 +127,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

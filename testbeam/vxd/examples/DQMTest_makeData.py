@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -80,7 +80,7 @@ TelDigi = register_module('TelDigitizer')
 TelDigi.param('ElectronicNoise', 200)
 TelDigi.param("NoiseSN", 5.0)
 
-#PXD DAQ produces PXDRawHits, not PXDDigits.
+# PXD DAQ produces PXDRawHits, not PXDDigits.
 PXDConv = register_module("PXDRawHitProducer")
 
 # Save output of simulation
@@ -106,4 +106,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

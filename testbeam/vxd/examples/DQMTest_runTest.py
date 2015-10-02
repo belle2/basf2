@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -74,7 +74,7 @@ tel_dqm.param('Clusters', 'TelClusters')
 telvxd_dqm = register_module('TelxVXD')
 
 # VXDTF:
-## parameters:
+# parameters:
 if havePXD:
     if fieldOn:
         VXDTF = setup_vxdtf('caTracks',

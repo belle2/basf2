@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------
@@ -31,14 +31,7 @@ from ROOT import Belle2
 # Import xml parser
 import xml.etree.ElementTree as xml
 
-paramnames = [
-    'du',
-    'dv',
-    'dw',
-    'alpha',
-    'beta',
-    'gamma',
-    ]
+paramnames = ['du', 'dv', 'dw', 'alpha', 'beta', 'gamma']
 
 
 def write_alignment(aligntree, file_path):
@@ -52,7 +45,7 @@ def write_alignment(aligntree, file_path):
 
 def get_alignment_from_txt(txt_path):
     """Load alignment from millepede.res text file into dictionary
-    
+
     Returns dictionary with structure dict[sensor vxd id][alignment parameter]=value
     """
 
@@ -74,7 +67,7 @@ def get_alignment_from_txt(txt_path):
         vxdid = str(Belle2.VxdID(sensor).getLayerNumber()) + '.' \
             + str(Belle2.VxdID(sensor).getLadderNumber()) + '.' \
             + str(Belle2.VxdID(sensor).getSensorNumber())
-        if not vxdid in alignment.keys():
+        if vxdid not in alignment:
             alignment[vxdid] = dict()
         alignment[vxdid][paramnames[int(param) - 1]] = value
     file.close()
@@ -83,7 +76,7 @@ def get_alignment_from_txt(txt_path):
 
 def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
     """Sum alignment parameters from xml and millepede.res text file.
-    
+
     Returns updated xml tree.
     """
 
@@ -93,7 +86,7 @@ def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
         if not str(comp.attrib['component']) in txtdata:
             continue
         for paramname in paramnames:
-            if not paramname in txtdata[comp.attrib['component']]:
+            if paramname not in txtdata[comp.attrib['component']]:
                 continue
             param = comp.find(paramname)
             # Text file is always in cm/rad (until Geant4 changes units)
@@ -113,31 +106,28 @@ def sum_xmltxt_alignment(alignment_xml_path, alignment_txt_path):
             elif unit == 'deg':
                 factor = 2. * 3.1415926 / 360.
             else:
-                raise Exception('Unsupported unit in xml file '
-                                + alignment_xml_path)
-            param.text = str(1. / factor * (float(param.text) * factor
-                             + float(txtdata[str(comp.attrib['component'
-                             ])][paramname])))
+                raise Exception('Unsupported unit in xml file ' + alignment_xml_path)
+            param.text = str(1. / factor * (float(param.text) * factor +
+                                            float(txtdata[str(comp.attrib['component'])][paramname])))
     return aligntree
 
 
 def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
     """Sum alignment parameters in two xml files (with same units).
-    
+
     Returns updated xml tree
     Limited use due to typically different units (deg, mm)
     in default alignment xmls than in alignment (rad, cm).
-    
+
     Use sum_xmltxt_alignment instead if you sum with millepede result.
-    
+
     It is recommended to use (cm, rad) everywhere in alignment files.
     """
 
     aligntree1 = xml.parse(alignment_xml_path1)
     aligntree2 = xml.parse(alignment_xml_path2)
     for comp1 in aligntree1.iter('Align'):
-        comp2 = aligntree2.find(str('Align[@component="{vxdid}"]'
-                                ).format(vxdid=comp1.attrib['component']))
+        comp2 = aligntree2.find(str('Align[@component="{vxdid}"]').format(vxdid=comp1.attrib['component']))
         if comp2 is None:
             continue
         for paramname in paramnames:
@@ -155,23 +145,23 @@ def sum_xml_alignment(alignment_xml_path1, alignment_xml_path2):
 class SetAlignment(Module):
 
     """A utility module to manipulate alignment in VXD testbeam.
-    
+
     Create the module as x=SetAlignment( path to main geometry xml, path to xml with alignment )
     and add it to the path before GearBox.
     It will replace alignment in the man xml by the other one.
     At end of run, the change is reverted.
-    
+
      """
 
     def __init__(self, main_xml_path, alignment_xml_path):
         """Initialize the module"""
 
         super(SetAlignment, self).__init__()
-      # # The main geometry xml
+        #: The main geometry xml
         self.main_xml_path = main_xml_path
-      # # The alignment xml ... <Alignment>...</Alignment>
+        #: The alignment xml ... <Alignment>...</Alignment>
         self.alignment_xml_path = alignment_xml_path
-      # # Original content of main xml file
+        #: Original content of main xml file
         self.original_xml_data = ''
 
     def initialize(self):
@@ -182,14 +172,14 @@ class SetAlignment(Module):
 
         mainalignment = \
             maintree.getroot().find('./DetectorComponent/Content/Alignment')
-      # remove content of alignment node
+        # remove content of alignment node
         mainalignment.clear()
-      # add all align components from alignment xml to main geometry xml
+        # add all align components from alignment xml to main geometry xml
         mainalignment.extend(aligntree.findall('Align'))
-      # store a backup of the whole main xml file
+        # store a backup of the whole main xml file
         file = open(self.main_xml_path, 'r')
         self.original_xml_data = file.read()
-      # write main xml updated with alignment to file
+        # write main xml updated with alignment to file
         file = open(self.main_xml_path, 'w')
         maintree.write(file, encoding='UTF-8', xml_declaration=True)
         file.close()
@@ -206,5 +196,3 @@ class SetAlignment(Module):
         file = open(self.main_xml_path, 'w')
         file.write(self.original_xml_data)
         file.close()
-
-

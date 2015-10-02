@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -58,7 +58,7 @@ particlegun.param({  # Generate 5 tracks on average
     'yVertexParams': [0, 0.01],
     'zVertexParams': [-10, 0.01],
     'independentVertices': True,
-    })
+})
 
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD'])
@@ -86,4 +86,4 @@ main.add_module(output)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

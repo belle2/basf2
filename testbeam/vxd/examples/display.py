@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Common PXD&SVD TestBeam Jan 2014 @ DESY Simulation
@@ -9,7 +9,7 @@ events = 100  # Number of events to simulate
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding
@@ -108,7 +108,7 @@ param_mctrackfinder = {
     'UsePXDHits': 1,
     'Smearing': 0,
     'UseClusters': True,
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 # mctrackfinder.logging.log_level = LogLevel.DEBUG
 
@@ -178,4 +178,4 @@ main.add_module(display)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

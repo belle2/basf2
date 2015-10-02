@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -18,10 +18,10 @@ def setup_vxdtf(
     filterOverlaps='hopfield',
     baseLineTF=0,
     cellMinState=2,
-    ):
+):
 
     # VXDTF:
-    ## parameters:
+    # parameters:
     qiType = 'straightLine'
     #
     vxdtf = register_module('VXDTF')
@@ -72,8 +72,8 @@ def setup_vxdtf(
         'activateDeltaPt': [False],
         'activateCircleFit': [False],
         'tuneCircleFit': [0],
-        }
-        # 'tuneDistanceZ': [1.2],
+    }
+    # 'tuneDistanceZ': [1.2],
     vxdtf.param(param_vxdtf)
     return vxdtf
 
@@ -85,17 +85,18 @@ def setup_vxdtf1T(
     filterOverlaps='hopfield',
     baseLineTF=0,
     cellMinState=2,
-    ):
+):
 
     # VXDTF:
-    ## parameters:
+    # parameters:
     qiType = 'circleFit'
     #
     vxdtf = register_module('VXDTF')
     # vxdtf.logging.log_level = LogLevel.INFO
     vxdtf.logging.log_level = LogLevel.DEBUG
     vxdtf.logging.debug_level = 5
-    param_vxdtf = {  #   'artificialMomentum': 5.,
+    param_vxdtf = {
+        # 'artificialMomentum': 5.,
         'activateBaselineTF': baseLineTF,
         'tccMinState': [cellMinState],
         'tccMinLayer': [3],
@@ -134,8 +135,8 @@ def setup_vxdtf1T(
         'activateDeltaPt': [False],
         'activateCircleFit': [True],
         'tuneCircleFit': [0],
-        }
-   #     'tuneDistanceZ': [1.2],
+        # 'tuneDistanceZ': [1.2],
+    }
     vxdtf.param(param_vxdtf)
     return vxdtf
 
@@ -150,9 +151,7 @@ def setup_vxdtfR470VXD(
     qiType='straightLine',
     baseLineTF=0,
     seedType='straightLine',
-    ):
-
-                               # R470TB3GeVNoMagnetNoAlignedSource2014May27MINIInnerTEL
+):
 
     #
     vxdtf = register_module('VXDTF')
@@ -215,7 +214,7 @@ def setup_vxdtfR470VXD(
         'tuneAngles3D': [0.1],
         'tuneDistance3D': [0.1],
         'tuneDistanceZ': [2.5],
-        }
+    }
     vxdtf.param(param_vxdtf)
     return vxdtf
 
@@ -228,13 +227,13 @@ def setup_vxdtfR470InnerTEL(
     qiType='straightLine',
     baseLineTF=0,
     seedType='straightLine',
-    ):
+):
 
     vxdtf = register_module('VXDTF')
     # vxdtf.logging.log_level = LogLevel.INFO
     vxdtf.logging.log_level = LogLevel.DEBUG
     vxdtf.logging.debug_level = 1
-    param_vxdtf = {  #   'artificialMomentum': 5.,
+    param_vxdtf = {  # 'artificialMomentum': 5.,
                      # 7
                      # VXDTFInfoBoards
                      # 'activateAnglesXY': [True],  #### noMagnet
@@ -293,8 +292,7 @@ def setup_vxdtfR470InnerTEL(
         'tuneAngles3D': [0.1],
         'tuneDistance3D': [0.1],
         'tuneDistanceZ': [2.5],
-        }
-   #     'tuneDistanceZ': [1.2],
+    }
     vxdtf.param(param_vxdtf)
     return vxdtf
 
@@ -307,7 +305,7 @@ def setup_vxdtfR470OuterTEL(
     qiType='straightLine',
     baseLineTF=0,
     seedType='straightLine',
-    ):
+):
 
     vxdtf = register_module('VXDTF')
     # vxdtf.logging.log_level = LogLevel.INFO
@@ -370,9 +368,6 @@ def setup_vxdtfR470OuterTEL(
         'tuneAngles3D': [0.1],
         'tuneDistance3D': [0.1],
         'tuneDistanceZ': [2.5],
-        }
-   #     'tuneDistanceZ': [1.2],
+    }
     vxdtf.param(param_vxdtf)
     return vxdtf
-
-

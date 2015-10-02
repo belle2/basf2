@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -25,7 +25,7 @@ iterations = 1
 outputFile = 'beamAlignment.root'  # some control histograms
 
 if not os.path.exists(inputFile):
-    print '*** Input file ' + inputFile + ' not found'
+    print('*** Input file ' + inputFile + ' not found')
     sys.exit(1)
 
 # Input
@@ -70,4 +70,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

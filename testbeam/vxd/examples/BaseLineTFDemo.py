@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will simulate several testbeam events, reconstruct
@@ -8,7 +8,7 @@ from basf2 import *
 from subprocess import call
 import datetime
 
-### setup of the most important parts for the VXDTF ###
+# setup of the most important parts for the VXDTF ###
 fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 filterOverlaps = 'hopfield'
 seed = 1  # 1, 5, 6
@@ -16,7 +16,7 @@ numEvents = 250
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -43,11 +43,11 @@ geometry = register_module('Geometry')
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
     # secSetup = \
-        # 'TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD'
+    # 'TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD'
     secSetup = 'testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD'
     qiType = 'circleFit'  # circleFit
 else:
-  # To turn off magnetic field:
+    # To turn off magnetic field:
     geometry.param('components', ['TB'])
     # secSetup = 'TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD'
     secSetup = 'testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD'
@@ -134,7 +134,7 @@ param_tf = {  # normally we don't know the particleID, but in the case of the te
     'activateZigZagXY': False,
     'activateDeltaPt': False,
     'activateCircleFit': False,
-    }
+}
 tf.param(param_tf)
 
 # VXDTF DQM module
@@ -158,7 +158,7 @@ param_mctrackfinder = {
     'MinimalNDF': 5,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')
@@ -202,4 +202,4 @@ main.add_module(trackfit_dqm)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

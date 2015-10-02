@@ -49,6 +49,8 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         # based on the properties in the base class.
         main_path = super(RecordingRun, self).create_path()
 
+        main_path.add_module("WireHitTopologyPreparer")
+
         recording_finder_module = self.get_basf2_module(self.recording_finder_module)
         main_path.add_module(recording_finder_module)
         return main_path

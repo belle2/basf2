@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # --------------------------------------------------------------------------
@@ -14,7 +14,7 @@ from ROOT import Belle2
 class printPIDLikelihoods(Module):
 
     '''
-    Prints PID log likelihoods + basic track info in a well formatted way. 
+    Prints PID log likelihoods + basic track info in a well formatted way.
     User is prompted to continue or quit at each event
     '''
 
@@ -27,10 +27,9 @@ class printPIDLikelihoods(Module):
         exp = evtMetaData.obj().getExperiment()
         run = evtMetaData.obj().getRun()
         evt = evtMetaData.obj().getEvent()
-        print
-        print 'Experiment ' + str(exp) + ' Run ' + str(run) + ' Event ' \
-            + str(evt) + ':'
-        print
+        print()
+        print('Experiment ' + str(exp) + ' Run ' + str(run) + ' Event ' + str(evt) + ':')
+        print()
         tracks = Belle2.PyStoreArray('Tracks')
         for track in tracks:
             fitresult = track.getTrackFitResult(Belle2.Const.pion)
@@ -45,15 +44,14 @@ class printPIDLikelihoods(Module):
             else:
                 pdg = '?'
             index = track.getArrayIndex()
-            print 'Track ' + str(index) + ': p = ' + pmom + '  MCtruth = ' \
-                + pdg
+            print('Track ' + str(index) + ': p = ' + pmom + '  MCtruth = ' + pdg)
             likelihood = track.getRelated('PIDLikelihoods')
             try:
-                print 'logLikelihoods:'
+                print('logLikelihoods:')
                 likelihood.printArray()
             except:
-                print '--> No relation to PIDLikelihood'
-            print
+                print('--> No relation to PIDLikelihood')
+            print()
 
         # wait for user respond
         try:
@@ -79,4 +77,3 @@ main.add_module(printPIDLikelihoods())
 
 # Process events
 process(main)
-

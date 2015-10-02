@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -65,4 +65,4 @@ main.add_module(output)
 process(main)
 
 # Print statistics
-print statistics
+print(statistics)

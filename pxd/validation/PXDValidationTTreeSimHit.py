@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -50,21 +50,20 @@ class PXDValidationTTreeSimHit(Module):
         """Initialize the module"""
 
         super(PXDValidationTTreeSimHit, self).__init__()
-        ## Output ROOT file.
+        #: Output ROOT file.
         self.file = ROOT.TFile('PXDValidationTTreeSimHitOutput.root',
                                'recreate')
-        ## TTree for output data
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        ## Instance of EventData class
+        #: Instance of EventData class
         self.data = EventDataSimHit()
         # Declare tree branches
-        for key in EventDataSimHit.__dict__.keys():
-            if not '__' in key:
+        for key in EventDataSimHit.__dict__:
+            if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key
-                                 + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -112,8 +111,7 @@ class PXDValidationTTreeSimHit(Module):
                 self.data.simhit_PosOutX = simhit.getPosOut().X()
                 self.data.simhit_PosOutY = simhit.getPosOut().Y()
                 self.data.simhit_PosOutZ = simhit.getPosOut().Z()
-                self.data.simhit_Length = (simhit.getPosOut()
-                                           - simhit.getPosIn()).Mag()
+                self.data.simhit_Length = (simhit.getPosOut() - simhit.getPosIn()).Mag()
                 self.data.simhit_EnergyDep = simhit.getElectrons()
                 self.data.simhit_GlobalTime = simhit.getGlobalTime()
                 # Fill tree

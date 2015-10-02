@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -44,21 +44,20 @@ class PXDValidationTTreeDigit(Module):
         """Initialize the module"""
 
         super(PXDValidationTTreeDigit, self).__init__()
-        ## Output ROOT file.
+        #: Output ROOT file.
         self.file = ROOT.TFile('PXDValidationTTreeDigitOutput.root', 'recreate'
                                )
-        ## TTree for output data
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of PXD simulation')
-        ## Instance of EventData class
+        #: Instance of EventData class
         self.data = EventDataDigit()
         # Declare tree branches
-        for key in EventDataDigit.__dict__.keys():
-            if not '__' in key:
+        for key in EventDataDigit.__dict__:
+            if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key
-                                 + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -80,12 +79,9 @@ class PXDValidationTTreeDigit(Module):
             for digit in cluster_digits:
                 # Now let's store some data
                 # Event identification
-                self.data.exp = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getExperiment()
-                self.data.run = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getRun()
-                self.data.evt = Belle2.PyStoreObj('EventMetaData'
-                        ).obj().getEvent()
+                self.data.exp = Belle2.PyStoreObj('EventMetaData').obj().getExperiment()
+                self.data.run = Belle2.PyStoreObj('EventMetaData').obj().getRun()
+                self.data.evt = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
                 # Sesnor identification
                 vxd_id = digit.getSensorID()
                 self.data.vxd_id = vxd_id.getID()
@@ -127,5 +123,3 @@ class PXDValidationTTreeDigit(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
-
-

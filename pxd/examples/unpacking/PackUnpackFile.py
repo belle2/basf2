@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -12,7 +12,7 @@ input.param('inputFileName', 'PXDRawHit.root')
 input.param('branchNames', ['EventMetaData', 'PXDDigits', 'PXDDigit'])
 #     'RawPXDs',
 
-## to run the framework the used modules need to be registered
+# to run the framework the used modules need to be registered
 # eventinfosetter = register_module('EventInfoSetter')
 # Setting the option for all non-hepevt reader modules:
 # eventinfosetter.param('evtNumList', [10])  # we want to process 100 events
@@ -26,71 +26,15 @@ packer = register_module('PXDPacker')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhh_to_dhhc', [
-    [
-        0,
-        2,
-        4,
-        34,
-        36,
-        38,
-        ],
-    [
-        1,
-        6,
-        8,
-        40,
-        42,
-        44,
-        ],
-    [
-        2,
-        10,
-        12,
-        46,
-        48,
-        50,
-        ],
-    [
-        3,
-        14,
-        16,
-        52,
-        54,
-        56,
-        ],
-    [
-        4,
-        3,
-        5,
-        35,
-        37,
-        39,
-        ],
-    [
-        5,
-        7,
-        9,
-        41,
-        43,
-        45,
-        ],
-    [
-        6,
-        11,
-        13,
-        47,
-        49,
-        51,
-        ],
-    [
-        7,
-        15,
-        17,
-        53,
-        55,
-        57,
-        ],
-    ])
+    [0,  2,  4, 34, 36, 38],
+    [1,  6,  8, 40, 42, 44],
+    [2, 10, 12, 46, 48, 50],
+    [3, 14, 16, 52, 54, 56],
+    [4,  3,  5, 35, 37, 39],
+    [5,  7,  9, 41, 43, 45],
+    [6, 11, 13, 47, 49, 51],
+    [7, 15, 17, 53, 55, 57],
+])
 
 # packer.param('dhh_to_dhhc', [
 #    [    1,    1,    2,    3,    -1,    5,    ],
@@ -124,4 +68,3 @@ main.add_module(simpleoutput)
 process(main)
 # if there are less events in the input file the processing will be stopped at
 # EOF.
-

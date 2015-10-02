@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -33,19 +33,19 @@ parser.add_argument('--Output', metavar='Output File (path/filename)',
 args = parser.parse_args()
 
 if args.ped:
-    print 'pedestal file = ' + args.ped
+    print('pedestal file = ' + args.ped)
 else:
-    print 'using conditions service for pedestal calibration'
+    print('using conditions service for pedestal calibration')
 
-print 'data file     = ' + args.inputDir + args.inputRun + '.dat'
-print 'camac file    = ' + args.inputDir + args.inputRun + '.cmc'
+print('data file     = ' + args.inputDir + args.inputRun + '.dat')
+print('camac file    = ' + args.inputDir + args.inputRun + '.cmc')
 
 WriteFile = 1
 if args.Output:
     OutputFile = args.Output
 else:
     OutputFile = args.inputRun + '_drawwave.root'
-print 'Writing output root file to ' + OutputFile
+print('Writing output root file to ' + OutputFile)
 
 histomanager = register_module("HistoManager")
 

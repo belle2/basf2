@@ -78,7 +78,6 @@ namespace Belle2 {
       return QOverP;
     }
 
-  private:
     /** After calculating dEdX we need to map this to p using a predefined function and parameters that
      * were extracted with a fit to mc data. */
     double convertDEDXToMomentum(double dEdX, const FitParameters& fitParameters,

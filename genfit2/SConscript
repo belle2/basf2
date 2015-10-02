@@ -13,15 +13,20 @@ dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measureme
 # libraries
 env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'geometry']
 
+# prevent cling c++11 warnins as genfit is c++03 compatible
+env.Append(CLINGFLAGS="-Wno-inconsistent-missing-override")
+
 # check for EVE (needed for eventDisplay)
 if env.get('HAS_TEVE', False):
-  env['LIBS'] += env['TEVE_LIBS']
-  dirs += ['eventDisplay']
+    env['LIBS'] += env['TEVE_LIBS']
+    dirs += ['eventDisplay']
 else:
-  print "Genfit's eventDisplay disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)"
+    print "Genfit's eventDisplay disabled, please recompile root with opengl "\
+        "support (on Debian/Ubuntu you'll probably only need to install "\
+        "libglu1-mesa-dev and rebuild)"
 
 # add genfit2 to include path
-env.Append(CPPPATH = os.path.join(env['INCDIR'], 'genfit'))
+env.Append(CPPPATH=os.path.join(env['INCDIR'], 'genfit'))
 
 # install header files
 includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join(src_dir, '*', 'include', '*.h')))
@@ -30,17 +35,17 @@ env.Alias('genfit2', includes)
 # collect source files
 source_files = []
 for dir in dirs:
-    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file)) for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
+    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file))
+                         for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
 
 # see if it found source files, since this is a list of lists, we have
 # to flatten it, following an example from the Python documentation
 # http://docs.python.org/2/tutorial/datastructures.html
 if len(Flatten(source_files)) == 0:
-  print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
-  Exit(1)
+    print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
+    Exit(1)
 
 # builder for root dictionaries
-#rootcint = Builder(action='rootcint -f $TARGET -c -p $CINTFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES', source_scanner=CScanner())
 from root_dict import rootcling_generator
 env["ROOTCLING_ROOTMAP_LIB"] = 'genfit2'
 rootcint = Builder(generator=rootcling_generator, source_scanner=CScanner())
@@ -57,14 +62,20 @@ for dir in dirs:
         if dir == 'core':
             header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
         elif dir == 'GBL':
-    	    header_files = [os.path.join(src_dir, dir, 'include', 'GFGbl.h'), 
-            os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
-            os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
-            os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
-            os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')]
+            header_files = [
+                os.path.join(src_dir, dir, 'include', 'GFGbl.h'),
+                os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
+                os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
+                os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
+                os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')
+            ]
         elif dir == 'GFRave':
-            header_files = [os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'), os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')]
-        header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file))) for header_file in header_files]
+            header_files = [
+                os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'),
+                os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')
+            ]
+        header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file)))
+                        for header_file in header_files]
         dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
         dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
 
@@ -93,4 +104,3 @@ env.Alias('genfit2', lib)
 env['CONTINUE'] = False
 
 Return('env')
-

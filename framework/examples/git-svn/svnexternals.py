@@ -12,7 +12,7 @@ from subprocess import check_output, call, CalledProcessError
 try:
     LOCAL_DIR = os.environ["BELLE2_LOCAL_DIR"]
 except KeyError:
-    print "Belle II software not correctly set up, aborting"
+    print("Belle II software not correctly set up, aborting")
     sys.exit(1)
 
 
@@ -95,8 +95,8 @@ class SvnExternalsCache(object):
                 else:
                     try:
                         data.append(self.parse_external(line))
-                    except ValueError, e:
-                        print "Error parsing externals %s for r%s: %s" % (external, revision, path)
+                    except ValueError as e:
+                        print("Error parsing externals %s for r%s: %s" % (external, revision, path))
         except CalledProcessError:
             # Apparently no externals here, move on
             pass
@@ -155,7 +155,7 @@ else:
     current_revision = find_svnrevision()
 
 if current_revision is None:
-    print "Cannot determine SVN revision, cannot check for externals"
+    print("Cannot determine SVN revision, cannot check for externals")
     sys.exit(1)
 
 # Let's change into the release dir
@@ -168,37 +168,37 @@ if os.path.exists(".gitignore"):
     gitignore = f.readlines()
     f.close()
 
-print "Checking svn:externals for r%s" % current_revision
+print("Checking svn:externals for r%s" % current_revision)
 
 with SvnExternalsCache() as cache:
     for e in externals:
-        print "directory '%s'" % e
+        print("directory '%s'" % e)
 
         for dirname, revision, url in cache.get(current_revision, e):
             path = os.path.join(e, dirname)
             abspath = os.path.join(LOCAL_DIR, e, dirname)
             if cache.check_revision(abspath, revision):
-                print "%s already up to date" % path
+                print("%s already up to date" % path)
                 continue
             # Build command line for svn
             args = ["svn"]
             if os.path.exists(abspath):
                 # Seems to exist already, so update to specified revision
-                print "Updating", path,
+                print("Updating", path, end=' ')
                 args.append("update")
             else:
                 # Not there yet, checkout using svn
-                print "Fetching", path,
-                print "from", url,
+                print("Fetching", path, end=' ')
+                print("from", url, end=' ')
                 args += ["checkout", url]
 
             # If revision is specified, add it after the svn command
             if revision is not None:
-                print "r" + revision,
+                print("r" + revision, end=' ')
                 args.insert(2, "-r" + revision)
 
             # finish line
-            print
+            print()
             call(args + [abspath])
 
             # Check if it is already excluded

@@ -5,9 +5,9 @@
 # (This is only really a problem on SL5, which has Python 2.4)
 
 DIRNAME=`dirname $0`
-PYTHON=python
+PYTHON=python3
 if [ -n "$VIRTUAL_ENV" ]; then
-    PYTHON=$VIRTUAL_ENV/bin/python
+    PYTHON=$VIRTUAL_ENV/bin/python3
 fi
 
 $PYTHON $DIRNAME/svnexternals.py "$@"

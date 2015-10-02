@@ -21,7 +21,7 @@ namespace Belle2 {
   class BoostPythonModuleProxy {
   public:
     /** Don't construct this object yourself, use the REGISTER_PYTHON_MODULE macro instead. */
-    BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import = false);
+    BoostPythonModuleProxy(const char* name, PyObject * (*initFunc)(), bool auto_import = false);
   };
 
   /**
@@ -33,7 +33,7 @@ namespace Belle2 {
    * After the library has been loaded, you can use 'import name' to import the
    * defined objects.
    */
-#define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName);
+#define REGISTER_PYTHON_MODULE(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, PyInit_##moduleName);
 
   /**
    * Identical to REGISTER_PYTHON_MODULE(), but will also
@@ -71,6 +71,6 @@ namespace Belle2 {
    * In a steering file, the type MyTest.Sphere is available immediately after
    * register_module('MyTest').
    */
-#define REGISTER_PYTHON_MODULE_AUTOIMPORT(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, init##moduleName, true);
+#define REGISTER_PYTHON_MODULE_AUTOIMPORT(moduleName) Belle2::BoostPythonModuleProxy boostPythonModuleProxy##moduleName(#moduleName, PyInit_##moduleName, true);
 }
 #endif

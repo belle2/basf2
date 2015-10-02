@@ -101,7 +101,7 @@ namespace Belle2 {
       if (m) {
         PyObject* v = PyObject_GetAttrString(m, strdup("runno"));
         if (v) {
-          run = PyInt_AsLong(v);
+          run = PyLong_AsLong(v);
           Py_DECREF(v);
         }
         B2INFO("GeoARICHBtestCreator::create runno = " << run);
@@ -558,7 +558,7 @@ namespace Belle2 {
         int averageagel = 0;
         PyObject* v = PyObject_GetAttrString(m, strdup("averageagel"));
         if (v) {
-          averageagel = PyInt_AsLong(v);
+          averageagel = PyLong_AsLong(v);
           Py_DECREF(v);
         }
         B2INFO("Python averageagel = " << averageagel);

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-from distutils import sysconfig
 import config
 
 
@@ -65,11 +64,11 @@ global_env = Environment(ENV = os.environ,
                          EXTBINDIR = os.path.join('$EXTDIR', 'bin', extsubdir),
                          LINK='g++',
                          SHLINK='g++',
-                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR', '-isystem' + sysconfig.get_python_inc()],
+                         CCFLAGS = ['-Wall', '-isystem$EXTINCDIR'],
                          CXXFLAGS = ['-std=c++11'],
                          CPPDEFINES = {'_PACKAGE_': '\\"$PACKAGE\\"'},
                          CPPPATH = ['include'],
-                         LIBPATH = ['$LIBDIR', sysconfig.get_config_var('LIBDIR'), '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
+                         LIBPATH = ['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
                          DATAOBJECT_LIBS = [],
                          TOOLS_LIBS = {},
                          TOOLS_LIBPATH = {},

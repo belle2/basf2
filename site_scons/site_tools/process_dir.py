@@ -219,8 +219,7 @@ def process_dir(
                 'data',
             ]:
                 continue
-            process_dir(env, os.path.join(dir_name, entry), is_module_dir
-                        and dir_name != '.', release_dir)
+            process_dir(env, os.path.join(dir_name, entry), is_module_dir and dir_name != '.', release_dir)
 
     # determine whether we are in a special directory
     is_package_dir = dir_name == env['PACKAGE']
@@ -249,8 +248,7 @@ def process_dir(
             dict_file = env.RootDict(os.path.join(env['BUILDDIR'],
                                                   dict_filename), linkdef_file)
             # add current directory to include path for dictionary compilation
-            dict_files.append(env.SharedObject(dict_file, CPPPATH=['.']
-                                               + env['CPPPATH']))
+            dict_files.append(env.SharedObject(dict_file, CPPPATH=['.'] + env['CPPPATH']))
 
             # install corresponding pcm file in lib (for cling)
             pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
@@ -309,9 +307,7 @@ def process_dir(
 
             # install python module libraries with a file name that is recognized by python
             if is_python_module_dir:
-                pymod = env.InstallAs(os.path.join(env['LIBDIR'],
-                                                   os.path.basename(dir_name) + 'module'
-                                                   + env.subst('$SHLIBSUFFIX')), lib)
+                pymod = env.InstallAs(os.path.join(env['LIBDIR'], os.path.basename(dir_name) + env.subst('$SHLIBSUFFIX')), lib)
                 define_aliases(env, pymod, dir_name, 'lib')
     else:
 

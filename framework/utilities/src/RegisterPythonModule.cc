@@ -17,7 +17,7 @@
 
 using namespace Belle2;
 
-BoostPythonModuleProxy::BoostPythonModuleProxy(const char* name, void (*initFunc)(), bool auto_import)
+BoostPythonModuleProxy::BoostPythonModuleProxy(const char* name, PyObject * (*initFunc)(), bool auto_import)
 {
   if (PyImport_AppendInittab(const_cast<char*>(name), initFunc) == -1) {
     B2FATAL("REGISTER_PYTHON_MODULE(" << name << ") failed.");

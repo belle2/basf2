@@ -3,8 +3,6 @@
 
 from SCons.Script import *
 import os
-import platform
-from distutils import sysconfig
 import subprocess
 
 
@@ -47,7 +45,7 @@ def CheckFile(conf, dir, text=None):
         conf.Message('Checking for %s...' % text)
     else:
         conf.Message('Checking for directory %s...' % dir)
-    if conf.env.FindFile(dir, '.') == None:
+    if conf.env.FindFile(dir, '.') is None:
         result = 0
     else:
         result = 1
@@ -62,7 +60,7 @@ def CheckLibrary(conf, lib):
     process = subprocess.Popen(['ldd', lib], stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     output = process.communicate()[0]
-    if process.returncode == 0 and not 'not found' in output:
+    if process.returncode == 0 and 'not found' not in output:
         result = 1
     else:
         result = 0
@@ -81,7 +79,7 @@ def configure_belle2(conf):
 
     # local Belle II release setup
     if not conf.CheckEnvVar('BELLE2_ANALYSIS_DIR', 'analysis setup') \
-        and not conf.CheckEnvVar('BELLE2_LOCAL_DIR', 'local release setup'):
+            and not conf.CheckEnvVar('BELLE2_LOCAL_DIR', 'local release setup'):
         print 'analysis or local release is not set up.'
         print '-> Execute "setupana" or "setuprel" in your local analysis or release directory, respectively.'
         return False
@@ -91,11 +89,6 @@ def configure_belle2(conf):
 
 def configure_system(conf):
     """configure the system packages"""
-
-    # python
-    python_version = platform.python_version_tuple()
-    conf.env['PYTHON_LIBS'] = ['python%s.%s' % (python_version[0],
-                               python_version[1])]
 
     # xml
     if not conf.CheckConfigTool('xml2-config'):
@@ -111,8 +104,7 @@ def configure_system(conf):
     # TEve
     conf.env['HAS_TEVE'] = False
     conf.env['TEVE_LIBS'] = []
-    if conf.CheckLibrary(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so'
-                         )):
+    if conf.CheckLibrary(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so')):
         conf.env['HAS_TEVE'] = True
         conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 
@@ -145,9 +137,8 @@ def configure_externals(conf):
         sys.path[:0] = [os.environ['BELLE2_TOOLS'], extdir]
         from externals import config_externals
         return config_externals(conf)
-    except:
-
-        print 'Configuration of externals failed.'
+    except Exception, e:
+        print 'Configuration of externals failed:', e
         return False
 
     return True
@@ -162,14 +153,12 @@ def configure(env):
         'CheckPackage': CheckPackage,
         'CheckFile': CheckFile,
         'CheckLibrary': CheckLibrary,
-        })
+    })
 
-    if not configure_belle2(conf) or not configure_system(conf) \
-        or not configure_externals(conf):
+    if not configure_belle2(conf) or not configure_externals(conf) \
+            or not configure_system(conf):
         return False
 
     env = conf.Finish()
 
     return True
-
-

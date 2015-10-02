@@ -51,6 +51,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <locale>
+#include <codecvt>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/valgrind.h>
@@ -344,13 +346,18 @@ int main(int argc, char* argv[])
       //Init Python interpreter
       Py_InitializeEx(0);
 
-      std::vector<const char*> pyArgv(arguments.size() + 1);
-      pyArgv[0] = pythonFile.c_str();
+      std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+      std::vector<wstring> pyArgvString(arguments.size() + 1);
+      pyArgvString[0] = converter.from_bytes(pythonFile);
       for (size_t i = 0; i < arguments.size(); i++) {
-        pyArgv[i + 1] = arguments[i].c_str();
+        pyArgvString[i + 1] = converter.from_bytes(arguments[i]);
+      }
+      std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
+      for (size_t i = 0; i < pyArgvString.size(); ++i) {
+        pyArgvArray[i] = pyArgvString[i].c_str();
       }
       //Pass python filename and additional arguments to python
-      PySys_SetArgv(pyArgv.size(), const_cast<char**>(pyArgv.data()));
+      PySys_SetArgv(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
 
       //Execute Python file
       executePythonFile(pythonFile);
@@ -380,7 +387,7 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   if (runInteractiveMode) {
     pythonFile = FileSystem::findFile((libPath / "basf2.py").string());
-    string extCommand("python -i " + pythonFile);
+    string extCommand("python3 -i " + pythonFile);
     if (system(extCommand.c_str()) != 0)
       return 1;
   }

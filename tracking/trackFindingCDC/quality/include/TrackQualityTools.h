@@ -63,7 +63,6 @@ namespace Belle2 {
     private:
       const double m_outerCylindricalRFactor = 1.1;
       const unsigned int m_minimalHits = 7;
-      const int m_maximalLayerDelta = 7;
       const double m_maximalAngle = 0.7;
       const double m_maximumArcLength2DDistance = 10;
     };

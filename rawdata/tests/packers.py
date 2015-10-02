@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -28,4 +28,4 @@ add_raw_output(main)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -8,7 +8,7 @@ from sys import argv
 
 generateSecMap = False  # <----------- hier umschalten zwischen secMapGenerierung und VXDTF!
 
-################# start copy from here
+# start copy from here
 fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 numEvents = 25
 initialValue = 42
@@ -16,7 +16,7 @@ initialValue = 42
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -25,13 +25,14 @@ beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 useSimpleClusterizer = False  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
-useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = False  #  <---- adding Background - funzt noch net
+# <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
+useEDeposit = True
+addBG = False  # <---- adding Background - funzt noch net
 usePXD = True
 
 # flags für die pGun
 numTracks = 1
-################# end Copy here
+# end Copy here
 
 useTFDebug = True
 TFDebugLevel = 2
@@ -71,7 +72,7 @@ if useEDeposit:
 
 # allows steering initial value and numEvents by sript file
 if len(argv) is 1:
-    print ' no arguments given, using standard values'
+    print(' no arguments given, using standard values')
 elif len(argv) is 2:
     seed = int(argv[1])
 else:
@@ -90,11 +91,11 @@ geometry = register_module('Geometry')
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
     # secSetup = \
-        # ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
+    # ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
     secSetup = ['testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD']
     qiType = 'circleFit'  # circleFit
 else:
-  # To turn off magnetic field:
+    # To turn off magnetic field:
     geometry.param('components', ['TB'])
     # secSetup = ['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD']
     secSetup = ['testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD']
@@ -107,17 +108,17 @@ progress = register_module('Progress')
 
 rootFileName = \
     '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
-    events=numEvents,
-    seed=initialValue,
-    evtType=particleGenType,
-    clusterType=clusterType,
-    eDep=eDepType,
-    phi=phi,
+        events=numEvents,
+        seed=initialValue,
+        evtType=particleGenType,
+        clusterType=clusterType,
+        eDep=eDepType,
+        phi=phi,
     )
 
-print ''
-print ' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName)
-print ''
+print('')
+print(' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName))
+print('')
 
 spCreator = register_module('TBSpacePointCreator')
 spCreator.logging.log_level = LogLevel.DEBUG
@@ -141,4 +142,4 @@ main.add_module(spCreator)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

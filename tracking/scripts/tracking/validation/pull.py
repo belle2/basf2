@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from tracking.validation.plot import ValidationPlot, compose_axis_label, get_unit
@@ -235,10 +235,10 @@ class PullAnalysis(object):
     @contact.setter
     def contact(self, contact):
         self._contact = contact
-        for validation_plot in self.plots.values():
+        for validation_plot in list(self.plots.values()):
             validation_plot.contact = contact
 
     def write(self, tDirectory=None):
         # Write all validation plot to the given Root directory
-        for validation_plot in self.plots.values():
+        for validation_plot in list(self.plots.values()):
             validation_plot.write(tDirectory)

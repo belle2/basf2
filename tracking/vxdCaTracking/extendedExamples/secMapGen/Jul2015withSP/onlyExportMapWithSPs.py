@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -37,10 +37,10 @@ setupFileName2 = setupFileName2 + 'VXD' + 'Std'
 
 doNew = 1
 if len(argv) is 1:
-    print 'no arguments given, using standard values'
+    print('no arguments given, using standard values')
 elif len(argv) is 2:
     doNew = int(argv[1])
-    print '1 argument given, if passedValue is 1: only new secMap, 0: only old one: ' + str(doNew)
+    print('1 argument given, if passedValue is 1: only new secMap, 0: only old one: ' + str(doNew))
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -102,7 +102,7 @@ elif doNew is 1:
     exportVXDnew.param('filterRareCombinations', True)
     exportVXDnew.param('rarenessFilter', 0.005)
 else:
-    print("doNew-parameter is set to illegal parameter (only 0 and 1 allowed): " + str(doNew) + ", aborting program.")
+    print(("doNew-parameter is set to illegal parameter (only 0 and 1 allowed): " + str(doNew) + ", aborting program."))
     raise SystemExit
 
 # Create paths
@@ -123,4 +123,4 @@ if doNew is 0:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

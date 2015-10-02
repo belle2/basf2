@@ -98,6 +98,6 @@ plotter.clear()
 # Output the lines as a test case
 with open(testFileName) as input_file:
     for line in input_file:
-        print line,
+        print(line, end=' ')
 
 os.remove(testFileName)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -338,4 +338,4 @@ main.add_module(vxd_cdcTracksMergerAnalysis)
 
 # Process events
 process(main)
-print statistics
+print(statistics)

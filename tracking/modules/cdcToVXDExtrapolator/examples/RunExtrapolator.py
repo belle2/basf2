@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """Example showing how to run the CDCToVXDExtrapolator. Save the
@@ -113,4 +113,4 @@ display = register_module('Display')
 # analysis_main.add_module(display)
 
 process(analysis_main)
-print statistics
+print(statistics)

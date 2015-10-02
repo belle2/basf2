@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -91,7 +91,7 @@ def vector_iterator(v):
 
     """
 
-    return (v.at(i) for i in xrange(v.size()))
+    return (v.at(i) for i in range(v.size()))
 
 
 def is_iterable_collection(obj):
@@ -106,8 +106,7 @@ def is_iterable_collection(obj):
         Object to be checked.
     """
 
-    return isinstance(obj, collections.Iterable) and not isinstance(obj,
-                                                                    basestring)
+    return isinstance(obj, collections.Iterable) and not isinstance(obj, str)
 
 
 def is_primary(mcParticle):

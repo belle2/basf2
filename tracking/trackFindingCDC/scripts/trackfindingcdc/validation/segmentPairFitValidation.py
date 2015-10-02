@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import basf2
@@ -231,9 +231,9 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         y="fit p-value",
         check=("The {y_part_name} should be essentially the same over"
                "the whole range of the tan lambda spectrum"),
-        description = ("Investigating the reconstruction quality for different "
-                       "tan lambda regions of the CDC. Most notably is the superlayer dependency."
-                       "For stereo superlayers the curve is not flat but has distinct slope."),
+        description=("Investigating the reconstruction quality for different "
+                     "tan lambda regions of the CDC. Most notably is the superlayer dependency."
+                     "For stereo superlayers the curve is not flat but has distinct slope."),
         fit='line',
     )
 

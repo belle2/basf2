@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -89,7 +89,7 @@ class MinimalRun(object):
     def configure(self, arguments):
         # Simply translate the arguments that have
         # the same name as valid instance arguments
-        for (key, value) in vars(arguments).items():
+        for (key, value) in list(vars(arguments).items()):
             if value is None:
                 continue
             if hasattr(self, key):

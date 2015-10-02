@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -37,16 +37,16 @@ checkSPs = False
 
 if len(argv) > 1:
     numEvents = int(argv[1])
-    print '1st argument given, new value for numEvents: ' + str(numEvents)
+    print('1st argument given, new value for numEvents: ' + str(numEvents))
 if len(argv) > 2:
     thetaMin = int(argv[2])
-    print '2nd argument given, new value for thetaMin: ' + str(thetaMin)
+    print('2nd argument given, new value for thetaMin: ' + str(thetaMin))
 if len(argv) > 3:
     thetaMax = int(argv[3])
-    print '3rd argument given, new value for thetaMax: ' + str(thetaMax)
+    print('3rd argument given, new value for thetaMax: ' + str(thetaMax))
 if len(argv) > 4:
     numTracks = int(argv[4])
-    print '4th argument given, new value for numTracks: ' + str(numTracks)
+    print('4th argument given, new value for numTracks: ' + str(numTracks))
 
 
 secSetup = ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD']
@@ -153,7 +153,7 @@ param_sp2thConnector = {
     'minWeight': 0,
     'requirePrimary': True,
     'positionAnalysis': False,
-    }
+}
 sp2thConnector.param(param_sp2thConnector)
 
 # TCConverter, genfit -> SPTC
@@ -249,5 +249,5 @@ main.add_module(analizer)
 # Process events
 process(main)
 
-print 'Event Statistics :'
-print statistics
+print('Event Statistics :')
+print(statistics)

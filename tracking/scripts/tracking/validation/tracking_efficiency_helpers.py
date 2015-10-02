@@ -1,7 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# !/usr/bin/env python
 
 #################################################################
 #                                                               #
@@ -42,7 +40,7 @@ def get_simulation_components():
         'HeavyMetalShield',
         'VXDService',
         'Cryostat',
-        ]
+    ]
 
 
 def get_reconstruction_components():
@@ -73,15 +71,15 @@ def get_generated_pt_value(index):
         2.,
         3.,
         4.,
-        ]
+    ]
 
     if index == -1:
         return len(pt_values)
     try:
         return pt_values[index]
     except IndexError:
-        print 'ERROR in %s. Index is out of range. Only %d elements in list.' \
-            % (get_generated_pt_value.__name__, len(pt_values))
+        print('ERROR in %s. Index is out of range. Only %d elements in list.'
+              % (get_generated_pt_value.__name__, len(pt_values)))
         sys.exit(1)
 
 
@@ -94,7 +92,7 @@ def get_generated_pt_values():
     """
 
     list = []
-    for index in xrange(get_generated_pt_value(-1)):
+    for index in range(get_generated_pt_value(-1)):
         list.append(get_generated_pt_value(index))
 
     return list
@@ -164,7 +162,7 @@ def run_simulation(path, pt_value, output_filename=''):
         'yVertexParams': [0.0],
         'zVertexParams': [0.0],
         'thetaGeneration': 'uniformCos',
-        }
+    }
 
     pgun.param(param_pgun)
 
@@ -172,14 +170,11 @@ def run_simulation(path, pt_value, output_filename=''):
 
     background_files = []
     if 'BELLE2_BACKGROUND_DIR' in os.environ:
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
-                                      + '/PXD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
-                                      + '/SVD*.root')
-        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR']
-                                      + '/CDC*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/PXD*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/SVD*.root')
+        background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/CDC*.root')
 
-        print 'Number of used background files (%d): ' % len(background_files)
+        print('Number of used background files (%d): ' % len(background_files))
 
     # add simulation modules to the path
     add_simulation(path, get_simulation_components(), background_files)
@@ -214,5 +209,3 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
     path.add_module(tracking_efficiency)
 
     additional_options(path)
-
-

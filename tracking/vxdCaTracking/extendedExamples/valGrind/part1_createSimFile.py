@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -7,11 +7,12 @@ from sys import argv
 from basf2 import *
 from time import time
 
-################# start copy from here
+# start copy from here
 useSimpleClusterizer = False  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = True  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
-useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = False  #  <---- adding Background - funzt noch net
+# <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
+useEDeposit = True
+addBG = False  # <---- adding Background - funzt noch net
 usePXD = False
 
 numEvents = 5
@@ -28,7 +29,7 @@ thetaMax = 80.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
 phiMin = 0.  # degrees
 phiMax = 360.  # degrees
-################# end Copy here
+# end Copy here
 
 clusterType = 'fullClusterizer'
 if useSimpleClusterizer:
@@ -40,38 +41,40 @@ eDepType = 'eDepNo'
 if useEDeposit:
     eDepType = 'eDepYes'
 
-print '{events:} events, {numTracks:} tracksEach, Between {minP:} And {maxP:} GeV, Seed {theSeed:}, tMin {minTheta:}, tMax{maxTheta:}, phiMin {minPhi:}, phiMax{maxPhi:} - {genType:}!'.format(
-    events=numEvents,
-    numTracks=numTracks,
-    minP=momentumMin,
-    maxP=momentumMax,
-    theSeed=seed,
-    minTheta=thetaMin,
-    maxTheta=thetaMax,
-    minPhi=phiMin,
-    maxPhi=phiMax,
-    genType=particleGenType,
-    )
+print('{events:} events, {numTracks:} tracksEach, Between {minP:} And {maxP:} GeV, Seed {theSeed:}, tMin {minTheta:}, '
+      'tMax{maxTheta:}, phiMin {minPhi:}, phiMax{maxPhi:} - {genType:}!'.format(
+          events=numEvents,
+          numTracks=numTracks,
+          minP=momentumMin,
+          maxP=momentumMax,
+          theSeed=seed,
+          minTheta=thetaMin,
+          maxTheta=thetaMax,
+          minPhi=phiMin,
+          maxPhi=phiMax,
+          genType=particleGenType))
 
-simOutputFileName = \
-    '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
+simOutputFileName = '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
     events=numEvents,
     seed=seed,
     evtType=particleGenType,
     clusterType=clusterType,
     eDep=eDepType,
-    phi=phiMax,
-    )
+    phi=phiMax
+)
 
-print ''
-print ' entering particleSim and simulate using {clusterType:}. {eDep:} writing in file: {ofileName:}'.format(clusterType=clusterType,
-        eDep=eDepType, ofileName=simOutputFileName)
-print ''
+print('')
+print(
+    ' entering particleSim and simulate using {clusterType:}. {eDep:} writing in file: {ofileName:}'.format(
+        clusterType=clusterType,
+        eDep=eDepType,
+        ofileName=simOutputFileName))
+print('')
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(seed)
 
-#### register die restlichen modules (ab hier kommt nur noch Zeugs, wo Umstellen nur auf eigene Gefahr gilt)
+# register die restlichen modules (ab hier kommt nur noch Zeugs, wo Umstellen nur auf eigene Gefahr gilt)
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
@@ -81,7 +84,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 # Mix some background to simulation data
 # bgmixer = register_module('MixBkg')
-##bgmixer.param('BackgroundFiles', ['SVDROF*.root'])
+# bgmixer.param('BackgroundFiles', ['SVDROF*.root'])
 # bgmixer.param('BackgroundFiles', ['SVDROF_RBB_LER_1ms_0x.root', 'SVDROF_RBB_HER_1ms_0x.root'])
 # bgmixer.param('AnalysisMode', False)
 # bgmixer.set_log_level(LogLevel.INFO)
@@ -118,7 +121,7 @@ param_pGun = {  # 13: muons, 211: charged pions, 521: b+-Meson
     'xVertexParams': [0., 0.],
     'yVertexParams': [0., 0.],
     'zVertexParams': [0., 0.],
-    }
+}
 particlegun.param(param_pGun)
 
 evtgeninput = register_module('EvtGenInput')
@@ -126,7 +129,7 @@ evtgeninput.logging.log_level = LogLevel.WARNING
 
 geometry = register_module('Geometry')
 geometry.param('Components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])  # 'MagneticField',
+                              'PXD', 'SVD'])  # 'MagneticField',
 
 pxdDigitizer = register_module('PXDDigitizer')
 svdDigitizer = register_module('SVDDigitizer')
@@ -206,7 +209,7 @@ if useEDeposit is False:
         '/process/inactivate              OpWLS',
         '/process/inactivate           Cerenkov',
         '/process/inactivate      Scintillation',
-        ])
+    ])
 # "/process/inactivate        StepLimiter"
 
 output = register_module('RootOutput')
@@ -231,15 +234,15 @@ param_mctrackfinder = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 progress = register_module('Progress')
 
-print ''
-print ' entering particleGen using {genType:}. writing in file: {fileName:}'.format(genType=particleGenType,
-        fileName=simOutputFileName)
-print ''
+print('')
+print(' entering particleGen using {genType:}. writing in file: {fileName:}'.format(genType=particleGenType,
+                                                                                    fileName=simOutputFileName))
+print('')
 
 # print(time.time())
 
@@ -253,17 +256,17 @@ main.add_module(gearbox)
 main.add_module(geometry)
 
 if useEvtGen:
-  ##folgende Module nur für evtGen:
+    # folgende Module nur für evtGen:
     main.add_module(evtgeninput)
 else:
-  ## folgende Module nur für pGun:
+    # folgende Module nur für pGun:
     main.add_module(particlegun)
 if addBG:
     main.add_module(bgmixer)
 main.add_module(g4sim)
 
 if useSimpleClusterizer:
-    print ''
+    print('')
     main.add_module(simpleClusterizer)
 else:
     main.add_module(pxdDigitizer)
@@ -276,8 +279,8 @@ main.add_module(mctrackfinder)
 main.add_module(output)
 
 # Process events
-print main
+print(main)
 process(main)
 
 # print(time.time())
-print statistics
+print(statistics)

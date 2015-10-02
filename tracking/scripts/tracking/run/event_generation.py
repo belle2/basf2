@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -226,8 +226,8 @@ def is_generator_name(generator_name):
         If the name is a module name or a valid short hand for a module
     """
 
-    if generator_name in generator_module_names_by_short_name.values() \
-            or generator_name in generator_module_names_by_short_name.keys():
+    if generator_name in list(generator_module_names_by_short_name.values()) \
+            or generator_name in list(generator_module_names_by_short_name.keys()):
         return True
     else:
         # Also except any module from the generator package

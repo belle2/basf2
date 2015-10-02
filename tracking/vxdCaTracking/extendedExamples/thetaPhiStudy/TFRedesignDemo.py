@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -61,27 +61,27 @@ zVertex = [-0.5, 0.5]
 
 if len(argv) > 1:
     numEvents = int(argv[1])
-    print '1st argument given, new value for numEvents: ' + str(numEvents)
+    print('1st argument given, new value for numEvents: ' + str(numEvents))
 if len(argv) > 2:
     momentumMin = float(argv[2])
-    print '2nd argument given, new value for momentumMin: ' + str(momentumMin)
-    print 'pGun is now activated! Value for evtGen: ' + str(useEvtGen)
+    print('2nd argument given, new value for momentumMin: ' + str(momentumMin))
+    print('pGun is now activated! Value for evtGen: ' + str(useEvtGen))
     usePGun = True
 if len(argv) > 3:
     momentumMax = float(argv[3])
-    print '3rd argument given, new value for momentumMax: ' + str(momentumMax)
+    print('3rd argument given, new value for momentumMax: ' + str(momentumMax))
 if len(argv) > 4:
     numTracks = int(argv[4])
-    print '4th argument given, new value for numTracks: ' + str(numTracks)
+    print('4th argument given, new value for numTracks: ' + str(numTracks))
 if len(argv) > 5:
     thetaMin = float(argv[5])
-    print '5th argument given, new value for thetaMin: ' + str(thetaMin)
+    print('5th argument given, new value for thetaMin: ' + str(thetaMin))
 if len(argv) > 6:
     thetaMax = float(argv[6])
-    print '6th argument given, new value for thetaMax: ' + str(thetaMax)
+    print('6th argument given, new value for thetaMax: ' + str(thetaMax))
 if len(argv) > 7:
     pdgType = int(argv[7])
-    print '7th argument given, new value for particleType: ' + str(pdgType)
+    print('7th argument given, new value for particleType: ' + str(pdgType))
     charges = [pdgType, -pdgType]
 
 tuneValue = 0.06
@@ -107,8 +107,8 @@ if usePXD:
     # 'secMapEvtGenOnR10933June2014VXDStd-125to500MeV_PXDSVD',
     # 'secMapEvtGenOnR10933June2014VXDStd-30to125MeV_PXDSVD']
     tuneValue = 0.22
-print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
-                                                                        theSeed=initialValue)
+print('running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
+                                                                        theSeed=initialValue))
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -302,7 +302,7 @@ eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 50)
 # if doMultiCore:
-## eventCounter.param('allowMultiThreaded', True)
+#     eventCounter.param('allowMultiThreaded', True)
 # else:
 eventCounter.param('allowMultiThreaded', False)
 
@@ -366,5 +366,5 @@ else:
 
 process(main)
 
-print 'Event Statistics :'
-print statistics
+print('Event Statistics :')
+print(statistics)

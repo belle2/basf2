@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -104,7 +104,7 @@ class ClusterFilterValidationModule(harvesting.HarvestingModule):
 
         # Truth variables
         n_background = 0
-        for wireHit in cluster.items():
+        for wireHit in list(cluster.items()):
             cdcHit = wireHit.getHit()
             if mc_hit_lookup.isBackground(cdcHit):
                 n_background += 1

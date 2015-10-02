@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -8,11 +8,12 @@ from sys import argv
 
 generateSecMap = False  # <----------- hier umschalten zwischen secMapGenerierung und VXDTF!
 
-################# start copy from here
+# start copy from here
 useSimpleClusterizer = True  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
-useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = True  #  <---- adding Background - funzt noch net
+# <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
+useEDeposit = True
+addBG = True  # <---- adding Background - funzt noch net
 
 numEvents = 20
 seed = 1
@@ -28,15 +29,17 @@ thetaMax = 80.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
 phiMin = 0.  # degrees
 phiMax = 360.  # degrees
-################# end Copy here
+# end Copy here
 
-#### filterCalc & VXDTF:
+# filterCalc & VXDTF:
 pTcuts = [0.05, 0.5]
 setupFileName = 'belle2SimpleCaseTet35t80phi0t360'
 # setupFileName = "b2Theta70to80Phi0to90"
 # secSetup = ['belle2SimpleCaseSVD-50to500MeV_SVD'] # hier neuen namen fürs xml-file eintragen
 secSetup = ['belle2SimpleCaseTet35t80phi0t360SVD-50to500MeV_SVD']  # hier neuen namen fürs xml-file eintragen
-# secSetup = ['sectorList_evtNormSecHIGH_SVD', 'sectorList_evtNormSecMED_SVD', 'sectorList_evtNormSecLOW_SVD'] #standardDings für evtGen
+# secSetup = ['sectorList_evtNormSecHIGH_SVD',
+# 'sectorList_evtNormSecMED_SVD', 'sectorList_evtNormSecLOW_SVD']
+# #standardDings für evtGen
 secConfigU = [0., 0.5, 1.0]
 secConfigV = [0., 0.33, 0.67, 1.0]
 qiType = 'circleFit'
@@ -93,7 +96,7 @@ param_vxdtf = {  # 'activateZigZagXY': [False, True, True], # WARNING: aktiviere
     'activateCircleFit': [False],
     'tuneCircleFit': [0.00000001],
     'displayCollector': activateCollector,
-    }
+}
 
 clusterType = 'fullClusterizer'
 if useSimpleClusterizer:
@@ -107,7 +110,7 @@ if useEDeposit:
 
 # allows steering initial value and numEvents by sript file
 if len(argv) is 1:
-    print ' no arguments given, using standard values'
+    print(' no arguments given, using standard values')
 elif len(argv) is 2:
     seed = int(argv[1])
 else:
@@ -121,26 +124,25 @@ gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 # geometry.set_log_level(LogLevel.INFO) INFO if set to true, complete list of components can be found...
 
 # Show progress of processing
 progress = register_module('Progress')
 
-rootFileName = \
-    '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
+rootFileName = '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
     events=numEvents,
     seed=seed,
     evtType=particleGenType,
     clusterType=clusterType,
     eDep=eDepType,
     phi=phiMax,
-    )
+)
 
-print ''
-print ' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName)
-print ''
+print('')
+print(' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName))
+print('')
 
 setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
@@ -166,7 +168,7 @@ param_fCalc2 = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 filterCalc2.param(param_fCalc2)
 
 # using one export module only
@@ -200,7 +202,7 @@ param_analyzer = {
     'caTCname': 'caTracks',
     'collectorDisplayId': collector_info,
     'collectorFilePath': TFInfoOutputPath,
-    }
+}
 analyzer.param(param_analyzer)
 
 mctrackfinder = register_module('TrackFinderMCTruth')
@@ -214,7 +216,7 @@ param_mctrackfinder = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 rootinput = register_module('RootInput')
@@ -233,11 +235,11 @@ main.add_module(geometry)
 main.add_module(eventCounter)
 
 if generateSecMap:
-  ##folgende Module nur für secMapGen:
+    # folgende Module nur für secMapGen:
     main.add_module(filterCalc2)
     main.add_module(exportXML)
 else:
-  ## folgende Module nur für secMapTest:
+    # folgende Module nur für secMapTest:
     main.add_module(vxdtf)
     main.add_module(mctrackfinder)
     main.add_module(analyzer)
@@ -245,4 +247,4 @@ else:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

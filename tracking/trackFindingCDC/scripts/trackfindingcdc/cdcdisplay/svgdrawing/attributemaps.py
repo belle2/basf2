@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from ROOT import gSystem
@@ -301,8 +301,8 @@ class BackgroundTagColorMap(CDCHitColorMap):
         color = self.color_by_bkgtag.get(backgroundTag, None)
 
         if color is None:
-            print 'Background tag %s not associated with a color.' \
-                % backgroundTag
+            print('Background tag %s not associated with a color.'
+                  % backgroundTag)
             return 'orange'
         else:
             return color
@@ -321,8 +321,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
 
         bkgname_and_color = sorted(color_by_bkgname.items())
 
-        message = 'Background tag color coding is \n%s' % '\n'.join(name
-                                                                    + ' -> ' + color for (name, color) in bkgname_and_color)
+        message = 'Background tag color coding is \n%s' % '\n'.join(name + ' -> ' + color for (name, color) in bkgname_and_color)
         return message
 
 
@@ -479,7 +478,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         if pdgcode in self.color_by_pdgcode:
             color = self.color_by_pdgcode[pdgcode]
         else:
-            print 'Unknown PDG code', pdgcode
+            print('Unknown PDG code', pdgcode)
             color = self.missing_pdg_color
 
         return color
@@ -493,12 +492,11 @@ class MCPDGCodeColorMap(CDCHitColorMap):
 
         pdg_code_by_color = {}
 
-        for (pdgcode, color) in self.color_by_pdgcode.items():
+        for (pdgcode, color) in list(self.color_by_pdgcode.items()):
             pdg_code_by_color.setdefault(color, [])
             pdg_code_by_color[color].append(pdgcode)
 
-        legend_content = '\n'.join(str(color) + '->'
-                                   + str(pdg_code_by_color[color])
+        legend_content = '\n'.join(str(color) + '->' + str(pdg_code_by_color[color])
                                    for color in pdg_code_by_color)
 
         return legend_head + legend_content
@@ -629,7 +627,7 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
         elif fbInfo == -1:
             return 'red'
         else:
-            print 'Segment not orientable to match track'
+            print('Segment not orientable to match track')
             return self.bkgSegmentColor
 
 

@@ -96,7 +96,7 @@ class FitValidationModule(HarvestingModule):
             viktor_pt=viktor_pt,
             mc_pt=mc_pt)
 
-        print return_dict
+        print(return_dict)
         return return_dict
 
     save_tree = refiners.save_tree(folder_name="tree")

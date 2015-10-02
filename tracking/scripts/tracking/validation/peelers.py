@@ -18,7 +18,7 @@ def format_crop_keys(peel_func):
         crops = peel_func(obj, key=key)
         if key and hasattr(crops, 'items'):
             crops_with_formatted_keys = dict()
-            for part_name, value in crops.items():
+            for part_name, value in list(crops.items()):
                 formatted_key = formatter.format(key, part_name=part_name)
                 crops_with_formatted_keys[formatted_key] = value
             return crops_with_formatted_keys

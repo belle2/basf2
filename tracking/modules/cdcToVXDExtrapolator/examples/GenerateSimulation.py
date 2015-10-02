@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 "Generate some example events with Kshorts for testing the CDCToVXDExtrapolator"
@@ -37,4 +37,4 @@ progress = register_module('Progress')
 analysis_main.add_module(progress)
 
 process(analysis_main)
-print statistics
+print(statistics)

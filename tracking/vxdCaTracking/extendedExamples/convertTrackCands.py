@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # example file invoking and testing the ConverterModules that convert genfit::TrackCands to SpacePointTrackCands and vice versa
@@ -16,16 +16,16 @@ MyDebugLevel = 500
 initialValue = 0  # 0 for random events
 
 if len(argv) is 1:
-    print 'no arguments given, using standard values'
+    print('no arguments given, using standard values')
 if len(argv) is 2:
     initialValue = int(argv[1])
-    print 'using input value ' + str(initialValue) + ' as initialValue'
+    print('using input value ' + str(initialValue) + ' as initialValue')
 
 # important parameters for simulation
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -126,21 +126,21 @@ param_mctrackfinder = {
     'MinimalNDF': 5,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mcTrackFinder.param(param_mctrackfinder)
 
 # TCConverter, genfit -> SPTC
 trackCandConverter = register_module('GFTC2SPTCConverter')
 trackCandConverter.logging.log_level = MyLogLevel
 trackCandConverter.logging.debug_level = MyDebugLevel
-param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
+param_trackCandConverter = {  # 'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
     'NoSingleClusterSVDSP': 'nosingleSP',
     'SingleClusterSVDSP': 'singleSP',
     'PXDClusterSP': 'pxdOnly',
-    }
+}
 trackCandConverter.param(param_trackCandConverter)
 
 # TCConverter, SPTC -> genfit
@@ -183,4 +183,4 @@ main.add_module(tcConverterTest)
 
 process(main)
 
-print statistics
+print(statistics)

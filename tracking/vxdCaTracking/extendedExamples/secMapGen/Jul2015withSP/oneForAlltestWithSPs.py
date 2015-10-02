@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -99,16 +99,16 @@ posAnalysisRootFileName = 'bla' + 'TH_' + 'allTH_' + '_' + str(int(numEvents / 1
 # (please take care that your entries are of the same format as used in secSetup)
 
 if usePXD:
-    secSetup = [setupFileName+'VXDStd-moreThan400MeV_PXDSVD',
-                setupFileName+'VXDStd-100to400MeV_PXDSVD', setupFileName+'VXDStd-25to100MeV_PXDSVD']
-    secSetup2 = [setupFileName2+'VXDStd-moreThan400MeV_PXDSVD',
-                 setupFileName2+'VXDStd-100to400MeV_PXDSVD', setupFileName2+'VXDStd-25to100MeV_PXDSVD']
+    secSetup = [setupFileName + 'VXDStd-moreThan400MeV_PXDSVD',
+                setupFileName + 'VXDStd-100to400MeV_PXDSVD', setupFileName + 'VXDStd-25to100MeV_PXDSVD']
+    secSetup2 = [setupFileName2 + 'VXDStd-moreThan400MeV_PXDSVD',
+                 setupFileName2 + 'VXDStd-100to400MeV_PXDSVD', setupFileName2 + 'VXDStd-25to100MeV_PXDSVD']
 
 else:
-    secSetup = [setupFileName+'SVDStd-moreThan400MeV_SVD',
-                setupFileName+'SVDStd-100to400MeV_SVD', setupFileName+'SVDStd-25to100MeV_SVD']
-    secSetup2 = [setupFileName2+'SVDStd-moreThan400MeV_SVD',
-                 setupFileName2+'SVDStd-100to400MeV_SVD', setupFileName2+'SVDStd-25to100MeV_SVD']
+    secSetup = [setupFileName + 'SVDStd-moreThan400MeV_SVD',
+                setupFileName + 'SVDStd-100to400MeV_SVD', setupFileName + 'SVDStd-25to100MeV_SVD']
+    secSetup2 = [setupFileName2 + 'SVDStd-moreThan400MeV_SVD',
+                 setupFileName2 + 'SVDStd-100to400MeV_SVD', setupFileName2 + 'SVDStd-25to100MeV_SVD']
 
 # some other settings for the VXDTF
 qiType = 'circleFit'
@@ -116,22 +116,21 @@ filterOverlaps = 'hopfield'
 
 
 if len(argv) is 1:
-    print 'no arguments given, using standard values'
+    print('no arguments given, using standard values')
 elif len(argv) is 2:
     initialValue = int(argv[1])
-    print '1 argument given, new value for seed: ' + str(initialValue)
+    print('1 argument given, new value for seed: ' + str(initialValue))
 elif len(argv) is 3:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
-    print '2 arguments given, new value for seed: ' + str(initialValue) \
-        + ' and for numEvents: ' + str(numEvents)
+    print('2 arguments given, new value for seed: ' + str(initialValue) +
+          ' and for numEvents: ' + str(numEvents))
 elif len(argv) is 4:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
     eventAdd = int(argv[3]) * numEvents
-    print '3 arguments given, new value for seed: ' + str(initialValue) \
-        + ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' \
-        + str(eventAdd)
+    print('3 arguments given, new value for seed: ' + str(initialValue) +
+          ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' + str(eventAdd))
 elif len(argv) is 5:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
@@ -141,9 +140,9 @@ elif len(argv) is 5:
         doExportXML = False
     else:
         doExportXML = True
-    print '4 arguments given, new value for seed: ' + str(initialValue) \
-        + ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' \
-        + str(eventAdd) + ', for doExportXML: ' + str(doExportXML)
+    print('4 arguments given, new value for seed: ' + str(initialValue) +
+          ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' +
+          str(eventAdd) + ', for doExportXML: ' + str(doExportXML))
 
 
 clusterType = 'fullClusterizer'
@@ -187,7 +186,7 @@ param_filterCalcSVDStd = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 param_filterCalcVXDStd = {
     'detectorType': ['SVD', 'PXD'],
@@ -209,7 +208,7 @@ param_filterCalcVXDStd = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 param_filterCalcVXDStdNew = {
     'detectorType': ['SVD', 'PXD'],
@@ -231,7 +230,7 @@ param_filterCalcVXDStdNew = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 param_filterCalcSVDStdNew = {
     'detectorType': ['SVD'],
@@ -253,7 +252,7 @@ param_filterCalcSVDStdNew = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
@@ -280,7 +279,7 @@ param_pGun = {
     'xVertexParams': [-0.1, 0.1],
     'yVertexParams': [-0.1, 0.1],
     'zVertexParams': [-0.5, 0.5],
-    }
+}
 particlegun.param(param_pGun)
 
 particlegun2 = register_module('ParticleGun')
@@ -297,7 +296,7 @@ param_pGun2 = {
     'xVertexParams': [-0.1, 0.1],
     'yVertexParams': [-0.1, 0.1],
     'zVertexParams': [-0.5, 0.5],
-    }
+}
 particlegun2.param(param_pGun2)
 
 evtgeninput = register_module('EvtGenInput')
@@ -308,12 +307,12 @@ gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 progress = register_module('Progress')
 
-print ''
-print ''
+print('')
+print('')
 
 filterCalcSVDStd = register_module('FilterCalculator')
 filterCalcSVDStd.logging.log_level = LogLevel.INFO
@@ -431,7 +430,7 @@ param_mctrackfinder = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 
@@ -452,7 +451,7 @@ param_sp2thConnector = {
     'minWeight': 0,
     'requirePrimary': True,
     'positionAnalysis': False,
-    }
+}
 sp2thConnector.param(param_sp2thConnector)
 
 # TCConverter, genfit -> SPTC
@@ -482,7 +481,7 @@ param_sptcReferee = {
     'kickSpacePoint': True,  # not necessarily essential -> alternatve: check and filter in SecMapTrainerBase
     'checkSameSensor': True,
     'useMCInfo': True,
-    }
+}
 sptcReferee.param(param_sptcReferee)
 
 
@@ -548,7 +547,7 @@ if useEDeposit is False:
         '/process/inactivate              OpWLS',
         '/process/inactivate           Cerenkov',
         '/process/inactivate      Scintillation',
-        ])
+    ])
 # "/process/inactivate        StepLimiter"
 
 
@@ -621,4 +620,4 @@ else:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -29,21 +29,21 @@ argv = sys.argv[1:]
 try:
     (opts, args) = getopt.getopt(argv, 'hbdf:')
 except getopt.GetoptError:
-    print 'test.py -h for help'
+    print('test.py -h for help')
     sys.exit(2)
 for (opt, arg) in opts:
     if opt == '-h':
-        print '<cmd> read the source, Luke...\n'
+        print('<cmd> read the source, Luke...\n')
         sys.exit(2)
     elif opt in '-d':
-        print 'Enable display\n'
+        print('Enable display\n')
         displayOn = True
     elif opt in '-b':
-        print 'Disable bkg\n'
+        print('Disable bkg\n')
         bgMixer = False
     elif opt in '-f':
         input_file = arg
-        print 'Input file is: ' + input_file + '\n'
+        print('Input file is: ' + input_file + '\n')
 
 # Track parameters
 particle_ids = [-11, 11]  # particles
@@ -160,7 +160,7 @@ bgmixer.param('backgroundFiles', [
     bkgDir + 'Touschek_HER_100us.root',
     bkgDir + 'Touschek_LER_100us.root',
     bkgDir + 'twoPhoton_200us.root',
-    ])
+])
 
 # Options
 # bgmixer.param('AnalysisMode', False)
@@ -360,4 +360,4 @@ if displayOn:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

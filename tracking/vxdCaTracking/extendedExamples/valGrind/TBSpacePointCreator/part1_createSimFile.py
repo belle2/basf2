@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -7,7 +7,7 @@ from sys import argv
 from basf2 import *
 from time import time
 
-################# start copy from here
+# start copy from here
 fieldOn = True  # Turn field on or off (changes geometry components and digi/clust params)
 numEvents = 25
 initialValue = 42
@@ -15,7 +15,7 @@ initialValue = 42
 momentum = 6.0  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -24,14 +24,15 @@ beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 useSimpleClusterizer = False  # <----------- hier umschalten zwischen simple(schnell) und full clusterizer(realistisch)!
 useEvtGen = False  # <----------- hier umschalten zwischen evtGen( realistische events) und pGun(einfache events)!
-useEDeposit = True  # <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
-addBG = False  #  <---- adding Background - funzt noch net
+# <----- EnergyDeposit für Hits (zum debuggen) damit False funzt, pxd/data/PXD.xml und svd/data/SVD.xml see neutrons auf true setzen
+useEDeposit = True
+addBG = False  # <---- adding Background - funzt noch net
 usePXD = True
 
 # flags für die pGun
 numTracks = 1
 
-################# end Copy here
+# end Copy here
 
 clusterType = 'fullClusterizer'
 if useSimpleClusterizer:
@@ -43,38 +44,40 @@ eDepType = 'eDepNo'
 if useEDeposit:
     eDepType = 'eDepYes'
 
-print '{events:} events, {numTracks:} tracksEach, Between {minP:} And {maxP:} GeV, Seed {theSeed:}, tMin {minTheta:}, tMax{maxTheta:}, phiMin {minPhi:}, phiMax{maxPhi:} - {genType:}!'.format(
-    events=numEvents,
-    numTracks=numTracks,
-    minP=momentum,
-    maxP=momentum_spread,
-    theSeed=initialValue,
-    minTheta=theta,
-    maxTheta=theta_spread,
-    minPhi=phi,
-    maxPhi=phi_spread,
-    genType=particleGenType,
-    )
+print('{events:} events, {numTracks:} tracksEach, Between {minP:} And {maxP:} GeV, Seed {theSeed:}, tMin {minTheta:}, '
+      'tMax{maxTheta:}, phiMin {minPhi:}, phiMax{maxPhi:} - {genType:}!'.format(
+          events=numEvents,
+          numTracks=numTracks,
+          minP=momentum,
+          maxP=momentum_spread,
+          theSeed=initialValue,
+          minTheta=theta,
+          maxTheta=theta_spread,
+          minPhi=phi,
+          maxPhi=phi_spread,
+          genType=particleGenType))
 
-simOutputFileName = \
-    '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
+simOutputFileName = '{events:}simulatedEventsAndSeed{seed:}with{evtType:}Using{clusterType:}-{eDep:}May2014phi{phi:}.root'.format(
     events=numEvents,
     seed=initialValue,
     evtType=particleGenType,
     clusterType=clusterType,
     eDep=eDepType,
     phi=phi,
-    )
+)
 
-print ''
-print ' entering particleSim and simulate using {clusterType:}. {eDep:} writing in file: {ofileName:}'.format(clusterType=clusterType,
-        eDep=eDepType, ofileName=simOutputFileName)
-print ''
+print('')
+print(
+    ' entering particleSim and simulate using {clusterType:}. {eDep:} writing in file: {ofileName:}'.format(
+        clusterType=clusterType,
+        eDep=eDepType,
+        ofileName=simOutputFileName))
+print('')
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
 
-#### register die restlichen modules (ab hier kommt nur noch Zeugs, wo Umstellen nur auf eigene Gefahr gilt)
+# register die restlichen modules (ab hier kommt nur noch Zeugs, wo Umstellen nur auf eigene Gefahr gilt)
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
@@ -84,7 +87,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 # Mix some background to simulation data
 # bgmixer = register_module('MixBkg')
-##bgmixer.param('BackgroundFiles', ['SVDROF*.root'])
+# bgmixer.param('BackgroundFiles', ['SVDROF*.root'])
 # bgmixer.param('BackgroundFiles', ['SVDROF_RBB_LER_1ms_0x.root', 'SVDROF_RBB_HER_1ms_0x.root'])
 # bgmixer.param('AnalysisMode', False)
 # bgmixer.set_log_level(LogLevel.INFO)
@@ -141,11 +144,11 @@ geometry = register_module('Geometry')
 if fieldOn:
     geometry.param('components', ['MagneticField', 'TB'])
     # secSetup = \
-        # ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
+    # ['TB3GeVFullMagnetNoAlignedSource2014May22SVD-moreThan1500MeV_SVD']
     secSetup = ['testBeamMini6GeVJune08MagnetOnSVD-moreThan1500MeV_SVD']
     qiType = 'circleFit'  # circleFit
 else:
-  # To turn off magnetic field:
+    # To turn off magnetic field:
     geometry.param('components', ['TB'])
     # secSetup = ['TB4GeVNoMagnetNoAlignedSource2014May21SVD-moreThan1500MeV_SVD']
     secSetup = ['testBeamMini6GeVJune08MagnetOffSVD-moreThan1500MeV_SVD']
@@ -234,7 +237,7 @@ if useEDeposit is False:
         '/process/inactivate              OpWLS',
         '/process/inactivate           Cerenkov',
         '/process/inactivate      Scintillation',
-        ])
+    ])
 # "/process/inactivate        StepLimiter"
 
 output = register_module('RootOutput')
@@ -247,10 +250,10 @@ eventCounter.param('stepSize', 1)
 
 progress = register_module('Progress')
 
-print ''
-print ' entering particleGen using {genType:}. writing in file: {fileName:}'.format(genType=particleGenType,
-        fileName=simOutputFileName)
-print ''
+print('')
+print(' entering particleGen using {genType:}. writing in file: {fileName:}'.format(genType=particleGenType,
+                                                                                    fileName=simOutputFileName))
+print('')
 
 # print(time.time())
 
@@ -264,17 +267,17 @@ main.add_module(gearbox)
 main.add_module(geometry)
 
 if useEvtGen:
-  ##folgende Module nur für evtGen:
+    # folgende Module nur für evtGen:
     main.add_module(evtgeninput)
 else:
-  ## folgende Module nur für pGun:
+    # folgende Module nur für pGun:
     main.add_module(particlegun)
 if addBG:
     main.add_module(bgmixer)
 main.add_module(g4sim)
 
 if useSimpleClusterizer:
-    print ''
+    print('')
     main.add_module(simpleClusterizer)
 else:
     main.add_module(pxdDigitizer)
@@ -286,8 +289,8 @@ main.add_module(eventCounter)
 main.add_module(output)
 
 # Process events
-print main
+print(main)
 process(main)
 
 # print(time.time())
-print statistics
+print(statistics)

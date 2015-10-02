@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import collections
@@ -32,7 +32,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
 
         return '\n'.join('%s : %s' % (key, value)
                          for (key, value) in
-                         self.figures_by_name.items())
+                         list(self.figures_by_name.items()))
 
     def write(self, tdirectory=None):
         """Writes the figures of merit as a TNtuple.
@@ -55,7 +55,7 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
         description = self.description
         check = self.check
 
-        figure_names = [root_save_name(key) for key in self.figures_by_name.keys()]
+        figure_names = [root_save_name(key) for key in list(self.figures_by_name.keys())]
         values = list(self.figures_by_name.values())
 
         with root_cd(tdirectory) as tdirectory:
@@ -139,7 +139,7 @@ class ValidationManyFiguresOfMerit(ValidationFiguresOfMerit):
             Defaults to the current directory.
         """
         name = self.name
-        figure_names = [root_save_name(key) for key in self.figures_by_name.keys()]
+        figure_names = [root_save_name(key) for key in list(self.figures_by_name.keys())]
         values = list(self.figures_by_name.values())
 
         leaf_specification = ':'.join(figure_names)

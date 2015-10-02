@@ -1,7 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# !/usr/bin/env python
 
 #################################################################
 #                                                               #
@@ -27,7 +25,6 @@
 </header>
 """
 
-from __future__ import division
 
 import ROOT
 
@@ -54,7 +51,7 @@ CONTACT_PERSON = {'Name': 'Thomas Hauth',
 def main():
     """Function which is executed"""
 
-    print 'Tracking validation plots.'
+    print('Tracking validation plots.')
 
     option_parser = OptionParser()
     option_parser.add_option('-i', '--input-file', dest='input_file',
@@ -78,10 +75,10 @@ def main():
     try:
         number_entries = data_tree.GetEntries()
     except AttributeError:
-        print 'Could not load tree with name %s.' % tree_name
+        print('Could not load tree with name %s.' % tree_name)
 
     if number_entries == 0:
-        print 'Data tree \'%s\'is empty or does not exist. Exit.' % tree_name
+        print('Data tree \'%s\'is empty or does not exist. Exit.' % tree_name)
         sys.exit(0)
 
     # output root file
@@ -213,14 +210,14 @@ def draw_pvalue(data_tree):
     hist_pvalue.SetMinimum(0)
     # hist_pvalue.SetMaximum(number_entries / 50.)
 
-    for entry in xrange(number_entries):
+    for entry in range(number_entries):
         data_tree.GetEntry(entry)
 
         try:
             pvalue = data_tree.GetLeaf('pValue').GetValue()
         except ReferenceError:
-            print 'The variable "pValue" doesn\'t exist in the tree "%s".\nLeave this function without plotting the variable.' \
-                % data_tree.GetName()
+            print('The variable "pValue" doesn\'t exist in the tree "%s".\nLeave this function without plotting the variable.'
+                  % data_tree.GetName())
             return
 
         if pvalue is -999:
@@ -279,7 +276,7 @@ def calculate_efficiency_in_pt(data_tree):
                                                     CONTACT_PERSON['Email']))
 
     # loop over bins and calculate efficiency and error of efficiency
-    for ibin in xrange(1, number_bins + 1):
+    for ibin in range(1, number_bins + 1):
         number_generated = hist_pt_gen.GetBinContent(ibin)
         efficiency = 0
         error = 0
@@ -287,9 +284,7 @@ def calculate_efficiency_in_pt(data_tree):
         if number_generated > 0:
             number_reconstructed = hist_pt_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
-            error = math.sqrt(number_reconstructed * (number_generated
-                                                      - number_reconstructed) / pow(number_generated,
-                                                                                    3))
+            error = math.sqrt(number_reconstructed * (number_generated - number_reconstructed) / pow(number_generated, 3))
             # set according bin to the efficiency value and add errorbar
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
@@ -348,9 +343,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
         if number_generated > 0:
             number_reconstructed = hist_cos_rec.GetBinContent(ibin)
             efficiency = number_reconstructed / number_generated
-            error = math.sqrt(number_reconstructed * (number_generated
-                                                      - number_reconstructed) / pow(number_generated,
-                                                                                    3))
+            error = math.sqrt(number_reconstructed * (number_generated - number_reconstructed) / pow(number_generated, 3))
 
         efficiency_hist.SetBinContent(ibin, efficiency)
         efficiency_hist.SetBinError(ibin, error)
@@ -378,7 +371,7 @@ def create_momentum_resolution_plot(data_tree):
     fit_pt_res_values = []
     fit_pt_res_errors = []
 
-    for (pt_value, sigma_pt_value) in sigma_pt_values.iteritems():
+    for (pt_value, sigma_pt_value) in sigma_pt_values.items():
         ibin = hist_resolution.FindBin(pt_value)
         bin_center = hist_resolution.GetBinCenter(ibin)
 
@@ -460,7 +453,7 @@ def calculate_momentum_resolution2(data_tree):
     for key in PT_VALUES:
         delta_pt_dict[key] = []
 
-    for entry_index in xrange(data_tree.GetEntries()):
+    for entry_index in range(data_tree.GetEntries()):
         # load entry
         data_tree.GetEntry(entry_index)
 
@@ -474,17 +467,17 @@ def calculate_momentum_resolution2(data_tree):
                 try:
                     delta_pt_dict[test_object[1]].append(pt - pt_gen)
                 except KeyError:
-                    print 'pt = %0.2f is not generated and not used as key. Abort!' \
-                        % test_object[1]
+                    print('pt = %0.2f is not generated and not used as key. Abort!'
+                          % test_object[1])
                     sys.exit(1)
     pt_resolutions = {}
 
-    print '********************************'
-    print 'Momentum resolution:'
+    print('********************************')
+    print('Momentum resolution:')
     for key in sorted(delta_pt_dict):
         (rms90, rms_error) = get_scaled_rms_90(delta_pt_dict[key])
         pt_resolutions[key] = [rms90, rms_error]
-        print 'pt = %0.2f: sigma/pt = %0.4f' % (key, rms90 / key)
+        print('pt = %0.2f: sigma/pt = %0.4f' % (key, rms90 / key))
 
     return pt_resolutions
 
@@ -510,7 +503,7 @@ def fit_resolution(
     try:
         import scipy.optimize
     except ImportError:
-        print 'Module scipy.optimize is not installed. Fit cannot be done.'
+        print('Module scipy.optimize is not installed. Fit cannot be done.')
         return []
 
     # weights = None
@@ -529,7 +522,7 @@ def fit_resolution(
                                  y_value_list, [0.002, 0.003],
                                  sigma=y_value_errors)
 
-    print par_opt, par_cov
+    print(par_opt, par_cov)
 
     return par_opt
 
@@ -541,8 +534,8 @@ def draw_impact_parameter(data_tree):
     @param data_tree ROOT tree with the input data
     """
 
-    print '********************************'
-    print 'Impact parameter:'
+    print('********************************')
+    print('Impact parameter:')
 
     impact_param_d = {}
     impact_param_z = {}
@@ -553,10 +546,10 @@ def draw_impact_parameter(data_tree):
     try:
         number_of_entries = data_tree.GetEntries()
     except AttributeError:
-        print 'ERROR: data_tree in function "draw_impact_parameter" is no TTree.'
+        print('ERROR: data_tree in function "draw_impact_parameter" is no TTree.')
         sys.exit(2)
 
-    for index_entry in xrange(number_of_entries):
+    for index_entry in range(number_of_entries):
         data_tree.GetEntry(index_entry)
 
         pt_gen = data_tree.GetLeaf('pt_gen').GetValue()
@@ -589,8 +582,8 @@ def draw_impact_parameter(data_tree):
         d0_resolutions[key] = [d0_resolution, d0_error]
         (z_resolution, z_error) = get_scaled_rms_90(impact_param_z[key])
         z_resolutions[key] = [z_resolution, z_error]
-        print 'pt = %0.2f: sigma_d0 = %0.4f, sigma_z = %0.4f' % (key,
-                                                                 d0_resolution, z_resolution)
+        print('pt = %0.2f: sigma_d0 = %0.4f, sigma_z = %0.4f' % (key,
+                                                                 d0_resolution, z_resolution))
 
     number_bins = 62
     lower_edge = -0.025
@@ -636,9 +629,9 @@ def scale_histogram(hist):
         if hist.GetEntries() > 0:
             hist.Scale(1 / hist.GetEntries())
         else:
-            print 'Cannot scale. No entries in histogram ' + hist.GetName()
+            print('Cannot scale. No entries in histogram ' + hist.GetName())
     else:
-        print 'Not a TH1F. Not able to scale.'
+        print('Not a TH1F. Not able to scale.')
 
 
 def d0_sign(vector_d, momentum):
@@ -649,7 +642,7 @@ def d0_sign(vector_d, momentum):
     """
 
     if len(vector_d) != 2 or len(momentum) != 2:
-        print 'Need x and y values of d and p_d.'
+        print('Need x and y values of d and p_d.')
         sys.exit(1)
 
     phi_momentum = np.arctan2(momentum[1], momentum[0])
@@ -694,7 +687,7 @@ def draw_residua(
                                     % (variable_name, pt_value), bins, ledge,
                                     uedge)
 
-    for index in xrange(number_entries):
+    for index in range(number_entries):
         data_tree.GetEntry(index)
 
         variable_reconstructed = data_tree.GetLeaf(variable_name).GetValue()
@@ -704,13 +697,11 @@ def draw_residua(
             pt_gen = round(data_tree.GetLeaf('pt_gen').GetValue(), 2)
             if pt_gen in used_pts:
                 if normalize:
-                    histograms[pt_gen].Fill((variable_reconstructed
-                                             - variable_generated) / variable_generated)
+                    histograms[pt_gen].Fill((variable_reconstructed - variable_generated) / variable_generated)
                 else:
-                    histograms[pt_gen].Fill(variable_reconstructed
-                                            - variable_generated)
+                    histograms[pt_gen].Fill(variable_reconstructed - variable_generated)
 
-    for (pt, hist) in histograms.iteritems():
+    for (pt, hist) in histograms.items():
         scale_histogram(hist)
         if normalize:
             hist.SetXTitle('(%s - %s) / %s' % (variable_name,

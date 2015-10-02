@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
@@ -364,14 +364,14 @@ class ValidationPlot(object):
         if x_bin_labels:
             for histogram in self.histograms:
                 x_taxis = histogram.GetXaxis()
-                x_bin_edges = array.array("d", range(len(x_bin_labels) + 1))
+                x_bin_edges = array.array("d", list(range(len(x_bin_labels) + 1)))
                 x_taxis.Set(n_x_bins, x_bin_edges)
 
         # Adjust the discrete bins after the filling to be equidistant
         if y_bin_labels:
             for histogram in self.histogram:
                 x_taxis = histogram.GetXaxis()
-                y_bin_edges = array.array("d", range(len(y_bin_labels) + 1))
+                y_bin_edges = array.array("d", list(range(len(y_bin_labels) + 1)))
                 y_taxis.Set(n_y_bins, y_bin_edges)
 
         return self
@@ -714,7 +714,7 @@ class ValidationPlot(object):
         if bin_labels:
             for histogram in self.histograms:
                 x_taxis = histogram.GetXaxis()
-                bin_edges = array.array("d", range(len(bin_labels) + 1))
+                bin_edges = array.array("d", list(range(len(bin_labels) + 1)))
                 x_taxis.Set(n_bins, bin_edges)
 
     def create(self,
@@ -787,8 +787,8 @@ class ValidationPlot(object):
         x_taxis = tprofile.GetXaxis()
         n_bins = x_taxis.GetNbins()
 
-        bin_ids_with_underflow = range(n_bins + 1)
-        bin_ids_without_underflow = range(1, n_bins + 1)
+        bin_ids_with_underflow = list(range(n_bins + 1))
+        bin_ids_without_underflow = list(range(1, n_bins + 1))
 
         bin_centers = np.array([x_taxis.GetBinCenter(i_bin) for i_bin in bin_ids_without_underflow])
         bin_widths = np.array([x_taxis.GetBinWidth(i_bin) for i_bin in bin_ids_without_underflow])
@@ -842,7 +842,7 @@ class ValidationPlot(object):
                             'cov',
                             tgrapherrors.GetCovariance())
 
-        print " Corr ", tgrapherrors.GetCorrelationFactor()
+        print(" Corr ", tgrapherrors.GetCorrelationFactor())
 
         cls.add_stats_entry(tgrapherrors,
                             'corr',
@@ -1163,7 +1163,7 @@ class ValidationPlot(object):
             cumulated_std = 0.0
 
             # Always include the overflow bins.
-            i_bins = range(0, n_bins + 2)
+            i_bins = list(range(0, n_bins + 2))
             if not cumulate_forward:
                 i_bins = reversed(i_bins)
 
@@ -1205,7 +1205,7 @@ class ValidationPlot(object):
             n_bins = histogram.GetNbinsX()
             cumulated_content = 0.0
 
-            i_bins = range(0, n_bins + 2)
+            i_bins = list(range(0, n_bins + 2))
             if not cumulate_forward:
                 i_bins = reversed(i_bins)
 
@@ -1485,8 +1485,7 @@ class ValidationPlot(object):
             finite_xs = xs
 
         # Prepare for the estimation of outliers
-        if outlier_z_score is not None and (lower_bound is None
-                                            or upper_bound is None):
+        if outlier_z_score is not None and (lower_bound is None or upper_bound is None):
 
             x_mean, x_std = self.get_robust_mean_and_std(finite_xs)
 
@@ -1838,7 +1837,7 @@ def test():
     tfile = ROOT.TFile('test.root')
     tBrowser = ROOT.TBrowser()
     tBrowser.BrowseObject(tfile)
-    raw_input()
+    input()
     tfile.Close()
 
 

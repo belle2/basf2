@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
@@ -129,8 +129,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPRFake = set([cdcHitID for trackCand in trackCands
                                   for cdcHitID in
                                   trackCand.getHitIDs(Belle2.Const.CDC)
-                                  if self.trackMatchLookUp.isGhostPRTrackCand(trackCand)
-                                  or self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
+                                  if self.trackMatchLookUp.isGhostPRTrackCand(trackCand) or
+                                  self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
 
         totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
 
@@ -168,8 +168,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 maximum_intersection = \
                     max(list_of_numbers_of_hits_for_connected_tracks)
                 self.pr_number_of_matched_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks))
-                self.number_of_wrong_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks)
-                                                 - maximum_intersection)
+                self.number_of_wrong_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks) -
+                                                 maximum_intersection)
 
             self.number_of_connected_tracks.append(len(list_of_connected_mc_tracks))
 
@@ -306,7 +306,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             hit_figures_of_merit['is_hit_found'] = np.sum(self.is_hit_found)
             hit_figures_of_merit['is_hit_matched'] = np.sum(self.is_hit_matched)
 
-            print hit_figures_of_merit
+            print(hit_figures_of_merit)
             hit_figures_of_merit.write()
 
         output_tfile.Close()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #############################################################################
@@ -60,7 +60,7 @@ param_track_finder_mc_truth = {
     'UseClusters': 1,
     'WhichParticles': ['PXD', 'SVD'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
 # VXD TF (SVD) before PXD Data Reduction (pre ROI)
@@ -87,7 +87,7 @@ param_pxdDataRed = {
     'numSigmaTotV': 10,
     'maxWidthU': 0.5,
     'maxWidthV': 0.5,
-    }
+}
 pxdDataRed.param(param_pxdDataRed)
 
 # Filtering of PXDDigits
@@ -147,4 +147,4 @@ main.add_module(rootOutput)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

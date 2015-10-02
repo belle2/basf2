@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will simulate several testbeam events, reconstruct
@@ -9,7 +9,8 @@ from subprocess import call
 from time import time
 from sys import argv
 
-secSetup = 'testBeamSTD2'  # ,'evtgenHIGH' 'evtgenSTD', 'evtgenLOW'] # when using the same secSetup several times, use this for setting Value
+# ,'evtgenHIGH' 'evtgenSTD', 'evtgenLOW'] # when using the same secSetup several times, use this for setting Value
+secSetup = 'testBeamSTD2'
 qiType = 'circleFit'
 filterOverlaps = 'hopfield'
 detectType = 'VXD'
@@ -17,7 +18,7 @@ seed = 1
 numEvents = 1
 
 if len(argv) is 1:
-    print ' no arguments given, using standard values'
+    print(' no arguments given, using standard values')
 elif len(argv) is 2:
     seed = int(argv[1])
 elif len(argv) is 3:
@@ -59,20 +60,19 @@ main.add_module(exportXML)
 # Process events
 process(main)
 
-print statistics
+print(statistics)
 
-print 'Event Statistics for exportXML:'
-print statistics([exportXML])
+print('Event Statistics for exportXML:')
+print(statistics([exportXML]))
 
-print 'Memory statistics'
+print('Memory statistics')
 for stats in statistics.modules:
-    print 'Module %s:' % stats.name
-    print ' -> initialize(): %10d KB' % stats.memory(statistics.INIT)
-    print ' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN)
-    print ' -> event():      %10d KB' % stats.memory()
-    print ' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN)
-    print ' -> terminate():  %10d KB' % stats.memory(statistics.TERM)
+    print('Module %s:' % stats.name)
+    print(' -> initialize(): %10d KB' % stats.memory(statistics.INIT))
+    print(' -> beginRun():   %10d KB' % stats.memory(statistics.BEGIN_RUN))
+    print(' -> event():      %10d KB' % stats.memory())
+    print(' -> endRun():     %10d KB' % stats.memory(statistics.END_RUN))
+    print(' -> terminate():  %10d KB' % stats.memory(statistics.TERM))
 
-print 'Event Statistics detailed:'
-print statistics(statistics.TOTAL)
-
+print('Event Statistics detailed:')
+print(statistics(statistics.TOTAL))

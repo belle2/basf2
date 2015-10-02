@@ -160,7 +160,7 @@ def test():
     ROOT.gStyle.SetPalette(root_palette["rainbow"])
 
     hex_histogram.Draw("colz")
-    raw_input()
+    input()
 
 if __name__ == "__main__":
     test()

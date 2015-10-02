@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -64,4 +64,4 @@ main.add_module(exportXML)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

@@ -329,7 +329,7 @@ class FitHarvester(QueueHarvester):
         number_of_momentum_measurements_in_total = 0
         number_of_momentum_measurements_with_smaller_weight = 0
 
-        for track_point_ID in xrange(related_reco_track.getNumPointsWithMeasurement()):
+        for track_point_ID in range(related_reco_track.getNumPointsWithMeasurement()):
             track_point = related_reco_track.getPointWithMeasurement(track_point_ID)
 
             is_momentum_measurement = track_point.getRawMeasurement().__class__.__name__ == "genfit::PlanarMomentumMeasurement"
@@ -341,7 +341,7 @@ class FitHarvester(QueueHarvester):
                 fitter_info = track_point.getFitterInfo(cardinal_rep)
                 num_measurements = fitter_info.getNumMeasurements()
 
-                for measurement_id in xrange(num_measurements):
+                for measurement_id in range(num_measurements):
                     number_of_measurements_in_total += 1
                     weight = fitter_info.getMeasurementOnPlane(measurement_id).getWeight()
                     if weight != 1:

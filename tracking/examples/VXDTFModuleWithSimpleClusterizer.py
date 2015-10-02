@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -34,8 +34,8 @@ if usePXD:
 # with SVD, then comment the VXD-version (of vice versa if you want to
 # have the svd version)
 
-print 'running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
-                                                                        theSeed=initialValue)
+print('running {events:} events, Seed {theSeed:} - evtGen No BG'.format(events=numEvents,
+                                                                        theSeed=initialValue))
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -138,5 +138,5 @@ main.add_module(analyzer)
 # Process events
 process(main)
 
-print 'Event Statistics :'
-print statistics
+print('Event Statistics :')
+print(statistics)

@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
 
 from ROOT import gSystem
+import collections
 gSystem.Load('libtracking_trackFindingCDC')
 
 from ROOT import Belle2  # make Belle2 namespace available
@@ -49,7 +50,7 @@ class CDCSVGPlotter:
     def styling_to_attribute_map(self, **styling):
         attribute_map = Belle2.TrackFindingCDC.PrimitivePlotter.AttributeMap()
 
-        for key, value in styling.items():
+        for key, value in list(styling.items()):
             attribute_map[str(key)] = str(value)
 
         return attribute_map
@@ -73,8 +74,8 @@ class CDCSVGPlotter:
     def unpack_attributes(styling, i_obj=0, obj=None):
         """Mapping function to unpack the attributes from the attribute maps. Mechanism and interface inspired by d3.js"""
         result = {}
-        for (key, value) in styling.items():
-            if callable(value):
+        for (key, value) in list(styling.items()):
+            if isinstance(value, collections.Callable):
                 result[key] = value(i_obj, obj)
             elif isinstance(value, str):
                 result[key] = value
@@ -92,8 +93,8 @@ class CDCSVGPlotter:
             draw(obj, **obj_styling)
 
     def draw_storevector(self, storeobj_name, **styling):
-        print 'Drawing vector from DataStore:', storeobj_name,
-        print
+        print('Drawing vector from DataStore:', storeobj_name, end=' ')
+        print()
         pystoreobj = Belle2.PyStoreObj(storeobj_name)
 
         if pystoreobj:
@@ -101,39 +102,39 @@ class CDCSVGPlotter:
             wrapped_vector = pystoreobj.obj()
             vector = wrapped_vector.get()
 
-            print 'with', vector.size(), 'entries'
-            print 'Attributes are'
-            for (key, value) in styling.items():
-                print str(key), ':', str(value)
+            print('with', vector.size(), 'entries')
+            print('Attributes are')
+            for (key, value) in list(styling.items()):
+                print(str(key), ':', str(value))
 
             self.draw_iterable(vector, **styling)
 
         else:
-            print "### not present in the DataStore"
-            print "Current content of the DataStore"
-            print "StoreArrays:"
+            print("### not present in the DataStore")
+            print("Current content of the DataStore")
+            print("StoreArrays:")
             Belle2.PyStoreArray.printList()
-            print "StoreObjPtr:"
+            print("StoreObjPtr:")
             Belle2.PyStoreObj.printList()
 
     def draw_storearray(self, storearray_name, **styling):
-        print 'Drawing StoreArray:', storearray_name,
-        print
+        print('Drawing StoreArray:', storearray_name, end=' ')
+        print()
         storearray = Belle2.PyStoreArray(storearray_name)
         if storearray:
-            print 'with', storearray.getEntries(), 'entries'
-            print 'Attributes are'
-            for (key, value) in styling.items():
-                print str(key), ':', str(value)
+            print('with', storearray.getEntries(), 'entries')
+            print('Attributes are')
+            for (key, value) in list(styling.items()):
+                print(str(key), ':', str(value))
 
             self.draw_iterable(storearray, **styling)
 
         else:
-            print "### not present in the DataStore"
-            print "Current content of the DataStore"
-            print "StoreArrays:"
+            print("### not present in the DataStore")
+            print("Current content of the DataStore")
+            print("StoreArrays:")
             Belle2.PyStoreArray.printList()
-            print "StoreObjPtr:"
+            print("StoreObjPtr:")
             Belle2.PyStoreObj.printList()
 
     def draw(self, obj, **styling):
@@ -153,10 +154,8 @@ class CDCSVGPlotter:
         width = boundingBox.getWidth()
 
         totalPoints = 1120 * 1120
-        svgHeight = round(math.sqrt(totalPoints * float(height)
-                                    / width))
-        svgWidth = round(math.sqrt(totalPoints * float(width)
-                                   / height))
+        svgHeight = round(math.sqrt(totalPoints * float(height) / width))
+        svgWidth = round(math.sqrt(totalPoints * float(width) / height))
 
         eventdata_plotter.setCanvasHeight(svgHeight)
         eventdata_plotter.setCanvasWidth(svgWidth)
@@ -180,10 +179,8 @@ class CDCSVGPlotter:
         width = boundingBox.getWidth()
 
         totalPoints = 1120 * 1120
-        svgHeight = round(math.sqrt(totalPoints * float(height)
-                                    / width))
-        svgWidth = round(math.sqrt(totalPoints * float(width)
-                                   / height))
+        svgHeight = round(math.sqrt(totalPoints * float(height) / width))
+        svgWidth = round(math.sqrt(totalPoints * float(width) / height))
 
         eventdata_plotter.setCanvasHeight(svgHeight)
         eventdata_plotter.setCanvasWidth(svgWidth)

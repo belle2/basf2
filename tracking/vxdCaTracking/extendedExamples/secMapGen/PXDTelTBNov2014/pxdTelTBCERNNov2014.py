@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 events = 1000  # Number of events to simulate
@@ -6,7 +6,7 @@ numTracks = 1
 momentum = 120  # GeV/c
 momentum_spread = 0.05  # %
 theta = 90.0  # degrees
-theta_spread = 0.005  ## degrees (sigma of gaussian)
+theta_spread = 0.005  # degrees (sigma of gaussian)
 phi = 180.0  # degrees
 phi_spread = 0.005  # degrees (sigma of gaussian)
 gun_x_position = 100.  # cm ... 100cm ... outside magnet + plastic shielding + Al scatterer (air equiv.)
@@ -92,7 +92,7 @@ param_fCalc = {  # currently accepted: PXD, SVD, TEL
     'smearHits': 1,
     'uniSigma': 0.3,
     'noCurler': 1,
-    }
+}
 filterCalc.param(param_fCalc)
 main.add_module(filterCalc)
 
@@ -130,4 +130,4 @@ main.add_module(geosaver)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

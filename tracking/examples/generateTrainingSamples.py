@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -272,4 +272,4 @@ main.add_module(samplesgenerator)
 main.add_module(progress)
 process(main)
 
-print statistics
+print(statistics)

@@ -1,11 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# example file showing how to use the different modules to convert genfit::TrackCands from the TrackFinderMCTruth to SpacePointTrackCands
-# also shown in this example file: how to use some other modules (e.g. the SPTCReferee) to get 'clean' (i.e. fullfill some defined criteria) SpacePointTrackCands
-# NOTE: you might want to twist some of these pre-defined parameters to fit your purposes!
-# NOTE: there is now the possibility of reading in previously simulated events
-# to override the root filename (e.g. when only reading but not writing is enabled use the -i option of basf2)
+"""
+Example file showing how to use the different modules to convert
+genfit::TrackCands from the TrackFinderMCTruth to SpacePointTrackCands.
+
+Also shown in this example file: how to use some other modules (e.g. the
+SPTCReferee) to get 'clean' (i.e. fullfill some defined criteria)
+SpacePointTrackCands
+
+NOTE: you might want to twist some of these pre-defined parameters to fit your purposes!
+NOTE: there is now the possibility of reading in previously simulated events to
+override the root filename (e.g. when only reading but not writing is enabled
+use the -i option of basf2)
+"""
 
 import os
 from basf2 import *
@@ -42,10 +50,10 @@ MyDebugLevel = 1  # some of the modules print some additional information in ter
 # possibility of using another initial Value from the command line
 initialValue = 0  # 0 for random events
 if len(argv) is 1:
-    print 'no arguments given, using standard values'
+    print('no arguments given, using standard values')
 if len(argv) is 2:
     initialValue = int(argv[1])
-    print 'using input value ' + str(initialValue) + ' as initialValue'
+    print('using input value ' + str(initialValue) + ' as initialValue')
 
 # automatically generate root file name from tags above
 firstPart = ''
@@ -56,9 +64,9 @@ if usePGun:
         + str(int(thetaMax)) + '_'
 
 simulationFileName = firstPart + str(int(numEvents / 1000)) + 'k.root'
-print 'saving to/reading from: ' + simulationFileName
+print('saving to/reading from: ' + simulationFileName)
 
-########################################################################################################################################################
+##########################################################################
 # module registration
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -78,7 +86,7 @@ gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',
-               'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
+                              'PXD', 'SVD'])  # 'components', ['BeamPipe', 'MagneticFieldConstant4LimitedRCDC',........
 
 # evtgen
 evtgeninput = register_module('EvtGenInput')
@@ -100,7 +108,7 @@ param_pGun = {  # 13: muons, 211: charged pions
     'xVertexParams': [-.01, .01],
     'yVertexParams': [-.01, .01],
     'zVertexParams': [-0.5, 0.5],
-    }
+}
 particlegun.param(param_pGun)
 
 g4sim = register_module('FullSim')
@@ -117,7 +125,9 @@ svdDigitizer = register_module('SVDDigitizer')
 svdClusterizer = register_module('SVDClusterizer')
 # svdClusterizer.param('Clusters','mySVDClusters')
 
-## output module to have some simulated events available to not have to simulate the events everytime the following modules are invoked (takes less time)
+# output module to have some simulated events available to not have to
+# simulate the events everytime the following modules are invoked (takes
+# less time)
 rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', simulationFileName)
 
@@ -160,10 +170,10 @@ param_mctrackfinder = {
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
     'TrueHitMustExist': True,
-    }
+}
 mcTrackFinder.param(param_mctrackfinder)
 
-##################################################################### Converting and Referee ##############################################
+#####################################################################
 # module to create relations between SpacePoints and TrueHits -> some of the following modules will be utilizing these relations!
 sp2thConnector = register_module('SpacePoint2TrueHitConnector')
 # sp2thConnector.logging.log_level = LogLevel.WARNING
@@ -183,7 +193,7 @@ param_sp2thConnector = {
     'requirePrimary': True,
     'positionAnalysis': False,
     'rootFileName': ['PositionAnalysis_SP2TH', 'RECREATE'],
-    }
+}
 sp2thConnector.param(param_sp2thConnector)
 
 # TCConverter, genfit -> SPTC
@@ -191,7 +201,7 @@ trackCandConverter = register_module('GFTC2SPTCConverter')
 # trackCandConverter.logging.log_level = LogLevel.INFO
 trackCandConverter.logging.log_level = MyLogLevel
 trackCandConverter.logging.debug_level = MyDebugLevel
-param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
+param_trackCandConverter = {  # 'PXDClusters': 'myPXDClusters',
                               #    'SVDClusters': 'mySVDClusters',
     'NoSingleClusterSVDSP': 'nosingleSP_relTH',
     'SingleClusterSVDSP': 'singleSP_relTH',
@@ -203,7 +213,7 @@ param_trackCandConverter = {  #    'PXDClusters': 'myPXDClusters',
     'genfitTCName': 'mcTracks',
     'SpacePointTCName': 'SPTracks',
     'minNDF': int(1),
-    }
+}
 trackCandConverter.param(param_trackCandConverter)
 
 # SpacePointTrackCand referee
@@ -225,7 +235,7 @@ param_sptcReferee = {
     'minDistance': 0.05,
     'checkSameSensor': True,
     'useMCInfo': True,
-    }
+}
 sptcReferee.param(param_sptcReferee)
 
 # back conversion and testing commented out -> not needed at the moment
@@ -234,19 +244,19 @@ sptcReferee.param(param_sptcReferee)
 # btrackCandConverter.logging.log_level = LogLevel.INFO
 # btrackCandConverter.logging.debug_level = 100
 # param_btrackCandConverter = {
-    # 'SpacePointTCName': 'SPTracks',
-    # 'genfitTCName': 'myMCTracks',
+# 'SpacePointTCName': 'SPTracks',
+# 'genfitTCName': 'myMCTracks',
 # }
 # btrackCandConverter.param(param_btrackCandConverter)
 
-## TCConverterTest
+# TCConverterTest
 # tcConverterTest = register_module('TCConvertersTest')
 # tcConverterTest.logging.log_level = LogLevel.INFO
 # tcConverterTest.logging.debug_level = 100
 # param_tcConverterTest = {
-    # 'SpacePointTCName': 'SPTracks',
-    # 'genfitTCNames': ['mcTracks','myMCTracks'],
-    # 'SpacePointArrayNames': 'pxdOnly',
+# 'SpacePointTCName': 'SPTracks',
+# 'genfitTCNames': ['mcTracks','myMCTracks'],
+# 'SpacePointArrayNames': 'pxdOnly',
 # }
 # tcConverterTest.param(param_tcConverterTest)
 
@@ -263,12 +273,12 @@ main.add_module(progress)
 
 if not useRootInput:
     if useEvtGen:
-    ##following modules only for evtGen:
+        # following modules only for evtGen:
         main.add_module(evtgeninput)
         if usePGun:
             main.add_module(particlegun)
     else:
-    ## following modules only for pGun:
+        # following modules only for pGun:
         main.add_module(particlegun)
 
 main.add_module(gearbox)
@@ -299,4 +309,4 @@ main.add_module(sptcReferee)
 
 process(main)
 
-print statistics
+print(statistics)

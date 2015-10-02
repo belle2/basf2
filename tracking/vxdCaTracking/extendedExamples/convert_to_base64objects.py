@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from ROOT import gSystem
@@ -32,12 +32,12 @@ obj = Belle2.Stream.deserializeXML(data)
 base64 = Belle2.Stream.serializeAndEncode(obj)
 escaped = Belle2.Stream.escapeXML(base64)
 
-print (lines[0])[:-1] + '\n' + escaped + '\n' + lines[-1]
+print((lines[0])[:-1] + '\n' + escaped + '\n' + lines[-1])
 
 # for testing equivalence of serialized data
 # obj2 = Belle2.Stream.deserializeEncodedRawData(base64)
 # xml2 = Belle2.Stream.serializeXML(obj2)
 # xml_wrapped = Belle2.Stream.escapeXML(xml2)
 #
-##print lines[0][:-1] + base64 + lines[-1]
+# print lines[0][:-1] + base64 + lines[-1]
 # print lines[0][:-1] + xml_wrapped + lines[-1]

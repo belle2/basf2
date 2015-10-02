@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -51,7 +51,7 @@ secConfigUFine = [
     0.6,
     0.8,
     1.,
-    ]
+]
 secConfigVFine = [
     0.,
     0.2,
@@ -59,7 +59,7 @@ secConfigVFine = [
     0.6,
     0.8,
     1.,
-    ]
+]
 
 # secSetup = ['belle2SimpleCaseSVD-50to500MeV_SVD'] # hier neuen namen fürs xml-file eintragen
 secSetup = ['belle2SimpleCaseTet70t80phi0t90SVD-50to500MeV_SVD']  # hier neuen namen fürs xml-file eintragen
@@ -68,22 +68,21 @@ qiType = 'circleFit'
 filterOverlaps = 'hopfield'
 
 if len(argv) is 1:
-    print 'no arguments given, using standard values'
+    print('no arguments given, using standard values')
 elif len(argv) is 2:
     initialValue = int(argv[1])
-    print '1 argument given, new value for seed: ' + str(initialValue)
+    print('1 argument given, new value for seed: ' + str(initialValue))
 elif len(argv) is 3:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
-    print '2 arguments given, new value for seed: ' + str(initialValue) \
-        + ' and for numEvents: ' + str(numEvents)
+    print('2 arguments given, new value for seed: ' + str(initialValue) +
+          ' and for numEvents: ' + str(numEvents))
 elif len(argv) is 4:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
     eventAdd = int(argv[3]) * numEvents
-    print '3 arguments given, new value for seed: ' + str(initialValue) \
-        + ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' \
-        + str(eventAdd)
+    print('3 arguments given, new value for seed: ' + str(initialValue) +
+          ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' + str(eventAdd))
 elif len(argv) is 5:
     initialValue = int(argv[1])
     numEvents = int(argv[2])
@@ -93,9 +92,9 @@ elif len(argv) is 5:
         doExportXML = False
     else:
         doExportXML = True
-    print '4 arguments given, new value for seed: ' + str(initialValue) \
-        + ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' \
-        + str(eventAdd) + ', for doExportXML: ' + str(doExportXML)
+    print('4 arguments given, new value for seed: ' + str(initialValue) +
+          ', for numEvents: ' + str(numEvents) + ', for eventAdd: ' +
+          str(eventAdd) + ', for doExportXML: ' + str(doExportXML))
 
 clusterType = 'fullClusterizer'
 if useSimpleClusterizer:
@@ -140,7 +139,7 @@ param_filterCalcSVDMini = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 param_filterCalcSVDStd = {
     'detectorType': 1,
     'maxXYvertexDistance': 1.,
@@ -161,7 +160,7 @@ param_filterCalcSVDStd = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 param_filterCalcSVDFine = {
     'detectorType': 1,
     'maxXYvertexDistance': 1.,
@@ -182,7 +181,7 @@ param_filterCalcSVDFine = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 param_filterCalcVXDMini = {
     'detectorType': -1,
@@ -204,7 +203,7 @@ param_filterCalcVXDMini = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 param_filterCalcVXDStd = {
     'detectorType': -1,
     'maxXYvertexDistance': 1.,
@@ -225,7 +224,7 @@ param_filterCalcVXDStd = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 param_filterCalcVXDFine = {
     'detectorType': -1,
     'maxXYvertexDistance': 1.,
@@ -246,7 +245,7 @@ param_filterCalcVXDFine = {
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
@@ -272,7 +271,7 @@ param_pGun = {  # 13: muons, 211: charged pions
     'xVertexParams': [0., 0.],
     'yVertexParams': [0., 0.],
     'zVertexParams': [0., 0.],
-    }
+}
 particlegun.param(param_pGun)
 
 evtgeninput = register_module('EvtGenInput')
@@ -282,15 +281,15 @@ gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 # geometry.set_log_level(LogLevel.INFO) INFO if set to true, complete list of components can be found...
 
 # Show progress of processing
 progress = register_module('Progress')
 
-print ''
-print ''
+print('')
+print('')
 
 filterCalcSVDMini = register_module('FilterCalculator')
 filterCalcSVDMini.logging.log_level = LogLevel.INFO
@@ -389,7 +388,7 @@ param_vxdtf = {  # extended output for filters
     'activateDeltaPt': [True],
     'activateCircleFit': [False],
     'tuneCircleFit': [0.00000001],
-    }
+}
 vxdtf.param(param_vxdtf)
 
 analyzer = register_module('TFAnalizer')
@@ -409,7 +408,7 @@ param_mctrackfinder = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 g4sim = register_module('FullSim')
@@ -474,7 +473,7 @@ if useEDeposit is False:
         '/process/inactivate              OpWLS',
         '/process/inactivate           Cerenkov',
         '/process/inactivate      Scintillation',
-        ])
+    ])
 # "/process/inactivate        StepLimiter"
 
 # Create paths
@@ -488,16 +487,16 @@ main.add_module(geometry)
 main.add_module(eventCounter)
 
 if useEvtGen:
-  ##folgende Module nur für evtGen:
+    # folgende Module nur für evtGen:
     main.add_module(evtgeninput)
 else:
-  ## folgende Module nur für pGun:
+    # folgende Module nur für pGun:
     main.add_module(particlegun)
 
 main.add_module(g4sim)
 
 if generateSecMap:
-  ##folgende Module nur für secMapGen:
+    # folgende Module nur für secMapGen:
     main.add_module(filterCalcSVDMini)
     main.add_module(filterCalcSVDStd)
     # main.add_module(filterCalcSVDFine)
@@ -507,9 +506,9 @@ if generateSecMap:
     if doExportXML:
         main.add_module(exportXML)
 else:
-  ## folgende Module nur für secMapTest:
+    # folgende Module nur für secMapTest:
     if useSimpleClusterizer:
-        print ''
+        print('')
         main.add_module(simpleClusterizer)
     else:
         main.add_module(pxdDigitizer)
@@ -523,4 +522,4 @@ else:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

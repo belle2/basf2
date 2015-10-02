@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from tracking.validation.plot import ValidationPlot, compose_axis_label
@@ -101,7 +101,7 @@ class ClassificationAnalysis(object):
             cut_value = cut_classifier.cut_value
 
             if not isinstance(self.cut, numbers.Number):
-                print formatter.format(plot_name, subplot_name="cut_classifier"), "summary"
+                print(formatter.format(plot_name, subplot_name="cut_classifier"), "summary")
                 cut_classifier.describe(estimates, truths)
 
         else:
@@ -275,14 +275,14 @@ class ClassificationAnalysis(object):
     def contact(self, contact):
         self._contact = contact
 
-        for plot in self.plots.values():
+        for plot in list(self.plots.values()):
             plot.contact = contact
 
         if self.fom:
             self.fom.contact = contact
 
     def write(self, tdirectory=None):
-        for plot in self.plots.values():
+        for plot in list(self.plots.values()):
             plot.write(tdirectory)
 
         if self.fom:
@@ -328,9 +328,9 @@ class CutClassifier(object):
 
     def describe(self, estimates, truths):
         if self.cut_direction_ < 0:
-            print "Cut accepts >= ", self.cut_value_, 'with'
+            print("Cut accepts >= ", self.cut_value_, 'with')
         else:
-            print "Cut accepts <= ", self.cut_value_, 'with'
+            print("Cut accepts <= ", self.cut_value_, 'with')
 
         binary_estimates = self.predict(estimates)
 
@@ -338,9 +338,9 @@ class CutClassifier(object):
         purity = scores.purity(truths, binary_estimates)
         background_rejection = scores.background_rejection(truths, binary_estimates)
 
-        print "efficiency", efficiency
-        print "purity", purity
-        print "background_rejection", background_rejection
+        print("efficiency", efficiency)
+        print("purity", purity)
+        print("background_rejection", background_rejection)
 
 
 def cut_at_background_rejection(background_rejection=0.5, cut_direction=1):

@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking import modules

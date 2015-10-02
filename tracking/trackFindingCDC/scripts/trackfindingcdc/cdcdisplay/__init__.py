@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import Module
@@ -20,8 +20,8 @@ import math
 import subprocess
 from datetime import datetime
 
-import svgdrawing
-import svgdrawing.attributemaps as attributemaps
+from . import svgdrawing
+from . import svgdrawing.attributemaps as attributemaps
 
 
 class CDCSVGDisplayModule(Module):
@@ -344,9 +344,9 @@ class CDCSVGDisplayModule(Module):
 
         output_folder = self.output_folder
         if not os.path.exists(output_folder):
-            print "CDCSVGDisplay.__init__ : Output folder '", output_folder, \
-                "' does not exist."
-            answer = raw_input('Create it? (y or n)')
+            print("CDCSVGDisplay.__init__ : Output folder '", output_folder,
+                  "' does not exist.")
+            answer = input('Create it? (y or n)')
             if answer == 'y':
                 os.makedirs(output_folder)
 
@@ -460,12 +460,12 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawCDCSimHits(self.cdc_hits_store_array_name, '', '.2')
             if self.use_python:
-                print 'Drawing simulated hits'
+                print('Drawing simulated hits')
                 hit_storearray = Belle2.PyStoreArray(self.cdc_hits_store_array_name)
                 if hit_storearray:
                     simHits_related_to_hits = [hit.getRelated('CDCSimHits')
                                                for hit in hit_storearray]
-                    print '#CDCSimHits', hit_storearray.getEntries()
+                    print('#CDCSimHits', hit_storearray.getEntries())
                     styleDict = {'stroke-width': '0.2'}
                     plotter.draw_iterable(simHits_related_to_hits, **styleDict)
 
@@ -535,10 +535,10 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawCDCSimHitsConnectByToF(self.cdc_hits_store_array_name, "black", ".2")
             if self.use_python:
-                print 'Drawing simulated hits connected by tof'
+                print('Drawing simulated hits connected by tof')
                 cdchits_storearray = Belle2.PyStoreArray(self.cdc_hits_store_array_name)
                 if not cdchits_storearray:
-                    print 'Store array not present'
+                    print('Store array not present')
                 if cdchits_storearray:
                     simhits_related_to_cdchit = [cdchit.getRelated('CDCSimHits')
                                                  for cdchit in cdchits_storearray]
@@ -552,7 +552,7 @@ class CDCSVGDisplayModule(Module):
                             simhits_by_mcparticle.setdefault(mcTrackId, [])
                             simhits_by_mcparticle[mcTrackId].append(simhit)
 
-                    for simhits_for_mcparticle in simhits_by_mcparticle.values():
+                    for simhits_for_mcparticle in list(simhits_by_mcparticle.values()):
                         simhits_for_mcparticle.sort(key=lambda simhit:
                                                     simhit.getFlightTime())
 
@@ -673,11 +673,11 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawMCAxialAxialPairs(self.cdc_reco_segment_vector_store_obj_name, "black", '')
             if self.use_python:
-                print 'Draw axial to axial segment pairs'
+                print('Draw axial to axial segment pairs')
                 segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
-                    print '#Segment', segments.size()
+                    print('#Segment', segments.size())
                     axial_segments = [segment for segment in segments
                                       if segment.getStereoType() == 0]
 
@@ -696,7 +696,7 @@ class CDCSVGDisplayModule(Module):
                     good_axial_segment_pair_relations = [pair for pair in
                                                          axial_segment_pair_relations if is_good_pair(pair)]
 
-                    print '#Pairs', len(good_axial_segment_pair_relations)
+                    print('#Pairs', len(good_axial_segment_pair_relations))
                     styleDict = {"stroke": "black"}
                     plotter.draw_iterable(good_axial_segment_pair_relations, **styleDict)
 
@@ -711,11 +711,11 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawMCSegmentTriples(self.cdc_reco_segment_vector_store_obj_name, '', '')
             if self.use_python:
-                print 'Draw axial to axial segment pairs'
+                print('Draw axial to axial segment pairs')
                 segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
-                    print '#Segment', segments.size()
+                    print('#Segment', segments.size())
                     axial_segments = [segment for segment in segments
                                       if segment.getStereoType() == 0]
 
@@ -763,14 +763,14 @@ class CDCSVGDisplayModule(Module):
                     good_segment_triples = [triple for triple in segment_triples
                                             if is_good_triple(triple)]
 
-                    print '#Triple', len(good_segment_triples)
+                    print('#Triple', len(good_segment_triples))
                     styleDict = {"stroke": "black"}
                     plotter.draw_iterable(good_segment_triples, **styleDict)
 
         # Draw Tangent segments
         if self.draw_tangentsegments:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke-width': '0.2'}
                 plotter.draw_storearray('CDCTangentSegments', **styleDict)
@@ -786,7 +786,7 @@ class CDCSVGDisplayModule(Module):
         # Draw segment triples
         if self.draw_segmenttriples:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray('CDCSegmentTriples', **styleDict)
@@ -802,7 +802,7 @@ class CDCSVGDisplayModule(Module):
         # Wrong RL Info
         if self.draw_wrong_rl_infos_in_tracks:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.WrongRLColorMap()}
 
@@ -814,11 +814,11 @@ class CDCSVGDisplayModule(Module):
                     vector = wrapped_vector.get()
 
                     for track in vector:
-                        plotter.draw_iterable(track.items(), **styleDict)
+                        plotter.draw_iterable(list(track.items()), **styleDict)
 
         if self.draw_wrong_rl_infos_in_segments:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.WrongRLColorMap()}
 
@@ -830,21 +830,21 @@ class CDCSVGDisplayModule(Module):
                     vector = wrapped_vector.get()
 
                     for track in vector:
-                        plotter.draw_iterable(track.items(), **styleDict)
+                        plotter.draw_iterable(list(track.items()), **styleDict)
 
         # Draw Track Trajectories
         if self.draw_track_trajectories:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
-                print 'Drawing track fits'
+                print('Drawing track fits')
                 track_storevector = Belle2.PyStoreObj('CDCTrackVector')
                 if track_storevector:
                     tracks = track_storevector.obj().unwrap()
-                    print '#2D Trajectories', \
-                        tracks.size(), \
-                        'from cdc tracks'
+                    print('#2D Trajectories',
+                          tracks.size(),
+                          'from cdc tracks')
 
                     iterTrajectories = (cdcTrack.getStartTrajectory3D().getTrajectory2D()
                                         for cdcTrack in tracks)
@@ -872,14 +872,14 @@ class CDCSVGDisplayModule(Module):
         # Draw the superlayer boundaries
         if self.draw_superlayer_boundaries:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
-                print 'Drawing superlayer boundaries'
+                print('Drawing superlayer boundaries')
                 plotter.draw_superlayer_boundaries()
 
         # Draw the outer and inner wall of the cdc.
         if self.draw_cdc_walls:
-            print 'Drawing CDC walls'
+            print('Drawing CDC walls')
             if self.use_cpp:
                 cppplotter.drawOuterCDCWall('black')
                 cppplotter.drawInnerCDCWall('black')
@@ -891,14 +891,14 @@ class CDCSVGDisplayModule(Module):
         # Draw segment triples fits
         if self.draw_segmenttriple_trajectories:
             if self.use_cpp:
-                print 'No CPP-function defined'
+                print('No CPP-function defined')
             if self.use_python:
-                print 'Drawing segment triple fits'
+                print('Drawing segment triple fits')
                 segmentTriple_storearray = Belle2.PyStoreArray('CDCSegmentTriples')
                 if segmentTriple_storearray:
-                    print '#2D Trajectories', \
-                        segmentTriple_storearray.getEntries(), \
-                        'from segment triples'
+                    print('#2D Trajectories',
+                          segmentTriple_storearray.getEntries(),
+                          'from segment triples')
 
                     iterSegmentTriples = iter(segmentTriple_storearray)
                     iterTrajectories = (segmentTriple.getTrajectory2D()
@@ -910,12 +910,12 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawSegmentTrajectories(self.cdc_reco_segment_vector_store_obj_name)
             if self.use_python:
-                print 'Drawing the fits to the selected RecoHit2DSegments'
+                print('Drawing the fits to the selected RecoHit2DSegments')
 
                 segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
-                    print '#2D Trajectories', segments.size(), 'from segments'
+                    print('#2D Trajectories', segments.size(), 'from segments')
 
                     iterTrajectories = (segment.getTrajectory2D() for segment in
                                         segments)
@@ -926,10 +926,10 @@ class CDCSVGDisplayModule(Module):
             if self.use_cpp:
                 cppplotter.drawGFTrackCandTrajectories(self.track_cands_store_array_name, '', '')
             if self.use_python:
-                print 'Drawing trajectories of the exported Genfit tracks'
+                print('Drawing trajectories of the exported Genfit tracks')
                 gftrackcand_storearray = Belle2.PyStoreArray(self.track_cands_store_array_name)
                 if gftrackcand_storearray:
-                    print '#Genfit tracks', gftrackcand_storearray.getEntries()
+                    print('#Genfit tracks', gftrackcand_storearray.getEntries())
 
                     def color_map(iTrajectory, trajectory):
                         # return "black"
@@ -956,7 +956,7 @@ class CDCSVGDisplayModule(Module):
 
                     plotter.draw_iterable(trajectories, **styleDict)
                 else:
-                    print "Non Genfit tracks present"
+                    print("Non Genfit tracks present")
 
         # Draw the genfit track-trajectories
         if self.draw_gftrack_trajectories:
@@ -972,11 +972,11 @@ class CDCSVGDisplayModule(Module):
 
         if self.interactive:
             if self.use_python:
-                print " Use the 'display' command to show the svg file", fileName, \
-                    'generated for the last event'
+                print(" Use the 'display' command to show the svg file", fileName,
+                      'generated for the last event')
             if self.use_cpp:
-                print " Use the 'display' command to show the svg file", cppfileName, \
-                    'generated for the last event with cpp'
+                print(" Use the 'display' command to show the svg file", cppfileName,
+                      'generated for the last event with cpp')
 
             # 'display' is part of the ImageMagic package commonly installed in linux
             if self.use_python:
@@ -986,7 +986,7 @@ class CDCSVGDisplayModule(Module):
             # procDisplay = subprocess.Popen(['display','-background','white',
             # '-flatten',fileName])
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])
-            raw_input('Hit enter for next event')
+            input('Hit enter for next event')
 
         self.file_number += 1
 

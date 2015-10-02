@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This steering file will
@@ -96,5 +96,5 @@ main.add_module(spCreatorTest)
 # Process events
 process(main)
 
-print 'Event Statistics :'
-print statistics
+print('Event Statistics :')
+print(statistics)

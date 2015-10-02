@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking import modules
@@ -34,7 +35,7 @@ class TestingModule(basf2.Module):
         for track in tracks:
             rel = Belle2.DataStore.getRelationsWithObj(track, "TrackFitResults")
             if rel.size() > 0:
-                print "Deleting fitted tracks"
+                print("Deleting fitted tracks")
                 track.swap(genfit.TrackCand())
 
 

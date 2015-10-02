@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # adapted from ExtrapCDCTracksToVXD.py
@@ -317,4 +317,4 @@ main.add_module(display)
 
 # Process events
 process(main)
-print statistics
+print(statistics)

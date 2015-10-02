@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ###########################################################################################################################
@@ -15,7 +15,7 @@ parser.add_option('--input', dest='input', default='-999',
 
 (options, args) = parser.parse_args()
 
-print options
+print(options)
 
 from basf2 import *
 
@@ -50,19 +50,13 @@ g4sim.logging.log_level = LogLevel.ERROR
 
 mixbkg = register_module('MixBkg')
 bkg_file = [
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_HER/CDCROFnoMC_Coulomb_HER_1ms_2x.root'
-        ,
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_LER/CDCROFnoMC_Coulomb_LER_1ms_2x.root'
-        ,
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_HER/CDCROFnoMC_RBB_HER_1ms_2x.root'
-        ,
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_LER/CDCROFnoMC_RBB_LER_1ms_2x.root'
-        ,
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_HER/CDCROFnoMC_Touschek_HER_1ms_2x.root'
-        ,
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_LER/CDCROFnoMC_Touschek_LER_1ms_2x.root'
-        ,
-    ]
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_HER/CDCROFnoMC_Coulomb_HER_1ms_2x.root',
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_LER/CDCROFnoMC_Coulomb_LER_1ms_2x.root',
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_HER/CDCROFnoMC_RBB_HER_1ms_2x.root',
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_LER/CDCROFnoMC_RBB_LER_1ms_2x.root',
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_HER/CDCROFnoMC_Touschek_HER_1ms_2x.root',
+    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_LER/CDCROFnoMC_Touschek_LER_1ms_2x.root',
+]
 
 # '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_HER/CDCROF_Coulomb_HER_1ms_0x.root',
 # '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_LER/CDCROF_Coulomb_LER_1ms_0x.root',
@@ -77,7 +71,7 @@ cdcDigitizer = register_module('CDCDigitizer')
 
 # ---------------------------------------------------------------
 cdctracking = register_module('CDCLegendreTracking')
-param_cdctracking = {  #    'Resolution StereoHits': 2.,
+param_cdctracking = {  # 'Resolution StereoHits': 2.,
     'GFTrackCandidatesColName': 'TrackCands',
     'Threshold': 10,
     'InitialAxialHits': 30,
@@ -90,7 +84,7 @@ param_cdctracking = {  #    'Resolution StereoHits': 2.,
     'EnableDrawing': False,
     'StepScale': 0.75,
     'ReconstructCurler': False,
-    }
+}
 cdctracking.param(param_cdctracking)
 
 # ---------------------------------------------------------------
@@ -146,5 +140,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
-
+print(statistics)

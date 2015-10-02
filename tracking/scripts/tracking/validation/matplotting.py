@@ -71,7 +71,7 @@ def plot(tobject, **kwd):
     elif isinstance(tobject, ROOT.TMultiGraph):
         return plot_tmultigraph(tobject, **kwd)
 
-    elif isinstance(tobject, (ROOT.TProfile, ROOT.TH1,)):
+    elif isinstance(tobject, (ROOT.TProfile, ROOT.TH1)):
         return plot_th1(tobject, **kwd)
 
     elif isinstance(tobject, ROOT.TGraph):
@@ -421,7 +421,7 @@ def get_stats_from_tgraph(tgraph):
 
     additional_stats = ValidationPlot.get_additional_stats(tgraph)
     if additional_stats:
-        for key, value in additional_stats.items():
+        for key, value in list(additional_stats.items()):
             stats[key] = value
 
     return stats
@@ -435,7 +435,7 @@ def get_stats_from_th(th):
 
     additional_stats = ValidationPlot.get_additional_stats(th)
     if additional_stats:
-        for key, value in additional_stats.items():
+        for key, value in list(additional_stats.items()):
             stats[key] = value
 
     if not isinstance(th, (ROOT.TH2, ROOT.TH3)):
@@ -490,7 +490,7 @@ def compose_stats_label(title, additional_stats={}):
     if title:
         label_elements.append(str(title))
 
-    for key, value in additional_stats.items():
+    for key, value in list(additional_stats.items()):
         if isinstance(value, str):
             label_element = labeled_string_template.format(key, value)
         else:
@@ -617,8 +617,8 @@ def plot_th1_data_into(ax,
     x_taxis = th1.GetXaxis()
     n_bins = x_taxis.GetNbins()
 
-    bin_ids_with_underflow = range(n_bins + 1)
-    bin_ids_without_underflow = range(1, n_bins + 1)
+    bin_ids_with_underflow = list(range(n_bins + 1))
+    bin_ids_without_underflow = list(range(1, n_bins + 1))
 
     # Get the n_bins + 1 bin edges starting from the underflow bin 0
     bin_edges = np.array([x_taxis.GetBinUpEdge(i_bin) for i_bin in bin_ids_with_underflow])
@@ -718,11 +718,11 @@ def plot_th2_data_into(ax,
     x_n_bins = x_taxis.GetNbins()
     y_n_bins = y_taxis.GetNbins()
 
-    x_bin_ids_with_underflow = range(x_n_bins + 1)
-    y_bin_ids_with_underflow = range(y_n_bins + 1)
+    x_bin_ids_with_underflow = list(range(x_n_bins + 1))
+    y_bin_ids_with_underflow = list(range(y_n_bins + 1))
 
-    x_bin_ids_without_underflow = range(1, x_n_bins + 1)
-    y_bin_ids_without_underflow = range(1, y_n_bins + 1)
+    x_bin_ids_without_underflow = list(range(1, x_n_bins + 1))
+    y_bin_ids_without_underflow = list(range(1, y_n_bins + 1))
 
     # Get the n_bins + 1 bin edges starting from the underflow bin 0
     x_bin_edges = np.array([x_taxis.GetBinUpEdge(i_bin) for i_bin in x_bin_ids_with_underflow])

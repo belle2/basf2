@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
@@ -383,7 +383,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 """
         figures_of_merit.check = ''
         figures_of_merit.contact = contact
-        print figures_of_merit
+        print(figures_of_merit)
 
         # Validation plots #
         ####################
@@ -400,7 +400,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # use TrackCand seeds for the fake track plotting       #
         # as the fit (if successful) is probably not meaningful #
         #########################################################
-        print 'fake list: ' + str(len(self.pr_fakes))
+        print('fake list: ' + str(len(self.pr_fakes)))
         plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
                                                make_hist=False)
         validation_plots.extend(plots)
@@ -570,7 +570,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
             validation_plots.append(histogram)
 
-        for (parameter_name, parameter_values) in profile_parameters.items():
+        for (parameter_name, parameter_values) in list(profile_parameters.items()):
             if parameter_name in parameter_names \
                     or root_save_name(parameter_name) in parameter_names:
 

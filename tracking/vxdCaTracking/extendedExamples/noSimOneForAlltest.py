@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -46,7 +46,7 @@ if useEDeposit:
 
 # allows steering initial value and numEvents by sript file
 if len(argv) is 1:
-    print ' no arguments given, using standard values'
+    print(' no arguments given, using standard values')
 elif len(argv) is 2:
     initialValue = int(argv[1])
 else:
@@ -60,20 +60,20 @@ gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-               'PXD', 'SVD'])
+                              'PXD', 'SVD'])
 
 # geometry.set_log_level(LogLevel.INFO) INFO if set to true, complete list of components can be found...
 
 # Show progress of processing
 progress = register_module('Progress')
 
-rootFileName = \
-    '{events:}simulatedEventsAndSeed{seed:}Using{clusterType:}-{eDep:}April2014phi{phi:}.root'.format(events=numEvents,
-        seed=initialValue, clusterType=clusterType, eDep=eDepType, phi=phiMax)
+rootFileName = '{events:}simulatedEventsAndSeed{seed:}Using{clusterType:}-{eDep:}April2014phi{phi:}.root'.format(
+    events=numEvents, seed=initialValue, clusterType=clusterType, eDep=eDepType, phi=phiMax
+)
 
-print ''
-print ' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName)
-print ''
+print('')
+print(' entering trackingTests reading file {fileName:}'.format(fileName=rootFileName))
+print('')
 
 setupFileNamesvd = setupFileName + 'SVD'
 filterCalc2 = register_module('FilterCalculator')
@@ -102,7 +102,7 @@ param_fCalc2 = {  # -1 = VXD, 0 = PXD, 1 = SVD
     'uniSigma': 0.3,
     'noCurler': 1,
     'useOldSecCalc': 0,
-    }
+}
 filterCalc2.param(param_fCalc2)
 
 # using one export module only
@@ -167,7 +167,7 @@ param_vxdtf = {  # extended output for filters
     'activateDeltaPt': [True],
     'activateCircleFit': [False],
     'tuneCircleFit': [0.00000001],
-    }
+}
 vxdtf.param(param_vxdtf)
 
 analyzer = register_module('TFAnalizer')
@@ -187,7 +187,7 @@ param_mctrackfinder = {
     'MinimalNDF': 6,
     'WhichParticles': ['primary'],
     'GFTrackCandidatesColName': 'mcTracks',
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 rootinput = register_module('RootInput')
@@ -203,11 +203,11 @@ main.add_module(geometry)
 main.add_module(eventCounter)
 
 if generateSecMap:
-  ##folgende Module nur für secMapGen:
+    # folgende Module nur für secMapGen:
     main.add_module(filterCalc2)
     main.add_module(exportXML)
 else:
-  ## folgende Module nur für secMapTest:
+    # folgende Module nur für secMapTest:
     main.add_module(vxdtf)
     main.add_module(mctrackfinder)
     main.add_module(analyzer)
@@ -215,4 +215,4 @@ else:
 # Process events
 process(main)
 
-print statistics
+print(statistics)

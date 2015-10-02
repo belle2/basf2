@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -52,9 +52,12 @@ def main():
 
     # Indication if tracks should be fitted.
     # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
-    argument_parser.add_argument('-f', '--fit', action='store_true',
-                                 help='Perform fitting of the generated tracks with Genfit. Default is not to perform a fit but use the seed values generated in track finding.'
-                                 )
+    argument_parser.add_argument(
+        '-f',
+        '--fit',
+        action='store_true',
+        help='Perform fitting of the generated tracks with Genfit. Default is not '
+        'to perform a fit but use the seed values generated in track finding.')
 
     # Geometry name to be used in the Genfit extrapolation.
     argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'],
@@ -112,7 +115,7 @@ def main():
         tBrowser = ROOT.TBrowser()
         tBrowser.BrowseObject(tFile)
         tBrowser.Show()
-        raw_input('Press enter to close.')
+        input('Press enter to close.')
         tFile.Close()
 
 

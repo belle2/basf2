@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -33,7 +33,7 @@ import logging
 try:
     import root_pandas
 except ImportError:
-    print "do a pip install git+https://github.com/ibab/root_pandas"
+    print("do a pip install git+https://github.com/ibab/root_pandas")
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sb
@@ -141,8 +141,8 @@ def plot():
     bkg_new = len(new_hits.loc[new_hits.is_background == 1])
     signal_new = len(new_hits.loc[new_hits.is_background == 0])
 
-    print(bkg_old, "->", bkg_new, "(-%.2f %%)" % (100.0 - 100.0 * bkg_new / bkg_old))
-    print(signal_old, "->", signal_new, "(-%.2f %%)" % (100.0 - 100.0 * signal_new / signal_old))
+    print((bkg_old, "->", bkg_new, "(-%.2f %%)" % (100.0 - 100.0 * bkg_new / bkg_old)))
+    print((signal_old, "->", signal_new, "(-%.2f %%)" % (100.0 - 100.0 * signal_new / signal_old)))
 
 
 def run_many_times():
@@ -181,7 +181,7 @@ def plot_many_times():
                                   "signal_new": signal_new}, ignore_index=True)
 
     results = results.set_index(["tmva_cut"])
-    print results
+    print(results)
 
     plt.clf()
     plt.plot(results.index, results.bkg_new)

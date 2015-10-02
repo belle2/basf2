@@ -146,16 +146,16 @@ class TrackingValidationResult:
         primaries = pr_data[self.pr_data.is_prompt == 1]
         primaries_mc = mc_data[self.mc_data.is_prompt == 1]
 
-        print self.label
-        print "Fake", 100 * primaries.is_fake.mean(), 100 * pr_data.is_fake.mean()
-        print "Clone", 100 * primaries.is_clone.mean(), 100 * pr_data.is_clone.mean()
-        print "Ghost", 100 * primaries.is_ghost.mean(), 100 * pr_data.is_ghost.mean()
-        print "Fitted", 100 * primaries.is_fitted.mean(), 100 * pr_data.is_fitted.mean()
-        print "Found", 100 * primaries_mc.is_matched.mean(), 100 * mc_data.is_matched.mean()
-        print "Found2", 100.0 - 100 * primaries_mc.is_missing.mean(), 100.0 - 100 * mc_data.is_missing.mean()
-        print "Merged", 100 * primaries_mc.is_merged.mean(), 100 * mc_data.is_merged.mean()
-        print "Hit-Eff", 100 * primaries_mc.hit_efficiency.mean(), 100 * mc_data.hit_efficiency.mean()
-        print "Wrong Hits", primaries.number_of_wrong_hits.mean(), pr_data.number_of_wrong_hits.mean()
+        print(self.label)
+        print("Fake", 100 * primaries.is_fake.mean(), 100 * pr_data.is_fake.mean())
+        print("Clone", 100 * primaries.is_clone.mean(), 100 * pr_data.is_clone.mean())
+        print("Ghost", 100 * primaries.is_ghost.mean(), 100 * pr_data.is_ghost.mean())
+        print("Fitted", 100 * primaries.is_fitted.mean(), 100 * pr_data.is_fitted.mean())
+        print("Found", 100 * primaries_mc.is_matched.mean(), 100 * mc_data.is_matched.mean())
+        print("Found2", 100.0 - 100 * primaries_mc.is_missing.mean(), 100.0 - 100 * mc_data.is_missing.mean())
+        print("Merged", 100 * primaries_mc.is_merged.mean(), 100 * mc_data.is_merged.mean())
+        print("Hit-Eff", 100 * primaries_mc.hit_efficiency.mean(), 100 * mc_data.hit_efficiency.mean())
+        print("Wrong Hits", primaries.number_of_wrong_hits.mean(), pr_data.number_of_wrong_hits.mean())
 
     def append_to_dataframe(self, df):
         result = {"finding_efficiency": self.finding_efficiency,

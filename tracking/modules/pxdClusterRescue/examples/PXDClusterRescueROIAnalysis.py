@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 ##############################################################################
 
 import os
@@ -90,4 +91,4 @@ main.add_module(PXDClusterRescueROIAnalysis)
 # Process events
 process(main)
 
-print statistics
+print(statistics)

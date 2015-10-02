@@ -87,26 +87,26 @@ class CDCHitUniqueAssumer(basf2.Module):
 
             for track in tracks:
                 # Unset all taken flags
-                for recoHit in track.items():
+                for recoHit in list(track.items()):
                     if not recoHit.getWireHit().getAutomatonCell().hasTakenFlag():
                         self.number_of_hits_with_wrong_flags += 1
 
             for track in tracks:
                 # Now check that we only have every wire hit once
-                for recoHit in track.items():
+                for recoHit in list(track.items()):
                     self.number_of_total_hits += 1
                     if recoHit.getWireHit().getAutomatonCell().hasAssignedFlag():
                         self.number_of_doubled_hits += 1
                     recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
 
                 for innerTrack in tracks:
-                    for recoHit in innerTrack.items():
+                    for recoHit in list(innerTrack.items()):
                         recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag()
 
     def terminate(self):
-        print "Number of doubled hits:", self.number_of_doubled_hits
-        print "Number of hits with wrong taken flag:", self.number_of_hits_with_wrong_flags
-        print "Number of total hits:", self.number_of_total_hits
+        print("Number of doubled hits:", self.number_of_doubled_hits)
+        print("Number of hits with wrong taken flag:", self.number_of_hits_with_wrong_flags)
+        print("Number of total hits:", self.number_of_total_hits)
 
 
 class HitCleaner(basf2.Module):
@@ -189,9 +189,9 @@ class HitCleaner(basf2.Module):
                 track.setPdgCode(int(track.getChargeSeed() * 211))
 
     def terminate(self):
-        print("Number of tracks in total: %d" % self.number_of_tracks)
-        print("Number of hits in total: %d" % self.number_of_hits)
-        print("Number of deleted hits: %d" % self.number_of_deleted_hits)
+        print(("Number of tracks in total: %d" % self.number_of_tracks))
+        print(("Number of hits in total: %d" % self.number_of_hits))
+        print(("Number of deleted hits: %d" % self.number_of_deleted_hits))
 
-        print("Number of deleted hits per track: %f" % (1.0 * self.number_of_deleted_hits / self.number_of_tracks))
-        print("Ratio of deleted hits: %f" % (100.0 * self.number_of_deleted_hits / self.number_of_hits))
+        print(("Number of deleted hits per track: %f" % (1.0 * self.number_of_deleted_hits / self.number_of_tracks)))
+        print(("Ratio of deleted hits: %f" % (100.0 * self.number_of_deleted_hits / self.number_of_hits)))

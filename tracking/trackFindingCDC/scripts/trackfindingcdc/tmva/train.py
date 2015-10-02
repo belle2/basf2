@@ -204,7 +204,7 @@ def show_tmva_results(file_path):
 
     tmva_gui_command = ".x " + tmva_gui_script_file_path + '("' + file_path + '")'
     ROOT.gROOT.ProcessLine(tmva_gui_command)
-    raw_input("Press enter to continue.")
+    input("Press enter to continue.")
 
     os.chdir(save_working_dir_path)
 
@@ -274,18 +274,18 @@ class ClassificationOverview:
                           in variable_names
                           if "truth" not in name or name in select]
 
-        print "Truth name", truth_name
-        print "Variable names", variable_names
+        print("Truth name", truth_name)
+        print("Variable names", variable_names)
 
         import root_numpy
-        print "Loading tree"
+        print("Loading tree")
         branch_names = variable_names + [truth_name]
         input_record_array = root_numpy.tree2rec(input_tree, branches=branch_names)
-        print "Loaded tree"
+        print("Loaded tree")
         truths = input_record_array[truth_name]
 
         for variable_name in variable_names:
-            print 'Analyse', variable_name
+            print('Analyse', variable_name)
 
             # Get the truths as a numpy array
             estimates = input_record_array[variable_name]
@@ -306,4 +306,4 @@ class ClassificationOverview:
         if isinstance(self.output_file_name, str):
             output_file.Close()
 
-        print "Saved overviews completely"
+        print("Saved overviews completely")

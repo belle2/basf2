@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -35,17 +35,7 @@ import numpy as np
 
 # the discrete pt values in GeV for which to generate particles using the
 # particle gun
-pt_values = [
-    0.1,
-    0.25,
-    0.4,
-    0.6,
-    1.,
-    1.5,
-    2.,
-    3.,
-    4.,
-]
+pt_values = [0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
 
 
 pt_bin_edges = [(low + high) / 2.0 for (low, high) in zip(pt_values[:-1], pt_values[1:])]
@@ -186,8 +176,7 @@ def computeBins(discreteValues):
     discreteValues = [2 * discreteValues[0] - discreteValues[1]] \
         + discreteValues
     # add trailing item which has the same distance as entry n-1 to n
-    discreteValues = discreteValues + [2 * discreteValues[-1]
-                                       - discreteValues[-2]]
+    discreteValues = discreteValues + [2 * discreteValues[-1] - discreteValues[-2]]
 
     bin_borders = []
     # loop over the discrete entries and compute the bin borders
@@ -195,8 +184,7 @@ def computeBins(discreteValues):
     for i in range(0, len(discreteValues) - 2):
         avg_low = (discreteValues[i] + discreteValues[i + 1]) / 2.
         avg_high = (discreteValues[i + 1] + discreteValues[i + 2]) / 2.
-        bin_borders = bin_borders + [(avg_low, avg_high, discreteValues[i
-                                                                        + 1])]
+        bin_borders = bin_borders + [(avg_low, avg_high, discreteValues[i + 1])]
 
     return bin_borders
 
@@ -291,17 +279,7 @@ def main():
 
     # the discrete pt values in GeV for which to generate particles using the
     # particle gun
-    ptDiscrete = [
-        0.1,
-        0.25,
-        0.4,
-        0.6,
-        1.,
-        1.5,
-        2.,
-        3.,
-        4.,
-    ]
+    ptDiscrete = [0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
     ptBinBorders = computeBins(ptDiscrete)
     validation_run = FullTracking(ptBinBorders=ptBinBorders)
 

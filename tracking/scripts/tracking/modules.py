@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """This file contains python modules that are helpful in construction BASF2 paths for tracking runs.
@@ -53,7 +53,7 @@ class BrowseTFileOnTerminateModule(basf2.Module):
         with root_utils.root_open(self.root_file) as tfile:
             root_utils.root_browse(tfile)
             # FIXME: Is there a way to listen to the close event of the TBrowser?
-            raw_input('Press enter to close.')
+            input('Press enter to close.')
 
         super(BrowseTFileOnTerminateModule, self).terminate()
 
@@ -204,7 +204,7 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
         self.tmva_cut = tmva_cut
 
         if self.tmva_cut < 0 or self.tmva_cut > 1:
-            print "Given tmva_cut %.1f is not in the valid range [0, 1]. Not adding the module" % self.tmva_cut
+            print("Given tmva_cut %.1f is not in the valid range [0, 1]. Not adding the module" % self.tmva_cut)
             return
 
         background_hit_finder_module = StandardEventGenerationRun.get_basf2_module(

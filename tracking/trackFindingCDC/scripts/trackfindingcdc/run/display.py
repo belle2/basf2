@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import basf2
@@ -104,7 +104,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
             except AttributeError:
                 continue
             else:
-                print 'Setting', option, 'to', is_active_option
+                print('Setting', option, 'to', is_active_option)
                 setattr(cdc_display_module, option, is_active_option)
 
     def create_path(self):

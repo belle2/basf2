@@ -95,7 +95,7 @@ def root_cd(tdirectory):
     if not tdirectory or "." == tdirectory:
         tdirectory = save_tdirectory
 
-    elif isinstance(tdirectory, basestring):
+    elif isinstance(tdirectory, str):
         tdirectory_name = tdirectory
 
         # Look for the tdirectory with the name

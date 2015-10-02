@@ -1,7 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# !/usr/bin/env python
 
 #################################################################
 #                                                               #
@@ -30,7 +28,7 @@ pt_value = get_generated_pt_value(9)
 
 output_filename = '../trackingEfficiency_pt_%.2fGeV.root' % pt_value
 
-print output_filename
+print(output_filename)
 
 path = create_path()
 

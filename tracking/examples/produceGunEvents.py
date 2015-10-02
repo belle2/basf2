@@ -1,15 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-######### Imports #########
+# ####### Imports #######
 from basf2 import *
 
 import simulation
 
-########## Register modules  ##########
+# ######## Register modules  ########
 eventInfoSetterModule = register_module('EventInfoSetter')
 eventInfoSetterModule.param({'evtNumList': [10], 'runList': [1],
-                            'expList': [1]})
+                             'expList': [1]})
 
 progressModule = register_module('Progress')
 
@@ -22,12 +22,12 @@ particleGunModule.param({
     'momentumParams': [0.6, 1.4],
     'thetaGeneration': 'uniform',
     'thetaParams': [17., 150.],
-    })
+})
 
 rootOutputModule = register_module('RootOutput')
 rootOutputModule.param({'outputFileName': 'mc_gun.root'})
 
-########## Create paths and add modules  ##########
+# ######## Create paths and add modules  ########
 main = create_path()
 
 main.add_module(eventInfoSetterModule)
@@ -45,4 +45,4 @@ main.add_module(rootOutputModule)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

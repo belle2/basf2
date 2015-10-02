@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-import fit_functions
+from . import fit_functions
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
@@ -78,7 +78,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         result_df = pd.DataFrame([{"dedx_bin_center": dedx_bin_center,
                                    "mu": fit_parameters[1][1],
                                    "sigma": fit_parameters[0]} for dedx_bin_center,
-                                  fit_parameters in self.result_parameters_for_each_dedx_bin.iteritems()
+                                  fit_parameters in self.result_parameters_for_each_dedx_bin.items()
                                   if fit_parameters is not None])
 
         if len(result_df) == 0:

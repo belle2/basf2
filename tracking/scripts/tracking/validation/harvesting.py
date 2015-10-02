@@ -30,6 +30,7 @@ def get_logger():
 
 
 class AttributeDict(dict):
+
     """Class that enables access to the dictionaries items by attribute lookup
     in addition to normal item lookup.
 
@@ -204,7 +205,7 @@ class HarvestingModule(basf2.Module):
         #: Name of the ROOT output file to be generated
         self.output_file_name = output_file_name
 
-        if not isinstance(self.output_file_name, (ROOT.TFile, basestring)):
+        if not isinstance(self.output_file_name, (ROOT.TFile, str)):
             raise TypeError("output_file_name is allowed to be a string or a ROOT.TFile object")
 
         #: Name of this harvest
@@ -343,12 +344,12 @@ class HarvestingModule(basf2.Module):
 
             try:
                 while True:
-                    for part_name, parts in raw_crops.items():
+                    for part_name, parts in list(raw_crops.items()):
                         parts.append(crop[part_name])
                     # next crop
                     crop = (yield)
             except GeneratorExit:
-                for part_name, parts in raw_crops.items():
+                for part_name, parts in list(raw_crops.items()):
                     crops[part_name] = np.array(parts)
 
         else:
@@ -465,7 +466,7 @@ class HarvestingModule(basf2.Module):
         finally:
             # If we opened the TFile ourself, close it again
             if self.output_file_name:
-                if isinstance(self.output_file_name, basestring):
+                if isinstance(self.output_file_name, str):
                     output_tfile.Close()
 
     @staticmethod

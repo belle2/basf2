@@ -48,11 +48,11 @@ class QuadTreePlotter(basf2.Module):
         xAxis = hist.GetXaxis()
         yAxis = hist.GetYaxis()
 
-        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in xrange(1, xAxis.GetNbins() + 2)])
-        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in xrange(1, yAxis.GetNbins() + 2)])
+        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in range(1, xAxis.GetNbins() + 2)])
+        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in range(1, yAxis.GetNbins() + 2)])
 
-        l = np.array([[hist.GetBinContent(iX, iY) for iY in xrange(1, yAxis.GetNbins() + 1)]
-                      for iX in xrange(1, xAxis.GetNbins() + 1)])
+        l = np.array([[hist.GetBinContent(iX, iY) for iY in range(1, yAxis.GetNbins() + 1)]
+                      for iX in range(1, xAxis.GetNbins() + 1)])
 
         cmap = sb.cubehelix_palette(8, start=2, rot=0, dark=0, light=1, reverse=False, as_cmap=True)
 
@@ -70,7 +70,7 @@ class QuadTreePlotter(basf2.Module):
         fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
         plt.savefig(fileName)
         procDisplay = subprocess.Popen(['eog', fileName])
-        raw_input("Press Enter to continue..")
+        input("Press Enter to continue..")
 
     def init_plotting(self):
         """
@@ -217,7 +217,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
             def f(segment):
                 theta, r = self.calculateIntersectionInQuadTreePicture(segment.front(), segment.back())
-                plt.plot(theta, r, color=map(0, segment), marker="o")
+                plt.plot(theta, r, color=list(map(0, segment)), marker="o")
 
             self.forAllAxialSegments(f)
 
@@ -226,7 +226,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
             def f(segment):
                 theta, r = self.calculatePositionInQuadTreePicture(segment.front().getRecoPos2D())
-                plt.plot(theta, r, color=map(0, segment), marker="", ls="-")
+                plt.plot(theta, r, color=list(map(0, segment)), marker="", ls="-")
 
             self.forAllAxialSegments(f)
 
@@ -235,11 +235,11 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
             def f(segment):
                 middle_index = int(np.round(segment.size() / 2.0))
-                middle_point = segment.items()[middle_index]
+                middle_point = list(segment.items())[middle_index]
                 theta_front, r_front = self.calculateIntersectionInQuadTreePicture(segment.front(), middle_point)
                 theta_back, r_back = self.calculateIntersectionInQuadTreePicture(middle_point, segment.back())
 
-                plt.plot([theta_front, theta_back], [r_front, r_back], color=map(0, segment), marker="o", ls="-")
+                plt.plot([theta_front, theta_back], [r_front, r_back], color=list(map(0, segment)), marker="o", ls="-")
 
             self.forAllAxialSegments(f)
 
@@ -251,7 +251,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
                 trajectory = fitter.fit(segment)
                 momentum = trajectory.getUnitMom2D(Belle2.TrackFindingCDC.Vector2D(0, 0)).scale(trajectory.getAbsMom2D())
                 theta, r = self.convertToQuadTreePicture(momentum.phi(), momentum.norm(), trajectory.getChargeSign())
-                plt.plot(theta, r, color=map(0, segment), marker="o")
+                plt.plot(theta, r, color=list(map(0, segment)), marker="o")
 
             self.forAllAxialSegments(f)
 
@@ -424,7 +424,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
         if self.draw_track_hits:
             for id, track in enumerate(track_vector):
-                for recoHit in track.items():
+                for recoHit in list(track.items()):
                     self.plot_hit_line(recoHit, color=map[id % len(map)])
 
         if self.draw_last_track and len(track_vector) != 0:
@@ -441,7 +441,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                      not recoHit.isInCellZBounds())):
                     continue
 
-                if recoHit in last_track.items():
+                if recoHit in list(last_track.items()):
                     color = map[len(track_vector) % len(map)]
                 else:
                     if rlWireHit.getRLInfo() == 1:

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-######### Imports #########
+# ####### Imports #######
 import sys
 import os
 import optparse
@@ -31,8 +31,8 @@ class PrintMCMatchingRelation(Module):
 
         trackCands = Belle2.PyStoreArray('TrackCands')
         if trackCands:
-            print 'Number of pattern recognition tracks', \
-                trackCands.getEntries()
+            print('Number of pattern recognition tracks',
+                  trackCands.getEntries())
 
             for (iTrackCand, trackCand) in enumerate(trackCands):
                 isMatched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
@@ -40,7 +40,7 @@ class PrintMCMatchingRelation(Module):
 
         mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
         if trackCands:
-            print 'Number of Monte Carlo tracks', mcTrackCands.getEntries()
+            print('Number of Monte Carlo tracks', mcTrackCands.getEntries())
 
             for mcTrackCand in mcTrackCands:
                 isMatched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
@@ -54,18 +54,18 @@ class PrintMCMatchingRelation(Module):
     def terminate(self):
         track_finding_efficiency = 1.0 * sum(self.isMatchedMCTracks) \
             / len(self.isMatchedMCTracks)
-        print 'Track finding efficiency: ', track_finding_efficiency
+        print('Track finding efficiency: ', track_finding_efficiency)
 
         fake_rate = 1.0 - 1.0 * sum(self.isMatchedPRTracks) \
             / len(self.isMatchedPRTracks)
-        print 'Fake rate (% unmatched pattern recognition tracks) : ', \
-            fake_rate
+        print('Fake rate (% unmatched pattern recognition tracks) : ',
+              fake_rate)
 
         import numpy as np
         mcAbsTransversMomentums = np.array(self.mcAbsTransversMomentums)
         isMatchedMCTracks = np.array(self.isMatchedMCTracks)
         (binned_total_counts, bins) = np.histogram(mcAbsTransversMomentums,
-                bins=50)
+                                                   bins=50)
 
         (binned_match_counts, bins) = \
             np.histogram(mcAbsTransversMomentums[isMatchedMCTracks], bins=bins)
@@ -75,8 +75,7 @@ class PrintMCMatchingRelation(Module):
         bin_centers = (bins[:-1] + bins[1:]) / 2.0
         upper_x_errors = bins[1:] - bin_centers
         lower_x_errors = bin_centers - bins[:-1]
-        y_errors = np.sqrt(binned_finding_efficiency * (1
-                           - binned_finding_efficiency) / binned_total_counts)
+        y_errors = np.sqrt(binned_finding_efficiency * (1 - binned_finding_efficiency) / binned_total_counts)
 
         import matplotlib.pyplot as plt
         plt.errorbar(bin_centers, binned_finding_efficiency, linestyle='None',
@@ -86,10 +85,10 @@ class PrintMCMatchingRelation(Module):
         plt.show()
 
 
-########## Register modules  ##########
+# ######## Register modules  ########
 eventInfoSetterModule = register_module('EventInfoSetter')
 eventInfoSetterModule.param({'evtNumList': [1000], 'runList': [1],
-                            'expList': [1]})
+                             'expList': [1]})
 
 printCollectionsModule = register_module('PrintCollections')
 
@@ -102,12 +101,12 @@ particleGunModule.param({
     'momentumParams': [0.2, 3.0],
     'thetaGeneration': 'uniform',
     'thetaParams': [17., 150.],
-    })
+})
 
-## Put your track finder here
+# Put your track finder here
 trackFinderModule = register_module('CDCLegendreTracking')
 
-## Reference Monte Carlo tracks
+# Reference Monte Carlo tracks
 trackFinderMCTruthModule = register_module('TrackFinderMCTruth')
 trackFinderMCTruthModule.param({
     'UseCDCHits': True,
@@ -116,7 +115,7 @@ trackFinderMCTruthModule.param({
     'WhichParticles': ['primary'],
     'EnergyCut': 0.1,
     'GFTrackCandidatesColName': 'MCTrackCands',
-    })
+})
 
 mcTrackMatcherModule = register_module('MCTrackMatcher')
 mcTrackMatcherModule.param({
@@ -126,9 +125,9 @@ mcTrackMatcherModule.param({
     'MCGFTrackCandsColName': 'MCTrackCands',
     'MinimalPurity': 0.66,
     'RelateClonesToMCParticles': True,
-    })
+})
 
-########## Create paths and add modules  ##########
+# ######## Create paths and add modules  ########
 main = create_path()
 main.add_module(eventInfoSetterModule)
 main.add_module(particleGunModule)
@@ -148,4 +147,4 @@ main.add_module(PrintMCMatchingRelation())
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

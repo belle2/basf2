@@ -30,7 +30,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
         number_of_wrong_rl_infos = 0
 
-        for reco_hit in track_cand.items():
+        for reco_hit in list(track_cand.items()):
             underlaying_cdc_hit = reco_hit.getWireHit().getHit()
             hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit.getRecoPos3D()
             sum_of_difference_norms_axial += hit_difference.xy().norm()
@@ -79,7 +79,7 @@ class WrongRLInfoCounter(HarvestingModule):
         number_of_hits = 0
         number_of_stereo = 0
 
-        for hitID in xrange(track_cand.getNHits()):
+        for hitID in range(track_cand.getNHits()):
             hit = track_cand.getHit(hitID)
             if not hit.__class__.__name__ == "genfit::WireTrackCandHit":
                 continue

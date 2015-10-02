@@ -323,6 +323,7 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
 
         local_track_finder_module = StandardEventGenerationRun.get_basf2_module(
             "SegmentFinderCDCFacetAutomatonDev",
+            SegmentOrientation="outwards",
             ClusterFilter="tmva",
             ClusterFilterParameters={
                 "cut": str(tmva_cut)},

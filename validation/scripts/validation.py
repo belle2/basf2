@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # basf2 specific imports
@@ -78,17 +78,13 @@ def statistics_plots(
             by load from other processes on the execution host."""))
     if contact:
         hGlobalTiming.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
-    for (index, method) in statistics.EStatisticCounters.values.iteritems():
+    for (index, method) in statistics.EStatisticCounters.values.items():
         methodName[method] = str(method)[0] \
             + str(method).lower()[1:].replace('_r', 'R')
         if index == 5:
             break
-        hGlobalTiming.SetBinContent(index + 1,
-                                    statistics.getGlobal().time_mean(method)
-                                    * 1e-6)
-        hGlobalTiming.SetBinError(index + 1,
-                                  statistics.getGlobal().time_stddev(method)
-                                  * 1e-6)
+        hGlobalTiming.SetBinContent(index + 1, statistics.getGlobal().time_mean(method) * 1e-6)
+        hGlobalTiming.SetBinError(index + 1, statistics.getGlobal().time_stddev(method) * 1e-6)
         hGlobalTiming.GetXaxis().SetBinLabel(index + 1, methodName[method])
     hGlobalTiming.Write()
 
@@ -120,10 +116,8 @@ def statistics_plots(
                  jobDesc)))
         index = 1
         for modstat in modules:
-            hModuleTiming.SetBinContent(index, modstat.time_mean(method)
-                                        * 1e-6)
-            hModuleTiming.SetBinError(index, modstat.time_stddev(method)
-                                      * 1e-6)
+            hModuleTiming.SetBinContent(index, modstat.time_mean(method) * 1e-6)
+            hModuleTiming.SetBinError(index, modstat.time_stddev(method) * 1e-6)
             hModuleTiming.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
         hModuleTiming.Write('%s%sTiming' % (prefix, methodName[method]))
@@ -184,8 +178,7 @@ def statistics_plots(
         index = 1
         for modstat in modules:
             hModuleMemory.SetBinContent(index, modstat.memory_mean(method))
-            hModuleMemory.SetBinError(index, modstat.memory_stddev(method)
-                                      * sqrtN)
+            hModuleMemory.SetBinError(index, modstat.memory_stddev(method) * sqrtN)
             hModuleMemory.GetXaxis().SetBinLabel(index, modstat.name)
             index += 1
         hModuleMemory.Write('%s%sMemory' % (prefix, methodName[method]))
@@ -250,8 +243,7 @@ def event_timing_plot(
     if contact:
         hTiming.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
     for event in range(1 + burnIn, entries + 1):
-        hTiming.Fill(hEventTime.GetBinContent(event)
-                     - hEventTime.GetBinContent(event - 1))
+        hTiming.Fill(hEventTime.GetBinContent(event) - hEventTime.GetBinContent(event - 1))
     hTiming.Write()
     ROOT.gStyle.SetOptStat(stat)
 
@@ -480,7 +472,7 @@ class Validation:
 
         # Then add those central folders that do not have a local match
         for (package, folder) in get_validation_folders('central', self.basepaths, self.log).items():
-            if package not in validation_folders.keys():
+            if package not in validation_folders:
                 validation_folders[package] = folder
 
         # If we are not performing a complete validation, we need to remove
@@ -497,7 +489,7 @@ class Validation:
                 del validation_folders[ignored]
 
         # Now write to self.list_of_packages which packages we have collected
-        self.list_of_packages = validation_folders.keys()
+        self.list_of_packages = list(validation_folders.keys())
 
         # Finally, we collect the steering files from each folder we have
         # collected:
@@ -667,7 +659,7 @@ class Validation:
         if not self.quiet:
             # This variable is needed for the progress bar function
             progress_bar_lines = 0
-            print
+            print()
 
         # The list of scripts that have to be processed
         remaining_scripts = [script for script in self.list_of_scripts
@@ -675,7 +667,7 @@ class Validation:
 
         # Sort the list of scripts that have to be processed by runtime,
         # execute slow scripts first
-        remaining_scripts.sort(key=lambda x: x.runtime, reverse=True)
+        remaining_scripts.sort(key=lambda x: x.runtime or 0, reverse=True)
 
         # While there are scripts that have not yet been executed...
         while remaining_scripts:
@@ -729,10 +721,10 @@ class Validation:
                                        if script.status == ScriptStatus.waiting]
                             running = [script for script in remaining_scripts
                                        if script.status == ScriptStatus.running]
-                            print 'Finished [{0},{1}]: {2} -> {3}'.\
-                                format(len(waiting), len(running),
-                                       script_object.path,
-                                       script_object.status)
+                            print('Finished [{0},{1}]: {2} -> {3}'.format(
+                                len(waiting), len(running),
+                                script_object.path,
+                                script_object.status))
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed
@@ -772,16 +764,16 @@ class Validation:
                                        if _.status == ScriptStatus.waiting]
                             running = [_ for _ in remaining_scripts
                                        if _.status == ScriptStatus.running]
-                            print 'Started [{0},{1}]: {2}'.\
-                                format(len(waiting), len(running),
-                                       script_object.path)
+                            print('Started [{0},{1}]: {2}'.format(
+                                len(waiting), len(running),
+                                script_object.path))
 
             # Update the list of scripts that have to be processed
             remaining_scripts = [script for script in remaining_scripts if
                                  script.status in [ScriptStatus.waiting, ScriptStatus.running]]
 
             # Sort them again, Justin Case
-            remaining_scripts.sort(key=lambda x: x.runtime, reverse=True)
+            remaining_scripts.sort(key=lambda x: x.runtime or 0, reverse=True)
 
             # Wait for one second before starting again
             time.sleep(1)
@@ -797,7 +789,7 @@ class Validation:
         # And close the runtime data file
         if not self.mode == "cluster":
             runtimes.close()
-        print
+        print()
 
     def create_plots(self):
         """!

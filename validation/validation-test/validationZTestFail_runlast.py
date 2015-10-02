@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -14,6 +14,6 @@ validation correctly detects and reports this.
 
 import sys
 
-print "This script will exit with code 20 on purpose"
+print("This script will exit with code 20 on purpose")
 
 sys.exit(20)

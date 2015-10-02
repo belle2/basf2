@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import logging
 import os
 import subprocess
@@ -28,11 +31,11 @@ class Local:
         @param max_number_of_processes: The maximum number of processes
         """
 
-        # A dict which holds the connections between the jobs (=Script objects)
+        #: A dict which holds the connections between the jobs (=Script objects)
         # and the processes that were spawned for them
         self.jobs_processes = {}
 
-        # Contains a reference to the logger-object from validate_basf2
+        #: Contains a reference to the logger-object from validate_basf2
         # Set up the logging functionality for the 'local execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
@@ -140,7 +143,7 @@ class Local:
         # with the return code / exit_status of the process.
         if process.poll() is not None:
             del self.jobs_processes[job]
-            self.current_number_of_processes = len(self.jobs_processes.keys())
+            self.current_number_of_processes = len(self.jobs_processes)
             return [True, process.returncode]
         else:
             return [False, 0]

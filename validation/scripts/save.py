@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import math
@@ -33,19 +34,19 @@ def create_image_matrix(imidzes, package, size):
 
     # error handling
     if not imgs:
-        print "Something went wrong. Exitting."
+        print("Something went wrong. Exitting.")
         return 0
     if not imidzes:
-        print "Error: No images input."
+        print("Error: No images input.")
         return 0
     if not package:
-        print "Error: No package input."
+        print("Error: No package input.")
         return 0
     if not size:
-        print "Error: No size input."
+        print("Error: No size input.")
         return 0
     if not os.path.isdir("./plots/" + package):
-        print "Error: The requested directory does not exist."
+        print("Error: The requested directory does not exist.")
         return 0
 
     # initialize variables
@@ -224,7 +225,7 @@ def create_image_matrix(imidzes, package, size):
 
     # save image to a temp file
     img.save("./plots/matrix.png", "PNG")
-    print "Image successfully saved."
+    print("Image successfully saved.")
 
     # return true as a sign of successfull image creation
     return 1

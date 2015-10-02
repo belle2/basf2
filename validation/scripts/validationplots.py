@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # Normal imports
 import argparse
@@ -134,7 +134,7 @@ def find_root_object(list_of_root_objects, **kwargs):
     """
     if kwargs is not None:
         # Read in the filter and the values we are filtering for
-        sieve, desired_values = kwargs.items()[0]
+        sieve, desired_values = list(kwargs.items())[0]
 
         # If we don't receive a list of desired values, make it a list!
         if not isinstance(desired_values, list):
@@ -165,7 +165,7 @@ def serve_existing_plots(list_of_revisions):
     :return: No return value
     """
 
-    print "File exists already and will be served from archive!"
+    print("File exists already and will be served from archive!")
 
     """
     # The path where the content.html should be
@@ -328,7 +328,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
                          "names only as strings")
         pth += "/"
     # let the user know that where we are
-    print "Plot matrix creation from images from " + folder
+    print("Plot matrix creation from images from " + folder)
 
     # Get the file the Plotuples are from. Beware, this is a filthy hack and
     # the entire function should probably be redone!
@@ -397,7 +397,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
             plts = plts.strip()
             if plts.endswith(".png") and plts[:-4] in desc:
                 # first, print that we are attaching an image to the grid
-                print "Adding {0} to the plot matrix".format(plts[:-4])
+                print("Adding {0} to the plot matrix".format(plts[:-4]))
                 # set our image path
                 img = './plots/{0}/{1}/{2}'.format('_'.join(sorted(
                     list_of_revisions)), package, plts)
@@ -476,10 +476,10 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         for el in sorted(ident):
             # split the package from the plot key
 
-            print "el" + str(el)
+            print("el" + str(el))
 
             plts = el.split(PackageSeperatorToken)[1]
-            print "plts" + str(plts)
+            print("plts" + str(plts))
             # prepare the ends of lines
             if (i % k) == 0:
                 end = "\n</tr>\n<tr>"
@@ -532,7 +532,7 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
         html.append("\n<span class='noplots'><strong"
                     ">This section does not contain any plots."
                     "</strong></span>")
-    print "Plot matrix successfully created."
+    print("Plot matrix successfully created.")
     return html
 
 
@@ -568,13 +568,8 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
 
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages
-    plot_objects, \
-        plot_keys, \
-        plot_packages = create_RootObjects_from_list(list_of_plot_files, False)
-    reference_objects, \
-        reference_keys, \
-        reference_packages = create_RootObjects_from_list(
-            list_of_reference_files, True)
+    plot_objects, plot_keys, plot_packages = create_RootObjects_from_list(list_of_plot_files, False)
+    reference_objects,  reference_keys,  reference_packages = create_RootObjects_from_list(list_of_reference_files, True)
 
     # Get the joint lists (and remove duplicates if applicable)
     list_of_root_objects = plot_objects + reference_objects
@@ -610,7 +605,7 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
         i = i + 1
 
         # Some information to be printed out while the plots are created
-        print 'Now creating plots for package: {0}'.format(package)
+        print('Now creating plots for package: {0}'.format(package))
 
         html_output.write('<div id="' + package + '">\n')
         html_output.write('<h1>' + package + '</h1>\n')
@@ -631,7 +626,7 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
                 files_in_pkg.append(rootfile_name)
         files_in_pkg.sort()
 
-        print 'Files in pkg:', files_in_pkg
+        print('Files in pkg:', files_in_pkg)
 
         # Now we loop over all files that belong to the package to
         # group the plots correctly
@@ -641,7 +636,7 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
 
             # Some more information to be printed out while plots are
             # being created
-            print '\nNow creating plots for file: {0}'.format(rootfile)
+            print('\nNow creating plots for file: {0}'.format(rootfile))
 
             # Start the section for the fixed/floating headers
             html_output.write('<section class="persistent-area">')
@@ -698,7 +693,7 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
             html_output.write('</section>')
 
         # Make the command line output more readable
-        print 2 * '\n'
+        print(2 * '\n')
 
         # Close the div for the package
         html_output.write('</div>\n\n')
@@ -1225,7 +1220,7 @@ class Plotuple:
         for root_object in self.list_of_root_objects:
             if root_object.is_reference:
                 self.reference = root_object
-                print self.reference.rootfile
+                print(self.reference.rootfile)
                 break
 
         # If we couldn't find a reference element, add that to warnings
@@ -1622,7 +1617,7 @@ class Plotuple:
         # generated in several steps and serves as a buffer. Once the line
         # is finished, it is appended to 'html', which is a list of lines
         line = '<tr><th></th>'
-        for key in self.newest.object.keys():
+        for key in list(self.newest.object.keys()):
             columns.append(key)
             line += '<th>' + key + '</th>'
         line += '</tr>'
@@ -1644,7 +1639,7 @@ class Plotuple:
         # first row of the table
         else:
             line = '<tr><td>reference</td>'
-            for key in self.reference.object.keys():
+            for key in list(self.reference.object.keys()):
                 line += '<td>{0:.4f}</td>'.format(self.reference.object[key])
             line += '</tr>'
             html.append(line)
@@ -1724,7 +1719,7 @@ class Plotuple:
             html.append('<a href="./plots/{0}.pdf">'
                         '<img src="./plots/{0}.png"></a>\n'
                         .format(self.file))
-            print '\n' + self.file + '\n'
+            print('\n' + self.file + '\n')
 
         html.append('</div>\n')
 
@@ -1835,7 +1830,7 @@ def create_plots(revisions=None, force=False, process_pipe=None):
     # serve what's in the archive
     if os.path.exists(expected_path) and not force:
         serve_existing_plots(list_of_revisions)
-        print 'Served existing plots.'
+        print('Served existing plots.')
     # Otherwise: Create the requested plots
     else:
         generate_new_plots(list_of_revisions, process_pipe)
@@ -1856,8 +1851,8 @@ def create_plots(revisions=None, force=False, process_pipe=None):
             shutil.copyfile(src + 'content.html', dst + 'content.html')
             shutil.copyfile(src + 'packages.html', dst + 'packages.html')
 
-            print 'Copied generated content.html and packages.html to the ' \
-                  'base directory! \n'
+            print('Copied generated content.html and packages.html to the '
+                  'base directory! \n')
 
     # signal the main process that the plot creation is complete
     if process_pipe:

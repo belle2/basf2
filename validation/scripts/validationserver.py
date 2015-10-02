@@ -1,19 +1,19 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import argparse
-import BaseHTTPServer
+import http.server
 import logging as log
 import os
 import sys
 import traceback
 import mimetypes
 import webbrowser
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 from cgi import parse_header, parse_multipart
 from save import create_image_matrix, merge_multiple_plots
 from multiprocessing import Process, Pipe
-from urlparse import urlparse
+from urllib.parse import urlparse
 import time
 from functools import reduce
 
@@ -87,12 +87,12 @@ def check_plotting_status(progress_key):
 
     process, process_pipe, last_status = g_plottingProcesses[progress_key]
 
-    print "process is alive " + str(process.is_alive())
+    print("process is alive " + str(process.is_alive()))
     # read latest message
     while process_pipe.poll():
         msg = process_pipe.recv()
 
-        print "received : " + str(msg)
+        print("received : " + str(msg))
         last_status = msg
 
         # update the last status
@@ -119,7 +119,7 @@ def start_plotting_request(revision_names):
     return rev_key
 
 
-class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+class Handler(http.server.BaseHTTPRequestHandler):
 
     """!
     Defines how the BaseHTTPServer handles HTTP Requests (GET or POST)
@@ -368,7 +368,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             return 404, json.dumps({}), 'application/json'
 
         ajax_command = path_items[ajax_location + 1]
-        print "got ajax command" + ajax_command
+        print("got ajax command" + ajax_command)
 
         # Used to check if a web server is running
         if 'pingserver' == ajax_command:
@@ -516,7 +516,7 @@ def run(ip='localhost', port=8000):
     Runs a BaseHTTPServer on the given address
     """
     server_address = (ip, port)
-    httpd = BaseHTTPServer.HTTPServer(server_address, Handler, 'root')
+    httpd = http.server.HTTPServer(server_address, Handler, 'root')
     log.info("Server: Waiting for requests... \n")
     httpd.serve_forever()
 
@@ -563,4 +563,4 @@ def configure_and_run(ip='localhost', port=8000, parseCommandLine=False, openSit
         log.info("Server: Terminating")
     # Terminate upon KeyboardInterrupt
     except KeyboardInterrupt as k:
-        print "Server: Terminated by user!"
+        print("Server: Terminated by user!")

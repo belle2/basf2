@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # Import timeit module and start a timer. Allows to get the runtime of the
 # program at any given point
@@ -237,7 +237,7 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
 
     # Move the cursor up and clear lines
     for i in range(delete_lines):
-        print "\x1b[2K \x1b[1A",
+        print("\x1b[2K \x1b[1A", end=' ')
 
     # Print the progress bar:
     progressbar = ""
@@ -246,12 +246,12 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
             progressbar += '='
         else:
             progressbar += ' '
-    print '\x1b[0G[{0}] {1:6.1f}% ({2}/{3})'.format(progressbar, percent,
+    print('\x1b[0G[{0}] {1:6.1f}% ({2}/{3})'.format(progressbar, percent,
                                                     finished_scripts,
-                                                    all_scripts)
+                                                    all_scripts))
 
     # Print the total runtime:
-    print 'Runtime: {0}s'.format(runtime)
+    print('Runtime: {0}s'.format(runtime))
 
     # Print the list of currently running scripts:
     running = [os.path.basename(__.path) for __ in list_of_scripts
@@ -261,8 +261,8 @@ def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
     if not running:
         running = ['-']
 
-    print 'Running: {0}'.format(running[0])
+    print('Running: {0}'.format(running[0]))
     for __ in running[1:]:
-        print '{0} {1}'.format(len('Running:') * " ", __)
+        print('{0} {1}'.format(len('Running:') * " ", __))
 
     return len(running) + 2

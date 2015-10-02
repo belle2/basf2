@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import re
 import os
@@ -119,7 +119,7 @@ class Script:
         Print out all properties = attributes of a script.
         @return: None
         """
-        print
+        print()
         pp.pprint(vars(self))
 
     def get_recursive_dependencies(self, list_of_scripts, level=0):

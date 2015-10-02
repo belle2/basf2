@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -112,12 +112,12 @@ def parseCheckQuantity(quantString):
 
         # parse quantity further ?
         if "[" in quant[0] and "]" in quant[0]:
-            splitQuant = filter(lambda x: len(x) > 0, quant[0].replace("[", "]").split("]"))
-            spiltQuant = map(lambda x: x.strip(), splitQuant)
+            splitQuant = [x for x in quant[0].replace("[", "]").split("]") if len(x) > 0]
+            spiltQuant = [x.strip() for x in splitQuant]
             quant = (splitQuant[0], splitQuant[1])
 
     else:
-        print "cannot parse quantity expression " + str(quantString)
+        print("cannot parse quantity expression " + str(quantString))
         sys.exit(1)
 
     return (filename, quant, comp, val)
@@ -164,9 +164,9 @@ for c_string in argsVar["check_quantity"]:
     c_parsed = c_parsed + [parseCheckQuantity(c_string)]
 
 if argsVar["skip_compile"] is False:
-    print "Compiling revision ..."
+    print("Compiling revision ...")
     exitCode = os.system("scons -j8")
-    print "Exit code of compile was " + str(exitCode)
+    print("Exit code of compile was " + str(exitCode))
     if exitCode > 0 and argsVar["report_compile_fail"]:
         sys.exit(125)  # tell git to ignore this failed build
 
@@ -179,7 +179,7 @@ if len(validation_scripts) > 0:
     validation_call = "validate_basf2.py -s " + validation_scripts
     exitCode = os.system(validation_call)
 
-    print "Exit code of " + validation_call + " was " + str(exitCode)
+    print("Exit code of " + validation_call + " was " + str(exitCode))
 
     if exitCode > 0:
         if argsVar["report_execution_fail"]:
@@ -192,9 +192,9 @@ if argsVar["execute"] is None:
     argsVar["execute"] = []
 
 for ex in argsVar["execute"]:
-    print "Executing " + str(ex)
+    print("Executing " + str(ex))
     exitCode = os.system(ex.strip('"'))
-    print "Exit code of " + str(ex) + " was " + str(exitCode)
+    print("Exit code of " + str(ex) + " was " + str(exitCode))
 
     if exitCode > 0:
         if argsVar["report_execution_fail"]:
@@ -205,22 +205,22 @@ for ex in argsVar["execute"]:
 # perform checks
 for c in c_parsed:
 
-    print "Running check on file " + str(c[0]) + " for quantity " + str(c[1]) + " " + str(c[2]) + " " + str(c[3])
+    print("Running check on file " + str(c[0]) + " for quantity " + str(c[1]) + " " + str(c[2]) + " " + str(c[3]))
 
     file_name = c[0]
 
     refObjKey = c[1][0]
     results = {refObjKey: None}
     results = extract_information_from_file(file_name, results)
-    print "results " + str(results)
+    print("results " + str(results))
     if results is None:
-        print "result file " + str(file_name) + " not found"
-        print "Check failed"
+        print("result file " + str(file_name) + " not found")
+        print("Check failed")
         sys.exit(1)
 
     if results[refObjKey] is None:
-        print "could not find quantity " + str(c[1]) + " in file " + str(c[0])
-        print "Check failed"
+        print("could not find quantity " + str(c[1]) + " in file " + str(c[0]))
+        print("Check failed")
         sys.exit(1)
 
     if c[1][1] is None:
@@ -228,7 +228,7 @@ for c in c_parsed:
     else:
         subKeyNumber = int(c[1][1])
         valValue = results[refObjKey][subKeyNumber]
-    print "Retrieved value " + str(valValue)
+    print("Retrieved value " + str(valValue))
 
     compareResult = None
     if c[2] is ">":
@@ -236,14 +236,14 @@ for c in c_parsed:
     elif c[2] is "<":
         compareResult = float(valValue) < float(c[3])
     else:
-        print "Compare operation " + c[2] + " not supported"
+        print("Compare operation " + c[2] + " not supported")
         sys.exit(0)
 
     if not compareResult:
-        print "Check failed"
+        print("Check failed")
         sys.exit(1)
     else:
-        print "Check successful"
+        print("Check successful")
         sys.exit(0)
 
 sys.exit(0)

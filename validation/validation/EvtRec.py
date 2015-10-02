@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -44,7 +44,7 @@ add_mdst_output(main, True, '../EvtRec_mdst.root')
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)
 
 from validation import *
 statistics_plots('EvtRec_statistics.root', contact='tkuhr',

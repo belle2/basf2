@@ -167,7 +167,7 @@ namespace Belle2 {
       void shiftToPositiveArcLengths2D(bool doForAllTracks = false);
 
       /// Sort the CDCRecoHits by their CDCWireHit.
-      void sort() __attribute__((deprecated));
+      void sortByRadius();
 
       /// Legacy accessor for the CDCRecoHit3D of the track, still used in some corners of python scripts.
       const std::vector<CDCRecoHit3D>& items() const

@@ -149,7 +149,7 @@ void CDCTrack::receiveMaskedFlag() const
   }
 }
 
-void CDCTrack::sort()
+void CDCTrack::sortByRadius()
 { std::sort(begin(), end()); }
 
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)

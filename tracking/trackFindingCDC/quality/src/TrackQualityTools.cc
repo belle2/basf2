@@ -59,7 +59,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   }
 
   // We start with the most inner hit
-  track.sort();
+  track.sortByRadius();
 
   // We then set the trajectory to start with this point
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();

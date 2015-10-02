@@ -98,7 +98,7 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
     }
 
     // Set the start point of the trajectory to the first hit
-    newTrackCandidate.sort();
+    newTrackCandidate.sortByRadius();
     if (newTrackCandidate.size() < 5) {
       tracks.pop_back();
       continue;

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import os
 from basf2 import *
 
@@ -106,4 +107,4 @@ simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)
 
 process(main)
-print statistics
+print(statistics)

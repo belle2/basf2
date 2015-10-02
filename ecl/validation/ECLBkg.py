@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -44,7 +44,7 @@ eclanalysis.param('doTracking', 1)
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
-    print 'Warning: variable BELLE2_BACKGROUND_DIR is not set'
+    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
 
 # Create paths
 main = create_path()
@@ -55,4 +55,4 @@ add_reconstruction(main)
 main.add_module(eclanalysis)
 
 process(main)
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -80,4 +80,4 @@ ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
 process(main)
-print statistics
+print(statistics)

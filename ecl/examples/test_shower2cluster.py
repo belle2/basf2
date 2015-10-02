@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # basf2 test_shower2cluster.py
@@ -42,5 +42,4 @@ main.add_module(output)
 process(main)
 
 # ----> Print call statistics
-print statistics
-
+print(statistics)

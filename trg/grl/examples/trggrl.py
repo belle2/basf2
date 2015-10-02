@@ -1,12 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------------
 #           TSim-ecl example code.
-#-------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 #       In order to test Tsim-ecl code, you need a root file which has ECLHit table.(after Gsim)
 #       ex)
 #       commend > basf2 TrgEcl_pgun.py [Name of output root file]
-#-------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 import os
 from basf2 import *
 
@@ -19,13 +20,13 @@ if argc != 2:
 if argc == 2:
 
     f_out_root = argvs[1]
-print
-#print 'f_in_root  = %s' % f_in_root
-print 'f_out_root = %s\n' % f_out_root
+print()
+# print 'f_in_root  = %s' % f_in_root
+print('f_out_root = %s\n' % f_out_root)
 
 ################
-#f_in_root1 = f_in_root+ "1.root";
-#f_in_root2 = f_in_root+ "2.root";
+# f_in_root1 = f_in_root+ "1.root";
+# f_in_root2 = f_in_root+ "2.root";
 
 # suppress messages and warnings during processing:
 # level: LogLevel.DEBUG/INFO/WARNING/ERROR/FATALls
@@ -37,7 +38,7 @@ set_random_seed(0)
 basf2datadir = os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), 'data')
 
 # one event
-#eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+# eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 
 # Register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -46,8 +47,8 @@ eventinfoprinter = register_module('EventInfoPrinter')
 gearbox = register_module('Gearbox')
 
 # input
-#rootinput1 = register_module('RootInput')
-#rootinput1.param('inputFileName', f_in_root)
+# rootinput1 = register_module('RootInput')
+# rootinput1.param('inputFileName', f_in_root)
 
 # Geometry builder
 geometry = register_module('Geometry')
@@ -56,23 +57,20 @@ geometry = register_module('Geometry')
 g4sim = register_module('FullSim')
 
 # register module for TRGCDC
-#evtmetagen        = register_module('EventInfoSetter')
-evtmetainfo       = register_module('Progress')
-#paramloader       = register_module('Gearbox')
-#geobuilder        = register_module('Geometry')
-#particlegun       = register_module('ParticleGun')
-#evtgeninput       = register_module('EvtGenInput')
-#kkgeninput        = register_module('KKGenInput')
+# evtmetagen        = register_module('EventInfoSetter')
+evtmetainfo = register_module('Progress')
+# paramloader       = register_module('Gearbox')
+# geobuilder        = register_module('Geometry')
+# particlegun       = register_module('ParticleGun')
+# evtgeninput       = register_module('EvtGenInput')
+# kkgeninput        = register_module('KKGenInput')
 mcparticleprinter = register_module('PrintMCParticles')
-#g4sim             = register_module('FullSim')
-#bkgmixer          = register_module('BeamBkgMixer')
-cdcdigitizer      = register_module('CDCDigitizer')
-cdctrg            = register_module("TRGCDC")
-#rootOut           = register_module('RootOutput')
-#rootIn            = register_module('RootInput')
-
-
-
+# g4sim             = register_module('FullSim')
+# bkgmixer          = register_module('BeamBkgMixer')
+cdcdigitizer = register_module('CDCDigitizer')
+cdctrg = register_module("TRGCDC")
+# rootOut           = register_module('RootOutput')
+# rootIn            = register_module('RootInput')
 
 
 # one event
@@ -90,22 +88,23 @@ param_pGun = {
     'thetaGeneration': 'uniform',
     'thetaParams': [50., 130.],
     'phiGeneration': 'uniform',
-#    'phiParams': [0, 360],
+    #    'phiParams': [0, 360],
     'phiParams': [-45, 45],
     'vertexGeneration': 'uniform',
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
-    }
+}
 
 pGun.param(param_pGun)
 
-mcparticleprinter.param('maxLevel',-1)
+mcparticleprinter.param('maxLevel', -1)
 # need to check
-#g4sim.param('UICommands',['/control/execute ' + os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
+# g4sim.param('UICommands',['/control/execute ' +
+#                           os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
 
-#...CDCDigitizer...
-#set digitizer to no smearing
+# ...CDCDigitizer...
+# set digitizer to no smearing
 param_cdcdigi = {'Fraction': 1,
                  'Resolution1': 0.,
                  'Resolution2': 0.,
@@ -114,47 +113,46 @@ cdcdigitizer.param(param_cdcdigi)
 cdcdigitizer.param('AddInWirePropagationDelay', True)
 cdcdigitizer.param('AddTimeOfFlight', True)
 
-#...CDC Trigger...
-#---General settings---
-#cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
-cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051_2013beamtest.dat"))
-#cdctrg.param('DebugLevel', 1)
+# ...CDC Trigger...
+# ---General settings---
+# cdctrg.param('ConfigFile', os.path.join(basf2datadir,"trg/cdc/TRGCDCConfig_0_20101111_1051.dat"))
+cdctrg.param('ConfigFile', os.path.join(basf2datadir, "trg/cdc/TRGCDCConfig_0_20101111_1051_2013beamtest.dat"))
+# cdctrg.param('DebugLevel', 1)
 cdctrg.param('CurlBackStop', 0)
 cdctrg.param('SimulationMode', 1)        # 1:fast, 2:firm, 3:fast and firm
 cdctrg.param('FastSimulationMode', 0)
-#cdctrg.param('SimulationMode',0x11)
-#cdctrg.param('TRGCDCRootFile',1)
-#cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
-#---TSF settings---
-#TSLUT (latest version @ 2014.07)
-cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir,"trg/cdc/innerLUT_v2.2.coe"))
-cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir,"trg/cdc/outerLUT_v2.2.coe"))
-#cdctrg.param('TSFLogicLUT', 1)
-#cdctrg.param('TSFRootFile',1)
-#---2D finder settings---
-cdctrg.param('2DFinderPerfect',0)
-cdctrg.param('HoughFinderMeshX',160)
-cdctrg.param('HoughFinderMeshY',26)
-#---3D finder settings---
-cdctrg.param('Hough3DRootFile',1)
+# cdctrg.param('SimulationMode',0x11)
+# cdctrg.param('TRGCDCRootFile',1)
+# cdctrg.param('RootTRGCDCFile', 'TRGCDC.root')
+# ---TSF settings---
+# TSLUT (latest version @ 2014.07)
+cdctrg.param('InnerTSLUTFile', os.path.join(basf2datadir, "trg/cdc/innerLUT_v2.2.coe"))
+cdctrg.param('OuterTSLUTFile', os.path.join(basf2datadir, "trg/cdc/outerLUT_v2.2.coe"))
+# cdctrg.param('TSFLogicLUT', 1)
+# cdctrg.param('TSFRootFile',1)
+# ---2D finder settings---
+cdctrg.param('2DFinderPerfect', 0)
+cdctrg.param('HoughFinderMeshX', 160)
+cdctrg.param('HoughFinderMeshY', 26)
+# ---3D finder settings---
+cdctrg.param('Hough3DRootFile', 1)
 # 0: perfect finder, 1: Hough3DFinder, 2: (Default) GeoFinder, 3: VHDL GeoFinder
 # 0: (Default) Logic TSF, 1: LUT TSF
-#cdctrg.param('Finder3DMode',0)
-#---3D fitter settings---
-cdctrg.param('Fitter3DRootFile',1)
+# cdctrg.param('Finder3DMode',0)
+# ---3D fitter settings---
+cdctrg.param('Fitter3DRootFile', 1)
 cdctrg.param('RootFitter3DFile', 'Fitter3D.root')
 cdctrg.param('Fitter3DLRLUT', 0)
-
 
 
 # TRGECL
 trgeclfam = register_module("TRGECLFAM")
 trgecl = register_module("TRGECL")
 trgeclMC = register_module("TRGECLMCMatching")
-#addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
-trgeclfam.param('FAMFitMethod',1)
+# addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
+trgeclfam.param('FAMFitMethod', 1)
 
-grltrg          = register_module('TRGGRL')
+grltrg = register_module('TRGGRL')
 grltrg.param('DebugLevel', 0)
 grltrg.param('ConfigFile',
              os.path.join(os.environ['BELLE2_LOCAL_DIR'],
@@ -165,7 +163,7 @@ rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', f_out_root)
 
 # import random
-#progress = register_module('Progress')
+# progress = register_module('Progress')
 
 
 # Set parameters
@@ -173,12 +171,12 @@ rootoutput.param('outputFileName', f_out_root)
 # Create paths
 main = create_path()
 
-#main.add_module(rootinput1)
+# main.add_module(rootinput1)
 # main.add_module(rootinput2)
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtmetainfo)
-#main.add_module(paramloader)
+# main.add_module(paramloader)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(pGun)
@@ -190,7 +188,7 @@ main.add_module(cdctrg)
 main.add_module(trgeclfam)
 main.add_module(trgecl)
 main.add_module(grltrg)
-#main.add_module(trgeclMC)
+# main.add_module(trgeclMC)
 
 main.add_module(rootoutput)
 
@@ -200,5 +198,5 @@ process(main)
 ###
 ###
 ###
-print statistics
+print(statistics)
 # ===<END>

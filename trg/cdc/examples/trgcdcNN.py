@@ -1,4 +1,5 @@
-#!/user/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import basf2
 import numpy as np
@@ -15,9 +16,9 @@ and CDC trigger, and evaluated by an ensemble of trained neural networks.
 The results are collected and evaluated by a short test module.
 """
 
-#--------------#
+# ------------ #
 # user options #
-#--------------#
+# ------------ #
 
 # general options - bkg, detector components and digitizing should match training
 seed = 10000
@@ -52,9 +53,9 @@ mlpname += '.root'
 ptedges = [0.3, 0.4, 0.5, 0.7, 1., 2., 10.]
 zcut = 6
 
-#--------------------------------#
+# ------------------------------ #
 # create path up to neurotrigger #
-#--------------------------------#
+# ------------------------------ #
 
 # set random seed
 basf2.set_random_seed(seed)
@@ -101,9 +102,9 @@ trgcdc_params = {
 trgcdc.param(trgcdc_params)
 main.add_module(trgcdc)
 
-#--------------#
+# ------------ #
 # NeuroTrigger #
-#--------------#
+# ------------ #
 
 neuro = basf2.register_module('NeuroTrigger')
 
@@ -116,9 +117,9 @@ basf2.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo
 
 main.add_module(neuro)
 
-#-------------#
+# ----------- #
 # test module #
-#-------------#
+# ----------- #
 
 
 class TestModule(basf2.Module):
@@ -157,18 +158,18 @@ class TestModule(basf2.Module):
         for i in range(len(ptedges) - 1):
             inbin = np.where(np.logical_and(self.ptMC >= ptedges[i],
                                             self.ptMC <= ptedges[i + 1]))[0]
-            print "pt in", ptedges[i:(i + 2)], ":", len(inbin)
+            print("pt in", ptedges[i:(i + 2)], ":", len(inbin))
             if len(inbin) == 0:
                 continue
             # RMS
             zNN = self.zNN[inbin]
             zMC = self.zMC[inbin]
-            print "RMS:", np.std(zNN - zMC)
+            print("RMS:", np.std(zNN - zMC))
             # efficiency
             ip = np.where(abs(zMC) <= 1)[0]
             if len(ip) > 0:
-                print "zMC in +-1cm:", len(ip)
-                print "efficiency (zNN in +-%.1fcm):" % zcut, 100. * len(np.where(abs(zNN[ip]) <= zcut)[0]) / len(ip)
+                print("zMC in +-1cm:", len(ip))
+                print("efficiency (zNN in +-%.1fcm):" % zcut, 100. * len(np.where(abs(zNN[ip]) <= zcut)[0]) / len(ip))
 
 main.add_module(TestModule())
 
@@ -176,4 +177,4 @@ main.add_module(TestModule())
 basf2.process(main)
 
 # Print call statistics
-print basf2.statistics
+print(basf2.statistics)

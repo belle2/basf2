@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -12,10 +12,10 @@ os.environ['G4VRMLFILE_VIEWER'] = 'freewrl'
 eventinfosetter = register_module('EventInfoSetter')
 # Load XML parameters
 paramloader = register_module('Gearbox')
-#paramloader.param('fileName', '/geometry/Beast2_phase2.xml')
+# paramloader.param('fileName', '/geometry/Beast2_phase2.xml')
 paramloader.param('fileName', '/geometry/Beast2_phase1.xml')
-#paramloader.param('fileName', '/home/igal/src/belle2/release/beast/examples/Beast2_phase1.xml')
-#paramloader.param('fileName', '/beast/Beast2_phase1.xml')
+# paramloader.param('fileName', '/home/igal/src/belle2/release/beast/examples/Beast2_phase1.xml')
+# paramloader.param('fileName', '/beast/Beast2_phase1.xml')
 # Create Geometry
 geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
@@ -26,12 +26,12 @@ eventinfosetter.param('evtNumList', [1])
 
 g4sim.param('EnableVisualization', True)
 g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-            '/vis/scene/add/axes 0 0 0 31 mm',
-            '/vis/scene/add/trajectories smooth',
-            '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
-                                                                # Draw the geometry
-                                                                # Draw coordinate axes at the origin with a length of 100mm in each direction
-                                                                # Draw simulated tracks
+                           '/vis/scene/add/axes 0 0 0 31 mm',
+                           '/vis/scene/add/trajectories smooth',
+                           '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
+# Draw the geometry
+# Draw coordinate axes at the origin with a length of 100mm in each direction
+# Draw simulated tracks
 # Uncomment the following two lines to have yellow dots at each step boundary
 # along the trajectory
 # '/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true',

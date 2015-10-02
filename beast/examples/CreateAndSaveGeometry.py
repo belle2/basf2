@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -17,7 +17,7 @@ from basf2 import *
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')
-#eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
+# eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 
 # Geometry parameter loader
 gearbox = register_module('Gearbox')

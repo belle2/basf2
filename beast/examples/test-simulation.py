@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -63,7 +63,7 @@ particlegun.param({  # Shoot electrons and positrons
     'yVertexParams': [0.0],
     'zVertexParams': [0.0],
     'independentVertices': False,
-    })
+})
 
 # Main XML parameter file to load, relative to global data directory
 gearbox.param('fileName', 'beast/microtpc/detector.xml')
@@ -104,4 +104,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics of our microtpc event processing
-print statistics
+print(statistics)

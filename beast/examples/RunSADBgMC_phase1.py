@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -23,20 +23,20 @@ class PyTrigger(Module):
         self.return_value(0)
         mcparticles = Belle2.PyStoreArray('MCParticles')
         for p in mcparticles:
-            print
+            print()
             if len(p.getRelationsTo('MicrotpcSimHits')) > 0 \
-                or len(p.getRelationsTo('He3tubeSimHits')) > 0 \
-                or len(p.getRelationsTo('PindiodeSimHits')) > 0 \
-                or len(p.getRelationsTo('BgoSimHits')) > 0 \
-                or len(p.getRelationsTo('CsiSimHits')) > 0:
-#                B2INFO('found a Beast!')
+                    or len(p.getRelationsTo('He3tubeSimHits')) > 0 \
+                    or len(p.getRelationsTo('PindiodeSimHits')) > 0 \
+                    or len(p.getRelationsTo('BgoSimHits')) > 0 \
+                    or len(p.getRelationsTo('CsiSimHits')) > 0:
+                #                B2INFO('found a Beast!')
                 self.return_value(1)
 
                 break
 
 
 d = datetime.datetime.today()
-print d.strftime('job start: %Y-%m-%d %H:%M:%S\n')
+print(d.strftime('job start: %Y-%m-%d %H:%M:%S\n'))
 
 # read parameters
 
@@ -47,7 +47,7 @@ if argc == 3:
     name = argvs[1]
     num = argvs[2]
 else:
-    print './RunBGMC.py [(RBB,Touschek,Coulomb)_(HER,LER)(,_far)] [num]'
+    print('./RunBGMC.py [(RBB,Touschek,Coulomb)_(HER,LER)(,_far)] [num]')
     sys.exit()
 
 # set accring (0:LER, 1:HER)
@@ -56,10 +56,10 @@ if name.find('LER') != -1:
 elif name.find('HER') != -1:
     accring = 1
 else:
-    print 'name should include either of HER or LER'
+    print('name should include either of HER or LER')
     sys.exit()
 
-## set readmode (0:RBB, 1:Toucshek/Coulomb/Brems)
+# set readmode (0:RBB, 1:Toucshek/Coulomb/Brems)
 # if name.find("RBB") != -1 :
 #    readmode = 0
 # else
@@ -78,7 +78,7 @@ outputfilename = 'output/out_phase1_pos_TiN_' + name + '_' + num + '.root'
 seed = '1' + num + num + '1'
 
 # readouttime  [ns]
-### good readouttime = 100000 #[ns]
+# good readouttime = 100000 #[ns]
 readouttime = 100000  # [ns]
 # readouttime = 1000 #[ns]
 nevent = 10000000
@@ -92,34 +92,34 @@ nevent = 10000000
 if name == 'Brems_LER':
     readmode = 1
 elif name == 'Touschek_LER':
-#    nevent=583 #1us
+    #    nevent=583 #1us
     readmode = 1
 elif name == 'Coulomb_LER':
-#    nevent=3985
+    #    nevent=3985
     readmode = 1
 elif name == 'Brems_HER':
-#    nevent=1473
+    #    nevent=1473
     readmode = 1
 elif name == 'Touschek_HER':
-#    nevent=2104 #1us
+    #    nevent=2104 #1us
     readmode = 1
 elif name == 'Coulomb_HER':
-#    nevent=4257
+    #    nevent=4257
     readmode = 1
 else:
-#    nevent=4489
+    #    nevent=4489
 
-    print 'Unknown name!'
+    print('Unknown name!')
     sys.exit()
 
-print 'accring: ', accring, '(0:LER, 1:HER)'
-print 'input:   ', inputfilename
-print 'log:     ', logfilename
-print 'output:  ', outputfilename
-print 'range:   ', range
-print 'seed:    ', seed
-print 'nevent:  ', nevent
-print 'readouttime:', readouttime
+print('accring: ', accring, '(0:LER, 1:HER)')
+print('input:   ', inputfilename)
+print('log:     ', logfilename)
+print('output:  ', outputfilename)
+print('range:   ', range)
+print('seed:    ', seed)
+print('nevent:  ', nevent)
+print('readouttime:', readouttime)
 
 # -----------------------------------------------------------------
 
@@ -158,22 +158,22 @@ print 'readouttime:', readouttime
 # Example steering file - 2011 Belle II Collaboration
 ########################################################
 
-## Set the global log level
+# Set the global log level
 # set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.WARNING)
 # set_log_level(LogLevel.DEBUG)
 
 set_random_seed(int(seed))
 
-## Register the event meta generator and set the number of events to a very
-## high number which exceeds the number of events in the input file.
-## Register the event meta generator and set the number of events to a very
-## high number which exceeds the number of events in the input file.
+# Register the event meta generator and set the number of events to a very
+# high number which exceeds the number of events in the input file.
+# Register the event meta generator and set the number of events to a very
+# high number which exceeds the number of events in the input file.
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [nevent], 'runList': [1], 'expList': [1]})
 
-## Register the TouschekSADInput module and specify the location of the Touschek
-## input file. The file can be downloaded from the TWiki.
+# Register the TouschekSADInput module and specify the location of the Touschek
+# input file. The file can be downloaded from the TWiki.
 touschekinput = register_module('SADInput')
 touschekinput.param('Filename', inputfilename)
 
@@ -201,8 +201,8 @@ touschekinput.param('Range', range)
 # set the logging output of the Touschek Input module to DEBUG.
 # touschekinput.set_log_level(LogLevel.DEBUG)
 
-## Register the standard chain of modules to the framework,
-## which are required for the simulation.
+# Register the standard chain of modules to the framework,
+# which are required for the simulation.
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
@@ -220,10 +220,10 @@ fullsim.param('SecondariesEnergyCut', 0.0)  # in MeV
 
 # fullsim.set_log_level(LogLevel.DEBUG)
 
-## Add additional modules according to your own needs
+# Add additional modules according to your own needs
 progress = register_module('Progress')
 
-## Write the output to a file
+# Write the output to a file
 rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', outputfilename)
 rootoutput.param('updateFileCatalog', False)
@@ -234,9 +234,9 @@ rootoutput.param('updateFileCatalog', False)
 # rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","CsiSimHits"])
 # rootoutput.param('branchNames', ["BgoSimHits","MicrotpcSimHits","PindiodeSimHits","He3tubeSimHits","CsiSimHits","MCParticles"])
 rootoutput.param('branchNames', ['BgoSimHits', 'MicrotpcSimHits',
-                 'PindiodeSimHits', 'He3tubeSimHits', 'CsiSimHits'])
+                                 'PindiodeSimHits', 'He3tubeSimHits', 'CsiSimHits'])
 
-## Create the main path and add the required modules
+# Create the main path and add the required modules
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
@@ -246,13 +246,13 @@ main.add_module(fullsim)
 main.add_module(progress)
 ########################################
 # simulation is done now, so we'll put the PyTrigger module here
-##trigger = PyTrigger()
-##main.add_module(trigger)
+# trigger = PyTrigger()
+# main.add_module(trigger)
 
 # if PyTrigger returns 0, we'll jump into an empty path
 # (skipping further modules in 'main': Beast2 SimHits)
-##emptypath = create_path()
-##trigger.if_false(emptypath)
+# emptypath = create_path()
+# trigger.if_false(emptypath)
 ########################################
 main.add_module(rootoutput)
 
@@ -265,9 +265,9 @@ main.add_module(rootoutput)
 
 process(main)
 
-### Print some basic event statistics
-print 'Event Statistics:'
-print statistics
+# Print some basic event statistics
+print('Event Statistics:')
+print(statistics)
 
 d = datetime.datetime.today()
-print d.strftime('job finish: %Y-%m-%d %H:%M:%S\n')
+print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

@@ -25,13 +25,11 @@ namespace Belle2 {
      *
      * @param hits              A range of hits, which elements support ->getRLWireHit() to access a wire hit including a right left passage hypotheses.
      * @param[out] gfTrackCand  Genfit track candidate to be filled
-     * @param reverseRLInfo     Switch to indicate that the reverse right left passage shall be forwarded. */
+     * @param reverseRLInfo     Switch to indicate that the reverse right left passage shall be forwarded.
+     * @param sortingParameter  Sorting parameter if the first hit - 1. Defaults to -1 (so the first CDC hit has 0) */
     template<class AHitRange>
-    void fillHitsInto(const AHitRange& hits, genfit::TrackCand& gfTrackCand, bool reverseRLInfo = false)
+    void fillHitsInto(const AHitRange& hits, genfit::TrackCand& gfTrackCand, bool reverseRLInfo = false, int sortingParameter = -1)
     {
-      // the sorting parameter is just used to reinforce the order in the range.
-      int sortingParameter = -1;
-
       for (const auto& genHit : hits) {
         ++sortingParameter;
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -95,4 +95,4 @@ output = register_module('RootOutput')
 output.param('outputFileName', 'dedxPID_evtgen.root')
 main.add_module(output)
 process(main)
-print statistics
+print(statistics)

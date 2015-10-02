@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -16,7 +16,7 @@ reco_steering = Belle2.FileSystem.findFile('reconstruction/tests/reco.py_noexec'
 
 # create and move to temporary directory
 tempdir = tempfile.mkdtemp()
-print "Moving to temporary directory " + str(tempdir)
+print("Moving to temporary directory " + str(tempdir))
 os.chdir(tempdir)
 
 # run generator & simulation

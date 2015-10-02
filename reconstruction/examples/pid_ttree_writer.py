@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #############################################################
@@ -56,8 +56,7 @@ class TreeWriterModule(Module):
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key
-                                 + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def event(self):
         """Store TOP and dE/dx info in tree"""
@@ -110,7 +109,7 @@ class TreeWriterModule(Module):
                 # some tracks don't have an mcparticle (fixed now)
                 B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
-                print 'event: %d, track: %d' % (event, track.getArrayIndex())
+                print('event: %d, track: %d' % (event, track.getArrayIndex()))
 
     def terminate(self):
         """ Close the output file."""
@@ -126,4 +125,4 @@ main.add_module(register_module('RootInput'))
 main.add_module(TreeWriterModule())
 
 process(main)
-print statistics
+print(statistics)

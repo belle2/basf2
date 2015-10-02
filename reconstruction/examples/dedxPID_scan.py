@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -44,4 +44,4 @@ output.param('outputFileName', 'dedxPID_scan.root')
 output.param('branchNames', 'DedxTracks')
 main.add_module(output)
 process(main)
-print statistics
+print(statistics)

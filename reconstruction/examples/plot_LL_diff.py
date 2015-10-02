@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -51,7 +51,7 @@ class MinModule(Module):
                 # some tracks don't have an mcparticle
                 B2WARNING('problems with track <-> mcparticle relations')
                 event = Belle2.PyStoreObj('EventMetaData').obj().getEvent()
-                print 'event: %d, track: %d' % (event, track.getArrayIndex())
+                print('event: %d, track: %d' % (event, track.getArrayIndex()))
             else:
                 pdg = abs(mcpart.getPDG())
                 momentumVec = mcpart.getMomentum()
@@ -93,7 +93,7 @@ class MinModule(Module):
         # c1.Draw()
 
         c1.SaveAs('ll_diff.png')
-        print 'Output plots saved in ll_diff.png'
+        print('Output plots saved in ll_diff.png')
 
 
 main = create_path()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -16,11 +16,11 @@ argvs = sys.argv
 argc = len(argvs)
 
 if argc != 2:
-    print '***Error: output file not given -> specify it as an argument'
+    print('***Error: output file not given -> specify it as an argument')
     sys.exit()
 
 outFile = argvs[1]
-print 'Output file: ' + outFile
+print('Output file: ' + outFile)
 
 # set_log_level(LogLevel.ERROR)
 
@@ -43,4 +43,4 @@ main.add_module(progress)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -29,7 +29,7 @@ for i in range(particles.size()):
     pdgs.append(particles.at(i).getPDGCode())
 
 pdgs += [-p for p in pdgs]
-print pdgs
+print(pdgs)
 
 generator = register_module('ParticleGun')
 generator.param('momentumParams', [0.05, 4.5])
@@ -65,4 +65,4 @@ main.add_module(output)
 main.add_module(register_module('ProgressBar'))
 
 process(main)
-print statistics
+print(statistics)

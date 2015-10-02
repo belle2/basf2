@@ -192,7 +192,7 @@ namespace Belle2 {
 
     GeoCache& GeoCache::getInstance()
     {
-      static auto_ptr<GeoCache> instance(new GeoCache());
+      static unique_ptr<GeoCache> instance(new GeoCache());
       return *instance;
     }
   }

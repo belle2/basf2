@@ -73,7 +73,8 @@ namespace Belle2 {
        * created. All other components found in the parameters will be ignored
        * @param components List of detector components to be created
        */
-      void setDetectorComponents(const std::vector<std::string>& components) {
+      void setDetectorComponents(const std::vector<std::string>& components)
+      {
         m_components.clear();
         m_components.insert(components.begin(), components.end());
       }
@@ -84,7 +85,8 @@ namespace Belle2 {
        * the geometry, components matching names in the list will be ignored
        * @param components List of detector components to be excluded
        */
-      void setExcludedComponents(const std::vector<std::string>& components) {
+      void setExcludedComponents(const std::vector<std::string>& components)
+      {
         m_excluded.clear();
         m_excluded.insert(components.begin(), components.end());
       }
@@ -98,12 +100,14 @@ namespace Belle2 {
        *
        * @param components List of detector components to be added in addition
        */
-      void setAdditionalComponents(const std::vector<std::string>& components) {
+      void setAdditionalComponents(const std::vector<std::string>& components)
+      {
         m_additional.clear();
         m_additional.insert(components.begin(), components.end());
       }
 
-      void setAssignRegions(bool assignRegions) {
+      void setAssignRegions(bool assignRegions)
+      {
         m_assignRegions = assignRegions;
       }
 
@@ -126,7 +130,8 @@ namespace Belle2 {
        *
        * @return Pointer to the new G4VisAttributes object
        */
-      G4VisAttributes* newVisAttributes() {
+      G4VisAttributes* newVisAttributes()
+      {
         m_VisAttributes.push_back(new G4VisAttributes());
         return m_VisAttributes.back();
       }
@@ -134,12 +139,10 @@ namespace Belle2 {
     private:
       /** Default constructor declared private since class is a Singleton. */
       GeometryManager(): m_topVolume(0) {};
-      /** Destructor declared private since class is a Singleton */
-      ~GeometryManager() { clear(); delete gGeoManager; }
       /** Copy constructor declared private since class is a Singleton. */
-      GeometryManager(const GeometryManager&);
+      GeometryManager(const GeometryManager&) = delete;
       /** Assignment operator declared private since class is a Singleton. */
-      void operator=(const GeometryManager&);
+      GeometryManager& operator=(const GeometryManager&) = delete;
 
       /** Pointer to the top volume of the native geometry description */
       G4VPhysicalVolume* m_topVolume;
@@ -158,7 +161,7 @@ namespace Belle2 {
       /** List of visualization attributes */
       std::vector<G4VisAttributes*> m_VisAttributes;
       /** Allow destruction of instance */
-      friend class std::auto_ptr<GeometryManager>;
+      friend class std::default_delete<GeometryManager>;
     };
 
   }

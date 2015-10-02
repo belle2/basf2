@@ -103,9 +103,9 @@ namespace Belle2 {
       /** Singleton: hide constructor */
       Materials(): m_materialCache(CacheSize) {};
       /** Singleton: hide copy constructor */
-      Materials(const Materials&);
+      Materials(const Materials&) = delete;
       /** Singleton: hide assignment operator */
-      void operator=(const Materials&);
+      void operator=(const Materials&) = delete;
 
       /** Cache for already searched Materials */
       mutable MRUCache<std::string, G4Material*> m_materialCache;

@@ -107,9 +107,9 @@ namespace Belle2 {
       /** Singleton class, hidden constructor */
       GeoCache() {};
       /** Singleton class, hidden copy constructor */
-      GeoCache(const GeoCache&);
+      GeoCache(const GeoCache&) = delete;
       /** Singleton class, hidden assignment operator */
-      GeoCache& operator=(const GeoCache&);
+      GeoCache& operator=(const GeoCache&) = delete;
 
       /** Set of all PXD layer IDs */
       std::set<Belle2::VxdID> m_pxdLayers;

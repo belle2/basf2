@@ -29,17 +29,20 @@ namespace Belle2 {
     template<class MODEL> class Factory {
     public:
       /** Constructor to register a model with a given name */
-      Factory() {
+      Factory()
+      {
         EvtGenModelRegister::registerModel(factory);
       }
       /** Create a new instance of the EvtDecayBase and return the pointer */
-      static EvtDecayBase* factory() {
+      static EvtDecayBase* factory()
+      {
         return new MODEL();
       }
     };
 
     /** Register a new Model, called by the EvtGenModelRegister::Factory class */
-    static void registerModel(ModelFactory* factory) {
+    static void registerModel(ModelFactory* factory)
+    {
       getInstance().m_models.push_back(factory);
     }
 
@@ -54,13 +57,9 @@ namespace Belle2 {
     EvtGenModelRegister() {};
 
     /** Singleton: private copy constructor */
-    EvtGenModelRegister(const EvtGenModelRegister& other);
-
-    /** Singleton: private destructor */
-    ~EvtGenModelRegister() {};
-
-    /** Singleton: allow destruction of instance */
-    friend class std::auto_ptr<EvtGenModelRegister>;
+    EvtGenModelRegister(const EvtGenModelRegister& other) = delete;
+    /** Singleton: private assignment operator */
+    EvtGenModelRegister& operator=(const EvtGenModelRegister&) = delete;
 
     /** Return reference to the instance.
      * This class behaves like a purely static class but we need a singleton

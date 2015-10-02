@@ -31,7 +31,7 @@ namespace Belle2 {
 
     Materials& Materials::getInstance()
     {
-      static auto_ptr<Materials> instance(new Materials());
+      static unique_ptr<Materials> instance(new Materials());
       return *instance;
     }
 

@@ -49,7 +49,7 @@ namespace Belle2 {
 
     GeometryManager& GeometryManager::getInstance()
     {
-      static auto_ptr<GeometryManager> instance(new GeometryManager());
+      static unique_ptr<GeometryManager> instance(new GeometryManager());
       return *instance;
     }
 

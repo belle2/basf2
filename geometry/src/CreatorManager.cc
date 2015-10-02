@@ -19,7 +19,7 @@ using namespace Belle2::geometry;
 
 CreatorManager& CreatorManager::getInstance()
 {
-  static auto_ptr<CreatorManager> instance(new CreatorManager());
+  static unique_ptr<CreatorManager> instance(new CreatorManager());
   return *instance;
 }
 

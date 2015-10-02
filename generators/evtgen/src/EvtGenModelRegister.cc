@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -17,14 +16,14 @@ namespace Belle2 {
 
   EvtGenModelRegister& EvtGenModelRegister::getInstance()
   {
-    static auto_ptr<EvtGenModelRegister> instance(new EvtGenModelRegister());
+    static unique_ptr<EvtGenModelRegister> instance(new EvtGenModelRegister());
     return *instance;
   }
 
   list<EvtDecayBase*> EvtGenModelRegister::getModels()
   {
     list<EvtDecayBase*> modelList;
-    BOOST_FOREACH(ModelFactory * factory, getInstance().m_models) {
+    for (ModelFactory* factory : getInstance().m_models) {
       modelList.push_back(factory());
     }
     return modelList;

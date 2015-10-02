@@ -36,11 +36,12 @@ class BGHistogrammer(Module):
         ]
     #: length of simHits list
     n = len(simHits)
-    #: list of histograms
-    hist = [TH1F('h' + str(i), simHits[i], 400, -20, 20) for i in range(n)]
 
     def initialize(self):
         ''' Initialize the Module: set histogram axis titles, description and check'''
+
+        #: list of histograms
+        self.hist = [TH1F('h' + str(i), self.simHits[i], 400, -20, 20) for i in range(self.n)]
 
         for i in range(self.n):
             self.hist[i].GetXaxis().SetTitle('time [#mus]')

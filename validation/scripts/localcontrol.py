@@ -52,7 +52,7 @@ class Local:
         self.logger.note("Executing validation with {0} parallel processes.".
                          format(self.max_number_of_processes))
 
-        ## Counter for number of running parallel processes
+        #: Counter for number of running parallel processes
         self.current_number_of_processes = 0
 
     def available(self):
@@ -114,7 +114,7 @@ class Local:
         # If we are performing a dry run, just start an empty process.
         if dry:
             params = ['echo', '"Performing a dry run!"']
-        process = subprocess.Popen(params, stdout=log, stderr=log)
+        process = subprocess.Popen(params, stdout=log, stderr=subprocess.STDOUT)
 
         # Save the connection between the job and the given process-ID
         self.jobs_processes[job] = process

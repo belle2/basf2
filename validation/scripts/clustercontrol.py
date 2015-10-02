@@ -22,16 +22,16 @@ class Cluster:
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 
-        ## The command to submit a job. 'LOGFILE' will be replaced by the
+        #: The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
         # self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
         self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
 
-        ## The path, where the help files are being created
+        #: The path, where the help files are being created
         # Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
 
-        ## Contains a reference to the logger-object from validate_basf2
+        #: Contains a reference to the logger-object from validate_basf2
         # Set up the logging functionality for the 'cluster execution'-Class,
         # so we can log to validate_basf2.py's log what is going on in
         # .execute and .is_finished
@@ -41,12 +41,12 @@ class Cluster:
         # local machine. The information can be extracted from $BELLE2_TOOLS,
         # $BELLE2_RELEASE_DIR and $BELLE2_LOCAL_DIR
 
-        ## Path to the basf2 tools and central/local release
+        #: Path to the basf2 tools and central/local release
         self.tools = self.adjust_path(os.environ['BELLE2_TOOLS'])
         belle2_release_dir = os.environ.get('BELLE2_RELEASE_DIR', None)
         belle2_local_dir = os.environ.get('BELLE2_LOCAL_DIR', None)
 
-        ## The command for setuprel (and setoption)
+        #: The command for setuprel (and setoption)
         self.setuprel = 'setuprel'
         if belle2_release_dir is not None:
             self.setuprel += ' ' + belle2_release_dir.split('/')[-1]
@@ -66,7 +66,7 @@ class Cluster:
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
 
-        ## The file object to which all cluster messages will be written
+        #: The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
     def adjust_path(self, path):
@@ -162,7 +162,7 @@ class Cluster:
         # and just create the *.done file right away and delete the *.sh file.
         if not dry:
             process = subprocess.Popen(params, stdout=self.clusterlog,
-                                       stderr=self.clusterlog)
+                                       stderr=subprocess.STDOUT)
 
             # Check whether the submission succeeded
             if process.wait() != 0:

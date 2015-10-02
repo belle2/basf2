@@ -131,14 +131,18 @@ class FastBDTClassifier(object):
             variable_names = [name for name in variable_names if name not in exclude]
 
         # Remove the variables that have Monte Carlo truth information unless explicitly selected
-        variable_names = [name for name
-                          in variable_names
-                          if "truth" not in name or name in select]
+        truth_free_variable_names = [name for name
+                                     in variable_names
+                                     if "truth" not in name or name in select]
 
-        if "weight" in variable_names and "weight" not in select:
-            variable_names.remove("weight")
+        spectator_names = [name for name
+                           in variable_names
+                           if "truth" in name and name not in select]
 
-        for variable_name in variable_names:
+        if "weight" in truth_free_variable_names and "weight" not in select:
+            truth_free_variable_names.remove("weight")
+
+        for variable_name in truth_free_variable_names:
             if self.replace_nan:
                 replace_nan = self.replace_nan
                 variable_expression = "TMath::Finite({0})?{0}:{1}".format(variable_name, replace_nan)
@@ -146,6 +150,9 @@ class FastBDTClassifier(object):
                 variable_expression = variable_name
 
             factory.AddVariable(variable_expression)
+
+        for spectator_name in spectator_names:
+            factory.AddSpectator(spectator_name)
 
         if "weight" in column_names and "weight" not in exclude:
             get_logger().info("Setting weight column")

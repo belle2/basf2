@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -61,7 +61,7 @@ paramloader = register_module('Gearbox')
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
 paramloader.param('fileName', xmlgeometry)
-print xmlgeometry
+print(xmlgeometry)
 paramloader.param('fileName', xmlgeometry)
 
 # database testing
@@ -150,5 +150,5 @@ main.add_module(arichrec)
 process(main)
 
 # Print basic event statistics to stdout
-print 'Event Statistics:'
-print statistics
+print('Event Statistics:')
+print(statistics)

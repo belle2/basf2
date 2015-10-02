@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -49,13 +49,13 @@ parser.add_option('-n', '--neve', dest='neve', default=20000,
 fname = options.path + '/run' + options.runno + '.dat'
 
 if not os.path.isfile(fname):
-    print 'File does not exist:'
-    print fname
+    print('File does not exist:')
+    print(fname)
     fname += '.gz'
-    print 'Appending .gz...'
+    print('Appending .gz...')
 if not os.path.isfile(fname):
-    print 'File does not exist:'
-    print fname
+    print('File does not exist:')
+    print(fname)
     sys.exit(-1)
 
 if options.output == outroot:
@@ -66,7 +66,7 @@ else:
 mask = int(options.mask, 16)
 runno = int(options.runno)  # needed for geoarich module
 
-print 'TrackMask:' + options.mask
+print('TrackMask:' + options.mask)
 
 # this variable is called from GeoARICHBtest2011Creator
 averageagel = int(options.avgagel)
@@ -82,7 +82,7 @@ paramloader = register_module('Gearbox')
 xmlgeometry = 'file://%s/arich/modules/arichBtest/data/%s/arichBtest%s.xml' \
     % (os.getcwd(), options.year, options.year)
 paramloader.param('fileName', xmlgeometry)
-print xmlgeometry
+print(xmlgeometry)
 paramloader.param('fileName', xmlgeometry)
 
 # paramloader.param('Backends', ['sql:'])
@@ -107,7 +107,7 @@ btest.param('outputFileName', outroot)
 momentum = 120.0
 if options.year == '2013':
     momentum = 3.0
-print 'Beam momentum ' + str(momentum)
+print('Beam momentum ' + str(momentum))
 btest.param('beamMomentum', momentum)
 
 # Simulation module
@@ -153,5 +153,5 @@ main.add_module(geosaver)
 process(main)
 
 # Print basic event statistics to stdout
-print 'Event Statistics:'
-print statistics
+print('Event Statistics:')
+print(statistics)

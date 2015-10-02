@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -17,13 +17,14 @@ import sys
 from basf2 import *
 logging.log_level = LogLevel.WARNING
 
-print ''
-print 'Use the script as: basf2 ARICHBkg.py arguments'
-print 'Arguments are in the following order: type (RBB_HER,Touschek_HER,...), path to files , job number , number of files to analyse'
-print ''
-print 'example: basf2 ARICHBkg.py RBB_HER /gpfs/home/belle/nakayama/basf2_opt/release_201502_development/Work_MCgen/output/ 0 100'
-print 'will analyse first hundred RBB_HER files'
-print ''
+print('')
+print('Use the script as: basf2 ARICHBkg.py arguments')
+print('Arguments are in the following order: type (RBB_HER,Touschek_HER,...), path to files , '
+      'job number , number of files to analyse')
+print('')
+print('example: basf2 ARICHBkg.py RBB_HER /gpfs/home/belle/nakayama/basf2_opt/release_201502_development/Work_MCgen/output/ 0 100')
+print('will analyse first hundred RBB_HER files')
+print('')
 
 # -------------------------
 # here we register modules
@@ -51,7 +52,7 @@ for i in range(nfiles * n, nfiles * (n + 1)):
     fnames.append(filenn)
 
 out = 'arich_' + typee + '_' + str(n) + '.root'
-print 'Output file: ' + out
+print('Output file: ' + out)
 
 input.param('inputFileNames', fnames)
 geobuilder.param('components', ['ARICH'])

@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <Python.h>
 
 
 using namespace std;
@@ -38,6 +39,8 @@ void ProcHandler::startInputProcess()
     B2FATAL("fork() failed: " << strerror(errno));
   } else {
     s_processID = 10000;
+    //Reset some python state: signals, threads, gil in the child
+    PyOS_AfterFork();
     //die when parent dies
     prctl(PR_SET_PDEATHSIG, SIGHUP);
   }
@@ -57,6 +60,8 @@ void ProcHandler::startWorkerProcesses(int nproc)
       B2FATAL("fork() failed: " << strerror(errno));
     } else { // In worker process
       s_processID = i;
+      //Reset some python state: signals, threads, gil in the child
+      PyOS_AfterFork();
       //die when parent dies
       prctl(PR_SET_PDEATHSIG, SIGHUP);
       break;

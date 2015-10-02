@@ -40,8 +40,8 @@ class FastBDTClassifier(object):
         regexp2 = ".*" + str(name) + ".*"
         class_name = "TMVA::Method" + str(name)
         plugin_name = "TMVA" + str(name)
-        ctor1 = "Method" + str(name) + "(DataSetInfo&,TString)"
-        ctor2 = "Method" + str(name) + "(TString&,TString&,DataSetInfo&,TString&)"
+        ctor1 = "Method" + str(name) + "(TMVA::DataSetInfo&,TString)"
+        ctor2 = "Method" + str(name) + "(TString&,TString&,TMVA::DataSetInfo&,TString&)"
         ROOT.gPluginMgr.AddHandler(base, regexp1, class_name, plugin_name, ctor1)
         ROOT.gPluginMgr.AddHandler(base, regexp2, class_name, plugin_name, ctor2)
 

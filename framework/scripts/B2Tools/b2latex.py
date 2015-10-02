@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import subprocess
@@ -68,7 +68,8 @@ class LatexObject(object):
         output += self.output
         output += r"\end{document}"
 
-        file(filename, 'w').write(output)
+        with open(filename, 'w') as f:
+            f.write(output)
         if compile:
             for i in range(0, 2):
                 ret = subprocess.call(['pdflatex', '-halt-on-error', '-interaction=nonstopmode', filename])
@@ -395,7 +396,7 @@ if __name__ == '__main__':
         graphics.add(image, width=0.49)
     o += graphics.finish()
 
-    import format
+    from . import format
     o += Section("Format section e.g. " + format.decayDescriptor("B+ ==> mu+ nu gamma"))
     o += r"Some important channels in B physics"
     items = Itemize()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -24,7 +24,7 @@ def variable(variable_string):
         'extraInfo': r'ex\-tra\-In\-fo',
         'SignalProbability': r'Sig\-nal\-Prob\-a\-bil\-i\-ty',
         'cosAngleBetweenMomentumAndVertexVector': r'cosAngle\-Between\-Momentum\-And\-Vertex\-Vector'}
-    for key, value in substitutes.iteritems():
+    for key, value in substitutes.items():
         variable_string = variable_string.replace(key, value)
     return variable_string
 

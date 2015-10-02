@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from root_numpy import root2array, list_trees, list_branches, list_structures, array2root, tree2array
 import os
 import pandas as pd
@@ -21,7 +24,7 @@ def _get_pandas_branches(filename, tree, t, branches):
     TODO: Are there more possibilities for "wrong" branches?
     """
 
-    usable_column_types = [u"int", u"float", u"double", u"char", u"long", u"long long"]
+    usable_column_types = ["int", "float", "double", "char", "long", "long long"]
 
     structure = list_structures(filename, tree)
 
@@ -29,14 +32,15 @@ def _get_pandas_branches(filename, tree, t, branches):
         used_branches = structure
     else:
         used_branches = branches
-    all_numerical_branches = filter(lambda branch_name: structure[branch_name][0][1] in usable_column_types, used_branches)
+    all_numerical_branches = [branch_name for branch_name in used_branches if structure[branch_name][0][1] in usable_column_types]
     if len(all_numerical_branches) == 0:
         raise ValueError("Could not find any numerical branch in the tree %s. Can not export this tree." % tree)
 
     # Filter out the branches which are not one dimensional in the first column. We assume here that the root tree looks
     # the same on each row.
     first_row = tree2array(t, branches=all_numerical_branches, start=0, stop=1, step=1)[0]
-    good_indices = map(lambda x: x[0], filter(lambda element_with_index: element_with_index[1].size == 1, enumerate(first_row)))
+    good_indices = [x[0] for x in [element_with_index for element_with_index in enumerate(first_row)
+                                   if element_with_index[1].size == 1]]
     good_branches = [all_numerical_branches[b] for b in good_indices]
     if len(good_branches) == 0:
         raise ValueError(
@@ -73,9 +77,9 @@ class RootReader():
 
     def __next__(self):
         """ Python 3 iterator """
-        return self.next()
+        return next(self)
 
-    def next(self):
+    def __next__(self):
         """ The next function """
         root_array = tree2array(self.tree, self.branches,
                                 start=self.current_chunk * self.chunksize, stop=(self.current_chunk + 1) * self.chunksize, step=1)
@@ -120,7 +124,7 @@ def read_root(filename, branches=None, tree_key=None, chunksize=None):
             result_dataframes.update({tree: dataframe})
 
     if len(result_dataframes) == 1:
-        return result_dataframes.values()[0]
+        return list(result_dataframes.values())[0]
     else:
         return result_dataframes
 

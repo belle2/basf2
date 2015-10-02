@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import numpy as np
@@ -31,7 +31,7 @@ def read(optlevel, b, name):
     valuenormed = [0] * len(optlevel)
     sigmanormed = [0] * len(optlevel)
     n = [0] * len(optlevel)
-    t = range(0, len(optlevel))
+    t = list(range(0, len(optlevel)))
     for i in t:
         fobj = open('out/' + optlevel[i] + '.out', 'r')
         readvalue = []
@@ -43,7 +43,7 @@ def read(optlevel, b, name):
         # Calculation
         value[i] = np.mean(readvalue)
         sigma[i] = np.std(readvalue)
-        u = range(0, len(readvalue))
+        u = list(range(0, len(readvalue)))
         z = 0
         if cut:
             for j in u:
@@ -78,10 +78,9 @@ def read(optlevel, b, name):
     plt.close()
     fobj = open('plots/' + name + '.out', 'w')
     for i in t:
-        fobj.write(optlevel[i] + '&' + str(n[i]) + '&' + str('%.3f'
-                                                             % value[i]) + ' & ' + str('%.3f' % sigma[i]) + '&'
-                   + str('%.4f' % valuenormed[i]) + '&' + str('%.4f'
-                                                              % sigmanormed[i]) + '\\\\\n')
+        fobj.write(optlevel[i] + '&' + str(n[i]) + '&' + str('%.3f' % value[i]) +
+                   ' & ' + str('%.3f' % sigma[i]) + '&' + str('%.4f' % valuenormed[i]) +
+                   '&' + str('%.4f' % sigmanormed[i]) + '\\\\\n')
         fobj.write("\hline\n")
 
 

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # checks all built shared libraries for undefined symbols
 # (not satisfied by links)
 
@@ -35,9 +38,9 @@ def checkLinks(subdir):
             os.system("g++ -o %s -L%s -l:%s %s" %
                       (tmpfile.name, libdir, lib, maincc[1]))
             tmpfile.close()  # might not work
-            print "passed: " + lib
+            print("passed: " + lib)
         except:
-            print "FAILED: " + lib
+            print("FAILED: " + lib)
             pass
 
 checkLinks('lib')

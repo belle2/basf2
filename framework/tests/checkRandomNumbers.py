@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# coding: utf8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """
 Check that random numbers don't change and are consistent.
@@ -11,8 +11,6 @@ It also sets the framework to debugging output and shows the information used
 to calculate the random generator state.
 """
 
-
-from __future__ import print_function, division
 import struct
 from basf2 import *
 from ROOT import gRandom

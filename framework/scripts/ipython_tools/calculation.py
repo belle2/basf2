@@ -1,5 +1,8 @@
-import viewer
-import queue
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from . import viewer
+from . import queue
 import inspect
 import time
 
@@ -66,13 +69,13 @@ class Basf2Calculation:
             process_bars = {process: viewer.ProgressBarViewer()
                             for process in self.process_list if process.path is not None}
 
-        started_processes = filter(lambda p: p.path is not None, self.process_list)
+        started_processes = [p for p in self.process_list if p.path is not None]
         running_processes = started_processes
         # Update all process bars as long as minimum one process is running
         while len(running_processes) > 0:
 
-            running_processes = filter(lambda p: self.is_running(p), started_processes)
-            ended_processes = filter(lambda p: not self.is_running(p), started_processes)
+            running_processes = [p for p in started_processes if self.is_running(p)]
+            ended_processes = [p for p in started_processes if not self.is_running(p)]
 
             for process in ended_processes:
                 if display_bar:
@@ -128,7 +131,7 @@ class Basf2Calculation:
             return map_function(self.process_list[0])
         else:
             if index is None:
-                return map(map_function, self.process_list)
+                return list(map(map_function, self.process_list))
             else:
                 if isinstance(index, int):
                     return map_function(self.process_list[index])
@@ -232,7 +235,7 @@ class Basf2Calculation:
             widget = widget_function(self.process_list[0])
         else:
             if index is None:
-                widget = viewer.ProcessViewer(map(widget_function, self.process_list))
+                widget = viewer.ProcessViewer(list(map(widget_function, self.process_list)))
             else:
                 if isinstance(index, int):
                     widget = widget_function(self.process_list[index])
@@ -303,8 +306,8 @@ class Basf2CalculationList:
         """
         import itertools
 
-        parameter_names_in_list = list(self.lists.iterkeys())
-        parameter_values_in_list = list(self.lists.itervalues())
+        parameter_names_in_list = list(self.lists.keys())
+        parameter_values_in_list = list(self.lists.values())
 
         every_parameter_combination = itertools.product(*parameter_values_in_list)
 

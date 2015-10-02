@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # The needed scrips from this package
-import python_modules
-import calculation
-import queue
+from . import python_modules
+from . import calculation
+from . import queue
 
 # System imports
 import os

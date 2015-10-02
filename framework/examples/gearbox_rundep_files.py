@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ############################################################
@@ -52,4 +52,4 @@ main.add_module(gearbox)
 
 # Process all events
 process(main)
-print statistics(statistics.BEGIN_RUN)
+print(statistics(statistics.BEGIN_RUN))

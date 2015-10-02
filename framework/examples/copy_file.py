@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # copy a file by reading it using RootInput and writing it again
@@ -21,4 +21,4 @@ main.add_module('ProgressBar')
 
 process(main)
 
-print statistics
+print(statistics)

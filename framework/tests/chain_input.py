@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -14,7 +14,7 @@ class NoopModule(Module):
 class TestModule(Module):
     """Test to read relations in the input files."""
 
-    ##event counter
+    #: event counter
     iEvent = 0
 
     def event(self):
@@ -33,7 +33,7 @@ class TestModule(Module):
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print 'truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex())
+                print('truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex()))
 
         self.iEvent += 1
 

@@ -1,10 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Test the parallel processing functionality by simulating a few events
 # using 2 processes (so nothing too taxing)
 
+import os
 from basf2 import *
+from ROOT import TFile, TTree
 
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
@@ -176,11 +178,9 @@ if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
 set_nprocesses(2)
 process(main)
 
-print statistics
+print(statistics)
 
 # check wether output file contains correct number of events
-from ROOT import TFile
-from ROOT import TTree
 file = TFile('parallel_processing_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 5:
@@ -195,5 +195,4 @@ if numhits < 5:  # usually much more, existence is most important thing here
     B2FATAL('Output file should contain at least 5 hits!')
 
 
-import os
 os.remove('parallel_processing_test.root')

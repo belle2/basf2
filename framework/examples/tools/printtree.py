@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import ROOT
 import sys
@@ -16,7 +17,7 @@ args = parser.parse_args()
 rootFile = ROOT.TFile(args.ROOTFILE)
 tree = rootFile.Get(args.TREENAME)
 if not tree:
-    print "Couldn't find tree: " + args.TREENAME
+    print("Couldn't find tree: " + args.TREENAME)
     sys.exit(1)
 
 
@@ -49,16 +50,16 @@ else:
     # use TObjArray sort instead
     branchesList.Sort()
 
-    print "%s:\t%30s\t%7s\t%7s" % ("#", "Branch Name", "Size", "Compressed Size")
-    print "===================================================================="
+    print("%s:\t%30s\t%7s\t%7s" % ("#", "Branch Name", "Size", "Compressed Size"))
+    print("====================================================================")
     for index, branch in enumerate(branchesList):
         size = convert_bytes(branch.GetTotBytes('*'))
         comp_size = convert_bytes(branch.GetZipBytes('*'))
-        print "%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size)
+        print("%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size))
     print "===================================================================="
     tot = tree.GetTotBytes()
     totzip = tree.GetZipBytes()
     nentries = tree.GetEntries()
-    print "\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tot), convert_bytes(totzip))
-    print "\t%30s\t%7s\t%7s" % ("Per entry", convert_bytes(tot/nentries), convert_bytes(totzip/nentries))
-    print "'%s' contains %d entries." % (args.TREENAME, nentries)
+    print("\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tot), convert_bytes(totzip)))
+    print("\t%30s\t%7s\t%7s" % ("Per entry", convert_bytes(tot/nentries), convert_bytes(totzip/nentries)))
+    print("'%s' contains %d entries." % (args.TREENAME, nentries))

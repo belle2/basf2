@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # basf2 imports
 import basf2
 from ROOT import Belle2

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -89,7 +89,7 @@ anotherpath.add_module(eventinfo)
 # check printing of paths, should be:
 # [] -> eventinfosetter -> [SelectOddEvents -> eventinfo]
 # -> printcollections
-print main
+print(main)
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
 # [] -> eventinfosetter -> [SelectOddEvents -> [Progress -> []]]
@@ -117,4 +117,4 @@ process(main)
 B2INFO("second process() call follows...")
 process(main)
 
-print main
+print(main)

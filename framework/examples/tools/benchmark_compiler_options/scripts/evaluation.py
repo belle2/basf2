@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import numpy as np
@@ -21,7 +21,7 @@ def read(optlevel):
 
     filename = 'output/output-' + optlevel + '.dat'
     if fFileExist(filename) == 0:
-        print 'missing ' + filename
+        print('missing ' + filename)
     else:
         CDCLegendreTracking = []
         fobj = open(filename, 'r')
@@ -31,7 +31,7 @@ def read(optlevel):
                 words = line.split()
                 CDCLegendreTracking.append(float(words[6]))
         fobj.close()
-        print optlevel + ' read'
+        print(optlevel + ' read')
         # write CDCLegendreTracking times
         fobj = open('out/' + optlevel + '.out', 'w')
         for i in range(0, len(CDCLegendreTracking)):

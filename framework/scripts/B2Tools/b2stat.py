@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 # Thomas Keck 2015
 
 import copy
@@ -15,8 +16,8 @@ def binom_error(n_sig, n_tot):
     for an efficiency = nSig/nTrueSig or purity = nSig / (nSig + nBckgrd), this function calculates the
     standard deviation according to http://arxiv.org/abs/physics/0701199 .
     """
-    variance = numpy.where(n_tot > 0, (n_sig + 1) * (n_sig + 2) / ((n_tot + 2) * (n_tot + 3))
-                           - (n_sig + 1) ** 2 / ((n_tot + 2) ** 2), 0)
+    variance = numpy.where(n_tot > 0, (n_sig + 1) * (n_sig + 2) / ((n_tot + 2) * (n_tot + 3)) -
+                           (n_sig + 1) ** 2 / ((n_tot + 2) ** 2), 0)
     return numpy.sqrt(variance)
 
 
@@ -64,7 +65,7 @@ class Histograms(object):
         # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
         self.hists = dict()
-        for name, mask in masks.iteritems():
+        for name, mask in masks.items():
             self.hists[name] = numpy.histogram(data.loc[mask, column], bins=self.bins,
                                                weights=None if weight_column is None else data.loc[mask, weight_column])[0]
 

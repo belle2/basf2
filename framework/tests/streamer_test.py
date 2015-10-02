@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 from basf2 import *
+from ROOT import TFile, TTree
 
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -42,8 +44,6 @@ process(main)
 
 
 # load file and see if it can be read properly
-from ROOT import TFile
-from ROOT import TTree
 file = TFile('streamer_test.root')
 tree = file.Get('tree')
 
@@ -61,5 +61,4 @@ tree.Project("", "ZZZ.Doesnt.Exist")
 # also test using some class members
 tree.Project("", "GF2Tracks.getNumPoints()")
 
-import os
 os.remove('streamer_test.root')

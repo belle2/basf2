@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ###############################################################################
@@ -12,16 +12,16 @@ from basf2 import *
 
 try:
     import matplotlib
-    #to avoid loading gtk backend in the following imports
-    #(fails if no X11 display is available)
+    # to avoid loading gtk backend in the following imports
+    # (fails if no X11 display is available)
     matplotlib.use('agg')
 
     import matplotlib.pyplot as plt
     from matplotlib.patches import Circle
     import matplotlib.cm as colormap
 except:
-    B2FATAL('This example requires Matplotlib. Please install'\
-          ' it and try again. (Package "python-matplotlib" on Debian/Ubuntu)')
+    B2FATAL('This example requires Matplotlib. Please install'
+            ' it and try again. (Package "python-matplotlib" on Debian/Ubuntu)')
 
 from ROOT import Belle2
 import os
@@ -40,14 +40,7 @@ def plot(x, y, col, show=0):
     # draw the x/y arrays. note that looping over the hits and
     # drawing them individually would be much slower
     for i in range(len(col)):
-        ax.plot(
-            x[i],
-            y[i],
-            marker='.',
-            color=col[i],
-            linestyle='None',
-            markersize=1,
-            )
+        ax.plot(x[i], y[i], marker='.', color=col[i], linestyle='None', markersize=1)
 
     ax.set_title('CDCSimHits')
     ax.set_xlabel('x [cm]')
@@ -55,18 +48,7 @@ def plot(x, y, col, show=0):
     ax.axis('scaled')
 
     # draw CDC superlayer boundaries
-    layers = [
-        16.8,
-        25.7,
-        36.5,
-        47.6,
-        58.4,
-        69.5,
-        80.2,
-        91.3,
-        102.0,
-        111.1,
-        ]
+    layers = [16.8, 25.7, 36.5, 47.6, 58.4, 69.5, 80.2, 91.3, 102.0, 111.1]
     Circs = [Circle((0, 0), a, facecolor='none', edgecolor='lightgrey')
              for a in layers]
     for e in Circs:
@@ -86,7 +68,7 @@ class CDCPlotModule(Module):
     matplotlib. The result is saved as a PNG.
     """
 
-    ## event counter
+    # event counter
     num_events = 0
 
     def event(self):
@@ -103,7 +85,7 @@ class CDCPlotModule(Module):
         mcparts = []
         for hit in simhits:
             mcpart = hit.getRelatedFrom("MCParticles")
-            if not mcpart in mcparts:
+            if mcpart not in mcparts:
                 mcparts.append(mcpart)
                 trackhits_x.append([])
                 trackhits_y.append([])
@@ -166,7 +148,7 @@ param_pGun = {
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
-    }
+}
 
 pGun.param(param_pGun)
 
@@ -185,4 +167,4 @@ main.add_module(g4sim)
 main.add_module(plotmodule)
 
 process(main)
-print statistics
+print(statistics)

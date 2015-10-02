@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -18,14 +18,14 @@ if len(sys.argv) == 2:
             current_module = register_module(modName)
             print_params(current_module, False, avModList[modName])
         except:
-            B2FATAL('The module could not be loaded. This is most likely '
-                    + 'caused by a library with missing links.')
+            B2FATAL('The module could not be loaded. This is most likely ' +
+                    'caused by a library with missing links.')
     elif modName == modName.lower():
         # lower case? might be a package instead
         print_all_modules(avModList, modName)
     else:
-        B2FATAL('Print module information: A module with the name "'
-                + modName + '" does not exist!')
+        B2FATAL('Print module information: A module with the name "' +
+                modName + '" does not exist!')
 else:
     # Otherwise print all modules.
     print_all_modules(avModList)

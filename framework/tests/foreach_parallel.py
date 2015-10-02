@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # Test that for_each also works with parallel processing
 from basf2 import *
+from ROOT import Belle2
 
 path = create_path()
 
@@ -12,8 +16,6 @@ path.add_module(eventinfosetter)
 pgun = register_module('ParticleGun')
 pgun.param('nTracks', 3)
 path.add_module(pgun)
-
-from ROOT import Belle2
 
 
 class TestModule(Module):
@@ -39,6 +41,6 @@ path.for_each('MCParticle', 'MCParticles', subeventpath)
 
 path.add_module('PrintCollections')
 
-print path
+print(path)
 set_nprocesses(2)
 process(path)

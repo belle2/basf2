@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -89,7 +89,7 @@ anotherpath.add_path(subsubpath)
 # check printing of paths, should be:
 # [] -> eventinfosetter -> [SelectOddEvents -> eventinfo -> [Progress -> []]]
 # -> printcollections
-print main
+print(main)
 
 # when the module returns false/0 (odd events), we jump to Progress instead:
 # [] -> eventinfosetter -> [SelectOddEvents -> [Progress -> []]]
@@ -114,4 +114,4 @@ main.add_module(PrintName("final"))
 
 process(main)
 
-print main
+print(main)

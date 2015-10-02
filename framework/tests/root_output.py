@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
 from basf2 import *
+from ROOT import TFile, TTree
 
 # Register modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -29,8 +30,6 @@ main.add_module(output)
 process(main)
 
 # check wether output file contains correct number of events
-from ROOT import TFile
-from ROOT import TTree
 file = TFile('root_output_test.root')
 tree = file.Get('tree')
 if tree.GetEntries() != 200:

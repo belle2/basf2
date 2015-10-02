@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # This test catches a regression in PyRoot (in root 5.34/19+?, fixed in 5.34/23)
@@ -13,6 +13,6 @@ tree = f.Get('tree')
 tree.GetEntry(0)
 hits = tree.PXDSimHits
 nentries = hits.GetEntriesFast()
-print nentries
+print(nentries)
 hit = hits[0]
 hit.Dump()

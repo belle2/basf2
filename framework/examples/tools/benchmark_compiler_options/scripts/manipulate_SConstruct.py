@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -22,12 +22,12 @@ for line in fobj:
 for i in range(0, len(input_data)):
     if input_data[i].startswith('elif option == \'opt\':'):
         a = True
-        print 'line found'
+        print('line found')
     if a:
         if input_data[i].startswith('    global_env.Append(CCFLAGS'):
             output.append(option)
             a = False
-            print 'option changed'
+            print('option changed')
         else:
             output.append(input_data[i])
     else:

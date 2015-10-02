@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
@@ -23,7 +23,7 @@ class TestModule(Module):
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print 'truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex())
+                print('truehit %d => hit %d' % (truehit.getArrayIndex(), hit.getArrayIndex()))
 
 
 # ============================================================================

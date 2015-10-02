@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -11,13 +11,13 @@
 from basf2 import *
 
 # show default loglevel
-print 'Default loglevel:', logging.log_level
+print('Default loglevel:', logging.log_level)
 
 # change loglevel to show also debug messages
 logging.log_level = LogLevel.DEBUG
 # or alternatively:
 set_log_level(LogLevel.DEBUG)
-print 'New loglevel:    ', logging.log_level
+print('New loglevel:    ', logging.log_level)
 
 # change debug level
 logging.debug_level = 123
@@ -33,13 +33,13 @@ logging.set_package('pxd', pxd_logging)
 # set specific log options for svd package:
 # debug level 10, print level, message, and file name for info messages
 logging.package('svd').debug_level = 10
-logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE
-                                | LogInfo.FILE)
+logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE |
+                                LogInfo.FILE)
 
 # show default loginfo for all levels
 for (name, value) in LogLevel.names.items():
     if name != 'default':
-        print 'LogInfo for level %8s: %3d' % (name, logging.get_info(value))
+        print('LogInfo for level %8s: %3d' % (name, logging.get_info(value)))
 
 # reset logging connections (default log connection to the console is deleted)
 logging.reset()
@@ -70,7 +70,7 @@ B2INFO('Some other message')
 
 # show number of log_messages per level
 for (level, num) in logging.log_stats.items():
-    print 'Messages for level %8s: %2d' % (level.name, num)
+    print('Messages for level %8s: %2d' % (level.name, num))
 
 eventinfosetter = register_module('EventInfoSetter')
 # configure logging for the EventInfoSetter module:

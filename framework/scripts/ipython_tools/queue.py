@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from multiprocessing import Queue
-from Queue import Empty
+from queue import Empty
 
 
 class Basf2CalculationQueue:
@@ -57,7 +60,7 @@ class Basf2CalculationQueue:
         Do not call this but rather use the functions from _Basf2Calculation.
         """
         self.fill_results()
-        return self.results.keys()
+        return list(self.results.keys())
 
 
 class Basf2CalculationQueueItem:

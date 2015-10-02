@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import random
 import string
 import os
@@ -398,7 +401,7 @@ class ProcessViewer(object):
         import ipywidgets as widgets
 
         a = widgets.Tab()
-        for i in xrange(len(self.children)):
+        for i in range(len(self.children)):
             a.set_title(i, "Process " + str(i))
         a.children = [children.create() for children in self.children if children is not None]
         return a

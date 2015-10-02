@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 # Thomas Keck 2015
 
 import copy
@@ -18,7 +19,7 @@ import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
 
-import b2stat
+from . import b2stat
 
 from basf2 import *
 
@@ -165,7 +166,7 @@ class Plotter(object):
             if 'color' not in errorbar_kwargs:
                 errorbar_kwargs['color'] = color
             if 'ecolor' not in errorbar_kwargs:
-                errorbar_kwargs['ecolor'] = map(lambda x: 0.5 * x, color)
+                errorbar_kwargs['ecolor'] = [0.5 * x for x in color]
             e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, **errorbar_kwargs)
 
         if errorband_kwargs is not None and yerr is not None:
@@ -245,7 +246,7 @@ class PurityOverEfficiency(Plotter):
         self.axis.set_title("ROC Purity Plot")
         self.axis.get_xaxis().set_label_text('Efficiency')
         self.axis.get_yaxis().set_label_text('Purity')
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -285,7 +286,7 @@ class RejectionOverEfficiency(Plotter):
         self.axis.set_title("ROC Rejection Plot")
         self.axis.get_xaxis().set_label_text('Signal Efficiency')
         self.axis.get_yaxis().set_label_text('Background Rejection')
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -326,7 +327,7 @@ class Diagonal(Plotter):
         self.axis.set_title("Diagonal Plot")
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Purity Per Bin')
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -410,7 +411,7 @@ class Distribution(Plotter):
             self.axis.get_yaxis().set_label_text('# Entries per Bin / Bin Width')
         else:
             self.axis.get_yaxis().set_label_text('# Entries per Bin')
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -508,7 +509,7 @@ class Difference(Plotter):
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
         self.axis.get_xaxis().set_label_text('Classifier Output')
         self.axis.get_yaxis().set_label_text('Difference')
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -601,6 +602,7 @@ class Overtraining(Plotter):
             B2WARNING("Cannot calculate kolmogorov smirnov test for background due to missing data")
         else:
             ks = scipy.stats.ks_2samp(data.loc[train_mask & bckgrd_mask, column], data.loc[test_mask & bckgrd_mask, column])
+            props = dict(boxstyle='round', edgecolor='gray', facecolor='white', linewidth=0.1, alpha=0.5)
             self.axis_d2.text(0.1, 0.9, r'background (train - test) difference $p={:.2f}$'.format(ks[1]), fontsize=36, bbox=props,
                               verticalalignment='top', horizontalalignment='left', transform=self.axis_d2.transAxes)
         return self
@@ -684,7 +686,7 @@ class VerboseDistribution(Plotter):
             box_axis.get_xaxis().set_label_text('')
         self.box_axes[-1].set_title("")
         self.axis.set_title("Distribution Plot")
-        self.axis.legend(map(lambda x: x[0], self.plots), self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
@@ -753,9 +755,9 @@ class CorrelationMatrix(Plotter):
         cmap = seaborn.diverging_palette(220, 10, as_cmap=True)
         # Draw the heatmap with the mask and correct aspect ratio
         try:
-            seaborn.heatmap(corr, cmap=cmap,
-                            square=True, xticklabels=range(1, len(columns) + 1), yticklabels=range(1, len(columns) + 1), annot=True,
-                            linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
+            seaborn.heatmap(corr, cmap=cmap, square=True,
+                            xticklabels=list(range(1, len(columns) + 1)), yticklabels=list(range(1, len(columns) + 1)),
+                            annot=True, linewidths=.5, cbar_kws={"shrink": .5}, ax=self.axis)
         except ValueError:
             pass
         return self

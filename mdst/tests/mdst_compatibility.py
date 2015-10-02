@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf8
 
 """
@@ -14,14 +14,11 @@ approach also allows to check for the compatibility of getters of the mdst
 objects.
 """
 
-from __future__ import print_function
 import sys
 import bisect
 from basf2 import create_path, process, Module, LogLevel
 import ROOT
 from ROOT import Belle2
-ROOT.gSystem.Load("libmdst_dataobjects.so")
-
 
 #: Hard coded list of EDetector value to name
 EDetector = ["invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL",
@@ -29,7 +26,7 @@ EDetector = ["invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL",
 
 
 # we need to print some Belle2::Const::ParticleTypes and
-# Belle2::Const::DetectorSet objects so we override the __str__
+# Belle2::Const::DetectorSet objects so we override the __repr__
 # member of these classes to provide readable output independent of it's memory
 # position (in contrast to the default <"ROOT.Belle2.Const.ParticleType" object
 # at 0x...>). We override str and repr members for both classes
@@ -49,10 +46,10 @@ def str_vector(vec, dim):
     return "(" + ",".join("%.6g" % vec[i] for i in range(dim)) + ")"
 
 # and override the members of the classes to use our own functions in future
-Belle2.Const.ParticleType.__str__ = str_ParticleType
-Belle2.Const.DetectorSet.__str__ = str_DetectorSet
-ROOT.TVector3.__str__ = lambda x: str_vector(x, 3)
-ROOT.TLorentzVector.__str__ = lambda x: str_vector(x, 4)
+Belle2.Const.ParticleType.__repr__ = str_ParticleType
+Belle2.Const.DetectorSet.__repr__ = str_DetectorSet
+ROOT.TVector3.__repr__ = lambda x: str_vector(x, 3)
+ROOT.TLorentzVector.__repr__ = lambda x: str_vector(x, 4)
 
 # prepare a list of PID detector sets, one detector per set
 PIDDetector_ids = [Belle2.Const.PIDDetectors.c_set[i] for i in
@@ -125,7 +122,7 @@ class DataStorePrinter(object):
                     self.object_members.append((member, args, None, None))
 
         # sort them to have fixed order
-        self.object_members.sort()
+        self.object_members.sort(key=lambda x: repr(x))
 
     def add_member(self, name, arguments=[], callback=None, display=None):
         """

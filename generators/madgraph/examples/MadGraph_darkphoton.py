@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -41,7 +41,7 @@ mg_outputdir = \
 # no user input needed below this line
 
 # full path to MadGraph externals
-mg_externals = os.path.expandvars('$BELLE2_EXTERNALS_DIR/madgraph/bin/mg5_aMC')
+mg_externals = 'mg5_aMC'
 
 # full path to steering file (generated automatically, will be overwritten (if existing) or created)
 mg_steeringfile = \
@@ -78,8 +78,7 @@ fp1.close()
 subprocess.check_call([mg_externals, mg_steeringfile])
 
 # gunzip the unweighted output file
-subprocess.check_call(['gunzip', mg_outputdir
-                      + '/Events/run_01/unweighted_events.lhe.gz'])
+subprocess.check_call(['gunzip', mg_outputdir + '/Events/run_01/unweighted_events.lhe.gz'])
 
 
 # creating the path for the processing
@@ -95,8 +94,7 @@ lhereader = register_module('LHEInput')
 lhereader.param('makeMaster', True)
 lhereader.param('runNum', 1)
 lhereader.param('expNum', 1)
-lhereader.param('inputFileList', [mg_outputdir
-                + '/Events/run_01/unweighted_events.lhe'])
+lhereader.param('inputFileList', [mg_outputdir + '/Events/run_01/unweighted_events.lhe'])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)

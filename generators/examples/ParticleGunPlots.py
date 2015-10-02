@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import sys
 import math
 from basf2 import create_path, register_module, process, logging, \
@@ -30,6 +31,7 @@ h_zyvertex = TH2D('zyvertex', 'vertex in zy;z/#mum;y/#mum',
 
 class ShowMCParticles(Module):
     """Simple module to collect some information about MCParticles"""
+
     def event(self):
         """Fill the histograms with the values of the MCParticle collection"""
         mcParticles = Belle2.PyStoreArray('MCParticles')
@@ -96,13 +98,13 @@ particlegun.param({
 # HER: sigma_x = 10.2µm, sigma_z = 6mm, angle= 41.5mrad
 # LER: sigma_x = 7.76µm, sigma_z = 5mm, angle=-41.5mrad
 vertexsmear.param({
-    #Beamspot size in x
+    # Beamspot size in x
     'sigma_pvx': 6.18e-4,  # µm
-    #Beamspot size in y
+    # Beamspot size in y
     'sigma_pvy': 59e-7,    # nm
-    #Beamspot size in z
+    # Beamspot size in z
     'sigma_pvz': 154e-4,   # µm
-    #Angle between beamspot and z axis, rotation around y
+    # Angle between beamspot and z axis, rotation around y
     'angle_pv_zx': -1.11e-2,
 })
 
@@ -118,7 +120,7 @@ main.add_module(showMCPart)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)
 
 # Create a Canvas to show histograms
 c = TCanvas('Canvas', 'Canvas', 1920, 768)
@@ -137,5 +139,5 @@ for (j, h) in enumerate(vertexhists, i + 2):
 c.Update()
 
 # Wait for enter to be pressed
-print "Press Enter to exit ..."
+print("Press Enter to exit ...")
 sys.stdin.readline()

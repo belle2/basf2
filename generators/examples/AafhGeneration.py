@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 ########################################################
 # 100 eemm events are generated using the AAFH
 # generator

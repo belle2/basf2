@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-######################################################## This steering file
+# This steering file
 # shows all options for the simulation of background events fed from SAD input
 # files.
 #
@@ -31,16 +31,16 @@
 
 from basf2 import *
 
-## Set the global log level
+# Set the global log level
 set_log_level(LogLevel.ERROR)
 
-## Register the event meta generator and set the number of events to a very #
+# Register the event meta generator and set the number of events to a very
 # high number which exceeds the number of events in the input file.
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10000000], 'runList': [1]})
 
-## Register the SADInput module and specify the location of the SAD # input
-# file. The file can be downloaded from the TWiki.
+# Register the SADInput module and specify the location of the SAD input file.
+# The file can be downloaded from the TWiki.
 sadinput = register_module('SADInput')
 sadinput.param('Filename', 'SADreaderInput.root')
 
@@ -67,24 +67,25 @@ sadinput.param('Range', 390)
 # logging output of the Input module to DEBUG.
 sadinput.set_log_level(LogLevel.DEBUG)
 
-## Register the standard chain of modules to the framework, # which are
-# required for the simulation.
+# Register the standard chain of modules to the framework, which are required
+# for the simulation.
 gearbox = register_module('Gearbox')
 
 geometry = register_module('Geometry')
 
 fullsim = register_module('FullSim')
 
-## Add additional modules according to your own needs pxddigi   =
-# register_module('PXDDigitizer') progress  = register_module('Progress')
-#
-## Write the output to a file
+# Add additional modules according to your own needs
+# pxddigi = register_module('PXDDigitizer')
+# progress  = register_module('Progress')
+
+# Write the output to a file
 rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', 'SADreaderOutput.root')
 
 progress = register_module('Progress')
 
-## Create the main path and add the required modules
+# Create the main path and add the required modules
 main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(gearbox)
@@ -92,15 +93,15 @@ main.add_module(sadinput)
 main.add_module(geometry)
 main.add_module(fullsim)
 
-## Add additional modules if you like main.add_module(pxddigi)
+# Add additional modules if you like main.add_module(pxddigi)
 main.add_module(progress)
 
-## Add the output module
+# Add the output module
 main.add_module(rootoutput)
 
-## Start the event processing
+# Start the event processing
 process(main)
 
-### Print some basic event statistics
-print 'Event Statistics:'
-print statistics
+# Print some basic event statistics
+print('Event Statistics:')
+print(statistics)

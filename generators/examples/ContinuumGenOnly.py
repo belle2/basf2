@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -24,8 +24,8 @@ beamparameters = add_beamparameters(main, "Y4S")
 # to run the framework the used modules need to be registered
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', 'vpho')
-evtgen.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
-             + '/generators/evtgen/decayfiles/ccbar+Dst.dec')
+evtgen.param('userDECFile', os.environ['BELLE2_LOCAL_DIR'] +
+             '/generators/evtgen/decayfiles/ccbar+Dst.dec')
 # evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
 #                   + '/generators/evtgen/decayfiles/uubar.dec')
 
@@ -40,4 +40,4 @@ main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

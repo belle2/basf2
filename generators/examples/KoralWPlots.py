@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # ####################################################### This steering file
@@ -108,7 +108,7 @@ main.add_module(showMCPart)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)
 
 # Create a Canvas to show histograms
 c = ROOT.TCanvas('Canvas', 'Canvas', 1536, 768)

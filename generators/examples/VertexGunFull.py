@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##############################################################################
@@ -25,8 +25,7 @@ set_random_seed(1028307)
 vertex1 = register_module('ParticleGun')
 
 # setting the number of tracks and pdg codes for the first vertex
-vertex1.param('nTracks', -1)  # a negative track number means one track for
-                              # every PDG code
+vertex1.param('nTracks', -1)  # a negative track number means one track for every PDG code
 vertex1.param('pdgCodes', [-11, 11, -13, 13])
 
 # set the starting parameters of the particle originating from the first vertex
@@ -51,8 +50,7 @@ vertex1.param('zVertexParams', [0.0, 0.0])
 vertex2 = register_module('ParticleGun')
 
 # setting the number of tracks and pdg codes for the first vertex
-vertex2.param('nTracks', -1)  # a negative track number means one track for
-                              # every PDG code
+vertex2.param('nTracks', -1)  # a negative track number means one track for every PDG code
 vertex2.param('pdgCodes', [-211, 211, -211])
 
 # set the starting parameters of the particle originating from the first vertex
@@ -77,8 +75,7 @@ vertex2.param('zVertexParams', [1, 1])
 vertex3 = register_module('ParticleGun')
 
 # setting the number of tracks and pdg codes for the first vertex
-vertex3.param('nTracks', -1)  # a negative track number means one track for
-                              # every PDG code
+vertex3.param('nTracks', -1)  # a negative track number means one track for every PDG code
 vertex3.param('pdgCodes', [-11, 11])
 
 # set the starting parameters of the particle originating from the first vertex
@@ -148,4 +145,4 @@ main.add_module(output)
 process(main)
 
 # Print call statistics
-print statistics
+print(statistics)

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
 from beamparameters import add_beamparameters
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -42,4 +42,4 @@ main.add_module("RootOutput", outputFileName="evtgen_upsilon4s_fullsim.root")
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

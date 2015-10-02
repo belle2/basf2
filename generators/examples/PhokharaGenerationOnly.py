@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -127,4 +127,4 @@ main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

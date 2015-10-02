@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Scripts and functions to set the BeamParameters from known configurations
 """
 
-from __future__ import print_function, division, absolute_import
 from basf2 import *
 import math
 import numpy as np

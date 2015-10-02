@@ -137,9 +137,6 @@ namespace Belle2 {
 
     EXPECT_EQ(aSecIDString.str(), aSecIDStream.str()); // testing stream operator overloading after string-conversion
 
-    EXPECT_EQ(aSecIDStream, aSecIDStream); // testing stream operator overloading by direct check
-
-
     FullSecID aFullSecID3 = FullSecID(vxdID, false, sectorID); // same ID as above but now, the sublayerID is false instead of true
 
     EXPECT_GT(aFullSecID2, aFullSecID3); // aFullSecID2 > aFullSecID3

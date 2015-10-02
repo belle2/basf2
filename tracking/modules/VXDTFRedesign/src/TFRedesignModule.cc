@@ -1,4 +1,5 @@
 /**************************************************************************
+
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
@@ -1321,7 +1322,7 @@ void TFRedesignModule::hopfield(TCsOfEvent& tcVector, double omega)
   if ((m_PARAMDebugMode == true) && (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME()) == true)) {
     stringstream printOut;
     printMyMatrix(W, printOut);
-    B2DEBUG(100, " weight matrix W: " << endl << printOut << endl);
+    B2DEBUG(100, " weight matrix W: " << endl << printOut.str() << endl);
   }
 
   vector<int> sequenceVector(nTCs, 0);

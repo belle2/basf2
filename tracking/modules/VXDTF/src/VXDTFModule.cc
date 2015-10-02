@@ -2942,7 +2942,7 @@ void VXDTFModule::hopfieldVectorized(TCsOfEvent& tcVector, double omega)
   if ((m_PARAMDebugMode == true) && (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME()) == true)) {
     stringstream printOut;
 //    printMyMatrix(W, printOut);
-    B2DEBUG(100, " weight matrix W: " << endl << printOut << endl);
+    B2DEBUG(100, " weight matrix W: " << endl << printOut.str() << endl);
   }
 
   vector<int> sequenceVector(nTCs, 0);
@@ -3243,7 +3243,7 @@ void VXDTFModule::hopfield(TCsOfEvent& tcVector, double omega)
   if ((m_PARAMDebugMode == true) && (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME()) == true)) {
     stringstream printOut;
     printMyMatrix(W, printOut);
-    B2DEBUG(100, " weight matrix W: " << endl << printOut << endl);
+    B2DEBUG(100, " weight matrix W: " << endl << printOut.str() << endl);
   }
 
   vector<int> sequenceVector(nTCs, 0);

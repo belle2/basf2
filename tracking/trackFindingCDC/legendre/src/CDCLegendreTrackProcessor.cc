@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
+#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreSimpleFilter.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackMerger.h>
@@ -63,11 +64,10 @@ void TrackProcessor::processTrack(TrackCandidate* trackCandidate)
 void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) const
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  tracks.clear();
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
   if (m_trackList.empty()) return;
-  tracks.reserve(m_trackList.size());
+  tracks.reserve(tracks.size() + m_trackList.size());
 
   for (TrackCandidate* trackCand : m_trackList) {
     if (trackCand->getTrackHits().size() < 5) continue;
@@ -103,19 +103,11 @@ void TrackProcessor::createCDCTrackCandidates(std::vector<Belle2::TrackFindingCD
       tracks.pop_back();
       continue;
     }
-    trajectory2D.setLocalOrigin(newTrackCandidate.front().getRecoPos2D());
-
-    // Maybe we should reverse the trajectory here, is this right?
 
     CDCTrajectory3D trajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption());
     newTrackCandidate.setStartTrajectory3D(trajectory3D);
 
-    // Recalculate the perpS of the hits
-    for (CDCRecoHit3D& recoHit : newTrackCandidate) {
-      double newPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
-      recoHit.setArcLength2D(newPerpS);
-    }
-
+    trackQualityTools.normalizeHitsAndResetTrajectory(newTrackCandidate);
   }
 }
 

@@ -157,7 +157,8 @@ void TrackFinderCDCBaseModule::event()
     for (CDCTrack& track : outputTracks) {
       genfit::TrackCand gfTrackCand;
       if (track.fillInto(gfTrackCand)) {
-        storedGFTrackCands.appendNew(gfTrackCand);
+        genfit::TrackCand* storedGenfitTrackCand = storedGFTrackCands.appendNew(gfTrackCand);
+        track.setRelatedGenfitTrackCandidate(storedGenfitTrackCand);
       }
     }
   }

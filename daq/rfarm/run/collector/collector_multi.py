@@ -1,4 +1,5 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -12,8 +13,8 @@ set_log_level(LogLevel.ERROR)
 argvs = sys.argv
 argc = len(argvs)
 
-print argvs[1]
-print argc
+print(argvs[1])
+print(argc)
 
 # detecor components to be reconstructed
 components = [

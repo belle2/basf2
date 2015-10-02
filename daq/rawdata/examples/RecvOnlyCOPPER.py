@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -22,7 +22,8 @@ import sys
 argvs = sys.argv
 
 if len(argvs) < 6:
-    print 'Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> <Use shared memory? yes=1/no=0> <nodename>'
+    print('Usage : RecvSendCOPPER.py <COPPER hostname> <COPPER nodeID> <bit flag of FINNESEs> '
+          '<Use shared memory? yes=1/no=0> <nodename>')
     sys.exit()
 
 # Set the log level to show only error and fatal messages

@@ -1,4 +1,5 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -18,7 +19,7 @@ argc = len(argvs)
 # argvs[2] = input ring buffer
 # argvs[3] = RoI queue name
 
-print "MQname = " + argvs[3]
+print("MQname = " + argvs[3])
 
 # detecor components to be reconstructed
 components = [

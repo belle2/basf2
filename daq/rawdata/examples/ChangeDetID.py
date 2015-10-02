@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -22,7 +22,7 @@ from basf2 import *
 import sys
 argvs = sys.argv
 if len(argvs) != 3:
-    print 'Usage : RecvStream0.py <input filename> <output> '
+    print('Usage : RecvStream0.py <input filename> <output> ')
     sys.exit()
 
 # Set the log level to show only error and fatal messages

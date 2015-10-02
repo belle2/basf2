@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -46,4 +46,3 @@ main.add_module(output)
 
 # fw.set_nprocesses (2)
 fw.process(main)
-

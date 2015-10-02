@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -12,7 +12,7 @@ from basf2 import *
 import sys
 argvs = sys.argv
 if len(argvs) != 5:
-    print 'Usage : RecvStream2.py <COPPER hostname> <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>'
+    print('Usage : RecvStream2.py <COPPER hostname> <Use NSM(Network Shared Memory)? yes=1/no=0> <port # of eb0> <NSM nodename>')
     sys.exit()
 
 # Set the log level to show only error and fatal messages

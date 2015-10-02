@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -22,7 +22,7 @@ import sys
 argvs = sys.argv
 
 if len(argvs) < 3:
-    print 'Usage : DummyDataPacker.py <runno> <maxevents>'
+    print('Usage : DummyDataPacker.py <runno> <maxevents>')
     sys.exit()
 
 # Set the log level to show only error and fatal messages

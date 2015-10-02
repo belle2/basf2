@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ################################################################################################
@@ -132,4 +132,4 @@ analysis_main.add_module(output)
 
 process(analysis_main)
 
-print statistics
+print(statistics)

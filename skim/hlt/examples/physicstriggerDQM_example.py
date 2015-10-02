@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Contributor: Chunhua LI
@@ -43,4 +43,4 @@ analysis_main.add_module(physicstriggerDQM)
 
 process(analysis_main)
 
-print statistics
+print(statistics)

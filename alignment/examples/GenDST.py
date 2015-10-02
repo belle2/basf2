@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import os
 import sys
 from basf2 import *
@@ -9,7 +10,7 @@ from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 if len(sys.argv) < 4:
-    print 'Usage: basf2 GenDST.py experiment run num_events cosmics_run'
+    print('Usage: basf2 GenDST.py experiment run num_events cosmics_run')
     sys.exit(1)
 
 experiment = int(sys.argv[1])
@@ -29,13 +30,13 @@ class TrackFitCheck(Module):
     def isOK(self, track):
         # VXD only (12 layers (cosmics!) x 2 for overlaps)
         if track.getNumPointsWithMeasurement() > 24:
-            print 'Num points > 24 : ', str(track.getNumPointsWithMeasurement())
+            print('Num points > 24 : ', str(track.getNumPointsWithMeasurement()))
             return False
         if track.getNumPointsWithMeasurement() < 5:
-            print 'Num points < 5 : ', str(track.getNumPointsWithMeasurement())
+            print('Num points < 5 : ', str(track.getNumPointsWithMeasurement()))
             return False
         if track.getFitStatus().getPVal() < 0.001:
-            print 'P-value < 0.001 : ', str(track.getFitStatus().getPVal())
+            print('P-value < 0.001 : ', str(track.getFitStatus().getPVal()))
             return False
 
         return True
@@ -51,7 +52,7 @@ class TrackFitCheck(Module):
         else:
             ok = False
         if not ok:
-            print 'Event has no good tracks. It will not be stored'
+            print('Event has no good tracks. It will not be stored')
         super(TrackFitCheck, self).return_value(ok)
 
 main = create_path()
@@ -92,4 +93,4 @@ main.add_module(trackFitCheck)
 
 main.add_module('Progress')
 process(main)
-print statistics
+print(statistics)

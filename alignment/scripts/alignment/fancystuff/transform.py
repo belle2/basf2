@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """ Transformation classes
 
 In this file all classes for the transformation methods are defined.
@@ -9,7 +11,7 @@ The base class is Transform.
 __author__ = 'swehle'
 
 
-from settings import ProTool
+from .settings import ProTool
 
 import numpy as np
 import pandas as pd

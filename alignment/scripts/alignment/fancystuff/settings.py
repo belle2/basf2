@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """Settings file
 
 The logger for all classes in the distribution is defined here.

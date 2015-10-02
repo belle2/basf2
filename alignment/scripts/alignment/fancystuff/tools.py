@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """ Tools collection
 
 In the tools collection all plotting tools are gathered.
@@ -6,8 +8,8 @@ In the tools collection all plotting tools are gathered.
 """
 __author__ = 'swehle'
 
-import transform
-from settings import create_figure
+from . import transform
+from .settings import create_figure
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -40,7 +42,7 @@ def set_axis_label_range(ax, new_start, new_end, n_labels=5, axis=1, to_flat=Non
         x_on_flat = np.linspace(0, 1, n_labels)
         new_labels = []
 
-        for x, i in zip(x_on_flat, range(0, n_labels)):
+        for x, i in zip(x_on_flat, list(range(0, n_labels))):
             new_labels.append(to_flat.get_x(x))
         new_labels[-1] = to_flat.max
         new_labels[0] = to_flat.min
@@ -95,7 +97,7 @@ def draw_flat_correlation(x, y, ax=None, draw_label=True, width=5):
     # Draw the matrix
     im = ax.imshow(a.T, interpolation='nearest', vmin=-5, vmax=5)
     if not_on_axes:
-        print "Printing colorbar"
+        print("Printing colorbar")
         plt.colorbar(im, fraction=0.046, pad=0.04)
         set_axis_label_range(ax, x.min(), x.max(), to_flat=tx)
         set_axis_label_range(ax, y.min(), y.max(), axis=0, to_flat=ty)
@@ -109,8 +111,8 @@ def draw_flat_correlation(x, y, ax=None, draw_label=True, width=5):
 
     # Calculate overall chi2 error for flat distribution
     chi2 = 0
-    for i in xrange(0, n_bins):
-        for j in xrange(0, n_bins):
+    for i in range(0, n_bins):
+        for j in range(0, n_bins):
             # a[i][j] = (a[i][j] - nexp) / nerr
             chi2 += a[i][j] * a[i][j]
 
@@ -196,8 +198,8 @@ def draw_flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=N
         labels = df.columns
 
     fig, axes = plt.subplots(nrows=n_vars, ncols=n_vars, figsize=(size, size))
-    for i, row in zip(range(n_vars), axes):
-        for j, ax in zip(range(n_vars), row):
+    for i, row in zip(list(range(n_vars)), axes):
+        for j, ax in zip(list(range(n_vars)), row):
             if i is j:
                 plt.sca(ax)
                 plt.hist(df.ix[:, i].values, transform.get_optimal_bin_size(len(df)), color="gray", histtype='step')
@@ -216,8 +218,8 @@ def draw_flat_corr_matrix(df, pdf=None, tight=False, col_numbers=False, labels=N
         plt.tight_layout()
 
     # Common outer label
-    for i, row in zip(range(n_vars), axes):
-        for j, ax in zip(range(n_vars), row):
+    for i, row in zip(list(range(n_vars)), axes):
+        for j, ax in zip(list(range(n_vars)), row):
             if i == n_vars - 1:
                 if col_numbers:
                     ax.set_xlabel("%d" % j)
@@ -264,8 +266,8 @@ def draw_fancy_correlation_matrix(df, pdf=None, tight=False, col_numbers=False, 
     cma = plt.cm.ScalarMappable(norm=norm, cmap=color)
 
     fig, axes = plt.subplots(nrows=n_vars, ncols=n_vars, figsize=(size, size))
-    for i, row in zip(range(n_vars), axes):
-        for j, ax in zip(range(n_vars), row):
+    for i, row in zip(list(range(n_vars)), axes):
+        for j, ax in zip(list(range(n_vars)), row):
             if i is j:
                 plt.sca(ax)
                 plt.hist(df.ix[:, i].values, transform.get_optimal_bin_size(len(df)), color="gray", histtype='step')
@@ -298,8 +300,8 @@ def draw_fancy_correlation_matrix(df, pdf=None, tight=False, col_numbers=False, 
         plt.tight_layout()
 
     # Common outer label
-    for i, row in zip(range(n_vars), axes):
-        for j, ax in zip(range(n_vars), row):
+    for i, row in zip(list(range(n_vars)), axes):
+        for j, ax in zip(list(range(n_vars)), row):
             if i == n_vars - 1:
                 if col_numbers:
                     ax.set_xlabel("%d" % j)

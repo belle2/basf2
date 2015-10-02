@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import os
 import sys
 from basf2 import *
@@ -24,15 +25,15 @@ def exp_runs(exp, runs):
 # Set path and format of DST files and runs, where magnet is off
 # If you don't, you should see plenty of failed extrapolations
 cal.setDstStoragePattern('alignment/examples/DST_Exp{experiment}_Run{run}.root')
-cal.setMagnetOffRuns(exp_runs(1, range(1, 101)))
+cal.setMagnetOffRuns(exp_runs(1, list(range(1, 101))))
 
 # createCalibration(name='tadeasTest1.root')#, importCalibration='database.root')
 
 cal.selectRange(1, 1, 2, 100)
 
 cal.selectSample(
-    exp_runs(1, range(1, 11)) +
-    exp_runs(2, range(1, 11))
+    exp_runs(1, list(range(1, 11))) +
+    exp_runs(2, list(range(1, 11)))
 )
 
 cal.loadGeometry()
@@ -85,4 +86,4 @@ cal.addMillepedeCalibration(name='MP2_perdata_fine',
 """
 
 cal.calibrate()
-print statistics
+print(statistics)

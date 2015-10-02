@@ -966,7 +966,7 @@ class ValidationPlot(object):
         plot_xs = xs[plot_indices]
         plot_ys = ys[plot_indices]
 
-        graph.Set(n_plot_data)
+        graph.Set(int(n_plot_data))
         for i, (x, y) in enumerate(zip(plot_xs, plot_ys)):
             graph.SetPoint(i, x, y)
 

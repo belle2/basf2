@@ -18,6 +18,11 @@ import ROOT
 ROOT.gSystem.Load('libtracking')
 from ROOT import Belle2
 
+# FIXME: define hash function for TrackCand to be able to add it to set. This is
+# not really correct, it just checks for the address and normally if a==b also
+# hash(a) == hash(b) is required
+ROOT.genfit.TrackCand.__hash__ = lambda x: id(x)
+
 
 class ExpertTrackingValidationModule(TrackingValidationModule):
 

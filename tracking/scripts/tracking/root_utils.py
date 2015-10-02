@@ -132,8 +132,8 @@ def root_save_name(name):
     str
         Name with potentially harmful characters deleted / replaced.
     """
-    deletechars = r"/$\#{}()"
-    name = name.replace(' ', '_').replace('-', '_').translate(None, deletechars)
+    deletechars = str.maketrans("", "", r"/$\#{}()")
+    name = name.replace(' ', '_').replace('-', '_').translate(deletechars)
     return name
 
 

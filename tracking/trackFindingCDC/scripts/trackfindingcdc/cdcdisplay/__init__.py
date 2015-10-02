@@ -21,7 +21,7 @@ import subprocess
 from datetime import datetime
 
 from . import svgdrawing
-from . import svgdrawing.attributemaps as attributemaps
+from .svgdrawing import attributemaps
 
 
 class CDCSVGDisplayModule(Module):

@@ -106,6 +106,7 @@ class PathViewer(Basf2Widget):
             .path-table td {
               padding: 10px;
               }
+
         </style>"""
 
     def create(self):
@@ -128,7 +129,11 @@ class PathViewer(Basf2Widget):
                 html.value += "<tr><td>No parameter available.</td></tr>"
             else:
                 for param in module.available_params():
-                    html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td>" + str(param.values) + "</td>" \
+                    if str(param.values) != str(param.default) and str(param.default) != "":
+                        color_text = " style='color: red;'"
+                    else:
+                        color_text = ""
+                    html.value += "<tr>" + "<td>" + param.name + "</td>" + "<td" + color_text + ">" + str(param.values) + "</td>" \
                         + "<td style='color: gray'>" + str(param.default) + "</td>" + "</tr>"
             html.value += "</table>"
             children.append(html)

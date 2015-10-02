@@ -61,9 +61,9 @@ void BaseFilterFittedTracksModule::initialize()
 void BaseFilterFittedTracksModule::event()
 {
   StoreArray<genfit::TrackCand> outputTrackCands(m_param_outputStoreArrayNameForTrackCands);
-  outputTrackCands.create();
+  outputTrackCands.create(false);
   StoreArray<RecoTrack> outputRecoTracks(m_param_outputStoreArrayNameForRecoTracks);
-  outputRecoTracks.create();
+  outputRecoTracks.create(false);
 
   StoreArray<genfit::TrackCand> inputTrackCands(m_param_inputStoreArrayNameForTrackCands);
   StoreArray<RecoTrack> inputRecoTracks(m_param_inputStoreArrayNameForRecoTracks);

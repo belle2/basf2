@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -47,7 +47,7 @@ layer_nsensors = {
 }
 
 fileName = '/data/belle2/BG/Feb2015/output/base_kekcc/base_touschek_histo.root'
-print 'reading from file ', fileName
+print('reading from file ', fileName)
 
 rootfile = TFile(fileName)
 tree = rootfile.Get('bSummary')
@@ -56,8 +56,7 @@ nev = tree.GetEntries()
 for iev in range(0, nev):
     tree.GetEntry(iev)
 
-    dose_data[str(tree.component)][tree.layer][tree.ladder - 1, tree.sensor
-                                               - 1] = 100 * tree.dose
+    dose_data[str(tree.component)][tree.layer][tree.ladder - 1, tree.sensor - 1] = 100 * tree.dose
 
 overlap_factor = 0.0  # Overlap of neighbour bars relative to bar width
 
@@ -65,8 +64,8 @@ component = 'Touschek_LER'
 
 for layer in layers:
     ladder_width = 2 * np.pi / layer_nladders[layer]
-    ladder_angles = np.linspace(layer_phi0[layer], layer_phi0[layer] + 2
-                                * np.pi, layer_nladders[layer], endpoint=False)
+    ladder_angles = np.linspace(layer_phi0[layer], layer_phi0[layer] + 2 * np.pi,
+                                layer_nladders[layer], endpoint=False)
     bottoms = np.zeros(layer_nladders[layer])
     ax = subplot(2, 2, layer - 2, polar=True)
     for sensor in range(layer_nsensors[layer]):

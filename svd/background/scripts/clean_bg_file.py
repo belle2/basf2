@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # remove empty events from beam background data files.
@@ -50,4 +50,4 @@ main.add_module(register_module('ProgressBar'))
 
 process(main)
 
-print statistics
+print(statistics)

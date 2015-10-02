@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -34,24 +34,23 @@ class Clusters2Truehits(Module):
         relClustersToTrueHits = \
             Belle2.PyRelationArray('SVDClustersToSVDTrueHits')
         nClusterRelations = relClustersToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'\
-            .format(nT=nTruehits, nC=nClusters, nRel=nClusterRelations)
+        print('Found {nT} TrueHits and {nC} Clusters, with {nRel} relations.'
+              .format(nT=nTruehits, nC=nClusters, nRel=nClusterRelations))
         relDigitsToTrueHits = Belle2.PyRelationArray('SVDDigitsToSVDTrueHits')
         nDigitRelations = relDigitsToTrueHits.getEntries()
-        print 'Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'\
-            .format(nT=nTruehits, nD=nDigits, nRel=nDigitRelations)
+        print('Found {nT} TrueHits and {nD} Digits, with {nRel} relations.'
+              .format(nT=nTruehits, nD=nDigits, nRel=nDigitRelations))
         relClustersToDigits = Belle2.PyRelationArray('SVDClustersToSVDDIgits')
-        print 'Found {nR} relations between clusters and digits.'\
-            .format(nR=relClustersToDigits.getEntries())
+        print('Found {nR} relations between clusters and digits.'
+              .format(nR=relClustersToDigits.getEntries()))
         # Define auxiliary print functions
-        truehit_print = lambda index, truehit: \
-            'TrueHit {index}: u {u}, v {v}, charge {charge}'\
-            .format(index=index, u=truehit.getU(), v=truehit.getV(),
-                    charge=truehit.getEnergyDep())
-        cluster_print = lambda index, cluster: \
-            ('Cluster {index}: u-side {side}, position {pos}, '
-             + 'positionError {posError}, time {time}, signal {signal}'
-             ).format(
+
+        def truehit_print(index, truehit):
+            return 'TrueHit {index}: u {u}, v {v}, charge {charge}'.format(
+                index=index, u=truehit.getU(), v=truehit.getV(), charge=truehit.getEnergyDep())
+
+        def cluster_print(index, cluster):
+            return 'Cluster {index}: u-side {side}, position {pos}, positionError {posError}, time {time}, signal {signal}'.format(
                 index=index,
                 side=cluster.isUCluster(),
                 pos=cluster.getPosition(),
@@ -59,9 +58,9 @@ class Clusters2Truehits(Module):
                 time=cluster.getClsTime(),
                 signal=cluster.getCharge(),
             )
-        digit_print = lambda index, digit: \
-            ('Digit {index}: u-side {side}, strip {pos}, time {time},'
-             + 'signal {signal}').format(
+
+        def digit_print(index, digit):
+            return 'Digit {index}: u-side {side}, strip {pos}, time {time}, signal {signal}'.format(
                 index=index, side=digit.isUStrip(),
                 pos=digit.getCellID(), time=digit.getIndex(),
                 signal=digit.getCharge()
@@ -74,15 +73,15 @@ class Clusters2Truehits(Module):
         for cluster_index in range(nClusters):
             cluster = clusters[cluster_index]
             uside = cluster.isUCluster()
-            print cluster_print(cluster_index, cluster)
+            print(cluster_print(cluster_index, cluster))
             for digit_index in relClustersToDigits.getToIndices(cluster_index):
-                print digit_print(digit_index, digits[digit_index])
+                print(digit_print(digit_index, digits[digit_index]))
 
-            print
+            print()
             cluster_truehits = \
                 relClustersToTrueHits.getToIndices(cluster_index)
             for truehit_index in cluster_truehits:
-                print truehit_print(truehit_index, truehits[truehit_index])
+                print(truehit_print(truehit_index, truehits[truehit_index]))
                 if uside:
                     truehits_unused_u.discard(truehit_index)
                 else:
@@ -98,18 +97,18 @@ class Clusters2Truehits(Module):
                                 truehit_digits.add(digit_index)
 
                 for index in truehit_digits:
-                    print digit_print(index, digits[index])
+                    print(digit_print(index, digits[index]))
 
-                print
+                print()
 
-            print
+            print()
 
-        print
-        print 'Truehits with no clusters in u: {n}'\
-            .format(n=len(truehits_unused_u))
-        print truehits_unused_u
+        print()
+        print('Truehits with no clusters in u: {n}'
+              .format(n=len(truehits_unused_u)))
+        print(truehits_unused_u)
         for truehit_index in truehits_unused_u:
-            print truehit_print(truehit_index, truehits[truehit_index])
+            print(truehit_print(truehit_index, truehits[truehit_index]))
             truehit_digits = set()
             for digit_index in range(nDigits):
                 digit = digits[digit_index]
@@ -119,16 +118,16 @@ class Clusters2Truehits(Module):
                             truehit_digits.add(digit_index)
 
             for index in truehit_digits:
-                print digit_print(index, digits[index])
+                print(digit_print(index, digits[index]))
 
-            print
+            print()
 
-        print
-        print 'Truehits with no clusters in v: {n}'\
-            .format(n=len(truehits_unused_v))
-        print truehits_unused_v
+        print()
+        print('Truehits with no clusters in v: {n}'
+              .format(n=len(truehits_unused_v)))
+        print(truehits_unused_v)
         for truehit_index in truehits_unused_v:
-            print truehit_print(truehit_index, truehits[truehit_index])
+            print(truehit_print(truehit_index, truehits[truehit_index]))
             truehit_digits = set()
             for digit_index in range(nDigitRelations):
                 digit = digits[digit_index]
@@ -137,13 +136,13 @@ class Clusters2Truehits(Module):
                         if index == truehit_index:
                             truehit_digits.add(digit_index)
 
-            print truehit_digits
+            print(truehit_digits)
             for index in truehit_digits:
-                print digit_print(index, digits[index])
+                print(digit_print(index, digits[index]))
 
-            print
+            print()
 
-        print
+        print()
 
 
 # Particle gun module
@@ -211,7 +210,7 @@ main.add_module(output)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)
 
 # Wait for enter to be pressed
 # sys.stdin.readline()

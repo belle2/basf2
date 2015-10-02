@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -52,15 +52,13 @@ class SVDValidationTTreeEfficiency(Module):
         self.data = EffData()
 
         # Declare tree branches
-        for key in EffData.__dict__.keys():
+        for key in EffData.__dict__:
             if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.treeU.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
-                self.treeV.Branch(key, AddressOf(self.data, key), key
-                                  + formstring)
+                self.treeU.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.treeV.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """

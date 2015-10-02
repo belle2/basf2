@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # copy a beam background simulatio file, keeping only data related to SVD.
@@ -29,4 +29,4 @@ main.add_module(register_module('ProgressBar'))
 
 process(main)
 
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -54,13 +54,12 @@ class SVDValidationTTreeDigit(Module):
         self.data = EventDataDigit()
 
         # Declare tree branches
-        for key in EventDataDigit.__dict__.keys():
+        for key in EventDataDigit.__dict__:
             if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key
-                                 + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """

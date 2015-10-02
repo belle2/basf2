@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -32,8 +32,7 @@ gROOT.ProcessLine('struct SVDEventData {\
     float cluster_seed;\
     float cluster_size;\
     float cluster_xPull;\
-};'
-                  )
+};')
 
 from ROOT import SVDEventData
 
@@ -49,20 +48,19 @@ class SVDHitErrorsTTree(Module):
         """Initialize the module"""
 
         super(SVDHitErrorsTTree, self).__init__()
-        ## Output ROOT file.
+        #: Output ROOT file.
         self.file = ROOT.TFile('SVDHitErrorOutput.root', 'recreate')
-        ## TTree for output data
+        #: TTree for output data
         self.tree = ROOT.TTree('tree', 'Event data of SVD simulation')
-        ## Instance of SVDEventData class
+        #: Instance of SVDEventData class
         self.data = SVDEventData()
         # Declare tree branches
-        for key in SVDEventData.__dict__.keys():
-            if not '__' in key:
+        for key in SVDEventData.__dict__:
+            if '__' not in key:
                 formstring = '/F'
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
-                self.tree.Branch(key, AddressOf(self.data, key), key
-                                 + formstring)
+                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
     def beginRun(self):
         """ Does nothing """
@@ -105,10 +103,8 @@ class SVDHitErrorsTTree(Module):
                 self.data.truehit_v = truehit.getV()
                 self.data.truehit_time = truehit.getGlobalTime()
                 self.data.truehit_charge = truehit.getEnergyDep()
-                self.data.theta_u = math.atan2(truehit.getExitU()
-                        - truehit.getEntryU(), thickness)
-                self.data.theta_v = math.atan2(truehit.getExitV()
-                        - truehit.getEntryV(), thickness)
+                self.data.theta_u = math.atan2(truehit.getExitU() - truehit.getEntryU(), thickness)
+                self.data.theta_v = math.atan2(truehit.getExitV() - truehit.getEntryV(), thickness)
                 # Cluster information
                 self.data.cluster_x = cluster.getPosition()
                 self.data.cluster_xError = cluster.getPositionSigma()
@@ -116,11 +112,9 @@ class SVDHitErrorsTTree(Module):
                 self.data.cluster_seed = cluster.getSeedCharge()
                 self.data.cluster_size = cluster.getSize()
                 if cluster.isUCluster():
-                    self.data.cluster_xPull = (cluster.getPosition()
-                            - truehit.getU()) / cluster.getPositionSigma()
+                    self.data.cluster_xPull = (cluster.getPosition() - truehit.getU()) / cluster.getPositionSigma()
                 else:
-                    self.data.cluster_xPull = (cluster.getPosition()
-                            - truehit.getV()) / cluster.getPositionSigma()
+                    self.data.cluster_xPull = (cluster.getPosition() - truehit.getV()) / cluster.getPositionSigma()
                 self.file.cd()
                 self.tree.Fill()
 
@@ -130,5 +124,3 @@ class SVDHitErrorsTTree(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
-
-

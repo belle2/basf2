@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -22,10 +22,9 @@ output = register_module('RootOutput')
 output.param('outputFileName', 'muForBKLM.root')
 
 gearbox = register_module('Gearbox')
-print 'Gearbox registered '
-gearbox.param('backends', ['file:./geometry/data/', 'file:./XMLdata/', 'file:'
-              ])
-print 'backend set '
+print('Gearbox registered ')
+gearbox.param('backends', ['file:./geometry/data/', 'file:./XMLdata/', 'file:'])
+print('backend set ')
 gearbox.param('fileName', 'Belle2_red.xml')
 # gearbox.param('InputFileXML','Belle2.xml')
 
@@ -44,4 +43,3 @@ main.add_module(output)
 
 # Process 100 events
 process(main)
-

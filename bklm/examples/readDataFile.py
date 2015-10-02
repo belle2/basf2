@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ######################################################
@@ -34,7 +34,7 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 
 gearbox = register_module('Gearbox')
-print 'Gearbox registered '
+print('Gearbox registered ')
 # gearbox.param('backends', ['file:./geometry/data/', 'file:./XMLdata/', 'file:'])
 
 # Geometry builder
@@ -50,7 +50,7 @@ bklmreco = register_module('BKLMReconstructor')
 # efficiencies...
 bklmEff = register_module('BKLMEffnRadio')
 
-print 'backend set '
+print('backend set ')
 # gearbox.param('fileName', 'Belle2_red.xml')
 # gearbox.param('InputFileXML','Belle2.xml')
 

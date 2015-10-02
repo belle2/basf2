@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Reconstruction with EKLM time calibration data collection.
@@ -30,4 +30,4 @@ main.add_module(eklmtimecalibration)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Generation of 1000 ee->mumu(ISR) events using PHOKHARA.
@@ -129,4 +129,4 @@ main.add_module(output)
 process(main)
 
 # show call statistics
-print statistics
+print(statistics)

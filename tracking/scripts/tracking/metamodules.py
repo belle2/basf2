@@ -65,6 +65,11 @@ class WrapperModule(basf2.Module):
         """Forwards the parameters"""
         return self.module.param
 
+    @property
+    def available_params(self):
+        """Forwards the avaiilable parameters"""
+        return self.module.available_params
+
     def compose_wrapped_module_name(self, module):
         """Compose a name that indicates the wrapped module."""
         return "{wrapper_name}({module_name})".format(module_name=module.name(),

@@ -36,7 +36,7 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
 
   addParam("useOldImplementation",
            m_param_useOldImplementation,
-           "Whether to use the old implementation o the quad tree.",
+           "Whether to use the old implementation of the quad tree.",
            false);
 
   addParam("useSegments",

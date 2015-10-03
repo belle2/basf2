@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-ClassImp(BKLMHit1d)
+// Not needed in ROOT6 ClassImp(BKLMHit1d)
 
 // empty constructor for ROOT - do not use this
 BKLMHit1d::BKLMHit1d() :

@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-ClassImp(BKLMDigit)
+// Not needed in ROOT6 ClassImp(BKLMDigit)
 
 // empty constructor for ROOT - do not use this
 BKLMDigit::BKLMDigit() :

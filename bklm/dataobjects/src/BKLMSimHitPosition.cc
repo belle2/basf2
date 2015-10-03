@@ -12,4 +12,4 @@
 
 using namespace Belle2;
 
-ClassImp(BKLMSimHitPosition)
+// Not needed in ROOT6 ClassImp(BKLMSimHitPosition)

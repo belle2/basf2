@@ -384,7 +384,7 @@ void TrackfitDQMModule::plotResiduals(const genfit::Track* track)
           continue;
 
         double u = kfi->getFittedState().getState()(3);
-        double v = kfi->getFittedState().getState()(3);
+        double v = kfi->getFittedState().getState()(4);
         double resU = res.getState()(0);
         double errU = sqrt(res.getCov()(0, 0));
         double resV = res.getState()(1);

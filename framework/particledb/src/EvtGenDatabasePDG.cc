@@ -154,6 +154,7 @@ void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
         const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
         TParticlePDG* part = AddParticle(pname, pname, mass, 0, pwidth, chg3, "Unknown", stdhepid, 0, 0,
                                          ctau / c_mm_per_s, spin2 / 2.0, pmaxwidth, lundkc);
+        pdgToPartMap[stdhepid] = part;
         if (!part) {
           B2FATAL("EvtGenDatabasePDG::ReadPDGTable: Problem creating particle '" << pname << "'");
         }

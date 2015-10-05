@@ -44,7 +44,10 @@ void RCCallback::init(NSMCommunicator&) throw()
                     m_table.c_str(), m_rcconfig.c_str());
   } else {
     m_rcconfig = node.getName() + "@RC:" + m_rcconfig;
-    if (getDB()) {
+    if (m_file.size() > 0) {
+      m_obj = DBObjectLoader::load(m_file);
+      m_obj.print(m_showall);
+    } else if (getDB()) {
       DBInterface& db(*getDB());
       m_obj = DBObjectLoader::load(db, m_table, m_rcconfig, m_showall);
       db.close();

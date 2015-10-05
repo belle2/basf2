@@ -49,6 +49,7 @@ namespace Belle2 {
     void setState(const RCState& state) throw();
     void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
+    void setDBFile(const std::string& file) { m_file = file; }
     const std::string& getDBTable() const { return m_table; }
     void setAutoReply(bool auto_reply) { m_auto = auto_reply; }
     void setDB(DBInterface* db, const std::string& table);
@@ -71,6 +72,7 @@ namespace Belle2 {
     DBObject m_obj;
     DBInterface* m_db;
     std::string m_table;
+    std::string m_file;
     bool m_auto;
     std::string m_rcconfig;
     std::string m_provider_host;

@@ -40,8 +40,11 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
   if (timeout > 0) {
     callback->setTimeout(timeout);
   }
+  std::string file = config.get("file");
   std::string dbtable = config.get("dbtable");
-  if (dbtable.size() > 0) {
+  if (file.size() > 0) {
+    callback->setDBFile(file);
+  } else if (dbtable.size() > 0) {
     LogFile::debug("database.use=%s", config.getBool("database.use") ? "TRUE" : "FALSE");
     if (config.getBool("database.use")) {
       callback->setDB(new PostgreSQLInterface(config.get("database.host"),

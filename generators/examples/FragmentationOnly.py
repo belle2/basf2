@@ -21,7 +21,7 @@ eventinfosetter.param('expList', [1])  # and experiment number 1
 
 # use root file with e.g. uubar pairs from KKMC  as input
 rootinput = register_module('RootInput')
-rootinput.param('inputFileName', './kkmc_uubar.root')
+rootinput.param('inputFileName', './kkmc_uu.root')
 
 # get the gearbox
 gearbox = register_module('Gearbox')
@@ -34,8 +34,7 @@ fragmentation = register_module('Fragmentation')
 fragmentation.param('ParameterFile', '../modules/fragmentation/data/pythia_belle2.dat')
 fragmentation.param('ListPYTHIAEvent', 0)
 fragmentation.param('UseEvtGen', 1)
-fragmentation.param('EvtPdl', os.path.expandvars('$BELLE2_EXTERNALS_DIR/evtgen/share/evt.pdl'))
-fragmentation.param('DecFile', os.path.expandvars('$BELLE2_EXTERNALS_DIR/evtgen/share/DECAY_2010.DEC'))
+fragmentation.param('DecFile', os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC'))
 fragmentation.param('UserDecFile', '../modules/fragmentation/data/dec_belle2_uubar.dec')
 
 # add root output module

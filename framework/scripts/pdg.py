@@ -6,10 +6,12 @@ Small wrapper module to ease access to pdg codes for particle gun or similar
 usage in the steering file
 """
 
-from ROOT import TDatabasePDG
+from basf2 import *
+import ROOT
+from ROOT.Belle2 import EvtGenDatabasePDG
 
 # the particle database (filled from evt.pdl by framework)
-_database = TDatabasePDG.Instance()
+_database = EvtGenDatabasePDG.Instance()
 
 
 def get(name):
@@ -84,3 +86,49 @@ def conjugate(name):
         return to_name(-from_name(name))
     except LookupError as e:
         return name
+
+
+def load(filename):
+    """
+    Read particle database from given evtgen pdl file
+    """
+    _database.ReadEvtGenTable(filename)
+
+
+def load_default():
+    """Read default evt.pdl file"""
+    _database.ReadEvtGenTable()
+
+
+def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0):
+    """
+    Add a new particle to the list of known particles.
+
+    The name cannot contain any whitespace character.
+
+    Args:
+        name (str): name of the particle
+        pdgCode (int): pdg code identifiert for the particle
+        mass (float): mass of the particle in GeV
+        width (float): width of the particle in GeV
+        charge (float): charge of the particle in e
+        sping (float): spin of the particle
+        max_width (float): max width, if omitted 3*width will be used
+        lifetime (float): lifetime in ns, should be 0 as geant4 cannot handle it correctly otherwise
+        pythiaID (int): pythiaID of the particle (if any), if omitted 0 will be used
+    """
+    if lifetime > 0:
+        B2WARNING("Userdefined particle with non-zero lifetime will not be simulated correctly")
+
+    if max_width is None:
+        # FIXME: is 3 a good default?
+        max_width = width*3
+
+    particle = _database.AddParticle(name, name, mass, False, width, charge*3, "userdefined",
+                                     pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
+    if particle:
+        B2RESULT("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
+                 (name, pdgCode, mass, width, charge, spin))
+        return True
+
+    return False

@@ -1,38 +1,36 @@
-#ifndef mwreader_h
-#define mwreader_h
+#ifndef _Belle2_MWReader_h
+#define _Belle2_MWReader_h
 
-#define MWMAXITEM 100
+#include <daq/slc/base/IOException.h>
 
-const int mwreader_revision = 3;
+struct mwreader;
 
-struct mwreader {
-  struct mwdata {
-    int chan;
-    float value;
-    char unit[8];
-    char alarm[8];
-    char cond[8];
-  } data[MWMAXITEM];
-  int date;
-  int time;
-  int nitem;
-};
+namespace Belle2 {
 
-#endif
-) throw(IOException);
-void update() throw(IOException);
+  class MWReader {
 
-private:
-void read(int ic, int mode) throw(IOException);
+  public:
+    MWReader();
 
-private:
-char m_buf[2048];
-int m_index;
-int* m_sock;
-int* m_mw100ip;
-mwreader* m_reader;
+  public:
+    void set(mwreader* reader);
+    mwreader* get() { return m_reader; }
 
-};
+  public:
+    void init() throw(IOException);
+    void update() throw(IOException);
+
+  private:
+    void read(int ic, int mode) throw(IOException);
+
+  private:
+    char m_buf[2048];
+    int m_index;
+    int* m_sock;
+    int* m_mw100ip;
+    mwreader* m_reader;
+
+  };
 
 }
 

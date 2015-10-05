@@ -453,6 +453,11 @@ void SecMapTrainerBaseModule::event()
 
   vector<VXDTrack> trackletsOfEvent; // tracks cut into bite-sized pieces for the filtering part
 
+  /** nVXDTracks >= nSPTCs.
+   * Reason:
+   * for each sptc: find fitting secMap. if near border, nSecMaps fitting > 1.
+   * in this case the VXDTrack will be cloned for each relevant secMap.
+   */
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
     B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
@@ -472,7 +477,7 @@ void SecMapTrainerBaseModule::event()
       m_trackletMomentumCounter.at(chosenMap - 1)++;
 
       /// converts to internal data structure and attaches it to given secMap
-      VXDTrack newTrack = convertSPTC2VXDTrack(secMap, currentTC);
+      VXDTrack newTrack = convertSPTC2VXDTrack(secMap, currentTC, iTC);
 
       trackletsOfEvent.push_back(std::move(newTrack)); // nTracklets >= nSPTCs
     }
@@ -1475,10 +1480,12 @@ bool SecMapTrainerBaseModule::checkAcceptanceOfSecMap(FilterCalcNames::InternalR
 
 
 
-FilterCalcNames::VXDTrack SecMapTrainerBaseModule::convertSPTC2VXDTrack(FilterCalcNames::InternalRawSectorMap* secMap,
-    const SpacePointTrackCand*  currentTC)
+FilterCalcNames::VXDTrack SecMapTrainerBaseModule::convertSPTC2VXDTrack(
+  FilterCalcNames::InternalRawSectorMap* secMap,
+  const SpacePointTrackCand*  currentTC,
+  unsigned tcID)
 {
-  VXDTrack newTrack(currentTC->getMomSeed().Perp(), &secMap->getSecMap());
+  VXDTrack newTrack(tcID, currentTC->getMomSeed().Perp(), &secMap->getSecMap());
 
   // collect hits which fullfill all given tests
   std::vector<const SpacePoint*> goodSPs;

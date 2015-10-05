@@ -321,17 +321,27 @@ bool DBObjectLoader::createDB(DBInterface& db,
 
 StringList DBObjectLoader::getDBlist(DBInterface& db,
                                      const std::string& tablename,
-                                     const std::string& grep)
+                                     const std::string& grep, int max)
 {
   StringList str;
   try {
     if (!db.isConnected()) db.connect();
     if (grep.size() > 0) {
       const char* prefix = grep.c_str();
+      std::stringstream ss;
+      ss << "select name from " << tablename << " where name = REPLACE(path, '.', '') "
+         << "and (name like '_%" << prefix << "_%' or name like '_%" << prefix << "' or "
+         << "name like '" << prefix << "_%' or name = '" << prefix << "') order by id desc";
+      if (max > 0) ss << " limit " << max;
+      ss << ";";
+      db.execute(ss.str());
+      /*
       db.execute("select name from %s where name = REPLACE(path, '.', '') "
                  "and (name like '_%s%s_%s' or name like '_%s%s' or "
-                 "name like '%s_%s' or name = '%s') order by id desc;",
-                 tablename.c_str(), "%%", prefix, "%%", "%%", prefix, prefix, "%%", prefix);
+                 "name like '%s_%s' or name = '%s') order by id desc %s;",
+                 tablename.c_str(), "%%", prefix, "%%", "%%", prefix, prefix, "%%",
+      prefix, (max>0?"");
+      */
     } else {
       db.execute("select name from %s where name = REPLACE(path, '.', '') "
                  "order by id desc;", tablename.c_str());

@@ -12,11 +12,12 @@ namespace Belle2 {
   class PostgreSQLInterface : public DBInterface {
 
   public:
-    PostgreSQLInterface(const std::string& host = "",
-                        const std::string& database = "",
-                        const std::string& user = "",
-                        const std::string& password = "",
-                        int port = -1) throw();
+    PostgreSQLInterface(const std::string& host,
+                        const std::string& database,
+                        const std::string& user,
+                        const std::string& password,
+                        int port) throw();
+    PostgreSQLInterface() throw();
     virtual ~PostgreSQLInterface() throw() {}
 
   public:

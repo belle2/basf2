@@ -15,7 +15,7 @@ using namespace Belle2;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    LogFile::debug("usage: %s <tablename> [-e expno] [-r runno] [-n <node>]", argv[0]);
+    LogFile::debug("usage: %s <tablename> [-e expno] [-r runno] [-n <node>] [-m <max>]", argv[0]);
     return 1;
   }
 
@@ -23,6 +23,7 @@ int main(int argc, char** argv)
   std::string nodename;
   int expno = -1;
   int runno = -1;
+  int max = -1;
   for (int i = 2; i < argc; i++) {
     if (strcmp(argv[i], "-e") == 0) {
       i++;
@@ -36,6 +37,10 @@ int main(int argc, char** argv)
       i++;
       if (i < argc) nodename = argv[i];
     }
+    if (strcmp(argv[i], "-m") == 0) {
+      i++;
+      if (i < argc) max = atoi(argv[i]);
+    }
   }
   std::stringstream prefix;
   if (expno >= 0) prefix << StringUtil::form("%04d:", expno);
@@ -48,7 +53,7 @@ int main(int argc, char** argv)
                          config.get("database.user"),
                          config.get("database.password"),
                          config.getInt("database.port"));
-  StringList list = DBObjectLoader::getDBlist(db, tablename, prefix.str());
+  StringList list = DBObjectLoader::getDBlist(db, tablename, prefix.str(), max);
   for (size_t i = 0; i < list.size(); i++) {
     std::cout << list[i] << std::endl;
   }

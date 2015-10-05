@@ -23,7 +23,8 @@ namespace Belle2 {
                          const DBObject& obj);
     static StringList getDBlist(DBInterface& db,
                                 const std::string& tablename,
-                                const std::string& prefix);
+                                const std::string& prefix,
+                                int max = -1);
 
   private:
     static bool setObject(DBObject& obj, StringList& str,

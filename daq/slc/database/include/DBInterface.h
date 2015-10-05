@@ -43,6 +43,14 @@ namespace Belle2 {
     int getPort() const throw() { return m_port; }
 
   protected:
+    DBInterface() throw() {}
+    void init(const std::string& host,
+              const std::string& database,
+              const std::string& user,
+              const std::string& password,
+              int port) throw();
+
+  protected:
     DBRecordList m_record_v;
     std::string m_host;
     std::string m_database;

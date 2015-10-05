@@ -1,4 +1,5 @@
 #include "daq/slc/database/PostgreSQLInterface.h"
+#include "daq/slc/base/ConfigFile.h"
 
 #ifndef NOT_USE_PSQL
 #include <libpq-fe.h>
@@ -8,6 +9,8 @@
 
 #include <daq/slc/base/StringUtil.h>
 
+#include <iostream>
+
 using namespace Belle2;
 
 PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
@@ -15,8 +18,20 @@ PostgreSQLInterface::PostgreSQLInterface(const std::string& host,
                                          const std::string& user,
                                          const std::string& password,
                                          int port) throw()
-  : DBInterface(host, database, user, password, port)
 {
+  init(host, database, user, password, port);
+  m_sq_conn = NULL;
+  m_sq_result = NULL;
+}
+
+PostgreSQLInterface::PostgreSQLInterface() throw()
+{
+  ConfigFile config("slowcontrol");
+  init(config.get("database.host"),
+       config.get("database.dbname"),
+       config.get("database.user"),
+       config.get("database.password"),
+       config.getInt("database.port"));
   m_sq_conn = NULL;
   m_sq_result = NULL;
 }

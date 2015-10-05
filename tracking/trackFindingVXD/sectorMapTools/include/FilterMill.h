@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
     /** to be executed by functions which shall work with unchangeable set of filters. */
-    void checkLocked(std::string name)
+    void checkLocked(std::string name) const
     {
       if (!m_locked) {
         B2WARNING("FilterMill-checkLocked: Function " << name <<
@@ -76,7 +76,7 @@ namespace Belle2 {
 
 
     /** to block adding new filters, execute this member. */
-    void lockMill() { m_locked(true); }
+    void lockMill() { m_locked = true; }
 
 
     /** add new Filter for 2 Hits . */
@@ -87,6 +87,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
+      B2DEBUG(5, "FilterMill::add2HitFilter: filter " << newFilter.first << " added")
       m_2Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -99,6 +100,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
+      B2DEBUG(5, "FilterMill::add3HitFilter: filter " << newFilter.first << " added")
       m_3Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -111,6 +113,7 @@ namespace Belle2 {
                 " after lockdown! This is unintended behavior - doing nothing instead...");
         return;
       }
+      B2DEBUG(5, "FilterMill::add4HitFilter: filter " << newFilter.first << " added")
       m_4Hitfilters.push_back(std::move(newFilter));
     }
 
@@ -121,34 +124,36 @@ namespace Belle2 {
     {
       checkLocked("grindData");
       unsigned nHits = dataSet.hits.size();
+      B2DEBUG(20, "FilterMill::grindData: dataSet got " << nHits << " hits and collectedData: " << collectedData.size())
       if (nHits == 2) {
         for (const auto& filterPack : m_2Hitfilters) {
           double result = filterPack.second(
-                            *dataSet.hits[0],
-                            *dataSet.hits[1]);
+                            *(dataSet.hits[0]),
+                            *(dataSet.hits[1]));
           collectedData.push_back({filterPack.first, result});
         }
       } else if (nHits == 3) {
         for (const auto& filterPack : m_3Hitfilters) {
           double result = filterPack.second(
-                            *dataSet.hits[0],
-                            *dataSet.hits[1],
-                            *dataSet.hits[2]);
+                            *(dataSet.hits[0]),
+                            *(dataSet.hits[1]),
+                            *(dataSet.hits[2]));
           collectedData.push_back({filterPack.first, result});
         }
       } else if (nHits == 4) {
         for (const auto& filterPack : m_4Hitfilters) {
           double result = filterPack.second(
-                            *dataSet.hits[0],
-                            *dataSet.hits[1],
-                            *dataSet.hits[2],
-                            *dataSet.hits[3]);
+                            *(dataSet.hits[0]),
+                            *(dataSet.hits[1]),
+                            *(dataSet.hits[2]),
+                            *(dataSet.hits[3]));
           collectedData.push_back({filterPack.first, result});
         }
       } else {
         B2ERROR("FilterMill-grindData: someone use " << nHits <<
                 " to be grinded! This number is currently not supported - doing nothing instead...");
       }
+      B2DEBUG(5, "FilterMill::grindData: collectedData has now " << collectedData.size() << " entries")
     }
 
   };

@@ -49,7 +49,7 @@ namespace Belle2 {
     int getPDG() const { return m_pdg; }
 
     /** returns number of hits attached to curren track. */
-    int size() const { return m_hits.size(); }
+    unsigned size() const { return m_hits.size(); }
 
     /** get Pt of track. */
     float getPt() const { return m_pT; }

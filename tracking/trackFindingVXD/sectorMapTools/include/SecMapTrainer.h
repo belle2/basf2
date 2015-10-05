@@ -67,23 +67,26 @@ namespace Belle2 {
     /** checks if given Hit is acceptable for this trainer. */
     bool acceptHit(const SpacePoint& hit)
     {
-      bool accepted(false);
-
       B2Vector3D distance2IP =
         m_config.vIP - B2Vector3D(hit.getPosition().X(), hit.getPosition().Y(), hit.getPosition().Z());
 
-      if (m_config.hitMinMaxDist2IP3D.first < distance2IP.Mag()
-          or m_config.hitMinMaxDist2IP3D.second > distance2IP.Mag())
-      { return accepted; }
+      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has now dist2IP/thresholdmin/-max: " << distance2IP.Mag() << "/" <<
+              m_config.hitMinMaxDist2IP3D.first << "/" << m_config.hitMinMaxDist2IP3D.second)
+      if ((m_config.hitMinMaxDist2IP3D.first > 0
+           and m_config.hitMinMaxDist2IP3D.first < distance2IP.Mag())
+          or (m_config.hitMinMaxDist2IP3D.second > 0
+              and m_config.hitMinMaxDist2IP3D.second > distance2IP.Mag()))
+      { return false; }
 
       auto layerID = hit.getVxdID().getLayerNumber();
-      if (m_config.minMaxLayer.first < layerID
-          or m_config.minMaxLayer.second > layerID)
-      { return accepted; }
+      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID/thresholdmin/-max: " << layerID << "/" << m_config.minMaxLayer.first <<
+              "/" << m_config.minMaxLayer.second)
+      if (m_config.minMaxLayer.first > layerID
+          or m_config.minMaxLayer.second < layerID)
+      { return false; }
 
-      accepted = true;
-
-      return accepted;
+      B2DEBUG(20, "SecMapTrainer::acceptHit: isAccepted")
+      return true;
     }
 
 
@@ -92,6 +95,8 @@ namespace Belle2 {
     unsigned process2HitCombinations(const SecMapTrainerTC& aTC)
     {
       unsigned nValues = 0;
+      B2DEBUG(10, "SecMapTrainer::process2HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
+              aTC.getPDG())
       if (aTC.size() < 2) { return nValues; }
       m_dataSet.trackNo = aTC.getTrackID();
       m_dataSet.pdg = aTC.getPDG();
@@ -100,22 +105,32 @@ namespace Belle2 {
       std::vector<std::pair<std::string, double> > collectedResults;
       SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
       SecMapTrainerTC::ConstIterator innerIt = ++aTC.outermostHit();
+      B2DEBUG(10, "SecMapTrainer::process2HitCombinations: b4 loop outerHit-/inneHitSecID: " << outerIt->getSectorID() << "/" <<
+              innerIt->getSectorID())
 
+      bool isEqual = (innerIt == aTC.innerEnd());
+      B2DEBUG(20, "SecMapTrainer::process2HitCombinations: innerIt == aTC.innerEnd(): " << isEqual)
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
-      for (; innerIt == aTC.innerEnd();) {
+      for (; innerIt != aTC.innerEnd();) {
+        B2DEBUG(10, "SecMapTrainer::process2HitCombinations: outerHit-/inneHitSecID: " << outerIt->getSectorID() << "/" <<
+                innerIt->getSectorID())
         XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
         hitBundle.sectorIDs = {outerIt->getSectorID(), innerIt->getSectorID()};
-        hitBundle.hits = {outerIt, innerIt};
+        hitBundle.hits = {&(*outerIt), &(*innerIt)};
         m_dataSet.sectorIDs = hitBundle.sectorIDs;
         m_filterMill.grindData(hitBundle, collectedResults);
 
         for (const auto& entry : collectedResults) {
+          std::string secIDs;
+          for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
+          B2DEBUG(50, "SecMapTrainer::process2HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
           m_dataSet.filterID = entry.first;
           m_dataSet.value = entry.second;
 
           m_rootInterface.fill(m_dataSet);
           ++nValues;
         }
+        collectedResults.clear();
         ++outerIt;
         ++innerIt;
       }
@@ -128,6 +143,8 @@ namespace Belle2 {
     unsigned process3HitCombinations(const SecMapTrainerTC& aTC)
     {
       unsigned nValues = 0;
+      B2DEBUG(10, "SecMapTrainer::process3HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
+              aTC.getPDG())
       if (aTC.size() < 3) { return nValues; }
       m_dataSet.trackNo = aTC.getTrackID();
       m_dataSet.pdg = aTC.getPDG();
@@ -139,7 +156,10 @@ namespace Belle2 {
       SecMapTrainerTC::ConstIterator innerIt = ++(++aTC.outermostHit());
 
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
-      for (; innerIt == aTC.innerEnd();) {
+      for (; innerIt != aTC.innerEnd();) {
+        B2DEBUG(10, "SecMapTrainer::process3HitCombinations: outer-/center-/innerHitSecID: " << outerIt->getSectorID() <<
+                "/" << centerIt->getSectorID() <<
+                "/" << innerIt->getSectorID())
         XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
         hitBundle.sectorIDs = {outerIt->getSectorID(), centerIt->getSectorID(), innerIt->getSectorID()};
         hitBundle.hits = {&(*outerIt), &(*centerIt), &(*innerIt)};
@@ -147,6 +167,9 @@ namespace Belle2 {
         m_filterMill.grindData(hitBundle, collectedResults);
 
         for (const auto& entry : collectedResults) {
+          std::string secIDs;
+          for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
+          B2DEBUG(50, "SecMapTrainer::process3HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
           m_dataSet.filterID = entry.first;
           m_dataSet.value = entry.second;
 
@@ -165,6 +188,8 @@ namespace Belle2 {
     unsigned process4HitCombinations(const SecMapTrainerTC& aTC)
     {
       unsigned nValues = 0;
+      B2DEBUG(10, "SecMapTrainer::process4HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
+              aTC.getPDG())
       if (aTC.size() < 4) { return nValues; }
       m_dataSet.trackNo = aTC.getTrackID();
       m_dataSet.pdg = aTC.getPDG();
@@ -177,7 +202,13 @@ namespace Belle2 {
       SecMapTrainerTC::ConstIterator innerIt = ++(++(++aTC.outermostHit()));
 
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
-      for (; innerIt == aTC.innerEnd();) {
+      for (; innerIt != aTC.innerEnd();) {
+        std::string secIDs;
+        for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
+        B2DEBUG(10, "SecMapTrainer::process4HitCombinations: outer-/oCenter-/iCenter-/innerHitSecID: " << outerIt->getSectorID() <<
+                "/" << outerCenterIt->getSectorID() <<
+                "/" << innerCenterIt->getSectorID() <<
+                "/" << innerIt->getSectorID())
         XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
         hitBundle.sectorIDs = {
           outerIt->getSectorID(),
@@ -195,6 +226,7 @@ namespace Belle2 {
         m_filterMill.grindData(hitBundle, collectedResults);
 
         for (const auto& entry : collectedResults) {
+          B2DEBUG(50, "SecMapTrainer::process4HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
           m_dataSet.filterID = entry.first;
           m_dataSet.value = entry.second;
 
@@ -211,8 +243,8 @@ namespace Belle2 {
 
     /** converts the SPTC into a SecMapTrainerTC */
     bool convertSPTC(
-      unsigned tcID,
-      const SpacePointTrackCand& tc)
+      const SpacePointTrackCand& tc,
+      unsigned tcID)
     {
       SecMapTrainerTC newTrack(tcID, tc.getMomSeed().Perp());
 
@@ -223,6 +255,8 @@ namespace Belle2 {
         goodSPs.push_back(aSP);
       }
 
+      B2DEBUG(10, "SecMapTrainer::convertSPTC: nGoodHits: " << goodSPs.size())
+
       // want to have hits going from outer to inner ones
       if (tc.isOutgoing()) std::reverse(goodSPs.begin(), goodSPs.end());
 
@@ -232,11 +266,13 @@ namespace Belle2 {
         if (fSeCID.getFullSecID() == std::numeric_limits<unsigned int>::max())
         { B2ERROR("a secID for spacePoint not found!"); continue; }
         std::string fullSecID = fSeCID.getFullSecString();
+        B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID)
 
         newTrack.addHit(std::move(
                           SecMapTrainerHit(fullSecID, aSP->getPosition())));
       }
 
+      B2DEBUG(10, "SecMapTrainer::convertSPTC: the TC has now nHits/threshold: " << newTrack.size() << "/" << m_config.nHitsMin)
       if (newTrack.size() < m_config.nHitsMin) return false;
 
       // add vertex (but without real vertexPosition, since origin is assumed)
@@ -245,7 +281,7 @@ namespace Belle2 {
 
       newTrack.addHit(std::move(newVirtualHit));
 
-      m_tcs(std::move(newTrack));
+      m_tcs.push_back(std::move(newTrack));
 
       return true;
     }
@@ -253,14 +289,15 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(TrainerConfigData& configData) :
+    SecMapTrainer(TrainerConfigData& configData, TFile* rootFile) :
       m_config(configData),
       m_factory(
         configData.vIP.X(),
         configData.vIP.Y(),
         configData.vIP.Z(),
         configData.mField),
-      m_filterMill()
+      m_filterMill(),
+      m_rootInterface(rootFile, configData.secMapName)
     {
       // stretch the cuts:
       m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;
@@ -283,6 +320,13 @@ namespace Belle2 {
     }
 
 
+    /** initialize the trainer (to be called in Module::initialize(). */
+    void initialize()
+    { m_rootInterface.initialize(); }
+
+    /** initialize the trainer (to be called in Module::terminate(). */
+    void terminate()
+    { m_rootInterface.write(); }
 
     /** Initialize event. */
     void initializeEvent(int expNo, int runNo, int evtNo)
@@ -295,13 +339,16 @@ namespace Belle2 {
 
 
     /** checks if given TC is acceptable for this trainer. */
-    bool acceptTC(SpacePointTrackCand& tc, unsigned iD)
+    bool acceptTC(const SpacePointTrackCand& tc, unsigned iD)
     {
+      B2DEBUG(10, "SecMapTrainer::acceptTC: nHits/threshold: " << tc.getNHits() << "/" << m_config.nHitsMin)
       // catch TCS which are too short in any case
       if (tc.getNHits() < m_config.nHitsMin) return false;
 
+      B2DEBUG(10, "SecMapTrainer::acceptTC: hasHitsOnSameSensor: " << tc.hasHitsOnSameSensor())
       // catch TCs where more than one hit was on the same sensor
       if (tc.hasHitsOnSameSensor()) return false;
+
 
       // catch TCS where particle type is wrong
       for (const auto& pdg : m_config.pdgCodesAllowed) {
@@ -310,11 +357,15 @@ namespace Belle2 {
 
       // check if momentum of TC is within range:
       auto pT = tc.getMomSeed().Perp();
+      B2DEBUG(10, "SecMapTrainer::acceptTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTCuts.first << "/" <<
+              m_config.pTCuts.second)
       if (m_config.pTCuts.first > pT
           or m_config.pTCuts.second < pT) return false;
 
       // catch tracks which start too far away from orign
       B2Vector3D distance2IP = m_config.vIP - tc.getPosSeed();
+      B2DEBUG(10, "SecMapTrainer::acceptTC: distance2IP/thresholdXY/-Z: " << distance2IP.Mag() << "/" << m_config.seedMaxDist2IPXY << "/"
+              << m_config.seedMaxDist2IPZ)
       if (m_config.seedMaxDist2IPXY > 0
           and m_config.seedMaxDist2IPXY < distance2IP.Perp()) return false;
       if (m_config.seedMaxDist2IPZ > 0

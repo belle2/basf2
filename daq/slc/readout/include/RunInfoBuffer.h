@@ -14,7 +14,10 @@ namespace Belle2 {
     enum State {
       NOTREADY = 0,
       READY = 1,
-      RUNNING = 2
+      RUNNING = 2,
+      PAUSING = 3,
+      PAUSED = 4,
+      RESUMING = 5
     };
 
   public:
@@ -90,6 +93,12 @@ namespace Belle2 {
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
     event_header& getEventHeader() { return m_info->header; }
     void copyEventHeader(int* buf);
+    bool isNotReady() throw() { return (m_info) && m_info->state == NOTREADY; }
+    bool isReady() throw() { return (m_info) && m_info->state == READY; }
+    bool isRunning() throw() { return (m_info) && m_info->state == RUNNING; }
+    bool isPausing() throw() { return (m_info) && m_info->state == PAUSING; }
+    bool isPaused() throw() { return (m_info) && m_info->state == PAUSED; }
+    bool isResuming() throw() { return (m_info) && m_info->state == RESUMING; }
 
     bool waitRunning(int timeout);
     bool waitReady(int timeout);

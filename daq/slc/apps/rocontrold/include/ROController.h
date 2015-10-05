@@ -22,6 +22,8 @@ namespace Belle2 {
               const DBObject& obj) throw();
     bool load(const DBObject& obj, int timeout) throw(RCHandlerException);
     bool start(int expno, int runno) throw(RCHandlerException);
+    bool pause() throw();
+    bool resume() throw();
     bool abort() throw();
     bool term() throw();
     bool stop() throw(RCHandlerException);

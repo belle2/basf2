@@ -19,8 +19,9 @@
 
 using namespace Belle2;
 
-COPPERCallback::COPPERCallback(FEE* fee[4])
+COPPERCallback::COPPERCallback(FEE* fee[4], bool dummymode)
 {
+  m_dummymode = dummymode;
   setTimeout(5);
   m_con.setCallback(this);
   for (int i = 0; i < 4; i++) {
@@ -38,8 +39,10 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName(), "ronode_status", ronode_status_revision);
   m_con.init("cprbasf2_" + getNode().getName(), 1);
-  m_ttrx.open();
-  m_copper.open();
+  if (!m_dummymode) {
+    m_ttrx.open();
+    m_copper.open();
+  }
   m_flow.open(&m_con.getInfo());
   configure(obj);
 }
@@ -47,7 +50,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
-    m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
+    m_dummymode = m_dummymode || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
     add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
@@ -59,7 +62,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
-      if (!m_fee[i] || !o_hslb.getBool("used")) continue;
+      if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
       m_fee[i]->init(*this, hslb);
@@ -125,7 +128,7 @@ void COPPERCallback::term() throw()
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
+  //m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
   if (!m_dummymode) {
     m_ttrx.open();
     m_ttrx.monitor();
@@ -173,6 +176,18 @@ void COPPERCallback::stop() throw(RCHandlerException)
   ronode_status* status = (ronode_status*)getData().get();
   status->stime = 0;
   m_con.stop();
+}
+
+void COPPERCallback::pause() throw(RCHandlerException)
+{
+  LogFile::debug("Pausing");
+  m_con.pause();
+}
+
+void COPPERCallback::resume() throw(RCHandlerException)
+{
+  LogFile::debug("Resuming");
+  m_con.resume();
 }
 
 void COPPERCallback::recover(const DBObject& obj) throw(RCHandlerException)

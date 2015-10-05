@@ -34,6 +34,8 @@ namespace Belle2 {
     void clear();
     bool load(int timeout);
     bool start(int expno, int runno);
+    bool pause();
+    bool resume();
     bool stop();
     bool abort();
     const std::string& getName() { return m_name; }

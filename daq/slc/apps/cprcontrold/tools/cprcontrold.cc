@@ -15,6 +15,8 @@ int main(int argc, char** argv)
 {
   if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
     ConfigFile config("slowcontrol", "copper", argv[1]);
+    bool dummymode = config.getBool("dummymode");
+    LogFile::info("dummymode is %s", ((dummymode) ? "on" : "off"));
     FEE* fee[4] = {NULL, NULL, NULL, NULL};
     for (int i = 0; i < 4; i++) {
       const std::string libname = config.get(StringUtil::form("fee.%c.lib", i + 'a'));
@@ -35,7 +37,7 @@ int main(int argc, char** argv)
         fee[i] = NULL;
       }
     }
-    RCNodeDaemon(config, new COPPERCallback(fee)).run();
+    RCNodeDaemon(config, new COPPERCallback(fee, dummymode)).run();
   }
   return 0;
 }

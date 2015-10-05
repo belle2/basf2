@@ -101,7 +101,7 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
-    m_eb1tx.init(this, 0, "eb1tx", obj);
+    //m_eb1tx.init(this, 0, "eb1tx", obj);
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }
@@ -114,7 +114,7 @@ void ROCallback::term() throw()
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[0].term();
   }
-  m_eb1tx.term();
+  //m_eb1tx.term();
 }
 
 void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -137,9 +137,11 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_stream1.load(obj, 10)) {
     throw (RCHandlerException("Faield to boot stream1"));
   }
+  /*
   if (!m_eb1tx.load(obj, 0)) {
     throw (RCHandlerException("Faield to boot eb1tx"));
   }
+  */
   set("stream1.pid", m_stream1.getControl().getProcess().get_id());
   LogFile::debug("Booted stream1");
   try_wait();
@@ -161,7 +163,35 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
   if (!m_stream1.start(expno, runno)) {
     throw (RCHandlerException("Faield to start stream1"));
   }
-  m_eb1tx.start(expno, runno);
+  //m_eb1tx.start(expno, runno);
+}
+
+void ROCallback::pause() throw(RCHandlerException)
+{
+  LogFile::debug("Pausing");
+  try {
+    if (m_eb0.isUsed()) m_eb0.pause();
+  } catch (const RCHandlerException& e) {
+    LogFile::warning("eb0 did not start : %s", e.what());
+  }
+  for (size_t i = 0; i < m_stream0.size(); i++) {
+    m_stream0[i].pause();
+  }
+  m_stream1.pause();
+}
+
+void ROCallback::resume() throw(RCHandlerException)
+{
+  LogFile::debug("Resuming");
+  try {
+    if (m_eb0.isUsed()) m_eb0.resume();
+  } catch (const RCHandlerException& e) {
+    LogFile::warning("eb0 did not start : %s", e.what());
+  }
+  for (size_t i = 0; i < m_stream0.size(); i++) {
+    m_stream0[i].resume();
+  }
+  m_stream1.resume();
 }
 
 void ROCallback::stop() throw(RCHandlerException)
@@ -192,8 +222,8 @@ void ROCallback::abort() throw(RCHandlerException)
     set(vname, -1);
   }
   set("eb0.pid", -1);
-  m_eb1tx.abort();
-  set("eb1tx.pid", -1);
+  //m_eb1tx.abort();
+  //set("eb1tx.pid", -1);
 }
 
 void ROCallback::monitor() throw(RCHandlerException)
@@ -239,9 +269,9 @@ void ROCallback::monitor() throw(RCHandlerException)
         throw (RCHandlerException("stream0-%d : crashed", (int)i));
       }
     }
-    if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
+    /*if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
       throw (RCHandlerException("eb1tx : crashed"));
-    }
+      }*/
   }
 }
 

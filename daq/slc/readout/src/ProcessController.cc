@@ -80,6 +80,30 @@ bool ProcessController::stop()
   return true;
 }
 
+bool ProcessController::pause()
+{
+  m_info.lock();
+  if (m_info.isRunning()) {
+    m_info.setState(RunInfoBuffer::PAUSING);
+  } else {
+    LogFile::warning("Process is not running. Pause request was ignored.");
+  }
+  m_info.unlock();
+  return true;
+}
+
+bool ProcessController::resume()
+{
+  m_info.lock();
+  if (m_info.isPaused()) {
+    m_info.setState(RunInfoBuffer::RESUMING);
+  } else {
+    LogFile::warning("Process is not paused. Resume request was ignored.");
+  }
+  m_info.unlock();
+  return true;
+}
+
 bool ProcessController::abort()
 {
   m_info.clear();

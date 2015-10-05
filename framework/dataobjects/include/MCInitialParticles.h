@@ -41,7 +41,25 @@ namespace Belle2 {
     };
 
     /** Default constructor */
-    MCInitialParticles(): m_labToCMS(nullptr), m_CMSToLab(nullptr), m_invariantMass(0.0), m_generationFlags(0) {}
+    MCInitialParticles(): TObject() {}
+    /** Copy constructor */
+    MCInitialParticles(const MCInitialParticles& b): TObject(), m_her(b.m_her), m_ler(b.m_ler),
+      m_vertex(b.m_vertex), m_generationFlags(b.m_generationFlags) {}
+    /** Assignment operator */
+    MCInitialParticles& operator=(const MCInitialParticles& b)
+    {
+      m_her = b.m_her; m_ler = b.m_ler; m_vertex = b.m_vertex;
+      m_generationFlags = b.m_generationFlags;
+      resetBoost();
+      return *this;
+    }
+    /** Equality operator */
+    bool operator==(const MCInitialParticles& b)
+    {
+      return m_her == b.m_her && m_ler == b.m_ler && m_vertex == b.m_vertex &&
+             m_generationFlags == b.m_generationFlags;
+    }
+
     /** Free memory of the LorentzRotation if it was created */
     virtual ~MCInitialParticles() { resetBoost(); }
 
@@ -53,8 +71,7 @@ namespace Belle2 {
      */
     void set(const TLorentzVector& her, const TLorentzVector& ler, const TVector3& vertex)
     {
-      m_her = her; m_ler = ler;
-      m_vertex = vertex;
+      m_her = her; m_ler = ler; m_vertex = vertex;
       resetBoost();
     }
     /** Set the High Energy Beam 4-momentum */
@@ -114,13 +131,13 @@ namespace Belle2 {
     /** collision position */
     TVector3 m_vertex;
     /** Boost from Lab into CMS. (calculated on first use, not saved to file) */
-    mutable TLorentzRotation* m_labToCMS; //!transient
+    mutable TLorentzRotation* m_labToCMS{nullptr}; //!transient
     /** Boost from CMS into lab. (calculated on first use, not saved to file) */
-    mutable TLorentzRotation* m_CMSToLab; //!transient
+    mutable TLorentzRotation* m_CMSToLab{nullptr}; //!transient
     /** invariant mass of HER+LER (calculated on first use, not saved to file) */
-    mutable double m_invariantMass; //!transient
+    mutable double m_invariantMass{0.0}; //!transient
     /** Flags to be used when generating events */
-    int m_generationFlags;
+    int m_generationFlags{0};
     /** ROOT Dictionary */
     ClassDef(MCInitialParticles, 1);
   };

@@ -28,6 +28,30 @@ namespace Belle2 {
 
     /** default constructor */
     BeamParameters(): MCInitialParticles(), m_covHER{0}, m_covLER{0}, m_covVertex{0} {}
+    /** copy constructor */
+    BeamParameters(const BeamParameters& b): MCInitialParticles(b)
+    {
+      std::copy_n(b.m_covHER, 6, m_covHER);
+      std::copy_n(b.m_covLER, 6, m_covLER);
+      std::copy_n(b.m_covVertex, 6, m_covVertex);
+    }
+    /** assignment operator */
+    BeamParameters& operator=(const BeamParameters& b)
+    {
+      MCInitialParticles::operator=(b);
+      std::copy_n(b.m_covHER, 6, m_covHER);
+      std::copy_n(b.m_covLER, 6, m_covLER);
+      std::copy_n(b.m_covVertex, 6, m_covVertex);
+      return *this;
+    }
+    /** equality operator */
+    bool operator==(const BeamParameters& b)
+    {
+      return MCInitialParticles::operator==(b) &&
+             std::equal(m_covHER, m_covHER + 6, b.m_covHER) &&
+             std::equal(m_covLER, m_covLER + 6, b.m_covLER) &&
+             std::equal(m_covVertex, m_covVertex + 6, b.m_covVertex);
+    }
 
     /** Set the covariance matrix for HER (E, theta_x, theta_y) where E is the
      * energy, theta_x is the horizontal angle between nominal direction and

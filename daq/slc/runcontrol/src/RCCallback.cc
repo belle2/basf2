@@ -39,7 +39,7 @@ void RCCallback::init(NSMCommunicator&) throw()
   add(new NSMVHandlerText("dbtable", true, false, m_table));
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcrequest", true, false, ""));
-  if (m_table.size() == 0 || m_rcconfig.size() == 0) {
+  if (m_file.size() == 0 && (m_table.size() == 0 || m_rcconfig.size() == 0)) {
     LogFile::notice("dbtable or rcconfig is empty (dbtable='%s', runtype='%s')",
                     m_table.c_str(), m_rcconfig.c_str());
   } else {

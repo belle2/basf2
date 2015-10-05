@@ -43,6 +43,7 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
   std::string file = config.get("file");
   std::string dbtable = config.get("dbtable");
   if (file.size() > 0) {
+    LogFile::info("read file %s", file.c_str());
     callback->setDBFile(file);
   } else if (dbtable.size() > 0) {
     LogFile::debug("database.use=%s", config.getBool("database.use") ? "TRUE" : "FALSE");
@@ -58,6 +59,8 @@ RCNodeDaemon::RCNodeDaemon(ConfigFile& config,
       callback->setProvider(config.get("provider.host"),
                             config.getInt("provider.port"));
     }
+  } else if (file.size() > 0) {
+
   } else {
     LogFile::notice("dbtable is empty");
   }

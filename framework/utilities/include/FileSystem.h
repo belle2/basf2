@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <fstream>
 
 namespace Belle2 {
   /** Utility functions related to filename validation and filesystem access */
@@ -68,6 +69,26 @@ namespace Belle2 {
 
     private:
       int m_file;  /**< File descriptor of file to be locked */
+    };
+
+    /** Helper file to create a temporary file and ensure deletion if object goes out of scope */
+    class TemporaryFile: public std::fstream {
+    public:
+      /** construct a new temporary file */
+      explicit TemporaryFile(std::ios_base::openmode mode = std::ios_base::trunc | std::ios_base::out);
+      /** prevent assignment */
+      TemporaryFile(const TemporaryFile&) = delete;
+      /** but allow move construction */
+      TemporaryFile(TemporaryFile&&) = default;
+      /** prevent copy constructor */
+      TemporaryFile& operator=(const TemporaryFile&) = delete;
+      /** close file and delete on destruction */
+      ~TemporaryFile();
+      /** get filename of the temporary file */
+      std::string getName() const { return m_filename; }
+    private:
+      /** filename of the temporary file */
+      std::string m_filename;
     };
 
   private:

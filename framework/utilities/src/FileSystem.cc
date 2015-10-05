@@ -114,3 +114,18 @@ bool FileSystem::Lock::lock(int timeout)
   return false;
 }
 
+FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fstream()
+{
+  fs::path filename = fs::temp_directory_path() / fs::unique_path();
+  m_filename = filename.native();
+  open(m_filename.c_str(), mode);
+  if (!is_open()) {
+    B2ERROR("Cannot create temporary file:" << strerror(errno));
+  }
+}
+
+FileSystem::TemporaryFile::~TemporaryFile()
+{
+  close();
+  fs::remove(m_filename);
+}

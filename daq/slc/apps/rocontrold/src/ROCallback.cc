@@ -166,32 +166,36 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
   //m_eb1tx.start(expno, runno);
 }
 
-void ROCallback::pause() throw(RCHandlerException)
+bool ROCallback::pause() throw(RCHandlerException)
 {
   LogFile::debug("Pausing");
   try {
     if (m_eb0.isUsed()) m_eb0.pause();
   } catch (const RCHandlerException& e) {
     LogFile::warning("eb0 did not start : %s", e.what());
+    return false;
   }
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[i].pause();
   }
   m_stream1.pause();
+  return true;
 }
 
-void ROCallback::resume() throw(RCHandlerException)
+bool ROCallback::resume(int subno) throw(RCHandlerException)
 {
   LogFile::debug("Resuming");
   try {
-    if (m_eb0.isUsed()) m_eb0.resume();
+    if (m_eb0.isUsed()) m_eb0.resume(subno);
   } catch (const RCHandlerException& e) {
     LogFile::warning("eb0 did not start : %s", e.what());
+    return false;
   }
   for (size_t i = 0; i < m_stream0.size(); i++) {
-    m_stream0[i].resume();
+    m_stream0[i].resume(subno);
   }
-  m_stream1.resume();
+  m_stream1.resume(subno);
+  return true;
 }
 
 void ROCallback::stop() throw(RCHandlerException)

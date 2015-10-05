@@ -128,9 +128,15 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       } else if (cmd == RCCommand::STOP) {
         stop();
       } else if (cmd == RCCommand::RESUME) {
-        resume(msg.getParam(0));
+        if (!resume(msg.getParam(0))) {
+          setState(RCState::NOTREADY_S);
+          return true;
+        }
       } else if (cmd == RCCommand::PAUSE) {
-        pause();
+        if (!pause()) {
+          setState(RCState::NOTREADY_S);
+          return true;
+        }
       }
       try {
         if (cmd == RCCommand::ABORT) {

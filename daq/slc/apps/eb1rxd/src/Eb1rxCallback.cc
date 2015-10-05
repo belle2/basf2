@@ -116,18 +116,20 @@ void Eb1rxCallback::stop() throw(RCHandlerException)
    resume() : Restart triggers back to RUNNING
    subno    : Sub run number for the resumed run
 */
-void Eb1rxCallback::resume(int subno) throw(RCHandlerException)
+bool Eb1rxCallback::resume(int subno) throw(RCHandlerException)
 {
   LogFile::debug("sub run # = %03d", subno);
   LogFile::debug("Resume done");
+  return true;
 }
 
 /*
    pause() : Suspend triggers to PAUSED
 */
-void Eb1rxCallback::pause() throw(RCHandlerException)
+bool Eb1rxCallback::pause() throw(RCHandlerException)
 {
   LogFile::debug("Pause done");
+  return true;
 }
 
 /*

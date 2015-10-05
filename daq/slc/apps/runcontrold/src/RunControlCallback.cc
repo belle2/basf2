@@ -233,14 +233,16 @@ void RunControlCallback::recover(const DBObject&) throw(RCHandlerException)
   m_starttime = -1;
 }
 
-void RunControlCallback::pause() throw(RCHandlerException)
+bool RunControlCallback::pause() throw(RCHandlerException)
 {
   distribute(NSMMessage(RCCommand::PAUSE));
+  return true;
 }
 
-void RunControlCallback::resume(int subno) throw(RCHandlerException)
+bool RunControlCallback::resume(int subno) throw(RCHandlerException)
 {
   distribute(NSMMessage(RCCommand::RESUME, subno));
+  return true;
 }
 
 void RunControlCallback::abort() throw(RCHandlerException)

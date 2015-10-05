@@ -262,12 +262,14 @@ void RFMasterCallback::stop() throw(RCHandlerException)
   RCCallback::setState(RCState::READY_S);
 }
 
-void RFMasterCallback::pause() throw(RCHandlerException)
+bool RFMasterCallback::pause() throw(RCHandlerException)
 {
+  return true;
 }
 
-void RFMasterCallback::resume(int /*subno*/) throw(RCHandlerException)
+bool RFMasterCallback::resume(int /*subno*/) throw(RCHandlerException)
 {
+  return true;
 }
 
 void RFMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)

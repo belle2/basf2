@@ -178,16 +178,46 @@ void COPPERCallback::stop() throw(RCHandlerException)
   m_con.stop();
 }
 
-void COPPERCallback::pause() throw(RCHandlerException)
+bool COPPERCallback::pause() throw(RCHandlerException)
 {
   LogFile::debug("Pausing");
   m_con.pause();
+  while (m_con.getInfo().isRunning() || m_con.getInfo().isPausing()) {
+    try {
+      perform(wait(NSMNode(), RCCommand::ABORT, 1));
+      LogFile::notice("Pause was canceled");
+      return false;
+    } catch (const TimeoutException& e) {
+      LogFile::warning("Pasuing not finished yet");
+    }
+  }
+  if (m_con.getInfo().isPaused()) {
+    LogFile::info("Paused");
+  } else {
+    LogFile::warning("Pasuing was ignored");
+  }
+  return true;
 }
 
-void COPPERCallback::resume() throw(RCHandlerException)
+bool COPPERCallback::resume(int /*subno*/) throw(RCHandlerException)
 {
   LogFile::debug("Resuming");
   m_con.resume();
+  while (m_con.getInfo().isPaused() || m_con.getInfo().isResuming()) {
+    try {
+      perform(wait(NSMNode(), RCCommand::ABORT, 1));
+      LogFile::notice("Resume was canceled");
+      return false;
+    } catch (const TimeoutException& e) {
+      LogFile::warning("Resuming not finished yet");
+    }
+  }
+  if (m_con.getInfo().isRunning()) {
+    LogFile::info("Resumed");
+  } else {
+    LogFile::warning("Resume was ignored");
+  }
+  return true;
 }
 
 void COPPERCallback::recover(const DBObject& obj) throw(RCHandlerException)

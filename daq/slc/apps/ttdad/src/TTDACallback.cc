@@ -143,18 +143,20 @@ void TTDACallback::stop() throw(RCHandlerException)
   }
 }
 
-void TTDACallback::pause() throw(RCHandlerException)
+bool TTDACallback::pause() throw(RCHandlerException)
 {
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
   }
+  return true;
 }
 
-void TTDACallback::resume(int /*subno*/) throw(RCHandlerException)
+bool TTDACallback::resume(int /*subno*/) throw(RCHandlerException)
 {
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
   }
+  return true;
 }
 
 void TTDACallback::recover(const DBObject&) throw(RCHandlerException)

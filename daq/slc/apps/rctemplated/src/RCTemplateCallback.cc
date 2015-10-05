@@ -93,19 +93,23 @@ void RCTemplateCallback::stop() throw(RCHandlerException)
 /*
    resume() : Restart triggers back to RUNNING
    subno    : Sub run number for the resumed run
+   returns true on success or false on failed
 */
-void RCTemplateCallback::resume(int subno) throw(RCHandlerException)
+bool RCTemplateCallback::resume(int subno) throw(RCHandlerException)
 {
   LogFile::debug("sub run # = %03d", subno);
   LogFile::debug("Resume done");
+  return true;
 }
 
 /*
    pause() : Suspend triggers to PAUSED
+   returns true on success or false on failed
 */
-void RCTemplateCallback::pause() throw(RCHandlerException)
+bool RCTemplateCallback::pause() throw(RCHandlerException)
 {
   LogFile::debug("Pause done");
+  return true;
 }
 
 /*

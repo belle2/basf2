@@ -55,7 +55,8 @@ TrackfitDQMModule::TrackfitDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
   addParam("GFTrackCandidatesColName", m_storeTrackCandName,
-           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)", std::string(""));
+           "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
+           std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Track fit Validation histograms will be put into this directory", std::string("trackfit"));
   addParam("fillExpertHistograms", m_fillExpertHistos,

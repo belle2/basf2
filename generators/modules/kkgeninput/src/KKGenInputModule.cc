@@ -49,13 +49,6 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
   //Get ENVIRONMENTs
   char* belle2_release_dir = std::getenv("BELLE2_RELEASE_DIR");
   char* belle2_local_dir = std::getenv("BELLE2_LOCAL_DIR");
-  char* belle2_externals_dir = std::getenv("BELLE2_EXTERNALS_DIR");
-
-  //Get default full filename of evt.pdl
-  string default_evtpdlfilename = string("./evt.pdl");
-  if (belle2_externals_dir != NULL)
-    default_evtpdlfilename = string(belle2_externals_dir)
-                             + string("/share/evtgen/evt.pdl");
 
   //Set default full filenames of KK2f setting files
   string default_KKdefaultFileName = string("");
@@ -98,7 +91,7 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
   addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename", default_KKdefaultFileName);
   addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu/q-pairs generation setting", default_tauinputFileName);
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
-  addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename", default_evtpdlfilename);
+  addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename. This parameter is deprecated and will be ignored", std::string(""));
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", default_KKMCOutputFileName);
 
 }
@@ -108,6 +101,9 @@ void KKGenInputModule::initialize()
 {
   B2INFO("starting initialisation of KKGen Input Module. ");
   FILE* fp;
+  if (getParam<std::string>("evtpdlfilename").isSetInSteering()) {
+    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+  }
 
   fp = fopen(m_KKMCOutputFileName.c_str(), "r");
   if (fp) {
@@ -125,7 +121,7 @@ void KKGenInputModule::initialize()
   }
 
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
-                 m_taudecaytableFileName, m_EvtPDLFileName, m_KKMCOutputFileName);
+                 m_taudecaytableFileName, m_KKMCOutputFileName);
 
   //initial particle for beam parameters
   m_initial.initialize();

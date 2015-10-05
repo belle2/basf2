@@ -19,7 +19,6 @@
 #include <EvtGenBase/EvtCPUtil.hh>
 #include <EvtGenBase/EvtParticle.hh>
 #include <EvtGenBase/EvtParticleFactory.hh>
-#include <EvtGenBase/EvtPDL.hh>
 #include <EvtGenBase/EvtRandom.hh>
 #include <EvtGenBase/EvtVector4R.hh>
 #include <generators/evtgen/EvtGenFwRandEngine.h>
@@ -48,9 +47,8 @@ namespace Belle2 {
      */
     ~EvtGenInterface();
 
-    /** Setup evtgen with the given decay and pdl files  */
-    int setup(const std::string& decayFileName, const std::string& pdlFileName,
-              const std::string& parentParticle,
+    /** Setup evtgen with the given decay files  */
+    int setup(const std::string& decayFileName, const std::string& parentParticle,
               const std::string& userFileName = std::string(""));
 
     /** Generate a single event */

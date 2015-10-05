@@ -2,10 +2,9 @@
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
-#include <EvtGenBase/EvtPDL.hh>
-#include <EvtGenBase/EvtId.hh>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <TDatabasePDG.h>
 
 using namespace Belle2;
 using namespace std;
@@ -32,17 +31,12 @@ bool DecayDescriptorParticle::init(const DecayStringParticle& p)
   m_isSelected = !p.m_strSelector.empty();
   if (!p.m_strLabel.empty()) m_strLabel = p.m_strLabel;
   // Determine PDG code using the particle names defined in evt.pdl
-  if (EvtPDL::entries() == 0) {
-    string strEvtPDL = Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl";
-    EvtPDL evtpdl;
-    evtpdl.read(strEvtPDL.c_str());
-  }
-  EvtId evtId = EvtPDL::getId(m_strName);
-  if (evtId.getId() == -1) {
+  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(m_strName.c_str());
+  if (!particle) {
     B2WARNING("Particle not in evt.pdl file! " << m_strName);
     return false;
   }
-  m_iPDGCode = EvtPDL::getStdHep(evtId);
+  m_iPDGCode = particle->PdgCode();
   return true;
 }
 

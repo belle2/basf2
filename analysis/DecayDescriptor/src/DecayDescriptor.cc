@@ -9,8 +9,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <EvtGenBase/EvtPDL.hh>
-#include <EvtGenBase/EvtId.hh>
+#include <TDatabasePDG.h>
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -137,8 +136,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
     B2WARNING("Template type not supported!");
     return 0;
   }
-  EvtId evtId_p = EvtPDL::evtIdFromStdHep(iPDGCode_p);
-  int iPDGCodeCC_p = EvtPDL::getStdHep(EvtPDL::chargeConj(evtId_p));
+
+  int iPDGCodeCC_p = TDatabasePDG::Instance()->GetParticle(iPDGCode_p)->AntiParticle()->PdgCode();
   int iPDGCode_d = m_mother.getPDGCode();
   if (abs(iPDGCode_d) != abs(iPDGCode_p)) return 0;
   int iCC = 0;

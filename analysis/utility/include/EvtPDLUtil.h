@@ -14,11 +14,6 @@
 namespace Belle2 {
   namespace EvtPDLUtil {
     /**
-     * Initializes the EvtPDL database.
-     */
-    void initEvtPDL();
-
-    /**
      * Checks if the particle with given pdg code has an anti-particle or not.
      *
      * @param pdgCode of the particle

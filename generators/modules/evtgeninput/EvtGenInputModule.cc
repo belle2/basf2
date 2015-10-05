@@ -45,8 +45,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(), m_initial(BeamParameters::c_s
   addParam("userDECFile", m_userDECFileName, "user DECfile name", string(""));
   addParam("DECFile", m_DECFileName, "standard DECfile name should be provided: default file is in externals/share/evtgen/DECAY.DEC",
            Environment::Instance().getExternalsPath() + "/share/evtgen/DECAY.DEC");
-  addParam("pdlFile", m_pdlFileName, "standard pdlfile name should be provided: default file is in externals/share/evtgen/evt.pdl",
-           Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl");
+  addParam("pdlFile", m_pdlFileName, "this used to be a parameter to choose the evt.pdl file. This is deprecated", std::string(""));
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
   addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
@@ -62,9 +61,12 @@ EvtGenInputModule::EvtGenInputModule() : Module(), m_initial(BeamParameters::c_s
 void EvtGenInputModule::initialize()
 {
   B2DEBUG(10, "starting initialisation of EvtGen Input Module. ");
+  if (getParam<std::string>("pdlFile").isSetInSteering()) {
+    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.")
+  }
 
   //setup the DECAY files:
-  m_Ievtgen.setup(m_DECFileName, m_pdlFileName, m_parentParticle, m_userDECFileName);
+  m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
 
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();

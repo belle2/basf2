@@ -11,6 +11,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/utilities/FileSystem.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
@@ -22,6 +24,7 @@
 #include <EvtGenBase/EvtAbsRadCorr.hh>
 #include <EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
+#include <EvtGenBase/EvtPDL.hh>
 
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -40,7 +43,7 @@ EvtGenInterface::~EvtGenInterface()
   if (m_Generator) delete m_Generator;
 }
 
-int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pdlFileName, const std::string& parentParticle,
+int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
                            const std::string& userFileName)
 {
   B2INFO("Begin initialisation of EvtGen Interface.");
@@ -58,8 +61,10 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pd
 
   // Method to add User EvtGen models here
   if (!m_Generator) {
+    FileSystem::TemporaryFile tmp;
+    EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
     int mixingType = EvtCPUtil::Coherent;
-    m_Generator = new EvtGen(DECFileName.c_str(), pdlFileName.c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels,
+    m_Generator = new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels,
                              mixingType);
   }
   if (!userFileName.empty()) {

@@ -9,20 +9,14 @@
  **************************************************************************/
 
 #include <analysis/utility/EvtPDLUtil.h>
-
-#include <EvtGenBase/EvtPDL.hh>
-#include <EvtGenBase/EvtId.hh>
-
-#include <framework/core/Environment.h>
+#include <TDatabasePDG.h>
 
 bool Belle2::EvtPDLUtil::hasAntiParticle(int pdgCode)
 {
-  initEvtPDL();
+  TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
+  TParticlePDG* antiParticle = particle->AntiParticle();
 
-  EvtId particle     = EvtPDL::evtIdFromStdHep(pdgCode);
-  EvtId antiParticle = EvtPDL::chargeConj(particle);
-
-  if (EvtPDL::getStdHep(antiParticle) == 0)
+  if (!antiParticle)
     return false;
 
   return particle != antiParticle;
@@ -30,32 +24,12 @@ bool Belle2::EvtPDLUtil::hasAntiParticle(int pdgCode)
 
 std::string Belle2::EvtPDLUtil::particleName(int pdgCode)
 {
-  initEvtPDL();
-  return EvtPDL::name(EvtPDL::evtIdFromStdHep(pdgCode));
+  return TDatabasePDG::Instance()->GetParticle(pdgCode)->GetName();
 }
 
 std::string Belle2::EvtPDLUtil::antiParticleName(int pdgCode)
 {
-  initEvtPDL();
-
-  EvtId particle     = EvtPDL::evtIdFromStdHep(pdgCode);
-  EvtId antiParticle = EvtPDL::chargeConj(particle);
-
-  if (EvtPDL::getStdHep(antiParticle) == 0)
-    return EvtPDL::name(particle);
-
-  return EvtPDL::name(antiParticle);
-}
-
-void Belle2::EvtPDLUtil::initEvtPDL()
-{
-  if (EvtPDL::entries() != 0)
-    return;
-
-  // EvtPDL is not initialized yet
-  std::string strEvtPDL = Environment::Instance().getExternalsPath() + "/share/evtgen/evt.pdl";
-  EvtPDL evtpdl;
-  evtpdl.read(strEvtPDL.c_str());
+  return TDatabasePDG::Instance()->GetParticle(pdgCode)->AntiParticle()->GetName();
 }
 
 std::string Belle2::EvtPDLUtil::antiParticleListName(int pdgCode, std::string label)

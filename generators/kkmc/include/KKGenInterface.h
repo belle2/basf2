@@ -15,11 +15,11 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <EvtGenBase/EvtPDL.hh>
 
 #include <string>
 #include <fstream>
 #include <string.h>
+#include <unordered_map>
 
 #include <TLorentzRotation.h>
 
@@ -90,7 +90,7 @@ namespace Belle2 {
     KKGenInterface& operator= (const KKGenInterface& m) = delete;
 
     int setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName, const std::string& taudecaytableFileName,
-              const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
+              const std::string& KKMCOutputFileName); /**< Setup for KKMC/TAUOLA  */
 
     void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
                        double Espread_HER); /**< Setup for beam inforamtion to KKMC */
@@ -111,7 +111,7 @@ namespace Belle2 {
     // int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
 
   protected:
-    EvtPDL* myevtpdl; /**<Variable needed for EvtPDL (just for translation from PYTHIA6 KF to PDG id). */
+    std::unordered_map<int, int> m_mapPythiaIDtoPDG;
   };
 
 }

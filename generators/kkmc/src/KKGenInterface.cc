@@ -14,6 +14,8 @@
 #include <framework/logging/Logger.h>
 #include <generators/kkmc/KKGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+#include <THashList.h>
 
 #include <string>
 #include <queue>
@@ -35,12 +37,10 @@ using namespace Belle2;
 
 KKGenInterface::KKGenInterface()
 {
-  // initialize EvtPDL
-  myevtpdl = new EvtPDL();
 }
 
 int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName,
-                          const std::string& taudecaytableFileName, const std::string& EvtPDLFileName, const std::string& KKMCOutputFileName)
+                          const std::string& taudecaytableFileName, const std::string& KKMCOutputFileName)
 {
   B2INFO("Begin initialisation of KKGen Interface.");
 
@@ -70,18 +70,15 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   // seed of random generator should be set here
   kk_init_seed_();
 
-  // To use EvtPDL, setting file should be read
-  myevtpdl->read(EvtPDLFileName.c_str());
-
-  // If EvtPDL does not know pi0, initialization of EvtPDL fails
-  if (EvtPDL::evtIdFromLundKC(111) == EvtId(-1, -1)) {
-    boost::filesystem::path fpath(EvtPDLFileName);
-    // Probably, the reason why it fails is whether pdlfile is correctly read or not
-    if (boost::filesystem::exists(fpath)) {
-      B2FATAL("pdlfile exists, but, EvtPDL does not work...");
-    } else {
-      B2FATAL("Since pdlfile does not exist, EvtPDL does not work...");
+  // create mapping from pythia id to pdg code
+  auto particlelist = EvtGenDatabasePDG::Instance()->ParticleList();
+  m_mapPythiaIDtoPDG.reserve(particlelist->GetEntries());
+  for (TObject* object : *particlelist) {
+    EvtGenParticlePDG* particle = dynamic_cast<EvtGenParticlePDG*>(object);
+    if (!particle) {
+      B2FATAL("Something is wrong with the EvtGenDatabasePDG, got object not inheriting from EvtGenParticlePDG");
     }
+    m_mapPythiaIDtoPDG[particle->PythiaID()] = particle->PdgCode();
   }
 
   B2INFO("End initialisation of KKGen Interface.");
@@ -223,13 +220,12 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   //updating the GraphParticle information from /hepevt/ common block information
 
   // convert PYTHIA ID to PDG ID
-  EvtId evtid = EvtPDL::evtIdFromLundKC(hepevt_.idhep[index - 1]);
-  // If EvtPDL does not know this ID
-  if (evtid == EvtId(-1, -1)) {
-    // set this PYTHIA number directly
-    gParticle->setPDG(hepevt_.idhep[index - 1]);
+  auto iter = m_mapPythiaIDtoPDG.find(hepevt_.idhep[index - 1]);
+  if (iter != end(m_mapPythiaIDtoPDG)) {
+    gParticle->setPDG(iter->second);
   } else {
-    gParticle->setPDG(myevtpdl->getStdHep(evtid));
+    //not in the map, set pythia id directly
+    gParticle->setPDG(hepevt_.idhep[index - 1]);
   }
 
   //all(!) particles from the generator have to be primary

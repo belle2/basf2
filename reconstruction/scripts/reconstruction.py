@@ -197,11 +197,15 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     # V0 Monte Carlo matching
     path.add_module('MCV0Matcher')
 
-    # dE/dx PID
-    dEdxPID = register_module('DedxPID')
-    dEdxPID.param('useSVD', use_vxd)
-    dEdxPID.param('useCDC', use_cdc)
-    path.add_module(dEdxPID)
+    if components is None or 'CDC' in components:
+        # CDC dE/dx PID
+        CDCdEdxPID = register_module('CDCDedxPID')
+        path.add_module(CDCdEdxPID)
+
+    if components is None or 'SVD' in components or 'PXD' in components:
+        # VXD dE/dx PID
+        VXDdEdxPID = register_module('VXDDedxPID')
+        path.add_module(VXDdEdxPID)
 
     # prune genfit tracks
     if pruneTracks:

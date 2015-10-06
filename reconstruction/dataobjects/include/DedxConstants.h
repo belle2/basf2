@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Pulvermacher
+ * Contributors: Jake Bennett, Christian Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,6 @@ namespace Belle2 {
 
     /** list of trackig detectors, starting with innermost detector */
     enum Detector { c_PXD, c_SVD, c_CDC };
-
   }
 }
 #endif

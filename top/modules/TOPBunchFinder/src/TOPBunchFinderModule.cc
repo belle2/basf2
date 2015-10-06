@@ -23,7 +23,8 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
 
 // framework - DataStore
@@ -94,8 +95,11 @@ namespace Belle2 {
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
 
-    StoreArray<DedxLikelihood> dedxLikelihoods;
-    dedxLikelihoods.isRequired();
+    StoreArray<CDCDedxLikelihood> cdcDedxLikelihoods;
+    cdcDedxLikelihoods.isRequired();
+
+    StoreArray<VXDDedxLikelihood> vxdDedxLikelihoods;
+    vxdDedxLikelihoods.isRequired();
 
     StoreArray<MCParticle> mcParticles;
     mcParticles.isOptional();
@@ -166,7 +170,6 @@ namespace Belle2 {
     int usedTrk = 0;
 
     // loop over reconstructed tracks and make sum of log likelihoods for diff. bunches
-
     StoreArray<Track> tracks;
     for (const auto& track : tracks) {
       TOPtrack trk(&track);
@@ -178,13 +181,14 @@ namespace Belle2 {
         if (!trk.getBarHit()) continue;
         mass = trk.getMCParticle()->getMass();
       } else {
-        auto dedx = track.getRelated<DedxLikelihood>();
-        if (dedx) {
-          mass = getMostProbableMass(dedx);
-        } else {
+        auto cdcdedx = track.getRelated<CDCDedxLikelihood>();
+        auto vxddedx = track.getRelated<VXDDedxLikelihood>();
+        if (!cdcdedx and !vxddedx) {
           mass = Const::pion.getMass();
           B2WARNING("TOPBunchFinder: no relation to DedxLikelihood - "
                     "pion mass used instead");
+        } else {
+          mass = getMostProbableMass(cdcdedx, vxddedx);
         }
       }
 
@@ -236,16 +240,24 @@ namespace Belle2 {
   }
 
 
-  double TOPBunchFinderModule::getMostProbableMass(const DedxLikelihood* dedx) const
+
+
+  double TOPBunchFinderModule::getMostProbableMass(const CDCDedxLikelihood* cdcdedx, const VXDDedxLikelihood* vxddedx) const
   {
-    if (!dedx) return 0;
+    if (!cdcdedx and !vxddedx) return 0;
 
     std::vector<double> logL;
     std::vector<double> mass;
     //    for(auto type: Const::chargedStableSet) { --- not implemented yet
     for (auto type = Const::chargedStableSet.begin();
          type != Const::chargedStableSet.end(); ++type) {
-      logL.push_back(dedx->getSVDLogLikelihood(type) + dedx->getCDCLogLikelihood(type));
+      if (cdcdedx and vxddedx) {
+        logL.push_back(cdcdedx->getLogL(type) + vxddedx->getLogL(type));
+      } else if (cdcdedx) {
+        logL.push_back(cdcdedx->getLogL(type));
+      } else {
+        logL.push_back(vxddedx->getLogL(type));
+      }
       mass.push_back(type.getMass());
     }
     unsigned i0 = Const::pion.getIndex();

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXSCANMODULE_H
-#define DEDXSCANMODULE_H
+#ifndef CDCDEDXSCANMODULE_H
+#define CDCDEDXSCANMODULE_H
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
@@ -27,21 +27,21 @@ using namespace std;
 
 namespace Belle2 {
 
-  class DedxTrack;
+  class CDCDedxTrack;
 
-  /** This class performs the same function as DedxPIDModule, but does so
+  /** This class performs the same function as CDCDedxPIDModule, but does so
    * without using real objects from BASF2. Instead, it scans values of
    * DOCA and entrance angle for a cell in each layer of the CDC.
    */
-  class DedxScanModule : public Module {
+  class CDCDedxScanModule : public Module {
 
   public:
 
     /** Default constructor */
-    DedxScanModule();
+    CDCDedxScanModule();
 
     /** Destructor */
-    virtual ~DedxScanModule();
+    virtual ~CDCDedxScanModule();
 
     /** Initialize the module */
     virtual void initialize();

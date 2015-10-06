@@ -71,7 +71,8 @@ namespace Belle2 {
       Float_t zDec;    /**< decay vertex (cylindrical coordinate z) of MCParticle */
       Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
 
-      LogLikelihoods dedx;  /**< log likelihoods from dE/dx */
+      LogLikelihoods cdcdedx;  /**< log likelihoods from CDC dE/dx */
+      LogLikelihoods svddedx;  /**< log likelihoods from SVD dE/dx */
       LogLikelihoods top;   /**< log likelihoods from TOP */
       LogLikelihoods arich; /**< log likelihoods from ARICH */
       LogLikelihoods ecl;   /**< log likelihoods from ECL */
@@ -104,7 +105,8 @@ namespace Belle2 {
         zDec = 0;
         phiDec = 0;
         primary = 0;
-        dedx.clear();
+        cdcdedx.clear();
+        svddedx.clear();
         top.clear();
         arich.clear();
         ecl.clear();

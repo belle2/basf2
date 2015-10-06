@@ -21,7 +21,7 @@ using namespace Belle2;
 const int num_dedx_bins = 100;
 
 
-/** Save 2d PDFs of dE/dx vs. momentum for use with the DedxPID module.
+/** Save 2d PDFs of dE/dx vs. momentum for use with the CDCDedxPID module.
  *
  *  PDFs for individual dE/dx measurements as well as their truncated means are
  *  produced.
@@ -90,9 +90,10 @@ int main(int argc, char* argv[])
       const int pdg_code = Const::chargedStableSet.at(iPart).getPDGCode();
       //const int num_dedx_bins = use_truncated_mean ? (num_dedx_bins_hits) : num_dedx_bins_hits;
 
-      for (int detector = 0; detector < Dedx::c_num_detectors; detector++) {
+      // first prepare the histograms for the VXD
+      for (int detector = 0; detector <= Dedx::c_SVD; detector++) {
         std::cout << "i " << i << ", d" << detector << "\n";
-        const char* flayer_var = "DedxTracks.dedxLayer";
+        const char* flayer_var = "VXDDedxTracks.dedxLayer";
         TString flayer_selection;
         double dedx_cutoff = 0;
         switch (Dedx::Detector(detector)) {
@@ -105,15 +106,11 @@ int main(int argc, char* argv[])
             dedx_cutoff = 2.5e4;
             break;
           case Dedx::c_CDC:
-            flayer_selection = TString::Format("%s >= 0", flayer_var);
-            //  const double dedx_cutoff = use_truncated_mean?((pdg_code==211)?2.5e-6:2e-5):(2e-5);
-            //  TODO: if sample doesn't contain slow particles this can be reduced
-            dedx_cutoff = 150.0;
             break;
         }
 
         const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);
-        const char* varname = use_truncated_mean ? "DedxTracks.m_dedx_avg_truncated" : "DedxTracks.dedx";
+        const char* varname = use_truncated_mean ? "VXDDedxTracks.m_dedx_avg_truncated" : "VXDDedxTracks.dedx";
 
         hists[detector] = new TH2F(histname.Data(), histname.Data(),
                                    num_p_bins, pbins,
@@ -121,16 +118,45 @@ int main(int argc, char* argv[])
         hists[detector]->Sumw2(); //save weights (important for fitting)
         if (use_truncated_mean)
           tree->Project(histname.Data(),
-                        TString::Format("%s[][%i]:DedxTracks.m_p_cdc", varname, detector),
-                        TString::Format("%s < %g && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+                        TString::Format("%s[][%i]:VXDDedxTracks.m_p", varname, detector),
+                        TString::Format("%s < %g && abs(VXDDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
         else
           tree->Project(histname.Data(),
-                        TString::Format("%s:DedxTracks.m_p_cdc", varname),
-                        TString::Format("%s < %g && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+                        TString::Format("%s:VXDDedxTracks.m_p", varname),
+                        TString::Format("%s < %g && abs(VXDDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
 
-        //TString::Format("%s < %g && abs(log(DedxTracks.m_chi2)) < 5 && abs(DedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+        //TString::Format("%s < %g && abs(log(VXDDedxTracks.m_chi2)) < 5 && abs(VXDDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
 
       } //detector type
+
+      // now add the CDC histograms
+      int detector = (int)Dedx::c_CDC;
+      std::cout << "i " << i << ", d" << detector << "\n";
+      const char* flayer_var = "CDCDedxTracks.dedxLayer";
+      TString flayer_selection;
+      double dedx_cutoff = 0;
+      flayer_selection = TString::Format("%s >= 0", flayer_var);
+      //  const double dedx_cutoff = use_truncated_mean?((pdg_code==211)?2.5e-6:2e-5):(2e-5);
+      //  TODO: if sample doesn't contain slow particles this can be reduced
+      dedx_cutoff = 150.0;
+
+      const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);
+      const char* varname = use_truncated_mean ? "CDCDedxTracks.m_dedx_avg_truncated" : "CDCDedxTracks.dedx";
+
+      hists[detector] = new TH2F(histname.Data(), histname.Data(),
+                                 num_p_bins, pbins,
+                                 num_dedx_bins, 0, dedx_cutoff);
+      hists[detector]->Sumw2(); //save weights (important for fitting)
+      if (use_truncated_mean)
+        tree->Project(histname.Data(),
+                      TString::Format("%s[][%i]:CDCDedxTracks.m_p_cdc", varname, detector),
+                      TString::Format("%s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+      else
+        tree->Project(histname.Data(),
+                      TString::Format("%s:CDCDedxTracks.m_p_cdc", varname),
+                      TString::Format("%s < %g && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
+
+      //TString::Format("%s < %g && abs(log(CDCDedxTracks.m_chi2)) < 5 && abs(CDCDedxTracks.m_pdg) == %i && %s", varname, dedx_cutoff, pdg_code, flayer_selection.Data()));
 
 
       //{{{ for each momentum bin, normalize pdf (disable if you want to keep the orginals, e.g. for fitting)

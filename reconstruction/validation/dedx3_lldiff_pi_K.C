@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>christian.pulvermacher@kit.edu</contact>
+  <contact>jvbennett@cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
 </header>
 */
@@ -32,7 +32,7 @@ void plot(const TString &input_filename)
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
   }
-  if(tree->GetEntries() == 0 || tree->GetBranch("DedxTracks.m_p") == 0) {
+  if(tree->GetEntries() == 0 || tree->GetBranch("CDCDedxTracks.m_p") == 0) {
     std::cerr << "Input file doesn't contain dE/dx data, aborting!\n";
     exit(1);
   }
@@ -46,14 +46,18 @@ void plot(const TString &input_filename)
   for (int det = 0; det < 2; det++) {
     TString selection;
     if (det == 0) //SVD
-      selection = TString::Format("(DedxTracks.m_svdLogl[][2] - DedxTracks.m_svdLogl[][3]):DedxTracks.m_p_true");
+      selection = TString::Format("(VXDDedxTracks.m_vxdLogl[][2] - VXDDedxTracks.m_vxdLogl[][3]):VXDDedxTracks.m_p_true");
     else //CDC
-      selection = TString::Format("(DedxTracks.m_cdcLogl[][2] - DedxTracks.m_cdcLogl[][3]):DedxTracks.m_p_true");
+      selection = TString::Format("(CDCDedxTracks.m_cdcLogl[][2] - CDCDedxTracks.m_cdcLogl[][3]):CDCDedxTracks.m_p_true");
 
     for (int part = 2; part < 4; part++) {
       //now create histograms with log-likelihood difference
-      tree->Project(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]), selection,
-          TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));
+      if( det == 0 ) //SVD
+	tree->Project(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]), selection,
+		      TString::Format("abs(VXDDedxTracks.m_pdg) == %d", pdg_codes[part]));
+      else //CDC
+	tree->Project(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]), selection,
+		      TString::Format("abs(CDCDedxTracks.m_pdg) == %d", pdg_codes[part]));
       TH1* hist = (TH1*)output_file->Get(TString::Format("%d_%d_LLdiff", det, pdg_codes[part]));
       hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %s, over momentum (in %s)", pdg_names[part], (det==0)?"VXD":"CDC"));
       hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
@@ -62,6 +66,7 @@ void plot(const TString &input_filename)
       } else {
         hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries >0 "));
       }
+      hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
       hist->Write();
 
     }

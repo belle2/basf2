@@ -3,13 +3,13 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jake Bennett, Christian Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXTRACK_H
-#define DEDXTRACK_H
+#ifndef CDCDEDXTRACK_H
+#define CDCDEDXTRACK_H
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
@@ -21,44 +21,38 @@
 #include <vector>
 
 namespace Belle2 {
-  /** Debug output for DedxPID module.
+  /** Debug output for CDCDedxPID module.
    *
    * Contains information of individual hits belonging to a track
    */
-  class DedxTrack : public RelationsObject {
-    friend class DedxPIDModule;
-    friend class DedxScanModule;
+  class CDCDedxTrack : public RelationsObject {
+    friend class CDCDedxPIDModule;
+    friend class CDCDedxScanModule;
     friend class DedxCorrectionModule;
 
   public:
 
     /** Default constructor */
-    DedxTrack() :
+    CDCDedxTrack() :
       RelationsObject(),
-      m_cdc(0), m_vxd(0), m_eventID(0), m_trackID(0),
+      m_eventID(0), m_trackID(0),
       m_p(0), m_p_cdc(0), m_cosTheta(0), m_charge(0),
       m_length(0.0), m_nHits(0), m_nHitsUsed(0),
       m_pdg(0), m_mother_pdg(0), m_p_true(0)
     {
-      //for all particles
-      //for all detectors
-      for (int i = 0; i < Dedx::c_num_detectors; i++)
-        m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
+      m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
 
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_cdcLogl[i] = 0.0;
-        m_svdLogl[i] = 0.0;
       }
     }
 
     /** Add a single hit to the object */
-    void addHit(int sid, int layer, double doca, double enta, int adcCount, double dE, double dx, double dEdx,
-                double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes)
+    void addHit(int wire, int layer, double doca, double enta, int adcCount, double dE, double dx, double dEdx, double cellHeight,
+                double cellHalfWidth, int driftT, double driftD, double driftDRes)
     {
-      if (sid < 15000) m_cdc++;
-      else m_vxd++;
-      m_sensorID.push_back(sid);
+      m_wire.push_back(wire);
       m_layer.push_back(layer);
       m_doca.push_back(doca);
       m_enta.push_back(enta);
@@ -74,7 +68,7 @@ namespace Belle2 {
     }
 
     /** add a dE/dx value */
-    void addDedx(int layer, float distance, float dedxValue)
+    void addDedx(int layer, double distance, double dedxValue)
     {
       dedxLayer.push_back(layer);
       dist.push_back(distance);
@@ -82,43 +76,38 @@ namespace Belle2 {
       m_length += distance;
     }
 
-
-    /** Get average dE/dx for given detector. */
-    float getDedx(Const::EDetector detector) const
-    {
-      int iDet = (int)(detector - Const::PXD);
-      if (iDet < 0 or iDet > Dedx::c_CDC)
-        return 0.0;
-      return m_dedx_avg[iDet];
-    }
-
-    /** Get truncated average dE/dx for given detector. */
-    float getDedxTruncated(Const::EDetector detector) const
-    {
-      int iDet = (int)(detector - Const::PXD);
-      if (iDet < 0 or iDet > Dedx::c_CDC)
-        return 0.0;
-      return m_dedx_avg_truncated[iDet];
-    }
-
     /** Return the event ID */
     double eventID() const { return m_eventID; }
     /** Return the track ID */
     double trackID() const { return m_trackID; }
 
+    /** Get truth information. */
+    double getPDG() const { return m_pdg; }
+
+    /** Get average dE/dx. */
+    double getDedx() const { return m_dedx_avg; }
+    /** Get truncated average dE/dx. */
+    double getTruncatedMean() const { return m_dedx_avg_truncated; }
+    /** Get truncated average dE/dx. */
+    double getError() const { return m_dedx_avg_truncated_err; }
+
+    /** Return the vector of dE/dx values for this object */
+    std::vector< double > getDedxList() const { return m_dEdx; }
+
     /** Return the momentum in the CDC */
     double getMomentum() const { return m_p_cdc; }
-    /** Return the number of hits on the track */
-    double getNHits() const { return m_nHits; }
+    /** Return the number of hits on this Track */
+    int size() const { return m_nHits; }
     /** Return the number of hits used in truncated mean */
     double getNHitsUsed() const { return m_nHitsUsed; }
-
+    /** Return cos(theta) for this Track */
+    double getCosTheta() const { return m_cosTheta; }
 
     /** Return the (global) layer number */
     int getLayer(int i) const { return m_layer[i]; }
-
     /** Return the sensor ID for this hit: wire number for CDC (0-14336) */
-    int getSensorID(int i) const { return m_sensorID[i]; }
+    int getWire(int i) const { return m_wire[i]; }
+
     /** Return the adcCount for this hit */
     int getADCCount(int i) const { return m_adcCount[i]; }
     /** Return the charge from this hit */
@@ -144,44 +133,24 @@ namespace Belle2 {
     /** Return the drift distance resolution for a hit */
     double getDriftDRes(int i) const { return m_driftDRes[i]; }
 
-    /** Return the mean value of dE/dx for CDC */
-    double getMean() const { return m_dedx_avg[2]; }
-    /** Return the truncated mean value of dE/dx for CDC */
-    double getTruncatedMean() const { return m_dedx_avg_truncated[2]; }
-    /** Return the error on the truncated mean value of dE/dx for CDC */
-    double getError() const { return m_dedx_avg_truncated_err[2]; }
-
-    /** Return the number of good hits on this Track */
-    int size() const { return m_cdc + m_vxd; }
-    /** Return the number of good CDC hits on this Track */
-    int CDCsize() const { return m_cdc; }
-    /** Return cos(theta) for this Track */
-    double getCosTheta() const { return m_cosTheta; }
-
-    /** Return the vector of dE/dx values for this object */
-    std::vector< double > getDedxList() const { return m_dEdx; }
-
-    /** Set the mean value of dE/dx */
-    void setMean(int sid, double mean) { m_dedx_avg[sid] = mean; }
-    /** Set the truncated mean value of dE/dx */
-    void setTruncatedMean(int sid, double mean) { m_dedx_avg_truncated[sid] = mean; }
-    /** Set the error on the truncated mean value of dE/dx */
-    void setError(int sid, double err) { m_dedx_avg_truncated_err[sid] = err; }
+    /** Get average dE/dx. */
+    void setMean(double mean) { m_dedx_avg = mean; }
+    /** Get truncated average dE/dx. */
+    void setTruncatedMean(double mean) { m_dedx_avg_truncated = mean; }
+    /** Get truncated average dE/dx. */
+    void setError(double error) { m_dedx_avg_truncated_err = error; }
 
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { m_dEdx[i] = dedx; }
 
   private:
 
-    int m_cdc;    /**< the number of hits in the CDC */
-    int m_vxd;    /**< the number of hits in the VXD */
-
     int m_eventID; /**< event in which this Track was found */
     int m_trackID; /**< ID number of the Track */
 
     // hit level information
     std::vector<int> m_layer;   /**< layer number */
-    std::vector<int> m_sensorID; /**< unique sensor ID (wire ID in CDC) */
+    std::vector<int> m_wire; /**< wire ID in the CDC */
     std::vector<int> m_adcCount;   /**< adcCount per hit */
     std::vector<double> m_dE;   /**< charge per hit */
     std::vector<double> m_dx;   /**< path length in cell */
@@ -215,14 +184,13 @@ namespace Belle2 {
     double m_mother_pdg; /**< MC PID of mother particle */
     double m_p_true; /**< MC true momentum */
 
-    double m_dedx_avg[Dedx::c_num_detectors];               /**< dE/dx averaged */
-    double m_dedx_avg_truncated[Dedx::c_num_detectors];     /**< dE/dx averaged, truncated mean */
-    double m_dedx_avg_truncated_err[Dedx::c_num_detectors]; /**< standard deviation of m_dedx_avg_truncated */
+    double m_dedx_avg;               /**< dE/dx averaged */
+    double m_dedx_avg_truncated;     /**< dE/dx averaged, truncated mean */
+    double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */
 
-    float m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
-    float m_svdLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+    double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(DedxTrack, 8); /**< Debug output for DedxPID module. */
+    ClassDef(CDCDedxTrack, 1); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

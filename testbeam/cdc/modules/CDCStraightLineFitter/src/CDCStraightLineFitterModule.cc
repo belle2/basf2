@@ -127,7 +127,7 @@ namespace Belle2 {
     StoreArray<ExtHit> extHits;
     extHits.registerInDataStore();
 
-    StoreArray<DedxTrack> dedxTracks;
+    StoreArray<CDCDedxTrack> dedxTracks;
     dedxTracks.registerInDataStore();
 
     StoreObjPtr<TOPRecBunch> recBunch;
@@ -155,7 +155,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> fitResults;
     StoreArray<MCParticle> mcParticles;
     StoreArray<ExtHit> extHits;
-    StoreArray<DedxTrack> dedxTracks;
+    StoreArray<CDCDedxTrack> dedxTracks;
     RelationArray trackCandToFitResults(trackCandidates, fitResults);
     RelationArray trackCandToMCParticles(trackCandidates, mcParticles);
 
@@ -238,7 +238,7 @@ namespace Belle2 {
         }
       }
 
-      // determine dE/dx and save to DedxTracks
+      // determine dE/dx and save to CDCDedxTracks
 
       auto* dedxTrack = dedxTracks.appendNew();
       setDedx(trackCandidate, momFit, posFit, dedxTrack);
@@ -349,7 +349,7 @@ namespace Belle2 {
   bool CDCStraightLineFitterModule::setDedx(const genfit::TrackCand& trackCand,
                                             const TVector3& momFit,
                                             const TVector3& posFit,
-                                            DedxTrack* dedxTrack)
+                                            CDCDedxTrack* dedxTrack)
   {
 
     const auto& cdcgp = CDC::CDCGeometryPar::Instance();
@@ -411,9 +411,9 @@ namespace Belle2 {
       truncSigma = sqrt((truncSigma / n - truncMean * truncMean) / n);
     }
 
-    dedxTrack->setMean(Dedx::c_CDC, mean);
-    dedxTrack->setTruncatedMean(Dedx::c_CDC, truncMean);
-    dedxTrack->setError(Dedx::c_CDC, truncSigma);
+    dedxTrack->setMean(mean);
+    dedxTrack->setTruncatedMean(truncMean);
+    dedxTrack->setError(truncSigma);
     return true;
   }
 

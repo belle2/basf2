@@ -15,7 +15,8 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
 #include <ecl/dataobjects/ECLHit.h>
@@ -41,7 +42,8 @@ void NtupleDetectorStatsRecTool::setupTree()
   m_iARICHAeroHits = -1;
   m_iARICHLikelihoods = -1;
   m_iCDCHits = -1;
-  m_iDedxLikelihoods = -1;
+  m_iCDCDedxLikelihoods = -1;
+  m_iVXDDedxLikelihoods = -1;
   m_iECLDsps = -1;
   m_iECLHitAssignments = -1;
   m_iECLHits = -1;
@@ -59,7 +61,8 @@ void NtupleDetectorStatsRecTool::setupTree()
   m_tree->Branch("nARICHAeroHits",      &m_iARICHAeroHits,  "nARICHAeroHits/I");
   m_tree->Branch("nARICHLikelihoods",   &m_iARICHLikelihoods,   "nARICHLikelihoods/I");
   m_tree->Branch("nCDCHits",        &m_iCDCHits,    "nCDCHits/I");
-  m_tree->Branch("nDedxLikelihoods",    &m_iDedxLikelihoods,  "nDedxLikelihoods/I");
+  m_tree->Branch("nCDCDedxLikelihoods",    &m_iCDCDedxLikelihoods,  "nCDCDedxLikelihoods/I");
+  m_tree->Branch("nVXDDedxLikelihoods",    &m_iVXDDedxLikelihoods,  "nVXDDedxLikelihoods/I");
   m_tree->Branch("nECLDsps",            &m_iECLDsps,    "nECLDsps/I");
   m_tree->Branch("nECLHitAssignments",  &m_iECLHitAssignments,  "nECLHitAssignments/I");
   m_tree->Branch("nECLHits",    &m_iECLHits,    "nECLHits/I");
@@ -88,8 +91,11 @@ void NtupleDetectorStatsRecTool::eval(const  Particle*)
   StoreArray<CDCHit>    mCDCHits;
   m_iCDCHits = (int) mCDCHits.getEntries();
 
-  StoreArray<DedxLikelihood>    mDedxLikelihoods;
-  m_iDedxLikelihoods = (int) mDedxLikelihoods.getEntries();
+  StoreArray<CDCDedxLikelihood>    mCDCDedxLikelihoods;
+  m_iCDCDedxLikelihoods = (int) mCDCDedxLikelihoods.getEntries();
+
+  StoreArray<VXDDedxLikelihood>    mVXDDedxLikelihoods;
+  m_iVXDDedxLikelihoods = (int) mVXDDedxLikelihoods.getEntries();
 
   StoreArray<ECLDsp>    mECLDsps;
   m_iECLDsps = (int) mECLDsps.getEntries();

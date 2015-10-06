@@ -26,8 +26,10 @@ namespace Belle2 {
     int m_iARICHLikelihoods;
     /** N CDCHits */
     int m_iCDCHits;
-    /** N DedxLikelihoods */
-    int m_iDedxLikelihoods;
+    /** N CDCDedxLikelihoods */
+    int m_iCDCDedxLikelihoods;
+    /** N VXDDedxLikelihoods */
+    int m_iVXDDedxLikelihoods;
     /** N ECLDspss */
     int m_iECLDsps;
     /** N ECLHitAssignments */

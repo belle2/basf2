@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <reconstruction/modules/DedxCorrection/DedxCorrectionModule.h>
-#include <reconstruction/dataobjects/DedxTrack.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -39,8 +39,8 @@ DedxCorrectionModule::DedxCorrectionModule() : Module()
 
   addParam("runNumber", m_runNo, "run number", int(-1));
 
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.0));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.2));
+  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
+  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
 
   // !!!!! At some point functionality to import the calibration constants
   // should be added here (for now just use some arbitrary numbers for testing)
@@ -54,12 +54,12 @@ void DedxCorrectionModule::initialize()
 {
 
   // required inputs
-  StoreArray<DedxTrack>::required();
+  StoreArray<CDCDedxTrack>::required();
   StoreArray<Track>::required();
   StoreArray<TrackFitResult>::required();
 
   // register outputs
-  StoreArray<DedxTrack>::registerPersistent();
+  StoreArray<CDCDedxTrack>::registerPersistent();
 
 }
 
@@ -67,11 +67,11 @@ void DedxCorrectionModule::event()
 {
 
   // inputs
-  StoreArray<DedxTrack> dedxTracks;
+  StoreArray<CDCDedxTrack> dedxTracks;
   StoreArray<Track> tracks;
 
   // outputs
-  StoreArray<DedxTrack> dedxArray;
+  StoreArray<CDCDedxTrack> dedxArray;
 
   // **************************************************
   //
@@ -81,7 +81,7 @@ void DedxCorrectionModule::event()
 
   for (int iTrack = 0; iTrack < tracks.getEntries(); ++iTrack) {
     Track* track = tracks[iTrack];
-    DedxTrack* dedxTrack = track->getRelatedTo<DedxTrack>();
+    CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
     if (!dedxTrack || dedxTrack->size() != 0) {
       B2WARNING("No good hits on this track...");
       continue;
@@ -104,15 +104,15 @@ void DedxCorrectionModule::event()
     int nhits = dedxTrack->size();
     for (int i = 0; i < nhits; ++i) {
       // only look at CDC hits
-      if (dedxTrack->getSensorID(i) > 15000) continue;
+      if (dedxTrack->getWire(i) > 15000) continue;
 
-      double newdedx = StandardCorrection(m_runNo, dedxTrack->getSensorID(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
+      double newdedx = StandardCorrection(m_runNo, dedxTrack->getWire(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
       dedxTrack->setDedx(i, newdedx);
     } // end loop over hits
 
-    calculateMeans(&(dedxTrack->m_dedx_avg[c_CDC]),
-                   &(dedxTrack->m_dedx_avg_truncated[c_CDC]),
-                   &(dedxTrack->m_dedx_avg_truncated_err[c_CDC]),
+    calculateMeans(&(dedxTrack->m_dedx_avg),
+                   &(dedxTrack->m_dedx_avg_truncated),
+                   &(dedxTrack->m_dedx_avg_truncated_err),
                    dedxTrack->dedx);
   } // end loop over tracks
 }

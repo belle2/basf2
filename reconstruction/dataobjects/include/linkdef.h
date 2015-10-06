@@ -5,8 +5,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::DedxTrack+;
-#pragma link C++ class Belle2::DedxLikelihood+;
-
+#pragma link C++ class Belle2::CDCDedxTrack+;
+#pragma link C++ class Belle2::CDCDedxLikelihood+;
+#pragma link C++ class Belle2::VXDDedxTrack+;
+#pragma link C++ class Belle2::VXDDedxLikelihood+;
 
 #endif

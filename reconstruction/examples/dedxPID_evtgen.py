@@ -76,21 +76,33 @@ genfit = register_module('GenFitter')
 # genfit.param('UseClusters', True)
 main.add_module(genfit)
 
-dedx = register_module('DedxPID')
-dedx_params = {  # 'pdfFile': 'YourPDFFile.root',
+cdcdedx = register_module('CDCDedxPID')
+cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
+    'useIndividualHits': True,
+    'removeLowest': 0.05,
+    'removeHighest': 0.25,
+    'onlyPrimaryParticles': False,
+    'enableDebugOutput': True,
+    'ignoreMissingParticles': False,
+}
+cdcdedx.param(cdcdedx_params)
+main.add_module(cdcdedx)
+
+svddedx = register_module('SVDDedxPID')
+svddedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
     'removeLowest': 0.05,
     'removeHighest': 0.25,
     'onlyPrimaryParticles': False,
     'usePXD': use_pxd,
     'useSVD': True,
-    'useCDC': True,
     'trackDistanceThreshold': 4.0,
     'enableDebugOutput': True,
     'ignoreMissingParticles': False,
 }
-dedx.param(dedx_params)
-main.add_module(dedx)
+svddedx.param(svddedx_params)
+main.add_module(svddedx)
+
 output = register_module('RootOutput')
 output.param('outputFileName', 'dedxPID_evtgen.root')
 main.add_module(output)

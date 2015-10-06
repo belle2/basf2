@@ -23,7 +23,7 @@
 using namespace std;
 
 namespace Belle2 {
-  class DedxTrack;
+  class CDCDedxTrack;
 
   /** This module may be used to apply the corrections to dE/dx per the
    * calibration constants. The interface with the calibration database

@@ -3,13 +3,13 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jake Bennett, Christian Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXPIDMODULE_H
-#define DEDXPIDMODULE_H
+#ifndef CDCDEDXPIDMODULE_H
+#define CDCDEDXPIDMODULE_H
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
@@ -28,19 +28,18 @@ class TH2F;
 namespace Belle2 {
   class PXDCluster;
   class SVDCluster;
-  class DedxTrack;
-  class HelixHelper;
+  class CDCDedxTrack;
 
-  /** Extract dE/dx from fitted tracks.
+  /** Extract CDC dE/dx information from fitted tracks.
    *
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
-   * for all particle hypotheses are calculated and saved in a DedxLikelihood object.
+   * for all particle hypotheses are calculated and saved in a CDCDedxLikelihood object.
    *
    * Performs a simple path length correction to the dE/dx measuremnt
    * based on individual hits in the CDC and determines the mean and
    * truncated mean dE/dx value for each track.
    *
-   * The 'EnableDebugOutput' option adds DedxTrack objects (one for each genfit::Track),
+   * The 'EnableDebugOutput' option adds CDCDedxTrack objects (one for each genfit::Track),
    * which includes individual dE/dx data points and their corresponding layer,
    * and hit information like reconstructed position, charge, etc.
    *
@@ -49,15 +48,15 @@ namespace Belle2 {
    * <a href="http://www-ekp.physik.uni-karlsruhe.de/pub/web/thesis/iekp-ka2012-9.pdf">dE/dx Particle Identification and Pixel Detector Data Reduction for the Belle II Experiment</a> (Chapter 6)
    *
    */
-  class DedxPIDModule : public Module {
+  class CDCDedxPIDModule : public Module {
 
   public:
 
     /** Default constructor */
-    DedxPIDModule();
+    CDCDedxPIDModule();
 
     /** Destructor */
-    virtual ~DedxPIDModule();
+    virtual ~CDCDedxPIDModule();
 
     /** Initialize the module */
     virtual void initialize();
@@ -85,16 +84,6 @@ namespace Belle2 {
      */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    /** returns traversed length through active medium of given PXDCluster. */
-    static double getTraversedLength(const PXDCluster* hit, const HelixHelper* helix);
-
-    /** returns traversed length through active medium of given SVDCluster. */
-    static double getTraversedLength(const SVDCluster* hit, const HelixHelper* helix);
-
-    /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(DedxTrack* track, const HelixHelper& helix, const StoreArray<HitClass>& hits,
-                                              const std::vector<int>& hit_indices) const;
-
     /** for all particles, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
@@ -102,31 +91,20 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(float(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
-
-    /** should info from this detector be included in likelihood? */
-    bool detectorEnabled(Dedx::Detector d) const
-    {
-      return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD) or (d == Dedx::c_CDC and m_useCDC);
-    }
+    void saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
 
     /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[Dedx::c_num_detectors][Const::ChargedStable::c_SetSize]; //m_pdfs[detector_type][particle_type]
+    TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize];
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
 
-    //parameters: technical stuff
-    double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */
     bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     //parameters: which particles and detectors to use
     bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */
-    bool m_usePXD; /**< use PXD hits for likelihood */
-    bool m_useSVD; /**< use SVD hits for likelihood */
-    bool m_useCDC; /**< use CDC hits for likelihood */
 
     //parameters: PDF configuration
     std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */

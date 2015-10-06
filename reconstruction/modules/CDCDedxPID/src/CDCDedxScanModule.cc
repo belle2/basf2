@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/dedxPID/DedxScanModule.h>
-#include <reconstruction/modules/dedxPID/LineHelper.h>
+#include <reconstruction/modules/CDCDedxPID/CDCDedxScanModule.h>
+#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <reconstruction/dataobjects/DedxTrack.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -54,9 +54,9 @@ using namespace Belle2;
 using namespace CDC;
 using namespace Dedx;
 
-REG_MODULE(DedxScan)
+REG_MODULE(CDCDedxScan)
 
-DedxScanModule::DedxScanModule() : Module()
+CDCDedxScanModule::CDCDedxScanModule() : Module()
 {
 
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
@@ -65,13 +65,13 @@ DedxScanModule::DedxScanModule() : Module()
   m_trackID = 0;
 }
 
-DedxScanModule::~DedxScanModule() { }
+CDCDedxScanModule::~CDCDedxScanModule() { }
 
-void DedxScanModule::initialize()
+void CDCDedxScanModule::initialize()
 {
 
   // register outputs
-  StoreArray<DedxTrack>::registerPersistent();
+  StoreArray<CDCDedxTrack>::registerPersistent();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -82,11 +82,11 @@ void DedxScanModule::initialize()
   }
 }
 
-void DedxScanModule::event()
+void CDCDedxScanModule::event()
 {
 
   // outputs
-  StoreArray<DedxTrack> dedxArray;
+  StoreArray<CDCDedxTrack> dedxArray;
 
   // get the geometry of the cdc
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -99,7 +99,7 @@ void DedxScanModule::event()
 
   srand(time(NULL));
 
-  boost::shared_ptr<DedxTrack> dedxTrack = boost::make_shared<DedxTrack>();
+  boost::shared_ptr<CDCDedxTrack> dedxTrack = boost::make_shared<CDCDedxTrack>();
 
   for (int i = 0; i < 56; ++i) {
     int nWires = cdcgeo.nWiresInLayer(i);
@@ -136,16 +136,16 @@ void DedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(Dedx::c_CDC, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
+        dedxTrack->addHit(0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0);
       }
     }
     dedxArray.appendNew(*dedxTrack);
   }
 }
 
-void DedxScanModule::terminate()
+void CDCDedxScanModule::terminate()
 {
 
-  B2INFO("DedxScanModule exiting after processing " << m_trackID <<
+  B2INFO("CDCDedxScanModule exiting after processing " << m_trackID <<
          " tracks in " << m_eventID + 1 << " events.");
 }

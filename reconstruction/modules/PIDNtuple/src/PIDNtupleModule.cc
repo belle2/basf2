@@ -96,7 +96,8 @@ void PIDNtupleModule::initialize()
   m_tree->Branch("rhoDec", &m_pid.rhoDec, "rhoDec/F");
   m_tree->Branch("zDec",   &m_pid.zDec,   "zDec/F");
   m_tree->Branch("phiDec", &m_pid.phiDec, "phiDec/F");
-  m_tree->Branch("dedx",  &m_pid.dedx,  "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
+  m_tree->Branch("cdcdedx",  &m_pid.cdcdedx,  "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
+  m_tree->Branch("svddedx",  &m_pid.svddedx,  "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
   m_tree->Branch("top",   &m_pid.top,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
   m_tree->Branch("arich", &m_pid.arich, "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
   m_tree->Branch("ecl",   &m_pid.ecl,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
@@ -162,14 +163,23 @@ void PIDNtupleModule::event()
       m_pid.phiDec = decVertex.Phi();
     }
 
-    m_pid.dedx.le = pid->getLogL(Const::electron, Const::SVD + Const::CDC);
-    m_pid.dedx.lmu = pid->getLogL(Const::muon, Const::SVD + Const::CDC);
-    m_pid.dedx.lpi = pid->getLogL(Const::pion, Const::SVD + Const::CDC);
-    m_pid.dedx.lk = pid->getLogL(Const::kaon, Const::SVD + Const::CDC);
-    m_pid.dedx.lp = pid->getLogL(Const::proton, Const::SVD + Const::CDC);
-    m_pid.dedx.flag = pid->isAvailable(Const::SVD + Const::CDC);
+    m_pid.cdcdedx.le = pid->getLogL(Const::electron, Const::CDC);
+    m_pid.cdcdedx.lmu = pid->getLogL(Const::muon, Const::CDC);
+    m_pid.cdcdedx.lpi = pid->getLogL(Const::pion, Const::CDC);
+    m_pid.cdcdedx.lk = pid->getLogL(Const::kaon, Const::CDC);
+    m_pid.cdcdedx.lp = pid->getLogL(Const::proton, Const::CDC);
+    m_pid.cdcdedx.flag = pid->isAvailable(Const::CDC);
     if (mcParticle)
-      m_pid.dedx.seen = mcParticle->hasSeenInDetector(Const::SVD + Const::CDC);
+      m_pid.cdcdedx.seen = mcParticle->hasSeenInDetector(Const::CDC);
+
+    m_pid.svddedx.le = pid->getLogL(Const::electron, Const::SVD);
+    m_pid.svddedx.lmu = pid->getLogL(Const::muon, Const::SVD);
+    m_pid.svddedx.lpi = pid->getLogL(Const::pion, Const::SVD);
+    m_pid.svddedx.lk = pid->getLogL(Const::kaon, Const::SVD);
+    m_pid.svddedx.lp = pid->getLogL(Const::proton, Const::SVD);
+    m_pid.svddedx.flag = pid->isAvailable(Const::SVD);
+    if (mcParticle)
+      m_pid.svddedx.seen = mcParticle->hasSeenInDetector(Const::SVD);
 
     m_pid.top.le = pid->getLogL(Const::electron, Const::TOP);
     m_pid.top.lmu = pid->getLogL(Const::muon, Const::TOP);

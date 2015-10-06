@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec_dedx.root</input>
-  <contact>christian.pulvermacher@kit.edu</contact>
+  <contact>jvbennett@cmu.edu</contact>
   <description>check PID performance of each particle vs. all others</description>
 </header>
 */
@@ -32,7 +32,7 @@ void plot(const TString &input_filename)
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
   }
-  if(tree->GetEntries() == 0 || tree->GetBranch("DedxTracks.m_p") == 0) {
+  if(tree->GetEntries() == 0 || tree->GetBranch("CDCDedxTracks.m_p") == 0) {
     std::cerr << "Input file doesn't contain dE/dx data, aborting!\n";
     exit(1);
   }
@@ -47,20 +47,20 @@ void plot(const TString &input_filename)
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...
-    logl_strings[part] = TString::Format("exp(DedxTracks.m_cdcLogl[][%i] + DedxTracks.m_svdLogl[][%i]) / (", part, part);
+    logl_strings[part] = TString::Format("exp(CDCDedxTracks.m_cdcLogl[][%i] + VXDDedxTracks.m_vxdLogl[][%i]) / (", part, part);
 
     //and divide by summed likelihood of all particles
     for(int i = 0; i < num_particles; i++) {
       if(i!=0)
         logl_strings[part] += " + ";
-      logl_strings[part] += TString::Format("exp(DedxTracks.m_cdcLogl[][%i] + DedxTracks.m_svdLogl[][%i])", i, i);
+      logl_strings[part] += TString::Format("exp(CDCDedxTracks.m_cdcLogl[][%i] + VXDDedxTracks.m_vxdLogl[][%i])", i, i);
     }
     logl_strings[part] += ") ";
     std::cout << logl_strings[part] << "\n";
 
     //now create histograms with this (unweighted) probability
     tree->Project(TString::Format("%d_prob", pdg_codes[part]), logl_strings[part].Data(),
-        TString::Format("abs(DedxTracks.m_pdg) == %d", pdg_codes[part]));
+        TString::Format("abs(CDCDedxTracks.m_pdg) == %d", pdg_codes[part]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("%d_prob", pdg_codes[part]));
     hist->SetTitle(TString::Format("Unweighted output prob. for true %s", pdg_names[part]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
@@ -71,6 +71,7 @@ void plot(const TString &input_filename)
     } else {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1"));
     }
+    hist->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
     hist->Write();
 
   }

@@ -17,7 +17,8 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
-#include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/CDCDedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/Muid.h>
@@ -57,7 +58,8 @@ namespace Belle2 {
     tracks.isRequired();
     StoreArray<TOPLikelihood>::optional();
     StoreArray<ARICHLikelihood>::optional();
-    StoreArray<DedxLikelihood>::optional();
+    StoreArray<CDCDedxLikelihood>::optional();
+    StoreArray<VXDDedxLikelihood>::optional();
     StoreArray<ECLPidLikelihood>::optional();
     StoreArray<Muid>::optional();
   }
@@ -101,9 +103,13 @@ namespace Belle2 {
       const ARICHLikelihood* arich = track->getRelated<ARICHLikelihood>();
       if (arich) setLikelihoods(arich);
 
-      // set dedx likelihoods
-      const DedxLikelihood* dedx = track->getRelatedTo<DedxLikelihood>();
-      if (dedx) setLikelihoods(dedx);
+      // set CDC dE/dx likelihoods
+      const CDCDedxLikelihood* cdcdedx = track->getRelatedTo<CDCDedxLikelihood>();
+      if (cdcdedx) setLikelihoods(cdcdedx);
+
+      // set VXD dE/dx likelihoods
+      const VXDDedxLikelihood* vxddedx = track->getRelatedTo<VXDDedxLikelihood>();
+      if (vxddedx) setLikelihoods(vxddedx);
 
       // set ecl likelihoods
       const ECLPidLikelihood* ecl = track->getRelatedTo<ECLPidLikelihood>();
@@ -140,12 +146,21 @@ namespace Belle2 {
   }
 
 
-  void MdstPIDModule::setLikelihoods(const DedxLikelihood* logl)
+  void MdstPIDModule::setLikelihoods(const CDCDedxLikelihood* logl)
   {
 
     for (const auto& chargedStable : Const::chargedStableSet) {
-      m_pid->setLogLikelihood(Const::SVD, chargedStable, logl->getSVDLogLikelihood(chargedStable));
-      m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getCDCLogLikelihood(chargedStable));
+      m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getLogL(chargedStable));
+    }
+
+  }
+
+
+  void MdstPIDModule::setLikelihoods(const VXDDedxLikelihood* logl)
+  {
+
+    for (const auto& chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::SVD, chargedStable, logl->getLogL(chargedStable));
     }
 
   }

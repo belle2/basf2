@@ -31,7 +31,7 @@
 #include <top/dataobjects/TOPBarHit.h>
 #include <top/dataobjects/TOPPull.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <reconstruction/dataobjects/DedxTrack.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <TRandom3.h>
@@ -152,14 +152,14 @@ namespace Belle2 {
     for (const auto& track : tracks) {
       const auto* trackFit = track.getTrackFitResult(Const::pion);
       if (!trackFit) continue;
-      const auto* dedxTrack = track.getRelated<DedxTrack>();
+      const auto* dedxTrack = track.getRelated<CDCDedxTrack>();
       if (!dedxTrack) continue;
       trackMomentums.push_back(trackFit->getMomentum(Bfield));
       dedxs.push_back(dedxTrack->getTruncatedMean());
       dedxErrs.push_back(dedxTrack->getError());
     }
     if (trackMomentums.size() != 2) {
-      B2WARNING("CDCTOPNtuple: missing TrackFitResult or DedxTrack");
+      B2WARNING("CDCTOPNtuple: missing TrackFitResult or CDCDedxTrack");
       return;
     }
 

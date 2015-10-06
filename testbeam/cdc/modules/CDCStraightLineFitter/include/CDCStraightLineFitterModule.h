@@ -16,7 +16,7 @@
 
 #include <genfit/TrackCand.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <reconstruction/dataobjects/DedxTrack.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <TVector3.h>
 #include <TRotation.h>
 
@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Simple straight line fit (based on an old fortran code from HERA-B)
    * Input: track candidates from a track finder (genfit::TrackCand)
-   * Output: fitted tracks (Track, TrackFitResult), dE/dx (dedxTracks),
+   * Output: fitted tracks (Track, TrackFitResult), dE/dx (CDCDedxTracks),
    * extrapolation to TOP (ExtHit)
    */
   class CDCStraightLineFitterModule : public Module {
@@ -81,16 +81,16 @@ namespace Belle2 {
     bool fitTrackCandidate(const genfit::TrackCand& trackCand);
 
     /**
-     * Determines dE/dx (mean, truncated mean and error) and stores results to DedxTrack
+     * Determines dE/dx (mean, truncated mean and error) and stores results to CDCDedxTrack
      * @param trackCand track candidate
      * @param momFit fitted track momentum
      * @param posFit fitted track position
-     * @param dedxTrack object to store dE/dx
+     * @param CDCDedxTrack object to store dE/dx
      */
     bool setDedx(const genfit::TrackCand& trackCand,
                  const TVector3& momFit,
                  const TVector3& posFit,
-                 DedxTrack* dedxTrack);
+                 CDCDedxTrack* dedxTrack);
 
     /**
      * Returns Chi^2 of the fit

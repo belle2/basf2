@@ -19,7 +19,8 @@ namespace Belle2 {
   class PIDLikelihood;
   class TOPLikelihood;
   class ARICHLikelihood;
-  class DedxLikelihood;
+  class CDCDedxLikelihood;
+  class VXDDedxLikelihood;
   class ECLPidLikelihood;
   class Muid;
 
@@ -83,10 +84,16 @@ namespace Belle2 {
     void setLikelihoods(const ARICHLikelihood* logl);
 
     /**
-     * Set Dedx log likelihoods and corresponding reconstruction flag
-     * @param logl DedxLikelihood pointer
+     * Set CDC dE/dx log likelihoods and corresponding reconstruction flag
+     * @param logl CDCDedxLikelihood pointer
      */
-    void setLikelihoods(const DedxLikelihood* logl);
+    void setLikelihoods(const CDCDedxLikelihood* logl);
+
+    /**
+     * Set VXD dE/dx log likelihoods and corresponding reconstruction flag
+     * @param logl VXDDedxLikelihood pointer
+     */
+    void setLikelihoods(const VXDDedxLikelihood* logl);
 
     /**
      * Set ECL log likelihoods and corresponding reconstruction flag

@@ -17,7 +17,8 @@
 
 namespace Belle2 {
 
-  class DedxLikelihood;
+  class CDCDedxLikelihood;
+  class VXDDedxLikelihood;
 
   /**
    * Bunch finder: searches for the bunch crossing where the interaction happened
@@ -82,7 +83,7 @@ namespace Belle2 {
      * Return mass of the most probable charged stable particle according to dEdx
      * @return mass
      */
-    double getMostProbableMass(const DedxLikelihood* dedx) const;
+    double getMostProbableMass(const CDCDedxLikelihood* cdcdedx, const VXDDedxLikelihood* vxddedx) const;
 
   };
 

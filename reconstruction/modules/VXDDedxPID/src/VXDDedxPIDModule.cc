@@ -3,17 +3,16 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jake Bennett
+ * Contributors: Jake Bennett, Christian Pulvermacher
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/dedxPID/DedxPIDModule.h>
-#include <reconstruction/modules/dedxPID/LineHelper.h>
-#include <reconstruction/modules/dedxPID/HelixHelper.h>
+#include <reconstruction/modules/VXDDedxPID/VXDDedxPIDModule.h>
+#include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
-#include <reconstruction/dataobjects/DedxTrack.h>
-#include <reconstruction/dataobjects/DedxLikelihood.h>
+#include <reconstruction/dataobjects/VXDDedxTrack.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -23,15 +22,9 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <cdc/translators/LinearGlobalADCCountTranslator.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
@@ -53,17 +46,16 @@
 #include <utility>
 
 using namespace Belle2;
-using namespace CDC;
 using namespace Dedx;
 
-REG_MODULE(DedxPID)
+REG_MODULE(VXDDedxPID)
 
-DedxPIDModule::DedxPIDModule() : Module(), m_pdfs()
+VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Set module properties
-  setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC, SVD and PXD.");
+  setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the SVD and PXD.");
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
@@ -74,7 +66,6 @@ DedxPIDModule::DedxPIDModule() : Module(), m_pdfs()
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
-  addParam("useCDC", m_useCDC, "Use CDCHits for dE/dx calculation", true);
 
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
            "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
@@ -82,17 +73,16 @@ DedxPIDModule::DedxPIDModule() : Module(), m_pdfs()
            false);
 
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_r19831_400k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_r21775_400k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
   m_trackID = 0;
-
 }
 
-DedxPIDModule::~DedxPIDModule() { }
+VXDDedxPIDModule::~VXDDedxPIDModule() { }
 
-void DedxPIDModule::initialize()
+void VXDDedxPIDModule::initialize()
 {
 
   // check for a pdf file - necessary for likelihood calculations
@@ -123,10 +113,6 @@ void DedxPIDModule::initialize()
   StoreArray<MCParticle> mcparticles;
   mcparticles.isOptional();
   tracks.optionalRelationTo(mcparticles);
-  if (m_useCDC)
-    StoreArray<CDCHit>::required();
-  else
-    StoreArray<CDCHit>::optional();
   if (m_useSVD)
     StoreArray<SVDCluster>::required();
   else
@@ -138,13 +124,13 @@ void DedxPIDModule::initialize()
 
   // register outputs
   if (m_enableDebugOutput) {
-    StoreArray<DedxTrack> dedxTracks;
+    StoreArray<VXDDedxTrack> dedxTracks;
     dedxTracks.registerInDataStore();
     tracks.registerRelationTo(dedxTracks);
   }
 
   if (!m_pdfFile.empty()) {
-    StoreArray<DedxLikelihood> dedxLikelihoods;
+    StoreArray<VXDDedxLikelihood> dedxLikelihoods;
     dedxLikelihoods.registerInDataStore();
     tracks.registerRelationTo(dedxLikelihoods);
 
@@ -155,7 +141,7 @@ void DedxPIDModule::initialize()
 
     //load dedx:momentum PDFs
     const char* suffix = (!m_useIndividualHits) ? "_trunc" : "";
-    for (int detector = 0; detector < c_num_detectors; detector++) {
+    for (int detector = 0; detector <= c_SVD; detector++) {
       int nBinsX, nBinsY;
       double xMin, xMax, yMin, yMax;
       nBinsX = nBinsY = -1;
@@ -195,7 +181,6 @@ void DedxPIDModule::initialize()
   }
 
   // create instances here to not confuse profiling
-  CDCGeometryPar::Instance();
   VXD::GeoCache::getInstance();
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
@@ -203,13 +188,13 @@ void DedxPIDModule::initialize()
   }
 }
 
-void DedxPIDModule::event()
+void VXDDedxPIDModule::event()
 {
   // go through Tracks
   // get fitresult and gftrack and do extrapolations, save corresponding dE/dx and likelihood values
   //   get genfit::TrackCand through genfit::Track::getCand()
   //   get hit indices through genfit::TrackCand::getHit(...)
-  //   create one DedxTrack per fitresult/gftrack
+  //   create one VXDDedxTrack per fitresult/gftrack
   //create one DedkLikelihood per Track (plus rel)
   m_eventID++;
 
@@ -222,11 +207,8 @@ void DedxPIDModule::event()
   StoreArray<SVDCluster> svdClusters;
 
   // outputs
-  StoreArray<DedxTrack> dedxArray;
-  StoreArray<DedxLikelihood> likelihoodArray;
-
-  // get the geometry of the cdc
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  StoreArray<VXDDedxTrack> dedxArray;
+  StoreArray<VXDDedxLikelihood> likelihoodArray;
 
   // **************************************************
   //
@@ -237,7 +219,7 @@ void DedxPIDModule::event()
   for (const auto& track : tracks) {
     m_trackID++;
 
-    std::shared_ptr<DedxTrack> dedxTrack = std::make_shared<DedxTrack>();
+    std::shared_ptr<VXDDedxTrack> dedxTrack = std::make_shared<VXDDedxTrack>();
     dedxTrack->m_eventID = m_eventID;
     dedxTrack->m_trackID = m_trackID;
 
@@ -260,7 +242,7 @@ void DedxPIDModule::event()
           continue; //not a primary particle, ignore
         }
 
-        //add some MC truths to DedxTrack object
+        //add some MC truths to VXDDedxTrack object
         dedxTrack->m_pdg = mcpart->getPDG();
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
@@ -289,187 +271,12 @@ void DedxPIDModule::event()
     // Check to see if the track is pruned
     genfit::AbsTrackRep* trackrep = gftrack->getCardinalRep();
     if (gftrack->getFitStatus(trackrep)->isTrackPruned()) {
-      B2ERROR("GFTrack is pruned, please run DedxPID only on unpruned tracks! Skipping this track.");
+      B2ERROR("GFTrack is pruned, please run VXDDedxPID only on unpruned tracks! Skipping this track.");
       continue;
     }
 
     //used for PXD/SVD hits
     const HelixHelper helixAtOrigin(trackPos, trackMom, dedxTrack->m_charge);
-
-    // loop over all CDC hits from this track
-    if (m_useCDC) {
-      double layerdE = 0.0; // total charge in current layer
-      double layerdx = 0.0; // total path length in current layer
-      double cdcMom = 0.0; // momentum valid in the CDC
-
-      // Get the TrackPoints, which contain the hit information we need.
-      // Then iterate over each point.
-      int tpcounter = 0;
-      const std::vector< genfit::TrackPoint* > gftrackPoints = gftrack->getPointsWithMeasurement();
-      for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
-           tp != gftrackPoints.end(); tp++) {
-        tpcounter++;
-
-        // should also be possible to use this for svd and pxd hits...
-        genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);
-        const CDCRecoHit* cdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
-        if (!cdcRecoHit) continue;
-        const CDCHit* cdcHit = cdcRecoHit->getCDCHit();
-
-        // get the poca on the wire and track momentum for this hit
-        // make sure the fitter info exists
-        const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo(trackrep);
-        if (!fi) {
-          B2WARNING("No fitter info, skipping...");
-          continue;
-        }
-
-        // get the global wire ID (between 0 and 14336) and the layer info
-        WireID wireID = cdcRecoHit->getWireID();
-        const int wire = wireID.getIWire();
-        int layer = cdcHit->getILayer();
-        int superlayer = cdcHit->getISuperLayer();
-        int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
-
-        // if multiple hits in a layer, we may combine the hits
-        const bool lastHit = (tp + 1 == gftrackPoints.end());
-        bool lastHitInCurrentLayer = lastHit;
-        if (!lastHit) {
-          //peek at next hit
-          genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
-          const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
-          if (!nextcdcRecoHit) {
-            lastHitInCurrentLayer = true;
-            break;
-          }
-          const CDCHit* nextcdcHit = nextcdcRecoHit->getCDCHit();
-          const int nextILayer = nextcdcHit->getILayer();
-          const int nextSuperlayer = nextcdcHit->getISuperLayer();
-          const int nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
-          lastHitInCurrentLayer = (nextLayer != currentLayer);
-        }
-
-        // find the position of the endpoints of the sense wire
-        const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID);
-        const TVector3& wirePosB = cdcgeo.wireBackwardPosition(wireID);
-        const TVector3 wireDir = (wirePosB - wirePosF).Unit();
-
-        int nWires = cdcgeo.nWiresInLayer(currentLayer);
-
-        // radii of field wires for this layer
-        double inner = cdcgeo.innerRadiusWireLayer()[currentLayer];
-        double outer = cdcgeo.outerRadiusWireLayer()[currentLayer];
-
-        double topHeight = outer - wirePosF.Perp();
-        double bottomHeight = wirePosF.Perp() - inner;
-        double cellHeight = topHeight + bottomHeight;
-        double topHalfWidth = PI * outer / nWires;
-        double bottomHalfWidth = PI * inner / nWires;
-        double cellHalfWidth = PI * wirePosF.Perp() / nWires;
-
-        // first construct the boundary lines, then create the cell
-        const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
-        const DedxPoint tr = DedxPoint(topHalfWidth, topHeight);
-        const DedxPoint br = DedxPoint(bottomHalfWidth, -bottomHeight);
-        const DedxPoint bl = DedxPoint(-bottomHalfWidth, -bottomHeight);
-        DedxDriftCell c = DedxDriftCell(tl, tr, br, bl);
-
-        // make sure the MOP is reasonable (an exception is thrown for bad numerics)
-        try {
-          const genfit::MeasuredStateOnPlane& mop = fi->getFittedState();
-
-          // use the MOP to determine the DOCA and entrance angle
-          B2Vector3D fittedPoca = mop.getPos();
-          const TVector3& pocaMom = mop.getMom();
-          if (tp == gftrackPoints.begin() || cdcMom == 0) {
-            cdcMom = pocaMom.Mag();
-            dedxTrack->m_p_cdc = cdcMom;
-          }
-
-          // get the doca and entrance angle information.
-          // constructPlane places the coordinate center in the POCA to the
-          // wire.  Using this is the default behavior.  If this should be too
-          // slow, as it has to re-evaluate the POCA
-          //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
-
-          // uses the plane determined by the track fit.
-          B2Vector3D pocaOnWire = mop.getPlane()->getO();
-
-          // The vector from the wire to the track.
-          B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
-
-          // the sign of the doca is defined here to be positive in the +x dir
-          double doca = B2WireDoca.Perp();
-          if (B2WireDoca.X() < 0) doca = -1.0 * doca;
-
-          // The opening angle of the track momentum direction
-          const double px = pocaMom.x();
-          const double py = pocaMom.y();
-          const double wx = pocaOnWire.x();
-          const double wy = pocaOnWire.y();
-          const double cross = wx * py - wy * px;
-          const double dot   = wx * px + wy * py;
-          double entAng = atan2(cross, dot);
-
-          LinearGlobalADCCountTranslator translator;
-          double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
-          double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
-          int driftT = cdcHit->getTDCCount();
-
-          RealisticTDCCountTranslator realistictdc;
-          double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
-          double driftDRealisticRes = realistictdc.getDriftLengthResolution(driftDRealistic, wireID, true, pocaOnWire.Z(), pocaMom.Phi(),
-                                      pocaMom.Theta());
-
-          // now calculate the path length for this hit
-          double celldx = c.dx(doca, entAng);
-          if (!c.isValid()) continue;
-
-          layerdE += adcCount;
-          layerdx += celldx;
-
-          // save individual hits
-          double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
-          if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes);
-        } catch (genfit::Exception) {
-          B2WARNING("Event " << m_eventID << ", Track: " << m_trackID << ": genfit::MeasuredStateOnPlane exception...");
-          continue;
-        }
-
-        // check if there are any more hits in this layer
-        if (lastHitInCurrentLayer) {
-          double totalDistance = layerdx / sin(trackMom.Theta());
-          double layerDedx = layerdE / totalDistance;
-
-          // save the information for this layer
-          if (layerDedx > 0) {
-            dedxTrack->addDedx(currentLayer, totalDistance, layerDedx);
-            if (!m_pdfFile.empty() and m_useIndividualHits) {
-              // use the momentum valid in the cdc
-              saveLogLikelihood(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[c_CDC]);
-            }
-          }
-
-          layerdE = 0;
-          layerdx = 0;
-        }
-      } // end of loop over CDC hits for this track
-
-
-      if (!m_useIndividualHits or m_enableDebugOutput) {
-        calculateMeans(&(dedxTrack->m_dedx_avg[c_CDC]),
-                       &(dedxTrack->m_dedx_avg_truncated[c_CDC]),
-                       &(dedxTrack->m_dedx_avg_truncated_err[c_CDC]),
-                       dedxTrack->dedx);
-        const int numDedx = dedxTrack->dedx.size();
-        dedxTrack->m_nHits = numDedx;
-        const int lowEdgeTrunc = int(numDedx * m_removeLowest);
-        const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest));
-        dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
-      }
-    }
 
     // Now get the genfit::TrackCand to extract the VXD hits
     genfit::TrackCand* gftrackcand = fitResult->getRelatedFrom<genfit::TrackCand>();
@@ -496,40 +303,46 @@ void DedxPIDModule::event()
 
     // calculate likelihoods for truncated mean
     if (!m_useIndividualHits) {
-      for (int detector = 0; detector < c_num_detectors; detector++) {
+      for (int detector = 0; detector <= c_SVD; detector++) {
         if (!detectorEnabled(static_cast<Detector>(detector)))
           continue; //unwanted detector
 
-        // for cdc hits, use the momentum valid in the cdc
-        saveLogLikelihood((detector == c_CDC) ? dedxTrack->m_cdcLogl : dedxTrack->m_svdLogl,
-                          (detector == c_CDC) ? dedxTrack->m_p_cdc : dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector], m_pdfs[detector]);
+        saveLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector], m_pdfs[detector]);
       }
     }
 
     if (m_enableDebugOutput) {
-      // book the information for this track
-      DedxTrack* newDedxTrack = dedxArray.appendNew(*dedxTrack);
-      track.addRelationTo(newDedxTrack);
+      // add a few last things to the VXDDedxTrack
+      const int numDedx = dedxTrack->dedx.size();
+      dedxTrack->m_nHits = numDedx;
+      // add a factor of 0.5 here to make sure we are rounding appropriately...
+      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
+      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+      dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+
+      // now book the information for this track
+      VXDDedxTrack* newVXDDedxTrack = dedxArray.appendNew(*dedxTrack);
+      track.addRelationTo(newVXDDedxTrack);
     }
 
-    // save DedxLikelihood
+    // save VXDDedxLikelihood
     if (!m_pdfFile.empty()) {
-      DedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_cdcLogl, dedxTrack->m_svdLogl);
+      VXDDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_vxdLogl);
       track.addRelationTo(likelihoodObj);
     }
 
   } // end of loop over tracks
 }
 
-void DedxPIDModule::terminate()
+void VXDDedxPIDModule::terminate()
 {
 
-  B2INFO("DedxPIDModule exiting after processing " << m_trackID <<
+  B2INFO("VXDDedxPIDModule exiting after processing " << m_trackID <<
          " tracks in " << m_eventID + 1 << " events.");
 }
 
-void DedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
-                                   const std::vector<double>& dedx) const
+void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
+                                      const std::vector<double>& dedx) const
 {
   // Calculate the truncated average by skipping the lowest & highest
   // events in the array of dE/dx values
@@ -541,8 +354,10 @@ void DedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* 
   double sum_of_squares = 0.0;
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest));
+
+  // add a factor of 0.5 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
+  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
@@ -573,7 +388,7 @@ void DedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* 
 }
 
 
-double DedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
+double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
@@ -590,7 +405,7 @@ double DedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelpe
 }
 
 
-double DedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelper* helix)
+double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelper* helix)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
@@ -615,8 +430,8 @@ double DedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelpe
 }
 
 
-template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const HelixHelper& helix,
-                                                         const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
+template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const HelixHelper& helix,
+                                                            const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
 {
   const int num_hits = hit_indices.size();
   if (num_hits == 0)
@@ -660,12 +475,12 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
       track->m_dedx_avg[current_detector] += dedx;
       track->addDedx(layer, total_distance, dedx);
       if (!m_pdfFile.empty() and m_useIndividualHits) {
-        saveLogLikelihood(track->m_svdLogl, track->m_p, dedx, m_pdfs[current_detector]);
+        saveLogLikelihood(track->m_vxdLogl, track->m_p, dedx, m_pdfs[current_detector]);
       }
     }
 
     if (m_enableDebugOutput) {
-      track->addHit(currentSensor, layer, 0, 0, charge, charge, 0, dedx, 0, 0, 0, 0, 0);
+      track->addHit(currentSensor, layer, charge, total_distance, dedx);
     }
   }
 
@@ -679,8 +494,8 @@ template <class HitClass> void DedxPIDModule::saveSiHits(DedxTrack* track, const
 }
 
 
-void DedxPIDModule::saveLogLikelihood(float(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                      TH2F* const* pdf) const
+void VXDDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
+                                         TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
   const Int_t bin_x = pdf[0]->GetXaxis()->FindFixBin(p);

@@ -93,8 +93,10 @@ trackfitter = register_module('GenFitter')
 main.add_module(trackfitter)
 
 # dE/dx PID (needed for bunch finder!)
-dEdxPID = register_module('DedxPID')
-main.add_module(dEdxPID)
+CDCdEdxPID = register_module('CDCDedxPID')
+main.add_module(CDCdEdxPID)
+VXDdEdxPID = register_module('VXDDedxPID')
+main.add_module(VXDdEdxPID)
 
 # Track extrapolation
 ext = register_module('Ext')

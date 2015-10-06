@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainDataSet.h>
 #include <tracking/trackFindingVXD/sectorMapTools/FilterValueDataSet.h>
 
 #include <framework/logging/Logger.h>
@@ -33,9 +32,6 @@ namespace Belle2 {
   /** To be used as an interface to root-stuff. */
   class RawSecMapRootInterface {
   protected:
-
-    /** Mask for storing datasets to be piped into Trees. */
-    SecMapTrainDataSet m_data;
 
     /** a pointer to the file where the Tree shall be stored. */
     TFile* m_file;

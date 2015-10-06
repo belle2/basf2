@@ -53,8 +53,8 @@ namespace Belle2 {
     /** stores the position of the assumed position of the interaction point - the virtual IP. */
     B2Vector3D vIP = B2Vector3D(0, 0, 0);
 
-    /** Hit specific: determines the range for min (.first) and max (.second) distance to the IP in 3D to. */
-    std::pair<double, double> hitMinMaxDist2IP3D = { -1, -1};
+//     /** Hit specific: determines the range for min (.first) and max (.second) distance to the IP in 3D to. */
+//     std::pair<double, double> hitMinMaxDist2IP3D = { -1, -1};
 
     /** Sets the human readable proto-name of the sectorMap. */
     std::string secMapName = "testMap";

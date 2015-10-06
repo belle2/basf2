@@ -18,7 +18,6 @@
 
 #include <tracking/trackFindingVXD/sectorMapTools/FilterMill.h>
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainDataSet.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
 
 #include <tracking/vectorTools/B2Vector3.h>

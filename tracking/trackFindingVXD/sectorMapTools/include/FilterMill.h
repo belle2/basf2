@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/sectorMapTools/XHitDataSet.h>
 #include <framework/logging/Logger.h>
 
 #include <string>

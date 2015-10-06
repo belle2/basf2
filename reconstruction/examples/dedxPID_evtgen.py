@@ -88,7 +88,7 @@ cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
 cdcdedx.param(cdcdedx_params)
 main.add_module(cdcdedx)
 
-svddedx = register_module('SVDDedxPID')
+svddedx = register_module('VXDDedxPID')
 svddedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'useIndividualHits': True,
     'removeLowest': 0.05,

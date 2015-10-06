@@ -20,19 +20,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-// #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// #include <iostream>
-// #include <fstream>
 #include <string>
 #include <vector>
-// #include <list>
-#include <map>
-#include <utility> // pair
 
-#include <TVector3.h>
-#include <TTree.h>
 #include <TFile.h>
 
 
@@ -89,11 +81,14 @@ namespace Belle2 {
     /** contains the spacePointTrackCands to be analyzed for the secMap-Training. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
+    /** Temporary test file which shall be replaced by the final StoreObjPtr< RootMergeable>-stuff. */
     TFile* m_testRootfile;
+
+    /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
     TrainerConfigData m_testConfig;
 
+    /** one trainer for being able to test raw data sampling for secMap-training. */
     SecMapTrainer<XHitFilterFactory<SecMapTrainerHit>> m_testTrainer;
-
 
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;

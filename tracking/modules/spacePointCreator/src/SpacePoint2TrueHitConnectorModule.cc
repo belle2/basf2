@@ -11,6 +11,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 // #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/Environment.h> // getNumberProcesses
 
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -39,6 +40,7 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   Module()
 {
   setDescription("Module that tries to find the appropriate TrueHit to each SpacePoint and to register a relation between them for making MC information for SpacePoints more easily accesible for Modules that need it. Module can also be used to filter out 'fishy' SpacePoints.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("storeSeperate", m_PARAMstoreSeparate,
            "Set to false if you do not want to create seperate StoreArrays for processed SpacePoints. (i.e. a relation from SpacePoint to TrueHit will be set in the passed StoreArray. NOTE: this StoreArray will contain SpacePoints with a relation to TrueHits and such without after this module). The Names of the output StoreArrays will be the names of the input StoreArrays with 'outputSuffix' (module parameter) appended to them",
@@ -89,6 +91,17 @@ SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   initializeCounters();
   m_rootFilePtr = NULL;
   m_treePtr = NULL;
+
+  if (m_PARAMpositionAnalysis == true and Environment::Instance().getNumberProcesses() > 0) {
+    B2WARNING(
+      "SpacePoint2TrueHitConnector::initialize: parameter positionAnalysis (and therefore root-output) is enabled and basf2 is running in multi-threaded mode - this can cause nondeterministic behavior! "
+      << "\n"
+      << " you can suppress multi-threading for this module by writing:"
+      << "\n"
+      << "main.add_module('SpacePoint2TrueHitConnector').set_property_flags(0) "
+      << "\n"
+      << "into the steering file!")
+  }
 }
 
 // ================================================================ INITIALIZE ====================================================

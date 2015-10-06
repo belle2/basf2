@@ -29,6 +29,7 @@ REG_MODULE(SPTCReferee) // register the module
 SPTCRefereeModule::SPTCRefereeModule() : Module()
 {
   setDescription("Module that does some sanity checks on SpacePointTrackCands to prevent some problematic cases to be forwarded to other modules that rely on 'unproblematic' cases (e.g. FilterCalculator). Different checks can be enabled by setting the according flags. Using MC information for the tests can also be switched on/off for tests where MC information can be helpful.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // names
   addParam("sptcName", m_PARAMsptcName, "Container name of the SpacePointTrackCands to be checked (input)", std::string(""));

@@ -26,6 +26,7 @@ SPTC2GFTCConverterModule::SPTC2GFTCConverterModule() :
   Module()
 {
   setDescription("Module for converting SpacePointTrackCand to genfit::TrackCand.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SpacePointTCName", m_SPTCName, "Name of the container containing the SpacePointTrackCands to convert", string(""));
   addParam("genfitTCName", m_genfitTCName, "Name of the container of the (output) genfit::TrackCands", string(""));
@@ -118,14 +119,16 @@ void SPTC2GFTCConverterModule::event()
     B2DEBUG(15, "genfit::TrackCand contains " << genfitTC.getNHits() << " TrackCandHits.");
     genfit::TrackCand* newTC = genfitTCs.appendNew(genfitTC);
     trackCand->addRelationTo(newTC);
-    B2DEBUG(15, "Added relation between SPTC " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() << " and GFTC.")
+    B2DEBUG(15, "Added relation between SPTC " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
+            " and GFTC.")
   }
 }
 
 void SPTC2GFTCConverterModule::terminate()
 {
   stringstream output;
-  output << "SPTC2GFTCConverter::terminate: got " << m_SpacePointTCCtr << " SpacePointTrackCands and created " << m_genfitTCCtr << " genfit::TrackCands";
+  output << "SPTC2GFTCConverter::terminate: got " << m_SpacePointTCCtr << " SpacePointTrackCands and created " << m_genfitTCCtr <<
+         " genfit::TrackCands";
   if (m_skippedSPsCtr) output << ". " << m_skippedSPsCtr << " SpacePoints were skipped!";
   B2INFO(output.str());
 }
@@ -138,13 +141,15 @@ std::vector<int> SPTC2GFTCConverterModule::getRelatedClusters(const Belle2::Spac
 
   RelationVector<ClusterType> relatedClusters = spacePoint->getRelationsTo<ClusterType>(clusterNames);
   if (relatedClusters.size() == 0) {
-    B2DEBUG(1, "Found no related Clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+    B2DEBUG(1, "Found no related Clusters for SpacePoint " << spacePoint->getArrayIndex() << " from Array " <<
+            spacePoint->getArrayName())
     throw ClusterNotFound();
   } else if (relatedClusters.size() > 2) throw SpacePoint::InvalidNumberOfClusters();
 
-  for (const ClusterType & cluster : relatedClusters) {
+  for (const ClusterType& cluster : relatedClusters) {
     clusterInds.push_back(cluster.getArrayIndex());
-    B2DEBUG(60, "Cluster " << cluster.getArrayIndex() << " from Array " << cluster.getArrayName() << " is related to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
+    B2DEBUG(60, "Cluster " << cluster.getArrayIndex() << " from Array " << cluster.getArrayName() << " is related to SpacePoint " <<
+            spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName())
   }
 
   return clusterInds;

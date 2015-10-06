@@ -52,15 +52,16 @@ using namespace boost::spirit::endian;
 REG_MODULE(PXDUnpacker)
 
 /// If you change this list, change the NAMEs in the terminate function, too
+//#define ONSEN_ERR_FLAG_FTSW_DHC_MM 0x00000001ul// unused
 #define ONSEN_ERR_FLAG_DHC_DHE_MM  0x00000002ul
-//#define ONSEN_ERR_FLAG_DHC_DHP_MM  0x00000004ul // unsused
+#define ONSEN_ERR_FLAG_DHC_META_MM  0x00000004ul
 #define ONSEN_ERR_FLAG_ONSEN_TRG_FIRST 0x00000008ul
 #define ONSEN_ERR_FLAG_DHC_END   0x00000010ul
 #define ONSEN_ERR_FLAG_DHE_START  0x00000020ul
 #define ONSEN_ERR_FLAG_DHC_FRAMECOUNT 0x00000040ul
 #define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080ul
 #define ONSEN_ERR_FLAG_DHC_START_SECOND  0x00000100ul
-//#define ONSEN_ERR_FLAG_DHC_END2  0x00000200ul
+//#define ONSEN_ERR_FLAG_DHC_END2  0x00000200ul// unused
 #define ONSEN_ERR_FLAG_FIX_SIZE   0x00000400ul
 #define ONSEN_ERR_FLAG_DHE_CRC    0x00000800ul
 #define ONSEN_ERR_FLAG_DHC_UNKNOWN   0x00001000ul
@@ -564,10 +565,6 @@ public:
     return 0;
   };
 
-  unsigned int getDHPid(void)
-  {
-    return ((ubig16_t*)data)[0] & 0xF;
-  };
 
   unsigned int getFixedSize(void)
   {
@@ -674,7 +671,7 @@ void PXDUnpackerModule::initialize()
 void PXDUnpackerModule::terminate()
 {
   const string error_name[ONSEN_MAX_TYPE_ERR] = {
-    "NULL", "DHC/DHE mismatch", "-unused-", "ONSEN Trigger is not first frame",
+    "-unused-", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
     "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
     "DHC_START is not second frame", "-unused-", "Fixed size frame wrong size", "DHE CRC Error:",
     "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
@@ -714,7 +711,6 @@ void PXDUnpackerModule::event()
 
   m_errorMask = 0;
 
-
   m_meta_event_nr = evtPtr->getEvent();
   m_meta_run_nr = evtPtr->getRun();
   m_meta_subrun_nr = evtPtr->getSubrun();
@@ -722,7 +718,7 @@ void PXDUnpackerModule::event()
   /// evtPtr->getTime()
 
 
-  int nsr = 0;
+  int nsr = 0;// number of packets
   for (auto& it : storeRaws) {
     if (verbose) {
       B2INFO("PXD Unpacker --> Unpack Objects: ");
@@ -740,8 +736,10 @@ void PXDUnpackerModule::event()
   }
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
+#pragma GCC diagnostic pop
   int Frames_in_event;
   int fullsize;
   int datafullsize;
@@ -751,7 +749,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     m_errorMask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
-  unsigned int data[px.size()];
+  unsigned int data[px.size()];// size cannot be unlimited, because we check it before
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
   memcpy(data, (unsigned int*)px.data(), fullsize);
 
@@ -883,7 +881,7 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
   ubig16_t sor;
 
   for (int i = 2 ; i < nr_words ; i++) {
-    if (i != 2) {
+    if (i != 2) { //skip header
       if ((((cluster[i] & 0x8000) == 0)
            && ((cluster[i] & 0x4000) >> 14) == 1)) {  //searches for start of row frame with start of cluster flag = 1 => new cluster
         if (!m_doNotStore) m_storeRawCluster.appendNew(&data[i - words_in_cluster], words_in_cluster, vxd_id);
@@ -1096,6 +1094,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
 
 
+  // please check if this mask is suitable. At least here we are limited by the 16 bit trigger number in the DHH packet header.
+  // we can use more bits in the START Frame
+  if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
+    B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
+            "(MetaInfo) mask");
+    m_errorMask |= ONSEN_ERR_FLAG_DHC_META_MM;
+  }
+
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
     if (countedDHEStartFrames != countedDHEEndFrames + 1)
       if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
@@ -1157,14 +1163,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       countedDHCFrames++;
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
-//         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
-//                 dhc.data_direct_readout_frame_raw->getDHEId());
+        B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
+                dhc.data_direct_readout_frame_raw->getDHEId());
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_ID;
       }
       m_errorMask |= dhc.check_crc();
-      found_mask_active_dhp |= 15 << dhc.data_direct_readout_frame->getDHPPort();
-//       B2INFO("UNPACK FCE FRAME with len " << hex << len);
+      found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
+      B2INFO("UNPACK FCE FRAME with len " << hex << len)
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
 
       break;
@@ -1200,10 +1206,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
 //       stat_start++;
 
-//   m_meta_event_nr=evtPtr->getEvent();
-//   m_meta_run_nr=evtPtr->getRun();
-//   n_meta_subrun_nr=evtPtr->getSubrun();
-//   m_meta_experiment=evtPtr->getExperiment();
+      /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
+      /// of this frame against the one from MEta Event Info
+      ///   m_meta_event_nr=evtPtr->getEvent();// filled already above
+      ///   m_meta_run_nr=evtPtr->getRun();// filled already above
+      ///   n_meta_subrun_nr=evtPtr->getSubrun();// filled already above
+      ///   m_meta_experiment=evtPtr->getExperiment();// filled already above
 
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
@@ -1241,7 +1249,6 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         layer = ((currentDHEID & 0x20) >> 5) + 1;
         currentVxdId = VxdID(layer, ladder, sensor);
       }
-      //currentVxdId = currentDHEID;
 
       break;
     };

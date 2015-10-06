@@ -16,7 +16,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.0 nu_tau nubar_tau PHSP;
+1.0 nu_tau anti-nu_tau PHSP;
 Enddecay
 CDecay anti-B0sig
 #

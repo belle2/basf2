@@ -42,6 +42,3 @@ unsigned int Track::getNumberOfFittedHypothesis() const
   }
   return fittedHypothesis;
 }
-
-
-ClassImp(Track);

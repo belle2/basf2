@@ -13,8 +13,6 @@
 using namespace Belle2;
 using namespace std;
 
-ClassImp(V0);
-
 V0::V0():
   m_trackIndexPositive(-1),
   m_trackIndexNegative(-1),

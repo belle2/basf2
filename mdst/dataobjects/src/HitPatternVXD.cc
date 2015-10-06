@@ -12,8 +12,6 @@
 
 using namespace Belle2;
 
-ClassImp(HitPatternVXD);
-
 HitPatternVXD::HitPatternVXD(): m_pattern(0)
 {
 

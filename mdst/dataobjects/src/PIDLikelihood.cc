@@ -210,6 +210,4 @@ void PIDLikelihood::printArray() const
 
 }
 
-ClassImp(PIDLikelihood)
-
 

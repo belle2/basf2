@@ -73,7 +73,8 @@ public:
    * Sort the particles and generate MCParticle list.
    * @param g The graph which should be sorted and transformed to a list of particles.
    */
-  template <class Graph> void sort(Graph& g) {
+  template <class Graph> void sort(Graph& g)
+  {
     //Set seen flag for all vertices to false
     m_seen.clear();
     m_seen.resize(num_vertices(g), false);
@@ -100,7 +101,8 @@ public:
    * @param v The vertex whose daughters are investigated.
    * @param g The graph in which the vertex lives.
    */
-  template <class Vertex, class Graph> void finish_vertex(Vertex v, Graph& g) {
+  template <class Vertex, class Graph> void finish_vertex(Vertex v, Graph& g)
+  {
     MCParticleGraph::GraphParticle& p = *m_particles[v - 1];
 
     //Reset daughter information, will be filled by find_daughters
@@ -126,7 +128,8 @@ public:
    * @param g The graph in which the vertex lives.
    * @param mother Reference to the mother particle.
    */
-  template <class Vertex, class Graph> void find_daughters(Vertex v, Graph& g, MCParticleGraph::GraphParticle& mother) {
+  template <class Vertex, class Graph> void find_daughters(Vertex v, Graph& g, MCParticleGraph::GraphParticle& mother)
+  {
     //References to the daughter information of the mother for easier access
     int& d1 = mother.m_firstDaughter;
     int& d2 = mother.m_lastDaughter;
@@ -176,7 +179,8 @@ public:
    * @param m Reference to the mother particle whose vertex and time information should be set.
    * @param d Reference to the daughter particle.
    */
-  void setVertexTime(MCParticleGraph::GraphParticle& m, MCParticleGraph::GraphParticle& d) {
+  void setVertexTime(MCParticleGraph::GraphParticle& m, MCParticleGraph::GraphParticle& d)
+  {
     //Only set vertex information if both particles have a valid vertex set
     m.setValidVertex(m.hasValidVertex() &&  d.hasValidVertex());
     if (m.hasValidVertex() && d.getProductionTime() >= m.getDecayTime()) {
@@ -194,10 +198,12 @@ protected:
 
   int m_index;                                             /**< The latest index given to a particle. */
   MemoryPool<MCParticleGraph::GraphParticle>& m_particles; /**< Reference to the list of particles which should be sorted. */
-  TClonesArray* m_plist;                                   /**< The final array of sorted particles which is stored in the DataStore. */
+  TClonesArray*
+  m_plist;                                   /**< The final array of sorted particles which is stored in the DataStore. */
   bool m_setVertex;                                        /**< True if the vertex information should be saved. */
   bool m_setTime;                                          /**< True if the production time information should be saved. */
-  vector<bool> m_seen;                                     /**< Vector of the particles that were already seen while sorting the graph. */
+  vector<bool>
+  m_seen;                                     /**< Vector of the particles that were already seen while sorting the graph. */
   std::queue<unsigned int> m_vqueue;                       /**< The list of the vertices that will be visited. */
 };
 

@@ -19,8 +19,6 @@
 
 using namespace Belle2;
 
-ClassImp(TrackFitResult);
-
 TrackFitResult::TrackFitResult() :
   m_pdg(0), m_pValue(0),
   m_hitPatternCDCInitializer(0),

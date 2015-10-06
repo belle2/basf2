@@ -137,6 +137,3 @@ std::string MCParticle::getInfoHTML() const
   }
   return out.str();
 }
-
-
-ClassImp(MCParticle)

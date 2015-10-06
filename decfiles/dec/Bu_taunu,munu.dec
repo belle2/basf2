@@ -11,11 +11,6 @@
 #
 #
 
-Alias tau+sig tau+
-Alias tau-sig tau-
-ChargeConj tau+sig tau-sig
-
-
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
 0.5 B-sig B+ VSS;

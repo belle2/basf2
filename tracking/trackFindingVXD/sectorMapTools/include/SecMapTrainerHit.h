@@ -25,13 +25,13 @@ namespace Belle2 {
   class SecMapTrainerHit {
   public:
     /** Constructor of class SecMapTrainerHit. */
-    SecMapTrainerHit(const std::string& fullSecID, const B2Vector3D& hit):
+    SecMapTrainerHit(const FullSecID& fullSecID, const B2Vector3D& hit):
       m_secID(fullSecID),
       m_hitPos(hit) {}
 
     /** constructor for cases where simply a Hit is needed. */
     SecMapTrainerHit(double x, double y, double z) :
-      m_secID(FullSecID().getFullSecString()),
+      m_secID(FullSecID()),
       m_hitPos(B2Vector3D(x, y, z)) {}
 
     /** returns global hit position of current hit. */
@@ -47,10 +47,13 @@ namespace Belle2 {
     double Z() const { return m_hitPos.Z(); }
 
     /** returns secID of sector containing this hit. */
-    std::string getSectorID() const { return m_secID; }
+    std::string getSectorIDString() const { return m_secID.getFullSecString(); }
+
+    /** returns secID of sector containing this hit. */
+    FullSecID getSectorID() const { return m_secID; }
 
   protected:
-    std::string m_secID; /**< ID of sector containing this hit. */
+    FullSecID m_secID; /**< ID of sector containing this hit. */
     B2Vector3D m_hitPos; /**< global hit position. */
   };
 }

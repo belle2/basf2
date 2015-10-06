@@ -21,9 +21,10 @@ namespace Belle2 {
   public:
 
     /** Constructor of class SecMapTrainerTC*/
-    SecMapTrainerTC(int trackID, float pT):
+    SecMapTrainerTC(int trackID, float pT, int pdg):
       m_index(trackID),
-      m_pT(pT) {}
+      m_pT(pT),
+      m_pdg(pdg) {}
 
     /** typedef for more readable iterator-type */
     using ConstIterator = typename std::vector<SecMapTrainerHit>::const_iterator;
@@ -56,8 +57,8 @@ namespace Belle2 {
 
   protected:
     int m_index; /**< stores index number of track. */
-    int m_pdg; /**< stores pdGCode of particle. */
     float m_pT; /**< stores transverse momentum value for track classification. */
+    int m_pdg; /**< stores pdGCode of particle. */
     std::vector<SecMapTrainerHit> m_hits; /**< contains hits attached to track. */
   };
 }

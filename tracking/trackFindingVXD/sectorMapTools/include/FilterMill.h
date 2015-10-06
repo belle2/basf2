@@ -70,6 +70,27 @@ namespace Belle2 {
 
   public:
 
+    /** small struct containing pointers to two hits. */
+    struct HitPair {
+      const PointType* outer;
+      const PointType* inner;
+    };
+
+    /** small struct containing pointers to three hits. */
+    struct HitTriplet {
+      const PointType* outer;
+      const PointType* center;
+      const PointType* inner;
+    };
+
+    /** small struct containing pointers to four hits. */
+    struct HitQuadruplet {
+      const PointType* outer;
+      const PointType* outerCenter;
+      const PointType* innerCenter;
+      const PointType* inner;
+    };
+
     /** Constructor. */
     FilterMill() :
       m_locked(false) {}
@@ -119,44 +140,63 @@ namespace Belle2 {
 
 
     /** on given dataSet, apply all filters stored in the mill and store the results in collectedData. */
-    void grindData(const XHitDataSet<std::string, PointType>& dataSet,
-                   std::vector<std::pair<std::string, double> >& collectedData) const
+    void grindData2Hit(const HitPair& dataSet,
+                       std::vector<std::pair<std::string, double> >& collectedData) const
     {
-      checkLocked("grindData");
-      unsigned nHits = dataSet.hits.size();
-      B2DEBUG(20, "FilterMill::grindData: dataSet got " << nHits << " hits and collectedData: " << collectedData.size())
-      if (nHits == 2) {
-        for (const auto& filterPack : m_2Hitfilters) {
-          double result = filterPack.second(
-                            *(dataSet.hits[0]),
-                            *(dataSet.hits[1]));
-          collectedData.push_back({filterPack.first, result});
-        }
-      } else if (nHits == 3) {
-        for (const auto& filterPack : m_3Hitfilters) {
-          double result = filterPack.second(
-                            *(dataSet.hits[0]),
-                            *(dataSet.hits[1]),
-                            *(dataSet.hits[2]));
-          collectedData.push_back({filterPack.first, result});
-        }
-      } else if (nHits == 4) {
-        for (const auto& filterPack : m_4Hitfilters) {
-          double result = filterPack.second(
-                            *(dataSet.hits[0]),
-                            *(dataSet.hits[1]),
-                            *(dataSet.hits[2]),
-                            *(dataSet.hits[3]));
-          collectedData.push_back({filterPack.first, result});
-        }
-      } else {
-        B2ERROR("FilterMill-grindData: someone use " << nHits <<
-                " to be grinded! This number is currently not supported - doing nothing instead...");
+      checkLocked("grindData2Hit");
+      if (m_2Hitfilters.empty()) { B2DEBUG(5, "there are no 2-hit-filters stored, skipping grinding"); return; }
+
+      for (const auto& filterPack : m_2Hitfilters) {
+        double result = filterPack.second(
+                          *(dataSet.outer),
+                          *(dataSet.inner));
+        collectedData.push_back({filterPack.first, result});
       }
-      B2DEBUG(5, "FilterMill::grindData: collectedData has now " << collectedData.size() << " entries")
+
+      B2DEBUG(5, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries")
+    }
+
+
+    /** on given dataSet, apply all filters stored in the mill and store the results in collectedData. */
+    void grindData3Hit(const HitTriplet& dataSet,
+                       std::vector<std::pair<std::string, double> >& collectedData) const
+    {
+      checkLocked("grindData3Hit");
+      if (m_3Hitfilters.empty()) { B2DEBUG(5, "there are no 3-hit-filters stored, skipping grinding"); return; }
+
+      for (const auto& filterPack : m_3Hitfilters) {
+        double result = filterPack.second(
+                          *(dataSet.outer),
+                          *(dataSet.center),
+                          *(dataSet.inner));
+        collectedData.push_back({filterPack.first, result});
+      }
+
+      B2DEBUG(5, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries")
+    }
+
+
+    /** on given dataSet, apply all filters stored in the mill and store the results in collectedData. */
+    void grindData4Hit(const HitQuadruplet& dataSet,
+                       std::vector<std::pair<std::string, double> >& collectedData) const
+    {
+      checkLocked("grindData4Hit");
+      if (m_4Hitfilters.empty()) { B2DEBUG(5, "there are no 4-hit-filters stored, skipping grinding"); return; }
+
+      for (const auto& filterPack : m_4Hitfilters) {
+        double result = filterPack.second(
+                          *(dataSet.outer),
+                          *(dataSet.outerCenter),
+                          *(dataSet.innerCenter),
+                          *(dataSet.inner));
+        collectedData.push_back({filterPack.first, result});
+      }
+
+      B2DEBUG(5, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries")
     }
 
   };
 
 }
+
 

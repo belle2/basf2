@@ -59,25 +59,25 @@ namespace Belle2 {
     std::vector<SecMapTrainerTC> m_tcs;
 
 
-    /** A standard mask for the data to be collected for the root-output. */
-    SecMapTrainDataSet m_dataSet;
+    /** contains current experiment number. */
+    unsigned m_expNo;
+
+
+    /** contains current run number. */
+    unsigned m_runNo;
+
+
+    /** contains current event number. */
+    unsigned m_evtNo;
 
 
 
-    /** checks if given Hit is acceptable for this trainer. */
+    /** checks if given Hit is acceptable for this trainer.
+    *
+    * Returns true if accepted and false otherwise. */
     bool acceptHit(const SpacePoint& hit)
     {
-      B2Vector3D distance2IP =
-        m_config.vIP - B2Vector3D(hit.getPosition().X(), hit.getPosition().Y(), hit.getPosition().Z());
-
-      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has now dist2IP/thresholdmin/-max: " << distance2IP.Mag() << "/" <<
-              m_config.hitMinMaxDist2IP3D.first << "/" << m_config.hitMinMaxDist2IP3D.second)
-      if ((m_config.hitMinMaxDist2IP3D.first > 0
-           and m_config.hitMinMaxDist2IP3D.first < distance2IP.Mag())
-          or (m_config.hitMinMaxDist2IP3D.second > 0
-              and m_config.hitMinMaxDist2IP3D.second > distance2IP.Mag()))
-      { return false; }
-
+      // rejects if layerID is not acceptable for this secMap-training.
       auto layerID = hit.getVxdID().getLayerNumber();
       B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID/thresholdmin/-max: " << layerID << "/" << m_config.minMaxLayer.first <<
               "/" << m_config.minMaxLayer.second)
@@ -98,38 +98,39 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::process2HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
               aTC.getPDG())
       if (aTC.size() < 2) { return nValues; }
-      m_dataSet.trackNo = aTC.getTrackID();
-      m_dataSet.pdg = aTC.getPDG();
 
       // the iterators mark the hits to be used:
-      std::vector<std::pair<std::string, double> > collectedResults;
       SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
       SecMapTrainerTC::ConstIterator innerIt = ++aTC.outermostHit();
-      B2DEBUG(10, "SecMapTrainer::process2HitCombinations: b4 loop outerHit-/inneHitSecID: " << outerIt->getSectorID() << "/" <<
-              innerIt->getSectorID())
 
-      bool isEqual = (innerIt == aTC.innerEnd());
-      B2DEBUG(20, "SecMapTrainer::process2HitCombinations: innerIt == aTC.innerEnd(): " << isEqual)
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
+      std::vector<std::pair<std::string, double> > collectedResults;
       for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process2HitCombinations: outerHit-/inneHitSecID: " << outerIt->getSectorID() << "/" <<
-                innerIt->getSectorID())
-        XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
-        hitBundle.sectorIDs = {outerIt->getSectorID(), innerIt->getSectorID()};
-        hitBundle.hits = {&(*outerIt), &(*innerIt)};
-        m_dataSet.sectorIDs = hitBundle.sectorIDs;
-        m_filterMill.grindData(hitBundle, collectedResults);
+        B2DEBUG(10, "SecMapTrainer::process2HitCombinations: outerHit-/innerHitSecID: " << outerIt->getSectorIDString() <<
+                "/" << innerIt->getSectorIDString())
 
+        auto& dataSet = m_rootInterface.get2HitDataSet();
+        dataSet.expNo = m_expNo;
+        dataSet.runNo = m_runNo;
+        dataSet.evtNo = m_evtNo;
+        dataSet.trackNo = aTC.getTrackID();
+        dataSet.pdg = aTC.getPDG();
+        dataSet.secIDs.outer = outerIt->getSectorID().getFullSecID();
+        dataSet.secIDs.inner = innerIt->getSectorID().getFullSecID();
+
+        // create data for each filterType:
+        FilterMill<SecMapTrainerHit>::HitPair newHitPair;
+        newHitPair.outer = &(*outerIt);
+        newHitPair.inner = &(*innerIt);
+        m_filterMill.grindData2Hit(newHitPair, collectedResults);
+
+        // fill data for each filter type:
         for (const auto& entry : collectedResults) {
-          std::string secIDs;
-          for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
-          B2DEBUG(50, "SecMapTrainer::process2HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
-          m_dataSet.filterID = entry.first;
-          m_dataSet.value = entry.second;
-
-          m_rootInterface.fill(m_dataSet);
+          B2DEBUG(50, "SecMapTrainer::process2HitCombinations: filter/value: " << entry.first << "/" << entry.second)
+          dataSet.setValueOfFilter(entry.first, entry.second);
           ++nValues;
         }
+        m_rootInterface.fill2Hit();
         collectedResults.clear();
         ++outerIt;
         ++innerIt;
@@ -146,35 +147,44 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::process3HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
               aTC.getPDG())
       if (aTC.size() < 3) { return nValues; }
-      m_dataSet.trackNo = aTC.getTrackID();
-      m_dataSet.pdg = aTC.getPDG();
 
       // the iterators mark the hits to be used:
-      std::vector<std::pair<std::string, double> > collectedResults;
       SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
       SecMapTrainerTC::ConstIterator centerIt = ++aTC.outermostHit();
       SecMapTrainerTC::ConstIterator innerIt = ++(++aTC.outermostHit());
 
-      // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
+      // loop over all 3-hit-combis, collect data for each filterType and store it in root-tree:
+      std::vector<std::pair<std::string, double> > collectedResults;
       for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process3HitCombinations: outer-/center-/innerHitSecID: " << outerIt->getSectorID() <<
-                "/" << centerIt->getSectorID() <<
-                "/" << innerIt->getSectorID())
-        XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
-        hitBundle.sectorIDs = {outerIt->getSectorID(), centerIt->getSectorID(), innerIt->getSectorID()};
-        hitBundle.hits = {&(*outerIt), &(*centerIt), &(*innerIt)};
-        m_dataSet.sectorIDs = hitBundle.sectorIDs;
-        m_filterMill.grindData(hitBundle, collectedResults);
+        B2DEBUG(10, "SecMapTrainer::process3HitCombinations: outer-/center-/innerHitSecID: " << outerIt->getSectorIDString() <<
+                "/" << centerIt->getSectorIDString() <<
+                "/" << innerIt->getSectorIDString())
 
+        auto& dataSet = m_rootInterface.get3HitDataSet();
+        dataSet.expNo = m_expNo;
+        dataSet.runNo = m_runNo;
+        dataSet.evtNo = m_evtNo;
+        dataSet.trackNo = aTC.getTrackID();
+        dataSet.pdg = aTC.getPDG();
+        dataSet.secIDs.outer = outerIt->getSectorID().getFullSecID();
+        dataSet.secIDs.center = centerIt->getSectorID().getFullSecID();
+        dataSet.secIDs.inner = innerIt->getSectorID().getFullSecID();
+
+        // create data for each filterType:
+        FilterMill<SecMapTrainerHit>::HitTriplet newHitTriplet;
+        newHitTriplet.outer = &(*outerIt);
+        newHitTriplet.center = &(*centerIt);
+        newHitTriplet.inner = &(*innerIt);
+        m_filterMill.grindData3Hit(newHitTriplet, collectedResults);
+
+        // fill data for each filter type:
         for (const auto& entry : collectedResults) {
-          std::string secIDs;
-          for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
-          B2DEBUG(50, "SecMapTrainer::process3HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
-          m_dataSet.filterID = entry.first;
-          m_dataSet.value = entry.second;
-
-          m_rootInterface.fill(m_dataSet);
+          B2DEBUG(50, "SecMapTrainer::process3HitCombinations: filter/value: " << entry.first << "/" << entry.second)
+          dataSet.setValueOfFilter(entry.first, entry.second);
+          ++nValues;
         }
+        m_rootInterface.fill3Hit();
+        collectedResults.clear();
         ++outerIt;
         ++centerIt;
         ++innerIt;
@@ -191,49 +201,52 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::process4HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
               aTC.getPDG())
       if (aTC.size() < 4) { return nValues; }
-      m_dataSet.trackNo = aTC.getTrackID();
-      m_dataSet.pdg = aTC.getPDG();
 
       // the iterators mark the hits to be used:
-      std::vector<std::pair<std::string, double> > collectedResults;
       SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
       SecMapTrainerTC::ConstIterator outerCenterIt = ++aTC.outermostHit();
       SecMapTrainerTC::ConstIterator innerCenterIt = ++(++aTC.outermostHit());
       SecMapTrainerTC::ConstIterator innerIt = ++(++(++aTC.outermostHit()));
 
       // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
+      std::vector<std::pair<std::string, double> > collectedResults;
       for (; innerIt != aTC.innerEnd();) {
-        std::string secIDs;
-        for (const auto& iD : m_dataSet.sectorIDs) {secIDs += iD; }
-        B2DEBUG(10, "SecMapTrainer::process4HitCombinations: outer-/oCenter-/iCenter-/innerHitSecID: " << outerIt->getSectorID() <<
-                "/" << outerCenterIt->getSectorID() <<
-                "/" << innerCenterIt->getSectorID() <<
-                "/" << innerIt->getSectorID())
-        XHitDataSet<std:: string, SecMapTrainerHit> hitBundle;
-        hitBundle.sectorIDs = {
-          outerIt->getSectorID(),
-          outerCenterIt->getSectorID(),
-          innerCenterIt->getSectorID(),
-          innerIt->getSectorID()
-        };
-        hitBundle.hits = {
-          &(*outerIt),
-          &(*outerCenterIt),
-          &(*innerCenterIt),
-          &(*innerIt)
-        };
-        m_dataSet.sectorIDs = hitBundle.sectorIDs;
-        m_filterMill.grindData(hitBundle, collectedResults);
+        B2DEBUG(10, "SecMapTrainer::process4HitCombinations: outer-/oCenter-/iCenter-/innerHitSecID: " << outerIt->getSectorIDString() <<
+                "/" << outerCenterIt->getSectorIDString() <<
+                "/" << innerCenterIt->getSectorIDString() <<
+                "/" << innerIt->getSectorIDString())
 
+
+        auto& dataSet = m_rootInterface.get4HitDataSet();
+        dataSet.expNo = m_expNo;
+        dataSet.runNo = m_runNo;
+        dataSet.evtNo = m_evtNo;
+        dataSet.trackNo = aTC.getTrackID();
+        dataSet.pdg = aTC.getPDG();
+        dataSet.secIDs.outer = outerIt->getSectorID().getFullSecID();
+        dataSet.secIDs.outerCenter = outerCenterIt->getSectorID().getFullSecID();
+        dataSet.secIDs.innerCenter = innerCenterIt->getSectorID().getFullSecID();
+        dataSet.secIDs.inner = innerIt->getSectorID().getFullSecID();
+
+        // create data for each filterType:
+        FilterMill<SecMapTrainerHit>::HitQuadruplet newHitQuadruplet;
+        newHitQuadruplet.outer = &(*outerIt);
+        newHitQuadruplet.outerCenter = &(*outerCenterIt);
+        newHitQuadruplet.innerCenter = &(*innerCenterIt);
+        newHitQuadruplet.inner = &(*innerIt);
+        m_filterMill.grindData4Hit(newHitQuadruplet, collectedResults);
+
+        // fill data for each filter type:
         for (const auto& entry : collectedResults) {
-          B2DEBUG(50, "SecMapTrainer::process4HitCombinations: secID/filterID/value: " << secIDs << "/" << entry.first << "/" << entry.second)
-          m_dataSet.filterID = entry.first;
-          m_dataSet.value = entry.second;
-
-          m_rootInterface.fill(m_dataSet);
+          B2DEBUG(50, "SecMapTrainer::process4HitCombinations: filter/value: " << entry.first << "/" << entry.second)
+          dataSet.setValueOfFilter(entry.first, entry.second);
           ++nValues;
         }
+        m_rootInterface.fill4Hit();
+        collectedResults.clear();
         ++outerIt;
+        ++outerCenterIt;
+        ++innerCenterIt;
         ++innerIt;
       }
       return nValues;
@@ -241,50 +254,31 @@ namespace Belle2 {
 
 
 
-    /** converts the SPTC into a SecMapTrainerTC */
-    bool convertSPTC(
-      const SpacePointTrackCand& tc,
-      unsigned tcID)
+    /** converts the SpacePoints into a SecMapTrainerTC */
+    void convertSP2TC(
+      std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
+      unsigned tcID, double pTValue, int pdgCode)
     {
-      SecMapTrainerTC newTrack(tcID, tc.getMomSeed().Perp());
-
-      // collect hits which fullfill all given tests
-      std::vector<const SpacePoint*> goodSPs;
-      for (const SpacePoint* aSP : tc.getHits()) {
-        if (!acceptHit(*aSP)) continue;
-        goodSPs.push_back(aSP);
-      }
-
       B2DEBUG(10, "SecMapTrainer::convertSPTC: nGoodHits: " << goodSPs.size())
 
-      // want to have hits going from outer to inner ones
-      if (tc.isOutgoing()) std::reverse(goodSPs.begin(), goodSPs.end());
+      SecMapTrainerTC newTrack(tcID, pTValue, pdgCode);
 
-      for (const SpacePoint* aSP : goodSPs) {
-
-        FullSecID fSeCID = createSecID(aSP->getVxdID(), aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV());
-        if (fSeCID.getFullSecID() == std::numeric_limits<unsigned int>::max())
-        { B2ERROR("a secID for spacePoint not found!"); continue; }
-        std::string fullSecID = fSeCID.getFullSecString();
-        B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID)
+      for (const auto& secIDAndSPpair : goodSPs) {
+        FullSecID fullSecID = secIDAndSPpair.first;
+        B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID.getFullSecString())
 
         newTrack.addHit(std::move(
-                          SecMapTrainerHit(fullSecID, aSP->getPosition())));
+                          SecMapTrainerHit(fullSecID, secIDAndSPpair.second->getPosition())));
       }
-
-      B2DEBUG(10, "SecMapTrainer::convertSPTC: the TC has now nHits/threshold: " << newTrack.size() << "/" << m_config.nHitsMin)
-      if (newTrack.size() < m_config.nHitsMin) return false;
 
       // add vertex (but without real vertexPosition, since origin is assumed)
       SecMapTrainerHit newVirtualHit(FullSecID().getFullSecString(), m_config.vIP);
-//    newVirtualHit.setVertex();
 
       newTrack.addHit(std::move(newVirtualHit));
 
       m_tcs.push_back(std::move(newTrack));
-
-      return true;
     }
+
 
   public:
 
@@ -302,53 +296,62 @@ namespace Belle2 {
       // stretch the cuts:
       m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;
       m_config.pTCuts.second += m_config.pTCuts.second * m_config.pTSmear;
-      // prepare the filters first:
-      for (auto& fName : m_config.twoHitFilters) {
-        auto filter = m_factory.get2HitInterface(fName);
-        m_filterMill.add2HitFilter({fName, filter});
-      }
-      for (auto& fName : m_config.threeHitFilters) {
-        auto filter = m_factory.get3HitInterface(fName);
-        m_filterMill.add3HitFilter({fName, filter});
-      }
-      for (auto& fName : m_config.fourHitFilters) {
-        auto filter = m_factory.get4HitInterface(fName);
-        m_filterMill.add4HitFilter({fName, filter});
-      }
-      // prevent further modifications:
-      m_filterMill.lockMill();
     }
 
 
     /** initialize the trainer (to be called in Module::initialize(). */
     void initialize()
-    { m_rootInterface.initialize(); }
+    {
+      // prepare the filters:
+      m_rootInterface.initialize2Hit(m_config.twoHitFilters);
+      for (auto& fName : m_config.twoHitFilters) {
+        auto filter = m_factory.get2HitInterface(fName);
+        m_filterMill.add2HitFilter({fName, filter});
+      }
+
+      m_rootInterface.initialize3Hit(m_config.threeHitFilters);
+      for (auto& fName : m_config.threeHitFilters) {
+        auto filter = m_factory.get3HitInterface(fName);
+        m_filterMill.add3HitFilter({fName, filter});
+      }
+
+      m_rootInterface.initialize4Hit(m_config.fourHitFilters);
+      for (auto& fName : m_config.fourHitFilters) {
+        auto filter = m_factory.get4HitInterface(fName);
+        m_filterMill.add4HitFilter({fName, filter});
+      }
+
+      // prevent further modifications:
+      m_filterMill.lockMill();
+    }
 
     /** initialize the trainer (to be called in Module::terminate(). */
-    void terminate()
-    { m_rootInterface.write(); }
+    void terminate(TFile* file)
+    { m_rootInterface.write(file); }
 
     /** Initialize event. */
     void initializeEvent(int expNo, int runNo, int evtNo)
     {
-      m_dataSet.expNo = expNo;
-      m_dataSet.runNo = runNo;
-      m_dataSet.evtNo = evtNo;
+      m_expNo = expNo;
+      m_runNo = runNo;
+      m_evtNo = evtNo;
     }
 
 
 
-    /** checks if given TC is acceptable for this trainer. */
-    bool acceptTC(const SpacePointTrackCand& tc, unsigned iD)
+    /** checks if given TC is acceptable for this trainer and store it if it is accepted.
+    *
+    * The return value is true, it was accepted and stored, false if not.
+    */
+    bool storeTC(const SpacePointTrackCand& tc, unsigned iD)
     {
-      B2DEBUG(10, "SecMapTrainer::acceptTC: nHits/threshold: " << tc.getNHits() << "/" << m_config.nHitsMin)
+      B2DEBUG(10, "SecMapTrainer::storeTC: nHits/threshold: " << tc.getNHits() << "/" << m_config.nHitsMin)
       // catch TCS which are too short in any case
       if (tc.getNHits() < m_config.nHitsMin) return false;
 
-      B2DEBUG(10, "SecMapTrainer::acceptTC: hasHitsOnSameSensor: " << tc.hasHitsOnSameSensor())
+      B2DEBUG(10, "SecMapTrainer::storeTC: hasHitsOnSameSensor: " << tc.hasHitsOnSameSensor())
       // catch TCs where more than one hit was on the same sensor
       if (tc.hasHitsOnSameSensor()) return false;
-
 
       // catch TCS where particle type is wrong
       for (const auto& pdg : m_config.pdgCodesAllowed) {
@@ -357,21 +360,42 @@ namespace Belle2 {
 
       // check if momentum of TC is within range:
       auto pT = tc.getMomSeed().Perp();
-      B2DEBUG(10, "SecMapTrainer::acceptTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTCuts.first << "/" <<
+      B2DEBUG(10, "SecMapTrainer::storeTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTCuts.first << "/" <<
               m_config.pTCuts.second)
       if (m_config.pTCuts.first > pT
           or m_config.pTCuts.second < pT) return false;
 
       // catch tracks which start too far away from orign
       B2Vector3D distance2IP = m_config.vIP - tc.getPosSeed();
-      B2DEBUG(10, "SecMapTrainer::acceptTC: distance2IP/thresholdXY/-Z: " << distance2IP.Mag() << "/" << m_config.seedMaxDist2IPXY << "/"
+      B2DEBUG(10, "SecMapTrainer::storeTC: distance2IP/thresholdXY/-Z: " << distance2IP.Mag() << "/" << m_config.seedMaxDist2IPXY << "/"
               << m_config.seedMaxDist2IPZ)
       if (m_config.seedMaxDist2IPXY > 0
           and m_config.seedMaxDist2IPXY < distance2IP.Perp()) return false;
       if (m_config.seedMaxDist2IPZ > 0
           and m_config.seedMaxDist2IPXY < distance2IP.Z()) return false;
 
-      return convertSPTC(tc, iD);
+      // collect hits which fullfill all given tests
+      std::vector<std::pair<FullSecID, const SpacePoint*> > goodSPs;
+      for (const SpacePoint* aSP : tc.getHits()) {
+        if (!acceptHit(*aSP)) continue;
+
+        FullSecID fSecID = createSecID(aSP->getVxdID(), aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV());
+        if (fSecID.getFullSecID() == std::numeric_limits<unsigned int>::max())
+        { B2ERROR("a secID for spacePoint not found!"); continue; }
+
+        goodSPs.push_back({fSecID, aSP});
+      }
+
+      // catch tracks which have not enough accepted hits.
+      B2DEBUG(10, "SecMapTrainer::storeTC: the TC has now nHits/threshold: " << goodSPs.size() << "/" << m_config.nHitsMin)
+      if (goodSPs.size() < m_config.nHitsMin) return false;
+
+      // want to have hits going from outer to inner ones
+      if (tc.isOutgoing()) std::reverse(goodSPs.begin(), goodSPs.end());
+
+      convertSP2TC(goodSPs, iD, tc.getMomSeed().Perp(), tc.getPdgCode());
+
+      return true;
     }
 
 
@@ -380,6 +404,7 @@ namespace Belle2 {
      * returns unsigned int max if correct ID could not be found. */
     FullSecID createSecID(VxdID iD, double uVal, double vVal)
     {
+      // TODO replace by new secMap-design-approach
       auto secID = SectorTools::calcSecID(m_config.uDirectionCuts, m_config.vDirectionCuts, {uVal, vVal});
       if (secID == std::numeric_limits<unsigned short>::max())
         return FullSecID(std::numeric_limits<unsigned int>::max());
@@ -405,7 +430,6 @@ namespace Belle2 {
         //four hit:
         nFourHitResults += process4HitCombinations(tc);
       }
-      // TODO debug output...
 
       m_tcs.clear();
 

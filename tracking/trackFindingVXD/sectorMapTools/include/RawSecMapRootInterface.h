@@ -11,23 +11,26 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainDataSet.h>
+#include <tracking/trackFindingVXD/sectorMapTools/FilterValueDataSet.h>
 
 #include <framework/logging/Logger.h>
 
 #include <framework/pcore/RootMergeable.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <framework/pcore/ProcHandler.h>
 
 #include <TFile.h>
 #include <TList.h>
 #include <TTree.h>
 #include <string>
+// #include <map>
+// #include <limits>       // std::numeric_limits
 
 
 namespace Belle2 {
 
   /** To be used as an interface to root-stuff. */
-//   template<class DataType, class TreeType>
   class RawSecMapRootInterface {
   protected:
 
@@ -36,119 +39,249 @@ namespace Belle2 {
 
     /** a pointer to the file where the Tree shall be stored. */
     TFile* m_file;
-    TFile* m_file2; // WARNING temporary workaround for being able to fill ttress (not multithreading-compatible!)
 
     /** name of the StoreObjPtr. */
     std::string m_name;
 
-    /** interface to the TTree. */
-//     StoreObjPtr<RootMergeable<TTree>> m_tree; // TODO
-    TTree* m_testTree;
+    /** interface to the TTree storing two-hit-variables. */
+    StoreObjPtr<RootMergeable<TTree>> m_tree2Hit;
+
+    /** Mask for storing dataSets to be piped into 2hit-tree. */
+    FilterValueDataSet<SecIDPair> m_data2Hit;
+
+    /** interface to the TTree storing three-hit-variables. */
+    StoreObjPtr<RootMergeable<TTree>> m_tree3Hit;
+
+    /** Mask for storing dataSets to be piped into 2hit-tree. */
+    FilterValueDataSet<SecIDTriplet> m_data3Hit;
+
+    /** interface to the TTree storing four-hit-variables. */
+    StoreObjPtr<RootMergeable<TTree>> m_tree4Hit;
+
+    /** Mask for storing dataSets to be piped into 2hit-tree. */
+    FilterValueDataSet<SecIDQuadruplet> m_data4Hit;
 
   public:
 
-    /** Constructor - prepares ttree. */
-    RawSecMapRootInterface(TFile* file, std::string mapName) : m_file(file), m_name(mapName), m_testTree(nullptr)
-    {
-      /// WARNING: StoreObjPtr< RootMergeable< TTree > > m_tree does not work yet, has to be finished a.s.a.p.!
-//       m_file->cd();
-//       m_tree.registerInDataStore(mapName, DataStore::c_Persistent);
-//       if (!m_tree.isValid()) {
-//         m_tree.construct(mapName.c_str(), "Raw data for a sectorMap");
-//       }
-//       m_tree->get().Branch("expNo", &m_data.expNo);
-//       m_tree->get().Branch("runNo", &m_data.runNo);
-//       m_tree->get().Branch("evtNo", &m_data.evtNo);
-//       m_tree->get().Branch("trackNo", &m_data.trackNo);
-//       m_tree->get().Branch("pdg", &m_data.pdg);
-//       m_tree->get().Branch("filter", &m_data.filterID);
-//       m_tree->get().Branch("secIDChain", &m_data.sectorIDs);
-//       m_tree->get().Branch("value", &m_data.value);
-//       m_tree->get().SetDirectory(nullptr);
-    }
-
-
-    /** initialize the RawSecMapRootInterface (to be called in Module::initialize(). */
-    void initialize()
-    {
-      B2DEBUG(1, "RawSecMapRootInterface::initialize: start")
-      /// WARNING: StoreObjPtr< RootMergeable< TTree > > m_tree does not work yet, has to be finished a.s.a.p.!
-//    m_file->cd();
-//    bool registered = m_tree.registerInDataStore(m_name, DataStore::c_Persistent);
-//    bool constructed = m_tree.construct(m_name.c_str(), "Raw data for a sectorMap");
-//    B2DEBUG(1, "RawSecMapRootInterface::initialize: isRegistered/isConstructed: " << registered << "/" << constructed)
+//  /** contains everything to uniquely identify a track. */
+//  struct TrackIdentifier {
+//    /** number of the experiment this dataset is taken from. */
+//    unsigned expNo;
 //
-//    m_tree->get().Branch("expNo", &m_data.expNo);
-//    m_tree->get().Branch("runNo", &m_data.runNo);
-//    m_tree->get().Branch("evtNo", &m_data.evtNo);
-//    m_tree->get().Branch("trackNo", &m_data.trackNo);
-//    m_tree->get().Branch("pdg", &m_data.pdg);
-//    m_tree->get().Branch("filter", &m_data.filterID);
-//    m_tree->get().Branch("secIDChain", &m_data.sectorIDs);
-//    m_tree->get().Branch("value", &m_data.value);
-//    B2DEBUG(1, "RawSecMapRootInterface::initialize: nBranches/nEntries: " << m_tree->get().GetNbranches () << "/" << m_tree->get().GetEntries())
-//    m_tree->get().Fill();
-//    m_file->Write();
-//    m_tree->get().SetDirectory(nullptr);
-
-      m_file2 = new TFile("noMergeableTest.root", "RECREATE");
-
-      m_testTree = new TTree(m_name.c_str(), "Raw data for a sectorMap");
-      m_testTree->Branch("expNo", &m_data.expNo);
-      m_testTree->Branch("runNo", &m_data.runNo);
-      m_testTree->Branch("evtNo", &m_data.evtNo);
-      m_testTree->Branch("trackNo", &m_data.trackNo);
-      m_testTree->Branch("pdg", &m_data.pdg);
-      m_testTree->Branch("filter", &m_data.filterID);
-      m_testTree->Branch("secIDChain", &m_data.sectorIDs);
-      m_testTree->Branch("value", &m_data.value);
-      m_testTree->Fill();
-      m_file2->Write();
-      B2DEBUG(1, "RawSecMapRootInterface::initialize: nBranches/nEntries: " << m_testTree->GetNbranches() << "/" <<
-              m_testTree->GetEntries())
-    }
-
-
-    /** fill given dataSet into root Tree. */
-    void fill(const SecMapTrainDataSet& newSet)
-    {
-      m_data = newSet;
-      /// WARNING: StoreObjPtr< RootMergeable< TTree > > m_tree does not work yet, has to be finished a.s.a.p.!
-//    if (!m_tree.isValid()) {
-//    B2ERROR("RawSecMapRootInterface-fill: StoreObjPtr not valid! You probably forgot to call RawSecMapRootInterface.initialize() in Module::initialize!")
-//    return;
-//    }
-//    m_file->cd();
-//       m_tree->get().Fill();
-
-      m_file2->cd();
-      m_testTree->Fill();
-    }
-
-
-    /** write to file at end of processing. */
-    void write()
-    {
-      /// WARNING: StoreObjPtr< RootMergeable< TTree > > m_tree does not work yet, has to be finished a.s.a.p.!
-//    B2DEBUG(1, "RawSecMapRootInterface::write: start")
-//       if (!m_file || !m_file->IsOpen()) {
-//         B2ERROR("RawSecMapRootInterface-write: for map " << m_name <<
-//                 ": file is not accessable and thererore no writing could be done!")
-//         return;
-//       }
-//       m_file->cd();
-//       B2DEBUG(1, "RawSecMapRootInterface::write: nBranches/nEntries: " << m_tree->get().GetNbranches()) // << "/" << m_tree->get().GetEntriesFast())
-//       m_tree->write(m_file);
-// //       m_tree->get().SetDirectory(nullptr);
-//       m_file->Close();
+//    /** number of the run this dataset is taken from. */
+//    unsigned runNo;
 //
-      m_file2->cd();
-      B2DEBUG(1, "RawSecMapRootInterface::testwrite: nBranches/nEntries: " << m_testTree->GetNbranches() << "/" <<
-              m_testTree->GetEntriesFast())
-      m_testTree->Print();
-      m_file2->Write();
-      m_file2->Close();
-      B2DEBUG(1, "RawSecMapRootInterface::write: end")
+//    /** number of the event this dataset is taken from. */
+//    unsigned evtNo;
+//
+//    /** number of the reference track this dataset is taken from (its ID in the datastore). */
+//    unsigned trackNo;
+//
+//    /** Pdg given by reference track. */
+//    int pdg;
+//  };
+//
+//
+
+
+    /** Constructor - prepares ttree. without calling the initializer-functions this Object is still not working! */
+    RawSecMapRootInterface(TFile* file, std::string mapName) :
+      m_file(file),
+      m_name(mapName),
+      m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
+      m_data2Hit( {}),
+                m_tree3Hit((m_name + std::string("3Hit")), DataStore::c_Persistent),
+                m_data3Hit({}),
+                m_tree4Hit((m_name + std::string("4Hit")), DataStore::c_Persistent),
+    m_data4Hit({}) {}
+
+
+    /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */
+    void initialize2Hit(std::vector<std::string> filterNames)
+    {
+      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: start")
+
+      // preparing StoreObjPtr:
+      bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")), DataStore::c_Persistent);
+      bool constructed = m_tree2Hit.construct((m_name + std::string("2Hit")).c_str(), "Raw data of two-hit-combinations for a sectorMap");
+      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: isRegistered/isConstructed: " << registered << "/" << constructed)
+
+      // preparing data-mask for 2-hit-combinations:
+      m_data2Hit = FilterValueDataSet<SecIDPair>(filterNames);
+
+      m_tree2Hit->get().Branch("expNo", &(m_data2Hit.expNo));
+      m_tree2Hit->get().Branch("runNo", &(m_data2Hit.runNo));
+      m_tree2Hit->get().Branch("evtNo", &(m_data2Hit.evtNo));
+      m_tree2Hit->get().Branch("trackNo", &(m_data2Hit.trackNo));
+      m_tree2Hit->get().Branch("pdg", &(m_data2Hit.pdg));
+      m_tree2Hit->get().Branch("outerSecID", &(m_data2Hit.secIDs.outer));
+      m_tree2Hit->get().Branch("innerSecID", &(m_data2Hit.secIDs.inner));
+
+      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: adding " << filterNames.size() << " filters as branches to ttree ")
+      for (auto& name : filterNames) {
+        double* valuePtr = m_data2Hit.getValuePtr(name);
+        if (valuePtr != nullptr) {
+          B2DEBUG(5, "RawSecMapRootInterface::initialize2Hit: adding now branch with name " << name)
+          m_tree2Hit->get().Branch(name.c_str(), valuePtr);
+        } else {
+          B2ERROR("RawSecMapRootInterface::initialize2Hit: filterName " << name <<
+                  " not known! this is unintended behavior - skipping filter");
+        }
+
+      }
+      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: nBranches/nEntries: " << m_tree2Hit->get().GetNbranches() << "/" <<
+              m_tree2Hit->get().GetEntries())
+    }
+
+
+
+    /** initialize the RawSecMapRootInterface for three-hit-combinations (to be called in Module::initialize(). */
+    void initialize3Hit(std::vector<std::string> filterNames)
+    {
+      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: start")
+
+      // preparing StoreObjPtr:
+      bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")), DataStore::c_Persistent);
+      bool constructed = m_tree3Hit.construct((m_name + std::string("3Hit")).c_str(),
+                                              "Raw data of three-hit-combinations for a sectorMap");
+      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: isRegistered/isConstructed: " << registered << "/" << constructed)
+
+      // preparing data-mask for 2-hit-combinations:
+      m_data3Hit = FilterValueDataSet<SecIDTriplet>(filterNames);
+
+      m_tree3Hit->get().Branch("expNo", &(m_data3Hit.expNo));
+      m_tree3Hit->get().Branch("runNo", &(m_data3Hit.runNo));
+      m_tree3Hit->get().Branch("evtNo", &(m_data3Hit.evtNo));
+      m_tree3Hit->get().Branch("trackNo", &(m_data3Hit.trackNo));
+      m_tree3Hit->get().Branch("pdg", &(m_data3Hit.pdg));
+      m_tree3Hit->get().Branch("outerSecID", &(m_data3Hit.secIDs.outer));
+      m_tree3Hit->get().Branch("centerSecID", &(m_data3Hit.secIDs.center));
+      m_tree3Hit->get().Branch("innerSecID", &(m_data3Hit.secIDs.inner));
+
+      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: adding " << filterNames.size() << " filters as branches to ttree ")
+      for (auto& name : filterNames) {
+        double* valuePtr = m_data3Hit.getValuePtr(name);
+        if (valuePtr != nullptr) {
+          B2DEBUG(5, "RawSecMapRootInterface::initialize3Hit: adding now branch with name " << name)
+          m_tree3Hit->get().Branch(name.c_str(), valuePtr);
+        } else {
+          B2ERROR("RawSecMapRootInterface::initialize3Hit: filterName " << name <<
+                  " not known! this is unintended behavior - skipping filter");
+        }
+
+      }
+      B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: nBranches/nEntries: " << m_tree3Hit->get().GetNbranches() << "/" <<
+              m_tree3Hit->get().GetEntries())
+    }
+
+
+
+    /** initialize the RawSecMapRootInterface for four-hit-combinations (to be called in Module::initialize(). */
+    void initialize4Hit(std::vector<std::string> filterNames)
+    {
+      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: start")
+
+      // preparing StoreObjPtr:
+      bool registered = m_tree4Hit.registerInDataStore((m_name + std::string("4Hit")), DataStore::c_Persistent);
+      bool constructed = m_tree4Hit.construct((m_name + std::string("4Hit")).c_str(),
+                                              "Raw data of four-hit-combinations for a sectorMap");
+      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: isRegistered/isConstructed: " << registered << "/" << constructed)
+
+      // preparing data-mask for 2-hit-combinations:
+      m_data4Hit = FilterValueDataSet<SecIDQuadruplet>(filterNames);
+
+      m_tree4Hit->get().Branch("expNo", &(m_data4Hit.expNo));
+      m_tree4Hit->get().Branch("runNo", &(m_data4Hit.runNo));
+      m_tree4Hit->get().Branch("evtNo", &(m_data4Hit.evtNo));
+      m_tree4Hit->get().Branch("trackNo", &(m_data4Hit.trackNo));
+      m_tree4Hit->get().Branch("pdg", &(m_data4Hit.pdg));
+      m_tree4Hit->get().Branch("outerSecID", &(m_data4Hit.secIDs.outer));
+      m_tree4Hit->get().Branch("outerCenterSecID", &(m_data4Hit.secIDs.outerCenter));
+      m_tree4Hit->get().Branch("innerCenterSecID", &(m_data4Hit.secIDs.innerCenter));
+      m_tree4Hit->get().Branch("innerSecID", &(m_data4Hit.secIDs.inner));
+
+      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: adding " << filterNames.size() << " filters as branches to ttree ")
+      for (auto& name : filterNames) {
+        double* valuePtr = m_data4Hit.getValuePtr(name);
+        if (valuePtr != nullptr) {
+          B2DEBUG(5, "RawSecMapRootInterface::initialize4Hit: adding now branch with name " << name)
+          m_tree4Hit->get().Branch(name.c_str(), valuePtr);
+        } else {
+          B2ERROR("RawSecMapRootInterface::initialize4Hit: filterName " << name <<
+                  " not known! this is unintended behavior - skipping filter");
+        }
+
+      }
+      B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: nBranches/nEntries: " << m_tree4Hit->get().GetNbranches() << "/" <<
+              m_tree4Hit->get().GetEntries())
+    }
+
+
+    /** returns a reference to the 2-hit-dataset so one can set the relevant values. */
+    FilterValueDataSet<SecIDPair>& get2HitDataSet() { return m_data2Hit; }
+
+
+    /** returns a reference to the 3-hit-dataset so one can set the relevant values. */
+    FilterValueDataSet<SecIDTriplet>& get3HitDataSet() { return m_data3Hit; }
+
+
+    /** returns a reference to the 4-hit-dataset so one can set the relevant values. */
+    FilterValueDataSet<SecIDQuadruplet>& get4HitDataSet() { return m_data4Hit; }
+
+
+    /** fill two-hit-combinations in tree, triggers an Error if values not set yet.
+     * (data is reset during each fill2Hit-call).*/
+    void fill2Hit()
+    {
+      if (!m_data2Hit.isValid()) {
+        B2ERROR("RawSecMapRootInterface::fill2Hit: attempt to fill invalid data in the tree! -> unintended behavior, data will not be filled.");
+        m_data2Hit.reset();
+        return;
+      }
+      m_tree2Hit->get().Fill();
+      m_data2Hit.reset();
+    }
+
+
+    /** fill three-hit-combinations in tree, triggers an Error if values not set yet.
+    * (data is reset during each fill3Hit-call).*/
+    void fill3Hit()
+    {
+      if (!m_data3Hit.isValid()) {
+        B2ERROR("RawSecMapRootInterface::fill3Hit: attempt to fill invalid data in the tree! -> unintended behavior, data will not be filled.");
+        m_data3Hit.reset();
+        return;
+      }
+      m_tree3Hit->get().Fill();
+      m_data3Hit.reset();
+    }
+
+
+    /** fill four-hit-combinations in tree, triggers an Error if values not set yet.
+     * (data is reset during each fill4Hit-call).*/
+    void fill4Hit()
+    {
+      if (!m_data4Hit.isValid()) {
+        B2ERROR("RawSecMapRootInterface::fill4Hit: attempt to fill invalid data in the tree! -> unintended behavior, data will not be filled.");
+        m_data4Hit.reset();
+        return;
+      }
+      m_tree4Hit->get().Fill();
+      m_data4Hit.reset();
+    }
+
+
+    /** write all trees to file at end of processing. */
+    void write(TFile* file)
+    {
+      B2DEBUG(1, "RawSecMapRootInterface::write: start")
+
+      if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
+        //use TFile you created in initialize()
+        m_tree2Hit->write(file);
+        m_tree3Hit->write(file);
+        m_tree4Hit->write(file);
+      }
     }
 
   };

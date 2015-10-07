@@ -207,10 +207,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
   } else {
     const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-    var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
+    setVariableIfNotNaN<named("fit_full")>(fitter.fit(observationsFull).getPValue());
 
     if (observationsNeigh.size() > 3) {
-      var<named("fit_neigh")>() = fitter.fit(observationsNeigh).getPValue();
+      setVariableIfNotNaN<named("fit_neigh")>(fitter.fit(observationsNeigh).getPValue());
     } else {
       var<named("fit_neigh")>() = 0;
     }
@@ -227,7 +227,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("max_hit_z_distance")>() = max_hit_z_distance;
   setVariableIfNotNaN<named("stereo_quad_tree_distance")>(stereo_quad_tree_distance);
 
-  var<named("pt_of_track")>() = std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D();
+  setVariableIfNotNaN<named("pt_of_track")>(std::isnan(trajectoryTrack.getAbsMom2D()) ? 0.0 : trajectoryTrack.getAbsMom2D());
   var<named("track_is_curler")>() = trajectoryTrack.getExit().hasNAN();
 
   var<named("superlayer_already_full")>() = not trajectoryTrack.getOuterExit().hasNAN() and hitsInSameRegion > 5;

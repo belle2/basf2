@@ -146,7 +146,7 @@ namespace Belle2 {
       template<int I>
       void setVariableIfNotNaN(const Float_t& value, const Float_t& valueIfNaN = 0)
       {
-        if (std::isnan(value)) {
+        if (std::isnan(value) or std::isinf(value)) {
           var<I>() = valueIfNaN;
         } else {
           var<I>() = value;

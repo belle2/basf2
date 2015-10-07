@@ -13,6 +13,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 
+#include <TLorentzVector.h>
+
 #include <vector>
 #include <set>
 
@@ -122,11 +124,19 @@ namespace Belle2 {
     const std::vector<Belle2::KLMCluster*> getKLMClusters() const;
 
     /**
+     * Get 4-momentum vector in lab system of all tracks and clusters in ROE
+     *
+     * @return total TLorentzVector in lab system of all tracks and clusters in ROE
+     */
+    TLorentzVector getROE4Vector() const;
+
+    /**
      * Get number of all remaining tracks.
      *
      * @return number of all remaining tracks
      */
-    int getNTracks(void) const {
+    int getNTracks(void) const
+    {
       return int(m_trackIndices.size());
     }
 
@@ -135,7 +145,8 @@ namespace Belle2 {
      *
      * @return number of all remaining ECL showers
      */
-    int getNECLClusters(void) const {
+    int getNECLClusters(void) const
+    {
       return int(m_eclClusterIndices.size());
     }
 
@@ -144,7 +155,8 @@ namespace Belle2 {
      *
      * @return number of all remaining KLM clusters
      */
-    int getNKLMClusters(void) const {
+    int getNKLMClusters(void) const
+    {
       return int(m_klmClusterIndices.size());
     }
 
@@ -157,8 +169,8 @@ namespace Belle2 {
   private:
 
     // persistent data members
-    std::set<int> m_trackIndices;       /**< StoreArray indices to unused tracks */
-    std::set<int> m_eclClusterIndices;  /**< StoreArray indices to unused ECLClusters */
+    std::set<int> m_trackIndices;      /**< StoreArray indices to unused tracks */
+    std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
     std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
     // TODO: add support for vee
 
@@ -170,7 +182,8 @@ namespace Belle2 {
     /**
      * Copies indices (elements) from "from" vector to "to" set
      */
-    void addIndices(const std::vector<int>& from, std::set<int>& to) {
+    void addIndices(const std::vector<int>& from, std::set<int>& to)
+    {
       for (unsigned i = 0; i < from.size(); i++)
         to.insert(from[i]);
     }

@@ -15,6 +15,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/logging/Logger.h>
 #include <iostream>
@@ -101,6 +102,47 @@ const std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
   }
 
   return remainKLMClusters;
+}
+
+TLorentzVector RestOfEvent::getROE4Vector() const
+{
+  std::vector<Track*> roeTracks = RestOfEvent::getTracks();
+  std::vector<ECLCluster*> roeClusters = RestOfEvent::getECLClusters();
+
+  TLorentzVector roe4Vector;
+
+  // Add all momentum from tracks
+  for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+    const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
+
+    if (!pid) {
+      B2ERROR("Track with no PID information!");
+      continue;
+    }
+
+    // At the moment (16.7.2015) only TrackFitResult with pion mass hypothesis available
+    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(pid->getMostLikely());
+
+    // Update energy of tracks (for future purpose)
+    /*
+    float tempMass = pid->getMostLikely().getMass();
+    TLorentzVector temp4Vector;
+    temp4Vector.SetVect(tfr->getMomentum());
+    temp4Vector.SetE(TMath::Sqrt(tfr->getMomentum().Mag2() + tempMass * tempMass));
+    roe4Vector += temp4Vector;
+    */
+
+    roe4Vector += tfr->get4Momentum();
+
+  }
+
+  // Add all momentum from neutral ECLClusters
+  for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+    if (roeClusters[iEcl]->isNeutral())
+      roe4Vector += roeClusters[iEcl]->get4Vector();
+  }
+
+  return roe4Vector;
 }
 
 void RestOfEvent::print() const

@@ -45,8 +45,6 @@ namespace Belle2 {
     /**
      * Returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
      * the signal photon yields the mass of the a neutral Pion.
-     *
-     * TODO: Check this
      */
     double pionVeto(const Particle* particle);
 
@@ -56,7 +54,7 @@ namespace Belle2 {
     double nROENeutralECLClusters(const Particle* particle);
 
     /**
-     * Returns number of lepton particles in the related RestOfEvent object
+     * Returns number of lepton particles in the related RestOfEvent object (counts particles and anti-particles)
      */
     double nROELeptons(const Particle* particle);
 
@@ -68,17 +66,50 @@ namespace Belle2 {
     /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2
      */
-    double ROEDeltaEnergyTag(const Particle* particle);
+    double ROEDeltaE(const Particle* particle);
 
     /**
      * Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2
      */
-    double ROEMassTag(const Particle* particle);
+    double ROEMbc(const Particle* particle);
 
     /**
-     * Returns total 4-momentum of the related RestOfEvent object
+     * Returns MC Errors for an artificial tag side particle, which corresponds to the ROE object
      */
-    TLorentzVector ROE4Vector(const Particle* particle);
+    double ROEMCErrors(const Particle* particle);
+
+    /**
+     * Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2
+     */
+    double correctedDeltaE(const Particle* particle);
+
+    /**
+     * Returns beam constrained mass of the signal side (reconstructed side + neutrino) with respect to E_cms/2
+     */
+    double correctedMbc(const Particle* particle);
+
+    /**
+     * Returns the missing mass squared. Two definitions exist:
+     * Option 0: (E)vent based missing mass: calculates the missing 4-momentum based on all the momentum and energy in the EVENT
+     * Option 1: (C)andidate based missing mass: calculates the missing 4-momentum based on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)
+     */
+    double ECMissingMass(const Particle* particle, const std::vector<double>& opt);
+
+    // ------------------------------------------------------------------------------
+    // Below are some functions for ease of usage, they are not a part of variables
+    // ------------------------------------------------------------------------------
+
+    /**
+     * Returns the missing 4-momentum vector in CMS system. Two definitions exist:
+     * Option 0: (E)vent based: calculates the missing 4-momentum based on all the momentum and energy in the EVENT
+     * Option 1: (C)andidate based: calculates the missing 4-momentum based on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)
+     */
+    TLorentzVector missing4VectorCMS(const Particle* particle, const std::vector<double>& opt);
+
+    /**
+     * Returns the neutrino 4-momentum vector. Mass of neutrino is 0 by definition: E = |p|.
+     */
+    TLorentzVector neutrino4Vector(const Particle* particle);
 
   }
 } // Belle2 namespace

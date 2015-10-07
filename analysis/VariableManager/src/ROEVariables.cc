@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -30,6 +31,9 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+
+// utility
+#include <analysis/utility/MCMatching.h>
 
 #include <iostream>
 
@@ -185,7 +189,7 @@ namespace Belle2 {
       // Get all Tracks in ROE
       const std::vector<Track*> roeTracks = roe->getTracks();
 
-      // Count tracks from leptons
+      // Count leptons
       for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
         const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
 
@@ -219,6 +223,7 @@ namespace Belle2 {
       const std::vector<Track*> roeTracks = roe->getTracks();
 
       for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+        // At the moment (16.7.2015) only TrackFitResult with pion mass hypothesis available
         const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(Const::ChargedStable(211));
         roeCharge += tfr->getChargeSign();
       }
@@ -226,28 +231,147 @@ namespace Belle2 {
       return roeCharge;
     }
 
-    double ROEDeltaEnergyTag(const Particle* particle)
+    double ROEDeltaE(const Particle* particle)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * ROE4Vector(particle);
+
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      TLorentzVector vec = T.rotateLabToCms() * roe->getROE4Vector();
 
       return T.getCMSEnergy() / 2 - vec.E();
     }
 
-    double ROEMassTag(const Particle* particle)
+    double ROEMbc(const Particle* particle)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * ROE4Vector(particle);
+
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      TLorentzVector vec = T.rotateLabToCms() * roe->getROE4Vector();
+
       double E = T.getCMSEnergy() / 2;
       double m2 = E * E - vec.Vect().Mag2();
       double mbc = m2 > 0 ? sqrt(m2) : 0;
+
       return mbc;
     }
 
-    TLorentzVector ROE4Vector(const Particle* particle)
+    double correctedDeltaE(const Particle* particle)
     {
-      TLorentzVector ROE4Vector;
+      PCmsLabTransform T;
+      TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+      TLorentzVector neutrino4vec = T.rotateLabToCms() * neutrino4Vector(particle);
+      double totalSigEnergy = (sig4vec + neutrino4vec).Energy();
+      double E = T.getCMSEnergy() / 2;
 
+      double deltaE = E - totalSigEnergy;
+
+      return deltaE;
+    }
+
+    double correctedMbc(const Particle* particle)
+    {
+      PCmsLabTransform T;
+      TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+      TLorentzVector neutrino4vec = T.rotateLabToCms() * neutrino4Vector(particle);
+      TVector3 totalSigMomentum = (sig4vec + neutrino4vec).Vect();
+      double E = T.getCMSEnergy() / 2;
+
+      double m2 = E * E - totalSigMomentum.Mag2();
+      double mbc = m2 > 0 ? sqrt(m2) : 0;
+
+      return mbc;
+    }
+
+    double ECMissingMass(const Particle* particle, const std::vector<double>& opt)
+    {
+      double missM2 = missing4VectorCMS(particle, opt).Mag2();
+
+      return missM2;
+    }
+
+    double ROEMCErrors(const Particle* particle)
+    {
+      StoreArray<Particle> particles;
+
+      //Get MC Particle of the other B meson
+      const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+
+      if (!mcParticle)
+        return -999;
+
+      const MCParticle* mcMother = mcParticle->getMother();
+
+      if (!mcMother)
+        return -999;
+
+      const std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
+
+      if (mcDaughters.size() != 2)
+        return -999;
+
+      const MCParticle* mcROE;
+      if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
+        mcROE = mcDaughters[1];
+      else
+        mcROE = mcDaughters[0];
+
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      // Load all Tracks and ECLClusters
+      const std::vector<Track*> roeTracks = roe->getTracks();
+      const std::vector<ECLCluster*> roeECL = roe->getECLClusters();
+
+      // Create artificial particle
+      Particle p(mcROE->get4Vector(), mcROE->getPDG());
+      Particle* newPart = particles.appendNew(p);
+
+      // Loop through ROE objects, create particles on ROE side
+      for (unsigned iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+        const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
+
+        if (!pid) {
+          B2ERROR("No PID information for this track!");
+          return -999;
+        }
+
+        Const::ChargedStable type(abs(pid->getMostLikely().getPDGCode()));
+        Particle p(roeTracks[iTrack], type);
+        Particle* tempPart = particles.appendNew(p);
+        newPart->appendDaughter(tempPart);
+      }
+
+      for (unsigned iECL = 0; iECL < roeECL.size(); iECL++) {
+        if (roeECL[iECL]->isNeutral()) {
+          Particle p(roeECL[iECL]);
+          Particle* tempPart = particles.appendNew(p);
+          newPart->appendDaughter(tempPart);
+        }
+      }
+
+      return MCMatching::getMCErrors(newPart, mcROE);
+    }
+
+    // ------------------------------------------------------------------------------
+    // Below are some functions for ease of usage, they are not a part of variables
+    // ------------------------------------------------------------------------------
+
+    TLorentzVector missing4VectorCMS(const Particle* particle, const std::vector<double>& opt)
+    {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
@@ -257,36 +381,58 @@ namespace Belle2 {
         return empty;
       }
 
-      // Get all ECLClusters in ROE
-      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
-
-      // Get all tracks in ROE
-      const std::vector<Track*> roeTracks = roe->getTracks();
-
-      // Add all momentum from tracks
-      for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
-        const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
-
-        if (!pid) {
-          B2ERROR("No PID information for this track!");
-          TLorentzVector empty;
-          return empty;
-        }
-
-        // At the moment (16.7.2015) only Pion TrackFitResult available
-        const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(pid->getMostLikely());
-        ROE4Vector += tfr->get4Momentum();
+      if (opt.size() != 1) {
+        B2ERROR("Number of arguments should be 1!");
+        TLorentzVector empty;
+        return empty;
       }
 
-      // Add all momentum from neutral ECLClusters
-      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-        if (roeClusters[iEcl]->isNeutral())
-          ROE4Vector += roeClusters[iEcl]->get4Vector();
+      double definition = opt[0];
+
+      PCmsLabTransform T;
+      TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+      TLorentzVector roe4vec = T.rotateLabToCms() * roe->getROE4Vector();
+
+      TLorentzVector miss4vec;
+      double E_beam_cms = T.getCMSEnergy() / 2.0;
+
+      // Definition 1:
+      if (definition == 0) {
+        miss4vec.SetVect(- (sig4vec.Vect() + roe4vec.Vect()));
+        miss4vec.SetE(2 * E_beam_cms - (sig4vec.Energy() + roe4vec.Energy()));
       }
 
-      return ROE4Vector;
+      // Definition 2:
+      else if (definition == 1) {
+        miss4vec.SetVect(- sig4vec.Vect());
+        miss4vec.SetE(E_beam_cms - sig4vec.Energy());
+      }
+
+      return miss4vec;
     }
 
+    TLorentzVector neutrino4Vector(const Particle* particle)
+    {
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        TLorentzVector empty;
+        return empty;
+      }
+
+      PCmsLabTransform T;
+      TLorentzVector sig4vec = particle->get4Vector();
+      TLorentzVector roe4vec = roe->getROE4Vector();
+
+      TLorentzVector neutrino4vec;
+
+      neutrino4vec.SetVect((-1) * (sig4vec.Vect() + roe4vec.Vect()));
+      neutrino4vec.SetE(neutrino4vec.Vect().Mag());
+
+      return neutrino4vec;
+    }
 
     VARIABLE_GROUP("Rest Of Event");
 
@@ -319,11 +465,27 @@ namespace Belle2 {
     REGISTER_VARIABLE("ROE_Charge", ROECharge,
                       "Returns total charge of the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_dEtag", ROEDeltaEnergyTag,
+    REGISTER_VARIABLE("ROE_deltaE", ROEDeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ROE_Mtag", ROEMassTag,
+    REGISTER_VARIABLE("ROE_Mbc", ROEMbc,
                       "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
+
+    REGISTER_VARIABLE("ROE_MCErrors", ROEMCErrors,
+                      "Returns MC Errors for an artificial particle, which corresponds to the ROE object.");
+
+    REGISTER_VARIABLE("correctedDeltaE", correctedDeltaE,
+                      "Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2.");
+
+    REGISTER_VARIABLE("correctedMbc", correctedMbc,
+                      "Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2");
+
+    REGISTER_VARIABLE("ECMissingMass(opt)", ECMissingMass,
+                      "Returns the missing mass squared. Two definitions exist:"
+                      "Option 0: (E)vent based missing mass: calculates the missing 4-momentum based"
+                      "					 on all the momentum and energy in the EVENT"
+                      "Option 1: (C)andidate based missing mass: calculates the missing 4-momentum based"
+                      "          on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)");
 
   }
 }

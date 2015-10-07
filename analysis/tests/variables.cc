@@ -289,7 +289,8 @@ namespace {
     // Neutral ECLCluster on reconstructed side
     ECLCluster myECL;
     myECL.setisTrack(false);
-    myECL.setEnergy(0.5);
+    float eclREC = 0.5;
+    myECL.setEnergy(eclREC);
     ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
     // Particle on reconstructed side from ECLCluster
@@ -299,8 +300,8 @@ namespace {
     // Create ECLCluster on ROE side
     ECLCluster myROEECL;
     myROEECL.setisTrack(false);
-    float eclE = 1.0;
-    myROEECL.setEnergy(eclE);
+    float eclROE = 1.0;
+    myROEECL.setEnergy(eclROE);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
 
     // Create KLMCluster on ROE side
@@ -350,15 +351,38 @@ namespace {
 
     // ROE variables
     PCmsLabTransform T;
+    float E0 = T.getCMSEnergy() / 2;
 
-    TLorentzVector p1lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + momentum.Mag2()));
-    TLorentzVector p2lab(0, 0, eclE, eclE);
+    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + momentum.Mag2()));
+    TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
+    TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
-    TLorentzVector p1 = T.rotateLabToCms() * p1lab;
-    TLorentzVector p2 = T.rotateLabToCms() * p2lab;
+    TLorentzVector rec4vec;
+    rec4vec.SetE(pECL_REC_Lab.E());
+    rec4vec.SetVect(pECL_REC_Lab.Vect());
 
-    float Etag = p1.E() + p2.E();
-    float Ptag2 = (p1.Vect() + p2.Vect()).Mag2();
+    TLorentzVector roe4vec;
+    roe4vec.SetE(pTrack_ROE_Lab.E() + pECL_ROE_Lab.E());
+    roe4vec.SetVect(pTrack_ROE_Lab.Vect() + pECL_ROE_Lab.Vect());
+
+    TLorentzVector rec4vecCMS = T.rotateLabToCms() * rec4vec;
+    TLorentzVector roe4vecCMS = T.rotateLabToCms() * roe4vec;
+
+    TLorentzVector m4v0;
+    m4v0.SetE(2 * E0 - (rec4vecCMS.E() + roe4vecCMS.E()));
+    m4v0.SetVect(- (rec4vecCMS.Vect() + roe4vecCMS.Vect()));
+
+    TLorentzVector m4v1;
+    m4v1.SetE(E0 - rec4vecCMS.E());
+    m4v1.SetVect(- rec4vecCMS.Vect());
+
+    TLorentzVector neutrino4vec;
+    neutrino4vec.SetVect(- (roe4vec.Vect() + rec4vec.Vect()));
+    neutrino4vec.SetE(neutrino4vec.Vect().Mag());
+
+    TLorentzVector neutrino4vecCMS = T.rotateLabToCms() * neutrino4vec;
+
+    TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
 
     // TESTS
     EXPECT_FLOAT_EQ(1.0, nROETracks(part));
@@ -367,8 +391,12 @@ namespace {
     EXPECT_FLOAT_EQ(1.0, nROEKLMClusters(part));
     EXPECT_FLOAT_EQ(1.0, nROELeptons(part));
     EXPECT_FLOAT_EQ(1.0, ROECharge(part));
-    EXPECT_FLOAT_EQ(T.getCMSEnergy() / 2 - Etag, ROEDeltaEnergyTag(part));
-    EXPECT_FLOAT_EQ(TMath::Sqrt(T.getCMSEnergy()*T.getCMSEnergy() / 4 - Ptag2), ROEMassTag(part));
+    EXPECT_FLOAT_EQ(E0 - roe4vecCMS.E(), ROEDeltaE(part));
+    EXPECT_FLOAT_EQ(TMath::Sqrt(E0 * E0 - roe4vecCMS.Vect().Mag2()), ROEMbc(part));
+    EXPECT_FLOAT_EQ(E0 - corrRec4vecCMS.E(), correctedDeltaE(part));
+    EXPECT_FLOAT_EQ(TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()), correctedMbc(part));
+    EXPECT_FLOAT_EQ(m4v0.Mag2(), ECMissingMass(part, {0}));
+    EXPECT_FLOAT_EQ(m4v1.Mag2(), ECMissingMass(part, {1}));
   }
 
 

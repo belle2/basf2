@@ -30,7 +30,7 @@ ClassImp(CDCWireHitTopology);
 
 CDCWireHitTopology& CDCWireHitTopology::getInstance()
 {
-  static StoreObjPtr<CDCWireHitTopology> instance("", DataStore::c_Persistent);
+  StoreObjPtr<CDCWireHitTopology> instance("", DataStore::c_Persistent);
   if (not instance.isValid()) {
     B2FATAL("CDCWireHitTopology could not by found in the StoreArray! Have you added the WireHitTopologyPreparer module?");
   }

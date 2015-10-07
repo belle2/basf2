@@ -135,10 +135,6 @@ class FastBDTClassifier(object):
                                      in variable_names
                                      if "truth" not in name or name in select]
 
-        spectator_names = [name for name
-                           in variable_names
-                           if "truth" in name and name not in select]
-
         if "weight" in truth_free_variable_names and "weight" not in select:
             truth_free_variable_names.remove("weight")
 
@@ -150,9 +146,6 @@ class FastBDTClassifier(object):
                 variable_expression = variable_name
 
             factory.AddVariable(variable_expression)
-
-        for spectator_name in spectator_names:
-            factory.AddSpectator(spectator_name)
 
         if "weight" in column_names and "weight" not in exclude:
             get_logger().info("Setting weight column")

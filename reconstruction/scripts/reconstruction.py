@@ -78,6 +78,9 @@ def add_track_finding(path, components=None):
     """
     Adds the realistic track finding to the path.
     """
+
+    from trackfindingcdc.modules import add_cdc_tracking
+
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
@@ -90,9 +93,7 @@ def add_track_finding(path, components=None):
         if use_vxd:
             cdc_trackcands = 'CDCGFTrackCands'
         trackcands = cdc_trackcands
-        cdc_trackfinder = register_module('Trasan')
-        cdc_trackfinder.param('GFTrackCandidatesColName', cdc_trackcands)
-        path.add_module(cdc_trackfinder)
+        add_cdc_tracking(path, trackcands)
 
     # VXD track finder
     if use_vxd:
@@ -183,7 +184,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
 
     # track fitting
     trackfitter = register_module('GenFitter')
-    trackfitter.param('BuildBelle2Tracks', False)
+    trackfitter.param({'BuildBelle2Tracks': False,
+                       "PDGCodes": [211]})
     path.add_module(trackfitter)
 
     # create Belle2 Tracks from the genfit Tracks

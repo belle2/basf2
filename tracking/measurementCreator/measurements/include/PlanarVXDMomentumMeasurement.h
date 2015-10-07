@@ -14,6 +14,7 @@
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimation.h>
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimationTools.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
 
 
@@ -26,11 +27,14 @@ namespace Belle2 {
   class PlanarVXDMomentumMeasurement : public PlanarMomentumMeasurement {
 
   public:
-    PlanarVXDMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit, const RecoTrack* recoTrack) :
+    PlanarVXDMomentumMeasurement(const genfit::PlanarMeasurement& parentElement, HitType* hit, const Belle2::RecoTrack* recoTrack) :
       PlanarMomentumMeasurement(parentElement), m_hit(hit), m_recoTrack(recoTrack)
     {
       rawHitCoords_.ResizeTo(1);
       rawHitCov_.ResizeTo(1, 1);
+
+      setHitId(hit->getArrayIndex());
+      setDetId(getDetId());
     }
 
     /** Clone the measurement */
@@ -75,6 +79,12 @@ namespace Belle2 {
       m_useTrackingSeeds = useTrackingSeeds;
     }
 
+    /** Get the underlaying hit (cluster) */
+    HitType* getHit() const
+    {
+      return m_hit;
+    }
+
   private:
     /** Parameters for the main function */
     typename VXDMomentumEstimation<HitType>::FitParameters m_fitParameters;
@@ -93,6 +103,12 @@ namespace Belle2 {
     HitType* m_hit = nullptr;
     /** RecoTrack for which the hit is created */
     const RecoTrack* m_recoTrack = nullptr;
+
+    /// Return the detector ID
+    int getDetId() const
+    {
+      return -1;
+    }
   };
 
   template <class HitType>
@@ -171,6 +187,20 @@ namespace Belle2 {
     genfit::MeasurementOnPlane* mop = new genfit::MeasurementOnPlane(rawHitCoordinates, rawHitCovariance,
         state.getPlane(), state.getRep(), constructHMatrix(state.getRep()));
     return {mop};
+  }
+
+  /// Specialisation for PXD clusters
+  template<>
+  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
+  {
+    return Belle2::Const::PXD;
+  }
+
+  /// Specialisation for SVD clusters
+  template<>
+  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
+  {
+    return Belle2::Const::SVD;
   }
 
 }

@@ -36,7 +36,7 @@ namespace Belle2 {
     }
 
     /** Clone */
-    virtual genfit::AbsMeasurement* clone() const {return new PlanarMomentumMeasurement(*this);}
+    virtual genfit::AbsMeasurement* clone() const override {return new PlanarMomentumMeasurement(*this);}
 
     /** Construct the QP matrix */
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep* rep) const override

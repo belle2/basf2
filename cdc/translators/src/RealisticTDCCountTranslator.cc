@@ -41,7 +41,7 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   // translate TDC Count into time information:
   // N.B. 0.5 is necessary since real TDC module rounds down the time.
   //  float driftTime = (static_cast<float>(m_tdcOffset - (tdcCount + 0.5))) * m_tdcBinWidth;
-  float driftTime = (m_cdcp.getT0(wireID) - (tdcCount + 0.5)) * m_tdcBinWidth;
+  float driftTime = m_cdcp.getT0(wireID) - (tdcCount + 0.5) * m_tdcBinWidth;
   //  std::cout << "t0= " << m_cdcp.getT0(wireID) << std::endl;
 
   unsigned short layer = wireID.getICLayer();

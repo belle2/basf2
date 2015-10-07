@@ -129,7 +129,6 @@ namespace Belle2 {
 
     double m_tdcBinWidth;       /**< Width of a TDC bin (in ns)*/
     double m_tdcBinWidthInv;    /**< m_tdcBinWidth^-1 (in ns^-1)*/
-    double m_tdcBinHwidth;      /**< Half width of a TDC bin (in ns)*/
     double m_tdcResol;          /**< TDC resolution (in ns)*/
     double m_driftV;            /**< Nominal drift velocity (in cm/ns)*/
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/

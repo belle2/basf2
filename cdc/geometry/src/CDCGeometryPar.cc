@@ -235,7 +235,7 @@ void CDCGeometryPar::read()
 
   //Set various quantities (should be moved to CDC.xml later...)
   m_tdcOffset = 8192;  //for common-stop mode; to be adjused later
-  m_tdcBinWidth = 1.0;  //in ns
+  m_tdcBinWidth = 1. / 1.016;  //in ns
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)

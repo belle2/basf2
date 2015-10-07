@@ -34,7 +34,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 //  m_tdcOffset(0.0), m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
   m_cdcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
-  m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0), m_tdcBinHwidth(0.5),
+  m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
   m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true)
 {
@@ -118,7 +118,6 @@ void CDCDigitizerModule::initialize()
   //  m_tdcOffset    = cdcp.getTdcOffset();
   m_tdcBinWidth  = cdcp.getTdcBinWidth();
   m_tdcBinWidthInv = 1. / m_tdcBinWidth;
-  m_tdcBinHwidth = m_tdcBinWidth / 2.;
   m_tdcResol     = m_tdcBinWidth / sqrt(12.);
   m_driftV       = cdcp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
@@ -136,7 +135,6 @@ void CDCDigitizerModule::initialize()
   cout << "CDCDigitizer initialize" << endl;
   //  cout << "m_tdcOffset= " <<  m_tdcOffset << endl;
   cout << "m_tdcBinWidth= " <<  m_tdcBinWidth << endl;
-  cout << "m_tdcBinHwidth= " <<  m_tdcBinHwidth << endl;
   cout << "m_tdcResol= " <<  m_tdcResol << endl;
   cout << "m_driftV= " <<  m_driftV << endl;
   cout << "m_driftVInv= " <<  m_driftVInv << endl;

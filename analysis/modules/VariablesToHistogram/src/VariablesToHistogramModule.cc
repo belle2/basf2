@@ -67,7 +67,7 @@ void VariablesToHistogramModule::initialize()
     float high = 0;
     std::tie(varStr, varNbins, low, high) = varTuple;
     std::string compatibleName = Variable::makeROOTCompatible(varStr);
-    auto ptr = std::unique_ptr<StoreObjPtr<RootMergeable<TH1F>>>(new StoreObjPtr<RootMergeable<TH1F>>("", DataStore::c_Persistent));
+    auto ptr = std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>(new StoreObjPtr<RootMergeable<TH1D>>("", DataStore::c_Persistent));
     ptr->registerInDataStore(m_fileName + varStr, DataStore::c_DontWriteOut);
     ptr->construct(compatibleName.c_str(), compatibleName.c_str(), varNbins, low, high);
     m_hists.push_back(std::move(ptr));

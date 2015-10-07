@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TFile.h>
 
 #include <string>
@@ -54,7 +54,7 @@ namespace Belle2 {
     /** ROOT file for output. */
     TFile* m_file;
     /** The ROOT TH1Fs for output. */
-    std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH1F>>>> m_hists;
+    std::vector<std::unique_ptr<StoreObjPtr<RootMergeable<TH1D>>>> m_hists;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

@@ -90,7 +90,7 @@ class SvnExternalsCache(object):
         try:
             prop = check_output(["git", "svn", "propget", "-r%s" % current_revision, "svn:externals", path])
 
-            for line in prop.splitlines():
+            for line in prop.decode().splitlines():
                 if not line.strip():
                     continue
                 else:

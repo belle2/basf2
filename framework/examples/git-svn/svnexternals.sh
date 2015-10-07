@@ -6,7 +6,10 @@
 
 DIRNAME=`dirname $0`
 PYTHON=python3
-if [ -n "$VIRTUAL_ENV" ]; then
+if [ -n "$BELLE2_EXTERNALS_DIR" ]; then
+    PYTHON=$BELLE2_EXTERNALS_DIR/$BELLE2_ARCH/common/bin/python3
+fi
+if [ -n "$VIRTUAL_ENV" ] && [ -e "$VIRTUAL_ENV/bin/python3" ]; then
     PYTHON=$VIRTUAL_ENV/bin/python3
 fi
 

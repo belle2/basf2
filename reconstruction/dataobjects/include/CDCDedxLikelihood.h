@@ -29,7 +29,8 @@ namespace Belle2 {
         m_cdcLogl[i] = 0.0;
     }
 
-    CDCDedxLikelihood(const double* cdcLogl): RelationsObject()
+    /** actually const double (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
+    explicit CDCDedxLikelihood(const double* cdcLogl): RelationsObject()
     {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++)

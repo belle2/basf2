@@ -29,7 +29,6 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <vxd/geometry/GeoCache.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <genfit/TrackCand.h>
@@ -173,7 +172,6 @@ void CDCDedxPIDModule::initialize()
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
-  VXD::GeoCache::getInstance();
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
     B2FATAL("Need to have SetupGenfitExtrapolationModule in path before this one.");
@@ -247,7 +245,6 @@ void CDCDedxPIDModule::event()
     }
 
     // get momentum (at origin) from fit result
-    const TVector3& trackPos = fitResult->getPosition();
     const TVector3& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.Mag();
     dedxTrack->m_cosTheta = trackMom.CosTheta();

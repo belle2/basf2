@@ -29,7 +29,8 @@ namespace Belle2 {
         m_vxdLogl[i] = 0.0;
     }
 
-    VXDDedxLikelihood(const double* vxdLogl): RelationsObject()
+    /** actually const double (&logl)[Const::ChargedStable::c_SetSize], but CINT complains. */
+    explicit VXDDedxLikelihood(const double* vxdLogl): RelationsObject()
     {
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++)

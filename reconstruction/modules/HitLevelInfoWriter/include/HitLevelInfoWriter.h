@@ -88,7 +88,7 @@ namespace Belle2 {
     int m_nhitsused; /**< the total number of hits for this Track */
     int m_nhits; /**< the number of good hits for this Track */
 
-    double m_trackDist; /**< the total distance traveled by the track */
+    //    double m_trackDist; /**< the total distance traveled by the track */
 
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean */
@@ -110,8 +110,8 @@ namespace Belle2 {
     double m_cosTheta; /**< cos(theta) for the track */
 
     double m_PDG;        /**< MC PID */
-    double m_motherPDG; /**< MC PID of mother particle */
-    double m_pTrue;     /**< MC true momentum */
+    //    double m_motherPDG; /**< MC PID of mother particle */
+    //    double m_pTrue;     /**< MC true momentum */
 
     // hit level information (references on nhits)
     static const int kMaxHits = 100; /**< default hit level index */

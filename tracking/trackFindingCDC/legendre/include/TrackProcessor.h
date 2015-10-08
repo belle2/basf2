@@ -108,6 +108,8 @@ namespace Belle2 {
 
       void unmaskHitsInTrack(CDCTrack& track);
 
+      void postprocessTrack(CDCTrack& track);
+
       /**
        * Get the list with currently stored tracks.
        */
@@ -193,6 +195,8 @@ namespace Belle2 {
 
 
       }
+
+      CDCRiemannFitter& getFitter() {return m_trackFitter;};
 
     private:
       std::list<CDCTrack> m_cdcTracks; /**< List of track candidates. */

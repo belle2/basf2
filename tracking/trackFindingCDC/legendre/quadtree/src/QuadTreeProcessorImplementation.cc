@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorImplementation.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
@@ -62,7 +61,7 @@ bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCRecoSegment2
   // cppcheck-suppress arrayIndexOutOfBounds
   dist[1][1] = rMax - rHitFrontMax;
 
-  if (FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
+  if (sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
     return false;
   }
 
@@ -78,7 +77,7 @@ bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCRecoSegment2
   // cppcheck-suppress arrayIndexOutOfBounds
   dist[1][1] = rMax - rHitBackMax;
 
-  if (FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
+  if (sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
     return false;
   }
 

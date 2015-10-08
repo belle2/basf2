@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
@@ -29,14 +28,14 @@ namespace Belle2 {
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
    */
-  class TrackFinderCDCLegendreModule: virtual public TrackFinderCDCBaseModule {
+  class CDCLegendreTrackingModule: virtual public TrackFinderCDCBaseModule {
 
   public:
 
     /** Constructor.
      *  Create and allocate memory for variables here. Add the module parameters in this method.
      */
-    TrackFinderCDCLegendreModule();
+    CDCLegendreTrackingModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
@@ -59,14 +58,9 @@ namespace Belle2 {
     const unsigned long m_nbinsTheta =
       pow(2, 16); /**< hardcoded value!!! temporary solution, for avoiding segfaults only  //static_cast<int>(std::pow(2.0, m_maxLevel + 3)); //+3 needed for make bin overlapping; */
 
-    int m_track1Run;
-    int m_track2Run;
-    int m_track3Run;
-
     std::vector<TrackFindingCDC::CDCRecoSegment2D> m_segments;
 
 
-    TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */
     TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
     TrackFindingCDC::TrackProcessorNew m_trackProcessor; /**< Object for creating tracks */
 
@@ -126,6 +120,7 @@ namespace Belle2 {
 
     void postprocessSingleNode(std::vector<TrackFindingCDC::QuadTreeHitWrapper*>&, bool,
                                TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);
+
 
   };
 

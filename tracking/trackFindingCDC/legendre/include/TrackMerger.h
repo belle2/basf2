@@ -10,19 +10,17 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
-
 #include <list>
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class LegendreHit;
     class CDCTrack;
     class CDCRecoHit3D;
-    class Vector2D;
     class CDCWireHit;
+    class CDCTrajectory2D;
+    class TrackProcessorNew;
 
     class TrackMergerNew {
     public:
@@ -30,26 +28,20 @@ namespace Belle2 {
       /**
        * This class is to be used static only.
        */
-      TrackMergerNew() = delete;
+      TrackMergerNew(TrackProcessorNew& trackProcessor): m_trackProcessor(trackProcessor) {};
+
+      ~TrackMergerNew() {};
+
+      /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
+      void doTracksMerging(std::list<CDCTrack>& trackList);
+
+      /** Try to merge given track with tracks in tracklist. */
+      void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList);
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& trackCandidate);
-
-      /** Tries to split back-to-back tracks into two different tracks */
-      static bool checkBack2BackTrack(CDCTrack& trackCandidate);
-
-      static ESign getChargeSign(CDCTrack& track) ;
-
-      static ESign getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
-
-      static double getPhi(const CDCRecoHit3D& hit) ;
-
-      static void deleteAllMarkedHits(CDCTrack& track);
-
-      static bool mergeTwoTracks(CDCTrack& track1, CDCTrack& track2);
+//      CDCTrack& splitBack2BackTrack(CDCTrack& track);
 
     private:
-
 
 
       /** Some typedefs for the results of the merging process */
@@ -59,15 +51,46 @@ namespace Belle2 {
       typedef std::pair<CDCTrack*, Probability> BestMergePartner;
 
       /**
+       * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
+       * The hit sorting is not maintained.
+       */
+      void mergeTracks(CDCTrack& track1, CDCTrack& track2);
+
+      /**
+       * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.
+       * @param factor gives a number how far the hit is allowed to be.
+       */
+      void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
+
+      /** Try to merge the two tracks
+       * For this, build a common hit list and do a fast fit.
+       * Then, throw away hits with a very high distance and fit again. Repeat this process three times.
+       * As a result. the reduced probability for a good fit is given.
+       * The bad hits are marked but none of them is deleted!
+       * This method does not do the actual merging. */
+      double doTracksFitTogether(CDCTrack& track1, CDCTrack& track2);
+
+      /**
+       * Searches for the best candidate to merge this track to.
+       * @param trackCandidateToBeMerged
+       * @param start_iterator the iterator where to start searching (this element included)
+       * @return a pointer to the best fit candidate.
+       */
+      BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
+                                                 std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator);
+
+      /**
        * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
        * @param otherTrackCandidate to reset
        */
-      static void resetHits(CDCTrack& otherTrackCandidate);
+      void resetHits(CDCTrack& track);
 
       /**
        * This parameter is the minimum probability a fit must have to lead to the result: merge
        */
-      static constexpr double m_minimum_probability_to_be_merged = 0.3;
+      static constexpr double m_minimum_probability_to_be_merged = 0.85;
+
+      TrackProcessorNew& m_trackProcessor;
     };
   }
 }

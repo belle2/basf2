@@ -11,10 +11,10 @@
 
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 
-#include <tracking/trackFindingCDC/legendre/TrackMerger.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include "../include/TrackHitsProcessor.h"
 #include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
 
 using namespace std;

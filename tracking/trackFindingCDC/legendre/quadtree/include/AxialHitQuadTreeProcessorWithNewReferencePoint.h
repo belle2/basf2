@@ -10,8 +10,9 @@
 
 
 #pragma once
+#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
@@ -23,7 +24,7 @@ namespace Belle2 {
     class TrackHit;
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, TrackHit, 2, 2> {
+    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, QuadTreeHitWrapper, 2, 2> {
 
     public:
 
@@ -40,22 +41,22 @@ namespace Belle2 {
 
     public:
 
-      void provideItemsSet(std::vector<TrackHit*>& itemsVector) override final
+      void provideItemsSet(std::vector<QuadTreeHitWrapper*>& itemsVector) override final
       {
         clear();
 
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
         quadtreeItemsVector.reserve(itemsVector.size());
-        for (TrackHit* item : itemsVector) {
-          if (item->getHitUsage() != TrackHit::c_notUsed) continue;
+        for (QuadTreeHitWrapper* item : itemsVector) {
+          if (item->getUsedFlag()) continue;
           if (insertItemInNode(m_quadTree, item, 0, 0))
             quadtreeItemsVector.push_back(new ItemType(item));
         }
       }
 
-      std::vector<TrackHit*> getAssignedHits()
+      std::vector<QuadTreeHitWrapper*> getAssignedHits()
       {
-        std::vector<TrackHit*> itemsToReturn;
+        std::vector<QuadTreeHitWrapper*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
         for (ItemType* item : m_quadTree->getItemsVector()) {
@@ -68,7 +69,8 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      inline bool insertItemInNode(QuadTree* node, TrackHit* hit, unsigned int /*t_index*/, unsigned int /*r_index*/) const override final
+      inline bool insertItemInNode(QuadTree* node, QuadTreeHitWrapper* hit, unsigned int /*t_index*/,
+                                   unsigned int /*r_index*/) const override final
       {
         float dist_1[2][2];
         float dist_2[2][2];

@@ -11,7 +11,6 @@
 
 #pragma once
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
@@ -547,7 +546,7 @@ namespace Belle2 {
                       + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMax());
 
 
-        float rMean = node->getYMean();
+//        float rMean = node->getYMean();
 
         if ((rMinD > 0) && (rMaxD * rMinD >= 0)) return true;
         if ((rMaxD * rMinD < 0)) return true;

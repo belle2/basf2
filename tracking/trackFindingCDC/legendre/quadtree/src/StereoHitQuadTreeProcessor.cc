@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/quadtree/StereoHitQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -32,5 +31,5 @@ bool StereoHitQuadTreeProcessor::insertItemInNode(QuadTree* node, const CDCRecoH
   dist[1][0] = perpS * inverseSlopeMax - reconstructedZ + zMin;
   dist[1][1] = perpS * inverseSlopeMax - reconstructedZ + zMax;
 
-  return !FastHough::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
+  return !sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1]);
 }

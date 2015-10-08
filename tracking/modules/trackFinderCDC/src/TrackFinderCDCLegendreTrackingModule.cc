@@ -11,12 +11,12 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreTrackingModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreFastHough.h>
+#include <tracking/trackFindingCDC/legendre/TrackMerger.h>
+#include <tracking/trackFindingCDC/legendre/ConformalExtension.h>
+
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/TrackQuality.h>
-#include <tracking/trackFindingCDC/legendre/TrackMerger.h>
-
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
@@ -27,16 +27,17 @@
 
 #include <genfit/TrackCand.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include "../../../trackFindingCDC/legendre/include/TrackHitsProcessor.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 //ROOT macro
-REG_MODULE(TrackFinderCDCLegendre)
+REG_MODULE(CDCLegendreTracking);
 
-TrackFinderCDCLegendreModule::TrackFinderCDCLegendreModule() :
-  TrackFinderCDCBaseModule(), m_cdcLegendreTrackProcessor(), m_cdcLegendreTrackDrawer(nullptr), m_trackProcessor()
+CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
+  TrackFinderCDCBaseModule(), m_cdcLegendreTrackDrawer(nullptr), m_trackProcessor()
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -76,7 +77,7 @@ TrackFinderCDCLegendreModule::TrackFinderCDCLegendreModule() :
            "Enable batch mode for track drawer. (Done with gROOT->SetBatch())", false);
 }
 
-void TrackFinderCDCLegendreModule::initialize()
+void CDCLegendreTrackingModule::initialize()
 {
   TrackFinderCDCBaseModule::initialize();
 
@@ -85,15 +86,10 @@ void TrackFinderCDCLegendreModule::initialize()
   m_cdcLegendreTrackDrawer->initialize();
 
   // set parameters of track processor
-  m_cdcLegendreTrackProcessor.setTrackDrawer(m_cdcLegendreTrackDrawer);
-
-  m_track1Run = 0;
-  m_track2Run = 0;
-  m_track3Run = 0;
 
 }
 
-void TrackFinderCDCLegendreModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   startNewEvent();
   findTracks();
@@ -101,7 +97,7 @@ void TrackFinderCDCLegendreModule::generate(std::vector<Belle2::TrackFindingCDC:
   clearVectors();
 }
 
-void TrackFinderCDCLegendreModule::startNewEvent()
+void CDCLegendreTrackingModule::startNewEvent()
 {
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
   m_cdcLegendreTrackDrawer->event();
@@ -120,14 +116,16 @@ void TrackFinderCDCLegendreModule::startNewEvent()
 
 
   B2DEBUG(100, "Initializing hits");
-//  m_cdcLegendreTrackProcessor.initializeHitListFromWireHitTopology();
   m_trackProcessor.initializeQuadTreeHitWrappers();
 
 
 }
 
-void TrackFinderCDCLegendreModule::findTracks()
+void CDCLegendreTrackingModule::findTracks()
 {
+
+  TrackMergerNew trackMerger(m_trackProcessor);
+
   /*
     B2DEBUG(100, "Perform track finding");
     for(CDCRecoSegment2D& segment: m_segments){
@@ -141,75 +139,28 @@ void TrackFinderCDCLegendreModule::findTracks()
     }
   */
 
-  int nTracksBefore = m_trackProcessor.getTracks().size();
-  // The first case is somewhat special
   doTreeTrackFinding(50, 0.07, false);
-//  if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
-//    postprocessTracks();
-  int nTracksAfter = m_trackProcessor.getTracks().size();
+
   m_trackProcessor.assignNewHits();
-  /*  for(CDCTrack& track: m_trackProcessor.getTracks()){
-      if(track.size() > 3){
-        TrackQuality trackQuality(track);
-        m_trackProcessor.updateTrack(track);
-      }
-  //    TrackMergerNew::deleteAllMarkedHits(track);
-    }
 
-    m_trackProcessor.mergeTracks();
-  */
-  m_track1Run += nTracksAfter - nTracksBefore;
-
-  nTracksBefore = nTracksAfter;
   doTreeTrackFinding(50, 0.07, true);
-//  if (m_treeFindingNumber == 1 || m_doPostprocessingOften)
-//    postprocessTracks();
-  nTracksAfter = m_trackProcessor.getTracks().size();
-//  m_trackProcessor.assignNewHits();
-  /*  for(CDCTrack& track: m_trackProcessor.getTracks()){
-      if(track.size() > 3){
-        TrackQuality trackQuality(track);
-        m_trackProcessor.updateTrack(track);
-      }
-  //    TrackMergerNew::deleteAllMarkedHits(track);
-    }
-  */
-//  m_trackProcessor.mergeTracks();
 
-  m_track2Run += nTracksAfter - nTracksBefore;
+  m_trackProcessor.mergeTracks();
+  trackMerger.doTracksMerging(m_trackProcessor.getTracks());
 
-  nTracksBefore = nTracksAfter;
   for (int counter = 1; counter < m_treeFindingNumber; counter++) {
     doTreeTrackFinding((m_treeFindingNumber - counter) * 20, 0.15, true);
 //    if (counter == m_treeFindingNumber - 1 || m_doPostprocessingOften)
 //      postprocessTracks();
     m_trackProcessor.assignNewHits();
-    /*    for(CDCTrack& track: m_trackProcessor.getTracks()){
-          if(track.size() > 3){
-            TrackQuality trackQuality(track);
-            m_trackProcessor.updateTrack(track);
-          }
-    //      TrackMergerNew::deleteAllMarkedHits(track);
-        }
-    */
-//    m_trackProcessor.mergeTracks();
   }
-  nTracksAfter = m_trackProcessor.getTracks().size();
-//  m_trackProcessor.mergeTracks();
 
-  m_track3Run += nTracksAfter - nTracksBefore;
-
-
-  m_trackProcessor.assignNewHits();
-
-
-
-//  for(CDCTrack& track: m_trackProcessor.getTracks()){
   m_trackProcessor.doForAllTracks([&](CDCTrack & track) {
-    return;
+//   return;
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
-
+      TrackHitsProcessor::splitBack2BackTrack(track);
+      m_trackProcessor.updateTrack(track);
       std::vector<const CDCWireHit*> hitsToSplit;
 
       for (CDCRecoHit3D& hit : track) {
@@ -218,7 +169,7 @@ void TrackFinderCDCLegendreModule::findTracks()
         }
       }
 
-      TrackMergerNew::deleteAllMarkedHits(track);
+      TrackHitsProcessor::deleteAllMarkedHits(track);
 
       for (const CDCWireHit* hit : hitsToSplit) {
         hit->getAutomatonCell().setMaskedFlag(false);
@@ -234,7 +185,9 @@ void TrackFinderCDCLegendreModule::findTracks()
   for (CDCTrack& track : m_trackProcessor.getTracks()) {
     m_trackProcessor.updateTrack(track);
   }
+
   m_trackProcessor.mergeTracks();
+  trackMerger.doTracksMerging(m_trackProcessor.getTracks());
 
   m_trackProcessor.assignNewHits();
 
@@ -242,16 +195,15 @@ void TrackFinderCDCLegendreModule::findTracks()
 
 }
 
-void TrackFinderCDCLegendreModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   //create GenFit Track candidates
-//  m_cdcLegendreTrackProcessor.createCDCTrackCandidates(tracks);
   m_trackProcessor.createCDCTracks(tracks);
   m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
 
-void TrackFinderCDCLegendreModule::doTreeTrackFinding(unsigned int limitInitial, double rThreshold, bool increaseThreshold)
+void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, double rThreshold, bool increaseThreshold)
 {
 
 
@@ -284,22 +236,18 @@ void TrackFinderCDCLegendreModule::doTreeTrackFinding(unsigned int limitInitial,
 
 
   BasePrecisionFunction::PrecisionFunction currentFunct;
-//  currentFunct = originPrecisionFunction.getFunction();
-//  if (*not increaseThreshold) currentFunct = originPrecisionFunction.getFunction();
-//  else currentFunct = nonOriginPrecisionFunction.getFunction();
   currentFunct = originPrecisionFunction.getFunction();
 
   AxialHitQuadTreeProcessor::ChildRanges ranges;
-//  ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 15)), AxialHitQuadTreeProcessor::rangeY(m_rMin, m_rMax));
   ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0.,  0.30));
 
 
-  bool symmetricalKappa(true);
+//  bool symmetricalKappa(true);
 
   if ((rThreshold == 0.07) and (not increaseThreshold)) {
     currentFunct = originPrecisionFunction.getFunction();
     ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15));
-    symmetricalKappa = true;
+//    symmetricalKappa = true;
   } else if ((rThreshold == 0.07) and increaseThreshold) {
     currentFunct = nonOriginPrecisionFunction.getFunction();
     ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15));
@@ -432,9 +380,6 @@ void TrackFinderCDCLegendreModule::doTreeTrackFinding(unsigned int limitInitial,
   qtProcessor.clearSeededTree();
 
   //sort tracks by value of curvature
-  m_cdcLegendreTrackProcessor.sortTrackList();
-
-  // ?????
   std::vector<TrackHit*> hits_vector; //temporary array;
   m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
 
@@ -445,21 +390,35 @@ void TrackFinderCDCLegendreModule::doTreeTrackFinding(unsigned int limitInitial,
 }
 
 
-void TrackFinderCDCLegendreModule::postprocessSingleNode(std::vector<TrackFindingCDC::QuadTreeHitWrapper*>& candidateHits,
-                                                         bool __attribute__((unused)) increaseThreshold, AxialHitQuadTreeProcessor::QuadTree* __attribute__((unused)) qt)
+void CDCLegendreTrackingModule::postprocessSingleNode(std::vector<QuadTreeHitWrapper*>& candidateHits,
+                                                      bool __attribute__((unused)) increaseThreshold, AxialHitQuadTreeProcessor::QuadTree* __attribute__((unused)) qt)
 {
 
   for (QuadTreeHitWrapper* hit : candidateHits) {
     hit->setUsedFlag(false);// setHitUsage(TrackHit::c_notUsed);
   }
 
-  m_trackProcessor.createCDCTrackCandidates(candidateHits);
+//  m_trackProcessor.createCDCTrackCandidates(candidateHits);
+//  return;
+
+  ConformalExtension conformalExtension(&m_trackProcessor);
+
+  std::vector<const CDCWireHit*> cdcWireHits;
+
+  for (QuadTreeHitWrapper* hit : candidateHits) {
+    cdcWireHits.push_back(hit->getCDCWireHit());
+  }
+
+  conformalExtension.newRefPoint(cdcWireHits, true);
+
+  m_trackProcessor.createCandidate(cdcWireHits);
   return;
 
 }
 
-void TrackFinderCDCLegendreModule::postprocessTracks()
+void CDCLegendreTrackingModule::postprocessTracks()
 {
+  /*
   if (m_deleteHitsInTheEnd) {
     m_cdcLegendreTrackProcessor.deleteHitsOfAllBadTracks();
   }
@@ -475,21 +434,17 @@ void TrackFinderCDCLegendreModule::postprocessTracks()
   if (m_appendHitsInTheEnd) {
     m_cdcLegendreTrackProcessor.appendHitsOfAllTracks();
   }
+  */
 }
 
-void TrackFinderCDCLegendreModule::terminate()
+void CDCLegendreTrackingModule::terminate()
 {
-  B2INFO("Tracks in runs:");
-  B2INFO("	run 1: " << m_track1Run);
-  B2INFO("	run 2: " << m_track2Run);
-  B2INFO("	run 3: " << m_track3Run);
 
 //  m_trackProcessor.saveHist();
   delete m_cdcLegendreTrackDrawer;
 }
 
-void TrackFinderCDCLegendreModule::clearVectors()
+void CDCLegendreTrackingModule::clearVectors()
 {
-  m_cdcLegendreTrackProcessor.clearVectors();
   m_trackProcessor.clearVectors();
 }

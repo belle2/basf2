@@ -22,6 +22,10 @@ namespace Belle2 {
     class TrackCandidate;
     class TrackHit;
 
+    class CDCTrajectory2D;
+    class CDCWireHit;
+    class CDCTrack;
+
     class TrackFitter {
     public:
       /**
@@ -37,6 +41,15 @@ namespace Belle2 {
         std::pair<double, double>& ref_point,
         bool with_drift_time = false) const;
 
+      double fitTrackCandidateFast(
+        std::vector<const CDCWireHit*>& hits,
+        std::pair<double, double>& track_par,
+        std::pair<double, double>& ref_point);
+
+
+      static double fitTrackCandidateFast(
+        std::vector<std::pair<std::pair<double, double>, double>>& hits);
+
       /**
        * @brief Perform fast circular fitting
        * @param track Track candidate which are going to be fitted
@@ -45,6 +58,11 @@ namespace Belle2 {
       void fitTrackCandidateFast(
         TrackCandidate* track,
         bool with_drift_time = false) const;
+
+      static CDCTrajectory2D fitCDCTrackWhithoutRecoPos(CDCTrack& track);
+
+      static CDCTrajectory2D fitWireHitsWhithoutRecoPos(std::vector<const CDCWireHit*>& wireHits);
+
     };
   }
 }

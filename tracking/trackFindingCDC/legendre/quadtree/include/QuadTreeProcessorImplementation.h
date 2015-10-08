@@ -34,6 +34,10 @@ namespace Belle2 {
                             unsigned int /*r_index*/) const override final;
     private:
       Vector2D m_origin; /**< The origin of the conformal transformation */
+
+      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
+
     };
 
   }

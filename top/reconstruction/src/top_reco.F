@@ -77,9 +77,9 @@
       
       CALL XSEC_QBAR(HLX,MODUL,T1,T2,OK)
       IF(.NOT.OK) RETURN
-
+      
       TOF_C0=(T1+T2)/2
-      T_LEN=ABS(T2-T1)*C0
+      T_LEN=(T2-T1)*C0
       OK=T_LEN.GT.QBAR_B(MODUL)/2
       IF(.NOT.OK) RETURN
       SIG_TLEN=T_LEN/SQRT(12.)
@@ -153,24 +153,24 @@
          CALL XSEC_PLANE(HLX_LOC,RP(1,I),NORM(1,I),T,OK)
          IF(.NOT.OK) CYCLE
          CALL GET_HLX_RDIR(HLX_LOC,T,R,DIR)
-         H=-SIGN(0.01, S_PROD(DIR,NORM(1,I)))
-         DO K=1,3
-            R(K)=R(K)+H*DIR(K)  ! error compensation: move by 100 microns toward bar
-         ENDDO
-         CALL NOMINAL_TO_LOCAL(R,DIR,MDN) ! transform to local (bar) frame
-         IF(ABS(R(1)).GT.AH) CYCLE
-         IF(ABS(R(2)).GT.BH) CYCLE
-         IF(H.GT.0) THEN
-            T1=T+T0
-            FL1=.TRUE.
+         T=T+T0
+         IF(S_PROD(DIR,NORM(1,I)).LT.0) THEN
+            IF(.NOT.FL1) THEN
+               T1=T
+               FL1=.TRUE.
+            ELSE
+               T1=MAX(T1,T)
+            ENDIF
          ELSE
-            T2=T+T0
-            FL2=.TRUE.
+            IF(.NOT.FL2) THEN
+               T2=T
+               FL2=.TRUE.
+            ELSE
+               T2=MIN(T2,T)
+            ENDIF
          ENDIF
-         OK=FL1.AND.FL2
-         IF(OK) RETURN
       ENDDO
-      OK=FL1.AND.FL2
+      OK=FL1.AND.FL2.AND.T2.GT.T1
       
       END
 

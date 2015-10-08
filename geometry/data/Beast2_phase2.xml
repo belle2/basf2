@@ -52,7 +52,7 @@
   <xi:include href="../pxd/PXD-phase2.xml"/>
   <xi:include href="../svd/SVD-phase2.xml"/>
   <xi:include href="../cdc/CDC.xml"/>
-  <!--xi:include href="../top/TOP.xml"/-->
+  <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../bklm/BKLM.xml"/>
@@ -60,10 +60,17 @@
 
   <xi:include href="../beast/microtpc/MICROTPC-phase2.xml"/>
   <!--xi:include href="../beast/pindiode/PINDIODE-phase2.xml"/-->
-  <!--xi:include href="../beast/beamabort/BEAMABORT-phase2.xml"/-->
+  <xi:include href="../beast/beamabort/BEAMABORT-phase2.xml"/>
   <xi:include href="../beast/he3tube/HE3TUBE-phase2.xml"/>
   <xi:include href="../beast/claws/CLAWS.xml"/>
   <xi:include href="../beast/fangs/FANGS.xml"/>
   <xi:include href="../beast/plume/PLUME.xml"/>
+
+
+  <!-- VXD Tracking and MUID muon identification -->
+  <Tracking>
+    <xi:include href="../tracking/VXDTFindex.xml"/>
+    <xi:include href="../tracking/MuidParameters.xml"/>
+  </Tracking>
 
 </Detector>

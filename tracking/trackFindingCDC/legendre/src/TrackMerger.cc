@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 
 #include <TMath.h>
 #include "../include/QuadTreeHitWrapper.h"
@@ -28,7 +29,14 @@ bool TrackMergerNew::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
 {
   CDCRiemannFitter trackFitter;
 
-  if ((track1.size() < 5) || (track2.size() < 5)) return false;
+  if ((track1.size() == 0) || (track2.size() == 0)) return false;
+  if ((track1.size() < 5) && (track2.size() < 5)) return false;
+
+
+
+  if ((not TrackProcessorNew::isCurler(track1)) && (not TrackProcessorNew::isCurler(track2)) &&
+      (fabs(track1.getStartTrajectory3D().getTrajectory2D().getStartUnitMom2D().phi() -
+            track1.getStartTrajectory3D().getTrajectory2D().getStartUnitMom2D().phi()) > TMath::Pi() / 4.)) return false;
 
   bool usePosition(false);
 
@@ -76,46 +84,59 @@ bool TrackMergerNew::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
   double distCriteria1(0);
   for (CDCRecoHit3D& item : track1) {
     HitProcessor::updateRecoHit3D(result1, item);
-    distCriteria1 += fabs(result1.getDist2D(item.getRecoPos2D()));
+    distCriteria1 += pow(result1.getDist2D(item.getRecoPos2D()), 2);
   }
-  distCriteria1 = distCriteria1 / track1.size();
+  distCriteria1 = distCriteria1 / pow(track1.size(), 2);
 
   double distCriteria2(0);
   for (CDCRecoHit3D& item : track2) {
     HitProcessor::updateRecoHit3D(result2, item);
-    distCriteria2 += fabs(result2.getDist2D(item.getRecoPos2D()));
+    distCriteria2 += pow(result2.getDist2D(item.getRecoPos2D()), 2);
   }
-  distCriteria2 = distCriteria2 / track2.size();
+  distCriteria2 = distCriteria2 / pow(track2.size(), 2);
 
 
   double distCriteriaMerge(0);
   for (CDCRecoHit3D& item : track1) {
     HitProcessor::updateRecoHit3D(resultMerge, item);
-    distCriteriaMerge += fabs(resultMerge.getDist2D(item.getRecoPos2D()));
+    distCriteriaMerge += pow(resultMerge.getDist2D(item.getRecoPos2D()), 2);
   }
   for (CDCRecoHit3D& item : track2) {
     HitProcessor::updateRecoHit3D(resultMerge, item);
-    distCriteriaMerge += fabs(resultMerge.getDist2D(item.getRecoPos2D()));
+    distCriteriaMerge += pow(resultMerge.getDist2D(item.getRecoPos2D()), 2);
   }
-  distCriteriaMerge = distCriteriaMerge / (track1.size() + track2.size());
+  distCriteriaMerge = distCriteriaMerge / pow(track1.size() + track2.size(), 2);
 
 //  B2INFO("criteria1: " << distCriteria1 << "; criteria2: " << distCriteria2 << "; criteriaMerge: " << distCriteriaMerge);
 
 //  if(resultMerge.getChi2()*2./resultMerge.getNDF() <= (result1.getChi2()/result1.getNDF() + result2.getChi2()/result2.getNDF())) return true;
 
-  if (distCriteriaMerge < 0.3) return true;
+  if (((distCriteriaMerge <= distCriteria1) && (distCriteriaMerge <= distCriteria2))) {
+    B2INFO("Merging: track1: " << distCriteria1 << "; track2: " << distCriteria2 << "; merged: " << distCriteriaMerge);
+
+    return true;
+  }
 
   return false;
 }
 
-CDCTrack& TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
+std::vector<const CDCWireHit*> TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
 {
   assert(trackCandidate);
-  if (trackCandidate.size() < 5) return trackCandidate;
+
+  std::vector<const CDCWireHit*> removedHits;
+
+//  return removedHits;
+  if (trackCandidate.size() < 5) return removedHits;
 
   // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
   // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
 //    std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
+
+  for (CDCRecoHit3D& hit : trackCandidate) {
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  }
 
 
   if (checkBack2BackTrack(trackCandidate)) {
@@ -131,11 +152,22 @@ CDCTrack& TrackMergerNew::splitBack2BackTrack(CDCTrack& trackCandidate)
 
     }
 
+    for (CDCRecoHit3D& hit : trackCandidate) {
+      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag())
+        removedHits.push_back(&(hit.getWireHit()));
+    }
+
     deleteAllMarkedHits(trackCandidate);
+
+    for (const CDCWireHit* hit : removedHits) {
+      hit->getAutomatonCell().setMaskedFlag(false);
+      hit->getAutomatonCell().setTakenFlag(false);
+    }
+
 
   }
 
-  return trackCandidate;
+  return removedHits;
 }
 
 

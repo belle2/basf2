@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/CDCLegendreTrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
 
@@ -28,14 +29,14 @@ namespace Belle2 {
   /** CDC tracking module, using Legendre transformation of the drift time circles.
    * This is a module, performing tracking in the CDC. It is based on the paper "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers" by T. Alexopoulus, et al. NIM A592 456-462 (2008)
    */
-  class CDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
+  class TrackFinderCDCLegendreModule: virtual public TrackFinderCDCBaseModule {
 
   public:
 
     /** Constructor.
      *  Create and allocate memory for variables here. Add the module parameters in this method.
      */
-    CDCLegendreTrackingModule();
+    TrackFinderCDCLegendreModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
@@ -61,6 +62,8 @@ namespace Belle2 {
     int m_track1Run;
     int m_track2Run;
     int m_track3Run;
+
+    std::vector<TrackFindingCDC::CDCRecoSegment2D> m_segments;
 
 
     TrackFindingCDC::TrackProcessor m_cdcLegendreTrackProcessor; /**< Object for creating tracks */

@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
 
 #include "TH1F.h"
+#include "TH2F.h"
 
 #include <list>
 #include <vector>
@@ -48,7 +49,9 @@ namespace Belle2 {
         m_cdcTracks(), m_trackFitter(),
         m_histChi2("h_chi2", "chi2", 100, 0., 300.),
         m_histChi2NDF("h_chi2", "chi2", 100, 0., 300.),
-        m_histDist("h_dist", "dist", 100, 0., 2.) { }
+        m_histDist("h_dist", "dist", 100, 0., 2.),
+        m_histADC("h_ADC", "ADC", 1000, 0., 1000),
+        m_histADCpt("h_ADCpt", "ADC vs Pt", 400, 0., 1000, 40, 0., 3.) { }
 
 
       /**
@@ -71,13 +74,15 @@ namespace Belle2 {
       /*CDCTrack&*/ void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
 
       /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
-      void createCDCTrackCandidates(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) ;
+      void createCDCTracks(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) ;
 
       void updateTrack(CDCTrack& track);
 
       bool checkTrack(CDCTrack& track);
 
       void assignNewHits(CDCTrack& track);
+
+      void assignNewHitsUsingSegments(CDCTrack& track, float fraction = 0.3);
 
       void assignNewHits();
 
@@ -95,13 +100,18 @@ namespace Belle2 {
 
       double getQuantile(double alpha, double n);
 
+      void checkADC();
+
       CDCTrajectory2D fit(CDCTrack& track);
 
+      void createCandidate(std::vector<const CDCWireHit*>& hits);
+
+      void unmaskHitsInTrack(CDCTrack& track);
 
       /**
        * Get the list with currently stored tracks.
        */
-      const std::vector<CDCTrack>& getTracks()
+      std::list<CDCTrack>& getTracks()
       {
         return m_cdcTracks;
       }
@@ -109,7 +119,7 @@ namespace Belle2 {
       /**
        * Get the list with currently stored tracks.
        */
-      const std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
+      std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
       {
         return m_QuadTreeHitWrappers;
       }
@@ -118,7 +128,7 @@ namespace Belle2 {
        * For the use in the QuadTree use this hit set.
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT();
+      std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
 
 
 
@@ -165,10 +175,30 @@ namespace Belle2 {
         m_cdcTracks.clear();
       }
 
+      static bool isCurler(CDCTrack& track) { return fabs(track.getStartTrajectory3D().getCurvatureXY()) > 0.017; }
+
+      /**
+       * Do a certain function for each track in the track list
+       */
+      void doForAllTracks(std::function<void(CDCTrack& track)> function)
+      {
+        /*         for (CDCTrack& track : m_cdcTracks) {
+                  function(track);
+                }
+        */
+        for (std::list<CDCTrack>::iterator it = m_cdcTracks.begin(); it !=  m_cdcTracks.end(); ++it) {
+          function(*it);
+        }
+
+
+
+      }
+
     private:
-      std::vector<CDCTrack> m_cdcTracks; /**< List of track candidates. */
+      std::list<CDCTrack> m_cdcTracks; /**< List of track candidates. */
       std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits */
-      CDCKarimakiFitter m_trackFitter;
+      CDCRiemannFitter m_trackFitter;
+//      CDCKarimakiFitter m_trackFitter;
 
       /**
        * @brief Perform the necessary operations after the track candidate has been constructed
@@ -178,15 +208,6 @@ namespace Belle2 {
        */
       void processTrack(CDCTrack& track);
 
-      /**
-       * Do a certain function for each track in the track list
-       */
-      void doForAllTracks(std::function<void(CDCTrack& track)> function)
-      {
-        for (CDCTrack& track : m_cdcTracks) {
-          function(track);
-        }
-      }
 
       /**
        * Do a certain function for each track in the track list
@@ -202,6 +223,8 @@ namespace Belle2 {
       TH1F m_histChi2NDF;
       TH1F m_histDist;
 
+      TH1F m_histADC;
+      TH2F m_histADCpt;
     };
   }
 }

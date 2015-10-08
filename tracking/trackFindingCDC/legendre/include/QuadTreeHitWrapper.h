@@ -13,6 +13,7 @@
 #include <tuple>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
   class CDCHit;
@@ -63,6 +64,9 @@ namespace Belle2 {
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
       std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
 
+      CDCRecoSegment2D& getSegment() {return m_segment;};
+
+      void setSegment(CDCRecoSegment2D& segment) {m_segment = segment; };
 
     private:
       /** Returns the phi angle of the center wire position.
@@ -84,6 +88,8 @@ namespace Belle2 {
 
       Vector2D m_conformalPosition;      /**< Position in the conformal space of the drift center (not the wire!) */
       double m_conformalDriftLength;     /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
+
+      CDCRecoSegment2D m_segment;
 
     }; //end class CDCTrackHit
   } //end namespace TrackFindingCDC

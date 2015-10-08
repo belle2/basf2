@@ -18,6 +18,9 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+
 
 #include <TF1.h>
 #include <TCanvas.h>
@@ -46,6 +49,8 @@ namespace Belle2 {
 
       inline bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
+
+      std::vector<QuadTree> m_seededTree;
 
     public:
 
@@ -195,6 +200,287 @@ namespace Belle2 {
       }
 
 
+      void seedQuadTree(int lvl, bool twoSidedPhasespace = false)
+      {
+        unsigned long nbins = pow(2, lvl);
+
+        m_seededTree.reserve(nbins * nbins);
+
+        ChildRanges ranges = std::make_pair(rangeX(m_quadTree->getXMin(), m_quadTree->getXMax()),
+                                            rangeY(m_quadTree->getYMin(), m_quadTree->getYMax()));
+
+
+        const rangeX& x = ranges.first;
+        const rangeY& y = ranges.second;
+
+        unsigned long binSizeX = (x.second - x.first) / nbins;
+        float binSizeY = (y.second - y.first) / nbins;
+
+        std::vector<ItemType*> items = m_quadTree->getItemsVector();
+
+        for (unsigned long xIndex = 0; xIndex < nbins; xIndex++) {
+          for (unsigned long yIndex = 0; yIndex < nbins; yIndex++) {
+            unsigned long xMin = xIndex * binSizeX + x.first;
+            unsigned long xMax = (xIndex + 1) * binSizeX + x.first;
+            float yMin = yIndex * binSizeY + y.first;
+            float yMax = (yIndex + 1) * binSizeY + y.first;
+
+            m_seededTree.emplace_back(xMin, xMax, yMin, yMax, lvl, nullptr);
+            QuadTree& newQuadTree = m_seededTree.back();
+            if ((newQuadTree.getYMin() < -0.02)  && (newQuadTree.getYMax() < -0.02)) continue;
+            newQuadTree.reserveHitsVector(m_quadTree->getNItems() * 2);
+
+            for (ItemType* item : items) {
+              if (item->isUsed()) continue;
+
+              if (insertItemInNode(&newQuadTree, item->getPointer(), 0, 0)) {
+                if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
+                  if (checkDerivative(&newQuadTree, item->getPointer()))
+                    newQuadTree.insertItem(item);
+                } else {
+                  newQuadTree.insertItem(item);
+                }
+              }
+            }
+
+            if (newQuadTree.getNItems() < 10) m_seededTree.pop_back();
+
+          }
+        }
+
+        sortSeededTree();
+
+      }
+
+
+      void sortSeededTree()
+      {
+        std::sort(m_seededTree.begin(), m_seededTree.end(), [](QuadTree & quadTree1, QuadTree & quadTree2) { return quadTree1.getNItems() > quadTree2.getNItems();});
+      }
+
+      void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
+                          unsigned int nHitsThreshold, float rThreshold)
+      {
+        /*
+                int nFoundCands(0);
+
+                CandidateProcessorLambda lmdCandidateProcessingFinal = [&nFoundCands, &lmdProcessor](const AxialHitQuadTreeProcessor::ReturnList &
+                  hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+
+                  lmdProcessor(hits, qt);
+
+                  nFoundCands++;
+                };
+
+
+                do{
+                  nFoundCands = 0;
+                  sortSeededTree();
+                  QuadTree& quadTree = m_seededTree.front();
+
+                  fillGivenTree(&quadTree, lmdCandidateProcessingFinal, nHitsThreshold, rThreshold, true);
+
+                  quadTree.cleanUpItems(*this);
+
+                } while(nFoundCands > 0);
+        */
+        sortSeededTree();
+//        B2INFO("Size of the tree : " << m_seededTree.size());
+
+        for (QuadTree& tree : m_seededTree) {
+//          B2INFO("NItems in the node: " << tree.getNItems());
+//          fillGivenTreeWithSegments(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+        }
+
+      }
+
+
+      /**
+       * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
+       * process further and go one level deeper.
+       */
+      void fillGivenTreeWithSegments(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold,
+                                     float rThreshold,
+                                     bool checkThreshold)
+      {
+        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
+                (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
+        if (node->getItemsVector().size() < nItemsThreshold)
+          return;
+        if (checkThreshold) {
+          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
+            return;
+        }
+
+
+        if (false && (node->getLevel() > 8) /*&& (fabs(node->getYMax()) < 0.015)*/) {
+//          node->getChildren()->apply([&](QuadTree * qt) {
+          std::vector<CDCRecoSegment2D> segments;
+
+          for (ItemType* item : node->getItemsVector()) {
+            CDCRecoSegment2D& segment = item->getPointer()->getSegment();
+            if (segment.size() == 0) continue;
+            bool addSegment(true);
+            if (segments.size() != 0) {
+              for (CDCRecoSegment2D& segmentTmp : segments) {
+                if (segmentTmp == segment) {
+                  addSegment = false;
+                }
+              }
+            }
+
+//              int nHits(0);
+//              for(CDCRecoHit2D& hit: segment){
+//                for(ItemType* qtHit: node->getItemsVector()){
+//                  if(qtHit->getPointer()->getCDCWireHit()->getWire() == hit.getWire()) nHits++;
+//                }
+//              }
+
+//              if(static_cast<float>(nHits)/static_cast<float>(segment.items().size()) < 0.4) addSegment = false;
+
+            if (addSegment)segments.push_back(segment);
+
+          }
+
+          for (CDCRecoSegment2D& segment : segments) {
+            for (ItemType* qtHitGlobal : m_quadTree->getItemsVector()) {
+              bool addHit(true);
+              for (ItemType* qtHit : node->getItemsVector()) {
+                if (qtHitGlobal->getPointer()->getCDCWireHit()->getWire() == qtHit->getPointer()->getCDCWireHit()->getWire())addHit = false;
+              }
+
+              if (addHit && (qtHitGlobal->getPointer()->getSegment() == segment)) {
+                node->insertItem(qtHitGlobal);
+              }
+
+            }
+
+
+          }
+//          });
+        }
+
+
+        if (checkIfLastLevel(node)) {
+
+
+          if (true/*fabs(node->getYMax()) < 0.015*/) {
+            std::vector<CDCRecoSegment2D> segments;
+
+//            int nHitsBefore = node->getNItems();
+
+            for (ItemType* item : node->getItemsVector()) {
+              CDCRecoSegment2D& segment = item->getPointer()->getSegment();
+              if (segment.size() == 0) continue;
+              bool addSegment(true);
+              if (segments.size() != 0) {
+                for (CDCRecoSegment2D& segmentTmp : segments) {
+                  if (segmentTmp == segment) {
+                    addSegment = false;
+                  }
+                }
+              }
+              /*
+                            int nHits(0);
+                            for(CDCRecoHit2D& hit: segment){
+                              for(ItemType* qtHit: node->getItemsVector()){
+                                if(qtHit->getPointer()->getCDCWireHit()->getWire() == hit.getWire()) nHits++;
+                              }
+                            }
+
+                            if(static_cast<float>(nHits/segment.items().size()) < 0.1) addSegment = false;
+              */
+              if (addSegment)segments.push_back(segment);
+
+            }
+
+//            B2INFO("NSegments: " << segments.size());
+            for (CDCRecoSegment2D& segment : segments) {
+              for (ItemType* qtHitGlobal : m_quadTree->getItemsVector()) {
+                bool addHit(true);
+                for (ItemType* qtHit : node->getItemsVector()) {
+                  if (qtHitGlobal->getPointer()->getCDCWireHit()->getWire() == qtHit->getPointer()->getCDCWireHit()->getWire())addHit = false;
+                }
+
+                if (addHit && (qtHitGlobal->getPointer()->getSegment() == segment)) {
+                  node->insertItem(qtHitGlobal);
+                }
+
+              }
+
+
+            }
+
+
+//            int nHitsAfter = node->getNItems();
+
+//            if(nHitsAfter > nHitsBefore) B2INFO("NEW HITS ADDED! NHITS: " << nHitsAfter - nHitsBefore);
+//            if(nHitsAfter < nHitsBefore) B2WARNING("WTF!");
+
+          }
+          callResultFunction(node, lmdProcessor);
+          return;
+        }
+
+        if (node->getChildren() == nullptr)
+          node->initializeChildren(*this);
+
+
+
+
+        if (!node->checkFilled()) {
+          fillChildren(node, node->getItemsVector());
+          node->setFilled();
+        }
+
+
+
+        constexpr int m_nbins_theta = 2;
+        constexpr int m_nbins_r = 2;
+
+        bool binUsed[m_nbins_theta][m_nbins_r];
+        for (int iX = 0; iX < m_nbins_theta; iX++)
+          for (int iY = 0; iY < m_nbins_r; iY++)
+            binUsed[iX][iY] = false;
+
+        //Processing, which bins are further investigated
+        for (int bin_loop = 0; bin_loop < 4; bin_loop++) {
+
+          // Search for the bin with the highest bin content.
+          int xIndexMax = 0;
+          int yIndexMax = 0;
+          size_t maxValue = 0;
+          for (int xIndexLoop = 0; xIndexLoop < 2; ++xIndexLoop) {
+            for (int yIndexLoop = 0; yIndexLoop < 2; ++yIndexLoop) {
+              if ((maxValue < node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems())
+                  && (!binUsed[xIndexLoop][yIndexLoop])) {
+                maxValue = node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems();
+                xIndexMax = xIndexLoop;
+                yIndexMax = yIndexLoop;
+              }
+            }
+          }
+
+          // Go down one level for the bin with the maximum number of items in it
+          binUsed[xIndexMax][yIndexMax] = true;
+
+          // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
+          node->getChildren()->get(xIndexMax, yIndexMax)->cleanUpItems(*this);
+
+          this->fillGivenTreeWithSegments(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold,
+                                          checkThreshold);
+
+        }
+      }
+
+
+      void clearSeededTree()
+      {
+        m_seededTree.clear();
+        m_seededTree.resize(0);
+      }
+
       QuadTree* createSingleNode(const ChildRanges& ranges)
       {
         std::vector<ItemType*> hitsVector = m_quadTree->getItemsVector();
@@ -252,6 +538,24 @@ namespace Belle2 {
         nevent++;
       }
 
+      bool checkDerivative(QuadTree* node, QuadTreeHitWrapper* hit) const
+      {
+        float rMinD = -1.*hit->getConformalX() * TrigonometricalLookupTable::Instance().sinTheta(node->getXMin())
+                      + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMin());
+
+        float rMaxD = -1.*hit->getConformalX() * TrigonometricalLookupTable::Instance().sinTheta(node->getXMax())
+                      + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMax());
+
+
+        float rMean = node->getYMean();
+
+        if ((rMinD > 0) && (rMaxD * rMinD >= 0)) return true;
+        if ((rMaxD * rMinD < 0)) return true;
+        return false;
+
+
+      }
+
       bool checkExtremum(QuadTree* node, QuadTreeHitWrapper* hit) const
       {
 
@@ -266,10 +570,10 @@ namespace Belle2 {
 
         if ((thetaExtremumLookup > node->getXMax()) || (thetaExtremumLookup < node->getXMin())) return false;
 
-        double rPrim = hit->getConformalX() * TrigonometricalLookupTable::Instance().cosTheta(thetaExtremumLookup)
-                       + hit->getConformalY() * TrigonometricalLookupTable::Instance().sinTheta(thetaExtremumLookup);
+        double rD = hit->getConformalX() * TrigonometricalLookupTable::Instance().cosTheta(thetaExtremumLookup)
+                    + hit->getConformalY() * TrigonometricalLookupTable::Instance().sinTheta(thetaExtremumLookup);
 
-        if ((rPrim > node->getYMin()) && (rPrim < node->getYMax())) return true;
+        if ((rD > node->getYMin()) && (rD < node->getYMax())) return true;
 
 
         return false;

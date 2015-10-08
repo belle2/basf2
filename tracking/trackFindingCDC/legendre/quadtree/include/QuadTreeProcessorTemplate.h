@@ -287,20 +287,6 @@ namespace Belle2 {
         m_quadTree->clearTree();
       }
 
-      QuadTree* m_quadTree; /**< The quad tree we work with */
-
-    private:
-
-      /**
-       * Create a quad tree with the given parameters ranges.
-       */
-      void createQuadTree(const ChildRanges& ranges)
-      {
-        const rangeX& x = ranges.first;
-        const rangeY& y = ranges.second;
-        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
-      }
-
 
       /**
        * When a node is accepted as a result, we extract a vector with the items (back transformed to typeData*)
@@ -319,6 +305,22 @@ namespace Belle2 {
 
         lambda(resultItems, node);
       }
+
+
+      QuadTree* m_quadTree; /**< The quad tree we work with */
+
+    private:
+
+      /**
+       * Create a quad tree with the given parameters ranges.
+       */
+      void createQuadTree(const ChildRanges& ranges)
+      {
+        const rangeX& x = ranges.first;
+        const rangeY& y = ranges.second;
+        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
+      }
+
 
 
       /**

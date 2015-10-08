@@ -22,6 +22,7 @@ namespace Belle2 {
     class CDCTrack;
     class CDCRecoHit3D;
     class Vector2D;
+    class CDCWireHit;
 
     class TrackMergerNew {
     public:
@@ -32,7 +33,7 @@ namespace Belle2 {
       TrackMergerNew() = delete;
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static CDCTrack& splitBack2BackTrack(CDCTrack& trackCandidate);
+      static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& trackCandidate);
 
       /** Tries to split back-to-back tracks into two different tracks */
       static bool checkBack2BackTrack(CDCTrack& trackCandidate);

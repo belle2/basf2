@@ -14,7 +14,8 @@
 #include <tracking/trackFindingCDC/legendre/TrackMerger.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include "../include/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
 
 using namespace std;
 
@@ -33,6 +34,20 @@ const CDCRecoHit3D HitProcessor::createRecoHit3D(CDCTrajectory2D& trackTrajector
   return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
 
 }
+
+const CDCRecoHit3D HitProcessor::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  ERightLeft rlInfo = ERightLeft::c_Right;
+  if (trackTrajectory2D.getDist2D(hit->getRefPos2D()) < 0)
+    rlInfo = ERightLeft::c_Left;
+  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getHit(), rlInfo);
+
+  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+
+}
+
 
 void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit)
 {
@@ -171,53 +186,66 @@ double SimpleFilter::getAssigmentProbability(const TrackHit* hit, const TrackCan
 
   return 1.0 - exp(-1 / dist);
 }
+*/
 
 
-
-void SimpleFilter::reassignHitsFromOtherTracks(const std::list<TrackCandidate*>& m_trackList)
+void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates)
 {
 
-  B2DEBUG(100, "NCands = " << m_trackList.size());
+  return;
+  std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
+  for (CDCTrack& cand : trackCandidates) {
 
-  for (TrackCandidate* cand : m_trackList) {
-    for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::c_usedInTrack);
-    }
+    for (CDCRecoHit3D& recoHit : cand) {
+      recoHit.getWireHit().getAutomatonCell().setTakenFlag(true);
+      recoHit.getWireHit().getAutomatonCell().setMaskedFlag(false);
 
-    if (cand->getTrackHits().size() == 0) continue;
-
-    for (TrackHit* hit : cand->getTrackHits()) {
-      double prob = getAssigmentProbability(hit, cand);
-
-      double bestHitProb = prob;
-      TrackCandidate* bestCandidate = NULL;
-
-      for (TrackCandidate* candInner : m_trackList) {
-        if (candInner == cand) continue;
-        double probTemp = getAssigmentProbability(hit, candInner);
-
-        if (probTemp > bestHitProb) {
-          bestCandidate = candInner;
-          bestHitProb = probTemp;
-        }
-      }
-
-      if (bestHitProb > prob) {
-        bestCandidate->addHit(hit);
-        hit->setHitUsage(TrackHit::c_bad);
-      }
-    }
-
-    deleteAllMarkedHits(cand);
-  }
-
-  for (TrackCandidate* cand : m_trackList) {
-    for (TrackHit* hit : cand->getTrackHits()) {
-      hit->setHitUsage(TrackHit::c_usedInTrack);
+      assignedHits.push_back(std::make_pair(recoHit, cand));
     }
   }
+
+
+  B2DEBUG(100, "NCands = " << trackCandidates.size());
+
+  for (std::pair<CDCRecoHit3D, CDCTrack>& itemWithCand : assignedHits) {
+
+    CDCRecoHit3D& item = itemWithCand.first;
+    CDCTrack& cand = itemWithCand.second;
+
+
+    CDCTrajectory2D trajectory = cand.getStartTrajectory3D().getTrajectory2D();
+
+    HitProcessor::updateRecoHit3D(trajectory, item);
+    double dist = fabs(trajectory.getDist2D(item.getRecoPos2D()));
+
+    double bestHitDist = dist;
+    CDCTrack* bestCandidate = NULL;
+
+    for (CDCTrack& candInner : trackCandidates) {
+      if (candInner == cand) continue;
+      CDCTrajectory2D trajectoryInner = candInner.getStartTrajectory3D().getTrajectory2D();
+
+      HitProcessor::updateRecoHit3D(trajectoryInner, item);
+      double distTemp = fabs(trajectoryInner.getDist2D(item.getRecoPos2D()));
+
+      if (distTemp < bestHitDist) {
+        bestCandidate = &candInner;
+        bestHitDist = distTemp;
+      }
+    }
+
+    if (bestHitDist < dist) {
+      const CDCRecoHit3D& cdcRecoHit3D  =  CDCRecoHit3D::reconstruct(item.getRLWireHit(),
+                                           bestCandidate->getStartTrajectory3D().getTrajectory2D());
+
+      bestCandidate->push_back(std::move(cdcRecoHit3D));
+      item.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      deleteAllMarkedHits(cand);
+      cdcRecoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(false);
+    }
+
+  }
+
+
 }
 
-
-
-*/

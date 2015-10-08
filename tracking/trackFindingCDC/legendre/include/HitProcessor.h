@@ -22,6 +22,7 @@ namespace Belle2 {
     class QuadTreeHitWrapper;
     class CDCRecoHit3D;
     class CDCTrajectory2D;
+    class CDCWireHit;
 
     class HitProcessor {
 
@@ -33,6 +34,8 @@ namespace Belle2 {
       /** Create CDCRecoHit3D */
       static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
 
+      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
+
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit);
 
@@ -42,7 +45,7 @@ namespace Belle2 {
       //static double getAssigmentProbability(const TrackHit* hit, const TrackCandidate* track);
 
       /** Hits reassignment */
-      //static void reassignHitsFromOtherTracks(const std::list<TrackCandidate*>& trackList);
+      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates);
 
       /** Append unused hits to tracks */
       static void appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<QuadTreeHitWrapper*>& AxialHitList);

@@ -16,8 +16,6 @@
 
 using namespace Belle2;
 
-ClassImp(MCParticleTrajectory);
-
 namespace {
   /** Utility function to set an TVector3 from two points.
    * v = a - b

@@ -271,7 +271,7 @@ def process_dir(
             aux_dict_targets.append(rootmap_target)
 
         # build a shared library with all source and dictionary files
-        if len(env['SRC_FILES']) > 0:
+        if len(env['SRC_FILES']) > 0 or len(dict_files) > 0:
 
             # determine path of library and adjust path and name for modules
             lib_dir_name = env['LIBDIR']

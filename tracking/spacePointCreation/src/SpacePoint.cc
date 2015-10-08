@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(SpacePoint)
+// ClassImp(SpacePoint)
 
 SpacePoint::SpacePoint(const Belle2::PXDCluster* pxdCluster,
                        const Belle2::VXD::SensorInfoBase* aSensorInfo) :

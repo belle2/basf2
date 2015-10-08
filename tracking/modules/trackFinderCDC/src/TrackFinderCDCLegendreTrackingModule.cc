@@ -179,9 +179,13 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
 
   BasePrecisionFunction::PrecisionFunction currentFunct;
+//  currentFunct = originPrecisionFunction.getFunction();
+//  if (*not increaseThreshold) currentFunct = originPrecisionFunction.getFunction();
+//  else currentFunct = nonOriginPrecisionFunction.getFunction();
   currentFunct = originPrecisionFunction.getFunction();
 
   AxialHitQuadTreeProcessor::ChildRanges ranges;
+//  ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 15)), AxialHitQuadTreeProcessor::rangeY(m_rMin, m_rMax));
   ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0,  0.3));
 
 
@@ -191,7 +195,7 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
   } else if ((rThreshold == 0.07) and increaseThreshold) {
     currentFunct = nonOriginPrecisionFunction.getFunction();
     ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15));
-  } else {
+  } else { /*if(rThreshold == 0.15)*/
     currentFunct = nonOriginPrecisionFunction.getFunction();
     ranges = std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0, 0.15));
   }
@@ -365,6 +369,7 @@ void CDCLegendreTrackingModule::terminate()
   B2INFO("	run 2: " << m_track2Run);
   B2INFO("	run 3: " << m_track3Run);
 
+//  m_trackProcessor.saveHist();
   delete m_cdcLegendreTrackDrawer;
 }
 

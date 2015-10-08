@@ -15,8 +15,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RelationContainer);
-
 RelationContainer::RelationContainer():
   m_elements(RelationElement::Class()),
   m_fromName(""), m_fromDurability(-1),

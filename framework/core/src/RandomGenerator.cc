@@ -131,5 +131,3 @@ void RandomGenerator::RndmArray(Int_t n, unsigned char* array)
     std::copy_n((unsigned char*)&r, remainder, array + (n - remainder - 1));
   }
 }
-
-ClassImp(RandomGenerator);

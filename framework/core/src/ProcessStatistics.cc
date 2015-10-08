@@ -20,8 +20,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(ProcessStatistics);
-
 int ProcessStatistics::getIndex(const Module* module)
 {
   auto indexIt = m_modulesToStatsIndex.find(module);

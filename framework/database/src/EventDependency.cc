@@ -13,9 +13,6 @@
 
 using namespace Belle2;
 
-ClassImp(EventDependency);
-
-
 void EventDependency::add(unsigned int event, TObject* object)
 {
   m_objects.Add(object);

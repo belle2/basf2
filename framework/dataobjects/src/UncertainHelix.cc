@@ -18,9 +18,6 @@
 using namespace Belle2;
 using namespace HelixParameterIndex;
 
-ClassImp(UncertainHelix);
-
-
 UncertainHelix::UncertainHelix() :
   Helix(),
   m_covariance(5),

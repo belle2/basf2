@@ -116,5 +116,3 @@ void BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>&
               << cov.size() << " given");
   }
 }
-
-ClassImp(BeamParameters);

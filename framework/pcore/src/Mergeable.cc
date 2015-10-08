@@ -4,8 +4,6 @@
 
 using namespace Belle2;
 
-ClassImp(Mergeable);
-
 Long64_t Mergeable::Merge(TCollection* hlist)
 {
   Long64_t nMerged = 0;

@@ -21,8 +21,6 @@
 using namespace Belle2;
 using namespace HelixParameterIndex;
 
-ClassImp(Helix);
-
 Helix::Helix():
   m_d0(0.0),
   m_phi0(0.0),

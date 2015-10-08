@@ -15,9 +15,6 @@
 
 using namespace Belle2;
 
-ClassImp(ProfileInfo)
-
-
 void ProfileInfo::set(double timeOffset)
 {
   m_virtualMemory = Utils::getVirtualMemoryKB();

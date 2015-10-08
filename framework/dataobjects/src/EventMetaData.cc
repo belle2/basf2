@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(EventMetaData)
-
 EventMetaData::EventMetaData(unsigned long event, unsigned long run, unsigned long experiment):
   m_event(event),
   m_run(run),

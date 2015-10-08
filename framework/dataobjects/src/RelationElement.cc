@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RelationElement)
-
 RelationElement::RelationElement(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights):
   TObject(),
   m_from(from),

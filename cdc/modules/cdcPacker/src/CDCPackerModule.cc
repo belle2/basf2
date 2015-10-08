@@ -45,7 +45,7 @@ REG_MODULE(CDCPacker)
 CDCPackerModule::CDCPackerModule() : Module()
 {
   //Set module properties
-  setDescription("Generate CDCHit from Raw data.");
+  setDescription("Generate RawCDC object from CDCHit");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("rawCDCName", m_rawCDCName, "Name of the RawCDC List name..", string(""));

@@ -23,11 +23,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-
-ClassImp(SVDRecoHit)
-
-
 SVDRecoHit::SVDRecoHit():
   genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(0), m_trueHit(0),
   m_cluster(0), m_isU(0), m_energyDep(0), m_rotationPhi(0)

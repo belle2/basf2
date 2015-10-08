@@ -31,5 +31,3 @@ PXDRawPedestal::PXDRawPedestal(VxdID sensorID, void* data):
     m_pedestals[i] = d[2 * i + 1]; // Check if endianess is correctly done, seems so... TODO
   }
 };
-
-ClassImp(PXDRawPedestal)

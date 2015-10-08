@@ -29,5 +29,3 @@ PXDRawROIs::~PXDRawROIs()
   if (m_rois)
     delete[] m_rois;
 }
-
-ClassImp(PXDRawROIs)

@@ -29,5 +29,3 @@ PXDRawCluster::~PXDRawCluster()
 {
   delete m_cluster;
 };
-
-ClassImp(PXDRawCluster)

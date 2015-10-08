@@ -97,5 +97,3 @@ std::vector<std::pair<float, float>> VXDSimHit::getElectronsConstantNumber(doubl
   }
   return result;
 }
-
-ClassImp(VXDSimHit);

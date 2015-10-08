@@ -38,5 +38,3 @@ PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, bool pedestal_flag):
 //         }
   }
 };
-
-ClassImp(PXDRawAdc)

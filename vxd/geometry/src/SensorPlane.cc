@@ -14,8 +14,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(VXD::SensorPlane)
-
 void VXD::SensorPlane::Print(const Option_t*) const
 {
   B2INFO("VXDSensorPlane for " << (string)VxdID(m_sensorID));

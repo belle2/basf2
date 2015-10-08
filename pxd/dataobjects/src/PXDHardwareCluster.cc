@@ -37,5 +37,3 @@ PXDHardwareCluster::~PXDHardwareCluster()
   delete m_pixelV;
   delete m_pixelQ;
 };
-
-ClassImp(PXDHardwareCluster)

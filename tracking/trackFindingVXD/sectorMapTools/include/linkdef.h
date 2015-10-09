@@ -9,6 +9,7 @@
 #pragma link C++ class Belle2::Sector+;
 #pragma link C++ class Belle2::ActivatedSector+;
 
+#pragma link C++ class Belle2::SectorMap+;
 
 // #pragma link C++ class <std::pair<std::string, RootMergeable<TTree> >+;
 // #pragma link C++ class Belle2::KeyValBox<std::string, RootMergeable<TTree> >+;

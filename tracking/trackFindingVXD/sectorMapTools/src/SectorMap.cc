@@ -1,4 +1,4 @@
-#include "tracking/trackFindingVXD/environment/VXDTFEnvironment.h"
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 
 #ifndef __CINT__
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
@@ -12,14 +12,14 @@ using namespace Belle2;
 typedef unordered_map< string, VXDTFFilters*> setupNameToFilters_t;
 #endif
 
-VXDTFEnvironment::VXDTFEnvironment(): m_allSetupsFilters(NULL)
+SectorMap::SectorMap(): m_allSetupsFilters(NULL)
 {
 #ifndef __CINT__
   m_allSetupsFilters = new setupNameToFilters_t;
 #endif
 }
 
-VXDTFEnvironment::~VXDTFEnvironment()
+SectorMap::~SectorMap()
 {
 #ifndef __CINT__
 
@@ -32,7 +32,7 @@ VXDTFEnvironment::~VXDTFEnvironment()
 
 
 const VXDTFFilters*
-VXDTFEnvironment::getFilters(const std::string& setupName)
+SectorMap::getFilters(const std::string& setupName)
 {
 #ifndef __CINT__
 
@@ -48,7 +48,7 @@ VXDTFEnvironment::getFilters(const std::string& setupName)
 }
 
 void
-VXDTFEnvironment::assignFilters(const string& setupName, VXDTFFilters* filters)
+SectorMap::assignFilters(const string& setupName, VXDTFFilters* filters)
 {
 #ifndef __CINT__
   auto all_filters = (setupNameToFilters_t*) m_allSetupsFilters;
@@ -56,5 +56,5 @@ VXDTFEnvironment::assignFilters(const string& setupName, VXDTFFilters* filters)
 #endif
 }
 
-ClassImp(VXDTFEnvironment)
+
 

@@ -43,7 +43,7 @@ namespace Belle2 {
 
   private:
     void retrieveFromXML(void);
-    void initVXDTFEnvironment(void);
+    void initSectorMap(void);
     void initSectorMapFilter(int i);
 
     std::vector< std::string > m_PARAMsectorSetup;

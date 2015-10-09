@@ -20,7 +20,7 @@
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 #include "tracking/trackFindingVXD/FilterTools/Observer.h"
 
-#include "tracking/trackFindingVXD/environment/VXDTFEnvironment.h"
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/VXDTFRedesign/SegmentFilterConverterModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
@@ -113,8 +113,8 @@ SegmentFilterConverterModule::SegmentFilterConverterModule() : Module()
 void
 SegmentFilterConverterModule::initialize()
 {
-  StoreObjPtr< VXDTFEnvironment > environment("", DataStore::c_Persistent);
-  environment.registerInDataStore(DataStore::c_DontWriteOut);
+  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
 }
 
 void
@@ -156,15 +156,15 @@ SegmentFilterConverterModule::retrieveFromXML(void)
 void
 SegmentFilterConverterModule::event()
 {
-  StoreObjPtr< VXDTFEnvironment > environment("", DataStore::c_Persistent);
-  if (! environment) {
-    environment.create();
-    initVXDTFEnvironment();
+  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  if (! sectorMap) {
+    sectorMap.create();
+    initSectorMap();
   }
 }
 
 void
-SegmentFilterConverterModule::initVXDTFEnvironment(void)
+SegmentFilterConverterModule::initSectorMap(void)
 {
   for (unsigned int i = 0; i < m_PARAMsectorSetup.size() ; ++i)
     initSectorMapFilter(i);
@@ -174,8 +174,8 @@ void
 SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 {
 
-  const VXDTFSecMap* sectorMap = m_SectorMaps[ setupIndex ];
-  StoreObjPtr< VXDTFEnvironment > environment("", DataStore::c_Persistent);
+  const VXDTFSecMap* oldSectorMap = m_SectorMaps[ setupIndex ];
+  StoreObjPtr< SectorMap > newSectorMap("", DataStore::c_Persistent);
   VXDTFFilters* segmentFilters = new VXDTFFilters();
 
   {
@@ -216,7 +216,7 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
   }
 
 
-  for (auto friendsBlob : sectorMap->getSectorMap()) {
+  for (auto friendsBlob : oldSectorMap->getSectorMap()) {
     FullSecID innerSectorID = FullSecID(friendsBlob.first);
 
     for (auto outerSectorBlob : friendsBlob.second) {
@@ -281,7 +281,7 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
                   innerSectorID << " -> " << outerSectorID << " outer sector");
     }
   }
-  environment->assignFilters(sectorMap->getMapName(), segmentFilters);
+  newSectorMap->assignFilters(oldSectorMap->getMapName(), segmentFilters);
 }
 
 

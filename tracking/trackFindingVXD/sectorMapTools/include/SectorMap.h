@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
 
-#ifndef VXDTFENVIRONMENT_HH
-#define VXDTFENVIRONMENT_HH
+#ifndef SECTORMAP_HH
+#define SECTORMAP_HH
 
 #include <TObject.h>
 #include <string>
@@ -25,7 +25,7 @@ namespace Belle2 {
   // sector maps etc. etc.
   // It will be put in the datastore with duration RUN.
   // This class owns her members and she is in charge for their deletions.
-  class VXDTFEnvironment : public TObject {
+  class SectorMap : public TObject {
   private:
     // Contains all the Filters indexed by their setupNames
     // m_SegmentFilters is a pointer to an unsorted_map, since ROOT 5 is
@@ -34,7 +34,7 @@ namespace Belle2 {
     void* m_allSetupsFilters;  //! transient value
 
 
-    VXDTFEnvironment(const VXDTFEnvironment& VXDTFEnvironment)
+    SectorMap(const SectorMap& sectorMap)
     // ROOT/CINT needs a copy constructor,
 #ifndef __CINT__
     // but I do not want to copy this class which is a singleton so:
@@ -45,8 +45,8 @@ namespace Belle2 {
 
   public:
 
-    VXDTFEnvironment();
-    virtual ~VXDTFEnvironment();
+    SectorMap();
+    virtual ~SectorMap();
 
     const VXDTFFilters* getFilters(const std::string& setupName);
 
@@ -55,7 +55,7 @@ namespace Belle2 {
                        VXDTFFilters* filters);
 
 
-    ClassDef(VXDTFEnvironment , 0);
+    ClassDef(SectorMap , 11);
   };
 }
 #endif

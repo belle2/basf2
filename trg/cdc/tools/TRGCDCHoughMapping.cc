@@ -201,9 +201,8 @@ superLayer(const unsigned id) {
 /////////////////////////////////////////////////base of ts
 
     for(int i=0 ; i<N_TS_SL0 ; i++) {
-        float offset = (SL == 0)? 0.5 : 0 ;
-     	xy.x=r_SL0*cos((PI2/N_TS_SL0)*(i+offset));
-        xy.y=r_SL0*sin((PI2/N_TS_SL0)*(i+offset));
+        xy.x=r_SL0*cos((PI2/N_TS_SL0)*i);
+        xy.y=r_SL0*sin((PI2/N_TS_SL0)*i);
 
         xymatrix.push_back(xy);
     }

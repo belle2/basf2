@@ -47,7 +47,7 @@ namespace Belle2 {
     SecMapTrainerVXDTFModule();
 
     /** SecMapTrainerVXDTFModule destructor. */
-    virtual ~SecMapTrainerVXDTFModule() { delete m_testRootfile; }
+    virtual ~SecMapTrainerVXDTFModule() {}
 
     /** initialize. */
     virtual void initialize();
@@ -81,14 +81,17 @@ namespace Belle2 {
     /** contains the spacePointTrackCands to be analyzed for the secMap-Training. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
-    /** Temporary test file which shall be replaced by the final StoreObjPtr< RootMergeable>-stuff. */
-    TFile* m_testRootfile;
+// // // //     /** Temporary test file which shall be replaced by the final StoreObjPtr< RootMergeable>-stuff. */
+// // // //     TFile* m_testRootfile;
 
-    /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
-    TrainerConfigData m_testConfig;
+    /** contains the trainers for the secMaps to be trained. */
+    std::vector< SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > > m_secMapTrainers;
 
-    /** one trainer for being able to test raw data sampling for secMap-training. */
-    SecMapTrainer<XHitFilterFactory<SecMapTrainerHit>> m_testTrainer;
+//     /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
+//     TrainerConfigData m_testConfig;
+//
+//     /** one trainer for being able to test raw data sampling for secMap-training. */
+//     SecMapTrainer<XHitFilterFactory<SecMapTrainerHit>> m_testTrainer;
 
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;

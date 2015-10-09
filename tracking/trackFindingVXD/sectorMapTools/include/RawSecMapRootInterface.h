@@ -59,43 +59,33 @@ namespace Belle2 {
 
   public:
 
-//  /** contains everything to uniquely identify a track. */
-//  struct TrackIdentifier {
-//    /** number of the experiment this dataset is taken from. */
-//    unsigned expNo;
-//
-//    /** number of the run this dataset is taken from. */
-//    unsigned runNo;
-//
-//    /** number of the event this dataset is taken from. */
-//    unsigned evtNo;
-//
-//    /** number of the reference track this dataset is taken from (its ID in the datastore). */
-//    unsigned trackNo;
-//
-//    /** Pdg given by reference track. */
-//    int pdg;
-//  };
-//
-//
-
 
     /** Constructor - prepares ttree. without calling the initializer-functions this Object is still not working! */
-    RawSecMapRootInterface(TFile* file, std::string mapName) :
-      m_file(file),
+    RawSecMapRootInterface(std::string mapName,  int rngAppendix) :
+//       m_file(file),
       m_name(mapName),
       m_tree2Hit((m_name + std::string("2Hit")), DataStore::c_Persistent),
       m_data2Hit( {}),
                 m_tree3Hit((m_name + std::string("3Hit")), DataStore::c_Persistent),
                 m_data3Hit({}),
                 m_tree4Hit((m_name + std::string("4Hit")), DataStore::c_Persistent),
-    m_data4Hit({}) {}
+                m_data4Hit({})
+    {
+      // TODO check if file exists first!
+      m_file = new TFile((mapName + "_" + std::to_string(rngAppendix) +  ".root").c_str(), "RECREATE");
+      m_file->cd();
+    }
+
+    /** destructor deleting the rootFile. */
+    ~RawSecMapRootInterface() { delete m_file; }
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */
     void initialize2Hit(std::vector<std::string> filterNames)
     {
-      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: start")
+      B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: start - got " << filterNames.size() << " filters")
+      B2DEBUG(1, "and root file got size of: " << m_file->GetSize())
+      m_file->cd();
 
       // preparing StoreObjPtr:
       bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")), DataStore::c_Persistent);
@@ -135,6 +125,7 @@ namespace Belle2 {
     void initialize3Hit(std::vector<std::string> filterNames)
     {
       B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: start")
+      m_file->cd();
 
       // preparing StoreObjPtr:
       bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")), DataStore::c_Persistent);
@@ -176,6 +167,7 @@ namespace Belle2 {
     void initialize4Hit(std::vector<std::string> filterNames)
     {
       B2DEBUG(1, "RawSecMapRootInterface::initialize4Hit: start")
+      m_file->cd();
 
       // preparing StoreObjPtr:
       bool registered = m_tree4Hit.registerInDataStore((m_name + std::string("4Hit")), DataStore::c_Persistent);
@@ -268,15 +260,16 @@ namespace Belle2 {
 
 
     /** write all trees to file at end of processing. */
-    void write(TFile* file)
+    void write()
     {
       B2DEBUG(1, "RawSecMapRootInterface::write: start")
+      m_file->cd();
 
       if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
         //use TFile you created in initialize()
-        m_tree2Hit->write(file);
-        m_tree3Hit->write(file);
-        m_tree4Hit->write(file);
+        m_tree2Hit->write(m_file);
+        m_tree3Hit->write(m_file);
+        m_tree4Hit->write(m_file);
       }
     }
 

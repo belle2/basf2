@@ -10,6 +10,8 @@
 
 #include <tracking/modules/VXDTFHelperTools/SecMapTrainerVXDTFModule.h>
 
+#include <TRandom.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -28,10 +30,10 @@ REG_MODULE(SecMapTrainerVXDTF)
 /// /// /// /// /// /// /// /// CONSTRUCTOR /// /// /// /// /// /// /// ///
 SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   Module(),
-  m_eventData("EventMetaData", DataStore::c_Event),
-  m_testRootfile(nullptr),
-  m_testConfig(),
-  m_testTrainer(m_testConfig, m_testRootfile)
+  m_eventData("EventMetaData", DataStore::c_Event)
+//   m_testRootfile(nullptr),
+//   m_testConfig(),
+//   m_testTrainer(m_testConfig)
 {
   InitializeVariables();
 
@@ -41,6 +43,14 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
 
   addParam("spTCarrayName", m_PARAMspTCarrayName,
            "the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation", string(""));
+
+
+  /// TODO nice interface for creating TrainerConfigData:
+  TrainerConfigData testData;
+  int rngAppendix = gRandom->Integer(std::numeric_limits<int>::max());
+  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(testData, rngAppendix);
+
+  m_secMapTrainers.push_back(std::move(newMap));
 }
 
 
@@ -49,9 +59,12 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
 void SecMapTrainerVXDTFModule::initialize()
 {
   B2INFO("~~~~~~~~~~~SecMapTrainerVXDTFModule - initialize ~~~~~~~~~~")
-  m_testRootfile = new TFile("testName.root", "RECREATE");
-  m_testRootfile->cd();
-  m_testTrainer.initialize();
+
+  for (auto& trainer : m_secMapTrainers) {
+    trainer.initialize();
+  }
+
+//   m_testTrainer.initialize();
   m_spacePointTrackCands.isRequired(m_PARAMspTCarrayName);
 }
 
@@ -65,7 +78,11 @@ void SecMapTrainerVXDTFModule::event()
   int thisEvent = m_eventData->getEvent();
   B2DEBUG(5, "~~~~~~~~~~~SecMapTrainerVXDTFModule - experiment/run/event " << thisExperiment << "/" << thisRun << "/" << thisEvent <<
           " ~~~~~~~~~~")
-  m_testTrainer.initializeEvent(thisExperiment, thisRun, thisEvent);
+
+  for (auto& trainer : m_secMapTrainers) {
+    trainer.initializeEvent(thisExperiment, thisRun, thisEvent);
+  }
+//   m_testTrainer.initializeEvent(thisExperiment, thisRun, thisEvent);
 
   //simulated particles and hits
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
@@ -83,20 +100,28 @@ void SecMapTrainerVXDTFModule::event()
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
     B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
 
-    bool accepted = m_testTrainer.storeTC(*currentTC, iTC);
-    nAccepted += (accepted ? 1 : 0);
-//     for (auto* secMap : m_sectorMaps) {
-    /// TODO different sectorMaps (have to be stored in a vector of secMaps...).
-//     }
+//     bool accepted = m_testTrainer.storeTC(*currentTC, iTC);
+
+    for (auto& trainer : m_secMapTrainers) {
+      bool accepted = trainer.storeTC(*currentTC, iTC);
+      nAccepted += (accepted ? 1 : 0);
+    }
   }
   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs accepted: " << nAccepted);
 
 
   // process raw data:
-  unsigned nTCsProcessed = m_testTrainer.processTracks();
+  for (auto& trainer : m_secMapTrainers) {
+    unsigned nTCsProcessed = trainer.processTracks();
 
-  B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs processed: " << nTCsProcessed <<
-          ", calculations done!");
+    B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << " with mapTrainer " << trainer.getConfig().secMapName <<
+            ": number of TCs processed: " << nTCsProcessed <<
+            ", calculations done!");
+  }
+//   unsigned nTCsProcessed = m_testTrainer.processTracks();
+
+//   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs processed: " << nTCsProcessed <<
+//           ", calculations done!");
 }
 
 
@@ -106,7 +131,8 @@ void SecMapTrainerVXDTFModule::event()
 void SecMapTrainerVXDTFModule::terminate()
 {
   B2DEBUG(1, " SecMapTrainerVXDTFModule::terminate:: start.")
-  m_testRootfile->cd();
-  m_testTrainer.terminate(m_testRootfile);
+  for (auto& trainer : m_secMapTrainers) {
+    trainer.terminate();
+  }
   B2INFO(" SecMapTrainerVXDTFModule, everything is done. Terminating.")
 }

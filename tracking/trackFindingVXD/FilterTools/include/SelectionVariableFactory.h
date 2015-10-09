@@ -58,8 +58,9 @@ namespace Belle2 {
   class SelectionVariableFactory {
   public:
     /** constructor where virtual IP has been passed */
-    SelectionVariableFactory(double x = 0, double y = 0, double z = 0) :
+    SelectionVariableFactory(double x = 0, double y = 0, double z = 0, double = 0) :
       m_virtualIP(PointType(x, y, z)) {}
+
 
 
     /** shortCut for better readability. */

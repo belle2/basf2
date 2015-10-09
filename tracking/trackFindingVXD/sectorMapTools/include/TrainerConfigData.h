@@ -41,10 +41,10 @@ namespace Belle2 {
     /** stores all the pdgCodes which are allowed to be used by the SecMap. if empty all types are allowed. */
     std::vector<int> pdgCodesAllowed;
 
-    /** stores a cut for maximum distance of the seed in xy of the given virtual IP. */
+    /** stores a cut for maximum distance of the seed in xy of the given virtual IP. WARNING only working if MC-TCs are used, VXDTF-TCs use innermost hit as seed != mctc-seed! */
     double seedMaxDist2IPXY = 23.5;
 
-    /** stores a cut for maximum distance of the seed in z of the given virtual IP. */
+    /** stores a cut for maximum distance of the seed in z of the given virtual IP. WARNING only working if MC-TCs are used, VXDTF-TCs use innermost hit as seed != mctc-seed!  */
     double seedMaxDist2IPZ = 23.5;
 
     /** stores the minimal number of hits a TC must have to be accepted as TC (vIP-Hits are ignored). */
@@ -73,6 +73,11 @@ namespace Belle2 {
     /** Magnetic field value to be set for the filters. */
     double mField = 1.5;
 
+    /** defined 1 == 100%, if relative frequency of sec-combi to the outer-sector is less than threshold, sector-combi will be deleted. */
+    double rarenessThreshold = 0.001;
+
+    /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
+    std::pair<double, double> quantiles = {0.005, 0.005};
   };
 }
 

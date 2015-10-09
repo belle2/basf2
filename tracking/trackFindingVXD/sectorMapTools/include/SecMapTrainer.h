@@ -282,7 +282,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(TrainerConfigData& configData, TFile* rootFile) :
+    SecMapTrainer(TrainerConfigData& configData, int rngAppendix = 0) :
       m_config(configData),
       m_factory(
         configData.vIP.X(),
@@ -290,7 +290,7 @@ namespace Belle2 {
         configData.vIP.Z(),
         configData.mField),
       m_filterMill(),
-      m_rootInterface(rootFile, configData.secMapName)
+      m_rootInterface(configData.secMapName, rngAppendix)
     {
       // stretch the cuts:
       m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;
@@ -325,8 +325,10 @@ namespace Belle2 {
     }
 
     /** initialize the trainer (to be called in Module::terminate(). */
-    void terminate(TFile* file)
-    { m_rootInterface.write(file); }
+//     void terminate(TFile* file)
+//     { m_rootInterface.write(file); }
+    void terminate()
+    { m_rootInterface.write(); }
 
     /** Initialize event. */
     void initializeEvent(int expNo, int runNo, int evtNo)
@@ -336,6 +338,9 @@ namespace Belle2 {
       m_evtNo = evtNo;
     }
 
+
+    /** returns configuration. */
+    const TrainerConfigData& getConfig() { return m_config; }
 
 
     /** checks if given TC is acceptable for this trainer and store it if it is accepted.

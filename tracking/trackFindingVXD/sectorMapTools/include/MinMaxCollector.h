@@ -14,7 +14,7 @@
 // includes - stl:
 #include <deque>
 #include <string>
-#include <utility> // std::pair
+#include <utility> // std::pair, std::move
 #include <limits>       // std::numeric_limits
 
 #include <math.h>       /* ceil */
@@ -200,12 +200,24 @@ namespace Belle2 {
 
 
 
+    /** for convenience reasons, pipe to append. */
+    void insert(DataType newVal)
+    { append(std::move(newVal));}
+
+
+
+    /** for convenience reasons, pipe to append. */
+    void push_back(DataType newVal)
+    { append(std::move(newVal));}
+
+
+
     /** append new value */
     void append(DataType newVal)
     {
       m_sampleSize++;
 
-      if (m_sampleSize < 6) { // to shorten warm-up-phase
+      if (m_sampleSize < m_warmUpThreshold) { // to shorten warm-up-phase
         m_smallestValues.push_back(newVal);
         std::sort(m_smallestValues.begin(), m_smallestValues.end());
         m_biggestValues.push_back(newVal);
@@ -253,6 +265,14 @@ namespace Belle2 {
     bool empty() const { return (m_smallestValues.empty() and m_biggestValues.empty()); }
 
 
+
+    /** deletes all values collected so far and resets to constructor-settings. */
+    void clear()
+    {
+      m_sampleSize = 0;
+      m_smallestValues.clear();
+      m_biggestValues.clear();
+    }
 
     /** returns actual sampleSize */
     unsigned sampleSize() const { return m_sampleSize; }

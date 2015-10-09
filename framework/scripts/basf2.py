@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# now let's make sure we actually run in python 3
+import sys
+if sys.version_info[0] < 3:
+    print("basf2 requires python3. Please run the steering files using basf2 "
+          "(or python3), not python")
+    sys.exit(1)
+
+# import to override print function
+import basf2_print
+
 # -----------------------------------------------
 #          Import basf2 environment
 # -----------------------------------------------
@@ -10,20 +20,3 @@ from basf2_env import *
 #    Import global basf2 function definitions
 # -----------------------------------------------
 from basf2_def import *
-
-# -----------------------------------------------------
-# replace print function with a flushing print function
-# -----------------------------------------------------
-
-import builtins
-
-
-def flush_print(*args, **argk):
-    """print function which flushes by default"""
-    argk.setdefault("flush", True)
-    builtins._print(*args, **argk)
-
-# remember original print function
-builtins._print = print
-# and replace it with the flushing one
-builtins.print = flush_print

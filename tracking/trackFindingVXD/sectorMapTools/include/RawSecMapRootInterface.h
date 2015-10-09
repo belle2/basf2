@@ -77,7 +77,7 @@ namespace Belle2 {
     }
 
     /** destructor deleting the rootFile. */
-    ~RawSecMapRootInterface() { delete m_file; }
+    ~RawSecMapRootInterface() { /*delete m_file;*/ }
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */

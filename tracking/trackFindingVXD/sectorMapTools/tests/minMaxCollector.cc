@@ -110,8 +110,8 @@ namespace VXDTFMinMaxCollectorTest {
     }
     newCollector.print();
 
-    EXPECT_EQ(5, newCollector.size());
-    EXPECT_EQ(10, newCollector.totalSize()); // did not grow, old value replaced...
+    EXPECT_EQ(9, newCollector.size());
+    EXPECT_EQ(18, newCollector.totalSize()); // did not grow, old value replaced...
     EXPECT_EQ(50, newCollector.sampleSize());
     EXPECT_EQ(5., newCollector.getMinMax(0.009, 0.991).first);
     EXPECT_EQ(42., newCollector.getMinMax(0.009, 0.991).second);

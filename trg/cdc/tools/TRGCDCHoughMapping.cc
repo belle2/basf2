@@ -470,10 +470,10 @@ superLayer(const unsigned id) {
                 {
                       if(ii==0){
 			    if(j>39 && j<80)
-                            outputf<<"or SL"<<SL<<"_TS("<<N_TS_SL0<<")";
-                            outc << " or SL" << SL << "_TS["<<N_TS_SL0<<"]";
+                            outputf<<"or SL"<<SL<<"_TS("<<(N_TS_SL0 - 1)<<")";
+                            outc << " or SL" << SL << "_TS["<<(N_TS_SL0 - 1)<<"]";
                             HPcelly[k][j].push_back(SL);
-                            HPcelly[k][j].push_back(N_TS_SL0);
+                            HPcelly[k][j].push_back(N_TS_SL0 - 1);
                                 }
                       if(ii!=0){
 		            if(j>39 && j<80)
@@ -487,14 +487,14 @@ superLayer(const unsigned id) {
         if (ffp==1)
                 {
 
-                      if(iip==N_TS_SL0){
+                      if(iip==(N_TS_SL0 - 1)){
 				if(j>=0 && j<40)
                                 outputfp<<"or SL"<<SL<<"_TS(0)";
                                 outcp<<" or SL"<< SL <<"_TS[0] ";
                                 pHPcelly[k][j].push_back(SL);
                                 pHPcelly[k][j].push_back(0);
                                 }
-                      if(iip!=N_TS_SL0) {
+                      if(iip!=(N_TS_SL0 - 1)) {
 				if(j>=0 && j<40)
                                 outputfp<<"or SL"<<SL<<"_TS("<<iip+1<<")";
                                 outcp << " or SL" << SL << "_TS[" << iip+1 << "]";

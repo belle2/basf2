@@ -118,7 +118,7 @@ namespace Belle2 {
 
     FullSecID getFullID(VxdID aSensorID, float x, float y) const
     {
-      return m_compactSecIDsMap.getFullID(aSensorID, x, y);
+      return m_compactSecIDsMap.getFullSecID(aSensorID, x, y);
     }
 
   private:

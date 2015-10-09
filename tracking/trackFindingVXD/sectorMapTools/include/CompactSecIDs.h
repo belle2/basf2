@@ -136,7 +136,7 @@ namespace Belle2 {
 
     }
 
-    FullSecID getFullID(VxdID aSensorID, float x, float y) const
+    FullSecID getFullSecID(VxdID aSensorID, float x, float y) const
     {
 
       auto layer = aSensorID.getLayerNumber() ;

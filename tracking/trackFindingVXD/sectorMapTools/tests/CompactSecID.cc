@@ -87,7 +87,7 @@ TEST(CompactSecIDs, stressTest)
           sectors[i].resize(vSup.size() + 1);
           for (unsigned int j = 0; j < vSup.size() + 1 ; j++) {
             sectors[i][j] = FullSecID(VxdID(layer, ladder , sensor),
-                                      false, counter);
+                                      sensor % 2 == 0 ? false : true ,  counter);
             counter ++;
           }
         }
@@ -104,12 +104,12 @@ TEST(CompactSecIDs, stressTest)
           sectors[i].resize(vSup.size() + 1);
           for (unsigned int j = 0; j < vSup.size() + 1; j++) {
             sectors[i][j] = FullSecID(VxdID(layer, ladder , sensor),
-                                      false, counter);
+                                      sensor % 2 == 0 ? false : true, counter);
             counter ++;
           }
         }
 
-        // un succesfully insert
+        // un succesfully insert because the sectors are already in compactSecIds
         EXPECT_EQ(0  , compactSecIds.addSectors(uSup , vSup, sectors));
       }
 
@@ -119,7 +119,9 @@ TEST(CompactSecIDs, stressTest)
     for (int ladder = 1 ; ladder <= ladders[layer - 1] ; ladder++)
       for (int sensor = 1 ; sensor <=  sensors[layer - 1] ; sensor++)
         for (unsigned int sector = 0 ; sector < (uSup.size() + 1) * (vSup.size() + 1) ; sector ++) {
-          FullSecID aSector(VxdID(layer, ladder , sensor), true, sector);
+          FullSecID aSector(VxdID(layer, ladder , sensor),
+                            sensor % 2 == 0 ? false : true
+                            , sector);
           // succesfully retrieve
           EXPECT_EQ(++ expected, compactSecIds.getCompactID(aSector));
 
@@ -129,19 +131,19 @@ TEST(CompactSecIDs, stressTest)
 
   for (float u = 0. ; u < 1.; u += .25) {
     for (float v = 0.; v < 1.; v += .2)
-      cout << compactSecIds.getFullID(VxdID(1, 1 , 1), u, v) << "\t";
+      cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
     cout << endl;
   }
 
   for (float u = 1.e-6 ; u < 1.3; u += .25) {
     for (float v = 1.e-6; v < 1.3; v += .2)
-      cout << compactSecIds.getFullID(VxdID(1, 1 , 1), u, v) << "\t";
+      cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
     cout << endl;
   }
 
   for (float u = .25 ; u < 1.25; u += .25) {
     for (float v = 0.2; v < 1.2; v += .2)
-      cout << compactSecIds.getFullID(VxdID(1, 1 , 1), u, v) << "\t";
+      cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
     cout << endl;
   }
 

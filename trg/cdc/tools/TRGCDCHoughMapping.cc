@@ -201,8 +201,10 @@ superLayer(const unsigned id) {
 /////////////////////////////////////////////////base of ts
 
     for(int i=0 ; i<N_TS_SL0 ; i++) {
-        xy.x=r_SL0*cos((PI2/N_TS_SL0)*i);
-        xy.y=r_SL0*sin((PI2/N_TS_SL0)*i);
+        float offset = (SL == 0)? 0.5 : 0 ;
+     	xy.x=r_SL0*cos((PI2/N_TS_SL0)*(i+offset));
+        xy.y=r_SL0*sin((PI2/N_TS_SL0)*(i+offset));
+
         xymatrix.push_back(xy);
     }
 ///////////////////////////////////////////////////HP to TS
@@ -469,10 +471,10 @@ superLayer(const unsigned id) {
                 {
                       if(ii==0){
 			    if(j>39 && j<80)
-                            outputf<<"or SL"<<SL<<"_TS(159)";
-                            outc << " or SL" << SL << "_TS[159]";
+                            outputf<<"or SL"<<SL<<"_TS("<<N_TS_SL0<<")";
+                            outc << " or SL" << SL << "_TS["<<N_TS_SL0<<"]";
                             HPcelly[k][j].push_back(SL);
-                            HPcelly[k][j].push_back(159);
+                            HPcelly[k][j].push_back(N_TS_SL0);
                                 }
                       if(ii!=0){
 		            if(j>39 && j<80)
@@ -486,14 +488,14 @@ superLayer(const unsigned id) {
         if (ffp==1)
                 {
 
-                      if(iip==159){
+                      if(iip==N_TS_SL0){
 				if(j>=0 && j<40)
                                 outputfp<<"or SL"<<SL<<"_TS(0)";
                                 outcp<<" or SL"<< SL <<"_TS[0] ";
                                 pHPcelly[k][j].push_back(SL);
                                 pHPcelly[k][j].push_back(0);
                                 }
-                      if(iip!=159) {
+                      if(iip!=N_TS_SL0) {
 				if(j>=0 && j<40)
                                 outputfp<<"or SL"<<SL<<"_TS("<<iip+1<<")";
                                 outcp << " or SL" << SL << "_TS[" << iip+1 << "]";

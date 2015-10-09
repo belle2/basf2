@@ -80,14 +80,14 @@ namespace Belle2 {
     /** contains the spacePointTrackCands to be analyzed for the secMap-Training. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
-// // // //   /** Temporary test file which shall be replaced by the final StoreObjPtr< RootMergeable>-stuff. */
-// // // //   TFile* m_testRootfile;
+//     /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
+//     TrainerConfigData m_testConfig;
 
-    /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
-    TrainerConfigData m_testConfig;
+//     /** one trainer for being able to test raw data sampling for secMap-training. */
+//     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit>> m_testTrainer;
 
-    /** one trainer for being able to test raw data sampling for secMap-training. */
-    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit>> m_testTrainer;
+    /** contains the trainers for the secMaps to be trained. */
+    std::vector< SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > > m_secMapTrainers;
 
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;

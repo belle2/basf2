@@ -32,11 +32,11 @@ namespace Belle2 {
 
     /** stores the cuts in u-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
-    std::vector<double> uDirectionCuts = {0., .25, .5, .75, 1.};
+    std::vector<double> uDirectionCuts = {0., .15, .5, .85, 1.};
 
     /** stores the cuts in v-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
-    std::vector<double> vDirectionCuts = {0., .25, .5, .75, 1.};
+    std::vector<double> vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
 
     /** stores all the pdgCodes which are allowed to be used by the SecMap. if empty all types are allowed. */
     std::vector<int> pdgCodesAllowed;

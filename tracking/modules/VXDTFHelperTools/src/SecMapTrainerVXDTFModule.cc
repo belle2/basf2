@@ -45,10 +45,31 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
            "the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation", string(""));
 
 
+  // small lambda for getting random numbers:
+  auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
+
+
   /// TODO nice interface for creating TrainerConfigData:
-  TrainerConfigData testData;
-  int rngAppendix = gRandom->Integer(std::numeric_limits<int>::max());
-  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(testData, rngAppendix);
+  TrainerConfigData testData1;
+  testData1.pTCuts = {0.02, 3.5};
+  testData1.pTSmear = 0.;
+  testData1.minMaxLayer = {3, 6};
+  testData1.uDirectionCuts = {0., .15, .5, .85, 1.};
+  testData1.vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
+  testData1.pdgCodesAllowed = {};
+  testData1.seedMaxDist2IPXY = 23.5;
+  testData1.seedMaxDist2IPZ = 23.5;
+  testData1.nHitsMin = 3;
+  testData1.vIP = B2Vector3D(0, 0, 0);
+  testData1.secMapName = "lowTestVXDTF";
+  testData1.twoHitFilters = { "distance3D", "distanceXY", "slopeRZ"};
+  testData1.threeHitFilters = { "angles3D", "deltaSlopeRZ"};
+  testData1.fourHitFilters = { "deltaDistance2IP"};
+  testData1.mField = 1.5;
+  testData1.rarenessThreshold = 0.001;
+  testData1.quantiles = {0.005, 0.005};
+
+  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(testData1, rngAppendix());
 
   m_secMapTrainers.push_back(std::move(newMap));
 }
@@ -107,7 +128,7 @@ void SecMapTrainerVXDTFModule::event()
       nAccepted += (accepted ? 1 : 0);
     }
   }
-  B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs accepted: " << nAccepted);
+  B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs total/accepted: " << nSPTCs << "/" << nAccepted);
 
 
   // process raw data:

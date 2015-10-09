@@ -145,12 +145,21 @@ namespace Belle2 {
       checkLocked("grindData2Hit");
       if (m_2Hitfilters.empty()) { B2DEBUG(5, "there are no 2-hit-filters stored, skipping grinding"); return; }
 
-      for (const auto& filterPack : m_2Hitfilters) {
-        double result = filterPack.second(
-                          *(dataSet.outer),
-                          *(dataSet.inner));
-        collectedData.push_back({filterPack.first, result});
+      std::vector<std::pair<std::string, double>> tempData;
+      try {
+        for (const auto& filterPack : m_2Hitfilters) {
+
+          double result = filterPack.second(
+                            *(dataSet.outer),
+                            *(dataSet.inner));
+          tempData.push_back({filterPack.first, result});
+        }
+      } catch (...) {
+        B2WARNING("FilterMill:grindData2Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        return;
       }
+
+      collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
       B2DEBUG(5, "FilterMill::grindData2Hit: collectedData has now " << collectedData.size() << " entries")
     }
@@ -163,13 +172,21 @@ namespace Belle2 {
       checkLocked("grindData3Hit");
       if (m_3Hitfilters.empty()) { B2DEBUG(5, "there are no 3-hit-filters stored, skipping grinding"); return; }
 
-      for (const auto& filterPack : m_3Hitfilters) {
-        double result = filterPack.second(
-                          *(dataSet.outer),
-                          *(dataSet.center),
-                          *(dataSet.inner));
-        collectedData.push_back({filterPack.first, result});
+      std::vector<std::pair<std::string, double>> tempData;
+      try {
+        for (const auto& filterPack : m_3Hitfilters) {
+
+          double result = filterPack.second(
+                            *(dataSet.outer),
+                            *(dataSet.center),
+                            *(dataSet.inner));
+          tempData.push_back({filterPack.first, result});
+        }
+      } catch (...) {
+        B2WARNING("FilterMill:grindData3Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        return;
       }
+      collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
       B2DEBUG(5, "FilterMill::grindData3Hit: collectedData has now " << collectedData.size() << " entries")
     }
@@ -182,14 +199,22 @@ namespace Belle2 {
       checkLocked("grindData4Hit");
       if (m_4Hitfilters.empty()) { B2DEBUG(5, "there are no 4-hit-filters stored, skipping grinding"); return; }
 
-      for (const auto& filterPack : m_4Hitfilters) {
-        double result = filterPack.second(
-                          *(dataSet.outer),
-                          *(dataSet.outerCenter),
-                          *(dataSet.innerCenter),
-                          *(dataSet.inner));
-        collectedData.push_back({filterPack.first, result});
+      std::vector<std::pair<std::string, double>> tempData;
+      try {
+        for (const auto& filterPack : m_4Hitfilters) {
+
+          double result = filterPack.second(
+                            *(dataSet.outer),
+                            *(dataSet.outerCenter),
+                            *(dataSet.innerCenter),
+                            *(dataSet.inner));
+          tempData.push_back({filterPack.first, result});
+        }
+      } catch (...) {
+        B2WARNING("FilterMill:grindData4Hit: an exception was thrown by one of the Filters/SelectionVariables, that indicates strange input data, no data collected!")
+        return;
       }
+      collectedData.insert(collectedData.end(), tempData.begin(), tempData.end());
 
       B2DEBUG(5, "FilterMill::grindData4Hit: collectedData has now " << collectedData.size() << " entries")
     }

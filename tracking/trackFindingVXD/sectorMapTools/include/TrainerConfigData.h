@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+
 #pragma once
 
 #include <tracking/vectorTools/B2Vector3.h>
@@ -21,7 +22,13 @@ namespace Belle2 {
 
   /** simple struct containing all the configuration data needed for the SecMapTrainer. */
   struct TrainerConfigData {
+    // TODO:
+    // JAKOB will change the name of this class into SectorMapConfig which is
+    // more meaningful, and will put it among the dataobjects since it will be
+    // stored together with the cut values
+
     /** stores pTCuts for min (.first) and max (.second) ptCut. */
+    // Eugenio: Why not use pTmin and pTmax instead of pTCuts.first and pTCuts.second which is awkward?
     std::pair<double, double> pTCuts = {0.02, 3.5};
 
     /** allows smearing of the cuts. Values greater 0 stretch the cuts, values smaller 0 narrow them down. */
@@ -32,10 +39,15 @@ namespace Belle2 {
 
     /** stores the cuts in u-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
+    // TODO: These are not Cuts, perhaps upperValues Low values?
+    // Can we get rid og 0 and 1 since they are not conveing any information?
     std::vector<double> uDirectionCuts = {0., .15, .5, .85, 1.};
+
 
     /** stores the cuts in v-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
+    // TODO: These are not Cuts, perhaps upperValues Low values?
+    // Can we get rid og 0 and 1 since they are not conveing any information?
     std::vector<double> vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
 
     /** stores all the pdgCodes which are allowed to be used by the SecMap. if empty all types are allowed. */

@@ -13,7 +13,6 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/vxdCaTracking/XHitFilterFactory.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainer.h>
-#include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>

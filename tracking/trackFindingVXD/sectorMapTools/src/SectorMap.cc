@@ -1,9 +1,14 @@
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+/********************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                           *
+ * Copyright(C) 2015 - Belle II Collaboration                                   *
+ *                                                                              *
+ * Author: The Belle II Collaboration                                           *
+ * Contributors: Eugenio Paoloni                                                *
+ *                                                                              *
+ * This software is provided "as is" without any warranty.                      *
+ *******************************************************************************/
 
-#ifndef __CINT__
-#include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
-#include <unordered_map>
-#endif
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
 
 using namespace std;
 using namespace Belle2;
@@ -47,6 +52,7 @@ SectorMap::getFilters(const std::string& setupName)
 
 }
 
+
 void
 SectorMap::assignFilters(const string& setupName, VXDTFFilters* filters)
 {
@@ -57,4 +63,10 @@ SectorMap::assignFilters(const string& setupName, VXDTFFilters* filters)
 }
 
 
-
+#ifndef __CINT__
+const unordered_map< string, VXDTFFilters*>&
+SectorMap::getAllSetups(void)
+{
+  return * (setupNameToFilters_t*) m_allSetupsFilters;
+}
+#endif

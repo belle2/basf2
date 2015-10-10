@@ -8,8 +8,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <iostream>
 
 #include "tracking/modules/VXDTFRedesign/TFRedesignModule.h"
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 
 // framework
 #include <framework/gearbox/Const.h>
@@ -1865,6 +1868,9 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
   unsigned int discardedSegmentsCounter = 0;
   unsigned int activatedSegmentsCounter = 0;
 
+  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);;
+  auto filters = sectorMap->getFilters(currentPass->getName());
+
   for (VXDSector* mainSector : currentPass->sectorVector) {
 
     const vector<VXDSector*>& hisFriends = mainSector->getFriendPointers(); // loading friends of sector
@@ -1879,7 +1885,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
       for (VXDTFHit* friendHit : friendHits) {
         allFriendHits.push_back({friendHit, friendSector});
       }
-    } // iterating through friendsectors and importing their containing hits
+    } // iterating through friendsectors and importing their containing hits. Gene: why are we paying this performance penalty?
 
     const vector<VXDTFHit*>& ownHits = mainSector->getHits(); // loading own hits of sector
     int nCurrentHits = ownHits.size();
@@ -1890,7 +1896,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
     for (int currentMainHit = 0; currentMainHit < nCurrentHits; currentMainHit++) {
       int currentFriendHit = 0;
 
-      VXDTFHit* mainHit = ownHits.at(currentMainHit);//[currentMainHit];
+      VXDTFHit* mainHit = ownHits.at(currentMainHit);//[currentMainHit]; // Gene: hit 1 on mainSecID
 
       if (nFriendHits == 0 && mainHit->getNumberOfSegments() == 0) {
         B2DEBUG(10, "event " << m_eventCounter << ": current Hit has no friendHits although layer is " << mainSecID.getLayerID() <<
@@ -1910,15 +1916,20 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
         acceptedRejectedFilters.clear();
         simpleSegmentQI = 0;
 
-        VXDTFHit* friendHit = friendEntry.first;
+        VXDTFHit* friendHit = friendEntry.first;  // Gene: hit 2 on friendSecID (see later)
         VXDSector* friendSector = friendEntry.second;
         if (friendHit->isReserved() == true) { continue; }
 
         currentFriendID = friendSector->getSecID();
         FullSecID friendSecID = FullSecID(currentFriendID);
 
+        // Gene all the work is concentrated here
+        bool GeneAccepted = filters->friendsSectorFilter(mainSecID, friendSecID).accept(*mainHit , *friendHit);
+
         friendCoords = friendHit->getHitCoordinates();
+
         currentPass->twoHitFilterBox.resetValues(*currentCoords, *friendCoords, mainSector, currentFriendID);
+
 
         if (currentPass->distance3D.first == true) { // min & max!
           accepted = currentPass->twoHitFilterBox.checkDist3D(FilterID::distance3D);
@@ -1940,6 +1951,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
             }
           } // else segment not approved
         } else { B2DEBUG(175, " dist3d is not activated for pass: " << currentPass->sectorSetup << "!") }
+
 
         if (currentPass->distanceXY.first == true) { // min & max!
           accepted = currentPass->twoHitFilterBox.checkDistXY(FilterID::distanceXY);
@@ -2061,6 +2073,25 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
 //             acceptedRejectedFilters.push_back( {FilterID::random2Hit, false} );
 //           } // else segment not approved
 //         } else { B2DEBUG(175, " random2Hit is not activated for pass: " << currentPass->sectorSetup << "!") }
+
+        cout << endl
+
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).first << " < "
+             << currentPass->twoHitFilterBox.calcDist3D() << " < "
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::distance3D).second << " | "
+
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).first << " < "
+             << currentPass->twoHitFilterBox.calcDistXY() << " < "
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::distanceXY).second << " | "
+
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).first << " < "
+             << currentPass->twoHitFilterBox.calcSlopeRZ() << " < "
+             << currentPass->twoHitFilterBox.getCutoffs(FilterID::slopeRZ).second << " | "
+
+             << mainSecID.getFullSecID() << " " << friendSecID.getFullSecID() << " GenRes: "
+
+             << GeneAccepted << " " << (currentPass->activatedSegFinderTests == simpleSegmentQI) << endl
+             ;
 
         if (simpleSegmentQI < currentPass->activatedSegFinderTests) {
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 50, PACKAGENAME()) == true) {
@@ -4794,6 +4825,7 @@ void TFRedesignModule::setupPasses()
     PassData* newPass = new PassData;
 
     newPass->sectorSetup = m_PARAMsectorSetup.at(i);
+
     newPass->generalTune = m_PARAMtuneCutoffs; // for all passes the same
 
     VXDTFSecMap::Class(); // essential, needed for root, waiting for root 6 to be removed (hopefully)

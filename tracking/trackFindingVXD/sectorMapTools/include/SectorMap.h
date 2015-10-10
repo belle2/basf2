@@ -13,21 +13,22 @@
 
 #include <TObject.h>
 #include <string>
-
+#ifndef __CINT__
+#include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
+#include <unordered_map>
+#include <string>
+#endif
 namespace Belle2 {
 
 
-  class VXDTFFilters;
-
-
   // This class contains everything needed by the VXDTF that is not going
-  // to change during a RUN, i.e. IP position, B field @ IP, collections of
-  // sector maps etc. etc.
+  // to change during a RUN, i.e. IP position, B field @ IP, static sectors,
+  // 2 space points filters, 3 space points filters,  etc. etc.
   // It will be put in the datastore with duration RUN.
   // This class owns her members and she is in charge for their deletions.
   class SectorMap : public TObject {
   private:
-    // Contains all the Filters indexed by their setupNames
+    // Contains all the Filters and configurations indexed by their setupNames
     // m_SegmentFilters is a pointer to an unsorted_map, since ROOT 5 is
     // not able to digest it... I will hide its identity to ROOTCINT
     // cfr. PIMPL or Opaque Pointers
@@ -50,6 +51,9 @@ namespace Belle2 {
 
     const VXDTFFilters* getFilters(const std::string& setupName);
 
+#ifndef __CINT__
+    const std::unordered_map< std::string, VXDTFFilters*>& getAllSetups(void);
+#endif
 
     void assignFilters(const std::string& setupName ,
                        VXDTFFilters* filters);

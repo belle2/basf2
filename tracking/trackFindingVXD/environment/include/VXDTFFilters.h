@@ -24,6 +24,8 @@
 #include "tracking/vxdCaTracking/VXDTFHit.h"
 #include "tracking/dataobjects/FullSecID.h"
 
+#include "tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h"
+
 #include "vxd/dataobjects/VxdID.h"
 #include "tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h"
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
@@ -52,7 +54,7 @@ namespace Belle2 {
 
     typedef StaticSector< point_t, filter2sp_t, int , int > staticSector_t;
 
-    VXDTFFilters() {m_staticSectors.resize(2);}
+    VXDTFFilters(): m_testConfig() {m_staticSectors.resize(2);}
 
     int addSectorsOnSensor(const vector<float>&                normalizedUsup,
                            const vector<float>&                normalizedVsup,
@@ -121,11 +123,18 @@ namespace Belle2 {
       return m_compactSecIDsMap.getFullSecID(aSensorID, x, y);
     }
 
+    const TrainerConfigData& getConfig(void) const { return m_testConfig; }
+    void setConfig(const TrainerConfigData& config) { m_testConfig = config ; }
+
   private:
 
     vector< staticSector_t* > m_staticSectors;
 
     CompactSecIDs m_compactSecIDsMap;
+
+    /** configuration  */
+    TrainerConfigData m_testConfig;
+
   };
 
 }

@@ -13,7 +13,6 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableFactory.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainer.h>
-#include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -80,11 +79,6 @@ namespace Belle2 {
     /** contains the spacePointTrackCands to be analyzed for the secMap-Training. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
-//     /** dummy configuration for a single secMapTrainer (used as a bare-Minimum-setting for further tests). */
-//     TrainerConfigData m_testConfig;
-
-//     /** one trainer for being able to test raw data sampling for secMap-training. */
-//     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit>> m_testTrainer;
 
     /** contains the trainers for the secMaps to be trained. */
     std::vector< SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > > m_secMapTrainers;

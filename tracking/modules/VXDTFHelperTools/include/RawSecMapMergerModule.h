@@ -18,6 +18,9 @@
 #include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
 #include <tracking/trackFindingVXD/sectorMapTools/ProtoSectorGraph.h>
+#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include "framework/datastore/StoreObjPtr.h"
+
 // stl:
 #include <string>
 #include <vector>
@@ -59,37 +62,6 @@ namespace Belle2 {
 
     /** Destructor of the module. */
     virtual ~RawSecMapMergerModule() {}
-
-
-
-    /** loads configuration for given parameter mapName */
-    TrainerConfigData getConfig(std::string mapName)
-    {
-      B2INFO("RawSecMapMerger::getConfig(): loading mapName: " << mapName)
-      // TODO
-      // INFO: this will be a parameter or loaded from a csvFile/database-entry:
-      TrainerConfigData testData3;
-      testData3.pTCuts = {0.290, 3.5};
-      testData3.pTSmear = 0.;
-      testData3.minMaxLayer = {3, 6};
-      testData3.uDirectionCuts = {0., .15, .5, .85, 1.};
-      testData3.vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
-      testData3.pdgCodesAllowed = {};
-      testData3.seedMaxDist2IPXY = 23.5;
-      testData3.seedMaxDist2IPZ = 23.5;
-      testData3.nHitsMin = 3;
-      testData3.vIP = B2Vector3D(0, 0, 0);
-      testData3.secMapName = "highTestRedesign";
-      testData3.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "SlopeRZ"};
-      testData3.threeHitFilters = { "Angle3DSimple", "DeltaCircleRadiusHighOccupancy"};
-      testData3.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
-      testData3.mField = 1.5;
-      testData3.rarenessThreshold = 0.001;
-      testData3.quantiles = {0.005, 0.005};
-      return std::move(testData3);
-    }
-
-
 
     /** returns all names of root-files fitting given parameter mapName  */
     std::vector<std::string> getRootFiles(std::string mapName)
@@ -407,20 +379,20 @@ namespace Belle2 {
      */
     virtual void initialize()
     {
-      m_PARAMmapNames.push_back("highTestRedesign");
-      B2INFO("RawSecMapMerger::initialize():")
 
-      // loop over sectorMaps:
-      for (std::string& mapName : m_PARAMmapNames) {
-        B2INFO("RawSecMapMerger::initialize(): loading mapName: " << mapName)
+      StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+      B2INFO("RawSecMapMerger::initialize():");
 
-        auto config = getConfig(mapName);
+      // loop over all the setups in the sectorMap:
+      for (auto setup : sectorMap->getAllSetups()) {
+
+        auto config = setup.second->getConfig();
+        B2INFO("RawSecMapMerger::initialize(): loading mapName: " << config.secMapName);
 
         processSectorCombinations(config, 2);
-
         processSectorCombinations(config, 3);
-
         processSectorCombinations(config, 4);
+
       }
 
     }

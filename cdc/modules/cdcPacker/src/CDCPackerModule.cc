@@ -53,7 +53,6 @@ CDCPackerModule::CDCPackerModule() : Module()
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
-  addParam("tdcOffset", m_tdcOffset, "TDC offset (nsec).", 5562);
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file",
            string("/gpfs/home/belle/muchida/basf2/release/cdc/examples/ch_map_yamadas.dat"));
   addParam("enableStoreRawCDC", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);

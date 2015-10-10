@@ -161,7 +161,6 @@ namespace Belle2 {
       int m_event; /// Event number.
       int m_fadcThreshold;  /// FADC threshold.
       //      int m_overflow; /// TDC overflow.
-      int m_tdcOffset; /// TDC offset (nsec).
 
 
     private:

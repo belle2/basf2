@@ -34,7 +34,8 @@ namespace Belle2 {
     //! @param extTime extrapolation time of this hit (ns)
     //! @param hitTime Measured time of this hit (ns)
     //! @param chiSq Chi-squared contribution of this hit
-    MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos, double extTime, double hitTime, double chiSq);
+    MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPos, const TVector3& hitPos,
+            double extTime, double hitTime, double chiSq);
 
     //! Destructor
     virtual ~MuidHit() {}

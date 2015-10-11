@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(MuidHit)
-
 MuidHit::MuidHit() :
   m_PdgCode(0),
   m_ExtTime(0.0),
@@ -29,7 +27,8 @@ MuidHit::MuidHit() :
   m_HitPosition = m_ExtPosition;
 }
 
-MuidHit::MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition, const TVector3& hitPosition, double extTime, double hitTime, double chiSquared)
+MuidHit::MuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
+                 const TVector3& hitPosition, double extTime, double hitTime, double chiSquared)
 {
   m_PdgCode = pdgCode;
   m_InBarrel = inBarrel;

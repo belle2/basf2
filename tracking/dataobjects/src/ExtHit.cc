@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(ExtHit)
-
 // empty constructor for ROOT - do not use this
 ExtHit::ExtHit() :
   RelationsObject(),

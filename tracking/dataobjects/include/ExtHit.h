@@ -37,7 +37,8 @@ namespace Belle2 {
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t, const TVector3& r, const TVector3& p, const TMatrixDSym& e);
+    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t, const TVector3& r, const TVector3& p,
+           const TMatrixDSym& e);
 
     //! Copy constructor
     ExtHit(const ExtHit&);

@@ -67,8 +67,8 @@
 using namespace std;
 using namespace Belle2;
 
-#define TWOPI 6.283185482025146484375
-#define M_PI_8 0.3926990926265716552734
+#define TWOPI (2.0*M_PI)
+#define PI_8 (0.125*M_PI)
 #define DEPTH_RPC 9
 #define DEPTH_SCINT 11
 
@@ -174,8 +174,8 @@ void MuidModule::initialize()
 {
 
   // Convert from GeV to GEANT4 energy units (MeV); avoid negative values
-  m_MinPt = max(0.0, m_MinPt) * GeV;
-  m_MinKE = max(0.0, m_MinKE) * GeV;
+  m_MinPt = max(0.0, m_MinPt) * CLHEP::GeV;
+  m_MinKE = max(0.0, m_MinKE) * CLHEP::GeV;
 
   // Convert user's maximum track-KLMCluster cone angle from degrees to radians
   m_MaxClusterTrackConeAngle *= M_PI / 180.0;
@@ -538,15 +538,16 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
     int charge = gfTrackRep->getCharge(firstState);
     TVector3 firstDirection(firstMomentum.Unit());
 
-    double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * kilogauss / tesla;
-    double radius = (firstMomentum.Perp() * GeV / eV) / (c_light / (m / s) * charge * Bz) * (m / cm);
-    double centerPhi = firstMomentum.Phi() - halfpi;
+    double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
+    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
+                    (CLHEP::m / CLHEP::cm);
+    double centerPhi = firstMomentum.Phi() - M_PI_2;
     double centerX = firstPosition.X() + radius * cos(centerPhi);
     double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + pi;
-    double dPhi = pocaPhi - centerPhi - pi;
-    if (dPhi > pi) { dPhi -= twopi; }
-    if (dPhi < -pi) { dPhi  += twopi; }
+    double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
+    double dPhi = pocaPhi - centerPhi - M_PI;
+    if (dPhi > M_PI) { dPhi -= TWOPI; }
+    if (dPhi < -M_PI) { dPhi  += TWOPI; }
     TVector3 ipPosition(centerX + radius * cos(pocaPhi),
                         centerY + radius * sin(pocaPhi),
                         firstPosition.Z() - dPhi * radius * firstDirection.Z() / firstDirection.Perp());
@@ -572,24 +573,24 @@ void MuidModule::getStartPoint(const genfit::Track* gfTrack, int pdgCode,
       pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
     } else {
       dPhi = lastDirection.Phi() - ipDirection.Phi();
-      if (dPhi < -pi) { dPhi += twopi; }
-      if (dPhi >  pi) { dPhi -= twopi; }
+      if (dPhi < -M_PI) { dPhi += TWOPI; }
+      if (dPhi >  M_PI) { dPhi -= TWOPI; }
       double dx = lastPosition.X() - ipPosition.X();
       double dy = lastPosition.Y() - ipPosition.Y();
       pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
                    * (dPhi / sin(0.5 * dPhi));
     }
-    double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / GeV;
+    double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
     // time of flight from I.P. (ns) at the last point on the Genfit track
-    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * c_light / (cm / ns)));
+    m_TOF = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * CLHEP::c_light / (CLHEP::cm / CLHEP::ns)));
 
     covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
-    position.setX(lastPosition.X()*cm); // in Geant4 units (mm)
-    position.setY(lastPosition.Y()*cm);
-    position.setZ(lastPosition.Z()*cm);
-    momentum.setX(lastMomentum.X()*GeV);  // in Geant4 units (MeV/c)
-    momentum.setY(lastMomentum.Y()*GeV);
-    momentum.setZ(lastMomentum.Z()*GeV);
+    position.setX(lastPosition.X() * CLHEP::cm); // in Geant4 units (mm)
+    position.setY(lastPosition.Y() * CLHEP::cm);
+    position.setZ(lastPosition.Z() * CLHEP::cm);
+    momentum.setX(lastMomentum.X() * CLHEP::GeV);  // in Geant4 units (MeV/c)
+    momentum.setY(lastMomentum.Y() * CLHEP::GeV);
+    momentum.setZ(lastMomentum.Z() * CLHEP::GeV);
   }
 
   catch (genfit::Exception& e) {
@@ -711,13 +712,13 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
 
   Point point;
   point.chi2 = -1.0;
-  point.position.SetX(state->GetPosition().x() / cm);
-  point.position.SetY(state->GetPosition().y() / cm);
-  point.position.SetZ(state->GetPosition().z() / cm);
-  point.momentum.SetX(state->GetMomentum().x() / GeV);
-  point.momentum.SetY(state->GetMomentum().y() / GeV);
-  point.momentum.SetZ(state->GetMomentum().z() / GeV);
-  G4ThreeVector prePos = state->GetG4Track()->GetStep()->GetPreStepPoint()->GetPosition() / cm;
+  point.position.SetX(state->GetPosition().x() / CLHEP::cm);
+  point.position.SetY(state->GetPosition().y() / CLHEP::cm);
+  point.position.SetZ(state->GetPosition().z() / CLHEP::cm);
+  point.momentum.SetX(state->GetMomentum().x() / CLHEP::GeV);
+  point.momentum.SetY(state->GetMomentum().y() / CLHEP::GeV);
+  point.momentum.SetZ(state->GetMomentum().z() / CLHEP::GeV);
+  G4ThreeVector prePos = state->GetG4Track()->GetStep()->GetPreStepPoint()->GetPosition() / CLHEP::cm;
   TVector3 oldPosition(prePos.x(), prePos.y(), prePos.z());
   double r = point.position.Perp();
   double z = fabs(point.position.Z() - m_OffsetZ);
@@ -797,9 +798,9 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track* track, int pdgCod
     MuidHit* muidHit = muidHits.appendNew(pdgCode, point.inBarrel, point.isForward, point.sector, point.layer, point.position,
                                           point.positionAtHitPlane, m_TOF, point.time, point.chi2);
     track->addRelationTo(muidHit);
-    G4Point3D newPos(point.position.X()*cm, point.position.Y()*cm, point.position.Z()*cm);
+    G4Point3D newPos(point.position.X() * CLHEP::cm, point.position.Y() * CLHEP::cm, point.position.Z() * CLHEP::cm);
     state->SetPosition(newPos);
-    G4Vector3D newMom(point.momentum.X()*GeV, point.momentum.Y()*GeV, point.momentum.Z()*GeV);
+    G4Vector3D newMom(point.momentum.X() * CLHEP::GeV, point.momentum.Y() * CLHEP::GeV, point.momentum.Z() * CLHEP::GeV);
     state->SetMomentum(newMom);
     state->SetError(fromPhasespaceToG4e(point.momentum, point.covariance));
     m_Chi2 += point.chi2;
@@ -822,8 +823,8 @@ bool MuidModule::findBarrelIntersection(const TVector3& oldPosition, Point& poin
 
   double phi = point.position.Phi();
   if (phi < 0.0) { phi += TWOPI; }
-  if (phi > TWOPI - M_PI_8) { phi -= TWOPI; }
-  int sector = (int)((phi + M_PI_8) / M_PI_4);
+  if (phi > TWOPI - PI_8) { phi -= TWOPI; }
+  int sector = (int)((phi + PI_8) / M_PI_4);
 
   double oldR = oldPosition * m_BarrelSectorPerp[sector];
   double newR = point.position * m_BarrelSectorPerp[sector];
@@ -1276,7 +1277,7 @@ TMatrixDSym MuidModule::fromG4eToPhasespace(const G4ErrorFreeTrajState* state)
   // zT = -x * sin(lambda) * cos(phi) - y * sin(lambda) * sin(phi) + z * cos(lambda)
 
   G4ErrorFreeTrajParam param = state->GetParameters();
-  double p = 1.0 / (param.GetInvP() * GeV);     // in GeV/c
+  double p = 1.0 / (param.GetInvP() * CLHEP::GeV);     // in GeV/c
   double p2 = p * p;
   double lambda = param.GetLambda();            // in radians
   double phi = param.GetPhi();          // in radians

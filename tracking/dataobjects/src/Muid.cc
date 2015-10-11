@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(Muid)
-
 Muid::Muid() :
   m_PDGCode(0),
   m_Momentum(TVector3(0.0, 0.0, 0.0)),

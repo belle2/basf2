@@ -6,7 +6,6 @@ env['LIBS'] = [
     '$GEANT4_LIBS',
     'framework',
     'simulation',
-    'simulation_dataobjects',
     'genfit2',
     'tracking_dataobjects',
     'mdst_dataobjects',

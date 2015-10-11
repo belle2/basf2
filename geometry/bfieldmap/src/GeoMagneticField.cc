@@ -16,6 +16,7 @@
 #include <geometry/bfieldmap/BFieldComponentQuad.h>
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 #include <geometry/bfieldmap/BFieldComponentKlm1.h>
+#include <geometry/bfieldmap/BFieldComponent3d.h>
 #include <geometry/CreatorFactory.h>
 
 
@@ -48,6 +49,7 @@ GeoMagneticField::GeoMagneticField() : CreatorBase()
   m_componentTypeMap.insert(make_pair("Quad",     boost::bind(&GeoMagneticField::readQuadBField,     this, _1)));
   m_componentTypeMap.insert(make_pair("Beamline", boost::bind(&GeoMagneticField::readBeamlineBField, this, _1)));
   m_componentTypeMap.insert(make_pair("Klm1", boost::bind(&GeoMagneticField::readKlm1BField, this, _1)));
+  m_componentTypeMap.insert(make_pair("3d", boost::bind(&GeoMagneticField::read3dBField, this, _1)));
 }
 
 
@@ -199,3 +201,50 @@ void GeoMagneticField::readKlm1BField(const GearDir& component)
   bComp.setLayerParam(barrelGapHeightLayer0, barrelIronThickness, endcapGapHeight, dLayer);
 }
 
+void GeoMagneticField::read3dBField(const GearDir& component)
+{
+  string mapFilename   = component.getString("MapFilename");
+  int mapSizeR         = component.getInt("NumberGridPointsR");
+  int mapSizeZ         = component.getInt("NumberGridPointsZ");
+  int mapSizePhi       = component.getInt("NumberGridPointsPhi");
+
+  double mapRegionMinZ = component.getLength("ZMin");
+  double mapRegionMaxZ = component.getLength("ZMax");
+  double mapOffset     = component.getLength("ZOffset");
+
+  double mapRegionMinR = component.getLength("RadiusMin");
+  double mapRegionMaxR = component.getLength("RadiusMax");
+
+  double gridPitchR    = component.getLength("GridPitchR");
+  double gridPitchZ    = component.getLength("GridPitchZ");
+  double gridPitchPhi  = component.getLength("GridPitchPhi");
+  bool mirrorPhi       = bool(component.getInt("MirrorPhi"));
+
+  double excludeRegionMinZ = component.getLength("ExcludeZMin");
+  double excludeRegionMaxZ = component.getLength("ExcludeZMax");
+  double excludeRegionMinR = component.getLength("ExcludeRadiusMin");
+  double excludeRegionMaxR = component.getLength("ExcludeRadiusMax");
+
+  double errorRegionMinR  = component.getLength("BiasRadiusMin");
+  double errorRegionMaxR  = component.getLength("BiasRadiusMax");
+  double errorBr          = component.getDouble("BiasBr");
+  double errorBphi        = component.getDouble("BiasBphi");
+  double errorBz          = component.getDouble("BiasBz");
+
+  bool doInterpolation    = bool(component.getInt("enableInterpolation"));
+  string enableCoordinate = component.getString("EnableCoordinate");
+
+  BFieldComponent3d& bComp = BFieldMap::Instance().addBFieldComponent<BFieldComponent3d>();
+  bComp.setMapFilename(mapFilename);
+  bComp.setMapSize(mapSizeR, mapSizePhi, mapSizeZ);
+  bComp.setMapRegionZ(mapRegionMinZ, mapRegionMaxZ, mapOffset);
+  bComp.setMapRegionR(mapRegionMinR, mapRegionMaxR);
+  bComp.setGridPitch(gridPitchR, gridPitchPhi, gridPitchZ);
+  bComp.setExcludeRegionZ(excludeRegionMinZ, excludeRegionMaxZ);
+  bComp.setExcludeRegionR(excludeRegionMinR, excludeRegionMaxR);
+  bComp.setErrorRegionR(errorRegionMinR, errorRegionMaxR, errorBr, errorBphi, errorBz);
+  bComp.mirrorPhi(mirrorPhi);
+  bComp.doInterpolation(doInterpolation);
+  bComp.enableCoordinate(enableCoordinate);
+
+}

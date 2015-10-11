@@ -54,7 +54,8 @@ namespace Belle2 {
 
   protected:
 
-    typedef std::map < std::string, boost::function < void (const GearDir&) > > CompTypeMap; /**< Typedef for the map connecting the name of the component to the method reading the parameters.*/
+    typedef std::map < std::string, boost::function < void (const GearDir&) > >
+    CompTypeMap; /**< Typedef for the map connecting the name of the component to the method reading the parameters.*/
     CompTypeMap m_componentTypeMap; /**< Maps the name of the component to the function reading the parameters.*/
 
     /**
@@ -87,6 +88,12 @@ namespace Belle2 {
      */
 
     void readKlm1BField(const GearDir& component);
+
+    /**
+     * Reads the parameters for 3d magnetic field (r,phi,z).
+     * @param component The GearDir pointing to the component parameter block from which the parameters should be read.
+     */
+    void read3dBField(const GearDir& component);
 
   private:
 

@@ -1,4 +1,4 @@
 Import('env')
-env['LIBS'] = ['framework', '$ROOT_LIBS']
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'calibration_dataobjects']
 Return('env')
 

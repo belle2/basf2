@@ -18,6 +18,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 #include <fstream>
 #include <sys/file.h>
 
@@ -113,7 +114,7 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   if (moduleEntry == packageEntry->second.end()) return tryDefault(package, module);
 
   // find the payload whose IoV contains the current event and load it
-  for (auto& entry : moduleEntry->second) {
+  for (auto& entry : boost::adaptors::reverse(moduleEntry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
       result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module.c_str());

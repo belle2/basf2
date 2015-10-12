@@ -88,7 +88,7 @@ class PyAlgo(Module):
         # interactive.embed()
 
 
-def addCalibration(path, algorithm, collector=None, name=None):
+def addCalibration(path, algorithm, collector=None, name=None, granularity='run'):
     """
     Add calibration to the path
     """
@@ -97,7 +97,7 @@ def addCalibration(path, algorithm, collector=None, name=None):
     if name is not None:
         collector.param('prefix', name)
         algorithm.setPrefix(name)
-    collector.param('granularity', 'run')
+    collector.param('granularity', granularity)
     path.add_module(collector)
     path.add_module(PyAlgo(algorithm))
 
@@ -110,7 +110,8 @@ main.add_module('EventInfoSetter',
                 runList=[1, 2, 3, 4, 5])
 
 algo = Belle2.calibration.TestCalibrationAlgorithm()
-addCalibration(main, algo)
+addCalibration(main, algo, granularity='run')
+# Or granularity='all'
 
 main.add_module('Progress')
 main.add_module('RootOutput')

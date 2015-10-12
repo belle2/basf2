@@ -44,16 +44,6 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() :
   addParam("spTCarrayName", m_PARAMspTCarrayName,
            "the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation", string(""));
 
-  // small lambda for getting random numbers:
-  auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
-  // What does it mean "Appendix"? E.P.
-
-  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
-  for (auto setup : sectorMap->getAllSetups()) {
-    auto config = setup.second->getConfig();
-    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(config, rngAppendix());
-    m_secMapTrainers.push_back(std::move(newMap));
-  }
 }
 
 
@@ -61,6 +51,19 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() :
 void SecMapTrainerBaseModule::initialize()
 {
   B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - initialize ~~~~~~~~~~")
+  // small lambda for getting random numbers:
+  auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
+  // What does it mean "Appendix"? E.P.
+
+
+  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  sectorMap.isRequired();
+  for (auto setup : sectorMap->getAllSetups()) {
+    auto config = setup.second->getConfig();
+    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(config, rngAppendix());
+    m_secMapTrainers.push_back(std::move(newMap));
+  }
+
   for (auto& trainer : m_secMapTrainers) {
     trainer.initialize();
   }

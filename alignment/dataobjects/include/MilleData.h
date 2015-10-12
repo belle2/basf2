@@ -14,11 +14,15 @@
 
 using namespace std;
 namespace Belle2 {
+  /// Mergeable class holding list of so far opened mille binaries and providing the binaries
   class MilleData : public Mergeable {
   public:
-    MilleData() : Mergeable(), m_files(), m_binary(0) {};
+    /// Constructor
+    MilleData() : Mergeable() {};
+    /// Destructor
     virtual ~MilleData() { close(); }
 
+    /// Implementation of merging
     virtual void merge(const Mergeable* other)
     {
       auto* data = static_cast<const MilleData*>(other);
@@ -35,21 +39,10 @@ namespace Belle2 {
           m_files.push_back(file);
       }
     }
-    virtual void clear() {/* m_files.clear();*/ }
-    /*
-        Long64_t Merge(TCollection *hlist)
-        {
-          if (hlist) {
-            MilleData *xh = 0;
-            TIter nxh(hlist);
-            while ((xh = (MilleData *) nxh())) {
-              // Add this histogram to me
-              merge(xh);
-            }
-          }
-          return (Long64_t) getFiles().size();
-        }
-    */
+    /// Implementation of clearing
+    virtual void clear() { m_files.clear(); }
+
+    /// Open a new file and remember it. Filename should encode also process id!
     void open(string filename)
     {
       if (m_binary) {
@@ -58,6 +51,7 @@ namespace Belle2 {
       m_binary = new gbl::MilleBinary(filename);
       m_files.push_back(filename);
     }
+    /// Is some file already open?
     bool isOpen() { return !!m_binary; }
     void fill(gbl::GblTrajectory& trajectory)
     {
@@ -65,23 +59,29 @@ namespace Belle2 {
         trajectory.milleOut(*m_binary);
       }
     }
+    /// Close current mille binary if opened
     void close()
     {
       if (m_binary) {
         delete m_binary;
-        m_binary = 0;
+        m_binary = nullptr;
       }
-      usleep(200);
     }
+    /// Get the list of all created files
     const vector<string>& getFiles() const { return m_files; }
-    void reset()
+    /// Copy by assignment
+    MilleData& operator=(const MilleData& other)
     {
-      //m_files.clear();
+      close();
+      m_files = other.m_files;
+      return *this;
     }
+    /// Construct from other object
+    MilleData(const MilleData& other) : m_files(other.m_files), m_binary(nullptr) {}
   private:
-    vector<string> m_files;
-    gbl::MilleBinary* m_binary; //! not streamed
+    vector<string> m_files = {}; /**< List of already created file names */
+    gbl::MilleBinary* m_binary = nullptr; //! Pointer to opened binary file (not streamed)
 
-    ClassDef(MilleData, 1) /**< class definition */
+    ClassDef(MilleData, 1) /**< Mergeable list of opened mille binaries */
   };
 }

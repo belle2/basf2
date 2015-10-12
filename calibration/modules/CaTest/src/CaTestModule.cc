@@ -12,14 +12,7 @@
 
 #include <calibration/dataobjects/CalibRootObj.h>
 #include <framework/pcore/ProcHandler.h>
-#include <../framework/pcore/include/RootMergeable.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/core/Environment.h>
-#include <framework/core/InputController.h>
-#include <framework/pybasf2/Framework.h>
-#include <../framework/pybasf2/include/PyStoreObj.h>
 
 #include <TH1F.h>
 #include <TTree.h>
@@ -68,9 +61,6 @@ void CaTestModule::prepare()
   registerObject<TTree>("tree", ttree);
   registerObject<MilleData>("test_mille", mmille);
 
-  StoreObjPtr<RootMergeable<TH1F>> events("events", DataStore::c_Persistent);
-  events.registerInDataStore();
-  events.construct("events", "events", 100, 0, 100);
 }
 
 void CaTestModule::collect()
@@ -86,9 +76,6 @@ void CaTestModule::collect()
   // Data object access and filling ----------------------------------------
   getObject<TH1F>("histogram1").Fill(gRandom->Gaus(42., 20.));
   getObject<TTree>("tree").Fill();
-
-  StoreObjPtr<RootMergeable<TH1F>> events("events", DataStore::c_Persistent);
-  events->get().Fill(m_evt);
 
   auto& mille = getObject<MilleData>("test_mille");
   if (!mille.isOpen()) mille.open(

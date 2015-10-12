@@ -39,7 +39,7 @@ HepevtOutputModule::HepevtOutputModule() : Module()
   //Parameter definition
   addParam("OutputFilename", m_filename, "The filename of the output file");
   addParam("MirrorPz", m_mirrorPz, "If the directions of HER and LER are switched, mirror Pz.", false);
-  addParam("StoreVirtualParticles", m_storeVirtualParticles, "Store also virtual particles in the HEPEvt file.", false);
+  addParam("StoreVirtualParticles", m_storeVirtualParticles, "Store also virtual particles in the HePEvt file.", false);
   addParam("FullFormat", m_fullFormat, "Write the full HepEvt format to file. Set it to false for a compact format.", true);
 }
 
@@ -78,16 +78,20 @@ void HepevtOutputModule::event()
     if (m_fullFormat) {
       int isthep = 1;
       if (mcPart.getFirstDaughter() > 0) isthep = 2;
+      if (mcPart.isInitial()) isthep = 2;
 
       int motherIndex = 0;
       if (mcPart.getMother() != NULL) motherIndex = mcPart.getMother()->getIndex();
 
       // cppcheck-suppress zerodiv
-      m_fileStream << format("%5i%12i%10i%10i%10i%10i") % isthep % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter() % mcPart.getLastDaughter();
+      m_fileStream << format("%5i%12i%10i%10i%10i%10i") % isthep % mcPart.getPDG() % motherIndex % motherIndex % mcPart.getFirstDaughter()
+                   % mcPart.getLastDaughter();
       m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass();
-      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() % mcPart.getProductionTime();
+      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f\n") % mcPart.getVertex().X() % mcPart.getVertex().Y() % mcPart.getVertex().Z() %
+                   mcPart.getProductionTime();
     } else {
-      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f%15i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass() % mcPart.getPDG();
+      m_fileStream << format("%15.6f%15.6f%15.6f%15.6f%15.6f%15i\n") % mom.X() % mom.Y() % mom.Z() % mcPart.getEnergy() % mcPart.getMass()
+                   % mcPart.getPDG();
     }
   }
 }

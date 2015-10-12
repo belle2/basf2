@@ -184,7 +184,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             postvars = parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
-            postvars = parse_qs(self.rfile.read(length), keep_blank_values=1)
+            # explicit decode as utf-8 as python3 will provide only a byte-string
+            content_str = self.rfile.read(length).decode('utf-8')
+            postvars = parse_qs(content_str, keep_blank_values=1)
         else:
             postvars = {}
         return postvars
@@ -202,12 +204,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if contentType.startswith('application/json'):
             contentLength = int(self.headers['Content-length'])
             content = self.rfile.read(contentLength)
+            # explicit decode as utf-8 as python3 will provide only a byte-string
+            content_decoded = content.decode('utf-8')
             log.debug("POST: Content-length %d" % contentLength)
-            log.debug("POST: Content: %s" % content)
-            data = json.loads(content)
+            log.debug("POST: Content: %s" % content_decoded)
+            data = json.loads(content_decoded)
 
             if 'input' not in data:
-                log.debug("POST: Missing input parameter: %s" % content)
+                log.debug("POST: Missing input parameter: %s" % content_decoded)
                 self.send_response(404)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()

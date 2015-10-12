@@ -1,5 +1,4 @@
 #include <calibration/TestCalibrationAlgorithm.h>
-#include <../framework/pcore/include/RootMergeable.h>
 
 using namespace std;
 using namespace Belle2;

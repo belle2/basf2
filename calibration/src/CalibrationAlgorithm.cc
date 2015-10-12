@@ -114,7 +114,11 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, string name, IntervalOfValidity iov)
 {
-  MyDBQuery query("dbstore", name, data, iov);
+  DBQuery query;
+  query.package = "dbstore";
+  query.module = name;
+  query.object = data;
+  query.iov = iov;
   m_payloads.push_back(query);
 }
 
@@ -140,16 +144,26 @@ void CalibrationAlgorithm::saveCalibration(TObject* data, string name)
   saveCalibration(data, name, iov);
 }
 
+std::list<Database::DBQuery> CalibrationAlgorithm::getPayloads()
+{
+  std::list<Database::DBQuery> queries;
+
+  if (m_payloads.empty())
+    return queries;
+
+  for (auto payload : m_payloads) {
+    Database::DBQuery query(payload.package, payload.module, payload.object, payload.iov);
+    queries.push_back(query);
+  }
+  return queries;
+}
+
 bool CalibrationAlgorithm::commit()
 {
   if (m_payloads.empty())
     return false;
-  std::list<Database::DBQuery> output;
-  for (auto pay : m_payloads) {
-    Database::DBQuery query(pay.package, pay.module, pay.object, pay.iov);
-    output.push_back(query);
-  }
-  return Database::Instance().storeData(output);
+  std::list<Database::DBQuery> payloads = getPayloads();
+  return Database::Instance().storeData(payloads);
 }
 
 vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::getRunListFromAllData()

@@ -41,7 +41,7 @@ void DatabaseChain::addDatabase(Database* database)
   } else if (database == this) {
     B2ERROR("Cannot add DatabaseChain to itself.");
   } else {
-    m_databases.push_back(database);
+    m_databases.insert(m_databases.begin(), database);
   }
 }
 

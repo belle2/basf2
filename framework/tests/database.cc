@@ -29,7 +29,7 @@ namespace {
   protected:
 
     /** Type of database to be tested */
-    enum EDatabaseType {c_local, c_central, c_chain};
+    enum EDatabaseType {c_local, c_central, c_chain, c_default};
 
     /** Type of database to be tested */
     EDatabaseType m_dbType = c_local;
@@ -54,6 +54,8 @@ namespace {
           DatabaseChain::createInstance();
           LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
           ConditionsDatabase::createDefaultInstance("default");
+          break;
+        case c_default:
           break;
       }
 

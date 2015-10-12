@@ -14,6 +14,7 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -29,7 +30,12 @@ Database* Database::s_instance = 0;
 
 Database& Database::Instance()
 {
-  if (!s_instance) LocalDatabase::createInstance();
+  if (!s_instance) {
+    DatabaseChain::createInstance(true);
+    LocalDatabase::createInstance(FileSystem::findFile("data/framework/database.txt"), "", LogConfig::c_Error);
+    ConditionsDatabase::createDefaultInstance("production", LogConfig::c_Warning);
+    LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
+  }
   return *s_instance;
 }
 
@@ -142,6 +148,8 @@ void Database::exposePythonAPI()
 {
   using namespace boost::python;
 
+  def("reset_database", &Database::reset);
+  def("use_database_chain", &DatabaseChain::createInstance);
   def("use_local_database", &LocalDatabase::createInstance);
   def("use_central_database", &ConditionsDatabase::createDefaultInstance);
   def("use_central_database", &ConditionsDatabase::createInstance);

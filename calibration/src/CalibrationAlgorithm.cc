@@ -114,7 +114,7 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, string name, IntervalOfValidity iov)
 {
-  Database::DBQuery query("dbstore", name, data, iov);
+  MyDBQuery query("dbstore", name, data, iov);
   m_payloads.push_back(query);
 }
 
@@ -144,8 +144,12 @@ bool CalibrationAlgorithm::commit()
 {
   if (m_payloads.empty())
     return false;
-
-  return Database::Instance().storeData(m_payloads);
+  std::list<Database::DBQuery> output;
+  for (auto pay : m_payloads) {
+    Database::DBQuery query(pay.package, pay.module, pay.object, pay.iov);
+    output.push_back(query);
+  }
+  return Database::Instance().storeData(output);
 }
 
 vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::getRunListFromAllData()

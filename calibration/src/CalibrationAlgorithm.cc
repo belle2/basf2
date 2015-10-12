@@ -18,14 +18,14 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
     return calibration::CalibrationAlgorithm::c_Failure;
   }
 
+  if (getRunListFromAllData().empty()) {
+    B2ERROR("No collected data.");
+    return calibration::CalibrationAlgorithm::c_Failure;
+  }
+
   // If no runs are provided, just take all collected
   if (runs.empty())
     runs = getRunListFromAllData();
-
-  if (runs.empty()) {
-    B2ERROR("No data available at all.");
-    return calibration::CalibrationAlgorithm::c_Failure;
-  }
 
   std::sort(runs.begin(), runs.end());
 

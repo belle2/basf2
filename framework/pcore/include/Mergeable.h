@@ -13,6 +13,7 @@
 #include <TObject.h>
 
 class TCollection;
+class TDirectory;
 
 namespace Belle2 {
   /** Abstract base class for objects that can be merged.
@@ -59,6 +60,10 @@ namespace Belle2 {
      * \note dictionaries containing your Mergeable class need to be loaded, so 'hadd' will not work currently.
      */
     virtual Long64_t Merge(TCollection* hlist);
+    /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
+    virtual void Reset() {clear();}
+    /** Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing. */
+    virtual void SetDirectory(TDirectory*) {}
   private:
     ClassDef(Mergeable, 0); /**< Abstract base class for objects that can be merged. */
   };

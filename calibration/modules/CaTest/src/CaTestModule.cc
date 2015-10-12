@@ -10,16 +10,13 @@
 
 #include <calibration/modules/CaTest/CaTestModule.h>
 
-#include <calibration/dataobjects/CalibRootObj.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TH1F.h>
 #include <TTree.h>
 #include <TFile.h>
-
-#include <calibration/TestCalibrationAlgorithm.h>
-
+#include <TRandom.h>
 
 using namespace Belle2;
 
@@ -39,7 +36,8 @@ CaTestModule::CaTestModule() : CalibrationCollectorModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
-
+  addParam("spread", m_spread,
+           "Spread of gaussian (mean=42) filling of test histogram (range=<0,100>) - probability of algo iterations depend on it", int(20.));
 }
 
 void CaTestModule::prepare()
@@ -74,7 +72,7 @@ void CaTestModule::collect()
   m_exp = emd->getExperiment();
 
   // Data object access and filling ----------------------------------------
-  getObject<TH1F>("histogram1").Fill(gRandom->Gaus(42., 20.));
+  getObject<TH1F>("histogram1").Fill(gRandom->Gaus(42., m_spread));
   getObject<TTree>("tree").Fill();
 
   auto& mille = getObject<MilleData>("test_mille");

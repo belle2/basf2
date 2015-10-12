@@ -12,8 +12,6 @@
 #define CATESTMODULEMODULE_H
 
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/pcore/Mergeable.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -44,6 +42,8 @@ namespace Belle2 {
     /** Current process id */
     int m_procId = -1;
 
+    /** Spread of gaussian (mean=42) filling test histogram (range=<0,100>) - probability of algo iterations depend on it */
+    int m_spread;
   };
 }
 

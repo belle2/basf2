@@ -44,7 +44,7 @@ namespace Belle2 {
         TObject*           object; /**< Pointer to the object */
         IntervalOfValidity iov;    /**< Interval of validity of the object */
       };
-      /// The of always-created object holding set of all (exp,run) occured in data collection
+      /// The name of always-created object holding set of all (exp,run) occured in data collection
       static const std::string RUN_RANGE_OBJ_NAME;
       /// Convenient typedef for (exp,run) pairs
       typedef std::pair<int, int> ExpRun;
@@ -103,6 +103,7 @@ namespace Belle2 {
       /// Submit constants from last calibration into database
       bool commit();
 
+      /// Get the description of the algoithm (set by developers in constructor)
       std::string getDescription() {return m_description;}
 
     protected:

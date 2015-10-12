@@ -1,5 +1,8 @@
 #include <calibration/TestCalibrationAlgorithm.h>
 
+#include <TProfile.h>
+#include <TRandom.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace calibration;

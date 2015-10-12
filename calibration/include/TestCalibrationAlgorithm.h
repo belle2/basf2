@@ -10,8 +10,6 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <TProfile.h>
-#include <TRandom.h>
 
 namespace Belle2 {
   namespace calibration {
@@ -30,11 +28,10 @@ namespace Belle2 {
     protected:
 
       /// Run algo on data
-      virtual E_Result calibrate() override;
+      virtual E_Result calibrate();
 
     private:
-      // TODO: Why I had to do this to get rid warnings during dictionary compilation?
-      ClassDefOverride(TestCalibrationAlgorithm, 0); /**< Test class implementing calibration algorithm */
+      ClassDef(TestCalibrationAlgorithm, 0); /**< Test class implementing calibration algorithm */
 
     };
   } // calibration namespace

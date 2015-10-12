@@ -36,17 +36,21 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
 
   if (getRunListFromAllData() == std::vector<ExpRun>({{ -1, -1}})) {
     // Data collected with granularity=all
-    if (m_runs != getRunListFromAllData()) {
+    if (m_runs != std::vector<ExpRun>({{ -1, -1}})) {
       B2ERROR("The data is collected with granularity=all (exp=-1,run=-1), but you seem to request calibration for specific runs.");
       // Take the (-1,-1)
       m_runs = getRunListFromAllData();
       caRange = getIovFromData();
     }
+    if (getIovFromData().empty()) {
+      B2ERROR("No collected data.");
+      return calibration::CalibrationAlgorithm::c_Failure;
+    }
   }
 
   IntervalOfValidity dataRange = getIovFromData();
   if (dataRange.empty()) {
-    B2ERROR("No data available for selected runs.");
+    B2ERROR("No data collected for selected runs.");
     return calibration::CalibrationAlgorithm::c_Failure;
   }
 
@@ -55,8 +59,9 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
     // TODO: remove runs outside collected data range...?
     B2INFO("If you want to extend the validity range of calibration constants beyond data, you should do it before DB commit manually.");
 
+    // This probably cannot happen until some logic elsewhere is broken - let's have it as a consistency check
     if (!dataRange.overlaps(caRange)) {
-      B2ERROR("The requested calibration range does not even overlap with the collected data.");
+      B2ERROR("The calibration range does not even overlap with the collected data.");
       // We should get just c_NotEnoughData or c_Failure all times, so don't start and fail
       return calibration::CalibrationAlgorithm::c_Failure;
     }

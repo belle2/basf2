@@ -90,7 +90,7 @@ namespace Belle2 {
       ManagedStorableList::reset_prototype reset =
       [ = ]() -> void {
         StoreObjPtr< MilleData > object(name, DataStore::c_Persistent);
-        object->reset();
+        object->clear();
       };
 
       ManagedStorableList::read_prototype read =

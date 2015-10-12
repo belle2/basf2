@@ -23,9 +23,6 @@ namespace Belle2 {
     /**
      * CDCHitFilter: Filters CDC hits according to given
      * configuration criteria. Does not copy the relations of the CDCHits.
-     * This hit filter is used in the packer/unpacker test, because not all CDC channels
-     * are listed in the mapping file cdc/examples/ch_map.dat
-     * As soon as the full CDC mapping is available, this filter can be removed
      */
 
     class CDCHitFilterModule : public Module {

@@ -392,8 +392,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
           if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {
-            // fill ADC ... convert float to unsigned char ... and how about common mode?
-            halfladder_pixmap[row][col] = (unsigned char) it->getCharge(); // scaling??
+            // fill ADC ... convert float to unsigned char, clip to 0 - 255 , no scaling ... and how about common mode?
+            long v = lrint(it->getCharge());
+            if (v > 255) v = 255;
+            if (v < 0) v = 0;
+            halfladder_pixmap[row][col] = (unsigned char) v;
           }
         }
       }

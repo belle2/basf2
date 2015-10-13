@@ -18,7 +18,7 @@ os.chdir(tempdir)
 
 shutil.copy(inputFile, "inputdata.root")
 
-cmd = "basf2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache cache.pkl -summary -verbose"
+cmd = "basf2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache cache.pkl -verbose"
 
 # fsp variablestontuple
 assert 0 == os.system(cmd)
@@ -32,8 +32,6 @@ assert 0 == os.system(cmd)
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 6
 assert len(glob.glob('var*.root*')) == 3
-assert len(glob.glob('FEIsummary.tex')) == 1
-os.unlink('FEIsummary.tex')
 
 # create full path and run again
 # mostly just need to omit --preload, usually one would use --dump-path to get a stable version

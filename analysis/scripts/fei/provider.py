@@ -580,7 +580,6 @@ def TrainMultivariateClassifier(resource, mvaConfig, Nbins, trainingData):
     if not os.path.isfile(configFilename):
         B2ERROR("Training of MVC failed. Ignoring channel.")
         return
-        # raise RuntimeError("Training of MVC failed")
 
     return configFilename
 

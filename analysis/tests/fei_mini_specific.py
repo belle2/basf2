@@ -16,7 +16,7 @@ tempdir = tempfile.mkdtemp()
 print(tempdir)
 os.chdir(tempdir)
 
-cmd = "basf2 -p 2 " + steeringFile + " -i " + inputFile + " -- -summary -verbose"
+cmd = "basf2 -p 2 " + steeringFile + " -i " + inputFile + " -- -verbose"
 
 # fsp variablestontuple
 assert 0 == os.system(cmd)
@@ -30,8 +30,6 @@ assert 0 == os.system(cmd)
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 4
 assert len(glob.glob('var*.root*')) == 2
-assert len(glob.glob('FEIsummary.tex')) == 1
-os.unlink('FEIsummary.tex')
 
 # create full path and run again
 # mostly just need, usually one would use --dump-path to get a stable version

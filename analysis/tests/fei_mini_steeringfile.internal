@@ -59,7 +59,10 @@ p = Particle('D0:special', mvaConfig_D, preCutConfiguration_nonFSP)
 p.addChannel(['K-', 'pi+:special'])
 particles.append(p)
 
-feistate = fullEventInterpretation(None, None, particles)
+selection_path = create_path()
+selection_path.add_module('RootInput')
+
+feistate = fullEventInterpretation(None, selection_path, particles)
 
 # show constructed path
 feistate.path.add_module('PrintCollections')

@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# subprocess has to be
 from fei.provider import *
 
 from basf2 import *
 import unittest
+import unittest.mock
 import os
 import tempfile
 import atexit
 import shutil
 import contextlib
 import IPython
-import inspect
-import ast
+import subprocess
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, DecayChannel
 
 # @cond
@@ -521,31 +522,6 @@ class TestPostCutDetermination(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
 
-class MockTFile(object):
-
-    def __init__(self, filename):
-        assert filename == 'e+:generic_42.root'
-
-    def Get(self, branch):
-        assert branch == 'distribution'
-        ntuple = ROOT.TNtuple("temp", "test", "isSignal")
-        for i in range(23):
-            ntuple.Fill(0)
-            ntuple.Fill(1)
-        for i in range(42-23):
-            ntuple.Fill(1)
-        return ntuple
-
-
-# If you're afraid of black magic, ignore the following lines
-class InjectMockTFile(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'ROOT':
-            return ast.copy_location(ast.Name(id='MockTFile', ctx=node.ctx), node)
-        return node
-
-
 class TestFSPDistribution(unittest.TestCase):
 
     def setUp(self):
@@ -563,8 +539,16 @@ class TestFSPDistribution(unittest.TestCase):
 
     def test_FSPDistributionWithFile(self):
         # I call upon the mighty god of Python!
-        exec(compile(InjectMockTFile().visit(ast.parse(inspect.getsource(FSPDistribution))), '<string>', 'exec'))
         with temporary_file('e+:generic_42.root'):
+            tfile = ROOT.TFile('e+:generic_42.root', 'RECREATE')
+            ntuple = ROOT.TNtuple("distribution", "distribution", "isSignal")
+            for i in range(23):
+                ntuple.Fill(0)
+                ntuple.Fill(1)
+            for i in range(42-23):
+                ntuple.Fill(1)
+            ntuple.Write()
+            tfile.Close()
             # Returns dictionary with nSignal and nBackground if Histogram does exists
             self.assertDictEqual(FSPDistribution(self.resource, 'e+:generic', 'isSignal'),
                                  {'nSignal': 42, 'nBackground': 23})
@@ -716,28 +700,6 @@ class TestGenerateTrainingData(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
 
-class MockTFileForSPlotModel(object):
-
-    def __init__(self, filename, recreate):
-        assert recreate == "RECREATE"
-        assert filename == "model_Name_42.root"
-
-    def ls(self):
-        pass
-
-    def Close(self):
-        pass
-
-
-# If you're afraid of black magic, ignore the following lines
-class InjectMockTFileForSPlotModel(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'ROOT':
-            return ast.copy_location(ast.Name(id='MockTFileForSPlotModel', ctx=node.ctx), node)
-        return node
-
-
 class TestGenerateSPlotModel(unittest.TestCase):
 
     def setUp(self):
@@ -746,7 +708,6 @@ class TestGenerateSPlotModel(unittest.TestCase):
                              'signalPeak': 1.8, 'signalWidth': 0.1, 'range': (1.4, 1.9)}
 
     def test_GenerateSPlotModel(self):
-        exec(compile(InjectMockTFileForSPlotModel().visit(ast.parse(inspect.getsource(GenerateSPlotModel))), '<string>', 'exec'))
         mvaConfig = MVAConfiguration(name='FastBDT', type='Plugin',
                                           config='TMVAConfigString',
                                           variables=['p', 'pt'],
@@ -857,42 +818,8 @@ class TestGenerateTrainingDataUsingSPlot(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
 
-def MockSubprocessFailCall(command, shell):
-    assert shell
-    expectation = "externTeacher --methodName 'FastBDT' --methodType 'Plugin'"\
-                  " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString' --target 'isSignal'"\
-                  " --variables 'p' 'pt' --prefix 'trainingData'"\
-                  " > 'trainingData'.log 2>&1"
-    assert command == expectation, command
-
-# If you're afraid of black magic, ignore the following lines
-
-
-class InjectMockSubprocessFail(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'subprocess':
-            return ast.copy_location(ast.Name(id='MockSubprocessFailCall', ctx=node.ctx), node)
-        return node
-
-
-def MockSubprocessSuccessCall(command, shell):
-    assert shell
-    expectation = "externTeacher --methodName 'FastBDT' --methodType 'Plugin'"\
-                  " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString' --target 'isSignal'"\
-                  " --variables 'p' 'pt' --prefix 'trainingData'"\
-                  " > 'trainingData'.log 2>&1"
-    assert command == expectation, command
-    open('trainingData_1.config', 'a').close()
-
-
-# If you're afraid of black magic, ignore the following lines
-class InjectMockSubprocessSuccess(ast.NodeTransformer):
-
-    def visit_Attribute(self, node):
-        if hasattr(node, 'value') and hasattr(node.value, 'id') and node.value.id == 'subprocess':
-            return ast.copy_location(ast.Name(id='MockSubprocessSuccessCall', ctx=node.ctx), node)
-        return node
+def SubprocessSuccessSideEffect(command, shell):
+    open('trainingData_1.config', 'w').close()
 
 
 class TestTrainMultivariateClassifier(unittest.TestCase):
@@ -925,25 +852,35 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
     def test_TrainMultivariateClassifierTrainingFailed(self):
-        # I call upon the mighty god of Python!
-        exec(compile(InjectMockSubprocessFail().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
-                     '<string>', 'exec'))
+        original_call = subprocess.call
+        subprocess.call = unittest.mock.create_autospec(subprocess.call)
         # Returns None if training was did not create correct file
         # with self.assertRaises(RuntimeError):
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
                                                      'trainingData.root'), None)
+        subprocess.call.assert_called_once_with("externTeacher --methodName 'FastBDT' --methodType 'Plugin'"
+                                                " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString'"
+                                                " --target 'isSignal' --variables 'p' 'pt' --prefix 'trainingData'"
+                                                " > 'trainingData'.log 2>&1", shell=True)
+        subprocess.call = original_call
 
     def test_TrainMultivariateClassifierTrainingSuccessfull(self):
-        # I call upon the mighty god of Python!
-        exec(compile(InjectMockSubprocessSuccess().visit(ast.parse(inspect.getsource(TrainMultivariateClassifier))),
-                     '<string>', 'exec'))
+        original_call = subprocess.call
+        subprocess.call = unittest.mock.create_autospec(subprocess.call,
+                                                        side_effect=lambda command, shell: open('trainingData_1.config',
+                                                                                                'w').close())
         # Returns config filename if training was did not create correct file
         self.assertEqual(TrainMultivariateClassifier(self.resource, self.mvaConfig, 'CreateMVAPdfs:Nbins=100:',
                                                      'trainingData.root'), 'trainingData_1.config')
         # Enables caching
         result = MockResource(cache=True, usesMultiThreading=True, env={'externTeacher': 'externTeacher'})
         self.assertEqual(self.resource, result)
+        subprocess.call.assert_called_once_with("externTeacher --methodName 'FastBDT' --methodType 'Plugin'"
+                                                " --methodConfig 'CreateMVAPdfs:Nbins=100:TMVAConfigString'"
+                                                " --target 'isSignal' --variables 'p' 'pt' --prefix 'trainingData'"
+                                                " > 'trainingData'.log 2>&1", shell=True)
         os.remove('trainingData_1.config')
+        subprocess.call = original_call
 
 
 class TestSignalProbability(unittest.TestCase):

@@ -179,16 +179,12 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         @param signalParticleList name of ParticleList containing the signal-candidates of the signal-side,
                Use None to perform independent tag-side reconstruction (equivalent to old Belle I Full Reconstruction).
         @param selection_path basf2 module path to execute before any tag-side reconstruction.
-               The path should load the data and perform skimming if needed
+               The path should load the data and perform skimming and belle-I conversion if needed
                In addition it should select a signal-side B and create a 'RestOfEvents' list if signalParticleList is not None
-               Use None if you don't want to provide an selection path.
         @param particles list of particle objects which shall be reconstructed by this algorithm
         @return FeiState object containing basf2 path to execute, plus status information
     """
     args = getCommandLineOptions()
-
-    if signalParticleList and not selection_path:
-        B2FATAL("If you provide and signal particle list, you have to provide an selection path!")
 
     # Create a new directed acyclic graph
     dag = dagFramework.DAG()
@@ -544,40 +540,30 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
         dag.save_cached_resources(args.cache)
 
     path = create_path()
-    if selection_path is None:
-        path.add_module('RootInput')
 
     if finished_training:
-        if selection_path is not None:
-            path.add_path(selection_path)
+        path.add_path(selection_path)
         path.add_path(fei_path)
-    else:
-        fei_path.add_module("RootOutput")
-        if is_first_run:
-            if selection_path is not None:
-                path.add_path(selection_path)
-            if signalParticleList:
-                # TODO SignalMC with no correct signal-candidate will be still used as background component
-                # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
-                # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
-                cut = 'isSignalAcceptMissingNeutrino == 1'
-                cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
-                applyCuts(signalParticleList, cut, path=path)
-                buildRestOfEvent(signalParticleList, path=path)
-                path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
-            else:
-                path.add_path(fei_path)
-        else:
-            if selection_path is not None:
-                path.add_module('RootInput')
-            path.add_path(fei_path)
+        return FeiState(path, is_trained=True)
 
-    if args.cache is not None and not is_first_run:
-        # when preloader is used, make sure we also reload the statistics
-        for module in path.modules():
-            if module.type() == 'RootInput':
-                module.param('excludeBranchNamesPersistent', [])
+    fei_path.add_module("RootOutput")
+    if is_first_run:
+        path.add_path(selection_path)
+        if signalParticleList:
+            # TODO SignalMC with no correct signal-candidate will be still used as background component
+            # We have to fix this cut! (Other FEI-UserCuts should be fine, as soon as this one is fixed)
+            # Although the cut is not 100% correct at the moment, it still a big step in the right direction.
+            cut = 'isSignalAcceptMissingNeutrino == 1'
+            cut += ' or eventCached(countInList(' + dag.env['ROE'] + ', isSignalAcceptMissingNeutrino == 1)) == 0'
+            applyCuts(signalParticleList, cut, path=path)
+            buildRestOfEvent(signalParticleList, path=path)
+            path.for_each('RestOfEvent', 'RestOfEvents', fei_path)
+        else:
+            path.add_path(fei_path)
+    else:
+        path.add_module('RootInput', excludeBranchNamesPersistent=[])
+        path.add_path(fei_path)
 
     # with RestOfEvent path, this will be the first module inside for_each
     path.add_module('ProgressBar')
-    return FeiState(path, is_trained=finished_training)
+    return FeiState(path, is_trained=False)

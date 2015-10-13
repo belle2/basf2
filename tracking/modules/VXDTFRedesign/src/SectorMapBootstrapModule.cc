@@ -52,6 +52,9 @@ SectorMapBootstrapModule::initialize()
 {
   StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
+  sectorMap.create();
+  bootstrapSectorMap();
+
 }
 
 void

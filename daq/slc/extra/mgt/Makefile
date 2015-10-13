@@ -18,7 +18,12 @@ EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
 all: $(LIB)
 	@ mkdir -p $(EXTINCDIR)/mgt/
 	@ install -m 644 -p *.h $(EXTINCDIR)/mgt/
-	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
+	@ if [ -e $(EXTLIBDIR) ];\
+	  then \
+	  install -m 644 -p $(LIB) $(EXTLIBDIR)/; \
+	  else \
+	  install -m 644 -p $(LIB) $(EXTDIR)/$(BELLE2_ARCH)/$(BELLE2_EXTERNALS_OPTION)/bin; \
+	  fi
 
 clean:
 	@ echo "<< clearing directry >>"

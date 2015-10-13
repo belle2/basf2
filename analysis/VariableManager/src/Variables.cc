@@ -1077,6 +1077,16 @@ namespace Belle2 {
       return 0;
     }
 
+
+    double isPrimarySignal(const Particle* part)
+    {
+      if (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5)
+        return 1.0;
+      else
+        return 0.0;
+    }
+
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1134,6 +1144,8 @@ namespace Belle2 {
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,

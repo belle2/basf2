@@ -25,8 +25,6 @@
 using namespace std;
 using namespace Belle2;
 
-// ClassImp(SpacePointTrackCand)
-
 SpacePointTrackCand::SpacePointTrackCand() :
   m_pdg(0),
   m_MCTrackID(-1),

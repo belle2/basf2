@@ -784,8 +784,6 @@ namespace Belle2 {
 
   /** typedef for common usage with double */
   typedef B2Vector3<double> B2Vector3D;
-//   ClassImp(B2Vector3<double>);
-
 
   /** typedef for common usage with float */
   typedef B2Vector3<float> B2Vector3F;

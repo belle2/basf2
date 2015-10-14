@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(AlwaysYesFilter)
-
 void AlwaysYesFilter::checkSpacePoints(const SectorFriendship* thisFriendship, CompatibilityTable& compatibilityTable)
 {
   for (auto& aVector : compatibilityTable) {

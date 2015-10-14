@@ -26,8 +26,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-ClassImp(CDCWireHitTopology);
-
 CDCWireHitTopology& CDCWireHitTopology::getInstance()
 {
   StoreObjPtr<CDCWireHitTopology> instance("", DataStore::c_Persistent);

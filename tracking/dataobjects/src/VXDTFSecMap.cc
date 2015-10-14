@@ -16,8 +16,6 @@ using namespace std;
 using namespace Belle2;
 
 
-ClassImp(VXDTFSecMap)
-
 
 void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
 {
@@ -29,7 +27,8 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
 
   stringstream infoOutput;
   infoOutput << "importRawSectorMap: now converting rawMap " << rawMap.getMapName() << ":\n";
-  int acceptedFriends = 0, acceptedCutoffs = 0, rejectedSectors = 0, rejectedFriends = 0, rejectedCutoffs = 0, countNormalSamples = 0, countSmallSamples = 0, sampleThreshold = rawMap.getSampleThreshold();
+  int acceptedFriends = 0, acceptedCutoffs = 0, rejectedSectors = 0, rejectedFriends = 0, rejectedCutoffs = 0, countNormalSamples = 0,
+      countSmallSamples = 0, sampleThreshold = rawMap.getSampleThreshold();
 
   for (auto aSector : rawMap.getSectorMap()) {
     vectorOfFriends.clear();
@@ -59,8 +58,10 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
     m_sectorMap.push_back(make_pair(aSector.first, vectorOfFriends));
   }
 
-  infoOutput << "imported sectors/friends/cutoffs: " << size() << "/" << acceptedFriends << "/" << acceptedCutoffs << ", rejected sectors/friends/cutoffs: " << rejectedSectors << "/" << rejectedFriends << "/" << rejectedCutoffs << endl;
-  infoOutput << "with small sample threshold of " << sampleThreshold << ", " << countSmallSamples << "/" << countNormalSamples << " small/normal samples were accepted" << endl;
+  infoOutput << "imported sectors/friends/cutoffs: " << size() << "/" << acceptedFriends << "/" << acceptedCutoffs <<
+             ", rejected sectors/friends/cutoffs: " << rejectedSectors << "/" << rejectedFriends << "/" << rejectedCutoffs << endl;
+  infoOutput << "with small sample threshold of " << sampleThreshold << ", " << countSmallSamples << "/" << countNormalSamples <<
+             " small/normal samples were accepted" << endl;
 
   B2INFO(infoOutput.str());
 
@@ -86,10 +87,12 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
 
   stringstream originPos;
   originPos << " x: " << getOrigin()[0] << ", y: " << getOrigin()[1] << ", z: " << getOrigin()[2];
-  B2DEBUG(1, " now the following parameters are set: mapName " << getMapName() << ", detectorType " << getDetectorType() << ", magneticFieldStrength " << getMagneticFieldStrength() << ", origin " << originPos.str())
+  B2DEBUG(1, " now the following parameters are set: mapName " << getMapName() << ", detectorType " << getDetectorType() <<
+          ", magneticFieldStrength " << getMagneticFieldStrength() << ", origin " << originPos.str())
 
   stringstream newInfo;
-  newInfo << " lower pT threshold: " << rawMap.getLowerMomentumThreshold() << ", upper pT threshold: " << rawMap.getHigherMomentumThreshold() ;
+  newInfo << " lower pT threshold: " << rawMap.getLowerMomentumThreshold() << ", upper pT threshold: " <<
+          rawMap.getHigherMomentumThreshold() ;
   setAdditionalInfo(newInfo.str());
 
 
@@ -101,8 +104,8 @@ void VXDTFSecMap::importRawSectorMap(Belle2::VXDTFRawSecMap& rawMap)
 int VXDTFSecMap::getNumOfValues(const VXDTFSecMapTypedef::SecMapCopy& secMap) const
 {
   int result = 0;
-  for (const VXDTFSecMapTypedef::Sector & aSector : secMap) { // looping over sectors (StrippedRawSecMap)
-    for (const VXDTFSecMapTypedef::Friend & afriend : aSector.second) { // looping over friends
+  for (const VXDTFSecMapTypedef::Sector& aSector : secMap) {  // looping over sectors (StrippedRawSecMap)
+    for (const VXDTFSecMapTypedef::Friend& afriend : aSector.second) {  // looping over friends
       result += afriend.second.size() * 2; // there is only a pair of quantiles (min and max) stored -> size = 2
 //       for (Cutoff & aCutoffType : afriend.second) { // looping over CutoffTypes
 //         result += 2; // there is only a pair of quantiles (min and max) stored -> size = 2

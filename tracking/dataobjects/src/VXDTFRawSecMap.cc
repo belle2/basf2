@@ -13,7 +13,7 @@
 
 #include <algorithm> // std::sort, std::find
 
-#include <string> // 
+#include <string> //
 #include <iostream> // stringstream
 #include <math.h>       // round
 #include "tracking/dataobjects/FullSecID.h"
@@ -23,8 +23,6 @@ using namespace std;
 using namespace Belle2;
 
 
-
-ClassImp(VXDTFRawSecMap);
 
 
 void VXDTFRawSecMap::addSectorMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap)

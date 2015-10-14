@@ -17,8 +17,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(SectorFriendship)
-
 void SectorFriendship::prepareCompatibilityTable()
 {
   m_compatibilityTable.clear();

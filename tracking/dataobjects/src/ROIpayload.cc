@@ -100,9 +100,8 @@ void ROIpayload::setCRC()
 
   crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32;
 
-  dhh_crc_32.process_bytes((void*)(m_rootdata + OFFSET_HEADER), HEADER_SIZE_WO_LENGTH * sizeof(uint32_t) + m_index * sizeof(uint64_t));
+  dhh_crc_32.process_bytes((void*)(m_rootdata + OFFSET_HEADER),
+                           HEADER_SIZE_WO_LENGTH * sizeof(uint32_t) + m_index * sizeof(uint64_t));
 
   m_data32[m_index * 2 + OFFSET_ROIS] = htonl(dhh_crc_32.checksum()) ;
 }
-
-ClassImp(ROIpayload);

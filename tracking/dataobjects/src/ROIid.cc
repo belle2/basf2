@@ -33,5 +33,3 @@ ROIid::Contains(const PXDDigit& thePXDDigit) const
           m_sensorID == thePXDDigit.getSensorID()
          );
 }
-
-ClassImp(ROIid);

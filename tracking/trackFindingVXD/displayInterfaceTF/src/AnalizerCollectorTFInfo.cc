@@ -41,8 +41,6 @@ using namespace Belle2;
  * Information about the Methodes in AnalizerCollectorTFInfo.h
  */
 
-ClassImp(AnalizerCollectorTFInfo)
-
 const string AnalizerCollectorTFInfo::m_fileSeparator = ",";
 
 const int AnalizerCollectorTFInfo::m_idAlive = -1;

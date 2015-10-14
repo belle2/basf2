@@ -18,8 +18,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TrackMatchLookUp)
-
 // Helper functions in anonymous namespace
 namespace {
 

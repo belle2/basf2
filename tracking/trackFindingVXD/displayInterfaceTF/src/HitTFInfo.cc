@@ -21,8 +21,6 @@ using namespace Belle2;
  *
  **/
 
-ClassImp(HitTFInfo)
-
 HitTFInfo::HitTFInfo()
 {
   m_sectorID = 0;

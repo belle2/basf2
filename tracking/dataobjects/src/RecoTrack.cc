@@ -8,8 +8,6 @@
 
 using namespace Belle2;
 
-ClassImp(RecoTrack);
-
 RecoTrack::RecoTrack(const TVector3& position, const TVector3& momentum, const short int charge,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,

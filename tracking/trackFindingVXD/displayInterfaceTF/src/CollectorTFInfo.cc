@@ -61,8 +61,6 @@ const int CollectorTFInfo::m_idAlive = -1;
  * Information about the Methodes in CollectorTFInfo.h
  */
 
-ClassImp(CollectorTFInfo)
-
 
 CollectorTFInfo::CollectorTFInfo()
 {

@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'trg']
+env['LIBS'] = ['framework', 'trg', 'fann']
 
 Return('env')

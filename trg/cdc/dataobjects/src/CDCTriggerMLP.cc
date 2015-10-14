@@ -56,21 +56,6 @@ CDCTriggerMLP::nWeightsCal() const
   return nWeights;
 }
 
-float
-CDCTriggerMLP::distToCenter(float phi, float pt, float theta) const
-{
-  float dist = fabs(1. / pt - (invptRange[0] + invptRange[1]) / 2.);
-  if (phiRange[0] <= (phi - 2. * M_PI) && (phi - 2. * M_PI) <= phiRange[1]) {
-    dist += fabs(phi - 2. * M_PI - (phiRange[0] + phiRange[1]) / 2.);
-  } else if (phiRange[0] <= (phi + 2. * M_PI) && (phi + 2. * M_PI) <= phiRange[1]) {
-    dist += fabs(phi + 2. * M_PI - (phiRange[0] + phiRange[1]) / 2.);
-  } else {
-    dist += fabs(phi - (phiRange[0] + phiRange[1]) / 2.);
-  }
-  dist += fabs(theta - (thetaRange[0] + thetaRange[1]) / 2.);
-  return dist;
-}
-
 bool
 CDCTriggerMLP::inPhiRange(float phi) const
 {
@@ -78,7 +63,6 @@ CDCTriggerMLP::inPhiRange(float phi) const
           (phiRange[0] <= phi && phi <= phiRange[1]) ||
           (phiRange[0] <= (phi + 2. * M_PI) && (phi + 2. * M_PI) <= phiRange[1]));
 }
-
 
 bool
 CDCTriggerMLP::inPtRange(float pt) const

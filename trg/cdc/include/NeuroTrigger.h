@@ -47,12 +47,21 @@ namespace Belle2 {
       bool multiplyHidden = true;
       /** Output scale for all networks. */
       std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
-      /** Phi region in degree for all networks. */
+      /** Phi region for which MLP is used in degree for all networks. */
       std::vector<std::vector<float>> phiRange = {{0., 360.}};
-      /** Charge / Pt region in 1/GeV for all networks. */
+      /** Charge / Pt region for which MLP is used in 1/GeV for all networks. */
       std::vector<std::vector<float>> invptRange = {{ -5., 5.}};
-      /** Theta region in degree for all networks. */
+      /** Theta region for which MLP is used in degree for all networks. */
       std::vector<std::vector<float>> thetaRange = {{17., 150.}};
+      /** Phi region for which MLP is trained in degree for all networks.
+       *  Can be larger than use range to avoid edge effects. */
+      std::vector<std::vector<float>> phiRangeTrain = {{0., 360.}};
+      /** Charge / Pt region for which MLP is trained in 1/GeV for all networks.
+       *  Can be larger than use range to avoid edge effects. */
+      std::vector<std::vector<float>> invptRangeTrain = {{ -5., 5.}};
+      /** Theta region for which MLP is trained in degree for all networks.
+       *  Can be larger than use range to avoid edge effects. */
+      std::vector<std::vector<float>> thetaRangeTrain = {{17., 150.}};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 512;
     };
@@ -65,6 +74,9 @@ namespace Belle2 {
 
     /** Set parameters and get some network independent parameters. */
     void initialize(const Parameters& p);
+
+    /** Get indices for sector ranges in parameter lists. */
+    std::vector<unsigned> getRangeIndices(const Parameters& p, unsigned isector);
 
     /** Save MLPs to file.
      * @param filename name of the TFile to write to
@@ -89,10 +101,19 @@ namespace Belle2 {
     /** add an MLP to the list of networks */
     void addMLP(CDCTriggerMLP newMLP) { m_MLPs.push_back(newMLP); }
 
-    /** Select an expert MLP based on the track parameters of the given track.
+    /** Select one expert MLP based on the track parameters of the given track.
+     * This function assumes that sectors are unique.
+     * The first matching sector is returned without checking the rest.
      * @return index of the selected MLP, -1 if the track does not fit any sector
      */
     int selectMLP(const CDCTriggerTrack& track);
+
+    /** Select all matching expert MLPs based on the track parameters of the given track.
+     * This function is used only during training to train overlapping sectors.
+     * At the end of the training, sectors are redefined to be unique.
+     * @return indices of the selected MLPs, empty if the track does not fit any sector
+     */
+    std::vector<int> selectMLPs(const CDCTriggerTrack& track);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);

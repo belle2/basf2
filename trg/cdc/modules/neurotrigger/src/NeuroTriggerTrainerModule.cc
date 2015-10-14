@@ -90,6 +90,15 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
            "Theta region in degree for which experts are trained. "
            "1 value pair, nMLP value pairs or nTheta value pairs "
            "with nPhi * nPt * nTheta = nMLP.", m_parameters.thetaRange);
+  addParam("phiRangeTrain", m_parameters.phiRangeTrain,
+           "Phi region in degree from which training events are taken. "
+           "Can be larger than phiRange to avoid edge effect.", m_parameters.phiRangeTrain);
+  addParam("invptRangeTrain", m_parameters.invptRangeTrain,
+           "Charge / Pt region in 1/GeV from which training events are taken. "
+           "Can be larger than phiRange to avoid edge effect.", m_parameters.invptRangeTrain);
+  addParam("thetaRangeTrain", m_parameters.thetaRangeTrain,
+           "Theta region in degree from which training events are taken. "
+           "Can be larger than phiRange to avoid edge effect.", m_parameters.thetaRangeTrain);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling).", m_parameters.tMax);
   // parameters for training data preparation
@@ -168,7 +177,6 @@ void NeuroTriggerTrainerModule::initialize()
   }
 }
 
-
 void NeuroTriggerTrainerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
@@ -189,52 +197,56 @@ void NeuroTriggerTrainerModule::event()
         }
       }
     }
-    // find correct sector
-    int isector = m_NeuroTrigger.selectMLP(*tracks[itrack]);
-    if (isector < 0) continue;
-    // get target values
-    vector<float> target = {};//mcTrack->getProductionVertex().Z()};
-    if (m_parameters.targetZ)
-      target.push_back(mcTrack->getProductionVertex().Z());
-    if (m_parameters.targetTheta)
-      target.push_back(mcTrack->getMomentum().Theta());
-    target = m_NeuroTrigger[isector].scaleTarget(target);
-    // skip out of range targets or rescale them
-    bool outOfRange = false;
-    for (unsigned itarget = 0; itarget < target.size(); ++itarget) {
-      if (fabs(target[itarget]) > 1.) {
-        outOfRange = true;
-        target[itarget] /= fabs(target[itarget]);
-      }
-    }
-    if (!m_rescaleTarget && outOfRange) continue;
     // update 2D track variables
     m_NeuroTrigger.updateTrack(*tracks[itrack]);
 
-    if (m_nTrainPrepare > 0 &&
-        m_trainSets[isector].getTrackCounter() < m_nTrainPrepare) {
-      // get relative ids for all hits related to the MCParticle
-      // and count them to find relevant id range
-      // using only related hits suppresses background EXCEPT for curling tracks
-      for (const CDCTriggerSegmentHit& hit : mcTrack->getRelationsTo<CDCTriggerSegmentHit>()) {
-        // get relative id
-        double relId = m_NeuroTrigger.getRelId(hit);
-        int intId = round(relId);
-        m_trainSets[isector].addHit(hit.getISuperLayer(), intId);
+    // find all matching sectors
+    vector<int> sectors = m_NeuroTrigger.selectMLPs(*tracks[itrack]);
+    if (sectors.size() == 0) continue;
+    // get target values
+    vector<float> targetRaw = {};
+    if (m_parameters.targetZ)
+      targetRaw.push_back(mcTrack->getProductionVertex().Z());
+    if (m_parameters.targetTheta)
+      targetRaw.push_back(mcTrack->getMomentum().Theta());
+    for (unsigned i = 0; i < sectors.size(); ++i) {
+      int isector = sectors[i];
+      vector<float> target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
+      // skip out of range targets or rescale them
+      bool outOfRange = false;
+      for (unsigned itarget = 0; itarget < target.size(); ++itarget) {
+        if (fabs(target[itarget]) > 1.) {
+          outOfRange = true;
+          target[itarget] /= fabs(target[itarget]);
+        }
       }
-      m_trainSets[isector].countTrack();
-      // if required hit number is reached, get relevant ids
-      if (m_trainSets[isector].getTrackCounter() >= m_nTrainPrepare) {
-        updateRelevantID(isector);
+      if (!m_rescaleTarget && outOfRange) continue;
+
+      if (m_nTrainPrepare > 0 &&
+          m_trainSets[isector].getTrackCounter() < m_nTrainPrepare) {
+        // get relative ids for all hits related to the MCParticle
+        // and count them to find relevant id range
+        // using only related hits suppresses background EXCEPT for curling tracks
+        for (const CDCTriggerSegmentHit& hit : mcTrack->getRelationsTo<CDCTriggerSegmentHit>()) {
+          // get relative id
+          double relId = m_NeuroTrigger.getRelId(hit);
+          int intId = round(relId);
+          m_trainSets[isector].addHit(hit.getISuperLayer(), intId);
+        }
+        m_trainSets[isector].countTrack();
+        // if required hit number is reached, get relevant ids
+        if (m_trainSets[isector].getTrackCounter() >= m_nTrainPrepare) {
+          updateRelevantID(isector);
+        }
+      } else {
+        // check whether we already have enough samples
+        float nTrainMax = m_multiplyNTrain ? m_nTrainMax * m_NeuroTrigger[isector].nWeights() : m_nTrainMax;
+        if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
+          continue;
+        }
+        // get training data
+        m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector), target);
       }
-    } else {
-      // check whether we already have enough samples
-      float nTrainMax = m_multiplyNTrain ? m_nTrainMax * m_NeuroTrigger[isector].nWeights() : m_nTrainMax;
-      if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
-        continue;
-      }
-      // get training data
-      m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector), target);
     }
   }
   // check number of samples for all sectors
@@ -266,6 +278,19 @@ void NeuroTriggerTrainerModule::terminate()
       continue;
     }
     train(isector);
+    // set sector ranges
+    vector<unsigned> indices = m_NeuroTrigger.getRangeIndices(m_parameters, isector);
+    vector<float> phiRange = m_parameters.phiRange[indices[0]];
+    vector<float> invptRange = m_parameters.invptRange[indices[1]];
+    vector<float> thetaRange = m_parameters.thetaRange[indices[2]];
+    //convert phi and theta from degree to radian
+    phiRange[0] *= Unit::deg;
+    phiRange[1] *= Unit::deg;
+    thetaRange[0] *= Unit::deg;
+    thetaRange[1] *= Unit::deg;
+    m_NeuroTrigger[isector].setPhiRange(phiRange);
+    m_NeuroTrigger[isector].setInvptRange(invptRange);
+    m_NeuroTrigger[isector].setThetaRange(thetaRange);
   }
   // save everything to file
   m_NeuroTrigger.save(m_filename, m_arrayname);

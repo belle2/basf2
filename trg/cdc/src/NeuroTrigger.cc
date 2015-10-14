@@ -110,7 +110,55 @@ NeuroTrigger::initialize(const Parameters& p)
       okay = false;
     }
   }
+  // ensure that train sectors are valid
+  if (p.phiRange.size() != p.phiRangeTrain.size()) {
+    B2ERROR("Number of phiRange lists and phiRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iPhi = 0; iPhi < p.phiRange.size(); ++iPhi) {
+      if (p.phiRangeTrain[iPhi].size() != 2) {
+        B2ERROR("phiRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.phiRangeTrain[iPhi][0] > p.phiRange[iPhi][0] ||
+                 p.phiRangeTrain[iPhi][1] < p.phiRange[iPhi][1]) {
+        B2ERROR("phiRangeTrain should be wider than phiRange or equal.");
+        okay = false;
+      }
+    }
+  }
+  if (p.invptRange.size() != p.invptRangeTrain.size()) {
+    B2ERROR("Number of invptRange lists and invptRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iPt = 0; iPt < p.invptRange.size(); ++iPt) {
+      if (p.invptRangeTrain[iPt].size() != 2) {
+        B2ERROR("invptRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.invptRangeTrain[iPt][0] > p.invptRange[iPt][0] ||
+                 p.invptRangeTrain[iPt][1] < p.invptRange[iPt][1]) {
+        B2ERROR("invptRangeTrain should be wider than invptRange or equal.");
+        okay = false;
+      }
+    }
+  }
+  if (p.thetaRange.size() != p.thetaRangeTrain.size()) {
+    B2ERROR("Number of thetaRange lists and thetaRangeTrain lists should be equal.");
+    okay = false;
+  } else {
+    for (unsigned iTheta = 0; iTheta < p.thetaRange.size(); ++iTheta) {
+      if (p.thetaRangeTrain[iTheta].size() != 2) {
+        B2ERROR("thetaRangeTrain should be exactly 2 values.");
+        okay = false;
+      } else if (p.thetaRangeTrain[iTheta][0] > p.thetaRange[iTheta][0] ||
+                 p.thetaRangeTrain[iTheta][1] < p.thetaRange[iTheta][1]) {
+        B2ERROR("thetaRangeTrain should be wider than thetaRange or equal.");
+        okay = false;
+      }
+    }
+  }
+
   if (!okay) return;
+
   // initialize MLPs
   m_MLPs.clear();
   for (unsigned iMLP = 0; iMLP < p.nMLP; ++iMLP) {
@@ -127,19 +175,11 @@ NeuroTrigger::initialize(const Parameters& p)
     }
     nNodes.push_back(nTarget);
     unsigned short targetVars = int(p.targetZ) + (int(p.targetTheta) << 1);
-    //get sector ranges
-    vector<float> phiRange;
-    vector<float> invptRange;
-    vector<float> thetaRange;
-    if (rangeProduct) {
-      phiRange = p.phiRange[iMLP % p.phiRange.size()];
-      invptRange = p.invptRange[(iMLP / p.phiRange.size()) % p.invptRange.size()];
-      thetaRange = p.thetaRange[iMLP / (p.phiRange.size() * p.invptRange.size())];
-    } else {
-      phiRange = (p.phiRange.size() == 1) ? p.phiRange[0] : p.phiRange[iMLP];
-      invptRange = (p.invptRange.size() == 1) ? p.invptRange[0] : p.invptRange[iMLP];
-      thetaRange = (p.thetaRange.size() == 1) ? p.thetaRange[0] : p.thetaRange[iMLP];
-    }
+    //get sector ranges (initially train ranges)
+    vector<unsigned> indices = getRangeIndices(p, iMLP);
+    vector<float> phiRange = p.phiRangeTrain[indices[0]];
+    vector<float> invptRange = p.invptRangeTrain[indices[1]];
+    vector<float> thetaRange = p.thetaRangeTrain[indices[2]];
     //get scaling values
     vector<float> outputScale = (p.outputScale.size() == 1) ? p.outputScale[0] : p.outputScale[iMLP];
     //convert phi and theta from degree to radian
@@ -169,6 +209,21 @@ NeuroTrigger::initialize(const Parameters& p)
   }
 }
 
+vector<unsigned>
+NeuroTrigger::getRangeIndices(const Parameters& p, unsigned isector)
+{
+  std::vector<unsigned> indices = {0, 0, 0};
+  if (p.phiRange.size() * p.invptRange.size() * p.thetaRange.size() == p.nMLP) {
+    indices[0] = isector % p.phiRange.size();
+    indices[1] = (isector / p.phiRange.size()) % p.invptRange.size();
+    indices[2] = isector / (p.phiRange.size() * p.invptRange.size());
+  } else {
+    indices[0] = (p.phiRange.size() == 1) ? 0 : isector;
+    indices[1] = (p.invptRange.size() == 1) ? 0 : isector;
+    indices[2] = (p.thetaRange.size() == 1) ? 0 : isector;
+  }
+  return indices;
+}
 
 int
 NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
@@ -198,28 +253,70 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
     theta = mcTrack->getMomentum().Theta();
   }
 
-  // find best sector
-  unsigned bestIndex = -1;
-  float mindist = 999.;
-  unsigned nCandidates = 0;
+  // find sector
+  // should be unique
+  // if several sectors match, first in the list is taken
+  int bestIndex = -1;
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
     if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
         && m_MLPs[isector].inThetaRange(theta)) {
-      ++nCandidates;
-      float dist = m_MLPs[isector].distToCenter(phi0, pt, theta);
-      if (dist < mindist) {
-        bestIndex = isector;
-        mindist = dist;
-      }
+      bestIndex = isector;
+      break;
     }
   }
 
-  if (nCandidates == 0) {
+  if (bestIndex < 0) {
     B2DEBUG(150, "Track does not match any sector.");
     B2DEBUG(150, "pt=" << pt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
   }
 
   return bestIndex;
+}
+
+vector<int>
+NeuroTrigger::selectMLPs(const CDCTriggerTrack& track)
+{
+  vector<int> indices = {};
+
+  if (m_MLPs.size() == 0) {
+    B2WARNING("Trying to select MLP before initializing MLPs.");
+    return indices;
+  }
+
+  float phi0 = track.getHoughPhiVertex();
+  float pt = track.getHoughPt() * track.getCharge();
+  float theta = M_PI_2;
+
+  //get theta of related MC track
+  RelationVector<MCParticle> mcParticles = track.getRelationsTo<MCParticle>();
+  if (mcParticles.size() > 0) {
+    MCParticle* mcTrack = mcParticles[0];
+    if (mcParticles.size() > 1) {
+      double maxWeight = mcParticles.weight(0);
+      for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
+        if (mcParticles.weight(imc) > maxWeight) {
+          mcTrack = mcParticles[imc];
+          maxWeight = mcParticles.weight(imc);
+        }
+      }
+    }
+    theta = mcTrack->getMomentum().Theta();
+  }
+
+  // find all matching sectors
+  for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
+    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inPtRange(pt)
+        && m_MLPs[isector].inThetaRange(theta)) {
+      indices.push_back(isector);
+    }
+  }
+
+  if (indices.size() == 0) {
+    B2DEBUG(150, "Track does not match any sector.");
+    B2DEBUG(150, "pt=" << pt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
+  }
+
+  return indices;
 }
 
 void

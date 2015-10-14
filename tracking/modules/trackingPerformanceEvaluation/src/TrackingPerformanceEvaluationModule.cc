@@ -114,11 +114,11 @@ void TrackingPerformanceEvaluationModule::initialize()
   m_h1_cotTheta_err = createHistogram1D("h1cotThetaerr", "cot#theta error", 100, 0, 0.03, "#sigma_{cot#theta}", m_histoList);
 
   //track parameters residuals
-  m_h1_d0_res = createHistogram1D("h1d0res", "d0 residuals", 100, -0.5, 0.5, "d0 resid (cm)", m_histoList);
-  m_h1_phi_res = createHistogram1D("h1phires", "#phi residuals", 100, -10, 10, "#phi resid (rad)", m_histoList);
-  m_h1_omega_res = createHistogram1D("h1omegares", "#omega residuals", 100, -0.01, 0.01, "#omega resid (cm^{-1})", m_histoList);
-  m_h1_z0_res = createHistogram1D("h1z0res", "z0 residuals", 100, -1, 1, "z0 resid (cm)", m_histoList);
-  m_h1_cotTheta_res = createHistogram1D("h1cotThetares", "cot#theta residuals", 100, -10, 10, "cot#theta resid", m_histoList);
+  m_h1_d0_res = createHistogram1D("h1d0res", "d0 residuals", 100, -0.1, 0.1, "d0 resid (cm)", m_histoList);
+  m_h1_phi_res = createHistogram1D("h1phires", "#phi residuals", 100, -0.1, 0.1, "#phi resid (rad)", m_histoList);
+  m_h1_omega_res = createHistogram1D("h1omegares", "#omega residuals", 100, -0.0005, 0.0005, "#omega resid (cm^{-1})", m_histoList);
+  m_h1_z0_res = createHistogram1D("h1z0res", "z0 residuals", 100, -0.1, 0.1, "z0 resid (cm)", m_histoList);
+  m_h1_cotTheta_res = createHistogram1D("h1cotThetares", "cot#theta residuals", 100, -0.1, 0.1, "cot#theta resid", m_histoList);
 
 
   //track parameters pulls
@@ -176,9 +176,14 @@ void TrackingPerformanceEvaluationModule::initialize()
 
   m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 100, 0, 1, "pValue", m_histoList);
 
+  m_h2_OmegaerrOmegaVSpt = createHistogram2D("h2OmegaerrOmegaVSpt", "#sigma_{#omega}/#omega VS p_{t}",
+                                             100, 0, 3, "p_{t} (GeV/c)",
+                                             1000, 0, 0.2, "#sigma_{#omega}/#omega",
+                                             m_histoList);
+
 
   m_h2_z0errVSpt = createHistogram2D("h2z0errVSpt", "#sigma_{z0} VS p_{t}",
-                                     100, 0, 2, "p_{t} (GeV/c)",
+                                     100, 0, 3, "p_{t} (GeV/c)",
                                      100, 0, 0.1, "#sigma_{z0} (cm)",
                                      m_histoList);
 
@@ -189,7 +194,7 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                    m_histoList);
 
   m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
-                                     100, 0, 2, "p_{t} (GeV/c)",
+                                     100, 0, 3, "p_{t} (GeV/c)",
                                      100, 0, 0.1, "#sigma_{d0} (cm)",
                                      m_histoList);
 
@@ -889,7 +894,10 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
 
   //track parameters residuals:
   double d0_res = fitResult->getD0() - mcParticleInfo.getD0();
-  double phi_res = fmod(fitResult->getPhi() - mcParticleInfo.getPhi() + TMath::Pi(), 2 * TMath::Pi()) - TMath::Pi();
+
+  //  double phi_res = fmod(fitResult->getPhi() - mcParticleInfo.getPhi() + 2*TMath::Pi(), 2 * TMath::Pi()); //giulia
+  double phi_res = TMath::ASin(TMath::Sin(fitResult->getPhi() - mcParticleInfo.getPhi()));   //giulia
+
   double omega_res =  fitResult->getOmega() - mcParticleInfo.getOmega();
   double z0_res = fitResult->getZ0() - mcParticleInfo.getZ0();
   double cotTheta_res = fitResult->getCotTheta() - mcParticleInfo.getCotTheta();
@@ -911,6 +919,10 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   m_h1_omega_pll->Fill(omega_res / omega_err);
   m_h1_z0_pll->Fill(z0_res / z0_err);
   m_h1_cotTheta_pll->Fill(cotTheta_res / cotTheta_err);
+
+
+  m_h2_OmegaerrOmegaVSpt->Fill(fitResult->getMomentum().Pt(), omega_err / mcParticleInfo.getOmega());
+
 
 }
 
@@ -944,7 +956,6 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
   m_h2_d0errVSpt->Fill(pt, d0_err);
 
   m_h2_z0errVSpt->Fill(pt, z0_err);
-
 
   m_h2_d0errMSVSpt->Fill(pt, d0_err * beta * p * pow(sinTheta, 3 / 2) / 0.0136);
 

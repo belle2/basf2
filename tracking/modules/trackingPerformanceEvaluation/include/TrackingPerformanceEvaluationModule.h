@@ -168,6 +168,8 @@ namespace Belle2 {
 
     TH1F* m_h1_pValue;
 
+    TH2F* m_h2_OmegaerrOmegaVSpt;
+
     TH2F* m_h2_z0errVSpt_wpxd;
     TH2F* m_h2_z0errVSpt_wopxd;
     TH2F* m_h2_z0errVSpt;
@@ -196,9 +198,8 @@ namespace Belle2 {
     TH3F* m_h3_TracksPerMCTrackCand_minus;
 
     //histograms used for purity plots
-    // -- Disabled as they are unused --
-    //TH1F* m_h1_HitsMCTrackCandPerTrackCand;
-    //TH1F* m_h1_HitsTrackCand;
+    TH1F* m_h1_HitsMCTrackCandPerTrackCand;
+    TH1F* m_h1_HitsTrackCand;
 
     TH3F* m_h3_MCParticlesPerTrack;
     TH3F* m_h3_Tracks;

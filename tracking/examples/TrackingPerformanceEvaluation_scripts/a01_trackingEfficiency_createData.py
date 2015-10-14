@@ -26,15 +26,17 @@
 import sys
 from basf2 import *
 from simulation import add_simulation
+from beamparameters import add_beamparameters
 
 set_random_seed(123 + int(sys.argv[1]))
 
 release = sys.argv[2]
-print release
+
+print(release)
 
 output_filename = './' + release + '/TV_data_' + release + '_' + sys.argv[1] + '.root'
 
-print output_filename
+print(output_filename)
 
 path = create_path()
 
@@ -53,6 +55,8 @@ progress = register_module('Progress')
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.WARNING
 
+beamparameters = add_beamparameters(path, "Y4S")
+
 # no bkg
 background_files = []
 
@@ -62,9 +66,10 @@ root_output.param('outputFileName', output_filename)
 
 path.add_module(eventinfosetter)
 path.add_module(progress)
+path.add_module(beamparameters)
 path.add_module(evtgeninput)
 add_simulation(path)
 path.add_module(root_output)
 
 process(path)
-print statistics
+print(statistics)

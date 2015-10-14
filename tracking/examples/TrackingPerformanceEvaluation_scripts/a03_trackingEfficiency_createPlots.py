@@ -14,14 +14,14 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
-release = sys.argv[2]
+release = sys.argv[1]
 input_root_files = ['./' + release + '/TV_reco_' + release + '_*.root']
 root_file_name = './' + release + '/TV_analysis_' + release + '_10k.root'
 
-print 'Tracking Validation will run over these files: '
-print input_root_files
-print '(full simulation)'
-print
+print('Tracking Validation will run over these files: ')
+print(input_root_files)
+print('(full simulation)')
+print()
 
 path = create_path()
 
@@ -31,8 +31,6 @@ path.add_module(root_input)
 
 gearbox = register_module('Gearbox')
 path.add_module(gearbox)
-
-print
 
 geometry = register_module('Geometry')
 path.add_module(geometry)
@@ -44,4 +42,4 @@ path.add_module(create_plots)
 
 process(path)
 
-print statistics
+print(statistics)

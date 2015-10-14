@@ -19,10 +19,10 @@ release = sys.argv[2]
 input_root_files = './' + release + '/TV_data_' + release + '_' + sys.argv[1] + '.root'
 output_file_name = './' + release + '/TV_reco_' + release + '_' + sys.argv[1] + '.root'
 
-print 'Tracking will run over these files: '
-print input_root_files
-print '(full simulation)'
-print
+print('Tracking will run over these files: ')
+print(input_root_files)
+print('(full simulation)')
+print()
 
 path = create_path()
 
@@ -57,4 +57,4 @@ for modItem in modList:
 
 process(path)
 
-print statistics
+print(statistics)

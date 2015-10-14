@@ -438,11 +438,11 @@ superLayer(const unsigned id) {
 
                         }
 
-                else if(r1=1 && r2!=1)
+                else if(r1==1 && r2!=1)
                         {
                             if( r1>=rplus  )
                                 {
-                                    if( r1=1 && plus1>0 )
+                                    if( r1==1 && plus1>0 )
                                         {
                                             pHPcelly[k][j].push_back(SL);
                                             pHPcelly[k][j].push_back(i);

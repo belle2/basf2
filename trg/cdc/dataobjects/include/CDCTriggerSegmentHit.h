@@ -29,13 +29,19 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }
 
+    //modifiers
+    void setLeftRight(unsigned short LR) { m_leftRight = LR; }
+
     //accessors
     unsigned short getSegmentID() const { return m_segmentID; }
     unsigned short getPriorityPosition() const { return m_priorityPosition; }
     unsigned short getLeftRight() const { return m_leftRight; }
     /** get TDC count without offset.
-     * default offset is current offset applied by the CDCDigitizer. */
-    short getTDCCountWithoutOffset(short offset = 8192) const { return offset - m_tdcCount; }
+     * default offset and binwidth are current values applied by the CDCDigitizer. */
+    short getTDCCountWithoutOffset(short offset = 8192, double binwidth = 1. / 1.016) const
+    {
+      return offset - m_tdcCount * binwidth;
+    }
     /** true if LeftRight position is determined */
     bool LRknown() const { return (m_leftRight == 1 || m_leftRight == 2); }
 

@@ -61,6 +61,8 @@ namespace Belle2 {
     std::string m_filename;
     /** Name of file where training samples are stored. */
     std::string m_trainFilename;
+    /** Name of file where training log is stored. */
+    std::string m_logFilename;
     /** Name of the TObjArray holding the networks. */
     std::string m_arrayname;
     /** Name of the TObjArray holding the training samples. */

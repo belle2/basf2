@@ -39,11 +39,15 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   );
   // parameters for saving / loading
   addParam("filename", m_filename,
-           "Name of the files where the NeuroTrigger parameters will be saved.",
+           "Name of the root file where the NeuroTrigger parameters will be saved.",
            string("NeuroTrigger.root"));
   addParam("trainFilename", m_trainFilename,
-           "Name of the files where the generated training samples will be saved.",
+           "Name of the root file where the generated training samples will be saved.",
            string("NeuroTrigger.root"));
+  addParam("logFilename", m_logFilename,
+           "Name of the text file where the training logs will be saved "
+           "(one for each sector, named logFilename_i.log).",
+           string("NeuroTrigger"));
   addParam("arrayname", m_arrayname,
            "Name of the TObjArray to hold the NeuroTrigger parameters.",
            string("MLPs"));
@@ -384,17 +388,23 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
   double bestRMS = 999.;
   vector<fann_type> bestWeights = {};
+  vector<double> bestTrainLog = {};
+  vector<double> bestValidLog = {};
   // repeat training several times with different random start weights
   for (int irun = 0; irun < m_repeatTrain; ++irun) {
     double bestValid = 999.;
+    vector<double> trainLog = {};
     vector<double> validLog = {};
+    trainLog.assign(m_maxEpochs, 0.);
     validLog.assign(m_maxEpochs, 0.);
+    int breakEpoch = 0;
     vector<fann_type> bestWeights = {};
     bestWeights.assign(m_NeuroTrigger[isector].nWeights(), 0.);
     fann_randomize_weights(ann, -0.1, 0.1);
     // train and save the network
     for (int epoch = 1; epoch <= m_maxEpochs; ++epoch) {
       double mse = parallel_fann::train_epoch_irpropm_parallel(ann, train_data, m_nThreads);
+      trainLog[epoch - 1] = mse;
       // evaluate validation set
       fann_reset_MSE(ann);
       double valid_mse = parallel_fann::test_data_parallel(ann, valid_data, m_nThreads);
@@ -411,6 +421,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
         B2INFO("Training stopped in epoch " << epoch);
         B2INFO("Train error: " << mse << ", valid error: " << valid_mse <<
                ", best valid: " << bestValid);
+        breakEpoch = epoch;
         break;
       }
       // print current status
@@ -446,10 +457,18 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
     B2INFO("RMS on test samples: " << RMS << " (best: " << bestRMS << ")");
     if (RMS < bestRMS) {
       bestRMS = RMS;
+      bestTrainLog.assign(trainLog.begin(), trainLog.begin() + breakEpoch);
+      bestValidLog.assign(validLog.begin(), validLog.begin() + breakEpoch);
     } else {
       m_NeuroTrigger[isector].setWeights(oldWeights);
     }
   }
+  // save training log
+  ofstream logstream(m_logFilename + "_" + to_string(isector) + ".log");
+  for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
+    logstream << bestTrainLog[i] << " " << bestValidLog[i] << endl;
+  }
+  logstream.close();
   // free memory
   fann_destroy_train(train_data);
   fann_destroy_train(valid_data);

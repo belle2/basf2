@@ -53,7 +53,8 @@ namespace Belle2 {
                            bool leftRight = false,
                            float z = 0,
                            float = 0,
-                           float = 0);
+                           float = 0,
+                           unsigned short = 0);
 
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.

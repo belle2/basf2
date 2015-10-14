@@ -21,7 +21,8 @@ float SimpleTDCCountTranslator::getDriftLength(unsigned short tdcCount,
                                                bool,
                                                float z,
                                                float,
-                                               float)
+                                               float,
+                                               unsigned short)
 {
   // translate TDC Count into time information:
   CDCGeometryPar& geometryPar = CDCGeometryPar::Instance();

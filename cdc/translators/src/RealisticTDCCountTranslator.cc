@@ -36,7 +36,8 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
                                                   bool leftRight,
                                                   float z,
                                                   float alpha,
-                                                  float theta)
+                                                  float theta,
+                                                  unsigned short adcCount)
 {
   // translate TDC Count into time information:
   // N.B. 0.5 is necessary since real TDC module rounds down the time.
@@ -60,6 +61,9 @@ float RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Third: If time of flight was simulated, this has to be undone, too. If it wasn't timeOfFlightEstimator should be taken as 0.
   driftTime -= timeOfFlightEstimator;
+
+  //Forth: Time-walk correction
+  driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.

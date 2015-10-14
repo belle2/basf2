@@ -274,6 +274,10 @@ void CDCGeometryPar::read()
 
     //Read t0
     readT0(gbxParams);
+
+    //Read time-walk coefficient
+    readChMap(gbxParams);
+    readTW(gbxParams);
   }
 
   //Replace xt etc. with those for reconstriction
@@ -285,6 +289,7 @@ void CDCGeometryPar::read()
     readSigma(gbxParams, 1);
     readPropSpeed(gbxParams, 1);
     readT0(gbxParams, 1);
+    readTW(gbxParams, 1);
   }
 
   //calculate and save shifts in super-layers
@@ -681,6 +686,84 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
 
   if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readT0: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+}
+
+
+// Read time-walk parameters
+void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
+{
+  std::string fileName0 = gbxParams.getString("twFileName");
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("tw4ReconFileName");
+  }
+
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  unsigned iBoard = 0;
+  float coef = 0.;
+  unsigned nRead = 0;
+
+  while (true) {
+    // Read board id and coefficient
+    ifs >> iBoard >> coef;
+    m_timeWalkCoef[iBoard] = coef;
+    if (ifs.eof()) break;
+    ++nRead;
+  }
+
+  if (nRead != nBoards) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #boards (=" << nBoards
+                                  << ") !");
+
+  ifs.close();
+}
+
+
+// Read ch-map
+void CDCGeometryPar::readChMap(const GearDir gbxParams)
+{
+  std::string fileName0 = gbxParams.getString("chmapFileName");
+  fileName0 = "/cdc/data/" + fileName0;
+
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  unsigned short iSL, iL, iW, iB, iC;
+  unsigned nRead = 0;
+
+  while (true) {
+    // Read a relation
+    ifs >> iSL >> iL >> iW >> iB >> iC;
+    if (ifs.eof()) break;
+
+    ++nRead;
+    WireID wID(iSL, iL, iW);
+    m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iB));
+  }
+
+  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #sense-wires (="
+                                      << nSenseWires << ") !");
 
   ifs.close();
 }

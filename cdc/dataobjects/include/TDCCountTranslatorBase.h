@@ -42,6 +42,7 @@ namespace Belle2 {
        *  @param z                       z-position for determining the in-wire-propagation time.
        *  @param alpha                   Track incident angle in r-phi plane.
        *  @param theta                   Track incident angle in s-z plane (=polar angle).
+       *  @param adcCount                ADC count.
        *
        *  @return  Best estimation of closest distance between the track and the wire.
        */
@@ -51,7 +52,8 @@ namespace Belle2 {
                                    bool ambiguityDiscrimiator  = false,
                                    float z = 0,
                                    float alpha = 0,
-                                   float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
+                                   float theta = static_cast<float>(TMath::Pi() / 2.),
+                                   unsigned short adcCount = 0) = 0;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *

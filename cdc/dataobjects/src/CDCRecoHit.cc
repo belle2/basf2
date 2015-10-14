@@ -45,7 +45,7 @@ void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTransla
 
 CDCRecoHit::CDCRecoHit()
   : genfit::AbsMeasurement(),
-    m_tdcCount(0), m_wireID(WireID()), m_cdcHit(NULL), m_leftRight(0)
+    m_tdcCount(0), m_adcCount(0), m_wireID(WireID()), m_cdcHit(NULL), m_leftRight(0)
 {
 }
 
@@ -59,6 +59,7 @@ CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCa
   // get information from cdcHit into local variables.
   m_wireID = cdcHit->getID();
   m_tdcCount = cdcHit->getTDCCount();
+  m_adcCount = cdcHit->getADCCount();
 
   // set l-r info
   const genfit::WireTrackCandHit* aTrackCandHitPtr =  dynamic_cast<const genfit::WireTrackCandHit*>(trackCandHit);
@@ -175,10 +176,10 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
   // from CDCGeometryPar::getNewLeftRightRaw().
   double mL = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
                                                    false, //left
-                                                   z, alpha, theta);
+                                                   z, alpha, theta, m_adcCount);
   double mR = s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, trackTime,
                                                    true, //right
-                                                   z, alpha, theta);
+                                                   z, alpha, theta, m_adcCount);
   double VL = s_tdcCountTranslator->getDriftLengthResolution(mL, m_wireID,
                                                              false, //left
                                                              z, alpha, theta);

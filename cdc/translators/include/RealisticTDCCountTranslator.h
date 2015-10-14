@@ -43,6 +43,7 @@ namespace Belle2 {
        * @param z                     z-position on the wire (cm).
        * @param alpha                 Track incident angle in r-phi plane (rad).
        * @param theta                 Track incident angle in s-z plane (=polar angle) (rad).
+       * @param adcCount              ADC count.
        * @return Drift length (cm) if drift time >= 0; v*(drift time) (i.e. negative value) otherwise, where v is set to one (cm/ns) for simplicity.
        */
       float getDriftLength(unsigned short tdcCount,
@@ -51,7 +52,8 @@ namespace Belle2 {
                            bool leftRight = false,
                            float z = 0,
                            float alpha = 0,
-                           float = static_cast<float>(TMath::Pi() / 2.));
+                           float = static_cast<float>(TMath::Pi() / 2.),
+                           unsigned short adcCount = 0);
 
       /**
        * Get position resolution^2 corresponding to the drift length

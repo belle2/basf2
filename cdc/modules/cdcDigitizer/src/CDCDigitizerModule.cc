@@ -311,8 +311,12 @@ void CDCDigitizerModule::event()
 
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
-    //remove negative drift time (TDC) upon request
+    //add time-walk (here for simplicity)
+    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
+    iterSignalMap->second.m_driftTime += m_cdcp->getTimeWalk(iterSignalMap->first,
+                                                             adcCount);
 
+    //remove negative drift time (TDC) upon request
     if (!m_outputNegativeDriftTime &&
         iterSignalMap->second.m_driftTime < 0.) {
       continue;
@@ -325,7 +329,7 @@ void CDCDigitizerModule::event()
     //    //set tdcCount2ndHit = tdcCount
     //    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
     //set tdcCount2ndHit = default value
-    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first);
+    cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
 
     //    std::cout <<"t0= " << m_cdcp->getT0(iterSignalMap->first) << std::endl;
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);

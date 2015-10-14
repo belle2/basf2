@@ -153,6 +153,9 @@ namespace Belle2 {
     /** TDC Count as out of CDCHit. */
     unsigned short m_tdcCount;
 
+    /** ADC Count as out of CDCHit. */
+    unsigned short m_adcCount;
+
     /** Wire Identifier. */
     WireID m_wireID;
 

@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "TVector3.h"
 
@@ -25,6 +26,7 @@ const unsigned MAX_N_SCELLS  =   384;
 const unsigned MAX_N_FLAYERS =    55;
 const unsigned nSenseWires   = 14336;
 const unsigned nSuperLayers  =     9;
+const unsigned nBoards       =   300;
 
 namespace Belle2 {
   namespace CDC {
@@ -101,6 +103,19 @@ namespace Belle2 {
        */
 
       void readT0(const GearDir, int mode = 0);
+
+      /**
+       * Read channel map between wire-id and electronics-id.
+       * @param GearDir Gear Dir.
+       */
+      void readChMap(const GearDir);
+
+      /**
+       * Read time-walk parameter.
+       * @param GearDir Gear Dir.
+       * @param mode 0: read simulation file, 1: read reconstruction file.
+       */
+      void readTW(const GearDir, int mode = 0);
 
       //! Generate an xml file used in gearbox
       /*!
@@ -344,6 +359,21 @@ namespace Belle2 {
       {
         //  std::cout << wireID.getICLayer() <<" "<< wireID.getIWire() << std::endl;
         return m_t0[wireID.getICLayer()][wireID.getIWire()];
+      }
+
+      //! Returns time-walk
+      /*!
+      \param wireID   wire id
+      \param adcCount ADC count
+      \return         time-walk (in ns)
+      */
+      float getTimeWalk(const WireID& wID, unsigned short adcCount) const
+      {
+        std::map<WireID, unsigned short>::const_iterator it = m_wireToBoard.find(wID);
+        //  std::cout <<"SL,L,W, bd#= " << wID.getISuperLayer() <<" "<< wID.getILayer() <<" "<< wID.getIWire() <<" "<< it->second << std::endl;
+        float tw = (it != m_wireToBoard.end() && adcCount > 0) ? m_timeWalkCoef[it->second] / sqrt(adcCount) : 0.;
+        //  std::cout <<"bd#,coef,adc,tw= " << it->second <<" "<< m_timeWalkCoef[it->second] <<" "<< adcCount <<" "<< tw << std::endl;
+        return tw;
       }
 
       //! Calculates and saves shifts in super-layers (to be used in searching hits in neighboring cells)
@@ -741,6 +771,9 @@ namespace Belle2 {
       float m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
       float m_PropSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */
+      float m_timeWalkCoef[nBoards];  /*!< coefficient for time walk (in ns/sqrt(ADC count)). */
+
+      std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 
       unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
       double m_tdcBinWidth;        /*!< TDC bin width (nsec/bin). */

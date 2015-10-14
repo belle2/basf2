@@ -152,10 +152,10 @@ void NeuroTriggerTrainerModule::initialize()
     CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
     for (unsigned iMLP = 0; iMLP < m_NeuroTrigger.nSectors(); ++iMLP) {
       m_trainSets.push_back(CDCTriggerMLPData());
-      int layerId = 2;
+      int layerId = 3;
       for (int iSL = 0; iSL < 9; ++iSL) {
         m_trainSets[iMLP].addCounters(cdc.nWiresInLayer(layerId));
-        layerId += (iSL > 0 ? 6 : 8);
+        layerId += (iSL > 0 ? 6 : 7);
       }
     }
   }
@@ -279,10 +279,10 @@ NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
   vector<float> relevantID;
   relevantID.assign(18, 0.);
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
-  int layerId = 2;
+  int layerId = 3;
   for (unsigned iSL = 0; iSL < 9; ++iSL) {
     int nWires = cdc.nWiresInLayer(layerId);
-    layerId += (iSL > 0 ? 6 : 8);
+    layerId += (iSL > 0 ? 6 : 7);
     B2DEBUG(120, "SL " << iSL << " (" <<  nWires << " wires)");
     // get maximum hit counter
     unsigned maxCounter = 0;

@@ -216,13 +216,6 @@ namespace Belle2 {
 
       bool m_enablePrintOut;
 
-
-      /**
-       * Set/unset relation between CDCHit and CDCRawHit(WaveForm).
-       */
-
-      bool m_setRelationRaw2Hit;
-
       /**
        * Name of the RawCDC dataobject (supressed mode).
        */

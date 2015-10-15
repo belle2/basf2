@@ -185,6 +185,7 @@ vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::getRunListFromAllDa
     for (auto exprun : sublist)
       list.push_back(exprun);
   }
-  std::unique(list.begin(), list.end());
+  std::sort(list.begin(), list.end());
+  list.erase(std::unique(list.begin(), list.end()), list.end());
   return list;
 }

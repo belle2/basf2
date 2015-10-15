@@ -126,7 +126,7 @@ namespace Belle2 {
     //! Is this VXD label?
     bool    isVXD()          const {return (eid > vxdOffset && eid < cdcOffset);}
     //! Is this CDC label?
-    bool    isCDC()          const {return (eid >= cdcOffset && eid < klmOffset && eid < maxEID);}
+    bool    isCDC()          const {return (eid >= cdcOffset && eid < klmOffset);}
     //! Is this KLM label?
     bool    isKLM()          const {return (eid >= klmOffset && eid < maxEID);}
     //! Get id of alignment/calibration parameter

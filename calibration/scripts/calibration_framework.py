@@ -221,6 +221,9 @@ def run_calibration(path, output_path=".", max_iterations=5, iteration_callback=
         CalibrationAlgorithm.c_Failure: "Failure",
     }
 
+    # prepare the xml tree for the results
+    xml = etree.ElementTree(etree.Element("CalibrationResults", start=datetime.now().isoformat()))
+
     # add the calibration modules to the path
     path.add_path(_calib_path)
 
@@ -228,15 +231,16 @@ def run_calibration(path, output_path=".", max_iterations=5, iteration_callback=
     ctx = multiprocessing.get_context("fork")
     # and a pipe between parent and child process
     parent_conn, child_conn = ctx.Pipe()
-    # prepare the xml tree for the results
-    xml = etree.ElementTree(etree.Element("CalibrationResults", start=datetime.now().isoformat()))
 
+    # make sure output directory exists
+    os.makedirs(output_path, exist_ok=True)
+    # set filename for xml output
     result_filename = os.path.join(output_path, "CalibrationResults.xml")
     B2RESULT("Saving calibration results to '%s'" % result_filename)
     if os.path.exists(result_filename):
         B2WARNING("CalibrationResults.xml already exists in output path, renaming old one ...")
         os.rename(result_filename, result_filename + "~")
-
+    # set filename for database.txt output
     database_filename = os.path.join(output_path, "calibration-database.txt")
     if os.path.exists(database_filename):
         B2WARNING("There is already a calibration-database.txt in the output path, "

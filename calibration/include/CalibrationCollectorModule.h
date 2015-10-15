@@ -51,7 +51,7 @@ namespace Belle2 {
       template <class T>
       void registerObject(string name, T* obj)
       {
-        string fullName = m_prefix + "_" + name;
+        string fullName = getName() + "_" + name;
 
         StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
         storeobj.registerInDataStore();
@@ -68,14 +68,12 @@ namespace Belle2 {
       T& getObject(string name)
       {
         std::string strExpRun = std::to_string(m_currentExpRun.first) + "." + std::to_string(m_currentExpRun.second);
-        std::string fullName = m_prefix + "_" + name;
+        std::string fullName = getName() + "_" + name;
         StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
         return storeobj->getObject(strExpRun);
       }
 
     private:
-      /// The prefix for calibration datastore objects
-      std::string m_prefix;
       /// Current exp, run for correct object retrieval/creation
       std::pair<int, int> m_currentExpRun = { -999, -999};
 

@@ -5,8 +5,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace calibration;
-
 
 TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
 {
@@ -20,20 +18,20 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
   );
 }
 
-CalibrationAlgorithm::E_Result TestCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
   auto& histogram1 = getObject<TH1F>("histogram1");
   auto& ttree = getObject<TTree>("tree");
   auto& mille = getObject<MilleData>("test_mille");
 
   if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())
-    return calibration::CalibrationAlgorithm::c_NotEnoughData;
+    return c_NotEnoughData;
 
   Double_t mean = histogram1.GetMean();
   Double_t meanerror = histogram1.GetMeanError();
 
   if (meanerror <= 0.)
-    return Belle2::calibration::CalibrationAlgorithm::c_Failure;
+    return c_Failure;
 
   static int nameDistinguisher(0);
   TH1I* correction = new TH1I(TString(string("constant-in-histo") + to_string(nameDistinguisher)),
@@ -44,8 +42,9 @@ CalibrationAlgorithm::E_Result TestCalibrationAlgorithm::calibrate()
   saveCalibration(correction, "test_constant");
 
   // Iterate until we find answer to the most fundamental question...
+  B2INFO("mean: " << mean);
   if (mean - 42. >= 1.)
-    return calibration::CalibrationAlgorithm::c_Iterate;
+    return c_Iterate;
 
-  return calibration::CalibrationAlgorithm::c_OK;
+  return c_OK;
 }

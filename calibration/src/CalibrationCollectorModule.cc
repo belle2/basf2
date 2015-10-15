@@ -7,9 +7,6 @@ using namespace calibration;
 
 CalibrationCollectorModule::CalibrationCollectorModule()
 {
-  addParam("prefix", m_prefix,
-           "Prefix for calibration dataobjets in datastore for this module (used also by algorithms to find data). If empty (default), will be set to module default name",
-           std::string(""));
   addParam("granularity", m_granularity,
            "Granularity of data collection. Data is separated by runs (=run) or not separated at all (=all)", std::string("run"));
 }
@@ -18,9 +15,6 @@ CalibrationCollectorModule::CalibrationCollectorModule()
 
 void CalibrationCollectorModule::initialize()
 {
-  if (m_prefix == "")
-    m_prefix = getType();
-
   if (m_granularity != "run" && m_granularity != "all")
     B2ERROR("Invalid granularity option provided: '" << m_granularity << "' Allowed options are: 'run' or 'all'");
 

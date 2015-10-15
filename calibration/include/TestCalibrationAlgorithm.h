@@ -12,29 +12,27 @@
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
-  namespace calibration {
-    /**
-     * Test class implementing calibration algorithm
-     */
-    class TestCalibrationAlgorithm : public CalibrationAlgorithm {
-    public:
+  /**
+   * Test class implementing calibration algorithm
+   */
+  class TestCalibrationAlgorithm : public CalibrationAlgorithm {
+  public:
 
-      /// Constructor set the prefix to TestCalibration
-      TestCalibrationAlgorithm();
+    /// Constructor set the prefix to TestCalibration
+    TestCalibrationAlgorithm();
 
-      /// Destructor
-      virtual ~TestCalibrationAlgorithm() {}
+    /// Destructor
+    virtual ~TestCalibrationAlgorithm() {}
 
-    protected:
+  protected:
 
-      /// Run algo on data
-      virtual E_Result calibrate();
+    /// Run algo on data
+    virtual EResult calibrate();
 
-    private:
-      ClassDef(TestCalibrationAlgorithm, 0); /**< Test class implementing calibration algorithm */
+  private:
+    ClassDef(TestCalibrationAlgorithm, 0); /**< Test class implementing calibration algorithm */
 
-    };
-  } // calibration namespace
+  };
 } // namespace Belle2
 
 

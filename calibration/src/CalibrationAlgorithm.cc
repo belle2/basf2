@@ -1,26 +1,27 @@
 #include <calibration/CalibrationAlgorithm.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;
-using namespace calibration;
 
 const std::string CalibrationAlgorithm::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 
-CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::calibration::CalibrationAlgorithm::ExpRun > runs)
+CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector< Belle2::CalibrationAlgorithm::ExpRun > runs, int iteration)
 {
+  m_iteration = iteration;
   m_payloads.clear();
 
   // Let's check that we have the data by accessing an object
   // created by all collector modules by their base class
   StoreObjPtr<CalibRootObj<RunRange>> storeobj(m_prefix + "_" + RUN_RANGE_OBJ_NAME, DataStore::c_Persistent);
   if (!storeobj.isValid()) {
-    B2ERROR("Could not access collected data in datastore.");
-    return calibration::CalibrationAlgorithm::c_Failure;
+    B2ERROR("Could not access collected data in datastore." << (m_prefix + "_" + RUN_RANGE_OBJ_NAME));
+    return c_Failure;
   }
 
   if (getRunListFromAllData().empty()) {
     B2ERROR("No collected data.");
-    return calibration::CalibrationAlgorithm::c_Failure;
+    return c_Failure;
   }
 
   // If no runs are provided, just take all collected
@@ -44,14 +45,14 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
     }
     if (getIovFromData().empty()) {
       B2ERROR("No collected data.");
-      return calibration::CalibrationAlgorithm::c_Failure;
+      return c_Failure;
     }
   }
 
   IntervalOfValidity dataRange = getIovFromData();
   if (dataRange.empty()) {
     B2ERROR("No data collected for selected runs.");
-    return calibration::CalibrationAlgorithm::c_Failure;
+    return c_Failure;
   }
 
   if (!dataRange.contains(caRange)) {
@@ -63,7 +64,7 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
     if (!dataRange.overlaps(caRange)) {
       B2ERROR("The calibration range does not even overlap with the collected data.");
       // We should get just c_NotEnoughData or c_Failure all times, so don't start and fail
-      return calibration::CalibrationAlgorithm::c_Failure;
+      return c_Failure;
     }
   }
 
@@ -71,7 +72,7 @@ CalibrationAlgorithm::E_Result CalibrationAlgorithm::execute(vector< Belle2::cal
   return calibrate();
 }
 
-vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::string2RunList(string list)
+vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::string2RunList(string list) const
 {
   std::vector<ExpRun> result;
 
@@ -91,7 +92,7 @@ vector< CalibrationAlgorithm::ExpRun > CalibrationAlgorithm::string2RunList(stri
   return result;
 }
 
-string CalibrationAlgorithm::runList2String(vector< CalibrationAlgorithm::ExpRun >& list)
+string CalibrationAlgorithm::runList2String(vector< CalibrationAlgorithm::ExpRun >& list) const
 {
   std::string str("");
   for (auto run : list) {
@@ -103,7 +104,7 @@ string CalibrationAlgorithm::runList2String(vector< CalibrationAlgorithm::ExpRun
   return str;
 }
 
-string CalibrationAlgorithm::runList2String(CalibrationAlgorithm::ExpRun run)
+string CalibrationAlgorithm::runList2String(CalibrationAlgorithm::ExpRun run) const
 {
   std::vector<ExpRun> runlist;
   runlist.push_back(run);
@@ -119,12 +120,7 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, string name, IntervalOfValidity iov)
 {
-  DBQuery query;
-  query.package = "dbstore";
-  query.module = name;
-  query.object = data;
-  query.iov = iov;
-  m_payloads.push_back(query);
+  m_payloads.emplace_back("dbstore", name, data, iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, string name)
@@ -147,20 +143,6 @@ void CalibrationAlgorithm::saveCalibration(TObject* data, string name)
   }
 
   saveCalibration(data, name, iov);
-}
-
-std::list<Database::DBQuery> CalibrationAlgorithm::getPayloads()
-{
-  std::list<Database::DBQuery> queries;
-
-  if (m_payloads.empty())
-    return queries;
-
-  for (auto payload : m_payloads) {
-    Database::DBQuery query(payload.package, payload.module, payload.object, payload.iov);
-    queries.push_back(query);
-  }
-  return queries;
 }
 
 bool CalibrationAlgorithm::commit()

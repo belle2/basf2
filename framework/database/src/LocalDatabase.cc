@@ -39,9 +39,6 @@ LocalDatabase::LocalDatabase(const std::string& fileName,
   if (m_payloadDir.empty()) {
     m_payloadDir = fs::path(m_fileName).parent_path().string();
   }
-  if (!fs::exists(m_payloadDir)) {
-    fs::create_directories(m_payloadDir);
-  }
   readDatabase();
 }
 
@@ -132,6 +129,9 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
 
 bool LocalDatabase::storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov)
 {
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
+  }
   // get lock for write access to database file
   FileSystem::Lock lock(m_fileName);
   if (!lock.lock()) {

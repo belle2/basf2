@@ -52,6 +52,8 @@ void MCV0MatcherModule::initialize()
   StoreArray<V0> v0s(m_V0ColName);
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   v0s.registerRelationTo(mcParticles);
+  B2WARNING("This module is supposed to be used only for the debugging\n \
+            of the V0Finder module, not as MC matching during analysis.");
 }
 
 

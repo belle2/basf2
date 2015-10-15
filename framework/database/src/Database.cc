@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <boost/python/def.hpp>
+#include <boost/python/overloads.hpp>
 
 #include <framework/database/Database.h>
 
@@ -143,14 +144,18 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
   return true;
 }
 
+BOOST_PYTHON_FUNCTION_OVERLOADS(chain_createInstance_overloads, DatabaseChain::createInstance, 0, 2);
+BOOST_PYTHON_FUNCTION_OVERLOADS(local_createInstance_overloads, LocalDatabase::createInstance, 0, 3);
+BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createDefaultInstance_overloads, ConditionsDatabase::createDefaultInstance, 1, 2);
+BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createInstance_overloads, ConditionsDatabase::createInstance, 4, 5);
 
 void Database::exposePythonAPI()
 {
   using namespace boost::python;
 
   def("reset_database", &Database::reset);
-  def("use_database_chain", &DatabaseChain::createInstance);
-  def("use_local_database", &LocalDatabase::createInstance);
-  def("use_central_database", &ConditionsDatabase::createDefaultInstance);
-  def("use_central_database", &ConditionsDatabase::createInstance);
+  def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads());
+  def("use_local_database", &LocalDatabase::createInstance, local_createInstance_overloads());
+  def("use_central_database", &ConditionsDatabase::createDefaultInstance, condition_createDefaultInstance_overloads());
+  def("use_central_database", &ConditionsDatabase::createInstance, condition_createInstance_overloads());
 }

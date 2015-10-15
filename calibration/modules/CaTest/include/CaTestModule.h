@@ -19,7 +19,7 @@ namespace Belle2 {
    *
    *
    */
-  class CaTestModule : public calibration::CalibrationCollectorModule {
+  class CaTestModule : public CalibrationCollectorModule {
 
 
   public:

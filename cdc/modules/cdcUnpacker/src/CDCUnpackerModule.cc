@@ -51,8 +51,8 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
-  addParam("tdcOffset", m_tdcOffset, "TDC offset (nsec).", 5562);
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
+  addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
+  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
   addParam("enableStoreRawCDC", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);

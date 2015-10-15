@@ -131,7 +131,7 @@ namespace Belle2 {
      *
      * Takes ownership of object (do not delete it!)
      */
-    CalibRootObj(T* object) : Mergeable()
+    explicit CalibRootObj(T* object) : Mergeable()
     {
       if (m_object)
         delete m_object;

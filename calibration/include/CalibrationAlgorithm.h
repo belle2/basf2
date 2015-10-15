@@ -62,7 +62,7 @@ namespace Belle2 {
        * so you can change it via setPrefix(...). The prefix has to be shared among collectors and
        * the algorithm to share the datastore objects, but can be changed (via parameter for collector modules).
        */
-      CalibrationAlgorithm(std::string collectorModuleName) : m_prefix(collectorModuleName) {}
+      explicit CalibrationAlgorithm(std::string collectorModuleName) : m_prefix(collectorModuleName) {}
 
       /// Virtual destructor (base class)
       virtual ~CalibrationAlgorithm() {}

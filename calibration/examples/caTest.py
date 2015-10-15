@@ -3,137 +3,51 @@
 import os
 import sys
 from basf2 import *
-from ROOT import Belle2
+from calibration_framework import add_calibration, run_calibration
+import ROOT
+from ROOT.Belle2 import TestCalibrationAlgorithm
 
 set_log_level(LogLevel.INFO)
-set_random_seed(13)
 
-
-class PyAlgo(Module):
-
-    def __init__(self, algorithm):
-        """
-        Initialize algorithm runner
-        """
-        super(PyAlgo, self).__init__()
-        self.algo = algorithm
-
-    def doFirstIteration(self, runlist):
-        """
-        Perfrom first iteration over list of runs
-        """
-        to_calibrate = []
-        for_iteration = []
-
-        lastRunToBeMerged = False
-        while (len(runlist) or lastRunToBeMerged):
-            if not len(to_calibrate) and len(runlist):
-                to_calibrate.append(runlist[0])
-                runlist.remove(runlist[0])
-
-            if not len(to_calibrate):
-                break
-
-            def list_to_str(alist):
-                res = ""
-                for item in alist:
-                    if res != "":
-                        res = res + ","
-                    res = res + str(item[0]) + "." + str(item[1])
-                return res
-
-            result = self.algo.execute(list_to_str(to_calibrate))
-            if result == self.algo.c_OK:  # OK
-                print("Calibration done for ", to_calibrate, " Sending constants to DB...")
-                to_calibrate = []
-                self.algo.commit()
-
-            if result == self.algo.c_Iterate:  # Iterate
-                print("Iteration requested for ", to_calibrate, " Sending constants to DB...")
-                for_iteration.append(to_calibrate)
-                to_calibrate = []
-                self.algo.commit()
-
-            if result == self.algo.c_NotEnoughData:  # Merge next
-                print("Calibration for ", to_calibrate, " does not have enough data. Merging with next run if possible...")
-                if len(runlist):
-                    to_calibrate.append(runlist[0])
-                    runlist.remove(runlist[0])
-                if not len(runlist):
-                    if not lastRunToBeMerged:
-                        lastRunToBeMerged = True
-                    else:
-                        lastRunToBeMerged = False
-
-            if result == self.algo.c_Failure:  # Fail
-                print("Calibration failed for ", to_calibrate)
-                to_calibrate = []
-
-        return for_iteration
-
-    def terminate(self):
-        """
-        reimplement Module::terminate()
-        """
-        print("Starting calibration...")
-
-        print(self.algo.getDescription())
-        raw_runlist = self.algo.getRunListFromAllData()
-        runlist = []
-        for exprun in raw_runlist:
-            runlist.append((exprun.first, exprun.second))
-        for_iter = self.doFirstIteration(runlist)
-        print("Iteration needed for following data chunks: ", for_iter)
-        import interactive
-        # interactive.embed()
-
-
-def addCalibration(path, algorithm, collector=None, name=None, granularity='run'):
-    """
-    Add calibration to the path
-    """
-    if collector is None:
-        collector = register_module(algo.getCollectorName())
-    if name is not None:
-        collector.param('prefix', name)
-        algorithm.setPrefix(name)
-    collector.param('granularity', granularity)
-    path.add_module(collector)
-    path.add_module(PyAlgo(algorithm))
-
-# ----------------------------------------------------------------------------
-
+# create a path with all modules needed for the collector
 main = create_path()
 main.add_module('EventInfoSetter',
-                evtNumList=[100, 100, 100, 100, 100],
+                evtNumList=[50, 50, 100, 100, 100],
                 expList=[1, 1, 1, 1, 1],
                 runList=[1, 2, 3, 4, 5])
 
-algo = Belle2.calibration.TestCalibrationAlgorithm()
-addCalibration(main, algo, granularity='run')
-# Or granularity='all'
+# add a calibration with the collectormodule "CaTest" and the
+# TestCalibrationAlgorithm
+add_calibration("CaTest", TestCalibrationAlgorithm())
 
-main.add_module('Progress')
-main.add_module('RootOutput')
+# you can also create the collector and the algorithm before
+# >>> collector = register_module("CaTest")
+# >>> collector.param(...)
+# >>> algorithm = TestCalibrationAlgorithm()
+# >>> add_calibration(collector, algorithm)
 
-process(main)
-print(statistics)
+# or give the calibration a name
+# >>> add_calibration(collector, algorithm, "mycalibration")
 
-# ----------------------------------------------------------------------------
+# or provide a list of algorithms
+# >>> add_calibration(collector, [algorithm1, algorithm2])
 
-exit(0)
+# run the calibration: this will add all calibrations to the main path and run
+# it, including iterations
+# run_calibration(main, max_iterations=5)
 
-import interactive
+# you can specify an output directory for the calibration results or omit the
+# max_iterations parameter
+# >>> run_calibration(main, "calibration_dir")
 
-print(" -----------------------------------------------------")
-print(" You are in interactive environment")
-print("")
-print(" The algorithm can still access datastore and database")
-print(" and you can do anything you like, e.g. execute it...")
-print("")
-print(" Exit with: [Ctrl]+[D] -> [y] -> [Enter]")
-print("")
-print(" algo = Belle2.calibration.TestCalibrationAlgorithm()")
-print(" -----------------------------------------------------")
+# All iterations will have the same random seed so if your iteration criteria
+# depends on randomness then this will not work. To get rid of this you can
+# register a callback to be called before each iteration with one argument which
+# is the iteration number
 
-interactive.embed()
+
+def before_iteration(iteration):
+    B2RESULT("iteration callback for iteration %d" % iteration)
+    set_random_seed("my seed for iteration %d" % iteration)
+
+run_calibration(main, iteration_callback=before_iteration)

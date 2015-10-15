@@ -18,6 +18,7 @@
 
 #include <G4Track.hh>
 #include <G4Step.hh>
+#include <G4Version.hh>
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the QCSMONITOR detector */
@@ -42,7 +43,11 @@ namespace Belle2 {
       //particles will be attributed to the last saved mother particle
       registerMCParticleRelation(relMCSimHit);
 
+#if G4VERSION_NUMBER < 1010
       saturationEngine = new G4EmSaturation();
+#else
+      saturationEngine = new G4EmSaturation(1); // verbose level
+#endif
     }
 
     bool SensitiveDetector::step(G4Step* step, G4TouchableHistory*)

@@ -44,8 +44,16 @@ void Database::setInstance(Database* database)
 {
   if (s_instance) {
     DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance);
-    if (chain) {
+    DatabaseChain* replacement = dynamic_cast<DatabaseChain*>(database);
+    if (replacement && chain) {
+      B2DEBUG(200, "Replacing DatabaseChain with DatabaseChain: ignored");
+      delete database;
+    } else if (chain) {
       chain->addDatabase(database);
+    } else if (replacement) {
+      B2DEBUG(200, "Replacing Database with DatabaseChain: adding existing database to chain");
+      replacement->addDatabase(s_instance);
+      s_instance = replacement;
     } else {
       B2WARNING("The already created database instance is replaced by a new instance.");
       delete s_instance;
@@ -152,6 +160,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createInstance_overloads, ConditionsDa
 void Database::exposePythonAPI()
 {
   using namespace boost::python;
+  // make sure the default instance is created
+  Database::Instance();
 
   def("reset_database", &Database::reset);
   def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads());

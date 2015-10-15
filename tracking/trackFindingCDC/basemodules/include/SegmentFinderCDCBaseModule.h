@@ -23,7 +23,7 @@ namespace Belle2 {
     ///  Initialize the Module before event processing.
     void initialize() override;
 
-    /// Processes the event and generates track candidates
+    /// Processes the event and generates track candidates.
     void event() override;
 
     /** Implementation specific method that generates segments and

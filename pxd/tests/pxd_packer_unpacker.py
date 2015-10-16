@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -44,7 +44,7 @@ class PxdPackerUnpackerTestModule(Module):
             Returns a python-list containing the PXDRawHits
         """
 
-        # first convert to a python-list to be abple to sort
+        # first convert to a python-list to be able to sort
         py_list = [x for x in unsortedPyStoreArray]
 
         # sort via a hierachy of sort keys
@@ -114,70 +114,14 @@ packer = register_module('PXDPacker')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhe_to_dhc', [
-    [
-        0,
-        2,
-        4,
-        34,
-        36,
-        38,
-    ],
-    [
-        1,
-        6,
-        8,
-        40,
-        42,
-        44,
-    ],
-    [
-        2,
-        10,
-        12,
-        46,
-        48,
-        50,
-    ],
-    [
-        3,
-        14,
-        16,
-        52,
-        54,
-        56,
-    ],
-    [
-        4,
-        3,
-        5,
-        35,
-        37,
-        39,
-    ],
-    [
-        5,
-        7,
-        9,
-        41,
-        43,
-        45,
-    ],
-    [
-        6,
-        11,
-        13,
-        47,
-        49,
-        51,
-    ],
-    [
-        7,
-        15,
-        17,
-        53,
-        55,
-        57,
-    ],
+    [0,  2,  4, 34, 36, 38],
+    [1,  6,  8, 40, 42, 44],
+    [2, 10, 12, 46, 48, 50],
+    [3, 14, 16, 52, 54, 56],
+    [4,  3,  5, 35, 37, 39],
+    [5,  7,  9, 41, 43, 45],
+    [6, 11, 13, 47, 49, 51],
+    [7, 15, 17, 53, 55, 57],
 ])
 
 

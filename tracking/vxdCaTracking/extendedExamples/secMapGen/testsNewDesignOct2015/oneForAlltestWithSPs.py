@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -50,16 +50,17 @@ checkTH = True
 
 
 # flags for the pGun
-numTracks = 2
+numTracks = 5
 # transverseMomentum:
 momentumMin = 0.05  # GeV/c
 momentumMax = 0.3  # %
 # theta: starting angle of particle direction in r-z-plane
-thetaMin = 22.0  # degrees
-thetaMax = 144.  # degrees
+thetaMin = 75.0  # degrees
+thetaMax = 85.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-phiMin = 0.  # degrees
+phiMin = 350.  # degrees
 phiMax = 360.  # degrees
+pdgCODES = [13]
 
 
 # flags for the 2nd pGun
@@ -68,11 +69,12 @@ numTracks2 = 5
 momentumMin2 = 0.3  # GeV/c
 momentumMax2 = 3.5  # %
 # theta: starting angle of particle direction in r-z-plane
-thetaMin2 = 12.0  # degrees
-thetaMax2 = 155.  # degrees
+thetaMin2 = 75.0  # degrees
+thetaMax2 = 85.  # degrees
 # phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-phiMin2 = 0.  # degrees
+phiMin2 = 350.  # degrees
 phiMax2 = 360.  # degrees
+pdgCODES2 = [13]
 
 # parameters for the secMap-calculation (pT in GeV/c):
 pTcuts = [0.025, 0.1, 0.4]
@@ -87,7 +89,7 @@ secConfigUStd = [0., 0.33, 0.67, 1.0]
 secConfigVStd = [0., 0.33, 0.67, 1.0]
 
 trainerVXDTFLogLevel = LogLevel.DEBUG
-trainerVXDTFDebugLevel = 1
+trainerVXDTFDebugLevel = 10
 
 MyLogLevel = LogLevel.INFO
 MyDebugLevel = 10
@@ -224,7 +226,7 @@ gearbox = register_module('Gearbox')
 # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
 particlegun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [13, -13],
+    'pdgCodes': pdgCODES,
     'nTracks': numTracks,
     'momentumGeneration': 'uniformPt',
     'momentumParams': [momentumMin, momentumMax],
@@ -241,7 +243,7 @@ particlegun.param(param_pGun)
 
 particlegun2 = register_module('ParticleGun')
 param_pGun2 = {
-    'pdgCodes': [13, -13],
+    'pdgCodes': pdgCODES2,
     'nTracks': numTracks2,
     'momentumGeneration': 'uniformPt',
     'momentumParams': [momentumMin2, momentumMax2],

@@ -9,10 +9,12 @@
  **************************************************************************/
 
 #pragma once
-#include <TObject.h>
 #include <vector>
 #include <string>
+#include <TObject.h>
 #include <TTimeStamp.h>
+#include <TH3F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
   /**
@@ -24,21 +26,23 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAsicInfo(): m_id(""), m_timeStamp(0, 0, 0, kTRUE, 0), m_quality(0), m_deadChannel(), m_cutChannel(), m_comment("") {};
+    ARICHAsicInfo(): m_id(""), m_timeFinishGain(0, 0, 0, kTRUE, 0), m_timeFinishOffset(0, 0, 0, kTRUE, 0),
+      m_deadChannel(), m_cutChannel(), m_gain(), m_offset(), m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHAsicInfo(std::string id, TTimeStamp timeStamp, int quality, std::vector<std::string> deadChannel,
-                  std::vector<std::string> cutChannel, std::string comment)
-    {
-      m_id = id;
-      m_timeStamp = timeStamp;
-      m_quality = quality;
-      m_deadChannel = deadChannel;
-      m_cutChannel = cutChannel;
-      m_comment = comment;
-    }
+    ARICHAsicInfo(std::string id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<std::string> deadChannel,
+                  std::vector<std::string> cutChannel, std::string comment): m_id(id), m_timeFinishGain(timeFinishGain),
+      m_timeFinishOffset(timeFinishOffset),
+      m_deadChannel(deadChannel), m_cutChannel(cutChannel), m_gain(), m_offset(), m_comment(comment) {};
+
+    /**
+     * Constructor
+     */
+    ARICHAsicInfo(std::string id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<TH3F*> gain,
+                  std::vector<TH3F*> offset): m_id(id), m_timeFinishGain(timeFinishGain), m_timeFinishOffset(timeFinishOffset),
+      m_deadChannel(), m_cutChannel(), m_gain(gain), m_offset(offset), m_comment("") {};
 
     /**
      * Destructor
@@ -55,25 +59,25 @@ namespace Belle2 {
      */
     void setAsicID(const std::string& id) {m_id = id; }
 
-    /** Return Test date
-     * @return Test date
+    /** Return Test date gain - finish
+     * @return Test date gain - finish
      */
-    TTimeStamp getTimeStamp() const {return m_timeStamp; }
+    TTimeStamp getTimeFinishGain() const {return m_timeFinishGain; }
 
-    /** Set Test date
-     * @param Test date
+    /** Set Test date gain - finish
+     * @param Test date gain - finish
      */
-    void setTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
+    void setTimeFinishGain(TTimeStamp timeFinishGain) {m_timeFinishGain = timeFinishGain; }
 
-    /** Return Quality of the chip
-     * @return Quality of the chip
+    /** Return Test date offset - finish
+     * @return Test date offset - finish
      */
-    int getChipQuality() const {return m_quality; }
+    TTimeStamp getTimeFinishOffset() const {return m_timeFinishOffset; }
 
-    /** Set Quality of the chip
-     * @param Quality of the chip
+    /** Set Test date offset - finish
+     * @param Test date offset - finish
      */
-    void setChipQuality(int quality) {m_quality = quality; }
+    void setTimeFinishOffset(TTimeStamp timeFinishOffset) {m_timeFinishOffset = timeFinishOffset; }
 
     /**
      * Return a channel number from the list of dead channels
@@ -113,6 +117,36 @@ namespace Belle2 {
      */
     int getCutChannelsSize() const {return m_cutChannel.size();}
 
+    /**
+     * Return Measurements with different gain settings
+     * @return Measurements with different gain settings
+     */
+    TH3F* getGainMeasurement(unsigned int i) const { if (i < m_gain.size()) return m_gain[i]; else return NULL;}
+
+    /**
+     * set Measurements with different gain settings
+     * @param Measurements with different gain settings
+     */
+    void setGainMeasurement(std::vector<TH3F*> gain)
+    {
+      for (unsigned int i = 0; i < m_gain.size(); i++) m_gain.push_back(gain[i]);
+    }
+
+    /**
+     * Return Measurements with different offset settings
+     * @return Measurements with different offset settings
+     */
+    TH3F* getOffsetMeasurement(unsigned int i) const { if (i < m_offset.size()) return m_offset[i]; else return NULL;}
+
+    /**
+     * set Measurements with different offset settings
+     * @param Measurements with different offset settings
+     */
+    void setOffsetMeasurement(std::vector<TH3F*> offset)
+    {
+      for (unsigned int i = 0; i < m_offset.size(); i++) m_offset.push_back(offset[i]);
+    }
+
     /** Return Commment
      * @return Commment
      */
@@ -125,14 +159,16 @@ namespace Belle2 {
 
 
   private:
-    std::string m_id;        /**< Asic Identifier */
-    TTimeStamp m_timeStamp;  /**< Test Date of the measurement */
-    int m_quality;           /**< Quality class of the chip */
+    std::string m_id;                 /**< Asic Identifier */
+    TTimeStamp m_timeFinishGain;      /**< Test Date of gain measurements - finish */
+    TTimeStamp m_timeFinishOffset;    /**< Test Date of offset measurements - finish */
     std::vector<std::string> m_deadChannel;   /**< List of dead channels on the ASIC chip */
     std::vector<std::string> m_cutChannel;    /**< List of cut channels on the ASIC chip */
-    std::string m_comment;   /**< Comment */
+    std::vector<TH3F*> m_gain;      /**< Threshold scans with different gain settings */
+    std::vector<TH3F*> m_offset;                /**< Threshold scans with different offset settings (course & fine offset)*/
+    std::string m_comment;          /**< Comment */
 
-    ClassDef(ARICHAsicInfo, 1);  /**< ClassDef */
+    ClassDef(ARICHAsicInfo, 2);  /**< ClassDef */
   };
 } // end namespace Belle2
 

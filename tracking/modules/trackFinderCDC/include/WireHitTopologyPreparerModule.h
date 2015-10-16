@@ -19,6 +19,8 @@ namespace Belle2 {
     {
       setDescription("Combine the CDCHits from the DataStore with the geometry information to have them both at hand in the CDC tracking modules. "
                      "Also set all CDCWireHits as unused.");
+
+      setPropertyFlags(c_ParallelProcessingCertified);
     }
 
     /// Create the StoreObject.

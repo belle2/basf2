@@ -60,6 +60,8 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrient
            m_param_writeGFTrackCands,
            "Flag to output genfit tracks to store array.",
            true);
+
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void TrackFinderCDCBaseModule::initialize()

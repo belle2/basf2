@@ -150,13 +150,13 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hits to be stored
-      std::vector<CDCWireHit> m_wireHits;
+      std::vector<CDCWireHit> m_wireHits; //!
 
       /// Memory for the oriented wire hits to be stored
-      std::vector<CDCRLWireHit> m_rlWireHits;
+      std::vector<CDCRLWireHit> m_rlWireHits; //!
 
       /// Reference of the tdc count translator used at the beginning of this event.
-      CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator;
+      CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator; //!
 
       /// Allow the simple simulation to manipulate the objects directly
       friend CDCSimpleSimulation;

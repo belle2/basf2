@@ -32,52 +32,31 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHAerogelInfo(): m_version(0.0), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0), m_lambda(),
-      m_transmittance() {};
+    ARICHAerogelInfo(): m_version(0.0), m_serial(""), m_id(""), m_refractiveIndex(0.0), m_transmissionLength(0), m_thickness(0.0),
+      m_lambda(),
+      m_transmittance(), m_comment("") {};
 
     /**
      * Constructor
      */
     ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness,
-                     std::vector<double> transmittance)
-    {
-      m_version = version;
-      m_serial = serial;
-      m_id = id;
-      m_refractiveIndex = index;
-      m_transmissionLength = trlen;
-      m_thickness = thickness;
-      m_transmittance = transmittance;
-    }
+                     std::vector<double> transmittance): m_version(version), m_serial(serial), m_id(id), m_refractiveIndex(index),
+      m_transmissionLength(trlen), m_thickness(thickness), m_lambda(), m_transmittance(transmittance), m_comment("") {};
 
     /**
      * Constructor
      */
     ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness,
-                     std::vector<int> lambda, std::vector<double> transmittance)
-    {
-      m_version = version;
-      m_serial = serial;
-      m_id = id;
-      m_refractiveIndex = index;
-      m_transmissionLength = trlen;
-      m_thickness = thickness;
-      m_lambda = lambda;
-      m_transmittance = transmittance;
-    }
+                     std::vector<int> lambda, std::vector<double> transmittance): m_version(version), m_serial(serial), m_id(id),
+      m_refractiveIndex(index), m_transmissionLength(trlen), m_thickness(thickness), m_lambda(lambda), m_transmittance(transmittance),
+      m_comment("") {};
 
     /**
      * Constructor
      */
-    ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen, double thickness)
-    {
-      m_version = version;
-      m_serial = serial;
-      m_id = id;
-      m_refractiveIndex = index;
-      m_transmissionLength = trlen;
-      m_thickness = thickness;
-    }
+    ARICHAerogelInfo(double version, std::string serial, std::string id, double index, double trlen,
+                     double thickness): m_version(version), m_serial(serial), m_id(id), m_refractiveIndex(index), m_transmissionLength(trlen),
+      m_thickness(thickness), m_lambda(), m_transmittance(), m_comment("") {};
 
     /**
      * Destructor

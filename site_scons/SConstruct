@@ -19,6 +19,8 @@ if not analysis:
 AddOption('--no-symlink', dest='no-symlink', action='store_true', default=False, help='Use copies instead of symbolic links')
 AddOption('--extra-libpath', dest='extralibpath', action='store', help='Additional library path')
 AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
+AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
+          help="if given the externals version will not checked for consistency between .externals and the environment")
 
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
@@ -50,6 +52,15 @@ if 'ROOTSYS' not in os.environ:
     print 'root is not set up.'
     print setup_message
     Exit(1)
+
+if GetOption("check_externals"):
+    if "BELLE2_EXTERNALS_VERSION" in os.environ and os.path.exists(".externals"):
+        ext_version = open(".externals").read().strip()
+        if ext_version != os.environ["BELLE2_EXTERNALS_VERSION"]:
+            print "externals version (%s) differs from the one defined in .externals (%s)" \
+                % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version)
+            print "Please run setuprel again."
+            Exit(1)
 
 # create construction environment
 global_env = Environment(

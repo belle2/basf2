@@ -189,6 +189,21 @@ namespace Belle2 {
       for (unsigned int i = 0; i < transmittance.size(); i++)  m_transmittance.push_back(transmittance[i]);
     }
 
+    /**
+     * Return Lambda for Aerogel Transmittance
+     * @return Lambda for Aerogel transmittance
+     */
+    int getAerogelTransmittanceLambda(unsigned int i) const { if (i < m_lambda.size()) return m_lambda[i]; else return -1;}
+
+    /**
+     * Set Lambda for Aerogel Transmittance
+     * @param Lambda for transmittance
+     */
+    void setAerogelTransmittanceLambda(std::vector<double> lambda)
+    {
+      for (unsigned int i = 0; i < lambda.size(); i++)  m_lambda.push_back(lambda[i]);
+    }
+
     /** Return comment
      * @return comment
      */
@@ -216,6 +231,6 @@ namespace Belle2 {
     std::string m_comment;                     /**< optional comment */
 
 
-    ClassDef(ARICHAerogelInfo, 2);  /**< ClassDef */
+    ClassDef(ARICHAerogelInfo, 3);  /**< ClassDef */
   };
 } // end namespace Belle2

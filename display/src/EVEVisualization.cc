@@ -685,10 +685,11 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
 
 
   for (int k = 0; k < 8; ++k) {
-    // Coordinates for all eight corners of the box.
-    int signU = (k & 4) ? -1 : 1;
-    int signV = (k & 2) ? -1 : 1;
-    int signN = (k & 1) ? -1 : 1;
+    // Coordinates for all eight corners of the box
+    // as two parallel rectangles, with vertices specified in clockwise direction
+    int signU = ((k + 1) & 2) ? -1 : 1;
+    int signV = (k & 4) ? -1 : 1;
+    int signN = (k & 2) ? -1 : 1;
     float vertex[3];
     for (int i = 0; i < 3; ++i) {
       vertex[i] = o(i) + signU * u(i) + signV * v(i) + signN * norm(i);

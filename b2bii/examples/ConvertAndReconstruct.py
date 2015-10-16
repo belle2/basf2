@@ -15,6 +15,8 @@ from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
 from modularAnalysis import vertexKFit
+from modularAnalysis import vertexRave
+from modularAnalysis import printVariableValues
 from b2biiConversion import convertBelleMdstToBelleIIMdst
 
 if len(sys.argv) != 3:
@@ -25,6 +27,11 @@ if len(sys.argv) != 3:
 inputBelleMDSTFile = sys.argv[1]
 outputBelle2ROOTFile = sys.argv[2]
 
+# set the location of the Belle DB server
+# options are: ekpbelle.physik.uni-karlsruhe.de
+# or can51 (if you're running on KEKCC computers)
+os.putenv('BELLE_POSTGRES_SERVER', 'ekpbelle.physik.uni-karlsruhe.de')
+
 # Convert
 convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
 
@@ -32,29 +39,59 @@ convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
 # first the gearbox needs to be loaded
 loadGearbox()
 
+# Only charged final state particles need to be loaded
+# All photon and pi0 candidates are already loaded
+# to 'gamma:mdst' and 'pi0:mdst' particle lists
 fillParticleList('pi+:all', '')
 fillParticleList('K-:all', '')
+fillParticleList('mu+:all', '')
+fillParticleList('e+:all', '')
 
-fillParticleList('K_S0:mdst', '')
-# vertexKFit('K_S0:mdst', 0.0)
+# in the case of pi0 candidates in 'pi0:mdst' the mc truth matching
+# needs to be executed
+matchMCTruth('pi0:mdst')
 matchMCTruth('K_S0:mdst')
+vertexKFit('K_S0:mdst', -1)
 
-reconstructDecay('D0:Kpipi0 -> K-:all pi+:all pi0:mdst', '1.7 < M < 2.0')
-reconstructDecay('B+:D0pi -> anti-D0:Kpipi0 pi+:all', '4.8 < M < 5.5')
+# The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
+printVariableValues('pi+:all', ['mcPDG', 'p', 'atcPIDBelle(3,2)', 'muIDBelle', 'muIDBelleQuality', 'eIDBelle'])
 
-matchMCTruth('B+:D0pi')
+printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'])
+printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'])
+
+# V0's (loaded by ParticleLoader from the converted V0 Array)
+# the difference between K_S0:all and K_S0:mdst is in the
+# momentum/position of the daughter tracks. The K_S0:all
+# daughters have momentum/position determined wrt. pivot=(0,0,0),
+# while K_S0:mdst daughters have it wrt. pivot=Decay vertex.
+# In addition K_S0:mdst has goodKs and nisKsFinder outputs attached
+# as extra info.
+# fillParticleList('K_S0:all', '')
+# vertexRave('K_S0:all', 0.0)
+# matchMCTruth('K_S0:all')
+
+printVariableValues('K_S0:mdst', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
+                                  'extraInfo(goodKs)', 'extraInfo(ksnbVLike)', 'extraInfo(ksnbNoLam)'])
+
+# reconstructDecay('D0:Kpipi0 -> K-:all pi+:all pi0:mdst', '1.7 < M < 2.0')
+# reconstructDecay('B+:D0pi -> anti-D0:Kpipi0 pi+:all', '4.8 < M < 5.5')
+
+# matchMCTruth('B+:D0pi')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsK0 = ['EventMetaData', '^K_S0']
 toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['MomentumUncertainty', '^K_S0 -> ^pi+ ^pi-']
 toolsK0 += ['InvMass', '^K_S0']
 toolsK0 += ['Vertex', '^K_S0']
-# toolsK0 += ['MCVertex', '^K_S0']
-toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
+toolsK0 += ['MCVertex', '^K_S0']
+# toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
+# toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
 # toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
 toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^K_S0']
+toolsK0 += [
+    'CustomFloats[dr:dz:isSignal:chiProb:extraInfo(goodKs):extraInfo(ksnbVLike):extraInfo(ksnbNoLam):extraInfo(ksnbStandard)]',
+    '^K_S0']
 
 toolsB = ['EventMetaData', '^B+']
 toolsB += ['InvMass', '^B+ -> ^anti-D0 pi+']
@@ -68,15 +105,16 @@ toolsB += ['CustomFloats[Kid_belle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
 toolsTrackPI = ['EventMetaData', 'pi+']
 toolsTrackPI += ['Kinematics', '^pi+']
 toolsTrackPI += ['Track', '^pi+']
-toolsTrackPI += ['PID', '^pi+']
+# toolsTrackPI += ['PID', '^pi+']
 toolsTrackPI += ['MCTruth', '^pi+']
 toolsTrackPI += ['MCKinematics', '^pi+']
 toolsTrackPI += ['ErrMatrix', '^pi+']
+toolsTrackPI += ['CustomFloats[eIDBelle:muIDBelleQuality:muIDBelle:atcPIDBelle(3,2):atcPIDBelle(4,2):atcPIDBelle(4,3)]', '^pi+']
 
 ntupleFile(outputBelle2ROOTFile)
 # ntupleTree('bp', 'B+:D0pi', toolsB)
 ntupleTree('kshort', 'K_S0:mdst', toolsK0)
-ntupleTree('pion', 'pi+:all', toolsTrackPI)
+# ntupleTree('pion', 'pi+:all', toolsTrackPI)
 
 # progress
 progress = register_module('Progress')

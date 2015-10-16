@@ -2,7 +2,7 @@
 #define V0FINDERMODULE_H
 
 #include <framework/core/Module.h>
-
+#include <framework/gearbox/Const.h>
 #include <memory>
 
 #include "genfit/GFRaveVertexFactory.h"
@@ -65,15 +65,19 @@ namespace Belle2 {
      */
     virtual void terminate();
   private:
-    std::string m_GFTrackColName;
-    std::string m_TFRColName;
-    std::string m_TrackColName;
-    std::string m_V0ColName;
+    std::string m_GFTrackColName;  //!< Genfit track column name in the DataStore
+    std::string m_TFRColName;  //!< TrackFitResult column name in the DataStore
+    std::string m_TrackColName;  //!< Track column name in the DataStore
+    std::string m_V0ColName;  //!< V0 column name in the DataStore
 
     double m_beamPipeRadius;
     double m_vertexChi2CutInside;
     double m_massWindowKshortInside;
     double m_vertexChi2CutOutside;
+    int m_v0Pdg;
+
+    Const::ChargedStable m_trackHypothesis = Const::pion;
+    Const::ParticleType m_v0Hypothesis = Const::Kshort;
   };
 }
 #endif

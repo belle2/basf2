@@ -356,6 +356,25 @@ namespace Belle2 {
       return Const::pion;
     }
 
+    double muIDBelle(const Particle* particle)
+    {
+      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0.5;
+
+      if (pid->isAvailable(Const::KLM))
+        return pid->getProbability(Const::muon, nullptr, Const::KLM);
+      else
+        return 0;
+    }
+
+    double muIDBelleQuality(const Particle* particle)
+    {
+      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
+      if (!pid) return 0;
+
+      return pid->isAvailable(Const::KLM);
+    }
+
     double atcPIDBelle(const Particle* particle,  const std::vector<double>& sigAndBkgHyp)
     {
       int sigHyp = int(std::lround(sigAndBkgHyp[0]));
@@ -402,43 +421,6 @@ namespace Belle2 {
 
       return pid_sig / (pid_sig + pid_bkg);
     }
-
-    /*
-    double electronIDBelle(const Particle* particle)
-    {
-      const PIDLikelihood* pid = particle->getRelatedTo<PIDLikelihood>();
-      if (!pid) return 0.5;
-
-      // ACC = ARICH
-      Const::PIDDetectorSet set = Const::ARICH;
-      double acc_sig = exp(pid->getLogL(hypothesisConversion(Const::electron), set));
-      double acc_bkg = exp(pid->getLogL(hypothesisConversion(Const::pion), set));
-      double acc = 0.5;
-      if( acc_sig + acc_bkg  > 0.0 )
-    acc = acc_sig/(acc_sig+acc_bkg);
-
-      // TOF = TOP
-      double tof = 0.5;
-
-      // dE/dx = CDC
-      set = Const::CDC;
-      double cdc_sig = exp(pid->getLogL(hypothesisConversion(Const::electron), set));
-      double cdc_bkg = exp(pid->getLogL(hypothesisConversion(Const::pion), set));
-      double cdc = 0.5;
-      double cdc_all = cdc_sig + cdc_bkg;
-      if(cdc_all != 0) {
-    cdc = cdc_sig/cdc_all;
-    if(cdc < 0.001) cdc = 0.001;
-    if(cdc > 0.999) cdc = 0.999;
-      }
-
-      // Combined atc
-      double pid_sig = acc*tof*cdc;
-      double pid_bkg = (1.-acc)*(1.-tof)*(1.-cdc);
-      double atc     = pid_sig/(pid_sig+pid_bkg);
-
-    }
-    */
 
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("DLLPion", particleDeltaLogLPion,     "Delta Log L = L(particle's hypothesis) - L(pion)");
@@ -488,8 +470,11 @@ namespace Belle2 {
                       "returns Belle's PID atc variable: atc_pid(3,1,5,i,j).prob().\n"
                       "To be used only when analysing converted Belle samples.");
 
-    REGISTER_VARIABLE("muIDBelle", particleMuonKLMId,
+    REGISTER_VARIABLE("muIDBelle", muIDBelle,
                       "returns Belle's PID Muon_likelihood() variable.\n"
+                      "To be used only when analysing converted Belle samples.");
+    REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
+                      "returns true if Belle's PID Muon_likelihood() is usable (reliable).\n"
                       "To be used only when analysing converted Belle samples.");
 
     REGISTER_VARIABLE("eIDBelle", particleElectronECLId,

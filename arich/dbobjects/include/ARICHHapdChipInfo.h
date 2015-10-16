@@ -26,60 +26,46 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHHapdChipInfo(): m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL), m_bombardmentGain(NULL), m_bombardmentCurrent(),
-      m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0) {};
+    ARICHHapdChipInfo(): m_serial(""), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL), m_bombardmentGain(NULL),
+      m_bombardmentCurrent(),
+      m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(),
+      m_badChannel() {};
 
     /**
      * Constructor
      */
-    ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain)
-    {
-      m_serial = serial;
-      m_chip = chip;
-      m_biasVoltage = biasVoltage;
-      m_gain = gain;
-    }
+    ARICHHapdChipInfo(std::string serial): m_serial(serial), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL),
+      m_bombardmentGain(NULL), m_bombardmentCurrent(), m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL),
+      m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(), m_badChannel() {};
+
+    /**
+     * Constructor
+     */
+    ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain): m_serial(serial), m_chip(chip),
+      m_biasVoltage(biasVoltage), m_gain(gain), m_leakCurrent(NULL), m_bombardmentGain(NULL), m_bombardmentCurrent(),
+      m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(),
+      m_badChannel() {};
 
     /**
      * Constructor
      */
     ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain, TGraph* bombardmentGain,
                       std::vector<TGraph*> bombardmentCurrent, TGraph* avalancheGain, std::vector<TGraph*> avalancheCurrent, TH2F* biasVoltage2D,
-                      TH2F* biasCurrent2D, int channel)
-    {
-      m_serial = serial;
-      m_chip = chip;
-      m_biasVoltage = biasVoltage;
-      m_gain = gain;
-      m_bombardmentGain = bombardmentGain;
-      m_bombardmentCurrent = bombardmentCurrent;
-      m_avalancheGain = avalancheGain;
-      m_avalancheCurrent = avalancheCurrent;
-      m_biasVoltage2D = biasVoltage2D;
-      m_biasCurrent2D = biasCurrent2D;
-      m_channelId = channel;
-    }
+                      TH2F* biasCurrent2D, int channel): m_serial(serial), m_chip(chip), m_biasVoltage(biasVoltage), m_gain(gain), m_leakCurrent(NULL),
+      m_bombardmentGain(bombardmentGain), m_bombardmentCurrent(bombardmentCurrent), m_avalancheGain(avalancheGain),
+      m_avalancheCurrent(avalancheCurrent), m_biasVoltage2D(biasVoltage2D), m_biasCurrent2D(biasCurrent2D), m_channelId(channel),
+      m_deadChannel(), m_badChannel() {};
 
     /**
      * Constructor
      */
     ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain, TGraph* leakCurrent, TGraph* bombardmentGain,
                       std::vector<TGraph*> bombardmentCurrent, TGraph* avalancheGain, std::vector<TGraph*> avalancheCurrent, TH2F* biasVoltage2D,
-                      TH2F* biasCurrent2D, int channel)
-    {
-      m_serial = serial;
-      m_chip = chip;
-      m_biasVoltage = biasVoltage;
-      m_gain = gain;
-      m_leakCurrent = leakCurrent;
-      m_bombardmentGain = bombardmentGain;
-      m_bombardmentCurrent = bombardmentCurrent;
-      m_avalancheGain = avalancheGain;
-      m_avalancheCurrent = avalancheCurrent;
-      m_biasVoltage2D = biasVoltage2D;
-      m_biasCurrent2D = biasCurrent2D;
-      m_channelId = channel;
-    }
+                      TH2F* biasCurrent2D, int channel): m_serial(serial), m_chip(chip), m_biasVoltage(biasVoltage), m_gain(gain),
+      m_leakCurrent(leakCurrent), m_bombardmentGain(bombardmentGain), m_bombardmentCurrent(bombardmentCurrent),
+      m_avalancheGain(avalancheGain), m_avalancheCurrent(avalancheCurrent), m_biasVoltage2D(biasVoltage2D),
+      m_biasCurrent2D(biasCurrent2D), m_channelId(channel), m_deadChannel(), m_badChannel() {};
+
     /**
      * Destructor
      */

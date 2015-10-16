@@ -30,32 +30,32 @@ analyze = PXDHitErrorsTTree()
 eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
 
 # Set parameters for particlegun
-particlegun.param({  # Generate 5 tracks (on average)
-                     # Vary the number according to Poisson distribution
-                     # Generate pi+, pi-, e+ and e-
-                     # with a normal distributed transversal momentum
-                     # with a center of 5 GeV and a width of 1 GeV
-                     # a normal distributed phi angle,
-                     # center of 180 degree and a width of 30 degree
-                     # Generate theta angles uniform in cos theta
-                     # between 17 and 150 degree
-                     # normal distributed vertex generation
-                     # around the origin with a sigma of 2cm in the xy plane
-                     # and no deviation in z
-                     # all tracks sharing the same vertex per event
+particlegun.param({
+    # Generate 1 track (always)
     'nTracks': 1,
+    # don't vary the number according to Poisson distribution
     'varyNTracks': False,
+    # Generate pi+, pi-, e+ and e-
     'pdgCodes': [211, -211, 11, -11],
+    # with a normal distributed transversal momentum
     'momentumGeneration': 'normal',
+    # with a center of 2 GeV and a width of 0.2 GeV
     'momentumParams': [2, 0.2],
+    # a uniform distributed phi angle,
     'phiGeneration': 'uniform',
+    # full circle
     'phiParams': [0, 360],
+    # Generate theta angles uniform in cos theta
     'thetaGeneration': 'uniformCos',
+    # between 30 and 150 degree
     'thetaParams': [30, 150],
+    # normal distributed vertex generation
     'vertexGeneration': 'normal',
+    # around the origin with a sigma of 0.5cm in each direction
     'xVertexParams': [0.0, 0.5],
     'yVertexParams': [0.0, 0.5],
     'zVertexParams': [0.0, 0.5],
+    # all one track sharing the same vertex per event
     'independentVertices': False,
     })
 

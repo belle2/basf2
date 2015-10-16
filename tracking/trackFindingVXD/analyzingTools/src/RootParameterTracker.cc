@@ -207,9 +207,10 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
     });
     data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
 
-/// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
+    /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    newBranch->Print();
+    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<
@@ -265,7 +266,8 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
 
     /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    newBranch->Print();
+    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<
@@ -322,7 +324,8 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
 
     /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    newBranch->Print();
+    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4VecDoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
               "/" << algorithmName <<

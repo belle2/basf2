@@ -215,7 +215,7 @@ namespace Belle2 {
       for (auto& boxEntry : m_treeBox) {
         int nBytesWritten = boxEntry.second->Fill();
         B2DEBUG(20, "RootParameterTracker::fillRoot() ttree " << boxEntry.first << " got " << nBytesWritten << " Bytes written")
-        boxEntry.second->Print();
+        // boxEntry.second->Print();
       }
 
       for (auto& algoData2tcType : m_algoDataDouble) {
@@ -255,7 +255,7 @@ namespace Belle2 {
 
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 5, PACKAGENAME()) == true) {
           B2DEBUG(5, "RootParameterTracker::terminate(), TTree " << boxEntry.first << " was written:")
-          boxEntry.second->Print();
+          // boxEntry.second->Print();
         }
       }
       m_file->Close();

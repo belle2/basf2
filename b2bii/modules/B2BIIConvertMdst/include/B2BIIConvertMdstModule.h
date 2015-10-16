@@ -53,6 +53,15 @@ typedef Point3D<double> HepPoint3D;
 //enable ACC conversion (needs externals >= v00-06-01)
 #define HAVE_KID_ACC
 
+//enable EID conversion (needs externals > v00-07-01)
+#define HAVE_EID
+
+// enable findKs (needs externals > v00-07-01)
+#define HAVE_FINDKS
+
+// enable nisKsFinder (needs externals > v00-07-01)
+#define HAVE_NISKSFINDER
+
 namespace Belle2 {
 
   /**
@@ -164,8 +173,6 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
-    void convertMdstChargedObjectAlternative(const Belle::Mdst_charged& belleTrack, Track* track);
-    void convertMdstChargedObjectAlternative2(const Belle::Mdst_charged& belleTrack, Track* track);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -241,7 +248,12 @@ namespace Belle2 {
 #ifdef HAVE_KID_ACC
     /** Returns ACC likelihood for given hypothesis idp. Copied from atc_pid::acc_pid(). */
     static double acc_pid(const Belle::Mdst_charged& chg, int idp);
+    /** Returns CDC likelihood for given hypothesis idp. Copied from atc_pid::cdd_pid(). */
+    double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
+
+    /* calcualtes atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
     // RELATIONS
@@ -260,17 +272,6 @@ namespace Belle2 {
      * Helper function to recover falsely set idhep info in GenHepEvt list
      */
     int recoverMoreThan24bitIDHEP(int id);
-
-    /**
-     * Compares the track momentum and position values for pion hypothesis.
-     */
-    void testTrackConversion(const Belle::Mdst_charged& belleTrack, const TrackFitResult* tfr);
-
-    /**
-     * Compares the track momentum and position values for pion hypothesis.
-     */
-    int testTrackConversion(const HepLorentzVector& momentum, const HepPoint3D& position, const HepSymMatrix& error,
-                            const int belle_charge, const TrackFitResult* trackFit);
 
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle

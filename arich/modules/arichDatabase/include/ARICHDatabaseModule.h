@@ -14,6 +14,9 @@
 
 // DB structures in arich/dbobjects
 #include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHAsicInfo.h>
+#include <arich/dbobjects/ARICHHapdChipInfo.h>
+#include <arich/dbobjects/ARICHHapdInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 
 #include <string>
@@ -21,6 +24,7 @@
 #include <TTimeStamp.h>
 #include <TH1S.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <TGraph.h>
 #include <vector>
 
@@ -87,6 +91,9 @@ namespace Belle2 {
     int m_runHigh;
     std::string m_wr;
     std::vector<std::string> m_inputFileNames;
+    std::vector<std::string> m_inputFileNames2;
+    std::vector<std::string> m_inputFileNames3;
+    std::string m_globalTag;
 
     GearDir m_content;
     double m_version;
@@ -110,6 +117,33 @@ namespace Belle2 {
     std::string chipname;
     std::string number;
     std::string graphName;
+
+    TTimeStamp timeFinishGain;
+    TTimeStamp timeFinishOffset;
+    std::vector<TH3F*> m_gain;
+    std::vector<TH3F*> m_offset;
+    std::string asicName;
+    std::string asicSerial;
+
+    std::string dateEnd;
+    std::string line;
+    std::string yearStr;
+    std::string monthStr;
+    std::string dayStr;
+    std::string hourStr;
+    std::string minStr;
+    int year;
+    int month;
+    int day;
+    int hour;
+    int min;
+    size_t findSerial;
+    size_t findTxt;
+    size_t findTxt2;
+    size_t findRoot;
+
+    GearDir m_content2;
+
   };
 
 } // Belle2 namespace

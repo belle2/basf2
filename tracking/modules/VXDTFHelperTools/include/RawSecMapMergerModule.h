@@ -86,7 +86,9 @@ namespace Belle2 {
       for (auto file : fileList) { /*treeChain->Add(file);*/ }
 
 //       TFile* input = TFile::Open("highTestRedesign_454970355.root");
-      treeChain->Add("highTestRedesign_454970355.root");
+//       treeChain->Add("highTestRedesign_454970355.root");
+//    treeChain->Add("lowTestRedesign_1990122242.root");
+      treeChain->Add("lowTestRedesign_454970355.root");
 //    TTree* tree = (TTree*) input->Get("m_treePtr"); // name of tree in root file
 
       return std::move(treeChain);
@@ -130,6 +132,7 @@ namespace Belle2 {
       // creating master sector containing all inner sectors and therefore the full graph in the end:
       ProtoSectorGraph<MinMaxCollector<double>> fullRawSectorGraph(std::numeric_limits<unsigned>::max());
 
+      if (nEntries == 0) { B2WARNING("createRelationSecMap: valid file but no data stored!"); return std::move(fullRawSectorGraph); }
       unsigned percentMark = nEntries / 10;
       unsigned progressCounter = 0;
       // log all sector-combinations and determine their absolute number of appearances:
@@ -161,7 +164,10 @@ namespace Belle2 {
         if (!found) {
           auto pos = fullRawSectorGraph.addInnerSector(currentID);
 //      auto pos = fullRawSectorGraph.find(currentID);
-          pos->addRelationToGraph(thisEntry, sectorBranches);
+          secBranches.pop_front();
+          secBranches[0].first->GetEntry(thisEntry);
+          if (FullSecID(currentID).getLayerID() < FullSecID(secBranches[0].second).getLayerID()) { B2ERROR("createRelationSecMap: outerID is not outermore than innerID! (outer/inner: " << FullSecID(currentID).getFullSecString() << "/" << FullSecID(secBranches[0].second).getFullSecString() << ")"); }
+          pos->addRelationToGraph(thisEntry, secBranches);
         }
 
 //         fullRawSectorGraph.addRelationToGraph(thisEntry, sectorBranches);
@@ -206,7 +212,7 @@ namespace Belle2 {
     {
       unsigned nEntries = chain->GetEntries();
       B2INFO("RawSecMapMerger::distillRawData4FilterCuts():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-             " branches")
+             " branches and chainLength " << secChainLength)
 
       // prepare the links for the filter-value-branches:
       std::deque<std::pair<TBranch*, double>> filterBranches;
@@ -219,9 +225,10 @@ namespace Belle2 {
       }
 
       // loop over the tree to find the entries matching this outerSector:
-      unsigned percentMark = nEntries / 50;
-      unsigned progressCounter = 0;
-      for (unsigned i = 0 ;  i <= nEntries; i++) {
+      unsigned percentMark = 1;
+      if (nEntries > 100) { percentMark = nEntries / 50; }
+      unsigned progressCounter = 0, goodCasesCtr = 0;
+      for (unsigned i = 0 ;  i < nEntries; i++) {
         if ((i % percentMark) == 0) {
           progressCounter += 2;
           B2INFO("RawSecMapMerger::distillRawData4FilterCuts(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
@@ -229,14 +236,36 @@ namespace Belle2 {
         }
 
         auto thisEntry = chain->LoadTree(i);
-        // collect raw data of each sector-combination and find cuts:
-        for (auto& graph : relationsGraph) {
-          graph.distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, secChainLength);
+
+        sectorBranches[0].first->GetEntry(thisEntry);
+        auto foundSector = relationsGraph.find(sectorBranches[0].second);
+        if (foundSector == relationsGraph.end()) {
+          B2DEBUG(1, "RawSecMapMerger::distillRawData4FilterCuts(): entry " << i << " with outerSecID: " << FullSecID(
+                    sectorBranches[0].second).getFullSecString() << ", did not find sector, skipping!");
+          continue;
         }
+
+        // collect raw data of each sector-combination and find cuts:
+        // variant 1:
+//    goodCasesCtr += foundSector->distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, secChainLength);
+
+        // variant 2:
+//    auto secBranches = sectorBranches; // hardCopy
+//    secBranches.pop_front();
+        goodCasesCtr += foundSector->distillRawData4FilterCutsV2(thisEntry, config, sectorBranches, filterBranches, secChainLength);
+
+        // old stuff (to be deleted):
+//         for (auto& graph : relationsGraph) {
+//           graph.distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, secChainLength);
+//         }
       } // leaves-loop
+      B2INFO("RawSecMapMerger::distillRawData4FilterCuts(): within " << nEntries << "  sectorGraphs found " << goodCasesCtr <<
+             " compatible sectors. now starting determining cuts.")
+
 
       // find cuts of each sector-combination:
-      percentMark = relationsGraph.size() / 25;
+      percentMark = 1;
+      if (relationsGraph.size() > 100) { percentMark = relationsGraph.size() / 25; }
       progressCounter = 0;
       unsigned currentSector = 0;
       for (auto& sector : relationsGraph) {
@@ -250,6 +279,57 @@ namespace Belle2 {
                  progressCounter << "% processed,  sector " << std::string(FullSecID(sector.getRawSecID())) << " had " << nSamples << " samples")
         }
         currentSector++;
+      }
+    }
+
+
+
+    /** for debugging: print data for crosschecks. for small sample sizes < 100 the whole sample will be printed, for bigger ones only 100 entries will be printed. */
+    void printData(std::unique_ptr<TChain>& chain, TrainerConfigData& config, std::deque<std::pair<TBranch*, unsigned>>& sectorBranches,
+                   std::vector<std::string>& secBranchNames)
+    {
+      // prepare everything:
+      unsigned nEntries = chain->GetEntries();
+      unsigned percentMark = 1;
+      if (nEntries > 100) { percentMark = nEntries / 50; }
+      unsigned progressCounter = 0;
+
+      std::deque<std::pair<TBranch*, double>> filterBranches;
+      std::vector<std::string>* filterBranchNames;
+      if (secBranchNames.size() == 2) {
+        filterBranchNames = &(config.twoHitFilters);
+      } else if (secBranchNames.size() == 3) {
+        filterBranchNames = &(config.threeHitFilters);
+      } else {
+        filterBranchNames = &(config.fourHitFilters);
+      }
+      getBranches<double>(chain, *filterBranchNames, filterBranches);
+
+      B2INFO("RawSecMapMerger::printData():  start of " << nEntries <<
+             " entries in tree and " << sectorBranches.size() <<
+             "/" << filterBranchNames->size() <<
+             " sector-/filter-branches")
+
+      for (unsigned i = 0 ;  i < nEntries; i++) {
+        if ((i % percentMark) != 0) { continue; }
+
+        auto thisEntry = chain->LoadTree(i);
+
+        progressCounter += 2;
+        B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
+
+        std::string out;
+        for (unsigned i = 0 ; i < secBranchNames.size(); i++) {
+          sectorBranches[i].first->GetEntry(thisEntry);
+          out += secBranchNames[i] + ": " + FullSecID(sectorBranches[i].second).getFullSecString() + ". ";
+        }
+        out += "\n";
+
+        for (unsigned i = 0 ; i < filterBranchNames->size(); i++) {
+          filterBranches[i].first->GetEntry(thisEntry);
+          out += (*filterBranchNames)[i] + ": " + std::to_string(filterBranches[i].second) + ". ";
+        }
+        B2INFO(out << "\n")
       }
     }
 
@@ -291,20 +371,33 @@ namespace Belle2 {
       std::deque<std::pair<TBranch*, unsigned>> sectorBranches;
       getBranches<unsigned>(chain, branchNames, sectorBranches);
 
+      // for debugging: print data for crosschecks:
+      printData(chain, configuration, sectorBranches, branchNames);
+
+
       // create proto-graph containing all sector-chains occured in the training sample.
       ProtoSectorGraph<MinMaxCollector<double>> relationsGraph = createRelationSecMap(chain, sectorBranches);
 
+      std::string output = relationsGraph.print();
+      B2INFO("after createRelationSecMap: relationsGraph looks like this: \n\n" << output)
+
+
+      if (relationsGraph.empty()) { return; }
+
       // use rareness-threshold to find sector-combinations which are very rare and remove them:
-      unsigned nSectorsRemoved = pruneMap(configuration.rarenessThreshold, relationsGraph);
+//       unsigned nSectorsRemoved = pruneMap(configuration.rarenessThreshold, relationsGraph);
 
       // get the raw data and determine the cuts for the filters/selectionVariables:
       distillRawData4FilterCuts(chain, configuration, sectorBranches, relationsGraph, secChainLength);
 
       // checks for sectors which have inner neighbour and updates the sublayerID of the sensors.
       auto nsectorsRenamed = relationsGraph.updateSubLayers();
-      B2DEBUG(1, "results ... nSecRemoved/renamed" << nSectorsRemoved << "/" << nsectorsRenamed)
+//       B2DEBUG(1, "results ... nSecRemoved/renamed " << nSectorsRemoved << "/" << nsectorsRenamed)
+      B2DEBUG(1, "results ... nSecrenamed " << nsectorsRenamed)
 
 
+      std::string output2 = relationsGraph.print();
+      B2INFO("end of processing: relationsGraph looks like this: \n\n" << output2)
       /**
        * Here the data will be loaded in the new secMap-Design:
        *
@@ -389,7 +482,11 @@ namespace Belle2 {
         auto config = setup.second->getConfig();
         B2INFO("RawSecMapMerger::initialize(): loading mapName: " << config.secMapName);
 
+        if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
+
         processSectorCombinations(config, 2);
+
+        return; // TODO WARNING DEBUG we do not want to run more than one run yet!
         processSectorCombinations(config, 3);
         processSectorCombinations(config, 4);
 

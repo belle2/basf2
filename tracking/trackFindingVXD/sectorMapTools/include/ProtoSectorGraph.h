@@ -78,6 +78,18 @@ namespace Belle2 {
       return false;
     }
 
+
+    /** loops over all branches to update their entries. */
+    void updateBranchEntries(Long64_t thisEntry,
+                             std::deque<std::pair<TBranch*, unsigned>>& sectorBranches)
+    {
+      std::string out;
+      for (std::pair<TBranch*, unsigned>& branchPack : sectorBranches) {
+        branchPack.first->GetEntry(thisEntry);
+        out += FullSecID(branchPack.second).getFullSecString() + " ";
+      }
+      B2DEBUG(1, "updateBranchEntries: secBranches carries the following sectors: " << out);
+    }
   public:
 
 
@@ -123,6 +135,11 @@ namespace Belle2 {
     Iterator addInnerSector(unsigned rawID)
     {
       //    auto foundPos = m_innerSectors.find(rawID);
+      if (rawID == m_rawID) {
+        B2WARNING("addInnerSector: given ID " << FullSecID(rawID).getFullSecString() <<
+                  " is identical with ID of this sector - can not add sector to itself!");
+        return --(end());
+      }
       auto foundPos = find(rawID);
       if (foundPos == end()) {
         m_innerSectors.push_back(Sector(rawID));
@@ -167,6 +184,11 @@ namespace Belle2 {
     Iterator end() { return m_innerSectors.end(); }
 
 
+    /** returns true, if sector has no inner sectors. */
+    bool empty() { return m_innerSectors.empty(); }
+//  Iterator empty() { return (m_innerSectors.empty() ? true : false); }
+
+
     /** returns raw ID. */
     unsigned getRawSecID() const { return m_rawID; }
 
@@ -185,6 +207,9 @@ namespace Belle2 {
     /** add value for given filter, return true if successful, false if not. */
     bool addRawDataValue(std::string filterID, double value)
     {
+      wasFound();
+      B2DEBUG(1, "ProtoSectorGraph iD: " << FullSecID(m_rawID).getFullSecString() << " for filterID " << filterID << " the value " <<
+              value << " has been found")
       auto pos = m_rawDataForFilter.find(filterID);
       if (pos != m_rawDataForFilter.end()) { pos->second.append(value); return true; }
       B2ERROR("ProtoSectorGraph::addRawDataValue: attempted to add value " << value <<
@@ -199,7 +224,7 @@ namespace Belle2 {
     {
       unsigned nSamples = 0;
       // sanity check:
-      if (m_rawDataForFilter.empty() and m_innerSectors.empty()) { B2WARNING("no rawData!"); return 1; }
+      if (m_rawDataForFilter.empty() and m_innerSectors.empty()) { B2DEBUG(50, "determineCutsAndCleanRawData: no rawData!"); return 0; }
 
       // will not be executed when empty:
       for (auto& innerSector : m_innerSectors) {
@@ -255,17 +280,20 @@ namespace Belle2 {
       sectorBranches[0].first->GetEntry(thisEntry);
       unsigned currentID = sectorBranches[0].second;
 
-      // case: it is not this one and and none of the inner sectors:
-      Iterator pos = find(currentID);
-      if (pos == end()) {
-        pos = addInnerSector(currentID);
-//    pos = find(currentID);
+      if (currentID == m_rawID) {
+        wasFound();
       } else {
-        pos->wasFound();
-      }
+        Iterator pos = find(currentID);
 
-      sectorBranches.pop_front();
-      pos->addRelationToGraph(thisEntry, sectorBranches);
+        // case: it is not this one and and none of the inner sectors:
+        if (pos == end()) {
+          pos = addInnerSector(currentID);
+        }
+
+        sectorBranches.pop_front();
+        pos->addRelationToGraph(thisEntry, sectorBranches);
+
+      }
 
 //    // now only two cases left to capture: isThisSector or isInnerSector (both at the same time is not possible).
 //    // case: is this sector -> is not inner Sector:
@@ -364,34 +392,45 @@ namespace Belle2 {
     unsigned size() const { return m_innerSectors.size(); }
 
 
-    /** collect raw data of each sector-combination and find cuts */
-    void distillRawData4FilterCuts(
+
+    /** collect raw data of each sector-combination and find cuts, return value counts number of compatible cases */
+    unsigned distillRawData4FilterCutsV2(
       Long64_t thisEntry,
       TrainerConfigData& config,
-      std::deque<std::pair<TBranch*, unsigned>> sectorBranches, // hardcopy, since it will be pruned during the process.
+      std::deque<std::pair<TBranch*, unsigned>>
+      sectorBranches, // hardcopy, since it will be pruned during the process. TODO: could be solved in a less time-consuming way (iterators?)
       std::deque<std::pair<TBranch*, double>>& filterBranches,
       unsigned nSectorChain)
     {
-      // case: this graph is walked through:
-      if (sectorBranches.empty()) { return; }
 
-      std::vector<std::string> nHitFilters;
-      if (nSectorChain == 2) {
-        nHitFilters = config.twoHitFilters;
-      } else if (nSectorChain == 3) {
-        nHitFilters = config.threeHitFilters;
-      } else {
-        nHitFilters = config.fourHitFilters;
+      // case: this graph is walked through (should not be possible):
+      if (sectorBranches.empty()) {
+        B2WARNING("distillRawData4FilterCutsV2: no sectorBranches, return...")
+        return 0;
       }
 
-      // update branch-entry:
-      sectorBranches[0].first->GetEntry(thisEntry);
+      updateBranchEntries(thisEntry, sectorBranches);
+//    sectorBranches[0].first->GetEntry(thisEntry);
+      unsigned currentRawID = sectorBranches[0].second;
 
-      // case: we are in the wrong graph:
-      if (sectorBranches[0].second != getRawSecID()) { return; }
+      // case this iD is not compatible with this sector (should not be possible):
+      if (currentRawID != getRawSecID()) {
+        B2WARNING("distillRawData4FilterCutsV2: rawSecID (" << FullSecID(m_rawID).getFullSecString() << ") not compatible to given ID (" <<
+                  FullSecID(currentRawID).getFullSecString() << "), return...")
+        return 0;
+      }
 
-      // case: we have found the innermost Sector of the graph we wanted:
+
+      // case: we have found the innermost Sector of the graph we wanted: (and we are currently in it)
       if (sectorBranches.size() == 1) {
+        std::vector<std::string> nHitFilters;
+        if (nSectorChain == 2) {
+          nHitFilters = config.twoHitFilters;
+        } else if (nSectorChain == 3) {
+          nHitFilters = config.threeHitFilters;
+        } else {
+          nHitFilters = config.fourHitFilters;
+        }
 
         // prepare for collection if not done yet:
         if (m_rawDataForFilter.empty()) {
@@ -407,14 +446,105 @@ namespace Belle2 {
             filterBranches[fPos].second);
         }
 
-        return;
+        B2DEBUG(1, "distillRawData4FilterCutsV2: was able to add rawData of " << nFilters << ", return...")
+        return 1;
+      }
+
+      // all other cases- we are not yet done yet but at least current sector is correct.
+      sectorBranches.pop_front();
+//    sectorBranches[0].first->GetEntry(thisEntry);
+
+      // find inner sector with correct id:
+      unsigned innerRawID = sectorBranches[0].second;
+      if (currentRawID == innerRawID) { B2ERROR(" this and inner raw iD are identical! " << FullSecID(currentRawID).getFullSecString()); }
+      auto secPos = find(innerRawID);
+
+      // case: this is not the right graph, skipping...
+      if (secPos == m_innerSectors.end()) {
+        B2DEBUG(1, "distillRawData4FilterCutsV2: are in the wrong graph (this=good/inner=bad: " << FullSecID(
+                  currentRawID).getFullSecString() << "/" << FullSecID(innerRawID).getFullSecString() << "), return...")
+        return 0;
+      }
+
+      // case: we have found the correct inner sector, passing data:
+      B2DEBUG(1, "distillRawData4FilterCutsV2: are yet on the right way (this/inner: " << FullSecID(
+                currentRawID).getFullSecString() << "/" << FullSecID(innerRawID).getFullSecString() << "), moving on to next link in the chain.")
+      return secPos->distillRawData4FilterCutsV2(thisEntry, config, sectorBranches, filterBranches, nSectorChain);
+    }
+
+
+
+
+
+
+
+
+    /** collect raw data of each sector-combination and find cuts, return value counts number of compatible cases */
+    unsigned distillRawData4FilterCuts(
+      Long64_t thisEntry,
+      TrainerConfigData& config,
+      std::deque<std::pair<TBranch*, unsigned>>
+      sectorBranches, // hardcopy, since it will be pruned during the process. TODO: could be solved in a less time-consuming way (iterators?)
+      std::deque<std::pair<TBranch*, double>>& filterBranches,
+      unsigned nSectorChain)
+    {
+      // case: this graph is walked through:
+      if (sectorBranches.empty()) {
+        B2DEBUG(1, "distillRawData4FilterCuts: no sectorBranches, return...")
+        return 0;
+      }
+
+      std::vector<std::string> nHitFilters;
+      if (nSectorChain == 2) {
+        nHitFilters = config.twoHitFilters;
+      } else if (nSectorChain == 3) {
+        nHitFilters = config.threeHitFilters;
+      } else {
+        nHitFilters = config.fourHitFilters;
+      }
+
+      // update branch-entry:
+      sectorBranches[0].first->GetEntry(thisEntry);
+
+      // case: we are in the wrong graph:
+      if (sectorBranches[0].second != getRawSecID()) {
+        B2DEBUG(50, "distillRawData4FilterCuts: rawSecID (" << FullSecID(m_rawID).getFullSecString() << ") not compatible to given ID (" <<
+                FullSecID(sectorBranches[0].second).getFullSecString() << "), return...")
+        return 0;
+      }
+
+      // case: we have found the innermost Sector of the graph we wanted:
+      if (sectorBranches.size() == 1) {
+        B2DEBUG(1, "case: we have found the innermost Sector of the graph we wanted - now writing data")
+
+        // prepare for collection if not done yet:
+        if (m_rawDataForFilter.empty()) {
+          prepareRawDataContainers(config.quantiles, nHitFilters);
+        }
+
+        // collect values for filtering:
+        unsigned nFilters = filterBranches.size();
+        for (unsigned fPos = 0; fPos < nFilters; fPos++) {
+          filterBranches[fPos].first->GetEntry(thisEntry);
+          addRawDataValue(
+            nHitFilters[fPos],
+            filterBranches[fPos].second);
+        }
+
+        B2DEBUG(1, "distillRawData4FilterCuts: was able to add rawData of " << nFilters << ", return...")
+        return 1;
       }
 
       // case: we might be in the correct graph (so far so good), but this is not the end yet -> continue looping through the next sectors in chain:
+      B2DEBUG(50, "distillRawData4FilterCuts: we are in the correct graph(rawSecID/givenID: " << FullSecID(
+                m_rawID).getFullSecString() << "/" << FullSecID(sectorBranches[0].second).getFullSecString() <<
+              "), but not at the end yet, going further.")
+      unsigned countGood = 0;
       sectorBranches.pop_front();
       for (Sector& subGraph : m_innerSectors) {
-        subGraph.distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, nSectorChain);
+        countGood += subGraph.distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, nSectorChain);
       }
+      return countGood;
     }
 
 
@@ -447,6 +577,24 @@ namespace Belle2 {
 
       if (!m_isLocked) {setFullSecID(false); }
       return nUpdated;
+    }
+
+
+    std::string print()
+    {
+      FullSecID myTempID(getRawSecID());
+
+      std::string out = " " + myTempID.getFullSecString();
+      out += (" nInner/nTimesFound/nSample: " + std::to_string(size()) + "/" + std::to_string(m_nTimesFound) + "/" + std::to_string(
+                m_rawDataForFilter.size())) + " ";
+      if (m_innerSectors.empty()) { out += "||\n"; return std::move(out); }
+      out += " ";
+      for (auto& innerSector : m_innerSectors) {
+        out += innerSector.print();
+      }
+
+//    out += "\n";
+      return std::move(out);
     }
   }; // end of ProtoSectorGraph-declaration.
 }

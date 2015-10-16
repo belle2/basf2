@@ -77,7 +77,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   TrainerConfigData config1;
   config1.pTCuts = {0.02, 0.08};
   config1.pTSmear = 0.;
-  config1.minMaxLayer = {3, 6};
+  config1.minMaxLayer = {3, 6}; // TODO -> convert to vector containing all layerNumbers to be used; e.g.: {0, 3, 4, 5, 6};
   config1.uDirectionCuts = {0., .15, .5, .85, 1.};
   config1.vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
   config1.pdgCodesAllowed = {};
@@ -92,6 +92,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.001;
   config1.quantiles = {0.005, 0.005};
+  // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
   bootstrapSectorMap(config1);
 
 

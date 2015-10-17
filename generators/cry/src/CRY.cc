@@ -80,6 +80,11 @@ void CRY::init()
   inputFile.open(m_setupFile, std::ios::in);
   char buffer[2000];
 
+  // check if the setup file is found
+  if (! inputFile.is_open()) {
+    B2FATAL("[CRY]: Could not open setup file: " << m_setupFile);
+  }
+
   std::string setupString("");
   while (!inputFile.getline(buffer, 2000).eof()) {
     setupString.append(buffer);

@@ -21,6 +21,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -83,12 +85,18 @@ namespace Belle2 {
     //! @param[out] bword2 second 16bit word
     //! @param[out] bword3 third 16bit word
     //! @param[out] bword4 forth 16bit word
-    void formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1, unsigned short& bword2, unsigned short& bword3, unsigned short& bword4);
+    void formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1, unsigned short& bword2,
+                    unsigned short& bword3, unsigned short& bword4);
 
     //    //! put datapackets for a track together
     //    //! param[in] channel The channel that will be set in all layers
     //     //! param[out] bword1-bword4 the words
     //    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4);
+    //! fill m_ModuleIdToelectId from xml file
+    void loadMap();
+    map<int, int> m_ModuleIdToelectId;
+    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
+    int electCooToInt(int copper, int finesse, int lane, int axis);
 
 
   };

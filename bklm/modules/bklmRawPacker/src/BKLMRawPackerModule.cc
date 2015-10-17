@@ -6,9 +6,11 @@
 //-
 
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
+#include <bklm/dataobjects/BKLMDigit.h>
 
 using namespace std;
 using namespace Belle2;
+#define NUM_BKLM_COPPER 4
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -59,6 +61,7 @@ void BKLMRawPackerModule::initialize()
   rawklmarray.registerPersistent();
 
   B2INFO("BKLMRawPackerModule: initialize() done.");
+  loadMap();
 }
 
 
@@ -67,123 +70,124 @@ void BKLMRawPackerModule::initialize()
 void BKLMRawPackerModule::event()
 {
   B2INFO("pack the event.." << endl);
+  StoreArray<BKLMDigit> digits;
+  vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
+  data_words[4][4].clear();
+  //int tot_num_hits=digits.getEntries();
+
+  ///fill data_words
+  for (int d = 0; d < digits.getEntries(); d++) {
+    int* buf = new int[2];//for one hit, hit length is 2;
+    buf[0] = 0;
+    buf[1] = 0;
+    BKLMDigit* digit = digits[d];
+
+    int iChannelNr = digit->getStrip();
+    int iAx = digit->isPhiReadout();
+    int iLayer = digit->getLayer();
+    int iSector = digit->getSector();
+    int isForward = digit->isForward();
+    int iTdc = digit->getTime();
+    int icharge = digit->getNPixel();
+    int iCTime = digit->getCTime();
+    int moduleId = (isForward ? BKLM_END_MASK : 0)
+                   | ((iSector - 1) << BKLM_SECTOR_BIT)
+                   | ((iLayer - 1) << BKLM_LAYER_BIT)
+                   | ((iAx) << BKLM_PLANE_BIT);
+
+    int electId = 0;
+    if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
+      B2INFO("BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " << iSector
+             << endl);
+      continue;
+    } else {
+      electId = m_ModuleIdToelectId[moduleId];
+    }
+
+    int copperId;
+    int finesse;
+    int lane;
+    intToElectCoo(electId, copperId, finesse, lane);
+
+    B2INFO("BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << iLayer << " " << iAx << " " <<
+           iChannelNr << " " << iTdc << " " << icharge << " " << iCTime << " " << endl);
+
+    unsigned short bword1 = 0;
+    unsigned short bword2 = 0;
+    unsigned short bword3 = 0;
+    unsigned short bword4 = 0;
+    formatData(iChannelNr, iAx, iLayer, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    buf[0] |= bword2;
+    buf[0] |= ((bword1 << 16));
+    buf[1] |= bword4;
+    buf[1] |= ((bword3 << 16));
+    data_words[copperId][finesse].push_back(buf[0]);
+    data_words[copperId][finesse].push_back(buf[1]);
+  }
+
   //    Make RawKLM array
   rawklmarray.create();
 
-  //
-  // Fill event info (These values will be stored in RawHeader )
-  //
   RawCOPPERPackerInfo rawcprpacker_info;
-  rawcprpacker_info.exp_num = 1;
-  rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
-  rawcprpacker_info.eve_num = n_basf2evt;
-  rawcprpacker_info.node_id = m_nodeid;
-  rawcprpacker_info.tt_ctime = 0x7123456;
-  rawcprpacker_info.tt_utime = 0xF1234567;
-  rawcprpacker_info.b2l_ctime = 0x7654321;
+  for (int i = 0 ; i < NUM_BKLM_COPPER; i++) {
+    //
+    // Fill event info (These values will be stored in RawHeader )
+    //
+    rawcprpacker_info.exp_num = 1;
+    rawcprpacker_info.run_subrun_num = 2; // run number : 14bits, subrun # : 8bits
+    rawcprpacker_info.eve_num = n_basf2evt;
+    rawcprpacker_info.node_id = BKLM_ID + i;
+    rawcprpacker_info.tt_ctime = 0x7123456;
+    rawcprpacker_info.tt_utime = 0xF1234567;
+    rawcprpacker_info.b2l_ctime = 0x7654321;
 
-  //
-  // Prepare buffer to fill dummy data
-  //
+    //one call per copper
+    RawKLM* raw_klm = rawklmarray.appendNew();
 
-  //one call per copper, so here we only pack data for one sector
-  RawKLM* raw_klm = rawklmarray.appendNew();
-  //one hit per layer in both directions, this is what we would expect per finesse...
-  int numHits = 13 * 2;
-  int hitCounter = -1;
-  int* buf1, *buf2, *buf3, *buf4;
-  int nwords_1st = 2 * numHits, nwords_2nd = 2 * numHits, nwords_3rd = 2 * numHits, nwords_4th = 2 * numHits;
+    int* buf1, *buf2, *buf3, *buf4;
+    int nwords_1st = data_words[i][0].size();
+    int nwords_2nd = data_words[i][1].size();
+    int nwords_3rd = data_words[i][2].size();
+    int nwords_4th = data_words[i][3].size();
 
-  //we have to add one, because some sort of counter is expected by the unpacker
-  buf1 = new int[ nwords_1st + 1];
-  buf2 = new int[ nwords_2nd + 1];
-  buf3 = new int[ nwords_3rd + 1];
-  buf4 = new int[ nwords_4th + 1];
-  for (int iLay = 1; iLay < 14; iLay++)    {
-    for (int iAx = 0; iAx < 2; iAx++) {
-      hitCounter++;
-      //basf2 words are 32 bits, whereas in the dataformat documentation for the KLM assumes 16bits
+    buf1 = NULL;
+    buf2 = NULL;
+    buf3 = NULL;
+    buf4 = NULL;
+    buf1 = new int[ nwords_1st + 1];
+    buf2 = new int[ nwords_2nd + 1];
+    buf3 = new int[ nwords_3rd + 1];
+    buf4 = new int[ nwords_4th + 1];
 
-      unsigned short bword1 = 0;
-      unsigned short bword2 = 0;
-      unsigned short bword3 = 0;
-      unsigned short bword4 = 0;
-
-
-      buf1[0 + hitCounter * 2] = 0;
-      buf1[1 + hitCounter * 2] = 0;
-      int iChannelNr = 10;
-
-      //tdc, charge, ctime
-      //we need to switch bword1/bword2 and bword3/bword4 since the hi/loword ordering
-      //from the concentrator board has teh hiword on the rightmost side
-      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      B2INFO("buf1: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl);
-      buf1[0 + hitCounter * 2] |= bword2;
-      buf1[0 + hitCounter * 2] |= ((bword1 << 16));
-      buf1[1 + hitCounter * 2] |= bword4;
-      buf1[1 + hitCounter * 2] |= ((bword3 << 16));
-
-      B2INFO("word1: " << buf1[0 + hitCounter * 2] << " word2: " << buf1[1 + hitCounter * 2] << endl);
-      buf2[0 + hitCounter * 2] = 0;
-      buf2[1 + hitCounter * 2] = 0;
-
-      iChannelNr = 25;
-
-      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      buf2[0 + hitCounter * 2] |= bword2;
-      buf2[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
-      buf2[1 + hitCounter * 2] |= bword4;
-      buf2[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
-      B2INFO("buf2: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl);
-      B2INFO("word1: " << buf2[0 + hitCounter * 2] << " word2: " << buf2[1 + hitCounter * 2] << endl);
-
-      buf3[0 + hitCounter * 2] = 0;
-      buf3[1 + hitCounter * 2] = 0;
-
-      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      iChannelNr = 35;
-
-      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      B2INFO("buf3: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl);
-      B2INFO("word1: " << buf3[0 + hitCounter * 2] << " word2: " << buf3[1 + hitCounter * 2] << endl);
-      buf3[0 + hitCounter * 2] |= bword2;
-      buf3[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
-      buf3[1 + hitCounter * 2] |= bword4;
-      buf3[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
-
-
-
-      buf4[0 + hitCounter * 2] = 0;
-      buf4[1 + hitCounter * 2] = 0;
-
-      iChannelNr = 17;
-
-      formatData(iChannelNr, iAx, iLay, 20, 30, 70, bword1, bword2, bword3, bword4);
-      B2INFO("buf4: " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4 << endl);
-      B2INFO("word1: " << buf4[0 + hitCounter * 2] << " word2: " << buf4[1 + hitCounter * 2] << endl);
-      buf4[0 + hitCounter * 2] |= bword2;
-      buf4[0 + hitCounter * 2] |= ((bword1 << 16) & 0xFFFF0000);
-      buf4[1 + hitCounter * 2] |= bword4;
-      buf4[1 + hitCounter * 2] |= ((bword3 << 16) & 0xFFFF0000);
-
-
-
-
-
-
+    for (int j = 0; j < nwords_1st; j++) {
+      buf1[j] = data_words[i][0][j];
     }
-  }
-  raw_klm->PackDetectorBuf(buf1, nwords_1st + 1,
-                           buf2, nwords_2nd + 1,
-                           buf3, nwords_3rd + 1,
-                           buf4, nwords_4th + 1,
-                           rawcprpacker_info);
 
-  delete [] buf1;
-  delete [] buf2;
-  delete [] buf3;
-  delete [] buf4;
+    for (int j = 0; j < nwords_2nd; j++) {
+      buf2[j] = data_words[i][1][j];
+    }
+
+    for (int j = 0; j < nwords_3rd; j++) {
+      buf3[j] = data_words[i][2][j];
+    }
+
+    for (int j = 0; j < nwords_4th; j++) {
+      buf4[j] = data_words[i][3][j];
+    }
+
+
+    raw_klm->PackDetectorBuf(buf1, nwords_1st + 1,
+                             buf2, nwords_2nd + 1,
+                             buf3, nwords_3rd + 1,
+                             buf4, nwords_4th + 1,
+                             rawcprpacker_info);
+
+    delete [] buf1;
+    delete [] buf2;
+    delete [] buf3;
+    delete [] buf4;
+
+  }
 
   printf("Event # %.8d\n", n_basf2evt);
   fflush(stdout);
@@ -206,7 +210,8 @@ void BKLMRawPackerModule::event()
 
 
 
-void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1, unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
+void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1,
+                                     unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
   bword1 = 0;
@@ -221,6 +226,82 @@ void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, i
   bword4 |= (charge & 0xFFF);
 
 }
+
+void BKLMRawPackerModule::loadMap()
+{
+  GearDir dir("/Detector/ElectronicsMapping/BKLM");
+
+  for (GearDir& copper : dir.getNodes("COPPER")) {
+    //GearDir& ID : copper.getNodes("ID")
+    //int id=copper.getInt("ID");
+    int copperId = copper.getInt("@id");
+    //      cout <<"copper id: "<< id <<endl;
+    for (GearDir& slot : copper.getNodes("Slot")) {
+      int slotId = slot.getInt("@id");
+      //      cout << "slotid : " << slotId << endl;
+      B2INFO("slotid: " << slotId << endl;);
+      for (GearDir& lane : slot.getNodes("Lane")) {
+        int laneId = lane.getInt("@id");
+        for (GearDir& axis : lane.getNodes("Axis")) {
+          int axisId = axis.getInt("@id");
+          int sector = axis.getInt("Sector");
+          int isForward = axis.getInt("IsForward");
+          int layer = axis.getInt("Layer");
+          int plane = axis.getInt("Plane");
+          //int elecId = electCooToInt(copperId, slotId, laneId, axisId);
+          int elecId = electCooToInt(copperId, slotId - 1, laneId, axisId);
+          int moduleId = 0;
+
+
+          B2INFO("reading xml file...");
+          B2INFO(" copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId);
+          B2INFO(" sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane << endl);
+          moduleId = (isForward ? BKLM_END_MASK : 0)
+                     | ((sector - 1) << BKLM_SECTOR_BIT)
+                     | ((layer - 1) << BKLM_LAYER_BIT)
+                     | ((plane) << BKLM_PLANE_BIT);
+          //m_ModuleIdToelectId[elecId] = moduleId;
+          m_ModuleIdToelectId[moduleId] = elecId;
+          B2INFO(" electId: " << elecId << " modId: " << moduleId << endl);
+        }
+      }
+    }
+  }
+
+}
+
+void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
+{
+  copper = 0;
+  finesse = 0;
+  lane = 0;
+  copper = (id & 0xF);
+  finesse = (id >> 4) & 3;
+  lane = 0;
+  lane = (id >> 6) & 0xF;
+
+}
+
+int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int axis)
+{
+  //  there are at most 16 copper -->4 bit
+  // 4 finesse --> 2 bit
+  // < 16 lanes -->4 bit
+  // axis --> 1 bit
+  unsigned int ret = 0;
+  copper = copper & 0xF;
+  ret |= copper;
+  finesse = finesse & 3;
+  ret |= (finesse << 4);
+  lane = lane & 0xF;
+  ret |= (lane << 6);
+  axis = axis & 0x1;
+  ret |= (axis << 10);
+
+  return ret;
+
+}
+
 //    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4)
 //    {
 //

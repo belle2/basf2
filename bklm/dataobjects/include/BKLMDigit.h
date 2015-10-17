@@ -105,6 +105,9 @@ namespace Belle2 {
     //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
+    //! @return ctime
+    short getCTime() const { return m_CTime; }
+
     //! Get the status of scint pulse-shape fit
     //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
     int getFitStatus() { return m_FitStatus; }

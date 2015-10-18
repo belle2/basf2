@@ -1,0 +1,92 @@
+Relation betw. wireID and frontend electronicsID
+================================================
+Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardID (0-299), channelID (0-47).
+
+* ch_map.dat: coded by Yamada (DAQ group).
+
+
+
+xt-relation
+===========
+Format: lyr#  theta  alpha phi left/right 0th 1st 2nd 3rd 4th 5th cut-off slope
+lyr#: layerID (0-55);
+theta: polar angle of the incident track (18-149deg.);
+alpha: incident angle of the track in r-phi plane (0-180 deg.);
+phi: azimuthal angle of the cell (not used now; maybe used in future);
+left/right: left or right flag;
+0th - 5th: coefficients for 5th-order polynomial;
+cut-off: maximum drift time to use 5th order polynomial;
+slope: if drift time is greater than cut-off, xt is approximated by linear
+function. this is the slope for that.
+
+Unit: cm and microsec.
+
+* xt_v2.1.dat    : layer#55 thickness reduced by ~1cm.
+* xt_v2.dat      : obsolete. xt = xt(layer,l/r,alpha,theta) with a bug fixed.
+* xt_v1.dat      : obsolete. xt = xt(layer,l/r,alpha.theta)
+* xt_v0.dat      : obsolete. 1'st version of realistic xt; only layer and L/R dependence is taken into account.
+* xt_simple.dat  : ideal linear xt. v=40 mu/ns.
+* xt_noB_v0.2.dat: xt for B-field = 0.
+
+
+
+sigma
+=====
+The file contains intrinsic space resolution^2 of CDC.
+
+sigma^2 = sigma^2(layer, driftL) [cm^2].
+
+Format: layerID (0-55), param (0-6)
+param[0],[1]: primary-ion statistics term
+param[2]    : diffusion term
+param[3]    : electronics noise term
+param[4],[5]: term describes electric distortion near cell boundary
+
+See xx for detail.
+
+* sigma_simple.dat: assume ideal sigma^2 = 130um^2, indep. of layer or driftL.
+* sigma_v0.dat    : more realistic one, obtained in beam test.
+
+
+
+propagation speed
+=================
+The file contains propagation speed of electric signal along a sense wire.
+
+Format: layerID, speed [cm/ns]
+
+* propspeed_v0.dat: The value observed in Belle-1 CDC is assumed.
+
+
+
+t0
+==
+The file contains the constants related to trigger-signal delay (or event time).
+
+Format: layerID (0-55), wireID(0-), t0 [ns]
+
+* t0.dat: Set t0=8192 ns for all wires.
+
+
+
+time-walk
+=========
+The file contains coefficients for time-walk (p.h.-dependent timing shift).
+
+Parametrization: time-walk = A/sqrt(ADCcount).
+
+Format: frontend electronics boardID (0-299), A [ns/sqrt(ADCcount)]
+
+* tw_off.dat        : Set A = 0 for all boards.
+* tw_crudevalues.dat: Crude As obtained from the beam test in '13. Modified for use in Monte Carlo.
+
+
+
+(mis)alignment
+==============
+The file contains (mis)alignment parameters w.r.t. displaced geometry (=ideal geometry currently). Misalignment params. are use in digitization; alignment ones in reconstruction.
+
+Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward endplate [cm], (dx,dy,dz) of sense wire at forward endplate [cm], tension [grW]
+
+* misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires.
+* alignment.dat:  : = misalignment.dat.

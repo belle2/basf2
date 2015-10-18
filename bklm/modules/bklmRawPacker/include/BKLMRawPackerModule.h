@@ -74,6 +74,10 @@ namespace Belle2 {
 
     //! RawKLM array
     StoreArray<RawKLM> rawklmarray;
+
+    //! to map logical coordinates to hardware coordinates
+    map<int, int> m_ModuleIdToelectId;
+
     //! format the data
     //! @param[in] channel rpc channel
     //! @param[in] axis phi or z
@@ -92,10 +96,16 @@ namespace Belle2 {
     //    //! param[in] channel The channel that will be set in all layers
     //     //! param[out] bword1-bword4 the words
     //    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4);
+
     //! fill m_ModuleIdToelectId from xml file
     void loadMap();
-    map<int, int> m_ModuleIdToelectId;
+
+    //! To be used to map module id to electronics address
+    //! @param copperId id of the copper board
+    //! @param finesse is the Finesse slot on the copper boards
     void intToElectCoo(int id, int& copper, int& finesse, int& lane);
+
+    //! TO be used to map electronics address to module id
     int electCooToInt(int copper, int finesse, int lane, int axis);
 
 

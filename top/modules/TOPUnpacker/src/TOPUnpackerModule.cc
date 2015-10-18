@@ -53,6 +53,14 @@ namespace Belle2 {
     setDescription("Raw data unpacker for TOP");
     setPropertyFlags(c_ParallelProcessingCertified);
 
+    // Add parameters
+    addParam("inputRawDataName", m_inputRawDataName,
+             "name of RawTOP store array", string(""));
+    addParam("outputDigitsName", m_outputDigitsName,
+             "name of TOPDigit store array", string(""));
+    addParam("outputWaveformsName", m_outputWaveformsName,
+             "name of TOPRawWaveform store array", string(""));
+
   }
 
   TOPUnpackerModule::~TOPUnpackerModule()
@@ -62,14 +70,14 @@ namespace Belle2 {
   void TOPUnpackerModule::initialize()
   {
 
-    StoreArray<RawTOP> rawData;
+    StoreArray<RawTOP> rawData(m_inputRawDataName);
     rawData.isRequired();
 
-    StoreArray<TOPDigit> digits;
+    StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.registerInDataStore();
 
-    StoreArray<TOPRawWaveform> waveforms;
-    waveforms.registerInDataStore();
+    StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
+    waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
     if (!m_topgp->isInitialized()) {
       GearDir content("/Detector/DetectorComponent[@name='TOP']/Content");
@@ -90,9 +98,11 @@ namespace Belle2 {
   void TOPUnpackerModule::event()
   {
 
-    StoreArray<RawTOP> rawData;
-    StoreArray<TOPDigit> digits;
+    StoreArray<RawTOP> rawData(m_inputRawDataName);
+    StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.clear();
+    StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
+    waveforms.clear();
 
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
@@ -103,10 +113,10 @@ namespace Belle2 {
         unsigned dataFormat = (buffer[0] >> 24) & 0xFF;
         switch (dataFormat) {
           case 1:
-            unpackProductionFormat(buffer, bufferSize);
+            unpackProductionFormat(buffer, bufferSize, digits);
             break;
           case 2:
-            unpackWaveformFormat(buffer, bufferSize);
+            unpackWaveformFormat(buffer, bufferSize, waveforms);
             break;
           default:
             B2ERROR("TOPUnpacker: unknown data format type = " << dataFormat);
@@ -117,10 +127,9 @@ namespace Belle2 {
   }
 
 
-  void TOPUnpackerModule::unpackProductionFormat(const int* buffer, int bufferSize)
+  void TOPUnpackerModule::unpackProductionFormat(const int* buffer, int bufferSize,
+                                                 StoreArray<TOPDigit>& digits)
   {
-
-    StoreArray<TOPDigit> digits;
 
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
@@ -146,17 +155,17 @@ namespace Belle2 {
         }
         break;
       default:
-        B2ERROR("TOPUnpacker::unpackProductionFormat: unknown data format version = "
+        B2ERROR("TOPUnpacker::unpackProductionFormat: unknown data format version "
                 << version);
     }
 
   }
 
 
-  void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize)
+  void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize,
+                                               StoreArray<TOPRawWaveform>& waveforms)
   {
 
-    StoreArray<TOPRawWaveform> waveforms;
     StoreObjPtr<EventMetaData> evtMetaData;
 
     unsigned short scrodID = buffer[0] & 0xFFFF;
@@ -209,12 +218,12 @@ namespace Belle2 {
         int n = bufferSize - array.getIndex() - 1;
         if (n > 0) {
           B2ERROR("TOPUnpacker::unpackWaveformFormat: " << n <<
-                  " words of data buffer unused");
+                  " words of data buffer not used");
         }
       }
       break;
       default:
-        B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version = "
+        B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version "
                 << version);
     }
 

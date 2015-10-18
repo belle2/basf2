@@ -52,6 +52,12 @@ namespace Belle2 {
     setDescription("Raw data packer for TOP");
     setPropertyFlags(c_ParallelProcessingCertified);
 
+    // Add parameters
+    addParam("inputDigitsName", m_inputDigitsName,
+             "name of TOPDigit store array", string(""));
+    addParam("outputRawDataName", m_outputRawDataName,
+             "name of RawTOP store array", string(""));
+
   }
 
   TOPPackerModule::~TOPPackerModule()
@@ -61,10 +67,10 @@ namespace Belle2 {
   void TOPPackerModule::initialize()
   {
 
-    StoreArray<TOPDigit> digits;
+    StoreArray<TOPDigit> digits(m_inputDigitsName);
     digits.isRequired();
 
-    StoreArray<RawTOP> rawData;
+    StoreArray<RawTOP> rawData(m_outputRawDataName);
     rawData.registerInDataStore();
 
     if (!m_topgp->isInitialized()) {
@@ -87,8 +93,8 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    StoreArray<TOPDigit> digits;
-    StoreArray<RawTOP> rawData;
+    StoreArray<TOPDigit> digits(m_inputDigitsName);
+    StoreArray<RawTOP> rawData(m_outputRawDataName);
 
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();

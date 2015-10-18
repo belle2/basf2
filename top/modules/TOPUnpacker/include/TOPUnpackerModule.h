@@ -13,6 +13,9 @@
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 #include <string>
 
 namespace Belle2 {
@@ -69,16 +72,23 @@ namespace Belle2 {
      * Unpack raw data given in production format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
+     * @param digits collection to unpack to
      */
-    void unpackProductionFormat(const int* buffer, int bufferSize);
+    void unpackProductionFormat(const int* buffer, int bufferSize,
+                                StoreArray<TOPDigit>& digits);
 
     /**
      * Unpack raw data given in waveform format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
+     * @param waveforms collection to unpack to
      */
-    void unpackWaveformFormat(const int* buffer, int bufferSize);
+    void unpackWaveformFormat(const int* buffer, int bufferSize,
+                              StoreArray<TOPRawWaveform>& waveforms);
 
+    std::string m_inputRawDataName;  /**< name of RawTOP store array */
+    std::string m_outputDigitsName;  /**< name of TOPDigit store array */
+    std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
     TOP::TOPGeometryPar* m_topgp;  /**< geometry parameters */
 
   };

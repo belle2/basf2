@@ -47,11 +47,11 @@ namespace Belle2 {
        */
       TrackProcessorNew() :
         m_cdcTracks(), m_trackFitter(),
-        m_histChi2("h_chi2", "chi2", 100, 0., 300.),
-        m_histChi2NDF("h_chi2", "chi2", 100, 0., 300.),
-        m_histDist("h_dist", "dist", 100, 0., 2.),
-        m_histADC("h_ADC", "ADC", 1000, 0., 1000),
-        m_histADCpt("h_ADCpt", "ADC vs Pt", 400, 0., 1000, 40, 0., 3.) { }
+        m_histChi2("h_legendreChi2", "chi2", 100, 0., 300.),
+        m_histChi2NDF("h_legendreChi2NDF", "chi2", 100, 0., 300.),
+        m_histDist("h_legendreDist", "dist", 100, 0., 2.),
+        m_histADC("h_legendreADC", "ADC", 1000, 0., 1000),
+        m_histADCpt("h_legendreADCpt", "ADC vs Pt", 400, 0., 1000, 40, 0., 3.) { }
 
 
       /**

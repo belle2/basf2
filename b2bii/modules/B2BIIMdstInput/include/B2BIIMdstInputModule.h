@@ -44,6 +44,12 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** Open the next file from the list of files
+     * @returns true on success */
+    bool openNextFile();
+    /** Read the next event from the currently open file.
+     * @returns true on success */
+    bool readNextEvent();
 
     /**
      * Initializes Belle II DataStore.
@@ -54,11 +60,13 @@ namespace Belle2 {
     // MISC
     //-----------------------------------------------------------------------------
 
-    //! Input MDST file name
+    /** Input MDST file name for backwards compatibility */
     std::string m_inputFileName;
+    /** List of input MDST filenames */
+    std::vector<std::string> m_inputFileNames;
 
     //! PantherFile
-    Belle::Panther_FileIO* m_fd;
+    Belle::Panther_FileIO* m_fd{nullptr};
 
     //! Event counter
     int m_nevt;

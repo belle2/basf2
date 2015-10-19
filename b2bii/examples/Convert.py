@@ -5,7 +5,7 @@ import os
 import sys
 
 from basf2 import *
-from simulation import add_simulation
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 
 if len(sys.argv) != 3:
     sys.exit('Must provide two input parameters: [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
@@ -17,27 +17,8 @@ outputBelle2ROOTFile = sys.argv[2]
 
 main = create_path()
 
-# Input MDST Module
-input = register_module('B2BIIMdstInput')
-input.param('inputFileName', inputBelleMDSTFile)
-# input.logging.set_log_level(LogLevel.DEBUG)
-# input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-main.add_module(input)
-
-# Fix MSDT Module
-fix = register_module('B2BIIFixMdst')
-# fix.logging.set_log_level(LogLevel.DEBUG)
-# fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-main.add_module(fix)
-
-emptypath = create_path()
-fix.if_value('<=0', emptypath)  # discard 'bad events' marked by fixmdst
-
-# Convert MDST Module
-convert = register_module('B2BIIConvertMdst')
-# convert.logging.set_log_level(LogLevel.DEBUG)
-# convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-main.add_module(convert)
+# add all modules necessary to read and convert the mdst file
+convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=main)
 
 # Store the converted Belle II dataobjects in ROOT
 output = register_module('RootOutput')

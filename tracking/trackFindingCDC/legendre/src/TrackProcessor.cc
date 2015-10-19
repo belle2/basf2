@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
@@ -299,7 +300,12 @@ void TrackProcessorNew::createCDCTracks(std::vector<Belle2::TrackFindingCDC::CDC
 
 //  std::copy(m_tracksVector.begin(), m_tracksVector.end(), tracks.begin());
 
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
+  tracks.reserve(tracks.size() + m_cdcTracks.size());
+
   for (CDCTrack& track : m_cdcTracks) {
+    trackQualityTools.normalizeHitsAndResetTrajectory(track);
+    track.sortByRadius();
     if (track.size() > 5) tracks.push_back(std::move(track));
   }
 }

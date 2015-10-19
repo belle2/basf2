@@ -19,13 +19,13 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))
     # input.logging.set_log_level(LogLevel.DEBUG)
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-    analysis_main.add_module(input)
+    path.add_module(input)
 
     # Fix MSDT Module
     fix = register_module('B2BIIFixMdst')
     # fix.logging.set_log_level(LogLevel.DEBUG)
     # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-    analysis_main.add_module(fix)
+    path.add_module(fix)
 
     if(applyHadronBJSkim):
         emptypath = create_path()
@@ -35,7 +35,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     convert = register_module('B2BIIConvertMdst')
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
-    analysis_main.add_module(convert)
+    path.add_module(convert)
 
 
 def parse_process_url(url):

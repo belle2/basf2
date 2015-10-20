@@ -67,7 +67,7 @@ void ConditionsService::getPayloads(std::string GlobalTag, std::string Experimen
 
     curl_easy_cleanup(curl);
   }
-  parse_payloads(m_buffer);
+  if (!m_buffer.empty()) parse_payloads(m_buffer);
 
   B2INFO("Conditions service retrieved " << m_payloads.size() << " payloads for experiment " << ExperimentName << " and run " <<
          RunName << " listed under global tag " << GlobalTag);

@@ -1,4 +1,4 @@
-[INFO] Steering file: tests/mdst_compatibility.py
+[INFO] Steering file: mdst/tests/mdst_compatibility.py
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -8,7 +8,7 @@ EventMetaData:
   getEvent(): 0
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194090345178389
@@ -3919,7 +3919,7 @@ EventMetaData:
   getEvent(): 1
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194093029445924
@@ -7005,7 +7005,7 @@ EventMetaData:
   getEvent(): 2
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194094248154873
@@ -11230,7 +11230,7 @@ EventMetaData:
   getEvent(): 3
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194096257224344
@@ -15738,7 +15738,7 @@ EventMetaData:
   getEvent(): 4
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194098155950942
@@ -20477,7 +20477,7 @@ EventMetaData:
   getEvent(): 5
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194099596828101
@@ -24300,7 +24300,7 @@ EventMetaData:
   getEvent(): 6
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194101048358457
@@ -28660,7 +28660,7 @@ EventMetaData:
   getEvent(): 7
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194102584495677
@@ -32401,7 +32401,7 @@ EventMetaData:
   getEvent(): 8
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194103841122601
@@ -37507,7 +37507,7 @@ EventMetaData:
   getEvent(): 9
   getExperiment(): 1
   getGeneratedWeight(): 1
-  getParentIndex(): -1
+  getParentLfn(): /home/ritter/belle2/software/mdst/tests/mdst-v00-05-02.root
   getRun(): 1
   getSubrun(): 0
   getTime(): 1436194105653167058

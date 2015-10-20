@@ -252,7 +252,7 @@ class DataStorePrinter(object):
 mdst_dataobjects = [
     DataStorePrinter("EventMetaData", [
         "getErrorFlag", "getEvent", "getRun", "getSubrun", "getExperiment",
-        "getTime", "getParentIndex", "getGeneratedWeight",
+        "getTime", "getParentLfn", "getGeneratedWeight",
     ], array=False),
     DataStorePrinter("TRGSummary", ["getTimTypeBits"], {
         "getInputBits": range(10),

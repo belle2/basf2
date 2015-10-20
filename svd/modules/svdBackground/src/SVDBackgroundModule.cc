@@ -200,7 +200,7 @@ void SVDBackgroundModule::event()
   }
 
   // Get number of events to process
-  unsigned long numberOfEvents = storeFileMetaData->getEvents();
+  unsigned long numberOfEvents = storeFileMetaData->getNEvents();
   double currentComponentTime = storeBgMetaData->getRealTime() * Unit::us;
 
   // Exposition and dose

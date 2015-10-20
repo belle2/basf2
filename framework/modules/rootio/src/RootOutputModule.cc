@@ -11,6 +11,7 @@
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
+#include <framework/core/InputController.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
@@ -19,7 +20,7 @@
 
 #include <TClonesArray.h>
 
-#include <time.h>
+#include <ctime>
 
 
 using namespace std;
@@ -163,6 +164,7 @@ void RootOutputModule::initialize()
       B2DEBUG(150, "The branch " << branchName << " was created.");
     }
   }
+
   dir->cd();
 }
 
@@ -175,9 +177,9 @@ void RootOutputModule::event()
   //check for new parent file
   StoreObjPtr<FileMetaData> fileMetaDataPtr("", DataStore::c_Persistent);
   if (fileMetaDataPtr) {
-    int id = fileMetaDataPtr->getId();
-    if (id && (m_parents.empty() || (m_parents.back() != id))) {
-      m_parents.push_back(id);
+    string lfn = fileMetaDataPtr->getLfn();
+    if (!lfn.empty() && (m_parentLfns.empty() || (m_parentLfns.back() != lfn))) {
+      m_parentLfns.push_back(lfn);
     }
   }
 
@@ -224,16 +226,17 @@ void RootOutputModule::fillFileMetaData()
       RootIOUtilities::buildIndex(tree);
     }
 
-    fileMetaDataPtr->setEvents(numEntries);
+    fileMetaDataPtr->setNEvents(numEntries);
     fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
     fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   }
 
   //fill more file level metadata
-  fileMetaDataPtr->setParents(m_parents);
-  const char* release = getenv("BELLE2_RELEASE");
-  if (!release) release = "unknown";
+  fileMetaDataPtr->setParents(m_parentLfns);
   string site;
+  char date[100];
+  auto now = time(0);
+  strftime(date, 100, "%Y-%m-%d %H:%M:%S", gmtime(&now));
   const char* belle2_site = getenv("BELLE2_SITE");
   if (belle2_site) {
     site = belle2_site;
@@ -247,9 +250,11 @@ void RootOutputModule::fillFileMetaData()
   if (!user) user = getenv("USER");
   if (!user) user = getlogin();
   if (!user) user = "unknown";
-  fileMetaDataPtr->setCreationData(release, time(0), site, user);
-  fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
+  const char* release = getenv("BELLE2_RELEASE");
+  if (!release) release = "unknown";
+  fileMetaDataPtr->setCreationData(date, site, user, release);
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
+  fileMetaDataPtr->setMcEvents(InputController::mcEvents());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {
@@ -281,7 +286,7 @@ void RootOutputModule::terminate()
   for (int jj = 0; jj < DataStore::c_NDurabilityTypes; jj++) {
     m_entries[jj].clear();
   }
-  m_parents.clear();
+  m_parentLfns.clear();
 
   B2DEBUG(200, "terminate() finished");
 }

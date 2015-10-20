@@ -30,7 +30,7 @@ using namespace Belle2;
 using namespace boost::python;
 
 
-FileMetaData updateFileMetaData(const std::string& fileName, int id, const std::string& guid, const std::string& lfn, int logFile)
+FileMetaData updateFileMetaData(const std::string& fileName, const std::string& lfn)
 {
   // open the root file
   TFile* file = TFile::Open(fileName.c_str(), "UPDATE");
@@ -59,7 +59,7 @@ FileMetaData updateFileMetaData(const std::string& fileName, int id, const std::
   }
 
   // update the IDs and write the updated FileMetaData to the file
-  fileMetaData->setIds(id, guid, lfn, logFile);
+  fileMetaData->setLfn(lfn);
   if (newTree) {
     newTree->Fill();
     newTree->Write();

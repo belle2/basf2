@@ -127,8 +127,6 @@ void RootInputModule::initialize()
   }
 
   if (m_parentLevel > 0) {
-    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-    FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
     createParentStoreEntries();
   } else if (m_parentLevel < 0) {
     B2ERROR("parentLevel must be >= 0!");
@@ -178,7 +176,6 @@ void RootInputModule::terminate()
   }
   m_storeEntries.clear();
   m_persistentStoreEntries.clear();
-  m_currentParent.clear();
   m_parentStoreEntries.clear();
   m_parentTrees.clear();
 }
@@ -223,14 +220,13 @@ void RootInputModule::readTree()
   // with ill results for Mergeable objects.)
   // GetTreeNumber() also starts at the last entry before we read the first event from m_tree,
   // so we'll save the last persistent tree loaded and only reload on changes.
+  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   const long treeNum = m_tree->GetTreeNumber();
   const bool fileChanged = (m_lastPersistentEntry != treeNum);
   if (fileChanged) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
-    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-    FileCatalog::Instance().getParentMetaData(m_parentLevel, 0, *fileMetaData, m_parentMetaData);
-    m_currentParent.resize(0);
+    B2INFO("New input file:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {
@@ -247,6 +243,9 @@ void RootInputModule::readTree()
     if (!readParentTrees())
       B2FATAL("Could not read data from parent file!");
   }
+
+  const StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData->setParentLfn(fileMetaData->getLfn());
 }
 
 
@@ -316,59 +315,55 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 
 bool RootInputModule::createParentStoreEntries()
 {
-  StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
-  long experiment = fileMetaData->getExperimentLow();
-  long run = fileMetaData->getRunLow();
-  long event = fileMetaData->getEventLow();
+  // get the experiment/run/event number and parentLfn of the first entry
+  TBranch* branch = m_tree->GetBranch("EventMetaData");
+  char* address = branch->GetAddress();
+  EventMetaData* eventMetaData = 0;
+  branch->SetAddress(&eventMetaData);
+  branch->GetEntry(0);
+  int experiment = eventMetaData->getExperiment();
+  int run = eventMetaData->getRun();
+  unsigned int event = eventMetaData->getEvent();
+  std::string parentLfn = eventMetaData->getParentLfn();
+  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
+  branch->SetAddress(address);
 
   // loop over parents and get their metadata
-  FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
   for (int level = 0; level < m_parentLevel; level++) {
-    bool parentFound = false;
-    for (unsigned int iParent = 0; iParent < parentMetaData->size(); iParent++) {
-      FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
 
-      // pick a parent that contains the given event
-      if (metaData.containsEvent(experiment, run, event)) {
-        TDirectory* dir = gDirectory;
-        TFile* file = TFile::Open(metaData.getLfn().c_str(), "READ");
-        dir->cd();
-        if (!file || !file->IsOpen()) {
-          B2ERROR("Couldn't open parent file " << metaData.getLfn());
-          continue;
-        }
-
-        // get the event tree and connect its branches
-        TTree* tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
-        if (!tree) {
-          B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << metaData.getLfn());
-          continue;
-        }
-        if (int(m_parentStoreEntries.size()) <= level) {
-          m_parentStoreEntries.resize(level + 1);
-          connectBranches(tree, DataStore::c_Event, &m_parentStoreEntries[level]);
-        }
-        if (int(m_currentParent.size()) <= level) m_currentParent.resize(level + 1);
-        m_currentParent[level] = iParent;
-        m_parentTrees.insert(std::make_pair(metaData.getId(), tree));
-
-        // get the persistent tree and read its branches
-        TTree* persistent = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Persistent].c_str()));
-        if (!persistent) {
-          B2ERROR("No tree " << c_treeNames[DataStore::c_Persistent] << " found in " << metaData.getLfn());
-        } else {
-          connectBranches(persistent, DataStore::c_Persistent, 0);
-        }
-
-        parentFound = true;
-        parentMetaData = &((*parentMetaData)[iParent].parents);
-        break;
-      }
-    }
-    if (!parentFound) {
-      B2ERROR("Failed to connect parent file at level " << level);
+    // open the parent file
+    TDirectory* dir = gDirectory;
+    TFile* file = TFile::Open(parentPfn.c_str(), "READ");
+    dir->cd();
+    if (!file || !file->IsOpen()) {
+      B2ERROR("Couldn't open parent file " << parentPfn);
       return false;
     }
+
+    // get the event tree and connect its branches
+    TTree* tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
+    if (!tree) {
+      B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << parentPfn);
+      return false;
+    }
+    if (int(m_parentStoreEntries.size()) <= level)  m_parentStoreEntries.resize(level + 1);
+    connectBranches(tree, DataStore::c_Event, &m_parentStoreEntries[level]);
+    m_parentTrees.insert(std::make_pair(parentLfn, tree));
+
+    // get the persistent tree and read its branches
+    TTree* persistent = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Persistent].c_str()));
+    if (!persistent) {
+      B2ERROR("No tree " << c_treeNames[DataStore::c_Persistent] << " found in " << parentPfn);
+      return false;
+    }
+    connectBranches(persistent, DataStore::c_Persistent, 0);
+
+    // get parent LFN of parent
+    EventMetaData* metaData = 0;
+    tree->SetBranchAddress("EventMetaData", &metaData);
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    tree->GetBranch("EventMetaData")->GetEntry(entry);
+    parentLfn = metaData->getParentLfn();
   }
 
   return true;
@@ -378,89 +373,55 @@ bool RootInputModule::createParentStoreEntries()
 bool RootInputModule::readParentTrees()
 {
   const StoreObjPtr<EventMetaData> eventMetaData;
-  long experiment = eventMetaData->getExperiment();
-  long run = eventMetaData->getRun();
-  long event = eventMetaData->getEvent();
-  long entry = -1;
+  int experiment = eventMetaData->getExperiment();
+  int run = eventMetaData->getRun();
+  unsigned int event = eventMetaData->getEvent();
 
-  const FileCatalog::ParentMetaData* parentMetaData = &m_parentMetaData;
+  std::string parentLfn = eventMetaData->getParentLfn();
+  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
   for (int level = 0; level < m_parentLevel; level++) {
 
-    // check whether the current parent tree contains the current event
+    // Open the parent file if we haven't done this already
     TTree* tree = 0;
-    if (int(m_currentParent.size()) > level) {
-      int iParent = m_currentParent[level];
-      if (iParent < 0) {
-        B2ERROR("Failed to get parent data");
+    if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
+      TDirectory* dir = gDirectory;
+      B2DEBUG(50, "Opening parent file: " << parentPfn);
+      TFile* file = TFile::Open(parentPfn.c_str(), "READ");
+      dir->cd();
+      if (!file || !file->IsOpen()) {
+        B2ERROR("Couldn't open parent file " << parentPfn);
         return false;
       }
-      const FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
-      tree = m_parentTrees[metaData.getId()];
-      entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
-      if (entry != -1) {
-        parentMetaData = &((*parentMetaData)[iParent].parents);
-      } else {
-        tree = 0;
+      tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
+      if (!tree) {
+        B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << parentPfn);
+        return false;
       }
+      for (auto entry : m_parentStoreEntries[level]) {
+        tree->SetBranchAddress(entry->name.c_str(), &(entry->object));
+      }
+      m_parentTrees.insert(std::make_pair(parentLfn, tree));
+    } else {
+      tree = m_parentTrees[parentLfn];
     }
 
-    // if the current tree does not contain the current event, loop over parents and find the one that does
-    if (!tree) {
-      m_currentParent.resize(level + 1);
-      m_currentParent[level] = -1;
-      for (int iParent = 0; iParent < int(parentMetaData->size()); iParent++) {
-        if (iParent == m_currentParent[level]) continue;
-        const FileMetaData& metaData = (*parentMetaData)[iParent].metaData;
-
-        // only consider parents who can contain the current event according to their metadata
-        if (metaData.containsEvent(experiment, run, event)) {
-
-          // check whether the parent tree is already open, otherwise load it
-          if (m_parentTrees.find(metaData.getId()) != m_parentTrees.end()) {
-            tree = m_parentTrees[metaData.getId()];
-          } else {
-            TDirectory* dir = gDirectory;
-            TFile* file = TFile::Open(metaData.getLfn().c_str(), "READ");
-            dir->cd();
-            if (!file || !file->IsOpen()) {
-              B2ERROR("Couldn't open parent file " << metaData.getLfn());
-              continue;
-            }
-            tree = dynamic_cast<TTree*>(file->Get(c_treeNames[DataStore::c_Event].c_str()));
-            if (!tree) {
-              B2ERROR("No tree " << c_treeNames[DataStore::c_Event] << " found in " << metaData.getLfn());
-              continue;
-            }
-            m_parentTrees.insert(std::make_pair(metaData.getId(), tree));
-          }
-
-          // if the tree does contain the current event, connect its branches and exit parents loop
-          entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
-          if (entry != -1) {
-            for (auto entry : m_parentStoreEntries[level]) {
-              tree->SetBranchAddress(entry->name.c_str(), &(entry->object));
-            }
-            parentMetaData = &((*parentMetaData)[iParent].parents);
-            m_currentParent[level] = iParent;
-            break;
-          } else {
-            tree = 0;
-          }
-        }
-      }
-    }
-
-    // check whether we found a parent tree
-    if (!tree) {
-      B2ERROR("Failed to get parent data");
+    // get entry number in parent tree
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    if (entry < 0) {
+      B2ERROR("No event " << experiment << "/" << run << "/" << event << " in parent file " << parentPfn);
       return false;
     }
 
     // read the tree and mark the data read in the data store
+    EventMetaData* parentMetaData = 0;
+    tree->SetBranchAddress("EventMetaData", &parentMetaData);
     tree->GetEntry(entry);
     for (auto entry : m_parentStoreEntries[level]) {
       entry->ptr = entry->object;
     }
+
+    // set the parent LFN to the next level
+    parentLfn = parentMetaData->getParentLfn();
   }
 
   return true;

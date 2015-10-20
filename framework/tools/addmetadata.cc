@@ -32,10 +32,7 @@ int main(int argc, char* argv[])
   options.add_options()
   ("help,h", "print all available options")
   ("file", prog::value<string>(), "file name")
-  ("id,i", prog::value<int>(), "unique identifier")
-  ("guid,g", prog::value<string>(), "GUID")
   ("lfn,l", prog::value<string>(), "logical file name")
-  ("logfile,f", prog::value<int>(), "unique identifier of log file")
   ;
 
   prog::positional_options_description posOptDesc;
@@ -54,7 +51,7 @@ int main(int argc, char* argv[])
   }
 
   // check parameters
-  for (auto param : {"file", "id", "guid", "lfn"}) {
+  for (auto param : {"file", "lfn"}) {
     if (!varMap.count(param)) {
       B2ERROR("The " << param << " parameter is missing.");
       return 1;
@@ -63,13 +60,7 @@ int main(int argc, char* argv[])
 
   // read parameters
   string fileName = varMap["file"].as<string>();
-  int id = varMap["id"].as<int>();
-  string guid = varMap["guid"].as<string>();
   string lfn = varMap["lfn"].as<string>();
-  int logFile = 0;
-  if (varMap.count("logfile")) {
-    logFile = varMap["logfile"].as<int>();
-  }
 
   // open the root file
   gErrorIgnoreLevel = kError;
@@ -99,7 +90,7 @@ int main(int argc, char* argv[])
   }
 
   // update the IDs and write the updated FileMetaData to the file
-  fileMetaData->setIds(id, guid, lfn, logFile);
+  fileMetaData->setLfn(lfn);
   if (newTree) {
     newTree->Fill();
     newTree->Write(newTree->GetName(), TObject::kWriteDelete);

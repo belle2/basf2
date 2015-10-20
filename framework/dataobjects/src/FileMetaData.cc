@@ -24,13 +24,13 @@ using namespace Belle2;
 using namespace boost::python;
 
 FileMetaData::FileMetaData() :
-  m_id(0), m_guid(""), m_lfn(""), m_events(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
-  m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_release(""), m_timeStamp(0), m_site(""), m_user(""), m_logFile(0),
-  m_randomSeed(""), m_steering("")
+  m_lfn(""), m_nEvents(0), m_experimentLow(0), m_runLow(0), m_eventLow(0),
+  m_experimentHigh(0), m_runHigh(0), m_eventHigh(0), m_date(""), m_site(""), m_user(""), m_release(""),
+  m_steering(""), m_mcEvents(0)
 {
 }
 
-bool FileMetaData::containsEvent(unsigned long experiment, unsigned long run, unsigned long event) const
+bool FileMetaData::containsEvent(int experiment, int run, unsigned int event) const
 {
   if (experiment < m_experimentLow) return false;
   if (experiment == m_experimentLow) {
@@ -48,10 +48,8 @@ bool FileMetaData::containsEvent(unsigned long experiment, unsigned long run, un
 void FileMetaData::exposePythonAPI()
 {
   class_<FileMetaData>("FileMetaData")
-  .def("get_id", &FileMetaData::getId)
-  .def("get_guid", &FileMetaData::getGuid)
   .def("get_lfn", &FileMetaData::getLfn)
-  .def("get_events", &FileMetaData::getEvents)
+  .def("get_nevents", &FileMetaData::getNEvents)
   .def("get_experiment_low", &FileMetaData::getExperimentLow)
   .def("get_run_low", &FileMetaData::getRunLow)
   .def("get_event_low", &FileMetaData::getEventLow)
@@ -60,14 +58,13 @@ void FileMetaData::exposePythonAPI()
   .def("get_event_high", &FileMetaData::getEventHigh)
   .def("get_n_parents", &FileMetaData::getNParents)
   .def("get_parent", &FileMetaData::getParent)
-  .def("get_release", &FileMetaData::getRelease)
-  .def("get_timestamp", &FileMetaData::getTimeStamp)
+  .def("get_date", &FileMetaData::getDate)
   .def("get_site", &FileMetaData::getSite)
   .def("get_user", &FileMetaData::getUser)
-  .def("get_logfile", &FileMetaData::getLogFile)
-  .def("get_random_seed", &FileMetaData::getRandomSeed)
+  .def("get_release", &FileMetaData::getRelease)
   .def("get_steering", &FileMetaData::getSteering)
-  .def("set_ids", &FileMetaData::setIds);
+  .def("get_mc_events", &FileMetaData::getMcEvents)
+  .def("set_lfn", &FileMetaData::setLfn);
 }
 
 void FileMetaData::Print(Option_t* option) const
@@ -79,97 +76,91 @@ void FileMetaData::Print(Option_t* option) const
 
   bool all = (option && (strcmp(option, "all") == 0));
   cout << "FileMetaData" << endl;
-  cout << "  ID     : " << m_id << endl;
   cout << "  LFN    : " << m_lfn << endl;
-  if (all)
-    cout << "  GUID   : " << m_guid << endl;
-  cout << "  #event : " << m_events << endl;
+  cout << "  #event : " << m_nEvents << endl;
   cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow << " - "  << m_experimentHigh << "/" << m_runHigh
        << "/" << m_eventHigh << endl;
   cout << "  parents:";
-  for (int parent : m_parents) cout << " " << parent;
+  for (std::string parent : m_parentLfns) cout << " " << parent;
   cout << endl;
   if (all) {
-    cout << "  release: " << m_release << endl;
-    cout << "  time   : " << m_timeStamp << endl;
+    cout << "  date   : " << m_date << endl;
     cout << "  site   : " << m_site << endl;
     cout << "  user   : " << m_user << endl;
-    cout << "  log    : " << m_logFile << endl;
-    cout << "  seed   : " << m_randomSeed << endl;
+    cout << "  release: " << m_release << endl;
+    cout << "  #MC    : " << m_mcEvents << endl;
   }
 }
 
-namespace Belle2 {
+bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
+{
+  physicalFileName = "";
+  if (input.eof()) return false;
 
-  std::istream& operator>> (std::istream& input, FileMetaData& metaData)
-  {
-    metaData = FileMetaData();
-    if (input.eof()) return input;
+  std::string line;
+  std::getline(input, line);
+  boost::algorithm::trim(line);
+  if (line.compare("<File>") != 0) return false;
 
-    std::string line;
+  while (!input.eof()) {
     std::getline(input, line);
     boost::algorithm::trim(line);
-    if (line.compare("<File>") != 0) return input;
+    if (line.compare("</File>") == 0) return true;
 
-    while (!input.eof()) {
-      std::getline(input, line);
-      boost::algorithm::trim(line);
-      if (line.compare("</File>") == 0) return input;
-
-      int pos = line.find(">") + 1;
-      std::string tag = line.substr(0, pos);
-      std::string value = line.substr(pos, line.rfind("<") - pos);
-      if (tag.compare("<ID>") == 0) {
-        metaData.m_id = stoi(value);
-      } else if (tag.compare("<LFN>") == 0) {
-        metaData.m_lfn = value;
-      } else if (tag.compare("<ExperimentLow>") == 0) {
-        metaData.m_experimentLow = stoi(value);
-      } else if (tag.compare("<RunLow>") == 0) {
-        metaData.m_runLow = stoi(value);
-      } else if (tag.compare("<EventLow>") == 0) {
-        metaData.m_eventLow = stoi(value);
-      } else if (tag.compare("<ExperimentHigh>") == 0) {
-        metaData.m_experimentHigh = stoi(value);
-      } else if (tag.compare("<RunHigh>") == 0) {
-        metaData.m_runHigh = stoi(value);
-      } else if (tag.compare("<EventHigh>") == 0) {
-        metaData.m_eventHigh = stoi(value);
-      } else if (tag.compare("<Parents>") == 0) {
+    int pos = line.find(">") + 1;
+    std::string tag = line.substr(0, pos);
+    std::string value = line.substr(pos, line.rfind("<") - pos);
+    if (tag.compare("<LFN>") == 0) {
+      m_lfn = value;
+    } else if (tag.compare("<PFN>") == 0) {
+      physicalFileName = value;
+    } else if (tag.compare("<ExperimentLow>") == 0) {
+      m_experimentLow = stoi(value);
+    } else if (tag.compare("<RunLow>") == 0) {
+      m_runLow = stoi(value);
+    } else if (tag.compare("<EventLow>") == 0) {
+      m_eventLow = stoi(value);
+    } else if (tag.compare("<ExperimentHigh>") == 0) {
+      m_experimentHigh = stoi(value);
+    } else if (tag.compare("<RunHigh>") == 0) {
+      m_runHigh = stoi(value);
+    } else if (tag.compare("<EventHigh>") == 0) {
+      m_eventHigh = stoi(value);
+    } else if (tag.compare("<Parents>") == 0) {
+      pos = value.find(",");
+      while (pos > 0) {
+        m_parentLfns.push_back(value.substr(0, pos));
+        value.erase(0, pos + 1);
         pos = value.find(",");
-        while (pos > 0) {
-          metaData.m_parents.push_back(stoi(value.substr(0, pos)));
-          value.erase(0, pos + 1);
-          pos = value.find(",");
-        }
-        metaData.m_parents.push_back(stoi(value));
       }
+      m_parentLfns.push_back(value);
     }
-
-    return input;
   }
 
-  std::ostream& operator<< (std::ostream& output, const FileMetaData& metaData)
-  {
-    output << "  <File>\n";
-    output << "    <ID>" << metaData.m_id << "</ID>\n";
-    output << "    <LFN>" << metaData.m_lfn << "</LFN>\n";
-    output << "    <ExperimentLow>" << metaData.m_experimentLow << "</ExperimentLow>\n";
-    output << "    <RunLow>" << metaData.m_runLow << "</RunLow>\n";
-    output << "    <EventLow>" << metaData.m_eventLow << "</EventLow>\n";
-    output << "    <ExperimentHigh>" << metaData.m_experimentHigh << "</ExperimentHigh>\n";
-    output << "    <RunHigh>" << metaData.m_runHigh << "</RunHigh>\n";
-    output << "    <EventHigh>" << metaData.m_eventHigh << "</EventHigh>\n";
-    if (!metaData.m_parents.empty()) {
-      output << "    <Parents>" << metaData.m_parents[0];
-      for (unsigned int parent = 1; parent < metaData.m_parents.size(); parent++) {
-        output << "," << metaData.m_parents[parent];
-      }
-      output << "</Parents>\n";
-    }
-    output << "  </File>\n";
+  return false;
+}
 
-    return output;
+bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
+{
+  output << "  <File>\n";
+  output << "    <LFN>" << m_lfn << "</LFN>\n";
+  if (!physicalFileName.empty()) {
+    output << "    <PFN>" << physicalFileName << "</PFN>\n";
   }
+  output << "    <ExperimentLow>" << m_experimentLow << "</ExperimentLow>\n";
+  output << "    <RunLow>" << m_runLow << "</RunLow>\n";
+  output << "    <EventLow>" << m_eventLow << "</EventLow>\n";
+  output << "    <ExperimentHigh>" << m_experimentHigh << "</ExperimentHigh>\n";
+  output << "    <RunHigh>" << m_runHigh << "</RunHigh>\n";
+  output << "    <EventHigh>" << m_eventHigh << "</EventHigh>\n";
+  if (!m_parentLfns.empty()) {
+    output << "    <Parents>" << m_parentLfns[0];
+    for (unsigned int parent = 1; parent < m_parentLfns.size(); parent++) {
+      output << "," << m_parentLfns[parent];
+    }
+    output << "</Parents>\n";
+  }
+  output << "  </File>\n";
 
+  return true;
 }

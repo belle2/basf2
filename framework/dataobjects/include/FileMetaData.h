@@ -30,45 +30,37 @@ namespace Belle2 {
      */
     FileMetaData();
 
-    /** Unique identifier getter.
-     */
-    int getId() const {return m_id;}
-
-    /** Grid unique identifier getter.
-     */
-    std::string getGuid() const {return m_guid;}
-
     /** Logical file name getter.
      */
     std::string getLfn() const {return m_lfn;}
 
     /** Number of events getter.
      */
-    unsigned long getEvents() const {return m_events;}
+    int getNEvents() const {return m_nEvents;}
 
     /** Lowest experiment number getter.
      */
-    unsigned long getExperimentLow() const {return m_experimentLow;}
+    int getExperimentLow() const {return m_experimentLow;}
 
     /** Lowest run number getter.
      */
-    unsigned long getRunLow() const {return m_runLow;}
+    int getRunLow() const {return m_runLow;}
 
     /** Lowest event number in lowest run getter.
      */
-    unsigned long getEventLow() const {return m_eventLow;}
+    unsigned int getEventLow() const {return m_eventLow;}
 
     /** Highest experiment number getter.
      */
-    unsigned long getExperimentHigh() const {return m_experimentHigh;}
+    int getExperimentHigh() const {return m_experimentHigh;}
 
     /** Highest run number getter.
      */
-    unsigned long getRunHigh() const {return m_runHigh;}
+    int getRunHigh() const {return m_runHigh;}
 
     /** Highest event number in highest run getter.
      */
-    unsigned long getEventHigh() const {return m_eventHigh;}
+    unsigned int getEventHigh() const {return m_eventHigh;}
 
     /** Check whether the given event is in the covered range of events.
      *
@@ -76,25 +68,21 @@ namespace Belle2 {
      *  @param run The run number of the event.
      *  @param event The event number of the event.
      */
-    bool containsEvent(unsigned long experiment, unsigned long run, unsigned long event) const;
+    bool containsEvent(int experiment, int run, unsigned int event) const;
 
     /** Get number of parent files.
      */
-    int getNParents() const {return m_parents.size();}
+    int getNParents() const {return m_parentLfns.size();}
 
-    /** Get unique identifier of parent file.
+    /** Get LFN of parent file.
      *
      *  @param iParent The number of the parent file.
      */
-    int getParent(int iParent) const {return m_parents[iParent];}
-
-    /** Software release version getter.
-     */
-    std::string getRelease() const {return m_release;}
+    std::string getParent(int iParent) const {return m_parentLfns[iParent];}
 
     /** File creation date and time getter.
      */
-    time_t getTimeStamp() const {return m_timeStamp;}
+    std::string getDate() const {return m_date;}
 
     /** Site where the file was created getter.
      */
@@ -104,23 +92,29 @@ namespace Belle2 {
      */
     std::string getUser() const {return m_user;}
 
-    /** Unique identifier of log file getter.
+    /** Software release version getter.
      */
-    int getLogFile() const {return m_logFile;}
-
-    /** Random seed getter.
-     */
-    std::string getRandomSeed() const {return m_randomSeed;}
+    std::string getRelease() const {return m_release;}
 
     /** Steering file content getter.
      */
     std::string getSteering() const {return m_steering;}
 
+    /** Number of geerated events getter.
+     */
+    int getMcEvents() const {return m_mcEvents;}
+
+    /** Setter for LFN.
+      *
+      *  @param lfn The logical file name.
+      */
+    void setLfn(const std::string& lfn) {m_lfn = lfn;}
+
     /** Number of events setter.
      *
-     *  @param events The number of events.
+     *  @param nEvents The number of events.
      */
-    void setEvents(unsigned long events) {m_events = events;}
+    void setNEvents(int nEvents) {m_nEvents = nEvents;}
 
     /** Lowest experiment, run and event number setter.
      *
@@ -128,7 +122,7 @@ namespace Belle2 {
      *  @param run The lowest run number.
      *  @param event The lowest event number of the lowest run.
      */
-    void setLow(unsigned long experiment, unsigned long run, unsigned long event) {m_experimentLow = experiment; m_runLow = run; m_eventLow = event;}
+    void setLow(int experiment, int run, unsigned int event) {m_experimentLow = experiment; m_runLow = run; m_eventLow = event;}
 
     /** Highest experiment, run and event number setter.
      *
@@ -136,46 +130,35 @@ namespace Belle2 {
      *  @param run The highest run number.
      *  @param event The highest event number of the highest run.
      */
-    void setHigh(unsigned long experiment, unsigned long run, unsigned long event) {m_experimentHigh = experiment; m_runHigh = run; m_eventHigh = event;}
+    void setHigh(int experiment, int run, unsigned int event) {m_experimentHigh = experiment; m_runHigh = run; m_eventHigh = event;}
 
     /** Parents setter.
      *
      *  @param parents The vector of parent IDs.
      */
-    void setParents(const std::vector<int>& parents) {m_parents = parents;}
+    void setParents(const std::vector<std::string>& parents) {m_parentLfns = parents;}
 
     /** Creation data setter.
      *
-     *  @param release The software release.
-     *  @param timeStamp The creation date and time.
+     *  @param date The creation date and time.
      *  @param site The site where the file was created.
      *  @param user The user who created the file.
+     *  @param release The software release.
      */
-    void setCreationData(const std::string& release, time_t timeStamp, const std::string& site, const std::string& user)
-    {m_release = release; m_timeStamp = timeStamp; m_site = site; m_user = user;}
-
-    /** Setter for IDs.
-      *
-      *  @param id The unique identifier.
-      *  @param guid The grid unique identifier.
-      *  @param lfn The logical file name.
-      *  @param logFile The ID of the log file.
-      */
-    void setIds(int id, const std::string& guid, const std::string& lfn, int logFile = 0)
-    {m_id = id; m_guid = guid; m_lfn = lfn; m_logFile = logFile;}
-
-    /** Random seed and number generator setter.
-     *
-     *  @param seed The random seed.
-     *  @param random The random number generator object.
-     */
-    void setRandomSeed(const std::string& seed) {m_randomSeed = seed;}
+    void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release)
+    {m_date = date; m_site = site; m_user = user; m_release = release;}
 
     /** Steering file content setter.
      *
      *  @param steering The content of the steering file.
      */
     void setSteering(const std::string& steering) {m_steering = steering;}
+
+    /** Number of generated events setter.
+     *
+     *  @param nEvents The number of generated events.
+     */
+    void setMcEvents(int nEvents) {m_mcEvents = nEvents;}
 
     /**
      * Exposes methods of the FileMateData class to Python.
@@ -188,29 +171,23 @@ namespace Belle2 {
      */
     virtual void Print(Option_t* option = "") const;
 
-    /** Input stream operator for reading file meta data from the file catalog in xml format.
+    /** Read file meta data in xml format from the input stream.
      *
      *  @param input The input stream.
-     *  @param metaData The FileMetaData object.
+     *  @param physicalFileName The physical file name. Will be set on return.
+     *  @return True if metadata could be read
      */
-    friend std::istream& operator>> (std::istream& input, FileMetaData& metaData);
+    bool read(std::istream& input, std::string& physicalFileName);
 
-    /** Output stream operator for writing file meta data to the file catalog in xml format.
+    /** Write file meta data in xml format to the output stream.
      *
      *  @param output The output stream.
-     *  @param metaData The FileMetaData object.
+     *  @param physicalFileName The physical file name.
+     *  @return True if metadata could be written
      */
-    friend std::ostream& operator<< (std::ostream& output, const FileMetaData& metaData);
+    bool write(std::ostream& output, std::string physicalFileName);
 
   private:
-
-    /** Unique identifier.
-     */
-    int m_id;
-
-    /** Grid unique identifier.
-     */
-    std::string m_guid;
 
     /** Logical file name.
      */
@@ -218,43 +195,39 @@ namespace Belle2 {
 
     /** Number of events.
      */
-    unsigned long m_events;
+    int m_nEvents;
 
     /** Lowest experiment number.
      */
-    unsigned long m_experimentLow;
+    int m_experimentLow;
 
     /** Lowest run number.
      */
-    unsigned long m_runLow;
+    int m_runLow;
 
     /** Lowest event number in lowest run.
      */
-    unsigned long m_eventLow;
+    unsigned int m_eventLow;
 
     /** Highest experiment number.
      */
-    unsigned long m_experimentHigh;
+    int m_experimentHigh;
 
     /** Highest run number.
      */
-    unsigned long m_runHigh;
+    int m_runHigh;
 
     /** Highest event number in highest run.
      */
-    unsigned long m_eventHigh;
+    unsigned int m_eventHigh;
 
-    /** Unique identifiers of parent files.
+    /** LFNs of parent files.
      */
-    std::vector<int> m_parents;
-
-    /** Software release version.
-     */
-    std::string m_release;
+    std::vector<std::string> m_parentLfns;
 
     /** File creation date and time.
      */
-    time_t m_timeStamp;
+    std::string m_date;
 
     /** Site where the file was created.
      */
@@ -264,19 +237,19 @@ namespace Belle2 {
      */
     std::string m_user;
 
-    /** Unique identifier of log file.
+    /** Software release version.
      */
-    int m_logFile;
-
-    /** The random seed.
-     */
-    std::string m_randomSeed;
+    std::string m_release;
 
     /** The steering file content.
      */
     std::string m_steering;
 
-    ClassDef(FileMetaData, 4); /**< Metadata information about a file. */
+    /** Number of generated events, 0 for real data.
+     */
+    int m_mcEvents;
+
+    ClassDef(FileMetaData, 5); /**< Metadata information about a file. */
 
   }; //class
 

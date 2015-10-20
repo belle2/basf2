@@ -68,6 +68,7 @@ namespace Belle2 {
     unsigned long m_skipNEvents; /**< Skip this number of events before starting. */
     unsigned long m_eventsToSkip; /**< counter that starts at m_skipNEvents. */
     int m_colIndex;  /**< The current index for the exp and run lists. */
+    int m_production;  /** The production number. */
 
     std::vector<int> m_expList;      /**< The list (column) of experiments. */
     std::vector<int> m_runList;      /**< The list (column) of runs. */

@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
   options.add_options()
   ("help,h", "print all available options")
   ("file,f", prog::value<string>(), "local file name")
-  ("id,i", prog::value<int>(), "unique identifier")
   ("lfn,l", prog::value<string>(), "logical file name")
   ("all,a", "print all information")
   ("steering,s", "print steering file contents")
@@ -79,14 +78,9 @@ int main(int argc, char* argv[])
     branch->SetAddress(&metaDataPtr);
     tree->GetEntry(0);
 
-  } else if (varMap.count("id")) {
-    if (!FileCatalog::Instance().getMetaData(varMap["id"].as<int>(), metaData)) {
-      B2ERROR("No meta data found in file catalog for ID " << varMap["id"].as<int>());
-      return 1;
-    }
-
   } else if (varMap.count("lfn")) {
-    if (!FileCatalog::Instance().getMetaData(varMap["lfn"].as<string>(), metaData)) {
+    std::string lfn = varMap["lfn"].as<string>();
+    if (!FileCatalog::Instance().getMetaData(lfn, metaData)) {
       B2ERROR("No meta data found in file catalog for LFN " << varMap["lfn"].as<int>());
       return 1;
     }

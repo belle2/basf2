@@ -78,12 +78,11 @@ bool FileCatalog::readCatalog(FileCatalog::FileMap& fileMap)
   std::ifstream file(m_fileName.c_str());
   if (!file.is_open()) return false;
 
-  FileMetaData entry;
-
   try {
     while (!file.eof()) {
-      file >> entry;
-      if (entry.getId() != 0) fileMap.insert(FileMap::value_type(entry.getId(), entry));
+      FileMetaData entry;
+      std::string physicalFileName;
+      if (entry.read(file, physicalFileName)) fileMap[entry.getLfn()] = std::make_pair(physicalFileName, entry);
     }
   } catch (std::exception& e) {
     B2ERROR("Errors occured while reading " << m_fileName <<
@@ -102,7 +101,7 @@ bool FileCatalog::writeCatalog(const FileCatalog::FileMap& fileMap)
 
   file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   file << "<FileCatalog>\n";
-  for (auto entry : fileMap) file << entry.second;
+  for (auto entry : fileMap) entry.second.second.write(file, entry.second.first);
   file << "</FileCatalog>\n";
 
   return true;
@@ -127,27 +126,23 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
     return false;
   }
 
-  // use absolute path and next negative integer number as ID for the meta data
+  // use absolute path as LFN if it is not set
   fileName = fs::absolute(fileName, fs::initial_path<fs::path>()).c_str();
-  int id = fileMap.begin()->first - 1;
-  if (metaData.getId() == 0) {
-    metaData.setIds(id, "", fileName);
-  } else {
-    metaData.setIds(metaData.getId(), metaData.getGuid(), fileName);
+  if (metaData.getLfn().empty()) {
+    metaData.setLfn(fileName);
   }
 
   // check whether a file with this name is already registered
   for (auto entry : fileMap) {
-    if (fileName.compare(entry.second.getLfn()) == 0) {
-      if (metaData.getId() <= 0) B2WARNING("A file " << fileName << " is already registered in with ID " << entry.first <<
-                                             " and will be overwritten in the catalog.");
+    if (fileName.compare(entry.second.second.getLfn()) == 0) {
+      B2WARNING("A file " << fileName << " is already registered and will be overwritten in the catalog.");
       fileMap.erase(entry.first);
       break;
     }
   }
 
   // add the new entry and write the file catalog
-  fileMap.insert(FileMap::value_type(id, metaData));
+  fileMap[metaData.getLfn()] = std::make_pair(fileName, metaData);
   if (!writeCatalog(fileMap)) {
     B2ERROR("Failed to write file catalog " << m_fileName);
     return false;
@@ -157,35 +152,7 @@ bool FileCatalog::registerFile(std::string fileName, FileMetaData& metaData)
 }
 
 
-bool FileCatalog::getMetaData(int id, FileMetaData& metaData)
-{
-  metaData = FileMetaData();
-  if (m_fileName.empty()) return false;
-
-  // get lock for read access to file catalog
-  FileSystem::Lock lock(m_fileName);
-  if (!lock.lock()) {
-    B2ERROR("Locking of file catalog " << m_fileName << " failed.");
-    return false;
-  }
-
-  // read the file catalog
-  FileMap fileMap;
-  if (!readCatalog(fileMap)) {
-    B2ERROR("Failed to read file catalog " << m_fileName);
-    return false;
-  }
-
-  // find the entry with given ID
-  auto iterator = fileMap.find(id);
-  if (iterator == fileMap.end()) return false;
-  metaData = iterator->second;
-
-  return true;
-}
-
-
-bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
+bool FileCatalog::getMetaData(std::string& fileName, FileMetaData& metaData)
 {
   metaData = FileMetaData();
   if (m_fileName.empty()) return false;
@@ -205,9 +172,15 @@ bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
   }
 
   // find the entry with given LFN
+  auto iEntry = fileMap.find(fileName);
+  if (iEntry != fileMap.end()) {
+    metaData = iEntry->second.second;
+    if (!iEntry->second.first.empty()) fileName = iEntry->second.first;
+    return true;
+  }
   for (auto entry : fileMap) {
-    if (lfn.compare(entry.second.getLfn()) == 0) {
-      metaData = entry.second;
+    if (fileName.compare(entry.second.first) == 0) {
+      metaData = entry.second.second;
       return true;
     }
   }
@@ -216,55 +189,13 @@ bool FileCatalog::getMetaData(std::string lfn, FileMetaData& metaData)
 }
 
 
-bool FileCatalog::getParents(const FileMap& fileMap, int level, const FileMetaData& metaData, ParentMetaData& parentMetaData)
+std::string FileCatalog::getPhysicalFileName(std::string lfn)
 {
-  // loop over parents and get their meatdata from the catalog
-  for (int iParent = 0; iParent < metaData.getNParents(); iParent++) {
-    int parentID = metaData.getParent(iParent);
-    auto iterator = fileMap.find(parentID);
-    if (iterator == fileMap.end()) {
-      B2ERROR("Parent file with ID " << parentID << " not found in the file catalog.");
-      return false;
-    }
-
-    // fill the parent meta data information and recursively call getParents to get the grandparents meatdata
-    parentMetaData.resize(parentMetaData.size() + 1);
-    ParentMetaDataEntry& entry = parentMetaData.back();
-    entry.metaData = iterator->second;
-    if (level > 0) {
-      if (!getParents(fileMap, level - 1, iterator->second, entry.parents)) return false;
-    }
+  std::string fileName = lfn;
+  FileMetaData metaData;
+  if (!getMetaData(fileName, metaData)) {
+    B2DEBUG(100, "No LFN " << lfn << " found in the file catalog.");
   }
-
-  return true;
+  return fileName;
 }
 
-bool FileCatalog::getParentMetaData(int level, int id, FileMetaData& metaData, ParentMetaData& parentMetaData)
-{
-  parentMetaData.resize(0);
-  if (level == 0) return true;
-
-  // get lock for read access to file catalog
-  FileSystem::Lock lock(m_fileName);
-  if (!lock.lock()) {
-    B2ERROR("Locking of file catalog " << m_fileName << " failed.");
-    return false;
-  }
-
-  // read the file catalog
-  FileMap fileMap;
-  if (!readCatalog(fileMap)) {
-    B2ERROR("Failed to read file catalog " << m_fileName);
-    return false;
-  }
-
-  // if no metadata given search for entry in catalog
-  if ((metaData.getNParents() == 0) && (metaData.getId() == 0)) {
-    auto iterator = fileMap.find(id);
-    if (iterator == fileMap.end()) return false;
-    metaData = iterator->second;
-  }
-
-  // now get the parent metadata information
-  return getParents(fileMap, level, metaData, parentMetaData);
-}

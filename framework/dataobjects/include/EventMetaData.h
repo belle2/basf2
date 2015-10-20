@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck, Andreas Moll                                *
+ * Contributors: Martin Heck, Andreas Moll, Thomas Kuhr                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    explicit EventMetaData(unsigned long event = 0, unsigned long run = 0, unsigned long experiment = 0);
+    explicit EventMetaData(unsigned int event = 0, int run = 0, int experiment = 0);
 
     /** Destructor. */
     ~EventMetaData() {}
@@ -39,7 +39,7 @@ namespace Belle2 {
      *
      *  @param event The current event number.
      */
-    void setEvent(unsigned long event)
+    void setEvent(unsigned int event)
     {
       m_event = event;
     }
@@ -48,7 +48,7 @@ namespace Belle2 {
      *
      *  @param run The number of the current run.
      */
-    void setRun(unsigned long run)
+    void setRun(int run)
     {
       m_run = run;
     }
@@ -57,7 +57,7 @@ namespace Belle2 {
      *
      *  @param subrun The number of the current sub run.
      */
-    void setSubrun(unsigned long subrun)
+    void setSubrun(int subrun)
     {
       m_subrun = subrun;
     }
@@ -66,9 +66,18 @@ namespace Belle2 {
      *
      *  @param experiment The number of the current experiment.
      */
-    void setExperiment(unsigned long experiment)
+    void setExperiment(int experiment)
     {
       m_experiment = experiment;
+    }
+
+    /** Production Setter.
+     *
+     *  @param production The integer identifier of the production.
+     */
+    void setProduction(int production)
+    {
+      m_production = production;
     }
 
     /** Time Setter.
@@ -95,13 +104,13 @@ namespace Belle2 {
     /** is end-of-data set? (see setEndOfData()). */
     bool isEndOfData() const;
 
-    /** Parent Index Setter.
+    /** Parent LFN Setter.
      *
-     *  @param index The index of the current parent file.
+     *  @param parent The LFN of the current parent file.
      */
-    void setParentIndex(int index)
+    void setParentLfn(std::string parent)
     {
-      m_parent_index = index;
+      m_parentLfn = parent;
     }
 
     /** Generated Weight Setter.
@@ -110,25 +119,25 @@ namespace Belle2 {
      */
     void setGeneratedWeight(double weight)
     {
-      m_generated_weight = weight;
+      m_generatedWeight = weight;
     }
 
     /** Set Error Flag
      *
-     *   @param error_flag a bit flag for an error event.
+     *   @param errorFlag a bit flag for an error event.
      */
-    void setErrorFlag(unsigned int error_flag)
+    void setErrorFlag(unsigned int errorFlag)
     {
-      m_error_flag = error_flag;
+      m_errorFlag = errorFlag;
     }
 
     /** Add Error Flag
      *
-     *   @param error_flag a bit flag for an error event.
+     *   @param errorFlag a bit flag for an error event.
      */
-    void addErrorFlag(EventErrorFlag event_error_flag)
+    void addErrorFlag(EventErrorFlag errorFlag)
     {
-      m_error_flag |= event_error_flag;
+      m_errorFlag |= errorFlag;
     }
 
     /** Get error flag
@@ -137,14 +146,14 @@ namespace Belle2 {
      */
     unsigned int getErrorFlag() const
     {
-      return m_error_flag;
+      return m_errorFlag;
     }
 
     /** Event Getter.
      *
      *  @return The number of the current event.
      */
-    unsigned long getEvent() const
+    unsigned int getEvent() const
     {
       return m_event;
     }
@@ -153,7 +162,7 @@ namespace Belle2 {
      *
      *  @return The number of the current run.
      */
-    unsigned long getRun() const
+    int getRun() const
     {
       return m_run;
     }
@@ -163,7 +172,7 @@ namespace Belle2 {
      *  @return Sub-run number, increases indicate recovery from DAQ-internal trouble without
      *          change to detector constants. Not supposed to be used by offline analysis.
      */
-    unsigned long getSubrun() const
+    int getSubrun() const
     {
       return m_subrun;
     }
@@ -172,9 +181,18 @@ namespace Belle2 {
      *
      *  @return The number of the current experiment.
      */
-    unsigned long getExperiment() const
+    int getExperiment() const
     {
       return m_experiment;
+    }
+
+    /** Production Getter.
+     *
+     *  @return The number of the current production.
+     */
+    int getProduction() const
+    {
+      return m_production;
     }
 
     /** Time Getter.
@@ -186,11 +204,11 @@ namespace Belle2 {
       return m_time;
     }
 
-    /** Return index of the current parent file, or -1 if not set.
+    /** Return LFN of the current parent file, or an empty string if not set.
      */
-    int getParentIndex() const
+    std::string getParentLfn() const
     {
-      return m_parent_index;
+      return m_parentLfn;
     }
 
     /** Generated Weight Getter.
@@ -199,7 +217,7 @@ namespace Belle2 {
      */
     double getGeneratedWeight() const
     {
-      return m_generated_weight;
+      return m_generatedWeight;
     }
 
     /** Comparison Operator.
@@ -219,24 +237,25 @@ namespace Belle2 {
 
   private:
 
-    unsigned long m_event; /**< Event number.  */
+    unsigned int m_event; /**< Event number.  */
 
-    unsigned long m_run; /**< Run number.  */
+    int m_run; /**< Run number.  */
 
-    unsigned long
-    m_subrun; /**< Sub-run number, increases indicate recovery from DAQ-internal trouble without change to detector constants. Not supposed to be used by offline analysis.  */
+    int m_subrun; /**< Sub-run number, increases indicate recovery from DAQ-internal trouble without change to detector constants. Not supposed to be used by offline analysis.  */
 
-    unsigned long m_experiment; /**< Experiment number.  */
+    int m_experiment; /**< Experiment number.  */
+
+    int m_production; /**< Unique identifier of the production of the event.  */
 
     unsigned long long int m_time; /**< Time in ns since epoch (1970-01-01).  */
 
-    int m_parent_index; /**< Index of parent file, or -1 if not set.  */
+    std::string m_parentLfn;  /** LFN of the parent file */
 
-    double m_generated_weight; /**< Generated weight.  */
+    double m_generatedWeight; /**< Generated weight.  */
 
-    unsigned int m_error_flag;  /**< Error flag.  */
+    unsigned int m_errorFlag;  /**< Error flag.  */
 
-    ClassDef(EventMetaData, 3); /**< Store event number, run number, and experiment number. */
+    ClassDef(EventMetaData, 4); /**< Store event number, run number, and experiment number. */
   }; //class
 } // namespace Belle2
 #endif // EVENTMETADATA

@@ -31,6 +31,6 @@ process(main)
 assert 0 == os.system('showmetadata ' + testFile.name)
 
 os.system('touch Belle2FileCatalog.xml')
-assert 0 == os.system('addmetadata --id 12345 --guid ABCD --lfn /logical/file/name --logfile 67890 ' + testFile.name)
+assert 0 == os.system('addmetadata --lfn /logical/file/name ' + testFile.name)
 
 assert 0 == os.system('showmetadata ' + testFile.name)

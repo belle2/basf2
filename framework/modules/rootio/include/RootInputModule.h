@@ -153,17 +153,11 @@ namespace Belle2 {
     /** Vector of DataStore entries of persistent durability that we are supposed to read in. */
     StoreEntries m_persistentStoreEntries;
 
-    /** Tree of parent metadata */
-    FileCatalog::ParentMetaData m_parentMetaData;
-
-    /** Index of the current parent per level */
-    std::vector<int> m_currentParent;
-
     /** The parent DataStore entries per level */
     std::vector<StoreEntries> m_parentStoreEntries;
 
-    /** Map of file IDs to trees */
-    std::map<int, TTree*> m_parentTrees;
+    /** Map of file LFNs to trees */
+    std::map<std::string, TTree*> m_parentTrees;
 
   };
 } // end namespace Belle2

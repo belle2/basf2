@@ -142,8 +142,8 @@ namespace Belle2 {
     /** Vector of DataStore entries that are written to the output. */
     std::vector<DataStore::StoreEntry*> m_entries[DataStore::c_NDurabilityTypes];
 
-    /** Vector of parent file IDs. */
-    std::vector<int> m_parents;
+    /** Vector of parent file LFNs. */
+    std::vector<std::string> m_parentLfns;
 
     /** Lowest experiment number.
      */

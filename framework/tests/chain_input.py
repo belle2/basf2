@@ -23,7 +23,7 @@ class TestModule(Module):
         prints PXD true and simhit indices, using relations
         """
         filemetadata = Belle2.PyStoreObj('FileMetaData', 1)
-        nevents = filemetadata.obj().getEvents()
+        nevents = filemetadata.obj().getNEvents()
         if self.iEvent < 12 and not nevents == 12:
             B2FATAL("FileMetaData from file 1 not loaded!")
         elif self.iEvent >= 12 and not nevents == 15:

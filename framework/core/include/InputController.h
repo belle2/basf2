@@ -82,6 +82,9 @@ namespace Belle2 {
     /** Set the loaded TChain (event durability). */
     static void setChain(const TChain* chain) { s_chain = chain; }
 
+    /** Accessor for number of generated events. */
+    static int& mcEvents() { return s_mcEvents; }
+
   private:
     InputController() { }
     ~InputController() { }
@@ -113,6 +116,9 @@ namespace Belle2 {
 
     /** Opened TChain (event durability). */
     static const TChain* s_chain;
+
+    /** counter for number of generated events. */
+    static int s_mcEvents;
   };
 }
 #endif

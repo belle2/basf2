@@ -11,6 +11,8 @@
 #include <framework/modules/eventinfo/EventInfoSetterModule.h>
 
 #include <framework/core/Environment.h>
+#include <framework/core/InputController.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #include <chrono>
 #include <set>
@@ -33,6 +35,8 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
   m_evtNumber = 0;
   m_eventsToSkip = 0;
   m_colIndex = 0;
+  m_production = 0;
+  if (getenv("BELLE2_PRODUCTION")) m_production = stoi(getenv("BELLE2_PRODUCTION"));
 
   //Set module properties
   setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so. Note that all experiment/run combinations specified must be unique");
@@ -131,11 +135,13 @@ void EventInfoSetterModule::event()
   }
 
   m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setProduction(m_production);
   m_eventMetaDataPtr->setExperiment(m_expList[m_colIndex]);
   m_eventMetaDataPtr->setRun(m_runList[m_colIndex]);
   m_eventMetaDataPtr->setEvent(m_evtNumber);
   auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
   m_eventMetaDataPtr->setTime(std::chrono::duration_cast<std::chrono::nanoseconds>(time).count());
 
+  InputController::mcEvents()++;
   m_evtNumber++;
 }

@@ -35,7 +35,7 @@ namespace Belle2 {
     /** We need a virtual destr */
     virtual ~MeasurementCreatorFactory() { }
 
-    /** Use the parameters given to the module and create the measurement creators from them */
+    /** Use the parameters given to the module and create the measurement creators from them. */
     void initialize()
     {
       for (const auto& creatorWithParameterDictionary : m_creatorsWithParametersDictionary) {
@@ -58,7 +58,7 @@ namespace Belle2 {
       }
     }
 
-    /** Overload this method to create the measurement creators by their name */
+    /** Overload this method to create the measurement creators by their name. */
     virtual BaseMeasurementCreatorType* createMeasurementCreatorFromName(const std::string& creatorName) const = 0;
 
     /** Return the creators to the module */
@@ -67,14 +67,14 @@ namespace Belle2 {
       return m_measurementCreators;
     }
 
-    /** Return a reference to the parameters you can use in the module */
+    /** Return a reference to the parameters you can use in the module. */
     std::map<std::string, std::map<std::string, std::string>>& getParameters()
     {
       return m_creatorsWithParametersDictionary;
     }
 
   private:
-    /** A vector with the measurement creators. Is filled in initialize */
+    /** A vector with the measurement creators. Is filled in initialize. */
     std::vector<std::unique_ptr<BaseMeasurementCreatorType>> m_measurementCreators;
 
     /** The map of dictionaries of the parameters. Fill it with the module parameters. */

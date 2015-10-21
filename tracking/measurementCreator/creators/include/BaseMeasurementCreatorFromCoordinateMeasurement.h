@@ -22,12 +22,12 @@ namespace Belle2 {
   class BaseMeasurementCreatorFromCoordinateMeasurement : public BaseMeasurementCreatorFromHit<HitType, detector> {
   public:
 
-    /** Needs the genfit MeasurementFactory for this */
+    /** Needs the genfit MeasurementFactory for this. */
     explicit BaseMeasurementCreatorFromCoordinateMeasurement(const genfit::MeasurementFactory<genfit::AbsMeasurement>&
                                                              measurementFactory) :
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 
-    /** Create measurements based on coordinate measurements */
+    /** Create measurements based on coordinate measurements. */
     std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
                                                              const RecoHitInformation& recoHitInformation) const override
     {

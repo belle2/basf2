@@ -13,6 +13,7 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>
+#include <framework/gearbox/Const.h>
 #include <genfit/TrackPoint.h>
 #include <vector>
 
@@ -33,22 +34,22 @@ namespace Belle2 {
   template <class HitType, Const::EDetector detector>
   class BaseMeasurementCreatorFromHit : public BaseMeasurementCreator {
   public:
-    /** Creates a MeasurementCreator which handles the creation of measurements of a given kind **/
+    /** Creates a MeasurementCreator which handles the creation of measurements of a given kind. **/
     explicit BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreator(), m_measurementFactory(measurementFactory) {}
 
     /** Destructor **/
     virtual ~BaseMeasurementCreatorFromHit() { }
 
-    /** Overload this method to create measurement track points from a given hit **/
+    /** Overload this method to create measurement track points from a given hit. **/
     virtual std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
         const RecoHitInformation& recoHitInformation) const = 0;
 
   private:
-    /** A reference to the prefilled measurement factory */
+    /** A reference to the prefilled measurement factory. */
     const genfit::MeasurementFactory<genfit::AbsMeasurement>& m_measurementFactory;
 
-    /** We do not need this method in this overload */
+    /** We do not need this method in this overload. */
     std::vector<genfit::TrackPoint*> createMeasurementPoints(RecoTrack&) const override final
     {
       return {};
@@ -76,7 +77,7 @@ namespace Belle2 {
       return coordinateMeasurement;
     }
 
-    /** Helper: Create a TrackPoint from a measurement with a given RecoHitInformation */
+    /** Helper: Create a TrackPoint from a measurement with a given RecoHitInformation. */
     genfit::TrackPoint* createTrackPointWithRecoHitInformation(genfit::AbsMeasurement* coordinateMeasurement,
                                                                RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation) const
     {

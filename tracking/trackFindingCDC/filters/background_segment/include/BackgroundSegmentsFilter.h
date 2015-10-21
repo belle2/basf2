@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segment/AdvancedRecoSegment2DVarSet.h>
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentTruthVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -21,36 +21,20 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Class that computes floating point variables from a segment.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
-     */
-    class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
-
-    public:
-      /// Construct the peeler and take an optional prefix.
-      explicit BackgroundSegmentTruthVarSet(const std::string& prefix = "") : CDCRecoSegment2DTruthVarSet(prefix) { }
-
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) override final
-      {
-        CDCRecoSegment2DTruthVarSet::extract(segment);
-
-        var<named("truth")>() = var<named("segment_is_fake_truth")>();
-        return true;
-      }
-    };
-
-
+    /// Base Filter for filtering out Background Segments, but rejects all segments.
     using BaseBackgroundSegmentsFilter = Filter<CDCRecoSegment2D>;
 
+    /// MC Filter for filtering out Background Segments.
     using MCBackgroundSegmentsFilter = MCFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
+    /// Recording Filter for filtering out Background Segments.
     using RecordingBackgroundSegmentsFilter =
       RecordingFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
 
+    /// Filter for filtering out Background Segments, but accepts all segments.
     using AllBackgroundSegmentsFilter = AllFilter<BaseBackgroundSegmentsFilter>;
 
+    /// TMVA Filter for filtering out Background Segments.
     using TMVABackgroundSegmentsFilter = TMVAFilter<AdvancedCDCRecoSegment2DVarSet>;
-
   }
 }

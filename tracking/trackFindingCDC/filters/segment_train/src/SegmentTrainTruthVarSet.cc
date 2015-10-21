@@ -9,10 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainTruthVarSet.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 
 #include <assert.h>
 

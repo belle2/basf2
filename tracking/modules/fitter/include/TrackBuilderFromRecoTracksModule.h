@@ -22,7 +22,7 @@ namespace Belle2 {
   class RecoTrack;
   class Track;
 
-  /** Create Belle2::Tracks from fitted RecoTracks */
+  /** Create Belle2::Tracks from fitted RecoTracks. */
   class TrackBuilderFromRecoTracksModule : public Module {
 
   public:
@@ -43,11 +43,11 @@ namespace Belle2 {
     void event() override;
 
   private:
-    std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input reco tracks */
-    std::string m_param_tracksStoreArrayName; /**< StoreArray name of the output belle tracks */
+    std::string m_param_recoTracksStoreArrayName; /**< StoreArray name of the input reco tracks. */
+    std::string m_param_tracksStoreArrayName; /**< StoreArray name of the output belle tracks. */
     std::string m_param_trackCandidatesStoreArrayName; /**< StoreArray name of the input track candidates related to the reco tracks. */
 
-    /** Create the related track fit result. If it can not be created, returns false */
+    /** Create the related track fit result. If it can not be created, returns false. */
     bool createTrackFitResult(const RecoTrack& recoTrack, Track& newBelleTrack, const genfit::AbsTrackRep* trackRep);
   };
 }

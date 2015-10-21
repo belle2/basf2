@@ -22,17 +22,17 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
 {
   setDescription("Converts the given genfit::TrackCands in the StoreArray to RecoTracks for further use in the fitter.");
 
-  addParam("TrackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName, "StoreArray name of the input track candidates.",
+  addParam("trackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName, "StoreArray name of the input track candidates.",
            std::string("TrackCands"));
-  addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the output reco tracks.",
            std::string("RecoTracks"));
-  addParam("RecoHitInformationStoreArrayName", m_param_recoHitInformationStoreArrayName,
+  addParam("recoHitInformationStoreArrayName", m_param_recoHitInformationStoreArrayName,
            "StoreArray name of the output reco hit information.", std::string("RecoHitInformations"));
 
-  addParam("CDCHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.", std::string("CDCHits"));
-  addParam("PXDHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.",
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.", std::string("CDCHits"));
+  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.",
            std::string("PXDClusters"));
-  addParam("SVDHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.",
+  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.",
            std::string("SVDClusters"));
 }
 

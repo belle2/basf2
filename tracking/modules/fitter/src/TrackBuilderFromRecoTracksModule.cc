@@ -27,14 +27,14 @@ TrackBuilderFromRecoTracksModule::TrackBuilderFromRecoTracksModule() :
 {
   setDescription("Create Belle::tracks from the given reco Tracks.");
 
-  addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            std::string("RecoTracks"));
 
-  addParam("TrackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName,
+  addParam("trackCandidatesStoreArrayName", m_param_trackCandidatesStoreArrayName,
            "StoreArray name of the input track candidates related to the reco tracks.",
            std::string("TrackCands"));
 
-  addParam("TracksStoreArrayName", m_param_tracksStoreArrayName, "StoreArray name of the output genfit::tracks.",
+  addParam("tracksStoreArrayName", m_param_tracksStoreArrayName, "StoreArray name of the output genfit::tracks.",
            std::string("Tracks"));
 
 }

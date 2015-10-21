@@ -17,6 +17,21 @@ namespace Belle2 {
     class CDCTrack;
   }
 
+  /**
+   * This module applies configurable correction functions to all found tracks.
+   *
+   * Typical correction functions include:
+   *   - Removal of hits after long breaks
+   *   - Removal of hits on the wrong side of the detector
+   *   - Splitting of curling tracks into two halves
+   *   - etc.
+   *
+   * See the TrackQualityTools for details on the specific functions.
+   *
+   * Mainly the corrections are applied to remove fakes and to make the tracks fitable with genfit (which fails mainly for low-momentum tracks).
+   * WARNING: Not all of the correction functions work well and the finding efficiency may be reduced strongly even when applying the correctly working
+   * functions! Handle with care ;-)
+   */
   class TrackQualityAsserterCDCModule: public TrackFinderCDCBaseModule {
 
   public:
@@ -25,11 +40,11 @@ namespace Belle2 {
       setDescription("Many tracks in the CDC can not be fitted. For fitting them, we remove parts of the hits or maybe the whole track.");
 
       addParam("corrections", m_param_corrections,
-               "The list of corrections to apply. Choose from LayerBreak, LargeAngle, OneSuperlayer, Small.",
+               "The list of corrections to apply. Choose from LayerBreak, LargeAngle, LargeBreak2, OneSuperlayer, Small, B2B, MoveToNextAxial, None, Split, and ArcLength2D.",
       {std::string("LayerBreak"), std::string("LargeAngle"), std::string("OneSuperlayer"), std::string("Small")});
 
       addParam("onlyNotFittedTracks", m_param_onlyNotFittedTracks,
-               "Flag to use the corrections only for not fitted tracks", false);
+               "Flag to apply the corrections only to not fitted tracks.", false);
     }
 
   private:
@@ -38,10 +53,10 @@ namespace Belle2 {
      */
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
-    /// The corrections to use
+    /// The corrections to use.
     std::vector<std::string> m_param_corrections;
 
-    /// Flag to use the corrections only for not fitted tracks
+    /// Flag to use the corrections only for not fitted tracks.
     bool m_param_onlyNotFittedTracks = false;
   };
 

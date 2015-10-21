@@ -16,7 +16,7 @@ namespace Belle2 {
 
   class GBLRecoFitterModule : public BaseRecoFitterModule {
   public:
-    /** Module for the GBL fitter */
+    /** Module for the GBL fitter. DO NOT USE THIS MODULE IN THE MOMENT! */
     GBLRecoFitterModule() : BaseRecoFitterModule()
     {
       setDescription("GBL Fitter using Genfit. If you have TrackCands, you have to convert them to RecoTracks"

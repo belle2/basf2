@@ -29,9 +29,10 @@ namespace Belle2 {
     explicit VXDMomentumEstimationMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
 
+    /** Desctructor. */
     virtual ~VXDMomentumEstimationMeasurementCreator() { }
 
-    /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not */
+    /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not. */
     void setParameter(const std::string& parameterName, const std::string& parameterValue) override
     {
       if (parameterName == "minimumMomentum") {
@@ -67,7 +68,7 @@ namespace Belle2 {
 
   protected:
     /**
-     * Create a measurement based on the momentum estimation given by the VXDMomentumEstimation class
+     * Create a measurement based on the momentum estimation given by the VXDMomentumEstimation class.
      */
     virtual std::vector<genfit::AbsMeasurement*> createMeasurementFromCoordinateMeasurement(HitType* hit,
         const RecoTrack& recoTrack, const RecoHitInformation&,
@@ -98,19 +99,19 @@ namespace Belle2 {
     }
 
   private:
-    /** Parameters for the main function */
+    /** Parameters for the main function. */
     typename VXDMomentumEstimation<HitType>::FitParameters m_fitParameters;
-    /** Parameters for the correction function. Set them to zero to not use a correction function */
+    /** Parameters for the correction function. Set them to zero to not use a correction function. */
     typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
-    /** Use the seeds of the track finder or the seeds of the MC particles */
+    /** Use the seeds of the track finder or the seeds of the MC particles. */
     bool m_useMCInformation = false;
-    /** Use the thickness of the clusters of the path length for estimating dX */
+    /** Use the thickness of the clusters of the path length for estimating dX. */
     bool m_useThickness = false;
-    /** Minimal value for the momentum below the estimation is used */
+    /** Minimal value for the momentum below the estimation is used. */
     double m_minimumMomentum = 0.1;
-    /** Sigma of the measurement */
+    /** Sigma of the measurement. */
     double m_sigma = 0.03;
-    /** Use the tracking seeds in the origin for calculating the path length rather than the current state*/
+    /** Use the tracking seeds in the origin for calculating the path length rather than the current state. */
     bool m_useTrackingSeeds = false;
   };
 }

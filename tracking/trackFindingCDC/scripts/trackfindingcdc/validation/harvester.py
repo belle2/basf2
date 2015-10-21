@@ -7,9 +7,12 @@ import numpy as np
 
 
 class ReconstructionPositionHarvester(HarvestingModule):
-    #: Harvester module to check for the reconstructed positions
+
+    """ Harvester module to check for the reconstructed positions """
 
     def __init__(self, output_file_name, tracks_store_vector_name="CDCTrackVector"):
+        """ Initiialize with the output file name of the root file and the store obj with the
+        CDCTrack vector to use. MC track cands are needed. """
         super(
             ReconstructionPositionHarvester,
             self).__init__(
@@ -19,7 +22,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp()
 
     def peel(self, track_cand):
-
+        """ Extract the information """
         mc_hit_lookup = self.mc_hit_lookup
         mc_hit_lookup.fill()
 
@@ -58,9 +61,15 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
 
 class WrongRLInfoCounter(HarvestingModule):
-    #: Harvester module to check for the reconstructed positions
+
+    """
+    Harvester module to check for the correct reconstructed orientation.
+    """
 
     def __init__(self, output_file_name, tracks_store_vector_name="TrackCands"):
+        """
+        Initialize with the root output file name and the store array name of the track cands to use.
+        """
         HarvestingModule.__init__(self,
                                   foreach=tracks_store_vector_name,
                                   output_file_name=output_file_name)
@@ -68,6 +77,7 @@ class WrongRLInfoCounter(HarvestingModule):
         self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp()
 
     def peel(self, track_cand):
+        """ Extract the information. """
         cdc_hits = Belle2.PyStoreArray("CDCHits")
 
         mc_hit_lookup = self.mc_hit_lookup
@@ -109,7 +119,13 @@ class WrongRLInfoCounter(HarvestingModule):
 
 
 class SegmentFakeRatesModule(HarvestingModule):
-    #: Harvesting module to check for basic matching information of the found segments
+
+    """
+    Harvesting module to check for basic matching information of the found segments.
+    If you want to have matching information, please use the MC matcher module to make all possible
+    combinations between legendre, local and MC track candidates.
+    Also, the Segments must be transformed into GF track cands.
+    """
 
     def __init__(
             self,
@@ -117,6 +133,15 @@ class SegmentFakeRatesModule(HarvestingModule):
             local_track_cands_store_array_name="LocalTrackCands",
             mc_track_cands_store_array_name="MCTrackCands",
             legendre_track_cand_store_array_name="LegendreTrackCands"):
+        """
+        Initialize the harvesting module with
+        Arguments
+        ---------
+          output_file_name Name of the root file
+          local_track_cands_store_array_name Name of the StoreArray for local track cands
+          mc_track_cands_store_array_name Name of the StoreArray for MC track cands
+          legendre_track_cand_store_array_name Name of the StoreArray for legendre track cands
+        """
         super(
             SegmentFakeRatesModule,
             self).__init__(
@@ -132,10 +157,12 @@ class SegmentFakeRatesModule(HarvestingModule):
             legendre_track_cand_store_array_name)
 
     def prepare(self):
+        """ Prepare the CDC lookup. """
         self.cdcHits = Belle2.PyStoreArray("CDCHits")
         return HarvestingModule.prepare(self)
 
     def peel(self, local_track_cand):
+        """ Extract the information from the segments. """
         mc_track_matcher_local = self.mc_track_matcher_local
         mc_track_matcher_legendre = self.mc_track_matcher_legendre
 
@@ -215,9 +242,16 @@ class SegmentFakeRatesModule(HarvestingModule):
 
 
 class SegmentFinderParameterExtractorModule(HarvestingModule):
-    #: Harvester module to extract momentum and position information from the found segments and tracks
+
+    """
+    Harvester module to extract momentum and position information from the found segments and tracks.
+    You need the apply MC track matcher module.
+    """
 
     def __init__(self, local_track_cands_store_array_name, mc_track_cands_store_array_name, output_file_name):
+        """ Init the harvester with the local track candidates StoreArray name and the one for MC track cands
+        and the output file name for the result root file.
+        """
         super(
             SegmentFinderParameterExtractorModule,
             self).__init__(
@@ -230,6 +264,7 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
                                                         self.foreach)
 
     def peel(self, local_track_cand):
+        """ Extract the information from the local track candidate. """
         mc_track_matcher = self.mc_track_matcher
 
         is_matched = mc_track_matcher.isMatchedPRTrackCand(local_track_cand)
@@ -280,12 +315,23 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
 
 class SeedsAnalyser(HarvestingModule):
 
+    """
+    Extract the momentum seeds of the first and the last hit of the track candidates (when use_vxd_hits is true),
+    the helx and the mc momentum.
+    """
+
     def __init__(self, output_file_name, track_cands, use_vxd_hits=True):
+        """
+        Init with the root output file name and the name of the store array of the track cands to use.
+        """
         HarvestingModule.__init__(self, foreach=track_cands, output_file_name=output_file_name)
 
         self.use_vxd_hits = use_vxd_hits
 
     def peel(self, legendre_track_cand):
+        """
+        Extract the information.
+        """
         if legendre_track_cand.getChargeSeed() > 0:
             helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), 1, 1.5)
         if legendre_track_cand.getChargeSeed() < 0:

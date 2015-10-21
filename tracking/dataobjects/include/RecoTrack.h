@@ -18,15 +18,19 @@
 
 #include <genfit/Track.h>
 
-#include <vector>
-#include <string>
-
 #include <framework/datastore/StoreArray.h>
 
-#include <framework/gearbox/Const.h>
+#include <algorithm>
+#include <functional>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 
 namespace genfit {
   class AbsFitter;
+  class TrackCand;
 }
 
 namespace Belle2 {

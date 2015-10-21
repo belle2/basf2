@@ -1,8 +1,11 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <genfit/AbsFitter.h>
 #include <genfit/RKTrackRep.h>
 #include <genfit/FitStatus.h>
+#include <genfit/TrackCand.h>
+#include <genfit/AbsFitter.h>
+
+#include <framework/gearbox/Const.h>
 
 #include <framework/dataobjects/Helix.h>
 

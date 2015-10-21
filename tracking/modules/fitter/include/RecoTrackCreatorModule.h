@@ -14,14 +14,14 @@
 
 namespace Belle2 {
 
-  /** Module turning trackCands to reco tracks (will be unneeded once we create reco tracks in the beginning) */
+  /** Module turning trackCands to reco tracks (will be unneeded once we create reco tracks from the beginning) */
   class RecoTrackCreatorModule : public Module {
 
   public:
-    /** Initilialize the module parameters */
+    /** Initilialize the module parameters. */
     RecoTrackCreatorModule();
 
-    /** Initialize the needed StoreArrays and ensure they are created properly */
+    /** Initialize the needed StoreArrays and ensure they are created properly. */
     void initialize() override;
 
     /** Loop over all track candidates and create a recotrack. */

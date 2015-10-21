@@ -1,4 +1,9 @@
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimationTools.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 

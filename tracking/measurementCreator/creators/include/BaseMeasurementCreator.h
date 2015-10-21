@@ -28,13 +28,13 @@ namespace Belle2 {
    */
   class BaseMeasurementCreator {
   public:
-    /** Creates a MeasurementCreator which handles the creation of track points with measurements of a given kind **/
+    /** Creates a MeasurementCreator which handles the creation of track points with measurements of a given kind. **/
     BaseMeasurementCreator() {}
 
-    /** Destructor **/
+    /** Destructor. **/
     virtual ~BaseMeasurementCreator() { }
 
-    /** Overload this method to create track points with measurements **/
+    /** Overload this method to create track points with measurements. **/
     virtual std::vector<genfit::TrackPoint*> createMeasurementPoints(RecoTrack& recoTrack) const = 0;
 
     /** Use this to set the parameters of the creator. Does nothing per default. */

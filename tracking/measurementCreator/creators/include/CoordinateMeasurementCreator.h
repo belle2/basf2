@@ -20,7 +20,7 @@ namespace Belle2 {
     explicit CoordinateMeasurementCreator(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       BaseMeasurementCreatorFromHit<HitType, detector>(measurementFactory) {}
 
-    /** Create measurements based on coordinate measurements */
+    /** Create measurements based on coordinate measurements. */
     std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
                                                              const RecoHitInformation& recoHitInformation) const override
     {
@@ -32,7 +32,7 @@ namespace Belle2 {
       return {trackPoint};
     }
 
-    /** Destructor */
+    /** Destructor. */
     virtual ~CoordinateMeasurementCreator() { }
   };
 }

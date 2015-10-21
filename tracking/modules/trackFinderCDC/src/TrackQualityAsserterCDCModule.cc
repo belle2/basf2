@@ -45,7 +45,6 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
     // Reset all hits to not have a background hit (what they should not have anyway)
     trackQualityTools.normalizeHitsAndResetTrajectory(track);
 
-
     for (const std::string& correctorFunction : m_param_corrections) {
       if (correctorFunction == "LayerBreak") {
         // GOOD

@@ -18,6 +18,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(WireHitTopologyPreparer);
 
 namespace {
+  /// Helper function
   bool maximalOneHitPerWire(StoreArray<CDCHit>& storedHits)
   {
     std::unordered_set<unsigned short> hitEWires;

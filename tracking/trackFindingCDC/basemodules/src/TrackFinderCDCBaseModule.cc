@@ -14,8 +14,11 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-//in type
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <algorithm>
+#include <framework/core/Module.h>
+#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 //out type
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>

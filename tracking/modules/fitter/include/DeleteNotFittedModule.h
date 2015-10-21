@@ -18,10 +18,11 @@ namespace Belle2 {
   class TrackFitResult;
 
   /**
-   * Copy all TrackCands with a TrackFitResult to the StoreArray
+   * Copy all TrackCands with a given condition (see the virtual function) to the StoreArray.
    *
    * Used the input StoreArray and copies all TrackCands from this array to the output StoreArray that have a related TrackFitResult.
-   *
+   * This module is just a base module - you have to provide the copyRecoTrack condition.
+   * This is typically used to copy all fitted or all not fitted tracks - therefore the name.
    */
   class BaseFilterFittedTracksModule : public Module {
 
@@ -32,12 +33,14 @@ namespace Belle2 {
      */
     BaseFilterFittedTracksModule();
 
-    /** Initialize the output StoreArray */
+    /** Initialize the output StoreArray. */
     void initialize() override;
 
     /** Copy the trackCands. */
     void event() override;
 
+    /** You have to provide this condition. It is called for every RecoTrack in the store array. If it returns true,
+     * the track gets copied into the new store array. */
     virtual bool copyRecoTrack(const RecoTrack& recoTrack) const = 0;
 
   private:
@@ -52,7 +55,9 @@ namespace Belle2 {
     std::string m_param_outputStoreArrayNameForRecoTracks;
   };
 
+  /** Implementation of the BaseFilterFittedTracksModule to copy all fitted tracks */
   class CopyFittedTracksModule : public BaseFilterFittedTracksModule {
+    /** Implementation */
     bool copyRecoTrack(const RecoTrack& recoTrack) const override
     {
       TrackFitResult* relatedTrackFitResult = recoTrack.getRelated<TrackFitResult>("TrackFitResults");
@@ -60,7 +65,9 @@ namespace Belle2 {
     }
   };
 
+  /** Implementation of the BaseFilterFittedTracksModule to copy all not fitted tracks */
   class CopyNotFittedTracksModule : public BaseFilterFittedTracksModule {
+    /** Implementation */
     bool copyRecoTrack(const RecoTrack& recoTrack) const override
     {
       TrackFitResult* relatedTrackFitResult = recoTrack.getRelated<TrackFitResult>("TrackFitResults");

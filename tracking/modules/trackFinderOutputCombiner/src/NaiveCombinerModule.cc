@@ -23,13 +23,13 @@ NaiveCombinerModule::NaiveCombinerModule() : TrackFinderCDCFromSegmentsModule()
   setDescription("Tries to combine the two outputs of two implementations of the track finder algorithm."
                  "Does so by just throwing everything together in one list (naive approach) or by using mc info (best approach)");
 
-  addParam("UseMCInformation",
+  addParam("useMCInformation",
            m_param_useMCInformation,
            "Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks.",
            false);
-  addParam("UseTakenFlagOfHits",
+  addParam("useTakenFlagOfHits",
            m_param_useTakenFlagOfHits,
-           "When adding the segments to the new store array, check if the hits are already taken by the tracks or not.",
+           "If yes (and not using MC information), copy only those hits of the segments to new tracks which are not already found by the Legendre track finder.",
            false);
 }
 

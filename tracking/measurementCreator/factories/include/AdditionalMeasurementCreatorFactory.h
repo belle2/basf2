@@ -20,11 +20,11 @@ namespace Belle2 {
     MeasurementCreatorFactory<BaseMeasurementCreator> {
 
   public:
-    /** Initialize */
+    /** Initialize. */
     AdditionalMeasurementCreatorFactory() : MeasurementCreatorFactory<BaseMeasurementCreator>()
     {}
 
-    /** No creator is implemented in the moment */
+    /** No creator is implemented in the moment. */
     BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const
     {
       return nullptr;

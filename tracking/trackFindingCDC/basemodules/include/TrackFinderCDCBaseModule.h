@@ -9,16 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <framework/core/Module.h>
+#include <string>
+#include <vector>
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
+  namespace TrackFindingCDC { class CDCTrack; }
 
   /// A base class for track finders in the CDC.
-  /** This module defines / handles
-   *  * the inputs and outputs to the DataStore and the respective StoreArray names,
-   *  * unpacking of the CDCHits and attaching of the geometry,
-   *  * Preparation of the Monte Carlo information.
+  /** This module defines / handles the inputs and outputs to the DataStore and the respective StoreArray names.
    */
   class TrackFinderCDCBaseModule : public Module {
   public:

@@ -21,12 +21,12 @@ namespace Belle2 {
 
   class RecoTrack;
 
-  /** A base class for all modules that implement a fitter for reco tracks */
+  /** A base class for all modules that implement a fitter for reco tracks. */
   class BaseRecoFitterModule : public Module {
 
   public:
     /**
-     * Constructor .
+     * Constructor.
      */
     BaseRecoFitterModule();
 
@@ -36,25 +36,25 @@ namespace Belle2 {
     void initialize() override;
 
     /**
-     * Do the fitting using the created fitter
+     * Do the fitting using the created fitter.
      */
     void event() override;
 
 
   protected:
     /**
-     * Method do create the used filter
+     * Method do create the used filter.
      * This method has to by implemented by the derived class
      * @return The fitter we will use for fitting.
      */
     virtual std::shared_ptr<genfit::AbsFitter> createFitter() const = 0;
 
   private:
-    /** StoreArray name of the input and output reco tracks */
+    /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName = "RecoTracks";
     /** Use this particle hypothesis for fitting. Please use the positive pdg code only. */
     unsigned int m_param_pdgCodeToUseForFitting = 211;
-    /** Resort the hits while fitting */
+    /** Resort the hits while fitting. */
     bool m_param_resortHits = false;
   };
 }

@@ -9,12 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
+    class SegmentInformation;
+
     /// Names of the variables to be generated.
     constexpr
     static char const* const segmentTrainTruthNames[2] = {

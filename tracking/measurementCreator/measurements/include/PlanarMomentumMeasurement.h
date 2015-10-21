@@ -24,10 +24,10 @@ namespace Belle2 {
   class PlanarMomentumMeasurement : public genfit::PlanarMeasurement {
 
   public:
-    /** Default contructor with 1 dim */
+    /** Default contructor with 1 dim. */
     PlanarMomentumMeasurement() : genfit::PlanarMeasurement(1) {}
 
-    /** Copy from other planar measurement and resize the hit coords to one dimension */
+    /** Copy from other planar measurement and resize the hit coords to one dimension. */
     explicit PlanarMomentumMeasurement(const genfit::PlanarMeasurement& parentElement) :
       genfit::PlanarMeasurement(parentElement)
     {
@@ -35,10 +35,10 @@ namespace Belle2 {
       rawHitCov_.ResizeTo(1, 1);
     }
 
-    /** Clone */
+    /** Clone. */
     virtual genfit::AbsMeasurement* clone() const override {return new PlanarMomentumMeasurement(*this);}
 
-    /** Construct the QP matrix */
+    /** Construct the QP matrix. */
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep* rep) const override
     {
       if (dynamic_cast<const genfit::RKTrackRep*>(rep) == nullptr) {

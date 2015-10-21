@@ -13,37 +13,44 @@
 
 
 namespace Belle2 {
-  /** Class doing the momentum estimation from dEdX for SVDClusters and PXDClusters */
+  /**
+   * Class doing the momentum estimation from dEdX for SVDClusters and PXDClusters.
+   * It uses a precompiled estimator function (given by the parameters FitParameters and CorrectionFitParameters
+   * and calculates the momentum estimation based on dEdX that get compiled from the ADC count and the path length of each given hit.
+   * For calculating the path length, some helix parameter must be used, than can for example come from the track fit.
+   *
+   * Template class for SVD or PXD clusters.
+   *  */
   template <class ClusterType>
   class VXDMomentumEstimation {
 
   private:
-    /** Do not copy or create */
+    /** Do not copy or create. */
     VXDMomentumEstimation() { }
-    /** Do not copy or create */
+    /** Do not copy or create. */
     VXDMomentumEstimation(const VXDMomentumEstimation&);
-    /** Do not copy or create */
+    /** Do not copy or create. */
     VXDMomentumEstimation& operator = (const VXDMomentumEstimation&);
 
   public:
-    /** Struct holding the parameters of the estimation function which maps dEdX to p */
+    /** Struct holding the parameters of the estimation function which maps dEdX to p. */
     struct FitParameters {
-      double aE = 1.080493149e+11;
-      double bE = -752991.2151;
-      double cE = 0.03636985211;
-      double dE = -3.020359066e-09;
+      double aE = 1.56173140e+07;
+      double bE = -9.89192780e+03;
+      double cE = 2.42177970e-02;
+      double dE = 2.65702553e-08;
     };
 
     /** Struct holding the parameters of the correction function to map them median of the estimation
      * function to 0.  */
     struct CorrectionFitParameters {
-      double aM = 41.21477882;
-      double bM = -2.650950176;
-      double cM = 0.05576940304;
-      double dM = -206.4416227;
+      double aM = 0;
+      double bM = 0;
+      double cM = 0;
+      double dM = 0;
     };
 
-    /** Use this class as a singleton */
+    /** Use this class as a singleton. */
     static const VXDMomentumEstimation& getInstance()
     {
       static VXDMomentumEstimation instance;

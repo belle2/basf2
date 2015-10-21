@@ -26,7 +26,23 @@ namespace Belle2 {
   }
 
   namespace TrackFindingCDC {
-    /// This module matches the found segments and the found tracks with a given filter.
+    /** Module for the combination of tracks and segments. Development edition.
+     *
+     * This module uses configurable filters to create matches between segments (from the local finder)
+     * and tracks (from the global finder). It also has capabilities to filter the remaining tracks for fakes
+     * and the remaining segments for new tracks/background.
+     *
+     * Use this module at the end of the path, after you have run the local and the global track finder.
+     *
+     * It uses several (filtering) steps, to do its job, namely:
+     *  1. Creation of a fast segment and track lookup.
+     *  2. First matching of segment and tracks that share one or more hits. \label{list-start}
+     *  3. Deletion of fake segments. \label{list-fakes}
+     *  4. Flagging of segments belonging to particles that probably can not be found by the global track finder (and can therefore not be matched).
+     *  5. Matching of the remaining segments with the tracks or among themselves and then with the tracks (not used in the following). \label{list-second}
+     *  6. Filtering of fake tracks in the made combinations.  \label{list-end}
+     *  7. Cleanup of the lookup cache.
+     */
     template < class SegmentTrackFilterFirstStep,
                class BackgroundSegmentFilter,
                class NewSegmentFilter,
@@ -50,7 +66,7 @@ namespace Belle2 {
         m_ptrSegmentInformationListTrackFilter(new SegmentInformationListTrackFilter),
         m_ptrTrackFilter(new TrackFilter) { }
 
-      /** Initialize the filter */
+      /** Initialize the filter. */
       void initialize() override
       {
         TrackFinderCDCFromSegmentsModule::initialize();
@@ -84,7 +100,7 @@ namespace Belle2 {
         }
       }
 
-      /** Terminate the filter */
+      /** Terminate the filter. */
       void terminate() override
       {
         TrackFinderCDCFromSegmentsModule::terminate();
@@ -120,7 +136,7 @@ namespace Belle2 {
 
     private:
       /**
-       * Try to combine the segments and the tracks
+       * Try to combine the segments and the tracks.
        */
       void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
@@ -213,29 +229,29 @@ namespace Belle2 {
       /// Object that handles the combination
       SegmentTrackCombiner m_combiner;
 
-      /// Reference to the chooser to be used for matching segments and tracks in the first step
+      /// Reference to the chooser to be used for matching segments and tracks in the first step.
       std::unique_ptr<SegmentTrackFilterFirstStep> m_ptrSegmentTrackFilterFirstStep;
 
-      /// Reference to the background segment filter
+      /// Reference to the background segment filter.
       std::unique_ptr<BackgroundSegmentFilter> m_ptrBackgroundSegmentFilter;
 
-      /// Reference to the new segment filter
+      /// Reference to the new segment filter.
       std::unique_ptr<NewSegmentFilter> m_ptrNewSegmentFilter;
 
-      /// Reference to the chooser to be used for matching segments and tracks in the second step
+      /// Reference to the chooser to be used for matching segments and tracks in the second step.
       std::unique_ptr<SegmentTrackFilterSecondStep> m_ptrSegmentTrackFilterSecondStep;
 
-      /// Reference to the filter to be used for construction segment trains
+      /// Reference to the filter to be used for construction segment trains.
       std::unique_ptr<SegmentTrainFilter> m_ptrSegmentTrainFilter;
 
-      /// Reference to the filter to be used to do an uniqe segment train <-> track matching
+      /// Reference to the filter to be used to do an uniqe segment train <-> track matching.
       std::unique_ptr<SegmentInformationListTrackFilter> m_ptrSegmentInformationListTrackFilter;
 
-      /// Reference to the filter to be used to filter out fake tracks
+      /// Reference to the filter to be used to filter out fake tracks.
       std::unique_ptr<TrackFilter> m_ptrTrackFilter;
     };
 
-    /// Do the combination work. See the SegmentTrackCombiner for more details.
+    /// Do the combination work. See the SegmentTrackCombiner methods for full details.
     template < class SegmentTrackFilterFirstStep,
                class BackgroundSegmentFilter,
                class NewSegmentFilter,

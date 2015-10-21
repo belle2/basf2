@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Base MC Filter
+    /// MC Filter Type using a VarSet and the truth variable in it.
     template<class ATruthVarSet>
     class MCFilter : public FilterOnVarSet<ATruthVarSet> {
 
@@ -26,6 +26,7 @@ namespace Belle2 {
       /// Constructor
       MCFilter() : Super() { }
 
+      /// Reject an item if the truth variable is 0, else accept it.
       virtual CellWeight operator()(const Object& object) override
       {
         Super::operator()(object);

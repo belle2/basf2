@@ -1,7 +1,9 @@
 #include <tracking/measurementCreator/measurements/HMatrixQP.h>
-#include <cassert>
-#include <alloca.h>
-#include <iostream>
+#include <TMatrixT.h>                   // for TMatrixT
+#include <TMatrixTSym.h>                // for TMatrixTSym
+#include <TVectorT.h>                   // for TVectorT
+#include <cassert>                      // for assert
+#include <iostream>                     // for operator<<, basic_ostream, etc
 
 using namespace genfit;
 

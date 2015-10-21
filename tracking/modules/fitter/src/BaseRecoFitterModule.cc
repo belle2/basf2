@@ -27,7 +27,7 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 {
   setDescription("Fit the given reco tracks with the given fitter parameters.");
 
-  addParam("RecoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            std::string("RecoTracks"));
 
   addParam("pdgCodeToUseForFitting", m_param_pdgCodeToUseForFitting,

@@ -10,37 +10,43 @@
 
 #pragma once
 
-#include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <tracking/vectorTools/B2Vector3.h>
+#include <TVector3.h>
+#include <framework/dataobjects/Helix.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <tracking/spacePointCreation/SpacePoint.h>
-
-#include <framework/dataobjects/Helix.h>
+#include <algorithm>
+#include <cmath>
+#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {
+  class SVDCluster;
+  class PXDCluster;
+
+  /** Tools needed for the VXD momentum estimation to, e.g. calculate the path length or properties of the hits. Can also be used for other things. */
   template <class ClusterType>
   class VXDMomentumEstimationTools {
 
   private:
+    /// Do not create this class.
     VXDMomentumEstimationTools() { }
+    /// Do not create this class.
     VXDMomentumEstimationTools(const VXDMomentumEstimationTools&);
+    /// Do not create this class.
     VXDMomentumEstimationTools& operator = (const VXDMomentumEstimationTools&);
 
   public:
-    /** Us this class as singleton */
+    /** Use this class as singleton. */
     static const VXDMomentumEstimationTools& getInstance()
     {
       static VXDMomentumEstimationTools instance;
       return instance;
     }
 
-    /** Main function: return dEdX for a cluster and the given momentum, position and charge seeds */
+    /** Main function: return dEdX for a cluster and the given momentum, position and charge seeds. */
     double getDEDX(const ClusterType& cluster, const TVector3& momentum, const TVector3& position, short charge) const
     {
 
@@ -51,7 +57,7 @@ namespace Belle2 {
       return calibratedCharge / pathLength;
     }
 
-    /** Return dEdX but not with dX = path length but with dX = thickness of cluster */
+    /** Return dEdX but not with dX = path length but with dX = thickness of cluster. */
     double getDEDXWithThickness(const ClusterType& cluster) const
     {
       const double calibratedCharge = getCalibratedCharge(cluster);
@@ -60,7 +66,7 @@ namespace Belle2 {
       return calibratedCharge / pathLength;
     }
 
-    /** Return the thickness of a cluster */
+    /** Return the thickness of a cluster. */
     double getThicknessOfCluster(const ClusterType& cluster) const
     {
       const VxdID&   vxdID = cluster.getSensorID();
@@ -68,7 +74,7 @@ namespace Belle2 {
       return sensorInfoBase.getThickness();
     }
 
-    /** Return the thickness of a cluster */
+    /** Return the thickness of a cluster. */
     double getWidthOfCluster(const ClusterType& cluster) const
     {
       const VxdID&   vxdID = cluster.getSensorID();
@@ -76,7 +82,7 @@ namespace Belle2 {
       return sensorInfoBase.getWidth();
     }
 
-    /** Return the thickness of a cluster */
+    /** Return the thickness of a cluster. */
     double getLengthOfCluster(const ClusterType& cluster) const
     {
       const VxdID&   vxdID = cluster.getSensorID();
@@ -84,7 +90,7 @@ namespace Belle2 {
       return sensorInfoBase.getLength();
     }
 
-    /** Returns the distance from the interaction point to the cluster in the r-phi-plane */
+    /** Returns the distance from the interaction point to the cluster in the r-phi-plane. */
     double getRadiusOfCluster(const ClusterType& cluster) const
     {
       const SpacePoint* spacePoint = cluster.template getRelated<SpacePoint>("SpacePoints");
@@ -103,7 +109,7 @@ namespace Belle2 {
       return radius;
     }
 
-    /** Return the layer of the cluster */
+    /** Return the layer of the cluster. */
     VxdID::baseType getLayerOfCluster(const ClusterType& cluster) const
     {
       VxdID vxdID = cluster.getSensorID();
@@ -111,7 +117,7 @@ namespace Belle2 {
       return layer;
     }
 
-    /** Return the ladder of the cluster */
+    /** Return the ladder of the cluster. */
     VxdID::baseType getLadderOfCluster(const ClusterType& cluster) const
     {
       VxdID vxdID = cluster.getSensorID();
@@ -119,7 +125,7 @@ namespace Belle2 {
       return ladder;
     }
 
-    /** Return the sensor number of the cluster */
+    /** Return the sensor number of the cluster. */
     VxdID::baseType getSensorNumberOfCluster(const ClusterType& cluster) const
     {
       VxdID vxdID = cluster.getSensorID();
@@ -127,7 +133,7 @@ namespace Belle2 {
       return sensorNumber;
     }
 
-    /** Return the segment number of the cluster */
+    /** Return the segment number of the cluster. */
     VxdID::baseType getSegmentNumberOfCluster(const ClusterType& cluster) const
     {
       VxdID vxdID = cluster.getSensorID();
@@ -206,32 +212,33 @@ namespace Belle2 {
     }
 
   private:
-    /** the layer positions in the case we do not have a SpacePoint we can look at */
+    /** the layer positions in the case we do not have a SpacePoint we can look at. */
     const double m_layerPositions[6] = {1.42, 2.18, 3.81, 8.0, 10.51, 13.51};
 
-    /** For SVD the calibration is 1, for PXD (see below) it is ~0.6 */
+    /** For SVD the calibration is 1, for PXD (see below) it is ~0.6. */
     double getCalibration() const
     {
       return 1;
     }
   };
 
+  /** We only need a calibration for the PXD Clusters. */
   template<>
   double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const;
 
-  /** We have to handle PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here. */
   template <>
   TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const;
 
-  /** We have to handle PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here. */
   template <>
   TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const;
 
-  /** We have to handle PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here. */
   template <>
   TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const;
 
-  /** We have to handle PXD and SVD differently here */
+  /** We have to handle PXD and SVD differently here. */
   template <>
   TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const;
 }

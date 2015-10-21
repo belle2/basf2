@@ -19,13 +19,13 @@ DAFRecoFitterModule::DAFRecoFitterModule() : BaseRecoFitterModule()
                  "using the RecoTrackCreatorModule first. After that, you probably want to add the measurements from the"
                  "hits using the MeasurementCreatorModule.");
 
-  addParam("ProbCut", m_param_probabilityCut,
+  addParam("probCut", m_param_probabilityCut,
            "Probability cut for the DAF. Any value between 0 and 1 is possible. Common values are between 0.01 and 0.001",
            double(0.001));
 
-  addParam("MinimumIterations", m_param_minimumIterations,
+  addParam("minimumIterations", m_param_minimumIterations,
            "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(2));
-  addParam("MaximumIterations", m_param_maximumIterations,
+  addParam("maximumIterations", m_param_maximumIterations,
            "Maximum number of iterations for the Kalman filter", static_cast<unsigned int>(4));
 
   addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,

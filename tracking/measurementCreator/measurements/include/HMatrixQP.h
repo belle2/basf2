@@ -10,7 +10,10 @@
 
 #pragma once
 
-#include <genfit/AbsHMatrix.h>
+#include <TMatrixDSymfwd.h>             // for TMatrixDSym
+#include <TMatrixDfwd.h>                // for TMatrixD
+#include <TVectorDfwd.h>                // for TVectorD
+#include <genfit/AbsHMatrix.h>          // for AbsHMatrix
 
 namespace Belle2 {
 
@@ -23,32 +26,31 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    /** Constructor. */
     HMatrixQP() {;}
 
-    /** Return the underlying matrix */
+    /** Return the underlying matrix. */
     const TMatrixD& getMatrix() const;
 
-    /** Calculate H * v = v_0 */
+    /** Calculate H * v = v_0. */
     TVectorD Hv(const TVectorD& v) const;
 
-    /** Calculate M * H^T = first column of M */
+    /** Calculate M * H^T = first column of M. */
     TMatrixD MHt(const TMatrixDSym& M) const;
 
-    /** Calculate M * H^T = first column of M */
+    /** Calculate M * H^T = first column of M. */
     TMatrixD MHt(const TMatrixD& M) const;
 
-    /** Calculate H * M * H^T = M_00 */
+    /** Calculate H * M * H^T = M_00. */
     void HMHt(TMatrixDSym& M) const;
 
-    /** Clone the matrix */
+    /** Clone the matrix. */
     virtual HMatrixQP* clone() const {return new HMatrixQP(*this);}
 
-    /** Check for equality.
-     * FIXME: Is this right???? */
-    virtual bool isEqual(const genfit::AbsHMatrix& other) const {return (dynamic_cast<const HMatrixQP*>(&other) != NULL);}
+    /** Check for equality. */
+    virtual bool isEqual(const genfit::AbsHMatrix& other) const {return (dynamic_cast<const HMatrixQP*>(&other) != nullptr);}
 
-    /** Print a symbol for the matrix for debugging */
+    /** Print a symbol for the matrix for debugging. */
     virtual void Print(const Option_t* = "") const;
   };
 

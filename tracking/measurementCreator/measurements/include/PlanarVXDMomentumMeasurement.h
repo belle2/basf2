@@ -21,7 +21,7 @@
 namespace Belle2 {
   /**
    * Measurement class implementing a planar hit geometry (1 or 2D) with a momentum measurement based on the VXD dEdX information
-   * with settable parameters (see VXDMomentumEstimationMeasurementCreator).
+   * with setable parameters (see VXDMomentumEstimationMeasurementCreator).
    */
   template <class HitType>
   class PlanarVXDMomentumMeasurement : public PlanarMomentumMeasurement {
@@ -37,80 +37,83 @@ namespace Belle2 {
       setDetId(getDetId());
     }
 
-    /** Clone the measurement */
+    /** Clone the measurement. */
     virtual genfit::AbsMeasurement* clone() const {return new PlanarVXDMomentumMeasurement(*this);}
 
-    /** Construct the measurement on the plane set in the parent element */
+    /** Construct the measurement on the plane set in the parent element. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
-    /** Set the correction fit parameters */
+    /** Set the correction fit parameters. */
     void setCorrectionFitParameters(const typename VXDMomentumEstimation<HitType>::CorrectionFitParameters& correctionFitParameters)
     {
       m_correctionFitParameters = correctionFitParameters;
     }
 
-    /** Set the measurement sigma */
+    /** Set the measurement sigma. */
     void setSigma(double sigma)
     {
       m_sigma = sigma;
     }
 
-    /** Set the fit parameters */
+    /** Set the fit parameters. */
     void setFitParameters(const typename VXDMomentumEstimation<HitType>::FitParameters& fitParameters)
     {
       m_fitParameters = fitParameters;
     }
 
-    /** Set whether to use mc information */
+    /** Set whether to use mc information. */
     void setUseMCInformation(bool useMCInformation)
     {
       m_useMCInformation = useMCInformation;
     }
 
-    /** Set whether to use the thickness */
+    /** Set whether to use the thickness. */
     void setUseThickness(bool useThickness)
     {
       m_useThickness = useThickness;
     }
 
-    /** Set whether to use tracking seeds not the current state */
+    /** Set whether to use tracking seeds not the current state. */
     void setUseTrackingSeeds(bool useTrackingSeeds)
     {
       m_useTrackingSeeds = useTrackingSeeds;
     }
 
-    /** Get the underlaying hit (cluster) */
+    /** Get the underlaying hit (cluster). */
     HitType* getHit() const
     {
       return m_hit;
     }
 
   private:
-    /** Parameters for the main function */
+    /** Parameters for the main function. */
     typename VXDMomentumEstimation<HitType>::FitParameters m_fitParameters;
-    /** Parameters for the correction function. Set them to zero to not use a correction function */
+    /** Parameters for the correction function. Set them to zero to not use a correction function. */
     typename VXDMomentumEstimation<HitType>::CorrectionFitParameters m_correctionFitParameters;
-    /** Use the thickness of the clusters of the path length for estimating dX */
+    /** Use the thickness of the clusters of the path length for estimating dX. */
     bool m_useThickness = false;
-    /** Use the seeds of the track finder or the seeds of the MC particles */
+    /** Use the seeds of the track finder or the seeds of the MC particles. */
     bool m_useMCInformation = true;
-    /** Use the tracking seeds in the origin for calculating the path length rather than the current state*/
+    /** Use the tracking seeds in the origin for calculating the path length rather than the current state. */
     bool m_useTrackingSeeds = false;
-    /** Value of the measurement sigma */
+    /** Value of the measurement sigma. */
     double m_sigma = 0.03;
 
-    /** Underlaying hit/cluster */
+    /** Underlaying hit/cluster. */
     HitType* m_hit = nullptr;
-    /** RecoTrack for which the hit is created */
+    /** RecoTrack for which the hit is created. */
     const RecoTrack* m_recoTrack = nullptr;
 
-    /// Return the detector ID
+    /// Return the detector ID.
     int getDetId() const
     {
       return -1;
     }
   };
 
+  /** Do the job: construct a measurement based on the estimator chosen by the parameters.
+   * TODO: Implement better error handling and a smarter cut.
+   */
   template <class HitType>
   std::vector<genfit::MeasurementOnPlane*> PlanarVXDMomentumMeasurement<HitType>::constructMeasurementsOnPlane(
     const genfit::StateOnPlane& state) const
@@ -189,14 +192,14 @@ namespace Belle2 {
     return {mop};
   }
 
-  /// Specialisation for PXD clusters
+  /// Specialisation for PXD clusters.
   template<>
   int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
   {
     return Belle2::Const::PXD;
   }
 
-  /// Specialisation for SVD clusters
+  /// Specialisation for SVD clusters.
   template<>
   int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
   {

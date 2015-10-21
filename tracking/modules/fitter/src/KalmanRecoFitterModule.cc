@@ -20,9 +20,9 @@ KalmanRecoFitterModule::KalmanRecoFitterModule() : BaseRecoFitterModule()
                  "using the RecoTrackCreatorModule first. After that, you probably want to add the measurements from the"
                  "hits using the MeasurementCreatorModule.");
 
-  addParam("MinimumIterations", m_param_minimumIterations,
+  addParam("minimumIterations", m_param_minimumIterations,
            "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(3));
-  addParam("MaximumIterations", m_param_maximumIterations,
+  addParam("maximumIterations", m_param_maximumIterations,
            "Maximum number of iterations for the Kalman filter", static_cast<unsigned int>(10));
 
   addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,

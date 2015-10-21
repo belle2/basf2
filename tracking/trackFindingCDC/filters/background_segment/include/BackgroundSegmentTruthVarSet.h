@@ -9,20 +9,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DTruthVarSet.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter type that accepts all items (just for reference).
-    template<class AType>
-    class AllFilter : public AType {
-    public:
-      /** Accept all items. */
-      virtual CellWeight operator()(const typename AType::Object&) override final
-      {
-        return 1;
-      }
+    class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
 
+    public:
+      /// Construct the peeler and take an optional prefix.
+      explicit BackgroundSegmentTruthVarSet(const std::string& prefix = "") : CDCRecoSegment2DTruthVarSet(prefix) { }
+
+      /// Generate and assign the variables from the cluster
+      virtual bool extract(const CDCRecoSegment2D* segment) override final
+      {
+        CDCRecoSegment2DTruthVarSet::extract(segment);
+
+        var<named("truth")>() = var<named("segment_is_fake_truth")>();
+        return true;
+      }
     };
   }
 }

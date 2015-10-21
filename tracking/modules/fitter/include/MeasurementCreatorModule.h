@@ -54,25 +54,25 @@ namespace Belle2 {
 
 
   private:
-    /** StoreArray name of the input and output reco tracks */
+    /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName;
-    /** The name of the store array for the cdc hits */
+    /** The name of the store array for the cdc hits. */
     std::string m_param_storeArrayNameOfCDCHits;
-    /** The name of the store array for the svd hits */
+    /** The name of the store array for the svd hits. */
     std::string m_param_storeArrayNameOfSVDHits;
-    /** The name of the store array for the pxd hits */
+    /** The name of the store array for the pxd hits. */
     std::string m_param_storeArrayNameOfPXDHits;
 
-    /** The measurement factory we will use */
+    /** The measurement factory we will use. */
     genfit::MeasurementFactory<genfit::AbsMeasurement> m_measurementFactory;
 
-    /** The factory for creating the measurement creators for cdc hits */
+    /** The factory for creating the measurement creators for cdc hits. */
     CDCMeasurementCreatorFactory m_cdcMeasurementCreatorFactory;
-    /** The factory for creating the measurement creators for svd hits */
+    /** The factory for creating the measurement creators for svd hits. */
     SVDMeasurementCreatorFactory m_svdMeasurementCreatorFactory;
-    /** The factory for creating the measurement creators for pxd hits */
+    /** The factory for creating the measurement creators for pxd hits. */
     PXDMeasurementCreatorFactory m_pxdMeasurementCreatorFactory;
-    /** The factory for creating the measurement creators which are not base on a hit type */
+    /** The factory for creating the measurement creators which are not base on a hit type. */
     AdditionalMeasurementCreatorFactory m_additionalMeasurementCreatorFactory;
 
     /**

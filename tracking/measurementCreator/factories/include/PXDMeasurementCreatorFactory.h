@@ -15,17 +15,17 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
-  /** Add all measurement creators related to PXD hits */
+  /** Add all measurement creators related to PXD hits. */
   class PXDMeasurementCreatorFactory : public
     MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>> {
 
   public:
-    /** Initialize with a measurement factory */
+    /** Initialize with a measurement factory. */
     explicit PXDMeasurementCreatorFactory(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory) :
       MeasurementCreatorFactory<BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>>(),
           m_measurementFactory(measurementFactory) {}
 
-    /** Only a simple reco hit creator and the momentum estimation is implemented in the moment */
+    /** Only a simple reco hit creator and the momentum estimation is implemented in the moment. */
     BaseMeasurementCreatorFromHit<RecoTrack::UsedPXDHit, Const::PXD>* createMeasurementCreatorFromName(
       const std::string& creatorName) const
     {
@@ -38,7 +38,7 @@ namespace Belle2 {
       return nullptr;
     }
   private:
-    /** A reference to the prefilled measurement factory */
+    /** A reference to the prefilled measurement factory. */
     const genfit::MeasurementFactory<genfit::AbsMeasurement>& m_measurementFactory;
   };
 }

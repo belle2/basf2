@@ -1064,6 +1064,11 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
       likelihoods[4] = 0; //no protons
       //Miss_likelihood should only be != 0 for tracks that do not pass the Chi_2 cut.
 
+      // in some cases the ex.XYZ_likelihood() < 0; Set it to 0 in these cases.
+      for (int i = 0; i < 5; i++)
+        if (likelihoods[i] < 0)
+          likelihoods[i] = 0;
+
       //note: discard_allzero = false since all likelihoods = 0 usually means that Junk_likelihood is 1
       //      PIDLikelihood::getProbability(hyp) will correctly return 0 then.
       setLikelihoods(pid, Const::KLM, likelihoods);

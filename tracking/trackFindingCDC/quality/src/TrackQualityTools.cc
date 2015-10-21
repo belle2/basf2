@@ -97,8 +97,11 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
 
   track.setEndTrajectory3D(track.getStartTrajectory3D());
 
+  const CDCTrajectory2D& startTrajectory = track.getStartTrajectory3D().getTrajectory2D();
+
   for (CDCRecoHit3D& recoHit : track) {
-    recoHit.setArcLength2D(currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D()));
+    // The 0.1 is to prevent hits "before" the first hit to be sorted at the end of the track.
+    recoHit.setArcLength2D(startTrajectory.calcArcLength2D(recoHit.getRecoPos2D()) + 0.1);
     recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }

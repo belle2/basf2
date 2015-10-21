@@ -80,9 +80,6 @@ V0FinderModule::V0FinderModule() : Module()
            30.);
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
-  addParam("v0Pdg", m_v0Pdg,
-           "Hypothesis used to reconstruct the V0.",
-           int(310));
 }
 
 
@@ -132,20 +129,6 @@ void V0FinderModule::initialize()
     genfit::FieldManager::getInstance()->init(new GFGeant4Field());
     genfit::FieldManager::getInstance()->useCache();
   }
-
-  m_v0Hypothesis = Const::ParticleType(m_v0Pdg);
-
-  if (m_v0Hypothesis == Const::Kshort) {
-    m_trackHypothesis = Const::pion;
-  } else if (m_v0Hypothesis == Const::photon) {
-    m_trackHypothesis = Const::electron;
-  } else {
-    B2ERROR("V0Hypothesis " << m_v0Pdg << " not supported yet, fallback to default.");
-    m_v0Pdg = 310;
-    m_trackHypothesis = Const::pion;
-  }
-  B2INFO("V0PDG: " << m_v0Hypothesis.getPDGCode());
-  B2INFO("TrackPDG:" << m_trackHypothesis.getPDGCode());
 }
 
 
@@ -176,15 +159,15 @@ void V0FinderModule::event()
   tracksMinus.reserve(nTracks);
 
   for (auto& track : tracks) {
-    const TrackFitResult* tfr = track.getTrackFitResult(m_trackHypothesis);
+    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
 
     if (!tfr) {
       B2WARNING("No TrackFitResult for track");
       continue;
     }
-    if (tfr->getParticleType() != m_trackHypothesis) {
+    if (tfr->getParticleType() != Const::pion) {
       B2DEBUG(99, "Requested TrackFitResult for pion, got something else");
-//      continue;  // this is commented out until we fit with different track hypothesis.
+      continue;
     }
 
     genfit::Track* gfTrack = tfr->getRelatedFrom<genfit::Track>(m_GFTrackColName);
@@ -292,18 +275,18 @@ void V0FinderModule::event()
         const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
         const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
-        if (fabs(tr0->getPdg()) != m_trackHypothesis.getPDGCode()
-            || fabs(tr1->getPdg()) != m_trackHypothesis.getPDGCode()) {
+        if (fabs(tr0->getPdg()) != Const::pion.getPDGCode()
+            || fabs(tr1->getPdg()) != Const::pion.getPDGCode()) {
           B2ERROR("Unsupported particle hypothesis in V0.");
           continue;
         }
 
         TLorentzVector lv0, lv1;
-        lv0.SetVectM(tr0->getMom(), m_trackHypothesis.getMass());
-        lv1.SetVectM(tr1->getMom(), m_trackHypothesis.getMass());
+        lv0.SetVectM(tr0->getMom(), Const::pionMass);
+        lv1.SetVectM(tr1->getMom(), Const::pionMass);
 
         const double mReco = (lv0 + lv1).M();
-        if (fabs(mReco - m_v0Hypothesis.getMass()) > m_massWindowKshortInside * Unit::MeV) {
+        if (fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
           B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
           continue;
         }
@@ -338,13 +321,13 @@ void V0FinderModule::event()
       TrackFitResult* tfrPlusVtx
         = trackFitResults.appendNew(stPlus.getPos(), stPlus.getMom(),
                                     stPlus.get6DCov(), stPlus.getCharge(),
-                                    m_trackHypothesis,
+                                    Const::pion,
                                     gfTrackPlus->getFitStatus()->getPVal(),
                                     Bz / 10., 0, 0);
       TrackFitResult* tfrMinusVtx
         = trackFitResults.appendNew(stMinus.getPos(), stMinus.getMom(),
                                     stMinus.get6DCov(), stMinus.getCharge(),
-                                    m_trackHypothesis,
+                                    Const::pion,
                                     gfTrackMinus->getFitStatus()->getPVal(),
                                     Bz / 10., 0, 0);
 

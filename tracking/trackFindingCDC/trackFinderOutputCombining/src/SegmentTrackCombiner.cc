@@ -27,16 +27,9 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
   // Mark the segments which are fully found by the legendre track finder as taken
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      bool oneHitDoesNotHaveTakenFlag = false;
+      const bool isFullyTaken = segment->getSegment()->isFullyTaken();
 
-      for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
-        if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
-          oneHitDoesNotHaveTakenFlag = true;
-          break;
-        }
-      }
-
-      if (not oneHitDoesNotHaveTakenFlag) {
+      if (isFullyTaken) {
         // Ensure that all hits belong to the same track!
         std::set<TrackInformation*> tracksWithHitsInCommon;
         for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
@@ -48,6 +41,13 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
 
         if (tracksWithHitsInCommon.size() == 1) {
           segment->getSegment()->getAutomatonCell().setTakenFlag();
+          for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
+            TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
+            if (trackWithHit != nullptr) {
+              trackWithHit->getTrackCand()->setHasMatchingSegment();
+              break;
+            }
+          }
         }
       }
     }
@@ -324,20 +324,21 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
   clearSmallerCombinations(trainsOfSegments);
 }
 
-void SegmentTrackCombiner::addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track)
+void SegmentTrackCombiner::addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits)
 {
   if (segment.getAutomatonCell().hasTakenFlag())
     return;
 
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   for (const CDCRecoHit2D& recoHit : segment) {
-    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag())
+    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag() and useTakenFlagOfHits)
       continue;
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
     track.push_back(recoHit3D);
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
 
+  track.setHasMatchingSegment();
   segment.getAutomatonCell().setTakenFlag();
 }
 

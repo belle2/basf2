@@ -28,5 +28,6 @@ namespace Belle2 {
 
     /** Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks */
     bool m_param_useMCInformation;
+    bool m_param_useTakenFlagOfHits;
   };
 }

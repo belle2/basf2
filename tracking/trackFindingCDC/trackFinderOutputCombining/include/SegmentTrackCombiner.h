@@ -110,7 +110,7 @@ namespace Belle2 {
        * @param segment
        * @param track
        */
-      static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track);
+      static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits = true);
 
     private:
       const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */

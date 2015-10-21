@@ -27,6 +27,10 @@ NaiveCombinerModule::NaiveCombinerModule() : TrackFinderCDCFromSegmentsModule()
            m_param_useMCInformation,
            "Uses the MC information from the MCTrackFinder and the MCMatcher to merge tracks.",
            false);
+  addParam("UseTakenFlagOfHits",
+           m_param_useTakenFlagOfHits,
+           "When adding the segments to the new store array, check if the hits are already taken by the tracks or not.",
+           false);
 }
 
 void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
@@ -46,7 +50,7 @@ void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D
       CDCTrajectory3D trajectory(trajectory2D, CDCTrajectorySZ::basicAssumption());
       newTrack.setStartTrajectory3D(trajectory);
 
-      SegmentTrackCombiner::addSegmentToTrack(segment, newTrack);
+      SegmentTrackCombiner::addSegmentToTrack(segment, newTrack, m_param_useTakenFlagOfHits);
       if (newTrack.size() == 0)
         tracks.pop_back();
     }

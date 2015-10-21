@@ -564,8 +564,8 @@ class CDCRecoFitter(metamodules.PathModule):
 
         reco_track_creator_module = StandardEventGenerationRun.get_basf2_module(
             "RecoTrackCreator",
-            RecoTracksStoreArrayName=output_tracks_store_array_name,
-            TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
+            recoTracksStoreArrayName=output_tracks_store_array_name,
+            trackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
         usedCDCMeasurementCreators = {"RecoHitCreator": {}}
         usedSVDMeasurementCreators = {"RecoHitCreator": {}}
@@ -588,26 +588,28 @@ class CDCRecoFitter(metamodules.PathModule):
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
                 "DAFRecoFitter",
                 resortHits=True,
-                RecoTracksStoreArrayName=output_tracks_store_array_name,
-                numberOfFailedHits=2,
+                recoTracksStoreArrayName=output_tracks_store_array_name,
+                numberOfFailedHits=5,
+                minimumIterations=3,
+                maximumIterations=10,
                 pdgCodeToUseForFitting=pdg_code)
         elif use_filter == "kalman":
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
                 "KalmanRecoFitter",
-                RecoTracksStoreArrayName=output_tracks_store_array_name,
+                recoTracksStoreArrayName=output_tracks_store_array_name,
                 pdgCodeToUseForFitting=pdg_code)
         elif use_filter == "gbl":
             reco_fitter_module = StandardEventGenerationRun.get_basf2_module(
                 "GBLRecoFitter",
-                RecoTracksStoreArrayName=output_tracks_store_array_name,
+                recoTracksStoreArrayName=output_tracks_store_array_name,
                 pdgCodeToUseForFitting=pdg_code)
 
         reco_fitter_module.set_debug_level(basf2.LogLevel.DEBUG)
 
         track_builder = StandardEventGenerationRun.get_basf2_module(
             'TrackBuilderFromRecoTracks',
-            RecoTracksStoreArrayName=output_tracks_store_array_name,
-            TrackCandidatesStoreArrayName=input_track_cands_store_array_name)
+            recoTracksStoreArrayName=output_tracks_store_array_name,
+            trackCandidatesStoreArrayName=input_track_cands_store_array_name)
 
         module_list = []
         if setup_geometry:

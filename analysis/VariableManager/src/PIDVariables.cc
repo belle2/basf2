@@ -362,7 +362,7 @@ namespace Belle2 {
       if (!pid) return 0.5;
 
       if (pid->isAvailable(Const::KLM))
-        return pid->getProbability(Const::muon, nullptr, Const::KLM);
+        return exp(pid->getLogL(Const::muon, Const::KLM));
       else
         return 0;
     }

@@ -119,12 +119,13 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         # based on the properties in the base class.
         main_path = super(ReadOrGenerateTrackedEventsRun, self).create_path()
 
-        main_path.add_module("WireHitTopologyPreparer")
-
         if self.finder_module is not None:
             # Setup track finder
             # determine which sub-detector hits will be used
             tracking_coverage = self.determine_tracking_coverage(self.finder_module)
+
+            if tracking_coverage["UseCDCHits"]:
+                main_path.add_module("WireHitTopologyPreparer")
 
             if self.finder_module == 'StandardReco':
                 track_finder_module = StandardTrackingReconstructionModule(components=self.components)

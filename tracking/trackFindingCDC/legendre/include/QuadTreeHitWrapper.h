@@ -31,7 +31,7 @@ namespace Belle2 {
         m_conformalDriftLength() { }
 
       /** Constructor to create a TrackHit from a CDCWireHit object.
-       * Some member variables of CDCHit are copied and other to CDCTrackHit specific variables are initialized
+       * Some member variables of CDCHit are copied and other to QuadTreeHitWrapper specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
       explicit QuadTreeHitWrapper(const CDCWireHit* wireHit)
@@ -48,14 +48,19 @@ namespace Belle2 {
       /** Returns the drift time in the conformal plane (with r << x,y).*/
       inline double getConformalDriftLength() const { return m_conformalDriftLength; }
 
+      /** Returns pointer to the underlying CDCWireHit.*/
       const CDCWireHit* getCDCWireHit() const { return m_cdcWireHit; }
 
+      /** Sets TAKEN flag of Automaton cell.*/
       void setUsedFlag(bool flag) { m_cdcWireHit->getAutomatonCell().setTakenFlag(flag); };
 
+      /** Sets MASKED flag of Automaton cell.*/
       void setMaskedFlag(bool flag) { m_cdcWireHit->getAutomatonCell().setMaskedFlag(flag); };
 
+      /** Returns TAKEN flag of Automaton cell.*/
       bool getUsedFlag() const {return m_cdcWireHit->getAutomatonCell().hasTakenFlag();};
 
+      /** Returns MASKED flag of Automaton cell.*/
       bool getMaskedFlag() const {return m_cdcWireHit->getAutomatonCell().hasMaskedFlag();};
 
       /** Check hit drift lenght; if it's greater than cell size return false */
@@ -69,14 +74,6 @@ namespace Belle2 {
       void setSegment(CDCRecoSegment2D& segment) {m_segment = segment; };
 
     private:
-      /** Returns the phi angle of the center wire position.
-        * From the Hit position (= center of the wire) the angle is calculated so that it goes from 0 to 2*pi.
-        * With the cases:
-        *   x > 0, y > 0: phi in 0, pi/2
-        *   x < 0, y > 0: phi in pi/2, pi
-        *   x < 0, y < 0: phi in pi, 3/2 pi
-        *   x > 0, y < 0: phi in 3/2 pi, 2 pi
-        */
 
       /** Set all parameters from the given wire hit */
       void initializeFromWireHit(const CDCWireHit* wireHit);

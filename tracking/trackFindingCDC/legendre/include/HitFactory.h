@@ -40,12 +40,21 @@ namespace Belle2 {
     class CDCWireHit;
     class QuadTreeHitWrapper;
 
+    /**
+     * @brief Class which holds and creates hit objects used during track finding procedure
+     *
+     * Class takes CDCWireHit objects from DataStore and convert them into QuadTreeHitWrapper objects.
+     * Created QuadTreeHitWrapper objects stored in internal vector.
+     * Also contains methods to:
+     *   - create CDCRecoHit3D objects using QuadTreeHitWrapper or CDCWireHit
+     *   - convert vector of QuadTreeHitWrapper to CDCWireHit and vice versa
+     *   - prepare vector of QuadTreeHitWrapper for quadtree
+     */
     class HitFactory {
     public:
 
       /**
-       * Please note that the implemented methods do only use the axial hits!
-       * We use the fitter and the drawer as a pointer to have the possibility to use different classes.
+       * Constructor
        */
       HitFactory() : m_QuadTreeHitWrappers()  { } ;
 
@@ -64,11 +73,21 @@ namespace Belle2 {
        */
       void initializeQuadTreeHitWrappers();
 
-      void unmaskHitsInTrack(CDCTrack& track);
-
+      /**
+       * Convert vector of QuadTreeHitWrapper hits into vector of CDCWireHit
+       */
       std::vector<const CDCWireHit*> convertQTHitsToWireHits(std::vector<QuadTreeHitWrapper>& qtHitsToConvert);
 
+      /**
+       * Convert vector of CDCWireHit hits into vector of QuadTreeHitWrapper
+       */
       std::vector<QuadTreeHitWrapper> convertWireHitsToQTHits(std::vector<const CDCWireHit*>& wireHitsToConvert);
+
+      /** Create CDCRecoHit3D */
+      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
+
+      /** Create CDCRecoHit3D */
+      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
       /**
        * Get the list with currently stored tracks.
@@ -80,10 +99,10 @@ namespace Belle2 {
 
       /**
        * For the use in the QuadTree use this hit set.
+       *
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
       std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
-
 
       /**
        * Reset all masked hits

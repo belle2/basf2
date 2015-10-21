@@ -34,7 +34,7 @@ bool TrackHitsProcessor::mergeTwoTracks(CDCTrack& track1, CDCTrack& track2)
 
 
 
-  if ((not TrackProcessorNew::isCurler(track1)) && (not TrackProcessorNew::isCurler(track2)) &&
+  if ((not TrackProcessor::isCurler(track1)) && (not TrackProcessor::isCurler(track2)) &&
       (fabs(track1.getStartTrajectory3D().getTrajectory2D().getStartUnitMom2D().phi() -
             track1.getStartTrajectory3D().getTrajectory2D().getStartUnitMom2D().phi()) > TMath::Pi() / 4.)) return false;
 

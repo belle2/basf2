@@ -13,16 +13,12 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TVector3.h>
 #include <string>
 #include <list>
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    class TrackCandidate;
-    class TrackHit;
 
     class CDCTrajectory2D;
     class CDCWireHit;
@@ -49,8 +45,6 @@ namespace Belle2 {
         CDCRiemannFitter fitter;
         fitter.update(trajectory2D, observations2D);
       }
-
-
     };
   }
 }

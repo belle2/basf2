@@ -60,14 +60,6 @@ std::vector<QuadTreeHitWrapper*> HitFactory::createQuadTreeHitWrappersForQT(bool
   return QuadTreeHitWrappers;
 }
 
-void HitFactory::unmaskHitsInTrack(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-}
-
 std::vector<const CDCWireHit*> HitFactory::convertQTHitsToWireHits(std::vector<QuadTreeHitWrapper>& qtHitsToConvert)
 {
   std::vector<const CDCWireHit*> cdcWireHits;
@@ -91,3 +83,31 @@ std::vector<QuadTreeHitWrapper> HitFactory::convertWireHitsToQTHits(std::vector<
 
   return qtHits;
 }
+
+
+const CDCRecoHit3D HitFactory::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit)
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  ERightLeft rlInfo = ERightLeft::c_Right;
+  if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
+    rlInfo = ERightLeft::c_Left;
+  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
+
+  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+
+}
+
+const CDCRecoHit3D HitFactory::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+
+  ERightLeft rlInfo = ERightLeft::c_Right;
+  if (trackTrajectory2D.getDist2D(hit->getRefPos2D()) < 0)
+    rlInfo = ERightLeft::c_Left;
+  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getHit(), rlInfo);
+
+  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+
+}
+

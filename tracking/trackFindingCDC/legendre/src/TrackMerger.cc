@@ -24,7 +24,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMergerNew::mergeTracks(CDCTrack& track1, CDCTrack& track2)
+void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
 {
   if (track1 == track2) return;
 
@@ -45,7 +45,7 @@ void TrackMergerNew::mergeTracks(CDCTrack& track1, CDCTrack& track2)
 
 }
 
-void TrackMergerNew::resetHits(CDCTrack& track)
+void TrackMerger::resetHits(CDCTrack& track)
 {
   for (const CDCRecoHit3D& hit : track.items()) {
     hit->getWireHit().getAutomatonCell().setTakenFlag(true);
@@ -54,7 +54,7 @@ void TrackMergerNew::resetHits(CDCTrack& track)
 }
 
 
-void TrackMergerNew::doTracksMerging(std::list<CDCTrack>& trackList)
+void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
 {
   CDCKarimakiFitter trackFitter;
 
@@ -98,7 +98,7 @@ void TrackMergerNew::doTracksMerging(std::list<CDCTrack>& trackList)
 
 }
 
-TrackMergerNew::BestMergePartner TrackMergerNew::calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
+TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
     std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator)
 {
   double probabilityToBeMerged = 0;
@@ -130,7 +130,7 @@ TrackMergerNew::BestMergePartner TrackMergerNew::calculateBestTrackToMerge(CDCTr
 }
 
 
-void TrackMergerNew::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList)
+void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList)
 {
 
   CDCKarimakiFitter trackFitter;
@@ -171,7 +171,7 @@ void TrackMergerNew::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<C
 }
 
 
-void TrackMergerNew::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory)
+void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory)
 {
 
   // Maybe it is better to use the assignment probability here also? -> SimpleFilter
@@ -190,7 +190,7 @@ void TrackMergerNew::removeStrangeHits(double factor, std::vector<const CDCWireH
 
 }
 
-double TrackMergerNew::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
+double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
   CDCKarimakiFitter trackFitter;
   /*

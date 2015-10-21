@@ -22,33 +22,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-const CDCRecoHit3D HitProcessor::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit)
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  ERightLeft rlInfo = ERightLeft::c_Right;
-  if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-    rlInfo = ERightLeft::c_Left;
-  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
-
-  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
-}
-
-const CDCRecoHit3D HitProcessor::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  ERightLeft rlInfo = ERightLeft::c_Right;
-  if (trackTrajectory2D.getDist2D(hit->getRefPos2D()) < 0)
-    rlInfo = ERightLeft::c_Left;
-  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getHit(), rlInfo);
-
-  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
-}
-
-
 void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit)
 {
   hit.setRecoPos3D(hit.getRecoHit2D().getRLWireHit().reconstruct3D(trackTrajectory2D));
@@ -60,8 +33,6 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHi
   }
   // Recalculate the perpS of the hits
   hit.setArcLength2D(perpS);
-
-//  B2INFO("    perpS: " << hit.getPerpS());
 
 }
 
@@ -134,7 +105,6 @@ void HitProcessor::deleteAllMarkedHits(CDCTrack& trackCandidate)
       return true;
     }
     return false;
-//    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
   }),
   trackCandidate.end());
 
@@ -249,3 +219,10 @@ void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandida
 
 }
 
+void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
+{
+  for (const CDCRecoHit3D& hit : track) {
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+  }
+}

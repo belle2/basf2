@@ -21,7 +21,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class TrackHit;
 
     /** A QuadTreeProcessor for TrackHits */
     class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, QuadTreeHitWrapper, 2, 2> {

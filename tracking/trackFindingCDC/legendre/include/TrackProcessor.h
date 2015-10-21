@@ -10,19 +10,13 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
+#include <tracking/trackFindingCDC/legendre/HitFactory.h>
+#include <tracking/trackFindingCDC/legendre/TrackHolder.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
-#include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
-
-#include "TH1F.h"
-#include "TH2F.h"
 
 #include <list>
 #include <vector>
-#include <string>
 #include <set>
 
 using namespace std;
@@ -33,139 +27,81 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    class TrackDrawer;
-    class TrackHit;
     class CDCTrack;
     class CDCTrajectory2D;
 
-    class TrackProcessorNew {
+    class TrackProcessor {
     public:
 
-      /**
-       * Please note that the implemented methods do only use the axial hits!
-       * We use the fitter and the drawer as a pointer to have the possibility to use different classes.
-       */
-      TrackProcessorNew() :
-        m_cdcTracks(), m_trackFitter(),
-        m_histChi2("h_legendreChi2", "chi2", 100, 0., 300.),
-        m_histChi2NDF("h_legendreChi2NDF", "chi2", 100, 0., 300.),
-        m_histDist("h_legendreDist", "dist", 100, 0., 2.),
-        m_histADC("h_legendreADC", "ADC", 1000, 0., 1000),
-        m_histADCpt("h_legendreADCpt", "ADC vs Pt", 400, 0., 1000, 40, 0., 3.) { }
-
+      TrackProcessor(HitFactory& hitFactory, TrackHolder& trackHolder) :
+        m_hitFactory(hitFactory),
+        m_trackHolder(trackHolder),
+        m_trackFitter() { }
 
       /**
        * Do not copy this class
        */
-      TrackProcessorNew(const TrackProcessorNew& copy) = delete;
+      TrackProcessor(const TrackProcessor& copy) = delete;
 
       /**
        * Do not copy this class
        */
-      TrackProcessorNew& operator=(const TrackProcessorNew&) = delete;
-
-      /**
-       * Compile the hitList from the wire hit topology.
-       */
-      void initializeQuadTreeHitWrappers();
+      TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       void removeBadSLayers(CDCTrack& track);
 
-      /*CDCTrack&*/ void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
+      /// Create CDCTrack using QuadTreeHitWrapper hits and store it in the list
+      void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
 
-      /** Created CDCTracks from the stored CDCLegendreTrackCandidates */
-      void createCDCTracks(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) ;
+      /// Create CDCTrack using CDCWireHit hits and store it in the list
+      void createCandidate(std::vector<const CDCWireHit*>& hits);
 
+      /// Update trajectory of the CDCTrack
       void updateTrack(CDCTrack& track);
 
+      /// Check track -- currently based on number of hits only.
       bool checkTrack(CDCTrack& track);
 
+      /// Assign new hits to the track basing on the distance from the hit to the track
       void assignNewHits(CDCTrack& track);
 
       void assignNewHitsUsingSegments(CDCTrack& track, float fraction = 0.3);
 
+      /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
       void assignNewHits();
 
-      int estimateCharge(double theta, double r, std::vector<TrackHit*>& trackHits);
+      /// Check p-value of the track
+      void checkTrackProb();
 
-      void mergeTracks();
-
-      void fillHist(CDCTrack& track);
-
-      void saveHist();
-
+      /// Check chi2 of the fit (using quantiles of chi2 distribution)
       bool checkChi2(CDCTrack& track);
 
-      double estimateChi2(CDCTrack& track);
+      /** Calculate quantile of chi2
+       * @param alpha quntile of chi2
+       * @param n number degrees of freedom
+       */
+      double calculateChi2ForQuantile(double alpha, double n);
 
-      double getQuantile(double alpha, double n);
-
-      void checkADC();
-
+      /// Fit CDCTrack object
       CDCTrajectory2D fit(CDCTrack& track);
 
-      void createCandidate(std::vector<const CDCWireHit*>& hits);
-
+      /// Set MASKED flag of automaton cells to false
       void unmaskHitsInTrack(CDCTrack& track);
 
+      /// Perform track postprocessing
       void postprocessTrack(CDCTrack& track);
-
-      /**
-       * Get the list with currently stored tracks.
-       */
-      std::list<CDCTrack>& getTracks()
-      {
-        return m_cdcTracks;
-      }
-
-      /**
-       * Get the list with currently stored tracks.
-       */
-      std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
-      {
-        return m_QuadTreeHitWrappers;
-      }
-
-      /**
-       * For the use in the QuadTree use this hit set.
-       * @return the hit set with axial hits to use in the QuadTree-Finding.
-       */
-      std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
-
-
 
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
        */
       void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
 
-
-
-
       /**
        * Reset all masked hits
        */
       void resetMaskedHits()
       {
-        doForAllHits([](QuadTreeHitWrapper & hit) {
-          hit.setMaskedFlag(false);
-          hit.setUsedFlag(false);
-        });
-
-        doForAllTracks([](CDCTrack & track) {
-          for (CDCRecoHit3D& hit : track) {
-            hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-          }
-        });
-        /*
-
-                doForAllHits([](QuadTreeHitWrapper & hit) {
-                  if (hit.getMaskedFlag()) {
-                    hit.setMaskedFlag(false);
-                    hit.setUsedFlag(false);
-                  }
-                });
-        */
+        m_hitFactory.resetMaskedHits(m_trackHolder.getCDCTracks());
       }
 
       /**
@@ -173,62 +109,20 @@ namespace Belle2 {
        */
       void clearVectors()
       {
-        m_QuadTreeHitWrappers.clear();
-        m_cdcTracks.clear();
+        m_hitFactory.clearVectors();
+        m_trackHolder.clearVectors();
       }
 
       static bool isCurler(CDCTrack& track) { return fabs(track.getStartTrajectory3D().getCurvatureXY()) > 0.017; }
 
-      /**
-       * Do a certain function for each track in the track list
-       */
-      void doForAllTracks(std::function<void(CDCTrack& track)> function)
-      {
-        /*         for (CDCTrack& track : m_cdcTracks) {
-                  function(track);
-                }
-        */
-        for (std::list<CDCTrack>::iterator it = m_cdcTracks.begin(); it !=  m_cdcTracks.end(); ++it) {
-          function(*it);
-        }
-
-
-
-      }
-
       CDCRiemannFitter& getFitter() {return m_trackFitter;};
 
     private:
-      std::list<CDCTrack> m_cdcTracks; /**< List of track candidates. */
-      std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits */
+      HitFactory& m_hitFactory; /**< Reference to common HitFactory object.*/
+      TrackHolder& m_trackHolder; /**< Reference to common TrackHolder object.*/
+
       CDCRiemannFitter m_trackFitter;
-//      CDCKarimakiFitter m_trackFitter;
 
-      /**
-       * @brief Perform the necessary operations after the track candidate has been constructed
-       * @param track The constructed track candidate
-       * @param trackHitList list of all hits, which are used for track finding. Hits belonging to the track candidate will be deleted from it.
-       * This function leaves room for other operations like further quality checks or even the actual fitting of the track candidate.
-       */
-      void processTrack(CDCTrack& track);
-
-
-      /**
-       * Do a certain function for each track in the track list
-       */
-      void doForAllHits(std::function<void(QuadTreeHitWrapper& hit)> function)
-      {
-        for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
-          function(hit);
-        }
-      }
-
-      TH1F m_histChi2;
-      TH1F m_histChi2NDF;
-      TH1F m_histDist;
-
-      TH1F m_histADC;
-      TH2F m_histADCpt;
     };
   }
 }

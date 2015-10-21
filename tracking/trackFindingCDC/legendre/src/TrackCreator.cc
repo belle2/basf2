@@ -8,32 +8,28 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/TrackFactory.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/legendre/TrackCreator.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
-#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/ConformalExtension.h>
+#include <tracking/trackFindingCDC/legendre/HitFactory.h>
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>
 #include "../include/TrackHitsProcessor.h"
 
-#include "TCanvas.h"
-#include "TH1F.h"
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCTrack& TrackFactory::createCDCTrackCandidate(std::vector<QuadTreeHitWrapper*>& qtHits)
+void TrackCreator::createCDCTrackCandidate(std::vector<QuadTreeHitWrapper*>& qtHits, CDCTrack& track)
 {
-  m_cdcTracks.emplace_back();
-  CDCTrack& newTrackCandidate = m_cdcTracks.back();
-
-  if (qtHits.size() == 0) return newTrackCandidate;
-
   CDCObservations2D observations2DLegendre;
   for (const QuadTreeHitWrapper* item : qtHits) {
     observations2DLegendre.append(*item->getCDCWireHit());
@@ -45,26 +41,19 @@ CDCTrack& TrackFactory::createCDCTrackCandidate(std::vector<QuadTreeHitWrapper*>
   for (QuadTreeHitWrapper* trackHit : qtHits) {
     if (trackHit->getUsedFlag() || trackHit->getMaskedFlag()) continue;
 
-    const CDCRecoHit3D& cdcRecoHit3D  = HitProcessor::createRecoHit3D(trackTrajectory2D, trackHit);
-    newTrackCandidate.push_back(std::move(cdcRecoHit3D));
+    const CDCRecoHit3D& cdcRecoHit3D  = HitFactory::createRecoHit3D(trackTrajectory2D, trackHit);
+    track.push_back(std::move(cdcRecoHit3D));
     cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
   }
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
-  newTrackCandidate.setStartTrajectory3D(trajectory3D);
-
-  return newTrackCandidate;
+  track.setStartTrajectory3D(trajectory3D);
 }
 
 
 
-CDCTrack& TrackFactory::createCDCTrackCandidate(std::vector<const CDCWireHit*>& hits)
+void TrackCreator::createCDCTrackCandidate(std::vector<const CDCWireHit*>& hits, CDCTrack& track)
 {
-  //  B2INFO("create");
-  m_cdcTracks.emplace_front();
-  CDCTrack& newTrackCandidate = m_cdcTracks.front();
-
-
   CDCObservations2D observations;
   for (const CDCWireHit* item : hits) {
     observations.append(*item);
@@ -77,36 +66,26 @@ CDCTrack& TrackFactory::createCDCTrackCandidate(std::vector<const CDCWireHit*>& 
   for (const CDCWireHit* item : hits) {
     if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
 
-    const CDCRecoHit3D& cdcRecoHit3D  = HitProcessor::createRecoHit3D(trackTrajectory2D, item);
-    newTrackCandidate.push_back(std::move(cdcRecoHit3D));
+    const CDCRecoHit3D& cdcRecoHit3D  = HitFactory::createRecoHit3D(trackTrajectory2D, item);
+    track.push_back(std::move(cdcRecoHit3D));
     cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
   }
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
-  newTrackCandidate.setStartTrajectory3D(trajectory3D);
-
-  return newTrackCandidate;
-
+  track.setStartTrajectory3D(trajectory3D);
 }
 
 
-void TrackFactory::createCDCTracks(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackCreator::createCDCTracks(std::vector<CDCTrack>& tracksToStore, std::list<CDCTrack>& tracksFromFinder)
 {
-//  tracks.clear();
+  tracksToStore.reserve(tracksToStore.size() + tracksFromFinder.size());
 
-//  std::copy(m_tracksVector.begin(), m_tracksVector.end(), tracks.begin());
-
-  for (CDCTrack& track : m_cdcTracks) {
-    if (track.size() > 5) tracks.push_back(std::move(track));
+  for (CDCTrack& track : tracksFromFinder) {
+    if (track.size() > 5) tracksToStore.push_back(std::move(track));
   }
 }
 
-void TrackFactory::deleteTrack(CDCTrack& track)
-{
-
-}
-
-CDCTrajectory2D TrackFactory::fit(CDCTrack& track)
+CDCTrajectory2D TrackCreator::fit(CDCTrack& track)
 {
   bool m_usePosition(true);
 //  bool m_useOrientation(false);

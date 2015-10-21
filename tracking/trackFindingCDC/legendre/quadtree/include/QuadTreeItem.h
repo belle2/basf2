@@ -5,7 +5,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class TrackHit;
     class QuadTreeHitWrapper;
     class CDCRecoSegment2D;
 
@@ -82,13 +81,6 @@ namespace Belle2 {
       bool m_usedFlag;        /**< This flag can be set to not use the item in the next quad tree search round */
       typeData* m_pointer;    /**< A pointer to the underlying event */
     };
-
-    /** As special case: the TrackHit has a used flag itself */
-    template<>
-    bool QuadTreeItem<TrackHit>::isUsed() const;
-
-    template<>
-    void QuadTreeItem<TrackHit>::setUsedFlag(bool usedFlag);
 
     /** As special case: the QuadTreeHitWrapper has a used flag itself */
     template<>

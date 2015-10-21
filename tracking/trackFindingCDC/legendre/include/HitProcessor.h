@@ -24,17 +24,15 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class CDCWireHit;
 
+    /**
+     * Class performs hit assignment, reassignment and deletion of hits to the tracks
+     */
     class HitProcessor {
 
     public:
 
       /** This is a static class only. We do not need a constructor here */
       HitProcessor() = delete;
-
-      /** Create CDCRecoHit3D */
-      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
-
-      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit);
@@ -56,6 +54,9 @@ namespace Belle2 {
 
       /** Delete all hits markes as bad in a track. Should be called after every hit reassignment */
       static void deleteAllMarkedHits(CDCTrack& trackCandidate);
+
+      /** Unmask hits which are assigned to the track */
+      void unmaskHitsInTrack(CDCTrack& track);
 
     };
   }

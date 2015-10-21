@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #pragma once
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <TVector3.h>
@@ -41,6 +43,13 @@ namespace Belle2 {
       static CDCTrajectory2D fitCDCTrackWhithoutRecoPos(CDCTrack& track);
 
       static CDCTrajectory2D fitWireHitsWhithoutRecoPos(std::vector<const CDCWireHit*>& wireHits);
+
+      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D)
+      {
+        CDCRiemannFitter fitter;
+        fitter.update(trajectory2D, observations2D);
+      }
+
 
     };
   }

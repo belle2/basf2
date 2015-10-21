@@ -172,7 +172,12 @@ class Basf2Calculation:
         """
         Return the saved queue item with the given name
         """
-        return self.map_on_processes(lambda process: process.get(name), index)
+        def f(process, name):
+            try:
+                return process.get(name)
+            except KeyError:
+                return None
+        return self.map_on_processes(lambda process: f(process, name), index)
 
     def get_keys(self, index=None):
         """

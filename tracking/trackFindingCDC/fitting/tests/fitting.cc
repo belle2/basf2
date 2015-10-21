@@ -16,7 +16,6 @@
 
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
@@ -207,21 +206,3 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
   testLineFitter(fitter);
 }
 
-
-TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_compileTrackCandidateFit)
-{
-  const std::vector<TrackHit*> legendreTrackHits;
-  const std::vector<TrackHit*> legendreTrackHits2;
-
-  {
-    CDCRiemannFitter riemannFitter = CDCRiemannFitter::getFitter();
-    CDCTrajectory2D trajctory2D = riemannFitter.fit(legendreTrackHits);
-    CDCTrajectory2D togetherTrajctory2D = riemannFitter.fit(legendreTrackHits, legendreTrackHits2);
-  }
-  {
-    CDCKarimakiFitter karimakiFitter = CDCKarimakiFitter::getFitter();
-    CDCTrajectory2D trajctory2D = karimakiFitter.fit(legendreTrackHits);
-    CDCTrajectory2D togetherTrajctory2D = karimakiFitter.fit(legendreTrackHits, legendreTrackHits2);
-  }
-
-}

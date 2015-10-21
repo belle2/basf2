@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-
 #include <tracking/trackFindingCDC/legendre/quadtree/precision_functions/BasePrecisionFunction.h>
 
 namespace Belle2 {
@@ -30,16 +28,16 @@ namespace Belle2 {
         m_function = [&](double r_qt) -> double {
           double res;
           //TODO: bug is here!
-          if ((TrackCandidate::convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
-            r_qt = fabs(TrackCandidate::convertPtToRho(3.)) * r_qt / fabs(r_qt);
+          if ((convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+            r_qt = fabs(convertPtToRho(3.)) * r_qt / fabs(r_qt);
 
           if (r_qt != 0)
-            res = exp(-16.1987 * TrackCandidate::convertRhoToPt(fabs(r_qt)) - 5.96206)
-            + 0.000190872 - 0.0000739319 * TrackCandidate::convertRhoToPt(fabs(r_qt));
+            res = exp(-16.1987 * convertRhoToPt(fabs(r_qt)) - 5.96206)
+            + 0.000190872 - 0.0000739319 * convertRhoToPt(fabs(r_qt));
 
           else
             res = 0.00005;
-
+          /*10.5 - 0.24 * exp(-4.13118 * convertRhoToPt(curv) + 2.74);*/
           B2DEBUG(100, "origin: res = " << res << "; r = " << r_qt);
           return res;
         };

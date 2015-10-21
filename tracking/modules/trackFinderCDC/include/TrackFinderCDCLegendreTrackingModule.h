@@ -20,7 +20,6 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     class FastHough;
-    class TrackDrawer;
     class CDCTrack;
   }
 
@@ -61,14 +60,11 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::CDCRecoSegment2D> m_segments;
 
 
-    TrackFindingCDC::TrackDrawer* m_cdcLegendreTrackDrawer; /**< Class which allows in-module drawing*/
     TrackFindingCDC::TrackProcessorNew m_trackProcessor; /**< Object for creating tracks */
 
     unsigned int m_param_threshold;         /**< Threshold for votes in the legendre plane, parameter of the module*/
     double m_param_stepScale;           /**< Scale of steps for SteppedHough*/
     int m_maxLevel;               /**< Maximum Level of FastHough Algorithm*/
-    bool m_drawCandidates;        /**< Draw each candidate in interactive mode*/
-    bool m_drawCandInfo;          /**< Set whether TrackDrawer class will bw used at all*/
     bool m_deleteHitsWhileFinding;    /**< Try to delete bad hits from track candidate */
     bool m_deleteHitsInTheEnd;        /**< Try to delete bad hits from track candidate in the end */
     bool m_appendHitsInTheEnd;        /**< Try to append new hits to track candidate in the end*/
@@ -112,11 +108,6 @@ namespace Belle2 {
      */
     void outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
-    /**
-     * Create candidates using vector of quadtree nodes.
-     */
-    void processNodes(std::vector<TrackFindingCDC::QuadTreeLegendre*>&, TrackFindingCDC::QuadTreeLegendre::CandidateProcessorLambda&,
-                      unsigned int);
 
     void postprocessSingleNode(std::vector<TrackFindingCDC::QuadTreeHitWrapper*>&, bool,
                                TrackFindingCDC::AxialHitQuadTreeProcessor::QuadTree*);

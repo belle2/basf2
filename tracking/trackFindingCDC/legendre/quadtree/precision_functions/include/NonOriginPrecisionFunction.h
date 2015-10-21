@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-
 #include <tracking/trackFindingCDC/legendre/quadtree/precision_functions/BasePrecisionFunction.h>
 
 namespace Belle2 {
@@ -29,14 +27,14 @@ namespace Belle2 {
       {
         m_function = [&](double r_qt) -> double {
           double res;
-          if ((TrackCandidate::convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
-            r_qt = fabs(TrackCandidate::convertPtToRho(3.)) * r_qt / fabs(r_qt);
+          if ((convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+            r_qt = fabs(convertPtToRho(3.)) * r_qt / fabs(r_qt);
 
           if (r_qt != 0)
-            if (TrackCandidate::convertRhoToPt(fabs(r_qt)) < 0.36)
-              res = exp(-0.356965 - 0.00186066 * TrackCandidate::convertRhoToPt(fabs(r_qt))) - 0.697526;
+            if (convertRhoToPt(fabs(r_qt)) < 0.36)
+              res = exp(-0.356965 - 0.00186066 * convertRhoToPt(fabs(r_qt))) - 0.697526;
             else
-              res = exp(-0.357335 + 0.000438872 * TrackCandidate::convertRhoToPt(fabs(r_qt))) - 0.697786;
+              res = exp(-0.357335 + 0.000438872 * convertRhoToPt(fabs(r_qt))) - 0.697786;
           else
             res = 0.00005;
           B2DEBUG(100, "non origin: res = " << res << "; r = " << r_qt);

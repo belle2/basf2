@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/precision_functions/BasePrecisionFunction.h>
 
 template<class ANode>
 void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANode* leaf)
@@ -82,8 +83,9 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   using HoughBox = StereoHitContained<OffOrigin<InPhi0CurvBox> >::HoughBox;
   hitInPhi0CurvBox.setLocalOrigin(perigee);
 
+  BasePrecisionFunction funct;
   // Determine a precision that we expect to achieve at the fitted momentum
-  double levelPrecision = 10.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(curv) + 2.74);
+  double levelPrecision = 10.5 - 0.24 * exp(-4.13118 * funct.convertRhoToPt(curv) + 2.74);
   double curvPrecision = 0.15 / (pow(2., levelPrecision));
   double phi0Precision = M_PI / (pow(2., levelPrecision + 1));
 

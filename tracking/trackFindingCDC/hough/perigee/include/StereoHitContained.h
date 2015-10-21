@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/RLTagged.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <tracking/trackFindingCDC/numerics/Sign.h>
 #include <tracking/trackFindingCDC/numerics/numerics.h>
@@ -76,43 +75,6 @@ namespace Belle2 {
         bool isIn = contains(*houghBox, wire, signedDriftLength);
         ERightLeft rlInfo = recoHit2D->getRLInfo();
         return isIn ? 1.0 + isValid(rlInfo) * m_rlWeightGain : NAN;
-      }
-
-      /** Checks if the track hit is contained in a phi0 curv hough space.
-       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
-       */
-      inline Weight operator()(const TrackHit* const& trackHit,
-                               const HoughBox* const& houghBox)
-      {
-        const CDCWireHit* wireHit = trackHit->getUnderlayingCDCWireHit();
-        return operator()(wireHit, houghBox);
-      }
-
-      /** Checks if the wire hit is contained in a phi0 curv hough space.
-       *  If the wire hit was already determined to be right or left of all tracks
-       *  in a wider hough box up the hierarchy only evaluate for that orientation.
-       *  If one of the right left passage hypothesis can be ruled out in this box
-       *  signal so by tagging it.
-       *  Note the that the RLTagged<WireHit*> is obtained as non-const reference to
-       *  be able to write back the new right left passage hypothesis.
-       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
-       *  Accepts if either the right passage hypothesis or the left passage hypothesis
-       *  is in the hough box.
-       */
-      inline Weight operator()(RLTagged<const TrackHit*>& rlTaggedTrackHit,
-                               const HoughBox* const& houghBox)
-      {
-        const CDCWireHit* wireHit = rlTaggedTrackHit->getUnderlayingCDCWireHit();
-
-        const CDCWire& wire = wireHit->getWire();
-        const ERightLeft rlInfo = rlTaggedTrackHit.getRLInfo();
-        const double driftLength = wireHit->getRefDriftLength();
-
-        ERightLeft newRLInfo =
-          containRightOrLeft(*houghBox, wire, driftLength, rlInfo);
-
-        rlTaggedTrackHit.setRLInfo(newRLInfo);
-        return isValid(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
       }
 
 

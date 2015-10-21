@@ -28,18 +28,6 @@ namespace Belle2 {
 
     class TrackFitter {
     public:
-      /**
-       * @brief Perform fast circular fitting
-       * @param hits Hits pattern which we are going to fit
-       * @param track_par Set of track parameters - polar angle and curvature of track
-       * @param ref_point Reference point; In current case - point of closest approach to IP
-       * @param with_drift_time Parameter which allows to perform fitting with taking into account drift time of hits; Not stable!
-       */
-      double fitTrackCandidateFast(
-        std::vector<Belle2::TrackFindingCDC::TrackHit*>& hits,
-        std::pair<double, double>& track_par,
-        std::pair<double, double>& ref_point,
-        bool with_drift_time = false) const;
 
       double fitTrackCandidateFast(
         std::vector<const CDCWireHit*>& hits,
@@ -49,15 +37,6 @@ namespace Belle2 {
 
       static double fitTrackCandidateFast(
         std::vector<std::pair<std::pair<double, double>, double>>& hits);
-
-      /**
-       * @brief Perform fast circular fitting
-       * @param track Track candidate which are going to be fitted
-       * @param with_drift_time Parameter which allows to perform fitting with taking into account drift time of hits; Not stable!
-       */
-      void fitTrackCandidateFast(
-        TrackCandidate* track,
-        bool with_drift_time = false) const;
 
       static CDCTrajectory2D fitCDCTrackWhithoutRecoPos(CDCTrack& track);
 

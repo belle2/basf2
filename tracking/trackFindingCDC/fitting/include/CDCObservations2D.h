@@ -10,8 +10,6 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackCandidate.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
@@ -339,21 +337,6 @@ namespace Belle2 {
           if (not ptrWireHit) continue;
           const CDCWireHit& wireHit = *ptrWireHit;
           nAppendedHits += append(wireHit);
-        }
-        return nAppendedHits;
-      }
-
-      /** Appends all wire positions of the hits in the legendre track hits.
-       *  Always use position since there is no other mode as long as
-       *  there are no right left passage information available.
-       */
-      size_t appendRange(const std::vector<TrackFindingCDC::TrackHit*>& legendreTrackHits)
-      {
-        size_t nAppendedHits = 0;
-        for (const TrackFindingCDC::TrackHit* ptrLegendreTrackHit : legendreTrackHits) {
-          if (not ptrLegendreTrackHit) continue;
-          const CDCWireHit* wireHit = ptrLegendreTrackHit->getUnderlayingCDCWireHit();
-          nAppendedHits += append(*wireHit);
         }
         return nAppendedHits;
       }

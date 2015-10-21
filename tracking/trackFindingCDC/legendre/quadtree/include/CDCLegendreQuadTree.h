@@ -23,7 +23,6 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-#include <tracking/trackFindingCDC/legendre/TrackHit.h>
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
@@ -316,10 +315,6 @@ namespace Belle2 {
       bool m_filled; /**< Is the node has been filled with hits */
 
     };
-
-
-    // a special instance
-    typedef TrackFindingCDC::QuadTreeTemplate<int, float, TrackHit> QuadTreeLegendre;    // another special instance
 
   }
 }

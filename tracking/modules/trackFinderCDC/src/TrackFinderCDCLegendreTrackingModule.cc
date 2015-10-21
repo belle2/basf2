@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/legendre/TrackMerger.h>
 #include <tracking/trackFindingCDC/legendre/ConformalExtension.h>
 
-#include <tracking/trackFindingCDC/legendre/CDCLegendreTrackDrawer.h>
 #include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/legendre/TrackQuality.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
@@ -37,7 +36,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(CDCLegendreTracking);
 
 CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
-  TrackFinderCDCBaseModule(), m_cdcLegendreTrackDrawer(nullptr), m_trackProcessor()
+  TrackFinderCDCBaseModule(), m_trackProcessor()
 {
   setDescription(
     "Performs the pattern recognition in the CDC with the conformal finder: digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -67,12 +66,6 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
   addParam("TreeFindingNumber", m_treeFindingNumber,
            "Repeat the whole process that many times.", 3);
 
-  addParam("DrawCandidates", m_drawCandidates,
-           "Draw candidate after finding", false);
-
-  addParam("EnableDrawing", m_drawCandInfo,
-           "Enable in-module drawing", false);
-
   addParam("EnableBatchMode", m_batchMode,
            "Enable batch mode for track drawer. (Done with gROOT->SetBatch())", false);
 }
@@ -80,12 +73,6 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
 void CDCLegendreTrackingModule::initialize()
 {
   TrackFinderCDCBaseModule::initialize();
-
-  // initialize track drawer
-  m_cdcLegendreTrackDrawer = new TrackDrawer(m_drawCandInfo, m_drawCandidates, m_batchMode);
-  m_cdcLegendreTrackDrawer->initialize();
-
-  // set parameters of track processor
 
 }
 
@@ -100,7 +87,6 @@ void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CD
 void CDCLegendreTrackingModule::startNewEvent()
 {
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
-  m_cdcLegendreTrackDrawer->event();
 
   /*
     // Aquire the store vector
@@ -199,7 +185,6 @@ void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCD
 {
   //create GenFit Track candidates
   m_trackProcessor.createCDCTracks(tracks);
-  m_cdcLegendreTrackDrawer->finalizeFile();
 }
 
 
@@ -381,7 +366,6 @@ void CDCLegendreTrackingModule::doTreeTrackFinding(unsigned int limitInitial, do
 
   //sort tracks by value of curvature
   std::vector<TrackHit*> hits_vector; //temporary array;
-  m_cdcLegendreTrackDrawer->finalizeROOTFile(hits_vector);
 
   B2DEBUG(90, "Number of steps in tree track finding: " << nSteps);
   B2DEBUG(90, "Threshold on number of hits: " << limit);
@@ -441,7 +425,6 @@ void CDCLegendreTrackingModule::terminate()
 {
 
 //  m_trackProcessor.saveHist();
-  delete m_cdcLegendreTrackDrawer;
 }
 
 void CDCLegendreTrackingModule::clearVectors()

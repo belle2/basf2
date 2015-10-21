@@ -31,7 +31,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
     path.add_module("SegmentFinderCDCFacetAutomatonDev",
                     ClusterFilter="tmva",
                     ClusterFilterParameters={
-                        "cut": str(0.1)},
+                        "cut": str(0.2)},
                     WriteGFTrackCands=False,
                     TracksStoreObjName="__TempCDCTracksVector")
 
@@ -47,6 +47,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
 
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
+                    quadTreeLevel=6,
                     TracksStoreObjNameIsInput=True,
                     WriteGFTrackCands=False)
 
@@ -55,7 +56,9 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
                     TracksStoreObjNameIsInput=True,
                     WriteGFTrackCands=False,
                     SegmentTrackFilterFirstStepFilter="tmva",
-                    SegmentTrackFilterFirstStepFilterParameters={"cut": str(0.75)})
+                    SegmentTrackFilterFirstStepFilterParameters={"cut": str(0.75)},
+                    TrackFilter="tmva",
+                    TrackFilterParameters={"cut": str(0.1)})
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",

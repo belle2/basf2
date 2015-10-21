@@ -20,6 +20,7 @@ class BackgroundSegmentsRecordingRun(StandardEventGenerationRun):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = StandardEventGenerationRun.create_path(self)
+        main_path.add_module("WireHitTopologyPreparer")
 
         main_path.add_module(modules.CDCFullFinder(output_track_cands_store_array_name="TrackCands",
                                                    background_filter="recording",

@@ -150,7 +150,11 @@ void CDCTrack::receiveMaskedFlag() const
 }
 
 void CDCTrack::sortByRadius()
-{ std::sort(begin(), end()); }
+{
+  std::sort(begin(), end(), [](const CDCRecoHit3D & a, const CDCRecoHit3D & b) -> bool {
+    return a.getRefPos2D().norm() < b.getRefPos2D().norm();
+  });
+}
 
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {

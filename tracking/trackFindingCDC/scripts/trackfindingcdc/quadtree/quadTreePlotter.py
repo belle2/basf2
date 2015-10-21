@@ -28,8 +28,8 @@ class QuadTreePlotter(basf2.Module):
         Do not forget to set the ranges! Otherwise you will end up with an empty plot..
         """
         basf2.Module.__init__(self)
-        self.file_name_of_quad_tree_content = "quadtree_content.root"
-        self.draw_quad_tree_content = True and False
+        self.file_name_of_quad_tree_content = "output.root"
+        self.draw_quad_tree_content = True
         self.range_x_min = 0
         self.range_x_max = 0
         self.range_y_min = 0
@@ -43,7 +43,8 @@ class QuadTreePlotter(basf2.Module):
             return
 
         input_file = ROOT.TFile(self.file_name_of_quad_tree_content)
-        hist = input_file.Get("hist")
+
+        hist = input_file.Get("histUsed")
 
         xAxis = hist.GetXaxis()
         yAxis = hist.GetYaxis()
@@ -54,9 +55,20 @@ class QuadTreePlotter(basf2.Module):
         l = np.array([[hist.GetBinContent(iX, iY) for iY in range(1, yAxis.GetNbins() + 1)]
                       for iX in range(1, xAxis.GetNbins() + 1)])
 
+        hist = input_file.Get("histUnused")
+
+        xAxis = hist.GetXaxis()
+        yAxis = hist.GetYaxis()
+
+        x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in xrange(1, xAxis.GetNbins() + 2)])
+        y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in xrange(1, yAxis.GetNbins() + 2)])
+
+        l2 = np.array([[hist.GetBinContent(iX, iY) for iY in xrange(1, yAxis.GetNbins() + 1)]
+                       for iX in xrange(1, xAxis.GetNbins() + 1)])
+
         cmap = sb.cubehelix_palette(8, start=2, rot=0, dark=0, light=1, reverse=False, as_cmap=True)
 
-        plt.gca().pcolorfast(x_edges, y_edges, l.T, cmap=cmap)
+        plt.gca().pcolorfast(x_edges, y_edges, (l + l2).T, cmap=cmap)
 
         x_labels = ["{1:0.{0}f}".format(int(not float(x).is_integer()), x) if i % 4 == 0 else "" for i, x in enumerate(x_edges)]
         plt.xticks(x_edges, x_labels)
@@ -71,6 +83,8 @@ class QuadTreePlotter(basf2.Module):
         plt.savefig(fileName)
         procDisplay = subprocess.Popen(['eog', fileName])
         input("Press Enter to continue..")
+        # procDisplay = subprocess.Popen(['eog', fileName])
+        # raw_input("Press Enter to continue..")
 
     def init_plotting(self):
         """

@@ -10,8 +10,14 @@ import os
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option('--input', dest='input', default='-999',
-                  help='location of input file')
+
+parser.add_option(
+    '-i',
+    '--input',
+    dest='input',
+    default='-999',
+    help='location of input file'
+)
 
 (options, args) = parser.parse_args()
 
@@ -21,99 +27,101 @@ from basf2 import *
 
 set_log_level(LogLevel.INFO)
 
+from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
+
 # necessary modumes
 eventinfosetter = register_module('EventInfoSetter')
-
+beamparameter = register_module('BeamParameters')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-# eventinfosetter.param('evtNumList', [options.nevents])
+eventinfosetter.param('evtNumList', [10])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
-# EvtGen to provide generic BB events
-evtgeninput = register_module('EvtGenInput')
-# evtgeninput.param('userDECFile', os.environ['BELLE2_LOCAL_DIR']
-#                  + '/tracking/acceptance/BtoDpi.dec')
-evtgeninput.param('boost2LAB', True)
-# DECFile and pdlFile have sane defaults
-#
-# simulation
-g4sim = register_module('FullSim')
-# this is need for the MCTrackFinder to work correctly
-g4sim.param('StoreAllSecondaries', True)
-# make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
-
-mixbkg = register_module('MixBkg')
-bkg_file = [
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_HER/CDCROFnoMC_Coulomb_HER_1ms_2x.root',
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_LER/CDCROFnoMC_Coulomb_LER_1ms_2x.root',
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_HER/CDCROFnoMC_RBB_HER_1ms_2x.root',
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_LER/CDCROFnoMC_RBB_LER_1ms_2x.root',
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_HER/CDCROFnoMC_Touschek_HER_1ms_2x.root',
-    '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_LER/CDCROFnoMC_Touschek_LER_1ms_2x.root',
-]
-
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_HER/CDCROF_Coulomb_HER_1ms_0x.root',
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/Coulomb_LER/CDCROF_Coulomb_LER_1ms_0x.root',
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_HER/CDCROF_RBB_HER_1ms_0x.root',
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/RBB_LER/CDCROF_RBB_LER_1ms_0x.root',
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_HER/CDCROF_Touschek_HER_1ms_0x.root',
-# '/storage/5/mziegler/Belle2/MCprod_2013Summer/Touschek_LER/CDCROF_Touschek_LER_1ms_0x.root'
-mixbkg.param('BackgroundFiles', bkg_file)
-
-# digitizer
-cdcDigitizer = register_module('CDCDigitizer')
-
-# ---------------------------------------------------------------
-cdctracking = register_module('CDCLegendreTracking')
-param_cdctracking = {  # 'Resolution StereoHits': 2.,
-    'GFTrackCandidatesColName': 'TrackCands',
-    'Threshold': 10,
-    'InitialAxialHits': 30,
-    'MaxLevel': 10,
-    'FitTracks': True,
-    'EarlyTrackFitting': False,
-    'EarlyTrackMerge': False,
-    'AppendHits': True,
-    'DrawCandidates': False,
-    'EnableDrawing': False,
-    'StepScale': 0.75,
-    'ReconstructCurler': False,
-}
-cdctracking.param(param_cdctracking)
-
-# ---------------------------------------------------------------
-# match the found track candidates with MCParticles
-mcmatching = register_module('CDCMCMatching')
-
-# select the correct collection for the matching
-param_mcmatching = {'GFTrackCandidatesColName': 'TrackCands',
-                    'CDCHitsColName': 'CDCHits',
-                    'MCParticlesColName': 'MCParticles'}
-mcmatching.param(param_mcmatching)
-
-# ----------------------------------------------------------------
-CDCNiceDrawing = register_module('CDCNiceDrawing')
-CDCNiceDrawing.param('StoreDirectory', 'Legendre')
-CDCNiceDrawing.param('DrawMCSignal', True)
-CDCNiceDrawing.param('DrawCands', True)
-
-# ---------------------------------------------------------------
-# input
 input = register_module('RootInput')
 input.param('inputFileName', options.input)
 
-# output
-output = register_module('RootOutput')
-output.param('outputFileName', 'tmp/MCEvtGenData_output.root')
+# simulate only tracking detectors to simulate the whole detector included in
+# BelleII.xml, comment the next line
+# geometry.param('components', ['MagneticField',
+# 'BeamPipe',
+# 'PXD',
+# 'SVD',
+# 'CDC'])
+
 
 # ---------------------------------------------------------------
-# Add all modules to the main path
+
+
+particlegun = register_module('ParticleGun')
+# Set parameters for particlegun
+particlegun.param({  # Generate 5 tracks But vary the number of tracks
+                     # according to Poisson distribution Generate pi+, pi-, e+
+                     # and e- with a normal distributed transversal momentum
+                     # with a center of 5 GeV and a width of 1 GeV a normal
+                     # distributed phi angle, center of 180 degree and a width
+                     # of 30 degree Generate theta angles uniform in cos theta
+                     # between 17 and 150 degree normal distributed vertex
+                     # generation around the origin with a sigma of 2cm in the
+                     # xy plane and no deviation in z all tracks sharing the
+                     # same vertex per event
+    'nTracks': 1,
+    'varyNTracks': False,
+    'pdgCodes': [-211],  # 211-pi, 321-K, 2212-p
+    'momentumGeneration': 'fixed',  # 'uniform',
+    'momentumParams': [0.6],  # , 0.7],
+    'phiGeneration': 'fixed',
+    'phiParams': [135],  # , 281],
+    'thetaGeneration': 'uniform',
+    'thetaParams': [100, 110],
+    'vertexGeneration': 'normal',
+    'xVertexParams': [-5., 0.005],
+    'yVertexParams': [-5., 0.005],
+    'zVertexParams': [0, 0],
+    'independentVertices': False,
+})
+
+# EvtGen to provide generic BB events
+evtgeninput = register_module('EvtGenInput')
+
+# simulation
+g4sim = register_module('FullSim')
+# this is need for the MCTrackFinder to work correctly
+g4sim.param('StoreAllSecondaries', False)
+g4sim.param('SecondariesEnergyCut', 0.1)
+
+# make the simulation less noisy
+g4sim.logging.log_level = LogLevel.ERROR
+
+# digitizer
+cdcDigitizer = register_module('CDCDigitizer')
+cdcDigitizer.param({
+    'AddInWirePropagationDelay': True,
+    'AddTimeOfFlight': True,
+})
+
+wirehittopologypreparer = register_module('WireHitTopologyPreparer')
+
+# TrackFinderCDCLegendre
+cdctracking = register_module('CDCLegendreTracking')
+
+# Display module
+display_module = CDCSVGDisplayModule()
+display_module.draw_gftrackcand_trajectories = True
+display_module.draw_gftrackcands = True
+display_module.output_folder = "tmp/"
+display_module.use_time_in_filename = False
+display_module.filename_prefix = "LegendreFinder"
+display_module.interactive = False
+
+
+printcollections = register_module('PrintCollections')
+
+# create paths
 main = create_path()
 
 # add modules to paths
@@ -122,22 +130,26 @@ if options.input == '-999':
     main.add_module(eventinfoprinter)
     main.add_module(gearbox)
     main.add_module(geometry)
+    main.add_module(beamparameter)
+    # main.add_module(particlegun1)
     main.add_module(evtgeninput)
     main.add_module(g4sim)
-    main.add_module(mixbkg)
     main.add_module(cdcDigitizer)
+
 else:
     main.add_module(input)
     main.add_module(gearbox)
     main.add_module(geometry)
 
+
+main.add_module(wirehittopologypreparer)
+
 main.add_module(cdctracking)
-main.add_module(mcmatching)
-main.add_module(CDCNiceDrawing)
 
-main.add_module(output)
+main.add_module(display_module)
 
+# main.add_module(printcollections)
+
+# Process events
 process(main)
-
-# Print call statistics
 print(statistics)

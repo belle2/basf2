@@ -191,6 +191,16 @@ namespace Belle2 {
         m_relatedGenfitTrackCandidate = relatedTrackCand;
       }
 
+      void setHasMatchingSegment(bool hasMatchingSegment = true)
+      {
+        m_hasMatchingSegment = hasMatchingSegment;
+      }
+
+      bool getHasMatchingSegment() const
+      {
+        return m_hasMatchingSegment;
+      }
+
     private:
       /// Memory for the automaton cell.
       AutomatonCell m_automatonCell;
@@ -203,6 +213,9 @@ namespace Belle2 {
 
       /// Related genfit track cand
       genfit::TrackCand* m_relatedGenfitTrackCandidate = nullptr;
+
+      /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
+      bool m_hasMatchingSegment = false;
 
     }; //class
 

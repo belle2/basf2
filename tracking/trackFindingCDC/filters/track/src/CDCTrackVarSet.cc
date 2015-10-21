@@ -141,6 +141,8 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   setVariableIfNotNaN<named("adc_min")>(adc_min);
   setVariableIfNotNaN<named("adc_sum")>(adc_sum);
 
+  var<named("has_matching_segment")>() = track->getHasMatchingSegment();
+
   setVariableIfNotNaN<named("empty_s_mean")>(empty_s_sum / size);
   setVariableIfNotNaN<named("empty_s_sum")>(empty_s_sum);
   setVariableIfNotNaN<named("empty_s_variance")>(empty_s_variance);

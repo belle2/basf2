@@ -43,6 +43,8 @@ namespace Belle2 {
       "empty_s_min",
       "empty_s_sum",
 
+      "has_matching_segment",
+
       "s_range",
     };
 
@@ -53,7 +55,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 19;
+      static const size_t nNames = 20;
 
       constexpr
       static char const* getName(int iName)

@@ -138,11 +138,11 @@ class ReadOrGenerateEventsRun(MinimalRun):
         if self.root_input_file is None:
             generator_module = get_generator_module(self.generator_module)
 
-            generator_module_name = self.get_basf2_module_name(generator_module)
-            if generator_module_name == "EvtGenInput":
-                beamparameters.add_beamparameters(main_path, "Y4S")
-
             if generator_module is not None:
+                generator_module_name = self.get_basf2_module_name(generator_module)
+                if generator_module_name == "EvtGenInput":
+                    beamparameters.add_beamparameters(main_path, "Y4S")
+
                 # Allow for Background only execution
                 main_path.add_module(generator_module)
 

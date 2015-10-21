@@ -134,7 +134,7 @@ void DisplayUI::updateUI()
   if (!eventMetaData) {
     m_eventLabel->SetText("No EventMetaData object available.");
   } else {
-    m_eventLabel->SetText(TString::Format("Event: \t\t%lu\nRun: \t\t%lu\nExperiment: \t%lu", eventMetaData->getEvent(),
+    m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d", eventMetaData->getEvent(),
                                           eventMetaData->getRun(), eventMetaData->getExperiment()));
   }
   m_eventLabel->Resize();
@@ -228,14 +228,14 @@ void DisplayUI::showJumpToEventDialog()
   char returnString[256]; //magic length specified by TGInputDialog. Note that it still overwrites the stack if you paste something long enough.
   new TGInputDialog(gEve->GetBrowser()->GetClient()->GetDefaultRoot(), gEve->GetBrowser(),
                     "Jump to event '#evt/#run/#exp':",
-                    TString::Format("%lu/%lu/%lu", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()),
+                    TString::Format("%u/%d/%d", eventMetaData->getEvent(), eventMetaData->getRun(), eventMetaData->getExperiment()),
                     returnString);
   if (returnString[0] == '\0')
     return; //cancelled
 
-  long event, run, exp;
+  unsigned int event, run, exp;
   returnString[255] = '\0'; //I don't trust root to terminate the string correctly
-  if (sscanf(returnString, "%ld/%ld/%ld", &event, &run, &exp) != 3) {
+  if (sscanf(returnString, "%u/%u/%u", &event, &run, &exp) != 3) {
     B2WARNING("Wrong format!");
     return;
   }

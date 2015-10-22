@@ -64,10 +64,10 @@ namespace Belle2 {
       /// Change to next pass
       bool nextPass()
       {
-        if (m_legendreFindingPass == LegendreFindingPass::NonCurlers)  m_legendreFindingPass =
-            LegendreFindingPass::NonCurlersWithIncreasingThreshold;
-        else if (m_legendreFindingPass == LegendreFindingPass::NonCurlersWithIncreasingThreshold) m_legendreFindingPass =
-            LegendreFindingPass::FullRange;
+        if (m_legendreFindingPass == LegendreFindingPass::NonCurlers)
+          m_legendreFindingPass = LegendreFindingPass::NonCurlersWithIncreasingThreshold;
+        else if (m_legendreFindingPass == LegendreFindingPass::NonCurlersWithIncreasingThreshold)
+          m_legendreFindingPass = LegendreFindingPass::FullRange;
         else if (m_legendreFindingPass == LegendreFindingPass::FullRange) {
           m_legendreFindingPass = LegendreFindingPass::End;
           return false;

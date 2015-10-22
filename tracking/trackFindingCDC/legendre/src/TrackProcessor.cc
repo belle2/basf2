@@ -254,7 +254,7 @@ void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
 
   for (CDCRecoHit3D& recoHit : trackCandidate) {
 
-    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.3)
+    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.2)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
@@ -427,6 +427,7 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, float fraction)
 
 void TrackProcessor::checkTrackProb()
 {
+  return;
   m_trackHolder.doForAllTracks([](CDCTrack & track) {
     std::vector<std::pair<std::pair<double, double>, double>> hits;
 

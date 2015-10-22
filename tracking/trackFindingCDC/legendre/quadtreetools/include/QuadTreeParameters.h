@@ -45,7 +45,7 @@ namespace Belle2 {
             || (m_legendreFindingPass == LegendreFindingPass::NonCurlersWithIncreasingThreshold))
           return 50;
         else
-          return 20;
+          return 30;
       }
 
       /// Get threshold on curvature
@@ -55,7 +55,7 @@ namespace Belle2 {
             || (m_legendreFindingPass == LegendreFindingPass::NonCurlersWithIncreasingThreshold))
           return 0.07;
         else
-          return 0.20;
+          return 0.15;
       }
 
       /// Get ranges for quadtree processor

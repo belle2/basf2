@@ -55,6 +55,7 @@ void TrackMerger::resetHits(CDCTrack& track)
 
 void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
 {
+  return;
   CDCKarimakiFitter trackFitter;
 
   // Search for best matches

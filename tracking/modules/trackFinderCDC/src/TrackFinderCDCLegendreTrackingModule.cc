@@ -121,13 +121,14 @@ void CDCLegendreTrackingModule::findTracks()
 
     nCandsAdded = m_trackHolder.getCDCTracks().size() - nCandsAdded;
 
+    m_QuadTreePassCounter.nextPass();
     // Change to the next pass
-    if (m_QuadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
-      m_QuadTreePassCounter.nextPass();
-    }
-    if ((m_QuadTreePassCounter.getPass() == LegendreFindingPass::FullRange) && (nCandsAdded == 0)) {
-      m_QuadTreePassCounter.nextPass();
-    }
+//    if (m_QuadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
+//      m_QuadTreePassCounter.nextPass();
+//    }
+//    if ((m_QuadTreePassCounter.getPass() == LegendreFindingPass::FullRange) && (nCandsAdded == 0)) {
+//     m_QuadTreePassCounter.nextPass();
+//    }
 
   } while (m_QuadTreePassCounter.getPass() != LegendreFindingPass::End);
 
@@ -135,7 +136,7 @@ void CDCLegendreTrackingModule::findTracks()
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
   m_trackHolder.doForAllTracks([&](CDCTrack & track) {
-//   return;
+    return;
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
       HitProcessor::splitBack2BackTrack(track);

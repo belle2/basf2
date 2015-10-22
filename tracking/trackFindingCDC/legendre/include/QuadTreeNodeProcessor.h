@@ -50,8 +50,8 @@ namespace Belle2 {
       AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface()
       {
         AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
-        hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
-          this->candidateProcessingFinal(hits, qt);
+        hits __attribute__((unused)), AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+          this->candidateProcessingFinal(qt);
         };
 
         return lmdCandidateProcessingFinal;
@@ -60,7 +60,7 @@ namespace Belle2 {
 
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
-      void candidateProcessingFinal(const AxialHitQuadTreeProcessor::ReturnList& hits, AxialHitQuadTreeProcessor::QuadTree* qt)
+      void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt)
       {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);

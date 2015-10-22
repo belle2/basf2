@@ -22,7 +22,6 @@
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>
-#include "../include/TrackHitsProcessor.h"
 
 using namespace std;
 using namespace Belle2;

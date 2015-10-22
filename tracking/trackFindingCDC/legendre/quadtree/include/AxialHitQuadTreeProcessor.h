@@ -77,44 +77,7 @@ namespace Belle2 {
       {
         float dist_1[2][2];
         float dist_2[2][2];
-        /*
-        double r2 = (hit->getCDCWireHit()->getRefPos2D().norm() + hit->getCDCWireHit()->getRefDriftLength()) *
-                    (hit->getCDCWireHit()->getRefPos2D().norm() - hit->getCDCWireHit()->getRefDriftLength());
-        double d2 = hit->getCDCWireHit()->getRefDriftLength()*hit->getCDCWireHit()->getRefDriftLength();
 
-        int thetaMin = node->getXMin();
-        int thetaMax = node->getXMax();
-        float rMin = node->getYMin();
-        float rMax = node->getYMax();
-
-        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMin));
-        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMin));
-        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMax));
-        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMax));
-
-
-        //left border of the node:
-        float kappaHitMin = (cosThetaMin/(1-sinThetaMin)) * (2.*hit->getCDCWireHit()->getRefPos2D().x()/(r2-d2));
-        //right border of the node:
-        float kappaHitMax = (cosThetaMax/(1-sinThetaMax)) * (2.*hit->getCDCWireHit()->getRefPos2D().x()/(r2-d2));
-
-        float rHitMin1 = kappaHitMin - hit->getConformalDriftLength();
-        float rHitMin2 = kappaHitMin + hit->getConformalDriftLength();
-        float rHitMax1 = kappaHitMax - hit->getConformalDriftLength();
-        float rHitMax2 = kappaHitMax + hit->getConformalDriftLength();
-
-        dist_1[0][0] = rMin - rHitMin1;
-        dist_1[0][1] = rMin - rHitMax1;
-        dist_1[1][0] = rMax - rHitMin1;
-        dist_1[1][1] = rMax - rHitMax1;
-
-        dist_2[0][0] = rMin - rHitMin2;
-        dist_2[0][1] = rMin - rHitMax2;
-        dist_2[1][0] = rMax - rHitMin2;
-        dist_2[1][1] = rMax - rHitMax2;
-
-
-        */
         unsigned long thetaMin = node->getXMin();
         unsigned long thetaMax = node->getXMax();
         float rMin = node->getYMin();

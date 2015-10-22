@@ -14,7 +14,16 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include "../include/TrackHitsProcessor.h"
+#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+
+
+#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+
+#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
+
+#include <TMath.h>
 #include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
 
 using namespace std;
@@ -94,20 +103,6 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
 
   }
   */
-}
-
-void HitProcessor::deleteAllMarkedHits(CDCTrack& trackCandidate)
-{
-
-  trackCandidate.erase(
-  std::remove_if(trackCandidate.begin(), trackCandidate.end(), [](const CDCRecoHit3D & hit) {
-    if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-      return true;
-    }
-    return false;
-  }),
-  trackCandidate.end());
-
 }
 
 void HitProcessor::deleteWrongHitsOfTrack(CDCTrack& trackCandidate)
@@ -226,3 +221,208 @@ void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
     hit.getWireHit().getAutomatonCell().setTakenFlag(true);
   }
 }
+
+std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& trackCandidate)
+{
+  assert(trackCandidate);
+
+  std::vector<const CDCWireHit*> removedHits;
+
+//  return removedHits;
+  if (trackCandidate.size() < 5) return removedHits;
+
+  // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
+  // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
+//    std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
+
+  for (CDCRecoHit3D& hit : trackCandidate) {
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  }
+
+
+  if (checkBack2BackTrack(trackCandidate)) {
+
+    ESign trackCharge = getChargeSign(trackCandidate);
+
+    for (const CDCRecoHit3D& hit : trackCandidate.items()) {
+
+      if (getCurvatureSignWrt(hit, trackCandidate.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) {
+        hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
+        hit.getWireHit().getAutomatonCell().setTakenFlag(false);
+      }
+
+    }
+
+    for (CDCRecoHit3D& hit : trackCandidate) {
+      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag())
+        removedHits.push_back(&(hit.getWireHit()));
+    }
+
+    deleteAllMarkedHits(trackCandidate);
+
+    for (const CDCWireHit* hit : removedHits) {
+      hit->getAutomatonCell().setMaskedFlag(false);
+      hit->getAutomatonCell().setTakenFlag(false);
+    }
+
+
+  }
+
+  return removedHits;
+}
+
+CDCTrajectory2D HitProcessor::fitWhithoutRecoPos(CDCTrack& track)
+{
+  std::vector<const CDCWireHit*> wireHits;
+  for (const CDCRecoHit3D& hit : track) {
+    wireHits.push_back(&(hit.getWireHit()));
+  }
+
+  return fitWhithoutRecoPos(wireHits);
+}
+
+CDCTrajectory2D HitProcessor::fitWhithoutRecoPos(std::vector<const CDCWireHit*>& wireHits)
+{
+  CDCKarimakiFitter trackFitter;
+  CDCObservations2D observations;
+  for (const CDCWireHit* wireHit : wireHits) {
+    observations.append(wireHit->getRefPos2D().x(), wireHit->getRefPos2D().y(), 0, 1. / fabs(wireHit->getRefDriftLength()));
+  }
+  CDCTrajectory2D trackTrajectory2D ;
+  trackFitter.update(trackTrajectory2D, observations);
+
+  return trackTrajectory2D;
+}
+
+
+bool HitProcessor::checkBack2BackTrack(CDCTrack& track)
+{
+  int vote_pos = 0;
+  int vote_neg = 0;
+
+  for (const CDCRecoHit3D& hit : track.items()) {
+    int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center());
+
+    if (curve_sign == ESign::c_Plus)
+      ++vote_pos;
+    else if (curve_sign == ESign::c_Minus)
+      ++vote_neg;
+    else {
+      B2ERROR(
+        "Strange behaviour of TrackHit::getCurvatureSignWrt");
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  if ((fabs(vote_pos - vote_neg) / (double)(vote_pos + vote_neg) < 1.)
+      && fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
+    return true;
+
+  return false;
+}
+
+void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
+{
+
+
+  track.erase(
+  std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & hit) {
+    if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
+      return true;
+    }
+    return false;
+//    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
+  }),
+  track.end());
+
+}
+
+void HitProcessor::resetHits(CDCTrack& track)
+{
+  for (const CDCRecoHit3D& hit : track.items()) {
+    hit->getWireHit().getAutomatonCell().setTakenFlag(false);
+  }
+}
+
+
+ESign HitProcessor::getChargeSign(CDCTrack& track)
+{
+  ESign trackCharge;
+  int vote_pos(0), vote_neg(0);
+
+  Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
+
+  if (std::isnan(center.x())) {
+    B2WARNING("Trajectory is not setted or wrong!");
+    return track.getStartTrajectory3D().getChargeSign();
+  }
+
+  for (const CDCRecoHit3D& hit : track.items()) {
+    ESign curve_sign = getCurvatureSignWrt(hit, center);
+
+    if (curve_sign == ESign::c_Plus)
+      ++vote_pos;
+    else if (curve_sign == ESign::c_Minus)
+      ++vote_neg;
+    else {
+      B2ERROR(
+        "Strange behaviour of TrackHit::getCurvatureSignWrt");
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  if (vote_pos > vote_neg)
+    trackCharge = ESign::c_Plus;
+  else
+    trackCharge = ESign::c_Minus;
+
+
+  return trackCharge;
+}
+
+ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
+{
+  double phi_diff = atan2(xy.y(), xy.x()) - getPhi(hit);
+
+  while (phi_diff > /*2 */ TMath::Pi())
+    phi_diff -= 2 * TMath::Pi();
+  while (phi_diff < -1. * TMath::Pi())
+    phi_diff += 2 * TMath::Pi();
+
+  if (phi_diff > 0 /*TMath::Pi()*/)
+    return ESign::c_Minus;
+  else
+    return ESign::c_Plus;
+
+}
+
+double HitProcessor::getPhi(const CDCRecoHit3D& hit)
+{
+
+
+  double phi = atan2(hit.getRecoPos2D().y() , hit.getRecoPos2D().x());
+  /*
+    while (phi > 2 * TMath::Pi())
+      phi -= 2 * TMath::Pi();
+    while (phi < 0)
+      phi += 2 * TMath::Pi();
+  */
+  return phi;
+  /*
+    //the phi angle of the hit depends on the definition, so I try to use the wireId instead
+    //however maybe this function might also be still useful...
+    double phi = atan(hit.getRecoPos2D().y() / hit.getRecoPos2D().x());
+
+    if (hit.getRecoPos2D().x() < 0) {
+      phi += TMath::Pi();
+    }
+
+    if (hit.getRecoPos2D().x() >= 0 && hit.getRecoPos2D().y() < 0) {
+      phi += 2 * TMath::Pi();
+    }
+
+    return phi;
+  */
+}
+

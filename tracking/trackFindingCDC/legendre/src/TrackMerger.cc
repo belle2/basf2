@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
-#include <tracking/trackFindingCDC/legendre/TrackHitsProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
@@ -37,7 +36,7 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
 
   m_trackProcessor.updateTrack(track1);
 
-  std::vector<const CDCWireHit*> removedHits = TrackHitsProcessor::splitBack2BackTrack(track1);
+  std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track1);
 
   m_trackProcessor.updateTrack(track1);
 

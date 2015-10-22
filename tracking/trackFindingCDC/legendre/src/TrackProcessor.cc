@@ -20,10 +20,7 @@
 
 #include <genfit/TrackCand.h>
 #include <framework/gearbox/Const.h>
-#include "../include/TrackHitsProcessor.h"
-
-#include "TCanvas.h"
-#include "TH1F.h"
+#include "../include/HitProcessor.h"
 
 using namespace std;
 using namespace Belle2;
@@ -61,7 +58,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track)
   updateTrack(track);
   //return;
   //  B2INFO("split");
-  TrackHitsProcessor::splitBack2BackTrack(track);
+  HitProcessor::splitBack2BackTrack(track);
   if (not checkTrack(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -97,7 +94,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track)
 
 
   //  B2INFO("split");
-  TrackHitsProcessor::splitBack2BackTrack(track);
+  HitProcessor::splitBack2BackTrack(track);
   if (not checkTrack(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -167,7 +164,7 @@ void TrackProcessor::updateTrack(CDCTrack& track)
 
   //B2INFO("orientation: " << trackTrajectory2D.getLocalCircle().orientation() << "; charge: " << trackTrajectory2D.getChargeSign() << "; charge2: " << TrackMergerNew::getChargeSign(track));
 
-  if (trackTrajectory2D.getChargeSign() != TrackHitsProcessor::getChargeSign(track)) trackTrajectory2D.reverse();
+  if (trackTrajectory2D.getChargeSign() != HitProcessor::getChargeSign(track)) trackTrajectory2D.reverse();
 
   trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
 
@@ -261,7 +258,7 @@ void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
-  TrackHitsProcessor::deleteAllMarkedHits(trackCandidate);
+  HitProcessor::deleteAllMarkedHits(trackCandidate);
 
   updateTrack(trackCandidate);
 }
@@ -281,7 +278,7 @@ void TrackProcessor::assignNewHits()
 
     assignNewHits(track);
 
-    std::vector<const CDCWireHit*> removedHits = TrackHitsProcessor::splitBack2BackTrack(track);
+    std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track);
 
     createCandidate(removedHits);
 
@@ -440,13 +437,13 @@ void TrackProcessor::checkTrackProb()
     }
 
 
-//    B2DEBUG(100, "chi2: new = " << TMath::Prob(TrackHitsProcessor::fitWhithoutRecoPos(track), track.size() - 4) << "; old = " << TMath::Prob(TrackFitter::fitTrackCandidateFast(hits), track.size() - 4));
+//    B2DEBUG(100, "chi2: new = " << TMath::Prob(HitProcessor::fitWhithoutRecoPos(track), track.size() - 4) << "; old = " << TMath::Prob(TrackFitter::fitTrackCandidateFast(hits), track.size() - 4));
 
-    if (TMath::Prob((TrackHitsProcessor::fitWhithoutRecoPos(track)).getChi2(), track.size() - 4) < 0.4) {
+    if (TMath::Prob((HitProcessor::fitWhithoutRecoPos(track)).getChi2(), track.size() - 4) < 0.4) {
       for (const CDCRecoHit3D& hit : track) {
         hit->getWireHit().getAutomatonCell().setMaskedFlag(true);
       }
-      TrackHitsProcessor::deleteAllMarkedHits(track);
+      HitProcessor::deleteAllMarkedHits(track);
     }
   });
 

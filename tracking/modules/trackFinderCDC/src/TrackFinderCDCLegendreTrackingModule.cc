@@ -21,13 +21,13 @@
 #include <tracking/trackFindingCDC/legendre/TrackQuality.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
+#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
 #include <tracking/trackFindingCDC/legendre/QuadTreeNodeProcessor.h>
 
 #include <cdc/dataobjects/CDCHit.h>
-#include <tracking/trackFindingCDC/legendre/TrackHitsProcessor.h>
 
 using namespace std;
 using namespace Belle2;
@@ -138,7 +138,7 @@ void CDCLegendreTrackingModule::findTracks()
 //   return;
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
-      TrackHitsProcessor::splitBack2BackTrack(track);
+      HitProcessor::splitBack2BackTrack(track);
       m_trackProcessor.updateTrack(track);
       std::vector<const CDCWireHit*> hitsToSplit;
 
@@ -148,7 +148,7 @@ void CDCLegendreTrackingModule::findTracks()
         }
       }
 
-      TrackHitsProcessor::deleteAllMarkedHits(track);
+      HitProcessor::deleteAllMarkedHits(track);
 
       for (const CDCWireHit* hit : hitsToSplit) {
         hit->getAutomatonCell().setMaskedFlag(false);

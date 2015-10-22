@@ -82,6 +82,7 @@ DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfi
 
 
 class Particle(object):
+
     """
     The Particle class is the only class the end-user gets into contact with.
     The user creates an instance of this class for every particle he wants to reconstruct with the FEI algorithm,
@@ -213,6 +214,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
 
         for channel in particle.channels:
             dag.add('Name_' + channel.name, channel.name)
+            dag.add('Mother_' + channel.name, particle.identifier)
             dag.add('MVAConfig_' + channel.name, channel.mvaConfig)
             dag.add('MVATarget_' + channel.name, channel.mvaConfig.target)
             dag.add('UserCutConfig_' + channel.name, channel.userCutConfig)
@@ -463,6 +465,14 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
                 target='MVATarget_' + particle.identifier)
         dag.addNeeded('VariablesToNTuple_' + particle.identifier)
 
+    dag.add('SaveStatisticSummary', provider.SaveStatisticSummary,
+            mcCounts='mcCounts',
+            listCounts='listCounts',
+            VariablesToNTuple_list=['VariablesToNTuple_' + particle.identifier for particle in particles],
+            particle_lists=['ParticleList_' + particle.identifier for particle in particles],
+            targets=['MVATarget_' + particle.identifier for particle in particles],
+            particle_Labels=['Label_' + particle.identifier for particle in particles])
+
     # Create the automatic reporting summary pdf
     if args.summary:
 
@@ -528,6 +538,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     dag.addNeeded('listCounts')
     dag.addNeeded('mcCounts')
     dag.addNeeded('ModuleStatisticsFile')
+    dag.addNeeded('SaveStatisticSummary')
 
     fei_path = create_path()
 

@@ -7,7 +7,6 @@
 
 from basf2 import *
 import ROOT
-from ROOT import Belle2
 
 import modularAnalysis
 import pdg
@@ -731,4 +730,83 @@ def CountParticleLists(resource, targets, lists):
         resource.condition = ('EventType', '==0')
         resource.halt = True
         return
+    return filename
+
+
+def SaveStatisticSummary(resource, mcCounts, listCounts, VariablesToNTuple_list, particle_lists, targets, particle_Labels):
+    from fei import compactReporting as cR
+
+    resource.cache = False
+    filename = 'SummaryStatistic_' + resource.hash + '.txt'
+
+    out = open(filename, 'w')
+    out.write('# Post-Cut efficiencies for compact-FEI-summary \n')
+    out.write('# Particle           | post-cut efficency and purity              | pre-cut efficiency and purity \n')
+
+    for particle, target, label in zip(particle_lists, targets, particle_Labels):
+
+        mc_Count = -42
+        mc_hists = ROOT.TFile(mcCounts)
+        for key in mc_hists.GetListOfKeys():
+            part = particle.replace('e+', 'e-').replace('mu+', 'mu-').replace('Jpsi', 'J/psi')
+            if pdg.to_name(int(cR.rename_MCCount(key.GetName()))) in part:
+                mc_Count = cR.calcSum(key.ReadObj())
+
+        unique_Count = -42
+        for var_file in VariablesToNTuple_list:
+            if particle.replace('J/psi', 'Jpsi') in var_file:
+                var_hist = ROOT.TFile(var_file)
+                var = var_hist.Get('variables')
+                leafs_str = [str(i.GetName()) for i in var.GetListOfLeaves()]
+                if 'extraInfo__bouniqueSignal__bc' in leafs_str:
+                    unique_Count = int(GetEntriesSafe(var, '{target} == 1 && {unique} == 1'.format(
+                        target=target,
+                        unique='extraInfo__bouniqueSignal__bc')))
+                sig_Count = int(GetEntriesSafe(var, '{target} == 1'.format(target=target)))
+                bkg_Count = int(GetEntriesSafe(var, '{target} == 0'.format(target=target)))
+                roc_filename = 'CS_{particle}_{label}_roc.png'.format(
+                    particle=particle.rsplit(':', 1)[0].replace('/', '').replace('+', ''),
+                    label=label)
+                cR.makeROCPlotFromNtuple(var_file, roc_filename, mc_Count, target)
+
+        list_Count_sig = 0
+        list_Count_bkg = 0
+        list_Count_all = 0
+        list_hists = ROOT.TFile(listCounts)
+        for key in list_hists.GetListOfKeys():
+            part = particle.rsplit(':', 1)[0].replace('Jpsi', 'J/psi')
+            list = cR.rename_ListCount(key.GetName())
+            if part in list and 'Signal' in list:
+                list_Count_sig += cR.calcSum(key.ReadObj())
+            if part in list and 'Background' in list:
+                list_Count_bkg += cR.calcSum(key.ReadObj())
+            if part in list and 'All' in list:
+                list_Count_all += cR.calcSum(key.ReadObj())
+
+        line = '{part:<5} - {label:<13}: {eff:<20}, {pur:<20} | {pre_eff:<20}, {pre_pur:<20}'.format(
+            part=particle.rsplit(':', 1)[0],
+            label=label,
+            # Post-Cut:
+            eff=sig_Count * 100. / mc_Count,
+            pur=sig_Count * 100. / (sig_Count + bkg_Count),
+            # Pre-Cut (Detector for FSP):
+            pre_eff=list_Count_sig * 100. / mc_Count,
+            pre_pur=list_Count_sig * 100. / (list_Count_sig + list_Count_bkg))
+
+        out.write(line + '\n')
+
+        if unique_Count != -42:
+            line2 = '{part:<5} - {label:<13}: {eff:<20}, {pur:<20} UNIQUE'.format(
+                part=particle.rsplit(':', 1)[0],
+                label=label,
+                # Post-Cut:
+                eff=unique_Count * 100. / mc_Count,
+                pur=unique_Count * 100. / (unique_Count + bkg_Count))
+
+            out.write(line2 + '\n')
+
+    out.close()
+
+    B2INFO('Statistic Summary saved in file {file}'.format(file=filename))
+
     return filename

@@ -39,9 +39,9 @@ namespace Belle2 {
    *   - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
    *
    * o) neutral final state particles
-   *   - gamma         (input MDST type = ECLCluster)
-   *   - K_S0, Lambda0 (input MDST type = V0)
-   *   - K_L0          (input MDST type = KLMCluster)
+   *   - gamma                            (input MDST type = ECLCluster)
+   *   - K_S0, Lambda0, converted photons (input MDST type = V0)
+   *   - K_L0                             (input MDST type = KLMCluster)
    *
    * The following BASF2 relations are set by the ParticleLoader:
    *

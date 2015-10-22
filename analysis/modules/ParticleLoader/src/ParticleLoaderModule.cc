@@ -161,18 +161,28 @@ namespace Belle2 {
           }
 
           if (abs(pdgCode) == abs(Const::photon.getPDGCode())) {
-            B2INFO("   -> MDST source: ECLClusters");
-            m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            if (m_addDaughters == false) {
+              B2INFO("   -> MDST source: ECLClusters");
+              m_ECLClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            } else {
+              B2INFO("   -> MDST source: V0 (-> TFR(e) + TFR(e))");
+              m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+            }
           }
 
           if (abs(pdgCode) == abs(Const::Kshort.getPDGCode())) {
-            B2INFO("   -> MDST source: V0");
+            B2INFO("   -> MDST source: V0 (-> TFR(pi) + TFR(pi))");
             m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
             m_KLMClusters2Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
+          }
+
+          if (abs(pdgCode) == abs(Const::lambda.getPDGCode())) {
+            B2INFO("   -> MDST source: V0 (-> TFR(p) + TFR(pi))");
+            m_V02Plists.push_back(make_tuple(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut));
           }
         }
         B2INFO("   -> With cuts  : " << cutParameter);
@@ -235,7 +245,7 @@ namespace Belle2 {
       for (auto v02Plist : m_V02Plists) {
         int listPDGCode = get<c_PListPDGCode>(v02Plist);
 
-        if (listPDGCode != v0Type.getPDGCode())
+        if (abs(listPDGCode) != abs(v0Type.getPDGCode()))
           continue;
 
         Const::ChargedStable pTypeP(Const::pion);
@@ -574,7 +584,8 @@ namespace Belle2 {
     if (abs(pdgCode) == abs(Const::Klong.getPDGCode()))
       return true;
 
-    // TODO: Lambda0 is missing
+    if (abs(pdgCode) == abs(Const::lambda.getPDGCode()))
+      return true;
 
     return result;
   }

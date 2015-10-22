@@ -427,7 +427,6 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, float fraction)
 
 void TrackProcessor::checkTrackProb()
 {
-  return;
   m_trackHolder.doForAllTracks([](CDCTrack & track) {
     std::vector<std::pair<std::pair<double, double>, double>> hits;
 

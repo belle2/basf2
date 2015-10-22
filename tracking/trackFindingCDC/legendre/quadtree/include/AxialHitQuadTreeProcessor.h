@@ -82,10 +82,10 @@ namespace Belle2 {
         unsigned long thetaMax = node->getXMax();
         float rMin = node->getYMin();
         float rMax = node->getYMax();
-        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(thetaMin);
-        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(thetaMin);
-        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(thetaMax);
-        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(thetaMax);
+        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMin));
+        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMin));
+        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMax));
+        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMax));
 
         float rHitMin = hit->getConformalX() * cosThetaMin + hit->getConformalY() * sinThetaMin;
         float rHitMax = hit->getConformalX() * cosThetaMax + hit->getConformalY() * sinThetaMax;

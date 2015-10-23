@@ -79,18 +79,19 @@ namespace Belle2 {
     }
 
 
+  public:
     /** loops over all branches to update their entries. */
-    void updateBranchEntries(Long64_t thisEntry,
-                             std::deque<std::pair<TBranch*, unsigned>>& sectorBranches)
+    template <class ValueType>
+    static void updateBranchEntries(Long64_t thisEntry,
+                                    std::deque<std::pair<TBranch*, ValueType>>& sectorBranches)
     {
       std::string out;
-      for (std::pair<TBranch*, unsigned>& branchPack : sectorBranches) {
+      for (std::pair<TBranch*, ValueType>& branchPack : sectorBranches) {
         branchPack.first->GetEntry(thisEntry);
         out += FullSecID(branchPack.second).getFullSecString() + " ";
       }
       B2DEBUG(1, "updateBranchEntries: secBranches carries the following sectors: " << out);
     }
-  public:
 
 
     /** shortcut for easier readibility. */
@@ -268,32 +269,55 @@ namespace Belle2 {
     }
 
 
-    /** if combination does not exist yet, it will get added to the graph (returns true), if it exists, simply counters are increased (returns false). */
+    /** if combination does not exist yet, it will get added to the graph, if it exists, simply counters are increased.
+    * returns true, if everything was okay, false if there was an issue.
+    *
+    * deques:
+    * .first pointer to branch, .second value of branch for given thisEntry. Hardcopy because of recursive approach.
+    */
     bool addRelationToGraph(Long64_t thisEntry, // of the tree/chain
-                            std::deque<std::pair<TBranch*, unsigned>>
-                            sectorBranches) // .first pointer to branch, .second value of branch for given thisEntry. Hardcopy because of recursive approach.
+                            std::deque<std::pair<TBranch*, unsigned>> sectorBranches, // Hardcopy because of recursive approach
+                            std::deque<std::pair<TBranch*, double>>& filterBranches)
     {
       // case: we are finished:
-      if (sectorBranches.empty()) return false;
+      if (sectorBranches.empty()) { B2ERROR("addRelationToGraph: should not happen!"); return false; }
+
+      // case: reached final sector:
+      if (sectorBranches.size() == 1) {
+        wasFound();
+        /// TODO filterBranches: collect min&max...
+        return true;
+      }
+
+      sectorBranches.pop_front();
 
       // set correct entry:
-      sectorBranches[0].first->GetEntry(thisEntry);
-      unsigned currentID = sectorBranches[0].second;
+      updateBranchEntries<unsigned>(thisEntry, sectorBranches);
+      unsigned innerID = sectorBranches[0].second;
 
-      if (currentID == m_rawID) {
-        wasFound();
-      } else {
-        Iterator pos = find(currentID);
+      Iterator pos = find(innerID);
 
-        // case: it is not this one and and none of the inner sectors:
-        if (pos == end()) {
-          pos = addInnerSector(currentID);
-        }
+//       if (currentID == m_rawID) {
+//         wasFound();
+//    return
+//       } else {
+//    B2ERROR("addRelationToGraph: should not happen!")
+//    return false;
+//    }
+//
+//    sectorBranches.pop_front();
+//    unsigned innerID = sectorBranches[0].second;
+//    Iterator pos = find(innerID);
 
-        sectorBranches.pop_front();
-        pos->addRelationToGraph(thisEntry, sectorBranches);
-
+      // case: it is not this one and and none of the inner sectors:
+      if (pos == end()) {
+        pos = addInnerSector(innerID);
       }
+
+//    sectorBranches.pop_front();
+      return pos->addRelationToGraph(thisEntry, sectorBranches, filterBranches);
+
+//       }
 
 //    // now only two cases left to capture: isThisSector or isInnerSector (both at the same time is not possible).
 //    // case: is this sector -> is not inner Sector:
@@ -409,7 +433,7 @@ namespace Belle2 {
         return 0;
       }
 
-      updateBranchEntries(thisEntry, sectorBranches);
+      updateBranchEntries<unsigned>(thisEntry, sectorBranches);
 //    sectorBranches[0].first->GetEntry(thisEntry);
       unsigned currentRawID = sectorBranches[0].second;
 
@@ -451,12 +475,23 @@ namespace Belle2 {
       }
 
       // all other cases- we are not yet done yet but at least current sector is correct.
+      B2DEBUG(1, "distillRawData4FilterCutsV2: before doing pop_front, size: " <<
+              sectorBranches.size() <<
+              " (this/inner: " << FullSecID(currentRawID).getFullSecString() <<
+              "/" <<
+              FullSecID(sectorBranches[1].second).getFullSecString() <<
+              ")")
       sectorBranches.pop_front();
 //    sectorBranches[0].first->GetEntry(thisEntry);
 
       // find inner sector with correct id:
       unsigned innerRawID = sectorBranches[0].second;
-      if (currentRawID == innerRawID) { B2ERROR(" this and inner raw iD are identical! " << FullSecID(currentRawID).getFullSecString()); }
+      if (currentRawID == innerRawID) {
+        B2ERROR(" this and inner raw iD are identical, size: " <<
+                sectorBranches.size() <<
+                "! " <<
+                FullSecID(currentRawID).getFullSecString());
+      }
       auto secPos = find(innerRawID);
 
       // case: this is not the right graph, skipping...

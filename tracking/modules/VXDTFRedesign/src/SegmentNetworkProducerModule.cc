@@ -75,9 +75,9 @@ void SegmentNetworkProducerModule::event()
 
   buildActiveSectorNetwork(collectedData);
 
-  buildTrackNodeNetwork();
+  buildTrackNodeNetwork(); // apply-two-hit-filters
 
-  buildSegmentNetwork();
+  buildSegmentNetwork(); // apply-three-hit-filters
 
   // TODO debug output with counters!
 }

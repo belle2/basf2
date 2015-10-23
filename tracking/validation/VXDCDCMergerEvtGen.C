@@ -26,43 +26,43 @@ void VXDCDCMergerEvtGen(){
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
-  //TH1F *h1 = new TH1F("h1","Merged Tracks EvtGen",10,0,10);
-  //h1->GetXaxis()->SetTitle("# of merged tracks");
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for EvtGen events")); 
-  //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *h1 = new TH1F("h1","Merged Tracks EvtGen",10,0,10);
+  h1->GetXaxis()->SetTitle("# of merged tracks");
+  h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for EvtGen events")); 
+  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 1"));
+  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //tree->Draw("eclClusterEnergy>>hClusterE","eclClusterEnergy>0");
   //tree->Draw("MergedTracks>>h1");
   //h1->Write();
   //c1->SaveAs("plots/MergedTracks_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h2 = new TH1F("h2","True Matched Tracks Truth Track Finder",10,0,10);
-  //tree->Draw("TrueMatchedTracks>>h2");
+  TH1F *h2 = new TH1F("h2","True Matched Tracks Truth Track Finder",10,0,10);
+  tree->Draw("TrueMatchedTracks>>h2");
   //h2->Write();
   //c1->SaveAs("plots/TrueMatchedTracks_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h3 = new TH1F("h3","CDCTracks",10,0,10);
-  //tree->Draw("CDCTracks>>h3");
+  TH1F *h3 = new TH1F("h3","CDCTracks",10,0,10);
+  tree->Draw("CDCTracks>>h3");
   //h3->Write();
   //c1->SaveAs("plots/CDCTracks_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h4 = new TH1F("h4","VXDTracks",10,0,10);
-  //tree->Draw("VXDTracks>>h4");
+  TH1F *h4 = new TH1F("h4","VXDTracks",10,0,10);
+  tree->Draw("VXDTracks>>h4");
   //h4->Write();
   //c1->SaveAs("plots/VXDTracks_5GeV_muons_1000_Theta.jpg");
 
-  //TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
-  //tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
-  //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
+  tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
+  h1->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
+  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/Chi2_5GeV_muons_1000_Theta.jpg");
   //h5->Write();
 
-  //TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
-  //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
+  h1->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
+  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
   //tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
   //h6->Write();
@@ -80,10 +80,10 @@ void VXDCDCMergerEvtGen(){
   //c1->SaveAs("plots/Dz_5GeV_muons_1000_Theta.jpg");
 
 
-  //TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
-  //h1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
-  //h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
-  //h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
+  TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
+  h1->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
+  h1->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
+  h1->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
   //h10->Write();
 
@@ -202,5 +202,31 @@ void VXDCDCMergerEvtGen(){
   eff_theta->Write();
   //delete eff_theta;
 
-  output->Close();
+  h2->SetLineWidth(3);
+  h2->SetLineColor(1);
+  h2->GetYaxis()->SetRange(0,2);
+  h2->Draw();
+  /*  h3->SetLineColor(3);
+  h3->SetLineWidth(3);
+  h3->Draw("same");
+  h4->SetLineColor(4);
+  h4->SetLineWidth(3);
+  h4->Draw("same");*/
+  h1->SetLineColor(2);
+  h1->SetLineWidth(3);
+  h1->Draw("same");
+  //h1->Write();
+  //c1->SaveAs("plots/TrueMergedTrk_5GeV_muons_1000_Theta.jpg");
+
+  h3->SetLineColor(4);
+  h3->SetLineWidth(3);
+  //  h3->GetYaxis()->SetRange(-1.,1.);
+  //h3->Draw();
+  h4->SetLineColor(3);
+  h4->SetLineWidth(3);
+  h4->Draw();
+  h3->Draw("same");
+  //h3->Write();
+  //c1->SaveAs("plots/VXDCDCTrk_5GeV_muons_1000_Theta.jpg");
+
 }

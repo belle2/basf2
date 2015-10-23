@@ -58,21 +58,21 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
   gStyle->SetOptStat("e");
   tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
-  h5->GetXaxis()->SetTitle("Chi2");
+  h5->GetXaxis()->SetTitle("Chi2 Single Muon Low Pt");
   //h5->GetYaxis()->SetTitle("Efficiency");
-  h5->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2")); 
+  h5->GetListOfFunctions()->Add(new TNamed("Description","6D Chi2 Single Muon Low Pt")); 
   h5->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h5->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/Chi2_5GeV_muons_1000_Theta.jpg");
   gStyle->SetOptStat("e");
   h5->Write();
 
-  TH1F *h6 = new TH1F("h6","Position Residual",100,0,0.5);
+  TH1F *h6 = new TH1F("h6","Position Residual Single Muon Low Pt",100,0,0.5);
   gStyle->SetOptStat("e");
   tree->Draw("PosRes>>h6","GoodTag==1&&TruthTag==1");
-  h6->GetXaxis()->SetTitle("Pos Res");
+  h6->GetXaxis()->SetTitle("Pos Res Single Muon Low Pt");
   //h5->GetYaxis()->SetTitle("Efficiency");
-  h6->GetListOfFunctions()->Add(new TNamed("Description","Position Residual")); 
+  h6->GetListOfFunctions()->Add(new TNamed("Description","Position Residual Single Muon Low Pt")); 
   h6->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h6->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
@@ -93,10 +93,10 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
 
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
   tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
-  h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual")); 
+  h10->GetListOfFunctions()->Add(new TNamed("Description","Momentum Residual Single Muon Low Pt")); 
   h10->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h10->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
-  h10->GetXaxis()->SetTitle("Mom Res");
+  h10->GetXaxis()->SetTitle("Mom Res Single Muon Low Pt");
   //h5->GetYaxis()->SetTitle("Efficiency");
   //tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
   gStyle->SetOptStat("e");
@@ -159,7 +159,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   eff_ptspttlp->SetMaximum(1.1);
   eff_ptspttlp->Sumw2();
   gPad->RedrawAxis();
-  TH1F *eff_ptlp = new TH1F("eff_ptlp", "Eff vs Pt Truth Track Finder Single Muon",100,0.,1.);
+  TH1F *eff_ptlp = new TH1F("eff_ptlp", "Eff vs Pt Truth Track Finder Single Muon Low Pt",100,0.,1.);
   eff_ptspttlp->GetXaxis()->SetTitle("Pt (GeV)");
   eff_ptspttlp->GetYaxis()->SetTitle("Efficiency");
   eff_ptspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs Pt [0, 5] GeV Muon")); 
@@ -182,7 +182,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   tree->Draw("(Pz/(P))>>eff_thetaspttlp","TruthTag==1&&GoodTag==1");
   eff_thetaspttlp->Sumw2();
   gPad->RedrawAxis();
-  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta Truth Track Finder Single Muon", 50, -1, 1.);
+  TH1F *eff_theta = new TH1F("eff_theta", "Eff vs Theta Truth Track Finder Single Muon Low Pt", 50, -1, 1.);
   eff_thetaspttlp->GetXaxis()->SetTitle("Polar Angle (rad)");
   eff_thetaspttlp->GetYaxis()->SetTitle("Efficiency");
   eff_thetaspttlp->GetListOfFunctions()->Add(new TNamed("Description","Efficiency vs theta")); 

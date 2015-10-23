@@ -212,9 +212,11 @@ trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'GFTracksColName': 'GFTracks',
     'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
-    'TrackCandColName': 'TracksCand',
+    #    'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
-    'chi2_max': 100000000,
+    'chi2_max': 100,
+    'merge_radius': 2.0,
+    'recover': 1,
 }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
 
@@ -222,7 +224,7 @@ vxd_cdcTracksMerger.param(trackMerger_param)
 
 # MERGING ANALYSIS
 # track merger analysis
-vxd_cdcTracksMergerAnalysis = register_module('VXDCDCTrackMergerAnalysis')
+vxd_cdcMergerAnalysis = register_module('VXDCDCMergerAnalysis')
 trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                                # default False
@@ -234,11 +236,11 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
     'root_output_filename': '../VXDCDCMergerSinglePartTruthFinderLowPt.root',
-    'chi2_max': 100,
-    'merge_radius': 2.0,
+    #    'chi2_max': 100,
+    #    'merge_radius': 2.0,
 }
-vxd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)
-vxd_cdcTracksMergerAnalysis.logging.log_level = LogLevel.DEBUG
+vxd_cdcMergerAnalysis.param(trackMergerAnalysis_param)
+vxd_cdcMergerAnalysis.logging.log_level = LogLevel.DEBUG
 
 
 class HighlighterModule(Module):
@@ -327,8 +329,8 @@ main.add_module(setupgen)
 # main.add_module(si_fitting)
 main.add_module(fitting)
 main.add_module(track_splitter)
-# main.add_module(vxd_cdcTracksMerger)
-main.add_module(vxd_cdcTracksMergerAnalysis)
+main.add_module(vxd_cdcTracksMerger)
+main.add_module(vxd_cdcMergerAnalysis)
 # main.add_module(HighlighterModule())
 # main.add_module(display)
 

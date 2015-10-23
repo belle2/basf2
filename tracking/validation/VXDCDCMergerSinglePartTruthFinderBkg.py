@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -9,19 +9,17 @@
 
 """
 <header>
-<output>VXDCDCMergerSinglePartTruthFinderBkg.root</output>
+<output>VXDCDCMergerSinglePartTruthFinder.root</output>
 <contact>Benjamin Oberhof, tracking@belle2.kek.jp</contact>
 </header>
 """
 
 import os
 import random
-import glob
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -29,7 +27,7 @@ eventinfosetter = register_module('EventInfoSetter')
 # generate one event
 eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [10000])
 eventinfoprinter = register_module('EventInfoPrinter')
 
 # Fixed random seed
@@ -62,7 +60,7 @@ param_pGun = {  # ---    'momentumParams': [0.4, 1.6],
                 # fixed, uniform
                 # [0, 5],
     'pdgCodes': [13],
-    'nTracks': 10,
+    'nTracks': 1,
     'varyNTracks': 0,
     'momentumGeneration': 'uniform',
     'momentumParams': [0, 5],
@@ -214,9 +212,11 @@ trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'GFTracksColName': 'GFTracks',
     'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
-    'TrackCandColName': 'TracksCand',
+    #    'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
-    'chi2_max': 100000000,
+    'chi2_max': 100,
+    'merge_radius': 2.0,
+    'recover': 1,
 }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
 
@@ -224,7 +224,7 @@ vxd_cdcTracksMerger.param(trackMerger_param)
 
 # MERGING ANALYSIS
 # track merger analysis
-vxd_cdcTracksMergerAnalysis = register_module('VXDCDCTrackMergerAnalysis')
+vxd_cdcMergerAnalysis = register_module('VXDCDCMergerAnalysis')
 trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                                # default False
@@ -235,12 +235,12 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
-    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinderBkg.root',
-    'chi2_max': 100,
-    'merge_radius': 2.0,
+    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinder.root',
+    #    'chi2_max': 100,
+    #    'merge_radius': 2.0,
 }
-vxd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)
-vxd_cdcTracksMergerAnalysis.logging.log_level = LogLevel.DEBUG
+vxd_cdcMergerAnalysis.param(trackMergerAnalysis_param)
+vxd_cdcMergerAnalysis.logging.log_level = LogLevel.DEBUG
 
 
 class HighlighterModule(Module):
@@ -298,15 +298,11 @@ matcher2 = register_module('MCTrackMatcher')
 # matcher2.param('MCGFTrackCandsColName','MCGFTrackCands')
 matcher2.param('PRGFTrackCandsColName', 'CDCTracksCand')
 
-# bg = None
-# bkgdir = 'bkg/'
-
+bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-
-# bg = glob.glob(bkgdir+'*.root')
+    print 'Warning: variable BELLE2_BACKGROUND_DIR is not set'
 
 # Create paths
 main = create_path()
@@ -325,13 +321,12 @@ main.add_module(pGun)
 # main.add_module(svdDigitizer)
 # main.add_module(svdClusterizer)
 # main.add_module(cdcDigitizer)
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bg)
 main.add_module(si_mctrackfinder)
 # main.add_module(vxd_trackfinder)
 main.add_module(cdc_mctrackfinder)
 # main.add_module(cdc_trackfinder)
 # main.add_module(cdcmcmatching)
-# main.add_module(display)
 main.add_module(mctf)
 main.add_module(matcher1)
 main.add_module(matcher2)
@@ -340,13 +335,13 @@ main.add_module(setupgen)
 # main.add_module(si_fitting)
 main.add_module(fitting)
 main.add_module(track_splitter)
-# main.add_module(vxd_cdcTracksMerger)
-main.add_module(vxd_cdcTracksMergerAnalysis)
+main.add_module(vxd_cdcTracksMerger)
+main.add_module(vxd_cdcMergerAnalysis)
 # main.add_module(HighlighterModule())
-
+# main.add_module(display)
 
 # ---main.add_module(output)
 
 # Process events
 process(main)
-print(statistics)
+print statistics

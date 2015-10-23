@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -20,7 +20,6 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
-from beamparameters import add_beamparameters
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -213,17 +212,18 @@ trackMerger_param = {  # (in cm) use cdc inner wall
                        #    'GFTracksColName': 'GFTracks',
     'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
-    'TrackCandColName': 'TracksCand',
+    #    'TrackCandColName': 'TracksCand',
     'relMatchedTracks': 'MatchedTracksIdx',
     'chi2_max': 100,
+    'merge_radius': 2.0,
+    'recover': 1,
 }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
-
 vxd_cdcTracksMerger.param(trackMerger_param)
 
 # MERGING ANALYSIS
 # track merger analysis
-vxd_cdcTracksMergerAnalysis = register_module('VXDCDCTrackMergerAnalysis')
+vxd_cdcMergerAnalysis = register_module('VXDCDCMergerAnalysis')
 trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius':        16.29,  #(in cm) use cdc outer wall
                                # default False
@@ -235,11 +235,11 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
     'root_output_filename': '../VXDCDCMergerEvtGenTruthFinder.root',
-    'chi2_max': 100,
-    'merge_radius': 2.0,
+    #    'chi2_max': 100,
+    #    'merge_radius': 2.0,
 }
-vxd_cdcTracksMergerAnalysis.param(trackMergerAnalysis_param)
-vxd_cdcTracksMergerAnalysis.logging.log_level = LogLevel.DEBUG
+vxd_cdcMergerAnalysis.param(trackMergerAnalysis_param)
+vxd_cdcMergerAnalysis.logging.log_level = LogLevel.DEBUG
 
 
 class HighlighterModule(Module):
@@ -307,7 +307,6 @@ main.add_module(eventinfoprinter)
 # main.add_module(geometry)
 # main.add_module(pGun)
 # main.add_module(mcparticleprinter)
-beamparameters = add_beamparameters(main, "Y4S")
 main.add_module(evtgeninput)
 # main.add_module(g4sim)
 # main.add_module(pxdDigitizer)
@@ -329,8 +328,8 @@ main.add_module(cand_merger)
 main.add_module(setupgen)
 main.add_module(fitting)
 main.add_module(track_splitter)
-# main.add_module(vxd_cdcTracksMerger)
-main.add_module(vxd_cdcTracksMergerAnalysis)
+main.add_module(vxd_cdcTracksMerger)
+main.add_module(vxd_cdcMergerAnalysis)
 # main.add_module(HighlighterModule())
 # main.add_module(display)
 
@@ -338,4 +337,4 @@ main.add_module(vxd_cdcTracksMergerAnalysis)
 
 # Process events
 process(main)
-print(statistics)
+print statistics

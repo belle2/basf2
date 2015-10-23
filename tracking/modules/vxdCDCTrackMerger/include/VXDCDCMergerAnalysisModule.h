@@ -1,5 +1,5 @@
-#ifndef VXDCDCTRACKMERGERMODULE_H
-#define VXDCDCTRACKMERGERMODULE_H
+#ifndef VXDCDCMERGERANALYSISMODULE_H
+#define VXDCDCMERGERANALYSISMODULE_H
 
 #include <framework/core/Module.h>
 #include "genfit/Track.h"
@@ -7,46 +7,20 @@
 //#include "genfit/AbsTrackRep.h"
 
 //root stuff
-//#include <TTree.h>
-//#include <TFile.h>
+#include <TTree.h>
+#include <TFile.h>
 
 
 namespace Belle2 {
-  /** A module siCDCTrackMerger.
-   *
-   *  A detailed description of your module.
-   */
-  class VXDCDCTrackMergerModule : public Module {
+  class VXDCDCMergerAnalysisModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    VXDCDCTrackMergerModule();
-
+    VXDCDCMergerAnalysisModule();
     /** Use to clean up anything you created in the constructor. */
-    virtual ~VXDCDCTrackMergerModule();
-
-    /** Use this to initialize resources or memory your module needs.
-     *
-     *  Also register any outputs of your module (StoreArrays, RelationArrays,
-     *  StoreObjPtrs) here, see the respective class documentation for details.
-     */
+    virtual ~VXDCDCMergerAnalysisModule();
     virtual void initialize();
-
-    /** Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
     virtual void beginRun();
-
-    /** Called once for each event.
-     *
-     * This is most likely where your module will actually do anything.
-     */
     virtual void event();
-
-    /** Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
     virtual void endRun();
 
     /** Clean up anything you created in initialize(). */
@@ -58,15 +32,11 @@ namespace Belle2 {
     double m_CDC_wall_radius;
     double m_chi2_max;
     double m_merge_radius;
-    bool m_recover;
-    //std::string m_mergedVXDGFTracksColName;
-    //std::string m_mergedCDCGFTracksColName;
     std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
     std::string m_GFTracksColName;
-    //    std::string m_GFTracksColName;
     std::string m_TrackCandColName;
-    std::string m_relMatchedTracks;
+    std::string m_UnMergedCands;
     //std::string m_mcParticlesColName;
     //position at which a cdc track crosses  the cdc wall
     //std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;
@@ -76,20 +46,27 @@ namespace Belle2 {
 
     //root stuff
     //bool m_produce_root_file;
-    //std::string m_root_output_filename;
-    //TTree* m_ttree;
-    //TFile* m_root_file;
+    std::string m_root_output_filename;
+    TTree* m_ttree;
+    TFile* m_root_file;
 
     //for global trk merging efficiency
     double m_total_pairs;
     double m_total_matched_pairs;
     //root tree variables
-    /*int m_npair;
+    //int nEv;
+    //int m_nevent;
+    int m_npair;
+    int m_ntruepair;
     int m_ncdc_trk;
-    int m_nsi_trk;
-    double m_trk_mrg_eff;
+    int m_nvxd_trk;
+    //double m_trk_mrg_eff;
     std::vector<int>* m_match_vec;
-    std::vector<int>* m_pre_match_vec;
+    std::vector<int>* m_true_match_vec;
+    std::vector<int>* m_true_match_mc;
+    std::vector<int>* m_right_match_vec;
+    std::vector<int>* m_reco_vec;
+    //std::vector<int>* m_loop_match_vec;
     std::vector<float>* m_chi2_vec;
     std::vector<float>* m_dist_vec;
     std::vector<float>* m_dx_vec;
@@ -98,13 +75,19 @@ namespace Belle2 {
     std::vector<float>* m_x_vec;
     std::vector<float>* m_y_vec;
     std::vector<float>* m_z_vec;
+    std::vector<float>* m_pos_vec;
     std::vector<float>* m_dmom_vec;
     std::vector<float>* m_dmomx_vec;
     std::vector<float>* m_dmomy_vec;
     std::vector<float>* m_dmomz_vec;
     std::vector<float>* m_momx_vec;
     std::vector<float>* m_momy_vec;
-    std::vector<float>* m_momz_vec;*/
+    std::vector<float>* m_momz_vec;
+    std::vector<float>* m_mom_vec;
+    std::vector<float>* m_vxdmomx_vec;
+    std::vector<float>* m_vxdmomy_vec;
+    std::vector<float>* m_vxdmomz_vec;
+    std::vector<float>* m_vxdmom_vec;
   };
 }
 #endif

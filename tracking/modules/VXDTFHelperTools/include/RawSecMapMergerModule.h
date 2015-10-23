@@ -12,7 +12,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-// #include <framework/gearbox/GearDir.h> // needed for reading xml-files
 
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
@@ -44,7 +43,6 @@
 #include <TBranch.h>
 #include <TChain.h>
 //boost:
-#include <boost/tuple/tuple.hpp> // a generalized version of pair
 // #ifndef __CINT__
 #include <boost/chrono.hpp>
 // #endif
@@ -58,114 +56,54 @@ namespace Belle2 {
    *
    */
   class RawSecMapMergerModule : public Module {
+  protected:
+    /// ///////////////////////////////////////////////////////////////////////////////// member variables of module:
+    /** List of files (wildcards not allowed - use python glob.glob() to expand to list of files) */
+    std::vector<std::string> m_PARAMrootFileNames;
 
+    /** contains names of sectorMaps to be loaded. */
+    std::vector<std::string> m_PARAMmapNames;
+
+    // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:
-    /**
-     * Constructor of the module.
-     */
-    RawSecMapMergerModule();
 
+    /** Constructor of the module. */
+    RawSecMapMergerModule();
 
 
     /** Destructor of the module. */
     virtual ~RawSecMapMergerModule() {}
 
-    /** returns all names of root-files fitting given parameter mapName  */
-    std::vector<std::string> getRootFiles(std::string mapName)
-    {
-      B2INFO("RawSecMapMerger::getRootFiles(): loading mapName: " << mapName)
-      // TODO
-      // INFO: root files will contain the mapName and some extensions: mapName_rngNumber.root
-      // in current directory read all files matching this.
-      return {"mapName"};
-    }
 
+    /** returns all names of root-files fitting given parameter mapName  */
+    std::vector<std::string> getRootFiles(std::string mapName);
 
 
     /** bundle all relevant files to a TChain */
-    std::unique_ptr<TChain> createTreeChain(TrainerConfigData& configuration, std::string nHitString)
-    {
-      B2INFO("RawSecMapMerger::createTreeChain(): loading mapName: " << configuration.secMapName << " with extension " << nHitString)
-      std::unique_ptr<TChain> treeChain = std::unique_ptr<TChain>(new TChain((configuration.secMapName + nHitString).c_str()));
-
-      // dummy code yet:
-      auto fileList = getRootFiles(configuration.secMapName);
-      for (auto file : fileList) { /*treeChain->Add(file);*/ }
-
-//       TFile* input = TFile::Open("highTestRedesign_454970355.root");
-//       treeChain->Add("highTestRedesign_454970355.root");
-//    treeChain->Add("lowTestRedesign_1990122242.root");
-      treeChain->Add("lowTestRedesign_454970355.root");
-//    TTree* tree = (TTree*) input->Get("m_treePtr"); // name of tree in root file
-
-      return std::move(treeChain);
-    }
-
+    std::unique_ptr<TChain> createTreeChain(TrainerConfigData& configuration, std::string nHitString);
 
 
     /** for given chain and names of branches:
      * this function returns their pointers to the branch and the containing value
      * in the same order as the input vector of branch names. */
-    template<class ValueType>
-    std::vector<BranchInterface<ValueType>> getBranches(
-                                           std::unique_ptr<TChain>& chain,
-                                           const std::vector<std::string>& branchNames)
-    {
-      std::vector<BranchInterface<ValueType>> branches;
-      B2INFO("RawSecMapMerger::getBranches(): loading branches: " << branchNames.size())
-      unsigned nBranches = branchNames.size();
-
-      branches.resize(nBranches, BranchInterface<ValueType>());
-      for (unsigned fPos = 0; fPos < nBranches; fPos++) {
-        branches[fPos].name = branchNames[fPos];
-        chain->SetBranchAddress(
-          branches[fPos].name.c_str(),
-          &(branches[fPos].value),
-          &(branches[fPos].branch));
-      }
-      B2INFO("RawSecMapMerger::getBranches():  done")
-      return std::move(branches);
-    }
+    template<class ValueType> std::vector<BranchInterface<ValueType>> getBranches(
+          std::unique_ptr<TChain>& chain,
+          const std::vector<std::string>& branchNames);
 
 
-
-    /// sets everything which is hit-dependent.
+    /** sets everything which is hit-dependent. */
     std::string prepareNHitSpecificStuff(
       unsigned nHits,
       TrainerConfigData& config,
       std::vector<std::string>& secBranchNames,
-      std::vector<std::string>& filterBranchNames)
-    {
-      if (nHits == 2) {
-        secBranchNames = { "outerSecID", "innerSecID"};
-        filterBranchNames = config.twoHitFilters;
-        return "2Hit";
-      }
-
-      if (nHits == 3) {
-        secBranchNames = { "outerSecID", "centerSecID", "innerSecID"};
-        filterBranchNames = config.threeHitFilters;
-        return "3Hit";
-      }
-
-      if (nHits == 4) {
-        secBranchNames = { "outerSecID", "outerCenterSecID", "innerCenterSecID", "innerSecID"};
-        filterBranchNames = config.fourHitFilters;
-        return "4Hit";
-      }
-
-      B2ERROR("prepareNHitSpecificStuff: wrong chainLength!");
-      return "";
-    }
+      std::vector<std::string>& filterBranchNames);
 
 
-
-
-    /// returns secIDs of current entry in the secBranches.
+    /**  returns secIDs of current entry in the secBranches. */
     std::vector<unsigned> getSecIDs(std::vector<BranchInterface<unsigned>>& secBranches, Long64_t entry)
     {
       std::vector<unsigned> iDs;
-      for (auto& branch : secBranches) {
+      for (BranchInterface<unsigned>& branch : secBranches) {
         branch.update(entry);
         iDs.push_back(branch.value);
       }
@@ -173,138 +111,26 @@ namespace Belle2 {
     }
 
 
-    /// train graph
-    template <class FilterType>
-    void trainGraph(
+    /**  fill the graphs with raw data fitting to their filters respectively. */
+    template <class FilterType> void trainGraph(
       SectorGraph<FilterType>& mainGraph,
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      auto nEntries = chain->GetEntries();
-      B2DEBUG(10, "RawSecMapMerger::trainGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-              " branches")
-      if (nEntries == 0) { B2WARNING("trainGraph: valid file but no data stored!"); return; }
-
-      auto percentMark = nEntries / 10; auto progressCounter = 0;
-      // log all sector-combinations and determine their absolute number of appearances:
-      for (auto i = 0 ;  i <= nEntries; i++) {
-        if ((i % percentMark) == 0) {
-          progressCounter += 10;
-          B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
-        }
-        auto thisEntry = chain->LoadTree(i);
-
-        auto ids = getSecIDs(sectorBranches, thisEntry);
-        auto currentID = SubGraphID(ids);
-
-        auto pos = mainGraph.find(currentID);
-
-        if (pos == mainGraph.end()) { B2WARNING("trainGraph: could not find subgraph " << currentID.print() << " - skipping entry..."); continue; }
-
-        for (auto& filter : filterBranches) {
-          filter.update(thisEntry);
-          pos->second.addValue(FilterType(filter.name), filter.value);
-        }
-      } // entry-loop-end
-    }
+      std::vector<BranchInterface<double>>& filterBranches);
 
 
-    /// build graph with secChains found in TChain.
-    template <class FilterType>
-    SectorGraph<FilterType> buildGraph(
+    /**  build graph with secChains found in TChain. */
+    template <class FilterType> SectorGraph<FilterType> buildGraph(
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      auto nEntries = chain->GetEntries();
-      B2INFO("RawSecMapMerger::buildGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-             " branches")
-
-      // creating main graph containing all subgraphs:
-      std::vector<std::string> filterNames;
-      for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
-      SectorGraph<FilterType> mainGraph(filterNames);
-
-      if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return std::move(mainGraph); }
-      auto percentMark = nEntries / 10;
-      auto progressCounter = 0;
-      // log all sector-combinations and determine their absolute number of appearances:
-      for (auto i = 0 ;  i <= nEntries; i++) {
-        if ((i % percentMark) == 0) {
-          progressCounter += 10;
-          B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
-        }
-        auto thisEntry = chain->LoadTree(i);
-
-        auto ids = getSecIDs(sectorBranches, thisEntry);
-        auto currentID = SubGraphID(ids);
-        B2DEBUG(10, "buildGraph-SubGraphID-print: id: " << currentID.print());
-
-        auto pos = mainGraph.find(currentID);
-
-        if (pos == mainGraph.end()) { pos = mainGraph.add(currentID); }
-
-        if (pos == mainGraph.end()) { B2WARNING("could not find nor add subgraph - skipping entry..."); continue; }
-
-        pos->second.wasFound();
-
-        for (auto& filter : filterBranches) {
-          filter.update(thisEntry);
-          pos->second.checkAndReplaceIfMinMax(FilterType(filter.name), filter.value);
-        }
-      } // entry-loop-end
-
-      B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size())
-      B2DEBUG(1, "fullGraph-Print: " << mainGraph.print());
-
-      return std::move(mainGraph);
-    }
-
-
+      std::vector<BranchInterface<double>>& filterBranches);
 
 
     /** for debugging: print data for crosschecks. for small sample sizes < 100 the whole sample will be printed, for bigger ones only 100 entries will be printed. */
     void printData(
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      // prepare everything:
-      unsigned nEntries = chain->GetEntries();
-      unsigned percentMark = 1;
-      if (nEntries > 100) { percentMark = nEntries / 50; }
-      unsigned progressCounter = 0;
-
-      B2INFO("RawSecMapMerger::printData():  start of " << nEntries <<
-             " entries in tree and " << sectorBranches.size() <<
-             "/" << filterBranches.size() <<
-             " sector-/filter-branches")
-
-      for (unsigned i = 0 ;  i < nEntries; i++) {
-        if ((i % percentMark) != 0) { continue; }
-        progressCounter += 2;
-        B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
-
-        auto thisEntry = chain->LoadTree(i);
-
-        std::string out;
-        for (unsigned i = 0 ; i < sectorBranches.size(); i++) {
-          sectorBranches[i].branch->GetEntry(thisEntry);
-          out += sectorBranches[i].name + ": " + FullSecID(sectorBranches[i].value).getFullSecString() + ". ";
-        }
-        out += "\n";
-
-        for (unsigned i = 0 ; i < filterBranches.size(); i++) {
-          filterBranches[i].branch->GetEntry(thisEntry);
-          out += filterBranches[i].name + ": " + std::to_string(filterBranches[i].value) + ". ";
-        }
-        B2INFO(out << "\n")
-      }
-    }
-
+      std::vector<BranchInterface<double>>& filterBranches);
 
 
     /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
@@ -419,15 +245,6 @@ namespace Belle2 {
 
 
 
-    /// ///////////////////////////////////////////////////////////////////////////////// member variables of module:
-  protected:
-    /** parameter of module: contains the names to be loaded. */
-//     std::vector<std::string> m_PARAMmapNames;
-  public:
-    // ///////////////////////////////////////////////////////////////////////////////// member variables END:
-
-
-
     /** Initializes the Module.
      */
     virtual void initialize()
@@ -436,7 +253,7 @@ namespace Belle2 {
       B2INFO("RawSecMapMerger::initialize():");
 
       // loop over all the setups in the sectorMap:
-      for (auto setup : sectorMap->getAllSetups()) {
+      for (auto& setup : sectorMap->getAllSetups()) {
 
         auto config = setup.second->getConfig();
         B2INFO("RawSecMapMerger::initialize(): loading mapName: " << config.secMapName);

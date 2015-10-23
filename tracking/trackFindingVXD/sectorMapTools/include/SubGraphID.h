@@ -61,6 +61,13 @@ namespace Belle2 {
     /** returns chainLength of this id. */
     unsigned size() const { return m_idChain.size(); }
 
+    /** returns first entry of IDchain. */
+    std::vector<unsigned>::const_iterator begin() const { return m_idChain.begin(); }
+
+    /** returns last entry of IDchain. */
+    std::vector<unsigned>::const_iterator end() const { return m_idChain.end(); }
+
+
     /** if both graphs have got the same IDs except the last one, they share a trunk. */
     bool checkSharesTrunk(const SubGraphID& b) const
     {
@@ -84,6 +91,23 @@ namespace Belle2 {
       return std::move(out);
     }
 
+  };
+
+
+}
+
+namespace std {
+  /** customized hash-function for being able to use unordered_map. */
+  template <> struct hash<Belle2::SubGraphID> {
+    std::size_t operator()(const Belle2::SubGraphID& graphID) const
+    {
+      std::size_t hashVal = 0;
+      for (unsigned iD : graphID) {
+        hashVal = std::hash<unsigned>()(iD) ^ hashVal;
+        ++hashVal;
+      }
+      return hashVal;
+    }
   };
 }
 

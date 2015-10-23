@@ -16,7 +16,7 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <utility> // std::pair, std::move
 
 
@@ -25,7 +25,7 @@ namespace Belle2 {
   /** contains all subgraphs. */
   template<class FilterType>  class SectorGraph {
   protected:
-    std::map<SubGraphID, SubGraph<FilterType>> m_subgraphs; /**< contains all subgraphs. */
+    std::unordered_map<SubGraphID, SubGraph<FilterType>> m_subgraphs; /**< contains all subgraphs. */
 
     std::vector<FilterType> m_filterIDs; /**< ids of all filterTypes to be stored by subGraphs. */
   public:
@@ -35,7 +35,7 @@ namespace Belle2 {
     { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is illegal usage of this class!") } }
 
     /** for better readability. */
-    using Iterator = typename std::map<SubGraphID, SubGraph<FilterType>>::iterator;
+    using Iterator = typename std::unordered_map<SubGraphID, SubGraph<FilterType>>::iterator;
 
     /** find entry. returns end() if not found. */
     Iterator find(SubGraphID idChain) { return m_subgraphs.find(idChain); }

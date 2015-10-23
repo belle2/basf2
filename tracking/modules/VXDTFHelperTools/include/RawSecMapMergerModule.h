@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2011 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,24 +12,31 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/GearDir.h> // needed for reading xml-files
+// #include <framework/gearbox/GearDir.h> // needed for reading xml-files
 
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
-#include <tracking/trackFindingVXD/sectorMapTools/ProtoSectorGraph.h>
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
-#include "framework/datastore/StoreObjPtr.h"
+#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+
+#include <tracking/trackFindingVXD/sectorMapTools/BranchInterface.h>
+#include <tracking/trackFindingVXD/sectorMapTools/MinMax.h>
+#include <tracking/trackFindingVXD/sectorMapTools/RawDataCollectedMinMax.h>
+#include <tracking/trackFindingVXD/sectorMapTools/SectorGraph.h>
+#include <tracking/trackFindingVXD/sectorMapTools/SubGraph.h>
+#include <tracking/trackFindingVXD/sectorMapTools/SubGraphID.h>
 
 // stl:
 #include <string>
 #include <vector>
-#include <deque>
-// #include <set>
-// #include <list>
-// #include <map>
+#include <map>
+#include <unordered_map>
 #include <utility> // std::pair
 #include <memory> // std::unique_ptr
+#include <limits>       // std::numeric_limits
+#include <functional>
 
 // root:
 #include <TFile.h>
@@ -38,9 +45,9 @@
 #include <TChain.h>
 //boost:
 #include <boost/tuple/tuple.hpp> // a generalized version of pair
-#ifndef __CINT__
+// #ifndef __CINT__
 #include <boost/chrono.hpp>
-#endif
+// #endif
 
 namespace Belle2 {
 
@@ -100,205 +107,170 @@ namespace Belle2 {
      * this function returns their pointers to the branch and the containing value
      * in the same order as the input vector of branch names. */
     template<class ValueType>
-    void getBranches(
-      std::unique_ptr<TChain>& chain,
-      const std::vector<std::string>& branchNames,
-      std::deque<std::pair<TBranch*, ValueType>>& branches)
+    std::vector<BranchInterface<ValueType>> getBranches(
+                                           std::unique_ptr<TChain>& chain,
+                                           const std::vector<std::string>& branchNames)
     {
+      std::vector<BranchInterface<ValueType>> branches;
       B2INFO("RawSecMapMerger::getBranches(): loading branches: " << branchNames.size())
-      branches.clear();
       unsigned nBranches = branchNames.size();
 
-      branches.resize(nBranches, {nullptr, ValueType(0)});
+      branches.resize(nBranches, BranchInterface<ValueType>());
       for (unsigned fPos = 0; fPos < nBranches; fPos++) {
+        branches[fPos].name = branchNames[fPos];
         chain->SetBranchAddress(
-          branchNames[fPos].c_str(),
-          &(branches[fPos].second),
-          &(branches[fPos].first));
+          branches[fPos].name.c_str(),
+          &(branches[fPos].value),
+          &(branches[fPos].branch));
       }
       B2INFO("RawSecMapMerger::getBranches():  done")
+      return std::move(branches);
     }
 
 
 
-    /** builds a graph of related sectors by using training data. */
-    ProtoSectorGraph<MinMaxCollector<double>> createRelationSecMap(
-                                             std::unique_ptr<TChain>& chain,
-                                             std::deque<std::pair<TBranch*, unsigned>>& sectorBranches,
-                                             std::deque<std::pair<TBranch*, double>>& filterBranches)
+    /// sets everything which is hit-dependent.
+    std::string prepareNHitSpecificStuff(
+      unsigned nHits,
+      TrainerConfigData& config,
+      std::vector<std::string>& secBranchNames,
+      std::vector<std::string>& filterBranchNames)
     {
-      unsigned nEntries = chain->GetEntries();
-      B2INFO("RawSecMapMerger::createRelationSecMap():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-             " branches")
-      // creating master sector containing all inner sectors and therefore the full graph in the end:
-      ProtoSectorGraph<MinMaxCollector<double>> fullRawSectorGraph(std::numeric_limits<unsigned>::max());
+      if (nHits == 2) {
+        secBranchNames = { "outerSecID", "innerSecID"};
+        filterBranchNames = config.twoHitFilters;
+        return "2Hit";
+      }
 
-      if (nEntries == 0) { B2WARNING("createRelationSecMap: valid file but no data stored!"); return std::move(fullRawSectorGraph); }
-      unsigned percentMark = nEntries / 10;
-      unsigned progressCounter = 0;
+      if (nHits == 3) {
+        secBranchNames = { "outerSecID", "centerSecID", "innerSecID"};
+        filterBranchNames = config.threeHitFilters;
+        return "3Hit";
+      }
+
+      if (nHits == 4) {
+        secBranchNames = { "outerSecID", "outerCenterSecID", "innerCenterSecID", "innerSecID"};
+        filterBranchNames = config.fourHitFilters;
+        return "4Hit";
+      }
+
+      B2ERROR("prepareNHitSpecificStuff: wrong chainLength!");
+      return "";
+    }
+
+
+
+
+    /// returns secIDs of current entry in the secBranches.
+    std::vector<unsigned> getSecIDs(std::vector<BranchInterface<unsigned>>& secBranches, Long64_t entry)
+    {
+      std::vector<unsigned> iDs;
+      for (auto& branch : secBranches) {
+        branch.update(entry);
+        iDs.push_back(branch.value);
+      }
+      return std::move(iDs);
+    }
+
+
+    /// train graph
+    template <class FilterType>
+    void trainGraph(
+      SectorGraph<FilterType>& mainGraph,
+      std::unique_ptr<TChain>& chain,
+      std::vector<BranchInterface<unsigned>>& sectorBranches,
+      std::vector<BranchInterface<double>>& filterBranches)
+    {
+      auto nEntries = chain->GetEntries();
+      B2DEBUG(10, "RawSecMapMerger::trainGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
+              " branches")
+      if (nEntries == 0) { B2WARNING("trainGraph: valid file but no data stored!"); return; }
+
+      auto percentMark = nEntries / 10; auto progressCounter = 0;
       // log all sector-combinations and determine their absolute number of appearances:
-      for (unsigned i = 0 ;  i <= nEntries; i++) {
+      for (auto i = 0 ;  i <= nEntries; i++) {
         if ((i % percentMark) == 0) {
           progressCounter += 10;
-          B2INFO("RawSecMapMerger::createRelationSecMap(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << fullRawSectorGraph.size() << " sectors...")
+          B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
+                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
         }
-
-        // d/*/*/*/*/*/*/*/*/*/*/*o*/*/*/*/*/*/*/*/*/*/*/ hard copy of the branches:
-        std::deque<std::pair<TBranch*, unsigned>>& secBranches = sectorBranches;
-
         auto thisEntry = chain->LoadTree(i);
-//         secBranches[0].first->GetEntry(thisEntry);
-        ProtoSectorGraph<MinMaxCollector<double>>::updateBranchEntries<unsigned>(thisEntry, secBranches);
-        unsigned currentID = secBranches[0].second;
 
-        auto pos = fullRawSectorGraph.find(currentID);
+        auto ids = getSecIDs(sectorBranches, thisEntry);
+        auto currentID = SubGraphID(ids);
 
-//         bool found = false;
-//         for (auto& sector : fullRawSectorGraph) {
-//           if (sector.getRawSecID() != currentID) { continue; }
-//           found = true;
-//           sector.wasFound();
-//           break;
-// //      secBranches.pop_front();
-// //      sector.addRelationToGraph(thisEntry, secBranches);
-//         }
+        auto pos = mainGraph.find(currentID);
 
-        // if combination does not exist yet, it will get added to the graph, if it exists, simply counters are increased.
-//         if (!found) {
-        if (pos == fullRawSectorGraph.end()) {
-          pos = fullRawSectorGraph.addInnerSector(currentID);
+        if (pos == mainGraph.end()) { B2WARNING("trainGraph: could not find subgraph " << currentID.print() << " - skipping entry..."); continue; }
+
+        for (auto& filter : filterBranches) {
+          filter.update(thisEntry);
+          pos->second.addValue(FilterType(filter.name), filter.value);
         }
-
-
-//      auto pos = fullRawSectorGraph.find(currentID);
-//    secBranches.pop_front();
-//           secBranches[0].first->GetEntry(thisEntry);
-        if (secBranches.size() > 1 && FullSecID(currentID).getLayerID() < FullSecID(secBranches[1].second).getLayerID()) {
-          B2ERROR("createRelationSecMap: outerID is not outermore than innerID! (outer/inner: " <<
-                  FullSecID(currentID).getFullSecString() << "/" <<
-                  FullSecID(secBranches[0].second).getFullSecString() << ")");
-        }
-        pos->addRelationToGraph(thisEntry, secBranches, filterBranches);
-      }
-
-//         fullRawSectorGraph.addRelationToGraph(thisEntry, sectorBranches);
-//       }
-      B2INFO("RawSecMapMerger::createRelationSecMap(): fullRawSectorGraph has now size: " << fullRawSectorGraph.size())
-
-      return std::move(fullRawSectorGraph);
+      } // entry-loop-end
     }
 
 
-
-    /** takes a relationMap and checks for each outer sector:
-     *   how often did it occur (-> mainSampleSize)
-     * for each inner sector:
-     *   how often did it occur (-> innerSampleSize)
-     * sort innerSectors by rareness (rarest one comes first):
-     *   if innerSampleSize is below threshold -> remove, update mainSampleSize
-     * Produces a Map of ProtoSectorGraphs which contain innerSectors
-     * (ProtoSectorGraphs which are no innerSector and have no innerSectors themselves will not be stored).  */
-    /** use rareness-threshold to find sector-combinations which are very rare and remove them: */
-    unsigned pruneMap(double rarenessThreshold, ProtoSectorGraph<MinMaxCollector<double>>& relationsGraph)
-    {
-      unsigned nSectorsKilled = 0;
-
-      // TODO one could also remove subGraphs here (the pruneGraph-function is recursive), but maybe we want to have those seldom cases too.
-      for (auto& subGraph : relationsGraph) {
-        nSectorsKilled += subGraph.pruneGraph(rarenessThreshold);
-      }
-      B2INFO("RawSecMapMerger::pruneMap(): nSectorsKilled: " << nSectorsKilled << " with rarenessCut: " << rarenessThreshold)
-      return nSectorsKilled;
-    }
-
-
-
-    /** get the raw data and determine the cuts for the filters/selectionVariables: */
-    void distillRawData4FilterCuts(
+    /// build graph with secChains found in TChain.
+    template <class FilterType>
+    SectorGraph<FilterType> buildGraph(
       std::unique_ptr<TChain>& chain,
-      TrainerConfigData& config,
-      std::deque<std::pair<TBranch*, unsigned>>& sectorBranches,
-      ProtoSectorGraph<MinMaxCollector<double>>& relationsGraph,
-      unsigned secChainLength)
+      std::vector<BranchInterface<unsigned>>& sectorBranches,
+      std::vector<BranchInterface<double>>& filterBranches)
     {
-      unsigned nEntries = chain->GetEntries();
-      B2INFO("RawSecMapMerger::distillRawData4FilterCuts():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-             " branches and chainLength " << secChainLength)
+      auto nEntries = chain->GetEntries();
+      B2INFO("RawSecMapMerger::buildGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
+             " branches")
 
-      // prepare the links for the filter-value-branches:
-      std::deque<std::pair<TBranch*, double>> filterBranches;
-      if (secChainLength == 2) {
-        getBranches<double>(chain, config.twoHitFilters, filterBranches);
-      } else if (secChainLength == 3) {
-        getBranches<double>(chain, config.threeHitFilters, filterBranches);
-      } else {
-        getBranches<double>(chain, config.fourHitFilters, filterBranches);
-      }
+      // creating main graph containing all subgraphs:
+      std::vector<std::string> filterNames;
+      for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
+      SectorGraph<FilterType> mainGraph(filterNames);
 
-      // loop over the tree to find the entries matching this outerSector:
-      unsigned percentMark = 1;
-      if (nEntries > 100) { percentMark = nEntries / 50; }
-      unsigned progressCounter = 0, goodCasesCtr = 0;
-      for (unsigned i = 0 ;  i < nEntries; i++) {
+      if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return std::move(mainGraph); }
+      auto percentMark = nEntries / 10;
+      auto progressCounter = 0;
+      // log all sector-combinations and determine their absolute number of appearances:
+      for (auto i = 0 ;  i <= nEntries; i++) {
         if ((i % percentMark) == 0) {
-          progressCounter += 2;
-          B2INFO("RawSecMapMerger::distillRawData4FilterCuts(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << relationsGraph.size() << " sectors...")
+          progressCounter += 10;
+          B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
+                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
         }
-
         auto thisEntry = chain->LoadTree(i);
 
-        sectorBranches[0].first->GetEntry(thisEntry);
-        auto foundSector = relationsGraph.find(sectorBranches[0].second);
-        if (foundSector == relationsGraph.end()) {
-          B2DEBUG(1, "RawSecMapMerger::distillRawData4FilterCuts(): entry " << i << " with outerSecID: " << FullSecID(
-                    sectorBranches[0].second).getFullSecString() << ", did not find sector, skipping!");
-          continue;
+        auto ids = getSecIDs(sectorBranches, thisEntry);
+        auto currentID = SubGraphID(ids);
+        B2DEBUG(10, "buildGraph-SubGraphID-print: id: " << currentID.print());
+
+        auto pos = mainGraph.find(currentID);
+
+        if (pos == mainGraph.end()) { pos = mainGraph.add(currentID); }
+
+        if (pos == mainGraph.end()) { B2WARNING("could not find nor add subgraph - skipping entry..."); continue; }
+
+        pos->second.wasFound();
+
+        for (auto& filter : filterBranches) {
+          filter.update(thisEntry);
+          pos->second.checkAndReplaceIfMinMax(FilterType(filter.name), filter.value);
         }
+      } // entry-loop-end
 
-        // collect raw data of each sector-combination and find cuts:
-        // variant 1:
-//    goodCasesCtr += foundSector->distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, secChainLength);
+      B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size())
+      B2DEBUG(1, "fullGraph-Print: " << mainGraph.print());
 
-        // variant 2:
-//    auto secBranches = sectorBranches; // hardCopy
-//    secBranches.pop_front();
-        goodCasesCtr += foundSector->distillRawData4FilterCutsV2(thisEntry, config, sectorBranches, filterBranches, secChainLength);
-
-        // old stuff (to be deleted):
-//         for (auto& graph : relationsGraph) {
-//           graph.distillRawData4FilterCuts(thisEntry, config, sectorBranches, filterBranches, secChainLength);
-//         }
-      } // leaves-loop
-      B2INFO("RawSecMapMerger::distillRawData4FilterCuts(): within " << nEntries << "  sectorGraphs found " << goodCasesCtr <<
-             " compatible sectors. now starting determining cuts.")
-
-
-      // find cuts of each sector-combination:
-      percentMark = 1;
-      if (relationsGraph.size() > 100) { percentMark = relationsGraph.size() / 25; }
-      progressCounter = 0;
-      unsigned currentSector = 0;
-      for (auto& sector : relationsGraph) {
-
-        // after collecting all data, store only the cuts to keep ram consumption down:
-        unsigned nSamples = sector.determineCutsAndCleanRawData();
-
-        if ((currentSector % percentMark) == 0) {
-          progressCounter += 2;
-          B2INFO("RawSecMapMerger::distillRawData4FilterCuts(): with mark: " << percentMark << " and i=" << currentSector << ", " <<
-                 progressCounter << "% processed,  sector " << std::string(FullSecID(sector.getRawSecID())) << " had " << nSamples << " samples")
-        }
-        currentSector++;
-      }
+      return std::move(mainGraph);
     }
+
 
 
 
     /** for debugging: print data for crosschecks. for small sample sizes < 100 the whole sample will be printed, for bigger ones only 100 entries will be printed. */
-    void printData(std::unique_ptr<TChain>& chain, TrainerConfigData& config, std::deque<std::pair<TBranch*, unsigned>>& sectorBranches,
-                   std::vector<std::string>& secBranchNames)
+    void printData(
+      std::unique_ptr<TChain>& chain,
+      std::vector<BranchInterface<unsigned>>& sectorBranches,
+      std::vector<BranchInterface<double>>& filterBranches)
     {
       // prepare everything:
       unsigned nEntries = chain->GetEntries();
@@ -306,40 +278,28 @@ namespace Belle2 {
       if (nEntries > 100) { percentMark = nEntries / 50; }
       unsigned progressCounter = 0;
 
-      std::deque<std::pair<TBranch*, double>> filterBranches;
-      std::vector<std::string>* filterBranchNames;
-      if (secBranchNames.size() == 2) {
-        filterBranchNames = &(config.twoHitFilters);
-      } else if (secBranchNames.size() == 3) {
-        filterBranchNames = &(config.threeHitFilters);
-      } else {
-        filterBranchNames = &(config.fourHitFilters);
-      }
-      getBranches<double>(chain, *filterBranchNames, filterBranches);
-
       B2INFO("RawSecMapMerger::printData():  start of " << nEntries <<
              " entries in tree and " << sectorBranches.size() <<
-             "/" << filterBranchNames->size() <<
+             "/" << filterBranches.size() <<
              " sector-/filter-branches")
 
       for (unsigned i = 0 ;  i < nEntries; i++) {
         if ((i % percentMark) != 0) { continue; }
-
-        auto thisEntry = chain->LoadTree(i);
-
         progressCounter += 2;
         B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
 
+        auto thisEntry = chain->LoadTree(i);
+
         std::string out;
-        for (unsigned i = 0 ; i < secBranchNames.size(); i++) {
-          sectorBranches[i].first->GetEntry(thisEntry);
-          out += secBranchNames[i] + ": " + FullSecID(sectorBranches[i].second).getFullSecString() + ". ";
+        for (unsigned i = 0 ; i < sectorBranches.size(); i++) {
+          sectorBranches[i].branch->GetEntry(thisEntry);
+          out += sectorBranches[i].name + ": " + FullSecID(sectorBranches[i].value).getFullSecString() + ". ";
         }
         out += "\n";
 
-        for (unsigned i = 0 ; i < filterBranchNames->size(); i++) {
-          filterBranches[i].first->GetEntry(thisEntry);
-          out += (*filterBranchNames)[i] + ": " + std::to_string(filterBranches[i].second) + ". ";
+        for (unsigned i = 0 ; i < filterBranches.size(); i++) {
+          filterBranches[i].branch->GetEntry(thisEntry);
+          out += filterBranches[i].name + ": " + std::to_string(filterBranches[i].value) + ". ";
         }
         B2INFO(out << "\n")
       }
@@ -347,54 +307,57 @@ namespace Belle2 {
 
 
 
+    /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
     /** does everything needed for given chainLength of sectors (e.g.: 2 -> twoHitFilters)*/
-    void processSectorCombinations(TrainerConfigData& configuration, unsigned secChainLength)
+    void processSectorCombinations(TrainerConfigData& config, unsigned secChainLength)
     {
-      B2DEBUG(1, "processSectorCombinations: training map " << configuration.secMapName << " with secChainLength: " << secChainLength)
-
+      B2DEBUG(1, "processSectorCombinations: training map " << config.secMapName << " with secChainLength: " << secChainLength)
 
       // branch-names sorted from outer to inner:
       std::vector<std::string> secBranchNames;
       // filter names are different for different secChainLengths:
       std::vector<std::string> filterBranchNames;
-      std::string nHit = prepareNHitSpecificStuff(secChainLength, configuration, secBranchNames, filterBranchNames);
+      std::string nHit = prepareNHitSpecificStuff(secChainLength, config, secBranchNames, filterBranchNames);
 
+      // contains the raw data
+      std::unique_ptr<TChain> chain = createTreeChain(config, nHit);
 
-      std::unique_ptr<TChain> chain = createTreeChain(configuration, nHit);
-
+      if (chain->GetEntries() == 0) { B2WARNING("raw data for map " << config.secMapName << " with " << nHit << " is empty! skipping"); return; }
       // prepare links to branches branches:
-      std::deque<std::pair<TBranch*, unsigned>> sectorBranches;
-      getBranches<unsigned>(chain, secBranchNames, sectorBranches);
-      std::deque<std::pair<TBranch*, double>> filterBranches;
-      getBranches<double>(chain, filterBranchNames, filterBranches);
+      std::vector<BranchInterface<unsigned>> sectorBranches = getBranches<unsigned>(chain, secBranchNames);
+      std::vector<BranchInterface<double>> filterBranches = getBranches<double>(chain, filterBranchNames);
 
       // for debugging: print data for crosschecks:
-      printData(chain, configuration, sectorBranches, secBranchNames);
+      printData(chain, sectorBranches, filterBranches);
 
-
-      // create proto-graph containing all sector-chains occured in the training sample.
-      ProtoSectorGraph<MinMaxCollector<double>> relationsGraph = createRelationSecMap(chain, sectorBranches, filterBranches);
-
-      std::string output = relationsGraph.print();
-      B2INFO("after createRelationSecMap: relationsGraph looks like this: \n\n" << output)
-
-
-      if (relationsGraph.empty()) { return; }
+      // create graph containing all sector-chains occured in the training sample
+      SectorGraph<std::string> mainGraph = buildGraph<std::string>(chain, sectorBranches, filterBranches);
 
       // use rareness-threshold to find sector-combinations which are very rare and remove them:
-//       unsigned nSectorsRemoved = pruneMap(configuration.rarenessThreshold, relationsGraph);
+      unsigned nKilled = mainGraph.pruneGraph(config.rarenessThreshold);
 
-      // get the raw data and determine the cuts for the filters/selectionVariables:
-      distillRawData4FilterCuts(chain, configuration, sectorBranches, relationsGraph, secChainLength);
+      B2DEBUG(1, "processSectorCombinations: nKilled " << nKilled)
 
+      // get the raw data and determine the cuts for the filters/selectionVariable
+      for (auto& subgraph : mainGraph) {
+        subgraph.second.prepareDataCollection(config.quantiles); // TODO small-sample-case!
+      }
+
+      trainGraph(mainGraph, chain, sectorBranches, filterBranches);
+      /// TODO next steps: implement nice and neat way to take care of the ram-threshold!
+      /**
+       * 404 bytes per graph max (no trainer-values) + 3 (id in mainGraph)
+       * 100.000 graphs max
+       * -> 40.700.000 ~ 40 MB for empty mainGraph containing 100k subgraphs.
+       * per subgraph space available: (2GB - 40 MB) / 100.000 = 20 MB per graph. (double)-> 2.500.000 values max. / 20 Filters
+       * 125k value-sets max.
+       * */
+
+      /// TODO update sublayers!
       // checks for sectors which have inner neighbour and updates the sublayerID of the sensors.
-      auto nsectorsRenamed = relationsGraph.updateSubLayers();
-//       B2DEBUG(1, "results ... nSecRemoved/renamed " << nSectorsRemoved << "/" << nsectorsRenamed)
-      B2DEBUG(1, "results ... nSecrenamed " << nsectorsRenamed)
+      //    auto nsectorsRenamed = relationsGraph.updateSubLayers();
 
-
-      std::string output2 = relationsGraph.print();
-      B2INFO("end of processing: relationsGraph looks like this: \n\n" << output2)
+      B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print();)
       /**
        * Here the data will be loaded in the new secMap-Design:
        *
@@ -459,7 +422,7 @@ namespace Belle2 {
     /// ///////////////////////////////////////////////////////////////////////////////// member variables of module:
   protected:
     /** parameter of module: contains the names to be loaded. */
-    std::vector<std::string> m_PARAMmapNames;
+//     std::vector<std::string> m_PARAMmapNames;
   public:
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
 
@@ -469,9 +432,6 @@ namespace Belle2 {
      */
     virtual void initialize()
     {
-      doALLTEMP(); /// DEBUG WARNING TEST...
-      return;
-
       StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
       B2INFO("RawSecMapMerger::initialize():");
 
@@ -481,731 +441,22 @@ namespace Belle2 {
         auto config = setup.second->getConfig();
         B2INFO("RawSecMapMerger::initialize(): loading mapName: " << config.secMapName);
 
-        if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
+//         if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
 
         processSectorCombinations(config, 2);
 
-        return; // TODO WARNING DEBUG we do not want to run more than one run yet!
+// //         return; // TODO WARNING DEBUG we do not want to run more than one run yet!
         processSectorCombinations(config, 3);
         processSectorCombinations(config, 4);
 
       }
-
     }
 
 
 
-    /** simple struct for interfacing the Branch.  */
-    template <class ValueType> struct BranchInterface {
-      std::string name; /**< carries name of branch. */
-      TBranch* branch; /**< carries pointer to branch. */
-      ValueType value; /**< carries value of current branchEntry. */
 
-      /** constructor */
-      BranchInterface() : name(""), branch(nullptr), value(ValueType(0)) {}
 
-      /** update entry */
-      void update(Long64_t entry) { branch->GetEntry(entry); }
-    };
-
-
-
-    /** for given chain and names of branches:
-    * this function returns their pointers to the branch and the containing value
-    * in the same order as the input vector of branch names. */
-    template<class ValueType>
-    std::vector<BranchInterface<ValueType>> getBranchesV2(
-                                           std::unique_ptr<TChain>& chain,
-                                           const std::vector<std::string>& branchNames)
-    {
-      std::vector<BranchInterface<ValueType>> branches;
-      B2INFO("RawSecMapMerger::getBranches(): loading branches: " << branchNames.size())
-      unsigned nBranches = branchNames.size();
-
-      branches.resize(nBranches, BranchInterface<ValueType>());
-      for (unsigned fPos = 0; fPos < nBranches; fPos++) {
-        branches[fPos].name = branchNames[fPos];
-        chain->SetBranchAddress(
-          branches[fPos].name.c_str(),
-          &(branches[fPos].value),
-          &(branches[fPos].branch));
-      }
-      B2INFO("RawSecMapMerger::getBranches():  done")
-      return std::move(branches);
-    }
-
-
-
-    /** for debugging: print data for crosschecks. for small sample sizes < 100 the whole sample will be printed, for bigger ones only 100 entries will be printed. */
-    void printDataV2(
-      std::unique_ptr<TChain>& chain,
-      std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      // prepare everything:
-      unsigned nEntries = chain->GetEntries();
-      unsigned percentMark = 1;
-      if (nEntries > 100) { percentMark = nEntries / 50; }
-      unsigned progressCounter = 0;
-
-      B2INFO("RawSecMapMerger::printData():  start of " << nEntries <<
-             " entries in tree and " << sectorBranches.size() <<
-             "/" << filterBranches.size() <<
-             " sector-/filter-branches")
-
-      for (unsigned i = 0 ;  i < nEntries; i++) {
-        if ((i % percentMark) != 0) { continue; }
-
-        auto thisEntry = chain->LoadTree(i);
-
-        progressCounter += 2;
-        B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":")
-
-        std::string out;
-        for (unsigned i = 0 ; i < sectorBranches.size(); i++) {
-          sectorBranches[i].branch->GetEntry(thisEntry);
-          out += sectorBranches[i].name + ": " + FullSecID(sectorBranches[i].value).getFullSecString() + ". ";
-        }
-        out += "\n";
-
-        for (unsigned i = 0 ; i < filterBranches.size(); i++) {
-          filterBranches[i].branch->GetEntry(thisEntry);
-          out += filterBranches[i].name + ": " + std::to_string(filterBranches[i].value) + ". ";
-        }
-        B2INFO(out << "\n")
-      }
-    }
-
-
-
-    std::string prepareNHitSpecificStuff(unsigned nHits, TrainerConfigData& config, std::vector<std::string>& secBranchNames,
-                                         std::vector<std::string>& filterBranchNames)
-    {
-      if (nHits == 2) {
-        secBranchNames = { "outerSecID", "innerSecID"};
-        filterBranchNames = config.twoHitFilters;
-        return "2Hit";
-      }
-
-      if (nHits == 3) {
-        secBranchNames = { "outerSecID", "centerSecID", "innerSecID"};
-        filterBranchNames = config.threeHitFilters;
-        return "3Hit";
-      }
-
-      if (nHits == 4) {
-        secBranchNames = { "outerSecID", "outerCenterSecID", "innerCenterSecID", "innerSecID"};
-        filterBranchNames = config.fourHitFilters;
-        return "4Hit";
-      }
-
-      B2ERROR("prepareNHitSpecificStuff: wrong chainLength!");
-      return "";
-    }
-
-
-
-    /** small class for storing min and max. */
-    class MinMax {
-    protected:
-      std::pair<double, double> m_minMax; /**< .first is min, .second is .max. */
-    public:
-
-      /** construtor, starts with max for min and min for max (will later be replaced by valid entries). */
-      MinMax() :
-        m_minMax( {std::numeric_limits< double >::max(), std::numeric_limits< double >::min()}) {}
-
-      /// reset to start values.
-      void reset() { m_minMax = {std::numeric_limits< double >::max(), std::numeric_limits< double >::min()}; }
-
-      /** checks value and replaces old ones if new one is better. returns true if minMax was updated. */
-      bool checkAndReplaceIfMinMax(double newVal)
-      {
-        bool wasAdded = false;
-        if (m_minMax.first > newVal) { m_minMax.first = newVal; wasAdded = true; }
-        if (m_minMax.second < newVal) { m_minMax.second = newVal; wasAdded = true; }
-        return wasAdded;
-      }
-
-      double getMin() const { return m_minMax.first; } /**< returns smallest value stored so far. */
-
-      double getMax() const { return m_minMax.second; } /**< returns biggest value stored so far. */
-
-      std::string print() const
-      {
-        std::string min = m_minMax.first == std::numeric_limits< double >::max() ? "max<double>" : std::to_string(m_minMax.first);
-        std::string max = m_minMax.second == std::numeric_limits< double >::min() ? "min<double>" : std::to_string(m_minMax.second);
-        return "min: " + min + ", max: " + max;
-      }
-    };
-
-
-
-// // // // //  /** WARNING TODO! */
-// // // // //  class RawDataCollectedBase {
-// // // // //
-// // // // //  };
-
-    class RawDataCollectedMinMax { /* : public RawDataCollectedBase*/
-    protected:
-//    unsigned m_maxThreshold; ///< the maximum number of elements allowed to be collected. Standard value expects threshold of 2 GB RAM
-//    unsigned m_expectedSize; ///< the expected size of the final data sample.
-      unsigned m_currentSize; ///< the current size of the data sample.
-      unsigned m_fillIntermediateThreshold; ///< an internal threshold taking care of collecting intermediate results during sample collection
-      std::pair<double, double> m_minMaxQuantiles; ///< the quantiles to be collected in the end (defined in [0;1])
-      std::vector<std::pair<double, double>> m_intermediateValues; ///< collects intermediate threshold if expected size is too big.
-      MinMaxCollector<double> m_collector; ///< collects raw data in an RAM-saving way.
-    public:
-
-      /// constructor.
-      RawDataCollectedMinMax(unsigned expectedSize,
-                             std::pair<double, double> quantiles,
-                             unsigned maxSizeThreshold = 100000) :
-//    m_maxThreshold(maxSizeThreshold),
-//    m_expectedSize(expectedSize),
-        m_currentSize(0),
-        m_fillIntermediateThreshold(std::numeric_limits<unsigned>::max()),
-        m_minMaxQuantiles(quantiles),
-        m_collector((quantiles.first > (/*1.-*/quantiles.second) ? quantiles.first * 2 : (/*1.-*/quantiles.second) * 2))
-      {
-        if (double(expectedSize) / (double(maxSizeThreshold) * 0.05) > double(maxSizeThreshold))
-        { B2FATAL("RawDataCollectedMinMax: expected data to big, can not execute!") }
-
-        if (maxSizeThreshold < expectedSize) {
-          m_fillIntermediateThreshold = maxSizeThreshold / 10;
-        }
-      }
-
-      /// adds value to collector.
-      void add(double newVal)
-      {
-        m_collector.append(newVal);
-        m_currentSize++;
-
-        // if threshold reached, collect results and fill into intermediate value-container:
-        if (m_collector.totalSize() > m_fillIntermediateThreshold) {
-          std::pair<double, double> results = m_collector.getMinMax(m_minMaxQuantiles.first, m_minMaxQuantiles.second);
-          m_intermediateValues.push_back(std::move(results));
-          m_collector.clear();
-        }
-      }
-
-      /// returns current sample size (which is not the actual size of the container).
-      unsigned getSampleSize() const { return m_currentSize; }
-
-      /// returns current best estimates for min and max cuts.
-      std::pair<double, double> getMinMax()
-      {
-        if (m_intermediateValues.empty()) {
-          return m_collector.getMinMax(m_minMaxQuantiles.first, m_minMaxQuantiles.second);
-        }
-
-        // issue: m_collector-sample could be too small and therefore distort results for small intermediateValue-samples. Therefore neglect m_collector for that case.
-        if (m_intermediateValues.size() == 1) {
-          return { m_intermediateValues.at(0).first, m_intermediateValues.at(0).second};
-        }
-        if (m_intermediateValues.size() == 2) {
-          return {
-            0.5 * (m_intermediateValues.at(0).first + m_intermediateValues.at(0).first),
-            0.5 * (m_intermediateValues.at(0).second + m_intermediateValues.at(0).second) };
-        }
-
-        if (!m_collector.empty()) {
-          std::pair<double, double> results = m_collector.getMinMax(m_minMaxQuantiles.first, m_minMaxQuantiles.second);
-          m_intermediateValues.push_back(results);
-        }
-
-        unsigned index = std::floor(double(m_intermediateValues.size()) * 0.5);
-        double min, max;
-
-        std::sort(m_intermediateValues.begin(), m_intermediateValues.end(),
-                  [](const std::pair<double, double>& a, const std::pair<double, double>& b) -> bool { return a.first < b.first; });
-        min = m_intermediateValues.at(index).first;
-
-        std::sort(m_intermediateValues.begin(), m_intermediateValues.end(),
-                  [](const std::pair<double, double>& a, const std::pair<double, double>& b) -> bool { return a.second < b.second; });
-        max = m_intermediateValues.at(index).second;
-
-        return {min, max};
-      }
-    };
-
-
-    class SubGraphID {
-    protected:
-      const std::vector<unsigned> m_idChain;
-    public:
-
-      /** overloaded '=='-operator */
-      bool operator==(const SubGraphID& b) const
-      {
-        unsigned size = m_idChain.size();
-        if (b.m_idChain.size() != size) { return false; }
-
-        for (unsigned i = 0; i < size; i++) {
-          if (b.m_idChain[i] != m_idChain[i]) { return false; }
-        }
-
-        return true;
-      }
-
-      /** overloaded '<'-operator for sorting algorithms */
-      bool operator<(const SubGraphID& b)  const
-      {
-        // sorting: if outermost (== first) sector > of b.outermost this > b. If outermost == b.outermost, step is repeated until end of chain length is reached. last straw: longer chain is bigger.
-        unsigned size = m_idChain.size() < b.m_idChain.size() ? m_idChain.size() : b.m_idChain.size();
-        for (unsigned i = 0 ; i < size; i++) {
-          if (m_idChain[i] < b.m_idChain[i]) return true;
-          if (m_idChain[i] == b.m_idChain[i]) continue;
-          return false;
-        }
-        return m_idChain.size() < b.m_idChain.size();
-      }
-
-      /** constructor, mandatory iDChain musst at least contain one iD. */
-      SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
-      {
-        if (m_idChain.empty()) { B2FATAL("SubGraphID-Constructor, given idChain is empty - illegal usage!") }
-      }
-
-      /** returns chainLength of this id. */
-      unsigned size() const { return m_idChain.size(); }
-
-      /** if both graphs have got the same IDs except the last one, they share a trunk. */
-      bool checkSharesTrunk(const SubGraphID& b) const
-      {
-        unsigned size = m_idChain.size();
-        if (b.m_idChain.size() != size) { return false; }
-
-        for (unsigned i = 0; i < size - 1; i++) {
-          if (b.m_idChain[i] != m_idChain[i]) { return false; }
-        }
-
-        return true;
-      }
-
-      /** returns string of entries. */
-      std::string print() const
-      {
-        std::string out;
-        for (unsigned iD : m_idChain) {
-          out += FullSecID(iD).getFullSecString() + " ";
-        }
-        return std::move(out);
-      }
-
-    };
-
-
-
-    /** contains all relevant stuff needed for dealing with a subGraph. ~ 404 bytes per subGraph. */
-    template<class FilterType> class SubGraph {
-    protected:
-      const SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
-
-      std::unordered_map<FilterType, MinMax>
-      m_minMaxValues; /**< contains all min- and max-values found so far for all filters relevant for this Graph. */
-
-      unsigned m_found; /**< counts number of times this subgraph was found. */
-
-      std::unordered_map<FilterType, RawDataCollectedMinMax>* m_rawDataCollected; /**< takes care of collecting the raw data. */
-//    std::unique_ptr<RawDataCollectedBase> m_rawDataCollected; /**< contains pointer to the data container taking care of collecting the raw data. */
-    public:
-
-      /** overloaded '=='-operator */
-      bool operator==(const SubGraph<FilterType>& b) const
-      { return (m_id == b.m_id); }
-
-      /** for better readability. */
-      using Iterator = typename std::unordered_map<FilterType, MinMax>::iterator;
-
-      /** constructor, mandatory iDChain musst at least contain one iD. */
-      SubGraph(SubGraphID& id, std::vector<FilterType>& fIDs) : m_id(id), m_found(1), m_rawDataCollected(nullptr)
-      {
-        for (auto& iD : fIDs) {
-          m_minMaxValues.insert({iD, MinMax()});
-        }
-      }
-
-      /// destructor
-      ~SubGraph() { if (m_rawDataCollected != nullptr) delete m_rawDataCollected; }
-
-      /** add filter, if not added yet, checks value and replaces old ones if new one is better. returns true if minMax was updated. */
-      bool checkAndReplaceIfMinMax(FilterType fID, double value)
-      {
-        Iterator pos = m_minMaxValues.find(fID);
-        if (pos == m_minMaxValues.end()) {
-          B2WARNING("FilterID " << fID << " not known to this subgraph " << m_id.print() << " - nothing added!");
-          return false;
-        }
-        return pos->second.checkAndReplaceIfMinMax(value);
-      }
-
-      void wasFound() { m_found++; } /**< increases found-counter. */
-
-      unsigned getFound() const { return m_found; } /**< returns found-counter. */
-
-      /** if both graphs have got the same IDs except the last one, they share a trunk. */
-      bool checkSharesTrunk(const SubGraph<FilterType>& b) const { return (m_id.checkSharesTrunk(b.m_id)); }
-
-      std::string print() const
-      {
-        std::string out = "id: " + m_id.print() + " was found " + std::to_string(m_found) + " times. Filters with values collected:\n";
-        for (const auto& entry : m_minMaxValues) {
-          out += entry.first + " " + entry.second.print() + " _||_ ";
-        }
-        return std::move(out);
-      }
-
-      /** returns iD of this graph*/
-      const SubGraphID& getID() const { return m_id; }
-
-      /// takes care of being able to use the data collector.
-      void prepareDataCollection(std::pair<double, double> quantiles)
-      {
-        if (m_rawDataCollected != nullptr) delete m_rawDataCollected;
-        m_rawDataCollected = new std::unordered_map<FilterType, RawDataCollectedMinMax>();
-
-        for (const auto& entry : m_minMaxValues) {
-          m_rawDataCollected->insert({entry.first, RawDataCollectedMinMax(m_found, quantiles)});
-        }
-      }
-
-      /// adds value to rawDataCollector
-      void addValue(FilterType fID, double value)
-      {
-        if (m_rawDataCollected == nullptr) { B2FATAL("SubGraph::addValue: attempt to add data before prepareDataCollection(...) was executed! Aborting illegal procedure."); }
-        // TODO bau um auf m_rawDataCollected!
-        auto pos = m_rawDataCollected->find(fID);
-        if (pos == m_rawDataCollected->end()) {
-          B2WARNING("addValue: FilterID " << fID << " not known to this subgraph " << m_id.print() << " - nothing added!");
-          return;
-        }
-        pos->second.add(value);
-        return;
-      }
-
-      /// this deletes the old min and max values stored and replaces them with the quantiles to be found.
-      const std::unordered_map<FilterType, MinMax>& getFinalQuantileValues()
-      {
-        for (const auto& entry : *m_rawDataCollected) {
-          std::pair<double, double> results = entry.second.getMinMax();
-          checkAndReplaceIfMinMax(entry.first, results.first);
-          checkAndReplaceIfMinMax(entry.first, results.second);
-        }
-        return m_minMaxValues;
-      }
-
-    };
-
-
-
-    /** contains all subgraphs. */
-    template<class FilterType>  class SectorGraph {
-    protected:
-      std::map<SubGraphID, SubGraph<FilterType>> m_subgraphs; /**< contains all subgraphs. */
-
-      std::vector<FilterType> m_filterIDs; /**< ids of all filterTypes to be stored by subGraphs. */
-    public:
-
-      /** constructor expects filterIDs. */
-      SectorGraph(std::vector<FilterType>& fIDs) : m_filterIDs(fIDs)
-      { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is illegal usage of this class!") } }
-
-      /** for better readability. */
-      using Iterator = typename std::map<SubGraphID, SubGraph<FilterType>>::iterator;
-
-      /** find entry. returns end() if not found. */
-      Iterator find(SubGraphID idChain) { return m_subgraphs.find(idChain); }
-
-      /** returns begin of subGraphs. */
-      Iterator begin() { return m_subgraphs.begin(); }
-
-      /** returns end of subGraphs. */
-      Iterator end() { return m_subgraphs.end(); }
-
-      /** returns number of collected subgraphs so far. */
-      unsigned size() const { return m_subgraphs.size(); }
-
-      /** returns number of occurances for all subGraphs found together. */
-      unsigned long nFoundTotal() const
-      {
-        unsigned long nFound = 0;
-        for (auto& pack : m_subgraphs) { nFound += pack.second.getFound(); }
-        return nFound;
-      }
-
-      /** add new subgraph if not added already. */
-      Iterator add(SubGraphID& newID)
-      {
-        if (m_subgraphs.find(newID) != end())
-        { B2WARNING("SectorGraph::add: given ID " << newID.print() << " is already in graph, not added again..."); return end(); }
-        std::pair<Iterator, bool> pos = m_subgraphs.insert({newID, SubGraph<FilterType>(newID, m_filterIDs)});
-        B2DEBUG(1, "SectorGraph::add: new subgraph added: " << pos.first->second.print())
-        return pos.first;
-      }
-
-      /** returns a string giving an overview of the graph. */
-      std::string print() const
-      {
-        std::string out = "graph has got " + std::to_string(m_subgraphs.size()) + " entries:\n";
-        for (const auto& entry : m_subgraphs) {
-          out += entry.second.print() + "\n";
-        }
-        return std::move(out);
-      }
-
-      /** returns removed occurances. */
-      unsigned pruneGraph(double rarenessCut)
-      {
-        //sanity checks:
-        if (rarenessCut < 0 or rarenessCut >= 1)
-        { B2WARNING("pruneGraph: rarenessCut is rubbish: " << rarenessCut << ", stopping prune-process."); return 0; }
-        if (rarenessCut == 0) { B2DEBUG(1, "pruneGraph: nothing to be done, stopping prune-process."); return 0; }
-
-        /// vector of trunks:
-        // .first counts total number of occurances of branches of this trunk
-        // .second is a vector of pointers to the subgraphs of that trunk.
-        std::vector< std::pair<unsigned, std::vector<SubGraph<FilterType>*> >> trunks;
-
-        // find those sharing a trunk (trunkTotal) and cluster them in trunks:
-        for (auto& subGraphEntry : m_subgraphs) {
-          SubGraph<FilterType>& graph = subGraphEntry.second;
-          bool found = false;
-          for (auto& trunk : trunks) {
-            if (graph.checkSharesTrunk(*(trunk.second.at(0)))) {
-              trunk.first += graph.getFound();
-              trunk.second.push_back(&graph);
-              found = true;
-              continue;
-            }
-
-            if (found) continue;
-            trunks.push_back({graph.getFound(), {&graph} });
-          }
-        }
-
-        unsigned long nFoundB4 = nFoundTotal(), nKilled = 0;
-        unsigned sizeb4 = size();
-        B2DEBUG(1, "pruneGraph - before pruning: graph of size " << sizeb4 << " has " << trunks.size() << " trunks with " << nFoundB4 <<
-                " total found.")
-
-        // collect subGraphs (branches) to be deleted:
-        std::vector<SubGraph<FilterType>*> deadBranches;
-        for (auto& trunk : trunks) {
-          double trunkCut = rarenessCut * double(trunk.first);
-
-          // sort branches of trunk by rareness (rarest one first):
-          std::sort(trunk.second.begin(),
-                    trunk.second.end(),
-                    [](const SubGraph<FilterType>* a, const SubGraph<FilterType>* b)
-                    -> bool { return a->getFound() < b->getFound(); });
-
-          // skip trunk, if there are no rare branches.
-          auto pos = trunk.second.begin();
-          if (double((**pos).getFound()) >= trunkCut) continue;
-
-          // collect branches to be killed starting with the smallest one and stop when reaching those which have been slipping above the threshold in the process:
-          while (pos != trunk.second.end()) {
-            // mark the most rarest entry:
-            deadBranches.push_back(*pos);
-            trunkCut -= double((**pos).getFound()) * rarenessCut;
-
-            // reached the point when all graphs left are now good enough for us: -> stopping loop.
-            if (double((**pos).getFound()) >= trunkCut) break;
-            ++pos;
-          }
-        } // looping over trunks
-
-        if (deadBranches.empty()) { B2DEBUG(1, "pruneGraph: no rare branches found - stopping pruning process."); return 0; }
-
-        // kill selected ones:
-        for (auto* graph : deadBranches) {
-          nKilled += graph->getFound();
-          m_subgraphs.erase(graph->getID());
-        }
-
-        B2DEBUG(1, "pruneGraph - after pruning graph with size (before/after " << sizeb4 << "/" << size() <<
-                ") and nFound (before/after/killed " << nFoundB4 << "/" << nFoundTotal() << "/" << nKilled)
-
-        return nKilled;
-      }
-
-    };
-
-
-
-    std::vector<unsigned> getSecIDs(std::vector<BranchInterface<unsigned>>& secBranches, Long64_t entry)
-    {
-      std::vector<unsigned> iDs;
-      for (auto& branch : secBranches) {
-        branch.update(entry);
-        iDs.push_back(branch.value);
-      }
-      return std::move(iDs);
-    }
-
-
-    /// train graph
-    template <class FilterType>
-    void trainGraph(
-      SectorGraph<FilterType>& mainGraph,
-      std::unique_ptr<TChain>& chain,
-      std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      auto nEntries = chain->GetEntries();
-      B2DEBUG(10, "RawSecMapMerger::trainGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-              " branches")
-      if (nEntries == 0) { B2WARNING("trainGraph: valid file but no data stored!"); return; }
-
-      auto percentMark = nEntries / 10; auto progressCounter = 0;
-      // log all sector-combinations and determine their absolute number of appearances:
-      for (auto i = 0 ;  i <= nEntries; i++) {
-        if ((i % percentMark) == 0) {
-          progressCounter += 10;
-          B2INFO("RawSecMapMerger::trainGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
-        }
-        auto thisEntry = chain->LoadTree(i);
-
-        auto ids = getSecIDs(sectorBranches, thisEntry);
-        auto currentID = SubGraphID(ids);
-
-        auto pos = mainGraph.find(currentID);
-
-        if (pos == mainGraph.end()) { B2WARNING("trainGraph: could not find subgraph " << currentID.print() << " - skipping entry..."); continue; }
-
-        for (auto& filter : filterBranches) {
-          filter.update(thisEntry);
-          pos->second.addValue(FilterType(filter.name), filter.value);
-        }
-      } // entry-loop-end
-    }
-
-
-    template <class FilterType>
-    SectorGraph<FilterType> buildGraph(
-      std::unique_ptr<TChain>& chain,
-      std::vector<BranchInterface<unsigned>>& sectorBranches,
-      std::vector<BranchInterface<double>>& filterBranches)
-    {
-      auto nEntries = chain->GetEntries();
-      B2INFO("RawSecMapMerger::buildGraph():  start of " << nEntries << " entries in tree and " << sectorBranches.size() <<
-             " branches")
-
-      // creating main graph containing all subgraphs:
-      std::vector<std::string> filterNames;
-      for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
-      SectorGraph<FilterType> mainGraph(filterNames);
-
-      if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return std::move(mainGraph); }
-      auto percentMark = nEntries / 10;
-      auto progressCounter = 0;
-      // log all sector-combinations and determine their absolute number of appearances:
-      for (auto i = 0 ;  i <= nEntries; i++) {
-        if ((i % percentMark) == 0) {
-          progressCounter += 10;
-          B2INFO("RawSecMapMerger::buildGraph(): with mark: " << percentMark << " and i=" << i << ", " << progressCounter <<
-                 "% related, mainGraph has got " << mainGraph.size() << " sectors...")
-        }
-        auto thisEntry = chain->LoadTree(i);
-
-        auto ids = getSecIDs(sectorBranches, thisEntry);
-        auto currentID = SubGraphID(ids);
-        B2DEBUG(10, "buildGraph-SubGraphID-print: id: " << currentID.print());
-
-        auto pos = mainGraph.find(currentID);
-
-        if (pos == mainGraph.end()) { pos = mainGraph.add(currentID); }
-
-        if (pos == mainGraph.end()) { B2WARNING("could not find nor add subgraph - skipping entry..."); continue; }
-
-        pos->second.wasFound();
-
-        for (auto& filter : filterBranches) {
-          filter.update(thisEntry);
-          pos->second.checkAndReplaceIfMinMax(FilterType(filter.name), filter.value);
-        }
-      } // entry-loop-end
-
-      B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size())
-      B2DEBUG(1, "fullGraph-Print: " << mainGraph.print());
-
-      return std::move(mainGraph);
-    }
-
-
-
-    /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
-    void processSectorCombinationsV2(TrainerConfigData& config, unsigned secChainLength)
-    {
-      B2DEBUG(1, "processSectorCombinationsV2: training map " << config.secMapName << " with secChainLength: " << secChainLength)
-
-      // branch-names sorted from outer to inner:
-      std::vector<std::string> secBranchNames;
-      // filter names are different for different secChainLengths:
-      std::vector<std::string> filterBranchNames;
-      std::string nHit = prepareNHitSpecificStuff(secChainLength, config, secBranchNames, filterBranchNames);
-
-      // contains the raw data
-      std::unique_ptr<TChain> chain = createTreeChain(config, nHit);
-
-      // prepare links to branches branches:
-      std::vector<BranchInterface<unsigned>> sectorBranches = getBranchesV2<unsigned>(chain, secBranchNames);
-      std::vector<BranchInterface<double>> filterBranches = getBranchesV2<double>(chain, filterBranchNames);
-
-      // for debugging: print data for crosschecks:
-      printDataV2(chain, sectorBranches, filterBranches);
-
-      SectorGraph<std::string> mainGraph = buildGraph<std::string>(chain, sectorBranches, filterBranches);
-
-      unsigned nKilled = mainGraph.pruneGraph(config.rarenessThreshold);
-
-      B2DEBUG(1, "processSectorCombinationsV2: nKilled " << nKilled)
-
-      for (auto& subgraph : mainGraph) {
-        subgraph.second.prepareDataCollection(config.quantiles); // TODO small-sample-case!
-      }
-
-      trainGraph(mainGraph, chain, sectorBranches, filterBranches);
-      /// TODO next steps:
-      // selectDataContainer!
-      /**
-       * 404 bytes per graph max (no trainer-values) + 3 (id in mainGraph)
-       * 100.000 graphs max
-       * -> 40.700.000 ~ 40 MB for empty mainGraph containing 100k subgraphs.
-       * per subgraph space available: (2GB - 40 MB) / 100.000 = 20 MB per graph. (double)-> 2.500.000 values max. / 20 Filters
-       * 125k value-sets max.
-       * */
-
-      B2INFO("processSectorCombinationsV2: training finished.\n" << mainGraph.print();)
-    }
-
-
-
-    /** pseudo code */
-    void doALLTEMP()
-    {
-      StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
-      B2INFO("RawSecMapMerger::doALLTEMP():");
-
-      // loop over all the setups in the sectorMap:
-      for (auto setup : sectorMap->getAllSetups()) {
-
-        auto config = setup.second->getConfig();
-        B2INFO("RawSecMapMerger::doALLTEMP(): loading mapName: " << config.secMapName);
-
-        if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
-
-        processSectorCombinationsV2(config, 2);
-
-        return; // TODO WARNING DEBUG we do not want to run more than one run yet!
-      }
-    }
-
-
-
+    /// following stuff is maybe yet relevant -> to be checked!
 // // // //   void dummyMergerSketch()
 // // // //   {
 // // // //     /// WARNING ATTENTION pseudo code:

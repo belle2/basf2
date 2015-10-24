@@ -148,7 +148,7 @@
   </Material>
 
   <Material name="ScaleGas">
-     <density unit="g/cm3">6.69081e-1</density>
+     <density unit="g/cm3">6.69081e-4</density>
      <state>Gas</state>
      <Components>
         <Element fraction="0.7">He</Element>

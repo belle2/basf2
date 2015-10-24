@@ -53,7 +53,7 @@
       <dz_scint unit="cm">0.3</dz_scint>
       <Al_width unit="cm">0.0001</Al_width>
     </Active>
-
+<!--
    <Active>
       <Material>CLAW-Material</Material>
       <z_claw unit="cm">0.0</z_claw>
@@ -120,7 +120,7 @@
       <dz_scint unit="cm">0.3</dz_scint>
       <Al_width unit="cm">0.0001</Al_width>
     </Active>
-
+-->
 
     <Active>
       <Material>CLAW-Material</Material>
@@ -154,7 +154,7 @@
       <Al_width unit="cm">0.0001</Al_width>
     </Active>
 
-
+<!--
     <Active>
       <Material>CLAW-Material</Material>
       <z_claw unit="cm">-100.0</z_claw>
@@ -219,7 +219,7 @@
       <dz_scint unit="cm">0.3</dz_scint>
       <Al_width unit="cm">0.0001</Al_width>
     </Active>
-
+-->
 
   </Content>
 </DetectorComponent>

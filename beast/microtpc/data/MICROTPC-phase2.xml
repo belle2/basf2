@@ -69,6 +69,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -84,6 +85,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -99,6 +101,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -114,6 +117,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -129,6 +133,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -144,6 +149,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -159,6 +165,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>      
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -174,6 +181,7 @@ whitespace, comma or semi-colon -->
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
+      <ScaleGas>MICROTPC-Material</ScaleGas>      
       <Material>MICROTPC-Material</Material>
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>

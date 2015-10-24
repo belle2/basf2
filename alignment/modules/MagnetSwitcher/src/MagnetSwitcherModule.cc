@@ -50,7 +50,7 @@ void MagnetSwitcherModule::beginRun()
   switcher = true;
   // If current run in list, switch field OFF
   for (unsigned int i = 0; i < m_expList.size(); i++) {
-    if (emd->getExperiment() == (unsigned int) m_expList[i] && emd->getRun() == (unsigned int) m_runList[i]) {
+    if (emd->getExperiment() == m_expList[i] && emd->getRun() == m_runList[i]) {
       switcher = false;
       break;
     }

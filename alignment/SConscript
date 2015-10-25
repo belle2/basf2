@@ -13,6 +13,6 @@ if testbeam:
 
 env['LIBS'] = ['framework', 'cdc_dataobjects',
                'vxd', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
-               'alignment_dataobjects', 'bklm', 'bklm_dataobjects']
+               'alignment_dataobjects', 'bklm', 'bklm_dataobjects', 'calibration']
 Return('env')
 

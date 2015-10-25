@@ -9,7 +9,7 @@
 
 """
 <header>
-<output>VXDCDCMergerSinglePartTruthFinder.root</output>
+<output>VXDCDCMergerSinglePartTruthFinderBkg.root</output>
 <contact>Benjamin Oberhof, tracking@belle2.kek.jp</contact>
 </header>
 """
@@ -235,7 +235,7 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
     'GFTracksColName': 'GFTracks',
     'TrackCandColName': 'TracksCand',
     'UnMergedCands': 'UnMergedCand',
-    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinder.root',
+    'root_output_filename': '../VXDCDCMergerSinglePartTruthFinderBkg.root',
     #    'chi2_max': 100,
     #    'merge_radius': 2.0,
 }

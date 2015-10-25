@@ -10,7 +10,10 @@
 #pragma once
 
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBStore.h>
 #include <framework/logging/LogConfig.h>
+
+#include <TClonesArray.h>
 
 #include <string>
 #include <utility>
@@ -107,6 +110,24 @@ namespace Belle2 {
      * @return           True if the storage of the object succeeded.
      */
     bool storeData(const std::string& module, TObject* object, IntervalOfValidity& iov) {return storeData("dbstore", module, object, iov);};
+
+    /**
+     * Store an ClonesArray in the database with the default package name "dbstore" and default module name.
+     *
+     * @param object     The object that should be stored in the database.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    bool storeData(TClonesArray* array, IntervalOfValidity& iov) {return storeData("dbstore", DataStore::defaultArrayName(array->ClassName()), array, iov);};
+
+    /**
+     * Store an object in the database with the default package name "dbstore" and default module name.
+     *
+     * @param object     The object that should be stored in the database.
+     * @param iov        The interval of validity of the the object.
+     * @return           True if the storage of the object succeeded.
+     */
+    template<class T> bool storeData(T* object, IntervalOfValidity& iov) {return storeData("dbstore", DBStore::objectName<T>(""), object, iov);};
 
     /**
      * Store multiple objects in the database.

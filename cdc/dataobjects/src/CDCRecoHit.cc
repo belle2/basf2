@@ -283,24 +283,3 @@ bool CDCRecoHit::getFlyByDistanceVector(B2Vector3D& pointingVector,
   trackDir.SetMag(1.);
   return true;
 }
-
-
-std::vector< int > CDCRecoHit::labels()
-{
-  return std::vector< int >();
-}
-
-TMatrixD CDCRecoHit::derivatives(const genfit::StateOnPlane*)
-{
-  return TMatrixD();
-}
-
-TMatrixD CDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
-{
-  return TMatrixD();
-}
-
-std::vector< int > CDCRecoHit::localLabels()
-{
-  return std::vector< int >();
-}

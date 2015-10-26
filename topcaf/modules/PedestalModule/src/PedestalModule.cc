@@ -120,10 +120,12 @@ void PedestalModule::event()
 
       if ((m_mode == 0)) { // Calculate pedestals from waveform
 
-        //      B2INFO("PedestalModule::GetChannelID(): " <<   evtwave_ptr->GetChannelID() );
+
         topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
         const std::vector<double> v_samples = evtwave_ptr->GetSamples();
         int nsamples = v_samples.size();
+
+        //  B2INFO("PedestalModule::GetChannelID(): " <<   evtwave_ptr->GetChannelID() <<" ASIC Window: "<<evtwave_ptr->GetASICWindow());
 
         TProfile* channel_adc_h = m_sample2ped[channel_name];
         if (!channel_adc_h) {

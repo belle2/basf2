@@ -152,7 +152,7 @@ void SampleTimeCalibrationModule::event()
 
       EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
 
-      if ((m_mode == 0)) { // Calculate calibration
+      if ((m_mode == 0) && (evtwave_ptr->GetAmplitude() > 70)) { // Calculate calibration
         FillWaveform(evtwave_ptr);
       }
       if (m_mode == 1) { // Apply calibration to waveform
@@ -429,6 +429,8 @@ void SampleTimeCalibrationModule::FillWaveform(const EventWaveformPacket* in_wp)
   double shift_time_bin = max_bin - 64.0 * time_win;
   //  B2INFO("channel_id: " << channel_id << "\tshift_time_bin: " << shift_time_bin << " = " << max_bin << " - 64.0 * " << time_win);
   std::pair<double, double> p = std::make_pair(shift_time_bin, delta_t);
+
+  B2INFO("channel_id: " << channel_id << "\tshift_time_bin: " << shift_time_bin << " = " << max_bin << " - 64.0 * " << time_win);
 
   //Start Add
   if (peak_win % 2 == 0) {

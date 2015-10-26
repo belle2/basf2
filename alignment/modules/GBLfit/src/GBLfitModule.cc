@@ -30,7 +30,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-#include <cdc/dataobjects/CDCRecoHit.h>
+#include <alignment/reconstruction/AlignableCDCRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
@@ -178,7 +178,7 @@ GBLfitModule::GBLfitModule() :
   addParam("CDCWireSag", m_enableWireSag,
            "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.", false);
   addParam("UseTrackTime", m_useTrackTime,
-           "Determines whether the realistic TDC track time converter and the CDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.  Requires EstimateSeedTime with current input (2015-03-11).",
+           "Determines whether the realistic TDC track time converter and the AlignableCDCRecoHits will take the track propagation time into account.  The setting has to agree with those of the CDCDigitizer.  Requires EstimateSeedTime with current input (2015-03-11).",
            true);
   addParam("EstimateSeedTime", m_estimateSeedTime,
            "If set, time for the seed will be recalculated based on a helix approximation.  Only makes a difference if UseTrackTime is set.",
@@ -281,21 +281,21 @@ void GBLfitModule::initialize()
     }
   }
 
-  // Create new Translators and give them to the CDCRecoHits.
+  // Create new Translators and give them to the AlignableCDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  //CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new RealisticCDCGeometryTranslator(true), new RealisticTDCCountTranslator(true));
+  //AlignableCDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new RealisticCDCGeometryTranslator(true), new RealisticTDCCountTranslator(true));
   if (m_realisticCDCGeoTranslator) {
-    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
-                               new RealisticCDCGeometryTranslator(m_enableWireSag),
-                               new RealisticTDCCountTranslator(m_useTrackTime),
-                               m_useTrackTime);
+    AlignableCDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                                        new RealisticCDCGeometryTranslator(m_enableWireSag),
+                                        new RealisticTDCCountTranslator(m_useTrackTime),
+                                        m_useTrackTime);
   } else {
     if (m_enableWireSag)
       B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
-    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
-                               new IdealCDCGeometryTranslator(),
-                               new RealisticTDCCountTranslator(m_useTrackTime),
-                               m_useTrackTime);
+    AlignableCDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                                        new IdealCDCGeometryTranslator(),
+                                        new RealisticTDCCountTranslator(m_useTrackTime),
+                                        m_useTrackTime);
   }
 
   // Set GBL parameters
@@ -530,8 +530,8 @@ void GBLfitModule::event()
         }
       }
       if (cdcHits.getEntries()) {
-        genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
-        CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
+        genfit::MeasurementProducer <CDCHit, AlignableCDCRecoHit>* CDCProducer =  NULL;
+        CDCProducer =  new genfit::MeasurementProducer <CDCHit, AlignableCDCRecoHit> (cdcHits.getPtr());
         factory.addProducer(Const::CDC, CDCProducer);
       }
       if (bklmHits.getEntries()) {
@@ -1139,7 +1139,7 @@ HitPatternCDC GBLfitModule::getHitPatternCDC(genfit::Track track)
       //if (weight == 0)
       //  continue;
 
-      CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
+      AlignableCDCRecoHit* cdcHit =  dynamic_cast<AlignableCDCRecoHit*>(absMeas);
 
       if (cdcHit) {
         WireID wire = cdcHit->getWireID();

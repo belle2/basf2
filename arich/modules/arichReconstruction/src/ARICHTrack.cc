@@ -69,7 +69,7 @@ double ARICHTrack::getMeanEmissionLength(int i) const
   if (dir.Z() == 0) return 0;
   double atl = arichgp->getAerogelTransmissionLength(i);
   double d   = arichgp->getAerogelThickness(i) / dir.Z() / atl;
-  double dmean = 1 - d / (exp(d) - 1);
+  double dmean = 1 - d / expm1(d);
   return (dmean * atl);
 }
 

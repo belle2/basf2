@@ -40,27 +40,19 @@ namespace Belle2 {
      */
 
     ARICHHapdQA(std::string serial, TTimeStamp measurementDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
-                std::vector<TGraph*> noise, std::vector<TH1S*> hitCount)
-    {
-      m_serial = serial;
-      m_measurementDate = measurementDate;
-      m_leakCurrent = leakCurrent;
-      m_hitData2D = hitData2D;
-      m_noise = noise;
-      m_hitCount = hitCount;
-    };
+                std::vector<TGraph*> noise, std::vector<TH1S*> hitCount): m_serial(serial), m_measurementDate(measurementDate),
+      m_leakCurrent(leakCurrent),
+      m_hitData2D(hitData2D), m_noise(noise), m_hitCount(hitCount)
+    { };
 
     /**
      * Constructor
      */
 
-    ARICHHapdQA(std::vector<TGraph*> leakCurrent, TH2F* hitData2D, std::vector<TGraph*> noise, std::vector<TH1S*> hitCount)
-    {
-      m_leakCurrent = leakCurrent;
-      m_hitData2D = hitData2D;
-      m_noise = noise;
-      m_hitCount = hitCount;
-    };
+    ARICHHapdQA(std::vector<TGraph*> leakCurrent, TH2F* hitData2D, std::vector<TGraph*> noise,
+                std::vector<TH1S*> hitCount): m_leakCurrent(leakCurrent),
+      m_hitData2D(hitData2D), m_noise(noise), m_hitCount(hitCount)
+    { };
 
 
     /**

@@ -105,6 +105,7 @@ namespace Belle2 {
     m_NpointsQE = 0;
     m_qeScale = 0.;
     m_windowAbsorbtion = 0.;
+    m_chipNegativeCrosstalk = 0;
     for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0.;}
   }
 

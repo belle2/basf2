@@ -62,7 +62,7 @@ namespace Belle2 {
     /*!
       \param aeroHit track hit on aerogel plane (ARICHAeroHit)
     */
-    ARICHTrack(const ARICHAeroHit& aeroHit);
+    explicit ARICHTrack(const ARICHAeroHit& aeroHit);
 
     //! Useful constructor
     /*!

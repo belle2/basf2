@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHFirmware(int version)
+    explicit ARICHFirmware(int version)
     {
       m_version = version;
     }

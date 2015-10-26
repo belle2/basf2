@@ -92,9 +92,7 @@ namespace Belle2 {
   {
     B2DEBUG(50, "Initialize");
 
-    char filename[m_outputFile.size() + 1];
-    strcpy(filename, m_outputFile.c_str());
-    file = new TFile(filename, "RECREATE");
+    file = new TFile(m_outputFile.c_str(), "RECREATE");
 
     tree = new TTree("tree", "ext at ARICH");
     tree->Branch("m_eventNo", &m_eventNo, "m_eventNo/I");

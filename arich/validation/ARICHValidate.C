@@ -45,7 +45,6 @@ void ARICHValidate(){
   double fakee=0;
   double fake = 0.005;
   int i=0;
-  double cut=0;
   while (fake < 0.05){      
     while (fakee < fake){                                                                                      
       nentrpi+=hpi->GetBinContent(startbin);

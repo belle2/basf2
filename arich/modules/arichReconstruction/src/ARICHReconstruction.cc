@@ -287,6 +287,9 @@ namespace Belle2 {
 
     const unsigned int nAerogelLayers = m_arichGeoParameters->getNumberOfAerogelRadiators();
 
+    if (nAerogelLayers > c_noOfAerogels) B2ERROR("ARICHReconstrucion: number of aerogel layers defined in the xml file exceeds " <<
+                                                   c_noOfAerogels);
+
     static double  refractiveInd[c_noOfAerogels];
     static double  zaero[c_noOfAerogels];
     static double  thickness[c_noOfAerogels];

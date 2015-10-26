@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/geometry/ARICHGeometryPar.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -74,6 +75,8 @@ namespace Belle2 {
     unsigned m_bitMask; /**< bitmask for hit detection (4bits/hit) */
     int m_debug; /**< debug */
     ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
+    std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
+    std::string m_inputRawDataName; /**< name of RawARICH store array */
 
   };
 

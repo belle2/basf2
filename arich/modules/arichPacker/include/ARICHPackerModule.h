@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/geometry/ARICHGeometryPar.h>
+#include <string>
 
 namespace Belle2 {
 
@@ -68,6 +69,8 @@ namespace Belle2 {
     int m_nonSuppressed;   /**< type of data (1 nonsuppressed, 0 suppressed) */
     unsigned m_bitMask;    /**< bitmask for hit detection (4bit/hit) */
     int m_debug; /**< debug */
+    std::string m_inputDigitsName;   /**< name of ARICHDigit store array */
+    std::string m_outputRawDataName; /**< name of RawARICH store array */
   };
 
 } // Belle2 namespace

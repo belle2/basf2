@@ -52,6 +52,9 @@ namespace Belle2 {
     addParam("nonSuppressed", m_nonSuppressed, "Pack in non-suppressed format (store all channels)", 0);
     addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
     addParam("debug", m_debug, "print packed bitmap", 0);
+    addParam("inputDigitsName", m_inputDigitsName, "name of ARICHDigit store array", string(""));
+    addParam("outputRawDataName", m_outputRawDataName, "name of RawARICH store array", string(""));
+
   }
 
   ARICHPackerModule::~ARICHPackerModule()
@@ -61,10 +64,10 @@ namespace Belle2 {
   void ARICHPackerModule::initialize()
   {
 
-    StoreArray<ARICHDigit> digits;
+    StoreArray<ARICHDigit> digits(m_inputDigitsName);
     digits.isRequired();
 
-    StoreArray<RawARICH> rawData;
+    StoreArray<RawARICH> rawData(m_outputRawDataName);
     rawData.registerInDataStore();
 
     if (!m_arichgp->isInit()) {
@@ -83,8 +86,8 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    StoreArray<ARICHDigit> digits;
-    StoreArray<RawARICH> rawData;
+    StoreArray<ARICHDigit> digits(m_inputDigitsName);
+    StoreArray<RawARICH> rawData(m_outputRawDataName);
 
     int nModules = m_arichgp->getNMCopies();
 
@@ -140,7 +143,8 @@ namespace Belle2 {
               unsigned chn = digit->getChannelID();
               unsigned chan_n = chn / 8;
               unsigned chan_i = chn % 8;
-              buf[i + chan_n] += (m_bitMask << chan_i * 4);
+              unsigned bitmap = (unsigned)digit->getBitmap();
+              buf[i + chan_n] += (bitmap << chan_i * 4);
             }
             i += 18;
           }
@@ -153,7 +157,8 @@ namespace Belle2 {
             // write data
             for (const auto& digit : sortedDigits[boardID - 1]) {
               unsigned chn = digit->getChannelID();
-              unsigned chn_data =  m_bitMask + (chn << 8);
+              unsigned bitmap = (unsigned)digit->getBitmap();
+              unsigned chn_data = bitmap + (chn << 8);
               if (j % 2 == 1) buf[i] = (chn_data << 16);
               else {buf[i] += chn_data; i++;}
               j++;

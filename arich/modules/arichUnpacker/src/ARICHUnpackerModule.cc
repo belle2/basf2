@@ -50,11 +50,12 @@ namespace Belle2 {
   {
     // set module description
     setDescription("Raw data unpacker for ARICH");
-    addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
-    addParam("debug", m_debug, "print data words bitmap", 0);
-
     setPropertyFlags(c_ParallelProcessingCertified);
 
+    addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
+    addParam("debug", m_debug, "print data words bitmap", 0);
+    addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", string(""));
+    addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", string(""));
   }
 
   ARICHUnpackerModule::~ARICHUnpackerModule()
@@ -64,10 +65,10 @@ namespace Belle2 {
   void ARICHUnpackerModule::initialize()
   {
 
-    StoreArray<RawARICH> rawData;
+    StoreArray<RawARICH> rawData(m_inputRawDataName);
     rawData.isRequired();
 
-    StoreArray<ARICHDigit> digits;
+    StoreArray<ARICHDigit> digits(m_outputDigitsName);
     digits.registerInDataStore();
 
     if (!m_arichgp->isInit()) {
@@ -85,8 +86,8 @@ namespace Belle2 {
   void ARICHUnpackerModule::event()
   {
 
-    StoreArray<RawARICH> rawData;
-    StoreArray<ARICHDigit> digits;
+    StoreArray<RawARICH> rawData(m_inputRawDataName);
+    StoreArray<ARICHDigit> digits(m_outputDigitsName);
     digits.clear();
 
 
@@ -117,7 +118,7 @@ namespace Belle2 {
   void ARICHUnpackerModule::unpackUnsuppressedData(const int* buffer, int bufferSize)
   {
 
-    StoreArray<ARICHDigit> digits;
+    StoreArray<ARICHDigit> digits(m_outputDigitsName);
 
     unsigned mergerID = (buffer[0] >> 8) & 0xFF;
 
@@ -131,7 +132,8 @@ namespace Belle2 {
           i += 2;
           for (int j = 0; j < 144; j++) {
             unsigned chan = buffer[i] & (m_bitMask << (j % 8) * 4);
-            if (chan) digits.appendNew(boardID, j, 0);
+            uint8_t bitmap = (buffer[i] >> (j % 8) * 4) & 0xF;
+            if (chan) digits.appendNew(boardID, j, bitmap);
             if ((j + 1) % 8 == 0) i++;
           }
         }
@@ -146,7 +148,7 @@ namespace Belle2 {
   void ARICHUnpackerModule::unpackSuppressedData(const int* buffer, int bufferSize)
   {
 
-    StoreArray<ARICHDigit> digits;
+    StoreArray<ARICHDigit> digits(m_outputDigitsName);
 
     unsigned short mergerID = (buffer[0] >> 8) & 0xFF;
     unsigned version = (buffer[0] >> 16) & 0xFF;
@@ -169,7 +171,8 @@ namespace Belle2 {
             else {word = buffer[i]; i++;}
             unsigned is_hit = word & m_bitMask;
             unsigned chn = (word >> 8) & (0xFF);
-            if (is_hit) digits.appendNew(boardID, chn, 0);
+            uint8_t bitmap = word & (0xF);
+            if (is_hit) digits.appendNew(boardID, chn, bitmap);
           }
           if (nhits % 2) i++;
         }

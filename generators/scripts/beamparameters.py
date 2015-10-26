@@ -87,14 +87,30 @@ beamparameter_presets = {
         "energyHER": 7.160,
         "energyLER": 4.092,
     }),
+    "Y1D1": ("SuperKEKB", {  # m(Y1D) = 10.152 GeV
+        "energyHER": 6.720,
+        "energyLER": 3.840,
+    }),
+    "Y2D1": ("SuperKEKB", {  # m(Y2D) = 10.425 GeV
+        "energyHER": 6.901,
+        "energyLER": 3.944,
+    }),
+    "Y6S": ("SuperKEKB", {  # m(Y6S) = 11.020 GeV
+        "energyHER": 7.295,
+        "energyLER": 4.169,
+    }),
+    "Yb10775": ("SuperKEKB", {  # m(Yb10775) = 10.775 GeV
+        "energyHER": 7.133,
+        "energyLER": 4.076,
+    }),
     "KEKB-Belle": (None, {
         "energyHER": 7.998213,
         "energyLER": 3.499218,
         "angleHER": 0.022,
     }),
-    "LEP": (None, {
-        "energyHER": 100,
-        "energyLER": 100,
+    "LEP1": (None, {
+        "energyHER": 45.6,
+        "energyLER": 45.6,
     }),
     "DAPHNE": (None, {
         "energyHER": 1.02 / 2.,

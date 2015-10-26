@@ -111,7 +111,7 @@ namespace Belle2 {
     // int getPythiaSpinType(int); /**< Function to get SpinType from Pythia ID. */
 
   protected:
-    std::unordered_map<int, int> m_mapPythiaIDtoPDG;
+    std::unordered_map<int, int> m_mapPythiaIDtoPDG; /**< mapping of PYTHIA id to PDG codes*/
   };
 
 }

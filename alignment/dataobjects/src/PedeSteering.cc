@@ -2,11 +2,8 @@
 #include <fstream>
 
 using namespace Belle2;
+using namespace std;
 
-ClassImp(PedeSteering)
-// ------------
-// PedeSteering
-// ------------
 string PedeSteering::make(string filename)
 {
   command("end");

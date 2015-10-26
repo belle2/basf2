@@ -26,7 +26,7 @@ void ARICHValidate(){
   ch->Draw("(m_logl.pi-m_logl.K)>>hall","(abs(m_pdg)==321 || abs(m_pdg)==211) && m_flag==1 && sqrt((m_truePosition.x - m_position.x)**2 +(m_truePosition.y-m_position.y)**2)<1 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_status>105");
 
   hall->GetListOfFunctions()->Add(new TNamed("Description", "Difference of ARICHLikelihood value for K and #pi hypothesis, for K and #pi tracks with 3.0 - 3.5 GeV (particle gun from the IP). TrackFinderMCTruth is used for track matching."));
-
+  hall->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));
   hall->GetListOfFunctions()->Add(new TNamed("Check", "Well separated K and #pi peaks."));
 
   hall->Write();
@@ -34,8 +34,8 @@ void ARICHValidate(){
   TH1F* heff = new TH1F("heff","K id. efficiency vs. #pi missid. probability;fake;efficiency",100,0.005,0.05);
   
   heff->GetListOfFunctions()->Add(new TNamed("Description", "K identification efficiency vs. #pi missidentification probability, for K and #pi tracks with 3.0 - 3.5 GeV. TrackFinderMCTruth is used for track matching."));
-  
-  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, > 0.99 eff. for > 0.02 fake."));
+  heff->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));
+  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, >0.98 eff. for > 0.02 fake."));
   
   int startbin = hpi->FindFirstBinAbove(0.);
   int nentrpi = 0; 
@@ -65,8 +65,8 @@ void ARICHValidate(){
   ch->Draw("m_detPhotons>>hnphot","abs(m_pdg)==211 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_flag==1 && m_status>105");
   
   hnphot->GetListOfFunctions()->Add(new TNamed("Description", "Number of detected photons in a 3#sigma band around the expected Cherenkov angle, for #pi with momenta 3.0-3.5 GeV."));
-  
-  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~12."));
+  hnphot->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));
+  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~11.5."));
   
   hnphot->Write();
   

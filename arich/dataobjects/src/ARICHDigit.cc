@@ -15,6 +15,19 @@ using namespace Belle2;
 
 ClassImp(ARICHDigit)
 
+DigitBase::EAppendStatus ARICHDigit::addBGDigit(const DigitBase* bg)
+{
 
+  const auto* bgDigit = static_cast<const ARICHDigit*>(bg);
+  uint8_t bg_bitmap = bgDigit->getBitmap();
+  int i = 0;
+  while (bg_bitmap >> i) {
+    if (m_bitmap == 0xF) break;
+    m_bitmap = (m_bitmap << 1) + 1;
+    i++;
+  }
 
+  return DigitBase::c_DontAppend;
+
+}
 

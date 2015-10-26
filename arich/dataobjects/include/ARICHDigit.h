@@ -12,17 +12,17 @@
 #define ARICHDIGIT_H
 
 // ROOT
-#include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 #include <stdint.h>
 
 namespace Belle2 {
 
 
   //! ARICHDigit class for storing photon hit information.
-  /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigitizer module). Contains only module number, channel number and global time.
+  /*! This class holds the ARICH hit information after digitization (obtained from ARICHSimHit after ARICHDigitizer module). Contains only module number, channel number and hit bitmap (4 bits).
   */
 
-  class ARICHDigit : public RelationsObject {
+  class ARICHDigit : public DigitBase {
 
   public:
 
@@ -63,6 +63,23 @@ namespace Belle2 {
     //! Get global time of hit
     uint8_t getBitmap() const { return m_bitmap; }
 
+    /**
+     * Implementation of the base class function.
+     * Enables BG overlay module to identify uniquely the physical channel of this Digit.
+     * @return unique channel ID, composed of channel ID (1-512) and bar ID (1-16)
+     */
+    unsigned int getUniqueChannelID() const {return m_channelID + (m_moduleID << 16);}
+
+    /**
+     * Implementation of the base class function
+     * @param bg BG digit
+     * @return append status
+     *
+     * NOTE: Implementation is provisional (number of "1"s in channel bitmap is equal to number of p.e. that hit channel).
+     * Should be updated together with digitizer update, to emulate more proper response.
+     */
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+
     /*
     //! Set ID number of module that registered hit
     void setModuleID(int moduleID) { m_moduleID = moduleID; }
@@ -78,7 +95,7 @@ namespace Belle2 {
     int m_moduleID;           /**< ID number of module that registered hit */
     int m_channelID;          /**< ID number of hit channel */
     uint8_t m_bitmap;          /**< bitmap */
-    ClassDef(ARICHDigit, 2); /**< the class title */
+    ClassDef(ARICHDigit, 3); /**< the class title */
 
   };
 

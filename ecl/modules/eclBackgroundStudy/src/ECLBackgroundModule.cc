@@ -61,7 +61,6 @@ ECLBackgroundModule::ECLBackgroundModule() :
   h_nECLSimHits(0),
   h_CrystalRadDoseTheta(0),
   h_CrystalRadDose(0),
-  h_Pileup(0),
   h_CrystalThetaID2(0),
   h_CrystalThetaID67(0),
   h_HitLocations(0),
@@ -77,9 +76,6 @@ ECLBackgroundModule::ECLBackgroundModule() :
   h_Shower(0),
   h_ProdVert(0),
   h_ProdVertvsThetaId(0),
-  T_event{0},
-  T_energy{0},
-  T_1us{0},
   Crystal{0},
   m_arichgp(0),
   nHAPDperRing{0},
@@ -143,8 +139,10 @@ void ECLBackgroundModule::defineHisto()
   h_HitLocations = new TH2F("Hit_Locations", "Hit locations;z (cm); r (cm)", 250, -200, 300, 80,    0, 160);
   h_ProdVertvsThetaId = new TH2F("MCProd_Vert_vs_ThetaID", "Production Vertex vs #theta_{ID};#theta_{ID};z (cm)", 69, -0.5, 68.5, 125,
                                  -200, 300);
+  hEdepPerRing = new TH1F("hEdepPerRing", "Energy deposited per #theta_{ID};#theta_{ID}; GeV", 69, -0.5, 68.5);
+  hNevtPerRing = new TH1F("hNevtPerRing", "Number of events #theta_{ID} (for pile-up);#theta_{ID};N_{event}", 69, -0.5, 68.5);
 
-  h_Pileup = new TH1F("Pile_up", "Estimated Pile up Noise vs #theta_{ID}; #theta_{ID}; MeV", 69, -0.5, 68.5);
+
 
   //Neutrons
   h_NeutronFluxThetaID2 = new TH1F("Neutron_Flux_ThetaID_2", "Diode Neutron Flux, #theta_{ID}=2;#phi_{ID}; yr^{-1}/cm^{-2}", 64, -0.5,
@@ -237,6 +235,12 @@ void ECLBackgroundModule::event()
   StoreArray<BeamBackHit> BeamBackArray;
   StoreArray<ECLShower> eclShowerArray;
 
+  //some variables that will be used many times
+  int m_cellID, m_thetaID, m_phiID, pid, NperRing, SubDet;
+  double edep, theta, dose, damage, Energy, diodeDose, weightedFlux;
+  float Mass;
+  TVector3 hitPosn, rHit;
+
   //ignore events with huge number of SimHits (usually a glitchy event)
   if (eclArray.getEntries() > 4000) {
     B2INFO("ECLBackgroundModule: Skipping event #" << m_nEvent << " due to large number of ECLSimHits");
@@ -249,10 +253,9 @@ void ECLBackgroundModule::event()
 
   double edepSum = 0;
   double edepSumTheta[nECLThetaID] = {0};
+  double E_tot[nECLCrystalTot] = {0};
 
   h_nECLSimHits->Fill(eclArray.getEntries()); //number of ECL hits in an event
-
-  double E_tmp[nECLCrystalTot] = {0};
 
   //MC ID of photon hits
   vector<int> MCPhotonIDs;
@@ -260,23 +263,22 @@ void ECLBackgroundModule::event()
   int hitNum = eclArray.getEntries();
   for (int i = 0; i < hitNum; i++) { //loop over ECLSimHits
     ECLSimHit* aECLHit = eclArray[i];
-    int m_cellID       = aECLHit->getCellId() - 1; //cell ID
-    double edep        = aECLHit->getEnergyDep();  //energy deposited
-    TVector3 hitPosn   = aECLHit->getPosition();   //position of hit
-    int pid            = aECLHit->getPDGCode();
-
-    float Mass         = Crystal[m_cellID]->GetMass();
-    int m_thetaID      = Crystal[m_cellID]->GetThetaID();
-    int m_phiID        = Crystal[m_cellID]->GetPhiID();
-    int NperRing       = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
-    double theta       = Crystal[m_cellID]->GetTheta();
+    m_cellID  = aECLHit->getCellId() - 1; //cell ID
+    edep      = aECLHit->getEnergyDep();  //energy deposited
+    hitPosn   = aECLHit->getPosition();   //position of hit
+    pid       = aECLHit->getPDGCode();
+    Mass      = Crystal[m_cellID]->GetMass();
+    m_thetaID = Crystal[m_cellID]->GetThetaID();
+    m_phiID   = Crystal[m_cellID]->GetPhiID();
+    NperRing  = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
+    theta     = Crystal[m_cellID]->GetTheta();
 
 
     //get Track ID of photons which create the SimHits
     if (pid == 22) MCPhotonIDs.push_back(aECLHit->getTrackId());
 
     edepSum = edepSum + edep;
-    E_tmp[m_cellID] = edep + E_tmp[m_cellID]; //sum energy deposited in this crystal
+    E_tot[m_cellID] = edep + E_tot[m_cellID]; //sum energy deposited in this crystal
     edepSumTheta[m_thetaID] = edepSumTheta[m_thetaID] + edep;   //sum of energy for this thetaID value
     EinTheta[m_thetaID] = true;                                 //there is an energy deposit in this theta ring. used later
     isE = true;
@@ -284,24 +286,24 @@ void ECLBackgroundModule::event()
 
     //fill histograms
     //radiation dose for this SimHit
-    double dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
+    dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
 
     h_CrystalRadDoseTheta->Fill(theta, dose / NperRing);
-    h_CrystalRadDose->Fill(m_thetaID,  dose / NperRing);
-    hEMDose->Fill(m_cellID, dose);
-    hEnergyPerCrystal->Fill(m_cellID, edep);
+    h_CrystalRadDose->AddBinContent(m_thetaID + 1,  dose / NperRing);
+    hEMDose->AddBinContent(m_cellID + 1, dose);
+    hEnergyPerCrystal->AddBinContent(m_cellID + 1, edep);
 
     //2nd thetaID ring
     if (m_thetaID == 2) {
-      h_CrystalThetaID2->Fill(m_phiID,  dose);
+      h_CrystalThetaID2->AddBinContent(m_phiID + 1,  dose);
     }
     //67th thetaID ring
     if (m_thetaID == 67) {
-      h_CrystalThetaID67->Fill(m_phiID, dose);
+      h_CrystalThetaID67->AddBinContent(m_phiID + 1, dose);
     }
     //Barrel
     if (m_thetaID < 59 && m_thetaID > 12) {
-      h_BarrelDose->Fill(m_phiID, dose / 46);
+      h_BarrelDose->AddBinContent(m_phiID + 1, dose / 46);
     }
 
     //location of the hit
@@ -310,15 +312,14 @@ void ECLBackgroundModule::event()
   }
 
 
-  //for pileup noise estimation
+  //for pileup noise estimation. To properly produce pileup noise plot, see comment at EOF.
   for (int iECLCell = 0; iECLCell < nECLCrystalTot; iECLCell++) {
-    double edep = E_tmp[iECLCell];
-    int    m_thetaID = Crystal[iECLCell]->GetThetaID();
-    int    NperRing  = Crystal[iECLCell]->GetNperThetaID();
+    edep      = E_tot[iECLCell];
+    m_thetaID = Crystal[iECLCell]->GetThetaID();
+    NperRing  = Crystal[iECLCell]->GetNperThetaID();
     if (edep > 0.000000000001) {
-      T_1us[m_thetaID] += edep / NperRing / m_sampleTime;
-      T_energy[m_thetaID] += edep;
-      T_event[m_thetaID] += 1;
+      hNevtPerRing->Fill(m_thetaID, 1.0 / NperRing);
+      hEdepPerRing->Fill(m_thetaID, edep / NperRing);
     }
 
   }
@@ -350,38 +351,37 @@ void ECLBackgroundModule::event()
     BeamBackHit* aBeamBackSimHit = BeamBackArray[iHits];
 
     //get relevant values
-    int m_cellID  = aBeamBackSimHit->getIdentifier();
-    double damage = aBeamBackSimHit->getNeutronWeight();
-    double edep   = aBeamBackSimHit->getEnergyDeposit();
-    int pid       = aBeamBackSimHit->getPDG();
-    int SubDet    = aBeamBackSimHit->getSubDet();
-    double Energy = aBeamBackSimHit->getEnergy();
-    TVector3 rHit = aBeamBackSimHit->getPosition();
+    m_cellID = aBeamBackSimHit->getIdentifier();
+    damage   = aBeamBackSimHit->getNeutronWeight();
+    edep     = aBeamBackSimHit->getEnergyDeposit();
+    pid      = aBeamBackSimHit->getPDG();
+    SubDet   = aBeamBackSimHit->getSubDet();
+    Energy   = aBeamBackSimHit->getEnergy();
+    rHit     = aBeamBackSimHit->getPosition();
 
 
     if (SubDet == 6) { //ECL
 
-      int m_thetaID      = Crystal[m_cellID]->GetThetaID();
-      int m_phiID        = Crystal[m_cellID]->GetPhiID();
-      int NperRing       = Crystal[m_cellID]->GetNperThetaID();
-
-      double diodeDose = edep * GeVtoJ * usInYr / (m_sampleTime * DiodeMass);
-      h_DiodeRadDose->AddBinContent(m_thetaID, diodeDose / NperRing);  //diode radiation dose plot
+      m_thetaID = Crystal[m_cellID]->GetThetaID();
+      m_phiID   = Crystal[m_cellID]->GetPhiID();
+      NperRing  = Crystal[m_cellID]->GetNperThetaID();
+      diodeDose = edep * GeVtoJ * usInYr / (m_sampleTime * DiodeMass);
+      h_DiodeRadDose->AddBinContent(m_thetaID + 1, diodeDose / NperRing); //diode radiation dose plot
 
       if (pid == 2112) {
 
-        double weightedFlux = damage * usInYr / (m_sampleTime * DiodeArea) ;           //neutrons per cm^2 per year
+        weightedFlux = damage * usInYr / (m_sampleTime * DiodeArea) ;           //neutrons per cm^2 per year
 
         //neutron plots
         if (m_thetaID == 0) h_NeutronEThetaID0->Fill(Energy * 1000);
         h_NeutronE->Fill(Energy * 1000);
         hEneu->Fill(log10(Energy * 1000));
 
-        h_NeutronFlux->Fill(m_thetaID, weightedFlux / NperRing);
-        hDiodeFlux->Fill(m_cellID,  weightedFlux);
+        h_NeutronFlux->AddBinContent(m_thetaID + 1, weightedFlux / NperRing);
+        hDiodeFlux->AddBinContent(m_cellID + 1,  weightedFlux);
 
-        if (m_thetaID == 2)  h_NeutronFluxThetaID2->Fill(m_phiID , weightedFlux);
-        if (m_thetaID == 67) h_NeutronFluxThetaID67->Fill(m_phiID , weightedFlux);
+        if (m_thetaID == 2)  h_NeutronFluxThetaID2->AddBinContent(m_phiID + 1 , weightedFlux);
+        if (m_thetaID == 67) h_NeutronFluxThetaID67->AddBinContent(m_phiID + 1 , weightedFlux);
 
 
       }
@@ -395,8 +395,8 @@ void ECLBackgroundModule::event()
   for (int i = 0; i < nShower; i++) {
     ECLShower* aShower = eclShowerArray[i];
 
-    double Energy = aShower->getEnergy();
-    double theta = aShower->getTheta();
+    Energy = aShower->getEnergy();
+    theta = aShower->getTheta();
 
     //get number of background showers with energy above 20MeV
     if (Energy > 0.02) {
@@ -421,19 +421,13 @@ void ECLBackgroundModule::event()
 
   if (m_nEvent % ((int)m_sampleTime * 100) == 0) B2INFO("ECLBackgroundModule: At Event #" << m_nEvent);
   m_nEvent++;
+
+
 }
 
 void ECLBackgroundModule::endRun()
 {
   B2INFO("ECLBackgroundModule: Total Number of events: "  << m_nEvent)
-
-  //fill pileup plot
-  for (int idx = 0; idx < nECLThetaID; idx++) {
-    if (T_event[idx] > 0) {
-      double average = T_energy[idx] / T_event[idx];
-      h_Pileup->Fill(idx, sqrt(T_1us[idx] / average) * average * 1000);//1000 in MeV
-    }
-  }
 
   //print doses of crystals of interest
   for (int i = 0; i < (int)m_CryInt.size(); i++) {
@@ -678,3 +672,40 @@ int ECLBackgroundModule::ARICHmod2row(int modID)
   B2WARNING("ECLBackgroundModule: ARICHmod2row: modID out of bound; can't get ring index");
   return -1;
 }
+
+
+
+
+/*
+// In order to produce the pileup noise estimate, use this function (paste into another file):
+void PileUpNoise(){
+
+  const int numOfTypes = 8;
+  TString Filetypes[] =  {"Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "RBB_HER", "RBB_LER", "BHWide_HER", "BHWide_LER"};
+  TFile *f;
+
+  double hEdepPerRing[69] = {};
+  double hNevtPerRing[69] = {};
+  double sampletime=1000;
+
+  TH1F *h_Pileup = new TH1F("Pile_up", "Estimated Pile up Noise vs #theta_{ID}; #theta_{ID}; MeV", 69, -0.5, 68.5);
+
+  for(int i=0; i<numOfTypes; i++){
+    f = new TFile(Filetypes[i]+".root");                      //loads the sample files (eg, Touschek_HER.root, RBB_LER.root, etc)
+    TH1F *hNevt = (TH1F*)gROOT->FindObject("hNevtPerRing");
+    TH1F *hEdep = (TH1F*)gROOT->FindObject("hEdepPerRing");
+    for(int j=1; j<70; j++){
+      hEdepPerRing[j-1] = hEdepPerRing[j-1] + hEdep->GetBinContent(j);
+      hNevtPerRing[j-1] = hNevtPerRing[j-1] + hNevt->GetBinContent(j);
+    }
+  }
+
+  for(int i=1; i<70; i++){
+      double Eavg = hEdepPerRing[i-1] / hNevtPerRing[i-1];
+      double pileup = sqrt( hNevtPerRing[i-1] / sampletime ) * Eavg * 1000;
+      h_Pileup->SetBinContent(i, pileup);
+  }
+
+}
+*/
+

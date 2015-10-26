@@ -91,8 +91,6 @@ namespace Belle2 {
     TH1F* h_CrystalRadDoseTheta;
     /** Crystal Radiation Dose*/
     TH1F* h_CrystalRadDose;
-    /** Pile up noise*/
-    TH1F* h_Pileup;
     /** Crystal Radiation Dose, ThetaID=2*/
     TH1F* h_CrystalThetaID2;
     /** Crystal Radiation Dose, ThetaID=67*/
@@ -101,6 +99,13 @@ namespace Belle2 {
     TH2F* h_HitLocations;
     /** Crystal Radiation Dose in Barrel, 12<thetaID<59*/
     TH1F* h_BarrelDose;
+
+    /** Energy averaged per ring */
+    TH1F* hEdepPerRing;
+
+    /** Event counter averaged per ring (theta-id)*/
+    TH1F* hNevtPerRing;
+
 
 
     /**Diode Radiation Dose */
@@ -133,14 +138,6 @@ namespace Belle2 {
     const double usInYr = 1e13;
     /**Joules in a GeV */
     const double GeVtoJ = 1.6e-10;
-
-    /** number of energy deposits in each thetaID*/
-    double T_event[69] = {0};
-    /** Energy in each thetaID*/
-    double T_energy[69] = {0};
-    /** Energy per crystal per us */
-    double T_1us[69] = {0};
-
 
     //from Alex Beaulieu's implementation
 
@@ -259,10 +256,6 @@ namespace Belle2 {
     TH2F* hDiodeFluxBAR;
     /**Diode Neutron Flux Wide bins*/
     TH1F* hDiodeFluxWideTID;
-
-
-
-
 
   };
 

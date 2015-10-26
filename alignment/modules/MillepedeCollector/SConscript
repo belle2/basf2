@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = [ 'framework', 'genfit2', 'calibration', '$ROOT_LIBS', 'alignment', 'alignment_dataobjects']
+
+
+Return('env')
+

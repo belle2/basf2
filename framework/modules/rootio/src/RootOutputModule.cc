@@ -250,6 +250,7 @@ void RootOutputModule::fillFileMetaData()
   if (!user) user = getenv("USER");
   if (!user) user = getlogin();
   if (!user) user = "unknown";
+  fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
   const char* release = getenv("BELLE2_RELEASE");
   if (!release) release = "unknown";
   fileMetaDataPtr->setCreationData(date, site, user, release);

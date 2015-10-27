@@ -26,7 +26,7 @@
   source="unsigned int m_randomSeed" \
   targetClass="Belle2::FileMetaData" target="m_randomSeed" \
   code="{m_randomSeed = TString::Format("%d", onfile.m_randomSeed);}"
-#pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
+#pragma read sourceClass="Belle2::FileMetaData" version="[-4]" \
   source="int m_events" \
   targetClass="Belle2::FileMetaData" target="m_nEvents" \
   code="{m_nEvents = onfile.m_events;}"

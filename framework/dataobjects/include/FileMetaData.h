@@ -92,6 +92,10 @@ namespace Belle2 {
      */
     std::string getUser() const {return m_user;}
 
+    /** Random seed getter.
+     */
+    std::string getRandomSeed() const {return m_randomSeed;}
+
     /** Software release version getter.
      */
     std::string getRelease() const {return m_release;}
@@ -147,6 +151,12 @@ namespace Belle2 {
      */
     void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release)
     {m_date = date; m_site = site; m_user = user; m_release = release;}
+
+    /** Random seed setter.
+     *
+     *  @param seed The random seed.
+     */
+    void setRandomSeed(const std::string& seed) {m_randomSeed = seed;}
 
     /** Steering file content setter.
      *
@@ -237,6 +247,10 @@ namespace Belle2 {
      */
     std::string m_user;
 
+    /** The random seed used when producing the file
+     */
+    std::string m_randomSeed;
+
     /** Software release version.
      */
     std::string m_release;
@@ -249,7 +263,7 @@ namespace Belle2 {
      */
     int m_mcEvents;
 
-    ClassDef(FileMetaData, 5); /**< Metadata information about a file. */
+    ClassDef(FileMetaData, 6); /**< Metadata information about a file. */
 
   }; //class
 

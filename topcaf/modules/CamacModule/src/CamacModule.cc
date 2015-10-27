@@ -155,7 +155,7 @@ int CamacModule::FindNextPacket(int evtno_req)
       // SLOT FORMAT - Loop over slots/modules //
       ///////////////////////////////////////////
       unsigned int test_position = 0;
-      unsigned short previous_position, current_slot;
+      unsigned short previous_position = 0, current_slot = 0;
       unsigned short word_count = 0;
       bool isFirst = true;
       //unsigned short our_tdc=0;

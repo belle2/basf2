@@ -33,8 +33,10 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <framework/dataobjects/BeamParameters.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
 
 #include "CLHEP/Vector/ThreeVector.h"
@@ -115,6 +117,9 @@ namespace Belle2 {
     // false = use 5x5 (helix parameters) covaraince matrix
     bool m_use6x6CovarianceMatrix4Tracks;
 
+    //! variable to tell us which IPProfile bin was active last time we looked
+    int m_lastIPProfileBin{ -1};
+
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
@@ -152,6 +157,9 @@ namespace Belle2 {
 
     /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
     void convertBeamEnergy();
+
+    /** Stores the IPProfiles in BeamParameters (currently in DataStore) */
+    void convertIPProfile(bool beginRun = false);
 
     //-----------------------------------------------------------------------------
     // CONVERT OBJECTS
@@ -291,6 +299,9 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
+    /** BeamParameters, currently in datastore */
+    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent};
+
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order
      *  px/py/pz/E/x/y/z or in indices are (0,1,2,3,4,5,6)
@@ -307,6 +318,7 @@ namespace Belle2 {
 
     /** Conversion factor for Kappa -> Omega helix parameters */
     const double KAPPA2OMEGA = 1.5 * TMath::C() * 1E-11;
+
   };
 
 } // end namespace Belle2

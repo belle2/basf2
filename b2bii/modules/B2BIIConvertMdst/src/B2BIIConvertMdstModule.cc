@@ -214,8 +214,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   particles.registerRelationTo(mcParticles);
   particles.registerRelationTo(m_pidLikelihoods);
 
-  StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
-  beamParams.registerInDataStore();
+  m_beamParams.registerInDataStore();
 
   B2DEBUG(99, "[B2BIIConvertMdstModule::initializeDataStore] initialization of DataStore ended");
 }
@@ -232,6 +231,7 @@ void B2BIIConvertMdstModule::beginRun()
 
   // load IP data from DB server
   Belle::IpProfile::begin_run();
+  convertIPProfile(true);
   Belle::IpProfile::dump();
   bool usableIP = Belle::IpProfile::usable();
   B2INFO("B2BIIConvertMdst: IpProfile is usable = " << usableIP);
@@ -254,6 +254,9 @@ void B2BIIConvertMdstModule::event()
     m_realData = false; // <- this is MC sample
   else
     m_realData = true;  // <- this is real data sample
+
+  // 0. Convert IPProfile
+  convertIPProfile();
 
   // 1. Convert MC information
   convertGenHepEvtTable();
@@ -283,8 +286,6 @@ void B2BIIConvertMdstModule::event()
 //-----------------------------------------------------------------------------
 void B2BIIConvertMdstModule::convertBeamEnergy()
 {
-  StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
-
   const double Eher = Belle::BeamEnergy::E_HER();
   const double Eler = Belle::BeamEnergy::E_LER();
   const double crossingAngle = Belle::BeamEnergy::Cross_angle();
@@ -293,12 +294,55 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
 
   std::vector<double> covariance; //0 entries = no error
 
-  if (!beamParams)
-    beamParams.create();
-  beamParams->setLER(Eler, angleLer, covariance);
-  beamParams->setHER(Eher, angleHer, covariance);
+  if (!m_beamParams) m_beamParams.create();
+
+  m_beamParams->setLER(Eler, angleLer, covariance);
+  m_beamParams->setHER(Eher, angleHer, covariance);
 
   B2INFO("Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
+}
+
+void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
+{
+  if (!Belle::IpProfile::usable()) {
+    // No IPProfile for this run ...
+    if (beginRun) {
+      // no IPProfile, set vertex to NaN without errors for the full run
+      m_beamParams->setVertex(
+        TVector3(std::numeric_limits<double>::quiet_NaN(),
+                 std::numeric_limits<double>::quiet_NaN(),
+                 std::numeric_limits<double>::quiet_NaN()
+                ), std::vector<double>()
+      );
+    }
+    return;
+  }
+  HepPoint3D ip;
+  HepSymMatrix ipErr;
+  if (beginRun) {
+    // use event independent average in begin run
+    ip = Belle::IpProfile::position();
+    ipErr = Belle::IpProfile::position_err();
+  } else {
+    // update evtbin
+    Belle::IpProfile::set_evtbin_number();
+    // check if it changed, if not there's nothing to do
+    if (Belle::IpProfile::EvtBinNo() == m_lastIPProfileBin) return;
+    // get event dependent position and error
+    ip = Belle::IpProfile::e_position();
+    ipErr = Belle::IpProfile::e_position_err();
+  }
+  // reset last ipprofile bin
+  m_lastIPProfileBin = Belle::IpProfile::EvtBinNo();
+
+  TMatrixDSym cov(ipErr.num_col());
+  for (int i = 0; i < ipErr.num_row(); ++i) {
+    for (int j = 0; j < ipErr.num_col(); ++j) {
+      cov(i, j) = ipErr(i + 1, j + 1);
+    }
+  }
+  m_beamParams->setVertex(TVector3(ip.x(), ip.y(), ip.z()));
+  m_beamParams->setCovVertex(cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()

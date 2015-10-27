@@ -249,11 +249,19 @@ void ECLBackgroundModule::event()
   }
 
   bool isE = false;
-  bool EinTheta[nECLThetaID] = {false};
+  //bool EinTheta[nECLThetaID] = {false};
 
   double edepSum = 0;
-  double edepSumTheta[nECLThetaID] = {0};
-  double E_tot[nECLCrystalTot] = {0};
+  //double edepSumTheta[nECLThetaID] = {0};
+  //double E_tot[nECLCrystalTot] = {0};
+
+
+  auto edepSumTheta = new double[nECLThetaID]();
+  auto E_tot = new double[nECLCrystalTot]();
+
+  auto EinTheta = new bool[nECLThetaID]();
+  std::fill_n(EinTheta, nECLThetaID, false);
+
 
   h_nECLSimHits->Fill(eclArray.getEntries()); //number of ECL hits in an event
 
@@ -422,6 +430,9 @@ void ECLBackgroundModule::event()
   if (m_nEvent % ((int)m_sampleTime * 100) == 0) B2INFO("ECLBackgroundModule: At Event #" << m_nEvent);
   m_nEvent++;
 
+  delete[] edepSumTheta;
+  delete[] E_tot;
+  delete[] EinTheta;
 
 }
 

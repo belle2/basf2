@@ -35,7 +35,8 @@ void ARICHValidate(){
   
   heff->GetListOfFunctions()->Add(new TNamed("Description", "K identification efficiency vs. #pi missidentification probability, for K and #pi tracks with 3.0 - 3.5 GeV. TrackFinderMCTruth is used for track matching."));
   heff->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));
-  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, >0.98 eff. for > 0.02 fake."));
+  heff->GetListOfFunctions()->Add(new TNamed("Check", "Continuous, >0.98 eff. for > 0.02 fake. NOTE: as this is not a usual histogram p-value 
+calculation is not proper so it will often apear RED. If other two plots are OK please don't mind."));
   
   int startbin = hpi->FindFirstBinAbove(0.);
   int nentrpi = 0; 

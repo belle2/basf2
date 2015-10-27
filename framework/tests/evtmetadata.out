@@ -153,3 +153,114 @@
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=0, run=0, evt=0
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	0
+[INFO] 1	0	0
+[INFO] 2	0	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	1	0
+[INFO] 1	1	0
+[INFO] 2	1	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	2	0
+[INFO] 1	2	0
+[INFO] 2	2	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=0, run=0, evt=2
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 2	0	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	1	0
+[INFO] 1	1	0
+[INFO] 2	1	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	2	0
+[INFO] 1	2	0
+[INFO] 2	2	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=0, run=1, evt=0
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	1	0
+[INFO] 1	1	0
+[INFO] 2	1	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	2	0
+[INFO] 1	2	0
+[INFO] 2	2	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=0, run=1, evt=5
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	2	0
+[INFO] 1	2	0
+[INFO] 2	2	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=0, run=2, evt=2
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 2	2	0
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=1, run=0, evt=0
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::beginRun()
+[INFO] 0	0	1
+[INFO] 1	0	1
+[INFO] 2	0	1
+[INFO] EvtMetaDataTest::endRun()
+[INFO] EvtMetaDataTest::terminate()
+[INFO] skipping to exp=2, run=0, evt=0
+[INFO] event	run	exp
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] EvtMetaDataTest::initialize()
+[INFO] EvtMetaDataTest::terminate()

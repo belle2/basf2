@@ -52,6 +52,9 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Ignore override of file name via command line argument -i.", false);
 
   addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0);
+  addParam("skipTillEvent", m_skipTillEvent, "Skip events until the event with "
+           "the specified (experiment, run, event number) occurs. This parameter "
+           "is useful for debugging to start with a specific event.", m_skipTillEvent);
 
   addParam(c_SteerBranchNames[0], m_branchNames[0],
            "Names of event durability branches to be read. Empty means all branches. (EventMetaData is always read)", emptyvector);
@@ -131,6 +134,23 @@ void RootInputModule::initialize()
   } else if (m_parentLevel < 0) {
     B2ERROR("parentLevel must be >= 0!");
     return;
+  }
+
+  if (!m_skipTillEvent.empty()) {
+    // make sure the number of entries is exactly 3
+    if (m_skipTillEvent.size() != 3) {
+      B2ERROR("skipTillEvent must be a list of three values: experiment, run, event number");
+      // ignore the value
+      m_skipTillEvent.clear();
+    } else {
+      InputController::setNextEntry(m_skipTillEvent[0], m_skipTillEvent[1], m_skipTillEvent[2]);
+    }
+    if (m_nextEntry > 0) {
+      B2ERROR("You cannot supply a number of events to skip (skipNEvents) and an "
+              "event to skip to (skipTillEvent) at the same time, ignoring skipNEvents");
+      //force the number of skipped events to be zero
+      m_nextEntry = 0;
+    }
   }
 }
 

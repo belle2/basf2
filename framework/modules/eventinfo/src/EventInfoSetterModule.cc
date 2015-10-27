@@ -32,29 +32,28 @@ REG_MODULE(EventInfoSetter)
 
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
-  m_evtNumber = 0;
-  m_eventsToSkip = 0;
-  m_colIndex = 0;
-  m_production = 0;
   if (getenv("BELLE2_PRODUCTION")) m_production = stoi(getenv("BELLE2_PRODUCTION"));
 
   //Set module properties
-  setDescription("Sets the event meta data information (exp, run, evt). You must use this module to tell basf2 about the number of events you want to generate, unless you have an input module that already does so. Note that all experiment/run combinations specified must be unique");
+  setDescription(
+    "Sets the event meta data information (exp, run, evt). You must use this "
+    "module to tell basf2 about the number of events you want to generate, "
+    "unless you have an input module that already does so. Note that all "
+    "experiment/run combinations specified must be unique"
+  );
 
   //Parameter definition
-  std::vector<int> defaultExpRunList;
-  defaultExpRunList.push_back(0);
-  std::vector<int> defaultEvtNum;
-  defaultEvtNum.push_back(1);
-
-  addParam("expList",      m_expList,      "List of experiment numbers.", defaultExpRunList);
-  addParam("runList",      m_runList,      "List of run numbers.",        defaultExpRunList);
-  addParam("evtNumList",   m_evtNumList,
-           "List of the number of events which should be processed. Can be overridden via -n argument to basf2.", defaultEvtNum);
-
-  addParam("skipNEvents", m_skipNEvents,
-           "Skip this number of events before starting. Equivalent to running over this many events without performing any action, to allow starting at higher event numbers.",
-           0ul);
+  addParam("expList", m_expList, "List of experiment numbers.", m_expList);
+  addParam("runList", m_runList, "List of run numbers.", m_runList);
+  addParam("evtNumList", m_evtNumList, "List of the number of events which "
+           "should be processed. Can be overridden via -n argument to basf2.",
+           m_evtNumList);
+  addParam("skipNEvents", m_eventsToSkip, "Skip this number of events before "
+           "starting. Equivalent to running over this many events without performing "
+           "any action, to allow starting at higher event numbers.", m_eventsToSkip);
+  addParam("skipTillEvent", m_skipTillEvent, "Skip events until the event with "
+           "the specified (experiment, run, event number) occurs. This parameter "
+           "is useful for debugging to start with a specific event.", m_skipTillEvent);
 }
 
 
@@ -95,8 +94,22 @@ void EventInfoSetterModule::initialize()
     }
   }
 
+  if (!m_skipTillEvent.empty()) {
+    // make sure the number of entries is exactly 3
+    if (m_skipTillEvent.size() != 3) {
+      B2ERROR("skipTillEvent must be a list of three values: experiment, run, event number");
+      // ignore the value
+      m_skipTillEvent.clear();
+    }
+    if (m_eventsToSkip > 0) {
+      B2ERROR("You cannot supply a number of events to skip (skipNEvents) and an "
+              "event to skip to (skipTillEvent) at the same time, ignoring skipNEvents");
+      //force the number of skipped events to be zero
+      m_eventsToSkip = 0;
+    }
+  }
+
   m_evtNumber = 0;
-  m_eventsToSkip = m_skipNEvents;
   m_colIndex = 0; //adjusted in event() if mismatched
 }
 
@@ -117,6 +130,22 @@ void EventInfoSetterModule::event()
       } else { //no experiment/run with non-zero number of events found
         return;
       }
+    }
+
+    // check if we want to skip to a specific event
+    if (!m_skipTillEvent.empty()) {
+      // if current experiment and run number is different to what we're looking for
+      if (m_skipTillEvent[0] != m_expList[m_colIndex] || m_skipTillEvent[1] != m_runList[m_colIndex]) {
+        // then we set the m_evtNumber to the max
+        m_evtNumber = m_evtNumList[m_colIndex];
+      } else {
+        // otherwise we start at the event number we want to skip to
+        m_evtNumber = m_skipTillEvent[2];
+        // and reset the variable as skipping is done
+        m_skipTillEvent.clear();
+      }
+      // and check again if the event number is in the range we want to generate
+      continue;
     }
 
     if (m_eventsToSkip != 0) { //are we still skipping?

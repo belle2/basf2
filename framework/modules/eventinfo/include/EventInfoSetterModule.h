@@ -64,14 +64,14 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< Output object. */
 
-    unsigned long m_evtNumber; /**< The current event number. */
-    unsigned long m_skipNEvents; /**< Skip this number of events before starting. */
-    unsigned long m_eventsToSkip; /**< counter that starts at m_skipNEvents. */
-    int m_colIndex;  /**< The current index for the exp and run lists. */
-    int m_production;  /** The production number. */
+    unsigned long m_evtNumber{0}; /**< The current event number. */
+    unsigned long m_eventsToSkip{0ul}; /**< skip this many events before starting. */
+    int m_colIndex{0};  /**< The current index for the exp and run lists. */
+    int m_production{0};  /** The production number. */
 
-    std::vector<int> m_expList;      /**< The list (column) of experiments. */
-    std::vector<int> m_runList;      /**< The list (column) of runs. */
-    std::vector<int> m_evtNumList;   /**< The list (column) of the number of events which should be processed. */
+    std::vector<int> m_expList{0};      /**< The list (column) of experiments. */
+    std::vector<int> m_runList{0};      /**< The list (column) of runs. */
+    std::vector<int> m_evtNumList{1};   /**< The list (column) of the number of events which should be processed. */
+    std::vector<int> m_skipTillEvent;   /**< The (expNo, runNo, evtNo) tuple to skip to, empty if not used */
   };
 }

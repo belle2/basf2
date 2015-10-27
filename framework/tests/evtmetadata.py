@@ -85,3 +85,23 @@ for skipNEvents in range(10):
     main.add_module(evtmetadatatest)
 
     process(main)
+
+
+# test skipping to specific events
+skipToEvents = [
+    [0, 0, 0],
+    [0, 0, 2],
+    [0, 1, 0],
+    [0, 1, 5],
+    [0, 2, 2],
+    [1, 0, 0],
+    [2, 0, 0],
+]
+
+for event in skipToEvents:
+    B2INFO("skipping to exp={0}, run={1}, evt={2}".format(*event))
+    main = create_path()
+    main.add_module("EventInfoSetter", evtNumList=[3, 3, 3, 3], expList=[0, 0, 0, 1],
+                    runList=[0, 1, 2, 0], skipTillEvent=event)
+    main.add_module(EvtMetaDataTest())
+    process(main)

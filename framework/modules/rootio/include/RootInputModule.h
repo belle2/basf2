@@ -159,6 +159,8 @@ namespace Belle2 {
     /** Map of file LFNs to trees */
     std::map<std::string, TTree*> m_parentTrees;
 
+    /** experiment, run, event number of first event to load */
+    std::vector<int> m_skipTillEvent;
   };
 } // end namespace Belle2
 

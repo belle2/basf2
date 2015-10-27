@@ -41,3 +41,11 @@ main.add_module(printcollections)
 
 # Process events
 process(main)
+
+# Test starting directly with a given event
+for evtNo in range(1, 6):
+    main = create_path()
+    main.add_module("RootInput", inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'),
+                    branchNames=["EventMetaData"], skipTillEvent=[0, 1, evtNo])
+    main.add_module("EventInfoPrinter")
+    process(main)

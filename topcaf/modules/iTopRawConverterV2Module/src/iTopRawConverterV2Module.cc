@@ -69,11 +69,11 @@ void iTopRawConverterV2Module::event()
   m_evtwaves_ptr.clear();
   m_evt_no++;
 
-  int packet_type = 0;
+  //  int packet_type = 0;
   int c = 0;
-  int lastWindow = 0;
+  //  int lastWindow = 0;
   int readoutWindow = 0;
-  int carrier = 0;
+  //  int carrier = 0;
   int asic = 0;
   int channel = 0;
   const int waveHeaderSize = 6;
@@ -116,7 +116,7 @@ void iTopRawConverterV2Module::event()
     word = (unsigned int*) m_temp_buffer;
 
     unsigned int event = (0x7FFFF) & (*word);
-    unsigned int trigger_pattern = (0xF) & ((*word) >> 28);
+    //    unsigned int trigger_pattern = (0xF) & ((*word) >> 28);
     unsigned int windows = (0x1FF) & ((*word) >> 19);
     windows++;
 
@@ -134,7 +134,7 @@ void iTopRawConverterV2Module::event()
       if ((*word) == 0x6c617374) break;
       m_carrier = ((*word) >> 30);
       asic = 0x3 & ((*word) >> 28);
-      lastWindow = ((*word) >> 16) & 0x00FF;
+      //      lastWindow = ((*word) >> 16) & 0x00FF;
       readoutWindow = 0x1FF & (*word);
       //      B2INFO("total words : "<<(totalword)<<"\tread : 0x"<<std::hex<<std::setfill('0')<<std::setw(8)<<(*word)<<std::dec);
       //      B2INFO("carrier: "<<m_carrier<<"\tasic: "<<asic<<"\tlastWrAddr: "<<lastWindow<<"\tconvertAddr: "<<readoutWindow);
@@ -268,7 +268,7 @@ int iTopRawConverterV2Module::FindNextPacket()
   // int pos = m_input_file.tellg();
 
   unsigned int* word = (unsigned int*) m_temp_buffer;
-  unsigned int word_value = *word;
+  //  unsigned int word_value = *word;
 
   //  B2INFO("packet word: 0x"<<std::hex<<word_value);
 

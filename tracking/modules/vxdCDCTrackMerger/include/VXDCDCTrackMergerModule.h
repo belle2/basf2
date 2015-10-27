@@ -1,20 +1,32 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors:  Benjamin Oberhof                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef VXDCDCTRACKMERGERMODULE_H
 #define VXDCDCTRACKMERGERMODULE_H
 
 #include <framework/core/Module.h>
+#include "genfit/TrackCand.h"
 #include "genfit/Track.h"
 #include "genfit/RKTrackRep.h"
-//#include "genfit/AbsTrackRep.h"
 
-//root stuff
-//#include <TTree.h>
-//#include <TFile.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/StoreArray.h>
 
+using namespace genfit;
 
 namespace Belle2 {
-  /** A module siCDCTrackMerger.
+  /** VXDCDCTrackMergerModule a module to merge VXD and CDC tracks
    *
-   *  A detailed description of your module.
+   *  It merges VXD and CDC tracks looking at their intersections
+   *  with a cylinder placed at the boundary of the CDC with the VXD.
    */
   class VXDCDCTrackMergerModule : public Module {
   public:
@@ -59,52 +71,35 @@ namespace Belle2 {
     double m_chi2_max;
     double m_merge_radius;
     bool m_recover;
-    //std::string m_mergedVXDGFTracksColName;
-    //std::string m_mergedCDCGFTracksColName;
-    std::string m_VXDGFTracksColName;
-    std::string m_CDCGFTracksColName;
-    std::string m_GFTracksColName;
-    //    std::string m_GFTracksColName;
-    std::string m_TrackCandColName;
-    std::string m_relMatchedTracks;
-    //std::string m_mcParticlesColName;
-    //position at which a cdc track crosses  the cdc wall
-    //std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;
-    //the eta-phi grid silicon and cdc tracks grid
-    //std::vector<std::vector<std::vector<genfit::Track*>*>*>* m_si_tracks_grid;
-    //std::vector<std::vector<std::vector<genfit::Track*>*>*>* m_cdc_tracks_grid;
 
-    //root stuff
-    //bool m_produce_root_file;
-    //std::string m_root_output_filename;
-    //TTree* m_ttree;
-    //TFile* m_root_file;
+    std::string m_VXDGFTracksColName;
+    std::string m_VXDGFTrackCandsColName;
+    std::string m_CDCGFTracksColName;
+    std::string m_CDCGFTrackCandsColName;
+    std::string m_mergedGFTrackCandsColName;
+
+
+    std::string m_relMatchedTracks;
 
     //for global trk merging efficiency
     double m_total_pairs;
     double m_total_matched_pairs;
     //root tree variables
-    /*int m_npair;
-    int m_ncdc_trk;
-    int m_nsi_trk;
-    double m_trk_mrg_eff;
-    std::vector<int>* m_match_vec;
-    std::vector<int>* m_pre_match_vec;
-    std::vector<float>* m_chi2_vec;
-    std::vector<float>* m_dist_vec;
-    std::vector<float>* m_dx_vec;
-    std::vector<float>* m_dy_vec;
-    std::vector<float>* m_dz_vec;
-    std::vector<float>* m_x_vec;
-    std::vector<float>* m_y_vec;
-    std::vector<float>* m_z_vec;
-    std::vector<float>* m_dmom_vec;
-    std::vector<float>* m_dmomx_vec;
-    std::vector<float>* m_dmomy_vec;
-    std::vector<float>* m_dmomz_vec;
-    std::vector<float>* m_momx_vec;
-    std::vector<float>* m_momy_vec;
-    std::vector<float>* m_momz_vec;*/
+
+    // VXD TrackCands, Tracks
+    StoreArray<TrackCand>  m_VXDGFTrackCands;
+    StoreArray<Track>      m_VXDGFTracks;
+
+
+    // CDC TrackCands, Tracks
+    StoreArray<TrackCand>  m_CDCGFTrackCands;
+    StoreArray<Track>      m_CDCGFTracks;
+
+
+    // create the TrackCand ouput list
+    StoreArray<TrackCand>  m_TrackCands;
+
+    void collectMergedTrackCands(void);
   };
 }
 #endif

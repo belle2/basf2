@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors:  Benjamin Oberhof                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -22,10 +32,14 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   setDescription("This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
 
   //input
-  //  addParam("GFTracksColName",  m_GFTracksColName,  "GFTrack collection");
-  addParam("VXDGFTracksColName",  m_VXDGFTracksColName,  "VXDl GFTrack collection (from GFTrackSplitter)");
-  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection (from GFTrackSplitter)");
-  //  addParam("TrackCandColName", m_TrackCandColName, "Track Cand collection (from TrackFinder)");
+  addParam("VXDGFTracksColName", m_VXDGFTracksColName, "VXD GFTrack collection");
+  addParam("VXDGFTrackCandsColName", m_VXDGFTrackCandsColName, "VXD GFTrackCand collection", std::string(""));
+
+  addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection");
+  addParam("CDCGFTrackCandsColName", m_CDCGFTrackCandsColName, "CDC GFTrackCand collection", std::string(""));
+
+  addParam("MergedGFTrackCandsColName", m_mergedGFTrackCandsColName,
+           "Merged GFTrackCand collection", std::string(""));
 
   //output
   addParam("relMatchedTracks", m_relMatchedTracks, "Output RelationArray for Merged Tracks");
@@ -45,14 +59,19 @@ VXDCDCTrackMergerModule::~VXDCDCTrackMergerModule()
 
 void VXDCDCTrackMergerModule::initialize()
 {
-  //  StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
-  StoreArray<genfit::Track> vxdTracks(m_VXDGFTracksColName);
-  StoreArray<genfit::Track> cdcTracks(m_CDCGFTracksColName);
-  //  StoreArray<genfit::Track>::required(m_GFTracksColName);
 
-  vxdTracks.isRequired();
-  cdcTracks.isRequired();
-  cdcTracks.registerRelationTo(vxdTracks);
+  m_VXDGFTracks.isRequired(m_VXDGFTracksColName);
+  m_VXDGFTrackCands.isOptional(m_VXDGFTrackCandsColName);
+  m_VXDGFTrackCands.optionalRelationTo(m_VXDGFTracks);
+
+  m_CDCGFTracks.isRequired(m_CDCGFTracksColName);
+  m_CDCGFTrackCands.isOptional(m_CDCGFTrackCandsColName);
+  m_CDCGFTrackCands.optionalRelationTo(m_CDCGFTracks);
+
+  // Let us register the results of our work
+  m_CDCGFTracks.registerRelationTo(m_VXDGFTracks);
+
+  m_TrackCands.registerInDataStore(m_mergedGFTrackCandsColName);
 
   m_CDC_wall_radius     = 16.25;
   m_total_pairs         = 0;
@@ -72,18 +91,14 @@ void VXDCDCTrackMergerModule::event()
   //get CDC tracks
   StoreArray<genfit::Track> CDCGFTracks(m_CDCGFTracksColName);
   unsigned int nCDCTracks = CDCGFTracks.getEntries();
-  B2INFO("VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
+  B2DEBUG(9, "VXDCDCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
   if (nCDCTracks == 0) B2WARNING("VXDCDCTrackMerger: CDCGFTracksCollection is empty!");
 
   //get VXD tracks
   StoreArray<genfit::Track> VXDGFTracks(m_VXDGFTracksColName);
   unsigned int nVXDTracks = VXDGFTracks.getEntries();
-  B2INFO("VXDCDCTrackMerger: input Number of Silicon Tracks: " << nVXDTracks);
+  B2DEBUG(9, "VXDCDCTrackMerger: input Number of Silicon Tracks: " << nVXDTracks);
   if (nVXDTracks == 0) B2WARNING("VXDCDCTrackMerger: VXDGFTracksCollection is empty!");
-
-  //  StoreArray<genfit::Track> GFTracks(m_GFTracksColName);
-  //StoreArray<genfit::TrackCand> UnMergedCands(m_UnMergedCands);
-  //  const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
 
   TVector3 position(0., 0., 0.);
   TVector3 momentum(0., 0., 1.);
@@ -179,69 +194,6 @@ void VXDCDCTrackMergerModule::event()
         }
       }//If on radius
 
-      /*
-      //Recover track candidate index
-      genfit::Track* GFTrk = GFTracks[itrack];
-      const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-      if (cdc_TrkCandPtr == NULL) {
-        continue;
-      }
-      //cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
-      GFTrk = GFTracks[jtrack + nCDCTracks];
-      const genfit::TrackCand* vxd_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
-      if (vxd_TrkCandPtr == NULL) {
-        continue;
-      }*/
-      //vxd_mcp_index = vxd_TrkCandPtr->getMcTrackId();
-
-      /*LE
-      for (std::vector<int>::iterator it = m_true_match_mc->begin(); it != m_true_match_mc->end(); ++it) {
-        if ((*it) == cdc_mcp_index) {
-          //std::cout << "Already matched guy: " << *it << " of " << m_true_match_mc->size() << std::endl;
-          truth_flag = 1;
-        }
-      }
-      */
-      /*LE
-      if ((cdc_mcp_index == vxd_mcp_index) && truth_flag == 0) { //Calculate for true matched tracks
-        m_true_match_vec->push_back(1);
-        m_true_match_mc->push_back(vxd_mcp_index);
-        truth_matched = 1;
-        vxd_truth = jtrack;
-        n_trk_truth_pair++;
-        if (matched_track == 0) {
-          try {
-            genfit::MeasuredStateOnPlane vxd_sop = VXDGFTracks[jtrack]->getFittedState(-1);
-            genfit::MeasuredStateOnPlane cdc_sop = CDCGFTracks[itrack]->getFittedState();
-            cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
-            vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
-          } catch (...) {
-            B2WARNING("VXDTrack extrapolation to plane failed!");
-            continue;
-          }
-          genfit::MeasuredStateOnPlane vxd_sop = VXDGFTracks[jtrack]->getFittedState(-1);
-          genfit::MeasuredStateOnPlane cdc_sop = CDCGFTracks[itrack]->getFittedState();
-          cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
-          vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
-          try {
-            TMatrixDSym inv_covmtrx = (vxd_sop.getCov() + cdc_sop.getCov()).Invert();
-          } catch (...) {
-            B2WARNING("Matrix singular!");
-            continue;
-          }
-          TMatrixDSym inv_covmtrx = (vxd_sop.getCov() + cdc_sop.getCov()).Invert();
-          TVectorD state_diff = cdc_sop.getState() - vxd_sop.getState();
-          state_diff *= inv_covmtrx;
-          chi_2 = state_diff * (cdc_sop.getState() - vxd_sop.getState());
-          CHI2_MAX = chi_2;
-          vxd_xmin = vxd_sop.getPos();
-          vxd_pmin = vxd_sop.getMom();
-        }
-        if ((truth_matched == 0) && (cdc_mcp_index != vxd_mcp_index) && (jtrack == (nVXDTracks - 1))) {
-          m_true_match_vec->push_back(0);
-        }
-      }
-      */
     }//end loop on VXD tracks
 
     if ((matched_track == 1) || (recovered_track == 1)) {
@@ -250,10 +202,21 @@ void VXDCDCTrackMergerModule::event()
       else
         rel_weight = 1;
       relMatchedTracks.add(itrack, vxd_match, rel_weight);
+
     }
+
+
   }//loop on CDC
 
-  //B2INFO("VXDCDCTrackMerger: Merged Tracks: " << matches);
+  auto VXDTrackCandToTrack = RelationArray(m_VXDGFTrackCands, m_VXDGFTracks);
+  auto CDCTrackCandToTrack = RelationArray(m_CDCGFTrackCands, m_CDCGFTracks);
+
+  if (m_VXDGFTrackCands.isValid() &&
+      VXDTrackCandToTrack.isValid() &&
+      m_CDCGFTrackCands.isValid() &&
+      CDCTrackCandToTrack.isValid()
+     )
+    collectMergedTrackCands();
 
 }
 
@@ -263,4 +226,91 @@ void VXDCDCTrackMergerModule::endRun()
 
 void VXDCDCTrackMergerModule::terminate()
 {
+}
+
+void VXDCDCTrackMergerModule::collectMergedTrackCands(void)
+{
+  using namespace genfit;
+  // Reminder: GF stands for Genfit
+  // genfit::TrackCand is a sorted collection of hits
+  // genfit::Track is the result of a fit og a TrackCand
+
+
+  RelationIndex<TrackCand, Track>
+  VXDTrackCandToTrack(m_VXDGFTrackCands, m_VXDGFTracks);
+
+  // get CDC TrackCands, Tracks and relation from TrackCands to Tracks
+  RelationIndex<TrackCand, Track>
+  CDCTrackCandToTrack(m_CDCGFTrackCands, m_CDCGFTracks);
+
+  // get relation from CDC to VXD track
+  RelationIndex<Track, Track> relMatchedTracks(m_CDCGFTracks, m_VXDGFTracks);
+
+  // create the TrackCand output list
+
+  m_TrackCands.create();
+
+  int nVXDonly(0);
+  int nCDConly(0);
+  int nMerged(0);
+  // first: add VXD tracks (merged with CDC or unmerged)
+  for (int i = 0 ; i < m_VXDGFTrackCands.getEntries() ; i++) {
+
+    auto VXDGFTrackCand = m_VXDGFTrackCands[i];
+
+    auto combinedTrackCand = m_TrackCands.appendNew(*VXDGFTrackCand);
+
+    auto relation1 = VXDTrackCandToTrack.getFirstElementFrom(VXDGFTrackCand);
+    if (! relation1) {
+      B2WARNING("No relation from VXD genfit::TrackCand to VXD genfit::Track");
+      continue;
+    }
+    const genfit::Track* VXDGFTrack = relation1 -> to ;  // this is the VXD fitted track
+
+    auto relation2 = relMatchedTracks.getFirstElementTo(VXDGFTrack);
+    if (! relation2) { // VXD track without a CDC match
+      nVXDonly ++;
+      continue;
+    }
+
+    const genfit::Track* CDCGFTrack = relation2 -> from ;  // this is the CDC track
+
+    auto relation3 = CDCTrackCandToTrack.getFirstElementTo(CDCGFTrack);
+    if (! relation3) {
+      B2WARNING("No relation from CDC genfit::TrackCand to CDC genfit::Track");
+      continue;
+    }
+    const genfit::TrackCand* CDCGFTrackCand = relation3 -> from ;  // this is the CDC pattern
+
+    int nCdcCandHits = CDCGFTrackCand->getNHits();
+    for (int i = 0 ; i < nCdcCandHits; ++i)
+      combinedTrackCand->addHit(CDCGFTrackCand->getHit(i)->clone());
+    nMerged ++;
+
+  }
+
+
+  // second: add CDC tracks that are not merged from PXD tracks
+
+  for (int i = 0 ; i < m_CDCGFTracks.getEntries() ; i++) {
+
+    auto CDCGFTrack = m_CDCGFTracks[i];
+
+    if (relMatchedTracks.getFirstElementFrom(CDCGFTrack))
+      continue; // TrackCand already merged
+
+    auto relation = CDCTrackCandToTrack.getFirstElementTo(CDCGFTrack);
+    if (! relation) {
+      B2WARNING("No relation from CDC genfit::TrackCand to CDC genfit::Track");
+      continue;
+    }
+    const genfit::TrackCand* CDCGFTrackCand = relation -> from ;  // this is the CDC pattern
+
+    m_TrackCands.appendNew(*CDCGFTrackCand);
+    nCDConly++;
+  }
+
+  B2DEBUG(9, "VXDCDCTrackMerger: VXD only tracks: " << nVXDonly);
+  B2DEBUG(9, "VXDCDCTrackMerger: CDC only tracks: " << nCDConly);
+  B2DEBUG(9, "VXDCDCTrackMerger: merged tracks  : " << nMerged);
 }

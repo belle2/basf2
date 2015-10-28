@@ -1,4 +1,4 @@
-[INFO] Steering file: framework/tests/root_input.py
+[INFO] Steering file: root_input.py
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -74,9 +74,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[INFO] Added file /home/ritter/belle2/software/framework/tests/root_input.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
-[INFO] RootInput: will read entry 1 (entry 1 in current file) next.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -88,9 +85,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[INFO] Added file /home/ritter/belle2/software/framework/tests/root_input.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
-[INFO] RootInput: will read entry 2 (entry 2 in current file) next.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -101,9 +95,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[INFO] Added file /home/ritter/belle2/software/framework/tests/root_input.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
-[INFO] RootInput: will read entry 3 (entry 3 in current file) next.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -113,9 +104,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[INFO] Added file /home/ritter/belle2/software/framework/tests/root_input.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
-[INFO] RootInput: will read entry 4 (entry 4 in current file) next.
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -124,8 +112,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[INFO] Added file /home/ritter/belle2/software/framework/tests/root_input.root
-[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1

@@ -5,10 +5,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/StereoHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
-
-#include <TFile.h>
-#include <TH2F.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <utility>
 
@@ -29,7 +26,20 @@ bool isValidHitTrajectoryMatch(const CDCRLWireHit& rlWireHit)
   return true;
 }
 
-void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, const CDCTrack& track) const
+void StereohitsProcesser::postprocessTrack(CDCTrack& track)
+{
+  const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
+
+  track.shiftToPositiveArcLengths2D();
+  track.sortByArcLength2D();
+
+  const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
+  CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
+  track.setStartTrajectory3D(newStartTrajectory);
+}
+
+
+void StereohitsProcesser::fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -49,7 +59,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
         if (perpS < 0) {
           if (isCurler) {
             perpS += 2 * TMath::Pi() * radius;
-          } else if (m_checkForB2BTracks) {
+          } else if (m_param_checkForB2BTracks) {
             continue;
           }
         }
@@ -60,116 +70,37 @@ void StereohitsProcesser::fillHitsVector(std::vector<HitType*>& hitsVector, cons
   }
 }
 
-void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<HitType*>& foundStereoHits,
-    const std::vector<HitType*>& doubledRecoHits, const std::vector<HitType*>& hitsVector) const
+void StereohitsProcesser::addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<const CDCRecoHit3D*>& foundStereoHits,
+    const std::vector<const CDCRecoHit3D*>& doubledRecoHits, const std::vector<const CDCRecoHit3D*>& hitsVector) const
 {
   foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
-  foundStereoHits.end(), [&doubledRecoHits](HitType * recoHit3D) -> bool {
+  foundStereoHits.end(), [&doubledRecoHits](const CDCRecoHit3D * recoHit3D) -> bool {
     return std::find(doubledRecoHits.begin(), doubledRecoHits.end(), recoHit3D) != doubledRecoHits.end();
   }), foundStereoHits.end());
 
-  for (HitType* hit : foundStereoHits) {
+  for (const CDCRecoHit3D* hit : foundStereoHits) {
     if (hit->getWireHit().getAutomatonCell().hasTakenFlag())
       B2FATAL("Adding already found hit");
     track.push_back(*hit);
     hit->getWireHit().getAutomatonCell().setTakenFlag();
   }
 
-  for (HitType* recoHit : hitsVector) {
+  for (const CDCRecoHit3D* recoHit : hitsVector) {
     delete recoHit;
   }
 }
 
-void StereohitsProcesser::makeHistogramming(CDCTrack& track, unsigned int m_param_minimumHits)
+void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
 {
-  typedef std::pair<StereoHitQuadTreeProcessor::QuadTree*, StereoHitQuadTreeProcessor::ReturnList> Result;
-  std::vector<Result> possibleStereoSegments;
-
-  StereoHitQuadTreeProcessor::ReturnList hitsVector;
+  std::vector<const CDCRecoHit3D*> hitsVector;
   fillHitsVector(hitsVector, track);
 
-  StereoHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessing = [&](const StereoHitQuadTreeProcessor::ReturnList &
-      items,
-  StereoHitQuadTreeProcessor::QuadTree * node) -> void {
-    possibleStereoSegments.push_back(std::make_pair(node, std::move(items)));
-    B2DEBUG(100, "Lambda: " << node->getXMean() << "; Z0: " << node->getYMean() << "; nhits: " << items.size());
-  };
+  m_hitQuadTree.seed(hitsVector);
 
-  StereoHitQuadTreeProcessor::ChildRanges childRanges = StereoHitQuadTreeProcessor::ChildRanges(StereoHitQuadTreeProcessor::rangeX(
-                                                          tan(-75.* TMath::Pi() / 180.), tan(75.* TMath::Pi() / 180.)), StereoHitQuadTreeProcessor::rangeY(-100, 100));
-  StereoHitQuadTreeProcessor oldQuadTree(m_level, childRanges, m_param_debugOutput);
-  oldQuadTree.provideItemsSet(hitsVector);
-  oldQuadTree.fillGivenTree(lmdCandidateProcessing, m_param_minimumHits);
+  const std::vector<pair<Z0TanLambdaBox, vector<const CDCRecoHit3D*>>>& foundStereoHitsWithNode =
+    m_hitQuadTree.findSingleBest(m_param_minimumNumberOfHits);
 
-  /* DEBUG */
-  if (m_param_debugOutput) {
-    const auto& debugMap = oldQuadTree.getDebugInformation();
-
-    TFile file("quadtree_content.root", "RECREATE");
-    TH2F hist("hist", "QuadTreeContent", std::pow(2, m_level), childRanges.first.first, childRanges.first.second,
-              std::pow(2, m_level), childRanges.second.first, childRanges.second.second);
-
-    for (const auto& debug : debugMap) {
-      const auto& positionInformation = debug.first;
-      const auto& quadItemsVector = debug.second;
-      hist.Fill(positionInformation.first, positionInformation.second, quadItemsVector.size());
-    }
-
-    hist.Write();
-    file.Close();
-  }
-
-  if (possibleStereoSegments.size() == 0) {
-    B2WARNING("Found no stereo hits!");
-    return;
-  }
-
-  auto maxList = std::max_element(possibleStereoSegments.begin(), possibleStereoSegments.end(), [](const Result & a,
-  const Result & b) {
-    return a.second.size() < b.second.size();
-  });
-
-  // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
-  auto& foundStereoHits = maxList->second;
-  auto node = maxList->first;
-
-  std::vector<HitType*> doubledRecoHits;
-  doubledRecoHits.reserve(foundStereoHits.size() / 2);
-
-  for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
-       ++outerIterator) {
-    const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
-    for (auto innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
-      if (currentHit == (*innerIterator)->getWireHit().getHit()) {
-        double lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMin());
-        double lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node->getYMax());
-        double lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMin());
-        double lambda22 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node->getYMax());
-
-        if (fabs((lambda11 + lambda12) / 2 - node->getXMean()) < fabs((lambda21 + lambda22) / 2 - node->getXMean())) {
-          doubledRecoHits.push_back(*outerIterator);
-        } else {
-          doubledRecoHits.push_back(*innerIterator);
-        }
-      }
-
-    }
-  }
-
-  addMaximumNodeToTrackAndDeleteHits(track, foundStereoHits, doubledRecoHits, hitsVector);
-}
-
-void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsigned int minimumNumberOfHits)
-{
-  std::vector<HitType*> hitsVector;
-  fillHitsVector(hitsVector, track);
-
-  m_newQuadTree.seed(hitsVector);
-
-  const std::vector<pair<Z0TanLambdaBox, vector<HitType*>>>& foundStereoHitsWithNode =
-    m_newQuadTree.findSingleBest(minimumNumberOfHits);
-
-  m_newQuadTree.fell();
+  m_hitQuadTree.fell();
 
   if (foundStereoHitsWithNode.size() != 1)
     return;
@@ -178,7 +109,7 @@ void StereohitsProcesser::makeHistogrammingWithNewQuadTree(CDCTrack& track, unsi
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
   auto node = foundStereoHitsWithNode[0].first;
 
-  std::vector<HitType*> doubledRecoHits;
+  std::vector<const CDCRecoHit3D*> doubledRecoHits;
   doubledRecoHits.reserve(foundStereoHits.size() / 2);
 
   for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
@@ -234,15 +165,14 @@ void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment, st
     }
   }
 
-  if (not isCurler and m_checkForB2BTracks and oneHitIsOnWrongSide) {
+  if (not isCurler and m_param_checkForB2BTracks and oneHitIsOnWrongSide) {
     return;
   }
 
   recoSegments.push_back(new CDCRecoSegment3D(newRecoSegment));
 }
 
-void StereohitsProcesser::makeHistogrammingWithSegments(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments,
-                                                        unsigned int minimumNumberOfHits)
+void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments)
 {
   // Reconstruct the segments
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -270,7 +200,7 @@ void StereohitsProcesser::makeHistogrammingWithSegments(CDCTrack& track, const s
 
   // Do the tree finding
   m_segmentQuadTree.seed(recoSegments);
-  const auto& foundStereoSegmentsWithNode = m_segmentQuadTree.findSingleBest(minimumNumberOfHits);
+  const auto& foundStereoSegmentsWithNode = m_segmentQuadTree.findSingleBest(m_param_minimumNumberOfHits);
   m_segmentQuadTree.fell();
 
   if (foundStereoSegmentsWithNode.size() == 1) {

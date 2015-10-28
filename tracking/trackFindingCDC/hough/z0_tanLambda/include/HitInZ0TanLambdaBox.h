@@ -11,12 +11,12 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
-#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Predicate class to check for the containment of hits in a z0 tan lambda hough space part.
+    /**
+     * Predicate class to check for the containment of hits in a z0 tan lambda hough space part.
      *  Note this part this code defines the performance of
      *  the search in the hough plain quite significantly and there is probably room for improvement.
      */
@@ -26,7 +26,8 @@ namespace Belle2 {
       /// Use a Z0TanLambdaBox
       typedef Z0TanLambdaBox HoughBox;
 
-      /** Checks if the wire hit is contained in a z0 tan lambda hough space.
+      /**
+       *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
       inline Weight operator()(const CDCRecoHit3D* recoHit,
@@ -35,19 +36,20 @@ namespace Belle2 {
         const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
         const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
 
-        const float& perpS = recoHit->getArcLength2D();
-        const float& reconstructedZ = recoHit->getRecoZ();
-
         const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        float dist[2][2];
-        dist[0][0] = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
-        dist[0][1] = perpS * lowerTanLambda - reconstructedZ + upperZ0;
-        dist[1][0] = perpS * upperTanLambda - reconstructedZ + lowerZ0;
-        dist[1][1] = perpS * upperTanLambda - reconstructedZ + upperZ0;
+        const float& perpS = recoHit->getArcLength2D();
+        const float& reconstructedZ = recoHit->getRecoZ();
 
-        if (not SameSignChecker::sameSign(dist[0][0], dist[0][1], dist[1][0], dist[1][1])) {
+        const float& distLowerZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
+        const float& distUpperZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + upperZ0;
+        const float& distLowerZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + lowerZ0;
+        const float& distUpperZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + upperZ0;
+
+        const bool sameSign = SameSignChecker::sameSign(distLowerZ0LowerTanLambda, distUpperZ0LowerTanLambda,
+                                                        distLowerZ0UpperTanLambda, distUpperZ0UpperTanLambda);
+        if (not sameSign) {
           return 1.0;
         } else {
           return NAN;

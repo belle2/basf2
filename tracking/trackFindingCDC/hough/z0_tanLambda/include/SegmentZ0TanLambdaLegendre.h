@@ -7,26 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/hough/z0_tanLambda/HitInZ0TanLambdaBox.h>
-#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
-#include <tracking/trackFindingCDC/hough/RangeInBox.h>
-#include <tracking/trackFindingCDC/hough/SimpleBoxDivisionHoughTree.h>
+#pragma once
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaLegendre.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/hough/RangeInBox.h>
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/HitInZ0TanLambdaBox.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<size_t z0Divisions = 2,
-             size_t tanLambdaDivisions = 2>
-    class SegmentZ0TanLambdaLegendre : public
-      SimpeBoxDivisionHoughTree<const CDCRecoSegment3D*, RangeInBox<HitInZ0TanLambdaBox>, z0Divisions, tanLambdaDivisions> {
-
-    private:
-      /// Super type
-      typedef SimpeBoxDivisionHoughTree<const CDCRecoSegment3D*, RangeInBox<HitInZ0TanLambdaBox>, z0Divisions, tanLambdaDivisions> Super;
-    public:
-      /// Constructor using the given maximal level setting the maximal values.
-      SegmentZ0TanLambdaLegendre(size_t maxLevel) : Super(maxLevel, 120, std::tan(75.0 * M_PI / 180.0)) {}
-    };
+    /**
+     * Hough Tree for finding StereoHits with using Segments as the item type.
+     * This implementation uses the RangeInBox-Template with the normal HitInZ0TanLambda decision algorithm
+     * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
+     * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
+     */
+    using SegmentZ0TanLambdaLegendre = Z0TanLambdaLegendre<const CDCRecoSegment3D*, RangeInBox<HitInZ0TanLambdaBox>, 2, 2>;
   }
 }

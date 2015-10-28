@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/hough/Box.h>
 #include <tracking/trackFindingCDC/hough/DiscreteValue.h>
 
-// For better readability we use z slope instead of inverse z slope everywhere!
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Tag for z0 direction

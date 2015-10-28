@@ -13,7 +13,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class AHitPtr, class AInBoxAlgorithm, size_t divisionX, size_t divisionY> // Division at each level
+    template<class AHitPtr, class AInBoxAlgorithm, size_t divisionX, size_t divisionY>
     class SimpeBoxDivisionHoughTree : public BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY> {
 
     private:
@@ -21,7 +21,7 @@ namespace Belle2 {
       typedef typename AInBoxAlgorithm::HoughBox HoughBox;
     public:
       /// Constructor using the given maximal level.
-      SimpeBoxDivisionHoughTree(size_t maxLevel, const float maximumX, const float maximumY) : Super(maxLevel),
+      SimpeBoxDivisionHoughTree(const float maximumX, const float maximumY) : Super(0),
         m_maximumX(maximumX), m_maximumY(maximumY) {}
 
       void initialize()
@@ -34,8 +34,8 @@ namespace Belle2 {
         const size_t nDiscreteYs = nYBins + 1;
         const auto yBins = linspace<float>(-m_maximumY, m_maximumY, nDiscreteYs);
 
-        Super::template assignArray<Super::template TypeIndex<DiscreteZ0>::value>(xBins, 0);
-        Super::template assignArray<Super::template TypeIndex<DiscreteTanLambda>::value>(yBins, 0);
+        Super::template assignArray<0>(xBins, 0);
+        Super::template assignArray<1>(yBins, 0);
 
         Super::initialize();
       }

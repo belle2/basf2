@@ -47,7 +47,6 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
 
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
-                    quadTreeLevel=6,
                     TracksStoreObjNameIsInput=True,
                     WriteGFTrackCands=False)
 

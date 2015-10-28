@@ -124,7 +124,7 @@ class CDCFullFinder(metamodules.PathModule):
                  use_pair_finder=False):
 
         modules = [
-            CDCLocalTrackFinder(tmva_cut=tmva_cut), CDCLegendreTrackFinder(debug_output=False)
+            CDCLocalTrackFinder(tmva_cut=tmva_cut), CDCLegendreTrackFinder()
         ]
 
         filter_parameters_for_combiner = dict(segment_track_filter_first_step_cut=first_tmva_cut,
@@ -239,7 +239,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
 
     def __init__(self, output_track_cands_store_array_name=None,
                  output_track_cands_store_vector_name="CDCTrackVector",
-                 assign_stereo_hits=True, debug_output=False,
+                 assign_stereo_hits=True,
                  TracksStoreObjNameIsInput=False,
                  stereo_level=6, stereo_hits=5):
 
@@ -264,9 +264,8 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
             TracksStoreObjNameIsInput=True,
             WriteGFTrackCands=False,
             TracksStoreObjName=output_track_cands_store_vector_name,
-            debugOutput=debug_output,
             quadTreeLevel=stereo_level,
-            minimumHitsInQuadtree=stereo_hits)
+            minimumNumberOfHits=stereo_hits)
 
         if assign_stereo_hits:
             module_list.append(last_tracking_module)

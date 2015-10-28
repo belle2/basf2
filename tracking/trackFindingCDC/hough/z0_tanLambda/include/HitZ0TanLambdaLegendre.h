@@ -7,24 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaLegendre.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitInZ0TanLambdaBox.h>
-#include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaBox.h>
-#include <tracking/trackFindingCDC/hough/SimpleBoxDivisionHoughTree.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template<class AHitPointerType,
-             size_t z0Divisions = 2,
-             size_t tanLambdaDivisions = 2> // Division at each level
-    class HitZ0TanLambdaLegendre : public
-      SimpeBoxDivisionHoughTree<AHitPointerType, HitInZ0TanLambdaBox, z0Divisions, tanLambdaDivisions> {
 
-    private:
-      /// Super type
-      typedef SimpeBoxDivisionHoughTree<AHitPointerType, HitInZ0TanLambdaBox, z0Divisions, tanLambdaDivisions> Super;
-    public:
-      /// Constructor using the given maximal level setting the maximal values.
-      HitZ0TanLambdaLegendre(size_t maxLevel) : Super(maxLevel, 120, std::tan(75.0 * M_PI / 180.0)) {}
-    };
+    /**
+     * Hough Tree for finding StereoHits with using CDCRecoHit3D as the item type.
+     * This implementation uses the normal HitInZ0TanLambda decision algorithm
+     * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
+     * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
+     */
+    using HitZ0TanLambdaLegendre = Z0TanLambdaLegendre<const CDCRecoHit3D*, HitInZ0TanLambdaBox, 2, 2>;
   }
 }

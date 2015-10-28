@@ -43,7 +43,8 @@ namespace Belle2 {
     /**
      * Constructor with all information
      */
-    KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum, TMatrixFSym errormatrix);
+    KLMCluster(ROOT::Math::XYZPointF coordinates, float time, int nLayers, int nInnermostLayer, TVector3 momentum,
+               TMatrixFSym errormatrix);
 
     /**
      * Constructor with all information in floats
@@ -119,7 +120,7 @@ namespace Belle2 {
      * Get KL Cluster momentum error matrix
      * @return 7x7 KL Cluster momentum error matrix
      */
-    TMatrixFSym getErrorMatrix()
+    TMatrixFSym getErrorMatrix() const
     {return m_momentumErrorMatrix;}
 
 

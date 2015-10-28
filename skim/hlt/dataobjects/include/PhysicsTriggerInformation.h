@@ -13,7 +13,6 @@
 
 //#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
 #include <framework/datastore/RelationsObject.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -21,9 +20,9 @@ namespace Belle2 {
   class PhysicsTriggerInformation: public RelationsObject {
 
   public:
-
-    PhysicsTriggerInformation(): m_userCustomOpen(0), m_ngoodTracks(0), m_ngoodECLClusters(0), m_Pzvis(0.), m_Evis(0.), m_Esum(0.),
-      m_MaxAngleTT(-10.), m_AngleTT(-10.), m_AngleGG(-10.), m_P1(0.), m_P2(0.), m_E1(0.), m_E2(0.), m_nKLMClusters(0) {}
+    PhysicsTriggerInformation();
+//    PhysicsTriggerInformation(): m_userCustomOpen(0), m_ngoodTracks(0), m_ngoodECLClusters(0), m_Pzvis(0.), m_Evis(0.), m_Esum(0.),
+    //    m_MaxAngleTT(-10.), m_AngleTT(-10.), m_AngleGG(-10.), m_P1(0.), m_P2(0.), m_E1(0.), m_E2(0.), m_nKLMClusters(0), m_ptsummary(0),m_ntrg(0){}
 
     ~PhysicsTriggerInformation() {}
 
@@ -82,38 +81,6 @@ namespace Belle2 {
     void setP2(float P2) {m_P2 = P2;}
 
     /**
-     *set Dr
-     */
-    void setDr(float Dr) {m_dr.push_back(Dr);}
-
-    /**
-     *set Dz
-     */
-    void setDz(float Dz) {m_dz.push_back(Dz);}
-
-    /**
-     *set the transverse momentum of the track
-     */
-    void setPt(float Pt) {m_pt.push_back(Pt);}
-
-    /**
-     *set the momentum of track
-     */
-    void setP(float P) {m_p.push_back(P);}
-
-    /**
-     *set polar angle of track
-     */
-    void setCosTheta(float CosTheta) {m_costheta.push_back(CosTheta);}
-
-
-    /**
-     *set azimuth angle of track
-     */
-    void setPhi(float phi) {m_phi.push_back(phi);}
-
-
-    /**
      *set angle between G1 ang G2
      *G1 is the largest energetic cluster
      *G2 is the second largest energetic cluster
@@ -130,42 +97,17 @@ namespace Belle2 {
      */
     void setE2(float E2) {m_E2 = E2;}
 
-    /**
-     *set chrage of track
-     */
-    void setCharge(int Charge) {m_Charge.push_back(Charge);}
 
-    /**
-     *set cluster energy
-     */
-    void setECLClusterE(float ECLClusterE) {m_ECLClusterE.push_back(ECLClusterE);}
+    /**set the summary of physics trigger results*/
+    void setPTSummary(int bitMask) {m_ptsummary |= bitMask;}
 
-    /**
-     *set polar angle of cluster
-     */
-    void setECLClusterTheta(float ECLClusterTheta) {m_ECLClusterTheta.push_back(ECLClusterTheta);}
+    /**set the sub trigger result*/
+    void setsubTrgResult(int i, int res) {m_trgresult[i] |= res;}
 
-    /**
-     *set azimuth angle of cluster
-     */
-    void setECLClusterPhi(float ECLClusterPhi) {m_ECLClusterPhi.push_back(ECLClusterPhi);}
+    void setnsubTrg(int i) {m_nsubtrg[i]++;}
 
-    /**
-     *set timing of cluster
-     */
-    void setECLClusterTiming(float ECLClusterTiming) {m_ECLClusterTiming.push_back(ECLClusterTiming);}
-
-    /**
-     *set use user custom or not
-     */
-    void setUserCustomValue(int userCustomOpen) {m_userCustomOpen = userCustomOpen;}
-
-//getters
-
-    /**
-     *return the value of user custom
-     */
-    int getUserCustomValue()const {return m_userCustomOpen;}
+    void setntotTrg(int i = 1) {m_ntottrg += i;}
+    //getters
 
     /**
      *return the number of tracks
@@ -196,37 +138,6 @@ namespace Belle2 {
      *return the visible Pz
      */
     float getPzvis()const {return m_Pzvis;}
-
-    /**
-     *return Dr
-     */
-    std::vector<float> getDr()const {return m_dr;}
-
-    /**
-     *return Dz
-     */
-    std::vector<float> getDz()const {return m_dz;}
-
-    /**
-     *return the transverse momentum of tracks
-     */
-    std::vector<float> getPt()const {return m_pt;}
-
-    /**
-     *return the momentum of tracks
-     */
-    std::vector<float> getP()const {return m_p;}
-
-    /**
-     *return polar angle of tracks
-     */
-    std::vector<float> getCosTheta()const {return m_costheta;}
-
-    /**
-     *return azimuth angle of tracks
-     */
-    std::vector<float> getPhi()const {return m_phi;}
-
 
     /**
      *return angle between two tracks with the largest momentum in the rest frame
@@ -264,36 +175,16 @@ namespace Belle2 {
      */
     float getE2()const {return m_E2;}
 
-    /**
-     *return the charge of tracks
-     */
-    std::vector<int> getCharge()const {return m_Charge;}
+    /**return the summary of trigger results*/
+    int getPTSummary() const {return m_ptsummary;}
 
-    /**
-     *return the cluster energy
-     */
-    std::vector<float> getECLClusterE()const {return m_ECLClusterE;}
+    int getsubTrgResult(int i) const {return m_trgresult[i];}
 
-    /**
-     *return the polar angle of cluster
-     */
-    std::vector<float> getECLClusterTheta()const {return m_ECLClusterTheta;}
+    int getnsubTrg(int i) const {return m_nsubtrg[i];}
 
-    /**
-     *return the azimuth angle of cluster
-     */
-    std::vector<float> getECLClusterPhi()const {return m_ECLClusterPhi;}
-
-    /**
-     *return the timing of the cluster
-     */
-    std::vector<float> getECLClusterTiming()const {return m_ECLClusterTiming;}
-
+    int getntotTrg() const {return m_ntottrg;}
 
   private:
-
-    /**switch of custom seletion cretria for user*/
-    int m_userCustomOpen;
 
     /**the number of good tracks*/
     int m_ngoodTracks;
@@ -306,39 +197,6 @@ namespace Belle2 {
 
     /**the total visible energy*/
     float m_Evis;
-
-    /**dr*/
-    std::vector<float> m_dr;
-
-    /**dz*/
-    std::vector<float> m_dz;
-
-    /**transverse momentum of tracks*/
-    std::vector<float> m_pt;
-
-    /**track momenta*/
-    std::vector<float> m_p;
-
-    /**the polar angle of tracks*/
-    std::vector<float> m_costheta;
-
-    /**the azimuth angle of tracks*/
-    std::vector<float> m_phi;
-
-    /**charge*/
-    std::vector<int> m_Charge;
-
-    /**the cluster energy*/
-    std::vector<float> m_ECLClusterE;
-
-    /**the polar angle of cluster*/
-    std::vector<float> m_ECLClusterTheta;
-
-    /**the azimuth angle of the cluster*/
-    std::vector<float> m_ECLClusterPhi;
-
-    /**the timing of the cluster*/
-    std::vector<float> m_ECLClusterTiming;
 
     /**the sum of cluster energy*/
     float m_Esum;
@@ -364,12 +222,19 @@ namespace Belle2 {
     /**the second largest energtic cluster*/
     float m_E2;
 
-
-
     /**the number of KLM clusters*/
     int  m_nKLMClusters;
 
-    ClassDef(PhysicsTriggerInformation, 1)
+    /**the summary of physics trigger*/
+    int m_ptsummary;
+    /**the number of triggers*/
+    int m_ntottrg;
+    /**the largest trigger index*/
+    int m_trgresult[16];
+    /**the tag */
+    int m_nsubtrg[16];
+
+    ClassDef(PhysicsTriggerInformation, 2)
   };
 
 }

@@ -24,7 +24,8 @@ namespace Belle2 {
       /// Constructor
       QuadTreeParameters(int maxLevel, LegendreFindingPass& legendreFindingPass):
         m_maxLevel(maxLevel), m_legendreFindingPass(legendreFindingPass),
-        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15))),
+        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(-0.02, 0.14))),
+//        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.15))),
         m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, 16)), AxialHitQuadTreeProcessor::rangeY(0., 0.30))),
         m_originPrecisionFunction(),
         m_nonOriginPrecisionFunction()

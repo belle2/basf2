@@ -47,17 +47,27 @@ namespace Belle2 {
         //radius of the CDC
         double rCDC = 113.;
 
+        if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.seedQuadTree(4);
+
         //find high-pt tracks (not-curlers: diameter of the track higher than radius of CDC -- 2*Rtrk > rCDC => Rtrk < 2./rCDC, r(legendre) = 1/Rtrk =>  r(legendre) < 2./rCDC)
-        qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC); //fillSeededTree
+        if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.fillSeededTree(lmdInterface, 50,
+              2. / rCDC); //fillSeededTree
+        else qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
+        //qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
 
         //find curlers with diameter higher than half of radius of CDC (see calculations above)
-        qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC); //fillGivenTree
+        if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.fillSeededTree(lmdInterface, 70, 4. / rCDC); //fillGivenTree
+        else qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
+        //qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
 
         // Start loop, where tracks are searched for
         int limit = parameters.getInitialHitsLimit();
         double rThreshold = parameters.getCurvThreshold();
         do {
-          qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold); //fillSeededTree
+          if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.fillSeededTree(lmdInterface, limit,
+                rThreshold); //fillSeededTree
+          else qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
+          //qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
 
           limit = limit * m_param_stepScale;
 

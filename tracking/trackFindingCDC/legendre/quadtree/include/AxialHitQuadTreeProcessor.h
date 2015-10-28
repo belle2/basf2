@@ -82,10 +82,10 @@ namespace Belle2 {
         unsigned long thetaMax = node->getXMax();
         float rMin = node->getYMin();
         float rMax = node->getYMax();
-        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMin));
-        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMin));
-        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(abs(thetaMax));
-        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(abs(thetaMax));
+        float cosThetaMin = TrigonometricalLookupTable::Instance().cosTheta(thetaMin);
+        float sinThetaMin = TrigonometricalLookupTable::Instance().sinTheta(thetaMin);
+        float cosThetaMax = TrigonometricalLookupTable::Instance().cosTheta(thetaMax);
+        float sinThetaMax = TrigonometricalLookupTable::Instance().sinTheta(thetaMax);
 
         float rHitMin = hit->getConformalX() * cosThetaMin + hit->getConformalY() * sinThetaMin;
         float rHitMax = hit->getConformalX() * cosThetaMax + hit->getConformalY() * sinThetaMax;
@@ -131,11 +131,13 @@ namespace Belle2 {
             if (node->getLevel() < (getLastLevel() - 5)) {
               float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
               float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 4.;
-              unsigned long theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
-              unsigned long theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 4.);
+              unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 4);
 
-              if (theta1 <= 0)
-                theta1 = node->getXBin(i);
+              unsigned long theta1 = node->getXBin(i);
+              if (theta1 <= extension) theta1 = 0;
+              else theta1 -= extension;
+
+              unsigned long theta2 = node->getXBin(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);
 
@@ -143,11 +145,13 @@ namespace Belle2 {
             } else {
               float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
               float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 8.;
-              unsigned long theta1 = node->getXBin(i) - std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
-              unsigned long theta2 = node->getXBin(i + 1) + std::abs(pow(2, getLastLevel() + 0 - node->getLevel()) / 8.);
+              unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 8);
 
-              if (theta1 <= 0)
-                theta1 = node->getXBin(i);
+              unsigned long theta1 = node->getXBin(i);
+              if (theta1 <= extension) theta1 = 0;
+              else theta1 -= extension;
+
+              unsigned long theta2 = node->getXBin(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable::Instance().getNBinsTheta())
                 theta2 = node->getXBin(i + 1);
 
@@ -162,8 +166,12 @@ namespace Belle2 {
       }
 
 
-      void seedQuadTree(int lvl, bool twoSidedPhasespace = false)
+      void seedQuadTree(int lvl)
       {
+        bool twoSidedPhasespace(false);
+
+        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0)twoSidedPhasespace = true;
+
         unsigned long nbins = pow(2, lvl);
 
         m_seededTree.reserve(nbins * nbins);
@@ -223,35 +231,13 @@ namespace Belle2 {
       void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
                           unsigned int nHitsThreshold, float rThreshold)
       {
-        /*
-                int nFoundCands(0);
-
-                CandidateProcessorLambda lmdCandidateProcessingFinal = [&nFoundCands, &lmdProcessor](const AxialHitQuadTreeProcessor::ReturnList &
-                  hits, AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
-
-                  lmdProcessor(hits, qt);
-
-                  nFoundCands++;
-                };
-
-
-                do{
-                  nFoundCands = 0;
-                  sortSeededTree();
-                  QuadTree& quadTree = m_seededTree.front();
-
-                  fillGivenTree(&quadTree, lmdCandidateProcessingFinal, nHitsThreshold, rThreshold, true);
-
-                  quadTree.cleanUpItems(*this);
-
-                } while(nFoundCands > 0);
-        */
         sortSeededTree();
 //        B2INFO("Size of the tree : " << m_seededTree.size());
 
         for (QuadTree& tree : m_seededTree) {
 //          B2INFO("NItems in the node: " << tree.getNItems());
 //          fillGivenTreeWithSegments(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+          tree.cleanUpItems(*this);
           fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
         }
 

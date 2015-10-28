@@ -117,7 +117,7 @@ namespace Belle2 {
 
         for (const CDCWireHit* hit : cdcWireHits) {
           hit->getAutomatonCell().setTakenFlag(true);
-          hit->getAutomatonCell().setMaskedFlag(true);
+          hit->getAutomatonCell().setMaskedFlag(false);
 
         }
 

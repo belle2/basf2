@@ -65,35 +65,35 @@ void PhysicsTriggerDQMModule::defineHisto()
   h_MaxAngleGG = new TH1F("MaxAngleGG", "The maximum angle between charged clusters", 100, 0, 3.5);
   h_MaxAngleGG->SetXTitle("MaxAngleGG");
 
-  //tracks information
-  h_TrackP = new TH1F("P", "The momentum of the charged tracks", 100, 0, 10);
-  h_TrackP->SetXTitle("P(Track)");
+  /*  //tracks information
+    h_TrackP = new TH1F("P", "The momentum of the charged tracks", 100, 0, 10);
+    h_TrackP->SetXTitle("P(Track)");
 
-  h_TrackCostheta = new TH1F("CosthetaTrack", "The cos(theta) of the charged tracks", 100, -1, 1);
-  h_TrackCostheta->SetXTitle("Costheta(Track)");
+    h_TrackCostheta = new TH1F("CosthetaTrack", "The cos(theta) of the charged tracks", 100, -1, 1);
+    h_TrackCostheta->SetXTitle("Costheta(Track)");
 
 
-  h_TrackPhi = new TH1F("PhiTrack", "The phi angle of thecharged tracks", 200, -3.5, 3.5);
-  h_TrackPhi->SetXTitle("Phi(Track)");
+    h_TrackPhi = new TH1F("PhiTrack", "The phi angle of thecharged tracks", 200, -3.5, 3.5);
+    h_TrackPhi->SetXTitle("Phi(Track)");
 
-  h_TrackDr = new TH1F("DrTrack", "The dr of thecharged tracks", 100, 0, 10);
-  h_TrackDr->SetXTitle("Dz(Track)");
+    h_TrackDr = new TH1F("DrTrack", "The dr of thecharged tracks", 100, 0, 10);
+    h_TrackDr->SetXTitle("Dz(Track)");
 
-  h_TrackDz = new TH1F("DzTrack", "The dz of thecharged tracks", 200, -10, 10);
-  h_TrackDz->SetXTitle("Dz(Track)");
+    h_TrackDz = new TH1F("DzTrack", "The dz of thecharged tracks", 200, -10, 10);
+    h_TrackDz->SetXTitle("Dz(Track)");
 
-  h_ClusterE = new TH1F("E", "The energy of the clusters", 100, 0, 10);
-  h_ClusterE->SetXTitle("ECluster");
+    h_ClusterE = new TH1F("E", "The energy of the clusters", 100, 0, 10);
+    h_ClusterE->SetXTitle("ECluster");
 
-  h_ClusterTheta = new TH1F("ThetaCluster", "The theta angle of the clusters", 100, 0, 3.5);
-  h_ClusterTheta->SetXTitle("Theta(Cluster)");
+    h_ClusterTheta = new TH1F("ThetaCluster", "The theta angle of the clusters", 100, 0, 3.5);
+    h_ClusterTheta->SetXTitle("Theta(Cluster)");
 
-  //h_ClusterPhi = new TH1F("phi","The phi angle of the clusters",100,0,10);
-  //h_ClusterPhi->SetXTitle("#phi(Cluster)");
+    //h_ClusterPhi = new TH1F("phi","The phi angle of the clusters",100,0,10);
+    //h_ClusterPhi->SetXTitle("#phi(Cluster)");
 
-  h_ClusterTiming = new TH1F("Timing", "The timing of the clusters", 500, 0, 3500);
-  h_ClusterTiming->SetXTitle("Timing(Cluster)");
-
+    h_ClusterTiming = new TH1F("Timing", "The timing of the clusters", 500, 0, 3500);
+    h_ClusterTiming->SetXTitle("Timing(Cluster)");
+  */
 
 }
 
@@ -148,29 +148,29 @@ void PhysicsTriggerDQMModule::event()
   h_E1->Fill(phytriInfo->getE1());
   h_MaxAngleTT->Fill(phytriInfo->getAngleTT());
   h_MaxAngleGG->Fill(phytriInfo->getAngleGG());
+  /*
+    vector<float> trackP = phytriInfo->getP();
+    vector<float> trackCostheta = phytriInfo->getCosTheta();
+    vector<float> trackPhi = phytriInfo->getPhi();
+    vector<float> trackDr = phytriInfo->getDr();
+    vector<float> trackDz = phytriInfo->getDz();
+    for (unsigned int i = 0; i < trackP.size(); i++) {
+      h_TrackP->Fill(trackP[i]);
+      h_TrackCostheta->Fill(trackCostheta[i]);
+      h_TrackPhi->Fill(trackPhi[i]);
+      h_TrackDr->Fill(trackDr[i]);
+      h_TrackDz->Fill(trackDz[i]);
+    }
 
-  vector<float> trackP = phytriInfo->getP();
-  vector<float> trackCostheta = phytriInfo->getCosTheta();
-  vector<float> trackPhi = phytriInfo->getPhi();
-  vector<float> trackDr = phytriInfo->getDr();
-  vector<float> trackDz = phytriInfo->getDz();
-  for (unsigned int i = 0; i < trackP.size(); i++) {
-    h_TrackP->Fill(trackP[i]);
-    h_TrackCostheta->Fill(trackCostheta[i]);
-    h_TrackPhi->Fill(trackPhi[i]);
-    h_TrackDr->Fill(trackDr[i]);
-    h_TrackDz->Fill(trackDz[i]);
-  }
-
-  vector<float>clusterE = phytriInfo->getECLClusterE();
-  vector<float>clusterTheta = phytriInfo->getECLClusterTheta();
-  //vector<float>clusterPhi = phytriInfo->getECLClusterPhi();
-  vector<float>clusterTiming = phytriInfo->getECLClusterTiming();
-  for (unsigned int i = 0; i < clusterE.size(); i++) {
-    h_ClusterE->Fill(clusterE[i]);
-    h_ClusterTheta->Fill(clusterTheta[i]);
-//  h_ClusterPhi->Fill(clusterPhi[i]);
-    h_ClusterTiming->Fill(clusterTiming[i]);
-  }
-
+    vector<float>clusterE = phytriInfo->getECLClusterE();
+    vector<float>clusterTheta = phytriInfo->getECLClusterTheta();
+    //vector<float>clusterPhi = phytriInfo->getECLClusterPhi();
+    vector<float>clusterTiming = phytriInfo->getECLClusterTiming();
+    for (unsigned int i = 0; i < clusterE.size(); i++) {
+      h_ClusterE->Fill(clusterE[i]);
+      h_ClusterTheta->Fill(clusterTheta[i]);
+  //  h_ClusterPhi->Fill(clusterPhi[i]);
+      h_ClusterTiming->Fill(clusterTiming[i]);
+    }
+  */
 }

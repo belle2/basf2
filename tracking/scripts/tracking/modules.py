@@ -655,30 +655,6 @@ class CDCFitter(metamodules.PathModule):
         super(CDCFitter, self).__init__(modules=module_list)
 
 
-class CDCEventDisplay(metamodules.WrapperModule):
-
-    """ Add the b2display or the cdc display module of the cdc display to the path """
-
-    def __init__(self, full_display=True):
-
-        if full_display:
-            display_module = StandardEventGenerationRun.get_basf2_module("Display", showTrackCandidates=True,
-                                                                         showTrackLevelObjects=True, showMCInfo=False,
-                                                                         hideObjects=["Unassigned RecoHits"])
-        else:
-            display_module = CDCSVGDisplayModule()
-            display_module.use_python = True
-            display_module.use_cpp = False
-            display_module.draw_hits = True
-            display_module.draw_track_trajectories = True
-            display_module.draw_tracks = True
-            display_module.draw_takenflag = False
-            display_module.draw_wrong_rl_infos_in_tracks = False
-            display_module.draw_wrong_rl_infos_in_segments = False
-
-        super(CDCEventDisplay, self).__init__(display_module)
-
-
 class CDCMCFiller(basf2.Module):
 
     """ Fill the later needed mc information """

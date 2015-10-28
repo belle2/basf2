@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 //framework aux
 #include <framework/gearbox/Unit.h>
@@ -30,6 +31,7 @@
 
 //utilities
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/PhysicsTriggerVariables.h>
 #include <analysis/VariableManager/L1EmulatorVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/utilities/FileSystem.h>
@@ -38,6 +40,8 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+
+#include <TRandom.h>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
@@ -54,15 +58,10 @@ L1EmulationModule::L1EmulationModule() : Module()
   // Set module properties
   setDescription("L1 emulator for the study of L1 trigger");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  addParam("UserCustomOpen", m_userCustomOpen, "the switch of customing the L1 Trigger by user", 0);
   std::string emptyCut;
-  for (int i = 1; i <= 50; i++) {
-    char name[10];
-    sprintf(name, "TRG%d", i);
-    addParam(name, m_userCut[i - 1], name, emptyCut);
-  }
-
+  std::vector<int> emptyScale;
+  addParam("TRG", m_userCut, "trigger", emptyCut);
+  addParam("TRG_Scale", m_scalefactor, "the scale factor of trigger", emptyScale);
 }
 
 L1EmulationModule::~L1EmulationModule()
@@ -73,116 +72,120 @@ void L1EmulationModule::initialize()
 {
   B2INFO("L1EmulationModule processing");
   StoreArray<L1EmulationInformation>::registerPersistent();
-  m_cut = Variable::Cut::Compile(m_userCut[0]);
-
-  Total_Event = 0;
-  for (int i = 0; i < 50; i++) {
-    TRG_Event[i] = 0;
-    TRG_Event_TRGOnly[i] = 0;
-    for (int j = 0; j < 50; j++)
-      TRG_Event_Matrix[i][j] = 0;
-  }
+  m_cut = Variable::Cut::Compile(m_userCut);
+  m_weightcount = 0;
+  for (int i = 0; i < 50; i++)
+    m_subweightcount[i] = 0;
+  m_ntrg = 0;
 }
 
 
 void L1EmulationModule::event()
 {
-  eventSelect();
-  setReturnValue(1);
+  setReturnValue(0);
+  if (eventSelect())
+    setReturnValue(1);
 }
 
 void L1EmulationModule::terminate()
 {
-//std::cout<<"TRG "<<"\t"<<"Ratio"<<std::endl;
-  int W = 7;
+  double w = m_subweightcount[m_ntrg];
+  double wt = m_weightcount;
+  if (m_ntrg == 4)
+    std::cout << Form("----------------------------------------------------------------") << "\n";
 
-  std::cout << std::endl;
-  std::cout << "========L1 Emulator TRG Matrix========" << std::endl;
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << "-------";
-  std::cout << "-------" << std::endl;
-
-  std::cout << std::left << std::setw(W) << "TRG";
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << i + 1;
-  std::cout << std::endl;
-
-  for (int i = 0; i < 50; i++) {
-    if (m_userCut[i].size()) {
-//std::cout<<i+1<<"\t"<<TRG_Event[i]/(float)Total_Event<<std::endl;
-      std::cout << std::left << std::setw(W) << i + 1;
-      for (int j = 0; j < 50; j++) {
-        if (j < i)std::cout << std::setw(W) << " ";
-        if (j >= i && m_userCut[j].size())
-          std::cout << std::setw(W) << std::setprecision(2) << TRG_Event_Matrix[i][j] / (float)Total_Event;
-      }
-      std::cout << std::endl;
-
-    }
-
-
-  }
-
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << "-------";
-  std::cout << "-------" << std::endl;
-  std::cout << std::left << std::setw(W) << "TRG";
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << i + 1;
-  std::cout << std::endl;
-
-  std::cout << std::left << std::setw(W) << "R";
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << TRG_Event_TRGOnly[i] / (float)Total_Event;
-  std::cout << std::endl;
-
-  for (int i = 0; i < 50; i++)
-    if (m_userCut[i].size())std::cout << std::setw(W) << "-------";
-  std::cout << "-------" << std::endl;
-  std::cout << std::endl;
-
+  std::cout << Form("%-40s%-20.2f%-10.2f", (getName()).c_str(), w, w / wt * 100.) << "\n";
+  if (m_ntrg == 1)
+    std::cout << Form("============================L1 Emulator Output End===========================") << "\n";
 }
 
 
-void L1EmulationModule::eventSelect()
+bool L1EmulationModule::eventSelect()
 {
-  Total_Event++;
-  for (int i = 0; i < 50; i++)m_summary[i] = 0;
+
+//get weight of event
+  double Weight = 1.0;
+  StoreObjPtr<EventMetaData> eventmetadata;
+  if (eventmetadata)
+    Weight = eventmetadata->getGeneratedWeight();
 
   const Particle* part = NULL;
   StoreArray<L1EmulationInformation> LEInfos;
-  L1EmulationInformation* LEInfo = LEInfos.appendNew(L1EmulationInformation());
-
-  int count = 0;
-  int record = -1;
-  for (int i = 0; i < 50; i++) {
-    // TODO: This is extremely inefficient
-    // The Cut objects should be created once in initialize!
-    // Because parsing the cut string and generating the cut objects is (extremely) slow!
-    m_cut = Variable::Cut::Compile(m_userCut[i]);
-    if (m_userCut[i].size() && m_cut->check(part)) {
-      m_summary[i] = 1;
-      if (i == 0)LEInfo->setECLBhabha(1);
-      else if (i == 1) LEInfo->setBhabhaVeto(1);
-      else if (i == 2) LEInfo->setggVeto(1);
-      TRG_Event[i]++;
-      count++;
-      record = i;
-    }
-    LEInfo->setSummary(m_summary[i]);
+  if (!LEInfos.getEntries()) {
+    LEInfos.appendNew(L1EmulationInformation());
+    B2DEBUG(200, "No entry in L1EmulationInformation");
+    m_weightcount += Weight;
+    LEInfos[0]->settotWeight(m_weightcount);
   }
+  m_weightcount = LEInfos[0]->gettotWeight();
+  //L1EmulationInformation* LEInfo = LEInfos.appendNew(L1EmulationInformation());
+  L1EmulationInformation& LEInfo = *LEInfos[0];
+  LEInfo.setnTrg(1);
+  m_ntrg = LEInfo.getnTrg();
 
-  for (int i = 0; i < 50; i++) {
-    if (m_summary[i] == 1) {
-      for (int j = i; j < 50; j++) {
-        if (m_summary[j] == 1)
-          TRG_Event_Matrix[i][j]++;
-      }
+  double summary = 0.0;
+
+  if (m_userCut.size() && m_cut->check(part)) {
+    if (makeScalefx(m_scalefactor)) {
+      summary = Weight;
+      if (m_ntrg == 1)LEInfo.setECLBhabha(1);
+      else if (m_ntrg == 2)
+        LEInfo.setBhabhaVeto(1);
+      else if (m_ntrg == 3)
+        LEInfo.setSBhabhaVeto(1);
+      else if (m_ntrg == 4)
+        LEInfo.setggVeto(1);
     }
   }
-  if (count == 1)
-    TRG_Event_TRGOnly[record]++;
+  m_subweightcount[m_ntrg] += summary;
+  LEInfo.setsubWeight(m_ntrg, m_subweightcount[m_ntrg]);
+  LEInfo.setSummary(m_ntrg, summary);
+  bool Val = false;
+//The global trigger result
+  if (summary > 0) {
+    LEInfo.setSummary(0, summary);
+    Val = true;
+  }
 
-
+  return Val;
 }
+
+bool L1EmulationModule::makeScale(int f)
+{
+  bool Val = false;
+  double ran = gRandom->Uniform(f);
+  if (ceil(ran) == f) Val = true;
+
+  return Val;
+}
+
+bool L1EmulationModule::makeScalefx(std::vector<int> f)
+{
+  bool Val = true;
+
+  int fsize = f.size();
+  if (fsize < 1)
+    Val = makeScale(1);
+  else if (fsize == 1)
+    Val = makeScale(f[0]);
+
+  if (fsize <= 1)
+    return Val;
+
+  Particle* p = NULL;
+  double theta = -1;
+  double interval = 0.;
+  theta = Variable::MinusThetaBhabhaLE(p); interval = (2.65 - 0.2) / (double)fsize;
+  theta = Variable::ThetaC1LE(p); interval = (2.7 - 0.2) / (double)fsize;
+
+  for (int i = 0; i < fsize; i++) {
+    if (theta >= (interval * i + 0.2) && theta < (interval * (i + 1) + 0.2)) {
+      Val = makeScale(f[i]);
+      break;
+    }
+  }
+
+  return Val;
+}
+
 

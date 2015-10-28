@@ -27,18 +27,16 @@ namespace Belle2 {
     class CDCRecoSegment2D;
     class CDCTrack;
 
-    /** Class which does the segment - track combining */
+    /** Class which does the segment - track combining. */
     class SegmentTrackCombiner {
     public:
 
       /** We use this to describe more than one segment that could belong together in one single superlayer.
-       * Actually the segment finder should not preduce such things... */
+       * Actually the segment finder should not produce such things... */
       typedef std::vector<SegmentInformation*> TrainOfSegments;
 
       /**
        * Fill the given elements into the internal lookup tables.
-       * @param tracks
-       * @param segments
        */
       void fillWith(std::vector<CDCTrack>& tracks, std::vector<CDCRecoSegment2D>& segments)
       {
@@ -52,21 +50,18 @@ namespace Belle2 {
        * There are some difficulties in the case that one segment has hits in common with more than one track
        * and the filter gives a positive result in more than one case.
        * In this case we combine it with the track for which the filter gives the highest result.
-       * @param segmentTrackChooserFirstStep
        */
       void match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep);
 
       /**
        * Filter out the segments that are fake or background. Mark them as taken.
        * For deciding which is background or not we use the given filter.
-       * @param backgroundSegmentFilter
        */
       void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
        * For deciding which is new or not we use the given filter.
-       * @param newSegmentFilter
        */
       void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentFilter);
 
@@ -85,8 +80,9 @@ namespace Belle2 {
        * - We now still have the problem that there could be two ore more tracks matched to the same segment (or segment in a train)
        *   So we go through all the segments in the good-markes trains and check if they have more than one match. We try to find the best matching candidate.
        * - Now we really have a one-on-one relation between tracks and segments. We can put them all together.
+       *
+       * In the moment, this method does work, but produces some fakes and is therefore not used in production.
        */
-
       void combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
                    BaseSegmentTrainFilter& segmentTrainFilter,
                    BaseSegmentInformationListTrackFilter& segmentTrackFilter);
@@ -97,6 +93,10 @@ namespace Belle2 {
        */
       void clearAndRecover();
 
+      /**
+       * Filter out tracks with the given filter. Normally, you train your filter to filter out fake candidates
+       * (but you can use any filter you want). The tracks with a NAN-filter result get removed from the list.
+       */
       void filterTracks(std::vector<CDCTrack>& tracks, BaseTrackFilter& trackFilter)
       {
         tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [&trackFilter](const CDCTrack & track) -> bool {
@@ -106,43 +106,42 @@ namespace Belle2 {
       }
 
       /**
-       * Helper function to add a segment to a track with respecting the taken information
-       * @param segment
-       * @param track
+       * Helper function to add a segment to a track with respecting the taken information of the segment.
+       * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
        */
       static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits = true);
 
     private:
       const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */
 
-      /** Find the best fitting train of segments to a given track from the list */
+      /** Find the best fitting train of segments to a given track from the list. */
       const TrainOfSegments* findBestFittingSegmentTrain(std::list<TrainOfSegments>& trainsOfSegments,
                                                          TrackInformation* trackInformation, BaseSegmentInformationListTrackFilter& segmentTrackFilter);
 
-      /** Go through all segments a combine them to their best matches */
+      /** Go through all segments a combine them to their best matches. */
       void tryToCombineSegmentTrainAndMatchedTracks(const TrainOfSegments& trainOfSegments,
                                                     BaseSegmentInformationListTrackFilter& segmentTrackFilter);
 
-      /** Do the Segment <-> Track matching */
+      /** Do the Segment <-> Track matching. */
       void matchTracksToSegment(SegmentInformation* segmentInformation, BaseSegmentTrackFilter& segmentTrackChooser);
 
-      /** Make all possible subsets of a given list */
+      /** Make all possible subsets of a given list. */
       void makeAllCombinations(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation,
                                BaseSegmentTrainFilter& segmentTrainFilter);
 
-      /** Create all possible trains with a given segments list */
+      /** Create all possible trains with a given segments list. */
       void createTrainsOfMatchedSegments(std::list<TrainOfSegments>& trainsOfSegments, const TrackInformation* trackInformation,
                                          BaseSegmentTrainFilter& segmentTrainFilter);
 
-      /** Delete all trains which are found as a bigger one also */
+      /** Delete all trains which are found as a bigger one also. */
       void clearSmallerCombinations(std::list<TrainOfSegments>& trainsOfSegments);
 
-      /** Combine a segment and a track */
+      /** Combine a segment and a track. */
       void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
 
     private:
-      TrackLookUp m_trackLookUp; /**< The used track list */
-      SegmentLookUp m_segmentLookUp; /**< The used segment list */
+      TrackLookUp m_trackLookUp; /**< The used track list. */
+      SegmentLookUp m_segmentLookUp; /**< The used segment list. */
     };
   }
 }

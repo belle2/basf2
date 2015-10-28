@@ -1,4 +1,5 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
+#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -72,7 +73,7 @@ void TrackLookUp::fillWith(std::vector<CDCTrack>& tracks)
   for (CDCTrack& trackCand : tracks) {
     TrackInformation* trackInformation = new TrackInformation(&trackCand);
 
-    std::vector<double>& perpSList = trackInformation->getPerpSList();
+    std::vector<double>& perpSList = trackInformation->getArcLength2DList();
     perpSList.reserve(trackCand.size());
     for (const CDCRecoHit3D& recoHit : trackCand) {
       perpSList.push_back(recoHit.getArcLength2D());

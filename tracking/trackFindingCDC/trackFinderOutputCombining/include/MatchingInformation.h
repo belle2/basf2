@@ -24,8 +24,7 @@ namespace Belle2 {
 
     /**
      * This class represents a matchable type.
-     * It has capabilities of storing the matches together
-     * with the probability of a match.
+     * It has capabilities of storing a matchable type and their matches together with the probability of a match.
      */
     template<class OwnType, class MatchingType>
     class MatchingInformation {
@@ -35,7 +34,7 @@ namespace Belle2 {
 
       /**
        * Initialize the object with the underlying instance that should be matched.
-       * @param input
+       * @param input object to be used as matchable base object.
        */
       explicit MatchingInformation(OwnType* input) : m_object(input), m_isSorted(true)
       {
@@ -44,7 +43,7 @@ namespace Belle2 {
 
       /**
        * Return the matches with the probabilities as a vector of pairs.
-       * @return
+       * @return the list of matches with their probabilities as set before.
        */
       ListOfMatchCandidates& getMatches()
       {
@@ -55,7 +54,7 @@ namespace Belle2 {
       /**
        * Return the matches with the probabilities as a vector of pairs.
        * Const version.
-       * @return
+       * @return the list of matches with their probabilities as set before.
        */
       const ListOfMatchCandidates& getMatches() const
       {
@@ -64,7 +63,7 @@ namespace Belle2 {
 
       /**
        * If not already sorted sort the matches according to their match probability
-       * and return the one with the highest.
+       * and return the one with the highest probability.
        * @return A object with the highest match probability. If there are more than one
        * with the same probability a random one is returned.
        */
@@ -95,9 +94,9 @@ namespace Belle2 {
       }
 
       /**
-       * Add the object with the probability.
-       * @param match
-       * @param matchingProbability
+       * Add the object with the given probability.
+       * @param match the object to add as match.
+       * @param matchingProbability the probability of that match.
        */
       void addMatch(MatchingType* match, double matchingProbability = 0)
       {
@@ -105,9 +104,10 @@ namespace Belle2 {
         m_isSorted = false;
       }
 
+    protected:
       /**
-       * Return the underlying object.
-       * @return
+       * Return the underlying matchable object.
+       * @return The object.
        */
       OwnType* getObject() const
       {
@@ -115,7 +115,7 @@ namespace Belle2 {
       }
 
     private:
-      OwnType* m_object; /**< The underlying object */
+      OwnType* m_object; /**< The underlying object. */
       ListOfMatchCandidates m_listOfMatches; /**< The list of matches with their probabilities. */
       bool m_isSorted; /**< A flag to cache the sorted state. */
     };
@@ -123,11 +123,11 @@ namespace Belle2 {
     /**
      * This is a MatchingInformation for the relation CDCTrack -> CDCSegment
      * It has additional information on the track like a storage for the best fitting segment train
-     * and the list of perpS of the track.
+     * and the list of arc length 2D of the track.
      */
     class TrackInformation : public MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation> {
     public:
-      /** Initialize with a track cand pointer. We do not have the ownership */
+      /** Initialize with a track cand pointer. We do not have the ownership. */
       explicit TrackInformation(TrackFindingCDC::CDCTrack* trackCand) :
         MatchingInformation<TrackFindingCDC::CDCTrack, SegmentInformation>(trackCand),
         m_arcLength2DList(), m_goodFittingSegmentTrain(), m_minArcLength2D(0), m_maxArcLength2D(0)
@@ -143,44 +143,40 @@ namespace Belle2 {
       }
 
       /**
-       * Return the maximum perpS. calcPerpS must be called before!
-       * @return
+       * Return the maximum arc length 2D. calcArcLength2D must be called before!
        */
-      double getMaxPerpS() const
+      double getMaxArcLength2D() const
       {
         return m_maxArcLength2D;
       }
 
       /**
-       * Return the minimum perpS. calcPerpS must be called before!
-       * @return
+       * Return the minimum arc length 2D. calcArcLength2D must be called before!
        */
-      double getMinPerpS() const
+      double getMinArcLength2D() const
       {
         return m_minArcLength2D;
       }
 
       /**
-       * Return the perpS list.
-       * @return
+       * Return the arc length 2D list.
        */
-      std::vector<double>& getPerpSList()
+      std::vector<double>& getArcLength2DList()
       {
         return m_arcLength2DList;
       }
 
       /**
-       * Return the perpS list.
+       * Return the arc length 2D list.
        * Const version.
-       * @return
        */
-      const std::vector<double>& getPerpSList() const
+      const std::vector<double>& getArcLength2DList() const
       {
         return m_arcLength2DList;
       }
 
       /**
-       * Calculate the maximum and minimum perpS.
+       * Calculate the maximum and minimum arc length 2D.
        */
       void calcArcLength2D()
       {
@@ -191,7 +187,6 @@ namespace Belle2 {
 
       /**
        * Fill the storage for the best matching segment train for caching.
-       * @param goodFittingSegmentTrain
        */
       void setGoodSegmentTrain(const std::vector<SegmentInformation*>& goodFittingSegmentTrain)
       {
@@ -216,19 +211,19 @@ namespace Belle2 {
       }
 
     private:
-      std::vector<double> m_arcLength2DList; /**< The list of perpS. Must be provided by the user */
+      std::vector<double> m_arcLength2DList; /**< The list of arc length 2D. Must be provided by the user. */
       std::vector<SegmentInformation*> m_goodFittingSegmentTrain; /**< The cache for the best fitting segment train. */
-      double m_minArcLength2D; /**< The minimum perpS. Is calculated with calcPerpS */
-      double m_maxArcLength2D; /**< The maximum perpS. Is calculated with calcPerpS */
+      double m_minArcLength2D; /**< The minimum arc length 2D. Is calculated with calcArcLength2D */
+      double m_maxArcLength2D; /**< The maximum arc length 2D. Is calculated with calcArcLength2D */
     };
 
     /**
-     * This is a MatchingInformation for the relation CDCSegment -> CDCTrack
+     * This is a MatchingInformation for the relation CDCSegment -> CDCTrack.
      * It has additional information on the segment like the infromation if this segment is already taken by a track finder.
      */
     class SegmentInformation : public MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation> {
     public:
-      /** Initialize with a segmentpointer. We do not have the ownership */
+      /** Initialize with a segmentpointer. We do not have the ownership. */
       explicit SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
         MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation>(segment)
       {
@@ -244,7 +239,6 @@ namespace Belle2 {
 
       /**
        * Calls the hasTakenFlag function of the underlying segment.
-       * @return
        */
       bool isAlreadyTaken() const
       {

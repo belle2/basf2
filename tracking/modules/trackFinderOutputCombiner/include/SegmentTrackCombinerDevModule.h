@@ -20,30 +20,14 @@
 
 namespace Belle2 {
 
-  /** Module for the combination of tracks and segments. Development edition.
+  /**
+   * Module for the combination of tracks and segments. Development edition.
    * See the base module for more information.
    */
-  class SegmentTrackCombinerDevModule:
-    public Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule <
-    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
-    Belle2::TrackFindingCDC::BaseBackgroundSegmentsFilter,
-    Belle2::TrackFindingCDC::BaseNewSegmentsFilter,
-    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
-    Belle2::TrackFindingCDC::BaseSegmentTrainFilter,
-    Belle2::TrackFindingCDC::BaseSegmentInformationListTrackFilter,
-    Belle2::TrackFindingCDC::BaseTrackFilter
-    > {
+  class SegmentTrackCombinerDevModule: public Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule {
 
     /// Parent Module with the real implementation.
-    typedef Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule <
-    Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
-           Belle2::TrackFindingCDC::BaseBackgroundSegmentsFilter,
-           Belle2::TrackFindingCDC::BaseNewSegmentsFilter,
-           Belle2::TrackFindingCDC::BaseSegmentTrackFilter,
-           Belle2::TrackFindingCDC::BaseSegmentTrainFilter,
-           Belle2::TrackFindingCDC::BaseSegmentInformationListTrackFilter,
-           Belle2::TrackFindingCDC::BaseTrackFilter
-           > Super;
+    typedef Belle2::TrackFindingCDC::SegmentTrackCombinerImplModule Super;
 
   public:
     /// Constructor of the module. Setting up parameters and description.

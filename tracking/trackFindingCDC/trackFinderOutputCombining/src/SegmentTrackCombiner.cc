@@ -348,7 +348,7 @@ void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformat
   addSegmentToTrack(*(segmentInformation->getSegment()), *(matchingTrack->getTrackCand()));
 
   for (const CDCRecoHit3D& recoHit : * (matchingTrack->getTrackCand())) {
-    matchingTrack->getPerpSList().push_back(recoHit.getArcLength2D());
+    matchingTrack->getArcLength2DList().push_back(recoHit.getArcLength2D());
   }
   matchingTrack->calcArcLength2D();
 }
@@ -382,7 +382,7 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       const CDCTrajectory2D& trajectory2D = possiblyMatch->getTrackCand()->getStartTrajectory3D().getTrajectory2D();
       double perpSFront = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->front().getRecoPos2D());
       double perpSBack = trajectory2D.calcArcLength2D(segmentInformation->getSegment()->back().getRecoPos2D());
-      if (perpSFront > possiblyMatch->getMaxPerpS() or perpSBack < possiblyMatch->getMinPerpS())
+      if (perpSFront > possiblyMatch->getMaxArcLength2D() or perpSBack < possiblyMatch->getMinArcLength2D())
       {
         B2DEBUG(120, "Segment is above or below track.");
         matchesAboveTrack.push_back(possiblyMatch);

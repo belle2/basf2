@@ -45,9 +45,9 @@ L1Emualtion_Veto(analysis_main)
 # is no scale for the path, set [1]. if you set the array with more than one component, e.g. [1000,200,50,10], the
 # trigger path will be scaled as a function of the election's theta in lab frame by default.
 L1Emulation('TwoTracks', 'NltHLT==2 and BhabhaVetoHLT==0', analysis_main, [1])
-L1Emulation('TwoTracksScale', 'NltHLT==2', path, [2000])
+L1Emulation('TwoTracksScale', 'NltHLT==2', analysis_main, [2000])
 L1Emulation('OneTrkOneMu', 'NtHLT>=1 and Layer1KLMHLT>=3 and maxAngTMHLT>45', analysis_main, [1])
-L1Emulation('Hadron1', 'NtHLT>=3 and NltHLT>=2', path, [1])
+L1Emulation('Hadron1', 'NtHLT>=3 and NltHLT>=2', analysis_main, [1])
 
 # Finally, load L1EmulationPrint module to print the reigger result on screen.
 L1EmulationPrint(analysis_main)

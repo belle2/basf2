@@ -30,6 +30,8 @@ namespace Belle2 {
 
     /**the number of CDC tracks*/
     int m_nTracks;
+    /**the number of long CDC tracks*/
+    int m_nLongTracks;
     /**the number of CDC tracks matched to ECL cluster*/
     int m_nECLMatchTracks;
     /**the number of CDC tracks matched to KLM cluster*/
@@ -38,6 +40,8 @@ namespace Belle2 {
     /**the maximum open angle between the tracks*/
     float m_maxAng;
 
+    /**the polar angle of the track with negative charge*/
+    float m_minusTheta;
     /**
       *the information of the track with the largest momentum [P,theta, phi, charge, e ]
       *p:momentum,  theta: polar angle, phi: azimuthal angle, charge, e: the energh of the ECL cluster matched to trk1
@@ -47,6 +51,20 @@ namespace Belle2 {
     /**the information of the track with the second largest momentum [P,theta, phi, harge, e ]*/
     double* m_P2Bhabha;
 
+    /**the P1 in CMS*/
+    float  m_P1CMSBhabha;
+
+    /**the P2 in CMS*/
+    float  m_P2CMSBhabha;
+
+    /**the visible Pz*/
+    float m_VisiblePz;
+
+    /**the visible energy*/
+    float m_VisibleEnergy;
+
+    /**the P1+P2 in CMS*/
+    float m_P12CMS;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

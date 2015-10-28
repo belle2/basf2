@@ -27,9 +27,11 @@ namespace Belle2 {
   class NtupleLETRGTool : public NtupleFlatTool {
 
   private:
+    /**the total weight*/
+    float m_totWeight;
 
     /**the trigger results*/
-    int* m_GDL;
+    float* m_GDL;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

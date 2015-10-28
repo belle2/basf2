@@ -27,11 +27,19 @@ namespace Belle2 {
   class NtupleLEKLMTool : public NtupleFlatTool {
 
   private:
-
+    /**the max angle between KLM clusters*/
+    float m_maxAngMM;
+    /**the max angle between CDC tracks and KLM clusters*/
+    float m_maxAngTM;
     /**the number of KLM clusters*/
     int m_nKLMClusters;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+    /**the largest layers of KLM clusters*/
+    int m_Layer1;
+    /**the second largest layers of KLM clusters*/
+    int m_Layer2;
+
 
   public:
     /** Constuctor. */

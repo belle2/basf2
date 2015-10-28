@@ -34,6 +34,9 @@ namespace Belle2 {
     /**the total ECL energy*/
     float m_Etot;
 
+    /**the total ECL of C1 and C2*/
+    float m_E12;
+
     /**
     *information of the most energnetic ECL cluster, [E, R, Theta, Phi]
     *E: energy, R: the distance between cluster an IP, Theta: polar angle, Phi: the azimuthal angle
@@ -44,8 +47,17 @@ namespace Belle2 {
 
     float* m_Vp4E2;
 
+    /**information of the most energnetic neutral cluster, [E, R, Theta, Phi]*/
+    float* m_Vp4Neutral;
+
+
     /**the angle between the most and the second most energnetic ECL clusters*/
     float m_AngleGG;
+
+    /**the angle between C1 (C2) and T1 (T2)*/
+    float m_AngleGT;
+
+//    float m_EC12CMS;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

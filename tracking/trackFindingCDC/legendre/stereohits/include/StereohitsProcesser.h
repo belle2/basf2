@@ -66,8 +66,8 @@ namespace Belle2 {
        */
       void addStereoHitsWithQuadTree(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments);
 
-      /** Postprocessing: sort by arc length, set all arc lengths to be positive and fit the tracks. */
-      void postprocessTrack(CDCTrack& track);
+      /// Postprocessing: sort by arc length, set all arc lengths to be positive and fit the tracks.
+      void postprocessTrack(CDCTrack& track) const;
 
       /// Return the bare value of the parameter check for B2B tracks.
       bool getCheckForB2BTracksValue() const
@@ -108,32 +108,46 @@ namespace Belle2 {
     private:
 
       /// Utilities
-      /**
-       * Fill the given vector with all not used rl wire hits that could match the given track as CDCRecoHits3D.
-       */
+      /// Fill the given vector with all not used rl wire hits that could match the given track as CDCRecoHits3D.
       void fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const;
 
-      /**
-       * Add only those hits to the track that are in the node with the maximum number of hits.
-       */
-      void addMaximumNodeToTrackAndDeleteHits(CDCTrack& track, std::vector<const CDCRecoHit3D*>& foundStereoHits,
-                                              const std::vector<const CDCRecoHit3D*>& doubledRecoHits, const std::vector<const CDCRecoHit3D*>& hitsVector) const;
+      /// Fill the given vector with all not used segments that could match the given track as CDCRecoSegment3D.
+      void fillSegmentsVector(std::vector<const CDCRecoSegment3D*> recoSegmentsVector, const std::vector<CDCRecoSegment2D>& segments,
+                              CDCTrack& track) const;
 
       /**
        * Use the given trajectory to reconstruct the 2d hits in the segment in z direction
        * to match the trajectory perfectly. Then add the newly created reconstructed 3D segment to the given list.
+       *
+       * WARNING: We *create* CDCRecoSegment3Ds here as pointers, but the ownership is handles over to the list.
+       * Please delete the segments by yourself.
        */
       void reconstructSegment(const CDCRecoSegment2D& segment, std::vector<const CDCRecoSegment3D*>& recoSegments,
-                              const CDCTrajectory2D& trackTrajectory, const double maximumPerpS) const;
+                              const CDCTrajectory2D& trackTrajectory) const;
+
+      /**
+       * Use the given trajectory to reconstruct the 2d hits in the vector in z direction
+       * to match the trajectory perfectly. Then add the newly created reconstructed 3D hit to the given list.
+       *
+       * WARNING: We *create* CDCRecoHit3Ds here as pointers, but the ownership is handles over to the list.
+       * Please delete the hits by yourself.
+       */
+      void reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<const CDCRecoHit3D*>& hitsVector,
+                          const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const;
 
       /// Parameters
-      unsigned int m_param_quadTreeLevel = 6;        /// Maximum level of the quad tree search.
-      bool m_param_checkForB2BTracks = true;         /// Set to false to skip the B2B check (good for curlers)
-      unsigned int m_param_minimumNumberOfHits = 5;  /// Minimal number of hits a quad tree node must have to be called a found bin
+      /// Maximum level of the quad tree search.
+      unsigned int m_param_quadTreeLevel = 6;
+      /// Set to false to skip the B2B check (good for curlers)
+      bool m_param_checkForB2BTracks = true;
+      /// Minimal number of hits a quad tree node must have to be called a found bin
+      unsigned int m_param_minimumNumberOfHits = 5;
 
       /// quad tree implementations
-      HitZ0TanLambdaLegendre m_hitQuadTree;          /// Handler for the hit quad tree
-      SegmentZ0TanLambdaLegendre m_segmentQuadTree;  /// Handler for the segment quad tree
+      /// Handler for the hit quad tree
+      HitZ0TanLambdaLegendre m_hitQuadTree;
+      /// Handler for the segment quad tree
+      SegmentZ0TanLambdaLegendre m_segmentQuadTree;
     };
   }
 }

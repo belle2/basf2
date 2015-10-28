@@ -85,31 +85,29 @@ namespace Belle2 {
 
 
     //histograms for track information
-    TH1F* h_TrackP;
-//    TH1F* h_TrackCharge;
-    TH1F* h_TrackCostheta;
+    // TH1F* h_TrackP;
+    // TH1F* h_TrackCostheta;
 
     /**the azimuthal angle of tracks*/
-    TH1F* h_TrackPhi;
+    // TH1F* h_TrackPhi;
 
     /**the Dr*/
-    TH1F* h_TrackDr;
+    // TH1F* h_TrackDr;
 
     /**Dz*/
-    TH1F* h_TrackDz;
+    // TH1F* h_TrackDz;
 
     //histograms for cluster information
     /**the energy of clusters*/
-    TH1F* h_ClusterE;
+    // TH1F* h_ClusterE;
 
     /**the polar angle of clusters*/
-    TH1F* h_ClusterTheta;
+    //  TH1F* h_ClusterTheta;
 
 
     //TH1F* h_ClusterPhi;
     /**the timing of clusters*/
-    TH1F* h_ClusterTiming;
-
+    // TH1F* h_ClusterTiming;
   };
 
 } // end namespace Belle2

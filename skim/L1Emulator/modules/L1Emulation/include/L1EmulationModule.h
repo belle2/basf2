@@ -20,8 +20,6 @@
 namespace Belle2 {
   /**
    * physics trigger
-   *
-   *    *
    */
 
   class L1EmulationModule : public Module {
@@ -46,40 +44,35 @@ namespace Belle2 {
     /** Termination action. */
     virtual void terminate();
 
-
     /**Perform the selection criteria on event*/
-    void eventSelect();
-//  void eventInformation();
+    bool eventSelect();
 
+    /**make a scale for a trigger path*/
+    bool makeScale(int);
 
+    /**make a scale as a function of the e-'s theta in lab*/
+    bool makeScalefx(std::vector<int>);
 
   private:
 
-
-
-    /**Switch of customing the selection criteria by user.*/
-    int m_userCustomOpen;
-    /**the total number of events*/
-    int Total_Event;
-    /**the number of events triggered by TRGi*/
-    int TRG_Event[50];
-    /**the number of events triggered by TRGi only*/
-    int TRG_Event_TRGOnly[50];
-    /**the number of events triggered by TRGi and TRGj simultaneously */
-    int TRG_Event_Matrix[50][50];
-    /**the TRG*/
-    std::string m_userCut[50];
-
+    /**the users' cut*/
+    std::string m_userCut;
 
     /**Access users' cut*/
     std::unique_ptr<Variable::Cut> m_cut;
 
-    /**Trigger results*/
-    int m_summary[50];
-    /**Trigger results that triggered by one TRGi only*/
-    int m_summary_TRGonly[50];
+    /**Scalefactor as a function of theta for Bhabha*/
+    std::vector<int> m_scalefactor;
 
+    /**the sum of the weight of the processed events*/
+    double m_weightcount;
+
+    /**the sum of the weight of the event triggered by a path*/
+    double m_subweightcount[50];
+
+    /**the index of trigger path*/
+    int m_ntrg;
   };
 }
 
-#endif /* PHYSICSTRIGGERMODULE_H */
+#endif /* L1EMULATIONMODULE_H */

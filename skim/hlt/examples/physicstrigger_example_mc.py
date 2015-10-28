@@ -9,20 +9,6 @@
 # For reconstruction module, events are reconstructed with information form all
 # detectors except PXD
 #
-# For PhyscisTriger module, to be flexible, the user custom option is open.
-# If you want to select the events by using yourself selection criteria,
-# just set UserCustomOpen to a value larger than zero as commented sentences below,
-# and provide your selection criteria to UserCustomCut.
-#
-# physicstrigger.param('UserCustomOpen',1); (default: 0)
-# physicstrigger.param('UserCustomCut','2<=nTracksHLT<=10'); (default: empty)
-#
-# Please pay attention that only variables defined in VariableManager/PhysicsTriggerVariables{h,cc}
-# could be used in your selection criteria.
-# If you want to use other variables defined by yourself, please define it in PhysicsTriggerVariables.cc firstly.
-# Once user custom is open, the official selection criteria will be closed automaticly.
-#
-#
 # Contributor: Chunhua LI
 #
 ##################################################################################################
@@ -33,22 +19,26 @@ from reconstruction import add_reconstruction
 from modularAnalysis import inputMdstList
 from modularAnalysis import fillParticleList
 from modularAnalysis import analysis_main
-from modularAnalysis import loadReconstructedParticles
 from modularAnalysis import generateY4S
+from HLTTrigger import add_HLT_Y4S
+from beamparameters import add_beamparameters
+from modularAnalysis import generateY4S
+from ROOT import Belle2
 
 logging.log_level = LogLevel.INFO
 emptypath = create_path()
 
-evtmetagen = register_module('EventInfoSetter')
-evtmetagen.param('evtNumList', [10])  # we want to process 10 events
-evtmetagen.param('runList', [1])  # from run number 1
-evtmetagen.param('expList', [1])  # and experiment number 1
-analysis_main.add_module(evtmetagen)
+# set the BeamParameters for running at Y(4S)
+beamparameters = add_beamparameters(analysis_main, "Y4S")
+print_params(beamparameters)
 
-# generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('boost2LAB', True)
-analysis_main.add_module(evtgeninput)
+# generation of 100 events according to the specified DECAY table
+# Y(4S) -> Btag- Bsig+
+# Btag- -> D0 pi-; D0 -> K- pi+
+# Bsig+ -> mu+ nu_mu
+#
+# generateY4S function is defined in analysis/scripts/modularAnalysis.py
+generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
 
 # detecor simulation
 components_sim = [
@@ -103,8 +93,6 @@ components_rec = [  # 'PXD',
 # reconstruction
 add_reconstruction(analysis_main, components_rec)
 
-# load all final state Particles
-loadReconstructedParticles()
 
 # create charged tracks list
 fillParticleList('pi+:HLT', '')
@@ -112,14 +100,8 @@ fillParticleList('pi+:HLT', '')
 # create gamma list
 fillParticleList('gamma:HLT', '')
 
-physicstrigger = register_module('PhysicsTrigger')
-# physicstrigger.param('UserCustomOpen',1);
-# physicstrigger.param('UserCustomCut','2<=nTracksHLT<=10');
-analysis_main.add_module(physicstrigger)
+add_HLT_Y4S(analysis_main)
 
-# uncomment if you want to turn on the physics-trigger
-# emptypath = create_path()
-# physicstrigger.if_false(emptypath)
 
 # outputs
 branches = ['HLTTags', 'L3Tags', 'L3Tracks', 'L3Clusters',

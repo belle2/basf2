@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/HitFactory.h>
+#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-void HitFactory::initializeQuadTreeHitWrappers()
+void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers()
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -48,7 +48,7 @@ void HitFactory::initializeQuadTreeHitWrappers()
 }
 
 
-std::vector<QuadTreeHitWrapper*> HitFactory::createQuadTreeHitWrappersForQT(bool useSegmentsOnly)
+std::vector<QuadTreeHitWrapper*> QuadTreeHitWrapperCreator::createQuadTreeHitWrappersForQT(bool useSegmentsOnly)
 {
   std::vector<QuadTreeHitWrapper*> QuadTreeHitWrappers;
   doForAllHits([&QuadTreeHitWrappers, &useSegmentsOnly](QuadTreeHitWrapper & trackHit) {
@@ -60,32 +60,8 @@ std::vector<QuadTreeHitWrapper*> HitFactory::createQuadTreeHitWrappersForQT(bool
   return QuadTreeHitWrappers;
 }
 
-std::vector<const CDCWireHit*> HitFactory::convertQTHitsToWireHits(std::vector<QuadTreeHitWrapper>& qtHitsToConvert)
-{
-  std::vector<const CDCWireHit*> cdcWireHits;
 
-  for (QuadTreeHitWrapper& hit : qtHitsToConvert) {
-    cdcWireHits.push_back(hit.getCDCWireHit());
-  }
-
-  return cdcWireHits;
-}
-
-std::vector<QuadTreeHitWrapper> HitFactory::convertWireHitsToQTHits(std::vector<const CDCWireHit*>& wireHitsToConvert)
-{
-  std::vector<QuadTreeHitWrapper> qtHits;
-
-  for (QuadTreeHitWrapper& qtHit : m_QuadTreeHitWrappers) {
-    for (const CDCWireHit* wireHit : wireHitsToConvert) {
-      if (qtHit.getCDCWireHit()->getStoreIHit() == wireHit->getStoreIHit()) qtHits.push_back(qtHit);
-    }
-  }
-
-  return qtHits;
-}
-
-
-const CDCRecoHit3D HitFactory::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit)
+const CDCRecoHit3D QuadTreeHitWrapperCreator::createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 
@@ -98,7 +74,7 @@ const CDCRecoHit3D HitFactory::createRecoHit3D(CDCTrajectory2D& trackTrajectory2
 
 }
 
-const CDCRecoHit3D HitFactory::createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
+const CDCRecoHit3D QuadTreeHitWrapperCreator::createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 

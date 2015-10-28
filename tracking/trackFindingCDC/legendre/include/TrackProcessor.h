@@ -10,20 +10,15 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
-#include <tracking/trackFindingCDC/legendre/HitFactory.h>
-#include <tracking/trackFindingCDC/legendre/TrackHolder.h>
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 #include <list>
 #include <vector>
-#include <set>
 
 using namespace std;
 
 namespace Belle2 {
-
-  class CDCHit;
 
   namespace TrackFindingCDC {
 
@@ -33,45 +28,78 @@ namespace Belle2 {
     class TrackProcessor {
     public:
 
-      TrackProcessor(HitFactory& hitFactory, TrackHolder& trackHolder) :
-        m_hitFactory(hitFactory),
-        m_trackHolder(trackHolder),
-        m_trackFitter() { }
+      /// Default constructor does nothing.
+      TrackProcessor() { }
 
-      /**
-       * Do not copy this class
-       */
+      /// Do not copy this class.
       TrackProcessor(const TrackProcessor& copy) = delete;
 
-      /**
-       * Do not copy this class
-       */
+      /// Do not copy this class.
       TrackProcessor& operator=(const TrackProcessor&) = delete;
-
-      void removeBadSLayers(CDCTrack& track);
-
-      /// Create CDCTrack using QuadTreeHitWrapper hits and store it in the list
-      void createCDCTrackCandidates(std::vector<QuadTreeHitWrapper*>& trackHits);
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list
       void createCandidate(std::vector<const CDCWireHit*>& hits);
 
       /// Update trajectory of the CDCTrack
-      void updateTrack(CDCTrack& track);
-
-      /// Check track -- currently based on number of hits only.
-      bool checkTrack(CDCTrack& track);
+      void normalizeTrack(CDCTrack& track);
 
       /// Assign new hits to the track basing on the distance from the hit to the track
       void assignNewHits(CDCTrack& track);
-
-      void assignNewHitsUsingSegments(CDCTrack& track, float fraction = 0.3);
 
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
       void assignNewHits();
 
       /// Check p-value of the track
       void checkTrackProb();
+
+      /// Perform track postprocessing
+      void postprocessTrack(CDCTrack& track);
+
+      /**
+       * Reset all masked hits
+       */
+      void resetMaskedHits()
+      {
+        m_hitFactory.resetMaskedHits(m_cdcTrackList.getCDCTracks());
+      }
+
+      /**
+       * After each event the created hits and trackCandidates should be deleted.
+       */
+      void clearVectors()
+      {
+        m_hitFactory.clear();
+        m_cdcTrackList.clear();
+      }
+
+      QuadTreeHitWrapperCreator& getHitFactory()
+      {
+        return m_hitFactory;
+      }
+
+      std::list<CDCTrack>& getCDCTrackList()
+      {
+        return m_cdcTrackList.getCDCTracks();
+      }
+
+      /// Perform provided function to all tracks
+      void doForAllTracks(std::function<void(CDCTrack& track)> function)
+      {
+        m_cdcTrackList.doForAllTracks(function);
+      }
+
+    private:
+      QuadTreeHitWrapperCreator m_hitFactory; /**< HitFactory object.*/
+      CDCTrackList m_cdcTrackList; /**< a list handling the found CDC tracks as an object.*/
+
+      /// Set MASKED flag of automaton cells to false
+      void unmaskHitsInTrack(CDCTrack& track);
+
+      /**
+       * Postprocessing: Delete axial hits that do not "match" to the given track.
+       */
+      void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
+
 
       /// Check chi2 of the fit (using quantiles of chi2 distribution)
       bool checkChi2(CDCTrack& track);
@@ -82,47 +110,15 @@ namespace Belle2 {
        */
       double calculateChi2ForQuantile(double alpha, double n);
 
+      void assignNewHitsUsingSegments(CDCTrack& track, float fraction = 0.3);
+
+      void removeBadSLayers(CDCTrack& track);
+
+      /// Check track -- currently based on number of hits only.
+      bool checkTrack(CDCTrack& track);
+
       /// Fit CDCTrack object
       CDCTrajectory2D fit(CDCTrack& track);
-
-      /// Set MASKED flag of automaton cells to false
-      void unmaskHitsInTrack(CDCTrack& track);
-
-      /// Perform track postprocessing
-      void postprocessTrack(CDCTrack& track);
-
-      /**
-       * Postprocessing: Delete axial hits that do not "match" to the given track.
-       */
-      void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
-
-      /**
-       * Reset all masked hits
-       */
-      void resetMaskedHits()
-      {
-        m_hitFactory.resetMaskedHits(m_trackHolder.getCDCTracks());
-      }
-
-      /**
-       * After each event the created hits and trackCandidates should be deleted.
-       */
-      void clearVectors()
-      {
-        m_hitFactory.clearVectors();
-        m_trackHolder.clearVectors();
-      }
-
-      static bool isCurler(CDCTrack& track) { return fabs(track.getStartTrajectory3D().getCurvatureXY()) > 0.017; }
-
-      CDCRiemannFitter& getFitter() {return m_trackFitter;};
-
-    private:
-      HitFactory& m_hitFactory; /**< Reference to common HitFactory object.*/
-      TrackHolder& m_trackHolder; /**< Reference to common TrackHolder object.*/
-
-      CDCRiemannFitter m_trackFitter;
-
     };
   }
 }

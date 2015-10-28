@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/legendre/HitFactory.h>
+#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
@@ -35,13 +35,12 @@ namespace Belle2 {
     public:
 
       ///Constructor
-      QuadTreeNodeProcessor(HitFactory& hitFactory, TrackProcessor& trackProcessor, AxialHitQuadTreeProcessor& qtProcessor,
+      QuadTreeNodeProcessor(TrackProcessor& trackProcessor, AxialHitQuadTreeProcessor& qtProcessor,
                             BasePrecisionFunction::PrecisionFunction& precisionFunct) :
-        m_hitFactory(hitFactory), m_trackProcessor(trackProcessor), m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
+        m_trackProcessor(trackProcessor), m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
       {
       };
 
-      ~QuadTreeNodeProcessor() {};
 
       /**
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -136,7 +135,7 @@ namespace Belle2 {
           hit->setUsedFlag(false);
         }
 
-        ConformalExtension conformalExtension(m_hitFactory);
+        ConformalExtension conformalExtension(m_trackProcessor.getHitFactory());
 
         std::vector<const CDCWireHit*> cdcWireHits;
 
@@ -150,8 +149,6 @@ namespace Belle2 {
       }
 
     private:
-
-      HitFactory& m_hitFactory; /**< Reference which holds HitFactory of the module*/
       TrackProcessor& m_trackProcessor; /**< Reference for creating tracks */
       AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor */
 

@@ -11,9 +11,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/legendre/HitFactory.h>
+#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 
 #include <list>
@@ -31,7 +32,7 @@ namespace Belle2 {
 
     public:
 
-      ConformalExtension(HitFactory& hitFactory, double levelPrecision = 9): m_hitFactory(hitFactory),
+      ConformalExtension(QuadTreeHitWrapperCreator& hitFactory, double levelPrecision = 9): m_hitFactory(hitFactory),
         m_levelPrecision(levelPrecision)
       {
       };
@@ -41,9 +42,8 @@ namespace Belle2 {
       /// perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
       std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits, bool doMaskInitialHits = false)
       {
-        CDCTrajectory2D trackTrajectory2D ;
-
-        trackTrajectory2D = TrackFitter::fitWireHitsWhithoutRecoPos(cdcWireHits);
+        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
+        CDCTrajectory2D trackTrajectory2D = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
 
         double chi2 = trackTrajectory2D.getChi2();
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
@@ -72,7 +72,7 @@ namespace Belle2 {
             cdcWireHitsNew.push_back(hit);
           }
 
-          CDCTrajectory2D trackTrajectory2Dtmp = TrackFitter::fitWireHitsWhithoutRecoPos(cdcWireHits);
+          CDCTrajectory2D trackTrajectory2Dtmp = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
 
           double chi2New = trackTrajectory2Dtmp.getChi2();
 
@@ -101,9 +101,8 @@ namespace Belle2 {
           cdcWireHits.push_back(&(hit.getWireHit()));
         }
 
-        CDCTrajectory2D trackTrajectory2D ;
-
-        trackTrajectory2D = TrackFitter::fitWireHitsWhithoutRecoPos(cdcWireHits);
+        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
+        const CDCTrajectory2D& trackTrajectory2D = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
 
         std::nth_element(track.begin(), track.begin() + track.size() / 2, track.end());
 
@@ -136,13 +135,12 @@ namespace Belle2 {
             cdcWireHitsNew.push_back(hit);
           }
 
-          CDCTrajectory2D trackTrajectory2Dtmp = TrackFitter::fitWireHitsWhithoutRecoPos(cdcWireHits);
-
+          const CDCTrajectory2D& trackTrajectory2Dtmp = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
           double chi2New = trackTrajectory2Dtmp.getChi2();
 
           if (chi2New < chi2 * 2.) {
             for (const CDCWireHit* hit : newAssignedHits) {
-              const CDCRecoHit3D& cdcRecoHit3D  = HitFactory::createRecoHit3D(trackTrajectory2D, hit);
+              const CDCRecoHit3D& cdcRecoHit3D  = QuadTreeHitWrapperCreator::createRecoHit3D(trackTrajectory2D, hit);
               track.push_back(std::move(cdcRecoHit3D));
               cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
             }
@@ -203,7 +201,7 @@ namespace Belle2 {
 
     private:
 
-      HitFactory& m_hitFactory;  /**< Object which holds hits */
+      QuadTreeHitWrapperCreator& m_hitFactory;  /**< Object which holds hits */
       double m_levelPrecision;   /**< Function which defines precision of conformal transformation */
       //.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
 

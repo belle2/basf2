@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #pragma once
+#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

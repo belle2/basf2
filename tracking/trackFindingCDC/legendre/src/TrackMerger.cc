@@ -34,11 +34,11 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
   }
   track2.clear();
 
-  m_trackProcessor.updateTrack(track1);
+  m_trackProcessor.normalizeTrack(track1);
 
   std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track1);
 
-  m_trackProcessor.updateTrack(track1);
+  m_trackProcessor.normalizeTrack(track1);
 
   m_trackProcessor.createCandidate(removedHits);
 
@@ -86,7 +86,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
 
     if (prob > m_minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate);
-      m_trackProcessor.updateTrack(*bestCandidate);
+      m_trackProcessor.normalizeTrack(*bestCandidate);
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
     }
   }
@@ -161,7 +161,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCT
   for (CDCTrack& track : trackList) {
 
     resetHits(track);
-    m_trackProcessor.updateTrack(track);
+    m_trackProcessor.normalizeTrack(track);
 
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
 //    cand->reestimateCharge();
@@ -229,16 +229,18 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   // Calculate track parameters
   CDCTrajectory2D commonTrajectory;
 
+  const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
+
   // Approach the best fit
-  commonTrajectory = TrackFitter::fitWireHitsWhithoutRecoPos(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
   removeStrangeHits(5, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = TrackFitter::fitWireHitsWhithoutRecoPos(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
   removeStrangeHits(3, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = TrackFitter::fitWireHitsWhithoutRecoPos(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = TrackFitter::fitWireHitsWhithoutRecoPos(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = TrackFitter::fitWireHitsWhithoutRecoPos(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
 
 //TODO: perform B2B tracks check
 //if B2B return 0;

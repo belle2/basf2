@@ -41,57 +41,37 @@ namespace Belle2 {
     class QuadTreeHitWrapper;
 
     /**
-     * @brief Class which holds and creates hit objects used during track finding procedure
+     * @brief Class which holds and creates hit objects used during track finding procedure.
      *
      * Class takes CDCWireHit objects from DataStore and convert them into QuadTreeHitWrapper objects.
-     * Created QuadTreeHitWrapper objects stored in internal vector.
+     * Created QuadTreeHitWrapper objects stored in internal vector and this class is a wrapper around this vector.
      * Also contains methods to:
      *   - create CDCRecoHit3D objects using QuadTreeHitWrapper or CDCWireHit
      *   - convert vector of QuadTreeHitWrapper to CDCWireHit and vice versa
      *   - prepare vector of QuadTreeHitWrapper for quadtree
      */
-    class HitFactory {
+    class QuadTreeHitWrapperCreator {
     public:
 
-      /**
-       * Constructor
-       */
-      HitFactory() : m_QuadTreeHitWrappers()  { } ;
+      /// Empty constructor does nothing.
+      QuadTreeHitWrapperCreator() { } ;
 
-      /**
-       * Do not copy this class
-       */
-      HitFactory(const HitFactory& copy) = delete;
+      /// Do not copy this class.
+      QuadTreeHitWrapperCreator(const QuadTreeHitWrapperCreator& copy) = delete;
 
-      /**
-       * Do not copy this class
-       */
-      HitFactory& operator=(const HitFactory&) = delete;
+      /// Do not copy this class.
+      QuadTreeHitWrapperCreator& operator=(const QuadTreeHitWrapperCreator&) = delete;
 
-      /**
-       * Compile the hitList from the wire hit topology.
-       */
+      /// Compile the hitList from the wire hit topology.
       void initializeQuadTreeHitWrappers();
 
-      /**
-       * Convert vector of QuadTreeHitWrapper hits into vector of CDCWireHit
-       */
-      std::vector<const CDCWireHit*> convertQTHitsToWireHits(std::vector<QuadTreeHitWrapper>& qtHitsToConvert);
+      /// Create CDCRecoHit3D.
+      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
 
-      /**
-       * Convert vector of CDCWireHit hits into vector of QuadTreeHitWrapper
-       */
-      std::vector<QuadTreeHitWrapper> convertWireHitsToQTHits(std::vector<const CDCWireHit*>& wireHitsToConvert);
+      /// Create CDCRecoHit3D.
+      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
-      /** Create CDCRecoHit3D */
-      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
-
-      /** Create CDCRecoHit3D */
-      static const CDCRecoHit3D createRecoHit3D(CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
-
-      /**
-       * Get the list with currently stored tracks.
-       */
+      /// Get the list with currently stored tracks.
       std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
       {
         return m_QuadTreeHitWrappers;
@@ -104,9 +84,7 @@ namespace Belle2 {
        */
       std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
 
-      /**
-       * Reset all masked hits
-       */
+      /// Reset all masked hits.
       void resetMaskedHits(std::list<CDCTrack>& cdcTracks)
       {
         doForAllHits([](QuadTreeHitWrapper & hit) {
@@ -114,24 +92,20 @@ namespace Belle2 {
           hit.setUsedFlag(false);
         });
 
-        for (std::list<CDCTrack>::iterator it = cdcTracks.begin(); it !=  cdcTracks.end(); ++it) {
-          for (const CDCRecoHit3D& hit : *it) {
+        for (CDCTrack& cdcTrack : cdcTracks) {
+          for (const CDCRecoHit3D& hit : cdcTrack) {
             hit.getWireHit().getAutomatonCell().setTakenFlag(true);
           }
         }
       }
 
-      /**
-       * After each event the created hits and trackCandidates should be deleted.
-       */
-      void clearVectors()
+      /// After each event the created hits and trackCandidates should be deleted.
+      void clear()
       {
         m_QuadTreeHitWrappers.clear();
       }
 
-      /**
-       * Do a certain function for each track in the track list
-       */
+      /// Do a certain function for each track in the track list.
       void doForAllHits(std::function<void(QuadTreeHitWrapper& hit)> function)
       {
         for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
@@ -140,9 +114,7 @@ namespace Belle2 {
       }
 
     private:
-      std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits */
-
-
+      std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits. */
     };
   }
 }

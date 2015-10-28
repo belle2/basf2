@@ -90,8 +90,6 @@ namespace Belle2 {
 
       };
 
-      ~TrackQuality() {};
-
       int startingSLayer()
       {
         std::vector<double>::iterator startSlIt;

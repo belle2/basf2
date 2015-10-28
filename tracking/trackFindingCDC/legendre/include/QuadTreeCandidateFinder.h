@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/legendre/HitFactory.h>
+#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
 #include <tracking/trackFindingCDC/legendre/QuadTreeNodeProcessor.h>

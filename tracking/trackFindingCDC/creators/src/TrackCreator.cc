@@ -171,7 +171,6 @@ void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
 }
 
 
-
 void TrackCreator::appendStartRecoHits3D(const CDCSegmentTriple& triple,
                                          double perpSOffset,
                                          CDCTrack& recohits3D) const

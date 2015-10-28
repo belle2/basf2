@@ -17,7 +17,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCTrack;
-    class CDCRecoHit3D;
     class CDCWireHit;
     class CDCTrajectory2D;
     class TrackProcessor;
@@ -25,12 +24,8 @@ namespace Belle2 {
     class TrackMerger {
     public:
 
-      /**
-       * This class is to be used static only.
-       */
+      /// Constructor with a reference to the track processor.
       TrackMerger(TrackProcessor& trackProcessor): m_trackProcessor(trackProcessor) {};
-
-      ~TrackMerger() {};
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
       void doTracksMerging(std::list<CDCTrack>& trackList);
@@ -38,12 +33,7 @@ namespace Belle2 {
       /** Try to merge given track with tracks in tracklist. */
       void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList);
 
-      /** Tries to split back-to-back tracks into two different tracks */
-//      CDCTrack& splitBack2BackTrack(CDCTrack& track);
-
     private:
-
-
       /** Some typedefs for the results of the merging process */
       typedef unsigned int TrackCandidateIndex;
       typedef std::pair<TrackCandidateIndex, CDCTrack*> TrackCandidateWithIndex;

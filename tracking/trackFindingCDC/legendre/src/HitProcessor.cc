@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
 
-
-#include <tracking/trackFindingCDC/legendre/TrackFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 

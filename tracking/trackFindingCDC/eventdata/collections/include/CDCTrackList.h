@@ -7,13 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <list>
-#include <vector>
 
 using namespace std;
 
@@ -22,63 +19,42 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     * Object which holds list of created CDCTracks
+     * Object which holds the list of created CDCTracks.
+     * It is more or less only a wrapper to a std::list with some additional functions for convenience.
      */
-    class TrackHolder {
+    class CDCTrackList {
     public:
+      /// Empty constructor does nothing.
+      CDCTrackList() { };
 
-      /// Constructor
-      TrackHolder() : m_cdcTracks() { };
+      /// Do not copy this class.
+      CDCTrackList(const CDCTrackList& copy) = delete;
 
-      /**
-       * Do not copy this class
-       */
-      TrackHolder(const TrackHolder& copy) = delete;
+      /// Do not copy this class.
+      CDCTrackList& operator=(const CDCTrackList&) = delete;
 
-      /**
-       * Do not copy this class
-       */
-      TrackHolder& operator=(const TrackHolder&) = delete;
-
-      /// Create empty CDCTrack object at the end of the list
+      /// Create empty CDCTrack object at the end of the list.
       CDCTrack& createEmptyTrack()
       {
         m_cdcTracks.emplace_back();
         return m_cdcTracks.back();
       };
 
-      /// Delete track from the list.
-      void deleteTrack(CDCTrack& track)
-      {
-        m_cdcTracks.remove(track);
-      }
-
-      /// Perform provided function to all tracks
+      /// Perform the provided function to all tracks.
       void doForAllTracks(std::function<void(CDCTrack& track)> function)
       {
-        for (std::list<CDCTrack>::iterator it = m_cdcTracks.begin(); it !=  m_cdcTracks.end(); ++it) {
-          function(*it);
+        for (CDCTrack& cdcTrack : m_cdcTracks) {
+          function(cdcTrack);
         }
       }
 
-      /// Reset all masked hits
-      void resetMaskedHits()
-      {
-        doForAllTracks([](CDCTrack & track) {
-          for (CDCRecoHit3D& hit : track) {
-            hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-            hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-          }
-        });
-      }
-
-      /// Clear list of track at the end of event
-      void clearVectors()
+      /// Clear the list of tracks at the end of the event.
+      void clear()
       {
         m_cdcTracks.clear();
       }
 
-      /// Get list of CDCTracks
+      /// Get the list of CDCTracks.
       std::list<CDCTrack>& getCDCTracks()
       {
         return m_cdcTracks;
@@ -86,7 +62,6 @@ namespace Belle2 {
 
     private:
       std::list<CDCTrack> m_cdcTracks; /**< List containing CDCTrack objects. */
-
     };
   }
 }

@@ -122,10 +122,36 @@ def add_track_finding(path, components=None):
 
     # track merging
     if use_vxd and use_cdc:
-        track_merger = register_module('MCTrackCandCombiner')
-        track_merger.param('CDCTrackCandidatesColName', cdc_trackcands)
-        track_merger.param('VXDTrackCandidatesColName', vxd_trackcands)
-        path.add_module(track_merger)
+        vxd_tracklets = 'VXDGFTracks'
+        cdc_tracklets = 'CDCGFTracks'
+    # track fitting
+        VXDtrackFitter = register_module('GenFitter')
+        VXDtrackFitter.param('GFTrackCandidatesColName', vxd_trackcands)
+        VXDtrackFitter.param('BuildBelle2Tracks', False)
+        VXDtrackFitter.param("PDGCodes", [211])
+        VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
+
+        CDCtrackFitter = register_module('GenFitter')
+        CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
+        CDCtrackFitter.param('BuildBelle2Tracks', False)
+        CDCtrackFitter.param("PDGCodes", [211])
+        CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
+
+        vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
+        vxd_cdcTracksMerger_param = {
+            'VXDGFTrackCandsColName': vxd_trackcands,
+            'VXDGFTracksColName': vxd_tracklets,
+            'CDCGFTrackCandsColName': cdc_trackcands,
+            'CDCGFTracksColName': cdc_tracklets,
+            'relMatchedTracks': 'MatchedTracksIdx',
+            'chi2_max': 100,
+            'recover': 1
+        }
+        vxd_cdcTracksMerger.param(vxd_cdcTracksMerger_param)
+
+        path.add_module(VXDtrackFitter)
+        path.add_module(CDCtrackFitter)
+        path.add_module(vxd_cdcTracksMerger)
 
 
 def add_mc_track_finding(path, components=None):

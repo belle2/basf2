@@ -8,6 +8,7 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import fillParticleList
 from modularAnalysis import analysis_main
 from modularAnalysis import generateY4S
+from HLTTrigger import add_HLT_Y4S
 
 set_random_seed(12345)
 
@@ -33,8 +34,9 @@ fillParticleList('pi+:HLT', '', path=main)
 # create gamma list
 fillParticleList('gamma:HLT', '', path=main)
 
-physicstrigger = register_module('PhysicsTrigger')
-main.add_module(physicstrigger)
+add_HLT_Y4S(main)
+# physicstrigger = register_module('PhysicsTrigger')
+# main.add_module(physicstrigger)
 
 # output
 # store only the HLTTags, all other information will be discarded

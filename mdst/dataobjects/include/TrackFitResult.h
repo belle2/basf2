@@ -262,8 +262,9 @@ namespace Belle2 {
      */
     const uint32_t m_hitPatternVXDInitializer;
 
-    ClassDef(TrackFitResult, 6); /**< Values of the result of a track fit with a given particle hypothesis. */
+    ClassDef(TrackFitResult, 7); /**< Values of the result of a track fit with a given particle hypothesis. */
     /* Version history:
+       ver 7: fixed sign errors in the translation of position and momentum covariances.
        ver 6: use fixed size arrays instead of vectors (add schema evolution rule), use Double32_t.
        ver 5: CDC Hit Pattern now a single variable (add schema evolution rule).
        ver 4: added hit pattern

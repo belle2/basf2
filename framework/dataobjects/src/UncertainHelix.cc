@@ -72,7 +72,7 @@ UncertainHelix::UncertainHelix(const TVector3& position,
 
   m_covariance.Similarity(jacobianRot);
 
-  // 2. Translate to perigee parameters
+  // 2. Translate to perigee parameters on the position
   const double pz = momentum.Z();
   const double invPt = 1 / pt;
   const double invPtSquared = invPt * invPt;
@@ -81,12 +81,13 @@ UncertainHelix::UncertainHelix(const TVector3& position,
   TMatrixD jacobianToHelixParameters(5, 6);
   jacobianToHelixParameters.Zero();
 
-  jacobianToHelixParameters(iD0, iY) = charge;
+  jacobianToHelixParameters(iD0, iY) = -1;
   jacobianToHelixParameters(iPhi0, iX) = charge * invPt / alpha;
   jacobianToHelixParameters(iPhi0, iPy) = invPt;
-  jacobianToHelixParameters(iOmega, iPx) = charge * invPtSquared / alpha;
+  jacobianToHelixParameters(iOmega, iPx) = -charge * invPtSquared / alpha;
   jacobianToHelixParameters(iTanLambda, iPx) = - pz * invPtSquared;
   jacobianToHelixParameters(iTanLambda, iPz) = invPt;
+  jacobianToHelixParameters(iZ0, iX) = - pz * invPt;
   jacobianToHelixParameters(iZ0, iZ) = 1;
   m_covariance.Similarity(jacobianToHelixParameters);
 
@@ -154,14 +155,14 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
   const double invSignedAlphaOmega2 = 1.0 / signedAlphaOmega2;
 
   // Position after the move.
-  jacobianInflate(iX, iPhi0) = 0.0; //charge * d0 == 0 after moving
-  jacobianInflate(iY, iD0) = boost::math::sign(omega);
+  jacobianInflate(iX, iPhi0) = 0.0; // d0 == 0 after moving
+  jacobianInflate(iY, iD0) = -1.0;
   jacobianInflate(iZ, iZ0) = 1.0;
 
   // Momentum
-  jacobianInflate(iPx, iOmega) = invSignedAlphaOmega2;
+  jacobianInflate(iPx, iOmega) = -invSignedAlphaOmega2;
   jacobianInflate(iPy, iPhi0) = invAbsAlphaOmega;
-  jacobianInflate(iPz, iOmega) = tanLambda * invSignedAlphaOmega2;
+  jacobianInflate(iPz, iOmega) = -tanLambda * invSignedAlphaOmega2;
   jacobianInflate(iPz, iTanLambda) = invAbsAlphaOmega;
   cov6.Similarity(jacobianInflate);
 

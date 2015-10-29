@@ -82,5 +82,78 @@
                m_cov5[i] = onfile.m_cov5[i]; \
           }"
 
-
+#pragma read sourceClass="Belle2::TrackFitResult" version="[6]"   \
+  source="Double32_t m_cov5[15]; Double32_t m_tau[5];"      \
+  targetClass="Belle2::TrackFitResult"          \
+  target="m_cov5"                 \
+  code="{							      \
+  /* Translate the false covariance matrix back to the 6x6 matrix */  \
+  TMatrixDSym oldCov5(5);					      \
+  {								      \
+    unsigned int counter = 0;					      \
+    for (unsigned int i = 0; i < 5; ++i) {			      \
+      for (unsigned int j = i; j < 5; ++j) {			      \
+        oldCov5(i, j) = oldCov5(j, i) = onfile.m_cov5[counter];	      \
+        ++counter;							      \
+        }                 \
+      }                 \
+    }                 \
+                  \
+  const double bZ = 1.5;            \
+  const int iX = 0;             \
+  const int iY = 1;             \
+  const int iZ = 2;             \
+  const int iPx = 3;              \
+  const int iPy = 4;              \
+  const int iPz = 5;              \
+				  \
+  const int iD0 = 0;             \
+  const int iPhi0 = 1;             \
+  const int iOmega = 2;             \
+  const int iZ0 = 3;              \
+  const int iTanLambda = 4;              \
+                  \
+  /* Transform covariance matrix */         \
+  TMatrixD jacobianInflate(6, 5);         \
+  jacobianInflate.Zero();           \
+                  \
+  const double d0 = onfile.m_tau[0];            \
+  const double omega = onfile.m_tau[2];         \
+  const double tanLambda = onfile.m_tau[4];         \
+  const Belle2::Helix helix(d0,0, omega, 0, tanLambda);	    \
+  const TVector3 position = helix.getPerigee();	\
+  const TVector3 momentum = helix.getMomentum();          \
+  const int charge = helix.getChargeSign();		      \
+  							\
+  const double alpha =  1.0 / (bZ * TMath::C()) * 1E11;     \
+  const double absAlphaOmega = alpha * std::fabs(omega);    \
+  const double signedAlphaOmega2 =  absAlphaOmega * omega;    \
+                  \
+  const double invAbsAlphaOmega = 1.0 / absAlphaOmega;      \
+  const double invSignedAlphaOmega2 = 1.0 / signedAlphaOmega2;    \
+								  \
+  /* Undo the false translation back to the position and momentum uncertainties*/ \
+  jacobianInflate(iX, iPhi0) = d0;       \
+  jacobianInflate(iY, iD0) = charge;      \
+  jacobianInflate(iZ, iZ0) = 1.0;         \
+  jacobianInflate(iPx, iOmega) = invSignedAlphaOmega2;      \
+  jacobianInflate(iPy, iPhi0) = invAbsAlphaOmega;     \
+  jacobianInflate(iPz, iOmega) = tanLambda * invSignedAlphaOmega2;	\
+  jacobianInflate(iPz, iTanLambda) = invAbsAlphaOmega;			\
+									\
+  TMatrixDSym cov6 = oldCov5; /* copy */				\
+  cov6.Similarity(jacobianInflate);					\
+									\
+  const Belle2::UncertainHelix uncertainHelix(position, momentum, charge, bZ, cov6, 0.0); \
+									\
+  /* Upper half of the covariance matrix goes into m_cov5. */		\
+  const TMatrixDSym& newCov5 = uncertainHelix.getCovariance();     \
+  memset(m_cov5, 0, 15*sizeof(Double32_t));       \
+  unsigned int counter = 0;           \
+  for (unsigned int i = 0; i < 5; ++i) {        \
+    for (unsigned int j = i; j < 5; ++j) {      \
+      m_cov5[counter++] = newCov5(i, j);        \
+    }                 \
+  }                 \
+  }"
 #endif

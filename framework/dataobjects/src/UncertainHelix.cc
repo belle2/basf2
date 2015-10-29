@@ -144,7 +144,6 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
 
   const double invAbsAlphaOmega = 1.0 / absAlphaOmega;
   const double invSignedAlphaOmega2 = 1.0 / signedAlphaOmega2;
-  const int charge = boost::math::sign(omega);
 
   // Position after the move.
   jacobianInflate(iX, iPhi0) = d0;

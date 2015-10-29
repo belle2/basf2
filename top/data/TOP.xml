@@ -12,6 +12,7 @@
     <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="TOP-SupportAlignment.xml"/>
     <xi:include href="FrontEndMapping.xml"/>
+    <xi:include href="ChannelMappingIRSX.xml"/>
     
     <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 

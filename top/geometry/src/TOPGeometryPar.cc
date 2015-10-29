@@ -48,8 +48,13 @@ namespace Belle2 {
     void TOPGeometryPar::Initialize(const GearDir& content)
     {
       read(content);
+
       GearDir frontEndMapping(content, "FrontEndMapping");
-      m_mapper.initialize(frontEndMapping);
+      m_frontEndMapper.initialize(frontEndMapping);
+
+      GearDir channelMapping(content, "ChannelMapping");
+      m_channelMapper.initialize(channelMapping);
+
       m_initialized = true;
     }
 

@@ -26,6 +26,7 @@
 
 #include <top/geometry/TOPQbar.h>
 #include <top/geometry/FrontEndMapper.h>
+#include <top/geometry/ChannelMapper.h>
 
 
 #define MAXPTS_TTS 10
@@ -289,10 +290,16 @@ namespace Belle2 {
       double getPMToffsetY() const {return m_pmtOffsetY / m_unit;}
 
       /**
-       * Get channel mapper
-       * @return channel mapper object
+       * Get front-end mapper (mapping of SCROD's to positions within TOP modules)
+       * @return  front-end mapper object
        */
-      const FrontEndMapper& getFrontEndMapper() const {return m_mapper;}
+      const FrontEndMapper& getFrontEndMapper() const {return m_frontEndMapper;}
+
+      /**
+       * Get channel mapper (mapping of channels to pixels)
+       * @return  channel mapper object
+       */
+      const ChannelMapper& getChannelMapper() const {return m_channelMapper;}
 
       /**
        * Return number of TDC bits
@@ -480,6 +487,9 @@ namespace Belle2 {
       int getChannelID(double x, double y, int pmtID) const;
 
 
+
+      //--deprecated - but not replaced yet at calling places ---------------->
+
       /**
        * Calculate channel ID from bar column and ASIC row, column and channel
        * @param electronicsModule column within a TOP module
@@ -574,6 +584,8 @@ namespace Belle2 {
         return ColRowChannel + column * 128;
       }
 
+      //<--end deprecated---------------------------------------------------
+
       /**
        * Convert new numbering scheme to the old one
        * @param channelID channel ID in the new numbering scheme
@@ -666,7 +678,8 @@ namespace Belle2 {
 
       //! mapping
 
-      FrontEndMapper m_mapper; /**< front end electronics mapper */
+      FrontEndMapper m_frontEndMapper; /**< front end electronics mapper */
+      ChannelMapper m_channelMapper; /**< channel-pixel mapper */
 
       //! TDC parameters
 

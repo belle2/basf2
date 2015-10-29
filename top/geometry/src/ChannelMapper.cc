@@ -1,0 +1,289 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Staric                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include <top/geometry/ChannelMapper.h>
+#include <unordered_set>
+#include <framework/logging/LogSystem.h>
+
+using namespace std;
+
+namespace Belle2 {
+  namespace TOP {
+
+    ChannelMapper::ChannelMapper()
+    {
+
+      for (auto& channels : m_channels) {
+        for (auto& channel : channels) channel = 0;
+      }
+
+      for (auto& pixels : m_pixels) {
+        for (auto& pixel : pixels) pixel = 0;
+      }
+
+      if (c_numRows * c_numColumns != c_numAsics * c_numChannels)
+        B2FATAL("TOP::ChannelMapper: bug in coding (enum) - "
+                "number of channels and number of pixels disagree");
+    }
+
+
+    ChannelMapper::~ChannelMapper()
+    {
+    }
+
+    void ChannelMapper::initialize(const GearDir& channelMapping)
+    {
+
+      // get parameters from Gearbox
+      string type = channelMapping.getString("type");
+      for (const GearDir& map : channelMapping.getNodes("map")) {
+        std::vector<double> data = map.getArray("");
+        unsigned row = int(data[0]);
+        unsigned col = int(data[1]);
+        unsigned asic = int(data[2]);
+        unsigned chan = int(data[3]);
+        m_mapping.push_back(TOPChannelMap(row, col, asic, chan));
+      }
+
+      // check the size of the mapping
+      if (m_mapping.size() != c_numAsics * c_numChannels)
+        B2FATAL("TOP::ChannelMapper: got incorrect map size from xml file for '"
+                << type << "' - expect " <<  c_numAsics * c_numChannels
+                << ", got " << m_mapping.size());
+
+      // check the mapping for consistency
+      bool ok = true;
+      unordered_set<unsigned> pixels;
+      unordered_set<unsigned> channels;
+      for (unsigned ii = 0; ii < m_mapping.size(); ii++) {
+        const auto& map = m_mapping[ii];
+        unsigned row = map.getRow();
+        unsigned col = map.getColumn();
+        unsigned asic = map.getASICNumber();
+        unsigned chan = map.getASICChannel();
+        if (row >= c_numRows) {
+          B2ERROR("TOP::ChannelMapper: pixel row out of range, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+        if (col >= c_numColumns) {
+          B2ERROR("TOP::ChannelMapper: pixel column out of range, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+        if (asic >= c_numAsics) {
+          B2ERROR("TOP::ChannelMapper: asic number out of range, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+        if (chan >= c_numChannels) {
+          B2ERROR("TOP::ChannelMapper: asic channel number out of range, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+        if (!pixels.insert(col + row * c_numColumns).second) {
+          B2ERROR("TOP::ChannelMapper: pixel already mapped, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+        if (!channels.insert(chan + asic * c_numChannels).second) {
+          B2ERROR("TOP::ChannelMapper: channel already mapped, node=" << ii
+                  << ": " << row << " " << col << " " << asic << " " << chan);
+          ok = false;
+        }
+      }
+      if (!ok) {
+        B2FATAL("TOP::ChannelMapper: errors detected in xml file for '" << type << "'");
+        return;
+      }
+
+      // prepare conversion arrays
+      for (const auto& map : m_mapping) {
+        m_channels[map.getRow()][map.getColumn()] = &map;
+        m_pixels[map.getASICNumber()][map.getASICChannel()] = &map;
+      }
+
+      B2INFO("TOP::ChannelMapper: " << m_mapping.size() <<
+             " channels of carrier board of type '" << type << "' mapped to pixels.");
+
+      // print mappings if debug level for package 'top' is set to 100 or larger
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
+        print(type);
+      }
+
+    }
+
+
+    unsigned ChannelMapper::getChannelID(int pixel) const
+    {
+      if (!isPixelIDValid(pixel)) return c_invalidChannelID;
+
+      unsigned pix = pixel - 1;
+      unsigned pixRow = pix / c_numPixelColumns;
+      unsigned pixCol = pix % c_numPixelColumns;
+
+      unsigned carrier = pixRow / c_numRows;
+      unsigned row = pixRow % c_numRows;
+      unsigned boardstack = pixCol / c_numColumns;
+      unsigned col =  pixCol % c_numColumns;
+
+      const auto& map = m_channels[row][col];
+      if (!map) {
+        B2ERROR("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
+        return c_invalidChannelID;
+      }
+      unsigned chan = map->getASICChannel();
+      unsigned asic = map->getASICNumber();
+      return chan + c_numChannels * (asic + c_numAsics *
+                                     (carrier + c_numCarrierBoards * boardstack));
+
+    }
+
+
+    void ChannelMapper::splitChannelID(unsigned channel,
+                                       unsigned& boardstack,
+                                       unsigned& carrier,
+                                       unsigned& asic,
+                                       unsigned& chan) const
+    {
+      chan = channel % c_numChannels;
+      channel /= c_numChannels;
+      asic = channel % c_numAsics;
+      channel /= c_numAsics;
+      carrier = channel % c_numCarrierBoards;
+      boardstack = channel / c_numCarrierBoards;
+    }
+
+
+    int ChannelMapper::getPixelID(unsigned channel) const
+    {
+
+      if (!isChannelIDValid(channel)) return c_invalidPixelID;
+
+      unsigned boardstack = 0;
+      unsigned carrier = 0;
+      unsigned asic = 0;
+      unsigned chan = 0;
+      splitChannelID(channel, boardstack, carrier, asic, chan);
+
+      const auto& map = m_pixels[asic][chan];
+      if (!map) {
+        B2ERROR("TOP::ChannelMapper: no pixel mapped to channel " << channel);
+        return c_invalidPixelID;
+      }
+      unsigned row = map->getRow();
+      unsigned col = map->getColumn();
+      unsigned pixRow = row + carrier * c_numRows;
+      unsigned pixCol = col + boardstack * c_numColumns;
+
+      return pixCol + pixRow * c_numPixelColumns + 1;
+
+    }
+
+
+    void ChannelMapper::print(std::string type) const
+    {
+      unsigned boardstack = 0;
+      unsigned carrier = 0;
+      unsigned asic = 0;
+      unsigned chan = 0;
+
+      std::string xaxis("+------phi--------->");
+      std::string yaxis("|ohr|||^");
+
+      cout << endl;
+      cout << "           Mapping of TOP electronic channels to pixels";
+      if (!type.empty()) cout << " for " << type;
+      cout << endl << endl;
+      cout << " Boardstack numbers (view from the back):" << endl << endl;
+      for (int row = c_numPixelRows - 1; row >= 0; row--) {
+        cout << "  " << yaxis[row] << " ";
+        for (int col = 0; col < c_numPixelColumns; col++) {
+          int pixel = col + c_numPixelColumns * row + 1;
+          auto channel = getChannelID(pixel);
+          if (channel != c_invalidChannelID) {
+            splitChannelID(channel, boardstack, carrier, asic, chan);
+            cout << boardstack;
+          } else {
+            cout << "?";
+          }
+        }
+        cout << endl;
+      }
+      cout << "  " << xaxis << endl << endl;
+
+      cout << " Carrier board numbers (view from the back):" << endl << endl;
+      for (int row = c_numPixelRows - 1; row >= 0; row--) {
+        cout << "  " << yaxis[row] << " ";
+        for (int col = 0; col < c_numPixelColumns; col++) {
+          int pixel = col + c_numPixelColumns * row + 1;
+          auto channel = getChannelID(pixel);
+          if (channel != c_invalidChannelID) {
+            splitChannelID(channel, boardstack, carrier, asic, chan);
+            cout << carrier;
+          } else {
+            cout << "?";
+          }
+        }
+        cout << endl;
+      }
+      cout << "  " << xaxis << endl << endl;
+
+      cout << " ASIC numbers (view from the back):" << endl << endl;
+      for (int row = c_numPixelRows - 1; row >= 0; row--) {
+        cout << "  " << yaxis[row] << " ";
+        for (int col = 0; col < c_numPixelColumns; col++) {
+          int pixel = col + c_numPixelColumns * row + 1;
+          auto channel = getChannelID(pixel);
+          if (channel != c_invalidChannelID) {
+            splitChannelID(channel, boardstack, carrier, asic, chan);
+            cout << asic;
+          } else {
+            cout << "?";
+          }
+        }
+        cout << endl;
+      }
+      cout << "  " << xaxis << endl << endl;
+
+      cout << " ASIC channel numbers (view from the back):" << endl << endl;
+      for (int row = c_numPixelRows - 1; row >= 0; row--) {
+        cout << "  " << yaxis[row] << " ";
+        for (int col = 0; col < c_numPixelColumns; col++) {
+          int pixel = col + c_numPixelColumns * row + 1;
+          auto channel = getChannelID(pixel);
+          if (channel != c_invalidChannelID) {
+            splitChannelID(channel, boardstack, carrier, asic, chan);
+            cout << chan;
+          } else {
+            cout << "?";
+          }
+        }
+        cout << endl;
+      }
+      cout << "  " << xaxis << endl << endl;
+
+    }
+
+    void ChannelMapper::test() const
+    {
+      for (int pixel = 1; pixel <= c_numPixels; pixel++)
+        if (pixel != getPixelID(getChannelID(pixel)))
+          B2ERROR("TOP::ChannelMapper: bug, getPixelID is not inverse of getChannelID");
+
+      for (unsigned channel = 0; channel < c_numPixels; channel++)
+        if (channel != getChannelID(getPixelID(channel)))
+          B2ERROR("TOP::ChannelMapper: bug, getChannelID is not inverse of getPixelID");
+    }
+
+
+  } // TOP namespace
+} // Belle2 namespace

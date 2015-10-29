@@ -8,5 +8,6 @@
 #pragma link C++ class Belle2::TOPASICPedestals+;
 #pragma link C++ class Belle2::TOPASICGains+;
 #pragma link C++ class Belle2::TOPASICChannel+;
+#pragma link C++ class Belle2::TOPChannelMap+;
 
 #endif

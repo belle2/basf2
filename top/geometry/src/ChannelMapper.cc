@@ -42,7 +42,7 @@ namespace Belle2 {
     {
 
       // get parameters from Gearbox
-      string type = channelMapping.getString("type");
+      string type = channelMapping.getString("type", "");
       for (const GearDir& map : channelMapping.getNodes("map")) {
         std::vector<double> data = map.getArray("");
         unsigned row = int(data[0]);
@@ -51,6 +51,7 @@ namespace Belle2 {
         unsigned chan = int(data[3]);
         m_mapping.push_back(TOPChannelMap(row, col, asic, chan));
       }
+      if (m_mapping.empty()) return; // temporary fix!!!!
 
       // check the size of the mapping
       if (m_mapping.size() != c_numAsics * c_numChannels)

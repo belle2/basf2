@@ -69,9 +69,6 @@ namespace Belle2 {
     /**Access users' cut*/
     std::unique_ptr<Variable::Cut> m_cut;
 
-    /**summarize the trigger results*/
-    int m_summary;
-
     /**the trigger categories*/
     int m_trgcategory;
 

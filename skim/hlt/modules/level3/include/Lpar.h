@@ -268,7 +268,7 @@ namespace Belle2 {
       s = std::fabs(rho) * phi;
       if (0.0 == phi)return 0;
       d *= r / (std::fabs(rc) * std::sin(phi));
-      if (abs(d) > abs(limit)) return 0;
+      if (std::fabs(d) > std::fabs(limit)) return 0;
       d_cross_limit = d * limit;
       if (d_cross_limit > limit * limit) return 0;
       return 1;

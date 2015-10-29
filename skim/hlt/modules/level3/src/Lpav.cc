@@ -21,7 +21,7 @@ using namespace L3;
 //
 // constants, enums and typedefs
 //
-
+/*
 static double err_dis_inv(double x, double y, double w, double a, double b)
 {
   if (a == 0 && b == 0) {
@@ -33,7 +33,7 @@ static double err_dis_inv(double x, double y, double w, double a, double b)
     return w * rsq / f;
   }
 }
-
+*/
 //
 // constructors and destructor
 //
@@ -435,12 +435,13 @@ double Lpav::similarity(double x, double y) const
   double l = cov().Similarity(v);
   return (l > 0) ? l : -1.;
 }
-*/
+
 void Lpav::add(double xi, double yi, double w, double a, double b)
 {
   const double wi = err_dis_inv(xi, yi, w, a, b);
-  add(xi, yi, wi);
+  add_point(xi, yi, wi);
 }
+*/
 
 void Lpav::add_point(double xi, double yi, double wi)
 {
@@ -474,7 +475,7 @@ void Lpav::add_point_frac(double xi, double yi, double w, double a)
   m_rrrrsum += wrri * rri;
   m_nc += a;
 }
-*/
+
 void Lpav::sub(double xi, double yi, double w, double a, double b)
 {
   const double wi = err_dis_inv(xi, yi, w, a, b);
@@ -491,6 +492,7 @@ void Lpav::sub(double xi, double yi, double w, double a, double b)
   m_rrrrsum -= wrri * rri;
   m_nc -= 1;
 }
+*/
 
 Lpav& Lpav::operator+=(const Lpav& la1)
 {

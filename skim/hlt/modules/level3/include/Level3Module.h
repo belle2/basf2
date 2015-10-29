@@ -20,6 +20,8 @@ namespace Belle2 {
 
   class FTFinder;
   class FCFinder;
+
+  /* The Level-3 software trigger */
   class Level3Module : public L3TriggerManager, public Module {
 
   public:

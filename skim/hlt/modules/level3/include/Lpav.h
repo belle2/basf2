@@ -76,10 +76,14 @@ namespace Belle2 {
       //! comparison operator
       bool operator!=(const Lpav&) const;
 
+      /*
+      // unused functions
       //! add point
       void add(double x, double y, double w = 1, double a = 0, double b = 0);
       //! subtract point
       void sub(double x, double y, double w = 1, double a = 0, double b = 0);
+      */
+
       //! calculate average
       void calculate_average(void);
       //! calculate average
@@ -252,8 +256,7 @@ namespace Belle2 {
     void
     Lpav::clear()
     {
-      m_wsum = m_xsum = m_ysum = m_xxsum = m_yysum = m_xysum
-                                                     = m_xrrsum = m_yrrsum = m_rrrrsum = m_rscale = m_nc = 0;
+      m_wsum = m_xsum = m_ysum = m_xxsum = m_yysum = m_xysum = m_xrrsum = m_yrrsum = m_rrrrsum = m_rscale = m_nc = 0;
       m_chisq = -1;
     }
   }

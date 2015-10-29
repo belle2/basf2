@@ -95,7 +95,7 @@ UncertainHelix::UncertainHelix(const TVector3& position,
   assert(m_covariance.GetNrows() == 5);
 
   // 3. Extrapolate to the origin.
-  /*const double arcLength2D = */ passiveMoveBy(-position.X(), -position.Y(), 0.0);
+  /* const double arcLength2D = */ passiveMoveBy(-position.X(), -position.Y(), 0.0);
 }
 
 
@@ -127,35 +127,27 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
   const int iPz = 5;
 
   // Transform covariance matrix
-  TMatrixDSym cov6 = m_covariance; //copy
-
-  // 1. Move the reference point to the perigee
-  // In this way we are making sure that all covariance entries related to component parallel to phi are zero.
-  TMatrixD jacobianPassiveMove(5, 5);
-  calcPassiveMoveByJacobian(getPerigeeX(), getPerigeeY(), jacobianPassiveMove);
-  cov6.Similarity(jacobianPassiveMove);
-
   TMatrixD jacobianInflate(6, 5);
   jacobianInflate.Zero();
 
-  // 2. Inflate the perigee covariance to a cartesian covariance where phi0 == 0 and d0 == 0 is assumed
-  // d0 == 0 because we moved the reference point into the perigee point first.
+  // 1. Inflate the perigee covariance to a cartesian covariance where phi0 == 0 is assumed
   // The real phi0 is a simple rotation which can be handled in the next step.
   // Jacobian matrix for the translation
 
-  //const double& d0 = getD0(); // == 0 since we moved to the perigee point first.
+  const double& d0 = getD0();
   const double& omega = getOmega();
   const double& tanLambda = getTanLambda();
 
   const double alpha = getAlpha(bZ_tesla);
   const double absAlphaOmega = alpha * std::fabs(omega);
-  const double signedAlphaOmega2 =  absAlphaOmega  * omega;
+  const double signedAlphaOmega2 = absAlphaOmega * omega;
 
   const double invAbsAlphaOmega = 1.0 / absAlphaOmega;
   const double invSignedAlphaOmega2 = 1.0 / signedAlphaOmega2;
+  const int charge = boost::math::sign(omega);
 
   // Position after the move.
-  jacobianInflate(iX, iPhi0) = 0.0; // d0 == 0 after moving
+  jacobianInflate(iX, iPhi0) = d0;
   jacobianInflate(iY, iD0) = -1.0;
   jacobianInflate(iZ, iZ0) = 1.0;
 
@@ -164,9 +156,11 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
   jacobianInflate(iPy, iPhi0) = invAbsAlphaOmega;
   jacobianInflate(iPz, iOmega) = -tanLambda * invSignedAlphaOmega2;
   jacobianInflate(iPz, iTanLambda) = invAbsAlphaOmega;
+
+  TMatrixDSym cov6 = m_covariance; //copy
   cov6.Similarity(jacobianInflate);
 
-  /// 3. Rotate to the right phi0
+  /// 2. Rotate to the right phi0
   const double& cosPhi0 = getCosPhi0();
   const double& sinPhi0 = getSinPhi0();
 

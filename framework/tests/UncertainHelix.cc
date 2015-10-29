@@ -9,8 +9,8 @@
  **************************************************************************/
 
 #include <framework/dataobjects/UncertainHelix.h>
+#include <TVectorD.h>
 #include <boost/range/irange.hpp>
-
 #include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
 
@@ -118,9 +118,35 @@ namespace {
 
     EXPECT_EQ(expectedCharge, charge);
 
+    // Test the covariance matrix for the right null space
+    TVectorD nullSpace(6);
+    const double factor =
+      (expectedPosition.X() * expectedMomentum.Y() - expectedPosition.Y() * expectedMomentum.X()) / expectedMomentum.Perp2();
+    nullSpace[0] = expectedMomentum.X();
+    nullSpace[1] = expectedMomentum.Y();
+    nullSpace[2] = 0;
+    nullSpace[3] = factor * expectedMomentum.Y();
+    nullSpace[4] = - factor * expectedMomentum.X();
+    nullSpace[5] = 0;
+
+    TVectorD nullVector = cov6 * nullSpace;
+    for (int j : irange(0, 6)) {
+      EXPECT_NEAR(0, nullVector(j), 1e-7);
+    }
+
+    // Make a second round trip to assert the covariance
+    // is stable after one adjustment of the null space
+    UncertainHelix uncertainHelix2(position,
+                                   momentum,
+                                   charge,
+                                   bZ,
+                                   cov6,
+                                   pValue);
+
+    const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
     for (int i : irange(0, 6)) {
       for (int j : irange(0, 6)) {
-        EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 1e-7);
+        EXPECT_NEAR(cov6(i, j), cov6_2(i, j), 1e-7);
       }
     }
   }
@@ -165,9 +191,35 @@ namespace {
 
       EXPECT_EQ(expectedCharge, charge);
 
+      // Test the covariance matrix for the right null space
+      TVectorD nullSpace(6);
+      const double factor =
+        (expectedPosition.X() * expectedMomentum.Y() - expectedPosition.Y() * expectedMomentum.X()) / expectedMomentum.Perp2();
+      nullSpace[0] = expectedMomentum.X();
+      nullSpace[1] = expectedMomentum.Y();
+      nullSpace[2] = 0;
+      nullSpace[3] = factor * expectedMomentum.Y();
+      nullSpace[4] = - factor * expectedMomentum.X();
+      nullSpace[5] = 0;
+
+      TVectorD nullVector = cov6 * nullSpace;
+      for (int j : irange(0, 6)) {
+        EXPECT_NEAR(0, nullVector(j), 1e-7);
+      }
+
+      // Make a second round trip to assert the covariance
+      // is stable after one adjustment of the null space
+      UncertainHelix uncertainHelix2(position,
+                                     momentum,
+                                     charge,
+                                     bZ,
+                                     cov6,
+                                     pValue);
+
+      const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
       for (int i : irange(0, 6)) {
         for (int j : irange(0, 6)) {
-          EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 1e-7);
+          EXPECT_NEAR(cov6(i, j), cov6_2(i, j), 1e-7);
         }
       }
     }

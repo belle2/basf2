@@ -218,6 +218,14 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     trackbuilder = register_module('TrackBuilder')
     path.add_module(trackbuilder)
 
+    # match the tracks to the MC truth
+    mctrackfinder = register_module('TrackFinderMCTruth')
+    mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
+    path.add_module(mctrackfinder)
+    mctrackmatcher = register_module('MCTrackMatcher')
+    mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
+    path.add_module(mctrackmatcher)
+
     # V0 finding
     v0finder = register_module('V0Finder')
     path.add_module(v0finder)

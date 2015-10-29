@@ -208,6 +208,14 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     else:
         add_track_finding(path, components)
 
+    # match the tracks to the MC truth
+    mctrackfinder = register_module('TrackFinderMCTruth')
+    mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
+    path.add_module(mctrackfinder)
+    mctrackmatcher = register_module('MCTrackMatcher')
+    mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
+    path.add_module(mctrackmatcher)
+
     # track fitting
     trackfitter = register_module('GenFitter')
     trackfitter.param({'BuildBelle2Tracks': False,
@@ -217,14 +225,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     # create Belle2 Tracks from the genfit Tracks
     trackbuilder = register_module('TrackBuilder')
     path.add_module(trackbuilder)
-
-    # match the tracks to the MC truth
-    mctrackfinder = register_module('TrackFinderMCTruth')
-    mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
-    path.add_module(mctrackfinder)
-    mctrackmatcher = register_module('MCTrackMatcher')
-    mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
-    path.add_module(mctrackmatcher)
 
     # V0 finding
     v0finder = register_module('V0Finder')

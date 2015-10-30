@@ -35,7 +35,7 @@ int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr)
     return 1;
   }
   
-  printf("Booting ShaperDSP...\n");
+  printf("Booting ShaperDSP (%s)...\n", ip_addr);
   message[0]='B';
   message[1]=sh_num;
   message[2]=200;

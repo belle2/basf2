@@ -9,7 +9,7 @@ const unsigned int MEM_BIN_ADDR = 0xA7000000;
 
 int main(int argc, char** argv)
 {
-  std::ifstream fin("/home/shaper/config.dat");
+  std::ifstream fin("/home/run/shaper/config.dat");
   int col;
   char ip [256];
   while (fin >> col) {

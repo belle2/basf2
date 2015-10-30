@@ -208,12 +208,17 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     else:
         add_track_finding(path, components)
 
-    # match the tracks to the MC truth
+    # Match the tracks to the MC truth.  The matching works based on
+    # the output of the TrackFinderMCTruth.
     mctrackfinder = register_module('TrackFinderMCTruth')
     mctrackfinder.param('GFTrackCandidatesColName', 'MCTrackCands')
     path.add_module(mctrackfinder)
     mctrackmatcher = register_module('MCMatcherTracks')
     mctrackmatcher.param('MCGFTrackCandsColName', 'MCTrackCands')
+    # FIXME 2015/10/30: Stopgap for the release, ideally the module
+    # would not care whether the PXD / SVD clusters are available.
+    mctrackmatcher.param('UsePXDHits', use_vxd)
+    mctrackmatcher.param('UseSVDHits', use_vxd)
     path.add_module(mctrackmatcher)
 
     # track fitting

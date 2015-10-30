@@ -5,10 +5,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define ECL_TCP_STATUS_PORT 6001
+//#define ECL_TCP_STATUS_PORT 6001
 
 int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr)
 {
+  int nEclTcpPort = 6001;
   int sock;
   struct sockaddr_in server;
   char message [100], server_reply[1004];
@@ -25,7 +26,9 @@ int sh_boot(const char* ip_addr, int sh_num, unsigned int mem_addr)
   }
   server.sin_addr.s_addr = inet_addr(ip_addr);
   server.sin_family = AF_INET;
-  server.sin_port = htons( ECL_TCP_STATUS_PORT );
+  nEclTcpPort = 7000 + (((server.sin_addr.s_addr)>>24)&0xFF);
+  server.sin_port = htons( nEclTcpPort );
+  //server.sin_port = htons( ECL_TCP_STATUS_PORT );
   if (connect(sock , (struct sockaddr *)&server, sizeof(server)) < 0) {
     printf("Fault: connection error\n");
     close(sock);

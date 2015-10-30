@@ -169,7 +169,7 @@ class TestMatchParticleList(unittest.TestCase):
         # Enables caching and MC-data condition
         result = MockResource(env={'ROE': False}, cache=True, condition=('EventType', '==0'))
         # Adds MCMatching for given particle List
-        result.path.add_module('MCMatching', listName='e+:generic')
+        result.path.add_module('MCMatcherParticles', listName='e+:generic')
         result.path.add_module('ParticleSelector', decayString='e+:generic', cut='')
         self.assertEqual(self.resource, result)
 
@@ -183,7 +183,7 @@ class TestMatchParticleList(unittest.TestCase):
         # Adds MCMatching for given particle List
         cut = '[eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) > 0 and isSignal == 1] or '
         cut += 'eventCached(countInList(B+, isSignalAcceptMissingNeutrino == 1)) == 0'
-        result.path.add_module('MCMatching', listName='e+:generic')
+        result.path.add_module('MCMatcherParticles', listName='e+:generic')
         result.path.add_module('ParticleSelector', decayString='e+:generic', cut=cut)
         self.assertEqual(self.resource, result)
 

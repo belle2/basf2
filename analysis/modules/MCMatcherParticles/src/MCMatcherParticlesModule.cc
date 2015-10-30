@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/MCMatching/MCMatchingModule.h>
+#include <analysis/modules/MCMatcherParticles/MCMatcherParticlesModule.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -28,13 +28,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(MCMatching)
+  REG_MODULE(MCMatcherParticles)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  MCMatchingModule::MCMatchingModule() : Module()
+  MCMatcherParticlesModule::MCMatcherParticlesModule() : Module()
   {
     setDescription("Performs MC matching (sets relation Particle->MCParticle) for all particles (and its (grand)^N-daughter particles) in the ParticleList. The relation can be used in conjuction with MCMatching::MCErrorFlags flags, e.g. using the isSignal or mcPDG & mcErrors variables.");
     setPropertyFlags(c_ParallelProcessingCertified);
@@ -43,9 +43,8 @@ namespace Belle2 {
   }
 
 
-  void MCMatchingModule::initialize()
+  void MCMatcherParticlesModule::initialize()
   {
-    B2WARNING("MCMatching module is deprecated. Please use the MCMatcherParticles module instead.")
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     particles.isRequired();
@@ -55,7 +54,7 @@ namespace Belle2 {
   }
 
 
-  void MCMatchingModule::event()
+  void MCMatcherParticlesModule::event()
   {
     if (!m_plist) {
       B2ERROR("ParticleList " << m_listName << " not found");

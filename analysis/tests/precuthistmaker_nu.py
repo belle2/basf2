@@ -92,7 +92,7 @@ def checkHistograms(name, selection):
         B2FATAL("No events found. Reconstruction broken? Too few events in sample?")
 
     if trueSignals != hmSignals:
-        B2FATAL("Mismatch in number of entries! (ParticleCombiner + MCMatching: " +
+        B2FATAL("Mismatch in number of entries! (ParticleCombiner + MCMatch: " +
                 str(trueSignals) + ", PreCutHistMaker: " + str(hmSignals))
 
     hist_from_ntuple = TH1F("ntuplehist", "ntuplehist", hist_params[0], hist_params[1], hist_params[2])

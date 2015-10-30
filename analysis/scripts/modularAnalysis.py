@@ -1089,8 +1089,8 @@ def matchMCTruth(list_name, path=analysis_main):
     @param path      modules are added to this path
     """
 
-    mcMatch = register_module('MCMatching')
-    mcMatch.set_name('MCMatching_' + list_name)
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('MCMatch_' + list_name)
     mcMatch.param('listName', list_name)
     path.add_module(mcMatch)
 

@@ -283,7 +283,7 @@ def loadModuleStatisticsDataFrame(filename):
     for m in stats.getAll():
         modtype = 'Other'
         listname = 'Other'
-        for mt in ['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other']:
+        for mt in ['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatch', 'TMVAExpert', 'Other']:
             splitted = m.getName().split('_')
             if splitted[0] in mt:
                 modtype = mt

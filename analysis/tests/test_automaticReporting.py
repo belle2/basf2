@@ -234,7 +234,7 @@ class TestLoadModuleStatisticsDataFrame(unittest.TestCase):
         self.assertEqual(len(df), 141)
         self.assertListEqual(sorted(df.columns), sorted(['name', 'time', 'type', 'listname']))
         self.assertListEqual(sorted(df.type.unique()), sorted(['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter',
-                                                               'MCMatching', 'TMVAExpert', 'Other']))
+                                                               'MCMatch', 'TMVAExpert', 'Other']))
         unique = df.listname.unique()
         for l in self.lists + ['Other']:
             self.assertTrue(l in unique)
@@ -243,7 +243,7 @@ class TestLoadModuleStatisticsDataFrame(unittest.TestCase):
         self.assertAlmostEqual(sdf['ParticleLoader'], 348.587310, delta=0.001)
         self.assertAlmostEqual(sdf['ParticleCombiner'], 608.436537, delta=0.001)
         self.assertAlmostEqual(sdf['ParticleVertexFitter'], 9545.304479, delta=0.001)
-        self.assertAlmostEqual(sdf['MCMatching'], 406.493269, delta=0.001)
+        self.assertAlmostEqual(sdf['MCMatch'], 406.493269, delta=0.001)
         self.assertAlmostEqual(sdf['TMVAExpert'], 1036.668055, delta=0.001)
         self.assertAlmostEqual(sdf['Other'], 18281.310939, delta=0.001)
 

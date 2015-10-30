@@ -29,7 +29,9 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       ecl_udp_lib_debug?printf("inet_addr() fault (%d)\n", errno):0;
       return 3;
     }
-  addr.sin_port=htons(ECL_COL_UDP_PORT);
+  int nEclUdpPort = 6000 + (((dest_addr.sin_addr.s_addr)>>24)&0xFF);
+  addr.sin_port=htons(nEclUdpPort);
+  //addr.sin_port=htons(ECL_COL_UDP_PORT);
   memset(&(addr.sin_zero),'\0',8);
  
   if( bind(ecl_udp_socket, (struct sockaddr *)&addr, sizeof(addr)) == -1)

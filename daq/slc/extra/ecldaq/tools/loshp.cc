@@ -13,10 +13,12 @@ void w_sh_reg_io(const char* ip,
   printf("%s:%d<<%d\n", ip, reg_num, wdata);
   char msg[100];
   memset(msg, 0, 100);
-  sh_reg_io(ip, "w", 16, reg_num, wdata, NULL, msg);
-  if (msg[0] != 0) {
-    printf("%s", msg);
-    exit(1);
+  int ret;
+  if ((ret = sh_reg_io(ip, "w", 16, reg_num, wdata, NULL, msg)) != 0) {
+    if (msg[0] != 0) {
+      printf("error: %d >> %s\n", ret, msg);
+      exit(1);
+    }
   }
 }
 

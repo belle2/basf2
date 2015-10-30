@@ -30,9 +30,6 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       return 3;
     }
 
-  int nEclUdpPort = 6000 + (((dest_addr.sin_addr.s_addr)>>24)&0xFF);
-  addr.sin_port=htons(nEclUdpPort);
-
   dest_addr.sin_family=AF_INET;
   if( (dest_addr.sin_addr.s_addr = inet_addr(pzIP_ADDR)) == INADDR_NONE)
     {
@@ -40,10 +37,11 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       return 5;
     }
 
+  int nEclUdpPort = 6000 + (((dest_addr.sin_addr.s_addr)>>24)&0xFF);
   //nEclUdpPort = 6000;
   //  printf("%d %x\n",nEclUdpPort, dest_addr.sin_addr.s_addr);
 
-  dest_addr.sin_port=htons(nEclUdpPort);
+  addr.sin_port=htons(nEclUdpPort);
   //  memset(&(addr.sin_zero),'\0',8);
 
   if( bind(ecl_udp_socket, (struct sockaddr *)&addr, sizeof(addr)) == -1)
@@ -52,7 +50,7 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       return 4;
     }
   
-  dest_addr.sin_port=htons(ECL_COL_UDP_PORT);
+  dest_addr.sin_port=htons(nEclUdpPort);
   memset(&(dest_addr.sin_zero),'\0',8);
 
   ecl_udp_lib_debug?printf("ecl_udp_init() OK\n"):0;

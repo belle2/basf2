@@ -17,6 +17,8 @@
 #include <geometry/CreatorBase.h>
 #include <geometry/utilities.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
+#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
 
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
@@ -60,6 +62,7 @@ namespace Belle2 {
       for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
+      BFieldManager::getInstance().clearComponents();
       //FIXME: Geometry is now run independent, don't delete anything, let Geant4 care about freeing stuff
       return;
       //Clean up existing Geometry
@@ -96,6 +99,9 @@ namespace Belle2 {
           materials.createMaterial(mat);
         }
       }
+
+      //Interface the magnetic field
+      BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
 
       //Now set Top volume
       double width  = detectorDir.getLength("Global/width",  8 * Unit::m) / Unit::mm;

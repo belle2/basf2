@@ -18,7 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <tracking/vectorTools/B2Vector3.h> // use TVector3 instead?
+#include <framework/geometry/B2Vector3.h> // use TVector3 instead?
 #include <boost/range/adaptor/reversed.hpp> // for ranged based loops in reversed order
 
 using namespace Belle2;

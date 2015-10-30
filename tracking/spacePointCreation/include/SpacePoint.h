@@ -10,7 +10,7 @@
 #pragma once
 
 // tracking
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 // #include <TVector3.h>
 
 // framework

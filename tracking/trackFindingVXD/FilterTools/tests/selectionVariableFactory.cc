@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableFactory.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <tracking/vxdCaTracking/XHitFilterFactory.h>
 

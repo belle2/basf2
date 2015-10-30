@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariable.h>
 #include <tracking/trackFindingVXD/FilterTools/SelectionVariableHelper.h>
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <math.h>
 
 #include <vector>

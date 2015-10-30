@@ -15,7 +15,7 @@
 
 #include <array>
 
-#include <tracking/vectorTools/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
+#include <framework/geometry/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
 
 #include <TVector3.h>
 #include <TFile.h>
@@ -45,11 +45,13 @@ namespace Belle2 {
 
   public:
 
-    typedef SpacePoint::SpBaseType ModBaseType; /**< typedef for less writing effort and to have the same BaseType in all modules */ // TODO: utilize this throughout the Module
+    /** typedef for less writing effort and to have the same BaseType in all modules */ // TODO: utilize this throughout the Module
+    typedef SpacePoint::SpBaseType ModBaseType;
 
     CurlingTrackCandSplitterModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize: initialize counters, register stuff in DataStore, check if all necessary StoreArrays are present, etc. */
+    /** initialize: initialize counters, register stuff in DataStore, check if all necessary StoreArrays are present, etc. */
+    virtual void initialize();
 
     virtual void event(); /**< event: check SpacePointTrackCand for curling behaviour, split if needed (and wanted by user) */
 
@@ -77,12 +79,17 @@ namespace Belle2 {
       std::array<std::vector<double>, c_nPlanes> TrueHitYGlobal; /**< global y-positions of TrueHits (layerwise) */
       std::array<std::vector<double>, c_nPlanes> TrueHitZGlobal; /**< global z-positions of TrueHits (layerwise) */
 
-      std::array<std::vector<double>, c_nPlanes> PosResidueXGlobal; /**< X-position (global) difference between TrueHit and SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> PosResidueYGlobal; /**< Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> PosResidueZGlobal; /**< Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      /** X-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueXGlobal;
+      /** Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueYGlobal;
+      /** Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueZGlobal;
 
-      std::array<std::vector<double>, c_nPlanes> PosResidueULocal; /**< U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> PosResidueVLocal; /**< V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+      /** U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueULocal;
+      /** V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> PosResidueVLocal;
 
       std::array<std::vector<double>, c_nPlanes> TrueHitULocal; /**< local u-positions of TrueHits (layerwise) */
       std::array<std::vector<double>, c_nPlanes> TrueHitVLocal; /**< local v-positions of TrueHits (layerwise) */
@@ -91,17 +98,26 @@ namespace Belle2 {
       std::array<std::vector<double>, c_nPlanes> PosResiduesLocal; /**< position differences in local coordinates (layerwise) */
       std::array<std::vector<double>, c_nPlanes> PosResiduesGlobal; /**< position differences in global coordinates (layerwise) */
 
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosResiduals; /**< Distance between TrueHits that do not match but are related from one SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosX; /**< Difference of X-positions (global) for mismatched TrueHits (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosY; /**< Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosZ; /**< Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+      /** Distance between TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosResiduals;
+      /** Difference of X-positions (global) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosX;
+      /** Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosY;
+      /** Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosZ;
 
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosU; /**< Difference of U-positions (local) for mismatched TrueHits (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchPosV; /**< Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+      /** Difference of U-positions (local) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosU;
+      /** Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchPosV;
 
-      std::array<std::vector<double>, c_nPlanes> MisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
-      std::array<std::vector<double>, c_nPlanes> MisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      /** Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchMomX;
+      /** Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchMomY;
+      /** Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+      std::array<std::vector<double>, c_nPlanes> MisMatchMomZ;
     };
 
     /**
@@ -113,7 +129,8 @@ namespace Belle2 {
       double m_U; /**< U-position */
       double m_V; /**< V-position */
 
-      TaggedUVPos() : m_setU(false), m_setV(false), m_U(0.), m_V(0.) {} /**< default constructor initializes both bools to false and both doubles to 0. */
+      /** default constructor initializes both bools to false and both doubles to 0. */
+      TaggedUVPos() : m_setU(false), m_setV(false), m_U(0.), m_V(0.) {}
     };
 
   protected:
@@ -122,7 +139,8 @@ namespace Belle2 {
 
     std::string m_PARAMsptcName; /**< collection name of the SpacePointTrackCands to be analyzed */
 
-    std::string m_PARAMcurlingOutFirstName; /**< collection name of the first outgoing (i.e. coming from the interaction point) parts of a curling TrackCand */
+    /** collection name of the first outgoing (i.e. coming from the interaction point) parts of a curling TrackCand */
+    std::string m_PARAMcurlingOutFirstName;
 
     std::string m_PARAMcurlingAllInName; /**< collection name of all ingoing parts of a curling TrackCand */
 
@@ -130,7 +148,8 @@ namespace Belle2 {
 
     std::string m_PARAMcompleteCurlerName; /**< collection name of all parts of a curling TrackCand */
 
-    std::vector<double> m_PARAMsetOrigin; /**< set the origin to a specific point. Needed for determining the direction of flight of the particle for a given hit */
+    /** set the origin to a specific point. Needed for determining the direction of flight of the particle for a given hit */
+    std::vector<double> m_PARAMsetOrigin;
 
     int m_PARAMnTrackStubs; /**< maximum number of TrackCand Stubs to be stored for a curling TrackCand */
 
@@ -173,12 +192,15 @@ namespace Belle2 {
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
-    bool getDirectionOfFlight(const std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>, const Belle2::B2Vector3<SpacePoint::SpBaseType>>& hitPosAndMom, const Belle2::B2Vector3<SpacePoint::SpBaseType> origin);
+    bool getDirectionOfFlight(const std::pair<const Belle2::B2Vector3<SpacePoint::SpBaseType>,
+                              const Belle2::B2Vector3<SpacePoint::SpBaseType>>& hitPosAndMom,
+                              const Belle2::B2Vector3<SpacePoint::SpBaseType> origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster
      */
-    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no TrueHit for one (or more) Cluster(s). Without a TrueHit a decision if a TrackCand is curling is not possible");
+    BELLE2_DEFINE_EXCEPTION(FoundNoTrueHit, "Found no TrueHit for one (or more) Cluster(s). "
+                            "Without a TrueHit a decision if a TrackCand is curling is not possible");
 
     /**
      * Exception for case when TrueHits for a given SpacePoint do not match (possible for e.g. SVD SpacePoint consisting of two SVDClusters)
@@ -191,7 +213,8 @@ namespace Belle2 {
     BELLE2_DEFINE_EXCEPTION(FoundNoCluster, "No related Cluster to a SpacePoint was found.");
 
     bool m_PARAMpositionAnalysis; /**< Set to true if output to ROOT file is desired with the positions and position differences of SpacePoints and TrueHits */
-    std::vector<std::string> m_PARAMrootFileName; /**< two entries accepted. First is filename, second is 'RECREATE' or 'UPDATE' (write mode) */
+    /** two entries accepted. First is filename, second is 'RECREATE' or 'UPDATE' (write mode) */
+    std::vector<std::string> m_PARAMrootFileName;
     TFile* m_rootFilePtr; /**< Pointer to ROOT file */
     TTree* m_treePtr; /**< Pointer to ROOT tree */
 
@@ -211,33 +234,50 @@ namespace Belle2 {
     std::array<std::vector<double>, c_nPlanes> m_rootTrueHitVLocals; /**< Local Y-Positions of TrueHits (layerwise) */
 //     std::vector<double> m_rootTrueHitZLocals; /**< Local Z-Positions of TrueHits (layerwise) */
 
-    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueXGlobal; /**< X-position (global) difference between TrueHit and SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueYGlobal; /**< Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueZGlobal; /**< Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    /** X-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueXGlobal;
+    /** Y-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueYGlobal;
+    /** Z-position (global) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueZGlobal;
 
-    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueULocal; /**< U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueVLocal; /**< V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+    /** U-position (local) differnece between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueULocal;
+    /** V-position (local) difference between TrueHit and SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootPosResidueVLocal;
 
-    std::array<std::vector<double>, c_nPlanes> m_rootLocalPosResiduals; /**< Local Position Residuals between TrueHits and SpacePoints (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootGlobalPosResiduals; /**< Global Position Residuals between TrueHits and SpacePoints (layerwise) */
+    /** Local Position Residuals between TrueHits and SpacePoints (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootLocalPosResiduals;
+    /** Global Position Residuals between TrueHits and SpacePoints (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootGlobalPosResiduals;
 
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosDistance; /**< Distance of TrueHits that do not match but are related from one SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosX; /**< Difference of X-positions (global) for mismatched TrueHits (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosY; /**< Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosZ; /**< Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+    /** Distance of TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosDistance;
+    /** Difference of X-positions (global) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosX;
+    /** Difference of Y-positions (global) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosY;
+    /** Difference of Z-positions (global) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosZ;
 
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosU; /**< Difference of U-positions (local) for mismatched TrueHits (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosV; /**< Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+    /** Difference of U-positions (local) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosU;
+    /** Difference of V-positions (local) for mismatched TrueHits (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchPosV;
 
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomX; /**< Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomY; /**< Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
-    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ; /**< Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    /** Difference of Momentum in X-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomX;
+    /** Difference of Momentum in Y-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomY;
+    /** Difference of Momentum in Z-Direction for TrueHits that do not match but are related from one SpacePoint (layerwise) */
+    std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ;
 
     /** get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates). Returning a TaggedUVPos makes it possible to properly analyze SpacePoints with only one Cluster */
     TaggedUVPos getUV(const Belle2::SpacePoint* spacePoint);
 
+    /** Get The Values that are later written to a ROOT file */
     template <class TrueHit>
-    void getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables); /**< Get The Values that are later written to a ROOT file */
+    void getValuesForRoot(const Belle2::SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
     void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };

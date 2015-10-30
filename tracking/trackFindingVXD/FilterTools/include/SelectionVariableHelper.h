@@ -12,7 +12,7 @@
 
 #include <math.h>
 
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <boost/math/special_functions/sign.hpp>
 #include <framework/core/FrameworkExceptions.h>
 

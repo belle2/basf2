@@ -21,7 +21,7 @@
 #include <genfit/TrackCandHit.h>
 #include <genfit/HMatrixU.h>
 
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <memory>
 

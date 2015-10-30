@@ -12,7 +12,7 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TVector3.h>
 #include <framework/dataobjects/Helix.h>
 #include <vxd/geometry/GeoCache.h>

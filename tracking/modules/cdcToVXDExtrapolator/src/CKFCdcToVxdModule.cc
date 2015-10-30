@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>

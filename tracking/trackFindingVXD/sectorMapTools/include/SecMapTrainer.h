@@ -20,7 +20,7 @@
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
 
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <tracking/dataobjects/FullSecID.h>
 #include <vxd/dataobjects/VxdID.h>

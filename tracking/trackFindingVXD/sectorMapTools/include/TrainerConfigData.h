@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <string>
 #include <vector>

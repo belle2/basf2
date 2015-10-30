@@ -19,7 +19,7 @@
 #include <tracking/trackFindingVXD/analyzingTools/AnalizerTCInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/AnalyzingAlgorithmFactory.h>
 #include <tracking/trackFindingVXD/analyzingTools/AlgoritmType.h>
-#include <tracking/vectorTools/B2Vector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 //root-stuff
 #include <TVector3.h>

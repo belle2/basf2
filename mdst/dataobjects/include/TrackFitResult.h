@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/Helix.h>
 #include <framework/dataobjects/UncertainHelix.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
@@ -90,36 +91,43 @@ namespace Belle2 {
      *
      *  As we calculate recalculate the momentum from a geometric helix, we need an estimate
      *  of the magnetic field along the z-axis to give back the momentum.
-     *  @TODO This has a default value so that the basf2 compiles; default should be removed.
-     *  @param bField  Magnetic field at the perigee.
      */
-    TVector3 getMomentum(const float bField = 1.5) const
-    { return getHelix().getMomentum(bField); }
+    TVector3 getMomentum() const
+    {
+      const double bField = BFieldManager::getField(getPosition()).Z() / Unit::T;
+      return getHelix().getMomentum(bField);
+    }
 
     /** Getter for the 4Momentum at the closest approach of the track in the r/phi projection.
      * P = (px, py, pz, E) where E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
-     * @param bField  Magnetic field at the perigee.
-     *
      */
-    TLorentzVector get4Momentum(const float bField = 1.5) const
-    { return TLorentzVector(getMomentum(bField), getEnergy(bField)); }
+    TLorentzVector get4Momentum() const
+    {
+      return TLorentzVector(getMomentum(), getEnergy());
+    }
 
     /** Getter for the Energy at the closest approach of the track in the r/phi projection.
      * E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
      */
-    double getEnergy(const float bField = 1.5) const
-    { return std::sqrt(getMomentum(bField).Mag2() + getParticleType().getMass() * getParticleType().getMass()); }
+    double getEnergy() const
+    {
+      return std::sqrt(getMomentum().Mag2() + getParticleType().getMass() * getParticleType().getMass());
+    }
 
     /** Getter for the absolute value of the transverse momentum at the perigee.
-     *
-     * @param bField Magnetic field at the perigee
      */
-    double getTransverseMomentum(const float bField = 1.5) const
-    { return getHelix().getTransverseMomentum(bField); }
+    double getTransverseMomentum() const
+    {
+      const double bField = BFieldManager::getField(getPosition()).Z() / Unit::T;
+      return getHelix().getTransverseMomentum(bField);
+    }
 
     /** Position and Momentum Covariance Matrix.  */
-    TMatrixDSym getCovariance6(const float bField = 1.5) const
-    { return getUncertainHelix().getCartesianCovariance(bField); }
+    TMatrixDSym getCovariance6() const
+    {
+      const double bField = BFieldManager::getField(getPosition()).Z() / Unit::T;
+      return getUncertainHelix().getCartesianCovariance(bField);
+    }
 
     /** Getter for ParticleType of the mass hypothesis of the track fit. */
     Const::ParticleType getParticleType() const { return Const::ParticleType(m_pdg); }

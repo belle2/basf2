@@ -203,8 +203,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
   TEveRecTrackD recTrack;
   const TVector3& poca = fitResult->getPosition();
-  const TVector3& Bfield = BFieldMap::Instance().getBField(poca);
-  const TVector3& poca_momentum = fitResult->getMomentum(Bfield.z());
+  const TVector3& poca_momentum = fitResult->getMomentum();
 
   recTrack.fV.Set(poca);
   recTrack.fP.Set(poca_momentum);

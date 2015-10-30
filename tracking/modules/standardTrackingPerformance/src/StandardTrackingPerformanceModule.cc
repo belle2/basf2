@@ -16,7 +16,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <genfit/FieldManager.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -102,9 +101,6 @@ void StandardTrackingPerformanceModule::event()
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  double Bx, By, Bz;
-  genfit::FieldManager::getInstance()->getFieldVal(0, 0, 0, Bx, By, Bz);
-
   BOOST_FOREACH(MCParticle & mcParticle, mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
@@ -134,7 +130,7 @@ void StandardTrackingPerformanceModule::event()
         if (fitResult != NULL) { // valid TrackFitResult found
           m_nFittedChargedStabletracks++;
           // write some data to the root tree
-          TVector3 mom = fitResult->getMomentum(Bz / 10);
+          TVector3 mom = fitResult->getMomentum();
           m_trackProperties.cosTheta = mom.CosTheta();
           m_trackProperties.ptot = mom.Mag();
           m_trackProperties.pt = mom.Pt();
@@ -152,7 +148,7 @@ void StandardTrackingPerformanceModule::event()
           m_trackProperties.nWeights = 0;
           for (size_t iTP = 0; iTP < gfTrack->getNumPointsWithMeasurement(); ++iTP) {
             const genfit::TrackPoint* tp = gfTrack->getPointWithMeasurement(iTP);
-            for (genfit::AbsMeasurement * m : tp->getRawMeasurements()) {
+            for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
               if (dynamic_cast<PXDRecoHit*>(m))
                 ++m_trackProperties.nPXDhits;
               else if (dynamic_cast<SVDRecoHit*>(m))
@@ -215,7 +211,7 @@ genfit::Track* StandardTrackingPerformanceModule::findRelatedTrack(
   B2DEBUG(99, "MCParticle array index: " << iMcParticle);
   genfit::Track* resultGfTrack = NULL;
 
-  for (genfit::Track & gfTrack : gfTracks) {
+  for (genfit::Track& gfTrack : gfTracks) {
     const genfit::TrackCand* aTrackCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(&gfTrack);
     if (!aTrackCandPtr) {
       B2ERROR("No Track Candidate for track.  Skipping.");
@@ -296,7 +292,7 @@ const TrackFitResult* StandardTrackingPerformanceModule::findRelatedTrackFitResu
 
   std::vector<const TrackFitResult*> fitResults;
 
-  BOOST_FOREACH(const relElement_t & relGfTrackToTrackFitResult, relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
+  BOOST_FOREACH(const relElement_t& relGfTrackToTrackFitResult, relGfTracksToTrackFitResults.getElementsFrom(gfTrack)) {
     B2DEBUG(99, "----> Related TrackFitResult found!!!");
 
     fitResults.push_back(relGfTrackToTrackFitResult.to);

@@ -33,7 +33,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <TRandom3.h>
 
 
@@ -147,14 +146,13 @@ namespace Belle2 {
     std::vector<TVector3> trackMomentums;
     std::vector<float> dedxs;
     std::vector<float> dedxErrs;
-    double Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
 
     for (const auto& track : tracks) {
       const auto* trackFit = track.getTrackFitResult(Const::pion);
       if (!trackFit) continue;
       const auto* dedxTrack = track.getRelated<CDCDedxTrack>();
       if (!dedxTrack) continue;
-      trackMomentums.push_back(trackFit->getMomentum(Bfield));
+      trackMomentums.push_back(trackFit->getMomentum());
       dedxs.push_back(dedxTrack->getTruncatedMean());
       dedxErrs.push_back(dedxTrack->getError());
     }
@@ -191,7 +189,7 @@ namespace Belle2 {
       m_top.evt = evtMetaData->getEvent();
       m_top.run = evtMetaData->getRun();
 
-      TVector3 momentum = trackFit->getMomentum(Bfield);
+      TVector3 momentum = trackFit->getMomentum();
       m_top.p = momentum.Mag();
       m_top.cth = momentum.CosTheta();
       m_top.phi = momentum.Phi();

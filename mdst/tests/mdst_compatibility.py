@@ -16,7 +16,7 @@ objects.
 
 import sys
 import bisect
-from basf2 import create_path, process, Module, LogLevel
+from basf2 import create_path, process, Module, LogLevel, set_log_level
 import ROOT
 from ROOT import Belle2
 
@@ -333,4 +333,11 @@ def print_file(filename):
     process(main)
 
 if __name__ == "__main__":
+    import ROOT
+    # set a constant 1.5T magnetic field and make sure we don't get a warning
+    # message for that
+    set_log_level(LogLevel.ERROR)
+    ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
+    set_log_level(LogLevel.INFO)
+    # now run the test
     print_file("mdst/tests/mdst-v00-05-02.root")

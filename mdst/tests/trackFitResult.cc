@@ -55,12 +55,12 @@ namespace Belle2 {
       EXPECT_NEAR(position.X(), myResult.getPosition().X(), absError);
       EXPECT_NEAR(position.Y(), myResult.getPosition().Y(), absError);
       EXPECT_NEAR(position.Z(), myResult.getPosition().Z(), absError);
-      EXPECT_NEAR(momentum.Px(), myResult.getMomentum(bField).Px(), absError);
-      EXPECT_NEAR(momentum.Py(), myResult.getMomentum(bField).Py(), absError);
-      EXPECT_NEAR(momentum.Pz(), myResult.getMomentum(bField).Pz(), absError);
+      EXPECT_NEAR(momentum.Px(), myResult.getMomentum().Px(), absError);
+      EXPECT_NEAR(momentum.Py(), myResult.getMomentum().Py(), absError);
+      EXPECT_NEAR(momentum.Pz(), myResult.getMomentum().Pz(), absError);
 
       // Test getter for transverse momentum
-      EXPECT_NEAR(momentum.Perp(), myResult.getTransverseMomentum(bField), absError);
+      EXPECT_NEAR(momentum.Perp(), myResult.getTransverseMomentum(), absError);
 
       // Test other variables
       EXPECT_EQ(charge, myResult.getChargeSign());

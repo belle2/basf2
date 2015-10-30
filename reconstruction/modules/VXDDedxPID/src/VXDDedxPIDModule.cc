@@ -73,7 +73,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
            false);
 
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_r21775_400k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_r22564_400k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -249,8 +249,6 @@ void VXDDedxPIDModule::event()
 
         const TVector3 true_momentum = mcpart->getMomentum();
         dedxTrack->m_p_true = true_momentum.Mag();
-      } else {
-        B2WARNING("No MCParticle found for current track!");
       }
     }
 

@@ -51,7 +51,10 @@ namespace Belle2 {
         unsigned chan = int(data[3]);
         m_mapping.push_back(TOPChannelMap(row, col, asic, chan));
       }
-      if (m_mapping.empty()) return; // temporary fix!!!!
+      if (m_mapping.empty()) {
+        B2WARNING("TOP::ChannelMapper: mapping is not available in Gearbox");
+        return;
+      }
 
       // check the size of the mapping
       if (m_mapping.size() != c_numAsics * c_numChannels)
@@ -192,10 +195,12 @@ namespace Belle2 {
 
     void ChannelMapper::print(std::string type) const
     {
-      unsigned boardstack = 0;
-      unsigned carrier = 0;
-      unsigned asic = 0;
-      unsigned chan = 0;
+      std::vector<std::string> what;
+      what.push_back(string("Boardstack numbers (view from the back):"));
+      what.push_back(string("Carrier board numbers (view from the back):"));
+      what.push_back(string("ASIC numbers (view from the back):"));
+      what.push_back(string("ASIC channel numbers (view from the back):"));
+      unsigned value[4] = {0, 0, 0, 0};
 
       std::string xaxis("+------phi--------->");
       std::string yaxis("|ohr|||^");
@@ -204,73 +209,25 @@ namespace Belle2 {
       cout << "           Mapping of TOP electronic channels to pixels";
       if (!type.empty()) cout << " for " << type;
       cout << endl << endl;
-      cout << " Boardstack numbers (view from the back):" << endl << endl;
-      for (int row = c_numPixelRows - 1; row >= 0; row--) {
-        cout << "  " << yaxis[row] << " ";
-        for (int col = 0; col < c_numPixelColumns; col++) {
-          int pixel = col + c_numPixelColumns * row + 1;
-          auto channel = getChannelID(pixel);
-          if (channel != c_invalidChannelID) {
-            splitChannelID(channel, boardstack, carrier, asic, chan);
-            cout << boardstack;
-          } else {
-            cout << "?";
-          }
-        }
-        cout << endl;
-      }
-      cout << "  " << xaxis << endl << endl;
 
-      cout << " Carrier board numbers (view from the back):" << endl << endl;
-      for (int row = c_numPixelRows - 1; row >= 0; row--) {
-        cout << "  " << yaxis[row] << " ";
-        for (int col = 0; col < c_numPixelColumns; col++) {
-          int pixel = col + c_numPixelColumns * row + 1;
-          auto channel = getChannelID(pixel);
-          if (channel != c_invalidChannelID) {
-            splitChannelID(channel, boardstack, carrier, asic, chan);
-            cout << carrier;
-          } else {
-            cout << "?";
+      for (int i = 0; i < 4; i++) {
+        cout << " " << what[i] << endl << endl;
+        for (int row = c_numPixelRows - 1; row >= 0; row--) {
+          cout << "  " << yaxis[row] << " ";
+          for (int col = 0; col < c_numPixelColumns; col++) {
+            int pixel = col + c_numPixelColumns * row + 1;
+            auto channel = getChannelID(pixel);
+            if (channel != c_invalidChannelID) {
+              splitChannelID(channel, value[0], value[1], value[2], value[3]);
+              cout << value[i];
+            } else {
+              cout << "?";
+            }
           }
+          cout << endl;
         }
-        cout << endl;
+        cout << "  " << xaxis << endl << endl;
       }
-      cout << "  " << xaxis << endl << endl;
-
-      cout << " ASIC numbers (view from the back):" << endl << endl;
-      for (int row = c_numPixelRows - 1; row >= 0; row--) {
-        cout << "  " << yaxis[row] << " ";
-        for (int col = 0; col < c_numPixelColumns; col++) {
-          int pixel = col + c_numPixelColumns * row + 1;
-          auto channel = getChannelID(pixel);
-          if (channel != c_invalidChannelID) {
-            splitChannelID(channel, boardstack, carrier, asic, chan);
-            cout << asic;
-          } else {
-            cout << "?";
-          }
-        }
-        cout << endl;
-      }
-      cout << "  " << xaxis << endl << endl;
-
-      cout << " ASIC channel numbers (view from the back):" << endl << endl;
-      for (int row = c_numPixelRows - 1; row >= 0; row--) {
-        cout << "  " << yaxis[row] << " ";
-        for (int col = 0; col < c_numPixelColumns; col++) {
-          int pixel = col + c_numPixelColumns * row + 1;
-          auto channel = getChannelID(pixel);
-          if (channel != c_invalidChannelID) {
-            splitChannelID(channel, boardstack, carrier, asic, chan);
-            cout << chan;
-          } else {
-            cout << "?";
-          }
-        }
-        cout << endl;
-      }
-      cout << "  " << xaxis << endl << endl;
 
     }
 

@@ -60,7 +60,7 @@ int sh_init_ecldsp(const char* ip_addr, int sh_num, unsigned int mem_addr)
   while(  server_reply[recv_len-1] != 0 );
   printf(server_reply);
   close(sock);
-  if (strcmp(server_reply, "DONE") != 0) {
+  if (strcmp(server_reply, "DONE\n") != 0) {
     printf("Failed to init %d %s", sh_num, server_reply);
     return 3;
   }

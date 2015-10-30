@@ -10,7 +10,6 @@ const unsigned int MEM_BIN_ADDR = 0xA7000000;
 void w_sh_reg_io(const char* ip,
                  int reg_num, int wdata)
 {
-  printf("%s:%d<<%d\n", ip, reg_num, wdata);
   char msg[100];
   memset(msg, 0, 100);
   int ret;

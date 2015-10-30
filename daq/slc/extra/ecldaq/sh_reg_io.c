@@ -19,22 +19,18 @@ int sh_reg_io(const char* ip_addr, const char* opt,
 
   sh_num--;
 
-  printf("ecl_udp_init_ip\n");
   if((rc = ecl_udp_init_ip(ip_addr))!=0) {
     sprintf(msg, "Can not init network (%d,%d)\n", rc, errno);
     ecl_udp_close();
     return 2;
   }
-  printf("ecl_udp_init_ip: done\n");
   sh_mask = (sh_num == 15)? 0xFFF :1 << sh_num;
 
-  printf("ecl_udp_read_reg\n");
   if((rc = ecl_udp_read_reg(_ECL_COLLECTOR_REG_DL_LOCKED, &reg_data)) != 0) {
     sprintf(msg, "ecl_udp_read_reg() fault (%d,%d)\n", rc, errno);
     ecl_udp_close();
     return 3;
   }
-  printf("ecl_udp_read_reg: done\n");
 
   if((sh_mask & reg_data) != sh_mask)
     sprintf(msg, "WARNING: RCLK is not locked!: DL_LOCKED_REG=%04X, expecting: %04X\n", reg_data, sh_mask);

@@ -70,21 +70,18 @@ int ecl_udp_read_reg( unsigned short int reg_num, unsigned short int *reg_data)
   send_buf[2]=0;
   send_buf[3]=reg_num;
 
-  printf("%s:%d\n",__FILE__,__LINE__);
   if((rc=sendto(ecl_udp_socket,(char*)send_buf, 8, 0, (struct sockaddr*)&dest_addr, sizeof(dest_addr))) != 8)
     {
       ecl_udp_lib_debug?printf("sendto() fault (%d)\n", errno):0;
       return 1;
     }
 
-  printf("%s:%d\n",__FILE__,__LINE__);
   if((rc=recvfrom(ecl_udp_socket, (char*)recv_buf, 10, 0, NULL, NULL)) != 10)
     {
       ecl_udp_lib_debug?printf("recvfrom() fault (%d)\n", errno):0;
       return 2;
     }
   
-  printf("%s:%d\n",__FILE__,__LINE__);
   if(recv_buf[0]!=0xABCD || recv_buf[1]!=send_buf[1])
     {
       ecl_udp_lib_debug?printf("Bad received header : %04X %04X (%04X %04X must be) \n", recv_buf[0], recv_buf[1], 
@@ -92,11 +89,9 @@ int ecl_udp_read_reg( unsigned short int reg_num, unsigned short int *reg_data)
       return 3;
     }
 
-  printf("%s:%d\n",__FILE__,__LINE__);
   *reg_data = recv_buf[4];
 
   ecl_udp_lib_debug?printf("ecl_udp_read_reg(): [%04X]=>%04X\n",reg_num,*reg_data):0;
-  printf("%s:%d\n",__FILE__,__LINE__);
 
   return 0;
 }

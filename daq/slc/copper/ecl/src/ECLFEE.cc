@@ -37,6 +37,7 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 
 void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 {
+  /*
   hslb.writefn(0x30, 0);
   for (int ntry = 0; hslb.checkfee() == "UNKNOWN"; ntry++) {
     hslb.writefn(0x82, 0x1000);
@@ -48,6 +49,7 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject&)
     }
     usleep(100);
   }
+  */
   int ver;
   if ((ver = hslb.readfn(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
     throw (IOException("Inconsitent HWVER (%d!=%d)",
@@ -62,6 +64,7 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 void ECLFEE::load(HSLB& hslb, const DBObject& obj)
 {
   // writing parameters to registers
+  /*
   const DBObjectList objs(obj.getObjects("par"));
   for (DBObjectList::const_iterator it = objs.begin();
        it != objs.end(); it++) {
@@ -77,6 +80,43 @@ void ECLFEE::load(HSLB& hslb, const DBObject& obj)
   LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x09);
   hslb.writefee32(0x30, 0x03);
   LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x03);
+  */
+
+  const int SHAPER_MASK_LOW  = 0xFF;
+  const int SHAPER_MASK_HIGH = 0x0F;
+  const int TTD_TRG_RARE_FACTOR = 0xc1;
+  const int TTD_TRG_TYPE        = 0x11;
+
+  const int CALIB_AMPL0_LOW  = 0x00;
+  const int CALIB_AMPL0_HIGH = 0x00;
+  const int CALIB_AMPL_STEP_HIGH = 0x00;
+
+  const int CALIB_DELAY0_LOW  = 0x00;
+  const int CALIB_DELAY0_HIGH = 0x00;
+  const int CALIB_DELAY_STEP_LOW  = 0x00;
+  const int CALIB_DELAY_STEP_HIGH = 0x00;
+
+  const int CALIB_EVENTS_PER_STEP = 0x00;
+
+  hslb.writefee8(0x20, SHAPER_MASK_LOW);
+  hslb.writefee8(0x21, SHAPER_MASK_HIGH);
+  hslb.writefee8(0x38, TTD_TRG_RARE_FACTOR);
+  hslb.writefee8(0x39, TTD_TRG_TYPE);
+
+  hslb.writefee8(0x40, CALIB_AMPL0_LOW);
+  hslb.writefee8(0x41, CALIB_AMPL0_HIGH);
+  hslb.writefee8(0x42, CALIB_AMPL_STEP_HIGH);
+  hslb.writefee8(0x43, CALIB_AMPL_STEP_HIGH);
+
+  hslb.writefee8(0x44, CALIB_DELAY0_LOW);
+  hslb.writefee8(0x45, CALIB_DELAY0_HIGH);
+  hslb.writefee8(0x46, CALIB_DELAY_STEP_LOW);
+  hslb.writefee8(0x47, CALIB_DELAY_STEP_HIGH);
+
+  hslb.writefee8(0x48, CALIB_EVENTS_PER_STEP);
+
+  hslb.writefee8(0x30, 0x0D);
+  hslb.writefee8(0x30, 0x09);
 }
 
 extern "C" {

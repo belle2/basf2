@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <unistd.h>
+#include <fstream>
 
 #include "ecl_collector_lib.h"
 
@@ -183,15 +183,13 @@ void loshp(const char* ip, int col)
 
 int main(int argc, char** argv)
 {
-
-  if (argc < 2) {
-    printf("usage: %s <col> \n", argv[0]);
-    return 1;
-  }
-  int col = atoi(argv[1]);
+  std::ifstream fin("/home/run/shaper/config.dat");
+  int col;
   char ip [256];
-  sprintf(ip, "192.168.1.%d", col);
-  loshp(ip, col);
+  while (fin >> col) {
+    sprintf(ip, "192.168.1.%d", col);
+    loshp(ip, col);
+  }
   return 0;
 }
 

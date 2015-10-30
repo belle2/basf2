@@ -22,22 +22,12 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       ecl_udp_lib_debug?printf("socket() fault (%d)\n", errno):0;
       return 2;
     }
-			     
+
   addr.sin_family=AF_INET;
   if( (addr.sin_addr.s_addr = inet_addr(str_ecl_local_host_name)) == INADDR_NONE)
     {
       ecl_udp_lib_debug?printf("inet_addr() fault (%d)\n", errno):0;
       return 3;
-    }
-  int nEclUdpPort = 6000 + (((dest_addr.sin_addr.s_addr)>>24)&0xFF);
-  addr.sin_port=htons(nEclUdpPort);
-  //addr.sin_port=htons(ECL_COL_UDP_PORT);
-  memset(&(addr.sin_zero),'\0',8);
- 
-  if( bind(ecl_udp_socket, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-    {
-      ecl_udp_lib_debug?printf("bind() fault (%d)\n", errno):0;
-      return 4;
     }
 
   dest_addr.sin_family=AF_INET;
@@ -46,6 +36,20 @@ int ecl_udp_init_ip(const char *pzIP_ADDR)
       ecl_udp_lib_debug?printf("inet_addr() fault (%d)\n", errno):0;
       return 5;
     }
+
+  int nEclUdpPort = 6000 + (((dest_addr.sin_addr.s_addr)>>24)&0xFF);
+  //nEclUdpPort = 6000;
+  //  printf("%d %x\n",nEclUdpPort, dest_addr.sin_addr.s_addr);
+
+  addr.sin_port=htons(nEclUdpPort);
+  //  memset(&(addr.sin_zero),'\0',8);
+
+  if( bind(ecl_udp_socket, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+    {
+      ecl_udp_lib_debug?printf("bind() fault (%d)\n", errno):0;
+      return 4;
+    }
+  
   dest_addr.sin_port=htons(ECL_COL_UDP_PORT);
   memset(&(dest_addr.sin_zero),'\0',8);
 

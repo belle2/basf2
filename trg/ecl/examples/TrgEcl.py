@@ -47,7 +47,7 @@ rootinput1.param('inputFileName', f_in_root)
 # TRGECL
 trgeclfam = register_module("TRGECLFAM")
 trgecl = register_module("TRGECL")
-trgeclMC = register_module("TRGECLMCMatching")
+trgeclMC = register_module("MCMatcherTRGECL")
 
 # output
 rootoutput = register_module('RootOutput')

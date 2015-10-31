@@ -426,8 +426,6 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   vector<dd_t> f(16);
   for (int k = 0; k < 2 * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- 1 ADC tick
     dsp.fillvector(f);
-    for (int i = 0; i < 16; i++)
-      f[i].second *= 24. * 12. * 2. / 508.; // rescale derivative since ShapeFitter operates in ADC clock units.
 
     double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
     double sg0[16], sg1[16], sg2[16];

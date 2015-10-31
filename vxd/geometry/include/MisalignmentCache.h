@@ -12,7 +12,9 @@
 #define VXD_MISALIGNMENT_CACHE_H
 
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
 #include <unordered_map>
+#include <tuple>
 
 #include <TGeoMatrix.h>
 
@@ -27,6 +29,8 @@ namespace Belle2 {
 
       /** Hash map type to store existing misalignment transforms */
       typedef std::unordered_map<Belle2::VxdID::baseType, TGeoHMatrix> MisalignmentMap;
+      /** Misalignment shift information contains a validity flag (if false, the misaligned object falls outside its sensor) and shifts in u and v.*/
+      typedef std::tuple<bool, double, double> MisalignmentShiftType;
 
       /** destructor to clean up misalignment */
       ~MisalignmentCache() { clear(); };
@@ -56,13 +60,20 @@ namespace Belle2 {
        * @param id VxdID of the desired sensor
        * @return identity transform if no data found.
        */
-      const TGeoHMatrix& getMisalignment(Belle2::VxdID id) const;
+      const TGeoHMatrix& getMisalignmentTransform(Belle2::VxdID id) const;
 
-      /** Return the misalignment transform for a given sensor.
-       * This function is a shorthand for MisalignmentCache::getInstance().getMisalignment
+      /** Return misalignment shift for a VXDTrueHit.
+       * This is the principal misalignment method, used to misalign TrueHits or Clusters (via relation to their TrueHits.
+       * @param truehit pointer to the TrueHit to misalign
+       * @return std::pair<double, double> of misalignment shifts
+       **/
+      MisalignmentShiftType getMisalignmentShift(const VXDTrueHit* hit);
+
+      /** Return misalignment shift for a VXDTrueHit.
+       * This is a shorthand for MisalignmentCache::getInstance().getMisalignmentShift.
        */
-      static const TGeoHMatrix& get(Belle2::VxdID id)
-      { return getInstance().getMisalignment(id); }
+      static MisalignmentShiftType getMisalignment(const VXDTrueHit* hit)
+      { return getInstance().getMisalignmentShift(hit); }
 
       /** Return a reference to the singleton instance */
       static MisalignmentCache& getInstance();

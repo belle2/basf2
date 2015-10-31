@@ -10,6 +10,7 @@
 
 
 #include <vxd/geometry/MisalignmentCache.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -23,7 +24,7 @@ using namespace boost::property_tree;
 namespace Belle2 {
   namespace VXD {
 
-    const TGeoHMatrix& MisalignmentCache::getMisalignment(VxdID id) const
+    const TGeoHMatrix& MisalignmentCache::getMisalignmentTransform(VxdID id) const
     {
       static const TGeoHMatrix unity;
 
@@ -92,6 +93,28 @@ namespace Belle2 {
         return;
       }
       m_isAlive = true;
+    }
+
+    MisalignmentCache::MisalignmentShiftType MisalignmentCache::getMisalignmentShift(const VXDTrueHit* hit)
+    {
+      if (!m_isAlive || !hit) return make_tuple(false, 0.0, 0.0);
+      VxdID sensorID = hit->getSensorID();
+      const TGeoHMatrix& transform = getMisalignmentTransform(sensorID);
+      // We need entry point as a reference - the point on the original track unaffected by passage through the sensor. We also don't care for w and set it to zero.
+      const double xea[3] = {hit->getEntryU(), hit->getEntryV(), 0.0};
+      TVector3 tev(hit->getEntryMomentum().Unit());
+      const double tea[3] = {tev.X(), tev.Y(), tev.Z()};
+      double xca[3], tca[3];
+      transform.MasterToLocal(xea, xca);
+      transform.MasterToLocalVect(tea, tca);
+      if (abs(tca[3]) > 0.0) {
+        double factor = - xca[2] / tca[2];
+        double dx = xca[0] + factor * tca[0] - xea[0];
+        double dy = xca[1] + factor * tca[1] - xea[1];
+        return make_tuple(true, dx, dy);
+      } else {
+        return make_tuple(false, 0.0, 0.0);
+      }
     }
 
     MisalignmentCache& MisalignmentCache::getInstance()

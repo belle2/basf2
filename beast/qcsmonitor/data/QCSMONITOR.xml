@@ -26,7 +26,8 @@
     <Active>
       <Material>QCSMONITOR-Material</Material>
       <ThetaZ unit="deg">0.0</ThetaZ>
-      <Phi unit="deg">-15.,15.,75.,105,165.,195.,-75.,-105.</Phi>
+      <!--Phi unit="deg">-15.,15.,75.,105,165.,195.,-75.,-105.</Phi-->
+      <Phi unit="deg">0.,90.,180.,-90.</Phi>
       <dx_scint unit="cm">5.0</dx_scint>
       <dy_scint unit="cm">2.0</dy_scint>
       <dz_scint unit="cm">0.25</dz_scint>

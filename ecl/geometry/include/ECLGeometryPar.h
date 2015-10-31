@@ -15,24 +15,38 @@
 #define ECLGEOMETRYPAR_H
 
 #include <vector>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <functional>
 #include <map>
-#include <G4ThreeVector.hh>
+#include <G4String.hh>
 
-typedef int EclIdentifier;
-typedef double EclGeV;
-typedef double EclCM;
-typedef double EclRad;
+#include "TVector3.h"
+/** tyep define EclIdentifier */
+typedef int EclIdentifier ;
+/** tyep define EclGeV */
+typedef double     EclGeV        ;
+/** tyep define EclGeV */
+typedef double   EclCM         ;
+/** tyep define EclCC */
+typedef double     EclCC         ;
+/** tyep define EclKG */
+typedef double     EclKG         ;
+/** tyep define EclRad */
+typedef double     EclRad        ;
+/** tyep define EclDeg */
+typedef double     EclDeg        ;
 
-class G4VTouchable;
-class TVector3;
+class G4VTouchable; // LEP: new way
 
 namespace Belle2 {
   namespace ECL {
 
-
-    //! The Class for ECL Geometry Parameters
-    /*! This class provides ECL gemetry parameters for simulation, reconstruction and so on.
-        These parameters are got from geometry description
+//! The Class for ECL Geometry Parameters
+    /*! This class provides ECL gemetry paramters for simulation, reconstruction and so on.
+        These parameters are gotten from gearbox.
     */
     class ECLGeometryPar {
 
@@ -56,16 +70,16 @@ namespace Belle2 {
       //! Print some debug information
       void Print() const;
 
-      //! Gets geometry parameters from PhysicalVolumeStore
+      //! Gets geometry parameters from gearbox.
       void read();
 
       //! Mapping theta, phi Id
       void Mapping(int cid);
 
       /** The Postion of crystal*/
-      const TVector3& GetCrystalPos(int cid);
+      TVector3 GetCrystalPos(int cid);
       /** The direction of crystal*/
-      const TVector3& GetCrystalVec(int cid);
+      TVector3 GetCrystalVec(int cid);
 
       /** Get Cell Id */
       int GetCellID(int ThetaId, int PhiId);
@@ -75,24 +89,42 @@ namespace Belle2 {
       int GetThetaID() {return mPar_thetaID;};
       /** Get Phi Id */
       int GetPhiID() {return mPar_phiID;};
+      /** Get Cell Id (LEP: old way) */
+      int ECLVolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
       /** Get Cell Id (LEP: new way)*/
-      int ECLVolumeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
-      int TouchableToCellID(const G4VTouchable*); // The same as above but without sanity checks
+      int ECLVolumeToCellID(const G4VTouchable*);//Mapping from G4VTouchable copyNumbers to Crystal CellID
 
     private:
-      void InitCrystal(int cid);
-      struct CrystalGeom_t {
-        G4ThreeVector pos, dir;
-      };
-      std::vector<CrystalGeom_t> m_crystals;
-
+      /** The Theta angle of  crystal derection for Barrel crystals */
+      double m_BLThetaCrystal[46];
+      /** The Phi angle of  crystal derection  for Barrel crystals */
+      double m_BLPhiCrystal[46];
+      /** The Prep of  crystal derection  for Barrel crystals */
+      double m_BLPreppos[46];
+      /** The Theta angle of  crystal position  for Barrel crystals */
+      double m_BLPhipos[46];
+      /** The Z of  crystal position  for Barrel crystals */
+      double m_BLZpos[46];
+      /** The Theta angle of  crystal derection  for Endcap crystals */
+      double m_ECThetaCrystal[132];
+      /** The Phi angle of  crystal derection  for Endcap crystals */
+      double m_ECPhiCrystal[132];
+      /** The Theta angle of  crystal position  for Endcap crystals */
+      double m_ECThetapos[132];
+      /** The Phi angle of  crystal position  for Endcap crystals */
+      double m_ECPhipos[132];
+      /** The R angle of  crystal position  for Endcap crystals */
+      double m_ECRpos[132];
       /** The Cell ID information*/
       int mPar_cellID;
       /** The Theta ID information*/
       int mPar_thetaID;
       /** The Phi ID information*/
       int mPar_phiID;
-      int m_ini_cid;
+      /** The Theta Index information*/
+      int mPar_thetaIndex;
+      /** The Phi IndeX information*/
+      int mPar_phiIndex;
       /** Pointer that saves the instance of this class. */
       static ECLGeometryPar* m_B4ECLGeometryParDB;
     };
@@ -115,7 +147,7 @@ namespace Belle2 {
         const std::vector< Identifier >&           aNbrs     ,
         const std::vector< Identifier >::size_type aNearSize
       ) ;
-
+///
       virtual ~EclNbr();
 
       // member functions
@@ -182,6 +214,8 @@ namespace Belle2 {
 
       /** type define Identifier */
       typedef EclIdentifier Identifier;
+//      has trouble with g++ stl, poor compiler
+//      typedef int Identifier;
 
       /// Constructors and destructor
       /** Constructor of TEclEnergyHit */
@@ -347,10 +381,17 @@ namespace Belle2 {
 
     };
 
+
     /**  define EclEnergyHitMap */
-    typedef std::map <TEclEnergyHit::Identifier, TEclEnergyHit,
+    typedef std::map < TEclEnergyHit::Identifier, TEclEnergyHit,
             std::less<TEclEnergyHit::Identifier> > EclEnergyHitMap;
 
   } // end of namespace ECL
 } // end of namespace Belle2
+
+namespace Belle2 {
+  /**  function of G4  VolumeName to Crystal CellID */
+  int ECLG4VolNameToCellID(const G4String& VolumeName);//Mapping from VolumeName to Crystal CellID
+} // end of namespace Belle2
+
 #endif

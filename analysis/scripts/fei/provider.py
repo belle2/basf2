@@ -91,6 +91,7 @@ def LoadParticles(resource):
     modularAnalysis.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
                                        ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:FSP', ''),
                                        ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')], writeOut=True, path=resource.path)
+    return 'Dummy'
 
 
 def MatchParticleList(resource, particleList, mvaTarget):

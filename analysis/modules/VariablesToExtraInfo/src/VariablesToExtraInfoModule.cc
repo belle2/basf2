@@ -72,7 +72,11 @@ void VariablesToExtraInfoModule::event()
     Particle* p = m_inputList->getParticle(i);
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
       double value = m_functions[iVar](p);
-      p->addExtraInfo(m_extraInfoNames[iVar], value);
+      if (p->hasExtraInfo(m_extraInfoNames[iVar])) {
+        B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
+      } else {
+        p->addExtraInfo(m_extraInfoNames[iVar], value);
+      }
     }
   }
 }

@@ -107,7 +107,7 @@ namespace Belle2 {
       double xca[3], tca[3];
       transform.MasterToLocal(xea, xca);
       transform.MasterToLocalVect(tea, tca);
-      if (abs(tca[3]) > 0.0) {
+      if (abs(tca[2]) > 0.0) {
         double factor = - xca[2] / tca[2];
         double dx = xca[0] + factor * tca[0] - xea[0];
         double dy = xca[1] + factor * tca[1] - xea[1];

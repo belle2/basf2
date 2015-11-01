@@ -69,6 +69,8 @@ namespace Belle2 {
     void saveCombinationsForSignal();
     /** Make all Particle combinations for given PDG and input lists, save into 'all' histogram. */
     bool saveAllCombinations();
+    /** Make FSP particles for given PDG, save into all and signal histogram */
+    void saveFSP();
 
     std::string m_decayString; /**< decay string. */
     int m_pdg;                /**< PDG code of combined particles */
@@ -103,6 +105,7 @@ namespace Belle2 {
     std::string m_cutParameter;  /**< selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
     int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
+    bool m_fsp_mode; /**< True if only one daughter particle, like it is the case for FSP particles */
 
   };
 

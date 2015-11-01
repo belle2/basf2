@@ -91,6 +91,13 @@ void PreCutHistMakerModule::initialize()
   set<int> setOfPDGs;
   set<string> setOfInputListNames;
   int nProducts = decay.getNDaughters();
+
+  if (nProducts == 1) {
+    m_fsp_mode = true;
+  } else {
+    m_fsp_mode = false;
+  }
+
   for (int i = 0; i < nProducts; ++i) {
     const DecayDescriptorParticle* daughter = decay.getDaughter(i)->getMother();
 
@@ -276,6 +283,29 @@ bool PreCutHistMakerModule::fillParticleLists(const std::vector<MCParticle*>& mc
   return true;
 }
 
+void PreCutHistMakerModule::saveFSP()
+{
+  for (unsigned int i = 0; i < m_inputLists[0]->getListSize(); ++i) {
+    Particle* part =  m_inputLists[0]->getParticle(i);
+    MCMatching::setMCTruth(part);
+
+    if (m_targetVar->function(part) > 0.5) {
+      m_withoutCut->get().Fill(1);
+    } else {
+      m_withoutCut->get().Fill(0);
+    }
+
+    if (!m_cut->check(part))
+      continue;
+
+    if (m_targetVar->function(part) > 0.5) {
+      m_histogramSignal->get().Fill(m_var->function(part));
+    }
+    m_histogramAll->get().Fill(m_var->function(part));
+  }
+}
+
+
 void PreCutHistMakerModule::saveCombinationsForSignal()
 {
   StoreArray<Particle> particles;
@@ -343,10 +373,14 @@ void PreCutHistMakerModule::event()
     //antiparticle lists are created in clearTemporaryLists(), so this doesn't need to be done here
   }
 
+  if (m_fsp_mode) {
+    saveFSP();
+    return;
+  }
+
   //for signal + background
   if (not saveAllCombinations())
     return;
-
 
   //combinations for signal decays
   StoreArray<MCParticle> mcparticles;

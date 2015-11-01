@@ -127,6 +127,15 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
         target='isSignal',
     )
 
+    mva_KS0_FSP = MVAConfiguration(
+        variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb',
+                   'M', 'useCMSFrame(E)', 'daughterAngle(0,1)',
+                   'useRestFrame(daughter({}, p))',
+                   'cosAngleBetweenMomentumAndVertexVector',
+                   'daughter({}, dz)', 'daughter({}, dr)'],
+        target='isSignal',
+    )
+
     pre_KS0 = PreCutConfiguration(
         variable='M',
         # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
@@ -138,7 +147,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p = Particle('K_S0', mva_KS0, pre_KS0, postCutConfig=postCut)
     p.addChannel(['pi+', 'pi-'])
     p.addChannel(['pi0', 'pi0'])
-    p.addChannel(['K_S0:FSP'])
+    p.addChannel(['K_S0:FSP'], mvaConfig=mva_KS0_FSP)
     particles.append(p)
 
 # ####################### D0 #########################

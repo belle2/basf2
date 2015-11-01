@@ -354,7 +354,7 @@ if __name__ == '__main__':
                         removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
                         particle.mvaConfig.target)
         if particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            makeCosBDLPlot(root_file,
+            makeCosBDLPlot(ntuple,
                            removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
                            particle.mvaConfig.target)
 

@@ -14,7 +14,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -25,14 +24,14 @@ REG_MODULE(VariablesToExtraInfo)
 
 VariablesToExtraInfoModule::VariablesToExtraInfoModule()
 {
-  setDescription("For each particle in the input list the selected variables are saved in an extra-info field '${variable}_previous'. Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");
+  setDescription("For each particle in the input list the selected variables are saved in an extra-info field with the given name. Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  vector<string> emptylist;
+  std::map<std::string, std::string> emptymap;
   addParam("particleList", m_inputListName, "Name of particle list with reconstructed particles.");
   addParam("variables", m_variables,
-           "List of variables to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
-           emptylist);
+           "Dictionary of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           emptymap);
 }
 
 VariablesToExtraInfoModule::~VariablesToExtraInfoModule()
@@ -45,12 +44,13 @@ void VariablesToExtraInfoModule::initialize()
   m_inputList.isRequired(m_inputListName);
 
   //collection function pointers
-  for (const string& varStr : m_variables) {
-    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
+  for (const auto& pair : m_variables) {
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(pair.first);
     if (!var) {
-      B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
+      B2ERROR("Variable '" << pair.first << "' is not available in Variable::Manager!");
     } else {
       m_functions.push_back(var->function);
+      m_extraInfoNames.push_back(pair.second);
     }
   }
 }
@@ -64,20 +64,15 @@ void VariablesToExtraInfoModule::event()
     return;
   }
 
-  unsigned int nVars = m_variables.size();
-  std::vector<std::string> extraInfoNames(nVars);
-
-  for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-    extraInfoNames[iVar] = m_variables[iVar] + "_previous";
-  }
 
   const unsigned int numParticles = m_inputList->getListSize();
+  const unsigned int nVars = m_functions.size();
 
   for (unsigned int i = 0; i < numParticles; i++) {
     Particle* p = m_inputList->getParticle(i);
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
       double value = m_functions[iVar](p);
-      p->addExtraInfo(extraInfoNames[iVar], value);
+      p->addExtraInfo(m_extraInfoNames[iVar], value);
     }
   }
 }

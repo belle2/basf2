@@ -19,11 +19,14 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <string>
+#include <map>
+#include <vector>
 
 namespace Belle2 {
   class Particle;
 
-  /** For each particle in the input list the selected variables are saved in an extra-info field '${variable}_previous'. Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");*/
+  /** For each particle in the input list the selected variables are saved in an extra-info field with the given name,
+   *  Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");*/
   class VariablesToExtraInfoModule : public Module {
   public:
 
@@ -41,10 +44,12 @@ namespace Belle2 {
     std::string m_inputListName;
     /**< input particle list */
     StoreObjPtr<ParticleList> m_inputList;
-    /** List of variables to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
-    std::vector<std::string> m_variables;
-    /** List of function pointers corresponding to given variables. */
+    /** Map of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
+    std::map<std::string, std::string> m_variables;
+    /**< Vector of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /**< Vector of extra info names */
+    std::vector<std::string> m_extraInfoNames;
   };
 
 } // Belle2 namespace

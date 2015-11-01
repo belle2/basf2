@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, UserCutConfiguration, PlotConfiguration
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, UserCutConfiguration
 
 
 def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):
@@ -36,7 +36,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
                          'useRestFrame(daughter({}, distance))',
                          'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                          'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
-                         'daughterInvariantMass({},{},{},{},{})', 'Q']
+                         'daughterInvariantMass({},{},{},{},{})', 'Q', 'extraInfo(decayModeID)']
 
     # note: these should not be correlated to Mbc (weak correlation of deltaE is OK)
     B_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
@@ -44,12 +44,9 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
               'useRestFrame(daughter({}, p))',
               'useRestFrame(daughter({}, distance))',
               'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
-              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE']
+              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE', 'extraInfo(decayModeID)']
 
     particles = []
-
-    import variables as v
-    v.variables.addAlias('isPrimarySignal', 'passesCut(isSignal > 0.5 and mcPrimary > 0.5)')
 
 # ################## Charged FSP ###############################
     mva_chargedFSP = MVAConfiguration(
@@ -62,10 +59,24 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
         target='isPrimarySignal',
     )
 
-    particles.append(Particle('pi+', mva_chargedFSP, postCutConfig=postCut))
-    particles.append(Particle('e+', mva_chargedFSP, postCutConfig=postCut))
-    particles.append(Particle('mu+', mva_chargedFSP, postCutConfig=postCut))
-    particles.append(Particle('K+', mva_chargedFSP, postCutConfig=postCut))
+    pre_chargedFSP = PreCutConfiguration(
+        variable='dr',
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(100, 0.0, 10.0),
+        efficiency=0.99,
+        purity=0.001,
+    )
+
+    user_chargedFSP = UserCutConfiguration('[dr < 2] and [dz < 4]')
+
+    particles.append(Particle('pi+', mva_chargedFSP, pre_chargedFSP, user_chargedFSP,
+                              postCutConfig=postCut).addChannel(['pi+:FSP']))
+    particles.append(Particle('e+', mva_chargedFSP, pre_chargedFSP, user_chargedFSP,
+                              postCutConfig=postCut).addChannel(['e+:FSP']))
+    particles.append(Particle('mu+', mva_chargedFSP, pre_chargedFSP, user_chargedFSP,
+                              postCutConfig=postCut).addChannel(['mu+:FSP']))
+    particles.append(Particle('K+', mva_chargedFSP, pre_chargedFSP, user_chargedFSP,
+                              postCutConfig=postCut).addChannel(['K+:FSP']))
 
 # ################# GAMMA ############################
 
@@ -76,7 +87,17 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
         target='isPrimarySignal',
     )
 
-    particles.append(Particle('gamma', mva_gamma, postCutConfig=postCut))
+    pre_gamma = PreCutConfiguration(
+        variable='goodGamma',
+        # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+        binning=(100, 0.0, 1.0),
+        efficiency=0.99,
+        purity=0.001,
+    )
+
+    user_gamma = UserCutConfiguration('E > 0.1')
+
+    particles.append(Particle('gamma', mva_gamma, pre_gamma, user_gamma, postCutConfig=postCut).addChannel(['gamma:FSP']))
 
 # ################# PI0 ###############################
     mva_pi0 = MVAConfiguration(
@@ -106,11 +127,6 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
         target='isSignal',
     )
 
-    mva_KS0_pi0pi0 = MVAConfiguration(
-        variables=['M', 'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))', 'Q'],
-        target='isSignal',
-    )
-
     pre_KS0 = PreCutConfiguration(
         variable='M',
         # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
@@ -121,7 +137,8 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     p = Particle('K_S0', mva_KS0, pre_KS0, postCutConfig=postCut)
     p.addChannel(['pi+', 'pi-'])
-    # p.addChannel(['pi0', 'pi0'], mva_KS0_pi0pi0)
+    p.addChannel(['pi0', 'pi0'])
+    p.addChannel(['K_S0:FSP'])
     particles.append(p)
 
 # ####################### D0 #########################
@@ -148,7 +165,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p.addChannel(['pi-', 'pi+', 'pi+', 'pi-'])
     p.addChannel(['pi-', 'pi+', 'pi0'])
     p.addChannel(['pi-', 'pi+', 'pi0', 'pi0'])
-    # p.addChannel(['K_S0', 'pi0'])
+    p.addChannel(['K_S0', 'pi0'])
     p.addChannel(['K_S0', 'pi+', 'pi-'])
     p.addChannel(['K_S0', 'pi+', 'pi-', 'pi0'])
     p.addChannel(['K-', 'K+'])
@@ -175,7 +192,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p.addChannel(['K-', 'pi+', 'pi+', 'pi0'])
     p.addChannel(['K-', 'K+', 'pi+'])
     p.addChannel(['K-', 'K+', 'pi+', 'pi0'])
-    # p.addChannel(['pi+', 'pi0'])
+    p.addChannel(['pi+', 'pi0'])
     p.addChannel(['pi+', 'pi+', 'pi-'])
     p.addChannel(['pi+', 'pi+', 'pi-', 'pi0'])
     p.addChannel(['K_S0', 'pi+'])
@@ -202,8 +219,8 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     p = Particle('D*+', mva_DStarPlus, pre_DStarPlus, postCutConfig=postCutSoft)
     p.addChannel(['D0', 'pi+'])
-    # p.addChannel(['D+', 'pi0'], mva_DStarPlus_withoutVertex)
-    # p.addChannel(['D+', 'gamma'], mva_DStarPlus_withoutVertex)
+    p.addChannel(['D+', 'pi0'])
+    p.addChannel(['D+', 'gamma'])
     particles.append(p)
 
 # ####################### D*0 #########################
@@ -313,10 +330,10 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p.addChannel(['anti-D0', 'pi+', 'pi+', 'pi-'])
     p.addChannel(['anti-D0', 'pi+', 'pi+', 'pi-', 'pi0'])
     p.addChannel(['anti-D0', 'D+'])
-    # p.addChannel(['anti-D0', 'D+', 'K_S0'])
-    # p.addChannel(['anti-D*0', 'D+', 'K_S0'])
-    # p.addChannel(['anti-D0', 'D*+', 'K_S0'])
-    # p.addChannel(['anti-D*0', 'D*+', 'K_S0'])
+    p.addChannel(['anti-D0', 'D+', 'K_S0'])
+    p.addChannel(['anti-D*0', 'D+', 'K_S0'])
+    p.addChannel(['anti-D0', 'D*+', 'K_S0'])
+    p.addChannel(['anti-D*0', 'D*+', 'K_S0'])
     p.addChannel(['anti-D0', 'D0', 'K+'])
     p.addChannel(['anti-D*0', 'D0', 'K+'])
     p.addChannel(['anti-D0', 'D*0', 'K+'])
@@ -332,7 +349,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p.addChannel(['anti-D0', 'K+'])
     p.addChannel(['D-', 'pi+', 'pi+'])
     p.addChannel(['D-', 'pi+', 'pi+', 'pi0'])
-    # p.addChannel(['J/psi', 'K+'])
+    p.addChannel(['J/psi', 'K+'])
     p.addChannel(['J/psi', 'K+', 'pi+', 'pi-'])
     p.addChannel(['J/psi', 'K+', 'pi0'])
     p.addChannel(['J/psi', 'K_S0', 'pi+'])
@@ -388,10 +405,10 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p.addChannel(['D-', 'D*0', 'K+'])
     p.addChannel(['D*-', 'D0', 'K+'])
     p.addChannel(['D*-', 'D*0', 'K+'])
-    # p.addChannel(['D-', 'D+', 'K_S0'])
-    # p.addChannel(['D*-', 'D+', 'K_S0'])
-    # p.addChannel(['D-', 'D*+', 'K_S0'])
-    # p.addChannel(['D*-', 'D*+', 'K_S0'])
+    p.addChannel(['D-', 'D+', 'K_S0'])
+    p.addChannel(['D*-', 'D+', 'K_S0'])
+    p.addChannel(['D-', 'D*+', 'K_S0'])
+    p.addChannel(['D*-', 'D*+', 'K_S0'])
     p.addChannel(['D_s+', 'D-'])
     p.addChannel(['D*-', 'pi+'])
     p.addChannel(['D*-', 'pi+', 'pi0'])

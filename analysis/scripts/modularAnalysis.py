@@ -1033,19 +1033,19 @@ def variablesToExtraInfo(
     path=analysis_main,
 ):
     """
-    For each particle in the input list the selected variables are saved in an extra-info field '${variable}_previous'.
+    For each particle in the input list the selected variables are saved in an extra-info field witht he given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
 
     @param particleList  The input ParticleList
-    @param variables      Variable to order Particles by.
+    @param variables     Dictionary of Variables and extraInfo names.
     @param path          modules are added to this path
     """
 
-    bcs = register_module('VariablesToExtraInfo')
-    bcs.set_name('VariablesToExtraInfo_' + particleList)  # + '_' + variables)
-    bcs.param('particleList', particleList)
-    bcs.param('variables', variables)
-    path.add_module(bcs)
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name('VariablesToExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    path.add_module(mod)
 
 
 def findMCDecay(

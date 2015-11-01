@@ -10,6 +10,8 @@ from B2Tools import b2latex
 from B2Tools import format
 
 from fei import preCutDetermination
+from fei import compactReporting
+
 import os
 import re
 import sys
@@ -21,6 +23,14 @@ import numpy
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
 from ROOT import Belle2
+
+import seaborn
+seaborn.set(font_scale=5)
+seaborn.set_style('whitegrid')
+
+import pandas
+import numpy
+from root_pandas import read_root
 
 # workaround to make Belle2.Variables namespace available in root6
 import variables
@@ -147,44 +157,6 @@ def loadHistsFromRootFile(filename):
     # Put arrays and patches into own Hist class to simplify usage
     binnedDataList = [BinnedData(array, patch) for array, patch in zip(arrays, patches)]
     return dict(list(zip(keys_str, binnedDataList)))
-
-
-def loadMCCountsDictionary(filename):
-    """
-    Load MCCounts into a dictionary of pdg code and BinnedData objects
-        @param filename name of the ROOT file containing the MCCounts
-        @return dictionary of pdg code and BinnedData objects with MCCounts
-    """
-    hists = loadHistsFromRootFile(filename)
-
-    def rename(name):
-        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
-        return old_name[len('NumberOfMCParticlesInEvent('):-len(")")]
-
-    return {rename(key): hist for key, hist in hists.items()}
-
-
-def loadListCountsDictionary(filename):
-    """
-    Load ListCounts into a dictionary containting BinnedData objects
-    Keys are named by the MatchedParticleList name plus the suffixes _Signal, _Background, _All.
-        @param filename name of the ROOT file containing the ListCounts
-        @return dictionary of ParticleListNames and BinnedData objects
-    """
-    hists = loadHistsFromRootFile(filename)
-
-    def rename(name):
-        old_name = Belle2.Variable.invertMakeROOTCompatible(name)
-        if ',' in old_name:
-            if old_name[-2] == '1':
-                return old_name.split(',')[0][len('countInList('):] + '_Signal'
-            if old_name[-2] == '0':
-                return old_name.split(',')[0][len('countInList('):] + '_Background'
-            raise RuntimeError("Given listCount name is not valid " + old_name)
-        else:
-            return old_name[len('countInList('):-1] + '_All'
-
-    return {rename(key): hist for key, hist in hists.items()}
 
 
 def loadPreCutDictionary(filename):
@@ -523,127 +495,6 @@ def createUniqueFilename(name, hash, suffix='png'):
     return filename.replace('/', '').replace(':', '').replace(' ', '').replace('=', '').replace('>', '')
 
 
-def createSummary(resource, finalStateSummaries, combinedSummaries, particles, mcCounts, listCounts, moduleStatisticsFile):
-    """
-    Creates combined summary .tex file for FEIR
-        @param resource object
-        @param finalStateSummaries list of placeholder dictonaries (for each FSP)
-        @param combinedSummaries list of placeholder dictonaries (for each combined particle)
-        @param particles List of Particle objects
-        @param mcCounts filename containing MCParticle counts
-        @param listCounts filename containing List counts
-        @param moduleStatisticsFilefile name of the TFile containing actual statistics
-        @return dictionary of placeholders used in the .tex file
-    """
-
-    o = b2latex.LatexFile()
-
-    o += b2latex.TitlePage(title='Full Event Interpretation Report',
-                           authors=['Thomas Keck', 'Christian Pulvermacher'],
-                           abstract=r"""
-                           This report contains key performance indicators and control plots of the Full Event Interpretation.
-                           The user-, pre-, and post-cuts as well as trained multivariate selection methods are described.
-                           Furthermore the resulting purities and efficiencies are stated.
-                              """,
-                           add_table_of_contents=True).finish()
-
-    channelSummaries = sum([x['channels'] for x in combinedSummaries], [])
-
-    o += b2latex.Section("Summary").finish()
-    o += b2latex.String(r"""
-        For each final-state particle a multivariate selection method is trained without any previous cuts
-        on the candidates. Afterwards, a post cut is applied on the signal probability calculated by the method.
-        This reduces combinatorics in the following stages of the Full
-        Event Interpretation.
-        """).finish()
-
-    table = b2latex.LongTable(columnspecs=r'c|rr|rr',
-                              caption='Final-state particle efficiency and purity before and after the applied post-cut.',
-                              head=r'Final-state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\' +
-                                   r' particle    &  detector & post-cut   &  detector & post-cut \\',
-                              format_string=r'{name} & {user_efficiency:.2f} & {post_efficiency:.2f}'
-                                            r'& {user_purity:.2f} & {post_purity:.2f} ')
-    for summary in finalStateSummaries:
-        table.add(**summary)
-    o += table.finish()
-
-    o += b2latex.String(r"""
-        For each decay channel of each intermediate particle a multivariate selection method is trained after applying
-        a fast pre-cut on the candidates. Afterwards, a post-cut is applied on the signal probability calculated by the method.
-        This reduces combinatorics in the following stages of the Full
-        Event Interpretation. For some intermediate particles, in particular the final B mesons, an additional user-cut
-        is applied before all other cuts.
-        """).finish()
-
-    table = b2latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
-                              caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
-                              head=r'Particle & Covered '
-                                   r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
-                                   r' & BR in \% &  recon. & user-cut & pre-cut & post-cut '
-                                   r' & recon. & user-cut & pre-cut & post-cut \\',
-                              format_string=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
-                                            r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
-                                            r' & {detector_purity:.2f} & {user_purity:.2f} & {pre_purity:.2f} & {post_purity:.2f}')
-    for summary in combinedSummaries:
-        table.add(**summary)
-    o += table.finish()
-
-    # If you change the number of colors, than change below \ifnum5 accordingly
-    colours = ["orange", "blue", "red", "green", "cyan", "purple"]
-
-    o += b2latex.Section("CPU time per channel").finish()
-
-    colour_list = b2latex.DefineColourList()
-    o += colour_list.finish()
-
-    listCountsData = loadListCountsDictionary(listCounts)
-    stats = loadModuleStatisticsDataFrame(moduleStatisticsFile)
-    sum_time_seconds = stats['time'].sum()
-    moduleTypes = list(stats.type.unique())
-    stats = stats.groupby(['listname', 'type'])['time'].sum()
-
-    statTable = []
-    for summary in itertools.chain(finalStateSummaries, channelSummaries):
-        name = summary['name']
-        plist = summary['list']
-        if plist is None:
-            continue
-        if plist not in stats:
-            continue
-        trueCandidates = listCountsData[plist + '_Signal'].sum()
-        allCandidates = listCountsData[plist + '_All'].sum()
-        statTable.append([name, stats[plist].sum(), stats[plist], trueCandidates, allCandidates])
-
-    table = b2latex.LongTable(columnspecs=r'lrcrr',
-                              caption='Total CPU time spent in event() calls for each channel. Bars show ' +
-                                      ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
-                                      ', in this order. Does not include I/O, initialisation, training, post-cuts etc.',
-                              head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
-                              format_string=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
-    for name, time, timePerModule, trueCandidates, allCandidates in statTable:
-        percents = tuple(timePerModule[key] / time * 100.0 if key in timePerModule else 0.0 for key in moduleTypes)
-        if len(percents) < 6:
-            percents = percents + (0,) * (6 - len(percents))
-        timePerCandidate = format.duration(numpy.float64(time) / trueCandidates)
-        timePerCandidate += ' (' + format.duration(numpy.float64(time) / allCandidates) + ')'
-        table.add(name=name,
-                  bargraph=r'\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % percents,
-                  time=format.duration(time),
-                  timePerCandidate=timePerCandidate,
-                  timePercent=time / sum_time_seconds * 100 if sum_time_seconds > 0 else 0)
-    o += table.finish(tail='Total & & ' + format.duration(sum_time_seconds) + ' & & 100 ')
-
-    for ph in finalStateSummaries:
-        o += ph['page']
-    for ph in combinedSummaries:
-        o += ph['page']
-
-    o.save('FEIsummary.tex', compile=True)
-    resource.needed = False
-    resource.cache = True
-    return
-
-
 def createTMVASection(filename, tmvaTraining, mvaConfig, plotConfig):
     """
     Create TMVA section, with information about used methods,
@@ -918,13 +769,12 @@ def createFSPReport(resource, particleName, particleLabel, matchedList, mvaConfi
             'post_efficiency': post_efficiency, 'post_purity': post_purity, 'covered': 100.0}
 
 
-def createParticleReport(resource, particleName, particleLabel, channelNames, matchedLists, mvaConfig, mvaConfigs,
+def createParticleReport(particleName, particleLabel, channelNames, matchedLists, mvaConfig, mvaConfigs,
                          userCutConfig, userConfigs, preCutConfig, preCut, preCutHistograms, postCutConfig, postCut,
                          plotConfig, tmvaTrainings, splotTrainings, signalProbabilities, nTuple, listCounts, mcCounts,
                          coveredBranchingFractions):
     """
     Creates a pdf document with the PreCut and Training plots
-        @param resource object
         @param particleName valid pdg particle name
         @param particleLabel user defined label
         @param channelPlaceholders list of all tex placeholder dictionaries of all channels
@@ -932,13 +782,7 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
         @param listCounts particle count in all particle lists
         @return dictionary containing latex placeholders of this particle
     """
-    import seaborn
-    import pandas
-    import numpy
-    from root_pandas import read_root
     # Set nice searborn settings
-    seaborn.set(font_scale=5)
-    seaborn.set_style('whitegrid')
 
     resource.needed = False
     resource.cache = True
@@ -1200,94 +1044,118 @@ def createParticleReport(resource, particleName, particleLabel, channelNames, ma
             'detector_efficiency': recon_efficiency, 'detector_purity': recon_purity, 'channels': channels}
 
 
-def sendMail():
-    import smtplib
-    from email.MIMEMultipart import MIMEMultipart
-    from email.MIMEBase import MIMEBase
-    from email.MIMEText import MIMEText
-    from email.Utils import COMMASPACE, formatdate
-    from email import Encoders
-    import random
+if __name__ == '__main__':
 
-    fromMail = 'nordbert@kit.edu'
-    toMails = ['t.keck@online.de', 'christian.pulvermacher@kit.edu']
+    if len(sys.argv) != 3:
+        print("Usage: " + sys.argv[0] + ' SummaryFile.pickle OutputFile.tex')
+        sys.exit(1)
 
-    ClicheBegin = ['Hello', 'Congratulations!', 'Whats up?', 'Dear Sir/Madam', 'Howdy!']
-    Person = ['I\'m', 'Nordbert is']
-    StateOfMind = ['happy', 'cheerful', 'joyful', 'delighted', 'lucky']
-    VerbAnnounce = ['announce', 'declare', 'make public', 'make known', 'report', 'publicize', 'broadcast', 'publish']
-    PossesivePronoun = ['our', 'my', 'your']
-    Adjective = [
-        'awesome',
-        'revolutionary',
-        'gorgeous',
-        'beautiful',
-        'spectacular',
-        'splendid',
-        'superb',
-        'wonderful',
-        'impressive',
-        'amazing',
-        'stunning',
-        'breathtaking',
-        'incredible']
-    VerbFinished = ('has', ['finished', 'completed', 'terminated', 'concluded'])
-    Motivation = [
-        ('Keep on your', Adjective, 'work!'), (Person, 'so proud of you!'), ([
-            'Enjoy this', 'Relax a'], 'moment and have a', [
-            'cookie', '\bn ice', 'bath', 'day off'], '\b.')]
-    ClicheEnd = ['Best regards', 'Yours sincerely', 'Kind regards', 'Yours faithfully', 'See you', 'cu']
+    obj = pickle.load(open(sys.argv[1], 'rb'))
+    print(obj)
 
-    def generate_sentence(term):
-        if isinstance(term, str):
-            return term
-        if isinstance(term, list):
-            return generate_sentence(term[random.randint(0, len(term) - 1)])
-        if isinstance(term, tuple):
-            return " ".join([generate_sentence(subterm) for subterm in term])
-        raise RuntimeError('Invalid type received in sentence generator')
+    mc_counts = compactReporting.getMCCounts(obj)
+    list_counts = compactReporting.getMCCounts(obj)
 
-    sentence = (ClicheBegin,
-                '\n\n',
-                Person,
-                StateOfMind,
-                'to',
-                VerbAnnounce,
-                'that',
-                PossesivePronoun,
-                Adjective,
-                'Full Event Interpretation',
-                VerbFinished,
-                '\b.\n\nThat\'s',
-                Adjective,
-                '\b!\n',
-                Motivation,
-                '\n\n',
-                ClicheEnd,
-                '\b,\n',
-                ['',
-                 ('the',
-                  [Adjective,
-                   StateOfMind])],
-                'Nordbert')
+    o = b2latex.LatexFile()
 
-    text = MIMEText(re.sub('.\b', '', generate_sentence(sentence)))
+    o += b2latex.TitlePage(title='Full Event Interpretation Report',
+                           authors=['Thomas Keck', 'Christian Pulvermacher'],
+                           abstract=r"""
+                           This report contains key performance indicators and control plots of the Full Event Interpretation.
+                           The user-, pre-, and post-cuts as well as trained multivariate selection methods are described.
+                           Furthermore the resulting purities and efficiencies are stated.
+                              """,
+                           add_table_of_contents=True).finish()
 
-    filename = 'FEIsummary.pdf'
-    pdf = MIMEBase('application', "octet-stream")
-    pdf.set_payload(open(filename, "rb").read())
-    Encoders.encode_base64(pdf)
-    pdf.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(filename))
+    channelSummaries = sum([x['channels'] for x in combinedSummaries], [])
 
-    msg = MIMEMultipart()
-    msg['From'] = fromMail
-    msg['To'] = COMMASPACE.join(toMails)
-    msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = 'Congratulations!'
-    msg.attach(text)
-    msg.attach(pdf)
+    o += b2latex.Section("Summary").finish()
+    o += b2latex.String(r"""
+        For each final-state particle a multivariate selection method is trained without any previous cuts
+        on the candidates. Afterwards, a post cut is applied on the signal probability calculated by the method.
+        This reduces combinatorics in the following stages of the Full
+        Event Interpretation.
+        """).finish()
 
-    server = smtplib.SMTP('smtp.kit.edu')
-    # server.login(fromMail, 'Not necessary for kit.edu :-)')
-    server.sendmail(fromMail, toMails, msg.as_string())
-    server.quit()
+    table = b2latex.LongTable(columnspecs=r'c|rr|rr',
+                              caption='Final-state particle efficiency and purity before and after the applied post-cut.',
+                              head=r'Final-state &  \multicolumn{2}{c}{Efficiency in \%}  &  \multicolumn{2}{c}{Purity in \%} \\' +
+                                   r' particle    &  detector & post-cut   &  detector & post-cut \\',
+                              format_string=r'{name} & {user_efficiency:.2f} & {post_efficiency:.2f}'
+                                            r'& {user_purity:.2f} & {post_purity:.2f} ')
+    for summary in finalStateSummaries:
+        table.add(**summary)
+    o += table.finish()
+
+    o += b2latex.String(r"""
+        For each decay channel of each intermediate particle a multivariate selection method is trained after applying
+        a fast pre-cut on the candidates. Afterwards, a post-cut is applied on the signal probability calculated by the method.
+        This reduces combinatorics in the following stages of the Full
+        Event Interpretation. For some intermediate particles, in particular the final B mesons, an additional user-cut
+        is applied before all other cuts.
+        """).finish()
+
+    table = b2latex.LongTable(columnspecs=r'c|r|rrrr|rrrr',
+                              caption='Per-particle efficiency and purity before and after the applied user-, pre- and post-cut.',
+                              head=r'Particle & Covered '
+                                   r' & \multicolumn{4}{c}{Efficiency in \%}  &  \multicolumn{4}{c}{Purity in \%} \\'
+                                   r' & BR in \% &  recon. & user-cut & pre-cut & post-cut '
+                                   r' & recon. & user-cut & pre-cut & post-cut \\',
+                              format_string=r'{name} & {covered:.2f} & {detector_efficiency:.2f} & {user_efficiency:.2f}'
+                                            r' & {pre_efficiency:.2f}  & {post_efficiency:.2f}'
+                                            r' & {detector_purity:.2f} & {user_purity:.2f} & {pre_purity:.2f} & {post_purity:.2f}')
+    for summary in combinedSummaries:
+        table.add(**summary)
+    o += table.finish()
+
+    # If you change the number of colors, than change below \ifnum5 accordingly
+    colours = ["orange", "blue", "red", "green", "cyan", "purple"]
+
+    o += b2latex.Section("CPU time per channel").finish()
+
+    colour_list = b2latex.DefineColourList()
+    o += colour_list.finish()
+
+    listCountsData = loadListCountsDictionary(obj['list_counts'])
+    stats = loadModuleStatisticsDataFrame(obj['module_statistics'])
+    sum_time_seconds = stats['time'].sum()
+    moduleTypes = list(stats.type.unique())
+    stats = stats.groupby(['listname', 'type'])['time'].sum()
+
+    statTable = []
+    for summary in itertools.chain(finalStateSummaries, channelSummaries):
+        name = summary['name']
+        plist = summary['list']
+        if plist is None:
+            continue
+        if plist not in stats:
+            continue
+        trueCandidates = list_counts[plist]['Signal']
+        allCandidates = list_counts[plist]['All']
+        statTable.append([name, stats[plist].sum(), stats[plist], trueCandidates, allCandidates])
+
+    table = b2latex.LongTable(columnspecs=r'lrcrr',
+                              caption='Total CPU time spent in event() calls for each channel. Bars show ' +
+                                      ', '.join('\\textcolor{%s}{%s}' % (c, m) for c, m in zip(colour_list.colours, moduleTypes)) +
+                                      ', in this order. Does not include I/O, initialisation, training, post-cuts etc.',
+                              head=r'Decay & CPU time & by module & per (true) candidate & Relative time ',
+                              format_string=r'{name} & {time} & {bargraph} & {timePerCandidate} & {timePercent:.2f}\% ')
+    for name, time, timePerModule, trueCandidates, allCandidates in statTable:
+        percents = tuple(timePerModule[key] / time * 100.0 if key in timePerModule else 0.0 for key in moduleTypes)
+        if len(percents) < 6:
+            percents = percents + (0,) * (6 - len(percents))
+        timePerCandidate = format.duration(numpy.float64(time) / trueCandidates)
+        timePerCandidate += ' (' + format.duration(numpy.float64(time) / allCandidates) + ')'
+        table.add(name=name,
+                  bargraph=r'\plotbar{ %g/, %g/, %g/, %g/, %g/, %g/, }' % percents,
+                  time=format.duration(time),
+                  timePerCandidate=timePerCandidate,
+                  timePercent=time / sum_time_seconds * 100 if sum_time_seconds > 0 else 0)
+    o += table.finish(tail='Total & & ' + format.duration(sum_time_seconds) + ' & & 100 ')
+
+    for ph in finalStateSummaries:
+        o += ph['page']
+    for ph in combinedSummaries:
+        o += ph['page']
+
+    o.save(sys.argv[2], compile=True)

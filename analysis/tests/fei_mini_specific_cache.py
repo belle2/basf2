@@ -10,7 +10,7 @@ from basf2 import *
 from ROOT import Belle2
 
 inputFile = Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root')
-steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_specific_steeringfile.internal')
+steeringFile = Belle2.FileSystem.findFile('analysis/tests/fei_mini_steeringfile.internal')
 
 tempdir = tempfile.mkdtemp()
 print(tempdir)
@@ -20,19 +20,25 @@ shutil.copy(inputFile, "inputdata.root")
 
 cmd = "basf2 -p 2 " + steeringFile + " -i inputdata.root -o inputdata.root -- -cache cache.pkl -verbose"
 
-# fsp variablestontuple
+open('specific_mode', 'w').close()
+
+# fsp pre cut hist maker
 assert 0 == os.system(cmd)
 assert len(glob.glob('cache.pkl')) == 1
 assert len(glob.glob('mcParticlesCount.root')) == 1
-# fsp TMVATeacher
+# fsp training data
 assert 0 == os.system(cmd)
-# fsp training, final variablestontuple
+# fsp D pre cut hist maker and fsp training
 assert 0 == os.system(cmd)
+assert len(glob.glob('weights/*')) == 6
+assert len(glob.glob('CutHistograms_D0*.root')) == 3
+assert len(glob.glob('var_*')) == 3
+# D channels training ignored.
 assert 0 == os.system(cmd)
-# fsp training, final variablestontuple
+assert len(glob.glob('D0*.root')) == 0
+# Summary.
 assert 0 == os.system(cmd)
-assert len(glob.glob('weights/*')) == 4
-assert len(glob.glob('var*.root*')) == 2
+assert len(glob.glob('Summary*')) == 1
 
 # create full path and run again
 # mostly just need, usually one would use --dump-path to get a stable version

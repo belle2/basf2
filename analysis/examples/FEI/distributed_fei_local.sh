@@ -92,15 +92,7 @@ function create_ntuples_with_finished_training {
 
 function run_basf2 {
   cd "$collectionDirectory"
-  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --nThreads 8 --cache cache.pkl --summary || return 1
-  cd - > /dev/null
-}
-
-function create_summary {
-  cd "$collectionDirectory"
-  cp cache.pkl cache.pkl_
-  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --cache cache.pkl --summary --rerunCached || return 1
-  mv cache.pkl_ cache.pkl
+  basf2 $steeringFile --dump-path basf2_path.pickle -i "$persistentDirectory"/1/basf2_input.root -- --verbose --nThreads 8 --cache cache.pkl || return 1
   cd - > /dev/null
 }
 

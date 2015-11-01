@@ -18,16 +18,25 @@ os.chdir(tempdir)
 
 cmd = "basf2 " + steeringFile + " -i " + inputFile + " -- -verbose"
 
-# fsp variablestontuple
+# fsp pre cut hist maker
 assert 0 == os.system(cmd)
-# fsp TMVATeacher
+assert len(glob.glob('mcParticlesCount.root')) == 1
+# fsp training data
 assert 0 == os.system(cmd)
-# fsp training and D hists
+# fsp D pre cut hist maker and fsp training
 assert 0 == os.system(cmd)
 assert len(glob.glob('weights/*')) == 6
-assert len(glob.glob('CutHistograms_D0*.root')) == 2
-# D channels ignored.
+assert len(glob.glob('CutHistograms_D0*.root')) == 3
+assert len(glob.glob('var_*')) == 3
+# D channels training ignored.
 assert 0 == os.system(cmd)
 assert len(glob.glob('D0*.root')) == 0
+# Summary.
+assert 0 == os.system(cmd)
+assert len(glob.glob('Summary*')) == 1
+
+# create full path and run again
+assert 0 == os.system(cmd)
+assert len(glob.glob('analysisPathDone.root')) == 1
 
 shutil.rmtree(tempdir)

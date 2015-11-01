@@ -12,23 +12,26 @@ import modularAnalysis
 import pdg
 
 from fei import preCutDetermination
+import pickle
 
 
-# Temporary hack until automaticReporting is finished with refactoring
-# use createUniqueFilename instead afterwards.
 def removeJPsiSlash(string):
     return string.replace('/', '')
 
 
-def GetEntriesSafe(tree, selection):
+def joinCuts(*cuts):
     """
-    Replacement for TTree::GetEntries(const char* selection) that
-    doesn't stop after a 1 billion entries or so.
+    Join given cut string together using correct cut-syntax with and and brackets
+    @param cuts cut string
     """
-    s = ROOT.TSelectorEntries(selection)
-    tree.Process(s, "", 1000000000000000)
-    tree.SetNotify(0)
-    return s.GetSelectedRows()
+    notempty = sum(cut != '' for cut in cuts)
+    if notempty == 0:
+        return ''
+    if notempty == 1:
+        for cut in cuts:
+            if cut != '':
+                return cut
+    return '[' + '] and ['.join(cut for cut in cuts if cut != '') + ']'
 
 
 import re
@@ -79,30 +82,15 @@ def LoadGeometry(resource):
     resource.path.add_module(geometry)
 
 
-def SelectParticleList(resource, particleName, particleLabel, userCut):
+def LoadParticles(resource):
     """
-    Creates a ParticleList gathering up all Particles with the given particleName
+    Load Particle module
         @param resource object
-        @param particleName valid pdg particle name
-        @param particleLabel user defined label
-        @param userCut user defined cut
-        @return name of ParticleList
     """
     resource.cache = True
-    particleList = particleName + ':' + resource.hash
-
-    cut = ''
-    if resource.env['ROE']:
-        if userCut != '':
-            cut = '[' + userCut + '] and isInRestOfEvent > 0.5'
-        else:
-            cut = 'isInRestOfEvent > 0.5'
-    else:
-        if userCut != '':
-            cut = userCut
-
-    modularAnalysis.fillParticleList(particleList, cut, writeOut=True, path=resource.path)
-    return particleList
+    modularAnalysis.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
+                                       ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:FSP', ''),
+                                       ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')], writeOut=True, path=resource.path)
 
 
 def MatchParticleList(resource, particleList, mvaTarget):
@@ -132,7 +120,8 @@ def MatchParticleList(resource, particleList, mvaTarget):
 
 def MakeParticleList(resource, particleName, daughterParticleLists, preCut, userCut, decayModeID):
     """
-    Creates a ParticleList by combining other ParticleLists via the ParticleCombiner module.
+    Creates a ParticleList by combining other ParticleLists via the ParticleCombiner module or
+    if only one daughter particle is given all FSP particles with the given corresponding name are gathered up.
         @param resource object
         @param particleName valid pdg particle name
         @param daughterParticleLists list of ParticleList name of every daughter particles
@@ -146,25 +135,22 @@ def MakeParticleList(resource, particleName, daughterParticleLists, preCut, user
     if preCut is None:
         return
 
-    if userCut != '' and preCut['cutstring'] != '':
-        cut = '[' + preCut['cutstring'] + '] and [' + userCut + ']'
-    elif userCut != '':
-        cut = userCut
-    elif preCut['cutstring'] != '':
-        cut = preCut['cutstring']
-    else:
-        cut = ''
     particleList = particleName + ':' + resource.hash
-    decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
-
-    pmake = register_module('ParticleCombiner')
-    pmake.set_name('ParticleCombiner_' + decayString)
-    pmake.param('decayString', decayString)
-    pmake.param('cut', cut)
-    pmake.param('maximumNumberOfCandidates', 1000)
-    pmake.param('decayMode', decayModeID)
-    pmake.param('writeOut', True)
-    resource.path.add_module(pmake)
+    if len(daughterParticleLists) == 1:
+        cut = joinCuts(userCut, 'isInRestOfEvent > 0.5' if resource.env['ROE'] else '', preCut['cutstring'])
+        modularAnalysis.cutAndCopyList(particleList, daughterParticleLists[0], cut, writeOut=True, path=resource.path)
+        modularAnalysis.variablesToExtraInfo(particleList, {'constant({dmID})'.format(dmID=decayModeID): 'decayModeID'},
+                                             path=resource.path)
+    else:
+        decayString = particleList + ' ==> ' + ' '.join(daughterParticleLists)
+        pmake = register_module('ParticleCombiner')
+        pmake.set_name('ParticleCombiner_' + decayString)
+        pmake.param('decayString', decayString)
+        pmake.param('cut', joinCuts(userCut, preCut['cutstring']))
+        pmake.param('maximumNumberOfCandidates', 1000)
+        pmake.param('decayMode', decayModeID)
+        pmake.param('writeOut', True)
+        resource.path.add_module(pmake)
 
     return particleList
 
@@ -319,8 +305,6 @@ def PreCutDetermination(resource, channelNames, preCutConfig, preCutHistograms):
     channelNames, preCutHistograms = list(zip(*[(c, p) for c, p in zip(channelNames, preCutHistograms) if p is not None]))
 
     # Calculate common PreCuts
-    # !! You probabily do NOT want to change the next line, otherwise you're probabily going to break the corresponding test
-    #    of this function.
     commonPreCuts = preCutDetermination.CalculatePreCuts(preCutConfig, channelNames, preCutHistograms)
     for (channelName, cut) in commonPreCuts.items():
         results[channelName] = None if cut['isIgnored'] else cut
@@ -339,35 +323,6 @@ def PostCutDetermination(resource, postCutConfig):
         return {'cutstring': '', 'range': (0, 1)}
     return {'cutstring': str(postCutConfig.value) + ' < extraInfo(SignalProbability)',
             'range': (postCutConfig.value, 1)}
-
-
-def FSPDistribution(resource, inputList, mvaTarget):
-    """
-    Returns signal and background distribution of FSP
-    Counts the number of MC Particles for every pdg code in all events
-        @param resource object
-        @param inputList particle list name
-        @param mvaTarget configuration for the multivariate analysis
-    """
-    resource.cache = True
-    filename = removeJPsiSlash('{i}_{h}.root'.format(i=inputList, h=resource.hash))
-
-    if not os.path.isfile(filename):
-        output = register_module('VariablesToNtuple')
-        output.param('particleList', inputList)
-        output.param('variables', [mvaTarget])
-        output.param('fileName', filename)
-        output.param('treeName', 'distribution')
-        resource.path.add_module(output)
-        resource.condition = ('EventType', '==0')
-        resource.halt = True
-        return None
-
-    rootfile = ROOT.TFile(filename)
-    distribution = rootfile.Get('distribution')
-
-    return {'nSignal': int(GetEntriesSafe(distribution, mvaTarget + ' == 1')),
-            'nBackground': int(GetEntriesSafe(distribution, mvaTarget + ' == 0'))}
 
 
 def CalculateInverseSamplingRate(resource, distribution):
@@ -630,14 +585,13 @@ def TagUniqueSignal(resource, particleList, signalProbability, target):
     return 'extraInfo(uniqueSignal)'
 
 
-def VariablesToNTuple(resource, particleList, signalProbability, target, extraVars):
+def VariablesToNTuple(resource, particleList, signalProbability, target):
     """
     Saves the calculated signal probability for this particle list
         @param resource object
         @param particleList the particleList
         @param signalProbability signalProbability as additional dependency
         @param target target variable
-        @param extraVars list of additional variables (can be empty)
         @return Resource named VariablesToNTuple_{particleIdentifier} providing root filename
     """
     resource.cache = True
@@ -650,9 +604,8 @@ def VariablesToNTuple(resource, particleList, signalProbability, target, extraVa
         output = register_module('VariablesToNtuple')
         output.set_name('VariablesToNtuple_' + particleList)
         output.param('particleList', particleList)
-        variables = [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB']
-        if extraVars is not None and len(extraVars) > 0 and extraVars[0] is not None:
-            variables += extraVars
+        variables = [target, 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors',
+                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
         output.param('variables', variables)
         output.param('fileName', filename)
         output.param('treeName', 'variables')
@@ -733,80 +686,48 @@ def CountParticleLists(resource, targets, lists):
     return filename
 
 
-def SaveStatisticSummary(resource, mcCounts, listCounts, VariablesToNTuple_list, particle_lists, targets, particle_Labels):
-    from fei import compactReporting as cR
+def SaveSummary(resource, mcCounts, listCounts, moduleStatistics, particles, ntuples, preCuts, postCuts,
+                plists, clists, mlists, mothers, cnames, preCutHistograms, inverseSamplingRates, trainingData):
+    """
+    Save all important files, determined cuts and the all configurations objects in a pickled file,
+    so we can use it later to produce a compact or a detailed training report
+        @param resource object
+        @param mcCounts filename containing mcCounts
+        @param listCount filename containing list counts
+        @param particles all particle objects given by the user
+        @param ntuples filenames of ntuples produced for each particle
+        @param preCuts determined preCut object for each particle
+        @param postCuts deterined postCut object for each particle
+        @param plists particle list names
+        @param clists raw channel list names
+        @param mlists matched channel list names
+        @param mothers mother particle identifier of each channel
+        @param cnames channel names of each channel
+        @param preCutHistograms filename of preCutHistogram for each channel
+        @param inverseSamplingRates inverse sampling rates for each channel
+        @param trainingData filename of TMVA training data input for each channel
+    """
 
-    resource.cache = False
-    filename = 'SummaryStatistic_' + resource.hash + '.txt'
+    resource.cache = True
+    filename = 'Summary_' + resource.hash + '.pickle'
 
-    out = open(filename, 'w')
-    out.write('# Post-Cut efficiencies for compact-FEI-summary \n')
-    out.write('# Particle           | post-cut efficency and purity              | pre-cut efficiency and purity \n')
+    obj = {'mc_counts': mcCounts,
+           'list_counts': listCounts,
+           'module_statistics': moduleStatistics,
+           'particles': particles,
+           'ntuples': ntuples,
+           'pre_cuts': preCuts,
+           'post_cuts': postCuts,
+           'plists': plists,
+           'clists': clists,
+           'mlists': mlists,
+           'mothers': mothers,
+           'cnames': cnames,
+           'pre_cut_histograms': preCutHistograms,
+           'inverse_sampling_rates': inverseSamplingRates,
+           'training_data': trainingData}
 
-    for particle, target, label in zip(particle_lists, targets, particle_Labels):
-
-        mc_Count = -42
-        mc_hists = ROOT.TFile(mcCounts)
-        for key in mc_hists.GetListOfKeys():
-            part = particle.replace('e+', 'e-').replace('mu+', 'mu-').replace('Jpsi', 'J/psi')
-            if pdg.to_name(int(cR.rename_MCCount(key.GetName()))) in part:
-                mc_Count = cR.calcSum(key.ReadObj())
-
-        unique_Count = -42
-        for var_file in VariablesToNTuple_list:
-            if particle.replace('J/psi', 'Jpsi') in var_file:
-                var_hist = ROOT.TFile(var_file)
-                var = var_hist.Get('variables')
-                leafs_str = [str(i.GetName()) for i in var.GetListOfLeaves()]
-                if 'extraInfo__bouniqueSignal__bc' in leafs_str:
-                    unique_Count = int(GetEntriesSafe(var, '{target} == 1 && {unique} == 1'.format(
-                        target=target,
-                        unique='extraInfo__bouniqueSignal__bc')))
-                sig_Count = int(GetEntriesSafe(var, '{target} == 1'.format(target=target)))
-                bkg_Count = int(GetEntriesSafe(var, '{target} == 0'.format(target=target)))
-                roc_filename = 'CS_{particle}_{label}_roc.png'.format(
-                    particle=particle.rsplit(':', 1)[0].replace('/', '').replace('+', ''),
-                    label=label)
-                cR.makeROCPlotFromNtuple(var_file, roc_filename, mc_Count, target)
-
-        list_Count_sig = 0
-        list_Count_bkg = 0
-        list_Count_all = 0
-        list_hists = ROOT.TFile(listCounts)
-        for key in list_hists.GetListOfKeys():
-            part = particle.rsplit(':', 1)[0].replace('Jpsi', 'J/psi')
-            list = cR.rename_ListCount(key.GetName())
-            if part in list and 'Signal' in list:
-                list_Count_sig += cR.calcSum(key.ReadObj())
-            if part in list and 'Background' in list:
-                list_Count_bkg += cR.calcSum(key.ReadObj())
-            if part in list and 'All' in list:
-                list_Count_all += cR.calcSum(key.ReadObj())
-
-        line = '{part:<5} - {label:<13}: {eff:<20}, {pur:<20} | {pre_eff:<20}, {pre_pur:<20}'.format(
-            part=particle.rsplit(':', 1)[0],
-            label=label,
-            # Post-Cut:
-            eff=sig_Count * 100. / mc_Count,
-            pur=sig_Count * 100. / (sig_Count + bkg_Count),
-            # Pre-Cut (Detector for FSP):
-            pre_eff=list_Count_sig * 100. / mc_Count,
-            pre_pur=list_Count_sig * 100. / (list_Count_sig + list_Count_bkg))
-
-        out.write(line + '\n')
-
-        if unique_Count != -42:
-            line2 = '{part:<5} - {label:<13}: {eff:<20}, {pur:<20} UNIQUE'.format(
-                part=particle.rsplit(':', 1)[0],
-                label=label,
-                # Post-Cut:
-                eff=unique_Count * 100. / mc_Count,
-                pur=unique_Count * 100. / (unique_Count + bkg_Count))
-
-            out.write(line2 + '\n')
-
-    out.close()
-
-    B2INFO('Statistic Summary saved in file {file}'.format(file=filename))
+    out = open(filename, 'wb')
+    pickle.dump(obj, out)
 
     return filename

@@ -5,6 +5,11 @@
 
 from basf2 import *
 from fei import *
+import os
+import modularAnalysis
+
+import fei.preCutDetermination
+fei.preCutDetermination.minimum_number_of_particles = 50
 
 chargedTrackVars = [
     'eid',
@@ -33,8 +38,26 @@ mvaConfig_chargedFSP = MVAConfiguration(
     target='isSignal',
 )
 
+pre_chargedFSP = PreCutConfiguration(
+    variable='dr',
+    # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
+    binning=(100, 0.0, 10.0),
+    efficiency=0.99,
+    purity=0.001,
+)
+
 mvaConfig_D = MVAConfiguration(
-    variables=['daughterProductOf(extraInfo(SignalProbability))', 'daughterAngle(0, 1)', 'p', 'pt', 'M', 'dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb'],
+    variables=['daughterProductOf(extraInfo(SignalProbability))',
+               'daughterAngle(0, 1)',
+               'p',
+               'pt',
+               'M',
+               'dr',
+               'dz',
+               'distance',
+               'significanceOfDistance',
+               'chiProb',
+               'extraInfo(decayModeID)'],
     target='isSignal',
 )
 
@@ -46,13 +69,14 @@ preCutConfiguration_nonFSP = PreCutConfiguration(
 )
 
 particles = []
-particles.append(Particle('pi+', mvaConfig_chargedFSP))
-particles.append(Particle('pi+:special', mvaConfig_chargedFSP))
-particles.append(Particle('K+', mvaConfig_chargedFSP))
+particles.append(Particle('pi+', mvaConfig_chargedFSP, pre_chargedFSP).addChannel(['pi+:FSP']))
+particles.append(Particle('pi+:special', mvaConfig_chargedFSP, pre_chargedFSP).addChannel(['pi+:FSP']))
+particles.append(Particle('K+', mvaConfig_chargedFSP, pre_chargedFSP).addChannel(['K+:FSP']))
 
 
 p = Particle('D0', mvaConfig_D, preCutConfiguration_nonFSP)
 p.addChannel(['K-', 'pi+'])
+p.addChannel(['pi-', 'pi+'])
 particles.append(p)
 
 p = Particle('D0:special', mvaConfig_D, preCutConfiguration_nonFSP)
@@ -62,11 +86,17 @@ particles.append(p)
 selection_path = create_path()
 selection_path.add_module('RootInput')
 
-feistate = fullEventInterpretation(None, selection_path, particles)
+if os.path.isfile('specific_mode'):
+    modularAnalysis.fillParticleLists([('mu+:signal', 'muid > 0.1')], True, selection_path)
+    feistate = fullEventInterpretation('mu+:signal', selection_path, particles)
+else:
+    feistate = fullEventInterpretation(None, selection_path, particles)
 
-# show constructed path
+if feistate.is_trained:
+    feistate.path.add_module('RootOutput', outputFileName='analysisPathDone.root', ignoreCommandLineOverride=True)
+
+
 feistate.path.add_module('PrintCollections')
 print(feistate.path)
 process(feistate.path)
-
 print(statistics)

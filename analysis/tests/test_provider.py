@@ -110,54 +110,6 @@ class TestLoadGeometry(unittest.TestCase):
         self.assertEqual(self.resource, result)
 
 
-class TestSelectParticleList(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource(env={'ROE': False})
-
-    def test_SelectParticleList(self):
-        # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', 'eid > 0.2'), 'e+:42')
-        # Enables caching
-        result = MockResource(env={'ROE': False}, cache=True)
-        # Adds ParticleLoader
-        result.path.add_module('ParticleLoader', decayStringsWithCuts=[('e+:42', 'eid > 0.2')], writeOut=True)
-        self.assertEqual(self.resource, result)
-
-    def test_SelectParticleListWithoutCut(self):
-        # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', ''), 'e+:42')
-        # Enables caching
-        result = MockResource(env={'ROE': False}, cache=True)
-        # Adds ParticleLoader
-        result.path.add_module('ParticleLoader', decayStringsWithCuts=[('e+:42', '')], writeOut=True)
-        self.assertEqual(self.resource, result)
-
-    def test_SelectParticleListInROE(self):
-        # Set environment to ROE
-        self.resource.env['ROE'] = 'B+'
-        # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', 'eid > 0.2'), 'e+:42')
-        # Enables caching
-        result = MockResource(env={'ROE': 'B+'}, cache=True)
-        # Adds ParticleLoader with cut
-        result.path.add_module('ParticleLoader',
-                               decayStringsWithCuts=[('e+:42', '[eid > 0.2] and isInRestOfEvent > 0.5')], writeOut=True)
-        self.assertEqual(self.resource, result)
-
-    def test_SelectParticleListInROEWithoutCut(self):
-        # Set environment to ROE
-        self.resource.env['ROE'] = 'B+'
-        # Returns name of ParticleList
-        self.assertEqual(SelectParticleList(self.resource, 'e+', 'generic', ''), 'e+:42')
-        # Enables caching
-        result = MockResource(env={'ROE': 'B+'}, cache=True)
-        # Adds ParticleLoader with cut
-        result.path.add_module('ParticleLoader',
-                               decayStringsWithCuts=[('e+:42', 'isInRestOfEvent > 0.5')], writeOut=True)
-        self.assertEqual(self.resource, result)
-
-
 class TestMatchParticleList(unittest.TestCase):
 
     def setUp(self):
@@ -198,24 +150,24 @@ class TestMatchParticleList(unittest.TestCase):
 class TestMakeParticleList(unittest.TestCase):
 
     def setUp(self):
-        self.resource = MockResource()
+        self.resource = MockResource(env={'ROE': False})
 
     def test_MakeParticleList(self):
         # Returns name of ParticleList
         self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': '1.5 < M < 2.0'}, 'p > 3', 23), 'D0:42')
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'ROE': False})
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                                maximumNumberOfCandidates=1000,
-                               decayMode=23, cut='[1.5 < M < 2.0] and [p > 3]')
+                               decayMode=23, cut='[p > 3] and [1.5 < M < 2.0]')
         self.assertEqual(self.resource, result)
 
     def test_MakeParticleListEmptyUserCut(self):
         # Returns name of ParticleList
         self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': '1.5 < M < 2.0'}, '', 23), 'D0:42')
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'ROE': False})
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                                maximumNumberOfCandidates=1000,
@@ -226,7 +178,7 @@ class TestMakeParticleList(unittest.TestCase):
         # Returns name of ParticleList
         self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': ''}, 'p > 3', 23), 'D0:42')
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'ROE': False})
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                                maximumNumberOfCandidates=1000,
@@ -237,7 +189,7 @@ class TestMakeParticleList(unittest.TestCase):
         # Returns name of ParticleList
         self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], {'cutstring': ''}, '', 23), 'D0:42')
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'ROE': False})
         # Adds ParticleCombiner for given decay
         result.path.add_module('ParticleCombiner', decayString='D0:42 ==> K- pi+', writeOut=True,
                                maximumNumberOfCandidates=1000,
@@ -248,7 +200,55 @@ class TestMakeParticleList(unittest.TestCase):
         # Returns None if given PreCut is None
         self.assertEqual(MakeParticleList(self.resource, 'D0', ['K-', 'pi+'], None, '', 23), None)
         # Enables caching
-        result = MockResource(cache=True)
+        result = MockResource(cache=True, env={'ROE': False})
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListFSP(self):
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'e+', ['e+'], {'cutstring': ''}, 'eid > 0.2', 23), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': False}, cache=True)
+        # Adds ParticleLoader
+        result.path.add_module('ParticleListManipulator', inputListNames=['e+'],
+                               outputListName='e+:42', cut='eid > 0.2', writeOut=True)
+        result.path.add_module('VariablesToExtraInfo', particleList='e+:42', variables={'constant(23)': 'decayModeID'})
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListFSPWithoutCut(self):
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'e+', ['e+'], {'cutstring': ''}, '', 23), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': False}, cache=True)
+        # Adds ParticleLoader
+        result.path.add_module('ParticleListManipulator', inputListNames=['e+'],
+                               outputListName='e+:42', cut='', writeOut=True)
+        result.path.add_module('VariablesToExtraInfo', particleList='e+:42', variables={'constant(23)': 'decayModeID'})
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListFSPInROE(self):
+        # Set environment to ROE
+        self.resource.env['ROE'] = 'B+'
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'e+', ['e+'], {'cutstring': ''}, 'eid > 0.2', 23), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': 'B+'}, cache=True)
+        # Adds ParticleLoader with cut
+        result.path.add_module('ParticleListManipulator', inputListNames=['e+'],
+                               outputListName='e+:42', cut='[eid > 0.2] and [isInRestOfEvent > 0.5]', writeOut=True)
+        result.path.add_module('VariablesToExtraInfo', particleList='e+:42', variables={'constant(23)': 'decayModeID'})
+        self.assertEqual(self.resource, result)
+
+    def test_MakeParticleListFSPInROEWithoutCut(self):
+        # Set environment to ROE
+        self.resource.env['ROE'] = 'B+'
+        # Returns name of ParticleList
+        self.assertEqual(MakeParticleList(self.resource, 'e+', ['e+'], {'cutstring': ''}, '', 23), 'e+:42')
+        # Enables caching
+        result = MockResource(env={'ROE': 'B+'}, cache=True)
+        # Adds ParticleLoader with cut
+        result.path.add_module('ParticleListManipulator', inputListNames=['e+'],
+                               outputListName='e+:42', cut='isInRestOfEvent > 0.5', writeOut=True)
+        result.path.add_module('VariablesToExtraInfo', particleList='e+:42', variables={'constant(23)': 'decayModeID'})
         self.assertEqual(self.resource, result)
 
 
@@ -520,41 +520,6 @@ class TestPostCutDetermination(unittest.TestCase):
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
-
-
-class TestFSPDistribution(unittest.TestCase):
-
-    def setUp(self):
-        self.resource = MockResource()
-
-    def test_FSPDistribution(self):
-        # Returns None if Histogram does not exists
-        self.assertEqual(FSPDistribution(self.resource, 'e+:generic', 'isSignal'), None)
-        # Enables caching, halt and condition
-        result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
-        # Adds VariablesToNtuple for given ParticleList
-        result.path.add_module('VariablesToNtuple', particleList='e+:generic', variables=['isSignal'],
-                               fileName='e+:generic_42.root', treeName='distribution')
-        self.assertEqual(self.resource, result)
-
-    def test_FSPDistributionWithFile(self):
-        # I call upon the mighty god of Python!
-        with temporary_file('e+:generic_42.root'):
-            tfile = ROOT.TFile('e+:generic_42.root', 'RECREATE')
-            ntuple = ROOT.TNtuple("distribution", "distribution", "isSignal")
-            for i in range(23):
-                ntuple.Fill(0)
-                ntuple.Fill(1)
-            for i in range(42-23):
-                ntuple.Fill(1)
-            ntuple.Write()
-            tfile.Close()
-            # Returns dictionary with nSignal and nBackground if Histogram does exists
-            self.assertDictEqual(FSPDistribution(self.resource, 'e+:generic', 'isSignal'),
-                                 {'nSignal': 42, 'nBackground': 23})
-            # Enables caching, halt and condition
-            result = MockResource(cache=True)
-            self.assertEqual(self.resource, result)
 
 
 class TestCalculateInverseSamplingRate(unittest.TestCase):
@@ -958,45 +923,35 @@ class TestVariablesToNTuple(unittest.TestCase):
     def test_VariablesToNTupleWithFile(self):
         with temporary_file('var_D0:1_42.root'):
             # Returns filename if file already exists
-            self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', 'signalProbability', 'isSignal', None), 'var_D0:1_42.root')
+            self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', 'signalProbability', 'isSignal'), 'var_D0:1_42.root')
             # Enables caching
             result = MockResource(cache=True)
             self.assertEqual(self.resource, result)
 
     def test_VariablesToNTupleMissingParticleList(self):
         # Returns None if particle list is None
-        self.assertEqual(VariablesToNTuple(self.resource, None, 'signalProbability', 'isSignal', None), None)
+        self.assertEqual(VariablesToNTuple(self.resource, None, 'signalProbability', 'isSignal'), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_VariablesToNTupleMissingSignalProbability(self):
         # Returns None if SignalProbability is None
-        self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', None, 'isSignal', None), None)
+        self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', None, 'isSignal'), None)
         # Enables caching
         result = MockResource(cache=True)
         self.assertEqual(self.resource, result)
 
     def test_VariablesToNTuple(self):
         # Returns None if file does not exists
-        self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', 'signalProbability', 'isSignal', None), None)
+        self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', 'signalProbability', 'isSignal'), None)
         # Enables caching, halt and condition
         result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
         # Adds VariablesToNtuple for given ParticleList
-        variables = ['isSignal', 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB']
+        variables = ['isSignal', 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors',
+                     'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)']
         result.path.add_module('VariablesToNtuple', particleList='D0:1', fileName='var_D0:1_42.root',
                                treeName='variables', variables=variables)
-        self.assertEqual(self.resource, result)
-
-    def test_VariablesToNTupleWithExtraVars(self):
-        # Returns None if file does not exists
-        self.assertEqual(VariablesToNTuple(self.resource, 'D0:1', 'signalProbability', 'isSignal', ['a', 'b']), None)
-        # Enables caching, halt and condition
-        result = MockResource(cache=True, halt=True, condition=('EventType', '==0'))
-        # Adds VariablesToNtuple for given ParticleList
-        variables = ['isSignal', 'extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'cosThetaBetweenParticleAndTrueB']
-        result.path.add_module('VariablesToNtuple', particleList='D0:1', fileName='var_D0:1_42.root',
-                               treeName='variables', variables=variables + ['a', 'b'])
         self.assertEqual(self.resource, result)
 
 

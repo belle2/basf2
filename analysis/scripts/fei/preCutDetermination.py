@@ -180,6 +180,9 @@ def GetNumberOfEvents(histogram):
     return histogram.Integral(0, histogram.GetNbinsX() + 1)
 
 
+minimum_number_of_particles = 1000
+
+
 def GetIgnoredChannels(signal, bckgrd, cuts):
     """
     Returns the channels which should be ignored because the cuts are very tight and therefore
@@ -189,6 +192,6 @@ def GetIgnoredChannels(signal, bckgrd, cuts):
     @param cuts cuts on the x-axis of the channels
     """
     def isIgnored(channel):
-        return (GetNumberOfEventsInRange(signal[channel], cuts[channel]) < 1000 or
-                GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < 1000)
+        return (GetNumberOfEventsInRange(signal[channel], cuts[channel]) < minimum_number_of_particles or
+                GetNumberOfEventsInRange(bckgrd[channel], cuts[channel]) < minimum_number_of_particles)
     return [channel for channel in signal.keys() if isIgnored(channel)]

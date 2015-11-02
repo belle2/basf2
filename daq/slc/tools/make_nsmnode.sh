@@ -7,7 +7,7 @@ name=`perl -e "print lc(${1})"`
 bigname=`perl -e "print uc(${1})"`
 classname=`perl -e "print ucfirst(${name})"`
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/apps
+dir=${BELLE2_DAQ_SLC}/apps
 appdir=${dir}/${name}d
 
 if [ ! -e  ${appdir} ]; then
@@ -52,7 +52,7 @@ echo "directory ${appdir} already exsists"
 fi
 
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/data/config
+dir=${BELLE2_DAQ_SLC}/data/config
 
 filename=${dir}/${name}.conf
 if [ -e ${filename} ]; then

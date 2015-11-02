@@ -7,7 +7,7 @@ name=`perl -e "print lc(${1})"`
 bigname=`perl -e "print lcfirst(${1})"`
 classname=`perl -e "print ucfirst(${name})"`
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/apps
+dir=${BELLE2_DAQ_SLC}/apps
 
 appdir=${dir}/${name}d
 
@@ -53,13 +53,13 @@ else
 echo "directory ${appdir} already exsists"
 fi
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/data/config
+dir=${BELLE2_DAQ_SLC}/data/config
 filename=${dir}/${name}.conf
 echo "create NSM configuration file : ${filename}"
 sed "s/rctemplate/${name}/g" ${dir}/rctemplate.conf | \
 sed "s/RCTEMPLATE/$bigname/g" > ${filename}
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/data/database
+dir=${BELLE2_DAQ_SLC}/data/database
 filename=${dir}/${name}d.conf
 echo "create database input file : ${filename}"
 sed "s/rctemplate/${name}/g" ${dir}/rctemplated.conf | \

@@ -8,7 +8,7 @@ bigname=`perl -e "print lcfirst(${1})"`
 classname=`perl -e "print uc(${1})"`
 id=$2
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/copper
+dir=${BELLE2_DAQ_SLC}/copper
 
 if [ ! -e  ${dir}/${name} ]; then
 mkdir $dir/${name}/
@@ -30,14 +30,14 @@ else
 echo "directory ${dir}/${name} already exsists"
 fi
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/data/config
+dir=${BELLE2_DAQ_SLC}/data/config
 
 filename=$dir/cpr${id}.conf
 echo "create NSM configuration file : ${filename}"
 sed "s/TEMPLATE/$classname/g" $dir/cpr_template.conf | \
 sed "s/template/${name}/g" | sed "s/CPR001/CPR${id}/g"  > $dir/cpr${id}.conf
 
-dir=${BELLE2_LOCAL_DIR}/daq/slc/data/database
+dir=${BELLE2_DAQ_SLC}/data/database
 
 mkdir -p $dir/${name}
 

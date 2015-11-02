@@ -24,7 +24,7 @@ CFLAGS  += -I$(SLCDIR)/include
 ifeq ($(NOT_USE_PSQL),yes)
 CFLAGS  += -DNOT_USE_PSQL
 else 
-CFLAGS  += -I$(PGSQL_LIB_PATH)/include
+CFLAGS  += -I$(PGSQL_INC_PATH)
 endif
 CFLAGS  += $(EXTERNAL_CFLAGS)
 

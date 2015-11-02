@@ -11,7 +11,7 @@ ca2nsm_SRCS += ca2nsm.c
 ca2nsm_LIBS += $(EPICS_BASE_HOST_LIBS) 
 
 daq_slc_base_DIR = $(BELLE2_DAQ_SLC)/lib
-pq_DIR = $(PGSQL_LIB_PATH)/lib
+pq_DIR = $(PGSQL_LIB_PATH)
 
 include $(TOP)/configure/RULES
 #----------------------------------------

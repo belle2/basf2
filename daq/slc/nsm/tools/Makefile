@@ -10,12 +10,15 @@ LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
 LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses
 ifneq ($(NOT_USE_PSQL),yes)
-LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
+LIBS    += -L$(PGSQL_LIB_PATH) -lpq
 endif
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm 
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(INCDIR)
+ifneq ($(NOT_USE_PSQL),yes)
+CFLAGS  += -I$(PGSQL_INC_PATH)
+endif
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)

@@ -18,6 +18,8 @@ from modularAnalysis import vertexKFit
 from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
 from b2biiConversion import convertBelleMdstToBelleIIMdst
+from b2biiMonitors import addBeamParamsConversionMonitors
+from b2biiMonitors import addTrackConversionMonitors
 
 if len(sys.argv) != 3:
     sys.exit('Must provide two input parameters: [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
@@ -29,8 +31,9 @@ outputBelle2ROOTFile = sys.argv[2]
 
 # set the location of the Belle DB server
 # options are: ekpbelle.physik.uni-karlsruhe.de
-# or can51 (if you're running on KEKCC computers)
-os.putenv('BELLE_POSTGRES_SERVER', 'ekpbelle.physik.uni-karlsruhe.de')
+# or ekpbelle.physik.uni-karlsruhe.de (if you're running outside KEKCC computers)
+os.putenv('BELLE_POSTGRES_SERVER', 'can51')
+os.putenv('USE_GRAND_REPROCESS_DATA', '1')
 
 # Convert
 convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
@@ -38,6 +41,10 @@ convertBelleMdstToBelleIIMdst(inputBelleMDSTFile)
 # Reconstruct
 # first the gearbox needs to be loaded
 loadGearbox()
+
+# Create monitoring histograms
+addBeamParamsConversionMonitors()
+addTrackConversionMonitors()
 
 # Only charged final state particles need to be loaded
 # All photon and pi0 candidates are already loaded

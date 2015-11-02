@@ -56,13 +56,13 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int barID, int chID, int TDC, double t0)
+    int TOPreco::addData(int barID, int pixelID, int TDC, double t0)
     {
       int status;
       barID--; // 0-based ID used in fortran
-      chID--;   // 0-based ID used in fortran
+      pixelID--;   // 0-based ID used in fortran
       float T0 = (float) t0;
-      data_put_(&barID, &chID, &TDC, &T0, &status);
+      data_put_(&barID, &pixelID, &TDC, &T0, &status);
       return status;
     }
 
@@ -225,10 +225,10 @@ namespace Belle2 {
       ich++; // convert to 1-based
     }
 
-    double TOPreco::getPDF(int chID, double T, double Mass)
+    double TOPreco::getPDF(int pixelID, double T, double Mass)
     {
       float t = (float) T; float mass = (float) Mass;
-      return get_pdf_(&chID, &t, &mass);
+      return get_pdf_(&pixelID, &t, &mass);
     }
 
   } // end top namespace

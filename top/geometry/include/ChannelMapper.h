@@ -56,6 +56,12 @@ namespace Belle2 {
       void initialize(const GearDir& channelMapping);
 
       /**
+       * Checks if mapping is available
+       * @return true if available
+       */
+      bool isAvailable() const {return m_available;}
+
+      /**
        * Checks validity of pixel ID
        * @param pixel pixel ID (1-based)
        * @return true for valid ID
@@ -118,6 +124,7 @@ namespace Belle2 {
     private:
 
       std::vector<TOPChannelMap> m_mapping; /**< mappings from xml file */
+      bool m_available = false; /**< true if mapping available */
 
       const TOPChannelMap* m_channels[c_numRows][c_numColumns]; /**< conversion array */
       const TOPChannelMap* m_pixels[c_numAsics][c_numChannels]; /**< conversion array */

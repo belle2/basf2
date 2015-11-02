@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPRECONSTRUCTORMODULE_H
-#define TOPRECONSTRUCTORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -106,4 +105,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif // TOPRECONSTRUCTORMODULE_H

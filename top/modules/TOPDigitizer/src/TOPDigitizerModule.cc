@@ -144,8 +144,8 @@ namespace Belle2 {
     // simulate start time (bunch time given by trigger smeared according to T0 jitter)
     double startTime = gRandom->Gaus(trigT0, m_timeZeroJitter);
 
-    // channels with time digitizers
-    std::map<unsigned, TimeDigitizer> channels;
+    // pixels with time digitizers
+    std::map<unsigned, TimeDigitizer> pixels;
     typedef std::map<unsigned, TimeDigitizer>::iterator Iterator;
 
     // add simulated hits
@@ -157,42 +157,42 @@ namespace Belle2 {
       double x = simHit.getX();
       double y = simHit.getY();
       int pmtID = simHit.getPmtID();
-      int channelID = m_topgp->getChannelID(x, y, pmtID);
-      if (channelID == 0) continue;
+      int pixelID = m_topgp->getPixelID(x, y, pmtID);
+      if (pixelID == 0) continue;
 
       // add TTS to photon time and make it relative to start time
       double time = simHit.getTime() + generateTTS() - startTime;
 
-      // add time to digitizer of a given channel
-      TimeDigitizer digitizer(simHit.getBarID(), channelID);
+      // add time to digitizer of a given pixel
+      TimeDigitizer digitizer(simHit.getBarID(), pixelID);
       unsigned id = digitizer.getUniqueID();
-      Iterator it = channels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
+      Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, &simHit);
     }
 
     // add randomly distributed dark noise
     if (m_darkNoise > 0) {
       int numBars = m_topgp->getNbars();
-      int numChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
-                        m_topgp->getNpadx() * m_topgp->getNpady();
+      int numPixels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
+                      m_topgp->getNpadx() * m_topgp->getNpady();
       double timeMin = m_topgp->getTime(0);
       double timeMax = m_topgp->getTime(m_topgp->TDCoverflow() - 1);
       for (int barID = 1; barID <= numBars; barID++) {
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
-          int channelID = int(gRandom->Rndm() * numChannels) + 1;
+          int pixelID = int(gRandom->Rndm() * numPixels) + 1;
           double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
-          TimeDigitizer digitizer(barID, channelID);
+          TimeDigitizer digitizer(barID, pixelID);
           unsigned id = digitizer.getUniqueID();
-          Iterator it = channels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
+          Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time);
         }
       }
     }
 
     // digitize in time
-    for (auto& channel : channels) {
-      channel.second.digitize(digits, m_electronicJitter);
+    for (auto& pixel : pixels) {
+      pixel.second.digitize(digits, m_electronicJitter);
     }
 
   }
@@ -206,10 +206,6 @@ namespace Belle2 {
   void TOPDigitizerModule::terminate()
   {
 
-  }
-
-  void TOPDigitizerModule::printModuleParams() const
-  {
   }
 
   double TOPDigitizerModule::generateTTS()

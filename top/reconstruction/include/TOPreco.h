@@ -9,8 +9,7 @@
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
-#ifndef _TOPreco_h
-#define _TOPreco_h
+#pragma once
 
 #include <top/reconstruction/TOPtrack.h>
 
@@ -94,11 +93,11 @@ namespace Belle2 {
       /**
        * Add data
        * @param barID bar ID
-       * @param chID channel ID
+       * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param TDC digitized time
        * @param t0 offset in [ns] to be added
        */
-      int addData(int barID, int chID, int TDC, double t0 = 0.0);
+      int addData(int barID, int pixelID, int TDC, double t0 = 0.0);
 
       /**
        * Return size of data list
@@ -205,23 +204,23 @@ namespace Belle2 {
       /**
        * Get pulls: K-th pull
        * @param K counter
-       * @param channelID software channel ID (1-based)
+       * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param T photon time
        * @param T0 PDF mean time
        * @param Wid PDF sigma
        * @param PhiCer azimuthal Cerenkov angle
        * @param Wt weight
        */
-      void getPull(int K, int& channelID, float& T, float& T0, float& Wid,
+      void getPull(int K, int& pixelID, float& T, float& T0, float& Wid,
                    float& PhiCer, float& Wt);
 
       /**
-       * Return PDF for channel chID at time t for mass hypothesis mass
-       * @param chID channel ID
+       * Return PDF for pixel pixelID at time t for mass hypothesis mass
+       * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param t time
        * @param mass mass
        */
-      double getPDF(int chID, double t, double mass);
+      double getPDF(int pixelID, double t, double mass);
 
       /**
        * Set track beta (for beta resolution studies)
@@ -261,7 +260,6 @@ namespace Belle2 {
 
     };
 
-  } // top namespace
+  } // TOP namespace
 } // Belle2 namespace
 
-#endif

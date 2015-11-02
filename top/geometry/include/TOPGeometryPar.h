@@ -290,18 +290,6 @@ namespace Belle2 {
       double getPMToffsetY() const {return m_pmtOffsetY / m_unit;}
 
       /**
-       * Get front-end mapper (mapping of SCROD's to positions within TOP modules)
-       * @return  front-end mapper object
-       */
-      const FrontEndMapper& getFrontEndMapper() const {return m_frontEndMapper;}
-
-      /**
-       * Get channel mapper (mapping of channels to pixels)
-       * @return  channel mapper object
-       */
-      const ChannelMapper& getChannelMapper() const {return m_channelMapper;}
-
-      /**
        * Return number of TDC bits
        * @return number of TDC bits
        */
@@ -477,129 +465,6 @@ namespace Belle2 {
        */
       double getZBackward() const {return m_ZBackward / m_unit; }
 
-      /**
-       * Calculate channel ID from local possition on the PMT
-       * @param x position x on the sensitive detector plane
-       * @param y position y on the sensitive detector plane
-       * @param pmtID  ID of the PMT
-       * @return ID of channel for whole bar
-       */
-      int getChannelID(double x, double y, int pmtID) const;
-
-
-
-      //--deprecated - but not replaced yet at calling places ---------------->
-
-      /**
-       * Calculate channel ID from bar column and ASIC row, column and channel
-       * @param electronicsModule column within a TOP module
-       * @param asicRow ASIC row number
-       * @param asicColumn ASIC column number
-       * @param asicChannel ASIC channel number
-       * @return software channel ID
-       */
-      int getChannelID(int electronicsModule, int asicRow,
-                       int asicColumn, int asicChannel) const
-      {
-        return 4 - (asicChannel % 8) / 2 + (asicChannel % 2) * 64 + asicColumn * 4
-               + electronicsModule * 16 + asicRow * 128;
-      }
-
-      /**
-       * Converts hardware to software channel ID
-       * @param channel hardware channel ID
-       * @return software channel ID
-       */
-      int getChannelID(unsigned int channel) const
-      {
-        unsigned asicChannel = channel % 8; channel /= 8;
-        unsigned asicRow = channel % 4; channel /= 4;
-        unsigned asicCol = channel % 4; channel /= 4;
-        unsigned column = channel;
-        return getChannelID(column, asicRow, asicCol, asicChannel);
-      }
-
-      /**
-       * Returns a column of electronic module within TOP module
-       * @param pixel software channel ID
-       * @return electronic module number
-       */
-      int getElectronicsModuleNumber(int pixel) const
-      {
-        return ((pixel - 1) % 64) / 16;
-      }
-
-      /**
-       * Returns ASIC row
-       * @param pixel software channel ID
-       * @return ASIC row
-       */
-      int getAsicRow(int pixel) const
-      {
-        return (pixel - 1) / 128;
-      }
-
-      /**
-       * Returns ASIC column
-       * @param pixel software channel ID
-       * @return ASIC column
-       */
-      int getAsicColumn(int pixel) const
-      {
-        return ((pixel - 1) % 16) / 4;
-      }
-
-      /**
-       * Returns ASIC channel
-       * @param pixel software channel ID
-       * @return ASIC channel
-       */
-      int getAsicChannel(int pixel) const
-      {
-        return 2 * ((3 - (pixel - 1) % 4)) + ((pixel - 1) % 128) / 64;
-      }
-
-      /**
-       * Converts software to hardware channel ID
-       * @param pixel software channel ID
-       * @return hardware channel ID
-       */
-      unsigned getHardwareChannelID(int pixel) const
-      {
-        unsigned asicChannel = getAsicChannel(pixel);
-        unsigned asicRow = getAsicRow(pixel);
-        unsigned asicCol = getAsicColumn(pixel);
-        unsigned column = getElectronicsModuleNumber(pixel);
-        return asicChannel + asicRow * 8 + asicCol * 32 + column * 128;
-      }
-
-      /**
-       * Returns hardware channel ID
-       * @param ColRowChannel packed word ASICChannel(0:2), ASICRow(3:4), ASICCol(5:6)
-       * @param column electronics module number (a column within TOP module)
-       * @return hardware channel ID
-       */
-      unsigned getHardwareChannelID(unsigned ColRowChannel, unsigned column) const
-      {
-        return ColRowChannel + column * 128;
-      }
-
-      //<--end deprecated---------------------------------------------------
-
-      /**
-       * Convert new numbering scheme to the old one
-       * @param channelID channel ID in the new numbering scheme
-       * @return channel ID in the old numbering scheme
-       */
-      int getOldNumbering(int channelID) const;
-
-      /**
-       * Convert old numbering scheme to the new one
-       * @param channelID channel ID in the old numbering scheme
-       * @return channel ID in the new numbering scheme
-       */
-      int getNewNumbering(int channelID) const;
-
       /** Ger backwads possition
        *@return backward possition of the quartz bar
        */
@@ -621,6 +486,40 @@ namespace Belle2 {
        */
       G4Transform3D getAlignment(const std::string& component);
 
+      /**
+       * Calculate pixel ID from local possition on the PMT
+       * @param x position x on the sensitive detector plane
+       * @param y position y on the sensitive detector plane
+       * @param pmtID  ID of the PMT
+       * @return pixel ID (1-based)
+       */
+      int getPixelID(double x, double y, int pmtID) const;
+
+      /**
+       * Convert new numbering scheme for pixels to the old one
+       * @param pixelID pixel ID in the new numbering scheme
+       * @return pixel ID in the old numbering scheme
+       */
+      int getOldNumbering(int pixelID) const;
+
+      /**
+       * Convert old numbering scheme for pixels to the new one
+       * @param pixelID pixel ID in the old numbering scheme
+       * @return pixel ID in the new numbering scheme
+       */
+      int getNewNumbering(int pixelID) const;
+
+      /**
+       * Get front-end mapper (mapping of SCROD's to positions within TOP modules)
+       * @return  front-end mapper object
+       */
+      const FrontEndMapper& getFrontEndMapper() const {return m_frontEndMapper;}
+
+      /**
+       * Get channel mapper (mapping of channels to pixels)
+       * @return  channel mapper object
+       */
+      const ChannelMapper& getChannelMapper() const {return m_channelMapper;}
 
     private:
 

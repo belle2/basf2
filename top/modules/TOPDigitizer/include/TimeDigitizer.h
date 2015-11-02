@@ -29,8 +29,10 @@ namespace Belle2 {
 
       /**
        * Constructor
+       * @param barID TOP module ID
+       * @param pixelID pixel ID
        */
-      TimeDigitizer(int barID, int channelID): m_barID(barID), m_channelID(channelID)
+      TimeDigitizer(int barID, int pixelID): m_barID(barID), m_pixelID(pixelID)
       {}
 
       /**
@@ -50,16 +52,16 @@ namespace Belle2 {
       int getBarID() const { return m_barID; }
 
       /**
-       * Return channel ID
-       * @return software channel ID
+       * Return pixel ID
+       * @return pixel ID (e.g. software channel)
        */
-      int getChannelID() const { return m_channelID; }
+      int getPixelID() const { return m_pixelID; }
 
       /**
-       * Return unique channel ID
-       * @return unique channel ID
+       * Return unique pixel ID
+       * @return unique pixel ID
        */
-      unsigned getUniqueID() const {return m_channelID + (m_barID << 16);}
+      unsigned getUniqueID() const {return m_pixelID + (m_barID << 16);}
 
       /**
        * Do time digitization using simplified pile-up and double-hit-resolution model.
@@ -72,8 +74,8 @@ namespace Belle2 {
 
     private:
 
-      int m_barID;               /**< bar ID (1-based) */
-      int m_channelID;           /**< software channel ID (1-based) */
+      int m_barID;   /**< bar ID (1-based) */
+      int m_pixelID; /**< pixel (e.g. software channel) ID (1-based) */
       std::multimap<double, const TOPSimHit*> m_times; /**< sorted hit times */
 
     };

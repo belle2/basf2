@@ -303,7 +303,7 @@ namespace Belle2 {
       return m_QE[i] + (m_QE[i + 1] - m_QE[i]) / m_LambdaStep * (dlam - i * m_LambdaStep);
     }
 
-    int TOPGeometryPar::getChannelID(double x, double y, int pmtID) const
+    int TOPGeometryPar::getPixelID(double x, double y, int pmtID) const
     {
       if (fabs(x) >= m_AsizexHalf) return 0;
       if (fabs(y) >= m_AsizeyHalf) return 0;
@@ -325,14 +325,14 @@ namespace Belle2 {
     }
 
 
-    int TOPGeometryPar::getOldNumbering(int channelID) const
+    int TOPGeometryPar::getOldNumbering(int pixelID) const
     {
-      if (channelID == 0) return 0;
+      if (pixelID == 0) return 0;
 
-      channelID--;
+      pixelID--;
       int nx = m_Npmtx * m_Npadx;
-      int i = channelID % nx;
-      int j = channelID / nx;
+      int i = pixelID % nx;
+      int j = pixelID / nx;
       int ix = i % m_Npadx;
       int ipmtx = i / m_Npadx;
       int iy = j % m_Npady;
@@ -346,17 +346,17 @@ namespace Belle2 {
     }
 
 
-    int TOPGeometryPar::getNewNumbering(int channelID) const
+    int TOPGeometryPar::getNewNumbering(int pixelID) const
     {
-      if (channelID == 0) return 0;
+      if (pixelID == 0) return 0;
 
-      channelID--;
-      int ix = channelID % m_Npadx;
-      channelID /= m_Npadx;
-      int iy = channelID % m_Npady;
-      channelID /= m_Npady;
-      int ipmtx = channelID % m_Npmtx;
-      int ipmty = channelID / m_Npmtx;
+      pixelID--;
+      int ix = pixelID % m_Npadx;
+      pixelID /= m_Npadx;
+      int iy = pixelID % m_Npady;
+      pixelID /= m_Npady;
+      int ipmtx = pixelID % m_Npmtx;
+      int ipmty = pixelID / m_Npmtx;
 
       ix = m_Npadx - 1 - ix;
       ipmtx = m_Npmtx - 1 - ipmtx;

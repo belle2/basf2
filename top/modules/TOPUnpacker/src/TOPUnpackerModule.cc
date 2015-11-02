@@ -138,7 +138,7 @@ namespace Belle2 {
       return;
     }
     int barID = feemap->barID;
-    int column = feemap->column;
+    int boardstack = feemap->column;
 
     unsigned version = (buffer[0] >> 16) & 0xFF;
     switch (version) {
@@ -146,10 +146,10 @@ namespace Belle2 {
         for (int i = 1; i < bufferSize; i++) {
           int word = buffer[i];
           int tdc = word & 0xFFFF;
-          unsigned chan = ((word >> 16) & 0x7F) + column * 128;
+          unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
           unsigned flags = (word >> 24) & 0xFF;
-          int channelID = m_topgp->getChannelID(chan);
-          auto* digit = digits.appendNew(barID, channelID, tdc);
+          int pixelID = m_topgp->getChannelMapper().getPixelID(chan);
+          auto* digit = digits.appendNew(barID, pixelID, tdc);
           digit->setHardwareChannelID(chan);
           digit->setHitQuality((TOPDigit::EHitQuality) flags);
         }
@@ -165,63 +165,23 @@ namespace Belle2 {
   void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize,
                                                StoreArray<TOPRawWaveform>& waveforms)
   {
-
-    StoreObjPtr<EventMetaData> evtMetaData;
-
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
     if (!feemap) {
       B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
       return;
     }
-    int barID = feemap->barID;
-    int column = feemap->column;
 
     DataArray array(buffer, bufferSize);
     unsigned version = (buffer[0] >> 16) & 0xFF;
+    int err = 0;
     switch (version) {
-      case 1: {
-        unsigned scrod = array.getWord();
-        unsigned freezeDate = array.getWord();
-        unsigned eventNumber = array.getWord();
-        if (eventNumber != evtMetaData->getEvent()) {
-          B2ERROR("TOPUnpacker::unpackWaveformFormat: inconsistent event number, "
-                  "expect " << evtMetaData->getEvent() << " got " << eventNumber);
-          return;
-        }
-        unsigned triggerType = array.getWord();
-        unsigned flags = array.getWord();
-        int numofWaveforms = array.getWord();
-        for (int k = 0; k < numofWaveforms; k++) {
-          unsigned referenceASIC = array.getWord();
-          int numofSegments = array.getWord();
-          for (int iseg = 0; iseg < numofSegments; iseg++) {
-            unsigned segmentASIC = array.getWord();
-            unsigned hardChID = m_topgp->getHardwareChannelID(segmentASIC >> 9, column);
-            int channelID = m_topgp->getChannelID(hardChID);
-            int numofPoints = array.getWord();
-            std::vector<unsigned short> wfdata;
-            for (int i = 0; i < numofPoints / 2; i++) {
-              unsigned data = array.getWord();
-              wfdata.push_back(data & 0xFFFF);
-              wfdata.push_back(data >> 16);
-            }
-            if (numofPoints % 2 != 0) {
-              unsigned data = array.getWord();
-              wfdata.push_back(data & 0xFFFF);
-            }
-            waveforms.appendNew(barID, channelID, hardChID, scrod, freezeDate,
-                                triggerType, flags, referenceASIC, segmentASIC,
-                                wfdata);
-          }
-        }
-        int n = bufferSize - array.getIndex() - 1;
-        if (n > 0) {
-          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << n <<
+      case 1:
+        err = unpackWaveformFormatV1(array, feemap, waveforms);
+        if (err != 0)
+          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
                   " words of data buffer not used");
-        }
-      }
-      break;
+        break;
       default:
         B2ERROR("TOPUnpacker::unpackWaveformFormat: unknown data format version "
                 << version);
@@ -230,6 +190,52 @@ namespace Belle2 {
   }
 
 
+  int TOPUnpackerModule::unpackWaveformFormatV1(TOP::DataArray& array,
+                                                const TOP::FEEMap* feemap,
+                                                StoreArray<TOPRawWaveform>& waveforms)
+  {
+
+    StoreObjPtr<EventMetaData> evtMetaData;
+    int barID = feemap->barID;
+    int boardstack = feemap->column;
+
+    unsigned scrod = array.getWord();
+    unsigned freezeDate = array.getWord();
+    unsigned eventNumber = array.getWord();
+    if (eventNumber != evtMetaData->getEvent()) {
+      B2ERROR("TOPUnpacker::unpackWaveformFormat: inconsistent event number, "
+              "expect " << evtMetaData->getEvent() << " got " << eventNumber);
+      return array.getRemainingWords();
+    }
+    unsigned triggerType = array.getWord();
+    unsigned flags = array.getWord();
+    int numofWaveforms = array.getWord();
+    for (int k = 0; k < numofWaveforms; k++) {
+      unsigned referenceASIC = array.getWord();
+      int numofSegments = array.getWord();
+      for (int iseg = 0; iseg < numofSegments; iseg++) {
+        unsigned segmentASIC = array.getWord();
+        unsigned channelID = (segmentASIC >> 9) + boardstack * 128; // TODO decide how(?)
+        int pixelID = m_topgp->getChannelMapper().getPixelID(channelID);
+        int numofPoints = array.getWord();
+        std::vector<unsigned short> wfdata;
+        for (int i = 0; i < numofPoints / 2; i++) {
+          unsigned data = array.getWord();
+          wfdata.push_back(data & 0xFFFF);
+          wfdata.push_back(data >> 16);
+        }
+        if (numofPoints % 2 != 0) {
+          unsigned data = array.getWord();
+          wfdata.push_back(data & 0xFFFF);
+        }
+        waveforms.appendNew(barID, pixelID, channelID, scrod, freezeDate,
+                            triggerType, flags, referenceASIC, segmentASIC,
+                            wfdata);
+      }
+    }
+    return array.getRemainingWords();
+
+  }
 
   void TOPUnpackerModule::endRun()
   {

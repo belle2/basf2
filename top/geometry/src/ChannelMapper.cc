@@ -113,6 +113,7 @@ namespace Belle2 {
         m_channels[map.getRow()][map.getColumn()] = &map;
         m_pixels[map.getASICNumber()][map.getASICChannel()] = &map;
       }
+      m_available = true;
 
       B2INFO("TOP::ChannelMapper: " << m_mapping.size() <<
              " channels of carrier board of type '" << type << "' mapped to pixels.");

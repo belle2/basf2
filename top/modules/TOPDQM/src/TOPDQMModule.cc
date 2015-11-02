@@ -53,8 +53,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TOPDQMModule::TOPDQMModule() : HistoModule(),
-    m_topgp(TOP::TOPGeometryPar::Instance()),
-    m_barHits(NULL)
+    m_topgp(TOP::TOPGeometryPar::Instance())
 
   {
     // set module description (e.g. insert text)
@@ -85,8 +84,8 @@ namespace Belle2 {
 
     // variables needed for booking
     int NumBars = m_topgp->getNbars();
-    int NumChannels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_topgp->getNpadx() *
-                      m_topgp->getNpady();
+    int NumPixels = m_topgp->getNpmtx() * m_topgp->getNpmty() * m_topgp->getNpadx() *
+                    m_topgp->getNpady();
     int NumTDCbins = 1 << m_topgp->getTDCbits();
 
     // book histograms
@@ -97,12 +96,12 @@ namespace Belle2 {
 
     for (int i = 0; i < NumBars; i++) {
       string name = str(format("hitsBar%1%") % (i + 1));
-      string title = str(format("Number of hits per channel, bar#%1%") % (i + 1));
+      string title = str(format("Number of hits per pixel, bar#%1%") % (i + 1));
       TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
-                          NumChannels, 0.5, NumChannels + 0.5);
-      h1->GetXaxis()->SetTitle("channel ID");
-      h1->GetYaxis()->SetTitle("hits per channel");
-      m_channelHits.push_back(h1);
+                          NumPixels, 0.5, NumPixels + 0.5);
+      h1->GetXaxis()->SetTitle("pixel ID");
+      h1->GetYaxis()->SetTitle("hits per pixel");
+      m_pixelHits.push_back(h1);
     }
 
     for (int i = 0; i < NumBars; i++) {
@@ -182,7 +181,7 @@ namespace Belle2 {
         B2ERROR("Invalid bar ID found in TOPDigit");
         continue;
       }
-      m_channelHits[i]->Fill(digit.getChannelID());
+      m_pixelHits[i]->Fill(digit.getChannelID());
       m_hitTimes[i]->Fill(digit.getTDC());
     }
 

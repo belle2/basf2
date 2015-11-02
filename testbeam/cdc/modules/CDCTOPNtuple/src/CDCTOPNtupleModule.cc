@@ -116,7 +116,7 @@ namespace Belle2 {
     m_treePulls->Branch("Theta",   &m_theta,   "Theta/F");
     m_treePulls->Branch("x",  &m_top.extHit.x,  "x/F");
     m_treePulls->Branch("z",  &m_top.extHit.z,  "z/F");
-    m_treePulls->Branch("pixel",  &m_channelID,  "pixel/I");
+    m_treePulls->Branch("pixel",  &m_pixelID,  "pixel/I");
     m_treePulls->Branch("t",  &m_t,  "t/F");
     m_treePulls->Branch("t0",  &m_t0,  "t0/F");
     m_treePulls->Branch("sigma",  &m_sigma,  "sigma/F");
@@ -280,7 +280,7 @@ namespace Belle2 {
           for (const auto& photonPull : photonPulls) {
             sum += photonPull->getWeight();
             if (rnd < sum) {
-              m_channelID = photonPull->getChannelID();
+              m_pixelID = photonPull->getPixelID();
               m_t = photonPull->getTime();
               m_t0 = photonPull->getMeanTime();
               m_sigma = photonPull->getSigma();

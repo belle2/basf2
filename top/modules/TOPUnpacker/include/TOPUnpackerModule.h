@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPUNPACKERMODULE_H
-#define TOPUNPACKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -19,6 +18,64 @@
 #include <string>
 
 namespace Belle2 {
+
+  namespace TOP {
+
+    /**
+     * Helper class for getting data words from a finesse buffer
+     */
+    class DataArray {
+
+    public:
+
+      /**
+       * Constructor
+       * @param data pointer to finesse buffer (pointer must be valid)
+       * @param size buffer size
+       */
+      DataArray(const int* data, int size)
+      {
+        m_data = data;
+        m_size = size;
+        m_i = 0;
+      }
+
+      /**
+       * Returns consecutive data word
+       * @return data word
+       */
+      int getWord()
+      {
+        m_i++;
+        if (m_i < m_size) {
+          return m_data[m_i];
+        }
+        B2ERROR("Bug in data format: DataArray - index out of range");
+        return 0;
+      }
+
+      /**
+       * Returns index of last returned data word
+       * @return index
+       */
+      int getIndex() const {return m_i;}
+
+      /**
+       * Returns number of remaining words in the buffer
+       * @return number of remaining words
+       */
+      int getRemainingWords() const {return m_size - m_i - 1;}
+
+    private:
+
+      int m_size;        /**< buffer size */
+      const int* m_data; /**< buffer data */
+      int m_i;           /**< index */
+
+    };
+
+  } // TOP namespace
+
 
   /**
    * Raw data unpacker
@@ -86,6 +143,17 @@ namespace Belle2 {
     void unpackWaveformFormat(const int* buffer, int bufferSize,
                               StoreArray<TOPRawWaveform>& waveforms);
 
+    /**
+     * Unpack raw data given in waveform format version 1
+     * @param array raw data buffer
+     * @param feemap front-end map
+     * @param waveforms collection to unpack to
+     * @return number of words remaining in data buffer
+     */
+    int unpackWaveformFormatV1(TOP::DataArray& array,
+                               const TOP::FEEMap* feemap,
+                               StoreArray<TOPRawWaveform>& waveforms);
+
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
@@ -94,58 +162,5 @@ namespace Belle2 {
   };
 
 
-  namespace TOP {
-
-    /**
-     * Helper class for getting data words from a finesse buffer
-     */
-    class DataArray {
-
-    public:
-
-      /**
-       * Constructor
-       * @param data pointer to finesse buffer (pointer must be valid)
-       * @param size buffer size
-       */
-      DataArray(const int* data, int size)
-      {
-        m_data = data;
-        m_size = size;
-        m_i = 0;
-      }
-
-      /**
-       * Returns consecutive data word
-       * @return data word
-       */
-      int getWord()
-      {
-        m_i++;
-        if (m_i < m_size) {
-          return m_data[m_i];
-        }
-        B2ERROR("Bug in data format: DataArray - index out of range");
-        return 0;
-      }
-
-      /**
-       * Returns index of last returned data word
-       * @return index
-       */
-      int getIndex() const {return m_i;}
-
-    private:
-
-      int m_size;        /**< buffer size */
-      const int* m_data; /**< buffer data */
-      int m_i;           /**< index */
-
-    };
-
-  } // TOP namespace
-
-
 } // Belle2 namespace
 
-#endif

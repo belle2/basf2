@@ -104,11 +104,11 @@ namespace Belle2 {
 
     for (const auto& digit : digits) {
       int barID = digit.getBarID();
-      int col = digit.getHardwareChannelID() / 128;
-      const auto* feemap = mapper.getMap(barID, col);
+      int boardstack = digit.getHardwareChannelID() / 128;
+      const auto* feemap = mapper.getMap(barID, boardstack);
       if (!feemap) {
         B2ERROR("TOPPacker: no front-end map available for barID " << barID <<
-                " column " << col);
+                " boardstack# " << boardstack);
         continue;
       }
       sortedDigits[feemap->index].push_back(&digit);

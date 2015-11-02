@@ -107,8 +107,8 @@ namespace Belle2 {
   {
     // input
 
-    StoreArray<TOPDigit> topDigits;
-    topDigits.isRequired();
+    StoreArray<TOPDigit> digits;
+    digits.isRequired();
 
     StoreArray<Track> tracks;
     tracks.isRequired();
@@ -127,11 +127,11 @@ namespace Belle2 {
 
     // output
 
-    StoreArray<TOPLikelihood> topLikelihoods;
-    topLikelihoods.registerInDataStore();
-    topLikelihoods.registerRelationTo(extHits);
-    topLikelihoods.registerRelationTo(barHits);
-    tracks.registerRelationTo(topLikelihoods);
+    StoreArray<TOPLikelihood> likelihoods;
+    likelihoods.registerInDataStore();
+    likelihoods.registerRelationTo(extHits);
+    likelihoods.registerRelationTo(barHits);
+    tracks.registerRelationTo(likelihoods);
 
     StoreArray<TOPPull> topPulls;
     topPulls.registerInDataStore(DataStore::c_DontWriteOut);
@@ -185,8 +185,8 @@ namespace Belle2 {
 
     // output: log likelihoods
 
-    StoreArray<TOPLikelihood> topLikelihoods;
-    topLikelihoods.create();
+    StoreArray<TOPLikelihood> likelihoods;
+    likelihoods.create();
 
     StoreArray<TOPPull> topPulls;
     topPulls.create();
@@ -212,11 +212,10 @@ namespace Belle2 {
 
     // add photons
 
-    StoreArray<TOPDigit> topDigits;
-    for (int i = 0; i < topDigits.getEntries(); ++i) {
-      const TOPDigit* data = topDigits[i];
-      if (data->getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.addData(data->getBarID(), data->getChannelID(), data->getTDC(), bunchTime);
+    StoreArray<TOPDigit> digits;
+    for (const auto& digit : digits) {
+      if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
+        reco.addData(digit.getBarID(), digit.getChannelID(), digit.getTDC(), bunchTime);
     }
 
     // reconstruct track-by-track and store the results
@@ -250,18 +249,18 @@ namespace Belle2 {
       double estBkg = reco.getExpectedBG();
 
       // store results
-      TOPLikelihood* topL = topLikelihoods.appendNew(reco.getFlag(), nphot,
-                                                     logl, estPhot, estBkg);
+      TOPLikelihood* topL = likelihoods.appendNew(reco.getFlag(), nphot,
+                                                  logl, estPhot, estBkg);
       // make relations:
       track.addRelationTo(topL);
       topL->addRelationTo(trk.getExtHit());
       topL->addRelationTo(trk.getBarHit());
 
       // store pulls
-      int ich; float t, t0, wid, fic, wt;
+      int pixelID; float t, t0, wid, fic, wt;
       for (int k = 0; k < reco.getPullSize(); k++) {
-        reco.getPull(k, ich, t, t0, wid, fic, wt);
-        auto* pull = topPulls.appendNew(ich, t, t0, wid, fic, wt);
+        reco.getPull(k, pixelID, t, t0, wid, fic, wt);
+        auto* pull = topPulls.appendNew(pixelID, t, t0, wid, fic, wt);
         track.addRelationTo(pull);
       }
 

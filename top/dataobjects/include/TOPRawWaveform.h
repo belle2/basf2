@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPRAWWAVEFORM_H
-#define TOPRAWWAVEFORM_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
@@ -28,8 +27,8 @@ namespace Belle2 {
      */
     TOPRawWaveform():
       m_barID(0),
+      m_pixelID(0),
       m_channelID(0),
-      m_hardChannelID(0),
       m_scrodID(0),
       m_scrodRevision(0),
       m_freezeDate(0),
@@ -43,8 +42,8 @@ namespace Belle2 {
      * Full constructor
      */
     TOPRawWaveform(int barID,
-                   int channelID,
-                   unsigned hardChannelID,
+                   int pixelID,
+                   unsigned channelID,
                    unsigned scrod,
                    unsigned freezeDate,
                    unsigned triggerType,
@@ -55,8 +54,8 @@ namespace Belle2 {
       m_data(data)
     {
       m_barID = barID;
+      m_pixelID = pixelID;
       m_channelID = channelID;
-      m_hardChannelID = hardChannelID;
       m_scrodID = scrod & 0xFFFF;
       m_scrodRevision = (scrod >> 16) & 0x00FF;
       m_freezeDate = freezeDate;
@@ -73,16 +72,16 @@ namespace Belle2 {
     int getBarID() const { return m_barID; }
 
     /**
-     * Returns channel ID
-     * @return channel ID
+     * Returns software channel ID (1-based)
+     * @return pixel ID
      */
-    int getChannelID() const { return m_channelID; }
+    int getPixelID() const { return m_pixelID; }
 
     /**
      * Returns hardware channel ID
-     * @return hardware channel ID
+     * @return channel ID
      */
-    unsigned getHardwareChannelID() const { return m_hardChannelID; }
+    unsigned getChannelID() const { return m_channelID; }
 
     /**
      * Returns SCROD ID
@@ -188,8 +187,8 @@ namespace Belle2 {
   private:
 
     int m_barID;                    /**< quartz bar ID */
-    int m_channelID;                /**< software channel ID */
-    unsigned m_hardChannelID;       /**< hardware channel ID */
+    int m_pixelID;                  /**< software channel ID */
+    unsigned m_channelID;           /**< hardware channel ID */
     unsigned short m_scrodID;       /**< SCROD ID */
     unsigned short m_scrodRevision; /**< SCROD revision number */
     unsigned m_freezeDate;          /**< protocol freeze date (YYYYMMDD in BCD) */
@@ -206,4 +205,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

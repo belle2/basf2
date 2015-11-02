@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPDQMMODULE_H
-#define TOPDQMMODULE_H
+#pragma once
 
 // I copied 6 lines below from PXDDQMModule.h - is it realy needed?
 #undef DQM
@@ -93,19 +92,18 @@ namespace Belle2 {
     TOP::TOPGeometryPar* m_topgp;   /**< geometry parameters */
 
     // histograms
-    TH1F* m_barHits;  /**< number of hits per bar */
-    std::vector<TH1F*> m_channelHits;   /**< number of hits per channel for each bar */
-    std::vector<TH1F*> m_hitTimes;   /**< time distribution for each bar */
-    TH1F* m_recoTime;           /**< time distribution */
-    TH1F* m_recoTimeBg;         /**< time distribution background */
-    TH1F* m_recoTimeMinT0;      /**< time distribution in respect to the first peak */
-    TH1F* m_recoTimeDiff;       /**< residual distribution */
-    TH1F* m_recoPull;           /**< pull distribution */
-    TH2F* m_recoTimeDiff_Phic;  /**< residuals vs phiCer */
-    TProfile* m_recoPull_Phic;  /**< pulls vs phiCer */
+    TH1F* m_barHits = 0;  /**< number of hits per bar */
+    std::vector<TH1F*> m_pixelHits; /**< number of hits per pixel for each bar */
+    std::vector<TH1F*> m_hitTimes;  /**< time distribution for each bar */
+    TH1F* m_recoTime = 0;           /**< time distribution */
+    TH1F* m_recoTimeBg = 0;         /**< time distribution background */
+    TH1F* m_recoTimeMinT0 = 0;      /**< time distribution in respect to the first peak */
+    TH1F* m_recoTimeDiff = 0;       /**< residual distribution */
+    TH1F* m_recoPull = 0;           /**< pull distribution */
+    TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
+    TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
 
   };
 
 } // Belle2 namespace
 
-#endif

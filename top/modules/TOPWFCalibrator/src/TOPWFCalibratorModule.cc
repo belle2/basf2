@@ -97,7 +97,7 @@ namespace Belle2 {
 
     for (auto& waveform : waveforms) {
       if (waveform.getBarID() != m_barID) continue;
-      unsigned channel = waveform.getHardwareChannelID();
+      unsigned channel = waveform.getChannelID();
       unsigned window = waveform.getStorageWindow();
       if (channel < c_NumChannels and window < c_NumWindows) {
         auto prof = m_profile[channel][window];

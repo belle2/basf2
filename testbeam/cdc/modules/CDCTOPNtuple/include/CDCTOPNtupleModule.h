@@ -77,7 +77,7 @@ namespace Belle2 {
     float m_theta = 0;      /**< additional var: angle btw. upper and lower track arm */
 
     TTree* m_treePulls = 0;   /**< TTree for pulls */
-    int m_channelID = 0; /**< software channel ID (1-based) */
+    int m_pixelID = 0;   /**< software channel ID (1-based) */
     float m_t = 0;       /**< photon time */
     float m_t0 = 0;      /**< PDF mean time (signal) or minimal PDF mean (background) */
     float m_sigma = 0;   /**< PDF sigma (signal) or 0 (background) */

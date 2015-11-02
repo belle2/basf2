@@ -23,6 +23,11 @@ else:
     print('usage: basf2 top/examples/showRawWaveforms.py <file_name>')
     sys.exit()
 
+if not os.path.exists(fileName):
+    print(fileName + ': file not found')
+    sys.exit()
+
+
 fileType = ''
 if fileName.rfind('.dat') + len('.dat') == len(fileName):
     fileType = 'dat'
@@ -103,7 +108,7 @@ class WFDisplay(Module):
             self.hist[k].Reset()
             self.hist[k].SetMinimum(0)
             self.hist[k].SetMaximum(4096)
-            chan = waveform.getHardwareChannelID()
+            chan = waveform.getChannelID()
             window = waveform.getStorageWindow()
             refwin = waveform.getReferenceWindow()
             title = 'chan ' + str(chan) + ' '

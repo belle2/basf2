@@ -1,5 +1,5 @@
-# EventType: 11106500
-# Descriptor: [B0 -> (eta' -> (eta -> pi+ pi-) pi0 pi+ pi- ) (K_S0 -> pi+ pi-)]cc
+# EventType: 1110062100
+# Descriptor: [B0 -> (eta' -> (eta -> pi+ pi- pi0) pi+ pi- ) (K_S0 -> pi+ pi-)]cc
 # NickName: Bd_etapKS,eta2pi+2pi-,pi+pi-pi0
 # Documentation: Decay mode for sensitivity studies
 # Tested: Yes

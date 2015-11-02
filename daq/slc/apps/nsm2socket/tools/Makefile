@@ -23,7 +23,7 @@ CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 CFLAGS  += -I$(BELLE2_INC)
 ifneq ($(NOT_USE_PSQL),yes)
-CFLAGS  += -$(PGSQL_INC_PATH) -lpq
+CFLAGS  += -I$(PGSQL_INC_PATH)
 endif
 
 MAINS   = $(wildcard *.cc)

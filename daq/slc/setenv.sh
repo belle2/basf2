@@ -2,7 +2,8 @@
 
 export BELLE2_DAQ_SLC=$PWD
 export PATH=$BELLE2_DAQ_SLC/bin:$PATH
-if [ -z ${BELLE2_LOCAL_DIR+x} ]; then
+if ! test "$BELLE2_LOCAL_DIR" = "" ; then
+#if [ -z ${BELLE2_LOCAL_DIR+x} ]; then
   if [ -d $BELLE2_EXTERNALS_DIR/lib/$BELLE2_EXTERNALS_SUBDIR/ ]; then
     export PGSQL_LIB_PATH=$BELLE2_EXTERNALS_DIR/lib/$BELLE2_EXTERNALS_SUBDIR
   else 

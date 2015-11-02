@@ -66,8 +66,8 @@ throw(RCHandlerException)
     // loshf-all
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
-      printf("loading param to ip %s\n", ip);
       sprintf(ip, "192.168.1.%d", col);
+      printf("loading param to ip %s\n", ip);
       w_sh_reg_io(ip, 0x502, obj.getInt("thread_af"));
       w_sh_reg_io(ip, 0x500, obj.getInt("trbuf"));
       w_sh_reg_io(ip, 0x501, obj.getInt("uthread_af"));

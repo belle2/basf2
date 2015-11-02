@@ -14,7 +14,7 @@ LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
 endif
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_apps_ecldspd
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
-LIBS    += -lecl
+LIBS    += -lecldaq
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT 
 ifneq ($(NOT_USE_PSQL),yes)
@@ -32,7 +32,6 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
 
 force:
 	@ $(RM) $(BINDIR)/*

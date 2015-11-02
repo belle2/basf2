@@ -10,8 +10,8 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (Daemon::start("flowmonitor", argc, argv, 0, "")) {
-    ConfigFile config("slowcontrol", "flowmonitor");
+  if (Daemon::start("flowmonitor", argc, argv, 0, "<config>")) {
+    ConfigFile config("slowcontrol", argv[1]);
     FlowMonitorCallback callback(config.get("nsm.nodename"),
                                  config.get("runcontrol"));
     callback.setNeventsThreshold(config.getInt("nevents"));

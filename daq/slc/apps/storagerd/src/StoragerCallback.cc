@@ -240,6 +240,17 @@ void StoragerCallback::abort() throw(RCHandlerException)
 
 void StoragerCallback::monitor() throw(RCHandlerException)
 {
+  const RCState state(getNode().getState());
+  if (state == RCState::RUNNING_S || state == RCState::READY_S ||
+      state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
+      state == RCState::STARTING_TS) {
+    for (size_t i = 0; i < m_con.size(); i++) {
+      if (!m_con[i].isAlive()) {
+        setState(RCState::NOTREADY_S);
+        throw (RCHandlerException(m_con[i].getName() + " : crashed"));
+      }
+    }
+  }
   NSMData& data(getData());
   if (!data.isAvailable()) return;
   storage_status* info = (storage_status*)data.get();

@@ -28,7 +28,6 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
 
 force:
 	@ $(RM) $(BINDIR)/*

@@ -291,7 +291,17 @@ bool DBObjectLoader::createDB(DBInterface& db,
       LogFile::error("Configname is null. createDB canceled.");
       return false;
     }
+    if (!db.checkTable("configlist")) {
+      db.execute("create table configlist \n"
+                 "(name varchar(64) not null, \n"
+                 "id bigserial, lastupdate timestamp, \n"
+                 "UNIQUE(name));");
+      db.execute("create index configlist_id_index on configlist(id);",
+                 tablename.c_str(), tablename.c_str());
+    }
     if (!db.checkTable(tablename)) {
+      db.execute("insert into configlist (name, lastupdate) values "
+                 "('%s', current_timestamp);", tablename.c_str());
       db.execute("create table %s \n"
                  "(name  varchar(64) \n"
                  "check (replace(name, '.', '') = name) not null, \n"

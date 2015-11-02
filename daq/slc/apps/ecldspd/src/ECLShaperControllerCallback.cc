@@ -36,16 +36,18 @@ throw(RCHandlerException)
     const DBObject& o_cols(obj("cols"));
     char ip [256];
     // loshf-all
+    const unsigned int mem_bin_addr = 0xA7000000;
+    const unsigned int mem_ecldsp_addr = 0xA8000000;
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
       sprintf(ip, "192.168.1.%d", col);
-      sh_boot(ip, 16, obj.getInt("mem_bin_addr"));
+      sh_boot(ip, 16, mem_bin_addr);
     }
     // loshc-all 1
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
       sprintf(ip, "192.168.1.%d", col);
-      sh_init_ecldsp(ip, 16, obj.getInt("mem_ecldsp_addr"));
+      sh_init_ecldsp(ip, 16, mem_ecldsp_addr);
     }
   }
 }

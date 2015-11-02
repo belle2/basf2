@@ -94,6 +94,19 @@ namespace Belle2 {
       return frame.getMomentum(part).Pt();
     }
 
+    double covMatrixElement(const Particle* part, const std::vector<double>& element)
+    {
+      int elementI = int(std::lround(element[0]));
+      int elementJ = int(std::lround(element[1]));
+
+      if (elementI < 0 || elementI > 6)
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: i = " << elementI);
+      if (elementJ < 0 || elementJ > 6)
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: j = " << elementJ);
+
+      return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
+    }
+
     double particleCosTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1094,6 +1107,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
     REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+    REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
+                      "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
+                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.");
+
     REGISTER_VARIABLE("cosTheta", particleCosTheta,
                       "momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
@@ -1114,6 +1131,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
     REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
+    REGISTER_VARIABLE("x", particleDX, "x coordinate of vertex");
+    REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
+    REGISTER_VARIABLE("z", particleDZ, "z coordinate of veretx");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
 
     REGISTER_VARIABLE("M", particleMass,

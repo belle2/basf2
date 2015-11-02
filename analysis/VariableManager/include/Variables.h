@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   class Particle;
 
@@ -95,6 +97,12 @@ namespace Belle2 {
      * return transverse distance relative to interaction point
      */
     double particleDRho(const Particle* part);
+
+    /**
+     * return the (i,j)-th element of the MomentumVertex covariance matrix
+     * Ordering of the elements in the error matrix is: px, py, pz, E, x, y, z
+     */
+    double covMatrixElement(const Particle*, const std::vector<double>& element);
 
     /**
      * return mass (determined from particle's 4-momentum vector)

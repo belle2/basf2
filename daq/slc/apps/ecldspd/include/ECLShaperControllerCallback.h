@@ -14,6 +14,7 @@ namespace Belle2 {
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void recover(const DBObject& obj) throw(RCHandlerException);
 
@@ -21,12 +22,10 @@ namespace Belle2 {
     std::string col_status(int sh_num) throw(RCHandlerException);
 
   private:
-    void sh_boot(int shm_num) throw(RCHandlerException);
-    void sh_init_ecldsp(int sh_num, int adr) throw(IOException);
-    void sh_reg_io_write(const std::string& hostname, int shm_num,
-                         int adr, int val) throw(RCHandlerException);
-    void col_reg_io_write(const std::string& hostname,
-                          int adr, int val)throw(RCHandlerException);
+    void w_sh_reg_io(const char* ip,
+                     int reg_num, int wdata) throw(RCHandlerException);
+    void w_col_reg_io(const char* ip,
+                      int reg_num, int wdata) throw(RCHandlerException);
 
   private:
     bool m_forced;

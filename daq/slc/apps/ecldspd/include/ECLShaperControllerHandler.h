@@ -3,14 +3,14 @@
 
 namespace Belle2 {
 
-  class NSMVHandlerColStatus : public NSMVHandlerText {
+  class ECLShaperStatusHandler : public NSMVHandlerText {
 
   public:
-    NSMVHandlerColStatus(ECLShaperControllerCallback& callback,
-                         const std::string& name, int sh_num)
+    ECLShaperStatusHandler(ECLShaperControllerCallback& callback,
+                           const std::string& name, int sh_num)
       : NSMVHandlerText(name, true, false),
         m_callback(callback), m_sh_num(sh_num) {}
-    virtual ~NSMVHandlerColStatus() throw() {}
+    virtual ~ECLShaperStatusHandler() throw() {}
 
   public:
     bool handleGetText(std::string& val)
@@ -27,6 +27,32 @@ namespace Belle2 {
   private:
     ECLShaperControllerCallback& m_callback;
     int m_sh_num;
+  };
+
+  class ECLShaperBootHandler : public NSMVHandlerInt {
+
+  public:
+    ECLShaperBootHandler(ECLShaperControllerCallback& callback,
+                         const std::string& name)
+      : NSMVHandlerInt(name, true, false),
+        m_callback(callback) {}
+    virtual ~ECLShaperBootHandler() throw() {}
+
+  public:
+    bool handleSetInt(int val)
+    {
+      try {
+        m_callback.boot(m_callback.getDBObject());
+        return true;
+      } catch (const RCHandlerException& e) {
+        LogFile::error(e.what());
+      }
+      return false;
+    }
+
+  private:
+    ECLShaperControllerCallback& m_callback;
+
   };
 
 }

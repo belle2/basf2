@@ -25,8 +25,9 @@ throw(RCHandlerException)
   for (int col = o_cols.getInt("min");
        col <= o_cols.getInt("max"); col++) {
     std::string vname = StringUtil::form("col[%d].status", col);
-    add(new NSMVHandlerColStatus(*this, vname, col));
+    add(new ECLShaperStatusHandler(*this, vname, col));
   }
+  add(new ECLShaperBootHandler(*this, "boot"));
 }
 
 void ECLShaperControllerCallback::boot(const DBObject& obj)

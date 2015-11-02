@@ -34,7 +34,7 @@ namespace Belle2 {
   public:
     ECLShaperBootHandler(ECLShaperControllerCallback& callback,
                          const std::string& name)
-      : NSMVHandlerInt(name, true, false),
+      : NSMVHandlerInt(name, false, true),
         m_callback(callback) {}
     virtual ~ECLShaperBootHandler() throw() {}
 

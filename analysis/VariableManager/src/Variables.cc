@@ -19,7 +19,6 @@
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -1008,95 +1007,17 @@ namespace Belle2 {
       return event_tracks - par_tracks;
     }
 
-    // Event ------------------------------------------------
-    double eventType(const Particle*)
-    {
-      StoreArray<MCParticle> mcparticles;
-      return (mcparticles.getEntries()) > 0 ? 0 : 1;
-    }
-
-    double nTracks(const Particle*)
-    {
-      StoreArray<Track> tracks;
-      return tracks.getEntries();
-    }
-
-    double nECLClusters(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      return eclClusters.getEntries();
-    }
-
-    double nKLMClusters(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      return klmClusters.getEntries();
-    }
-
-    double ECLEnergy(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      double result = 0;
-      for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        result += eclClusters[i]->getEnergy();
-      }
-      return result;
-    }
-
-    double KLMEnergy(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      double result = 0;
-      for (int i = 0; i < klmClusters.getEntries(); ++i) {
-        result += klmClusters[i]->getMomentum().Energy();
-      }
-      return result;
-    }
-
-    double isContinuumEvent(const Particle*)
-    {
-      StoreArray<MCParticle> mcParticles;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == 300553)
-          return 0.0;
-      }
-      return 1.0;
-    }
-
-    double expNum(const Particle*)
-    {
-      StoreObjPtr<EventMetaData> evtMetaData;
-      int exp_no = evtMetaData->getExperiment();
-      return exp_no;
-    }
-
-    double evtNum(const Particle*)
-    {
-      StoreObjPtr<EventMetaData> evtMetaData;
-      int evt_no = evtMetaData->getEvent();
-      return evt_no;
-    }
-
-    double runNum(const Particle*)
-    {
-      StoreObjPtr<EventMetaData> evtMetaData;
-      int run_no = evtMetaData->getRun();
-      return run_no;
-    }
-
-
-    double False(const Particle*)
-    {
-      return 0;
-    }
-
-
     double isPrimarySignal(const Particle* part)
     {
       if (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5)
         return 1.0;
       else
         return 0.0;
+    }
+
+    double False(const Particle*)
+    {
+      return 0;
     }
 
 
@@ -1194,24 +1115,6 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle.")
-
-    VARIABLE_GROUP("Event");
-    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
-    REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
-                      "[Eventbased] true if event doesn't contain an Y(4S)");
-    REGISTER_VARIABLE("nTracks", nTracks,
-                      "[Eventbased] number of tracks in the event");
-    REGISTER_VARIABLE("nECLClusters", nECLClusters,
-                      "[Eventbased] number of ECL in the event");
-    REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
-                      "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("ECLEnergy", ECLEnergy,
-                      "[Eventbased] total energy in ECL in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
-                      "[Eventbased] total energy in KLM in the event");
-    REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
-    REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
-    REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
 
     VARIABLE_GROUP("TDCPV");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");

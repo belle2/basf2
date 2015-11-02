@@ -454,56 +454,10 @@ namespace Belle2 {
      */
     double eclClusterTrackMatched(const Particle* particle);
 
-
-    /**
-     * returns true if event doesn't contain an Y(4S)
-     */
-    double isContinuumEvent(const Particle*);
-
-    /**
-     * return number of tracks in event
-     */
-    double nTracks(const Particle*);
-
-    /**
-     * return number of ECL clusters in event
-     */
-    double nECLClusters(const Particle*);
-
-    /**
-     * return number of KLM clusters in event
-     */
-    double nKLMClusters(const Particle*);
-
-    /**
-     * return total energy in ECL clusters in event
-     */
-    double ECLEnergy(const Particle*);
-
-    /**
-     * return total energy in KLM clusters in event
-     */
-    double KLMEnergy(const Particle*);
-
     /**
      * return always zero
      */
     double False(const Particle*);
-
-    /**
-    * return experiment number
-    */
-    double expNum(const Particle*);
-
-    /**
-    * return event number
-    */
-    double evtNum(const Particle*);
-
-    /**
-    * return run number
-    */
-    double runNum(const Particle*);
   }
 } // Belle2 namespace
 

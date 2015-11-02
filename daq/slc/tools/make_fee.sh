@@ -24,7 +24,12 @@ sed "s/template/${name}/g" > ${filename}
 filename=${dir}/${name}/src/${classname}FEE.cc
 echo "create source file : ${filename}"
 sed "s/TEMPLATE/$classname/g" $dir/template/src/TEMPLATEFEE.cc | \
-sed "s/template/${name}/g"  > $dir/${name}/src/${classname}FEE.cc 
+sed "s/template/${name}/g"  > ${filename}
+
+filename=${dir}/${name}/Makefile
+echo "create source file : ${filename}"
+sed "s/TEMPLATE/$classname/g" $dir/template/Makefile | \
+sed "s/template/${name}/g"  > ${filename}
 
 else 
 echo "directory ${dir}/${name} already exsists"

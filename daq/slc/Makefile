@@ -31,14 +31,15 @@ copyinc:
 	@ mkdir -p include/nsm2
 	@ make nsmlib
 	@ mkdir -p include/mgt
-	@ make -C extra/mgt BELLE2_EXTERNALS_DIR=$(PWD)
+	@ make -C extra/mgt 
 	@ mkdir -p include/ttrx
-	@ make -C extra/ttrx BELLE2_EXTERNALS_DIR=$(PWD)
+	@ make -C extra/ttrx 
 	@ mkdir -p include/ecldaq
-	@ make -C extra/ecldaq BELLE2_EXTERNALS_DIR=$(PWD)
+	@ make -C extra/ecldaq 
 
 $(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@ NOT_USE_PSQL=$(NOT_USE_PSQL)
+	@ if [ $@ = "copper" ]; then make -C copper; fi
 
 tool: 
 	@ for dir in $(SUBPACKAGES); \

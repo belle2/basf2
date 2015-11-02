@@ -66,6 +66,7 @@ throw(RCHandlerException)
     // loshf-all
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
+      printf("loading param to ip %s\n", ip);
       sprintf(ip, "192.168.1.%d", col);
       w_sh_reg_io(ip, 0x502, obj.getInt("thread_af"));
       w_sh_reg_io(ip, 0x500, obj.getInt("trbuf"));
@@ -178,34 +179,6 @@ throw(RCHandlerException)
   boot(obj);
   load(obj);
 }
-
-/*
-void ECLShaperControllerCallback::sh_boot(int sh_num) throw(RCHandlerException)
-{
-  std::string hostname = StringUtil::form("192.168.1.%d", sh_num);
-  int err;
-  if ((err = ::sh_boot(hostname.c_str(), 0, 0xA7000000)) > 0) {
-    std::string msg;
-    if (err == 1) msg = "Connection error";
-    else if (err == 2) msg = "Failed to recieve reply";
-    else if (err == 3) msg = "Boot failed";
-    throw (RCHandlerException("Failed to boot Shaper : %s", msg.c_str()));
-  }
-}
-
-void ECLShaperControllerCallback::sh_init_ecldsp(int sh_num, int adr) throw(RCHandlerException)
-{
-  std::string hostname = StringUtil::form("192.168.1.%d", sh_num);
-  int err;
-  if ((err = ::sh_init_ecldsp(hostname.c_str(), sh_num, adr)) > 0) {
-    std::string msg;
-    if (err == 1) msg = "Connection error";
-    else if (err == 2) msg = "Failed to recieve reply";
-    else if (err == 3) msg = "Init failed";
-    throw (RCHandlerException("Failed to boot Shaper : %s", msg.c_str()));
-  }
-}
-*/
 
 void ECLShaperControllerCallback::w_sh_reg_io(const char* ip,
                                               int reg_num, int wdata) throw(RCHandlerException)

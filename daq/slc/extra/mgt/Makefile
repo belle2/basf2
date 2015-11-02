@@ -7,23 +7,14 @@ OBJS = find_pci_path.o libhslb.o
 
 LIB  = libmgt.so
 
-EXTDIR=$(BELLE2_EXTERNALS_DIR)
-EXTSRCDIR=$(EXTDIR)/src
-EXTBUILDDIR=$(EXTDIR)/build/$(BELLE2_EXTERNALS_SUBDIR)
-EXTINCDIR=$(EXTDIR)/include
-EXTLIBDIR=$(EXTDIR)/lib/$(BELLE2_EXTERNALS_SUBDIR)
-EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
+INCDIR=$(BELLE2_DAQ_SLC)/include
+LIBDIR=$(BELLE2_DAQ_SLC)/lib
 
 #all: $(OBJS)
 all: $(LIB)
-	@ mkdir -p $(EXTINCDIR)/mgt/
-	@ install -m 644 -p *.h $(EXTINCDIR)/mgt/
-	@ if [ -e $(EXTLIBDIR) ];\
-	  then \
-	  install -m 644 -p $(LIB) $(EXTLIBDIR)/; \
-	  else \
-	  install -m 644 -p $(LIB) $(EXTDIR)/$(BELLE2_ARCH)/$(BELLE2_EXTERNALS_OPTION)/bin; \
-	  fi
+	@ mkdir -p $(INCDIR)/mgt/
+	@ install -m 644 -p *.h $(INCDIR)/mgt/
+	@ install -m 644 -p $(LIB) $(LIBDIR)/
 
 clean:
 	@ echo "<< clearing directry >>"

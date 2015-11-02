@@ -8,17 +8,13 @@ OBJS     = $(SRCS:%.c=%.o)
 
 LIB  = libecldaq.so
 
-EXTDIR=$(BELLE2_EXTERNALS_DIR)
-EXTSRCDIR=$(EXTDIR)/src
-EXTBUILDDIR=$(EXTDIR)/build/$(BELLE2_EXTERNALS_SUBDIR)
-EXTINCDIR=$(EXTDIR)/include
-EXTLIBDIR=$(EXTDIR)/lib/$(BELLE2_EXTERNALS_SUBDIR)
-EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
+INCDIR=$(BELLE2_DAQ_SLC)/include
+LIBDIR=$(BELLE2_DAQ_SLC)/lib
 
 all: $(OBJS) $(LIB)
-	@ mkdir -p $(EXTINCDIR)/ecldaq/
-	@ install -m 644 -p *.h $(EXTINCDIR)/ecldaq/
-	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
+	@ mkdir -p $(INCDIR)/ecldaq/
+	@ install -m 644 -p *.h $(INCDIR)/ecldaq/
+	@ install -m 644 -p $(LIB) $(LIBDIR)/
 
 clean:
 	@ echo "<< clearing directry >>"

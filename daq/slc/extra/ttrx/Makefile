@@ -7,24 +7,13 @@ OBJS = ttrxlib.o bootrx.o stat4r.o
 
 LIB  = libttrx.so
 
-EXTDIR=$(BELLE2_EXTERNALS_DIR)
-EXTSRCDIR=$(EXTDIR)/src
-EXTBUILDDIR=$(EXTDIR)/build/$(BELLE2_EXTERNALS_SUBDIR)
-EXTINCDIR=$(EXTDIR)/include
-EXTLIBDIR=$(EXTDIR)/lib/$(BELLE2_EXTERNALS_SUBDIR)
-EXTBINDIR=$(EXTDIR)/bin/$(BELLE2_EXTERNALS_SUBDIR)
+INCDIR=$(BELLE2_DAQ_SLC)/include
+LIBDIR=$(BELLE2_DAQ_SLC)/lib
 
-all: $(LIB)
-	@ mkdir -p $(EXTINCDIR)/ttrx/
-	@ install -m 644 -p *.h $(EXTINCDIR)/ttrx/
-#	@ install -m 644 -p $(LIB) $(EXTLIBDIR)/
-	@ if [ -e $(EXTLIBDIR) ];\
-	  then \
-	  install -m 644 -p $(LIB) $(EXTLIBDIR)/; \
-	  else \
-	  install -m 644 -p $(LIB) $(EXTDIR)/$(BELLE2_ARCH)/$(BELLE2_EXTERNALS_OPTION)/bin; \
-	  fi
-
+all: $(OBJS) $(LIB)
+	@ mkdir -p $(INCDIR)/ttrx/
+	@ install -m 644 -p *.h $(INCDIR)/ttrx/
+	@ install -m 644 -p $(LIB) $(LIBDIR)/
 
 clean:
 	@ echo "<< clearing directry >>"

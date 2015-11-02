@@ -13,6 +13,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/tkonno/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunControlGUI.java</file>
+            <file>file:/home/tkonno/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunConfigDialog.java</file>
+            <file>file:/home/tkonno/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RCStateViewPane.java</file>
+            <file>file:/home/tkonno/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/ConfigViewPane.java</file>
+            <file>file:/home/tkonno/javalib/b2daq.runcontrol/src/b2daq/apps/runcontrol/RunControlMainPane.java</file>
         </group>
     </open-files>
 </project-private>

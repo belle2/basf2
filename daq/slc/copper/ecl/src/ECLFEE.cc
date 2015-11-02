@@ -37,19 +37,6 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 
 void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 {
-  /*
-  hslb.writefn(0x30, 0);
-  for (int ntry = 0; hslb.checkfee() == "UNKNOWN"; ntry++) {
-    hslb.writefn(0x82, 0x1000);
-    usleep(100);
-    hslb.writefn(0x82, 0x10);
-    if (ntry > 100) {
-      throw (IOException("Can not establish b2link at HSLB %c",
-                         (char)('a' + hslb.get_finid())));
-    }
-    usleep(100);
-  }
-  */
   int ver;
   if ((ver = hslb.readfn(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
     throw (IOException("Inconsitent HWVER (%d!=%d)",
@@ -63,60 +50,63 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 
 void ECLFEE::load(HSLB& hslb, const DBObject& obj)
 {
-  // writing parameters to registers
-  /*
-  const DBObjectList objs(obj.getObjects("par"));
-  for (DBObjectList::const_iterator it = objs.begin();
-       it != objs.end(); it++) {
-    const DBObject& o_par(*it);
-    int adr = o_par.getInt("adr");
-    int val = o_par.getInt("val");
-    LogFile::debug("writefee adr=%d, val=%d", adr, val);
-    hslb.writefee32(adr, val);
+  if (obj.hasValue("shaper_mask_low")) {
+    hslb.writefee8(0x20, obj.getInt("shaper_mask_low"));       // SHAPER_MASK_LOW
+    hslb.writefee8(0x21, obj.getInt("shaper_mask_high"));      // SHAPER_MASK_HIGH
+    hslb.writefee8(0x38, obj.getInt("ttd_trg_rare_factor"));   // TTD_TRG_RARE_FACTOR
+    hslb.writefee8(0x39, obj.getInt("ttd_trg_type"));          // TTD_TRG_TYPE
+
+    hslb.writefee8(0x40, obj.getInt("calib_ampl0_low"));       // CALIB_AMPL0_LOW
+    hslb.writefee8(0x41, obj.getInt("calib_ampl0_high"));      // CALIB_AMPL0_HIGH
+    hslb.writefee8(0x42, obj.getInt("calib_ampl_step_high"));  // CALIB_AMPL_STEP_HIGH
+    hslb.writefee8(0x43, obj.getInt("calib_ampl_step_high"));  // CALIB_AMPL_STEP_HIGH
+
+    hslb.writefee8(0x44, obj.getInt("calib_delay0_low"));      // CALIB_DELAY0_LOW
+    hslb.writefee8(0x45, obj.getInt("calib_delay0_high"));     // CALIB_DELAY0_HIGH
+    hslb.writefee8(0x46, obj.getInt("calib_delay_step_low"));  // CALIB_DELAY_STEP_LOW
+    hslb.writefee8(0x47, obj.getInt("calib_delay_step_high")); // CALIB_DELAY_STEP_HIGH
+
+    hslb.writefee8(0x48, obj.getInt("calib_events_per_step")); // CALIB_EVENTS_PER_STEP
+
+    hslb.writefee8(0x30, 0x0D);
+    hslb.writefee8(0x30, 0x09);
+  } else {
+    const int SHAPER_MASK_LOW  = 0xFF;
+    const int SHAPER_MASK_HIGH = 0x0F;
+    const int TTD_TRG_RARE_FACTOR = 0xc1;
+    const int TTD_TRG_TYPE        = 0x11;
+
+    const int CALIB_AMPL0_LOW  = 0x00;
+    const int CALIB_AMPL0_HIGH = 0x00;
+    const int CALIB_AMPL_STEP_HIGH = 0x00;
+
+    const int CALIB_DELAY0_LOW  = 0x00;
+    const int CALIB_DELAY0_HIGH = 0x00;
+    const int CALIB_DELAY_STEP_LOW  = 0x00;
+    const int CALIB_DELAY_STEP_HIGH = 0x00;
+
+    const int CALIB_EVENTS_PER_STEP = 0x00;
+
+    hslb.writefee8(0x20, SHAPER_MASK_LOW);
+    hslb.writefee8(0x21, SHAPER_MASK_HIGH);
+    hslb.writefee8(0x38, TTD_TRG_RARE_FACTOR);
+    hslb.writefee8(0x39, TTD_TRG_TYPE);
+
+    hslb.writefee8(0x40, CALIB_AMPL0_LOW);
+    hslb.writefee8(0x41, CALIB_AMPL0_HIGH);
+    hslb.writefee8(0x42, CALIB_AMPL_STEP_HIGH);
+    hslb.writefee8(0x43, CALIB_AMPL_STEP_HIGH);
+
+    hslb.writefee8(0x44, CALIB_DELAY0_LOW);
+    hslb.writefee8(0x45, CALIB_DELAY0_HIGH);
+    hslb.writefee8(0x46, CALIB_DELAY_STEP_LOW);
+    hslb.writefee8(0x47, CALIB_DELAY_STEP_HIGH);
+
+    hslb.writefee8(0x48, CALIB_EVENTS_PER_STEP);
+
+    hslb.writefee8(0x30, 0x0D);
+    hslb.writefee8(0x30, 0x09);
   }
-  hslb.writefee32(0x30, 0x0d);
-  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x0d);
-  hslb.writefee32(0x30, 0x09);
-  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x09);
-  hslb.writefee32(0x30, 0x03);
-  LogFile::debug("writefee adr=%d, val=%d", 0x30, 0x03);
-  */
-
-  const int SHAPER_MASK_LOW  = 0xFF;
-  const int SHAPER_MASK_HIGH = 0x0F;
-  const int TTD_TRG_RARE_FACTOR = 0xc1;
-  const int TTD_TRG_TYPE        = 0x11;
-
-  const int CALIB_AMPL0_LOW  = 0x00;
-  const int CALIB_AMPL0_HIGH = 0x00;
-  const int CALIB_AMPL_STEP_HIGH = 0x00;
-
-  const int CALIB_DELAY0_LOW  = 0x00;
-  const int CALIB_DELAY0_HIGH = 0x00;
-  const int CALIB_DELAY_STEP_LOW  = 0x00;
-  const int CALIB_DELAY_STEP_HIGH = 0x00;
-
-  const int CALIB_EVENTS_PER_STEP = 0x00;
-
-  hslb.writefee8(0x20, SHAPER_MASK_LOW);
-  hslb.writefee8(0x21, SHAPER_MASK_HIGH);
-  hslb.writefee8(0x38, TTD_TRG_RARE_FACTOR);
-  hslb.writefee8(0x39, TTD_TRG_TYPE);
-
-  hslb.writefee8(0x40, CALIB_AMPL0_LOW);
-  hslb.writefee8(0x41, CALIB_AMPL0_HIGH);
-  hslb.writefee8(0x42, CALIB_AMPL_STEP_HIGH);
-  hslb.writefee8(0x43, CALIB_AMPL_STEP_HIGH);
-
-  hslb.writefee8(0x44, CALIB_DELAY0_LOW);
-  hslb.writefee8(0x45, CALIB_DELAY0_HIGH);
-  hslb.writefee8(0x46, CALIB_DELAY_STEP_LOW);
-  hslb.writefee8(0x47, CALIB_DELAY_STEP_HIGH);
-
-  hslb.writefee8(0x48, CALIB_EVENTS_PER_STEP);
-
-  hslb.writefee8(0x30, 0x0D);
-  hslb.writefee8(0x30, 0x09);
 }
 
 extern "C" {

@@ -49,9 +49,11 @@ throw(RCHandlerException)
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
       sprintf(ip, "192.168.1.%d", col);
+      printf("initializing ip %s\n", ip);
       sh_init_ecldsp(ip, 16, mem_ecldsp_addr);
     }
   }
+  printf("Boot sequence done!\n");
 }
 
 void ECLShaperControllerCallback::load(const DBObject& obj)
@@ -223,9 +225,10 @@ void ECLShaperControllerCallback::w_col_reg_io(const char* ip,
 {
   char msg[100];
   memset(msg, 0, 100);
-  col_reg_io(ip, "w", reg_num, wdata, NULL, msg);
-  if (msg[0] != 0) {
-    throw (RCHandlerException("error on col_reg_io: %s", msg));
+  if (col_reg_io(ip, "w", reg_num, wdata, NULL, msg) != 0) {
+    if (msg[0] != 0) {
+      throw (RCHandlerException("error on col_reg_io: %s", msg));
+    }
   }
 }
 

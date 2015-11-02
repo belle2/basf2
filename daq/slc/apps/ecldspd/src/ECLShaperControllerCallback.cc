@@ -42,7 +42,7 @@ throw(RCHandlerException)
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
       sprintf(ip, "192.168.1.%d", col);
-      printf("booting ip %s", ip);
+      printf("booting ip %s\n", ip);
       sh_boot(ip, 16, mem_bin_addr);
     }
     // loshc-all 1

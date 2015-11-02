@@ -427,7 +427,10 @@ namespace Belle2 {
     void SetZ(DataType z) { m_coordinates[2] = z; }
 
     /** set all coordinates using data type */
-    void SetXYZ(DataType x, DataType y, DataType z);
+    void SetXYZ(DataType x, DataType y, DataType z)
+    {
+      SetX(x); SetY(y); SetZ(z);
+    }
     /** set all coordinates using a reference to TVector3 */
     void SetXYZ(const TVector3& tVec);
     /** set all coordinates using a pointer to TVector3 */

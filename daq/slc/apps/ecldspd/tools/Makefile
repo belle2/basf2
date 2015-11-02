@@ -12,7 +12,9 @@ LIBS    += -lm -lpthread -ldl -lrt -lreadline
 ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(PGSQL_LIB_PATH) -lpq
 endif
-LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_apps_ecldspd
+LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system \
+           -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol \
+	   -ldaq_slc_apps_ecldspd
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 LIBS    += -lecldaq
 

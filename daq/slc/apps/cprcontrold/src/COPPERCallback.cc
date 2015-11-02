@@ -143,6 +143,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
           try {
+            hslb.test();
             hslb.load();
           } catch (const HSLBHandlerException& e) {
             throw (RCHandlerException("Failed to load: %s", e.what()));

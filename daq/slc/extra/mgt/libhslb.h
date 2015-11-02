@@ -32,6 +32,7 @@ void dumpfpga(int conf, char* str);
 int bootfpga(int fndev, const char* file,
              int verbose, int forced, int m012);
 int checkfee(hslb_info* hslb);
+int check_hslb(hslb_info* hslb, char* msg);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
 __dummy_open_bracket_to_cheat_emacs_auto_indent {

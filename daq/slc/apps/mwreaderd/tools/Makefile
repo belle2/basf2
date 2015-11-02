@@ -9,7 +9,9 @@ TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
 LIBS    += -lm -lpthread -ldl -lrt -lreadline
-LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_apps_mwreaderd
+LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system \
+           -ldaq_slc_database -ldaq_slc_nsm \
+           -ldaq_slc_runcontrol -ldaq_slc_apps_mwreaderd
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
@@ -25,7 +27,6 @@ OBJS   = $(SRCS:$(SRCDIR)/%.cc=$(TMPDIR)/%.o)
 .PHONY : all clean 
 
 all: $(TARGETS)
-#	@ install -m755 -p $(BINDIR)/* $(BELLE2_LOCAL_DIR)/bin/$(BELLE2_SUBDIR)
 
 force:
 	@ $(RM) $(BINDIR)/*

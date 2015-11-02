@@ -8,6 +8,7 @@
 #include <mgt/hsreg.h>
 
 #include <unistd.h>
+#include <cstring>
 
 using namespace Belle2;
 
@@ -275,6 +276,18 @@ std::string HSLB::checkfee() throw(HSLBHandlerException)
                             feetype[m_hslb.feehw], m_hslb.feeserial, m_hslb.feetype, m_hslb.feever);
   }
   return std::string("UNKNOWN");
+}
+
+void HSLB::test() throw(HSLBHandlerException)
+{
+  if (m_hslb.fd <= 0) {
+    throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
+  }
+  char msg[256];
+  memset(msg, 0, 256);
+  if (check_hslb(&m_hslb, msg) > 0) {
+    throw (HSLBHandlerException("tesths failed : %s", msg));
+  }
 }
 
 void HSLB::linkfee() throw(HSLBHandlerException)

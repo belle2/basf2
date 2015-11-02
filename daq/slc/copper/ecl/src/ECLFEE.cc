@@ -38,11 +38,11 @@ void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 void ECLFEE::boot(HSLB& hslb,  const DBObject&)
 {
   int ver;
-  if ((ver = hslb.readfn(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
+  if ((ver = hslb.readfee8(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
     throw (IOException("Inconsitent HWVER (%d!=%d)",
                        ver, HSLB_HARDWARE_VERSION));
   }
-  if ((ver = hslb.readfn(HSREG_FWVER)) != HSLB_FIRMWARE_VERSION) {
+  if ((ver = hslb.readfee8(HSREG_FWVER)) != HSLB_FIRMWARE_VERSION) {
     throw (IOException("Inconsitent FWVER (%d!=%d)",
                        ver, HSLB_FIRMWARE_VERSION));
   }

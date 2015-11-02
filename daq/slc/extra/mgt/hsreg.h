@@ -12,9 +12,10 @@
 
 */
 
-
 #ifndef __HSREG_H__
 #define __HSREG_H__
+
+#include <stdint.h>
 
 /* FEE registers as implemented in belle2link_cdc */
 
@@ -98,6 +99,47 @@
   stal(16#83#)(15 downto 12) <= state;
 */
 #define HSREGL_RXDATA  0x84  /* stal(16#84#) <= cntcrcerr & rxdata; */
+#define HSREGL_EVENTSZ 0x85
+#define HSREGL_NEVENT  0x86
+#define HSREGL_UPTIME  0x87
+#define HSREGL_NKBYTE  0x88
+#define HSREGL_NWORD   0x89
+#define HSREGL_VETOSET 0x8b
+#define HSREGL_VETOCNT 0x8c
+#define HSREGL_VETOBUF0 0x8d
+#define HSREGL_VETOBUF1 0x8e
+
+static const int hsreg_revision = 1;
+
+struct hsreg {
+  uint8_t  stat;    /* 72 */
+  uint8_t  csr;     /* 73 */
+  uint8_t  xbusy;   /* 74 */
+  uint8_t  conf;    /* 75 */
+  uint8_t  fincpld; /* 76 */
+  uint8_t  feehw;   /* 77 >> 4 */
+  uint8_t  feefw;   /* 79 >> 4 */
+  uint8_t  feecrce; /* 68 */
+  uint16_t feeser;  /* 78 | ((77 & f) << 8) */
+  uint16_t feever;  /* 7a | ((79 & f) << 8) */
+  uint16_t finser;  /* (7c << 8) | 7b */
+  uint16_t fintyp;  /* (7e << 8) | 7d */
+  uint32_t hslbid;  /* 80 */
+  uint32_t hslbver; /* 81 */
+  uint32_t hslbrst; /* 82 */
+  uint32_t hslbsta; /* 83 */
+  uint32_t rxdata;  /* 84 */
+  uint32_t eventsz; /* 85 */
+  uint32_t nevent;  /* 86 */
+  uint32_t uptime;  /* 87 */
+  uint32_t nkbyte;  /* 88 */
+  uint32_t nword;   /* 89 */
+  uint32_t vetoset; /* 8b */
+  uint32_t vetocnt; /* 8c */
+  uint32_t vetobuf[2]; /* 8d, 8e */
+};
+
+typedef struct hsreg hsreg_t;
 
 /* 0 parameter */
 #define HSDO_NOP      0x100

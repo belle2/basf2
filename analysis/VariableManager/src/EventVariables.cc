@@ -26,6 +26,13 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
+//
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dataobjects/BeamParameters.h>
+
+#include <TLorentzVector.h>
+#include <TVector3.h>
+
 namespace Belle2 {
   namespace Variable {
 
@@ -105,6 +112,49 @@ namespace Belle2 {
       return run_no;
     }
 
+    // Beam Energies
+    double getHEREnergy(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getHER().E();
+    }
+
+    double getLEREnergy(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getLER().E();
+    }
+
+    double getCrossingAngle(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect());
+    }
+
+    double getCMSEnergy(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getEnergy();
+    }
+
+    double getIPX(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getVertex().X();
+    }
+
+    double getIPY(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getVertex().Y();
+    }
+
+    double getIPZ(const Particle*)
+    {
+      PCmsLabTransform T;
+      return T.getBeamParams().getVertex().Z();
+    }
+
     VARIABLE_GROUP("Event");
 
     REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
@@ -126,6 +176,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
 
+    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] HER energy");
+    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");
+    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
+    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
 
+    REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
   }
 }

@@ -60,6 +60,40 @@ namespace Belle2 {
     */
     double runNum(const Particle*);
 
+    /**
+     * return energy of HER
+     */
+    double getHEREnergy(const Particle*);
+
+    /**
+     * return energy of LER
+     */
+    double getLEREnergy(const Particle*);
+
+    /**
+     * return CMS energy
+     */
+    double getCMSEnergy(const Particle*);
+
+    /**
+     * return crossing angle
+     */
+    double getCrossingAngle(const Particle*);
+
+    /**
+     * return x coordinate of the IP
+     */
+    double getIPX(const Particle*);
+
+    /**
+     * return y coordinate of the IP
+     */
+    double getIPY(const Particle*);
+
+    /**
+     * return z coordinate of the IP
+     */
+    double getIPZ(const Particle*);
   }
 } // Belle2 namespace
 

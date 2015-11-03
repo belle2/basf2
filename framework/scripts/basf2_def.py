@@ -199,6 +199,8 @@ def process(path, max_event=0):
         else:
             B2FATAL("Couldn't open path-file '" + pickle_path + "' and no steering file provided.")
 
+    B2RESULT("Starting event processing, random seed is set to '" + get_random_seed() + "'")
+
     if max_event != 0:
         fw.process(path, max_event)
     else:

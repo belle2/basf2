@@ -48,15 +48,15 @@ namespace Belle2 {
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
       static void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
-      /// Check p-value of the track
-      static void checkTrackProb(CDCTrackList& cdcTrackList);
+      /// Check the p-values of the tracks. If they are below the given value, delete all hits of the track (which means: do not use this track later).
+      static void deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
 
-      /// Perform track postprocessing
+      /// Perform all track postprocessing.
       static void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                    CDCTrackList& cdcTrackList);
 
     private:
-      /// Set MASKED flag of all reco hits to false and TAKEN flag to true. Does not touch the settings of the track.
+      /// Set the MASKED flag of all reco hits to false and TAKEN flag to true. Does not touch the settings of the track.
       static void unmaskHitsInTrack(CDCTrack& track);
 
       /**
@@ -67,14 +67,14 @@ namespace Belle2 {
        * As this function used the masked flag, all hits should have their masked flag set to false before calling
        * this function.
        */
-      static void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate, double maximum_distance = 0.2);
+      static void deleteHitsFarAwayFromTrajectory(CDCTrack& trackCandidate, double maximum_distance = 0.2);
 
+      /// Check chi2 of the fit using the given two quantiles of the chi2 distribution.
+      static bool isChi2InQuantiles(CDCTrack& track, double lower_quantile = 0.025, double upper_quantile = 0.975);
 
-      /// Check chi2 of the fit (using quantiles of chi2 distribution)
-      static bool checkChi2(CDCTrack& track);
-
-      /** Calculate quantile of chi2
-       * @param alpha quntile of chi2
+      /**
+       * Calculate the quantile of chi2 with the given number of freedoms using the known chi2 distribution.
+       * @param alpha quantile of chi2
        * @param n number degrees of freedom
        */
       static double calculateChi2ForQuantile(double alpha, double n);

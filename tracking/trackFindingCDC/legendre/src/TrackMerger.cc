@@ -51,15 +51,6 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 
 }
 
-void TrackMerger::resetHits(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track.items()) {
-    hit->getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit->getWireHit().getAutomatonCell().setMaskedFlag(false);
-  }
-}
-
-
 void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                   double minimum_probability_to_be_merged)
 {
@@ -78,13 +69,13 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
       CDCTrack& track2 = *it2;
 
-      resetHits(track1);
-      resetHits(track2);
+      HitProcessor::unmaskHitsInTrack(track1);
+      HitProcessor::unmaskHitsInTrack(track2);
 
       double probTemp = doTracksFitTogether(track1, track2);
 
-      resetHits(track1);
-      resetHits(track2);
+      HitProcessor::unmaskHitsInTrack(track1);
+      HitProcessor::unmaskHitsInTrack(track2);
 
       if (probTemp > prob) {
         prob = probTemp;
@@ -125,8 +116,8 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 
     double probabilityTemp = doTracksFitTogether(trackToBeMerged, track2);
 
-    resetHits(trackToBeMerged);
-    resetHits(track2);
+    HitProcessor::unmaskHitsInTrack(trackToBeMerged);
+    HitProcessor::unmaskHitsInTrack(track2);
 
     if (probabilityToBeMerged < probabilityTemp) {
       probabilityToBeMerged = probabilityTemp;
@@ -173,7 +164,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
   cdcTrackList.doForAllTracks([&](CDCTrack & track) {
 
-    resetHits(track);
+    HitProcessor::unmaskHitsInTrack(track);
     trackQualityTools.normalizeTrack(track);
 
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO

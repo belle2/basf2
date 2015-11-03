@@ -36,12 +36,12 @@ namespace Belle2 {
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
       static void doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                  double minimum_probability_to_be_merged = m_minimum_probability_to_be_merged);
+                                  double minimum_probability_to_be_merged = 0.85);
 
       /** Try to merge given track with tracks in tracklist. */
       static void tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
                                                  const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                                 double minimum_probability_to_be_merged = m_minimum_probability_to_be_merged);
+                                                 double minimum_probability_to_be_merged = 0.85);
 
     private:
       /** Some typedefs for the results of the merging process */
@@ -76,17 +76,6 @@ namespace Belle2 {
        */
       static BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
                                                         std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator);
-
-      /**
-       * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
-       * @param otherTrackCandidate to reset
-       */
-      static void resetHits(CDCTrack& track);
-
-      /**
-       * This parameter is the minimum probability a fit must have to lead to the result: merge
-       */
-      static constexpr double m_minimum_probability_to_be_merged = 0.85;
     };
   }
 }

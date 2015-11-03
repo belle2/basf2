@@ -83,7 +83,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
   assignNewHitsUsingSegments(track, conformalCDCWireHitList);
 
   //  B2INFO("delete");
-  deleteBadHitsOfOneTrack(track);
+  deleteHitsFarAwayFromTrajectory(track);
   trackQualityTools.normalizeTrack(track);
 
   if (not checkTrack(track)) {
@@ -117,7 +117,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
   trackQualityTools.normalizeTrack(track);
 
   //  B2INFO("delete");
-  deleteBadHitsOfOneTrack(track);
+  deleteHitsFarAwayFromTrajectory(track);
   trackQualityTools.normalizeTrack(track);
 
   if (not checkTrack(track)) {
@@ -223,7 +223,7 @@ bool TrackProcessor::checkTrack(CDCTrack& track)
   return true;
 }
 
-void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& track, double maximum_distance)
+void TrackProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximum_distance)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   for (CDCRecoHit3D& recoHit : track) {
@@ -260,7 +260,7 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
     trackQualityTools.normalizeTrack(track);
 
     //  B2INFO("delete");
-    deleteBadHitsOfOneTrack(track);
+    deleteHitsFarAwayFromTrajectory(track);
 
     trackQualityTools.normalizeTrack(track);
   });
@@ -402,42 +402,30 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, const std::vect
 
 }
 
-void TrackProcessor::checkTrackProb(CDCTrackList& cdcTrackList)
+void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
 {
-  cdcTrackList.doForAllTracks([](CDCTrack & track) {
-    std::vector<std::pair<std::pair<double, double>, double>> hits;
+  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+    const CDCTrajectory2D& fittedTrajectory = HitProcessor::fitWhithoutRecoPos(track);
+    const double chi2 = fittedTrajectory.getChi2();
+    const int dof = track.size() - 4;
 
-    for (const CDCRecoHit3D& hit : track) {
-
-      hits.push_back(std::make_pair(std::make_pair(hit.getRecoWirePos2D().x(), hit.getRecoWirePos2D().y()),
-                                    fabs(hit.getSignedRecoDriftLength())));
-    }
-
-
-//    B2DEBUG(100, "chi2: new = " << TMath::Prob(HitProcessor::fitWhithoutRecoPos(track), track.size() - 4) << "; old = " << TMath::Prob(TrackFitter::fitTrackCandidateFast(hits), track.size() - 4));
-
-    if (TMath::Prob((HitProcessor::fitWhithoutRecoPos(track)).getChi2(), track.size() - 4) < 0.4) {
-      for (const CDCRecoHit3D& hit : track) {
-        hit->getWireHit().getAutomatonCell().setMaskedFlag(true);
-      }
-      HitProcessor::deleteAllMarkedHits(track);
+    if (TMath::Prob(chi2, dof) < minimal_probability_for_good_fit) {
+      // Remove all hits = delete the track.
+      track.clear();
     }
   });
-
-  return ;
-
 }
 
 
-bool TrackProcessor::checkChi2(CDCTrack& track)
+bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)
 {
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
-  double minChi2 = calculateChi2ForQuantile(0.025, trackTrajectory2D.getNDF());
-  double maxChi2 = calculateChi2ForQuantile(0.975, trackTrajectory2D.getNDF());
-  double Chi2 = trackTrajectory2D.getChi2();
+  const double minChi2 = calculateChi2ForQuantile(lower_quantile, trackTrajectory2D.getNDF());
+  const double maxChi2 = calculateChi2ForQuantile(upper_quantile, trackTrajectory2D.getNDF());
+  const double chi2 = trackTrajectory2D.getChi2();
 
-  if ((Chi2 < minChi2) || (Chi2 > maxChi2)) return false;
+  if ((chi2 < minChi2) || (chi2 > maxChi2)) return false;
 
   return true;
 }
@@ -451,11 +439,11 @@ double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
     d = -2.0637 * pow(log(1. / alpha) - 0.16, 0.4274) + 1.5774;
   }
 
-  double A = d * pow(2., 0.5);
-  double B = 2.*(d * d - 1.) / 3.;
-  double C = d * (d * d - 7) / (9. * pow(2., 0.5));
-  double D = (6.*d * d * d * d + 14 * d * d - 32) / 405.;
-  double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
+  const double A = d * pow(2., 0.5);
+  const double B = 2.*(d * d - 1.) / 3.;
+  const double C = d * (d * d - 7) / (9. * pow(2., 0.5));
+  const double D = (6.*d * d * d * d + 14 * d * d - 32) / 405.;
+  const double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
 
   return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
 }

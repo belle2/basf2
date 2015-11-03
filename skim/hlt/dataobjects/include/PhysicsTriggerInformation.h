@@ -104,8 +104,10 @@ namespace Belle2 {
     /**set the sub trigger result*/
     void setsubTrgResult(int i, int res) {m_trgresult[i] |= res;}
 
+    /**set the sub triggers*/
     void setnsubTrg(int i) {m_nsubtrg[i]++;}
 
+    /**set the total triggers*/
     void setntotTrg(int i = 1) {m_ntottrg += i;}
     //getters
 
@@ -178,10 +180,13 @@ namespace Belle2 {
     /**return the summary of trigger results*/
     int getPTSummary() const {return m_ptsummary;}
 
+    /**return the sub summary of trigger results*/
     int getsubTrgResult(int i) const {return m_trgresult[i];}
 
+    /**return the number of sub triggers*/
     int getnsubTrg(int i) const {return m_nsubtrg[i];}
 
+    /**return the number of total triggers*/
     int getntotTrg() const {return m_ntottrg;}
 
   private:
@@ -189,7 +194,7 @@ namespace Belle2 {
     /**the number of good tracks*/
     int m_ngoodTracks;
 
-    /*the number of good ECL clusters*/
+    /**the number of good ECL clusters*/
     int m_ngoodECLClusters;
 
     /**the total absolute of Pz momenta*/
@@ -201,10 +206,10 @@ namespace Belle2 {
     /**the sum of cluster energy*/
     float m_Esum;
 
-    /*the maximum angle between the charged tracks in the rest frame*/
+    /**the maximum angle between the charged tracks in the rest frame*/
     float m_MaxAngleTT;
 
-    /*the angle between the first and second largest momentum tracks in the rest frame*/
+    /**the angle between the first and second largest momentum tracks in the rest frame*/
     float m_AngleTT;
 
     /**the angle between the first and second energetic cluster*/

@@ -25,23 +25,27 @@ namespace Belle2 {
 
     class TrackMerger {
     public:
+      /// Static class only.
+      TrackMerger() = delete;
 
-      /// Constructor with a reference to the track processor.
-      TrackMerger() { }
+      /// Static class only.
+      TrackMerger(const TrackMerger& copy) = delete;
+
+      /// Static class only.
+      TrackMerger& operator=(const TrackMerger&) = delete;
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      static void doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                  double minimum_probability_to_be_merged = m_minimum_probability_to_be_merged);
 
       /** Try to merge given track with tracks in tracklist. */
       static void tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
-                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                                 double minimum_probability_to_be_merged = m_minimum_probability_to_be_merged);
 
     private:
       /** Some typedefs for the results of the merging process */
-      typedef unsigned int TrackCandidateIndex;
-      typedef std::pair<TrackCandidateIndex, CDCTrack*> TrackCandidateWithIndex;
-      typedef double Probability;
-      typedef std::pair<CDCTrack*, Probability> BestMergePartner;
+      typedef std::pair<CDCTrack*, double> BestMergePartner;
 
       /**
        * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.

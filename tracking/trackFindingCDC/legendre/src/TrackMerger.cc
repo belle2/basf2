@@ -60,7 +60,8 @@ void TrackMerger::resetHits(CDCTrack& track)
 }
 
 
-void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                  double minimum_probability_to_be_merged)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
@@ -92,7 +93,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
     }
 
-    if (prob > m_minimum_probability_to_be_merged) {
+    if (prob > minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate, conformalCDCWireHitList, cdcTrackList);
       trackQualityTools.normalizeTrack(*bestCandidate);
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
@@ -138,7 +139,8 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 
 
 void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
-                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                                 double minimum_probability_to_be_merged)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 
@@ -150,9 +152,9 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
     have_merged_something = false;
     BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(track, cdcTrackList.getCDCTracks().begin(),
                                             cdcTrackList.getCDCTracks().end());
-    Probability& probabilityWithCandidate = candidateToMergeBest.second;
+    double& probabilityWithCandidate = candidateToMergeBest.second;
 
-    if (probabilityWithCandidate > m_minimum_probability_to_be_merged) {
+    if (probabilityWithCandidate > minimum_probability_to_be_merged) {
       CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
       mergeTracks(track, *bestFitTrackCandidate, conformalCDCWireHitList, cdcTrackList);
       have_merged_something = true;

@@ -75,7 +75,6 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
 {
-  TrackMerger trackMerger;
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
   QuadTreePassCounter quadTreePassCounter;
@@ -118,7 +117,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
     // Try to merge tracks
-    if (m_param_doEarlyMerging)trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
+    if (m_param_doEarlyMerging)TrackMerger::doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
     nCandsAdded = m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size() - nCandsAdded;
 
@@ -171,7 +170,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
   // Perform tracks merging
-  trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
+  TrackMerger::doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
   // Assign new hits
   m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());

@@ -9,24 +9,8 @@
  **************************************************************************/
 
 #pragma once
-
-
-#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <vector>
 #include <list>
-#include <algorithm>
-
-#include <cstdlib>
-#include <iomanip>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <memory>
-#include <cmath>
-#include <functional>
 
 using namespace std;
 
@@ -37,7 +21,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCTrack;
+    class CDCTrajectory2D;
     class CDCWireHit;
+    class CDCRecoHit3D;
     class ConformalCDCWireHit;
 
     /**
@@ -50,72 +36,38 @@ namespace Belle2 {
      *   - convert vector of QuadTreeHitWrapper to CDCWireHit and vice versa
      *   - prepare vector of QuadTreeHitWrapper for quadtree
      */
-    class QuadTreeHitWrapperCreator {
+    class ConformalCDCWireHitCreator {
     public:
       /// Compile the hitList from the wire hit topology.
       static void initializeQuadTreeHitWrappers(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Create CDCRecoHit3D.
-      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit);
+      static const CDCRecoHit3D reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit);
 
       /// Create CDCRecoHit3D.
-      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
-
-      /// Get the list with currently stored tracks.
-      std::vector<ConformalCDCWireHit>& getQuadTreeHitWrappers()
-      {
-        return m_QuadTreeHitWrappers;
-      }
+      static const CDCRecoHit3D reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
       /**
        * For the use in the QuadTree use this hit set.
        *
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      std::vector<ConformalCDCWireHit*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
+      static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(std::vector<ConformalCDCWireHit>&
+          conformalCDCWireHitList,
+          bool useSegmentsOnly = false);
 
       /// Reset all masked hits.
-      void resetMaskedHits(std::list<CDCTrack>& cdcTracks)
-      {
-        doForAllHits([](ConformalCDCWireHit & hit) {
-          hit.setMaskedFlag(false);
-          hit.setUsedFlag(false);
-        });
-
-        for (CDCTrack& cdcTrack : cdcTracks) {
-          for (const CDCRecoHit3D& hit : cdcTrack) {
-            hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-          }
-        }
-      }
-
-      /// After each event the created hits and trackCandidates should be deleted.
-      void clear()
-      {
-        m_QuadTreeHitWrappers.clear();
-      }
-
-      /// Do a certain function for each track in the track list.
-      void doForAllHits(std::function<void(ConformalCDCWireHit& hit)> function)
-      {
-        for (ConformalCDCWireHit& hit : m_QuadTreeHitWrappers) {
-          function(hit);
-        }
-      }
+      static void resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
-      std::vector<ConformalCDCWireHit> m_QuadTreeHitWrappers; /**< Vector which hold axial hits. */
-
-    public:
       /// Static only.
-      QuadTreeHitWrapperCreator() { } ;
-
-    private:
-      /// Do not copy this class.
-      QuadTreeHitWrapperCreator(const QuadTreeHitWrapperCreator& copy) = delete;
+      ConformalCDCWireHitCreator() { } ;
 
       /// Do not copy this class.
-      QuadTreeHitWrapperCreator& operator=(const QuadTreeHitWrapperCreator&) = delete;
+      ConformalCDCWireHitCreator(const ConformalCDCWireHitCreator& copy) = delete;
+
+      /// Do not copy this class.
+      ConformalCDCWireHitCreator& operator=(const ConformalCDCWireHitCreator&) = delete;
     };
   }
 }

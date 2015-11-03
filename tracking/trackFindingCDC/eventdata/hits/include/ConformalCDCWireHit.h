@@ -62,6 +62,7 @@ namespace Belle2 {
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
       std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0) const;
 
+      const CDCRecoSegment2D& getSegment() const {return m_segment;};
       CDCRecoSegment2D& getSegment() {return m_segment;};
 
       void setSegment(CDCRecoSegment2D& segment) {m_segment = segment; };

@@ -32,15 +32,13 @@ namespace Belle2 {
 
     public:
 
-      ConformalExtension(QuadTreeHitWrapperCreator& hitFactory, double levelPrecision = 9): m_hitFactory(hitFactory),
-        m_levelPrecision(levelPrecision)
+      ConformalExtension(double levelPrecision = 9) : m_levelPrecision(levelPrecision)
       {
       };
 
-      ~ConformalExtension() {};
-
       /// perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits, bool doMaskInitialHits = false)
+      std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
+                                                 std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, bool doMaskInitialHits = false)
       {
         const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
         CDCTrajectory2D trackTrajectory2D = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
@@ -58,7 +56,7 @@ namespace Belle2 {
 
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta);
+        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, conformalCDCWireHitList);
 
         if (newAssignedHits.size() > 0) {
 
@@ -93,7 +91,7 @@ namespace Belle2 {
 
 
       /// perform transformation for the given track; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> newRefPoint(CDCTrack& track)
+      std::vector<const CDCWireHit*> newRefPoint(CDCTrack& track, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
       {
         std::vector<const CDCWireHit*> cdcWireHits;
 
@@ -121,7 +119,7 @@ namespace Belle2 {
 
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta);
+        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, conformalCDCWireHitList);
 
         if (newAssignedHits.size() > 0) {
 
@@ -140,7 +138,7 @@ namespace Belle2 {
 
           if (chi2New < chi2 * 2.) {
             for (const CDCWireHit* hit : newAssignedHits) {
-              const CDCRecoHit3D& cdcRecoHit3D  = QuadTreeHitWrapperCreator::createRecoHit3D(trackTrajectory2D, hit);
+              const CDCRecoHit3D& cdcRecoHit3D  = ConformalCDCWireHitCreator::reconstructWireHit(trackTrajectory2D, hit);
               track.push_back(std::move(cdcRecoHit3D));
               cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
             }
@@ -163,7 +161,8 @@ namespace Belle2 {
        * @param theta angle between x-axis and vector to the center of the circle which represents trajectory
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
-      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, double curv, double theta)
+      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, double curv, double theta,
+                                                        std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
       {
 
         double precision_r, precision_theta;
@@ -176,7 +175,8 @@ namespace Belle2 {
                AxialHitQuadTreeProcessorWithNewReferencePoint::rangeY(static_cast<float>(curv - precision_r),
                    static_cast<float>(curv + precision_r)));
 
-        std::vector<ConformalCDCWireHit*> hitsVector = m_hitFactory.createQuadTreeHitWrappersForQT(false);
+        std::vector<ConformalCDCWireHit*> hitsVector = ConformalCDCWireHitCreator::createConformalCDCWireHitListForQT(
+                                                         conformalCDCWireHitList, false);
 
         for (ConformalCDCWireHit* hit : hitsVector) {
           hit->setUsedFlag(false);
@@ -200,8 +200,6 @@ namespace Belle2 {
 
 
     private:
-
-      QuadTreeHitWrapperCreator& m_hitFactory;  /**< Object which holds hits */
       double m_levelPrecision;   /**< Function which defines precision of conformal transformation */
       //.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
 

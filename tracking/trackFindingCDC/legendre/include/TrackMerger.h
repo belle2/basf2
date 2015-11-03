@@ -20,6 +20,7 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrajectory2D;
     class TrackProcessor;
+    class ConformalCDCWireHit;
 
     class TrackMerger {
     public:
@@ -28,10 +29,11 @@ namespace Belle2 {
       TrackMerger(TrackProcessor& trackProcessor): m_trackProcessor(trackProcessor) {};
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      void doTracksMerging(std::list<CDCTrack>& trackList);
+      void doTracksMerging(std::list<CDCTrack>& trackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /** Try to merge given track with tracks in tracklist. */
-      void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList);
+      void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList,
+                                          const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
       /** Some typedefs for the results of the merging process */
@@ -44,7 +46,7 @@ namespace Belle2 {
        * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
        * The hit sorting is not maintained.
        */
-      void mergeTracks(CDCTrack& track1, CDCTrack& track2);
+      void mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /**
        * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.

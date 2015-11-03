@@ -38,40 +38,26 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list
-      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits);
+      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Assign new hits to the track basing on the distance from the hit to the track
-      void assignNewHits(CDCTrack& track);
+      void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
-      void assignNewHits();
+      void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Check p-value of the track
       void checkTrackProb();
 
       /// Perform track postprocessing
-      void postprocessTrack(CDCTrack& track);
-
-      /**
-       * Reset all masked hits
-       */
-      void resetMaskedHits()
-      {
-        m_hitFactory.resetMaskedHits(m_cdcTrackList.getCDCTracks());
-      }
+      void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /**
        * After each event the created hits and trackCandidates should be deleted.
        */
       void clearVectors()
       {
-        m_hitFactory.clear();
         m_cdcTrackList.clear();
-      }
-
-      QuadTreeHitWrapperCreator& getHitFactory()
-      {
-        return m_hitFactory;
       }
 
       std::list<CDCTrack>& getCDCTrackList()
@@ -86,7 +72,6 @@ namespace Belle2 {
       }
 
     private:
-      QuadTreeHitWrapperCreator m_hitFactory; /**< HitFactory object.*/
       CDCTrackList m_cdcTrackList; /**< a list handling the found CDC tracks as an object.*/
 
       /// Set MASKED flag of automaton cells to false
@@ -107,7 +92,8 @@ namespace Belle2 {
        */
       double calculateChi2ForQuantile(double alpha, double n);
 
-      void assignNewHitsUsingSegments(CDCTrack& track, float fraction = 0.3);
+      void assignNewHitsUsingSegments(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                      float fraction = 0.3);
 
       void removeBadSLayers(CDCTrack& track);
 

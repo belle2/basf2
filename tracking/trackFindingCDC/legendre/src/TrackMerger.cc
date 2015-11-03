@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <TMath.h>
 
@@ -23,7 +25,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
+void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   if (track1 == track2) return;
 
@@ -42,7 +44,7 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
 
   trackQualityTools.normalizeTrack(track1);
 
-  m_trackProcessor.addCandidateWithHits(removedHits);
+  m_trackProcessor.addCandidateWithHits(removedHits, conformalCDCWireHitList);
 
 }
 
@@ -55,7 +57,7 @@ void TrackMerger::resetHits(CDCTrack& track)
 }
 
 
-void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
+void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
@@ -88,7 +90,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
     }
 
     if (prob > m_minimum_probability_to_be_merged) {
-      mergeTracks(track1, *bestCandidate);
+      mergeTracks(track1, *bestCandidate, conformalCDCWireHitList);
       trackQualityTools.normalizeTrack(*bestCandidate);
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
     }
@@ -132,7 +134,8 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 }
 
 
-void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList)
+void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList,
+                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
@@ -148,7 +151,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCT
 
     if (probabilityWithCandidate > m_minimum_probability_to_be_merged) {
       CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
-      mergeTracks(track, *bestFitTrackCandidate);
+      mergeTracks(track, *bestFitTrackCandidate, conformalCDCWireHitList);
       have_merged_something = true;
     }
 

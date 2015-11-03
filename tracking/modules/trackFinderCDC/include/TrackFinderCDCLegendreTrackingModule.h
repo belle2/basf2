@@ -26,11 +26,11 @@ namespace Belle2 {
    * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
    * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
    */
-  class CDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
+  class TrackFinderCDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
 
   public:
     /// Create and allocate memory for variables here and add the module parameters in this method.
-    CDCLegendreTrackingModule();
+    TrackFinderCDCLegendreTrackingModule();
 
   private:
     /// Parameter

@@ -38,10 +38,7 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list
-      void createCandidate(std::vector<const CDCWireHit*>& hits);
-
-      /// Update trajectory of the CDCTrack
-      void normalizeTrack(CDCTrack& track);
+      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits);
 
       /// Assign new hits to the track basing on the distance from the hit to the track
       void assignNewHits(CDCTrack& track);
@@ -116,9 +113,6 @@ namespace Belle2 {
 
       /// Check track -- currently based on number of hits only.
       bool checkTrack(CDCTrack& track);
-
-      /// Fit CDCTrack object
-      CDCTrajectory2D fit(CDCTrack& track);
     };
   }
 }

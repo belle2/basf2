@@ -60,6 +60,10 @@ namespace Belle2 {
 
       void moveToNextAxialLayer(CDCTrack& track) const;
 
+      void unmaskHitsInTrack(CDCTrack& track) const;
+
+      void normalizeTrack(CDCTrack& track) const;
+
     private:
       const double m_outerCylindricalRFactor = 1.1;
       const unsigned int m_minimalHits = 7;

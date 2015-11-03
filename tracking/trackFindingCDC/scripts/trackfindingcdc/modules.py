@@ -36,7 +36,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
                     TracksStoreObjName="__TempCDCTracksVector")
 
     # Find axial tracks
-    path.add_module("CDCLegendreTracking",
+    path.add_module("TrackFinderCDCLegendreTracking",
                     WriteGFTrackCands=False)
 
     # Improve the quality of the axial tracks

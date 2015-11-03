@@ -246,7 +246,7 @@ class CDCLegendreTrackFinder(metamodules.PathModule):
         module_list = []
 
         legendre_tracking_module = StandardEventGenerationRun.get_basf2_module(
-            'CDCLegendreTracking',
+            'TrackFinderCDCLegendreTracking',
             WriteGFTrackCands=False,
             TracksStoreObjNameIsInput=TracksStoreObjNameIsInput,
             TracksStoreObjName=output_track_cands_store_vector_name)

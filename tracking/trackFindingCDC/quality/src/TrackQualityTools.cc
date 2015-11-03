@@ -1,5 +1,8 @@
 #include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
@@ -50,6 +53,46 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   if (splittedCDCTrack.size() > 0) {
     tracks.push_back(splittedCDCTrack);
   }
+}
+
+void TrackQualityTools::unmaskHitsInTrack(CDCTrack& track) const
+{
+  for (const CDCRecoHit3D& hit : track) {
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  }
+}
+
+void TrackQualityTools::normalizeTrack(CDCTrack& track) const
+{
+  // Set the start point of the trajectory to the first hit
+  if (track.size() < 5) return;
+
+  unmaskHitsInTrack(track);
+
+  bool m_usePosition = true;
+  CDCObservations2D observations2D;
+  observations2D.setUseRecoPos(m_usePosition);
+  for (const CDCRecoHit3D& item : track.items()) {
+    observations2D.append(item, m_usePosition);
+  }
+
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  CDCTrajectory2D trackTrajectory2D = fitter.fit(observations2D);
+
+  if (trackTrajectory2D.getChargeSign() != HitProcessor::getChargeSign(track)) trackTrajectory2D.reverse();
+
+  trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
+  for (CDCRecoHit3D& recoHit : track) {
+    HitProcessor::updateRecoHit3D(trackTrajectory2D, recoHit);
+  }
+
+  track.sortByArcLength2D();
+
+  CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
+  track.setStartTrajectory3D(trajectory3D);
+
+  unmaskHitsInTrack(track);
 }
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const

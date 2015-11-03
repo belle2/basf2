@@ -145,7 +145,7 @@ namespace Belle2 {
 
         conformalExtension.newRefPoint(cdcWireHits, true);
 
-        m_trackProcessor.createCandidate(cdcWireHits);
+        m_trackProcessor.addCandidateWithHits(cdcWireHits);
       }
 
     private:

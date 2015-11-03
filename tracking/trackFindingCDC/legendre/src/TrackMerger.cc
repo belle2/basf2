@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/legendre/TrackMerger.h>
-
+#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
@@ -27,6 +27,8 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
 {
   if (track1 == track2) return;
 
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
+
   for (const CDCRecoHit3D& hit : track2) {
     const CDCRecoHit3D& cdcRecoHit3D  =  CDCRecoHit3D::reconstruct(hit.getRLWireHit(), track1.getStartTrajectory3D().getTrajectory2D());
 
@@ -34,13 +36,13 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2)
   }
   track2.clear();
 
-  m_trackProcessor.normalizeTrack(track1);
+  trackQualityTools.normalizeTrack(track1);
 
   std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track1);
 
-  m_trackProcessor.normalizeTrack(track1);
+  trackQualityTools.normalizeTrack(track1);
 
-  m_trackProcessor.createCandidate(removedHits);
+  m_trackProcessor.addCandidateWithHits(removedHits);
 
 }
 
@@ -55,7 +57,8 @@ void TrackMerger::resetHits(CDCTrack& track)
 
 void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
 {
-  CDCKarimakiFitter trackFitter;
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
   // Search for best matches
   for (std::list<CDCTrack>::iterator it1 = trackList.begin(); it1 !=  trackList.end(); ++it1) {
@@ -86,7 +89,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& trackList)
 
     if (prob > m_minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate);
-      m_trackProcessor.normalizeTrack(*bestCandidate);
+      trackQualityTools.normalizeTrack(*bestCandidate);
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
     }
   }
@@ -131,8 +134,9 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 
 void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList)
 {
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
-  CDCKarimakiFitter trackFitter;
   B2DEBUG(100, "Merger: Initial nCands = " << trackList.size());
 
   bool have_merged_something;
@@ -161,7 +165,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCT
   for (CDCTrack& track : trackList) {
 
     resetHits(track);
-    m_trackProcessor.normalizeTrack(track);
+    trackQualityTools.normalizeTrack(track);
 
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
 //    cand->reestimateCharge();

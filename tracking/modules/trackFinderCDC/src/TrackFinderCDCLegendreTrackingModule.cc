@@ -29,6 +29,8 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
+#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace std;
@@ -36,9 +38,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 //ROOT macro
-REG_MODULE(CDCLegendreTracking);
+REG_MODULE(TrackFinderCDCLegendreTracking);
 
-CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
+TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
   TrackFinderCDCBaseModule()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder:"
@@ -55,7 +57,7 @@ CDCLegendreTrackingModule::CDCLegendreTrackingModule() :
            false);
 }
 
-void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   startNewEvent();
   findTracks();
@@ -63,7 +65,7 @@ void CDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CD
   clearVectors();
 }
 
-void CDCLegendreTrackingModule::startNewEvent()
+void TrackFinderCDCLegendreTrackingModule::startNewEvent()
 {
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
 
@@ -71,9 +73,11 @@ void CDCLegendreTrackingModule::startNewEvent()
   m_trackProcessor.getHitFactory().initializeQuadTreeHitWrappers();
 }
 
-void CDCLegendreTrackingModule::findTracks()
+void TrackFinderCDCLegendreTrackingModule::findTracks()
 {
   TrackMerger trackMerger(m_trackProcessor);
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
+
   QuadTreePassCounter quadTreePassCounter;
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
@@ -133,7 +137,8 @@ void CDCLegendreTrackingModule::findTracks()
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
       HitProcessor::splitBack2BackTrack(track);
-      m_trackProcessor.normalizeTrack(track);
+
+      trackQualityTools.normalizeTrack(track);
       std::vector<const CDCWireHit*> hitsToSplit;
 
       for (CDCRecoHit3D& hit : track) {
@@ -149,7 +154,7 @@ void CDCLegendreTrackingModule::findTracks()
         hit->getAutomatonCell().setTakenFlag(false);
       }
 
-      m_trackProcessor.createCandidate(hitsToSplit);
+      m_trackProcessor.addCandidateWithHits(hitsToSplit);
 
     }
 //    TrackMergerNew::deleteAllMarkedHits(track);
@@ -157,7 +162,7 @@ void CDCLegendreTrackingModule::findTracks()
 
   // Update tracks before storing to DataStore
   for (CDCTrack& track : m_trackProcessor.getCDCTrackList()) {
-    m_trackProcessor.normalizeTrack(track);
+    trackQualityTools.normalizeTrack(track);
   }
 
   // Remove bad tracks
@@ -171,7 +176,7 @@ void CDCLegendreTrackingModule::findTracks()
 
 }
 
-void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
   std::list<CDCTrack>& tracksFromFinder = m_trackProcessor.getCDCTrackList();
   tracks.reserve(tracks.size() + tracksFromFinder.size());
@@ -181,7 +186,7 @@ void CDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCD
   }
 }
 
-void CDCLegendreTrackingModule::clearVectors()
+void TrackFinderCDCLegendreTrackingModule::clearVectors()
 {
   m_trackProcessor.clearVectors();
 }

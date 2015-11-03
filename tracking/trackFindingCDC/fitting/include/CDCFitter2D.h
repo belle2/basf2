@@ -26,7 +26,8 @@ namespace Belle2 {
       CDCFitter2D() :
         AFitMethod(),
         m_usePosition(false),
-        m_useOrientation(true)
+        m_useOrientation(true),
+        m_doUseDriftVariance(true)
       {}
 
       /// Fits a collection of observation drift circles.
@@ -90,6 +91,7 @@ namespace Belle2 {
         return result;
       }
 
+
       /** Updates a given trajectory with a fit to two collection of hit types,
        * which are convertable to observation circles.
        */
@@ -99,6 +101,8 @@ namespace Belle2 {
                   const AEndHits& endHits) const
       {
         CDCObservations2D observations2D;
+        observations2D.setUseDriftVariance(m_doUseDriftVariance);
+
         if (m_usePosition) {
           observations2D.setUseRecoPos(true);
           observations2D.appendRange(startHits);
@@ -131,6 +135,8 @@ namespace Belle2 {
       void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
       {
         CDCObservations2D observations2D;
+        observations2D.setUseDriftVariance(m_doUseDriftVariance);
+
         if (m_usePosition) {
           observations2D.setUseRecoPos(true);
           observations2D.appendRange(hits);
@@ -163,12 +169,18 @@ namespace Belle2 {
       /// Setup the fitter to use both the reconstructed position and the reference position and the drift length with right left orientation.
       void usePositionAndOrientation() { m_usePosition = true; m_useOrientation = true;}
 
+      /// Setup the fitter to not use the drift length variance.
+      void setNotUseDriftVariance() { m_doUseDriftVariance = false; }
+
     private:
       /// Flag indicating the reconstructed position shall be used in the fit.
       bool m_usePosition;
 
       /// Flag indicating the reference position and drift length with right left orientation shall be used in the fit.
       bool m_useOrientation;
+
+      /// Flag which indicates to only use the reco position and the 1/drift length as a weight.
+      bool m_doUseDriftVariance;
 
     }; //class
 

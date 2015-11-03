@@ -25,6 +25,8 @@ namespace Belle2 {
       // Static getter for a line fitter
       static const CDCKarimakiFitter& getLineFitter();
 
+      static const CDCKarimakiFitter& getNoDriftVarianceFitter();
+
     }; // class
   } // end namespace TrackFindingCDC
 } // namespace Belle2

@@ -33,7 +33,7 @@ namespace Belle2 {
       /** Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
-      CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos) {}
+      CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos), m_useDriftVariance(true) {}
 
     public:
       /// Matrix type used to wrap the raw memory chunk of values
@@ -157,9 +157,21 @@ namespace Belle2 {
                                             wireHit.getRefDriftLengthVariance() :
                                             getPseudoDriftLengthVariance(wireHit));
 
-        const double weight = 1.0 / driftLengthVariance;
-        size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
-        return nAppendedHits;
+        if (m_useDriftVariance) {
+          const double weight = 1.0 / driftLengthVariance;
+          size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
+          return nAppendedHits;
+        } else {
+          const double weight = fabs(1.0 / driftLength);
+          size_t nAppendedHits = append(wireRefPos2D, 0, weight);
+          return nAppendedHits;
+        }
+      }
+
+      size_t append(const Belle2::TrackFindingCDC::CDCWireHit* wireHit,
+                    const ERightLeft rlInfo = ERightLeft::c_Unknown)
+      {
+        return append(*(wireHit), rlInfo);
       }
 
       /** Appends the hit circle at wire reference position with a right left passage hypotheses.
@@ -190,9 +202,15 @@ namespace Belle2 {
       size_t append(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit)
       {
         const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
-        const double signedDriftLength = rlWireHit.getSignedRefDriftLength();
-        const double weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
-        return append(wireRefPos2D, signedDriftLength, weight);
+        if (m_useDriftVariance) {
+          const double signedDriftLength = rlWireHit.getSignedRefDriftLength();
+          const double weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
+          return append(wireRefPos2D, signedDriftLength, weight);
+        } else {
+          const double driftLength = fabs(rlWireHit.getRefDriftLength());
+          const double weight = 1.0 / driftLength;
+          return append(wireRefPos2D, 0, weight);
+        }
       }
 
       /// Appends the two observed position
@@ -213,8 +231,13 @@ namespace Belle2 {
         if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
           const double driftLength = 0.0;
-          const double weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
-          return append(recoPos2D, driftLength, weight);
+          if (m_useDriftVariance) {
+            const double weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
+            return append(recoPos2D, driftLength, weight);
+          } else {
+            const double weight = fabs(1.0 / recoHit2D.getWireHit().getRefDriftLength());
+            return append(recoPos2D, driftLength, weight);
+          }
         } else {
           return append(recoHit2D.getRLWireHit());
         }
@@ -230,13 +253,23 @@ namespace Belle2 {
         if (useRecoPos) {
           const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
           const double driftLength = 0.0;
-          const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-          return append(recoPos2D, driftLength, weight);
+          if (m_useDriftVariance) {
+            const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+            return append(recoPos2D, driftLength, weight);
+          } else {
+            const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
+            return append(recoPos2D, driftLength, weight);
+          }
         } else {
           const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
           const double driftLength = recoHit3D.getSignedRecoDriftLength();
-          const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-          return append(recoWirePos2D, driftLength, weight);
+          if (m_useDriftVariance) {
+            const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
+            return append(recoWirePos2D, driftLength, weight);
+          } else {
+            const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
+            return append(recoWirePos2D, 0, weight);
+          }
         }
       }
 
@@ -487,6 +520,12 @@ namespace Belle2 {
       void setUseRecoPos(bool useRecoPos)
       { m_useRecoPos = useRecoPos; }
 
+      /// Setter for the indicator that the drift variance should be used.
+      void setUseDriftVariance(bool useDriftVariance)
+      {
+        m_useDriftVariance = useDriftVariance;
+      }
+
     private:
       /** Memory for the individual observations.
        *  Arrangement of values is x,y, drift raduis, weight, x, y, .....
@@ -499,6 +538,14 @@ namespace Belle2 {
        *  in between append() calls.
        */
       bool m_useRecoPos;
+
+      /**
+       * Indicator if the position + 1/the drift length as the weight should be used (if set to false)
+       * instead of position, drift length & 1/drift length variance as a weight (if set to true).
+       * Setting this to false is only reasonable for a few special cases to be consistent with the
+       * legendre implementation.
+       */
+      bool m_useDriftVariance;
 
     }; // end class CDCObservations2D
 

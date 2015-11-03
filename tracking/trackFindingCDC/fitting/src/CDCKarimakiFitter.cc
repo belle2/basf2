@@ -23,3 +23,10 @@ const CDCKarimakiFitter& CDCKarimakiFitter::getLineFitter()
   lineFitter.setLineConstrained();
   return lineFitter;
 }
+
+const CDCKarimakiFitter& CDCKarimakiFitter::getNoDriftVarianceFitter()
+{
+  static CDCKarimakiFitter fitter;
+  fitter.setNotUseDriftVariance();
+  return fitter;
+}

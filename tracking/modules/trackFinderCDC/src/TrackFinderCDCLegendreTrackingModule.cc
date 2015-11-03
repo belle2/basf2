@@ -111,9 +111,6 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Assign new hits to the tracks
     TrackProcessor::assignNewHits(m_conformalCDCWireHitList, m_cdcTrackList);
 
-    // Check p-value of the tracks
-    TrackProcessor::deleteTracksWithLowFitProbability(m_cdcTrackList);
-
     // Try to merge tracks
     if (m_param_doEarlyMerging) {
       TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);

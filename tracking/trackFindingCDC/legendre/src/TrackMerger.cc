@@ -216,18 +216,18 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   // Calculate track parameters
   CDCTrajectory2D commonTrajectory;
 
-  const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
+  const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
 
   // Approach the best fit
-  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
   removeStrangeHits(5, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
   removeStrangeHits(3, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fitWhithoutDriftLengthVariance(commonHitListOfTwoTracks);
+  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
 
 //TODO: perform B2B tracks check
 //if B2B return 0;

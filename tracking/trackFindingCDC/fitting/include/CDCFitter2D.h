@@ -80,18 +80,6 @@ namespace Belle2 {
         return result;
       }
 
-      /// Fit the wire hits with using 1/drift length as a weight and no signed radius (only good for some special cases).
-      CDCTrajectory2D fitWhithoutDriftLengthVariance(const std::vector<const Belle2::TrackFindingCDC::CDCWireHit*>& wireHits) const
-      {
-        CDCObservations2D observations;
-        for (const CDCWireHit* wireHit : wireHits) {
-          observations.append(wireHit->getRefPos2D().x(), wireHit->getRefPos2D().y(), 0, 1. / fabs(wireHit->getRefDriftLength()));
-        }
-        const CDCTrajectory2D& result = fit(observations);
-        return result;
-      }
-
-
       /** Updates a given trajectory with a fit to two collection of hit types,
        * which are convertable to observation circles.
        */

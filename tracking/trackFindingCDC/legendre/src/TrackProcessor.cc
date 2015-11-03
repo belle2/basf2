@@ -135,7 +135,7 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
 
 void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
 {
-  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
 
   cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
   cdcTrackList.getCDCTracks().end(), [&](CDCTrack & track) {
@@ -144,7 +144,7 @@ void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackLis
       wireHits.push_back(&(recoHit.getWireHit()));
     }
 
-    const CDCTrajectory2D& fittedTrajectory = trackFitter.fitWhithoutDriftLengthVariance(wireHits);
+    const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(wireHits);
     const double chi2 = fittedTrajectory.getChi2();
     const int dof = track.size() - 4;
 

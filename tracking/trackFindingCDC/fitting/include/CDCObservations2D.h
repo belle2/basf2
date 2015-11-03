@@ -152,16 +152,17 @@ namespace Belle2 {
                     const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
-        const double driftLength = isValid(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
-        const double driftLengthVariance = (abs(rlInfo) == 1 ?
-                                            wireHit.getRefDriftLengthVariance() :
-                                            getPseudoDriftLengthVariance(wireHit));
 
         if (m_useDriftVariance) {
+          const double driftLength = isValid(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
+          const double driftLengthVariance = (abs(rlInfo) == 1 ?
+                                              wireHit.getRefDriftLengthVariance() :
+                                              getPseudoDriftLengthVariance(wireHit));
           const double weight = 1.0 / driftLengthVariance;
           size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
           return nAppendedHits;
         } else {
+          const double driftLength = wireHit.getRefDriftLength();
           const double weight = fabs(1.0 / driftLength);
           size_t nAppendedHits = append(wireRefPos2D, 0, weight);
           return nAppendedHits;

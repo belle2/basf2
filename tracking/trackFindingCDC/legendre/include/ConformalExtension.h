@@ -40,8 +40,8 @@ namespace Belle2 {
       std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
                                                  std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, bool doMaskInitialHits = false)
       {
-        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
-        CDCTrajectory2D trackTrajectory2D = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
+        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+        CDCTrajectory2D trackTrajectory2D = fitter.fit(cdcWireHits);
 
         double chi2 = trackTrajectory2D.getChi2();
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
@@ -70,7 +70,7 @@ namespace Belle2 {
             cdcWireHitsNew.push_back(hit);
           }
 
-          CDCTrajectory2D trackTrajectory2Dtmp = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
+          CDCTrajectory2D trackTrajectory2Dtmp = fitter.fit(cdcWireHits);
 
           double chi2New = trackTrajectory2Dtmp.getChi2();
 
@@ -99,8 +99,8 @@ namespace Belle2 {
           cdcWireHits.push_back(&(hit.getWireHit()));
         }
 
-        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getFitter();
-        const CDCTrajectory2D& trackTrajectory2D = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
+        const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+        const CDCTrajectory2D& trackTrajectory2D = fitter.fit(cdcWireHits);
 
         std::nth_element(track.begin(), track.begin() + track.size() / 2, track.end());
 
@@ -133,7 +133,7 @@ namespace Belle2 {
             cdcWireHitsNew.push_back(hit);
           }
 
-          const CDCTrajectory2D& trackTrajectory2Dtmp = fitter.fitWhithoutDriftLengthVariance(cdcWireHits);
+          const CDCTrajectory2D& trackTrajectory2Dtmp = fitter.fit(cdcWireHits);
           double chi2New = trackTrajectory2Dtmp.getChi2();
 
           if (chi2New < chi2 * 2.) {

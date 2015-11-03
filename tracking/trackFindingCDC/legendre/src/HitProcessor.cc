@@ -75,81 +75,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     }
 
   }
-  /*
-  for (TrackHit* hit : axialHitList) {
-    if (hit->getHitUsage() == TrackHit::c_usedInTrack or
-        hit->getHitUsage() == TrackHit::c_bad) continue;
-
-    // Search for best candidate to assign to
-    double bestHitProb = 0;
-    TrackCandidate* bestCandidate = nullptr;
-
-    for (TrackCandidate* cand : trackList) {
-      double probTemp = getAssigmentProbability(hit, cand);
-
-      if (probTemp > bestHitProb) {
-        bestCandidate = cand;
-        bestHitProb = probTemp;
-      }
-    }
-
-    if (bestCandidate != nullptr and bestHitProb > minimal_assignment_probability) {
-      bestCandidate->addHit(hit);
-      hit->setHitUsage(TrackHit::c_usedInTrack);
-    }
-
-  }
-  */
 }
-
-void HitProcessor::deleteWrongHitsOfTrack(CDCTrack& trackCandidate)
-{
-  /*
-  assert(trackCandidate);
-
-  std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
-
-  if (trackHits.size() == 0) return;
-
-  for (TrackHit* hit : trackHits) {
-    assert(hit);
-    hit->setHitUsage(TrackHit::c_usedInTrack);
-  }
-
-  int ndf = trackHits.size() - 4;
-
-  if (ndf <= 0) return;
-
-  for (TrackHit* trackHit : trackHits) {
-    assert(trackHit);
-    double assignment_probability = getAssigmentProbability(trackHit, trackCandidate);
-
-    if (assignment_probability < minimal_assignment_probability) {
-      trackHit->setHitUsage(TrackHit::c_bad);
-    }
-  }
-  */
-  deleteAllMarkedHits(trackCandidate);
-
-}
-
-
-/*
-double SimpleFilter::getAssigmentProbability(const TrackHit* hit, const TrackCandidate* track)
-{
-  double x0_track = track->getXc();
-  double y0_track = track->getYc();
-  double R = track->getRadius();
-
-  double x0_hit = hit->getWirePosition().X();
-  double y0_hit = hit->getWirePosition().Y();
-  double dist = fabs(fabs(R - sqrt((x0_track - x0_hit) * (x0_track - x0_hit) + (y0_track - y0_hit) *
-                                   (y0_track - y0_hit))) - hit->getDriftLength());
-
-  return 1.0 - exp(-1 / dist);
-}
-*/
-
 
 void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates)
 {
@@ -225,12 +151,7 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
 
   std::vector<const CDCWireHit*> removedHits;
 
-//  return removedHits;
   if (trackCandidate.size() < 5) return removedHits;
-
-  // If the trackCandidate goes more or less through the IP, we have a problem with back-to-back tracks. These can be assigned to only on track.
-  // If this is the case, we delete the smaller fraction here and let the track-finder find the remaining track again
-//    std::vector<TrackHit*>& trackHits = trackCandidate->getTrackHits();
 
   for (CDCRecoHit3D& hit : trackCandidate) {
     hit.getWireHit().getAutomatonCell().setTakenFlag(true);
@@ -329,7 +250,6 @@ void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
       return true;
     }
     return false;
-//    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
   }),
   track.end());
 
@@ -373,7 +293,7 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
 
 ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 {
-  double phi_diff = atan2(xy.y(), xy.x()) - getPhi(hit);
+  double phi_diff = atan2(xy.y(), xy.x()) - hit.getRecoPos3D().phi();
 
   while (phi_diff > /*2 */ TMath::Pi())
     phi_diff -= 2 * TMath::Pi();
@@ -385,35 +305,6 @@ ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
   else
     return ESign::c_Plus;
 
-}
-
-double HitProcessor::getPhi(const CDCRecoHit3D& hit)
-{
-
-
-  double phi = atan2(hit.getRecoPos2D().y() , hit.getRecoPos2D().x());
-  /*
-    while (phi > 2 * TMath::Pi())
-      phi -= 2 * TMath::Pi();
-    while (phi < 0)
-      phi += 2 * TMath::Pi();
-  */
-  return phi;
-  /*
-    //the phi angle of the hit depends on the definition, so I try to use the wireId instead
-    //however maybe this function might also be still useful...
-    double phi = atan(hit.getRecoPos2D().y() / hit.getRecoPos2D().x());
-
-    if (hit.getRecoPos2D().x() < 0) {
-      phi += TMath::Pi();
-    }
-
-    if (hit.getRecoPos2D().x() >= 0 && hit.getRecoPos2D().y() < 0) {
-      phi += 2 * TMath::Pi();
-    }
-
-    return phi;
-  */
 }
 
 void HitProcessor::resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)

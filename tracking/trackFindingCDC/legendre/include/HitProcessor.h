@@ -33,26 +33,17 @@ namespace Belle2 {
 
     public:
 
-      /** This is a static class only. We do not need a constructor here */
+      /** This is a static class only. We do not need a constructor here. */
       HitProcessor() = delete;
 
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit);
 
-      /** Returns the probability of hit assignment to the track. Actually this is not a probability at all but only a number between 0 and 1.
-       * 1 is best.
-       * TODO: more robust criteria should be implemented */
-      //static double getAssigmentProbability(const TrackHit* hit, const TrackCandidate* track);
-
       /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates);
+      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& track);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<ConformalCDCWireHit*>& AxialHitList);
-
-      /** Tries to find and delete all "bad" hits in a track.
-       * By doing so we will loose hit efficiency, but gain a low fake rate. */
-      static void deleteWrongHitsOfTrack(CDCTrack& trackCandidate);
+      static void appendUnusedHits(std::vector<CDCTrack>& tracks, const std::vector<ConformalCDCWireHit*>& conformalCDCWireHitList);
 
       /** Delete all hits markes as bad (MASKED) in a track. Should be called after every hit reassignment */
       static void deleteAllMarkedHits(CDCTrack& track);
@@ -71,9 +62,6 @@ namespace Belle2 {
 
       /** Estimate sign of the point curvature with respect to given point.*/
       static ESign getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy) ;
-
-      /** Get azimutal angle of  the hit.*/
-      static double getPhi(const CDCRecoHit3D& hit) ;
 
       /** Fit track using position of the wire and 1/driftLength taken as weight.*/
       static CDCTrajectory2D fitWhithoutRecoPos(CDCTrack& track);

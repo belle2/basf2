@@ -42,7 +42,7 @@ def add_posttracking_reconstruction(path, components=None):
         path.add_module(electron_id)
 
         # MC matching
-        ecl_mc = register_module('ECLMCMatching')
+        ecl_mc = register_module('MCMatcherECLClusters')
         path.add_module(ecl_mc)
 
     # EKLM reconstruction

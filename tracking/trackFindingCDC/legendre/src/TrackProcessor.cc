@@ -33,13 +33,8 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
 {
   if (hits.size() == 0) return;
 
-  CDCObservations2D observations;
-  for (const CDCWireHit* item : hits) {
-    observations.append(*item);
-  }
-
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-  const CDCTrajectory2D& trackTrajectory2D = fitter.fit(observations);
+  const CDCTrajectory2D& trackTrajectory2D = fitter.fit(hits);
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
 
   CDCTrack& track = cdcTrackList.createEmptyTrack();
@@ -139,12 +134,7 @@ void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackLis
 
   cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
   cdcTrackList.getCDCTracks().end(), [&](CDCTrack & track) {
-    std::vector<const CDCWireHit*> wireHits;
-    for (const CDCRecoHit3D& recoHit : track) {
-      wireHits.push_back(&(recoHit.getWireHit()));
-    }
-
-    const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(wireHits);
+    const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(track);
     const double chi2 = fittedTrajectory.getChi2();
     const int dof = track.size() - 4;
 

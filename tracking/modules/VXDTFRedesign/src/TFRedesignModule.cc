@@ -2989,12 +2989,12 @@ bool TFRedesignModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFil
     try {
       accepted = fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistanceHighOccupancy2IP);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     }
 
@@ -3017,12 +3017,12 @@ bool TFRedesignModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFil
     try {
       accepted = fourHitFilterBox.checkDeltapT(FilterID::deltapTHighOccupancy);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     }
 

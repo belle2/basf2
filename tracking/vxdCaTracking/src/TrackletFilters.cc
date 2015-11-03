@@ -130,13 +130,13 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
   try {
     fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
   } catch (FilterExceptions::Straight_Line& anException) {
-    B2WARNING("Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
+    B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what())
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
 
-      B2WARNING("After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  <<
-                "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() <<
-                " " << fitResults.second.Z() << "\n")
+      B2DEBUG(1, "After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  <<
+              "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() <<
+              " " << fitResults.second.Z() << "\n")
 
     } catch (FilterExceptions::Straight_Up& anException) {
       try {
@@ -606,7 +606,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     if (T(k, 0) < 0) {
 
       //Console Output:
-      B2WARNING("T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
+      B2DEBUG(1, "T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
         B2DEBUG(3, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " <<
                 printMyMatrixstring(T));

@@ -4216,12 +4216,12 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     try {
       accepted = threeHitFilterBox.checkCircleDist2IP(FilterID::distanceHighOccupancy2IP);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...")
+      B2DEBUG(1, "Exception caught: " << FilterID::distanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...")
       accepted = false;
     }
     if (accepted == true) {

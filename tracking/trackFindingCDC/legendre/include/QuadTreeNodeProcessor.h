@@ -148,7 +148,7 @@ namespace Belle2 {
 
         conformalExtension.newRefPoint(cdcWireHits, conformalCDCWireHitList, true);
 
-        TrackProcessor::addCandidateWithHits(cdcWireHits, conformalCDCWireHitList, cdcTrackList);
+        TrackProcessor::addCandidateFromHitsWithPostprocessing(cdcWireHits, conformalCDCWireHitList, cdcTrackList);
       }
 
     private:

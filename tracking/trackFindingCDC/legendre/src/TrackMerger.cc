@@ -47,7 +47,7 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 
   trackQualityTools.normalizeTrack(track1);
 
-  TrackProcessor::addCandidateWithHits(removedHits, conformalCDCWireHitList, cdcTrackList);
+  TrackProcessor::addCandidateFromHitsWithPostprocessing(removedHits, conformalCDCWireHitList, cdcTrackList);
 
 }
 

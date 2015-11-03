@@ -157,7 +157,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
         hit->getAutomatonCell().setTakenFlag(false);
       }
 
-      TrackProcessor::addCandidateWithHits(hitsToSplit, m_conformalCDCWireHitList, m_cdcTrackList);
+      TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, m_conformalCDCWireHitList, m_cdcTrackList);
 
     }
 //    TrackMergerNew::deleteAllMarkedHits(track);

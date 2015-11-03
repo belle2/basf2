@@ -319,3 +319,37 @@ void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
   }
 }
 
+void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximum_distance)
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  for (CDCRecoHit3D& recoHit : track) {
+    const Vector2D& recoPos2D = recoHit.getRecoPos2D();
+    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximum_distance)
+      recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
+  }
+
+  deleteAllMarkedHits(track);
+}
+
+void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                        double minimal_distance_to_track)
+{
+  if (track.size() < 10) return;
+  unmaskHitsInTrack(track);
+
+  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+
+  for (const ConformalCDCWireHit& hit : conformalCDCWireHitList) {
+    if (hit.getUsedFlag() or hit.getMaskedFlag()) {
+      continue;
+    }
+
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*(hit.getCDCWireHit()), trackTrajectory2D);
+    const Vector2D& recoPos2D = cdcRecoHit3D.getRecoPos2D();
+
+    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimal_distance_to_track) {
+      track.push_back(std::move(cdcRecoHit3D));
+      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
+    }
+  }
+}

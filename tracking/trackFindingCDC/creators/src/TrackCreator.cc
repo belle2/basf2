@@ -170,6 +170,21 @@ void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
 
 }
 
+void TrackCreator::create(std::vector<const CDCWireHit*>& hits, CDCTrack& track) const
+{
+  if (hits.size() == 0) return;
+
+  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+
+  for (const CDCWireHit* item : hits) {
+    if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
+
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*item, trackTrajectory2D);
+    track.push_back(std::move(cdcRecoHit3D));
+    cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+  }
+}
+
 
 void TrackCreator::appendStartRecoHits3D(const CDCSegmentTriple& triple,
                                          double perpSOffset,

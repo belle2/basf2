@@ -63,6 +63,9 @@ namespace Belle2 {
       void create(const CDCSegmentPairTrack& segmentPairTrack,
                   CDCTrack& track) const;
 
+      /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
+      void create(std::vector<const CDCWireHit*>& hits, CDCTrack& track) const;
+
 
     private:
       ///Reconstruct the start segment of a triple and append it to the track

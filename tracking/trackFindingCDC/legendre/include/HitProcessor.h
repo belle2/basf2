@@ -77,6 +77,20 @@ namespace Belle2 {
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);
+
+      /**
+       * Postprocessing: Delete axial hits that do not "match" to the given track.
+       * This is done by checking the distance between the hits and the trajectory, which should not exceed the
+       * maximum_distance parameter.
+       *
+       * As this function used the masked flag, all hits should have their masked flag set to false before calling
+       * this function.
+       */
+      static void deleteHitsFarAwayFromTrajectory(CDCTrack& trackCandidate, double maximum_distance = 0.2);
+
+      /// Assign new hits to the track basing on the distance from the hit to the track.
+      static void assignNewHitsToTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                       double minimal_distance_to_track = 0.15);
     };
   }
 }

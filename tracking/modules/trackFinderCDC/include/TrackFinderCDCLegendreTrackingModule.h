@@ -13,8 +13,8 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
-#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

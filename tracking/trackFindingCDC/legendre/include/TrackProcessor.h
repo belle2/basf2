@@ -55,11 +55,6 @@ namespace Belle2 {
       static void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                    CDCTrackList& cdcTrackList);
 
-      std::list<CDCTrack>& getCDCTrackList()
-      {
-        return m_cdcTrackList.getCDCTracks();
-      }
-
       CDCTrackList& getCDCTrackListTmp()
       {
         return m_cdcTrackList;

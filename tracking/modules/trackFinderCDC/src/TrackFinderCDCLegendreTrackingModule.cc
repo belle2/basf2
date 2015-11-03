@@ -102,7 +102,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
     QuadTreeCandidateFinder quadTreeCandidateFinder;
 
-    int nCandsAdded = m_trackProcessor.getCDCTrackList().size();
+    int nCandsAdded = m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size();
 
     // Interface
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface = quadTreeNodeProcessor.getLambdaInterface(
@@ -120,7 +120,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Try to merge tracks
     if (m_param_doEarlyMerging)trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
-    nCandsAdded = m_trackProcessor.getCDCTrackList().size() - nCandsAdded;
+    nCandsAdded = m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size() - nCandsAdded;
 
     // Change to the next pass
     if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
@@ -163,9 +163,9 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   });
 
   // Update tracks before storing to DataStore
-  for (CDCTrack& track : m_trackProcessor.getCDCTrackList()) {
+  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
     trackQualityTools.normalizeTrack(track);
-  }
+  });
 
   // Remove bad tracks
   m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
@@ -180,12 +180,11 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  std::list<CDCTrack>& tracksFromFinder = m_trackProcessor.getCDCTrackList();
-  tracks.reserve(tracks.size() + tracksFromFinder.size());
+  tracks.reserve(tracks.size() + m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size());
 
-  for (CDCTrack& track : tracksFromFinder) {
+  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
     if (track.size() > 5) tracks.push_back(std::move(track));
-  }
+  });
 }
 
 void TrackFinderCDCLegendreTrackingModule::clearVectors()

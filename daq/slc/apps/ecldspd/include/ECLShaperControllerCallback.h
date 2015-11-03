@@ -22,13 +22,49 @@ namespace Belle2 {
     std::string col_status(int sh_num) throw(RCHandlerException);
 
   private:
-    void w_sh_reg_io(const char* ip,
-                     int reg_num, int wdata) throw(RCHandlerException);
-    void w_col_reg_io(const char* ip,
-                      int reg_num, int wdata) throw(RCHandlerException);
+    static void w_sh_reg_io(const char* ip,
+                            int reg_num, int wdata) throw(RCHandlerException);
+    static void w_col_reg_io(const char* ip,
+                             int reg_num, int wdata) throw(RCHandlerException);
 
   private:
     bool m_forced;
+
+  private:
+    class Worker {
+    public:
+      Worker(int id, const DBObject& obj)
+        : m_id(id), m_obj(obj) {}
+      virtual ~Worker() {}
+      virtual void run() = 0;
+    protected:
+      int m_id;
+      const DBObject& m_obj;
+    };
+
+    class Boot : public Worker {
+    public:
+      Boot(int id, const DBObject& obj)
+        : Worker(id, obj) {}
+      virtual ~Boot() {}
+      virtual void run();
+    };
+
+    class Init : public Worker {
+    public:
+      Init(int id, const DBObject& obj)
+        : Worker(id, obj) {}
+      virtual ~Init() {}
+      virtual void run();
+    };
+
+    class Load : public Worker {
+    public:
+      Load(int id, const DBObject& obj)
+        : Worker(id, obj) {}
+      virtual ~Load() {}
+      virtual void run();
+    };
 
   };
 

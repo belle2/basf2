@@ -135,7 +135,7 @@ void BKLMReconstructorModule::event()
       double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
       double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
-      CLHEP::Hep3Vector global = m->localToGlobal(local);
+      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift());
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();

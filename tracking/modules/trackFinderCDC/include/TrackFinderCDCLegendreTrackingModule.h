@@ -39,7 +39,8 @@ namespace Belle2 {
     bool m_param_doEarlyMerging;        /**< Defines whether early track merging will be performed. */
 
     /// Worker
-    TrackFindingCDC::TrackProcessor m_trackProcessor;  /**< Object for doing all sort of things with the tracks. */
+    TrackFindingCDC::CDCTrackList
+    m_cdcTrackList;      /**< Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
     std::vector<TrackFindingCDC::ConformalCDCWireHit>
     m_conformalCDCWireHitList; /**< List for holding all used conformal CDC wire hits. */
 

@@ -28,8 +28,8 @@ namespace Belle2 {
     class TrackProcessor {
     public:
 
-      /// Default constructor does nothing.
-      TrackProcessor() { }
+      /// Static use only.
+      TrackProcessor() = delete;
 
       /// Do not copy this class.
       TrackProcessor(const TrackProcessor& copy) = delete;
@@ -55,21 +55,19 @@ namespace Belle2 {
       static void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                    CDCTrackList& cdcTrackList);
 
-      CDCTrackList& getCDCTrackListTmp()
-      {
-        return m_cdcTrackList;
-      }
-
     private:
-      CDCTrackList m_cdcTrackList; /**< a list handling the found CDC tracks as an object.*/
-
-      /// Set MASKED flag of automaton cells to false
+      /// Set MASKED flag of all reco hits to false and TAKEN flag to true. Does not touch the settings of the track.
       static void unmaskHitsInTrack(CDCTrack& track);
 
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
+       * This is done by checking the distance between the hits and the trajectory, which should not exceed the
+       * maximum_distance parameter.
+       *
+       * As this function used the masked flag, all hits should have their masked flag set to false before calling
+       * this function.
        */
-      static void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
+      static void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate, double maximum_distance = 0.2);
 
 
       /// Check chi2 of the fit (using quantiles of chi2 distribution)

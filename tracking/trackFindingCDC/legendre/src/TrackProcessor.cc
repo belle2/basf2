@@ -84,6 +84,8 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
 
   //  B2INFO("delete");
   deleteBadHitsOfOneTrack(track);
+  trackQualityTools.normalizeTrack(track);
+
   if (not checkTrack(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -116,6 +118,8 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
 
   //  B2INFO("delete");
   deleteBadHitsOfOneTrack(track);
+  trackQualityTools.normalizeTrack(track);
+
   if (not checkTrack(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -219,19 +223,16 @@ bool TrackProcessor::checkTrack(CDCTrack& track)
   return true;
 }
 
-void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
+void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& track, double maximum_distance)
 {
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
-  for (CDCRecoHit3D& recoHit : trackCandidate) {
-
-    if (fabs(trackCandidate.getStartTrajectory3D().getTrajectory2D().getDist2D(recoHit.getRecoPos2D())) > 0.2)
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  for (CDCRecoHit3D& recoHit : track) {
+    const Vector2D& recoPos2D = recoHit.getRecoPos2D();
+    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximum_distance)
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
   }
 
-  HitProcessor::deleteAllMarkedHits(trackCandidate);
-
-  trackQualityTools.normalizeTrack(trackCandidate);
+  HitProcessor::deleteAllMarkedHits(track);
 }
 
 void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)

@@ -34,9 +34,9 @@ namespace Belle2 {
     public:
 
       ///Constructor
-      QuadTreeNodeProcessor(TrackProcessor& trackProcessor, AxialHitQuadTreeProcessor& qtProcessor,
+      QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
                             BasePrecisionFunction::PrecisionFunction& precisionFunct) :
-        m_trackProcessor(trackProcessor), m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
+        m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
       {
       };
 
@@ -148,11 +148,10 @@ namespace Belle2 {
 
         conformalExtension.newRefPoint(cdcWireHits, conformalCDCWireHitList, true);
 
-        m_trackProcessor.addCandidateWithHits(cdcWireHits, conformalCDCWireHitList, cdcTrackList);
+        TrackProcessor::addCandidateWithHits(cdcWireHits, conformalCDCWireHitList, cdcTrackList);
       }
 
     private:
-      TrackProcessor& m_trackProcessor; /**< Reference for creating tracks */
       AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor */
 
       BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function*/

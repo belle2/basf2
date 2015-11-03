@@ -81,7 +81,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
   do {
-    HitProcessor::resetMaskedHits(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
+    HitProcessor::resetMaskedHits(m_cdcTrackList, m_conformalCDCWireHitList);
 
     // Create object which holds and generates parameters
     QuadTreeParameters quadTreeParameters(m_param_maxLevel, quadTreePassCounter.getPass());
@@ -96,30 +96,32 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     //  qtProcessor.seedQuadTree(4, symmetricalKappa);
 
     // Create object which contains interface between quadtree processor and track processor (module)
-    QuadTreeNodeProcessor quadTreeNodeProcessor(m_trackProcessor, qtProcessor, quadTreeParameters.getPrecisionFunction());
+    QuadTreeNodeProcessor quadTreeNodeProcessor(qtProcessor, quadTreeParameters.getPrecisionFunction());
 
     // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
     QuadTreeCandidateFinder quadTreeCandidateFinder;
 
-    int nCandsAdded = m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size();
+    int nCandsAdded = m_cdcTrackList.getCDCTracks().size();
 
     // Interface
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface = quadTreeNodeProcessor.getLambdaInterface(
-          m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
+          m_conformalCDCWireHitList, m_cdcTrackList);
 
     // Start candidate finding
     quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
 
     // Assign new hits to the tracks
-    m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
+    TrackProcessor::assignNewHits(m_conformalCDCWireHitList, m_cdcTrackList);
 
     // Check p-value of the tracks
-    m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
+    TrackProcessor::checkTrackProb(m_cdcTrackList);
 
     // Try to merge tracks
-    if (m_param_doEarlyMerging)TrackMerger::doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
+    if (m_param_doEarlyMerging) {
+      TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);
+    }
 
-    nCandsAdded = m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size() - nCandsAdded;
+    nCandsAdded = m_cdcTrackList.getCDCTracks().size() - nCandsAdded;
 
     // Change to the next pass
     if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
@@ -134,7 +136,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
-  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
+  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
       HitProcessor::splitBack2BackTrack(track);
@@ -155,33 +157,33 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
         hit->getAutomatonCell().setTakenFlag(false);
       }
 
-      m_trackProcessor.addCandidateWithHits(hitsToSplit, m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
+      TrackProcessor::addCandidateWithHits(hitsToSplit, m_conformalCDCWireHitList, m_cdcTrackList);
 
     }
 //    TrackMergerNew::deleteAllMarkedHits(track);
   });
 
   // Update tracks before storing to DataStore
-  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
+  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
     trackQualityTools.normalizeTrack(track);
   });
 
   // Remove bad tracks
-  m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
+  TrackProcessor::checkTrackProb(m_cdcTrackList);
 
   // Perform tracks merging
-  TrackMerger::doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
+  TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);
 
   // Assign new hits
-  m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
+  TrackProcessor::assignNewHits(m_conformalCDCWireHitList, m_cdcTrackList);
 
 }
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  tracks.reserve(tracks.size() + m_trackProcessor.getCDCTrackListTmp().getCDCTracks().size());
+  tracks.reserve(tracks.size() + m_cdcTrackList.getCDCTracks().size());
 
-  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
+  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
     if (track.size() > 5) tracks.push_back(std::move(track));
   });
 }
@@ -189,5 +191,5 @@ void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::Tra
 void TrackFinderCDCLegendreTrackingModule::clearVectors()
 {
   m_conformalCDCWireHitList.clear();
-  m_trackProcessor.getCDCTrackListTmp().clear();
+  m_cdcTrackList.clear();
 }

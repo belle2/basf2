@@ -1,6 +1,6 @@
-# EventType: 1110042100
-# Descriptor: [B0 -> (phi -> pi+ pi- pi0) (K_S0 -> pi+ pi-) ]cc
-# NickName: Bd_phiKS,2pi+2pi-pi0
+# EventType: 1110040100
+# Descriptor: [B0 -> (phi -> K+ K-) (K_S0 -> pi+ pi-) ]cc
+# NickName: Bd_phiKS_K+K-pi+pi-
 # Documentation: Decay mode for sensitivity studies
 # Tested: Yes
 # PhysicsWG: TDPCV
@@ -8,11 +8,6 @@
 # Email: alessandro.gaz@pd.infn.it
 # Cuts: None
 # Date: 20150330
-#
-# Here I am assuming for simplicity that phi -> pi+ pi- pi0
-# PHSP, that is I am ignoring the rho pi components (all three
-# have been seen). Should check if there are significant
-# variations in the efficiencies.
 #
 Alias        K_S0sig   K_S0
 ChargeConj   K_S0sig   K_S0sig
@@ -24,7 +19,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000   phisig   K_S0sig   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
+1.000    phisig   K_S0sig     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
 Enddecay
 CDecay anti-B0sig
 #
@@ -33,7 +28,7 @@ Decay K_S0sig
 Enddecay
 #
 Decay phisig
-1.000         pi+       pi-     pi0            PHSP;
+1.000         K+       K-                   VSS;
 Enddecay
 #
 End

@@ -1,6 +1,6 @@
 # EventType: 1110024000
 # Descriptor: [B0 -> (phi -> K+ K-) (K_S0 -> pi0 pi0) ]cc
-# NickName: Bd_phiKS,K+K-pi0pi0
+# NickName: Bd_phiKS_K+K-pi0pi0
 # Documentation: Decay mode for sensitivity studies
 # Tested: Yes
 # PhysicsWG: TDPCV

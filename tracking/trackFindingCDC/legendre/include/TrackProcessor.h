@@ -22,6 +22,7 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrackList;
     class ConformalCDCWireHit;
+    class CDCTrajectory2D;
 
     /// Class with high-level track (post)processing.
     class TrackProcessor {

@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
@@ -134,9 +135,16 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
 
 void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
 {
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
+
   cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
   cdcTrackList.getCDCTracks().end(), [&](CDCTrack & track) {
-    const CDCTrajectory2D& fittedTrajectory = HitProcessor::fitWhithoutRecoPos(track);
+    std::vector<const CDCWireHit*> wireHits;
+    for (const CDCRecoHit3D& recoHit : track) {
+      wireHits.push_back(&(recoHit.getWireHit()));
+    }
+
+    const CDCTrajectory2D& fittedTrajectory = trackFitter.fitWhithoutDriftLengthVariance(wireHits);
     const double chi2 = fittedTrajectory.getChi2();
     const int dof = track.size() - 4;
 
@@ -173,4 +181,3 @@ double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
 
   return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
 }
-

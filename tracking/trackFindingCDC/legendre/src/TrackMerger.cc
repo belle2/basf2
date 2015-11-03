@@ -54,7 +54,6 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                   double minimum_probability_to_be_merged)
 {
-  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
   // Search for best matches
@@ -87,6 +86,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
     if (prob > minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate, conformalCDCWireHitList, cdcTrackList);
       trackQualityTools.normalizeTrack(*bestCandidate);
+//      const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
     }
   }
@@ -133,8 +133,6 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
                                                  const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                                  double minimum_probability_to_be_merged)
 {
-  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
-
   B2DEBUG(100, "Merger: Initial nCands = " << cdcTrackList.getCDCTracks().size());
 
   bool have_merged_something;
@@ -167,6 +165,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
     HitProcessor::unmaskHitsInTrack(track);
     trackQualityTools.normalizeTrack(track);
 
+// const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
 //    cand->reestimateCharge();
 
@@ -177,8 +176,6 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
 
 void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory)
 {
-
-  // Maybe it is better to use the assignment probability here also? -> SimpleFilter
   for (const CDCWireHit* hit : wireHits) {
 
     double dist = fabs(fabs(trajectory.getDist2D(hit->getRefPos2D())) - fabs(hit->getRefDriftLength()));
@@ -187,29 +184,14 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*
       hit->getAutomatonCell().setMaskedFlag(true);
     }
   }
-  wireHits.erase(std::remove_if(wireHits.begin(), wireHits.end(),
-  [&](const CDCWireHit * hit) {
-    return hit->getAutomatonCell().hasMaskedFlag();
-  }), wireHits.end());
 
+  HitProcessor::deleteAllMarkedHits(wireHits);
 }
 
 double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
-  CDCKarimakiFitter trackFitter;
-  /*
-    // Check if the two tracks do have something in common!
-    Vector2D deltaMomentum{track1.getStartTrajectory3D().getTrajectory2D().getStartMom2D() - track2.getStartTrajectory3D().getTrajectory2D().getStartMom2D()};
-    Vector3D deltaPosition{track1.getStartTrajectory3D().getTrajectory2D().getGlobalPerigee() - track2.getStartTrajectory3D().getTrajectory2D().getGlobalPerigee()};
-
-    // Quick processing: if we have two tracks with approximately the same parameters, they can be merged!
-    if (deltaMomentum.norm() / track1.getStartTrajectory3D().getTrajectory2D().getStartMom2D().norm() < 0.1 and
-        std::abs(TVector2::Phi_mpi_pi(track1.getStartTrajectory3D().getTrajectory2D().getStartMom2D().phi() - track2.getStartTrajectory3D().getTrajectory2D().getStartMom2D().phi())) < TMath::Pi() / 10 and
-        deltaPosition.norm() < 10 and track1.getStartChargeSign() == track2.getStartChargeSign()) {
-      return 1;
-    }
-  */
-  // Build common hit list
+  // Build common hit list by copying the wire hits into one large list (we use the wire hits here as we do not want hem to bring
+  // their "old" reconstructed position when fitting later.
   std::vector<const CDCWireHit*> commonHitListOfTwoTracks;
   for (const CDCRecoHit3D& hit : track1) {
     commonHitListOfTwoTracks.push_back(&(hit.getWireHit()));

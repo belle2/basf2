@@ -17,9 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 
 #include <TMath.h>
@@ -151,7 +148,7 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
   }
 
 
-  if (checkBack2BackTrack(trackCandidate)) {
+  if (isBack2BackTrack(trackCandidate)) {
 
     ESign trackCharge = getChargeSign(trackCandidate);
 
@@ -182,31 +179,7 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
   return removedHits;
 }
 
-CDCTrajectory2D HitProcessor::fitWhithoutRecoPos(CDCTrack& track)
-{
-  std::vector<const CDCWireHit*> wireHits;
-  for (const CDCRecoHit3D& hit : track) {
-    wireHits.push_back(&(hit.getWireHit()));
-  }
-
-  return fitWhithoutRecoPos(wireHits);
-}
-
-CDCTrajectory2D HitProcessor::fitWhithoutRecoPos(std::vector<const CDCWireHit*>& wireHits)
-{
-  CDCKarimakiFitter trackFitter;
-  CDCObservations2D observations;
-  for (const CDCWireHit* wireHit : wireHits) {
-    observations.append(wireHit->getRefPos2D().x(), wireHit->getRefPos2D().y(), 0, 1. / fabs(wireHit->getRefDriftLength()));
-  }
-  CDCTrajectory2D trackTrajectory2D ;
-  trackFitter.update(trackTrajectory2D, observations);
-
-  return trackTrajectory2D;
-}
-
-
-bool HitProcessor::checkBack2BackTrack(CDCTrack& track)
+bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 {
   int vote_pos = 0;
   int vote_neg = 0;
@@ -234,23 +207,23 @@ bool HitProcessor::checkBack2BackTrack(CDCTrack& track)
 
 void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
 {
-
-
   track.erase(
   std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & hit) {
-    if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-      return true;
-    }
-    return false;
-  }),
-  track.end());
+    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
+  }), track.end());
+}
 
+void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
+{
+  wireHits.erase(std::remove_if(wireHits.begin(), wireHits.end(),
+  [&](const CDCWireHit * hit) {
+    return hit->getAutomatonCell().hasMaskedFlag();
+  }), wireHits.end());
 }
 
 
 ESign HitProcessor::getChargeSign(CDCTrack& track)
 {
-  ESign trackCharge;
   int vote_pos(0), vote_neg(0);
 
   Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
@@ -268,19 +241,14 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
     else if (curve_sign == ESign::c_Minus)
       ++vote_neg;
     else {
-      B2ERROR(
-        "Strange behaviour of TrackHit::getCurvatureSignWrt");
-      exit(EXIT_FAILURE);
+      B2FATAL("Strange behaviour of TrackHit::getCurvatureSignWrt");
     }
   }
 
   if (vote_pos > vote_neg)
-    trackCharge = ESign::c_Plus;
+    return ESign::c_Plus;
   else
-    trackCharge = ESign::c_Minus;
-
-
-  return trackCharge;
+    return ESign::c_Minus;
 }
 
 ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)

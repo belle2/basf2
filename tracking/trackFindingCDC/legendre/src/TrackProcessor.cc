@@ -282,7 +282,7 @@ void TrackProcessor::assignNewHits(CDCTrack& track)
   CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
 
-  for (QuadTreeHitWrapper& hit : m_hitFactory.getQuadTreeHitWrappers()) {
+  for (ConformalCDCWireHit& hit : m_hitFactory.getQuadTreeHitWrappers()) {
     if (hit.getUsedFlag() || hit.getMaskedFlag()) continue;
 
     ERightLeft rlInfo = ERightLeft::c_Right;
@@ -321,7 +321,7 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, float fraction)
 
   std::vector<CDCRecoSegment2D> segments;
   for (CDCRecoHit3D& recoHit : track) {
-    for (QuadTreeHitWrapper& qtHit : m_hitFactory.getQuadTreeHitWrappers()) {
+    for (ConformalCDCWireHit& qtHit : m_hitFactory.getQuadTreeHitWrappers()) {
       if (qtHit.getCDCWireHit()->getWire() == recoHit.getWire()) {
 
         CDCRecoSegment2D& segment = qtHit.getSegment();
@@ -351,10 +351,10 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, float fraction)
     }
   }
 
-  std::vector<QuadTreeHitWrapper*> hitsToAdd;
+  std::vector<ConformalCDCWireHit*> hitsToAdd;
 
   for (CDCRecoSegment2D& segment : segments) {
-    for (QuadTreeHitWrapper& qtHitGlobal : m_hitFactory.getQuadTreeHitWrappers()) {
+    for (ConformalCDCWireHit& qtHitGlobal : m_hitFactory.getQuadTreeHitWrappers()) {
       bool addHit(true);
       for (CDCRecoHit3D& recoHit : track) {
         if (qtHitGlobal.getCDCWireHit()->getWire() == recoHit.getWire()) addHit = false;
@@ -368,7 +368,7 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, float fraction)
 
   }
 
-  for (QuadTreeHitWrapper* hit : hitsToAdd) {
+  for (ConformalCDCWireHit* hit : hitsToAdd) {
 
     ERightLeft rlInfo = ERightLeft::c_Right;
     if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)

@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -43,7 +43,7 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHi
 }
 
 
-void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<QuadTreeHitWrapper*>& axialHitList)
+void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<ConformalCDCWireHit*>& axialHitList)
 {
   for (CDCTrack& trackCandidate : trackCandidates) {
     if (trackCandidate.size() < 5) continue;
@@ -53,7 +53,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     CDCTrajectory2D trackTrajectory2D = trackCandidate.getStartTrajectory3D().getTrajectory2D();
 
 
-    for (const QuadTreeHitWrapper* hit : axialHitList) {
+    for (const ConformalCDCWireHit* hit : axialHitList) {
       if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
 
       ERightLeft rlInfo = ERightLeft::c_Right;

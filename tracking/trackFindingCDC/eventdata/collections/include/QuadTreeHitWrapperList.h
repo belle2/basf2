@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <list>
 
 using namespace std;
@@ -34,9 +34,9 @@ namespace Belle2 {
       QuadTreeHitWrapperList& operator=(const QuadTreeHitWrapperList&) = delete;
 
       /// Perform the provided function to all tracks.
-      void doForAllHits(std::function<void(QuadTreeHitWrapper& hit)> function)
+      void doForAllHits(std::function<void(ConformalCDCWireHit& hit)> function)
       {
-        for (QuadTreeHitWrapper& hit : m_quadTreeHitWrapperList) {
+        for (ConformalCDCWireHit& hit : m_quadTreeHitWrapperList) {
           function(hit);
         }
       }
@@ -48,13 +48,13 @@ namespace Belle2 {
       }
 
       /// Get the list of CDCTracks.
-      std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrapperList()
+      std::vector<ConformalCDCWireHit>& getQuadTreeHitWrapperList()
       {
         return m_quadTreeHitWrapperList;
       };
 
     private:
-      std::vector<QuadTreeHitWrapper> m_quadTreeHitWrapperList; /**< List containing QuadTreeHitWrapper objects. */
+      std::vector<ConformalCDCWireHit> m_quadTreeHitWrapperList; /**< List containing QuadTreeHitWrapper objects. */
     };
   }
 }

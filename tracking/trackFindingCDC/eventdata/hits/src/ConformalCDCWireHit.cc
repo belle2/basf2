@@ -8,19 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
 
-void QuadTreeHitWrapper::initializeFromWireHit(const CDCWireHit* wireHit)
+void ConformalCDCWireHit::initializeFromWireHit(const CDCWireHit* wireHit)
 {
   assert(wireHit);
   m_cdcWireHit = wireHit;
@@ -28,7 +27,7 @@ void QuadTreeHitWrapper::initializeFromWireHit(const CDCWireHit* wireHit)
   performConformalTransformation();
 }
 
-void QuadTreeHitWrapper::performConformalTransformation()
+void ConformalCDCWireHit::performConformalTransformation()
 {
   const Vector2D& twoDimensionalPosition = m_cdcWireHit->getRefPos2D();
   double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
@@ -42,7 +41,7 @@ void QuadTreeHitWrapper::performConformalTransformation()
 }
 
 
-std::tuple<double, double, double> QuadTreeHitWrapper::performConformalTransformWithRespectToPoint(double x0, double y0)
+std::tuple<double, double, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(double x0, double y0)
 {
   Vector2D twoDimensionalPosition = m_cdcWireHit->getRefPos2D() - Vector2D(x0, y0);
   double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
@@ -54,7 +53,7 @@ std::tuple<double, double, double> QuadTreeHitWrapper::performConformalTransform
 }
 
 
-bool QuadTreeHitWrapper::checkHitDriftLength()
+bool ConformalCDCWireHit::checkHitDriftLength()
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();

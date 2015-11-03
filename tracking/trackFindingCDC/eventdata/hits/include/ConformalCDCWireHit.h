@@ -11,30 +11,21 @@
 #pragma once
 
 #include <tuple>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
-  class CDCHit;
-
   namespace TrackFindingCDC {
 
     class CDCWireHit;
 
     /** CDC Hit Class used for pattern recognition in the Legendre plain. */
-    class QuadTreeHitWrapper {
+    class ConformalCDCWireHit {
     public:
-
-      /** For root: */
-      QuadTreeHitWrapper() : m_cdcWireHit(nullptr), m_conformalPosition(),
-        m_conformalDriftLength() { }
-
       /** Constructor to create a TrackHit from a CDCWireHit object.
-       * Some member variables of CDCHit are copied and other to QuadTreeHitWrapper specific variables are initialized
+       * Some member variables specific to QuadTreeHitWrapper specific variables are initialized
        * (e.g. the position of the hit wire in normal space and in the conformal plane).
        */
-      explicit QuadTreeHitWrapper(const CDCWireHit* wireHit)
+      explicit ConformalCDCWireHit(const CDCWireHit* wireHit)
       {
         initializeFromWireHit(wireHit);
       }
@@ -63,7 +54,9 @@ namespace Belle2 {
       /** Returns MASKED flag of Automaton cell.*/
       bool getMaskedFlag() const {return m_cdcWireHit->getAutomatonCell().hasMaskedFlag();};
 
-      /** Check hit drift lenght; if it's greater than cell size return false */
+      /** Check hit drift lenght; if it's greater than cell size return false
+       * TODO: This is done using the CDCGeometry - better do this using the CDCWireTopology!
+       * */
       bool checkHitDriftLength();
 
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
@@ -74,19 +67,19 @@ namespace Belle2 {
       void setSegment(CDCRecoSegment2D& segment) {m_segment = segment; };
 
     private:
-
-      /** Set all parameters from the given wire hit */
-      void initializeFromWireHit(const CDCWireHit* wireHit);
-
-      const CDCWireHit* m_cdcWireHit;
-
-      /** Assigns values for conformal coordinates by transforming the wire coordinates. */
-      void performConformalTransformation();
+      const CDCWireHit* m_cdcWireHit;    /**< Pointer to the wire hit. */
 
       Vector2D m_conformalPosition;      /**< Position in the conformal space of the drift center (not the wire!) */
       double m_conformalDriftLength;     /**< Drift time of the hit in the conformal plane (under the assumption that r << x,y*/
 
-      CDCRecoSegment2D m_segment;
+      CDCRecoSegment2D m_segment;        // TODO: This feature is never used and should be implemented differently.
+
+      /** Set all parameters from the given wire hit */
+      void initializeFromWireHit(const CDCWireHit* wireHit);
+
+      /** Assigns values for conformal coordinates by transforming the wire coordinates. */
+      void performConformalTransformation();
+
 
     }; //end class CDCTrackHit
   } //end namespace TrackFindingCDC

@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
@@ -29,10 +29,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class QuadTreeHitWrapper;
+    class ConformalCDCWireHit;
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, QuadTreeHitWrapper, 2, 2> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, ConformalCDCWireHit, 2, 2> {
 
     public:
 
@@ -72,7 +72,7 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      inline bool insertItemInNode(QuadTree* node, QuadTreeHitWrapper* hit, unsigned int /*t_index*/,
+      inline bool insertItemInNode(QuadTree* node, ConformalCDCWireHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
       {
         float dist_1[2][2];
@@ -486,7 +486,7 @@ namespace Belle2 {
         nevent++;
       }
 
-      bool checkDerivative(QuadTree* node, QuadTreeHitWrapper* hit) const
+      bool checkDerivative(QuadTree* node, ConformalCDCWireHit* hit) const
       {
         float rMinD = -1.*hit->getConformalX() * TrigonometricalLookupTable::Instance().sinTheta(node->getXMin())
                       + hit->getConformalY() * TrigonometricalLookupTable::Instance().cosTheta(node->getXMin());
@@ -504,7 +504,7 @@ namespace Belle2 {
 
       }
 
-      bool checkExtremum(QuadTree* node, QuadTreeHitWrapper* hit) const
+      bool checkExtremum(QuadTree* node, ConformalCDCWireHit* hit) const
       {
 
         double thetaExtremum = atan2(hit->getConformalY(), hit->getConformalX());

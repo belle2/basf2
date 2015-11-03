@@ -1,18 +1,18 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template<>
-bool QuadTreeItem<QuadTreeHitWrapper>::isUsed() const
+bool QuadTreeItem<ConformalCDCWireHit>::isUsed() const
 {
   return getPointer()->getUsedFlag() || getPointer()->getMaskedFlag();
 }
 
 template<>
-void QuadTreeItem<QuadTreeHitWrapper>::setUsedFlag(bool usedFlag)
+void QuadTreeItem<ConformalCDCWireHit>::setUsedFlag(bool usedFlag)
 {
   getPointer()->setUsedFlag(usedFlag);
 }

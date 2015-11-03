@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/precision_functions/OriginPrecisionFunction.h>
@@ -66,7 +66,7 @@ namespace Belle2 {
         }
         advancedProcessing(qt);
 
-        std::vector<QuadTreeHitWrapper*> candidateHits;
+        std::vector<ConformalCDCWireHit*> candidateHits;
 
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -128,10 +128,10 @@ namespace Belle2 {
 
 
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
-      void postprocessSingleNode(std::vector<QuadTreeHitWrapper*>& candidateHits)
+      void postprocessSingleNode(std::vector<ConformalCDCWireHit*>& candidateHits)
       {
 
-        for (QuadTreeHitWrapper* hit : candidateHits) {
+        for (ConformalCDCWireHit* hit : candidateHits) {
           hit->setUsedFlag(false);
         }
 
@@ -139,7 +139,7 @@ namespace Belle2 {
 
         std::vector<const CDCWireHit*> cdcWireHits;
 
-        for (QuadTreeHitWrapper* hit : candidateHits) {
+        for (ConformalCDCWireHit* hit : candidateHits) {
           cdcWireHits.push_back(hit->getCDCWireHit());
         }
 

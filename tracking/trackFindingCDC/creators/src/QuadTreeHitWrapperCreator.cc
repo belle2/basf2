@@ -38,7 +38,7 @@ void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers()
   m_QuadTreeHitWrappers.reserve(cdcWireHits.size());
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
-    QuadTreeHitWrapper QuadTreeHitWrapper(cdcWireHit);
+    ConformalCDCWireHit QuadTreeHitWrapper(cdcWireHit);
     if (QuadTreeHitWrapper.checkHitDriftLength() and QuadTreeHitWrapper.getCDCWireHit()->isAxial()) {
       m_QuadTreeHitWrappers.push_back(std::move(QuadTreeHitWrapper));
     }
@@ -48,10 +48,10 @@ void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers()
 }
 
 
-std::vector<QuadTreeHitWrapper*> QuadTreeHitWrapperCreator::createQuadTreeHitWrappersForQT(bool useSegmentsOnly)
+std::vector<ConformalCDCWireHit*> QuadTreeHitWrapperCreator::createQuadTreeHitWrappersForQT(bool useSegmentsOnly)
 {
-  std::vector<QuadTreeHitWrapper*> QuadTreeHitWrappers;
-  doForAllHits([&QuadTreeHitWrappers, &useSegmentsOnly](QuadTreeHitWrapper & trackHit) {
+  std::vector<ConformalCDCWireHit*> QuadTreeHitWrappers;
+  doForAllHits([&QuadTreeHitWrappers, &useSegmentsOnly](ConformalCDCWireHit & trackHit) {
     if (trackHit.getUsedFlag() || trackHit.getMaskedFlag()) return;
     if ((not trackHit.getSegment().isAxial()) and useSegmentsOnly) return;
     QuadTreeHitWrappers.push_back(&trackHit);
@@ -61,7 +61,7 @@ std::vector<QuadTreeHitWrapper*> QuadTreeHitWrapperCreator::createQuadTreeHitWra
 }
 
 
-const CDCRecoHit3D QuadTreeHitWrapperCreator::createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit)
+const CDCRecoHit3D QuadTreeHitWrapperCreator::createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
 

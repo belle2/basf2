@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 
@@ -176,9 +176,9 @@ namespace Belle2 {
                AxialHitQuadTreeProcessorWithNewReferencePoint::rangeY(static_cast<float>(curv - precision_r),
                    static_cast<float>(curv + precision_r)));
 
-        std::vector<QuadTreeHitWrapper*> hitsVector = m_hitFactory.createQuadTreeHitWrappersForQT(false);
+        std::vector<ConformalCDCWireHit*> hitsVector = m_hitFactory.createQuadTreeHitWrappersForQT(false);
 
-        for (QuadTreeHitWrapper* hit : hitsVector) {
+        for (ConformalCDCWireHit* hit : hitsVector) {
           hit->setUsedFlag(false);
           hit->setMaskedFlag(false);
         }
@@ -186,11 +186,11 @@ namespace Belle2 {
         AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(ranges, std::make_pair(refPos.x(), refPos.y()));
         qtProcessor.provideItemsSet(hitsVector);
 
-        std::vector<QuadTreeHitWrapper*> newAssignedHits = qtProcessor.getAssignedHits();
+        std::vector<ConformalCDCWireHit*> newAssignedHits = qtProcessor.getAssignedHits();
 
         std::vector<const CDCWireHit*> newCdcWireHits;
 
-        for (QuadTreeHitWrapper* hit : newAssignedHits) {
+        for (ConformalCDCWireHit* hit : newAssignedHits) {
           newCdcWireHits.push_back(hit->getCDCWireHit());
         }
 

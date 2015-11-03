@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
@@ -38,7 +38,7 @@ namespace Belle2 {
 
     class CDCTrack;
     class CDCWireHit;
-    class QuadTreeHitWrapper;
+    class ConformalCDCWireHit;
 
     /**
      * @brief Class which holds and creates hit objects used during track finding procedure.
@@ -66,13 +66,13 @@ namespace Belle2 {
       void initializeQuadTreeHitWrappers();
 
       /// Create CDCRecoHit3D.
-      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, QuadTreeHitWrapper* hit);
+      static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit);
 
       /// Create CDCRecoHit3D.
       static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
       /// Get the list with currently stored tracks.
-      std::vector<QuadTreeHitWrapper>& getQuadTreeHitWrappers()
+      std::vector<ConformalCDCWireHit>& getQuadTreeHitWrappers()
       {
         return m_QuadTreeHitWrappers;
       }
@@ -82,12 +82,12 @@ namespace Belle2 {
        *
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      std::vector<QuadTreeHitWrapper*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
+      std::vector<ConformalCDCWireHit*> createQuadTreeHitWrappersForQT(bool useSegmentsOnly = false);
 
       /// Reset all masked hits.
       void resetMaskedHits(std::list<CDCTrack>& cdcTracks)
       {
-        doForAllHits([](QuadTreeHitWrapper & hit) {
+        doForAllHits([](ConformalCDCWireHit & hit) {
           hit.setMaskedFlag(false);
           hit.setUsedFlag(false);
         });
@@ -106,15 +106,15 @@ namespace Belle2 {
       }
 
       /// Do a certain function for each track in the track list.
-      void doForAllHits(std::function<void(QuadTreeHitWrapper& hit)> function)
+      void doForAllHits(std::function<void(ConformalCDCWireHit& hit)> function)
       {
-        for (QuadTreeHitWrapper& hit : m_QuadTreeHitWrappers) {
+        for (ConformalCDCWireHit& hit : m_QuadTreeHitWrappers) {
           function(hit);
         }
       }
 
     private:
-      std::vector<QuadTreeHitWrapper> m_QuadTreeHitWrappers; /**< Vector which hold axial hits. */
+      std::vector<ConformalCDCWireHit> m_QuadTreeHitWrappers; /**< Vector which hold axial hits. */
     };
   }
 }

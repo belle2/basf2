@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCTrack;
-    class QuadTreeHitWrapper;
+    class ConformalCDCWireHit;
     class CDCRecoHit3D;
     class CDCTrajectory2D;
     class CDCWireHit;
@@ -48,7 +48,7 @@ namespace Belle2 {
       static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<QuadTreeHitWrapper*>& AxialHitList);
+      static void appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<ConformalCDCWireHit*>& AxialHitList);
 
       /** Tries to find and delete all "bad" hits in a track.
        * By doing so we will loose hit efficiency, but gain a low fake rate. */

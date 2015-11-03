@@ -60,7 +60,7 @@ namespace Belle2 {
 
       void moveToNextAxialLayer(CDCTrack& track) const;
 
-      void unmaskHitsInTrack(CDCTrack& track) const;
+      static void unmaskHitsInTrack(CDCTrack& track);
 
       void normalizeTrack(CDCTrack& track) const;
 

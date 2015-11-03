@@ -42,9 +42,6 @@ namespace Belle2 {
                                        const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                        CDCTrackList& cdcTrackList);
 
-      /// Assign new hits to the track basing on the distance from the hit to the track
-      static void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
-
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
       static void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
@@ -65,6 +62,10 @@ namespace Belle2 {
        * this function.
        */
       static void deleteHitsFarAwayFromTrajectory(CDCTrack& trackCandidate, double maximum_distance = 0.2);
+
+      /// Assign new hits to the track basing on the distance from the hit to the track.
+      static void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                double minimal_distance_to_track = 0.15);
 
       /// Check chi2 of the fit using the given two quantiles of the chi2 distribution.
       static bool isChi2InQuantiles(CDCTrack& track, double lower_quantile = 0.025, double upper_quantile = 0.975);

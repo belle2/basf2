@@ -184,37 +184,29 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
 
 }
 
-void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                   double minimal_distance_to_track)
 {
   if (track.size() < 10) return;
-
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
   HitProcessor::unmaskHitsInTrack(track);
 
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
   for (const ConformalCDCWireHit& hit : conformalCDCWireHitList) {
-    if (hit.getUsedFlag() || hit.getMaskedFlag()) continue;
-
-    ERightLeft rlInfo = ERightLeft::c_Right;
-    if (trackTrajectory2D.getDist2D(hit.getCDCWireHit()->getRefPos2D()) < 0)
-      rlInfo = ERightLeft::c_Left;
-    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit.getCDCWireHit()->getHit(), rlInfo);
-    if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
+    if (hit.getUsedFlag() or hit.getMaskedFlag()) {
       continue;
-
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
-    if (fabs(trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D())) < 0.15) {
-      track.push_back(std::move(cdcRecoHit3D));
-      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
     }
 
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*(hit.getCDCWireHit()), trackTrajectory2D);
+    const Vector2D& recoPos2D = cdcRecoHit3D.getRecoPos2D();
 
+    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimal_distance_to_track) {
+      track.push_back(std::move(cdcRecoHit3D));
+      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
+    }
   }
 
+  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
   trackQualityTools.normalizeTrack(track);
 }
 

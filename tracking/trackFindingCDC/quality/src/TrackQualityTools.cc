@@ -55,7 +55,7 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   }
 }
 
-void TrackQualityTools::unmaskHitsInTrack(CDCTrack& track) const
+void TrackQualityTools::unmaskHitsInTrack(CDCTrack& track)
 {
   for (const CDCRecoHit3D& hit : track) {
     hit.getWireHit().getAutomatonCell().setTakenFlag(true);

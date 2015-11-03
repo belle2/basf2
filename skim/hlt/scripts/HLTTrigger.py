@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from modularAnalysis import fillParticleList
 import os
 import sys
 
@@ -15,6 +16,12 @@ def add_HLT_Y4S(path, filter=False):
     @filter 1: open the filter of hlt, 0: close the filter of hlt
     @path add this module to the path
     """
+    # create charged tracks list
+    fillParticleList('pi+:HLT', '', False, path)
+
+    # create gamma list
+    fillParticleList('gamma:HLT', '', False, path)
+
     # hadron
     PTrigger('Hadron', 'NtHLT>=3 and VisibleEnergyHLT>2.5', path, 1)
     # Bhabha Accept1

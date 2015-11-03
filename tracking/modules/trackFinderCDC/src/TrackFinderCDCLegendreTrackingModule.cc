@@ -75,14 +75,14 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
 {
-  TrackMerger trackMerger(m_trackProcessor);
+  TrackMerger trackMerger;
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
   QuadTreePassCounter quadTreePassCounter;
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
   do {
-    HitProcessor::resetMaskedHits(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
+    HitProcessor::resetMaskedHits(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
     // Create object which holds and generates parameters
     QuadTreeParameters quadTreeParameters(m_param_maxLevel, quadTreePassCounter.getPass());
@@ -118,7 +118,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
     // Try to merge tracks
-    if (m_param_doEarlyMerging)trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
+    if (m_param_doEarlyMerging)trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
     nCandsAdded = m_trackProcessor.getCDCTrackList().size() - nCandsAdded;
 
@@ -135,7 +135,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
-  m_trackProcessor.doForAllTracks([&](CDCTrack & track) {
+  m_trackProcessor.getCDCTrackListTmp().doForAllTracks([&](CDCTrack & track) {
     if (track.size() > 3) {
       TrackQuality trackQuality(track);
       HitProcessor::splitBack2BackTrack(track);
@@ -171,7 +171,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
   // Perform tracks merging
-  trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
+  trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackListTmp(), m_conformalCDCWireHitList);
 
   // Assign new hits
   m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());

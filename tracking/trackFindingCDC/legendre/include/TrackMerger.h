@@ -21,19 +21,20 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class TrackProcessor;
     class ConformalCDCWireHit;
+    class CDCTrackList;
 
     class TrackMerger {
     public:
 
       /// Constructor with a reference to the track processor.
-      TrackMerger(TrackProcessor& trackProcessor): m_trackProcessor(trackProcessor) {};
+      TrackMerger() { }
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      void doTracksMerging(std::list<CDCTrack>& trackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /** Try to merge given track with tracks in tracklist. */
-      void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& trackList,
-                                          const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
+                                                 const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
       /** Some typedefs for the results of the merging process */
@@ -46,13 +47,14 @@ namespace Belle2 {
        * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
        * The hit sorting is not maintained.
        */
-      void mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                              CDCTrackList& cdcTrackList);
 
       /**
        * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.
        * @param factor gives a number how far the hit is allowed to be.
        */
-      void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
+      static void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
 
       /** Try to merge the two tracks
        * For this, build a common hit list and do a fast fit.
@@ -60,7 +62,7 @@ namespace Belle2 {
        * As a result. the reduced probability for a good fit is given.
        * The bad hits are marked but none of them is deleted!
        * This method does not do the actual merging. */
-      double doTracksFitTogether(CDCTrack& track1, CDCTrack& track2);
+      static double doTracksFitTogether(CDCTrack& track1, CDCTrack& track2);
 
       /**
        * Searches for the best candidate to merge this track to.
@@ -68,21 +70,19 @@ namespace Belle2 {
        * @param start_iterator the iterator where to start searching (this element included)
        * @return a pointer to the best fit candidate.
        */
-      BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
-                                                 std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator);
+      static BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
+                                                        std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator);
 
       /**
        * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
        * @param otherTrackCandidate to reset
        */
-      void resetHits(CDCTrack& track);
+      static void resetHits(CDCTrack& track);
 
       /**
        * This parameter is the minimum probability a fit must have to lead to the result: merge
        */
       static constexpr double m_minimum_probability_to_be_merged = 0.85;
-
-      TrackProcessor& m_trackProcessor;
     };
   }
 }

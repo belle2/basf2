@@ -264,7 +264,7 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
     trackQualityTools.normalizeTrack(track);
   });
 
-  HitProcessor::reassignHitsFromOtherTracks(cdcTrackList.getCDCTracks());
+  HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
   cdcTrackList.doForAllTracks([](CDCTrack & cand) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag();

@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 
@@ -77,23 +78,22 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
   }
 }
 
-void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandidates)
+void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
 {
 
   return;
   std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
-  for (CDCTrack& cand : trackCandidates) {
-
+  cdcTrackList.doForAllTracks([&assignedHits](CDCTrack & cand) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag(true);
       recoHit.getWireHit().getAutomatonCell().setMaskedFlag(false);
 
       assignedHits.push_back(std::make_pair(recoHit, cand));
     }
-  }
+  });
 
 
-  B2DEBUG(100, "NCands = " << trackCandidates.size());
+  B2DEBUG(100, "NCands = " << cdcTrackList.getCDCTracks().size());
 
   for (std::pair<CDCRecoHit3D, CDCTrack>& itemWithCand : assignedHits) {
 
@@ -109,8 +109,8 @@ void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandida
     double bestHitDist = dist;
     CDCTrack* bestCandidate = NULL;
 
-    for (CDCTrack& candInner : trackCandidates) {
-      if (candInner == cand) continue;
+    cdcTrackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
+      if (candInner == cand) return;
       CDCTrajectory2D trajectoryInner = candInner.getStartTrajectory3D().getTrajectory2D();
 
       HitProcessor::updateRecoHit3D(trajectoryInner, item);
@@ -120,7 +120,7 @@ void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackCandida
         bestCandidate = &candInner;
         bestHitDist = distTemp;
       }
-    }
+    });
 
     if (bestHitDist < dist) {
       const CDCRecoHit3D& cdcRecoHit3D  =  CDCRecoHit3D::reconstruct(item.getRLWireHit(),
@@ -307,18 +307,16 @@ ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 
 }
 
-void HitProcessor::resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   for (ConformalCDCWireHit& hit : conformalCDCWireHitList) {
     hit.setMaskedFlag(false);
     hit.setUsedFlag(false);
   }
 
-  for (CDCTrack& cdcTrack : cdcTracks) {
-    for (const CDCRecoHit3D& hit : cdcTrack) {
-      hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    }
-  }
+  cdcTrackList.doForAllTracks([](const CDCTrack & cdcTrack) {
+    cdcTrack.forwardTakenFlag();
+  });
 }
 
 

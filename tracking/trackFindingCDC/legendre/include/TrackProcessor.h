@@ -38,20 +38,22 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list
-      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                CDCTrackList& cdcTrackList);
+      static void addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
+                                       const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                       CDCTrackList& cdcTrackList);
 
       /// Assign new hits to the track basing on the distance from the hit to the track
-      void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      static void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
-      void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
+      static void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
       /// Check p-value of the track
-      void checkTrackProb(CDCTrackList& cdcTrackList);
+      static void checkTrackProb(CDCTrackList& cdcTrackList);
 
       /// Perform track postprocessing
-      void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
+      static void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                   CDCTrackList& cdcTrackList);
 
       std::list<CDCTrack>& getCDCTrackList()
       {
@@ -63,40 +65,34 @@ namespace Belle2 {
         return m_cdcTrackList;
       }
 
-      /// Perform provided function to all tracks
-      void doForAllTracks(std::function<void(CDCTrack& track)> function)
-      {
-        m_cdcTrackList.doForAllTracks(function);
-      }
-
     private:
       CDCTrackList m_cdcTrackList; /**< a list handling the found CDC tracks as an object.*/
 
       /// Set MASKED flag of automaton cells to false
-      void unmaskHitsInTrack(CDCTrack& track);
+      static void unmaskHitsInTrack(CDCTrack& track);
 
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
        */
-      void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
+      static void deleteBadHitsOfOneTrack(CDCTrack& trackCandidate);
 
 
       /// Check chi2 of the fit (using quantiles of chi2 distribution)
-      bool checkChi2(CDCTrack& track);
+      static bool checkChi2(CDCTrack& track);
 
       /** Calculate quantile of chi2
        * @param alpha quntile of chi2
        * @param n number degrees of freedom
        */
-      double calculateChi2ForQuantile(double alpha, double n);
+      static double calculateChi2ForQuantile(double alpha, double n);
 
-      void assignNewHitsUsingSegments(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                      float fraction = 0.3);
+      static void assignNewHitsUsingSegments(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                             float fraction = 0.3);
 
-      void removeBadSLayers(CDCTrack& track);
+      static void removeBadSLayers(CDCTrack& track);
 
       /// Check track -- currently based on number of hits only.
-      bool checkTrack(CDCTrack& track);
+      static bool checkTrack(CDCTrack& track);
     };
   }
 }

@@ -149,6 +149,13 @@ void CDCTrack::receiveMaskedFlag() const
   }
 }
 
+void CDCTrack::forwardTakenFlag(bool takenFlag) const
+{
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(takenFlag);
+  }
+}
+
 void CDCTrack::sortByRadius()
 {
   std::sort(begin(), end(), [](const CDCRecoHit3D & a, const CDCRecoHit3D & b) -> bool {

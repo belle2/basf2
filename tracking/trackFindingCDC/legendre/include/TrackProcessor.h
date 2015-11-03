@@ -56,9 +56,6 @@ namespace Belle2 {
                                    CDCTrackList& cdcTrackList);
 
     private:
-      /// Set the MASKED flag of all reco hits to false and TAKEN flag to true. Does not touch the settings of the track.
-      static void unmaskHitsInTrack(CDCTrack& track);
-
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
        * This is done by checking the distance between the hits and the trajectory, which should not exceed the
@@ -79,13 +76,8 @@ namespace Belle2 {
        */
       static double calculateChi2ForQuantile(double alpha, double n);
 
-      static void assignNewHitsUsingSegments(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                             float fraction = 0.3);
-
-      static void removeBadSLayers(CDCTrack& track);
-
-      /// Check track -- currently based on number of hits only.
-      static bool checkTrack(CDCTrack& track);
+      /// Check track quality -- currently based on number of hits only.
+      static bool checkTrackQuality(const CDCTrack& track);
     };
   }
 }

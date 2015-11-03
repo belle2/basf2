@@ -60,13 +60,10 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
                                       CDCTrackList& cdcTrackList)
 {
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
-  //  B2INFO("update");
   trackQualityTools.normalizeTrack(track);
-  //return;
-  //  B2INFO("split");
+
   HitProcessor::splitBack2BackTrack(track);
-  if (not checkTrack(track)) {
+  if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
@@ -75,18 +72,12 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  //  B2INFO("update");
   trackQualityTools.normalizeTrack(track);
 
-  removeBadSLayers(track);
-
-  assignNewHitsUsingSegments(track, conformalCDCWireHitList);
-
-  //  B2INFO("delete");
   deleteHitsFarAwayFromTrajectory(track);
   trackQualityTools.normalizeTrack(track);
 
-  if (not checkTrack(track)) {
+  if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
@@ -98,13 +89,10 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
   trackQualityTools.normalizeTrack(track);
 
   assignNewHits(track, conformalCDCWireHitList);
-  assignNewHitsUsingSegments(track, conformalCDCWireHitList);
-  removeBadSLayers(track);
-
 
   //  B2INFO("split");
   HitProcessor::splitBack2BackTrack(track);
-  if (not checkTrack(track)) {
+  if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
@@ -113,14 +101,12 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  //  B2INFO("update");
   trackQualityTools.normalizeTrack(track);
 
-  //  B2INFO("delete");
   deleteHitsFarAwayFromTrajectory(track);
   trackQualityTools.normalizeTrack(track);
 
-  if (not checkTrack(track)) {
+  if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
@@ -129,21 +115,10 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-
-
-  //  B2INFO("update");
   trackQualityTools.normalizeTrack(track);
 
   assignNewHits(track, conformalCDCWireHitList);
-  assignNewHitsUsingSegments(track, conformalCDCWireHitList);
 
-  /*  ConformalExtension conformalExtension(this);
-
-    conformalExtension.newRefPoint(track);
-
-  */
-  removeBadSLayers(track);
-  //  B2INFO("update");
   trackQualityTools.normalizeTrack(track);
 
   for (const CDCRecoHit3D& hit : track) {
@@ -153,74 +128,9 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
 
 }
 
-void TrackProcessor::unmaskHitsInTrack(CDCTrack& track)
+bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 {
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-  }
-}
-
-void TrackProcessor::removeBadSLayers(CDCTrack& track)
-{
-  return;
-  unmaskHitsInTrack(track);
-
-  double apogeeArcLenght = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
-
-  for (CDCRecoHit3D& hit : track) {
-    if (hit.getArcLength2D() < 0) {
-      hit.setArcLength2D(hit.getArcLength2D() + apogeeArcLenght * 2.);
-    }
-  }
-
-  track.sortByArcLength2D();
-
-  int startSLayer = track.front().getISuperLayer();
-  int currentSLayer(startSLayer);
-  int nHitsInSL(0);
-
-//  double startArcLength(track.front().getArcLength2D());
-  double stopArcLength(track.back().getArcLength2D());
-
-  std::vector<CDCRecoHit3D>::iterator lastHit;
-
-  currentSLayer = track.front().getISuperLayer();
-  nHitsInSL = 0;
-  currentSLayer = 2;
-  for (const CDCRecoHit3D& hit : track) {
-    if (hit.getISuperLayer() < 2) continue;
-    if (currentSLayer == hit.getISuperLayer()) nHitsInSL ++;
-    else if (((currentSLayer == (hit.getISuperLayer() + 2)) || (currentSLayer == (hit.getISuperLayer() - 2))) && (nHitsInSL >= 4)) {
-      nHitsInSL = 0;
-      currentSLayer = hit.getISuperLayer();
-    } else {
-      stopArcLength = hit.getArcLength2D();
-      break;
-//      lastHit = hit;
-    }
-  }
-
-  if ((stopArcLength > track.back().getArcLength2D())
-      || (stopArcLength < track.front().getArcLength2D()))B2WARNING("wrong stop ArcLength");
-
-  track.erase(std::remove_if(track.begin(), track.end(), [&stopArcLength](CDCRecoHit3D & hit) {
-    if (hit.getArcLength2D() > stopArcLength) {
-      hit.getWireHit()->getAutomatonCell().setTakenFlag(false);
-      hit.getWireHit()->getAutomatonCell().setMaskedFlag(false);
-      return true;
-    } else return false;
-
-//    return hit.getArcLength2D() > stopArcLength;
-  }), track.end());
-
-}
-
-bool TrackProcessor::checkTrack(CDCTrack& track)
-{
-  if (track.size() < 5) return false;
-
-  return true;
+  return track.size() >= 5;
 }
 
 void TrackProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximum_distance)
@@ -280,12 +190,10 @@ void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalC
 
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
-  unmaskHitsInTrack(track);
+  HitProcessor::unmaskHitsInTrack(track);
 
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-//  ESign trackCharge = TrackMergerNew::getChargeSign(track);
   CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-
 
   for (const ConformalCDCWireHit& hit : conformalCDCWireHitList) {
     if (hit.getUsedFlag() || hit.getMaskedFlag()) continue;
@@ -296,9 +204,6 @@ void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalC
     const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit.getCDCWireHit()->getHit(), rlInfo);
     if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
       continue;
-
-//        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
-//          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
 
     const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
 
@@ -311,95 +216,6 @@ void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalC
   }
 
   trackQualityTools.normalizeTrack(track);
-}
-
-void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                                float fraction)
-{
-  return;
-  /*if (track.size() < 5) return;
-
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  //  ESign trackCharge = TrackMergerNew::getChargeSign(track);
-  CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-
-  std::vector<CDCRecoSegment2D> segments;
-  for (CDCRecoHit3D& recoHit : track) {
-    for (ConformalCDCWireHit& qtHit : conformalCDCWireHitList) {
-      if (qtHit.getCDCWireHit()->getWire() == recoHit.getWire()) {
-
-        const CDCRecoSegment2D& segment = qtHit.getSegment();
-        if (segment.size() == 0) continue;
-        bool addSegment(true);
-        if (segments.size() != 0) {
-          for (CDCRecoSegment2D& segmentTmp : segments) {
-            if (segmentTmp == segment) {
-              addSegment = false;
-            }
-          }
-        }
-
-        int nHits(0);
-        for (CDCRecoHit2D& segmentHit : segment) {
-  //          for (CDCRecoHit3D& recoHitTmp : track) {
-          if (recoHit.getWire() == segmentHit.getWire()) nHits++;
-  //          }
-        }
-
-        if (static_cast<float>(nHits / segment.items().size()) < fraction) addSegment = false;
-
-        if (addSegment)segments.push_back(segment);
-
-        break;
-      }
-    }
-  }
-
-  std::vector<ConformalCDCWireHit*> hitsToAdd;
-
-  for (CDCRecoSegment2D& segment : segments) {
-    for (ConformalCDCWireHit& qtHitGlobal : conformalCDCWireHitList) {
-      bool addHit(true);
-      for (CDCRecoHit3D& recoHit : track) {
-        if (qtHitGlobal.getCDCWireHit()->getWire() == recoHit.getWire()) addHit = false;
-      }
-
-      if (addHit && (qtHitGlobal.getSegment() == segment)) {
-        hitsToAdd.push_back(&qtHitGlobal);
-      }
-
-    }
-
-  }
-
-  for (ConformalCDCWireHit* hit : hitsToAdd) {
-
-    ERightLeft rlInfo = ERightLeft::c_Right;
-    if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-      rlInfo = ERightLeft::c_Left;
-    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
-    if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
-      continue;
-
-  //        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
-  //          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
-
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
-    if (fabs(trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D())) < 0.2) {
-      track.push_back(std::move(cdcRecoHit3D));
-      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
-    }
-
-
-  }
-
-
-  trackQualityTools.normalizeTrack(track);*/
-
-
 }
 
 void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
@@ -425,9 +241,7 @@ bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, d
   const double maxChi2 = calculateChi2ForQuantile(upper_quantile, trackTrajectory2D.getNDF());
   const double chi2 = trackTrajectory2D.getChi2();
 
-  if ((chi2 < minChi2) || (chi2 > maxChi2)) return false;
-
-  return true;
+  return ((chi2 >= minChi2) and (chi2 <= maxChi2));
 }
 
 double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)

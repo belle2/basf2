@@ -59,8 +59,7 @@ void TrackProcessor::addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
 void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                       CDCTrackList& cdcTrackList)
 {
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   HitProcessor::splitBack2BackTrack(track);
   if (not checkTrackQuality(track)) {
@@ -72,10 +71,10 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   deleteHitsFarAwayFromTrajectory(track);
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
@@ -86,9 +85,9 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
-  assignNewHits(track, conformalCDCWireHitList);
+  assignNewHitsToTrack(track, conformalCDCWireHitList);
 
   //  B2INFO("split");
   HitProcessor::splitBack2BackTrack(track);
@@ -101,10 +100,10 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   deleteHitsFarAwayFromTrajectory(track);
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   if (not checkTrackQuality(track)) {
     for (const CDCRecoHit3D& hit : track) {
@@ -115,11 +114,11 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
     return;
   }
 
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
-  assignNewHits(track, conformalCDCWireHitList);
+  assignNewHitsToTrack(track, conformalCDCWireHitList);
 
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 
   for (const CDCRecoHit3D& hit : track) {
     hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
@@ -147,8 +146,6 @@ void TrackProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double max
 
 void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
 {
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
   cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
   [](const CDCTrack & track) {
     return track.size() == 0;
@@ -160,32 +157,30 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
 
     if (track.size() < 4) return;
 
-    assignNewHits(track, conformalCDCWireHitList);
+    assignNewHitsToTrack(track, conformalCDCWireHitList);
 
     std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track);
 
     addCandidateWithHits(removedHits, conformalCDCWireHitList, cdcTrackList);
 
     //  B2INFO("update");
-    trackQualityTools.normalizeTrack(track);
+    TrackQualityTools::normalizeTrack(track);
 
     //  B2INFO("delete");
     deleteHitsFarAwayFromTrajectory(track);
 
-    trackQualityTools.normalizeTrack(track);
+    TrackQualityTools::normalizeTrack(track);
   });
 
   HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
-  cdcTrackList.doForAllTracks([](CDCTrack & cand) {
-    for (CDCRecoHit3D& recoHit : cand) {
-      recoHit.getWireHit().getAutomatonCell().setTakenFlag();
-    }
-  });
 
+  cdcTrackList.doForAllTracks([](CDCTrack & cand) {
+    cand.forwardTakenFlag();
+  });
 }
 
-void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
-                                   double minimal_distance_to_track)
+void TrackProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                          double minimal_distance_to_track)
 {
   if (track.size() < 10) return;
   HitProcessor::unmaskHitsInTrack(track);
@@ -206,8 +201,7 @@ void TrackProcessor::assignNewHits(CDCTrack& track, const std::vector<ConformalC
     }
   }
 
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-  trackQualityTools.normalizeTrack(track);
+  TrackQualityTools::normalizeTrack(track);
 }
 
 void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)

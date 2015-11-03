@@ -55,20 +55,12 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   }
 }
 
-void TrackQualityTools::unmaskHitsInTrack(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-  }
-}
-
-void TrackQualityTools::normalizeTrack(CDCTrack& track) const
+void TrackQualityTools::normalizeTrack(CDCTrack& track)
 {
   // Set the start point of the trajectory to the first hit
   if (track.size() < 5) return;
 
-  unmaskHitsInTrack(track);
+  HitProcessor::unmaskHitsInTrack(track);
 
   bool m_usePosition = true;
   CDCObservations2D observations2D;
@@ -92,7 +84,7 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track) const
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
 
-  unmaskHitsInTrack(track);
+  HitProcessor::unmaskHitsInTrack(track);
 }
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const

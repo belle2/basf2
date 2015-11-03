@@ -137,14 +137,6 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
 
 }
 
-void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-}
-
 std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& trackCandidate)
 {
   assert(trackCandidate);
@@ -319,4 +311,11 @@ void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<Confo
   });
 }
 
+void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
+{
+  for (const CDCRecoHit3D& hit : track) {
+    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  }
+}
 

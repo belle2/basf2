@@ -54,9 +54,6 @@ namespace Belle2 {
       /** Delete all hits markes as bad (MASKED) in a track. Should be called after every hit reassignment */
       static void deleteAllMarkedHits(CDCTrack& track);
 
-      /** Unmask hits which are assigned to the track */
-      static void unmaskHitsInTrack(CDCTrack& track);
-
       /** Tries to split back-to-back tracks into two different tracks */
       static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& trackCandidate);
 
@@ -77,6 +74,9 @@ namespace Belle2 {
 
       /// Reset all masked hits.
       static void resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+
+      /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
+      static void unmaskHitsInTrack(CDCTrack& track);
     };
   }
 }

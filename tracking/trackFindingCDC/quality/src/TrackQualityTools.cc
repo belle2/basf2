@@ -71,32 +71,40 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track) const
   Belle2::Helix helix(trajectory3D.getSupport(), trajectory3D.getMom3DAtSupport() , charge, 1.5);
   const Vector2D& startPosition = track.front().getRecoPos2D();
   const double perpSAtFront = helix.getArcLength2DAtXY(startPosition.x(), startPosition.y());
-  Vector3D newStartPosition(helix.getPositionAtArcLength2D(perpSAtFront));
-  Vector3D newStartMomentum(helix.getMomentumAtArcLength2D(perpSAtFront, 1.5));
-  const CDCTrajectory2D currentTrajectory2D(newStartPosition.xy(), newStartMomentum.xy(), charge);
 
-  // Check if we have to reverse the trajectory. This is done by counting the number of hits
-  // with positive an with negative perpS
-  unsigned int numberOfPositiveHits = 0;
-  for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
-    if (currentPerpS > 0) {
-      numberOfPositiveHits++;
+  if (std::isnan(perpSAtFront)) {
+    B2WARNING("Strange trajectory. Can not do much about it.");
+  } else {
+    Vector3D newStartPosition(helix.getPositionAtArcLength2D(perpSAtFront));
+    Vector3D newStartMomentum(helix.getMomentumAtArcLength2D(perpSAtFront, 1.5));
+    if (newStartMomentum.hasNAN() or newStartPosition.hasNAN()) {
+      B2WARNING("Strange trajectory. Can not do much about it.");
+    } else {
+      const CDCTrajectory2D currentTrajectory2D(newStartPosition.xy(), newStartMomentum.xy(), charge);
+
+      // Check if we have to reverse the trajectory. This is done by counting the number of hits
+      // with positive an with negative perpS
+      unsigned int numberOfPositiveHits = 0;
+      for (CDCRecoHit3D& recoHit : track) {
+        const double currentPerpS = currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
+        if (currentPerpS > 0) {
+          numberOfPositiveHits++;
+        }
+      }
+      // ... or by looking at the arcLength of the origin
+      const double arcLength2DOfOrigin = currentTrajectory2D.calcArcLength2D(Vector2D(0, 0));
+
+      const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size() or arcLength2DOfOrigin > 0;
+
+      // We reset the trajectory here to start at the newStartPosition of the first hit
+      if (reverseTrajectory)
+        track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, -newStartMomentum, -charge));
+      else
+        track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, newStartMomentum, charge));
     }
   }
-  // ... or by looking at the arcLength of the origin
-  const double arcLength2DOfOrigin = currentTrajectory2D.calcArcLength2D(Vector2D(0, 0));
-
-  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size() or arcLength2DOfOrigin > 0;
-
-  // We reset the trajectory here to start at the newStartPosition of the first hit
-  if (reverseTrajectory)
-    track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, -newStartMomentum, -charge));
-  else
-    track.setStartTrajectory3D(CDCTrajectory3D(newStartPosition, newStartMomentum, charge));
 
   track.setEndTrajectory3D(track.getStartTrajectory3D());
-
   const CDCTrajectory2D& startTrajectory = track.getStartTrajectory3D().getTrajectory2D();
 
   for (CDCRecoHit3D& recoHit : track) {

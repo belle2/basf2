@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <framework/logging/Logger.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -36,6 +37,9 @@ double TrackFindingCDC::getBFieldZ(const Vector2D& pos2D)
 
 double TrackFindingCDC::getBFieldZ(const Vector3D& pos3D)
 {
+  if (pos3D.hasNAN()) {
+    B2FATAL("Accessing a NaN position of the B Field!");
+  }
   TVector3 mag3D = BFieldMap::Instance().getBField(pos3D);
   return mag3D.Z();
 }

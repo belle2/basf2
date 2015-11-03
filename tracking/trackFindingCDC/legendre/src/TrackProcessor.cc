@@ -27,7 +27,8 @@ using namespace TrackFindingCDC;
 
 
 void TrackProcessor::addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
-                                          const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+                                          const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                          CDCTrackList& cdcTrackList)
 {
   if (hits.size() == 0) return;
 
@@ -36,7 +37,7 @@ void TrackProcessor::addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
     observations.append(*item);
   }
 
-  CDCTrack& track = m_cdcTrackList.createEmptyTrack();
+  CDCTrack& track = cdcTrackList.createEmptyTrack();
 
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   const CDCTrajectory2D& trackTrajectory2D = fitter.fit(observations);
@@ -52,10 +53,11 @@ void TrackProcessor::addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
 
-  postprocessTrack(track, conformalCDCWireHitList);
+  postprocessTrack(track, conformalCDCWireHitList, cdcTrackList);
 }
 
-void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                      CDCTrackList& cdcTrackList)
 {
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
@@ -69,7 +71,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
     }
-    m_cdcTrackList.getCDCTracks().remove(track);
+    cdcTrackList.getCDCTracks().remove(track);
     return;
   }
 
@@ -87,7 +89,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
     }
-    m_cdcTrackList.getCDCTracks().remove(track);
+    cdcTrackList.getCDCTracks().remove(track);
     return;
   }
 
@@ -105,7 +107,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
     }
-    m_cdcTrackList.getCDCTracks().remove(track);
+    cdcTrackList.getCDCTracks().remove(track);
     return;
   }
 
@@ -119,7 +121,7 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
     }
-    m_cdcTrackList.getCDCTracks().remove(track);
+    cdcTrackList.getCDCTracks().remove(track);
     return;
   }
 
@@ -232,18 +234,18 @@ void TrackProcessor::deleteBadHitsOfOneTrack(CDCTrack& trackCandidate)
   trackQualityTools.normalizeTrack(trackCandidate);
 }
 
-void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
 {
   const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
 
-  m_cdcTrackList.getCDCTracks().erase(std::remove_if(m_cdcTrackList.getCDCTracks().begin(), m_cdcTrackList.getCDCTracks().end(),
+  cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
   [](const CDCTrack & track) {
     return track.size() == 0;
-  }) , m_cdcTrackList.getCDCTracks().end());
+  }) , cdcTrackList.getCDCTracks().end());
 
 
 //  for (CDCTrack& track : m_cdcTracks) {
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
 
     if (track.size() < 4) return;
 
@@ -251,7 +253,7 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
 
     std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track);
 
-    addCandidateWithHits(removedHits, conformalCDCWireHitList);
+    addCandidateWithHits(removedHits, conformalCDCWireHitList, cdcTrackList);
 
     //  B2INFO("update");
     trackQualityTools.normalizeTrack(track);
@@ -262,8 +264,8 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
     trackQualityTools.normalizeTrack(track);
   });
 
-  HitProcessor::reassignHitsFromOtherTracks(m_cdcTrackList.getCDCTracks());
-  m_cdcTrackList.doForAllTracks([](CDCTrack & cand) {
+  HitProcessor::reassignHitsFromOtherTracks(cdcTrackList.getCDCTracks());
+  cdcTrackList.doForAllTracks([](CDCTrack & cand) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag();
     }
@@ -399,9 +401,9 @@ void TrackProcessor::assignNewHitsUsingSegments(CDCTrack& track, const std::vect
 
 }
 
-void TrackProcessor::checkTrackProb()
+void TrackProcessor::checkTrackProb(CDCTrackList& cdcTrackList)
 {
-  m_cdcTrackList.doForAllTracks([](CDCTrack & track) {
+  cdcTrackList.doForAllTracks([](CDCTrack & track) {
     std::vector<std::pair<std::pair<double, double>, double>> hits;
 
     for (const CDCRecoHit3D& hit : track) {

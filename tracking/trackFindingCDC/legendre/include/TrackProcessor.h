@@ -38,31 +38,29 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list
-      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      void addCandidateWithHits(std::vector<const CDCWireHit*>& hits, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                CDCTrackList& cdcTrackList);
 
       /// Assign new hits to the track basing on the distance from the hit to the track
       void assignNewHits(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
-      void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
+      void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
       /// Check p-value of the track
-      void checkTrackProb();
+      void checkTrackProb(CDCTrackList& cdcTrackList);
 
       /// Perform track postprocessing
-      void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
-
-      /**
-       * After each event the created hits and trackCandidates should be deleted.
-       */
-      void clearVectors()
-      {
-        m_cdcTrackList.clear();
-      }
+      void postprocessTrack(CDCTrack& track, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
       std::list<CDCTrack>& getCDCTrackList()
       {
         return m_cdcTrackList.getCDCTracks();
+      }
+
+      CDCTrackList& getCDCTrackListTmp()
+      {
+        return m_cdcTrackList;
       }
 
       /// Perform provided function to all tracks

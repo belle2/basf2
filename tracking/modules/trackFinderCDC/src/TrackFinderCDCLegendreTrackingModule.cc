@@ -106,16 +106,16 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
     // Interface
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface = quadTreeNodeProcessor.getLambdaInterface(
-          m_conformalCDCWireHitList);
+          m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
 
     // Start candidate finding
     quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
 
     // Assign new hits to the tracks
-    m_trackProcessor.assignNewHits(m_conformalCDCWireHitList);
+    m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
 
     // Check p-value of the tracks
-    m_trackProcessor.checkTrackProb();
+    m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
     // Try to merge tracks
     if (m_param_doEarlyMerging)trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
@@ -156,7 +156,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
         hit->getAutomatonCell().setTakenFlag(false);
       }
 
-      m_trackProcessor.addCandidateWithHits(hitsToSplit, m_conformalCDCWireHitList);
+      m_trackProcessor.addCandidateWithHits(hitsToSplit, m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
 
     }
 //    TrackMergerNew::deleteAllMarkedHits(track);
@@ -168,13 +168,13 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   }
 
   // Remove bad tracks
-  m_trackProcessor.checkTrackProb();
+  m_trackProcessor.checkTrackProb(m_trackProcessor.getCDCTrackListTmp());
 
   // Perform tracks merging
   trackMerger.doTracksMerging(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
 
   // Assign new hits
-  m_trackProcessor.assignNewHits(m_conformalCDCWireHitList);
+  m_trackProcessor.assignNewHits(m_conformalCDCWireHitList, m_trackProcessor.getCDCTrackListTmp());
 
 }
 
@@ -191,5 +191,5 @@ void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::Tra
 void TrackFinderCDCLegendreTrackingModule::clearVectors()
 {
   m_conformalCDCWireHitList.clear();
-  m_trackProcessor.clearVectors();
+  m_trackProcessor.getCDCTrackListTmp().clear();
 }

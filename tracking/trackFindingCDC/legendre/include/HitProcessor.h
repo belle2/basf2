@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #pragma once
-#include "tracking/trackFindingCDC/numerics/ESign.h"
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <list>
 #include <vector>

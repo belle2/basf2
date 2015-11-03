@@ -45,11 +45,12 @@ namespace Belle2 {
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
        *  hits belonging to found candidates will be marked as used and ignored for further filling iterations
        */
-      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+          CDCTrackList& cdcTrackList)
       {
         AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
         hits __attribute__((unused)), AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
-          this->candidateProcessingFinal(qt, conformalCDCWireHitList);
+          this->candidateProcessingFinal(qt, conformalCDCWireHitList, cdcTrackList);
         };
 
         return lmdCandidateProcessingFinal;
@@ -58,7 +59,8 @@ namespace Belle2 {
 
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
-      void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+      void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                    CDCTrackList& cdcTrackList)
       {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -71,7 +73,7 @@ namespace Belle2 {
           hit->setUsedFlag(false);
           candidateHits.push_back(hit->getPointer());
         }
-        postprocessSingleNode(candidateHits, conformalCDCWireHitList);
+        postprocessSingleNode(candidateHits, conformalCDCWireHitList, cdcTrackList);
       };
 
       /// Trying to assing new hits from neighbouring regions of the given node.
@@ -128,7 +130,8 @@ namespace Belle2 {
 
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
       void postprocessSingleNode(std::vector<ConformalCDCWireHit*>& candidateHits,
-                                 std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+                                 std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+                                 CDCTrackList& cdcTrackList)
       {
 
         for (ConformalCDCWireHit* hit : candidateHits) {
@@ -145,7 +148,7 @@ namespace Belle2 {
 
         conformalExtension.newRefPoint(cdcWireHits, conformalCDCWireHitList, true);
 
-        m_trackProcessor.addCandidateWithHits(cdcWireHits, conformalCDCWireHitList);
+        m_trackProcessor.addCandidateWithHits(cdcWireHits, conformalCDCWireHitList, cdcTrackList);
       }
 
     private:

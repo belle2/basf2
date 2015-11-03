@@ -333,4 +333,4 @@ main.add_module(vxd_cdcMergerAnalysis)
 
 # Process events
 process(main)
-print statistics
+print(statistics)

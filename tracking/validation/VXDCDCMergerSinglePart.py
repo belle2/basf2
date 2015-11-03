@@ -216,7 +216,6 @@ trackMerger_param = {  # (in cm) use cdc inner wall
     'recover': 1,
 }
 #    'root_output_filename': 'VXD_CDC_trackmerger_test.root',
-
 vxd_cdcTracksMerger.param(trackMerger_param)
 
 # MERGING ANALYSIS
@@ -334,4 +333,4 @@ main.add_module(vxd_cdcMergerAnalysis)
 
 # Process events
 process(main)
-print statistics
+print(statistics)

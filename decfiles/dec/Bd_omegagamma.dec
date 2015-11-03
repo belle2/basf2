@@ -1,6 +1,6 @@
 # EventType: 1110001000
-# Descriptor: [B0 -> rho0 gamma]cc
-# NickName: Bd_rho0gamma
+# Descriptor: [B0 -> omega gamma]cc
+# NickName: Bd_omegagamma
 # Documentation: Rare b->d gamma process
 # Tested: Yes
 # PhysicsWG: EWP

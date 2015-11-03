@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -19,24 +19,24 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     * Object which holds the list of QuadTreeHitWrappers.
+     * Object which holds the list of ConformalCDCWireHit.
      * It is more or less only a wrapper to a std::vector with some additional functions for convenience.
      */
-    class QuadTreeHitWrapperList {
+    class ConformalCDCWireHitList {
     public:
       /// Empty constructor does nothing.
-      QuadTreeHitWrapperList() { };
+      ConformalCDCWireHitList() { };
 
       /// Do not copy this class.
-      QuadTreeHitWrapperList(const QuadTreeHitWrapperList& copy) = delete;
+      ConformalCDCWireHitList(const ConformalCDCWireHitList& copy) = delete;
 
       /// Do not copy this class.
-      QuadTreeHitWrapperList& operator=(const QuadTreeHitWrapperList&) = delete;
+      ConformalCDCWireHitList& operator=(const ConformalCDCWireHitList&) = delete;
 
       /// Perform the provided function to all tracks.
       void doForAllHits(std::function<void(ConformalCDCWireHit& hit)> function)
       {
-        for (ConformalCDCWireHit& hit : m_quadTreeHitWrapperList) {
+        for (ConformalCDCWireHit& hit : m_conformalCDCWireHitList) {
           function(hit);
         }
       }
@@ -44,17 +44,17 @@ namespace Belle2 {
       /// Clear the list of tracks at the end of the event.
       void clear()
       {
-        m_quadTreeHitWrapperList.clear();
+        m_conformalCDCWireHitList.clear();
       }
 
       /// Get the list of CDCTracks.
-      std::vector<ConformalCDCWireHit>& getQuadTreeHitWrapperList()
+      std::vector<ConformalCDCWireHit>& getConformalCDCWireHitList()
       {
-        return m_quadTreeHitWrapperList;
+        return m_conformalCDCWireHitList;
       };
 
     private:
-      std::vector<ConformalCDCWireHit> m_quadTreeHitWrapperList; /**< List containing QuadTreeHitWrapper objects. */
+      std::vector<ConformalCDCWireHit> m_conformalCDCWireHitList; /**< List containing ConformalCDCWireHit objects. */
     };
   }
 }

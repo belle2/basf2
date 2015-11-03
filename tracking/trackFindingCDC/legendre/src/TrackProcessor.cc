@@ -44,7 +44,7 @@ void TrackProcessor::addCandidateWithHits(std::vector<const CDCWireHit*>& hits,
   for (const CDCWireHit* item : hits) {
     if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
 
-    const CDCRecoHit3D& cdcRecoHit3D  = ConformalCDCWireHitCreator::reconstructWireHit(trackTrajectory2D, item);
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*item, trackTrajectory2D);
     track.push_back(std::move(cdcRecoHit3D));
     cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
   }

@@ -15,43 +15,32 @@
 using namespace std;
 
 namespace Belle2 {
-
-  class CDCHit;
-
   namespace TrackFindingCDC {
-
-    class CDCTrack;
-    class CDCTrajectory2D;
-    class CDCWireHit;
-    class CDCRecoHit3D;
     class ConformalCDCWireHit;
 
     /**
-     * @brief Class which holds and creates hit objects used during track finding procedure.
+     * Class which creates hit objects used during track finding procedure.
      *
-     * Class takes CDCWireHit objects from DataStore and convert them into QuadTreeHitWrapper objects.
-     * Created QuadTreeHitWrapper objects stored in internal vector and this class is a wrapper around this vector.
-     * Also contains methods to:
-     *   - create CDCRecoHit3D objects using QuadTreeHitWrapper or CDCWireHit
-     *   - convert vector of QuadTreeHitWrapper to CDCWireHit and vice versa
-     *   - prepare vector of QuadTreeHitWrapper for quadtree
+     * The class takes CDCWireHit objects from the DataStore (vie the CDCWireHitTopology)
+     * and convert them into ConformalCDCWireHit objects.
+     * It also contains a method to prepare a vector of ConformalCDCWireHit objects for the quadtree.
      */
     class ConformalCDCWireHitCreator {
     public:
-      /// Compile the hitList from the wire hit topology.
+      /**
+       * Compile the hitList from the wire hit topology.
+       * The method goes through all wire hits from the wire hit topology and creates a ConformalCDCWireHit for each.
+       * This ConformalCDCWireHit is however only added to the list, if is fulfills some quality criteria.
+       */
       static void copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
-
-      /// Create CDCRecoHit3D.
-      static const CDCRecoHit3D reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
 
       /**
        * For the use in the QuadTree use this hit set.
-       *
        * @return the hit set with axial hits to use in the QuadTree-Finding.
        */
-      static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(std::vector<ConformalCDCWireHit>&
-          conformalCDCWireHitList,
-          bool useSegmentsOnly = false);
+      static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(
+        std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
+        bool useSegmentsOnly = false);
 
     private:
       /// Static only.

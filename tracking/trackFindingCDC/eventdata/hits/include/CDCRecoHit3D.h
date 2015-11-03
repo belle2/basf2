@@ -74,6 +74,17 @@ namespace Belle2 {
       static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
+      /**
+       * Reconstruct a three dimensional hit from a wire hit (as in reconstruct(rlWireHit, trajectory2D)), but this time use a
+       * wire hit without a right-left information as an input. The right-left information is chosen to be consistent with the
+       * reference position of the wire and the trajectory passed in to that function (by checking the sign of
+       * trackTrajectory2D.getDist2D(wireHit.getRefPos2D())).
+       * WARNING: This function is only to be used with axial hits (and asserts this). The corresponding rl-wire hit is taken
+       * from the CDCWireHitTopology object.
+       */
+      static CDCRecoHit3D reconstructNearest(const CDCWireHit& wireHit,
+                                             const CDCTrajectory2D& trackTrajectory2D);
+
       /// Reconstructs the three dimensional hit from the two dimensional,
       /// the two dimensional trajectory and sz trajectory.
       /** For two dimensional reconstructed hits on axial wires this reconstructs

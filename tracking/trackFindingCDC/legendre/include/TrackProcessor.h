@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 #include <list>
@@ -24,6 +23,7 @@ namespace Belle2 {
 
     class CDCTrack;
     class CDCTrajectory2D;
+    class ConformalCDCWireHit;
 
     class TrackProcessor {
     public:

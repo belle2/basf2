@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
+#include <tracking/trackFindingCDC/creators/ConformalCDCWireHitCreator.h>
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -138,7 +138,7 @@ namespace Belle2 {
 
           if (chi2New < chi2 * 2.) {
             for (const CDCWireHit* hit : newAssignedHits) {
-              const CDCRecoHit3D& cdcRecoHit3D  = ConformalCDCWireHitCreator::reconstructWireHit(trackTrajectory2D, hit);
+              const CDCRecoHit3D& cdcRecoHit3D  = CDCRecoHit3D::reconstructNearest(*hit, trackTrajectory2D);
               track.push_back(std::move(cdcRecoHit3D));
               cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
             }

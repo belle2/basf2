@@ -8,12 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
+#include <tracking/trackFindingCDC/creators/ConformalCDCWireHitCreator.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 using namespace Belle2;
@@ -54,17 +51,4 @@ std::vector<ConformalCDCWireHit*> ConformalCDCWireHitCreator::createConformalCDC
   }
   B2DEBUG(90, "In hit set are " << QuadTreeHitWrappers.size() << " hits.")
   return QuadTreeHitWrappers;
-}
-
-const CDCRecoHit3D ConformalCDCWireHitCreator::reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  ERightLeft rlInfo = ERightLeft::c_Right;
-  if (trackTrajectory2D.getDist2D(hit->getRefPos2D()) < 0)
-    rlInfo = ERightLeft::c_Left;
-  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getHit(), rlInfo);
-
-  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
 }

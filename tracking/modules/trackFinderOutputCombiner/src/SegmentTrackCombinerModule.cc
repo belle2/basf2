@@ -10,11 +10,9 @@ using namespace TrackFindingCDC;
 void SegmentTrackCombinerImplModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
                                               std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
-  const TrackQualityTools& qualityTools = TrackQualityTools::getInstance();
-
   // Resort the perpS information
   for (CDCTrack& track : tracks) {
-    qualityTools.normalizeHitsAndResetTrajectory(track);
+    TrackQualityTools::normalizeHitsAndResetTrajectory(track);
   }
 
   m_combiner.fillWith(tracks, segments);
@@ -27,7 +25,7 @@ void SegmentTrackCombinerImplModule::generate(std::vector<TrackFindingCDC::CDCRe
 
   // Resort the perpS information
   for (CDCTrack& track : tracks) {
-    qualityTools.normalizeHitsAndResetTrajectory(track);
+    TrackQualityTools::normalizeHitsAndResetTrajectory(track);
   }
 
   // Delete all taken segments

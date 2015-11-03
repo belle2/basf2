@@ -77,8 +77,6 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
 
 void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
 {
-
-  return;
   std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
   cdcTrackList.doForAllTracks([&assignedHits](CDCTrack & cand) {
     for (CDCRecoHit3D& recoHit : cand) {

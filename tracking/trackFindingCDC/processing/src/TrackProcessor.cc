@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
-#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
@@ -121,7 +121,7 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
     TrackQualityTools::normalizeTrack(track);
   });
 
-  HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
+  // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
 
   cdcTrackList.doForAllTracks([](CDCTrack & cand) {
     cand.forwardTakenFlag();

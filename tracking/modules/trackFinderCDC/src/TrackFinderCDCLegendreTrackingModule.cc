@@ -29,7 +29,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
-#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -75,8 +75,6 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
 {
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
   QuadTreePassCounter quadTreePassCounter;
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
@@ -141,7 +139,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
       TrackQuality trackQuality(track);
       HitProcessor::splitBack2BackTrack(track);
 
-      trackQualityTools.normalizeTrack(track);
+      TrackQualityTools::normalizeTrack(track);
       std::vector<const CDCWireHit*> hitsToSplit;
 
       for (CDCRecoHit3D& hit : track) {
@@ -165,7 +163,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Update tracks before storing to DataStore
   m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-    trackQualityTools.normalizeTrack(track);
+    TrackQualityTools::normalizeTrack(track);
   });
 
   // Remove bad tracks

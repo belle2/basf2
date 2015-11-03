@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/processing/TrackMerger.h>
 
-#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
@@ -32,8 +32,6 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 {
   if (track1 == track2) return;
 
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
   for (const CDCRecoHit3D& hit : track2) {
     const CDCRecoHit3D& cdcRecoHit3D  =  CDCRecoHit3D::reconstruct(hit.getRLWireHit(), track1.getStartTrajectory3D().getTrajectory2D());
 
@@ -41,11 +39,11 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
   }
   track2.clear();
 
-  trackQualityTools.normalizeTrack(track1);
+  TrackQualityTools::normalizeTrack(track1);
 
   std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track1);
 
-  trackQualityTools.normalizeTrack(track1);
+  TrackQualityTools::normalizeTrack(track1);
 
   TrackProcessor::addCandidateFromHitsWithPostprocessing(splittedHits, conformalCDCWireHitList, cdcTrackList);
 
@@ -151,11 +149,10 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
 
   B2DEBUG(100, "Merger: Resulting nCands = " << cdcTrackList.getCDCTracks().size());
 
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
   cdcTrackList.doForAllTracks([&](CDCTrack & track) {
 
     HitProcessor::unmaskHitsInTrack(track);
-    trackQualityTools.normalizeTrack(track);
+    TrackQualityTools::normalizeTrack(track);
 
 // const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO

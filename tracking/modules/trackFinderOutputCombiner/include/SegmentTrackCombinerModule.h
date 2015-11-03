@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
-#include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 
 #include <vector>
 

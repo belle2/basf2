@@ -52,18 +52,8 @@ namespace Belle2 {
      */
     class QuadTreeHitWrapperCreator {
     public:
-
-      /// Empty constructor does nothing.
-      QuadTreeHitWrapperCreator() { } ;
-
-      /// Do not copy this class.
-      QuadTreeHitWrapperCreator(const QuadTreeHitWrapperCreator& copy) = delete;
-
-      /// Do not copy this class.
-      QuadTreeHitWrapperCreator& operator=(const QuadTreeHitWrapperCreator&) = delete;
-
       /// Compile the hitList from the wire hit topology.
-      void initializeQuadTreeHitWrappers();
+      static void initializeQuadTreeHitWrappers(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Create CDCRecoHit3D.
       static const CDCRecoHit3D createRecoHit3D(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit);
@@ -115,6 +105,17 @@ namespace Belle2 {
 
     private:
       std::vector<ConformalCDCWireHit> m_QuadTreeHitWrappers; /**< Vector which hold axial hits. */
+
+    public:
+      /// Static only.
+      QuadTreeHitWrapperCreator() { } ;
+
+    private:
+      /// Do not copy this class.
+      QuadTreeHitWrapperCreator(const QuadTreeHitWrapperCreator& copy) = delete;
+
+      /// Do not copy this class.
+      QuadTreeHitWrapperCreator& operator=(const QuadTreeHitWrapperCreator&) = delete;
     };
   }
 }

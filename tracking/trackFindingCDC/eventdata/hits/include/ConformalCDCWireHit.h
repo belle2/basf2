@@ -57,10 +57,10 @@ namespace Belle2 {
       /** Check hit drift lenght; if it's greater than cell size return false
        * TODO: This is done using the CDCGeometry - better do this using the CDCWireTopology!
        * */
-      bool checkHitDriftLength();
+      bool checkHitDriftLength() const;
 
       /** Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength) */
-      std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0);
+      std::tuple<double, double, double> performConformalTransformWithRespectToPoint(double x0, double y0) const;
 
       CDCRecoSegment2D& getSegment() {return m_segment;};
 

@@ -70,7 +70,7 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
 
   B2DEBUG(100, "Initializing hits");
-  m_trackProcessor.getHitFactory().initializeQuadTreeHitWrappers();
+  QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers(m_conformalCDCWireHitList);
 }
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()

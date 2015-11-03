@@ -11,23 +11,15 @@
 #include <tracking/trackFindingCDC/creators/QuadTreeHitWrapperCreator.h>
 #include <tracking/trackFindingCDC/legendre/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-#include <cdc/dataobjects/CDCHit.h>
-
-
-#include <framework/datastore/StoreArray.h>
-
-#include <genfit/TrackCand.h>
-#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers()
+void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
   const std::vector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
 
   B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
@@ -35,16 +27,16 @@ void QuadTreeHitWrapperCreator::initializeQuadTreeHitWrappers()
     B2WARNING("cdcHitsCollection is empty!");
   }
 
-  m_QuadTreeHitWrappers.reserve(cdcWireHits.size());
+  conformalCDCWireHitList.reserve(cdcWireHits.size());
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
-    ConformalCDCWireHit QuadTreeHitWrapper(cdcWireHit);
-    if (QuadTreeHitWrapper.checkHitDriftLength() and QuadTreeHitWrapper.getCDCWireHit()->isAxial()) {
-      m_QuadTreeHitWrappers.push_back(std::move(QuadTreeHitWrapper));
+    conformalCDCWireHitList.emplace_back(cdcWireHit);
+    const ConformalCDCWireHit& newlyAddedHit = conformalCDCWireHitList.back();
+    if (not(newlyAddedHit.checkHitDriftLength() and newlyAddedHit.getCDCWireHit()->isAxial())) {
+      conformalCDCWireHitList.pop_back();
     }
   }
-  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_QuadTreeHitWrappers.size() << " axial.");
-
+  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << conformalCDCWireHitList.size() << " axial.");
 }
 
 

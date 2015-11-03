@@ -41,7 +41,7 @@ void ConformalCDCWireHit::performConformalTransformation()
 }
 
 
-std::tuple<double, double, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(double x0, double y0)
+std::tuple<double, double, double> ConformalCDCWireHit::performConformalTransformWithRespectToPoint(double x0, double y0) const
 {
   Vector2D twoDimensionalPosition = m_cdcWireHit->getRefPos2D() - Vector2D(x0, y0);
   double dominator = twoDimensionalPosition.normSquared() - m_cdcWireHit->getRefDriftLength() * m_cdcWireHit->getRefDriftLength();
@@ -53,7 +53,7 @@ std::tuple<double, double, double> ConformalCDCWireHit::performConformalTransfor
 }
 
 
-bool ConformalCDCWireHit::checkHitDriftLength()
+bool ConformalCDCWireHit::checkHitDriftLength() const
 {
   //Get the position of the hit wire from CDCGeometryParameters
   CDCGeometryPar& cdcg = CDCGeometryPar::Instance();

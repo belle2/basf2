@@ -22,7 +22,7 @@ main = create_path()
 
 # Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # random number for generation
@@ -75,7 +75,7 @@ display = register_module('Display')
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Test_10000_Sibidanov.root')
+ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Example.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 

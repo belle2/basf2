@@ -50,7 +50,7 @@ bool LocalDatabase::readDatabase()
   if (!fs::exists(m_fileName)) return true;
 
   // get lock for read access to database file
-  FileSystem::Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName, true);
   if (!lock.lock()) {
     B2ERROR("Locking of database file " << m_fileName << " failed.");
     return false;

@@ -86,9 +86,10 @@ std::string FileSystem::findFile(const string& path)
 }
 
 
-FileSystem::Lock::Lock(std::string fileName)
+FileSystem::Lock::Lock(std::string fileName, bool readonly)
 {
-  m_file = open(fileName.c_str(), O_RDWR | O_CREAT, 0640);
+  const int mode = readonly ? O_RDONLY : O_RDWR;
+  m_file = open(fileName.c_str(), mode | O_CREAT, 0640);
 }
 
 FileSystem::Lock::~Lock()

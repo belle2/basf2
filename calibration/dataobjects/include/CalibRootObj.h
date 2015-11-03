@@ -12,7 +12,6 @@
 #include <alignment/dataobjects/MilleData.h>
 #include <framework/pcore/MapMergeable.h>
 #include <calibration/dataobjects/RunRange.h>
-#include <memory>
 
 
 namespace Belle2 {
@@ -39,16 +38,15 @@ namespace Belle2 {
     virtual ~CalibRootObj()
     {
       for (auto obj : m_objects)
-        if (m_object) {
-          delete obj;
-        }
-
-      if (m_object) {
-        m_object.release();
-      }
+        delete obj;
 
       m_objects.clear();
       m_iovs.clear();
+
+      if (m_object) {
+        delete m_object;
+        m_object = nullptr;
+      }
     }
 
     /**
@@ -137,7 +135,13 @@ namespace Belle2 {
      */
     explicit CalibRootObj(T* object) : Mergeable()
     {
-      m_object.reset(object);
+      if (m_object) {
+        delete m_object;
+        m_object = nullptr;
+      }
+
+      object->SetDirectory(nullptr);
+      m_object = object;
     }
 
     /**
@@ -159,7 +163,7 @@ namespace Belle2 {
       if (std::find(m_iovs.begin(), m_iovs.end(), iov) != m_iovs.end())
         return;
 
-      // If our object was streamed out, i.e. when
+      // If our object was already streamed out, i.e. when
       // output file is reloaded, just create new empty object.
       // It should be anyway checked for number of entries
       // before usage. Continuing in filling should result in
@@ -167,11 +171,11 @@ namespace Belle2 {
       // Other Mergeables should probably work well as soon as they
       // need no constructor parameters.
       if (!m_object) {
-        m_object.reset(new T());
+        m_object = new T();
       }
 
       T* newobj = new T();
-      cloneObj(m_object.get(), newobj);
+      cloneObj(m_object, newobj);
 
       // Make unique name for named objects
       if (auto tnamed = dynamic_cast<TNamed*>(newobj)) {
@@ -242,7 +246,10 @@ namespace Belle2 {
 
     void replaceObject(T* newobj)
     {
-      m_object.reset(newobj);
+      if (m_object)
+        delete m_object;
+      newobj->SetDirectory(nullptr);
+      m_object = newobj;
     }
   private:
     /**
@@ -292,7 +299,7 @@ namespace Belle2 {
     /** List of IOVs for managed objects */
     std::vector<KeyType> m_iovs{};
     /** Template object used for later object creation */
-    std::unique_ptr<T> m_object{}; // Internal original object for making copies
+    T* m_object{nullptr}; // Internal original object for making copies
 
     ClassDef(CalibRootObj, 1) /**< Run dependent mergeable wrapper */
   };

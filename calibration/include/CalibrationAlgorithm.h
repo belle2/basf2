@@ -70,7 +70,7 @@ namespace Belle2 {
     std::vector<ExpRun> getRunListFromAllData();
 
     /// Runs calibration over list of runs
-    EResult execute(std::vector<ExpRun> runs, int iteration);
+    EResult execute(std::vector<ExpRun> runs = {}, int iteration = 1);
 
     /// Get constants (in TObjects) for database update from last calibration
     const std::list<Database::DBQuery>& getPayloads() const { return m_payloads; }

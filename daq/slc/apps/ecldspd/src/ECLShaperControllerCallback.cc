@@ -4,6 +4,7 @@
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Process.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <ecldaq/ecl_collector_lib.h>
@@ -68,15 +69,15 @@ throw(RCHandlerException)
   if (!m_forced) return;
   if (obj.hasObject("cols")) {
     const DBObject& o_cols(obj("cols"));
-    std::vector<PThread> ths;
+    std::vector<Process> prs;
     // loshp-all
     for (int col = o_cols.getInt("min");
          col <= o_cols.getInt("max"); col++) {
-      ths.push_back(PThread(new Load(col, obj), true, false));
+      prs.push_back(Process(new Load(col, obj)));
     }
-    for (std::vector<PThread>::iterator it = ths.begin();
-         it != ths.end(); it++) {
-      it->join();
+    for (std::vector<Process>::iterator it = prs.begin();
+         it != prs.end(); it++) {
+      it->wait();
     }
   }
   m_forced = false;

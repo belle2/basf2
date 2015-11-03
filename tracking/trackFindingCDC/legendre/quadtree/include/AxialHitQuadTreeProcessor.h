@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 

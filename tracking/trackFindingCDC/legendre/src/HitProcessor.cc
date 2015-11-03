@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -22,7 +22,6 @@
 #include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
 
 #include <TMath.h>
-#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
 
 using namespace std;
 

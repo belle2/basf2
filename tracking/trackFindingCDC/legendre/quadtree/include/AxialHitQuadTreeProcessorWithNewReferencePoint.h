@@ -10,7 +10,7 @@
 
 
 #pragma once
-#include "tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>

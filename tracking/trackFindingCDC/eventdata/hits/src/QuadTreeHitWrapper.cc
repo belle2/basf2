@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>

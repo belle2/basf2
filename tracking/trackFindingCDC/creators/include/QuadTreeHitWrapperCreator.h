@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include <tracking/trackFindingCDC/legendre/QuadTreeHitWrapper.h>
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>

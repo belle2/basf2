@@ -1,6 +1,6 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include "../../include/QuadTreeHitWrapper.h"
+#include <tracking/trackFindingCDC/eventdata/hits/QuadTreeHitWrapper.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

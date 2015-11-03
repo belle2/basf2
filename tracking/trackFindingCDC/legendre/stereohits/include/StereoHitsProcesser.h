@@ -30,7 +30,7 @@ namespace Belle2 {
      * Both quad trees are initialized and razed in the moment, although only the one for hits is used in the standard reconstruction.
      * This may change in the future.
      */
-    class StereohitsProcesser {
+    class StereoHitsProcesser {
     public:
       /** Prepare the hough algorithm: initialize the quad trees. */
       void initialize()

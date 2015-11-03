@@ -1,6 +1,6 @@
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/stereohits/StereohitsProcesser.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/StereoHitsProcesser.h>
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <vector>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
     bool m_param_useSegments = false; /**< Whether to use the segments or the hits in the quad tree. */
 
     /// Processor
-    TrackFindingCDC::StereohitsProcesser m_stereohitsProcesser; /**< The stereo quad tree processor to use. */
+    TrackFindingCDC::StereoHitsProcesser m_stereohitsProcesser; /**< The stereo quad tree processor to use. */
   };
 
 }

@@ -1,4 +1,4 @@
-#include <tracking/trackFindingCDC/legendre/stereohits/StereohitsProcesser.h>
+#include <tracking/trackFindingCDC/legendre/stereohits/StereoHitsProcesser.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -28,7 +28,7 @@ bool isValidStereoSegment(const CDCRecoSegment2D& segment)
   return not(segment.getStereoType() == StereoType::c_Axial or segment.isFullyTaken());
 }
 
-void StereohitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<const CDCRecoHit3D*>& hitsVector,
+void StereoHitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<const CDCRecoHit3D*>& hitsVector,
                                          const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const
 {
   Vector3D recoPos3D = rlWireHit.reconstruct3D(trackTrajectory);
@@ -51,7 +51,7 @@ void StereohitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vec
   hitsVector.push_back(newRecoHit);
 }
 
-void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment,
+void StereoHitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment,
                                              std::vector<const CDCRecoSegment3D*>& recoSegmentVector,
                                              const CDCTrajectory2D& trackTrajectory) const
 {
@@ -92,7 +92,7 @@ void StereohitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment,
 }
 
 
-void StereohitsProcesser::fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const
+void StereoHitsProcesser::fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getGlobalCircle().absRadius();
@@ -109,7 +109,7 @@ void StereohitsProcesser::fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsV
   }
 }
 
-void StereohitsProcesser::fillSegmentsVector(std::vector<const CDCRecoSegment3D*> recoSegmentsVector,
+void StereoHitsProcesser::fillSegmentsVector(std::vector<const CDCRecoSegment3D*> recoSegmentsVector,
                                              const std::vector<CDCRecoSegment2D>& segments, CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -128,7 +128,7 @@ void StereohitsProcesser::fillSegmentsVector(std::vector<const CDCRecoSegment3D*
   }
 }
 
-void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
+void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
 {
   // Reconstruct the hits to the track
   std::vector<const CDCRecoHit3D*> recoHits;
@@ -188,7 +188,7 @@ void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
 }
 
 
-void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments)
+void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments)
 {
   // Reconstruct the segments
   std::vector<const CDCRecoSegment3D*> recoSegments;
@@ -221,7 +221,7 @@ void StereohitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track, const std::
   }
 }
 
-void StereohitsProcesser::postprocessTrack(CDCTrack& track) const
+void StereoHitsProcesser::postprocessTrack(CDCTrack& track) const
 {
   const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 

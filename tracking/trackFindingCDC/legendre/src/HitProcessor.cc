@@ -335,13 +335,6 @@ void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
 
 }
 
-void HitProcessor::resetHits(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track.items()) {
-    hit->getWireHit().getAutomatonCell().setTakenFlag(false);
-  }
-}
-
 
 ESign HitProcessor::getChargeSign(CDCTrack& track)
 {
@@ -422,4 +415,19 @@ double HitProcessor::getPhi(const CDCRecoHit3D& hit)
     return phi;
   */
 }
+
+void HitProcessor::resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+{
+  for (ConformalCDCWireHit& hit : conformalCDCWireHitList) {
+    hit.setMaskedFlag(false);
+    hit.setUsedFlag(false);
+  }
+
+  for (CDCTrack& cdcTrack : cdcTracks) {
+    for (const CDCRecoHit3D& hit : cdcTrack) {
+      hit.getWireHit().getAutomatonCell().setTakenFlag(true);
+    }
+  }
+}
+
 

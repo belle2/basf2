@@ -19,7 +19,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void ConformalCDCWireHitCreator::initializeQuadTreeHitWrappers(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
+void ConformalCDCWireHitCreator::copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   const std::vector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
@@ -56,21 +56,6 @@ std::vector<ConformalCDCWireHit*> ConformalCDCWireHitCreator::createConformalCDC
   return QuadTreeHitWrappers;
 }
 
-
-const CDCRecoHit3D ConformalCDCWireHitCreator::reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D,
-    ConformalCDCWireHit* hit)
-{
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  ERightLeft rlInfo = ERightLeft::c_Right;
-  if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-    rlInfo = ERightLeft::c_Left;
-  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
-
-  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
-
-}
-
 const CDCRecoHit3D ConformalCDCWireHitCreator::reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
@@ -82,19 +67,4 @@ const CDCRecoHit3D ConformalCDCWireHitCreator::reconstructWireHit(const CDCTraje
 
   return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
 
-}
-
-void ConformalCDCWireHitCreator::resetMaskedHits(std::list<CDCTrack>& cdcTracks,
-                                                 std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
-{
-  for (ConformalCDCWireHit& hit : conformalCDCWireHitList) {
-    hit.setMaskedFlag(false);
-    hit.setUsedFlag(false);
-  }
-
-  for (CDCTrack& cdcTrack : cdcTracks) {
-    for (const CDCRecoHit3D& hit : cdcTrack) {
-      hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    }
-  }
 }

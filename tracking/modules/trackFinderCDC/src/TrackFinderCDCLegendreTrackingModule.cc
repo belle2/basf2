@@ -70,7 +70,7 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
 
   B2DEBUG(100, "Initializing hits");
-  ConformalCDCWireHitCreator::initializeQuadTreeHitWrappers(m_conformalCDCWireHitList);
+  ConformalCDCWireHitCreator::copyHitsFromTopology(m_conformalCDCWireHitList);
 }
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
@@ -82,7 +82,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
   do {
-    ConformalCDCWireHitCreator::resetMaskedHits(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
+    HitProcessor::resetMaskedHits(m_trackProcessor.getCDCTrackList(), m_conformalCDCWireHitList);
 
     // Create object which holds and generates parameters
     QuadTreeParameters quadTreeParameters(m_param_maxLevel, quadTreePassCounter.getPass());

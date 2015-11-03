@@ -81,12 +81,8 @@ namespace Belle2 {
       /** Fit track using position of the wire and 1/driftLength taken as weight.*/
       static CDCTrajectory2D fitWhithoutRecoPos(std::vector<const CDCWireHit*>& wireHits);
 
-      /**
-       * After the candidate-to-merge finding, some hits are marked as bad. This method resets them.
-       * @param track to reset
-       */
-      static void resetHits(CDCTrack& track);
-
+      /// Reset all masked hits.
+      static void resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
     };
   }
 }

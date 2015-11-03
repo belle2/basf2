@@ -39,10 +39,7 @@ namespace Belle2 {
     class ConformalCDCWireHitCreator {
     public:
       /// Compile the hitList from the wire hit topology.
-      static void initializeQuadTreeHitWrappers(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
-
-      /// Create CDCRecoHit3D.
-      static const CDCRecoHit3D reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, ConformalCDCWireHit* hit);
+      static void copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
       /// Create CDCRecoHit3D.
       static const CDCRecoHit3D reconstructWireHit(const CDCTrajectory2D& trackTrajectory2D, const CDCWireHit* hit);
@@ -55,9 +52,6 @@ namespace Belle2 {
       static std::vector<ConformalCDCWireHit*> createConformalCDCWireHitListForQT(std::vector<ConformalCDCWireHit>&
           conformalCDCWireHitList,
           bool useSegmentsOnly = false);
-
-      /// Reset all masked hits.
-      static void resetMaskedHits(std::list<CDCTrack>& cdcTracks, std::vector<ConformalCDCWireHit>& conformalCDCWireHitList);
 
     private:
       /// Static only.

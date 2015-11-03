@@ -1419,18 +1419,32 @@ bool SecMapTrainerWithSpacePointsModule::acceptHit(const SpacePoint* aSP, SecMap
 
   // catch hits which are on wrong detector
   Belle2::VXD::SensorInfoBase::SensorType detectorType = aSP->getType();
-  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::PXD and secMap->usePXD() == false) return false;
-  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::SVD and secMap->useSVD() == false) return false;
-  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::TEL and secMap->useTEL() == false) return false;
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::PXD and secMap->usePXD() == false) {
+    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type PXD")
+    return false;
+  }
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::SVD and secMap->useSVD() == false) {
+    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type SVD")
+    return false;
+  }
+  if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::TEL and secMap->useTEL() == false) {
+    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type TEL")
+    return false;
+  }
 
   // catch hits which are out of range
   if (secMap->getAcceptedRegionForSensors().first > 0) {
-    if ((aSP->getPosition() - m_origin).Mag() < secMap->getAcceptedRegionForSensors().first) return false;
+    if ((aSP->getPosition() - m_origin).Mag() < secMap->getAcceptedRegionForSensors().first) {
+      B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (below lower threshold)")
+      return false;
+    }
   }
   if (secMap->getAcceptedRegionForSensors().second > 0) {
-    if ((aSP->getPosition() - m_origin).Mag() > secMap->getAcceptedRegionForSensors().second) return false;
+    if ((aSP->getPosition() - m_origin).Mag() > secMap->getAcceptedRegionForSensors().second) {
+      B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (above upper threshold)")
+      return false;
+    }
   }
-
   // passed all tests
   return true;
 } /**< for given hit and sectorMap, the function returns true, if hit is accepted and false if not */
@@ -1444,14 +1458,23 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
 {
 
   // catch wrong pT-range
-  if (secMap->acceptPt(currentTC->getMomSeed().Perp()) == false) return false;
+  if (secMap->acceptPt(currentTC->getMomSeed().Perp()) == false) {
+    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong pT")
+    return false;
+  }
 
   // catch wrong charge
   if (m_filterCharges != 0) {
     if (std::abs(currentTC->getPdgCode()) > 10 and std::abs(currentTC->getPdgCode()) < 16) { // catch leptons
-      if (boost::math::sign(currentTC->getPdgCode()) == boost::math::sign(m_filterCharges)) return false;
+      if (boost::math::sign(currentTC->getPdgCode()) == boost::math::sign(m_filterCharges)) {
+        B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong lepton charge")
+        return false;
+      }
     } else {
-      if (boost::math::sign(currentTC->getPdgCode()) != boost::math::sign(m_filterCharges)) return false;
+      if (boost::math::sign(currentTC->getPdgCode()) != boost::math::sign(m_filterCharges)) {
+        B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong hadron charge")
+        return false;
+      }
     }
   }
 
@@ -1461,10 +1484,17 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   // catch tracks which start too far away from orign
   if (currentTC->getPosSeed().Perp() > m_PARAMmaxXYvertexDistance
       or
-      std::abs(currentTC->getPosSeed().Z()) > m_PARAMmaxZvertexDistance) return false;
+      std::abs(currentTC->getPosSeed().Z()) > m_PARAMmaxZvertexDistance) {
+    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to bad seed position")
+    return false;
+  }
 
   // catch tracks which are too short in any case
-  if (currentTC->getNHits() < m_PARAMminTrackletLength) return false;
+  if (currentTC->getNHits() < m_PARAMminTrackletLength) {
+    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough hits (" <<
+            currentTC->getNHits() << ")")
+    return false;
+  }
 
   // catch stuff which depends on single hits
   unsigned int nGoodHits = 0;
@@ -1473,7 +1503,11 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   }
 
   // catch tracks which are too short because of hit-specific cuts
-  if (nGoodHits < m_PARAMminTrackletLength) return false;
+  if (nGoodHits < m_PARAMminTrackletLength) {
+    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough good hits (" <<
+            nGoodHits << ")")
+    return false;
+  }
 
   // pass all tests
   return true;

@@ -20,13 +20,15 @@ beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 numTracks = 1
-numEvents = 5000
+numEvents = 15000
 initialValue = 0  # want random events
+usePXD = True
+checkTH = True
 
 fieldValue = 0.  # expected magnetic field in Tesla
 # parameters for the secMap-calculation:
-pTcuts = [1., 1.5]
-setupFileName = 'testBeamMini6GeVJune08'
+pTcuts = [1.5]
+setupFileName = 'testbeamTest3Nov2015'
 
 if fieldOn:
     fieldValue = 1.
@@ -128,23 +130,22 @@ print(
         theSeed=initialValue))
 print('')
 
-filterCalc = register_module('FilterCalculator')
+filterCalc = register_module('SecMapTrainerWithSpacePoints')
+# filterCalc = register_module('FilterCalculator')
 filterCalc.logging.log_level = LogLevel.INFO
 filterCalc.logging.debug_level = 10
-param_fCalc = {  # currently accepted: PXD, SVD, TEL
-                 # 2?
+param_fCalc = {
     'detectorType': ['PXD', 'SVD'],
     'acceptedRegionForSensors': [-1, -1],
     'maxXYvertexDistance': 200.,
-    'tracksPerEvent': numTracks,
-    'useEvtgen': 0,
+    'maxZvertexDistance': 200,
     'pTcuts': pTcuts,
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
     'setOrigin': [gun_x_position * 0.4, 0., 0.],
     'magneticFieldStrength': fieldValue,
-    'testBeam': 1,
+    'testBeam': 2,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
     'rootFileName': [setupFileName, 'UPDATE'],
@@ -152,25 +153,25 @@ param_fCalc = {  # currently accepted: PXD, SVD, TEL
     'smearHits': 1,
     'uniSigma': 0.3,
     'noCurler': 1,
+    'spTCarrayName': 'checkedSPTCs',
 }
 filterCalc.param(param_fCalc)
 
-filterCalc2 = register_module('FilterCalculator')
+filterCalc2 = register_module('SecMapTrainerWithSpacePoints')
 filterCalc2.logging.log_level = LogLevel.INFO
-filterCalc2.logging.debug_level = 10
+filterCalc2.logging.debug_level = 100
 param_fCalc2 = {
     'detectorType': ['SVD'],
     'acceptedRegionForSensors': [-1, -1],
     'maxXYvertexDistance': 200.,
-    'tracksPerEvent': numTracks,
-    'useEvtgen': 0,
+    'maxZvertexDistance': 200,
     'pTcuts': pTcuts,
     'highestAllowedLayer': 6,
     'sectorConfigU': secConfigU,
     'sectorConfigV': secConfigV,
     'setOrigin': [gun_x_position * 0.4, 0., 0.],
     'magneticFieldStrength': fieldValue,
-    'testBeam': 1,
+    'testBeam': 2,
     'secMapWriteToRoot': 1,
     'secMapWriteToAscii': 0,
     'rootFileName': [setupFileName, 'UPDATE'],
@@ -178,18 +179,112 @@ param_fCalc2 = {
     'smearHits': 1,
     'uniSigma': 0.3,
     'noCurler': 1,
+    'spTCarrayName': 'checkedSPTCs',
 }
 filterCalc2.param(param_fCalc2)
 
+
 # using one export module only
-exportXML = register_module('ExportSectorMap')
+exportXML = register_module('RawSecMapMergerWithSpacePoints')
 exportXML.logging.log_level = LogLevel.DEBUG
-exportXML.logging.debug_level = 30
+exportXML.logging.debug_level = 10
 exportXML.param('rootFileName', setupFileName)
+exportXML.param('sortByDistance2origin', True)
+
+
+doPXD = 0
+if usePXD:
+    doPXD = 1
+mctrackfinder = register_module('TrackFinderMCTruth')
+mctrackfinder.logging.log_level = LogLevel.INFO
+param_mctrackfinder = {
+    'UseCDCHits': 0,
+    'UseSVDHits': 1,
+    'UsePXDHits': doPXD,
+    'Smearing': 0,
+    'UseClusters': True,
+    'MinimalNDF': 6,
+    'WhichParticles': ['primary'],
+    'GFTrackCandidatesColName': 'mcTracks',
+}
+mctrackfinder.param(param_mctrackfinder)
+
+spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD.logging.log_level = LogLevel.INFO
+spCreatorSVD.logging.debug_level = 5
+param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
+                      'NameOfInstance': 'couplesClusters',
+                      'SpacePoints': 'nosingleSP'}
+spCreatorSVD.param(param_spCreatorSVD)
+
+spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD.logging.log_level = LogLevel.INFO
+spCreatorPXD.logging.debug_level = 5
+spCreatorPXD.param('NameOfInstance', 'pxdOnly')
+spCreatorPXD.param('SpacePoints', 'pxdOnly')
+
+
+sp2thConnector = register_module('SpacePoint2TrueHitConnector')
+sp2thConnector.logging.log_level = LogLevel.WARNING
+param_sp2thConnector = {
+    'DetectorTypes': ['PXD', 'SVD'],
+    'TrueHitNames': ['', ''],
+    'ClusterNames': ['', ''],
+    'SpacePointNames': ['pxdOnly', 'nosingleSP'],
+    'outputSuffix': '_relTH',
+    'storeSeperate': False,
+    'registerAll': False,
+    'maxGlobalPosDiff': 0.05,
+    'maxPosSigma': 5,
+    'minWeight': 0,
+    'requirePrimary': True,
+    'positionAnalysis': False,
+}
+sp2thConnector.param(param_sp2thConnector)
+
+
+# TCConverter, genfit -> SPTC
+trackCandConverter = register_module('GFTC2SPTCConverter')
+trackCandConverter.logging.log_level = LogLevel.INFO
+param_trackCandConverterReference = {
+    'genfitTCName': 'mcTracks',
+    'SpacePointTCName': 'SPTracks',
+    'NoSingleClusterSVDSP': 'nosingleSP',
+    'PXDClusterSP': 'pxdOnly',
+    'checkTrueHits': checkTH,
+    'useSingleClusterSP': False,
+    'checkNoSingleSVDSP': True,
+}
+trackCandConverter.param(param_trackCandConverterReference)
+
+
+# SpacePointTrackCand referee
+sptcReferee = register_module('SPTCReferee')
+sptcReferee.logging.log_level = LogLevel.INFO
+param_sptcReferee = {
+    'sptcName': 'SPTracks',
+    'newArrayName': 'checkedSPTCs',
+    'storeNewArray': True,
+    'checkCurling': False,
+    'splitCurlers': False,
+    'keepOnlyFirstPart': True,
+    'kickSpacePoint': True,  # not necessarily essential -> alternatve: check and filter in SecMapTrainerBase
+    'checkSameSensor': True,
+    'useMCInfo': True,
+}
+sptcReferee.param(param_sptcReferee)
+
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 250)
+
+pxdDigitizer = register_module('PXDDigitizer')
+svdDigitizer = register_module('SVDDigitizer')
+pxdClusterizer = register_module('PXDClusterizer')
+svdClusterizer = register_module('SVDClusterizer')
+
+log_to_file('createSecMapForVXDTF/events_' + str(initialValue) + '/' + str(numEvents) + '.txt', append=False)
 
 # Create paths
 main = create_path()
@@ -202,11 +297,23 @@ main.add_module(geometry)
 main.add_module(particlegun)
 main.add_module(g4sim)
 
+main.add_module(pxdDigitizer)
+main.add_module(svdDigitizer)
+main.add_module(pxdClusterizer)
+main.add_module(svdClusterizer)
 main.add_module(eventCounter)
+main.add_module(spCreatorPXD)
+main.add_module(spCreatorSVD)
+main.add_module(mctrackfinder)
+
+main.add_module(exportXML)
+
+main.add_module(sp2thConnector)
+main.add_module(trackCandConverter)
+main.add_module(sptcReferee)
 main.add_module(filterCalc)
 main.add_module(filterCalc2)
 
-main.add_module(exportXML)
 # Process events
 process(main)
 

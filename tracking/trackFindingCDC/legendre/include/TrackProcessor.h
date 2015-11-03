@@ -45,7 +45,7 @@ namespace Belle2 {
       /// Assign new hits to all tracks (using assignNewHits(CDCTrack&) method)
       static void assignNewHits(const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
 
-      /// Check the p-values of the tracks. If they are below the given value, delete all hits of the track (which means: do not use this track later).
+      /// Check the p-values of the tracks. If they are below the given value, delete the track from the list.
       static void deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
 
       /// Perform all track postprocessing.
@@ -78,7 +78,7 @@ namespace Belle2 {
       static double calculateChi2ForQuantile(double alpha, double n);
 
       /// Check track quality -- currently based on number of hits only.
-      static bool checkTrackQuality(const CDCTrack& track);
+      static bool checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcTrackList);
     };
   }
 }

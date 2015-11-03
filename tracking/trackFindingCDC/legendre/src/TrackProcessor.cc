@@ -62,74 +62,50 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<Conform
   TrackQualityTools::normalizeTrack(track);
 
   HitProcessor::splitBack2BackTrack(track);
-  if (not checkTrackQuality(track)) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.getCDCTracks().remove(track);
+  TrackQualityTools::normalizeTrack(track);
+  if (not checkTrackQuality(track, cdcTrackList)) {
     return;
   }
-
-  TrackQualityTools::normalizeTrack(track);
 
   deleteHitsFarAwayFromTrajectory(track);
   TrackQualityTools::normalizeTrack(track);
-
-  if (not checkTrackQuality(track)) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.getCDCTracks().remove(track);
+  if (not checkTrackQuality(track, cdcTrackList)) {
     return;
   }
 
+  assignNewHitsToTrack(track, conformalCDCWireHitList);
   TrackQualityTools::normalizeTrack(track);
 
-  assignNewHitsToTrack(track, conformalCDCWireHitList);
-
-  //  B2INFO("split");
   HitProcessor::splitBack2BackTrack(track);
-  if (not checkTrackQuality(track)) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.getCDCTracks().remove(track);
+  TrackQualityTools::normalizeTrack(track);
+  if (not checkTrackQuality(track, cdcTrackList)) {
     return;
   }
-
-  TrackQualityTools::normalizeTrack(track);
 
   deleteHitsFarAwayFromTrajectory(track);
   TrackQualityTools::normalizeTrack(track);
-
-  if (not checkTrackQuality(track)) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.getCDCTracks().remove(track);
+  if (not checkTrackQuality(track, cdcTrackList)) {
     return;
   }
 
-  TrackQualityTools::normalizeTrack(track);
-
   assignNewHitsToTrack(track, conformalCDCWireHitList);
-
   TrackQualityTools::normalizeTrack(track);
 
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-
+  HitProcessor::unmaskHitsInTrack(track);
 }
 
-bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
+bool TrackProcessor::checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcTrackList)
 {
-  return track.size() >= 5;
+  if (track.size() < 5) {
+    for (const CDCRecoHit3D& hit : track) {
+      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
+    }
+    cdcTrackList.getCDCTracks().remove(track);
+    return false;
+  }
+
+  return true;
 }
 
 void TrackProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximum_distance)
@@ -151,24 +127,19 @@ void TrackProcessor::assignNewHits(const std::vector<ConformalCDCWireHit>& confo
     return track.size() == 0;
   }) , cdcTrackList.getCDCTracks().end());
 
-
-//  for (CDCTrack& track : m_cdcTracks) {
   cdcTrackList.doForAllTracks([&](CDCTrack & track) {
 
     if (track.size() < 4) return;
 
     assignNewHitsToTrack(track, conformalCDCWireHitList);
-
-    std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track);
-
-    addCandidateWithHits(removedHits, conformalCDCWireHitList, cdcTrackList);
-
-    //  B2INFO("update");
     TrackQualityTools::normalizeTrack(track);
 
-    //  B2INFO("delete");
-    deleteHitsFarAwayFromTrajectory(track);
+    std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track);
+    TrackQualityTools::normalizeTrack(track);
 
+    addCandidateWithHits(splittedHits, conformalCDCWireHitList, cdcTrackList);
+
+    deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
   });
 
@@ -200,22 +171,18 @@ void TrackProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<Con
       cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
     }
   }
-
-  TrackQualityTools::normalizeTrack(track);
 }
 
 void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
 {
-  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+  cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
+  cdcTrackList.getCDCTracks().end(), [&](CDCTrack & track) {
     const CDCTrajectory2D& fittedTrajectory = HitProcessor::fitWhithoutRecoPos(track);
     const double chi2 = fittedTrajectory.getChi2();
     const int dof = track.size() - 4;
 
-    if (TMath::Prob(chi2, dof) < minimal_probability_for_good_fit) {
-      // Remove all hits = delete the track.
-      track.clear();
-    }
-  });
+    return TMath::Prob(chi2, dof) < minimal_probability_for_good_fit;
+  }), cdcTrackList.getCDCTracks().end());
 }
 
 

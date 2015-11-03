@@ -32,9 +32,9 @@ main.add_module(roinput)
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
-# Geometry (only TOP is needed)
+# Geometry (only TOP is needed and B-field)
 geometry = register_module('Geometry')
-geometry.param('components', ['TOP'])
+geometry.param('components', ['MagneticField', 'TOP'])
 main.add_module(geometry)
 
 # Output: make flat ntuple from TOPLikelihoods, tracking info and MC truth

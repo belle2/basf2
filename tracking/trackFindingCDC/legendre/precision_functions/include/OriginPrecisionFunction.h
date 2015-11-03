@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/precision_functions/BasePrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precision_functions/BasePrecisionFunction.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -19,30 +19,30 @@ namespace Belle2 {
      * Basic function for checking quadtree's node "r" boundaries:
      * when used in quadtree processor marks nodes at lvl==13 as leafs
      */
-    class NonOriginPrecisionFunction : public BasePrecisionFunction {
+    class OriginPrecisionFunction : public BasePrecisionFunction {
 
     public:
 
-      NonOriginPrecisionFunction()
+      OriginPrecisionFunction()
       {
         m_function = [&](double r_qt) -> double {
           double res;
+          //TODO: bug is here!
           if ((convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
             r_qt = fabs(convertPtToRho(3.)) * r_qt / fabs(r_qt);
 
           if (r_qt != 0)
-            if (convertRhoToPt(fabs(r_qt)) < 0.36)
-              res = exp(-0.356965 - 0.00186066 * convertRhoToPt(fabs(r_qt))) - 0.697526;
-            else
-              res = exp(-0.357335 + 0.000438872 * convertRhoToPt(fabs(r_qt))) - 0.697786;
+            res = exp(-16.1987 * convertRhoToPt(fabs(r_qt)) - 5.96206)
+            + 0.000190872 - 0.0000739319 * convertRhoToPt(fabs(r_qt));
+
           else
             res = 0.00005;
-          B2DEBUG(100, "non origin: res = " << res << "; r = " << r_qt);
+          /*10.5 - 0.24 * exp(-4.13118 * convertRhoToPt(curv) + 2.74);*/
+          B2DEBUG(100, "origin: res = " << res << "; r = " << r_qt);
           return res;
         };
       };
 
-      virtual ~NonOriginPrecisionFunction() {};
 
 
     };

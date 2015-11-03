@@ -11,19 +11,19 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreTrackingModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/legendre/TrackMerger.h>
-#include <tracking/trackFindingCDC/legendre/ConformalExtension.h>
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/ConformalExtension.h>
 
-#include <tracking/trackFindingCDC/legendre/QuadTreeCandidateFinder.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeCandidateFinder.h>
 
-#include <tracking/trackFindingCDC/legendre/TrackQuality.h>
+#include <tracking/trackFindingCDC/processing/TrackQuality.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
-#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/legendre/QuadTreeNodeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
 
 
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>

@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
 #include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
-#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -132,14 +132,17 @@ void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackLis
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
 
-  cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
-  cdcTrackList.getCDCTracks().end(), [&](CDCTrack & track) {
+  const auto& checkProbability = [&](CDCTrack & track) {
     const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(track);
     const double chi2 = fittedTrajectory.getChi2();
     const int dof = track.size() - 4;
 
     return TMath::Prob(chi2, dof) < minimal_probability_for_good_fit;
-  }), cdcTrackList.getCDCTracks().end());
+  };
+
+  cdcTrackList.getCDCTracks().erase(
+    std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(), checkProbability),
+    cdcTrackList.getCDCTracks().end());
 }
 
 

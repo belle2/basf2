@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/TrackMerger.h>
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
 
 #include <tracking/trackFindingCDC/quality/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
-#include <tracking/trackFindingCDC/legendre/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
-#include <tracking/trackFindingCDC/legendre/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -43,19 +43,17 @@ void TrackMerger::mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vec
 
   trackQualityTools.normalizeTrack(track1);
 
-  std::vector<const CDCWireHit*> removedHits = HitProcessor::splitBack2BackTrack(track1);
+  std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track1);
 
   trackQualityTools.normalizeTrack(track1);
 
-  TrackProcessor::addCandidateFromHitsWithPostprocessing(removedHits, conformalCDCWireHitList, cdcTrackList);
+  TrackProcessor::addCandidateFromHitsWithPostprocessing(splittedHits, conformalCDCWireHitList, cdcTrackList);
 
 }
 
 void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<ConformalCDCWireHit>& conformalCDCWireHitList,
                                   double minimum_probability_to_be_merged)
 {
-  const TrackQualityTools& trackQualityTools = TrackQualityTools::getInstance();
-
   // Search for best matches
   for (std::list<CDCTrack>::iterator it1 = cdcTrackList.getCDCTracks().begin(); it1 !=  cdcTrackList.getCDCTracks().end(); ++it1) {
     std::list<CDCTrack>::iterator it2 = it1;
@@ -68,13 +66,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
       CDCTrack& track2 = *it2;
 
-      HitProcessor::unmaskHitsInTrack(track1);
-      HitProcessor::unmaskHitsInTrack(track2);
-
       double probTemp = doTracksFitTogether(track1, track2);
-
-      HitProcessor::unmaskHitsInTrack(track1);
-      HitProcessor::unmaskHitsInTrack(track2);
 
       if (probTemp > prob) {
         prob = probTemp;
@@ -85,7 +77,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
     if (prob > minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate, conformalCDCWireHitList, cdcTrackList);
-      trackQualityTools.normalizeTrack(*bestCandidate);
+      TrackQualityTools::normalizeTrack(*bestCandidate);
 //      const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
     }
@@ -190,6 +182,9 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*
 
 double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
+  HitProcessor::unmaskHitsInTrack(track1);
+  HitProcessor::unmaskHitsInTrack(track2);
+
   // Build common hit list by copying the wire hits into one large list (we use the wire hits here as we do not want hem to bring
   // their "old" reconstructed position when fitting later.
   std::vector<const CDCWireHit*> commonHitListOfTwoTracks;
@@ -201,17 +196,12 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   }
 
   // Sorting is done via pointer addresses (!!). This is not very stable and also not very meaningful (in terms of physical meaning),
-  // but it does the job.
+  // but it does the job for later unique.
   std::sort(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end());
 
   commonHitListOfTwoTracks.erase(
     std::unique(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end()),
     commonHitListOfTwoTracks.end());
-
-  for (const CDCWireHit* hit : commonHitListOfTwoTracks) {
-    hit->getAutomatonCell().setTakenFlag(true);
-    hit->getAutomatonCell().setMaskedFlag(false);
-  }
 
   // Calculate track parameters
   CDCTrajectory2D commonTrajectory;
@@ -228,6 +218,9 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
   commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
+
+  HitProcessor::unmaskHitsInTrack(track1);
+  HitProcessor::unmaskHitsInTrack(track2);
 
 //TODO: perform B2B tracks check
 //if B2B return 0;

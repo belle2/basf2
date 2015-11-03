@@ -76,7 +76,7 @@ namespace Belle2 {
       /// Get maxlevel of quadtree
       int getMaxLevel()
       {
-        if ((m_legendreFindingPass == LegendreFindingPass::NonCurlers))
+        if (m_legendreFindingPass == LegendreFindingPass::NonCurlers)
           return m_maxLevel;
         else
           return m_maxLevel - 2;

@@ -75,9 +75,16 @@ def main():
                                  nargs="?", default="TrackingValidation.root",
                                  help='Name of the output file used to store the validation plots.')
 
-    argument_parser.add_argument('-m', '--module', type=str, choices=['TrackFinderCDCAutomaton', 'CDCLegendreTracking', 'FullReco'],
-                                 default='FullReco',
-                                 help='Track finding module or FullReco for the full reconstruction chain.')
+    argument_parser.add_argument(
+        '-m',
+        '--module',
+        type=str,
+        choices=[
+            'TrackFinderCDCAutomaton',
+            'TrackFinderCDCLegendreTracking',
+            'FullReco'],
+        default='FullReco',
+        help='Track finding module or FullReco for the full reconstruction chain.')
 
     arguments = argument_parser.parse_args()
 

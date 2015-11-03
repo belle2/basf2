@@ -104,7 +104,7 @@ particleGunModule.param({
 })
 
 # Put your track finder here
-trackFinderModule = register_module('CDCLegendreTracking')
+trackFinderModule = register_module('TrackFinderCDCLegendreTracking')
 
 # Reference Monte Carlo tracks
 trackFinderMCTruthModule = register_module('TrackFinderMCTruth')

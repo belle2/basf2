@@ -24,7 +24,7 @@ from tracking.validation.run import TrackingValidationRun
 class CDCLegendre(TrackingValidationRun):
     n_events = N_EVENTS
     generator_module = 'EvtGenInput'
-    finder_module = 'CDCLegendreTracking'
+    finder_module = 'TrackFinderCDCLegendreTracking'
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

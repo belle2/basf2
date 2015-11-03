@@ -107,7 +107,7 @@ cdcDigitizer.param({
 wirehittopologypreparer = register_module('WireHitTopologyPreparer')
 
 # TrackFinderCDCLegendre
-cdctracking = register_module('CDCLegendreTracking')
+cdctracking = register_module('TrackFinderCDCLegendreTracking')
 
 # Display module
 display_module = CDCSVGDisplayModule()

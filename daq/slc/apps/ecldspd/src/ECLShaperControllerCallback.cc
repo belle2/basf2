@@ -5,6 +5,9 @@
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Process.h>
+
+#include <daq/slc/nsm/NSMCommunicator.h>
+
 #include <daq/slc/base/StringUtil.h>
 
 #include <ecldaq/ecl_collector_lib.h>
@@ -37,6 +40,18 @@ void ECLShaperControllerCallback::boot(const DBObject& obj)
 throw(RCHandlerException)
 {
   if (obj.hasObject("cols")) {
+    NSMNode node("ECL01");
+    if (NSMCommunicator::send(NSMMessage(node, RCCommand::BOOT))) {
+      try {
+        wait(node, RCCommand::OK, 10);
+      } catch (const TimeoutException& e) {
+        LogFile::warning("%s %s:%d", e.what(), __FILE__, __LINE__);
+      } catch (const IOException& e) {
+        LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
+      }
+    } else {
+      LogFile::warning("%s is down.", node.getName().c_str());
+    }
     const DBObject& o_cols(obj("cols"));
     std::vector<PThread> ths;
     // loshf-all

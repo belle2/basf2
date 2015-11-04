@@ -359,8 +359,9 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
                       script.c_str());
     m_con.addArgument(obj.getText("hostname"));
     std::string copperid_s = obj.getText("copperid");
-    int copperid = atoi(copperid_s.substr(4).c_str());
-    int detectorid = atoi(copperid_s.substr(3).c_str()) / 1000;
+    int id = atoi(copperid_s.substr(3).c_str());
+    int copperid = id % 1000;//atoi(copperid_s.substr(4).c_str());
+    int detectorid = id / 1000;
     char str[64];
     sprintf(str, "0x%d000000", detectorid);
     copperid += strtol(str, NULL, 0);

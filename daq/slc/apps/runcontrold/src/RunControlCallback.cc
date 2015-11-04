@@ -153,6 +153,12 @@ void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
   }
 }
 
+void RunControlCallback::boot(const DBObject& obj) throw(RCHandlerException)
+{
+  m_runno.setConfig(obj.getName());
+  distribute(NSMMessage(RCCommand::BOOT));
+}
+
 void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
   obj.print();
@@ -480,7 +486,8 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
       if (cmd == RCCommand::CONFIGURE)
         m_msg.setData(node.getConfig());
       try {
-        if (cmd == RCCommand::LOAD) {
+        if (cmd == RCCommand::LOAD ||
+            cmd == RCCommand::BOOT) {
           while (node.isSequential() &&
                  !m_callback.check(node.getName(), RCState::READY_S)) {
             try {

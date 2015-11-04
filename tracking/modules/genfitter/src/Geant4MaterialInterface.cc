@@ -28,10 +28,16 @@ namespace Belle2 {
     // Not inheriting from G4Navigator because CheckNextStep is not
     // virtual.
   public:
-    G4SafeNavigator() : dX_(0), dY_(0), dZ_(0) {}
-    ~G4SafeNavigator() {}
+    G4SafeNavigator() = default;
+    ~G4SafeNavigator() = default;
 
-    void SetWorldVolume(G4VPhysicalVolume* pWorld);
+    G4VPhysicalVolume* GetWorldVolume() const { return nav_.GetWorldVolume(); }
+    void SetWorldVolume(G4VPhysicalVolume* pWorld)
+    {
+      nav_.SetWorldVolume(pWorld);
+      worldsolid_ = pWorld->GetLogicalVolume()->GetSolid();
+    }
+
     G4VPhysicalVolume* LocateGlobalPointAndSetup(const G4ThreeVector& point,
                                                  const G4ThreeVector* direction = 0,
                                                  const G4bool pRelativeSearch = true,
@@ -50,74 +56,61 @@ namespace Belle2 {
       return nav_.CreateTouchableHistory();
     }
   private:
-    void limitToWorld(G4ThreeVector& p, G4ThreeVector& d) const;
-
-    // Half-sizes of the world volume, assumed to be a G4Box;
-    double dX_, dY_, dZ_;
+    G4ThreeVector lastpoint_;
+    G4VPhysicalVolume* lastvolume_{0};
     G4Navigator nav_;
+    const G4VSolid* worldsolid_{0};
   };
 }
-
-void
-G4SafeNavigator::limitToWorld(G4ThreeVector& p, G4ThreeVector& d) const
-{
-  if (fabs(p.x()) >= dX_)
-    p.setX(0);
-  if (fabs(p.y()) >= dY_)
-    p.setY(0);
-  if (fabs(p.z()) >= dZ_)
-    p.setZ(0);
-
-  if (std::isnan(d.x()) || std::isnan(d.y()) || std::isnan(d.z())) {
-    B2WARNING("nan in direction in G4SafeNavigator::limitToWorld");
-    d.set(1., 0., 0.);
-  } else {
-    d.setMag(1.);
-  }
-}
-
-void G4SafeNavigator::SetWorldVolume(G4VPhysicalVolume* pWorld)
-{
-  G4Box* box = dynamic_cast<G4Box*>(pWorld->GetLogicalVolume()->GetSolid());
-  assert(box && "World volume a G4Box?");
-  dX_ = box->GetXHalfLength();
-  dY_ = box->GetYHalfLength();
-  dZ_ = box->GetZHalfLength();
-  nav_.SetWorldVolume(pWorld);
-}
-
 
 G4VPhysicalVolume* G4SafeNavigator::LocateGlobalPointAndSetup(const G4ThreeVector& point,
     const G4ThreeVector* direction,
     const G4bool pRelativeSearch,
     const G4bool ignoreDirection)
 {
-  G4ThreeVector p(point);
-  assert(direction);
-  G4ThreeVector dir(*direction);
-  limitToWorld(p, dir);
-  return nav_.LocateGlobalPointAndSetup(p, &dir, pRelativeSearch, ignoreDirection);
+  if (point == lastpoint_ && lastvolume_) {
+    return lastvolume_;
+  }
+  //B2INFO("###  init: " << point);
+  G4VPhysicalVolume* volume = nav_.LocateGlobalPointAndSetup(point, direction, pRelativeSearch, ignoreDirection);
+  if (!volume) {
+    volume = nav_.GetWorldVolume();
+  }
+  // remember last point to speed up setup if possible
+  lastpoint_ = point;
+  lastvolume_ = volume;
+  return volume;
 }
 
 G4VPhysicalVolume* G4SafeNavigator::ResetHierarchyAndLocate(const G4ThreeVector& point,
                                                             const G4ThreeVector& direction,
                                                             const G4TouchableHistory& h)
 {
-  G4ThreeVector p(point);
-  G4ThreeVector dir(direction);
-  limitToWorld(p, dir);
-  return nav_.ResetHierarchyAndLocate(p, dir, h);
+  if (point == lastpoint_ && lastvolume_) {
+    return lastvolume_;
+  }
+  //B2INFO("### reset: " << point);
+  G4VPhysicalVolume* volume = nav_.ResetHierarchyAndLocate(point, direction, h);
+  if (!volume) {
+    volume = nav_.GetWorldVolume();
+  }
+  // remember last point to speed up setup if possible
+  lastpoint_ = point;
+  lastvolume_ = volume;
+  return volume;
 }
 
-G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& pGlobalPoint,
-                                        const G4ThreeVector& pDirection,
+G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& point,
+                                        const G4ThreeVector& direction,
                                         const G4double pCurrentProposedStepLength,
                                         G4double& pNewSafety)
 {
-  G4ThreeVector p(pGlobalPoint);
-  G4ThreeVector dir(pDirection);
-  limitToWorld(p, dir);
-  return nav_.CheckNextStep(p, dir, pCurrentProposedStepLength, pNewSafety);
+  //make sure we're inside the world volume
+  if (worldsolid_->Inside(point) == kOutside) {
+    pNewSafety = worldsolid_->DistanceToIn(point);
+    return worldsolid_->DistanceToIn(point, direction);
+  }
+  return nav_.CheckNextStep(point, direction, pCurrentProposedStepLength, pNewSafety);
 }
 
 
@@ -139,13 +132,7 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
 {
   G4ThreeVector pos(posX * CLHEP::cm, posY * CLHEP::cm, posZ * CLHEP::cm);
   G4ThreeVector dir(dirX, dirY, dirZ);
-  const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir, false, false);
-  if (!newVolume) {
-    genfit::Exception exc("Geant4MaterialInterface: newVolume == 0", __LINE__, __FILE__);
-    exc.setFatal();
-    throw exc;
-  }
-
+  const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir);
   bool volChanged = newVolume != currentVolume_;
   currentVolume_ = newVolume;
 
@@ -355,6 +342,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
     oldState7 = state7;
     pointOld = pos;
+    nav_->LocateGlobalPointAndSetup(pos, &dir);
     slDist = nav_->CheckNextStep(pos, dir,
                                  (fabs(sMax) - s) * CLHEP::cm, safety);
     if (slDist == kInfinity)

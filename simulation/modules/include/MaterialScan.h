@@ -95,6 +95,11 @@ namespace Belle2 {
      */
     virtual void getRay(G4ThreeVector& origin, G4ThreeVector& direction) = 0;
 
+    /** get histogram for a given name, create if needed.
+     * @param name Name of the histogram
+     */
+    TH2D* getHistogram(const std::string& name);
+
     /** Fill the recorded material budget into the corresponding histogram
      * @param name Name of the histogram
      * @param value Value to store

@@ -64,6 +64,16 @@ MaterialScan::MaterialScan(TFile* rootFile, const std::string& name, const std::
 
 bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
 {
+  if (m_regions.empty()) {
+    // create summary histogram right now, not on demand, to make sure it is in the file
+    if (m_params.splitByMaterials) {
+      getHistogram("All_Materials_x0");
+      getHistogram("All_Materials_lambda");
+    } else {
+      getHistogram("All_Regions_x0");
+      getHistogram("All_Regions_lambda");
+    }
+  }
   //Increase the internal coordinates
   m_curU += m_stepU;
   if (m_curU >= m_params.maxU) {
@@ -80,7 +90,7 @@ bool MaterialScan::createNext(G4ThreeVector& origin, G4ThreeVector& direction)
   return (m_curV <= m_params.maxV);
 }
 
-void MaterialScan::fillValue(const std::string& name, double value)
+TH2D* MaterialScan::getHistogram(const std::string& name)
 {
   TH2D*& hist = m_regions[name];
   if (!hist) {
@@ -90,6 +100,12 @@ void MaterialScan::fillValue(const std::string& name, double value)
                     m_params.nU, m_params.minU, m_params.maxU,
                     m_params.nV, m_params.minV, m_params.maxV);
   }
+  return hist;
+}
+
+void MaterialScan::fillValue(const std::string& name, double value)
+{
+  TH2D* hist = getHistogram(name);
   hist->Fill(m_curU, m_curV, value);
 }
 

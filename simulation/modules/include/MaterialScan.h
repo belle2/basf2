@@ -57,8 +57,10 @@ namespace Belle2 {
 
     /** maximum Step length to be considered zero */
     static constexpr double c_zeroTolerance = 1e-6;
-    /** maximum number of consecutive zero steps before aborting execution */
-    static constexpr int c_maxZeroSteps = 10;
+    /** maximum number of consecutive zero steps before nudging the track along */
+    static constexpr int c_maxZeroStepsNudge = 10;
+    /** maximum number of consecutive zero steps before killing the track */
+    static constexpr int c_maxZeroStepsKill = 20;
 
     /** Constructor
      * @param rootFile Pointer to the ROOTFile where the histograms will be stored.

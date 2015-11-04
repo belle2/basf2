@@ -111,12 +111,24 @@ void MaterialScan::UserSteppingAction(const G4Step* step)
   } else {
     m_zeroSteps = 0;
   }
-  if (m_zeroSteps > c_maxZeroSteps) {
-    B2FATAL("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
-            << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
-            << " (" << region->GetName() << "): "
-            << m_zeroSteps << " consecutive steps with length less then "
-            << c_zeroTolerance << " mm");
+  if (m_zeroSteps > c_maxZeroStepsNudge) {
+    if (m_zeroSteps > c_maxZeroStepsKill) {
+      B2ERROR("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
+              << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+              << " (" << region->GetName() << "): "
+              << m_zeroSteps << " consecutive steps with length less then "
+              << c_zeroTolerance << " mm, killing it");
+      step->GetTrack()->SetTrackStatus(fStopAndKill);
+    } else {
+      B2WARNING("Track is stuck at " << preStepPoint->GetPosition() << " in volume '"
+                << preStepPoint->GetPhysicalVolume()->GetLogicalVolume()->GetName()
+                << " (" << region->GetName() << "): "
+                << m_zeroSteps << " consecutive steps with length less then "
+                << c_zeroTolerance << " mm, nudging it along");
+      G4ThreeVector pos = step->GetTrack()->GetPosition();
+      G4ThreeVector dir = step->GetTrack()->GetMomentumDirection();
+      step->GetTrack()->SetPosition(pos + c_zeroTolerance * dir);
+    }
   }
 
   //check if the depth is limited
@@ -346,6 +358,7 @@ void MaterialScanModule::beginRun()
       G4Event* event = new G4Event(++curRay);
       rayShooter.Shoot(event, origin, direction);
       eventManager->ProcessOneEvent(event);
+      delete event;
 
       //Show progress
       int donePercent = 100 * curRay / maxRays;

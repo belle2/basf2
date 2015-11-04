@@ -76,6 +76,7 @@ namespace Belle2 {
     ~PThread() throw() {}
 
   public:
+    pthread_t id() { return m_th; }
     pthread_t get_id() { return m_th; }
     bool kill(int signo)
     {

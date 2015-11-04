@@ -46,6 +46,7 @@ void ECLFEE::boot(HSLB& hslb,  const DBObject&)
     throw (IOException("Inconsitent FWVER (%d!=%d)",
                        ver, HSLB_FIRMWARE_VERSION));
   }
+  hslb.writefee8(0x30, 0x00);
 }
 
 void ECLFEE::load(HSLB& hslb, const DBObject& obj)

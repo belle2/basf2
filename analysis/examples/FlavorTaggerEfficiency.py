@@ -61,7 +61,7 @@ average_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
-workingFile = 'B2A801-FlavorTaggerR19795.root'
+workingFile = 'B2A801-FlavorTaggerR21095.root'
 if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     # root-file
     rootfile = ROOT.TFile(workingDirectory + '/' + workingFile, 'UPDATE')
@@ -471,7 +471,10 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         hist_signal.Draw('hist')
         hist_background.Draw('hist same')
 
-        l = ROOT.TLegend(0.6, 0.75, 0.8, 0.9)
+        if category == 'MaximumP':
+            l = ROOT.TLegend(0.4, 0.75, 0.6, 0.9)
+        else:
+            l = ROOT.TLegend(0.6, 0.75, 0.8, 0.9)
         l.AddEntry(hist_signal, 'true B0')
         l.AddEntry(hist_background, 'true B0bar')
         l.SetTextSize(0.05)
@@ -566,11 +569,11 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         effDiff = tot_eff_effB0 - tot_eff_effB0bar
         effAverage = (tot_eff_effB0 + tot_eff_effB0bar) / 2
 
-        print('* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' +
-              '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' +
-              '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' +
-              '   EffDiff=' + '{: 8.4f}'.format(effDiff * 100) + ' %' +
-              '{:>13}'.format(category + ' *'))
+        print '* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' \
+            + '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' \
+            + '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' \
+            + '   EffDiff=' + '{: 8.2f}'.format(effDiff * 100) + ' %' \
+            + '{:>13}'.format(category + ' *')
 
         hist_signal.Write('', ROOT.TObject.kOverwrite)
         hist_background.Write('', ROOT.TObject.kOverwrite)

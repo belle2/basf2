@@ -40,17 +40,29 @@ void ECLShaperControllerCallback::boot(const DBObject& obj)
 throw(RCHandlerException)
 {
   if (obj.hasObject("cols")) {
-    NSMNode node("ECL01");
-    if (NSMCommunicator::send(NSMMessage(node, RCCommand::BOOT))) {
+    NSMNode node1("ECL01");
+    if (NSMCommunicator::send(NSMMessage(node1, RCCommand::BOOT))) {
       try {
-        wait(node, RCCommand::OK, 10);
+        wait(node1, RCCommand::OK, 10);
       } catch (const TimeoutException& e) {
         LogFile::warning("%s %s:%d", e.what(), __FILE__, __LINE__);
       } catch (const IOException& e) {
         LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
       }
     } else {
-      LogFile::warning("%s is down.", node.getName().c_str());
+      LogFile::warning("%s is down.", node1.getName().c_str());
+    }
+    NSMNode node2("ECL02");
+    if (NSMCommunicator::send(NSMMessage(node2, RCCommand::BOOT))) {
+      try {
+        wait(node2, RCCommand::OK, 10);
+      } catch (const TimeoutException& e) {
+        LogFile::warning("%s %s:%d", e.what(), __FILE__, __LINE__);
+      } catch (const IOException& e) {
+        LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
+      }
+    } else {
+      LogFile::warning("%s is down.", node2.getName().c_str());
     }
     const DBObject& o_cols(obj("cols"));
     std::vector<PThread> ths;

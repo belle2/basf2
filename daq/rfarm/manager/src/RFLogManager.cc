@@ -7,6 +7,7 @@
 //-
 
 #include "daq/rfarm/manager/RFLogManager.h"
+#include <iostream>
 
 using namespace Belle2;
 using namespace std;
@@ -193,7 +194,29 @@ int RFLogManager::ProcessLog(int fd)
   int toolong = 0;
 
   p = buf;
+  fd_set fdset;
   do {
+    FD_ZERO(&fdset);
+    if (fd <= 0) {
+      printf("Pipe for log is not availablle\n");
+      Abort("No pipe available");
+    }
+    FD_SET(fd, &fdset);
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    if (select(fd + 1, &fdset, NULL, NULL, &tv) < 0) {
+      switch (errno) {
+        case EINTR: continue;
+        case EAGAIN: continue;
+        default:
+          perror("select");
+          return -1;
+      }
+      return -1;
+    } else if (!(fd > 0 && FD_ISSET(fd, &fdset))) {
+      return 0;
+    }
     if ((len = read(fd, p, siz)) < 0) {
       if (errno == EINTR) continue;
       if (errno == EPIPE) {
@@ -204,6 +227,7 @@ int RFLogManager::ProcessLog(int fd)
         Log("bad fd=%d", fd);
         return -1;
       }
+      perror("read");
       Abort("read");
     } else if (len == 0) {
       close(fd);

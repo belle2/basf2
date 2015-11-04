@@ -117,7 +117,7 @@ void RFMasterCallback::monitor() throw(RCHandlerException)
   static unsigned long long count = 0;
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
-    if (count % 10 == 0 || node.getState() == RCState::UNKNOWN) {
+    if (count % 60 == 59 || node.getState() == RCState::UNKNOWN) {
       if (NSMCommunicator::send(NSMMessage(node, RFCommand::STATUS))) {
       } else {
         setState(node, RCState::UNKNOWN);
@@ -184,9 +184,12 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
     if (node.getState() != RCState::READY_S) {
       if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
         setState(node, RCState::LOADING_TS);
+        LogFile::debug("%s >> LOADING", node.getName().c_str());
       } else {
         throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
       }
+    } else {
+      LogFile::debug("%s is READY", node.getName().c_str());
     }
   }
   while (true) {
@@ -226,9 +229,12 @@ void RFMasterCallback::abort() throw(RCHandlerException)
     if (node.getState() != RCState::NOTREADY_S) {
       if (NSMCommunicator::send(NSMMessage(node, RFCommand::UNCONFIGURE))) {
         setState(node, RCState::ABORTING_RS);
+        LogFile::debug("%s >> ABORTING", node.getName().c_str());
       } else {
         throw (RCHandlerException("Failed to unconfigure %s", node.getName().c_str()));
       }
+    } else {
+      LogFile::debug("%s is NOTREADY", node.getName().c_str());
     }
   }
   while (true) {

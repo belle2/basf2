@@ -14,6 +14,8 @@ extern "C" {
 #include <nsm2/belle2nsm.h>
 }
 
+#include <iostream>
+
 #define RFNSMOUT stdout
 
 using namespace std;
@@ -128,11 +130,12 @@ void RFNSM::m_Configure(NSMmsg* msg, NSMcontext* ctx)
   fflush(stdout);
   int stat = g_nsmserver->Configure(msg, ctx);
   fflush(stdout);
-  RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
     b2nsm_ok(msg, "Configured", NULL);
-  else
+  } else {
     b2nsm_error(msg, NULL);
+  }
 }
 
 void RFNSM::m_UnConfigure(NSMmsg* msg, NSMcontext* ctx)
@@ -140,55 +143,60 @@ void RFNSM::m_UnConfigure(NSMmsg* msg, NSMcontext* ctx)
   fflush(stdout);
   int stat = g_nsmserver->UnConfigure(msg, ctx);
   fflush(stdout);
-  RFNSM_Status::Instance().set_state(RFSTATE_UNCONFIGURED);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_UNCONFIGURED);
     b2nsm_ok(msg, "Unconfigured", NULL);
-  else
+  } else
     b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Start(NSMmsg* msg, NSMcontext* ctx)
 {
   int stat = g_nsmserver->Start(msg, ctx);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_RUNNING);
     b2nsm_ok(msg, "Running", NULL);
-  else
+  } else
     b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Stop(NSMmsg* msg, NSMcontext* ctx)
 {
   int stat = g_nsmserver->Stop(msg, ctx);
-  if (stat == 0)
-    b2nsm_ok(msg, "Running", NULL);
-  else
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
+    b2nsm_ok(msg, "Configured", NULL);
+  } else
     b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Pause(NSMmsg* msg, NSMcontext* ctx)
 {
   int stat = g_nsmserver->Pause(msg, ctx);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_IDLE);
     b2nsm_ok(msg, "Idle", NULL);
-  else
+  } else
     b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Resume(NSMmsg* msg, NSMcontext* ctx)
 {
   int stat = g_nsmserver->Resume(msg, ctx);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_RUNNING);
     b2nsm_ok(msg, "Running", NULL);
-  else
+  } else
     b2nsm_error(msg, NULL);
 }
 
 void RFNSM::m_Restart(NSMmsg* msg, NSMcontext* ctx)
 {
   int stat = g_nsmserver->Restart(msg, ctx);
-  if (stat == 0)
+  if (stat == 0) {
+    RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
     b2nsm_ok(msg, "Configured", NULL);
-  else
+  } else
     b2nsm_error(msg, NULL);
 }
 

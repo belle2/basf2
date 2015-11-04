@@ -2,6 +2,7 @@
 #define _Belle2_RFMasterCallback_h
 
 #include "daq/rfarm/manager/RFConf.h"
+#include "daq/rfarm/manager/RFCommand.h"
 
 #include <daq/slc/runcontrol/RCState.h>
 #include <daq/slc/runcontrol/RCCallback.h>

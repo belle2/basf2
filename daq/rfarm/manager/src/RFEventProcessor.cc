@@ -8,6 +8,7 @@
 //-
 
 #include "daq/rfarm/manager/RFEventProcessor.h"
+#include <iostream>
 
 #define RFOTSOUT stdout
 
@@ -149,6 +150,7 @@ int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
 
+  printf("Configure : done\n");
   fflush(stdout);
   return 0;
 
@@ -190,6 +192,7 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   m_rbufout->clear();
 
   printf("Unconfigure : done\n");
+  fflush(stdout);
   return 0;
 }
 

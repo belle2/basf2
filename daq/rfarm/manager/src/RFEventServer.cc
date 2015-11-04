@@ -9,6 +9,8 @@
 
 #include "daq/rfarm/manager/RFEventServer.h"
 
+#include <iostream>
+
 #define RFEVSOUT stdout
 
 using namespace std;

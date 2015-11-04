@@ -5,7 +5,7 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 2; i++) {
     HSLB hslb;
     hslb.open(i);
     ECLFEE fee;

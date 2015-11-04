@@ -169,7 +169,7 @@ int LogFile::put_impl(const std::string& msg, Priority priority, va_list ap)
     case FATAL:   color = "\x1b[41m\x1b[37m"; ss << "] [FATAL] "; break;
     default:                 ss << "] [UNKNOWN] "; break;
   }
-  static char s[1024 * 100];
+  static char* s = new char[1024 * 1024 * 5];
   vsprintf(s, msg.c_str(), ap);
   ss << s << std::endl;
   std::string str = ss.str();

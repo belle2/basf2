@@ -264,18 +264,18 @@ void ROCallback::monitor() throw(RCHandlerException)
       throw (RCHandlerException("eb0 : crashed"));
     }
     if (!m_stream1.getControl().isAlive()) {
-      setState(RCState::NOTREADY_S);
-      throw (RCHandlerException("stream1 : crashed"));
+      //throw (RCHandlerException("Process down : stream1"));
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
-        setState(RCState::NOTREADY_S);
-        throw (RCHandlerException("stream0-%d : crashed", (int)i));
+        // throw (RCHandlerException("Process down : stream0-%d", (int)i));
       }
     }
-    /*if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
+    /*
+    if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
       throw (RCHandlerException("eb1tx : crashed"));
-      }*/
+      }
+    */
   }
 }
 

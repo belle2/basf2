@@ -22,6 +22,7 @@ using namespace Belle2;
 COPPERCallback::COPPERCallback(FEE* fee[4], bool dummymode)
 {
   m_dummymode = dummymode;
+  m_dummymode_org = dummymode;
   setTimeout(5);
   m_con.setCallback(this);
   for (int i = 0; i < 4; i++) {
@@ -50,7 +51,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
-    m_dummymode = m_dummymode || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
+    m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
     add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
@@ -124,6 +125,30 @@ void COPPERCallback::term() throw()
   }
   m_copper.close();
   m_ttrx.close();
+}
+
+void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
+{
+  abort();
+  if (!m_dummymode) {
+    try {
+      for (int i = 0; i < 4; i++) {
+        const DBObject& o_hslb(obj("hslb", i));
+        if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
+          HSLB& hslb(m_hslb[i]);
+          hslb.open(i);
+          FEE& fee(*m_fee[i]);
+          try {
+            fee.boot(hslb, (obj("fee", i)));
+          } catch (const IOException& e) {
+            throw (RCHandlerException(e.what()));
+          }
+        }
+      }
+    } catch (const std::out_of_range& e) {
+      throw (RCHandlerException(e.what()));
+    }
+  }
 }
 
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -312,7 +337,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       getNode().getState() == RCState::READY_S ||
       getNode().getState() == RCState::PAUSED_S) {
     if (!m_con.isAlive()) {
-      throw (RCHandlerException(m_con.getName() + " : crashed"));
+      throw (RCHandlerException("Process down : basf2"));
     }
   }
 }

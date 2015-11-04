@@ -26,6 +26,7 @@ namespace Belle2 {
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual bool pause() throw(RCHandlerException);
@@ -50,6 +51,7 @@ namespace Belle2 {
     COPPER m_copper;
     FlowMonitor m_flow;
     bool m_dummymode;
+    bool m_dummymode_org;
     bool m_force_boothslb;
     std::string m_hslb_firm;
     bool m_iserr;

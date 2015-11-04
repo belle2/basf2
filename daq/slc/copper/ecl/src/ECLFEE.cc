@@ -4,6 +4,8 @@
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <mgt/hsreg.h>
 
 #include <unistd.h>
@@ -19,23 +21,23 @@ ECLFEE::ECLFEE()
 
 void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 {
-  std::string vname = StringUtil::form("ecl[%d]", hslb.get_finid());
-  callback.add(new ECLShaperMaskLowHandler(vname + ".shaper.mask.low", callback, hslb, *this, 0x20));
-  callback.add(new ECLShaperMaskHighHandler(vname + ".shaper.mask.high", callback, hslb, *this, 0x21));
-  callback.add(new ECLTTTrgRareFactorHandler(vname + ".ttd.trg.rare.factor", callback, hslb, *this, 0x38));
-  callback.add(new ECLTTTrgTypeHandler(vname + ".ttd.trg.type", callback, hslb, *this, 0x39));
-  callback.add(new ECLCalibAmpl0LowHandler(vname + ".calib.ampl0.low", callback, hslb, *this, 0x40));
-  callback.add(new ECLCalibAmpl0HighHandler(vname + ".calib.ampl0.high", callback, hslb, *this, 0x41));
-  callback.add(new ECLCalibAmplStepLowHandler(vname + ".calib.ampl.step.low", callback, hslb, *this, 0x42));
-  callback.add(new ECLCalibAmplStepHighHandler(vname + ".calib.ampl.step.high", callback, hslb, *this, 0x43));
-  callback.add(new ECLCalibDelay0LowHandler(vname + ".calib.delay0.low", callback, hslb, *this, 0x44));
-  callback.add(new ECLCalibDelay0HighHandler(vname + ".calib.delay0.high", callback, hslb, *this, 0x45));
-  callback.add(new ECLCalibDelaytepLowHandler(vname + ".calib.delay.step.low", callback, hslb, *this, 0x46));
-  callback.add(new ECLCalibDelayStepHighHandler(vname + ".calib.delay.step.high", callback, hslb, *this, 0x47));
-  callback.add(new ECLCalibEventPerStepHandler(vname + ".calib.event.per.step", callback, hslb, *this, 0x48));
+  std::string vname = StringUtil::form("ecl[%d].", hslb.get_finid());
+  callback.add(new ECLShaperMaskLowHandler(vname + "shaper_mask.low", callback, hslb, *this, 0x20));
+  callback.add(new ECLShaperMaskHighHandler(vname + "shaper_mask_high", callback, hslb, *this, 0x21));
+  callback.add(new ECLTTTrgRareFactorHandler(vname + "ttd_trg_rare_factor", callback, hslb, *this, 0x38));
+  callback.add(new ECLTTTrgTypeHandler(vname + "ttd_trg_type", callback, hslb, *this, 0x39));
+  callback.add(new ECLCalibAmpl0LowHandler(vname + "calib_ampl0_low", callback, hslb, *this, 0x40));
+  callback.add(new ECLCalibAmpl0HighHandler(vname + "calib_ampl0_high", callback, hslb, *this, 0x41));
+  callback.add(new ECLCalibAmplStepLowHandler(vname + "calib_ampl_step_low", callback, hslb, *this, 0x42));
+  callback.add(new ECLCalibAmplStepHighHandler(vname + "calib_ampl_step_high", callback, hslb, *this, 0x43));
+  callback.add(new ECLCalibDelay0LowHandler(vname + "calib_delay0_low", callback, hslb, *this, 0x44));
+  callback.add(new ECLCalibDelay0HighHandler(vname + "calib_delay0_high", callback, hslb, *this, 0x45));
+  callback.add(new ECLCalibDelaytepLowHandler(vname + "calib_delay_step_low", callback, hslb, *this, 0x46));
+  callback.add(new ECLCalibDelayStepHighHandler(vname + "calib_delay_step_high", callback, hslb, *this, 0x47));
+  callback.add(new ECLCalibEventPerStepHandler(vname + "calib_event_per_step", callback, hslb, *this, 0x48));
 }
 
-void ECLFEE::boot(HSLB& hslb,  const DBObject&)
+void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)
 {
   int ver;
   if ((ver = hslb.readfee8(HSREG_HWVER)) != HSLB_HARDWARE_VERSION) {
@@ -108,6 +110,26 @@ void ECLFEE::load(HSLB& hslb, const DBObject& obj)
     hslb.writefee8(0x30, 0x0D);
     hslb.writefee8(0x30, 0x09);
   }
+
+  printf("%x\n", hslb.readfee8(0x20));
+  printf("%x\n", hslb.readfee8(0x21));
+  printf("%x\n", hslb.readfee8(0x38));
+  printf("%x\n", hslb.readfee8(0x39));
+
+  printf("%x\n", hslb.readfee8(0x40));
+  printf("%x\n", hslb.readfee8(0x41));
+  printf("%x\n", hslb.readfee8(0x42));
+  printf("%x\n", hslb.readfee8(0x43));
+
+  printf("%x\n", hslb.readfee8(0x44));
+  printf("%x\n", hslb.readfee8(0x45));
+  printf("%x\n", hslb.readfee8(0x46));
+  printf("%x\n", hslb.readfee8(0x47));
+
+  printf("%x\n", hslb.readfee8(0x48));
+
+  printf("%x\n", hslb.readfee8(0x30));
+  printf("%x\n", hslb.readfee8(0x30));
 }
 
 extern "C" {

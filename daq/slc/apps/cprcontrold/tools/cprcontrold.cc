@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 {
   if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
     ConfigFile config("slowcontrol", "copper", argv[1]);
-    bool dummymode = config.getBool("dummymode");
+    const bool dummymode = config.getBool("dummymode");
     LogFile::info("dummymode is %s", ((dummymode) ? "on" : "off"));
     FEE* fee[4] = {NULL, NULL, NULL, NULL};
     for (int i = 0; i < 4; i++) {

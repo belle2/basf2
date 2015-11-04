@@ -4,6 +4,8 @@
 from basf2 import *
 from ROOT import Belle2
 
+set_random_seed("something important")
+
 path = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')

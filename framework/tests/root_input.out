@@ -1,4 +1,6 @@
-[INFO] Steering file: root_input.py
+[INFO] Steering file: framework/tests/root_input.py
+[INFO] The random number seed is set to "something important"
+[RESULT] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -73,6 +75,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -84,6 +87,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -94,6 +98,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -103,6 +108,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -111,6 +117,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
 [INFO] ========================================================================

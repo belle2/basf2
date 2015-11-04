@@ -1,5 +1,7 @@
 [INFO] Steering file: framework/tests/module_paths.py
+[INFO] The random number seed is set to "something important"
 [[[]] -> EventInfoSetter -> [SelectOddEvents -> EventInfoPrinter -> [Progress -> [[]]]] -> PrintCollections]
+[RESULT] Starting event processing, random seed is set to 'something important'
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1

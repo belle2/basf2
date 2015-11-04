@@ -5,6 +5,8 @@ import os
 import tempfile
 from basf2 import *
 
+set_random_seed("something important")
+
 testFile = tempfile.NamedTemporaryFile(prefix='b2filemetadata_')
 
 # Register modules

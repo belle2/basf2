@@ -5,6 +5,8 @@ import os
 from basf2 import *
 from ROOT import TFile, TTree
 
+set_random_seed("something important")
+
 # Register modules
 eventinfosetter = register_module('EventInfoSetter')
 eventinfo = register_module('EventInfoPrinter')

@@ -5,8 +5,9 @@
 # (both files)
 
 from basf2 import *
-
 from ROOT import Belle2
+
+set_random_seed("something important")
 
 
 class TestModule(Module):

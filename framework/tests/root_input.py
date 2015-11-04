@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-
-from basf2 import Module
 from ROOT import Belle2
+
+set_random_seed("something important")
 
 
 class NoopModule(Module):

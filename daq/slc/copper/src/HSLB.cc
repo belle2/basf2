@@ -10,6 +10,11 @@
 #include <unistd.h>
 #include <cstring>
 
+#define D(a,b,c) (((a)>>(c))&((1<<((b)+1-(c)))-1))
+#define B(a,b)   D(a,b,b)
+#define Bs(a,b,s)   (B(a,b)?(s):"")
+#define Ds(a,b,c,s)   (D(a,b,c)?(s):"")
+
 using namespace Belle2;
 
 const char* HSLB::getFEEType(int type)
@@ -64,6 +69,8 @@ bool HSLB::monitor() throw(HSLBHandlerException)
   m_hslb.fwevt = readfn32(0x085);
   m_hslb.fwclk = readfn32(0x086);
   m_hslb.cntsec = readfn32(0x087);
+  m_hslb.feecrce = readfee8(HSREG_CRCERR);
+
   return true;
 }
 
@@ -124,7 +131,8 @@ bool HSLB::isCRCError() throw(HSLBHandlerException)
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
   }
-  return (m_hslb.rxdata >> 16 > 0);
+  return (m_hslb.feecrce > 0);
+  //return (m_hslb.rxdata >> 16 > 0);
 }
 
 int HSLB::readfn(int adr) throw(HSLBHandlerException)

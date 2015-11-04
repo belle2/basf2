@@ -28,6 +28,7 @@ struct hslb_info {
   int reset;
   int b2lstat;
   int rxdata;
+  int feecrce;
   int fwevt;
   int fwclk;
   int cntsec;

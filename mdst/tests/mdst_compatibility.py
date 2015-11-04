@@ -16,7 +16,7 @@ objects.
 
 import sys
 import bisect
-from basf2 import create_path, process, Module, LogLevel, set_log_level
+from basf2 import create_path, process, Module, LogLevel, set_log_level, set_random_seed
 import ROOT
 from ROOT import Belle2
 
@@ -337,6 +337,7 @@ if __name__ == "__main__":
     # set a constant 1.5T magnetic field and make sure we don't get a warning
     # message for that
     set_log_level(LogLevel.ERROR)
+    set_random_seed(1)
     ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
     set_log_level(LogLevel.INFO)
     # now run the test

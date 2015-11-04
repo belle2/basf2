@@ -33,7 +33,11 @@ Buffer::Buffer(const Buffer& buf) throw()
 
 Buffer::~Buffer() throw()
 {
-  if (m_allocated && m_memory != NULL) delete [] m_memory;
+  if (m_allocated && m_memory != NULL) {
+    delete [] m_memory;
+    m_allocated = false;
+    m_memory = NULL;
+  }
 }
 
 const Buffer& Buffer::operator=(const Buffer& buf) throw()

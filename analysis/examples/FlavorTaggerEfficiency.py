@@ -61,7 +61,7 @@ average_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
-workingFile = 'B2A801-FlavorTaggerR21095.root'
+workingFile = 'B2A801-FlavorTaggerR22680.root'
 if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
     # root-file
     rootfile = ROOT.TFile(workingDirectory + '/' + workingFile, 'UPDATE')
@@ -569,11 +569,30 @@ if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatC
         effDiff = tot_eff_effB0 - tot_eff_effB0bar
         effAverage = (tot_eff_effB0 + tot_eff_effB0bar) / 2
 
-        print '* B0-Eff=' + '{: 8.2f}'.format(tot_eff_effB0 * 100) + ' %' \
-            + '   B0bar-Eff=' + '{: 8.2f}'.format(tot_eff_effB0bar * 100) + ' %' \
-            + '   EffAverage=' + '{: 8.2f}'.format(effAverage * 100) + ' %' \
-            + '   EffDiff=' + '{: 8.2f}'.format(effDiff * 100) + ' %' \
-            + '{:>13}'.format(category + ' *')
+        print(
+            '* B0-Eff=' +
+            '{: 8.2f}'.format(
+                tot_eff_effB0 *
+                100) +
+            ' %' +
+            '   B0bar-Eff=' +
+            '{: 8.2f}'.format(
+                tot_eff_effB0bar *
+                100) +
+            ' %' +
+            '   EffAverage=' +
+            '{: 8.2f}'.format(
+                effAverage *
+                100) +
+            ' %' +
+            '   EffDiff=' +
+            '{: 8.2f}'.format(
+                effDiff *
+                100) +
+            ' %' +
+            '{:>13}'.format(
+                category +
+                ' *'))
 
         hist_signal.Write('', ROOT.TObject.kOverwrite)
         hist_background.Write('', ROOT.TObject.kOverwrite)

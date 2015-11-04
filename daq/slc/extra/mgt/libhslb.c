@@ -50,7 +50,8 @@ openfn(int fin, int readonly)
 {
   int fd;
   int o_mode = readonly ? O_RDONLY : O_RDWR;
-  sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + fin);
+  //sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + fin);
+  sprintf(DEVICE, "/dev/copper/hslb:%c", 'a' + fin);
   
   if ((fd = open(DEVICE, o_mode)) < 0) {
     sprintf(errmsg, "cannot open %s: %s\n",

@@ -29,18 +29,18 @@ int main(int argc, char** argv)
           sprintf(s, "ssh cpr%d killall nsmd2", cpr_ecl01[i]);
           system(s);
         }
-        system("ssh ecl01 \"~/.bash_profile; bootnsmd2; bootnsmd2 -g\"");
+        system("ssh ecl01 \"source ~/.bash_profile; bootnsmd2; bootnsmd2 -g\"");
         for (unsigned int i = 0; i < sizeof(cpr_ecl01) / sizeof(int); i++) {
-          sprintf(s, "ssh cpr%d \"~/.bash_profile; bootnsmd2 cpr%d\"",
+          sprintf(s, "ssh cpr%d \"source ~/.bash_profile; bootnsmd2 cpr%d\"",
                   cpr_ecl01[i], cpr_ecl01[i]);
           system(s);
         }
       }
       if (cpr) {
-        system("ssh ecl01 \"~/.bash_profile; runcontrold ecl01 -d; rocontrold ropc501 -d\"");
+        system("ssh ecl01 \"source ~/.bash_profile; runcontrold ecl01 -d; rocontrold ropc501 -d\"");
         for (unsigned int i = 0; i < sizeof(cpr_ecl01) / sizeof(int); i++) {
           sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2; "
-                  "source ~/.bash_profile; cprcontrold cpr%d\"",
+                  "source ~/.bash_profile; cprcontrold cpr%d -d\"",
                   cpr_ecl01[i], cpr_ecl01[i]);
           system(s);
         }
@@ -49,12 +49,15 @@ int main(int argc, char** argv)
       if (nsm) {
         system("ssh ecl02 killall nsmd2");
         for (unsigned int i = 0; i < sizeof(cpr_ecl02) / sizeof(int); i++) {
-          sprintf(s, "ssh ecl02 \"ssh cpr%d killall nsmd2\"", cpr_ecl02[i]);
+          //sprintf(s, "ssh ecl02 \"ssh cpr%d killall nsmd2\"", cpr_ecl02[i]);
+          sprintf(s, "ssh cpr%d \"killall nsmd2\"", cpr_ecl02[i]);
           system(s);
         }
-        system("ssh ecl02 \"~/.bash_profile; bootnsmd2; bootnsmd2 -g\"");
+        system("ssh ecl02 \"source ~/.bash_profile; bootnsmd2; bootnsmd2 -g\"");
         for (unsigned int i = 0; i < sizeof(cpr_ecl02) / sizeof(int); i++) {
-          sprintf(s, "ssh ecl02 \"ssh cpr%d ~/.bash_profile; bootnsmd2 cpr%d\"",
+          //sprintf(s, "ssh ecl02 \"ssh cpr%d source ~/.bash_profile; bootnsmd2 cpr%d\"",
+          //        cpr_ecl02[i], cpr_ecl02[i]);
+          sprintf(s, "ssh cpr%d \"source ~/.bash_profile; bootnsmd2 cpr%d\"",
                   cpr_ecl02[i], cpr_ecl02[i]);
           system(s);
         }
@@ -62,8 +65,11 @@ int main(int argc, char** argv)
       if (cpr) {
         system("ssh ecl02 \"~/.bash_profile; runcontrold ecl02 -d; rocontrold ropc501 -d\"");
         for (unsigned int i = 0; i < sizeof(cpr_ecl02) / sizeof(int); i++) {
-          sprintf(s, "ssh ecl02 \"ssh cpr%d killall -9 cprcontrold basf2; "
-                  "source ~/.bash_profile; cprcontrold cpr%d\"",
+          //sprintf(s, "ssh ecl02 \"ssh cpr%d killall -9 cprcontrold basf2; "
+          //        "source ~/.bash_profile; cprcontrold cpr%d -d\"",
+          //        cpr_ecl02[i], cpr_ecl02[i]);
+          sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2; "
+                  "source ~/.bash_profile; cprcontrold cpr%d -d\"",
                   cpr_ecl02[i], cpr_ecl02[i]);
           system(s);
         }

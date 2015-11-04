@@ -14,8 +14,8 @@ if ! test "$BELLE2_LOCAL_DIR" = "" ; then
 else
   export PGSQL_LIB_PATH=/usr/pgsql-9.3/lib
   export PGSQL_INC_PATH=/usr/pgsql-9.3/include
-  export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH/lib:$LD_LIBRARY_PATH
 fi
+export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH/lib:$LD_LIBRARY_PATH
 export NSM2_INCDIR=$BELLE2_DAQ_SLC/data/nsm
 ## set NOT_USE_PSQL yes if postreSQL is not available
 #export NOT_USE_PSQL=yes

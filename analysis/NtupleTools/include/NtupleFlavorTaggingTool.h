@@ -22,22 +22,27 @@ using namespace Belle2;
 
 namespace Belle2 {
 
-  /** Writes the flavour tagging output of the B candidate to flat ntuple. */
+  /**
+   * NtupleTool to write the output of the FlavorTagger for all RestOfEvent B0s to a flat ntuple.
+   * The tool writes out the probabilities for B0 (B0Probability) and B0bar (B0barProbability),
+   * the combined product dilution*flavor (qrCombined) and the MC flavor (qrMC).
+   */
   class NtupleFlavorTaggingTool : public NtupleFlatTool {
+
   private:
-    float B0Probability;
-    float B0barProbability;
-    float qrCombined;
-    float qrMC;
-    float NTracksInROE;
-    float NECLClustersInROE;
-    float NKLMClustersInROE;
+
+    float* B0Probability;
+    float* B0barProbability;
+    float* qrCombined;
+    float* qrMC;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+
   public:
     /** Constructor. */
     NtupleFlavorTaggingTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

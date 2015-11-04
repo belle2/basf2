@@ -116,7 +116,7 @@ namespace Belle2 {
       return s_benergy_value;
     };
 
-    static double get_pi0resol(double p, double theta, char* side,
+    static double get_pi0resol(double p, double theta, const char* side,
                                bool mcdata, int exp, int option)
     {
       return pi0resol(p, theta, side, mcdata, exp, option);
@@ -219,7 +219,7 @@ namespace Belle2 {
     void correct_ecl_primary_vertex(const HepPoint3D&,
                                     const HepSymMatrix&);
     // Treat pi0 mass width as a func. of pi0 momentum.
-    static double pi0resol(double, double, char*, bool, int, int);
+    static double pi0resol(double, double, const char*, bool, int, int);
 
     //  Author:  T. Matsumoto
     //  based on dcpvrare_ml:0127, interface is modified by M. Nakao

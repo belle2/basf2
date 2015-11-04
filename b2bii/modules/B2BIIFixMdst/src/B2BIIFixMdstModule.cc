@@ -361,7 +361,7 @@ namespace Belle2 {
       int run = belleevt->RunNo();
       //if(m_benergy==1 && expmc==1) s_benergy_value = Benergy(exp, run);
 
-      if ((31 <= exp && exp <= 55 || 69 <= exp && exp <= 73) && m_check_version_consistency == 1) {
+      if (((31 <= exp && exp <= 55) || (69 <= exp && exp <= 73)) && m_check_version_consistency == 1) {
         char* env = std::getenv("USE_GRAND_REPROCESS_DATA");
         if ((env && m_reprocess_version == 0) ||
             (!env && m_reprocess_version == 1)) {
@@ -409,11 +409,11 @@ namespace Belle2 {
       }
 
       int B_l_d = 0;
-      int Date  = 0;
+      //int Date  = 0;
       if (bpmgr.count() > 0) {
         int i = bpmgr.count() - 1;
         B_l_d = bpmgr[i].Belle_level_date();
-        Date  = bpmgr[i].Date();
+        //Date  = bpmgr[i].Date();
       }
 
       if (bvmgr.count() > 0) {
@@ -519,7 +519,7 @@ namespace Belle2 {
       }
     }
 
-    if ((expnum == 0 || runnum == 0) & BsCouTab(BELLE_EVENT) > 0) {
+    if ((expnum == 0 || runnum == 0) && BsCouTab(BELLE_EVENT) > 0) {
       Belle_event& bevt = Belle_event_Manager::get_manager()[0];
       if (bevt.ExpMC() == 1) {
         expnum = bevt.ExpNo();

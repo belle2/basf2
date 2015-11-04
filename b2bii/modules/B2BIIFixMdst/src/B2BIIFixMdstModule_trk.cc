@@ -1437,13 +1437,13 @@ namespace Belle2 {
     return (lhs.m_hadMC == rhs.m_hadMC) && (lhs.m_cosMC == rhs.m_cosMC) && (lhs.m_cosDATA == rhs.m_cosDATA);
   }
 
-  static bool operator!=(const cal_scale_error_func_set_t& lhs, const cal_scale_error_func_set_t& rhs)
+  /*static bool operator!=(const cal_scale_error_func_set_t& lhs, const cal_scale_error_func_set_t& rhs)
   {
     return !(lhs == rhs);
-  }
+  }*/
 
 // Dummy function
-  static void null_scale(double scale[5], double pt, double tanl)
+  static void null_scale(double[5], double, double)
   {
     return;
   }
@@ -1468,7 +1468,7 @@ namespace Belle2 {
   }
 
 
-  static const bool
+  static bool
   is_already_scaled(void)
   {
     Mdst_event_add_Manager& addmgr = Mdst_event_add_Manager::get_manager();
@@ -1500,28 +1500,28 @@ namespace Belle2 {
   /*****                     *****/
   /***** misc math functions *****/
   /*****                     *****/
-  inline const double
+  inline double
   vfunc(const double x, const double x1, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            (x - x1) * a2 + yc ;
   }
 
-  inline const double
+  inline double
   cupfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            x > x2 ? (x - x2) * a2 + yc : yc;
   }
 
-  inline const double
+  inline double
   rootfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            x > x2 ? (x2 - x1) * a2 + yc : (x - x1) * a2 + yc;
   }
 
-  inline const double
+  inline double
   lambdafunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2, const double a3)
   {
     return x < x1 ? (x - x1) * a1 + yc :
@@ -1539,7 +1539,7 @@ namespace Belle2 {
 // old day by somebody
 //
   static void
-  cal_scale_error_EXP0723_cosmic_mc(double scale[5], const double pt, const double tanl_is_dummy)
+  cal_scale_error_EXP0723_cosmic_mc(double scale[5], const double pt, const double /*tanl*/)
   {
     // pt
     scale[0] = +1.0115E+00 - 3.6966E-02 * pt;
@@ -1554,7 +1554,7 @@ namespace Belle2 {
 // old day by somebody
 //
   static void
-  cal_scale_error_EXP2527_cosmic_mc(double scale[5], const double pt, const double tanl_is_dummy)
+  cal_scale_error_EXP2527_cosmic_mc(double scale[5], const double pt, const double /*tanl*/)
   {
     // pt
     scale[0] = +1.0257E+00 - 0.30671E-01 * pt;
@@ -1569,7 +1569,7 @@ namespace Belle2 {
 // July 09th, 2004, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP31_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP31_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.0874   - 0.26640E-01 * pt;
@@ -1589,7 +1589,7 @@ namespace Belle2 {
 // February 3rd, 2010, by Takeo Higuchi
 //
   static void
-  cal_scale_error_EXP33_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP33_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     if (SE_Reprocess_Version == 0) {
       // pt
@@ -1639,7 +1639,7 @@ namespace Belle2 {
 // July 21st, 2004, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP37_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP37_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.0694   - 0.19048E-01 * pt;
@@ -1655,7 +1655,7 @@ namespace Belle2 {
 // April, 20th, 2005, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP3941_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP3941_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.055465  - 0.2863498E-01 * pt;
@@ -1670,7 +1670,7 @@ namespace Belle2 {
 // Sep., 12th, 2005, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP43_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP43_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.013759    - 0.8743831E-02 * pt;
@@ -1685,7 +1685,7 @@ namespace Belle2 {
 // May., 27th, 2006, by fmiyuki
 //
   static void
-  cal_scale_error_EXP45_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP45_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] =  1.011008    - 0.2272887E-01 * pt;
@@ -1700,7 +1700,7 @@ namespace Belle2 {
 // May., 27th, 2006, by fmiyuki
 //
   static void
-  cal_scale_error_EXP47_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP47_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 0.9806778    - 0.2010826E-02 * pt;
@@ -1715,7 +1715,7 @@ namespace Belle2 {
 // May., 27th, 2006, by fmiyuki
 //
   static void
-  cal_scale_error_EXP49_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP49_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.000635    - 0.1659129E-01 * pt;
@@ -1730,7 +1730,7 @@ namespace Belle2 {
 // May 24th, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP51_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP51_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 0.98242     - 0.71780E-02 * pt;
@@ -1745,7 +1745,7 @@ namespace Belle2 {
 // May 24th, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP53_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP53_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 0.99832     - 0.17290E-01 * pt;
@@ -1760,7 +1760,7 @@ namespace Belle2 {
 // June 21st, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP55_cosmic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP55_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 0.98871     - 0.88399E-02 * pt;
@@ -1845,7 +1845,7 @@ namespace Belle2 {
 // old day by somebody
 //
   static void
-  cal_scale_error_EXP0723_cosmic_data(double scale[5], const double pt, const double tanl_is_dummy)
+  cal_scale_error_EXP0723_cosmic_data(double scale[5], const double pt, const double /*tanl*/)
   {
     // pt
     scale[0] = +1.1280E+00 - 7.6839E-03 * pt;
@@ -1860,7 +1860,7 @@ namespace Belle2 {
 // old day by somebody
 //
   static void
-  cal_scale_error_EXP2527_cosmic_data(double scale[5], const double pt, const double tanl)
+  cal_scale_error_EXP2527_cosmic_data(double scale[5], const double pt, const double /*tanl*/)
   {
     // pt
     scale[0] = +1.1002E+00 + 3.9852E-02 * pt;
@@ -1875,7 +1875,7 @@ namespace Belle2 {
 // July 9th, 2004, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP31_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP31_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.1908  + 0.20678E-02 * pt;
@@ -1894,7 +1894,7 @@ namespace Belle2 {
 // February 3rd, 2010, by Takeo Higuchi
 //
   static void
-  cal_scale_error_EXP33_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP33_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     if (SE_Reprocess_Version == 0) {
       // pt
@@ -1942,7 +1942,7 @@ namespace Belle2 {
 // July 21st, 2004, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP37_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP37_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.2129  + 0.36787E-01 * pt;
@@ -1957,7 +1957,7 @@ namespace Belle2 {
 // April 20th, 2004, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP3941_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP3941_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.182285  + 0.4142677E-01 * pt;
@@ -1972,7 +1972,7 @@ namespace Belle2 {
 // Sep., 12th, 2005 by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP43_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP43_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.262359  + 0.1411302E-01 * pt;
@@ -1987,7 +1987,7 @@ namespace Belle2 {
 // May., 29th, 2006 by fmiyuki
 //
   static void
-  cal_scale_error_EXP4547_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP4547_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt 8bin
     scale[0] =  1.164526    + 0.7671143E-01 * pt;
@@ -2002,7 +2002,7 @@ namespace Belle2 {
 // May., 27th, 2006 by fmiyuki
 //
   static void
-  cal_scale_error_EXP49_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP49_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt 8bin
     scale[0] =  1.243211    + 0.5776083E-01 * pt;
@@ -2039,7 +2039,7 @@ namespace Belle2 {
 // May 24th, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP53_cosmic_data(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP53_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
     // pt 5bin
     scale[0] =  1.2587      + 0.32782E-01 * pt;
@@ -2268,7 +2268,7 @@ namespace Belle2 {
 // April 20th, by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP3941_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP3941_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.236096  - 0.1015809 * pt;
@@ -2283,7 +2283,7 @@ namespace Belle2 {
 // Sep. 12th, 2005 by KUSAKA Akito
 //
   static void
-  cal_scale_error_EXP43_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP43_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.240166    - 0.1051634 * pt;
@@ -2316,7 +2316,7 @@ namespace Belle2 {
 // May. 27th, 2006 by fmiyuki
 //
   static void
-  cal_scale_error_EXP47_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP47_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = 1.218633    - .1078999 * pt;
@@ -2331,7 +2331,7 @@ namespace Belle2 {
 // May. 27th, 2006 by fmiyuki
 //
   static void
-  cal_scale_error_EXP49_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP49_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] =  1.217751    - .1075724 * pt;
@@ -2365,7 +2365,7 @@ namespace Belle2 {
 // May 24th, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP53_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP53_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = lambdafunc(pt, 0.50681, 1.2150, 1.2266, 0.99662E-01, -0.23508, -0.52268E-01);
@@ -2380,7 +2380,7 @@ namespace Belle2 {
 // June 21st, 2007 by higuchit
 //
   static void
-  cal_scale_error_EXP55_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP55_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = vfunc(pt, 0.34925, 1.1780, 0.89069E-01, -0.10090);
@@ -2395,7 +2395,7 @@ namespace Belle2 {
 // March 4th, 2009 by higuchit
 //
   static void
-  cal_scale_error_EXP6165_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP6165_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = vfunc(pt, 1.4501, 1.0348, -0.12125, -0.27519E-01);
@@ -2410,7 +2410,7 @@ namespace Belle2 {
 // October 8th, 2009 by higuchit
 //
   static void
-  cal_scale_error_EXP67_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP67_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = vfunc(pt, 1.0501, 1.0852, -0.14604, -0.66317E-01);
@@ -2428,7 +2428,7 @@ namespace Belle2 {
 // May 12th, 2010 by higuchit
 //
   static void
-  cal_scale_error_EXP6971_hadronic_mc(double scale[5], double pt, double tanl)
+  cal_scale_error_EXP6971_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
     // pt
     scale[0] = vfunc(pt, 1.7258, 1.0126, -0.12693, 0.31924E-01);
@@ -2537,7 +2537,7 @@ namespace Belle2 {
 
 
   static cal_scale_error_func_set_t
-  get_scale_error_func_for_exprun(const int no_exp, const int no_run)
+  get_scale_error_func_for_exprun(const int no_exp, const int /*no_run*/)
   {
     return
       (7 <= no_exp && no_exp <= 23) ? EXP0723_scale :
@@ -2693,7 +2693,7 @@ namespace Belle2 {
     SE_Message_Level = message_level;
     SE_Reprocess_Version = reprocess_version;
 
-    int no_exp, no_run, no_evt, no_frm, expmc;
+    int no_exp{0}, no_run{0}, no_evt{0}, no_frm{0}, expmc{0};
     get_event_id(&no_exp, &no_run, &no_evt, &no_frm, &expmc);
 
     if (DUMMY_scale == get_scale_error_func_for_exprun(no_exp, no_run)) return 2;
@@ -3159,7 +3159,7 @@ namespace Belle2 {
     const int i_ch(flag & 0xff);
     const int i_trk((flag >> 8) & 0xff);
     const int i_vee2((flag >> 16) & 0xff);
-    Mdst_charged_Manager& chMgr(Mdst_charged_Manager::get_manager());
+    //Mdst_charged_Manager////& chMgr(Mdst_charged_Manager::get_manager());
     Mdst_trk_Manager& tMgr(Mdst_trk_Manager::get_manager());
     Mdst_vee2_Manager& veeMgr(Mdst_vee2_Manager::get_manager());
     Mdst_trk_extra_Manager& teMgr(Mdst_trk_extra_Manager::get_manager());
@@ -3372,7 +3372,7 @@ namespace Belle2 {
 
     double u[n][n];
     double s;
-    int pozdef = 1;
+    //int pozdef = 1;
     for (int j = 0; j < n; j++) {
       s = a[j][j];
       for (int k = 0; k < j; k++) s -= u[j][k] * u[j][k];
@@ -3385,7 +3385,7 @@ namespace Belle2 {
         }
       } else {
         for (int i = j; i < n; i++) u[i][j] = 0;
-        pozdef = 0;
+        //pozdef = 0;
       }
     }
 

@@ -582,7 +582,7 @@ namespace Belle2 {
 //=================================================================
 // Fix up wrong calib. in Exp.45 by Isamu Nakamura, added 20060413.
 //=================================================================
-  static double ecl_adhoc_corr_45(int exp, int run, int cid)
+  static double ecl_adhoc_corr_45(int exp, int /*run*/, int cid)
   {
 
     int bcid[] = {
@@ -606,7 +606,7 @@ namespace Belle2 {
 //=====================
 // Correct energy scale (MC) to make pi0 peak nominal. 20080530
 //=====================
-  static double ecl_mcx3_corr(int exp, int run, double energy, double theta)
+  static double ecl_mcx3_corr(int /*exp*/, int /*run*/, double energy, double /*theta*/)
   {
     //KM std::cout<<"ecl_mcx3_corr called."<<std::endl;
     double return_value;
@@ -667,8 +667,8 @@ namespace Belle2 {
 //**********************************
 // Original definition.
 //double pi0resol(double p, double theta, char* side, bool mcdata, int exp )
-  double B2BIIFixMdstModule::pi0resol(double p, double theta, char* side, bool mcdata,
-                                      int exp, int option)
+  double B2BIIFixMdstModule::pi0resol(double p, double theta, const char* side, bool mcdata,
+                                      int /*exp*/, int /*option*/)
   {
 // option is added to become compatible with future gsim modification.
     int iside = 0;
@@ -1654,7 +1654,7 @@ namespace Belle2 {
 
         // In the case of option=0 or 1, criteria is controlled
         // by the inv. mass.
-        double mass_ctrl;
+        double mass_ctrl{0};
         if (option == 0 || option == 1) {
           mass_ctrl = mass_before;
         }
@@ -1720,7 +1720,7 @@ namespace Belle2 {
           int iter = 0;
           double Df, f_old = DBL_MAX;
           double Dchi2, chi2_old = DBL_MAX;
-          double mass_gg, chi2 = DBL_MAX;
+          double /*mass_gg,*/ chi2 = DBL_MAX;
           bool exit_flag = false;
 
           // Set parameters to decide whether converged.
@@ -1740,7 +1740,7 @@ namespace Belle2 {
             const double open_angle = sin_theta1 * sin_theta2 * cos_Dphi
                                       + cos_theta1 * cos_theta2;
             const double mass2_gg = 2 * E1 * E2 * (1 - open_angle);
-            mass_gg = (mass2_gg > 0) ? std::sqrt(mass2_gg) : -std::sqrt(-mass2_gg);
+            //mass_gg = (mass2_gg > 0) ? std::sqrt(mass2_gg) : -std::sqrt(-mass2_gg);
 
             // No more iteration. Break to return.
             if (exit_flag || ++iter > iter_max)
@@ -1806,7 +1806,7 @@ namespace Belle2 {
   }
 
   void B2BIIFixMdstModule::make_pi0_primary_vertex(int option, double low_limit, double up_limit,
-                                                   const HepPoint3D& epvtx,
+                                                   const HepPoint3D& /*epvtx*/,
                                                    const HepSymMatrix& epvtx_err)
   {
 #if 0
@@ -2122,12 +2122,12 @@ namespace Belle2 {
 
         const double del_chisq = 0.1;
         const double del_f   = 0.1;
-        const int icovar  = 1;
+        //const int icovar  = 1;
 
         double mass0     = 0.0;
         double dmass0    = 0.0;
-        double dmass     = 0.0;
-        double sdev      = 0.0;
+        //double dmass     = 0.0;
+        //double sdev      = 0.0;
 
         do {
 
@@ -2161,16 +2161,16 @@ namespace Belle2 {
           if (it++ == 0) {
             mass0  = mass;
             dmass0 = std::sqrt(dm2_2);
-            if (mass0 > 0.0) {
+            /*if (mass0 > 0.0) {
               dmass = 0.5 * dmass0 / mass;
-            }
+            }*/
           }
-          const double residual = mass - mpi0_pdg;
-          const double pull     = residual / dmass;
+          //const double residual = mass - mpi0_pdg;
+          //const double pull     = residual / dmass;
           if (it >= iter_max ||
               mass < low_default || mass > up_default) {
             it = -it;
-            sdev = (dmass > 0.0) ? pull : -100;
+            //sdev = (dmass > 0.0) ? pull : -100;
             break;
           }
 

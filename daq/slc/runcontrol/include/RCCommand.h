@@ -11,6 +11,7 @@ namespace Belle2 {
 
   public:
     static const RCCommand CONFIGURE;
+    static const RCCommand BOOT;
     static const RCCommand LOAD;
     static const RCCommand START;
     static const RCCommand STOP;

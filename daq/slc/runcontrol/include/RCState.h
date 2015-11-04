@@ -21,6 +21,7 @@ namespace Belle2 {
     static const RCState FATAL_ES;
     static const RCState RECOVERING_RS;
     static const RCState ABORTING_RS;
+    static const RCState BOOTING_RS;
 
   public:
     RCState() throw() : NSMState(Enum::UNKNOWN) {}
@@ -40,7 +41,7 @@ namespace Belle2 {
     bool isStable() const throw() { return getId() > 1 && getId() <= 5; }
     bool isTransition() const throw() { return getId() > 5 && getId() <= 9; }
     bool isError() const throw() { return getId() > 9 && getId() <= 11; }
-    bool isRecovering() const throw() { return getId() > 11 && getId() <= 13; }
+    bool isRecovering() const throw() { return getId() > 11 && getId() <= 14; }
     RCState next() const throw();
 
   public:

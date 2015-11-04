@@ -19,6 +19,7 @@ RCCallback::RCCallback(int timeout) throw()
   : NSMCallback(timeout)
 {
   reg(RCCommand::CONFIGURE);
+  reg(RCCommand::BOOT);
   reg(RCCommand::LOAD);
   reg(RCCommand::START);
   reg(RCCommand::STOP);
@@ -118,6 +119,9 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         configure(m_obj);
         setState(state);
         reply(NSMMessage(NSMCommand::OK, state.getLabel()));
+      } else if (cmd == RCCommand::BOOT) {
+        get(m_obj);
+        boot(m_obj);
       } else if (cmd == RCCommand::LOAD) {
         get(m_obj);
         load(m_obj);

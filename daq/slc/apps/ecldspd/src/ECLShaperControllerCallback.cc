@@ -31,7 +31,6 @@ throw(RCHandlerException)
     std::string vname = StringUtil::form("col[%d].status", col);
     add(new ECLShaperStatusHandler(*this, vname, col));
   }
-  add(new ECLShaperBootHandler(*this, "boot"));
 }
 
 void ECLShaperControllerCallback::boot(const DBObject& obj)

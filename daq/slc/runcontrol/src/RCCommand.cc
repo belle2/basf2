@@ -12,6 +12,7 @@ const RCCommand RCCommand::RESUME(105, "RC_RESUME");
 const RCCommand RCCommand::PAUSE(106, "RC_PAUSE");
 const RCCommand RCCommand::RECOVER(107, "RC_RECOVER");
 const RCCommand RCCommand::ABORT(108, "RC_ABORT");
+const RCCommand RCCommand::BOOT(109, "RC_BOOT");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
@@ -24,6 +25,7 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   else if (label == RESUME.getLabel()) *this = RESUME;
   else if (label == PAUSE.getLabel()) *this = PAUSE;
   else if (label == ABORT.getLabel()) *this = ABORT;
+  else if (label == BOOT.getLabel()) *this = BOOT;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -39,6 +41,7 @@ const RCCommand& RCCommand::operator=(int id) throw()
   else if (id == RESUME.getId()) *this = RESUME;
   else if (id == PAUSE.getId()) *this = PAUSE;
   else if (id == ABORT.getId()) *this = ABORT;
+  else if (id == BOOT.getId()) *this = BOOT;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -67,7 +70,8 @@ int RCCommand::isAvailable(const RCState& state) const throw()
     return ENABLED;
   } else if (*this == RESUME && state == RCState::PAUSED_S) {
     return ENABLED;
-  } else if (*this == RECOVER || *this == ABORT || *this == RECOVER) {
+  } else if (*this == RECOVER || *this == ABORT ||
+             *this == RECOVER || *this == BOOT) {
     return ENABLED;
   } else if (state == RCState::ERROR_ES) {
     return ENABLED;
@@ -85,6 +89,7 @@ RCState RCCommand::nextState() const throw()
   else if (*this == PAUSE) return RCState::PAUSED_S;
   else if (*this == RECOVER) return RCState::READY_S;
   else if (*this == ABORT) return RCState::NOTREADY_S;
+  else if (*this == BOOT) return RCState::NOTREADY_S;
   else return Enum::UNKNOWN;
 }
 
@@ -98,5 +103,6 @@ RCState RCCommand::nextTState() const throw()
   else if (*this == PAUSE) return RCState::PAUSED_S;
   else if (*this == RECOVER) return RCState::RECOVERING_RS;
   else if (*this == ABORT) return RCState::ABORTING_RS;
+  else if (*this == BOOT) return RCState::BOOTING_RS;
   else return Enum::UNKNOWN;
 }

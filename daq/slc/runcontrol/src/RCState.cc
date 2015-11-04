@@ -15,6 +15,7 @@ const RCState RCState::ERROR_ES(10, "ERROR");
 const RCState RCState::FATAL_ES(11, "FATAL");
 const RCState RCState::RECOVERING_RS(12, "RECOVERING");
 const RCState RCState::ABORTING_RS(13, "ABORTING");
+const RCState RCState::BOOTING_RS(14, "BOOTING");
 
 const RCState& RCState::operator=(const std::string& label) throw()
 {
@@ -30,6 +31,7 @@ const RCState& RCState::operator=(const std::string& label) throw()
   else if (label == FATAL_ES.getLabel()) *this = FATAL_ES;
   else if (label == RECOVERING_RS.getLabel()) *this = RECOVERING_RS;
   else if (label == ABORTING_RS.getLabel()) *this = ABORTING_RS;
+  else if (label == BOOTING_RS.getLabel()) *this = BOOTING_RS;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -55,6 +57,7 @@ const RCState& RCState::operator=(int id) throw()
   else if (id == FATAL_ES.getId()) *this = FATAL_ES;
   else if (id == RECOVERING_RS.getId()) *this = RECOVERING_RS;
   else if (id == ABORTING_RS.getId()) *this = ABORTING_RS;
+  else if (id == BOOTING_RS.getId()) *this = BOOTING_RS;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -66,6 +69,7 @@ RCState RCState::next() const throw()
   else if (*this == STOPPING_TS) return READY_S;
   else if (*this == RECOVERING_RS) return READY_S;
   else if (*this == ABORTING_RS) return NOTREADY_S;
+  else if (*this == BOOTING_RS) return NOTREADY_S;
   else if (*this == CONFIGURING_TS) return NOTREADY_S;
   else return Enum::UNKNOWN;
 }

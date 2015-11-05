@@ -1,5 +1,5 @@
 #include "daq/slc/copper/ecl/ECLFEE.h"
-#include "daq/slc/copper/ecl/ECLFEEHandler.h"
+#include "daq/slc/copper/FEEHandler.h"
 
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
@@ -22,19 +22,19 @@ ECLFEE::ECLFEE()
 void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("ecl[%d].", hslb.get_finid());
-  callback.add(new ECLShaperMaskLowHandler(vname + "shaper_mask.low", callback, hslb, *this, 0x20));
-  callback.add(new ECLShaperMaskHighHandler(vname + "shaper_mask_high", callback, hslb, *this, 0x21));
-  callback.add(new ECLTTTrgRareFactorHandler(vname + "ttd_trg_rare_factor", callback, hslb, *this, 0x38));
-  callback.add(new ECLTTTrgTypeHandler(vname + "ttd_trg_type", callback, hslb, *this, 0x39));
-  callback.add(new ECLCalibAmpl0LowHandler(vname + "calib_ampl0_low", callback, hslb, *this, 0x40));
-  callback.add(new ECLCalibAmpl0HighHandler(vname + "calib_ampl0_high", callback, hslb, *this, 0x41));
-  callback.add(new ECLCalibAmplStepLowHandler(vname + "calib_ampl_step_low", callback, hslb, *this, 0x42));
-  callback.add(new ECLCalibAmplStepHighHandler(vname + "calib_ampl_step_high", callback, hslb, *this, 0x43));
-  callback.add(new ECLCalibDelay0LowHandler(vname + "calib_delay0_low", callback, hslb, *this, 0x44));
-  callback.add(new ECLCalibDelay0HighHandler(vname + "calib_delay0_high", callback, hslb, *this, 0x45));
-  callback.add(new ECLCalibDelaytepLowHandler(vname + "calib_delay_step_low", callback, hslb, *this, 0x46));
-  callback.add(new ECLCalibDelayStepHighHandler(vname + "calib_delay_step_high", callback, hslb, *this, 0x47));
-  callback.add(new ECLCalibEventPerStepHandler(vname + "calib_event_per_step", callback, hslb, *this, 0x48));
+  callback.add(new FEE8Handler(vname + "shaper_mask_low", callback, hslb, *this, 0x20));
+  callback.add(new FEE8Handler(vname + "shaper_mask_high", callback, hslb, *this, 0x21));
+  callback.add(new FEE8Handler(vname + "ttd_trg_rare_factor", callback, hslb, *this, 0x38));
+  callback.add(new FEE8Handler(vname + "ttd_trg_type", callback, hslb, *this, 0x39));
+  callback.add(new FEE8Handler(vname + "calib_ampl0_low", callback, hslb, *this, 0x40));
+  callback.add(new FEE8Handler(vname + "calib_ampl0_high", callback, hslb, *this, 0x41));
+  callback.add(new FEE8Handler(vname + "calib_ampl_step_low", callback, hslb, *this, 0x42));
+  callback.add(new FEE8Handler(vname + "calib_ampl_step_high", callback, hslb, *this, 0x43));
+  callback.add(new FEE8Handler(vname + "calib_delay0_low", callback, hslb, *this, 0x44));
+  callback.add(new FEE8Handler(vname + "calib_delay0_high", callback, hslb, *this, 0x45));
+  callback.add(new FEE8Handler(vname + "calib_delay_step_low", callback, hslb, *this, 0x46));
+  callback.add(new FEE8Handler(vname + "calib_delay_step_high", callback, hslb, *this, 0x47));
+  callback.add(new FEE8Handler(vname + "calib_event_per_step", callback, hslb, *this, 0x48));
 }
 
 void ECLFEE::boot(HSLB& hslb,  const DBObject& obj)

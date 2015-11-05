@@ -27,7 +27,7 @@ sed "s/TEMPLATE/$classname/g" $dir/template/src/TEMPLATEFEE.cc | \
 sed "s/template/${name}/g"  > ${filename}
 
 filename=${dir}/${name}/Makefile
-echo "create source file : ${filename}"
+echo "create Makefile : ${filename}"
 sed "s/TEMPLATE/$classname/g" $dir/template/Makefile | \
 sed "s/template/${name}/g"  > ${filename}
 

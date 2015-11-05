@@ -1,4 +1,5 @@
 #include "daq/slc/copper/template/TEMPLATEFEE.h"
+#include "daq/slc/copper/FEEHandler.h"
 
 #include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
@@ -13,7 +14,9 @@ TEMPLATEFEE::TEMPLATEFEE()
 
 void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
 {
-
+  std::string vname = StringUtil::form("template[%d].", hslb.get_finid());
+  callback.add(new FEE8Handler(vname + "reg0", callback, hslb, *this, 0x01));
+  callback.add(new FEE8Handler(vname + "reg1", callback, hslb, *this, 0x02));
 }
 
 void TEMPLATEFEE::boot(HSLB& hslb,  const DBObject& obj)
@@ -31,17 +34,18 @@ void TEMPLATEFEE::load(HSLB& hslb, const DBObject& obj)
     LogFile::warning("file %s not exsits", stream.c_str());
   }
 
-  // writing parameters to registers
-  const DBObjectList objs(obj.getObjects("par"));
-  for (DBObjectList::const_iterator it = objs.begin();
-       it != objs.end(); it++) {
-    const DBObject& o_par(*it);
-    const std::string name = o_par.getText("name");
-    int adr = o_par.getInt("adr");
-    int val = o_par.getInt("val");
-    LogFile::debug("writefee  val=%d to %s(adr=%d)", val, name.c_str(), adr);
-    hslb.writefee32(adr, val);
-  }
+  // write access to register "reg0"
+  int adr = obj("reg0").getInt("adr");
+  int val = obj("reg0").getInt("val");
+  LogFile::debug("writefee8 val=%d to reg0(adr=%d)", val, adr);
+  hslb.writefee8(adr, val);
+
+  // write access to register "reg1"
+  adr = obj("reg1").getInt("adr");
+  val = obj("reg1").getInt("val");
+  LogFile::debug("writefee8 val=%d to reg1(adr=%d)", val, adr);
+  hslb.writefee8(adr, val);
+
 }
 
 extern "C" {

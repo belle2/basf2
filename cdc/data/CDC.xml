@@ -12,7 +12,8 @@
       <!-- Min. track length -->
       <MinTrackLength desc="Min. track length required for saving in MCParticle.; to be applied to all particles other than primaries and decay-daughters." unit="mm">150.0</MinTrackLength>  
     </SensitiveDetector>
-    <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation>
+    <!--    <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation> --> 
+    <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation> 
 
     <!-- Material definition mode -->
     <MaterialDefinitionMode desc="=0: define a mixture of gases and wires in the entire tracking volume; =1: dummy (unavailable now); =2: define all sense and field wires explicitly in the volume.">0</MaterialDefinitionMode>

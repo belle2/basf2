@@ -748,6 +748,8 @@ namespace Belle2 {
       double m_senseWireDensity;                    /*!< The density of sense wires. */
       double m_fieldWireDiameter;                   /*!< The diameter of field wires. */
 
+      double m_globalPhiRotation;  /*!< Global ratation in phi (rad.); only for sence wires now. */
+
       double m_motherInnerR;  /*!< The inner radius of cdc mother volume. */
       double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
       double m_motherLength;  /*!< The length of cdc mother volume. */

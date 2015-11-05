@@ -127,6 +127,9 @@ void CDCGeometryPar::read()
   GearDir outerWallParams(content, "OuterWalls/");
   m_motherOuterR = outerWallParams.getLength("OuterWall[6]/OuterR");
 
+  m_globalPhiRotation = content.getAngle("GlobalPhiRotation");
+  //  std:: cout << content.getAngle("GlobalPhiRotation") << std::endl;
+
   int nBound = content.getNumberNodes("MomVol/ZBound");
   // Loop over to get the parameters of each boundary
   for (int iBound = 0; iBound < nBound; iBound++) {
@@ -902,10 +905,10 @@ unsigned CDCGeometryPar::cellId(unsigned layerId, const TVector3& position) cons
   }*/
 
   unsigned j = 0;
-  for (unsigned i = 0; i < 1; i++) {
+  for (unsigned i = 0; i < 1; ++i) {
     const double phiF = phiSize * (double(i) + offset)
-                        + phiSize * 0.5 * double(m_nShifts[layerId]);
-    const double phiB = phiSize * (double(i) + offset);
+                        + phiSize * 0.5 * double(m_nShifts[layerId]) + m_globalPhiRotation;
+    const double phiB = phiSize * (double(i) + offset)   + m_globalPhiRotation;
     const TVector3 f(m_rSLayer[layerId] * cos(phiF), m_rSLayer[layerId] * sin(phiF), m_zSForwardLayer[layerId]);
     const TVector3 b(m_rSLayer[layerId] * cos(phiB), m_rSLayer[layerId] * sin(phiB), m_zSBackwardLayer[layerId]);
     const TVector3 v = f - b;
@@ -1111,6 +1114,17 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   m_BWirPos[L][C][0] = m_rSLayer[L] * cos(phiB);
   m_BWirPos[L][C][1] = m_rSLayer[L] * sin(phiB);
   m_BWirPos[L][C][2] = m_zSBackwardLayer[L];
+
+  const double dfi = m_globalPhiRotation;
+  //  std::cout <<"dfi in CDCGeometry= " << dfi << std::endl;
+  double x = m_FWirPos[L][C][0];
+  double y = m_FWirPos[L][C][1];
+  m_FWirPos[L][C][0] = cos(dfi) * x - sin(dfi) * y;
+  m_FWirPos[L][C][1] = sin(dfi) * x + cos(dfi) * y;
+  x = m_BWirPos[L][C][0];
+  y = m_BWirPos[L][C][1];
+  m_BWirPos[L][C][0] = cos(dfi) * x - sin(dfi) * y;
+  m_BWirPos[L][C][1] = sin(dfi) * x + cos(dfi) * y;
 
   for (int i = 0; i < 3; ++i) {
     m_FWirPosMisalign[L][C][i] = m_FWirPos[L][C][i];

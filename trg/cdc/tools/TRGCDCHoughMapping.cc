@@ -201,9 +201,8 @@ superLayer(const unsigned id) {
 /////////////////////////////////////////////////base of ts
 
     for(int i=0 ; i<N_TS_SL0 ; i++) {
-        xy.x=r_SL0*cos((PI2/N_TS_SL0)*i);
-        xy.y=r_SL0*sin((PI2/N_TS_SL0)*i);
-
+     	xy.x=r_SL0*cos((PI2/N_TS_SL0)*i);
+	xy.y=r_SL0*sin((PI2/N_TS_SL0)*i);
         xymatrix.push_back(xy);
     }
 ///////////////////////////////////////////////////HP to TS
@@ -227,7 +226,7 @@ superLayer(const unsigned id) {
     const string vhp = "UT3_0_SL" + to_string(id * 2) + "_p.vhd";
     ofstream outputf(vh);
     ofstream outputfp(vhp);
-   
+
    //generate firware code(Minus)
      outputf<<"library IEEE;"<<endl;
      outputf<<"use IEEE.STD_LOGIC_1164.ALL;"<<endl;
@@ -235,7 +234,7 @@ superLayer(const unsigned id) {
      outputf<<" "<<endl;
      outputf<<"entity UT3_0_SL"<<SL<<" is"<<endl;
      outputf<<" "<<endl;
-     outputf<<"Port ("<<endl; 	 
+     outputf<<"Port ("<<endl;
      outputf<<"		  SL"<<SL<<"_row1  : out  STD_LOGIC_VECTOR (79 downto 40);"<<endl;
      outputf<<"		  SL"<<SL<<"_row2  : out  STD_LOGIC_VECTOR (79 downto 40);"<<endl;
      outputf<<"		  SL"<<SL<<"_row3  : out  STD_LOGIC_VECTOR (79 downto 40);"<<endl;
@@ -299,7 +298,7 @@ superLayer(const unsigned id) {
 
     //vertical
     for(int k=0 ; k<16 ; k++) {
-        
+
     //horizontal
         for(int t=0 ; t<160 ; t++) {
             double  j=t%160;
@@ -466,42 +465,7 @@ superLayer(const unsigned id) {
                 }
 
 
-        if (ff==1)
-                {
-                      if(ii==0){
-			    if(j>39 && j<80)
-                            outputf<<"or SL"<<SL<<"_TS("<<(N_TS_SL0 - 1)<<")";
-                            outc << " or SL" << SL << "_TS["<<(N_TS_SL0 - 1)<<"]";
-                            HPcelly[k][j].push_back(SL);
-                            HPcelly[k][j].push_back(N_TS_SL0 - 1);
-                                }
-                      if(ii!=0){
-		            if(j>39 && j<80)
-                            outputf<<"or SL"<<SL<<"_TS("<<ii-1<<")";
-                            outc << " or SL" << SL << "_TS[" << ii-1 << "]";
-                            HPcelly[k][j].push_back(SL);
-                            HPcelly[k][j].push_back(ii-1);
-                                }
-			    }
 
-        if (ffp==1)
-                {
-
-                      if(iip==(N_TS_SL0 - 1)){
-				if(j>=0 && j<40)
-                                outputfp<<"or SL"<<SL<<"_TS(0)";
-                                outcp<<" or SL"<< SL <<"_TS[0] ";
-                                pHPcelly[k][j].push_back(SL);
-                                pHPcelly[k][j].push_back(0);
-                                }
-                      if(iip!=(N_TS_SL0 - 1)) {
-				if(j>=0 && j<40)
-                                outputfp<<"or SL"<<SL<<"_TS("<<iip+1<<")";
-                                outcp << " or SL" << SL << "_TS[" << iip+1 << "]";
-                                pHPcelly[k][j].push_back(SL);
-                                pHPcelly[k][j].push_back(iip+1);
-                            }
-                }
 
 
 			 if(j>39 && j<80)
@@ -513,7 +477,7 @@ superLayer(const unsigned id) {
 
             }
        }
-                        outputf<<" "<<endl; 
+                        outputf<<" "<<endl;
 			outputf<<"end Behavioral;"<<endl;
 			outputfp<<" "<<endl;
                         outputfp<<"end Behavioral;"<<endl;

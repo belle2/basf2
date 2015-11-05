@@ -320,6 +320,9 @@ bool DBObjectLoader::createDB(DBInterface& db,
                  "UNIQUE (path)); ", tablename.c_str());
       db.execute("create index %s_id_index on %s(id);",
                  tablename.c_str(), tablename.c_str());
+    } else {
+      db.execute("update configlist set lastupdate = current_timestamp where name = '%s';",
+                 tablename.c_str());
     }
     db.execute(ss.str().c_str());
   } catch (const DBHandlerException& e) {

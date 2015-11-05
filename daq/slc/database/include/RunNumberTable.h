@@ -24,6 +24,7 @@ namespace Belle2 {
   public:
     RunNumberList get(int expno, bool started, int runno_min = 0, int runno_max = -1);
     RunNumberList get(int expno, int runno_min = 0, int runno_max = -1);
+    RunNumberList get(const std::string& type, int expno, int runno_min = 0, int runno_max = -1);
 
   private:
     DBInterface& m_db;

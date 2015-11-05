@@ -13,11 +13,33 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
-  if (argc < 1 || (argc > 1 && std::string(argv[1]) == "-h")) {
-    printf("usage: %s [<expno>]\n", argv[0]);
-    return 1;
+  int expno = 0;
+  int runno_min = 0;
+  int runno_max = -1;
+  std::string type;
+  for (int i = 1; i < argc; i++) {
+    if (std::string(argv[i]) == "-h") {
+      printf("usage: %s [-exp <expno>] [-runmin <min>] [-runmax <max>\n",
+             argv[0]);
+      return 1;
+    }
+    if (std::string(argv[i]) == "-exp") {
+      i++;
+      expno = atoi(argv[i]);
+    }
+    if (std::string(argv[i]) == "-runmin") {
+      i++;
+      runno_min = atoi(argv[i]);
+    }
+    if (std::string(argv[i]) == "-runmax") {
+      i++;
+      runno_max = atoi(argv[i]);
+    }
+    if (std::string(argv[i]) == "-type") {
+      i++;
+      type = argv[i];
+    }
   }
-  int expno = (argc > 1) ? atoi(argv[1]) : 0;
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
@@ -25,7 +47,10 @@ int main(int argc, char** argv)
                          config.get("database.password"),
                          config.getInt("database.port"));
   db.connect();
-  const RunNumberList list(RunNumberTable(db).get(expno));
+
+  const RunNumberList list(type.size() > 0 ?
+                           RunNumberTable(db).get(type, expno, runno_min, runno_max) :
+                           RunNumberTable(db).get(expno, runno_min, runno_max));
   for (RunNumberList::const_iterator it = list.begin();
        it != list.end(); it++) {
     const RunNumber& rn(*it);

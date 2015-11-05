@@ -163,6 +163,45 @@ RunNumberList RunNumberTable::get(int expno, int runno_min, int runno_max)
   return list;
 }
 
+RunNumberList RunNumberTable::get(const std::string& type, int expno, int runno_min, int runno_max)
+{
+  RunNumberList list;
+  try {
+    std::stringstream ss;
+    ss << "select config, expno, runno, subno, isstart, id, "
+       << "extract(epoch from record_time) as record_time from runnumber "
+       << "where (config like '%%_" << type << "%%_' or config like '%%_"
+       << type << "' or config like '" << type << "%%_') and";
+    const std::string cmd = ss.str();
+    if (expno == 0) {
+      if (runno_max > 0) {
+        m_db.execute("%s runno >= %d and runno <= %d", cmd.c_str(), runno_min, runno_max);
+      } else {
+        m_db.execute("%s runno >= %d", cmd.c_str(), runno_min);
+      }
+    } else {
+      if (runno_max > 0) {
+        m_db.execute("%s expno = %d and runno >= %d and runno <= %d",
+                     cmd.c_str(), expno, runno_min, runno_max);
+      } else {
+        m_db.execute("%s expno = %d and runno >= %d", cmd.c_str(), expno, runno_min);
+      }
+    }
+    const DBRecordList record_v(m_db.loadRecords());
+    for (DBRecordList::const_iterator it = record_v.begin();
+         it != record_v.end(); it++) {
+      const DBRecord& record(*it);
+      list.push_back(RunNumber(record.get("config"), record.getInt("expno"),
+                               record.getInt("runno"), record.getInt("subno"),
+                               record.getBool("isstart"), record.getInt("id"),
+                               record.getInt("record_time")));
+    }
+  } catch (const DBHandlerException& e) {
+    LogFile::error("DB access error : %s", e.what());
+  }
+  return list;
+}
+
 void RunNumberTable::create()
 {
   if (!m_db.checkTable("runnumber")) {

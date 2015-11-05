@@ -33,6 +33,7 @@ int main(int argc, char** argv)
                            config.get("database.user"),
                            config.get("database.password"),
                            config.getInt("database.port"));
+
     while (true) {
       TCPSocket socket;
       try {

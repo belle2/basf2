@@ -97,49 +97,25 @@ namespace Belle2 {
       return vote < 0;
     }
 
-    double isRestOfEventOfB0(const Particle*)
-    {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      Particle* part = roe->getRelated<Particle>();
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
-      else if (mcParticle->getPDG() == 511) {
-        return 1.0;
-      }
-      return 0.0;
-    }
-
-    double isRestOfEventOfB0bar(const Particle*)
-    {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      Particle* part = roe->getRelated<Particle>();
-      const MCParticle* mcParticle = part->getRelated<MCParticle>();
-      if (mcParticle == nullptr) {return -999.0;} //if there is no mcparticle (e.g. not in training modus)
-      else if (mcParticle->getPDG() == -511) {
-        return 1.0;
-      }
-      return 0.0;
-    }
-
     double isRestOfEventEmpty(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       float ObjectsInROE = 0; //Flavor of B
       if (roe-> getNTracks() != 0) {
         ObjectsInROE++;
-      } else if (roe-> getNECLClusters() != 0) {
-        ObjectsInROE++;
-      } else if (roe-> getNKLMClusters() != 0) {
-        ObjectsInROE++;
+//       } else if (roe-> getNECLClusters() != 0) {
+//         ObjectsInROE++;
+//       } else if (roe-> getNKLMClusters() != 0) {
+//         ObjectsInROE++;
       }
       if (ObjectsInROE > 0) {
         return ObjectsInROE;
       } else return -2;
     }
 
-    double isRestOfEventB0Flavor(const Particle*)
+    double isRelatedRestOfEventB0Flavor(const Particle* part)
     {
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       float q_MC = 0; //Flavor of B
       if (roe-> getNTracks() != 0) {
         for (auto& track : roe->getTracks()) {
@@ -190,11 +166,11 @@ namespace Belle2 {
       if (q_MC > 0) {
         return 1;
       } else if (q_MC < 0) {
-        return -1;
+        return 0;
       } else return -2;
     }
 
-    double isRestOfEventB0Flavor_Norm(const Particle*)
+    double isRestOfEventB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
@@ -670,11 +646,13 @@ namespace Belle2 {
         auto func = [particleName](const Particle * particle) -> double {
           Particle* nullpart = nullptr;
           float maximum_q = 0;
+          float qMC = 0;
           int maximum_PDG = 0;
           int maximum_PDG_Mother = 0;
           int maximum_PDG_Mother_Mother = 0;
           const MCParticle* MCp = particle ->getRelated<MCParticle>();
           maximum_q = particle -> getCharge();
+          qMC = 2 * (Variable::Manager::Instance().getVariable("qrCombined")->function(nullpart) - 0.5);
           if (MCp != nullptr)
           {
             maximum_PDG = TMath::Abs(MCp->getPDG());
@@ -735,58 +713,51 @@ namespace Belle2 {
             }
           }
           if (particleName == "Electron"
-              && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother == 511)
-                  || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)))
+              && ((maximum_q == qMC && maximum_PDG == 11 && maximum_PDG_Mother == 511)
+                  || (maximum_q != qMC && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)))
           {
             return 1.0;
           } else if (particleName == "IntermediateElectron"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)
+                     && maximum_q != qMC && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)
           {
             return 1.0;
           } else if (particleName == "Muon"
-                     && ((maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother == 511)
-                         || (maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)))
+                     && ((maximum_q == qMC && maximum_PDG == 13 && maximum_PDG_Mother == 511)
+                         || (maximum_q != qMC && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)))
           {
             return 1.0;
           } else if (particleName == "IntermediateMuon"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)
+                     && maximum_q != qMC && maximum_PDG == 13 && maximum_PDG_Mother_Mother == 511)
           {
             return 1.0;
           }  else if (particleName == "KinLepton"
-                      && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart) && (maximum_PDG == 11 || maximum_PDG == 13) && maximum_PDG_Mother == 511)
+                      && maximum_q == qMC && (maximum_PDG == 11 || maximum_PDG == 13) && maximum_PDG_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "Kaon"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "Kaon" && maximum_q == qMC
                      && maximum_PDG == 321 && maximum_PDG_Mother > 400 && maximum_PDG_Mother < 500 && maximum_PDG_Mother_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "SlowPion"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "SlowPion" && maximum_q != qMC
                      && maximum_PDG == 211 && maximum_PDG_Mother == 413 && maximum_PDG_Mother_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "KaonPion"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "KaonPion" && maximum_q == qMC
                      && maximum_PDG == 321 && SlowPion_PDG == 211 && maximum_PDG_Mother == SlowPion_PDG_Mother)
           {
             return 1.0;
-          } else if (particleName == "FastPion"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "FastPion" && maximum_q == qMC
                      && maximum_PDG == 211 && maximum_PDG_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "MaximumP*"
-                     && maximum_q == Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart))
+          } else if (particleName == "MaximumP*" && maximum_q == qMC)
           {
             return 1.0;
-          } else if (particleName == "FSC"
-                     && maximum_q != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "FSC" && maximum_q != qMC
                      && maximum_PDG == 211 && FastParticle_PDG_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "Lambda"
-                     && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != Variable::Manager::Instance().getVariable("isRestOfEventB0Flavor")->function(nullpart)
+          } else if (particleName == "Lambda" && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != qMC
                      && maximum_PDG == 3122)
           {
             return 1.0;
@@ -1123,13 +1094,11 @@ namespace Belle2 {
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
-    REGISTER_VARIABLE("isRestOfEventOfB0", isRestOfEventOfB0,  "[Eventbased] Check if current RestOfEvent is related to a B0.");
-    REGISTER_VARIABLE("isRestOfEventOfB0bar", isRestOfEventOfB0bar,
-                      "[Eventbased] Check if current RestOfEvent is related to a B0 B0bar.");
     REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,
                       "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
-    REGISTER_VARIABLE("isRestOfEventB0Flavor", isRestOfEventB0Flavor,  "-1 (1) if current RestOfEvent is related to a B0bar (B0).");
-    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor_Norm,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
+    REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
+                      "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0).");
+    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,
                       "Returns the number of K_S0 in the remainging Kaon ROE.");

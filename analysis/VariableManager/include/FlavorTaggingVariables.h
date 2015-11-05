@@ -30,29 +30,19 @@ namespace Belle2 {
     double isMajorityInRestOfEventFromB0bar(const Particle*);
 
     /**
-     * return 1 if (dummy)
-     */
-    double isRestOfEventOfB0(const Particle*);
-
-    /**
-     * return 1 if (dummy)
-     */
-    double isRestOfEventOfB0bar(const Particle*);
-
-    /**
      * -1 (1) if current RestOfEvent is related to a B0bar (B0) and -2 if empty - used for cuts
      */
     double isRestOfEventEmpty(const Particle* part);
 
     /**
-     * -1 (1) if current RestOfEvent is related to a B0bar (B0)
+     * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0)
      */
+    double isRelatedRestOfEventB0Flavor(const Particle* part);
 
-    double isRestOfEventB0Flavor(const Particle*);
     /**
      * 0 (1) if current RestOfEvent is related to a B0bar (B0)
      */
-    double isRestOfEventB0Flavor_Norm(const Particle*);
+    double isRestOfEventB0Flavor(const Particle*);
 
     /**
      * returns missing Momentum on the tag side (flavor tagging specific variable).

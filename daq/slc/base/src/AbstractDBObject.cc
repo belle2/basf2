@@ -26,26 +26,26 @@ void AbstractDBObject::reset() throw()
   m_path = "";
   m_id = 0;
   m_index = 0;
-  m_name_v = FieldNameList();
-  m_pro_m = FieldPropertyList();
+  m_name_v = DBField::NameList();
+  m_pro_m = DBField::PropertyList();
 }
 
 DBField::Property AbstractDBObject::getProperty(const std::string& name) const throw()
 {
-  FieldPropertyList::const_iterator it = m_pro_m.find(name);
+  DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   if (it != m_pro_m.end()) return it->second;
   return DBField::Property();
 }
 
 bool AbstractDBObject::hasField(const std::string& name) const throw()
 {
-  FieldPropertyList::const_iterator it = m_pro_m.find(name);
+  DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return (it != m_pro_m.end());
 }
 
 bool AbstractDBObject::hasValue(const std::string& name) const throw()
 {
-  FieldPropertyList::const_iterator it = m_pro_m.find(name);
+  DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) &&
          it->second.getType() != DBField::TEXT &&
          it->second.getType() != DBField::OBJECT;
@@ -53,13 +53,13 @@ bool AbstractDBObject::hasValue(const std::string& name) const throw()
 
 bool AbstractDBObject::hasText(const std::string& name) const throw()
 {
-  FieldPropertyList::const_iterator it = m_pro_m.find(name);
+  DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) && it->second.getType() == DBField::TEXT;
 }
 
 bool AbstractDBObject::hasObject(const std::string& name) const throw()
 {
-  FieldPropertyList::const_iterator it = m_pro_m.find(name);
+  DBField::PropertyList::const_iterator it = m_pro_m.find(name);
   return hasField(name) &&
          it->second.getType() == DBField::OBJECT;
 }
@@ -68,7 +68,7 @@ void AbstractDBObject::add(const std::string& name, DBField::Property pro) throw
 {
   if (!hasField(name)) {
     m_name_v.push_back(name);
-    m_pro_m.insert(FieldPropertyList::value_type(name, pro));
+    m_pro_m.insert(DBField::PropertyList::value_type(name, pro));
   }
 }
 

@@ -56,8 +56,8 @@ NSMData::NSMData(const NSMData& data) throw()
   } else {
     if (data.m_pdata != NULL) m_pdata = data.m_pdata;
   }
-  const FieldNameList& name_v(data.getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  const DBField::NameList& name_v(data.getFieldNames());
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     const DBField::Property& pro(data.getProperty(name));
@@ -323,9 +323,9 @@ void NSMData::writeObject(Writer& writer) const throw(IOException)
   writer.writeString(getFormat());
   writer.writeInt(getRevision());
   writer.writeInt(getSize());
-  const FieldNameList& name_v(getFieldNames());
+  const DBField::NameList& name_v(getFieldNames());
   writer.writeInt(name_v.size());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     writer.writeString(name);
@@ -376,8 +376,8 @@ void NSMData::print(const std::string& name_in) const throw()
 void NSMData::search(NSMData::NameValueList& map,
                      const std::string& name_in) const throw()
 {
-  const FieldNameList& name_v(getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  const DBField::NameList& name_v(getFieldNames());
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));
@@ -440,8 +440,8 @@ void NSMData::search(NSMData::NameValueList& map,
 
 void NSMData::printPV(const std::string& name_in) const throw()
 {
-  const FieldNameList& name_v(getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  const DBField::NameList& name_v(getFieldNames());
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));

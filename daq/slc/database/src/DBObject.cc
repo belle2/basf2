@@ -39,7 +39,7 @@ void DBObject::copy(const DBObject& obj)
   setId(obj.getId());
   setPath(obj.getPath());
   setName(obj.getName());
-  for (FieldNameList::const_iterator it = obj.getFieldNames().begin();
+  for (DBField::NameList::const_iterator it = obj.getFieldNames().begin();
        it != obj.getFieldNames().end(); it++) {
     const std::string& name(*it);
     DBField::Type type = obj.getProperty(name).getType();
@@ -108,7 +108,7 @@ const DBObject& DBObject::getObject(const std::string& name, int i) const throw(
 
 void DBObject::reset() throw()
 {
-  const FieldNameList& name_v(getFieldNames());
+  const DBField::NameList& name_v(getFieldNames());
   for (size_t ii = 0; ii < name_v.size(); ii++) {
     const std::string& name(name_v[ii]);
     if (hasObject(name)) {
@@ -164,9 +164,9 @@ void DBObject::writeObject(Writer& writer) const throw(IOException)
 {
   writer.writeString(getPath());
   writer.writeString(getName());
-  const FieldNameList& name_v(getFieldNames());
+  const DBField::NameList& name_v(getFieldNames());
   writer.writeInt(name_v.size());
-  for (FieldNameList::const_iterator iname = name_v.begin();
+  for (DBField::NameList::const_iterator iname = name_v.begin();
        iname != name_v.end(); iname++) {
     const std::string name = *iname;
     DBField::Type type = getProperty(name).getType();
@@ -321,8 +321,8 @@ StringList DBObject::getNameList(bool isfull) const throw()
 void DBObject::search(NameValueList& map, const std::string& name_in, bool isfull)
 const throw()
 {
-  const FieldNameList& name_v(getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  const DBField::NameList& name_v(getFieldNames());
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));
@@ -403,8 +403,8 @@ void DBObject::printSQL(const std::string& table, std::ostream& out,
     out << StringUtil::form("insert into %s (name, path) values ('%s', '.%s.');",
                             table.c_str(), getName().c_str(), name_in.c_str()) << std::endl;
   }
-  const FieldNameList& name_v(getFieldNames());
-  for (FieldNameList::const_iterator it = name_v.begin();
+  const DBField::NameList& name_v(getFieldNames());
+  for (DBField::NameList::const_iterator it = name_v.begin();
        it != name_v.end(); it++) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));

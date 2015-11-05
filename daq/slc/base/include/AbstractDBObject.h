@@ -29,8 +29,8 @@ namespace Belle2 {
     void setName(const std::string& name) throw() { m_name = name; }
     int getIndex() const { return m_index; }
     void setIndex(int index) { m_index = index; }
-    FieldNameList& getFieldNames() throw() { return m_name_v; }
-    const FieldNameList& getFieldNames() const throw() { return m_name_v; }
+    DBField::NameList& getFieldNames() throw() { return m_name_v; }
+    const DBField::NameList& getFieldNames() const throw() { return m_name_v; }
     DBField::Property getProperty(const std::string& name) const throw();
     bool hasField(const std::string& name) const throw();
     bool hasValue(const std::string& name) const throw();
@@ -81,8 +81,8 @@ namespace Belle2 {
     std::string m_path;
     int m_id;
     std::string m_name;
-    FieldNameList m_name_v;
-    FieldPropertyList m_pro_m;
+    DBField::NameList m_name_v;
+    DBField::PropertyList m_pro_m;
 
   private:
     template<typename T>

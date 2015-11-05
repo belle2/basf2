@@ -77,9 +77,11 @@ namespace Belle2 {
       int m_offset;
 
     };
+
+    typedef std::vector<std::string> NameList;
+    typedef std::map<std::string, DBField::Property> PropertyList;
+
   }
-  typedef std::vector<std::string> FieldNameList;
-  typedef std::map<std::string, DBField::Property> FieldPropertyList;
 
 }
 

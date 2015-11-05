@@ -129,6 +129,9 @@ void TTDACallback::start(int expno, int runno) throw(RCHandlerException)
     system(cmd.c_str());
     sleep(1);
     trigft();
+    cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d %s", m_ftswid, m_trigger_type.c_str());
+    LogFile::debug(cmd);
+    system(cmd.c_str());
   }
 }
 
@@ -168,9 +171,12 @@ void TTDACallback::recover(const DBObject&) throw(RCHandlerException)
 
 void TTDACallback::abort() throw(RCHandlerException)
 {
+  stop();
+  /*
   if (m_ttdnode.getName().size() > 0) {
     send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   }
+  */
 }
 
 void TTDACallback::trigft() throw(RCHandlerException)
@@ -192,11 +198,6 @@ void TTDACallback::trigft() throw(RCHandlerException)
       LogFile::debug(cmd);
       system(cmd.c_str());
       sleep(1);
-      //cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d %s %d %d", m_ftswid,
-      //           m_trigger_type.c_str(), pars[1], pars[2]);
-      cmd = StringUtil::form("/home/usr/nakao/bin/trigft -%d %s", m_ftswid);
-      LogFile::debug(cmd);
-      system(cmd.c_str());
     }
   } catch (const std::out_of_range& e) {
     LogFile::error(e.what());

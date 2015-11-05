@@ -9,8 +9,12 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
+#include <analysis/VariableManager/FlavorTaggingVariables.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Variables.h>
+#include <analysis/utility/MCMatching.h>
+#include <mdst/dataobjects/MCParticle.h>
 
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <cmath>
 #include <TBranch.h>
 #include <TLorentzVector.h>
@@ -40,8 +44,7 @@ void NtupleFlavorTaggingTool::setupTree()
 void NtupleFlavorTaggingTool::eval(const Particle* particle)
 {
   if (!particle) {
-//     B2ERROR("NtupleFlavorTaggingTool::eval - no Particle found!");
-    printf("NtupleFlavorTaggingTool::eval - no Particle found!");
+    B2INFO("NtupleFlavorTaggingTool::eval - no Particle found!");
     return;
   }
 
@@ -58,13 +61,17 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     qrCombined[iProduct] = -2;
     qrMC[iProduct] = -2;
 
-    const RestOfEvent* roe = selparticles[iProduct]->getRelatedTo<RestOfEvent>();
 
-    if (roe) {
+    if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
       B0Probability[iProduct] = selparticles[iProduct]->getExtraInfo("B0Probability");
       B0barProbability[iProduct] = selparticles[iProduct]->getExtraInfo("B0barProbability");
       qrCombined[iProduct] = selparticles[iProduct]->getExtraInfo("qrCombined");
-      qrMC[iProduct] = selparticles[iProduct]->getExtraInfo("qrMC");
+
+      //  MC Flavor is saved only if mcparticles is not empty
+      StoreArray<MCParticle> mcparticles;
+      if ((mcparticles.getEntries()) > 0) {
+        qrMC[iProduct] = 2 * (Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]) - 0.5);
+      }
     }
   }
 }

@@ -6,6 +6,9 @@
 
 #include <mgt/hsreg.h>
 
+#define REG0_ADDR 0x01
+#define REG1_ADDR 0x02
+
 using namespace Belle2;
 
 TEMPLATEFEE::TEMPLATEFEE()
@@ -15,8 +18,8 @@ TEMPLATEFEE::TEMPLATEFEE()
 void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("template[%d].", hslb.get_finid());
-  callback.add(new FEE8Handler(vname + "reg0", callback, hslb, *this, 0x01));
-  callback.add(new FEE8Handler(vname + "reg1", callback, hslb, *this, 0x02));
+  callback.add(new FEE8Handler(vname + "reg0", callback, hslb, *this, REG0_ADDR));
+  callback.add(new FEE8Handler(vname + "reg1", callback, hslb, *this, REG1_ADDR));
 }
 
 void TEMPLATEFEE::boot(HSLB& hslb,  const DBObject& obj)
@@ -35,16 +38,14 @@ void TEMPLATEFEE::load(HSLB& hslb, const DBObject& obj)
   }
 
   // write access to register "reg0"
-  int adr = obj("reg0").getInt("adr");
-  int val = obj("reg0").getInt("val");
-  LogFile::debug("writefee8 val=%d to reg0(adr=%d)", val, adr);
-  hslb.writefee8(adr, val);
+  int val = obj.getInt("reg0");
+  LogFile::debug("writefee8 val=%d to reg0(adr=%d)", val, REG0_ADDR);
+  hslb.writefee8(REG0_ADDR, val);
 
   // write access to register "reg1"
-  adr = obj("reg1").getInt("adr");
-  val = obj("reg1").getInt("val");
-  LogFile::debug("writefee8 val=%d to reg1(adr=%d)", val, adr);
-  hslb.writefee8(adr, val);
+  val = obj.getInt("reg1");
+  LogFile::debug("writefee8 val=%d to reg1(adr=%d)", val, REG1_ADDR);
+  hslb.writefee8(REG1_ADDR, val);
 
 }
 

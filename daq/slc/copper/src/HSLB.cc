@@ -286,7 +286,7 @@ std::string HSLB::checkfee() throw(HSLBHandlerException)
   return std::string("UNKNOWN");
 }
 
-void HSLB::test() throw(HSLBHandlerException)
+std::string HSLB::test() throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));
@@ -296,6 +296,7 @@ void HSLB::test() throw(HSLBHandlerException)
   if (check_hslb(&m_hslb, msg) > 0) {
     throw (HSLBHandlerException("tesths failed : %s", msg));
   }
+  return msg;
 }
 
 void HSLB::linkfee() throw(HSLBHandlerException)

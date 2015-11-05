@@ -251,51 +251,18 @@ bool NSMVHandlerHSLBRegFixed::handleGetInt(int& val)
   return false;
 }
 
-bool NSMVHandlerHSLBLinkFee::handleSetInt(int val)
+bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
 {
-  LogFile::info("trgon FEE (HSLB:%c)", m_hslb + 'a');
   if (val > 0) {
-    LogFile::info("link FEE (HSLB:%c)", m_hslb + 'a');
+    LogFile::info("Test HSLB:%c", m_hslb + 'a');
     try {
-      m_callback.getHSLB(m_hslb).linkfee();
+      val = m_callback.getHSLB(m_hslb).test();
       return true;
     } catch (const HSLBHandlerException& e) {
       LogFile::error(e.what());
     }
   } else {
-    LogFile::error("Failed to link FEE (HSLB:%c)", m_hslb + 'a');
-  }
-  return false;
-}
-
-bool NSMVHandlerHSLBTrgOnFee::handleSetInt(int val)
-{
-  if (val > 0) {
-    LogFile::info("trgon FEE (HSLB:%c)", m_hslb + 'a');
-    try {
-      m_callback.getHSLB(m_hslb).trgonfee();
-      return true;
-    } catch (const HSLBHandlerException& e) {
-      LogFile::error(e.what());
-    }
-  } else {
-    LogFile::error("Failed to trig on FEE (HSLB:%c)", m_hslb + 'a');
-  }
-  return false;
-}
-
-bool NSMVHandlerHSLBTrgOffFee::handleSetInt(int val)
-{
-  if (val > 0) {
-    LogFile::info("trgoff FEE (HSLB:%c)", m_hslb + 'a');
-    try {
-      m_callback.getHSLB(m_hslb).trgofffee();
-      return true;
-    } catch (const HSLBHandlerException& e) {
-      LogFile::error(e.what());
-    }
-  } else {
-    LogFile::error("Failed to trg off FEE (HSLB:%c)", m_hslb + 'a');
+    LogFile::error("Failed to Test HSLB:%c", m_hslb + 'a');
   }
   return false;
 }

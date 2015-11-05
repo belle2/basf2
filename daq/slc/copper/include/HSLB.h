@@ -50,7 +50,7 @@ namespace Belle2 {
     void writefee32(int adr, int val) throw(HSLBHandlerException);
     void writestream(const char* filename) throw(HSLBHandlerException);
     std::string checkfee() throw(HSLBHandlerException);
-    void test() throw(HSLBHandlerException);
+    std::string test() throw(HSLBHandlerException);
     void linkfee() throw(HSLBHandlerException);
     void trgofffee() throw(HSLBHandlerException);
     void trgonfee() throw(HSLBHandlerException);

@@ -52,10 +52,8 @@ MisalignmentGeneratorModule::MisalignmentGeneratorModule() : Module()
 
 void MisalignmentGeneratorModule::initialize()
 {
-  // Misalignment valid for entire experiment (all runs)
   IntervalOfValidity iov(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh);
-
-  VXDAlignment data;
+  auto data = new VXDAlignment();
 
   for (auto& id : VXD::GeoCache::getInstance().getListOfSensors()) {
     for (auto paramData : m_data) {
@@ -80,13 +78,13 @@ void MisalignmentGeneratorModule::initialize()
 
       if (distro == "gaus") value = gRandom->Gaus(0., value);
 
-      data.set(id, paramID, value);
+      data->set(id, paramID, value);
     }
   }
 
-  data.dump();
+  data->dump();
 
-  Database::Instance().storeData(m_name, &data, iov);
+  Database::Instance().storeData(m_name, data, iov);
 }
 
 

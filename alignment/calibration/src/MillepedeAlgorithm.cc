@@ -156,21 +156,21 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isVXD()) {
       // Add correction to all objects
       for (auto& vxd : newVXD) {
-        vxd.first->add(param.getVxdID(), param.getParameterId(), correction);
+        vxd.first->add(param.getVxdID(), param.getParameterId(), correction, m_invertSign);
       }
     }
 
     if (param.isCDC()) {
       // Add correction to all objects
       for (auto& cdc : newCDC) {
-        cdc.first->add(param.getWireID(), param.getParameterId(), correction);
+        cdc.first->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
       }
     }
 
     if (param.isKLM()) {
       // Add correction to all objects
       for (auto& bklm : newBKLM) {
-        bklm.first->add(param.getWireID(), param.getParameterId(), correction);
+        bklm.first->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
       }
     }
   }
@@ -189,8 +189,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (fabs(maxCorrectionPull) > 50.)
       B2INFO("Largest correction/error is " << maxCorrectionPull << " for parameter with label " << maxCorrectionPullLabel);
     if (paramChi2 / nParams >= 1.)
-      B2INFO("Parameter corrections incosistent with small change, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams <<
-             " > 2.");
+      B2INFO("Parameter corrections incosistent with small change, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams
+             << " = " << paramChi2 << " / " << nParams << " > 2.");
     B2INFO("Requesting iteration.");
     return c_Iterate;
   }

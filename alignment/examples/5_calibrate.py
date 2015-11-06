@@ -11,15 +11,11 @@ set_debug_level(1000)
 reset_database()
 use_local_database()
 
-# main = create_path()
-# main.add_module('RootInput')
-# process(main)
-
 # Only initialize RootInput, as we do not loop over events,
 # only load persistent objects stored during data collection
-inmod = register_module('RootInput')
-inmod.param('inputFileName', 'RootOutput.root')
-inmod.initialize()
+input = register_module('RootInput')
+input.param('inputFileName', 'RootOutput.root')
+input.initialize()
 
 # We only need to initialize Gearbox and Geometry
 # in order for VXDGeoCache to know about sensors and
@@ -54,6 +50,7 @@ for icLayer in range(0, 57):
   algo.steering().command(cmd)
 """
 
+# algo.invertSign()
 algo.execute()
 
 
@@ -62,6 +59,8 @@ import ROOT
 
 x_profile = ROOT.TH1F("x-profile", "X correction for layers", 56, 0, 56)
 y_profile = ROOT.TH1F("y-profile", "Y correction for layers", 56, 0, 56)
+
+real_vxd = None
 
 for payload in algo.getPayloads():
     vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
@@ -75,6 +74,7 @@ for payload in algo.getPayloads():
             y_profile.SetBinContent(icLayer, y)
             y_profile.SetBinError(icLayer, cdc.getError(Belle2.WireID(icLayer, 511), 1))
     except:
+        real_vxd = vxd
         pass
 
 # Done in algo
@@ -84,5 +84,5 @@ chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1
 pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
 
-# import interactive
-# interactive.embed()
+import interactive
+interactive.embed()

@@ -9,13 +9,12 @@
  **************************************************************************/
 
 #pragma once
+
 #include <calibration/CalibrationAlgorithm.h>
 #include <alignment/PedeResult.h>
 #include <alignment/dataobjects/PedeSteering.h>
 
 namespace Belle2 {
-  class PedeSteering;
-  class PedeResult;
   /**
    * Class implementing Millepede calibration algorithm
    */
@@ -28,8 +27,14 @@ namespace Belle2 {
     /// Destructor
     virtual ~MillepedeAlgorithm() {}
 
+    /// Get the steering to set commands etc.
     PedeSteering& steering() {return m_steering;}
+
+    /// Get the result (invalid until executed) to get parameters etc.
     alignment::PedeResult& result() {return m_result;}
+
+    /// Add (false, default behavior) or subtract (true) corrections to previous values?
+    void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
 
   protected:
 
@@ -37,10 +42,14 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
+    /// Add (true) or subtract (false) corrections?
+    bool m_invertSign{false};
+    /// The steering with commands
     PedeSteering m_steering{"PedeSteering.txt"};
+    /// The result (invalid until execution)
     alignment::PedeResult m_result{};
 
-    ClassDef(MillepedeAlgorithm, 0); /**< Millepede class implementing calibration algorithm */
+    ClassDef(MillepedeAlgorithm, 0); /**< Class implementing Millepede calibration algorithm */
 
   };
 } // namespace Belle2

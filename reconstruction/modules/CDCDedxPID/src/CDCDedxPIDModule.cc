@@ -286,7 +286,7 @@ void CDCDedxPIDModule::event()
       // make sure the fitter info exists
       const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo(trackrep);
       if (!fi) {
-        B2DEBUG("No fitter info, skipping...");
+        B2DEBUG(50, "No fitter info, skipping...");
         continue;
       }
 
@@ -426,7 +426,7 @@ void CDCDedxPIDModule::event()
 
 
     if (dedxTrack->dedx.empty()) {
-      B2DEBUG("Found track with no hits, ignoring.");
+      B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
     }
 

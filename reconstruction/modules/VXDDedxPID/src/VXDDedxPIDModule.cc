@@ -295,7 +295,7 @@ void VXDDedxPIDModule::event()
     }
 
     if (dedxTrack->dedx.empty()) {
-      B2DEBUG("Found track with no hits, ignoring.");
+      B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
     }
 

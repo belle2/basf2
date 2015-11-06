@@ -135,7 +135,7 @@ namespace TCNetworkContainerTests {
     StoreArray<PXDCluster> pxdClusterData; /**< some pxd clusters for testing. */
     StoreArray<SpacePointTrackCand> spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
 
-    StoreArray<SpTcNetwork> networkContainerInDataStore;
+    StoreArray<SpTcNetwork> networkContainerInDataStore; /**< network container in the datastore. */
   };
 
 

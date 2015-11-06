@@ -37,6 +37,7 @@ namespace Belle2 {
   protected:
   };
 
+  /** tests filters using 4 hits. */
   TEST_F(FourHitFiltersTest, TestFourHits)
   {
     TVector3 hit2(-2, 0, 0.), hit3(0, 2, 0.), hit1(0, 0, 0.), hit4(2, 0, 0.);

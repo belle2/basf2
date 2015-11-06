@@ -74,21 +74,21 @@ namespace Belle2 {
     std::string m_PARAMtcArrayName;
 
 
-    bool m_PARAMuseTimeSeedAsQI; /** JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators */
+    bool m_PARAMuseTimeSeedAsQI; /**< JKL - WARNING evil hack: uses an ugly workaround to be able to use realistically determined quality indicators */
 
 
     // member variables
 
 
-    /** knows current event number */
+    /** knows current event number. */
     unsigned int m_eventCounter;
 
 
-    /** total number of TCs found in SpacePointTrackCand-container */
+    /** total number of TCs found in SpacePointTrackCand-container. */
     unsigned int m_nTCsTotal;
 
 
-    /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */
+    /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 
   private:

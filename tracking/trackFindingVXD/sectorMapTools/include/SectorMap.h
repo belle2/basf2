@@ -21,17 +21,17 @@
 namespace Belle2 {
 
 
-  // This class contains everything needed by the VXDTF that is not going
-  // to change during a RUN, i.e. IP position, B field @ IP, static sectors,
-  // 2 space points filters, 3 space points filters,  etc. etc.
-  // It will be put in the datastore with duration RUN.
-  // This class owns her members and she is in charge for their deletions.
+  /** This class contains everything needed by the VXDTF that is not going
+  * to change during a RUN, i.e. IP position, B field @ IP, static sectors,
+  * 2 space points filters, 3 space points filters,  etc. etc.
+  * It will be put in the datastore with duration RUN.
+  * This class owns her members and she is in charge for their deletions. */
   class SectorMap : public TObject {
   private:
-    // Contains all the Filters and configurations indexed by their setupNames
-    // m_SegmentFilters is a pointer to an unsorted_map, since ROOT 5 is
-    // not able to digest it... I will hide its identity to ROOTCINT
-    // cfr. PIMPL or Opaque Pointers
+    /** Contains all the Filters and configurations indexed by their setupNames
+     * m_SegmentFilters is a pointer to an unsorted_map, since ROOT 5 is
+     * not able to digest it... I will hide its identity to ROOTCINT
+     * cfr. PIMPL or Opaque Pointers */
     void* m_allSetupsFilters;  //! transient value
 
 
@@ -49,16 +49,20 @@ namespace Belle2 {
     SectorMap();
     virtual ~SectorMap();
 
+    /** returns filters. */
     const VXDTFFilters* getFilters(const std::string& setupName);
 
 #ifndef __CINT__
+    /** returns setups. */
     const std::unordered_map< std::string, VXDTFFilters*>& getAllSetups(void);
 #endif
 
+    /** assigns filters. */
     void assignFilters(const std::string& setupName ,
                        VXDTFFilters* filters);
 
 
+    /** root class definition. */
     ClassDef(SectorMap , 11);
   };
 }

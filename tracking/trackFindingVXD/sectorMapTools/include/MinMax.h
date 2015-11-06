@@ -48,7 +48,7 @@ namespace Belle2 {
       std::string min = m_minMax.first == std::numeric_limits< double >::max() ? "max<double>" : std::to_string(m_minMax.first);
       std::string max = m_minMax.second == std::numeric_limits< double >::min() ? "min<double>" : std::to_string(m_minMax.second);
       return "min: " + min + ", max: " + max;
-    }
+    } /**< print function returning results for min and max as a string. */
   };
 }
 

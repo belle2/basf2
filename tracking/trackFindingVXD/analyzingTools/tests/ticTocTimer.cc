@@ -19,6 +19,7 @@ using namespace std::chrono;
 
 namespace Belle2 {
 
+  /** testing tictoctimer. */
   class TicTocTimerTest : public ::testing::Test {
 
   protected:

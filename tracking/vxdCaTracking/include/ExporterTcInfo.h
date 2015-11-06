@@ -60,11 +60,11 @@ namespace Belle2 {
     std::string getInfo() { return m_tcInfo; }
 
 
-    /**< returns pdgCode of tc in the tc-file */
+    /** returns pdgCode of tc in the tc-file */
     int getPdgCode() { return m_pdgCode; }
 
 
-    /**< returns index of the mother particle in the simulation */
+    /** returns index of the mother particle in the simulation */
     int getMotherID() { return m_motherID; }
 
 

@@ -389,7 +389,7 @@ namespace Belle2 {
       LocalCoordinates m_pTCuts; /**< .first stores lower, .second stores upper cut for pT. */
       LocalCoordinates m_acceptedRange; /**< if values > 0: .first is min distance to IP, .second is max distance to IP. */
       std::string m_name; /**< stores name for this InternalRawSectorMap. */
-      unsigned short m_highestAllowedLayer;
+      unsigned short m_highestAllowedLayer; /**< sets the highest layer allowed for the InternalRawSectorMap. */
       bool m_usePXD; /**< if true, secMap accepts PXD-hits. */
       bool m_useSVD; /**< if true, secMap accepts SVD-hits. */
       bool m_useTEL; /**< if true, secMap accepts TEL-hits. */

@@ -362,11 +362,11 @@ namespace Belle2 {
 
   protected:
 
-    TwoHitFilters m_twoHit;
-    ThreeHitFilters m_threeHit;
-    FourHitFilters m_fourHit;
+    TwoHitFilters m_twoHit; /**< contains all 2-hit-filters. */
+    ThreeHitFilters m_threeHit; /**< contains all 3-hit-filters. */
+    FourHitFilters m_fourHit; /**< contains all 4-hit-filters. */
 
-    TVector3 m_virtualIP;
+    TVector3 m_virtualIP; /**< contains global coordinates of virtual interaction point. */
   };
 }
 

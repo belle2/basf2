@@ -47,12 +47,14 @@ namespace Belle2 {
     /** dummy declaration to get the module compiling without real static sectorMaps */
     struct StaticSectorMap {
 
+      /** contains static sectors. */
       std::vector<StaticSectorDummy*> sectors;
 
+      /** destructor. */
       ~StaticSectorMap()
-      {
-        for (auto* aSector : sectors) { delete aSector; }
-      }
+      { for (auto* aSector : sectors) { delete aSector; } }
+
+      /** returns secID. */
       FullSecID getSecID() {return FullSecID(); }
 
       /** returns pointerTo a Static Sector */

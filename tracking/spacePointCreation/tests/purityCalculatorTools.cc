@@ -105,10 +105,10 @@ namespace PurityCalcTests {
    */
   struct compFirst {
     explicit compFirst(int j) : i(j) { } /**< explicit constructor for use as functor with argument */
-    bool operator()(const pair<int, short>& p) /**< comparison operator returning true if .first is j (from ctor) */
+    bool operator()(const pair<int, short>& p)
     {
       return p.first == i;
-    }
+    } /**< comparison operator returning true if .first is j (from ctor) */
   private:
     int i; /**< only member holding the value that has to be matched by the .first element of a pair */
   };
@@ -118,10 +118,10 @@ namespace PurityCalcTests {
    */
   struct compMCId {
     explicit compMCId(int j) : i(j) { } /**< explicit constructor for use as functor with arguments */
-    bool operator()(const MCVXDPurityInfo& info) /**< operator comparing the particle Id and the passed argument */
+    bool operator()(const MCVXDPurityInfo& info)
     {
       return info.getParticleID() == i;
-    }
+    } /**< operator comparing the particle Id and the passed argument */
   private:
     int i; /**< member holding the value that has to be mateched by the .first element of a pair */
   };

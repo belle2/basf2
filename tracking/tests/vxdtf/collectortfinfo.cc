@@ -16,27 +16,32 @@ namespace Belle2 {
   class CollectorTFInfoTest : public ::testing::Test {
 
 
+    /**
+     * Documentation Comment Jakob Lettenbichler:
+     * this was written by a student and will be removed after finishing redesign of VXDTF.
+     * Therefore some documentation-entries are not very useful - all of them are marked with "dummy comment".
+     */
   public:
-    void import_sectors_loop();
-    void import_sectors_standard();
+    void import_sectors_loop(); /**< dummy comment: import_sectors_loop */
+    void import_sectors_standard(); /**< dummy comment: import_sectors_standard */
 
-    void import_clusters_loop();
-    void import_clusters_standard();
+    void import_clusters_loop(); /**< dummy comment: import_clusters_loop */
+    void import_clusters_standard(); /**< dummy comment: import_clusters_standard */
 
-    void import_hit_loop();
-    void import_hit_standard();
+    void import_hit_loop(); /**< dummy comment: import_hit_loop */
+    void import_hit_standard(); /**< dummy comment: import_hit_standard */
 
-    void import_cell_loop();
-    void import_cell_standard();
+    void import_cell_loop(); /**< dummy comment: import_cell_loop */
+    void import_cell_standard(); /**< dummy comment: import_cell_standard */
 
-    void import_tfc_loop();
-    void import_tfc_standard();
+    void import_tfc_loop(); /**< dummy comment: import_tfc_loop */
+    void import_tfc_standard(); /**< dummy comment: import_tfc_standard */
 
-    void getAllCells();
-    void getAllHits();
-    void getAllClusters();
-    void getAllTC();
-    void getAllSectors();
+    void getAllCells(); /**< Output of all interesting Information of Cells */
+    void getAllHits(); /**< Output of all interesting Information of Hits */
+    void getAllClusters(); /**< Output of all interesting Information of Clusters */
+    void getAllTC(); /**< Output of all interesting Information of TC */
+    void getAllSectors(); /**< Output of all interesting Information of Sectors */
 
 
   protected:
@@ -601,13 +606,7 @@ namespace Belle2 {
 //   }
 //
 
-
-
-  TEST_F(CollectorTFInfoTest, testEmptyFilter)
-  {
-
-  }
-
+  /** dummy comment: testAllInformationLoop */
   TEST_F(CollectorTFInfoTest, testAllInformationLoop)
   {
     bool false_item = false;

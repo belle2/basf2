@@ -200,8 +200,8 @@ namespace VXDTFObserversTest {
     static unsigned int rejected; /**< count number of times result was rejected */
     static unsigned int wasInf; /**< count number of times result was inf */
     static unsigned int wasNan; /**< count number of times result was nan */
-    counter() {};
-    ~counter() {};
+    counter() {}; /**< constructor. */
+    ~counter() {}; /**< destructor. */
     static void resetCounter()
     {
       counter<T>::used = 0;
@@ -209,7 +209,7 @@ namespace VXDTFObserversTest {
       counter<T>::rejected = 0;
       counter<T>::wasInf = 0;
       counter<T>::wasNan = 0;
-    }
+    }  /**< resets all counters. */
   };
 
 
@@ -217,7 +217,7 @@ namespace VXDTFObserversTest {
   /** a container for counting accepted and rejected stuff, just delivers some interfaces to make the code more readable */
   class CountContainer {
   public:
-    CountContainer() { m_container.clear(); }
+    CountContainer() { m_container.clear(); }  /**< constructor. */
 
     /** a vector containing IDs */
     typedef std::vector<int> Particles;
@@ -231,7 +231,7 @@ namespace VXDTFObserversTest {
     typedef std::pair< bool, Particles > Key;
 
 
-    /** */
+    /** simple struct for counting accepted and rejected cases. */
     struct AcceptRejectPair {
       AcceptRejectPair() : accept(0), reject(0) {}
 
@@ -374,13 +374,13 @@ namespace VXDTFObserversTest {
     pdGacceptedRejected; /** map for pdgCodes (key: vector of pdgCodes found for given hits, sorted) storing how often it was accepted/rejected  value.first/value.second */
     static CountContainer
     mcIDacceptedRejected; /** map for mcParticleIDs (key, vector of mcParticleIDs (pair: first: true, if combination was from the same particle which was primary, found for given hits, sorted), storing how often it was accepted/rejected value.first/value.second */
-    counterMC() {};
-    ~counterMC() {};
+    counterMC() {};  /**< constructor. */
+    ~counterMC() {};  /**< destructor. */
     static void resetCounter()
     {
       counterMC<T>::pdGacceptedRejected.clear();
       counterMC<T>::mcIDacceptedRejected.clear();
-    }
+    }  /**< resets counters. */
   };
 
 
@@ -666,6 +666,7 @@ namespace VXDTFObserversTest {
   /** this observer combines all the easy-to-get info retrievable by observers and prints it to screen */
   class ProvideBasicInfoObserver : public VoidObserver {
   public:
+    /** notify function is called by the filter, this one combines all the easy-to-get info retrievable by observers and prints it to screen. */
     template<class Var, class RangeType>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,

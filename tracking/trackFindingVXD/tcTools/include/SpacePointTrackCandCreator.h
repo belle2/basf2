@@ -90,11 +90,11 @@ namespace Belle2 {
 
     /** WARNING hardcoded values so far, should be passed by parameter! */
 
-    double bFieldValue = 1.5;
+    double bFieldValue = 1.5; /**< magnetic field. */
 
-    int stdPdgCode = 211;
+    int stdPdgCode = 211; /**< standard value for pdg code used. */
 
-    int chargeSignFactor = 0;
+    int chargeSignFactor = 0; /**< == 1 if pdg code is for a lepton, -1 if not. */
   };
 
 } //Belle2 namespace

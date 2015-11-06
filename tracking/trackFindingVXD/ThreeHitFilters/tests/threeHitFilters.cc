@@ -85,6 +85,7 @@ namespace VXDTFthreeHitFilterTest {
   /** takes result, prints it and stores it to lastResult */
   class ResultsObserver : public VoidObserver {
   public:
+    /** notify function is called by the filter, this one takes result, prints it and stores it to lastResult. */
     template<class Var, typename ... otherTypes>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,

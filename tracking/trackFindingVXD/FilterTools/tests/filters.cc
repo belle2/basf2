@@ -27,10 +27,10 @@ namespace VXDTFfilterTest {
   class spacePoint: public tuple<float, float, float> {
   public:
     spacePoint(float x, float y, float z): tuple<float, float, float>(x, y, z)
-    {};
+    {}; /**< constructor accepting coordinates. */
   private:
-    // private copy constructor to test that all the
-    // arguments are passed by reference
+    /** private copy constructor to test that all the
+    * arguments are passed by reference. */
     spacePoint(const spacePoint&) = delete;
   };
 
@@ -38,6 +38,7 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance3D-filter */
   class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
   public:
+    /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -51,6 +52,7 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
   class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
   public:
+    /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -63,6 +65,7 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance1D-filter in X */
   class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
   public:
+    /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -74,6 +77,7 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
   class BooleanVariable : public SelectionVariable< spacePoint , bool > {
   public:
+    /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -82,23 +86,26 @@ namespace VXDTFfilterTest {
   };
 
 
-  template < class T>
-  class counter {
+  /** small class counting usage. */
+  template < class T> class counter {
   public:
-    static int N;
-    counter() {};
-    ~counter() {};
+    static int N; /**< counter. */
+    counter() {}; /**< constructor. */
+    ~counter() {}; /**< destructor. */
   };
 
 
+  /** counter for SquaredDistance3D. */
   template<>
   int counter< SquaredDistance3D   >::N(0);
 
 
+  /** counter for SquaredDistance2Dxy. */
   template<>
   int counter< SquaredDistance2Dxy >::N(0);
 
 
+  /** counter for SquaredDistance1Dx. */
   template<>
   int counter< SquaredDistance1Dx  >::N(0);
 
@@ -106,6 +113,7 @@ namespace VXDTFfilterTest {
   /** this observer does simply count the number of times, the attached Filter was used */
   class Observer : public VoidObserver {
   public:
+    /** notify function is called by the filter, this one increases the counter. */
     template<class Var, typename ... otherTypes>
     static void notify(const Var&,
                        const otherTypes& ...)

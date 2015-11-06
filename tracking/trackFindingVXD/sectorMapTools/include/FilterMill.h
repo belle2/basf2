@@ -71,23 +71,23 @@ namespace Belle2 {
 
     /** small struct containing pointers to two hits. */
     struct HitPair {
-      const PointType* outer;
-      const PointType* inner;
+      const PointType* outer; /**< outer hit. */
+      const PointType* inner; /**< inner hit. */
     };
 
     /** small struct containing pointers to three hits. */
     struct HitTriplet {
-      const PointType* outer;
-      const PointType* center;
-      const PointType* inner;
+      const PointType* outer; /**< outer hit. */
+      const PointType* center; /**< center hit. */
+      const PointType* inner; /**< inner hit. */
     };
 
     /** small struct containing pointers to four hits. */
     struct HitQuadruplet {
-      const PointType* outer;
-      const PointType* outerCenter;
-      const PointType* innerCenter;
-      const PointType* inner;
+      const PointType* outer; /**< outer hit. */
+      const PointType* outerCenter; /**< outerCenter hit. */
+      const PointType* innerCenter; /**< innerCenter hit. */
+      const PointType* inner; /**< inner hit. */
     };
 
     /** Constructor. */

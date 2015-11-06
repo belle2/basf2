@@ -107,10 +107,11 @@ namespace Belle2 {
 
       // TODO: to be sorted!
 
-      StoreArray<SpacePointTrackCand> m_referenceTCs;
-      StoreArray<SpacePointTrackCand> m_testTCs;
-      StoreArray<SpacePointTrackCand> m_acceptedTCs;
-      StoreArray<SpacePointTrackCand> m_lostTCs;
+      StoreArray<SpacePointTrackCand>
+      m_referenceTCs; /**< StoreArray for the reference TCs provided by a reference TF (like trackFinderMCTruth). */
+      StoreArray<SpacePointTrackCand> m_testTCs; /**< StoreArray for the TCs provided by a TF to be tested (like VXDTF). */
+      StoreArray<SpacePointTrackCand> m_acceptedTCs; /**< StoreArray for accepted/successfully reconstructed track candidates. */
+      StoreArray<SpacePointTrackCand> m_lostTCs; /**< StoreArray for lost track candidates. */
 
       RootParameterTracker m_rootParameterTracker; /**< takes care of collecting data and storing it to root branches */
       std::vector<double> m_PARAMorigin; /**< only allowed size: 3. stores coordinates of the origin used */
@@ -159,7 +160,7 @@ namespace Belle2 {
       double m_PARAMminTMomentumFilter; /**< to narrow down the relevant mcTracks, this minFilter can be set to filter tracks having lower transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
       double m_PARAMmaxTMomentumFilter; /**< to narrow down the relevant mcTracks, this maxFilter can be set to filter tracks having higher transverse momentum than this threshold. Relevant for checking efficiency of TFs with certain transverse momentum ranges */
 
-      /**< set here all parameters to be tracked which use an algorithm storing one double per tc.
+      /** set here all parameters to be tracked which use an algorithm storing one double per tc.
       *
       * Accepts a vector of vector of vector of strings of entries.
       * Sample usage in steering file:
@@ -167,7 +168,7 @@ namespace Belle2 {
       * first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType */
       std::vector< std::vector<std::vector<std::string> > > m_PARAMtrackedParametersDouble;
 
-      /**< set here all parameters to be tracked which use an algorithm storing one int per tc.
+      /** set here all parameters to be tracked which use an algorithm storing one int per tc.
        *
        * Accepts a vector of vector of vector of strings of entries.
        * Sample usage in steering file:
@@ -175,7 +176,7 @@ namespace Belle2 {
        * first innermost vector storest the TCType to be tracked, second the algorithms which shall be applied on that tcType */
       std::vector< std::vector<std::vector<std::string> > > m_PARAMtrackedParametersInt;
 
-      /**< set here all parameters to be tracked which use an algorithm storing one vector< double> per tc.
+      /** set here all parameters to be tracked which use an algorithm storing one vector< double> per tc.
        *
        * Accepts a vector of vector of vector of strings of entries.
        * Sample usage in steering file:

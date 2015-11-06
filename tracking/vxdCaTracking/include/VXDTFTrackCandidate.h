@@ -102,7 +102,7 @@ namespace Belle2 {
     } /**< returns position infos (global hit coordinates and errors for x and y coordinates) forming current TC. Currently, the first hit in the vector is the outermost hit  */
 
 
-    std::vector<TVector3*> getHitCoordinates()   /**< returns hit positions forming current TC */
+    std::vector<TVector3*> getHitCoordinates()
     {
       std::vector<TVector3*> coordinates;
       coordinates.reserve(m_attachedHits.size());
@@ -110,7 +110,7 @@ namespace Belle2 {
         coordinates.push_back(hit->getHitCoordinates());
       }
       return coordinates;
-    }
+    } /**< returns hit positions forming current TC */
 
 
     const std::vector<int>& getSVDHitIndices()
@@ -171,14 +171,14 @@ namespace Belle2 {
     bool getOverlappingState() { return m_overlapping; } /**< returns flag whether TC is sharing hits with other TCs or not (no manual check) */
 
 
-    bool checkOverlappingState()   /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
+    bool checkOverlappingState()
     {
       m_overlapping = false;
       for (VXDTFTrackCandidate* rival : m_bookingRivals) {
         if (rival->getCondition() != false) { m_overlapping = true; return true; }
       }
       return false;
-    }
+    } /**< returns flag whether TC is sharing hits with other TCs or not, after manual check, whether its rivals are still alive */
 
 
     /** fast getter telling whether TC has full ownership on its Clusters or not */
@@ -237,12 +237,12 @@ namespace Belle2 {
     void addTELClusterIndex(int anIndex) { m_telHitIndices.push_back(anIndex); } /**< add index number of TELCluster attached to current TC */
 
 
-    void addBookingRival(VXDTFTrackCandidate* aTC)   /**< adds a TC sharing hits with current one */
+    void addBookingRival(VXDTFTrackCandidate* aTC)
     {
       for (VXDTFTrackCandidate* rival : m_bookingRivals) { if (aTC == rival) { return; } }  // filter double entries
       m_overlapping = true;
       m_bookingRivals.push_back(aTC);
-    }
+    } /**< adds a TC sharing hits with current one */
 
 
     void addHopfieldClusterIndex(int anIndex) { m_hopfieldHitIndices.push_back(anIndex); } /**< add index number of Cluster attached to current TC (SVD and PXD), index is unique but does not point to real clusters */

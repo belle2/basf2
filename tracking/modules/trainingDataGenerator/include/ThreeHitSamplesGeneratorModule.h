@@ -98,14 +98,14 @@ namespace Belle2 {
 
     unsigned m_smallContainerCtr; /**< total number of SPTCs that did not have enough hits (3 in this case)*/
 
-    void initializeCounters() /**< initialize all counters to zero*/
+    void initializeCounters()
     {
       m_combCtr = 0;
       m_noiseSampleCtr = 0;
       m_signalSampleCtr = 0;
       m_invalidCombiCtr = 0;
       m_smallContainerCtr = 0;
-    }
+    } /**< initialize all counters to zero. */
 
     // ================================================== member functions =========================================================
 

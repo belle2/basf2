@@ -29,6 +29,7 @@ namespace Belle2 {
 
   }
 
+  /** tests filled filters. */
   TEST_F(CellTFInfoTest, testFilledFilter)
   {
     bool false_item = false;
@@ -55,6 +56,7 @@ namespace Belle2 {
   }
 
 
+  /** tests assigned hits. */
   TEST_F(CellTFInfoTest, testAssignedHits)
   {
     bool false_item = false;
@@ -92,6 +94,7 @@ namespace Belle2 {
 
 
 
+  /** tests neighbours. */
   TEST_F(CellTFInfoTest, testNeighbours)
   {
 //     bool false_item = false;

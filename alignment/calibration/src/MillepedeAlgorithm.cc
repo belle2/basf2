@@ -9,7 +9,6 @@
 #include <alignment/GlobalLabel.h>
 
 #include <TCanvas.h>
-#include <c++/4.8/list>
 
 using namespace std;
 using namespace Belle2;

@@ -14,6 +14,8 @@
     </SensitiveDetector>
     <!--    <Rotation desc="Rotation of the whole cdc detector (should be the same as beampipe)" unit="mrad">0.0</Rotation> --> 
     <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation> 
+    <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017774 GHz is 2 x (accelerator's RF).">1.017774</ClockFrequencyForTDC>
+    <!-- <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017728 GHz is 8 x (freq. of the clock of FTSW).">1.017728</ClockFrequencyForTDC> -->
 
     <!-- Material definition mode -->
     <MaterialDefinitionMode desc="=0: define a mixture of gases and wires in the entire tracking volume; =1: dummy (unavailable now); =2: define all sense and field wires explicitly in the volume.">0</MaterialDefinitionMode>

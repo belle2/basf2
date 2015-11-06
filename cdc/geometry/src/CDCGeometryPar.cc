@@ -66,6 +66,7 @@ void CDCGeometryPar::clear()
   m_fieldWireDiameter = 0.0;
 
   m_tdcOffset         = 0;
+  m_clockFreq4TDC     = 0.0;
   m_tdcBinWidth       = 0.0;
   m_nominalDriftV     = 0.0;
   m_nominalPropSpeed  = 0.0;
@@ -238,7 +239,17 @@ void CDCGeometryPar::read()
 
   //Set various quantities (should be moved to CDC.xml later...)
   m_tdcOffset = 8192;  //for common-stop mode; to be adjused later
-  m_tdcBinWidth = 1. / 1.016;  //in ns
+
+  m_clockFreq4TDC = 1.017774;  //in GHz
+  double tmp = gbxParams.getDouble("ClockFrequencyForTDC");
+  if (tmp != m_clockFreq4TDC) {
+    B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).")
+    m_clockFreq4TDC = tmp;
+  }
+  B2INFO("CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).")
+  m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
+  B2INFO("CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).")
+
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)

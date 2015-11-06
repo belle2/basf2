@@ -778,6 +778,7 @@ namespace Belle2 {
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 
       unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
+      double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */
       double m_tdcBinWidth;        /*!< TDC bin width (nsec/bin). */
       double m_nominalDriftV;      /*!< Nominal drift velocity (4.0x10^-3 cm/nsec). */
       double m_nominalDriftVInv;   /*!< Inverse of the nominal drift velocity. */

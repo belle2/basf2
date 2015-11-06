@@ -21,7 +21,9 @@ emptypath = create_path()
 
 filelistSIG = \
     [
+        #    '../../../../release-head-head/MC/Analysis_L1emulator/MC/tauTomunn-tau1-prong/BGx0-noVXD/rootFiles/*root'
         '../../../../release-head-head/MC/Analysis_L1emulator/MC/Bhabha/BGx0-noVXD/rootFiles/*root'
+        #    ' ../../../../release-head-head/MC/Analysis_L1emulator/MC/tau1prong-1prong/BGx0-noVXD/rootFiles/*root'
     ]
 
 inputMdstList(filelistSIG)
@@ -48,25 +50,8 @@ toolsY += ['LETRG', 'pi+']
 toolsY += ['LECDC', 'pi+']
 toolsY += ['LEECL', 'pi+']
 toolsY += ['LEKLM', 'pi+']
-
-
-recotools = [
-    'EventMetaData',
-    '^pi+',
-    'Kinematics',
-    '^pi+',
-    'MCKinematics',
-    '^pi+',
-    'Track',
-    '^pi+',
-    'MCTruth',
-    '^pi+',
-    'MCKinematics',
-    '^pi+',
-]
-
 # These ntuples are event level based, the parameters 'pi+' means nothing here.
-ntupleFile('BB.root')
+ntupleFile('Bhabha.root')
 ntupleTree('LETRG', '', toolsY)
 
 process(analysis_main)

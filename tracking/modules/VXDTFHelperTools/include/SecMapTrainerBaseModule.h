@@ -83,6 +83,8 @@ namespace Belle2 {
     /** contains the trainers for the secMaps to be trained. */
     std::vector< SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > > m_secMapTrainers;
 
+    bool m_PARAMallowTraining; /**> If true, training will be executed and filled into rootFiles, if not, only things like basf2 -m work but no training can be done. */
+
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;
   private:

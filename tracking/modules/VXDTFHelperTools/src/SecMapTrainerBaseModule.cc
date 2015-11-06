@@ -44,6 +44,12 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() :
   addParam("spTCarrayName", m_PARAMspTCarrayName,
            "the name of the storeArray containing the SpacePointTrackCands used for the secMap-generation", string(""));
 
+  addParam("allowTraining", m_PARAMallowTraining,
+           "If true, training will be executed and filled into rootFiles, if not, only things like basf2 -m work but no training can be done",
+           bool(false));
+
+
+  if (m_PARAMallowTraining == false) return;
 }
 
 
@@ -51,8 +57,11 @@ SecMapTrainerBaseModule::SecMapTrainerBaseModule() :
 void SecMapTrainerBaseModule::initialize()
 {
   B2INFO("~~~~~~~~~~~SecMapTrainerBaseModule - initialize ~~~~~~~~~~")
-  // small lambda for getting random numbers:
-  auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
+  if (m_PARAMallowTraining == false)
+    B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...")
+
+    // small lambda for getting random numbers:
+    auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
   // What does it mean "Appendix"? E.P.
 
 

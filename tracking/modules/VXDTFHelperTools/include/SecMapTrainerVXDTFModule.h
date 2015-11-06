@@ -86,6 +86,8 @@ namespace Belle2 {
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMspTCarrayName;
 
+    bool m_PARAMallowTraining; /**> If true, training will be executed and filled into rootFiles, if not, only things like basf2 -m work but no training can be done. */
+
     // TODO:
 //  /** Name of storeArray containing the spacePointTrackCands. */
 //  std::vector<std::string> m_PARAMsecMapNames;

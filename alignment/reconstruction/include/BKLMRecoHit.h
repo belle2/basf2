@@ -10,6 +10,7 @@
 
 #pragma once
 #include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/geometry/GeometryPar.h>
 
 
 // ROOT includes
@@ -62,6 +63,18 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
     const BKLMHit2d* m_bklmHit2d; /**< Pointer to the BKLMHit2d used when creating this object */
+
+    /** layer number */
+    int layer;
+
+    /** module used to get geometry information */
+    const bklm::Module* module;
+
+    /** global coordiante of the hit */
+    CLHEP::Hep3Vector global;
+
+    /** half height of scintillator module*/
+    const double halfheight_sci = 0.5;
 
     //!the number of fired phi-measuring strips
     //int m_numPhiStrips;

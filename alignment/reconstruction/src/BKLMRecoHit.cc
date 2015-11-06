@@ -36,10 +36,15 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   m_moduleID = hit->getModuleID();
 
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  const bklm::Module* module = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+  module = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
+
+  //+++ layer number
+  layer = hit->getLayer();
 
   //+++ global coordinates of the hit
-  CLHEP::Hep3Vector global(hit->getGlobalPosition()[0], hit->getGlobalPosition()[1], hit->getGlobalPosition()[2]);
+  global[0] = hit->getGlobalPosition()[0];
+  global[1] = hit->getGlobalPosition()[1];
+  global[2] = hit->getGlobalPosition()[2];
 
   //+++ local coordinates of the hit
   CLHEP::Hep3Vector local = module->globalToLocal(global);
@@ -85,7 +90,22 @@ genfit::AbsMeasurement* BKLMRecoHit::clone() const
 
 std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+  TVectorD predFglo = state.get6DState();
+  TVectorD correctedLocal(2);
+
+  //do correction for scintillators
+  if (layer == 1 || layer == 2) {
+    CLHEP::Hep3Vector global_shift_z(0, 0, predFglo[5]*halfheight_sci / sqrt(predFglo[3]*predFglo[3] + predFglo[4]*predFglo[4]));
+    CLHEP::Hep3Vector local_corrected_z = module->globalToLocal(global - global_shift_z);
+    correctedLocal[0] = local_corrected_z[1];
+    correctedLocal[1] = local_corrected_z[2];
+  } else {
+    correctedLocal[0] = rawHitCoords_[0];
+    correctedLocal[1] = rawHitCoords_[1];
+  }
+
+  // return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(correctedLocal, rawHitCov_, state.getPlane(),
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
 }
 

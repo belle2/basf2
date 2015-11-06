@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = [ 'framework', 'genfit2', 'calibration', '$ROOT_LIBS', 'alignment', 'alignment_dataobjects', 'vxd', 'vxd_dataobjects', 'cdc_dataobjects']
-
-
-Return('env')
-

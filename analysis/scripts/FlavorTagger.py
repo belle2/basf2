@@ -88,7 +88,7 @@ class FlavorTaggerInfoFiller(Module):
 class RemoveEmptyROEModule(Module):
 
     """
-    Detects when a ROE is empty in order to skip it. Final Extra Info is set accordingly.
+    Detects when a ROE does not contain tracks in order to skip it.
     """
 
     def event(self):
@@ -96,17 +96,29 @@ class RemoveEmptyROEModule(Module):
         roe = Belle2.PyStoreObj('RestOfEvent')
         B0 = roe.obj().getRelated('Particles')
         if mc_variables.variables.evaluate('isRestOfEventEmpty', B0) == -2:
-            B2INFO('FOUND NO TRACKS OR B0 IN ROE! NOT USED FOR TRAINING! COMBINER OUTPUT IS MANUALLY SET'
+            B2INFO('FOUND NO TRACKS IN ROE! COMBINER OUTPUT IS MANUALLY SET.'
                    )
+            ModeCode = GetModeCode()
             B0.addExtraInfo('ModeCode', ModeCode)
-            if ModeCode == 1:
-                B0.addExtraInfo('B0Probability', 0.5)
-                B0.addExtraInfo('B0barProbability', 0.5)
-                B0.addExtraInfo('qrCombined', 0.0)
-                B0.addExtraInfo('qrMC', -999)
-                B0.addExtraInfo('NTracksInROE', 0)
-                B0.addExtraInfo('NECLClustersInROE', 0)
-                B0.addExtraInfo('NKLMClustersInROE', 0)
+            self.return_value(1)
+
+
+class RemoveROEsWithoutB(Module):
+
+    """
+    Detects when a ROE has no B-Meson although it is not empty.
+    """
+
+    def event(self):
+        self.return_value(0)
+        someParticle = Belle2.Particle(None)
+        roe = Belle2.PyStoreObj('RestOfEvent')
+        B0 = roe.obj().getRelated('Particles')
+        if mc_variables.variables.evaluate('qrCombined', someParticle) < 0:
+            B2INFO('FOUND NO B-MESON IN ROE! EVENT WILL BE DISCARDED FOR TRAINING!'
+                   )
+            ModeCode = GetModeCode()
+            B0.addExtraInfo('ModeCode', ModeCode)
             self.return_value(1)
 
 
@@ -117,6 +129,7 @@ class RemoveExtraInfoModule(Module):
     """
 
     def event(self):
+        ModeCode = GetModeCode()
         for particleList in EventLevelParticleLists:
             plist = Belle2.PyStoreObj(particleList[0])
             for i in range(0, plist.obj().getListSize()):
@@ -140,23 +153,15 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
         info = Belle2.PyStoreObj('EventExtraInfo')
         someParticle = Belle2.Particle(None)
         B0 = roe.obj().getRelated('Particles')
+        ModeCode = GetModeCode()
         B0.addExtraInfo('ModeCode', ModeCode)
         if ModeCode == 1:
             B0Probability = info.obj().getExtraInfo('qrCombined')
             B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
             qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
-            qrMC = 2 * (mc_variables.variables.evaluate('qrCombined',
-                                                        someParticle) - 0.5)
-            NTracksInROE = roe.obj().getNTracks()
-            NECLClustersInROE = roe.obj().getNECLClusters()
-            NKLMClustersInROE = roe.obj().getNKLMClusters()
             B0.addExtraInfo('B0Probability', B0Probability)
             B0.addExtraInfo('B0barProbability', B0barProbability)
             B0.addExtraInfo('qrCombined', qrCombined)
-            B0.addExtraInfo('qrMC', qrMC)
-            B0.addExtraInfo('NTracksInROE', NTracksInROE)
-            B0.addExtraInfo('NECLClustersInROE', NECLClustersInROE)
-            B0.addExtraInfo('NKLMClustersInROE', NKLMClustersInROE)
 
 # ModeCode= 0 for Teacher or =1 for Expert mode
 
@@ -177,9 +182,6 @@ def GetModeCode():
         return 1
     else:
         return 0
-
-# Directory where the weights of the trained Methods are saved
-workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data/FlavorTagging/TrainedMethods'
 
 # Methods for Track and Event Levels
 methods = [
@@ -456,33 +458,31 @@ variables['FSC'] = [
 ]
 
 
-def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def FillParticleLists(path=analysis_main):
     B2INFO('TRACK LEVEL')
-    ReadyMethods = 0
-
-    fillParticleList('pi+:MaximumP*ROE', 'isInRestOfEvent > 0.5', path=path)
 
     for (particleList, category) in TrackLevelParticleLists:
-        methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
-        targetVariable = 'IsRightTrack(' + category + ')'
 
         # Select particles in ROE for different categories of flavour tagging.
         if particleList != 'Lambda0:LambdaROE':
+
+            # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=path)
+
         # Check if there is K short in this event
         if particleList == 'K+:KaonROE':
             # Precut done to prevent from overtraining, might be redundant
             applyCuts(particleList, '0.1<Kid', path=path)
-            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                              '0.40<=M<=0.60', 1, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if particleList == 'Lambda0:LambdaROE':
-            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
                              path=path)
-            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
                              path=path)
             reconstructDecay(particleList + ' -> pi-:inLambdaRoe p+:inLambdaRoe',
                              '1.00<=M<=1.23', 1, path=path)
@@ -491,6 +491,62 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
+
+    # Conditions to continue with the Event level: No variable has a NaN value!
+        condition = str()
+        for i in range(len(variables[category])):
+            if i == 0:
+                condition = condition + variables[category][i] + " != NaN and " + variables[category][i] + " != infinity"
+            else:
+                condition = condition + " and " + variables[category][i] + " != NaN and " \
+                    + variables[category][i] + " != infinity"
+        applyCuts(particleList, condition, path=path)
+
+    # Filling 'pi+:MaximumP*ROE' particle list
+    conditionMaximumP = str()
+    for variable in variables['MaximumP*']:
+        conditionMaximumP = conditionMaximumP + " and " + \
+            variable + " != NaN and " + variable + " != infinity"
+    fillParticleList('pi+:MaximumP*ROE', 'isInRestOfEvent > 0.5' + conditionMaximumP, path=path)
+
+    return True
+
+
+class SetZeroValueforEmptyList(Module):
+
+    # addParam('particleList', particleList, "particleList")
+
+    def event(self):
+        self.return_value(0)
+        roe = Belle2.PyStoreObj('RestOfEvent')
+        B0 = roe.obj().getRelated('Particles')
+        info = Belle2.PyStoreObj('EventExtraInfo')
+
+        # plist = Belle2.PyStoreObj(particleList)
+        # if plist.obj().getListSize() == 0:
+        B2WARNING('FOUND EMPTY LIST! COMBINER INPUT FOR THIS CATEGORY WILL BE SET MANUALLY!'
+                  )
+
+
+def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
+    B2INFO('TRACK LEVEL')
+
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
+    ReadyMethods = 0
+
+    for (particleList, category) in TrackLevelParticleLists:
+
+        CurrentParticleList = particleList
+        CurrentCategory = category
+
+        # SetZeroValueforEmptyCatList = SetZeroValueforEmptyList()
+        # SetZeroValueforEmptyCatList.param('particleList', particleList)
+        # path.add_module(SetZeroValueforEmptyCatList)
+
+        methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
+        targetVariable = 'IsRightTrack(' + category + ')'
 
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixTrackLevel):
             if mode == 'Expert':
@@ -525,10 +581,15 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         return True
 
 
-def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
+def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
     B2INFO('EVENT LEVEL')
+
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
     ReadyMethods = 0
     for (particleList, category) in EventLevelParticleLists:
+
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
         targetVariable = 'IsRightCategory(' + category + ')'
 
@@ -568,9 +629,13 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         return True
 
 
-def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
+def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods',
                   path=analysis_main):
     B2INFO('COMBINER LEVEL')
+
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
     methodPrefixCombinerLevel = weightFiles + 'CombinerLevel' \
         + categoriesCombinationCode + 'TMVA'
     if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel):
@@ -630,6 +695,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu',
 def FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
+    workingDirectory='.',
     categories=[
         'Electron',
         'Muon',
@@ -651,6 +717,20 @@ def FlavorTagger(
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
     """
 
+    # Directory where the weights of the trained Methods are saved
+    # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
+
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
+
+    if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
+        os.mkdir(workingDirectory + '/FlavorTagging')
+        os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
+    elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods'):
+        os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
+
+    workingDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
+
     B2INFO('*** FLAVOR TAGGING ***')
     B2INFO(' ')
     B2INFO('    Working directory is: ' + workingDirectory)
@@ -661,22 +741,28 @@ def FlavorTagger(
     roe_path = create_path()
     emptypath = create_path()
 
-    ROEEmptyTrigger = RemoveEmptyROEModule()
-
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
+    ROEEmptyTrigger = RemoveEmptyROEModule()
     roe_path.add_module(ROEEmptyTrigger)
     ROEEmptyTrigger.if_true(emptypath)
 
+    # Events containing ROE without B-Meson (but not empty) are discarded for training
+    if mode == 'Teacher':
+        RemoveROEsWoutB = RemoveROEsWithoutB()
+        roe_path.add_module(RemoveROEsWoutB)
+        RemoveROEsWoutB.if_true(emptypath)
+
     # track training or expert
     if WhichCategories(categories):
-        if TrackLevel(mode, weightFiles, roe_path):
-            if EventLevel(mode, weightFiles, roe_path):
-                CombinerLevel(mode, weightFiles, roe_path)
+        if FillParticleLists(roe_path):
+            if TrackLevel(mode, weightFiles, workingDirectory, roe_path):
+                if EventLevel(mode, weightFiles, workingDirectory, roe_path):
+                    CombinerLevel(mode, weightFiles, workingDirectory, roe_path)
 
     roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move EventExtraInfo to ParticleExtraInfo
 
     if mode == 'Expert':
-        # Initialation of FlavorTagInfo dataObject needs to be done in the main path
+            # Initialation of FlavorTagInfo dataObject needs to be done in the main path
         FlavorTagInfoBuilder = register_module('FlavorTagInfoBuilder')
         path.add_module(FlavorTagInfoBuilder)
         roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path

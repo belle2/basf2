@@ -28,6 +28,7 @@
 #include <rawdata/dataobjects/RawTOP.h>
 
 #include <sstream>
+#include <map>
 
 using namespace std;
 
@@ -58,7 +59,8 @@ namespace Belle2 {
     std::vector<std::string> defaultFileNames;
     addParam("inputFileNames", m_inputFileNames,
              "List of input file names (.dat format)", defaultFileNames);
-
+    addParam("dataFormat", m_dataFormat,
+             "data format: 0 Kurtis packets, 1 gigE events", 0);
 
   }
 
@@ -144,6 +146,9 @@ namespace Belle2 {
 
   bool TOPRawdataInputModule::openFile(const std::string& fileName)
   {
+    m_evtNumber = 0;
+    m_runNumber = 0;
+    m_expNumber = 0;
     m_bytesRead = 0;
     m_packetsRead = 0;
     m_eventsRead = 0;
@@ -172,21 +177,33 @@ namespace Belle2 {
   bool TOPRawdataInputModule::setExpRunNumbers(const std::string& fileName)
   {
 
-    std::size_t i1 = fileName.rfind("-e");
-    std::size_t i2 = fileName.rfind("-f");
-    int len = i2 - i1 - 2;
-    if (len <= 0) return false;
+    auto ii = fileName.rfind("run");
+    if (ii != std::string::npos) {
+      auto i1 = ii + 3;
+      auto i2 = fileName.rfind("_");
+      if (i2 == std::string::npos) i2 = fileName.rfind(".");
+      auto substr = fileName.substr(i1, i2 - i1);
+      std::stringstream ss;
+      ss << substr;
+      ss >> m_runNumber;
+      if (ss.fail()) return false;
+    } else {
+      auto i1 = fileName.rfind("-e");
+      auto i2 = fileName.rfind("-f");
+      int len = i2 - i1 - 2;
+      if (len <= 0) return false;
 
-    i1 += 2;
-    std::string substr = fileName.substr(i1, len);
-    i2 = substr.find("r");
-    if (i2 == std::string::npos) return false;
+      i1 += 2;
+      std::string substr = fileName.substr(i1, len);
+      i2 = substr.find("r");
+      if (i2 == std::string::npos) return false;
 
-    substr.replace(i2, 1 , " ");
-    std::stringstream ss;
-    ss << substr;
-    ss >> m_expNumber >> m_runNumber;
-    if (ss.fail()) return false;
+      substr.replace(i2, 1 , " ");
+      std::stringstream ss;
+      ss << substr;
+      ss >> m_expNumber >> m_runNumber;
+      if (ss.fail()) return false;
+    }
 
     return true;
 
@@ -209,6 +226,199 @@ namespace Belle2 {
 
 
   int TOPRawdataInputModule::readEvent()
+  {
+
+    switch (m_dataFormat) {
+      case 0:
+        return readEventIRS3B();
+      case 1:
+        return readEventIRSXv1();
+      default:
+        B2ERROR("unknown dataFormat");
+        return -1;
+    }
+
+  }
+
+  /* ------ IRSX -----------------------------------------------------------------*/
+
+  int TOPRawdataInputModule::readEventIRSXv1()
+  {
+
+    bool ok = true;
+    if (m_gigEPacket.empty()) {
+      ok = readGigEPacket();
+      if (!ok) return -1;
+    }
+
+    std::map<unsigned, unsigned> eventNum; // used to find next event
+    std::map<unsigned, std::vector<unsigned> > eventData; // a container for event data
+
+    // collect packets of an event
+
+    while (ok) {
+      unsigned word = m_gigEPacket[0];
+      unsigned evtNumber = word & 0x0007FFFF;
+      word = m_gigEPacket[1];
+      unsigned scrod = (word >> 9) & 0x7F;
+      unsigned carrier = (word >> 30) & 0x03;
+      unsigned key = carrier + scrod * 4;
+      auto it = eventNum.find(key);
+      if (it != eventNum.end()) {
+        if (evtNumber != it->second) break; // new event detected
+      } else {
+        eventNum[key] = evtNumber;
+      }
+
+      auto ev = eventData.find(scrod);
+      if (ev != eventData.end()) {
+        auto& scrodData = ev->second;
+        for (const auto& word : m_gigEPacket) scrodData.push_back(word); // append packet
+        scrodData[1]++; // increment packet counter
+      } else {
+        unsigned dataFormat = 2;
+        unsigned version = 2;
+        auto& scrodData = eventData[scrod];
+        scrodData.push_back(scrod + (version << 16) + (dataFormat << 24)); // append header
+        scrodData.push_back(0); // append packet counter
+        for (const auto& word : m_gigEPacket) scrodData.push_back(word); // append packet
+        scrodData[1]++; // increment packet counter
+      }
+
+      ok = readGigEPacket();
+      if (m_stream.eof()) break;
+      if (!ok) return -1;
+    }
+
+    // store the event
+
+    m_evtNumber++;
+
+    StoreArray<RawTOP> rawData;
+
+    RawCOPPERPackerInfo info;
+    info.exp_num = m_expNumber;
+    info.run_subrun_num = (m_runNumber << 8);
+    info.eve_num = m_evtNumber;
+    info.node_id = TOP_ID;
+    info.tt_ctime = 0;
+    info.tt_utime = 0;
+    info.b2l_ctime = 0;
+    info.hslb_crc16_error_bit = 0;
+    info.truncation_mask = 0;
+    info.type_of_data = 0;
+
+    int* buffer[4] = {0, 0, 0, 0};
+    int bufferSize[4] = {0, 0, 0, 0};
+    unsigned numPackets = 0;
+    int k = 0;
+    for (const auto& scrodData : eventData) {
+      numPackets += scrodData.second[1];
+      buffer[k] = (int*) scrodData.second.data();
+      bufferSize[k] = (int) scrodData.second.size();
+      k++;
+      if (k == 4) {
+        auto* raw = rawData.appendNew();
+        raw->PackDetectorBuf(buffer[0], bufferSize[0],
+                             buffer[1], bufferSize[1],
+                             buffer[2], bufferSize[2],
+                             buffer[3], bufferSize[3],
+                             info);
+        k = 0;
+        info.node_id++;
+      }
+    }
+    if (k > 0) {
+      for (int i = k; i < 4; i++) {
+        buffer[i] = 0;
+        bufferSize[i] = 0;
+      }
+      auto* raw = rawData.appendNew();
+      raw->PackDetectorBuf(buffer[0], bufferSize[0],
+                           buffer[1], bufferSize[1],
+                           buffer[2], bufferSize[2],
+                           buffer[3], bufferSize[3],
+                           info);
+    }
+
+    B2DEBUG(100, "Number of packets saved: " << numPackets);
+
+    m_eventsRead++;
+    return 0;
+  }
+
+
+  bool TOPRawdataInputModule::readGigEPacket()
+  {
+
+    m_gigEPacket.clear();
+
+    unsigned packetSize = 0;
+    m_stream.read((char*) &packetSize, sizeof(unsigned));
+    m_bytesRead += m_stream.gcount();
+    if (!m_stream.good()) {
+      if (!m_stream.eof()) B2ERROR("Error reading packet header word");
+      return false;
+    }
+
+    packetSize--; // Footer to be read separately
+    const unsigned maxSize = 257 * 512 + 1; // 257(words) * maxWindows + 1(words)
+    if (packetSize > maxSize) {
+      B2ERROR("Packet size exceeds the limit of " << maxSize << " words: size = "
+              << packetSize << " words");
+      return false;
+    }
+
+    if (m_gigEPacket.size() != packetSize) m_gigEPacket.resize(packetSize);
+    m_stream.read((char*) m_gigEPacket.data(), packetSize * sizeof(unsigned));
+    m_bytesRead += m_stream.gcount();
+    if (!m_stream.good()) {
+      B2ERROR("Error reading packet data");
+      m_gigEPacket.clear();
+      return false;
+    }
+
+    unsigned footer = 0;
+    m_stream.read((char*) &footer, sizeof(unsigned));
+    m_bytesRead += m_stream.gcount();
+    if (!m_stream.good()) {
+      B2ERROR("Error reading packet footer word");
+      m_gigEPacket.clear();
+      return false;
+    }
+
+    const char* last = "tsal";
+    unsigned* wlast = (unsigned*) last;
+    if (footer != *wlast) {
+      B2ERROR("Invalid footer word");
+      m_gigEPacket.clear();
+      return false;
+    }
+
+    if ((packetSize - 1) % 257 != 0) {
+      B2ERROR("Corrupted packet: packetSize");
+      m_gigEPacket.clear();
+      return false;
+    }
+
+    // check that number of windows is correct
+    unsigned numWindows = (packetSize - 1) / 257;
+    unsigned word = m_gigEPacket[0];
+    unsigned nw = (word >> 19) & 0x1FF; nw++; // should be incremented !
+    if (numWindows != nw) {
+      B2ERROR("Corrupted packet: numWindows");
+      m_gigEPacket.clear();
+      return false;
+    }
+
+    m_packetsRead++;
+    return true;
+  }
+
+
+  /* ------ IRS3B ----------------------------------------------------------------*/
+
+  int TOPRawdataInputModule::readEventIRS3B()
   {
 
     if (m_err) return -1;

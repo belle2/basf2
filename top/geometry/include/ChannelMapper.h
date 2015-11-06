@@ -40,6 +40,14 @@ namespace Belle2 {
            };
 
       /**
+       * Enum for electornic types
+       */
+      enum EType {c_unknown = 0,
+                  c_IRS3B   = 1,
+                  c_IRSX    = 2
+                 };
+
+      /**
        * constructor
        */
       ChannelMapper();
@@ -60,6 +68,18 @@ namespace Belle2 {
        * @return true if available
        */
       bool isAvailable() const {return m_available;}
+
+      /**
+       * Return electornic type (see enum)
+       * @return type
+       */
+      EType getType() const {return m_type;}
+
+      /**
+       * Return electornic name
+       * @return name
+       */
+      std::string getName() const {return m_typeName;}
 
       /**
        * Checks validity of pixel ID
@@ -90,6 +110,23 @@ namespace Belle2 {
       unsigned getChannelID(int pixel) const;
 
       /**
+       * Returns hardware channel ID (0-based)
+       * @param boardstack boardstack number (0-based)
+       * @param carrier carrier board number (0-based)
+       * @param asic ASIC number (0-based)
+       * @param chan ASIC channel number (0-based)
+       * @return channel ID (or c_invalidChannelID for invalid pixel)
+       */
+      unsigned getChannelID(unsigned boardstack,
+                            unsigned carrier,
+                            unsigned asic,
+                            unsigned chan) const
+      {
+        return chan + c_numChannels * (asic + c_numAsics *
+                                       (carrier + c_numCarrierBoards * boardstack));
+      }
+
+      /**
        * Splits hardware channel ID into boardstack#, carrier#, asic# and asic channel#
        * @param channel hardware channel ID (0-based) [input]
        * @param boardstack boardstack number (0-based) [output]
@@ -114,7 +151,7 @@ namespace Belle2 {
        * Print mappings to terminal screen
        * @param type electronic type
        */
-      void print(std::string type = "") const;
+      void print() const;
 
       /**
        * test that the conversion and inverse of it gives identity, if not B2ERROR
@@ -123,8 +160,10 @@ namespace Belle2 {
 
     private:
 
-      std::vector<TOPChannelMap> m_mapping; /**< mappings from xml file */
+      std::string m_typeName;    /**< electronic type name */
+      EType m_type = c_unknown;  /**< electornic type number */
       bool m_available = false; /**< true if mapping available */
+      std::vector<TOPChannelMap> m_mapping; /**< mappings from xml file */
 
       const TOPChannelMap* m_channels[c_numRows][c_numColumns]; /**< conversion array */
       const TOPChannelMap* m_pixels[c_numAsics][c_numChannels]; /**< conversion array */

@@ -139,6 +139,7 @@ namespace Belle2 {
     }
     int barID = feemap->barID;
     int boardstack = feemap->column;
+    const auto& mapper = m_topgp->getChannelMapper();
 
     unsigned version = (buffer[0] >> 16) & 0xFF;
     switch (version) {
@@ -148,7 +149,7 @@ namespace Belle2 {
           int tdc = word & 0xFFFF;
           unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
           unsigned flags = (word >> 24) & 0xFF;
-          int pixelID = m_topgp->getChannelMapper().getPixelID(chan);
+          int pixelID = mapper.getPixelID(chan);
           auto* digit = digits.appendNew(barID, pixelID, tdc);
           digit->setHardwareChannelID(chan);
           digit->setHitQuality((TOPDigit::EHitQuality) flags);
@@ -165,19 +166,26 @@ namespace Belle2 {
   void TOPUnpackerModule::unpackWaveformFormat(const int* buffer, int bufferSize,
                                                StoreArray<TOPRawWaveform>& waveforms)
   {
-    unsigned short scrodID = buffer[0] & 0xFFFF;
+    DataArray array(buffer, bufferSize);
+    unsigned word = array.getWord();
+    unsigned short scrodID = word & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
     if (!feemap) {
       B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
       return;
     }
 
-    DataArray array(buffer, bufferSize);
-    unsigned version = (buffer[0] >> 16) & 0xFF;
+    unsigned version = (word >> 16) & 0xFF;
     int err = 0;
     switch (version) {
       case 1:
         err = unpackWaveformFormatV1(array, feemap, waveforms);
+        if (err != 0)
+          B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
+                  " words of data buffer not used");
+        break;
+      case 2:
+        err = unpackWaveformFormatV2(array, feemap, waveforms);
         if (err != 0)
           B2ERROR("TOPUnpacker::unpackWaveformFormat: " << err <<
                   " words of data buffer not used");
@@ -198,6 +206,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     int barID = feemap->barID;
     int boardstack = feemap->column;
+    const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRS3B);
 
     unsigned scrod = array.getWord();
     unsigned freezeDate = array.getWord();
@@ -215,8 +224,12 @@ namespace Belle2 {
       int numofSegments = array.getWord();
       for (int iseg = 0; iseg < numofSegments; iseg++) {
         unsigned segmentASIC = array.getWord();
-        unsigned channelID = (segmentASIC >> 9) + boardstack * 128; // TODO decide how(?)
-        int pixelID = m_topgp->getChannelMapper().getPixelID(channelID);
+        unsigned chan = (segmentASIC >> 9) & 0x0007;
+        unsigned asic = (segmentASIC >> 14) & 0x0003; // called also asicCol
+        unsigned carrier = (segmentASIC >> 12) & 0x0003; // called also asicRow
+        unsigned channelID = mapper.getChannelID(boardstack, carrier, asic, chan);
+        int pixelID = mapper.getPixelID(channelID);
+
         int numofPoints = array.getWord();
         std::vector<unsigned short> wfdata;
         for (int i = 0; i < numofPoints / 2; i++) {
@@ -230,12 +243,60 @@ namespace Belle2 {
         }
         waveforms.appendNew(barID, pixelID, channelID, scrod, freezeDate,
                             triggerType, flags, referenceASIC, segmentASIC,
-                            wfdata);
-      }
-    }
+                            mapper.getType(), mapper.getName(), wfdata);
+      } // iseg
+    } // k
     return array.getRemainingWords();
 
   }
+
+
+  int TOPUnpackerModule::unpackWaveformFormatV2(TOP::DataArray& array,
+                                                const TOP::FEEMap* feemap,
+                                                StoreArray<TOPRawWaveform>& waveforms)
+  {
+
+    StoreObjPtr<EventMetaData> evtMetaData;
+    int barID = feemap->barID;
+    int boardstack = feemap->column;
+    const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
+
+    unsigned word = 0;
+    unsigned numPackets = array.getWord();
+    for (unsigned packet = 0; packet < numPackets; packet++) {
+      word = array.getWord();
+      // unsigned eventNumber = word & 0x7FFFF;
+      unsigned numWindows = (word >> 19) & 0x1FF; numWindows++; // should be incremented!
+      unsigned trigPattern = (word >> 28);
+      for (unsigned win = 0; win < numWindows; win++) {
+        word = array.getWord();
+        unsigned convertedAddr = word & 0x1FF; // storage window
+        unsigned scrod = (word >> 9) & 0x7F;
+        unsigned lastWriteAddr = (word >> 16) & 0x1FF; // reference window
+        unsigned asic = (word >> 28) & 0x03; // used to be called asicCol
+        unsigned carrier = (word >> 30) & 0x03; // used to be called asicRow
+        for (unsigned chan = 0; chan < 8; chan++) {
+          std::vector<unsigned short> wfdata;
+          for (unsigned i = 0; i < 32; i++) {
+            unsigned data = array.getWord();
+            wfdata.push_back(data & 0xFFFF);
+            wfdata.push_back(data >> 16);
+          }
+          unsigned channelID = mapper.getChannelID(boardstack, carrier, asic, chan);
+          int pixelID = mapper.getPixelID(channelID);
+          unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
+                                 (asic << 14);
+          waveforms.appendNew(barID, pixelID, channelID, scrod, 0,
+                              trigPattern, 0, lastWriteAddr, segmentASIC,
+                              mapper.getType(), mapper.getName(), wfdata);
+        } // chan
+      } // win
+    } // packet
+
+    return array.getRemainingWords();
+
+  }
+
 
   void TOPUnpackerModule::endRun()
   {

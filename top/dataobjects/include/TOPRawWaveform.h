@@ -12,12 +12,14 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
+#include <string>
 
 namespace Belle2 {
 
   /**
-   * Class to store IRS waveforms
-   * http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format
+   * Class to store raw IRS waveforms.
+   * IRS3B: http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format
+   * IRSX: https://belle2.cc.kek.jp/~twiki/pub/Detector/TOP/Module01Firmware/data_format_v1_5.xlsx
    */
   class TOPRawWaveform : public RelationsObject {
   public:
@@ -35,7 +37,8 @@ namespace Belle2 {
       m_triggerType(0),
       m_flags(0),
       m_referenceASIC(0),
-      m_segmentASIC(0)
+      m_segmentASIC(0),
+      m_electronicType(0)
     {}
 
     /**
@@ -50,8 +53,10 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
+                   unsigned electronicType,
+                   std::string electronicName,
                    const std::vector<unsigned short>& data):
-      m_data(data)
+      m_data(data),  m_electronicName(electronicName)
     {
       m_barID = barID;
       m_pixelID = pixelID;
@@ -63,6 +68,7 @@ namespace Belle2 {
       m_flags = flags;
       m_referenceASIC = referenceASIC;
       m_segmentASIC = segmentASIC;
+      m_electronicType = electronicType;
     }
 
     /**
@@ -90,13 +96,13 @@ namespace Belle2 {
     unsigned getScrodID() const { return m_scrodID; }
 
     /**
-     * Returns SCROD revision number
+     * Returns SCROD revision number (only given for IRS3B)
      * @return revision number
      */
     unsigned getScrodRevision() const { return m_scrodRevision; }
 
     /**
-     * Returns protocol freeze date
+     * Returns protocol freeze date (only given for IRS3B)
      * @return date as YYYYMMDD in BCD
      */
     unsigned getFreezeDate() const { return m_freezeDate; }
@@ -108,31 +114,31 @@ namespace Belle2 {
     unsigned getTriggerType() const { return m_triggerType; }
 
     /**
-     * Checks if trigger is hardware issued
+     * Checks if trigger is hardware issued (according to IRS3B definition)
      * @return true, if hardware trigger
      */
     bool isHardwareTrigger() const { return (m_triggerType & 0x0001);}
 
     /**
-     * Checks if trigger is software issued
+     * Checks if trigger is software issued (according to IRS3B definition)
      * @return true, if software trigger
      */
     bool isSoftwareTrigger() const { return (m_triggerType & 0x0002);}
 
     /**
-     * Checks for truncated events
+     * Checks for truncated events (according to IRS3B definition)
      * @return true for truncated events
      */
     bool isTruncatedEvents() const { return (m_triggerType & 0x0004);}
 
     /**
-     * Returns event flag bits
+     * Returns event flag bits (only given for IRS3B)
      * @return event flag bits
      */
     unsigned getEventFlags() const { return m_flags; }
 
     /**
-     * Checks if run in pedestal mode
+     * Checks if run in pedestal mode (only given for IRS3B)
      * @return true, if pedestal mode
      */
     bool isPedestalMode() const { return (m_flags & 0x0001);}
@@ -158,16 +164,40 @@ namespace Belle2 {
     unsigned getAsicChannel() const { return ((m_segmentASIC >> 9) & 0x0007);}
 
     /**
-     * Returns ASIC row
-     * @return row number
+     * Returns carrier board number
+     * @return carrier number
      */
-    unsigned getAsicRow() const { return ((m_segmentASIC >> 12) & 0x0003);}
+    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
 
     /**
-     * Returns ASIC column
+     * Returns ASIC number
+     * @return ASIC number
+     */
+    unsigned getAsicNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
+
+    /**
+     * Returns ASIC row (IRS3B naming convention)
+     * @return row number
+     */
+    unsigned getAsicRow() const { return getCarrierNumber();}
+
+    /**
+     * Returns ASIC column (IRS3B naming convention)
      * @return column number
      */
-    unsigned getAsicCol() const { return ((m_segmentASIC >> 14) & 0x0003);}
+    unsigned getAsicCol() const { return getAsicNumber();}
+
+    /**
+     * Returns type of electronic used to measure this waveform
+     * @return type (see ChannelMapper::EType)
+     */
+    unsigned getElectronicType() const {return m_electronicType;}
+
+    /**
+     * Returns the name of electronic used to measure this waveform
+     * @return name
+     */
+    std::string getElectronicName() const {return m_electronicName;}
 
     /**
      * Returns waveform size
@@ -197,8 +227,10 @@ namespace Belle2 {
     unsigned short m_referenceASIC; /**< reference ASIC window */
     unsigned short m_segmentASIC;   /**< segment ASIC window (storage window) */
     std::vector<unsigned short> m_data;  /**< waveform ADC values */
+    unsigned m_electronicType;      /**< electronic type (see ChannelMapper::EType) */
+    std::string m_electronicName;   /**< electronic name */
 
-    ClassDef(TOPRawWaveform, 1); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 2); /**< ClassDef */
 
   };
 

@@ -519,7 +519,15 @@ namespace Belle2 {
        * Get channel mapper (mapping of channels to pixels)
        * @return  channel mapper object
        */
-      const ChannelMapper& getChannelMapper() const {return m_channelMapper;}
+      const ChannelMapper& getChannelMapper(ChannelMapper::EType type =
+                                              ChannelMapper::c_IRSX) const
+      {
+        switch (type) {
+          case ChannelMapper::c_IRS3B: return m_channelMapperIRS3B;
+          case ChannelMapper::c_IRSX:  return m_channelMapperIRSX;
+          default: return m_channelMapperIRSX;
+        }
+      }
 
     private:
 
@@ -578,7 +586,8 @@ namespace Belle2 {
       //! mapping
 
       FrontEndMapper m_frontEndMapper; /**< front end electronics mapper */
-      ChannelMapper m_channelMapper; /**< channel-pixel mapper */
+      ChannelMapper m_channelMapperIRS3B; /**< channel-pixel mapper */
+      ChannelMapper m_channelMapperIRSX;  /**< channel-pixel mapper */
 
       //! TDC parameters
 

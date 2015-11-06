@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ChannelMapping descr="Mapping of pixels to channels of a carrier board for IRSX">
-  <type>IRSX</type>
+<ChannelMapping type = "IRSX" descr="Mapping of pixels to channels">
   <!-- columns represent: pixelRow pixelColumn asicNumber asicChannel -->
   <map> 0 0  1 0 </map>
   <map> 0 1  1 1 </map>

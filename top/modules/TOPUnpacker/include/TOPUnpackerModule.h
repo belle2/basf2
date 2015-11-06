@@ -37,7 +37,7 @@ namespace Belle2 {
       {
         m_data = data;
         m_size = size;
-        m_i = 0;
+        m_i = -1;
       }
 
       /**
@@ -151,6 +151,17 @@ namespace Belle2 {
      * @return number of words remaining in data buffer
      */
     int unpackWaveformFormatV1(TOP::DataArray& array,
+                               const TOP::FEEMap* feemap,
+                               StoreArray<TOPRawWaveform>& waveforms);
+
+    /**
+     * Unpack raw data given in waveform format version 2
+     * @param array raw data buffer
+     * @param feemap front-end map
+     * @param waveforms collection to unpack to
+     * @return number of words remaining in data buffer
+     */
+    int unpackWaveformFormatV2(TOP::DataArray& array,
                                const TOP::FEEMap* feemap,
                                StoreArray<TOPRawWaveform>& waveforms);
 

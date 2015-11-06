@@ -94,12 +94,40 @@ namespace Belle2 {
     int readEvent();
 
     /**
+     * Read event, IRS3B packet format (Kurtis)
+     * Return status:
+     * - 0 on success (event can be further processed)
+     * - negative value for EOF or for corrupted file (file has to be closed)
+     * - positive value for non-event or corrupted record (try with next data record)
+     * @return error status
+     */
+    int readEventIRS3B();
+
+    /**
+     * Read event, IRSX gigE raw data format (Lynn)
+     * Return status:
+     * - 0 on success (event can be further processed)
+     * - negative value for EOF or for corrupted file (file has to be closed)
+     * - positive value for non-event or corrupted record (try with next data record)
+     * @return error status
+     */
+    int readEventIRSXv1();
+
+
+    /**
+     * Read gigE raw data packet (https://belle2.cc.kek.jp/~twiki/pub/Detector/TOP/Module01Firmware/data_format_v1_5.xlsx)
+     * @return true on success
+     */
+    bool readGigEPacket();
+
+    /**
      * Read data of one SCROD
      * @return pointer to ScrodData (success) or NULL (failure)
      */
     TOPTB::ScrodData* readScrodData();
 
     std::string m_inputFileName; /**< input file name (raw data) */
+    int m_dataFormat; /**< data format */
     std::vector<std::string> m_inputFileNames; /**< list of input file names (raw data) */
     unsigned int m_listIndex;  /**< current index of input file name list element */
     unsigned long m_evtNumber; /**< current event number */
@@ -112,6 +140,8 @@ namespace Belle2 {
     std::ifstream m_stream;   /**< input stream for reading from a file */
     TOPTB::ScrodData* m_scrodData;   /**< storage for one SCROD data */
     bool m_err; /**< error status of last ScrodData::read */
+
+    std::vector<unsigned> m_gigEPacket; /**< data of one gigE packet */
 
   };
 

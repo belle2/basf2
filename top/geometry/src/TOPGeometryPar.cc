@@ -52,8 +52,11 @@ namespace Belle2 {
       GearDir frontEndMapping(content, "FrontEndMapping");
       m_frontEndMapper.initialize(frontEndMapping);
 
-      GearDir channelMapping(content, "ChannelMapping");
-      m_channelMapper.initialize(channelMapping);
+      GearDir channelMapping0(content, "ChannelMapping[@type='IRS3B']");
+      m_channelMapperIRS3B.initialize(channelMapping0);
+
+      GearDir channelMapping1(content, "ChannelMapping[@type='IRSX']");
+      m_channelMapperIRSX.initialize(channelMapping1);
 
       m_initialized = true;
     }

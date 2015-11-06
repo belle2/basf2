@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------------
 # Event display of raw waveforms.
 # Input from CRT/test beam raw data files (.dat) or from standard Basf2 root files
-# usage: basf2 top/examples/showRawWaveforms.py <path/file_name>
+# usage: basf2 top/examples/showRawWaveforms.py <path/file_name> <threshold>=0 <width>=0
 # -----------------------------------------------------------------------------------
 
 # avoid race conditions beetween pyroot and GUI thread
@@ -19,8 +19,16 @@ from ROOT import TH1F, TCanvas
 argvs = sys.argv
 if len(argvs) > 1:
     fileName = argvs[1]
+    threshold = 0
+    width = 0
+    if len(argvs) > 2:
+        threshold = int(argvs[2])
+        if len(argvs) > 3:
+            width = int(argvs[3])
 else:
-    print('usage: basf2 top/examples/showRawWaveforms.py <file_name>')
+    print('usage: basf2 top/examples/showRawWaveforms.py <file_name> <threshold> <width>')
+    print('   threshold: according to average baseline (default = 0)')
+    print('   width: minimal number of points above threshold (default = 0)')
     sys.exit()
 
 if not os.path.exists(fileName):
@@ -31,6 +39,10 @@ if not os.path.exists(fileName):
 fileType = ''
 if fileName.rfind('.dat') + len('.dat') == len(fileName):
     fileType = 'dat'
+    dataFormat = 0
+elif fileName.rfind('.bin') + len('.bin') == len(fileName):
+    fileType = 'dat'
+    dataFormat = 1
 elif fileName.rfind('.root') + len('.root') == len(fileName):
     fileType = 'root'
 else:
@@ -69,12 +81,7 @@ class WFDisplay(Module):
         self.c1.Divide(4, 4)
         self.c1.Show()
 
-    def draw(
-        self,
-        k,
-        event,
-        run,
-    ):
+    def draw(self, k, event, run,):
         ''' Draw histograms and wait for user respond '''
 
         self.c1.Clear()
@@ -89,7 +96,24 @@ class WFDisplay(Module):
         stat = wait()
         for i in range(k):
             self.hist[i].Reset()
+            self.hist[i].SetLineColor(1)
         return stat
+
+    def sortWaveforms(self, unsortedPyStoreArray):
+        """
+        Returns a python-list containing the sorted array
+        """
+
+        # first convert to a python-list to be able to sort
+        py_list = [x for x in unsortedPyStoreArray]
+
+        # sort via a hierachy of sort keys
+        return sorted(
+            py_list,
+            key=lambda x: (
+                x.getBarID(),
+                x.getChannelID())
+        )
 
     def event(self):
         '''
@@ -101,8 +125,11 @@ class WFDisplay(Module):
         event = evtMetaData.obj().getEvent()
         run = evtMetaData.obj().getRun()
 
-        waveforms = Belle2.PyStoreArray('TOPRawWaveforms')
+        waveformsUnsorted = Belle2.PyStoreArray('TOPRawWaveforms')
+        waveforms = self.sortWaveforms(waveformsUnsorted)
+
         k = 0
+        trig = False
         for waveform in waveforms:
             wf = waveform.getWaveform()
             self.hist[k].Reset()
@@ -111,19 +138,33 @@ class WFDisplay(Module):
             chan = waveform.getChannelID()
             window = waveform.getStorageWindow()
             refwin = waveform.getReferenceWindow()
-            title = 'chan ' + str(chan) + ' '
+            name = waveform.getElectronicName()
+            title = name + ' chan ' + str(chan) + ' '
             title += 'win ' + str(window) + ' (' + str(refwin) + ')'
             self.hist[k].SetTitle(title)
             self.hist[k].SetStats(False)
             i = 0
+            adcMean = 0
             for adc in wf:
                 i = i + 1
                 self.hist[k].SetBinContent(i, adc)
+                adcMean += adc
+            adcMean /= 64
+            wid = 0
+            for adc in wf:
+                i = i + 1
+                if adc - adcMean > threshold:
+                    wid = wid + 1
+            if wid > width:
+                trig = True
+                self.hist[k].SetLineColor(2)
             k = k + 1
             if k == 16:
-                stat = self.draw(k, event, run)
-                if stat:
-                    return
+                if trig:
+                    trig = False
+                    stat = self.draw(k, event, run)
+                    if stat:
+                        return
                 k = 0
         if k > 0:
             self.draw(k, event, run)
@@ -136,6 +177,7 @@ main = create_path()
 if fileType == 'dat':
     reader = register_module('TOPRawdataInput')
     reader.param('inputFileName', fileName)
+    reader.param('dataFormat', dataFormat)
     main.add_module(reader)
 elif fileType == 'root':
     reader = register_module('RootInput')
@@ -151,8 +193,18 @@ col0 = bar1 + "ElectronicsModule[@col = '0']/SCRODid"
 col1 = bar1 + "ElectronicsModule[@col = '1']/SCRODid"
 col2 = bar1 + "ElectronicsModule[@col = '2']/SCRODid"
 col3 = bar1 + "ElectronicsModule[@col = '3']/SCRODid"
-gearbox.param('override', [(col0, '59', ''), (col1, '66', ''), (col2, '65', ''
-                                                                ), (col3, '67', '')])
+
+if dataFormat == 0:
+    gearbox.param('override', [(col0, '59', ''),
+                               (col1, '66', ''),
+                               (col2, '65', ''),
+                               (col3, '67', '')])
+else:
+    gearbox.param('override', [(col0, '14', ''),
+                               (col1, '15', ''),
+                               (col2, '16', ''),
+                               (col3, '13', '')])
+
 main.add_module(gearbox)
 
 geometry = register_module('Geometry')

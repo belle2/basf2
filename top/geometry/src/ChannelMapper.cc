@@ -41,8 +41,21 @@ namespace Belle2 {
     void ChannelMapper::initialize(const GearDir& channelMapping)
     {
 
+      string path = channelMapping.getPath();
+      auto i1 = path.rfind("type='") + 6;
+      auto i2 = path.rfind("']");
+      m_typeName = path.substr(i1, i2 - i1);
+
+      if (m_typeName == "IRS3B") {
+        m_type = c_IRS3B;
+      } else if (m_typeName == "IRSX") {
+        m_type = c_IRSX;
+      } else {
+        B2ERROR("TOP::ChannelMapper: unknown electronic type '" << m_typeName
+                << "'");
+      }
+
       // get parameters from Gearbox
-      string type = channelMapping.getString("type", "");
       for (const GearDir& map : channelMapping.getNodes("map")) {
         std::vector<double> data = map.getArray("");
         unsigned row = int(data[0]);
@@ -59,7 +72,7 @@ namespace Belle2 {
       // check the size of the mapping
       if (m_mapping.size() != c_numAsics * c_numChannels)
         B2FATAL("TOP::ChannelMapper: got incorrect map size from xml file for '"
-                << type << "' - expect " <<  c_numAsics * c_numChannels
+                << m_typeName << "' - expect " <<  c_numAsics * c_numChannels
                 << ", got " << m_mapping.size());
 
       // check the mapping for consistency
@@ -104,7 +117,8 @@ namespace Belle2 {
         }
       }
       if (!ok) {
-        B2FATAL("TOP::ChannelMapper: errors detected in xml file for '" << type << "'");
+        B2FATAL("TOP::ChannelMapper: errors detected in xml file for '"
+                << m_typeName << "'");
         return;
       }
 
@@ -116,12 +130,13 @@ namespace Belle2 {
       m_available = true;
 
       B2INFO("TOP::ChannelMapper: " << m_mapping.size() <<
-             " channels of carrier board of type '" << type << "' mapped to pixels.");
+             " channels of carrier board of type '" << m_typeName
+             << "' mapped to pixels.");
 
       // print mappings if debug level for package 'top' is set to 100 or larger
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
-        print(type);
+        print();
       }
 
     }
@@ -145,11 +160,10 @@ namespace Belle2 {
         B2ERROR("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
         return c_invalidChannelID;
       }
-      unsigned chan = map->getASICChannel();
       unsigned asic = map->getASICNumber();
-      return chan + c_numChannels * (asic + c_numAsics *
-                                     (carrier + c_numCarrierBoards * boardstack));
+      unsigned chan = map->getASICChannel();
 
+      return getChannelID(boardstack, carrier, asic, chan);
     }
 
 
@@ -194,7 +208,7 @@ namespace Belle2 {
     }
 
 
-    void ChannelMapper::print(std::string type) const
+    void ChannelMapper::print() const
     {
       std::vector<std::string> what;
       what.push_back(string("Boardstack numbers (view from the back):"));
@@ -208,7 +222,7 @@ namespace Belle2 {
 
       cout << endl;
       cout << "           Mapping of TOP electronic channels to pixels";
-      if (!type.empty()) cout << " for " << type;
+      if (!m_typeName.empty()) cout << " for " << m_typeName;
       cout << endl << endl;
 
       for (int i = 0; i < 4; i++) {

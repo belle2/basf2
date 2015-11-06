@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ChannelMapping descr="Mapping of pixels to channels of a carrier board for IRS3B">
-  <type>IRS3B</type>
+<ChannelMapping type = "IRS3B" descr="Mapping of pixels to channels">
   <!-- columns represent: pixelRow pixelColumn asicNumber asicChannel -->
   <map> 0 0  0 6 </map>
   <map> 0 1  0 4 </map>

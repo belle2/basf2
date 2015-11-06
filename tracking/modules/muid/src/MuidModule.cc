@@ -441,9 +441,9 @@ void MuidModule::event()
 
       // Find the matching KLMCluster(s)
       for (int c = 0; c < klmClusters.getEntries(); ++c) {
-        G4Point3D clusterDirection(klmClusters[c]->getPosition().X(),
-                                   klmClusters[c]->getPosition().Y(),
-                                   klmClusters[c]->getPosition().Z());
+        G4Point3D clusterDirection(klmClusters[c]->getClusterPosition().X(),
+                                   klmClusters[c]->getClusterPosition().Y(),
+                                   klmClusters[c]->getClusterPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
           klmClusters[c]->setAssociatedTrackFlag();
           tracks[t]->addRelationTo(klmClusters[c]);

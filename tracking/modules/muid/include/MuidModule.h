@@ -102,6 +102,12 @@ namespace Belle2 {
 
   protected:
 
+    //! Mean hit - trigger time (ns)
+    double m_MeanDt;
+
+    //! Coincidence window half-width for in-time KLM hits (ns)
+    double m_MaxDt;
+
     //! Minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 
@@ -112,7 +118,7 @@ namespace Belle2 {
     double m_MaxStep;
 
     //! Flag for source (0 = beam, 1 = cosmic ray)
-    int    m_Cosmic;
+    int m_Cosmic;
 
     //! Name of the Track collection of the reconstructed tracks to be extrapolated
     std::string m_TracksColName;
@@ -243,8 +249,11 @@ namespace Belle2 {
     //! half-length (cm) of the barrel
     double m_BarrelHalfLength;
 
-    //! outermost endcap layer that is active for muon identification (user-defined)
-    int m_OutermostActiveEndcapLayer;
+    //! outermost forward-endcap layer that is active for muon identification (user-defined)
+    int m_OutermostActiveForwardEndcapLayer;
+
+    //! outermost backward-endcap layer that is active for muon identification (user-defined)
+    int m_OutermostActiveBackwardEndcapLayer;
 
     //! outermost barrel layer that is active for muon identification (user-defined)
     int m_OutermostActiveBarrelLayer;
@@ -281,6 +290,9 @@ namespace Belle2 {
 
     //! azimuthal unit vector of each barrel sector
     TVector3 m_BarrelSectorPhi[NSECTOR + 1];
+
+    //! flag to indicate whether the track is in the forward (true) or backward (false) region (for endcaps asymmetry)
+    bool m_IsForward;
 
     //! outermost barrel layer encountered by the extrapolated track in the prior steps
     int m_FirstBarrelLayer;

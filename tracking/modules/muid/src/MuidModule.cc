@@ -89,7 +89,8 @@ MuidModule::MuidModule() :
   m_BarrelMaxR(0.0),
   m_EndcapHalfLength(0.0),
   m_BarrelHalfLength(0.0),
-  m_OutermostActiveEndcapLayer(0),
+  m_OutermostActiveForwardEndcapLayer(0),
+  m_OutermostActiveBackwardEndcapLayer(0),
   m_OutermostActiveBarrelLayer(0),
   m_EndcapMiddleZ(0.0),
   m_BarrelScintVariance(0.0),
@@ -141,10 +142,13 @@ MuidModule::MuidModule() :
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
   addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
-  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.1));
-  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
-  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
-  addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference.", double(7.5));
+  addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
+  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-15)", double(15.0));
+  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
+           double(0.1));
+  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
+  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity; default 25)", double(25.0));
+  addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference (default 7.5)", double(7.5));
   addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle,
            "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
@@ -216,29 +220,26 @@ void MuidModule::initialize()
   m_Target = new Simulation::ExtCylSurfaceTarget(m_BarrelMaxR, minZ, maxZ);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_Target);
 
-  m_BarrelHalfLength /= CLHEP::cm;  // now in G4e units (cm)
-  m_EndcapHalfLength /= CLHEP::cm;  // now in G4e units (cm)
-  m_OffsetZ /= CLHEP::cm;           // now in G4e units (cm)
+  m_BarrelHalfLength /= CLHEP::cm;                   // now in G4e units (cm)
+  m_EndcapHalfLength /= CLHEP::cm;                   // now in G4e units (cm)
+  m_OffsetZ /= CLHEP::cm;                            // now in G4e units (cm)
   m_BarrelMinR = bklmGeometry->getGap1InnerRadius(); // in G4e units (cm)
-  m_BarrelMaxR /= CLHEP::cm;                                          // now in G4e units (cm)
-  m_EndcapMinR = eklmGeometry.getEndcapPosition()->InnerR / CLHEP::cm;     // in G4e units (cm)
-
-  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->OuterR / CLHEP::cm;     // in G4e units (cm)
-  m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;   // in G4e units (cm)
+  m_BarrelMaxR /= CLHEP::cm;                         // now in G4e units (cm)
+  m_EndcapMinR = eklmGeometry.getEndcapPosition()->InnerR / CLHEP::cm;  // in G4e units (cm)
+  m_EndcapMaxR = eklmGeometry.getEndcapPosition()->OuterR / CLHEP::cm;  // in G4e units (cm)
+  m_EndcapMiddleZ = m_BarrelHalfLength + m_EndcapHalfLength;            // in G4e units (cm)
 
   // Measurement uncertainties and acceptance windows
-  double width = eklmGeometry.getStripGeometry()->Width / CLHEP::cm;
+  double width = eklmGeometry.getStripGeometry()->Width / CLHEP::cm; // in G4e units (cm)
   m_EndcapScintVariance = width * width / 12.0;
-  width = bklmGeometry->getScintHalfWidth() * 2.0; // in G4e units (cm)
+  width = bklmGeometry->getScintHalfWidth() * 2.0;                   // in G4e units (cm)
   m_BarrelScintVariance = width * width / 12.0;
   int nBarrelLayers = bklmGeometry->getNLayer();
   for (int layer = 1; layer <= nBarrelLayers; ++layer) {
     const bklm::Module* module = bklmGeometry->findModule(layer, false);
     width = module->getPhiStripWidth(); // in G4e units (cm)
-    std::sprintf(line, "Layers/Layer[@layer=\"%d\"]/PhiStrips/Width", layer);
     m_BarrelPhiStripVariance[layer - 1] = width * width / 12.0;
     width = module->getZStripWidth(); // in G4e units (cm)
-    std::sprintf(line, "Layers/Layer[@layer=\"%d\"]/ZStrips/Width", layer);
     m_BarrelZStripVariance[layer - 1] = width * width / 12.0;
   }
 
@@ -256,7 +257,9 @@ void MuidModule::initialize()
              - 0.5 * eklmGeometry.getPlasticSheetGeometry()->Width) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
-  m_OutermostActiveEndcapLayer = nEndcapLayers - 1; // zero-based counting
+  m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting
+  m_OutermostActiveBackwardEndcapLayer = eklmGeometry.getNDetectorLayers(1) - 1; // zero-based counting
+
   for (int layer = 1; layer <= nEndcapLayers; ++layer) {
     m_EndcapModuleMiddleZ[layer - 1] = z0 + dz * (layer - 1); // in G4e units (cm)
   }
@@ -390,6 +393,7 @@ void MuidModule::event()
       muid->setMomentum(momentum.x(), momentum.y(), momentum.z());
       if (momentum.perp() <= m_MinPt) continue;
       if (m_Target->GetDistanceFromPoint(position) < 0.0) continue;
+      m_IsForward = (momentum.z() > 0.0); // to distinguish forward/backward endcaps
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string g4eName = "g4e_" + particle->GetParticleName();
       double mass = particle->GetPDGMass();
@@ -506,7 +510,7 @@ void MuidModule::registerVolumes()
         m_EnterExit->push_back(*iVol);
       }
     }
-    // Endcap KLM:
+    // Endcap KLM: StripSensitive_*
     if (name.compare(0, 14, "StripSensitive") == 0) {
       m_EKLMVolumes->push_back(*iVol);
       m_EnterExit->push_back(*iVol);
@@ -631,7 +635,7 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
   G4String name = touch->GetVolume(0)->GetName();
 
   // BKLM.Layer**GasPhysical or BKLM.Layer**ChimneyGasPhysical for barrel KLM RPCs
-  // BKLM.ScintActiveType*Physical for barrel KLM scintillator strips
+  // BKLM.ScintType*Physical for barrel KLM scintillator strips
   if (name.compare(0, 5, "BKLM.") == 0) {
     if ((name.find("ScintActiveType") != string::npos) ||
         (name.find("GasPhysical") != string::npos)) {
@@ -858,18 +862,21 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
 
   double oldZ = fabs(oldPosition.Z() - m_OffsetZ);
   double newZ = fabs(point.position.Z() - m_OffsetZ);
+  bool isForward = point.position.Z() > m_OffsetZ;
+  int outermostLayer = isForward ? m_OutermostActiveForwardEndcapLayer
+                       : m_OutermostActiveBackwardEndcapLayer;
 
-  for (int layer = m_FirstEndcapLayer; layer <= m_OutermostActiveEndcapLayer; ++layer) {
+  for (int layer = m_FirstEndcapLayer; layer <= outermostLayer; ++layer) {
     if (newZ <  m_EndcapModuleMiddleZ[layer]) break;
     if (oldZ <= m_EndcapModuleMiddleZ[layer]) {
       m_FirstEndcapLayer = layer + 1; // ratchet outward for next call's loop starting value
-      if (m_FirstEndcapLayer > m_OutermostActiveEndcapLayer) m_Escaped = true;
+      if (m_FirstEndcapLayer > outermostLayer) m_Escaped = true;
       point.inBarrel = false;
-      point.isForward = point.position.Z() > m_OffsetZ;
+      point.isForward = isForward;
       point.layer = layer;
       double phi = point.position.Phi();
       if (phi < 0.0) { phi += TWOPI; }
-      if (point.isForward) {
+      if (isForward) {
         phi = M_PI - phi;
         if (phi < 0.0) { phi += TWOPI; }
       }
@@ -897,7 +904,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
     BKLMHit2d* hit = bklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
     if (hit->isOutOfTime()) continue;
-    if (hit->getTime() > 50.0) continue; // DIVOT this needs tuning work
+    if ((hit->getTime() - m_MeanDt) > m_MaxDt) continue;
     TVector3 diff(hit->getGlobalPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) < 2.0) {
@@ -940,8 +947,14 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
     point.time = hit->getTime();
     double localVariance[2] = {m_BarrelScintVariance, m_BarrelScintVariance};
     if (hit->inRPC()) {
-      localVariance[0] = m_BarrelPhiStripVariance[point.layer];
-      localVariance[1] = m_BarrelZStripVariance[point.layer];
+      int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1;
+      double dn = nStrips - 1.5;
+      double factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.60; // measured-in-Belle resolution
+      localVariance[0] = m_BarrelPhiStripVariance[point.layer] * factor;
+      nStrips = hit->getZStripMax() - hit->getZStripMin() + 1;
+      dn = nStrips - 1.5;
+      factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55; // measured-in-Belle resolution
+      localVariance[1] = m_BarrelZStripVariance[point.layer] * factor;
     }
     adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
     if (point.chi2 >= 0.0) {
@@ -949,7 +962,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track* track)
       track->addRelationTo(hit);
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::KLM, bestHit, hit->getLayer(), point.positionAtHitPlane.Mag());
+      tc->addHit(Const::EDetector::KLM, bestHit, 0, point.positionAtHitPlane.Mag()); // "0" for BKLM
     }
   }
   return point.chi2 >= 0.0;
@@ -972,8 +985,9 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track* track)
     } else {
       if (hit->getEndcap() != 1) continue;
     }
-    // DIVOT no such function! if (hit->isOutOfTime()) continue;
-    if (hit->getTime() > 50.0) continue; // DIVOT this needs tuning work
+    // DIVOT no such function for EKLM!
+    // if (hit->isOutOfTime()) continue;
+    if ((hit->getTime() - m_MeanDt) > m_MaxDt) continue;
     TVector3 diff(hit->getPosition() - point.position);
     double dn = diff * n; // in cm
     if (fabs(dn) > 2.0) continue;
@@ -992,12 +1006,13 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track* track)
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
     adjustIntersection(point, localVariance, hit->getPosition(), point.position);
     if (point.chi2 >= 0.0) {
-      // DIVOT no such function for EKLM! hit->isOnTrack(true);
+      // DIVOT no such function for EKLM!
+      // hit->isOnTrack(true);
       track->addRelationTo(hit);
-      /* DIVOT not yet for EKLM alignment!
+      /* not yet for EKLM
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::KLM, bestHit, hit->getLayer(), point.positionAtHitPlane.Mag());
+      tc->addHit(Const::EDetector::KLM, bestHit, 1, point.positionAtHitPlane.Mag()); // "1" for EKLM
       */
     }
   }
@@ -1163,22 +1178,11 @@ void MuidModule::finishTrack(Muid* muid, int charge)
 
   // Done with this track: compute likelihoods and fill the muid object
 
+  int lastExtLayer(m_LastBarrelExtLayer + m_LastEndcapExtLayer + 1);
+  // outcome: 0=didn't reach KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
   int outcome(0);
-  int layerExt(m_LastBarrelExtLayer);
   if ((m_LastBarrelExtLayer >= 0) || (m_LastEndcapExtLayer >= 0)) {
-    if (m_Escaped) {
-      outcome = 3;
-      if (m_LastEndcapExtLayer >= 0) {
-        outcome = 4;
-        layerExt += m_LastEndcapExtLayer + 1;
-      }
-    } else {
-      outcome = 1;
-      if (m_LastEndcapExtLayer >= 0) {
-        outcome = 2;
-        layerExt += m_LastEndcapExtLayer + 1;
-      }
-    }
+    outcome = ((m_LastEndcapExtLayer < 0) ? 1 : 2) + (m_Escaped ? 2 : 0);
   }
 
   muid->setOutcome(outcome);
@@ -1186,16 +1190,14 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   muid->setEndcapExtLayer(m_LastEndcapExtLayer);
   muid->setBarrelHitLayer(m_LastBarrelHitLayer);
   muid->setEndcapHitLayer(m_LastEndcapHitLayer);
-  muid->setExtLayer(m_LastBarrelExtLayer + m_LastEndcapExtLayer + 1);
-  muid->setHitLayer((m_LastEndcapHitLayer == -1 ?
+  muid->setExtLayer(lastExtLayer);
+  muid->setHitLayer(((m_LastEndcapHitLayer == -1) ?
                      m_LastBarrelHitLayer :
                      m_LastBarrelExtLayer + m_LastEndcapHitLayer + 1));
   muid->setChiSquared(m_Chi2);
   muid->setDegreesOfFreedom(m_NPoint);
   muid->setExtLayerPattern(m_ExtLayerPattern);
   muid->setHitLayerPattern(m_HitLayerPattern);
-
-  int layerDiff = muid->getExtLayer() - muid->getHitLayer();
 
 // Do likelihood calculation
 
@@ -1214,19 +1216,19 @@ void MuidModule::finishTrack(Muid* muid, int charge)
   double logL_e = -1.0E20;
   if (outcome != 0) { // extrapolation reached KLM sensitive volume
     if (charge > 0.0) {
-      muon = m_MuonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      pion = m_PionPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      kaon = m_KaonPlusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      proton = m_ProtonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      deuteron = m_DeuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      electron = m_PositronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      muon = m_MuonPlusPar->getPDF(muid, m_IsForward);
+      pion = m_PionPlusPar->getPDF(muid, m_IsForward);
+      kaon = m_KaonPlusPar->getPDF(muid, m_IsForward);
+      proton = m_ProtonPar->getPDF(muid, m_IsForward);
+      deuteron = m_DeuteronPar->getPDF(muid, m_IsForward);
+      electron = m_PositronPar->getPDF(muid, m_IsForward);
     } else {
-      muon = m_MuonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      pion = m_PionMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      kaon = m_KaonMinusPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      proton = m_AntiprotonPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      deuteron = m_AntideuteronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
-      electron = m_ElectronPar->getPDF(outcome, layerExt, layerDiff, m_NPoint, m_Chi2);
+      muon = m_MuonMinusPar->getPDF(muid, m_IsForward);
+      pion = m_PionMinusPar->getPDF(muid, m_IsForward);
+      kaon = m_KaonMinusPar->getPDF(muid, m_IsForward);
+      proton = m_AntiprotonPar->getPDF(muid, m_IsForward);
+      deuteron = m_AntideuteronPar->getPDF(muid, m_IsForward);
+      electron = m_ElectronPar->getPDF(muid, m_IsForward);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);

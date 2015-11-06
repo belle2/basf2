@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/muid/MuidPar.h>
+#include <tracking/dataobjects/Muid.h>
 
 #include <fstream>
 #include <exception>
@@ -18,8 +19,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-#include <TMath.h>
 
 using namespace std;
 
@@ -57,50 +56,66 @@ namespace Belle2 {
               " or earlier")
     }
 
-    m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
     for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
-      sprintf(line, "Outcome[@outcome=\"%d\"]/", outcome);
+      sprintf(line, "LayerProfile/Outcome[@outcome=\"%d\"]/", outcome);
       GearDir outcomeContent(content);
       outcomeContent.append(line);
-      for (int layer = 0; layer <= 25; ++layer) {
-        sprintf(line, "LongitudinalPDF/LastLayer[@layer=\"%d\"]", layer);
-        std::vector<double> rangePDF = outcomeContent.getArray(line);
-        if (rangePDF.size() != MUID_RangeNbins) {
-          B2ERROR("LongitudinalPDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
-                  << " layer=" << layer << " has " << rangePDF.size() << " entries; should be " << MUID_RangeNbins)
-          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
-        } else {
-          for (int i = 0; i < MUID_RangeNbins; ++i) {
-            m_RangePDF[outcome][layer][i] = rangePDF[i];
-          }
-        }
-      }
-      for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
-        sprintf(line, "TransversePDF/DegreesOfFreedom[@ndof=\"%d\"]", 2 * halfNdof);
-        std::vector<double> reducedChiSquaredPDF = outcomeContent.getArray(line);
-        if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
-          B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  outcome " << outcome
-                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins)
-          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
-        } else {
-          double integral = 1.0E-30;
-          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
-            integral += reducedChiSquaredPDF[i];
-          }
-          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
-            m_ReducedChiSquaredPDF[outcome][halfNdof][i] = reducedChiSquaredPDF[i] / integral;
-          }
-          spline(MUID_ReducedChiSquaredNbins - 1, m_ReducedChiSquaredDx,
-                 &m_ReducedChiSquaredPDF[outcome][halfNdof][0],
-                 &m_ReducedChiSquaredD1[outcome][halfNdof][0],
-                 &m_ReducedChiSquaredD2[outcome][halfNdof][0],
-                 &m_ReducedChiSquaredD3[outcome][halfNdof][0]);
-          m_ReducedChiSquaredD1[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
-          m_ReducedChiSquaredD2[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
-          m_ReducedChiSquaredD3[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+      for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
+        if ((outcome == 1) && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
+        if ((outcome == 2) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
+        if ((outcome == 3) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == 4) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
+        if ((outcome == 5) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
+        if ((outcome == 6) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
+        if ((outcome >= 7) && (outcome <= 21) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
+        if ((outcome >= 22) && (outcome <= 36) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
+        if ((outcome >= 37) && (outcome <= 51) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
+        if ((outcome >= 52) && (outcome <= 66) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
+        sprintf(line, "LastLayer[@layer=\"%d\"]", lastLayer);
+        std::vector<double> layerPDF = outcomeContent.getArray(line);
+        for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
+          m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];
         }
       }
     }
+
+    m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
+    for (int detector = 0; detector <= MUID_MaxDetector; ++detector) {
+      sprintf(line, "TransversePDF/BarrelAndEndcap");
+      if (detector == 1) { sprintf(line, "TransversePDF/BarrelOnly"); }
+      if (detector == 2) { sprintf(line, "TransversePDF/EndcapOnly"); }
+      GearDir detectorContent(content);
+      detectorContent.append(line);
+
+      for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
+        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/Threshold", 2 * halfNdof);
+        m_ReducedChiSquaredThreshold[detector][halfNdof] = detectorContent.getDouble(line);
+        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/ScaleY", 2 * halfNdof);
+        m_ReducedChiSquaredScaleY[detector][halfNdof] = detectorContent.getDouble(line);
+        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Tail/ScaleX", 2 * halfNdof);
+        m_ReducedChiSquaredScaleX[detector][halfNdof] = detectorContent.getDouble(line);
+        sprintf(line, "DegreesOfFreedom[@ndof=\"%d\"]/Histogram", 2 * halfNdof);
+        std::vector<double> reducedChiSquaredPDF = detectorContent.getArray(line);
+        if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
+          B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  detector " << detector
+                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins)
+          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
+        } else {
+          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+            m_ReducedChiSquaredPDF[detector][halfNdof][i] = reducedChiSquaredPDF[i];
+          }
+          spline(MUID_ReducedChiSquaredNbins - 1, m_ReducedChiSquaredDx,
+                 &m_ReducedChiSquaredPDF[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD1[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD2[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD3[detector][halfNdof][0]);
+          m_ReducedChiSquaredD1[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD2[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD3[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+        }
+      }
+    }
+
     if (myExpNo == expNo) {
       B2INFO("MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo)
     } else {
@@ -145,55 +160,144 @@ namespace Belle2 {
     D[n - 1] = D[n - 2];
   }
 
-  double MuidPar::getPDF(int outcome, int lastExtLayer,
-                         int layerDifference, int ndof, double chiSquared) const
+  double MuidPar::getPDF(const Muid* muid, bool isForward) const
+  {
+    return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
+  }
+
+  double MuidPar::getPDFLayer(const Muid* muid, bool isForward) const
   {
 
     // outcome:  0=Not in KLM, 1=Barrel Stop, 2=Endcap Stop, 3=Barrel Exit, 4=Endcap Exit
-    // lastExtLayer:  last layer that Ext track touched (zero-based)
-    // layerDifference:  difference between last Ext layer and last hit layer
-    // reducedChiSquared: reduced chi**2 of the transverse deviations of all associated
-    //           hits from the corresponding Ext track crossings
 
-    if ((outcome <= 0) || (outcome > MUID_MaxOutcome)) return 0.0;
-    return getPDFRange(outcome, lastExtLayer, layerDifference) * getPDFRchisq(outcome, ndof, chiSquared);
+    int outcome = muid->getOutcome();
+    if ((outcome <= 0) || (outcome > 4)) return 0.0;
+
+    int barrelExtLayer = muid->getBarrelExtLayer();
+    int endcapExtLayer = muid->getEndcapExtLayer();
+    if (barrelExtLayer > MUID_MaxBarrelLayer) return 0.0;
+    if (endcapExtLayer > MUID_MaxForwardEndcapLayer) return 0.0;
+    unsigned int extLayerPattern = muid->getExtLayerPattern();
+    unsigned int hitLayerPattern = muid->getHitLayerPattern();
+
+    // Use finer granularity for non-zero outcome:
+    //  1: stop in barrel
+    //  2: stop in forward endcap (without crossing barrel)
+    //  3: exit from barrel (without crossing endcap)
+    //  4: exit from forward endcap (without crossing barrel)
+    //  5: stop in forward endcap (after crossing barrel)
+    //  6: exit from forward endcap (after crossing barrel)
+    //  7-21: stop in forward endcap (after crossing barrel)
+    //  22-36: stop in backward endcap (after crossing barrel)
+    //  37-51: exit from forward endcap (after crossing barrel)
+    //  52-66: exit from backward endcap (after crossing barrel)
+
+    int lastLayer = barrelExtLayer;
+    if (outcome == 2) { // forward endcap stop (no barrel hits)
+      lastLayer = endcapExtLayer;
+      if (barrelExtLayer < 0) {
+        outcome = isForward ? 2 : 5; // forward or backward endcap stop (no barrel hits)
+      } else {
+        outcome = (isForward ? 7 : 22) + barrelExtLayer; // forward/backward endcap stop (B+E)
+      }
+    } else if (outcome == 4) { // forward endcap exit (no barrel hits)
+      lastLayer = endcapExtLayer;
+      if (barrelExtLayer < 0) {
+        outcome = isForward ? 4 : 6;  // forward or backward endcap exit (no barrel hits)
+      } else {
+        outcome = (isForward ? 37 : 52) + barrelExtLayer; // forward/backward endcap exit (B+E)
+      }
+    }
+
+    // Get probability density that each crossed layer should have a hit.
+
+    double pdf = 1.0;
+    unsigned int testBit = 1;
+    for (int layer = 0; layer <= barrelExtLayer; ++layer) {
+      if ((testBit & extLayerPattern) != 0) {
+        if ((testBit & hitLayerPattern) != 0) {
+          pdf *= m_LayerPDF[outcome][lastLayer][layer];
+        } else {
+          if (((layer == 0) && (outcome < 7)) || (layer == MUID_MaxBarrelLayer) || (layer < barrelExtLayer))
+            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer]);
+        }
+      }
+      testBit <<= 1; // move to next bit
+    }
+    int maxLayer = isForward ? MUID_MaxForwardEndcapLayer : MUID_MaxBackwardEndcapLayer;
+    testBit = 1 << (MUID_MaxBarrelLayer + 1);
+    for (int layer = 0; layer <= endcapExtLayer; ++layer) {
+      if ((testBit & extLayerPattern) != 0) {
+        if ((testBit & hitLayerPattern) != 0) {
+          pdf *= m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1];
+        } else {
+          if ((layer == 0) || (layer == maxLayer) || (layer < endcapExtLayer))
+            pdf *= (1.0 - m_LayerPDF[outcome][lastLayer][layer + MUID_MaxBarrelLayer + 1]);
+        }
+      }
+      testBit <<= 1; // move to next bit
+    }
+
+    return pdf;
 
   }
 
-  double MuidPar::getPDFRange(int outcome, int lastExtLayer, int layerDifference) const
-  {
-
-    if ((lastExtLayer < 0) || (lastExtLayer > MUID_MaxLastExtLayer)) return 0.0;
-
-    // Evaluate the longitudinal-coordinate PDF for this particleID hypothesis
-
-    if (layerDifference >= MUID_RangeNbins) layerDifference = MUID_RangeNbins - 1;
-    return m_RangePDF[outcome][lastExtLayer][layerDifference];
-
-  }
-
-  double MuidPar::getPDFRchisq(int outcome, int ndof, double chiSquared) const
+  double MuidPar::getPDFRchisq(const Muid* muid) const
   {
 
     // Evaluate the transverse-coordinate PDF for this particleID hypothesis.
-    // Use spline interpolation of the PDF to avoid binning artifacts.
 
+    int ndof = muid->getDegreesOfFreedom();
     if (ndof <= 0) return 1.0;
+    double chiSquared = muid->getChiSquared();
+    if (chiSquared < 0.0) return 0.0;
     int halfNdof = (ndof >> 1);
+    double x = chiSquared / ndof;
+
+    // Assume that the track crossed both barrel and endcap
+    int detector = 0;
+    if (muid->getEndcapExtLayer() < 0) {
+      detector = 1; // crossed barrel only
+    } else if (muid->getBarrelExtLayer() < 0) {
+      detector = 2;  // crossed endcap only
+    }
+
+    // Use spline interpolation of the logarithms of the PDF to avoid binning artifacts.
+    // Use fitted tail function for reduced-chiSquared values beyond the tabulated threshold.
+
     double pdf = 0.0;
-    if ((chiSquared > 0.0) && (halfNdof <= MUID_MaxHalfNdof)) {
-      double x = chiSquared / ndof - 0.5 * m_ReducedChiSquaredDx;
-      if (x >= MUID_ReducedChiSquaredLimit - 0.5 * m_ReducedChiSquaredDx) {
-        pdf = m_ReducedChiSquaredPDF[outcome][halfNdof][MUID_ReducedChiSquaredNbins - 1];
+    if (halfNdof > MUID_MaxHalfNdof) { // extremely rare
+      x *= m_ReducedChiSquaredScaleX[detector][MUID_MaxHalfNdof] * halfNdof;
+      if (halfNdof == 1) {
+        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::exp(-x);
+      } else if (halfNdof == 2) {
+        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * std::exp(-x);
+      } else if (halfNdof == 3) {
+        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * x * x * std::exp(-x);
       } else {
+        pdf = m_ReducedChiSquaredScaleY[detector][MUID_MaxHalfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
+      }
+    } else {
+      if (x > m_ReducedChiSquaredThreshold[detector][halfNdof]) { // tail function for large x
+        x *= m_ReducedChiSquaredScaleX[detector][halfNdof] * halfNdof;
+        if (halfNdof == 1) {
+          pdf = m_ReducedChiSquaredScaleY[detector][halfNdof] * std::exp(-x);
+        } else if (halfNdof == 2) {
+          pdf = m_ReducedChiSquaredScaleY[detector][halfNdof] * x * std::exp(-x);
+        } else if (halfNdof == 3) {
+          pdf = m_ReducedChiSquaredScaleY[detector][halfNdof] * x * x * std::exp(-x);
+        } else {
+          pdf = m_ReducedChiSquaredScaleY[detector][halfNdof] * std::pow(x, halfNdof - 1.0) * std::exp(-x);
+        }
+      } else { // spline-interpolated histogram for small x
+        x -= 0.5 * m_ReducedChiSquaredDx;
         int i  = (int)(x / m_ReducedChiSquaredDx);
-        pdf = m_ReducedChiSquaredPDF[outcome][halfNdof][i];
+        double logPdf = m_ReducedChiSquaredPDF[detector][halfNdof][i];
         double dx = x - i * m_ReducedChiSquaredDx;
-        double corr = dx * (m_ReducedChiSquaredD1[outcome][halfNdof][i] +
-                            dx * (m_ReducedChiSquaredD2[outcome][halfNdof][i] +
-                                  dx * m_ReducedChiSquaredD3[outcome][halfNdof][i]));
-        double pdfcorr = pdf + corr;
-        if (pdfcorr > 0.0) pdf = pdfcorr;
+        logPdf += dx * (m_ReducedChiSquaredD1[detector][halfNdof][i] +
+                        dx * (m_ReducedChiSquaredD2[detector][halfNdof][i] +
+                              dx * m_ReducedChiSquaredD3[detector][halfNdof][i]));
+        pdf = std::exp(logPdf);
       }
     }
     return pdf;

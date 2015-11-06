@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = [ 'framework', '$ROOT_LIBS', 'alignment_dataobjects', 'vxd', 'alignment_dataobjects', 'vxd_dataobjects', 'cdc_dataobjects', 'alignment']
-
-
-Return('env')
-

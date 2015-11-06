@@ -46,6 +46,9 @@ void MillepedeCollectorModule::prepare()
 
   // Register Mille output
   registerObject<MilleData>("mille", new MilleData());
+
+  registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
+  registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 }
 
 void MillepedeCollectorModule::collect()
@@ -69,6 +72,9 @@ void MillepedeCollectorModule::collect()
 
     if (!fs->isFitConvergedFully())
       continue;
+
+    getObject<TH1F>("chi2/ndf").Fill(fs->getChi2() / fs->getNdf());
+    getObject<TH1F>("pval").Fill(fs->getPVal());
 
     using namespace gbl;
     GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());

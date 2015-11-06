@@ -10,9 +10,7 @@
 
 #include <alignment/dbobjects/VXDAlignment.h>
 
-using namespace std;
 using namespace Belle2;
-
 
 ClassImp(VXDAlignment)
 

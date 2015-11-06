@@ -219,8 +219,7 @@ bool MillepedeCalibrationModule::StoreInDataBase()
       if (!param.isVXD())
         continue;
       double old = 0.;
-      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
-                     result.getParameterError(ipar));
+      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar));
     }
   } else {
     alignment::PedeResult result("millepede.res");
@@ -231,8 +230,7 @@ bool MillepedeCalibrationModule::StoreInDataBase()
       if (!param.isVXD())
         continue;
       double old = init->get(param.getVxdID(), param.getParameterId() - 1);
-      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar),
-                     result.getParameterError(ipar));
+      alignment->set(param.getVxdID(), param.getParameterId() - 1, old + result.getParameterCorrection(ipar));
     }
   }
   IntervalOfValidity storeIOV = m_calibration_iov;
@@ -274,7 +272,7 @@ CalibrationModule::ECalibrationModuleMonitoringResult MillepedeCalibrationModule
       for (int ipar = 0; ipar < 6; ipar++) {
         param = ipar;
         residual = misalignment->get(vxdid, ipar) - m_finalAlignment.get(vxdid, ipar);
-        error = m_finalAlignment.getError(vxdid, ipar);
+
         m_treeResidual->get().Fill();
       }
     }

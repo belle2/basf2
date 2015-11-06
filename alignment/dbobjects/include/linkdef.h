@@ -7,5 +7,5 @@
 
 #pragma link C++ class Belle2::VXDAlignment+;
 #pragma link C++ class Belle2::CDCCalibration+;
-
+#pragma link C++ class Belle2::BKLMAlignment+;
 #endif

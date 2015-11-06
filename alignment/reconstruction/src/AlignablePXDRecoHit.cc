@@ -70,12 +70,12 @@ vector< int > AlignablePXDRecoHit::labels()
 
   std::vector<int> labGlobal;
 
-  labGlobal.push_back(GlobalLabel(vxdid, 1)); // du
-  labGlobal.push_back(GlobalLabel(vxdid, 2)); // dv
-  labGlobal.push_back(GlobalLabel(vxdid, 3)); // dw
-  labGlobal.push_back(GlobalLabel(vxdid, 4)); // dalpha
-  labGlobal.push_back(GlobalLabel(vxdid, 5)); // dbeta
-  labGlobal.push_back(GlobalLabel(vxdid, 6)); // dgamma
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dU)); // du
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dV)); // dv
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dW)); // dw
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dAlpha)); // dalpha
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dBeta)); // dbeta
+  labGlobal.push_back(GlobalLabel(vxdid, VXDAlignment::dGamma)); // dgamma
 
   return labGlobal;
 }
@@ -87,23 +87,23 @@ void AlignablePXDRecoHit::setDetectorPlane()
   if (m_misalignmentDBObjPtrName != "") {
     DBObjPtr<VXDAlignment> misalignment(m_misalignmentDBObjPtrName);
     if (misalignment.isValid()) {
-      du = misalignment->get(getSensorID(), 0);
-      dv = misalignment->get(getSensorID(), 1);
-      dw = misalignment->get(getSensorID(), 2);
-      dalpha = misalignment->get(getSensorID(), 3);
-      dbeta = misalignment->get(getSensorID(), 4);
-      dgamma = misalignment->get(getSensorID(), 5);
+      du = misalignment->get(getSensorID(), VXDAlignment::dU);
+      dv = misalignment->get(getSensorID(), VXDAlignment::dV);
+      dw = misalignment->get(getSensorID(), VXDAlignment::dW);
+      dalpha = misalignment->get(getSensorID(), VXDAlignment::dAlpha);
+      dbeta = misalignment->get(getSensorID(), VXDAlignment::dBeta);
+      dgamma = misalignment->get(getSensorID(), VXDAlignment::dGamma);
     }
   }
 
   DBObjPtr<VXDAlignment> alignment;
   if (alignment.isValid()) {
-    du = du - alignment->get(getSensorID(), 0);
-    dv = dv - alignment->get(getSensorID(), 1);
-    dw = dw - alignment->get(getSensorID(), 2);
-    dalpha = dalpha - alignment->get(getSensorID(), 3);
-    dbeta = dbeta - alignment->get(getSensorID(), 4);
-    dgamma = dgamma - alignment->get(getSensorID(), 5);
+    du = du - alignment->get(getSensorID(), VXDAlignment::dU);
+    dv = dv - alignment->get(getSensorID(), VXDAlignment::dV);
+    dw = dw - alignment->get(getSensorID(), VXDAlignment::dW);
+    dalpha = dalpha - alignment->get(getSensorID(), VXDAlignment::dAlpha);
+    dbeta = dbeta - alignment->get(getSensorID(), VXDAlignment::dBeta);
+    dgamma = dgamma - alignment->get(getSensorID(), VXDAlignment::dGamma);
   }
 
   // Construct a finite detector plane and set it.

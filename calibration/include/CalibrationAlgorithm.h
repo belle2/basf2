@@ -70,7 +70,7 @@ namespace Belle2 {
     std::vector<ExpRun> getRunListFromAllData();
 
     /// Runs calibration over list of runs
-    EResult execute(std::vector<ExpRun> runs = {}, int iteration = 1);
+    EResult execute(std::vector<ExpRun> runs = {}, int iteration = 0);
 
     /// Get constants (in TObjects) for database update from last calibration
     const std::list<Database::DBQuery>& getPayloads() const { return m_payloads; }
@@ -101,6 +101,14 @@ namespace Belle2 {
     {
       string fullName = m_prefix + "_" + name;
       StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
+
+      if (!storeobj.isValid()) {
+        B2ERROR("Access to non-existing datastore object with name " << fullName << ". New empty object is created and returned.");
+        B2ERROR("Check that the name registered in collector is the same as you request in algorithm: " << name);
+        B2ERROR("Check that the algorithm and collector use the same prefix (if you changed collector name): " << m_prefix);
+        storeobj.registerInDataStore();
+        storeobj.construct();
+      }
 
       string strRunList = runList2String(runlist);
       // TODO: Merge only once (now) or each call again?

@@ -46,40 +46,40 @@ class VXDMisalignment:
         self.misalignment.append(str(vxdid + ',' + str(param_id) + ',' + distribution + ',' + str(value)))
 
     def genSensorU(self, vxdid, value):
-        self.misalignSensors(vxdid, 0, 'gaus', value)
-
-    def genSensorV(self, vxdid, value):
         self.misalignSensors(vxdid, 1, 'gaus', value)
 
-    def genSensorW(self, vxdid, value):
+    def genSensorV(self, vxdid, value):
         self.misalignSensors(vxdid, 2, 'gaus', value)
 
-    def genSensorAlpha(self, vxdid, value):
+    def genSensorW(self, vxdid, value):
         self.misalignSensors(vxdid, 3, 'gaus', value)
 
-    def genSensorBeta(self, vxdid, value):
+    def genSensorAlpha(self, vxdid, value):
         self.misalignSensors(vxdid, 4, 'gaus', value)
 
-    def genSensorGamma(self, vxdid, value):
+    def genSensorBeta(self, vxdid, value):
         self.misalignSensors(vxdid, 5, 'gaus', value)
 
-    def setSensorU(self, vxdid, value):
-        self.misalignSensors(vxdid, 0, 'fix', value)
+    def genSensorGamma(self, vxdid, value):
+        self.misalignSensors(vxdid, 6, 'gaus', value)
 
-    def setSensorV(self, vxdid, value):
+    def setSensorU(self, vxdid, value):
         self.misalignSensors(vxdid, 1, 'fix', value)
 
-    def setSensorW(self, vxdid, value):
+    def setSensorV(self, vxdid, value):
         self.misalignSensors(vxdid, 2, 'fix', value)
 
-    def setSensorAlpha(self, vxdid, value):
+    def setSensorW(self, vxdid, value):
         self.misalignSensors(vxdid, 3, 'fix', value)
 
-    def setSensorBeta(self, vxdid, value):
+    def setSensorAlpha(self, vxdid, value):
         self.misalignSensors(vxdid, 4, 'fix', value)
 
-    def setSensorGamma(self, vxdid, value):
+    def setSensorBeta(self, vxdid, value):
         self.misalignSensors(vxdid, 5, 'fix', value)
+
+    def setSensorGamma(self, vxdid, value):
+        self.misalignSensors(vxdid, 6, 'fix', value)
 
     def setSensorAll(self, vxdid, value):
         self.setSensorU(vxdid, value)

@@ -31,35 +31,17 @@ evtgeninput.param('userDECFile', 'ccbar.dec')
 evtgeninput.param('ParentParticle', 'vpho')
 main.add_module(evtgeninput)
 
-# only up to CDC
-components = [
-    'MagneticFieldConstant4LimitedRCDC',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-]
+add_simulation(main)
 
-add_simulation(main, components)
-
-add_reconstruction(main, components)
-
-# enable debug output for the module added by add_reconstruction()
-for m in main.modules():
-    if m.name() == 'CDCDedxPID':
-        m.param('enableDebugOutput', True)
-for m in main.modules():
-    if m.name() == 'VXDDedxPID':
-        m.param('enableDebugOutput', True)
-        # m.param('usePXD', True)
+add_reconstruction(main)
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'EvtGenSimRec_pid.root')
-output.param('branchNames', ['CDCDedxLikelihoods', 'VXDDedxLikelihoods', 'Tracks', 'TrackFitResults',
-                             'MCParticles', 'CDCDedxTracks', 'VXDDedxTracks', 'PIDLikelihoods', 'EventMetaData'])
+output.param('branchNames', ['Tracks', 'TrackFitResults',
+                             'MCParticles', 'PIDLikelihoods', 'EventMetaData'])
 main.add_module(output)
 
 main.add_module(register_module('ProgressBar'))
 
 process(main)
-# print statistics
+print(statistics)

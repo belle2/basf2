@@ -178,6 +178,9 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
   Vector3D position = getSupport();
+  if (position.hasNAN()) {
+    return false;
+  }
   return fillInto(gfTrackCand, getBFieldZ(position));
 }
 

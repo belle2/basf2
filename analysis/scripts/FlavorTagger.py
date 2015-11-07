@@ -512,22 +512,6 @@ def FillParticleLists(path=analysis_main):
     return True
 
 
-class SetZeroValueforEmptyList(Module):
-
-    # addParam('particleList', particleList, "particleList")
-
-    def event(self):
-        self.return_value(0)
-        roe = Belle2.PyStoreObj('RestOfEvent')
-        B0 = roe.obj().getRelated('Particles')
-        info = Belle2.PyStoreObj('EventExtraInfo')
-
-        # plist = Belle2.PyStoreObj(particleList)
-        # if plist.obj().getListSize() == 0:
-        B2WARNING('FOUND EMPTY LIST! COMBINER INPUT FOR THIS CATEGORY WILL BE SET MANUALLY!'
-                  )
-
-
 def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
     B2INFO('TRACK LEVEL')
 
@@ -536,14 +520,20 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
 
     ReadyMethods = 0
 
+    # Each category has its own Path in order to be skipped if the corresponding particle list is empty
+    TrackLevelPathsList = dict()
+
     for (particleList, category) in TrackLevelParticleLists:
 
-        CurrentParticleList = particleList
-        CurrentCategory = category
+        TrackLevelPath = category + "TrackLevelPath"
 
-        # SetZeroValueforEmptyCatList = SetZeroValueforEmptyList()
-        # SetZeroValueforEmptyCatList.param('particleList', particleList)
-        # path.add_module(SetZeroValueforEmptyCatList)
+        exec('%s = %s' % (TrackLevelPath, 'create_path()'))
+        exec('TrackLevelPathsList["' + category + '"]=%s' % TrackLevelPath)
+
+        SkipEmptyParticleList = register_module("SkimFilter")
+        SkipEmptyParticleList.param('particleLists', particleList)
+        SkipEmptyParticleList.if_true(TrackLevelPathsList[category], AfterConditionPath.CONTINUE)
+        path.add_module(SkipEmptyParticleList)
 
         methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
         targetVariable = 'IsRightTrack(' + category + ')'
@@ -560,7 +550,7 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     methods=methods,
                     prefix=methodPrefixTrackLevel,
                     workingDirectory=workingDirectory,
-                    path=path,
+                    path=TrackLevelPathsList[category],
                 )
         else:
             B2INFO('PROCESSING: applyTMVAMethod on track level')
@@ -571,7 +561,7 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
-                path=path,
+                path=TrackLevelPathsList[category],
             )
             ReadyMethods += 1
 
@@ -588,7 +578,21 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
         B2FATAL('THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     ReadyMethods = 0
+
+    # Each category has its own Path in order to be skipped if the corresponding particle list is empty
+    EventLevelPathsList = dict()
+
     for (particleList, category) in EventLevelParticleLists:
+
+        EventLevelPath = category + "EventLevelPath"
+
+        exec('%s = %s' % (EventLevelPath, 'create_path()'))
+        exec('EventLevelPathsList["' + category + '"]=%s' % EventLevelPath)
+
+        SkipEmptyParticleList = register_module("SkimFilter")
+        SkipEmptyParticleList.param('particleLists', particleList)
+        SkipEmptyParticleList.if_true(EventLevelPathsList[category], AfterConditionPath.CONTINUE)
+        path.add_module(SkipEmptyParticleList)
 
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
         targetVariable = 'IsRightCategory(' + category + ')'
@@ -605,7 +609,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     prefix=methodPrefixEventLevel,
                     methods=methods,
                     workingDirectory=workingDirectory,
-                    path=path,
+                    path=EventLevelPathsList[category],
                 )
         else:
             # if category == 'KinLepton':
@@ -618,7 +622,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                 method=methods[0][0],
                 signalFraction=signalFraction,
                 workingDirectory=workingDirectory,
-                path=path,
+                path=EventLevelPathsList[category],
             )
 
             ReadyMethods += 1

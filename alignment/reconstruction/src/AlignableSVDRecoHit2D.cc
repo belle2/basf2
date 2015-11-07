@@ -86,18 +86,6 @@ void AlignableSVDRecoHit2D::setDetectorPlane()
 {
   double du = 0., dv = 0., dw = 0., dalpha = 0., dbeta = 0., dgamma = 0.;
 
-  if (m_misalignmentDBObjPtrName != "") {
-    DBObjPtr<VXDAlignment> misalignment(m_misalignmentDBObjPtrName);
-    if (misalignment.isValid()) {
-      du = misalignment->get(getSensorID(), VXDAlignment::dU);
-      dv = misalignment->get(getSensorID(), VXDAlignment::dV);
-      dw = misalignment->get(getSensorID(), VXDAlignment::dW);
-      dalpha = misalignment->get(getSensorID(), VXDAlignment::dAlpha);
-      dbeta = misalignment->get(getSensorID(), VXDAlignment::dBeta);
-      dgamma = misalignment->get(getSensorID(), VXDAlignment::dGamma);
-    }
-  }
-
   DBObjPtr<VXDAlignment> alignment;
   if (alignment.isValid()) {
     du = du - alignment->get(getSensorID(), VXDAlignment::dU);

@@ -183,9 +183,6 @@ GBLfitModule::GBLfitModule() :
   addParam("EstimateSeedTime", m_estimateSeedTime,
            "If set, time for the seed will be recalculated based on a helix approximation.  Only makes a difference if UseTrackTime is set.",
            true);
-
-  addParam("misalignment", m_misalignment, "Name of misalignment object in DB to be used by recohits (temporary simplified solution)",
-           std::string(""));
   addParam("BuildBelle2Tracks", m_buildBelle2Tracks,
            "Option to build Belle2::Tracks. Not needed by default if the module is used only for refit.",
            bool(false));

@@ -322,10 +322,9 @@ void CDCDigitizerModule::event()
       continue;
     }
 
-//N.B. The real TDC module rounds down the measured time (information from KEK electronics division via N.Taniguchi).
-//    unsigned short tdcCount = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
+    //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
-                                                          m_tdcBinWidthInv);
+                                                          m_tdcBinWidthInv + 0.5);
     //    //set tdcCount2ndHit = tdcCount
     //    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
     //set tdcCount2ndHit = default value

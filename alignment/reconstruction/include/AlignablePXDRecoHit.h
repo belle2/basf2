@@ -81,7 +81,7 @@ namespace Belle2 {
     }
 
     /**
-     * @brief Set the aligned/misaligned detector plane
+     * @brief Set the aligned detector plane
      *
      * @return void
      */
@@ -102,19 +102,9 @@ namespace Belle2 {
      */
     virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
 
-    /**
-     * @brief Sets the name of misalignment object to look for
-     *
-     * @return void
-     */
-    static void setMisalignmentDBObjPtrName(std::string name)
-    {
-      m_misalignmentDBObjPtrName = name;
-    }
   private:
-    static std::string m_misalignmentDBObjPtrName;
 
-    ClassDef(AlignablePXDRecoHit, 1); /** PXD RecoHit extended for alignment/calibration */
+    ClassDef(AlignablePXDRecoHit, 2); /**< PXD RecoHit extended for alignment/calibration */
   };
 }
 #endif

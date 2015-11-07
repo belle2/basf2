@@ -89,16 +89,22 @@ namespace Belle2 {
      */
     virtual std::vector< int > labels();
 
+    /**
+     * @brief Get alignment derivatives
+     *
+     * @param sop Track state on sensor plane
+     * @return TMatrixD
+     */
     virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
 
+    /**
+     * @brief Set the aligned detector plane
+     *
+     * @return void
+     */
     void setDetectorPlane();
 
-    static void setMisalignmentDBObjPtrName(std::string name)
-    {
-      m_misalignmentDBObjPtrName = name;
-    }
   private:
-    static std::string m_misalignmentDBObjPtrName;
 
     /** ROOT Macro.*/
     ClassDef(AlignableSVDRecoHit2D, 3);

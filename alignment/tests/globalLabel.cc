@@ -39,6 +39,7 @@ namespace Belle2 {
       paramid = 9;
     }
 
+    /// Register some parameters as time dependent
     void registerSomeTimeDepParams()
     {
       GlobalLabel(vxdid, paramid).registerTimeDependent(1, 100); // timeid=1 for 1..100
@@ -46,6 +47,7 @@ namespace Belle2 {
       GlobalLabel(cdcid, paramid).registerTimeDependent(51, 100); // timeid=51 for 51..100
     }
 
+    /// Set current time slice for time dependent params
     void setTime(unsigned int timeid)
     {
       unsigned int& subrun = GlobalLabel::getCurrentTimeIntervalRef();
@@ -60,7 +62,7 @@ namespace Belle2 {
 
   };
 
-
+  /// Test large number of time-dep params for registration and retrieval
   TEST_F(GlobalLabelTest, LargeNumberOfTimeDependentParameters)
   {
     for (int ilayer = 1; ilayer < 6; ilayer++) {
@@ -90,6 +92,7 @@ namespace Belle2 {
 
   }
 
+  /// Test that time dependence works
   TEST_F(GlobalLabelTest, TimeSettingWorkflow)
   {
     GlobalLabel vxdlabel1(vxdid, paramid);
@@ -111,6 +114,7 @@ namespace Belle2 {
 
   }
 
+  /// Test getters/setters, operators
   TEST_F(GlobalLabelTest, GettersSettersOperators)
   {
     GlobalLabel vxdlabel1(vxdid, paramid);
@@ -150,6 +154,7 @@ namespace Belle2 {
     EXPECT_EQ(873609, other.label());
   }
 
+  /// Test the default way of using this
   TEST_F(GlobalLabelTest, QickTestNormalOperation)
   {
 

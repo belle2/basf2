@@ -36,6 +36,7 @@ public:
     return (10.0 * m_bField.getBField(position));
   }
 
+  /// Get reference to the magnet switcher (true=ON, false=OFF)
   static bool& getSwitcher()
   {
     static bool switcher = true;

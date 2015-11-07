@@ -458,7 +458,7 @@ variables['FSC'] = [
 ]
 
 
-def FillParticleLists(path=analysis_main):
+def FillParticleLists(mode='Expert', path=analysis_main):
     B2INFO('TRACK LEVEL')
 
     for (particleList, category) in TrackLevelParticleLists:
@@ -758,7 +758,7 @@ def FlavorTagger(
 
     # track training or expert
     if WhichCategories(categories):
-        if FillParticleLists(roe_path):
+        if FillParticleLists(mode, roe_path):
             if TrackLevel(mode, weightFiles, workingDirectory, roe_path):
                 if EventLevel(mode, weightFiles, workingDirectory, roe_path):
                     CombinerLevel(mode, weightFiles, workingDirectory, roe_path)

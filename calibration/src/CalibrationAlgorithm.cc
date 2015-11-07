@@ -15,7 +15,7 @@ CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector< Belle2::Cali
   // created by all collector modules by their base class
   StoreObjPtr<CalibRootObj<RunRange>> storeobj(m_prefix + "_" + RUN_RANGE_OBJ_NAME, DataStore::c_Persistent);
   if (!storeobj.isValid()) {
-    B2ERROR("Could not access collected data in datastore." << (m_prefix + "_" + RUN_RANGE_OBJ_NAME));
+    B2ERROR("Could not access collected data in datastore. " << (m_prefix + "_" + RUN_RANGE_OBJ_NAME) << " object does not exist.");
     return c_Failure;
   }
 

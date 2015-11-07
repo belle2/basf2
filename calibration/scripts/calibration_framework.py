@@ -38,6 +38,7 @@ class SimpleCalibrationRunner(Module):
     This module is responsible of calling the CalibrationAlgorithm with the
     correct run iovs and record all calibration results.
     """
+
     def __init__(self, algorithm, status):
         """Constructor"""
         super().__init__()
@@ -256,7 +257,7 @@ def run_calibration(path, output_path=".", max_iterations=5, iteration_callback=
     # and start iterating
     for iteration in range(max_iterations):
         B2INFO("Calibration: starting iteration %d" % (iteration + 1))
-        new_database_filename = os.path.join(output_path, "calibration-database-iteration%d.txt" % (iteration+1))
+        new_database_filename = os.path.join(output_path, "calibration-database-iteration%d.txt" % (iteration + 1))
         # make sure it doesn't have any contents
         try:
             os.unlink(new_database_filename)
@@ -274,7 +275,7 @@ def run_calibration(path, output_path=".", max_iterations=5, iteration_callback=
         B2INFO("Calibration: finished iteration %d" % (iteration + 1))
         # ok, calibration is done for this iteration, now check results and add
         # to output xml
-        xml_results = etree.SubElement(xml.getroot(), "CalibrationRun", iteration=str(iteration+1))
+        xml_results = etree.SubElement(xml.getroot(), "CalibrationRun", iteration=str(iteration + 1))
         # if the database file exists somebody saved some payloads so remember
         # the payload file
         if os.path.exists(new_database_filename):

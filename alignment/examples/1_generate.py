@@ -20,11 +20,21 @@ cosmics_run = bool(sys.argv[4])
 
 
 class TrackFitCheck(Module):
+    """
+    Python module to discard events
+    where there are no fully fitted tracks
+    or where a track does not fullfill some
+    criteria. However works only
+    for single track per event in generator.
+    """
 
     def __init__(self):
+        """ init """
         super(TrackFitCheck, self).__init__()
 
     def isOK(self, track):
+        """ Check criteria for a genfit::Track """
+
         # VXD only (12 layers (cosmics!) x 2 for overlaps)
         if track.getNumPointsWithMeasurement() > 24:
             print('Num points > 24 : ', str(track.getNumPointsWithMeasurement()))
@@ -41,6 +51,7 @@ class TrackFitCheck(Module):
         return True
 
     def event(self):
+        """ Return True if event is fine, False otherwise """
         tracks = Belle2.PyStoreArray('GF2Tracks')
         ok = True
         if tracks.getEntries():

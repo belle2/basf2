@@ -112,7 +112,7 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
 vector< int > BKLMRecoHit::labels()
 {
   int barrel = 1;
-  int forward = m_bklmHit2d->isForward() ? 1 : 0;
+  int forward = 1; // m_bklmHit2d->isForward() ? 1 : 0;
   int sector = m_bklmHit2d->getSector();
   int layer = m_bklmHit2d->getLayer();
 

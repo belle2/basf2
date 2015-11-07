@@ -53,6 +53,7 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
+  static int recordCounter = 0;
   // Input tracks (have to be fitted by GBL)
   StoreArray<genfit::Track> tracks(m_tracks);
 
@@ -79,6 +80,11 @@ void MillepedeCollectorModule::collect()
     using namespace gbl;
     GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
     mille.fill(trajectory);
+    ++recordCounter;
+
+    // Split binary files each 10000 events
+    if (recordCounter % 10000 == 0)
+      mille.close();
   }
 }
 

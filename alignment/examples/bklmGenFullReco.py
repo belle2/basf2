@@ -37,7 +37,7 @@ param_pGun = {
 }
 pGun.param(param_pGun)
 main.add_module(pGun)
-
+# main.add_module('Cosmics')
 # geometry parameter database
 gearbox = register_module('Gearbox')
 main.add_module(gearbox)
@@ -75,7 +75,11 @@ main.add_module(eklm_digitizer)
 
 # reconstruction
 add_mc_reconstruction(main)
-
+"""
+for module in main.modules():
+  if module.name() == 'Ext':
+    module.param('Cosmic', True)
+"""
 output = register_module('RootOutput')
 output.param('outputFileName', 'fullreco.root')
 main.add_module(output)

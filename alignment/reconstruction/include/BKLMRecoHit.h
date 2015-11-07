@@ -68,10 +68,10 @@ namespace Belle2 {
     int layer;
 
     /** module used to get geometry information */
-    const bklm::Module* module;
+    const bklm::Module* module; //! not streamed
 
     /** global coordiante of the hit */
-    CLHEP::Hep3Vector global;
+    CLHEP::Hep3Vector global; //! not streamed
 
     /** half height of scintillator module*/
     const double halfheight_sci = 0.5;

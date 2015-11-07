@@ -304,10 +304,6 @@ void GBLfitModule::initialize()
   // Turn off MS in CDC. GblFitter takes ownership of the controller
   m_gbl.setTrackSegmentController(new GblMultipleScatteringController());
 
-  AlignablePXDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);
-  AlignableSVDRecoHit::setMisalignmentDBObjPtrName(m_misalignment);
-  AlignableSVDRecoHit2D::setMisalignmentDBObjPtrName(m_misalignment);
-
 }
 
 void GBLfitModule::beginRun()

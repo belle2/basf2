@@ -25,8 +25,6 @@ using namespace Belle2;
 
 ClassImp(AlignablePXDRecoHit);
 
-std::string AlignablePXDRecoHit::m_misalignmentDBObjPtrName = "";
-
 TMatrixD AlignablePXDRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
 

@@ -26,9 +26,6 @@ using namespace Belle2;
 
 ClassImp(AlignableSVDRecoHit2D);
 
-std::string AlignableSVDRecoHit2D::m_misalignmentDBObjPtrName = "";
-
-
 TMatrixD AlignableSVDRecoHit2D::derivatives(const genfit::StateOnPlane* sop)
 {
 

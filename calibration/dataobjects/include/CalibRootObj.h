@@ -16,25 +16,25 @@
 
 namespace Belle2 {
 
+  /**
+   * @brief Class to implement run dependence
+   * into mergeable ROOT-compatible objects.
+   *
+   * TODO: go to smart pointers (we have ROOT6!)
+   *
+   */
   template<class T>
   class CalibRootObj : public Mergeable {
 
   public:
     //typedef std::pair<int,int> KeyType;
+    /// The key type in the map - IOV or other representation
     typedef std::string KeyType;
-    /**
-     * @brief Class to implement run dependence
-     * into mergeable ROOT-compatible objects.
-     *
-     * TODO: go to smart pointers (we have ROOT6!)
-     *
-     */
+
+    /// Constructor
     CalibRootObj() : Mergeable() {};
 
-    /**
-     * @brief Destructor
-     *
-     */
+    /// Destructor
     virtual ~CalibRootObj()
     {
       for (auto obj : m_objects)
@@ -234,6 +234,7 @@ namespace Belle2 {
       return result;
     }
 
+    /// Check whether object of given IOV exists
     bool objectExists(KeyType iov)
     {
       for (unsigned int i = 0; i < m_iovs.size(); i++) {
@@ -244,6 +245,7 @@ namespace Belle2 {
       return false;
     }
 
+    /// Replace internal object by a new one (possibly dangerous!)
     void replaceObject(T* newobj)
     {
       if (m_object)
@@ -251,6 +253,7 @@ namespace Belle2 {
       newobj->SetDirectory(nullptr);
       m_object = newobj;
     }
+
   private:
     /**
      * @brief Clone "normal" TObject

@@ -517,24 +517,26 @@ namespace Belle2 {
           float maximum_p_track = 0; //Probability of being the target track from the track level
           float prob = 0; //The probability of beeing right classified flavor from the event level
           float maximum_q = 0; //Flavour of the track selected as target
-          if (ListOfParticles->getListSize() > 0)
+          if (ListOfParticles)
           {
-            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
-              Particle* particle = ListOfParticles->getParticle(i);
-              double x = 0;
-              if (extraInfoRightTrack == "IsRightTrack(MaximumP*)") {
-                x = (T.rotateLabToCms() * particle->get4Vector()).P();
-              } else x = particle->getExtraInfo(extraInfoRightTrack);
-              if (x > maximum_p_track) {
-                maximum_p_track = x;
-                target = particle;
+            if (ListOfParticles->getListSize() > 0) {
+              for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+                Particle* particle = ListOfParticles->getParticle(i);
+                double x = 0;
+                if (extraInfoRightTrack == "IsRightTrack(MaximumP*)") {
+                  x = (T.rotateLabToCms() * particle->get4Vector()).P();
+                } else x = particle->getExtraInfo(extraInfoRightTrack);
+                if (x > maximum_p_track) {
+                  maximum_p_track = x;
+                  target = particle;
+                }
               }
-            }
-            if (target != nullptr) {
-              prob = target -> getExtraInfo(extraInfoRightCategory); //Gets the probability of beeing right classified flavor from the event level
-              maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
-              if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
-                maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
+              if (target != nullptr) {
+                prob = target -> getExtraInfo(extraInfoRightCategory); //Gets the probability of beeing right classified flavor from the event level
+                maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
+                if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
+                  maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
+                }
               }
             }
           }
@@ -571,38 +573,42 @@ namespace Belle2 {
               return (info1 > info2);
             };
             StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-            std::vector<const Particle*> ParticleVector;
-            ParticleVector.reserve(ListOfParticles->getListSize());
-            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
-              ParticleVector.push_back(ListOfParticles->getParticle(i));
-            }
-            std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
-            if (particleListName == "Lambda0:LambdaROE") {
-              //Loop over Lambda vector until 3 or empty
-              if (ParticleVector.size() != 0) final_value = 1.0;
-              for (unsigned int i = 0; i < ParticleVector.size(); ++i) {
-                //PDG Code Lambda0 3122 (indicates a B0bar)
-                if (ParticleVector[i]->getPDGCode() == 3122) flavor = -1.0;
-                else if (ParticleVector[i]->getPDGCode() == -3122) flavor = 1.0;
-                else {flavor = 0.0;}
-                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
-                qr = (flavor * r);
-                val1 = val1 * (1 + qr);
-                val2 = val2 * (1 - qr);
+            if (ListOfParticles) {
+              if (ListOfParticles->getListSize() > 0) {
+                std::vector<const Particle*> ParticleVector;
+                ParticleVector.reserve(ListOfParticles->getListSize());
+                for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+                  ParticleVector.push_back(ListOfParticles->getParticle(i));
+                }
+                std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
+                if (particleListName == "Lambda0:LambdaROE") {
+                  //Loop over Lambda vector until 3 or empty
+                  if (ParticleVector.size() != 0) final_value = 1.0;
+                  for (unsigned int i = 0; i < ParticleVector.size(); ++i) {
+                    //PDG Code Lambda0 3122 (indicates a B0bar)
+                    if (ParticleVector[i]->getPDGCode() == 3122) flavor = -1.0;
+                    else if (ParticleVector[i]->getPDGCode() == -3122) flavor = 1.0;
+                    else {flavor = 0.0;}
+                    r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
+                    qr = (flavor * r);
+                    val1 = val1 * (1 + qr);
+                    val2 = val2 * (1 - qr);
+                  }
+                  final_value = (val1 - val2) / (val1 + val2);
+                } else if (particleListName == "K+:KaonROE") {
+                  //Loop over K+ vector until 3 or empty
+                  if (ParticleVector.size() != 0) final_value = 1.0;
+                  for (unsigned int i = 0; i < ParticleVector.size(); i++) {
+                    flavor = ParticleVector[i]->getCharge();
+                    r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
+                    qr = (flavor * r);
+                    val1 = val1 * (1 + qr);
+                    val2 = val2 * (1 - qr);
+                  }
+                }
               }
-              final_value = (val1 - val2) / (val1 + val2);
-            } else if (particleListName == "K+:KaonROE") {
-              //Loop over K+ vector until 3 or empty
-              if (ParticleVector.size() != 0) final_value = 1.0;
-              for (unsigned int i = 0; i < ParticleVector.size(); i++) {
-                flavor = ParticleVector[i]->getCharge();
-                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
-                qr = (flavor * r);
-                val1 = val1 * (1 + qr);
-                val2 = val2 * (1 - qr);
-              }
-              final_value = (val1 - val2) / (val1 + val2);
             }
+            final_value = (val1 - val2) / (val1 + val2);
 
             return final_value;
           }
@@ -1095,7 +1101,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
     REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,
-                      "-1 (1), -2 if current RestOfEvent is related to a B0bar (B0). But is used for checking if RoE empty.");
+                      "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 If ROE is empty.");
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
                       "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0).");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");

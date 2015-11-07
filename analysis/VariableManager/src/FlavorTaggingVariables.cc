@@ -605,10 +605,11 @@ namespace Belle2 {
                     val1 = val1 * (1 + qr);
                     val2 = val2 * (1 - qr);
                   }
+                  final_value = (val1 - val2) / (val1 + val2);
                 }
               }
             }
-            final_value = (val1 - val2) / (val1 + val2);
+
 
             return final_value;
           }

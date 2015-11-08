@@ -66,20 +66,22 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
 
   //+++ Construct vectors o, u, v of layer in global coords.
   CLHEP::Hep3Vector gOrigin = module->getGlobalOrigin();
+  CLHEP::Hep3Vector lOrigin = module->globalToLocal(gOrigin) + module->getLocalReconstructionShift();
+  CLHEP::Hep3Vector gOrigin_midway = module->localToGlobal(lOrigin);
   CLHEP::Hep3Vector uAxis(0, 1, 0);
   CLHEP::Hep3Vector vAxis(0, 0, 1);
   CLHEP::Hep3Vector gUaxis = module->localToGlobal(uAxis) - gOrigin;
   CLHEP::Hep3Vector gVaxis = module->localToGlobal(vAxis) - gOrigin;
 
   //!the position (in global coordinates) of this module's sensitive-volume origin
-  TVector3 origin(gOrigin[0], gOrigin[1], gOrigin[2]);
+  TVector3 origin_mid(gOrigin_midway[0], gOrigin_midway[1], gOrigin_midway[2]);
 
   //!the directioin (in global coordinates) of this module's U axis
   TVector3 uGlobal(gUaxis[0], gUaxis[1], gUaxis[2]);
   //!the directioin (in global coordinates) of this module's V axis
   TVector3 vGlobal(gVaxis[0], gVaxis[1], gVaxis[2]);
 
-  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin, uGlobal, vGlobal, 0));
+  genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin_mid, uGlobal, vGlobal, 0));
   setPlane(detPlane, m_moduleID);
 }
 

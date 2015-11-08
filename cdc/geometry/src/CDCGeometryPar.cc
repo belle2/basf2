@@ -1114,28 +1114,17 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   const double phiSize = 2 * M_PI / double(m_nWires[L]);
 
   const double phiF = phiSize * (double(C) + offset)
-                      + phiSize * 0.5 * double(m_nShifts[L]);
+                      + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
 
   m_FWirPos[L][C][0] = m_rSLayer[L] * cos(phiF);
   m_FWirPos[L][C][1] = m_rSLayer[L] * sin(phiF);
   m_FWirPos[L][C][2] = m_zSForwardLayer[L];
 
-  const double phiB = phiSize * (double(C) + offset);
+  const double phiB = phiSize * (double(C) + offset) + m_globalPhiRotation;
 
   m_BWirPos[L][C][0] = m_rSLayer[L] * cos(phiB);
   m_BWirPos[L][C][1] = m_rSLayer[L] * sin(phiB);
   m_BWirPos[L][C][2] = m_zSBackwardLayer[L];
-
-  const double dfi = m_globalPhiRotation;
-  //  std::cout <<"dfi in CDCGeometry= " << dfi << std::endl;
-  double x = m_FWirPos[L][C][0];
-  double y = m_FWirPos[L][C][1];
-  m_FWirPos[L][C][0] = cos(dfi) * x - sin(dfi) * y;
-  m_FWirPos[L][C][1] = sin(dfi) * x + cos(dfi) * y;
-  x = m_BWirPos[L][C][0];
-  y = m_BWirPos[L][C][1];
-  m_BWirPos[L][C][0] = cos(dfi) * x - sin(dfi) * y;
-  m_BWirPos[L][C][1] = sin(dfi) * x + cos(dfi) * y;
 
   for (int i = 0; i < 3; ++i) {
     m_FWirPosMisalign[L][C][i] = m_FWirPos[L][C][i];

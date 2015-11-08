@@ -11,6 +11,8 @@ cdc_hits = "CDCHits"
 cdc_hits_pack_unpack_collection = "CDCHits_test_output"
 set_random_seed(42)
 
+//! for test
+
 
 class PackerUnpackerTestModule(Module):
 

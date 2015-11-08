@@ -61,9 +61,9 @@ namespace Belle2 {
       std::string m_outputCDCHitListName;
 
 
-      int m_filterSuperLayer = -1; /** Only perform digitization for a specific super layer or for all, if the value is -1 */
-      int m_filterLayerMax = -1; /** Only perform digitization up to a specific layer or for all, if the value is -1 */
-      int m_filterWireMax = -1; /** Only perform digitization for a specific wire or for all, if the value is -1 */
+      int m_filterSuperLayer = -1; /**< Only perform digitization for a specific super layer or for all, if the value is -1 */
+      int m_filterLayerMax = -1; /**< Only perform digitization up to a specific layer or for all, if the value is -1 */
+      int m_filterWireMax = -1; /**< Only perform digitization for a specific wire or for all, if the value is -1 */
 
     };//end class declaration
 

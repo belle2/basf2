@@ -158,9 +158,9 @@ namespace Belle2 {
 
     private:
 
-      int m_event; /// Event number.
-      int m_fadcThreshold;  /// FADC threshold.
-      //      int m_overflow; /// TDC overflow.
+      int m_event; /**< Event number. */
+      int m_fadcThreshold;  /**< FADC threshold. */
+      //      int m_overflow; /**< TDC overflow. */
 
 
     private:

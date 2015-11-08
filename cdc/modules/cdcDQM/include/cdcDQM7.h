@@ -13,26 +13,26 @@ namespace Belle2 {
 
   public:
 
-    /**    Constructor */
+    //! Constructor
     cdcDQM7Module();
-    /** Destructor */
+    //! Destructor
     virtual ~cdcDQM7Module();
 
-    /** Module functions */
+    //! Module functions
     virtual void initialize();
     virtual void beginRun();
     virtual void event();
     virtual void endRun();
     virtual void terminate();
 
-    /** function to define histograms */
+    //! function to define histograms
     virtual void defineHisto();
 
   private:
-    TH1F* h_tdc;         /** histogram tdc */
-    TH1F* h_adc;         /** histogram fadc sum */
-    TH1F* h_layer;         /** histogram ilayer hits */
-    TH1F* h_nhits;         /** histogram cell hit in first ilayer */
+    TH1F* h_tdc;         /**< histogram tdc */
+    TH1F* h_adc;         /**< histogram fadc sum */
+    TH1F* h_layer;       /**< histogram ilayer hits */
+    TH1F* h_nhits;       /**< histogram cell hit in first ilayer */
 
   };
 }

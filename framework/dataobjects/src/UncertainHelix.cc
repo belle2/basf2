@@ -185,7 +185,11 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
 
 void UncertainHelix::reverse()
 {
-  // All except z0 have to be taken to their opposites
+  Helix::reverse();
+
+  // D0, omega and tan lambda have to be taken to their opposites
+  // Phi0 is augmented by pi which does not change its covariances
+  // Z0 stays the same
   TMatrixD jacobianReverse(5, 5);
   jacobianReverse.UnitMatrix();
   jacobianReverse(iD0, iD0) = -1;
@@ -193,7 +197,6 @@ void UncertainHelix::reverse()
   jacobianReverse(iTanLambda, iTanLambda) = -1;
 
   m_covariance.Similarity(jacobianReverse);
-
 }
 
 double UncertainHelix::passiveMoveBy(const double& byX,

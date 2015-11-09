@@ -25,8 +25,8 @@ namespace Belle2 {
     L1EmulationInformation(): m_eclBhabha(0), m_BhabhaVeto(0), m_SBhabhaVeto(0), m_ggVeto(0), m_ntrg(0), m_weight(0.)
     {
       for (int i = 0; i < 50; i++) {
-        m_subweight[i] = 0;
         m_summary[i] = 0;
+        m_trgname[i] = "NULL";
       }
     }
 
@@ -35,11 +35,12 @@ namespace Belle2 {
 //setters
     /**set trigger results*/
     void setSummary(int i, double Summary) {m_summary[i] = Summary;}
+
+    /**set trigger results that event is triggered by one path only*/
+    void setTrgName(int i, std::string name) {m_trgname[i] = name;}
+
     /**set total weight*/
     void settotWeight(double w) {m_weight = w;}
-
-    /**set total weight of sub trigger*/
-    void setsubWeight(int i, double w) { m_subweight[i] = w;}
 
     /**set the number of triggers*/
     void setnTrg(int n = 1) {m_ntrg += n;}
@@ -59,6 +60,9 @@ namespace Belle2 {
     /**get trigger results*/
     int getSummary(int i) const {return m_summary[i];}
 
+    /**get trigger results that a event is triggered by a path only*/
+    std::string getTrgName(int i) const {return m_trgname[i];}
+
     /**get ecl Bhabha veto*/
     int getECLBhabha() const {return m_eclBhabha;}
 
@@ -77,8 +81,6 @@ namespace Belle2 {
     /**get total weight*/
     double gettotWeight() const {return m_weight;}
 
-    /**get total weight of sub trigger*/
-    double getsubWeight(int i) const {return m_subweight[i];}
 
   private:
 
@@ -97,16 +99,16 @@ namespace Belle2 {
     /**the trigger results*/
     double m_summary[50];
 
+    /**the trigger results that the event is triggered by one path only*/
+    std::string m_trgname[50];
+
     /**the number of triggers*/
     int m_ntrg;
 
     /**the total weight*/
     double m_weight;
 
-    /**the sub weight*/
-    double m_subweight[50];
-
-    ClassDef(L1EmulationInformation, 2)
+    ClassDef(L1EmulationInformation, 3)
   };
 
 }

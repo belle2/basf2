@@ -13,7 +13,7 @@ def add_L1Emulation(path):
     # respectivley,which have to be defined sequentially.The corresponding
     # logics with names (eclBhabhaVetoHLT, BhabhaVetoHLT, SBhabhaVetoHLT, ggVetoHLT) are
     # available in other triggers.
-    L1Emualtion_Veto(path)
+    L1Emulation_Veto(path)
 
     # After definition, the logics "eclBhabhaVetoHLT, BhabhaVetoHLT,
     # SBhabhaVetoHLT, and ggVetoHLT" couldbe used in the following trigger.
@@ -77,10 +77,12 @@ def add_L1Emulation(path):
 
     L1Emulation('Hadron2', 'NcHLT>=4 and AngGGHLT>45 and AngGGHLT<170 and eclBhabhaVetoHLT==0', path, [1])
 
+    L1Emulation('Neutral', 'NcHLT>=3 and AngGGHLT>20 and AngGGHLT<170 and eclBhabhaVetoHLT==0', path, [1])
+
     L1EmulationPrint(path)
 
 
-def L1Emualtion_Veto(path):
+def L1Emulation_Veto(path):
     """
     This function adds the veto triggers to the path
     """

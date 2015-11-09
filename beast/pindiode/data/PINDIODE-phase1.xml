@@ -16,6 +16,7 @@
     <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
     </bar>
     <CrematGain>1.4*1e12</CrematGain>
+    <WorkFucntion>1.1</WorkFunction>
     <!-- 0-1 -->
     <Active>
       <Material>PINDIODE-Material</Material>

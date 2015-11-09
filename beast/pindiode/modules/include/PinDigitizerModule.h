@@ -71,6 +71,8 @@ namespace Belle2 {
       std::vector<TVector3> PINCenter;
       /** Cremat gain */
       double m_CrematGain;
+      /** Work function */
+      double m_WorkFunction;
       /** Event counter */
       int Event = 0;
     };

@@ -11,6 +11,7 @@
 
 from basf2 import *
 import glob
+import math
 from ROOT import Belle2
 from ROOT import TH1F, TFile, TNamed
 
@@ -46,10 +47,14 @@ class BGHistogrammer(Module):
         for i in range(self.n):
             self.hist[i].GetXaxis().SetTitle('time [#mus]')
             self.hist[i].GetYaxis().SetTitle('entries/bin')
-            descr = TNamed('Description', 'Time distribution of ' + self.simHits[i] + ' for mixed background')
+            descr = TNamed('Description', 'Time distribution of ' + self.simHits[i] +
+                           ' for mixed background')
             self.hist[i].GetListOfFunctions().Add(descr)
-            check = TNamed('Check', 'Distribution must be flat in the time window. Bin statistics is not Poissonian.')
+            check = TNamed('Check', 'Distribution must be flat in the time window. ' +
+                           'Bin statistics is not Poissonian.')
             self.hist[i].GetListOfFunctions().Add(check)
+            contact = TNamed('Contact', 'marko.staric@ijs.si')
+            self.hist[i].GetListOfFunctions().Add(contact)
 
     def event(self):
         ''' Event processor: fill histograms '''
@@ -60,11 +65,30 @@ class BGHistogrammer(Module):
                 time = hit.getGlobalTime() / 1000
                 self.hist[i].Fill(time)
 
+    def setErrors(self, hist):
+        ''' Set bin errors - they are not Poissonian'''
+        hmax = hist.GetMaximum()
+        temp = TH1F('temp', 'temporary', 100, 0, hmax * 1.1)
+        for i in range(hist.GetNbinsX()):
+            h = hist.GetBinContent(i + 1)
+            if h > hmax * 0.2:
+                temp.Fill(h)
+        mean = temp.GetMean()
+        rms = temp.GetStdDev()
+        if mean > 0:
+            for i in range(hist.GetNbinsX()):
+                h = hist.GetBinContent(i + 1)
+                e = 0
+                if h > 0:
+                    e = rms * math.sqrt(h / mean)
+                hist.SetBinError(i + 1, e)
+
     def terminate(self):
         """ Write histograms to the file."""
 
         tfile = TFile('timeDistributions.root', 'recreate')
         for i in range(self.n):
+            self.setErrors(self.hist[i])
             self.hist[i].Write()
         tfile.Close()
 

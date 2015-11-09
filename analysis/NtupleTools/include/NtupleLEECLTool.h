@@ -37,6 +37,8 @@ namespace Belle2 {
     /**the total ECL of C1 and C2*/
     float m_E12;
 
+    /**the CMS values of E1, E2. E12, ENeutral*/
+    float* m_ECMS;
     /**
     *information of the most energnetic ECL cluster, [E, R, Theta, Phi]
     *E: energy, R: the distance between cluster an IP, Theta: polar angle, Phi: the azimuthal angle
@@ -44,7 +46,6 @@ namespace Belle2 {
     float* m_Vp4E1;
 
     /**information of the second most energnetic ECL cluster, [E, R, Theta, Phi]*/
-
     float* m_Vp4E2;
 
     /**information of the most energnetic neutral cluster, [E, R, Theta, Phi]*/

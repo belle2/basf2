@@ -37,8 +37,11 @@ namespace Belle2 {
     /**the number of CDC tracks matched to KLM cluster*/
     int m_nKLMMatchTracks;
 
-    /**the maximum open angle between the tracks*/
-    float m_maxAng;
+    /**the maximum 3-D, accollinearity, and azimuthal angle between the tracks*/
+    double* m_maxAng;
+
+    /**the 3-D, accollinearity, and azimuthal angle between the trk1 and trk2*/
+    double* m_Ang;
 
     /**the polar angle of the track with negative charge*/
     float m_minusTheta;

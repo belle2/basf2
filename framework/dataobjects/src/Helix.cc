@@ -533,7 +533,7 @@ void Helix::setCartesian(const TVector3& position,
                          const short int charge,
                          const double bZ)
 {
-  assert(abs(charge) == 1);  // Not prepared for doubly-charged particles.
+  assert(abs(charge) <= 1);  // Not prepared for doubly-charged particles.
   const double alpha = getAlpha(bZ);
 
   // We allow for the case that position, momentum are not given

@@ -65,7 +65,7 @@ class FlavorTaggerInfoFiller(Module):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
                 track = particle.getTrack()  # Track of the particle
 
-                if category == 'MaximumP*':  # MaximumP only gives the momentum of the Highest Momentum Particle
+                if category == 'MaximumPstar':  # MaximumPstar only gives the momentum of the Highest Momentum Particle
                     targetProb = mc_variables.variables.evaluate('useCMSFrame(p)',
                                                                  particle)
                     categoryProb = 0.0
@@ -262,11 +262,11 @@ AvailableCategories = {
         'FSC',
         'QrOf(pi+:SlowPionROE, IsRightCategory(FSC), IsRightTrack(SlowPion))',
         9],
-    'MaximumP*': [
-        'pi+:MaximumP*ROE',
-        'MaximumP*',
-        'MaximumP*',
-        'QrOf(pi+:MaximumP*ROE, IsRightCategory(MaximumP*), IsRightTrack(MaximumP*))',
+    'MaximumPstar': [
+        'pi+:MaximumPstarROE',
+        'MaximumPstar',
+        'MaximumPstar',
+        'QrOf(pi+:MaximumPstarROE, IsRightCategory(MaximumPstar), IsRightTrack(MaximumPstar))',
         10],
     'KaonPion': [
         'K+:KaonROE',
@@ -294,7 +294,7 @@ def WhichCategories(categories=[
     'FastPion',
     'Lambda',
     'FSC',
-    'MaximumP*',
+    'MaximumPstar',
     'KaonPion',
 ]):
     if len(categories) > 12 or len(categories) < 2:
@@ -302,13 +302,13 @@ def WhichCategories(categories=[
                 )
         B2FATAL(
             'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
-            '"KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumP*" or "KaonPion" ')
+            '"KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
         return False
     categoriesCombination = []
     for category in categories:
         if category in AvailableCategories:
-            if category != 'MaximumP*' and (AvailableCategories[category][0],
-                                            AvailableCategories[category][1]) \
+            if category != 'MaximumPstar' and (AvailableCategories[category][0],
+                                               AvailableCategories[category][1]) \
                     not in TrackLevelParticleLists:
                 TrackLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][1]))
@@ -326,7 +326,7 @@ def WhichCategories(categories=[
             B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
             B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
                     '"Muon", "IntermediateMuon", "KinLepton", "Kaon", "SlowPion", "FastPion", '
-                    '"Lambda", "FSC", "MaximumP*" or "KaonPion" ')
+                    '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
             return False
     global categoriesCombinationCode
     for code in sorted(categoriesCombination):
@@ -438,7 +438,7 @@ variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, IsRightTrack(Kaon))',
                          'HighestProbInCat(pi+:SlowPionROE, IsRightTrack(SlowPion))',
                          'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
 
-variables['MaximumP*'] = [
+variables['MaximumPstar'] = [
     'useCMSFrame(p)',
     'useCMSFrame(pt)',
     'p',
@@ -492,7 +492,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
-    # Conditions to continue with the Event level: No variable has a NaN value!
+    # Conditions to continue with the Event level: No variable has a NaN or infinity value!
         condition = str()
         for i in range(len(variables[category])):
             if i == 0:
@@ -502,12 +502,12 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                     + variables[category][i] + " != infinity"
         applyCuts(particleList, condition, path=path)
 
-    # Filling 'pi+:MaximumP*ROE' particle list
-    conditionMaximumP = str()
-    for variable in variables['MaximumP*']:
-        conditionMaximumP = conditionMaximumP + " and " + \
+    # Filling 'pi+:MaximumPstarROE' particle list
+    conditionMaximumPstar = str()
+    for variable in variables['MaximumPstar']:
+        conditionMaximumPstar = conditionMaximumPstar + " and " + \
             variable + " != NaN and " + variable + " != infinity"
-    fillParticleList('pi+:MaximumP*ROE', 'isInRestOfEvent > 0.5' + conditionMaximumP, path=path)
+    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5' + conditionMaximumPstar, path=path)
 
     return True
 
@@ -585,7 +585,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
     for (particleList, category) in EventLevelParticleLists:
 
         EventLevelPath = category + "EventLevelPath"
-
+        print('%s = %s' % (EventLevelPath, 'create_path()'))
         exec('%s = %s' % (EventLevelPath, 'create_path()'))
         exec('EventLevelPathsList["' + category + '"]=%s' % EventLevelPath)
 
@@ -709,7 +709,7 @@ def FlavorTagger(
         'FastPion',
         'Lambda',
         'FSC',
-        'MaximumP*',
+        'MaximumPstar',
         'KaonPion',
     ],
     path=analysis_main,

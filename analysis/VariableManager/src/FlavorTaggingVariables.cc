@@ -523,7 +523,7 @@ namespace Belle2 {
               for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
                 Particle* particle = ListOfParticles->getParticle(i);
                 double x = 0;
-                if (extraInfoRightTrack == "IsRightTrack(MaximumP*)") {
+                if (extraInfoRightTrack == "IsRightTrack(MaximumPstar)") {
                   x = (T.rotateLabToCms() * particle->get4Vector()).P();
                 } else x = particle->getExtraInfo(extraInfoRightTrack);
                 if (x > maximum_p_track) {
@@ -757,7 +757,7 @@ namespace Belle2 {
                      && maximum_PDG == 211 && maximum_PDG_Mother == 511)
           {
             return 1.0;
-          } else if (particleName == "MaximumP*" && maximum_q == qMC)
+          } else if (particleName == "MaximumPstar" && maximum_q == qMC)
           {
             return 1.0;
           } else if (particleName == "FSC" && maximum_q != qMC
@@ -886,15 +886,15 @@ namespace Belle2 {
           {
             Particle* p = ListOfParticles->getParticle(i);
             double prob = 0;
-            if (extraInfoName == "IsRightTrack(MaximumP*)") {
+            if (extraInfoName == "IsRightTrack(MaximumPstar)") {
               prob = (T.rotateLabToCms() * p->get4Vector()).P();
             } else prob = p->getExtraInfo(extraInfoName);
             if (prob > maximum_prob) {
               maximum_prob = prob;
             }
           }
-          if ((extraInfoName == "IsRightTrack(MaximumP*)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
-              (extraInfoName != "IsRightTrack(MaximumP*)" && particle -> getExtraInfo(extraInfoName) == maximum_prob))
+          if ((extraInfoName == "IsRightTrack(MaximumPstar)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
+              (extraInfoName != "IsRightTrack(MaximumPstar)" && particle -> getExtraInfo(extraInfoName) == maximum_prob))
           {
             return 1.0;
           } else return 0.0;
@@ -997,25 +997,28 @@ namespace Belle2 {
           PCmsLabTransform T;
           double maximum_prob_fast = 0;
           Particle* TargetFastParticle = nullptr;
-          for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
+          if ((requestedVariable == "p_CMS_Fast") || (requestedVariable == "cosSlowFast") || (requestedVariable == "cosTPTO_Fast") || (requestedVariable == "SlowFastHaveOpositeCharges"))
           {
-            Particle* p_fast = FastParticleList->getParticle(i);
-            double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
-            if (prob_fast > maximum_prob_fast) {
-              maximum_prob_fast = prob_fast;
-              TargetFastParticle = p_fast;
-            }
-          }
-          TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
-          TLorentzVector momFastParticle = T.rotateLabToCms() * TargetFastParticle -> get4Vector();  //Momentum of Slow Pion in CMS-System
+            if (FastParticleList) {
+              for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
+                Particle* p_fast = FastParticleList->getParticle(i);
+                double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
+                if (prob_fast > maximum_prob_fast) {
+                  maximum_prob_fast = prob_fast;
+                  TargetFastParticle = p_fast;
+                }
+              }
+              TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
+              TLorentzVector momFastParticle = T.rotateLabToCms() * TargetFastParticle -> get4Vector();  //Momentum of Slow Pion in CMS-System
 
-          if (requestedVariable == "p_CMS_Fast") return momFastParticle.P();
-          else if (requestedVariable == "cosSlowFast") return TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
-          else if (requestedVariable == "cosTPTO_Fast") return Variable::Manager::Instance().getVariable("cosTPTO")->function(TargetFastParticle);
-          else if (requestedVariable == "SlowFastHaveOpositeCharges")
-          {
-            if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
-              return 1;
+              if (requestedVariable == "cosSlowFast") return TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
+              else if (requestedVariable == "cosTPTO_Fast") return Variable::Manager::Instance().getVariable("cosTPTO")->function(
+                                                                       TargetFastParticle);
+              else if (requestedVariable == "SlowFastHaveOpositeCharges") {
+                if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
+                  return 1;
+                } else return 0;
+              } else return momFastParticle.P();
             } else return 0;
           } else {
             B2FATAL("Wrong variable requested. The possibilities are p_CMS_Fast, cosSlowFast or cosTPTO_Fast");

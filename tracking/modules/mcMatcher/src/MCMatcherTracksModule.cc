@@ -95,13 +95,27 @@ MCMatcherTracksModule::MCMatcherTracksModule() : Module()
 
   // Hit content to be evaluated
   //  Select if hit clusters should be used from PXD/SVD
-  addParam("UseClusters", m_param_useClusters, "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits",
-           bool(true));
+  addParam("UseClusters",
+           m_param_useClusters,
+           "Set true if you want to use PXD/SVD clusters instead of PXD/SVD trueHits",
+           true);
 
   //  Choose which hits to use, all hits assigned to the track candidate will be used in the fit
-  addParam("UsePXDHits", m_param_usePXDHits, "Set true if PXDHits or PXDClusters should be used", bool(true));
-  addParam("UseSVDHits", m_param_useSVDHits, "Set true if SVDHits or SVDClusters should be used", bool(true));
-  addParam("UseCDCHits", m_param_useCDCHits, "Set true if CDCHits should be used", bool(true));
+  addParam("UsePXDHits",
+           m_param_usePXDHits,
+           "Set true if PXDHits or PXDClusters should be used in the matching in case they are present",
+           true);
+
+  addParam("UseSVDHits",
+           m_param_useSVDHits,
+           "Set true if SVDHits or SVDClusters should be used in the matching in case they are present",
+           true);
+
+  addParam("UseCDCHits",
+           m_param_useCDCHits,
+           "Set true if CDCHits should be used in the matching in case they are present",
+           true);
+
   addParam("UseOnlyAxialCDCHits",
            m_param_useOnlyAxialCDCHits,
            "Set true if only the axial CDCHits should be used",
@@ -172,38 +186,38 @@ void MCMatcherTracksModule::initialize()
 
 
 
-  //Purity relation - for each PRTrack to store the purest MCTrack
+  // Purity relation - for each PRTrack to store the purest MCTrack
   storeMCTrackCands.registerRelationTo(storePRTrackCands);
-  //Efficiency relation - for each MCTrack to store the most efficient PRTrack
+  // Efficiency relation - for each MCTrack to store the most efficient PRTrack
   storePRTrackCands.registerRelationTo(storeMCTrackCands);
-  //MC matching relation
+  // MC matching relation
   storePRTrackCands.registerRelationTo(storeMCParticles);
 
 
-  //Require the hits or clusters in case they should be used
-  //PXD
+  // Announce optional store arrays to the hits or clusters in case they should be used
+  // We make them optional in case of limited detector setup.
+  // PXD
   if (m_param_usePXDHits) {
     if (m_param_useClusters) {
-      StoreArray<PXDCluster>::required();
+      StoreArray<PXDCluster>::optional();
     } else {
-      StoreArray<PXDTrueHit>::required();
+      StoreArray<PXDTrueHit>::optional();
     }
   }
 
-  //SVD
+  // SVD
   if (m_param_useSVDHits) {
     if (m_param_useClusters) {
-      StoreArray<SVDCluster>::required();
+      StoreArray<SVDCluster>::optional();
     } else {
-      StoreArray<SVDTrueHit>::required();
+      StoreArray<SVDTrueHit>::optional();
     }
   }
 
-  //CDC
+  // CDC
   if (m_param_useCDCHits) {
-    StoreArray<CDCHit>::required();
+    StoreArray<CDCHit>::optional();
   }
-
 
 }
 
@@ -291,47 +305,51 @@ void MCMatcherTracksModule::event()
 
 
   // ### Get the number of relevant hits for each detector ###
-  //Since we are mostly dealing with indices in this module, this is all we need from the StoreArray
+  // Since we are mostly dealing with indices in this module, this is all we need from the StoreArray
+  // Silently skip store arrays that are not present in reduced detector setups.
   map< DetId, int>  nHits_by_detId;
 
-  //PXD
+  // PXD
   if (m_param_usePXDHits) {
-    int nHits = 0;
     if (m_param_useClusters) {
-
       StoreArray<PXDCluster> pxdClusters;
-      nHits = pxdClusters.getEntries();
+      if (pxdClusters.isValid()) {
+        int nHits = pxdClusters.getEntries();
+        nHits_by_detId[Const::PXD] = nHits;
+      }
 
     } else {
-
       StoreArray<PXDTrueHit> pxdTrueHits;
-      nHits = pxdTrueHits.getEntries();
-
+      if (pxdTrueHits.isValid()) {
+        int nHits = pxdTrueHits.getEntries();
+        nHits_by_detId[Const::PXD] = nHits;
+      }
     }
-    nHits_by_detId[Const::PXD] = nHits;
   }
 
-  //SVD
+  // SVD
   if (m_param_useSVDHits) {
-    int nHits = 0;
     if (m_param_useClusters) {
-
       StoreArray<SVDCluster> svdClusters;
-      nHits = svdClusters.getEntries();
-
+      if (svdClusters.isValid()) {
+        int nHits = svdClusters.getEntries();
+        nHits_by_detId[Const::SVD] = nHits;
+      }
     } else {
-
       StoreArray<SVDTrueHit> svdTrueHits;
-      nHits = svdTrueHits.getEntries();
-
+      if (svdTrueHits.isValid()) {
+        int nHits = svdTrueHits.getEntries();
+        nHits_by_detId[Const::SVD] = nHits;
+      }
     }
-    nHits_by_detId[Const::SVD] = nHits;
   }
 
-  //CDC
+  // CDC
   if (m_param_useCDCHits) {
     StoreArray<CDCHit> cdcHits;
-    nHits_by_detId[Const::CDC] = cdcHits.getEntries();
+    if (cdcHits.isValid()) {
+      nHits_by_detId[Const::CDC] = cdcHits.getEntries();
+    }
   }
 
 

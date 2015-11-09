@@ -223,8 +223,8 @@ namespace Belle2 {
         B2ERROR("Unknown beam background type found in 'scaleFactors': " << type << "\n"
                 "Possible are: " + m_bgTypes.getBGTypes());
       for (auto& bkg : m_backgrounds) {
-        if (type == bkg.type)
-          bkg.scaleFactor =  std::get<1>(scaleFactor);
+        if (bkg.type.find(type) != std::string::npos)
+          bkg.scaleFactor = std::get<1>(scaleFactor);
       }
     }
 
@@ -336,7 +336,8 @@ namespace Belle2 {
         addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
         addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
         addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
-        addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift, m_minTime, m_maxTime);
+        addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift,
+                        m_minTime, m_maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {

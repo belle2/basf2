@@ -64,11 +64,11 @@ namespace Belle2 {
     /**Scalefactor as a function of theta for Bhabha*/
     std::vector<int> m_scalefactor;
 
-    /**the sum of the weight of the processed events*/
-    double m_weightcount;
+    /**the name of trigger path*/
+    std::vector<std::string> trgname;
 
-    /**the sum of the weight of the event triggered by a path*/
-    double m_subweightcount[50];
+    /**the index of events*/
+    int nEvent;
 
     /**the index of trigger path*/
     int m_ntrg;

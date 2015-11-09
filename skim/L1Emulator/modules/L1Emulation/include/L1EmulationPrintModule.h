@@ -53,6 +53,19 @@ namespace Belle2 {
 
     /**the number of trigger pathes*/
     int m_ntrg;
+
+    /**the name of the trigger path*/
+    std::string m_trgname[50];
+
+    /**nEvent*/
+    int m_nEvent;
+
+    /**total trigger trsults*/
+    double m_summary[50];
+
+    /**trigger result of the event trigger by one path only*/
+    double m_summaryonly[50];
+
   };
 }
 

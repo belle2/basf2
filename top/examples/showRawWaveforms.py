@@ -189,10 +189,10 @@ else:
 gearbox = register_module('Gearbox')
 bar1 = \
     "/DetectorComponent[@name='TOP']//FrontEndMapping/TOPModule[@barID='1']/"
-col0 = bar1 + "ElectronicsModule[@col = '0']/SCRODid"
-col1 = bar1 + "ElectronicsModule[@col = '1']/SCRODid"
-col2 = bar1 + "ElectronicsModule[@col = '2']/SCRODid"
-col3 = bar1 + "ElectronicsModule[@col = '3']/SCRODid"
+col0 = bar1 + "Boardstack[@col = '0']/SCRODid"
+col1 = bar1 + "Boardstack[@col = '1']/SCRODid"
+col2 = bar1 + "Boardstack[@col = '2']/SCRODid"
+col3 = bar1 + "Boardstack[@col = '3']/SCRODid"
 
 if dataFormat == 0:
     gearbox.param('override', [(col0, '59', ''),

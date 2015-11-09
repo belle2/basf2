@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FRONTENDMAPPER_H
-#define FRONTENDMAPPER_H
+#pragma once
 
+#include <top/dbobjects/TOPFrontEndMap.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -21,49 +21,6 @@
 
 namespace Belle2 {
   namespace TOP {
-
-    /**
-     * Mapping of electronic module position to SCROD and COPPER/Finesse
-     */
-    struct FEEMap {
-      int barID;              /**< TOP module ID */
-      int column;             /**< column within TOP module */
-      unsigned short scrodID; /**< SCROD ID */
-      unsigned int copperID;  /**< COPPER ID */
-      int finesseID;          /**< Finesse slot number (0-based) */
-      int index;              /**< index of this element in std::vector */
-
-      /**
-       * Default constructor
-       */
-      FEEMap(): barID(0), column(0), scrodID(0), copperID(0), finesseID(0), index(0)
-      {}
-
-      /**
-       * Full constructor
-       * @param bar TOP module ID
-       * @param col column within TOP module
-       * @param scrod SCROD ID
-       * @param copper COPPER ID
-       * @param finesse Finesse slot number
-       * @param i index of this element in std::vector
-       */
-      FEEMap(int bar,
-             int col,
-             unsigned short scrod,
-             unsigned copper,
-             int finesse,
-             int i)
-      {
-        barID = bar;
-        column = col;
-        scrodID = scrod;
-        copperID = copper;
-        finesseID = finesse;
-        index = i;
-      }
-    };
-
 
     /**
      * Provides mapping between electronics module position within a TOP module and
@@ -95,11 +52,11 @@ namespace Belle2 {
        * @param col column
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMap(int barID, int col) const
+      const TOPFrontEndMap* getMap(int barID, int col) const
       {
         barID--;
         if (barID >= 0 and barID < c_numModules and col >= 0 and col < c_numColumns)
-          return m_fromBarToScrod[barID][col];
+          return m_fromBar[barID][col];
         return 0;
       }
 
@@ -108,11 +65,11 @@ namespace Belle2 {
        * @param scrodID SCROD ID
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMap(unsigned short scrodID) const
+      const TOPFrontEndMap* getMap(unsigned short scrodID) const
       {
-        std::map<unsigned short, const FEEMap*>::const_iterator it =
-          m_fromScrodToBar.find(scrodID);
-        if (it == m_fromScrodToBar.end()) return 0;
+        std::map<unsigned short, const TOPFrontEndMap*>::const_iterator it =
+          m_fromScrod.find(scrodID);
+        if (it == m_fromScrod.end()) return 0;
         return it->second;
       }
 
@@ -122,11 +79,11 @@ namespace Belle2 {
        * @param finesse Finesse slot number
        * @return pointer to map element or NULL
        */
-      const FEEMap* getMapFromCopper(unsigned copperID, int finesse) const
+      const TOPFrontEndMap* getMapFromCopper(unsigned copperID, int finesse) const
       {
-        std::map<unsigned int, const FEEMap*>::const_iterator it =
-          m_fromCopperInputToBar.find(copperID * 4 + finesse);
-        if (it == m_fromCopperInputToBar.end()) return 0;
+        std::map<unsigned int, const TOPFrontEndMap*>::const_iterator it =
+          m_fromCopper.find(copperID * 4 + finesse);
+        if (it == m_fromCopper.end()) return 0;
         return it->second;
       }
 
@@ -152,15 +109,15 @@ namespace Belle2 {
        */
       enum {c_numModules = 16, c_numColumns = 4};
 
-      std::vector<FEEMap> m_mapping; /**< mapping */
+      std::vector<TOPFrontEndMap> m_mapping; /**< mapping vector */
+
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
-      const FEEMap* m_fromBarToScrod[c_numModules][c_numColumns]; /**< conversion */
-      std::map<unsigned short, const FEEMap*> m_fromScrodToBar;   /**< conversion */
-      std::map<unsigned int, const FEEMap*> m_fromCopperInputToBar;   /**< conversion */
+      const TOPFrontEndMap* m_fromBar[c_numModules][c_numColumns]; /**< conversion array */
+      std::map<unsigned short, const TOPFrontEndMap*> m_fromScrod; /**< conversion map */
+      std::map<unsigned int, const TOPFrontEndMap*> m_fromCopper;  /**< conversion map */
 
     };
 
   } // TOP namespace
 } // Belle2 namespace
 
-#endif

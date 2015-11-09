@@ -111,7 +111,7 @@ namespace Belle2 {
                 " boardstack# " << boardstack);
         continue;
       }
-      sortedDigits[feemap->index].push_back(&digit);
+      sortedDigits[feemap->getIndex()].push_back(&digit);
     }
 
     for (const auto& copperID : mapper.getCopperIDs()) {
@@ -119,11 +119,11 @@ namespace Belle2 {
       for (int finesse = 0; finesse < 4; finesse++) {
         const auto* feemap = mapper.getMapFromCopper(copperID, finesse);
         if (!feemap) continue;
-        unsigned scrodID = feemap->scrodID;
+        unsigned scrodID = feemap->getScrodID();
         unsigned dataFormat = 1; // production data -> TODO: use enum
         unsigned version = 0;
         Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
-        for (const auto& digit : sortedDigits[feemap->index]) {
+        for (const auto& digit : sortedDigits[feemap->getIndex()]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
           unsigned chan = digit->getHardwareChannelID() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();

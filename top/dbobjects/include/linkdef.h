@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::TOPASICGains+;
 #pragma link C++ class Belle2::TOPASICChannel+;
 #pragma link C++ class Belle2::TOPChannelMap+;
+#pragma link C++ class Belle2::TOPFrontEndMap+;
 
 #endif

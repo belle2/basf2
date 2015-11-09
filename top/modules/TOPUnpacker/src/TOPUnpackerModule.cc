@@ -137,8 +137,8 @@ namespace Belle2 {
       B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
       return;
     }
-    int barID = feemap->barID;
-    int boardstack = feemap->column;
+    int barID = feemap->getBarID();
+    int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper();
 
     unsigned version = (buffer[0] >> 16) & 0xFF;
@@ -199,13 +199,13 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackWaveformFormatV1(TOP::DataArray& array,
-                                                const TOP::FEEMap* feemap,
+                                                const TOPFrontEndMap* feemap,
                                                 StoreArray<TOPRawWaveform>& waveforms)
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    int barID = feemap->barID;
-    int boardstack = feemap->column;
+    int barID = feemap->getBarID();
+    int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRS3B);
 
     unsigned scrod = array.getWord();
@@ -252,13 +252,13 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackWaveformFormatV2(TOP::DataArray& array,
-                                                const TOP::FEEMap* feemap,
+                                                const TOPFrontEndMap* feemap,
                                                 StoreArray<TOPRawWaveform>& waveforms)
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    int barID = feemap->barID;
-    int boardstack = feemap->column;
+    int barID = feemap->getBarID();
+    int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
 
     unsigned word = 0;

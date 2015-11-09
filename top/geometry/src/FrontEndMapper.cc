@@ -19,7 +19,7 @@ namespace Belle2 {
     {
       for (unsigned i = 0; i < c_numModules; i++) {
         for (unsigned k = 0; k < c_numColumns; k++) {
-          m_fromBarToScrod[i][k] = 0;
+          m_fromBar[i][k] = 0;
         }
       }
     }
@@ -49,50 +49,50 @@ namespace Belle2 {
         }
 
         bool barMapped = false; // to count mapped bars
-        for (const GearDir& electronicsModule : topModule.getNodes("ElectronicsModule")) {
+        for (const GearDir& boardstack : topModule.getNodes("Boardstack")) {
 
-          int col = electronicsModule.getInt("@col");
+          int col = boardstack.getInt("@col");
           if (col < 0 or col >= c_numColumns) {
-            B2ERROR(electronicsModule.getPath() << " col=" << col << " ***invalid number");
+            B2ERROR(boardstack.getPath() << " col=" << col << " ***invalid number");
             continue;
           }
           if (!bars.insert(barID * c_numColumns + col).second) {
-            B2ERROR(electronicsModule.getPath()
+            B2ERROR(boardstack.getPath()
                     << " barID=" << barID
                     << " col=" << col
                     << " ***already mapped");
             continue;
           }
 
-          unsigned short scrodID = (unsigned short) electronicsModule.getInt("SCRODid");
+          unsigned short scrodID = (unsigned short) boardstack.getInt("SCRODid");
           if (!scrodIDs.insert(scrodID).second) {
-            B2ERROR(electronicsModule.getPath() << "/SCRODid " << scrodID <<
+            B2ERROR(boardstack.getPath() << "/SCRODid " << scrodID <<
                     " ***already used");
             continue;
           }
 
-          string finesseSlot = electronicsModule.getString("FinesseSlot");
+          string finesseSlot = boardstack.getString("FinesseSlot");
           int finesse = 0;
           if (finesseSlot == "A") {finesse = 0;}
           else if (finesseSlot == "B") {finesse = 1;}
           else if (finesseSlot == "C") {finesse = 2;}
           else if (finesseSlot == "D") {finesse = 3;}
           else {
-            B2ERROR(electronicsModule.getPath() << "/FinesseSlot " << finesseSlot <<
+            B2ERROR(boardstack.getPath() << "/FinesseSlot " << finesseSlot <<
                     " ***invalid slot (valid are A, B, C, D)");
             continue;
           }
 
-          unsigned copperID = (unsigned) electronicsModule.getInt("COPPERid");
+          unsigned copperID = (unsigned) boardstack.getInt("COPPERid");
           m_copperIDs.insert(copperID);
-          string copper = electronicsModule.getString("COPPERid") + " " + finesseSlot;
+          string copper = boardstack.getString("COPPERid") + " " + finesseSlot;
           if (!coppers.insert(copper).second) {
-            B2ERROR(electronicsModule.getPath() << "/COPPERid " << copper <<
+            B2ERROR(boardstack.getPath() << "/COPPERid " << copper <<
                     " ***input already used");
             continue;
           }
 
-          FEEMap feemap(barID, col, scrodID, copperID, finesse, m_mapping.size());
+          TOPFrontEndMap feemap(barID, col, scrodID, copperID, finesse, m_mapping.size());
           m_mapping.push_back(feemap);
           barMapped = true;
         }
@@ -102,9 +102,9 @@ namespace Belle2 {
       // set conversion objects
 
       for (const auto& feemap : m_mapping) {
-        m_fromBarToScrod[feemap.barID - 1][feemap.column] = &feemap;
-        m_fromScrodToBar[feemap.scrodID] = &feemap;
-        m_fromCopperInputToBar[feemap.copperID * 4 + feemap.finesseID] = &feemap;
+        m_fromBar[feemap.getBarID() - 1][feemap.getBoardstackNumber()] = &feemap;
+        m_fromScrod[feemap.getScrodID()] = &feemap;
+        m_fromCopper[feemap.getCopperID() * 4 + feemap.getFinesseSlot()] = &feemap;
       }
 
       B2INFO("TOP::FrontEndMapper: " << m_mapping.size() << " SCROD's mapped to "

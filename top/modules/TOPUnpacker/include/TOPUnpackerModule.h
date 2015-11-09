@@ -151,7 +151,7 @@ namespace Belle2 {
      * @return number of words remaining in data buffer
      */
     int unpackWaveformFormatV1(TOP::DataArray& array,
-                               const TOP::FEEMap* feemap,
+                               const TOPFrontEndMap* feemap,
                                StoreArray<TOPRawWaveform>& waveforms);
 
     /**
@@ -162,7 +162,7 @@ namespace Belle2 {
      * @return number of words remaining in data buffer
      */
     int unpackWaveformFormatV2(TOP::DataArray& array,
-                               const TOP::FEEMap* feemap,
+                               const TOPFrontEndMap* feemap,
                                StoreArray<TOPRawWaveform>& waveforms);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */

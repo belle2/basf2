@@ -168,6 +168,40 @@ namespace Belle2 {
 
     }
 
+    double AngleTTLE(const Particle* p)
+    {
+      double result = -1.;
+      if (T1(p) && T2(p)) {
+        TLorentzVector V4p1 = (T1(p))->get4Vector();
+        TLorentzVector V4p2 = (T2(p))->get4Vector();
+        result = V4p1.Angle(V4p2.Vect());
+      }
+      return result;
+    }
+
+    double ThetaTTLE(const Particle* p)
+    {
+      double result = -1.;
+      if (T1(p) && T2(p)) {
+        TLorentzVector V4p1 = (T1(p))->get4Vector();
+        TLorentzVector V4p2 = (T2(p))->get4Vector();
+        result = (V4p1.Theta() + V4p2.Theta() - 3.1415926);
+      }
+      return result;
+    }
+
+    double PhiTTLE(const Particle* p)
+    {
+      double result = -1.;
+      if (T1(p) && T2(p)) {
+        TLorentzVector V4p1 = (T1(p))->get4Vector();
+        TLorentzVector V4p2 = (T2(p))->get4Vector();
+        result = V4p1.DeltaPhi(V4p2);
+      }
+      return result;
+    }
+
+
     double P1CMSBhabhaLE(const Particle* p)
     {
       double result = -1.;
@@ -308,6 +342,20 @@ namespace Belle2 {
       return result;
     }
 
+    double E1CMSBhabhaLE(const Particle* p)
+    {
+      double result = -1.;
+      const Particle* pp = T1(p);
+      if (pp) {
+        const ECLCluster* eclTrack = (pp->getTrack())->getRelated<ECLCluster>();
+        if (eclTrack) {
+          TLorentzVector V4p1 = eclTrack->get4Vector();
+          result = (PCmsLabTransform::labToCms(V4p1)).E();
+
+        }
+      }
+      return result;
+    }
 
     double EoPT1BhabhaLE(const Particle* p)
     {
@@ -351,6 +399,19 @@ namespace Belle2 {
       return result;
     }
 
+    double E2CMSBhabhaLE(const Particle* p)
+    {
+      double result = -1.;
+      const Particle* pp = T2(p);
+      if (pp) {
+        const ECLCluster* eclTrack = (pp->getTrack())->getRelated<ECLCluster>();
+        if (eclTrack) {
+          TLorentzVector V4p2 = eclTrack->get4Vector();
+          result = (PCmsLabTransform::labToCms(V4p2)).E();
+        }
+      }
+      return result;
+    }
 
     double Layer1BhabhaLE(const Particle* p)
     {
@@ -478,9 +539,61 @@ namespace Belle2 {
           Particle* par2 = pionshlt->getParticle(j);
           TLorentzVector V4p1 = par1->get4Vector();
           TLorentzVector V4p2 = par2->get4Vector();
-          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          const TVector3 V3p1 = V4p1.Vect();
+          const TVector3 V3p2 = V4p2.Vect();
           temp = V3p1.Angle(V3p2);
+          if (result < temp) result = temp;
+        }
+      }
+      result = result / 3.1415926 * 180.;
+      return result;
+    }
+
+
+    double maxPhiTTLE(const Particle*)
+    {
+      double result = -10.;
+      double temp = -10.;
+      StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
+      if (pionshlt->getListSize() < 2) return result;
+      for (unsigned int i = 0; i < pionshlt->getListSize() - 1; i++) {
+        Particle* par1 = pionshlt->getParticle(i);
+        for (unsigned int j = i + 1; j < pionshlt->getListSize(); j++) {
+          Particle* par2 = pionshlt->getParticle(j);
+          TLorentzVector V4p1 = par1->get4Vector();
+          TLorentzVector V4p2 = par2->get4Vector();
+          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          const TVector3 V3p1 = V4p1.Vect();
+          const TVector3 V3p2 = V4p2.Vect();
+          temp = V3p1.DeltaPhi(V3p2);
+          if (result < temp) result = temp;
+        }
+      }
+      result = result / 3.1415926 * 180.;
+      return result;
+    }
+
+
+    double maxThetaTTLE(const Particle*)
+    {
+      double result = -10.;
+      double temp = -10.;
+      StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
+      if (pionshlt->getListSize() < 2) return result;
+      for (unsigned int i = 0; i < pionshlt->getListSize() - 1; i++) {
+        Particle* par1 = pionshlt->getParticle(i);
+        for (unsigned int j = i + 1; j < pionshlt->getListSize(); j++) {
+          Particle* par2 = pionshlt->getParticle(j);
+          TLorentzVector V4p1 = par1->get4Vector();
+          TLorentzVector V4p2 = par2->get4Vector();
+          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          const TVector3 V3p1 = V4p1.Vect();
+          const TVector3 V3p2 = V4p2.Vect();
+          temp = std::abs(V3p1.Theta() + V3p2.Theta() - 3.1415926);
           if (result < temp) result = temp;
         }
       }
@@ -541,6 +654,17 @@ namespace Belle2 {
       if (ECLClusterNeutralLE(particle))
         return ECLClusterNeutralLE(particle)->getEnergy();
       else return -1.;
+    }
+
+    double  ENeutralCMSLE(const Particle* particle)
+    {
+      double result = -1.;
+      const ECLCluster* cc = ECLClusterNeutralLE(particle);
+      if (cc) {
+        TLorentzVector VNe = cc->get4Vector();
+        result = (PCmsLabTransform::labToCms(VNe)).E();
+      }
+      return result;
     }
 
     double  ThetaNeutralLE(const Particle* particle)
@@ -775,28 +899,28 @@ namespace Belle2 {
 
     //Variables for LE
     VARIABLE_GROUP("PhysicsTrigger");
-    REGISTER_VARIABLE("NtHLT",  nTracksLE,  "[Eventbased] number of tracks in the event after LE good tracks requirment");
-    REGISTER_VARIABLE("NltHLT",  nLongTracksLE,  "[Eventbased] number of long tracks in the event after LE good tracks requirment");
+    REGISTER_VARIABLE("NtHLT",  nTracksLE,  "[Eventbased] the number of good tracks in the event");
+    REGISTER_VARIABLE("NltHLT",  nLongTracksLE,  "[Eventbased] the number of long good tracks in the event: Pt>0.3 GeV");
     REGISTER_VARIABLE("NtcHLT",  nECLMatchTracksLE,
-                      "[Eventbased] number of tracks matched to ECL clusters in the event after LE good tracks requirment");
+                      "[Eventbased] the number of tracks matched to ECL clusters in the event");
     REGISTER_VARIABLE("NtmHLT",  nKLMMatchTracksLE,
-                      "[Eventbased] number of tracks matched to KLM clusters in the event after LE good tracks requirment");
+                      "[Eventbased] the number of tracks matched to KLM clusters in the event");
     REGISTER_VARIABLE("NEidHLT",  nEidLE,
-                      "[Eventbased] number of tracks which are identified as e");
+                      "[Eventbased] the number of tracks which are identified as e: Pcms>5.0 GeV and E/P>0.8");
     REGISTER_VARIABLE("PT1HLT",  P1BhabhaLE,
-                      "[Eventbased] the  momentum of trk1, where trk1 is the track with the largest momentum");
+                      "[Eventbased] the momentum of trk1, where trk1 is the track with the largest momentum");
     REGISTER_VARIABLE("PT2HLT",  P2BhabhaLE,
-                      "[Eventbased] the momentum of trk2, where trk2 is the track with the largest momentum");
+                      "[Eventbased] the momentum of trk2, where trk2 is the track with the secondary largest momentum");
     REGISTER_VARIABLE("PT1CMSHLT",  P1CMSBhabhaLE,
-                      "[Eventbased] the CMS momentum of trk1, where trk1 is the track with the largest momentum");
+                      "[Eventbased] the momentum of trk1 in e+e- center of mass system (CMS)");
     REGISTER_VARIABLE("PT2CMSHLT",  P2CMSBhabhaLE,
-                      "[Eventbased] the CMS momentum of trk2, where trk2 is the track with the largest momentum");
+                      "[Eventbased] the momentum of trk2 in CMS");
     REGISTER_VARIABLE("PT12CMSHLT",  P12CMSBhabhaLE,
-                      "[Eventbased] the total CMS momentum of trk2 and trk1");
+                      "[Eventbased] the total momentum of trk2 and trk1 in CMS");
     REGISTER_VARIABLE("PtT1HLT",  Pt1BhabhaLE,
-                      "[Eventbased] the transverse momentum of trk1, where trk1 is the track with the largest momentum");
+                      "[Eventbased] the transverse momentum of trk1");
     REGISTER_VARIABLE("PtT2HLT",  Pt2BhabhaLE,
-                      "[Eventbased] the transverse momentum of trk2, where trk2 is the track with the largest momentum");
+                      "[Eventbased] the transverse momentum of trk2");
 
     REGISTER_VARIABLE("ThetaT1HLT",  Theta1BhabhaLE,  "[Eventbased] the polar angle of trk1");
     REGISTER_VARIABLE("ThetaT2HLT",  Theta2BhabhaLE,  "[Eventbased] the polar angle of trk2");
@@ -808,36 +932,50 @@ namespace Belle2 {
     REGISTER_VARIABLE("ChargeT2HLT",  Charge2BhabhaLE,  "[Eventbased] the charge of trk2");
 
     REGISTER_VARIABLE("ET1HLT",  E1BhabhaLE,  "[Eventbased] the energy of ECL cluster matched to trk1");
+    REGISTER_VARIABLE("ET1CMSHLT",  E1CMSBhabhaLE,  "[Eventbased] the energy of ECL cluster matched to trk1 in CMS");
     REGISTER_VARIABLE("ET2HLT",  E2BhabhaLE,  "[Eventbased] the energy of ECL cluster matched to trk2");
+    REGISTER_VARIABLE("ET2CMSHLT",  E2CMSBhabhaLE,  "[Eventbased] the energy of ECL cluster matched to trk2 in CMS");
     REGISTER_VARIABLE("EoPT1HLT",  EoPT1BhabhaLE,
-                      "[Eventbased] the energy of ECL cluster matched to trk1 over the lab momentum of trak1");
+                      "[Eventbased] the energy of ECL cluster matched to trk1 over the momentum of trak1");
     REGISTER_VARIABLE("EoPT2HLT",  EoPT2BhabhaLE,
-                      "[Eventbased] the energy of ECL cluster matched to trk2 over the lab momentum of trak2");
+                      "[Eventbased] the energy of ECL cluster matched to trk2 over the momentum of trak2");
 
     REGISTER_VARIABLE("LayersT1HLT",  Layer1BhabhaLE,  "[Eventbased] the layers of KLM cluster matched to trk1");
     REGISTER_VARIABLE("LayersT2HLT",  Layer2BhabhaLE,  "[Eventbased] the layers of KLM cluster matched to trk2");
 
-    REGISTER_VARIABLE("NcHLT",  nClustersLE,  "[Eventbased] number of ECL clusters");
-    REGISTER_VARIABLE("EtotHLT", EtotLE, "[Eventbased] the total ECL energy");
-    REGISTER_VARIABLE("VisiblePzHLT", VisiblePzLE, "[Eventbased] sum of the absolute momentum in z-coordinate in the event");
+    REGISTER_VARIABLE("NcHLT",  nClustersLE,  "[Eventbased] the number of ECL clusters");
+    REGISTER_VARIABLE("EtotHLT", EtotLE, "[Eventbased] the total energy of ECL clusters");
+    REGISTER_VARIABLE("VisiblePzHLT", VisiblePzLE, "[Eventbased] the sum of the absolute momentum in z-coordinate in the event");
 
     REGISTER_VARIABLE("VisibleEnergyHLT", VisibleEnergyLE,
                       "[Eventbased] total visible energy (the sum of the charged track's momenta and the ECL cluster's energies)");
     REGISTER_VARIABLE("maxAngTTHLT", maxAngleTTLE,
-                      "[Eventbased] the maximum angle between two charged tracks in e+e- center-of-mass frame");
+                      "[Eventbased] the maximum angle between two charged tracks");
+    REGISTER_VARIABLE("maxPhiTTHLT", maxPhiTTLE,
+                      "[Eventbased] the maximum azimuthal angle between two charged tracks");
+    REGISTER_VARIABLE("maxThetaTTHLT", maxThetaTTLE,
+                      "[Eventbased] the maximum accollinearity angle between two charged tracks");
+
+    REGISTER_VARIABLE("AngTTHLT", AngleTTLE,
+                      "[Eventbased] the 3-D angle between trk1 and trk2");
+    REGISTER_VARIABLE("PhiTTHLT", PhiTTLE,
+                      "[Eventbased] the azimuthal angle between trk1 and trk2");
+    REGISTER_VARIABLE("ThetaTTHLT", ThetaTTLE,
+                      "[Eventbased] the accollinearity angle between trk1 and trk2");
 
     REGISTER_VARIABLE("maxAngMMHLT", maxAngleMMLE, "[Eventbased] the maximum angle between two KLM Clusters");
     REGISTER_VARIABLE("maxAngTMHLT", maxAngleTMLE, "[Eventbased] the maximum angle between CDC tracks and  KLM Clusters");
     REGISTER_VARIABLE("NkHLT", nKLMClustersLE, "[Eventbased] the number of KLM clusters");
     REGISTER_VARIABLE("Layer1KLMHLT", LayerKLMCluster1LE, "[Eventbased] the largest layers of KLM clusters");
-    REGISTER_VARIABLE("Layer2KLMHLT", LayerKLMCluster2LE, "[Eventbased] the second largest layers of KLM clusters");
-    REGISTER_VARIABLE("EC1HLT", EC1LE, "[Eventbased] the most energetic ECL cluster in the rest frame, the cluster is denoted as C1");
+    REGISTER_VARIABLE("Layer2KLMHLT", LayerKLMCluster2LE, "[Eventbased] the secondary largest layers of KLM clusters");
+    REGISTER_VARIABLE("EC1HLT", EC1LE, "[Eventbased] the most energetic ECL cluster, the cluster is denoted as C1");
     REGISTER_VARIABLE("EC1CMSHLT", EC1CMSLE, "[Eventbased] the most energetic ECL cluster in CMS, the cluster is denoted as C1");
     REGISTER_VARIABLE("ThetaC1HLT", ThetaC1LE, "[Eventbased] the pular angle of C1");
     REGISTER_VARIABLE("PhiC1HLT", PhiC1LE, "[Eventbased] the azimuthal angle of C1");
-    REGISTER_VARIABLE("RC1HLT", RC1LE, "[Eventbased] the distance between C1 and IP");
+    REGISTER_VARIABLE("RC1HLT", RC1LE, "[Eventbased] the distance between C1 and interation point (IP)");
     REGISTER_VARIABLE("EC2HLT", EC2LE, "[Eventbased] the second most energetic ECL cluster, the cluster is denoted as C2");
-    REGISTER_VARIABLE("EC2CMSHLT", EC2CMSLE, "[Eventbased] the second most energetic ECL cluster in CMS, the cluster is denoted as C2");
+    REGISTER_VARIABLE("EC2CMSHLT", EC2CMSLE,
+                      "[Eventbased] the secondary most energetic ECL cluster in CMS, the cluster is denoted as C2");
     REGISTER_VARIABLE("ThetaC2HLT", ThetaC2LE, "[Eventbased] the polar of C2");
     REGISTER_VARIABLE("PhiC2HLT", PhiC2LE, "[Eventbased] the azimuthal angle of C2");
     REGISTER_VARIABLE("RC2HLT", RC2LE, "[Eventbased] the distance between C2 and IP");
@@ -848,7 +986,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("ThetaNeutralHLT", ThetaNeutralLE, "[Eventbased] the polar of the neutral cluster with the largest energy");
     REGISTER_VARIABLE("RNeutralHLT", RNeutralLE, "[Eventbased] the distance between the neutral cluster and IP");
     REGISTER_VARIABLE("PhiNeutralHLT", PhiNeutralLE, "[Eventbased] the azimuthal angle of the neutral cluster with the largest energy");
-    REGISTER_VARIABLE("ENeutralHLT", ENeutralLE, "[Eventbased] the energy of the neutral cluster with the largest energy");
+    REGISTER_VARIABLE("ENeutralHLT", ENeutralLE, "[Eventbased] the largest energy of the neutral cluster");
+    REGISTER_VARIABLE("ENeutralCMSHLT", ENeutralCMSLE, "[Eventbased] the secondary largest energy of the neutral cluster in CMS");
 
     REGISTER_VARIABLE("AngGTHLT", AngleGTLE, "[Eventbased] the max angle between C1 (C2) and T1 (T2)");
 

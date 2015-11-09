@@ -73,10 +73,9 @@ void L1EmulationModule::initialize()
   B2INFO("L1EmulationModule processing");
   StoreArray<L1EmulationInformation>::registerPersistent();
   m_cut = Variable::Cut::Compile(m_userCut);
-  m_weightcount = 0;
-  for (int i = 0; i < 50; i++)
-    m_subweightcount[i] = 0;
   m_ntrg = 0;
+  trgname.clear();
+  nEvent = 0;
 }
 
 
@@ -89,14 +88,6 @@ void L1EmulationModule::event()
 
 void L1EmulationModule::terminate()
 {
-  double w = m_subweightcount[m_ntrg];
-  double wt = m_weightcount;
-  if (m_ntrg == 4)
-    std::cout << Form("----------------------------------------------------------------") << "\n";
-
-  std::cout << Form("%-40s%-20.2f%-10.2f", (getName()).c_str(), w, w / wt * 100.) << "\n";
-  if (m_ntrg == 1)
-    std::cout << Form("============================L1 Emulator Output End===========================") << "\n";
 }
 
 
@@ -104,6 +95,7 @@ bool L1EmulationModule::eventSelect()
 {
 
 //get weight of event
+  nEvent++;
   double Weight = 1.0;
   StoreObjPtr<EventMetaData> eventmetadata;
   if (eventmetadata)
@@ -114,18 +106,16 @@ bool L1EmulationModule::eventSelect()
   if (!LEInfos.getEntries()) {
     LEInfos.appendNew(L1EmulationInformation());
     B2DEBUG(200, "No entry in L1EmulationInformation");
-    m_weightcount += Weight;
-    LEInfos[0]->settotWeight(m_weightcount);
   }
-  m_weightcount = LEInfos[0]->gettotWeight();
   //L1EmulationInformation* LEInfo = LEInfos.appendNew(L1EmulationInformation());
   L1EmulationInformation& LEInfo = *LEInfos[0];
   LEInfo.setnTrg(1);
   m_ntrg = LEInfo.getnTrg();
+  if (nEvent == 1)LEInfo.setTrgName(m_ntrg - 1, getName());
 
   double summary = 0.0;
 
-  if (m_userCut.size() && m_cut->check(part)) {
+  if ((m_userCut.size() && m_cut->check(part)) || (!m_userCut.size())) {
     if (makeScalefx(m_scalefactor)) {
       summary = Weight;
       if (m_ntrg == 1)LEInfo.setECLBhabha(1);
@@ -137,13 +127,12 @@ bool L1EmulationModule::eventSelect()
         LEInfo.setggVeto(1);
     }
   }
-  m_subweightcount[m_ntrg] += summary;
-  LEInfo.setsubWeight(m_ntrg, m_subweightcount[m_ntrg]);
+
   LEInfo.setSummary(m_ntrg, summary);
   bool Val = false;
 //The global trigger result
   if (summary > 0) {
-    LEInfo.setSummary(0, summary);
+    if (m_ntrg > 4)LEInfo.setSummary(0, summary);
     Val = true;
   }
 
@@ -176,7 +165,7 @@ bool L1EmulationModule::makeScalefx(std::vector<int> f)
   double theta = -1;
   double interval = 0.;
   theta = Variable::MinusThetaBhabhaLE(p); interval = (2.65 - 0.2) / (double)fsize;
-  theta = Variable::ThetaC1LE(p); interval = (2.7 - 0.2) / (double)fsize;
+//  theta = Variable::ThetaC1LE(p); interval = (2.7 - 0.2) / (double)fsize;
 
   for (int i = 0; i < fsize; i++) {
     if (theta >= (interval * i + 0.2) && theta < (interval * (i + 1) + 0.2)) {

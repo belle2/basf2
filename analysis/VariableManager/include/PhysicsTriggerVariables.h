@@ -120,9 +120,19 @@ namespace Belle2 {
     double E1BhabhaLE(const Particle*);
 
     /**
+     * return the energy of ECL cluster matched to trk1 in CMS
+     */
+    double E1CMSBhabhaLE(const Particle*);
+
+    /**
      * return the energy of ECL cluster matched to trk2
      */
     double E2BhabhaLE(const Particle*);
+
+    /**
+     * return the energy of ECL cluster matched to trk2 in CMS
+     */
+    double E2CMSBhabhaLE(const Particle*);
 
     /**
      * return the layers of KLM matched to trk1
@@ -146,9 +156,36 @@ namespace Belle2 {
     double Charge2BhabhaLE(const Particle*);
 
     /**
+     * return the angle between trk1 and trk2
+     */
+    double AngleTTLE(const Particle*);
+
+    /**
+     * return the phi  between trk1 and trk2 [-pi, pi]
+     */
+    double PhiTTLE(const Particle*);
+
+    /**
+     * return the accollinearity between trk1 and trk2 abs(theta1+theta2-pi)
+     */
+    double ThetaTTLE(const Particle*);
+
+
+    /**
      * return the maximum angle between tracks
      */
     double maxAngleTTLE(const Particle*);
+
+    /**
+     * return the maximum accollinearity angle between tracks
+     */
+    double maxThetaTTLE(const Particle*);
+
+    /**
+     * return the maximum azimuthal angle between tracks
+     */
+    double maxPhiTTLE(const Particle*);
+
 
     /**
      * return the maximum angle between KLM clusters
@@ -273,6 +310,11 @@ namespace Belle2 {
      * return ENeutral
      */
     double ENeutralLE(const Particle*);
+
+    /**
+     * return ENeutral in CMS
+     */
+    double ENeutralCMSLE(const Particle*);
 
     /**
      * return RNeutral

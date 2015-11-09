@@ -178,9 +178,6 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand) const
 {
   Vector3D position = getSupport();
-  if (position.hasNAN()) {
-    return false;
-  }
   return fillInto(gfTrackCand, getBFieldZ(position));
 }
 
@@ -305,10 +302,6 @@ double CDCTrajectory3D::getAbsMom3D(const double bZ) const
   double absMom2D =  curvatureToAbsMom2D(curvatureXY, bZ);
 
   return factor2DTo3D * absMom2D;
-
-  double absMomZ = absMom2D * tanLambda;
-
-  return hypot(absMom2D, absMomZ);
 }
 
 double CDCTrajectory3D::getAbsMom3D() const
@@ -324,12 +317,4 @@ double CDCTrajectory3D::getAbsMom3D() const
   double absMom2D =  curvatureToAbsMom2D(curvatureXY, position);
 
   return factor2DTo3D * absMom2D;
-
-  double absMomZ = absMom2D * tanLambda;
-
-  return hypot(absMom2D, absMomZ);
 }
-
-
-
-

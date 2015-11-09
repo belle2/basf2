@@ -9,12 +9,12 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/logging/Logger.h>
 
 #include <TMath.h>
 #include <cmath>
 #include <cassert>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace std;
 using namespace Belle2;
@@ -37,9 +37,10 @@ double TrackFindingCDC::getBFieldZ(const Vector2D& pos2D)
 
 double TrackFindingCDC::getBFieldZ(const Vector3D& pos3D)
 {
-  if (pos3D.hasNAN()) {
-    B2FATAL("Accessing a NaN position of the B Field!");
-  }
+  // The BFieldMap can not handle positions with not a number coordinates
+  // which can occure if fits fail.
+  // Return NAN to the caller and let him decide what to do next.
+  if (pos3D.hasNAN()) return NAN;
   TVector3 mag3D = BFieldMap::Instance().getBField(pos3D);
   return mag3D.Z();
 }

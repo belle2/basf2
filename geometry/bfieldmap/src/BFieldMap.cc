@@ -33,6 +33,12 @@ const TVector3 BFieldMap::getBField(const TVector3& point)
 {
   TVector3 magFieldVec(0.0, 0.0, 0.0);
 
+  //Check that the point makes sense
+  if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {
+    B2ERROR("Bfield requested for a position containing NaN, returning field 0");
+    return magFieldVec;
+  }
+
   //Check if the map has been initialized yet. If not, initialize all components of the map.
   if (!m_isMapInitialized) {
     BOOST_FOREACH(BFieldComponentAbs * comp, m_components) {

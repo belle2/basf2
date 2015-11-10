@@ -48,9 +48,6 @@ namespace Belle2 {
     /**the sum of the weight of the processed events*/
     double m_weightcount;
 
-    /**the sum of the weight of the triggered events*/
-    double m_weightcounttrigger;
-
     /**the number of trigger pathes*/
     int m_ntrg;
 

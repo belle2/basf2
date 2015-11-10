@@ -100,7 +100,7 @@ namespace Belle2 {
     int m_runEventVerbosity;               /**< Geant4 run/event verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     int m_trackingVerbosity;               /**< Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info. */
     int m_hadronProcessVerbosity;          /**< Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
-    int m_lossTableVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
+    int m_emProcessVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */

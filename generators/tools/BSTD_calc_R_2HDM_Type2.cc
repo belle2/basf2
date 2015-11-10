@@ -21,7 +21,8 @@ using namespace Belle2;
 
 void usage()
 {
-  std::cout << "Usage: BSTD_calc_R_2HDM_Type2 [-h] [-m m_H+] m_B m_D* m_D m_tau m_lep rho1^2 rhoA1^2 R1(1) R2(1) aS1 aR3 m_b m_c" << std::endl;
+  std::cout << "Usage: BSTD_calc_R_2HDM_Type2 [-h] [-m m_H+] m_B m_D* m_D m_tau m_lep rho1^2 rhoA1^2 R1(1) R2(1) aS1 aR3 m_b m_c" <<
+            std::endl;
   std::cout << "Calculate R(D), R(D*), polarizations of tau and D* " << std::endl;
   std::cout << "as a function of tan(beta)/m_H+ for 2HDM Type2 using the BSTD model." << std::endl;
   std::cout << "CS2 term is neglected unless m_H+ value for CS2 term is specified by -m option." << std::endl;
@@ -39,12 +40,11 @@ void usage()
 int main(int argc, char* argv[])
 {
 
-  // get options
-  int c;
   // charged higgs mass
   double m_H(-1.);
   while (1) {
-    c = getopt(argc, argv, "rh:");
+    // get options
+    int c = getopt(argc, argv, "rh:");
     if (c == -1)break; //end of parameter.
     switch (c) {
       case 'h':

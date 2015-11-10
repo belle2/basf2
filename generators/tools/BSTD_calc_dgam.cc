@@ -42,10 +42,9 @@ int main(int argc, char* argv[])
 
   bool calcROnly = false;
 
-  // get options
-  int c;
   while (1) {
-    c = getopt(argc, argv, "rh");
+    // get options
+    int c = getopt(argc, argv, "rh");
     if (c == -1)break; //end of parameter.
     switch (c) {
       case 'h':

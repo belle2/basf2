@@ -135,9 +135,6 @@ double EvtBSemiTauonicAmplitude::CalcMaxProb(EvtId parent, EvtId meson,
   double m = root_part->mass();
 
   EvtVector4R p4meson, p4lepton, p4nu, p4w;
-  double q2max;
-  double q2min;
-  double dq2;
 
   double q2, elepton, plepton;
   int i, j;
@@ -160,9 +157,9 @@ double EvtBSemiTauonicAmplitude::CalcMaxProb(EvtId parent, EvtId meson,
       if ((mass[0] + mass[1] + mass[2]) > m) mass[0] = m - mass[1] - mass[2] - 0.00001;
     }
 
-    q2min = mass[1] * mass[1]; // limit to minimum=lepton mass square
-    q2max = (m - mass[0]) * (m - mass[0]);
-    dq2 = (q2max - q2min) / 25;
+    double q2min = mass[1] * mass[1]; // limit to minimum=lepton mass square
+    double q2max = (m - mass[0]) * (m - mass[0]);
+    double dq2 = (q2max - q2min) / 25;
 //    std::cout<<"m: "<<m<<" mass[0]: "<<mass[0]<<" q2min: "<<q2min<<" q2max: "<<q2max<<std::endl;
 
     //loop over q2

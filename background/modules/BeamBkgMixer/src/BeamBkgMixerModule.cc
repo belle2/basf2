@@ -277,16 +277,34 @@ namespace Belle2 {
     }
 
 
-    // SimHits
-    StoreArray<PXDSimHit>::optional();
-    StoreArray<SVDSimHit>::optional();
-    StoreArray<CDCSimHit>::optional();
-    StoreArray<TOPSimHit>::optional();
-    StoreArray<ARICHSimHit>::optional();
-    StoreArray<ECLHit>::optional();
-    StoreArray<BKLMSimHit>::optional();
-    StoreArray<EKLMSimHit>::optional();
-    StoreArray<BeamBackHit>::optional();
+    // SimHits registration
+
+    StoreArray<PXDSimHit> pxdSimHits;
+    if (m_PXD) pxdSimHits.registerInDataStore();
+
+    StoreArray<SVDSimHit> svdSimHits;
+    if (m_SVD) svdSimHits.registerInDataStore();
+
+    StoreArray<CDCSimHit> cdcSimHits;
+    if (m_CDC) cdcSimHits.registerInDataStore();
+
+    StoreArray<TOPSimHit> topSimHits;
+    if (m_TOP) topSimHits.registerInDataStore();
+
+    StoreArray<ARICHSimHit> arichSimHits;
+    if (m_ARICH) arichSimHits.registerInDataStore();
+
+    StoreArray<ECLHit> eclHits;
+    if (m_ECL) eclHits.registerInDataStore();
+
+    StoreArray<BKLMSimHit> bklmSimHits;
+    if (m_BKLM) bklmSimHits.registerInDataStore();
+
+    StoreArray<EKLMSimHit> eklmSimHits;
+    if (m_EKLM) eklmSimHits.registerInDataStore();
+
+    StoreArray<BeamBackHit> beamBackHits;
+    if (m_BeamBackHits) beamBackHits.registerInDataStore();
 
   }
 

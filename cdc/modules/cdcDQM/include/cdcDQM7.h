@@ -15,6 +15,7 @@ namespace Belle2 {
 
     //! Constructor
     cdcDQM7Module();
+
     //! Destructor
     virtual ~cdcDQM7Module();
 

@@ -37,6 +37,17 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
     This function adds the standard simulation modules to a path.
     """
 
+    # background mixing
+    if bkgfiles:
+        bkgmixer = register_module('BeamBkgMixer')
+        bkgmixer.param('backgroundFiles', bkgfiles)
+        if bkgcomponents:
+            bkgmixer.param('components', bkgcomponents)
+        else:
+            if components:
+                bkgmixer.param('components', components)
+        path.add_module(bkgmixer)
+
     # geometry parameter database
     if 'Gearbox' not in path:
         gearbox = register_module('Gearbox')
@@ -48,17 +59,6 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
-
-    # background mixing
-    if bkgfiles:
-        bkgmixer = register_module('BeamBkgMixer')
-        bkgmixer.param('backgroundFiles', bkgfiles)
-        if bkgcomponents:
-            bkgmixer.param('components', bkgcomponents)
-        else:
-            if components:
-                bkgmixer.param('components', components)
-        path.add_module(bkgmixer)
 
     # detector simulation
     if 'FullSim' not in path:

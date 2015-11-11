@@ -233,11 +233,16 @@ namespace Belle2 {
     gidTYPE makeEIDPID(gidTYPE eid_, gidTYPE pid_) {return pid_ * pidOffset + eid_ * eidOffest;}
     //! Helper to compose time elemnt id & param id
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
-    gidTYPE gid; /// global id
-    gidTYPE eid; /// element id
-    gidTYPE pid; /// parameter id
-    gidTYPE tid; /// time id
-    gidTYPE tif; /// time identification flag
+    //! global id
+    gidTYPE gid;
+    //! element id
+    gidTYPE eid;
+    //! parameter id
+    gidTYPE pid;
+    //! time id
+    gidTYPE tid;
+    //! time identification flag
+    gidTYPE tif;
   };
 }
 #endif

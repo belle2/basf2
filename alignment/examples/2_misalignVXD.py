@@ -17,13 +17,12 @@ class VXDMisalignment:
     """
 
     def __init__(self, name):
-        """ init members """
+        """ COnstructor """
+
+        #: name of the object
         self.name = name
-        """ name of the object """
+        #: alignment data = list of VxdID mask, param id, generation distribution and value
         self.alignment = []
-        """ alignment data = list of
-        VxdID mask, param id, generation distribution and value
-        """
 
     def getName(self):
         """ get object name """

@@ -1,0 +1,391 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from basf2 import *
+import os
+import sys
+import inspect
+from beamparameters import add_beamparameters
+
+analysis_main = create_path()
+
+
+def fitVertex(
+    list_name,
+    conf_level,
+    decay_string='',
+    fitter='rave',
+    fit_type='vertex',
+    constraint='',
+    daughtersUpdate=False,
+    path=analysis_main,
+):
+    """
+    Perform the specified kinematic fit for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param decay_string select particles used for the vertex fit
+    @param fitter       rave or kfitter
+    @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
+    @param constraint   type of additional constraints (valid options are empty string/ipprofile/iptube)
+    @updateDaughters    meke copy of the daughters and update them after the vertex fit
+    @param path         modules are added to this path
+    """
+
+    if 'Geometry' in path:
+        B2INFO('fitVertex: Geometry already in path')
+    else:
+        geometry = register_module('Geometry')
+        geometry.param('components', ['MagneticField'])
+        path.add_module(geometry)
+
+    pvfit = register_module('ParticleVertexFitter')
+    pvfit.set_name('ParticleVertexFitter_' + list_name)
+    pvfit.param('listName', list_name)
+    pvfit.param('confidenceLevel', conf_level)
+    pvfit.param('vertexFitter', fitter)
+    pvfit.param('fitType', fit_type)
+    pvfit.param('withConstraint', constraint)
+    pvfit.param('updateDaughters', daughtersUpdate)
+    pvfit.param('decayString', decay_string)
+    path.add_module(pvfit)
+
+
+def vertexKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'vertex',
+        constraint,
+        False,
+        path,
+    )
+
+
+def vertexKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the Daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        '',
+        'kfitter',
+        'vertex',
+        constraint,
+        True,
+        path,
+    )
+
+
+def massVertexKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'massvertex',
+        '',
+        False,
+        path,
+    )
+
+
+def massVertexKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass-constrained vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'massvertex',
+        '',
+        True,
+        path,
+    )
+
+
+def massKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'mass',
+        '',
+        False,
+        path,
+    )
+
+
+def massKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'mass',
+        '',
+        True,
+        path,
+    )
+
+
+def vertexRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the RAVE for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'vertex',
+        constraint,
+        False,
+        path,
+    )
+
+
+def vertexRaveDaughtersUpdate(
+    list_name,
+    conf_level,
+    constraint='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using RAVE for each Particle in the given ParticleList and update the Daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
+    @param path         modules are added to this path
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        '',
+        'rave',
+        'vertex',
+        constraint,
+        True,
+        path,
+    )
+
+
+def massVertexRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'massvertex',
+        '',
+        False,
+        path,
+    )
+
+
+def massVertexRaveDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass-constrained vertex fit using the RAVE for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'massvertex',
+        '',
+        True,
+        path,
+    )
+
+
+def massRave(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform mass fit using the RAVE for each Particle in the given ParticleList.
+    7x7 error matrix of the mother particle must be defined
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'rave',
+        'mass',
+        '',
+        False,
+        path,
+    )
+
+
+def TagV(
+    list_name,
+    MCassociation='',
+    confidenceLevel=0.001,
+    useFitAlgorithm='standard',
+    askMCInfo=False,
+    path=analysis_main
+):
+    """
+    For each Particle in the given Breco ParticleList:
+    perform the fit of tag side using the track list from the RestOfEvent dataobject
+    save the MC Btag in case of signal MC
+
+    @param list_name name of the input Breco ParticleList
+    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param MCassociation: use standard MC association or the internal one
+    @param useConstraint: choose constraint for the tag vertes fit
+    @param path      modules are added to this path
+    """
+
+    if 'Geometry' in path:
+        B2INFO('TagV: Geometry already in path')
+    else:
+        geometry = register_module('Geometry')
+        geometry.param('components', ['MagneticField'])
+        path.add_module(geometry)
+
+    tvfit = register_module('TagVertex')
+    tvfit.set_name('TagVertex_' + list_name)
+    tvfit.param('listName', list_name)
+    tvfit.param('confidenceLevel', confidenceLevel)
+    tvfit.param('MCAssociation', MCassociation)
+    tvfit.param('useFitAlgorithm', useFitAlgorithm)
+    tvfit.param('askMCInformation', askMCInfo)
+    path.add_module(tvfit)

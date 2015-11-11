@@ -7,28 +7,28 @@ import os
 import sys
 
 # The Belle II logo graphics
-logo = \
-    """
-                     eeeeeeee
-               eeeeeeeeeeeeeeeeeeee
-         eeeeeeee        eeeeeeeeeeeeeeee
-       eeeeee           eeee         eeeeee
-      eeee              eeee           eeee
-       eeee            eeee           eeee
-        eeeee          eeee          eeee
-           eeee       eeeeeeeeeeeeeeeee
-                      eeeeeeeeeeeee
+logo = """\
 
-                     eeeeeeeeeeeeee
-                     eeeeeeeeeeeeeeeeeee
-      eeee          eeee            eeeeee
-    eeee            eeee             eeeeee
-  eeee             eeee                eeee
- eeee              eeee                eeeee
-   eeee           eeee             eeeeeee
-     eeeeee       eeeeeeeeeeeeeeeeeeeee
-        eeeeeeeeeeeeeeeeeeeeeeeeee
-            eeeeeeeeeeeeeeeee
+                      eeeeeeee
+                eeeeeeeeeeeeeeeeeeee
+          eeeeeeee        eeeeeeeeeeeeeeee
+        eeeeee           eeee         eeeeee
+       eeee              eeee           eeee
+        eeee            eeee           eeee
+         eeeee          eeee          eeee
+            eeee       eeeeeeeeeeeeeeeee
+                       eeeeeeeeeeeee
+
+                      eeeeeeeeeeeeee
+                      eeeeeeeeeeeeeeeeeee
+       eeee          eeee            eeeeee
+     eeee            eeee             eeeeee
+   eeee             eeee                eeeee
+  eeee              eeee                eeeee
+    eeee           eeee             eeeeeee
+      eeeeee       eeeeeeeeeeeeeeeeeeeee
+         eeeeeeeeeeeeeeeeeeeeeeeeee
+             eeeeeeeeeeeeeeeee
 
    BBBBBBB             ll ll          2222222
    BB    BB    eeee    ll ll   eeee    22 22
@@ -40,35 +40,34 @@ logo = \
 
 """
 
-logolist = logo.splitlines()
-
 CSI = "\x1B["
 reset = CSI + 'm'
-for ii in range(len(logolist)):
-    print(CSI + '93;44m' + (logolist[ii])[:-1] + CSI + '0m')
+for line in logo.splitlines():
+    print(CSI + '93;44m' + line.ljust(48) + CSI + '0m')
 
 print('')
 print(basf2label.center(48))
 print(basf2copyright.center(48))
 print(('Version ' + basf2version).center(48))
 print('')
-print('-------------------------------------------------')
-print('BELLE2_RELEASE:      ', os.environ.get('BELLE2_RELEASE', ''))
-print('BELLE2_RELEASE_DIR:  ', os.environ.get('BELLE2_RELEASE_DIR', ''))
-print('BELLE2_LOCAL_DIR:    ', os.environ.get('BELLE2_LOCAL_DIR', ''))
-print('BELLE2_SUBDIR:       ', os.environ.get('BELLE2_SUBDIR', ''))
-print('Machine architecture:', os.environ.get('BELLE2_ARCH', ''))
-print('Kernel version:      ', os.uname()[2])
-# print 'Operating system:    ', os.uname()[3]
+print('-' * 48)
+for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION", "ARCH"]:
+    name = "BELLE2_" + var
+    print((name + ":").ljust(25), os.environ.get(name, ''))
+
+print('Kernel version:'.ljust(25), os.uname()[2])
 python_version = sys.version_info[:3]
-print('Python version:      ', '.'.join(str(ver) for ver in python_version))
+print('Python version:'.ljust(25), '.'.join(str(ver) for ver in python_version))
 try:
     from ROOT import gROOT
     gROOT.SetBatch()
     rootver = gROOT.GetVersion()
 except:
     rootver = 'PyROOT broken, cannot get version!'
-print('ROOT version:        ', rootver)
+print('ROOT version:'.ljust(25), rootver)
 print('')
-print('basf2 module directories:', ':'.join(fw.list_module_search_paths()))
-print('-------------------------------------------------')
+print('basf2 module directories:'.ljust(25))
+for dirname in fw.list_module_search_paths():
+    print(' ', dirname)
+
+print('-' * 48)

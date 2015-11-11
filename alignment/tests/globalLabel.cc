@@ -27,8 +27,11 @@ namespace Belle2 {
   /** Test fixture. */
   class GlobalLabelTest : public ::testing::Test {
   protected:
+    /// Testing vxd id
     VxdID vxdid;
+    /// Testing cdc id
     WireID cdcid;
+    /// Testng parameter id
     int paramid;
 
     /** init */

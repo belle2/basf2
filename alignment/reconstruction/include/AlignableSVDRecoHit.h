@@ -90,7 +90,6 @@ namespace Belle2 {
     void setDetectorPlane();
 
   private:
-    static std::string m_misalignmentDBObjPtrName;
 
     /** ROOT Macro.*/
     ClassDef(AlignableSVDRecoHit, 1);

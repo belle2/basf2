@@ -176,8 +176,8 @@ namespace Belle2 {
       /** Absorption in gas */
       double m_GasAbs;
       /** chip store arrays */
-      int m_dchip[10][80][336][MAXtSIZE];
-      //std::map<std::tuple<int, int, int, int>, int> m_dchip;
+      //int m_dchip[10][80][336][MAXtSIZE];
+      std::map<std::tuple<int, int, int, int>, int> m_dchip;
       std::map<std::tuple<int, int, int>, int> m_dchip_map;
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;

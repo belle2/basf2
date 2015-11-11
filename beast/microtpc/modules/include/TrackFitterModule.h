@@ -160,7 +160,7 @@ namespace Belle2 {
       /** Absorption in gas */
       double m_GasAbs;
       /** chip store arrays */
-      int dchip[10][80][336][MAXtSIZE];
+      //int dchip[10][80][336][MAXtSIZE];
       /** number of detectors. Read from MICROTPC.xml*/
       int nTPC = 0;
       /** TPC coordinate */

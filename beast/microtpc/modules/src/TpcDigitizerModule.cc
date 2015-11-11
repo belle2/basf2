@@ -76,7 +76,7 @@ void TpcDigitizerModule::initialize()
   //converter: electron number to TOT part II
   fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
-
+  /*
   for (int i = 0; i < m_nTPC; i++) {
     for (int j = 0; j < 80; j++) {
       for (int k = 0; k < 336; k++) {
@@ -87,6 +87,7 @@ void TpcDigitizerModule::initialize()
       }
     }
   }
+  */
 }
 
 void TpcDigitizerModule::beginRun()
@@ -224,9 +225,9 @@ void TpcDigitizerModule::event()
                   (0 <= bci && bci < MAXtSIZE)) {
                 PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
-                m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                ////m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
                 m_dchip_map[std::tuple<int, int, int>(detNb, col, row)] = 1;
-                //m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
               }
             }
           }
@@ -254,6 +255,7 @@ void TpcDigitizerModule::event()
   if (m_dchip_map.size() > 0) Pixelization();
   //m_dchip.clear();
   m_dchip_map.clear();
+  m_dchip.clear();
 }
 /*
 TLorentzVector TpcDigitizerModule::Drift(
@@ -357,9 +359,12 @@ void TpcDigitizerModule::Pixelization()
       const int quE = gRandom->Uniform(0, 2);
       const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
       //determined t0 ie first time above pixel threshold
-      for (int k = 0; k < MAXtSIZE; k++) {
-        //if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
-        if (m_dchip[detNb][i][j][k] > thresEl) {
+      //for (int k = 0; k < MAXtSIZE; k++) {
+      for (auto& keyValuePair2 : m_dchip) {
+        const auto& key2 = keyValuePair2.first;
+        int k = std::get<3>(key2);
+        if (m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)] > thresEl) {
+          //if (m_dchip[detNb][i][j][k] > thresEl) {
           k0 = k;
           break;
         }
@@ -370,11 +375,14 @@ void TpcDigitizerModule::Pixelization()
       if (k0 != -10) {
         int ik = 0;
         int NbOfEl = 0;
-        for (int k = k0; k < MAXtSIZE; k++) {
+        //for (int k = k0; k < MAXtSIZE; k++) {
+        for (auto& keyValuePair2 : m_dchip) {
+          const auto& key2 = keyValuePair2.first;
+          int k = std::get<3>(key2);
           //sum up charge with 16 cycles
           if (ik < 16) {
-            //NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
-            NbOfEl += m_dchip[detNb][i][j][k];
+            NbOfEl += m_dchip[std::tuple<int, int, int, int>(detNb, i, j, k)];
+            //NbOfEl += m_dchip[detNb][i][j][k];
           } else {
             //calculate ToT
             int tot = -1;
@@ -402,7 +410,7 @@ void TpcDigitizerModule::Pixelization()
         }
       }
     } //end loop on row
-    for (int k = 0; k < MAXtSIZE; k++) m_dchip[detNb][i][j][k] = 0;
+    //for (int k = 0; k < MAXtSIZE; k++) m_dchip[detNb][i][j][k] = 0;
   } // end loop on col
 
   //bool PixHit = false;

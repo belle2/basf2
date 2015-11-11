@@ -83,7 +83,7 @@ namespace Belle2 {
       /** TPC coordinate */
       std::vector<TVector3> TPCCenter;
       /** Event counter */
-      int Event = 0;
+      //int Event = 0;
 
       /** Charged density vs z vs section */
       TH1F* h_z[8];

@@ -60,6 +60,7 @@ PinDigitizerModule::PinDigitizerModule() : Module()
 
   //Default values are set here. New values can be in PINDIODE.xml.
   addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
+  addParam("WorkFunction", m_WorkFunction, "Convert eV to e [e/eV] ", 1.12);
 
 }
 
@@ -89,7 +90,7 @@ void PinDigitizerModule::event()
   StoreArray<PindiodeHit> PinHits;
   //Skip events with no PinSimHits, but continue the event counter
   if (PinSimHits.getEntries() == 0) {
-    Event++;
+    //Event++;
     return;
   }
 
@@ -122,12 +123,12 @@ void PinDigitizerModule::event()
   for (int i = 0; i < 2 * nPIN; i++) {
     if (itime[i] > 0) {
       time[i] /= itime[i];
-      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_CrematGain * 1e12;
+      volt[i] = edep[i] / m_WorkFunction * 1e6 * 1.602176565e-19 * m_CrematGain * 1e12;
       PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
     }
   }
 
-  Event++;
+  //Event++;
 
 }
 //read tube centers, impulse response, and garfield drift data filename from PINDIODE.xml

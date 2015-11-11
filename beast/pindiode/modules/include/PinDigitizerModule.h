@@ -74,7 +74,7 @@ namespace Belle2 {
       /** Work function */
       double m_WorkFunction;
       /** Event counter */
-      int Event = 0;
+      //int Event = 0;
     };
 
   }

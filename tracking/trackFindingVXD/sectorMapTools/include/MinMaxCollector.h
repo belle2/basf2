@@ -294,8 +294,10 @@ namespace Belle2 {
       string out = "MinMaxCollector with sampleSize " + to_string(m_sampleSize) +
                    " and quantileCut " + to_string(m_quantileCut) +
                    " has nSmallestValues/nBiggestValues: " + to_string(nSmallest) +
-                   "/"  + to_string(nBiggest) + "\n" + "SmallestValues: ";
+                   "/"  + to_string(nBiggest) + "\n";
 
+      if (!printFull) out += "The 5 values each describe for the valueContainer pos[0], pos[1], pos[mean], pos[max-1], pos[max]\n";
+      out += "SmallestValues: ";
       // only want to print full vector if there are not many entries in it:
       if (printFull or size() < 6) {
         for (DataType entry : m_smallestValues) { out += to_string(entry) + ", "; }

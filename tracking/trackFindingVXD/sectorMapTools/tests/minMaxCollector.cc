@@ -149,7 +149,7 @@ namespace VXDTFMinMaxCollectorTest {
   TEST_F(MinMaxCollectorTest, ComparisonWithClassicApproach)
   {
 
-    auto newCollector = MinMaxCollector<double>();
+    auto newCollector = MinMaxCollector<double>(0.03);
 
     auto vectorCollector = std::vector<double>();
     unsigned vecSize = vectorCollector.size();
@@ -210,6 +210,7 @@ namespace VXDTFMinMaxCollectorTest {
       vectorCollector.push_back(val);
     }
 
+    newCollector.print(true);
     newCollector.print();
 
     std::sort(vectorCollector.begin(), vectorCollector.end());
@@ -220,7 +221,8 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.001);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first,
+                0.001); // requested quantile is near the threshold, therefore no exact results quaranteed
     EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
 
 

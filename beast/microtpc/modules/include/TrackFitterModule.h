@@ -196,13 +196,15 @@ namespace Belle2 {
       /** Fit paramteter errors */
       float m_parFit_err[5];
       /** Covariant errors */
-      float m_cov[5][5];
+      //float m_cov[5][5];
+      float m_cov[25];
       /** Impact parameter x */
       float m_impact_x[4];
       /** Impact parameter y */
       float m_impact_y[4];
       /** Which side was/were hit 1 */
-      int m_side[4][4];
+      //int m_side[4][4];
+      int m_side[16];
       //int m_side1[4];
       /** Which side was/were hit 2 */
       //int m_side2[4];

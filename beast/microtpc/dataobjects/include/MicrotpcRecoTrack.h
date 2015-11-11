@@ -35,16 +35,18 @@ namespace Belle2 {
      * @param energyDep Deposited energy in electrons
      */
     MicrotpcRecoTrack(int detNb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
-                      const float parFit[5], const float parFit_err[5], const float cov[5][5], const float impact_x[4], const float impact_y[4],
-                      const int side[4][4]): m_detNb(detNb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
+                      const float parFit[5], const float parFit_err[5], const float cov[25], const float impact_x[4], const float impact_y[4],
+                      const int side[16]): m_detNb(detNb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
       m_time_range(time_range)
     {
       std::copy(parFit, parFit + 5, m_parFit);
       std::copy(parFit_err, parFit_err + 5, m_parFit_err);
-      std::copy(&cov[0][0], &cov[0][0] + 5 * 5, &m_cov[0][0]);
+      //std::copy(&cov[0][0], &cov[0][0] + 5 * 5, &m_cov[0][0]);
+      std::copy(cov, cov + 25, m_cov);
       std::copy(impact_x, impact_x + 4, m_impact_x);
       std::copy(impact_y, impact_y + 4, m_impact_y);
-      std::copy(&side[0][0], &side[0][0] + 4 * 4, &m_side[0][0]);
+      //std::copy(&side[0][0], &side[0][0] + 4 * 4, &m_side[0][0]);
+      std::copy(side, side + 16, m_side);
     }
     /** Return detector number */
     int getdetNb() const { return m_detNb; }
@@ -60,7 +62,8 @@ namespace Belle2 {
     /** Return the fit parameter errors */
     const float* getparFit_err() const { return m_parFit_err; }
     /** Return covariant */
-    const float* getcov() const { return m_cov[5];}
+    //const float* getcov() const { return m_cov[5];}
+    const float* getcov() const { return m_cov;}
     /** Return total ionization energy */
     float getesum() const { return m_esum; }
     /** Return track length */
@@ -76,7 +79,8 @@ namespace Belle2 {
     const float* getimpact_y() const { return m_impact_y; }
     /** Return which side was/were hit */
     //void getside(int ** side) const { m_side = side; return m_side; }
-    const int* getside() const { return m_side[4]; }
+    //const int* getside() const { return m_side[4]; }
+    const int* getside() const { return m_side; }
 
   private:
     /** detector number */
@@ -100,13 +104,14 @@ namespace Belle2 {
     /** Fit paramteter errors */
     float m_parFit_err[5];
     /** Covariant errors */
-    float m_cov[5][5];
+    float m_cov[25];
     /** Impact parameter x */
     float m_impact_x[4];
     /** Impact parameter y */
     float m_impact_y[4];
     /** Which side was/were hit */
-    int m_side[4][4];
+    //int m_side[4][4];
+    int m_side[16];
 
     ClassDef(MicrotpcRecoTrack, 1)
   };

@@ -168,7 +168,7 @@ void TrackFitterModule::event()
 
       Track = new TGraph2DErrors();
 
-      for (int j = 0; j < 4; j++)for (int k = 0; k < 4; k++)m_side[j][k] = 0;
+      for (int j = 0; j < 16; j++) m_side[j] = 0;
       /*
       for (int k = 0; k < 4; k++)  {
       m_side1[k] = 0;
@@ -249,10 +249,10 @@ void TrackFitterModule::event()
           Track->SetPointError(i_tpc[i], 0, 0, 1.);
 
           for (int k = 0; k < 4; k++) {
-            if (0 <= col && col <= k)m_side[k][0] = k + 1;
-            if (80 - k <= col && col <= 80)m_side[k][1] = k + 1;
-            if (0 <= row && row <= 5 * k)m_side[k][2] = k + 1;
-            if (336 - 5 * k <= row && row <= 336)m_side[k][3] = k + 1;
+            if (0 <= col && col <= k)m_side[4 * k + 0] = k + 1;
+            if (80 - k <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+            if (0 <= row && row <= 5 * k)m_side[4 * k + 2] = k + 1;
+            if (336 - 5 * k <= row && row <= 336)m_side[4 * k + 3] = k + 1;
           }
 
           /*
@@ -371,8 +371,10 @@ void TrackFitterModule::event()
           m_parFit[j] = min->GetParameter(j);
           m_parFit_err[i] = min->GetParError(j);
           for (int k = 0; k < 5; k++) {
-            m_cov[j][k] = 0;
-            m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
+            //m_cov[j][k] = 0;
+            //m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
+            m_cov[j * 5 + k] = 0;
+            m_cov[j * 5 + k] = min->GetCovarianceMatrixElement(j, k);
           }
         }
 

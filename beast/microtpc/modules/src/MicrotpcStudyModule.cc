@@ -359,11 +359,14 @@ void MicrotpcStudyModule::event()
     float trl = aTrack->gettrl();
     float esum = aTrack->getesum();
     //int time_range = aTrack->gettime_range();
-    int side[4][4];
-    side[0][3] = {aTrack->getside()[0]};
-    side[1][3] = {aTrack->getside()[1]};
-    side[2][3] = {aTrack->getside()[2]};
-    side[3][3] = {aTrack->getside()[3]};
+    int side[16];
+    for (int j = 0; j < 16; j++) {
+      side[j] = aTrack->getside()[j];
+    }
+    //side[0][3] = {aTrack->getside()[0]};
+    //side[1][3] = {aTrack->getside()[1]};
+    //side[2][3] = {aTrack->getside()[2]};
+    //side[3][3] = {aTrack->getside()[3]};
     //side[4][4] = {aTrack->getside()[4]};
 
     h_evtrl[detNb]->Fill(esum, trl);
@@ -398,7 +401,7 @@ void MicrotpcStudyModule::event()
       h_evtrl_He[detNb]->Fill(esum, trl);
       h_tvp_He[detNb]->Fill(theta, phi);
       h_wtvp_He[detNb]->Fill(theta, phi, esum);
-      if (side[0][0] == 1 && side[0][1] == 1 && side[0][2] == 2 && side[0][3] == 3) {
+      if (side[0] == 1 && side[1] == 1 && side[2] == 2 && side[3] == 3) {
         h_evtrl_He_pure[detNb]->Fill(esum, trl);
         h_tvp_He_pure[detNb]->Fill(theta, phi);
         h_wtvp_He_pure[detNb]->Fill(theta, phi, esum);

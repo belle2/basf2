@@ -28,7 +28,7 @@ def add_output(path, bgType, realTime, sampleType, fileName='output.root'):
             'ECLHits',
             'BKLMSimHits',
             'EKLMSimHits',
-            ]
+        ]
     elif sampleType == 'ECL':
         madeFor = 'ECL'
         branches = ['ECLHits']

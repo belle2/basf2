@@ -34,7 +34,7 @@ class BGHistogrammer(Module):
         'ECLHits',
         'BKLMSimHits',
         'EKLMSimHits',
-        ]
+    ]
     #: length of simHits list
     n = len(simHits)
 

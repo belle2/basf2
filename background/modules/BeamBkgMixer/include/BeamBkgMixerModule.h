@@ -242,6 +242,13 @@ namespace Belle2 {
                       double realTime,
                       BackgroundMetaData::EFileType fileTyp);
 
+    /**
+     * Checks for deposited energy of ECLHits and returns true if Edep < m_maxEdepECL
+     * @param cloneArrayECL pointer to TClonesArray of ECLHits
+     * @return true if all ECLHits have deposited energy below m_maxEdepECL
+     */
+    bool acceptEvent(TClonesArray* cloneArrayECL);
+
 
     std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
     std::vector<std::tuple<std::string, double> > m_scaleFactors; /**< scale factors */
@@ -253,6 +260,7 @@ namespace Belle2 {
     double m_maxTimeECL;  /**< maximal time shift of background event for ECL */
     double m_minTimePXD;  /**< minimal time shift of background event for PXD */
     double m_maxTimePXD;  /**< maximal time shift of background event for PXD */
+    double m_maxEdepECL;  /**< maximal allowed deposited energy in ECL */
 
     std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
 

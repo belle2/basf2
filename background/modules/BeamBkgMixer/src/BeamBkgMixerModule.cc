@@ -98,6 +98,11 @@ namespace Belle2 {
     addParam("beambackhits", m_BeamBackHits,
              "If true also add the BeamBackHits collection for the selected "
              "subdetectors to the output file", false);
+
+    addParam("maxEdepECL", m_maxEdepECL,
+             "maximal deposited energy of ECLHit to accept BG event for mixing"
+             "(0 means accept all events)", 0.0);
+
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -346,16 +351,22 @@ namespace Belle2 {
         double timeShift = gRandom->Rndm() * (m_maxTime - m_minTime) + m_minTime;
         bkg.tree->GetEntry(bkg.eventCount);
 
-        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, m_minTime, m_maxTime);
-        addSimHits(svdSimHits, bkg.simHits.SVD, timeShift, m_minTime, m_maxTime);
-        addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift, m_minTime, m_maxTime);
-        addSimHits(topSimHits, bkg.simHits.TOP, timeShift, m_minTime, m_maxTime);
-        addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift, m_minTime, m_maxTime);
-        addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
-        addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
-        addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
-        addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift,
-                        m_minTime, m_maxTime);
+        if (acceptEvent(bkg.simHits.ECL)) {
+          addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, m_minTime, m_maxTime);
+          addSimHits(svdSimHits, bkg.simHits.SVD, timeShift, m_minTime, m_maxTime);
+          addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift, m_minTime, m_maxTime);
+          addSimHits(topSimHits, bkg.simHits.TOP, timeShift, m_minTime, m_maxTime);
+          addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift, m_minTime, m_maxTime);
+          addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
+          addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
+          addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
+          addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift,
+                          m_minTime, m_maxTime);
+        } else {
+          iev--;
+          B2INFO("BeamBkgMixer: event " << bkg.eventCount <<
+                 " of " << bkg.type << " rejected due to large energy deposit in ECL");
+        }
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
@@ -378,14 +389,20 @@ namespace Belle2 {
         if (timeShift > m_minTime and timeShift < m_maxTime) continue;
         bkg.tree->GetEntry(bkg.eventCount);
 
-        double minTime = m_minTimeECL;
-        double maxTime = m_maxTimeECL;
-        if (timeShift <= m_minTime) {
-          maxTime = m_minTime;
+        if (acceptEvent(bkg.simHits.ECL)) {
+          double minTime = m_minTimeECL;
+          double maxTime = m_maxTimeECL;
+          if (timeShift <= m_minTime) {
+            maxTime = m_minTime;
+          } else {
+            minTime = m_maxTime;
+          }
+          addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
         } else {
-          minTime = m_maxTime;
+          iev--;
+          B2INFO("BeamBkgMixer: event " << bkg.eventCount <<
+                 " of " << bkg.type << " rejected due to large energy deposit in ECL");
         }
-        addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
@@ -476,6 +493,19 @@ namespace Belle2 {
     m_backgrounds.push_back(BkgFiles(tag, ftype, fileName, realTime, fileType));
   }
 
+
+  bool BeamBkgMixerModule::acceptEvent(TClonesArray* cloneArrayECL)
+  {
+    if (!cloneArrayECL) return true;
+    if (m_maxEdepECL == 0) return true;
+
+    int numEntries = cloneArrayECL->GetEntriesFast();
+    for (int i = 0; i < numEntries; i++) {
+      ECLHit* simHit = static_cast<ECLHit*>(cloneArrayECL->AddrAt(i));
+      if (simHit->getEnergyDep() > m_maxEdepECL) return false;
+    }
+    return true;
+  }
 
 
 } // end Belle2 namespace

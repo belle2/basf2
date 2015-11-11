@@ -283,6 +283,24 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr modulo(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        int divideBy = 1;
+        try {
+          divideBy = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of modulo  meta function must be integer!");
+          return nullptr;
+        }
+        auto func = [var, divideBy](const Particle * particle) -> double { return int(var->function(particle)) % divideBy; };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function modulo");
+      }
+    }
+
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -538,6 +556,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
                       "The result of second call to this variable on the same particle will be provided from the cache.");
+    REGISTER_VARIABLE("modulo(variable, n)", modulo,
+                      "Returns rest of division of variable by n.");
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");

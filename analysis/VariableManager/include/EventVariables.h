@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   class Particle;
 
@@ -94,6 +96,12 @@ namespace Belle2 {
      * return z coordinate of the IP
      */
     double getIPZ(const Particle*);
+
+    /**
+     * return (i,j) element of the IP covariance matrix.
+     */
+    double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
+
   }
 } // Belle2 namespace
 

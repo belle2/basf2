@@ -38,6 +38,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughterSumOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the remainder after division of value of variable by n
+     * First argument in the argument vector must be the name of variable and the second argument is n
+     */
+    Manager::FunctionPtr modulo(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the absolute value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

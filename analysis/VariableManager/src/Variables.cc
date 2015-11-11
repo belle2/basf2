@@ -98,10 +98,14 @@ namespace Belle2 {
       int elementI = int(std::lround(element[0]));
       int elementJ = int(std::lround(element[1]));
 
-      if (elementI < 0 || elementI > 6)
+      if (elementI < 0 || elementI > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: i = " << elementI);
-      if (elementJ < 0 || elementJ > 6)
+        return 0;
+      }
+      if (elementJ < 0 || elementJ > 6) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: j = " << elementJ);
+        return 0;
+      }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
     }

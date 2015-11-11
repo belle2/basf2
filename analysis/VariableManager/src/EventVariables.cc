@@ -134,7 +134,7 @@ namespace Belle2 {
     double getCMSEnergy(const Particle*)
     {
       PCmsLabTransform T;
-      return T.getBeamParams().getEnergy();
+      return T.getBeamParams().getMass();
     }
 
     double getIPX(const Particle*)
@@ -154,6 +154,26 @@ namespace Belle2 {
       PCmsLabTransform T;
       return T.getBeamParams().getVertex().Z();
     }
+
+
+    double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
+    {
+      int elementI = int(std::lround(element[0]));
+      int elementJ = int(std::lround(element[1]));
+
+      if (elementI < 0 || elementI > 3) {
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
+        return 0;
+      }
+      if (elementJ < 0 || elementJ > 3) {
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
+        return 0;
+      }
+
+      PCmsLabTransform T;
+      return T.getBeamParams().getCovVertex()(elementI, elementJ);
+    }
+
 
     VARIABLE_GROUP("Event");
 
@@ -184,5 +204,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
+
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
   }
 }

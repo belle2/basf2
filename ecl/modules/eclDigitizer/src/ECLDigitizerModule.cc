@@ -11,6 +11,7 @@
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
+#include <ecl/digitization/EclConfiguration.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
@@ -140,6 +141,9 @@ void ECLDigitizerModule::initialize()
   readDSPDB();
 
   m_adc.resize(m_nch);
+
+  EclConfiguration::get().setBackground(m_background);
+
 }
 
 void ECLDigitizerModule::beginRun()

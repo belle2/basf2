@@ -16,7 +16,9 @@
 #include <TRandom3.h>
 #include <TMatrixFSym.h>
 
+
 namespace Belle2 {
+  class ECLCluster;
   namespace ECL {
     class ECLReconstructorModule : public Module {
 
@@ -101,6 +103,26 @@ namespace Belle2 {
       // m_ranges -- theta ranges for the correction
       // m_ecorr  -- correction polynomial coefficients storage
       std::vector<double> m_ranges, m_ecorr;
+
+      //Temp fix to correct energy bias
+      //to be removed ASAP with a proper calibration
+
+      class TmpClusterCorrection {
+      public:
+        void init(const std::string& filename);
+        void scale(Belle2::ECLCluster& c) const;
+        ~TmpClusterCorrection()
+        { delete[] m_tmpCorrection; }
+      private:
+        const unsigned int m_nbinsTheta = 2;
+        const double m_maxThetaFwd = 0.5757;
+        double m_deltaE;
+        unsigned int m_nbinsE;
+        double* m_tmpCorrection;
+      };
+
+      TmpClusterCorrection m_tmpClusterCorrection;
+
     };
   }//ECL
 }//Belle2

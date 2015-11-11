@@ -19,6 +19,7 @@
 #include <ecl/rec_lib/TRecEclCFParameters.h>
 #include <ecl/rec_lib/TEclCFShower.h>
 #include <ecl/rec_lib/TRecEclCF.h>
+#include <ecl/digitization/EclConfiguration.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -31,6 +32,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <boost/foreach.hpp>
 #include <G4ParticleTable.hh>
@@ -88,6 +90,12 @@ void ECLReconstructorModule::initialize()
   eclClusters.registerRelationTo(eclShowers);
 
   ReadCorrection(); // read correction accounting shower leakage to get unbiased photon energy
+
+  if (EclConfiguration::get().background()) {
+    string dataFileName = FileSystem::findFile("/data/ecl/tmpClusterCorrection.txt");
+    assert(! dataFileName.empty());
+    m_tmpClusterCorrection.init(dataFileName);
+  }
 }
 
 void ECLReconstructorModule::ReadCorrection()
@@ -262,6 +270,11 @@ void ECLReconstructorModule::event()
         eclCluster->setEnedepSum(shower.second.UncEnergy());
         eclCluster->setNofCrystals(shower.second.NHits());
         eclCluster->setHighestE(HiEnergyinShower);
+
+        // Ad hoc Temp correction to reduce energy bias
+        // to be replaced ASAP with a proper calibration
+
+        if (EclConfiguration::get().background())  m_tmpClusterCorrection.scale(*eclCluster);
 
         eclCluster->addRelationTo(eclRecShower);
         //..... ECLCluster is completed here......
@@ -522,5 +535,35 @@ void ECLReconstructorModule::readErrorMatrix7x7(double energy, double theta,
   }
 
 }
+
+void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
+{
+  // header keeps the values of 4 parameters in any order
+  string param;
+  ifstream file(filename);
+  unsigned int i;
+  for (i = 0; i < 4; ++i) {
+    file >> param;
+    if (param == "deltaE") file >> m_deltaE;
+    if (param == "nbinsE") file >> m_nbinsE;
+  }
+  m_tmpCorrection = new double[ m_nbinsE * m_nbinsTheta];
+  unsigned int indexE, indexTheta;
+  for (i = 0; i < m_nbinsE * m_nbinsTheta; ++i)
+    file >> indexE >> indexTheta >> m_tmpCorrection[ indexE * m_nbinsTheta + indexTheta];
+  file.close();
+}
+
+void ECLReconstructorModule::TmpClusterCorrection::scale(ECLCluster& c) const
+{
+  double energy = c.getEnergy();
+  if (energy > 0) {
+    unsigned int iE = static_cast<unsigned int>(energy / m_deltaE);
+    if (iE >= m_nbinsE) iE = m_nbinsE - 1; // last bin used for also for overflows
+    unsigned int itheta = c.getTheta() > m_maxThetaFwd ? 1 : 0;
+    c.setEnergy(energy * m_tmpCorrection[ iE * m_nbinsTheta +  itheta]);
+  }
+}
+
 
 

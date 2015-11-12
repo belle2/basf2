@@ -4,7 +4,7 @@ env['SUBLIB'] = True
 
 env['LIBS'] = [
     'framework', 'geometry', 'simulation', '$ROOT_LIBS', 'mdst_dataobjects',
-    'simulation_dataobjects', 'beast_claws_dataobjects'
+    		  'beast_claws_dataobjects'
 ]
 
 Return('env')

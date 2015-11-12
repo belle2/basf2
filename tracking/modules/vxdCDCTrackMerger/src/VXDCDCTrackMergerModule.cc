@@ -208,15 +208,7 @@ void VXDCDCTrackMergerModule::event()
 
   }//loop on CDC
 
-  auto VXDTrackCandToTrack = RelationArray(m_VXDGFTrackCands, m_VXDGFTracks);
-  auto CDCTrackCandToTrack = RelationArray(m_CDCGFTrackCands, m_CDCGFTracks);
-
-  if (m_VXDGFTrackCands.isValid() &&
-      VXDTrackCandToTrack.isValid() &&
-      m_CDCGFTrackCands.isValid() &&
-      CDCTrackCandToTrack.isValid()
-     )
-    collectMergedTrackCands();
+  collectMergedTrackCands();
 
 }
 

@@ -329,7 +329,7 @@ HitPatternVXD TrackBuilderModule::getHitPatternVXD(const genfit::Track& track)
     aHitPatternVXD.setSVDLayer(l, SVD_uHits[l], SVD_vHits[l]);
 
   if (nNotFittedVXDhits > 0) {
-    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with VXD hits, not filling the HitPatternVXD");
+    B2DEBUG(100, " No KalmanFitterInfo associated to some TrackPoints with VXD hits, not filling the HitPatternVXD");
     B2DEBUG(100, nNotFittedVXDhits << " had no FitterInfo");
   }
   return aHitPatternVXD;
@@ -380,7 +380,7 @@ HitPatternCDC TrackBuilderModule::getHitPatternCDC(const genfit::Track& track)
 
   }
   if (nNotFittedCDChits > 0) {
-    B2WARNING(" No KalmanFitterInfo associated to some TrackPoints with CDC hits, not filling the HitPatternCDC");
+    B2DEBUG(100, " No KalmanFitterInfo associated to some TrackPoints with CDC hits, not filling the HitPatternCDC");
     B2DEBUG(100, nNotFittedCDChits << " out of " << nCDChits << " had no FitterInfo");
   }
   aHitPatternCDC.setNHits(nCDChits);

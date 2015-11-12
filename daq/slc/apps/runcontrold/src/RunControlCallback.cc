@@ -266,7 +266,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       if (!m_restarting) {
         if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
-          LogFile::info("Run automatically stopped due to eceeding run length");
+          LogFile::info("Run automatically stopped due to exceeding run length");
           stop();
           m_restarting = true;
         }

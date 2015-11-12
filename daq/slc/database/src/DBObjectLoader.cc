@@ -348,13 +348,6 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
       if (max > 0) ss << " limit " << max;
       ss << ";";
       db.execute(ss.str());
-      /*
-      db.execute("select name from %s where name = REPLACE(path, '.', '') "
-                 "and (name like '_%s%s_%s' or name like '_%s%s' or "
-                 "name like '%s_%s' or name = '%s') order by id desc %s;",
-                 tablename.c_str(), "%%", prefix, "%%", "%%", prefix, prefix, "%%",
-      prefix, (max>0?"");
-      */
     } else {
       db.execute("select name from %s where name = REPLACE(path, '.', '') "
                  "order by id desc;", tablename.c_str());

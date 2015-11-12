@@ -3,12 +3,14 @@
 
 #include <daq/slc/nsm/NSMVHandler.h>
 
-#define FEE_HANDLER_INT(_FEEHDR_)           \
-  class _FEEHDR_ : public FEEHandler {            \
+
+#define FEE_HANDLER_INT(_FEEHDR_)         \
+  class _FEEHDR_ : public FEEHandler {          \
   public:                 \
-    _FEEHDR_(const std::string& name, RCCallback& callback,     \
-             HSLB& hslb, FEE& fee, int adr)         \
-      : FEEHandler(name, callback, hslb, fee, adr) {}       \
+    _FEEHDR_(const std::string& name,          \
+             RCCallback& callback,           \
+             HSLB& hslb, FEE& fee, int adr, int bitmax = -1, int bitmin = 0) \
+      : FEEHandler(name, callback, hslb, fee, adr, bitmax, bitmin) {}   \
     virtual ~_FEEHDR_() throw() {}            \
     virtual bool feeget(int& val);        \
     virtual bool feeset(int val);         \
@@ -23,9 +25,10 @@
     class FEEHandler : public NSMVHandlerInt {
     public:
       FEEHandler(const std::string& name, RCCallback& callback,
-                 HSLB& hslb, FEE& fee, int adr)
+                 HSLB& hslb, FEE& fee, int adr, int bitmax, int bitmin)
         : NSMVHandlerInt(name, true, true),
-          m_callback(callback), m_hslb(hslb), m_fee(fee), m_adr(adr) {}
+          m_callback(callback), m_hslb(hslb), m_fee(fee),
+          m_adr(adr), m_bitmax(bitmax), m_bitmin(bitmin) {}
       virtual ~FEEHandler() throw() {}
     public:
       virtual bool handleGetInt(int& val) { return feeget(val); }
@@ -38,6 +41,11 @@
       HSLB& m_hslb;
       FEE& m_fee;
       int m_adr;
+      int m_bitmax;
+      int m_bitmin;
+    public:
+      static unsigned int bitmask(unsigned int max, unsigned int min);
+
     };
 
     FEE_HANDLER_INT(FEE8Handler);

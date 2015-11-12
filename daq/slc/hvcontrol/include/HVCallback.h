@@ -80,7 +80,7 @@ namespace Belle2 {
     Mutex m_mutex;
     std::string m_confignames;
 
-  private:
+  protected:
     HVState m_state_demand;
     HVConfigList m_config;
 

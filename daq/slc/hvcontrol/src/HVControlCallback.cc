@@ -136,8 +136,6 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
   const HVConfig& config(*iconfig);
   const HVCrateList& crate_v(config.getCrates());
   int i = 0;
-  //for (HVCrateList::const_iterator icrate = crate_v.begin();
-  //     icrate != crate_v.end(); icrate++) {
   if (!g_init || g_icrate == crate_v.end()) {
     g_icrate = crate_v.begin();
     g_init = true;
@@ -145,6 +143,7 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
   const HVCrate& crate(*g_icrate);
   const HVChannelList& channel_v(crate.getChannels());
   int crateid = crate.getId();
+  bool istable = true;
   for (HVChannelList::const_iterator ichannel = channel_v.begin();
        ichannel != channel_v.end(); ichannel++) {
     const HVChannel& channel(*ichannel);
@@ -155,11 +154,10 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
     float vmon = getVoltageMonitor(crateid, slot, ch);
     float cmon = getCurrentMonitor(crateid, slot, ch);
     std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d].", crateid, slot, ch);
-    /*
-    set(vname + "state", state_s);
-    set(vname + "vmon", vmon);
-    set(vname + "cmon", cmon);
-    */
+    if ((m_state_demand == HVState::OFF_S && state != HVMessage::OFF) ||
+        (m_state_demand != HVState::OFF_S && state != HVMessage::ON)) {
+      istable = false;
+    }
     if (m_mon_tmp[crateid][i].state != state) {
       set(vname + "state", state_s);
       m_mon_tmp[crateid][i].state = state;
@@ -173,6 +171,10 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
       m_mon_tmp[crateid][i].cmon = cmon;
     }
     i++;
+  }
+  if (m_state_demand != getNode().getState()) {
+    getNode().setState(m_state_demand);
+    reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
   }
   g_icrate++;
 }

@@ -26,7 +26,8 @@ void NSMNodeDaemon::add(NSMCallback* callback,
       com->setCallback(callback);
       callback->init(*com);
       callback->alloc_open(*com);
-      if (m_timeout == 0) m_timeout = callback->getTimeout();
+      //if (m_timeout == 0)
+      m_timeout = callback->getTimeout();
       m_callback.push_back(callback);
     }
   } catch (const std::exception& e) {

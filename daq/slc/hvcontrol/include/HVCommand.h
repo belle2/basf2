@@ -33,6 +33,7 @@ namespace Belle2 {
 
   public:
     HVState nextState() const throw();
+    HVState nextTState(const HVState& state) const throw();
 
   public:
     const HVCommand& operator=(const std::string& label) throw();

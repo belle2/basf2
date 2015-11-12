@@ -36,9 +36,11 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
     HVCommand cmd(msg.getRequestName());
     if (cmd == HVCommand::UNKNOWN) return false;
     HVState state(getNode().getState());
+    HVState tstate(cmd.nextTState(state));
     addNode(NSMNode(msg.getNodeName()));
     if (cmd == HVCommand::TURNOFF) {
-      getNode().setState(HVState::TRANSITION_TS);
+      m_state_demand = HVState::OFF_S;
+      getNode().setState(tstate);
       turnoff();
     } else if (state.isOff()) {
       if (cmd == HVCommand::CONFIGURE) {
@@ -53,29 +55,23 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         addAll(getConfig());
         configure(getConfig());
       } else if (cmd == HVCommand::TURNON) {
-        getNode().setState(HVState::TRANSITION_TS);
+        getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
         turnon();
       }
     } else if (state.isOn()) {
-      if (cmd == HVCommand::STANDBY) {
-        //if (state != HVState::STANDBY_S) {
-        getNode().setState(HVState::TRANSITION_TS);
+      if (cmd == HVCommand::STANDBY && state != HVState::STANDBY_S) {
+        getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
         standby();
-        //}
-      } else if (cmd == HVCommand::SHOULDER) {
-        //if (state != HVState::SHOULDER_S) {
-        getNode().setState(HVState::TRANSITION_TS);
+      } else if (cmd == HVCommand::SHOULDER && state != HVState::SHOULDER_S) {
+        getNode().setState(tstate);
         m_state_demand = HVState::SHOULDER_S;
         shoulder();
-        //}
-      } else if (cmd == HVCommand::PEAK) {
-        //if (state != HVState::PEAK_S) {
+      } else if (cmd == HVCommand::PEAK && state != HVState::PEAK_S) {
         getNode().setState(HVState::TRANSITION_TS);
         m_state_demand = HVState::PEAK_S;
         peak();
-        //}
       }
     }
   } catch (const HVHandlerException& e) {

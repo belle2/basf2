@@ -419,15 +419,17 @@ textarea {
 
 .object_wrap
 {
+/*  disabled this features, because hidden plots will still
+    be visible by the bottom line anyways
     border-bottom:1px solid gray;
     border-bottom:1px solid gray!important;
+    margin-bottom:25px;
+    padding-bottom:15px;*/
     display: none;
     width: 100%;
     -webkit-flex-wrap: wrap;
     flex-wrap:wrap;
     justify-content:space-between;
-    margin-bottom:25px;
-    padding-bottom:15px;
 }
 .show
 {

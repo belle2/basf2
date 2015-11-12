@@ -935,10 +935,9 @@ def get_style(index, overallItemCount):
               ROOT.kCyan + 2,
               ROOT.kBlue + 1,
               ROOT.kRed + 2,
-              ROOT.kMagenta - 10,
+              ROOT.kOrange + 3,
               ROOT.kYellow + 2,
-              ROOT.kViolet
-              ]
+              ROOT.kYellow + 4]
 
     # Define the linestyles for the plot
     linestyles = {'dashed': 2,    # Dashed: - - - - -

@@ -572,7 +572,7 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
     # Now create the ROOT objects for the plot and the reference objects,
     # and get the lists of keys and packages
     plot_objects, plot_keys, plot_packages = create_RootObjects_from_list(list_of_plot_files, False)
-    reference_objects,  reference_keys,  reference_packages = create_RootObjects_from_list(list_of_reference_files, True)
+    reference_objects, reference_keys, reference_packages = create_RootObjects_from_list(list_of_reference_files, True)
 
     # Get the joint lists (and remove duplicates if applicable)
     list_of_root_objects = plot_objects + reference_objects
@@ -933,7 +933,11 @@ def get_style(index, overallItemCount):
               ROOT.kGreen + 1,
               ROOT.kCyan + 2,
               ROOT.kBlue + 1,
-              ROOT.kRed + 2]
+              ROOT.kRed + 2,
+              ROOT.kMagenta - 10,
+              ROOT.kYellow + 2,
+              ROOT.kViolet
+              ]
 
     # Define the linestyles for the plot
     linestyles = {'dashed': 2,    # Dashed: - - - - -

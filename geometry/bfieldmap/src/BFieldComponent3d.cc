@@ -29,18 +29,6 @@ using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
 
-BFieldComponent3d::BFieldComponent3d() : m_mapFilename(""), m_mapEnable("rphiz"), m_interpolate(true), m_mirrorPhi(true)
-{
-
-}
-
-
-BFieldComponent3d::~BFieldComponent3d()
-{
-
-}
-
-
 void BFieldComponent3d::initialize()
 {
 

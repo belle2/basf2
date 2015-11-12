@@ -59,10 +59,10 @@ namespace Belle2 {
     };
 
     /** The BFieldComponentQuad constructor. */
-    BFieldComponentQuad();
+    BFieldComponentQuad() = default;
 
     /** The BFieldComponentQuad destructor. */
-    virtual ~BFieldComponentQuad();
+    virtual ~BFieldComponentQuad() = default;
 
     /**
      * Initializes the magnetic field component.
@@ -128,26 +128,38 @@ namespace Belle2 {
      */
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 
-  protected:
-
   private:
+    /** Magnetic field map of HER   */
+    std::string m_mapFilenameHER{""};
+    /** Magnetic field map of LER   */
+    std::string m_mapFilenameLER{""};
+    /** The filename of the magnetic field map */
+    std::string m_mapFilenameHERleak{""};
+    /** Filename of the aperture for HER */
+    std::string m_apertFilenameHER{""};
+    /** The filename of the aperture for LER */
+    std::string m_apertFilenameLER{""};
+    /** The size of the map for HER */
+    int m_mapSizeHER{0};
+    /** The size of the map for LER */
+    int m_mapSizeLER{0};
+    /** The size of the map */
+    int m_mapSizeHERleak{0};
+    /** The size of the aperture for HER */
+    int m_apertSizeHER{0};
+    /** The size of the aperture for LER */
+    int m_apertSizeLER{0};
 
-    std::string m_mapFilenameHER;        /**< Magnetic field map of HER   */
-    std::string m_mapFilenameLER;        /**< Magnetic field map of LER   */
-    std::string m_mapFilenameHERleak;    /**< The filename of the magnetic field map */
-    std::string m_apertFilenameHER;      /**< Filename of the aperture for HER */
-    std::string m_apertFilenameLER;      /**< The filename of the aperture for LER */
-    int m_mapSizeHER;                    /**< The size of the map for HER */
-    int m_mapSizeLER;                    /**< The size of the map for LER */
-    int m_mapSizeHERleak;                /**< The size of the map         */
-    int m_apertSizeHER;                  /**< The size of the aperture for HER */
-    int m_apertSizeLER;                  /**< The size of the aperture for LER */
-
-    ParamPoint* m_mapBufferHER;          /**< The map buffer for HER  */
-    ParamPoint* m_mapBufferLER;          /**< The map buffer for LER  */
-    ParamPoint* m_mapBufferHERleak;      /**< The memory buffer for the field parameters. */
-    ApertPoint* m_apertBufferHER; /**< The memory buffer for the aperture parameters (HER). */
-    ApertPoint* m_apertBufferLER; /**< The memory buffer for the aperture parameters (LER). */
+    /** The map buffer for HER  */
+    ParamPoint* m_mapBufferHER{nullptr};
+    /** The map buffer for LER  */
+    ParamPoint* m_mapBufferLER{nullptr};
+    /** The memory buffer for the field parameters. */
+    ParamPoint* m_mapBufferHERleak{nullptr};
+    /** The memory buffer for the aperture parameters (HER). */
+    ApertPoint* m_apertBufferHER{nullptr};
+    /** The memory buffer for the aperture parameters (LER). */
+    ApertPoint* m_apertBufferLER{nullptr};
   };
 
 } //end of namespace Belle2

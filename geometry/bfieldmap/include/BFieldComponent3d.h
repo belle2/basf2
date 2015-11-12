@@ -35,10 +35,11 @@ namespace Belle2 {
 
   public:
 
-    BFieldComponent3d();
+    /** The BFieldComponent3d constructor. */
+    BFieldComponent3d() = default;
 
     /** The BFieldComponent3d destructor. */
-    virtual ~BFieldComponent3d();
+    virtual ~BFieldComponent3d() = default;
 
     /**
      * Initializes the magnetic field component.
@@ -149,22 +150,36 @@ namespace Belle2 {
     double interpolate(int& ir, int& iphi, int& iz, double& r, double& phi, double& z,
                        const std::vector< std::vector< std::vector<double> > >& bmap) const;
 
-    std::string m_mapFilename; /**< The filename of the magnetic field map. */
-    std::vector< std::vector< std::vector<double> > > m_mapBuffer[3]; /**< The memory buffer for the magnetic field map. */
-    std::string m_mapEnable;   /**< Enable different dimension, \"rphiz\", \"rphi\", \"phiz\" or \"rz\" > */
-    bool m_interpolate;        /**< Flag to switch on/off interpolation > */
-    int m_mapSize[3];          /**< The size of the map in r, phi and z. */
-    double m_mapRegionZ[2];    /**< The min and max boundaries of the map region in z. */
-    double m_mapOffset;        /**< Offset required because the accelerator group defines the Belle center as zero. */
-    double m_mapRegionR[2];    /**< The min and max boundaries of the map region in r. */
-    double m_gridPitch[3];     /**< The grid pitch in r,phi,z. */
-    double m_exRegionZ[2];     /**< The min and max boundaries of the excluded region in z. */
-    double m_exRegionR[2];     /**< The min and max boundaries of the excluded region in r. */
-    bool m_exRegion;           /**< Flag to indicate whether there is a region to exclude. > */
-    bool m_mirrorPhi;          /**< Flag to indicate whether there is a region to exclude. > */
-    double m_errRegionR[2];    /**< The min and max boundaries of the region in r to apply error. */
-    double m_errB[3];          /**< The error Br, Bphi, Bz as a scale factor (B_new = m_errB * B_old). */
-
+    /** The filename of the magnetic field map. */
+    std::string m_mapFilename{""};
+    /** The memory buffer for the magnetic field map. */
+    std::vector< std::vector< std::vector<double> > > m_mapBuffer[3];
+    /** Enable different dimension, \"rphiz\", \"rphi\", \"phiz\" or \"rz\" > */
+    std::string m_mapEnable{"rphiz"};
+    /** Flag to switch on/off interpolation > */
+    bool m_interpolate{true};
+    /** The size of the map in r, phi and z. */
+    int m_mapSize[3];
+    /** The min and max boundaries of the map region in z. */
+    double m_mapRegionZ[2] {0};
+    /** Offset required because the accelerator group defines the Belle center as zero. */
+    double m_mapOffset{0};
+    /** The min and max boundaries of the map region in r. */
+    double m_mapRegionR[2] {0};
+    /** The grid pitch in r,phi,z. */
+    double m_gridPitch[3] {0};
+    /** The min and max boundaries of the excluded region in z. */
+    double m_exRegionZ[2] {0};
+    /** The min and max boundaries of the excluded region in r. */
+    double m_exRegionR[2] {0};
+    /** Flag to indicate whether there is a region to exclude. > */
+    bool m_exRegion{true};
+    /** Flag to indicate whether there is a region to exclude. > */
+    bool m_mirrorPhi{true};
+    /** The min and max boundaries of the region in r to apply error. */
+    double m_errRegionR[2] {0};
+    /** The error Br, Bphi, Bz as a scale factor (B_new = m_errB * B_old). */
+    double m_errB[3] {0};
   };
 
 } //end of namespace Belle2

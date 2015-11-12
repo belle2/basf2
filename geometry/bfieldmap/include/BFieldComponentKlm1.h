@@ -39,10 +39,10 @@ namespace Belle2 {
     };
 
     /** The BFieldComponentklm1 constructor. */
-    BFieldComponentKlm1();
+    BFieldComponentKlm1() = default;
 
     /** The BFieldComponentklm1 destructor. */
-    virtual ~BFieldComponentKlm1();
+    virtual ~BFieldComponentKlm1() = default;
 
     /**
      * Initializes the magnetic field Component.
@@ -75,56 +75,68 @@ namespace Belle2 {
 
     void setEndcapRegion(double minR, double minZ) { m_endcapRMin = minR; m_endcapZMin = minZ;}
 
-    void setLayerParam(double bgapl0, double bironth, double egap, double dl) {
+    void setLayerParam(double bgapl0, double bironth, double egap, double dl)
+    {
       m_barrelGapHeightLayer0 = bgapl0;  m_barrelIronThickness = bironth;
       m_endcapGapHeight = egap; m_dLayer = dl;
     }
 
-
-  protected:
-
   private:
+    /** cos(pi/8) */
+    double m_cospi8{cos(M_PI / 8)};
+    /** cos(3pi/8) */
+    double m_cos3pi8{cos(3 * M_PI / 8)};
+    /** cos(pi/4) */
+    double m_cospi4{cos(M_PI / 4)};
 
-    double m_cospi8; /**< cos(pi/8) */
-    double m_cos3pi8; /**< cos(3pi/8) */
-    double m_cospi4; /**< cos(pi/4) */
+    /** The filename of the magnetic field map. */
+    std::string m_mapFilename{""};
+    /** Offset required because the accelerator group defines the Belle center as zero. */
+    double m_mapOffset{0};
 
-    std::string m_mapFilename; /**< The filename of the magnetic field map. */
-    double m_mapOffset;        /**< Offset required because the accelerator group defines the Belle center as zero. */
+    /** The minimum boundaries of BKLM region in r. */
+    double m_barrelRMin{0};
+    /** The maximum boundaries of BKLM region in r. */
+    double m_barrelZMax{0};
+    /** The minimum boundaries of EKLM region in r. */
+    double m_endcapRMin{0};
+    /** The minimum boundaries of EKLM region in z. */
+    double m_endcapZMin{0};
 
-    double m_barrelRMin; /**< The minimum boundaries of BKLM region in r. */
-    double m_barrelZMax; /**< The maximum boundaries of BKLM region in r. */
-    double m_endcapRMin; /**< The minimum boundaries of EKLM region in r. */
-    double m_endcapZMin; /**< The minimum boundaries of EKLM region in z. */
+    /** The number of layers per 1 sector for BKLM */
+    int m_nBarrelLayers{0};
+    /** The number of layers per 1 sector for EKLM */
+    int m_nEndcapLayers{0};
 
-    int m_nBarrelLayers; /**< The number of layers per 1 sector for BKLM */
-    int m_nEndcapLayers; /**< The number of layers per 1 sector for EKLM */
-
-    double m_barrelGapHeightLayer0; /**< Gap height of BKLM layer0 */
-    double m_endcapGapHeight;  /**< Gap height of BKLM layer1-14 */
-    double m_dLayer;  /**< deppth of BKLM module? */
-    double m_barrelIronThickness;  /**< Thickness of Barrel iron plate */
+    /** Gap height of BKLM layer0 */
+    double m_barrelGapHeightLayer0{0};
+    /** Gap height of BKLM layer1-14 */
+    double m_endcapGapHeight{0};
+    /** deppth of BKLM module? */
+    double m_dLayer{0};
+    /** Thickness of Barrel iron plate */
+    double m_barrelIronThickness{0};
 
     // parameters for field map, field map represent linear function
-    double m_barrelZBreakpoint[15];
-    double m_barrelRBreakpoint[15];
+    double m_barrelZBreakpoint[15] {0};
+    double m_barrelRBreakpoint[15] {0};
 
-    double m_barrelFieldZSlope1[15];
-    double m_barrelFieldZIntercept1[15];
-    double m_barrelFieldZSlope2[15];
-    double m_barrelFieldZIntercept2[15];
-    double m_barrelFieldRSlope1[15];
-    double m_barrelFieldRIntercept1[15];
-    double m_barrelFieldRSlope2[15];
-    double m_barrelFieldRIntercept2[15];
+    double m_barrelFieldZSlope1[15] {0};
+    double m_barrelFieldZIntercept1[15] {0};
+    double m_barrelFieldZSlope2[15] {0};
+    double m_barrelFieldZIntercept2[15] {0};
+    double m_barrelFieldRSlope1[15] {0};
+    double m_barrelFieldRIntercept1[15] {0};
+    double m_barrelFieldRSlope2[15] {0};
+    double m_barrelFieldRIntercept2[15] {0};
 
-    double m_endcapZBreakpoint[2][15][5];
-    double m_endcapRBreakpoint[2][15][5];
+    double m_endcapZBreakpoint[2][15][5] {{{0}}};
+    double m_endcapRBreakpoint[2][15][5] {{{0}}};
 
-    double m_endcapFieldZSlope[2][15][5];
-    double m_endcapFieldZIntercept[2][15][5];
-    double m_endcapFieldRSlope[2][15][5];
-    double m_endcapFieldRIntercept[2][15][5];
+    double m_endcapFieldZSlope[2][15][5] {{{0}}};
+    double m_endcapFieldZIntercept[2][15][5] {{{0}}};
+    double m_endcapFieldRSlope[2][15][5] {{{0}}};
+    double m_endcapFieldRIntercept[2][15][5] {{{0}}};
     // > for KLM field
   };
 

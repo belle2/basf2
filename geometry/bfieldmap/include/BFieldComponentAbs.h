@@ -31,10 +31,10 @@ namespace Belle2 {
   public:
 
     /** The BFieldComponentAbs constructor. */
-    BFieldComponentAbs() {};
+    BFieldComponentAbs() = default;
 
     /** The BFieldComponentAbs destructor. */
-    virtual ~BFieldComponentAbs() {};
+    virtual ~BFieldComponentAbs() = default;
 
     /**
      * Initializes the magnetic field component.

@@ -56,7 +56,9 @@ namespace Belle2 {
       CreatorManager(const CreatorManager&) = delete;
       /** singleton, hide assignment operator */
       void operator=(const CreatorManager&) = delete;
-      static CreatorManager& getInstance();   /** Static map to hold all registered factories */
+      /** getter for the singleton instance */
+      static CreatorManager& getInstance();
+      /** Static map to hold all registered factories */
       std::map<std::string, CreatorFactory*> m_creatorFactories;
     };
 

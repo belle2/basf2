@@ -41,10 +41,10 @@ namespace Belle2 {
     };
 
     /** The BFieldComponentRadial constructor. */
-    BFieldComponentRadial();
+    BFieldComponentRadial() = default;
 
     /** The BFieldComponentRadial destructor. */
-    virtual ~BFieldComponentRadial();
+    virtual ~BFieldComponentRadial() = default;
 
     /**
      * Initializes the magnetic field component.
@@ -109,7 +109,8 @@ namespace Belle2 {
      * @param gaph height of the gap in endyoke [cm].
      * param iront thickness of iron plate in endyoke [cm].
      */
-    void setKlmParameters(double srmin, double zyoke, double gaph, double iront) {
+    void setKlmParameters(double srmin, double zyoke, double gaph, double iront)
+    {
       m_slotRMin = srmin, m_endyokeZMin = zyoke; m_gapHeight = gaph; m_ironPlateThickness = iront;
     }
 
@@ -117,19 +118,19 @@ namespace Belle2 {
 
   private:
 
-    std::string m_mapFilename; /**< The filename of the magnetic field map. */
-    BFieldPoint** m_mapBuffer; /**< The memory buffer for the magnetic field map. */
-    int m_mapSize[2];          /**< The size of the map in r and z. */
-    double m_mapRegionZ[2];    /**< The min and max boundaries of the map region in z. */
-    double m_mapOffset;        /**< Offset required because the accelerator group defines the Belle center as zero. */
-    double m_mapRegionR[2];    /**< The min and max boundaries of the map region in r. */
-    double m_gridPitchR;       /**< The grid pitch in r. */
-    double m_gridPitchZ;       /**< The grid pitch in z. */
+    std::string m_mapFilename{""}; /**< The filename of the magnetic field map. */
+    BFieldPoint** m_mapBuffer{nullptr}; /**< The memory buffer for the magnetic field map. */
+    int m_mapSize[2] {0};         /**< The size of the map in r and z. */
+    double m_mapRegionZ[2] {0};   /**< The min and max boundaries of the map region in z. */
+    double m_mapOffset{0};        /**< Offset required because the accelerator group defines the Belle center as zero. */
+    double m_mapRegionR[2] {0};   /**< The min and max boundaries of the map region in r. */
+    double m_gridPitchR{0};       /**< The grid pitch in r. */
+    double m_gridPitchZ{0};       /**< The grid pitch in z. */
 
-    double m_slotRMin;          /**< minimum radius for the gap in endyoke */
-    double m_endyokeZMin;       /**< minimum Z of endyoke */
-    double m_gapHeight;         /**< height of the gap in endyoke */
-    double m_ironPlateThickness;/**< thickness of iron plate in endyoke */
+    double m_slotRMin{0};          /**< minimum radius for the gap in endyoke */
+    double m_endyokeZMin{0};       /**< minimum Z of endyoke */
+    double m_gapHeight{0};         /**< height of the gap in endyoke */
+    double m_ironPlateThickness{0};/**< thickness of iron plate in endyoke */
   };
 
 } //end of namespace Belle2

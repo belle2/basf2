@@ -23,23 +23,6 @@ using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
 
-
-BFieldComponentKlm1::BFieldComponentKlm1() :
-  m_cospi8(cos(0.125 * M_PI)),
-  m_cos3pi8(cos(0.375 * M_PI)),
-  m_cospi4(cos(0.25  * M_PI)),
-  m_mapFilename("")
-{
-
-}
-
-
-BFieldComponentKlm1::~BFieldComponentKlm1()
-{
-
-}
-
-
 void BFieldComponentKlm1::initialize()
 {
   if (m_mapFilename.empty()) {
@@ -124,7 +107,7 @@ TVector3 BFieldComponentKlm1::calculate(const TVector3& point) const
     double cosphi = std::abs(x) / r;
     double d = ((cosphi < m_cospi8) ? ((cosphi < m_cos3pi8) ? std::abs(y)
                                        : (std::abs(x) + std::abs(y)) * m_cospi4)
-                  : std::abs(x)) - m_barrelRMin - m_barrelGapHeightLayer0;
+                : std::abs(x)) - m_barrelRMin - m_barrelGapHeightLayer0;
 
     if (d >= 0.0) {
       int layer = static_cast<int>(floor(d / m_dLayer));

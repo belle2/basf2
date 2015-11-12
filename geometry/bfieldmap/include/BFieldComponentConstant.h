@@ -25,10 +25,10 @@ namespace Belle2 {
   public:
 
     /** The BFieldComponentConstant constructor. */
-    BFieldComponentConstant();
+    BFieldComponentConstant() = default;
 
     /** The BFieldComponentConstant destructor. */
-    virtual ~BFieldComponentConstant();
+    virtual ~BFieldComponentConstant() = default;
 
     /**
      * Calculates the magnetic field vector at the specified space point.
@@ -46,15 +46,15 @@ namespace Belle2 {
      */
     void setMagneticFieldValues(double x, double y, double z, double rmax, double zmin, double zmax);
 
-
-  protected:
-
   private:
-
-    double m_magneticField[3]; /**< The values for the homogeneous magnetic field vector. */
-    double maxRadius4BField; /**< The values for the maximum radius for the homogeneous field. */
-    double minZ4BField; /**< The values for the minimum z position for the homogeneous field. */
-    double maxZ4BField; /**< The values for the maximum z position for the homogeneous field. */
+    /** The values for the homogeneous magnetic field vector. */
+    double m_magneticField[3] {0};
+    /** The values for the maximum radius for the homogeneous field. */
+    double maxRadius4BField{0};
+    /** The values for the minimum z position for the homogeneous field. */
+    double minZ4BField{0};
+    /** The values for the maximum z position for the homogeneous field. */
+    double maxZ4BField{0};
 
   };
 

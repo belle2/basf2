@@ -25,18 +25,6 @@ using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
 
-BFieldComponentRadial::BFieldComponentRadial() : m_mapFilename("")
-{
-
-}
-
-
-BFieldComponentRadial::~BFieldComponentRadial()
-{
-
-}
-
-
 void BFieldComponentRadial::initialize()
 {
   if (m_mapFilename.empty()) {
@@ -147,13 +135,15 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   double Br2 = m_mapBuffer[ir][iz + 1].r;
   double Br3 = m_mapBuffer[ir + 1][iz].r;
   double Br4 = m_mapBuffer[ir + 1][iz + 1].r;
-  double Br = ((Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;
+  double Br = ((Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr) /
+              m_gridPitchZ / m_gridPitchR;
 
   double Bz1 = m_mapBuffer[ir][iz].z;
   double Bz2 = m_mapBuffer[ir][iz + 1].z;
   double Bz3 = m_mapBuffer[ir + 1][iz].z;
   double Bz4 = m_mapBuffer[ir + 1][iz + 1].z;
-  double Bz = ((Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr) / m_gridPitchZ / m_gridPitchR;;
+  double Bz = ((Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr) /
+              m_gridPitchZ / m_gridPitchR;;
 
   double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
   double By = (r > 0.0) ? Br * point.Y() / r : 0.0;
@@ -197,7 +187,6 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   return TVector3(Bx, By, Bz);
 }
-
 
 void BFieldComponentRadial::terminate()
 {

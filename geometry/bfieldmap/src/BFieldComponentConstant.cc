@@ -15,19 +15,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-BFieldComponentConstant::BFieldComponentConstant()
-{
-
-}
-
-
-BFieldComponentConstant::~BFieldComponentConstant()
-{
-
-}
-
-
 TVector3 BFieldComponentConstant::calculate(const TVector3& point) const
 {
   double Bz = m_magneticField[2];

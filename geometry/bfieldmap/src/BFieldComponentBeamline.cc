@@ -47,18 +47,6 @@ bool BFieldComponentBeamline::isInRange(const TVector3& point)
     return false;
 }
 
-BFieldComponentBeamline::BFieldComponentBeamline() : m_mapFilename_her(""),  m_mapFilename_ler(""),
-  m_interFilename_her(""), m_interFilename_ler("")
-{
-
-}
-
-
-BFieldComponentBeamline::~BFieldComponentBeamline()
-{
-
-}
-
 void BFieldComponentBeamline::initialize_beamline(int isher)
 {
   BFieldPoint** *mapBuffer;
@@ -147,7 +135,7 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
 
   nbinx = m_interSizeX;
   *interBuffer = new InterpolationPoint*[nbinx];
-  int vnbiny[nbinx];
+  std::vector<int> vnbiny(nbinx, 0);
   for (int j = 0; j < nbinx; ++j) {
     const double x(m_interGridSize * (j + 0.5) - m_interMaxRadius);
     double y2 = m_interMaxRadius * m_interMaxRadius - x * x;
@@ -163,12 +151,12 @@ void BFieldComponentBeamline::initialize_beamline(int isher)
     interMapFile >> i1 >> i2 >> p.p[0] >> p.p[1] >> p.p[2] >> p.p[3];
 
     if (!(i1 < nbinx && i2 < vnbiny[i1]))
-      B2ERROR("Something wrong '" << interFilename << "': grid(" << i1 << ", " << i2 << ") " << "but maximum grid for y = " << vnbiny[i1]);
+      B2ERROR("Something wrong '" << interFilename << "': grid(" << i1 << ", " << i2 << ") " << "but maximum grid for y = " <<
+              vnbiny[i1]);
     (*interBuffer)[i1][i2] = p;
   }
 
   B2DEBUG(10, "... loaded " << mapFilename << "and" << interFilename << "files");
-
 }
 
 

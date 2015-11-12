@@ -106,6 +106,10 @@ namespace Belle2 {
         m_additional.insert(components.begin(), components.end());
       }
 
+      /** Choose whether a region should be assigned to each creator.
+       * If set to true, all volumes created by each creator are assigned a
+       * region with the name of the creator
+       */
       void setAssignRegions(bool assignRegions)
       {
         m_assignRegions = assignRegions;
@@ -161,7 +165,7 @@ namespace Belle2 {
       /** List of visualization attributes */
       std::vector<G4VisAttributes*> m_VisAttributes;
       /** Allow destruction of instance */
-      friend class std::default_delete<GeometryManager>;
+      friend struct std::default_delete<GeometryManager>;
     };
 
   }

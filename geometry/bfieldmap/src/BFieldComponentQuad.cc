@@ -26,18 +26,6 @@ using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
 
-
-BFieldComponentQuad::BFieldComponentQuad() : m_mapFilenameHER(""), m_mapFilenameLER(""), m_mapFilenameHERleak(""), m_apertFilenameHER(""), m_apertFilenameLER("")
-{
-
-}
-
-
-BFieldComponentQuad::~BFieldComponentQuad()
-{
-
-}
-
 void BFieldComponentQuad::initialize()
 {
   // check if input name is not empty

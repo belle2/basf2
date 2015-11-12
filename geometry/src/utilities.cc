@@ -27,6 +27,15 @@ using namespace std;
 
 namespace Belle2 {
   namespace geometry {
+    /** Parse a color string of the form #rgb, #rrggbb, #rgba, #rrggbbaa or
+     * rgb(r, g, b) and return a corresponding G4Colour.
+     *
+     * For #rgb and #rgba the color for red, green, blue (and optionally alpha)
+     * is each represented by one hexadecimal digit, #rrggbb and #rrggbbaa is
+     * the same with two digits per colour.
+     *
+     * rgb(r, g, b) expects the fraction of red, green and blue as float between 0 and 1.
+     */
     G4Colour parseColor(string colorString)
     {
       boost::to_lower(colorString);

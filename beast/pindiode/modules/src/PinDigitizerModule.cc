@@ -95,12 +95,13 @@ void PinDigitizerModule::event()
   }
 
   //Declare and initialze energy and time
-  double edep[2 * nPIN];
-  double time[2 * nPIN];
-  double itime[2 * nPIN];
-  double volt[2 * nPIN];
+  nPIN = 2 * nPIN;
+  double edep[nPIN];
+  double time[nPIN];
+  double itime[nPIN];
+  double volt[nPIN];
   int pdg[nPIN];
-  for (int i = 0; i < 2 * nPIN; i++) {
+  for (int i = 0; i < nPIN; i++) {
     edep[i] = 0;
     time[i] = 0;
     itime[i] = 0;
@@ -112,7 +113,7 @@ void PinDigitizerModule::event()
   for (int i = 0; i < nentries; i++) {
     PindiodeSimHit* aHit = PinSimHits[i];
     int detNb = aHit->getCellId();
-    if (detNb > 2 * nPIN)continue;
+    if (detNb > nPIN)continue;
     edep[detNb] += aHit->getEnergyDep();
     time[detNb] += aHit->getFlightTime();
     itime[detNb] ++;
@@ -120,7 +121,7 @@ void PinDigitizerModule::event()
     if (PDG == 22) pdg[detNb] = 1;
   }
 
-  for (int i = 0; i < 2 * nPIN; i++) {
+  for (int i = 0; i < nPIN; i++) {
     if (itime[i] > 0) {
       time[i] /= itime[i];
       volt[i] = edep[i] / m_WorkFunction * 1e6 * 1.602176565e-19 * m_CrematGain * 1e12;

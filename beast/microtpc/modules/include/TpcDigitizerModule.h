@@ -178,6 +178,7 @@ namespace Belle2 {
       /** chip store arrays */
       //int m_dchip[10][80][336][MAXtSIZE];
       std::map<std::tuple<int, int, int, int>, int> m_dchip;
+      /** chip map arrays */
       std::map<std::tuple<int, int, int>, int> m_dchip_map;
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;

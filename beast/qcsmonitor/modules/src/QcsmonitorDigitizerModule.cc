@@ -100,7 +100,6 @@ void QcsmonitorDigitizerModule::event()
   //auto edepArray = new vector<double>[m_ScintCell](); //energy deposits per scintillator cell
   auto adepArray = new vector<double>[m_ScintCell](); //energy deposits corrected per scintillator cell
   auto timeArray = new vector<double>[m_ScintCell](); //time cell bin nmber
-  //auto pdgArray = new vector<double>[numOfCells](); //particle pdg that deposits energy
 
   int nentries = QcsmonitorSimHits.getEntries();
   //loop on all entries to store for each QCSMONITOR scintillator cell

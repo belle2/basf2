@@ -64,9 +64,8 @@ namespace Belle2 {
 
       /** reads data from QCSMONITOR.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
-
       /** Number of QCSMONITOR scintillator cell */
-      int m_ScintCell;
+      int m_ScintCell = 0;
       /** Time step */
       double m_TimeStep;
       /** Lower time limit */

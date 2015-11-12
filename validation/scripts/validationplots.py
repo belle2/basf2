@@ -651,10 +651,11 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
             # Get the list of all objects that belong to the current
             # package and the current file. First the regular objects:
             objects_in_pkg_and_file = find_root_object(objects_in_pkg,
-                                                       rootfile=".*" + rootfile + ".*")
+                                                       rootfile=".*/" + rootfile + ".*")
+
             # And then the reference objects
             objects_in_pkg_and_file += find_root_object(reference_objects,
-                                                        rootfile=".*" + rootfile + ".*")
+                                                        rootfile=".*/" + rootfile + ".*")
 
             # A list in which we keep all the plotuples for this file
             list_of_plotuples = []

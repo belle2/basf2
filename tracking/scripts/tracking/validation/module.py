@@ -488,6 +488,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'phi',
             'theta',
         ],
+        non_expert_parameters=['p_{t}'],
         make_hist=True,
     ):
 
@@ -512,6 +513,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
+            non_expert_parameters=non_expert_parameters
         )
 
     def profiles_by_pr_parameters(
@@ -549,6 +551,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         profile_parameters,
         unit,
         make_hist,
+        non_expert_parameters=[]
     ):
 
         contact = self.contact
@@ -574,10 +577,12 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             if parameter_name in parameter_names \
                     or root_save_name(parameter_name) in parameter_names:
 
+                is_expert = not(parameter_name in non_expert_parameters)
+
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
                 profile_plot = ValidationPlot(profile_plot_name)
-                profile_plot.profile(parameter_values, xs, outlier_z_score=5.0)
+                profile_plot.profile(parameter_values, xs, outlier_z_score=5.0, is_expert=is_expert)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)
                 profile_plot.ylabel = compose_axis_label(quantity_name, unit)

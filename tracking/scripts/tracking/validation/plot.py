@@ -167,6 +167,9 @@ class ValidationPlot(object):
         #: A list of the histograms that make up the plot
         self.histograms = []
 
+        # per default all plots are expert and must be set to non-expert explicitly
+        self._is_expert = True
+
     def hist(self,
              xs,
              weights=None,
@@ -177,10 +180,12 @@ class ValidationPlot(object):
              outlier_z_score=None,
              include_exceptionals=True,
              allow_discrete=False,
-             cumulation_direction=None):
+             cumulation_direction=None,
+             is_expert=True):
         """Fill the plot with a one dimensional histogram."""
 
         th1_factory = ROOT.TH1D
+        self._is_expert = is_expert
 
         self.create_1d(th1_factory,
                        xs,
@@ -210,10 +215,12 @@ class ValidationPlot(object):
                 outlier_z_score=None,
                 include_exceptionals=True,
                 allow_discrete=False,
-                cumulation_direction=None):
+                cumulation_direction=None,
+                is_expert=True):
         """Fill the plot with a one dimensional profile of one variable over another."""
 
         th1_factory = ROOT.TProfile
+        self._is_expert = is_expert
 
         self.create_1d(th1_factory,
                        xs,
@@ -468,13 +475,23 @@ class ValidationPlot(object):
         """
         if not self.plot:
             raise ValueError("Can not write a validation plot that has not been filled.")
+
         with root_cd(tdirectory):
             ValidationPlot.set_tstyle()
             if self.plot not in self.histograms:
                 self.plot.Write()
 
             for histogram in self.histograms:
+                # add expert option, if requested
+                if self.is_expert:
+                    histogram.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'expert'))
+
                 histogram.Write()
+
+    @property
+    def is_expert(self):
+        """Getter method if an plot plot is marked as expert plot"""
+        return self._is_expert
 
     @property
     def title(self):

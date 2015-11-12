@@ -48,6 +48,10 @@ CONTACT_PERSON = {'Name': 'Thomas Hauth',
                   'Email': 'thomas.hauth@kit.edu'}
 
 
+def make_expert_plot(hist):
+    hist.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert'))
+
+
 def main():
     """Function which is executed"""
 
@@ -171,7 +175,7 @@ def draw_hit_counts(data_tree, pt_values):
 
         hists[det].GetListOfFunctions().Add(TNamed('Description', description))
         hists[det].GetListOfFunctions().Add(TNamed('Check', check))
-        hists[det].GetListOfFunctions().Add(TNamed('MetaOptions', 'expert'))
+        make_expert_plot(hists[det])
 
     hNweights = TH1F('hNweights', 'number of weights stored', 201, 0, 201)
     hWeightsProfile = TProfile('hWeightsProfile', 'profile of weights', 201,
@@ -194,6 +198,7 @@ def draw_hit_counts(data_tree, pt_values):
         hists[key].Write()
     # hNweights.Write()
     # hWeights.Write()
+    make_expert_plot(hWeightsProfile)
     hWeightsProfile.Write()
 
 
@@ -235,7 +240,7 @@ def draw_pvalue(data_tree):
 
     hist_pvalue.GetListOfFunctions().Add(TNamed('Description', description))
     hist_pvalue.GetListOfFunctions().Add(TNamed('Check', check))
-    hist_pvalue.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert'))
+    make_expert_plot(hist_pvalue)
 
     hist_pvalue.Write()
 
@@ -264,7 +269,7 @@ def calculate_efficiency_in_pt(data_tree):
     description = ('Events with 10 muon tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(500 '
                    'events for each pt value). The events are reconstructed '
-                   'with VXDTF + Trasan + MCTrackCandCombiner. This '
+                   'with VXDTF + CDC Track Finder + VXDCDCMerger.'
                    'plot shows the single track reconstruction efficiency '
                    'over the transverse momentum.')
 
@@ -351,6 +356,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
     efficiency_hist.SetTitle('Tracks with pt = %.2f GeV' % pt_value)
     efficiency_hist.SetXTitle('cos #Theta')
     efficiency_hist.SetYTitle('efficiency')
+    make_expert_plot(efficiency_hist)
     efficiency_hist.Write()
 
 
@@ -405,7 +411,6 @@ def create_momentum_resolution_plot(data_tree):
     hist_resolution.GetListOfFunctions().Add(TNamed('Contact',
                                                     CONTACT_PERSON['Email']))
     hist_resolution.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
-
     hist_resolution.Write()
 
     # fit_parameters = fit_resolution(fit_pt_values, fit_pt_res_values, 1, fit_pt_res_errors)
@@ -594,7 +599,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
     hist_impact_parameter_d0.SetYTitle('#sigma_{d0} [cm]')
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy, expert'))
     hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Contact',
                                                              CONTACT_PERSON['Email']))
 
@@ -603,7 +608,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z} [cm]')
-    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy, expert'))
     hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Contact',
                                                             CONTACT_PERSON['Email']))
 
@@ -710,6 +715,7 @@ def draw_residua(
             hist.SetXTitle('(%s - %s)' % (variable_name, gen_variable_name))
         hist.GetListOfFunctions().Add(TNamed('Contact', CONTACT_PERSON['Email'
                                                                        ]))
+        make_expert_plot(hist)
         hist.Write()
 
 

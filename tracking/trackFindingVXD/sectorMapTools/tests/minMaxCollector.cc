@@ -148,6 +148,7 @@ namespace VXDTFMinMaxCollectorTest {
   /** fill MinMaxCollector and a std::vector and compare results */
   TEST_F(MinMaxCollectorTest, ComparisonWithClassicApproach)
   {
+    gRandom->SetSeed(23);
 
     auto newCollector = MinMaxCollector<double>(0.03);
 

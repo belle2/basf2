@@ -6,8 +6,6 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
-import modularCalibration as cal
-
 reset_database()
 use_local_database()
 
@@ -43,7 +41,7 @@ main.add_module(
     name=misalignment.getName(),
     data=misalignment.getMisalignment())
 """
-main.add_module('GBLfit', UseClusters=False, misalignment='VXDMisalignment')
+main.add_module('GBLfit', UseClusters=False)
 
 main.add_module('MillepedeCollector')
 main.add_module('RootOutput', branchNames=['EventMetaData'])

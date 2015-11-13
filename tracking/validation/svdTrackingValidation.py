@@ -4,8 +4,10 @@
 """
 <header>
   <contact>tracking@belle2.kek.jp</contact>
-  <output>VXDTrackingValidation.root</output>
-  <description>This module validates that the vxd track finding is capable of reconstructing tracks in Y(4S) runs.</description>
+  <output>SVDTrackingValidation.root</output>
+  <description>
+  This module validates that the svd only track finding is capable of reconstructing tracks in Y(4S) runs.
+  </description>
 </header>
 """
 
@@ -33,6 +35,13 @@ class SVD4Layer(TrackingValidationRun):
     finder_module = basf2.register_module('VXDTF')
     param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.06}
     finder_module.param(param_vxdtf)
+
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': True,
+        'UseCDCHits': False,
+    }
+
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

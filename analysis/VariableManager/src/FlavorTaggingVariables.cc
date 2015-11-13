@@ -61,18 +61,20 @@ namespace Belle2 {
     {
       int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      for (auto& track : roe->getTracks()) {
-        const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle != nullptr) {
-          if (mcParticle->getPDG() == 511) {
-            vote++;
-            break;
+      if (roe.isValid()) {
+        for (auto& track : roe->getTracks()) {
+          const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              vote++;
+              break;
+            }
+            if (mcParticle->getPDG() == -511) {
+              vote--;
+              break;
+            }
+            mcParticle = mcParticle->getMother();
           }
-          if (mcParticle->getPDG() == -511) {
-            vote--;
-            break;
-          }
-          mcParticle = mcParticle->getMother();
         }
       }
       return vote > 0;
@@ -82,16 +84,18 @@ namespace Belle2 {
     {
       int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      for (auto& track : roe->getTracks()) {
-        const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle != nullptr) {
-          if (mcParticle->getPDG() == 511) {
-            vote++;
+      if (roe.isValid()) {
+        for (auto& track : roe->getTracks()) {
+          const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) {
+              vote++;
+            }
+            if (mcParticle->getPDG() == -511) {
+              vote--;
+            }
+            mcParticle = mcParticle->getMother();
           }
-          if (mcParticle->getPDG() == -511) {
-            vote--;
-          }
-          mcParticle = mcParticle->getMother();
         }
       }
       return vote < 0;
@@ -101,12 +105,14 @@ namespace Belle2 {
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       float ObjectsInROE = 0; //Flavor of B
-      if (roe-> getNTracks() != 0) {
-        ObjectsInROE++;
+      if (roe != nullptr) {
+        if (roe-> getNTracks() != 0) {
+          ObjectsInROE++;
 //       } else if (roe-> getNECLClusters() != 0) {
 //         ObjectsInROE++;
 //       } else if (roe-> getNKLMClusters() != 0) {
 //         ObjectsInROE++;
+        }
       }
       if (ObjectsInROE > 0) {
         return ObjectsInROE;
@@ -117,49 +123,51 @@ namespace Belle2 {
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       float q_MC = 0; //Flavor of B
-      if (roe-> getNTracks() != 0) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+      if (roe != nullptr) {
+        if (roe-> getNTracks() != 0) {
+          for (auto& track : roe->getTracks()) {
+            const MCParticle* mcParticle = track->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
-        }
-      } else if (roe-> getNECLClusters() != 0) {
-        for (auto& cluster : roe-> getECLClusters()) {
-          const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+        } else if (roe-> getNECLClusters() != 0) {
+          for (auto& cluster : roe-> getECLClusters()) {
+            const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
-        }
-      } else if (roe-> getNKLMClusters() != 0) {
-        for (auto& klmcluster : roe-> getKLMClusters()) {
-          const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+        } else if (roe-> getNKLMClusters() != 0) {
+          for (auto& klmcluster : roe-> getKLMClusters()) {
+            const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
         }
       }
@@ -174,49 +182,51 @@ namespace Belle2 {
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
-      if (roe-> getNTracks() != 0) {
-        for (auto& track : roe->getTracks()) {
-          const MCParticle* mcParticle = track->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+      if (roe.isValid()) {
+        if (roe-> getNTracks() != 0) {
+          for (auto& track : roe->getTracks()) {
+            const MCParticle* mcParticle = track->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
-        }
-      } else if (roe-> getNECLClusters() != 0) {
-        for (auto& cluster : roe-> getECLClusters()) {
-          const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+        } else if (roe-> getNECLClusters() != 0) {
+          for (auto& cluster : roe-> getECLClusters()) {
+            const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
-        }
-      } else if (roe-> getNKLMClusters() != 0) {
-        for (auto& klmcluster : roe-> getKLMClusters()) {
-          const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              q_MC++;
-              break;
+        } else if (roe-> getNKLMClusters() != 0) {
+          for (auto& klmcluster : roe-> getKLMClusters()) {
+            const MCParticle* mcParticle = klmcluster->getRelated<MCParticle>();
+            while (mcParticle != nullptr) {
+              if (mcParticle->getPDG() == 511) {
+                q_MC++;
+                break;
+              }
+              if (mcParticle->getPDG() == -511) {
+                q_MC--;
+                break;
+              }
+              mcParticle = mcParticle->getMother();
             }
-            if (mcParticle->getPDG() == -511) {
-              q_MC--;
-              break;
-            }
-            mcParticle = mcParticle->getMother();
           }
         }
       }
@@ -232,17 +242,19 @@ namespace Belle2 {
       TLorentzVector trackiCMSVec;
       TLorentzVector roeCMSVec;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      const auto& tracks = roe->getTracks();
-      for (unsigned int i = 0; i < tracks.size(); ++i) {
-        const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
-        const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
-        double trackiMassHypothesis = trackiChargedStable.getMass();
-        const TrackFitResult* tracki = tracks[i]->getTrackFitResult(trackiChargedStable);
-        if (tracki == nullptr) continue;
-        double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
-        TLorentzVector trackiVec(tracki->getMomentum(), energy);
-        trackiCMSVec = PCmsLabTransform::labToCms(trackiVec);
-        roeCMSVec += trackiCMSVec;
+      if (roe.isValid()) {
+        const auto& tracks = roe->getTracks();
+        for (unsigned int i = 0; i < tracks.size(); ++i) {
+          const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
+          const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
+          double trackiMassHypothesis = trackiChargedStable.getMass();
+          const TrackFitResult* tracki = tracks[i]->getTrackFitResult(trackiChargedStable);
+          if (tracki == nullptr) continue;
+          double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
+          TLorentzVector trackiVec(tracki->getMomentum(), energy);
+          trackiCMSVec = PCmsLabTransform::labToCms(trackiVec);
+          roeCMSVec += trackiCMSVec;
+        }
       }
       double missMom = -roeCMSVec.P();
       return missMom ;
@@ -250,24 +262,26 @@ namespace Belle2 {
 
     double NumberOfKShortinRemainingROEKaon(const Particle* particle)
     {
-      StoreObjPtr<ParticleList> KShorts("K_S0:ROEKaon");
+      StoreObjPtr<ParticleList> KShortList("K_S0:ROEKaon");
       int flag = 0;
-      if (KShorts->getListSize() == 0) {return flag;}
-      for (unsigned int i = 0; i < KShorts->getListSize(); i++) {
-        if (particle->overlapsWith(KShorts->getParticle(i))) {continue;}
-        flag++;
+      if (KShortList.isValid()) {
+        for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+          if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
+          flag++;
+        }
       }
       return flag;
     }
 
     double NumberOfKShortinRemainingROELambda(const Particle* particle)
     {
-      StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda");
+      StoreObjPtr<ParticleList> KShortList("K_S0:ROELambda");
       int flag = 0;
-      if (KShorts->getListSize() == 0) {return flag;}
-      for (unsigned int i = 0; i < KShorts->getListSize(); i++) {
-        if (particle->overlapsWith(KShorts->getParticle(i))) {continue;}
-        flag++;
+      if (KShortList.isValid()) {
+        for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+          if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
+          flag++;
+        }
       }
       return flag;
     }
@@ -284,11 +298,12 @@ namespace Belle2 {
       const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
       // if (mcparticle ==nullptr)
       //  return 0.0;
-      if (mcparticle->getPDG() == 3122) return 0.0; //Lambda0
-      else if (mcparticle->getPDG() == -3122) return 0.0; //Anti-Lambda0
-      else return 1.0;
+      if (mcparticle != nullptr) {
+        if (mcparticle->getPDG() == 3122) return 1.0; //Lambda0
+        else if (mcparticle->getPDG() == -3122) return 1.0; //Anti-Lambda0
+        else return 0.0;
+      } else return 0.0;
     }
-
 
 
     double lambdaZError(const Particle* particle)
@@ -320,16 +335,17 @@ namespace Belle2 {
 
     double chargeTimesKaonLiklihood(const Particle*)
     {
-      StoreObjPtr<ParticleList> kaons("K+:ROE");
-      if (kaons->getListSize() == 0) return 0.0;
       double maximum_Kid = 0;
       double maximum_charge = 0;
-      for (unsigned int i = 0; i < kaons->getListSize(); ++i) {
-        Particle* p = kaons->getParticle(i);
-        double Kid = p->getRelatedTo<PIDLikelihood>()->getProbability(Const::kaon, Const::pion);
-        if (Kid > maximum_Kid) {
-          maximum_Kid = Kid;
-          maximum_charge = p->getCharge();
+      StoreObjPtr<ParticleList> KaonList("K+:KaonROE");
+      if (KaonList.isValid()) {
+        for (unsigned int i = 0; i < KaonList->getListSize(); ++i) {
+          Particle* p = KaonList->getParticle(i);
+          double Kid = p->getRelatedTo<PIDLikelihood>()->getProbability(Const::kaon, Const::pion);
+          if (Kid > maximum_Kid) {
+            maximum_Kid = Kid;
+            maximum_charge = p->getCharge();
+          }
         }
       }
       return maximum_Kid * maximum_charge;
@@ -338,19 +354,20 @@ namespace Belle2 {
     double transverseMomentumOfChargeTracksInRoe(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
-        return 0.0;
 
       double sum = 0.0;
       double pt = 0.0;
-      for (const auto& track : roe->getTracks()) {
-        if (part->getTrack() == track)
-          continue;
-        if (track->getTrackFitResult(Const::pion) == nullptr)
-          continue;
-        pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
 
-        sum += sqrt(pt * pt);
+      if (roe.isValid()) {
+        for (const auto& track : roe->getTracks()) {
+          if (part->getTrack() == track)
+            continue;
+          if (track->getTrackFitResult(Const::pion) == nullptr)
+            continue;
+          pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
+
+          sum += sqrt(pt * pt);
+        }
       }
       return sum;
 
@@ -359,12 +376,14 @@ namespace Belle2 {
     double McFlavorOfTagSide(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
-      for (auto& track : roe->getTracks()) {
-        const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle != nullptr) {
-          if (mcParticle->getPDG() == 511) return 511;
-          else if (mcParticle->getPDG() == -511) return -511;
-          mcParticle = mcParticle->getMother();
+      if (roe != nullptr) {
+        for (auto& track : roe->getTracks()) {
+          const MCParticle* mcParticle = track->getRelated<MCParticle>();
+          while (mcParticle != nullptr) {
+            if (mcParticle->getPDG() == 511) return 511;
+            else if (mcParticle->getPDG() == -511) return -511;
+            mcParticle = mcParticle->getMother();
+          }
         }
       }
       return 0;
@@ -373,26 +392,28 @@ namespace Belle2 {
     double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      const ContinuumSuppression* cs = roe->getRelated<Particle>()->getRelated<ContinuumSuppression>();
-      const TVector3 thrustAxisO = cs->getThrustO(); //thrust is already in cms
-      const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
-      double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      double result = 0 ;
+      if (roe.isValid()) {
+        const ContinuumSuppression* cs = roe->getRelated<Particle>()->getRelated<ContinuumSuppression>();
+        const TVector3 thrustAxisO = cs->getThrustO(); //thrust is already in cms
+        const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+        result = fabs(cos(pAxis.Angle(thrustAxisO)));
 
-      //const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
-      //const TVector3 thrustAxisO = qq->getThrustO();
-      //cout << "thrustAxisO" << thrustAxisO << endl;
-      //const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
-      //cout << "pAxis" << pAxis << endl;
-      //double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+        //const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
+        //const TVector3 thrustAxisO = qq->getThrustO();
+        //cout << "thrustAxisO" << thrustAxisO << endl;
+        //const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
+        //cout << "pAxis" << pAxis << endl;
+        //double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      }
       return result;
     }
 
     double isInElectronOrMuonCat(const Particle* particle)
     {
 
-      StoreObjPtr<ParticleList> MuonList("mu+:ROE");
-      StoreObjPtr<ParticleList> ElectronList("e+:ROE");
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      StoreObjPtr<ParticleList> MuonList("mu+:MuonROE");
+      StoreObjPtr<ParticleList> ElectronList("e+:ElectronROE");
 
       double maximum_prob_el = 0;
       double maximum_prob_mu = 0;
@@ -400,21 +421,24 @@ namespace Belle2 {
       const Track* track_target_mu = nullptr;
       const Track* track_target_el = nullptr;
 
-      for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
-        Particle* p_mu = MuonList->getParticle(i);
-        double prob_mu = p_mu->getExtraInfo("IsRightTrack(Muon)");
-        if (prob_mu > maximum_prob_mu) {
-          maximum_prob_mu = prob_mu;
-          track_target_mu = p_mu -> getTrack();
+      if (MuonList.isValid()) {
+        for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
+          Particle* p_mu = MuonList->getParticle(i);
+          double prob_mu = p_mu->getExtraInfo("IsRightTrack(Muon)");
+          if (prob_mu > maximum_prob_mu) {
+            maximum_prob_mu = prob_mu;
+            track_target_mu = p_mu -> getTrack();
+          }
         }
       }
-      for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
-        Particle* p_el = ElectronList->getParticle(i);
-//             const Particle* p_el = p ->getRelated<PartList>();
-        double prob_el = p_el->getExtraInfo("IsRightTrack(Electron)");
-        if (prob_el > maximum_prob_el) {
-          maximum_prob_el = prob_el;
-          track_target_el = p_el -> getTrack();
+      if (ElectronList.isValid()) {
+        for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
+          Particle* p_el = ElectronList->getParticle(i);
+          double prob_el = p_el->getExtraInfo("IsRightTrack(Electron)");
+          if (prob_el > maximum_prob_el) {
+            maximum_prob_el = prob_el;
+            track_target_el = p_el -> getTrack();
+          }
         }
       }
       if (particle->getTrack() == track_target_mu || particle->getTrack() == track_target_el) {
@@ -427,7 +451,6 @@ namespace Belle2 {
 
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
       StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
-//       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
 //       double maximum_prob_K = 0;
       double maximum_prob_pi = 0;
@@ -444,12 +467,14 @@ namespace Belle2 {
 //           momTarget_K = T.rotateLabToCms() * p_K -> get4Vector();
 //         }
 //       }
-      for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-        Particle* p_pi = SlowPionList->getParticle(i);
-        double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
-        if (prob_pi > maximum_prob_pi) {
-          maximum_prob_pi = prob_pi;
-          momTarget_pi = T.rotateLabToCms() * p_pi -> get4Vector();
+      if (SlowPionList.isValid()) {
+        for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+          Particle* p_pi = SlowPionList->getParticle(i);
+          double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
+          if (prob_pi > maximum_prob_pi) {
+            maximum_prob_pi = prob_pi;
+            momTarget_pi = T.rotateLabToCms() * p_pi -> get4Vector();
+          }
         }
       }
       return TMath::Cos(momTarget_K.Angle(momTarget_pi.Vect()));
@@ -457,7 +482,6 @@ namespace Belle2 {
 
     double ImpactXY(const Particle* particle)
     {
-
       double x = particle->getX() - 0;
       double y = particle->getY() - 0;
 
@@ -469,40 +493,35 @@ namespace Belle2 {
 //       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
 
       double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
-
       double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
 
       return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
-
     }
 
     double KaonPionHaveOpositeCharges(const Particle* particle)
     {
-
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
       StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
-//       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
 //       double maximum_prob_K = 0;
       double maximum_prob_pi = 0;
 
       float chargeTarget_K = particle -> getCharge();
       float chargeTarget_pi = 0;
-
-      for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-        Particle* p_pi = SlowPionList->getParticle(i);
-        double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
-        if (prob_pi > maximum_prob_pi) {
-          maximum_prob_pi = prob_pi;
-          chargeTarget_pi =  p_pi -> getCharge();
+      if (SlowPionList.isValid()) {
+        for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+          Particle* p_pi = SlowPionList->getParticle(i);
+          double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
+          if (prob_pi > maximum_prob_pi) {
+            maximum_prob_pi = prob_pi;
+            chargeTarget_pi =  p_pi -> getCharge();
+          }
         }
       }
       if (chargeTarget_K * chargeTarget_pi == -1) {
         return 1;
       } else return 0;
     }
-
-    //FLAVOR TAGGING RELATED:
 
     Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments)
     {
@@ -517,32 +536,30 @@ namespace Belle2 {
           float maximum_p_track = 0; //Probability of being the target track from the track level
           float prob = 0; //The probability of beeing right classified flavor from the event level
           float maximum_q = 0; //Flavour of the track selected as target
-          if (ListOfParticles)
+          if (ListOfParticles.isValid())
           {
-            if (ListOfParticles->getListSize() > 0) {
-              for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
-                Particle* particle = ListOfParticles->getParticle(i);
-                double x = 0;
-                if (extraInfoRightTrack == "IsRightTrack(MaximumPstar)") {
-                  x = (T.rotateLabToCms() * particle->get4Vector()).P();
-                } else x = particle->getExtraInfo(extraInfoRightTrack);
-                if (x > maximum_p_track) {
-                  maximum_p_track = x;
-                  target = particle;
-                }
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* particle = ListOfParticles->getParticle(i);
+              double x = 0;
+              if (extraInfoRightTrack == "IsRightTrack(MaximumPstar)") {
+                x = (T.rotateLabToCms() * particle->get4Vector()).P();
+              } else x = particle->getExtraInfo(extraInfoRightTrack);
+              if (x > maximum_p_track) {
+                maximum_p_track = x;
+                target = particle;
               }
-              if (target != nullptr) {
-                prob = target -> getExtraInfo(extraInfoRightCategory); //Gets the probability of beeing right classified flavor from the event level
-                maximum_q = target -> getCharge(); //Gets the flavor of the track selected as target
-                if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
-                  maximum_q = target->getPDGCode() / TMath::Abs(target->getPDGCode());
-                }
-              }
+            }
+            if (target != nullptr) {
+              prob = target -> getExtraInfo(extraInfoRightCategory); //Gets the probability of beeing right classified flavor from the event level
+              // Gets the flavor of the track selected as target
+              if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
+                maximum_q = (-1) * target->getPDGCode() / TMath::Abs(target->getPDGCode());
+              } else maximum_q = target -> getCharge();
             }
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           //return 0.5 * (maximum_q * r + 1);
-//            if (extraInfoRightTrack == ("IsRightTrack(IntermediateElectron)" || "IsRightTrack(IntermediateMuon)" || "IsRightTrack(SlowPion)" || "IsRightTrack(FSC)" || "IsRightTrack(Lambda)")) return -1 * maximum_q * prob;
+//            if (extraInfoRightTrack == ("IsRightTrack(IntermediateElectron)" || "IsRightTrack(IntermediateMuon)" || "IsRightTrack(SlowPion)" || "IsRightTrack(FSC)")) return -1 * maximum_q * prob;
           return maximum_q * prob;
         };
         return func;
@@ -559,86 +576,79 @@ namespace Belle2 {
         auto extraInfoRightCategory = arguments[1];
         auto extraInfoRightTrack = arguments[2];
         auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
-          if (particleListName == "K+:KaonROE" || particleListName == "Lambda0:LambdaROE")
+//           if (particleListName == "K+:KaonROE" || particleListName == "Lambda0:LambdaROE")
+//           {
+          double flavor = 0.0;
+          double r = 0.0;
+          double qr = 0.0;
+          double final_value = 0.0;
+          double val1 = 1.0;
+          double val2 = 1.0;
+
+          auto compare = [extraInfoRightTrack](const Particle * part1, const Particle * part2)-> bool {
+            double info1 = part1->getExtraInfo(extraInfoRightTrack);
+            double info2 = part2->getExtraInfo(extraInfoRightTrack);
+            return (info1 > info2);
+          };
+
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+          if (ListOfParticles)
           {
-            double flavor = 0.0;
-            double r = 0.0;
-            double qr = 0.0;
-            double final_value = 0.0;
-            double val1 = 1.0;
-            double val2 = 1.0;
-            auto compare = [extraInfoRightTrack](const Particle * part1, const Particle * part2)-> bool {
-              double info1 = part1->getExtraInfo(extraInfoRightTrack);
-              double info2 = part2->getExtraInfo(extraInfoRightTrack);
-              return (info1 > info2);
-            };
-            StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-            if (ListOfParticles) {
-              if (ListOfParticles->getListSize() > 0) {
-                std::vector<const Particle*> ParticleVector;
-                ParticleVector.reserve(ListOfParticles->getListSize());
-                for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
-                  ParticleVector.push_back(ListOfParticles->getParticle(i));
-                }
-                std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
-                if (particleListName == "Lambda0:LambdaROE") {
-                  //Loop over Lambda vector until 3 or empty
-                  if (ParticleVector.size() != 0) final_value = 1.0;
-                  for (unsigned int i = 0; i < ParticleVector.size(); ++i) {
-                    //PDG Code Lambda0 3122 (indicates a B0bar)
-                    if (ParticleVector[i]->getPDGCode() == 3122) flavor = -1.0;
-                    else if (ParticleVector[i]->getPDGCode() == -3122) flavor = 1.0;
-                    else {flavor = 0.0;}
-                    r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
-                    qr = (flavor * r);
-                    val1 = val1 * (1 + qr);
-                    val2 = val2 * (1 - qr);
-                  }
-                  final_value = (val1 - val2) / (val1 + val2);
-                } else if (particleListName == "K+:KaonROE") {
-                  //Loop over K+ vector until 3 or empty
-                  if (ParticleVector.size() != 0) final_value = 1.0;
-                  for (unsigned int i = 0; i < ParticleVector.size(); i++) {
-                    flavor = ParticleVector[i]->getCharge();
-                    r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
-                    qr = (flavor * r);
-                    val1 = val1 * (1 + qr);
-                    val2 = val2 * (1 - qr);
-                  }
-                  final_value = (val1 - val2) / (val1 + val2);
-                }
+            if (ListOfParticles->getListSize() > 0) {
+              std::vector<const Particle*> ParticleVector;
+              ParticleVector.reserve(ListOfParticles->getListSize());
+
+              for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+                ParticleVector.push_back(ListOfParticles->getParticle(i));
               }
+              std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
+
+              //Loop over K+ vector until 3 or empty
+              if (ParticleVector.size() != 0) final_value = 1.0;
+              for (unsigned int i = 0; i < ParticleVector.size(); i++) {
+
+                if (particleListName == "Lambda0:LambdaROE") {
+                  flavor = (-1) * ParticleVector[i]->getPDGCode() / TMath::Abs(ParticleVector[i]->getPDGCode());
+                } else flavor = ParticleVector[i]->getCharge();
+
+                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
+                qr = (flavor * r);
+                val1 = val1 * (1 + qr);
+                val2 = val2 * (1 - qr);
+              }
+              final_value = (val1 - val2) / (val1 + val2);
             }
-
-
-            return final_value;
           }
+          return final_value;
+//           }
 
           //SlowPion, Electron, Muon
-          else{
-            StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-            StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-            double flavor = 0.0; //Flavour of the track selected as target
-            double maximum_p_track = 0.0; //Probability of being the target track from the track level
-            double final_value = 0.0;
-            for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++)
-            {
-              Particle* p = ListOfParticles->getParticle(i);
-              double x = p->getExtraInfo(extraInfoRightTrack);
-              if (x > maximum_p_track) {
-                maximum_p_track = x;
-                //In case of slowPions and intermediate momentum leptons sign is flipped
-                if (particleListName == "pi+:SlowPionROE" && extraInfoRightTrack == "IsRightTrack(SlowPion)") flavor = (-1.0) * p->getCharge();
-                else if (particleListName == "e+:IntermediateElectronROE"
-                && extraInfoRightTrack == "IsRightTrack(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
-                else if (particleListName == "mu+:IntermediateMuonROE"
-                && extraInfoRightTrack == "IsRightTrack(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
-                else flavor = p->getCharge();
-              }
-            }
-            final_value = flavor * maximum_p_track;
-            return final_value;
-          }
+//           else{
+//             StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
+//             StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+//             double flavor = 0.0; //Flavour of the track selected as target
+//             double maximum_p_track = 0.0; //Probability of being the target track from the track level
+//             double final_value = 0.0;
+//             if (ListOfParticles)
+//             {
+//               for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
+//                 Particle* p = ListOfParticles->getParticle(i);
+//                 double x = p->getExtraInfo(extraInfoRightTrack);
+//                 if (x > maximum_p_track) {
+//                   maximum_p_track = x;
+//                   //In case of slowPions and intermediate momentum leptons sign is flipped
+//                   if (particleListName == "pi+:SlowPionROE" && extraInfoRightTrack == "IsRightTrack(SlowPion)") flavor = (-1.0) * p->getCharge();
+//                   else if (particleListName == "e+:IntermediateElectronROE"
+//                   && extraInfoRightTrack == "IsRightTrack(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
+//                   else if (particleListName == "mu+:IntermediateMuonROE"
+//                   && extraInfoRightTrack == "IsRightTrack(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
+//                   else flavor = p->getCharge();
+//                 }
+//               }
+//             }
+//             final_value = flavor * maximum_p_track;
+//             return final_value;
+//           }
         };
         return func;
       } else {
@@ -660,21 +670,21 @@ namespace Belle2 {
           const MCParticle* MCp = particle ->getRelated<MCParticle>();
           maximum_q = particle -> getCharge();
           qMC = 2 * (Variable::Manager::Instance().getVariable("qrCombined")->function(nullpart) - 0.5);
+
+          // ---------------------------- Mothers and Grandmothers ---------------------------------
           if (MCp != nullptr)
           {
             maximum_PDG = TMath::Abs(MCp->getPDG());
             if (particleName != "Lambda" && MCp->getMother() != nullptr) {
               maximum_PDG_Mother = TMath::Abs(MCp->getMother()->getPDG());
             }
-            //for Kaons and SlowPions we need the mother of the mother for the particle
+            //for some Categories we need the mother of the mother of the particle
             if ((particleName == "Kaon" || particleName == "SlowPion" || particleName == "IntermediateElectron"
                  || particleName == "IntermediateMuon" || particleName == "FastPion")
                 && MCp->getMother()->getMother() != nullptr) maximum_PDG_Mother_Mother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
-          } else {
-            maximum_PDG = 0;
-            maximum_PDG_Mother = 0;
           }
-//           float SlowPion_q = 0;
+
+          // ----------------------------  For KaonPion Category ------------------------------------
           int SlowPion_PDG = 0;
           int SlowPion_PDG_Mother = 0;
           if (particleName == "KaonPion")
@@ -682,22 +692,25 @@ namespace Belle2 {
             StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
             double maximum_prob_pi = 0;
             Particle* TargetSlowPion = nullptr;
-            for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-              Particle* p_pi = SlowPionList->getParticle(i);
-              double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
-              if (prob_pi > maximum_prob_pi) {
-                maximum_prob_pi = prob_pi;
-                TargetSlowPion = p_pi;
-              }
-              const MCParticle* MCSlowPion = TargetSlowPion ->getRelated<MCParticle>();
+            if (SlowPionList.isValid()) {
+              for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+                Particle* p_pi = SlowPionList->getParticle(i);
+                double prob_pi = p_pi->getExtraInfo("IsRightTrack(SlowPion)");
+                if (prob_pi > maximum_prob_pi) {
+                  maximum_prob_pi = prob_pi;
+                  TargetSlowPion = p_pi;
+                }
+                const MCParticle* MCSlowPion = TargetSlowPion ->getRelated<MCParticle>();
 //               SlowPion_q = TargetSlowPion -> getCharge();
-              if (MCSlowPion->getMother() != nullptr && MCSlowPion->getMother()->getMother() != nullptr) {
-                SlowPion_PDG = TMath::Abs(MCSlowPion->getPDG());
-                SlowPion_PDG_Mother = TMath::Abs(MCSlowPion->getMother()->getPDG());
+                if (MCSlowPion != nullptr && MCSlowPion->getMother() != nullptr) {
+                  SlowPion_PDG = TMath::Abs(MCSlowPion->getPDG());
+                  SlowPion_PDG_Mother = TMath::Abs(MCSlowPion->getMother()->getPDG());
+                }
               }
             }
           }
-//           float FastParticle_q = 0;
+
+          // ----------------------------  For FastSlowCorrelated Category ----------------------------
           int FastParticle_PDG_Mother = 0;
           if (particleName == "FSC")
           {
@@ -705,20 +718,24 @@ namespace Belle2 {
             PCmsLabTransform T;
             double maximum_prob_fast = 0;
             Particle* TargetFastParticle = nullptr;
-            for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
-              Particle* p_fast = FastParticleList->getParticle(i);
-              double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
-              if (prob_fast > maximum_prob_fast) {
-                maximum_prob_fast = prob_fast;
-                TargetFastParticle = p_fast;
-              }
-              const MCParticle* MCFastParticle = TargetFastParticle ->getRelated<MCParticle>();
+            if (FastParticleList.isValid()) {
+              for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
+                Particle* p_fast = FastParticleList->getParticle(i);
+                double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
+                if (prob_fast > maximum_prob_fast) {
+                  maximum_prob_fast = prob_fast;
+                  TargetFastParticle = p_fast;
+                }
+                const MCParticle* MCFastParticle = TargetFastParticle ->getRelated<MCParticle>();
 //               FastParticle_q = TargetFastParticle -> getCharge();
-              if (MCFastParticle->getMother() != nullptr && MCFastParticle->getMother()->getMother() != nullptr) {
-                FastParticle_PDG_Mother = TMath::Abs(MCFastParticle->getMother()->getPDG());
+                if (MCFastParticle != nullptr && MCFastParticle->getMother() != nullptr) {
+                  FastParticle_PDG_Mother = TMath::Abs(MCFastParticle->getMother()->getPDG());
+                }
               }
             }
           }
+
+          // ------------------------------  Outputs  -----------------------------------
           if (particleName == "Electron"
               && ((maximum_q == qMC && maximum_PDG == 11 && maximum_PDG_Mother == 511)
                   || (maximum_q != qMC && maximum_PDG == 11 && maximum_PDG_Mother_Mother == 511)))
@@ -882,21 +899,22 @@ namespace Belle2 {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           double maximum_prob = 0;
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+          if (ListOfParticles.isValid())
           {
-            Particle* p = ListOfParticles->getParticle(i);
-            double prob = 0;
-            if (extraInfoName == "IsRightTrack(MaximumPstar)") {
-              prob = (T.rotateLabToCms() * p->get4Vector()).P();
-            } else prob = p->getExtraInfo(extraInfoName);
-            if (prob > maximum_prob) {
-              maximum_prob = prob;
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* p = ListOfParticles->getParticle(i);
+              double prob = 0;
+              if (extraInfoName == "IsRightTrack(MaximumPstar)") {
+                prob = (T.rotateLabToCms() * p->get4Vector()).P();
+              } else prob = p->getExtraInfo(extraInfoName);
+              if (prob > maximum_prob) {
+                maximum_prob = prob;
+              }
             }
-          }
-          if ((extraInfoName == "IsRightTrack(MaximumPstar)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
-              (extraInfoName != "IsRightTrack(MaximumPstar)" && particle -> getExtraInfo(extraInfoName) == maximum_prob))
-          {
-            return 1.0;
+            if ((extraInfoName == "IsRightTrack(MaximumPstar)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximum_prob) ||
+                (extraInfoName != "IsRightTrack(MaximumPstar)" && particle -> getExtraInfo(extraInfoName) == maximum_prob)) {
+              return 1.0;
+            } else return 0.0;
           } else return 0.0;
         };
         return func;
@@ -913,12 +931,14 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle*) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           double maximum_prob = 0;
-          for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
+          if (ListOfParticles.isValid())
           {
-            Particle* p = ListOfParticles->getParticle(i);
-            double prob = p->getExtraInfo(extraInfoName);
-            if (prob > maximum_prob) {
-              maximum_prob = prob;
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* p = ListOfParticles->getParticle(i);
+              double prob = p->getExtraInfo(extraInfoName);
+              if (prob > maximum_prob) {
+                maximum_prob = prob;
+              }
             }
           }
           return maximum_prob;
@@ -939,48 +959,65 @@ namespace Belle2 {
           TLorentzVector momXchargedclusters; //Momentum of charged X clusters in CMS-System
           TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
+
+          double Output = 0.0;
+
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          const auto& tracks = roe->getTracks();
-          for (auto& x : tracks)
+          if (roe.isValid())
           {
-            const TrackFitResult* tracki = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
-            if (tracki == nullptr || particle->getTrack() == x) continue;
-            TLorentzVector momtrack(tracki->getMomentum(), 0);
-            momXchargedtracks += T.rotateLabToCms() * momtrack;
-          }
-          const auto& ecl = roe->getECLClusters();
-          for (auto& x : ecl)
-          {
-            if (x->isNeutral()) momXneutralclusters += T.rotateLabToCms() * x -> get4Vector();
-            if (!(x->isNeutral())) momXchargedclusters += T.rotateLabToCms() * x -> get4Vector();
-          }
-          const auto& klm = roe->getKLMClusters();
-          for (auto& x : klm)
-          {
-            if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-              momXneutralclusters += T.rotateLabToCms() * x -> getMomentum();
+            const auto& tracks = roe->getTracks();
+            for (auto& x : tracks) {
+              const TrackFitResult* tracki = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
+              if (tracki == nullptr || particle->getTrack() == x) continue;
+              TLorentzVector momtrack(tracki->getMomentum(), 0);
+              TLorentzVector momXchargedtracki = T.rotateLabToCms() * momtrack;
+              if (momXchargedtracki == momXchargedtracki) momXchargedtracks += momXchargedtracki;
+            }
+            const auto& ecl = roe->getECLClusters();
+            for (auto& x : ecl) {
+              if (x == nullptr) continue;
+              TLorentzVector momXclusteri = T.rotateLabToCms() * x -> get4Vector();
+              if (momXclusteri == momXclusteri) {
+                if (x->isNeutral()) momXneutralclusters += momXclusteri;
+                else if (!(x->isNeutral())) momXchargedclusters += momXclusteri;
+              }
+            }
+            const auto& klm = roe->getKLMClusters();
+            for (auto& x : klm) {
+              if (x == nullptr) continue;
+              TLorentzVector momXKLMclusteri = T.rotateLabToCms() * x -> getMomentum();
+              if (momXKLMclusteri == momXKLMclusteri) {
+                if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
+                  momXneutralclusters += momXKLMclusteri;
+                }
+              }
+            }
+
+            TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+            TLorentzVector momX = (momXcharged + momXneutralclusters) - momTarget; //Total Momentum of the recoiling X in CMS-System
+            TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+            if (requestedVariable == "recoilMass") Output = momX.M();
+            else if (requestedVariable == "p_missing_CMS") Output = momMiss.Vect().Mag();
+            else if (requestedVariable == "CosTheta_missing_CMS") Output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+            else if (requestedVariable == "EW90") {
+              TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+              float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+              for (auto& i : ecl) {
+                if (i == nullptr) continue;
+                float Energyi = i -> getEnergy();
+                if (Energyi == Energyi) {
+                  if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += Energyi;
+                }
+                //       for (auto & i : klm) {
+                //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+                //         }
+              }
+              Output = E_W_90;
+            } else {
+              B2FATAL("Wrong variable requested. The possibilities are recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90");
             }
           }
-          TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-          TLorentzVector momX = (momXcharged + momXneutralclusters) - momTarget; //Total Momentum of the recoiling X in CMS-System
-          TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-          if (requestedVariable == "recoilMass") return momX.M();
-          else if (requestedVariable == "p_missing_CMS") return momMiss.Vect().Mag();
-          else if (requestedVariable == "CosTheta_missing_CMS") return TMath::Cos(momTarget.Angle(momMiss.Vect()));
-          else if (requestedVariable == "EW90")
-          {
-            TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
-            float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-            for (auto& i : ecl) {
-              if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += i -> getEnergy();
-            }
-//       for (auto & i : klm) {
-//         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-//         }
-            return E_W_90;
-          } else {
-            B2FATAL("Wrong variable requested. The possibilities are recoilMass, p_missing_CMS, CosTheta_missing_CMS or EW90");
-          }
+          return Output;
         };
         return func;
       } else {
@@ -995,11 +1032,16 @@ namespace Belle2 {
         auto func = [requestedVariable](const Particle * particle) -> double {
           StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
           PCmsLabTransform T;
+          TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
+          TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
           double maximum_prob_fast = 0;
           Particle* TargetFastParticle = nullptr;
+
+          double Output = 0.0;
+
           if ((requestedVariable == "p_CMS_Fast") || (requestedVariable == "cosSlowFast") || (requestedVariable == "cosTPTO_Fast") || (requestedVariable == "SlowFastHaveOpositeCharges"))
           {
-            if (FastParticleList) {
+            if (FastParticleList.isValid()) {
               for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
                 Particle* p_fast = FastParticleList->getParticle(i);
                 double prob_fast = (T.rotateLabToCms() * p_fast -> get4Vector()).P();
@@ -1008,21 +1050,22 @@ namespace Belle2 {
                   TargetFastParticle = p_fast;
                 }
               }
-              TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
-              TLorentzVector momFastParticle = T.rotateLabToCms() * TargetFastParticle -> get4Vector();  //Momentum of Slow Pion in CMS-System
-
-              if (requestedVariable == "cosSlowFast") return TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
-              else if (requestedVariable == "cosTPTO_Fast") return Variable::Manager::Instance().getVariable("cosTPTO")->function(
-                                                                       TargetFastParticle);
-              else if (requestedVariable == "SlowFastHaveOpositeCharges") {
-                if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
-                  return 1;
-                } else return 0;
-              } else return momFastParticle.P();
-            } else return 0;
+              if (TargetFastParticle != nullptr) {
+                momFastParticle = T.rotateLabToCms() * TargetFastParticle -> get4Vector();
+                if (requestedVariable == "cosSlowFast") Output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
+                else if (requestedVariable == "cosTPTO_Fast") Output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
+                                                                           TargetFastParticle);
+                else if (requestedVariable == "SlowFastHaveOpositeCharges") {
+                  if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
+                    Output = 1;
+                  }
+                } else Output = momFastParticle.P();
+              }
+            }
           } else {
             B2FATAL("Wrong variable requested. The possibilities are p_CMS_Fast, cosSlowFast or cosTPTO_Fast");
           }
+          return Output;
         };
         return func;
       } else {
@@ -1039,7 +1082,8 @@ namespace Belle2 {
           if (requestedVariable == "getListSize")
           {
             StoreObjPtr<ParticleList> ListOfParticles(ListName);
-            return ListOfParticles->getListSize();
+            if (ListOfParticles.isValid()) return ListOfParticles->getListSize();
+            else return 0;
           } else {
             B2FATAL("Wrong requested Variable. Available is getListSize for particle lists");
           }
@@ -1057,12 +1101,13 @@ namespace Belle2 {
 
         StoreObjPtr<ParticleList> Y(motherlist);
         std::vector<Particle*> daughters;
-        for (unsigned int i = 0; i < Y->getListSize(); ++i)
+        if (Y.isValid())
         {
-          const auto& x = Y->getParticle(i)->getDaughters();
-          daughters.insert(daughters.end(), x.begin(), x.end());
+          for (unsigned int i = 0; i < Y->getListSize(); ++i) {
+            const auto& x = Y->getParticle(i)->getDaughters();
+            daughters.insert(daughters.end(), x.begin(), x.end());
+          }
         }
-
         while (!daughters.empty())
         {
           std::vector<Particle*> tmpdaughters;
@@ -1115,7 +1160,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,
                       "Returns the number of K_S0 in the remainging Lambda ROE.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
-    REGISTER_VARIABLE("isLambda", isLambda,  "0.0 if MCLambda0, 1.0 else.");
+    REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if MCLambda0, 0.0 else.");
     REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
     REGISTER_VARIABLE("MomentumOfSecondDaughter", MomentumOfSecondDaughter,
                       "Returns the Momentum of second daughter if existing, else 0.");

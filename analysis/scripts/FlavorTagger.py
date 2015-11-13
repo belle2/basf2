@@ -473,16 +473,16 @@ def FillParticleLists(mode='Expert', path=analysis_main):
         if particleList == 'K+:KaonROE':
             # Precut done to prevent from overtraining, might be redundant
             applyCuts(particleList, '0.1<Kid', path=path)
-            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
+            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                              '0.40<=M<=0.60', 1, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if particleList == 'Lambda0:LambdaROE':
-            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
+            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
                              path=path)
-            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and useCMSFrame(p) != NaN',
+            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
                              path=path)
             reconstructDecay(particleList + ' -> pi-:inLambdaRoe p+:inLambdaRoe',
                              '1.00<=M<=1.23', 1, path=path)
@@ -492,22 +492,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
-    # Conditions to continue with the Event level: No variable has a NaN or infinity value!
-        condition = str()
-        for i in range(len(variables[category])):
-            if i == 0:
-                condition = condition + variables[category][i] + " != NaN and " + variables[category][i] + " != infinity"
-            else:
-                condition = condition + " and " + variables[category][i] + " != NaN and " \
-                    + variables[category][i] + " != infinity"
-        applyCuts(particleList, condition, path=path)
-
     # Filling 'pi+:MaximumPstarROE' particle list
-    conditionMaximumPstar = str()
-    for variable in variables['MaximumPstar']:
-        conditionMaximumPstar = conditionMaximumPstar + " and " + \
-            variable + " != NaN and " + variable + " != infinity"
-    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5' + conditionMaximumPstar, path=path)
+    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5', path=path)
 
     return True
 
@@ -727,11 +713,12 @@ def FlavorTagger(
     if not Belle2.FileSystem.findFile(workingDirectory):
         B2FATAL('THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
-    if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
-        os.mkdir(workingDirectory + '/FlavorTagging')
-        os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-    elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods'):
-        os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
+    if mode == 'Teacher':
+        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
+            os.mkdir(workingDirectory + '/FlavorTagging')
+            os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
+        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods'):
+            os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
 
     workingDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 

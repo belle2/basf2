@@ -41,10 +41,8 @@ class CosmicsHough(TrackingValidationRun):
     cdc_stereo_combiner_module.param(dict(TracksStoreObjNameIsInput=True,
                                           WriteGFTrackCands=True,
                                           TracksStoreObjName="AxialCDCTracks",
-                                          debugOutput=True,
                                           quadTreeLevel=6,
-                                          minimumHitsInQuadtree=20,
-                                          useOldImplementation=False))
+                                          minimumNumberOfHits=20))
 
     finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
 

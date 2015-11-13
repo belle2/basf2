@@ -599,7 +599,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
     hist_impact_parameter_d0.SetYTitle('#sigma_{d0} [cm]')
-    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy, expert'))
+    hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
     hist_impact_parameter_d0.GetListOfFunctions().Add(TNamed('Contact',
                                                              CONTACT_PERSON['Email']))
 
@@ -608,7 +608,7 @@ def draw_impact_parameter(data_tree):
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z} [cm]')
-    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy, expert'))
+    hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('MetaOptions', 'logy'))
     hist_impact_parameter_z.GetListOfFunctions().Add(TNamed('Contact',
                                                             CONTACT_PERSON['Email']))
 

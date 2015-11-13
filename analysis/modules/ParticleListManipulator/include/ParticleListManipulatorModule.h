@@ -28,6 +28,8 @@ namespace Belle2 {
    * two or more ParticleLists(s) to another ParticleList. In the
    * process selection criteria can be applied, meaning that all
    * Particles that pass it will be copied.
+   * Note that the Particles themselves are not copied.The original and copied
+   * ParticleLists will point to the same Particles.
    */
   class ParticleListManipulatorModule : public Module {
 

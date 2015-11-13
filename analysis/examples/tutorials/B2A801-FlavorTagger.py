@@ -67,16 +67,22 @@ buildRestOfEvent('B0:jspiks')
 # Build Continuum suppression. Needed for Flavor Tagging Variables. (Dependency will be removed)
 buildContinuumSuppression('B0:jspiks')
 
-# Before using the Flavor Tagger you need at least the default weight files: copy the folder in @login.cc.kek.jp:
-# scp -r /home/belle2/abudinen/public/FlavorTagging
-# into your local release under analysis/data/.
+# Before using the Flavor Tagger you need at least the default weight files for the employed release:
+# copy the folder in @login.cc.kek.jp:
+# scp -r /home/belle2/abudinen/public/FT-build-20xx-xx-xx/FlavorTagging
+# into your workingDirectory/.
+# The default working directory is '.'
+# If you have an own analysis package it is recomended to use
+# workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
+# Note that if you also train by yourself the weights of the trained Methods are saved therein.
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 # FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
 FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
-    categories=['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion'])
+    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
+    categories=['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion'])
 #
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
@@ -86,11 +92,11 @@ FlavorTagger(
 # Instead of the default name 'B2JpsiKs_mu' is better to use the abbreviation of your decay channel.
 # If you do not specify any category combination, the default one is choosed either in 'Teacher' or 'Expert' mode:
 #
-# ['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumP*', 'KaonPion']
+# ['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion']
 #
 # All available categories are:
 # ['Electron', 'IntermediateElectron', 'Muon', 'IntermediateMuon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion',
-# 'Lambda', 'FSC', 'MaximumP*', 'KaonPion']
+# 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion']
 #
 # If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels)
 # with 3 different samples of 500k events.
@@ -113,6 +119,7 @@ toolsDST += ['MCHierarchy', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
+toolsDST += ['ROEMultiplicities', '^B0']
 toolsDST += ['FlavorTagging', '^B0']
 #  Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 

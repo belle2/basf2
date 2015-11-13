@@ -2,6 +2,25 @@
 <DetectorComponent name="FANGS">
   <Creator library="beast_fangs">FANGSCreator</Creator>
   <Content>
+    <PixelThreshold>3000</PixelThreshold>
+    <PixelThresholdRMS>150</PixelThresholdRMS>
+    <ChipColumnNb>80</ChipColumnNb>
+    <ChipColumnX>1</ChipColumnX>
+    <ChipRowNb>336</ChipRowNb>
+    <ChipRowY>0.84</ChipRowY>
+    <PixelTimeBinNb>256</PixelTimeBinNb>
+    <PixelTimeBin>25</PixelTimeBin>
+    <TOTA1>10640.8</TOTA1>
+    <TOTB1>-18.4</TOTB1>
+    <TOTC1>96007.6</TOTC1>
+    <TOTQ1>57.</TOTQ1>
+    <TOTA2>29.4</TOTA2>
+    <TOTB2>64.7</TOTB2>
+    <TOTC2>1082.7</TOTC2>
+    <TOTQ2>57.</TOTQ2>
+    <Workfct>1.12</Workfct>
+    <z_sensor_width>0.05</z_sensor_width>
+    <v_sensor>0.023</v_sensor>
     <shape name="FANGS" type="box">
       <length unit="mm">170</length>
       <width unit="mm">28.7</width>

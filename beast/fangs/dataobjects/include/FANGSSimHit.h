@@ -28,27 +28,32 @@ namespace Belle2 {
   class FANGSSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    FANGSSimHit(): SimHitBase(), m_time(0), m_energyDep(0),
-      m_length(0), m_PDG(0), m_ladder(0), m_sensor(0)
+    FANGSSimHit(): SimHitBase(), m_trkID(0), m_ladder(0), m_sensor(0),
+      m_PDG(0), m_time(0), m_energyDep(0), m_length(0)
     {
       std::fill_n(m_momEntry, 3, 0.0);
       std::fill_n(m_posEntry, 3, 0.0);
+      std::fill_n(m_localposEntry, 3, 0.0);
       std::fill_n(m_posExit, 3, 0.0);
     }
 
     /** Standard constructor
      * @param energyDep Deposited energy in GeV
      */
-    FANGSSimHit(int ladder, int sensor, int pdg, float time, float energyDep,
-                float length, const float* posEntry, const float* posExit, const float* momEntry):
-      SimHitBase(), m_time(time), m_energyDep(energyDep),
-      m_length(length), m_PDG(pdg), m_ladder(ladder), m_sensor(sensor)
+    FANGSSimHit(int trkID, int ladder, int sensor, int pdg, float time, float energyDep,
+                float length, const float* posEntry, const float* localposEntry,
+                const float* posExit, const float* momEntry):
+      SimHitBase(), m_trkID(trkID), m_ladder(ladder), m_sensor(sensor), m_PDG(pdg),
+      m_time(time), m_energyDep(energyDep), m_length(length)
     {
       std::copy_n(momEntry, 3, m_momEntry);
       std::copy_n(posEntry, 3, m_posEntry);
+      std::copy_n(localposEntry, 3, m_localposEntry);
       std::copy_n(posExit, 3, m_posExit);
     }
 
+    /** Return track ID */
+    int gettrkID() const { return m_trkID; }
     /** Return the Ladder number (starting at 1, increasing with phi) */
     int getLadder() const { return m_ladder; }
     /** Return the Sensor number (starting at 1, increasing with decreasing z) */
@@ -61,6 +66,8 @@ namespace Belle2 {
     float getEnergyDep() const { return m_energyDep; }
     /** Return the entry track position */
     TVector3 getPosEntry() const { return TVector3(m_posEntry[0], m_posEntry[1], m_posEntry[2]); }
+    /** Return the local entry track position */
+    TVector3 getLocalPosEntry() const { return TVector3(m_localposEntry[0], m_localposEntry[1], m_localposEntry[2]); }
     /** Return the exit track position */
     TVector3 getPosExit() const { return TVector3(m_posExit[0], m_posExit[1], m_posExit[2]); }
     /** Return the track momentum */
@@ -73,24 +80,30 @@ namespace Belle2 {
     const float* getMomEntryArray() const { return m_momEntry; }
 
   private:
+    /** Track ID number */
+    int m_trkID;
+    /** Ladder id */
+    uint8_t m_ladder;
+    /** Sensor id */
+    uint8_t m_sensor;
+    /** PDG number of the track */
+    int m_PDG;
     /** global time */
     float m_time;
     /** Deposited energy in GeV */
     float m_energyDep;
     /** entry position, global coordinates */
     float m_posEntry[3];
+    /** entry position, local coordinates */
+    float m_localposEntry[3];
     /** exit position, global coordinates */
     float m_posExit[3];
     /** momentum at entry, global coordinates */
     float m_momEntry[3];
     /** track length */
     float m_length;
-    /** PDG number of the track */
-    int m_PDG;
-    /** Ladder id */
-    uint8_t m_ladder;
-    /** Sensor id */
-    uint8_t m_sensor;
+
+
 
     ClassDef(FANGSSimHit, 2)
   };

@@ -74,8 +74,10 @@ namespace Belle2 {
         //Add start position
         const G4ThreeVector preStepPos = preStep.GetPosition() / CLHEP::mm * Unit::mm;
         const G4ThreeVector preStepMom = preStep.GetMomentum() / CLHEP::MeV * Unit::MeV;
+        const G4AffineTransform& localToGlobalTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().Inverse();
+        const G4ThreeVector localpreStepPos = localToGlobalTransform.TransformPoint(preStep.GetPosition()) * Unit::mm;
         const double time = preStep.GetGlobalTime() / CLHEP::ns * Unit::ns;
-        traversal.setInitial(trackID, ladderID, sensorID, pdgCode, isPrimary, preStepPos, preStepMom, time);
+        traversal.setInitial(trackID, ladderID, sensorID, pdgCode, isPrimary, preStepPos, localpreStepPos, preStepMom, time);
         //Remember if the track came from the outside
         if (preStep.GetStepStatus() == fGeomBoundary) traversal.hasEntered();
       }
@@ -110,14 +112,17 @@ namespace Belle2 {
       if (save) {
         auto momEntry = vecToFloat(traversal.getEntryMomentum());
         auto posEntry = vecToFloat(traversal.getEntryPosition());
+        auto localposEntry = vecToFloat(traversal.getLocalEntryPosition());
         auto posExit = vecToFloat(traversal.getExitPosition());
         int hitIndex = m_simHits.getEntries();
         m_simHits.appendNew(
+          traversal.getTrackID(),
           traversal.getLadderID(), traversal.getSensorID(),
           traversal.getPDGCode(), traversal.getEntryTime(),
           traversal.getDepEnergy(),
-          traversal.getLength(), posEntry.data(), posExit.data(),
-          momEntry.data()
+          traversal.getLength(), posEntry.data(),
+          localposEntry.data(),
+          posExit.data(), momEntry.data()
         );
         m_relMCSimHit.add(traversal.getTrackID(), hitIndex, traversal.getDepEnergy());
       }

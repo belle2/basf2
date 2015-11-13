@@ -54,8 +54,12 @@ namespace Belle2 {
       const G4ThreeVector& getEntryMomentum() const { return m_entryMomentum; }
       /** get entry position */
       const G4ThreeVector& getEntryPosition() const { return m_entryPosition; }
+      /** get local entry position */
+      const G4ThreeVector& getLocalEntryPosition() const { return m_localentryPosition; }
       /** get exit position */
       const G4ThreeVector& getExitPosition() const { return m_exitPosition; }
+
+
 
       /** return whether the track was contained in the volume so far */
       bool isContained() const { return m_contained; }
@@ -69,7 +73,7 @@ namespace Belle2 {
 
       /** set initial values for a new track */
       void setInitial(int trackID, int ladderID, int sensorID, int pdgCode, bool primary, const G4ThreeVector& position,
-                      const G4ThreeVector& momentum, double time)
+                      const G4ThreeVector& localposition, const G4ThreeVector& momentum, double time)
       {
         m_trackID = trackID;
         m_ladderID = ladderID;
@@ -77,6 +81,7 @@ namespace Belle2 {
         m_pdgCode = pdgCode;
         m_primary = primary;
         m_entryPosition = position;
+        m_localentryPosition = localposition;
         m_entryMomentum = momentum;
         m_entryTime = time;
       }
@@ -108,6 +113,8 @@ namespace Belle2 {
       G4ThreeVector m_entryMomentum;
       /** Entry Position */
       G4ThreeVector m_entryPosition;
+      /** Local Entry Position */
+      G4ThreeVector m_localentryPosition;
       /** Exit Position */
       G4ThreeVector m_exitPosition;
       /** Geant4 Track ID */

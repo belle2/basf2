@@ -74,12 +74,6 @@ namespace Belle2 {
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
 
     /**
-     * copy of the daughters
-     * @param p pointer to particle
-     */
-    void copyDaughters(Particle* p);
-
-    /**
      * Main steering routine
      * @param p pointer to particle
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel

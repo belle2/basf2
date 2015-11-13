@@ -27,6 +27,7 @@
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ParticleCopy.h>
 
 // Magnetic field
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -136,7 +137,7 @@ namespace Belle2 {
       Particle* particle = plist->getParticle(i);
 
       if (m_updateDaughters == true) {
-        if (m_decayString.empty())copyDaughters(particle);
+        if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
       }
 
@@ -150,23 +151,6 @@ namespace Belle2 {
     if (m_vertexFitter == "rave")
       analysis::RaveSetup::getInstance()->reset();
   }
-
-
-  void ParticleVertexFitterModule::copyDaughters(Particle* mother)
-  {
-    StoreArray<Particle> particles;
-
-    std::vector<Belle2::Particle*> oldDaughters = mother->getDaughters();
-    for (unsigned iOld = 0; iOld < oldDaughters.size(); iOld++) {
-
-      Particle* dauCopy = particles.appendNew(*oldDaughters[iOld]);
-      dauCopy->copyRelations(oldDaughters[iOld]);
-      mother->removeDaughter(oldDaughters[iOld]);
-      mother->appendDaughter(dauCopy);
-    }
-
-  }
-
 
   bool ParticleVertexFitterModule::doVertexFit(Particle* mother)
   {

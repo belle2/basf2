@@ -1,14 +1,19 @@
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
+#include <analysis/utility/ParticleCopy.h>
+
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::ParticleCopy;
 
 namespace {
   /** Test fixture. */
@@ -19,7 +24,14 @@ namespace {
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap>::registerPersistent();
-      StoreArray<Particle>::registerPersistent();
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      StoreArray<RestOfEvent> roes;
+      particles.registerInDataStore();
+      mcparticles.registerInDataStore();
+      roes.registerInDataStore();
+      particles.registerRelationTo(mcparticles);
+      particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -298,6 +310,141 @@ namespace {
     EXPECT_DOUBLE_EQ(2.0, tCopy.getExtraInfo("somethingelse"));
     EXPECT_DOUBLE_EQ(3.0, tCopy.getExtraInfo("thirdvar_q"));
     tCopy.print();
+  }
+
+
+  /** test ParticleCopy utility */
+  TEST_F(ParticleTest, ParticleCopyUtility)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
+    StoreArray<RestOfEvent> roes;
+
+    // create some particles
+    Particle* T1Pion     = particles.appendNew(Particle(TLorentzVector(1, 1, 1, 1),  211, Particle::c_Flavored, Particle::c_Track, 1));
+    MCParticle* MC1      = mcparticles. appendNew(MCParticle());
+    MC1->setPDG(1);
+    T1Pion->addExtraInfo("test_var", 1.0);
+    T1Pion->addRelationTo(MC1);
+    Particle* T2Kaon     = particles.appendNew(Particle(TLorentzVector(2, 2, 2, 2), -321, Particle::c_Flavored, Particle::c_Track, 2));
+    MCParticle* MC2      = mcparticles. appendNew(MCParticle());
+    MC1->setPDG(2);
+    T2Kaon->addExtraInfo("test_var", 2.0);
+    T2Kaon->addRelationTo(MC2);
+    Particle* T3Kaon     = particles.appendNew(Particle(TLorentzVector(3, 3, 3, 3),  321, Particle::c_Flavored, Particle::c_Track, 3));
+    MCParticle* MC3      = mcparticles. appendNew(MCParticle());
+    MC3->setPDG(3);
+    T3Kaon->addExtraInfo("test_var", 3.0);
+    T3Kaon->addRelationTo(MC3);
+
+    // Construct composite particles
+    Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
+    D0KK->appendDaughter(T2Kaon);
+    D0KK->appendDaughter(T3Kaon);
+
+    Particle* B0 = particles.appendNew(Particle(TLorentzVector(5, 5, 5, 5), 511));
+    B0->appendDaughter(D0KK);
+    B0->appendDaughter(T1Pion);
+
+    RestOfEvent* roe = roes.appendNew(RestOfEvent());
+    std::vector<int> roeTracks = {4, 5, 6, 7};
+    roe->addTracks(roeTracks);
+    B0->addRelationTo(roe);
+
+    // Perform tests
+    // First sanity check
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 5/3/1
+    EXPECT_EQ(particles.getEntries(), 5);
+    EXPECT_EQ(mcparticles.getEntries(), 3);
+    EXPECT_EQ(roes.getEntries(), 1);
+
+    // now make a copy of B0
+    Particle* B0_copy = copyParticle(B0);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 10/3/1
+    EXPECT_EQ(particles.getEntries(), 10);
+    EXPECT_EQ(mcparticles.getEntries(), 3);
+    EXPECT_EQ(roes.getEntries(), 1);
+
+    // compare copy with original
+    EXPECT_EQ(B0->getPDGCode(), B0_copy->getPDGCode());
+    EXPECT_EQ(B0->getNDaughters(), B0_copy->getNDaughters());
+    EXPECT_EQ(B0->getDaughter(0)->getPDGCode(), B0_copy->getDaughter(0)->getPDGCode());
+    EXPECT_EQ(B0->getDaughter(1)->getPDGCode(), B0_copy->getDaughter(1)->getPDGCode());
+    EXPECT_EQ(B0->getDaughter(0)->getDaughter(0)->getPDGCode(), B0_copy->getDaughter(0)->getDaughter(0)->getPDGCode());
+    EXPECT_EQ(B0->getDaughter(0)->getDaughter(1)->getPDGCode(), B0_copy->getDaughter(0)->getDaughter(1)->getPDGCode());
+
+    EXPECT_FALSE(B0->getArrayIndex() == B0_copy->getArrayIndex());
+    EXPECT_FALSE(B0->getDaughter(0)->getArrayIndex() == B0_copy->getDaughter(0)->getArrayIndex());
+    EXPECT_FALSE(B0->getDaughter(1)->getArrayIndex() == B0_copy->getDaughter(1)->getArrayIndex());
+    EXPECT_FALSE(B0->getDaughter(0)->getDaughter(0)->getArrayIndex() == B0_copy->getDaughter(0)->getDaughter(0)->getArrayIndex());
+    EXPECT_FALSE(B0->getDaughter(0)->getDaughter(1)->getArrayIndex() == B0_copy->getDaughter(0)->getDaughter(1)->getArrayIndex());
+
+    EXPECT_TRUE(B0->get4Vector() == B0_copy->get4Vector());
+    EXPECT_TRUE(B0->getDaughter(0)->get4Vector() == B0_copy->getDaughter(0)->get4Vector());
+    EXPECT_TRUE(B0->getDaughter(1)->get4Vector() == B0_copy->getDaughter(1)->get4Vector());
+    EXPECT_TRUE(B0->getDaughter(0)->getDaughter(0)->get4Vector() == B0_copy->getDaughter(0)->getDaughter(0)->get4Vector());
+    EXPECT_TRUE(B0->getDaughter(0)->getDaughter(1)->get4Vector() == B0_copy->getDaughter(0)->getDaughter(1)->get4Vector());
+
+    EXPECT_TRUE(B0->getDaughter(1)->getExtraInfo("test_var") == B0_copy->getDaughter(1)->getExtraInfo("test_var"));
+    EXPECT_TRUE(B0->getDaughter(0)->getDaughter(0)->getExtraInfo("test_var") == B0_copy->getDaughter(0)->getDaughter(
+                  0)->getExtraInfo("test_var"));
+    EXPECT_TRUE(B0->getDaughter(0)->getDaughter(1)->getExtraInfo("test_var") == B0_copy->getDaughter(0)->getDaughter(
+                  1)->getExtraInfo("test_var"));
+
+    // check relations
+    const MCParticle* mc1orig = B0->getDaughter(1)->getRelated<MCParticle>();
+    const MCParticle* mc2orig = B0->getDaughter(0)->getDaughter(0)->getRelated<MCParticle>();
+    const MCParticle* mc3orig = B0->getDaughter(0)->getDaughter(1)->getRelated<MCParticle>();
+
+    const MCParticle* mc1copy = B0_copy->getDaughter(1)->getRelated<MCParticle>();
+    const MCParticle* mc2copy = B0_copy->getDaughter(0)->getDaughter(0)->getRelated<MCParticle>();
+    const MCParticle* mc3copy = B0_copy->getDaughter(0)->getDaughter(1)->getRelated<MCParticle>();
+
+    const RestOfEvent* roeorig = B0->getRelated<RestOfEvent>();
+    const RestOfEvent* roecopy = B0_copy->getRelated<RestOfEvent>();
+
+    EXPECT_TRUE(mc1orig == mc1copy);
+    EXPECT_TRUE(mc2orig == mc2copy);
+    EXPECT_TRUE(mc3orig == mc3copy);
+
+    EXPECT_TRUE(mc1orig->getPDG() == mc1copy->getPDG());
+    EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
+    EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
+
+    EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
+
+    // modify original and check the copy
+    MCParticle* MC4      = mcparticles. appendNew(MCParticle());
+    MC4->setPDG(4);
+    B0->getDaughter(0)->addRelationTo(MC4);
+
+    const MCParticle* mc4orig = B0->getDaughter(0)->getRelated<MCParticle>();
+    const MCParticle* mc4copy = B0_copy->getDaughter(0)->getRelated<MCParticle>();
+
+    EXPECT_FALSE(mc4orig == nullptr);
+    EXPECT_TRUE(mc4copy == nullptr);
+
+    const_cast<Particle*>(B0->getDaughter(1))->addExtraInfo("origOnly_var", 10.0);
+
+    EXPECT_DOUBLE_EQ(10.0, B0->getDaughter(1)->getExtraInfo("origOnly_var"));
+    EXPECT_THROW(B0_copy->getDaughter(1)->getExtraInfo("origOnly_var"), std::runtime_error);
+
+    // modify copy and check the original
+    MCParticle* MC5      = mcparticles. appendNew(MCParticle());
+    MC5->setPDG(5);
+    B0_copy->addRelationTo(MC5);
+
+    const MCParticle* mc5orig = B0->getRelated<MCParticle>();
+    const MCParticle* mc5copy = B0_copy->getRelated<MCParticle>();
+
+    EXPECT_TRUE(mc5orig == nullptr);
+    EXPECT_FALSE(mc5copy == nullptr);
+
+    const_cast<Particle*>(B0_copy->getDaughter(1))->addExtraInfo("copyOnly_var", 15.0);
+
+    EXPECT_THROW(B0->getDaughter(1)->getExtraInfo("copyOnly_var"), std::runtime_error);
+    EXPECT_DOUBLE_EQ(15.0, B0_copy->getDaughter(1)->getExtraInfo("copyOnly_var"));
+
   }
 
 }  // namespace

@@ -91,9 +91,10 @@ namespace Belle2 {
       plist->removeParticles(originals);
       const unsigned int copySize = plist->getListSize();
 
-      B2FATAL("Size of the ParticleList " << m_inputListNames[i]
-              << " has changed while copying the Particles! original size = "
-              << origSize << " vs. new size = " << copySize);
+      if (copySize != origSize)
+        B2FATAL("Size of the ParticleList " << m_inputListNames[i]
+                << " has changed while copying the Particles! original size = "
+                << origSize << " vs. new size = " << copySize);
     }
   }
 } // end Belle2 namespace

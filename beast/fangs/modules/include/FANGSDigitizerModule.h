@@ -25,6 +25,8 @@
 
 /** size of pixel hit */
 constexpr int MAXtSIZE = 1000;
+/** size of hit */
+constexpr int MAXSIZE = 3000;
 
 namespace Belle2 {
   namespace fangs {

@@ -9,11 +9,15 @@
  **************************************************************************/
 
 #include <beast/fangs/modules/FANGSStudyModule.h>
+#include <beast/fangs/modules/FANGSDigitizerModule.h>
 #include <beast/fangs/dataobjects/FANGSSimHit.h>
+#include <beast/fangs/dataobjects/FANGSHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
 #include <boost/foreach.hpp>
@@ -150,6 +154,11 @@ void FANGSStudyModule::defineHisto()
     h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepWT[i]->Sumw2();
   }
+  h_Edep = new TH2F("h_Edep", "det # # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);
+  h_pxNb = new TH2F("h_pxNb", "det # # vs. nb pixel", 20, 0., 20., 1000, 0., 1000.);
+  for (int i = 0; i < 15; i++) {
+    h_cvr[i] = new TH2F(TString::Format("cvr_%d", i) , " col v. row", 80, 0., 80., 336, 0., 336.);
+  }
 }
 
 
@@ -161,6 +170,14 @@ void FANGSStudyModule::initialize()
 
   //convert sample time into rate in Hz
   //rateCorrection = m_sampletime / 1e6;
+  //get FANGS paramters
+  getXMLData();
+
+  fctQ_Calib1 = new TF1("fctQ_Calib1", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);
+  fctQ_Calib1->SetParameters(m_TOTQ1, m_TOTC1, m_TOTA1 * m_TOTB1, m_TOTA1);
+
+  fctQ_Calib2 = new TF1("fctQ_Calib2", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);
+  fctQ_Calib2->SetParameters(m_TOTQ2, m_TOTC2, m_TOTA2 * m_TOTB2, m_TOTA2);
 }
 
 void FANGSStudyModule::beginRun()
@@ -172,7 +189,45 @@ void FANGSStudyModule::event()
   //Here comes the actual event processing
 
   StoreArray<FANGSSimHit>  SimHits;
+  StoreArray<FANGSHit> Hits;
 
+  int olddetNb = -1;
+  int ipix = 0;
+  float esum = 0;
+  //number of entries in Hits
+  for (const auto& FANGSHit : Hits) {
+    int detNb = FANGSHit.getdetNb();
+    //int pdg = FANGSHit.getPDG();
+    //int trkID = FANGSHit.gettrkID();
+    int col = FANGSHit.getcolumn();
+    int row = FANGSHit.getrow();
+    int tot = FANGSHit.getTOT();
+    int bcid = FANGSHit.getBCID();
+
+    if (olddetNb != detNb) {
+      if (esum > 0) {
+        h_Edep->Fill(detNb, esum);
+        h_pxNb->Fill(detNb, ipix);
+      }
+      ipix = 0;
+      esum = 0;
+      for (int j = 0; j < maxSIZE; j++) {
+        x[j] = 0;
+        y[j] = 0;
+        z[j] = 0;
+        e[j] = 0;
+      }
+      olddetNb = detNb;
+    }
+    x[ipix] = col * (2. * m_ChipColumnX / (float)m_ChipColumnNb) - m_ChipColumnX;
+    y[ipix] = row * (2. * m_ChipRowY / (float)m_ChipRowNb) - m_ChipRowY;
+    z[ipix] = (m_PixelTimeBin / 2. + m_PixelTimeBin * bcid) * m_v_sensor;
+    if (tot < 3) e[ipix] = fctQ_Calib1->Eval(tot) * m_Workfct * 1e-3;
+    else e[ipix] = fctQ_Calib2->Eval(tot) * m_Workfct * 1e-3;
+    esum += e[ipix];
+    h_cvr[detNb]->Fill(col, row);
+    ipix ++;
+  }
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
   //cout << nSimHits << endl;
@@ -228,6 +283,32 @@ void FANGSStudyModule::event()
   }
 
   eventNum++;
+}
+
+void FANGSStudyModule::getXMLData()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"FANGS\"]/Content/");
+
+  m_PixelThreshold = content.getInt("PixelThreshold");
+  m_PixelThresholdRMS = content.getInt("PixelThresholdRMS");
+  m_PixelTimeBinNb = content.getInt("PixelTimeBinNb");
+  m_PixelTimeBin = content.getDouble("PixelTimeBin");
+  m_ChipColumnNb = content.getInt("ChipColumnNb");
+  m_ChipRowNb = content.getInt("ChipRowNb");
+  m_ChipColumnX = content.getDouble("ChipColumnX");
+  m_ChipRowY = content.getDouble("ChipRowY");
+  m_TOTA1 = content.getDouble("TOTA1");
+  m_TOTB1 = content.getDouble("TOTB1");
+  m_TOTC1 = content.getDouble("TOTC1");
+  m_TOTQ1 = content.getDouble("TOTQ1");
+  m_TOTA2 = content.getDouble("TOTA2");
+  m_TOTB2 = content.getDouble("TOTB2");
+  m_TOTC2 = content.getDouble("TOTC2");
+  m_TOTQ2 = content.getDouble("TOTQ2");
+  m_v_sensor = content.getDouble("v_sensor");
+  m_sensor_width = content.getDouble("sensor_width");
+  m_Workfct = content.getDouble("Workfct");
+
 }
 
 void FANGSStudyModule::endRun()

@@ -22,8 +22,9 @@ def get_logger():
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     finder_module = None
-    tracking_coverage = {'UsePXDHits': True, 'UseSVDHits': True,
-                         'UseCDCHits': True, 'UseOnlyAxialCDCHits': False}
+    #: States which detectors the finder module covers like as a dictionary like
+    #: {'UsePXDHits': True, 'UseSVDHits': True,'UseCDCHits': True, 'UseOnlyAxialCDCHits': False}
+    tracking_coverage = {}
     fit_geometry = None  # Determines which fit geometry should be used.
     trackCandidatesColumnName = 'TrackCands'
 
@@ -68,6 +69,11 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 raise AttributeError('%s module does not have a parameter named %s' % (module, name))
 
     def determine_tracking_coverage(self, finder_module_or_name):
+        # Use value overwritten in the concrete subclass
+        if self.tracking_coverage:
+            return self.tracking_coverage
+
+        # Else try to determine it from the module name
         finder_module_name = self.get_basf2_module_name(finder_module_or_name)
 
         if (finder_module_name == 'TrackFinderCDCLegendreTracking' or
@@ -109,9 +115,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                         'UseOnlyAxialCDCHits': False}
         else:
             get_logger().info('Could not determine tracking coverage for module name %s. '
-                              'Using value stored in self.tracking_coverage which is %s',
-                              finder_module_name, self.tracking_coverage)
-            return self.tracking_coverage
+                              'Using the default of the MCMatcherTracks',
+                              finder_module_name)
+            return {}
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events

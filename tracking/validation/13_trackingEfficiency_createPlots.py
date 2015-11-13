@@ -393,7 +393,7 @@ def create_momentum_resolution_plot(data_tree):
         hist_resolution.SetBinContent(ibin, sigma_pt_over_pt)
         hist_resolution.SetBinError(ibin, sigma_pt_error_over_pt)
 
-    hist_resolution.SetTitle('Momentum resolution')
+    hist_resolution.SetTitle('Transverse Momentum resolution')
     hist_resolution.SetXTitle('pt in GeV/c')
     hist_resolution.SetYTitle('#sigma_{pt}/pt')
 

@@ -19,7 +19,7 @@
     <TOTC2>1082.7</TOTC2>
     <TOTQ2>57.</TOTQ2>
     <Workfct>1.12</Workfct>
-    <z_sensor_width>0.05</z_sensor_width>
+    <sensor_width>0.05</sensor_width>
     <v_sensor>0.023</v_sensor>
     <shape name="FANGS" type="box">
       <length unit="mm">170</length>

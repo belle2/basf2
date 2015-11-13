@@ -48,11 +48,14 @@ namespace Belle2 {
     virtual void event();
 
 
-  protected :
+  private:
     //! check data contents
     //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
     //    StoreArray<RawFTSW> raw_ftswarray;
+
+    //! use default elect id, if not found in mapping file
+    bool m_useDefaultElectId = true;
 
     //! # of events in a run
     int max_nevt;

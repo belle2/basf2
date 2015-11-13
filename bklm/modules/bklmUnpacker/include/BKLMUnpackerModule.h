@@ -90,6 +90,9 @@ namespace Belle2 {
     const int m_scintADCOffset = 3400;
     //! threshold for the scintillator ADC after subtracting the offset
     const int m_scintThreshold = 15;
+
+    //! name of BKLMDigit store array
+    std::string m_outputDigitsName;
   };
 
 

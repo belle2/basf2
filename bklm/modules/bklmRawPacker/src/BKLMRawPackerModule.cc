@@ -28,6 +28,7 @@ BKLMRawPackerModule::BKLMRawPackerModule() : Module()
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
+  addParam("useDefaultModuleId", m_useDefaultElectId, "use default elect id if not found in mapping", true);
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -75,6 +76,7 @@ void BKLMRawPackerModule::event()
   data_words[4][4].clear();
   //int tot_num_hits=digits.getEntries();
 
+  B2INFO("BKLMRawPackerModule:: entries of bklmdigits " << digits.getEntries());
   ///fill data_words
   for (int d = 0; d < digits.getEntries(); d++) {
     int* buf = new int[2];//for one hit, hit length is 2;
@@ -97,9 +99,14 @@ void BKLMRawPackerModule::event()
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
-      B2INFO("BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " << iSector
-             << endl);
-      continue;
+      if (m_useDefaultElectId) {
+        B2INFO("BKLMRawPacker::can not find in mapping. Use the default ElectId " << endl);
+        electId = 1;
+      } else {
+        B2INFO("BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " << iSector
+               << endl);
+        continue;
+      }
     } else {
       electId = m_ModuleIdToelectId[moduleId];
     }

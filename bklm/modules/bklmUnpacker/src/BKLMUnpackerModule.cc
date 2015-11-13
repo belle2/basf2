@@ -44,6 +44,7 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
   addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
+  addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("m_uppackedDigis"));
 }
 
 
@@ -54,7 +55,9 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  StoreArray<BKLMDigit>::registerPersistent();
+  //StoreArray<BKLMDigit>::registerPersistent();
+  StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
+  bklmDigits.registerInDataStore();
   loadMap();
 }
 
@@ -110,7 +113,7 @@ void BKLMUnpackerModule::beginRun()
 void BKLMUnpackerModule::event()
 {
   StoreArray<RawKLM> rawKLM;
-  StoreArray<BKLMDigit> bklmDigits;
+  StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
 
   B2INFO("Unpacker has have " << rawKLM.getEntries() << " entries " << endl);
   for (int i = 0; i < rawKLM.getEntries(); i++) {
@@ -196,7 +199,9 @@ void BKLMUnpackerModule::event()
         if (numDetNwords > 0)
           B2INFO("counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF) << endl);
         //careful, changed start to 1 to get rid of the first rpc hit which is meaningless (at least as long no rpc data is taken)
-        for (int iHit = 1; iHit < numHits; iHit++) {
+        //for (int iHit = 1; iHit < numHits; iHit++) {
+        //changed start to 0 to test BKLMRawPacker. Nov.13 2015)
+        for (int iHit = 0; iHit < numHits; iHit++) {
           B2INFO("unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit * hitLength + 1] << endl);
           //--->first word is the leftmost, not rightmost
           unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;

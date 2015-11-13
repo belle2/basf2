@@ -252,7 +252,7 @@ def copyParticles(
 
     # now replace original particles with their copies
     pcopy = register_module('ParticleCopier')
-    pcopy.param('inputListName', outputListName)
+    pcopy.param('inputListNames', [outputListName])
     path.add_module(pcopy)
 
 

@@ -185,6 +185,8 @@ def copyList(
 ):
     """
     Copy all Particle indices from input ParticleList to the output ParticleList.
+    Note that the Particles themselves are not copied. The original and copied
+    ParticleLists will point to the same Particles.
 
     @param ouputListName copied ParticleList
     @param inputListName original ParticleList to be copied
@@ -203,6 +205,8 @@ def copyLists(
 ):
     """
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    Note that the Particles themselves are not copied.The original and copied
+    ParticleLists will point to the same Particles.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -218,6 +222,40 @@ def copyLists(
     path.add_module(pmanipulate)
 
 
+def copyParticles(
+    outputListName,
+    inputListName,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Create copies of Particles given in the input ParticleList and add them to the output ParticleList.
+
+    The existing relations of the original Particle (or it's (grand-)^n-daughters)
+    are copied as well. Note that only the relation is copied and that the related
+    object is not. Copied particles are therefore related to the *same* object as
+    the original ones.
+
+    @param ouputListName new ParticleList filled with copied Particles
+    @param inputListName input ParticleList with original Particles
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    # first copy original particles to the new ParticleList
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListCopy_' + outputListName)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', [inputListName])
+    pmanipulate.param('writeOut', writeOut)
+    path.add_module(pmanipulate)
+
+    # now replace original particles with their copies
+    pcopy = register_module('ParticleCopier')
+    pcopy.param('inputListName', outputListName)
+    path.add_module(pcopy)
+
+
 def cutAndCopyLists(
     outputListName,
     inputListNames,
@@ -226,8 +264,10 @@ def cutAndCopyLists(
     path=analysis_main,
 ):
     """
-    Copy Particle indices that pass selection criteria from all
-    input ParticleLists to the single output ParticleList.
+    Copy Particle indices that pass selection criteria from all input ParticleLists to
+    the single output ParticleList.
+    Note that the Particles themselves are not copied.The original and copied
+    ParticleLists will point to the same Particles.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -253,8 +293,10 @@ def cutAndCopyList(
     path=analysis_main,
 ):
     """
-    Copy Particle indices that pass selection criteria from
-    the input ParticleList to the output ParticleList.
+    Copy Particle indices that pass selection criteria from the input ParticleList to
+    the output ParticleList.
+    Note that the Particles themselves are not copied.The original and copied
+    ParticleLists will point to the same Particles.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied

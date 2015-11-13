@@ -86,6 +86,14 @@ def add_packers(path, components=None):
         svdpacker = register_module('SVDPacker')
         path.add_module(svdpacker)
 
+    # CDC (parameters from cdc_packer_unpacker.py)
+    if components is None or 'CDC' in components:
+        cdc_mapping_file = "../../cdc/data/ch_map.dat"
+        cdcpacker = register_module('CDCPacker')
+        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
+        cdcpacker.param('cdcHitName', "CDCHits")
+        path.add_module(cdcpacker)
+
     # TOP
     if components is None or 'TOP' in components:
         toppacker = register_module('TOPPacker')
@@ -122,6 +130,16 @@ def add_unpackers(path, components=None):
         svdunpacker = register_module('SVDUnpacker')
         path.add_module(svdunpacker)
 
+    # CDC (parameters from cdc_packer_unpacker.py)
+    if components is None or 'CDC' in components:
+        cdc_mapping_file = "../../cdc/data/ch_map.dat"
+        cdc_hits_pack_unpack_collection = "CDCHits_test_output"
+        cdcunpacker = register_module('CDCUnpacker')
+        cdcunpacker.param('xmlMapFileName', cdc_mapping_file)
+        cdcunpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
+        cdcunpacker.param('enablePrintOut', False)
+        path.add_module(cdcunpacker)
+
     # TOP
     if components is None or 'TOP' in components:
         topunpacker = register_module('TOPUnpacker')
@@ -148,4 +166,4 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     branches = ['RawPXDs', 'RawSVDs', 'RawTOPs', 'RawARICHs', 'RawKLMs']
     branches += additionalBranches
     output.param('branchNames', branches)
-    path.add_module(output)
+#    path.add_module(output)

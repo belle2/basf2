@@ -266,7 +266,7 @@ namespace {
   }
 }
 
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -274,7 +274,7 @@ namespace {
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_value_overloads, if_value, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_false_overloads, if_false, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_true_overloads, if_true, 1, 2)
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic pop
 #endif

@@ -152,10 +152,19 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
   return true;
 }
 
+#if !defined(__GNUG__) || defined(__ICC)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
 BOOST_PYTHON_FUNCTION_OVERLOADS(chain_createInstance_overloads, DatabaseChain::createInstance, 0, 2);
 BOOST_PYTHON_FUNCTION_OVERLOADS(local_createInstance_overloads, LocalDatabase::createInstance, 0, 3);
 BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createDefaultInstance_overloads, ConditionsDatabase::createDefaultInstance, 1, 2);
 BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createInstance_overloads, ConditionsDatabase::createInstance, 4, 5);
+#if !defined(__GNUG__) || defined(__ICC)
+#else
+#pragma GCC diagnostic pop
+#endif
 
 void Database::exposePythonAPI()
 {

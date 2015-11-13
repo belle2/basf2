@@ -200,13 +200,13 @@ boost::python::list Framework::getRegisteredModulesPython() const
 }
 
 
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(process_overloads, process, 1, 2)
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic pop
 #endif

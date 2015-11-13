@@ -96,7 +96,7 @@ void ProcessStatisticsPython::clear()
 }
 
 
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -112,7 +112,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_timeMemoryCorr_overloads, getTimeMe
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(stats_calls_overloads, getCalls, 0, 1)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatisticsString, 0, 1)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2)
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
+#if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic pop
 #endif

@@ -9,6 +9,9 @@
 
 namespace Belle2 {
 
+  /**
+   * The module for Data Quality Monitor.
+   */
   class cdcDQM7Module : public HistoModule {  // <- derived from HistoModule class
 
   public:

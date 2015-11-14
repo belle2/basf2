@@ -34,6 +34,10 @@ class PackerUnpackerTestModule(Module):
                 x.getIWire()))
 
     def event(self):
+        """
+        event function
+        """
+
         # load the cdcHits and the collection which results from the packer and unpacker
         # processed by packer and unpacker
         cdcHitsPackedUnpacked_unsorted = Belle2.PyStoreArray(cdc_hits_pack_unpack_collection)

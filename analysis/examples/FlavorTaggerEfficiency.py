@@ -36,6 +36,10 @@ ROOT.gROOT.SetBatch(True)
 # please note: two different input files are needed
 # specify file name, if necessary
 
+if len(sys.argv) != 2:
+    sys.exit('Must provide one argument: [input_sim_file]'
+             )
+
 workingDirectory = \
     Belle2.FileSystem.findFile('/analysis/examples/tutorials')
 B2INFO('Working directory is: ' + workingDirectory)
@@ -61,10 +65,10 @@ average_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
-workingFile = 'B2A801-FlavorTaggerR22680.root'
-if Belle2.FileSystem.findFile(workingDirectory + '/' + workingFile):
+workingFile = sys.argv[1]
+if Belle2.FileSystem.findFile(workingFile):
     # root-file
-    rootfile = ROOT.TFile(workingDirectory + '/' + workingFile, 'UPDATE')
+    rootfile = ROOT.TFile(workingFile, 'UPDATE')
     tree = rootfile.Get('B0tree')
 
     mcstatus = array('d', [-511.5, 0.0, 511.5])
@@ -378,7 +382,7 @@ eventLevelParticles = [
     ('FastPion', 'QrOf__bopi__pl__clFastPionROE__cm__spIsRightCategory__boFastPion__bc__cm__spIsRightTrack__boFastPion__bc__bc'),
     ('KaonPion', 'QrOf__boK__pl__clKaonROE__cm__spIsRightCategory__boKaonPion__bc__cm__spIsRightTrack__boKaon__bc__bc'),
     ('MaximumP',
-     'QrOf__bopi__pl__clMaximumP__muROE__cm__spIsRightCategory__boMaximumP__mu__bc__cm__spIsRightTrack__boMaximumP__mu__bc__bc'),
+     'QrOf__bopi__pl__clMaximumPstarROE__cm__spIsRightCategory__boMaximumPstar__bc__cm__spIsRightTrack__boMaximumPstar__bc__bc'),
     ('FSC', 'QrOf__bopi__pl__clSlowPionROE__cm__spIsRightCategory__boSlowPion__bc__cm__spIsRightTrack__boSlowPion__bc__bc'),
     ('Lambda', 'InputQrOf__boLambda0__clLambdaROE__cm__spIsRightCategory__boLambda__bc__cm__spIsRightTrack__boLambda__bc__bc'),
 ]

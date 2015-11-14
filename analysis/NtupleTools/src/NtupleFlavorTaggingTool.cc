@@ -54,23 +54,26 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
-    if (selparticles[iProduct]->getExtraInfo("ModeCode") != 1) return;
-
     B0Probability[iProduct]     = -2;
     B0barProbability[iProduct] = -2;
     qrCombined[iProduct] = -2;
     qrMC[iProduct] = -2;
 
+    if (selparticles[iProduct]->hasExtraInfo("ModeCode")) {
+      if (selparticles[iProduct]->getExtraInfo("ModeCode") == 1 and Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
+        B0Probability[iProduct] = selparticles[iProduct]->getExtraInfo("B0Probability");
+        B0barProbability[iProduct] = selparticles[iProduct]->getExtraInfo("B0barProbability");
+        qrCombined[iProduct] = selparticles[iProduct]->getExtraInfo("qrCombined");
 
-    if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
-      B0Probability[iProduct] = selparticles[iProduct]->getExtraInfo("B0Probability");
-      B0barProbability[iProduct] = selparticles[iProduct]->getExtraInfo("B0barProbability");
-      qrCombined[iProduct] = selparticles[iProduct]->getExtraInfo("qrCombined");
-
-      //  MC Flavor is saved only if mcparticles is not empty
-      StoreArray<MCParticle> mcparticles;
-      if ((mcparticles.getEntries()) > 0) {
-        qrMC[iProduct] = 2 * (Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]) - 0.5);
+        //  MC Flavor is saved only if mcparticles is not empty
+        StoreArray<MCParticle> mcparticles;
+        if (mcparticles.isValid()) {
+          if ((mcparticles.getEntries()) > 0) {
+            {
+              qrMC[iProduct] = 2 * (Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]) - 0.5);
+            }
+          }
+        }
       }
     }
   }

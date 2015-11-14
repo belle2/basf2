@@ -132,7 +132,7 @@ namespace Belle2 {
       /** chip Nb map arrays */
       std::map<std::tuple<int, int>, int> m_dchip_detNb_map;
       /** number of detectors. Read from MICROFANGS.xml*/
-      int m_nFANGS = 0;
+      int m_nFANGS = 15;
 
       /** Lower timing cut */
       double m_lowerTimingCut = 0;

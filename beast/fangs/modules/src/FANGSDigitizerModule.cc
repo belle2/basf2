@@ -86,7 +86,7 @@ void FANGSDigitizerModule::event()
 {
   StoreArray<MCParticle> mcParticles;
   StoreArray<FANGSSimHit> FANGSSimHits;
-
+  m_nFANGS = 15;
   std::vector<double> T0(m_nFANGS,
                          m_upperTimingCut);  // TODO: why this number? Maybe pick something larger the the upperTiming cut? e.g. m_upperTimingCut + 1
 

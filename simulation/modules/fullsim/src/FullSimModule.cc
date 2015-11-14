@@ -318,7 +318,7 @@ void FullSimModule::initialize()
   //geometry at the moment so there is no need to do this in begin run. Instead
   //we use one Geant4 run for all Belle2 runs we might encounter. So let's do
   //run initialization now to save memory when doing parallel processing
-  B2INFO("Perform Geant4 final initializtation: Geometry optimization, PhysicsList calculations...");
+  B2INFO("Perform Geant4 final initialization: Geometry optimization, PhysicsList calculations...");
   RunManager::Instance().beginRun(0);
   B2INFO("done, Geant4 ready");
   //Otherwise we could use a fake run to do this and move RunManager::beginRun

@@ -9,7 +9,8 @@ env['LIBS'] = [
     'beast_he3tube_dataobjects', 'beast_srsensor_dataobjects',
     'beast_pindiode_dataobjects', 'beast_csi_dataobjects',
     'beast_beamabort_dataobjects', 'beast_plume_dataobjects',
-    'beast_claw_dataobjects', 'beast_qcsmonitor_dataobjects'
+    'beast_claw_dataobjects', 'beast_qcsmonitor_dataobjects',
+    'beast_claws_dataobjects', 'beast_fangs_dataobjects'
 ]
 
 Return('env')

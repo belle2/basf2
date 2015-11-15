@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="CLAWS">
-  <Creator library="claws">CLAWSCreator</Creator>
+  <Creator library="beast">CLAWSCreator</Creator>
   <Content>
     <stepLength unit="um">50</stepLength>
     <shape name="CLAWS" type="box">

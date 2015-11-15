@@ -25,7 +25,9 @@ simulation = register_module('FullSim')
 # analysis = register_module('Bgo')
 # analysis = register_module('Pindiode')
 # analysis = register_module('Srsensor')
-analysis = register_module('Microtpc')
+# analysis = register_module('Microtpc')
+# analysis = register_module('FANGS')
+analysis = register_module('CLAWS')
 # save the microtpc results
 output = register_module('RootOutput')
 # an show some progress of the microtpc simulation
@@ -34,7 +36,7 @@ progress = register_module('Progress')
 # Now lets set some parameters ...
 
 # Generate run 1 with 500 events
-eventinfosetter.param({'evtNumList': [5], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [500], 'runList': [1]})
 
 # Set the parameters for the particle gun
 particlegun.param({  # Shoot electrons and positrons
@@ -49,11 +51,11 @@ particlegun.param({  # Shoot electrons and positrons
                      # but from a fixed position
                      # namely 0,0,0
                      # and the same vertex vor all particles
-    'pdgCodes': [11, -11],
-    'nTracks': 5,
+    'pdgCodes': [11, 22, -11],
+    'nTracks': 1000,
     'varyNTracks': True,
     'momentumGeneration': 'fixed',
-    'momentumParams': [7.0],
+    'momentumParams': [0.00004],
     'thetaGeneration': 'normal',
     'thetaParams': [0.0, 1.0],
     'phiGeneration': 'uniform',
@@ -66,7 +68,9 @@ particlegun.param({  # Shoot electrons and positrons
 })
 
 # Main XML parameter file to load, relative to global data directory
-gearbox.param('fileName', 'beast/microtpc/detector.xml')
+# gearbox.param('fileName', 'beast/microtpc/detector.xml')
+# gearbox.param('fileName', 'beast/fangs/detector.xml')
+gearbox.param('fileName', 'beast/claws/detector.xml')
 # gearbox.param('fileName', 'beast/he3tube/detector.xml')
 # gearbox.param('fileName', 'beast/bgo/detector.xml')
 # gearbox.param('fileName', 'beast/pindiode/detector.xml')
@@ -80,7 +84,9 @@ geometry.set_log_level(LogLevel.INFO)
 analysis.set_log_level(LogLevel.INFO)
 
 # And write the results to microtpc-simulation.root
-output.param('outputFileName', 'microtpc-simulation.root')
+# output.param('outputFileName', 'microtpc-simulation.root')
+# output.param('outputFileName', 'fangs-simulation.root')
+output.param('outputFileName', 'claws-simulation.root')
 # output.param('outputFileName', 'plume-simulation.root')
 # output.param('outputFileName', 'csi-simulation.root')
 # output.param('outputFileName', 'he3tube-simulation.root')

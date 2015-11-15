@@ -27,7 +27,7 @@ geom.param('components', ['PXD', 'SVD'])
 geom.initialize()
 
 algo = Belle2.MillepedeAlgorithm()
-algo.steering().command('method inversion 3 0.1')
+algo.steering().command('method diagonalization 1 0.1')
 algo.steering().command('entries 100')
 algo.steering().command('chiscut 30. 6.')
 algo.steering().command('outlierdownweighting 3')

@@ -83,8 +83,8 @@ void MillepedeCollectorModule::collect()
     ++recordCounter;
 
     // Split binary files each 10000 events
-    if (recordCounter % 10000 == 0)
-      mille.close();
+    //if (recordCounter % 10000 == 0)
+    //  mille.close();
   }
 }
 

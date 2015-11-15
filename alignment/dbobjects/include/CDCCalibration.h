@@ -87,6 +87,10 @@ namespace Belle2 {
     /// Constructor
     CDCCalibration() : DBObjCalibrationConstMapBase() {}
 
+    /// Direct getter to X shift of layer
+    double getLayerShiftX(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerX);}
+    /// Direct getter to Y shift of layer
+    double getLayerShiftY(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerY);}
     /// Destructor
     ~CDCCalibration() {}
 

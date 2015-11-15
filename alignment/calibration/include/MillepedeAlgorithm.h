@@ -49,6 +49,24 @@ namespace Belle2 {
     /// The result (invalid until execution)
     alignment::PedeResult m_result{};
 
+    /// Convert IOV to string (to be able to use it as a key in map)
+    std::string to_string(IntervalOfValidity iov)
+    {
+      stringstream stream;
+      stream << iov;
+      return stream.str();
+    }
+
+    /// Convert string to IOV (to convert map key back to IOV)
+    IntervalOfValidity to_IOV(std::string iov)
+    {
+      stringstream stream;
+      stream << iov;
+      IntervalOfValidity IOV;
+      stream >> IOV;
+      return IOV;
+    }
+
     ClassDef(MillepedeAlgorithm, 0); /**< Class implementing Millepede calibration algorithm */
 
   };

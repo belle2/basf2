@@ -30,7 +30,7 @@ geometry.param({
 geometry.initialize()
 
 algo = Belle2.MillepedeAlgorithm()
-algo.steering().command('method inversion 3 0.1')
+algo.steering().command('method diagonalization 1 0.1')
 algo.steering().command('entries 100')
 algo.steering().command('chiscut 30. 6.')
 algo.steering().command('outlierdownweighting 3')
@@ -50,11 +50,15 @@ for icLayer in range(0, 57):
     cmd = str(Belle2.GlobalLabel(Belle2.WireID(icLayer, 511), 2).label()) + ' 0. -1.'
     algo.steering().command(cmd)
 
+# fix everything except layer 10, shifts U, V
 barrel = 1
 for sector in range(0, 9):
     for layer in range(1, 17):
-        for forward in [1]:  # I experimentally un-distinguished bwd/fwd in BKLMRecoHit
-            for ipar in [3, 4, 5, 6]:
+        for forward in [0, 1]:
+            pars = [1, 2, 3, 4, 5, 6]
+            for ipar in pars:
+                if layer == 10 and ipar in [1, 2]:
+                    continue
                 klmid = layer + 100 * sector + 1000 * forward + 10000 * barrel
                 label = Belle2.GlobalLabel(klmid, ipar)
                 cmd = str(label.label()) + ' 0. -1.'

@@ -79,9 +79,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("dbstore", "BKLMAlignment"));
   // Maps (key is object address in databse cache - same objects are not added twice)
-  std::map<VXDAlignment*, IntervalOfValidity> previousVXD;
-  std::map<CDCCalibration*, IntervalOfValidity> previousCDC;
-  std::map<BKLMAlignment*, IntervalOfValidity> previousBKLM;
+  std::map<string, VXDAlignment*> previousVXD;
+  std::map<string, CDCCalibration*> previousCDC;
+  std::map<string, BKLMAlignment*> previousBKLM;
   // Collect all distinct existing objects in DB:
   for (auto& exprun : runSet.getExpRunSet()) {
     // Ask DB for data at Event 1 in each run
@@ -89,46 +89,46 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     Database::Instance().getData(event1, belle2Constants);
     for (auto& payload : belle2Constants) {
       if (auto vxd = dynamic_cast<VXDAlignment*>(payload.object)) {
-        previousVXD.insert({vxd, payload.iov});
+        previousVXD[to_string(payload.iov)] = vxd;
       }
       if (auto cdc = dynamic_cast<CDCCalibration*>(payload.object)) {
-        previousCDC.insert({cdc, payload.iov});
+        previousCDC[to_string(payload.iov)] = cdc;
       }
       if (auto bklm = dynamic_cast<BKLMAlignment*>(payload.object)) {
-        previousBKLM.insert({bklm, payload.iov});
+        previousBKLM[to_string(payload.iov)] = bklm;
       }
     }
   }
   // All objects have to be re-created, with new constant values...
-  std::map<VXDAlignment*, IntervalOfValidity> newVXD;
-  std::map<CDCCalibration*, IntervalOfValidity> newCDC;
-  std::map<BKLMAlignment*, IntervalOfValidity> newBKLM;
+  std::map<string, VXDAlignment*> newVXD;
+  std::map<string, CDCCalibration*> newCDC;
+  std::map<string, BKLMAlignment*> newBKLM;
 
   if (nVXDparams)
     for (auto& vxd : previousVXD)
-      newVXD.insert({new VXDAlignment(*vxd.first), vxd.second});
+      newVXD[vxd.first] = new VXDAlignment(*vxd.second);
 
   if (nCDCparams)
     for (auto& cdc : previousCDC)
-      newCDC.insert({new CDCCalibration(*cdc.first), cdc.second});
+      newCDC[cdc.first] = new CDCCalibration(*cdc.second);
 
   if (nBKLMparams)
     for (auto& bklm : previousBKLM)
-      newBKLM.insert({new BKLMAlignment(*bklm.first), bklm.second});
+      newBKLM[bklm.first] = new BKLMAlignment(*bklm.second);
 
   if (newVXD.empty() && nVXDparams) {
     B2INFO("No previous VXDAlignment found. First update from nominal.");
-    newVXD.insert({new VXDAlignment(), getIovFromData()});
+    newVXD.insert({to_string(getIovFromData()), new VXDAlignment()});
   }
 
   if (newCDC.empty() && nCDCparams) {
     B2INFO("No previous CDCCalibration found. First update from nominal.");
-    newCDC.insert({new CDCCalibration(), getIovFromData()});
+    newCDC.insert({to_string(getIovFromData()), new CDCCalibration()});
   }
 
   if (newBKLM.empty() && nBKLMparams) {
     B2INFO("No previous BKLMAlignment found. First update from nominal.");
-    newBKLM.insert({new BKLMAlignment(), getIovFromData()});
+    newBKLM.insert({to_string(getIovFromData()), new BKLMAlignment()});
   }
 
   double maxCorrectionPull = 0.;
@@ -156,41 +156,41 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isVXD()) {
       // Add correction to all objects
       for (auto& vxd : newVXD) {
-        vxd.first->add(param.getVxdID(), param.getParameterId(), correction, m_invertSign);
+        vxd.second->add(param.getVxdID(), param.getParameterId(), correction, m_invertSign);
       }
     }
 
     if (param.isCDC()) {
       // Add correction to all objects
       for (auto& cdc : newCDC) {
-        cdc.first->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
+        cdc.second->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
       }
     }
 
     if (param.isKLM()) {
       // Add correction to all objects
       for (auto& bklm : newBKLM) {
-        bklm.first->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
+        bklm.second->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
       }
     }
   }
 
   // Save (possibly updated) objects
   for (auto& vxd : newVXD)
-    saveCalibration(vxd.first, "VXDAlignment", vxd.second);
+    saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first));
   for (auto& cdc : newCDC)
-    saveCalibration(cdc.first, "CDCCalibration", cdc.second);
+    saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first));
   for (auto& bklm : newBKLM)
-    saveCalibration(bklm.first, "BKLMAlignment", bklm.second);
+    saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first));
 
   commit();
 
-  if (paramChi2 / nParams > 2. || fabs(maxCorrectionPull) > 50.) {
+  if (paramChi2 / nParams > 1. || fabs(maxCorrectionPull) > 50.) {
     if (fabs(maxCorrectionPull) > 50.)
       B2INFO("Largest correction/error is " << maxCorrectionPull << " for parameter with label " << maxCorrectionPullLabel);
     if (paramChi2 / nParams >= 1.)
       B2INFO("Parameter corrections incosistent with small change, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams
-             << " = " << paramChi2 << " / " << nParams << " > 2.");
+             << " = " << paramChi2 << " / " << nParams << " > 1.");
     B2INFO("Requesting iteration.");
     return c_Iterate;
   }

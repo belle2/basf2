@@ -1,10 +1,7 @@
 Import('env')
 
-env['SUBLIB'] = True
+#These are the libraries the awesome package has to be linked against
+env['LIBS'] = ['framework', 'geometry', 'simulation', '$ROOT_LIBS']
 
-env['LIBS'] = [
-    'framework', 'geometry', 'simulation', '$ROOT_LIBS', 'mdst_dataobjects',
-    'beast_fangs_dataobjects', 'beast_claws'
-]
 
 Return('env')

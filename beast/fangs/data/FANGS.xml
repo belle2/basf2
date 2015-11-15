@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="FANGS">
-  <Creator library="beast_fangs">FANGSCreator</Creator>
+  <Creator library="fangs">FANGSCreator</Creator>
   <Content>
     <PixelThreshold>3000</PixelThreshold>
     <PixelThresholdRMS>150</PixelThresholdRMS>

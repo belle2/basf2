@@ -109,10 +109,11 @@ namespace Belle2 {
 
       class TmpClusterCorrection {
       public:
+        TmpClusterCorrection() : m_tmpCorrection(nullptr) {}
         void init(const std::string& filename);
         void scale(Belle2::ECLCluster& c) const;
         ~TmpClusterCorrection()
-        { delete[] m_tmpCorrection; }
+        { if (m_tmpCorrection != nullptr) delete[] m_tmpCorrection; }
       private:
         const unsigned int m_nbinsTheta = 2;
         const double m_maxThetaFwd = 0.5757;

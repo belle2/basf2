@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
-#ifndef BEAST_CLAWS_DATAOBJECTS_CLAWSSIMHIT_H
-#define BEAST_CLAWS_DATAOBJECTS_CLAWSSIMHIT_H
+#ifndef CLAWSSIMHIT_H
+#define CLAWSSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <stdint.h>
@@ -96,7 +95,7 @@ namespace Belle2 {
     /** Sensor id */
     uint8_t m_sensor;
 
-    ClassDef(CLAWSSimHit, 2)
+    ClassDef(CLAWSSimHit, 1)
   };
 
 } // end namespace Belle2

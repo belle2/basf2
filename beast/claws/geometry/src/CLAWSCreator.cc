@@ -30,7 +30,7 @@ namespace Belle2 {
 
     // Register the creator
     /** Creator creates the CLAW geometry */
-    geometry::CreatorFactory<CLAWSCreator> ClawFactory("CLAWSCreator");
+    geometry::CreatorFactory<CLAWSCreator> CLAWSFactory("CLAWSCreator");
 
     CLAWSCreator::CLAWSCreator(Simulation::SensitiveDetectorBase* sensitive): m_sensitive(sensitive)
     {

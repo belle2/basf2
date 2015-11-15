@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
-#ifndef BEAST_FANGS_SIMULATION_SENSITIVEDETECTOR_H
-#define BEAST_FANGS_SIMULATION_SENSITIVEDETECTOR_H
+#ifndef SENSITIVEDETECTOR_H
+#define SENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <framework/datastore/StoreArray.h>

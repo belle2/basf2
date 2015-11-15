@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
-#ifndef BEAST_CLAW_SIMULATION_SENSORTRAVERSAL_H
-#define BEAST_CLAW_SIMULATION_SENSORTRAVERSAL_H
+#ifndef SENSORTRAVERSAL_H
+#define SENSORTRAVERSAL_H
 
 #include <G4ThreeVector.hh>
 #include <vector>
@@ -138,4 +137,4 @@ namespace Belle2 {
 
   }
 } //Belle2 namespace
-#endif // BEAST_CLAW_SIMULATION_SENSORTRAVERSAL_H
+#endif // SENSORTRAVERSAL_H

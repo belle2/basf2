@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
-#ifndef BEAST_FANGS_DATAOBJECTS_FANGSSIMHIT_H
-#define BEAST_FANGS_DATAOBJECTS_FANGSSIMHIT_H
+#ifndef FANGSSIMHIT_H
+#define FANGSSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <stdint.h>
@@ -105,7 +104,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(FANGSSimHit, 2)
+    ClassDef(FANGSSimHit, 1)
   };
 
 } // end namespace Belle2

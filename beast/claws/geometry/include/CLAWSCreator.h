@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
-#ifndef BEAST_CLAWS_GEOMETRY_CLAWSCREATOR_H
-#define BEAST_CLAWS_GEOMETRY_CLAWSCREATOR_H
+#ifndef CLAWSCREATOR_H_
+#define CLAWSCREATOR_H_
 
 #include <geometry/CreatorBase.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
@@ -59,4 +58,4 @@ namespace Belle2 {
   }
 }
 
-#endif /* BEAST_CLAWS_GEOMETRY_CLAWSCREATOR_H */
+#endif /* CLAWSCREATOR_H_ */

@@ -333,8 +333,8 @@
 			<box>
 				<length unit="mm">64.000</length>
 				<z unit="mm">190.206</z>
-				<r unit="mm">-28.600</r>
-				<theta unit="deg">-11.900</theta>
+				<r unit="mm">-28.350</r>
+				<theta unit="deg">-11.750</theta>
 			</box>
 			<box>
 				<length unit="mm">60.000</length>

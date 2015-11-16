@@ -719,16 +719,17 @@ void GenFitterModule::event()
 
 void GenFitterModule::endRun()
 {
-  B2INFO("----- GenFitter run summary")
-  B2INFO("      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
-  B2INFO("      in total " << m_successfulFitCounter << " tracks were fitted");
+  B2DEBUG(5, "----- GenFitter '" << getName() << "' run summary");
+  B2DEBUG(5, "      " << m_successfulGFTrackCandFitCounter << " track candidates were fitted successfully");
+  B2DEBUG(5, "      in total " << m_successfulFitCounter << " tracks were fitted");
   if (m_failedFitCounter > 0) {
-    B2WARNING("GenFitter: " << m_failedGFTrackCandFitCounter
-              << " of " << m_successfulGFTrackCandFitCounter + m_failedGFTrackCandFitCounter
-              << " track candidates could not be fitted in this run");
-    B2WARNING("GenFitter: " << m_failedFitCounter
-              << " of " << m_successfulFitCounter + m_failedFitCounter
-              << " tracks could not be fitted in this run");
+    B2RESULT("GenFitter '" << getName() << "': " << m_failedGFTrackCandFitCounter
+             << " of " << m_successfulGFTrackCandFitCounter + m_failedGFTrackCandFitCounter
+             << " track candidates could not be fitted in this run");
+    B2DEBUG(5,
+            "GenFitter '" << getName() << "': " << m_failedFitCounter
+            << " of " << m_successfulFitCounter + m_failedFitCounter
+            << " tracks could not be fitted in this run");
   }
 }
 

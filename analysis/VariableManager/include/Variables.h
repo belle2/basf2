@@ -277,6 +277,31 @@ namespace Belle2 {
     double particleMCPrimaryParticle(const Particle* particle);
 
     /**
+     * return px of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPX(const Particle* particle);
+
+    /**
+     * return py of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPY(const Particle* particle);
+
+    /**
+     * return pz of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchPZ(const Particle* particle);
+
+    /**
+     * return Energy of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchE(const Particle* particle);
+
+    /**
+     * return total momentum of matched MCParticle (-999.0 if the particle is not matched)
+     */
+    double particleMCMatchP(const Particle* particle);
+
+    /**
      * return X component of the tag vertex
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)

@@ -669,6 +669,51 @@ namespace Belle2 {
       }
     }
 
+    double particleMCMatchPX(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Px();
+    }
+
+    double particleMCMatchPY(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Py();
+    }
+
+    double particleMCMatchPZ(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Pz();
+    }
+
+    double particleMCMatchE(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getEnergy();
+    }
+
+    double particleMCMatchP(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Mag();
+    }
+
     // TDCPV related ---------------------------------------------------------
 
     double particleTagVx(const Particle* particle)
@@ -1108,6 +1153,16 @@ namespace Belle2 {
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
+    REGISTER_VARIABLE("mcPX", particleMCMatchPX,
+                      "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPY", particleMCMatchPY,
+                      "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
+                      "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcE", particleMCMatchE,
+                      "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcP", particleMCMatchP,
+                      "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
 
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle.")

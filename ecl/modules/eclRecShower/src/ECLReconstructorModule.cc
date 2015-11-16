@@ -91,11 +91,13 @@ void ECLReconstructorModule::initialize()
 
   ReadCorrection(); // read correction accounting shower leakage to get unbiased photon energy
 
-  if (EclConfiguration::get().background()) {
-    string dataFileName = FileSystem::findFile("/data/ecl/tmpClusterCorrection.txt");
-    assert(! dataFileName.empty());
-    m_tmpClusterCorrection.init(dataFileName);
-  }
+  string tmpCorrectionsFileName;
+  if (EclConfiguration::get().background())
+    tmpCorrectionsFileName = FileSystem::findFile("/data/ecl/tmpClusterCorrection-BG.txt");
+  else
+    tmpCorrectionsFileName = FileSystem::findFile("/data/ecl/tmpClusterCorrection.txt");
+  assert(! tmpCorrectionsFileName.empty());
+  m_tmpClusterCorrection.init(tmpCorrectionsFileName);
 }
 
 void ECLReconstructorModule::ReadCorrection()
@@ -274,7 +276,7 @@ void ECLReconstructorModule::event()
         // Ad hoc Temp correction to reduce energy bias
         // to be replaced ASAP with a proper calibration
 
-        if (EclConfiguration::get().background())  m_tmpClusterCorrection.scale(*eclCluster);
+        m_tmpClusterCorrection.scale(*eclCluster);
 
         eclCluster->addRelationTo(eclRecShower);
         //..... ECLCluster is completed here......
@@ -538,30 +540,77 @@ void ECLReconstructorModule::readErrorMatrix7x7(double energy, double theta,
 
 void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
 {
+  B2INFO("ECLReconstructor: Reading ad hoc tmp cluster energy corrections from: " << filename);
   // header keeps the values of 4 parameters in any order
   string param;
   ifstream file(filename);
-  unsigned int i;
-  for (i = 0; i < 4; ++i) {
+  int nbinsTheta = 0;
+  for (unsigned i = 0; i < 3; ++i) {
     file >> param;
-    if (param == "deltaE") file >> m_deltaE;
-    if (param == "nbinsE") file >> m_nbinsE;
+    assert(file.good());
+    if (param == "deltaE") {
+      file >> m_deltaE;
+      assert(file.good());
+    }
+    if (param == "nbinsE") {
+      file >> m_nbinsE;
+      assert(file.good());
+    }
+    if (param == "thetaRegions") {
+      file >> nbinsTheta;
+      assert(file.good());
+      double theta;
+      for (int j = 0; j < nbinsTheta - 1; ++j) {
+        file >> theta ;
+        assert(file.good());
+        m_maxTheta.push_back(theta);
+      }
+    }
   }
-  m_tmpCorrection = new double[ m_nbinsE * m_nbinsTheta];
-  unsigned int indexE, indexTheta;
-  for (i = 0; i < m_nbinsE * m_nbinsTheta; ++i)
-    file >> indexE >> indexTheta >> m_tmpCorrection[ indexE * m_nbinsTheta + indexTheta];
+
+  m_tmpCorrection.reserve(m_nbinsE * nbinsTheta);
+  double correction;
+  // the index runs first on momentum and then on theta region
+  for (unsigned i = 0; i < m_nbinsE * (m_maxTheta.size() + 1); ++i) {
+    file >> correction;
+    assert(file.good());
+    m_tmpCorrection.push_back(correction);
+  }
   file.close();
+
+  B2INFO("ECLReconstructor: Number of bins in E: " << m_nbinsE);
+  B2INFO("ECLReconstructor: Number of Theta regions: " << nbinsTheta);
+
+  for (int i = 0; i < nbinsTheta; ++i) {
+    if (i < nbinsTheta - 1) {
+      B2INFO("ECLReconstructor: theta < " << m_maxTheta[i]);
+    } else {
+      B2INFO("ECLReconstructor: theta >= " << m_maxTheta[i - 1]);
+    }
+    ostringstream ostr;
+    for (unsigned int j = 0; j < m_nbinsE; j++)
+      ostr << m_tmpCorrection[ j + i * m_nbinsE ] << " ";
+    const char* out = ostr.str().c_str();
+    B2INFO("ECLReconstructor: corrections: " << out);
+  }
 }
 
 void ECLReconstructorModule::TmpClusterCorrection::scale(ECLCluster& c) const
 {
   double energy = c.getEnergy();
   if (energy > 0) {
+    int thetaRegion = m_maxTheta.size();
+    for (unsigned int itheta = 0; itheta < m_maxTheta.size(); itheta++) {
+      if (c.getTheta() < m_maxTheta[itheta]) {
+        thetaRegion = itheta;
+        break;
+      }
+    }
+
     unsigned int iE = static_cast<unsigned int>(energy / m_deltaE);
-    if (iE >= m_nbinsE) iE = m_nbinsE - 1; // last bin used for also for overflows
-    unsigned int itheta = c.getTheta() > m_maxThetaFwd ? 1 : 0;
-    c.setEnergy(energy * m_tmpCorrection[ iE * m_nbinsTheta +  itheta]);
+    if (iE >= m_nbinsE - 1)
+      iE = m_nbinsE - 1; // last bin used for also for overflows
+    c.setEnergy(energy * m_tmpCorrection[ iE + m_nbinsE * thetaRegion]);
   }
 }
 

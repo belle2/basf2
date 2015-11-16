@@ -260,32 +260,6 @@ namespace Belle2 {
       return missMom ;
     }
 
-    double NumberOfKShortinRemainingROEKaon(const Particle* particle)
-    {
-      StoreObjPtr<ParticleList> KShortList("K_S0:ROEKaon");
-      int flag = 0;
-      if (KShortList.isValid()) {
-        for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
-          if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
-          flag++;
-        }
-      }
-      return flag;
-    }
-
-    double NumberOfKShortinRemainingROELambda(const Particle* particle)
-    {
-      StoreObjPtr<ParticleList> KShortList("K_S0:ROELambda");
-      int flag = 0;
-      if (KShortList.isValid()) {
-        for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
-          if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
-          flag++;
-        }
-      }
-      return flag;
-    }
-
     double lambdaFlavor(const Particle* particle)
     {
       if (particle->getPDGCode() == 3122) return 1.0; //Lambda0
@@ -304,7 +278,6 @@ namespace Belle2 {
         else return 0.0;
       } else return 0.0;
     }
-
 
     double lambdaZError(const Particle* particle)
     {
@@ -523,6 +496,30 @@ namespace Belle2 {
       } else return 0;
     }
 
+    Manager::FunctionPtr NumberOfKShortinROEParticleList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto particleListName = arguments[0];
+        auto func = [particleListName](const Particle * particle) -> double {
+          int flag = 0;
+          if (particleListName == "K_S0:ROEKaon" || particleListName == "K_S0:ROELambda")
+          {
+            StoreObjPtr<ParticleList> KShortList(particleListName);
+            if (KShortList.isValid()) {
+              for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+                if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
+                flag++;
+              }
+            }
+          } else B2FATAL("NumberOfKShortinROEParticleList not available for the requested particleListName. The possibilities are K_S0:ROEKaon or K_S0:ROELambda");
+          return flag;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (1 required) for meta function NumberOfKShortinROEParticleList");
+      }
+    }
+
     Manager::FunctionPtr QrOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -554,12 +551,14 @@ namespace Belle2 {
               // Gets the flavor of the track selected as target
               if (extraInfoRightTrack == "IsRightTrack(Lambda)") {
                 maximum_q = (-1) * target->getPDGCode() / TMath::Abs(target->getPDGCode());
+              } else if (extraInfoRightTrack == "IsRightTrack(IntermediateElectron)" || extraInfoRightTrack == "IsRightTrack(IntermediateMuon)"
+                         || extraInfoRightTrack == "IsRightTrack(SlowPion)" || extraInfoRightTrack == "IsRightTrack(FSC)") {
+                maximum_q = (-1) * target -> getCharge();
               } else maximum_q = target -> getCharge();
             }
           }
           //float r = TMath::Abs(2 * prob - 1); //Definition of the dilution factor  */
           //return 0.5 * (maximum_q * r + 1);
-//            if (extraInfoRightTrack == ("IsRightTrack(IntermediateElectron)" || "IsRightTrack(IntermediateMuon)" || "IsRightTrack(SlowPion)" || "IsRightTrack(FSC)")) return -1 * maximum_q * prob;
           return maximum_q * prob;
         };
         return func;
@@ -576,11 +575,9 @@ namespace Belle2 {
         auto extraInfoRightCategory = arguments[1];
         auto extraInfoRightTrack = arguments[2];
         auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
-//           if (particleListName == "K+:KaonROE" || particleListName == "Lambda0:LambdaROE")
-//           {
           double flavor = 0.0;
           double r = 0.0;
-          double qr = 0.0;
+          double qp = 0.0;
           double final_value = 0.0;
           double val1 = 1.0;
           double val2 = 1.0;
@@ -603,52 +600,29 @@ namespace Belle2 {
               }
               std::sort(ParticleVector.begin(), ParticleVector.end(), compare);
 
-              //Loop over K+ vector until 3 or empty
               if (ParticleVector.size() != 0) final_value = 1.0;
-              for (unsigned int i = 0; i < ParticleVector.size(); i++) {
+              //Loop over K+ vector until 3 or empty
+              unsigned int Limit = ParticleVector.size() > 3 ? 3 : ParticleVector.size();
+              for (unsigned int i = 0; i < Limit; i++) {
 
                 if (particleListName == "Lambda0:LambdaROE") {
                   flavor = (-1) * ParticleVector[i]->getPDGCode() / TMath::Abs(ParticleVector[i]->getPDGCode());
+                } else if (extraInfoRightTrack == "IsRightTrack(IntermediateElectron)" || extraInfoRightTrack == "IsRightTrack(IntermediateMuon)"
+                           || extraInfoRightTrack == "IsRightTrack(SlowPion)" || extraInfoRightTrack == "IsRightTrack(FSC)") {
+                  flavor = (-1) * ParticleVector[i] -> getCharge();
                 } else flavor = ParticleVector[i]->getCharge();
 
-                r = ParticleVector[i]->getExtraInfo(extraInfoRightTrack);
-                qr = (flavor * r);
-                val1 = val1 * (1 + qr);
-                val2 = val2 * (1 - qr);
+                r = ParticleVector[i]->getExtraInfo(extraInfoRightCategory);
+                B2INFO("Right Cat:" << ParticleVector[i]->getExtraInfo(extraInfoRightCategory));
+                B2INFO("Right Track:" << ParticleVector[i]->getExtraInfo(extraInfoRightTrack));
+                qp = (flavor * r);
+                val1 = val1 * (1 + qp);
+                val2 = val2 * (1 - qp);
               }
               final_value = (val1 - val2) / (val1 + val2);
             }
           }
           return final_value;
-//           }
-
-          //SlowPion, Electron, Muon
-//           else{
-//             StoreObjPtr<EventExtraInfo> Info("EventExtraInfo");
-//             StoreObjPtr<ParticleList> ListOfParticles(particleListName);
-//             double flavor = 0.0; //Flavour of the track selected as target
-//             double maximum_p_track = 0.0; //Probability of being the target track from the track level
-//             double final_value = 0.0;
-//             if (ListOfParticles)
-//             {
-//               for (unsigned int i = 0; i < ListOfParticles->getListSize(); i++) {
-//                 Particle* p = ListOfParticles->getParticle(i);
-//                 double x = p->getExtraInfo(extraInfoRightTrack);
-//                 if (x > maximum_p_track) {
-//                   maximum_p_track = x;
-//                   //In case of slowPions and intermediate momentum leptons sign is flipped
-//                   if (particleListName == "pi+:SlowPionROE" && extraInfoRightTrack == "IsRightTrack(SlowPion)") flavor = (-1.0) * p->getCharge();
-//                   else if (particleListName == "e+:IntermediateElectronROE"
-//                   && extraInfoRightTrack == "IsRightTrack(IntermediateElectron)") flavor = (-1.0) * p->getCharge();
-//                   else if (particleListName == "mu+:IntermediateMuonROE"
-//                   && extraInfoRightTrack == "IsRightTrack(IntermediateMuon)") flavor = (-1.0) * p->getCharge();
-//                   else flavor = p->getCharge();
-//                 }
-//               }
-//             }
-//             final_value = flavor * maximum_p_track;
-//             return final_value;
-//           }
         };
         return func;
       } else {
@@ -1155,10 +1129,6 @@ namespace Belle2 {
                       "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0).");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
-    REGISTER_VARIABLE("NumberOfKShortinRemainingROEKaon", NumberOfKShortinRemainingROEKaon,
-                      "Returns the number of K_S0 in the remainging Kaon ROE.");
-    REGISTER_VARIABLE("NumberOfKShortinRemainingROELambda", NumberOfKShortinRemainingROELambda,
-                      "Returns the number of K_S0 in the remainging Lambda ROE.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
     REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if MCLambda0, 0.0 else.");
     REGISTER_VARIABLE("lambdaZError", lambdaZError,  "Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.");
@@ -1181,10 +1151,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("KaonPionHaveOpositeCharges", KaonPionHaveOpositeCharges,
                       "Returns 1 if the particles selected as target kaon and slow pion have oposite charges, 0 else")
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
-    REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", InputQrOf,
-                      "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
+    REGISTER_VARIABLE("NumberOfKShortinROEParticleList(particleListName)", NumberOfKShortinROEParticleList,
+                      "Returns the number of K_S0 in the given ROE ParticleList. The possibilities are K_S0:ROEKaon or K_S0:ROELambda");
     REGISTER_VARIABLE("QrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", QrOf,
                       "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
+    REGISTER_VARIABLE("InputQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", InputQrOf,
+                      "FlavorTagging: [Eventbased] weighted q*r where r is calculated from the output of event level for the 3 particles with highest track probability in particlelistName.");
     REGISTER_VARIABLE("IsRightCategory(particleName)", IsRightCategory,
                       "FlavorTagging: returns 1 if the class track by particleName category has the same flavor as the MC target track 0 else also if there is no target track");
     REGISTER_VARIABLE("IsRightTrack(particleName)", IsRightTrack,

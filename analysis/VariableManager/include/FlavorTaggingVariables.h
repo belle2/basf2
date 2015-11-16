@@ -52,20 +52,6 @@ namespace Belle2 {
     double p_miss(const Particle*);
 
     /**
-     * Returns the number of K_S0 in the remaining Kaon ROE (flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROEKaon") exists.
-     */
-    double NumberOfKShortinRemainingROEKaon(const Particle*);
-
-    /**
-     * Returns the number of K_S0 in the remaining Lambda ROE (flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") exists.
-     */
-    double NumberOfKShortinRemainingROELambda(const Particle*);
-
-    /**
      * 1.0 if pdg-code for Lambda0, -1.0 if Anti-Lambda0, 0.0 else
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
@@ -77,8 +63,6 @@ namespace Belle2 {
      *
      */
     double isLambda(const Particle* particle);
-
-
 
     /**
      * Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.
@@ -106,6 +90,13 @@ namespace Belle2 {
      * Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.
      */
     double transverseMomentumOfChargeTracksInRoe(const Particle* part);
+
+    /**
+     * Returns the number of K_S0 in the given ROE Particle List(flavor tagging specific variable).
+     *
+     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") or KShorts("K_S0:ROEKaon") exists.
+     */
+    Manager::FunctionPtr NumberOfKShortinROEParticleList(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the maximum q*r value for a given list (argument[0]). The r value is stored via extraInfo

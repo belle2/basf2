@@ -41,6 +41,9 @@
 #include <framework/core/InputController.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
+// utility
+#include <analysis/utility/C2TDistanceUtility.h>
+
 #include <TLorentzVector.h>
 #include <TRandom.h>
 #include <TVectorF.h>
@@ -846,43 +849,6 @@ namespace Belle2 {
       return (pIN - particle->get4Vector()).M2();
     }
 
-// Extra energy --------------------------------------------------------
-
-    double extraEnergy(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-      if (!roe)
-        return result;
-
-      const std::vector<ECLCluster*> remainECLClusters = roe->getECLClusters();
-      result = 0.0;
-      for (unsigned i = 0; i < remainECLClusters.size(); i++)
-        result += remainECLClusters[i]->getEnergy();
-
-      return result;
-    }
-
-    double extraEnergyFromGoodGamma(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
-      if (!roe)
-        return result;
-
-      const std::vector<ECLCluster*> remainECLClusters = roe->getECLClusters();
-      result = 0.0;
-      for (unsigned i = 0; i < remainECLClusters.size(); i++) {
-        Particle gamma(remainECLClusters[i]);
-        if (goodGamma(&gamma) > 0)
-          result += remainECLClusters[i]->getEnergy();
-      }
-
-      return result;
-    }
-
 // ECLCluster related variables -----------------------------------------
 
     double eclClusterDetectionRegion(const Particle* particle)
@@ -903,6 +869,54 @@ namespace Belle2 {
       }
 
       return result;
+    }
+
+    double minCluster2HelixDistance(const Particle* particle)
+    {
+      // Needed StoreArrays
+      StoreArray<ECLCluster> eclClusters;
+      StoreArray<Track> tracks;
+
+      // Initialize variables
+      ECLCluster* ecl = nullptr;
+      Track* track = nullptr;
+
+      // If neutral particle, 'getECLCluster'; if charged particle, 'getTrack->getECLCluster'; if no ECLCluster, return -1.0
+      if (particle->getCharge() == 0)
+        ecl = eclClusters[particle->getMdstArrayIndex()];
+      else {
+        track = tracks[particle->getMdstArrayIndex()];
+        if (track)
+          ecl = track->getRelatedTo<ECLCluster>();
+      }
+
+      if (!ecl)
+        return -1.0;
+
+      TVector3 v1raw = ecl->getclusterPosition();
+      TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
+
+      // Get closest track from Helix
+      float minDistHelix = 999.9;
+
+      for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
+
+        //TODO: expand use to all ChargeStable particles
+        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResult(Const::pion);
+        Helix helix = tfr->getHelix();
+
+        TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);
+        if (tempv2helix.Mag() == 999.9)
+          continue;
+
+        double tempDistHelix = (tempv2helix - v1).Mag();
+
+        if (tempDistHelix < minDistHelix) {
+          minDistHelix = tempDistHelix;
+        }
+      }
+
+      return minDistHelix;
     }
 
     bool isGoodGamma(int region, double energy, bool calibrated)
@@ -1206,8 +1220,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
                       "invariant mass squared of the system recoiling against given Particle");
 
-    REGISTER_VARIABLE("eextra", extraEnergy, "extra energy in the calorimeter that is not associated to the given Particle");
-
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
@@ -1220,6 +1232,8 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");
+    REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
+                      "Return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
     REGISTER_VARIABLE("goodGamma", goodGamma,
                       "1.0 if photon candidate passes good photon selection criteria");
     REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,

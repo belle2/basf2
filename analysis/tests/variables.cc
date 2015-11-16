@@ -30,6 +30,7 @@
 
 #include <TRandom3.h>
 #include <TLorentzVector.h>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -353,7 +354,7 @@ namespace {
     PCmsLabTransform T;
     float E0 = T.getCMSEnergy() / 2;
 
-    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + momentum.Mag2()));
+    TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::pion.getMass()*Const::pion.getMass() + 1.0 /*momentum.Mag2()*/));
     TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
     TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
@@ -368,35 +369,52 @@ namespace {
     TLorentzVector rec4vecCMS = T.rotateLabToCms() * rec4vec;
     TLorentzVector roe4vecCMS = T.rotateLabToCms() * roe4vec;
 
+    TVector3 pB = - roe4vecCMS.Vect();
+    pB.SetMag(0.340);
+
     TLorentzVector m4v0;
     m4v0.SetE(2 * E0 - (rec4vecCMS.E() + roe4vecCMS.E()));
     m4v0.SetVect(- (rec4vecCMS.Vect() + roe4vecCMS.Vect()));
 
     TLorentzVector m4v1;
     m4v1.SetE(E0 - rec4vecCMS.E());
-    m4v1.SetVect(- rec4vecCMS.Vect());
+    m4v1.SetVect(- (rec4vecCMS.Vect() + roe4vecCMS.Vect()));
 
-    TLorentzVector neutrino4vec;
-    neutrino4vec.SetVect(- (roe4vec.Vect() + rec4vec.Vect()));
-    neutrino4vec.SetE(neutrino4vec.Vect().Mag());
+    TLorentzVector m4v2;
+    m4v2.SetE(E0 - rec4vecCMS.E());
+    m4v2.SetVect(- rec4vecCMS.Vect());
 
-    TLorentzVector neutrino4vecCMS = T.rotateLabToCms() * neutrino4vec;
+    TLorentzVector m4v3;
+    m4v3.SetE(E0 - rec4vecCMS.E());
+    m4v3.SetVect(pB - rec4vecCMS.Vect());
+
+    TLorentzVector neutrino4vecCMS;
+    neutrino4vecCMS.SetVect(- (roe4vecCMS.Vect() + rec4vecCMS.Vect()));
+    neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
 
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
 
     // TESTS
     EXPECT_FLOAT_EQ(1.0, nROETracks(part));
+    EXPECT_FLOAT_EQ(1.0, nAllROETracks(part));
     EXPECT_FLOAT_EQ(1.0, nROEECLClusters(part));
+    EXPECT_FLOAT_EQ(1.0, nAllROEECLClusters(part));
     EXPECT_FLOAT_EQ(1.0, nROENeutralECLClusters(part));
+    EXPECT_FLOAT_EQ(1.0, nAllROENeutralECLClusters(part));
     EXPECT_FLOAT_EQ(1.0, nROEKLMClusters(part));
     EXPECT_FLOAT_EQ(1.0, nROELeptons(part));
     EXPECT_FLOAT_EQ(1.0, ROECharge(part));
+
     EXPECT_FLOAT_EQ(E0 - roe4vecCMS.E(), ROEDeltaE(part));
     EXPECT_FLOAT_EQ(TMath::Sqrt(E0 * E0 - roe4vecCMS.Vect().Mag2()), ROEMbc(part));
-    EXPECT_FLOAT_EQ(E0 - corrRec4vecCMS.E(), correctedDeltaE(part));
-    EXPECT_FLOAT_EQ(TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()), correctedMbc(part));
-    EXPECT_FLOAT_EQ(m4v0.Mag2(), ECMissingMass(part, {0}));
-    EXPECT_FLOAT_EQ(m4v1.Mag2(), ECMissingMass(part, {1}));
+
+    EXPECT_FLOAT_EQ(E0 - corrRec4vecCMS.E(), correctedBMesonDeltaE(part));
+    EXPECT_FLOAT_EQ(TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()), correctedBMesonMbc(part));
+
+    EXPECT_FLOAT_EQ(m4v0.Mag2(), ROEMissingMass(part, {0}));
+    EXPECT_FLOAT_EQ(m4v1.Mag2(), ROEMissingMass(part, {1}));
+    EXPECT_FLOAT_EQ(m4v2.Mag2(), ROEMissingMass(part, {2}));
+    EXPECT_FLOAT_EQ(m4v3.Mag2(), ROEMissingMass(part, {3}));
   }
 
 

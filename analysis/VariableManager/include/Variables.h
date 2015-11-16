@@ -392,27 +392,17 @@ namespace Belle2 {
     double recoilMassSquared(const Particle* particle);
 
     /**
-     * return extra energy in the calorimeter that is not associated to the given Particle
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double extraEnergy(const Particle* particle);
-
-    /**
-     * return extra energy in the calorimeter that is not associated to the given Particle
-     * ECLClusters passing goodGamma selection are used only.
-     *
-     * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
-     */
-    double extraEnergyFromGoodGamma(const Particle* particle);
-
-    /**
      * return 1/2/3 if the ECL Cluster is detected in the forward/barrel/backward region
      */
     double eclClusterDetectionRegion(const Particle* particle);
 
-    /** Returns true if the cluster with given attributes passes 'good gamma' criteria.
-     *
+    /**
+     * return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+     */
+    double minCluster2HelixDistance(const Particle* particle);
+
+    /**
+     * returns true if the cluster with given attributes passes 'good gamma' criteria
      * @param calibrated set to false for goodGammaUncalibrated().
      */
     bool isGoodGamma(int region, double energy, bool calibrated);

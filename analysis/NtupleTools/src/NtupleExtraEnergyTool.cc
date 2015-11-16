@@ -11,6 +11,7 @@
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ROEVariables.h>
 
 #include <TBranch.h>
 

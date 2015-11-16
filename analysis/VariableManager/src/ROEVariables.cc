@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/VariableManager/ROEVariables.h>
+#include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/VariableManager/Manager.h>
@@ -69,7 +70,8 @@ namespace Belle2 {
       return 0;
     }
 
-    double nROETracks(const Particle* particle)
+
+    double nAllROETracks(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -80,6 +82,34 @@ namespace Belle2 {
       }
 
       return roe->getNTracks();
+    }
+
+    double nROETracks(const Particle* particle)
+    {
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -1;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getTrackMasks();
+
+      int countTracks = 0;
+      std::vector<Track*> roeTracks = roe->getTracks();
+
+      for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+
+        if (masks.size() > 0)
+          if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
+            continue;
+
+        countTracks++;
+      }
+
+      return countTracks;
     }
 
     double nRemainingTracksInRestOfEvent(const Particle* particle)
@@ -101,7 +131,7 @@ namespace Belle2 {
       return roe_tracks - par_tracks;
     }
 
-    double nROEECLClusters(const Particle* particle)
+    double nAllROEECLClusters(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -112,6 +142,36 @@ namespace Belle2 {
       }
 
       return roe->getNECLClusters();
+    }
+
+    double nROEECLClusters(const Particle* particle)
+    {
+      int nClusters = 0;
+
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getECLClusterMasks();
+
+      // Get all ECLClusters in ROE
+      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+
+      // Loop through ECLClusters
+      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+        if (masks.size() > 0)
+          if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
+            continue;
+
+        nClusters++;
+      }
+
+      return nClusters;
     }
 
     double nROEKLMClusters(const Particle* particle)
@@ -150,7 +210,7 @@ namespace Belle2 {
       return 0;
     }
 
-    double nROENeutralECLClusters(const Particle* particle)
+    double nAllROENeutralECLClusters(const Particle* particle)
     {
       int nNeutrals = 0;
 
@@ -167,8 +227,44 @@ namespace Belle2 {
 
       // Select ECLClusters with no associated tracks
       for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-        if (roeClusters[iEcl]->isNeutral())
-          nNeutrals++;
+
+        if (!roeClusters[iEcl]->isNeutral())
+          continue;
+
+        nNeutrals++;
+      }
+
+      return nNeutrals;
+    }
+
+    double nROENeutralECLClusters(const Particle* particle)
+    {
+      int nNeutrals = 0;
+
+      // Get related ROE object
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getECLClusterMasks();
+
+      // Get all ECLClusters in ROE
+      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+
+      // Select ECLClusters with no associated tracks
+      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+
+        if (!roeClusters[iEcl]->isNeutral())
+          continue;
+        if (masks.size() > 0)
+          if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
+            continue;
+
+        nNeutrals++;
       }
 
       return nNeutrals;
@@ -186,6 +282,9 @@ namespace Belle2 {
         return -999;
       }
 
+      // Get masks
+      std::map<int, bool> masks = roe->getTrackMasks();
+
       // Get all Tracks in ROE
       const std::vector<Track*> roeTracks = roe->getTracks();
 
@@ -198,6 +297,11 @@ namespace Belle2 {
           return -1;
         }
 
+        if (masks.size() > 0)
+          if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
+            continue;
+
+        //TODO: set fractions array
         int absPDGCode = abs(pid->getMostLikely().getPDGCode());
 
         if (absPDGCode == 11 or absPDGCode == 13)
@@ -219,16 +323,84 @@ namespace Belle2 {
         return -999;
       }
 
+      // Get masks
+      std::map<int, bool> masks = roe->getTrackMasks();
+
       // Get all tracks in ROE
       const std::vector<Track*> roeTracks = roe->getTracks();
 
       for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
-        // At the moment (16.7.2015) only TrackFitResult with pion mass hypothesis available
-        const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(Const::ChargedStable(211));
+
+        if (masks.size() > 0)
+          if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
+            continue;
+
+        const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(Const::pion);
         roeCharge += tfr->getChargeSign();
       }
 
       return roeCharge;
+    }
+
+    double extraEnergy(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getECLClusterMasks();
+
+      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+      result = 0.0;
+
+      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+
+        if (masks.size() > 0)
+          if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
+            continue;
+
+        result += roeClusters[iEcl]->getEnergy();
+      }
+
+      return result;
+    }
+
+    double extraEnergyFromGoodGamma(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getECLClusterMasks();
+
+      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+      result = 0.0;
+
+      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+
+        if (masks.size() > 0)
+          if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
+            continue;
+
+        Particle gamma(roeClusters[iEcl]);
+
+        if (goodGamma(&gamma) > 0)
+          result += roeClusters[iEcl]->getEnergy();
+      }
+
+      return result;
     }
 
     double ROEDeltaE(const Particle* particle)
@@ -269,11 +441,11 @@ namespace Belle2 {
       return mbc;
     }
 
-    double correctedDeltaE(const Particle* particle)
+    double correctedBMesonDeltaE(const Particle* particle)
     {
       PCmsLabTransform T;
       TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-      TLorentzVector neutrino4vec = T.rotateLabToCms() * neutrino4Vector(particle);
+      TLorentzVector neutrino4vec = neutrino4VectorCMS(particle);
       double totalSigEnergy = (sig4vec + neutrino4vec).Energy();
       double E = T.getCMSEnergy() / 2;
 
@@ -282,11 +454,11 @@ namespace Belle2 {
       return deltaE;
     }
 
-    double correctedMbc(const Particle* particle)
+    double correctedBMesonMbc(const Particle* particle)
     {
       PCmsLabTransform T;
       TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
-      TLorentzVector neutrino4vec = T.rotateLabToCms() * neutrino4Vector(particle);
+      TLorentzVector neutrino4vec = neutrino4VectorCMS(particle);
       TVector3 totalSigMomentum = (sig4vec + neutrino4vec).Vect();
       double E = T.getCMSEnergy() / 2;
 
@@ -296,7 +468,7 @@ namespace Belle2 {
       return mbc;
     }
 
-    double ECMissingMass(const Particle* particle, const std::vector<double>& opt)
+    double ROEMissingMass(const Particle* particle, const std::vector<double>& opt)
     {
       double missM2 = missing4VectorCMS(particle, opt).Mag2();
 
@@ -390,7 +562,7 @@ namespace Belle2 {
       double definition = opt[0];
 
       PCmsLabTransform T;
-      TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+      TLorentzVector rec4vec = T.rotateLabToCms() * particle->get4Vector();
       TLorentzVector roe4vec = T.rotateLabToCms() * roe->getROE4Vector();
 
       TLorentzVector miss4vec;
@@ -398,20 +570,34 @@ namespace Belle2 {
 
       // Definition 1:
       if (definition == 0) {
-        miss4vec.SetVect(- (sig4vec.Vect() + roe4vec.Vect()));
-        miss4vec.SetE(2 * E_beam_cms - (sig4vec.Energy() + roe4vec.Energy()));
+        miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
+        miss4vec.SetE(2 * E_beam_cms - (rec4vec.Energy() + roe4vec.Energy()));
       }
 
       // Definition 2:
       else if (definition == 1) {
-        miss4vec.SetVect(- sig4vec.Vect());
-        miss4vec.SetE(E_beam_cms - sig4vec.Energy());
+        miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
+        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+      }
+
+      // Definition 3:
+      else if (definition == 2) {
+        miss4vec.SetVect(- rec4vec.Vect());
+        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+      }
+
+      // Definition 4:
+      else if (definition == 3) {
+        TVector3 pB = - roe4vec.Vect();
+        pB.SetMag(0.340);
+        miss4vec.SetVect(pB - rec4vec.Vect());
+        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
       }
 
       return miss4vec;
     }
 
-    TLorentzVector neutrino4Vector(const Particle* particle)
+    TLorentzVector neutrino4VectorCMS(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -423,12 +609,12 @@ namespace Belle2 {
       }
 
       PCmsLabTransform T;
-      TLorentzVector sig4vec = particle->get4Vector();
-      TLorentzVector roe4vec = roe->getROE4Vector();
+      TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
+      TLorentzVector roe4vec = T.rotateLabToCms() * roe->getROE4Vector();
 
       TLorentzVector neutrino4vec;
 
-      neutrino4vec.SetVect((-1) * (sig4vec.Vect() + roe4vec.Vect()));
+      neutrino4vec.SetVect(- (sig4vec.Vect() + roe4vec.Vect()));
       neutrino4vec.SetE(neutrino4vec.Vect().Mag());
 
       return neutrino4vec;
@@ -440,18 +626,27 @@ namespace Belle2 {
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
+    REGISTER_VARIABLE("nAllROETracks",  nROETracks,
+                      "Returns number of all tracks in the related RestOfEvent object.");
+
     REGISTER_VARIABLE("nROETracks",  nROETracks,
-                      "Returns number of tracks in the related RestOfEvent object.");
+                      "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.");
 
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
+    REGISTER_VARIABLE("nAllROEECLClusters", nROEECLClusters,
+                      "Returns number of all ECL clusters in the related RestOfEvent object.");
+
     REGISTER_VARIABLE("nROEECLClusters", nROEECLClusters,
-                      "Returns number of ECL clusters in the related RestOfEvent object.");
+                      "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.");
+
+    REGISTER_VARIABLE("nAllROENeutralECLClusters", nROENeutralECLClusters,
+                      "Returns number of all ECL clusters in the related RestOfEvent object.");
 
     REGISTER_VARIABLE("nROENeutralECLClusters", nROENeutralECLClusters,
-                      "Returns number of remaining neutral ECL clusters in the related RestOfEvent object.");
+                      "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
     REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of remaining KLM clusters in the related RestOfEvent object.");
@@ -462,30 +657,36 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROELeptons", nROELeptons,
                       "Returns number of lepton particles in the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_Charge", ROECharge,
+    REGISTER_VARIABLE("ROE_charge", ROECharge,
                       "Returns total charge of the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_deltaE", ROEDeltaE,
+    REGISTER_VARIABLE("ROE_eextra", extraEnergy,
+                      "extra energy in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("ROE_eextraGG", extraEnergyFromGoodGamma,
+                      "extra energy for good photons in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("ROE_deltae", ROEDeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ROE_Mbc", ROEMbc,
+    REGISTER_VARIABLE("ROE_mbc", ROEMbc,
                       "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ROE_MCErrors", ROEMCErrors,
+    REGISTER_VARIABLE("ROE_mcErrors", ROEMCErrors,
                       "Returns MC Errors for an artificial particle, which corresponds to the ROE object.");
 
-    REGISTER_VARIABLE("correctedDeltaE", correctedDeltaE,
-                      "Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2.");
+    REGISTER_VARIABLE("correctedB_deltae", correctedBMesonDeltaE,
+                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("correctedMbc", correctedMbc,
-                      "Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2");
+    REGISTER_VARIABLE("correctedB_mbc", correctedBMesonMbc,
+                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ECMissingMass(opt)", ECMissingMass,
-                      "Returns the missing mass squared. Two definitions exist:"
-                      "Option 0: (E)vent based missing mass: calculates the missing 4-momentum based"
-                      "					 on all the momentum and energy in the EVENT"
-                      "Option 1: (C)andidate based missing mass: calculates the missing 4-momentum based"
-                      "          on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)");
-
+    REGISTER_VARIABLE("roeMissMass(opt)", ROEMissingMass,
+                      "Returns the missing mass squared."
+                      "Option 0: Take momentum and energy of all ROE tracks and clusters into account"
+                      "Option 1: Take only momentum of ROE tracks and clusters into account"
+                      "Option 2: Don't take any ROE tracks and clusters into account, use signal side only"
+                      "Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB"
+                      "system in the direction of the ROE momentum");
   }
 }

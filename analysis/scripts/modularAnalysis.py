@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -821,7 +821,19 @@ def matchMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(list_name, only_good_ecl=True, path=analysis_main):
+def buildRestOfEvent(
+        list_name,
+        trackSelection='',
+        eclClusterSelection='',
+        fractions=[
+            0,
+            0,
+            1,
+            0,
+            0,
+            0],
+        only_good_ecl=True,
+        path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
@@ -834,6 +846,9 @@ def buildRestOfEvent(list_name, only_good_ecl=True, path=analysis_main):
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)
     roeBuilder.param('onlyGoodECLClusters', only_good_ecl)
+    roeBuilder.param('chargedStableFractions', fractions)
+    roeBuilder.param('trackSelection', trackSelection)
+    roeBuilder.param('eclClusterSelection', eclClusterSelection)
     path.add_module(roeBuilder)
 
 

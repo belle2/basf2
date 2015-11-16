@@ -12,11 +12,12 @@
 #define RESTOFEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
-
+#include <framework/gearbox/Const.h>
 #include <TLorentzVector.h>
 
 #include <vector>
 #include <set>
+#include <map>
 
 namespace Belle2 {
 
@@ -95,6 +96,24 @@ namespace Belle2 {
     void addKLMCluster(const KLMCluster* cluster);
 
     /**
+     * Set the probabilities of ChargedStable particles. This is used in ROEVariables, where mass hypotheses are needed.
+     * Default is pion-mass always.
+     *
+     * @param vector of probabilities of ChargedStable particles
+     */
+    void setChargedStableFractions(const std::vector<double>& fractions);
+
+    /**
+     * Sets the map of masks for Tracks
+     */
+    void setTrackMasks(std::map<int, bool> trackMasks);
+
+    /**
+     * Sets the map of masks for ECLClusters
+     */
+    void setECLClusterMasks(std::map<int, bool> clusterMasks);
+
+    /**
      * Add given StoreArray indices to the list of unused KLM Clusters in the event.
      *
      * @param vector of SoreArray indices of unused Clusters
@@ -165,6 +184,16 @@ namespace Belle2 {
      */
     void print() const;
 
+    /**
+     * Getter for the map of masks for Tracks
+     */
+    std::map<int, bool> getTrackMasks(void) const;
+
+    /**
+     * Getter for the map of masks for ECLClusters
+     */
+    std::map<int, bool> getECLClusterMasks(void) const;
+
 
   private:
 
@@ -172,6 +201,10 @@ namespace Belle2 {
     std::set<int> m_trackIndices;      /**< StoreArray indices to unused tracks */
     std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
     std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
+    double m_fractions[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0}; /**< A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables). Default is pion always.*/
+
+    std::map<int, bool> m_trackMasks; /**< Map of mask values for each track to be used in ROE or not */
+    std::map<int, bool> m_eclClusterMasks; /**< Map of mask values for each ECLCluster to be used in ROE or not */
     // TODO: add support for vee
 
     /**
@@ -188,7 +221,7 @@ namespace Belle2 {
         to.insert(from[i]);
     }
 
-    ClassDef(RestOfEvent, 3) /**< class definition */
+    ClassDef(RestOfEvent, 4) /**< class definition */
 
   };
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TLorentzVector.h>
+#include <map>
 
 namespace Belle2 {
   class Particle;
@@ -23,7 +24,12 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle);
 
     /**
-     * Returns number of tracks in the related RestOfEvent object
+     * Returns number of all the tracks in the related RestOfEvent object
+     */
+    double nAllROETracks(const Particle* particle);
+
+    /**
+     * Returns number of tracks in the related RestOfEvent object that pass the selection criteria
      */
     double nROETracks(const Particle* particle);
 
@@ -33,7 +39,12 @@ namespace Belle2 {
     double nRemainingTracksInRestOfEvent(const Particle* particle);
 
     /**
-     * Returns number of ECL clusters in the related RestOfEvent object
+     * Returns number of all ECL clusters in the related RestOfEvent object
+     */
+    double nAllROEECLClusters(const Particle* particle);
+
+    /**
+     * Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria
      */
     double nROEECLClusters(const Particle* particle);
 
@@ -49,7 +60,12 @@ namespace Belle2 {
     double pionVeto(const Particle* particle);
 
     /**
-     * Returns number of remaining neutral ECL clusters in the related RestOfEvent object
+     * Returns number of all neutral ECL clusters in the related RestOfEvent object
+     */
+    double nAllROENeutralECLClusters(const Particle* particle);
+
+    /**
+     * Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria
      */
     double nROENeutralECLClusters(const Particle* particle);
 
@@ -62,6 +78,17 @@ namespace Belle2 {
      * Returns total charge of the related RestOfEvent object
      */
     double ROECharge(const Particle* particle);
+
+    /**
+     * return extra energy in the calorimeter that is not associated to the given Particle
+     */
+    double extraEnergy(const Particle* particle);
+
+    /**
+     * return extra energy in the calorimeter that is not associated to the given Particle
+     * ECLClusters passing goodGamma selection are used only.
+     */
+    double extraEnergyFromGoodGamma(const Particle* particle);
 
     /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2
@@ -79,37 +106,43 @@ namespace Belle2 {
     double ROEMCErrors(const Particle* particle);
 
     /**
-     * Returns energy difference of the signal side (reconstructed side + neutrino) with respect to E_cms/2
+     * Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2
      */
-    double correctedDeltaE(const Particle* particle);
+    double correctedBMesonDeltaE(const Particle* particle);
 
     /**
-     * Returns beam constrained mass of the signal side (reconstructed side + neutrino) with respect to E_cms/2
+     * Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2
      */
-    double correctedMbc(const Particle* particle);
+    double correctedBMesonMbc(const Particle* particle);
 
     /**
-     * Returns the missing mass squared. Two definitions exist:
-     * Option 0: (E)vent based missing mass: calculates the missing 4-momentum based on all the momentum and energy in the EVENT
-     * Option 1: (C)andidate based missing mass: calculates the missing 4-momentum based on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)
+     * Returns the missing mass squared.
+     * Option 0: Take momentum and energy of all ROE tracks and clusters into account
+     * Option 1: Take only momentum of ROE tracks and clusters into account, energy set to E_beam
+     * Option 2: Don't take any ROE tracks and clusters into account, use signal side only
+     * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
+     *           system in the direction of the ROE momentum
      */
-    double ECMissingMass(const Particle* particle, const std::vector<double>& opt);
+    double ROEMissingMass(const Particle* particle, const std::vector<double>& opt);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
     /**
-     * Returns the missing 4-momentum vector in CMS system. Two definitions exist:
-     * Option 0: (E)vent based: calculates the missing 4-momentum based on all the momentum and energy in the EVENT
-     * Option 1: (C)andidate based: calculates the missing 4-momentum based on all the momentum and energy on the RECONSTRUCTED SIDE (signal candidate, p_B_cms is set to 0)
+     * Returns the missing 4-momentum vector in CMS system.
+     * Option 0: Take momentum and energy of all ROE tracks and clusters into account
+     * Option 1: Take only momentum of ROE tracks and clusters into account, energy set to E_beam
+     * Option 2: Don't take any ROE tracks and clusters into account, use signal side only
+     * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
+     *           system in the direction of the ROE momentum
      */
     TLorentzVector missing4VectorCMS(const Particle* particle, const std::vector<double>& opt);
 
     /**
-     * Returns the neutrino 4-momentum vector. Mass of neutrino is 0 by definition: E = |p|.
+     * Returns the neutrino 4-momentum vector in CMS system. Mass of neutrino is 0 by definition: E == |p|
      */
-    TLorentzVector neutrino4Vector(const Particle* particle);
+    TLorentzVector neutrino4VectorCMS(const Particle* particle);
 
   }
 } // Belle2 namespace

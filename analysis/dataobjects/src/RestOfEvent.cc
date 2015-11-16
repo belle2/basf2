@@ -52,6 +52,28 @@ void RestOfEvent::addKLMClusters(const std::vector<int>& indices)
   addIndices(indices, m_klmClusterIndices);
 }
 
+void RestOfEvent::setChargedStableFractions(const std::vector<double>& fractions)
+{
+  const unsigned int n = Const::ChargedStable::c_SetSize;
+
+  if (fractions.size() == n) {
+    for (unsigned int i = 0; i < n; i++)
+      m_fractions[i] = fractions[i];
+  } else {
+    B2WARNING("Size of fractions vector not appropriate! Default value will be used.");
+  }
+}
+
+void RestOfEvent::setTrackMasks(std::map<int, bool> masks)
+{
+  m_trackMasks = masks;
+}
+
+void RestOfEvent::setECLClusterMasks(std::map<int, bool> masks)
+{
+  m_eclClusterMasks = masks;
+}
+
 const std::vector<Belle2::Track*> RestOfEvent::getTracks() const
 {
   std::vector<Track*> remainTracks(getNTracks());
@@ -108,11 +130,11 @@ TLorentzVector RestOfEvent::getROE4Vector() const
 {
   std::vector<Track*> roeTracks = RestOfEvent::getTracks();
   std::vector<ECLCluster*> roeClusters = RestOfEvent::getECLClusters();
-
   TLorentzVector roe4Vector;
 
   // Add all momentum from tracks
   for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
+
     const PIDLikelihood* pid = roeTracks[iTrack]->getRelatedTo<PIDLikelihood>();
 
     if (!pid) {
@@ -120,29 +142,46 @@ TLorentzVector RestOfEvent::getROE4Vector() const
       continue;
     }
 
-    // At the moment (16.7.2015) only TrackFitResult with pion mass hypothesis available
-    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(pid->getMostLikely());
+    if (m_trackMasks.size() > 0)
+      if (!m_trackMasks.at(roeTracks[iTrack]->getArrayIndex()))
+        continue;
 
-    // Update energy of tracks (for future purpose)
-    /*
-    float tempMass = pid->getMostLikely().getMass();
+    Const::ChargedStable mostLikely = pid->getMostLikely(m_fractions);
+    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(mostLikely);
+
+    // Update energy of tracks (default: pion always)
+    float tempMass = mostLikely.getMass();
+    TVector3 tempMom = tfr->getMomentum();
     TLorentzVector temp4Vector;
-    temp4Vector.SetVect(tfr->getMomentum());
-    temp4Vector.SetE(TMath::Sqrt(tfr->getMomentum().Mag2() + tempMass * tempMass));
+    temp4Vector.SetVect(tempMom);
+    temp4Vector.SetE(TMath::Sqrt(tempMom.Mag2() + tempMass * tempMass));
+
     roe4Vector += temp4Vector;
-    */
-
-    roe4Vector += tfr->get4Momentum();
-
   }
 
   // Add all momentum from neutral ECLClusters
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-    if (roeClusters[iEcl]->isNeutral())
-      roe4Vector += roeClusters[iEcl]->get4Vector();
+
+    if (!roeClusters[iEcl]->isNeutral()) continue;
+
+    if (m_eclClusterMasks.size() > 0)
+      if (!m_eclClusterMasks.at(roeClusters[iEcl]->getArrayIndex()))
+        continue;
+
+    roe4Vector += roeClusters[iEcl]->get4Vector();
   }
 
   return roe4Vector;
+}
+
+std::map<int, bool> RestOfEvent::getTrackMasks() const
+{
+  return m_trackMasks;
+}
+
+std::map<int, bool> RestOfEvent::getECLClusterMasks() const
+{
+  return m_eclClusterMasks;
 }
 
 void RestOfEvent::print() const

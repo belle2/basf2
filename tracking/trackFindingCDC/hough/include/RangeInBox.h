@@ -35,7 +35,7 @@ namespace Belle2 {
         double sumOfWeights = 0;
         double numberOfPassedItems = 0;
         for (const auto& item : *rangeObject) {
-          const double hitWeight = hitInBoxAlgorithm(&item, box);
+          const double hitWeight = hitInBoxAlgorithm(item, box);
           if (not std::isnan(hitWeight)) {
             numberOfPassedItems++;
             sumOfWeights += hitWeight;

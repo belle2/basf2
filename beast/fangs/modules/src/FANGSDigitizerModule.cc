@@ -20,7 +20,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
+//#include <framework/gearbox/Unit.h>
 #include <framework/core/RandomNumbers.h>
 
 //c++
@@ -88,14 +88,15 @@ void FANGSDigitizerModule::event()
   StoreArray<FANGSSimHit> FANGSSimHits;
   m_nFANGS = 15;
   std::vector<double> T0(m_nFANGS,
-                         m_upperTimingCut);  // TODO: why this number? Maybe pick something larger the the upperTiming cut? e.g. m_upperTimingCut + 1
+                         m_upperTimingCut);
 
+  //Find the start time
   for (const auto& FANGSSimHit : FANGSSimHits) {
     const int lad = FANGSSimHit.getLadder();
     const int sen = FANGSSimHit.getSensor();
     const int detNb = (lad - 1) * 5 + sen - 1;
     const TVector3 trackPosition =  FANGSSimHit.getLocalPosEntry();
-    const double z = trackPosition.Z() / 10. + m_sensor_width / 2.;
+    const double z = trackPosition.Y() / 10. + m_sensor_width / 2.; //mm to cm
     if (z < T0[detNb]) {
       T0[detNb] = z;
     }
@@ -103,12 +104,12 @@ void FANGSDigitizerModule::event()
 
   for (auto& val : T0) {
     if (m_lowerTimingCut < val && val < m_upperTimingCut) {
-      val = val / m_v_sensor;
+      val = val / m_v_sensor; //cm to ns
     } else {
       val = -1.;
     }
   }
-  int olddetNb = -1;
+
   //loop on all entries to store in 3D the ionization for each FANGS
   for (const auto& FANGSSimHit : FANGSSimHits) {
 
@@ -116,18 +117,23 @@ void FANGSDigitizerModule::event()
     const int sen = FANGSSimHit.getSensor();
     const int detNb = (lad - 1) * 5 + sen - 1;
     const TVector3 simHitPosition =  FANGSSimHit.getLocalPosEntry();
-    const double edep = FANGSSimHit.getEnergyDep();
+    const double edep = FANGSSimHit.getEnergyDep() * 1e9; //GeV to eV
 
+    //mm to cm
     const TVector3 chipPosition(
       simHitPosition.X() / 10.,
-      simHitPosition.Y() / 10.,
-      simHitPosition.Z() / 10. + m_sensor_width / 2.);
+      simHitPosition.Z() / 10.,
+      simHitPosition.Y() / 10. + m_sensor_width / 2.);
 
-    if (olddetNb != detNb) {
-      if (m_dchip_map.size() > 0) Pixelization();
+    //If new detector filled the chip
+    if (olddetNb != detNb && m_dchip_map.size() > 0) {
+      Pixelization();
       olddetNb = detNb;
       m_dchip_map.clear();
       m_dchip.clear();
+      m_dchip_detNb_map.clear();
+      m_dchip_pdg_map.clear();
+      m_dchip_trkID_map.clear();
     }
 
     //check if ionization within sensitive volume
@@ -136,18 +142,12 @@ void FANGSDigitizerModule::event()
         (0. < chipPosition.Z() && chipPosition.Z() <  m_sensor_width) &&
         (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
 
-      //ionization energy
-      //GeV -> eV
-      const double ionEn = edep * Unit::keV;
-      // check if enough energy to ionize if not break
-      // keV -> eV
-
-      if ((ionEn * Unit::eV) <  m_Workfct) break;
+      if (edep <  m_Workfct) break;
       ////////////////////////////////
       // check if enough energy to ionize
-      else if ((ionEn * Unit::eV) >  m_Workfct) {
+      else if (edep >  m_Workfct) {
 
-        const double NbEle = ionEn * Unit::eV /  m_Workfct;
+        const double NbEle = edep / m_Workfct;
 
         int col = (int)((chipPosition.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
         int row = (int)((chipPosition.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
@@ -172,9 +172,12 @@ void FANGSDigitizerModule::event()
     }
   }
 
-  //if (m_dchip_map.size() > 0) Pixelization();
+  if (m_dchip_map.size() > 0) Pixelization();
   m_dchip_map.clear();
   m_dchip.clear();
+  m_dchip_detNb_map.clear();
+  m_dchip_pdg_map.clear();
+  m_dchip_trkID_map.clear();
 }
 
 void FANGSDigitizerModule::Pixelization()
@@ -189,33 +192,29 @@ void FANGSDigitizerModule::Pixelization()
 
   for (auto& keyValuePair : m_dchip_map) {
     const auto& key = keyValuePair.first;
-    //detector number
-    //int detNb = std::get<0>(key);
     //column
-    //int i = std::get<1>(key);
     int i = std::get<0>(key);
     //raw
-    //int j = std::get<2>(key);
     int j = std::get<1>(key);
 
     if (m_dchip_map[std::tuple<int, int>(i, j)] == 1) {
 
-      int k0 = -10;
+      int k0 = 1e9;
       const int quE = gRandom->Uniform(0, 2);
       const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
+      int kcounter = 0;
       //determined t0 ie first time above pixel threshold
       for (auto& keyValuePair2 : m_dchip) {
         const auto& key2 = keyValuePair2.first;
         int k = std::get<2>(key2);
         if (m_dchip[std::tuple<int, int, int>(i, j, k)] > thresEl) {
-          k0 = k;
-          break;
+          if (k0 > k)k0 = k;
+          kcounter ++;
         }
       }
       //determined nb of bc per pixel
-
       //if good t0
-      if (k0 != -10) {
+      if (k0 != 1e9) {
         int ik = 0;
         int NbOfEl = 0;
         for (auto& keyValuePair2 : m_dchip) {
@@ -249,6 +248,29 @@ void FANGSDigitizerModule::Pixelization()
           }
           ik++;
         }
+
+        if (kcounter < 16) {
+          //calculate ToT
+          int tot = -1;
+          if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1) {
+            tot = (int)fctToT_Calib1->Eval((double)NbOfEl) + quE;
+          } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
+            tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
+          } else if (NbOfEl > 800.*m_TOTQ1) {
+            tot = 14;
+          }
+          if (tot > 13) {
+            tot = 14;
+          }
+          if (tot >= 0) {
+            ToT.push_back(tot);
+            t0.push_back(k0);
+            col.push_back(i);
+            row.push_back(j);
+            bci.push_back(k0);
+          }
+        }
+
       }
     } //end loop on row
   } // end loop on col

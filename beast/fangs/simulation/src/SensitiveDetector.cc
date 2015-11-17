@@ -74,8 +74,9 @@ namespace Belle2 {
         //Add start position
         const G4ThreeVector preStepPos = preStep.GetPosition() / CLHEP::mm * Unit::mm;
         const G4ThreeVector preStepMom = preStep.GetMomentum() / CLHEP::MeV * Unit::MeV;
-        const G4AffineTransform& localToGlobalTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().Inverse();
-        const G4ThreeVector localpreStepPos = localToGlobalTransform.TransformPoint(preStep.GetPosition()) * Unit::mm;
+        //const G4AffineTransform& localToGlobalTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform().Inverse();
+        const G4AffineTransform& localToGlobalTransform = preStep.GetTouchableHandle()->GetHistory()->GetTopTransform();
+        const G4ThreeVector localpreStepPos = localToGlobalTransform.TransformPoint(preStep.GetPosition()) / CLHEP::mm * Unit::mm;
         const double time = preStep.GetGlobalTime() / CLHEP::ns * Unit::ns;
         traversal.setInitial(trackID, ladderID, sensorID, pdgCode, isPrimary, preStepPos, localpreStepPos, preStepMom, time);
         //Remember if the track came from the outside

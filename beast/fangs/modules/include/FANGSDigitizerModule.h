@@ -31,7 +31,7 @@ constexpr int MAXSIZE = 3000;
 namespace Belle2 {
   namespace fangs {
     /**
-     * FANGS tube digitizer
+     * FANGS ATLAS FE-I4B ASIC chip digitizer
      *
      * Creates FANGSHits from FANGSSimHits
      *
@@ -138,6 +138,9 @@ namespace Belle2 {
       double m_lowerTimingCut = 0;
       /** Upper timing cut */
       double m_upperTimingCut = 1000000;
+
+      /** Old detector counter */
+      int olddetNb = -1;
 
     };
 

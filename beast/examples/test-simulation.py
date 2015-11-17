@@ -26,8 +26,8 @@ simulation = register_module('FullSim')
 # analysis = register_module('Pindiode')
 # analysis = register_module('Srsensor')
 # analysis = register_module('Microtpc')
-analysis = register_module('FANGS')
-# analysis = register_module('CLAWS')
+# analysis = register_module('FANGS')
+analysis = register_module('CLAWS')
 # save the microtpc results
 output = register_module('RootOutput')
 # an show some progress of the microtpc simulation
@@ -69,8 +69,8 @@ particlegun.param({  # Shoot electrons and positrons
 
 # Main XML parameter file to load, relative to global data directory
 # gearbox.param('fileName', 'beast/microtpc/detector.xml')
-gearbox.param('fileName', 'beast/fangs/detector.xml')
-# gearbox.param('fileName', 'beast/claws/detector.xml')
+# gearbox.param('fileName', 'beast/fangs/detector.xml')
+gearbox.param('fileName', 'beast/claws/detector.xml')
 # gearbox.param('fileName', 'beast/he3tube/detector.xml')
 # gearbox.param('fileName', 'beast/bgo/detector.xml')
 # gearbox.param('fileName', 'beast/pindiode/detector.xml')
@@ -85,8 +85,8 @@ analysis.set_log_level(LogLevel.INFO)
 
 # And write the results to microtpc-simulation.root
 # output.param('outputFileName', 'microtpc-simulation.root')
-output.param('outputFileName', 'fangs-simulation.root')
-# output.param('outputFileName', 'claws-simulation.root')
+# output.param('outputFileName', 'fangs-simulation.root')
+output.param('outputFileName', 'claws-simulation.root')
 # output.param('outputFileName', 'plume-simulation.root')
 # output.param('outputFileName', 'csi-simulation.root')
 # output.param('outputFileName', 'he3tube-simulation.root')

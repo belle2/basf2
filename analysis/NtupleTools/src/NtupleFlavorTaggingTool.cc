@@ -70,7 +70,8 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
         if (mcparticles.isValid()) {
           if ((mcparticles.getEntries()) > 0) {
             {
-              qrMC[iProduct] = 2 * (Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]) - 0.5);
+              float qrnormed = Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]);
+              if (qrnormed > -2) qrMC[iProduct] = 2 * (qrnormed - 0.5);
             }
           }
         }

@@ -122,6 +122,79 @@ namespace Belle2 {
     double isRelatedRestOfEventB0Flavor(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+
+      float OutputB0tagQ = -2;
+
+      if (roe != nullptr) {
+        const Particle* Bcp = roe->getRelated<Particle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+
+        int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
+
+        if (MCMatchingError == 0 || MCMatchingError == 1) {
+          const MCParticle* Y4S = BcpMC->getMother();
+          StoreArray<MCParticle> AllMCParticles;
+          unsigned numParticles = AllMCParticles.getEntries();
+
+          if (AllMCParticles.isValid()) {
+            for (unsigned i = 0; i < numParticles; ++i) {
+              const MCParticle* newParticle = AllMCParticles[i];
+              const MCParticle* newMother = newParticle->getMother();
+
+              if (newMother != nullptr) {
+                if (newMother == Y4S &&  newParticle != BcpMC) {
+                  if (newParticle -> getPDG() == 511) OutputB0tagQ = 1;
+                  else OutputB0tagQ = 0;
+                }
+              }
+            }
+          }
+        }
+      }
+      return OutputB0tagQ;
+    }
+
+    double isRestOfEventB0Flavor(const Particle*)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+      float OutputB0tagQ = -2;
+
+      if (roe.isValid()) {
+        const Particle* Bcp = roe->getRelated<Particle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+
+        int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
+
+        if (MCMatchingError == 0 || MCMatchingError == 1) {
+          const MCParticle* Y4S = BcpMC->getMother();
+          StoreArray<MCParticle> AllMCParticles;
+          unsigned numParticles = AllMCParticles.getEntries();
+
+          if (AllMCParticles.isValid()) {
+            for (unsigned i = 0; i < numParticles; ++i) {
+              const MCParticle* newParticle = AllMCParticles[i];
+              const MCParticle* newMother = newParticle->getMother();
+
+              if (newMother != nullptr) {
+                if (newMother == Y4S &&  newParticle != BcpMC) {
+                  if (newParticle -> getPDG() == 511) OutputB0tagQ = 1;
+                  else OutputB0tagQ = 0;
+                }
+              }
+            }
+          }
+        }
+      }
+      return OutputB0tagQ;
+    }
+
+    double isRelatedRestOfEventMajorityB0Flavor(const Particle* part)
+    {
+      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+
+      float OutputStandard = 0.0;
+
       float q_MC = 0; //Flavor of B
       if (roe != nullptr) {
         if (roe-> getNTracks() != 0) {
@@ -171,14 +244,17 @@ namespace Belle2 {
           }
         }
       }
+
       if (q_MC > 0) {
-        return 1;
+        OutputStandard = 1;
       } else if (q_MC < 0) {
-        return 0;
-      } else return -2;
+        OutputStandard = 0;
+      } else OutputStandard = -2;
+
+      return OutputStandard;
     }
 
-    double isRestOfEventB0Flavor(const Particle*)
+    double isRestOfEventMajorityB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       float q_MC = 0; //Flavor of B
@@ -613,8 +689,8 @@ namespace Belle2 {
                 } else flavor = ParticleVector[i]->getCharge();
 
                 r = ParticleVector[i]->getExtraInfo(extraInfoRightCategory);
-                B2INFO("Right Cat:" << ParticleVector[i]->getExtraInfo(extraInfoRightCategory));
-                B2INFO("Right Track:" << ParticleVector[i]->getExtraInfo(extraInfoRightTrack));
+//                 B2INFO("Right Cat:" << ParticleVector[i]->getExtraInfo(extraInfoRightCategory));
+//                 B2INFO("Right Track:" << ParticleVector[i]->getExtraInfo(extraInfoRightTrack));
                 qp = (flavor * r);
                 val1 = val1 * (1 + qp);
                 val2 = val2 * (1 - qp);
@@ -1126,8 +1202,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,
                       "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 If ROE is empty.");
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
-                      "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0).");
-    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,  "0 (1) if current RestOfEvent is related to a B0bar (B0).");
+                      "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
+    REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,
+                      "0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
+    REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
+                      " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
+    REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
+                      "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
     REGISTER_VARIABLE("p_miss", p_miss,  "Calculates the missing Momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,  "1.0 if Lambda0, -1.0 if Anti-Lambda0, 0.0 else.");
     REGISTER_VARIABLE("isLambda", isLambda,  "1.0 if MCLambda0, 0.0 else.");

@@ -35,14 +35,24 @@ namespace Belle2 {
     double isRestOfEventEmpty(const Particle* part);
 
     /**
-     * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0)
+     * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
      */
     double isRelatedRestOfEventB0Flavor(const Particle* part);
 
     /**
-     * 0 (1) if current RestOfEvent is related to a B0bar (B0)
+     * 0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
      */
     double isRestOfEventB0Flavor(const Particle*);
+
+    /**
+     * 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).
+     */
+    double isRelatedRestOfEventMajorityB0Flavor(const Particle* part);
+
+    /**
+     * 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).
+     */
+    double isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
      * returns missing Momentum on the tag side (flavor tagging specific variable).

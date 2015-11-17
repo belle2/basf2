@@ -103,10 +103,11 @@ class RemoveEmptyROEModule(Module):
             self.return_value(1)
 
 
-class RemoveROEsWithoutB(Module):
+class RemoveWrongMCMatchedROEs(Module):
 
     """
-    Detects when a ROE has no B-Meson although it is not empty.
+    Detects when a ROE corresponds to a wrongly reconstructed event although it is not empty.
+    This is done checking the MCerror of Breco.
     """
 
     def event(self):
@@ -163,20 +164,23 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
             B0.addExtraInfo('B0barProbability', B0barProbability)
             B0.addExtraInfo('qrCombined', qrCombined)
 
-# ModeCode= 0 for Teacher or =1 for Expert mode
-
 
 def SetModeCode(mode='Expert'):
+    """
+    Sets ModeCode= 0 for Teacher or =1 for Expert mode.
+    """
+
     global ModeCode
     if mode == 'Expert':
         ModeCode = 1
     else:
         ModeCode = 0
 
-# Get the global ModeCode
-
 
 def GetModeCode():
+    """
+    Gets the global ModeCode.
+    """
     global ModeCode
     if ModeCode == 1:
         return 1
@@ -283,8 +287,6 @@ variablesCombinerLevel = []
 categoriesCombinationCode = 'CatCode'
 
 
-# Selection of the Categories that are going to be used.
-
 def WhichCategories(categories=[
     'Electron',
     'Muon',
@@ -297,6 +299,10 @@ def WhichCategories(categories=[
     'MaximumPstar',
     'KaonPion',
 ]):
+    """
+    Selection of the Categories that are going to be used.
+    """
+
     if len(categories) > 12 or len(categories) < 2:
         B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 12 are available'
                 )
@@ -433,6 +439,7 @@ variables['Lambda'] = [
     'chiProb',
     'distance',
 ]
+
 # Only for Event Level
 variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, IsRightTrack(Kaon))',
                          'HighestProbInCat(pi+:SlowPionROE, IsRightTrack(SlowPion))',
@@ -459,6 +466,9 @@ variables['FSC'] = [
 
 
 def FillParticleLists(mode='Expert', path=analysis_main):
+    """
+    Fills the particle Lists for each category.
+    """
 
     for (particleList, category) in TrackLevelParticleLists:
 
@@ -498,8 +508,11 @@ def FillParticleLists(mode='Expert', path=analysis_main):
 
 
 def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
-    B2INFO('TRACK LEVEL')
+    """
+    Trains or tests all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
+    """
 
+    B2INFO('TRACK LEVEL')
     if not Belle2.FileSystem.findFile(workingDirectory):
         B2FATAL('FlavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
@@ -562,6 +575,10 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
 
 
 def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
+    """
+    Trains or tests all categories at event level.
+    """
+
     B2INFO('EVENT LEVEL')
 
     if not Belle2.FileSystem.findFile(workingDirectory):
@@ -629,6 +646,10 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
 
 def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods',
                   path=analysis_main):
+    """
+    Trains or tests the combiner according to the selected categories.
+    """
+
     B2INFO('COMBINER LEVEL')
 
     if not Belle2.FileSystem.findFile(workingDirectory):
@@ -713,6 +734,7 @@ def FlavorTagger(
       For each Rest of Event built in the steering file.
       The flavor is predicted by Multivariate Methods trained with Variables and MetaVariables which use
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
+      This function can be used to train or to test the FlavorTagger: The available modes are "Teacher" or "Expert".
     """
 
     # Directory where the weights of the trained Methods are saved
@@ -750,9 +772,9 @@ def FlavorTagger(
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Teacher':
-        RemoveROEsWoutB = RemoveROEsWithoutB()
-        roe_path.add_module(RemoveROEsWoutB)
-        RemoveROEsWoutB.if_true(emptypath)
+        RemoveWrongROEs = RemoveWrongMCMatchedROEs()
+        roe_path.add_module(RemoveWrongROEs)
+        RemoveWrongROEs.if_true(emptypath)
 
     # track training or expert
     if WhichCategories(categories):

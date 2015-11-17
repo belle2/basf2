@@ -161,27 +161,23 @@ int main(int argc, char* argv[])
 
       //{{{ for each momentum bin, normalize pdf (disable if you want to keep the orginals, e.g. for fitting)
       if (true) {
-        for (int pbin = 1; pbin <= num_p_bins; pbin++) {
-          //get number of entries in this pbin, for all hists
-          double integral = 0;
-          for (int dedxbin = 1; dedxbin <= num_dedx_bins; dedxbin++) {
-            for (int d = 0; d < Dedx::c_num_detectors; d++) {
+        for (int d = 0; d < Dedx::c_num_detectors; d++) {
+          for (int pbin = 1; pbin <= num_p_bins; pbin++) {
+            // get number of entries in this pbin
+            double integral = 0;
+            for (int dedxbin = 1; dedxbin <= num_dedx_bins; dedxbin++) {
               integral += hists[d]->GetBinContent(pbin, dedxbin);
             }
-          }
 
-          if (integral == 0)
-            continue; //nothing to do
+            if (integral == 0)
+              continue; //nothing to do
 
-
-          //normalize this pbin to 1
-          for (int d = 0; d < Dedx::c_num_detectors; d++) {
+            // normalize this pbin to 1
             const double normal_width = -(hists[d]->GetYaxis()->GetBinLowEdge(1) - hists[d]->GetYaxis()->GetBinUpEdge(
                                             num_dedx_bins)) / num_dedx_bins;
-
             for (int dedxbin = 1; dedxbin <= num_dedx_bins; dedxbin++) {
-              hists[d]->SetBinContent(pbin, dedxbin,
-                                      hists[d]->GetBinContent(pbin, dedxbin) / integral * hists[d]->GetYaxis()->GetBinWidth(dedxbin) / normal_width);
+              hists[d]->SetBinContent(pbin, dedxbin, hists[d]->GetBinContent(pbin,
+                                      dedxbin) / integral * hists[d]->GetYaxis()->GetBinWidth(dedxbin) / normal_width);
               //std::cout << d << ", " << dedxbin << ": " <<  hists[d]->GetYaxis()->GetBinWidth(dedxbin)/normal_width << "\n";
             }
           }

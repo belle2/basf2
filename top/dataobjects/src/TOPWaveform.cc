@@ -8,36 +8,40 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dbobjects/TOPASICGains.h>
-#include <framework/logging/Logger.h>
+#include <top/dataobjects/TOPWaveform.h>
 
 using namespace std;
 using namespace Belle2;
 
-bool TOPASICGains::setGains(const std::vector<float>& gains, float error)
+// ClassImp(TOPWaveform)
+
+
+bool TOPWaveform::setDigital(float upperThr, float lowerThr, int minWidth)
 {
 
-  if (gains.size() != c_WindowSize) {
-    B2ERROR("TOPASICGains::setGains:  vector with wrong number of elements");
-    return false;
-  }
-
-  for (int i = 0; i < c_WindowSize; i++) {
-    float gain = gains[i] * m_unit;
-    if (gain > 0 and (gain + 0.5) < 0x10000) {
-      m_gains[i] = int(gain + 0.5);
+  float threshold = upperThr;
+  for (const auto& sample : m_data) {
+    if (sample.err > 0) {
+      if (sample.adc / sample.err > threshold) {
+        m_digital.push_back(true);
+        threshold = lowerThr;
+      } else {
+        m_digital.push_back(false);
+        threshold = upperThr;
+      }
     } else {
-      return false;
+      m_digital.push_back(threshold == lowerThr);
     }
   }
-  error *= m_unit;
-  m_gainError = int(error + 0.5);
-  return true;
 
+  int n = 0;
+  for (const auto& digital : m_digital) {
+    if (digital) n++;
+    else n = 0;
+    if (n > minWidth) return true;
+  }
+
+  return false;
 }
-
-
-// ClassImp(TOPASICGains);
-
 
 

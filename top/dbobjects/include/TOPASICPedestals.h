@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <TProfile.h>
+#include <vector>
 
 namespace Belle2 {
 
@@ -25,6 +26,7 @@ namespace Belle2 {
      * Various constants
      */
     enum {c_WindowSize = 64, /**< number of samples */
+          c_Bits       = 9   /**< number of bits reserved for pedestal value */
          };
 
     /**
@@ -48,9 +50,9 @@ namespace Belle2 {
     /**
      * Set pedestals from profile histogram with c_WindowSize bins
      * @param profile profile histogram
-     * @return true, on success
+     * @return number of pedestals that can not be packed into 16-bit word
      */
-    bool setPedestals(const TProfile* profile);
+    int setPedestals(const TProfile* profile);
 
     /**
      * Return ASIC window number
@@ -72,25 +74,67 @@ namespace Belle2 {
     float getValue(unsigned i) const
     {
       if (i < c_WindowSize) {
-        return (m_pedestals[i] & 0x00FF) + m_offset;
+        unsigned short mask = (1 << c_Bits);
+        mask--;
+        return (m_pedestals[i] & mask) + m_offset;
       }
       return 0;
     }
 
     /**
-     * Return pedestal uncertainly
+     * Return pedestal uncertainly of i-th sample
      * @param i sample number
      * @return pedestal uncertainty
      */
     float getError(unsigned i) const
     {
       if (i < c_WindowSize) {
-        return (m_pedestals[i] >> 8) / sqrt(12.0);
+        return (m_pedestals[i] >> c_Bits);
       }
       return 0;
     }
 
+    /**
+     * Check whether the pedestal of i-th sample is valid
+     * @param i sample number
+     * @return true if available
+     */
+    bool isValid(unsigned i) const
+    {
+      if (i < c_WindowSize) {
+        return (m_pedestals[i] != 0);
+      }
+      return false;
+    }
+
+
+    /**
+     * Return number of un-valid pedestals (e.g. those cannot be packed into 16-bit word)
+     * @return number of un-valid pedestals
+     */
+    unsigned getNumofUnvalid() const
+    {
+      unsigned bad = 0;
+      for (int i = 0; i < c_WindowSize; i++) {
+        if (!isValid(i)) bad++;
+      }
+      return bad;
+    }
+
   private:
+
+    /**
+     * Return the offset that can allow for the maximal number of good pedestal samples
+     * @param values pedestal values
+     * @param errors pedestal errors
+     * @param maxDif maximal number that can be stored in c_Bits
+     * @param maxErr maximal number that can be stored in 16 - c_Bits
+     * @return offset value
+     */
+    unsigned getOptimizedOffset(const std::vector<unsigned>& values,
+                                const std::vector<unsigned>& errors,
+                                unsigned maxDif,
+                                unsigned maxErr);
 
     unsigned short m_asicWindow;  /**< ASIC window number */
     unsigned short m_offset;      /**< common pedestal offset */

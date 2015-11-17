@@ -11,7 +11,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <TProfile.h>
 
 namespace Belle2 {
 

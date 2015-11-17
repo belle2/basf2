@@ -14,6 +14,7 @@
 #include <top/dbobjects/TOPASICPedestals.h>
 #include <top/dbobjects/TOPASICGains.h>
 #include <vector>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -31,25 +32,23 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPASICChannel(): m_barID(0), m_channel(0), m_timeInterval(0)
+    TOPASICChannel()
     {
-      for (unsigned i = 0; i < c_TimeAxisSize; i++)
-        m_timeAxis[i] = 0;
+      for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = 0;
     }
 
     /**
      * Constructor with barID, hardware channel number and number of ASIC windows
      * @param barID bar ID
-     * @param channel hardware channel number
+     * @param channelID hardware channel number
      * @param numWindows number of active windows per ASIC
      */
-    TOPASICChannel(int barID, unsigned channel, int numWindows):
-      m_barID(barID), m_channel(channel)
+    TOPASICChannel(int barID, unsigned channelID, int numWindows):
+      m_barID(barID), m_channelID(channelID)
     {
       for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
       float timeBin = 1 / 2.77; //TODO get correct value
       setTimeAxis(timeBin);
-      setTimeInterval(timeBin * c_TimeAxisSize);
     }
 
     /**
@@ -107,23 +106,30 @@ namespace Belle2 {
     }
 
     /**
-     * Set time interval to the next four ASIC windows
-     * @param timeInterval time interval
-     */
-    void setTimeInterval(float timeInterval) {m_timeInterval = timeInterval;}
-
-    /**
-     * Set equidistant time axis
+     * Set equidistant time axis.
+     * Time axis is differential: each time is with respect to the previous sample,
+     * the first one is with respect to the last sample of previous ASIC window.
      * @param timeBin time bin
      */
     void setTimeAxis(float timeBin)
     {
-      float t = 0;
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) {
-        m_timeAxis[i] = t;
-        t += timeBin;
-      }
+      for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin;
     }
+
+    /**
+     * Set time axis from calibration.
+     * Time axis is differential: each time is with respect to the previous sample,
+     * the first one is with respect to the last sample of previous ASIC window.
+     * @param timsDiffs vector of 256 elements of time differences btw. samples
+     */
+    void setTimeAxis(std::vector<float> timeDiffs)
+    {
+      for (unsigned i = 0; i < c_TimeAxisSize; i++) {
+        if (i < timeDiffs.size()) m_timeAxis[i] = timeDiffs[i];
+      }
+      if (timeDiffs.size() < c_TimeAxisSize)
+        B2WARNING("TOPASICChannel::setTimeAxis: vector too short")
+      }
 
     /**
      * Return bar ID
@@ -135,26 +141,19 @@ namespace Belle2 {
      * Return hardware channel number
      * @return channel number
      */
-    unsigned getChannel() const {return m_channel;}
+    unsigned getChannelID() const {return m_channelID;}
+
 
     /**
-     * Return time interval to the next four ASIC windows
-     * @return time interval
+     * Return sample time in respect to previous sample
+     * @param windowID ASIC window number
+     * @param i sample number within ASIC window
      */
-    float getTimeInterval() const {return m_timeInterval;}
-
-    /**
-     * Return time axis with an offset added
-     * @param offset offset to be added
-     * @return time axis
-     */
-    std::vector<float> getTimeAxis(float offset = 0) const
+    float getSampleTime(unsigned windowID, unsigned i) const
     {
-      std::vector<float> timeAxis;
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) {
-        timeAxis.push_back(m_timeAxis[i] + offset);
-      }
-      return timeAxis;
+      unsigned k = (windowID % 4) * TOPASICPedestals::c_WindowSize +
+                   (i % TOPASICPedestals::c_WindowSize);
+      return m_timeAxis[k];
     }
 
     /**
@@ -185,6 +184,7 @@ namespace Belle2 {
     const TOPASICGains* getGains(unsigned i) const
     {
       if (i < m_gains.size()) return m_gains[i];
+      if (i < m_pedestals.size()) return &m_defaultGain;
       return NULL;
     }
 
@@ -202,12 +202,13 @@ namespace Belle2 {
 
   private:
 
-    int m_barID;          /**< bar ID */
-    unsigned m_channel;   /**< hardware channel ID */
-    float m_timeInterval; /**< time interval between ASIC windows */
-    float m_timeAxis[c_TimeAxisSize]; /**< time axis */
+    int m_barID = 0;          /**< bar ID */
+    unsigned m_channelID = 0;   /**< hardware channel ID */
+    float m_timeAxis[c_TimeAxisSize]; /**< differential time axis */
     std::vector<TOPASICPedestals*> m_pedestals; /**< pedestals */
     std::vector<TOPASICGains*> m_gains;         /**< gains */
+
+    TOPASICGains m_defaultGain; /**< default gain */
 
     ClassDef(TOPASICChannel, 1); /**< ClassDef */
 

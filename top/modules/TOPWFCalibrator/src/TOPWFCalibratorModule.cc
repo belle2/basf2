@@ -36,6 +36,7 @@
 
 #include "TFile.h"
 #include <TClonesArray.h>
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -162,6 +163,8 @@ namespace Belle2 {
     TClonesArray constants("Belle2::TOPASICChannel");
     const auto name = DBStore::arrayName<TOPASICChannel>("");
 
+    int badPed = 0;
+    int badSampl = 0;
     for (int channel = 0; channel < c_NumChannels; channel++) {
       new(constants[channel]) TOPASICChannel(m_barID, channel, numWindows);
       auto* channelConstants = static_cast<TOPASICChannel*>(constants[channel]);
@@ -169,7 +172,14 @@ namespace Belle2 {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
           TOPASICPedestals pedestals(window);
-          pedestals.setPedestals(prof);
+          int bad = pedestals.setPedestals(prof);
+          if (bad > 0) {
+            badPed++;
+            badSampl += bad;
+            B2INFO("TOPWFCalibratorModule: " << bad
+                   << " bad pedestal(s) found for channel "
+                   << channel << " window " << window);
+          }
           bool ok = channelConstants->setPedestals(pedestals);
           if (!ok) {
             B2ERROR("TOPWFCalibratorModule: can't set pedestals for channel "
@@ -183,7 +193,6 @@ namespace Belle2 {
     IntervalOfValidity iov(expNo, m_runLow, expNo, m_runHigh);
     Database::Instance().storeData(name, &constants, iov);
 
-
     int all = 0;
     int incomplete = 0;
     for (int channel = 0; channel < constants.GetEntriesFast(); channel++) {
@@ -194,7 +203,9 @@ namespace Belle2 {
 
     B2RESULT("TOPWFCalibratorModule: bar ID = " << m_barID <<
              ", number of calibrated channels " << all <<
-             " (" << incomplete << " are incomplete)");
+             " incomplete: " << incomplete <<
+             " bad samples: " << badSampl <<
+             " in " << badPed << " windows");
 
   }
 

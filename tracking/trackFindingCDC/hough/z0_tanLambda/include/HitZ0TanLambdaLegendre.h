@@ -21,6 +21,6 @@ namespace Belle2 {
      * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
      * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
      */
-    using HitZ0TanLambdaLegendre = Z0TanLambdaLegendre<const CDCRecoHit3D*, HitInZ0TanLambdaBox, 2, 2>;
+    using HitZ0TanLambdaLegendre = Z0TanLambdaLegendre<CDCRecoHit3D, HitInZ0TanLambdaBox, 2, 2>;
   }
 }

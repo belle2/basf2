@@ -27,7 +27,7 @@ bool isValidStereoSegment(const CDCRecoSegment2D& segment)
   return not(segment.getStereoType() == StereoType::c_Axial or segment.isFullyTaken());
 }
 
-void StereoHitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<const CDCRecoHit3D*>& hitsVector,
+void StereoHitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
                                          const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const
 {
   Vector3D recoPos3D = rlWireHit.reconstruct3D(trackTrajectory);
@@ -46,8 +46,7 @@ void StereoHitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vec
       return;
     }
   }
-  CDCRecoHit3D* newRecoHit = new CDCRecoHit3D(rlWireHit, recoPos3D, perpS);
-  hitsVector.push_back(newRecoHit);
+  hitsVector.emplace_back(rlWireHit, recoPos3D, perpS);
 }
 
 void StereoHitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment,
@@ -91,7 +90,7 @@ void StereoHitsProcesser::reconstructSegment(const CDCRecoSegment2D& segment,
 }
 
 
-void StereoHitsProcesser::fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const
+void StereoHitsProcesser::fillHitsVector(std::vector<CDCRecoHit3D>& hitsVector, const CDCTrack& track) const
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getGlobalCircle().absRadius();
@@ -130,7 +129,7 @@ void StereoHitsProcesser::fillSegmentsVector(std::vector<const CDCRecoSegment3D*
 void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
 {
   // Reconstruct the hits to the track
-  std::vector<const CDCRecoHit3D*> recoHits;
+  std::vector<CDCRecoHit3D> recoHits;
   fillHitsVector(recoHits, track);
 
   // Do the tree finding
@@ -141,18 +140,37 @@ void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
   if (foundStereoHitsWithNode.size() != 1)
     return;
 
+
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
   auto node = foundStereoHitsWithNode[0].first;
 
-  std::vector<const CDCRecoHit3D*> doubledRecoHits;
-  doubledRecoHits.reserve(foundStereoHits.size() / 2);
+
+  for (const CDCRecoHit3D& recoHit : foundStereoHits) {
+    recoHit.getWireHit().getAutomatonCell().unsetMaskedFlag();
+  }
+
+  // Copy all usable hits (not the duplicates) into this list.
+  std::vector<CDCRecoHit3D> hitsToUse;
 
   for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
        ++outerIterator) {
-    const CDCHit* currentHit = (*outerIterator)->getWireHit().getHit();
-    for (auto innerIterator = foundStereoHits.begin(); innerIterator != outerIterator; ++innerIterator) {
-      if (currentHit == (*innerIterator)->getWireHit().getHit()) {
+    bool isDoubled = false;
+
+    const CDCHit* currentHitOuter = (*outerIterator)->getWireHit().getHit();
+
+    if (outerIterator->getWireHit().getAutomatonCell().hasMaskedFlag()) {
+      continue;
+    }
+
+    for (auto innerIterator = outerIterator; innerIterator != foundStereoHits.end(); ++innerIterator) {
+      if (innerIterator->getWireHit().getAutomatonCell().hasMaskedFlag()) {
+        continue;
+      }
+
+      const CDCHit* currentHitInner = (*innerIterator)->getWireHit().getHit();
+
+      if (innerIterator != outerIterator and currentHitOuter == currentHitInner) {
         const double lambda11 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
         const double lambda12 = 1 / (*innerIterator)->calculateZSlopeWithZ0(node.getUpperZ0());
         const double lambda21 = 1 / (*outerIterator)->calculateZSlopeWithZ0(node.getLowerZ0());
@@ -161,28 +179,29 @@ void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
         const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
-          doubledRecoHits.push_back(*outerIterator);
+          hitsToUse.push_back(*innerIterator);
+          innerIterator->getWireHit().getAutomatonCell().setMaskedFlag();
+          isDoubled = true;
+          break;
         } else {
-          doubledRecoHits.push_back(*innerIterator);
+          hitsToUse.push_back(*outerIterator);
+          outerIterator->getWireHit().getAutomatonCell().setMaskedFlag();
+          isDoubled = true;
+          break;
         }
       }
     }
-  }
 
-  foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
-  foundStereoHits.end(), [&doubledRecoHits](const CDCRecoHit3D * recoHit3D) -> bool {
-    return std::find(doubledRecoHits.begin(), doubledRecoHits.end(), recoHit3D) != doubledRecoHits.end();
-  }), foundStereoHits.end());
+    if (not isDoubled) {
+      hitsToUse.push_back(*outerIterator);
+    }
+  }
 
   // Add the hits to the track
-  for (const CDCRecoHit3D* recoHit : foundStereoHits) {
+  for (const CDCRecoHit3D& recoHit : hitsToUse) {
     B2ASSERT("Found hit should not have taken flag!", not recoHit->getWireHit().getAutomatonCell().hasTakenFlag());
-    track.push_back(*recoHit);
+    track.push_back(recoHit);
     recoHit->getWireHit().getAutomatonCell().setTakenFlag();
-  }
-
-  for (const CDCRecoHit3D* recoHit : recoHits) {
-    delete recoHit;
   }
 }
 

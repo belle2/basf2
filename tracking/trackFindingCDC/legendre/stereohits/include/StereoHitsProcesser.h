@@ -109,7 +109,7 @@ namespace Belle2 {
 
       /// Utilities
       /// Fill the given vector with all not used rl wire hits that could match the given track as CDCRecoHits3D.
-      void fillHitsVector(std::vector<const CDCRecoHit3D*>& hitsVector, const CDCTrack& track) const;
+      void fillHitsVector(std::vector<CDCRecoHit3D>& hitsVector, const CDCTrack& track) const;
 
       /// Fill the given vector with all not used segments that could match the given track as CDCRecoSegment3D.
       void fillSegmentsVector(std::vector<const CDCRecoSegment3D*> recoSegmentsVector, const std::vector<CDCRecoSegment2D>& segments,
@@ -132,7 +132,7 @@ namespace Belle2 {
        * WARNING: We *create* CDCRecoHit3Ds here as pointers, but the ownership is handles over to the list.
        * Please delete the hits by yourself.
        */
-      void reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<const CDCRecoHit3D*>& hitsVector,
+      void reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
                           const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const;
 
       /// Parameters

@@ -110,25 +110,25 @@ def additional_options(path):
     useWireSag = 1
     for m in path.modules():
         if realisticCDCGeo:
-            if m.name() == 'CDCDigitizer':
+            if m.type() == 'CDCDigitizer':
                 m.param('AddInWirePropagationDelay', useInWirePropagation)
                 m.param('AddTimeOfFlight', useTime)
                 m.param('CorrectForWireSag', useWireSag)
-            if m.name() == 'GenFitter':
+            if m.type() == 'GenFitter':
                 m.param('RealisticCDCGeoTranslator', 1)
                 m.param('UseTrackTime', useTime)
                 m.param('CDCWireSag', useWireSag)
         else:
-            if m.name() == 'CDCDigitizer':
+            if m.type() == 'CDCDigitizer':
                 m.param('AddInWirePropagationDelay', 0)
                 m.param('AddTimeOfFlight', 0)
                 m.param('CorrectForWireSag', 0)
-            if m.name() == 'GenFitter':
+            if m.type() == 'GenFitter':
                 m.param('RealisticCDCGeoTranslator', 0)
                 m.param('UseTrackTime', 0)
                 m.param('CDCWireSag', 0)
 
-        if m.name() == 'GenFitter':
+        if m.type() == 'GenFitter':
             m.param('PDGCodes', [get_generated_pdg_code()])
 
 

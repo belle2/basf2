@@ -133,6 +133,8 @@ void TpcDigitizerModule::event()
     const int detNb = microtpcSimHit.getdetNb();
     const double edep = microtpcSimHit.getEnergyDep();
     const double niel = microtpcSimHit.getEnergyNiel();
+    const int pdg = microtpcSimHit.gettkPDG();
+    const int trkID = microtpcSimHit.gettkID();
 
     const TVector3 simHitPosition = microtpcSimHit.gettkPos();
     const TVector3 chipPosition(
@@ -140,6 +142,17 @@ void TpcDigitizerModule::event()
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG
     );
+
+    //If new detector filled the chip
+    if (olddetNb != detNb && m_dchip_map.size() > 0) {
+      Pixelization();
+      olddetNb = detNb;
+      m_dchip_map.clear();
+      m_dchip.clear();
+      m_dchip_detNb_map.clear();
+      m_dchip_pdg_map.clear();
+      m_dchip_trkID_map.clear();
+    }
 
     //check if ionization within sensitive volume
     if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
@@ -226,8 +239,13 @@ void TpcDigitizerModule::event()
                 PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
                 ////m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
-                m_dchip_map[std::tuple<int, int, int>(detNb, col, row)] = 1;
-                m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                //m_dchip_map[std::tuple<int, int, int>(detNb, col, row)] = 1;
+                //m_dchip[std::tuple<int, int, int, int>(detNb, col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
+                m_dchip_map[std::tuple<int, int>(col, row)] = 1;
+                m_dchip_detNb_map[std::tuple<int, int>(col, row)] = detNb;
+                m_dchip_pdg_map[std::tuple<int, int>(col, row)] = pdg;
+                m_dchip_trkID_map[std::tuple<int, int>(col, row)] = trkID;
+                m_dchip[std::tuple<int, int, int>(col, row, bci)] += (int)(m_ScaleGain1 * m_ScaleGain2);
               }
             }
           }
@@ -253,9 +271,11 @@ void TpcDigitizerModule::event()
   }
   */
   if (m_dchip_map.size() > 0) Pixelization();
-  //m_dchip.clear();
   m_dchip_map.clear();
   m_dchip.clear();
+  m_dchip_detNb_map.clear();
+  m_dchip_pdg_map.clear();
+  m_dchip_trkID_map.clear();
 }
 /*
 TLorentzVector TpcDigitizerModule::Drift(
@@ -336,6 +356,120 @@ TVector2 TpcDigitizerModule::GEMGeo2(double x1, double y1)
 //bool TpcDigitizerModule::Pixelization(int detNb)
 void TpcDigitizerModule::Pixelization()
 {
+  std::vector<int> t0;
+  std::vector<int> col;
+  std::vector<int> row;
+  std::vector<int> ToT;
+  std::vector<int> bci;
+
+  StoreArray<MicrotpcHit> microtpcHits;
+
+  for (auto& keyValuePair : m_dchip_map) {
+    const auto& key = keyValuePair.first;
+    //column
+    int i = std::get<0>(key);
+    //raw
+    int j = std::get<1>(key);
+
+    if (m_dchip_map[std::tuple<int, int>(i, j)] == 1) {
+
+      int k0 = 1e9;
+      const int quE = gRandom->Uniform(0, 2);
+      const double thresEl = m_PixelThreshold + gRandom->Uniform(-1.*m_PixelThresholdRMS, 1.*m_PixelThresholdRMS);
+      int kcounter = 0;
+      //determined t0 ie first time above pixel threshold
+      for (auto& keyValuePair2 : m_dchip) {
+        const auto& key2 = keyValuePair2.first;
+        int k = std::get<2>(key2);
+        if (m_dchip[std::tuple<int, int, int>(i, j, k)] > thresEl) {
+          if (k0 > k)k0 = k;
+          kcounter ++;
+        }
+      }
+      //determined nb of bc per pixel
+      //if good t0
+      if (k0 != 1e9) {
+        int ik = 0;
+        int NbOfEl = 0;
+        for (auto& keyValuePair2 : m_dchip) {
+          const auto& key2 = keyValuePair2.first;
+          int k = std::get<2>(key2);
+          //sum up charge with 16 cycles
+          if (ik < 16) {
+            NbOfEl += m_dchip[std::tuple<int, int, int>(i, j, k)];
+          } else {
+            //calculate ToT
+            int tot = -1;
+            if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1) {
+              tot = (int)fctToT_Calib1->Eval((double)NbOfEl) + quE;
+            } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
+              tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
+            } else if (NbOfEl > 800.*m_TOTQ1) {
+              tot = 14;
+            }
+            if (tot > 13) {
+              tot = 14;
+            }
+            if (tot >= 0) {
+              ToT.push_back(tot);
+              t0.push_back(k0);
+              col.push_back(i);
+              row.push_back(j);
+              bci.push_back(k0);
+            }
+            ik = 0;
+            NbOfEl = 0;
+          }
+          ik++;
+        }
+
+        if (kcounter < 16) {
+          //calculate ToT
+          int tot = -1;
+          if (NbOfEl > thresEl && NbOfEl <= 45.*m_TOTQ1) {
+            tot = (int)fctToT_Calib1->Eval((double)NbOfEl) + quE;
+          } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
+            tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
+          } else if (NbOfEl > 800.*m_TOTQ1) {
+            tot = 14;
+          }
+          if (tot > 13) {
+            tot = 14;
+          }
+          if (tot >= 0) {
+            ToT.push_back(tot);
+            t0.push_back(k0);
+            col.push_back(i);
+            row.push_back(j);
+            bci.push_back(k0);
+          }
+        }
+
+      }
+    } //end loop on row
+  } // end loop on col
+
+  //bool PixHit = false;
+  //if entry
+  if (bci.size() > 0) {
+    //PixHit = true;
+    //find start time
+    sort(t0.begin(), t0.end());
+
+    //loop on nb of hit
+    for (int j = 0; j < (int)bci.size(); j++) {
+      if ((bci[j] - t0[0]) > (m_PixelTimeBinNb - 1)) {
+        continue;
+      }
+      //create MicrotpcHit
+      microtpcHits.appendNew(MicrotpcHit(col[j], row[j], bci[j] - t0[0], ToT[j],
+                                         m_dchip_detNb_map[std::tuple<int, int>(col[j], row[j])],
+                                         m_dchip_pdg_map[std::tuple<int, int>(col[j], row[j])],
+                                         m_dchip_trkID_map[std::tuple<int, int>(col[j], row[j])]));
+    } //end if entry
+  }
+  //return PixHit;
+  /*
   std::vector<int> t0[10];
   std::vector<int> col[10];
   std::vector<int> row[10];
@@ -432,6 +566,7 @@ void TpcDigitizerModule::Pixelization()
     } //end if entry
   }
   //return PixHit;
+  */
 }
 
 /*

@@ -177,9 +177,15 @@ namespace Belle2 {
       double m_GasAbs;
       /** chip store arrays */
       //int m_dchip[10][80][336][MAXtSIZE];
-      std::map<std::tuple<int, int, int, int>, int> m_dchip;
+      std::map<std::tuple<int, int, int>, int> m_dchip;
       /** chip map arrays */
-      std::map<std::tuple<int, int, int>, int> m_dchip_map;
+      std::map<std::tuple<int, int>, int> m_dchip_map;
+      /** chip pdg map arrays */
+      std::map<std::tuple<int, int>, int> m_dchip_pdg_map;
+      /** chip track ID map arrays */
+      std::map<std::tuple<int, int>, int> m_dchip_trkID_map;
+      /** chip Nb map arrays */
+      std::map<std::tuple<int, int>, int> m_dchip_detNb_map;
       /** Flag 0/1 only look at nuclear recoils*/
       int m_LookAtRec;
       /** number of detectors. Read from MICROTPC.xml*/
@@ -191,6 +197,9 @@ namespace Belle2 {
       double m_lowerTimingCut = 0;
       /** Upper timing cut */
       double m_upperTimingCut = 1000000;
+
+      /** Old detector counter */
+      int olddetNb = -1;
 
     };
 

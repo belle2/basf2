@@ -606,11 +606,20 @@ void ECLReconstructorModule::TmpClusterCorrection::scale(ECLCluster& c) const
         break;
       }
     }
-
+    int offset = thetaRegion * m_nbinsE;
     unsigned int iE = static_cast<unsigned int>(energy / m_deltaE);
-    if (iE >= m_nbinsE - 1)
-      iE = m_nbinsE - 1; // last bin used for also for overflows
-    c.setEnergy(energy * m_tmpCorrection[ iE + m_nbinsE * thetaRegion]);
+    double corr{0};
+    if (iE == 0)
+      corr = m_tmpCorrection[ offset ];
+    else if (iE < m_nbinsE - 1) {
+      double incE{ energy - iE * m_deltaE };
+      double clow{ m_tmpCorrection[offset + iE - 1] };
+      double chigh{ m_tmpCorrection[offset + iE] };
+      corr = clow + incE / m_deltaE * (chigh - clow);
+    } else
+      corr =  m_tmpCorrection[ offset + m_nbinsE - 1];
+
+    c.setEnergy(energy * corr);
   }
 }
 

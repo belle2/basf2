@@ -541,19 +541,19 @@ void ECLReconstructorModule::readErrorMatrix7x7(double energy, double theta,
 void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
 {
   B2INFO("ECLReconstructor: Reading ad hoc tmp cluster energy corrections from: " << filename);
-  // header keeps the values of 4 parameters in any order
+  // header keeps the values of 3 parameters in any order
   string param;
   ifstream file(filename);
   int nbinsTheta = 0;
-  for (unsigned i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i) {
     file >> param;
     assert(file.good());
     if (param == "deltaE") {
       file >> m_deltaE;
       assert(file.good());
     }
-    if (param == "nbinsE") {
-      file >> m_nbinsE;
+    if (param == "npointsE") {
+      file >> m_npointsE;
       assert(file.good());
     }
     if (param == "thetaRegions") {
@@ -568,17 +568,18 @@ void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
     }
   }
 
-  m_tmpCorrection.reserve(m_nbinsE * nbinsTheta);
+  size_t ncoeffE{m_npointsE + 2};
+  m_tmpCorrection.reserve(ncoeffE * nbinsTheta);
   double correction;
   // the index runs first on momentum and then on theta region
-  for (unsigned i = 0; i < m_nbinsE * (m_maxTheta.size() + 1); ++i) {
+  for (size_t i = 0; i < ncoeffE * (m_maxTheta.size() + 1); ++i) {
     file >> correction;
     assert(file.good());
     m_tmpCorrection.push_back(correction);
   }
   file.close();
 
-  B2INFO("ECLReconstructor: Number of bins in E: " << m_nbinsE);
+  B2INFO("ECLReconstructor: Number of points for interpolation in E: " << m_npointsE);
   B2INFO("ECLReconstructor: Number of Theta regions: " << nbinsTheta);
 
   for (int i = 0; i < nbinsTheta; ++i) {
@@ -588,8 +589,8 @@ void ECLReconstructorModule::TmpClusterCorrection::init(const string& filename)
       B2INFO("ECLReconstructor: theta >= " << m_maxTheta[i - 1]);
     }
     ostringstream ostr;
-    for (unsigned int j = 0; j < m_nbinsE; j++)
-      ostr << m_tmpCorrection[ j + i * m_nbinsE ] << " ";
+    for (size_t j = 0; j < ncoeffE; j++)
+      ostr << m_tmpCorrection[ j + i * (ncoeffE) ] << " ";
     const char* out = ostr.str().c_str();
     B2INFO("ECLReconstructor: corrections: " << out);
   }
@@ -600,24 +601,25 @@ void ECLReconstructorModule::TmpClusterCorrection::scale(ECLCluster& c) const
   double energy = c.getEnergy();
   if (energy > 0) {
     int thetaRegion = m_maxTheta.size();
-    for (unsigned int itheta = 0; itheta < m_maxTheta.size(); itheta++) {
+    for (size_t itheta = 0; itheta < m_maxTheta.size(); itheta++) {
       if (c.getTheta() < m_maxTheta[itheta]) {
         thetaRegion = itheta;
         break;
       }
     }
-    int offset = thetaRegion * m_nbinsE;
+    size_t ncoeffE{ m_npointsE + 2 };
+    int offset = thetaRegion * ncoeffE;
     unsigned int iE = static_cast<unsigned int>(energy / m_deltaE);
     double corr{0};
     if (iE == 0)
       corr = m_tmpCorrection[ offset ];
-    else if (iE < m_nbinsE - 1) {
+    else if (iE < m_npointsE - 1) {
       double incE{ energy - iE * m_deltaE };
-      double clow{ m_tmpCorrection[offset + iE - 1] };
-      double chigh{ m_tmpCorrection[offset + iE] };
+      double clow{ m_tmpCorrection[offset + iE ] };
+      double chigh{ m_tmpCorrection[offset + iE + 1 ] };
       corr = clow + incE / m_deltaE * (chigh - clow);
     } else
-      corr =  m_tmpCorrection[ offset + m_nbinsE - 1];
+      corr =  m_tmpCorrection[ offset + m_npointsE + 1 ];
 
     c.setEnergy(energy * corr);
   }

@@ -113,7 +113,7 @@ namespace Belle2 {
         void scale(Belle2::ECLCluster& c) const;
       private:
         double m_deltaE;
-        unsigned int m_nbinsE;
+        std::size_t m_npointsE;
         std::vector<double> m_maxTheta;
         std::vector<double> m_tmpCorrection;
       };

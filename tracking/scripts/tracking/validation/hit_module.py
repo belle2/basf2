@@ -5,6 +5,9 @@ import math
 import collections
 import numpy as np
 
+# Need for B2WARNING for some reason
+import inspect
+
 from tracking.validation.pull import PullAnalysis
 from tracking.validation.fom import ValidationFiguresOfMerit, \
     ValidationManyFiguresOfMerit
@@ -115,28 +118,55 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             return
         cdcHits = Belle2.PyStoreArray(self.cdcHitsColumnname)
 
-        totalHitListMC = set([cdcHitID for mcTrackCand in mcTrackCands
-                              for cdcHitID in
-                              mcTrackCand.getHitIDs(Belle2.Const.CDC)])
-        totalHitListPR = set([cdcHitID for trackCand in trackCands
-                              for cdcHitID in
-                              trackCand.getHitIDs(Belle2.Const.CDC)])
+        # # CDC Hits in MC tracks
+        totalHitListMC = []
+        for mcTrackCand in mcTrackCands:
+            cdcHitIDs = mcTrackCand.getHitIDs(Belle2.Const.CDC)
+            if len(cdcHitIDs):
+                # There seems to be a bug in PyROOT / gcc that results
+                # in a segmentation violation when trying to access an empty vector.
+                # Skip such instances.
+                continue
+            totalHitListMC.extend(cdcHitIDs)
 
-        totalHitListPRGood = set([cdcHitID for trackCand in trackCands
-                                  for cdcHitID in
-                                  trackCand.getHitIDs(Belle2.Const.CDC)
-                                  if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)])
+        # Make the ids unqiue
+        totalHitListMC = set(totalHitListMC)
 
-        totalHitListPRClone = set([cdcHitID for trackCand in trackCands
-                                   for cdcHitID in
-                                   trackCand.getHitIDs(Belle2.Const.CDC)
-                                   if self.trackMatchLookUp.isClonePRTrackCand(trackCand)])
-        totalHitListPRFake = set([cdcHitID for trackCand in trackCands
-                                  for cdcHitID in
-                                  trackCand.getHitIDs(Belle2.Const.CDC)
-                                  if self.trackMatchLookUp.isGhostPRTrackCand(trackCand) or
-                                  self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)])
+        # # CDC Hits in PR tracks
+        totalHitListPR = []
+        totalHitListPRGood = []
+        totalHitListPRClone = []
+        totalHitListPRFake = []
+        for trackCand in trackCands:
+            if trackCand.getNHits() == 0:
+                basf2.B2WARNING("Encountered a pattern recognition track with no hits")
+                continue
 
+            cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)
+            if len(cdcHitIDs):
+                # There seems to be a bug in PyROOT / gcc that results
+                # in a segmentation violation when trying to access an empty vector.
+                # Skip such instances.
+                continue
+
+            totalHitListPR.extend(cdcHitIDs)
+            if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand):
+                totalHitListPRGood.extend(cdcHitIDs)
+
+            if self.trackMatchLookUp.isClonePRTrackCand(trackCand):
+                totalHitListPRClone.extend(cdcHitIDs)
+
+            if (self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand) or
+                    self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)):
+                totalHitListPRFake.extend(cdcHitIDs)
+
+        # Make the ids unqiue
+        totalHitListPR = set(totalHitListPR)
+        totalHitListPRGood = set(totalHitListPRGood)
+        totalHitListPRClone = set(totalHitListPRClone)
+        totalHitListPRFake = set(totalHitListPRFake)
+
+        # # All CDC Hits
         totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
 
         number_of_mc_hits = len(totalHitListMC)
@@ -151,7 +181,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_matched = self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)
             is_clone = self.trackMatchLookUp.isClonePRTrackCand(trackCand)
 
-            trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
+            cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)
+            if len(cdcHitIDs) == 0:
+                continue
+            trackCandHits = set(cdcHitIDs)
 
             # this is not very efficient...
             list_of_connected_mc_tracks = set()

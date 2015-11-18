@@ -26,6 +26,7 @@ main.add_module(eventinfosetter)
 
 add_beamparameters(main, "Y4S")
 
+# generate ccbar events
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.param('userDECFile', 'ccbar.dec')
 evtgeninput.param('ParentParticle', 'vpho')
@@ -34,6 +35,11 @@ main.add_module(evtgeninput)
 add_simulation(main)
 
 add_reconstruction(main)
+
+# run a module to generate histograms to test pid performance
+pidperformance = register_module('CombinedPIDPerformance')
+pidperformance.param('outputFileName', 'CombinedPIDPerformance.root')
+main.add_module(pidperformance)
 
 output = register_module('RootOutput')
 output.param('outputFileName', 'EvtGenSimRec_pid.root')

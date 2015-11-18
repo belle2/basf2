@@ -18,7 +18,8 @@
     <TOTB2>64.7</TOTB2>
     <TOTC2>1082.7</TOTC2>
     <TOTQ2>57.</TOTQ2>
-    <Workfct>1.12</Workfct>
+    <Workfct>3.6</Workfct>
+    <Fanofac>0.1</Fanofac>
     <sensor_width>0.02</sensor_width>
     <v_sensor>0.023</v_sensor>
     <shape name="FANGS" type="box">

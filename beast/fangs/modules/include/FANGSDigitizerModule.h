@@ -117,6 +117,8 @@ namespace Belle2 {
       double m_TOTQ2;
       /** Work function */
       double m_Workfct;
+      /** Fano factor */
+      double m_Fanofac;
       /** sensor width */
       double m_sensor_width;
       /** Drift velocity in sensor */

@@ -147,7 +147,9 @@ void FANGSDigitizerModule::event()
       // check if enough energy to ionize
       else if (edep >  m_Workfct) {
 
-        const double NbEle = edep / m_Workfct;
+        const double meanEl = edep / m_Workfct;
+        const double sigma = sqrt(m_Fanofac * meanEl);
+        const int NbEle = (int)gRandom->Gaus(meanEl, sigma);
 
         int col = (int)((chipPosition.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
         int row = (int)((chipPosition.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
@@ -323,6 +325,7 @@ void FANGSDigitizerModule::getXMLData()
   m_v_sensor = content.getDouble("v_sensor");
   m_sensor_width = content.getDouble("sensor_width");
   m_Workfct = content.getDouble("Workfct");
+  m_Fanofac = content.getDouble("Fanofac");
 
   B2INFO("FANGSDigitizer: Aquired FANGS locations and gas parameters");
   B2INFO("              from FANGS.xml. There are " << m_nFANGS << " FANGSs implemented");

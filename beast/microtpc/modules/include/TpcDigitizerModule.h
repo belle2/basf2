@@ -31,7 +31,7 @@ constexpr int MAXtSIZE = 1000;
 namespace Belle2 {
   namespace microtpc {
     /**
-     * Tpc tube digitizer
+     * Micro TPC digitizer
      *
      * Creates TpcHits from TpcSimHits
      *

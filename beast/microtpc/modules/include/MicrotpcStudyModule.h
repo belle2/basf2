@@ -87,6 +87,7 @@ namespace Belle2 {
 
       /** Charged density vs z vs section */
       TH1F* h_z[8];
+      TH2F* h_xy[8];
       /** Charged density vs z vs r */
       TH2F* h_zr[8];
       /** Charged density vs x vs r */
@@ -95,6 +96,12 @@ namespace Belle2 {
       TH2F* h_zy[8];
       /** Track length v. energy deposited per TPC */
       TH2F* h_evtrl[8];
+      /** Track length v. energy deposited per TPC */
+      TH2F* h_evtrlb[8];
+      /** Track length v. energy deposited per TPC */
+      TH2F* h_evtrlc[8];
+      /** Track length v. energy deposited per TPC */
+      TH2F* h_evtrld[8];
       /** Track length v. energy deposited per TPC for He */
       TH2F* h_evtrl_He[8];
       /** Track length v. energy deposited per TPC for He and x */
@@ -129,6 +136,12 @@ namespace Belle2 {
 
       /** Phi v. theta per TPC */
       TH2F* h_tvp[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_tvpb[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_tvpc[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_tvpd[8];
       /** Phi v. theta per TPC for He */
       TH2F* h_tvp_He[8];
       /** Phi v. theta per TPC for He and x */

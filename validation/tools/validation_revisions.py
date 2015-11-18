@@ -113,7 +113,7 @@ def get_fom_from_file(script_name, file_names_and_fom, git_commit_hash, skip_com
     # Compile repo
     if not skip_compiling:
         print("Compiling...")
-        if not call_with_check("Error in compiling.", ["scons", "-j8", "-D"]):
+        if not call_with_check("Error in compiling.", False, ["scons", "-j8", "-D"]):
             return results
 
     # Execute script

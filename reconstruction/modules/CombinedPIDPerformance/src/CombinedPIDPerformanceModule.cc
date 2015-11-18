@@ -235,15 +235,14 @@ void CombinedPIDPerformanceModule::fillEfficiencyHistos(const TrackFitResult* tr
     if (pid->isAvailable(det) and abs(pdg) == 321) {
       pass = (pid->getDeltaLogL(Const::pion, Const::kaon, det) > 0) ? true : false;
       m_piK_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());
+      pass = (pid->getDeltaLogL(Const::proton, Const::kaon, det) > 0) ? true : false;
+      m_pK_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());
     }
     if (pid->isAvailable(det) and abs(pdg) == 211) {
       pass = (pid->getDeltaLogL(Const::kaon, Const::pion, det) > 0) ? true : false;
       m_Kpi_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());
-
       pass = (pid->getDeltaLogL(Const::proton, Const::pion, det) > 0) ? true : false;
       m_ppi_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());
-      pass = (pid->getDeltaLogL(Const::proton, Const::kaon, det) > 0) ? true : false;
-      m_pK_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());
 
       pass = (pid->getDeltaLogL(Const::deuteron, Const::pion, det) > 0) ? true : false;
       m_dpi_FakeRates[counter]->Fill(pass, trackFit->getMomentum().Mag());

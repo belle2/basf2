@@ -154,14 +154,14 @@ namespace Belle2 {
      * true
      */
     Filter< Variable, Range, BypassableFilter, Observer>
-    bypass(const bool& bypassVariable = false_c)
+    bypass(const bool& bypassVariable = false)
     {
       return Filter< Variable, Range, BypassableFilter, Observer>(m_range, bypassVariable);
     }
 
     Filter< Variable, Range, ActivableFilter, Observer>
     //    __attribute__((deprecated("Please use the bypass( const bool &) method instead")))
-    enable(const bool& enableVariable = true_c)
+    enable(const bool& enableVariable = true)
     {
       return Filter< Variable, Range, ActivableFilter, Observer>(m_range, enableVariable);
     }
@@ -176,9 +176,6 @@ namespace Belle2 {
     template< class otherObserver >
     Filter(const Filter< Variable, Range, otherObserver>& filter):
       m_range(filter.getRange()) {};
-
-    static const bool true_c = true ;
-    static const bool false_c = false;
 
 
 

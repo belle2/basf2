@@ -15,13 +15,10 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrigonometricalLookupTable* TrigonometricalLookupTable::s_trigonometricalLookupTable = nullptr;
-
 TrigonometricalLookupTable& TrigonometricalLookupTable::Instance()
 {
-  // todo: memory leak
-  if (!s_trigonometricalLookupTable) s_trigonometricalLookupTable = new TrigonometricalLookupTable();
-  return *s_trigonometricalLookupTable;
+  static TrigonometricalLookupTable trigonometricalLookupTable;
+  return trigonometricalLookupTable;
 }
 
 

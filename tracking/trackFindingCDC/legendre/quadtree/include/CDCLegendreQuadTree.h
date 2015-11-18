@@ -23,6 +23,7 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeChildren.h>
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
@@ -47,57 +48,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template<typename quadChild>
-    class QuadChildrenTemplate {
-    public:
-
-      QuadChildrenTemplate()
-      {
-        // initialize to null
-        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
-          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
-            m_children[t_index][r_index] = nullptr;
-          }
-        }
-      };
-
-      /*
-        This method will apply a lambda function to every child of the quad tree
-      */
-      void apply(std::function<void(quadChild*)> lmd)
-      {
-        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
-          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
-            if (m_children[t_index][r_index]) {
-              lmd(m_children[t_index][r_index]);
-            }
-          }
-        }
-      };
-
-      ~QuadChildrenTemplate()
-      {
-        this->apply([](quadChild * qt) { delete qt;});
-      };
-
-      inline void set(const size_t x, const size_t y, quadChild* qt)
-      {
-        m_children[x][y] = qt;
-      }
-
-      inline quadChild* get(const size_t x, const size_t y)
-      {
-        return m_children[x][y];
-      }
-      static constexpr size_t m_sizeX = 2;
-      static constexpr size_t m_sizeY = 2;
-
-    private:
-
-      quadChild* m_children[m_sizeX][m_sizeY];
-    };
-
 
     template<typename typeX, typename typeY, class typeData, int binCountX = 2, int binCountY = 2>
     class QuadTreeTemplate {
@@ -146,6 +96,7 @@ namespace Belle2 {
       void setParameters(typeX xMin, typeX xMax, typeY yMin, typeY yMax, int level, ThisType* parent)
       {
         m_level = level;
+        m_filled = false;
 
         if (m_level > 0) {
           m_parent = parent;
@@ -156,7 +107,11 @@ namespace Belle2 {
         computeBins(xMin, xMax, yMin, yMax);
       }
 
-      void terminate() { clearTree();}
+      /// This method should be called every time quadtree runs out of the scope/cleaned up
+      void terminate()
+      {
+        clearTree();
+      }
 
       /** Create vector with children of current node */
       template<class processor>

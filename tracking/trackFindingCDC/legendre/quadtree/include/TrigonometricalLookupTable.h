@@ -73,8 +73,6 @@ namespace Belle2 {
       bool m_lookup_created; /**< Allows to use the same lookup table for sin and cos */
       unsigned long m_nbinsTheta; /**< Number of theta bins */
 
-      static TrigonometricalLookupTable* s_trigonometricalLookupTable;
-
     };
   }
 }

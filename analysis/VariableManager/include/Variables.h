@@ -58,6 +58,11 @@ namespace Belle2 {
     double particlePhi(const Particle* part);
 
     /**
+     * return particle's pdg code
+     */
+    double particlePDGCode(const Particle* part);
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);

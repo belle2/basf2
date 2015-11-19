@@ -125,6 +125,11 @@ namespace Belle2 {
       return frame.getMomentum(part).Phi();
     }
 
+    double particlePDGCode(const Particle* part)
+    {
+      return part->getPDGCode();
+    }
+
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1098,6 +1103,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosTheta", particleCosTheta,
                       "momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
+    REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,

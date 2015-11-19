@@ -41,29 +41,31 @@ namespace Belle2 {
 
   public:
 
+    /** Default constructor */
     CombinedPIDPerformanceModule();
 
+    /** Destructor */
     virtual ~CombinedPIDPerformanceModule();
 
+    /** Initialize the module */
     virtual void initialize();
 
+    /** This method is called for each event */
     virtual void event();
 
+    /** End of the event processing */
     virtual void terminate();
 
   private:
 
+    /** list to store TObjects */
     TList* m_histoList;
 
-    //list of functions to create histograms:
+    /** method to create TEfficiencies */
     TEfficiency* createEfficiency(const char* name, const char* title,
                                   Int_t nbins, Double_t min, Double_t max, TList* histoList = NULL);
 
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
-
-    //list of functions to fill histograms
+    /** method to fill TEfficiencies */
     void fillEfficiencyHistos(const TrackFitResult* fitResult, const PIDLikelihood* pid, int pdg);
 
     /* user-defined parameters */
@@ -74,27 +76,27 @@ namespace Belle2 {
 
     /* list of histograms filled per MCParticle found in the event */
     // TEfficiencies for each particle type
-    std::vector< TEfficiency* > m_piK_Efficiencies;     //< pion efficiencies
-    std::vector< TEfficiency* > m_Kpi_Efficiencies;     //< kaon efficiencies
-    std::vector< TEfficiency* > m_ppi_Efficiencies;   //< proton efficiencies
-    std::vector< TEfficiency* > m_pK_Efficiencies;   //< proton efficiencies
-    std::vector< TEfficiency* > m_dpi_Efficiencies; //< deuteron efficiencies
-    std::vector< TEfficiency* > m_epi_Efficiencies; //< electron efficiencies
-    std::vector< TEfficiency* > m_mpi_Efficiencies;     //< muon efficiencies
+    std::vector< TEfficiency* > m_piK_Efficiencies; /**< pion efficiencies */
+    std::vector< TEfficiency* > m_Kpi_Efficiencies; /**< kaon efficiencies */
+    std::vector< TEfficiency* > m_ppi_Efficiencies; /**< proton efficiencies */
+    std::vector< TEfficiency* > m_pK_Efficiencies;  /**< proton efficiencies */
+    std::vector< TEfficiency* > m_dpi_Efficiencies; /**< deuteron efficiencies */
+    std::vector< TEfficiency* > m_epi_Efficiencies; /**< electron efficiencies */
+    std::vector< TEfficiency* > m_mpi_Efficiencies; /**< muon efficiencies */
 
     // TEfficiencies for fake rates
-    std::vector< TEfficiency* > m_piK_FakeRates;     //< pion fake rates
-    std::vector< TEfficiency* > m_Kpi_FakeRates;     //< kaon fake rates
-    std::vector< TEfficiency* > m_ppi_FakeRates;   //< proton fake rates
-    std::vector< TEfficiency* > m_pK_FakeRates;   //< proton fake rates
-    std::vector< TEfficiency* > m_dpi_FakeRates; //< deuteron fake rates
-    std::vector< TEfficiency* > m_epi_FakeRates; //< electron fake rates
-    std::vector< TEfficiency* > m_mpi_FakeRates;     //< muon fake rates
+    std::vector< TEfficiency* > m_piK_FakeRates;    /**< pion fake rates */
+    std::vector< TEfficiency* > m_Kpi_FakeRates;    /**< kaon fake rates */
+    std::vector< TEfficiency* > m_ppi_FakeRates;    /**< proton fake rates */
+    std::vector< TEfficiency* > m_pK_FakeRates;     /**< proton fake rates */
+    std::vector< TEfficiency* > m_dpi_FakeRates;    /**< deuteron fake rates */
+    std::vector< TEfficiency* > m_epi_FakeRates;    /**< electron fake rates */
+    std::vector< TEfficiency* > m_mpi_FakeRates;    /**< muon fake rates */
 
     // determine which detectors to use for each particle
-    Const::DetectorSet chargedSet;  //< pions, kaons, protons
-    Const::DetectorSet electronSet; //< electrons
-    Const::DetectorSet muonSet;     //< muons
+    Const::DetectorSet chargedSet;  /**< pions, kaons, protons */
+    Const::DetectorSet electronSet; /**< electrons */
+    Const::DetectorSet muonSet;     /**< muons */
 
   };
 } // end of namespace

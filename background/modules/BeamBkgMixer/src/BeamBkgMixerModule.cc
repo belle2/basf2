@@ -101,7 +101,7 @@ namespace Belle2 {
 
     addParam("maxEdepECL", m_maxEdepECL,
              "maximal deposited energy of ECLHit to accept BG event for mixing"
-             "(0 means accept all events)", 0.0);
+             "(0 means accept all events)", 1.0);
 
   }
 

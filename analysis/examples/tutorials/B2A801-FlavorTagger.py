@@ -34,29 +34,35 @@ from stdLooseFSParticles import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
-     ]
+    [
+        '/hsm/belle2/bdata/MC/signal/B2JpsiKs_mu/mcprod1405/BGx1/mc35_B2JpsiKs_mu_BGx1_s00/' +
+        'B2JpsiKs_mu_e0001r001*_s00_BGx1.mdst.root'
+    ]
 
 inputMdstList(filelistSIG)
 
 # use standard final state particle lists
 #
-# creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
-# creates "mu+:loose" ParticleList (and c.c.)
-stdLooseMu()
+# creates "highPID" ParticleLists (and c.c.)
+fillParticleList('pi+:highPID', 'piid > 0.5 and d0 < 5 and abs(z0) < 10')
+fillParticleList('mu+:highPID', 'muid > 0.2 and d0 < 2 and abs(z0) < 4')
+
 
 # reconstruct Ks -> pi+ pi- decay
-# keep only candidates with 0.4 < M(pipi) < 0.6 GeV
-reconstructDecay('K_S0:pipi -> pi+:loose pi-:loose', '0.25 < M < 0.75')
+# keep only candidates with dM<0.25
+reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', 'dM<0.25')
+# fit K_S0 Vertex
+fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False, analysis_main)
 
-# reconstruct J/psi -> mu+ mu- decay
-# keep only candidates with 3.0 < M(mumu) < 3.2 GeV
-reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', '3.0 < M < 3.2')
+# reconstruct J/psi -> mu+ mu- decay and fit vertex
+# keep only candidates with dM<0.11
+reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', 'dM<0.11')
+applyCuts('J/psi:mumu', '3.07 < M < 3.11')
+massVertexRave('J/psi:mumu', 0., '', analysis_main)
 
 # reconstruct B0 -> J/psi Ks decay
-# keep only candidates with 5.2 < M(J/PsiKs) < 5.4 GeV
-reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', '5.2 < M < 5.4')
+# keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
+reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.1 and abs(deltaE)<0.15')
 
 # perform MC matching (MC truth asociation). Always before TagV
 matchMCTruth('B0:jspiks')
@@ -111,6 +117,10 @@ FlavorTagger(
 # Another possibility is to train a combiner for a specific category combination using the default weight files
 
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
+
+# Fit Vertex of the B0 on the tag side
+TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
+
 toolsDST = ['EventMetaData', '^B0']
 toolsDST += ['RecoStats', '^B0']
 toolsDST += ['DeltaEMbc', '^B0']
@@ -121,11 +131,14 @@ toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['ROEMultiplicities', '^B0']
 toolsDST += ['FlavorTagging', '^B0']
-#  Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
+# Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 
 # write out the flat ntuples
 ntupleFile('B2A801-FlavorTagger.root')
 ntupleTree('B0tree', 'B0:jspiks', toolsDST)
+
+# Summary of created Lists
+summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
 
 # Process the events
 process(analysis_main)

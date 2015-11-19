@@ -48,7 +48,7 @@ namespace Belle2 {
 
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
-        return 1.0;
+        return 0;
 
       // Check for Tracks
       const auto& tracks = roe->getTracks();

@@ -485,7 +485,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
-                             '0.40<=M<=0.60', 1, path=path)
+                             '0.40<=M<=0.60', True, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if particleList == 'Lambda0:LambdaROE':
@@ -494,8 +494,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
                              path=path)
             reconstructDecay(particleList + ' -> pi-:inLambdaRoe p+:inLambdaRoe',
-                             '1.00<=M<=1.23', 1, path=path)
-            reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', 1, path=path)
+                             '1.00<=M<=1.23', True, path=path)
+            reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', True, path=path)
             fitVertex(particleList, 0.01, fitter='kfitter', path=path)
             if mode != 'Expert':
                 matchMCTruth(particleList, path=path)

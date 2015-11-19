@@ -23,6 +23,8 @@ REG_MODULE(Serializer)
 //                 Implementation
 //-----------------------------------------------------------------
 
+
+
 SerializerModule::SerializerModule() : Module()
 {
   //Set module properties
@@ -32,6 +34,7 @@ SerializerModule::SerializerModule() : Module()
 #ifdef DUMMY
   addParam("EventDataBufferWords", BUF_SIZE_WORD, "DataBuffer words per event", 4800);
 #endif
+  addParam("use Shared Memory", m_shmflag, "m_shmflag", 0);
 
   m_start_flag = 0;
   n_basf2evt = -1;
@@ -39,6 +42,7 @@ SerializerModule::SerializerModule() : Module()
 
   //Parameter definition
   B2INFO("Tx: Constructor done.");
+
 }
 
 
@@ -54,6 +58,7 @@ void SerializerModule::initialize()
 #ifdef DUMMY
   m_buffer = new int[ BUF_SIZE_WORD ];
 #endif
+
 
   if (m_shmflag != 0) {
     char temp_char1[100] = "/cpr_config";
@@ -502,7 +507,13 @@ void SerializerModule::openRunPauseNshm()
 
 int SerializerModule::checkRunPause()
 {
+
+#ifdef NONSTOP_SLC
+  RunInfoBuffer& status(DeSerializerModule::getStatus());
+  if (status.getState() == status.PAUSING) {
+#else
   if (*m_ptr) {
+#endif
     return 1;
   } else {
     return 0;

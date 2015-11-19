@@ -397,13 +397,11 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
     }
   }
   return n;
-
 }
 
 #ifdef NONSTOP
 void DeSerializerCOPPERModule::resumeRun()
 {
-
 #ifdef NONSTOP_DEBUG
   printf("\033[31m");
   printf("###########(DesCpr) Resume from PAUSE  ###############\n");
@@ -414,8 +412,6 @@ void DeSerializerCOPPERModule::resumeRun()
   g_run_error = 0;
   g_run_resuming = 1;
   m_start_flag = 0;
-
-
   return;
 }
 
@@ -480,13 +476,7 @@ void DeSerializerCOPPERModule::event()
 
   if (m_start_flag == 0) {
     // Use shared memory to start(for HSLB dummy data)
-#ifdef YAMADA_DUMMY
-    B2INFO("Opening COPPER...");
-    fflush(stderr);
-    openCOPPER();
-    B2INFO("Done.\n");
-    fflush(stderr);
-#endif
+
     if (g_status.isAvailable()) {
       B2INFO("DeSerializerCOPPER: Waiting for Start...\n");
       g_status.reportRunning();
@@ -494,6 +484,13 @@ void DeSerializerCOPPERModule::event()
 
     m_start_time = getTimeSec();
     n_basf2evt = 0;
+#ifdef YAMADA_DUMMY
+    B2INFO("Opening COPPER...");
+    fflush(stderr);
+    openCOPPER();
+    B2INFO("Done.\n");
+    fflush(stderr);
+#endif
   }
 
 

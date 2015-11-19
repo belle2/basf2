@@ -1203,7 +1203,11 @@ void DesSerPrePC::openRunPauseNshm()
 
 int DesSerPrePC::checkRunPause()
 {
+#ifdef NONSTOP_SLC
+  if (m_status.getState() == m_status.PAUSING) {
+#else
   if (*m_ptr) {
+#endif
     return 1;
   } else {
     return 0;
@@ -1212,7 +1216,11 @@ int DesSerPrePC::checkRunPause()
 
 int DesSerPrePC::checkRunRecovery()
 {
+#ifdef NONSTOP_SLC
+  if (m_status.getState() == m_status.RESUMING) {
+#else
   if (*m_ptr) {
+#endif
     return 0;
   } else {
     return 1;

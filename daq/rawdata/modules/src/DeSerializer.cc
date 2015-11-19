@@ -329,11 +329,16 @@ void DeSerializerModule::openRunPauseNshm()
 
 int DeSerializerModule::checkRunPause()
 {
+
   if (m_ptr == NULL) {
     B2INFO("Shared memory is not assigned.");
     return 0;
   }
+#ifdef NONSTOP_SLC
+  if (g_status.getState() == g_status.PAUSING) {
+#else
   if (*m_ptr) {
+#endif
     return 1;
   } else {
     return 0;
@@ -346,7 +351,11 @@ int DeSerializerModule::checkRunRecovery()
     B2INFO("Shared memory is not assigned.");
     return 0;
   }
+#ifdef NONSTOP_SLC
+  if (g_status.getState() == g_status.RESUMING) {
+#else
   if (*m_ptr) {
+#endif
     return 0;
   } else {
     return 1;

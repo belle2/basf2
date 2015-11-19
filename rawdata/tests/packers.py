@@ -19,10 +19,10 @@ main.add_module('Gearbox')
 main.add_module('Geometry')
 
 # conversion from digits to raw data
-add_packers(main)
+# add_packers(main)
 
 # output
-add_raw_output(main)
+# add_raw_output(main)
 
 # process events
 process(main)

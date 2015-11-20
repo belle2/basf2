@@ -43,7 +43,8 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Prints particle list to screen (useful for debugging)");
+    setDescription("Prints specified variables for all particles in the specified particle list to screen (useful for debugging).\n"
+                   "Event based variables can be printed by not specifying the particle list (empty string).");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -67,14 +68,22 @@ namespace Belle2 {
       if (nProducts > 0)
         B2ERROR("ParticlePrinterModule::initialize Invalid input DecayString " << m_listName
                 << ". DecayString should not contain any daughters, only the mother particle.");
-    } else
-      B2ERROR("ParticlePrinterModule::initialize Empty list name!");
+    }
   }
 
   void ParticlePrinterModule::event()
   {
     B2INFO("[ParticlePrinterModule] START ------------------------------");
 
+    bool includingVars = !(m_variables.empty());
+
+    // print event based variables (particle list is empty)
+    if (m_listName.empty() && includingVars) {
+      printVariables(nullptr);
+      return;
+    }
+
+    // Print variables for all particles in the list
     StoreObjPtr<ParticleList> plist(m_listName);
     if (!plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
@@ -82,8 +91,6 @@ namespace Belle2 {
     }
 
     plist->print();
-
-    bool includingVars = !(m_variables.empty());
 
     for (unsigned i = 0; i < plist->getListSize(); i++) {
       const Particle* particle = plist->getParticle(i);

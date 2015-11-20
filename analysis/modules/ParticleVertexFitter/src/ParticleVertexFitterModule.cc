@@ -30,7 +30,7 @@
 #include <analysis/utility/ParticleCopy.h>
 
 // Magnetic field
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <TMath.h>
 
@@ -71,7 +71,7 @@ namespace Belle2 {
   void ParticleVertexFitterModule::initialize()
   {
     // magnetic field
-    m_Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);

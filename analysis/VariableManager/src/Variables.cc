@@ -39,7 +39,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 // utility
 #include <analysis/utility/C2TDistanceUtility.h>

@@ -36,7 +36,7 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 
 // Magnetic field
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 
@@ -93,11 +93,10 @@ namespace Belle2 {
 
 
     // magnetic field
-    m_Bfield = BFieldMap::Instance().getBField(m_BeamSpotCenter).Z();
+    m_Bfield = BFieldManager::getField(m_BeamSpotCenter).Z() / Unit::T;
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
-
 
     //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
     //input

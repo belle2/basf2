@@ -39,7 +39,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <TLorentzVector.h>
 #include <TRandom.h>

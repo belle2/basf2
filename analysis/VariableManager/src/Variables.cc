@@ -1087,7 +1087,6 @@ namespace Belle2 {
       return 0;
     }
 
-
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1237,17 +1236,29 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");
+    REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
+                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
     REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
                       "Return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
     REGISTER_VARIABLE("goodGamma", goodGamma,
                       "1.0 if photon candidate passes good photon selection criteria");
     REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
                       "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
-    REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+
+    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
+                      "ECL cluster's uncorrected energy");
+    REGISTER_VARIABLE("clusterR", eclClusterR,
+                      "ECL cluster's distance");
+    REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
+                      "ECL cluster's azimuthal angle");
+    REGISTER_VARIABLE("clusterTheta", eclClusterTheta,
+                      "ECL cluster's polar angle");
+    REGISTER_VARIABLE("clusterTiming", eclClusterTiming,
+                      "ECL cluster's timing");
+    REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
+                      "energy of the crystall with highest  energy");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
                       "ratio of energies in inner 3x3 and 5x5 cells");
-    REGISTER_VARIABLE("clusterTiming", eclClusterTiming, "timing");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
                       "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,

@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -59,7 +60,9 @@ void RestOfEvent::setChargedStableFractions(const std::vector<double>& fractions
   if (fractions.size() == n) {
     for (unsigned int i = 0; i < n; i++)
       m_fractions[i] = fractions[i];
-  } else {
+  } else if (fractions.size() == 1 && fractions[0] == -1)
+    m_useTrueMassHypothesis = true;
+  else {
     B2WARNING("Size of fractions vector not appropriate! Default value will be used.");
   }
 }
@@ -142,15 +145,30 @@ TLorentzVector RestOfEvent::getROE4Vector() const
       continue;
     }
 
-    if (m_trackMasks.size() > 0)
+    if (!m_trackMasks.empty())
       if (!m_trackMasks.at(roeTracks[iTrack]->getArrayIndex()))
         continue;
 
-    Const::ChargedStable mostLikely = pid->getMostLikely(m_fractions);
-    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(mostLikely);
+    int particlePDG;
+
+    if (m_useTrueMassHypothesis) {
+      const MCParticle* mcp = roeTracks[iTrack]->getRelatedTo<MCParticle>();
+
+      if (!mcp) {
+        B2ERROR("No related MCParticle found! Default will be used.");
+        particlePDG = Const::pion.getPDGCode();
+      }
+
+      particlePDG = abs(mcp->getPDG());
+    } else {
+      particlePDG = pid->getMostLikely(m_fractions).getPDGCode();
+    }
+
+    Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
+    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
 
     // Update energy of tracks (default: pion always)
-    float tempMass = mostLikely.getMass();
+    float tempMass = trackParticle.getMass();
     TVector3 tempMom = tfr->getMomentum();
     TLorentzVector temp4Vector;
     temp4Vector.SetVect(tempMom);

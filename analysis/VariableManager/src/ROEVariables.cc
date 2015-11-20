@@ -102,7 +102,7 @@ namespace Belle2 {
 
       for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
 
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
             continue;
 
@@ -164,7 +164,7 @@ namespace Belle2 {
 
       // Loop through ECLClusters
       for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
             continue;
 
@@ -260,7 +260,7 @@ namespace Belle2 {
 
         if (!roeClusters[iEcl]->isNeutral())
           continue;
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
             continue;
 
@@ -297,7 +297,7 @@ namespace Belle2 {
           return -1;
         }
 
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
             continue;
 
@@ -331,7 +331,7 @@ namespace Belle2 {
 
       for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
 
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeTracks[iTrack]->getArrayIndex()))
             continue;
 
@@ -361,7 +361,7 @@ namespace Belle2 {
 
       for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
 
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
             continue;
 
@@ -390,7 +390,7 @@ namespace Belle2 {
 
       for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
 
-        if (masks.size() > 0)
+        if (!masks.empty())
           if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
             continue;
 

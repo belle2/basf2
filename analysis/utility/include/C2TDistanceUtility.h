@@ -14,12 +14,12 @@ namespace Belle2 {
    */
   namespace C2TDistanceUtility {
 
-    /*
+    /**
      * Clip the ECLCluster position vector from the point inside the ECL region to the inside surface of the ECL region
      */
     TVector3 clipECLClusterPosition(TVector3 v1);
 
-    /*
+    /**
      * Calculate the position on the track at the ECL cylindrical radius in the barrel region or at the cylindrical radius of the point in the endcap regions.
      */
     TVector3 getECLTrackHitPosition(Helix helix, TVector3 v1);

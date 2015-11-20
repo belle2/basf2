@@ -837,18 +837,30 @@ def buildRestOfEvent(
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
+    It is possible to add cuts for which tracks and clusters to use in calculations.
+    Pion mass hypothesis is used by default, otherwise ChargeStable fractions can
+    be given as input.
+
+    Example 1: Make track and cluster cuts, use equal ChargeStable probabilities
+        buildRestOfEvent('B+:sig', 'abs(d0) < 0.03 and -0.05 < z0 < 0.12', 'clusterE9E25 > 0.905', [1,1,1,1,1,1])
+    Example 2: Don't make any cuts, use generated particle mass hypothesis (MC info)
+        buildRestOfEvent('B+:sig', '', '', [-1])
 
     @param list_name name of the input ParticleList
+    @param track selection cut string
+    @param cluster selection cut string
+    @param array of ChargeStable probabilities/fractions (normalization not needed)
+    @param use only good clusters (true/false)
     @param path      modules are added to this path
     """
 
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)
-    roeBuilder.param('onlyGoodECLClusters', only_good_ecl)
-    roeBuilder.param('chargedStableFractions', fractions)
     roeBuilder.param('trackSelection', trackSelection)
     roeBuilder.param('eclClusterSelection', eclClusterSelection)
+    roeBuilder.param('chargedStableFractions', fractions)
+    roeBuilder.param('onlyGoodECLClusters', only_good_ecl)
     path.add_module(roeBuilder)
 
 

@@ -201,7 +201,15 @@ namespace Belle2 {
     std::set<int> m_trackIndices;      /**< StoreArray indices to unused tracks */
     std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
     std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
-    double m_fractions[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0}; /**< A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables). Default is pion always.*/
+
+    /**
+     * A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables).
+     * If fractions = {-1}, the true particle mass based on MC information will be used, if available
+     * Default is pion always.
+     */
+    double m_fractions[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0};
+
+    bool m_useTrueMassHypothesis = false;
 
     std::map<int, bool> m_trackMasks; /**< Map of mask values for each track to be used in ROE or not */
     std::map<int, bool> m_eclClusterMasks; /**< Map of mask values for each ECLCluster to be used in ROE or not */

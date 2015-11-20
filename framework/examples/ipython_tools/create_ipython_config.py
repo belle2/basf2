@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 # Skript to create or edit your ipython config to use a port and a password and not open a browser
 # when starting.
+# Please ensure you have the newest ipython-notebook version installed (greater/equal than 4.0.0).
+#
 
 from jinja2 import Template
 from IPython.lib import passwd
@@ -31,13 +32,12 @@ def main():
 
     print("Will now write your notebook config.")
 
-    base_name = os.path.dirname(os.path.realpath(__file__))
-
-    with file(os.path.join(base_name, "jupyter_notebook_config.py.j2"), 'r') as f:
+    base_name = os.path.dirname(os.path.realpath('__file__'))
+    with open(os.path.join(base_name, "jupyter_notebook_config.py.j2"), 'r+') as f:
         template = Template(f.read())
 
         try:
-            jupyter_folder = check_output(['jupyter', '--config-dir']).strip()
+            jupyter_folder = check_output(['jupyter', '--config-dir']).decode().strip()
         except OSError:
             print('Failed to create config file. Have you a recent ipython-notebook installation?')
             raise
@@ -46,13 +46,12 @@ def main():
             check_output(['jupyter', 'notebook', '--generate-config'])
 
         config_file = template.render(port=port, password=password)
-
         jupyter_config_file = os.path.join(jupyter_folder, 'jupyter_notebook_config.py')
 
         # Ask the user whether to override his config
         if os.path.isfile(jupyter_config_file):
             while True:
-                choice = input('You already have a jupyter config file. Do you want to replace it? [y/n] ').lower()
+                choice = input('You already have a jupyter config file. Do you want to replace it? [Y/n] ').lower()
                 if choice == "n":
                     print('Not writing config file.')
                     exit()
@@ -65,7 +64,7 @@ def main():
         else:
             print('Writing config file.')
 
-        with file(jupyter_config_file, 'w') as out:
+        with open(jupyter_config_file, 'w') as out:
             out.write(config_file)
 
         # Set the correct read-write-user-only permissions

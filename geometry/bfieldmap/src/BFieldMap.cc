@@ -56,7 +56,12 @@ const TVector3 BFieldMap::getBField(const TVector3& point)
   return magFieldVec;
 }
 
-
+void BFieldMap::clear()
+{
+  m_isMapInitialized = false;
+  for (auto ptr : m_components) delete ptr;
+  m_components.clear();
+}
 
 //====================================================================
 //                          Private methods

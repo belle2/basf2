@@ -57,6 +57,10 @@ namespace Belle2 {
      */
     template<class BFIELDCOMP> BFIELDCOMP& addBFieldComponent();
 
+    /**
+     * Clear the existing components
+     */
+    void clear();
 
   protected:
 
@@ -83,7 +87,8 @@ namespace Belle2 {
 
     /** Destroyer class to delete the instance of the BFieldMap class when the program terminates. */
     class SingletonDestroyer {
-    public: ~SingletonDestroyer() {
+    public: ~SingletonDestroyer()
+      {
         if (BFieldMap::m_instance != NULL) delete BFieldMap::m_instance;
       }
     };

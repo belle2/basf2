@@ -16,6 +16,12 @@ input = register_module('RootInput')
 input.param('inputFileName', 'RootOutput.root')
 input.initialize()
 
+gear = register_module('Gearbox')
+gear.initialize()
+geom = register_module('Geometry')
+geom.param('components', ['PXD', 'SVD'])
+geom.initialize()
+
 # Create the algorithm
 algo = Belle2.MillepedeAlgorithm()
 
@@ -34,18 +40,12 @@ algo.steering().command('Parameters')
 
 # Fixing VXD params --------------------------------------
 # Fix all VXDs
-import vxdgeometry
-for layer, ladders in vxdgeometry.hierarchy.items():
-    for ladder, sensors in ladders.items():
-        for sensor, sensorID in sensors.items():
-            vxdid = Belle2.VxdID(sensorID)
-            # Fix layer 6 and all slanted SVDs (all params):
-            # if vxdid.getLayerNumber() == 6 or (vxdid.getLayerNumber() > 3 and vxdid.getSensorNumber() == 1):
-            label = Belle2.GlobalLabel(vxdid, 0)
-            for ipar in range(1, 7):
-                par_label = label.label() + ipar
-                cmd = str(par_label) + ' 0. -1.'
-                algo.steering().command(cmd)
+for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
+    label = Belle2.GlobalLabel(vxdid, 0)
+    for ipar in range(1, 7):
+        par_label = label.label() + ipar
+        cmd = str(par_label) + ' 0. -1.'
+        algo.steering().command(cmd)
 
 # Fixing CDC params --------------------------------------
 # for icLayer in [item for item in list(range(0, 57)) if item not in [3, 4, 5, 6]]:

@@ -30,6 +30,8 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dataobjects/BeamParameters.h>
 
+#include <framework/logging/Logger.h>
+
 #include <TLorentzVector.h>
 #include <TVector3.h>
 

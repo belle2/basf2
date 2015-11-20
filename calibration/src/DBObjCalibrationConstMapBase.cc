@@ -41,7 +41,7 @@ double DBObjCalibrationConstMapBase::add(DBObjCalibrationConstMapBase::baseType 
   set(id, param, newValue);
   return newValue;
 }
-
+/*
 void DBObjCalibrationConstMapBase::Streamer(TBuffer& R__b)
 {
   if (R__b.IsReading()) {
@@ -63,3 +63,4 @@ void DBObjCalibrationConstMapBase::Streamer(TBuffer& R__b)
     }
   }
 }
+*/

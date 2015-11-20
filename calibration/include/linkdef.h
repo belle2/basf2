@@ -9,14 +9,7 @@
 #pragma link C++ class Belle2::CalibrationAlgorithm+;
 #pragma link C++ class Belle2::TestCalibrationAlgorithm+;
 
-#pragma link C++ class Belle2::DBObjCalibrationConstMapBase-;
-
-/*
 #pragma link C++ class Belle2::DBObjCalibrationConstMapBase+;
-#pragma link C++ class Belle2::DBObjCalibrationConstMapBase::ElementParameter+;
-#pragma link C++ class pair<int, int>+;
-#pragma link C++ class map<pair<int, int>, double> >+;
-*/
 
 
 #endif

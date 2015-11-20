@@ -50,6 +50,8 @@ namespace Belle2 {
     /// Map of (element, parameter) and its values
     typedef std::map<ElementParameter, double> ElementParameterMap;
 
+    const ElementParameterMap& getMap() {return m_constants;}
+
     /// Constructor
     DBObjCalibrationConstMapBase() {}
 
@@ -70,7 +72,7 @@ namespace Belle2 {
   private:
     ElementParameterMap m_constants; /**< Map of map of all calibration elements' constants */
 
-    ClassDef(DBObjCalibrationConstMapBase, 0); /**< Storage for alignment and calibration constants */
+    ClassDef(DBObjCalibrationConstMapBase, 1); /**< Storage for alignment and calibration constants */
 
   };
 

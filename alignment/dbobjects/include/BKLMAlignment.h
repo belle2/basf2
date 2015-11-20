@@ -35,7 +35,7 @@ namespace Belle2 {
     /// Destructor
     ~BKLMAlignment() {}
   private:
-    ClassDef(BKLMAlignment, 0); /**< BKLM allignment and calibration constants */
+    ClassDef(BKLMAlignment, 1); /**< BKLM allignment and calibration constants */
   };
 } // end namespace Belle2
 

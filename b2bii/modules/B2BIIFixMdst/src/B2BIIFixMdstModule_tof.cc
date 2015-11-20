@@ -93,7 +93,7 @@ namespace Belle2 {
           for (int im = 0; im < 5; im++) {
             double shift = 0.;
             shift_tof_set(expno, runno, mode, im, pmom, sgn, shift);
-            if (abs(shift) < .005) continue;
+            if (fabs(shift) < .005) continue;
             double ot = Tof.tof_exp(im);              //old t (expected)
             double odt = ot - Tof.tof();              //old dt
             double opid = Tof.pid(im);                //old pid
@@ -102,7 +102,7 @@ namespace Belle2 {
             if (opid > 0. && opid < 1.) {
               double ct = ot + shift;                //corr t
               double cdt = ct - Tof.tof();           //corr dt
-              double err = abs(odt) / sqrt(-2.*log(opid)); //est error
+              double err = fabs(odt) / sqrt(-2.*log(opid)); //est error
               double cch = pow(cdt / err, 2);        //corr chisq
               double cpid = exp(-.5 * cch);          //corr pid
               double ccl = TMath::Prob(cch, ndf);    //corr cl

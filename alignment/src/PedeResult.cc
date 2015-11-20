@@ -33,6 +33,7 @@ namespace Belle2 {
       // skip comment line
       getline(res, line);
 
+      noDeterminedParams = 0;
       data.clear();
       labelIndices.clear();
       int index(-1);
@@ -49,6 +50,8 @@ namespace Belle2 {
         ss >> label >> param >> presigma >> differ >> error;
         data.push_back(parameterData(index, label, param, error, presigma));
         labelIndices.insert(make_pair(label, index));
+        if (isParameterDetermined(index))
+          ++noDeterminedParams;
       }
 
       if (data.size() > 0)

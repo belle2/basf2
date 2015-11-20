@@ -26,6 +26,8 @@ namespace Belle2 {
       void dump();
       //! Get number of parameters in result (for looping over)
       int getNoParameters() const {return data.size();}
+      //! Get number of determined parameters (with correction)
+      int getNoDeterminedParameters() const {return noDeterminedParams;}
       //! Get index of parameter with given label
       int getParameterIndex(int parameterLabel);
       //! Get label of parameter at index
@@ -92,6 +94,8 @@ namespace Belle2 {
       bool valid;
       //! Map to link parameter labels and their indices in result
       map<int, int> labelIndices;
+      //! Number of parameters actually determined
+      int noDeterminedParams{0};
     };
   }
 }

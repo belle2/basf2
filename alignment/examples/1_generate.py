@@ -10,13 +10,13 @@ from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 if len(sys.argv) < 5:
-    print('Usage: basf2 GenDST.py experiment run num_events cosmics_run')
+    print('Usage: basf2 1_generate.py experiment_number run_number num_events cosmics_run=0|1')
     sys.exit(1)
 
 experiment = int(sys.argv[1])
 run = int(sys.argv[2])
 nevents = int(sys.argv[3])
-cosmics_run = bool(sys.argv[4])
+cosmics_run = bool(int(sys.argv[4]))
 
 
 class TrackFitCheck(Module):
@@ -67,6 +67,7 @@ class TrackFitCheck(Module):
 
 main = create_path()
 main.add_module('EventInfoSetter', expList=[experiment], runList=[run], evtNumList=[nevents])
+
 if cosmics_run:
     main.add_module('Cosmics')
 else:

@@ -4,7 +4,9 @@
 import os
 import sys
 from basf2 import *
+import ROOT
 from ROOT import Belle2
+import numpy as np
 
 set_debug_level(1000)
 
@@ -17,9 +19,6 @@ input = register_module('RootInput')
 input.param('inputFileName', 'RootOutput.root')
 input.initialize()
 
-# We only need to initialize Gearbox and Geometry
-# in order for VXDGeoCache to know about sensors and
-# gives us their list.
 gear = register_module('Gearbox')
 gear.initialize()
 geom = register_module('Geometry')
@@ -34,6 +33,7 @@ algo.steering().command('outlierdownweighting 3')
 algo.steering().command('dwfractioncut 0.1')
 
 algo.steering().command('Parameters')
+
 for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
     if vxdid.getLayerNumber() == 6 or (vxdid.getLayerNumber() > 3 and vxdid.getSensorNumber() == 1):
         label = Belle2.GlobalLabel(vxdid, 0)
@@ -42,47 +42,100 @@ for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
             cmd = str(par_label) + ' 0. -1.'
             algo.steering().command(cmd)
 
-"""
-for icLayer in range(0, 57):
-  cmd = str(Belle2.GlobalLabel(Belle2.WireID(icLayer, 511), 1).label())  + ' 0. -1.'
-  algo.steering().command(cmd)
-  cmd = str(Belle2.GlobalLabel(Belle2.WireID(icLayer, 511), 2).label())  + ' 0. -1.'
-  algo.steering().command(cmd)
-"""
-
 # algo.invertSign()
 algo.execute()
-
-
-import ROOT
-
-
-x_profile = ROOT.TH1F("x-profile", "X correction for layers", 56, 0, 56)
-y_profile = ROOT.TH1F("y-profile", "Y correction for layers", 56, 0, 56)
-
-real_vxd = None
-
-for payload in algo.getPayloads():
-    vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
-    cdc = payload.object.IsA().DynamicCast(Belle2.CDCCalibration().IsA(), payload.object, False)
-    try:
-        for icLayer in range(0, 56):
-            x = cdc.get(Belle2.WireID(icLayer, 511), 0)
-            y = cdc.get(Belle2.WireID(icLayer, 511), 1)
-            x_profile.SetBinContent(icLayer, x)
-            x_profile.SetBinError(icLayer, cdc.getError(Belle2.WireID(icLayer, 511), 0))
-            y_profile.SetBinContent(icLayer, y)
-            y_profile.SetBinError(icLayer, cdc.getError(Belle2.WireID(icLayer, 511), 1))
-    except:
-        real_vxd = vxd
-        pass
 
 # Done in algo
 # algo.commit()
 
+# -----------------------------------------------------------
+
+
+# Get the payloads into handy variables
+payloads = list(algo.getPayloads())
+vxd = None
+for payload in payloads:
+    if payload.module == 'VXDAlignment':
+        vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
+
+
+# Profile plot for all determined parameters
+profile = ROOT.TH1F(
+    "profile",
+    "correction & errors",
+    algo.result().getNoDeterminedParameters(),
+    1,
+    algo.result().getNoDeterminedParameters())
+
+# Define some branch variables
+param = np.zeros(1, dtype=int)
+value = np.zeros(1, dtype=float)
+error = np.zeros(1, dtype=float)
+layer = np.zeros(1, dtype=int)
+ladder = np.zeros(1, dtype=int)
+sensor = np.zeros(1, dtype=int)
+x = np.zeros(1, dtype=float)
+y = np.zeros(1, dtype=float)
+z = np.zeros(1, dtype=float)
+
+# Tree with VXD data
+vxdtree = ROOT.TTree('vxd', 'VXD data')
+vxdtree.Branch('layer', layer, 'layer/I')
+vxdtree.Branch('ladder', ladder, 'ladder/I')
+vxdtree.Branch('sensor', sensor, 'sensor/I')
+vxdtree.Branch('param', param, 'param/I')
+vxdtree.Branch('value', value, 'value/D')
+vxdtree.Branch('error', error, 'error/D')
+vxdtree.Branch('x', x, 'x/D')
+vxdtree.Branch('y', y, 'y/D')
+vxdtree.Branch('z', z, 'z/D')
+
+# Index of determined param
+ibin = 0
+
+for ipar in range(0, algo.result().getNoParameters()):
+    if not algo.result().isParameterDetermined(ipar):
+        continue
+
+    ibin = ibin + 1
+
+    label = Belle2.GlobalLabel(algo.result().getParameterLabel(ipar))
+    param[0] = label.getParameterId()
+    value[0] = algo.result().getParameterCorrection(ipar)
+    error[0] = algo.result().getParameterError(ipar)
+
+    if (label.isVXD()):
+        pos = Belle2.VXD.GeoCache.getInstance().get(label.getVxdID()).pointToGlobal(ROOT.TVector3(0, 0, 0))
+        layer[0] = label.getVxdID().getLayerNumber()
+        ladder[0] = label.getVxdID().getLadderNumber()
+        sensor[0] = label.getVxdID().getSensorNumber()
+        x[0] = pos[0]
+        y[0] = pos[1]
+        z[0] = pos[2]
+        vxdtree.Fill()
+
+    profile.SetBinContent(ibin, value[0])
+    profile.SetBinError(ibin, error[0])
+
+# Example how to access collected data (but you need exp and run number)
 chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
 pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
+# Skip into interactive environment
+# You can draw something in the trees or the profile
+# Exit with Ctrl+D
+print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+print(' You are now in interactive environment. You can still access the algorithm')
+print(' or the DataStore. Try e.g.:')
+print('')
+print(' >>> pval.Draw()')
+print(' >>> vxdtree.Draw("value:layer")')
+print(' >>> vxd.dump()')
+print(' >>> profile.Draw()')
+print('')
+print(' Look into this script and use TAB or python ? help to play more...')
+print(' Exit with [Ctrl] + [D] and then [Enter]')
+print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
 import interactive
 interactive.embed()

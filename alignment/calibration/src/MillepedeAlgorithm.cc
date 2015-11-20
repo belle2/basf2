@@ -78,7 +78,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     belle2Constants.push_back(Database::DBQuery("dbstore", "CDCCalibration"));
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("dbstore", "BKLMAlignment"));
-  // Maps (key is object address in databse cache - same objects are not added twice)
+  // Maps (key is IOV of object in DB)
   std::map<string, VXDAlignment*> previousVXD;
   std::map<string, CDCCalibration*> previousCDC;
   std::map<string, BKLMAlignment*> previousBKLM;
@@ -170,7 +170,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isKLM()) {
       // Add correction to all objects
       for (auto& bklm : newBKLM) {
-        bklm.second->add(param.getWireID(), param.getParameterId(), correction, m_invertSign);
+        bklm.second->add(param.getKlmID(), param.getParameterId(), correction, m_invertSign);
       }
     }
   }

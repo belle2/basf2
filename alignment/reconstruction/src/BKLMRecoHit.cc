@@ -14,6 +14,8 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <alignment/GlobalLabel.h>
+#include <bklm/dataobjects/BKLMElementID.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
 
 #include <genfit/DetPlane.h>
 #include <TVector3.h>
@@ -113,26 +115,18 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
 
 vector< int > BKLMRecoHit::labels()
 {
-  int barrel = 1;
-  int forward = m_bklmHit2d->isForward() ? 1 : 0;
-  int sector = m_bklmHit2d->getSector();
-  int layer = m_bklmHit2d->getLayer();
-
-  // Encode some KLM-unique id to identify alignable structure
-  // - it should be smaller than 1.000.000, which
-  // means moduleID cannot be used for this!
-  // This is Millepede limitation. One int must be enough to identify any
-  // single alignment parameter in the whole Belle 2 detector.
-  int klmid(layer + 100 * sector + 1000 * forward + 10000 * barrel);
-
+  BKLMElementID klmid;
+  klmid.setIsForward(m_bklmHit2d->isForward());
+  klmid.setSectorNumber(m_bklmHit2d->getSector());
+  klmid.setLayerNumber(m_bklmHit2d->getLayer());
   std::vector<int> labGlobal;
 
-  labGlobal.push_back(GlobalLabel(klmid, 1)); // du
-  labGlobal.push_back(GlobalLabel(klmid, 2)); // dv
-  labGlobal.push_back(GlobalLabel(klmid, 3)); // dw
-  labGlobal.push_back(GlobalLabel(klmid, 4)); // dalpha
-  labGlobal.push_back(GlobalLabel(klmid, 5)); // dbeta
-  labGlobal.push_back(GlobalLabel(klmid, 6)); // dgamma
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dU)); // du
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dV));// dv
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dW)); // dw
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dAlpha)); // dalpha
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dBeta)); // dbeta
+  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dGamma)); // dgamma
 
   return labGlobal;
 }

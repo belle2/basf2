@@ -4,7 +4,10 @@
 #include <map>
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
+#include <bklm/dataobjects/BKLMElementID.h>
+
 #include <framework/gearbox/Const.h>
+
 using namespace std;
 namespace Belle2 {
   /**
@@ -71,12 +74,12 @@ namespace Belle2 {
      */
     GlobalLabel(WireID cdcid, gidTYPE paramId);
     /**
-     * @brief Constructor from KLMid (currently int) (depends on time internally)
+     * @brief Constructor from KLMid (currently BKLMElementID) (depends on time internally)
      * @param klmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
      * @param paramId Numeric identificator of calibration/alignment parameter
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
-    GlobalLabel(int klmid, gidTYPE paramId);
+    GlobalLabel(BKLMElementID klmid, gidTYPE paramId);
     /**
      * @brief Register this Detector element and parameter
      *        as time dependent with instance starting at
@@ -122,7 +125,7 @@ namespace Belle2 {
     //! Get the WireID (returns default if not CDC label)
     WireID  getWireID()      const;
     //! Get the KlmID (returns 0 if not KLM label)
-    int     getKlmID()      const;
+    BKLMElementID  getKlmID()      const;
     //! Is this VXD label?
     bool    isVXD()          const {return (eid > vxdOffset && eid < cdcOffset);}
     //! Is this CDC label?

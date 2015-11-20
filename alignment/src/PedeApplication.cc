@@ -15,12 +15,10 @@ namespace Belle2 {
       string tmpfile("pede_test.tmp.txt");
 
       string cmd("pede > " + tmpfile);
-      int exitcode(system(cmd.c_str()));
-      if (exitcode != 0)
-        return ver;
+      system(cmd.c_str());
 
       ifstream file(tmpfile);
-      string line; char verText;
+      string line; string verText;
 
       getline(file, line);
       stringstream ss(line);

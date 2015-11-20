@@ -119,6 +119,9 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   double vy = generateValue(m_params.yVertexDist, m_params.yVertexParams);
   double vz = generateValue(m_params.zVertexDist, m_params.zVertexParams);
 
+  // Time offset
+  double nTimeOffset = static_cast<double>(m_params.timeOffset);
+
   //Determine number of tracks
   int nTracks = static_cast<int>(m_params.nTracks);
   if (m_params.nTracks <= 0) {
@@ -180,6 +183,9 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     //do this automatically but setting it here makes the particle correct
     //independent of the options
     p.setDecayTime(numeric_limits<double>::infinity());
+
+    // set time offset to check fit bias in e.g. the ECL waveform fits
+    p.setProductionTime(nTimeOffset);
 
     if (m_params.independentVertices) {
       //If we have independent vertices, generate new vertex for next particle

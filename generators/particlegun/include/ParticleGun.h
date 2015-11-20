@@ -99,6 +99,9 @@ namespace Belle2 {
        * distribution and assigns this momentum to all particles generated
        * for one event */
       bool fixedMomentumPerEvent = false;
+      /** Time offset from 0 */
+      double timeOffset;
+
     };
 
     /** Default constructor */

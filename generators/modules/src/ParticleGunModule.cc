@@ -122,6 +122,8 @@ ParticleGunModule::ParticleGunModule() : Module()
   addParam("zVertexParams", m_parameters.zVertexParams,
            "Parameters for the z vertex generation. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.zVertexParams);
+  addParam("timeOffset", m_parameters.timeOffset,
+           "Time offset", 0.0);
 }
 
 ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string name)
@@ -170,11 +172,11 @@ void ParticleGunModule::initialize()
   //Convert degree to radian
   if (m_parameters.thetaDist != ParticleGun::c_polylineCosDistribution &&
       m_parameters.thetaDist != ParticleGun::c_normalCosDistribution) {
-    for (double & angle : m_parameters.thetaParams) angle *= Unit::deg;
+    for (double& angle : m_parameters.thetaParams) angle *= Unit::deg;
   }
   if (m_parameters.phiDist != ParticleGun::c_polylineCosDistribution &&
       m_parameters.phiDist != ParticleGun::c_normalCosDistribution) {
-    for (double & angle : m_parameters.phiParams) angle *= Unit::deg;
+    for (double& angle : m_parameters.phiParams) angle *= Unit::deg;
   }
 
   //Assign parameters

@@ -67,6 +67,10 @@ def process_dir(
     release_dir,
 ):
 
+    # remove leading ./
+    if dir_name.startswith('./'):
+        dir_name = dir_name[2:]
+
     # determine library name
     if dir_name == '.':
         lib_name = parent_env['PACKAGE']
@@ -227,7 +231,7 @@ def process_dir(
     is_python_module_dir = env.Dictionary().get('PYTHON_MODULE', False)
     is_dataobjects_dir = os.path.basename(dir_name) == 'dataobjects' \
         and env['PACKAGE'] != 'framework'
-    if dir_name == './dataobjects':
+    if dir_name == 'dataobjects':
         is_dataobjects_dir = True
         is_module_dir = False
         lib_name = parent_env['PACKAGE']

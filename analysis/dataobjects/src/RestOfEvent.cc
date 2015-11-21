@@ -182,7 +182,7 @@ TLorentzVector RestOfEvent::getROE4Vector() const
 
     if (!roeClusters[iEcl]->isNeutral()) continue;
 
-    if (m_eclClusterMasks.size() > 0)
+    if (!m_eclClusterMasks.empty())
       if (!m_eclClusterMasks.at(roeClusters[iEcl]->getArrayIndex()))
         continue;
 

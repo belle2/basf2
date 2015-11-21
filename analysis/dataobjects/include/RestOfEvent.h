@@ -209,7 +209,8 @@ namespace Belle2 {
      */
     double m_fractions[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0};
 
-    bool m_useTrueMassHypothesis = false;
+    bool m_useTrueMassHypothesis =
+      false; /**< To use generated particle mass hypothesis in ROE4Vector or not. If MC not available, default is used. */
 
     std::map<int, bool> m_trackMasks; /**< Map of mask values for each track to be used in ROE or not */
     std::map<int, bool> m_eclClusterMasks; /**< Map of mask values for each ECLCluster to be used in ROE or not */

@@ -33,7 +33,7 @@ Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    LocalDatabase::createInstance(FileSystem::findFile("data/framework/database.txt"), "", LogConfig::c_Error);
+    LocalDatabase::createInstance(FileSystem::findFile("data/framework/database.txt"), "", true, LogConfig::c_Error);
     ConditionsDatabase::createDefaultInstance("production", LogConfig::c_Warning);
     LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
   }

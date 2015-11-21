@@ -26,15 +26,17 @@ using namespace std;
 using namespace Belle2;
 namespace fs = boost::filesystem;
 
-void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, LogConfig::ELogLevel logLevel)
+void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
+                                   LogConfig::ELogLevel logLevel)
 {
-  LocalDatabase* database = new LocalDatabase(fileName, payloadDir);
+  LocalDatabase* database = new LocalDatabase(fileName, payloadDir, readOnly);
   database->setLogLevel(logLevel);
   Database::setInstance(database);
 }
 
 LocalDatabase::LocalDatabase(const std::string& fileName,
-                             const std::string& payloadDir): m_fileName(fs::absolute(fileName).string()), m_payloadDir(payloadDir)
+                             const std::string& payloadDir,
+                             bool readOnly): m_fileName(fs::absolute(fileName).string()), m_payloadDir(payloadDir), m_readOnly(readOnly)
 {
   if (m_payloadDir.empty()) {
     m_payloadDir = fs::path(m_fileName).parent_path().string();
@@ -51,7 +53,7 @@ bool LocalDatabase::readDatabase()
 
   // get lock for read access to database file
   FileSystem::Lock lock(m_fileName, true);
-  if (!lock.lock()) {
+  if (!m_readOnly && !lock.lock()) {
     B2ERROR("Locking of database file " << m_fileName << " failed.");
     return false;
   }
@@ -129,6 +131,11 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
 
 bool LocalDatabase::storeData(const std::string& package, const std::string& module, TObject* object, IntervalOfValidity& iov)
 {
+  if (m_readOnly) {
+    B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
+    return false;
+  }
+
   if (!fs::exists(m_payloadDir)) {
     fs::create_directories(m_payloadDir);
   }

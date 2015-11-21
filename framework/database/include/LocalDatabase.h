@@ -30,11 +30,12 @@ namespace Belle2 {
      *
      * @param fileName   The name of the database text file with the IoV assignments.
      * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      * @param logLevel   The level of log messages about not-found payloads.
      * @return           A pointer to the created database instance
      */
     static void createInstance(const std::string& fileName = "database.txt", const std::string& payloadDir = "",
-                               LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+                               bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
 
     /**
      * Request an object from the database.
@@ -64,8 +65,9 @@ namespace Belle2 {
      *
      * @param fileName   The name of the database text file with the IoV assignments.
      * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      */
-    explicit LocalDatabase(const std::string& fileName, const std::string& payloadDir = "");
+    explicit LocalDatabase(const std::string& fileName, const std::string& payloadDir = "", bool readOnly = false);
 
     /** Hidden copy constructor, as it is a singleton. */
     LocalDatabase(const LocalDatabase&);
@@ -95,6 +97,9 @@ namespace Belle2 {
 
     /** The directory of payloads. */
     std::string m_payloadDir;
+
+    /** flag for read-only mode. */
+    bool m_readOnly;
 
     /** Map of packages to map of modules to vector of revisions and assigned IoVs. */
     std::map<std::string, std::map<std::string, std::vector<std::pair<int, IntervalOfValidity>>>> m_database;

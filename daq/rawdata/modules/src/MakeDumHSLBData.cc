@@ -38,9 +38,9 @@ void MakeDumHSLBDataModule::initialize()
   B2INFO("MakeDumHSLBData: initialize() started.");
 
   struct stat statbuf;
-  m_filefd = open(m_out_fname.c_str(), O_WRONLY);
+  m_filefd = open(m_out_fname.c_str(), O_WRONLY | O_CREAT);
   if (m_filefd < 0) {
-    printf("Error : cannot open %s: %s\n", m_out_fname, strerror(errno));
+    printf("Error : cannot open %s: %s\n", m_out_fname.c_str(), strerror(errno));
     exit(1);
   }
   if (fstat(m_filefd, &statbuf) < 0) {

@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-// Not needed in ROOT6 ClassImp(BKLMRawHit)
-
 // empty constructor for ROOT - do not use this
 BKLMRawHit::BKLMRawHit() :
   RelationsObject(),

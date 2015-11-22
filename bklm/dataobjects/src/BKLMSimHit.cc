@@ -12,8 +12,6 @@
 
 using namespace Belle2;
 
-// Not needed in ROOT6 ClassImp(BKLMSimHit)
-
 //! empty constructor for ROOT
 BKLMSimHit::BKLMSimHit() :
   SimHitBase(),

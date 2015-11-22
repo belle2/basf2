@@ -70,6 +70,7 @@ profile = ROOT.TH1F(
 # Define some branch variables
 param = np.zeros(1, dtype=int)
 value = np.zeros(1, dtype=float)
+correction = np.zeros(1, dtype=float)
 error = np.zeros(1, dtype=float)
 layer = np.zeros(1, dtype=int)
 ladder = np.zeros(1, dtype=int)
@@ -85,6 +86,7 @@ vxdtree.Branch('ladder', ladder, 'ladder/I')
 vxdtree.Branch('sensor', sensor, 'sensor/I')
 vxdtree.Branch('param', param, 'param/I')
 vxdtree.Branch('value', value, 'value/D')
+vxdtree.Branch('correction', correction, 'correction/D')
 vxdtree.Branch('error', error, 'error/D')
 vxdtree.Branch('x', x, 'x/D')
 vxdtree.Branch('y', y, 'y/D')
@@ -101,10 +103,12 @@ for ipar in range(0, algo.result().getNoParameters()):
 
     label = Belle2.GlobalLabel(algo.result().getParameterLabel(ipar))
     param[0] = label.getParameterId()
-    value[0] = algo.result().getParameterCorrection(ipar)
+    correction[0] = algo.result().getParameterCorrection(ipar)
     error[0] = algo.result().getParameterError(ipar)
 
     if (label.isVXD()):
+        value[0] = vxd.get(label.getVxdID().getID(), label.getParameterId())
+
         pos = Belle2.VXD.GeoCache.getInstance().get(label.getVxdID()).pointToGlobal(ROOT.TVector3(0, 0, 0))
         layer[0] = label.getVxdID().getLayerNumber()
         ladder[0] = label.getVxdID().getLadderNumber()

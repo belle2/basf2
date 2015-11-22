@@ -177,11 +177,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   // Save (possibly updated) objects
   for (auto& vxd : newVXD)
-    saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first));
+    saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first).overlap(getIovFromData()));
   for (auto& cdc : newCDC)
-    saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first));
+    saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first).overlap(getIovFromData()));
   for (auto& bklm : newBKLM)
-    saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first));
+    saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
 
   commit();
 

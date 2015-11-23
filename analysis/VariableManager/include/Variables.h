@@ -307,6 +307,12 @@ namespace Belle2 {
     double particleMCMatchP(const Particle* particle);
 
     /**
+     * return recoiling mass against the particles appended as particle's daughters.
+     * MC truth values are used in the calculations.
+     */
+    double particleMCRecoilMass(const Particle* particle);
+
+    /**
      * return X component of the tag vertex
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)

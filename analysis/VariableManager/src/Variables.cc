@@ -721,6 +721,26 @@ namespace Belle2 {
       return mcparticle->getMomentum().Mag();
     }
 
+    double particleMCRecoilMass(const Particle* part)
+    {
+      StoreArray<MCParticle> mcparticles;
+      if (mcparticles.getEntries() < 1)
+        return -999;
+
+      TLorentzVector pInitial = mcparticles[0]->get4Vector();
+      TLorentzVector pDaughters;
+      const std::vector<Particle*> daughters = part->getDaughters();
+      for (unsigned i = 0; i < daughters.size(); i++) {
+        const MCParticle* mcD = daughters[i]->getRelatedTo<MCParticle>();
+        if (mcD == nullptr)
+          return -999;
+
+        pDaughters += mcD->get4Vector();
+      }
+
+      return (pInitial - pDaughters).M();
+    }
+
     // TDCPV related ---------------------------------------------------------
 
     double particleTagVx(const Particle* particle)
@@ -1181,6 +1201,9 @@ namespace Belle2 {
                       "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
                       "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
+                      "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
+
 
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle.")

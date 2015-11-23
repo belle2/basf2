@@ -7,8 +7,7 @@ import sys
 import inspect
 from beamparameters import add_beamparameters
 from vertex import *
-
-analysis_main = create_path()
+from analysisPath import *
 
 
 def inputMdst(filename, path=analysis_main):

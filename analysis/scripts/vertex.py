@@ -6,8 +6,7 @@ import os
 import sys
 import inspect
 from beamparameters import add_beamparameters
-
-analysis_main = create_path()
+from analysisPath import *
 
 
 def fitVertex(

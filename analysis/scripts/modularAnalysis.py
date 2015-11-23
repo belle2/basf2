@@ -514,6 +514,76 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def reconstructRecoil(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Creates new Particles that recoil against the input particles.
+
+    For example the decay string M -> D1 D2 D3 will:
+     - create mother Particle M for each unique combination of D1, D2, D3 Particles
+     - Particles D1, D2, D3 will be appended as daughters to M
+     - the 4-momentum of the mother Particle M is given by
+         p(M) = p(HER) + p(LER) - Sum_i p(Di)
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @oaram dmID        user specified decay mode identifier
+    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param path        modules are added to this path
+    """
+
+    pmake = register_module('ParticleCombiner')
+    pmake.set_name('ParticleCombiner_' + decayString)
+    pmake.param('decayString', decayString)
+    pmake.param('cut', cut)
+    pmake.param('decayMode', dmID)
+    pmake.param('writeOut', writeOut)
+    pmake.param('recoilParticleType', 1)
+    path.add_module(pmake)
+
+
+def reconstructRecoilDaughter(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
+
+    For example the decay string M -> D1 D2 D3 will:
+     - create mother Particle M for each unique combination of D1, D2, D3 Particles
+     - Particles D1, D2, D3 will be appended as daughters to M
+     - the 4-momentum of the mother Particle M is given by
+         p(M) = p(D1) - Sum_i p(Di), where i>1
+
+    @param decayString DecayString specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass give cuts (in VariableManager style) and rejected otherwise
+    @oaram dmID        user specified decay mode identifier
+    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param path        modules are added to this path
+    """
+
+    pmake = register_module('ParticleCombiner')
+    pmake.set_name('ParticleCombiner_' + decayString)
+    pmake.param('decayString', decayString)
+    pmake.param('cut', cut)
+    pmake.param('decayMode', dmID)
+    pmake.param('writeOut', writeOut)
+    pmake.param('recoilParticleType', 2)
+    path.add_module(pmake)
+
+
 def rankByHighest(
     particleList,
     variable,

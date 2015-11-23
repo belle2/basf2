@@ -1,7 +1,7 @@
 /*
 <header>
   <input>EvtGenSimRec.root</input>
-  <contact>tkuhr</contact>
+  <contact>Thomas.Hauth@kit.edu</contact>
   <description>This example shows how to read in a data file and produce an output file with a 1D validation plot, a 2D validation plot, and a numerical validation output.
 It also demonstrates how a description of the displayed data and the instructions for the check by the shifter can be added.</description>
 </header>
@@ -20,7 +20,7 @@ void example()
   TH1F* hTopLHs = new TH1F("hTopLHs", "TOP Likelihoods", 100, -200, 200);
   hTopLHs->GetXaxis()->SetTitle("TOP LL(#pi)-LL(K)");
   hTopLHs->GetYaxis()->SetTitle("tracks");
-  tree->Draw("TOPLikelihoods.m_logL_pi-TOPLikelihoods.m_logL_K>>hTopLHs");
+  tree->Draw("TOPLikelihoods.getLogL_pi()-TOPLikelihoods.getLogL_K()>>hTopLHs");
   hTopLHs->GetListOfFunctions()->Add(new TNamed("Description", "This is an example of a validation plot."));
   hTopLHs->GetListOfFunctions()->Add(new TNamed("Check", "- There is a colored line for each revision/release.<br>- There is a histogram with black line and grey fill color as reference plot."));
   hTopLHs->Write();

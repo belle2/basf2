@@ -24,6 +24,8 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dataobjects/BeamParameters.h>
 
 #include <algorithm>
 
@@ -59,6 +61,15 @@ namespace Belle2 {
              0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+    addParam("recoilParticleType", m_recoilParticleType,
+             "If not equal 0, the mother Particle is reconstructed in the recoil against the daughter particles.\n"
+             "In the case of the following decay chain M -> D1 D2 ... Dn and\n"
+             " a) recoilParticleType = 1: \n"
+             "   - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
+             "   - D1, D2, ..., DN are attached as daughters of M\n"
+             " b) recoilParticleType = 2: \n"
+             "   - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
+             "   - D1, D2, ..., DN are attached as daughters of M\n" , 0);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
@@ -105,6 +116,9 @@ namespace Belle2 {
 
     m_cut = Variable::Cut::Compile(m_cutParameter);
 
+    if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
+      B2FATAL("Invalid recoil particle type = " << m_recoilParticleType <<
+              "! Valid values are 0 (not a recoil), 1 (recoiling against e+e- and daughters), 2 (daughter of a recoil)");
   }
 
   void ParticleCombinerModule::event()
@@ -128,7 +142,36 @@ namespace Belle2 {
     int numberOfCandidates = 0;
     while (m_generator->loadNext()) {
 
-      const Particle& particle = m_generator->getCurrentParticle();
+      Particle&& particle = m_generator->getCurrentParticle();
+
+      // if particle is reconstructed in the recoil,
+      // its 4-momentum vector needs to be fixed
+      // at this stage its 4 momentum is:
+      // p(mother) = Sum_i p(daughter_i)
+      // but it needs to be
+      //  a) in the case of recoilParticleType == 1
+      //    - p(mother) = p(e-) + p(e+) - Sum_i p(daughter_i)
+      //  b) in the case of recoilParticleType == 2
+      //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
+      if (m_recoilParticleType == 1) {
+        PCmsLabTransform T;
+        TLorentzVector recoilMomentum = T.getBeamParams().getHER() + T.getBeamParams().getLER() - particle.get4Vector();
+        particle.set4Vector(recoilMomentum);
+      } else if (m_recoilParticleType == 2) {
+        const std::vector<Particle*> daughters = particle.getDaughters();
+
+        if (daughters.size() < 2)
+          B2FATAL("Reconstructing particle as a duaghter of a recoil with less then 2 daughters!");
+
+        TLorentzVector pDaughters;
+        for (unsigned i = 1; i < daughters.size(); i++) {
+          pDaughters += daughters[i]->get4Vector();
+        }
+
+        TLorentzVector mom = daughters[0]->get4Vector() - pDaughters;
+        particle.set4Vector(mom);
+      }
+
       if (!m_cut->check(&particle))
         continue;
 

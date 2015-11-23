@@ -495,12 +495,12 @@ namespace Belle2 {
     double Teacher::sumOfFormula(std::string formula, TTree* tree) const
     {
       double sum = 0;
-      TTreeFormula form("form", formula.c_str(), tree);
-      form.GetNdata();
+      std::unique_ptr<TTreeFormula> form(new TTreeFormula("form", formula.c_str(), tree));
+      form->GetNdata();
       int nentries = tree->GetEntries();
       for (int i = 0; i < nentries; ++i) {
         tree->GetEvent(i);
-        sum += form.EvalInstance();
+        sum += form->EvalInstance();
       }
       return sum;
     }

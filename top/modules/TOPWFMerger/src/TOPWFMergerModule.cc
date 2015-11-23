@@ -27,6 +27,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
+#include <top/dataobjects/TOPDigit.h>
 
 #include <iostream>
 
@@ -48,12 +49,25 @@ namespace Belle2 {
 
   {
     // set module description
-    setDescription("TOP waveform merger + pedestal subtraction, gain correction");
+    setDescription("Module merges raw waveforms, performs pedestal subtraction "
+                   "and gain correction, and converts waveforms to hits.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("outlayerCut", m_outlayerCut, " ", 2.0);
-
+    addParam("outlayerCut", m_outlayerCut, "outlayer removal cut value in number of "
+             "sigma for pedestal offset determination", 3.0);
+    addParam("threshold", m_threshold, "threshold value in number of sigma "
+             "to discriminate signal against noise", 5.0);
+    addParam("hysteresis", m_hysteresis,
+             "comparator hysteresis in number of sigma", 1.0);
+    addParam("minWidth", m_minWidth,
+             "minimal required width of digital pulse in number of samples "
+             "(accept pulse if width > minWidth)", 2);
+    addParam("fraction", m_fraction,
+             "the fraction of constant fraction discrimination", 0.2);
+    addParam("delay", m_delay,
+             "the delay in number of samples of constant fraction discrimination", 2);
   }
+
 
   TOPWFMergerModule::~TOPWFMergerModule()
   {
@@ -68,6 +82,10 @@ namespace Belle2 {
     StoreArray<TOPWaveform> waveforms;
     waveforms.registerInDataStore();
     waveforms.registerRelationTo(rawWaveforms);
+
+    StoreArray<TOPDigit> digits;
+    digits.registerInDataStore();
+    digits.registerRelationTo(waveforms);
 
   }
 
@@ -93,12 +111,16 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> rawWaveforms;
     StoreArray<TOPWaveform> waveforms;
 
+    // group together waveforms belonging to the same module and channel
+
     typedef std::vector<const TOPRawWaveform*> RawWaveforms;
     std::map<unsigned, RawWaveforms> map;
     for (const auto& rawWaveform : rawWaveforms) {
       auto key = getKey(rawWaveform.getBarID(), rawWaveform.getChannelID());
       map[key].push_back(&rawWaveform);
     }
+
+    // merge raw waveforms, do pedestal subtraction and gain correction
 
     for (const auto& element : map) {
       auto key = element.first;
@@ -121,6 +143,28 @@ namespace Belle2 {
           waveform = waveforms.appendNew(barID, pixelID, channelID);
         bool ok = appendRawWavefrom(rawWaveform, calibration, waveform);
         if (ok) waveform->addRelationTo(rawWaveform);
+      }
+    }
+
+    // convert to hits
+
+    StoreArray<TOPDigit> digits;
+    for (auto& waveform : waveforms) {
+      int nDig = waveform.setDigital(m_threshold, m_threshold - m_hysteresis, m_minWidth);
+      if (nDig == 0) continue;
+      int nHit = waveform.convertToHits(m_fraction, m_delay);
+      if (nHit == 0) continue;
+      auto barID = waveform.getBarID();
+      auto pixelID = waveform.getPixelID();
+      auto channelID = waveform.getChannelID();
+      const auto& hits = waveform.getHits();
+      for (const auto& hit : hits) {
+        auto tdc = m_topgp->getTDCcount(hit.time);
+        auto* digit = digits.appendNew(barID, pixelID, tdc);
+        digit->setADC(hit.height);
+        digit->setPulseWidth(hit.width);
+        digit->setHardwareChannelID(channelID);
+        digit->addRelationTo(&waveform);
       }
     }
 
@@ -211,9 +255,10 @@ namespace Belle2 {
     }
     if (samples.empty()) return 0;
 
-    double cut = 1000;
+    const int niter = 4;
+    double cut = m_outlayerCut * (1 << (niter - 1));
     double offset = 0;
-    for (int iter = 0; iter < 3; iter++) {
+    for (int iter = 0; iter < niter; iter++) {
       double sumy = 0;
       double sume = 0;
       for (const auto& sample : samples) {
@@ -223,7 +268,7 @@ namespace Belle2 {
         sume += 1 / errSq;
       }
       if (sume > 0) offset = sumy / sume;
-      cut = m_outlayerCut;
+      cut /= 2;
     }
 
     return offset;

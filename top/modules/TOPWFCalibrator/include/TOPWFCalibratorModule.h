@@ -79,6 +79,7 @@ namespace Belle2 {
     int m_runHigh;         /**< IOV: to run */
 
     TProfile* m_profile[c_NumChannels][c_NumWindows]; /**< profile histograms */
+    TProfile* m_baseline[c_NumChannels]; /**< average baseline */
 
   };
 

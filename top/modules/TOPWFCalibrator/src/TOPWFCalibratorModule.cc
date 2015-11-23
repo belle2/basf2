@@ -72,6 +72,7 @@ namespace Belle2 {
       for (int k = 0; k < c_NumWindows; k++) {
         m_profile[i][k] = 0;
       }
+      m_baseline[i] = 0;
     }
 
   }
@@ -101,6 +102,22 @@ namespace Belle2 {
       unsigned channel = waveform.getChannelID();
       unsigned window = waveform.getStorageWindow();
       if (channel < c_NumChannels and window < c_NumWindows) {
+        auto baseline = m_baseline[channel];
+        if (!baseline) {
+          stringstream ss;
+          ss << "chan" << channel;
+          string name;
+          ss >> name;
+          string title = "Pedestal's average per window " + name;
+          int size = c_NumWindows;
+          baseline = new TProfile(name.c_str(), title.c_str(), size, 0, size, "s");
+          m_baseline[channel] = baseline;
+        }
+        double average = 0;
+        for (const auto& adc : waveform.getWaveform()) average += adc;
+        average /= waveform.getSize();
+        baseline->Fill(window, average);
+
         auto prof = m_profile[channel][window];
         if (!prof) {
           stringstream ss;
@@ -114,9 +131,10 @@ namespace Belle2 {
         }
         int i = 0;
         for (const auto& adc : waveform.getWaveform()) {
-          prof->Fill(i, adc);
+          prof->Fill(i, adc - average);
           i++;
         }
+
       }
     }
 
@@ -143,6 +161,8 @@ namespace Belle2 {
             TProfile* prof = m_profile[i][k];
             if (prof) prof->Write();
           }
+          TProfile* prof = m_baseline[i];
+          if (prof) prof->Write();
         }
       }
       file->Close();
@@ -168,11 +188,14 @@ namespace Belle2 {
     for (int channel = 0; channel < c_NumChannels; channel++) {
       new(constants[channel]) TOPASICChannel(m_barID, channel, numWindows);
       auto* channelConstants = static_cast<TOPASICChannel*>(constants[channel]);
+      auto* baseline = m_baseline[channel];
       for (int window = 0; window < c_NumWindows; window++) {
         TProfile* prof = m_profile[channel][window];
         if (prof) {
           TOPASICPedestals pedestals(window);
-          int bad = pedestals.setPedestals(prof);
+          double average = 0;
+          if (baseline) average = baseline->GetBinContent(window + 1);
+          int bad = pedestals.setPedestals(prof, average);
           if (bad > 0) {
             badPed++;
             badSampl += bad;

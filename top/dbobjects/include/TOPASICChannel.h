@@ -47,8 +47,7 @@ namespace Belle2 {
       m_barID(barID), m_channelID(channelID)
     {
       for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
-      float timeBin = 1 / 2.77; //TODO get correct value
-      setTimeAxis(timeBin);
+      setTimeAxis();
     }
 
     /**
@@ -111,7 +110,7 @@ namespace Belle2 {
      * the first one is with respect to the last sample of previous ASIC window.
      * @param timeBin time bin
      */
-    void setTimeAxis(float timeBin)
+    void setTimeAxis(float timeBin = 1 / 2.72)
     {
       for (unsigned i = 0; i < c_TimeAxisSize; i++) m_timeAxis[i] = timeBin;
     }

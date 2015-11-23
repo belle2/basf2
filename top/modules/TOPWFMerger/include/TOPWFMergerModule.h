@@ -18,11 +18,13 @@
 #include <top/dbobjects/TOPASICChannel.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 namespace Belle2 {
 
   /**
-   * Merging of raw waveforms, pedestal subtraction, gain correction
+   * Merging raw waveforms, pedestal subtraction and gain correction.
+   * Convertion to hits.
    */
   class TOPWFMergerModule : public Module {
 
@@ -115,10 +117,16 @@ namespace Belle2 {
                             const TOPASICPedestals* pedestals);
 
     double m_outlayerCut; /**< outlayer cut in number of sigma for pedestal offset */
+    double m_threshold;   /**< threshold value in number of sigma */
+    double m_hysteresis;  /**< hysteresis value in number of sigma */
+    int m_minWidth;    /**< minimal width of a digital pulse in number of samlpes */
+    double m_fraction;    /**< constant fraction discrimination: fraction */
+    int m_delay;  /**< constant fraction discrimination: delay [number of samples] */
 
     DBArray<TOPASICChannel> m_asicChannels; /**< ASIC calibration constants */
     std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (bar,channel) and ptr */
 
+    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();  /**< geometry */
 
   };
 

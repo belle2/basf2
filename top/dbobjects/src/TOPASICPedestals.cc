@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-int TOPASICPedestals::setPedestals(const TProfile* profile)
+int TOPASICPedestals::setPedestals(const TProfile* profile, double average)
 {
   int bad = c_WindowSize;
 
@@ -36,7 +36,7 @@ int TOPASICPedestals::setPedestals(const TProfile* profile)
   std::vector<unsigned> values;
   std::vector<unsigned> errors;
   for (int i = 0; i < c_WindowSize; i++) {
-    values.push_back(int(profile->GetBinContent(i + 1) + 0.5));
+    values.push_back(int(profile->GetBinContent(i + 1) + average + 0.5));
     errors.push_back(int(profile->GetBinError(i + 1) + 0.5));
   }
 

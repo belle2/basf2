@@ -50,9 +50,10 @@ namespace Belle2 {
     /**
      * Set pedestals from profile histogram with c_WindowSize bins
      * @param profile profile histogram
+     * @param average optional value to add
      * @return number of pedestals that can not be packed into 16-bit word
      */
-    int setPedestals(const TProfile* profile);
+    int setPedestals(const TProfile* profile, double average = 0);
 
     /**
      * Return ASIC window number

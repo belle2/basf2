@@ -26,26 +26,27 @@ namespace Belle2 {
      * Waveform sample (basic waveform element)
      */
     struct WFSample {
-      float time; /**< time */
-      float adc;  /**< adc value */
-      float err;  /**< uncertainty of adc value */
-
-      /**
-       * Default constructor
-       */
-      WFSample(): time(0), adc(0), err(0)
-      {}
-
-      /**
-       * Full constructor
-       */
-      WFSample(float Time, float ADC, float Err): time(Time), adc(ADC), err(Err)
-      {}
+      float time = 0; /**< time */
+      float adc = 0;  /**< adc value */
+      float err = 0;  /**< uncertainty of adc value */
     };
 
+    /**
+     * Reconstructed hit
+     */
+    struct Hit {
+      float time = 0;    /**< time */
+      float height = 0;  /**< pulse height */
+      float width = 0;   /**< pulse width */
+      float area = 0;    /**< pulse area */
+      float timeErr = 0;    /**< time uncertainty (rms) */
+      float heightErr = 0;  /**< pulse height uncertainty (rms) */
+      float widthErr = 0;   /**< pulse width uncertainty (rms) */
+      float areaErr = 0;    /**< pulse area uncertainty (rms) */
+    };
 
     /**
-     * Default constructor
+     * Default class constructor
      */
     TOPWaveform()
     {}
@@ -62,6 +63,7 @@ namespace Belle2 {
 
     /**
      * Append waveform sample to waveform
+     * @param sample waveform sample
      */
     void appendSample(WFSample sample)
     {
@@ -78,9 +80,18 @@ namespace Belle2 {
      * @param upperThr upper threshold level [number of sigma]
      * @param lowerThr lower threshold level [number of sigma]
      * @param minWidth minimal required width of digital pulse [number of samples]
-     * @return true if at least one digital pulse has width > minWidth
+     * @return number of digital pulses
      */
-    bool setDigital(float upperThr, float lowerThr, int minWidth = 0);
+    int setDigital(float upperThr, float lowerThr, unsigned minWidth = 0);
+
+    /**
+     * Reconstruct hits using CFD method (setDigital must be already called)
+     * (!!! under development !!!)
+     * @param fraction CFD fraction
+     * @param delay CFD delay in number of samples
+     * @return number of hits
+     */
+    int convertToHits(float fraction = 0.2, unsigned delay = 2);
 
     /**
      * Returns quartz bar ID
@@ -104,25 +115,32 @@ namespace Belle2 {
      * Returns waveform size (number of samples)
      * @return number of samples
      */
-    int getSize() const {return m_data.size();}
+    int getSize() const { return m_data.size(); }
 
     /**
      * Returns waveform
      * @return vector of waveform samples
      */
-    const std::vector<WFSample>& getWaveform() const
-    {
-      return m_data;
-    }
+    const std::vector<WFSample>& getWaveform() const {return m_data;}
 
     /**
-     * Returns digital waveform
-     * @return vector of samples over threshold
+     * Returns digital waveform (the result of setDigital)
+     * @return digital waveform
      */
-    const std::vector<bool>& getDigital() const
-    {
-      return m_digital;
-    }
+    const std::vector<bool>& getDigital() const {return m_digital;}
+
+    /**
+     * Returns number of hits (the result of convertToHits)
+     * @return number of hits
+     */
+    int getNumofHits() const {return m_hits.size();}
+
+    /**
+     * Returns reconstructed hits (the result of convertToHits)
+     * @return reconstructed hits
+     */
+    const std::vector<Hit>& getHits() const {return m_hits;}
+
 
   private:
 
@@ -130,8 +148,8 @@ namespace Belle2 {
     int m_pixelID = 0;                  /**< software channel ID */
     unsigned m_channelID = 0;           /**< hardware channel ID */
     std::vector<WFSample> m_data;       /**< waveform samples */
-
-    std::vector<bool> m_digital;        /**< samples over threshold */
+    std::vector<bool> m_digital;        /**< digital waveform (samples over threshold) */
+    std::vector<Hit> m_hits;            /**< reconstructed hits */
 
     ClassDef(TOPWaveform, 1); /**< ClassDef */
 

@@ -106,7 +106,7 @@ class TestLoadGeometry(unittest.TestCase):
         self.assertIs(LoadGeometry(self.resource), None)
         result = MockResource()
         # Adds Geometry
-        result.path.add_module('Geometry', components=['MagneticField'])
+        result.path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
         self.assertEqual(self.resource, result)
 
 

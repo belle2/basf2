@@ -36,9 +36,7 @@ def fitVertex(
     if 'Geometry' in path:
         B2INFO('fitVertex: Geometry already in path')
     else:
-        geometry = register_module('Geometry')
-        geometry.param('components', ['MagneticField'])
-        path.add_module(geometry)
+        path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
     pvfit = register_module('ParticleVertexFitter')
     pvfit.set_name('ParticleVertexFitter_' + list_name)
@@ -377,9 +375,7 @@ def TagV(
     if 'Geometry' in path:
         B2INFO('TagV: Geometry already in path')
     else:
-        geometry = register_module('Geometry')
-        geometry.param('components', ['MagneticField'])
-        path.add_module(geometry)
+        path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)

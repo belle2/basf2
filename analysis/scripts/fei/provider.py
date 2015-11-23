@@ -77,9 +77,7 @@ def LoadGeometry(resource):
     Loads Geometry module
         @param resource object
     """
-    geometry = register_module('Geometry')
-    geometry.param('components', ['MagneticField'])
-    resource.path.add_module(geometry)
+    resource.path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
 
 def LoadParticles(resource):

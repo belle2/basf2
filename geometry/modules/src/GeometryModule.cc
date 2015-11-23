@@ -39,11 +39,23 @@ GeometryModule::GeometryModule()
   addParam("assignRegions", m_assignRegions,
            "If true, automatically assign a Geant4 Region with the name of the "
            "creator to all volumes created by that creator", m_assignRegions);
+  addParam("ignoreIfPresent", m_ignoreIfPresent,
+           "If true this module will silently ignore if the geometry is already "
+           "present and do nothing in that case. If false a B2FATAL will be "
+           "if the geometry was already created before", m_ignoreIfPresent);
 }
 
 void GeometryModule::initialize()
 {
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+  if (geoManager.getTopVolume()) {
+    if (m_ignoreIfPresent) {
+      B2INFO("Geometry already created, skipping");
+      return;
+    } else {
+      B2FATAL("Geometry already created, more than one Geometry module present?");
+    }
+  }
   geoManager.setDetectorComponents(m_components);
   geoManager.setExcludedComponents(m_excluded);
   geoManager.setAdditionalComponents(m_additional);

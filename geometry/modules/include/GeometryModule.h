@@ -36,6 +36,10 @@ namespace Belle2 {
     std::vector<std::string> m_additional;
     /** Whether or not a region should be assigned to all volumes created by a given creator */
     bool m_assignRegions {false};
+    /** Whether or not this module will raise an error if the geometry is
+     * already present. This can be used to add the geometry multiple times if
+     * it's not clear if it's already present in another path */
+    bool m_ignoreIfPresent{false};
   };
 } //Belle2 namespace
 #endif

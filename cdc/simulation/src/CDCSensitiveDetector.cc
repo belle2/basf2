@@ -231,12 +231,11 @@ namespace Belle2 {
       const G4double pos[3] = {posIn.x(), posIn.y(), posIn.z()};
       G4double Bfield[3];
       field->GetFieldValue(pos, Bfield);
-      bool magneticField = true;
-      if (Bfield[0] == 0. && Bfield[1] == 0. &&
-          Bfield[2] == 0.) magneticField = false;
+      m_magneticField = (Bfield[0] == 0. && Bfield[1] == 0. &&
+                         Bfield[2] == 0.) ? false : true;
 #if defined(CDC_DEBUG)
       std::cout << "Bfield= " << Bfield[0] << " " << Bfield[1] << " " << Bfield[2] << std::endl;
-      std::cout << "magneticField= " << magneticField << std::endl;
+      std::cout << "magneticField= " << m_magneticField << std::endl;
 #endif
 
       double distance = 0;
@@ -251,7 +250,7 @@ namespace Belle2 {
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-      if (magneticField) {
+      if (m_magneticField) {
         // Cal. distance assuming helix track (still approximation)
         m_nonUniformField = 1;
         if (Bfield[0] == 0. && Bfield[1] == 0. &&
@@ -473,17 +472,18 @@ namespace Belle2 {
 
           const G4double test = (sint - s1) / s_in_layer;
           if (test < 0. || test > 1.) {
-            B2WARNING("CDCSensitiveDetector: Strange path length: " << "s1=" << " " << s1 << "sint=" << " " << sint << "s_in_layer=" << " " <<
-                      s_in_layer);
+            B2WARNING("CDCSensitiveDetector: Strange path length: " << "s1= " << s1 << " sint= " << sint << " s_in_layer= " << s_in_layer <<
+                      " test= " << test);
           }
-          edep_in_cell = edep * (sint - s1) / s_in_layer;
+          edep_in_cell = edep * std::abs((sint - s1)) / s_in_layer;
 
           const G4ThreeVector x_In(vent[0]*CLHEP::cm, vent[1]*CLHEP::cm, vent[2]*CLHEP::cm);
           const G4ThreeVector x_Out(xint[0]*CLHEP::cm, xint[1]*CLHEP::cm, xint[2]*CLHEP::cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * cm, p_In, posW, x_In, x_Out, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (sint - s1) * CLHEP::cm, pOnTrack, posW, x_In, x_Out,
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, std::abs((sint - s1)) * CLHEP::cm, pOnTrack, posW,
+                     x_In, x_Out,
                      posTrack, lr, newLrRaw, newLr, speed, hitWeight);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
@@ -504,16 +504,17 @@ namespace Belle2 {
 
           const G4double test = (s2 - sint) / s_in_layer;
           if (test < 0. || test > 1.) {
-            B2WARNING("CDCSensitiveDetector: Strange path length: " << "s1=" << " " << s1 << "sint=" << " " << sint << "s_in_layer=" << " " <<
-                      s_in_layer);
+            B2WARNING("CDCSensitiveDetector: Strange path length: " << "s2= " << s2 << " sint= " << sint << " s_in_layer= " << s_in_layer <<
+                      " test= " << test);
           }
-          edep_in_cell = edep * (s2 - sint) / s_in_layer;
+          edep_in_cell = edep * std::abs((s2 - sint)) / s_in_layer;
 
           const G4ThreeVector x_In(vent[0]*CLHEP::cm, vent[1]*CLHEP::cm, vent[2]*CLHEP::cm);
           const G4ThreeVector p_In(momBefore * vent[3], momBefore * vent[4], momBefore * vent[5]);
 
           //          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * cm, p_In, posW, x_In, posOut, posTrack, lr, newLrRaw, newLr, speed);
-          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, (s2 - sint) * CLHEP::cm, pOnTrack, posW, x_In,
+          saveSimHit(layerId, wires[i], trackID, pid, distance, tofBefore, edep_in_cell, std::abs((s2 - sint)) * CLHEP::cm, pOnTrack, posW,
+                     x_In,
                      posOut, posTrack, lr, newLrRaw, newLr, speed, hitWeight);
 #if defined(CDC_DEBUG)
           std::cout << "saveSimHit" << std::endl;
@@ -863,7 +864,7 @@ namespace Belle2 {
                                   const G4int ic, G4double xint[6],
                                   G4double& sint, G4int& iflag)
   {
-    //dead copy of gsim_cdc_cellbound.F in gsim-cdc for Belle (for tentaive use)
+    //~dead copy of gsim_cdc_cellbound.F in gsim-cdc for Belle (for tentaive use)
     //---------------------------------------------------------------------------
     // (Purpose)
     //    calculate intersection of track with cell boundary.
@@ -894,7 +895,10 @@ namespace Belle2 {
     CDCGeometryPar& p_cdc = CDCGeometryPar::Instance();
     G4double div   = p_cdc.nWiresInLayer(layerId);
 
-    //Check if ic1 and ic2 are ok
+    //Check if s1, s2, ic1 and ic2 are ok
+    if (s1 >= s2) {
+      B2ERROR("CDCSensitiveDetector: s1(=" << s1 << ") > s2(=" << s2 << ")");
+    }
     if (std::abs(ic1 - ic2) != 1) {
       if (ic1 == 1 && ic2 == div) {
       } else if (ic1 == div && ic2 == 1) {
@@ -916,6 +920,7 @@ namespace Belle2 {
       double z1 = fw0.z();
       double z2 = bw0.z();
       slant = std::atan2(2.0 * (p_cdc.senseWireR(layerId)) * sinhdel, z1 - z2);
+      //      std::cout << "slant  = " << slant   << std::endl;
 #if defined(CDC_DEBUG)
       std::cout << "nwires = " << p_cdc.nWiresInLayer(layerId) << std::endl;
       std::cout << "nshift = " << p_cdc.nShifts(layerId) << std::endl;
@@ -935,7 +940,17 @@ namespace Belle2 {
     G4double ywf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).y();
     G4double zwf   = (p_cdc.wireForwardPosition(layerId, ic1 - 1)).z();
 
-L100:
+    /*
+    G4double pathl = sqrt((vexit[0] - venter[0]) * (vexit[0] - venter[0])
+        + (vexit[1] - venter[1]) * (vexit[1] - venter[1])
+        + (vexit[2] - venter[2]) * (vexit[2] - venter[2]));
+    std::cout << "app pathl= " << pathl << std::endl;
+    G4double dot = venter[3] * vexit[3] + venter[4] * vexit[4];
+    dot /= sqrt(venter[3] * venter[3] + venter[4] * venter[4]);
+    dot /= sqrt( vexit[3] *  vexit[3] +  vexit[4] *  vexit[4]);
+    if (dot < 0.) std::cout <<"negativedot= " << dot << std::endl;
+    */
+
     //copy arrays
     G4double xx1[6], xx2[6];
     for (int i = 0; i < 6; ++i) {
@@ -949,12 +964,18 @@ L100:
     G4double xfwb, yfwb, zfwb, xfwf, yfwf, zfwf;
     G4double zw = 0.0;
 
+    psi = double(ic2 - ic1) * CLHEP::pi / div;
+    if (ic1 == 1 && ic2 == div) {
+      psi = -CLHEP::pi / div;
+    } else if (ic1 == div && ic2 == 1) {
+      psi =  CLHEP::pi / div;
+    }
+    cospsi = cos(psi);
+    sinpsi = sin(psi);
+
     if (slant == 0.0) {
       mode  = 2;
       theta = 0.;
-      psi    = double(ic2 - ic1) * CLHEP::pi / div;
-      cospsi = cos(psi);
-      sinpsi = sin(psi);
       xfwb   = cospsi * xwb - sinpsi * ywb;
       yfwb   = sinpsi * xwb + cospsi * ywb;
       phi = atan2(yfwb, xfwb);
@@ -962,9 +983,6 @@ L100:
     } else {
       mode = 0;
       theta = slant;
-      psi    = double(ic2 - ic1) * CLHEP::pi / div;
-      cospsi = cos(psi);
-      sinpsi = sin(psi);
       xfwb   = cospsi * xwb - sinpsi * ywb;
       yfwb   = sinpsi * xwb + cospsi * ywb;
       xfwf   = cospsi * xwf - sinpsi * ywf;
@@ -972,32 +990,152 @@ L100:
       zfwb   = zwb;
       zfwf   = zwf;
 
+      //prepare quantities related to the cell-boundary
       G4double vx = xfwf - xfwb;
       G4double vy = yfwf - yfwb;
       G4double vz = zfwf - zfwb;
       G4double vv = sqrt(vx * vx + vy * vy + vz * vz);
-      vx /= vv;
-      vy /= vv;
-      vz /= vv;
+      vx /= vv;  vy /= vv;  vz /= vv;
 
-      if (irTry == 0) {
-        zw   = 0.5 * (xx1[2] + xx2[2]);
-        G4double beta = (zw - zfwb) / vz;
-        G4double xfw  = xfwb + beta * vx;
-        G4double yfw  = yfwb + beta * vy;
-        phi = atan2(yfw, xfw);
-        if (phi < 0.0) phi += 2.*M_PI;
-      } else if (irTry == 1) {
-        phi   = atan2(xx2[1], xx2[0]);
-        if (phi < 0.0) phi += 2.*M_PI;
-        zw = xx2[2];
+      //translate to make the cubic description easier
+      G4double shiftx = (xx1[0] + xx2[0]) * 0.5;
+      G4double shifty = (xx1[1] + xx2[1]) * 0.5;
+      G4double shiftz = (xx1[2] + xx2[2]) * 0.5;
+      G4double shifts = (s1     +     s2) * 0.5;
+      G4double xshft = xx1[0] - shiftx;
+      G4double yshft = xx1[1] - shifty;
+      G4double zshft = xx1[2] - shiftz;
+      G4double sshft = s1     - shifts;
+
+      //approximate the trajectroy by cubic curves
+      G4double pabs1 = sqrt(xx1[3] * xx1[3] + xx1[4] * xx1[4] + xx1[5] * xx1[5]);
+      G4double pabs2 = sqrt(xx2[3] * xx2[3] + xx2[4] * xx2[4] + xx2[5] * xx2[5]);
+      //      std::cout << "pabs1,2= " << pabs1 <<" "<< pabs2 << std::endl;
+
+      G4double a[4] = {0.}, b[4] = {0.}, c[4] = {0.};
+
+      if (m_magneticField) {
+        GCUBS(sshft, xshft, xx1[3] / pabs1, xx2[3] / pabs2, a);
+        GCUBS(sshft, yshft, xx1[4] / pabs1, xx2[4] / pabs2, b);
+        GCUBS(sshft, zshft, xx1[5] / pabs1, xx2[5] / pabs2, c);
       } else {
-        phi   = atan2(xx1[1], xx1[0]);
-        if (phi < 0.0) phi += 2.*M_PI;
-        zw = xx1[2];
+        a[1] = xshft / sshft;
+        b[1] = yshft / sshft;
+        c[1] = zshft / sshft;
       }
-      xx1[2] -= zw;
-      xx2[2] -= zw;
+
+      //calculate an int. point betw. the trajectory and the cell-boundary
+      G4double stry(0.), xtry(0.), ytry(0.), ztry(0.);
+      G4double beta(0.), xfw(0.), yfw(0.);
+      G4double sphi(0.), cphi(0.), dphil(0.), dphih(0.);
+      const G4int maxTrials = 100;
+      const G4double eps = 5.e-4;
+      G4double sl =  sshft;
+      G4double sh = -sshft;
+      G4int i = 0;
+
+      stry = sl;
+      xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
+      ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
+      ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
+      beta = (ztry - zfwb) / vz;
+      xfw  = xfwb + beta * vx;
+      yfw  = yfwb + beta * vy;
+      sphi = (xtry * yfw - ytry * xfw);
+      cphi = (xtry * xfw + ytry * yfw);
+      dphil = atan2(sphi, cphi);
+
+      while (((sh - sl) > eps) && (i < maxTrials)) {
+        stry = 0.5 * (sl + sh);
+        xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
+        ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
+        ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
+        beta = (ztry - zfwb) / vz;
+        xfw  = xfwb + beta * vx;
+        yfw  = yfwb + beta * vy;
+
+        sphi  = (xtry * yfw - ytry * xfw);
+        cphi  = (xtry * xfw + ytry * yfw);
+        dphih = atan2(sphi, cphi);
+
+        if (dphil * dphih > 0.) {
+          sl = stry;
+        } else {
+          sh = stry;
+        }
+        ++i;
+      }
+
+      //      std::cout << "itry= " << i << std::endl;
+      if (i >= maxTrials - 1) {
+        B2WARNING("CDCSensitiveDetector: No intersection ?");
+
+        /*  G4double ds = 1.e-4;
+        G4int imax = (s2 - s1) / ds + 1;
+        G4double rdphimin = DBL_MAX;
+
+        for (i=0; i <= imax; ++i) {
+          stry = sshft + i * ds;
+          xtry = shiftx + a[0] + stry * (a[1] + stry * (a[2] + stry * a[3]));
+          ytry = shifty + b[0] + stry * (b[1] + stry * (b[2] + stry * b[3]));
+          ztry = shiftz + c[0] + stry * (c[1] + stry * (c[2] + stry * c[3]));
+          beta = (ztry - zfwb) / vz;
+          xfw  = xfwb + beta * vx;
+          yfw  = yfwb + beta * vy;
+
+          sphi = (xtry * yfw - ytry * xfw);
+          cphi = (xtry * xfw + ytry * yfw);
+          dphi  = atan2(sphi, cphi);
+          rdphi = sqrt(xfw * xfw + yfw * yfw) * dphi;
+
+          if ( std::abs(rdphi) < std::abs(rdphimin)) {
+            rdphimin = rdphi;
+            imin = i;
+          }
+        }
+        */
+      }
+      //      sint = sshft + imin * ds;
+      sint = stry;
+
+      //      std::cout <<"i,dphil,dphih,sint= " << i <<" "<< dphil <<" "<< dphih <<" "<< sint << std::endl;
+      //get the trajectory at the int. point
+      xint[0] = a[0] + sint * (a[1] + sint * (a[2] + sint * a[3]));
+      xint[1] = b[0] + sint * (b[1] + sint * (b[2] + sint * b[3]));
+      xint[2] = c[0] + sint * (c[1] + sint * (c[2] + sint * c[3]));
+      xint[3] = a[1] + sint * (2. * a[2] + 3. * sint * a[3]);
+      xint[4] = b[1] + sint * (2. * b[2] + 3. * sint * b[3]);
+      xint[5] = c[1] + sint * (2. * c[2] + 3. * sint * c[3]);
+
+      //translate back to the lab. frame
+      xint[0] += shiftx;
+      xint[1] += shifty;
+      xint[2] += shiftz;
+      sint    += shifts;
+      /*
+      std::cout <<"s1,s2,sint= " << s1 <<" "<< s2 <<" "<< sint << std::endl;
+      std::cout <<" xx1= " << xx1[0] <<" "<<  xx1[1] <<" "<<  xx1[2] << std::endl;
+      std::cout <<" xx2= " << xx2[0] <<" "<<  xx2[1] <<" "<<  xx2[2] << std::endl;
+      std::cout <<"xint= " << xint[0] <<" "<< xint[1] <<" "<< xint[2] << std::endl;
+      */
+
+      /*      if (((xx1[0] <= xint[0] && xint[0] <= xx2[0]) ||
+           (xx2[0] <= xint[0] && xint[0] <= xx1[0])) &&
+          ((xx1[1] <= xint[1] && xint[1] <= xx2[1]) ||
+           (xx2[1] <= xint[1] && xint[1] <= xx1[1])) &&
+          ((xx1[2] <= xint[2] && xint[2] <= xx2[2]) ||
+           (xx2[2] <= xint[2] && xint[2] <= xx1[2])) &&
+          (s1     <= sint    && sint    <= s2)) {
+      } else {
+        std::cout << "strangeinttersection" << std::endl;
+      }
+      */
+      //re-normalize to one since abs=1 is not guearanteed in the cubic approx.
+      G4double p = sqrt(xint[3] * xint[3] + xint[4] * xint[4] + xint[5] * xint[5]);
+      xint[3] /= p;  xint[4] /= p;  xint[5] /= p;
+      //      std::cout << "norm= " << p << std::endl;
+      iflag = 1;
+      return;
     }
 
     //rotate to the plane parallele to the x-z plane.
@@ -1009,10 +1147,6 @@ L100:
     //check y position for xx1 & xx2
     G4double yadj = 0.0;
     if (xx1[1]*xx2[1] > 0.0) {
-      if (mode == 0  && irTry <= 1) {
-        irTry += 1;
-        goto L100;
-      }
       yadj = 0.5 * (xx1[1] + xx2[1]);
 
       //      //adjust yadj (cell-boundary), because GIPLAN requires yadj be btw xx2[1] and xx1[1]
@@ -1036,7 +1170,8 @@ L100:
     xx1[1] += yshift;
     xx2[1] += yshift;
     G4double pzint[4];
-    GIPLAN(yc, xx1, xx2, s1, s2, ic, xint, sint, pzint, iflag);
+    const G4int model = m_magneticField ? ic : 2;
+    GIPLAN(yc, xx1, xx2, s1, s2, model, xint, sint, pzint, iflag);
 
     //reverse rotation
     if (iflag == 1) {
@@ -1201,7 +1336,7 @@ L100:
     G4double dx(0), dy(0), dz(0), ds(0), trlen(0);
     G4double shiftx(0), shifty(0), shiftz(0), shifts(0);
     G4double xshft(0), yshft(0), zshft(0), sshft(0), pabs1(0), pabs2(0);
-    G4double dinter(0), term(0);
+    G4double dinter(0), term(0), p(0);
     G4double a[4] = {0}, b[4] = {0}, c[4] = {0};
 
     //Track crossing the plane from above or below ?
@@ -1318,6 +1453,9 @@ L20:
     xint[3] = a[1] + s * (2. * a[2] + 3. * s * a[3]);
     xint[4] = b[1] + s * (2. * b[2] + 3. * s * b[3]);
     xint[5] = c[1] + s * (2. * c[2] + 3. * s * c[3]);
+    //re-normalize to one since abs=1 is not guearanteed in the cubic approx.
+    p = sqrt(xint[3] * xint[3] + xint[4] * xint[4] + xint[5] * xint[5]);
+    xint[3] /= p;  xint[4] /= p;  xint[5] /= p;
 
     //Compute PHIHIT,ZHIT and corresponding derivatives
 
@@ -1337,14 +1475,14 @@ L90:
 
   void CDCSensitiveDetector::GCUBS(const G4double x, const G4double y, const G4double d1, const G4double d2, G4double a[4])
   {
-    //dead copy of GCUBS in Geant3 (for tentative use)
+    //~dead copy of GCUBS in Geant3 (for tentative use)
     //    ******************************************************************
     //    *                                                                *
-    //    *       Calculates a cubic through P1,(-X,Y1),(X,Y2),P2          *
-    //    *       where Y2=-Y1                                             *
+    //    *       Calculates a cubic through P1,(X,Y),(-X,-Y),P2           *
     //    *        Y=A(1)+A(2)*X+A(3)*X**2+A(4)*X**3                       *
     //    *        The coordinate system is assumed to be the cms system   *
     //    *        of P1,P2.                                               *
+    //    *        d1(2): directional cosine at P1(2).                     *
     //    *                                                                *
     //    *    ==>Called by : GIPLAN,GICYL                                 *
     //    *       Author    H.Boerner  *********                           *

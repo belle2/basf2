@@ -301,6 +301,11 @@ namespace Belle2 {
       std::vector<int>  WireId_in_hit_order(int id0, int id1, int nWires);
 
       /**
+       * Magnetic field is on or off.
+       */
+      G4int m_magneticField;
+
+      /**
        * Magnetic field is uniform or non-uniform.
        * 0: uniform B field (1.5 T), 1: non-uniform B field.
        */

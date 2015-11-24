@@ -33,6 +33,7 @@
 #include <G4VisAttributes.hh>
 #include <G4NistManager.hh>
 #include <G4RotationMatrix.hh>
+#include <G4UserLimits.hh>
 #include <iostream>
 
 using namespace std;
@@ -831,6 +832,8 @@ namespace Belle2 {
         G4LogicalVolume* middleSensitiveTube = new G4LogicalVolume(middleSensitiveTubeShape, cdcMedGas,
                                                                    // cppcheck-suppress zerodiv
                                                                    (format("logicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), 0, 0, 0);
+        //hard-coded temporarily
+        middleSensitiveTube->SetUserLimits(new G4UserLimits(8.5 * CLHEP::cm));
         middleSensitiveTube->SetSensitiveDetector(m_sensitive);
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*CLHEP::cm / 2.0), middleSensitiveTube,
                           // cppcheck-suppress zerodiv

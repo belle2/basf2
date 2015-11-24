@@ -387,8 +387,8 @@ namespace Belle2 {
       const EclCM rib4h = (rib1ri - k_barCryOuterQ) - k_barCryMargin - gap4;
       const EclCM rib4z1 = k_barSupBackFarZ + 10.5 * CLHEP::cm + 1.8 * CLHEP::cm;
       const EclCM rib4z2 = k_barSupForwFarZ - 9.0 * CLHEP::cm - 1.0 * CLHEP::cm;
-      //const EclCM rib4ro = rib1ri; // LEP: move inward by 0.82mm to avoid eclBarrelCrystalSector--eclBarrelOuterSector boundary
-      const EclCM rib4ro = rib1ri - 0.82 * CLHEP::mm;
+      //const EclCM rib4ro = rib1ri; // LEP: move inward by 0.821mm to avoid eclBarrelCrystalSector--eclBarrelOuterSector boundary
+      const EclCM rib4ro = rib1ri - 0.821 * CLHEP::mm;
       const EclCM rib4ri = rib4ro - rib4h;
       const EclRad ribdp4 = rib4w / ((rib4ro + rib4ri) / 2.0);
 
@@ -540,9 +540,9 @@ namespace Belle2 {
       crystalContainer_I[1] += 0.35 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
       crystalContainer_I[2] += 0.35 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
       crystalContainer_I[3] = crystalContainer_I[4] = ri;
-      crystalContainer_I[5] += 0.33 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
-      crystalContainer_I[6] += 0.33 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
-      crystalContainer_I[7] += 0.33 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
+      crystalContainer_I[5] += 0.34 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
+      crystalContainer_I[6] += 0.34 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
+      crystalContainer_I[7] += 0.34 * CLHEP::mm; // to avoid corner-clipping of tilted sector with its container
       for (int j = 0; j < 8; ++j) crystalContainer_O[j] = ro;
       G4Transform3D TrSector = G4RotateZ3D(brphitiltphi - 0.5 * dPhi) * G4Translate3D(Q2);
       G4Transform3D TrSectorInverse = G4Translate3D(-Q2) * G4RotateZ3D(0.5 * dPhi - brphitiltphi);

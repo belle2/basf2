@@ -192,6 +192,28 @@ namespace Belle2 {
       return abs(z0_daughters[1] - z0_daughters[0]);
     }
 
+    double ImpactXY(const Particle* particle)
+    {
+      double px = particle->getPx();
+      double py = particle->getPy();
+
+      if (py == py && px == px) {
+
+        double x = particle->getX() - 0;
+        double y = particle->getY() - 0;
+
+        double pt = sqrt(px * px + py * py);
+
+//       const TVector3 m_BeamSpotCenter = TVector3(0., 0., 0.);
+//       TVector3 Bfield= BFieldMap::Instance().getBField(m_BeamSpotCenter); # TODO check why this produces a linking bug
+
+        double a = -0.2998 * 1.5 * particle->getCharge(); //Curvature of the track,
+        double T = TMath::Sqrt(pt * pt - 2 * a * (x * py - y * px) + a * a * (x * x + y * y));
+
+        return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
+      } else return 0;
+    }
+
 // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -1131,6 +1153,7 @@ namespace Belle2 {
                       "cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
     REGISTER_VARIABLE("VertexZDist", VertexZDist,
                       "Z-distance of two daughter tracks at vertex point");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
     REGISTER_VARIABLE("distance", particleDistance,
                       "3D distance relative to interaction point");

@@ -71,9 +71,9 @@ class FlavorTaggerInfoFiller(Module):
                     categoryProb = 0.0
                 else:
                     # Prob of being the right target
-                    targetProb = particle.getExtraInfo('IsRightTrack(' + category + ')')
+                    targetProb = particle.getExtraInfo('isRightTrack(' + category + ')')
                     # Prob of belonging to a cat
-                    categoryProb = particle.getExtraInfo('IsRightCategory(' + category + ')')
+                    categoryProb = particle.getExtraInfo('isRightCategory(' + category + ')')
 
     # Save information in the FlavorTagInfo DataObject
                 FlavorTaggerInfo.setTrack(track)
@@ -210,73 +210,73 @@ AvailableCategories = {
         'e+:ElectronROE',
         'Electron',
         'Electron',
-        'QrOf(e+:ElectronROE, IsRightCategory(Electron), IsRightTrack(Electron))',
+        'QrOf(e+:ElectronROE, isRightCategory(Electron), isRightTrack(Electron))',
         0],
     'IntermediateElectron': [
         'e+:IntermediateElectronROE',
         'IntermediateElectron',
         'IntermediateElectron',
-        'QrOf(e+:IntermediateElectronROE, IsRightCategory(IntermediateElectron), IsRightTrack(IntermediateElectron))',
+        'QrOf(e+:IntermediateElectronROE, isRightCategory(IntermediateElectron), isRightTrack(IntermediateElectron))',
         1],
     'Muon': [
         'mu+:MuonROE',
         'Muon',
         'Muon',
-        'QrOf(mu+:MuonROE, IsRightCategory(Muon), IsRightTrack(Muon))',
+        'QrOf(mu+:MuonROE, isRightCategory(Muon), isRightTrack(Muon))',
         2],
     'IntermediateMuon': [
         'mu+:IntermediateMuonROE',
         'IntermediateMuon',
         'IntermediateMuon',
-        'QrOf(mu+:IntermediateMuonROE, IsRightCategory(IntermediateMuon), IsRightTrack(IntermediateMuon))',
+        'QrOf(mu+:IntermediateMuonROE, isRightCategory(IntermediateMuon), isRightTrack(IntermediateMuon))',
         3],
     'KinLepton': [
         'mu+:KinLeptonROE',
         'KinLepton',
         'KinLepton',
-        'QrOf(mu+:KinLeptonROE, IsRightCategory(KinLepton), IsRightTrack(KinLepton))',
+        'QrOf(mu+:KinLeptonROE, isRightCategory(KinLepton), isRightTrack(KinLepton))',
         4],
     'Kaon': [
         'K+:KaonROE',
         'Kaon',
         'Kaon',
-        'InputQrOf(K+:KaonROE, IsRightCategory(Kaon), IsRightTrack(Kaon))',
+        'weightedQrOf(K+:KaonROE, isRightCategory(Kaon), isRightTrack(Kaon))',
         5],
     'SlowPion': [
         'pi+:SlowPionROE',
         'SlowPion',
         'SlowPion',
-        'QrOf(pi+:SlowPionROE, IsRightCategory(SlowPion), IsRightTrack(SlowPion))',
+        'QrOf(pi+:SlowPionROE, isRightCategory(SlowPion), isRightTrack(SlowPion))',
         6],
     'FastPion': [
         'pi+:FastPionROE',
         'FastPion',
         'FastPion',
-        'QrOf(pi+:FastPionROE, IsRightCategory(FastPion), IsRightTrack(FastPion))',
+        'QrOf(pi+:FastPionROE, isRightCategory(FastPion), isRightTrack(FastPion))',
         7],
     'Lambda': [
         'Lambda0:LambdaROE',
         'Lambda',
         'Lambda',
-        'InputQrOf(Lambda0:LambdaROE, IsRightCategory(Lambda), IsRightTrack(Lambda))',
+        'weightedQrOf(Lambda0:LambdaROE, isRightCategory(Lambda), isRightTrack(Lambda))',
         8],
     'FSC': [
         'pi+:SlowPionROE',
         'SlowPion',
         'FSC',
-        'QrOf(pi+:SlowPionROE, IsRightCategory(FSC), IsRightTrack(SlowPion))',
+        'QrOf(pi+:SlowPionROE, isRightCategory(FSC), isRightTrack(SlowPion))',
         9],
     'MaximumPstar': [
         'pi+:MaximumPstarROE',
         'MaximumPstar',
         'MaximumPstar',
-        'QrOf(pi+:MaximumPstarROE, IsRightCategory(MaximumPstar), IsRightTrack(MaximumPstar))',
+        'QrOf(pi+:MaximumPstarROE, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
         10],
     'KaonPion': [
         'K+:KaonROE',
         'Kaon',
         'KaonPion',
-        'QrOf(K+:KaonROE, IsRightCategory(KaonPion), IsRightTrack(Kaon))',
+        'QrOf(K+:KaonROE, isRightCategory(KaonPion), isRightTrack(Kaon))',
         11],
 }
 
@@ -351,8 +351,8 @@ variables['Electron'] = [
     'eid_dEdx',
     'eid_TOP',
     'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(p_missing_CMS)',
-    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(pMissCMS)',
+    'SemiLeptonicVariables(cosThetaMissCMS)',
     'SemiLeptonicVariables(EW90)',
     'eid_ARICH',
     'eid_ECL',
@@ -368,8 +368,8 @@ variables['Muon'] = [
     'muid_dEdx',
     'muid_TOP',
     'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(p_missing_CMS)',
-    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(pMissCMS)',
+    'SemiLeptonicVariables(cosThetaMissCMS)',
     'SemiLeptonicVariables(EW90)',
     'muid_ARICH',
     'chiProb',
@@ -384,8 +384,8 @@ variables['KinLepton'] = [
     'muid_dEdx',
     'muid_TOP',
     'SemiLeptonicVariables(recoilMass)',
-    'SemiLeptonicVariables(p_missing_CMS)',
-    'SemiLeptonicVariables(CosTheta_missing_CMS)',
+    'SemiLeptonicVariables(pMissCMS)',
+    'SemiLeptonicVariables(cosThetaMissCMS)',
     'SemiLeptonicVariables(EW90)',
     'muid_ARICH',
     'eid',
@@ -432,8 +432,8 @@ variables['Lambda'] = [
     'M',
     'cosAngleBetweenMomentumAndVertexVector',
     'lambdaZError',
-    'MomentumOfSecondDaughter',
-    'MomentumOfSecondDaughter_CMS',
+    'momentumOfSecondDaughter',
+    'momentumOfSecondDaughterCMS',
     'useCMSFrame(p)',
     'p',
     'chiProb',
@@ -441,9 +441,9 @@ variables['Lambda'] = [
 ]
 
 # Only for Event Level
-variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, IsRightTrack(Kaon))',
-                         'HighestProbInCat(pi+:SlowPionROE, IsRightTrack(SlowPion))',
-                         'cosKaonPion', 'KaonPionHaveOpositeCharges', 'Kid']
+variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, isRightTrack(Kaon))',
+                         'HighestProbInCat(pi+:SlowPionROE, isRightTrack(SlowPion))',
+                         'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', 'Kid']
 
 variables['MaximumPstar'] = [
     'useCMSFrame(p)',
@@ -458,11 +458,42 @@ variables['FSC'] = [
     'useCMSFrame(p)',
     'cosTPTO',
     'Kid',
-    'FSCVariables(p_CMS_Fast)',
+    'FSCVariables(pFastCMS)',
     'FSCVariables(cosSlowFast)',
-    'FSCVariables(cosTPTO_Fast)',
+    'FSCVariables(cosTPTOFast)',
     'FSCVariables(SlowFastHaveOpositeCharges)',
 ]
+
+
+class ShowNaN(Module):
+
+    def __init__(self, particleList, category, position):
+        super(ShowNaN, self).__init__()
+        self.particleList = particleList
+        self.category = category
+        self.position = position
+
+    def event(self):
+        self.return_value(0)
+        NumberOfNaNs = 0
+        B2INFO("#######Position is:" + self.position + " ########")
+        # for (particleList, category) in TrackLevelParticleLists:
+        plist = Belle2.PyStoreObj(self.particleList)
+        for i in range(0, plist.obj().getListSize()):
+            particle = plist.obj().getParticle(i)
+            for variable in variables[self.category]:
+                var = mc_variables.variables.evaluate(variable, particle)
+                # if particleList == 'Lambda0:LambdaROE':
+                if var != var:
+                    NumberOfNaNs += 1
+                    particleNo = "%d" % i
+                    B2ERROR(self.particleList + " Particle = " + particleNo + " " + variable + " " + "= nan")
+                else:
+                    continue
+        if NumberOfNaNs > 0:
+            NumberOfNaNs = "%d" % NumberOfNaNs
+            B2ERROR("NumberOfNaNs = " + NumberOfNaNs)
+            self.return_value(1)
 
 
 def FillParticleLists(mode='Expert', path=analysis_main):
@@ -528,13 +559,16 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
         exec('%s = %s' % (TrackLevelPath, 'create_path()'))
         exec('TrackLevelPathsList["' + category + '"]=%s' % TrackLevelPath)
 
+        ShowNaNs = ShowNaN(particleList, category, "Starting Event Level")
+        path.add_module(ShowNaNs)
+
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.param('particleLists', particleList)
         SkipEmptyParticleList.if_true(TrackLevelPathsList[category], AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
         methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
-        targetVariable = 'IsRightTrack(' + category + ')'
+        targetVariable = 'isRightTrack(' + category + ')'
 
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixTrackLevel):
             if mode == 'Expert':
@@ -601,7 +635,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
         path.add_module(SkipEmptyParticleList)
 
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
-        targetVariable = 'IsRightCategory(' + category + ')'
+        targetVariable = 'isRightCategory(' + category + ')'
 
         if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixEventLevel):
             if mode == 'Expert':
@@ -692,21 +726,21 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
             # Cuts to extract the target particle with the highest probability for each ParticleList
             # This is needed for FlavorTaggerInfoFiller
             for (particleList, category) in EventLevelParticleLists:
-                methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
-                targetVariable = 'IsRightCategory(' + category + ')'
+                # methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
+                targetVariable = 'isRightCategory(' + category + ')'
 
                 if category == 'KaonPion':
                     applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'IsRightTrack(Kaon)) > 0.5', path=path)
+                              'isRightTrack(Kaon)) > 0.5', path=path)
                 elif category == 'FSC':
                     applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'IsRightTrack(SlowPion)) > 0.5', path=path)
+                              'isRightTrack(SlowPion)) > 0.5', path=path)
                 elif category == 'Lambda':
                     applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'IsRightTrack(Lambda)) > 0.5', path=path)
+                              'isRightTrack(Lambda)) > 0.5', path=path)
                 else:
                     applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'IsRightTrack(' + category + ')) > 0.5', path=path)
+                              'isRightTrack(' + category + ')) > 0.5', path=path)
 
         return True
 
@@ -737,11 +771,11 @@ def FlavorTagger(
       This function can be used to train or to test the FlavorTagger: The available modes are "Teacher" or "Expert".
     """
 
-    # Directory where the weights of the trained Methods are saved
-    # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
-
     if mode != 'Teacher' and mode != 'Expert':
         B2FATAL('FlavorTagger: Wrong mode given: The available modes are "Teacher" or "Expert"')
+
+    # Directory where the weights of the trained Methods are saved
+    # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
     if not Belle2.FileSystem.findFile(workingDirectory):
         B2FATAL('FlavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')

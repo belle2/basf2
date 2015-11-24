@@ -66,9 +66,11 @@ namespace Belle2 {
         m_input[i] = m_variables[i]->function(particle);
       }
 
-      for (unsigned int i = 0; i < m_spectators.size(); ++i) {
-        m_input[i + m_variables.size()] = m_spectators[i]->function(particle);
-      }
+      // We do not fill the spectators, because they're not used anyway by EvaluateMVA
+      // and the spectators may contain variables which need MC information, which is not available on real data
+      //for (unsigned int i = 0; i < m_spectators.size(); ++i) {
+      //  m_input[i + m_variables.size()] = m_spectators[i]->function(particle);
+      //}
 
       return _analyse();
 

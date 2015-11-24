@@ -87,12 +87,12 @@ def add_packers(path, components=None):
         path.add_module(svdpacker)
 
     # CDC (parameters from cdc_packer_unpacker.py)
-    if components is None or 'CDC' in components:
-        cdc_mapping_file = "../../cdc/data/ch_map.dat"
-        cdcpacker = register_module('CDCPacker')
-        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcpacker.param('cdcHitName', "CDCHits")
-        path.add_module(cdcpacker)
+#    if components is None or 'CDC' in components:
+#        cdc_mapping_file = "../../cdc/data/ch_map.dat"
+#        cdcpacker = register_module('CDCPacker')
+#        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
+#        cdcpacker.param('cdcHitName', "CDCHits")
+#        path.add_module(cdcpacker)
 
     # TOP
     if components is None or 'TOP' in components:
@@ -105,9 +105,9 @@ def add_packers(path, components=None):
         path.add_module(arichpacker)
 
     # BKLM
-    if components is None or 'BKLM' in components:
-        bklmpacker = register_module('BKLMRawPacker')
-        path.add_module(bklmpacker)
+#    if components is None or 'BKLM' in components:
+#        bklmpacker = register_module('BKLMRawPacker')
+#        path.add_module(bklmpacker)
 
 
 def add_unpackers(path, components=None):
@@ -131,14 +131,14 @@ def add_unpackers(path, components=None):
         path.add_module(svdunpacker)
 
     # CDC (parameters from cdc_packer_unpacker.py)
-    if components is None or 'CDC' in components:
-        cdc_mapping_file = "../../cdc/data/ch_map.dat"
-        cdc_hits_pack_unpack_collection = "CDCHits_test_output"
-        cdcunpacker = register_module('CDCUnpacker')
-        cdcunpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcunpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
-        cdcunpacker.param('enablePrintOut', False)
-        path.add_module(cdcunpacker)
+#    if components is None or 'CDC' in components:
+#        cdc_mapping_file = "../../cdc/data/ch_map.dat"
+#        cdc_hits_pack_unpack_collection = "CDCHits_test_output"
+#        cdcunpacker = register_module('CDCUnpacker')
+#        cdcunpacker.param('xmlMapFileName', cdc_mapping_file)
+#        cdcunpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
+#        cdcunpacker.param('enablePrintOut', False)
+#        path.add_module(cdcunpacker)
 
     # TOP
     if components is None or 'TOP' in components:
@@ -151,9 +151,9 @@ def add_unpackers(path, components=None):
         path.add_module(arichunpacker)
 
     # BKLM
-    if components is None or 'BKLM' in components:
-        bklmunpacker = register_module('BKLMUnpacker')
-        path.add_module(bklmunpacker)
+#    if components is None or 'BKLM' in components:
+#        bklmunpacker = register_module('BKLMUnpacker')
+#        path.add_module(bklmunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

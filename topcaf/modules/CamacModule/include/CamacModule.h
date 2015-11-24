@@ -49,17 +49,15 @@ namespace Belle2 {
   private:
     std::string m_in_filename;
     std::ifstream m_input_file;
-    char temp_buffer[sizeof(packet_word_t) * 1280];
+    // char temp_buffer[sizeof(packet_word_t) * 1280];
     int m_current_pos;
 
-    int unix_time_sec, unix_time_msec;
     StoreObjPtr<CamacData> m_camac_data;
 
     int AlignEvtno(int evtno_req, int& evtno_read);
     //  std::map< unsigned int, CamacData* > m_evt2camac;
     std::multimap<int, unsigned short> m_3377wmap;
 
-    short m_c3377nhit;
     short m_c3377tdc[1024];
     short m_c3377lt[1024];
     short m_c3377ch[1024];

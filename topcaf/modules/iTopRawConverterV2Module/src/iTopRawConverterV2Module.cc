@@ -280,23 +280,26 @@ int iTopRawConverterV2Module::FindNextPacket()
     unsigned int packet_length = *((unsigned int*)(m_temp_buffer));
 
     //Grab the rest of the packet
-    int ndata = (packet_length - 1) * sizeof(packet_word_t);
+    size_t ndata = (packet_length - 1) * sizeof(packet_word_t);
+    // FIXME magic number, cf header file
     if (ndata > 1280) {
       B2WARNING("Large payload: " << ndata << " ... skipping!");
       return -1;
     }
 
-    char temp_buffer1[ndata];
-    m_input_file.read((char*) temp_buffer1, ndata);
-    unsigned int* packet_type = (unsigned int*)(&temp_buffer1[0]);
+    unsigned int temp_buffer1[ndata];
+    for (size_t i = 0; i < ndata; ++i) {
+      m_input_file >> temp_buffer1[i];
+    }
+    unsigned int* packet_type = &temp_buffer1[0];
 
     if (*packet_type == PACKET_TYPE_EVENT) {
       type = 1;
-      m_EvtPacket = new EventHeaderPacket((unsigned int*) temp_buffer1,
+      m_EvtPacket = new EventHeaderPacket(temp_buffer1,
                                           ndata / sizeof(packet_word_t));
     } else if (*packet_type == PACKET_TYPE_WAVEFORM) {
       type = 2;
-      m_WfPacket = new EventWaveformPacket((unsigned int*) temp_buffer1,
+      m_WfPacket = new EventWaveformPacket(temp_buffer1,
                                            ndata / sizeof(packet_word_t));
     }
 
@@ -305,7 +308,7 @@ int iTopRawConverterV2Module::FindNextPacket()
     this_checksum += PACKET_HEADER;
     this_checksum += packet_length;
     for (unsigned int i = 0; i < (packet_length - 1); i++) {
-      this_checksum += *((unsigned int*)(&temp_buffer1[i * sizeof(packet_word_t)]));
+      this_checksum += temp_buffer1[i * sizeof(packet_word_t)];
     }
 
     m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
@@ -319,4 +322,3 @@ int iTopRawConverterV2Module::FindNextPacket()
   // End of PACKET_HEADER check
   return -1;
 }
-

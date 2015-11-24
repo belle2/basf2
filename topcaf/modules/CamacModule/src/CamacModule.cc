@@ -17,7 +17,7 @@ using namespace Belle2;
 
 REG_MODULE(Camac);
 //Constructor
-CamacModule::CamacModule() : Module(), m_c3377nhit(0)
+CamacModule::CamacModule() : Module()
 {
 
   setDescription("This module is used to read auxliary CAMAC data for itop test beams.  Almost always needed for older versions of the electronics to get the FTSW timing.");

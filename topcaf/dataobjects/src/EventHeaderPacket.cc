@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(EventHeaderPacket)
-
 EventHeaderPacket::EventHeaderPacket(): Packet() {}
 
 EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,

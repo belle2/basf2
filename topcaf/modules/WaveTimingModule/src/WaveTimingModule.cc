@@ -14,20 +14,22 @@ REG_MODULE(WaveTiming);
 
 const int channel_samples = 4096;
 
-WaveTimingModule::WaveTimingModule() : Module()
+WaveTimingModule::WaveTimingModule() : HistoModule()
 {
   setDescription("This module calculates the timing of itop raw waveform event data");
   addParam("time2TDC", m_time2tdc, "Conversion factor to match iTOPDigit time scale [time unit/ns]", 40.0);
-
-
 }
 
 
 WaveTimingModule::~WaveTimingModule() {}
 
+void WaveTimingModule::defineHisto()
+{
+  m_occupancy = new TH2F("WaveFormOccupancy", "WaveFormOccupancy", 64, 1, 65, 8, 1, 9);
+}
+
 void WaveTimingModule::initialize()
 {
-
   m_topdigits_ptr.registerInDataStore();
   m_fraction = 0.4;
   m_time_delay = 15;
@@ -35,6 +37,7 @@ void WaveTimingModule::initialize()
   m_crude_time = 0;
   m_cf_time = 0;
   m_tmp_h = new TH1D("wave_h", "wave_h", channel_samples, 0, channel_samples);
+  REG_HISTOGRAM
 }
 
 void WaveTimingModule::beginRun()
@@ -70,7 +73,7 @@ void WaveTimingModule::event()
     //Look over all waveforms
     for (int w = 0; w < evtwaves_ptr.getEntries(); w++) {
 
-      unsigned int channel_id = evtwaves_ptr[w]->GetChannelID();
+      unsigned int hardwareID = evtwaves_ptr[w]->GetChannelID();
       //double win_time_shift = evtwaves_ptr[w]->GetTime();
       std::vector< double > v_samples = evtwaves_ptr[w]->GetSamples();
       int refwin = evtwaves_ptr[w]->GetRefWindow();
@@ -134,18 +137,18 @@ void WaveTimingModule::event()
 
       StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
       if (topconfig_ptr) {
-        channelID = topconfig_ptr->hardwareID_to_pixelNumber(channel_id);
+        channelID = topconfig_ptr->hardwareID_to_pixelNumber(hardwareID);
       } else {
         B2WARNING("ITOP channel mapping not found, TOPDigit channel IDs will be incorrect.");
       }
       double time = (ftsw - coarse_t + at40_t* sample_dt);
       int TDC = (int)(time * m_time2tdc);
-      B2INFO("ChannelID: " << channelID << "\tHardwareID: " << channel_id << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<
+      B2INFO("ChannelID: " << channelID << "\tHardwareID: " << hardwareID << "\t TDC(): " <<   TDC << "=(" << ftsw << "-" << coarse_t <<
              "+" << at40_t << "*" <<  sample_dt << ")*" << m_time2tdc);
       //Create TOPDIGIT
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);
-      this_topdigit->setHardwareChannelID(channel_id);
+      this_topdigit->setHardwareChannelID(hardwareID);
 
       //Update EventWaveForm for Sample-to-Sample correction
       evtwaves_ptr[w]->SetTime(at40_t* sample_dt);

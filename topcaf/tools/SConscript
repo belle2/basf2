@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['analyzeWave'] = ['framework', 'topcaf_dataobjects', '$ROOT_LIBS', 'TreePlayer'];
+Return('env')

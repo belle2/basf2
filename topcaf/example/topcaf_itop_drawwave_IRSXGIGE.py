@@ -3,15 +3,16 @@
 
 from basf2 import *
 import argparse
+import os.path as path
 
 parser = argparse.ArgumentParser(description='Go through a data file, apply calibration, and write the waveforms to a root file.',
                                  usage='%(prog)s [options]')
 
 parser.add_argument(
     '--inputRun',
-    metavar='InputRun (i.e. file name = InputRun.dat)',
+    metavar='InputRun (i.e. file name = InputRun.bin)',
     required=True,
-    help='the root name for the input data files.  myInputRun.dat would have a root name of myInputRun. REQUIRED')
+    help='the root name for the input data files.  myInputRun.bin would have a root name of myInputRun. REQUIRED')
 
 parser.add_argument('--inputDir', metavar='InputDirectory (path)', required=True,
                     help='the path to the data files (IRS and CAMAC) used for the analysis. This parameter is REQUIRED.')
@@ -30,14 +31,22 @@ parser.add_argument(
 parser.add_argument('--Output', metavar='Output File (path/filename)',
                     help='the output file name.  A default based on the input will be created if this argument is not supplied')
 
+
+parser.add_argument(
+    '-t',
+    '--topConfiguration',
+    required=False,
+    default=path.realpath('../data/TopConfigurations.root'),
+    help="Path name of top configuration root file, e.g. ../data/TopConfigurations.root")
+
 args = parser.parse_args()
 
 if args.ped:
-    print 'pedestal file = ' + args.ped
+    print('pedestal file = ' + args.ped)
 else:
-    print 'using conditions service for pedestal calibration'
+    print('using conditions service for pedestal calibration')
 
-print 'data file     = ' + args.inputDir + args.inputRun + '.dat'
+print('data file     = ' + path.join(args.inputDir, 'rawdata', args.inputRun + '.bin'))
 # print 'camac file    = ' + args.inputDir + args.inputRun + '.cmc'
 
 WriteFile = 1
@@ -45,7 +54,7 @@ if args.Output:
     OutputFile = args.Output
 else:
     OutputFile = args.inputRun + '_drawwave.root'
-print 'Writing output root file to ' + OutputFile
+print('Writing output root file to ' + OutputFile)
 
 histomanager = register_module("HistoManager")
 
@@ -66,10 +75,11 @@ outputDict = {'outputFileName': OutputFile}
 output.param(outputDict)
 
 # register topcaf modules
-# itopconfig = register_module('TopConfiguration')
+itopconfig = register_module('TopConfiguration')
+itopconfig.param('filename', args.topConfiguration)
 itopeventconverter = register_module('iTopRawConverterV2')
-evtconvDict = {'inputDirectory': args.inputDir,
-               'inputFileName': args.inputRun + '.dat'}
+evtconvDict = {'inputDirectory': path.join(args.inputDir, 'rawdata/'),
+               'inputFileName': args.inputRun + '.bin'}
 itopeventconverter.param(evtconvDict)
 itopeventconverter.param('scrod', 16)
 itopeventconverter.param('carrier', 0)
@@ -85,7 +95,7 @@ else:
     pedmodule.param('conditions', 1)
 
 camacconverter = register_module('Camac')
-camacDict = {'inputFilename': args.inputDir + args.inputRun + ".cmc",
+camacDict = {'inputFilename': path.join(args.inputDir, 'camac', args.inputRun+".camac"),
 
              #             'crateID': 13369927,  # leps june 2013 itop test beam
              #             'ftswSlot': 7,  # leps june 2013 itop test beam
@@ -123,7 +133,7 @@ main.add_module(histomanager)
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 # main.add_module(conditions)
-# main.add_module(itopconfig)
+main.add_module(itopconfig)
 main.add_module(itopeventconverter)
 main.add_module(pedmodule)
 main.add_module(camacconverter)

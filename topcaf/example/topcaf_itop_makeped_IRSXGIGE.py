@@ -41,14 +41,14 @@ parser.add_argument('--IOVf', metavar='Run_final', default='NULL',
 
 args = parser.parse_args()
 
-print 'data file     = ' + args.inputDir + args.inputRun + '.dat'
+print('data file     = ' + args.inputDir + args.inputRun + '.bin')
 
 if args.Conditions:
-    print 'Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' \
-        + args.IOVf
+    print('Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' +
+          args.IOVf)
     Conditions = 1
 else:
-    print 'Not using conditions service.'
+    print('Not using conditions service.')
     Conditions = 0
 
 WriteFile = 1
@@ -56,7 +56,7 @@ if args.Output:
     OutputFile = args.Output
 else:
     OutputFile = args.inputRun + '_PedestalCalibration.root'
-print 'Writing output calibration file to ' + OutputFile
+print('Writing output calibration file to ' + OutputFile)
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')
@@ -64,7 +64,7 @@ eventinfoprinter = register_module('EventInfoPrinter')
 # register topcaf modules
 
 itopeventconverter = register_module('iTopRawConverterV2')
-itopeventconverter.param('inputFileName', args.inputRun + '.dat')
+itopeventconverter.param('inputFileName', args.inputRun + '.bin')
 itopeventconverter.param('inputDirectory', args.inputDir)
 itopeventconverter.param('scrod', 16)
 itopeventconverter.param('carrier', 0)

@@ -4,8 +4,6 @@
 
 using namespace Belle2;
 
-ClassImp(EventWaveformPacket)
-
 EventWaveformPacket::EventWaveformPacket() : Packet() {}
 
 EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
@@ -56,7 +54,9 @@ void EventWaveformPacket::SetSamples(std::vector< double > samples)
   m_nsamples = samples.size();
 }
 
-EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp) : Packet()
+EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp)
+  : Packet()
+  , v_samples(in_wp.v_samples)
 {
 
   //From packet
@@ -74,7 +74,6 @@ EventWaveformPacket::EventWaveformPacket(const EventWaveformPacket& in_wp) : Pac
   m_asic_row = in_wp.m_asic_row;
   m_asic_col = in_wp.m_asic_col;
   m_nsamples = in_wp.m_nsamples;
-  v_samples = in_wp.v_samples;
   //Reco
   m_time = in_wp.m_time;
   m_amp = in_wp.m_amp;

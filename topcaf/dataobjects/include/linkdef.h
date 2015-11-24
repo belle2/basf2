@@ -1,4 +1,4 @@
-#ifdef __CINT__
+#ifdef __MAKECINT__
 
 #pragma link off all globals;
 #pragma link off all classes;

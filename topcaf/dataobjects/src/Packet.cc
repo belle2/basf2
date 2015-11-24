@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-ClassImp(Packet)
-
 Packet::Packet()
 {
   m_type = -1;

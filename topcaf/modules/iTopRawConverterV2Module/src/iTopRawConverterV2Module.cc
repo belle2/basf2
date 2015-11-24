@@ -19,15 +19,15 @@ iTopRawConverterV2Module::iTopRawConverterV2Module() : Module()
   addParam("scrod", m_scrod, "Scrod read out.");
   addParam("boardstack", m_module, "Boardstack read out.");
 
-  m_WfPacket = NULL;
-  m_EvtPacket = NULL;
+  m_WfPacket = nullptr;
+  m_EvtPacket = nullptr;
 }
 
 iTopRawConverterV2Module::~iTopRawConverterV2Module()
 {
-  if (m_WfPacket != NULL)
+  if (m_WfPacket != nullptr)
     delete m_WfPacket;
-  if (m_EvtPacket != NULL)
+  if (m_EvtPacket != nullptr)
     delete m_EvtPacket;
 
   m_input_file.close();
@@ -246,14 +246,14 @@ EventWaveformPacket* iTopRawConverterV2Module::GetWaveformPacket()
 int iTopRawConverterV2Module::FindNextPacket()
 {
   //Erase previous packet object
-  if (m_WfPacket != NULL) {
+  if (m_WfPacket != nullptr) {
     delete m_WfPacket;
-    m_WfPacket = NULL;
+    m_WfPacket = nullptr;
   }
 
-  if (m_EvtPacket != NULL) {
+  if (m_EvtPacket != nullptr) {
     delete m_EvtPacket;
-    m_EvtPacket = NULL;
+    m_EvtPacket = nullptr;
   }
 
   //Check file and if not at End-Of-File

@@ -16,7 +16,6 @@ root [0] .x CreateTopConfigurations.C+
 
 void CreateTopConfigurations(void){
 
-  const unsigned int NumberOfTopModules = 1;
   const unsigned int NumberOfPixels = 512;
 
   std::string outputFile = "../data/TopConfigurations.root";
@@ -30,14 +29,15 @@ void CreateTopConfigurations(void){
   TopElectronicConstructionName June2013LepsConstruction("June2013LEPSConstruction1");
   TopModuleElectronicConstructions.push_back(June2013LepsConstruction);
 
+  TopElectronicConstructionName ModuleC01Construction("ModuleC01");
+  TopModuleElectronicConstructions.push_back(ModuleC01Construction);
+
   TopElectronicRefMap ElectronicModuletoScrod;
   TopElectronicRetMap ScrodtoElectronicModule;
   TopUnsignedMap   ScrodtoElectronicModuleNumber;
   for(vector<TopElectronicConstructionName>::const_iterator i = TopModuleElectronicConstructions.begin();
       i!=TopModuleElectronicConstructions.end();
       ++i){
-
-    TopElectronicConstructionName name = *i;
 
     if( (*i) == CRTHybridConstruction ){
       ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 67;
@@ -51,6 +51,13 @@ void CreateTopConfigurations(void){
       ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 35;
       ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 32;
       ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 37;
+    }
+
+    if ( (*i) == ModuleC01Construction ) {
+	ElectronicModuletoScrod[TopElectronicModule(*i,0)] = 14;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,1)] = 15;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,2)] = 16;
+      	ElectronicModuletoScrod[TopElectronicModule(*i,3)] = 13;
     }
     
     ScrodtoElectronicModuleNumber[ElectronicModuletoScrod[TopElectronicModule(*i,0)]] = 0;

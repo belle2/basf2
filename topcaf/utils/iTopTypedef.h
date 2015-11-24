@@ -33,7 +33,7 @@ typedef std::map<unsigned int, TopElectronicModule> TopElectronicRetMap;
 
 
 
-#ifdef __CINT__
+#ifdef __MAKECINT__
 
 #pragma link C++ class TopElectronicModule+;
 #pragma link C++ class TopPixel+;

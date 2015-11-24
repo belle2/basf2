@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-ClassImp(TopConfigurations)
-
 TopConfigurations::TopConfigurations()
 {
 

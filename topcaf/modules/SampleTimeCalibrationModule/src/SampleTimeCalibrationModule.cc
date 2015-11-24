@@ -45,10 +45,10 @@ SampleTimeCalibrationModule::SampleTimeCalibrationModule() : Module()
   addParam("numberOfSamples", m_channel_samples, "Number of samples to consider (4096 for IRS3C)", 4096);
 
 
-  m_out_file = NULL;
-  m_in_file = NULL;
+  m_out_file = nullptr;
+  m_in_file = nullptr;
 
-  m_time_calib_tdc_h = NULL;
+  m_time_calib_tdc_h = nullptr;
 }
 
 SampleTimeCalibrationModule::~SampleTimeCalibrationModule() {}
@@ -122,7 +122,7 @@ void SampleTimeCalibrationModule::beginRun()
       if (!cl->InheritsFrom("TH1D")) continue;
       TH1D* h = (TH1D*)key->ReadObj();
       std::string name_key = h->GetName();
-      topcaf_channel_id_t channel_id = strtoul(name_key.c_str(), NULL, 0);
+      topcaf_channel_id_t channel_id = strtoul(name_key.c_str(), nullptr, 0);
 
       m_in_chid2samplecalib[channel_id] = h;
     }
@@ -192,7 +192,7 @@ void  SampleTimeCalibrationModule::terminate()
   if ((m_writefile == 1) || ((m_conditions == 1) && (m_mode == 0))) {
     //Save Channel sample adc info.
 
-    if ((m_conditions == 1)) { // Use Conditions Service to save calibration
+    if (m_conditions == 1) { // Use Conditions Service to save calibration
 
       m_payload_tag =  m_experiment + '_' + m_run + '_';
       m_payload_tag += getName();
@@ -488,7 +488,7 @@ double SampleTimeCalibrationModule::CalibrateWaveform(const EventWaveformPacket*
 
 
   // TH1D *channel_time_h =  m_in_chid2samplecalib[this_mod_chid];
-  if (m_in_chid2samplecalib[this_mod_chid] == NULL) {
+  if (not m_in_chid2samplecalib[this_mod_chid]) {
     B2WARNING("Problem retrieving sample time calibration data for channel " << channel_id);
     return -99999.;
   } else {

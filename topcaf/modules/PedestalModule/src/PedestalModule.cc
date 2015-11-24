@@ -15,6 +15,7 @@
 #include <TClass.h>
 
 using namespace Belle2;
+using std::string;
 
 REG_MODULE(Pedestal)
 
@@ -26,18 +27,18 @@ PedestalModule::PedestalModule() : Module()
 
   addParam("conditions", m_conditions,
            "Do not use Conditions Service - 0 ; Use Conditions Service - 1 (write to Conditions if mode==0) ", 0);
-  addParam("iovInitialRunID", m_initial_run, "Initial run ID for the interval of validity for these pedestals", std::string("NULL"));
-  addParam("iovFinalRunID", m_final_run, "Final run ID for the interval of validity for these pedestals", std::string("NULL"));
+  addParam("iovInitialRunID", m_initial_run, "Initial run ID for the interval of validity for these pedestals", string("NULL"));
+  addParam("iovFinalRunID", m_final_run, "Final run ID for the interval of validity for these pedestals", string("NULL"));
 
-  addParam("inputFileName", m_in_ped_filename, "Input filename used if mode==1 and conditions==0", std::string());
+  addParam("inputFileName", m_in_ped_filename, "Input filename used if mode==1 and conditions==0", string());
   addParam("writeFile", m_writefile, "Do not write file - 0 ; Write Peds to local root file - 1 ", 0);
   addParam("outputFileName", m_out_ped_filename,
            "output filename written if mode==0 and writeFile==1, also used for conditions temporary output.",
            std::string("/tmp/temp_pedestal.root"));
 
 
-  m_out_ped_file = NULL;
-  m_in_ped_file = NULL;
+  m_out_ped_file = nullptr;
+  m_in_ped_file = nullptr;
 
 }
 
@@ -85,6 +86,7 @@ void PedestalModule::beginRun()
     }
 
     if (!m_in_ped_file) {
+      list = nullptr;
       B2ERROR("Couldn't open input itop pedestal file: " << m_in_ped_filename);
     }  else {
       list = m_in_ped_file->GetListOfKeys();
@@ -99,7 +101,7 @@ void PedestalModule::beginRun()
       if (!cl->InheritsFrom("TProfile")) continue;
       TProfile* profile = (TProfile*)key->ReadObj();
       std::string name_key = profile->GetName();
-      topcaf_channel_id_t window_id = strtoul(name_key.c_str(), NULL, 0);
+      topcaf_channel_id_t window_id = strtoul(name_key.c_str(), nullptr, 0);
       m_sample2ped[window_id] = profile;
     }
 
@@ -118,14 +120,14 @@ void PedestalModule::event()
 
       EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
 
-      if ((m_mode == 0)) { // Calculate pedestals from waveform
+      if (m_mode == 0) { // Calculate pedestals from waveform
 
 
         topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
         const std::vector<double> v_samples = evtwave_ptr->GetSamples();
         int nsamples = v_samples.size();
 
-        //  B2INFO("PedestalModule::GetChannelID(): " <<   evtwave_ptr->GetChannelID() <<" ASIC Window: "<<evtwave_ptr->GetASICWindow());
+        B2DEBUG(1, "PedestalModule::GetChannelID(): " << evtwave_ptr->GetChannelID() << " ASIC Window: " << evtwave_ptr->GetASICWindow());
 
         TProfile* channel_adc_h = m_sample2ped[channel_name];
         if (!channel_adc_h) {
@@ -139,8 +141,7 @@ void PedestalModule::event()
           double adc = (double) v_samples.at(s);
           channel_adc_h->Fill(s, adc);
         }
-      }
-      if (m_mode == 1) { // Apply pedestals to waveform
+      } else if (m_mode == 1) { // Apply pedestals to waveform
 
         //      EventWaveformPacket *out_wp = new EventWaveformPacket(*evtwave_ptr);
 
@@ -149,9 +150,8 @@ void PedestalModule::event()
         //      unsigned int window_id = GetWindowID(evtwave_ptr);
 
         //Look up reference pedestal and correct
-        //      TProfile *ped_profile = m_sample2ped[window_id];
         TProfile* ped_profile = m_sample2ped[channel_name];
-        if (ped_profile == NULL) {
+        if (not ped_profile) {
           B2WARNING("Problem retrieving itop pedestal data for channel " << channel_name << "!!!");
         } else {
           std::vector<double> v_pedcorr_samples;
@@ -180,7 +180,7 @@ void  PedestalModule::terminate()
 
     //Save Channel sample adc info.
 
-    if ((m_conditions == 1)) { // Use Conditions Service to save pedestals
+    if (m_conditions == 1) { // Use Conditions Service to save pedestals
 
       B2INFO("writing itop pedestals using Conditions Service - Payload Tag:" << GetPayloadTag()
              << "\tSubsystem Tag: " << getPackage() << "\tAlgorithm Name: " << getName()
@@ -239,5 +239,3 @@ void  PedestalModule::terminate()
   }
 
 }
-
-

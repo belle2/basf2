@@ -1,11 +1,9 @@
 #include <topcaf/dataobjects/topFileMetaData.h>
-#include <framework/conditions/ConditionsService.h>
+//#include <framework/conditions/ConditionsService.h>
 #include <framework/logging/Logger.h>
 #include <TString.h>
 
 using namespace Belle2;
-
-ClassImp(topFileMetaData)
 
 void topFileMetaData::set(std::string dir, std::string filename)
 {

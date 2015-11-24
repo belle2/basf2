@@ -19,9 +19,9 @@ parser.add_argument('--ped', metavar='PedestalFile (path/filename)',
 
 parser.add_argument(
     '--inputRun',
-    metavar='InputRun (i.e. file name = InputRun.dat)',
+    metavar='InputRun (i.e. file name = InputRun.bin)',
     required=True,
-    help='the root name for the input data files.  myInputRun.dat would have a root ' +
+    help='the root name for the input data files.  myInputRun.bin would have a root ' +
          'name of myInputRun.  This parameter is REQUIRED.')
 
 parser.add_argument('--inputDir', metavar='InputDirectory (path)',
@@ -47,16 +47,15 @@ parser.add_argument('--IOVf', metavar='Run_final', default='NULL',
 
 args = parser.parse_args()
 
-print 'pedestal file = ' + args.ped
-print 'data file     = ' + args.inputDir + args.inputRun + '.dat'
-print 'camac file    = ' + args.inputDir + args.inputRun + '.cmc'
+print('pedestal file = ' + args.ped)
+print('data file     = ' + args.inputDir + args.inputRun + '.bin')
+print('camac file    = ' + args.inputDir + args.inputRun + '.camac')
 
 if args.Conditions:
-    print 'Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' \
-        + args.IOVf
+    print('Using conditions service with IOVi = ' + args.IOVi + ' and IOVf = ' + args.IOVf)
     Conditions = 1
 else:
-    print 'Not using conditions service.'
+    print('Not using conditions service.')
     Conditions = 0
 
 WriteFile = 1
@@ -64,7 +63,7 @@ if args.Output:
     OutputFile = args.Output
 else:
     OutputFile = args.inputRun + '_SampleCalibration.root'
-print 'Writing output calibration file to ' + OutputFile
+print('Writing output calibration file to ' + OutputFile)
 
 eventinfosetter = register_module('EventInfoSetter')
 eventinfoprinter = register_module('EventInfoPrinter')
@@ -82,7 +81,7 @@ output = register_module('RootOutput')
 # register topcaf modules
 itopconfig = register_module('TopConfiguration')
 itopeventconverter = register_module('iTopRawConverterV2')
-itopeventconverter.param('inputFileName', args.inputRun + '.dat')
+itopeventconverter.param('inputFileName', args.inputRun + '.bin')
 itopeventconverter.param('inputDirectory', args.inputDir)
 itopeventconverter.param('scrod', 16)
 itopeventconverter.param('carrier', 0)
@@ -91,7 +90,7 @@ itopeventconverter.param('boardstack', 0)
 
 camacconverter = register_module('AsciiCamac')
 camacDict = {
-    'inputFilename': args.inputDir + args.inputRun + '.cmc',
+    'inputFilename': args.inputDir + args.inputRun + '.camac',
 }
 camacconverter.param(camacDict)
 

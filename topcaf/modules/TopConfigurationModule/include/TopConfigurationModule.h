@@ -27,6 +27,7 @@ namespace Belle2 {
     void terminate();
 
   private:
+    std::string m_filename;
 
 
   };

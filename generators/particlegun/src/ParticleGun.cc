@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 #include <generators/particlegun/ParticleGun.h>
 
 #include <cmath>
@@ -120,7 +121,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   double vz = generateValue(m_params.zVertexDist, m_params.zVertexParams);
 
   // Time offset
-  double nTimeOffset = static_cast<double>(m_params.timeOffset);
+  double nTimeOffset = static_cast<double>(m_params.timeOffset) * Belle2::Unit::s;
 
   //Determine number of tracks
   int nTracks = static_cast<int>(m_params.nTracks);

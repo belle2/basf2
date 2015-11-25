@@ -369,22 +369,22 @@ rr_subsample = array('d', [0.0, 0.1, 0.25, 0.5, 0.625, 0.75, 0.875, 1.0])
 rr_size = len(rr_subsample)
 
 eventLevelParticles = [
-    ('Electron', 'QrOf__boe__pl__clElectronROE__cm__spIsRightCategory__boElectron__bc__cm__spIsRightTrack__boElectron__bc__bc'),
+    ('Electron', 'QrOf__boe__pl__clElectronROE__cm__spisRightCategory__boElectron__bc__cm__spisRightTrack__boElectron__bc__bc'),
     #    ('IntermediateElectron',
-    # 'QrOf__boe__pl__clROE__cm__spIsRightCategory__boIntermediateElectron__bc__cm__spIsRightTrack__boIntermediateElectron__bc__bc'),
-    ('Muon', 'QrOf__bomu__pl__clMuonROE__cm__spIsRightCategory__boMuon__bc__cm__spIsRightTrack__boMuon__bc__bc'),
+    # 'QrOf__boe__pl__clROE__cm__spisRightCategory__boIntermediateElectron__bc__cm__spisRightTrack__boIntermediateElectron__bc__bc'),
+    ('Muon', 'QrOf__bomu__pl__clMuonROE__cm__spisRightCategory__boMuon__bc__cm__spisRightTrack__boMuon__bc__bc'),
     #    ('IntermediateMuon',
-    # 'QrOf__bomu__pl__clROE__cm__spIsRightCategory__boIntermediateMuon__bc__cm__spIsRightTrack__boIntermediateMuon__bc__bc'),
+    # 'QrOf__bomu__pl__clROE__cm__spisRightCategory__boIntermediateMuon__bc__cm__spisRightTrack__boIntermediateMuon__bc__bc'),
     ('KinLepton',
-     'QrOf__bomu__pl__clKinLeptonROE__cm__spIsRightCategory__boKinLepton__bc__cm__spIsRightTrack__boKinLepton__bc__bc'),
-    ('Kaon', 'InputQrOf__boK__pl__clKaonROE__cm__spIsRightCategory__boKaon__bc__cm__spIsRightTrack__boKaon__bc__bc'),
-    ('SlowPion', 'QrOf__bopi__pl__clSlowPionROE__cm__spIsRightCategory__boSlowPion__bc__cm__spIsRightTrack__boSlowPion__bc__bc'),
-    ('FastPion', 'QrOf__bopi__pl__clFastPionROE__cm__spIsRightCategory__boFastPion__bc__cm__spIsRightTrack__boFastPion__bc__bc'),
-    ('KaonPion', 'QrOf__boK__pl__clKaonROE__cm__spIsRightCategory__boKaonPion__bc__cm__spIsRightTrack__boKaon__bc__bc'),
+     'QrOf__bomu__pl__clKinLeptonROE__cm__spisRightCategory__boKinLepton__bc__cm__spisRightTrack__boKinLepton__bc__bc'),
+    ('Kaon', 'weightedQrOf__boK__pl__clKaonROE__cm__spisRightCategory__boKaon__bc__cm__spisRightTrack__boKaon__bc__bc'),
+    ('SlowPion', 'QrOf__bopi__pl__clSlowPionROE__cm__spisRightCategory__boSlowPion__bc__cm__spisRightTrack__boSlowPion__bc__bc'),
+    ('FastPion', 'QrOf__bopi__pl__clFastPionROE__cm__spisRightCategory__boFastPion__bc__cm__spisRightTrack__boFastPion__bc__bc'),
+    ('KaonPion', 'QrOf__boK__pl__clKaonROE__cm__spisRightCategory__boKaonPion__bc__cm__spisRightTrack__boKaon__bc__bc'),
     ('MaximumP',
-     'QrOf__bopi__pl__clMaximumPstarROE__cm__spIsRightCategory__boMaximumPstar__bc__cm__spIsRightTrack__boMaximumPstar__bc__bc'),
-    ('FSC', 'QrOf__bopi__pl__clSlowPionROE__cm__spIsRightCategory__boSlowPion__bc__cm__spIsRightTrack__boSlowPion__bc__bc'),
-    ('Lambda', 'InputQrOf__boLambda0__clLambdaROE__cm__spIsRightCategory__boLambda__bc__cm__spIsRightTrack__boLambda__bc__bc'),
+     'QrOf__bopi__pl__clMaximumPstarROE__cm__spisRightCategory__boMaximumPstar__bc__cm__spisRightTrack__boMaximumPstar__bc__bc'),
+    ('FSC', 'QrOf__bopi__pl__clSlowPionROE__cm__spisRightCategory__boSlowPion__bc__cm__spisRightTrack__boSlowPion__bc__bc'),
+    ('Lambda', 'weightedQrOf__boLambda0__clLambdaROE__cm__spisRightCategory__boLambda__bc__cm__spisRightTrack__boLambda__bc__bc'),
 ]
 
 # needs the B0Tagger.root-file from combiner teacher

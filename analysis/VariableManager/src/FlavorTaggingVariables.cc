@@ -25,7 +25,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/dataobjects/Vertex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -54,9 +54,9 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    // FlavourTagger variables
+    // FlavorTagger variables
 
-    // Track Level Variables
+    // Track Level Variables ---------------------------------------------------------------------------------------------------
 
     double momentumMissingTagSide(const Particle*)
     {
@@ -84,19 +84,74 @@ namespace Belle2 {
     double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      double result = 0 ;
-      if (roe.isValid()) {
-        const ContinuumSuppression* cs = roe->getRelated<Particle>()->getRelated<ContinuumSuppression>();
-        const TVector3 thrustAxisO = cs->getThrustO(); //thrust is already in cms
-        const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
-        result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      PCmsLabTransform T;
+      std::vector<TVector3> p3_cms_roe;
+      TVector3 thrustO;
+      static const double P_MAX(3.2);
 
-        //const ContinuumSuppression* qq = p->getRelated<ContinuumSuppression>();
-        //const TVector3 thrustAxisO = qq->getThrustO();
-        //cout << "thrustAxisO" << thrustAxisO << endl;
-        //const TVector3 pAxis = PCmsLabTransform::labToCms(p->get4Vector()).Vect();
-        //cout << "pAxis" << pAxis << endl;
-        //double result = fabs(cos(pAxis.Angle(thrustAxisO)));
+      double result = 0 ;
+
+      if (roe.isValid()) {
+
+        // The following calculation of the thrust axis has been copied and modified
+        // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
+        // At some point this has to be updated!
+
+        // Charged tracks
+        //
+        const auto& roeTracks = roe->getTracks();
+        for (auto& track : roeTracks) {
+          if (track == nullptr) continue;
+          // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
+          // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+          const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+          Particle particle(track, charged);
+          if (particle.getParticleType() == Particle::c_Track) {
+            TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
+            if (p_cms != p_cms) continue;
+            if (p_cms.Rho() > P_MAX) continue;
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        // ECLCluster -> Gamma
+        //
+        const auto& roeECLClusters = roe->getECLClusters();
+        for (auto& cluster : roeECLClusters) {
+          if (cluster == nullptr) continue;
+          if (cluster->isNeutral()) {
+            // Create particle from ECLCluster with gamma hypothesis
+            Particle particle(cluster);
+            TLorentzVector p_lab = particle.get4Vector();
+            if (p_lab != p_lab) continue;
+            if (p_lab.Rho() < 0.05) continue;
+            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
+            if (p_cms != p_cms) continue;
+            if (p_cms.Rho() > P_MAX) continue;
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        const auto& roeKLMClusters = roe->getKLMClusters();
+        for (auto& cluster : roeKLMClusters) {
+          if (cluster == nullptr) continue;
+          if (!(cluster -> getAssociatedTrackFlag()) && !(cluster -> getAssociatedEclClusterFlag())) {
+            // Create particle from KLMCluster with K0_L hypothesis
+            Particle particle(cluster);
+            TLorentzVector p_lab = particle.get4Vector();
+            if (p_lab != p_lab) continue;
+            if (p_lab.Rho() < 0.05) continue;
+            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
+            if (p_cms != p_cms) continue;
+            if (p_cms.Rho() > P_MAX) continue;
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        thrustO  = thrust(p3_cms_roe.begin() , p3_cms_roe.end() , SelfFunc(TVector3()));
+        const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+        if (pAxis == pAxis) result = fabs(cos(pAxis.Angle(thrustO)));
+
       }
       return result;
     }
@@ -187,7 +242,7 @@ namespace Belle2 {
 
     }
 
-//     Event Level Variables
+//     Event Level Variables --------------------------------------------------------------------------------------------
 
     double isInElectronOrMuonCat(const Particle* particle)
     {
@@ -226,7 +281,7 @@ namespace Belle2 {
       } else return 0.0;
     }
 
-//     Target Variables
+//     Target Variables --------------------------------------------------------------------------------------------------
 
     double isMajorityInRestOfEventFromB0(const Particle*)
     {

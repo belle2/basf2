@@ -27,7 +27,7 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import *
+# The FlavorTagger already imports  modularAnalysis
 from FlavorTagger import *
 from stdFSParticles import *
 from stdLooseFSParticles import *
@@ -52,26 +52,26 @@ fillParticleList('mu+:highPID', 'muid > 0.2 and d0 < 2 and abs(z0) < 4')
 # keep only candidates with dM<0.25
 reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', 'dM<0.25')
 # fit K_S0 Vertex
-fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False, analysis_main)
+fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False)
 
 # reconstruct J/psi -> mu+ mu- decay and fit vertex
 # keep only candidates with dM<0.11
 reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', 'dM<0.11')
 applyCuts('J/psi:mumu', '3.07 < M < 3.11')
-massVertexRave('J/psi:mumu', 0., '', analysis_main)
+massVertexRave('J/psi:mumu', 0., '')
 
 # reconstruct B0 -> J/psi Ks decay
 # keep only candidates with Mbc > 5.1 and abs(deltaE)<0.15
 reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.1 and abs(deltaE)<0.15')
+
+# Fit the B0 Vertex
+vertexRave('B0:jspiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '')
 
 # perform MC matching (MC truth asociation). Always before TagV
 matchMCTruth('B0:jspiks')
 
 # build the rest of the event associated to the B0
 buildRestOfEvent('B0:jspiks')
-
-# Build Continuum suppression. Needed for Flavor Tagging Variables. (Dependency will be removed)
-buildContinuumSuppression('B0:jspiks')
 
 # Before using the Flavor Tagger you need at least the default weight files for the employed release:
 # copy the folder in @login.cc.kek.jp:
@@ -131,6 +131,11 @@ toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
 toolsDST += ['ROEMultiplicities', '^B0']
 toolsDST += ['FlavorTagging', '^B0']
+toolsDST += ['FlavorTagging', '^B0']
+toolsDST += ['TagVertex', '^B0']
+toolsDST += ['DeltaT', '^B0']
+toolsDST += ['MCTagVertex', '^B0']
+toolsDST += ['MCDeltaT', '^B0']
 # Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 
 # write out the flat ntuples

@@ -33,7 +33,6 @@ class FlavorTaggerInfoFiller(Module):
         weightFiles = 'B2JpsiKs_mu'
 
         roe = Belle2.PyStoreObj('RestOfEvent')
-        B0 = roe.obj().getRelated('Particles')
         FlavorTaggerInfo = roe.obj().getRelated('FlavorTagInfos')
 
         if not FlavorTaggerInfo:
@@ -96,10 +95,8 @@ class RemoveEmptyROEModule(Module):
         roe = Belle2.PyStoreObj('RestOfEvent')
         B0 = roe.obj().getRelated('Particles')
         if mc_variables.variables.evaluate('isRestOfEventEmpty', B0) == -2:
-            B2INFO('FlavorTagger: FOUND NO TRACKS IN ROE! COMBINER OUTPUT IS MANUALLY SET.'
+            B2INFO('FlavorTagger: FOUND NO TRACKS IN ROE! COMBINER OUTPUT IS THE DEFAULT -2.'
                    )
-            ModeCode = GetModeCode()
-            B0.addExtraInfo('ModeCode', ModeCode)
             self.return_value(1)
 
 
@@ -113,13 +110,9 @@ class RemoveWrongMCMatchedROEs(Module):
     def event(self):
         self.return_value(0)
         someParticle = Belle2.Particle(None)
-        roe = Belle2.PyStoreObj('RestOfEvent')
-        B0 = roe.obj().getRelated('Particles')
         if mc_variables.variables.evaluate('qrCombined', someParticle) < 0:
             B2INFO('FlavorTagger: FOUND NO B-MESON IN ROE! EVENT WILL BE DISCARDED FOR TRAINING!'
                    )
-            ModeCode = GetModeCode()
-            B0.addExtraInfo('ModeCode', ModeCode)
             self.return_value(1)
 
 
@@ -155,8 +148,8 @@ class MoveTaggerInformationToBExtraInfoModule(Module):
         someParticle = Belle2.Particle(None)
         B0 = roe.obj().getRelated('Particles')
         ModeCode = GetModeCode()
-        B0.addExtraInfo('ModeCode', ModeCode)
         if ModeCode == 1:
+            B0.addExtraInfo('ModeCode', ModeCode)
             B0Probability = info.obj().getExtraInfo('qrCombined')
             B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
             qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
@@ -465,37 +458,6 @@ variables['FSC'] = [
 ]
 
 
-class ShowNaN(Module):
-
-    def __init__(self, particleList, category, position):
-        super(ShowNaN, self).__init__()
-        self.particleList = particleList
-        self.category = category
-        self.position = position
-
-    def event(self):
-        self.return_value(0)
-        NumberOfNaNs = 0
-        B2INFO("#######Position is:" + self.position + " ########")
-        # for (particleList, category) in TrackLevelParticleLists:
-        plist = Belle2.PyStoreObj(self.particleList)
-        for i in range(0, plist.obj().getListSize()):
-            particle = plist.obj().getParticle(i)
-            for variable in variables[self.category]:
-                var = mc_variables.variables.evaluate(variable, particle)
-                # if particleList == 'Lambda0:LambdaROE':
-                if var != var:
-                    NumberOfNaNs += 1
-                    particleNo = "%d" % i
-                    B2ERROR(self.particleList + " Particle = " + particleNo + " " + variable + " " + "= nan")
-                else:
-                    continue
-        if NumberOfNaNs > 0:
-            NumberOfNaNs = "%d" % NumberOfNaNs
-            B2ERROR("NumberOfNaNs = " + NumberOfNaNs)
-            self.return_value(1)
-
-
 def FillParticleLists(mode='Expert', path=analysis_main):
     """
     Fills the particle Lists for each category.
@@ -558,9 +520,6 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
 
         exec('%s = %s' % (TrackLevelPath, 'create_path()'))
         exec('TrackLevelPathsList["' + category + '"]=%s' % TrackLevelPath)
-
-        ShowNaNs = ShowNaN(particleList, category, "Starting Event Level")
-        path.add_module(ShowNaNs)
 
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.param('particleLists', particleList)

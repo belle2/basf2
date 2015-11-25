@@ -79,12 +79,12 @@ def add_packers(path, components=None):
             ],
         ])
 
-        path.add_module(pxdpacker)
+#        path.add_module(pxdpacker)
 
     # SVD
-    if components is None or 'SVD' in components:
-        svdpacker = register_module('SVDPacker')
-        path.add_module(svdpacker)
+#    if components is None or 'SVD' in components:
+#        svdpacker = register_module('SVDPacker')
+#        path.add_module(svdpacker)
 
     # CDC (parameters from cdc_packer_unpacker.py)
 #    if components is None or 'CDC' in components:
@@ -95,9 +95,9 @@ def add_packers(path, components=None):
 #        path.add_module(cdcpacker)
 
     # TOP
-#    if components is None or 'TOP' in components:
-#        toppacker = register_module('TOPPacker')
-#        path.add_module(toppacker)
+    if components is None or 'TOP' in components:
+        toppacker = register_module('TOPPacker')
+        path.add_module(toppacker)
 
     # ARICH
 #    if components is None or 'ARICH' in components:

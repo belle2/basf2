@@ -70,8 +70,6 @@ namespace Belle2 {
     // -- B Cand --------------------------------------------------------------------------
     PCmsLabTransform T;
     double BeamEnergy = T.getCMSEnergy() / 2;
-    TLorentzVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
-    double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
 
     TLorentzVector p_cms_missA(0, 0, 0, 2 * BeamEnergy);
     TLorentzVector p_cms_missB(0, 0, 0, 2 * BeamEnergy);
@@ -219,6 +217,8 @@ namespace Belle2 {
       R2 = FW.R(2);
 
       // KSFW moments
+      TLorentzVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
+      double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
       KsfwMoments KsfwM(Hso0_max,
                         p3_cms_q_sigA,
                         p3_cms_q_sigB,

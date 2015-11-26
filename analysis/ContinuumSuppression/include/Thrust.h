@@ -177,7 +177,7 @@ namespace Belle2 {
     // make a list of pt and phi
     double sump = 0;
     Iterator p;
-    for (p = begin, pt = ptlist.begin(); p != end; p++, pt++) {
+    for (p = begin, pt = ptlist.begin(); p != end; ++p, ++pt) {
       TVector3 pvec(func(*p));
       sump += pvec.Mag();
       double pt1 = pvec.Dot(ptu1);

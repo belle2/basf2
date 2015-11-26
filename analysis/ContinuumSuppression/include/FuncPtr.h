@@ -40,8 +40,8 @@ namespace Belle2 {
     typedef Result(T::*pfun)() const;
   public:
     ptr_to_member_func() {};
-    ptr_to_member_func(Result(T::*x)()) : ptr(x) {};
-    ptr_to_member_func(const Result(T::*x)() const) : ptr(x) {};
+    explicit ptr_to_member_func(Result(T::*x)()) : ptr(x) {};
+    explicit ptr_to_member_func(const Result(T::*x)() const) : ptr(x) {};
     const Result operator()(T& t) const { return (t.*ptr)(); }
     const Result operator()(T* t) const { return ((*t).*ptr)(); }
     const Result operator()(const T& t) const { return (t.*ptr)(); }
@@ -70,8 +70,8 @@ namespace Belle2 {
     typedef Result(T::*pfun)() const;
   public:
     ptr_to_member_func_from_iter() {};
-    ptr_to_member_func_from_iter(Result(T::*x)()) : ptr(x) {};
-    ptr_to_member_func_from_iter(const Result(T::*x)() const) : ptr(x) {};
+    explicit ptr_to_member_func_from_iter(Result(T::*x)()) : ptr(x) {};
+    explicit ptr_to_member_func_from_iter(const Result(T::*x)() const) : ptr(x) {};
     const Result operator()(Iter& it) const { return ((*it).*ptr)(); }
     const Result operator()(const Iter& it) const { return ((*it).*ptr)(); }
   protected:

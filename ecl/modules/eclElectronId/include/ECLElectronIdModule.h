@@ -63,6 +63,10 @@ namespace Belle2 {
   private:
     //    double likelihood( const Const::ChargedStable& hyp, double eop) const;
     Belle2::ECLAbsPdf* m_pdf[ Const::ChargedStable::c_SetSize ];
+    // max value of Log Likelihood for a particle hypothesis.
+    // used when the pdf value is not positive or subnormal.
+    static constexpr double m_minLogLike = -700;
+
   };
 
 } //Belle2

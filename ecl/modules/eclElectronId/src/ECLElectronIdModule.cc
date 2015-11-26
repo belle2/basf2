@@ -104,7 +104,9 @@ void ECLElectronIdModule::event()
       if (currentpdf == 0) {
         currentpdf = m_pdf[Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }
-      likelihoods[hypo.getIndex()] = log(currentpdf->pdf(eop, p, costheta));
+      double pdfval = currentpdf->pdf(eop, p, costheta);
+      if (isnormal(pdfval) && pdfval > 0) likelihoods[hypo.getIndex()] = log(pdfval);
+      else likelihoods[hypo.getIndex()] = m_minLogLike;
     } // end loop on hypo
 
     const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, nCrystals, nClusters);

@@ -286,9 +286,11 @@ namespace Belle2 {
     bool Cut::processTernaryNumericConditions(std::string str)
     {
 
-      unsigned long int pos1 = 0;
-      unsigned long int pos2 = 0;
       for (auto& c : {"<", ">", "!", "="}) {
+
+        unsigned long int pos1 = 0;
+        unsigned long int pos2 = 0;
+
         if (((pos1 =  findIgnoringParenthesis(str, c)) != std::string::npos) and
             ((pos2 =  findIgnoringParenthesis(str, "<", pos1 + 2)) != std::string::npos
              or (pos2 =  findIgnoringParenthesis(str, ">", pos1 + 2)) != std::string::npos

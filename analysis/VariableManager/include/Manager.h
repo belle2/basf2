@@ -236,7 +236,7 @@ namespace Belle2 {
     class GroupProxy {
     public:
       /** constructor. */
-      GroupProxy(const std::string& groupName)
+      explicit GroupProxy(const std::string& groupName)
       {
         Manager::Instance().setVariableGroup(groupName);
       }

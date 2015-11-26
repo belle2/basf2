@@ -225,7 +225,6 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
       double sum = 0.0;
-      double pt = 0.0;
 
       if (roe.isValid()) {
         for (const auto& track : roe->getTracks()) {
@@ -233,7 +232,7 @@ namespace Belle2 {
             continue;
           if (track->getTrackFitResult(Const::pion) == nullptr)
             continue;
-          pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
+          double pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
 
           sum += sqrt(pt * pt);
         }
@@ -250,13 +249,11 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> MuonList("mu+:MuonROE");
       StoreObjPtr<ParticleList> ElectronList("e+:ElectronROE");
 
-      double maximumProbElectron = 0;
-      double maximumProbMuon = 0;
-
       const Track* trackTargetMuon = nullptr;
       const Track* trackTargetElectron = nullptr;
 
       if (MuonList.isValid()) {
+        double maximumProbMuon = 0;
         for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
           Particle* pMuon = MuonList->getParticle(i);
           double probMuon = pMuon->getExtraInfo("isRightTrack(Muon)");
@@ -267,6 +264,7 @@ namespace Belle2 {
         }
       }
       if (ElectronList.isValid()) {
+        double maximumProbElectron = 0;
         for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
           Particle* pElectron = ElectronList->getParticle(i);
           double probElectron = pElectron->getExtraInfo("isRightTrack(Electron)");
@@ -557,19 +555,15 @@ namespace Belle2 {
 
     double particleClassifiedFlavor(const Particle* particle)
     {
-      double result = -1.0;
-
-      if (!(particle->getExtraInfo("Class_Flavor"))) return result;
-
+      if (!(particle->getExtraInfo("Class_Flavor")))
+        return -1.0;
       return particle->getExtraInfo("Class_Flavor");
     }
 
     double particleMCFlavor(const Particle* particle)
     {
-      double result = -0.0;
-
-      if (!(particle->getExtraInfo("MC_Flavor"))) return result;
-
+      if (!(particle->getExtraInfo("MC_Flavor")))
+        return -0.0;
       return particle->getExtraInfo("MC_Flavor");
     }
 
@@ -742,17 +736,15 @@ namespace Belle2 {
           TLorentzVector momTargetKaon = T.rotateLabToCms() * particle -> get4Vector();
           TLorentzVector momTargetSlowPion;
 
-//       double maximumProbKaon = 0;
-          double maximumProbSlowPion = 0;
-
           float chargeTargetKaon = particle -> getCharge();
-          float chargeTargetSlowPion = 0;
 
           double Output = 0.0;
 
           if ((requestedVariable == "HaveOpositeCharges") || (requestedVariable == "cosKaonPion"))
           {
+            float chargeTargetSlowPion = 0;
             if (SlowPionList.isValid()) {
+              double maximumProbSlowPion = 0;
               for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
                 Particle* pSlowPion = SlowPionList->getParticle(i);
                 if (pSlowPion != nullptr) {
@@ -797,13 +789,13 @@ namespace Belle2 {
           TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
           TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
           double maximumProbFastest = 0;
-          Particle* TargetFastParticle = nullptr;
 
           double Output = 0.0;
 
           if ((requestedVariable == "pFastCMS") || (requestedVariable == "cosSlowFast") || (requestedVariable == "cosTPTOFast") || (requestedVariable == "SlowFastHaveOpositeCharges"))
           {
             if (FastParticleList.isValid()) {
+              Particle* TargetFastParticle = nullptr;
               for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
                 Particle* particlei = FastParticleList->getParticle(i);
                 if (particlei != nullptr) {
@@ -850,12 +842,12 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
-          double maximumProb = 0;
 
           double Output = 0.0;
 
           if (ListOfParticles.isValid())
           {
+            double maximumProb = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* particlei = ListOfParticles->getParticle(i);
               if (particlei != nullptr) {
@@ -1059,15 +1051,14 @@ namespace Belle2 {
           if (particleName == "KaonPion")
           {
             StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
-            double maximumProbSlowPion = 0;
             Particle* TargetSlowPion = nullptr;
             if (SlowPionList.isValid()) {
+              double maximumProbSlowPion = 0;
               for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
                 Particle* pSlowPion = SlowPionList->getParticle(i);
                 if (pSlowPion != nullptr) {
-                  double probSlowPion = 0;
                   if (pSlowPion -> hasExtraInfo("isRightTrack(SlowPion)")) {
-                    probSlowPion = pSlowPion->getExtraInfo("isRightTrack(SlowPion)");
+                    double probSlowPion = pSlowPion->getExtraInfo("isRightTrack(SlowPion)");
                     if (probSlowPion > maximumProbSlowPion) {
                       maximumProbSlowPion = probSlowPion;
                       TargetSlowPion = pSlowPion;
@@ -1092,9 +1083,9 @@ namespace Belle2 {
           {
             StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
             PCmsLabTransform T;
-            double maximumProbFastest = 0;
             Particle* TargetFastParticle = nullptr;
             if (FastParticleList.isValid()) {
+              double maximumProbFastest = 0;
               for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
                 Particle* particlei = FastParticleList->getParticle(i);
                 if (particlei != nullptr) {
@@ -1188,11 +1179,11 @@ namespace Belle2 {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
-          float maximumTargetProb = 0; //Probability of being the target track from the track level
           float prob = 0; //The probability of beeing right classified flavor from the event level
           float qTarget = 0; //Flavour of the track selected as target
           if (ListOfParticles.isValid())
           {
+            float maximumTargetProb = 0; //Probability of being the target track from the track level
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* particlei = ListOfParticles->getParticle(i);
               if (particlei != nullptr) {
@@ -1242,12 +1233,7 @@ namespace Belle2 {
         auto extraInfoRightCategory = arguments[1];
         auto extraInfoRightTrack = arguments[2];
         auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
-          double flavor = 0.0;
-          double r = 0.0;
-          double qp = 0.0;
           double final_value = 0.0;
-          double val1 = 1.0;
-          double val2 = 1.0;
 
           auto compare = [extraInfoRightTrack](const Particle * part1, const Particle * part2)-> bool {
             double info1 = 0;
@@ -1261,6 +1247,8 @@ namespace Belle2 {
           if (ListOfParticles)
           {
             if (ListOfParticles->getListSize() > 0) {
+              double val1 = 1.0;
+              double val2 = 1.0;
               std::vector<const Particle*> ParticleVector;
               ParticleVector.reserve(ListOfParticles->getListSize());
 
@@ -1274,6 +1262,7 @@ namespace Belle2 {
               unsigned int Limit = ParticleVector.size() > 3 ? 3 : ParticleVector.size();
               for (unsigned int i = 0; i < Limit; i++) {
                 if (ParticleVector[i]->hasExtraInfo(extraInfoRightCategory)) {
+                  double flavor = 0.0;
                   if (particleListName == "Lambda0:LambdaROE") {
                     flavor = (-1) * ParticleVector[i]->getPDGCode() / TMath::Abs(ParticleVector[i]->getPDGCode());
                   } else if (extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
@@ -1281,10 +1270,10 @@ namespace Belle2 {
                     flavor = (-1) * ParticleVector[i] -> getCharge();
                   } else flavor = ParticleVector[i]->getCharge();
 
-                  r = ParticleVector[i]->getExtraInfo(extraInfoRightCategory);
+                  double r = ParticleVector[i]->getExtraInfo(extraInfoRightCategory);
 //                 B2INFO("Right Cat:" << ParticleVector[i]->getExtraInfo(extraInfoRightCategory));
 //                 B2INFO("Right Track:" << ParticleVector[i]->getExtraInfo(extraInfoRightTrack));
-                  qp = (flavor * r);
+                  double qp = (flavor * r);
                   val1 = val1 * (1 + qp);
                   val2 = val2 * (1 - qp);
                 }

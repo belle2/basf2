@@ -106,7 +106,7 @@ namespace Belle2 {
        * Constructor of the cut. Call init with given string
        * @param str Cut is initaliszed with the specified cuts. Default are no cuts
        */
-      Cut(std::string str);
+      explicit Cut(std::string str);
 
 #if defined(__CINT__) || defined(R__DICTIONARY_FILENAME)
 #else

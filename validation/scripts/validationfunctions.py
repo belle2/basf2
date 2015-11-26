@@ -149,6 +149,13 @@ def parse_cmd_line_arguments():
                         "executed exclusively. All dependant scripts will also"
                         "be executed. E.g. -s ECL2D.C",
                         type=str, nargs='*')
+    parser.add_argument("-si", "--select-ignore-dependencies", help="The file "
+                        "name of one or more comma separated validation scripts "
+                        "that should be executed exclusively. This will ignore "
+                        "all depencies. This is useful if you modified a script "
+                        "that produces plots based on the output of its "
+                        "dependencies.",
+                        type=str, nargs='*')
     parser.add_argument("-q", "--quiet", help="Suppress the progress bar",
                         action='store_true')
     parser.add_argument("-t", "--tag", help="The name that will be used for "

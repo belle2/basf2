@@ -344,6 +344,9 @@ class Validation:
         #  files are not actually started (for debugging purposes)
         self.dry = False
 
+        # If this is set, dependencies will be ignored.
+        self.ignore_dependencies = False
+
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -583,12 +586,12 @@ class Validation:
         else:
             return None
 
-    def apply_script_selection(self, script_selection):
+    def apply_script_selection(self, script_selection, ignore_dependencies=False):
         """!
         This method will take the validation file name ( e.g. "FullTrackingValidation.py" ), determine
-        all the script it depends and set the status of theses scripts to "waiting",
+        all the script it depends on and set the status of theses scripts to "waiting",
         The status of all other scripts will be set to "skipped", which means they will not be executed
-        in the validation run.
+        in the validation run.  If ignore_dependencies is True, dependencies will also be set to "skipped".
         """
 
         # change file extension
@@ -607,7 +610,8 @@ class Validation:
                 continue
 
             others = script_obj.get_recursive_dependencies(self.list_of_scripts)
-            scripts_to_enable = scripts_to_enable.union(others)
+            if not ignore_dependencies:
+                scripts_to_enable = scripts_to_enable.union(others)
 
         # enable all selections and dependencies
         for script_obj in self.list_of_scripts:
@@ -892,14 +896,24 @@ def execute():
         validation.log.note('Building headers for Script objects...')
         validation.build_headers()
 
-        # Build dependencies for every script object we have created
-        validation.log.note('Building dependencies for Script objects...')
-        validation.build_dependencies()
+        # Build dependencies for every script object we have created, unless we're asked
+        # to ignore them.
+        if not cmd_arguments.select_ignore_dependencies:
+            validation.log.note('Building dependencies for Script objects...')
+            validation.build_dependencies()
 
         # select only specific scripts, if this option has been set
         if cmd_arguments.select:
             validation.log.note("Applying selection for validation scripts")
-            validation.apply_script_selection(cmd_arguments.select)
+            validation.apply_script_selection(cmd_arguments.select,
+                                              ignore_dependencies=False)
+
+        # select only specific scripts and ignore their dependencies if option is set
+        if cmd_arguments.select_ignore_dependencies:
+            validation.log.note("Applying selection for validation scripts, "
+                                "ignoring their dependencies")
+            validation.apply_script_selection(cmd_arguments.select_ignore_dependencies,
+                                              ignore_dependencies=True)
 
         # Start the actual validation
         validation.log.note('Starting the validation...')

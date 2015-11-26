@@ -461,7 +461,7 @@ KFitBase::prepareCorrelation(void) {
   HepMatrix tmp_hm(KFitConst::kNumber6, KFitConst::kNumber6, 0);
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; it++)
+  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
   {
     const HepMatrix& hm = *it;
 

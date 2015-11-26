@@ -633,7 +633,7 @@ VertexFitKFit::prepareInputMatrix(void) {
   HepMatrix    tmp_property(m_TrackCount, 3, 0);
 
 
-  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
   {
     // momentum x,y,z and position x,y,z
     for (int j = 0; j < KFitConst::kNumber6; j++)
@@ -703,7 +703,7 @@ VertexFitKFit::prepareOutputMatrix(void) {
   Hep3Vector h3v;
   unsigned index = 0;
 
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
   {
     KFitTrack& pdata = *it;
     // tracks
@@ -757,37 +757,36 @@ VertexFitKFit::prepareOutputMatrix(void) {
 enum KFitError::ECode
 VertexFitKFit::makeCoreMatrix(void) {
   // vertex fit
-  double px, py, pz, x, y, z, a;
-  double pt, invPt, invPt2, dlx, dly, dlz, a1, a2, r2d2, B, Rx, Ry, S, U;
-  double sininv, sqrtag;
-
   for (int i = 0; i < m_TrackCount; i++)
   {
-    px = m_al_1[i * KFitConst::kNumber6 + 0][0];
-    py = m_al_1[i * KFitConst::kNumber6 + 1][0];
-    pz = m_al_1[i * KFitConst::kNumber6 + 2][0];
-    x  = m_al_1[i * KFitConst::kNumber6 + 3][0];
-    y  = m_al_1[i * KFitConst::kNumber6 + 4][0];
-    z  = m_al_1[i * KFitConst::kNumber6 + 5][0];
-    a  = m_property[i][2];
+    double B, S, U;
+    double sininv, sqrtag;
 
-    pt =  sqrt(px * px + py * py);
+    double px = m_al_1[i * KFitConst::kNumber6 + 0][0];
+    double py = m_al_1[i * KFitConst::kNumber6 + 1][0];
+    double pz = m_al_1[i * KFitConst::kNumber6 + 2][0];
+    double x  = m_al_1[i * KFitConst::kNumber6 + 3][0];
+    double y  = m_al_1[i * KFitConst::kNumber6 + 4][0];
+    double z  = m_al_1[i * KFitConst::kNumber6 + 5][0];
+    double a  = m_property[i][2];
+
+    double pt =  sqrt(px * px + py * py);
     if (pt == 0) {
       m_ErrorCode = KFitError::kDivisionByZero;
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
 
-    invPt   = 1. / pt;
-    invPt2  = invPt * invPt;
-    dlx  =  m_v_a[0][0] - x;
-    dly  =  m_v_a[1][0] - y;
-    dlz  =  m_v_a[2][0] - z;
-    a1   = -dlx * py + dly * px;
-    a2   =  dlx * px + dly * py;
-    r2d2 =  dlx * dlx + dly * dly;
-    Rx   =  dlx - 2.*px * a2 * invPt2;
-    Ry   =  dly - 2.*py * a2 * invPt2;
+    double invPt   = 1. / pt;
+    double invPt2  = invPt * invPt;
+    double dlx  =  m_v_a[0][0] - x;
+    double dly  =  m_v_a[1][0] - y;
+    double dlz  =  m_v_a[2][0] - z;
+    double a1   = -dlx * py + dly * px;
+    double a2   =  dlx * px + dly * py;
+    double r2d2 =  dlx * dlx + dly * dly;
+    double Rx   =  dlx - 2.*px * a2 * invPt2;
+    double Ry   =  dly - 2.*py * a2 * invPt2;
 
     if (a != 0) { // charged
 

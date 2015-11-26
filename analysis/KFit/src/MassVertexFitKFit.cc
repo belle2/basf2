@@ -224,7 +224,7 @@ MassVertexFitKFit::prepareInputMatrix(void) {
   m_property = HepMatrix(m_TrackCount, 3, 0);
   m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
   {
     // momentum x,y,z and position x,y,z
     m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
@@ -297,7 +297,7 @@ MassVertexFitKFit::prepareCorrelation(void) {
 
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; it++)
+  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
   {
     const HepMatrix& hm = *it;
 
@@ -327,7 +327,7 @@ enum KFitError::ECode
 MassVertexFitKFit::prepareOutputMatrix(void) {
   Hep3Vector h3v;
   int index = 0;
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
   {
     KFitTrack& pdata = *it;
     // tracks
@@ -460,21 +460,20 @@ MassVertexFitKFit::makeCoreMatrix(void) {
   m_E[2 * m_TrackCount][1] =  2.*Sum_al_1[0][0] * Sum_a - 2.*Sum_al_1[3][0] * Sum_tmpx;
   m_E[2 * m_TrackCount][2] =  0.;
 
-  double px, py, pz, x, y, z;
-  double pt, invPt, invPt2, dlx, dly, dlz, a1, a2, r2d2, B, Rx, Ry, S, U;
-  double sininv, sqrtag;
-
   for (int i = 0; i < m_TrackCount; i++)
   {
-    px = m_al_1[i * KFitConst::kNumber7 + 0][0];
-    py = m_al_1[i * KFitConst::kNumber7 + 1][0];
-    pz = m_al_1[i * KFitConst::kNumber7 + 2][0];
-    x  = m_al_1[i * KFitConst::kNumber7 + 4][0];
-    y  = m_al_1[i * KFitConst::kNumber7 + 5][0];
-    z  = m_al_1[i * KFitConst::kNumber7 + 6][0];
+    double B, S, U;
+    double sininv, sqrtag;
+
+    double px = m_al_1[i * KFitConst::kNumber7 + 0][0];
+    double py = m_al_1[i * KFitConst::kNumber7 + 1][0];
+    double pz = m_al_1[i * KFitConst::kNumber7 + 2][0];
+    double x  = m_al_1[i * KFitConst::kNumber7 + 4][0];
+    double y  = m_al_1[i * KFitConst::kNumber7 + 5][0];
+    double z  = m_al_1[i * KFitConst::kNumber7 + 6][0];
     a  = m_property[i][2];
 
-    pt =  sqrt(px * px + py * py);
+    double pt =  sqrt(px * px + py * py);
 
     if (pt == 0) {
       m_ErrorCode = KFitError::kDivisionByZero;
@@ -482,16 +481,16 @@ MassVertexFitKFit::makeCoreMatrix(void) {
       return m_ErrorCode;
     }
 
-    invPt  =  1. / pt;
-    invPt2 =  invPt * invPt;
-    dlx    =  m_v_a[0][0] - x;
-    dly    =  m_v_a[1][0] - y;
-    dlz    =  m_v_a[2][0] - z;
-    a1     = -dlx * py + dly * px;
-    a2     =  dlx * px + dly * py;
-    r2d2   =  dlx * dlx + dly * dly;
-    Rx     =  dlx - 2.*px * a2 * invPt2;
-    Ry     =  dly - 2.*py * a2 * invPt2;
+    double invPt  =  1. / pt;
+    double invPt2 =  invPt * invPt;
+    double dlx    =  m_v_a[0][0] - x;
+    double dly    =  m_v_a[1][0] - y;
+    double dlz    =  m_v_a[2][0] - z;
+    double a1     = -dlx * py + dly * px;
+    double a2     =  dlx * px + dly * py;
+    double r2d2   =  dlx * dlx + dly * dly;
+    double Rx     =  dlx - 2.*px * a2 * invPt2;
+    double Ry     =  dly - 2.*py * a2 * invPt2;
 
     if (a != 0.) { // charged
 

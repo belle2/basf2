@@ -39,8 +39,7 @@ MakeMotherKFit::~MakeMotherKFit(void)
 
 
 enum KFitError::ECode
-MakeMotherKFit::addTrack(const KFitTrack& p)
-{
+MakeMotherKFit::addTrack(const KFitTrack& p) {
   m_Tracks.push_back(p);
   m_Charge += p.getCharge();
   m_TrackCount = m_Tracks.size();
@@ -50,9 +49,9 @@ MakeMotherKFit::addTrack(const KFitTrack& p)
 
 
 enum KFitError::ECode
-MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag)
-{
-  if (e.num_row() != (int)KFitConst::kNumber7) {
+MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag) {
+  if (e.num_row() != (int)KFitConst::kNumber7)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -63,8 +62,7 @@ MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const H
 
 
 enum KFitError::ECode
-MakeMotherKFit::setMagneticField(const double mf)
-{
+MakeMotherKFit::setMagneticField(const double mf) {
   m_MagneticField = mf;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -72,8 +70,7 @@ MakeMotherKFit::setMagneticField(const double mf)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setVertex(const HepPoint3D& v)
-{
+MakeMotherKFit::setVertex(const HepPoint3D& v) {
   m_Vertex = v;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -81,9 +78,9 @@ MakeMotherKFit::setVertex(const HepPoint3D& v)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setVertexError(const HepSymMatrix& e)
-{
-  if (e.num_row() != 3) {
+MakeMotherKFit::setVertexError(const HepSymMatrix& e) {
+  if (e.num_row() != 3)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -97,9 +94,9 @@ MakeMotherKFit::setVertexError(const HepSymMatrix& e)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setTrackVertexError(const HepMatrix& e)
-{
-  if (e.num_row() != 3 || e.num_col() != (int)KFitConst::kNumber7) {
+MakeMotherKFit::setTrackVertexError(const HepMatrix& e) {
+  if (e.num_row() != 3 || e.num_col() != (int)KFitConst::kNumber7)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -113,8 +110,7 @@ MakeMotherKFit::setTrackVertexError(const HepMatrix& e)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setTrackZeroVertexError(void)
-{
+MakeMotherKFit::setTrackZeroVertexError(void) {
   HepMatrix zero(3, KFitConst::kNumber7, 0);
 
   return this->setTrackVertexError(zero);
@@ -122,9 +118,9 @@ MakeMotherKFit::setTrackZeroVertexError(void)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setCorrelation(const HepMatrix& e)
-{
-  if (e.num_row() != (int)KFitConst::kNumber7 || e.num_col() != (int)KFitConst::kNumber7) {
+MakeMotherKFit::setCorrelation(const HepMatrix& e) {
+  if (e.num_row() != (int)KFitConst::kNumber7 || e.num_col() != (int)KFitConst::kNumber7)
+  {
     m_ErrorCode = KFitError::kBadMatrixSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -138,8 +134,7 @@ MakeMotherKFit::setCorrelation(const HepMatrix& e)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setZeroCorrelation(void)
-{
+MakeMotherKFit::setZeroCorrelation(void) {
   HepMatrix zero(KFitConst::kNumber7, KFitConst::kNumber7, 0);
 
   return this->setCorrelation(zero);
@@ -147,8 +142,7 @@ MakeMotherKFit::setZeroCorrelation(void)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setFlagAtDecayPoint(const bool flag)
-{
+MakeMotherKFit::setFlagAtDecayPoint(const bool flag) {
   m_FlagAtDecayPoint = flag;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -156,8 +150,7 @@ MakeMotherKFit::setFlagAtDecayPoint(const bool flag)
 
 
 enum KFitError::ECode
-MakeMotherKFit::setFlagBeforeAfter(const int flag)
-{
+MakeMotherKFit::setFlagBeforeAfter(const int flag) {
   m_FlagBeforeAfter = flag;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -165,8 +158,7 @@ MakeMotherKFit::setFlagBeforeAfter(const int flag)
 
 
 enum KFitError::ECode
-MakeMotherKFit::getErrorCode(void) const
-{
+MakeMotherKFit::getErrorCode(void) const {
   return m_ErrorCode;
 }
 
@@ -199,20 +191,21 @@ MakeMotherKFit::getMotherError(void) const
 
 
 enum KFitError::ECode
-MakeMotherKFit::doMake(void)
-{
+MakeMotherKFit::doMake(void) {
   // ...makes matrix.
   HepMatrix dMdC(KFitConst::kNumber7, KFitConst::kNumber7 * m_TrackCount + 3, 0);
   HepSymMatrix Ec(KFitConst::kNumber7 * m_TrackCount + 3, 0);
 
 
   // ...sets error matrix
-  if (m_FlagCorrelation && m_Correlation.size() != static_cast<unsigned int>((m_TrackCount * m_TrackCount - m_TrackCount) / 2)) {
+  if (m_FlagCorrelation && m_Correlation.size() != static_cast<unsigned int>((m_TrackCount * m_TrackCount - m_TrackCount) / 2))
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
   }
-  if (m_FlagTrackVertexError && m_TrackVertexError.size() != (unsigned int)m_TrackCount) {
+  if (m_FlagTrackVertexError && m_TrackVertexError.size() != (unsigned int)m_TrackCount)
+  {
     m_ErrorCode = KFitError::kBadTrackSize;
     KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
@@ -230,7 +223,8 @@ MakeMotherKFit::doMake(void)
 
   // ...makes mother particle
   double px = 0, py = 0, pz = 0, E = 0;
-  for (int i = 0; i < m_TrackCount; i++) {
+  for (int i = 0; i < m_TrackCount; i++)
+  {
     double a = 0, dx = 0, dy = 0;
     if (m_FlagAtDecayPoint) {
       const double c = KFitConst::kLightSpeed; // C++ bug?
@@ -265,7 +259,7 @@ MakeMotherKFit::calculateError(HepSymMatrix* Ec) const
   // ...error matrix of tracks
   {
     int i = 0;
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++) {
+    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it) {
       (*Ec).sub(i * KFitConst::kNumber7 + 1, it->getError(m_FlagBeforeAfter));
       i++;
     }
@@ -303,7 +297,7 @@ MakeMotherKFit::calculateError(HepSymMatrix* Ec) const
   // ...error matrix between vertex and tracks
   if (m_FlagTrackVertexError) {
     int i = 0;
-    for (vector<HepMatrix>::const_iterator it = m_TrackVertexError.begin(), endIt = m_TrackVertexError.end(); it != endIt; it++) {
+    for (vector<HepMatrix>::const_iterator it = m_TrackVertexError.begin(), endIt = m_TrackVertexError.end(); it != endIt; ++it) {
       const HepMatrix& hm = *it;
       for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
           (*Ec)[j + m_TrackCount * KFitConst::kNumber7][k + i * KFitConst::kNumber7] = hm[j][k];

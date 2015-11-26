@@ -311,7 +311,7 @@ MassFitKFit::prepareInputMatrix(void) {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++) {
+    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it) {
       // momentum x,y,z and position x,y,z
       m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
       m_al_0[index * KFitConst::kNumber7 + 1][0] = it->getMomentum(KFitConst::kBeforeFit).y();
@@ -354,7 +354,7 @@ MassFitKFit::prepareInputMatrix(void) {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 0);
 
-    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+    for (vector<KFitTrack>::const_iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
     {
       // momentum x,y,z and position x,y,z
       m_al_0[index * KFitConst::kNumber7 + 0][0] = it->getMomentum(KFitConst::kBeforeFit).x();
@@ -425,7 +425,7 @@ MassFitKFit::prepareCorrelation(void) {
 
   int row = 0, col = 0;
 
-  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; it++)
+  for (vector<HepMatrix>::const_iterator it = m_BeforeCorrelation.begin(), endIt = m_BeforeCorrelation.end(); it != endIt; ++it)
   {
     const HepMatrix& hm = *it;
 
@@ -462,7 +462,7 @@ MassFitKFit::prepareCorrelation(void) {
 
       int i = 0;
       for (vector<HepMatrix>::const_iterator it = m_BeforeTrackVertexError.begin(), endIt = m_BeforeTrackVertexError.end(); it != endIt;
-           it++) {
+           ++it) {
         const HepMatrix& hm = *it;
         for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
             m_V_al_0[j + KFitConst::kNumber7 * m_TrackCount][k + i * KFitConst::kNumber7] = hm[j][k];
@@ -480,7 +480,7 @@ enum KFitError::ECode
 MassFitKFit::prepareOutputMatrix(void) {
   Hep3Vector h3v;
   int index = 0;
-  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; it++)
+  for (vector<KFitTrack>::iterator it = m_Tracks.begin(), endIt = m_Tracks.end(); it != endIt; ++it)
   {
     KFitTrack& pdata = *it;
     // tracks

@@ -211,17 +211,15 @@ namespace Belle2 {
   void ParticleGenerator::fillIndicesToUniqueIDMap(const std::vector<int>& listA, const std::vector<int>& listB, int& uniqueID)
   {
     const Particle* A, *B;
-    bool aIsAlreadyIn = false;
-    bool bIsAlreadyIn = false;
     bool copies = false;
     for (unsigned i = 0; i < listA.size(); i++) {
-      aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
+      bool aIsAlreadyIn = m_indicesToUniqueIDs.count(listA[i]) ? true : false;
 
       if (not aIsAlreadyIn)
         m_indicesToUniqueIDs[ listA[i] ] = uniqueID++;
 
       for (unsigned j = 0; j < listB.size(); j++) {
-        bIsAlreadyIn = m_indicesToUniqueIDs.count(listB[j]) ? true : false;
+        bool bIsAlreadyIn = m_indicesToUniqueIDs.count(listB[j]) ? true : false;
 
         if (bIsAlreadyIn)
           continue;

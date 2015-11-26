@@ -45,6 +45,10 @@ namespace Belle2 {
   class ParticleIndexGenerator {
 
   public:
+    /**
+     * Default constructor
+     */
+    ParticleIndexGenerator() : m_numberOfLists(0), m_iCombination(0), m_nCombinations(0) { }
 
     /**
      * Initialises the generator to produce combinations with the given sizes of each particle list
@@ -82,8 +86,11 @@ namespace Belle2 {
    */
   class ListIndexGenerator {
   public:
+    /**
+     * Default constructor
+     */
+    ListIndexGenerator() : m_numberOfLists(0), m_iCombination(0), m_nCombinations(0) { }
 
-  public:
     /**
      * Initialises the generator to produce the given type of sublist
      * @param numberOfLists Number of Particle Lists which shall be combined
@@ -120,7 +127,7 @@ namespace Belle2 {
      * Initialises the generator to produce the given type of sublist
      * @param decayString
      */
-    ParticleGenerator(std::string decayString);
+    explicit ParticleGenerator(std::string decayString);
 
     /**
      * Initialises the generator to produce the given type of sublist

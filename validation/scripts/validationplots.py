@@ -1489,6 +1489,8 @@ class Plotuple:
         # If we have a 1D histogram
         if mode == '1D':
 
+            if 'nogrid' not in self.metaoptions:
+                canvas.SetGrid()
             if 'logx' in self.metaoptions:
                 canvas.SetLogx()
             if 'logy' in self.metaoptions:

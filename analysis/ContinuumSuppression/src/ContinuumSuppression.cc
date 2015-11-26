@@ -210,7 +210,7 @@ namespace Belle2 {
       //       vs only those in the roe.
       CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
       cleoConesAll = cc.cleo_cone_with_all();
-      cleoConesRoe = cc.cleo_cone_with_roe();
+      //cleoConesRoe = cc.cleo_cone_with_roe();
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(foxwolfram(p3_cms_all.begin(), p3_cms_all.end(), SelfFunc(TVector3())));

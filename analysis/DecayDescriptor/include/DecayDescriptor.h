@@ -48,7 +48,8 @@ namespace Belle2 {
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
     /** Dereference operator. */
-    operator DecayDescriptor* () {
+    operator DecayDescriptor* ()
+    {
       return m_isNULL ? nullptr : this;
     }
     /** Defaut ctor. */
@@ -58,7 +59,7 @@ namespace Belle2 {
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */
-    bool init(const std::string str);
+    bool init(const std::string& str);
 
     /** Initialise the DecayDescriptor from a given DecayString.
     The DecayString struct is obtained from the parser called
@@ -89,27 +90,33 @@ namespace Belle2 {
     ["B", "D0", "D0_K", "D_pi", "pi"] */
     std::vector<std::string> getSelectionNames();
     /** return mother. */
-    const DecayDescriptorParticle* getMother() const {
+    const DecayDescriptorParticle* getMother() const
+    {
       return &m_mother;
     }
     /** return number of direct daughters. */
-    int getNDaughters() const {
+    int getNDaughters() const
+    {
       return m_daughters.size();
     }
     /** return i-th daughter (0 based index). */
-    const DecayDescriptor* getDaughter(int i) const {
+    const DecayDescriptor* getDaughter(int i) const
+    {
       return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
     }
     /** Check if additional photons shall be ignored. */
-    bool isIgnorePhotons() const {
+    bool isIgnorePhotons() const
+    {
       return m_isIgnorePhotons;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
-    bool isIgnoreIntermediate() const {
+    bool isIgnoreIntermediate() const
+    {
       return m_isIgnoreIntermediate;
     }
     /** Is the decay inclusive? */
-    bool isInclusive() const {
+    bool isInclusive() const
+    {
       return m_isInclusive;
     }
 

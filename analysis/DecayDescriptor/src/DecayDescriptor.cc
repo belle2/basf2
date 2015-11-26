@@ -45,7 +45,7 @@ DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
 {
 }
 
-bool DecayDescriptor::init(const std::string str)
+bool DecayDescriptor::init(const std::string& str)
 {
   // The decay string grammar
   DecayStringGrammar<std::string::const_iterator> g;
@@ -225,7 +225,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
               if (!daughter) continue;
               m_daughters[iDaughter_d].match(daughter, iDaughter_p);
             }
-            itMulti--;
+            --itMulti;
             isModified = true;
             break;
           }

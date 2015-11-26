@@ -14,7 +14,7 @@ main = create_path()
 
 main.add_module('RootInput')
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
+main.add_module('Geometry', components=['BeamPipe', 'MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
 main.add_module('MagnetSwitcher')
 """
 misalignment = cal.VXDMisalignment('VXDMisalignment')

@@ -248,7 +248,7 @@ void matrix_cal(int cortyp, const char* inputRootFilename,
     for (icn = 0; icn < max; icn++) { //%%%%%%%%%%%%%%%%%%%%%%%%55555555555
       index = 1;
       for (id = 0; id < 16; id++) {
-        Y[it] = 0.;
+        Y[id] = 0.; // was it, fixed 20151126.
       }
 
       A0 = 0;

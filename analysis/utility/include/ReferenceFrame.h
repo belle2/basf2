@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
      * Create new rest frame
      */
-    RestFrame(const Particle* particle);
+    explicit RestFrame(const Particle* particle);
 
     /**
      * Get vertex 3-vector in  rest frame system

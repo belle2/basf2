@@ -15,7 +15,7 @@ public:
    * Change ROOT working directory to given directory
    * @param workingDirectory
    */
-  WorkingDirectoryManager(std::string workingDirectory) : oldDirectory(gSystem->WorkingDirectory())
+  explicit WorkingDirectoryManager(std::string workingDirectory) : oldDirectory(gSystem->WorkingDirectory())
   {
     gSystem->ChangeDirectory(workingDirectory.c_str());
   }

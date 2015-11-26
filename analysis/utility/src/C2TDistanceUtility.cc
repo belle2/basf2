@@ -45,8 +45,6 @@ TVector3 C2TDistanceUtility::clipECLClusterPosition(TVector3 v1)
 TVector3 C2TDistanceUtility::getECLTrackHitPosition(Helix helix, TVector3 v1)
 {
   double cylRadiusECLInCM = 125.80;
-  double forwardZECLInCM = 196.5;
-  double backwardZECLInCM = -102.0;
   TVector3 badVector(1, 1, 1);
   badVector.SetMag(999.9);
   TVector3 v2;
@@ -54,6 +52,8 @@ TVector3 C2TDistanceUtility::getECLTrackHitPosition(Helix helix, TVector3 v1)
   double arcLength = helix.getArcLength2DAtCylindricalR(cylRadiusECLInCM);
 
   if (!std::isnan(arcLength)) {
+    double forwardZECLInCM = 196.5;
+    double backwardZECLInCM = -102.0;
     v2 = helix.getPositionAtArcLength2D(arcLength);
     if (v2.Z() > forwardZECLInCM or v2.Z() < backwardZECLInCM) {
       arcLength = helix.getArcLength2DAtCylindricalR(v1.Perp());

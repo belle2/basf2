@@ -26,7 +26,7 @@ namespace Belle2 {
     /** Default constructor. */
     DecayTree();
     /** Constructor with decaying object (e.g. MCParticle) provided. */
-    DecayTree(T* obj);
+    explicit DecayTree(T* obj);
     /** Destructor. */
     ~DecayTree();
     /** Return list of decay daughters. */

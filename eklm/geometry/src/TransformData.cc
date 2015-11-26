@@ -43,6 +43,7 @@ EKLM::TransformData::TransformData(bool global)
       }
     }
   }
+#if 0
   /* Read alignment data from the database and modify transformations. */
   DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
   if (alignment.isValid()) {
@@ -73,6 +74,7 @@ EKLM::TransformData::TransformData(bool global)
   } else
     B2INFO("Could not read alignment data from the database, "
            "using default positions.");
+#endif
   if (global)
     transformsToGlobal();
 }

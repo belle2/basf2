@@ -105,9 +105,9 @@ void test2_Validation_RecoStats() {
     Float_t DetectorStatsRecMeans[NVarsDetectorStatsRec];
     Float_t DetectorStatsSimMeans[NVarsDetectorStatsSim];
     
-    Float_t RecoStatsRMS[NVarsRecoStats];
-    Float_t DetectorStatsRecRMS[NVarsDetectorStatsRec];
-    Float_t DetectorStatsSimRMS[NVarsDetectorStatsSim];
+    // Float_t RecoStatsRMS[NVarsRecoStats];
+    // Float_t DetectorStatsRecRMS[NVarsDetectorStatsRec];
+    // Float_t DetectorStatsSimRMS[NVarsDetectorStatsSim];
 
     TCanvas *tc = new TCanvas ("tcReco","tcReco",1000,800);
     //tc->Divide(6,4);
@@ -126,7 +126,7 @@ void test2_Validation_RecoStats() {
         tc->Print("test2_Validation_RecoStats_plots.pdf");
         printf( "%s\t\t%.2f\t\t%.2f\n", RecoStats[i].VarName, h_RecoStats[i]->GetMean(), h_RecoStats[i]->GetRMS() );
         RecoStatsMeans[i]=h_RecoStats[i]->GetMean();
-        RecoStatsRMS[i]=h_RecoStats[i]->GetRMS();
+        // RecoStatsRMS[i]=h_RecoStats[i]->GetRMS();
     }
     
     for(int i=0; i<NVarsDetectorStatsRec; i++) {
@@ -141,7 +141,7 @@ void test2_Validation_RecoStats() {
         tc->Print("test2_Validation_RecoStats_plots.pdf");
         printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsRec[i].VarName, h_DetectorStatsRec[i]->GetMean(), h_DetectorStatsRec[i]->GetRMS() );
         DetectorStatsRecMeans[i]=h_DetectorStatsRec[i]->GetMean();
-        DetectorStatsRecRMS[i]=h_DetectorStatsRec[i]->GetRMS();
+        // DetectorStatsRecRMS[i]=h_DetectorStatsRec[i]->GetRMS();
     }
     for(int i=0; i<NVarsDetectorStatsSim; i++) {
         tc->cd(i+1);
@@ -156,7 +156,7 @@ void test2_Validation_RecoStats() {
         tc->Print("test2_Validation_RecoStats_plots.pdf");
         printf( "%s\t\t%.2f\t\t%.2f\n", DetectorStatsSim[i].VarName, h_DetectorStatsSim[i]->GetMean(), h_DetectorStatsSim[i]->GetRMS() );
         DetectorStatsSimMeans[i]=h_DetectorStatsSim[i]->GetMean();
-        DetectorStatsSimRMS[i]=h_DetectorStatsSim[i]->GetRMS();
+        // DetectorStatsSimRMS[i]=h_DetectorStatsSim[i]->GetRMS();
     }
 
     tc->Print("test2_Validation_RecoStats_plots.pdf]");

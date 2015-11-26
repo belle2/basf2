@@ -48,7 +48,7 @@ void test4_Timing()
 
     const TString tmpdir = exec("mktemp -d").Strip(TString::kTrailing, '\n');
 
-    const int nFiles = sizeof(files)/sizeof(const char*);
+    // const int nFiles = sizeof(files)/sizeof(const char*);
     for (int iFile = 0; iFile < 1; iFile++) {
         TString path(files[iFile]);
         int lastslash = path.Last('/');

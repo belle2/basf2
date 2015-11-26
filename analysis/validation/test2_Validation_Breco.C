@@ -93,7 +93,7 @@ void test2_Validation_B2Dpi() {
     h_md0->GetListOfFunctions()->Add(new TNamed("Check", "Consistent mean, width. Note the mean and width are tabulated here."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6};
-    const int pid[] = {211,321,11,13,2212,521,421};
+    // const int pid[] = {211,321,11,13,2212,521,421};
 
     float B_P4[4];
     float B_D0_P4[4];
@@ -258,7 +258,7 @@ void test2_Validation_B2JpsiKS() {
     h_mkstruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.49 GeV."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9, ks=10, jpsi=11};
-    const int pid[] = {211,321,11,13,2212,521,421,22,511,313,310,443};
+    // const int pid[] = {211,321,11,13,2212,521,421,22,511,313,310,443};
 
     Float_t B0_P4[4];
     Float_t B0_Jpsi_P4[4];
@@ -455,7 +455,7 @@ void test2_Validation_B2Kstgamma() {
     h_mksttruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.89 GeV."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9};
-    const int pid[] = {211,321,11,13,2212,521,421,22,511,313};
+    // const int pid[] = {211,321,11,13,2212,521,421,22,511,313};
 
     float B0_P4[4];
     float B0_KST0_P4[4];
@@ -605,7 +605,7 @@ void test2_Validation_B2rho0gamma() {
     h_mrhotruthmatch->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, centred at 0.89 GeV."));
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, bplus=5, d0=6, photon=7, bzero=8, kstar=9, rho0=10};
-    const int pid[] = {211,321,11,13,2212,521,421,22,511,313,113};
+    // const int pid[] = {211,321,11,13,2212,521,421,22,511,313,113};
 
     float B0_P4[4];
     float B0_rho0_P4[4];

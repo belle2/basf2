@@ -182,8 +182,6 @@ void test2_Validation_Efficiency_Track_Reco(TString filename, TList* list) {
     float pi_TruthP4[4];
     int pi_mcErrors;
     int iCand;
-    int nCands;
-    int evt_no;
     tree->SetBranchAddress("pi_mcErrors", &pi_mcErrors);
     tree->SetBranchAddress("pi_TruthP4",  &pi_TruthP4);
     tree->SetBranchAddress("iCand",       &iCand);

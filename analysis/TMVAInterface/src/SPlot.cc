@@ -15,11 +15,11 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    SPlot::SPlot(std::string modelFileName, const std::map<std::string, std::vector<float>>& discriminatingVariables) : model(nullptr),
+    SPlot::SPlot(std::string modelFileName, const std::map<std::string, std::vector<float>>& discriminatingVariables) :
+      workspace(std::unique_ptr<RooWorkspace>(new RooWorkspace("SPlotWorkspace"))), model(nullptr),
       m_modelObjectName("model"), m_modelYieldsObjectNames( {"signal", "background"}), m_modelPlotComponentNames({"sig", "bkg"})
     {
 
-      workspace = std::unique_ptr<RooWorkspace>(new RooWorkspace("SPlotWorkspace"));
       modelFile = std::unique_ptr<TFile>(new TFile(modelFileName.c_str(), "UPDATE"));
       modelFile->cd();
 

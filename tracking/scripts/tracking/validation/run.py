@@ -53,8 +53,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         # based on the properties in the base class.
         main_path = super(TrackingValidationRun, self).create_path()
 
-        # add the validation module to the path
-        self.preparePathValidation(main_path)
+        # add the validation module to the path, but only if requested
+        if not self.simulate_only:
+            self.preparePathValidation(main_path)
         return main_path
 
 

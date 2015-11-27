@@ -124,6 +124,10 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         # based on the properties in the base class.
         main_path = super(ReadOrGenerateTrackedEventsRun, self).create_path()
 
+        # early return if only a simulation run was requested
+        if self.simulate_only:
+            return main_path
+
         if self.finder_module is not None:
             # Setup track finder
             # determine which sub-detector hits will be used

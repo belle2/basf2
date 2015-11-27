@@ -100,6 +100,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
     # Declarative section which can be redefined in a subclass
     generator_module = None
     bkg_files = []
+    simulate_only = False
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
 
@@ -126,6 +127,14 @@ class ReadOrGenerateEventsRun(MinimalRun):
             help='Path to folder of files or to a file containing the background to be used. ' +
                  'Can be given multiple times.',
         )
+
+        argument_parser.add_argument(
+            '-so',
+            '--simulate-only',
+            action='store_true',
+            default=self.simulate_only,
+            dest='simulate_only',
+            help='Only generate and simulate the events, but do not run any tracking or validation code')
 
         return argument_parser
 

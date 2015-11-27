@@ -120,7 +120,7 @@ void FANGSStudyModule::defineHisto()
     h_xvyvedepW[i] = new TH2F(TString::Format("h_xvyvedepW_%d", i) , "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedepW[i]->Sumw2();
 
-    h_rvzvedepW[i] = new TH2F(TString::Format("h_rvzvedep_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedepW[i] = new TH2F(TString::Format("h_rvzvedepW_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepW[i]->Sumw2();
 
 
@@ -151,7 +151,7 @@ void FANGSStudyModule::defineHisto()
     h_xvyvedepWT[i] = new TH2F(TString::Format("h_xvyvedepWT_%d", i) , "edep [MeV] vs. x vs. y [cm]", 2000, -25., 25., 2000, -25., 25.);
     h_xvyvedepWT[i]->Sumw2();
 
-    h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
+    h_rvzvedepWT[i] = new TH2F(TString::Format("h_rvzvedepWT_%d", i) , "edep [MeV] vs. z [cm]", 2000, 0., 25., 2000, -25., 25.);
     h_rvzvedepWT[i]->Sumw2();
   }
   h_Edep = new TH2F("h_Edep", "det # # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);

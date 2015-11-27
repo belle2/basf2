@@ -96,7 +96,7 @@ void FANGSDigitizerModule::event()
     const int sen = FANGSSimHit.getSensor();
     const int detNb = (lad - 1) * 5 + sen - 1;
     const TVector3 trackPosition =  FANGSSimHit.getLocalPosEntry();
-    const double z = trackPosition.Y() / 10. + m_sensor_width / 2.; //mm to cm
+    const double z = trackPosition.Y() + m_sensor_width / 2.; //cm
     if (z < T0[detNb]) {
       T0[detNb] = z;
     }
@@ -104,7 +104,7 @@ void FANGSDigitizerModule::event()
 
   for (auto& val : T0) {
     if (m_lowerTimingCut < val && val < m_upperTimingCut) {
-      val = val / m_v_sensor; //cm to ns
+      val = val / m_v_sensor; //cm / (cm / ns) = ns
     } else {
       val = -1.;
     }
@@ -119,11 +119,10 @@ void FANGSDigitizerModule::event()
     const TVector3 simHitPosition =  FANGSSimHit.getLocalPosEntry();
     const double edep = FANGSSimHit.getEnergyDep() * 1e9; //GeV to eV
 
-    //mm to cm
-    const TVector3 chipPosition(
-      simHitPosition.X() / 10.,
-      simHitPosition.Z() / 10.,
-      simHitPosition.Y() / 10. + m_sensor_width / 2.);
+    const TVector3 chipPosition(//cm
+      simHitPosition.X(),
+      simHitPosition.Z(),
+      simHitPosition.Y() + m_sensor_width / 2.);
 
     //If new detector filled the chip
     if (olddetNb != detNb && m_dchip_map.size() > 0) {

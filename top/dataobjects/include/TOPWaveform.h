@@ -43,6 +43,7 @@ namespace Belle2 {
       float heightErr = 0;  /**< pulse height uncertainty (rms) */
       float widthErr = 0;   /**< pulse width uncertainty (rms) */
       float areaErr = 0;    /**< pulse area uncertainty (rms) */
+      int imax = 0;         /**< sample number at the waveform maximum */
     };
 
     /**
@@ -86,12 +87,10 @@ namespace Belle2 {
 
     /**
      * Reconstruct hits using CFD method (setDigital must be already called)
-     * (!!! under development !!!)
      * @param fraction CFD fraction
-     * @param delay CFD delay in number of samples
      * @return number of hits
      */
-    int convertToHits(float fraction = 0.2, unsigned delay = 2);
+    int convertToHits(float fraction);
 
     /**
      * Returns quartz bar ID
@@ -116,6 +115,20 @@ namespace Belle2 {
      * @return number of samples
      */
     int getSize() const { return m_data.size(); }
+
+    /**
+     * Returns number of bad samples.
+     * Bad samples are those with undefined (un-valid) pedestals.
+     * @return number of bad samples
+     */
+    int getNumofBadSamples() const
+    {
+      int n = 0;
+      for (const auto& data : m_data) {
+        if (data.err == 0) n++;
+      }
+      return n;
+    }
 
     /**
      * Returns waveform

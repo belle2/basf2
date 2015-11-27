@@ -11,6 +11,7 @@
 #include <top/dataobjects/TOPWaveform.h>
 #include <framework/logging/Logger.h>
 #include <math.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -66,7 +67,7 @@ int TOPWaveform::setDigital(float upperThr, float lowerThr, unsigned minWidth)
 }
 
 
-int TOPWaveform::convertToHits(float fraction, unsigned delay)
+int TOPWaveform::convertToHits(float fraction)
 {
 
   m_hits.clear();
@@ -83,21 +84,36 @@ int TOPWaveform::convertToHits(float fraction, unsigned delay)
   for (unsigned i = 0; i < m_digital.size(); i++) {
     const auto& digital = m_digital[i];
     const auto& data = m_data[i];
-    if (digital and !prev) { // begin of pulse
-      hit.time = data.time;
+    if (digital and !prev) { // begin of digital pulse
       hit.height = data.adc;
       hit.heightErr = data.err;
       hit.width = 0;
       hit.area = data.adc;
       hit.areaErr = data.err * data.err;
-    } else if (prev and !digital) { // end of pulse
+      hit.imax = i;
+    } else if (prev and !digital) { // end of digital pulse: determine time and append hit
+      float heightFraction = hit.height * fraction;
+      unsigned k = hit.imax;
+      if (k >= m_data.size() - 2) continue; // last sample may not be the maximum
+      while (k > 0 and m_data[k].adc > heightFraction) k--;
+      float t1 = m_data[k].time;
+      float y1 = m_data[k].adc - heightFraction;
+      if (y1 > 0) continue; // leading edge of signal not present
+      k++;
+      float t2 = m_data[k].time;
+      float y2 = m_data[k].adc - heightFraction;
+      if (y1 != y2) {
+        hit.time = t1 - (t2 - t1) / (y2 - y1) * y1;
+      } else {
+        hit.time = (t1 + t2) / 2;
+      }
       hit.areaErr = sqrt(hit.areaErr);
       m_hits.push_back(hit);
     }
     if (data.adc > hit.height) {
-      hit.time = data.time;
       hit.height = data.adc;
       hit.heightErr = data.err;
+      hit.imax = i;
     }
     hit.width++;
     hit.area += data.adc;

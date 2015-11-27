@@ -26,6 +26,7 @@
 // DataStore classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawTOP.h>
+#include <top/dataobjects/TOPTimeZero.h>
 
 #include <sstream>
 #include <map>
@@ -46,22 +47,24 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  TOPRawdataInputModule::TOPRawdataInputModule() : Module(),
-    m_listIndex(0), m_evtNumber(0), m_runNumber(0), m_expNumber(0), m_bytesRead(0),
-    m_packetsRead(0), m_eventsRead(0), m_scrodData(0), m_err(false)
+  TOPRawdataInputModule::TOPRawdataInputModule() : Module()
   {
     // set module description
     setDescription("Raw data reader for TOP beam tests. Converts data to standard format (RawTOP) and puts on the data store.");
 
     // Add parameters
-    addParam("inputFileName", m_inputFileName, "Input file name (.dat format)",
+    addParam("inputFileName", m_inputFileName, "Input file name of binary data",
              string(""));
     std::vector<std::string> defaultFileNames;
     addParam("inputFileNames", m_inputFileNames,
-             "List of input file names (.dat format)", defaultFileNames);
+             "List of input file names of binary data", defaultFileNames);
     addParam("dataFormat", m_dataFormat,
              "data format: 0 Kurtis packets, 1 gigE events", 0);
-
+    addParam("camacDir", m_camacDir,
+             "relative path to camac data (relative to binary data directory)",
+             string(""));
+    addParam("ftswBin", m_ftswBin,
+             "size of ftsw bin in [ns] - to convert to time", 50e-3);
   }
 
 
@@ -89,6 +92,8 @@ namespace Belle2 {
     StoreArray<RawTOP> rawData;
     rawData.registerInDataStore();
 
+    StoreObjPtr<TOPTimeZero>::registerPersistent();
+
   }
 
 
@@ -102,6 +107,8 @@ namespace Belle2 {
     // create data store objects
     StoreObjPtr<EventMetaData> evtMetaData;
     evtMetaData.create();
+    StoreObjPtr<TOPTimeZero> timeZero;
+    timeZero.create();
 
     // read event
     int err = 0;
@@ -153,6 +160,7 @@ namespace Belle2 {
     m_packetsRead = 0;
     m_eventsRead = 0;
     m_err = false;
+    m_linesRead = 0;
 
     if (fileName.empty()) {
       B2ERROR("openFile: file name is empty");
@@ -165,12 +173,53 @@ namespace Belle2 {
       return false;
     }
 
+    if (!m_camacDir.empty()) {
+      string dir;
+      string name = fileName;
+      auto slash = fileName.rfind("/");
+      if (slash != string::npos) {
+        dir = fileName.substr(0, slash + 1);
+        name = fileName.substr(slash + 1);
+      }
+      auto dot = name.rfind(".");
+      if (dot != string::npos) name = name.substr(0, dot);
+      m_camacName = dir + m_camacDir + "/" + name + ".camac";
+      m_camac.open(m_camacName.c_str());
+      if (!m_camac) {
+        B2ERROR("openFile: " << m_camacName << " *** failed to open");
+        return false;
+      }
+    }
+
     bool ok = setExpRunNumbers(fileName);
     if (!ok) B2WARNING("Cannot parse experiment and run numbers from file name");
 
     beginRun();
+
     B2INFO("openFile: " << fileName);
+    if (m_camac) B2INFO("openFile: " << m_camacName);
     return true;
+  }
+
+
+  void TOPRawdataInputModule::closeFile()
+  {
+
+    if (!m_stream.is_open()) return;
+    m_stream.close();
+
+    endRun();
+
+    B2INFO("closeFile: " << m_inputFileNames[m_listIndex] << ", "
+           << m_eventsRead << " events "
+           << m_packetsRead << " packets "
+           << m_bytesRead << " bytes read.");
+
+    if (!m_camac.is_open()) return;
+    m_camac.close();
+    B2INFO("closeFile: " << m_camacName << ", "
+           << m_linesRead << " lines read.");
+
   }
 
 
@@ -207,21 +256,6 @@ namespace Belle2 {
 
     return true;
 
-  }
-
-
-  void TOPRawdataInputModule::closeFile()
-  {
-    // close the file
-
-    if (!m_stream.is_open()) return;
-    m_stream.close();
-
-    endRun();
-    B2INFO("closeFile: " << m_inputFileNames[m_listIndex] << ", "
-           << m_eventsRead << " events "
-           << m_packetsRead << " packets "
-           << m_bytesRead << " bytes read.");
   }
 
 
@@ -342,6 +376,21 @@ namespace Belle2 {
     }
 
     B2DEBUG(100, "Number of packets saved: " << numPackets);
+
+    // read camac data
+    if (m_camac.is_open()) {
+      unsigned dummy = 0, ftsw = 0;
+      m_camac >> dummy >> ftsw;
+      if (!m_camac.good()) {
+        B2ERROR("Error reading camac data");
+        return -1;
+      }
+      StoreObjPtr<TOPTimeZero> timeZero;
+      timeZero->setFTSW(ftsw);
+      double t0 = ftsw * m_ftswBin;
+      timeZero->setTime(t0);
+      m_linesRead++;
+    }
 
     m_eventsRead++;
     return 0;

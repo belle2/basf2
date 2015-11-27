@@ -63,9 +63,7 @@ namespace Belle2 {
              "minimal required width of digital pulse in number of samples "
              "(accept pulse if width > minWidth)", 2);
     addParam("fraction", m_fraction,
-             "the fraction of constant fraction discrimination", 0.2);
-    addParam("delay", m_delay,
-             "the delay in number of samples of constant fraction discrimination", 2);
+             "the fraction for constant fraction discrimination", 0.5);
   }
 
 
@@ -86,6 +84,9 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     digits.registerInDataStore();
     digits.registerRelationTo(waveforms);
+
+    if (m_fraction >= 1) B2ERROR("TOPWFMerger: fraction must be less that 1");
+    if (m_fraction <= 0) B2ERROR("TOPWFMerger: fraction must be greater that 0");
 
   }
 
@@ -152,7 +153,7 @@ namespace Belle2 {
     for (auto& waveform : waveforms) {
       int nDig = waveform.setDigital(m_threshold, m_threshold - m_hysteresis, m_minWidth);
       if (nDig == 0) continue;
-      int nHit = waveform.convertToHits(m_fraction, m_delay);
+      int nHit = waveform.convertToHits(m_fraction);
       if (nHit == 0) continue;
       auto barID = waveform.getBarID();
       auto pixelID = waveform.getPixelID();
@@ -167,18 +168,6 @@ namespace Belle2 {
         digit->addRelationTo(&waveform);
       }
     }
-
-    return;
-
-    //-- test ----->
-    for (const auto& waveform : waveforms) {
-      cout << waveform.getBarID() << " ";
-      cout << waveform.getChannelID() << " ";
-      for (const auto& raw : waveform.getRelationsTo<TOPRawWaveform>())
-        cout << raw.getStorageWindow() << " ";
-      cout << endl;
-    }
-    //<-- test -----
 
   }
 
@@ -229,6 +218,7 @@ namespace Belle2 {
       TOPWaveform::WFSample sample;
       sample.adc = (rawADC - pedestals->getValue(i) - offset) * gain;
       sample.err = (pedestals->getError(i)) * gain;
+      if (sample.err == 0) sample.adc = 0; // undefined pedestal
       sample.time = calibration->getSampleTime(window, i);
       waveform->appendSample(sample);
       i++;

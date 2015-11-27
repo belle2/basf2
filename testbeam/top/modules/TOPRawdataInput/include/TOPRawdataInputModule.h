@@ -127,19 +127,26 @@ namespace Belle2 {
     TOPTB::ScrodData* readScrodData();
 
     std::string m_inputFileName; /**< input file name (raw data) */
-    int m_dataFormat; /**< data format */
     std::vector<std::string> m_inputFileNames; /**< list of input file names (raw data) */
-    unsigned int m_listIndex;  /**< current index of input file name list element */
-    unsigned long m_evtNumber; /**< current event number */
-    unsigned long m_runNumber; /**< run number */
-    unsigned long m_expNumber; /**< experiment number */
-    unsigned long long m_bytesRead;  /**< number of bytes read from file */
-    unsigned long m_packetsRead;     /**< number of good packets read from file */
-    unsigned long m_eventsRead;      /**< number of events read from file */
+    int m_dataFormat = 0; /**< data format */
+    std::string m_camacDir; /**< relative path to directory with camac data */
+    double m_ftswBin = 0; /**< size of ftsw bin in [ns] */
 
-    std::ifstream m_stream;   /**< input stream for reading from a file */
+    unsigned int m_listIndex = 0;  /**< current index of input file name list element */
+    unsigned long m_evtNumber = 0; /**< current event number */
+    unsigned long m_runNumber = 0; /**< run number */
+    unsigned long m_expNumber = 0; /**< experiment number */
+    unsigned long long m_bytesRead = 0;  /**< number of bytes read from file */
+    unsigned long m_packetsRead = 0;     /**< number of good packets read from file */
+    unsigned long m_eventsRead = 0;      /**< number of events read from file */
+
+    std::ifstream m_stream;   /**< input stream for reading from binary file */
+    std::ifstream m_camac;   /**< input stream for reading from camac file */
+    std::string m_camacName; /**< currently open camac file name */
+    unsigned int m_linesRead = 0; /**< number of lines read from camac file */
+
     TOPTB::ScrodData* m_scrodData;   /**< storage for one SCROD data */
-    bool m_err; /**< error status of last ScrodData::read */
+    bool m_err = false; /**< error status of last ScrodData::read */
 
     std::vector<unsigned> m_gigEPacket; /**< data of one gigE packet */
 

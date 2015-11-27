@@ -121,7 +121,6 @@ namespace Belle2 {
     double m_hysteresis;  /**< hysteresis value in number of sigma */
     int m_minWidth;    /**< minimal width of a digital pulse in number of samlpes */
     double m_fraction;    /**< constant fraction discrimination: fraction */
-    int m_delay;  /**< constant fraction discrimination: delay [number of samples] */
 
     DBArray<TOPASICChannel> m_asicChannels; /**< ASIC calibration constants */
     std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (bar,channel) and ptr */

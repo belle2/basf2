@@ -1356,6 +1356,8 @@ class Plotuple:
             reference object.
         @return. None
         """
+        self.remove_stats_tf1(self.reference.object)
+
         # Line is thick and black
         self.reference.object.SetLineColor(ROOT.kBlack)
         self.reference.object.SetLineWidth(2)
@@ -1369,6 +1371,14 @@ class Plotuple:
         self.reference.object.DrawCopy(self.reference.object.GetOption())
         canvas.Update()
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
+    def remove_stats_tf1(self, object):
+        # removed TF1s which might have been added by validation scripts
+        # in tracking/scripts/tracking/validation/plot.py:1597
+        tf1 = object.FindObject("FitAndStats")
+        if tf1:
+            function_list = object.GetListOfFunctions()
+            function_list.Remove(tf1)
 
     def create_image_plot(self):
         """!
@@ -1411,6 +1421,8 @@ class Plotuple:
             # Get the index of the current plot
             index = index_from_revision(plot.revision)
             style = get_style(index, itemsToPlotCount)
+
+            self.remove_stats_tf1(plot.object)
 
             # Set line properties accordingly
             plot.object.SetLineColor(style.GetLineColor())
@@ -1537,6 +1549,8 @@ class Plotuple:
             # Get the index of the current plot
             index = index_from_revision(plot.revision)
             style = get_style(index, itemsToPlotCount)
+
+            self.remove_stats_tf1(plot.object)
 
             # Set line properties accordingly
             plot.object.SetLineColor(style.GetLineColor())

@@ -1560,6 +1560,10 @@ class Plotuple:
                 else:
                     plot.object.DrawCopy("SAME")
 
+                # redraw grid ontop of histogram, if selected
+                if 'nogrid' not in self.metaoptions:
+                    canvas.RedrawAxis("g")
+
             # If we have a two-dimensional histogram
             elif mode == '2D':
                 # Switch to the correct sub-panel of the canvas. If a ref-plot

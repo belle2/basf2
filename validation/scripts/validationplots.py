@@ -1485,17 +1485,17 @@ class Plotuple:
         else:
             canvas = ROOT.TCanvas('', '', 700, 525)
 
-        # If there is a reference object, and the list of plots is not empty,
-        # perform a Chi^2-Test on the reference object and the first object in
-        # the plot list:
-        if self.reference is not None and self.newest:
-            self.chi2test(canvas)
-
         # Allow possibility to turn off the stats box
         if 'nostats' in self.metaoptions:
             ROOT.gStyle.SetOptStat("")
         else:
             ROOT.gStyle.SetOptStat("nemr")
+
+        # If there is a reference object, and the list of plots is not empty,
+        # perform a Chi^2-Test on the reference object and the first object in
+        # the plot list:
+        if self.reference is not None and self.newest:
+            self.chi2test(canvas)
 
         # Now we distinguish between 1D and 2D histograms
         # If we have a 1D histogram

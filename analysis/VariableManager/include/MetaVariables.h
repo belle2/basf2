@@ -44,6 +44,18 @@ namespace Belle2 {
     Manager::FunctionPtr modulo(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the true if the variable value is nan
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr isNAN(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the true if the variable value is infinity
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the absolute value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

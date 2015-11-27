@@ -34,6 +34,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cmath>
+
 namespace Belle2 {
   namespace Variable {
 
@@ -298,6 +300,30 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function modulo");
+      }
+    }
+
+    Manager::FunctionPtr isNAN(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle * particle) -> double { return std::isnan(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isNAN");
+      }
+    }
+
+    Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle * particle) -> double { return std::isinf(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isInfinity");
       }
     }
 
@@ -567,6 +593,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
                       "E.g. sin(?) returns the cosine of the value of the variable.");
+    REGISTER_VARIABLE("isNAN(variable)", isNAN,
+                      "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
+                      "Useful for debugging.");
+    REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
+                      "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
+                      "Useful for debugging.");
     REGISTER_VARIABLE("NBDeltaIfMissing(detector, variable)", NBDeltaIfMissing,
                       "Returns value of variable if pid information of detector is available otherwise -999 (delta function of NeuroBayes).\n"
                       "Possible values for detector are TOP and ARICH.\n"

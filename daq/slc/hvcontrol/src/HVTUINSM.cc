@@ -38,7 +38,7 @@ void HVTUINSM::initNSM(const std::string& cfilename,
                          cfile.getInt("database.port"));
   const std::string nodename = cfile.get("nsm.nodename");
   LogFile::open("hvcui/" + cuiname, LogFile::ERROR);
-  StringList confignames = StringUtil::split(cfile.get("hv.confignames"), ',');
+  StringList confignames = StringUtil::split(cfile.get("hv.config.standby"), ',');
   const std::string configname = (StringUtil::find(confignames[0], "@")) ?
                                  confignames[0] : StringUtil::toupper(nodename) + "@" + confignames[0];
   const std::string tablename = cfile.get("hv.tablename");
@@ -68,7 +68,7 @@ void HVTUINSM::initNSM(const std::string& cfilename,
   init(false, interval);
   sleep(1);
   m_nsm = new HVTUICallback(NSMNode(cuiname), this);
-  m_nsm->addConfig(config);
+  m_nsm->setStandbyConfig(config);
   m_nsm->addAll(config);
   PThread(new NSMNodeDaemon(m_nsm, cfile.get("nsm.host"),
                             cfile.getInt("nsm.port")));

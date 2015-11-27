@@ -25,6 +25,33 @@ HVCallback::HVCallback() throw() : NSMCallback()
   reg(HVCommand::TURNON);
   reg(HVCommand::TURNOFF);
   m_state_demand = HVState::OFF_S;
+  m_config = FLAG_STANDBY;
+}
+
+HVConfig& HVCallback::getConfig() throw()
+{
+  switch (m_config) {
+    case FLAG_STANDBY:
+      return m_config_standby;
+    case FLAG_SHOULDER:
+      return m_config_shoulder;
+    case FLAG_PEAK:
+      return m_config_peak;
+  }
+  return m_config_standby;
+}
+
+const HVConfig& HVCallback::getConfig() const throw()
+{
+  switch (m_config) {
+    case FLAG_STANDBY:
+      return m_config_standby;
+    case FLAG_SHOULDER:
+      return m_config_shoulder;
+    case FLAG_PEAK:
+      return m_config_peak;
+  }
+  return m_config_standby;
 }
 
 bool HVCallback::perform(NSMCommunicator& com) throw()
@@ -41,36 +68,78 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
     if (cmd == HVCommand::TURNOFF) {
       m_state_demand = HVState::OFF_S;
       getNode().setState(tstate);
+      m_config = FLAG_STANDBY;
       turnoff();
     } else if (state.isOff()) {
       if (cmd == HVCommand::CONFIGURE) {
         const char* data = msg.getData();
         if (msg.getLength() && strlen(data) > 0) {
-          m_confignames = data;
+          StringList names = StringUtil::split(data, ',');
+          for (size_t i = 0; i < names.size(); i++) {
+            StringList s = StringUtil::split(names[i], '=');
+            if (s.size() > 1) {
+              if (s[0] == "standby") {
+                m_configname_standby = s[1];
+              } else if (s[0] == "shoulder") {
+                m_configname_shoulder = s[1];
+              } else if (s[0] == "peak") {
+                m_configname_peak = s[1];
+              }
+            }
+          }
         } else {
           LogFile::warning("No config name");
         }
-        LogFile::debug("config name : %s", m_confignames.c_str());
-        dbload(m_confignames);
-        addAll(getConfig());
+        LogFile::info("standby  : %s", m_configname_standby.c_str());
+        LogFile::info("shoulder : %s", m_configname_shoulder.c_str());
+        LogFile::info("peak     : %s", m_configname_peak.c_str());
+        reset();
+        dbload(m_config_standby, m_configname_standby);
+        dbload(m_config_shoulder, m_configname_shoulder);
+        dbload(m_config_peak, m_configname_peak);
+        addAll(m_config_standby);
+        set("config.standby", m_configname_standby);
+        set("config.shoulder", m_configname_shoulder);
+        set("config.peak", m_configname_peak);
+        m_config = FLAG_STANDBY;
         configure(getConfig());
+        addAll(getConfig());
       } else if (cmd == HVCommand::TURNON) {
+        get("config.standby", m_configname_standby);
+        dbload(m_config_standby, m_configname_standby);
+        addAll(m_config_standby);
         getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
+        m_config = FLAG_STANDBY;
         turnon();
       }
     } else if (state.isOn()) {
       if (cmd == HVCommand::STANDBY && state != HVState::STANDBY_S) {
+        get("config.standby", m_configname_standby);
+        dbload(m_config_standby, m_configname_standby);
+        addAll(m_config_standby);
         getNode().setState(tstate);
         m_state_demand = HVState::STANDBY_S;
+        m_config = FLAG_STANDBY;
+        configure(getConfig());
         standby();
       } else if (cmd == HVCommand::SHOULDER && state != HVState::SHOULDER_S) {
+        get("config.shoulder", m_configname_shoulder);
+        dbload(m_config_shoulder, m_configname_shoulder);
+        addAll(m_config_shoulder);
         getNode().setState(tstate);
         m_state_demand = HVState::SHOULDER_S;
+        m_config = FLAG_SHOULDER;
+        configure(getConfig());
         shoulder();
       } else if (cmd == HVCommand::PEAK && state != HVState::PEAK_S) {
-        getNode().setState(HVState::TRANSITION_TS);
+        get("config.peak", m_configname_peak);
+        dbload(m_config_peak, m_configname_peak);
+        addAll(m_config_peak);
+        getNode().setState(tstate);
         m_state_demand = HVState::PEAK_S;
+        m_config = FLAG_PEAK;
+        configure(getConfig());
         peak();
       }
     }
@@ -86,7 +155,10 @@ void HVCallback::addAll(const HVConfig& config) throw()
 {
   const HVCrateList& crate_v(config.getCrates());
   reset();
-  add(new NSMVHandlerText("configs", true, false, m_confignames));
+  add(new NSMVHandlerText("config", true, false, config.getName()));
+  add(new NSMVHandlerText("config.standby", true, true, m_configname_standby));
+  add(new NSMVHandlerText("config.shoulder", true, true, m_configname_shoulder));
+  add(new NSMVHandlerText("config.peak", true, true, m_configname_peak));
   add(new NSMVHandlerText("state", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerInt("ncrates", true, false, (int)crate_v.size()));
   for (HVCrateList::const_iterator icrate = crate_v.begin();

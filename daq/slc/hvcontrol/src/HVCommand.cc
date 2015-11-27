@@ -75,7 +75,7 @@ HVState HVCommand::nextTState(const HVState& state) const throw()
     if (state == HVState::OFF_S ||
         state == HVState::STANDBY_S ||
         state == HVState::SHOULDER_S) {
-      return HVState::RAMPINGDOWN_TS;
+      return HVState::RAMPINGUP_TS;
     } else if (state == HVState::PEAK_S) {
       return HVState::PEAK_S;
     }

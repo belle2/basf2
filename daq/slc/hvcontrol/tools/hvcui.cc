@@ -5,6 +5,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <iostream>
+#include <stdlib.h>
 
 using namespace Belle2;
 
@@ -12,17 +13,18 @@ int main(int argc, char** argv)
 {
   int crate = -1;
   if (argc <= 2) {
-    LogFile::debug("Usage : %s <config> <cuiname> [-c crateid]", argv[0]);
+    LogFile::debug("Usage : %s <config> [-n <cuiname>] [-c crateid]", argv[0]);
     return 1;
   }
+  std::string cuiname = getenv("USERNAME");
   for (int i = 1; i < argc; i++) {
     if (std::string(argv[i]) == "-c") {
       crate = atoi(argv[i + 1]);
-      break;
+    } else if (std::string(argv[i]) == "-n") {
+      cuiname = argv[i + 1];
     }
   }
   const std::string cfilename = StringUtil::form("hvcontrol/%s", argv[1]);
-  const std::string cuiname = (crate < 0) ? argv[2] : StringUtil::form("%s_%d", argv[2], crate);
   HVTUINSM tui(crate);
   tui.initNSM(cfilename, cuiname);
   tui.run();

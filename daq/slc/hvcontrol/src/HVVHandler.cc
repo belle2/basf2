@@ -34,6 +34,7 @@ bool NSMVHandlerHVRampUpSpeed::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
   val = m_callback.getRampUpSpeed(m_crate, m_slot, m_channel);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -41,6 +42,7 @@ bool NSMVHandlerHVRampDownSpeed::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
   val = m_callback.getRampDownSpeed(m_crate, m_slot, m_channel);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -92,6 +94,7 @@ bool NSMVHandlerHVSwitch::handleSetText(const std::string& val)
   m_callback.setSwitch(m_crate, m_slot, m_channel, (val == "ON"));
   std::string state = HVMessage::getStateText((HVMessage::State)m_callback.getState(m_crate, m_slot, m_channel));
   std::string vname = StringUtil::replace(getName(), "switch", "state");
+  m_callback.set(m_name, val);
   m_callback.set(vname, state);
   HV_HANDLE_POST;
 }
@@ -100,6 +103,7 @@ bool NSMVHandlerHVRampUpSpeed::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setRampUpSpeed(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -107,6 +111,7 @@ bool NSMVHandlerHVRampDownSpeed::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setRampDownSpeed(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -114,6 +119,7 @@ bool NSMVHandlerHVVoltageDemand::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setVoltageDemand(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -121,6 +127,7 @@ bool NSMVHandlerHVVoltageLimit::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setVoltageLimit(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -128,6 +135,7 @@ bool NSMVHandlerHVCurrentLimit::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setCurrentLimit(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -135,6 +143,7 @@ bool NSMVHandlerHVState::handleSetText(const std::string& val)
 {
   HV_HANDLE_PRE;
   m_callback.setState(m_crate, m_slot, m_channel, HVMessage::getState(val.c_str()));
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -142,6 +151,7 @@ bool NSMVHandlerHVVoltageMonitor::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setVoltageMonitor(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
@@ -149,6 +159,7 @@ bool NSMVHandlerHVCurrentMonitor::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
   m_callback.setCurrentMonitor(m_crate, m_slot, m_channel, val);
+  m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 

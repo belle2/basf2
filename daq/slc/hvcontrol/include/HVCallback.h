@@ -14,6 +14,11 @@ namespace Belle2 {
 
   class HVCallback : public NSMCallback {
 
+  protected:
+    enum ConfigFlag {
+      FLAG_STANDBY = 1, FLAG_SHOULDER = 2, FLAG_PEAK = 3
+    };
+
   public:
     HVCallback() throw();
     virtual ~HVCallback() throw() {}
@@ -53,21 +58,28 @@ namespace Belle2 {
     virtual float getCurrentMonitor(int, int, int) throw(IOException) { return 0; }
 
   public:
-    HVConfigList& getConfigs() throw() { return m_config; }
-    const HVConfigList& getConfigs() const throw() { return m_config; }
-    HVConfig& getConfig(int index = 0) throw(std::out_of_range) { return m_config[index]; }
-    const HVConfig& getConfig(int index = 0) const throw(std::out_of_range) { return m_config[index]; }
-    void setConfigNames(const std::string& confignames) throw() { m_confignames = confignames; }
+    HVConfig& getConfigStandby() throw() { return m_config_standby; }
+    HVConfig& getConfigShoulder() throw() { return m_config_shoulder; }
+    HVConfig& getConfigPeak() throw() { return m_config_peak; }
+    const HVConfig& getConfigStandby() const throw() { return m_config_standby; }
+    const HVConfig& getConfigShoulder() const throw() { return m_config_shoulder; }
+    const HVConfig& getConfigPeak() const throw() { return m_config_peak; }
+    HVConfig& getConfig() throw();
+    const HVConfig& getConfig() const throw();
+    void setStandbyConfig(const HVConfig& config) throw() { m_config_standby = config; }
+    void setShoulderConfig(const HVConfig& config) throw() { m_config_shoulder = config; }
+    void setPeakConfig(const HVConfig& config) throw() { m_config_peak = config; }
+    void setStandbyConfig(const std::string& name) throw() { m_configname_standby = name; }
+    void setShoulderConfig(const std::string& name) throw() { m_configname_shoulder = name; }
+    void setPeakConfig(const std::string& name) throw() { m_configname_peak = name; }
 
   public:
-    void addConfig(const HVConfig& config) throw() { m_config.push_back(config); }
     void addAll(const HVConfig& config) throw();
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
 
   protected:
-    virtual void dbload(const std::string& confignames) throw(IOException) = 0;
-    void resetConfigs() throw() { m_config = HVConfigList(); }
+    virtual void dbload(HVConfig& config, const std::string& confignames) throw(IOException) = 0;
 
   public:
     virtual bool perform(NSMCommunicator& com) throw();
@@ -78,11 +90,16 @@ namespace Belle2 {
 
   protected:
     Mutex m_mutex;
-    std::string m_confignames;
+    std::string m_configname_standby;
+    std::string m_configname_shoulder;
+    std::string m_configname_peak;
 
   protected:
     HVState m_state_demand;
-    HVConfigList m_config;
+    HVConfig m_config_standby;
+    HVConfig m_config_shoulder;
+    HVConfig m_config_peak;
+    ConfigFlag m_config;
 
   };
 

@@ -47,7 +47,7 @@ namespace Belle2 {
   protected:
     void load(const HVConfig& config,
               bool alloff, bool loadpars) throw(HVHandlerException);
-    void dbload(const std::string& confignames) throw(IOException);
+    void dbload(HVConfig& config, const std::string& confignames) throw(IOException);
 
   private:
     void monitor() throw();

@@ -6,6 +6,7 @@ import itertools
 import collections
 import array
 import numpy as np
+from functools import reduce
 
 import ROOT
 
@@ -482,10 +483,15 @@ class ValidationPlot(object):
                 self.plot.Write()
 
             for histogram in self.histograms:
+                # always disable ROOT's stat plot because it hides items
+                meta_options = ["nostats"]
+
                 # add expert option, if requested
                 if self.is_expert:
-                    histogram.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'expert'))
+                    meta_options.append("expert")
 
+                meta_options_str = reduce(lambda x, y: x + y + ",", meta_options, "")[:-1]
+                histogram.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', meta_options_str))
                 histogram.Write()
 
     @property

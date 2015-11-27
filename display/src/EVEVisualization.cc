@@ -180,20 +180,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   }
   // finished parsing the option string -------------------------------------------------------------
 
-  //TODO: move these
-  bool refit_ = false;
-  bool drawCardinalRep_ = true;
-  bool drawErrors = false;
-  bool drawRefTrack_ = false;
-  bool drawForward_ = false;
-  bool drawBackward_ = false;
-  eFitterType fitterId_ = RefKalman;
-  unsigned int repId_ = 0;
-  eMultipleMeasurementHandling mmHandling_ = unweightedClosestToPrediction;
-  double dPVal_ = 1.E-3;
-  int nMaxIter_ = 4;
-  bool resort_ = true;
-
   // We loop over all points (scattering non-measurement points for GBL)
   // and for Kalman we skip those with no measurements, which should
   // not be there
@@ -223,7 +209,12 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
     }
 
     boost::scoped_ptr<Track> refittedTrack(NULL);
-    if (refit_) {
+    if (m_refit) {
+
+      double dPVal_ = 1.E-3;
+      int nMaxIter_ = 4;
+      eFitterType fitterId_ = RefKalman;
+      eMultipleMeasurementHandling mmHandling_ = unweightedClosestToPrediction;
 
       // We use AbsFitter because GBL does not inherit from AbsKalmanFitter.
       boost::scoped_ptr<AbsFitter> fitter;
@@ -263,6 +254,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
       refittedTrack->deleteFitterInfo();
 
       try {
+        bool resort_ = true;
         fitter->processTrack(refittedTrack.get(), resort_);
       } catch (genfit::Exception& e) {
         B2ERROR("Exception (" << e.what() << ") encountered, could not refit track");
@@ -275,10 +267,11 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
     AbsTrackRep* rep;
 
-    if (drawCardinalRep_) {
+    if (m_drawCardinalRep) {
       rep = track->getCardinalRep();
       B2DEBUG(100, "Draw cardinal rep");
     } else {
+      unsigned int repId_ = 0;
       if (repId_ >= track->getNumReps())
         repId_ = track->getNumReps() - 1;
       rep = track->getTrackRep(repId_);
@@ -356,29 +349,29 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
         // Kalman: non-null prevFi ensures that the previous fitter info was also KalmanFitterInfo
         if (fi && prevFi) {
-          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, drawErrors);
-          if (drawErrors) { // make sure to draw errors in both directions
-            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, drawErrors, 0);
+          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors);
+          if (m_drawErrors) { // make sure to draw errors in both directions
+            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors, 0);
           }
           //these are currently disabled.
           //TODO: if activated, I want to have a separate TEveStraightLineSet instead of eveTrack (different colors/options)
-          if (drawForward_)
-            makeLines(eveTrack, prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, markType, drawErrors, 0);
-          if (drawBackward_)
-            makeLines(eveTrack, prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, markType, drawErrors);
+          if (m_drawForward)
+            makeLines(eveTrack, prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, markType, m_drawErrors, 0);
+          if (m_drawBackward)
+            makeLines(eveTrack, prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, markType, m_drawErrors);
           // draw reference track if corresponding option is set ------------------------------------------
-          if (drawRefTrack_ && fi->hasReferenceState() && prevFi->hasReferenceState())
+          if (m_drawRefTrack && fi->hasReferenceState() && prevFi->hasReferenceState())
             makeLines(eveTrack, prevFi->getReferenceState(), fi->getReferenceState(), rep, markType, false);
         }
 
         // GBL: non-null prevGFi ensures that the previous fitter info was also GblFitterInfo
         if (gfi && prevGFi) {
-          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, drawErrors);
-          if (drawErrors) {
-            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, drawErrors, 0);
+          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors);
+          if (m_drawErrors) {
+            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors, 0);
           }
 
-          if (drawRefTrack_ && gfi->hasReferenceState() && prevGFi->hasReferenceState()) {
+          if (m_drawRefTrack && gfi->hasReferenceState() && prevGFi->hasReferenceState()) {
             StateOnPlane prevSop = prevGFi->getReferenceState();
             StateOnPlane sop = gfi->getReferenceState();
             makeLines(eveTrack, &prevSop, &sop, rep, markType, false);

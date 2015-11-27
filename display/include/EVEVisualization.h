@@ -333,6 +333,24 @@ namespace Belle2 {
 
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;
+
+    /** Do refit in addTrack */
+    bool m_refit = false;
+
+    /** Draw cardinal representation in addTrack */
+    bool m_drawCardinalRep = true;
+
+    /** Draw errors in addTrack */
+    bool m_drawErrors = false;
+
+    /** Draw reference track in addTrack */
+    bool m_drawRefTrack = false;
+
+    /** draw forward in addTrack */
+    bool m_drawForward = false;
+
+    /** draw backward in addTrack */
+    bool m_drawBackward = false;
   };
 
   template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName,

@@ -611,9 +611,17 @@ void ECLReconstructorModule::TmpClusterCorrection::scale(ECLCluster& c) const
     int offset = thetaRegion * ncoeffE;
     unsigned int iE = static_cast<unsigned int>(energy / m_deltaE);
     double corr{0};
-    if (iE == 0)
-      corr = m_tmpCorrection[ offset ];
-    else if (iE < m_npointsE - 1) {
+    if (iE == 0) {
+      double halfdeltaE = m_deltaE / 2;
+      if (energy < halfdeltaE)
+        corr = m_tmpCorrection[ offset ];
+      else {
+        double incE{ energy - halfdeltaE };
+        const double& clow { m_tmpCorrection[offset] };
+        const double& chigh{ m_tmpCorrection[offset + 1 ] };
+        corr = clow + incE / halfdeltaE * (chigh - clow);
+      }
+    } else if (iE < m_npointsE - 1) {
       double incE{ energy - iE * m_deltaE };
       double clow{ m_tmpCorrection[offset + iE ] };
       double chigh{ m_tmpCorrection[offset + iE + 1 ] };

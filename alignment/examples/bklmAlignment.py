@@ -43,8 +43,7 @@ algo.steering().command('Parameters')
 for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
     for ipar in range(1, 7):
         label = Belle2.GlobalLabel(vxdid, ipar)
-        par_label = label.label() + ipar
-        cmd = str(par_label) + ' 0. -1.'
+        cmd = str(label.label()) + ' 0. -1.'
         algo.steering().command(cmd)
 
 # Fixing CDC params --------------------------------------
@@ -52,10 +51,10 @@ for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
 
 # Fix all CDC layers
 for icLayer in (range(0, 57)):
-    for ipar in range(1, 3)_
-    # Fix all for now (only layer shifts X/Y and only axial in fact)
-    cmd = str(Belle2.GlobalLabel(Belle2.WireID(icLayer, 511), ipar).label()) + ' 0. -1.'
-    algo.steering().command(cmd)
+    for ipar in range(1, 3):
+        # Fix all for now (only layer shifts X/Y and only axial in fact)
+        cmd = str(Belle2.GlobalLabel(Belle2.WireID(icLayer, 511), ipar).label()) + ' 0. -1.'
+        algo.steering().command(cmd)
 
 # Fixing BKLM params --------------------------------------
 # Fix all parameters except U, V for all modules
@@ -68,7 +67,7 @@ for sector in range(0, 9):
                 if ipar in [1, 2]:
                     continue
 
-                klmid = Belle2.BKLMID()
+                klmid = Belle2.BKLMElementID()
                 klmid.setIsForward(forward)
                 klmid.setSectorNumber(sector)
                 klmid.setLayerNumber(layer)

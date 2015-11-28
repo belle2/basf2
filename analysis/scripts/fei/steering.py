@@ -191,18 +191,20 @@ def fullEventInterpretation(signalParticleList, selection_path, particles):
     dag.add('ParticleList_mu+:FSP', 'mu+:FSP')
     dag.add('ParticleList_pi+:FSP', 'pi+:FSP')
     dag.add('ParticleList_K+:FSP', 'K+:FSP')
-    dag.add('ParticleList_K_S0:FSP', 'K_S0:FSP')
+    dag.add('ParticleList_K_S0:V0', 'K_S0:V0')
     dag.add('ParticleList_K_L0:FSP', 'K_L0:FSP')
     dag.add('ParticleList_p+:FSP', 'p+:FSP')
     dag.add('ParticleList_gamma:FSP', 'gamma:FSP')
+    dag.add('ParticleList_gamma:V0', 'gamma:V0')
     dag.add('VertexFit_e+:FSP', 'e+:FSP')
     dag.add('VertexFit_mu+:FSP', 'mu+:FSP')
     dag.add('VertexFit_pi+:FSP', 'pi+:FSP')
     dag.add('VertexFit_K+:FSP', 'K+:FSP')
-    dag.add('VertexFit_K_S0:FSP', 'K_S0:FSP')
+    dag.add('VertexFit_K_S0:V0', 'K_S0:V0')
     dag.add('VertexFit_K_L0:FSP', 'K_L0:FSP')
     dag.add('VertexFit_p+:FSP', 'p+:FSP')
     dag.add('VertexFit_gamma:FSP', 'gamma:FSP')
+    dag.add('VertexFit_gamma:V0', 'gamma:V0')
 
     # Add basic properties defined by the user of all Particles as Resources into the graph
     for particle in particles:

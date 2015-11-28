@@ -9,8 +9,11 @@ from fei import *
 from B2Tools import format
 
 import pickle
+import os
 import sys
 import math
+import functools
+import pprint
 
 
 def removeJPsiSlash(string):
@@ -26,10 +29,6 @@ def GetEntriesSafe(tree, selection):
     tree.Process(s, "", 1000000000000000)
     tree.SetNotify(0)
     return s.GetSelectedRows()
-
-
-def calcSum(hist):
-    return sum(hist.GetXaxis().GetBinCenter(bin + 1) * hist.GetBinContent(bin + 1) for bin in range(hist.GetNbinsX()))
 
 
 def purity(nSig, nBg):
@@ -59,6 +58,8 @@ def efficiencyError(nSig, nTrueSig):
     k = float(nSig)
     n = float(nTrueSig)
     variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
+    if variance <= 0:
+        return 0.0
     return math.sqrt(variance)
 
 
@@ -123,7 +124,7 @@ def makeMbcPlot(ntuple, outputFileName, targetVar):
     for cut in [0.01, 0.1, 0.5]:
         ntuple.SetLineColor(int(color))
         ntuple.SetLineStyle(ROOT.kSolid)
-        common = 'extraInfo__bouniqueSignal__bc == 1 && Mbc > 5.23 && extraInfo__boSignalProbability__bc > '
+        common = 'Mbc > 5.23 && extraInfo__boSignalProbability__bc > '
         ntuple.Draw('Mbc', common + str(cut), '' if first_plot else 'same')
         first_plot = False
 
@@ -165,7 +166,7 @@ def makeROCPlotFromNtuple(ntuple, outputFileName, nTrueSignal, targetVar):
     probabilityVar = 'extraInfo__boSignalProbability__bc'
     ntuple.Project('ROCbackground', probabilityVar, '!' + targetVar)
     ntuple.Project('ROCsignal', probabilityVar, targetVar)
-    ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + targetVar + '  && extraInfo__bouniqueSignal__bc == 1')
+    ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + targetVar)
     ntuple.Project('ROCuniqueSignal', probabilityVar, targetVar + '  && extraInfo__bouniqueSignal__bc == 1')
 
     for i, (signal, bckgrd) in enumerate([(signalHist, bckgrdHist), (uniqueSignalHist, uniqueBckgrdHist)]):
@@ -204,18 +205,95 @@ def makeROCPlotFromNtuple(ntuple, outputFileName, nTrueSignal, targetVar):
     canvas.SaveAs(outputFileName)
 
 
-def getMCCounts(obj):
+def createParticlePlots(particle, ntuple_filename, mc_counts):
+    if ntuple_filename is None:
+        return
+    root_file = ROOT.TFile(ntuple_filename)
+    ntuple = root_file.Get('variables')
+    mc_count = mc_counts[abs(pdg.from_name(particle.name))]
+    makeROCPlotFromNtuple(ntuple,
+                          removeJPsiSlash(particle.name) + '_' + particle.label + '_roc.png',
+                          mc_count,
+                          particle.mvaConfig.target)
+    if particle.identifier in ['B+:generic', 'B0:generic']:
+        makeMbcPlot(ntuple,
+                    removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
+                    particle.mvaConfig.target)
+    if particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
+        makeCosBDLPlot(ntuple,
+                       removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
+                       particle.mvaConfig.target)
+
+
+def calcSum(hist):
+    """
+    Calculate sum of given ROOT histogram
+    @param hist ROOT histogram
+    @return float
+    """
+    return sum(hist.GetXaxis().GetBinCenter(bin + 1) * hist.GetBinContent(bin + 1) for bin in range(hist.GetNbinsX()))
+
+
+def calcStdDev(hist):
+    """
+    Calculate standard deviation of given ROOT histogram
+    @param hist ROOT histogram
+    @return float
+    """
+    return hist.GetStdDev()
+
+
+def calcMean(hist):
+    """
+    Calculate mean of given ROOT histogram
+    @param hist ROOT histogram
+    @return float
+    """
+    return hist.GetMean()
+
+
+def calcMin(hist):
+    """
+    Calculate minimum of given ROOT histogram
+    @param hist ROOT histogram
+    @return float
+    """
+    return hist.GetXaxis().GetBinCenter(hist.GetFirstBinAbove(0.0))
+
+
+def calcMax(hist):
+    """
+    Calculate maximum of given ROOT histogram
+    @param hist ROOT histogram
+    @return float
+    """
+    return hist.GetXaxis().GetBinCenter(hist.GetLastBinAbove(0.0))
+
+
+def getMCCounts(obj, func=calcSum):
+    """
+    Calculate given function for all McParticles
+    @param obj object dumped by Summary provider of FEI
+    @param func used to reduce ROOT histogram to a number
+    @return dictionary(pdgcode, value)
+    """
     root_file = ROOT.TFile(obj['mc_counts'])
     mc_counts = {}
     for key in root_file.GetListOfKeys():
         variable = Belle2.Variable.invertMakeROOTCompatible(key.GetName())
         pdgcode = int(variable[len('NumberOfMCParticlesInEvent('):-len(")")])
-        count = calcSum(key.ReadObj())
+        count = func(key.ReadObj())
         mc_counts[pdgcode] = count
     return mc_counts
 
 
-def getListCounts(obj):
+def getListCounts(obj, func=calcSum):
+    """
+    Calculate given function for all ParticleLists
+    @param obj object dumped by Summary Provider of FEI
+    @param func used to reduce ROOT histogram to a number
+    @return dictionary(listname, dictionary(mode, value))
+    """
     root_file = ROOT.TFile(obj['list_counts'])
     list_counts = {}
     for key in root_file.GetListOfKeys():
@@ -226,7 +304,7 @@ def getListCounts(obj):
 
         if listname not in list_counts:
             list_counts[listname] = {}
-        list_counts[listname][mode] = calcSum(key.ReadObj())
+        list_counts[listname][mode] = func(key.ReadObj())
     return list_counts
 
 
@@ -243,6 +321,7 @@ def getModuleStatistics(obj):
         persistentTree.GetEntry(i)
         stats.merge(persistentTree.ProcessStatistics)
 
+    total_sum = 0.0
     statistics = {}
     for m in stats.getAll():
         modtype = 'Other'
@@ -257,119 +336,360 @@ def getModuleStatistics(obj):
         if modtype not in statistics[listname]:
             statistics[listname][modtype] = 0.0
         statistics[listname][modtype] += m.getTimeSum(m.c_Event) / 1e9
-    return statistics
+        total_sum += m.getTimeSum(m.c_Event) / 1e9
+    return statistics, total_sum
+
+
+def getMVARankings(obj):
+    """
+    Load TMVA variable rankings.
+        @param obj object dumped by Summary provider of FEI
+        @return dictionary(mother, dictionary(channel, list of tuple(variable, importance))
+    """
+    result = {}
+    for channel, mother, filename in zip(obj['cnames'], obj['mothers'], obj['training_data']):
+        if mother not in result:
+            result[mother] = {}
+        if filename is None:
+            result[mother][channel] = []
+            continue
+        logfile = filename[:-5] + '.log'
+        ranking = []
+        ranking_mode = 0
+        with open(logfile, 'r') as f:
+            for line in f:
+                if 'Variable Importance' in line:
+                    ranking_mode = 1
+                elif ranking_mode == 1:
+                    ranking_mode = 2
+                elif ranking_mode == 2 and '-------' in line:
+                    ranking_mode = 0
+                elif ranking_mode == 2:
+                    v = line.split(':')
+                    if int(v[1]) - 1 != len(ranking):
+                        B2WARNING("Error during read out of TMVA ranking from " + logfile)
+                    oldname = Belle2.Variable.invertMakeROOTCompatible(v[2].strip())
+                    ranking.append((oldname, float(v[3])))
+        result[mother][channel] = ranking
+    return result
+
+
+def getDetectorEfficiencies(obj, mc_counts):
+    result = {}
+    for channel, mother, precuthist in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
+        if precuthist is None:
+            filename = None
+        else:
+            filename, key = precuthist
+        if filename is None:
+            efficiency, purity = 0.0, 0.0
+            signal, bckgrd = 0.0, 0.0
+        else:
+            mc_count = mc_counts[abs(pdg.from_name(mother.split(':')[0]))]
+            f = ROOT.TFile(filename)
+            withoutCut = f.GetKey('withoutCut' + key).ReadObj()
+            signal = withoutCut.GetBinContent(2)
+            bckgrd = withoutCut.GetBinContent(2)
+            efficiency = signal / mc_count
+            purity = signal / (signal + bckgrd) if signal > 0 else 0.0
+        if mother not in result:
+            result[mother] = {'__total__': (0.0, 0.0)}
+        result[mother][channel] = (efficiency, purity)
+        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + bckgrd)
+
+    for mother in result:
+        total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
+        signal, bckgrd = result[mother]['__total__']
+        result[mother]['__total__'] = (signal / total, signal / (signal + bckgrd) if signal > 0 else 0.0)
+    return result
+
+
+def getUserCutEfficiencies(obj, mc_counts):
+    result = {}
+    for channel, mother, precuthist in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
+        if precuthist is None:
+            filename = None
+        else:
+            filename, key = precuthist
+        if filename is None:
+            efficiency, purity = 0.0, 0.0
+            signal, bckgrd = 0.0, 0.0
+        else:
+            mc_count = mc_counts[abs(pdg.from_name(mother.split(':')[0]))]
+            f = ROOT.TFile(filename)
+            signal_hist = f.GetKey('signal' + key).ReadObj()
+            all_hist = f.GetKey('all' + key).ReadObj()
+            signal = calcSum(signal_hist)
+            all = calcSum(all_hist)
+            efficiency = signal / mc_count
+            purity = signal / all if all > 0 else 0.0
+        if mother not in result:
+            result[mother] = {'__total__': (0.0, 0.0)}
+        result[mother][channel] = (efficiency, purity)
+        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + all)
+
+    for mother in result:
+        total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
+        signal, all = result[mother]['__total__']
+        result[mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+    return result
+
+
+def getPostCutEfficiencies(obj, mc_counts, list_counts):
+    result = {}
+    for particle, ntuple_filename in zip(obj['particles'], obj['ntuples']):
+        if ntuple_filename is None:
+            efficiency, purity, unique_efficiency, unique_purity = (0.0, 0.0, 0.0, 0.0)
+        else:
+            root_file = ROOT.TFile(ntuple_filename)
+            ntuple = root_file.Get('variables')
+
+            mc_count = mc_counts[abs(pdg.from_name(particle.name))]
+            signal_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 1'))
+            bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
+            efficiency = signal_count * 100. / mc_count,
+            purity = signal_count * 100. / (signal_count + bckgrd_count),
+
+            # TODO Background can also be counted twice! uniqueBackground Tag?
+            unique_signal_count = int(GetEntriesSafe(ntuple,
+                                                     particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
+            unique_bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
+            unique_efficiency = unique_signal_count * 100. / mc_count
+            unique_purity = unique_signal_count * 100. / (unique_signal_count + unique_bckgrd_count)
+
+        result[particle.identifier] = (efficiency, purity, unique_efficiency, unique_purity)
+    return result
+
+
+def getPreCutEfficiencies(obj, mc_counts, list_counts):
+    result = {}
+    for listname, channel, mother in zip(obj['mlists'], obj['cnames'], obj['mothers']):
+        if listname is None or listname not in list_counts:
+            efficiency, purity = (0.0, 0.0)
+            signal, all = 0, 0
+        else:
+            total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
+            signal = list_counts[listname]['Signal']
+            all = list_counts[listname]['All']
+            efficiency = signal * 100. / total
+            purity = signal * 100. / all if all > 0 else 0.0
+
+        if mother not in result:
+            result[mother] = {'__total__': (0.0, 0.0)}
+        result[mother][channel] = (efficiency, purity)
+        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + all)
+
+    for mother in result:
+        total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
+        signal, all = result[mother]['__total__']
+        result[mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+    return result
+
+
+def isFloat(element):
+    """ Checks if element is a convertible to float"""
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
+
+
+def isValidParticle(element):
+    """ Checks if element is a valid pdg name for a particle"""
+    try:
+        pdg.from_name(element)
+        return True
+    except LookupError:
+        return False
+
+
+class HashableDict(dict):
+    """
+    An hashable version of a python dict,
+    Since we use this only as a trick so the lru cache of getCoveredBranchingFraction works,
+    we return a dummy hash (always 1) and not a real hash.
+    """
+    def __hash__(self):
+        return 1
+
+
+@functools.lru_cache(maxsize=3)
+def loadBranchingFractions(filename=None):
+    """
+    Load branching fraction from MC decay-file.
+    Columns are, particle, channel, fraction
+        @param filename of the decay file default is $BELLE2_EXTERNALS_DIR/share/evtgen/DECAY.DEC
+    """
+    if filename is None:
+        filename = os.getenv('BELLE2_EXTERNALS_DIR') + '/share/evtgen/DECAY.DEC'
+
+    # Add some theoretical branching fractions which are not in the DECAY file
+    # TODO But these are produced anyway, wtf?
+    branching_fractions = {'D0': {tuple(sorted(('K-', 'pi+', 'pi0', 'pi0'))): 0.0},  # UNKOWN
+                           'anti-D0': {tuple(sorted(('K+', 'pi-', 'pi0', 'pi0'))): 0.0},  # UNKOWN
+                           'D_s+': {tuple(sorted(('K-', 'K_S0', 'pi+', 'pi+'))): 0.0164},  # From PDG
+                           'D_s+': {tuple(sorted(('K_S0', 'pi+', 'pi0'))): 0.005},  # Mode D_s->K0 pi- pi0 1%
+                           'D_s-': {tuple(sorted(('K+', 'K_S0', 'pi-', 'pi-'))): 0.0164},  # From PDG
+                           'D_s-': {tuple(sorted(('K_S0', 'pi-', 'pi0'))): 0.005},  # Mode D_s->K0 pi- pi0 1%
+                           'B+': {tuple(sorted(('J/psi', 'K_S0', 'pi+'))): 0.00094},
+                           'B-': {tuple(sorted(('J/psi', 'K_S0', 'pi-'))): 0.00094},
+                           'B0': {tuple(sorted(('J/psi', 'K_S0', 'pi+', 'pi-'))): 0.001},
+                           'anti-B0': {tuple(sorted(('J/psi', 'K_S0', 'pi+', 'pi-'))): 0.001},
+                           'K_S0': {('K_S0',): 0.692}}
+    branching_fractions = HashableDict(branching_fractions)
+    mother = 'UNKOWN'
+    with open(filename, 'r') as f:
+        for line in f:
+            fields = line.split(' ')
+            fields = [x for x in fields if x != '']
+            if len(fields) < 2 or fields[0][0] == '#':
+                continue
+            if fields[0] == 'Decay':
+                mother = fields[1].strip()
+                continue
+            if fields[0] == 'Enddecay':
+                mother = 'UNKOWN'
+                continue
+            if mother == 'UNKOWN':
+                continue
+            fields = fields[:-1]
+            if len(fields) < 1 or not isFloat(fields[0]):
+                continue
+            while len(fields) > 1:
+                if isValidParticle(fields[-1]):
+                    break
+                fields = fields[:-1]
+            if len(fields) < 1 or not all(isValidParticle(p) for p in fields[1:]):
+                continue
+            daughters = tuple(sorted(p for p in fields[1:] if p not in ['nu_e', 'nu_mu', 'nu_tau', 'anti-nu_e',
+                                                                        'anti-nu_mu', 'anti-nu_tau']))
+            if mother not in branching_fractions:
+                branching_fractions[mother] = HashableDict()
+            if daughters not in branching_fractions[mother]:
+                branching_fractions[mother][daughters] = 0.0
+            branching_fractions[mother][daughters] += float(fields[0])
+
+    return branching_fractions
+
+
+def conjugate(particle):
+    p = particle.split(':')
+    if len(p) > 1:
+        return pdg.conjugate(p[0]) + ':' + p[1]
+    else:
+        return pdg.conjugate(p[0])
+
+
+@functools.lru_cache(maxsize=1000)
+def getCoveredBranchingFraction(particle, branching_fractions):
+    """
+    Get covered branching fraction of a particle using a recursive algorithm
+    and the given exclusive branching_fractions (given as Hashable List)
+    @param particle identifier of the particle
+    @param branching_fractions
+    """
+    if particle not in branching_fractions:
+        if conjugate(particle) not in branching_fractions:
+            return 1.0
+        else:
+            particle = conjugate(particle)
+
+    total_covered = 0.0
+    for channel, fraction in branching_fractions[particle].items():
+        covered = fraction
+        for daughter in channel:
+            if particle.split(':')[0] == daughter.split(':')[0]:
+                continue
+            covered *= getCoveredBranchingFraction(daughter, branching_fractions)
+        total_covered += covered
+    return total_covered
+
+
+def getCoveredBranchingFractions(obj):
+    """
+    Load covered branching fractions from MC decay-file and given particle definitions.
+    Columns are, particle, channel, fraction
+        @param particles list of Particle objects
+    """
+    particles = obj['particles']
+    mc_branching_fractions = loadBranchingFractions()
+    branching_fractions = HashableDict()
+    for particle in particles:
+        branching_fractions[particle.identifier] = {}
+        for channel in particle.channels:
+            fraction = 0.0
+            daughters = tuple(daughter.split(':')[0] for daughter in channel.daughters)
+            if particle.name in mc_branching_fractions:
+                if tuple(sorted(daughters)) in mc_branching_fractions[particle.name]:
+                    fraction = mc_branching_fractions[particle.name][tuple(sorted(daughters))]
+            elif pdg.conjugate(particle.name) in mc_branching_fractions:
+                if tuple(sorted(map(pdg.conjugate, daughters))) in mc_branching_fractions[pdg.conjugate(particle.name)]:
+                    fraction = mc_branching_fractions[pdg.conjugate(particle.name)][tuple(sorted(map(pdg.conjugate, daughters)))]
+            else:
+                fraction = 1.0
+            if any(daughter.endswith(':V0') for daughter in channel.daughters):
+                fraction = 0.0
+            if fraction == 0.0:
+                print('WARNING: Branching fraction for ' + particle.identifier +
+                      ' ' + str(tuple(sorted(channel.daughters))) + ' is zero')
+            branching_fractions[particle.identifier][tuple(sorted(channel.daughters))] = fraction
+
+    covered = {}
+    for particle in particles:
+        covered[particle.identifier] = getCoveredBranchingFraction(particle.identifier, branching_fractions)
+    return covered
+
+
+def pretty_format(obj, indent=0):
+    """
+    Pretty-prints the object passed in.
+    """
+    return pprint.pformat(obj)
 
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 3:
-        print("Usage: " + sys.argv[0] + ' SummaryFile.pickle OutputFile.txt')
+    if len(sys.argv) != 2:
+        print("Usage: " + sys.argv[0] + ' SummaryFile.pickle')
         sys.exit(1)
 
     obj = pickle.load(open(sys.argv[1], 'rb'))
 
-    out = open(sys.argv[2], 'w')
-
-    print("Process MC Counts")
     mc_counts = getMCCounts(obj)
+    print('MC Counts')
+    print(pretty_format(mc_counts))
 
-    print("Process List Counts")
+    coveredBranchingFractions = getCoveredBranchingFractions(obj)
+    print('Covered Branching Fractions')
+    print(pretty_format(coveredBranchingFractions))
+
+    module_statistics, total_sum = getModuleStatistics(obj)
+    print('Module statistics')
+    print(pretty_format(module_statistics))
+    print('Total time spent (all modules): {}'.format(total_sum))
+    print('Total time spent (only monitored modules): {}'.format(sum(m for s in module_statistics.values() for m in s.values())))
+
+    rankings = getMVARankings(obj)
+    print('MVA Ranking')
+    print(pretty_format(rankings))
+
+    detectorEfficiencies = getDetectorEfficiencies(obj, mc_counts)
+    print('DetectorEfficiencies')
+    print(pretty_format(detectorEfficiencies))
+
+    userCutEfficiencies = getUserCutEfficiencies(obj, mc_counts)
+    print('UserCutEfficiencies')
+    print(pretty_format(userCutEfficiencies))
+
     list_counts = getListCounts(obj)
+    preCutEfficiencies = getPreCutEfficiencies(obj, mc_counts, list_counts)
+    print('PreCutEfficiencies')
+    print(pretty_format(preCutEfficiencies))
 
-    print("Process Module Statistics")
-
-    out.write('\n\n# Module CPU time statistics: \n')
-    module_statistics = getModuleStatistics(obj)
-    sum_time_seconds = sum(m for s in module_statistics.values() for m in s.values())
-    moduleTypes = list(set(m for s in module_statistics.values() for m in s.keys()))
-    list_to_channel = {l: c for l, c in zip(obj['mlists'], obj['cnames'])}
-    lines = []
-    for listname, stat in module_statistics.items():
-        if listname not in list_counts:
-            continue
-        trueCandidates = list_counts[listname]['Signal']
-        allCandidates = list_counts[listname]['All']
-
-        time = sum(m for m in stat.values())
-        timePerCandidate = format.duration(time / trueCandidates) + ' (' + format.duration(time / allCandidates) + ')'
-        timePercent = time / sum_time_seconds * 100 if sum_time_seconds > 0 else 0
-
-        lines.append('{channel}: {time} {timePerCandidate} {timePercent:.2f}\n'.format(
-                        time=time,
-                        channel=list_to_channel[listname],
-                        timePerCandidate=timePerCandidate,
-                        timePercent=timePercent
-        ))
-    out.write(''.join(sorted(lines)))
-
-    out.write('# Efficiencies and Purities for compact-FEI-summary \n')
-    print("Process list counts for individual channels")
-
-    out.write('\n\n# Individual channels: \n')
-    lines = []
-    for listname, channel, mother in zip(obj['mlists'], obj['cnames'], obj['mothers']):
-        if listname is None:
-            lines.append('{mother:<20} - {channel:<20}: Was ignored'.format(mother=mother, channel=channel))
-            continue
-        if listname not in list_counts:
-            lines.append('{mother:<20} - {channel:<20}: Was ignored'.format(mother=mother, channel=channel))
-            continue
-        lines.append('{mother:<20} - {channel:<20}: {eff:<20} {pur:<20}\n'.format(
-                     mother=mother,
-                     channel=channel,
-                     eff=list_counts[listname]['Signal'] * 100. / mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))],
-                     pur=list_counts[listname]['Signal'] * 100. / list_counts[listname]['All']))
-    out.write(''.join(sorted(lines)))
-
-    print("Process ntuples for all Particles")
-    out.write('\n\n# Particles: \n')
+    postCutEfficiencies = getPostCutEfficiencies(obj, mc_counts, list_counts)
+    print('PostCutEfficiencies')
+    print(pretty_format(postCutEfficiencies))
 
     for particle, ntuple_filename in zip(obj['particles'], obj['ntuples']):
-        if ntuple_filename is None:
-            out.write(particle.identifier + ' was ignored\n')
-            continue
-
-        root_file = ROOT.TFile(ntuple_filename)
-        ntuple = root_file.Get('variables')
-
-        mc_count = mc_counts[abs(pdg.from_name(particle.name))]
-        signal_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 1'))
-        bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
-        unique_signal_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
-        unique_bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0 && extraInfo__bouniqueSignal__bc == 1'))
-
-        line = '{part:<20}: {peff:<20} {pueff:<20} | {ppur:<20} {pupur:<20}\n'.format(
-            part=particle.identifier,
-            peff=signal_count * 100. / mc_count,
-            ppur=signal_count * 100. / (signal_count + bckgrd_count),
-            pueff=unique_signal_count * 100. / mc_count,
-            pupur=unique_signal_count * 100. / (unique_signal_count + unique_bckgrd_count))
-        out.write(line)
-        makeROCPlotFromNtuple(ntuple,
-                              removeJPsiSlash(particle.name) + '_' + particle.label + '_roc.png',
-                              mc_count,
-                              particle.mvaConfig.target)
-        if particle.identifier in ['B+:generic', 'B0:generic']:
-            makeMbcPlot(ntuple,
-                        removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
-                        particle.mvaConfig.target)
-        if particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            makeCosBDLPlot(ntuple,
-                           removeJPsiSlash(particle.name) + '_' + particle.label + '_money.png',
-                           particle.mvaConfig.target)
-
-    print("Process cut configuration")
-    out.write('\n\n# Indivual cuts of particles \n')
-    for particle, precut, postcut in zip(obj['particles'], obj['pre_cuts'], obj['post_cuts']):
-        if precut is None or postcut is None:
-            out.write(particle.identifier + ' was ignored\n')
-            continue
-        out.write(particle.identifier + ' PostCut ' + postcut['cutstring'] + '\n')
-        for channel, cut in precut.items():
-            if cut is None:
-                out.write('\t' + channel + ' was ignored\n')
-            else:
-                out.write('\t' + channel + ' ' + cut['cutstring'] + '\n')
-
-    print("Finished")
-    out.close()
+        createParticlePlots(particle, ntuple_filename, mc_counts)

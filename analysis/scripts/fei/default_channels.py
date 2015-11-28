@@ -36,7 +36,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
                          'useRestFrame(daughter({}, distance))',
                          'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
                          'daughterInvariantMass({},{})', 'daughterInvariantMass({},{},{})', 'daughterInvariantMass({},{},{},{})',
-                         'daughterInvariantMass({},{},{},{},{})', 'Q', 'extraInfo(decayModeID)']
+                         'daughterInvariantMass({},{},{},{},{})', 'Q', 'daughter({},extraInfo(decayModeID))']
 
     # note: these should not be correlated to Mbc (weak correlation of deltaE is OK)
     B_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
@@ -44,7 +44,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
               'useRestFrame(daughter({}, p))',
               'useRestFrame(daughter({}, distance))',
               'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
-              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE', 'extraInfo(decayModeID)']
+              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE', 'daughter({},extraInfo(decayModeID))']
 
     particles = []
 
@@ -81,23 +81,31 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 # ################# GAMMA ############################
 
     mva_gamma = MVAConfiguration(
-        variables=['clusterReg', 'goodGamma', 'goodGammaUnCal',
+        variables=['clusterReg',
                    'clusterNHits', 'clusterTiming', 'clusterE9E25',
                    'pt', 'E', 'pz'],
         target='isPrimarySignal',
     )
 
+    mva_gamma_v0 = MVAConfiguration(
+        variables=['pt', 'E', 'pz'],
+        target='isPrimarySignal',
+    )
+
     pre_gamma = PreCutConfiguration(
-        variable='goodGamma',
+        variable='E',
         # The range should include the signal peak, and the uniform part of the background (important for sPlot training!)
-        binning=(100, 0.0, 1.0),
+        binning=(500, 0.0, 5.0),
         efficiency=0.99,
         purity=0.001,
     )
 
-    user_gamma = UserCutConfiguration('E > 0.1')
+    user_gamma = UserCutConfiguration('goodGamma == 1')
 
-    particles.append(Particle('gamma', mva_gamma, pre_gamma, user_gamma, postCutConfig=postCut).addChannel(['gamma:FSP']))
+    p = Particle('gamma', mva_gamma, pre_gamma, user_gamma, postCutConfig=postCut)
+    p.addChannel(['gamma:FSP'])
+    p.addChannel(['gamma:V0'], mvaConfig=mva_gamma_v0)
+    particles.append(p)
 
 # ################# PI0 ###############################
     mva_pi0 = MVAConfiguration(
@@ -147,7 +155,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     p = Particle('K_S0', mva_KS0, pre_KS0, postCutConfig=postCut)
     p.addChannel(['pi+', 'pi-'])
     p.addChannel(['pi0', 'pi0'])
-    p.addChannel(['K_S0:FSP'], mvaConfig=mva_KS0_FSP)
+    p.addChannel(['K_S0:V0'], mvaConfig=mva_KS0_FSP)
     particles.append(p)
 
 # ####################### D0 #########################
@@ -327,7 +335,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     pre_BPlus = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
-        binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
+        binning=list(reversed([1.01 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
     )
@@ -372,7 +380,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     pre_BPlusSemileptonic = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
-        binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
+        binning=list(reversed([1.01 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
     )
@@ -398,7 +406,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     pre_B0 = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
-        binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
+        binning=list(reversed([1.01 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
     )
@@ -440,7 +448,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
 
     pre_B0Semileptonic = PreCutConfiguration(
         variable='daughterProductOf(extraInfo(SignalProbability))',
-        binning=list(reversed([1.0 / (1.5 ** i) for i in range(0, 20)])),
+        binning=list(reversed([1.01 / (1.5 ** i) for i in range(0, 20)])),
         efficiency=0.95,
         purity=0.0001,
     )

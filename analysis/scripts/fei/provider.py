@@ -87,8 +87,9 @@ def LoadParticles(resource):
     """
     resource.cache = True
     modularAnalysis.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                       ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:FSP', ''),
+                                       ('mu+:FSP', ''), ('gamma:FSP', ''), ('K_S0:V0', ''),
                                        ('p+:FSP', ''), ('K_L0:FSP', ''), ('Lambda0:FSP', '')], writeOut=True, path=resource.path)
+    modularAnalysis.fillConvertedPhotonsList('gamma:V0', '', writeOut=True, path=resource.path)
     return 'Dummy'
 
 

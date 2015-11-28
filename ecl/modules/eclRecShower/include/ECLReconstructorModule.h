@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <vector>
+#include <string>
 #include <TRandom3.h>
 #include <TMatrixFSym.h>
 
@@ -120,7 +121,29 @@ namespace Belle2 {
 
       TmpClusterCorrection m_tmpClusterCorrection;
 
+    public:
+      virtual const char* eclHitAssignmentArrayName() const
+      { return "ECLHitAssignments" ; }
+      virtual const char* eclShowerArrayName() const
+      { return "ECLShowers" ; }
+      virtual const char* eclClusterArrayName() const
+      { return "ECLClusters"; }
+      virtual const char* eclDigitArrayName() const
+      { return "ECLDigits" ; }
     };
+
+    class ECLReconstructorPureCsIModule : public ECLReconstructorModule {
+    public:
+      virtual const char* eclHitAssignmentArrayName() const override
+      { return "ECLHitAssignmentsPureCsI" ; }
+      virtual const char* eclShowerArrayName() const override
+      { return "ECLShowersPureCsI" ; }
+      virtual const char* eclClusterArrayName() const override
+      { return "ECLClustersPureCsI"; }
+      virtual const char* eclDigitArrayName() const override
+      { return "ECLDigitsPureCsI" ; }
+    };
+
   }//ECL
 }//Belle2
 

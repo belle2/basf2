@@ -53,7 +53,7 @@ using namespace ECL;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(ECLReconstructor)
-
+REG_MODULE(ECLReconstructorPureCsI)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -80,9 +80,10 @@ void ECLReconstructorModule::initialize()
   m_timeCPU = clock() * Unit::us;
 
   // ECL relevant objects.
-  StoreArray<ECLHitAssignment> eclHitAssignments;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLCluster> eclClusters;
+
+  StoreArray<ECLHitAssignment> eclHitAssignments(eclHitAssignmentArrayName());
+  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
+  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
 
   eclHitAssignments.registerInDataStore();
   eclShowers.registerInDataStore();
@@ -144,15 +145,15 @@ void ECLReconstructorModule::beginRun()
 void ECLReconstructorModule::event()
 {
   // Input Array
-  StoreArray<ECLDigit> eclDigiArray;
+  StoreArray<ECLDigit> eclDigiArray(eclDigitArrayName());
   if (!eclDigiArray) {
     B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
     return;
   }
   // Output Arrays
-  StoreArray<ECLHitAssignment> eclHitAssignments;
-  StoreArray<ECLShower> eclShowers;
-  StoreArray<ECLCluster> eclClusters;
+  StoreArray<ECLHitAssignment> eclHitAssignments(eclHitAssignmentArrayName());
+  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
+  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
 
   cout.unsetf(ios::scientific);
   cout.precision(6);

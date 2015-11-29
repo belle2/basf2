@@ -248,7 +248,7 @@ void V0FinderModule::event()
         continue;
       }
       if (vertexVector.size() != 1) {
-        B2ERROR("Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
+        B2INFO("Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
         continue;
       }
 

@@ -464,6 +464,11 @@ namespace Belle2 {
      * return always zero
      */
     double False(const Particle*);
+
+    /**
+     * return always one
+     */
+    double True(const Particle*);
   }
 } // Belle2 namespace
 

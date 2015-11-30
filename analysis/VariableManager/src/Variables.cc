@@ -1129,6 +1129,11 @@ namespace Belle2 {
       return 0;
     }
 
+    double True(const Particle*)
+    {
+      return 1;
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1280,6 +1285,8 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
+    REGISTER_VARIABLE("True", True,
+                      "returns always 1, used for testing and debugging.");
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,

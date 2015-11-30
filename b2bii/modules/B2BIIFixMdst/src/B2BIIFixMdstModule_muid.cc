@@ -126,7 +126,9 @@ namespace Belle2 {
   {
 
     Mdst_klm_mu_ex_Manager& muexMgr = Mdst_klm_mu_ex_Manager::get_manager();
-    if (muexMgr.count()) {
+    //if (muexMgr.count()) {
+    // TODO: this always evaluates to false!
+    if (&muexMgr == NULL) {
       B2ERROR("%B2BIIFixMdst muid did not find Mdst_klm_mu_ex table "
               << "in this event, which implies" << std::endl
               << "   that muid_set and muid_dec were not run yet. "

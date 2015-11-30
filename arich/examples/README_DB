@@ -1,36 +1,7 @@
-*Usage of ARICHDatabase.py steering file*
+Data for Database (ARICHDatabaseImporter.py)
 
-//////// How to run steering file
+All data can be found at: https://belle2.cc.kek.jp/svn/groups/arich/database/data/
 
-To run steering file you must provide 2 arguments:
-
-1.) READING/WRITING OPTION
-Choose option for reading/storing data:
-    Wagel      // storing aerogel data to DB - class ARICHAerogelInfo
-    Ragel      // reading aerogel from DB - class ARICHAerogelInfo
-    WhapdQA    // storing HAPD QA data to DB - class ARICHHapdQA
-    RhapdQA    // reading HAPD QA data from DB - class ARICHAHapdQA
-    Wasic      // storing ASIC data to DB - class ARICHAsicInfo
-    Rasic      // reading ASIC data from DB - class ARICHAsicInfo
-
-    Following option is not working yet:
-    WhapdInfo  // storing HAPD and HAPD chip data to DB - classes ARICHHapdInfo, ARICHHapdChipInfo
-
-2.) GLOBAL TAG
-Make sure to use same global tag for storing and reading same data to/from DB. This is very important for Rasic that has multiple payloads for one class.
-
-//////// Accessing the data
-
-Root/xml files can be found:
-1.) aerogel (xml files)
-1st measurement: https://belle2.cc.kek.jp/svn/groups/arich/database/data/aerogel/
-2nd measurement: http://www-f9.ijs.si/~manca/DBdata/aerogelData/
-
-2.) hapdQA (root files) - for now, only one root file is available
-http://www-f9.ijs.si/~manca/DBdata/hapdQAdata/
-
-3.) asics (root files)
-asicData.tar.gz at http://www-f9.ijs.si/~manca/DBdata/asicData/
-
-4.) hapd info (xls files; converted to xml files - check README file at https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/groups/arich/database/README?revision=13763&view=markup ); xml files available also at: http://www-f9.ijs.si/~manca/DBdata/hapdInfoData/
-
+Aerogel xml files (1st and 2nd measurement): aerogel_1st/ , aerogel_2nd/
+HAPD QA data (only one sample file for now): hapdQA_test/
+Xml files from Hamamatsu: hapd_hamamatsuData/ (check https://belle2.cc.kek.jp/svn/groups/arich/database/README to get original files)

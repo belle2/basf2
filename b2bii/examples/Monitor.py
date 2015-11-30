@@ -22,13 +22,12 @@ from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addKshortConversionMonitors
 
-if len(sys.argv) != 3:
-    sys.exit('Must provide two input parameters: [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
+if len(sys.argv) != 2:
+    sys.exit('Must provide two input parameters: [input_Belle_MDST_file].\n'
              'A small example Belle MDST file can be downloaded from'
              'http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
 
 inputBelleMDSTFile = sys.argv[1]
-outputBelle2ROOTFile = sys.argv[2]
 
 # set the location of the Belle DB server
 # options are: ekpbelle.physik.uni-karlsruhe.de

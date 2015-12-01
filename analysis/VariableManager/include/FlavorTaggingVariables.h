@@ -117,16 +117,6 @@ namespace Belle2 {
     double McFlavorOfTagSide(const Particle* part);
 
     /**
-     * Flavour of Btag from trained Method
-     */
-    double particleClassifiedFlavor(const Particle* particle);
-
-    /**
-     * Flavour of Btag from MC
-     */
-    double particleMCFlavor(const Particle* particle);
-
-    /**
      * Returns the number of K_S0 in the given ROE Particle List(flavor tagging specific variable).
      *
      * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") or KShorts("K_S0:ROEKaon") exists.

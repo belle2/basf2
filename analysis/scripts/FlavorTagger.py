@@ -229,48 +229,54 @@ AvailableCategories = {
         'KinLepton',
         'QrOf(mu+:KinLeptonROE, isRightCategory(KinLepton), isRightTrack(KinLepton))',
         4],
+    'IntermediateKinLepton': [
+        'mu+:IntermediateKinLeptonROE',
+        'IntermediateKinLepton',
+        'IntermediateKinLepton',
+        'QrOf(mu+:IntermediateKinLeptonROE, isRightCategory(IntermediateKinLepton), isRightTrack(IntermediateKinLepton))',
+        5],
     'Kaon': [
         'K+:KaonROE',
         'Kaon',
         'Kaon',
         'weightedQrOf(K+:KaonROE, isRightCategory(Kaon), isRightTrack(Kaon))',
-        5],
+        6],
     'SlowPion': [
         'pi+:SlowPionROE',
         'SlowPion',
         'SlowPion',
         'QrOf(pi+:SlowPionROE, isRightCategory(SlowPion), isRightTrack(SlowPion))',
-        6],
+        7],
     'FastPion': [
         'pi+:FastPionROE',
         'FastPion',
         'FastPion',
         'QrOf(pi+:FastPionROE, isRightCategory(FastPion), isRightTrack(FastPion))',
-        7],
+        8],
     'Lambda': [
         'Lambda0:LambdaROE',
         'Lambda',
         'Lambda',
         'weightedQrOf(Lambda0:LambdaROE, isRightCategory(Lambda), isRightTrack(Lambda))',
-        8],
+        9],
     'FSC': [
         'pi+:SlowPionROE',
         'SlowPion',
         'FSC',
         'QrOf(pi+:SlowPionROE, isRightCategory(FSC), isRightTrack(SlowPion))',
-        9],
+        10],
     'MaximumPstar': [
         'pi+:MaximumPstarROE',
         'MaximumPstar',
         'MaximumPstar',
         'QrOf(pi+:MaximumPstarROE, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
-        10],
+        11],
     'KaonPion': [
         'K+:KaonROE',
         'Kaon',
         'KaonPion',
         'QrOf(K+:KaonROE, isRightCategory(KaonPion), isRightTrack(Kaon))',
-        11],
+        12],
 }
 
 # Lists for each Step.
@@ -296,12 +302,12 @@ def WhichCategories(categories=[
     Selection of the Categories that are going to be used.
     """
 
-    if len(categories) > 12 or len(categories) < 2:
-        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 12 are available'
+    if len(categories) > 13 or len(categories) < 2:
+        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 13 are available'
                 )
         B2FATAL(
             'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
-            '"KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+            '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
         return False
     categoriesCombination = []
     for category in categories:
@@ -324,7 +330,7 @@ def WhichCategories(categories=[
         else:
             B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
             B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
-                    '"Muon", "IntermediateMuon", "KinLepton", "Kaon", "SlowPion", "FastPion", '
+                    '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", '
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
             return False
     global categoriesCombinationCode
@@ -388,6 +394,7 @@ variables['KinLepton'] = [
     'eid_ECL',
     'chiProb',
 ]
+variables['IntermediateKinLepton'] = variables['KinLepton']
 variables['Kaon'] = [
     'useCMSFrame(p)',
     'useCMSFrame(pt)',
@@ -469,22 +476,22 @@ def FillParticleLists(mode='Expert', path=analysis_main):
         if particleList != 'Lambda0:LambdaROE':
 
             # Filling particle list for actual category
-            fillParticleList(particleList, 'isInRestOfEvent > 0.5', path=path)
+            fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
 
         # Check if there is K short in this event
         if particleList == 'K+:KaonROE':
             # Precut done to prevent from overtraining, might be redundant
             applyCuts(particleList, '0.1<Kid', path=path)
-            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
                              path=path)
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                              '0.40<=M<=0.60', True, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
 
         if particleList == 'Lambda0:LambdaROE':
-            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
                              path=path)
-            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5',
+            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
                              path=path)
             reconstructDecay(particleList + ' -> pi-:inLambdaRoe p+:inLambdaRoe',
                              '1.00<=M<=1.23', True, path=path)
@@ -495,7 +502,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
 
     # Filling 'pi+:MaximumPstarROE' particle list
-    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5', path=path)
+    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
 
     return True
 
@@ -538,7 +545,7 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     methodPrefixTrackLevel +
                     '_1.config not found. Stopped')
             else:
-                B2INFO('PROCESSING: trainTMVAMethod on track level')
+                B2INFO('PROCESSING: trainTMVAMethod ' + methodPrefixTrackLevel + ' on track level')
                 trainTMVAMethod(
                     particleList,
                     variables=variables[category],
@@ -549,7 +556,7 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     path=TrackLevelPathsList[category],
                 )
         else:
-            B2INFO('PROCESSING: applyTMVAMethod on track level')
+            B2INFO('PROCESSING: applyTMVAMethod ' + methodPrefixTrackLevel + ' on track level')
             applyTMVAMethod(
                 particleList,
                 prefix=methodPrefixTrackLevel,
@@ -605,7 +612,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     methodPrefixEventLevel +
                     '_1.config not found. Stopped')
             else:
-                B2INFO('PROCESSING: trainTMVAMethod on event level')
+                B2INFO('PROCESSING: trainTMVAMethod ' + methodPrefixEventLevel + ' on event level')
                 trainTMVAMethod(
                     particleList,
                     variables=variables[category],
@@ -618,7 +625,7 @@ def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
         else:
             # if category == 'KinLepton':
                 # applyCuts(particleList, 'isInElectronOrMuonCat < 0.5', path=path)
-            B2INFO('PROCESSING: applyTMVAMethod on event level')
+            B2INFO('PROCESSING: applyTMVAMethod ' + methodPrefixEventLevel + ' on event level')
             applyTMVAMethod(
                 particleList,
                 prefix=methodPrefixEventLevel,
@@ -700,6 +707,9 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
                 else:
                     applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
                               'isRightTrack(' + category + ')) > 0.5', path=path)
+        else:
+            B2FATAL('FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
+                    methodPrefixCombinerLevel + '_1.config has been found. Please use the "Expert" mode')
 
         return True
 

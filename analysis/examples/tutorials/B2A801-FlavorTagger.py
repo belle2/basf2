@@ -88,7 +88,20 @@ FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
-    categories=['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion'])
+    categories=[
+        'Electron',
+        'IntermediateElectron',
+        'Muon',
+        'IntermediateMuon',
+        'KinLepton',
+        'IntermediateKinLepton',
+        'Kaon',
+        'SlowPion',
+        'FastPion',
+        'Lambda',
+        'FSC',
+        'MaximumPstar',
+        'KaonPion'])
 #
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
@@ -101,8 +114,20 @@ FlavorTagger(
 # ['Electron', 'Muon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion', 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion']
 #
 # All available categories are:
-# ['Electron', 'IntermediateElectron', 'Muon', 'IntermediateMuon', 'KinLepton', 'Kaon', 'SlowPion', 'FastPion',
-# 'Lambda', 'FSC', 'MaximumPstar', 'KaonPion']
+# [
+# 'Electron',
+# 'IntermediateElectron',
+# 'Muon',
+# 'IntermediateMuon',
+# 'KinLepton',
+# 'IntermediateKinLepton',
+# 'Kaon',
+# 'SlowPion',
+# 'FastPion',
+# 'Lambda',
+# 'FSC',
+# 'MaximumPstar',
+# 'KaonPion']
 #
 # If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels)
 # with 3 different samples of 500k events.

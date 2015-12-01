@@ -228,13 +228,12 @@ namespace Belle2 {
 
       if (roe.isValid()) {
         for (const auto& track : roe->getTracks()) {
-          if (part->getTrack() == track)
-            continue;
-          if (track->getTrackFitResult(Const::pion) == nullptr)
-            continue;
-          double pt = track->getTrackFitResult(Const::pion)->getTransverseMomentum();
-
-          sum += sqrt(pt * pt);
+          if (part->getTrack() == track) continue;
+          if (track == nullptr) continue;
+          const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+          if (track->getTrackFitResult(charged) == nullptr) continue;
+          double pt = track->getTrackFitResult(charged)->getTransverseMomentum();
+          if (pt == pt) sum += sqrt(pt * pt);
         }
       }
       return sum;
@@ -553,21 +552,6 @@ namespace Belle2 {
       return 0;
     }
 
-    double particleClassifiedFlavor(const Particle* particle)
-    {
-      if (!(particle->getExtraInfo("Class_Flavor")))
-        return -1.0;
-      return particle->getExtraInfo("Class_Flavor");
-    }
-
-    double particleMCFlavor(const Particle* particle)
-    {
-      if (!(particle->getExtraInfo("MC_Flavor")))
-        return -0.0;
-      return particle->getExtraInfo("MC_Flavor");
-    }
-
-
 //  ######################################### Meta Variables ##############################################
 
 //  Miscelaneous -------------------------------------------------------------------------------------------
@@ -639,8 +623,7 @@ namespace Belle2 {
                 flag++;
               }
             }
-          } else B2FATAL("NumberOfKShortinROEParticleList not available for the requested particleListName. The possibilities are K_S0:ROEKaon or K_S0:ROELambda");
-          return flag;
+          } else B2FATAL("NumberOfKShortinROEParticleList not available for the requested particleListName  " << particleListName << " . The possibilities are K_S0:ROEKaon or K_S0:ROELambda");          return flag;
         };
         return func;
       } else {
@@ -713,7 +696,8 @@ namespace Belle2 {
               }
               Output = E_W_90;
             } else {
-              B2FATAL("Wrong variable requested. The possibilities are recoilMass, pMissCMS, cosThetaMissCMS or EW90");
+              B2FATAL("Wrong variable  " << requestedVariable <<
+                      " requested. The possibilities are recoilMass, pMissCMS, cosThetaMissCMS or EW90");
             }
           }
           return Output;
@@ -769,7 +753,7 @@ namespace Belle2 {
             }
 
           } else {
-            B2FATAL("Wrong variable requested. The possibilities are cosKaonPion or HaveOpositeCharges");
+            B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
           }
           return Output;
         };
@@ -824,7 +808,7 @@ namespace Belle2 {
               }
             }
           } else {
-            B2FATAL("Wrong variable requested. The possibilities are pFastCMS, cosSlowFast or cosTPTOFast");
+            B2FATAL("Wrong variable " << requestedVariable << " requested. The possibilities are pFastCMS, cosSlowFast or cosTPTOFast");
           }
           return Output;
         };
@@ -840,6 +824,15 @@ namespace Belle2 {
         auto particleListName = arguments[0];
         auto extraInfoName = arguments[1];
         auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
+          if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
+          || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"))
+          {
+            B2FATAL("hasHighestProbInCat: Not available category in " << extraInfoName <<
+            ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda");
+            return 0.0;
+          }
+
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
 
@@ -887,6 +880,15 @@ namespace Belle2 {
         auto particleListName = arguments[0];
         auto extraInfoName = arguments[1];
         auto func = [particleListName, extraInfoName](const Particle*) -> double {
+          if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
+          || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"))
+          {
+            B2FATAL("HighestProbInCat: Not available category in " << extraInfoName <<
+            ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda");
+            return 0.0;
+          }
+
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           double maximumProb = 0;
@@ -927,17 +929,22 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto particleName = arguments[0];
         auto func = [particleName](const Particle * part) -> double {
+          if (!(particleName == "Electron" || particleName == "IntermediateElectron" || particleName == "Muon" || particleName == "IntermediateMuon"
+          || particleName == "KinLepton" || particleName == "IntermediateKinLepton" || particleName == "Kaon"
+          || particleName == "SlowPion" || particleName == "FastPion" || particleName == "Lambda"))
+          {
+            B2FATAL("isRightTrack: Not available category " << particleName <<
+            ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion and Lambda");
+            return 0.0;
+          }
+
           const MCParticle* mcParticle = part->getRelated<MCParticle>();
           if (mcParticle == nullptr) return 0.0;
           //direct electron
           else if (particleName == "Electron"
-          && ((mcParticle->getMother() != nullptr
+          && (mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
-          || (mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)))
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511))
           {
             return 1.0;
             //intermediate electron
@@ -950,14 +957,9 @@ namespace Belle2 {
             return 1.0;
             //direct muon
           } else if (particleName == "Muon"
-          && ((mcParticle->getMother() != nullptr
+          && (mcParticle->getMother() != nullptr
           && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
-          || (mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511))
-                    )
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511))
           {
             return 1.0;
             //intermediate muon
@@ -970,6 +972,14 @@ namespace Belle2 {
             return 1.0;
             //KinLepton
           } else if (particleName == "KinLepton"
+          && mcParticle->getMother() != nullptr
+          && mcParticle->getMother()->getMother() != nullptr
+          && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
+          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          {
+            return 1.0;
+            //IntermediateKinLepton
+          } else if (particleName == "IntermediateKinLepton"
           && mcParticle->getMother() != nullptr
           && mcParticle->getMother()->getMother() != nullptr
           && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
@@ -1022,6 +1032,15 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto particleName = arguments[0];
         auto func = [particleName](const Particle * particle) -> double {
+          if (!(particleName == "Electron" || particleName == "IntermediateElectron" || particleName == "Muon" || particleName == "IntermediateMuon"
+          || particleName == "KinLepton" || particleName == "IntermediateKinLepton" || particleName == "Kaon"
+          || particleName == "SlowPion" || particleName == "FastPion" || particleName == "KaonPion" || particleName == "Lambda" || particleName == "MaximumPstar" || particleName == "FSC"))
+          {
+            B2FATAL("isRightCategory: Not available category " << particleName <<
+            ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            return 0.0;
+          }
+
           Particle* nullpart = nullptr;
           float qTarget = 0;
           float qMC = 0;
@@ -1041,7 +1060,7 @@ namespace Belle2 {
             }
             //for some Categories we need the mother of the mother of the particle
             if ((particleName == "Kaon" || particleName == "SlowPion" || particleName == "IntermediateElectron"
-                 || particleName == "IntermediateMuon" || particleName == "FastPion")
+                 || particleName == "IntermediateMuon" || particleName == "IntermediateKinLepton" || particleName == "FastPion")
                 && MCp->getMother()->getMother() != nullptr) maximumPDGMotherMother =  TMath::Abs(MCp->getMother()->getMother()->getPDG());
           }
 
@@ -1111,8 +1130,7 @@ namespace Belle2 {
 
           // ------------------------------  Outputs  -----------------------------------
           if (particleName == "Electron"
-              && ((qTarget == qMC && maximumPDG == 11 && maximumPDGMother == 511)
-                  || (qTarget != qMC && maximumPDG == 11 && maximumPDGMotherMother == 511)))
+              && qTarget == qMC && maximumPDG == 11 && maximumPDGMother == 511)
           {
             return 1.0;
           } else if (particleName == "IntermediateElectron"
@@ -1120,8 +1138,7 @@ namespace Belle2 {
           {
             return 1.0;
           } else if (particleName == "Muon"
-                     && ((qTarget == qMC && maximumPDG == 13 && maximumPDGMother == 511)
-                         || (qTarget != qMC && maximumPDG == 13 && maximumPDGMotherMother == 511)))
+                     && qTarget == qMC && maximumPDG == 13 && maximumPDGMother == 511)
           {
             return 1.0;
           } else if (particleName == "IntermediateMuon"
@@ -1130,6 +1147,10 @@ namespace Belle2 {
             return 1.0;
           }  else if (particleName == "KinLepton"
                       && qTarget == qMC && (maximumPDG == 11 || maximumPDG == 13) && maximumPDGMother == 511)
+          {
+            return 1.0;
+          }  else if (particleName == "IntermediateKinLepton"
+                      && qTarget != qMC && (maximumPDG == 11 || maximumPDG == 13) && maximumPDGMotherMother == 511)
           {
             return 1.0;
           } else if (particleName == "Kaon" && qTarget == qMC
@@ -1176,6 +1197,24 @@ namespace Belle2 {
         auto extraInfoRightCategory = arguments[1];
         auto extraInfoRightTrack = arguments[2];
         auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
+          if (!(extraInfoRightCategory == "isRightCategory(Electron)" || extraInfoRightCategory == "isRightCategory(IntermediateElectron)" || extraInfoRightCategory == "isRightCategory(Muon)" || extraInfoRightCategory == "isRightCategory(IntermediateMuon)"
+          || extraInfoRightCategory == "isRightCategory(KinLepton)" || extraInfoRightCategory == "isRightCategory(IntermediateKinLepton)" || extraInfoRightCategory == "isRightCategory(Kaon)"
+          || extraInfoRightCategory == "isRightCategory(SlowPion)" || extraInfoRightCategory == "isRightCategory(FastPion)" || extraInfoRightCategory == "isRightCategory(KaonPion)" || extraInfoRightCategory == "isRightCategory(Lambda)" || extraInfoRightCategory == "isRightCategory(MaximumPstar)" || extraInfoRightCategory == "isRightCategory(FSC)"))
+          {
+            B2FATAL("QrOf: Not available category in " << extraInfoRightCategory <<
+            ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            return 0.0;
+          }
+
+          if (!(extraInfoRightTrack == "isRightTrack(Electron)" || extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(Muon)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
+          || extraInfoRightTrack == "isRightTrack(KinLepton)" || extraInfoRightTrack == "isRightTrack(IntermediateKinLepton)" || extraInfoRightTrack == "isRightTrack(Kaon)"
+          || extraInfoRightTrack == "isRightTrack(SlowPion)" || extraInfoRightTrack == "isRightTrack(FastPion)" || extraInfoRightTrack == "isRightTrack(MaximumPstar)" || extraInfoRightTrack == "isRightTrack(Lambda)"))
+          {
+            B2FATAL("QrOf: Not available category in " << extraInfoRightTrack <<
+            ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda");
+            return 0.0;
+          }
+
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
@@ -1210,7 +1249,7 @@ namespace Belle2 {
               if (extraInfoRightTrack == "isRightTrack(Lambda)") {
                 qTarget = (-1) * target->getPDGCode() / TMath::Abs(target->getPDGCode());
               } else if (extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
-                         || extraInfoRightTrack == "isRightTrack(SlowPion)" || extraInfoRightTrack == "isRightTrack(FSC)") {
+                         || extraInfoRightTrack == "isRightTrack(IntermediateKinLepton)" || extraInfoRightTrack == "isRightTrack(SlowPion)") {
                 qTarget = (-1) * target -> getCharge();
               } else qTarget = target -> getCharge();
             }
@@ -1233,6 +1272,24 @@ namespace Belle2 {
         auto extraInfoRightCategory = arguments[1];
         auto extraInfoRightTrack = arguments[2];
         auto func = [particleListName, extraInfoRightCategory, extraInfoRightTrack](const Particle*) -> double {
+          if (!(extraInfoRightCategory == "isRightCategory(Electron)" || extraInfoRightCategory == "isRightCategory(IntermediateElectron)" || extraInfoRightCategory == "isRightCategory(Muon)" || extraInfoRightCategory == "isRightCategory(IntermediateMuon)"
+          || extraInfoRightCategory == "isRightCategory(KinLepton)" || extraInfoRightCategory == "isRightCategory(IntermediateKinLepton)" || extraInfoRightCategory == "isRightCategory(Kaon)"
+          || extraInfoRightCategory == "isRightCategory(SlowPion)" || extraInfoRightCategory == "isRightCategory(FastPion)" || extraInfoRightCategory == "isRightCategory(KaonPion)" || extraInfoRightCategory == "isRightCategory(Lambda)" || extraInfoRightCategory == "isRightCategory(FSC)"))
+          {
+            B2FATAL("weightedQrOf: Not available category in " << extraInfoRightCategory <<
+            ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, FSC and Lambda");
+            return 0.0;
+          }
+
+          if (!(extraInfoRightTrack == "isRightTrack(Electron)" || extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(Muon)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
+          || extraInfoRightTrack == "isRightTrack(KinLepton)" || extraInfoRightTrack == "isRightTrack(IntermediateKinLepton)" || extraInfoRightTrack == "isRightTrack(Kaon)"
+          || extraInfoRightTrack == "isRightTrack(SlowPion)" || extraInfoRightTrack == "isRightTrack(FastPion)" || extraInfoRightTrack == "isRightTrack(Lambda)"))
+          {
+            B2FATAL("weightedQrOf: Not available category in " << extraInfoRightTrack <<
+            ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion and Lambda");
+            return 0.0;
+          }
+
           double final_value = 0.0;
 
           auto compare = [extraInfoRightTrack](const Particle * part1, const Particle * part2)-> bool {
@@ -1266,7 +1323,7 @@ namespace Belle2 {
                   if (particleListName == "Lambda0:LambdaROE") {
                     flavor = (-1) * ParticleVector[i]->getPDGCode() / TMath::Abs(ParticleVector[i]->getPDGCode());
                   } else if (extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
-                             || extraInfoRightTrack == "isRightTrack(SlowPion)" || extraInfoRightTrack == "isRightTrack(FSC)") {
+                             || extraInfoRightTrack == "isRightTrack(IntermediateKinLepton)" || extraInfoRightTrack == "isRightTrack(SlowPion)") {
                     flavor = (-1) * ParticleVector[i] -> getCharge();
                   } else flavor = ParticleVector[i]->getCharge();
 
@@ -1323,8 +1380,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
     REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavour of tag side from MC extracted from the RoE");
-    REGISTER_VARIABLE("BtagClassFlavor",  particleClassifiedFlavor,    "Flavour of Btag from trained Method");
-    REGISTER_VARIABLE("BtagMCFlavor",  particleMCFlavor,    "Flavour of Btag from MC");
 
 
     VARIABLE_GROUP("MetaFunctions FlavorTagging")
@@ -1342,10 +1397,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables,
                       "FlavorTagging:[Eventbased] Kinematical variables for FastSlowCorrelated category (pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast).");
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat,
-                      "Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName. The probability is accessed via extraInfoName.");
+                      "Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particlelistName. The probability is accessed via extraInfoName.");
     REGISTER_VARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
-                      "Returns the highest probability value for the given category")
-
+                      "Returns the highest target track probability value for the given category")
 
     REGISTER_VARIABLE("isRightTrack(particleName)", isRightTrack,
                       "Checks if the given Particle was really from a B. 1.0 if true otherwise 0.0");

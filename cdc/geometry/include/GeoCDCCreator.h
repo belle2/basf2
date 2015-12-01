@@ -21,6 +21,7 @@
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VisAttributes;
+class G4UserLimits;
 
 namespace Belle2 {
 
@@ -67,6 +68,9 @@ namespace Belle2 {
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;
+
+      //! Vector of pointers to G4UserLimits
+      std::vector<G4UserLimits*> m_userLimits;
 
     };
 

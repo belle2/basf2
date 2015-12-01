@@ -63,6 +63,7 @@ namespace Belle2 {
       physical_cdc = 0;
       m_VisAttributes.clear();
       m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
+      m_userLimits.clear();
     }
 
 
@@ -72,6 +73,8 @@ namespace Belle2 {
       if (m_bkgsensitive) delete m_bkgsensitive;
       for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
+      for (G4UserLimits* userLimits : m_userLimits) delete userLimits;
+      m_userLimits.clear();
     }
 
 
@@ -833,7 +836,11 @@ namespace Belle2 {
                                                                    // cppcheck-suppress zerodiv
                                                                    (format("logicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), 0, 0, 0);
         //hard-coded temporarily
-        middleSensitiveTube->SetUserLimits(new G4UserLimits(8.5 * CLHEP::cm));
+        //need to create an object per layer ??? to be checked later
+        G4UserLimits* uLimits = new G4UserLimits(8.5 * CLHEP::cm);
+        m_userLimits.push_back(uLimits);
+        //  std::cout <<"#userlimits= " << m_userLimits.size() << std::endl;
+        middleSensitiveTube->SetUserLimits(uLimits);
         middleSensitiveTube->SetSensitiveDetector(m_sensitive);
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*CLHEP::cm / 2.0), middleSensitiveTube,
                           // cppcheck-suppress zerodiv

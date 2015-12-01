@@ -66,7 +66,12 @@ namespace Belle2 {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
         }
-        advancedProcessing(qt);
+
+        /// THIS METHOD IS DISABLED BECACUSE IT CREATES INVALID TREE ITEMS
+        /// WHICH ARE IN THETA AREAS ( < 0 or > m_nbinsTheta )
+        /// WHICH IS NOT SUPPORTED BY OTHER PARTS OF THE QUAD TREE CODE
+        /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
+        //advancedProcessing(qt);
 
         std::vector<ConformalCDCWireHit*> candidateHits;
 
@@ -78,6 +83,10 @@ namespace Belle2 {
       };
 
       /// Trying to assing new hits from neighbouring regions of the given node.
+      /// THIS METHOD IS DISABLED BECACUSE IT CREATES INVALID TREE ITEMS
+      /// WHICH ARE IN THETA AREAS ( < 0 or > m_nbinsTheta )
+      /// WHICH IS NOT SUPPORTED BY OTHER PARTS OF THE QUAD TREE CODE
+      /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
       void advancedProcessing(AxialHitQuadTreeProcessor::QuadTree* qt)
       {
         double rRes = m_precisionFunct(qt->getYMean());

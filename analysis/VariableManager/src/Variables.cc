@@ -764,6 +764,17 @@ namespace Belle2 {
     }
 
     // TDCPV related ---------------------------------------------------------
+    double particleMCTagBFlavor(const Particle* particle)
+    {
+      double result = 1000.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getMCTagBFlavor();
+
+      return result;
+    }
 
     double particleTagVx(const Particle* particle)
     {
@@ -1245,6 +1256,7 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle.")
 
     VARIABLE_GROUP("TDCPV");
+    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
     REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");

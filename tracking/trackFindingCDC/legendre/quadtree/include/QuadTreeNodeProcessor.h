@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <cmath>
 
 
 namespace Belle2 {
@@ -80,7 +81,7 @@ namespace Belle2 {
       void advancedProcessing(AxialHitQuadTreeProcessor::QuadTree* qt)
       {
         double rRes = m_precisionFunct(qt->getYMean());
-        unsigned long thetaRes = abs(m_nbinsTheta * rRes / 0.3);
+        unsigned long thetaRes = std::round(std::fabs(m_nbinsTheta * rRes / 0.3));
 
         unsigned long meanTheta = qt->getXMean();
         double meanR = qt->getYMean();
@@ -90,24 +91,34 @@ namespace Belle2 {
 
         for (int ii = -1; ii <= 1; ii = +2) {
           for (int jj = -1; jj <= 1; jj = +2) {
-            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<unsigned long>((
-                                                               ii - 1)*thetaRes / 2),
-                                                             meanTheta + static_cast<unsigned long>((ii + 1)*thetaRes / 2)),
-                                                             AxialHitQuadTreeProcessor::rangeY(meanR + (jj - 1)*rRes / 2.,
-                                                                 meanR + (jj + 1)*rRes / 2.));
+            const double lowerRangeX = meanTheta + (ii - 1) * thetaRes / 2.0f;
+            // make sure there are negative lower borders in x region, because only positive values can be stored
+            // in unsigned long
+            if (lowerRangeX < 0.0f)
+              continue;
+            const auto rangeX = AxialHitQuadTreeProcessor::rangeX(static_cast<unsigned long>(lowerRangeX),
+                                                                  meanTheta + static_cast<unsigned long>((ii + 1) * thetaRes / 2.0f));
+            const auto rangeY = AxialHitQuadTreeProcessor::rangeY(meanR + (jj - 1) * rRes / 2.0f,
+                                                                  meanR + (jj + 1) * rRes / 2.0f);
 
+            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(rangeX, rangeY);
             nodesWithPossibleCands.push_back(m_qtProcessor.createSingleNode(rangesTmp));
           }
         }
 
         for (int ii = -1; ii <= 1; ii++) {
           for (int jj = -1; jj <= 1; jj++) {
-            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(AxialHitQuadTreeProcessor::rangeX(meanTheta + static_cast<unsigned long>((
-                                                               2 * ii - 1)*thetaRes / 2),
-                                                             meanTheta + static_cast<unsigned long>((2 * ii + 1)*thetaRes / 2)),
-                                                             AxialHitQuadTreeProcessor::rangeY(meanR + (2 * jj - 1)*rRes / 2.,
-                                                                 meanR + (2 * jj + 1)*rRes / 2.));
+            const double lowerRangeX = meanTheta + (2 * ii - 1) * thetaRes / 2.0f;
+            // make sure there are negative lower borders in x region, because only positive values can be stored
+            // in unsigned long
+            if (lowerRangeX < 0.0f)
+              continue;
+            const auto rangeX = AxialHitQuadTreeProcessor::rangeX(static_cast<unsigned long>(lowerRangeX),
+                                                                  meanTheta + static_cast<unsigned long>((2 * ii + 1) * thetaRes / 2.0f));
+            const auto rangeY = AxialHitQuadTreeProcessor::rangeY(meanR + (2 * jj - 1) * rRes / 2.0f,
+                                                                  meanR + (2 * jj + 1) * rRes / 2.0f);
 
+            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(rangeX, rangeY);
             nodesWithPossibleCands.push_back(m_qtProcessor.createSingleNode(rangesTmp));
           }
         }

@@ -84,7 +84,7 @@ namespace Belle2 {
         // append new digit
         TOPDigit* digit = digits.appendNew(m_barID, m_pixelID, TDC);
         digit->setADC(int(pulseHeight));
-        digit->setHardwareChannelID(topgp->getChannelMapper().getChannelID(m_pixelID));
+        digit->setChannelID(topgp->getChannelMapper().getChannelID(m_pixelID));
 
         // set relations to simulated hits and MC particles
         for (unsigned j = 0; j < simHits.size(); j++) {

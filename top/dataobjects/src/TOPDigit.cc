@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TOPDigit);
+// ClassImp(TOPDigit);
 
 int TOPDigit::s_doubleHitResolution = 0;
 int TOPDigit::s_pileupTime = 0;

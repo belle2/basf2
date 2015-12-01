@@ -24,7 +24,7 @@ namespace Belle2 {
 
   /**
    * Merging raw waveforms, pedestal subtraction and gain correction.
-   * Convertion to hits.
+   * Conversion to hits.
    */
   class TOPWFMergerModule : public Module {
 
@@ -121,6 +121,7 @@ namespace Belle2 {
     double m_hysteresis;  /**< hysteresis value in number of sigma */
     int m_minWidth;    /**< minimal width of a digital pulse in number of samlpes */
     double m_fraction;    /**< constant fraction discrimination: fraction */
+    bool m_useFTSW;  /**< if true add FTSW time to hit times when making TOPDigits */
 
     DBArray<TOPASICChannel> m_asicChannels; /**< ASIC calibration constants */
     std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (bar,channel) and ptr */

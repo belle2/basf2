@@ -181,7 +181,7 @@ namespace Belle2 {
     int nHits = topDigits.getEntries();
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
-      m_ringImage->Fill(m_rowWiseChannelID[data->getChannelID() - 1],
+      m_ringImage->Fill(m_rowWiseChannelID[data->getPixelID() - 1],
                         TOP::TIME(data->getTDC()));
     }
     m_numEvents++;

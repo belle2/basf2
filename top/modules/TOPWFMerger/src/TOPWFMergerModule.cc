@@ -28,6 +28,7 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveform.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPTimeZero.h>
 
 #include <iostream>
 
@@ -64,6 +65,9 @@ namespace Belle2 {
              "(accept pulse if width > minWidth)", 2);
     addParam("fraction", m_fraction,
              "the fraction for constant fraction discrimination", 0.5);
+    addParam("useFTSW", m_useFTSW,
+             "add or not add FTSW time to hit times when making TOPDigits", false);
+
   }
 
 
@@ -76,6 +80,13 @@ namespace Belle2 {
 
     StoreArray<TOPRawWaveform> rawWaveforms;
     rawWaveforms.isRequired();
+
+    StoreObjPtr<TOPTimeZero> timeZero;
+    if (m_useFTSW) {
+      timeZero.isRequired();
+    } else {
+      timeZero.isOptional();
+    }
 
     StoreArray<TOPWaveform> waveforms;
     waveforms.registerInDataStore();
@@ -149,6 +160,12 @@ namespace Belle2 {
 
     // convert to hits
 
+    double t0 = 0;
+    if (m_useFTSW) {
+      StoreObjPtr<TOPTimeZero> timeZero;
+      t0 = timeZero->getTime();
+    }
+
     StoreArray<TOPDigit> digits;
     for (auto& waveform : waveforms) {
       int nDig = waveform.setDigital(m_threshold, m_threshold - m_hysteresis, m_minWidth);
@@ -160,11 +177,11 @@ namespace Belle2 {
       auto channelID = waveform.getChannelID();
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
-        auto tdc = m_topgp->getTDCcount(hit.time);
+        auto tdc = m_topgp->getTDCcount(hit.time + t0);
         auto* digit = digits.appendNew(barID, pixelID, tdc);
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
-        digit->setHardwareChannelID(channelID);
+        digit->setChannelID(channelID);
         digit->addRelationTo(&waveform);
       }
     }

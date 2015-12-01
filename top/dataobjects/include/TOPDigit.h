@@ -36,27 +36,27 @@ namespace Belle2 {
      */
     TOPDigit():
       m_barID(0),
-      m_channelID(0),
+      m_pixelID(0),
       m_TDC(0),
       m_ADC(0),
       m_pulseWidth(0),
-      m_hardChannelID(0),
+      m_channelID(0),
       m_quality(c_Junk)
     {}
 
     /**
      * Almost full constructor
-     * @param barID     bar ID
-     * @param channelID channel ID
+     * @param barID     bar ID (1-based)
+     * @param pixelID   pixel ID (1-based)
      * @param TDC       digitized detection time
      */
-    TOPDigit(int barID, int channelID, int TDC):
+    TOPDigit(int barID, int pixelID, int TDC):
       m_barID(barID),
-      m_channelID(channelID),
+      m_pixelID(pixelID),
       m_TDC(TDC),
       m_ADC(0),
       m_pulseWidth(0),
-      m_hardChannelID(0),
+      m_channelID(0),
       m_quality(c_Good)
     {}
 
@@ -74,9 +74,16 @@ namespace Belle2 {
 
     /**
      * Set hardware channel ID (0-based)
-     * @param chID hardware channel ID
+     * @param channel hardware channel ID
      */
-    void setHardwareChannelID(unsigned int chID) {m_hardChannelID = chID;}
+    void setChannelID(unsigned int channel) {m_channelID = channel;}
+
+    /**
+     * Set hardware channel ID (0-based)
+     * @param channel hardware channel ID
+     */
+    void setHardwareChannelID(unsigned int channel)  __attribute__((deprecated("Please use setChannelID()")))
+    {m_channelID = channel;}
 
     /**
      * Set hit quality
@@ -97,53 +104,139 @@ namespace Belle2 {
     static void setPileupTime(int tdcBins) {s_pileupTime = tdcBins;}
 
     /**
-     * Get hit quality
+     * Subtract start time T0
+     * @param t0 start time
+     */
+    void subtractT0(double t0) { m_TDC -= int(t0);}
+
+    /**
+     * Returns hit quality
      * @return hit quality
      */
     EHitQuality getHitQuality() const {return m_quality; }
 
     /**
-     * Get bar ID
-     * @return bar ID
+     * Returns module ID
+     * @return module ID
      */
     int getBarID() const { return m_barID; }
 
     /**
-     * Get channel ID
+     * Returns pixel ID
      * @return software channel ID
      */
-    int getChannelID() const { return m_channelID; }
+    int getPixelID() const { return m_pixelID; }
 
     /**
-     * Get digitized time
+     * Returns pixel row number (1-based)
+     * @return pixel row number
+     */
+    int getPixelRow() const { return (m_pixelID - 1) / 64 + 1;}
+
+    /**
+     * Returns pixel column number (1-based)
+     * @return pixel column number
+     */
+    int getPixelCol() const { return (m_pixelID - 1) % 64 + 1;}
+
+    /**
+     * Returns PMT row number (1-based)
+     * @return PMT row number
+     */
+    int getPMTRow() const {return (getPixelRow() - 1) / 4 + 1;}
+
+    /**
+     * Returns PMT column number (1-based)
+     * @return PMT column number
+     */
+    int getPMTCol() const {return (getPixelCol() - 1) / 4 + 1;}
+
+    /**
+     * Returns PMT number (1-based)
+     * @return PMT number
+     */
+    int getPMTNumber() const {return getPMTCol() + (getPMTRow() - 1) * 16;}
+
+    /**
+     * Returns PMT pixel row number (1-based)
+     * @return PMT pixel row number
+     */
+    int getPMTPixelRow() const {return (getPixelRow() - 1) % 4 + 1;}
+
+    /**
+     * Returns PMT pixel column number (1-based)
+     * @return PMT pixel column number
+     */
+    int getPMTPixelCol() const {return (getPixelCol() - 1) % 4 + 1;}
+
+    /**
+     * Returns PMT pixel number (1-based)
+     * @return PMT pixel
+     */
+    int getPMTPixel() const {return getPMTPixelCol() + (getPMTPixelRow() - 1) * 4;}
+
+    /**
+     * Returns pixel ID
+     * @return software channel ID
+     */
+    int getChannelID() const  __attribute__((deprecated("Please use getPixelID()")))
+    { return m_pixelID; }
+
+    /**
+     * Returns digitized time
      * @return digitized time
      */
     int getTDC() const { return m_TDC; }
 
     /**
-     * Get digitized pulse height or integrated charge
+     * Returns digitized pulse height or integrated charge
      * @return digitized pulse height or integrated charge
      */
     int getADC() const { return m_ADC; }
 
     /**
-     * Get digitized pulse width
+     * Returns digitized pulse width
      * @return digitized pulse width
      */
     int getPulseWidth() const { return m_pulseWidth; }
 
     /**
-     * Get hardware channel ID
+     * Returns hardware channel ID
      * @return hardware channel ID
      */
-    unsigned int getHardwareChannelID() const { return m_hardChannelID; }
+    unsigned int getHardwareChannelID() const { return m_channelID; }
+
+    /**
+     * Returns ASIC channel number
+     * @return ASIC channel number
+     */
+    unsigned int getASICChannel() const {return m_channelID & 0x07;}
+
+
+    /**
+     * Returns ASIC number
+     * @return ASIC number
+     */
+    unsigned int getASICNumber() const {return (m_channelID >> 3) & 0x03;}
+
+    /**
+     * Returns carrier board number
+     * @return carrier board number
+     */
+    unsigned int getCarrierNumber() const {return (m_channelID >> 5) & 0x03;}
+
+    /**
+     * Returns boardstack number
+     * @return boardstack number
+     */
+    unsigned int getBoardstackNumber() const {return (m_channelID >> 7) & 0x03;}
 
     /**
      * Implementation of the base class function.
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, composed of channel ID (1-512) and bar ID (1-16)
      */
-    unsigned int getUniqueChannelID() const {return m_channelID + (m_barID << 16);}
+    unsigned int getUniqueChannelID() const {return m_pixelID + (m_barID << 16);}
 
     /**
      * Implementation of the base class function.
@@ -155,18 +248,18 @@ namespace Belle2 {
 
 
   private:
-    int m_barID;               /**< bar ID (1-based) */
-    int m_channelID;           /**< software channel ID (1-based) */
+    int m_barID;               /**< module ID (1-based) */
+    int m_pixelID;             /**< software channel ID (1-based) */
     int m_TDC;                 /**< digitized time */
     int m_ADC;                 /**< digitized pulse height or charge (to be decided) */
     int m_pulseWidth;          /**< digitized pulse width */
-    unsigned m_hardChannelID;  /**< hardware channel ID (0-based) */
+    unsigned m_channelID;      /**< hardware channel ID (0-based) */
     EHitQuality m_quality;     /**< hit quality */
 
     static int s_doubleHitResolution; /**< double hit resolving time in TDC units */
     static int s_pileupTime; /**< pile-up time in TDC units */
 
-    ClassDef(TOPDigit, 6); /**< ClassDef */
+    ClassDef(TOPDigit, 7); /**< ClassDef */
 
   };
 

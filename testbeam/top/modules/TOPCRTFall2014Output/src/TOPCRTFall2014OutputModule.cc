@@ -160,7 +160,7 @@ namespace Belle2 {
     for (int i = 0; i < nEntries; ++i) {
       TOPDigit* digi = topDigits[i];
 
-      int ich = m_topgp->getOldNumbering(digi->getChannelID()) - 1;
+      int ich = m_topgp->getOldNumbering(digi->getPixelID()) - 1;
 
       float tdc(digi->getTDC());
       if (m_randomize) {tdc += gRandom->Rndm();}

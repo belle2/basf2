@@ -154,7 +154,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> topDigits;
     for (const auto& digit : topDigits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit.getBarID(), digit.getChannelID(), digit.getTDC());
+        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC());
     }
 
     // create working variables

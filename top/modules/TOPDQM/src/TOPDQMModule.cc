@@ -181,7 +181,7 @@ namespace Belle2 {
         B2ERROR("Invalid bar ID found in TOPDigit");
         continue;
       }
-      m_pixelHits[i]->Fill(digit.getChannelID());
+      m_pixelHits[i]->Fill(digit.getPixelID());
       m_hitTimes[i]->Fill(digit.getTDC());
     }
 

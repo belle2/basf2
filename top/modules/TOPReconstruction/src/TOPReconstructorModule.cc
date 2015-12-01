@@ -215,7 +215,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.addData(digit.getBarID(), digit.getChannelID(), digit.getTDC(), bunchTime);
+        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC(), bunchTime);
     }
 
     // reconstruct track-by-track and store the results

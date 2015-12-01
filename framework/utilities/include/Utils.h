@@ -76,4 +76,24 @@ namespace Belle2 {
     {__VA_ARGS__;}\
   }
 
+  /* Macros to simplify giving hints to GCC and others compilers
+   * how likely it is, that a branch will be taken
+   * This also the compiler to generate faster code in hot sections
+   *
+   * Usage:
+   *
+   * if (branch_likely(my_number > 10)) {
+   *   // executed very often
+   * } else {
+   *   // executed very seldom
+   * }
+   */
+#if defined(__GNUC__) || defined(__ICL) || defined(__clang__)
+#define branch_likely(x)       __builtin_expect(!!(x), 1)
+#define branch_unlikely(x)     __builtin_expect(!!(x), 0)
+#else
+#define branch_likely(x)       (x)
+#define branch_unlikely(x)     (x)
+#endif
+
 } // Belle2 namespace

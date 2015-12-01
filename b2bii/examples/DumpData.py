@@ -9,7 +9,7 @@ from simulation import add_simulation
 
 if len(sys.argv) != 2:
     sys.exit('Must provide one input parameter: [input_Belle_MDST_file].\n'
-             'A small example Belle MDST file can be downloaded from'
+             'A small example Belle MDST file can be downloaded from '
              'http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
 
 inputBelleMDSTFile = sys.argv[1]

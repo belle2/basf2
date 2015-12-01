@@ -20,10 +20,11 @@ from modularAnalysis import printVariableValues
 from b2biiConversion import convertBelleMdstToBelleIIMdst
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
+from b2biiMonitors import addNeutralsConversionMonitors
 
 if len(sys.argv) != 3:
     sys.exit('Must provide two input parameters: [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
-             'A small example Belle MDST file can be downloaded from'
+             'A small example Belle MDST file can be downloaded from '
              'http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
 
 inputBelleMDSTFile = sys.argv[1]
@@ -45,6 +46,7 @@ loadGearbox()
 # Create monitoring histograms
 addBeamParamsConversionMonitors()
 addTrackConversionMonitors()
+addNeutralsConversionMonitors()
 
 # Only charged final state particles need to be loaded
 # All photon and pi0 candidates are already loaded

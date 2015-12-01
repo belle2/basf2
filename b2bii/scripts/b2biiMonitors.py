@@ -4,9 +4,13 @@
 from basf2 import *
 from modularAnalysis import fillParticleList
 from modularAnalysis import copyParticles
+from modularAnalysis import copyList
+from modularAnalysis import cutAndCopyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
+
 from vertex import vertexKFit
+from vertex import massVertexKFit
 
 
 def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=analysis_main):
@@ -238,3 +242,275 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
 
     tracks2hist.param('fileName', outputRootFile)
     path.add_module(tracks2hist)
+
+
+def addNeutralsConversionMonitors(outputRootFile='', path=analysis_main):
+    """
+    Creates 'gamma:b2bii_monitor' and 'pi0:b2bii_monitor' from already existing 'gamma:mdst' and
+    'pi0:mdst' ParticleList and fills it with all converted neutral gammas.
+    For each object several quantities are stored to histograms with 'VariablesToHistogram' module
+    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+
+    @param outputRootFile name of the output ROOT file to which the histograms are saved.
+    @param path modules are added to this path
+    """
+
+    gammaOutputRootFile = 'b2biiGammaConversionMonitors.root'
+    neutralPiOutputRootFile = 'b2biiPi0ConversionMonitors.root'
+    MCneutralPiOutputRootFile = 'b2biiMCPi0ConversionMonitors.root'
+
+    # load gammas and pi0, copy pi0s from 'pi0:mdst' list. We don't want to mess with them.
+    copyList('gamma:b2bii_monitor', 'gamma:mdst', False, path)
+    copyParticles('pi0:b2bii_monitor', 'pi0:mdst', False, path)
+    massVertexKFit('pi0:b2bii_monitor', 0, '', path)
+    matchMCTruth('gamma:b2bii_monitor', path)
+    matchMCTruth('pi0:b2bii_monitor', path)
+
+    cutAndCopyLists('pi0:b2bii_monitorMC', 'pi0:b2bii_monitor', 'mcPDG == 111')
+
+    # register VariablesToHistogram and fill them with monitored variables
+    gamma2hist = register_module('VariablesToHistogram')
+    gamma2hist.param('particleList', 'gamma:b2bii_monitor')
+    neutralPi2hist = register_module('VariablesToHistogram')
+    neutralPi2hist.param('particleList', 'pi0:b2bii_monitor')
+
+    MCneutralPi2hist = register_module('VariablesToHistogram')
+    MCneutralPi2hist.param('particleList', 'pi0:b2bii_monitorMC')
+
+    # define variables that are monitored and specify
+    # the corresponding histogram (#bins, low, high)
+    # ('variable_name', number_of_bins, x_low, x_high)
+
+    ###################
+    # Gamma
+    ###################
+
+    # Position and momentum
+    gamma2hist_x = ('x', 100, -1.0, 1.0)
+    gamma2hist_y = ('y', 100, -1.0, 1.0)
+    gamma2hist_z = ('z', 100, -1.0, 1.0)
+    gamma2hist_px = ('px', 100, -1.5, 1.5)
+    gamma2hist_py = ('py', 100, -1.5, 1.5)
+    gamma2hist_pz = ('pz', 100, -1.0, 2.5)
+    gamma2hist_truepx = ('mcPX', 100, -1.5, 1.5)
+    gamma2hist_truepy = ('mcPY', 100, -1.5, 1.5)
+    gamma2hist_truepz = ('mcPZ', 100, -1.0, 2.5)
+    gamma2hist_trueE = ('mcE', 100, 0.0, 3.0)
+
+    # Cluster variables
+    gamma2hist_E = ('E', 100, 0.0, 3.0)
+    gamma2hist_Theta = ('clusterTheta', 100, 0.0, 3.14)
+    gamma2hist_Phi = ('clusterPhi', 100, -3.14, 3.14)
+    gamma2hist_R = ('clusterR', 100, 120, 260)
+
+    # Auxiliary variables
+    gamma2hist_Edep = ('clusterUncorrE', 100, 0.0, 0.1)
+    # gamma2hist_Time= ('clusterTiming', 100, ?, ?)
+    gamma2hist_Emax = ('clusterHighestE', 100, 0.0, 2.0)
+    gamma2hist_E9E25 = ('clusterE9E25', 100, 0.0, 1.0)
+    gamma2hist_noC = ('clusterNHits', 100, 0.0, 30.0)
+
+    gamma2hist_Err00 = ('momVertCovM(0,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err10 = ('momVertCovM(1,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err11 = ('momVertCovM(1,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err20 = ('momVertCovM(2,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err21 = ('momVertCovM(2,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err22 = ('momVertCovM(2,2)', 100, -0.0005, 0.0005)
+    gamma2hist_Err30 = ('momVertCovM(3,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err31 = ('momVertCovM(3,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err32 = ('momVertCovM(3,2)', 100, -0.0005, 0.0005)
+    gamma2hist_Err33 = ('momVertCovM(3,3)', 100, -0.0005, 0.0005)
+    gamma2hist_Err40 = ('momVertCovM(4,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err41 = ('momVertCovM(4,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err42 = ('momVertCovM(4,2)', 100, -0.0005, 0.0005)
+    gamma2hist_Err43 = ('momVertCovM(4,3)', 100, -0.0005, 0.0005)
+    gamma2hist_Err44 = ('momVertCovM(4,4)', 100, 0.99, 1.01)
+    gamma2hist_Err50 = ('momVertCovM(5,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err51 = ('momVertCovM(5,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err52 = ('momVertCovM(5,2)', 100, -0.0005, 0.0005)
+    gamma2hist_Err53 = ('momVertCovM(5,3)', 100, -0.0005, 0.0005)
+    gamma2hist_Err54 = ('momVertCovM(5,4)', 100, -0.0005, 0.0005)
+    gamma2hist_Err55 = ('momVertCovM(5,5)', 100, 0.99, 1.01)
+    gamma2hist_Err60 = ('momVertCovM(6,0)', 100, -0.0005, 0.0005)
+    gamma2hist_Err61 = ('momVertCovM(6,1)', 100, -0.0005, 0.0005)
+    gamma2hist_Err62 = ('momVertCovM(6,2)', 100, -0.0005, 0.0005)
+    gamma2hist_Err63 = ('momVertCovM(6,3)', 100, -0.0005, 0.0005)
+    gamma2hist_Err64 = ('momVertCovM(6,4)', 100, -0.0005, 0.0005)
+    gamma2hist_Err65 = ('momVertCovM(6,5)', 100, -0.0005, 0.0005)
+    gamma2hist_Err66 = ('momVertCovM(6,6)', 100, 0.99, 1.01)
+
+    gamma2hist.param('variables',
+                     [gamma2hist_x,
+                      gamma2hist_y,
+                      gamma2hist_z,
+                      gamma2hist_px,
+                      gamma2hist_py,
+                      gamma2hist_pz,
+                      gamma2hist_truepx,
+                      gamma2hist_truepy,
+                      gamma2hist_truepz,
+                      gamma2hist_trueE,
+                      gamma2hist_E,
+                      gamma2hist_Theta,
+                      gamma2hist_Phi,
+                      gamma2hist_R,
+                      gamma2hist_Edep,
+                      gamma2hist_Emax,
+                      gamma2hist_E9E25,
+                      gamma2hist_noC,
+                      gamma2hist_Err00,
+                      gamma2hist_Err10,
+                      gamma2hist_Err11,
+                      gamma2hist_Err20,
+                      gamma2hist_Err21,
+                      gamma2hist_Err22,
+                      gamma2hist_Err30,
+                      gamma2hist_Err31,
+                      gamma2hist_Err32,
+                      gamma2hist_Err33,
+                      gamma2hist_Err40,
+                      gamma2hist_Err41,
+                      gamma2hist_Err42,
+                      gamma2hist_Err43,
+                      gamma2hist_Err44,
+                      gamma2hist_Err50,
+                      gamma2hist_Err51,
+                      gamma2hist_Err52,
+                      gamma2hist_Err53,
+                      gamma2hist_Err54,
+                      gamma2hist_Err55,
+                      gamma2hist_Err60,
+                      gamma2hist_Err61,
+                      gamma2hist_Err62,
+                      gamma2hist_Err63,
+                      gamma2hist_Err64,
+                      gamma2hist_Err65,
+                      gamma2hist_Err66])
+
+    ###################
+    # Pi0
+    ###################
+
+    # Position and momentum
+    neutralPi2hist_x = ('x', 100, -1.0, 1.0)
+    neutralPi2hist_y = ('y', 100, -1.0, 1.0)
+    neutralPi2hist_z = ('z', 100, -1.0, 1.0)
+    neutralPi2hist_px = ('px', 100, -2.0, 2.0)
+    neutralPi2hist_py = ('py', 100, -2.0, 2.0)
+    neutralPi2hist_pz = ('pz', 100, -1.0, 2.5)
+    neutralPi2hist_E = ('E', 100, 0.0, 3.0)
+    neutralPi2hist_InvM = ('M', 100, 0.1344, 0.136)
+    neutralPi2hist_M = ('InvM', 50, 0.08, 0.18)
+
+    neutralPi2hist_truepx = ('mcPX', 100, -2.0, 2.0)
+    neutralPi2hist_truepy = ('mcPY', 100, -2.0, 2.0)
+    neutralPi2hist_truepz = ('mcPZ', 100, -1.0, 2.5)
+    neutralPi2hist_trueE = ('mcE', 100, 0.0, 3.0)
+
+    neutralPi2hist_d1x = ('daughter(0,x)', 100, -1.0, 1.0)
+    neutralPi2hist_d1y = ('daughter(0,y)', 100, -1.0, 1.0)
+    neutralPi2hist_d1z = ('daughter(0,z)', 100, -1.0, 1.0)
+    neutralPi2hist_d1px = ('daughter(0,px)', 100, -1.5, 1.5)
+    neutralPi2hist_d1py = ('daughter(0,py)', 100, -1.5, 1.5)
+    neutralPi2hist_d1pz = ('daughter(0,pz)', 100, -1.0, 2.5)
+    neutralPi2hist_d1e = ('daughter(0,E)', 100, 0.0, 3)
+
+    neutralPi2hist_d2x = ('daughter(1,x)', 100, -1.0, 1.0)
+    neutralPi2hist_d2y = ('daughter(1,y)', 100, -1.0, 1.0)
+    neutralPi2hist_d2z = ('daughter(1,z)', 100, -1.0, 1.0)
+    neutralPi2hist_d2px = ('daughter(1,px)', 100, -1.5, 1.5)
+    neutralPi2hist_d2py = ('daughter(1,py)', 100, -1.5, 1.5)
+    neutralPi2hist_d2pz = ('daughter(1,pz)', 100, -1.0, 2.5)
+    neutralPi2hist_d2e = ('daughter(1,E)', 100, 0.0, 3)
+
+    neutralPi2hist_Err00 = ('momVertCovM(0,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err10 = ('momVertCovM(1,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err11 = ('momVertCovM(1,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err20 = ('momVertCovM(2,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err21 = ('momVertCovM(2,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err22 = ('momVertCovM(2,2)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err30 = ('momVertCovM(3,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err31 = ('momVertCovM(3,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err32 = ('momVertCovM(3,2)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err33 = ('momVertCovM(3,3)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err40 = ('momVertCovM(4,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err41 = ('momVertCovM(4,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err42 = ('momVertCovM(4,2)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err43 = ('momVertCovM(4,3)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err44 = ('momVertCovM(4,4)', 100, -100.0, 100.0)
+    neutralPi2hist_Err50 = ('momVertCovM(5,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err51 = ('momVertCovM(5,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err52 = ('momVertCovM(5,2)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err53 = ('momVertCovM(5,3)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err54 = ('momVertCovM(5,4)', 100, -100.0, 100.0)
+    neutralPi2hist_Err55 = ('momVertCovM(5,5)', 100, -100.0, 100.0)
+    neutralPi2hist_Err60 = ('momVertCovM(6,0)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err61 = ('momVertCovM(6,1)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err62 = ('momVertCovM(6,2)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err63 = ('momVertCovM(6,3)', 100, -0.0005, 0.0005)
+    neutralPi2hist_Err64 = ('momVertCovM(6,4)', 100, -100.0, 100.0)
+    neutralPi2hist_Err65 = ('momVertCovM(6,5)', 100, -100.0, 100.0)
+    neutralPi2hist_Err66 = ('momVertCovM(6,6)', 100, -100.0, 100.0)
+
+    neutralPi2hist.param('variables',
+                         [neutralPi2hist_x,
+                          neutralPi2hist_y,
+                          neutralPi2hist_z,
+                          neutralPi2hist_px,
+                          neutralPi2hist_py,
+                          neutralPi2hist_pz,
+                          neutralPi2hist_E,
+                          neutralPi2hist_M,
+                          neutralPi2hist_InvM,
+                          neutralPi2hist_d1x,
+                          neutralPi2hist_d1y,
+                          neutralPi2hist_d1z,
+                          neutralPi2hist_d1px,
+                          neutralPi2hist_d1py,
+                          neutralPi2hist_d1pz,
+                          neutralPi2hist_d1e,
+                          neutralPi2hist_d2x,
+                          neutralPi2hist_d2y,
+                          neutralPi2hist_d2z,
+                          neutralPi2hist_d2px,
+                          neutralPi2hist_d2py,
+                          neutralPi2hist_d2pz,
+                          neutralPi2hist_d2e,
+                          neutralPi2hist_Err00,
+                          neutralPi2hist_Err10,
+                          neutralPi2hist_Err11,
+                          neutralPi2hist_Err20,
+                          neutralPi2hist_Err21,
+                          neutralPi2hist_Err22,
+                          neutralPi2hist_Err30,
+                          neutralPi2hist_Err31,
+                          neutralPi2hist_Err32,
+                          neutralPi2hist_Err33,
+                          neutralPi2hist_Err40,
+                          neutralPi2hist_Err41,
+                          neutralPi2hist_Err42,
+                          neutralPi2hist_Err43,
+                          neutralPi2hist_Err44,
+                          neutralPi2hist_Err50,
+                          neutralPi2hist_Err51,
+                          neutralPi2hist_Err52,
+                          neutralPi2hist_Err53,
+                          neutralPi2hist_Err54,
+                          neutralPi2hist_Err55,
+                          neutralPi2hist_Err60,
+                          neutralPi2hist_Err61,
+                          neutralPi2hist_Err62,
+                          neutralPi2hist_Err63,
+                          neutralPi2hist_Err64,
+                          neutralPi2hist_Err65,
+                          neutralPi2hist_Err66])
+
+    MCneutralPi2hist.param('variables', [neutralPi2hist_truepx, neutralPi2hist_truepy, neutralPi2hist_truepz, neutralPi2hist_trueE])
+
+    gamma2hist.param('fileName', gammaOutputRootFile)
+    neutralPi2hist.param('fileName', neutralPiOutputRootFile)
+    MCneutralPi2hist.param('fileName', MCneutralPiOutputRootFile)
+
+    path.add_module(gamma2hist)
+    path.add_module(neutralPi2hist)
+    path.add_module(MCneutralPi2hist)

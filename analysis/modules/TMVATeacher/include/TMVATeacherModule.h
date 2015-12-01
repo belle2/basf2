@@ -71,6 +71,7 @@ namespace Belle2 {
     std::vector<std::string>
     m_spectators; /**< input spectators for the TMVA method (e.g. possible target, weight or mcStatus variables) */
     std::string m_prefix; /**< Filename of the created root file and common prefix for the trained TMVA method weight-files */
+    std::string m_treeName; /**< Treename of the created root file*/
     std::string m_workingDirectory; /**< Working directory in which the config file and the weight file directory is created */
 
     std::string m_sample; /**< sample variables used for inverse sampling rates, usually this is the same as the target */

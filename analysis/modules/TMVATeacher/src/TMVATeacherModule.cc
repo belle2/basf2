@@ -49,6 +49,7 @@ namespace Belle2 {
     addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("spectators", m_spectators,
              "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
+    addParam("treeName", m_treeName, "Tree name used in output file, default is prefix + '_tree.root'", m_prefix + "_tree.root");
     addParam("maxSamples", m_maxSamples, "Maximum number of samples. 0 means no limit.", 0lu);
     addParam("sample", m_sample,
              "Variable used for inverse sampling rates. Usually this is the same as the target", std::string(""));
@@ -87,7 +88,7 @@ namespace Belle2 {
     for (auto& tuple : m_methods)
       methods.push_back(TMVAInterface::Method(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)));
 
-    TMVAInterface::TeacherConfig config(m_prefix, m_workingDirectory, m_variables, m_spectators, methods);
+    TMVAInterface::TeacherConfig config(m_prefix, m_treeName, m_workingDirectory, m_variables, m_spectators, methods);
     m_teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, false));
 
   }

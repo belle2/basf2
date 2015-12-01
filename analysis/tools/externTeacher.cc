@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
   ("weight", po::value<std::string>(), "weight variable")
   ("prefix", po::value<std::string>(),
    "Prefix which is used by the TMVAInterface to store its configfile $prefix.config and by TMVA itself to write the files weights/$prefix_$method.class.C and weights/$prefix_$method.weights.xml with additional information")
+  ("treeName", po::value<std::string>(), "name of tree in output file")
   ("workingDirectory", po::value<std::string>(),
    "Working directory in which the config file and the weight file directory is created")
   ("factoryOption", po::value<std::string>(), "Option passed to TMVA::Factory")
@@ -95,6 +96,12 @@ int main(int argc, char* argv[])
   if (vm.count("prefix") == 1) {
     prefix = vm["prefix"].as<std::string>();
   }
+
+  std::string treeName = "TMVA_tree";
+  if (vm.count("treeName") == 1) {
+    treeName = vm["treeName"].as<std::string>();
+  }
+
 
   std::string workingDirectory = ".";
   if (vm.count("workingDirectory") == 1) {
@@ -181,7 +188,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  TMVAInterface::TeacherConfig config(prefix, workingDirectory, variables, spectators, methods);
+  TMVAInterface::TeacherConfig config(prefix, treeName, workingDirectory, variables, spectators, methods);
   auto teacher = std::unique_ptr<TMVAInterface::Teacher>(new TMVAInterface::Teacher(config, true));
 
   target = Variable::makeROOTCompatible(target);

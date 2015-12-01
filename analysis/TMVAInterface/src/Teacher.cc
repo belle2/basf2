@@ -63,10 +63,10 @@ namespace Belle2 {
 
       // Load tree from existing data
       if (useExistingData) {
-        m_file->GetObject(m_config.getTreeName().c_str(), tree);
+        m_file->GetObject(m_config.getTeacherTreeName().c_str(), tree);
 
         if (not tree) {
-          B2INFO("Did not found a tree named " << m_config.getTreeName() << " searching for another tree.");
+          B2INFO("Did not found a tree named " << m_config.getTeacherTreeName() << " searching for another tree.");
           TIter next(m_file->GetListOfKeys());
           while (TObject* obj = next()) {
             if (std::string(obj->GetName()).find("_tree") != std::string::npos) {
@@ -91,13 +91,13 @@ namespace Belle2 {
           }
         } else {
           B2WARNING("Couldn't find existing data, create new tree: Filename was " << m_config.getFileName() << ", Treename was " <<
-                    m_config.getTreeName());
+                    m_config.getTeacherTreeName());
         }
       }
 
       // If tree is not available yet create a new one
       if (tree == nullptr) {
-        tree = new TTree(m_config.getTreeName().c_str(), m_config.getTreeName().c_str());
+        tree = new TTree(m_config.getTeacherTreeName().c_str(), m_config.getTeacherTreeName().c_str());
 
         for (unsigned int i = 0; i < variable_names.size(); ++i)
           tree->Branch(Variable::makeROOTCompatible(variable_names[i]).c_str(), &m_input[i]);
@@ -106,7 +106,7 @@ namespace Belle2 {
         tree->Branch("__weight__", &m_original_weight);
 
       }
-      m_tree.registerInDataStore(m_config.getTreeName(), DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+      m_tree.registerInDataStore(m_config.getTeacherTreeName(), DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
       m_tree.construct();
       m_tree->assign(tree);
 
@@ -433,7 +433,8 @@ namespace Belle2 {
         }
       }
 
-      m_config = TeacherConfig(m_config.getPrefix(), m_config.getWorkingDirectory(), cleaned_variables, m_config.getSpectators(),
+      m_config = TeacherConfig(m_config.getPrefix(), m_config.getTeacherTreeName(), m_config.getWorkingDirectory(), cleaned_variables,
+                               m_config.getSpectators(),
                                m_config.getMethods(), m_config.getExtraData());
       m_variables = m_config.getVariablesFromManager();
 

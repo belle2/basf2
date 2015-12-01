@@ -62,7 +62,7 @@ namespace {
     std::vector<TMVAInterface::Method> methods;
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs"));
 
-    TeacherConfig config("unittest", ".", variables, spectators, methods);
+    TeacherConfig config("unittest", "unittest_tree", ".", variables, spectators, methods);
     Teacher teacher(config);
 
     std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";
@@ -118,7 +118,7 @@ namespace {
     std::vector<TMVAInterface::Method> methods;
     methods.push_back(TMVAInterface::Method("MockPlugin", "Plugin", "!H:!V:CreateMVAPdfs"));
 
-    TeacherConfig config("unittest2", ".", variables, spectators, methods);
+    TeacherConfig config("unittest2", "unitest_tree", ".", variables, spectators, methods);
     Teacher teacher(config);
 
     std::string factoryOption = "!V:Silent:Color:DrawProgressBar:AnalysisType=Classification";

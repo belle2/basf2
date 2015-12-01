@@ -109,6 +109,7 @@ namespace Belle2 {
 
     protected:
       std::string m_prefix; /**< Prefix used to identify files */
+      std::string m_treeName; /**< tree name in output file*/
       std::string m_workingDirectory; /**< where the config file and weight file directory is stored */
       std::vector<std::string> m_variables; /**< input variables */
       std::vector<std::string> m_spectators; /**< input spectators */
@@ -134,7 +135,7 @@ namespace Belle2 {
        * @param methods vector of Method config objects
        * @param extraData optional additional data
        */
-      TeacherConfig(const std::string& prefix, const std::string& workingDirectory,
+      TeacherConfig(const std::string& prefix, const std::string& treeName, const std::string& workingDirectory,
                     const std::vector<std::string>& variables, const std::vector<std::string>& spectators,
                     const std::vector<Method>& methods, const std::map<std::string, std::vector<double>>& extraData = {});
 
@@ -142,6 +143,11 @@ namespace Belle2 {
        * Return TMVA Methods
        */
       const std::vector<Method>& getMethods() const;
+
+      /**
+       * Return tree name used in output file of teacher
+       */
+      std::string getTeacherTreeName() const;
 
       /**
        * Save config file for given signal class and fraction

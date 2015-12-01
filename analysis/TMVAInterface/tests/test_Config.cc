@@ -64,13 +64,14 @@ namespace {
   TEST(ConfigTest, TeacherConfigGettersAreCorrect)
   {
     std::vector<Method> methods{Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100")};
-    TeacherConfig config("prefix", "workingDirectory/", {"p", "pt"}, {"M"}, methods);
+    TeacherConfig config("prefix", "test_tree", "workingDirectory/", {"p", "pt"}, {"M"}, methods);
 
     EXPECT_EQ(config.getPrefix(), "prefix");
     EXPECT_EQ(config.getWorkingDirectory(), "workingDirectory/");
     EXPECT_EQ(config.getFileName(), "prefix.root");
     EXPECT_EQ(config.getConfigFileName(1), "prefix_1.config");
     EXPECT_EQ(config.getTreeName(), "prefix_tree");
+    EXPECT_EQ(config.getTeacherTreeName(), "test_tree");
 
     auto variables = config.getVariablesFromManager();
     EXPECT_EQ(variables.size(), 2);
@@ -157,7 +158,7 @@ namespace {
     std::vector<Method> methods{Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100"),
                                 Method("BoostedDecisionTrees2", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100")};
 
-    TeacherConfig write("prefix", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
+    TeacherConfig write("prefix", "test_tree", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
     write.save(2, 0.6f);
 
     ExpertConfig read("prefix", tempDirectory.getTempDir(), "BoostedDecisionTrees", 2);
@@ -203,7 +204,7 @@ namespace {
     std::vector<Method> methods{Method("BoostedDecisionTrees", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100"),
                                 Method("BoostedDecisionTrees2", "BDT", "!H:!V:CreateMVAPdfs:NTrees=100")};
 
-    TeacherConfig write("prefix", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
+    TeacherConfig write("prefix", "test_tree", tempDirectory.getTempDir(), {"p", "pt"}, {"M"}, methods);
     write.addExtraData("Test", std::vector<double> {1.0, 2.0, 3.0});
     write.addExtraData("Test2", std::vector<double> { -1.0, 4.0});
     write.save(2, 0.6f);

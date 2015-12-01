@@ -83,7 +83,7 @@ namespace Belle2 {
     }
 
 
-    TeacherConfig::TeacherConfig(const std::string& prefix, const std::string& workingDirectory,
+    TeacherConfig::TeacherConfig(const std::string& prefix, const std::string& treeName, const std::string& workingDirectory,
                                  const std::vector<std::string>& variables,
                                  const std::vector<std::string>& spectators,
                                  const std::vector<Method>& methods,
@@ -92,12 +92,18 @@ namespace Belle2 {
     {
       m_variables = variables;
       m_spectators = spectators;
+      m_treeName = treeName;
     }
 
 
     const std::vector<Method>& TeacherConfig::getMethods() const
     {
       return m_methods;
+    }
+
+    std::string TeacherConfig::getTeacherTreeName() const
+    {
+      return m_treeName;
     }
 
     void TeacherConfig::save(int signalClass, double signalFraction) const

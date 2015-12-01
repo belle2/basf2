@@ -3,24 +3,25 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Viktor Trusov                                            *
+* Contributors: Viktor Trusov, Thomas Hauth                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
 /*
- * Object which can store pounsigned longers to hits while processing FastHogh algorithm
- *
- * TODO: check if it's possible to store in each hit list of nodes in which we can meet it.
- *
+ * Lookup table for sine/cosine for the bin used to partition the Theta space of
+ * the quad tree.
  */
 
 
 #pragma once
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Utils.h>
 
+#include <boost/math/constants/constants.hpp>
 #include <cmath>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,17 +32,10 @@ namespace Belle2 {
 
       TrigonometricalLookupTable();
 
-      ~TrigonometricalLookupTable();
-
       /**
-       * Delete static instance
+       * Initialize lookup table
        */
-      void initialize(bool forced = false);
-
-      /**
-       * Delete static instance
-       */
-      void clearTable();
+      void initialize();
 
       /**
        * Get instance of class
@@ -50,26 +44,43 @@ namespace Belle2 {
 
       inline float sinTheta(unsigned long bin)
       {
-        if (not m_lookup_created) initialize();
-        return m_sin_theta[bin];
-      };
+        if (branch_unlikely(not m_lookup_created)) {
+          initialize();
+        }
+        if (branch_unlikely(bin >= m_lookup_theta.size())) {
+          return computeSin(bin);
+        } else {
+          return m_lookup_theta[bin].first;
+        }
+      }
 
       inline float cosTheta(unsigned long bin)
       {
-        if (not m_lookup_created) initialize();
-        return m_cos_theta[bin];
-      };
+        if (branch_unlikely(not m_lookup_created)) initialize();
+        if (branch_unlikely(bin >= m_lookup_theta.size())) {
+          return computeCos(bin);
+        } else {
+          return m_lookup_theta[bin].second;
+        }
+      }
 
       inline unsigned long getNBinsTheta() const {return m_nbinsTheta;};
 
-      void setNBinsTheta(unsigned long nbins) {m_nbinsTheta = nbins;};
-
     private:
 
-      static constexpr double s_PI = 3.1415926535897932384626433832795; /**< pi is exactly three*/
+      inline float computeSin(unsigned long bin) const
+      {
+        const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;
+        return sin(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
+      }
 
-      float* m_sin_theta; /**< Lookup array for calculation of sin */
-      float* m_cos_theta; /**< Lookup array for calculation of cos */
+      inline float computeCos(unsigned long bin) const
+      {
+        const float bin_width = 2.* boost::math::constants::pi<float>()  / m_nbinsTheta;
+        return cos(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
+      }
+
+      std::vector<std::pair<float, float>> m_lookup_theta; /**< Lookup array for calculation of sin */
       bool m_lookup_created; /**< Allows to use the same lookup table for sin and cos */
       unsigned long m_nbinsTheta; /**< Number of theta bins */
 

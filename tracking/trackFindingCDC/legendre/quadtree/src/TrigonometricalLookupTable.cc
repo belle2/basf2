@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -21,52 +22,22 @@ TrigonometricalLookupTable& TrigonometricalLookupTable::Instance()
   return trigonometricalLookupTable;
 }
 
-
 TrigonometricalLookupTable::TrigonometricalLookupTable():
   m_lookup_created(false), m_nbinsTheta(pow(2, 16))
 {
 
 }
 
-TrigonometricalLookupTable::~TrigonometricalLookupTable()
+void TrigonometricalLookupTable::initialize()
 {
+  if (not m_lookup_created) {
 
-  clearTable();
-
-}
-
-
-void TrigonometricalLookupTable::clearTable()
-{
-
-  if (m_lookup_created) {
-    delete[] m_sin_theta;
-    delete[] m_cos_theta;
-    m_lookup_created = false;
-  }
-
-}
-
-
-
-void TrigonometricalLookupTable::initialize(bool forced)
-{
-  if ((not m_lookup_created) || (forced)) {
-
-    if (forced && m_lookup_created) {
-      clearTable();
-    }
-
-    float bin_width = 2.*s_PI / m_nbinsTheta;
-    m_sin_theta = new float[m_nbinsTheta + 1];
-    m_cos_theta = new float[m_nbinsTheta + 1];
+    m_lookup_theta.resize(m_nbinsTheta + 1);
 
     for (unsigned long i = 0; i <= m_nbinsTheta; ++i) {
-      m_sin_theta[i] = sin(i * bin_width - s_PI + bin_width / 2.);
-      m_cos_theta[i] = cos(i * bin_width - s_PI + bin_width / 2.);
+      m_lookup_theta[i] = std::make_pair(computeSin(i), computeCos(i));
     }
 
     m_lookup_created = true;
   }
-
 }

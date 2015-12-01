@@ -49,7 +49,8 @@ namespace Belle2 {
     };
 
     /** Constructor using the unique id */
-    BKLMElementID(baseType id = 0)
+    /** cppcheck suppress noExplicitConstructor */
+    explicit BKLMElementID(baseType id = 0)
     {
       m_id.id = id;
     }

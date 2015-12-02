@@ -25,6 +25,7 @@ nsm2cad_DBD += ioc_shell.dbd
 # nsm2cad_registerRecordDeviceDriver.cpp derives from nsm2cad.dbd
 nsm2cad_SRCS += nsm2cad_registerRecordDeviceDriver.cpp
 nsm2cad_SRCS += NSM2CACallback.cpp
+nsm2cad_SRCS += NSM2CA.cpp
 nsm2cad_SRCS += devNSM2CA.cpp
 nsm2cad_SRCS += deviceNSM2CA.c
 nsm2cad_SRCS += ioc_shell.c
@@ -49,7 +50,7 @@ include $(TOP)/configure/RULES
 #  ADD RULES AFTER THIS LINE
 
 USR_INCLUDES += -I$(BELLE2_DAQ_SLC)/include
-USR_LIBS += daq_slc_base daq_slc_system daq_slc_database daq_slc_nsm daq_slc_runcontrol
+USR_LIBS += daq_slc_base daq_slc_system daq_slc_database daq_slc_nsm daq_slc_runcontrol daq_slc_hvcontrol
 USR_LIBS += nsm2_corelib nsm2_b2lib
 USR_LIBS += nsm2_corelib nsm2_b2lib
 USR_LIBS += m pthread dl z rt pq readline ncurses 

@@ -15,9 +15,15 @@ struct
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
   DEVSUPFUN read_ai;
+  DEVSUPFUN special_linconv;
 } dev_nsm2_vget_ai = {
-  5, NULL, NULL, init_nsm2_vget_ai,
-  get_ioint_info_nsm2_ai, read_nsm2_vget_ai
+  6, 
+  NULL, 
+  NULL, 
+  init_nsm2_vget_ai, 
+  get_ioint_info_nsm2_ai, 
+  read_nsm2_vget_ai,
+  NULL
 };
 
 struct
@@ -54,9 +60,10 @@ struct
   DEVSUPFUN init_record;
   DEVSUPFUN get_ioint_info;
   DEVSUPFUN write_ao;
+  DEVSUPFUN special_linconv;
 } dev_nsm2_vset_ao = {
-  5, NULL, NULL, init_nsm2_vset_ao,
-  NULL, write_nsm2_vset_ao
+  6, NULL, NULL, init_nsm2_vset_ao,
+  NULL, write_nsm2_vset_ao, NULL
 };
 
 struct

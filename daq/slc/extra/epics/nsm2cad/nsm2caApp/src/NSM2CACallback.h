@@ -8,25 +8,7 @@
 
 namespace Belle2 {
 
-  class NSMVHandler2CA : public NSMVHandler {
-
-  public:
-    NSMVHandler2CA(const std::string& node,
-                   const std::string& name, IOSCANPVT& pvt,
-                   const std::string& type)
-      : NSMVHandler(node, name, true, true),
-        m_pvt(pvt), m_type(type) {}
-    virtual ~NSMVHandler2CA() throw() {}
-    virtual bool handleSet(const NSMVar& var);
-
-  public:
-    const std::string& getType() const { return m_type; }
-
-  private:
-    IOSCANPVT& m_pvt;
-    std::string m_type;
-
-  };
+  class NSM2CA;
 
   class NSM2CACallback : public NSMCallback {
 
@@ -44,8 +26,15 @@ namespace Belle2 {
     virtual void init(NSMCommunicator&) throw();
     virtual void timeout(NSMCommunicator&) throw();
     using NSMCallback::get;
+    virtual void vreply(NSMCommunicator& com, const std::string& vname, bool success) throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
     virtual void error(const char* nodename, const char* data) throw();
     virtual void ok(const char* nodename, const char* data) throw();
+
+    void setCA(NSM2CA* nsm2ca) { m_nsm2ca = nsm2ca; }
+
+  private:
+    NSM2CA* m_nsm2ca;
 
   };
 

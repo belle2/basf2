@@ -14,6 +14,8 @@ include $(TOP)/configure/CONFIG
 DB += nsmnode.db
 DB += store_ecl_status.db
 DB += ropc.db
+DB += hv.db
+DB += konno_hv.db
 
 #----------------------------------------------------
 # If <anyname>.db template is not named <anyname>*.template add

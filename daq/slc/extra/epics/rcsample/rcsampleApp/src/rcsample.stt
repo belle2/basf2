@@ -7,6 +7,12 @@ monitor rcrequest;
 string rcstate;
 assign rcstate to "PXD:rc:state";
 
+string superkekb;
+assign superkekb to "B2_:superkekb";
+
+string interlock;
+assign interlock to "B2_:interlock";
+
 ss rcsample_control 
 {
   state NOTREADY {
@@ -14,6 +20,10 @@ ss rcsample_control
       strcpy(rcstate, "NOTREADY");
       printf("Updated RC state = %s\n", rcstate);
       pvPut(rcstate);
+      strcpy(superkekb, "NOINJECTION");
+      pvPut(superkekb);
+      strcpy(interlock, "NOINTERLOCK");
+      pvPut(interlock);
     }
     when (strcmp(rcrequest, "LOAD") == 0) {
       printf("Got RC request = %s\n", rcrequest);

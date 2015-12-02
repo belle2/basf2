@@ -417,7 +417,6 @@ namespace Belle2 {
       }
     }
 
-
     Manager::FunctionPtr veto(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 or arguments.size() == 3) {

@@ -1285,6 +1285,7 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     // Fill b2link FEE header
 
     packed_buf[ poswords_to + POS_TT_CTIME_TYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;
+    unsigned int temp_ctime_type = packed_buf[ poswords_to + POS_TT_CTIME_TYPE ];
     packed_buf[ poswords_to + POS_TT_TAG ] = rawcpr_info.eve_num;
     packed_buf[ poswords_to + POS_TT_UTIME ] = rawcpr_info.tt_utime;
     packed_buf[ poswords_to + POS_EXP_RUN ] = (rawcpr_info.exp_num << 22) | (rawcpr_info.run_subrun_num &
@@ -1295,6 +1296,9 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     // copy the 1st Detector Buffer
     memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
     poswords_to += nwords[ i ];
+
+    // Fill b2link b2tt-tag trailer
+    packed_buf[ poswords_to + POS_TT_CTIME_B2LFEE ] = temp_ctime_type;
 
     // Fill b2link FEE trailer
     unsigned short crc16 = CalcCRC16LittleEndian(0xffff, crc16_start, nwords[ i ] + SIZE_B2LFEE_HEADER);

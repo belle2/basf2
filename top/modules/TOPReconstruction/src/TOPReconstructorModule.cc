@@ -24,7 +24,6 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPPull.h>
 
 // framework - DataStore
@@ -122,9 +121,6 @@ namespace Belle2 {
     StoreArray<TOPBarHit> barHits;
     barHits.isOptional();
 
-    StoreObjPtr<TOPRecBunch> recBunch;
-    recBunch.isOptional(); // to be changed to required in future
-
     // output
 
     StoreArray<TOPLikelihood> likelihoods;
@@ -200,22 +196,13 @@ namespace Belle2 {
 
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
-    // get reconstructed bunch time (if available)
-
-    double bunchTime = 0;
-    StoreObjPtr<TOPRecBunch> recBunch;
-    if (recBunch.isValid()) {
-      bunchTime = recBunch->getTime();
-      if (recBunch->isSimulated() and !recBunch->isReconstructed())
-        B2WARNING("TOPReconstructor: bunch time is simulated but not reconstructed");
-    }
-
     // add photons
 
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC(), bunchTime);
+        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC(),
+                     digit.getTime());
     }
 
     // reconstruct track-by-track and store the results

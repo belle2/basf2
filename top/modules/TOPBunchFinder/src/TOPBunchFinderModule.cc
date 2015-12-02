@@ -154,7 +154,8 @@ namespace Belle2 {
     StoreArray<TOPDigit> topDigits;
     for (const auto& digit : topDigits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC());
+        reco.addData(digit.getBarID(), digit.getPixelID(), digit.getTDC(),
+                     digit.getTime());
     }
 
     // create working variables
@@ -227,6 +228,10 @@ namespace Belle2 {
     double bunchTime = t0[i0];
     recBunch->setReconstructed(bunchNo, bunchTime, numTrk, usedTrk);
     for (int i = 0; i < n; i++) recBunch->addLogL(logL[i] - logL[i0]);
+
+    // correct time in TOPDigits
+
+    for (auto& digit : topDigits) digit.subtractT0(-bunchTime);
 
   }
 

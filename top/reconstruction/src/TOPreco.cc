@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPf77fun.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -56,13 +57,24 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int barID, int pixelID, int TDC, double t0)
+    int TOPreco::addData(int barID, int pixelID, int TDC, double time)
     {
       int status;
       barID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
-      float T0 = (float) t0;
-      data_put_(&barID, &pixelID, &TDC, &T0, &status);
+      float t = (float) time;
+      data_put_(&barID, &pixelID, &TDC, &t, &status);
+      return status;
+    }
+
+
+    int TOPreco::addData(int barID, int pixelID, int TDC)
+    {
+      int status;
+      barID--; // 0-based ID used in fortran
+      pixelID--;   // 0-based ID used in fortran
+      float t = TOPGeometryPar::Instance()->getTime(TDC);
+      data_put_(&barID, &pixelID, &TDC, &t, &status);
       return status;
     }
 

@@ -106,10 +106,10 @@ if GetOption('extraccflags'):
 # check for debug flag
 option = os.environ['BELLE2_OPTION']
 if option == 'debug':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=50000', '-g', '-Og'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=200000', '-g', '-Og'])
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=50000', '-O3'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=200000', '-O3'])
     global_env.Append(FORTRANFLAGS='-O3')
 elif option == 'intel':
     intel_dir = None

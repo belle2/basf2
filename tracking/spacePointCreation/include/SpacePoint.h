@@ -481,6 +481,6 @@ namespace Belle2 {
 
 
 
-    ClassDef(SpacePoint, 9) // last member changed: m_ClustersAssigned
+    ClassDefOverride(SpacePoint, 9) // last member changed: m_ClustersAssigned
   };
 }

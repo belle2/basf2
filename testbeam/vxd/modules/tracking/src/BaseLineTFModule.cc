@@ -220,13 +220,15 @@ BaseLineTFModule::~BaseLineTFModule()
 
 void BaseLineTFModule::initialize()
 {
-  B2DEBUG(1, "-----------------------------------------------\n       entering base-line track finder (" << m_PARAMnameOfInstance << ") - initialize:");
+  B2DEBUG(1, "-----------------------------------------------\n       entering base-line track finder (" << m_PARAMnameOfInstance <<
+          ") - initialize:");
 
   checkAndSetupModuleParameters();
 
   prepareExternalTools();
 
-  B2DEBUG(1, "       leaving base-line track finder (" << m_PARAMnameOfInstance << ") - initialize\n-----------------------------------------------");
+  B2DEBUG(1, "       leaving base-line track finder (" << m_PARAMnameOfInstance <<
+          ") - initialize\n-----------------------------------------------");
 }
 
 /** *************************************+************************************* **/
@@ -237,14 +239,17 @@ void BaseLineTFModule::initialize()
 
 void BaseLineTFModule::beginRun()
 {
-  B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance << ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
-  B2DEBUG(50, "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
+  B2INFO("-----------------------------------------------\n       entering VXD CA track finder (" << m_PARAMnameOfInstance <<
+         ") - beginRun.\n       if you want to have some basic infos during begin- and endrun about it, set debug level 1 or 2. Debug level 3 or more gives you event wise output (the higher the level, the more verbose it gets, highest level: 175)");
+  B2DEBUG(50,
+          "##### be careful, current TF status does not support more than one run per initialization! #####"); /// WARNING TODO: check whether this is still valid
 
   setupBaseLineTF();
 
   resetCountersAtBeginRun();
 
-  B2INFO(m_PARAMnameOfInstance << "leaving VXD CA track finder (BaseLineTFModule) - beginRun...\n       -----------------------------------------------");
+  B2INFO(m_PARAMnameOfInstance <<
+         "leaving VXD CA track finder (BaseLineTFModule) - beginRun...\n       -----------------------------------------------");
 }
 
 /** *************************************+************************************* **/
@@ -325,7 +330,8 @@ void BaseLineTFModule::event()
   thisInfoPackage.numTELCluster = nTelClusters;
   int nTotalClusters = nPxdClusters + nSvdClusters + nTelClusters; // counts number of clusters total
 
-  B2DEBUG(3, "event: " << m_eventCounter << ": nPxdClusters: " << nPxdClusters << ", nSvdClusters: " << nSvdClusters << ", nTelClusters: " << nTelClusters);
+  B2DEBUG(3, "event: " << m_eventCounter << ": nPxdClusters: " << nPxdClusters << ", nSvdClusters: " << nSvdClusters <<
+          ", nTelClusters: " << nTelClusters);
 
   boostClock::time_point stopTimer = boostClock::now();
   if (nTotalClusters == 0) {
@@ -383,14 +389,18 @@ void BaseLineTFModule::event()
     ClusterInfo newCluster(i, i , false, false, true, NULL, NULL, aTelClusterArray[i]);
     B2DEBUG(50, "Tel clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
-    B2DEBUG(50, " TELcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    B2DEBUG(50, " TELcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(
+              i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(
+              i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
   }
 
   for (int i = 0; i < nPxdClusters; ++i) {
     ClusterInfo newCluster(i, i + nTelClusters, true, false, false, aPxdClusterArray[i], NULL);
     B2DEBUG(50, "Pxd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
     clustersOfEvent[i] = newCluster;
-    B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    B2DEBUG(50, " PXDcluster " << i << " in position " << i << " stores real Cluster " << clustersOfEvent.at(
+              i).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(
+              i).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
 
   }
 
@@ -398,8 +408,11 @@ void BaseLineTFModule::event()
 
   for (int i = 0; i < nSvdClusters; ++i) {
     ClusterInfo newCluster(i, i + nPxdClusters + nTelClusters, false, true, false, NULL, aSvdClusterArray[i]);
-    B2DEBUG(50, "Svd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())     clustersOfEvent[i + nPxdClusters + nTelClusters] = newCluster;
-    B2DEBUG(50, " SVDcluster " << i << " in position " << i + nPxdClusters + nTelClusters << " stores real Cluster " << clustersOfEvent.at(i + nPxdClusters + nTelClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " << clustersOfEvent.at(i + nPxdClusters + nTelClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
+    B2DEBUG(50, "Svd clusterInfo: realIndex " << newCluster.getRealIndex() << ", ownIndex " << newCluster.getOwnIndex())
+    clustersOfEvent[i + nPxdClusters + nTelClusters] = newCluster;
+    B2DEBUG(50, " SVDcluster " << i << " in position " << i + nPxdClusters + nTelClusters << " stores real Cluster " <<
+            clustersOfEvent.at(i + nPxdClusters + nTelClusters).getRealIndex() << " at indexPosition of own list (clustersOfEvent): " <<
+            clustersOfEvent.at(i + nPxdClusters + nTelClusters).getOwnIndex() << " withClustersOfeventSize: " << clustersOfEvent.size())
 
   } // the position in the vector is NOT the index it has stored (except if there are no PXDClusters)
 
@@ -458,7 +471,7 @@ void BaseLineTFModule::event()
   if ((nTotalClusters - 1 < nTotalClustersThreshold)) {
     useBaseLine = true;
     // in this case it's worth checking whether BaseLineTF is useFull or not
-    for (ClusterInfo & aCluster : clustersOfEvent) {
+    for (ClusterInfo& aCluster : clustersOfEvent) {
       // collect number of Clusters per Sensor
       map<VxdID, uint> sensorIDs;
       VxdID currentID;
@@ -474,7 +487,7 @@ void BaseLineTFModule::event()
       } else {
         sensorIDs.at(currentID) += 1;
       }
-      for (auto & aSensorPack : sensorIDs) {
+      for (auto& aSensorPack : sensorIDs) {
         if (aSensorPack.first.getLayerNumber() > 2 or aSensorPack.first.getLayerNumber() < 7) {
           if (aSensorPack.second > 2) { useBaseLine = false; }
         } else {
@@ -515,7 +528,7 @@ void BaseLineTFModule::event()
       } // QiType 3 = straightLine which calculates the seed by itself
       int nTotalIndices = 0, nTotalHitsInTCs = 0;
 
-      for (VXDTFTrackCandidate * aTC : m_baselinePass.tcVector) {
+      for (VXDTFTrackCandidate* aTC : m_baselinePass.tcVector) {
         nTotalIndices += aTC->getTELHitIndices().size() + aTC->getPXDHitIndices().size() + aTC->getSVDHitIndices().size();
         nTotalHitsInTCs += aTC->size();
         genfit::TrackCand gfTC = generateGFTrackCand(aTC);                                          /// generateGFTrackCand
@@ -567,7 +580,8 @@ void BaseLineTFModule::event()
     } // else: classic CA shall do its job...
   }
 
-  B2DEBUG(3, "event: " << m_eventCounter << ", baseLine-only - too many hits -> skipping event, duration : " << thisInfoPackage.totalTime.count() << "ns")
+  B2DEBUG(3, "event: " << m_eventCounter << ", baseLine-only - too many hits -> skipping event, duration : " <<
+          thisInfoPackage.totalTime.count() << "ns")
 
   thisInfoPackage.totalTime = boost::chrono::duration_cast<boostNsec>(stopTimer - beginEvent);
   m_TESTERlogEvents.push_back(thisInfoPackage);
@@ -634,37 +648,67 @@ void BaseLineTFModule::endRun()
   m_TESTERlogEvents.resize(std::distance(m_TESTERlogEvents.begin(), newEndOfAnothterVector));
   std::reverse(m_TESTERlogEvents.begin(), m_TESTERlogEvents.end());
 
-  B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun of " <<  m_eventCounter + 1 << " events ###############\nfor explanations of the values, activate DEBUG-mode (level 2 or greater)!")
+  B2DEBUG(1, " ############### " << m_PARAMnameOfInstance << " endRun of " <<  m_eventCounter + 1 <<
+          " events ###############\nfor explanations of the values, activate DEBUG-mode (level 2 or greater)!")
 
   if (m_eventCounter == 0) { m_eventCounter = 1; }
   float invNEvents = 1. / float(m_eventCounter);
   string lineHigh = "------------------------------------------------------------------------------------------";
   string lineApnd = "--------------------------";
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
-  B2DEBUG(1, m_PARAMnameOfInstance << " settings: tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType << ", way to calc Seed: " << m_PARAMcalcSeedType << ", chosen settings: ")
+  B2DEBUG(1, m_PARAMnameOfInstance << " settings: tuneCutoffs: " << m_PARAMtuneCutoffs << ", QIfilterMode: " << m_PARAMcalcQIType <<
+          ", way to calc Seed: " << m_PARAMcalcSeedType << ", chosen settings: ")
   stringstream secInfo;
 
 
   B2DEBUG(1, "\nsecUConfig \t\t| secVConfig \t\t|\n" << secInfo.str())
-  B2DEBUG(2, "Explanation: secConfigs are cuts for sector-calculation (cut*sensorWidth for U, cut*sensorLength for V), same value for each sensor")
+  B2DEBUG(2,
+          "Explanation: secConfigs are cuts for sector-calculation (cut*sensorWidth for U, cut*sensorLength for V), same value for each sensor")
 
-  B2DEBUG(1, lineHigh  << "\n m_TESTERbadSectorRangeCounterForClusters\t| m_TESTERclustersPersSectorNotMatching\t| m_TESTERovercrowdedStrangeSensors \t|\n " << m_TESTERbadSectorRangeCounterForClusters << "\t| " << m_TESTERclustersPersSectorNotMatching << "\t| " << m_TESTERovercrowdedStrangeSensors << "\t|")
+  B2DEBUG(1, lineHigh  <<
+          "\n m_TESTERbadSectorRangeCounterForClusters\t| m_TESTERclustersPersSectorNotMatching\t| m_TESTERovercrowdedStrangeSensors \t|\n "
+          << m_TESTERbadSectorRangeCounterForClusters << "\t| " << m_TESTERclustersPersSectorNotMatching << "\t| " <<
+          m_TESTERovercrowdedStrangeSensors << "\t|")
 
-  B2DEBUG(2, "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, m_TESTERbadSectorRangeCounterForClusters: SVDclusters, were no 2nd cluster could be found\n m_TESTERclustersPersSectorNotMatching: times where a SVDsensor hat not the same number of u and v clusters, m_TESTERovercrowdedStrangeSensors: like m_TESTERclustersPersSectorNotMatching, but where a high occupancy case prevented reconstructing them")
+  B2DEBUG(2,
+          "Explanation: pxdc: number of PXDClusters, 2D), svdc: SVDClusters(1D)\n svdH: # of SVDHits(guess of actual number of 2D-Track- and -BG-hits)\n catC: SVDClusterCombinations(combining u/v, including ghosthits)\n ghR: ghostHitRate(is only a guess, TODO: should be correctly determined!!)\n noSc: are hits discarded, where no fitting sector could be found\n noFd: hits having no hits in compatible sectors (friends), ooR: sensors which were not in sensitive plane of sensor, m_TESTERbadSectorRangeCounterForClusters: SVDclusters, were no 2nd cluster could be found\n m_TESTERclustersPersSectorNotMatching: times where a SVDsensor hat not the same number of u and v clusters, m_TESTERovercrowdedStrangeSensors: like m_TESTERclustersPersSectorNotMatching, but where a high occupancy case prevented reconstructing them")
 
-  B2DEBUG(1, lineHigh << lineApnd << lineApnd << "\n startedBL\t| succeededBL\t| acceptedTCsWith1DHits\t| rejectedTCsWith1DHits\t| noHitsAtEvent\t| zzXY\t| zXYS\t| cf\t| dpT\t| Tfin\t|\n " << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " << m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " << m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " << m_TESTERcountTotalTCsFinal << "\t| ")
+  B2DEBUG(1, lineHigh << lineApnd << lineApnd <<
+          "\n startedBL\t| succeededBL\t| acceptedTCsWith1DHits\t| rejectedTCsWith1DHits\t| noHitsAtEvent\t| zzXY\t| zXYS\t| cf\t| dpT\t| Tfin\t|\n "
+          << m_TESTERstartedBaselineTF << "\t| " << m_TESTERsucceededBaselineTF << "\t| " << m_TESTERacceptedBrokenHitsTrack << "\t| " <<
+          m_TESTERrejectedBrokenHitsTrack << "\t| " << m_TESTERnoHitsAtEvent << "\t| " << "\t|" << m_TESTERtriggeredZigZagXY << "\t| " <<
+          m_TESTERtriggeredZigZagXYWithSigma << "\t| " << m_TESTERtriggeredCircleFit << "\t| " << m_TESTERtriggeredDpT << "\t| " <<
+          m_TESTERcountTotalTCsFinal << "\t| ")
 
-  B2DEBUG(2, "Explanation: startedBL: baseLineTF started, succeededBL baselineTF succeeded, acceptedTCsWith1DHits: TCs with 1D-svd-Hits were accepted, rejectedTCsWith1DHits: rejected, noHitsAtEvent: Events without hits\n zzXY: zigzagXY got triggered, cf: circleFit(tuneCircleFitValue), dpT: deltaPt, Tfin: total number of final TCs")
+  B2DEBUG(2,
+          "Explanation: startedBL: baseLineTF started, succeededBL baselineTF succeeded, acceptedTCsWith1DHits: TCs with 1D-svd-Hits were accepted, rejectedTCsWith1DHits: rejected, noHitsAtEvent: Events without hits\n zzXY: zigzagXY got triggered, cf: circleFit(tuneCircleFitValue), dpT: deltaPt, Tfin: total number of final TCs")
 
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
 
-  B2DEBUG(1, std::fixed << std::setprecision(2) << " total time consumption in milliseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() * 0.001) << "\t|")
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " total time consumption in milliseconds: \n " <<
+          "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" <<
+          (m_TESTERtimeConsumption.hitSorting.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * 0.001) << "\t|" <<
+          (m_TESTERtimeConsumption.segFinder.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * 0.001) << "\t|" <<
+          (m_TESTERtimeConsumption.cellularAutomaton.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * 0.001) << "\t|" <<
+          (m_TESTERtimeConsumption.postCAFilter.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * 0.001) << "\t|"
+          << (m_TESTERtimeConsumption.checkOverlap.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * 0.001) <<
+          "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * 0.001) << "\t|" << (m_TESTERtimeConsumption.intermediateStuff.count() *
+              0.001) << "\t|")
 
 //   m_eventCounter
-  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " << "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" << (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.
-          intermediateStuff.count() * invNEvents) << "\t|")
+  B2DEBUG(1, std::fixed << std::setprecision(2) << " mean time consumption in microseconds: \n " <<
+          "HSort\t|baseTF\t|sgFind\t|nbFind\t|CA \t|tcCol\t|tcFlt\t|kalmn\t|chkOvr\t|clnOvr\t|neuNet\t|others\t|\n" <<
+          (m_TESTERtimeConsumption.hitSorting.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.baselineTF.count() * invNEvents) <<
+          "\t|" << (m_TESTERtimeConsumption.segFinder.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.nbFinder.count() *
+              invNEvents) << "\t|" << (m_TESTERtimeConsumption.cellularAutomaton.count() * invNEvents) << "\t|" <<
+          (m_TESTERtimeConsumption.tcc.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.postCAFilter.count() * invNEvents) << "\t|"
+          << (m_TESTERtimeConsumption.kalmanStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.checkOverlap.count() *
+              invNEvents) << "\t|" << (m_TESTERtimeConsumption.cleanOverlap.count() * invNEvents) << "\t|" <<
+          (m_TESTERtimeConsumption.neuronalStuff.count() * invNEvents) << "\t|" << (m_TESTERtimeConsumption.
+              intermediateStuff.count() * invNEvents) << "\t|")
 
-  B2DEBUG(2, "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
+  B2DEBUG(2,
+          "Explanation: HSort: hit sorting, baseTF: baseline TF, sgFind: segment finder , nbFind: neighbouring segments finder, CA: cellular automaton, tcCol: track candidate collector, tcFlt: track candidate filter (e.g. circleFit), kalmn: kalman filter, chkOvr: checking track candidates for overlapping clusters, clnOvr: cleaning track candidates for overlapping clusters, neuNet: neuronal network of Hopfield type, others: everything which was not listed above")
 
   B2DEBUG(1, lineHigh << lineApnd << lineApnd)
 
@@ -676,10 +720,11 @@ void BaseLineTFModule::endRun()
   int q10 = numLoggedEvents / 10;
   int q90 = 9 * q10;
   int q99 = 99 * q1;
-  B2DEBUG(1, m_PARAMnameOfInstance << " there were " << numLoggedEvents << " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:" << endl)
+  B2DEBUG(1, m_PARAMnameOfInstance << " there were " << numLoggedEvents <<
+          " events recorded by the eventLogger, listing slowest, fastest, median q0.1 and q0.9 event:" << endl)
   if (numLoggedEvents != 0) {
     int meanTimeConsumption = 0;
-    for (EventInfoPackage & infoPackage : m_TESTERlogEvents) {
+    for (EventInfoPackage& infoPackage : m_TESTERlogEvents) {
       meanTimeConsumption += infoPackage.totalTime.count();
     }
     B2DEBUG(2, "slowest event: " << m_TESTERlogEvents.at(0).Print());
@@ -691,11 +736,15 @@ void BaseLineTFModule::endRun()
     B2DEBUG(2, "q90 event: " << m_TESTERlogEvents.at(q90).Print());
     B2DEBUG(2, "q99 event: " << m_TESTERlogEvents.at(q99).Print());
     B2DEBUG(2, "fastest event: " << m_TESTERlogEvents.at(numLoggedEvents - 1).Print());
-    B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(median).totalTime.count() << " of time consumption per event");
+    B2DEBUG(1, "manually calculated mean: " << meanTimeConsumption / numLoggedEvents << ", and median: " << m_TESTERlogEvents.at(
+              median).totalTime.count() << " of time consumption per event");
 
-    vector<EventInfoPackage> logEventsCopy = m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
-    vector<EventInfoPackage> infoQ(5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
-    stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream, twoHitDiscardedStream;
+    vector<EventInfoPackage> logEventsCopy =
+      m_TESTERlogEvents; // copying original since we want to change the internal order now for several times and do not want to break the original
+    vector<EventInfoPackage> infoQ(
+      5); // for each value we want to find the key figures, we store one entry. first is min, third is median, last is max
+    stringstream telClusterStream, pxdClusterStream, svdClusterStream, svdHitStream, twoHitCombiStream, twoHitActivatedStream,
+                 twoHitDiscardedStream;
 
     // sort by nTelClusters:
     std::sort(
@@ -708,7 +757,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).numTELCluster = logEventsCopy.at(median).numTELCluster;
     infoQ.at(3).numTELCluster = logEventsCopy.at(q75).numTELCluster;
     infoQ.at(4).numTELCluster = logEventsCopy.at(numLoggedEvents - 1).numTELCluster;
-    telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " << infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
+    telClusterStream << infoQ[0].numTELCluster << " / " << infoQ[1].numTELCluster << " / " << infoQ[2].numTELCluster << " / " <<
+                     infoQ[3].numTELCluster << " / " << infoQ[4].numTELCluster << "\n";
 
     // sort by nPxdClusters:
     std::sort(
@@ -721,7 +771,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).numPXDCluster = logEventsCopy.at(median).numPXDCluster;
     infoQ.at(3).numPXDCluster = logEventsCopy.at(q75).numPXDCluster;
     infoQ.at(4).numPXDCluster = logEventsCopy.at(numLoggedEvents - 1).numPXDCluster;
-    pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " << infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
+    pxdClusterStream << infoQ[0].numPXDCluster << " / " << infoQ[1].numPXDCluster << " / " << infoQ[2].numPXDCluster << " / " <<
+                     infoQ[3].numPXDCluster << " / " << infoQ[4].numPXDCluster << "\n";
 
     // sort by nSVDClusters:
     std::sort(
@@ -734,7 +785,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).numSVDCluster = logEventsCopy.at(median).numSVDCluster;
     infoQ.at(3).numSVDCluster = logEventsCopy.at(q75).numSVDCluster;
     infoQ.at(4).numSVDCluster = logEventsCopy.at(numLoggedEvents - 1).numSVDCluster;
-    svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " << infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
+    svdClusterStream << infoQ[0].numSVDCluster << " / " << infoQ[1].numSVDCluster << " / " << infoQ[2].numSVDCluster << " / " <<
+                     infoQ[3].numSVDCluster << " / " << infoQ[4].numSVDCluster << "\n";
 
     // sort by nSVDClusterCombis:
     std::sort(
@@ -747,7 +799,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).numSVDHits = logEventsCopy.at(median).numSVDHits;
     infoQ.at(3).numSVDHits = logEventsCopy.at(q75).numSVDHits;
     infoQ.at(4).numSVDHits = logEventsCopy.at(numLoggedEvents - 1).numSVDHits;
-    svdHitStream << infoQ[0].numSVDHits << " / " << infoQ[1].numSVDHits << " / " << infoQ[2].numSVDHits << " / " << infoQ[3].numSVDHits << " / " << infoQ[4].numSVDHits << "\n";
+    svdHitStream << infoQ[0].numSVDHits << " / " << infoQ[1].numSVDHits << " / " << infoQ[2].numSVDHits << " / " << infoQ[3].numSVDHits
+                 << " / " << infoQ[4].numSVDHits << "\n";
 
     // sort by 2HitCombis:
     std::sort(
@@ -760,7 +813,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).numHitCombisTotal = logEventsCopy.at(median).numHitCombisTotal;
     infoQ.at(3).numHitCombisTotal = logEventsCopy.at(q75).numHitCombisTotal;
     infoQ.at(4).numHitCombisTotal = logEventsCopy.at(numLoggedEvents - 1).numHitCombisTotal;
-    twoHitCombiStream << infoQ[0].numHitCombisTotal << " / " << infoQ[1].numHitCombisTotal << " / " << infoQ[2].numHitCombisTotal << " / " << infoQ[3].numHitCombisTotal << " / " << infoQ[4].numHitCombisTotal << "\n";
+    twoHitCombiStream << infoQ[0].numHitCombisTotal << " / " << infoQ[1].numHitCombisTotal << " / " << infoQ[2].numHitCombisTotal <<
+                      " / " << infoQ[3].numHitCombisTotal << " / " << infoQ[4].numHitCombisTotal << "\n";
 
     // sort by 2HitCombisActivated:
     std::sort(
@@ -773,7 +827,8 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).segFinderActivated = logEventsCopy.at(median).segFinderActivated;
     infoQ.at(3).segFinderActivated = logEventsCopy.at(q75).segFinderActivated;
     infoQ.at(4).segFinderActivated = logEventsCopy.at(numLoggedEvents - 1).segFinderActivated;
-    twoHitActivatedStream << infoQ[0].segFinderActivated << " / " << infoQ[1].segFinderActivated << " / " << infoQ[2].segFinderActivated << " / " << infoQ[3].segFinderActivated << " / " << infoQ[4].segFinderActivated << "\n";
+    twoHitActivatedStream << infoQ[0].segFinderActivated << " / " << infoQ[1].segFinderActivated << " / " << infoQ[2].segFinderActivated
+                          << " / " << infoQ[3].segFinderActivated << " / " << infoQ[4].segFinderActivated << "\n";
 
     // sort by 2HitCombisDiscarded:
     std::sort(
@@ -786,12 +841,14 @@ void BaseLineTFModule::endRun()
     infoQ.at(2).segFinderDiscarded = logEventsCopy.at(median).segFinderDiscarded;
     infoQ.at(3).segFinderDiscarded = logEventsCopy.at(q75).segFinderDiscarded;
     infoQ.at(4).segFinderDiscarded = logEventsCopy.at(numLoggedEvents - 1).segFinderDiscarded;
-    twoHitDiscardedStream << infoQ[0].segFinderDiscarded << " / " << infoQ[1].segFinderDiscarded << " / " << infoQ[2].segFinderDiscarded << " / " << infoQ[3].segFinderDiscarded << " / " << infoQ[4].segFinderDiscarded << "\n";
+    twoHitDiscardedStream << infoQ[0].segFinderDiscarded << " / " << infoQ[1].segFinderDiscarded << " / " << infoQ[2].segFinderDiscarded
+                          << " / " << infoQ[3].segFinderDiscarded << " / " << infoQ[4].segFinderDiscarded << "\n";
 
     B2INFO(" BLTF - endRun: ###############\n" <<
            "within " << m_eventCounter << " events, there were a total number of " << m_TESTERcountTotalTCsFinal << " TCs " <<
            "and " << float(m_TESTERcountTotalTCsFinal) * invNEvents << " TCs per event.\n" <<
-           "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" << float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
+           "Mean track length (indices/hits): " << float(m_TESTERcountTotalUsedIndicesFinal) / float(m_TESTERcountTotalTCsFinal) << "/" <<
+           float(m_TESTERcountTotalUsedHitsFinal) / float(m_TESTERcountTotalTCsFinal) << "\n\
 	min / q0.25 / median / q0.75 / max\n" <<
            "nTelClusters           " << telClusterStream.str() <<
            "nPxdClusters           " << pxdClusterStream.str() <<
@@ -864,7 +921,7 @@ void BaseLineTFModule::calcInitialValues4TCs(PassData* currentPass)
   pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
   pair<double, TVector3> returnValues; // first is chi2, second is momentum vector
 
-  for (VXDTFTrackCandidate * aTC : currentPass->tcVector) {
+  for (VXDTFTrackCandidate* aTC : currentPass->tcVector) {
 
     if (aTC->getCondition() == false) { continue; }
 
@@ -884,10 +941,12 @@ void BaseLineTFModule::calcInitialValues4TCs(PassData* currentPass)
 
     if (m_BackwardFilter == true) {
       aTC->setInitialValue((*currentHits)[0]->hitPosition, seedValue.first, pdgCode); // position, momentum, pdgCode
-      B2DEBUG(5, " backward: TC has got seedRadius/momentum/pT of " << (*currentHits)[0]->hitPosition.Perp() << "/" << seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
+      B2DEBUG(5, " backward: TC has got seedRadius/momentum/pT of " << (*currentHits)[0]->hitPosition.Perp() << "/" <<
+              seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
     } else {
       aTC->setInitialValue((*currentHits).at(currentHits->size() - 1)->hitPosition, seedValue.first, pdgCode);
-      B2DEBUG(5, "forward: TC has got seedRadius/momentum/pT of " << (*currentHits).at(currentHits->size() - 1)->hitPosition.Perp() << "/" << seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
+      B2DEBUG(5, "forward: TC has got seedRadius/momentum/pT of " << (*currentHits).at(currentHits->size() - 1)->hitPosition.Perp() << "/"
+              << seedValue.first.Mag() << "/" << seedValue.first.Perp() << "GeV and estimated pdgCode " << pdgCode);
     }
 
   }
@@ -914,7 +973,7 @@ void BaseLineTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
   TrackletFilters fitterBox;
   std::pair<double, TVector3> lineFitResult = { 0., TVector3()};
 
-  for (VXDTFTrackCandidate * currentTC : tcVector) {
+  for (VXDTFTrackCandidate* currentTC : tcVector) {
     if (currentTC->getCondition() == false) { continue; }
 
     const vector<PositionInfo*>* currentHits = currentTC->getPositionInfos();
@@ -930,14 +989,17 @@ void BaseLineTFModule::calcQIbyStraightLine(TCsOfEvent& tcVector)
       continue;
     }
 
-    currentTC->setTrackQuality(TMath::Prob(lineFitResult.first, currentTC->size() * 2 - 4)); // 4 parameters are estimated, each hit is created by two measurements
+    currentTC->setTrackQuality(TMath::Prob(lineFitResult.first,
+                                           currentTC->size() * 2 - 4)); // 4 parameters are estimated, each hit is created by two measurements
 
     if (m_BackwardFilter == true) {
       currentTC->setInitialValue((*currentHits)[0]->hitPosition, lineFitResult.second, m_PARAMpdGCode); // position, momentum, pdgCode
-      B2DEBUG(5, " backward: TC has got seedRadius/momentum/pT of " << (*currentHits)[0]->hitPosition.Perp() << "/" << lineFitResult.second.Mag() << "/" << lineFitResult.second.Perp() << "GeV and estimated pdgCode " << m_PARAMpdGCode);
+      B2DEBUG(5, " backward: TC has got seedRadius/momentum/pT of " << (*currentHits)[0]->hitPosition.Perp() << "/" <<
+              lineFitResult.second.Mag() << "/" << lineFitResult.second.Perp() << "GeV and estimated pdgCode " << m_PARAMpdGCode);
     } else {
       currentTC->setInitialValue((*currentHits).at(currentHits->size() - 1)->hitPosition, lineFitResult.second, m_PARAMpdGCode);
-      B2DEBUG(5, "forward: TC has got seedRadius/momentum/pT of " << (*currentHits).at(currentHits->size() - 1)->hitPosition.Perp() << "/" << lineFitResult.second.Mag() << "/" << lineFitResult.second.Perp() << "GeV and estimated pdgCode " << m_PARAMpdGCode);
+      B2DEBUG(5, "forward: TC has got seedRadius/momentum/pT of " << (*currentHits).at(currentHits->size() - 1)->hitPosition.Perp() << "/"
+              << lineFitResult.second.Mag() << "/" << lineFitResult.second.Perp() << "GeV and estimated pdgCode " << m_PARAMpdGCode);
     }
     currentTC->setFitSucceeded(true);
   }
@@ -984,7 +1046,8 @@ genfit::TrackCand BaseLineTFModule::generateGFTrackCand(VXDTFTrackCandidate* cur
     for (int index : pxdHits) { printIndices << index << " "; }
     printIndices << ", SVD: ";
     for (int index : svdHits) { printIndices << index << " "; }
-    B2DEBUG(10, "generated GFTC with seed.Mag/p/pT/PDGcode of " << posIn.Mag() << "/" << momIn.Mag() << "/" << momIn.Perp() << "/" << pdgCode << " and the following hits: " << printIndices.str());
+    B2DEBUG(10, "generated GFTC with seed.Mag/p/pT/PDGcode of " << posIn.Mag() << "/" << momIn.Mag() << "/" << momIn.Perp() << "/" <<
+            pdgCode << " and the following hits: " << printIndices.str());
   }
 
   bool gotNan = false;
@@ -1012,17 +1075,19 @@ genfit::TrackCand BaseLineTFModule::generateGFTrackCand(VXDTFTrackCandidate* cur
     for (int index : svdHits) { hitIndices << index << " "; }
 
     hitIndices << "\n Magnitudes: ";
-    for (TVector3 * hitPos : currentTC->getHitCoordinates()) {
+    for (TVector3* hitPos : currentTC->getHitCoordinates()) {
       hitIndices << hitPos->Mag() << " ";
     }
-    B2WARNING("pdgCode: " << pdgCode << ", stateSeed0-5: " << stateSeed(0) << "/" << stateSeed(1) << "/" << stateSeed(2) << "/" << stateSeed(3) << "/" << stateSeed(4) << "/" << stateSeed(5) << ", hitID/mag: " << hitIndices.str())
+    B2WARNING("pdgCode: " << pdgCode << ", stateSeed0-5: " << stateSeed(0) << "/" << stateSeed(1) << "/" << stateSeed(
+                2) << "/" << stateSeed(3) << "/" << stateSeed(4) << "/" << stateSeed(5) << ", hitID/mag: " << hitIndices.str())
   }
 
   newGFTrackCand.set6DSeedAndPdgCode(stateSeed, pdgCode);
 
 //   vector<int> hitIDs; // for checking hitIDs for double entries
   int hitIndex = -1; // temporary index for hit
-  BOOST_REVERSE_FOREACH(auto * aHit, currentTC->getHits()) { // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
+  BOOST_REVERSE_FOREACH(auto * aHit,
+                        currentTC->getHits()) { // order of hits within VXDTFTrackCandidate: outer->inner hits. GFTrackCand: inner->outer hits
     if (aHit->getDetectorType() == Const::SVD) {
       hitIndex = aHit->getClusterIndexU();
       if (hitIndex != -1) {
@@ -1085,8 +1150,10 @@ string BaseLineTFModule::EventInfoPackage::Print()
 
   output << " results: ";
   output << "nPXDCluster: " << numPXDCluster << ", nSVDCluster: " << numSVDCluster << ", nSVDHits(x-Passes): " << numSVDHits << endl;
-  output << "sfActivated: " << segFinderActivated << ", discarded: " << segFinderDiscarded << ", nfActivated: " << nbFinderActivated << ", discarded: " << nbFinderDiscarded << endl;
-  output << "tccApproved: " << tccApprovedTCs << ", nTCsAfterTCC: " << numTCsAfterTCC << ", nTCsPostTCfilter: " << numTCsAfterTCCfilter << ", nTCsKilledOverlap: " << numTCsKilledByCleanOverlap << ", nTCsFinal: " << numTCsfinal << endl;
+  output << "sfActivated: " << segFinderActivated << ", discarded: " << segFinderDiscarded << ", nfActivated: " << nbFinderActivated
+         << ", discarded: " << nbFinderDiscarded << endl;
+  output << "tccApproved: " << tccApprovedTCs << ", nTCsAfterTCC: " << numTCsAfterTCC << ", nTCsPostTCfilter: " <<
+         numTCsAfterTCCfilter << ", nTCsKilledOverlap: " << numTCsKilledByCleanOverlap << ", nTCsFinal: " << numTCsfinal << endl;
 
   return output.str();
 }
@@ -1138,7 +1205,7 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
   vector<ClusterHit> clusterHitList;
   vector<VXDTFHit> singleSidedHits;
 
-  for (ClusterInfo & aClusterInfo : clusters) {
+  for (ClusterInfo& aClusterInfo : clusters) {
     bool isPXD = aClusterInfo.isPXD();
     bool isTEL = aClusterInfo.isTEL();
     if (isPXD == true) { // there are pxdHits, only if PXDHits were allowed. pxd-hits are easy, can be stored right away
@@ -1151,7 +1218,9 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
       const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
-      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z())
+      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() <<
+              "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/"
+              << newPosition.hitSigma.Z())
       newPosition.sigmaU = aClusterInfo.getPXDCluster()->getUSigma();
       newPosition.sigmaV = aClusterInfo.getPXDCluster()->getVSigma();
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
@@ -1167,7 +1236,9 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
       const VXD::SensorInfoBase& aSensorInfo = VXD::GeoCache::get(aVxdID);
       newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
       newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
-      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z())
+      B2DEBUG(100, " baselineTF: pxdluster got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() <<
+              "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/"
+              << newPosition.hitSigma.Z())
       newPosition.sigmaU = aClusterInfo.getTELCluster()->getUSigma();
       newPosition.sigmaV = aClusterInfo.getTELCluster()->getVSigma();
       FullSecID aSecID = FullSecID(aVxdID, false, 0);
@@ -1182,7 +1253,7 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
   BrokenSensorsOfEvent brokenSensors = find2DSVDHits(activatedSensors, clusterHitList);   /// findSVD2DHits
   int nBrokenSensors = brokenSensors.size();
 
-  for (ClusterHit & aClusterCombi : clusterHitList) {
+  for (ClusterHit& aClusterCombi : clusterHitList) {
     VXDTFHit newHit = deliverVXDTFHitWrappedSVDHit(aClusterCombi.uCluster, aClusterCombi.vCluster);
     passInfo->fullHitsVector.push_back(newHit);
   }
@@ -1193,7 +1264,8 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
       stringstream badSensors;
       for (int sensorID : brokenSensors) { badSensors << " " << FullSecID(sensorID).getFullSecString(); }
-      B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: there are " << nBrokenSensors << " sensors with strange cluster-behavior (num of u and v clusters does not mach), sensors are: \n" << badSensors.str())
+      B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: there are " << nBrokenSensors <<
+              " sensors with strange cluster-behavior (num of u and v clusters does not mach), sensors are: \n" << badSensors.str())
     }
 
     // now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
@@ -1205,20 +1277,24 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
   vector<int> hitsPerLayer(6, 0);
   aLayerID = 0;
 
-  typedef pair< double, VXDTFHit*> HitExtra; // we use the first variable twice using different meanings (starts with: distance of hit to chosen origin, later: distance of hit to chosen seed). this is pretty messy, but I can not get the tuple-version to work...
+  typedef pair< double, VXDTFHit*>
+  HitExtra; // we use the first variable twice using different meanings (starts with: distance of hit to chosen origin, later: distance of hit to chosen seed). this is pretty messy, but I can not get the tuple-version to work...
   list<HitExtra> listOfHitExtras;
 
   int maxCounts = 0; // carries the highest number of hits per layer that occured
-  for (VXDTFHit & hit : passInfo->fullHitsVector) {
-    B2DEBUG(10, " VXDHit at sector " << hit.getSectorString() << " with radius " << hit.getHitCoordinates()->Perp() << " stores real Cluster (u/v/uv)" << hit.getClusterIndexU() << "/" << hit.getClusterIndexV() << "/" << hit.getClusterIndexUV())
+  for (VXDTFHit& hit : passInfo->fullHitsVector) {
+    B2DEBUG(10, " VXDHit at sector " << hit.getSectorString() << " with radius " << hit.getHitCoordinates()->Perp() <<
+            " stores real Cluster (u/v/uv)" << hit.getClusterIndexU() << "/" << hit.getClusterIndexV() << "/" << hit.getClusterIndexUV())
     aLayerID = hit.getVxdID().getLayerNumber();
     hitsPerLayer.at(aLayerID - 1) += 1;
     if (hitsPerLayer[aLayerID - 1] > maxCounts) { maxCounts = hitsPerLayer[aLayerID - 1]; }
-    listOfHitExtras.push_back(make_pair((*hit.getHitCoordinates() - passInfo->origin).Mag(),  &hit));    // first is distance of hit to chosen origin
+    listOfHitExtras.push_back(make_pair((*hit.getHitCoordinates() - passInfo->origin).Mag(),
+                                        &hit));    // first is distance of hit to chosen origin
   }
 
   if (int(listOfHitExtras.size()) == 0 or maxCounts < 1) {
-    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: got maxCount of VXDHits per layer: " << maxCounts << " while having " << clusters.size() << ", stopping baseline TF since no reconstruction possible")
+    B2DEBUG(1, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: got maxCount of VXDHits per layer: " <<
+            maxCounts << " while having " << clusters.size() << ", stopping baseline TF since no reconstruction possible")
     return false;
   }
 
@@ -1228,7 +1304,8 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
     stringstream ssHitsPerLayer;
     for (int i = 0; i < 6; ++i) { ssHitsPerLayer << "at layer " << i + 1 << ": " << hitsPerLayer.at(i) << endl; }
-    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: before creating TC: nHits (normal/strange) " << nHits << "/" << singleSidedHits.size() << ", Hits per Layer:\n" << ssHitsPerLayer.str())
+    B2DEBUG(3, m_PARAMnameOfInstance << " - event " << m_eventCounter << " baseline TF: before creating TC: nHits (normal/strange) " <<
+            nHits << "/" << singleSidedHits.size() << ", Hits per Layer:\n" << ssHitsPerLayer.str())
   }
 
   VXDTFTrackCandidate* newTC = new VXDTFTrackCandidate();
@@ -1236,19 +1313,19 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
 
   // easiest case: no more than 1 Hit per Layer:
   if (maxCounts == 1) {
-    for (HitExtra & bundle : listOfHitExtras) { // collecting hits by distance to chosen origin
+    for (HitExtra& bundle : listOfHitExtras) {  // collecting hits by distance to chosen origin
       newTC->addHits(bundle.second);
     }
   } else { // case of more than one hit per layer (e.g. overlapping hits, bhabha scattering, cosmic particle, background (last point not surpressed!))
     TVector3 seedPosition = *(*listOfHitExtras.begin()).second->getHitCoordinates();
 
     aVxdID = 0;
-    for (HitExtra & bundle : listOfHitExtras) { // prepare for sorting by distance to seed:
+    for (HitExtra& bundle : listOfHitExtras) {  // prepare for sorting by distance to seed:
       bundle.first = (*bundle.second->getHitCoordinates() - seedPosition).Mag();
     }
     listOfHitExtras.sort(); // now first entry is seed, following entries are hits with growing distance
 
-    for (HitExtra & bundle : listOfHitExtras) { // collect hits for TC
+    for (HitExtra& bundle : listOfHitExtras) {  // collect hits for TC
       if (aVxdID == bundle.second->getVxdID()) { continue; }
       newTC->addHits(bundle.second);
       aVxdID = bundle.second->getVxdID();
@@ -1260,14 +1337,15 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
   nHits = hitsOfTC.size();
   vector<PositionInfo*> currentHitPositions;
   currentHitPositions.reserve(nHits);
-  for (VXDTFHit * aHit : hitsOfTC) { currentHitPositions.push_back(aHit->getPositionInfo()); }
+  for (VXDTFHit* aHit : hitsOfTC) { currentHitPositions.push_back(aHit->getPositionInfo()); }
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
     stringstream secNameOutput;
     secNameOutput << endl << " tc " << 0 << " got " << nHits << " hits and the following secIDs: ";
-    for (VXDTFHit * aHit : hitsOfTC) {
+    for (VXDTFHit* aHit : hitsOfTC) {
       secNameOutput << aHit->getSectorString() << " ";
-      B2DEBUG(10, " VXDHit at sector " << aHit->getSectorString() << " with radius " << aHit->getHitCoordinates()->Perp() << " stores real Cluster (u/v/uv)" << aHit->getClusterIndexU() << "/" << aHit->getClusterIndexV() << "/" << aHit->getClusterIndexUV())
+      B2DEBUG(10, " VXDHit at sector " << aHit->getSectorString() << " with radius " << aHit->getHitCoordinates()->Perp() <<
+              " stores real Cluster (u/v/uv)" << aHit->getClusterIndexU() << "/" << aHit->getClusterIndexV() << "/" << aHit->getClusterIndexUV())
     } // used for output
     B2DEBUG(3, " " << secNameOutput.str() << " and " <<  nHits << " hits");
   }
@@ -1281,7 +1359,7 @@ bool BaseLineTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passI
 
   // checking for track-loops
   list<VxdID> collectedSensorIDs;
-  for (VXDTFHit * aHit : hitsOfTC) {
+  for (VXDTFHit* aHit : hitsOfTC) {
     collectedSensorIDs.push_back(aHit->getVxdID());
   }
   collectedSensorIDs.sort();
@@ -1465,7 +1543,8 @@ VXDTFHit BaseLineTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInf
   }
 
   if (uClusterInfo != NULL) {
-    if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true && vClusterInfo != NULL) {   // isWedgeSensor and 2D-Info
+    if ((aSensorInfo.getBackwardWidth() > aSensorInfo.getForwardWidth()) == true
+        && vClusterInfo != NULL) {   // isWedgeSensor and 2D-Info
       hitLocal.SetX((hitLocal.Y() / aSensorInfo.getWidth(0)) * uClusterInfo->getSVDCluster()->getPosition()); // hitLocal.Y is already set
     } else { // rectangular Sensor and/or no 2D-info (in this case the X-value of the center of the sensor is taken)
       hitLocal.SetX(uClusterInfo->getSVDCluster()->getPosition());
@@ -1480,16 +1559,20 @@ VXDTFHit BaseLineTFModule::deliverVXDTFHitWrappedSVDHit(ClusterInfo* uClusterInf
 
   newPosition.hitPosition = aSensorInfo.pointToGlobal(hitLocal);
   newPosition.hitSigma = aSensorInfo.vectorToGlobal(sigmaVec);
-  B2DEBUG(10, "deliverVXDTFHitWrappedSVDHit: got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" << newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" << newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z()) /// WARNING TODO: set to debug level 100
+  B2DEBUG(10, "deliverVXDTFHitWrappedSVDHit: got global pos X/Y/Z: " << newPosition.hitPosition.X() << "/" <<
+          newPosition.hitPosition.Y() << "/" << newPosition.hitPosition.Z() << ", global var X/Y/Z: " << newPosition.hitSigma.X() << "/" <<
+          newPosition.hitSigma.Y() << "/" << newPosition.hitSigma.Z()) /// WARNING TODO: set to debug level 100
 
   FullSecID aSecID = FullSecID(aVxdID, false, 0);
-  return VXDTFHit(newPosition, 1, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID.getFullSecID(), aVxdID, 0.5 * (timeStampU + timeStampV));
+  return VXDTFHit(newPosition, 1, uClusterInfo, vClusterInfo, NULL, Const::SVD, aSecID.getFullSecID(), aVxdID,
+                  0.5 * (timeStampU + timeStampV));
 }
 
 
 
 // now we check for each strange sensor whether it makes sense to generate 1D-VXDTFHits or not. we therefore filter by threshold to keep us from stumbling over messy sensors
-std::vector<VXDTFHit> BaseLineTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& activatedSensors, BrokenSensorsOfEvent& strangeSensors)
+std::vector<VXDTFHit> BaseLineTFModule::dealWithStrangeSensors(ActiveSensorsOfEvent& activatedSensors,
+    BrokenSensorsOfEvent& strangeSensors)
 {
   /** REDESIGNCOMMENT DEALWITHSTRANGESENSORS 1:
    * * short:
@@ -1510,10 +1593,10 @@ std::vector<VXDTFHit> BaseLineTFModule::dealWithStrangeSensors(ActiveSensorsOfEv
    * deliverVXDTFHitWrappedSVDHit(NULL, aClusterInfo)
    */
   ActiveSensorsOfEvent::iterator itCurrentSensor;
-  typedef pair<int, const SVDCluster*> ClusterBundle;
   vector<VXDTFHit> singleSidedHits;
   int nClusters = 0,
-      threshold = 2; // if there are 1 or 0 clusters at the sensor (the latter should not occur at all), there can not be formed any u + v - combination of clusters
+      threshold =
+        2; // if there are 1 or 0 clusters at the sensor (the latter should not occur at all), there can not be formed any u + v - combination of clusters
   singleSidedHits.reserve(strangeSensors.size()*threshold);
   bool takeUside = false;
 
@@ -1530,11 +1613,11 @@ std::vector<VXDTFHit> BaseLineTFModule::dealWithStrangeSensors(ActiveSensorsOfEv
     if (nClusters > threshold) { m_TESTERovercrowdedStrangeSensors++; continue; }
 
     if (takeUside == true) {
-      for (ClusterInfo * aClusterInfo : itCurrentSensor->second.uClusters) {
+      for (ClusterInfo* aClusterInfo : itCurrentSensor->second.uClusters) {
         if (aClusterInfo != NULL) { singleSidedHits.push_back(deliverVXDTFHitWrappedSVDHit(aClusterInfo, NULL)); }
       }
     } else {
-      for (ClusterInfo * aClusterInfo : itCurrentSensor->second.vClusters) {
+      for (ClusterInfo* aClusterInfo : itCurrentSensor->second.vClusters) {
         if (aClusterInfo != NULL) { singleSidedHits.push_back(deliverVXDTFHitWrappedSVDHit(NULL, aClusterInfo)); }
       }
     }
@@ -1546,7 +1629,8 @@ std::vector<VXDTFHit> BaseLineTFModule::dealWithStrangeSensors(ActiveSensorsOfEv
 
 
 // iterate through map of activated sensors & combine each possible combination of clusters. Store them in a vector of structs, where each struct carries an u & a v cluster
-BaseLineTFModule::BrokenSensorsOfEvent BaseLineTFModule::find2DSVDHits(ActiveSensorsOfEvent& activatedSensors, std::vector<ClusterHit>& clusterHitList)
+BaseLineTFModule::BrokenSensorsOfEvent BaseLineTFModule::find2DSVDHits(ActiveSensorsOfEvent& activatedSensors,
+    std::vector<ClusterHit>& clusterHitList)
 {
   /** REDESIGNCOMMENT FIND2DSVDHITS 1:
    * * short:
@@ -1570,18 +1654,22 @@ BaseLineTFModule::BrokenSensorsOfEvent BaseLineTFModule::find2DSVDHits(ActiveSen
   BrokenSensorsOfEvent strangeSensors;
   int numHits = 0;
   bool isStrange = false;
-  for (const mapEntry & aSensor : activatedSensors) {
+  for (const mapEntry& aSensor : activatedSensors) {
     int numUclusters = aSensor.second.uClusters.size();
     int numVclusters = aSensor.second.vClusters.size();
-    B2DEBUG(100, " sensor " << FullSecID(VxdID(aSensor.first), false, 0) << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
+    B2DEBUG(100, " sensor " << FullSecID(VxdID(aSensor.first), false,
+                                         0) << " has got " << numUclusters << " uClusters and " << numVclusters << " vClusters")
     if (numUclusters == 0 || numVclusters == 0) {
       m_TESTERbadSectorRangeCounterForClusters++;
-      B2DEBUG(3, "at event: " << m_eventCounter << " sensor " << FullSecID(VxdID(aSensor.first), false, 0) << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+      B2DEBUG(3, "at event: " << m_eventCounter << " sensor " << FullSecID(VxdID(aSensor.first), false,
+              0) << " at layer " << aSensor.second.layerID << " has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
       isStrange = true;
     }
     if (numUclusters != numVclusters) {
       m_TESTERclustersPersSectorNotMatching++;
-      B2DEBUG(4, "at event: " << m_eventCounter << " at sensor " << FullSecID(VxdID(aSensor.first), false, 0) << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters << " u/vclusters!")
+      B2DEBUG(4, "at event: " << m_eventCounter << " at sensor " << FullSecID(VxdID(aSensor.first), false,
+              0) << " at layer " << aSensor.second.layerID << " number of clusters do not match: Has got " << numUclusters << "/" << numVclusters
+              << " u/vclusters!")
       isStrange = true;
     }
     if (isStrange == true) { strangeSensors.push_back(aSensor.first); isStrange = false; }
@@ -1602,8 +1690,9 @@ BaseLineTFModule::BrokenSensorsOfEvent BaseLineTFModule::find2DSVDHits(ActiveSen
 
   if (strangeSensors.size() != 0 and LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 4, PACKAGENAME()) == true) {
     stringstream output;
-    output << m_PARAMnameOfInstance << " - event: " << m_eventCounter << ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
-    for (const mapEntry & aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }
+    output << m_PARAMnameOfInstance << " - event: " << m_eventCounter <<
+           ": there were strange sensors (having missing clusters) during this event, activated Sensors (ATTENTION: these are sensors, not sectors, therefore no sublayer and sector-info) were:\n";
+    for (const mapEntry& aSensor : activatedSensors) { output << " " << FullSecID(VxdID(aSensor.first), false, 0); }
     output << "\n strange sensors were:\n";
     for (unsigned int sensorID : strangeSensors) { output << " " << FullSecID(VxdID(sensorID), false, 0); }
     B2DEBUG(4, "\n\n" << output.str() << "\n\n")
@@ -1643,7 +1732,9 @@ bool BaseLineTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* a
   if (chi2 < 0) { chi2 = 0; }
   double probability = TMath::Prob(chi2, nHits - 3 + addDegreesOfFreedom);
   // why is there nHits - 3 + addDegreesOfFreedom? Answer: each hit is one additional degree of freedom (since only the measurement of the u-coordinate of the sensors can be used) but 3 parameters are measured, therefore 3 has to be substracted from the number of hits to get the ndf. The additional degree of freedom (+1) is there, since the origin is used as another hit for the circlefitter but has two degrees of freedom instead of one for the normal hits. therefore +1 has to be added again.
-  B2DEBUG(10, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " << closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 << " and probability of " << probability << " with ndf: " << nHits - 3 + addDegreesOfFreedom)
+  B2DEBUG(10, "TCC Filter at tc " << tcCtr << ": estimated closestApproachPhi, closestApproachR, estimatedRadius: " <<
+          closestApproachPhi << ", " << closestApproachR << ", " << estimatedRadius << " got fitted with chi2 of " << chi2 <<
+          " and probability of " << probability << " with ndf: " << nHits - 3 + addDegreesOfFreedom)
   if (thisPass->circleFit.first == true and probability < thisPass->circleFit.second) {  // means tc is bad
     B2DEBUG(20, "TCC filter: tc " << tcCtr << " rejected by circleFit! ");
     m_TESTERtriggeredCircleFit++; tcCtr++;
@@ -1662,7 +1753,8 @@ bool BaseLineTFModule::doTheCircleFit(PassData* thisPass, VXDTFTrackCandidate* a
   boostClock::time_point timer2 = boostClock::now();
   duration = boost::chrono::duration_cast<boostNsec>(timer2 - timer);
 
-  B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with nHits: " <<  nHits << ", time consumption: " << duration.count() << " ns");
+  B2DEBUG(20, " TCC filter circleFit approved TC " << tcCtr << " with nHits: " <<  nHits << ", time consumption: " << duration.count()
+          << " ns");
   return true;
 }
 
@@ -1707,7 +1799,9 @@ void BaseLineTFModule::checkAndSetupModuleParameters()
 
   m_littleHelperBox.resetValues(m_PARAMsmearMean, m_PARAMsmearSigma);
 
-  if (m_PARAMpdGCode > 10 and m_PARAMpdGCode < 18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
+  if (m_PARAMpdGCode > 10
+      and m_PARAMpdGCode <
+      18) { // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
     m_chargeSignFactor = 1;
   } else { m_chargeSignFactor = -1; }
 
@@ -1726,7 +1820,8 @@ void BaseLineTFModule::checkAndSetupModuleParameters()
   } else if (m_PARAMcalcQIType == "straightLine") {
     m_calcQiType = 3;
   } else {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType << "' is unknown, setting standard to circleFit...")
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen qiType '" << m_PARAMcalcQIType <<
+              "' is unknown, setting standard to circleFit...")
     m_calcQiType = 2;
   }
 
@@ -1736,7 +1831,8 @@ void BaseLineTFModule::checkAndSetupModuleParameters()
   } else if (m_PARAMcalcSeedType == "straightLine") {
     m_calcSeedType = 1;
   } else {
-    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType << "' is unknown, setting standard to helixFit...")
+    B2WARNING(m_PARAMnameOfInstance << "::initialize: chosen seedType '" << m_PARAMcalcSeedType <<
+              "' is unknown, setting standard to helixFit...")
     m_calcSeedType = 0;
   }
 
@@ -1848,7 +1944,8 @@ void BaseLineTFModule::setupBaseLineTF()
   try {
     newMap = dynamic_cast<const VXDTFSecMap*>(Gearbox::getInstance().getTObject(directory.c_str()));
   } catch (exception& e) {
-    B2FATAL("BaseLineTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() << ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
+    B2FATAL("BaseLineTFModule::initialize: could not load sectorMap. Reason: exception thrown: " << e.what() <<
+            ", this means you have to check whether the sectorMaps stored in ../tracking/data/VXDTFindex.xml and/or ../testbeam/vxd/data/VXDTFindexTF.xml are uncommented and locally unpacked and available!")
   }
 
   const double magneticField = newMap->getMagneticFieldStrength();
@@ -1866,7 +1963,9 @@ void BaseLineTFModule::setupBaseLineTF()
   stringstream secConU, secConV;
   for (double entry : m_baselinePass.secConfigU) { secConU << " " << entry; }
   for (double entry : m_baselinePass.secConfigV) { secConV << " " << entry; }
-  B2INFO(m_baselinePass.sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] << "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl << " and additional Info: " << m_baselinePass.additionalInfo)
+  B2INFO(m_baselinePass.sectorSetup << "-setting: got magneticFieldStrength: " << magneticField << ", origin at: (" << origin[0] <<
+         "," << origin[1] << "," << origin[2] << ") and sectorConfig \n U: " << secConU.str() << endl << " V: " << secConV.str() << endl <<
+         " and additional Info: " << m_baselinePass.additionalInfo)
 
   detectorType = newMap->getDetectorType();
   m_baselinePass.chosenDetectorType = detectorType;
@@ -1875,22 +1974,26 @@ void BaseLineTFModule::setupBaseLineTF()
   if (detectorType.find("SVD") != std::string::npos) {
     m_useSVDHits = true;
     m_baselinePass.useSVDHits = true;
-    m_baselinePass.numTotalLayers += 4; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+    m_baselinePass.numTotalLayers +=
+      4; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
   }
   if (detectorType.find("PXD") != std::string::npos) {
     m_usePXDHits = true;
     m_baselinePass.usePXDHits = true;
-    m_baselinePass.numTotalLayers += 2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+    m_baselinePass.numTotalLayers +=
+      2; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
 
   }
   if (detectorType.find("TEL") != std::string::npos) { // using const::Test as Telescope setter
     m_useTELHits = true;
     m_baselinePass.useTELHits = true;
-    m_baselinePass.numTotalLayers += 1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
+    m_baselinePass.numTotalLayers +=
+      1; // WARNING hardcoded! can we get this info from the system itself? WARNING find where this is still used and find out its purpose (dangerous when some layers are missing?)
   }
   if (m_usePXDHits == false and m_useSVDHits == false and m_useTELHits == false) {
-    B2ERROR(m_PARAMnameOfInstance << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" << detectorType << ") is invalid, resetting value to standard (=VXD)")
+    B2ERROR(m_PARAMnameOfInstance << " with setting '" << chosenSetup << "': chosen detectorType via param 'detectorType' (" <<
+            detectorType << ") is invalid, resetting value to standard (=VXD)")
     m_useSVDHits = true;
     m_usePXDHits = true;
     m_baselinePass.chosenDetectorType = "VXD";
@@ -1901,7 +2004,8 @@ void BaseLineTFModule::setupBaseLineTF()
 
   m_baselinePass.numTotalLayers = m_baselinePass.numTotalLayers - (6 - m_baselinePass.highestAllowedLayer);
   if (m_baselinePass.numTotalLayers < 2) { m_baselinePass.numTotalLayers = 2; }   // to avoid division by zero in some cases
-  B2DEBUG(1, m_PARAMnameOfInstance << "chosen detectorType: " << m_baselinePass.chosenDetectorType << " and chosen sectorSetup: " << m_baselinePass.sectorSetup)
+  B2DEBUG(1, m_PARAMnameOfInstance << "chosen detectorType: " << m_baselinePass.chosenDetectorType << " and chosen sectorSetup: " <<
+          m_baselinePass.sectorSetup)
 
   m_baselinePass.zigzagXY.first = m_PARAMactivateZigZagXY;
   m_baselinePass.zigzagXYWithSigma.first = m_PARAMactivateZigZagXYWithSigma;
@@ -1917,15 +2021,19 @@ void BaseLineTFModule::setupBaseLineTF()
 
 
   /// importing sectorMap including friend Information and friend specific cutoffs
-  std::pair<int, int> countedFriendsAndCutoffs = m_baselinePass.importSectorMap(newMap->getSectorMap(), newMap->getDistances(), newMap->isFilterByDistance2OriginActivated());
+  std::pair<int, int> countedFriendsAndCutoffs = m_baselinePass.importSectorMap(newMap->getSectorMap(), newMap->getDistances(),
+                                                 newMap->isFilterByDistance2OriginActivated());
 
-  B2DEBUG(1, m_PARAMnameOfInstance << " setup " << chosenSetup << ": importing secMap with " << newMap->getSectorMap().size() << " sectors -> imported: " << m_baselinePass.sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" << countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters)");
+  B2DEBUG(1, m_PARAMnameOfInstance << " setup " << chosenSetup << ": importing secMap with " << newMap->getSectorMap().size() <<
+          " sectors -> imported: " << m_baselinePass.sectorMap.size() << "/" << countedFriendsAndCutoffs.first << "/" <<
+          countedFriendsAndCutoffs.second << " sectors/friends/(friends w/o existing filters)");
 
 
   unsigned int centerSecID = FullSecID().getFullSecID(); // automatically produces secID of centerSector
   VXDSector* pCenterSector = new VXDSector(centerSecID);
   m_baselinePass.sectorMap.insert({centerSecID, pCenterSector});
-  B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(centerSecID)->second->getFriends().size() << " friends.");
+  B2DEBUG(100, "Baseline-Pass: adding virtual centerSector with " << m_baselinePass.sectorMap.find(
+            centerSecID)->second->getFriends().size() << " friends.");
 
   int countActivatedTCTests = 0;
   if (m_baselinePass.zigzagXY.first == true) { countActivatedTCTests++; }

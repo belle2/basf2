@@ -503,7 +503,6 @@ std::string HitExporter::exportSimpleMatlab(int runNumber)
   int mcPointCounter, mcTrackCounter, droppedEventsCtr = 0, goodEventsCtr = 0, goodTCsCtr = 0;
   for (EventMapEntry eventInfo : m_storedOutput) {
     mcPointCounter = 0, mcTrackCounter = 0; // counting them manually
-    typedef pair <int, int> HitIDRelation;
     // importing data:
     vector<ExporterHitInfo>* hitsOfEvent = NULL;
     hitsOfEvent = eventInfo.second->getHits();

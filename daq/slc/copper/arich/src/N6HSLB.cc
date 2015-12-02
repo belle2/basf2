@@ -14,16 +14,19 @@ N6HSLB::N6HSLB(HSLB& hslb) : m_hslb(hslb) {}
 int N6HSLB::write(unsigned int address, unsigned char value)
 {
   unsigned int b2adr = 0x300 + address;
-  unsigned int b2val = 0x3000100 + value;
+  unsigned int b2val = 0x30000100 + value;
   printf("write : 0x%x << 0x%x\n", b2adr, b2val);
-  //m_hslb.writefee32(b2adr, b2val);
+  m_hslb.writefee32(b2adr, b2val);
   return 0;
 }
 
 unsigned int N6HSLB::read(unsigned int address)
 {
   unsigned int b2adr = 0x300 + address;
-  unsigned int b2val = 0;//m_hslb.readfee32(b2adr);
+  unsigned int b2val = 0x30000000;
+  printf("write : 0x%x << 0x%x\n", b2adr, b2val);
+  m_hslb.writefee32(b2adr, b2val);
+  b2val = m_hslb.readfee32(b2adr);
   printf("read : 0x%x >> 0x%x\n", b2adr, b2val);
   return b2val;
 }

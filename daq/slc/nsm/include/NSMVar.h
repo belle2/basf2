@@ -61,7 +61,11 @@ namespace Belle2 {
     }
     const NSMVar& operator=(const std::string& val)
     {
-      copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev);
+      if (val.size() > 0) {
+        copy(m_name, TEXT, val.size() + 1, val.c_str(), m_id, m_rev);
+      } else {
+        copy(m_name, TEXT, 1, "", m_id, m_rev);
+      }
       return *this;
     }
     const NSMVar& operator=(const std::vector<int>& val);

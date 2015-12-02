@@ -148,6 +148,7 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
       if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
         return msg.getParam(0) > 0;
       }
+      LogFile::debug("%s:%d %s", __FILE__, __LINE__, msg.getRequestName());
       com.getCallback().perform(com);
       t = Time().get();
     }

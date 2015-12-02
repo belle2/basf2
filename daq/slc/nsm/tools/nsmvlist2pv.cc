@@ -75,7 +75,8 @@ namespace Belle2 {
             std::cout << "record(" << s1.str()
                       << ", \"B2_nsm:set:$(nodename):" << name << "\")" << std::endl
                       << "{" << std::endl
-                      << "  field(DESC, \"set value to " << name << "\")" << std::endl
+                      //<< "  field(DESC, \"set value to " << name << "\")" << std::endl
+                      << "  field(DESC, \"\")" << std::endl
                       << "  field(SCAN, \"Passive\")" << std::endl
                       << s2.str() << std::endl
                       << "}" << std::endl
@@ -99,7 +100,8 @@ namespace Belle2 {
             std::cout << "record(" << s1.str()
                       << ", \"B2_nsm:get:$(nodename):" << name << "\")" << std::endl
                       << "{" << std::endl
-                      << "  field(DESC, \"get value from " << name << "\")" << std::endl
+                      //<< "  field(DESC, \"get value from " << name << "\")" << std::endl
+                      << "  field(DESC, \"\")" << std::endl
                       << "  field(SCAN, \"I/O Intr\")" << std::endl
                       << s2.str() << std::endl
                       << "}" << std::endl

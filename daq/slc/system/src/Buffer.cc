@@ -10,7 +10,7 @@ throw() : m_memory(NULL), m_size(0), m_allocated(false) {}
 Buffer::Buffer(unsigned int size, unsigned char* memory) throw()
   : m_memory(memory), m_size(size), m_allocated(false)
 {
-  if (memory == NULL) {
+  if (memory == NULL && size > 0) {
     m_memory = new unsigned char[size];
     ::memset(m_memory, 0, size);
     m_allocated = true;

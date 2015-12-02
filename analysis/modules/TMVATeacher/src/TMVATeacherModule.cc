@@ -49,7 +49,7 @@ namespace Belle2 {
     addParam("variables", m_variables, "Input variables used by the TMVA method");
     addParam("spectators", m_spectators,
              "Input spectators used by the TMVA method. These variables are saved in the output file, but not used as training input.", empty);
-    addParam("treeName", m_treeName, "Tree name used in output file, default is prefix + '_tree.root'", m_prefix + "_tree.root");
+    addParam("treeName", m_treeName, "Tree name used in output file, default is prefix + '_tree'", std::string(""));
     addParam("maxSamples", m_maxSamples, "Maximum number of samples. 0 means no limit.", 0lu);
     addParam("sample", m_sample,
              "Variable used for inverse sampling rates. Usually this is the same as the target", std::string(""));
@@ -67,6 +67,10 @@ namespace Belle2 {
 
     if (m_sample == "" and not m_inverseSamplingRates.empty()) {
       B2FATAL("Received inverseSamplingRates but no sampling variable was given");
+    }
+
+    if (m_treeName == "") {
+      m_treeName = m_prefix + "_tree";
     }
 
     Variable::Manager& manager = Variable::Manager::Instance();

@@ -213,10 +213,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   if (!CheckCOPPERMagic(n)) {
     sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
-            GetMagicDriverHeader(n),
-            GetMagicFPGAHeader(n),
-            GetMagicFPGATrailer(n),
-            GetMagicDriverTrailer(n),
+            GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -229,8 +226,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
     sprintf(err_buf,
             "CORRUPTED DATA: Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
-            *cur_evenum_rawcprhdr, evenum_feehdr,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+            *cur_evenum_rawcprhdr, evenum_feehdr, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
 
@@ -239,7 +235,6 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   *cur_exprunsubrun_no = GetExpRunSubrun(n);
   *cur_copper_ctr = GetCOPPERCounter(n);
-
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
@@ -364,25 +359,48 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
 #endif
   int err_flag = 0;
   int flag = 0;
-  unsigned int temp_utime = 0, temp_ctime_trgtype = 0;
-  unsigned int utime[4], ctime_trgtype[4];
+  unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
+  unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
+  unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
+
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
+  memset(eve, 0, sizeof(eve));
+  memset(exprun, 0, sizeof(exprun));
+
 
   for (int i = 0; i < 4; i++) {
-    if (GetFINESSENwords(n, i) > 0) {
-      ctime_trgtype[ i ] = m_buffer[ GetOffsetFINESSE(n, i) +
-                                     SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
-      utime[ i ] = m_buffer[ GetOffsetFINESSE(n, i) +
-                             SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+    int finesse_nwords = GetFINESSENwords(n, i);
+    if (finesse_nwords > 0) {
+      int offset_finesse = GetOffsetFINESSE(n, i);
+      ctime_trgtype[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_TT_CTIME_TYPE ];
+      utime[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_TT_UTIME ];
+      eve[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_TT_TAG ];
+      exprun[ i ] = m_buffer[ offset_finesse + SIZE_B2LHSLB_HEADER + POS_EXP_RUN ];
+      temp_ctime_trgtype_footer =
+        m_buffer[ offset_finesse + finesse_nwords - (SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER) + POS_TT_CTIME_B2LFEE ];
+      temp_eve_footer =
+        m_buffer[ offset_finesse + finesse_nwords - (SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER) + POS_CHKSUM_B2LFEE ];
+
       if (flag == 0) {
         temp_ctime_trgtype = ctime_trgtype[ i ];
         temp_utime = utime[ i ];
+        temp_eve = eve[ i ];
+        temp_exprun = exprun[ i ];
         flag = 1;
       } else {
-        if (temp_ctime_trgtype != ctime_trgtype[ i ]
-            || temp_utime != utime[ i ]) {
+        if (temp_ctime_trgtype != ctime_trgtype[ i ] ||
+            temp_utime != utime[ i ] ||
+            temp_eve != eve[ i ] ||
+            temp_exprun != exprun[ i ]) {
           err_flag = 1;
+        } else if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
+                   (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
+          char err_buf[500];
+          sprintf(err_buf, "CORRUPTED DATA: mismatch between header and footer in FINESSE %d. Exiting...\n %s %s %d\n",
+                  i,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          string err_str = err_buf; throw (err_str);
         }
       }
     }
@@ -390,11 +408,11 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
 
   if (err_flag != 0) {
     for (int i = 0; i < 4; i++) {
-      printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x\n",
-             i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ]);
+      printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
+             i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
     }
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "CORRUPTED DATA: mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);

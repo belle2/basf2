@@ -39,6 +39,7 @@ namespace Belle2 {
   private:
     std::string m_inputListName; /**< name of input particle list. */
     std::string m_variableName; /**< Variable which defines the candidate ranking. */
+    std::string m_outputVariableName; /**< Name of generated Ranking-Variable, if specified by user */
     bool m_selectLowest; /**< Select the candidate with the lowest value (instead of highest). */
     int m_numBest; /**< Number of best candidates to keep. */
 

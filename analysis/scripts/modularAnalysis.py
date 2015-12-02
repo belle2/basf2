@@ -587,6 +587,7 @@ def rankByHighest(
     particleList,
     variable,
     numBest=0,
+    outputVariable='',
     path=analysis_main,
 ):
     """
@@ -596,10 +597,11 @@ def rankByHighest(
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
 
-    @param particleList  The input ParticleList
-    @param variable      Variable to order Particles by.
-    @param numBest       If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
-    @param path          modules are added to this path
+    @param particleList     The input ParticleList
+    @param variable         Variable to order Particles by.
+    @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
+    @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param path             modules are added to this path
     """
 
     bcs = register_module('BestCandidateSelection')
@@ -607,6 +609,7 @@ def rankByHighest(
     bcs.param('particleList', particleList)
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
+    bcs.param('outputVariable', outputVariable)
     path.add_module(bcs)
 
 
@@ -614,6 +617,7 @@ def rankByLowest(
     particleList,
     variable,
     numBest=0,
+    outputVariable='',
     path=analysis_main,
 ):
     """
@@ -623,10 +627,11 @@ def rankByLowest(
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
 
-    @param particleList  The input ParticleList
-    @param variable      Variable to order Particles by.
-    @param numBest       If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
-    @param path          modules are added to this path
+    @param particleList     The input ParticleList
+    @param variable         Variable to order Particles by.
+    @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
+    @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param path             modules are added to this path
     """
 
     bcs = register_module('BestCandidateSelection')
@@ -635,6 +640,7 @@ def rankByLowest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('selectLowest', True)
+    bcs.param('outputVariable', outputVariable)
     path.add_module(bcs)
 
 

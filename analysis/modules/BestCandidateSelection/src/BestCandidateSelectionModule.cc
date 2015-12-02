@@ -10,6 +10,8 @@
 
 #include <analysis/modules/BestCandidateSelection/BestCandidateSelectionModule.h>
 
+#include <analysis/VariableManager/Utility.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
@@ -34,6 +36,8 @@ BestCandidateSelectionModule::BestCandidateSelectionModule():
   addParam("variable", m_variableName, "Variable which defines the candidate ranking (see selectLowest for ordering)");
   addParam("selectLowest", m_selectLowest, "Candidate with lower value are better (default: higher is better))", false);
   addParam("numBest", m_numBest, "Keep this many of the best candidates (0: keep all)", 0);
+  addParam("outputVariable", m_outputVariableName,
+           "Name for created variable, which contains the rank for the particle. If not provided, the standard name '${variable}_rank' is used.");
 
 }
 
@@ -77,12 +81,17 @@ void BestCandidateSelectionModule::event()
     valueToIndex.insert(std::make_pair(value, p->getArrayIndex()));
   }
 
-  const std::string extraInfoName(m_variableName + "_rank");
-
+  std::string extraInfoName;
+  if (m_outputVariableName.empty()) {
+    std::string root_compatible_VariableName = Variable::makeROOTCompatible(m_variableName);
+    extraInfoName = root_compatible_VariableName + "_rank";
+  } else {
+    extraInfoName = m_outputVariableName + "_rank";
+  }
   //remove everything but best candidates
   m_inputList->clear();
   int rank = 1;
-  for (const auto & candidate : valueToIndex) {
+  for (const auto& candidate : valueToIndex) {
     Particle* p = particles[candidate.second];
     p->addExtraInfo(extraInfoName, rank);
     m_inputList->addParticle(p);

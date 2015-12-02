@@ -397,8 +397,10 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
         } else if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
                    (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
           char err_buf[500];
-          sprintf(err_buf, "CORRUPTED DATA: mismatch between header and footer in FINESSE %d. Exiting...\n %s %s %d\n",
-                  i,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          sprintf(err_buf,
+                  "CORRUPTED DATA: mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
+                  i,  temp_ctime_trgtype, temp_ctime_trgtype_footer, temp_eve, temp_eve_footer,
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
           string err_str = err_buf; throw (err_str);
         }

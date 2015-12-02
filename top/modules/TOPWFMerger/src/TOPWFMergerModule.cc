@@ -66,7 +66,7 @@ namespace Belle2 {
     addParam("fraction", m_fraction,
              "the fraction for constant fraction discrimination", 0.5);
     addParam("useFTSW", m_useFTSW,
-             "add or not add FTSW time to hit times when making TOPDigits", false);
+             "add or not add FTSW time to hit times when making TOPDigits", true);
 
   }
 
@@ -177,8 +177,9 @@ namespace Belle2 {
       auto channelID = waveform.getChannelID();
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
-        auto tdc = m_topgp->getTDCcount(hit.time + t0);
+        auto tdc = m_topgp->getTDCcount(hit.time);
         auto* digit = digits.appendNew(barID, pixelID, tdc);
+        digit->setTime(hit.time + t0);
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
         digit->setChannelID(channelID);

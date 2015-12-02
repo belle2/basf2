@@ -63,11 +63,12 @@ class PackerUnpackerTest(Module):
             # check the content of the digit
             assert digit.getHitQuality() == digitUnpacked.getHitQuality()
             assert digit.getBarID() == digitUnpacked.getBarID()
-            assert digit.getChannelID() == digitUnpacked.getChannelID()
+            assert digit.getPixelID() == digitUnpacked.getPixelID()
             assert digit.getTDC() == digitUnpacked.getTDC()
 #            assert digit.getADC() == digitUnpacked.getADC()
 #            assert digit.getPulseWidth() == digitUnpacked.getPulseWidth()
             assert digit.getHardwareChannelID() == digitUnpacked.getHardwareChannelID()
+#            assert digit.getTime() == digitUnpacked.getTime()
 
 
 main = create_path()

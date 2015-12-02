@@ -83,6 +83,7 @@ namespace Belle2 {
 
         // append new digit
         TOPDigit* digit = digits.appendNew(m_barID, m_pixelID, TDC);
+        digit->setTime(topgp->getTime(TDC));
         digit->setADC(int(pulseHeight));
         digit->setChannelID(topgp->getChannelMapper().getChannelID(m_pixelID));
 

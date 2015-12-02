@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPDIGIT_H
-#define TOPDIGIT_H
+#pragma once
 
 #include <framework/dataobjects/DigitBase.h>
 #include <framework/logging/Logger.h>
@@ -34,14 +33,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPDigit():
-      m_barID(0),
-      m_pixelID(0),
-      m_TDC(0),
-      m_ADC(0),
-      m_pulseWidth(0),
-      m_channelID(0),
-      m_quality(c_Junk)
+    TOPDigit()
     {}
 
     /**
@@ -57,8 +49,21 @@ namespace Belle2 {
       m_ADC(0),
       m_pulseWidth(0),
       m_channelID(0),
-      m_quality(c_Good)
+      m_quality(c_Good),
+      m_time(0)
     {}
+
+    /**
+     * Set time in [ns]
+     * @param time time in [ns]
+     */
+    void setTime(double time) {m_time = time;}
+
+    /**
+     * Set digitized detection time
+     * @param TDC digitized time
+     */
+    void setTDC(int TDC) {m_TDC = TDC;}
 
     /**
      * Set digitized pulse height or integrated charge
@@ -93,21 +98,21 @@ namespace Belle2 {
 
     /**
      * Set double hit resolution
-     * @param tdcBins double hit resolving time in TDC bins
+     * @param time double hit resolving time in [ns]
      */
-    static void setDoubleHitResolution(int tdcBins) {s_doubleHitResolution = tdcBins;}
+    static void setDoubleHitResolution(double time) {s_doubleHitResolution = time;}
 
     /**
      * Set pile-up time
-     * @param tdcBins pile-up time in TDC bins
+     * @param time pile-up time in [ns]
      */
-    static void setPileupTime(int tdcBins) {s_pileupTime = tdcBins;}
+    static void setPileupTime(double time) {s_pileupTime = time;}
 
     /**
-     * Subtract start time T0
-     * @param t0 start time
+     * Subtract start time from m_time
+     * @param t0 start time in [ns]
      */
-    void subtractT0(double t0) { m_TDC -= int(t0);}
+    void subtractT0(double t0) { m_time -= t0;}
 
     /**
      * Returns hit quality
@@ -183,6 +188,12 @@ namespace Belle2 {
     { return m_pixelID; }
 
     /**
+     * Returns t0-subtracted and calibrated time in [ns] (converted back from TDC counts)
+     * @return time
+     */
+    double getTime() const { return m_time; }
+
+    /**
      * Returns digitized time
      * @return digitized time
      */
@@ -248,22 +259,22 @@ namespace Belle2 {
 
 
   private:
-    int m_barID;               /**< module ID (1-based) */
-    int m_pixelID;             /**< software channel ID (1-based) */
-    int m_TDC;                 /**< digitized time */
-    int m_ADC;                 /**< digitized pulse height or charge (to be decided) */
-    int m_pulseWidth;          /**< digitized pulse width */
-    unsigned m_channelID;      /**< hardware channel ID (0-based) */
-    EHitQuality m_quality;     /**< hit quality */
+    int m_barID = 0;         /**< module ID (1-based) */
+    int m_pixelID = 0;       /**< software channel ID (1-based) */
+    int m_TDC = 0;           /**< digitized time */
+    int m_ADC = 0;           /**< digitized pulse height or charge (to be decided) */
+    int m_pulseWidth = 0;    /**< digitized pulse width */
+    unsigned m_channelID = 0;   /**< hardware channel ID (0-based) */
+    EHitQuality m_quality = c_Junk;  /**< hit quality */
+    float m_time = 0;        /**< time in [ns], converted from TDC, t0-subtracted */
 
-    static int s_doubleHitResolution; /**< double hit resolving time in TDC units */
-    static int s_pileupTime; /**< pile-up time in TDC units */
+    static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
+    static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 7); /**< ClassDef */
+    ClassDef(TOPDigit, 8); /**< ClassDef */
 
   };
 
 
 } // end namespace Belle2
 
-#endif

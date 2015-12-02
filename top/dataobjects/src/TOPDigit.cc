@@ -17,24 +17,27 @@ using namespace Belle2;
 
 // ClassImp(TOPDigit);
 
-int TOPDigit::s_doubleHitResolution = 0;
-int TOPDigit::s_pileupTime = 0;
+float TOPDigit::s_doubleHitResolution = 0;
+float TOPDigit::s_pileupTime = 0;
 
 
 DigitBase::EAppendStatus TOPDigit::addBGDigit(const DigitBase* bg)
 {
   const auto* bgDigit = static_cast<const TOPDigit*>(bg);
-  int diff = m_TDC - bgDigit->getTDC();
+  float diff = m_time - bgDigit->getTime();
 
-  if (abs(diff) > s_doubleHitResolution) return DigitBase::c_Append; // no pile-up
+  if (fabs(diff) > s_doubleHitResolution) return DigitBase::c_Append; // no pile-up
 
-  if (abs(diff) < s_pileupTime) { // pile-up results in time averaging
+  if (fabs(diff) < s_pileupTime) { // pile-up results in time averaging
+    float time[2] = {(float) m_time, (float) bgDigit->getTime()};
     float tdc[2] = {(float) m_TDC, (float) bgDigit->getTDC()};
     float adc[2] = {(float) m_ADC, (float) bgDigit->getADC()};
     float sum = adc[0] + adc[1];
     if (sum > 0) {
+      m_time = (time[0] * adc[0] + time[1] * adc[1]) / sum;
       m_TDC = int((tdc[0] * adc[0] + tdc[1] * adc[1]) / sum);
     } else {
+      m_time = (time[0] + time[1]) / 2;
       m_TDC = int((tdc[0] + tdc[1]) / 2);
     }
     m_ADC = int(sum);

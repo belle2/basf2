@@ -151,6 +151,7 @@ namespace Belle2 {
           unsigned flags = (word >> 24) & 0xFF;
           int pixelID = mapper.getPixelID(chan);
           auto* digit = digits.appendNew(barID, pixelID, tdc);
+          digit->setTime(m_topgp->getTime(tdc));
           digit->setChannelID(chan);
           digit->setHitQuality((TOPDigit::EHitQuality) flags);
         }

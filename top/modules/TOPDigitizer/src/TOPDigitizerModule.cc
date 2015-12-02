@@ -105,10 +105,8 @@ namespace Belle2 {
     }
 
     // set pile-up and double hit resolution times (needed for BG overlay)
-    int delt = int(m_topgp->getDoubleHitResolution() / m_topgp->getTDCbitwidth() + 0.5);
-    TOPDigit::setDoubleHitResolution(delt);
-    int dt = int(m_topgp->getPileupTime() / m_topgp->getTDCbitwidth() + 0.5);
-    TOPDigit::setPileupTime(dt);
+    TOPDigit::setDoubleHitResolution(m_topgp->getDoubleHitResolution());
+    TOPDigit::setPileupTime(m_topgp->getPileupTime());
 
   }
 

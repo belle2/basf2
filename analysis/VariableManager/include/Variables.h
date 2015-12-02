@@ -393,7 +393,7 @@ namespace Belle2 {
     double minCluster2HelixDistance(const Particle* particle);
 
     /**
-     * returns true if the cluster with given attributes passes 'good gamma' criteria
+     * Returns true if the cluster with given attributes passes 'good gamma' criteria.
      * @param calibrated set to false for goodGammaUncalibrated().
      */
     bool isGoodGamma(int region, double energy, bool calibrated);
@@ -408,11 +408,24 @@ namespace Belle2 {
 
     /**
      * Return 1 if ECLCluster passes the following selection criteria:
-     * Forward  : E_uncalib >  125 MeV && E9/E25>0.7
+     * Forward  : E_uncalib > 125 MeV && E9/E25>0.7
      * Barrel   : E_uncalib > 100 MeV
      * Backward : E_uncalib > 150 MeV
      */
     double goodGammaUncalibrated(const Particle* particle);
+
+    /**
+     * Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
+     */
+    bool isGoodBelleGamma(int region, double energy);
+
+    /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E > 100 MeV
+     * Barrel   : E >  50 MeV
+     * Backward : E > 150 MeV
+     */
+    double goodBelleGamma(const Particle* particle);
 
     /**
      * return ECL cluster's uncorrected energy

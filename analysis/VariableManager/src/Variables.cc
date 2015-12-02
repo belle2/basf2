@@ -992,6 +992,16 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
+    bool isGoodBelleGamma(int region, double energy)
+    {
+      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
+      goodGammaRegion1 = region == 1 && energy > 0.100;
+      goodGammaRegion2 = region == 2 && energy > 0.050;
+      goodGammaRegion3 = region == 3 && energy > 0.150;
+
+      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
+    }
+
     double goodGammaUncalibrated(const Particle* particle)
     {
       double energy = particle->getEnergy();
@@ -1006,6 +1016,14 @@ namespace Belle2 {
       int region = eclClusterDetectionRegion(particle);
 
       return (double) isGoodGamma(region, energy, true);
+    }
+
+    double goodBelleGamma(const Particle* particle)
+    {
+      double energy = particle->getEnergy();
+      int region = eclClusterDetectionRegion(particle);
+
+      return (double) isGoodBelleGamma(region, energy);
     }
 
     double eclClusterUncorrectedE(const Particle* particle)
@@ -1309,7 +1327,8 @@ namespace Belle2 {
                       "1.0 if photon candidate passes good photon selection criteria");
     REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
                       "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
-
+    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
+                      "1.0 if photon candidate passes good photon selection criteria (For Belle data and MC, hence 50, 100, 150 MeV cuts)");
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "ECL cluster's uncorrected energy");
     REGISTER_VARIABLE("clusterR", eclClusterR,

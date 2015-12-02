@@ -403,6 +403,38 @@ namespace Belle2 {
       return result;
     }
 
+    double extraEnergyFromGoodBelleGamma(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+      if (!roe) {
+        B2ERROR("Relation between particle and ROE doesn't exist!");
+        return -999;
+      }
+
+      // Get masks
+      std::map<int, bool> masks = roe->getECLClusterMasks();
+
+      const std::vector<ECLCluster*> roeClusters = roe->getECLClusters();
+      result = 0.0;
+
+      for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
+
+        if (!masks.empty())
+          if (!masks.at(roeClusters[iEcl]->getArrayIndex()))
+            continue;
+
+        Particle gamma(roeClusters[iEcl]);
+
+        if (goodBelleGamma(&gamma) > 0)
+          result += roeClusters[iEcl]->getEnergy();
+      }
+
+      return result;
+    }
+
     double ROEDeltaE(const Particle* particle)
     {
       PCmsLabTransform T;
@@ -665,6 +697,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("ROE_eextraGG", extraEnergyFromGoodGamma,
                       "extra energy for good photons in the calorimeter that is not associated to the given Particle");
+
+    REGISTER_VARIABLE("ROE_eextraGBG", extraEnergyFromGoodBelleGamma,
+                      "extra energy for good photons in the calorimeter (using the Belle 1 criteria, for b2bii) that is not associated to the given Particle");
 
     REGISTER_VARIABLE("ROE_deltae", ROEDeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");

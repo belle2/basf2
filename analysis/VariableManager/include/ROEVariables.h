@@ -91,6 +91,12 @@ namespace Belle2 {
     double extraEnergyFromGoodGamma(const Particle* particle);
 
     /**
+     * return extra energy in the calorimeter that is not associated to the given Particle
+     * ECLClusters passing goodBelleGamma (Belle 1 criteria) selection are used only.
+     */
+    double extraEnergyFromGoodBelleGamma(const Particle* particle);
+
+    /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2
      */
     double ROEDeltaE(const Particle* particle);

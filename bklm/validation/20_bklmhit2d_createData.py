@@ -88,4 +88,4 @@ output.param('branchNames', ['MCParticles', 'ExtHits', 'Muids', 'BKLMHit2ds', 'E
 path.add_module(output)
 
 process(path)
-print statistics
+print(statistics)

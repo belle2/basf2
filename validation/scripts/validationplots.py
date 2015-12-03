@@ -19,6 +19,7 @@ import ROOT
 # The pretty printer. Print prettier :)
 import pprint
 import validationcomparison
+import validation
 
 try:
     import simplejson as json
@@ -1365,11 +1366,21 @@ class Plotuple:
             self.pvalue = 0.0
 
         if pvalue is not None:
+            # check if there is a custom setting for pvalue sensitivity
+            mop = validation.MetaOptionParser(self.metaoptions)
+            pvalue_warn = mop.pvalue_warn()
+            pvalue_error = mop.pvalue_error()
+
+            if pvalue_warn is None:
+                pvalue_warn = 1.0
+            if pvalue_error is None:
+                pvalue_error = 0.01
+
             # If pvalue < 0.01: Very strong presumption against neutral hypothesis
-            if pvalue < 0.01:
+            if pvalue < pvalue_error:
                 canvas.SetFillColor(ROOT.kRed)
             # If pvalue < 1: Deviations at least exists
-            elif pvalue < 1:
+            elif pvalue < pvalue_warn:
                 canvas.SetFillColor(ROOT.kOrange)
 
             self.chi2test_result = ('Performed Chi^2-Test between '

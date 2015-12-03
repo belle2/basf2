@@ -143,7 +143,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 continue
 
             cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)
-            if len(cdcHitIDs):
+            if len(cdcHitIDs) == 0:
                 # There seems to be a bug in PyROOT / gcc that results
                 # in a segmentation violation when trying to access an empty vector.
                 # Skip such instances.

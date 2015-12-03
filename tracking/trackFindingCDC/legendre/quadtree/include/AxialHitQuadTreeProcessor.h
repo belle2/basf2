@@ -27,6 +27,9 @@
 #include <TAxis.h>
 #include <TLine.h>
 
+#include <array>
+#include <utility>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class ConformalCDCWireHit;
@@ -75,8 +78,9 @@ namespace Belle2 {
       inline bool insertItemInNode(QuadTree* node, ConformalCDCWireHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
       {
-        float dist_1[2][2];
-        float dist_2[2][2];
+        typedef std::array< std::array<float, 2>, 2> Quadlet;
+        Quadlet dist_1;
+        Quadlet dist_2;
 
         unsigned long thetaMin = node->getXMin();
         unsigned long thetaMax = node->getXMax();

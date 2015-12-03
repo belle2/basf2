@@ -57,7 +57,7 @@
     </Components>
     <!-- Yield per MeV photon -->
     <Property name="SCINTILLATIONYIELD">
-	<value energy="1.0">1.9E+03</value> 
+	<value energy="1.0" unit="1./MeV">1.9E+03</value> 
     </Property>
     <!-- Yield ratio fast/slow components -->
     <Property name="YIELDRATIO">
@@ -94,6 +94,35 @@
       <value energy="1.0" unit="ns">1220</value>
     </Property>
   </Material>
+
+  <!-- LYSO properties from Saint-Gobain PreLude 420 spec sheet -->
+  <!-- http://www.crystals.saint-gobain.com/PreLude_420_Scintillator.aspx -->
+  <Material name="LYSO">
+    <density unit="g/cm3">7.1</density>
+    <Components>
+      <Element fraction="1.8">Lu</Element>
+      <Element fraction="0.2">Y</Element>
+      <Element fraction="1">Si</Element>
+      <Element fraction="5">O</Element>
+      <!-- Dopant concentration pulled ou of my (AB) hat... placeholder shouldn't affect anything -->
+      <Element fraction="1e-5">Ce</Element>
+    </Components>
+    <!-- Yield per MeV photon (75% of NaI) -->
+    <Property name="SCINTILLATIONYIELD">
+      <value energy="1.0" unit="1./MeV">40E+03</value>
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.0</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">1</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">41</value>
+    </Property>
+  </Material>
+
   
   <Material name="AlTeflon">
     <density unit="g/cm3">2.256</density>

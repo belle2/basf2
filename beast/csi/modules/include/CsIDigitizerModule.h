@@ -210,7 +210,7 @@ namespace Belle2 {
       const double m_tTransitPMT = 48; /**< 48Mean transit time of the PMT signal (in ns) */
       const double m_Zl = 50;    /**< Line impedance of the analog chain (to get voltage from anode current) */
 
-      StoreArray<CsiHit> m_aHit; /**<  The result of each incoming particle in a crystal */
+      StoreArray<CsiHit>     m_aHit; /**<  Time-accumulated hits... deprecated      */
       StoreArray<CsiSimHit>  m_aSimHit; /**< Each simulated particle in the crystal */
       StoreArray<CsiDigiHit> m_aDigiHit; /**< Output: a digitized hit */
 

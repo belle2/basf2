@@ -51,8 +51,8 @@ namespace Belle2 {
       m_cellID = 0;
 
 
-      // CsiHitIndex: array of 16 (Nb. crystals) x 80 (max time index (tof [ns]/100))
-      for (int i = 0; i < 16; i++) {for (int j = 0; j < 80; j++) { CsiHitIndex[i][j] = 0;}}
+      // CsiHitIndex: array of 18 (Nb. crystals) x 80 (max time index (tof [ns]/100))
+      for (int i = 0; i < 18; i++) {for (int j = 0; j < 80; j++) { CsiHitIndex[i][j] = 0;}}
 
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
@@ -205,7 +205,7 @@ namespace Belle2 {
 
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
         m_oldEvnetNumber = m_currentEvnetNumber;
-        for (int iCSICell = 0; iCSICell < 16; iCSICell++) {
+        for (int iCSICell = 0; iCSICell < 18; iCSICell++) {
           for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
             CsiHitIndex[iCSICell][TimeIndex] = -1;
           }

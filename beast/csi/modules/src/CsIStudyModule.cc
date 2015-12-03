@@ -11,6 +11,8 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <beast/csi/modules/CsiModule.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 #include <beast/csi/dataobjects/CsiHit.h>
@@ -51,7 +53,8 @@ CsIStudyModule::CsIStudyModule() : HistoModule(),
   h_Gate(NULL),
   h_Charge(NULL),
   h_TrueEdep(NULL),
-  h_Height(NULL)
+  h_Height(NULL),
+  h_Weight(NULL)
 
 {
   // Set module properties
@@ -82,9 +85,8 @@ void CsIStudyModule::defineHisto()
   h_Gate                = new TH1C("Gate", "Recorded gate;Time index;ADC bits", m_nWFSamples, 0, m_nWFSamples - 1);
   h_Charge              = new TH1F("Charge", "log_{10} of integrated Charge", 200, 0, 10);
   h_TrueEdep            = new TH1F("TrueEdep", "log_{10} of true deposited energy/GeV", 200, -6, 0);
-
   h_Height              = new TH1F("Height", "log10 of pulse height", 200, 0, 6);
-
+  h_Weight              = new TH1F("Weight", "Distribution of the event weights form the generator", 1000, 0, 10);
 }
 
 void CsIStudyModule::initialize()
@@ -111,6 +113,12 @@ void CsIStudyModule::endRun()
 
 void CsIStudyModule::event()
 {
+
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  double eventWeight = eventMetaDataPtr->getGeneratedWeight();
+
+  h_Weight->Fill(eventWeight);
+
   //Loop over CsiHits
   if (m_hits.getEntries() > 0) {
     int hitNum = m_hits.getEntries(); /**< Number of Crystal hits */
@@ -130,12 +138,12 @@ void CsIStudyModule::event()
       E_tmp[m_cellID] += edep;
 
       // Fill histograms
-      h_CrystalSpectrum->Fill(edep);
-      h_CrystalEdep->Fill(m_cellID, edep);
-      h_CrystalRadDose->Fill(m_cellID, edep * edeptodose);
+      h_CrystalSpectrum->Fill(edep, eventWeight);
+      h_CrystalEdep->Fill(m_cellID, edep * eventWeight);
+      h_CrystalRadDose->Fill(m_cellID, edep * edeptodose * eventWeight);
 
       //Number of hits per second
-      h_NhitCrystal->Fill(m_cellID, 1.0e9 / Sampletime);
+      h_NhitCrystal->Fill(m_cellID, eventWeight * 1.0e9 / Sampletime);
     }
   }
 
@@ -144,7 +152,7 @@ void CsIStudyModule::event()
     int hitNum = m_simhits.getEntries(); /**< Number of Crystal hits */
 
     double Mass = 5;  /**< Mass of the crystal **/
-    double  edeptodose = GeVtoJ / Mass * usInYr / Sampletime;/**< Get dose in Gy/yr from Edep */
+    double edeptodose = GeVtoJ / Mass * usInYr / Sampletime;/**< Get dose in Gy/yr from Edep */
 
     /// Actual looping over CsISimHits
     for (int i = 0; i < hitNum; i++) {
@@ -153,11 +161,11 @@ void CsIStudyModule::event()
       double edep = aCsIHit->getEnergyDep();     /**< Energy deposited in the current hit */
 
       // Fill histograms
-      h_CrystalRadDoseSH->Fill(m_cellID, edep * edeptodose);
+      h_CrystalRadDoseSH->Fill(m_cellID, eventWeight * edep * edeptodose);
 
       // To get the Number of photons per GeV (divide by total edep before plotting)
       if (22 == aCsIHit->getPDGCode()) {
-        h_LightYieldCrystal->Fill(m_cellID);
+        h_LightYieldCrystal->Fill(m_cellID, eventWeight);
       }
     }
   }
@@ -179,9 +187,9 @@ void CsIStudyModule::event()
       vector<uint16_t>* waveform = aCsIDigiHit->getWaveform();
       vector<uint8_t>* status = aCsIDigiHit->getStatusBits();
 
-      h_TrueEdep->Fill(log10(trueEdep));
-      h_Charge->Fill(log10(charge - baseline));
-      h_Height->Fill(log10(height));
+      h_TrueEdep->Fill(log10(trueEdep), eventWeight);
+      h_Charge->Fill(log10(charge - baseline), eventWeight);
+      h_Height->Fill(log10(height), eventWeight);
 
       // Write the wavforms. All have the same number in the TFile, but
       // we can access them by their cycle number:

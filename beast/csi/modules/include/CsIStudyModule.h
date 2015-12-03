@@ -109,6 +109,7 @@ namespace Belle2 {
     TH1F* h_Charge ;            /**< Distribution of the integrated charge from the pulse processing algorithm*/
     TH1F* h_TrueEdep;           /**< Distribution of the true total deposited energy in the event*/
     TH1F* h_Height;           /**< Max height of the peak signa( */
+    TH1F* h_Weight;           /**< Event weight assigned by the generator */
 
 
 

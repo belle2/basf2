@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Igal Jaegle                               *
+ * Contributors: Martin Ritter, Igal Jaegle, Alexandre Beaulieu           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -158,6 +158,8 @@ namespace Belle2 {
         CrystalVisAtt->SetColour(18.0 / 256, 230.0 / 256, 3.0 / 256);
       } else if (strMatCrystal.compare("CsI-Tl") == 0) {
         CrystalVisAtt->SetColour(0.0, 0.5, 1.0);
+      } else if (strMatCrystal.compare("LYSO") == 0) {
+        CrystalVisAtt->SetColour(0.820, 0.148, 0.1875);
       }
 
       ////////// add foil dimensions ////////////////////////////
@@ -233,7 +235,7 @@ namespace Belle2 {
       double fold   = content.getLength("Enclosures/Fold") * CLHEP::cm;
       double lidthk = content.getLength("Enclosures/LidThickness") * CLHEP::cm;
       double halflength = 15.0 * CLHEP::cm;
-      double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis to make crystal tough the panel **/
+      double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis to make crystal touch the panel **/
 
       string strMatEnclosure = content.getString("Enclosures/Material", "5052-Alloy");
       G4Material* EnclosureMat = geometry::Materials::get(strMatEnclosure);

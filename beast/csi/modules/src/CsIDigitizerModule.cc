@@ -74,7 +74,7 @@ void CsIDigitizerModule::initialize()
 
   B2DEBUG(100, "Initializing ");
 
-  m_aHit.isRequired();
+  //m_aHit.isRequired();
   m_aSimHit.isRequired();
   m_aDigiHit.registerInDataStore();
 
@@ -87,10 +87,15 @@ void CsIDigitizerModule::initialize()
   for (uint i = 0; i != m_LY.size(); ++i) {
     csip->Print(i, 80);
 
-    m_LY.at(i)     = 1e3 * csip->GetMaterialProperty(i, "SCINTILLATIONYIELD");
-    m_tFast.at(i)  = csip->GetMaterialProperty(i, "FASTTIMECONSTANT");
-    m_tSlow.at(i)  = csip->GetMaterialProperty(i, "SLOWTIMECONSTANT");
-    m_tRatio.at(i) = csip->GetMaterialProperty(i, "YIELDRATIO");
+    m_LY.at(i)     = 1;//1e3 * csip->GetMaterialProperty(i, "SCINTILLATIONYIELD");
+    m_tFast.at(i)  = 1;//csip->GetMaterialProperty(i, "FASTTIMECONSTANT");
+    m_tSlow.at(i)  = 1;//csip->GetMaterialProperty(i, "SLOWTIMECONSTANT");
+    m_tRatio.at(i) = 1;//csip->GetMaterialProperty(i, "YIELDRATIO");
+  }
+
+  //Operate the pure CsI at higher gain to compensate for lower light yield
+  for (int i = 8; i < 16; i++) {
+    m_PmtGain[i] = 35e5;
   }
 
 }
@@ -107,7 +112,7 @@ void CsIDigitizerModule::event()
 
   B2DEBUG(80, "Digitingevent  " << m_currentEventNumber);
 
-  //Loop over CsiHits
+  //Loop over CsiSimHits
   if (m_aSimHit.getEntries() > 0) {
     int hitNum = m_aSimHit.getEntries(); /**< Number of Crystal hits */
 
@@ -179,10 +184,7 @@ void CsIDigitizerModule::event()
         uint16_t max = doChargeIntegration(tempSignal, 128, &m_Baseline, &m_Charge, &m_Time, &m_Waveform,
                                            &m_DPPCIBits,  5, 1.2e4, 1e4, 1e3, recordWaveform);
 
-
         if (m_Charge > 0) {
-
-          //StoreArray<CsiDigit> m_aDigiHit;
           if (!m_aDigiHit) m_aDigiHit.create();
           m_aDigiHit.appendNew();
           m_hitNum = m_aDigiHit.getEntries() - 1;
@@ -256,6 +258,10 @@ uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16
   vector<int>::iterator it;
   float tempBaseline = 0.0;
 
+  // Saving inverse number of samples used for baseline averaging (avoid division)
+  const double invMaxNavgBL = 1.0 / _NsamBL; /**< 1 / N_samples used for baseline averaging for most of the signal*/
+  double invNavgBL = 0.0;                   /**< 1 / N_samples used for baseline averaging (at beginning of signal)*/
+
   _Waveform->resize(nSam, 0);
   _DPPCIBits->resize(nSam, 0);
 
@@ -286,14 +292,19 @@ uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16
 
       baselineBuffer.push_back(*it);
 
-      if ((i + 1)  >  _NsamBL)
+
+      if ((i + 1)  >  _NsamBL) {
         baselineBuffer.pop_front();
+        invNavgBL = invMaxNavgBL;
+      } else {
+        invNavgBL = (1.0 / i);
+      }
 
       tempBaseline = 0;
       for (list<int>::iterator itbl = baselineBuffer.begin(); itbl != baselineBuffer.end(); ++itbl)
         tempBaseline += (float) * itbl;
 
-      tempBaseline /= baselineBuffer.size();
+      tempBaseline *= invNavgBL;
 
       baseline = (int) round(tempBaseline);
 
@@ -397,13 +408,13 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
   B2DEBUG(150, "Filling edepos vector. Container length is " << _nsam);
 
   for (Signal::iterator it = _times.begin() ; it != _times.end(); ++it, ++i) {
+    sumEnergies += _energies.at(i);
     // time index +/- 1 time bin
     int timeIndex = ((int)(*it - t0) * invdt  + ioffset);
     if ((timeIndex - 1) > (int) edepos.size()) {
       B2WARNING(" genTimeSignal: TimeIndex greater than length of signal container. Skipping deposit of " << _energies.at(i) << "GeV");
     } else {
       edepos.at(timeIndex) += _energies.at(i);
-      sumEnergies += _energies.at(i);
     }
   }
 

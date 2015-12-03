@@ -77,7 +77,7 @@ namespace Belle2 {
       double m_energyDeposit;     /** energy deposited in volume */
       double m_trackLength;       /** length of the track in the volume */
 
-      int CsiHitIndex[16][80]; /** Hit index of StoreArray */
+      int CsiHitIndex[18][80]; /** Hit index of StoreArray */
       int iECLCell;              /** Hit Energy of StoreArray */
       int TimeIndex;             /** Hit Time of StoreArray */
       //TVector3 PosCell;          /** center of crystal position */

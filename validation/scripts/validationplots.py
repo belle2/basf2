@@ -18,6 +18,7 @@ import numbers
 import ROOT
 # The pretty printer. Print prettier :)
 import pprint
+import validationcomparison
 
 try:
     import simplejson as json
@@ -1334,19 +1335,49 @@ class Plotuple:
             p-value)
         @return: None
         """
-        pvalue = self.reference.object.Chi2Test(self.newest.object)
 
-        # If pvalue < 0.01: Very strong presumption against neutral hypothesis
-        if pvalue < 0.01:
+        fail_message = "Comparison failed: "
+        pvalue = None
+        # will be set to true, if for some reason no Chi^2 test could be performed,
+        # but the two objects are still different (for example different bin size)
+        no_comparison_but_still_different = False
+
+        # execute the chi2 test, extract the relevant values and handle
+        # possible exceptions
+        try:
+            ctest = validationcomparison.Chi2Test(self.reference.object, self.newest.object)
+            pvalue = ctest.pvalue()
+            chi2 = ctest.chi2()
+            chi2ndf = ctest.chi2ndf()
+        except validationcomparison.ObjectsNotSupported as e:
+            self.chi2test_result = fail_message + str(e)
+        except validationcomparison.DifferingBinCount as e:
+            self.chi2test_result = fail_message + str(e)
+            no_comparison_but_still_different = True
+        except validationcomparison.TooFewBins as e:
+            self.chi2test_result = fail_message + str(e)
+        except validationcomparison.ComparisonFailed as e:
+            self.chi2test_result = fail_message + str(e)
+            no_comparison_but_still_different = True
+
+        if no_comparison_but_still_different:
             canvas.SetFillColor(ROOT.kRed)
-        # If pvalue < 1: Deviations at least exists
-        elif pvalue < 1:
-            canvas.SetFillColor(ROOT.kOrange)
+            self.pvalue = 0.0
 
-        self.chi2test_result = ('Performed Chi^2-Test between '
-                                'reference and {0}'
-                                .format(self.newest.revision))
-        self.pvalue = pvalue
+        if pvalue is not None:
+            # If pvalue < 0.01: Very strong presumption against neutral hypothesis
+            if pvalue < 0.01:
+                canvas.SetFillColor(ROOT.kRed)
+            # If pvalue < 1: Deviations at least exists
+            elif pvalue < 1:
+                canvas.SetFillColor(ROOT.kOrange)
+
+            self.chi2test_result = ('Performed Chi^2-Test between '
+                                    'reference and {0} (Chi^2 = {1} Chi^2/NDF = {2})'
+                                    .format(self.newest.revision, chi2, chi2ndf))
+            self.pvalue = pvalue
+        else:
+            self.pvalue = None
 
     def draw_ref(self, canvas):
         """!

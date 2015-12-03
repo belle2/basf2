@@ -72,7 +72,7 @@ namespace Belle2 {
        *  returned_cell_weight - CellWeight this filter should return when called. Defaults to NOT_A_CELL
        *  varsets - Comma separated list of names refering to concrete variable sets.
        */
-      virtual void setParameter(const std::string& key, const std::string& value)
+      virtual void setParameter(const std::string& key, const std::string& value) override
       {
         if (key == "varsets") {
           m_commaSeparatedVarSetNames = value;
@@ -84,7 +84,7 @@ namespace Belle2 {
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
-      virtual std::map<std::string, std::string> getParameterDescription()
+      virtual std::map<std::string, std::string> getParameterDescription() override
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
         des["varset"] = "Comma separated list of names refering to concrete variable sets.";

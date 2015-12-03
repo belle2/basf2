@@ -51,7 +51,7 @@ namespace Belle2 {
        *  weight_folder - The name of the folder to look for weight files from trainings.
        *  training_name - The name of the training that should be used for the prediction.
        */
-      virtual void setParameter(const std::string& key, const std::string& value)
+      virtual void setParameter(const std::string& key, const std::string& value) override
       {
         if (key == "cut") {
           m_param_cut = stod(value);
@@ -70,7 +70,7 @@ namespace Belle2 {
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
-      virtual std::map<std::string, std::string> getParameterDescription()
+      virtual std::map<std::string, std::string> getParameterDescription() override
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected";

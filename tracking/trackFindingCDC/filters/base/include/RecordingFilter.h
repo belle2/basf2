@@ -62,7 +62,7 @@ namespace Belle2 {
        *  tree_name -  Name of the Tree to be written.
        *  returned_cell_weight - CellWeight this filter should return when called. Defaults to NOT_A_CELL
        */
-      virtual void setParameter(const std::string& key, const std::string& value)
+      virtual void setParameter(const std::string& key, const std::string& value) override
       {
         if (key == "root_file_name") {
           m_rootFileName = value;
@@ -80,7 +80,7 @@ namespace Belle2 {
 
       /** Returns a map of keys to descriptions describing the individual parameters of the filter.
        */
-      virtual std::map<std::string, std::string> getParameterDescription()
+      virtual std::map<std::string, std::string> getParameterDescription() override
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected";

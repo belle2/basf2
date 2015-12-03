@@ -59,11 +59,13 @@ VXDCDCMergerAnalysisModule::VXDCDCMergerAnalysisModule() : Module(),
   setDescription("Analysis module for VXDCDCTrackMerger. This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC and creates a root file.");
 
   //input tracks and candidates
-  addParam("GFTracksColName",  m_GFTracksColName,  "GFTrack collection (from GenFit)");
+  //  addParam("GFTracksColName",  m_GFTracksColName,  "GFTrack collection (from GenFit)");
   addParam("VXDGFTracksColName",  m_VXDGFTracksColName,  "VXDl GFTrack collection (from GFTrackSplitter)");
   addParam("CDCGFTracksColName", m_CDCGFTracksColName, "CDC GFTrack collection (from GFTrackSplitter)");
-  addParam("TrackCandColName", m_TrackCandColName, "Track Cand collection (from TrackFinder)");
-  addParam("UnMergedCands", m_UnMergedCands, "Merged cands Collection for EvtDisplay");
+  addParam("VXDGFTrackCandsColName",  m_VXDGFTrackCandsColName,  "VXD GFTrackCand collection (from GFTrackSplitter)");
+  addParam("CDCGFTrackCandsColName", m_CDCGFTrackCandsColName, "CDC GFTrackCand collection (from GFTrackSplitter)");
+  //  addParam("TrackCandColName", m_TrackCandColName, "Track Cand collection (from TrackFinder)");
+  //  addParam("UnMergedCands", m_UnMergedCands, "Merged cands Collection for EvtDisplay");
 
   //Chi2 Cut
   addParam("root_output_filename", m_root_output_filename, "ROOT file for tracks merger analysis",
@@ -78,11 +80,13 @@ VXDCDCMergerAnalysisModule::~VXDCDCMergerAnalysisModule()
 void VXDCDCMergerAnalysisModule::initialize()
 {
 
-  StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
-  StoreArray<genfit::Track>::required(m_GFTracksColName);
-  StoreArray<genfit::TrackCand>::registerPersistent(m_UnMergedCands);
+  //StoreArray<genfit::TrackCand>::required(m_TrackCandColName);
+  //StoreArray<genfit::Track>::required(m_GFTracksColName);
+  //StoreArray<genfit::TrackCand>::registerPersistent(m_UnMergedCands);
   StoreArray<genfit::Track>::required(m_VXDGFTracksColName);
   StoreArray<genfit::Track>::required(m_CDCGFTracksColName);
+  StoreArray<genfit::TrackCand>::required(m_CDCGFTrackCandsColName);
+  StoreArray<genfit::TrackCand>::required(m_CDCGFTrackCandsColName);
 
   //m_CDC_wall_radius = 16.25;
   m_total_pairs         = 0;
@@ -204,9 +208,12 @@ void VXDCDCMergerAnalysisModule::event()
   B2INFO("VXDCDCMerger: input Number of Silicon Tracks: " << nVXDTracks);
   if (nVXDTracks == 0) B2WARNING("VXDCDCMerger: VXDGFTracksCollection is empty!");
 
-  StoreArray<genfit::Track> GFTracks(m_GFTracksColName);
-  StoreArray<genfit::TrackCand> UnMergedCands(m_UnMergedCands);
-  const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
+  StoreArray<genfit::TrackCand> VXDGFTrackCands(m_VXDGFTrackCandsColName);
+  StoreArray<genfit::TrackCand> CDCGFTrackCands(m_CDCGFTrackCandsColName);
+
+  //StoreArray<genfit::Track> GFTracks(m_GFTracksColName);
+  //StoreArray<genfit::TrackCand> UnMergedCands(m_UnMergedCands);
+  //const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
 
   RelationArray CDCToVXDTracks(CDCGFTracks, VXDGFTracks);
 
@@ -326,14 +333,18 @@ void VXDCDCMergerAnalysisModule::event()
 
       //RECOVER MC INFO (We have to loop on the original list (not splitted) of GFTracks)
       //Recover track candidate index
-      genfit::Track* GFTrk = GFTracks[itrack];
-      const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+      /////TENTATIVE MODS
+      //genfit::Track* GFTrk = GFTracks[itrack];
+      //const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+      const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(CDCGFTracks[itrack],
+                                                m_CDCGFTrackCandsColName);
       if (cdc_TrkCandPtr == NULL) {
         continue;
       }
       cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
-      GFTrk = GFTracks[jtrack + nCDCTracks];
-      const genfit::TrackCand* vxd_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+      //GFTrk = GFTracks[jtrack + nCDCTracks];
+      const genfit::TrackCand* vxd_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(VXDGFTracks[jtrack],
+                                                m_VXDGFTrackCandsColName);
       if (vxd_TrkCandPtr == NULL) {
         continue;
       }
@@ -410,8 +421,8 @@ void VXDCDCMergerAnalysisModule::event()
       m_match_vec->push_back(0);
       m_reco_vec->push_back(0);
       m_right_match_vec->push_back(0);
-      const genfit::TrackCand* UnMergedTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>((GFTracks[itrack]), m_TrackCandColName);
-      UnMergedCands.appendNew(*UnMergedTrkCandPtr);
+      //const genfit::TrackCand* UnMergedTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>((GFTracks[itrack]), m_TrackCandColName);
+      //UnMergedCands.appendNew(*UnMergedTrkCandPtr);
     }
 
     if (((matched_track == 1) || (recovered_track == 1)) && (truth_matched == 0)) {

@@ -34,9 +34,11 @@ namespace Belle2 {
     double m_merge_radius;
     std::string m_VXDGFTracksColName;
     std::string m_CDCGFTracksColName;
-    std::string m_GFTracksColName;
-    std::string m_TrackCandColName;
-    std::string m_UnMergedCands;
+    std::string m_VXDGFTrackCandsColName;
+    std::string m_CDCGFTrackCandsColName;
+    //std::string m_GFTracksColName;
+    //std::string m_TrackCandColName;
+    //std::string m_UnMergedCands;
     //std::string m_mcParticlesColName;
     //position at which a cdc track crosses  the cdc wall
     //std::vector<std::vector<std::vector<TVector3>*>*>* m_cdc_tracks_position;

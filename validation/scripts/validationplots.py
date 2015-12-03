@@ -19,7 +19,7 @@ import ROOT
 # The pretty printer. Print prettier :)
 import pprint
 import validationcomparison
-import validation
+import metaoptions
 
 try:
     import simplejson as json
@@ -1367,7 +1367,7 @@ class Plotuple:
 
         if pvalue is not None:
             # check if there is a custom setting for pvalue sensitivity
-            mop = validation.MetaOptionParser(self.metaoptions)
+            mop = metaoptions.MetaOptionParser(self.metaoptions)
             pvalue_warn = mop.pvalue_warn()
             pvalue_error = mop.pvalue_error()
 

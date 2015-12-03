@@ -14,6 +14,7 @@ import shutil
 import sys
 import time
 import numbers
+import queue
 # Load ROOT
 import ROOT
 # The pretty printer. Print prettier :)
@@ -541,12 +542,12 @@ def plot_matrix(list_of_plotuples, package, list_of_revisions, *args):
     return html
 
 
-def generate_new_plots(list_of_revisions, process_pipe=None):
+def generate_new_plots(list_of_revisions, process_queue=None):
     """
     Creates the plots that
     contain the requested revisions. Each plot (or n-tuple, for that matter)
     is stored in an object of class Plot.
-    @param process_pipe: communication Pipe object, which is used in
+    @param process_queue: communication queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
     :return: No return value
     """
@@ -631,8 +632,6 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
                 files_in_pkg.append(rootfile_name)
         files_in_pkg.sort()
 
-        print('Files in pkg:', files_in_pkg)
-
         # Now we loop over all files that belong to the package to
         # group the plots correctly
         for rootfile in files_in_pkg:
@@ -662,17 +661,20 @@ def generate_new_plots(list_of_revisions, process_pipe=None):
             # A list in which we keep all the plotuples for this file
             list_of_plotuples = []
 
+            # report the progress over the queue object, if available
+            if process_queue:
+                try:
+                    process_queue.put_nowait({"current_package": i, "total_package": len(list_of_packages),
+                                              "package_name": package, "file_name": fileName})
+                except queue.Full:
+                    # message could not be placed, but no problem next message will maybe work
+                    pass
+
             # Now loop over ALL keys (within a file, objects will be
             # sorted by key)
             i_key = 0
             for key in sorted(list_of_keys):
                 i_key = i_key + 1
-
-                # report the progress over the Pipe object, if available
-                if process_pipe:
-                    process_pipe.send({"current_package": i, "total_package": len(list_of_packages),
-                                       "package_name": package, "file_name": fileName,
-                                       "current_item": i_key, "total_item": len(list_of_keys)})
 
                 # Find all objects for the Plotuple that is defined by the
                 # package, the file and the key
@@ -1852,7 +1854,7 @@ class Plotuple:
 ##############################################################################
 
 
-def create_plots(revisions=None, force=False, process_pipe=None):
+def create_plots(revisions=None, force=False, process_queue=None):
     """!
     This function generates the plots and html
     page for the requested revisions.
@@ -1862,7 +1864,7 @@ def create_plots(revisions=None, force=False, process_pipe=None):
     @param revisions: The revisions which should be taken into account.
     @param force: If True, plots are created even if there already is a version
         of them (which may me deprecated, though)
-    @param process_pipe: communication Pipe object, which is used in
+    @param process_queue: communication Queue object, which is used in
            multi-processing mode to report the progress of the plot creating.
     """
 
@@ -1902,7 +1904,7 @@ def create_plots(revisions=None, force=False, process_pipe=None):
         print('Served existing plots.')
     # Otherwise: Create the requested plots
     else:
-        generate_new_plots(list_of_revisions, process_pipe)
+        generate_new_plots(list_of_revisions, process_queue)
 
         # Check if we generated the default view (i.e. all available revisions
         # and the references). If this is the case, copy these files to the
@@ -1924,5 +1926,6 @@ def create_plots(revisions=None, force=False, process_pipe=None):
                   'base directory! \n')
 
     # signal the main process that the plot creation is complete
-    if process_pipe:
-        process_pipe.send({"status": "complete"})
+    if process_queue:
+        process_queue.put({"status": "complete"})
+        process_queue.close()

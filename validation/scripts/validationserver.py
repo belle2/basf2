@@ -12,7 +12,8 @@ import webbrowser
 from urllib.parse import parse_qs
 from cgi import parse_header, parse_multipart
 from save import create_image_matrix, merge_multiple_plots
-from multiprocessing import Process, Pipe
+from multiprocessing import Process, Queue
+import queue
 from urllib.parse import urlparse
 import time
 from functools import reduce
@@ -85,18 +86,19 @@ def check_plotting_status(progress_key):
     if progress_key not in g_plottingProcesses:
         return None
 
-    process, process_pipe, last_status = g_plottingProcesses[progress_key]
+    process, qu, last_status = g_plottingProcesses[progress_key]
 
-    print("process is alive " + str(process.is_alive()))
     # read latest message
-    while process_pipe.poll():
-        msg = process_pipe.recv()
+    try:
+        # read as much entries from the queue as possible
+        while not qu.empty():
+            msg = qu.get_nowait()
+            last_status = msg
 
-        print("received : " + str(msg))
-        last_status = msg
-
-        # update the last status
-        g_plottingProcesses[progress_key] = (process, process_pipe, last_status)
+            # update the last status
+            g_plottingProcesses[progress_key] = (process, qu, last_status)
+    except queue.Empty:
+        pass
 
     return last_status
 
@@ -108,13 +110,13 @@ def start_plotting_request(revision_names):
     if rev_key in g_plottingProcesses:
         return rev_key
 
-    # create Pipe to stream progress
-    parent_conn, child_conn = Pipe()
+    # create queue to stream progress, only one directional from parent to child
+    qu = Queue()
 
     # start a new process for creating the plots
-    p = Process(target=create_plots, args=(revision_names, False, child_conn))
+    p = Process(target=create_plots, args=(revision_names, False, qu))
     p.start()
-    g_plottingProcesses[rev_key] = (p, parent_conn, None)
+    g_plottingProcesses[rev_key] = (p, qu, None)
 
     return rev_key
 

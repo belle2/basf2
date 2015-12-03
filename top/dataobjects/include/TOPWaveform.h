@@ -63,7 +63,7 @@ namespace Belle2 {
     {}
 
     /**
-     * Append waveform sample to waveform
+     * Appends waveform sample to waveform
      * @param sample waveform sample
      */
     void appendSample(WFSample sample)
@@ -75,6 +75,18 @@ namespace Belle2 {
       }
       m_data.push_back(sample);
     }
+
+    /**
+     * Appends ASIC window number of the raw waveform
+     * @param window window number
+     */
+    void appendWindowNumber(unsigned window) { m_windows.push_back(window);}
+
+    /**
+     * Sets reference ASIC window number
+     * @param window window number
+     */
+    void setReferenceWindow(unsigned window) {m_refWindow = window;}
 
     /**
      * Sets digital waveform, emulating comparator with hysteresis
@@ -154,6 +166,28 @@ namespace Belle2 {
      */
     const std::vector<Hit>& getHits() const {return m_hits;}
 
+    /**
+     * Returns ASIC window numbers
+     * @return vector of window numbers
+     */
+    const std::vector<unsigned short>& getWindowNumbers() const { return m_windows;}
+
+    /**
+     * Returns first ASIC window number
+     * @return first window number
+     */
+    unsigned getFirstWindow() const
+    {
+      if (m_windows.empty()) return 0;
+      return m_windows[0];
+    }
+
+    /**
+     * Returns reference ASIC window number
+     * @return reference window number
+     */
+    unsigned getReferenceWindow() const {return m_refWindow;}
+
 
   private:
 
@@ -163,8 +197,10 @@ namespace Belle2 {
     std::vector<WFSample> m_data;       /**< waveform samples */
     std::vector<bool> m_digital;        /**< digital waveform (samples over threshold) */
     std::vector<Hit> m_hits;            /**< reconstructed hits */
+    std::vector<unsigned short> m_windows; /**< ASIC window numbers */
+    unsigned short m_refWindow = 0; /**< reference ASIC window number */
 
-    ClassDef(TOPWaveform, 1); /**< ClassDef */
+    ClassDef(TOPWaveform, 2); /**< ClassDef */
 
   };
 

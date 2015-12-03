@@ -54,56 +54,70 @@ namespace Belle2 {
     {}
 
     /**
-     * Set time in [ns]
+     * Sets time in [ns]
      * @param time time in [ns]
      */
     void setTime(double time) {m_time = time;}
 
     /**
-     * Set digitized detection time
+     * Sets digitized detection time
      * @param TDC digitized time
      */
     void setTDC(int TDC) {m_TDC = TDC;}
 
     /**
-     * Set digitized pulse height or integrated charge
+     * Sets digitized pulse height or integrated charge
      * @param ADC pulse heigth or integrated charge
      */
     void setADC(int ADC) {m_ADC = ADC;}
 
     /**
-     * Set digitized pulse width
+     * Sets digitized pulse width
      * @param width pulse width
      */
     void setPulseWidth(int width) {m_pulseWidth = width;}
 
     /**
-     * Set hardware channel ID (0-based)
+     * Sets hardware channel ID (0-based)
      * @param channel hardware channel ID
      */
     void setChannelID(unsigned int channel) {m_channelID = channel;}
 
     /**
-     * Set hardware channel ID (0-based)
+     * Sets first ASIC window number of the merged waveform this hit is taken from
+     * @param window ASIC window number
+     */
+    void setFirstWindow(unsigned window) { m_firstWindow = window;}
+
+    /**
+     * Sets reference ASIC window number of the merged waveform this hit is taken from
+     * This corresponds to the last window in the analog memory sampled.
+     * All timing is a "look-back" from this window.
+     * @param window ASIC window number
+     */
+    void setReferenceWindow(unsigned window) { m_refWindow = window;}
+
+    /**
+     * Sets hardware channel ID (0-based)
      * @param channel hardware channel ID
      */
     void setHardwareChannelID(unsigned int channel)  __attribute__((deprecated("Please use setChannelID()")))
     {m_channelID = channel;}
 
     /**
-     * Set hit quality
+     * Sets hit quality
      * @param quality hit quality
      */
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
 
     /**
-     * Set double hit resolution
+     * Sets double hit resolution
      * @param time double hit resolving time in [ns]
      */
     static void setDoubleHitResolution(double time) {s_doubleHitResolution = time;}
 
     /**
-     * Set pile-up time
+     * Sets pile-up time
      * @param time pile-up time in [ns]
      */
     static void setPileupTime(double time) {s_pileupTime = time;}
@@ -223,7 +237,6 @@ namespace Belle2 {
      */
     unsigned int getASICChannel() const {return m_channelID & 0x07;}
 
-
     /**
      * Returns ASIC number
      * @return ASIC number
@@ -241,6 +254,20 @@ namespace Belle2 {
      * @return boardstack number
      */
     unsigned int getBoardstackNumber() const {return (m_channelID >> 7) & 0x03;}
+
+    /**
+     * Returns first ASIC window number of the merged waveform this hit is taken from
+     * @return window number
+     */
+    unsigned getFirstWindow() const { return m_firstWindow;}
+
+    /**
+     * Returns reference ASIC window number of the merged waveform this hit is taken from
+     * This corresponds to the last window in the analog memory sampled.
+     * All timing is a "look-back" from this window.
+     * @return window number
+     */
+    unsigned getReferenceWindow() const { return m_refWindow;}
 
     /**
      * Implementation of the base class function.
@@ -267,11 +294,13 @@ namespace Belle2 {
     unsigned m_channelID = 0;   /**< hardware channel ID (0-based) */
     EHitQuality m_quality = c_Junk;  /**< hit quality */
     float m_time = 0;        /**< time in [ns], converted from TDC, t0-subtracted */
+    unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
+    unsigned short m_refWindow = 0; /**< reference ASIC window */
 
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 8); /**< ClassDef */
+    ClassDef(TOPDigit, 9); /**< ClassDef */
 
   };
 

@@ -175,6 +175,8 @@ namespace Belle2 {
       auto barID = waveform.getBarID();
       auto pixelID = waveform.getPixelID();
       auto channelID = waveform.getChannelID();
+      auto firstWindow = waveform.getFirstWindow();
+      auto refWindow = waveform.getReferenceWindow();
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
         auto tdc = m_topgp->getTDCcount(hit.time);
@@ -183,6 +185,8 @@ namespace Belle2 {
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
         digit->setChannelID(channelID);
+        digit->setFirstWindow(firstWindow);
+        digit->setReferenceWindow(refWindow);
         digit->addRelationTo(&waveform);
       }
     }
@@ -241,6 +245,8 @@ namespace Belle2 {
       waveform->appendSample(sample);
       i++;
     }
+    waveform->appendWindowNumber(rawWaveform->getStorageWindow());
+    waveform->setReferenceWindow(rawWaveform->getReferenceWindow());
 
     return true;
   }

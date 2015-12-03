@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>Thomas.Hauth@kit.edu</contact>
   <output>CDCFullTrackingValidation.root</output>
   <description>This script validates the full CDC tracking chain with a legendre step first
   and a cellular automaton step second in Y(4S) runs.</description>

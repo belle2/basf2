@@ -171,6 +171,10 @@ class ValidationPlot(object):
         # per default all plots are expert and must be set to non-expert explicitly
         self._is_expert = True
 
+        # custom levels for pvalue warnings and errors
+        self.pvalue_warn = None
+        self.pvalue_error = None
+
     def hist(self,
              xs,
              weights=None,
@@ -489,6 +493,12 @@ class ValidationPlot(object):
                 # add expert option, if requested
                 if self.is_expert:
                     meta_options.append("expert")
+
+                # give a custom pvalue warning / error zone if requested
+                if self.pvalue_error is not None:
+                    meta_options.append("pvalue-error={}".format(self.pvalue_error))
+                if self.pvalue_warn is not None:
+                    meta_options.append("pvalue-warn={}".format(self.pvalue_warn))
 
                 meta_options_str = reduce(lambda x, y: x + y + ",", meta_options, "")[:-1]
                 histogram.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', meta_options_str))

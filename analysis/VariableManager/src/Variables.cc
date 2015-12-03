@@ -381,7 +381,6 @@ namespace Belle2 {
                               * part->getDaughter(1)->get4Vector();
       TLorentzVector vec = tagVec + sigVec;
       return vec.Vect().Mag();
-
     }
 
 // released energy --------------------------------------------------

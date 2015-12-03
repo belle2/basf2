@@ -381,7 +381,7 @@ fake_rate - ratio of pattern recognition tracks that are not related to a partic
             (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
 """
-        figures_of_merit.check = ''
+        figures_of_merit.check = 'Compare for degradations with respect to the reference line'
         figures_of_merit.contact = contact
         print(figures_of_merit)
 

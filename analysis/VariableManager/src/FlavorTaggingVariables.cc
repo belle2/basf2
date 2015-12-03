@@ -54,7 +54,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    // FlavorTagger variables
+    //   ############################################## FlavorTagger Variables   ###############################################
 
     // Track Level Variables ---------------------------------------------------------------------------------------------------
 
@@ -1219,7 +1219,7 @@ namespace Belle2 {
           PCmsLabTransform T;
           Particle* target = nullptr; //Particle selected as target
           float prob = 0; //The probability of beeing right classified flavor from the event level
-          float qTarget = 0; //Flavour of the track selected as target
+          float qTarget = 0; //Flavor of the track selected as target
           if (ListOfParticles.isValid())
           {
             float maximumTargetProb = 0; //Probability of being the target track from the track level
@@ -1346,7 +1346,7 @@ namespace Belle2 {
       }
     }
 
-    VARIABLE_GROUP("Flavour tagging");
+    VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO , "cosine of angle between thrust axis of given particle and thrust axis of ROE");
@@ -1379,10 +1379,10 @@ namespace Belle2 {
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).");
-    REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavour of tag side from MC extracted from the RoE");
+    REGISTER_VARIABLE("McFlavorOfTagSide",  McFlavorOfTagSide, "Flavor of tag side from MC extracted from the RoE");
 
 
-    VARIABLE_GROUP("MetaFunctions FlavorTagging")
+    VARIABLE_GROUP("Flavor Tagger MetaFunctions")
 
     REGISTER_VARIABLE("CheckingVariables(ListName, requestedVariable)", CheckingVariables,
                       "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");

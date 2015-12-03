@@ -370,13 +370,18 @@ rr_size = len(rr_subsample)
 
 eventLevelParticles = [
     ('Electron', 'QrOf__boe__pl__clElectronROE__cm__spisRightCategory__boElectron__bc__cm__spisRightTrack__boElectron__bc__bc'),
-    #    ('IntermediateElectron',
-    # 'QrOf__boe__pl__clROE__cm__spisRightCategory__boIntermediateElectron__bc__cm__spisRightTrack__boIntermediateElectron__bc__bc'),
+    ('IntermediateElectron',
+     'QrOf__boe__pl__clIntermediateElectronROE__cm__spisRightCategory__boIntermediateElectron__bc__cm__sp' +
+     'isRightTrack__boIntermediateElectron__bc__bc'),
     ('Muon', 'QrOf__bomu__pl__clMuonROE__cm__spisRightCategory__boMuon__bc__cm__spisRightTrack__boMuon__bc__bc'),
-    #    ('IntermediateMuon',
-    # 'QrOf__bomu__pl__clROE__cm__spisRightCategory__boIntermediateMuon__bc__cm__spisRightTrack__boIntermediateMuon__bc__bc'),
+    ('IntermediateMuon',
+     'QrOf__bomu__pl__clIntermediateMuonROE__cm__spisRightCategory__boIntermediateMuon__bc__cm__sp' +
+     'isRightTrack__boIntermediateMuon__bc__bc'),
     ('KinLepton',
      'QrOf__bomu__pl__clKinLeptonROE__cm__spisRightCategory__boKinLepton__bc__cm__spisRightTrack__boKinLepton__bc__bc'),
+    ('IntermediateKinLepton',
+     'QrOf__bomu__pl__clIntermediateKinLeptonROE__cm__spisRightCategory__boIntermediateKinLepton__bc__cm__sp' +
+     'isRightTrack__boIntermediateKinLepton__bc__bc'),
     ('Kaon', 'weightedQrOf__boK__pl__clKaonROE__cm__spisRightCategory__boKaon__bc__cm__spisRightTrack__boKaon__bc__bc'),
     ('SlowPion', 'QrOf__bopi__pl__clSlowPionROE__cm__spisRightCategory__boSlowPion__bc__cm__spisRightTrack__boSlowPion__bc__bc'),
     ('FastPion', 'QrOf__bopi__pl__clFastPionROE__cm__spisRightCategory__boFastPion__bc__cm__spisRightTrack__boFastPion__bc__bc'),
@@ -391,10 +396,10 @@ eventLevelParticles = [
 workingDirectory2 = \
     Belle2.FileSystem.findFile('/analysis/data/FlavorTagging/TrainedMethods')
 
-if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA.root'):
-    rootfile2 = ROOT.TFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA.root', 'UPDATE'
+if Belle2.FileSystem.findFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00010203040506070809101112TMVA.root'):
+    rootfile2 = ROOT.TFile(workingDirectory2 + '/B2JpsiKs_muCombinerLevelCatCode00010203040506070809101112TMVA.root', 'UPDATE'
                            )
-    tree2 = rootfile2.Get('B2JpsiKs_muCombinerLevelCatCode00020405060708091011TMVA_tree')
+    tree2 = rootfile2.Get('B2JpsiKs_muCombinerLevelCatCode00010203040506070809101112TMVA_tree')
     rootfile2.cd()
 
     print('****************** MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES *************************')

@@ -720,16 +720,18 @@ def FlavorTagger(
     workingDirectory='.',
     categories=[
         'Electron',
+        'IntermediateElectron',
         'Muon',
+        'IntermediateMuon',
         'KinLepton',
+        'IntermediateKinLepton',
         'Kaon',
         'SlowPion',
         'FastPion',
         'Lambda',
         'FSC',
         'MaximumPstar',
-        'KaonPion',
-    ],
+        'KaonPion'],
     path=analysis_main,
 ):
     """

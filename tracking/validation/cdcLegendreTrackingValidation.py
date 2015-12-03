@@ -29,6 +29,10 @@ class CDCLegendre(TrackingValidationRun):
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 
+    # disabled plotting of tan lambda and theta for this validation because
+    # the seed's theta is 90* for all and therefore this profile plot is useless
+    exclude_profile_pr_parameter = ["Seed tan #lambda", "Seed #theta"]
+
 
 def main():
     validation_run = CDCLegendre()

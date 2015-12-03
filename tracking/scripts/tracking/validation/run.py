@@ -24,6 +24,8 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     contact = TRACKING_MAILING_LIST
     output_file_name = 'TrackingValidation.root'  # Specification for BrowseTFileOnTerminateRunMixin
     pulls = True
+    exclude_profile_mc_parameter = []
+    exclude_profile_pr_parameter = []
 
     # The default way to add the validation module to the path
     # Derived classes can overload this method modify the validation module
@@ -36,7 +38,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
             contact=self.contact,
             fit=fit,
             pulls=self.pulls,
-            output_file_name=self.output_file_name
+            output_file_name=self.output_file_name,
+            exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
+            exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
         )
 
         trackingValidationModule.trackCandidatesColumnName = \

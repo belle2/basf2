@@ -67,7 +67,7 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
         purity=0.001,
     )
 
-    user_chargedFSP = UserCutConfiguration('[dr < 2] and [dz < 4]')
+    user_chargedFSP = UserCutConfiguration('[dr < 2] and [abs(dz) < 4]')
 
     particles.append(Particle('pi+', mva_chargedFSP, pre_chargedFSP, user_chargedFSP,
                               postCutConfig=postCut).addChannel(['pi+:FSP']))

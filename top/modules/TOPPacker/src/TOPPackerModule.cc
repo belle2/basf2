@@ -104,7 +104,7 @@ namespace Belle2 {
 
     for (const auto& digit : digits) {
       int barID = digit.getBarID();
-      int boardstack = digit.getHardwareChannelID() / 128;
+      int boardstack = digit.getChannel() / 128;
       const auto* feemap = mapper.getMap(barID, boardstack);
       if (!feemap) {
         B2ERROR("TOPPacker: no front-end map available for barID " << barID <<
@@ -125,7 +125,7 @@ namespace Belle2 {
         Buffer[finesse].push_back(scrodID + (version << 16) + (dataFormat << 24));
         for (const auto& digit : sortedDigits[feemap->getIndex()]) {
           unsigned tdc = digit->getTDC() & 0xFFFF;
-          unsigned chan = digit->getHardwareChannelID() % 128;
+          unsigned chan = digit->getChannel() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();
           Buffer[finesse].push_back(tdc + (chan << 16) + (flags << 24));
         }

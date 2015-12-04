@@ -184,7 +184,7 @@ namespace Belle2 {
         digit->setTime(hit.time + t0);
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
-        digit->setChannelID(channelID);
+        digit->setChannel(channelID);
         digit->setFirstWindow(firstWindow);
         digit->setReferenceWindow(refWindow);
         digit->addRelationTo(&waveform);

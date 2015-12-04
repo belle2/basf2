@@ -14,7 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <iostream>
 
-
 namespace Belle2 {
 
   /**
@@ -48,10 +47,22 @@ namespace Belle2 {
       m_TDC(TDC),
       m_ADC(0),
       m_pulseWidth(0),
-      m_channelID(0),
+      m_channel(0),
       m_quality(c_Good),
       m_time(0)
     {}
+
+    /**
+     * Sets double hit resolution
+     * @param time double hit resolving time in [ns]
+     */
+    static void setDoubleHitResolution(double time) {s_doubleHitResolution = time;}
+
+    /**
+     * Sets pile-up time
+     * @param time pile-up time in [ns]
+     */
+    static void setPileupTime(double time) {s_pileupTime = time;}
 
     /**
      * Sets time in [ns]
@@ -78,10 +89,17 @@ namespace Belle2 {
     void setPulseWidth(int width) {m_pulseWidth = width;}
 
     /**
-     * Sets hardware channel ID (0-based)
-     * @param channel hardware channel ID
+     * Sets hardware channel number (0-based)
+     * @param channel hardware channel number
      */
-    void setChannelID(unsigned int channel) {m_channelID = channel;}
+    void setChannel(unsigned int channel) {m_channel = channel;}
+
+    /**
+     * Sets hardware channel number (0-based)
+     * @param channel hardware channel number
+     */
+    void setHardwareChannelID(unsigned int channel)  __attribute__((deprecated("Please use setChannel()")))
+    {m_channel = channel;}
 
     /**
      * Sets first ASIC window number of the merged waveform this hit is taken from
@@ -98,29 +116,10 @@ namespace Belle2 {
     void setReferenceWindow(unsigned window) { m_refWindow = window;}
 
     /**
-     * Sets hardware channel ID (0-based)
-     * @param channel hardware channel ID
-     */
-    void setHardwareChannelID(unsigned int channel)  __attribute__((deprecated("Please use setChannelID()")))
-    {m_channelID = channel;}
-
-    /**
      * Sets hit quality
      * @param quality hit quality
      */
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
-
-    /**
-     * Sets double hit resolution
-     * @param time double hit resolving time in [ns]
-     */
-    static void setDoubleHitResolution(double time) {s_doubleHitResolution = time;}
-
-    /**
-     * Sets pile-up time
-     * @param time pile-up time in [ns]
-     */
-    static void setPileupTime(double time) {s_pileupTime = time;}
 
     /**
      * Subtract start time from m_time
@@ -226,34 +225,41 @@ namespace Belle2 {
     int getPulseWidth() const { return m_pulseWidth; }
 
     /**
-     * Returns hardware channel ID
-     * @return hardware channel ID
+     * Returns hardware channel number
+     * @return hardware channel number
      */
-    unsigned int getHardwareChannelID() const { return m_channelID; }
+    unsigned int getChannel() const { return m_channel; }
+
+    /**
+     * Returns hardware channel number
+     * @return hardware channel number
+     */
+    unsigned int getHardwareChannelID() const __attribute__((deprecated("Please use getChannel()")))
+    { return m_channel; }
 
     /**
      * Returns ASIC channel number
      * @return ASIC channel number
      */
-    unsigned int getASICChannel() const {return m_channelID & 0x07;}
+    unsigned int getASICChannel() const {return m_channel & 0x07;}
 
     /**
      * Returns ASIC number
      * @return ASIC number
      */
-    unsigned int getASICNumber() const {return (m_channelID >> 3) & 0x03;}
+    unsigned int getASICNumber() const {return (m_channel >> 3) & 0x03;}
 
     /**
      * Returns carrier board number
      * @return carrier board number
      */
-    unsigned int getCarrierNumber() const {return (m_channelID >> 5) & 0x03;}
+    unsigned int getCarrierNumber() const {return (m_channel >> 5) & 0x03;}
 
     /**
      * Returns boardstack number
      * @return boardstack number
      */
-    unsigned int getBoardstackNumber() const {return (m_channelID >> 7) & 0x03;}
+    unsigned int getBoardstackNumber() const {return (m_channel >> 7) & 0x03;}
 
     /**
      * Returns first ASIC window number of the merged waveform this hit is taken from
@@ -291,7 +297,7 @@ namespace Belle2 {
     int m_TDC = 0;           /**< digitized time */
     int m_ADC = 0;           /**< digitized pulse height or charge (to be decided) */
     int m_pulseWidth = 0;    /**< digitized pulse width */
-    unsigned m_channelID = 0;   /**< hardware channel ID (0-based) */
+    unsigned m_channel = 0;   /**< hardware channel number (0-based) */
     EHitQuality m_quality = c_Junk;  /**< hit quality */
     float m_time = 0;        /**< time in [ns], converted from TDC, t0-subtracted */
     unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
@@ -300,7 +306,7 @@ namespace Belle2 {
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 9); /**< ClassDef */
+    ClassDef(TOPDigit, 10); /**< ClassDef */
 
   };
 

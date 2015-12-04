@@ -23,6 +23,8 @@
 import ROOT
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True
+ROOT.gROOT.SetBatch(True)
+
 from ROOT import TFile, TChain, TTree, TH1F, TH2F, TCanvas, TNamed, gStyle
 import sys
 import math

@@ -21,6 +21,8 @@ class ValidationTest(unittest.TestCase):
 
         self.assertEqual(0.9, p.pvalue_warn())
         self.assertEqual(0.4, p.pvalue_error())
+        self.assertTrue(p.has_option("expert"))
+        self.assertFalse(p.has_option("not is list"))
 
         p = metaoptions.MetaOptionParser(["expert", "pvalue-warn="])
 

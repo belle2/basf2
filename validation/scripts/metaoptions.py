@@ -7,6 +7,9 @@ class MetaOptionParser:
     def __init__(self, meta_option_list):
         self.mo = meta_option_list
 
+    def has_option(self, option_name):
+        return option_name in self.mo
+
     def pvalue_warn(self):
         return self.float_value("pvalue-warn")
 

@@ -63,8 +63,8 @@ void BKLMK0LReconstructorModule::initialize()
   // Force creation and persistence of output datastore and relation
   StoreArray<KLMCluster> klmCluster;
   klmCluster.registerInDataStore();
-  // DIVOT StoreArray<BKLMHit2d> bklmHit2d;
-  // DIVOT klmCluster.registerRelationTo(bklmHit2d);
+  StoreArray<BKLMHit2d> bklmHit2d;
+  klmCluster.registerRelationTo(bklmHit2d);
   StoreArray<ECLCluster> eclCluster;
   klmCluster.registerRelationTo(eclCluster);
 
@@ -130,6 +130,9 @@ AddedToExistingCluster: ;
                             nlayers,
                             hit2ds[clusterIndices[j][innermost]]->getLayer(),
                             mom.x(), mom.y(), mom.z());
+    for (unsigned int k = 0; k < nHits; ++k) {
+      cluster->addRelationTo(hit2ds[clusterIndices[j][k]]);
+    }
     ECLCluster* bestECLCluster = NULL;
     double bestOpeningAngle = M_PI;
     for (int m = 0; m < eclClusters.getEntries(); ++m) {

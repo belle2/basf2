@@ -45,20 +45,36 @@ class ComparisonBase:
 
 class Chi2Test(ComparisonBase):
 
+    """
+    Perform a Chi2Test for ROOT objects
+    """
+
     class ResultQuantity(Enum):
         """
         Used to specific the quantity to extract during the Chi2Test
         """
+
+        # Chi^2
         chi2 = "CHI2"
+
+        # Chi^2 / number of degrees of freedom
         chi2ndf = "CHI2/NDF"
+
+        # the probability value
         pvalue = ""
 
     def __init__(self, objectA, objectB):
         """
         Store the two histograms/profiles operated on
         """
+
+        # store the first object to compare
         self.objectA = objectA
+
+        # store the second object to compare
         self.objectB = objectB
+
+        # used to store, whether the quantities have already been compared
         self.computed = False
 
     def can_compare(self):
@@ -109,6 +125,10 @@ class Chi2Test(ComparisonBase):
         return self.__chi2ndf
 
     def ensure_compute(self):
+        """
+        Ensure all required quantities get computed and are cached inside the class
+        """
+
         # todo: improve the diagnostics of this error message
         # can only be properly set, once the igood value of Chi2Test
         # can be accessed via PyROOT and python3
@@ -118,8 +138,11 @@ class Chi2Test(ComparisonBase):
             #        raise ComparisonFailed(fail_message)
             return
 
+        # compute and store pvalue
         self.__pvalue = self.__internal_compare(self.ResultQuantity.pvalue)
+        # compute and store chi^2
         self.__chi2 = self.__internal_compare(self.ResultQuantity.chi2)
+        # compute and store chi^2 / ndf
         self.__chi2ndf = self.__internal_compare(self.ResultQuantity.chi2ndf)
 
         self.computed = True
@@ -143,9 +166,18 @@ class Chi2Test(ComparisonBase):
                 b.SetBinContent(ibin, 0.0)
 
     def has_compatible_bins(self):
+        """
+        Check if both ROOT obeject have the same amount of bins
+        @return: True if the bins are equal, otherwise False
+        """
         return self.objectA.GetNbinsX() == self.objectB.GetNbinsX()
 
     def __internal_compare(self, quantity):
+        """
+        Performs the actual Chi^2 test
+        @param quantity: the quantity which should be returned, of type ResultQuantity
+        @return: The request result quantity
+        """
         if not self.correct_types():
             raise ObjectsNotSupported(
                 "Comparison of {} (Type {}) with {} (Type {}) not supported." +

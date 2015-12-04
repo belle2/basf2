@@ -17,6 +17,9 @@ class ValidationTest(unittest.TestCase):
     """
 
     def test_meta_option_parser(self):
+        """
+        Test if the meta options parsers behaves nice
+        """
         p = metaoptions.MetaOptionParser(["expert", "pvalue-warn=0.9", "pvalue-error=0.4"])
 
         self.assertEqual(0.9, p.pvalue_warn())

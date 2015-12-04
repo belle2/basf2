@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <geometry/Materials.h>
-//#include <G4MaterialPropertiesTable.hh>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -131,7 +130,7 @@ void CsiGeometryPar::read()
       m_Orientation.push_back(CrystalRot.colZ());
 
       m_thetaID.push_back(CrystalPos.getTranslation().z() > 0 ? 0 : 1);
-      m_phiID.push_back(iCell - 12 * m_thetaID.back());
+      m_phiID.push_back(iCell - 9 * m_thetaID.back());
 
       m_BoxID.push_back(iEnc - 1);
       m_SlotID.push_back(iSlot - 1);
@@ -167,13 +166,12 @@ int CsiGeometryPar::CsiVolNameToCellID(const G4String VolumeName)
     else if (equals(*it, "Crystal")) iCrystal = boost::lexical_cast<int>(*(it + 1)) - 1;
   }
 
-  cellID = 2 * iEnclosure + iCrystal;
+  cellID = 3 * iEnclosure + iCrystal;
 
   if (cellID < 0) B2WARNING("CsiGeometryPar: volume " << VolumeName << " is not a crystal");
 
   return cellID;
 }
-
 
 
 G4Material* CsiGeometryPar::GetMaterial(int cid)

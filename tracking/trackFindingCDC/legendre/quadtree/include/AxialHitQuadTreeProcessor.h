@@ -99,22 +99,34 @@ namespace Belle2 {
         float rHitMax1 = rHitMax - hit->getConformalDriftLength();
         float rHitMax2 = rHitMax + hit->getConformalDriftLength();
 
+        // this has some explicit cppcheck suppressions to silence false-positives about
+        // array bounds
         dist_1[0][0] = rMin - rHitMin1;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_1[0][1] = rMin - rHitMax1;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_1[1][0] = rMax - rHitMin1;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_1[1][1] = rMax - rHitMax1;
 
         dist_2[0][0] = rMin - rHitMin2;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_2[0][1] = rMin - rHitMax2;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_2[1][0] = rMax - rHitMin2;
+        // cppcheck-suppress arrayIndexOutOfBounds
         dist_2[1][1] = rMax - rHitMax2;
-
 
         bool valueToReturn(false);
 
-        if (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1])) valueToReturn = true;
-        else if (! sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1])) valueToReturn = true;
-        else {
+        // cppcheck-suppress arrayIndexOutOfBounds
+        if (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1])) {
+          valueToReturn = true;
+        }
+        // cppcheck-suppress arrayIndexOutOfBounds
+        else if (! sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1])) {
+          valueToReturn = true;
+        } else {
 
           float rHitMinExtr = -1.*hit->getConformalX() * sinThetaMin + hit->getConformalY() * cosThetaMin;
           float rHitMaxExtr = -1.*hit->getConformalX() * sinThetaMax + hit->getConformalY() * cosThetaMax;

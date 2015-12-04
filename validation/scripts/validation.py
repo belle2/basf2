@@ -32,6 +32,7 @@ from validationfunctions import get_start_time, get_validation_folders, scripts_
     find_creator, parse_cmd_line_arguments, draw_progress_bar
 
 import validationserver
+import validationplots
 
 
 def statistics_plots(
@@ -810,8 +811,7 @@ class Validation:
             os.symlink('../results', 'results')
 
         # import and run plot function
-        from validationplots import create_plots
-        create_plots(force=True)
+        validationplots.create_plots(force=True)
 
         # restore original working directory
         os.chdir(save_dir)

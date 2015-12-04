@@ -11,11 +11,16 @@ void plotComparisonBASF1vs2()
   
   // ADD BASF1 FILES
   TFile *f1 = new TFile("ntuple-Neutrals.root");
-  
+  TFile *gBASF = new TFile("BASFMonitors-testSample.root"); 
+
   // ADD BASF2 FILES
   TFile *g1 = new TFile("b2biiGammaConversionMonitors.root");
   TFile *g1p1 = new TFile("b2biiPi0ConversionMonitors.root");
   TFile *g1p2 = new TFile("b2biiMCPi0ConversionMonitors.root");
+
+  TFile *gBeamParams = new TFile("b2biiBeamParamsConversionMonitors.root");
+  TFile *gKSMonitors = new TFile("b2biiKshortConversionMonitors.root");
+  TFile *gKSAVFMonitors = new TFile("b2biiKshortConversionMonitors-AVF.root");
   
   // ADD COMPARISON PLOT LINES
   // This will put all plots in the same pdf file
@@ -28,7 +33,69 @@ void plotComparisonBASF1vs2()
   // ---------------------------------------------------------------------------------
 
   string fileName;
-  
+
+  if(gBASF->IsZombie() || gBeamParams->IsZombie())
+    cout << "Error opening files!" << endl;
+  else 
+    {
+      fileName = "BeamParameters-MonitorPlots";
+      drawHist(fileName, gBASF, gBeamParams, "h101",   "expNum",               "Exp No.",               0);
+      drawHist(fileName, gBASF, gBeamParams, "h102",   "modulo__borunNum__cm1000__bc",               "Run No. % 1000",               1);
+      drawHist(fileName, gBASF, gBeamParams, "h103",   "modulo__boevtNum__cm10000__bc",              "Evt No. % 10000",              1);
+
+      drawHist(fileName, gBASF, gBeamParams, "h104",   "Eher",              "Eher",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h105",   "Eler",              "Eler",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h106",   "Ecms",              "Ecms",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h107",   "XAngle",            "Xangle",            1);
+      
+      drawHist(fileName, gBASF, gBeamParams, "h108",   "IPX",              "IP.X",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h109",   "IPY",              "IP.Y",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h110",   "IPZ",              "IP.Z",              1);
+
+      drawHist(fileName, gBASF, gBeamParams, "h111",   "IPCov__bo0__cm0__bc",              "IP.error[0][0]",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h112",   "IPCov__bo0__cm1__bc",              "IP.error[0][1]",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h113",   "IPCov__bo0__cm2__bc",              "IP.error[0][2]",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h114",   "IPCov__bo1__cm1__bc",              "IP.error[1][1]",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h115",   "IPCov__bo1__cm2__bc",              "IP.error[1][2]",              1);
+      drawHist(fileName, gBASF, gBeamParams, "h116",   "IPCov__bo2__cm2__bc",              "IP.error[2][2]",              2);
+    }
+
+  if(gBASF->IsZombie() || gKSMonitors->IsZombie())
+    cout << "Error opening files!" << endl;
+  else 
+    {
+      fileName = "KS-MonitorPlots";
+      drawHist(fileName, gBASF, gKSMonitors, "h201",   "M",               "M (BVF)",               0);
+      drawHist(fileName, gBASF, gKSMonitors, "h202",   "px",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h203",   "py",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h204",   "pz",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h205",   "E",              "E (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h206",   "x",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h207",   "y",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h208",   "z",               "z (BVF)",              1);
+
+      drawHist(fileName, gBASF, gKSMonitors, "h212",   "daughter__bo0__cmpx__bc",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h213",   "daughter__bo0__cmpy__bc",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h214",   "daughter__bo0__cmpz__bc",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h215",   "daughter__bo0__cmE__bc",               "E (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h216",   "daughter__bo0__cmx__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h217",   "daughter__bo0__cmy__bc",               "z (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h218",   "daughter__bo0__cmy__bc",               "z (BVF)",              1);
+
+      drawHist(fileName, gBASF, gKSMonitors, "h222",   "daughter__bo1__cmpx__bc",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h223",   "daughter__bo1__cmpy__bc",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h224",   "daughter__bo1__cmpz__bc",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h225",   "daughter__bo1__cmE__bc",               "E (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h226",   "daughter__bo1__cmx__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h227",   "daughter__bo1__cmy__bc",               "z (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h228",   "daughter__bo1__cmy__bc",               "z (BVF)",              1);
+
+      drawHist(fileName, gBASF, gKSMonitors, "h291",   "extraInfo__bogoodKs__bc",              "goodKs flag",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h292",   "extraInfo__boksnbVLike__bc",           "nisKS.nbVlike",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h293",   "extraInfo__boksnbNoLam__bc",           "nisKs.nbNoLam",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h294",   "extraInfo__boksnbStandard__bc",        "nisKs.standard",              2);
+    }
+
   if(f1->IsZombie() or g1->IsZombie())
     cout << "Error opening files!" << endl;
   else 
@@ -164,8 +231,8 @@ void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string 
   TCanvas *C = new TCanvas("c1","c1",1000,600);
 
   // Load histograms
-  h1 = (TH1F*) file1->Get(name1.c_str());
-  h2 = (TH1F*) file2->Get(name2.c_str());
+  h1 = (TH1D*) file1->Get(name1.c_str());
+  h2 = (TH1D*) file2->Get(name2.c_str());
 
   // Paint histograms
   h1->GetXaxis()->SetTitle(axisName.c_str());

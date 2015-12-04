@@ -74,23 +74,23 @@ namespace Belle2 {
     /**
      * Return a key used in m_map
      * @param barID module ID
-     * @param channelID hardware channel ID
+     * @param channel hardware channel number
      * @return a key
      */
-    unsigned getKey(int barID, unsigned channelID) const
+    unsigned getKey(int barID, unsigned channel) const
     {
-      return channelID + (barID << 16);
+      return channel + (barID << 16);
     }
 
     /**
      * Return the mapped value
      * @param barID module ID
-     * @param channelID hardware channel ID
+     * @param channel hardware channel number
      * @return mapped value or NULL
      */
-    const TOPASICChannel* getConstants(int barID, unsigned channelID) const
+    const TOPASICChannel* getConstants(int barID, unsigned channel) const
     {
-      unsigned key = getKey(barID, channelID);
+      unsigned key = getKey(barID, channel);
       std::map<unsigned, const TOPASICChannel*>::const_iterator it = m_map.find(key);
       if (it == m_map.end()) return 0;
       return it->second;

@@ -108,7 +108,7 @@ namespace Belle2 {
 
     m_map.clear();
     for (const auto& asic : m_asicChannels) {
-      auto key = getKey(asic.getBarID(), asic.getChannelID());
+      auto key = getKey(asic.getBarID(), asic.getChannel());
       m_map[key] = &asic;
     }
 
@@ -128,7 +128,7 @@ namespace Belle2 {
     typedef std::vector<const TOPRawWaveform*> RawWaveforms;
     std::map<unsigned, RawWaveforms> map;
     for (const auto& rawWaveform : rawWaveforms) {
-      auto key = getKey(rawWaveform.getBarID(), rawWaveform.getChannelID());
+      auto key = getKey(rawWaveform.getBarID(), rawWaveform.getChannel());
       map[key].push_back(&rawWaveform);
     }
 
@@ -144,15 +144,15 @@ namespace Belle2 {
       int numWindows = calibration->getNumofWindows();
       auto barID = element.second[0]->getBarID();
       auto pixelID = element.second[0]->getPixelID();
-      auto channelID = element.second[0]->getChannelID();
-      auto* waveform = waveforms.appendNew(barID, pixelID, channelID);
+      auto channel = element.second[0]->getChannel();
+      auto* waveform = waveforms.appendNew(barID, pixelID, channel);
       int prevWindow = element.second[0]->getStorageWindow() - 1;
       for (const auto& rawWaveform : element.second) {
         int window = rawWaveform->getStorageWindow();
         int diff = window - prevWindow;
         prevWindow = window;
         if (diff != 1 and diff != (1 - numWindows))
-          waveform = waveforms.appendNew(barID, pixelID, channelID);
+          waveform = waveforms.appendNew(barID, pixelID, channel);
         bool ok = appendRawWavefrom(rawWaveform, calibration, waveform);
         if (ok) waveform->addRelationTo(rawWaveform);
       }
@@ -174,7 +174,7 @@ namespace Belle2 {
       if (nHit == 0) continue;
       auto barID = waveform.getBarID();
       auto pixelID = waveform.getPixelID();
-      auto channelID = waveform.getChannelID();
+      auto channel = waveform.getChannel();
       auto firstWindow = waveform.getFirstWindow();
       auto refWindow = waveform.getReferenceWindow();
       const auto& hits = waveform.getHits();
@@ -184,7 +184,7 @@ namespace Belle2 {
         digit->setTime(hit.time + t0);
         digit->setADC(hit.height);
         digit->setPulseWidth(hit.width);
-        digit->setChannel(channelID);
+        digit->setChannel(channel);
         digit->setFirstWindow(firstWindow);
         digit->setReferenceWindow(refWindow);
         digit->addRelationTo(&waveform);
@@ -216,7 +216,7 @@ namespace Belle2 {
     if (!pedestals) {
       B2WARNING("TOPWFMerger: no calibration available for bar " <<
                 calibration->getBarID() << " channel " <<
-                calibration->getChannelID() << " window " << window);
+                calibration->getChannel() << " window " << window);
       return false;
     }
     const auto* gains = calibration->getGains(window);
@@ -226,11 +226,11 @@ namespace Belle2 {
     }
 
     if (rawWaveform->getBarID() != calibration->getBarID())
-      B2FATAL("TOPWFMerger: bug (barID)");
-    if (rawWaveform->getChannelID() != calibration->getChannelID())
-      B2FATAL("TOPWFMerger: bug (channelID)");
-    if (window != pedestals->getASICWindowID())
-      B2FATAL("TOPWFMerger: bug (windowID)");
+      B2FATAL("TOPWFMerger: bug (module ID)");
+    if (rawWaveform->getChannel() != calibration->getChannel())
+      B2FATAL("TOPWFMerger: bug (channel number)");
+    if (window != pedestals->getASICWindow())
+      B2FATAL("TOPWFMerger: bug (ASIC window number)");
 
     auto offset = getPedestalOffset(rawWaveform, pedestals);
 

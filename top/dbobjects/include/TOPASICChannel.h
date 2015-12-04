@@ -38,13 +38,13 @@ namespace Belle2 {
     }
 
     /**
-     * Constructor with barID, hardware channel number and number of ASIC windows
-     * @param barID bar ID
-     * @param channelID hardware channel number
+     * Constructor with module ID, hardware channel number and number of ASIC windows
+     * @param barID module ID
+     * @param channel hardware channel number
      * @param numWindows number of active windows per ASIC
      */
-    TOPASICChannel(int barID, unsigned channelID, int numWindows):
-      m_barID(barID), m_channelID(channelID)
+    TOPASICChannel(int barID, unsigned channel, int numWindows):
+      m_barID(barID), m_channel(channel)
     {
       for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
       setTimeAxis();
@@ -70,7 +70,7 @@ namespace Belle2 {
      */
     bool setPedestals(const TOPASICPedestals& pedestals)
     {
-      unsigned i = pedestals.getASICWindowID();
+      unsigned i = pedestals.getASICWindow();
       if (i < m_pedestals.size()) {
         if (m_pedestals[i]) {
           *m_pedestals[i] = pedestals;
@@ -92,7 +92,7 @@ namespace Belle2 {
       if (m_gains.empty()) {
         for (unsigned i = 0; i < m_pedestals.size(); i++) m_gains.push_back(NULL);
       }
-      unsigned i = gains.getASICWindowID();
+      unsigned i = gains.getASICWindow();
       if (i < m_gains.size()) {
         if (m_gains[i]) {
           *m_gains[i] = gains;
@@ -131,8 +131,8 @@ namespace Belle2 {
       }
 
     /**
-     * Return bar ID
-     * @return bar ID
+     * Return module ID
+     * @return module ID
      */
     int getBarID() const {return m_barID;}
 
@@ -140,17 +140,17 @@ namespace Belle2 {
      * Return hardware channel number
      * @return channel number
      */
-    unsigned getChannelID() const {return m_channelID;}
+    unsigned getChannel() const {return m_channel;}
 
 
     /**
      * Return sample time in respect to previous sample
-     * @param windowID ASIC window number
+     * @param window ASIC window number
      * @param i sample number within ASIC window
      */
-    float getSampleTime(unsigned windowID, unsigned i) const
+    float getSampleTime(unsigned window, unsigned i) const
     {
-      unsigned k = (windowID % 4) * TOPASICPedestals::c_WindowSize +
+      unsigned k = (window % 4) * TOPASICPedestals::c_WindowSize +
                    (i % TOPASICPedestals::c_WindowSize);
       return m_timeAxis[k];
     }
@@ -165,25 +165,25 @@ namespace Belle2 {
     }
 
     /**
-     * Return pedestals of i-th ASIC window
-     * @param i ASIC window number
+     * Return pedestals of an ASIC window
+     * @param window ASIC window number
      * @return pointer to pedestals or NULL
      */
-    const TOPASICPedestals* getPedestals(unsigned i) const
+    const TOPASICPedestals* getPedestals(unsigned window) const
     {
-      if (i < m_pedestals.size()) return m_pedestals[i];
+      if (window < m_pedestals.size()) return m_pedestals[window];
       return NULL;
     }
 
     /**
-     * Return gains of i-th ASIC window
-     * @param i ASIC window number
+     * Return gains of an ASIC window
+     * @param window ASIC window number
      * @return pointer to gains or NULL
      */
-    const TOPASICGains* getGains(unsigned i) const
+    const TOPASICGains* getGains(unsigned window) const
     {
-      if (i < m_gains.size()) return m_gains[i];
-      if (i < m_pedestals.size()) return &m_defaultGain;
+      if (window < m_gains.size()) return m_gains[window];
+      if (window < m_pedestals.size()) return &m_defaultGain;
       return NULL;
     }
 
@@ -194,7 +194,7 @@ namespace Belle2 {
     unsigned getNumofGoodWindows() const
     {
       unsigned n = 0;
-      for (auto& window : m_pedestals) if (window) n++;
+      for (auto& pedestal : m_pedestals) if (pedestal) n++;
       return n;
     }
 
@@ -202,14 +202,14 @@ namespace Belle2 {
   private:
 
     int m_barID = 0;          /**< bar ID */
-    unsigned m_channelID = 0;   /**< hardware channel ID */
+    unsigned m_channel = 0;   /**< hardware channel number */
     float m_timeAxis[c_TimeAxisSize]; /**< differential time axis */
     std::vector<TOPASICPedestals*> m_pedestals; /**< pedestals */
     std::vector<TOPASICGains*> m_gains;         /**< gains */
 
     TOPASICGains m_defaultGain; /**< default gain */
 
-    ClassDef(TOPASICChannel, 1); /**< ClassDef */
+    ClassDef(TOPASICChannel, 2); /**< ClassDef */
 
   };
 

@@ -181,7 +181,7 @@ namespace Belle2 {
     int nHits = topDigits.getEntries();
     for (int i = 0; i < nHits; i++) {
       TOPDigit* aDigit = topDigits[i];
-      int barID = aDigit->getBarID();
+      int barID = aDigit->getModuleID();
 
       peflux->AddBinContent(barID * 2, 1. / m_TimeOfSimulation / 32.0);
 

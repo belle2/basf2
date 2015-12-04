@@ -103,11 +103,11 @@ namespace Belle2 {
     vector<const TOPDigit*>* sortedDigits = new vector<const TOPDigit*>[mapSize];
 
     for (const auto& digit : digits) {
-      int barID = digit.getBarID();
+      int moduleID = digit.getModuleID();
       int boardstack = digit.getChannel() / 128;
-      const auto* feemap = mapper.getMap(barID, boardstack);
+      const auto* feemap = mapper.getMap(moduleID, boardstack);
       if (!feemap) {
-        B2ERROR("TOPPacker: no front-end map available for barID " << barID <<
+        B2ERROR("TOPPacker: no front-end map available for module " << moduleID <<
                 " boardstack# " << boardstack);
         continue;
       }

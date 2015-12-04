@@ -38,8 +38,8 @@ namespace Belle2 {
     }
 
     /**
-     * Constructor with ASIC window
-     * @param asicWindow ASIC window ID
+     * Constructor with ASIC window number
+     * @param asicWindow ASIC window number
      */
     explicit TOPASICPedestals(unsigned short asicWindow): m_asicWindow(asicWindow),
       m_offset(0)
@@ -57,9 +57,9 @@ namespace Belle2 {
 
     /**
      * Return ASIC window number
-     * @return window ID
+     * @return window number
      */
-    unsigned getASICWindowID() const {return m_asicWindow;}
+    unsigned getASICWindow() const {return m_asicWindow;}
 
     /**
      * Return window size (number of pedestal samples)

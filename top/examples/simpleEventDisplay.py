@@ -31,7 +31,7 @@ class TOPDisplay(Module):
     '''
 
     #: 1D histograms
-    hist = [TH1F('h' + str(i), 'bar#' + str(i), 128, 0.0, 4096.0) for i in
+    hist = [TH1F('h' + str(i), 'module#' + str(i), 128, 0.0, 4096.0) for i in
             range(16)]
     #: canvas
     c1 = TCanvas('c1', 'TOP event display', 1000, 800)
@@ -58,17 +58,17 @@ class TOPDisplay(Module):
             if likelihood.getFlag() == 1:
                 exthit = likelihood.getRelated('ExtHits')
                 try:
-                    barID = exthit.getCopyID()
-                    self.hist[barID - 1].SetFillColor(2)
-                    self.hist[barID - 1].SetLineColor(2)
+                    moduleID = exthit.getCopyID()
+                    self.hist[moduleID - 1].SetFillColor(2)
+                    self.hist[moduleID - 1].SetLineColor(2)
                 except:
                     B2ERROR('No relation to ExtHit')
 
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
-            barID = digit.getBarID()
+            moduleID = digit.getModuleID()
             tdc = digit.getTDC()
-            self.hist[barID - 1].Fill(tdc)
+            self.hist[moduleID - 1].Fill(tdc)
 
         for i in range(16):
             self.c1.cd(i + 1)

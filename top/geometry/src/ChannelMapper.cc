@@ -142,9 +142,9 @@ namespace Belle2 {
     }
 
 
-    unsigned ChannelMapper::getChannelID(int pixel) const
+    unsigned ChannelMapper::getChannel(int pixel) const
     {
-      if (!isPixelIDValid(pixel)) return c_invalidChannelID;
+      if (!isPixelIDValid(pixel)) return c_invalidChannel;
 
       unsigned pix = pixel - 1;
       unsigned pixRow = pix / c_numPixelColumns;
@@ -158,20 +158,20 @@ namespace Belle2 {
       const auto& map = m_channels[row][col];
       if (!map) {
         B2ERROR("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
-        return c_invalidChannelID;
+        return c_invalidChannel;
       }
       unsigned asic = map->getASICNumber();
       unsigned chan = map->getASICChannel();
 
-      return getChannelID(boardstack, carrier, asic, chan);
+      return getChannel(boardstack, carrier, asic, chan);
     }
 
 
-    void ChannelMapper::splitChannelID(unsigned channel,
-                                       unsigned& boardstack,
-                                       unsigned& carrier,
-                                       unsigned& asic,
-                                       unsigned& chan) const
+    void ChannelMapper::splitChannelNumber(unsigned channel,
+                                           unsigned& boardstack,
+                                           unsigned& carrier,
+                                           unsigned& asic,
+                                           unsigned& chan) const
     {
       chan = channel % c_numChannels;
       channel /= c_numChannels;
@@ -185,13 +185,13 @@ namespace Belle2 {
     int ChannelMapper::getPixelID(unsigned channel) const
     {
 
-      if (!isChannelIDValid(channel)) return c_invalidPixelID;
+      if (!isChannelValid(channel)) return c_invalidPixelID;
 
       unsigned boardstack = 0;
       unsigned carrier = 0;
       unsigned asic = 0;
       unsigned chan = 0;
-      splitChannelID(channel, boardstack, carrier, asic, chan);
+      splitChannelNumber(channel, boardstack, carrier, asic, chan);
 
       const auto& map = m_pixels[asic][chan];
       if (!map) {
@@ -231,9 +231,9 @@ namespace Belle2 {
           cout << "  " << yaxis[row] << " ";
           for (int col = 0; col < c_numPixelColumns; col++) {
             int pixel = col + c_numPixelColumns * row + 1;
-            auto channel = getChannelID(pixel);
-            if (channel != c_invalidChannelID) {
-              splitChannelID(channel, value[0], value[1], value[2], value[3]);
+            auto channel = getChannel(pixel);
+            if (channel != c_invalidChannel) {
+              splitChannelNumber(channel, value[0], value[1], value[2], value[3]);
               cout << value[i];
             } else {
               cout << "?";
@@ -249,12 +249,12 @@ namespace Belle2 {
     void ChannelMapper::test() const
     {
       for (int pixel = 1; pixel <= c_numPixels; pixel++)
-        if (pixel != getPixelID(getChannelID(pixel)))
-          B2ERROR("TOP::ChannelMapper: bug, getPixelID is not inverse of getChannelID");
+        if (pixel != getPixelID(getChannel(pixel)))
+          B2ERROR("TOP::ChannelMapper: bug, getPixelID is not inverse of getChannel");
 
       for (unsigned channel = 0; channel < c_numPixels; channel++)
-        if (channel != getChannelID(getPixelID(channel)))
-          B2ERROR("TOP::ChannelMapper: bug, getChannelID is not inverse of getPixelID");
+        if (channel != getChannel(getPixelID(channel)))
+          B2ERROR("TOP::ChannelMapper: bug, getChannel is not inverse of getPixelID");
     }
 
 

@@ -27,26 +27,27 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPRawWaveform():
-      m_barID(0),
-      m_pixelID(0),
-      m_channelID(0),
-      m_scrodID(0),
-      m_scrodRevision(0),
-      m_freezeDate(0),
-      m_triggerType(0),
-      m_flags(0),
-      m_referenceASIC(0),
-      m_segmentASIC(0),
-      m_electronicType(0)
+    TOPRawWaveform()
     {}
 
     /**
      * Full constructor
+     * @param barID module ID
+     * @param pixelID pixel (e.g. software channel) ID
+     * @param channel hardware channel number
+     * @param scrod SCROD ID
+     * @param freezeDate protocol freeze date (YYYYMMDD in BCD)
+     * @param triggerType trigger type
+     * @param flags event flags
+     * @param referenceASIC reference ASIC window number
+     * @param segmentASIC segment ASIC window number (storage window)
+     * @param electronicType electronic type (see ChannelMapper::EType)
+     * @param electronicName electronic name (e.g. "IRS3B", "IRSX", etc.)
+     * @param data waveform ADC values (samples)
      */
     TOPRawWaveform(int barID,
                    int pixelID,
-                   unsigned channelID,
+                   unsigned channel,
                    unsigned scrod,
                    unsigned freezeDate,
                    unsigned triggerType,
@@ -60,7 +61,7 @@ namespace Belle2 {
     {
       m_barID = barID;
       m_pixelID = pixelID;
-      m_channelID = channelID;
+      m_channel = channel;
       m_scrodID = scrod & 0xFFFF;
       m_scrodRevision = (scrod >> 16) & 0x00FF;
       m_freezeDate = freezeDate;
@@ -72,8 +73,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns quartz bar ID
-     * @return bar ID
+     * Returns module ID
+     * @return module ID
      */
     int getBarID() const { return m_barID; }
 
@@ -84,10 +85,10 @@ namespace Belle2 {
     int getPixelID() const { return m_pixelID; }
 
     /**
-     * Returns hardware channel ID
-     * @return channel ID
+     * Returns hardware channel number
+     * @return channel number
      */
-    unsigned getChannelID() const { return m_channelID; }
+    unsigned getChannel() const { return m_channel; }
 
     /**
      * Returns SCROD ID
@@ -147,21 +148,27 @@ namespace Belle2 {
      * Returns IRS reference analog storage window.
      * This corresponds to the last window in the analog memory sampled.
      * All timing is a "look-back" from this window.
-     * @return reference window ID
+     * @return reference window number
      */
     unsigned getReferenceWindow() const { return m_referenceASIC; }
 
     /**
      * Returns IRS analog storage window this waveform was taken from.
-     * @return segment window ID
+     * @return segment window number
      */
     unsigned getStorageWindow() const { return (m_segmentASIC & 0x01FF); }
 
     /**
-     * Returns ASIC channel
+     * Returns ASIC channel number
      * @return channel number
      */
-    unsigned getAsicChannel() const { return ((m_segmentASIC >> 9) & 0x0007);}
+    unsigned getASICChannel() const { return ((m_segmentASIC >> 9) & 0x0007);}
+
+    /**
+     * Returns ASIC number
+     * @return ASIC number
+     */
+    unsigned getASICNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
 
     /**
      * Returns carrier board number
@@ -170,22 +177,16 @@ namespace Belle2 {
     unsigned getCarrierNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
 
     /**
-     * Returns ASIC number
-     * @return ASIC number
-     */
-    unsigned getAsicNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
-
-    /**
      * Returns ASIC row (IRS3B naming convention)
      * @return row number
      */
-    unsigned getAsicRow() const { return getCarrierNumber();}
+    unsigned getASICRow() const { return getCarrierNumber();}
 
     /**
      * Returns ASIC column (IRS3B naming convention)
      * @return column number
      */
-    unsigned getAsicCol() const { return getAsicNumber();}
+    unsigned getASICCol() const { return getASICNumber();}
 
     /**
      * Returns type of electronic used to measure this waveform
@@ -216,21 +217,21 @@ namespace Belle2 {
 
   private:
 
-    int m_barID;                    /**< quartz bar ID */
-    int m_pixelID;                  /**< software channel ID */
-    unsigned m_channelID;           /**< hardware channel ID */
-    unsigned short m_scrodID;       /**< SCROD ID */
-    unsigned short m_scrodRevision; /**< SCROD revision number */
-    unsigned m_freezeDate;          /**< protocol freeze date (YYYYMMDD in BCD) */
-    unsigned short m_triggerType;   /**< trigger type (bits 0:7) */
-    unsigned short m_flags;         /**< event flags (bits 0:7) */
-    unsigned short m_referenceASIC; /**< reference ASIC window */
-    unsigned short m_segmentASIC;   /**< segment ASIC window (storage window) */
+    int m_barID = 0;                    /**< quartz bar ID */
+    int m_pixelID = 0;                  /**< software channel ID */
+    unsigned m_channel = 0;             /**< hardware channel number */
+    unsigned short m_scrodID = 0;       /**< SCROD ID */
+    unsigned short m_scrodRevision = 0; /**< SCROD revision number */
+    unsigned m_freezeDate = 0;          /**< protocol freeze date (YYYYMMDD in BCD) */
+    unsigned short m_triggerType = 0;   /**< trigger type (bits 0:7) */
+    unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
+    unsigned short m_referenceASIC = 0; /**< reference ASIC window */
+    unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
     std::vector<unsigned short> m_data;  /**< waveform ADC values */
-    unsigned m_electronicType;      /**< electronic type (see ChannelMapper::EType) */
+    unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
 
-    ClassDef(TOPRawWaveform, 2); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 3); /**< ClassDef */
 
   };
 

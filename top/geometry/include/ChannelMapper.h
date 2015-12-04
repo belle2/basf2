@@ -35,8 +35,8 @@ namespace Belle2 {
             c_numPixelRows = c_numRows * c_numCarrierBoards, /**< per module */
             c_numPixelColumns = c_numColumns * c_numBoardstacks, /**< per module */
             c_numPixels = c_numPixelRows * c_numPixelColumns, /**< per module */
-            c_invalidChannelID = c_numPixels, /**< invalid channel ID value */
-            c_invalidPixelID = 0 /**< invalid pixel ID value */
+            c_invalidChannel = c_numPixels, /**< value of invalid channel number */
+            c_invalidPixelID = 0 /**< value of invalid pixel ID */
            };
 
       /**
@@ -93,57 +93,57 @@ namespace Belle2 {
       }
 
       /**
-       * Checks validity of hardware channel ID
-       * @param channel hardware channel ID (0-based)
+       * Checks validity of hardware channel number
+       * @param channel hardware channel number (0-based)
        * @return true for valid ID
        */
-      bool isChannelIDValid(unsigned channel) const
+      bool isChannelValid(unsigned channel) const
       {
         return channel < c_numPixels;
       }
 
       /**
-       * Converts pixel to hardware channel ID (0-based)
+       * Converts pixel to hardware channel number (0-based)
        * @param pixel pixel ID (1-based)
-       * @return channel ID (or c_invalidChannelID for invalid pixel)
+       * @return channel number (or c_invalidChannel for invalid pixel)
        */
-      unsigned getChannelID(int pixel) const;
+      unsigned getChannel(int pixel) const;
 
       /**
-       * Returns hardware channel ID (0-based)
+       * Returns hardware channel number (0-based)
        * @param boardstack boardstack number (0-based)
        * @param carrier carrier board number (0-based)
        * @param asic ASIC number (0-based)
        * @param chan ASIC channel number (0-based)
-       * @return channel ID (or c_invalidChannelID for invalid pixel)
+       * @return channel number (or c_invalidChannel for invalid pixel)
        */
-      unsigned getChannelID(unsigned boardstack,
-                            unsigned carrier,
-                            unsigned asic,
-                            unsigned chan) const
+      unsigned getChannel(unsigned boardstack,
+                          unsigned carrier,
+                          unsigned asic,
+                          unsigned chan) const
       {
         return chan + c_numChannels * (asic + c_numAsics *
                                        (carrier + c_numCarrierBoards * boardstack));
       }
 
       /**
-       * Splits hardware channel ID into boardstack#, carrier#, asic# and asic channel#
-       * @param channel hardware channel ID (0-based) [input]
+       * Splits hardware channel number into boardstack, carrier, asic and asic channel
+       * @param channel hardware channel number (0-based) [input]
        * @param boardstack boardstack number (0-based) [output]
        * @param carrier carrier board number (0-based) [output]
        * @param asic ASIC number (0-based) [output]
        * @param chan ASIC channel number (0-based) [output]
        */
-      void splitChannelID(unsigned channel,
-                          unsigned& boardstack,
-                          unsigned& carrier,
-                          unsigned& asic,
-                          unsigned& chan) const;
+      void splitChannelNumber(unsigned channel,
+                              unsigned& boardstack,
+                              unsigned& carrier,
+                              unsigned& asic,
+                              unsigned& chan) const;
 
       /**
-       * Converts hardware channel ID to pixel ID (1-based)
-       * @param channel hardware channel ID (0-based)
-       * @return pixel ID (or c_invalidPixelID for invalid channel)
+       * Converts hardware channel number to pixel ID (1-based)
+       * @param channel hardware channel number (0-based)
+       * @return pixel ID (or c_invalidPixelID for invalid channel number)
        */
       int getPixelID(unsigned channel) const;
 

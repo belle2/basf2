@@ -30,8 +30,8 @@ class PackerUnpackerTest(Module):
         return sorted(
             py_list,
             key=lambda x: (
-                x.getBarID(),
-                x.getChannelID(),
+                x.getModuleID(),
+                x.getChannel(),
                 x.getTDC())
         )
 
@@ -62,12 +62,12 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             assert digit.getHitQuality() == digitUnpacked.getHitQuality()
-            assert digit.getBarID() == digitUnpacked.getBarID()
+            assert digit.getModuleID() == digitUnpacked.getModuleID()
             assert digit.getPixelID() == digitUnpacked.getPixelID()
             assert digit.getTDC() == digitUnpacked.getTDC()
 #            assert digit.getADC() == digitUnpacked.getADC()
 #            assert digit.getPulseWidth() == digitUnpacked.getPulseWidth()
-            assert digit.getHardwareChannelID() == digitUnpacked.getHardwareChannelID()
+            assert digit.getChannel() == digitUnpacked.getChannel()
 #            assert digit.getTime() == digitUnpacked.getTime()
 
 

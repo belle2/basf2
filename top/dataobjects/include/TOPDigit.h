@@ -37,12 +37,12 @@ namespace Belle2 {
 
     /**
      * Almost full constructor
-     * @param barID     bar ID (1-based)
+     * @param moduleID     module ID (1-based)
      * @param pixelID   pixel ID (1-based)
      * @param TDC       digitized detection time
      */
-    TOPDigit(int barID, int pixelID, int TDC):
-      m_barID(barID),
+    TOPDigit(int moduleID, int pixelID, int TDC):
+      m_moduleID(moduleID),
       m_pixelID(pixelID),
       m_TDC(TDC),
       m_ADC(0),
@@ -137,7 +137,14 @@ namespace Belle2 {
      * Returns module ID
      * @return module ID
      */
-    int getBarID() const { return m_barID; }
+    int getModuleID() const { return m_moduleID; }
+
+    /**
+     * Returns module ID
+     * @return module ID
+     */
+    int getBarID() const __attribute__((deprecated("Please use getModuleID()")))
+    { return m_moduleID; }
 
     /**
      * Returns pixel ID
@@ -278,9 +285,9 @@ namespace Belle2 {
     /**
      * Implementation of the base class function.
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
-     * @return unique channel ID, composed of channel ID (1-512) and bar ID (1-16)
+     * @return unique channel ID, composed of pixel ID (1-512) and module ID (1-16)
      */
-    unsigned int getUniqueChannelID() const {return m_pixelID + (m_barID << 16);}
+    unsigned int getUniqueChannelID() const {return m_pixelID + (m_moduleID << 16);}
 
     /**
      * Implementation of the base class function.
@@ -292,21 +299,21 @@ namespace Belle2 {
 
 
   private:
-    int m_barID = 0;         /**< module ID (1-based) */
-    int m_pixelID = 0;       /**< software channel ID (1-based) */
-    int m_TDC = 0;           /**< digitized time */
-    int m_ADC = 0;           /**< digitized pulse height or charge (to be decided) */
-    int m_pulseWidth = 0;    /**< digitized pulse width */
+    int m_moduleID = 0;       /**< module ID (1-based) */
+    int m_pixelID = 0;        /**< software channel ID (1-based) */
+    int m_TDC = 0;            /**< digitized time */
+    int m_ADC = 0;            /**< digitized pulse height or charge (to be decided) */
+    int m_pulseWidth = 0;     /**< digitized pulse width */
     unsigned m_channel = 0;   /**< hardware channel number (0-based) */
     EHitQuality m_quality = c_Junk;  /**< hit quality */
-    float m_time = 0;        /**< time in [ns], converted from TDC, t0-subtracted */
+    float m_time = 0;         /**< time in [ns], converted from TDC, t0-subtracted */
     unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
-    unsigned short m_refWindow = 0; /**< reference ASIC window */
+    unsigned short m_refWindow = 0;   /**< reference ASIC window */
 
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 10); /**< ClassDef */
+    ClassDef(TOPDigit, 11); /**< ClassDef */
 
   };
 

@@ -228,8 +228,8 @@ namespace Belle2 {
         unsigned chan = (segmentASIC >> 9) & 0x0007;
         unsigned asic = (segmentASIC >> 14) & 0x0003; // called also asicCol
         unsigned carrier = (segmentASIC >> 12) & 0x0003; // called also asicRow
-        unsigned channelID = mapper.getChannelID(boardstack, carrier, asic, chan);
-        int pixelID = mapper.getPixelID(channelID);
+        unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
+        int pixelID = mapper.getPixelID(channel);
 
         int numofPoints = array.getWord();
         std::vector<unsigned short> wfdata;
@@ -242,7 +242,7 @@ namespace Belle2 {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
         }
-        waveforms.appendNew(barID, pixelID, channelID, scrod, freezeDate,
+        waveforms.appendNew(barID, pixelID, channel, scrod, freezeDate,
                             triggerType, flags, referenceASIC, segmentASIC,
                             mapper.getType(), mapper.getName(), wfdata);
       } // iseg
@@ -283,11 +283,11 @@ namespace Belle2 {
             wfdata.push_back(data & 0xFFFF);
             wfdata.push_back(data >> 16);
           }
-          unsigned channelID = mapper.getChannelID(boardstack, carrier, asic, chan);
-          int pixelID = mapper.getPixelID(channelID);
+          unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
+          int pixelID = mapper.getPixelID(channel);
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
-          waveforms.appendNew(barID, pixelID, channelID, scrod, 0,
+          waveforms.appendNew(barID, pixelID, channel, scrod, 0,
                               trigPattern, 0, lastWriteAddr, segmentASIC,
                               mapper.getType(), mapper.getName(), wfdata);
         } // chan

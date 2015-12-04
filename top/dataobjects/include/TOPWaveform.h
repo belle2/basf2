@@ -53,13 +53,13 @@ namespace Belle2 {
     {}
 
     /**
-     * Constructor with barID, pixelID and channelID - constructs empty waveform
+     * Constructor with module ID, pixel ID and channel number - constructs empty waveform
      * @param barID module ID (1-based)
      * @param pixelID software channel ID (1-based)
-     * @param channelID hardware channel ID (0-based)
+     * @param channel hardware channel number (0-based)
      */
-    TOPWaveform(int barID, int pixelID, unsigned channelID):
-      m_barID(barID), m_pixelID(pixelID), m_channelID(channelID)
+    TOPWaveform(int barID, int pixelID, unsigned channel):
+      m_barID(barID), m_pixelID(pixelID), m_channel(channel)
     {}
 
     /**
@@ -98,15 +98,15 @@ namespace Belle2 {
     int setDigital(float upperThr, float lowerThr, unsigned minWidth = 0);
 
     /**
-     * Reconstruct hits using CFD method (setDigital must be already called)
+     * Reconstructs hits using CFD method (setDigital must be already called)
      * @param fraction CFD fraction
      * @return number of hits
      */
     int convertToHits(float fraction);
 
     /**
-     * Returns quartz bar ID
-     * @return bar ID
+     * Returns module ID
+     * @return module ID
      */
     int getBarID() const { return m_barID; }
 
@@ -117,10 +117,10 @@ namespace Belle2 {
     int getPixelID() const { return m_pixelID; }
 
     /**
-     * Returns hardware channel ID
-     * @return channel ID
+     * Returns hardware channel number
+     * @return channel number
      */
-    unsigned getChannelID() const { return m_channelID; }
+    unsigned getChannel() const { return m_channel; }
 
     /**
      * Returns waveform size (number of samples)
@@ -193,14 +193,14 @@ namespace Belle2 {
 
     int m_barID = 0;                    /**< quartz bar ID */
     int m_pixelID = 0;                  /**< software channel ID */
-    unsigned m_channelID = 0;           /**< hardware channel ID */
+    unsigned m_channel = 0;             /**< hardware channel number */
     std::vector<WFSample> m_data;       /**< waveform samples */
     std::vector<bool> m_digital;        /**< digital waveform (samples over threshold) */
     std::vector<Hit> m_hits;            /**< reconstructed hits */
     std::vector<unsigned short> m_windows; /**< ASIC window numbers */
     unsigned short m_refWindow = 0; /**< reference ASIC window number */
 
-    ClassDef(TOPWaveform, 2); /**< ClassDef */
+    ClassDef(TOPWaveform, 3); /**< ClassDef */
 
   };
 

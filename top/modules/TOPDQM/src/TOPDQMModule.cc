@@ -175,10 +175,10 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
-      m_barHits->Fill(digit.getBarID());
-      int i = digit.getBarID() - 1;
+      m_barHits->Fill(digit.getModuleID());
+      int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_topgp->getNbars()) {
-        B2ERROR("Invalid bar ID found in TOPDigit");
+        B2ERROR("Invalid module ID found in TOPDigits");
         continue;
       }
       m_pixelHits[i]->Fill(digit.getPixelID());

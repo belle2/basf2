@@ -112,7 +112,7 @@ class WFDisplay(Module):
             py_list,
             key=lambda x: (
                 x.getBarID(),
-                x.getChannelID())
+                x.getChannel())
         )
 
     def event(self):
@@ -135,7 +135,7 @@ class WFDisplay(Module):
             self.hist[k].Reset()
             self.hist[k].SetMinimum(0)
             self.hist[k].SetMaximum(4096)
-            chan = waveform.getChannelID()
+            chan = waveform.getChannel()
             window = waveform.getStorageWindow()
             refwin = waveform.getReferenceWindow()
             name = waveform.getElectronicName()

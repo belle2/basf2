@@ -99,7 +99,7 @@ namespace Belle2 {
 
     for (auto& waveform : waveforms) {
       if (waveform.getBarID() != m_barID) continue;
-      unsigned channel = waveform.getChannelID();
+      unsigned channel = waveform.getChannel();
       unsigned window = waveform.getStorageWindow();
       if (channel < c_NumChannels and window < c_NumWindows) {
         auto baseline = m_baseline[channel];

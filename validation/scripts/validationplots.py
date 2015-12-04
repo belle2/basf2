@@ -1338,6 +1338,13 @@ class Plotuple:
             p-value)
         @return: None
         """
+        mop = metaoptions.MetaOptionParser(self.metaoptions)
+
+        if mop.has_option("nocompare"):
+            # is comparison disabled for this plot ?
+            self.chi2test_result = 'Chi^2 test is disabled for this plot'
+            self.pvalue = None
+            return
 
         fail_message = "Comparison failed: "
         pvalue = None
@@ -1369,7 +1376,6 @@ class Plotuple:
 
         if pvalue is not None:
             # check if there is a custom setting for pvalue sensitivity
-            mop = metaoptions.MetaOptionParser(self.metaoptions)
             pvalue_warn = mop.pvalue_warn()
             pvalue_error = mop.pvalue_error()
 

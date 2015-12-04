@@ -147,8 +147,13 @@ class Chi2Test(ComparisonBase):
 
     def __internal_compare(self, quantity):
         if not self.correct_types():
-            raise ObjectsNotSupported("Comparison of {} (Type {}) with {} (Type {}) not supported".format(
-                self.objectA.GetName(), self.objectA.ClassName(), self.objectB.GetName(), self.objectB.ClassName()))
+            raise ObjectsNotSupported(
+                "Comparison of {} (Type {}) with {} (Type {}) not supported." +
+                "Please contact Thomas.Hauth@kit.edu if you need this supported.".format(
+                    self.objectA.GetName(),
+                    self.objectA.ClassName(),
+                    self.objectB.GetName(),
+                    self.objectB.ClassName()))
         if not self.has_compatible_bins():
             raise DifferingBinCount("The objects have differing x bin count: {} has {} vs. {} has {}".format(
                 self.objectA.GetName(), self.objectA.GetNbinsX(), self.objectB.GetName(), self.objectB.GetNbinsX()))

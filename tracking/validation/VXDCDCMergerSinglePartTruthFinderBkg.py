@@ -20,6 +20,7 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -232,9 +233,11 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                #    'CDC_wall_radius': 16.25,
     'VXDGFTracksColName': 'VXDTracks',
     'CDCGFTracksColName': 'CDCTracks',
-    'GFTracksColName': 'GFTracks',
-    'TrackCandColName': 'TracksCand',
-    'UnMergedCands': 'UnMergedCand',
+    'VXDGFTrackCandsColName': 'VXDTracksCand',
+    'CDCGFTrackCandsColName': 'CDCTracksCand',
+    # 'GFTracksColName': 'GFTracks',
+    # 'TrackCandColName': 'TracksCand',
+    # 'UnMergedCands': 'UnMergedCand',
     'root_output_filename': '../VXDCDCMergerSinglePartTruthFinderBkg.root',
     #    'chi2_max': 100,
     #    'merge_radius': 2.0,

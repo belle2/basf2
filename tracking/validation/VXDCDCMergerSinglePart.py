@@ -20,6 +20,7 @@ from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
 from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # register necessary modules
 eventinfosetter = register_module('EventInfoSetter')
@@ -226,11 +227,13 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                # default False
                                # 'MCParticlesColName': 'mcParticlesTruth',
                                #    'CDC_wall_radius': 16.25,
-    'VXDGFTracksColName': 'VXDTracks',
-    'CDCGFTracksColName': 'CDCTracks',
-    'GFTracksColName': 'GFTracks',
-    'TrackCandColName': 'TracksCand',
-    'UnMergedCands': 'UnMergedCand',
+    'VXDGFTracksColName': 'VXDGFTracks',
+    'CDCGFTracksColName': 'CDCGFTracks',
+    'VXDGFTrackCandsColName': 'VXDGFTrackCands',
+    'CDCGFTrackCandsColName': 'CDCGFTrackCands',
+    # 'GFTracksColName': 'GFTracks',
+    # 'TrackCandColName': 'TracksCand',
+    # 'UnMergedCands': 'UnMergedCand',
     'root_output_filename': '../VXDCDCMergerSinglePart.root',
     #    'chi2_max': 100,
     #    'merge_radius': 2.0,
@@ -313,18 +316,19 @@ main.add_module(pGun)
 # main.add_module(cdcDigitizer)
 add_simulation(main)
 # main.add_module(si_mctrackfinder)
-main.add_module(vxd_trackfinder)
+# main.add_module(vxd_trackfinder)
 # main.add_module(cdc_mctrackfinder)
-main.add_module(cdc_trackfinder)
+# main.add_module(cdc_trackfinder)
 # main.add_module(cdcmcmatching)
-main.add_module(mctf)
-main.add_module(matcher1)
-main.add_module(matcher2)
-main.add_module(cand_merger)
+# main.add_module(mctf)
+# main.add_module(matcher1)
+# main.add_module(matcher2)
+# main.add_module(cand_merger)
 # main.add_module(si_fitting)
-main.add_module(fitting)
-main.add_module(track_splitter)
-main.add_module(vxd_cdcTracksMerger)
+# main.add_module(fitting)
+# main.add_module(track_splitter)
+# main.add_module(vxd_cdcTracksMerger)
+add_reconstruction(main)
 main.add_module(vxd_cdcMergerAnalysis)
 # main.add_module(HighlighterModule())
 # main.add_module(display)

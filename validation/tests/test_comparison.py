@@ -113,6 +113,7 @@ class TestComparison(unittest.TestCase):
 
         self.assertTrue(c.can_compare())
         self.assertAlmostEqual(c.pvalue(), 0.43093514577898634)
+        self.assertAlmostEqual(c.ndf(), 49)
 
     def test_compare_zero_error_profiles(self):
         """
@@ -135,6 +136,8 @@ class TestComparison(unittest.TestCase):
         chi2ndf = c.chi2ndf()
 
         self.assertAlmostEqual(pvalue, 0.4835651485797353)
+        # should still be only 49 ndf
+        self.assertAlmostEqual(c.ndf(), 49)
 
     def test_compare_histograms(self):
         """
@@ -147,6 +150,7 @@ class TestComparison(unittest.TestCase):
         self.assertAlmostEqual(c.pvalue(), 0.371600562118221)
         self.assertAlmostEqual(c.chi2(), 42.308970111484086)
         self.assertAlmostEqual(c.chi2ndf(), 1.0577242527871022)
+        self.assertAlmostEqual(c.ndf(), 40)
 
     def test_compare_unsupported_object(self):
         """

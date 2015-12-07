@@ -1359,6 +1359,7 @@ class Plotuple:
             pvalue = ctest.pvalue()
             chi2 = ctest.chi2()
             chi2ndf = ctest.chi2ndf()
+            ndf = ctest.ndf()
         except validationcomparison.ObjectsNotSupported as e:
             self.chi2test_result = fail_message + str(e)
         except validationcomparison.DifferingBinCount as e:
@@ -1392,8 +1393,8 @@ class Plotuple:
                 canvas.SetFillColor(ROOT.kOrange)
 
             self.chi2test_result = ('Performed Chi^2-Test between '
-                                    'reference and {0} (Chi^2 = {1} Chi^2/NDF = {2})'
-                                    .format(self.newest.revision, chi2, chi2ndf))
+                                    'reference and {} (Chi^2 = {} NDF = {} Chi^2/NDF = {})'
+                                    .format(self.newest.revision, chi2, ndf, chi2ndf))
             self.pvalue = pvalue
         else:
             self.pvalue = None

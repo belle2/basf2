@@ -3,6 +3,7 @@
 
 import ROOT
 from enum import Enum
+import numpy
 
 
 class ComparisonFailed(Exception):
@@ -48,20 +49,6 @@ class Chi2Test(ComparisonBase):
     """
     Perform a Chi2Test for ROOT objects
     """
-
-    class ResultQuantity(Enum):
-        """
-        Used to specific the quantity to extract during the Chi2Test
-        """
-
-        # Chi^2
-        chi2 = "CHI2"
-
-        # Chi^2 / number of degrees of freedom
-        chi2ndf = "CHI2/NDF"
-
-        # the probability value
-        pvalue = ""
 
     def __init__(self, objectA, objectB):
         """
@@ -119,37 +106,28 @@ class Chi2Test(ComparisonBase):
 
     def chi2ndf(self):
         """
-        @return the chi2 divided by the number of dregrees of freedom
+        @return the chi2 divided by the number of degrees of freedom
         """
         self.ensure_compute()
         return self.__chi2ndf
+
+    def ndf(self):
+        """
+        @return the number of degrees of freedom
+        """
+        self.ensure_compute()
+        return self.__ndf
 
     def ensure_compute(self):
         """
         Ensure all required quantities get computed and are cached inside the class
         """
-
-        # todo: improve the diagnostics of this error message
-        # can only be properly set, once the igood value of Chi2Test
-        # can be accessed via PyROOT and python3
-        # fail_message = "No Chi^2 could be computed by ROOT."
         if self.computed:
-            #    if not self.__chi2 > 0.0:
-            #        raise ComparisonFailed(fail_message)
             return
 
-        # compute and store pvalue
-        self.__pvalue = self.__internal_compare(self.ResultQuantity.pvalue)
-        # compute and store chi^2
-        self.__chi2 = self.__internal_compare(self.ResultQuantity.chi2)
-        # compute and store chi^2 / ndf
-        self.__chi2ndf = self.__internal_compare(self.ResultQuantity.chi2ndf)
-
+        # compute and store quantities
+        self.__pvalue, self.__chi2, self.__chi2ndf, self.__ndf = self.__internal_compare()
         self.computed = True
-
-        # see comment above
-        # if not self.__chi2 > 0.0:
-        #    raise ComparisonFailed(fail_message)
 
     def ensure_zero_error_has_no_content(self, a, b):
         """
@@ -172,10 +150,9 @@ class Chi2Test(ComparisonBase):
         """
         return self.objectA.GetNbinsX() == self.objectB.GetNbinsX()
 
-    def __internal_compare(self, quantity):
+    def __internal_compare(self):
         """
         Performs the actual Chi^2 test
-        @param quantity: the quantity which should be returned, of type ResultQuantity
         @return: The request result quantity
         """
         if not self.correct_types():
@@ -224,16 +201,20 @@ class Chi2Test(ComparisonBase):
         else:
             compareOptions += "UU"
 
-        if quantity == self.ResultQuantity.chi2:
-            compareOptions += " " + self.ResultQuantity.chi2.value
-        elif quantity == self.ResultQuantity.chi2ndf:
-            compareOptions += " " + self.ResultQuantity.chi2ndf.value
-
         if compareWeightOne and compareWeightTwo:
             self.ensure_zero_error_has_no_content(firstObj, secondObj)
 
-        # for python3, Chi2TestX is not working atm:
-        # https://root.cern.ch/phpBB3/viewtopic.php?t=19751
-        result = firstObj.Chi2Test(secondObj, compareOptions)
+        # use numpy arrays to support ROOT's pass-by-reference interface here
+        res_chi2 = numpy.array(1, numpy.float64)
+        res_igood = numpy.array(1, numpy.int32)
+        res_ndf = numpy.array(1, numpy.int32)
 
-        return result
+        res_pvalue = firstObj.Chi2TestX(secondObj, res_chi2, res_ndf, res_igood, compareOptions)
+
+        if res_ndf < 1:
+            raise ComparisonFailed("Comparison failed, no Chi^2 could be computed. Please send the ROOT files " +
+                                   "involved to Thomas.Hauth@kit.edu.")
+
+        res_chi2ndf = res_chi2 / res_ndf
+
+        return (res_pvalue, res_chi2, res_chi2ndf, res_ndf)

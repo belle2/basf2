@@ -239,30 +239,7 @@ void GenFitterModule::initialize()
   }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2ERROR("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
-
-    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-      geoManager.createTGeoRepresentation();
-    }
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
-    // activate / deactivate material effects in genfit
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
-
-    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
-  }
-
-  if (!genfit::FieldManager::getInstance()->isInitialized()) {
-    B2WARNING("Magnetic field not set up, doing this myself.");
-
-    //pass the magnetic field to genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-    genfit::FieldManager::getInstance()->useCache();
+    B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
   }
 
   //read the pdgCode options and set attributes accordingly

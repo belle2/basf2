@@ -31,7 +31,6 @@
 #include <genfit/Exception.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 #include <genfit/StateOnPlane.h>
 
 #include <TGeoManager.h>

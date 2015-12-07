@@ -18,7 +18,6 @@
 #include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 
 #include <TGeoManager.h>
 

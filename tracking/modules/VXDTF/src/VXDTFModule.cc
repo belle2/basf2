@@ -42,7 +42,6 @@
 #include <genfit/KalmanFitterRefTrack.h>
 #include <genfit/KalmanFitter.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 
 
 //root packages:
@@ -6954,27 +6953,11 @@ void VXDTFModule::prepareExternalTools()
   StoreArray<genfit::TrackCand>::registerPersistent(m_PARAMgfTrackCandsColName);
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2WARNING("Material effects not set up, doing this myself with default values.  Please use SetupGenfitExtrapolationModule.");
-
-    if (!gGeoManager) { //setup geometry and B-field for Genfit if not already there
-      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-      geoManager.createTGeoRepresentation();
-    }
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
-    // activate / deactivate material effects in genfit
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(true);
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(true);
-
-    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+    B2FATAL("Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
   }
 
   if (!genfit::FieldManager::getInstance()->isInitialized()) {
-    //pass the magnetic field to genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+    B2FATAL("Magnetic field effects not set up.  Please use SetupGenfitExtrapolationModule.");
   }
 
   /// temporary members for testing purposes (minimal testing routines)

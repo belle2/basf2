@@ -70,7 +70,6 @@
 
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
 #include <genfit/MeasurementFactory.h>
 
 #include <cstdlib>
@@ -245,26 +244,7 @@ void GBLfitModule::initialize()
   }
 
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2WARNING("Material effects not set up, doing this myself with default values (noise is turned off).");
-
-    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
-      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-      geoManager.createTGeoRepresentation();
-    }
-    //pass the magnetic field to genfit
-    genfit::FieldManager::getInstance()->init(new GFGeant4RecoField());
-    genfit::FieldManager::getInstance()->useCache();
-
-    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
-
-    // activate / deactivate material effects in genfit
-    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(false); // Noise matrix not used by GBL
-    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(false); // Noise matrix not used by GBL
-    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
-    genfit::MaterialEffects::getInstance()->setNoiseBrems(false); // Noise matrix not used by GBL
-
-    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+    B2FATAL("Material effects not set up, please use the SetupGenfitExtrapolationModule.");
   }
 
   //read the pdgCode options and set attributes accordingly

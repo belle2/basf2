@@ -17,8 +17,7 @@ class MetaOptionParser:
         @param meta_option_list: list of meta options read from ROOT object
         """
 
-        # store the meta option list for usage
-        # in the functions below
+        #: store the meta option list for usage in the functions below
         self.mo = meta_option_list
 
     def has_option(self, option_name):

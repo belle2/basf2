@@ -54,44 +54,44 @@ class TestComparison(unittest.TestCase):
         global call_iteration
 
         pA = self.create_profile(self.root_name("profileA"))
-        # store for later use
+        #: store for later use
         self.profileA = pA
 
         pB = self.create_profile(self.root_name("profileB"))
-        # store for later use
+        #: store for later use
         self.profileB = pB
 
         pC = self.create_profile(self.root_name("profileC"), 5000, 5, 3)
-        # store for later use
+        #: store for later use
         self.profileC = pC
 
         pZeroErrorBins = self.create_profile(self.root_name("profileZeroErrorBins"), max_fill=49)
         pZeroErrorBins.SetBinError(35, 0.0)
-        # store for later use
+        #: store for later use
         self.profileZeroErrorBins = pZeroErrorBins
 
         pZeroErrorBinsTwo = self.create_profile(self.root_name("profileZeroErrorBinsTwo"), max_fill=49)
         pZeroErrorBinsTwo.SetBinError(35, 0.0)
-        # store for later use
+        #: store for later use
         self.profileZeroErrorBinsTwo = pZeroErrorBinsTwo
 
         hA = self.create_histogram(self.root_name("histogramA"), 5000, 5, 3)
-        # store for later use
+        #: store for later use
         self.histogramA = hA
 
         hB = self.create_histogram(self.root_name("histogramB"), 5000, 5, 3)
-        # store for later use
+        #: store for later use
         self.histogramB = hB
 
         pAequal = self.create_profile(self.root_name("profileA_almostequal"), sigma=0.4)
-        # store for later use
+        #: store for later use
         self.profileAequal = pAequal
 
         pBequal = self.create_profile(self.root_name("profileB_almostequal"), sigma=0.4)
-        # store for later use
+        #: store for later use
         self.profileBequal = pBequal
 
-        # store for later use
+        #: store for later use
         self.profileDifferentBins = ROOT.TProfile(self.root_name("profileDifferentBins"),
                                                   self.root_name("profileDifferentBins"), 40, 0, 50.0)
         call_iteration += 1

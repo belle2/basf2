@@ -55,13 +55,13 @@ class Chi2Test(ComparisonBase):
         Store the two histograms/profiles operated on
         """
 
-        # store the first object to compare
+        #: store the first object to compare
         self.objectA = objectA
 
-        # store the second object to compare
+        #: store the second object to compare
         self.objectB = objectB
 
-        # used to store, whether the quantities have already been compared
+        #: used to store, whether the quantities have already been compared
         self.computed = False
 
     def can_compare(self):
@@ -125,7 +125,7 @@ class Chi2Test(ComparisonBase):
         if self.computed:
             return
 
-        # compute and store quantities
+        #: compute and store quantities
         self.__pvalue, self.__chi2, self.__chi2ndf, self.__ndf = self.__internal_compare()
         self.computed = True
 

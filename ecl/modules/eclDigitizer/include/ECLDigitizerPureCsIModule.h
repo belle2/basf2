@@ -12,6 +12,7 @@
 #define ECLDIGITIZERPURECSIMODULE_H_
 
 #include <framework/core/Module.h>
+#include <ecl/digitization/EclConfigurationPure.h>
 #include <vector>
 
 class TH1F;
@@ -66,35 +67,6 @@ namespace Belle2 {
         return false;
       }
 
-      static constexpr int        m_nch = 8736; // total number of electronic channels (crystals) in calorimeter
-      static constexpr double    m_tick_Tl = 24.*12. / 508.; // == 72/127 digitization clock tick (in microseconds ???)
-      static constexpr int       m_ntrg = 144; // number of trigger counts per ADC clock tick
-      static constexpr double    m_tick = 8 * (m_tick_Tl / m_ntrg);   // o(16 ns)
-      static constexpr int       m_nsmp = 31; // number of ADC measurements for signal fitting
-      static constexpr double    m_tmin = -15; // lower range of the signal fitting region in ADC clocks
-
-      static constexpr int         m_nl_Tl = 48; // length of samples signal in number of ADC clocks
-      static constexpr int         m_nl = m_nl_Tl * 15; // length of samples signal in number of ADC clocks
-
-      static constexpr int         m_ns = 32; // number of samples per ADC clock
-
-      static constexpr int        m_ndt = 96; // number of points per ADC tick where signal fit procedure parameters are evaluated
-
-      struct signalsample_t; // forward declaration
-
-      struct adccounts_t {
-        double total; // total deposition (sum of m_s array)
-        double c[m_nsmp]; // flash ADC measurements
-        void AddHit(const double a, const double t0, const signalsample_t& q);
-      };
-
-      struct signalsample_t {
-        double m_sumscale; // energy deposit in fitting window scale factor
-        double m_ft[m_nl * m_ns];
-        void InitSample(const TH1F*);
-        double Accumulate(const double, const double, double*) const;
-      };
-
       struct crystallinks_t { // offsets for storages of ECL channels
         short unsigned int idn;
         short unsigned int inoise;
@@ -103,14 +75,16 @@ namespace Belle2 {
       };
 
       std::vector<crystallinks_t> m_tbl;
-      // std::vector<ECLNoiseData> m_noise;
-      std::vector<signalsample_t> m_ss;
+
+      using fitparams_type = EclConfigurationPure::fitparamspure_t;
+      using signalsample_type = EclConfigurationPure::signalsamplepure_t;
+      using adccounts_type = EclConfigurationPure::adccountspure_t;
+
+      std::vector<fitparams_type> m_fitparams;
+      std::vector<signalsample_type> m_ss;
 
       // Storage for adc hits from entire calorimeter (8736 crystals)
-      std::vector<adccounts_t> m_adc;
-
-      void shapeFitterWrapperPureCsI(const int j, const int* FitA, const int m_ttrig,
-                                     int& m_lar, int& m_ltr, int& m_lq) const;
+      std::vector<adccounts_type> m_adc;
 
       /** read Shaper-DSP data from root file */
       void readDSPDB();
@@ -121,6 +95,10 @@ namespace Belle2 {
       /** Module parameters */
       bool m_background;
       bool m_calibration;
+      int m_tickFactor;
+      bool m_debug;
+      int m_testtrg;
+      double m_testsig;
       static constexpr const char* eclDigitArrayName() { return "ECLDigitsPureCsI"; }
       static constexpr const char* eclDspArrayName() { return "ECLDspsPureCsI"; }
     };

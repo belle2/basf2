@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <vector>
 #include <sstream>
+#include <cstdio>
 
 #include "NeuroBayesTeacher.hh"
 
@@ -215,7 +216,8 @@ int main(int argc, char** argv)
   // stdout is redirected to the file output_nb_log
   int original = dup(fileno(stdout));
   fflush(stdout);
-  if (freopen(output_nb_log, "w", stdout) == nullptr) {
+  FILE* log_stream = freopen(output_nb_log, "w", stdout);
+  if (log_stream == nullptr) {
     B2FATAL("NeuroBayes output log file " << output_nb_log << " could not be opened in writing mode.");
   }
 

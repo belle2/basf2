@@ -163,8 +163,6 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
   }
 
   if (err_flag == 1) {
@@ -176,8 +174,6 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
 
 #endif //NO_DATA_CHECK
   }
@@ -235,8 +231,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   *cur_exprunsubrun_no = GetExpRunSubrun(n);
   *cur_copper_ctr = GetCOPPERCounter(n);
-  if (true) {
-    //  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
+  if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
       sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
@@ -248,7 +243,14 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifdef DESY
+      //
+      // In DESY test, we ignore this error
+      //
+      printf("[DEBUG] [INFO] %s", err_buf);
+#else
       err_flag = 1;
+#endif
     }
   }
 
@@ -411,17 +413,8 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-
-    // confirm CRC16 value to check whether the mismatch occurred after CRC16 calculation or not.
-    printf("[INFO] checking CRC16 for this mismatched event...\n");
-    for (int i = 0; i < 4; i++) {
-      if (GetFINESSENwords(n , i) > 0) {
-        CheckCRC16(n, i);
-      }
-    }
-    printf("[INFO] CRC16 check is done. It seems to be O.K.\n");
-    fflush(stdout);
     string err_str = err_buf; throw (err_str);
+
     //     sleep(1234567);
     //     exit(1);
   }
@@ -699,9 +692,6 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
     string err_str = err_buf; throw (err_str);
-
-    //     sleep(12345678);
-    //     exit(-1);
 #endif
   }
 
@@ -1174,22 +1164,6 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       }
     }
     printf("\n");
-
-    // temp
-    for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
-      unsigned int temp_buf[4] = {0, 0, 0, 0};
-      for (int i = 0; i < 4; i++) {
-        temp_buf[i] = *(GetFINESSEBuffer(n, i) + k);
-      }
-      printf("%.8x %.8x %.8x %.8x\n", temp_buf[0], temp_buf[1], temp_buf[2], temp_buf[3]);
-      if (temp_buf[0] != temp_buf[1] ||
-          temp_buf[0] != temp_buf[2] ||
-          temp_buf[0] != temp_buf[3]
-         ) {
-        printf("different !\n");
-      }
-    }
-
     fflush(stdout);
     char err_buf[500];
     sprintf(err_buf,

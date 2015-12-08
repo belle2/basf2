@@ -40,8 +40,11 @@ CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module() , m_root
 {
   setDescription("This module evaluates the combined PID performance");
 
-  addParam("outputFileName", m_rootFileName, "Name of output root file.",
+  addParam("outputFileName", m_rootFileName, "Name of output root file",
            std::string("CombinedPIDPerformance_output.root"));
+  addParam("numberOfBins", m_nbins, "Number of bins in TEfficiency", int(100));
+  addParam("momentumLower", m_p_lower, "Lower limit of momentum range", double(0.0));
+  addParam("momentumUpper", m_p_upper, "Upper limit of momentum range", double(5.0));
 }
 
 CombinedPIDPerformanceModule::~CombinedPIDPerformanceModule() { }
@@ -78,44 +81,58 @@ void CombinedPIDPerformanceModule::initialize()
   // now create the histograms
   //  for( const auto& det : chargedSet ){
   for (unsigned int i = 0; i < chargedSet.size() + 3; ++i) {
-    m_piK_Efficiencies.push_back(createEfficiency(TString::Format("epik_%d", i), "#pi efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_piK_Efficiencies.push_back(createEfficiency(TString::Format("epik_%d", i), "#pi efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
-    m_Kpi_Efficiencies.push_back(createEfficiency(TString::Format("ekpi_%d", i), "K efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_Kpi_Efficiencies.push_back(createEfficiency(TString::Format("ekpi_%d", i), "K efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
-    m_ppi_Efficiencies.push_back(createEfficiency(TString::Format("eppi_%d", i), "p efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_ppi_Efficiencies.push_back(createEfficiency(TString::Format("eppi_%d", i), "p efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
-    m_pK_Efficiencies.push_back(createEfficiency(TString::Format("epk_%d", i), "p efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_pK_Efficiencies.push_back(createEfficiency(TString::Format("epk_%d", i), "p efficiency;p  [GeV/c];Efficiency", m_nbins, m_p_lower,
+                                                 m_p_upper,
                                                  m_histoList));
-    m_dpi_Efficiencies.push_back(createEfficiency(TString::Format("edpi_%d", i), "d efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_dpi_Efficiencies.push_back(createEfficiency(TString::Format("edpi_%d", i), "d efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
 
-    m_piK_FakeRates.push_back(createEfficiency(TString::Format("fpik_%d", i), "#pi fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_piK_FakeRates.push_back(createEfficiency(TString::Format("fpik_%d", i), "#pi fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
-    m_Kpi_FakeRates.push_back(createEfficiency(TString::Format("fkpi_%d", i), "K fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_Kpi_FakeRates.push_back(createEfficiency(TString::Format("fkpi_%d", i), "K fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
-    m_ppi_FakeRates.push_back(createEfficiency(TString::Format("fppi_%d", i), "p fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_ppi_FakeRates.push_back(createEfficiency(TString::Format("fppi_%d", i), "p fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
-    m_pK_FakeRates.push_back(createEfficiency(TString::Format("fpk_%d", i), "p fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_pK_FakeRates.push_back(createEfficiency(TString::Format("fpk_%d", i), "p fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                              m_p_upper,
                                               m_histoList));
-    m_dpi_FakeRates.push_back(createEfficiency(TString::Format("fdpi_%d", i), "d fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_dpi_FakeRates.push_back(createEfficiency(TString::Format("fdpi_%d", i), "d fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
   }
 
   //  for( const auto& det : electronSet ){
   for (unsigned int i = 0; i < electronSet.size() + 2; ++i) {
-    m_epi_Efficiencies.push_back(createEfficiency(TString::Format("eepi_%d", i), "e efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_epi_Efficiencies.push_back(createEfficiency(TString::Format("eepi_%d", i), "e efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
 
-    m_epi_FakeRates.push_back(createEfficiency(TString::Format("fepi_%d", i), "e fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_epi_FakeRates.push_back(createEfficiency(TString::Format("fepi_%d", i), "e fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
   }
 
   //  for( const auto& det : muonSet ){
   for (unsigned int i = 0; i < muonSet.size(); ++i) {
-    m_mpi_Efficiencies.push_back(createEfficiency(TString::Format("empi_%d", i), "#mu efficiency;p  [GeV/c];Efficiency", 100, 0, 5,
+    m_mpi_Efficiencies.push_back(createEfficiency(TString::Format("empi_%d", i), "#mu efficiency;p  [GeV/c];Efficiency", m_nbins,
+                                                  m_p_lower, m_p_upper,
                                                   m_histoList));
 
-    m_mpi_FakeRates.push_back(createEfficiency(TString::Format("fmpi_%d", i), "#mu fake rate;p  [GeV/c];Fake Rate", 100, 0, 5,
+    m_mpi_FakeRates.push_back(createEfficiency(TString::Format("fmpi_%d", i), "#mu fake rate;p  [GeV/c];Fake Rate", m_nbins, m_p_lower,
+                                               m_p_upper,
                                                m_histoList));
   }
 

@@ -70,6 +70,9 @@ namespace Belle2 {
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
+    int m_nbins; /**< number of bins in momentum range */
+    double m_p_lower; /**< lower limit of momentum range */
+    double m_p_upper; /**< upper limit of momentum range */
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */

@@ -54,6 +54,7 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
            "Flag to use the DigitizerPureCsI for Waveform fit Covariance Matrix calibration; Default is false",
            false);
   addParam("adcTickFactor", m_tickFactor, "multiplication factor to get adc tick from trigger tick", 8);
+  addParam("sigmaTrigger", m_sigmaTrigger, "Trigger resolution used", 0.020);
   addParam("Debug", m_debug, "debug mode on (default off)", false);
   addParam("debugtrgtime", m_testtrg, "set fixed trigger time for testing purposes", 0);
   addParam("debugsigtimeshift", m_testsig, "shift signal arrival time for testing purposes (in microsec)", 0.);
@@ -68,7 +69,7 @@ ECLDigitizerPureCsIModule::~ECLDigitizerPureCsIModule()
 void ECLDigitizerPureCsIModule::initialize()
 {
   m_nEvent  = 0 ;
-  EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick;
+  EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick / EclConfiguration::m_ntrg;
 
   StoreArray<ECLDsp>    ecldsp(eclDspArrayName()); ecldsp.registerInDataStore();
   StoreArray<ECLDigit> ecldigi(eclDigitArrayName()); ecldigi.registerInDataStore();
@@ -97,6 +98,13 @@ void ECLDigitizerPureCsIModule::event()
   // Output Arrays
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
   StoreArray<ECLDsp> eclDsps(eclDspArrayName());
+
+  /* add trigger resolution defined in a module paramer
+     shifting the waveform starting time by a random deltaT,
+     assuming that t0=0 adc channel is determined by the trigger */
+
+  double deltaT = m_sigmaTrigger == 0 ? 0 : gRandom->Gaus(0, m_sigmaTrigger);
+
 
   /*
     Not using trigger time for now
@@ -133,7 +141,7 @@ void ECLDigitizerPureCsIModule::event()
       if (m_debug)
         m_adc[j].AddHit(hitE, hitTime + m_testsig, m_ss[m_tbl[j].iss]);
       else
-        m_adc[j].AddHit(hitE, hitTime, m_ss[m_tbl[j].iss]);
+        m_adc[j].AddHit(hitE, hitTime + deltaT, m_ss[m_tbl[j].iss]);
       hitmap[j].push_back(&eclHit);
     }
   }

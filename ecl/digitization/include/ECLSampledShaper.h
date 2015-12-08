@@ -9,10 +9,21 @@ public:
     : m_sampledShape(s), m_timeScale(ts) {}
   ~ECLSampledShaper() { delete m_sampledShape;}
   void fillarray(int N, double* a)
-  { for (int i = 0; i < N; i++) a[i] = m_sampledShape->GetBinContent(i * m_timeScale + 1); }
+  {
+    if (m_timeScale == 1)
+      for (int i = 0; i < N; i++) a[i] = m_sampledShape->GetBinContent(i * m_timeScale + 1);
+    else {
+      for (int i = 0; i < N; i++) {
+        a[i] = 0;
+        for (int j = 0; j < m_timeScale; j++)
+          a[i] += m_sampledShape->GetBinContent(i * m_timeScale + j);
+        a[i] /= m_timeScale;
+      }
+    }
+  }
 private:
   const TH1F* m_sampledShape;
-  const double m_timeScale;
+  const int m_timeScale;
 };
 
 #endif

@@ -100,7 +100,7 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
 void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  , const int* FitA, const int ttrig, int& amp,
                                 double& time, double& chi2, int& iter)
 {
-  int baseline = accumulate(FitA, FitA + 15, 0) / 15;
+  int baseline = accumulate(FitA, FitA + 16, 0) / 16;
   const int* imax =  max_element(FitA, FitA + EclConfigurationPure::m_nsmp);
 
   amp = *imax - baseline;
@@ -108,9 +108,9 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
 
 
   int dt = ttrig;
-  double y[17];
+  double y[16];
   y[0] = baseline;
-  for (int i = 15; i < EclConfigurationPure::m_nsmp; i++) y[i - 14] = FitA[i];
+  for (int i = 16; i < EclConfigurationPure::m_nsmp; i++) y[i - 15] = FitA[i];
 
   //cout << "ttrig = " << dt << endl;
   //  for (int i=0; i<16; i++ ) cout << "y_" << i << " = " << y[i] << endl;

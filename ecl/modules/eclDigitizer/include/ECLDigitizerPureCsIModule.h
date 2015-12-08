@@ -96,6 +96,7 @@ namespace Belle2 {
       bool m_background;
       bool m_calibration;
       int m_tickFactor;
+      double m_sigmaTrigger;
       bool m_debug;
       int m_testtrg;
       double m_testsig;

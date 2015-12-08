@@ -1,7 +1,18 @@
-Data for Database (ARICHDatabaseImporter.py)
+####  Data for Database (ARICHDatabaseImporter.py)
 
 All data can be found at: https://belle2.cc.kek.jp/svn/groups/arich/database/data/
 
 Aerogel xml files (1st and 2nd measurement): aerogel_1st/ , aerogel_2nd/
 HAPD QA data (only one sample file for now): hapdQA_test/
 Xml files from Hamamatsu: hapd_hamamatsuData/ (check https://belle2.cc.kek.jp/svn/groups/arich/database/README to get original files)
+FEB test: febTest
+Asic data (only small sample of data): asicData
+xml file including all xml files from different types of data: AllData
+
+#### Importing and exporting data to/from DB
+
+For each class there are functions "importClass" and "exportClass". Export functions list few members of class. For using data, check the example.
+
+####  How to get and use data from database
+
+Check ARICHDatabaseImporter::getBiasVoltagesForHapdChip() for example (uncomment it in ARICHDatabaseImporter.py)

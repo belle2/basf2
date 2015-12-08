@@ -13,6 +13,8 @@
 #include <arich/dbobjects/structures/ARICHAsicInfo.h>
 #include <arich/dbobjects/structures/ARICHHapdQA.h>
 #include <arich/dbobjects/structures/ARICHFebTest.h>
+#include <arich/dbobjects/structures/ARICHHapdChipInfo.h>
+#include <arich/dbobjects/structures/ARICHHapdInfo.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -24,6 +26,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
+#include <TF1.h>
 #include <TGraph.h>
 #include <TFile.h>
 #include <TKey.h>
@@ -96,12 +99,10 @@ void ARICHDatabaseImporter::exportAerogelInfo()
 
   // Print aerogel info
 
-  unsigned int el = 0;
   for (const auto& element : elements) {
-    cout << "Element Number: " << el << "; version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
-         ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
-         element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness() << endl;
-    el++;
+    B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
+           ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
+           element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
   }
 }
 
@@ -216,6 +217,7 @@ void ARICHDatabaseImporter::importAsicInfo()
       TFile* f = TFile::Open(inputFile.c_str(), "READ");
       TIter next(f->GetListOfKeys());
       TKey* key;
+      // fill vectors with histograms with different gain and offset settings
       while ((key = (TKey*)next())) {
         string strname = key->GetName();
         if (strname.find("gain") != string::npos) {
@@ -228,6 +230,7 @@ void ARICHDatabaseImporter::importAsicInfo()
           m_offset.push_back(hist3d);
         } else { B2INFO("Key name does not match any of the following: gain, offset!"); }
       }
+      f->Close();
 
       // get time of measurement
       timeFinishGain = ARICHDatabaseImporter::getAsicDate(asicSerial, "gain");
@@ -256,7 +259,6 @@ void ARICHDatabaseImporter::importAsicInfo()
       new(asicConstants[asic])  ARICHAsicInfo(asicSerial, timeFinishGain, timeFinishOffset, nosignalCHs, badconnCHs, badoffsetCHs,
                                               badlinCHs, num,  m_gain, m_offset);
       asic++;
-      f->Close();
     }
   }
   // define IOV and store data to the DB
@@ -373,6 +375,7 @@ void ARICHDatabaseImporter::importFebTest()
   GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
   GearDir content2LV = GearDir("/ArichData/AllData/FEBDataLV/Content");
 
+  // find matching sn and dna
   for (const auto& febmap : content1.getNodes("feb")) {
     int serial = febmap.getInt("sn");
     string dna = febmap.getString("dna");
@@ -384,7 +387,8 @@ void ARICHDatabaseImporter::importFebTest()
     febConst->setFebSerial(serial);
     febConst->setFebDna(dna);
 
-    for (const auto& testFEB : content2.getNodes("febtest")) { // slow control data
+    // slow control data
+    for (const auto& testFEB : content2.getNodes("febtest")) {
       string timeSlowC = testFEB.getString("time");
 
       int i = 0;
@@ -429,6 +433,7 @@ void ARICHDatabaseImporter::importFebTest()
       }
     }
 
+    // high voltage test data
     for (const auto& testFEBhv : content2HV.getNodes("febtest")) {
       string timeHV = testFEBhv.getString("time");
       for (const auto& testFEBhv_sn : testFEBhv.getNodes("hvtest/feb")) {
@@ -446,7 +451,7 @@ void ARICHDatabaseImporter::importFebTest()
       }
     }
 
-
+    // low voltage test data
     for (const auto& testFEBlv : content2LV.getNodes("febtest")) {
       string timeLV = testFEBlv.getString("time");
       for (const auto& testFEBlv_sn : testFEBlv.getNodes("lvtest/feb")) {
@@ -509,11 +514,409 @@ void ARICHDatabaseImporter::exportFebTest()
   DBArray<ARICHFebTest> elements("testFeb");
   elements.getEntries();
 
-  // Print serial numbers of HAPDs
+  // Print serial numbers of FEBs
   unsigned int el = 0;
   for (const auto& element : elements) {
     B2INFO("Element Number: " << el << "; serial = " << element.getFebSerial());
     el++;
-    cout << "element" << endl;
   }
 }
+
+void ARICHDatabaseImporter::importHapdChipInfo()
+{
+  // define data array
+  TClonesArray chipConstants("Belle2::ARICHHapdChipInfo");
+  int hapd_i = 0, chip_i = 0;
+
+  GearDir content = GearDir("/ArichData/AllData/hapdData/Content");
+
+  string serial[1000], chip[4000];
+  int channel_label_aval[4000], bias[4000], gain[4000];
+  TGraph** bombardmentGain, **avalancheGain;
+  bombardmentGain = new TGraph *[4000];
+  avalancheGain = new TGraph *[4000];
+  TH2F** bias2DV, **bias2DI;
+  bias2DV = new TH2F *[4000];
+  bias2DI = new TH2F *[4000];
+  vector<int> deadlist[4000], cutlist[4000];
+  vector<TGraph*> bombCurrents[4000], avalCurrents[4000];
+
+  // extract chip info, such as bias voltage, lists of dead and bad channels etc.
+  for (const auto& hapdInfo : content.getNodes("hapd")) {
+    serial[hapd_i] = hapdInfo.getString("serial");
+    int chip_ABCD = 0;
+    for (const auto& chipInfo : hapdInfo.getNodes("chipinfo")) {
+      chip_i = 4 * hapd_i + chip_ABCD;
+      chip[chip_i] = chipInfo.getString("chip");
+      bias[chip_i] = chipInfo.getInt("bias");
+      string deadL = chipInfo.getString("deadlist");
+      string cutL = chipInfo.getString("cutlist");
+      if (deadL.find("ch") != string::npos) { string deadLsub = deadL.substr(3); cutlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(deadLsub.c_str()); }
+      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); deadlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str()); }
+      string gain_str = chipInfo.getString("gain");
+      gain[chip_i] = atoi(gain_str.c_str());
+      chip_ABCD++;
+    }
+
+    // prepare TGraphs for bombardment gain and current
+    int n3 = 30, i3 = 0;
+    //int channel_label_bomb;
+    float hv_bomb[n3], gain_bomb[n3], current1_bomb[n3], current2_bomb[n3], current3_bomb[n3];
+    chip_ABCD = 0;
+    for (const auto& BG : hapdInfo.getNodes("bombardmentgain/ch")) {
+      chip_i = 4 * hapd_i + chip_ABCD;
+      string value = BG.getString("value");
+      string value_1 = value;
+      string chip_label = value.erase(1);
+      string value_2 = value_1.substr(2);
+      //channel_label_bomb = atoi(value_2.c_str());
+      for (const auto& BG2 : BG.getNodes("point")) {
+        hv_bomb[i3] = (float) BG2.getDouble("hv");
+        gain_bomb[i3] = (float) BG2.getDouble("gain");
+        current1_bomb[i3] = (float) BG2.getDouble("current1");
+        current2_bomb[i3] = (float) BG2.getDouble("current2");
+        current3_bomb[i3] = (float) BG2.getDouble("current3");
+        i3++;
+      }
+
+      bombardmentGain[chip_i] = ARICHDatabaseImporter::getGraphGainCurrent("Bombardment", "gain", chip_label, i3, hv_bomb, gain_bomb);
+      TGraph* bombardmentCurrent1 = ARICHDatabaseImporter::getGraphGainCurrent("Bombardment", "current1", chip_label, i3, hv_bomb,
+                                    current1_bomb);
+      TGraph* bombardmentCurrent2 = ARICHDatabaseImporter::getGraphGainCurrent("Bombardment", "current2", chip_label, i3, hv_bomb,
+                                    current2_bomb);
+      TGraph* bombardmentCurrent3 = ARICHDatabaseImporter::getGraphGainCurrent("Bombardment", "current3", chip_label, i3, hv_bomb,
+                                    current3_bomb);
+      bombCurrents[chip_i].push_back(bombardmentCurrent1);
+      bombCurrents[chip_i].push_back(bombardmentCurrent2);
+      bombCurrents[chip_i].push_back(bombardmentCurrent3);
+
+      chip_ABCD++;
+      i3 = 0;
+    }
+
+    // prepare TGraphs for avalanche gain and current
+    int n4 = 30, i4 = 0;
+    float hv_aval[n4], gain_aval[n4], current1_aval[n4], current2_aval[n4], current3_aval[n4];
+    chip_ABCD = 0;
+    for (const auto& BG : hapdInfo.getNodes("avalanchegain/ch")) {
+      chip_i = 4 * hapd_i + chip_ABCD;
+      string value = BG.getString("value");
+      string value_1 = value;
+      string chip_label = value.erase(1);
+      string value_2 = value_1.substr(2);
+      channel_label_aval[chip_i] = atoi(value_2.c_str());
+      for (const auto& BG2 : BG.getNodes("point")) {
+        hv_aval[i4] = (float) BG2.getDouble("biasv");
+        gain_aval[i4] = (float) BG2.getDouble("gain");
+        current1_aval[i4] = (float) BG2.getDouble("current1");
+        current2_aval[i4] = (float) BG2.getDouble("current2");
+        current3_aval[i4] = (float) BG2.getDouble("current3");
+        i4++;
+      }
+
+      avalancheGain[chip_i] = ARICHDatabaseImporter::getGraphGainCurrent("Avalanche", "gain", chip_label, i4, hv_aval, gain_aval);
+      TGraph* avalancheCurrent1 = ARICHDatabaseImporter::getGraphGainCurrent("Avalanche", "current1", chip_label, i4, hv_aval,
+                                  current1_aval);
+      TGraph* avalancheCurrent2 = ARICHDatabaseImporter::getGraphGainCurrent("Avalanche", "current2", chip_label, i4, hv_aval,
+                                  current2_aval);
+      TGraph* avalancheCurrent3 = ARICHDatabaseImporter::getGraphGainCurrent("Avalanche", "current3", chip_label, i4, hv_aval,
+                                  current3_aval);
+      avalCurrents[chip_i].push_back(avalancheCurrent1);
+      avalCurrents[chip_i].push_back(avalancheCurrent2);
+      avalCurrents[chip_i].push_back(avalancheCurrent3);
+
+      chip_ABCD++;
+      i4 = 0;
+    }
+
+    chip_ABCD = 0;
+    // prepare 2D histograms for bias voltage and current
+    int n5 = 150, i5_a, i5_b, i5_c, i5_d, chipnum[n5];
+    i5_a = i5_b = i5_c = i5_d = 0;
+    float biasv[n5], biasi[n5];
+    for (const auto& HI : hapdInfo.getNodes("bias2d/biasvalue")) {
+      std::string chip_2d = HI.getString("@chip");
+      chipnum[i5_a] = HI.getInt("@ch");
+      biasv[i5_a] = (float) HI.getDouble("biasv");
+      biasi[i5_a] = (float) HI.getDouble("biasi");
+      if (chipnum[i5_a] == 36) {
+        chip_i = 4 * hapd_i + chip_ABCD;
+        bias2DV[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "voltage", chipnum, biasv);
+        bias2DI[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "current", chipnum, biasi);
+        chipnum[n5] = biasv[n5] = biasi[n5] = 0;
+        i5_a = 0;
+        chip_ABCD++;
+      }
+      i5_a++;
+    }
+
+    hapd_i++;
+  }
+
+  // fill data to ARICHHapdChipInfo class
+  for (int l = 0; l < chip_i + 1; l++) {
+    new(chipConstants[l])  ARICHHapdChipInfo();
+    auto* chipConst = static_cast<ARICHHapdChipInfo*>(chipConstants[l]);
+
+    chipConst->setHapdSerial(serial[l / 4]);
+    chipConst->setChipLabel(chip[l]);
+    chipConst->setBiasVoltage(bias[l]);
+    chipConst->setGain(gain[l]);
+    chipConst->setDeadChannel(deadlist[l]);
+    chipConst->setBadChannel(cutlist[l]);
+    chipConst->setBombardmentGain(bombardmentGain[l]);
+    chipConst->setBombardmentCurrent(bombCurrents[l]);
+    chipConst->setAvalancheGain(avalancheGain[l]);
+    chipConst->setAvalancheCurrent(avalCurrents[l]);
+    chipConst->setChannelNumber(channel_label_aval[l]);
+    chipConst->setBiasVoltage2D(bias2DV[l]);
+    chipConst->setBiasCurrent2D(bias2DI[l]);
+  }
+
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("testHapdChip", &chipConstants, iov);
+}
+
+void ARICHDatabaseImporter::importHapdInfo()
+{
+  // define data array
+  TClonesArray hapdConstants("Belle2::ARICHHapdInfo");
+  int hapd_i = 0;
+
+  GearDir content = GearDir("/ArichData/AllData/hapdData/Content");
+
+  string serial[1000];
+  float qe400[1000], hv[1000], current[1000];
+  int guardbias[1000];
+  TGraph** qe, **adc;
+  qe = new TGraph *[1000];
+  adc = new TGraph *[1000];
+
+  for (const auto& hapdInfo : content.getNodes("hapd")) {
+    serial[hapd_i] = hapdInfo.getString("serial");
+    qe400[hapd_i] = (float) hapdInfo.getDouble("qe400");
+    hv[hapd_i] = 1000 * (float) hapdInfo.getDouble("hv");
+    current[hapd_i] = (float) hapdInfo.getDouble("current");
+    string gb = hapdInfo.getString("guardbias");
+    guardbias[hapd_i] = atoi(gb.c_str());
+
+    // prepare TGraph of quantum efficiency as function of lambda
+    int n1 = 70;
+    float lambda[n1], qepoint[n1];
+    int i1 = 0;
+    for (const auto& QE : hapdInfo.getNodes("qe/qepoint")) {
+      lambda[i1] = (float) QE.getInt("@lambda");
+      qepoint[i1] = (float) QE.getDouble(".");
+      i1++;
+    }
+
+    qe[hapd_i] = new TGraph(i1, lambda, qepoint);
+    qe[hapd_i]->SetName("qe");
+    qe[hapd_i]->SetTitle("qe");
+    qe[hapd_i]->GetXaxis()->SetTitle("lambda");
+    qe[hapd_i]->GetYaxis()->SetTitle("qe");
+
+
+    // prepare TGraph of pulse height distribution
+    int n2 = 4100;
+    int channel_adc[n2], pulse_adc[n2];
+    int i2 = 0;
+    for (const auto& ADC : hapdInfo.getNodes("adc/value")) {
+      channel_adc[i2] = ADC.getInt("@ch");
+      string str = ADC.getString(".");
+      pulse_adc[i2] = atoi(str.c_str());
+      i2++;
+    }
+
+    adc[hapd_i] = new TGraph(i2, channel_adc, pulse_adc);
+    adc[hapd_i]->SetName("adc");
+    adc[hapd_i]->SetTitle("Pulse Height Distribution");
+    adc[hapd_i]->GetXaxis()->SetTitle("channel");
+    adc[hapd_i]->GetYaxis()->SetTitle("pulse height");
+
+
+    hapd_i++;
+  }
+
+  // fill data to ARICHHapdInfo class
+  for (int m = 0; m < hapd_i; m++) {
+    new(hapdConstants[m]) ARICHHapdInfo();
+    auto* hapdConst = static_cast<ARICHHapdInfo*>(hapdConstants[m]);
+    hapdConst->setSerialNumber(serial[m]);
+    hapdConst->setQuantumEfficiency400(qe400[m]);
+    hapdConst->setHighVoltage(hv[m]);
+    hapdConst->setGuardBias(guardbias[m]);
+    hapdConst->setCurrent(current[m]);
+    hapdConst->setQuantumEfficiency(qe[m]);
+    hapdConst->setPulseHeightDistribution(adc[m]);
+    //  for(unsigned int k = 0; k < 4; k++)  {hapdConst[hapd_i].setHapdChipInfo(k, chipConstants[hapd_i+k]); }
+  }
+
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("testHapd", &hapdConstants, iov);
+}
+
+std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist)
+{
+  vector<int> CHs;
+
+  // parse string to get numbers of all bad channels
+  if (chlist.find(",") != string::npos) {
+    while (chlist.find(",") != string::npos) {
+      string CH = chlist.substr(0, chlist.find(","));
+      CHs.push_back(atoi(CH.c_str()));
+      chlist = chlist.substr(chlist.find(",") + 1);
+    }
+    CHs.push_back(atoi(chlist.c_str()));
+  } else {
+    CHs.push_back(atoi(chlist.c_str()));
+  }
+  return CHs;
+}
+
+TGraph* ARICHDatabaseImporter::getGraphGainCurrent(std::string bomb_aval, std::string g_i, std::string chip_label, int i, float* HV,
+                                                   float* gain_current)
+{
+  TGraph* hapd_graph = new TGraph(i, HV, gain_current);
+  string title = bomb_aval + " " + g_i + ", chip " + chip_label;
+  hapd_graph->SetTitle(title.c_str());
+  hapd_graph->GetXaxis()->SetTitle("high voltage");
+  hapd_graph->GetYaxis()->SetTitle(g_i.c_str());
+  return hapd_graph;
+}
+
+int ARICHDatabaseImporter::getChannelPosition(std::string XY, std::string chip_2d, int chipnum)
+{
+  // use correct mapping
+  int x, y = 100;
+  if (chip_2d == "A") {
+    int y = 12;
+    int x = 0 + chipnum;
+    while (x > 6) {
+      x = x - 6;
+      y = y - 1;
+    }
+  } else if (chip_2d == "B") {
+    int x = 12;
+    int y = 13 - chipnum;
+    while (y < 7) {
+      y = y + 6;
+      x = x - 1;
+    }
+  } else if (chip_2d == "C") {
+    int y = 1;
+    int x = 13 - chipnum;
+    while (x < 7) {
+      x = x + 6;
+      y = y + 1;
+    }
+  } else if (chip_2d == "D") {
+    int x = 1;
+    int y = 0 + chipnum;
+    while (y > 6) {
+      y = y - 6;
+      x = x + 1;
+    }
+  }
+
+  if (XY == "x") { return x;}
+  else if (XY == "y") { return y;}
+  else {return 100;}
+}
+
+TH2F* ARICHDatabaseImporter::getBiasGraph(std::string chip_2d, std::string voltage_current, int* chipnum, float* bias_v_i)
+{
+  string name = "bias " + voltage_current + ", chip " + chip_2d;
+  TH2F* bias2d = new TH2F("bias2d", name.c_str(), 6, 0, 6, 6, 0, 6);
+  for (int XYname = 0; XYname < 6; XYname++) {
+    bias2d->GetXaxis()->SetBinLabel(XYname + 1, to_string(XYname).c_str());
+    bias2d->GetYaxis()->SetBinLabel(XYname + 1, to_string(XYname).c_str());
+  }
+  for (int XY = 0; XY < 36; XY++)  {
+    int x = 1;
+    int y = 0 + chipnum[XY];
+    while (y > 6) {
+      y = y - 6;
+      x = x + 1;
+    }
+    bias2d->SetBinContent(x, y, bias_v_i[XY]);
+  }
+
+  return bias2d;
+}
+
+void ARICHDatabaseImporter::exportHapdInfo()
+{
+  DBArray<ARICHHapdInfo> elements("testHapd");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    B2INFO("Serial = " << element.getSerialNumber() << "; HV = " << element.getHighVoltage() << "; qe400 = " <<
+           element.getQuantumEfficiency400());
+  }
+}
+
+void ARICHDatabaseImporter::exportHapdChipInfo()
+{
+  DBArray<ARICHHapdChipInfo> elements("testHapdChip");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    B2INFO("Serial = " << element.getHapdSerial() << "; chip = " << element.getChipLabel() << "; bias voltage = " <<
+           element.getBiasVoltage());
+  }
+}
+
+
+void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
+{
+  // example that shows how to extract and use data
+  // it calculates bias voltage at gain = 40 for each chip
+
+  DBArray<ARICHHapdChipInfo> elements("testHapdChip");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    if (element.getHapdSerial() == serialNumber) {
+      TGraph* avalgain = element.getAvalancheGain();
+
+      // use linear interpolation to get bias voltage at gain = 40
+      /*
+            // 1) you can do it by hand
+
+            double A, B, C, D;
+            for(int j = 0; j < 100; j++) {
+              avalgain->GetPoint(j, A, B);
+              if(B>40) {
+                avalgain->GetPoint(j-1, A, B);
+                avalgain->GetPoint(j, C, D);
+                float k = (B-D)/(A-C);
+                float n = B - k*A;
+                float xgain = (40 - n)/k;
+                B2INFO("serial#-chip = " << element.getHapdSerial() << "-" << element.getChipLabel() << "; " << "V(gain=40) = " << (int)(xgain+0.5));
+                j = 100;
+              }
+            }
+      */
+
+      // 2) use "Eval" function
+      // - avalgain graph is gain(voltage)
+      // - function "Eval" can be used to interpolate around chosen x
+      // - convert graph gain(voltage) to voltage(gain) to interpolate around gain = 40
+      TGraph* gainnew = new TGraph(avalgain->GetN());
+      double xpoint, ypoint;
+      for (int j = 0; j < avalgain->GetN(); j++) {
+        avalgain->GetPoint(j, xpoint, ypoint);
+        gainnew->SetPoint(j, ypoint, xpoint);
+      }
+      B2INFO("serial#-chip = " << element.getHapdSerial() << "-" << element.getChipLabel() << "; " << "V(gain=40) = " << (int)(
+               gainnew->Eval(40) + 0.5));
+
+    }
+  }
+}
+

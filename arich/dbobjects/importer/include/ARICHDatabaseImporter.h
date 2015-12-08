@@ -11,6 +11,8 @@
 #define ARICHDATABASEIMPORTER_H
 
 #include <TObject.h>
+#include <TGraph.h>
+#include <TH2F.h>
 #include <TTimeStamp.h>
 
 namespace Belle2 {
@@ -68,7 +70,7 @@ namespace Belle2 {
     TTimeStamp getAsicDate(std::string asicSerial, std::string type);
 
     /**
-     * Get lists of problematic AISC channels.
+     * Get lists of problematic ASIC channels.
      */
     std::vector<int> channelsList(std::string asicSerial, std::string type);
 
@@ -86,6 +88,51 @@ namespace Belle2 {
      * Export ARICH FEB test data from the database.
      */
     void exportFebTest();
+
+    /**
+     * Import ARICH HAPD data in the database.
+     */
+    void importHapdInfo();
+
+    /**
+     * Import ARICH HAPD Chip data in the database.
+     */
+    void importHapdChipInfo();
+
+    /**
+     * Get lists of problematic HAPD channels.
+     */
+    std::vector<int> channelsListHapd(std::string chlist);
+
+    /**
+     * Get position of channel on HAPD.
+     */
+    int getChannelPosition(std::string XY, std::string chip_2d, int chipnum);
+
+    /**
+     * Get graphs for bombardment and avalanche gain and current.
+     */
+    TGraph* getGraphGainCurrent(std::string bomb_aval, std::string g_i, std::string chip_label, int i, float* HV, float* gain_current);
+
+    /**
+     * Get histograms for bias voltage and current.
+     */
+    TH2F* getBiasGraph(std::string chip_2d, std::string voltage_current, int* chipnum, float* bias_v_i);
+
+    /**
+     * Export ARICH HAPD info data from the database.
+     */
+    void exportHapdInfo();
+
+    /**
+     * Export ARICH HAPD chip info data from the database.
+     */
+    void exportHapdChipInfo();
+
+    /**
+     * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
+     */
+    void getBiasVoltagesForHapdChip(std::string serialNumber);
 
   private:
 

@@ -38,34 +38,6 @@ namespace Belle2 {
       m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(), m_badChannel() {};
 
     /**
-     * Constructor
-     */
-    ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain): m_serial(serial), m_chip(chip),
-      m_biasVoltage(biasVoltage), m_gain(gain), m_leakCurrent(NULL), m_bombardmentGain(NULL), m_bombardmentCurrent(),
-      m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(),
-      m_badChannel() {};
-
-    /**
-     * Constructor
-     */
-    ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain, TGraph* bombardmentGain,
-                      std::vector<TGraph*> bombardmentCurrent, TGraph* avalancheGain, std::vector<TGraph*> avalancheCurrent, TH2F* biasVoltage2D,
-                      TH2F* biasCurrent2D, int channel): m_serial(serial), m_chip(chip), m_biasVoltage(biasVoltage), m_gain(gain), m_leakCurrent(NULL),
-      m_bombardmentGain(bombardmentGain), m_bombardmentCurrent(bombardmentCurrent), m_avalancheGain(avalancheGain),
-      m_avalancheCurrent(avalancheCurrent), m_biasVoltage2D(biasVoltage2D), m_biasCurrent2D(biasCurrent2D), m_channelId(channel),
-      m_deadChannel(), m_badChannel() {};
-
-    /**
-     * Constructor
-     */
-    ARICHHapdChipInfo(std::string serial, std::string chip, int biasVoltage, int gain, TGraph* leakCurrent, TGraph* bombardmentGain,
-                      std::vector<TGraph*> bombardmentCurrent, TGraph* avalancheGain, std::vector<TGraph*> avalancheCurrent, TH2F* biasVoltage2D,
-                      TH2F* biasCurrent2D, int channel): m_serial(serial), m_chip(chip), m_biasVoltage(biasVoltage), m_gain(gain),
-      m_leakCurrent(leakCurrent), m_bombardmentGain(bombardmentGain), m_bombardmentCurrent(bombardmentCurrent),
-      m_avalancheGain(avalancheGain), m_avalancheCurrent(avalancheCurrent), m_biasVoltage2D(biasVoltage2D),
-      m_biasCurrent2D(biasCurrent2D), m_channelId(channel), m_deadChannel(), m_badChannel() {};
-
-    /**
      * Destructor
      */
     ~ARICHHapdChipInfo() {};
@@ -222,7 +194,13 @@ namespace Belle2 {
      * Add a channel number to the list of dead channels
      * @param channel HAPD channel number
      */
-    void appendDeadChannel(unsigned int channel) {m_deadChannel.push_back(channel); }
+    void appendDeadChannel(int channel) {m_deadChannel.push_back(channel); }
+
+    /**
+     * Set the list of dead channels
+     * @param channel HAPD channel numbers
+     */
+    void setDeadChannel(std::vector<int> channels) {m_deadChannel = channels; }
 
     /**
      * Return size of the list of dead channels
@@ -241,7 +219,13 @@ namespace Belle2 {
      * Add a channel number to the list of cut channels
      * @param channel HAPD channel number
      */
-    void appendBadChannel(unsigned int ichannel) { m_badChannel.push_back(ichannel); }
+    void appendBadChannel(int ichannel) { m_badChannel.push_back(ichannel); }
+
+    /**
+     * Set the list of bad channels
+     * @param channel HAPD channel numbers
+     */
+    void setBadChannel(std::vector<int> channels) {m_badChannel = channels; }
 
     /**
      * Return size of the list of cut channels
@@ -256,14 +240,14 @@ namespace Belle2 {
     int m_gain;                       /**< Total Gain at Operational Values */
     TGraph* m_leakCurrent;            /**< Leakege Current as a function of bias voltage */
     TGraph* m_bombardmentGain;        /**< Bombardment Gain as a function of high voltage */
-    std::vector<TGraph*> m_bombardmentCurrent;   /**< Bombardment Current as a function of high voltage */
-    TGraph* m_avalancheGain;                     /**< Avalanche Gain as a function of bias voltage */
-    std::vector<TGraph*> m_avalancheCurrent;     /**< Avalanche Current as a function of bias voltage */
-    TH2F*   m_biasVoltage2D;                     /**< Bias Voltage as a function of the channel */
-    TH2F*   m_biasCurrent2D;                     /**< Bias Current as a function of the channel */
-    int m_channelId;                             /**< Channel Number for the Bombardment and Avalanche measurements information */
-    std::vector<unsigned int> m_deadChannel;     /**< List of dead channels on the HAPD chip */ // - glej cutch
-    std::vector<unsigned int> m_badChannel;      /**< List of bad (cut and dead channels) on the HAPD chip */ // - glej deadch
+    std::vector<TGraph*> m_bombardmentCurrent; /**< Bombardment Current as a function of high voltage */
+    TGraph* m_avalancheGain;                   /**< Avalanche Gain as a function of bias voltage */
+    std::vector<TGraph*> m_avalancheCurrent;   /**< Avalanche Current as a function of bias voltage */
+    TH2F* m_biasVoltage2D;                     /**< Bias Voltage as a function of the channel */
+    TH2F* m_biasCurrent2D;                     /**< Bias Current as a function of the channel */
+    int m_channelId;                           /**< Channel Number for the Bombardment and Avalanche measurements information */
+    std::vector<int> m_deadChannel;            /**< List of dead channels on the HAPD chip */ // - glej cutch
+    std::vector<int> m_badChannel;             /**< List of bad (cut and dead channels) on the HAPD chip */ // - glej deadch
 
 
     ClassDef(ARICHHapdChipInfo, 3); /**< ClassDef */

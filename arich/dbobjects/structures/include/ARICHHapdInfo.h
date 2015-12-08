@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHHapdInfo(): m_serial(""), m_qe400(0), m_highVoltage(0), m_guardBias(0), m_current(0), m_quantumEfficiency(NULL),
+    ARICHHapdInfo(): m_serial(""), m_qe400(0.0), m_highVoltage(0.0), m_guardBias(0), m_current(0.0), m_quantumEfficiency(NULL),
       m_pulseHeight(NULL)
     {
       for (unsigned i = 0; i < 4; i++) m_HAPDChipInfo[i] = Belle2::ARICHHapdChipInfo();
@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHHapdInfo(std::string serial, float qe400, float hv, float gb, float I, ARICHHapdChipInfo* HAPDChipInfo, TGraph* qe,
+    ARICHHapdInfo(std::string serial, float qe400, float hv, int gb, float I, ARICHHapdChipInfo* HAPDChipInfo, TGraph* qe,
                   TGraph* pulseHeight): m_serial(serial), m_qe400(qe400), m_highVoltage(hv), m_guardBias(gb), m_current(I), m_quantumEfficiency(qe),
       m_pulseHeight(pulseHeight)
     {
@@ -93,13 +93,13 @@ namespace Belle2 {
      * Return operational Guard Bias
      * @return guards bias
      */
-    float getGuardBias() const {return m_guardBias;}
+    int getGuardBias() const {return m_guardBias;}
 
     /**
      * Set operational Guard Bias
      * @param guard bias
      */
-    void setGuardBias(float gb) {m_guardBias = gb;}
+    void setGuardBias(int gb) {m_guardBias = gb;}
 
     /**
      * Return Operational current
@@ -116,7 +116,7 @@ namespace Belle2 {
     /**
      * Return HapdChipInfo of the chip i
      * @param i index of the chip
-     * @return current
+     * @return HapdChipInfo
      */
     ARICHHapdChipInfo getHapdChipInfo(unsigned int i);
 
@@ -129,13 +129,13 @@ namespace Belle2 {
 
     /**
      * Return Quantum Efficiency as a function of wavelength
-     * @return current
+     * @return quantum efficiency
      */
     TGraph* getQuantumEfficiency() const {return m_quantumEfficiency;}
 
     /**
      * Set Quantum Efficiency as a function of wavelength
-     * @param current
+     * @param quantum efficiency
      */
     void setQuantumEfficiency(TGraph* qe) {m_quantumEfficiency = qe;}
 
@@ -156,7 +156,7 @@ namespace Belle2 {
     std::string m_serial;                   /**< serial number of the sensor */
     float   m_qe400;                        /**< quantum efficiency at 400 nm */
     float   m_highVoltage;                  /**< Operational high voltage */
-    float   m_guardBias;                    /**< guard HV (V) */
+    int   m_guardBias;                      /**< guard HV (V) */
     float   m_current;                      /**< Current (A)  */
     ARICHHapdChipInfo m_HAPDChipInfo[4];    /**< HapdChipInfo id of the i-th chip in the sensor */
     TGraph*  m_quantumEfficiency;           /**< Quantum Efficiency as a function of wavelength */

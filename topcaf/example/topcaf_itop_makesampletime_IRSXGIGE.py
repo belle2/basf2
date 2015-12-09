@@ -4,6 +4,7 @@
 from basf2 import *
 import sys
 import argparse
+import os.path as path
 
 parser = argparse.ArgumentParser(
     description='Calculate the sample to sample time calibration (for <=IRS3C).' +
@@ -82,7 +83,7 @@ output = register_module('RootOutput')
 itopconfig = register_module('TopConfiguration')
 itopeventconverter = register_module('iTopRawConverterV2')
 itopeventconverter.param('inputFileName', args.inputRun + '.bin')
-itopeventconverter.param('inputDirectory', args.inputDir)
+itopeventconverter.param('inputDirectory', path.join(args.inputDir, 'rawdata/'))
 itopeventconverter.param('scrod', 16)
 itopeventconverter.param('carrier', 0)
 itopeventconverter.param('boardstack', 0)
@@ -90,7 +91,7 @@ itopeventconverter.param('boardstack', 0)
 
 camacconverter = register_module('AsciiCamac')
 camacDict = {
-    'inputFilename': args.inputDir + args.inputRun + '.camac',
+    'inputFilename': path.join(args.inputDir, 'camac/', args.inputRun + '.camac'),
 }
 camacconverter.param(camacDict)
 

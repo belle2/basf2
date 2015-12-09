@@ -21,10 +21,10 @@
 #include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
 #include "tracking/trackFindingVXD/FilterTools/Observer.h"
 
-#include "tracking/vxdCaTracking/VXDTFHit.h"
-#include "tracking/dataobjects/FullSecID.h"
+// #include "tracking/vxdCaTracking/VXDTFHit.h"
+// #include "tracking/dataobjects/FullSecID.h"
 
-#include "tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h"
+#include <tracking/dataobjects/SectorMapConfig.h>
 
 #include "vxd/dataobjects/VxdID.h"
 #include "tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h"
@@ -38,26 +38,34 @@
 namespace Belle2 {
 
 
+  template<class point_t>
   class VXDTFFilters {
   public:
 
-    typedef VXDTFHit point_t;
-
+//     typedef VXDTFHit point_t;
     typedef
-    decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
-             (0. < Distance2DXYSquared<point_t>() < 0.).observe(Observer()).enable()&&
-             (0. < Distance1DZ<point_t>()         < 0.)/*.observe(Observer())*/.enable()&&
-             (0. < SlopeRZ<point_t>()             < 0.).observe(Observer()).enable()&&
-             (Distance3DNormed<point_t>()         < 0.).enable()) filter2sp_t;
+    decltype((0. <= Distance3DSquared<point_t>()   <= 0.).observe(Observer()).enable()&&
+             (0. <= Distance2DXYSquared<point_t>() <= 0.).observe(Observer()).enable()&&
+             (0. <= Distance1DZ<point_t>()         <= 0.)/*.observe(Observer())*/.enable()&&
+             (0. <= SlopeRZ<point_t>()             <= 0.).observe(Observer()).enable()&&
+             (Distance3DNormed<point_t>()         <= 0.).enable()) filter2sp_t;
+//     typedef
+//     decltype((0. < Distance3DSquared<point_t>()   < 0.).observe(Observer()).enable()&&
+//              (0. < Distance2DXYSquared<point_t>() < 0.).observe(Observer()).enable()&&
+//              (0. < Distance1DZ<point_t>()         < 0.)/*.observe(Observer())*/.enable()&&
+//              (0. < SlopeRZ<point_t>()             < 0.).observe(Observer()).enable()&&
+//              (Distance3DNormed<point_t>()         < 0.).enable()) filter2sp_t;
 
 
 
     typedef StaticSector< point_t, filter2sp_t, int , int > staticSector_t;
 
+
     VXDTFFilters(): m_testConfig() {m_staticSectors.resize(2);}
 
-    int addSectorsOnSensor(const vector<float>&                normalizedUsup,
-                           const vector<float>&                normalizedVsup,
+
+    int addSectorsOnSensor(const vector<double>&                normalizedUsup,
+                           const vector<double>&                normalizedVsup,
                            const vector< vector<FullSecID> >& sectorIds)
     {
 
@@ -88,12 +96,12 @@ namespace Belle2 {
     }
 
 
-    int addFriendsSectorFilter(FullSecID inner,
-                               FullSecID outer,
+    int addFriendsSectorFilter(FullSecID outer,
+                               FullSecID inner,
                                const filter2sp_t& filter)
     {
       // TODO add the friendship relation to the static sector
-      if (m_staticSectors.size() < m_compactSecIDsMap[ outer ])
+      if (m_staticSectors.size() < m_compactSecIDsMap[ outer ] or m_compactSecIDsMap[ outer ] == 0)
         return 0;
 
       m_staticSectors[m_compactSecIDsMap[outer]]->assign2spFilter(inner, filter);
@@ -102,30 +110,59 @@ namespace Belle2 {
     }
 
 
+    /// returns compactSecID for given FullSecID, == 0 if not found.
+    CompactSecIDs::sectorID_t getCompactID(FullSecID outer) const
+    { return m_compactSecIDsMap[outer]; }
+
+
     //    const StaticSectorType& getSector(VxdID aSensorID,
     //  std::pair<float, float> normalizedLocalCoordinates) const
     //  {  }
 
-    const filter2sp_t friendsSectorFilter(const FullSecID& inner,
-                                          const FullSecID& outer) const
+    /// returns pointer to static sector for given fullSecID. if fullSecID is not found, a nullptr is returned.
+    const staticSector_t* getStaticSector(const FullSecID secID) const
+    {
+      auto sectorPosition = m_compactSecIDsMap[ secID ];
+      if (sectorPosition == 0) return nullptr;
+      return m_staticSectors[ sectorPosition ];
+    }
+
+
+    const filter2sp_t friendsSectorFilter(const FullSecID& outer,
+                                          const FullSecID& inner) const
     {
       // TODO: sanity checks
       static filter2sp_t just_in_case;
       const auto staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
+      // catch case when sector is not part of the sectorMap:
+      if (staticSector == nullptr) return just_in_case;
       const auto filter = staticSector->getFilter2sp(inner);
       return filter;
-      return just_in_case;
+//       return just_in_case;
     }
 
 
-    FullSecID getFullID(VxdID aSensorID, float x, float y) const
+    /// check if using getFullID() would be safe (true if it is safe):
+    bool areCoordinatesValid(VxdID aSensorID, double normalizedU, double normalizedV) const
     {
-      return m_compactSecIDsMap.getFullSecID(aSensorID, x, y);
+      return m_compactSecIDsMap.areCoordinatesValid(aSensorID, normalizedU, normalizedV);
     }
 
-    const TrainerConfigData& getConfig(void) const { return m_testConfig; }
-    void setConfig(const TrainerConfigData& config) { m_testConfig = config ; }
 
+    /// returns fullSecID for given sensorID and local coordinates. JKL: what happens here if no FullSecID could be found?
+    FullSecID getFullID(VxdID aSensorID, double normalizedU, double normalizedV) const
+    {
+      // TODO WARNING how to catch bad cases?
+      return m_compactSecIDsMap.getFullSecID(aSensorID, normalizedU, normalizedV);
+    }
+
+
+    const SectorMapConfig& getConfig(void) const { return m_testConfig; }
+    void setConfig(const SectorMapConfig& config) { m_testConfig = config; }
+
+
+    /// returns number of compact secIDs stored for this filter-container.
+    unsigned size() const { return m_compactSecIDsMap.getSize(); }
   private:
 
     vector< staticSector_t* > m_staticSectors;
@@ -133,7 +170,7 @@ namespace Belle2 {
     CompactSecIDs m_compactSecIDsMap;
 
     /** configuration  */
-    TrainerConfigData m_testConfig;
+    SectorMapConfig m_testConfig;
 
   };
 

@@ -30,6 +30,7 @@ VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   m_total_matched_pairs(0)
 {
   setDescription("This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
   addParam("VXDGFTracksColName", m_VXDGFTracksColName, "VXD GFTrack collection");

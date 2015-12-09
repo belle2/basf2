@@ -42,10 +42,12 @@ int main(int argc, char** argv)
         int flag = reader.readInt();
         if (flag == 1) {
           const std::string path = reader.readString();
+          LogFile::debug("load path: %s", path.c_str());
           StringList s = StringUtil::split(path, '/');
           const std::string table = (s.size() > 0) ? s[0] : dbtable;
-          const std::string config = (s.size() > 0) ? s[1] : path;
-          DBObject obj(DBObjectLoader::load(db, dbtable, config));
+          const std::string config = (s.size() > 1) ? s[1] : path;
+          LogFile::debug("loaded %s / %s", table.c_str(), config.c_str());
+          DBObject obj(DBObjectLoader::load(db, table, config));
           LogFile::debug("loaded %s from %s", obj.getName().c_str(), table.c_str());
           obj.print();
           TCPSocketWriter writer(socket);
@@ -55,6 +57,19 @@ int main(int argc, char** argv)
           const std::string table = reader.readString();
           reader.readObject(obj);
           DBObjectLoader::createDB(db, table, obj);
+        } else if (flag == 3) {
+          const std::string path = reader.readString();
+          LogFile::debug("load path: %s", path.c_str());
+          StringList s = StringUtil::split(path, '/');
+          const std::string table = (s.size() > 0) ? s[0] : dbtable;
+          const std::string config = (s.size() > 1) ? s[1] : path;
+          LogFile::debug("loaded %s / %s", table.c_str(), config.c_str());
+          StringList ss = DBObjectLoader::getDBlist(db, table, config);
+          TCPSocketWriter writer(socket);
+          writer.writeInt(ss.size());
+          for (size_t i = 0; i < ss.size(); i++) {
+            writer.writeString(ss[i]);
+          }
         }
       } catch (const IOException& e) {
         LogFile::error(e.what());

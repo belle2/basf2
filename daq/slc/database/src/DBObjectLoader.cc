@@ -84,15 +84,16 @@ DBObject DBObjectLoader::load(DBInterface& db,
   if (!db.isConnected()) {
     db.connect();
   }
-  db.execute("select * from %s p where p.path like '%s._%s' and not exists "
-             "(select * from (select * from %s where path like '%s._%s') c where c.path "
-             "like p.path || '_%s') order by id", \
-             tablename.c_str(), rootnode.c_str(), "%%",
-             tablename.c_str(), rootnode.c_str(), "%%", "%%");
-  DBRecordList record_v(db.loadRecords());
   DBObject obj;
+  StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
+  if (list.size() == 0) return obj;
+  std::stringstream ss;
+  ss << "select * from " << tablename << " p where p.path like '" << rootnode << "._%%' and not exists "
+     << "(select * from (select * from " << tablename << " where path like '" << rootnode << "._%%') c where c.path "
+     << "like p.path || '_%%') order by id";
+  db.execute(ss.str());
+  DBRecordList record_v(db.loadRecords());
   if (record_v.size() == 0) {
-    StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
     if (list.size() > 0) {
       configname = list[0];
       return DBObjectLoader::load(db, tablename, configname, isfull);
@@ -135,9 +136,12 @@ DBObject DBObjectLoader::load(DBInterface& db,
       config_in = value;
       StringList ss = StringUtil::split(value, '/');
       if (ss.size() > 1) {
-        table_in = ss[0];
         config_in = ss[1];
+        table_in = ss[0];
+      } else {
+        config_in = value;
       }
+      //LogFile::info(config_in);
       if (table_in == tablename && config_in == configname) {
         LogFile::error("recursive call of %s/%s",
                        table_in.c_str(), config_in.c_str());
@@ -248,13 +252,25 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
       case DBField::OBJECT: {
         DBObject cobj(value);
         std::string config_out = config_in;
+        //LogFile::notice(config_out);
         if (db) {
-          cobj = DBObjectLoader::load(*db, table_in, config_out, true);
-          if (cobj.getName().size() == 0) {
-            StringList list = DBObjectLoader::getDBlist(*db, table_in, config_out);
-            if (list.size() > 0) {
-              config_out = list[0];
+          StringList list = DBObjectLoader::getDBlist(*db, table_in, config_out);
+          if (list.size() > 0) {
+            //LogFile::notice("%s:%d", __FILE__, __LINE__);
+            bool found = false;
+            for (size_t i = 0; i < list.size(); i++) {
+              if (config_out == list[0]) {
+                found = true;
+                break;
+              }
+            }
+            if (found) {
               cobj = DBObjectLoader::load(*db, table_in, config_out, true);
+            } else {
+              if (list.size() > 0) {
+                config_out = list[0];
+                cobj = DBObjectLoader::load(*db, table_in, config_out, true);
+              }
             }
           }
         }
@@ -343,8 +359,10 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
       const char* prefix = grep.c_str();
       std::stringstream ss;
       ss << "select name from " << tablename << " where name = REPLACE(path, '.', '') "
-         << "and (name like '_%" << prefix << "_%' or name like '_%" << prefix << "' or "
-         << "name like '" << prefix << "_%' or name = '" << prefix << "') order by id desc";
+         << "and ("//"name like '_%" << prefix << "_%' or "
+         //<< "name like '_%" << prefix << "' or "
+         << "name like '" << prefix << "_%' or "
+         << "name = '" << prefix << "') order by id desc";
       if (max > 0) ss << " limit " << max;
       ss << ";";
       db.execute(ss.str());

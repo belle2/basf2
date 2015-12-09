@@ -117,7 +117,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "DeltaT") return new NtupleDeltaTTool(tree, d);
   else if (strToolName == "MCDeltaT") return new NtupleMCDeltaTTool(tree, d);
   else if (strToolName == "ContinuumSuppression") return new NtupleContinuumSuppressionTool(tree, d, strOption);
-  else if (strToolName == "FlavorTagging") return new NtupleFlavorTaggingTool(tree, d);
+  else if (strToolName == "FlavorTagging") return new NtupleFlavorTaggingTool(tree, d, strOption);
   else if (strToolName == "FlavorTagInfo") return new NtupleFlavorTagInfoTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName == "FlightInfo") return new NtupleFlightInfoTool(tree, d);

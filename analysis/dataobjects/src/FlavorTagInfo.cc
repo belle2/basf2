@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Roca                                           *
+ * Contributors: Christian Roca and Fernando Abudinen                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,6 +23,65 @@ using namespace Belle2;
 
 
 /************************SETTERS***********************/
+
+
+void FlavorTagInfo::setTargetTrackLevel(std::string category, Track* track)
+{
+  m_targetTrackLevel.insert(std::pair<std::string, Track*>(category, track));
+}
+
+
+void FlavorTagInfo::setProbTrackLevel(std::string category, float probability)
+{
+  m_probTrackLevel.insert(std::pair<std::string, float>(category, probability));
+}
+
+
+void FlavorTagInfo::setTargetEventLevel(std::string category, Belle2::Track* track)
+{
+  m_targetEventLevel.insert(std::pair<std::string, Track*>(category, track));
+}
+
+
+void FlavorTagInfo::setProbEventLevel(std::string category, float probability)
+{
+  m_probEventLevel.insert(std::pair<std::string, float>(category, probability));
+}
+
+
+void FlavorTagInfo::setQrCategory(std::string category, float qr)
+{
+  m_qrCategory.insert(std::pair<std::string, float>(category, qr));
+}
+
+
+void FlavorTagInfo::setUseModeFlavorTagger(std::string mode)
+{
+  m_useModeFlavorTagger = mode;
+}
+
+void FlavorTagInfo::setMethod(std::string method)
+{
+  m_method = method;
+}
+
+void FlavorTagInfo::setQrCombined(float qr)
+{
+  m_qrCombined = qr;
+}
+
+
+void FlavorTagInfo::setB0Probability(float B0Probability)
+{
+  m_B0Probability = B0Probability;
+}
+
+
+void FlavorTagInfo::setB0barProbability(float B0barProbability)
+{
+  m_B0barProbability = B0barProbability;
+}
+
 
 void FlavorTagInfo::setTrack(Track* track)
 {
@@ -134,6 +193,57 @@ void FlavorTagInfo::setCategories(std::string category)
 
 
 /************************GETTERS***********************/
+
+
+std::map<std::string, Belle2::Track*> FlavorTagInfo::getTargetTrackLevel()
+{
+  return m_targetTrackLevel;
+}
+
+std::map<std::string, float> FlavorTagInfo::getProbTrackLevel()
+{
+  return m_probTrackLevel;
+}
+
+std::map<std::string, Belle2::Track*> FlavorTagInfo::getTargetEventLevel()
+{
+  return m_targetEventLevel;
+}
+
+std::map<std::string, float> FlavorTagInfo::getProbEventLevel()
+{
+  return m_probEventLevel;
+}
+
+std::map<std::string, float> FlavorTagInfo::getQrCategory()
+{
+  return m_qrCategory;
+}
+
+std::string FlavorTagInfo::getUseModeFlavorTagger()
+{
+  return m_useModeFlavorTagger;
+}
+
+std::string FlavorTagInfo::getMethod()
+{
+  return m_method;
+}
+
+float FlavorTagInfo::getQrCombined()
+{
+  return m_qrCombined;
+}
+
+float FlavorTagInfo::getB0Probability()
+{
+  return m_B0Probability;
+}
+
+float FlavorTagInfo::getB0barProbability()
+{
+  return m_B0barProbability;
+}
 
 
 std::vector<float> FlavorTagInfo::getCatProb()

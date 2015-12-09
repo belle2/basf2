@@ -35,53 +35,66 @@ class FlavorTaggerInfoFiller(Module):
         roe = Belle2.PyStoreObj('RestOfEvent')
         FlavorTaggerInfo = roe.obj().getRelated('FlavorTagInfos')
 
+        qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
+        B0Probability = info.obj().getExtraInfo('qrCombined')
+        B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
+
+        FlavorTaggerInfo.setUseModeFlavorTagger("Expert")
+        FlavorTaggerInfo.setMethod("TMVA")
+        FlavorTaggerInfo.setQrCombined(qrCombined)
+        FlavorTaggerInfo.setB0Probability(B0Probability)
+        FlavorTaggerInfo.setB0barProbability(B0barProbability)
+
         if not FlavorTaggerInfo:
             B2ERROR('FlavorTaggerInfoFiller: FlavorTag does not exist')
             return
 
-        for (particleList, category) in EventLevelParticleLists:
-            # Load the Particle list in Python after the cuts
-            if category == 'KaonPion':
-                continue
-            elif category == 'FSC':
-                continue
-            elif category == 'IntermediateElectron':
-                continue
-            elif category == 'IntermediateMuon':
-                continue
+        for (particleList, category) in TrackLevelParticleLists:
+            # Load the Particle list in Python after the cuts in Track Level
             plist = Belle2.PyStoreObj(particleList)
 
             # From the likelihood it is possible to have Kaon category with no actual kaons
             if plist.obj().getListSize() == 0:
-                FlavorTaggerInfo.setTrack(None)
-                FlavorTaggerInfo.setCategories(category)
-                FlavorTaggerInfo.setCatProb(0)
-                FlavorTaggerInfo.setTargProb(0)
-                FlavorTaggerInfo.setParticle(None)
-                FlavorTaggerInfo.setP(0.0)
+                FlavorTaggerInfo.setTargetTrackLevel(category, None)
+                FlavorTaggerInfo.setProbTrackLevel(category, 0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
-                track = particle.getTrack()  # Track of the particle
-
-                if category == 'MaximumPstar':  # MaximumPstar only gives the momentum of the Highest Momentum Particle
-                    targetProb = mc_variables.variables.evaluate('useCMSFrame(p)',
-                                                                 particle)
-                    categoryProb = 0.0
-                else:
-                    # Prob of being the right target
+                if mc_variables.variables.evaluate(
+                        'hasHighestProbInCat(' + particleList + ',' + 'isRightTrack(' + category + '))',
+                        particle) == 1:
+                    # Prob of being the right target track
                     targetProb = particle.getExtraInfo('isRightTrack(' + category + ')')
+                    track = particle.getTrack()  # Track of the particle
+                    FlavorTaggerInfo.setTargetTrackLevel(category, track)
+                    FlavorTaggerInfo.setProbTrackLevel(category, targetProb)
+                    break
+
+        for (particleList, category) in EventLevelParticleLists:
+            # Load the Particle list in Python after the cuts in Event Level
+            plist = Belle2.PyStoreObj(particleList)
+
+            # From the likelihood it is possible to have Kaon category with no actual kaons
+            if plist.obj().getListSize() == 0:
+                FlavorTaggerInfo.setTargetEventLevel(category, None)
+                FlavorTaggerInfo.setProbEventLevel(category, 0)
+                FlavorTaggerInfo.setQrCategory(category, 0)
+
+            for i in range(0, plist.obj().getListSize()):
+                particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
+                if mc_variables.variables.evaluate(
+                        'hasHighestProbInCat(' + particleList + ',' + 'isRightCategory(' + category + '))',
+                        particle) == 1:
                     # Prob of belonging to a cat
                     categoryProb = particle.getExtraInfo('isRightCategory(' + category + ')')
+                    track = particle.getTrack()  # Track of the particle
+                    qrCategory = mc_variables.variables.evaluate(AvailableCategories[category][3], particle)
 
-    # Save information in the FlavorTagInfo DataObject
-                FlavorTaggerInfo.setTrack(track)
-                FlavorTaggerInfo.setTargProb(targetProb)
-                FlavorTaggerInfo.setParticle(particle)
-                FlavorTaggerInfo.setCategories(category)
-                FlavorTaggerInfo.setCatProb(categoryProb)
-                FlavorTaggerInfo.setP(particle.getP())
-                break  # Temporary break that avoids saving more than 1 Lambda per event.
+                    # Save information in the FlavorTagInfo DataObject
+                    FlavorTaggerInfo.setTargetEventLevel(category, track)
+                    FlavorTaggerInfo.setProbEventLevel(category, categoryProb)
+                    FlavorTaggerInfo.setQrCategory(category, qrCategory)
+                    break
 
 
 class RemoveEmptyROEModule(Module):
@@ -132,30 +145,6 @@ class RemoveExtraInfoModule(Module):
         if ModeCode == 1:
             info = Belle2.PyStoreObj('EventExtraInfo')
             info.obj().removeExtraInfo()
-
-
-class MoveTaggerInformationToBExtraInfoModule(Module):
-
-    """
-    Adds the flavor tagging information (q*r) from the MC and from the Combiner
-    as ExtraInfo to the reconstructed B0 particle.
-    """
-
-    def event(self):
-
-        roe = Belle2.PyStoreObj('RestOfEvent')
-        info = Belle2.PyStoreObj('EventExtraInfo')
-        someParticle = Belle2.Particle(None)
-        B0 = roe.obj().getRelated('Particles')
-        ModeCode = GetModeCode()
-        if ModeCode == 1:
-            B0.addExtraInfo('ModeCode', ModeCode)
-            B0Probability = info.obj().getExtraInfo('qrCombined')
-            B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
-            qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
-            B0.addExtraInfo('B0Probability', B0Probability)
-            B0.addExtraInfo('B0barProbability', B0barProbability)
-            B0.addExtraInfo('qrCombined', qrCombined)
 
 
 def SetModeCode(mode='Expert'):
@@ -688,25 +677,6 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
                 workingDirectory=workingDirectory,
                 path=path,
             )
-
-            # Cuts to extract the target particle with the highest probability for each ParticleList
-            # This is needed for FlavorTaggerInfoFiller
-            for (particleList, category) in EventLevelParticleLists:
-                # methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
-                targetVariable = 'isRightCategory(' + category + ')'
-
-                if category == 'KaonPion':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'isRightTrack(Kaon)) > 0.5', path=path)
-                elif category == 'FSC':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'isRightTrack(SlowPion)) > 0.5', path=path)
-                elif category == 'Lambda':
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'isRightTrack(Lambda)) > 0.5', path=path)
-                else:
-                    applyCuts(particleList, 'hasHighestProbInCat(' + particleList + ',' +
-                              'isRightTrack(' + category + ')) > 0.5', path=path)
         else:
             B2FATAL('FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
                     methodPrefixCombinerLevel + '_1.config has been found. Please use the "Expert" mode')
@@ -718,6 +688,7 @@ def FlavorTagger(
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     workingDirectory='.',
+    method='TMVA',
     categories=[
         'Electron',
         'IntermediateElectron',
@@ -787,8 +758,6 @@ def FlavorTagger(
             if TrackLevel(mode, weightFiles, workingDirectory, roe_path):
                 if EventLevel(mode, weightFiles, workingDirectory, roe_path):
                     CombinerLevel(mode, weightFiles, workingDirectory, roe_path)
-
-    roe_path.add_module(MoveTaggerInformationToBExtraInfoModule())  # Move EventExtraInfo to ParticleExtraInfo
 
     if mode == 'Expert':
             # Initialation of FlavorTagInfo dataObject needs to be done in the main path

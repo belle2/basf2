@@ -135,39 +135,39 @@ if Belle2.FileSystem.findFile(workingFile):
     # filling the histograms
 
     # not necessary
-    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0', 'B0_qrMC>0')
-    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0bar', 'B0_qrMC<0 && B0_qrMC>-2')
+    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0', 'B0_TMVA_qrMC>0')
+    tree.Draw('extraInfoB0Probability>>Comb_Net_Output_B0bar', 'B0_TMVA_qrMC<0 && B0_TMVA_qrMC>-2')
 
-    tree.Draw('B0_qrCombined>>BellePlot_B0', 'B0_qrMC>0 ')
-    tree.Draw('B0_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0 && B0_qrMC>-2')
-    tree.Draw('B0_qrCombined>>BellePlot_NoCut', 'B0_qrMC>-2')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_B0', 'B0_TMVA_qrMC>0 ')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_B0Bar', 'B0_TMVA_qrMC<0 && B0_TMVA_qrMC>-2')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_NoCut', 'B0_TMVA_qrMC>-2')
 
-    tree.Draw('B0_qrCombined>>Calibration_B0', 'B0_qrMC>0')
-    tree.Draw('B0_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0 && B0_qrMC>-2')
+    tree.Draw('B0_TMVA_qrCombined>>Calibration_B0', 'B0_TMVA_qrMC>0')
+    tree.Draw('B0_TMVA_qrCombined>>Calibration_B0Bar', 'B0_TMVA_qrMC<0 && B0_TMVA_qrMC>-2')
 
     # filling histograms wrong efficiency calculation
-    tree.Draw('B0_qrCombined>>BellePlot_B0_m0',
-              'B0_qrMC>0 && B0_qrCombined>0')
-    tree.Draw('B0_qrCombined>>BellePlot_B0_m1',
-              'B0_qrMC>0 && B0_qrCombined<0')
-    tree.Draw('B0_qrCombined>>BellePlot_B0_m2',
-              'B0_qrMC<0 && B0_qrCombined>0 && B0_qrMC>-2')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_B0_m0',
+              'B0_TMVA_qrMC>0 && B0_TMVA_qrCombined>0')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_B0_m1',
+              'B0_TMVA_qrMC>0 && B0_TMVA_qrCombined<0')
+    tree.Draw('B0_TMVA_qrCombined>>BellePlot_B0_m2',
+              'B0_TMVA_qrMC<0 && B0_TMVA_qrCombined>0 && B0_TMVA_qrMC>-2')
 
     # filling with abs(qr) in one of 6 bins with its weight
     # separate calculation for B0 and B0bar
-    treeB0 = tree.CopyTree('B0_qrMC>0 ')
-    treeB0bar = tree.CopyTree('B0_qrMC<0 && B0_qrMC>-2 ')
-    tree.Project('Average_r', 'abs(B0_qrCombined)',
-                 'abs(B0_qrCombined)')
-    treeB0.Project('Average_rB0', 'abs(B0_qrCombined)',
-                   'abs(B0_qrCombined)')
-    treeB0bar.Project('Average_rB0bar', 'abs(B0_qrCombined)',
-                      'abs(B0_qrCombined)')
+    treeB0 = tree.CopyTree('B0_TMVA_qrMC>0 ')
+    treeB0bar = tree.CopyTree('B0_TMVA_qrMC<0 && B0_TMVA_qrMC>-2 ')
+    tree.Project('Average_r', 'abs(B0_TMVA_qrCombined)',
+                 'abs(B0_TMVA_qrCombined)')
+    treeB0.Project('Average_rB0', 'abs(B0_TMVA_qrCombined)',
+                   'abs(B0_TMVA_qrCombined)')
+    treeB0bar.Project('Average_rB0bar', 'abs(B0_TMVA_qrCombined)',
+                      'abs(B0_TMVA_qrCombined)')
 
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(B0_qrCombined)', 'B0_qrMC>-2')
-    tree.Project('entries_per_binB0', 'abs(B0_qrCombined)', 'B0_qrMC>0 ')
-    tree.Project('entries_per_binB0bar', 'abs(B0_qrCombined)', 'B0_qrMC<0 && B0_qrMC>-2 ')
+    tree.Project('entries_per_bin', 'abs(B0_TMVA_qrCombined)', 'B0_TMVA_qrMC>-2')
+    tree.Project('entries_per_binB0', 'abs(B0_TMVA_qrCombined)', 'B0_TMVA_qrMC>0 ')
+    tree.Project('entries_per_binB0bar', 'abs(B0_TMVA_qrCombined)', 'B0_TMVA_qrMC<0 && B0_TMVA_qrMC>-2 ')
 
     # producing the average r histograms
     histo_avr_r.Divide(histo_entries_per_bin)

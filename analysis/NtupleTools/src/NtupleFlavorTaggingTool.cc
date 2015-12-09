@@ -14,6 +14,7 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/MCMatching.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/FlavorTagInfo.h>
 
 #include <cmath>
 #include <TBranch.h>
@@ -30,14 +31,31 @@ void NtupleFlavorTaggingTool::setupTree()
   B0barProbability = new float[nDecayProducts];
   qrCombined = new float[nDecayProducts];
   qrMC = new float[nDecayProducts];
+  string method("");
+
+  if (m_strOption.empty()) {
+    method = "TMVA";
+    B2INFO("Flavor Tagger Output saved for default Multivariate Method: No arguments given.");
+  } else {
+    if (m_strOption == "FANN") {
+      B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
+      method = "FANN";
+      m_useFANN = true;
+    } else {
+      B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
+              ". Set to 'TMVA' or 'FANN' to save the Flavor Tagger Output related to these methods or leave the option empty to use the default multivariate Method.");
+    }
+  }
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_B0Probability").c_str(), &B0Probability[iProduct],
-                   (strNames[iProduct] + "_B0Probability/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_B0barProbability").c_str(), &B0barProbability[iProduct],
-                   (strNames[iProduct] + "_B0barProbability/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_qrCombined").c_str(), &qrCombined[iProduct], (strNames[iProduct] + "_qrCombined/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_qrMC").c_str(), &qrMC[iProduct], (strNames[iProduct] + "_qrMC/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_" + method + "_B0Probability").c_str(), &B0Probability[iProduct],
+                   (strNames[iProduct] + "_" + method + "_B0Probability/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_" + method + "_B0barProbability").c_str(), &B0barProbability[iProduct],
+                   (strNames[iProduct] + "_" + method + "_B0barProbability/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_" + method + "_qrCombined").c_str(), &qrCombined[iProduct],
+                   (strNames[iProduct] + "_" + method + "_qrCombined/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_" + method + "_qrMC").c_str(), &qrMC[iProduct],
+                   (strNames[iProduct] + "_" + method + "_qrMC/F").c_str());
   }
 }
 
@@ -59,11 +77,15 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     qrCombined[iProduct] = -2;
     qrMC[iProduct] = -2;
 
-    if (selparticles[iProduct]->hasExtraInfo("ModeCode")) {
-      if (selparticles[iProduct]->getExtraInfo("ModeCode") == 1 and Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
-        B0Probability[iProduct] = selparticles[iProduct]->getExtraInfo("B0Probability");
-        B0barProbability[iProduct] = selparticles[iProduct]->getExtraInfo("B0barProbability");
-        qrCombined[iProduct] = selparticles[iProduct]->getExtraInfo("qrCombined");
+    FlavorTagInfo* flavTag = selparticles[iProduct]->getRelatedTo<FlavorTagInfo>();
+
+    if (flavTag != nullptr) {
+      if (flavTag->getUseModeFlavorTagger() != "Expert") continue;
+//       method[iProduct] = flavTag->getMethod();
+      if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
+        B0Probability[iProduct] = flavTag->getB0Probability();
+        B0barProbability[iProduct] = flavTag->getB0barProbability();
+        qrCombined[iProduct] = flavTag->getQrCombined();
 
         //  MC Flavor is saved only if mcparticles is not empty
         StoreArray<MCParticle> mcparticles;

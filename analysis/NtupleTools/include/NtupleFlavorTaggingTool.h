@@ -31,6 +31,8 @@ namespace Belle2 {
 
   private:
 
+    bool m_useFANN;    /** Flag to save the Flavor Tagger Output using the TMVA Output. Default is to use the TMVA Output. */
+
     float* B0Probability;
     float* B0barProbability;
     float* qrCombined;
@@ -41,7 +43,12 @@ namespace Belle2 {
 
   public:
     /** Constructor. */
-    NtupleFlavorTaggingTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleFlavorTaggingTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+          decaydescriptor, strOptions)
+    {
+      m_useFANN = false;
+      setupTree();
+    }
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

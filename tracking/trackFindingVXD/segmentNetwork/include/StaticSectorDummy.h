@@ -55,6 +55,9 @@ namespace Belle2 {
     /** returns innerSecIDs */
     const std::vector<Belle2::FullSecID>& getInnerSecIDs() const { return innerSecIDs; }
 
+    /** returns all IDs for inner sectors of two-sector-combinations */
+    const std::vector< FullSecID >& getInner2spSecIDs() const { return getInnerSecIDs(); }
+
     /** returns FullSecID of this sector */
     FullSecID getFullSecID() const { return aSecID; }
 

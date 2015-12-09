@@ -14,6 +14,7 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
+#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
@@ -514,7 +515,6 @@ namespace DirectedNodeNetworkTests {
   }
 
 
-
   /** testing full functionality of the DirectedNodeNetwork when filled with a complex type (including storing on the storeArray).
    * This is stored in the DirectedNetworkContainer, which will actually be used by some modules.
    *  This test is intended as a usage example to find out how to use this network. */
@@ -525,8 +525,9 @@ namespace DirectedNodeNetworkTests {
     DirectedNodeNetwork<TrackNode, VoidMetaInfo> hitNetwork = realisticNetworkPtr->accessHitNetwork();
     vector<TrackNode*> trackNodes = realisticNetworkPtr->accessTrackNodes();
 
-    StaticSectorDummy dummyStaticSector = StaticSectorDummy();
-    ActiveSector<StaticSectorDummy, TrackNode> dummyActiveSector = ActiveSector<StaticSectorDummy, TrackNode>(&dummyStaticSector);
+    const DirectedNodeNetworkContainer::StaticSectorType dummyStaticSector;
+//  const StaticSectorType * staticSectorPtr = &dummyStaticSector; // WARNING TODO warum funzt diese Konvertierung net?!?
+    ActiveSector<DirectedNodeNetworkContainer::StaticSectorType, TrackNode> dummyActiveSector(&dummyStaticSector);
 
     EXPECT_EQ(0, hitNetwork.size());
 

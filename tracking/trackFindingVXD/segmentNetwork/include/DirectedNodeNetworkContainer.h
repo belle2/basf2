@@ -15,6 +15,8 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
+// #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
+// #include <tracking/trackFindingVXD/environment/VXDTFFilters.h> // needed for the correct typedef of the StaticSector
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
@@ -36,15 +38,19 @@ namespace Belle2 {
    * TODO: create constructor for vIPs in SpacePoint. What about activeSectors for vIP? -> solution dependent of treatment in static sectorMap.
    */
   class DirectedNodeNetworkContainer : public RelationsObject {
+  public:
+    /** to improve readability of the code, here the definition of the static sector type. */
+    using StaticSectorType = StaticSectorDummy;
+//    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
   protected:
     /** ************************* DATA MEMBERS ************************* */
 
 
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
-    DirectedNodeNetwork<ActiveSector<StaticSectorDummy, TrackNode>, Belle2::VoidMetaInfo > m_ActiveSectorNetwork;
+    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo > m_ActiveSectorNetwork;
 
     /** stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<ActiveSector<StaticSectorDummy, TrackNode>* > m_activeSectors;
+    std::vector<ActiveSector<StaticSectorType, TrackNode>* > m_activeSectors;
 
     /** Stores the full network of TrackNode< SpaacePoint>, which were accepted by activated two-hit-filters of the assigned sectorMap */
     DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;
@@ -69,7 +75,7 @@ namespace Belle2 {
 
     /** standard constructor */
     DirectedNodeNetworkContainer() :
-      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<Belle2::StaticSectorDummy, Belle2::TrackNode>, Belle2::VoidMetaInfo >()),
+      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo >()),
       m_HitNetwork(DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>()),
       m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >()),
       m_VirtualInteractionPoint(NULL),
@@ -91,12 +97,12 @@ namespace Belle2 {
 /// getters
 
     /** returns reference to the ActiveSectorNetwork stored in this container, intended for read and write access */
-    DirectedNodeNetwork<Belle2::ActiveSector<Belle2::StaticSectorDummy, Belle2::TrackNode>, Belle2::VoidMetaInfo >&
+    DirectedNodeNetwork<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo >&
     accessActiveSectorNetwork() { return m_ActiveSectorNetwork; }
 
 
     /** returns reference to the actual ActiveSectors stored in this container, intended for read and write access */
-    std::vector<Belle2::ActiveSector<Belle2::StaticSectorDummy, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
+    std::vector<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
 
 
     /** returns reference to the HitNetwork stored in this container, intended for read and write access */
@@ -129,7 +135,7 @@ namespace Belle2 {
 
 
     // last member changed: added metaInfo for DirectedNodeNetwork
-    ClassDef(DirectedNodeNetworkContainer, 8)
+    ClassDef(DirectedNodeNetworkContainer, 9)
   };
 
 } //Belle2 namespace

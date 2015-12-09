@@ -11,6 +11,8 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
+// #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
+// #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 
 #include <string>
@@ -22,8 +24,13 @@ namespace Belle2 {
 
   /** minimal class to store combination of sector and spacePoint, since SpacePoint can not carry sectorConnection */
   struct TrackNode {
+
+    /** to improve readability of the code, here the definition of the static sector type. */
+    using StaticSectorType = StaticSectorDummy;
+    //    using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
+
     /** pointer to sector */
-    ActiveSector<StaticSectorDummy, TrackNode>* sector;
+    ActiveSector<StaticSectorType, TrackNode>* sector;
 
     /** pointer to spacePoint */
     SpacePoint* spacePoint;
@@ -34,24 +41,24 @@ namespace Belle2 {
     bool operator==(const TrackNode& b) const
     {
       // simple case: no null-ptrs interfering:
-      if (spacePoint != NULL and b.spacePoint != NULL and sector != NULL and b.sector != NULL) {
+      if (spacePoint != nullptr and b.spacePoint != nullptr and sector != nullptr and b.sector != nullptr) {
         // compares objects:
         return (*spacePoint == *(b.spacePoint)) and (*sector == *(b.sector));
       }
 
       // case: at least one of the 2 nodes has no null-ptrs:
-      if (spacePoint != NULL and sector != NULL) return false; // means: this Node has no null-Ptrs -> the other one has
-      if (b.spacePoint != NULL and b.sector != NULL) return false; // means: the other Node has no null-Ptrs -> this one has
+      if (spacePoint != nullptr and sector != nullptr) return false; // means: this Node has no null-Ptrs -> the other one has
+      if (b.spacePoint != nullptr and b.sector != nullptr) return false; // means: the other Node has no null-Ptrs -> this one has
 
       // case: both nodes have got at least one null-ptr:
       bool spacePointsAreEqual = false;
-      if (spacePoint != NULL and b.spacePoint != NULL) {
+      if (spacePoint != nullptr and b.spacePoint != nullptr) {
         spacePointsAreEqual = (*spacePoint == *(b.spacePoint));
       } else {
         spacePointsAreEqual = (spacePoint == b.spacePoint);
       }
       bool sectorsAreEqual = false;
-      if (sector != NULL and b.sector != NULL) {
+      if (sector != nullptr and b.sector != nullptr) {
         sectorsAreEqual = (*sector == *(b.sector));
       } else {
         sectorsAreEqual = (sector == b.sector);
@@ -72,8 +79,12 @@ namespace Belle2 {
     }
 
 
+    /** returns reference to hit. */
+    const SpacePoint& getHit() const { return *spacePoint; }
+
+
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(NULL), spacePoint(NULL) {}
+    TrackNode() : sector(nullptr), spacePoint(nullptr) {}
 
 
     /** destructor */

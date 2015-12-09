@@ -5,6 +5,8 @@ env['LIBS'] = [
   'vxd', 'vxd_dataobjects',
   'tracking', 'tracking_dataobjects',
   'testbeam_vxd_dataobjects',
+  '$ROOT_LIBS', 
+  'boost_regex',
   'genfit2'] # 'tracking', 
 
 Return('env')

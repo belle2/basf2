@@ -21,6 +21,7 @@ namespace Belle2 {
   class RCCallback : public NSMCallback {
 
     friend class RCMonitor;
+    friend class RCConfigHandler;
 
   public:
     RCCallback(int timeout = 4) throw();
@@ -63,7 +64,7 @@ namespace Belle2 {
     DBObject& getDBObject() throw() { return m_obj; }
 
   private:
-    void dbload(NSMCommunicator& com) throw(IOException);
+    void dbload(int length, const char* data) throw(IOException);
 
   protected:
     void dbrecord(DBObject obj, int expno, int runno) throw(IOException);

@@ -13,6 +13,41 @@
 #include <cstring>
 #include <cstdlib>
 
+namespace Belle2 {
+  class RCConfigHandler : public NSMVHandlerText {
+  public:
+    RCConfigHandler(RCCallback& callback,
+                    const std::string& name, const std::string& val)
+      : NSMVHandlerText(name, true, true, val), m_callback(callback) {}
+    bool handleGetText(std::string& val)
+    {
+      const DBObject& obj(m_callback.getDBObject());
+      val = obj.getName();
+      return true;
+    }
+    bool handleSetText(const std::string& val)
+    {
+      RCState state(m_callback.getNode().getState());
+      RCState tstate(RCCommand::CONFIGURE.nextTState());
+      m_callback.setState(tstate);
+      DBObject& obj(m_callback.getDBObject());
+      obj.getName();
+      try {
+        m_callback.abort();
+        m_callback.dbload(val.size(), val.c_str());
+      } catch (const IOException& e) {
+        throw (RCHandlerException(e.what()));
+      }
+      //set("rcconfig", m_obj.getName());
+      m_callback.configure(obj);
+      m_callback.setState(state);
+      return true;
+    }
+  private:
+    RCCallback& m_callback;
+  };
+}
+
 using namespace Belle2;
 
 RCCallback::RCCallback(int timeout) throw()
@@ -70,7 +105,7 @@ void RCCallback::init(NSMCommunicator&) throw()
       socket.close();
     }
   }
-  add(new NSMVHandlerText("rcconfig", true, false, m_obj.getName()));
+  add(new RCConfigHandler(*this, "rcconfig", m_obj.getName()));
   add(m_obj);
   try {
     initialize(m_obj);
@@ -109,13 +144,14 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
     if (tstate != Enum::UNKNOWN) {
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
+        const NSMMessage& msg(com.getMessage());
         try {
           abort();
-          dbload(com);
+          dbload(msg.getLength(), msg.getData());
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
         }
-        set("rcconfig", m_obj.getName());
+        //set("rcconfig", m_obj.getName());
         configure(m_obj);
         setState(state);
         reply(NSMMessage(NSMCommand::OK, state.getLabel()));
@@ -202,15 +238,14 @@ void RCCallback::setState(const RCState& state) throw()
   reply(NSMMessage(NSMCommand::OK, state.getLabel()));
 }
 
-void RCCallback::dbload(NSMCommunicator& com)
+void RCCallback::dbload(int length, const char* data)
 throw(IOException)
 {
-  remove(m_obj);
-  const NSMMessage& msg(com.getMessage());
-  if (msg.getLength() > 0 && strlen(msg.getData()) > 0) {
-    StringList s = StringUtil::split(msg.getData(), '/');
+  if (length > 0 && strlen(data) > 0) {
+    remove(m_obj);
+    StringList s = StringUtil::split(data, '/');
     if (s.size() == 0) {
-      throw (DBHandlerException("Bad config name was selected : %s", msg.getData()));
+      throw (DBHandlerException("Bad config name was selected : %s", data));
     }
     const std::string table = (s.size() > 1) ? s[0] : m_table;
     std::string config = (s.size() > 1) ? s[1] : s[0];

@@ -79,8 +79,8 @@ namespace VXDTFtwoHitFilterTest {
     static unsigned int rejected; /**< count number of times result was rejected */
     static unsigned int wasInf; /**< count number of times result was inf */
     static unsigned int wasNan; /**< count number of times result was nan */
-    counter() {};
-    ~counter() {};
+    counter() {}; /**< constructor. */
+    ~counter() {}; /**< destructor. */
     static void resetCounter()
     {
       counter<T>::used = 0;
@@ -88,7 +88,7 @@ namespace VXDTFtwoHitFilterTest {
       counter<T>::rejected = 0;
       counter<T>::wasInf = 0;
       counter<T>::wasNan = 0;
-    }
+    } /**< resets all counters. */
   };
 
 
@@ -110,6 +110,7 @@ namespace VXDTFtwoHitFilterTest {
   /** this observer does simply count the number of times, the attached Filter was used */
   class CountingObserver : public VoidObserver {
   public:
+    /** notifier counting how often a SelectionVariable was used */
     template<class Var, typename ... otherTypes>
     static void notify(const Var&,
                        otherTypes ...)
@@ -127,6 +128,7 @@ namespace VXDTFtwoHitFilterTest {
   class ErrorObserver : public VoidObserver {
   public:
     template<class Var, class Range, typename ... otherTypes>
+    /** notifier: print the name of the SelectionVariable and the result of its value-function as an Error. */
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,
                        const Range& range,
@@ -146,6 +148,7 @@ namespace VXDTFtwoHitFilterTest {
   /** this observer does simply print the name of the SelectionVariable and the result of its value-function as a Warning */
   class InfoObserver : public VoidObserver {
   public:
+    /** notifier: print the name of the SelectionVariable and the result of its value-function as a Warning. */
     template<class Var, class Range, typename ... otherTypes>
     static void notify(const Var& filterType,
                        typename Var::variableType fResult,

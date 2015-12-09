@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingVXD/sectorMapTools/RawDataCollectedMinMax.h>
+#include <tracking/trackFindingVXD/sectorMapTools/MinMax.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraphID.h>
 #include <tracking/dataobjects/FullSecID.h>
 
@@ -25,8 +26,12 @@ namespace Belle2 {
 
   /** contains all relevant stuff needed for dealing with a subGraph. ~ 404 bytes per subGraph. */
   template<class FilterType> class SubGraph {
+
+//  /** only the SectorGraph has extended manipulation rights here */
+//  template<typename AnyType> friend class SectorGraph;
+
   protected:
-    const SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
+    SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
 
     std::unordered_map<FilterType, MinMax>
     m_minMaxValues; /**< contains all min- and max-values found so far for all filters relevant for this Graph. */
@@ -34,7 +39,10 @@ namespace Belle2 {
     unsigned m_found; /**< counts number of times this subgraph was found. */
 
     std::unordered_map<FilterType, RawDataCollectedMinMax>* m_rawDataCollected; /**< takes care of collecting the raw data. */
-    //    std::unique_ptr<RawDataCollectedBase> m_rawDataCollected; /**< contains pointer to the data container taking care of collecting the raw data. */
+
+    /** set newID for this subgraph. */
+    void updateID(SubGraphID& newID)
+    { m_id = newID; }
   public:
 
     /** overloaded '=='-operator */
@@ -85,7 +93,7 @@ namespace Belle2 {
     /** returns iD of this graph*/
     const SubGraphID& getID() const { return m_id; }
 
-    /// takes care of being able to use the data collector.
+    /// takes care of being able to use the data collector. please use for quantiles [min, max] min ~0 & max ~1 (range 0-1)
     void prepareDataCollection(std::pair<double, double> quantiles)
     {
       if (m_rawDataCollected != nullptr) delete m_rawDataCollected;
@@ -112,14 +120,45 @@ namespace Belle2 {
     /// this deletes the old min and max values stored and replaces them with the quantiles to be found.
     const std::unordered_map<FilterType, MinMax>& getFinalQuantileValues()
     {
-      for (const auto& entry : *m_rawDataCollected) {
+      for (auto& entry : *m_rawDataCollected) {
         std::pair<double, double> results = entry.second.getMinMax();
         checkAndReplaceIfMinMax(entry.first, results.first);
         checkAndReplaceIfMinMax(entry.first, results.second);
       }
+
+      std::string out;
+      for (auto& entry : m_minMaxValues) {
+        out += entry.first + " " + entry.second.print() + "  ";
+      }
+      B2DEBUG(1, "SubGraph::getFinalQuantileValues: minMaxFound:\n" << out);
       return m_minMaxValues;
     }
 
+    /// for given vector of ids check if any of them is part of subGraphID. If yes, update their SubLayerID. returns number of updated secIDs
+    unsigned idCheckAndUpdate(const std::vector<unsigned>& ids)
+    {
+      unsigned nUpdated = 0;
+      for (unsigned id : ids) {
+
+        if (m_id.hasElement(id)) {
+          m_id.updateID(id);
+          nUpdated++;
+        }
+      }
+      return nUpdated;
+    }
+
+    /// returns vector containing all sectors for given sensor (if any) and empty vector if no sector of that sensor is here.
+    std::vector<FullSecID> getSectorsOfSensor(VxdID& sensor)
+    {
+      std::vector<FullSecID> foundIDs;
+
+      for (auto& sector : m_id) {
+        if (sensor != FullSecID(sector).getVxdID()) continue;
+        foundIDs.push_back(FullSecID(sector));
+      }
+      return std::move(foundIDs);
+    }
   };
 }
 

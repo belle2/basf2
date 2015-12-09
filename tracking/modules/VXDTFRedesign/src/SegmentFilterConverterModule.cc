@@ -113,7 +113,7 @@ SegmentFilterConverterModule::SegmentFilterConverterModule() : Module()
 void
 SegmentFilterConverterModule::initialize()
 {
-  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<VXDTFHit> > sectorMap("", DataStore::c_Persistent);
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
 }
 
@@ -156,7 +156,7 @@ SegmentFilterConverterModule::retrieveFromXML(void)
 void
 SegmentFilterConverterModule::event()
 {
-  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<VXDTFHit> > sectorMap("", DataStore::c_Persistent);
   if (! sectorMap) {
     sectorMap.create();
     initSectorMap();
@@ -175,8 +175,8 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
 {
 
   const VXDTFSecMap* oldSectorMap = m_SectorMaps[ setupIndex ];
-  StoreObjPtr< SectorMap > newSectorMap("", DataStore::c_Persistent);
-  VXDTFFilters* segmentFilters = new VXDTFFilters();
+  StoreObjPtr< SectorMap<VXDTFHit> > newSectorMap("", DataStore::c_Persistent);
+  VXDTFFilters<VXDTFHit>* segmentFilters = new VXDTFFilters<VXDTFHit>();
 
   {
     CompactSecIDs compactSecIds;
@@ -184,8 +184,8 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
     vector<int> ladders = { 8, 12, 7, 10, 12, 16};
     vector<int> sensors = { 2, 2, 2, 3, 4, 5};
 
-    vector< float > uSup = { 1. / 3., 2. / 3. };
-    vector< float > vSup = { 1. / 3., 2. / 3. };
+    vector< double > uSup = { 1. / 3., 2. / 3. };
+    vector< double > vSup = { 1. / 3., 2. / 3. };
 
 
     vector< vector< FullSecID > > sectors;
@@ -243,39 +243,39 @@ SegmentFilterConverterModule::initSectorMapFilter(int setupIndex)
       auto friendSectorsSegmentFilter =
         (
           (
-            min[ FilterID::distance3D ] <
-            Distance3DSquared<VXDTFHit>() <
+            min[ FilterID::distance3D ] <=
+            Distance3DSquared<VXDTFHit>() <=
             max[ FilterID::distance3D ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distance3D, setupIndex)) &&
 
           (
-            min[ FilterID::distanceXY ] <
-            Distance2DXYSquared<VXDTFHit>() <
+            min[ FilterID::distanceXY ] <=
+            Distance2DXYSquared<VXDTFHit>() <=
             max[ FilterID::distanceXY ]
           ).observe(Observer()).enable(VariableEnable(FilterID::distanceXY, setupIndex)) &&
 
           (
-            min[ FilterID::distanceZ ] <
-            Distance1DZ<VXDTFHit>() <
+            min[ FilterID::distanceZ ] <=
+            Distance1DZ<VXDTFHit>() <=
             max[ FilterID::distanceZ ]
           )/*.observe(Observer())*/.enable(VariableEnable(FilterID::distanceZ, setupIndex)) &&
 
 
           (
-            min[ FilterID::slopeRZ ] <
-            SlopeRZ<VXDTFHit>() <
+            min[ FilterID::slopeRZ ] <=
+            SlopeRZ<VXDTFHit>() <=
             max[ FilterID::slopeRZ ]
           ).observe(Observer()).enable(VariableEnable(FilterID::slopeRZ, setupIndex)) &&
 
           (
-            Distance3DNormed<VXDTFHit>() <
+            Distance3DNormed<VXDTFHit>() <=
             max[ FilterID::normedDistance3D ]
           ).enable(VariableEnable(FilterID::normedDistance3D, setupIndex))
 
         );
 
       if (
-        segmentFilters->addFriendsSectorFilter(innerSectorID, outerSectorID,
+        segmentFilters->addFriendsSectorFilter(outerSectorID, innerSectorID,
                                                friendSectorsSegmentFilter) == 0)
         B2WARNING("Problem adding the friendship relation from the inner sector:" <<
                   innerSectorID << " -> " << outerSectorID << " outer sector");
@@ -305,11 +305,11 @@ SegmentFilterConverterModule::endRun()
                             m_PARAMsectorSetup.at(i).c_str());
     i++;
     double dummyLim = 1.;
-    auto filterPersistent(dummyLim < Distance3DSquared<VXDTFHit>() < -dummyLim  &&
-                          dummyLim < Distance2DXYSquared<VXDTFHit>() < -dummyLim &&
-                          dummyLim < Distance1DZ<VXDTFHit>() < -dummyLim &&
-                          dummyLim < SlopeRZ<VXDTFHit>() < -dummyLim &&
-                          Distance3DNormed<VXDTFHit>() < -dummyLim
+    auto filterPersistent(dummyLim <= Distance3DSquared<VXDTFHit>() <= -dummyLim  &&
+                          dummyLim <= Distance2DXYSquared<VXDTFHit>() <= -dummyLim &&
+                          dummyLim <= Distance1DZ<VXDTFHit>() <= -dummyLim &&
+                          dummyLim <= SlopeRZ<VXDTFHit>() <= -dummyLim &&
+                          Distance3DNormed<VXDTFHit>() <= -dummyLim
                          );
 
 
@@ -339,23 +339,23 @@ SegmentFilterConverterModule::endRun()
         }
 
         filterPersistent = (
-                             min[ FilterID::distance3D ] <
-                             Distance3DSquared<VXDTFHit>() <
+                             min[ FilterID::distance3D ] <=
+                             Distance3DSquared<VXDTFHit>() <=
                              max[ FilterID::distance3D ] &&
 
-                             min[ FilterID::distanceXY ] <
-                             Distance2DXYSquared<VXDTFHit>() <
+                             min[ FilterID::distanceXY ] <=
+                             Distance2DXYSquared<VXDTFHit>() <=
                              max[ FilterID::distanceXY ] &&
 
-                             min[ FilterID::distanceZ ] <
-                             Distance1DZ<VXDTFHit>() <
+                             min[ FilterID::distanceZ ] <=
+                             Distance1DZ<VXDTFHit>() <=
                              max[ FilterID::distanceZ ] &&
 
-                             min[ FilterID::slopeRZ ] <
-                             SlopeRZ<VXDTFHit>() <
+                             min[ FilterID::slopeRZ ] <=
+                             SlopeRZ<VXDTFHit>() <=
                              max[ FilterID::slopeRZ ] &&
 
-                             Distance3DNormed<VXDTFHit>() <
+                             Distance3DNormed<VXDTFHit>() <=
                              max[ FilterID::normedDistance3D ]
 
                            );

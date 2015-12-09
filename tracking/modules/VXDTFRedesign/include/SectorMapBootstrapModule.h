@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   class VXDTFSecMap;
-  class TrainerConfigData;
+  class SectorMapConfig;
 
   /** The SegmentFilterConverterModule is a module able to read the
    *  cutoff values for filtering the Segments written in the
@@ -44,7 +44,7 @@ namespace Belle2 {
 
   private:
     void bootstrapSectorMap(void);
-    void bootstrapSectorMap(const TrainerConfigData& config);
+    void bootstrapSectorMap(const SectorMapConfig& config);
 
   };
 } // Belle2 namespace

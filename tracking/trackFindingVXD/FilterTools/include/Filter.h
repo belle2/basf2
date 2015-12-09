@@ -228,7 +228,7 @@ namespace Belle2 {
     class Range,
     class Observer
     >
-  class Filter < Variable, Range, BypassableFilter, Observer  >:
+  class Filter < Variable, Range, Belle2::BypassableFilter, Observer  >:
     public Filter< Variable, Range, Observer> {
   public:
 
@@ -320,7 +320,7 @@ namespace Belle2 {
     class Range,
     class Observer
     >
-  class Filter < Variable, Range, ActivableFilter, Observer  >:
+  class Filter < Variable, Range, Belle2::ActivableFilter, Observer  >:
     public Filter< Variable, Range, Observer> {
   public:
 
@@ -382,7 +382,7 @@ namespace Belle2 {
     class someFilter,
     class templateObserverType
     >
-  class Filter < OperatorNot, someFilter, templateObserverType > {
+  class Filter < Belle2::OperatorNot, someFilter, templateObserverType > {
   public:
 
     typedef  typename someFilter::argumentType argumentType;
@@ -434,7 +434,7 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
-  class Filter < OperatorAnd, FilterA, FilterB, templateObserverType > {
+  class Filter < Belle2::OperatorAnd, FilterA, FilterB, templateObserverType > {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
@@ -482,7 +482,7 @@ namespace Belle2 {
     typename ... types1,
     typename ... types2
     >
-  Filter< OperatorAnd, Filter< types1...>, Filter< types2...> , VoidObserver >
+  Filter< Belle2::OperatorAnd, Belle2::Filter< types1...>, Belle2::Filter< types2...> , Belle2::VoidObserver >
   operator &&(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {
     return Filter < OperatorAnd,
@@ -502,7 +502,7 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
-  class Filter < OperatorOr, FilterA, FilterB, templateObserverType > {
+  class Filter < Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
   public:
 
     typedef  typename FilterA::argumentType argumentType;
@@ -549,7 +549,7 @@ namespace Belle2 {
     typename ... types1,
     typename ... types2
     >
-  Filter< OperatorOr, Filter< types1...>, Filter< types2...> , VoidObserver >
+  Filter< Belle2::OperatorOr, Belle2::Filter< types1...>, Belle2::Filter< types2...> , Belle2::VoidObserver >
   operator ||(const Filter< types1...>& filter1 , const Filter< types2...>& filter2)
   {
     return Filter < OperatorOr,

@@ -21,7 +21,7 @@
 namespace Belle2 {
 
   /** simple struct containing all the configuration data needed for the SecMapTrainer. */
-  struct TrainerConfigData {
+  struct SectorMapConfig {
     // TODO:
     // JAKOB will change the name of this class into SectorMapConfig which is
     // more meaningful, and will put it among the dataobjects since it will be
@@ -29,26 +29,33 @@ namespace Belle2 {
 
     /** stores pTCuts for min (.first) and max (.second) ptCut. */
     // Eugenio: Why not use pTmin and pTmax instead of pTCuts.first and pTCuts.second which is awkward?
-    std::pair<double, double> pTCuts = {0.02, 3.5};
+//     std::pair<double, double> pTCuts = {0.02, 3.5};
+    /** stores pTCuts for min pT allowed for this . */
+    double pTmin = 0.02;
+    /** stores pTCuts for min (.first) and max (.second) ptCut. */
+    double pTmax = 3.5;
 
     /** allows smearing of the cuts. Values greater 0 stretch the cuts, values smaller 0 narrow them down. */
     double pTSmear = 0.;
 
-    /** stores allowed layers to be used, with min (.first) and max (.second) layer to be named. Numbers below 0 assume no cut on that side. */
-    std::pair<int, int> minMaxLayer = {3, 6};
+    /** stores allowed layers to be used (including virtual IP with layer 0). */
+    std::vector<int> allowedLayers = {0, 3, 4, 5, 6};
 
     /** stores the cuts in u-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
-    // TODO: These are not Cuts, perhaps upperValues Low values?
-    // Can we get rid og 0 and 1 since they are not conveing any information?
-    std::vector<double> uDirectionCuts = {0., .15, .5, .85, 1.};
-
-
+//     std::vector<double> uDirectionCuts = {0., .15, .5, .85, 1.};
     /** stores the cuts in v-direction in local relative coordinates of a sensor (0-1), to be used for determining the sectorID.
      * First one has to be 0, last one has to be 1. */
+//     std::vector<double> vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
     // TODO: These are not Cuts, perhaps upperValues Low values?
     // Can we get rid og 0 and 1 since they are not conveing any information?
-    std::vector<double> vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
+    // Jakob: the 1.-part I want to keep to let the code be more readable (-> sectorDivider.size() == nSectors in that direction), this is imho more important than freeing the space of one double.
+
+    /** defines where to draw the lines between sectors in u direction of a sensor. only values 0-1 (-> relative local coordinates) are accepted, the last entry is the outer border of the rightmost sector, the innermost one is the outer border of the leftmost sector, */
+    std::vector<double> uSectorDivider = {.15, .5, .85, 1.};
+
+    /** defines where to draw the lines between sectors in v direction of a sensor. only values 0-1 (-> relative local coordinates) are accepted, the last entry is the outer border of the rightmost sector, the innermost one is the outer border of the leftmost sector, */
+    std::vector<double> vSectorDivider = {.1, .3, .5, .7, .9, 1.};
 
     /** stores all the pdgCodes which are allowed to be used by the SecMap. if empty all types are allowed. */
     std::vector<int> pdgCodesAllowed;
@@ -89,7 +96,7 @@ namespace Belle2 {
     double rarenessThreshold = 0.001;
 
     /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
-    std::pair<double, double> quantiles = {0.005, 0.005};
+    std::pair<double, double> quantiles = {0.005, 1. - 0.005};
   };
 }
 

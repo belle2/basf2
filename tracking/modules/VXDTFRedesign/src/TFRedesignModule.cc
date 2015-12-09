@@ -1867,7 +1867,7 @@ unsigned int TFRedesignModule::segFinder(PassData* currentPass)
   unsigned int discardedSegmentsCounter = 0;
   unsigned int activatedSegmentsCounter = 0;
 
-  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);;
+  StoreObjPtr< SectorMap<VXDTFHit> > sectorMap("", DataStore::c_Persistent);;
   auto filters = sectorMap->getFilters(currentPass->getName());
 
   for (VXDSector* mainSector : currentPass->sectorVector) {

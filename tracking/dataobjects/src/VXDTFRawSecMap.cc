@@ -48,8 +48,8 @@ void VXDTFRawSecMap::addSectorMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newM
    * -> imported map is not empty in that case!
    * */
 
-  unsigned addedSectorCtr = 0, addedFriendCtr = 0, addedCutoffCtr = 0, addedValuesCtr = 0; // counters for mentioned types
-  int internalBefore = 0, importedBefore =
+  int addedSectorCtr = 0, addedFriendCtr = 0, addedCutoffCtr = 0, addedValuesCtr = 0, // counters for mentioned types
+      internalBefore = 0, importedBefore =
                          0; // store info of values before import to be able to compare it with the values coming afterwards
 
   B2DEBUG(5, "addSectorMap: internal map before merging size: sectors/friends/values: " << getNumOfSectors() << "/" <<
@@ -130,14 +130,9 @@ void VXDTFRawSecMap::sortMap(VXDTFRawSecMapTypedef::StrippedRawSecMap& newMap)
 int VXDTFRawSecMap::getNumOfValues(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap)
 {
   int result = 0;
-  B2DEBUG(100, " getNumOfValues::nSectors: " << secMap.size())
-  for (const VXDTFRawSecMapTypedef::SectorPack& aSector :
-       secMap) {  // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
-    B2DEBUG(100, " getNumOfValues::nFriends: " << aSector.second.size())
-    for (const VXDTFRawSecMapTypedef::FriendPack& afriend : aSector.second) {  // looping over friends
-      B2DEBUG(100, " getNumOfValues::nFilters: " << afriend.second.size())
-      for (const VXDTFRawSecMapTypedef::CutoffPack& aCutoffType : afriend.second) {  // looping over CutoffTypes
-        B2DEBUG(100, " getNumOfValues::nCuts: " << aCutoffType.second.size())
+  for (VXDTFRawSecMapTypedef::SectorPack& aSector : secMap) {  // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
+    for (VXDTFRawSecMapTypedef::FriendPack& afriend : aSector.second) {  // looping over friends
+      for (VXDTFRawSecMapTypedef::CutoffPack& aCutoffType : afriend.second) {  // looping over CutoffTypes
         result += aCutoffType.second.size();
       }
     }
@@ -150,10 +145,9 @@ int VXDTFRawSecMap::getNumOfValues(VXDTFRawSecMapTypedef::StrippedRawSecMap& sec
 void VXDTFRawSecMap::printDetailedInfo(VXDTFRawSecMapTypedef::StrippedRawSecMap& secMap)
 {
 //   int result = 0;
-  for (const VXDTFRawSecMapTypedef::SectorPack& aSector :
-       secMap) {  // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
+  for (VXDTFRawSecMapTypedef::SectorPack& aSector : secMap) {  // looping over sectors (VXDTFRawSecMapTypedef::StrippedRawSecMap)
     B2INFO("In Sector " << FullSecID(aSector.first) << " there are the following friends:")
-    for (const VXDTFRawSecMapTypedef::FriendPack& afriend : aSector.second) {  // looping over friends
+    for (VXDTFRawSecMapTypedef::FriendPack& afriend : aSector.second) {  // looping over friends
       B2INFO("..." << FullSecID(afriend.first) << " with " << afriend.second.size() << " cutoffTypes")
     }
   }
@@ -246,9 +240,9 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
   int nFriends = aSector.second.size(); // number of friendsectors before doing anything
   double rarenessThreshold =
     0; // if secCombi is occuring even more seldom than this threshold, it will be filtered (value will be set later)
-  unsigned nTotalValues = 0; // counts total number of occurrences of all sector-combinations of current sector
-  for (const VXDTFRawSecMapTypedef::FriendPack& aCombination : aSector.second) {
-    for (const VXDTFRawSecMapTypedef::CutoffPack& aCutoff : aCombination.second) {
+  int nTotalValues = 0; // counts total number of occurrences of all sector-combinations of current sector
+  for (VXDTFRawSecMapTypedef::FriendPack& aCombination : aSector.second) {
+    for (VXDTFRawSecMapTypedef::CutoffPack& aCutoff : aCombination.second) {
       nTotalValues += aCutoff.second.size();
     }
   }
@@ -259,7 +253,6 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
   B2DEBUG(20, "filterBadSectorCombis: sector " << mainSector << " got total number of values: " << nTotalValues <<
           " and calculated rarenessThreshold of " << rarenessThreshold)
 
-  unsigned countKickSameSensor = 0, countKickRare = 0, countKickBadLayer = 0;
   for (VXDTFRawSecMapTypedef::FriendPack& aCombination : aSector.second) {
     friendSector = FullSecID(aCombination.first);
 
@@ -277,7 +270,6 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
       B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector <<
               " got kicked because of being on the same sensor (sector/friend): " << mainSector.getLayerNumber() << "/" <<
               friendSector.getLayerNumber())
-      ++countKickSameSensor;
       continue;
     }
 
@@ -292,7 +284,6 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
         B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector <<
                 " got kicked because of rare sector combination (nFriendValues/nTotalValues/rarenessThreshold): " << nFriendValues << "/" <<
                 nTotalValues << "/" << rarenessThreshold)
-        ++countKickRare;
         continue;
       }
     }
@@ -304,7 +295,6 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
         B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector <<
                 " got kicked because of bad layer number (sector/friend): " << mainSector.getLayerNumber() << "/" << friendSector.getLayerNumber()
                 << " and bad VxdID: (sector/friend) " << mainSector.getVxdID() << "/" << friendSector.getVxdID())
-        ++countKickBadLayer;
         continue;
       } else {
         upgradeSecID = true; // that's why this check is done last
@@ -314,15 +304,8 @@ bool VXDTFRawSecMap::filterBadSectorCombis(VXDTFRawSecMapTypedef::SectorPack& aS
     }
   }
 
-  if (countKickSameSensor + countKickRare + countKickBadLayer != 0) {
-    B2DEBUG(10, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " has got " << badIDs.size() <<
-            " badIDs (" << countKickSameSensor << "/" << countKickRare << "/" << countKickBadLayer <<
-            " sameSensor-/rare-/badLayerKick)after safety checks")
-  } else {
-    B2DEBUG(50, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " has got " << badIDs.size() <<
-            " badIDs (" << countKickSameSensor << "/" << countKickRare << "/" << countKickBadLayer <<
-            " sameSensor-/rare-/badLayerKick)after safety checks")
-  }
+  B2DEBUG(30, "filterBadSectorCombis: friend " << friendSector << " of sector " << mainSector << " has got " << badIDs.size() <<
+          " badIDs after safety checks")
   if (int(badIDs.size()) == 0) { return upgradeSecID; }
 
   searchForBadEntries(aSector.second, badIDs);        /// kicking friend having no values stored
@@ -428,7 +411,7 @@ void VXDTFRawSecMap::repairSecMap()
 
     unsigned nFriendsBefore = sectorIt->second.size();
     bool upgradeMe = filterBadSectorCombis((*sectorIt));                  /// filterBadSectorCombis
-    unsigned nFriendsAfter = sectorIt->second.size();
+    int nFriendsAfter = sectorIt->second.size();
     B2DEBUG(25, "repairSecMap: at sector (id/name): " << sectorIt->first << "/" << currentSecID << ", had friends before/after: " <<
             nFriendsBefore << "/" << nFriendsAfter)
 
@@ -453,7 +436,7 @@ void VXDTFRawSecMap::repairSecMap()
   // now doing second run where friendIDs are upgraded too TODO: maybe better to kick dead sectors as friends too, since they are a dead end anyway -> problem, in this case we have to redo these steps until no sector/friend has died anymore. -> recursive function? TODO-2: the next section is doing this or not?
   for (VXDTFRawSecMapTypedef::SectorPack& aSector : m_sectorMap) {
     for (VXDTFRawSecMapTypedef::FriendPack& aFriend : aSector.second) {
-      for (const auto newIDPack : updatedSubLayerIDs) {
+      for (auto newIDPack : updatedSubLayerIDs) {
         if (newIDPack.first == aFriend.first) {
           aFriend.first = newIDPack.second; // getting updated ID
           break;
@@ -462,18 +445,18 @@ void VXDTFRawSecMap::repairSecMap()
     }
   }
 
-  if ((m_removeDeadSectorChains == true) and (killedSectors.size()) != 0) {
+  if ((m_removeDeadSectorChains == true) and (int(killedSectors.size()) != 0)) {
     B2DEBUG(15, " removeDeadSectorChains is true and there were " << killedSectors.size() <<
             " sectors killed, starting to clean friends too...")
-    unsigned oldNSectors = 0;
-    unsigned oldNFriends = 0;
-    unsigned newNSectors = getNumOfSectors();
-    unsigned newNFriends = getNumOfFriends();
-    unsigned nTimesRepeated = 0;
+    int oldNSectors = 0;
+    int oldNFriends = 0;
+    int newNSectors = getNumOfSectors();
+    int newNFriends = getNumOfFriends();
+    int nTimesRepeated = 0;
     while ((oldNSectors not_eq newNSectors)
            or (oldNFriends not_eq newNFriends)) {  // should restart if at least one of the conditions are fullfilled
       ++nTimesRepeated;
-      unsigned nNewSectorsKilled = 0; // number of new sectors killed
+      int nNewSectorsKilled = 0; // number of new sectors killed
       for (VXDTFRawSecMapTypedef::SectorPack& aSector : m_sectorMap) {  // kill dead friends
         if (aSector.first == centerSectorID) {
           B2DEBUG(1, "repairSecMap @ removeDeadSectorChains: centerSector found. skipping it...")
@@ -482,7 +465,7 @@ void VXDTFRawSecMap::repairSecMap()
         unsigned nFriendsBefore = aSector.second.size();
         searchForBadEntries(aSector.second, killedSectors);       /// remove all friend which are already dead sectors
 
-        unsigned nFriendsAfter = aSector.second.size();
+        int nFriendsAfter = aSector.second.size();
         B2DEBUG(20, "repairSecMap: after killing dead friends of sector " << FullSecID(aSector.first) << " there are " << nFriendsAfter <<
                 " friends left (there were " << nFriendsBefore << " friend before)")
         if (nFriendsAfter == 0) {
@@ -522,12 +505,12 @@ VXDTFRawSecMapTypedef::IDVector VXDTFRawSecMap::getLayersOfSecMap()
 {
   VXDTFRawSecMapTypedef::IDVector layerIDs;
   unsigned int currentID;
-  for (const VXDTFRawSecMapTypedef::SectorPack& aSectorEntry : m_sectorMap) {
+  for (VXDTFRawSecMapTypedef::SectorPack& aSectorEntry : m_sectorMap) {
     // check sector itself:
     currentID = FullSecID(aSectorEntry.first).getLayerID();
     if (std::find(layerIDs.begin(), layerIDs.end(), currentID) == layerIDs.end()) { layerIDs.push_back(currentID); }
     // check friends:
-    for (const VXDTFRawSecMapTypedef::FriendPack& aFriendEntry : aSectorEntry.second) {
+    for (VXDTFRawSecMapTypedef::FriendPack& aFriendEntry : aSectorEntry.second) {
       currentID = FullSecID(aFriendEntry.first).getLayerID();
       if (std::find(layerIDs.begin(), layerIDs.end(), currentID) == layerIDs.end()) { layerIDs.push_back(currentID); }
     }
@@ -562,8 +545,8 @@ void VXDTFRawSecMap::addDistances(VXDTFRawSecMapTypedef::SectorDistancesMap& aMa
 
   // check old map (m_dist2OriginMap) for each entry of the new one whether there is already an entry. If there is not, add new entry
   bool entryFound = false;
-  for (const VXDTFRawSecMapTypedef::SectorDistance aMapEntry : aMap) {
-    for (const VXDTFRawSecMapTypedef::SectorDistance oldMapEntry : m_dist2OriginMap) {
+  for (VXDTFRawSecMapTypedef::SectorDistance aMapEntry : aMap) {
+    for (VXDTFRawSecMapTypedef::SectorDistance oldMapEntry : m_dist2OriginMap) {
       B2DEBUG(100, "addDistances: aMapEntry f/s: " << aMapEntry.first << "/" << aMapEntry.second << ", oldMapEntry f/s: " <<
               oldMapEntry.first << "/" << oldMapEntry.second)
       if (aMapEntry == oldMapEntry) { entryFound = true; break; }

@@ -13,6 +13,10 @@
 #include "tracking/trackFindingVXD/sectorMapTools/SectorsOnSensor.h"
 #include <cstdint>
 #include <vector>
+#include <framework/logging/Logger.h>
+#include <framework/core/FrameworkExceptions.h>
+
+#include <assert.h>     /* assert */
 
 
 
@@ -23,6 +27,11 @@ namespace Belle2 {
   class CompactSecIDs {
 
   public:
+
+    /** gets thrown if CompactSecIDs does not store wanted FullSecID. */
+    BELLE2_DEFINE_EXCEPTION(Bad_Input, "CompactSecIDs - vxdID %1% with %2% number %3%  coordinates u/v: %4%/%5% could not be found!!");
+
+
     // limit to UINT16_MAX
     typedef uint16_t sectorID_t       ;
     typedef uint32_t secPairID_t      ;
@@ -41,8 +50,8 @@ namespace Belle2 {
 
     // add the FullSecIDs fullSecIDs to the internal lookup table
     // return the number of fullSecIDs actually added
-    int addSectors(const vector< float>&   normalizedUsup,
-                   const vector< float>&   normalizedVsup,
+    int addSectors(const vector< double>&   normalizedUsup,
+                   const vector< double>&   normalizedVsup,
                    const vector< vector< FullSecID >>& fullSecIDs)
     {
 
@@ -86,6 +95,7 @@ namespace Belle2 {
                           fullID.getVxdID().getSensorNumber(),
                           fullID.getSecID());
 
+      /// question JKL: what happens here for virtual IP, where layer, ladder, sensorID and secID is 0? does this return zero (which is also returned when having a fullID which is not stored in this CompactSecID-thingy?
     }
 
     secPairID_t getCompactID(const FullSecID id1, const FullSecID id2) const
@@ -136,15 +146,48 @@ namespace Belle2 {
 
     }
 
-    FullSecID getFullSecID(VxdID aSensorID, float x, float y) const
+
+    /// returns a fullSecID for given sensor and coordinates and if they are actually valid (checked by an assert).
+    FullSecID getFullSecID(VxdID aSensorID, double normalizedU, double normalizedV) const
     {
 
       auto layer = aSensorID.getLayerNumber() ;
       auto ladder = aSensorID.getLadderNumber();
       auto sensor = aSensorID.getSensorNumber();
 
-      return m_compactSectorsIDMap[layer][ladder][sensor](x, y);
+      // assert for checking layer, ladder, sensor
+      B2DEBUG(1, "VXDTFFilters:getFullSecID @ layer/ladder/sensor: " << aSensorID.getLayerNumber() << "/" << aSensorID.getLadderNumber()
+              << "/" << aSensorID.getSensorNumber());
+      B2DEBUG(1, "VXDTFFilters:getFullSecID : nLayers in Map: " << m_compactSectorsIDMap.size());
+      if (!(layer < m_compactSectorsIDMap.size())) throw(Bad_Input() << aSensorID << "layer" << layer << normalizedU << normalizedV);
+//    assert( ( layer < m_compactSectorsIDMap.size()));
+      B2DEBUG(1, "VXDTFFilters:getFullSecID : nLadders in layer: " << m_compactSectorsIDMap[layer].size());
+      if (!(ladder < m_compactSectorsIDMap[layer].size())) throw(Bad_Input() << aSensorID << "ladder" << ladder << normalizedU <<
+                                                                   normalizedV);
+//    assert( ( ladder < m_compactSectorsIDMap[layer].size()));
+      B2DEBUG(1, "VXDTFFilters:getFullSecID @ : nSensors in ladder: " << m_compactSectorsIDMap[layer][ladder].size());
+      if (!(sensor < m_compactSectorsIDMap[layer][ladder].size())) throw(Bad_Input() << aSensorID << "sensor" << sensor << normalizedU <<
+            normalizedV);
+//    assert( ( sensor < m_compactSectorsIDMap[layer][ladder].size()));
+      return m_compactSectorsIDMap[layer][ladder][sensor](normalizedU, normalizedV);
 
+    }
+
+
+    /// check if using operator() would be safe (true if it is safe):
+    bool areCoordinatesValid(VxdID aSensorID, double normalizedU, double normalizedV) const
+    {
+      auto layer = aSensorID.getLayerNumber() ;
+      auto ladder = aSensorID.getLadderNumber();
+      auto sensor = aSensorID.getSensorNumber();
+
+      // check sensor:
+      if (!(layer < m_compactSectorsIDMap.size())) return false;
+      if (!(ladder < m_compactSectorsIDMap[layer].size())) return false;
+      if (!(sensor < m_compactSectorsIDMap[layer][ladder].size())) return false;
+
+      // check u and v:
+      return m_compactSectorsIDMap[layer][ladder][sensor].areCoordinatesValid(normalizedU, normalizedV);
     }
 
 
@@ -161,8 +204,8 @@ namespace Belle2 {
     template<  class TContainer,
                class ... Indexes >
     int addSectors(TContainer& container,
-                   const vector< float >&     normalizedUsup,
-                   const vector< float >&     normalizedVsup,
+                   const vector< double >&     normalizedUsup,
+                   const vector< double >&     normalizedVsup,
                    const vector< vector< FullSecID > >& fullSecIDs,
                    short unsigned int index, Indexes ... indexes)
     {
@@ -177,8 +220,8 @@ namespace Belle2 {
 
 
     int addSectors(SectorsOnSensor<sectorID_t>&            sectors,
-                   const vector< float>&                   normalizedUsup,
-                   const vector< float>&                   normalizedVsup,
+                   const vector< double>&                   normalizedUsup,
+                   const vector< double>&                   normalizedVsup,
                    const vector< vector< FullSecID > >&    fullSecIDs)
     {
       if (sectors.size() != 0)

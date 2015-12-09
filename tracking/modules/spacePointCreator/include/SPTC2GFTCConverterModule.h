@@ -57,6 +57,7 @@ namespace Belle2 {
     template<typename ClusterType>
     std::vector<int> getRelatedClusters(const Belle2::SpacePoint* spacePoint, const std::string& clusterNames = "ALL");
 
-    BELLE2_DEFINE_EXCEPTION(ClusterNotFound, "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no related Cluster can be found for a SpacePoint */
+    BELLE2_DEFINE_EXCEPTION(ClusterNotFound,
+                            "No related Cluster to a SpacePoint was found."); /**< Exception thrown, when no related Cluster can be found for a SpacePoint */
   };
 }

@@ -92,6 +92,7 @@ param_track_finder_mc_truth = {
 }
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
+setupGenfit = register_module('SetupGenfitExtrapolation')
 
 trackfitter = register_module('GenFitter')
 # trackfitter.logging.log_level = LogLevel.WARNING
@@ -127,6 +128,7 @@ main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(setupGenfit)
 main.add_module(g4sim)
 main.add_module(vxdClusterizer)
 main.add_module(eventCounter)

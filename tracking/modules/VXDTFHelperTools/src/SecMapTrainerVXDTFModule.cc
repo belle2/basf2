@@ -54,13 +54,15 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
 
 
-  /// TODO nice interface for creating TrainerConfigData:
-  TrainerConfigData testData1;
-  testData1.pTCuts = {0.02, 3.5};
+  /// TODO nice interface for creating SectorMapConfig:
+  SectorMapConfig testData1;
+//   testData1.pTCuts = {0.02, 3.5};
+  testData1.pTmin = 0.02;
+  testData1.pTmax = 3.5;
   testData1.pTSmear = 0.;
-  testData1.minMaxLayer = {3, 6};
-  testData1.uDirectionCuts = {0., .15, .5, .85, 1.};
-  testData1.vDirectionCuts = {0., .1, .3, .5, .7, .9, 1.};
+  testData1.allowedLayers = {0, 3, 4, 5, 6};
+  testData1.uSectorDivider = { .15, .5, .85, 1.};
+  testData1.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
   testData1.pdgCodesAllowed = {};
   testData1.seedMaxDist2IPXY = 23.5;
   testData1.seedMaxDist2IPZ = 23.5;

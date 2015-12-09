@@ -32,14 +32,14 @@ namespace Belle2 {
     MinMaxCollector<double> m_collector; ///< collects raw data in an RAM-saving way.
   public:
 
-    /// constructor.
+    /// constructor. please use for quantiles [min, max] min ~0 & max ~1 (range 0-1)
     RawDataCollectedMinMax(unsigned expectedSize,
                            std::pair<double, double> quantiles,
                            unsigned maxSizeThreshold = 100000) :
       m_currentSize(0),
       m_fillIntermediateThreshold(std::numeric_limits<unsigned>::max()),
       m_minMaxQuantiles(quantiles),
-      m_collector((quantiles.first > (/*1.-*/quantiles.second) ? quantiles.first * 2 : (/*1.-*/quantiles.second) * 2))
+      m_collector((quantiles.first > (1. - quantiles.second) ? quantiles.first * 2. : (1. - quantiles.second) * 2.))
     {
       if (double(expectedSize) / (double(maxSizeThreshold) * 0.05) > double(maxSizeThreshold))
       { B2FATAL("RawDataCollectedMinMax: expected data to big, can not execute!") }
@@ -79,8 +79,8 @@ namespace Belle2 {
       }
       if (m_intermediateValues.size() == 2) {
         return {
-          0.5 * (m_intermediateValues.at(0).first + m_intermediateValues.at(0).first),
-          0.5 * (m_intermediateValues.at(0).second + m_intermediateValues.at(0).second) };
+          0.5 * (m_intermediateValues.at(0).first + m_intermediateValues.at(1).first),
+          0.5 * (m_intermediateValues.at(0).second + m_intermediateValues.at(1).second) };
       }
 
       if (!m_collector.empty()) {

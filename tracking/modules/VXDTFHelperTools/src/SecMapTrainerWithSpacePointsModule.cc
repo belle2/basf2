@@ -138,7 +138,7 @@ SecMapTrainerWithSpacePointsModule::SecMapTrainerWithSpacePointsModule() : Modul
   addParam("trackErrorTracks", m_PARAMtrackErrorTracks, "track tracks which cause strange results", bool(false));
 
   addParam("highestAllowedLayer", m_PARAMhighestAllowedLayer, "set value below 6 if you want to exclude outer layers (standard is 6)",
-           int(6));
+           unsigned(6));
 
   addParam("uniSigma", m_PARAMuniSigma,
            "standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits')",
@@ -356,8 +356,16 @@ void SecMapTrainerWithSpacePointsModule::initialize()
     }
     m_PARAMsecMapNames.push_back(secMapName);
 
-    InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName, m_PARAMpTCutSmearer * 0.01, m_PARAMpTcuts.at(i),
-                                                            m_PARAMpTcuts.at(i + 1), m_usePXD, m_useSVD, m_useTEL);
+    InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName,
+                                                            m_PARAMpTCutSmearer * 0.01,
+                                                            m_PARAMpTcuts.at(i),
+                                                            m_PARAMpTcuts.at(i + 1),
+                                                            m_PARAMhighestAllowedLayer,
+                                                            m_PARAMacceptedRegionForSensors.at(0),
+                                                            m_PARAMacceptedRegionForSensors.at(1),
+                                                            m_usePXD,
+                                                            m_useSVD,
+                                                            m_useTEL);
     secMap->insert({FullSecID().getFullSecString(), newCenterSector});
 
     B2INFO("SecMapTrainerWithSpacePointsModule-start: will use " << secMapName << " for storing cutoffs in range " <<
@@ -379,8 +387,16 @@ void SecMapTrainerWithSpacePointsModule::initialize()
   }
   m_PARAMsecMapNames.push_back(secMapName);
 
-  InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName, m_PARAMpTCutSmearer * 0.01, m_PARAMpTcuts.at(numCuts - 1), -1,
-                                                          m_usePXD, m_useSVD, m_useTEL);
+  InternalRawSectorMap* secMap = new InternalRawSectorMap(secMapName,
+                                                          m_PARAMpTCutSmearer * 0.01,
+                                                          m_PARAMpTcuts.at(numCuts - 1),
+                                                          -1,
+                                                          m_PARAMhighestAllowedLayer,
+                                                          m_PARAMacceptedRegionForSensors.at(0),
+                                                          m_PARAMacceptedRegionForSensors.at(1),
+                                                          m_usePXD,
+                                                          m_useSVD,
+                                                          m_useTEL);
   secMap->insert({FullSecID().getFullSecString(), newCenterSector});
 
   B2INFO("SecMapTrainerWithSpacePointsModule-start: will use " << secMapName << " for storing cutoffs in range " <<
@@ -444,7 +460,7 @@ void SecMapTrainerWithSpacePointsModule::event()
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
 
   if (nSPTCs == 0) {
-    B2WARNING("event " << m_eventCounter << ": there is no SpacePointTrackCandidate!")
+    B2INFO("event " << m_eventCounter << ": there is no SpacePointTrackCandidate!")
     return;
   }
 
@@ -463,14 +479,16 @@ void SecMapTrainerWithSpacePointsModule::event()
    */
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
-    B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored")
+    B2DEBUG(10, "current SPTC " << currentTC->getArrayIndex() <<
+            " has got " << currentTC->getNHits() << " hits stored")
     unsigned chosenMap = 0;
     for (auto* secMap : m_sectorMaps) {
       chosenMap++;
       /// can be accepted by several secMaps, because of momentum range or whatever:
       bool accepted = checkAcceptanceOfSecMap(secMap, currentTC);
 
-      B2DEBUG(15, "currens SPTC with " << currentTC->getNHits() <<
+      B2DEBUG(15, "current SPTC " << currentTC->getArrayIndex() <<
+              " with " << currentTC->getNHits() <<
               " hits stored and pT of " << currentTC->getMomSeed().Perp() <<
               "GeV/c was " << (accepted ? string("accepted") : string("rejected")) <<
               " by secMap " << secMap->getName() <<
@@ -535,11 +553,11 @@ void SecMapTrainerWithSpacePointsModule::event()
       }
 
       if (firstrun == false) {
-        B2DEBUG(20, "calculating 2-hit-filters")
+        B2DEBUG(25, "calculating 2-hit-filters")
         if (secondrun == false) {
-          B2DEBUG(20, "calculating 3-hit-filters")
+          B2DEBUG(25, "calculating 3-hit-filters")
           if (thirdrun == false) {
-            B2DEBUG(20, "calculating 4-hit-filters")
+            B2DEBUG(25, "calculating 4-hit-filters")
             currentSector = it4HitsFilter->getSectorID();
             friendSector = it3HitsFilter->getSectorID();
             thisSectorPos = thisSecMap->find(currentSector);
@@ -1415,37 +1433,42 @@ void SecMapTrainerWithSpacePointsModule::terminate()
 bool SecMapTrainerWithSpacePointsModule::acceptHit(const SpacePoint* aSP, SecMapTrainerWithSPNames::InternalRawSectorMap* secMap)
 {
   // catch hits on layers too high
-  if (VxdID(aSP->getVxdID()).getLayerNumber() > secMap->getHighestAllowedLayer()) return false;
+  if (VxdID(aSP->getVxdID()).getLayerNumber() > secMap->getHighestAllowedLayer()) {
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to being on a Layer too high: " << VxdID(
+              aSP->getVxdID()).getLayerNumber())
+    return false;
+  }
 
   // catch hits which are on wrong detector
   Belle2::VXD::SensorInfoBase::SensorType detectorType = aSP->getType();
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::PXD and secMap->usePXD() == false) {
-    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type PXD")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type PXD")
     return false;
   }
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::SVD and secMap->useSVD() == false) {
-    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type SVD")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type SVD")
     return false;
   }
   if (detectorType == Belle2::VXD::SensorInfoBase::SensorType::TEL and secMap->useTEL() == false) {
-    B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type TEL")
+    B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad detector type TEL")
     return false;
   }
 
   // catch hits which are out of range
   if (secMap->getAcceptedRegionForSensors().first > 0) {
     if ((aSP->getPosition() - m_origin).Mag() < secMap->getAcceptedRegionForSensors().first) {
-      B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (below lower threshold)")
+      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (below lower threshold)")
       return false;
     }
   }
   if (secMap->getAcceptedRegionForSensors().second > 0) {
     if ((aSP->getPosition() - m_origin).Mag() > secMap->getAcceptedRegionForSensors().second) {
-      B2DEBUG(50, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (above upper threshold)")
+      B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was rejected due to bad hit position (above upper threshold)")
       return false;
     }
   }
   // passed all tests
+  B2DEBUG(25, "acceptHit: SP " << aSP->getArrayIndex() << " was accepted by secMap " << secMap->getName())
   return true;
 } /**< for given hit and sectorMap, the function returns true, if hit is accepted and false if not */
 
@@ -1459,7 +1482,8 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
 
   // catch wrong pT-range
   if (secMap->acceptPt(currentTC->getMomSeed().Perp()) == false) {
-    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong pT")
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " (with nhits " <<
+            currentTC->getNHits() << ") was rejected due to wrong pT")
     return false;
   }
 
@@ -1467,31 +1491,34 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
   if (m_filterCharges != 0) {
     if (std::abs(currentTC->getPdgCode()) > 10 and std::abs(currentTC->getPdgCode()) < 16) { // catch leptons
       if (boost::math::sign(currentTC->getPdgCode()) == boost::math::sign(m_filterCharges)) {
-        B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong lepton charge")
+        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong lepton charge")
         return false;
       }
     } else {
       if (boost::math::sign(currentTC->getPdgCode()) != boost::math::sign(m_filterCharges)) {
-        B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong hadron charge")
+        B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to wrong hadron charge")
         return false;
       }
     }
   }
 
   // catch TCs where more than one hit was on the same sensor
-  if (currentTC->hasHitsOnSameSensor()) return false;
+  if (currentTC->hasHitsOnSameSensor()) {
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due having hits on same sensor.")
+    return false;
+  }
 
   // catch tracks which start too far away from orign
   if (currentTC->getPosSeed().Perp() > m_PARAMmaxXYvertexDistance
       or
       std::abs(currentTC->getPosSeed().Z()) > m_PARAMmaxZvertexDistance) {
-    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to bad seed position")
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to bad seed position")
     return false;
   }
 
   // catch tracks which are too short in any case
   if (currentTC->getNHits() < m_PARAMminTrackletLength) {
-    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough hits (" <<
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough hits (" <<
             currentTC->getNHits() << ")")
     return false;
   }
@@ -1504,12 +1531,14 @@ bool SecMapTrainerWithSpacePointsModule::checkAcceptanceOfSecMap(SecMapTrainerWi
 
   // catch tracks which are too short because of hit-specific cuts
   if (nGoodHits < m_PARAMminTrackletLength) {
-    B2DEBUG(50, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough good hits (" <<
+    B2DEBUG(20, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was rejected due to having not enough _good_ hits ("
+            <<
             nGoodHits << ")")
     return false;
   }
 
   // pass all tests
+  B2DEBUG(25, "checkAcceptanceOfSecMap: TC " << currentTC->getArrayIndex() << " was accepted by secMap " << secMap->getName())
   return true;
 } /**< can be accepted by several secMaps, because of momentum range or whatever  */
 
@@ -1622,11 +1651,11 @@ std::string SecMapTrainerWithSpacePointsModule::calcSecID(const SpacePoint* aSP,
     aCornerCoordinate = SectorTools::calcNormalizedSectorPoint(m_PARAMsectorConfigU, m_PARAMsectorConfigV, aSecID, aRelCoordCenter);
     SectorTools::NormCoords aCenterOfSector = SpacePoint::convertNormalizedToLocalCoordinates(aCornerCoordinate, aUniID);
 
-    B2DEBUG(20, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
-    B2DEBUG(20, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
-    B2DEBUG(20, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
+    B2DEBUG(75, "OOO SIZE: " << aSensorInfo.getUSize() << ", " << aSensorInfo.getVSize());
+    B2DEBUG(75, "OOO Center normalized: " << aCornerCoordinate.first << ", " << aCornerCoordinate.second);
+    B2DEBUG(75, "OOO Center real: " << localCorner11.first << ", " << localCorner11.second);
 
-    B2DEBUG(20, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" <<
+    B2DEBUG(75, "OOO I have found a SecID: " << aSectorName << " with centerU/V: " << aCenterOfSector.first << "/" <<
             aCenterOfSector.second << " for hit " << aCoorNormalized.first << "/" << aCoorNormalized.second);
     B2DEBUG(100, "OOO Sector " << aSectorName << " - edges: O(" << localCorner00.first << "," << localCorner00.second << "), U(" <<
             localCorner01.first << "," << localCorner01.second << "), V(" << localCorner10.first << "," << localCorner10.second << "), UV(" <<

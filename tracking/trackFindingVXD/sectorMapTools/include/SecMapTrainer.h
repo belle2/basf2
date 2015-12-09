@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainerHit.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainerTC.h>
-#include <tracking/trackFindingVXD/sectorMapTools/TrainerConfigData.h>
+#include <tracking/dataobjects/SectorMapConfig.h>
 
 #include <tracking/trackFindingVXD/sectorMapTools/FilterMill.h>
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
@@ -39,7 +39,7 @@ namespace Belle2 {
   class SecMapTrainer {
   protected:
     /** Contains all relevant configurations needed for training a sectorMap. */
-    TrainerConfigData m_config;
+    SectorMapConfig m_config;
 
 
     /** A factory taking care of having the correct filters prepared for secMapTraining. */
@@ -78,13 +78,15 @@ namespace Belle2 {
     {
       // rejects if layerID is not acceptable for this secMap-training.
       auto layerID = hit.getVxdID().getLayerNumber();
-      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID/thresholdmin/-max: " << layerID << "/" << m_config.minMaxLayer.first <<
-              "/" << m_config.minMaxLayer.second)
-      if (m_config.minMaxLayer.first > layerID
-          or m_config.minMaxLayer.second < layerID)
-      { return false; }
+      bool found = false;
+      std::string ids = "";
+      for (auto allowedLayer : m_config.allowedLayers) {
+        ids += std::to_string(allowedLayer) + " ";
+        if (allowedLayer == layerID) found = true;
+      }
+      B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
+              (found ? "accepted" : "rejected"))
 
-      B2DEBUG(20, "SecMapTrainer::acceptHit: isAccepted")
       return true;
     }
 
@@ -282,7 +284,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(TrainerConfigData& configData, int rngAppendix = 0) :
+    SecMapTrainer(SectorMapConfig& configData, int rngAppendix = 0) :
       m_config(configData),
       m_factory(
         configData.vIP.X(),
@@ -293,8 +295,10 @@ namespace Belle2 {
       m_rootInterface(configData.secMapName, rngAppendix)
     {
       // stretch the cuts:
-      m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;
-      m_config.pTCuts.second += m_config.pTCuts.second * m_config.pTSmear;
+//       m_config.pTCuts.first -= m_config.pTCuts.first * m_config.pTSmear;
+//       m_config.pTCuts.second += m_config.pTCuts.second * m_config.pTSmear;
+      m_config.pTmin -= m_config.pTmin * m_config.pTSmear;
+      m_config.pTmax += m_config.pTmax * m_config.pTSmear;
     }
 
 
@@ -340,7 +344,7 @@ namespace Belle2 {
 
 
     /** returns configuration. */
-    const TrainerConfigData& getConfig() { return m_config; }
+    const SectorMapConfig& getConfig() { return m_config; }
 
 
     /** checks if given TC is acceptable for this trainer and store it if it is accepted.
@@ -364,10 +368,9 @@ namespace Belle2 {
 
       // check if momentum of TC is within range:
       auto pT = tc.getMomSeed().Perp();
-      B2DEBUG(10, "SecMapTrainer::storeTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTCuts.first << "/" <<
-              m_config.pTCuts.second)
-      if (m_config.pTCuts.first > pT
-          or m_config.pTCuts.second < pT) return false;
+      B2DEBUG(10, "SecMapTrainer::storeTC: pT/thresholdmin/-max: " << pT << "/" << m_config.pTmin << "/" <<
+              m_config.pTmax)
+      if (m_config.pTmin > pT or m_config.pTmax < pT) return false;
 
       // catch tracks which start too far away from orign
       B2Vector3D distance2IP = m_config.vIP - tc.getPosSeed();
@@ -409,7 +412,11 @@ namespace Belle2 {
     FullSecID createSecID(VxdID iD, double uVal, double vVal)
     {
       // TODO replace by new secMap-design-approach
-      auto secID = SectorTools::calcSecID(m_config.uDirectionCuts, m_config.vDirectionCuts, {uVal, vVal});
+      std::vector<double> uTemp = {0.};
+      uTemp.insert(uTemp.end(), m_config.uSectorDivider.begin(), m_config.uSectorDivider.end());
+      std::vector<double> vTemp = {0.};
+      vTemp.insert(vTemp.end(), m_config.vSectorDivider.begin(), m_config.vSectorDivider.end());
+      auto secID = SectorTools::calcSecID(uTemp, vTemp, {uVal, vVal});
       if (secID == std::numeric_limits<unsigned short>::max())
         return FullSecID(std::numeric_limits<unsigned int>::max());
       return FullSecID(iD, false, secID);

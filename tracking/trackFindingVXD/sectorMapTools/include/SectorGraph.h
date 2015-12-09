@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  /** contains all subgraphs. */
+  /** contains all subgraphs. The ids used for the subgraphs have to be sorted from outer to inner sectors. */
   template<class FilterType>  class SectorGraph {
   protected:
     std::unordered_map<SubGraphID, SubGraph<FilterType>> m_subgraphs; /**< contains all subgraphs. */
@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** constructor expects filterIDs. */
     SectorGraph(std::vector<FilterType>& fIDs) : m_filterIDs(fIDs)
-    { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is illegal usage of this class!") } }
+    { if (m_filterIDs.empty()) { B2FATAL("SectorGraph-constructor: passed filterIDs are empty, this is an illegal usage of this class!") } }
 
     /** for better readability. */
     using Iterator = typename std::unordered_map<SubGraphID, SubGraph<FilterType>>::iterator;
@@ -153,6 +153,79 @@ namespace Belle2 {
       return nKilled;
     }
 
+
+    /**
+    * finds sectors having inner sectors in same layer and update them in the subGraph-ID.
+    * */
+    void updateSubLayerIDs()
+    {
+      unsigned nUpdated = 0, // counts sectors which shall be updated
+               nFound = 0, // counts sectors which were found (without double entry removal)
+               nGraphsUpdated = 0; // counts graphs which were updated
+
+      // collects the secIDs which have got inner sectors on same sensor:
+      std::vector<unsigned> idsFound;
+      std::string idsPrinted;
+
+      // collect all SecIDs where SubLayer has to be updated.
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraphID graphID = subGraphEntry.second.getID();
+        std::vector<unsigned> found = graphID.hasSharedLayer();
+        if (found.empty()) continue;
+        idsFound.insert(idsFound.end(), found.begin(), found.end());
+      }
+      for (unsigned id : idsFound) { idsPrinted += FullSecID(id).getFullSecString() + " "; }
+      B2DEBUG(1, "updateSubLayerIDs: before unique of found ids, following IDs are recorded: \n" << idsPrinted)
+      nFound += idsFound.size();
+      std::sort(idsFound.begin(), idsFound.end());
+      idsFound.erase(std::unique(idsFound.begin(), idsFound.end()), idsFound.end());
+      nUpdated += idsFound.size();
+
+      idsPrinted = "";
+      for (unsigned id : idsFound) { idsPrinted += FullSecID(id).getFullSecString() + " "; }
+      B2DEBUG(1, "updateSubLayerIDs: before updating Subgraphs, following IDs have to be updated: \n" << idsPrinted)
+
+
+      // update all subGraphIDs where subLayerID has to be increased:
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        unsigned nSecsUpdated = graph.idCheckAndUpdate(idsFound);
+        if (nSecsUpdated == 0) {
+          B2DEBUG(50, "updateSubLayerIDs: was _not_ updated: " << graph.getID().print())
+          continue;
+        }
+        nGraphsUpdated++;
+        B2DEBUG(50, "updateSubLayerIDs: was updated " << nSecsUpdated << " times: " << graph.getID().print())
+      }
+
+      B2DEBUG(1, "updateSubLayerIDs: nSectors found/updated: " << nFound << "/" << nUpdated << ", nSubgraphs updated: " << nGraphsUpdated)
+
+      // create new map of Subgraphs with updated LayerIDs
+      // subGraph: copy with updated iD.
+      // SubGraphID: a.isElementOf(SubGraphID& b) <- checks if given sectorPack ( >= 1 sector) is part of a, ignores subLayerID.
+      // SubGraphID: a.replaceElement(SubGraphID& b) <- checks if given sectorPack ( >= 1 sector) is part of a, ignores subLayerID. if yes, replaces element(s). WARNING only works with complete replacement of SubGraphID (entries are const).
+      // SubGraphID: a.areTheSameSectors(SubGraphID& b) <- checks if sectors are identical (while ignoring the subLayerID)
+      // SubGraphID: a.sharesLayer() <- returns IDs of entries being inner friend of sectors on same layer.
+
+      // return new map of Subgraphs.
+    }
+
+    /// returns a Vector containing all FullSecIDs found for given sensor.
+    std::vector<FullSecID> getAllFullSecIDsOfSensor(VxdID sensor)
+    {
+      std::vector<FullSecID> foundIDs;
+
+      for (auto& subGraph : m_subgraphs) {
+        std::vector<FullSecID> sectorsFound = subGraph.second.getSectorsOfSensor(sensor);
+        if (sectorsFound.empty()) continue;
+        foundIDs.insert(foundIDs.end(), sectorsFound.begin(), sectorsFound.end());
+      }
+      B2DEBUG(1, "getAllFullSecIDsOfSensor: VxdID " << sensor << " has " << foundIDs.size() << " sectors in this graph")
+      return std::move(foundIDs);
+    }
+
+    /// returns a const reference to the filterTypes stored in this graph
+    const std::vector<FilterType>& getFilterTypes() const { return m_filterIDs; }
   };
 }
 

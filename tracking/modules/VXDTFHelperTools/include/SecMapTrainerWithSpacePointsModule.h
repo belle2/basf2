@@ -325,11 +325,14 @@ namespace Belle2 {
        * second parameter: min pT value, if < 0 or simply not passed, 0 as lower limit is asumed
        * third parameter: max pT value, if < 0 or simply not passed, infinite upper limit is asumed
        * **/
-      InternalRawSectorMap(std::string name, float pTsmear, float minPt, float maxPt = -1, bool usePXD = true, bool useSVD = true,
+      InternalRawSectorMap(std::string name, float pTsmear, float minPt, float maxPt = -1, unsigned maxLayer = 6, float minRange = -1,
+                           float maxRange = -1, bool usePXD = true, bool useSVD = true,
                            bool useTEL = false):
         m_pTsmear(pTsmear),
         m_pTCuts( {minPt, maxPt}),
+                m_acceptedRange({minRange, maxRange}),
                 m_name(name),
+                m_highestAllowedLayer(maxLayer),
                 m_usePXD(usePXD),
                 m_useSVD(useSVD),
       m_useTEL(useTEL) {}
@@ -382,14 +385,14 @@ namespace Belle2 {
       LocalCoordinates getAcceptedRegionForSensors() const { return m_acceptedRange; }
 
       /** returns layerNumber of highest layerNumber allowed in sectorMap. */
-      unsigned short getHighestAllowedLayer() const { return m_highestAllowedLayer; }
+      unsigned getHighestAllowedLayer() const { return m_highestAllowedLayer; }
 
     protected:
       float m_pTsmear; /**< stores the allowed smearing range for ptCuts (1 > m_pTsmear > = 0). */
       LocalCoordinates m_pTCuts; /**< .first stores lower, .second stores upper cut for pT. */
       LocalCoordinates m_acceptedRange; /**< if values > 0: .first is min distance to IP, .second is max distance to IP. */
       std::string m_name; /**< stores name for this InternalRawSectorMap. */
-      unsigned short m_highestAllowedLayer; /**< sets the highest layer allowed for the InternalRawSectorMap. */
+      unsigned m_highestAllowedLayer; /**< sets the highest layer allowed for the InternalRawSectorMap. */
       bool m_usePXD; /**< if true, secMap accepts PXD-hits. */
       bool m_useSVD; /**< if true, secMap accepts SVD-hits. */
       bool m_useTEL; /**< if true, secMap accepts TEL-hits. */
@@ -579,7 +582,7 @@ namespace Belle2 {
     int m_totalHitCounter; /**< counts total number of hits occured. */
     unsigned m_PARAMminTrackletLength; /**< threshold for minimum tracklet length (without IP). tracklets having less hits than this value will not be checked. */
 
-    int m_PARAMhighestAllowedLayer; /**< defines the highest layer number allowed for filtering (this way, low momentum tracks can be checked neglecting the highest layer). */
+    unsigned m_PARAMhighestAllowedLayer; /**< defines the highest layer number allowed for filtering (this way, low momentum tracks can be checked neglecting the highest layer). */
 
     short m_filterCharges; /**< this value can be set to: 1: allow only particles with positive charges, 0: allow all particles, -1: allow only particles with negative charges - standard is 0. */
     float m_PARAMuniSigma; /**< standard value is 1/sqrt(12). Change this value for sharper or more diffuse hits (coupled with 'smearHits. */

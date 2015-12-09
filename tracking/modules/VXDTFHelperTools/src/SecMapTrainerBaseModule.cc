@@ -65,7 +65,7 @@ void SecMapTrainerBaseModule::initialize()
   // What does it mean "Appendix"? E.P.
 
 
-  StoreObjPtr< SectorMap > sectorMap("", DataStore::c_Persistent);
+  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
   sectorMap.isRequired();
   for (auto setup : sectorMap->getAllSetups()) {
     auto config = setup.second->getConfig();

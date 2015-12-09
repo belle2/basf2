@@ -68,7 +68,7 @@ namespace Belle2 {
           goodNeighbours = 0;
 
           for (auto* aNeighbour :  aNode->getInnerNodes()) {
-            // skip if neighbour has not the same state
+            // skip if neighbour has not the same state (NOTE if one wants to improve the versatility of the code, this should actually become a member of the cell-class, which then can add some extra stuff like checking for loops.
             if (currentCell != aNeighbour->getMetaInfo()) continue;
 
             goodNeighbours++;

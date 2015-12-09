@@ -13,11 +13,10 @@
 
 #include <TObject.h>
 #include <string>
-#ifndef __CINT__
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include <unordered_map>
 #include <string>
-#endif
+
 namespace Belle2 {
 
 
@@ -26,44 +25,67 @@ namespace Belle2 {
   * 2 space points filters, 3 space points filters,  etc. etc.
   * It will be put in the datastore with duration RUN.
   * This class owns her members and she is in charge for their deletions. */
+  template<class point_t>
   class SectorMap : public TObject {
+  public:
+
+    /// typedef for better readability. Index is name of the setup.
+    using setupNameToFilters_t = std::unordered_map< std::string, Belle2::VXDTFFilters<point_t>*>;
+
   private:
-    /** Contains all the Filters and configurations indexed by their setupNames
-     * m_SegmentFilters is a pointer to an unsorted_map, since ROOT 5 is
-     * not able to digest it... I will hide its identity to ROOTCINT
-     * cfr. PIMPL or Opaque Pointers */
-    void* m_allSetupsFilters;  //! transient value
+
+    /** Contains all the Filters and configurations indexed by their setupNames. */
+    setupNameToFilters_t* m_allSetupsFilters;
 
 
-    SectorMap(const SectorMap& sectorMap)
-    // ROOT/CINT needs a copy constructor,
-#ifndef __CINT__
-    // but I do not want to copy this class which is a singleton so:
-    // if __CINT__ is not defined I delete the copy constructor
-      = delete
-#endif
-        ;
+    /// I do not want to copy this class which is a singleton so:
+    SectorMap(const SectorMap& sectorMap)  = delete;
 
   public:
 
-    SectorMap();
-    virtual ~SectorMap();
+
+    /// Constructor.
+    SectorMap() : m_allSetupsFilters(NULL)
+    {
+      m_allSetupsFilters = new setupNameToFilters_t;
+    }
+
+
+    /// Destructor deleting all filters stored.
+    virtual ~SectorMap()
+    {
+      for (auto& filter : * m_allSetupsFilters)
+        delete filter.second;
+    }
+
 
     /** returns filters. */
-    const VXDTFFilters* getFilters(const std::string& setupName);
+    const VXDTFFilters<point_t>* getFilters(const std::string& setupName)
+    {
+      auto  result = m_allSetupsFilters->find(setupName);
+      if (result == m_allSetupsFilters->end())
+        return NULL;
+      return result->second;
+    }
 
-#ifndef __CINT__
+
     /** returns setups. */
-    const std::unordered_map< std::string, VXDTFFilters*>& getAllSetups(void);
-#endif
+    const setupNameToFilters_t& getAllSetups(void)
+    {
+      return * m_allSetupsFilters;
+    }
+
 
     /** assigns filters. */
     void assignFilters(const std::string& setupName ,
-                       VXDTFFilters* filters);
+                       VXDTFFilters<point_t>* filters)
+    {
+      (*m_allSetupsFilters)[ setupName ] = filters;
+    }
 
 
     /** root class definition. */
-    ClassDef(SectorMap , 11);
+    ClassDef(SectorMap , 13);
   };
 }
 #endif

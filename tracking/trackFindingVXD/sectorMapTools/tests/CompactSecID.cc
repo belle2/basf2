@@ -25,8 +25,8 @@ TEST(CompactSecIDs, basicCheck)
 {
   CompactSecIDs compactSecIds;
 
-  vector< float > uSup = { .25, .5 , .75 };
-  vector< float > vSup = { .25, .5 , .75 , .8};
+  vector< double > uSup = { .25, .5 , .75 };
+  vector< double > vSup = { .25, .5 , .75 , .8};
 
   vector< vector< FullSecID > > sectors;
 
@@ -70,8 +70,8 @@ TEST(CompactSecIDs, stressTest)
   vector<int> sensors = { 2, 2, 2, 3, 4, 5};
 
 
-  vector< float > uSup = { .25, .5 , .75 };
-  vector< float > vSup = { .2, .4 , .6 , .8};
+  vector< double > uSup = { .25, .5 , .75 };
+  vector< double > vSup = { .2, .4 , .6 , .8};
 
 
   vector< vector< FullSecID > > sectors;
@@ -129,21 +129,31 @@ TEST(CompactSecIDs, stressTest)
 
   //  list< pair< float, float> >;
 
-  for (float u = 0. ; u < 1.; u += .25) {
-    for (float v = 0.; v < 1.; v += .2)
+  for (double u = 0. ; u < 1.; u += .25) {
+    for (double v = 0.; v < 1.; v += .2)
       cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
     cout << endl;
   }
 
-  for (float u = 1.e-6 ; u < 1.3; u += .25) {
-    for (float v = 1.e-6; v < 1.3; v += .2)
-      cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
+  for (double u = 1.e-6 ; u < 1.3; u += .25) {
+    for (double v = 1.e-6; v < 1.3; v += .2) {
+      if (u < 0. or u > 1. or v < 0. or v >1.) {
+        EXPECT_ANY_THROW(compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v));
+      } else {
+        cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
+      }
+    }
     cout << endl;
   }
 
-  for (float u = .25 ; u < 1.25; u += .25) {
-    for (float v = 0.2; v < 1.2; v += .2)
-      cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
+  for (double u = .25 ; u < 1.25; u += .25) {
+    for (double v = 0.2; v < 1.2; v += .2) {
+      if (u < 0. or u > 1. or v < 0. or v >1.) {
+        EXPECT_ANY_THROW(compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v));
+      } else {
+        cout << compactSecIds.getFullSecID(VxdID(1, 1 , 1), u, v) << "\t";
+      }
+    }
     cout << endl;
   }
 

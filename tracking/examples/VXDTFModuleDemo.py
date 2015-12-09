@@ -13,7 +13,8 @@ initialValue = 1
 
 usePXD = True
 useEvtGen = True
-usePGun = False
+usePGun = True
+wantDisplay = False
 
 # flags for the pGun
 numTracks = 5
@@ -107,6 +108,7 @@ vxdtf.logging.debug_level = 1
 param_vxdtf = {'sectorSetup': secSetup,
                'GFTrackCandidatesColName': 'caTracks',
                'tuneCutoffs': tuneValue,
+               'displayCollector': 2
                # 'calcQIType': 'kalman'
                }
 
@@ -129,6 +131,7 @@ param_track_finder_mc_truth = {
 }
 track_finder_mc_truth.param(param_track_finder_mc_truth)
 
+setupGenfit = register_module('SetupGenfitExtrapolation')
 trackfitter = register_module('GenFitter')
 # trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('GFTrackCandidatesColName', 'caTracks')
@@ -144,7 +147,21 @@ analyzer.logging.debug_level = 11
 param_analyzer = {'printExtentialAnalysisData': False, 'caTCname': 'caTracks'}
 analyzer.param(param_analyzer)
 
-log_to_file('demoOutput.txt', append=False)
+
+if wantDisplay:
+    display = register_module('Display')
+    display.param('options', 'HTMS')  # default
+    # display.param('assignHitsToPrimaries', 0)
+    display.param('showAllPrimaries', False)
+    # display.param('showCharged', False)
+    display.param('showTrackLevelObjects', True)
+    display.param('automatic', False)
+    display.param('useClusters', True)
+    display.param('fullGeometry', True)
+    display.param('showTrackCandidates', True)
+    # display.param('GFTrackCandidatesColName', 'caTracksJKL')
+
+log_to_file('VXDTFModuleDemoOutput.txt', append=False)
 
 # Create paths
 main = create_path()
@@ -172,6 +189,7 @@ else:
     main.add_module(particlegun)
 main.add_module(gearbox)
 main.add_module(geometry)
+main.add_module(setupGenfit)
 main.add_module(g4sim)
 main.add_module(pxdDigitizer)
 main.add_module(pxdClusterizer)
@@ -182,6 +200,8 @@ main.add_module(vxdtf)
 main.add_module(track_finder_mc_truth)
 main.add_module(analyzer)
 main.add_module(trackfitter)
+if wantDisplay:
+    main.add_module(display)
 # Process events
 process(main)
 

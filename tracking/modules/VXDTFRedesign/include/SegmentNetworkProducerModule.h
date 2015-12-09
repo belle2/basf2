@@ -19,9 +19,12 @@
 // tracking
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
+#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
+#include <tracking/dataobjects/SectorMapConfig.h>
+// #include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
 
 
 // stl
@@ -43,7 +46,11 @@ namespace Belle2 {
   class SegmentNetworkProducerModule : public Module {
 
   public:
+    /** to improve readability of the code, here the definition of the static sector type. */
+    using StaticSectorType = StaticSectorDummy;
+//  using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
+    // TODO WARNING JKL
     /** dummy declaration to get the module compiling without real static sectorMaps */
     struct StaticSectorMap {
 
@@ -60,6 +67,7 @@ namespace Belle2 {
       /** returns pointerTo a Static Sector */
       StaticSectorDummy* getSector(FullSecID aSecID)
       {
+        // TODO WARNING JKL
         sectors.push_back(new StaticSectorDummy(aSecID));
         return sectors.back();
       }
@@ -75,10 +83,10 @@ namespace Belle2 {
       bool wasCreated;
 
       /** stores a sector if one is found, NULL else */
-      ActiveSector<StaticSectorDummy, TrackNode>* sector;
+      ActiveSector<StaticSectorType, TrackNode>* sector;
 
       /** stores a static sector */
-      StaticSectorDummy* staticSector;
+      const StaticSectorType* staticSector;
 
       /** collects the hits found on this sector */
       std::vector<Belle2::TrackNode*> hits;
@@ -96,6 +104,19 @@ namespace Belle2 {
     virtual void initialize()
     {
       InitializeCounters();
+
+      // load VXDTFFilters of secMap:
+// // // // // // // //     m_sectorMap.isRequired();
+// // // // // // // //     for (auto& setup : m_sectorMap->getAllSetups()) {
+// // // // // // // //     auto& filters = *(setup.second);
+// // // // // // // //
+// // // // // // // //     if (filters.getConfig().secMapName != m_secMapName) { continue; }
+// // // // // // // //     B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_secMapName << " with nCompactSecIDs: " << filters.size());
+// // // // // // // //
+// // // // // // // //     m_vxdtfFilters = &filters;
+// // // // // // // //     }
+// // // // // // // //     if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_secMapName << "' does not exist! Can not continue...");
+
 
       if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
         B2FATAL("SegmentNetworkProducerModule::Initialize(): parameter 'createNeworks' is set to " << m_PARAMCreateNeworks <<
@@ -154,22 +175,33 @@ namespace Belle2 {
 
 
     /** returns a NULL-ptr if no sector found, returns pointer to the static sector if found */
-    Belle2::StaticSectorDummy* findSectorForSpacePoint(SpacePoint& aSP)
+    const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
-      // TODO function
-      /** Pseudo code of actual function:
-       *
-       * for (StaticSectorDummy& aSector : m_secMap)
-       *   if aSP->getVxdID() != aSector.getVxdID() {continue;}
-       *
-       *   if (aSector.getFullSecID(aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()) != isValid) { continue;}
-       *
-       *   return &aSector;
-       *
-       * return NULL;
-       */
+//    if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
+//    B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() << " has no valid FullSecID: " << aSP);
+//    return nullptr;
+//    }
+//
+//    FullSecID spSecID = m_vxdtfFilters->getFullID(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV());
+//    B2DEBUG(1, "SegmentNetworkProducerModule()::findSectorForSpacePoint(): spacepoint " << aSP.getArrayIndex() << " got valid FullSecID of " << spSecID.getFullSecString());
+//       // TODO function
+//       /** Pseudo code of actual function:
+//        *
+//        * for (StaticSectorDummy& aSector : m_secMap)
+//        *   if aSP->getVxdID() != aSector.getVxdID() {continue;}
+//        *
+//        *   if (aSector.getFullSecID(aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV()) != isValid) { continue;}
+//        *
+//        *   return &aSector;
+//        *
+//        * return NULL;
+//        */
+//
+//    return m_vxdtfFilters->getStaticSector(spSecID);
+      // TODO WARNING JKL
 
-      // dummy function here (for mockup):
+
+//       // dummy function here (for mockup):
       for (StaticSectorDummy* aSector : m_secMap.sectors) {
         if (FullSecID(aSP.getVxdID()) == *aSector) return aSector;
       }
@@ -219,16 +251,23 @@ namespace Belle2 {
     /** only valid if nEntries == 3, excpects X, Y, and Z coordinates for virtual IP in global coordinates. Only used if addVirtualIP == true */
     std::vector<double> m_PARAMVirtualIPCoorindates;
 
+    /** the name of the SectorMap used for this instance. */
+    std::string m_secMapName;
 
 // member variables
 
     // input containers
+    /** contains the sectorMap and with it the VXDTFFilters. */
+// // // // // // // // // // // //   StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+
+    /** contains all sectorCombinations and Filters including cuts. */
+// // // // // // // // // // // // //  VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
 
     /** access to the static sectorMap, which will be used in this module */
-    //  StoreObjPtr<StaticSectorMap> m_secMap;  // TODO add real SecMap!
+//      StoreObjPtr<StaticSectorMap> m_secMap;  // TODO add real SecMap!
     StaticSectorMap m_secMap; // WARNING temporal dummy
 
 

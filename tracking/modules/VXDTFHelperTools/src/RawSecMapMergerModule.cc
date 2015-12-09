@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/VXDTFHelperTools/RawSecMapMergerModule.h>
+#include <tracking/trackFindingVXD/FilterTools/SelectionVariableType.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 using namespace std;
 using namespace Belle2;
@@ -52,14 +54,14 @@ std::vector<std::string> RawSecMapMergerModule::getRootFiles(std::string mapName
     B2DEBUG(1, "getRootFiles: fileName " << fileName << " accepted for map " << mapName)
     files4ThisMap.push_back(fileName);
   }
-  return move(files4ThisMap);
+  return files4ThisMap;
 }
 
 
 
 
 
-std::unique_ptr<TChain> RawSecMapMergerModule::createTreeChain(TrainerConfigData& configuration, std::string nHitString)
+std::unique_ptr<TChain> RawSecMapMergerModule::createTreeChain(const SectorMapConfig& configuration, std::string nHitString)
 {
   B2INFO("RawSecMapMerger::createTreeChain(): loading mapName: " << configuration.secMapName << " with extension " << nHitString)
   unique_ptr<TChain> treeChain = unique_ptr<TChain>(new TChain((configuration.secMapName + nHitString).c_str()));
@@ -67,7 +69,7 @@ std::unique_ptr<TChain> RawSecMapMergerModule::createTreeChain(TrainerConfigData
   vector<string> fileList = getRootFiles(configuration.secMapName);
   for (string& file : fileList) { treeChain->Add(file.c_str()); }
 
-  return move(treeChain);
+  return treeChain;
 }
 
 
@@ -91,7 +93,7 @@ template<class ValueType> std::vector<BranchInterface<ValueType>> RawSecMapMerge
       &(branches[fPos].branch));
   }
   B2INFO("RawSecMapMerger::getBranches():  done")
-  return move(branches);
+  return branches;
 }
 
 
@@ -100,7 +102,7 @@ template<class ValueType> std::vector<BranchInterface<ValueType>> RawSecMapMerge
 
 std::string RawSecMapMergerModule::prepareNHitSpecificStuff(
   unsigned nHits,
-  TrainerConfigData& config,
+  const SectorMapConfig& config,
   std::vector<std::string>& secBranchNames,
   std::vector<std::string>& filterBranchNames)
 {
@@ -216,7 +218,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
   B2INFO("RawSecMapMerger::buildGraph(): mainGraph finished - has now size: " << mainGraph.size())
   B2DEBUG(1, "fullGraph-Print: " << mainGraph.print());
 
-  return move(mainGraph);
+  return mainGraph;
 }
 
 
@@ -260,3 +262,257 @@ void RawSecMapMergerModule::printData(
     B2INFO(out << "\n")
   }
 }
+
+
+
+
+
+std::vector<VxdID> RawSecMapMergerModule::getCompatibleVxdIDs(const SectorMapConfig& config)
+{
+  // TODO WARNING hardcoded values!
+  std::vector<unsigned> layers  = { 0, 1, 2, 3, 4, 5, 6};
+  std::vector<unsigned> ladders = { 0, 8, 12, 7, 10, 12, 16};
+  std::vector<unsigned> sensors = { 0, 2, 2, 2, 3, 4, 5};
+
+  std::vector<VxdID> vxdIDs;
+
+  for (unsigned layerID : config.allowedLayers) {
+    for (unsigned ladderID = 0; ladderID < ladders.at(layerID); ladderID++) {
+      if (ladderID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has ladder 0
+      for (unsigned sensorID = 0; sensorID < sensors.at(layerID); sensorID++) {
+        if (sensorID == 0 and layerID != 0) continue; // only virtual IP (layer 0) has sensor 0
+        vxdIDs.push_back(VxdID(layerID, ladderID, sensorID));
+      }
+    }
+  }
+  return vxdIDs;
+}
+
+
+
+template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMapThingy(const SectorMapConfig& config,
+    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint>& segFilters)
+{
+  // get all sensors relevant for this secMap:
+  std::vector<VxdID> vxdIDs = getCompatibleVxdIDs(config);
+
+  std::vector< std::vector< FullSecID>> allSecIDsOfThisSensor; // refilled for each sensor.
+
+  // WARNING temporal solution until we agree how to define sectorDividers:
+  std::vector< double > uDividersMinusLastOne = config.uSectorDivider;
+  uDividersMinusLastOne.pop_back();
+  std::vector< double > vDividersMinusLastOne = config.vSectorDivider;
+  vDividersMinusLastOne.pop_back();
+
+  // collect all secIDs occured in training and add all sectors for this sensor to the VXDTFFilters-thingy (those which were not found are filled with FullSecIDs too, but no cuts will exist for them):
+  for (VxdID sensor : vxdIDs) {
+    allSecIDsOfThisSensor.clear();
+
+    std::vector< FullSecID> allTrainedSecIDsOfSensor = mainGraph.getAllFullSecIDsOfSensor(sensor);
+
+    std::sort(allTrainedSecIDsOfSensor.begin(), allTrainedSecIDsOfSensor.end());
+    allTrainedSecIDsOfSensor.erase(
+      std::unique(
+        allTrainedSecIDsOfSensor.begin(),
+        allTrainedSecIDsOfSensor.end()),
+      allTrainedSecIDsOfSensor.end());
+
+    // lambda for finding the correct sector-position
+    auto findSector = [](std::vector< FullSecID>& secIDs, int counter) {
+      std::vector< FullSecID>::iterator iter = secIDs.begin();
+      for (; iter != secIDs.end(); ++iter) {
+        if (iter->getSecID() == counter) return iter;
+      }
+      return secIDs.end();
+    };
+
+
+    std::vector< std::vector< FullSecID > > sectors;
+
+    //   sectors.resize(uSup.size() + 1);
+    sectors.resize(config.uSectorDivider.size());
+    unsigned nSectorsInU = config.uSectorDivider.size(),
+             nSectorsInV = config.vSectorDivider.size();
+
+
+    int counter = 0;
+    for (unsigned int i = 0; i < nSectorsInU; i++) {
+      allSecIDsOfThisSensor.push_back({});
+      for (unsigned int j = 0; j < nSectorsInV ; j++) {
+        auto pos = findSector(allTrainedSecIDsOfSensor, counter);
+        if (pos == allTrainedSecIDsOfSensor.end()) {
+          allSecIDsOfThisSensor.at(i).push_back(FullSecID(sensor, false, counter));
+        } else { allSecIDsOfThisSensor.at(i).push_back(*pos); }
+        counter ++;
+      }
+    }
+    segFilters.addSectorsOnSensor(uDividersMinusLastOne , vDividersMinusLastOne, allSecIDsOfThisSensor) ;
+
+
+    // // //    int counter = 0;
+    // // //    unsigned nUCuts = config.uDirectionCuts.size(), nVCuts = config.vDirectionCuts.size();
+    // // //    // add all secIDs for this sensor found during training and fill standard ones for the rest.
+    // // //    for (unsigned i = 0; i < nUCuts; i++) {
+    // // // //       allSecIDsOfThisSensor[i].resize(nVCuts + 1);
+    // // //      for (unsigned j = 0; j < nVCuts; j++) {
+    // // //      auto pos = findSector(allTrainedSecIDsOfSensor, counter);
+    // // //      if (pos == allTrainedSecIDsOfSensor.end()) {
+    // // //        allSecIDsOfThisSensor.at(i).push_back(FullSecID(sensor, false, counter));
+    // // //      } else { allSecIDsOfThisSensor.at(i).push_back(*pos); }
+    // // //      counter ++;
+    // // //      }
+    // // //    }
+    // // //    segmentFilters.addSectorsOnSensor(config.uDirectionCuts , config.vDirectionCuts, allSecIDsOfThisSensor);
+
+    B2DEBUG(1, "Sensor: " << sensor << " had " << allTrainedSecIDsOfSensor.size() << " trained IDs and " << counter <<
+            " sectors in Total")
+  } // end loop sensor of vxdIDs.
+
+  // and add the virtual IP:
+  std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
+  allSecIDsOfThisSensor.clear();
+  allSecIDsOfThisSensor = {{0}};
+  segFilters.addSectorsOnSensor(uCuts4vIP, vCuts4vIP, allSecIDsOfThisSensor);
+
+  return vxdIDs.size() + 1;
+}
+
+
+
+
+
+// TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
+template <class FilterType> VXDTFFilters<SpacePoint>* RawSecMapMergerModule::getSegmentFilters(const SectorMapConfig& config,
+    SectorGraph<FilterType>& mainGraph)
+{
+
+  VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
+
+  unsigned nSectors = addAllSectorsToSecMapThingy(config, mainGraph, *segmentFilters);
+  B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in addAllSectorsToSecMapThingy " << nSectors << " were added to secMap " <<
+          config.secMapName)
+
+  for (auto& subGraph : mainGraph) {
+    // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
+    std::string named3D = "Distance3DSquared", namedXY = "Distance2DXYSquared", nameddZ = "Distance1DZ", namesRZ = "SlopeRZ",
+                named3Dn = "Distance3DNormed";
+    const auto& filterCutsMap = subGraph.second.getFinalQuantileValues();
+    B2DEBUG(1, "mimimi")
+    /// TODO tune cutoffs
+
+    B2DEBUG(1, "min/max: " << named3D << ": " << filterCutsMap.at(named3D).getMin() << "/" << filterCutsMap.at(
+              named3D).getMax() << ", ")
+    B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
+    B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
+    VXDTFFilters<SpacePoint>::filter2sp_t friendSectorsSegmentFilter =
+      (
+        (
+          filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
+        ).observe(Observer()).enable() &&
+
+        (
+          filterCutsMap.at(namedXY).getMin() <= Distance2DXYSquared<SpacePoint>() <= filterCutsMap.at(namedXY).getMax()
+        ).observe(Observer()).enable() &&
+
+//    (
+//    filterCutsMap.at(nameddZ).getMin() <
+//    Distance1DZ<SpacePoint>() <
+//    filterCutsMap.at(nameddZ).getMax()
+//    )/*.observe(Observer())*/.enable() &&
+        ( /// WARNING HACK:
+          /*filterCutsMap.at(named3D).getMin()*/std::numeric_limits< double >::min() <= Distance1DZ<SpacePoint>() <=
+          std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/
+        )/*.observe(Observer())*/.enable() &&
+
+        (
+          filterCutsMap.at(namesRZ).getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at(namesRZ).getMax()
+        ).observe(Observer()).enable() &&
+
+//    (
+//    Distance3DNormed<SpacePoint>() <
+//    filterCutsMap.at(named3Dn).getMax()
+//    ).enable()
+        (Distance3DNormed<SpacePoint>() <= std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/).enable()
+      );
+
+    auto secIDs = subGraph.second.getID().getFullSecIDs();
+
+    // WARNING hack:
+    if (secIDs.size() != 2) B2FATAL("RawSecMapMerger: only 2-hit-combis allowed at the moment!");
+    // secIDs are sorted from outer to inner:
+    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: now adding FriendSectorFilter for secIDs (outer/inner): " << secIDs.at(
+              0) << "/" << secIDs.at(1))
+    if (segmentFilters->addFriendsSectorFilter(secIDs.at(0), secIDs.at(1),
+                                               friendSectorsSegmentFilter) == 0)
+      B2WARNING("Problem adding the friendship relation from the inner sector:" <<
+                secIDs.at(1) << " -> " << secIDs.at(0) << " outer sector");
+  }
+
+
+  return segmentFilters;
+}
+
+
+
+
+
+
+
+
+/**
+ * Here the data will be loaded in the new secMap-Design:
+ *
+ * // start creating new secMap:
+ * VXDTFFilters allFilters;
+ *
+ *  have to be added in one batch per sensor (sensor ordering not important, but sector-on-sensor-ordering is
+ * for (layer, ladder, sensor in config.allowedLayers) {
+ *
+ *    auto thisSensorID = VxdID(layer, ladder , sensor);
+ *   // get all sectors seen in Training of this sensor -> they have got the subLayerID! (but may be incomplete as a set)
+ *   std::vector< FullSecID> allTrainedSecIDsOfThisSensor;
+ *
+ *   protoMap.getAllFullSecIDsOfSensor(thisSensor, allTrainedSecIDsOfThisSensor);
+ *
+ *   //create full vector of FullSecIDs of this sensor -> if TrainedID already exists, that one gets stored.
+ *   std::vector< std::vector< FullSecID>> allSecIDsOfThisSensor;
+ *   allSecIDsOfThisSensor.resize(config.uDirectionCuts(layer).size() + 1);
+ *   int counter = 0;
+ *   for (unsigned int i = 0; i < config.uDirectionCuts(layer).size() + 1; i++) {
+ *   allSecIDsOfThisSensor[i].resize(config.vDirectionCuts(layer).size() + 1);
+ *   for (unsigned int j = 0; j < config.vDirectionCuts(layer).size() + 1 ; j++) {
+ *   auto tempID = FullSecID(thisSensorID, false, counter);
+ *
+ *   bool found = false;
+ *   for (FullSecID& trainedID : allTrainedSecIDsOfThisSensor) {
+ *   if (tempID.getVxdID() == trainedID.getVxdID()
+ *   and tempID.getSecID() == trainedID.getSecID())
+ *   {
+ *   found = true;
+ *   allSecIDsOfThisSensor[i][j] = trainedID;
+ * }
+ * }
+ *
+ * if (found == false) {
+ * allSecIDsOfThisSensor[i][j] = FullSecID(thisSensorID, false, counter);
+ * }
+ * counter ++;
+ * }
+ * }
+ *
+ * B2DEBUG(1, "Sensor: " << thisSensorID << " had " << allTrainedSecIDsOfThisSensor.size() << " trained IDs and " << counter << " sectors in Total")
+ *
+ * allFilters.addSectorsOnSensor(config.uDirectionCuts(layer), config.vDirectionCuts(layer), allSecIDsOfThisSensor); // TODO u/vDirectionCuts -> layerspecific!
+ *
+ *     // and add the virtual IP:
+ *     uSup = {};
+ *     vSup = {};
+ *     allSecIDsOfThisSensor = {{0}};
+ *     allFilters.addSectorsOnSensor(uSup, vSup, allSecIDsOfThisSensor);
+ *
+ *     // TODO:
+ *     // Now we need the selectionVariables. -> how to solve the issue of hardcoded filters (is it possible?)
+ * }
+ * }
+ *
+ */

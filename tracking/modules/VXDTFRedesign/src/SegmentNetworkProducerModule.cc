@@ -10,7 +10,6 @@
 
 #include <tracking/modules/VXDTFRedesign/SegmentNetworkProducerModule.h>
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -59,6 +58,10 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMVirtualIPCoorindates,
            "only valid if nEntries == 3, excpects X, Y, and Z coordinates for virtual IP in global coordinates. Only used if addVirtualIP == true",
            ipCoords);
+
+  addParam("sectorMapName",
+           m_secMapName,
+           "the name of the SectorMap used for this instance.", string("testMap"));
 }
 
 
@@ -70,6 +73,8 @@ void SegmentNetworkProducerModule::event()
 
   // make sure that network exists:
   if (! m_network) { m_network.create(); }
+// // // // //   StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);s
+  B2INFO("RawSecMapMerger::initialize():");
 
   vector< RawSectorData > collectedData = matchSpacePointToSectors();
 
@@ -110,9 +115,9 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
     // match all SpacePoints with the sectors:
     for (SpacePoint& aSP : storeArray) {
 
-      StaticSectorDummy* sectorFound = findSectorForSpacePoint(aSP);
+      const StaticSectorType* sectorFound = findSectorForSpacePoint(aSP);
 
-      if (sectorFound == NULL) {
+      if (sectorFound == nullptr) {
         B2WARNING("no sector found, SpacePoint discarded!");
         continue;
       }
@@ -134,7 +139,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
 
       // if secID not in collectedData:
       if (iter == collectedData.end()) {
-        collectedData.push_back({ foundSecID , false, NULL, sectorFound, {trackNode}});
+        collectedData.push_back({ foundSecID , false, nullptr, sectorFound, {trackNode}});
       } else {
         iter->hits.push_back(trackNode);
       }
@@ -146,11 +151,11 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
   if (m_PARAMAddVirtualIP == true) {
     m_network->setVirtualInteractionPoint(); // TODO pass relevant parameters!
     TrackNode* vIP = m_network->getVirtualInteractionPoint();
-    StaticSectorDummy* sectorFound = findSectorForSpacePoint(*vIP->spacePoint);
-    collectedData.push_back({FullSecID(), false, NULL, sectorFound, {vIP}}); // TODO: which FullSecID for the vIP?
+    const StaticSectorType* sectorFound = findSectorForSpacePoint((vIP->getHit()));
+    collectedData.push_back({FullSecID(), false, nullptr, sectorFound, {vIP}}); // TODO: which FullSecID for the vIP?
   }
 
-  return std::move(collectedData);
+  return collectedData;
 }
 
 
@@ -161,21 +166,21 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 {
   // TODO add counters!
 
-  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, TrackNode>, VoidMetaInfo>& activeSectorNetwork =
+  DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
-  vector<ActiveSector<StaticSectorDummy, TrackNode>*>& activeSectors = m_network->accessActiveSectors();
+  vector<ActiveSector<StaticSectorType, TrackNode>*>& activeSectors = m_network->accessActiveSectors();
 
   for (RawSectorData& outerSectorData : collectedData) {
-    ActiveSector<StaticSectorDummy, TrackNode>* outerSector = new ActiveSector<StaticSectorDummy, TrackNode>
+    ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
     (outerSectorData.staticSector);
 
     // skip double-adding of nodes into the network after first iteration -> speeding up the code:
     bool isFirstIteration = true;
     // find innerSectors of outerSector and add them to the network:
-    const std::vector<FullSecID>& innerSecIDs = outerSector->getInnerSecIDs();
+    const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
 
     for (const FullSecID innerSecID : innerSecIDs) {
-      vector<RawSectorData>::iterator pos =
+      vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(
           collectedData.begin(),
           collectedData.end(),
@@ -184,19 +189,19 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         );
 
       // current inner sector has no SpacePoints in this event:
-      if (pos == collectedData.end()) { continue; }
+      if (innerRawSecPos == collectedData.end()) { continue; }
 
       // take care of inner sector first:
-      ActiveSector<StaticSectorDummy, TrackNode>* innerSector = NULL;
-      if (pos->wasCreated) { // was already there
-        innerSector = pos->sector;
+      ActiveSector<StaticSectorType, TrackNode>* innerSector = nullptr;
+      if (innerRawSecPos->wasCreated) { // was already there
+        innerSector = innerRawSecPos->sector;
       } else {
-        innerSector = new ActiveSector<StaticSectorDummy, TrackNode>(pos->staticSector);
-        pos->wasCreated = true;
-        pos->sector = innerSector;
-        for (auto* hit : pos->hits) { hit->sector = innerSector; }
+        innerSector = new ActiveSector<StaticSectorType, TrackNode>(innerRawSecPos->staticSector);
+        innerRawSecPos->wasCreated = true;
+        innerRawSecPos->sector = innerSector;
+        for (Belle2::TrackNode* hit : innerRawSecPos->hits) { hit->sector = innerSector; }
         // add all SpacePoints of this sector to ActiveSector:
-        innerSector->addHits(pos->hits);
+        innerSector->addHits(innerRawSecPos->hits);
         activeSectors.push_back(innerSector);
       }
 
@@ -204,7 +209,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
       if (isFirstIteration) {
         outerSectorData.wasCreated = true;
         outerSectorData.sector = outerSector;
-        for (auto* hit : outerSectorData.hits) { hit->sector = outerSector; }
+        for (Belle2::TrackNode* hit : outerSectorData.hits) { hit->sector = outerSector; }
         // add all SpacePoints of this sector to ActiveSector:
         outerSector->addHits(outerSectorData.hits);
         activeSectors.push_back(outerSector);
@@ -230,7 +235,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
   // TODO add counters!
-  DirectedNodeNetwork<ActiveSector<StaticSectorDummy, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
+  DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
@@ -310,7 +315,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           &outerHit->getEntry(),
           &centerHit->getEntry());
         DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
-        if (tempSegmentnode == NULL) {
+        if (tempSegmentnode == nullptr) {
           segments.push_back(innerSegment);
         } else {
           delete innerSegment;
@@ -326,7 +331,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
             &outerHit->getEntry(),
             &centerHit->getEntry());
           DirectedNode<Segment<TrackNode>, CACell>* tempSegmentnode = segmentNetwork.getNode(*innerSegment);
-          if (tempSegmentnode == NULL) {
+          if (tempSegmentnode == nullptr) {
             segments.push_back(outerSegment);
           } else {
             delete outerSegment;

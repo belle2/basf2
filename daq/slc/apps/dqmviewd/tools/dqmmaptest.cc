@@ -10,7 +10,10 @@ int main(int argc, char** argv)
     printf("Usage : %s <path_to_tmapfile>\n", argv[0]);
     return 1;
   }
+  return 0;
   TMapFile* file = TMapFile::Create(argv[1], "recreate", 512000000, "test");
+
+
   TH1F* hx1 = new TH1F("FirstDet/h_HitXPositionCh01", "Hit X position (Ch-01);X [mm];Entires", 1000, -20, 20);
   TH1F* hy1 = new TH1F("FirstDet/h_HitYPositionCh01", "Hit Y position (Ch-01);Y [mm];Entires", 1000, -30, 30);
   TH2F* hxy1 = new TH2F("FirstDet/h_HitXYPositionCh01", "Hit X - Y (Ch-01);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);

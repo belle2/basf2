@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <ecl/digitization/EclConfigurationPure.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
 #include <vector>
 
 class TH1F;
@@ -85,7 +86,7 @@ namespace Belle2 {
 
       // Storage for adc hits from entire calorimeter (8736 crystals)
       std::vector<adccounts_type> m_adc;
-
+      std::vector<ECLNoiseData> m_noise;
       /** read Shaper-DSP data from root file */
       void readDSPDB();
 
@@ -97,6 +98,7 @@ namespace Belle2 {
       bool m_calibration;
       int m_tickFactor;
       double m_sigmaTrigger;
+      double m_elecNoise;
       bool m_debug;
       int m_testtrg;
       double m_testsig;

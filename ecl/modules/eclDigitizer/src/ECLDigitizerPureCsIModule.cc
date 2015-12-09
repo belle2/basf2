@@ -55,6 +55,7 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
            false);
   addParam("adcTickFactor", m_tickFactor, "multiplication factor to get adc tick from trigger tick", 8);
   addParam("sigmaTrigger", m_sigmaTrigger, "Trigger resolution used", 0.020);
+  addParam("elecNoise", m_elecNoise, "Electronics noise energy equivalent in MeV", 0.5);
   addParam("Debug", m_debug, "debug mode on (default off)", false);
   addParam("debugtrgtime", m_testtrg, "set fixed trigger time for testing purposes", 0);
   addParam("debugsigtimeshift", m_testsig, "shift signal arrival time for testing purposes (in microsec)", 0.);
@@ -160,21 +161,21 @@ void ECLDigitizerPureCsIModule::event()
       continue;
 
     //Skip Noise generation for now
-    /*
+
     float z[EclConfigurationPure::m_nsmp];
     for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
       z[i] = gRandom->Gaus(0, 1);
 
-    float AdcNoise[EclConfigurationPure::m_nsmp];
-    m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
-    */
+    float adcNoise[EclConfigurationPure::m_nsmp];
+    m_noise[0].generateCorrelatedNoise(z, adcNoise);
+
     //    if (a.total < .0001) continue;
     if (a.total < .0001) continue;
     int FitA[EclConfigurationPure::m_nsmp];
     for (int  i = 0; i < EclConfigurationPure::m_nsmp; i++) {
       // skip noise for now
       // FitA[i] = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
-      FitA[i] = 20 * (1000 * a.c[i]) + 3000;
+      FitA[i] = 20 * (1000 * a.c[i] + adcNoise[i]) + 3000;
 
       // cout << FitA[i] << endl;
     }
@@ -257,5 +258,15 @@ void ECLDigitizerPureCsIModule::readDSPDB()
   m_fitparams.resize(1);
 
   initParams(m_fitparams[0], m_ss[0]);
+
+  // at the moment same noise for all crystals
+  m_noise.resize(1);
+  int index = 0;
+  for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
+    for (int j = 0; j < EclConfigurationPure::m_nsmp; j++)
+      if (i <= j) {
+        if (i == j) m_noise[0].setMatrixElement(index++, m_elecNoise);     // units are MeV energy noise eq from electronics
+        else m_noise[0].setMatrixElement(index++, 0.);  //uncorrelated
+      }
 
 }

@@ -37,9 +37,6 @@ namespace Belle2 {
         addProcessingSignalListener(&m_clusterFilter);
       }
 
-      /// Main algorithm applying the cluster refinement
-      virtual void apply(std::vector<CDCWireHitCluster>& outputClusters) override final;
-
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -52,27 +49,28 @@ namespace Belle2 {
         m_clusterFilter.exposeParameters(moduleParamList);
       }
 
+      /// Main algorithm applying the cluster background detection
+      virtual void apply(std::vector<CDCWireHitCluster>& outputClusters) override final
+      {
+        for (CDCWireHitCluster& cluster : outputClusters) {
+          CellWeight clusterWeight = m_clusterFilter(cluster);
+          if (isNotACell(clusterWeight)) {
+            // Cluster detected as background
+            cluster.setBackgroundFlag(true);
+            for (const CDCWireHit* wireHit : cluster) {
+              wireHit->getAutomatonCell().setBackgroundFlag();
+              wireHit->getAutomatonCell().setTakenFlag();
+            }
+          }
+        }
+      }
+
     private:
       /// Reference to the filter to be used to filter background
       ClusterFilter m_clusterFilter;
 
-    }; // end class ClusterCreator
+    }; // end class ClusterBackgroundDetector
 
-    template<class ClusterFilter>
-    void ClusterBackgroundDetector<ClusterFilter>::apply(std::vector<CDCWireHitCluster>& outputClusters)
-    {
-      for (CDCWireHitCluster& cluster : outputClusters) {
-        CellWeight clusterWeight = m_clusterFilter(cluster);
-        if (isNotACell(clusterWeight)) {
-          // Cluster detected as background
-          cluster.setBackgroundFlag(true);
-          for (const CDCWireHit* wireHit : cluster) {
-            wireHit->getAutomatonCell().setBackgroundFlag();
-            wireHit->getAutomatonCell().setTakenFlag();
-          }
-        }
-      }
-    }
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
 

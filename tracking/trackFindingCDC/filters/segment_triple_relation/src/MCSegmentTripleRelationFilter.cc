@@ -19,10 +19,10 @@ MCSegmentTripleRelationFilter::MCSegmentTripleRelationFilter(bool allowReverse) 
 {
 }
 
-void MCSegmentTripleRelationFilter::clear()
+void MCSegmentTripleRelationFilter::beginEvent()
 {
-  m_mcSegmentTripleFilter.clear();
-  Super::clear();
+  m_mcSegmentTripleFilter.beginEvent();
+  Super::beginEvent();
 }
 
 void MCSegmentTripleRelationFilter::initialize()

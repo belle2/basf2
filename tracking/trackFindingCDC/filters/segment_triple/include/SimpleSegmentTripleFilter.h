@@ -19,9 +19,13 @@ namespace Belle2 {
     /// Filter for the constuction of segment triples based on simple criterions
     class SimpleSegmentTripleFilter : public Filter<CDCSegmentTriple> {
 
+    private:
+      /// Type of the base class.
+      typedef Filter<CDCSegmentTriple> Super;
+
     public:
       /// Clears all remember information from the last event
-      virtual void clear() override final;
+      virtual void beginEvent() override final;
 
       /// Forwards the modules initialize to the filter
       virtual void initialize() override final;

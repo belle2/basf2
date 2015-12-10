@@ -85,7 +85,7 @@ namespace Belle2 {
       {
 
         //clear the remembered fits
-        segmentPairFilter.clear();
+        segmentPairFilter.beginEvent();
 
         //Make pairs of closeby superlayers
         for (ISuperLayerType iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {

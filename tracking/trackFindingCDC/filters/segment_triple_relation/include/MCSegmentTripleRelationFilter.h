@@ -32,8 +32,8 @@ namespace Belle2 {
       /** Constructor. */
       MCSegmentTripleRelationFilter(bool allowReverse = true);
 
-      /// Clears stored information for a former event
-      virtual void clear() override final;
+      /// Used to prepare the Monte Carlo information for this event.
+      virtual void beginEvent() override final;
 
       /// Forwards the initialize method from the module
       virtual void initialize() override final;

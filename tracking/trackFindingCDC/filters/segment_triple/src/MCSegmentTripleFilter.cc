@@ -29,10 +29,10 @@ MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
 }
 
 
-void MCSegmentTripleFilter::clear()
+void MCSegmentTripleFilter::beginEvent()
 {
-  m_mcAxialSegmentPairFilter.clear();
-  Super::clear();
+  m_mcAxialSegmentPairFilter.beginEvent();
+  Super::beginEvent();
 }
 
 

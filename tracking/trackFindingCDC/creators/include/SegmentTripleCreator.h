@@ -27,8 +27,6 @@ namespace Belle2 {
       SegmentTripleCreator() {}
 
 
-
-
       /// Create the segment triples by combining close by segments in the combination axial-stereo-axial based on the filter selection criteria.
       template<class AAxialSegmentPairFilter, class ASegmentTripleFilter>
       inline void create(AAxialSegmentPairFilter& axialSegmentPairFilter,
@@ -93,8 +91,8 @@ namespace Belle2 {
       {
 
         //clear the remembered fits
-        axialSegmentPairFilter.clear();
-        segmentTripleFilter.clear();
+        axialSegmentPairFilter.beginEvent();
+        segmentTripleFilter.beginEvent();
 
         //Make pairs of closeby axial superlayers
         for (ILayerType iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS;

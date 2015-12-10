@@ -350,8 +350,6 @@ namespace Belle2 {
       template<class ARelationFilter, class AItemRange>
       void appendUsing(ARelationFilter& relationFilter, const AItemRange& itemRange)
       {
-        //forget everything from former creations
-        relationFilter.clear();
         Relation<AItem> neighborRelation;
         for (const auto& item : itemRange) {
           neighborRelation.first = item;

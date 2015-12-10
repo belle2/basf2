@@ -305,7 +305,6 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
         return trajectory2D.calcArcLength2D(first->getSegment()->front().getRecoPos2D()) >
                trajectory2D.calcArcLength2D(second->getSegment()->front().getRecoPos2D());
       });
-      segmentTrainFilter.clear();
       if (segmentTrainFilter(std::make_pair(x, trackInformation->getTrackCand())) != NOT_A_CELL)
         innerSet.push_back(x);
     }

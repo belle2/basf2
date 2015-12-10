@@ -20,10 +20,10 @@ MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
 }
 
 
-void MCSegmentPairRelationFilter::clear()
+void MCSegmentPairRelationFilter::beginEvent()
 {
-  m_mcSegmentPairFilter.clear();
-  Super::clear();
+  m_mcSegmentPairFilter.beginEvent();
+  Super::beginEvent();
 }
 
 

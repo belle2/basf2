@@ -16,9 +16,10 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void SimpleSegmentTripleFilter::clear()
+void SimpleSegmentTripleFilter::beginEvent()
 {
-  m_simpleAxialSegmentPairFilter.clear();
+  m_simpleAxialSegmentPairFilter.beginEvent();
+  Super::beginEvent();
 }
 
 
@@ -26,12 +27,14 @@ void SimpleSegmentTripleFilter::clear()
 void SimpleSegmentTripleFilter::initialize()
 {
   m_simpleAxialSegmentPairFilter.initialize();
+  Super::initialize();
 }
 
 
 
 void SimpleSegmentTripleFilter::terminate()
 {
+  Super::terminate();
   m_simpleAxialSegmentPairFilter.terminate();
 }
 

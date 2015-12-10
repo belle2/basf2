@@ -35,8 +35,8 @@ namespace Belle2 {
         Super(allowReverse), m_mcFacetFilter(allowReverse) {}
 
     public:
-      /// May be used to clear information from former events. Currently unused.
-      virtual void clear() override final;
+      /// Used to prepare the Monte Carlo information for this event.
+      virtual void beginEvent() override final;
 
       /// Forwards the modules initialize to the filter
       virtual void initialize() override final;

@@ -13,10 +13,10 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void MCFacetRelationFilter::clear()
+void MCFacetRelationFilter::beginEvent()
 {
-  m_mcFacetFilter.clear();
-  Super::clear();
+  m_mcFacetFilter.beginEvent();
+  Super::beginEvent();
 }
 
 

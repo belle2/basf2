@@ -24,7 +24,8 @@ using namespace TrackFindingCDC;
 
 TDCCountTranslatorBase& CDCWireHit::getTDCCountTranslator()
 {
-  return CDCWireHitTopology::getInstance().getTDCCountTranslator();
+  static CDC::RealisticTDCCountTranslator s_tdcCountTranslator;
+  return s_tdcCountTranslator;
 }
 
 CDCWireHit::CDCWireHit() :

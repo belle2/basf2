@@ -3,6 +3,8 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <cdc/translators/RealisticTDCCountTranslator.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -53,9 +55,9 @@ void WireHitTopologyPreparerModule::event()
 
   // Create the wirehits - translate the CDCHits and attach the geometry.
   B2DEBUG(100, "Creating all CDCWireHits");
+  CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
   CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  wireHitTopology.clear();
 
   //create the wirehits into a collection
   Index useNHits = cdcHits.getEntries();
@@ -69,7 +71,7 @@ void WireHitTopologyPreparerModule::event()
       B2ERROR("CDCHit.getArrayIndex() produced wrong result. Expected : " << iHit << " Actual : " << hit.getArrayIndex());
     }
 
-    wireHits.push_back(CDCWireHit(ptrHit, &(wireHitTopology.getTDCCountTranslator())));
+    wireHits.push_back(CDCWireHit(ptrHit, &tdcCountTranslator));
 
     const WireID wireID(hit.getID());
     if (wireID.getEWire() != hit.getID()) {

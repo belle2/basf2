@@ -682,7 +682,6 @@ namespace Belle2 {
         EXPECT_EQ(m_hitList.size(), 110) << "Too few hits in the hit vector.";
 
         CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        wireHitTopology.clear();
         wireHitTopology.fill(m_hitList);
       }
 

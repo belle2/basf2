@@ -11,9 +11,9 @@
 #
 #
 
-Particle Xdu- 1.6 2.5
-LSNONRELBW Xdu-
-ChangeMassMin Xdu- 0.3
+Particle anti-Xdu- 1.6 2.5
+LSNONRELBW anti-Xdu-
+ChangeMassMin anti-Xdu- 0.3
 
 Particle Xdu+ 1.6 2.5
 LSNONRELBW Xdu+

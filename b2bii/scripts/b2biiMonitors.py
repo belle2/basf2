@@ -33,9 +33,9 @@ def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMon
     beam2hist_runno = ('modulo(runNum,1000)', 1000, 0.0, 999.0)
     beam2hist_evtno = ('modulo(evtNum,10000)', 10000, 0.0, 9999.0)
 
-    beam2hist_Eher = ('Eher', 100, 7.990, 8.00)
-    beam2hist_Eler = ('Eler', 100, 3.495, 3.50)
-    beam2hist_Ecms = ('Ecms', 100, 10.50, 10.60)
+    beam2hist_Eher = ('Eher', 13000, 7.100, 8.400)
+    beam2hist_Eler = ('Eler',  6000, 3.100, 3.700)
+    beam2hist_Ecms = ('Ecms', 17000, 9.200, 10.900)
     beam2hist_Xang = ('XAngle', 100, 0.01, 0.03)
 
     beam2hist_ipx = ('IPX', 100, -0.5, 0.5)

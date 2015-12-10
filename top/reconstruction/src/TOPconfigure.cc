@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/reconstruction/TOPconfig.h>
 #include <top/reconstruction/TOPconfigure.h>
 
 // framework aux
@@ -33,10 +32,10 @@ namespace Belle2 {
       m_timeRange(0)
 
     {
-      if (!m_topgp) B2FATAL("TOPconfigure: no geometry available");
+      if (!m_topgp->isInitialized()) B2FATAL("TOPconfigure: no geometry available");
       m_topgp->setBasfUnits();
 
-      // space for bars including wedges
+      // space for TOP modules
       m_R1 = m_topgp->getRadius() - m_topgp->getWextdown();
       double x = m_topgp->getQwidth() / 2.0;
       double y = m_topgp->getRadius() + m_topgp->getQthickness();
@@ -87,7 +86,7 @@ namespace Belle2 {
       setTDC(m_topgp->getTDCbits(), m_topgp->getTDCbitwidth(), m_topgp->getTDCoffset());
       setCFD(m_topgp->getPileupTime(), m_topgp->getDoubleHitResolution());
 
-      int n = m_topgp->getNbars();           // number of bars in phi
+      int n = m_topgp->getNbars();           // number of modules
       double Dphi = 2 * M_PI / n;
       double Phi = m_topgp->getPhi0() - 0.5 * M_PI;
 
@@ -115,13 +114,13 @@ namespace Belle2 {
       setEdgeRoughness(0);
 
       for (int i = 0; i < n; i++) {
-        int id = setQbar(A, B, z1, z2, R, 0, Phi, PMT, SphericM);
+        int id = setQbar(A, B, z1, z2, R, 0, Phi, c_PMT, c_SphericM);
         setMirrorRadius(id, MirrR);
         setMirrorCenter(id, MirrXc, MirrYc);
-        addExpansionVolume(id, Left, Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
+        addExpansionVolume(id, c_Left, c_Prism, DzExp - Wflat, B / 2, B / 2 - YsizExp,
                            0, 0, Wwidth);
         setBBoxWindow(id, Wflat + filterThick + pmtWindow);
-        arrangePMT(id, Left, XsizPMT, YsizPMT, x0, y0);
+        arrangePMT(id, c_Left, XsizPMT, YsizPMT, x0, y0);
         Phi += Dphi;
       }
 

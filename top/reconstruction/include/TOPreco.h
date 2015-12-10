@@ -26,9 +26,9 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * Local(=bar)/Global(=BelleII) frame
+     * Local( = TOP module)/Global( = BelleII) frame
      */
-    enum {Local = 0, Global = 1};
+    enum {c_Local = 0, c_Global = 1};
 
     /**
      * TOP reconstruction: this class provides interface to fortran code
@@ -47,10 +47,10 @@ namespace Belle2 {
        * Constructor
        * @param NumHyp number of mass hypotheses
        * @param Masses masses
-       * @param BkgPerQbar estimation for minimal number of background hits
+       * @param BkgPerModule estimation for minimal number of background hits
        * @param ScaleN0 scale factor to scale N0
        */
-      TOPreco(int NumHyp, double Masses[], double BkgPerQbar = 0, double ScaleN0 = 1);
+      TOPreco(int NumHyp, double Masses[], double BkgPerModule = 0, double ScaleN0 = 1);
 
       /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
@@ -92,20 +92,20 @@ namespace Belle2 {
 
       /**
        * Add data
-       * @param barID bar ID
+       * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param TDC digitized time
        * @param time t0-corrected time in [ns] converted from TDC
        */
-      int addData(int barID, int pixelID, int TDC, double time);
+      int addData(int moduleID, int pixelID, int TDC, double time);
 
       /**
        * Add data (for backward compatibility only)
-       * @param barID bar ID
+       * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param TDC digitized time
        */
-      int addData(int barID, int pixelID, int TDC);
+      int addData(int moduleID, int pixelID, int TDC);
 
       /**
        * Return size of data list
@@ -186,10 +186,10 @@ namespace Belle2 {
        * @param Len track length inside bar
        * @param Tlen track length from IP
        * @param Mom track momentum
-       * @param barID bar ID if hit, else -1
+       * @param moduleID module ID if hit, else -1
        */
       void getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                       double& Tlen, double& Mom, int& barID);
+                       double& Tlen, double& Mom, int& moduleID);
 
       /**
        * Print log likelihoods to std output
@@ -257,11 +257,11 @@ namespace Belle2 {
        * @param Pz track momentum component z
        * @param Q track charge
        * @param pdg PDG code for which to compute pulls
-       * @param barID bar ID (optional)
+       * @param moduleID module ID (optional)
        */
       void reconstruct(double X, double Y, double Z, double Tlen,
                        double Px, double Py, double Pz, int Q,
-                       int pdg = 0, int barID = 0);
+                       int pdg = 0, int moduleID = 0);
 
       int m_hypID;    /**< true hypothesis ID */
       double m_beta;  /**< beta value, if set */

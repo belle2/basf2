@@ -32,28 +32,22 @@ extern "C" {
 namespace Belle2 {
   namespace TOP {
 
-    TOPtrack::TOPtrack(): m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
-      m_atTop(false), m_barID(0),
-      m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
-    {}
-
-
     TOPtrack::TOPtrack(double x, double y, double z,
                        double px, double py, double pz,
                        double Tlen, int Q, int pdg):
       m_valid(true), m_position(x, y, z), m_momentum(px, py, pz),
       m_trackLength(Tlen), m_charge(Q), m_pdg(pdg),
-      m_atTop(false), m_barID(0),
+      m_atTop(false), m_moduleID(0),
       m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
     {
-      m_barID = findBar();
+      m_moduleID = findModule();
     }
 
 
     TOPtrack::TOPtrack(const Track* track,
                        const Const::ChargedStable& chargedStable):
       m_valid(false), m_trackLength(0.0), m_charge(0), m_pdg(0),
-      m_atTop(false), m_barID(0),
+      m_atTop(false), m_moduleID(0),
       m_track(0), m_extHit(0), m_mcParticle(0), m_barHit(0)
     {
 
@@ -63,7 +57,7 @@ namespace Belle2 {
       m_track = track;
 
       Const::EDetector myDetID = Const::EDetector::TOP;
-      int NumBars = TOPGeometryPar::Instance()->getNbars();
+      int NumModules = TOPGeometryPar::Instance()->getNbars();
       int pdgCode = abs(chargedStable.getPDGCode());
 
       RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
@@ -71,7 +65,7 @@ namespace Belle2 {
         const ExtHit* extHit = extHits[i];
         if (abs(extHit->getPdgCode()) != pdgCode) continue;
         if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumBars) continue;
+        if (extHit->getCopyID() == 0 || extHit->getCopyID() > NumModules) continue;
         if (extHit->getStatus() != EXT_ENTER) continue;
         m_extHit = extHit;
       }
@@ -91,7 +85,7 @@ namespace Belle2 {
       }
       m_charge = fitResult->getChargeSign();
       if (m_mcParticle) m_pdg = m_mcParticle->getPDG();
-      m_barID = m_extHit->getCopyID();
+      m_moduleID = m_extHit->getCopyID();
       m_valid = true;
     }
 
@@ -112,8 +106,8 @@ namespace Belle2 {
 
     int TOPtrack::getHypID() const
     {
-      int lundc[5] = {11, 13, 211, 321, 2212};
-      for (int i = 0; i < 5; i++) {
+      int lundc[6] = {11, 13, 211, 321, 2212, 1000010020};
+      for (int i = 0; i < 6; i++) {
         if (abs(m_pdg) == lundc[i]) return i + 1;
       }
       return 0;
@@ -121,7 +115,7 @@ namespace Belle2 {
 
     int TOPtrack::toTop()
     {
-      if (m_atTop) return m_barID;
+      if (m_atTop) return m_moduleID;
 
       float r[3] = {(float) m_position.X(),
                     (float) m_position.Y(),
@@ -138,8 +132,8 @@ namespace Belle2 {
       m_momentum.SetXYZ(p[0], p[1], p[2]);
       m_trackLength += t * Const::speedOfLight;
       m_atTop = true;
-      m_barID = m + 1;
-      return m_barID;
+      m_moduleID = m + 1;
+      return m_moduleID;
     }
 
     void TOPtrack::smear(double sig_x, double sig_z,
@@ -177,11 +171,11 @@ namespace Belle2 {
       cout << "  z=" << getZ() << " cm\n";
       cout << "  trackLength=" << setprecision(4) << m_trackLength << " cm";
       cout << "  atTop=" << m_atTop;
-      cout << "  barID=" << m_barID;
+      cout << "  moduleID=" << m_moduleID;
       cout << endl;
     }
 
-    int TOPtrack::findBar()
+    int TOPtrack::findModule()
     {
       float r[3] = {(float) m_position.X(),
                     (float) m_position.Y(),

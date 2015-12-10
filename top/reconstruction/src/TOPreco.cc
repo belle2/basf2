@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace TOP {
 
-    TOPreco::TOPreco(int Num, double Masses[], double BkgPerQbar, double ScaleN0):
+    TOPreco::TOPreco(int Num, double Masses[], double BkgPerModule, double ScaleN0):
       m_hypID(0), m_beta(0.0)
     {
       data_clear_();
@@ -30,7 +30,7 @@ namespace Belle2 {
         masses.push_back((float) Masses[i]);
       }
       rtra_set_hypo_(&Num, masses.data());
-      float b = (float) BkgPerQbar; float s = (float) ScaleN0;
+      float b = (float) BkgPerModule; float s = (float) ScaleN0;
       set_top_par_(&b, &s);
       setPDFoption(c_Optimal); // default option
       setTmax(0); // use default (TDC range)
@@ -57,31 +57,31 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int barID, int pixelID, int TDC, double time)
+    int TOPreco::addData(int moduleID, int pixelID, int TDC, double time)
     {
       int status;
-      barID--; // 0-based ID used in fortran
+      moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      data_put_(&barID, &pixelID, &TDC, &t, &status);
+      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }
 
 
-    int TOPreco::addData(int barID, int pixelID, int TDC)
+    int TOPreco::addData(int moduleID, int pixelID, int TDC)
     {
       int status;
-      barID--; // 0-based ID used in fortran
+      moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = TOPGeometryPar::Instance()->getTime(TDC);
-      data_put_(&barID, &pixelID, &TDC, &t, &status);
+      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }
 
 
     void TOPreco::reconstruct(double X, double Y, double Z, double Tlen,
                               double Px, double Py, double Pz, int Q,
-                              int HYP, int barID)
+                              int HYP, int moduleID)
     {
       float x = (float) X;
       float y = (float) Y;
@@ -91,9 +91,9 @@ namespace Belle2 {
       float py = (float) Py;
       float pz = (float) Pz;
       int REF = 0;
-      barID--; // 0-based ID used in fortran
+      moduleID--; // 0-based ID used in fortran
       rtra_clear_();
-      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &HYP, &REF, &barID);
+      rtra_put_(&x, &y, &z, &t, &px, &py, &pz, &Q, &HYP, &REF, &moduleID);
       top_reco_();
     }
 
@@ -101,10 +101,10 @@ namespace Belle2 {
     {
       m_hypID = abs(trk.getPDGcode());
       if (pdg == 0) pdg = m_hypID;
-      int barID = trk.getBarID();
+      int moduleID = trk.getModuleID();
       reconstruct(trk.getX(), trk.getY(), trk.getZ(), trk.getTrackLength(),
                   trk.getPx(), trk.getPy(), trk.getPz(), trk.getCharge(),
-                  pdg, barID);
+                  pdg, moduleID);
     }
 
     int TOPreco::getFlag()
@@ -152,12 +152,12 @@ namespace Belle2 {
     }
 
     void TOPreco::getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
-                              double& Tlen, double& Mom, int& barID)
+                              double& Tlen, double& Mom, int& moduleID)
     {
       int K = 1;
       float r[3], dir[3], len, tof, p;
-      rtra_gethit_(&K, &LocGlob, r, dir, &len, &tof, &p, &barID);
-      barID++;
+      rtra_gethit_(&K, &LocGlob, r, dir, &len, &tof, &p, &moduleID);
+      moduleID++;
       for (int i = 0; i < 3; i++) {
         R[i] = r[i];
         Dir[i] = dir[i];
@@ -198,12 +198,12 @@ namespace Belle2 {
     void TOPreco::dumpTrackHit(int LocGlob)
     {
       double r[3], dir[3], len, Tlen, p;
-      int barID;
-      getTrackHit(LocGlob, r, dir, len, Tlen, p, barID);
+      int moduleID;
+      getTrackHit(LocGlob, r, dir, len, Tlen, p, moduleID);
 
       using namespace std;
       cout << showpoint << fixed << right;
-      cout << "TOPreco::dumpTrackHit: barID=" << barID;
+      cout << "TOPreco::dumpTrackHit: moduleID=" << moduleID;
       cout << "  Len=" << setprecision(2) << len;
       cout << "cm  Tlen=" << setprecision(1) << Tlen;
       cout << "cm  p=" << setprecision(2) << p << "GeV/c" << endl;
@@ -211,14 +211,14 @@ namespace Belle2 {
       for (int i = 0; i < 3; i++) {
         cout << setw(10) << setprecision(2) << r[i];
       }
-      if (LocGlob == Local) {cout << " (local)" << endl;}
+      if (LocGlob == c_Local) {cout << " (local)" << endl;}
       else {cout << " (global)" << endl;}
 
       cout << "direction:     ";
       for (int i = 0; i < 3; i++) {
         cout << setw(10) << setprecision(4) << dir[i];
       }
-      if (LocGlob == Local) {cout << " (local)" << endl;}
+      if (LocGlob == c_Local) {cout << " (local)" << endl;}
       else {cout << " (global)" << endl;}
     }
 

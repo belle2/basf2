@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef _TOPtrack_h
-#define _TOPtrack_h
+#pragma once
 
 #include <math.h>
 #include <TVector3.h>
@@ -34,7 +33,8 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      TOPtrack();
+      TOPtrack()
+      {}
 
       /**
        * Constructor with track parameters
@@ -186,15 +186,15 @@ namespace Belle2 {
 
       /**
        * Return internal particle code
-       * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=unknown
+       * @return internal particle code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 6=d, 0=unknown
        */
       int getHypID() const;
 
       /**
-       * Return bar ID
-       * @return bar ID, if track hits the bar, otherwise 0
+       * Return module ID
+       * @return module ID, if track hits the bar, otherwise 0
        */
-      int getBarID() const {return m_barID;}
+      int getModuleID() const {return m_moduleID;}
 
       /**
        * Check if toTop() was already called
@@ -209,7 +209,7 @@ namespace Belle2 {
       const Track* getTrack() const {return m_track;}
 
       /**
-       * Return extrapolated hit (track entrance to bar)
+       * Return extrapolated hit (track entrance to the bar)
        * if this track is constructed from mdst track
        * @return extrapolated hit pointer or NULL
        */
@@ -229,7 +229,7 @@ namespace Belle2 {
 
       /**
        * Propagate track to TOP counter (assuming uniform B field along z)
-       * @return bar ID, if track hits the bar, otherwise 0
+       * @return module ID, if track hits the bar, otherwise 0
        */
       int toTop();
 
@@ -250,27 +250,26 @@ namespace Belle2 {
     private:
 
       /**
-       * Finds barID the track is crossing
-       * @return bar ID, if track hits the bar, otherwise 0
+       * Finds moduleID the track is crossing
+       * @return module ID, if track hits the bar, otherwise 0
        */
-      int findBar();
+      int findModule();
 
-      bool m_valid;           /**< true for properly defined track */
-      TVector3 m_position;    /**< position vector*/
-      TVector3 m_momentum;    /**< momentum vector */
-      double m_trackLength;   /**< track length from IP to point */
-      int m_charge;           /**< charge */
-      int m_pdg;              /**< PDG code (optional) */
-      bool m_atTop;           /**< true, if toTop() called */
-      int m_barID;            /**< bar ID or 0 */
-      const Track* m_track;            /**< pointer to mdst track or NULL */
-      const ExtHit* m_extHit;          /**< pointer to extrapolated hit or NULL */
-      const MCParticle* m_mcParticle;  /**< pointer to MC particle or NULL */
-      const TOPBarHit* m_barHit;       /**< pointer to bar hit or NULL */
+      bool m_valid = false;       /**< true for properly defined track */
+      TVector3 m_position;        /**< position vector*/
+      TVector3 m_momentum;        /**< momentum vector */
+      double m_trackLength = 0;   /**< track length from IP to point */
+      int m_charge = 0;           /**< charge */
+      int m_pdg = 0;              /**< PDG code (optional) */
+      bool m_atTop = false;       /**< true, if toTop() called */
+      int m_moduleID = 0;         /**< module ID or 0 */
+      const Track* m_track = 0;            /**< pointer to mdst track or NULL */
+      const ExtHit* m_extHit = 0;          /**< pointer to extrapolated hit or NULL */
+      const MCParticle* m_mcParticle = 0;  /**< pointer to MC particle or NULL */
+      const TOPBarHit* m_barHit = 0;       /**< pointer to bar hit or NULL */
     };
 
   } // end TOP namespace
 } // end Belle2 namespace
 
-#endif
 

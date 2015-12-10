@@ -224,8 +224,9 @@ namespace Belle2 {
       reco.reconstruct(trk, m_PDGCode);
       if (m_debugLevel > 1) {
         trk.dump();
-        reco.dumpTrackHit(Local);
+        reco.dumpTrackHit(c_Local);
         reco.dumpLogL(Const::ChargedStable::c_SetSize);
+        cout << endl;
       }
 
       // get results

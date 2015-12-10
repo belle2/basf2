@@ -12,7 +12,6 @@
 #include <testbeam/top/modules/TOPbeamAlignment/TOPbeamAlignmentModule.h>
 #include <top/reconstruction/TOPreco.h>
 #include <top/reconstruction/TOPtrack.h>
-#include <top/reconstruction/TOPutil.h>
 #include <top/reconstruction/TOPconfigure.h>
 
 #include <framework/core/ModuleManager.h>
@@ -182,7 +181,7 @@ namespace Belle2 {
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
       m_ringImage->Fill(m_rowWiseChannelID[data->getPixelID() - 1],
-                        TOP::TIME(data->getTDC()));
+                        m_topgp->getTime(data->getTDC()));
     }
     m_numEvents++;
 

@@ -7,6 +7,7 @@
 // TOPutil.h
 // C++ interface to F77 functions: data conversion utility (for debugging etc.)
 // units: cm, ns
+// mostly opsolete now !
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
@@ -19,111 +20,8 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * returns channel ID from position in local frame of barID
-     * @param X x position (local frame)
-     * @param Y y position (local frame)
-     * @param Z z position (local frame)
-     * @param barID bar ID
-     * @return channel ID
-     */
-    inline int chID(double X, double Y, double Z, int barID)
-    {
-      float x = (float) X; float y = (float) Y; float z = (float) Z;
-      barID--;
-      return ich_digiz_(&x, &y, &z, &barID) + 1;
-    }
-
-    /**
-     * returns channel ID from position in local frame of barID
-     * @param X x position (local frame)
-     * @param Y y position (local frame)
-     * @param LR Left or Right
-     * @param barID bar ID
-     * @return channel ID
-     */
-    inline int chID(double X, double Y, int LR, int barID)
-    {
-      float x = (float) X; float y = (float) Y;
-      barID--;
-      return ich_digi_(&x, &y, &LR, &barID) + 1;
-    }
-
-    /**
-     * returns channel ID from PMTchannel, PMTid, window number, barID
-     * @param IX PMT channel column (0-based)
-     * @param IY PMT channel row (0-based)
-     * @param PMTidX PMT column (0-based)
-     * @param PMTidY PMT row (0-based)
-     * @param LR Left or Right
-     * @param barID bar ID
-     * @return channel ID
-     */
-    inline int chID(int IX, int IY, int PMTidX, int PMTidY, int LR, int barID)
-    {
-      barID--;
-      return ichan_(&IX, &IY, &PMTidX, &PMTidY, &LR, &barID) + 1;
-    }
-
-    /**
-     * converts channel ID of barID to PMTchannel, PMTid, window number
-     * @param chID channel ID
-     * @param barID bar ID
-     * @param IX PMT channel column (0-based)
-     * @param IY PMT channel row (0-based)
-     * @param PMTidX PMT column (0-based)
-     * @param PMTidY PMT row (0-based)
-     * @param LR Left or Right
-     */
-    inline void chIDtoIII(int chID, int barID,
-                          int& IX, int& IY, int& PMTidX, int& PMTidY, int& LR)
-    {
-      chID--;
-      barID--;
-      ichiii_(&chID, &barID, &IX, &IY, &PMTidX, &PMTidY, &LR);
-    }
-
-    /**
-     * converts channel ID to position in local frame of barID
-     * @param chID channel ID
-     * @param barID bar ID
-     * @param X x position (local frame)
-     * @param Y y position (local frame)
-     * @param Z z position (local frame)
-     */
-    inline void chIDtoXYZ(int chID, int barID,
-                          double& X, double& Y, double& Z)
-    {
-      chID--;
-      barID--;
-      float x, y, z;
-      ichxyz_(&chID, &barID, &x, &y, &z);
-      X = x; Y = y; Z = z;
-    }
-
-    /**
-     * returns digitised time
-     * @param T time
-     * @return digitized time
-     */
-    inline int TDCdigi(double T)
-    {
-      float t = (float) T;
-      return tdc_digi_(&t);
-    }
-
-    /**
-     * returns time in nanoseconds from digitised value
-     * @param TDC digitized time
-     * @return time
-     */
-    inline double TIME(int TDC)
-    {
-      return tdc_to_t_(&TDC);
-    }
-
-    /**
-     * transformation of 3D point from Belle to Qbar frame
-     * @param barID bar ID
+     * transformation of 3D point from Belle to TOP module frame
+     * @param moduleID module ID
      * @param X x position (global frame)
      * @param Y y position (global frame)
      * @param Z z position (global frame)
@@ -131,20 +29,20 @@ namespace Belle2 {
      * @param y y position (local frame)
      * @param z z position (local frame)
      */
-    inline void PointToLocal(int barID, double X, double Y, double Z,
+    inline void PointToLocal(int moduleID, double X, double Y, double Z,
                              double& x, double& y, double& z)
     {
-      barID--;
+      moduleID--;
       float r[3] = {(float) X, (float) Y, (float) Z};
       float dir[3] = {0, 0, 0};
-      to_local_(r, dir, &barID);
+      to_local_(r, dir, &moduleID);
       x = r[0]; y = r[1]; z = r[2];
     }
 
     /**
-     * transformation of 3D point from Qbar to Belle frame
+     * transformation of 3D point from TOP module to Belle frame
      * @param
-     * @param barID bar ID
+     * @param moduleID module ID
      * @param X x position (local frame)
      * @param Y y position (local frame)
      * @param Z z position (local frame)
@@ -152,19 +50,19 @@ namespace Belle2 {
      * @param y y position (global frame)
      * @param z z position (global frame)
      */
-    inline void PointToGlobal(int barID, double X, double Y, double Z,
+    inline void PointToGlobal(int moduleID, double X, double Y, double Z,
                               double& x, double& y, double& z)
     {
-      barID--;
+      moduleID--;
       float r[3] = {(float) X, (float) Y, (float) Z};
       float dir[3] = {0, 0, 0};
-      to_global_(r, dir, &barID);
+      to_global_(r, dir, &moduleID);
       x = r[0]; y = r[1]; z = r[2];
     }
 
     /**
-     * transformation of momentum vector from Belle to Qbar frame
-     * @param barID bar ID
+     * transformation of momentum vector from Belle to TOP module frame
+     * @param moduleID module ID
      * @param Px momentum component x (global frame)
      * @param Py momentum component y (global frame)
      * @param Pz momentum component z (global frame)
@@ -172,19 +70,19 @@ namespace Belle2 {
      * @param py momentum component y (local frame)
      * @param pz momentum component z (local frame)
      */
-    inline void MomentumToLocal(int barID, double Px, double Py, double Pz,
+    inline void MomentumToLocal(int moduleID, double Px, double Py, double Pz,
                                 double& px, double& py, double& pz)
     {
-      barID--;
+      moduleID--;
       float r[3] = {0, 0, 0};
       float dir[3] = {(float) Px, (float) Py, (float) Pz};
-      to_local_(r, dir, &barID);
+      to_local_(r, dir, &moduleID);
       px = dir[0]; py = dir[1]; pz = dir[2];
     }
 
     /**
-     * transformation of momentum vector from Qbar to Belle frame
-     * @param barID bar ID
+     * transformation of momentum vector from TOP module to Belle frame
+     * @param moduleID module ID
      * @param Px momentum component x (local frame)
      * @param Py momentum component y (local frame)
      * @param Pz momentum component z (local frame)
@@ -192,29 +90,29 @@ namespace Belle2 {
      * @param py momentum component y (global frame)
      * @param pz momentum component z (global frame)
      */
-    inline void MomentumToGlobal(int barID, double Px, double Py, double Pz,
+    inline void MomentumToGlobal(int moduleID, double Px, double Py, double Pz,
                                  double& px, double& py, double& pz)
     {
-      barID--;
+      moduleID--;
       float r[3] = {0, 0, 0};
       float dir[3] = {(float) Px, (float) Py, (float) Pz};
-      to_global_(r, dir, &barID);
+      to_global_(r, dir, &moduleID);
       px = dir[0]; py = dir[1]; pz = dir[2];
     }
 
     /**
-     * test if spatial point is inside bar (point given in Qbar frame)
+     * test if spatial point is inside quartz bar (point given in TOP module frame)
      * @param X x position (local frame)
      * @param Y y position (local frame)
      * @param Z z position (local frame)
-     * @param barID bar ID
+     * @param moduleID module ID
      * @return true, if inside
      */
-    inline bool InsideQbar(double X, double Y, double Z, int barID)
+    inline bool InsideQbar(double X, double Y, double Z, int moduleID)
     {
-      barID--;
+      moduleID--;
       float x = (float) X; float y = (float) Y; float z = (float) Z;
-      return inside_qbar_(&x, &y, &z, &barID) != 0;
+      return inside_qbar_(&x, &y, &z, &moduleID) != 0;
     }
 
     /**
@@ -222,14 +120,14 @@ namespace Belle2 {
      * @param X x position (local frame)
      * @param Y y position (local frame)
      * @param Z z position (local frame)
-     * @param barID bar ID
+     * @param moduleID module ID
      * @return true, if inside
      */
-    inline bool InsideExpansionVolume(double X, double Y, double Z, int barID)
+    inline bool InsideExpansionVolume(double X, double Y, double Z, int moduleID)
     {
-      barID--;
+      moduleID--;
       float x = (float) X; float y = (float) Y; float z = (float) Z;
-      return inside_extvol_(&x, &y, &z, &barID) != 0;
+      return inside_extvol_(&x, &y, &z, &moduleID) != 0;
     }
 
     /**
@@ -353,75 +251,6 @@ namespace Belle2 {
       return cher_angle_(&p, &mass, &refind);
     }
 
-    /**
-     * returns Qbar specs
-     * @param barID bar ID
-     * @param A width
-     * @param B thickness
-     * @param C length
-     * @param Lside left-side window type
-     * @param Rside right-side window type
-     * @param LexpvID left-side expansion volume ID or 0
-     * @param RexpvID right-side expansion volume ID or 0
-     */
-    inline void getQbar(int barID, double& A, double& B, double& C,
-                        int& Lside, int& Rside, int& LexpvID, int& RexpvID)
-    {
-      barID--;
-      float a, b, c;
-      get_qbar_(&barID, &a, &b, &c, &Lside, &Rside, &LexpvID, &RexpvID);
-      A = a; B = b; C = c;
-    }
-
-    /**
-     * returns expansion volume specs
-     * @param expvID expansion volume ID
-     * @param Dz length
-     * @param Yup uppermost y
-     * @param Ydown lowermost y
-     * @param YupIn uppermost y at bar
-     * @param YdownIn lowermost y at bar
-     * @param Width width
-     * @param Shape shape
-     * @param LR Left or Right
-     */
-    inline void getExpansionVolume(int expvID, double& Dz, double& Yup, double& Ydown,
-                                   double& YupIn, double& YdownIn,
-                                   double& Width, int& Shape, int& LR)
-    {
-      float dz, yup, ydn, a, yupi, ydni;
-      get_expvol_(&expvID, &dz, &yup, &ydn, &yupi, &ydni, &a, &Shape, &LR);
-      Dz = dz; Yup = yup; Ydown = ydn; YupIn = yupi; YdownIn = ydni; Width = a;
-    }
-
-    /**
-     * returns mirror specs
-     * @param barID bar ID
-     * @param R radius
-     * @param Xc center of curvature in x (local frame)
-     * @param Yc center of curvature in y (local frame)
-     * @param Zc center of curvature in z (local frame)
-     * @param F effective focal length
-     */
-    inline void getMirror(int barID, double& R, double& Xc, double& Yc, double& Zc,
-                          double& F)
-    {
-      barID--;
-      float r, xc, yc, zc, f;
-      get_mirror_(&barID, &r, &xc, &yc, &zc, &f);
-      R = r; Xc = xc; Yc = yc; Zc = zc; F = f;
-    }
-
-    /**
-     * returns thickness of bar box window
-     * @param barID bar ID
-     * @return thickness
-     */
-    inline double getBBoxWindow(int barID)
-    {
-      barID--;
-      return get_bbwin_(&barID);
-    }
 
   } // top namespace
 } // Belle2 namespace

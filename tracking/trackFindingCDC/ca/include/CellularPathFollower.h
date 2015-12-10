@@ -127,10 +127,10 @@ namespace Belle2 {
         const AItem* lastItem = path.back();
 
         bool grew = false;
-        for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(lastItem)) {
+        for (const WeightedRelation<const AItem>& relation : neighborhood.equal_range(lastItem)) {
           if (isHighestContinuation(relation)) {
 
-            const AItem* ptrNeighbor = getNeighbor(relation);
+            const AItem* ptrNeighbor = relation.getTo();
             path.push_back(ptrNeighbor);
 
             growPath(path, neighborhood, growMany);
@@ -166,14 +166,14 @@ namespace Belle2 {
 
 
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const typename Neighborhood::WeightedRelation& relation)
+      static bool isHighestContinuation(const WeightedRelation<const AItem>& relation)
       {
-        const AItem* ptrItem = getItem(relation);
-        const AItem* ptrNeighbor = getNeighbor(relation);
+        const AItem* ptrItem = relation.getFrom();
+        const AItem* ptrNeighbor = relation.getTo();
 
         if (not ptrItem or not ptrNeighbor) return false;
 
-        const NeighborWeight& weight = getWeight(relation);
+        const NeighborWeight& weight = relation.getWeight();
 
         const AItem& item = *ptrItem;
         const AItem& neighbor = *ptrNeighbor;

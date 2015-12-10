@@ -12,19 +12,37 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <tracking/trackFindingCDC/utilities/Ptr.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A mixin class to attach a weight to an object.
     template<class T>
-    class WithWeight : public T {
+    class WithWeight : public StarToPtr<T> {
+
+    private:
+      using Super = StarToPtr<T>;
 
     public:
       /// Make the constructor of the base type available
-      using T::T;
+      using Super::Super;
 
       /// Also forward the copy constructor form the base class object.
-      explicit WithWeight(const T& t): T(t) {}
+      explicit WithWeight(const T& t): Super(t) {}
+
+      /// Constructor which may also initialise the weight to a desired value
+      WithWeight(const T& t, Weight weight):
+        Super(t), m_weight(weight)
+      {}
+
+      /// Comparison operator establishing an ordering considering the pointer first and the weight second
+      bool operator<(const WithWeight<T>& other) const
+      {
+        const T& t = *this;
+        const T& otherT = other;
+        return t < otherT or (not(otherT < t) and getWeight() < other.getWeight());
+      }
 
       /// Getter for the weight
       Weight getWeight() const
@@ -33,7 +51,7 @@ namespace Belle2 {
       }
 
       /// Setter for the weight of the object.
-      void setWeight(const Weight& weight)
+      void setWeight(Weight weight)
       {
         m_weight = weight;
       }

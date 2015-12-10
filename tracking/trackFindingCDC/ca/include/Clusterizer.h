@@ -176,10 +176,10 @@ namespace Belle2 {
             size_t nNeighbors = 0;
 
             // Consider each neighbor
-            for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(clusterItem)) {
+            for (const WeightedRelation<AItem>& relation : neighborhood.equal_range(clusterItem)) {
               ++nNeighbors;
 
-              AItem* neighborItem = getNeighbor(relation);
+              AItem* neighborItem = relation.getTo();
 
               CellState neighborICluster = getCellState(*neighborItem);
               if (neighborICluster == -1) {

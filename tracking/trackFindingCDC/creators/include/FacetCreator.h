@@ -53,7 +53,7 @@ namespace Belle2 {
 
           if (nextNeighborRange.first != nextNeighborRange.second) {
 
-            const CDCWireHit* ptrMiddleWireHit = nextNeighborRange.first.getItem();
+            const CDCWireHit* ptrMiddleWireHit = nextNeighborRange.first->getFrom();
             if (not ptrMiddleWireHit) continue;
             const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
             if (middleWireHit.getAutomatonCell().hasTakenFlag()) continue;
@@ -61,7 +61,7 @@ namespace Belle2 {
             for (Neighborhood::iterator itStartWireHit = nextNeighborRange.first;
                  itStartWireHit != nextNeighborRange.second; ++itStartWireHit) {
 
-              const CDCWireHit* ptrStartWireHit = itStartWireHit.getNeighbor();
+              const CDCWireHit* ptrStartWireHit = itStartWireHit->getTo();
               if (not ptrStartWireHit) continue;
               const CDCWireHit& startWireHit = *ptrStartWireHit;
               if (startWireHit.getAutomatonCell().hasTakenFlag()) continue;
@@ -70,7 +70,7 @@ namespace Belle2 {
               for (Neighborhood::iterator itEndWireHit = nextNeighborRange.first;
                    itEndWireHit != nextNeighborRange.second; ++itEndWireHit) {
 
-                const CDCWireHit* ptrEndWireHit = itEndWireHit.getNeighbor();
+                const CDCWireHit* ptrEndWireHit = itEndWireHit->getTo();
                 if (not ptrEndWireHit) continue;
                 const CDCWireHit& endWireHit = *ptrEndWireHit;
                 if (endWireHit.getAutomatonCell().hasTakenFlag()) continue;

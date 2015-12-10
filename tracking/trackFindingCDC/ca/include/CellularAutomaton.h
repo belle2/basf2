@@ -151,9 +151,9 @@ namespace Belle2 {
         CellState maxStateWithContinuation = -std::numeric_limits<CellState>::infinity();
 
         // Check neighbors now
-        for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(&item)) {
+        for (const WeightedRelation<const AItem>& relation : neighborhood.equal_range(&item)) {
           //advance to valid neighbor
-          const AItem* ptrNeighbor = getNeighbor(relation);
+          const AItem* ptrNeighbor = relation.getTo();
           if (ptrNeighbor and not ptrNeighbor->getAutomatonCell().hasMaskedFlag()) {
 
             const AItem& neighbor = *ptrNeighbor;
@@ -165,7 +165,7 @@ namespace Belle2 {
             const CellState& neighborCellState = getFinalCellState(neighbor, neighborhood);
 
             // Add the value of the connetion to the gain value
-            CellState stateWithContinuation = neighborCellState + getWeight(relation);
+            CellState stateWithContinuation = neighborCellState + relation.getWeight();
 
             // Remember only the maximum value of all neighbors
             maxStateWithContinuation = std::max(maxStateWithContinuation, stateWithContinuation);

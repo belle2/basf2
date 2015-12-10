@@ -73,7 +73,9 @@ phiMax2 = 360.  # degrees
 pTcuts = [0.025, 0.1, 0.4]
 
 # choose a meaningful name for the sectorMap:
-setupFileName = 'shiftedL3IssueTest'
+setupFileName = 'secMapsDec2015'
+if useL3Shift:
+    setupFileName = 'shiftedL3IssueTest'
 
 
 # set the relative coordinates for the secMapCreation:

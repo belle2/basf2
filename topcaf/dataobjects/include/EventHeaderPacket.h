@@ -17,8 +17,9 @@ namespace Belle2 {
   class EventHeaderPacket: public Packet {
 
   public:
-
-    EventHeaderPacket();
+    // empty default constructor
+    // do not remove. This is necessary to put this class in the event store
+    EventHeaderPacket() : Packet() {};
     EventHeaderPacket(const unsigned int* temp_buffer, int nwords);
 
     //--- Getters ---//
@@ -34,7 +35,7 @@ namespace Belle2 {
     void SetFTSW(double ftsw) {m_ftsw = ftsw;}
 
   private:
-    packet_word_t m_type, m_freeze_date, m_evt_num;
+    packet_word_t m_freeze_date, m_evt_num;
     packet_word_t m_trigger, m_flag, m_nwaves, m_aux;
     double m_ftsw;
 

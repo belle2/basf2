@@ -19,9 +19,9 @@ namespace Belle2 {
 
 
   public:
-    EventWaveformPacket();
+    EventWaveformPacket() : Packet() {};
     EventWaveformPacket(const unsigned int* temp_buffer, int nwords);
-    EventWaveformPacket(const EventWaveformPacket& in_wp);
+    // EventWaveformPacket(const EventWaveformPacket& in_wp);
 
     ~EventWaveformPacket();
 

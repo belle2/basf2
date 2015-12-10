@@ -2,8 +2,6 @@
 
 using namespace Belle2;
 
-EventHeaderPacket::EventHeaderPacket(): Packet() {}
-
 EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,
                                      int nwords): Packet(temp_buffer, nwords)
 {

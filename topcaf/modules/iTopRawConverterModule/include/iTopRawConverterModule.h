@@ -44,7 +44,6 @@ namespace Belle2 {
     std::string m_input_fileandpath;
     std::ifstream m_input_file;
     std::string m_tmp;
-    unsigned int m_temp_buffer[1280];
     int m_current_pos, m_prev_pos;
     EventHeaderPacket* m_EvtPacket;
     EventWaveformPacket* m_WfPacket;

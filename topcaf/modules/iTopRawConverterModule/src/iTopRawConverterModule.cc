@@ -1,7 +1,9 @@
 #include <topcaf/modules/iTopRawConverterModule/iTopRawConverterModule.h>
 
 #include <iostream>
+#include <vector>
 
+using namespace std;
 using namespace Belle2;
 
 REG_MODULE(iTopRawConverter)
@@ -41,8 +43,6 @@ void iTopRawConverterModule::initialize()
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
   m_filedata_ptr.registerInDataStore();
-
-
 
 }
 
@@ -138,17 +138,13 @@ int iTopRawConverterModule::FindNextPacket()
   int type = -1;
   m_prev_pos = m_input_file.tellg();
 
-  m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t)); //Grab one word and shift position (should make it per bit!!!)
-  // int pos = m_input_file.tellg();
+  vector<packet_word_t> buffer(2);
+  m_input_file.read(reinterpret_cast<char*>(buffer.data()),
+                    2 * sizeof(packet_word_t)); //Grab two words: Header and length and shift position
 
-  unsigned int* word = (unsigned int*) m_temp_buffer;
-
-  //Check if PACKET_HEADER
-  if (*word == PACKET_HEADER) {
-    //Grab next work which should be the length
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-
-    unsigned int packet_length = *((unsigned int*)(m_temp_buffer));
+  packet_word_t word = buffer.at(0);
+  if (word == PACKET_HEADER) {
+    packet_word_t packet_length = buffer.at(1);
 
     //Grab the rest of the packet
     int ndata = (packet_length - 1) * sizeof(packet_word_t);
@@ -157,31 +153,31 @@ int iTopRawConverterModule::FindNextPacket()
       return -1;
     }
 
-    char temp_buffer1[ndata];
-    m_input_file.read((char*) temp_buffer1, ndata);
-    unsigned int* packet_type = (unsigned int*)(&temp_buffer1[0]);
+    vector<packet_word_t> data(ndata / sizeof(packet_word_t) + 1);
+    m_input_file.read(reinterpret_cast<char*>(data.data()), ndata);
+    packet_word_t packet_type = data.at(0);
 
-    if (*packet_type == PACKET_TYPE_EVENT) {
+    if (packet_type == PACKET_TYPE_EVENT) {
       type = 1;
-      m_EvtPacket = new EventHeaderPacket((unsigned int*) temp_buffer1,
+      m_EvtPacket = new EventHeaderPacket(data.data(),
                                           ndata / sizeof(packet_word_t));
-    } else if (*packet_type == PACKET_TYPE_WAVEFORM) {
+    } else if (packet_type == PACKET_TYPE_WAVEFORM) {
       type = 2;
-      m_WfPacket = new EventWaveformPacket((unsigned int*) temp_buffer1,
+      m_WfPacket = new EventWaveformPacket(data.data(),
                                            ndata / sizeof(packet_word_t));
     }
 
     //Do check sum
-    unsigned int this_checksum = 0;
+    packet_word_t this_checksum = 0;
     this_checksum += PACKET_HEADER;
     this_checksum += packet_length;
     for (unsigned int i = 0; i < (packet_length - 1); i++) {
-      this_checksum += *((unsigned int*)(&temp_buffer1[i * sizeof(packet_word_t)]));
+      this_checksum += data.at(i);
     }
 
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-    unsigned int* checksum = (unsigned int*)(m_temp_buffer);
-    if (this_checksum == (*checksum)) {
+    m_input_file.read(reinterpret_cast<char*>(buffer.data()), sizeof(packet_word_t));
+    packet_word_t checksum = buffer.at(0);
+    if (this_checksum == checksum) {
       return type;
     } else {
       return -1;
@@ -190,4 +186,3 @@ int iTopRawConverterModule::FindNextPacket()
   // End of PACKET_HEADER check
   return 0;
 }
-

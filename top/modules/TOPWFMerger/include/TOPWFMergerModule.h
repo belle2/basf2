@@ -73,24 +73,24 @@ namespace Belle2 {
 
     /**
      * Return a key used in m_map
-     * @param barID module ID
+     * @param moduleID module ID
      * @param channel hardware channel number
      * @return a key
      */
-    unsigned getKey(int barID, unsigned channel) const
+    unsigned getKey(int moduleID, unsigned channel) const
     {
-      return channel + (barID << 16);
+      return channel + (moduleID << 16);
     }
 
     /**
      * Return the mapped value
-     * @param barID module ID
+     * @param moduleID module ID
      * @param channel hardware channel number
      * @return mapped value or NULL
      */
-    const TOPASICChannel* getConstants(int barID, unsigned channel) const
+    const TOPASICChannel* getConstants(int moduleID, unsigned channel) const
     {
-      unsigned key = getKey(barID, channel);
+      unsigned key = getKey(moduleID, channel);
       std::map<unsigned, const TOPASICChannel*>::const_iterator it = m_map.find(key);
       if (it == m_map.end()) return 0;
       return it->second;
@@ -124,7 +124,7 @@ namespace Belle2 {
     bool m_useFTSW;  /**< if true add FTSW time to hit times when making TOPDigits */
 
     DBArray<TOPASICChannel> m_asicChannels; /**< ASIC calibration constants */
-    std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (bar,channel) and ptr */
+    std::map<unsigned, const TOPASICChannel*> m_map; /**< map of (module, channel) to */
 
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance();  /**< geometry */
 

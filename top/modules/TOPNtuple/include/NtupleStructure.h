@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPNTUPLESTRUCTURE_H
-#define TOPNTUPLESTRUCTURE_H
+#pragma once
 
 #include <TTree.h>
 
@@ -47,7 +46,7 @@ namespace Belle2 {
      * Structure for track parameters at TOP
      */
     struct TrackHit {
-      Int_t barID;  /**< bar ID */
+      Int_t moduleID;  /**< module ID */
       Int_t PDG;    /**< PDG code */
       Float_t x;    /**< impact point, x component */
       Float_t y;    /**< impact point, y component */
@@ -60,7 +59,7 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      TrackHit(): barID(0), PDG(0), x(0), y(0), z(0), p(0), theta(0), phi(0), time(0)
+      TrackHit(): moduleID(0), PDG(0), x(0), y(0), z(0), p(0), theta(0), phi(0), time(0)
       {}
 
       /**
@@ -68,7 +67,7 @@ namespace Belle2 {
        */
       void clear()
       {
-        barID = PDG = 0;
+        moduleID = PDG = 0;
         x = y = z = p = theta = phi = time = 0;
       }
 
@@ -103,8 +102,8 @@ namespace Belle2 {
       Likelihoods phot;   /**< number of expected photons (signal + bkg)*/
       Likelihoods logL;   /**< log likelihoods */
 
-      TrackHit extHit;  /**< extrapolated Track hit (in local bar frame) */
-      TrackHit barHit;  /**< related MC particle hit (in local bar frame) */
+      TrackHit extHit;  /**< extrapolated Track hit (in local module frame) */
+      TrackHit barHit;  /**< related MC particle hit (in local module frame) */
 
       /**
        * Default constructor
@@ -151,5 +150,4 @@ namespace Belle2 {
   } // TOP namestace
 } // Belle2 namespace
 
-#endif
 

@@ -126,7 +126,7 @@ namespace Belle2 {
       double tof = barHit->getLength() / beta / Const::speedOfLight;
       auto* extHit = extHits.appendNew(chargedStable.getPDGCode(),
                                        Const::TOP,
-                                       barHit->getBarID(),
+                                       barHit->getModuleID(),
                                        EXT_ENTER,
                                        tof,
                                        barHit->getPosition(),

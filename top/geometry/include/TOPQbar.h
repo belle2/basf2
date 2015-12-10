@@ -32,10 +32,10 @@ namespace Belle2 {
        * @param R radius of inner Q-bar surface
        * @param dx shift in x
        * @param phi Q-bar azimuthal angle
-       * @param barID Q-bar ID
+       * @param moduleID TOP module ID
        */
       TOPQbar(double width, double thickness, double z1, double z2, double R, double dx,
-              double phi, int barID);
+              double phi, int moduleID);
 
       /**
        * destructor
@@ -43,10 +43,10 @@ namespace Belle2 {
       ~TOPQbar();
 
       /**
-       * Returns Q-bar ID
-       * @return ID
+       * Returns TOP module ID
+       * @return module ID
        */
-      int getBarID() const {return m_barID;}
+      int getModuleID() const {return m_moduleID;}
 
       /**
        * Returns Q-bar width
@@ -141,7 +141,7 @@ namespace Belle2 {
 
     private:
 
-      int m_barID;        /**< Q-bar ID */
+      int m_moduleID;     /**< module ID */
       double m_width;     /**< Q-bar width */
       double m_thickness; /**< Q-bar thickness */
       double m_length;    /**< Q-bar length */

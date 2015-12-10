@@ -19,7 +19,7 @@ namespace Belle2 {
     {
       for (unsigned i = 0; i < c_numModules; i++) {
         for (unsigned k = 0; k < c_numColumns; k++) {
-          m_fromBar[i][k] = 0;
+          m_fromModule[i][k] = 0;
         }
       }
     }
@@ -36,19 +36,19 @@ namespace Belle2 {
 
       unordered_set<unsigned short> scrodIDs; // all SCROD ID's are different
       unordered_set<string> coppers; // COPPER inputs are used only once
-      unordered_set<int> bars; // (barID, col) mapped only once
+      unordered_set<int> modules; // (moduleID, col) mapped only once
 
       // read parameters from DB
-      int numBars = 0; // counter of mapped bars
+      int numModules = 0; // counter of mapped modules
       for (const GearDir& topModule : frontEndMapping.getNodes("TOPModule")) {
 
-        int barID = topModule.getInt("@barID");
-        if (barID <= 0 or barID > c_numModules) {
-          B2ERROR(topModule.getPath() << " barID=" << barID << " ***invalid ID");
+        int moduleID = topModule.getInt("@moduleID");
+        if (moduleID <= 0 or moduleID > c_numModules) {
+          B2ERROR(topModule.getPath() << " moduleID=" << moduleID << " ***invalid ID");
           continue;
         }
 
-        bool barMapped = false; // to count mapped bars
+        bool moduleMapped = false; // to count mapped modules
         for (const GearDir& boardstack : topModule.getNodes("Boardstack")) {
 
           int col = boardstack.getInt("@col");
@@ -56,9 +56,9 @@ namespace Belle2 {
             B2ERROR(boardstack.getPath() << " col=" << col << " ***invalid number");
             continue;
           }
-          if (!bars.insert(barID * c_numColumns + col).second) {
+          if (!modules.insert(moduleID * c_numColumns + col).second) {
             B2ERROR(boardstack.getPath()
-                    << " barID=" << barID
+                    << " moduleID=" << moduleID
                     << " col=" << col
                     << " ***already mapped");
             continue;
@@ -92,23 +92,24 @@ namespace Belle2 {
             continue;
           }
 
-          TOPFrontEndMap feemap(barID, col, scrodID, copperID, finesse, m_mapping.size());
+          TOPFrontEndMap feemap(moduleID, col, scrodID, copperID, finesse,
+                                m_mapping.size());
           m_mapping.push_back(feemap);
-          barMapped = true;
+          moduleMapped = true;
         }
-        if (barMapped) numBars++;
+        if (moduleMapped) numModules++;
       }
 
       // set conversion objects
 
       for (const auto& feemap : m_mapping) {
-        m_fromBar[feemap.getBarID() - 1][feemap.getBoardstackNumber()] = &feemap;
+        m_fromModule[feemap.getModuleID() - 1][feemap.getBoardstackNumber()] = &feemap;
         m_fromScrod[feemap.getScrodID()] = &feemap;
         m_fromCopper[feemap.getCopperID() * 4 + feemap.getFinesseSlot()] = &feemap;
       }
 
       B2INFO("TOP::FrontEndMapper: " << m_mapping.size() << " SCROD's mapped to "
-             << numBars << " TOP module(s)");
+             << numModules << " TOP module(s)");
 
     }
 

@@ -188,7 +188,7 @@ else:
 
 gearbox = register_module('Gearbox')
 bar1 = \
-    "/DetectorComponent[@name='TOP']//FrontEndMapping/TOPModule[@barID='1']/"
+    "/DetectorComponent[@name='TOP']//FrontEndMapping/TOPModule[@moduleID='1']/"
 col0 = bar1 + "Boardstack[@col = '0']/SCRODid"
 col1 = bar1 + "Boardstack[@col = '1']/SCRODid"
 col2 = bar1 + "Boardstack[@col = '2']/SCRODid"

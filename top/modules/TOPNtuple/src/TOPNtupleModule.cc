@@ -98,8 +98,8 @@ namespace Belle2 {
     m_tree->Branch("phot",  &m_top.phot,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("logL",  &m_top.logL,  "e/F:mu:pi:K:p:d");
 
-    m_tree->Branch("extHit",  &m_top.extHit,  "barID/I:PDG:x/F:y:z:p:theta:phi:time");
-    m_tree->Branch("barHit",  &m_top.barHit,  "barID/I:PDG:x/F:y:z:p:theta:phi:time");
+    m_tree->Branch("extHit",  &m_top.extHit,  "moduleID/I:PDG:x/F:y:z:p:theta:phi:time");
+    m_tree->Branch("barHit",  &m_top.barHit,  "moduleID/I:PDG:x/F:y:z:p:theta:phi:time");
 
     StoreArray<Track>::required();
     StoreArray<ExtHit>::required();
@@ -175,15 +175,15 @@ namespace Belle2 {
       m_top.logL.d  = top->getLogL(Const::deuteron);
 
       if (extHit) {
-        int barID = extHit->getCopyID();
+        int moduleID = extHit->getCopyID();
         TVector3 position = extHit->getPosition();
         TVector3 momentum = extHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(barID);
+        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
         if (bar) {
           position = bar->pointToLocal(position);
           momentum = bar->momentumToLocal(momentum);
         }
-        m_top.extHit.barID = barID;
+        m_top.extHit.moduleID = moduleID;
         m_top.extHit.PDG = extHit->getPdgCode();
         m_top.extHit.x = position.X();
         m_top.extHit.y = position.Y();
@@ -195,15 +195,15 @@ namespace Belle2 {
       }
 
       if (barHit) {
-        int barID = barHit->getBarID();
+        int moduleID = barHit->getModuleID();
         TVector3 position = barHit->getPosition();
         TVector3 momentum = barHit->getMomentum();
-        const TOP::TOPQbar* bar = m_topgp->getQbar(barID);
+        const TOP::TOPQbar* bar = m_topgp->getQbar(moduleID);
         if (bar) {
           position = bar->pointToLocal(position);
           momentum = bar->momentumToLocal(momentum);
         }
-        m_top.barHit.barID = barID;
+        m_top.barHit.moduleID = moduleID;
         m_top.barHit.PDG = barHit->getPDG();
         m_top.barHit.x = position.X();
         m_top.barHit.y = position.Y();

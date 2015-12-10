@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPNTUPLEMODULE_H
-#define TOPNTUPLEMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -80,4 +79,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

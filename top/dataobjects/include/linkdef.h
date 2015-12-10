@@ -16,4 +16,33 @@
 #pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPTimeZero+;
 
+// schema evolution rules to allow reading of old class versions
+
+#pragma read sourceClass="Belle2::TOPSimHit" version="[-2]" \
+  source="int m_barID" \
+  targetClass="Belle2::TOPSimHit" target="m_moduleID" \
+  code="{m_moduleID = onfile.m_barID;}"
+
+#pragma read sourceClass="Belle2::TOPBarHit" version="[1]" \
+  source="int m_barID" \
+  targetClass="Belle2::TOPBarHit" target="m_moduleID" \
+  code="{m_moduleID = onfile.m_barID;}"
+
+#pragma read sourceClass="Belle2::TOPDigit" version="[-6]" \
+  source="int m_barID" \
+  targetClass="Belle2::TOPDigit" \
+  target="m_moduleID" \
+  code="{m_moduleID = onfile.m_barID;}"
+#pragma read sourceClass="Belle2::TOPDigit" version="[-6]" \
+  source="int m_channelID" \
+  targetClass="Belle2::TOPDigit" \
+  target="m_pixelID" \
+  code="{m_pixelID = onfile.m_channelID;}"
+#pragma read sourceClass="Belle2::TOPDigit" version="[-6]" \
+  source="unsigned m_hardChannelID" \
+  targetClass="Belle2::TOPDigit" \
+  target="m_channel" \
+  code="{m_channel = onfile.m_hardChannelID;}"
+
+
 #endif

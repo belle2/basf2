@@ -54,12 +54,12 @@ namespace Belle2 {
 
     /**
      * Constructor with module ID, pixel ID and channel number - constructs empty waveform
-     * @param barID module ID (1-based)
+     * @param moduleID module ID (1-based)
      * @param pixelID software channel ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    TOPWaveform(int barID, int pixelID, unsigned channel):
-      m_barID(barID), m_pixelID(pixelID), m_channel(channel)
+    TOPWaveform(int moduleID, int pixelID, unsigned channel):
+      m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel)
     {}
 
     /**
@@ -108,7 +108,7 @@ namespace Belle2 {
      * Returns module ID
      * @return module ID
      */
-    int getBarID() const { return m_barID; }
+    int getModuleID() const { return m_moduleID; }
 
     /**
      * Returns software channel ID (1-based)
@@ -191,7 +191,7 @@ namespace Belle2 {
 
   private:
 
-    int m_barID = 0;                    /**< quartz bar ID */
+    int m_moduleID = 0;                 /**< module ID */
     int m_pixelID = 0;                  /**< software channel ID */
     unsigned m_channel = 0;             /**< hardware channel number */
     std::vector<WFSample> m_data;       /**< waveform samples */
@@ -200,7 +200,7 @@ namespace Belle2 {
     std::vector<unsigned short> m_windows; /**< ASIC window numbers */
     unsigned short m_refWindow = 0; /**< reference ASIC window number */
 
-    ClassDef(TOPWaveform, 3); /**< ClassDef */
+    ClassDef(TOPWaveform, 4); /**< ClassDef */
 
   };
 

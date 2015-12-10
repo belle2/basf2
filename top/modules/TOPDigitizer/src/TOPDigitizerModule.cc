@@ -66,7 +66,7 @@ namespace Belle2 {
     addParam("electronicEfficiency", m_electronicEfficiency,
              "electronic efficiency", 1.0);
     addParam("darkNoise", m_darkNoise,
-             "uniformly distributed dark noise (hits per bar)", 0.0);
+             "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
              "trigger T0 resolution [ns]", 0.0);
 
@@ -162,7 +162,7 @@ namespace Belle2 {
       double time = simHit.getTime() + generateTTS() - startTime;
 
       // add time to digitizer of a given pixel
-      TimeDigitizer digitizer(simHit.getBarID(), pixelID);
+      TimeDigitizer digitizer(simHit.getModuleID(), pixelID);
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, &simHit);
@@ -170,17 +170,17 @@ namespace Belle2 {
 
     // add randomly distributed dark noise
     if (m_darkNoise > 0) {
-      int numBars = m_topgp->getNbars();
+      int numModules = m_topgp->getNbars();
       int numPixels = m_topgp->getNpmtx() * m_topgp->getNpmty() *
                       m_topgp->getNpadx() * m_topgp->getNpady();
       double timeMin = m_topgp->getTime(0);
       double timeMax = m_topgp->getTime(m_topgp->TDCoverflow() - 1);
-      for (int barID = 1; barID <= numBars; barID++) {
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
           double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
-          TimeDigitizer digitizer(barID, pixelID);
+          TimeDigitizer digitizer(moduleID, pixelID);
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time);

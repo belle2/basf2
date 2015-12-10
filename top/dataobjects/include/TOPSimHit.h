@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSIMHIT_H
-#define TOPSIMHIT_H
+#pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <TObject.h>
@@ -30,20 +29,12 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    TOPSimHit():
-      SimHitBase(),
-      m_barID(0),
-      m_pmtID(0),
-      m_x(0.0),
-      m_y(0.0),
-      m_globalTime(0.0),
-      m_energy(0.0)
-    {
-    }
+    TOPSimHit(): SimHitBase()
+    {}
 
     /**
      * Full constructor.
-     * @param barID       bar ID
+     * @param moduleID    module ID
      * @param pmtID       PMT ID
      * @param xLocal      detection position x in local PMT frame
      * @param yLocal      detection position y in local PMT frame
@@ -51,7 +42,7 @@ namespace Belle2 {
      * @param energy_eV   photon energy in [eV]
      */
     TOPSimHit(
-      int barID,
+      int moduleID,
       int pmtID,
       double xLocal,
       double yLocal,
@@ -59,7 +50,7 @@ namespace Belle2 {
       double energy_eV
     ): SimHitBase()
     {
-      m_barID = barID;
+      m_moduleID = moduleID;
       m_pmtID = pmtID;
       m_x = (float) xLocal;
       m_y = (float) yLocal;
@@ -68,49 +59,49 @@ namespace Belle2 {
     }
 
     /**
-     * Get bar ID
-     * @return bar ID
+     * Returns module ID
+     * @return module ID
      */
-    int getBarID() const { return m_barID; }
+    int getModuleID() const { return m_moduleID; }
 
     /**
-     * Get PMT ID
+     * Returns PMT ID
      * @return PMT ID
      */
     int getPmtID() const { return m_pmtID; }
 
     /**
-     * Get local position of hit (in PMT frame)
+     * Returns local position of hit (in PMT frame)
      * @return local position
      */
     TVector2 getPosition() const { return TVector2(m_x, m_y); }
 
     /**
-     * Get local x position of hit (in PMT frame)
+     * Returns local x position of hit (in PMT frame)
      * @return local x position
      */
     double getX() const { return m_x; }
 
     /**
-     * Get local y position of hit (in PMT frame)
+     * Returns local y position of hit (in PMT frame)
      * @return local y position
      */
     double getY() const { return m_y; }
 
     /**
-     * Get detection time
+     * Returns detection time
      * @return detection time
      */
     double getTime() const { return m_globalTime; }
 
     /**
-     * Get detection time (implementation of base class function)
+     * Returns detection time (implementation of base class function)
      * @return detection time
      */
     float getGlobalTime() const { return m_globalTime; }
 
     /**
-     * Get photon energy
+     * Returns photon energy
      * @return photon energy in [eV]
      */
     double getEnergy() const { return m_energy; }
@@ -123,18 +114,17 @@ namespace Belle2 {
 
   private:
 
-    int m_barID;          /**< bar ID */
-    int m_pmtID;          /**< PMT ID */
-    float m_x;            /**< detection position in local PMT frame, x component */
-    float m_y;            /**< detection position in local PMT frame, y component */
-    float m_globalTime;   /**< detection time */
-    float m_energy;       /**< photon energy in [eV] */
+    int m_moduleID = 0;       /**< TOP module ID */
+    int m_pmtID = 0;          /**< PMT ID */
+    float m_x = 0;            /**< detection position in local PMT frame, x component */
+    float m_y = 0;            /**< detection position in local PMT frame, y component */
+    float m_globalTime = 0;   /**< detection time */
+    float m_energy = 0;       /**< photon energy in [eV] */
 
-    ClassDef(TOPSimHit, 2); /**< ClassDef */
+    ClassDef(TOPSimHit, 3); /**< ClassDef */
 
   };
 
 
 } // end namespace Belle2
 
-#endif

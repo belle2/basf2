@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /**
      * Full constructor
-     * @param barID module ID
+     * @param moduleID module ID
      * @param pixelID pixel (e.g. software channel) ID
      * @param channel hardware channel number
      * @param scrod SCROD ID
@@ -45,7 +45,7 @@ namespace Belle2 {
      * @param electronicName electronic name (e.g. "IRS3B", "IRSX", etc.)
      * @param data waveform ADC values (samples)
      */
-    TOPRawWaveform(int barID,
+    TOPRawWaveform(int moduleID,
                    int pixelID,
                    unsigned channel,
                    unsigned scrod,
@@ -59,7 +59,7 @@ namespace Belle2 {
                    const std::vector<unsigned short>& data):
       m_data(data),  m_electronicName(electronicName)
     {
-      m_barID = barID;
+      m_moduleID = moduleID;
       m_pixelID = pixelID;
       m_channel = channel;
       m_scrodID = scrod & 0xFFFF;
@@ -76,7 +76,7 @@ namespace Belle2 {
      * Returns module ID
      * @return module ID
      */
-    int getBarID() const { return m_barID; }
+    int getModuleID() const { return m_moduleID; }
 
     /**
      * Returns software channel ID (1-based)
@@ -217,7 +217,7 @@ namespace Belle2 {
 
   private:
 
-    int m_barID = 0;                    /**< quartz bar ID */
+    int m_moduleID = 0;                 /**< module ID */
     int m_pixelID = 0;                  /**< software channel ID */
     unsigned m_channel = 0;             /**< hardware channel number */
     unsigned short m_scrodID = 0;       /**< SCROD ID */
@@ -231,7 +231,7 @@ namespace Belle2 {
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
 
-    ClassDef(TOPRawWaveform, 3); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 4); /**< ClassDef */
 
   };
 

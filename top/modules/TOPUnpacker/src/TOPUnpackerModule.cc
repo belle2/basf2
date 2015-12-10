@@ -137,7 +137,7 @@ namespace Belle2 {
       B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
       return;
     }
-    int barID = feemap->getBarID();
+    int moduleID = feemap->getModuleID();
     int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper();
 
@@ -150,7 +150,7 @@ namespace Belle2 {
           unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
           unsigned flags = (word >> 24) & 0xFF;
           int pixelID = mapper.getPixelID(chan);
-          auto* digit = digits.appendNew(barID, pixelID, tdc);
+          auto* digit = digits.appendNew(moduleID, pixelID, tdc);
           digit->setTime(m_topgp->getTime(tdc));
           digit->setChannel(chan);
           digit->setHitQuality((TOPDigit::EHitQuality) flags);
@@ -205,7 +205,7 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    int barID = feemap->getBarID();
+    int moduleID = feemap->getModuleID();
     int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRS3B);
 
@@ -242,7 +242,7 @@ namespace Belle2 {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
         }
-        waveforms.appendNew(barID, pixelID, channel, scrod, freezeDate,
+        waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
                             triggerType, flags, referenceASIC, segmentASIC,
                             mapper.getType(), mapper.getName(), wfdata);
       } // iseg
@@ -258,7 +258,7 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    int barID = feemap->getBarID();
+    int moduleID = feemap->getModuleID();
     int boardstack = feemap->getBoardstackNumber();
     const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
 
@@ -287,7 +287,7 @@ namespace Belle2 {
           int pixelID = mapper.getPixelID(channel);
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
-          waveforms.appendNew(barID, pixelID, channel, scrod, 0,
+          waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
                               trigPattern, 0, lastWriteAddr, segmentASIC,
                               mapper.getType(), mapper.getName(), wfdata);
         } // chan

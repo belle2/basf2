@@ -74,7 +74,7 @@ namespace Belle2 {
          };
 
     std::string m_histogramFileName; /**< output file name for histograms */
-    int m_barID;                     /**< ID of TOP module to calibrate */
+    int m_moduleID;                  /**< TOP module ID to calibrate */
     int m_runLow;          /**< IOV: from run */
     int m_runHigh;         /**< IOV: to run */
 

@@ -8,15 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPSIMPHOTON_H
-#define TOPSIMPHOTON_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
 
 namespace Belle2 {
 
-  /*! Class to store Cherenkov photons at emission and at detection
+  /**
+   * Class to store Cherenkov photons at emission and at detection
    * relation to TOPSimHit
    * filled in top/simulation/src/SensitivePMT.cc
    */
@@ -24,31 +24,15 @@ namespace Belle2 {
   class TOPSimPhoton : public RelationsObject {
   public:
 
-    /*! Default constructor
+    /**
+     * Default constructor
      */
-    TOPSimPhoton():
-      m_barID(0),
-      m_xe(0.0),
-      m_ye(0.0),
-      m_ze(0.0),
-      m_pxe(0.0),
-      m_pye(0.0),
-      m_pze(0.0),
-      m_te(0.0),
-      m_xd(0.0),
-      m_yd(0.0),
-      m_zd(0.0),
-      m_pxd(0.0),
-      m_pyd(0.0),
-      m_pzd(0.0),
-      m_td(0.0),
-      m_length(0.0),
-      m_energy(0.0)
-    {
-    }
+    TOPSimPhoton()
+    {}
 
-    /*!  Full constructor.
-     * @param barID          bar ID
+    /**
+     * Full constructor.
+     * @param moduleID          module ID
      * @param emissionPoint  emission point
      * @param emissionMom    emission momentum (direction)
      * @param emissionTime   emission time
@@ -59,7 +43,7 @@ namespace Belle2 {
      * @param energy_eV      photon energy in [eV]
      */
     TOPSimPhoton(
-      int barID,
+      int moduleID,
       TVector3 emissionPoint,
       TVector3 emissionMom,
       double emissionTime,
@@ -70,7 +54,7 @@ namespace Belle2 {
       double energy_eV
     )
     {
-      m_barID = barID;
+      m_moduleID = moduleID;
       m_xe = (float) emissionPoint.x();
       m_ye = (float) emissionPoint.y();
       m_ze = (float) emissionPoint.z();
@@ -89,78 +73,86 @@ namespace Belle2 {
       m_energy = (float) energy_eV;
     }
 
-    /*! Get bar ID
-     * @return bar ID
+    /**
+     * Returns module ID
+     * @return module ID
      */
-    int getBarID() const { return m_barID; }
+    int getModuleID() const { return m_moduleID; }
 
-    /*! Get emission point
+    /**
+     * Returns emission point
      * @return emission point
      */
     TVector3 getEmissionPoint() const { TVector3 vec(m_xe, m_ye, m_ze); return vec; }
 
-    /*! Get emission momentum direction (unit vector)
+    /**
+     * Returns emission momentum direction (unit vector)
      * @return emission direction vector
      */
     TVector3 getEmissionDir() const
     { TVector3 vec(m_pxe, m_pye, m_pze); return vec.Unit(); }
 
-    /*! Get emission time
+    /**
+     * Returns emission time
      * @return emission time
      */
     double getEmissionTime() const { return m_te; }
 
-    /*! Get detection point
+    /**
+     * Returns detection point
      * @return detection point
      */
     TVector3 getDetectionPoint() const { TVector3 vec(m_xd, m_yd, m_zd); return vec; }
 
-    /*! Get detection momentum direction (unit vector)
+    /**
+     * Returns detection momentum direction (unit vector)
      * @return detection direction
      */
     TVector3 getDetectionDir() const
     { TVector3 vec(m_pxd, m_pyd, m_pzd); return vec.Unit(); }
 
-    /*! Get detection time
+    /**
+     * Returns detection time
      * @return detection time
      */
     double getDetectionTime() const { return m_td; }
 
-    /*! Get propagation length
+    /**
+     * Returns propagation length
      * @return propagation length
      */
     double getLength() const { return m_length; }
 
-    /*! Get photon energy
+    /**
+     * Returns photon energy
      * @return photon energy in [eV]
      */
     double getEnergy() const { return m_energy; }
 
   private:
-    int m_barID;      /**< bar ID */
-    float m_xe;       /**< emission point, x component */
-    float m_ye;       /**< emission point, y component */
-    float m_ze;       /**< emission point, z component */
-    float m_pxe;      /**< emission momentum (direction), x component */
-    float m_pye;      /**< emission momentum (direction), y component */
-    float m_pze;      /**< emission momentum (direction), z component */
-    float m_te;       /**< emission time */
-    float m_xd;       /**< detection point, x component */
-    float m_yd;       /**< detection point, y component */
-    float m_zd;       /**< detection point, z component */
-    float m_pxd;      /**< detection momentum (direction), x component */
-    float m_pyd;      /**< detection momentum (direction), y component */
-    float m_pzd;      /**< detection momentum (direction), z component */
-    float m_td;       /**< detection time */
-    float m_length;   /**< propagation length */
-    float m_energy;   /**< photon energy in [eV] */
+    int m_moduleID = 0;   /**< TOP module ID */
+    float m_xe = 0;       /**< emission point, x component */
+    float m_ye = 0;       /**< emission point, y component */
+    float m_ze = 0;       /**< emission point, z component */
+    float m_pxe = 0;      /**< emission momentum (direction), x component */
+    float m_pye = 0;      /**< emission momentum (direction), y component */
+    float m_pze = 0;      /**< emission momentum (direction), z component */
+    float m_te = 0;       /**< emission time */
+    float m_xd = 0;       /**< detection point, x component */
+    float m_yd = 0;       /**< detection point, y component */
+    float m_zd = 0;       /**< detection point, z component */
+    float m_pxd = 0;      /**< detection momentum (direction), x component */
+    float m_pyd = 0;      /**< detection momentum (direction), y component */
+    float m_pzd = 0;      /**< detection momentum (direction), z component */
+    float m_td = 0;       /**< detection time */
+    float m_length = 0;   /**< propagation length */
+    float m_energy = 0;   /**< photon energy in [eV] */
 
-    ClassDef(TOPSimPhoton, 1); /**< ClassDef */
+    ClassDef(TOPSimPhoton, 2); /**< ClassDef */
 
   };
 
 
 } // end namespace Belle2
 
-#endif
 

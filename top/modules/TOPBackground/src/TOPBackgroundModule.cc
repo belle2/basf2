@@ -260,7 +260,7 @@ namespace Belle2 {
       TOPBarHit* toptrk = topTracks[iHit];
 
       int PDG = toptrk->getPDG();
-      int barID = toptrk->getBarID();
+      int barID = toptrk->getModuleID();
 
       if (PDG == 2112) {
         nflux_bar->Fill(toptrk->getPosition().Z(), (barID - 1) * 22.5,

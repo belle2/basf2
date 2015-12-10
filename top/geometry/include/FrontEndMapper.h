@@ -24,7 +24,7 @@ namespace Belle2 {
 
     /**
      * Provides mapping between electronics module position within a TOP module and
-     * SCROD ID, COPPER and Finesse board
+     * SCROD ID, COPPER and Finesse slot
      */
     class FrontEndMapper {
 
@@ -48,15 +48,15 @@ namespace Belle2 {
 
       /**
        * Return map from TOP module side
-       * @param barID TOP module ID
+       * @param moduleID TOP module ID
        * @param col column
        * @return pointer to map element or NULL
        */
-      const TOPFrontEndMap* getMap(int barID, int col) const
+      const TOPFrontEndMap* getMap(int moduleID, int col) const
       {
-        barID--;
-        if (barID >= 0 and barID < c_numModules and col >= 0 and col < c_numColumns)
-          return m_fromBar[barID][col];
+        moduleID--;
+        if (moduleID >= 0 and moduleID < c_numModules and col >= 0 and col < c_numColumns)
+          return m_fromModule[moduleID][col];
         return 0;
       }
 
@@ -112,9 +112,9 @@ namespace Belle2 {
       std::vector<TOPFrontEndMap> m_mapping; /**< mapping vector */
 
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
-      const TOPFrontEndMap* m_fromBar[c_numModules][c_numColumns]; /**< conversion array */
-      std::map<unsigned short, const TOPFrontEndMap*> m_fromScrod; /**< conversion map */
-      std::map<unsigned int, const TOPFrontEndMap*> m_fromCopper;  /**< conversion map */
+      const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns]; /**< conversion */
+      std::map<unsigned short, const TOPFrontEndMap*> m_fromScrod; /**< conversion */
+      std::map<unsigned int, const TOPFrontEndMap*> m_fromCopper;  /**< conversion */
 
     };
 

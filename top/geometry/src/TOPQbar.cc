@@ -15,9 +15,9 @@ namespace Belle2 {
   namespace TOP {
 
     TOPQbar::TOPQbar(double width, double thickness, double z1, double z2,
-                     double R, double dx, double phi, int barID)
+                     double R, double dx, double phi, int moduleID)
     {
-      m_barID = barID;
+      m_moduleID = moduleID;
       m_width = width;
       m_thickness = thickness;
       m_length = z2 - z1;

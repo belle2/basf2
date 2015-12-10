@@ -39,12 +39,12 @@ namespace Belle2 {
 
     /**
      * Constructor with module ID, hardware channel number and number of ASIC windows
-     * @param barID module ID
+     * @param moduleID module ID
      * @param channel hardware channel number
      * @param numWindows number of active windows per ASIC
      */
-    TOPASICChannel(int barID, unsigned channel, int numWindows):
-      m_barID(barID), m_channel(channel)
+    TOPASICChannel(int moduleID, unsigned channel, int numWindows):
+      m_moduleID(moduleID), m_channel(channel)
     {
       for (int i = 0; i < numWindows; i++) m_pedestals.push_back(NULL);
       setTimeAxis();
@@ -134,7 +134,7 @@ namespace Belle2 {
      * Return module ID
      * @return module ID
      */
-    int getBarID() const {return m_barID;}
+    int getModuleID() const {return m_moduleID;}
 
     /**
      * Return hardware channel number
@@ -201,7 +201,7 @@ namespace Belle2 {
 
   private:
 
-    int m_barID = 0;          /**< bar ID */
+    int m_moduleID = 0;          /**< module ID */
     unsigned m_channel = 0;   /**< hardware channel number */
     float m_timeAxis[c_TimeAxisSize]; /**< differential time axis */
     std::vector<TOPASICPedestals*> m_pedestals; /**< pedestals */
@@ -209,7 +209,7 @@ namespace Belle2 {
 
     TOPASICGains m_defaultGain; /**< default gain */
 
-    ClassDef(TOPASICChannel, 2); /**< ClassDef */
+    ClassDef(TOPASICChannel, 3); /**< ClassDef */
 
   };
 

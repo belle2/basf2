@@ -63,7 +63,7 @@ namespace Belle2 {
     addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string(""));
 
-    addParam("barID", m_barID, "ID of TOP module to calibrate");
+    addParam("moduleID", m_moduleID, "ID of TOP module to calibrate");
 
     addParam("runLow", m_runLow, "IOV:  run lowest", 0);
     addParam("runHigh", m_runHigh, "IOV:  run highest", 0);
@@ -98,7 +98,7 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms;
 
     for (auto& waveform : waveforms) {
-      if (waveform.getBarID() != m_barID) continue;
+      if (waveform.getModuleID() != m_moduleID) continue;
       unsigned channel = waveform.getChannel();
       unsigned window = waveform.getStorageWindow();
       if (channel < c_NumChannels and window < c_NumWindows) {
@@ -186,7 +186,7 @@ namespace Belle2 {
     int badPed = 0;
     int badSampl = 0;
     for (int channel = 0; channel < c_NumChannels; channel++) {
-      new(constants[channel]) TOPASICChannel(m_barID, channel, numWindows);
+      new(constants[channel]) TOPASICChannel(m_moduleID, channel, numWindows);
       auto* channelConstants = static_cast<TOPASICChannel*>(constants[channel]);
       auto* baseline = m_baseline[channel];
       for (int window = 0; window < c_NumWindows; window++) {
@@ -224,7 +224,7 @@ namespace Belle2 {
       if (chan->getNumofGoodWindows() != chan->getNumofWindows()) incomplete++;
     }
 
-    B2RESULT("TOPWFCalibratorModule: bar ID = " << m_barID <<
+    B2RESULT("TOPWFCalibratorModule: module ID = " << m_moduleID <<
              ", number of calibrated channels " << all <<
              " incomplete: " << incomplete <<
              " bad samples: " << badSampl <<

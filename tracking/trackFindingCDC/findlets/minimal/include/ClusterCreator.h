@@ -32,31 +32,16 @@ namespace Belle2 {
       typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
 
     public:
+      /// Constructor adding the filter as a subordinary processing signal listener.
+      ClusterCreator()
+      {
+        addSubordinaryProcessingSignalListener(&m_wireHitRelationFilter);
+      }
+
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
         return "Groups the wire hits into super by expanding the given wire hit relation";
-      }
-
-      /// Signals the beginning of the event processing
-      void initialize() override
-      {
-        Super::initialize();
-        m_wireHitRelationFilter.initialize();
-      }
-
-      /// Signals the beginning of a new event
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_wireHitRelationFilter.beginEvent();
-      }
-
-      /// Signals the end of the event processing
-      void terminate() override
-      {
-        m_wireHitRelationFilter.terminate();
-        Super::terminate();
       }
 
     public:

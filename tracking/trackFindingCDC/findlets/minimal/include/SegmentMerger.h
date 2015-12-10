@@ -35,6 +35,12 @@ namespace Belle2 {
       typedef Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> Super;
 
     public:
+      /// Constructor adding the filter as a subordinary processing signal listener.
+      SegmentMerger()
+      {
+        addSubordinaryProcessingSignalListener(&m_segmentRelationFilter);
+      }
+
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -45,27 +51,6 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList) override final
       {
         m_segmentRelationFilter.exposeParameters(moduleParamList);
-      }
-
-      /// Signals the beginning of the event processing
-      void initialize() override
-      {
-        Super::initialize();
-        m_segmentRelationFilter.initialize();
-      }
-
-      /// Signals the beginning of a new event
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_segmentRelationFilter.beginEvent();
-      }
-
-      /// Signals the end of the event processing
-      void terminate() override
-      {
-        m_segmentRelationFilter.terminate();
-        Super::terminate();
       }
 
     public:

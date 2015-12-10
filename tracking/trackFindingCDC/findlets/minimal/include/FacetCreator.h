@@ -32,6 +32,12 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHitCluster, CDCFacet>;
 
     public:
+      /// Constructor adding the filter as a subordinary processing signal listener.
+      FacetCreator()
+      {
+        addSubordinaryProcessingSignalListener(&m_facetFilter);
+      }
+
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -42,27 +48,6 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList) override final
       {
         m_facetFilter.exposeParameters(moduleParamList);
-      }
-
-      /// Initialize before event processing
-      virtual void initialize() override final
-      {
-        Super::initialize();
-        m_facetFilter.initialize();
-      }
-
-      /// Start processing the current event
-      virtual void beginEvent() override final
-      {
-        Super::beginEvent();
-        m_facetFilter.beginEvent();
-      }
-
-      /// Terminate the event processing
-      virtual void terminate() override final
-      {
-        m_facetFilter.terminate();
-        Super::terminate();
       }
 
       virtual void apply(const std::vector<CDCWireHitCluster>& inputClusters,

@@ -38,6 +38,12 @@ namespace Belle2 {
       using Super = Findlet<const CDCFacet, CDCRecoSegment2D>;
 
     public:
+      /// Constructor adding the filter as a subordinary processing signal listener.
+      SegmentCreatorFacetAutomaton()
+      {
+        addSubordinaryProcessingSignalListener(&m_facetRelationFilter);
+      }
+
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -50,30 +56,9 @@ namespace Belle2 {
         m_facetRelationFilter.exposeParameters(moduleParamList);
       }
 
-      /// Initialize the Module before event processing
-      virtual void initialize() override final
-      {
-        m_facetRelationFilter.initialize();
-        Super::initialize();
-      }
-
-      /// Start processing the current event
-      virtual void beginEvent() override final
-      {
-        Super::beginEvent();
-        m_facetRelationFilter.beginEvent();
-      }
-
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCFacet>& inputFacets,
                          std::vector<CDCRecoSegment2D>& outputSegments) override final;
-
-      /// Terminate the event processing
-      virtual void terminate() override final
-      {
-        m_facetRelationFilter.terminate();
-        Super::terminate();
-      }
 
     private:
       /// Reference to the relation filter to be used to construct the facet network.

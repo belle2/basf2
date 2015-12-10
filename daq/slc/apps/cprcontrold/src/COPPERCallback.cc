@@ -162,9 +162,10 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
     try {
       for (int i = 0; i < 4; i++) {
         const DBObject& o_hslb(obj("hslb", i));
-        if (o_hslb.getBool("used") && m_fee[i] != NULL  && obj.hasObject("fee")) {
+        if (o_hslb.getBool("used") && m_fee[i] != NULL) {
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
+          if (!obj.hasObject("fee")) continue;
           try {
             hslb.test();
             hslb.load();

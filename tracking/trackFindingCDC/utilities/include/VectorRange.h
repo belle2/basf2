@@ -18,5 +18,10 @@ namespace Belle2 {
     template<class T>
     using VectorRange = Range<typename std::vector<T>::iterator>;
 
+    /// A pair of iterators into a constant vector usable with the range base for loop.
+    template<class T>
+    using ConstVectorRange = Range<typename std::vector<T>::const_iterator>;
+
+
   }
 }

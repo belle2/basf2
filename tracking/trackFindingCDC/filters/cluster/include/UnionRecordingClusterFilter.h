@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
@@ -19,11 +20,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitClusters.
-    class UnionRecordingClusterFilter: public UnionRecordingFilter<CDCWireHitCluster> {
+    class UnionRecordingClusterFilter:
+      public UnionRecordingFilter<ClusterFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<CDCWireHitCluster> Super;
+      typedef  UnionRecordingFilter<ClusterFilterFactory> Super;
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.

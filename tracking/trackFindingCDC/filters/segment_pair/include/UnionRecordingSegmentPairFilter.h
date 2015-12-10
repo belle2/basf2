@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segment_pair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
@@ -16,11 +17,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCSegmentPairs.
-    class UnionRecordingSegmentPairFilter: public UnionRecordingFilter<CDCSegmentPair> {
+    class UnionRecordingSegmentPairFilter: public UnionRecordingFilter<SegmentPairFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<CDCSegmentPair> Super;
+      typedef  UnionRecordingFilter<SegmentPairFilterFactory> Super;
 
     public:
       /// Valid names of variable sets for segment pairs.

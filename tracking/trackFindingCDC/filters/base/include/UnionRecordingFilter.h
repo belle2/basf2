@@ -20,16 +20,20 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter based on a tmva method.
-    template<class AObject>
-    class UnionRecordingFilter: public RecordingFilter<UnionVarSet<AObject>> {
+    template<class AFilterFactory>
+    class UnionRecordingFilter:
+      public RecordingFilter<UnionVarSet<typename AFilterFactory::CreatedFilter::Object> > {
 
     private:
       /// Type of the super class
-      typedef RecordingFilter<UnionVarSet<AObject>> Super;
+      typedef RecordingFilter<UnionVarSet<typename AFilterFactory::CreatedFilter::Object> > Super;
+
+      /// Type of the filters that can be included in the recodring
+      typedef typename AFilterFactory::CreatedFilter CreatedFilter;
 
     public:
       /// Type of the object to be analysed.
-      typedef AObject Object;
+      typedef typename CreatedFilter::Object Object;
 
     public:
       /// Constructor of the filter.
@@ -122,13 +126,13 @@ namespace Belle2 {
           B2INFO("Detected filter name");
           std::string filterName = name.substr(7, name.size() - 8);
           B2INFO("filterName = " << filterName);
-          std::unique_ptr<Filter<Object>> filter = m_filterFactory.create(filterName);
+          std::unique_ptr<CreatedFilter> filter = m_filterFactory.create(filterName);
           if (not filter) {
             B2WARNING("Could not construct filter for name " << filterName);
             return std::unique_ptr<BaseVarSet<Object>>(nullptr);
           } else {
             std::string prefix = filterName + "_";
-            BaseVarSet<Object>* filterVarSet = new FilterVarSet<Filter<Object>>(prefix,
+            BaseVarSet<Object>* filterVarSet = new FilterVarSet<CreatedFilter>(prefix,
                 std::move(filter));
             return std::unique_ptr<BaseVarSet<Object> >(filterVarSet);
           }
@@ -154,7 +158,7 @@ namespace Belle2 {
       std::string m_commaSeparatedVarSetNames;
 
       /// FilterFactory
-      FilterFactory<Filter<Object>> m_filterFactory;
+      AFilterFactory m_filterFactory;
 
     };
   }

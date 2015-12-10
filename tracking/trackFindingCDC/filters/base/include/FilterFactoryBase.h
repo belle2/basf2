@@ -30,6 +30,10 @@ namespace Belle2 {
     class FilterFactoryBase {
 
     public:
+      /// Type of the filter that this factory creates.
+      typedef AFilter CreatedFilter;
+
+    public:
       /** Fill the default filter name and parameter values*/
       FilterFactoryBase(std::string filterName,
                         std::map<std::string, std::string> filterParameters

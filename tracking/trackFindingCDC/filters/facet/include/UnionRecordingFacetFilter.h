@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
@@ -16,11 +17,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitFacets.
-    class UnionRecordingFacetFilter: public UnionRecordingFilter<CDCFacet> {
+    class UnionRecordingFacetFilter: public UnionRecordingFilter<FacetFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<CDCFacet> Super;
+      typedef  UnionRecordingFilter<FacetFilterFactory> Super;
 
     public:
       /// Valid names of variable sets for facets.

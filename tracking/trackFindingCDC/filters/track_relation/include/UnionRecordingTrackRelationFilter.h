@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/track_relation/TrackRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/track_relation/BaseTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
@@ -17,11 +18,11 @@ namespace Belle2 {
 
     /// Records the encountered relations between tracks.
     class UnionRecordingTrackRelationFilter:
-      public UnionRecordingFilter<Relation<CDCTrack> > {
+      public UnionRecordingFilter<TrackRelationFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<Relation<CDCTrack> > Super;
+      typedef  UnionRecordingFilter<TrackRelationFilterFactory> Super;
 
     public:
       /// Valid names of variable sets for tracks.

@@ -345,7 +345,8 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
 
         CDCRecoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D
-        rightLeftWireHit = wireHitTopology.getRLWireHit(cdcHit, rlInfo)
+        wireHit = wireHitTopology.getWireHit(cdcHit)
+        rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLTaggedWireHit(wireHit, rlInfo)
         if rightLeftWireHit.getStereoType() != 0:
             recoHit = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
             return recoHit
@@ -446,23 +447,23 @@ class StereoQuadTreePlotter(QuadTreePlotter):
             last_track = track_vector[-1]
             trajectory = last_track.getStartTrajectory3D().getTrajectory2D()
 
-            for rlWireHit in wireHitTopology.getRLWireHits():
+            for wireHit in wireHitTopology.getWireHits():
+                for rlInfo in (-1, 1):
+                    recoHit = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
 
-                recoHit = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(rlWireHit, trajectory)
+                    if (self.delete_bad_hits and
+                        (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
+                         not recoHit.isInCellZBounds())):
+                        continue
 
-                if (self.delete_bad_hits and
-                    (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
-                     not recoHit.isInCellZBounds())):
-                    continue
-
-                if recoHit in list(last_track.items()):
-                    color = map[len(track_vector) % len(map)]
-                else:
-                    if rlWireHit.getRLInfo() == 1:
-                        color = "black"
+                    if recoHit in list(last_track.items()):
+                        color = map[len(track_vector) % len(map)]
                     else:
-                        color = "gray"
-                self.plot_hit_line(recoHit, color)
+                        if rlWireHit.getRLInfo() == 1:
+                            color = "black"
+                        else:
+                            color = "gray"
+                    self.plot_hit_line(recoHit, color)
 
         plt.xlabel(r"$\tan \ \lambda$")
         plt.ylabel(r"$z_0$")

@@ -4,6 +4,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <utility>
@@ -12,22 +13,23 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  /** Returns a bool if the rlWire can be used as a stereo hit. */
+  bool isValidStereoHit(const CDCWireHit& wireHit)
+  {
+    return not(wireHit.getStereoType() == StereoType::c_Axial or wireHit.getAutomatonCell().hasTakenFlag());
+    // TODO Check for number of layers in between
+  }
 
-/** Returns a bool if the rlWire can be used as a stereo hit. */
-bool isValidStereoHit(const CDCRLWireHit& rlWireHit)
-{
-  return not(rlWireHit.getStereoType() == StereoType::c_Axial or rlWireHit.getWireHit().getAutomatonCell().hasTakenFlag());
-  // TODO Check for number of layers in between
+  /** Returns a bool if the segment can be used as a stereo hit. */
+  bool isValidStereoSegment(const CDCRecoSegment2D& segment)
+  {
+    // Skip axial segments
+    return not(segment.getStereoType() == StereoType::c_Axial or segment.isFullyTaken());
+  }
 }
 
-/** Returns a bool if the segment can be used as a stereo hit. */
-bool isValidStereoSegment(const CDCRecoSegment2D& segment)
-{
-  // Skip axial segments
-  return not(segment.getStereoType() == StereoType::c_Axial or segment.isFullyTaken());
-}
-
-void StereoHitsProcesser::reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
+void StereoHitsProcesser::reconstructHit(const CDCRLTaggedWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
                                          const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const
 {
   Vector3D recoPos3D = rlWireHit.reconstruct3D(trackTrajectory);
@@ -97,12 +99,16 @@ void StereoHitsProcesser::fillHitsVector(std::vector<CDCRecoHit3D>& hitsVector, 
   const bool isCurler = trajectory2D.getOuterExit().hasNAN();
 
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const auto& rlWireHits = wireHitTopology.getRLWireHits();
-  hitsVector.reserve(rlWireHits.size());
+  const auto& wireHits = wireHitTopology.getWireHits();
+  hitsVector.reserve(2 * wireHits.size());
 
-  for (const CDCRLWireHit& rlWireHit : rlWireHits) {
-    if (isValidStereoHit(rlWireHit)) {
-      reconstructHit(rlWireHit, hitsVector, trajectory2D, isCurler, radius);
+  for (const CDCWireHit& wireHit : wireHits) {
+    // Try reconstucting the hit with left passage
+    for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+      if (isValidStereoHit(wireHit)) {
+        CDCRLTaggedWireHit rlWireHit(&wireHit, rlInfo);
+        reconstructHit(rlWireHit, hitsVector, trajectory2D, isCurler, radius);
+      }
     }
   }
 }

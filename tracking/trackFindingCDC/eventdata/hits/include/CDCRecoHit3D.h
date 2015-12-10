@@ -46,6 +46,13 @@ namespace Belle2 {
                    const Vector3D& position,
                    double perpS = 0);
 
+      /// Constructor taking all stored variables of the reconstructed hit.
+      CDCRecoHit3D(const CDCWireHit* wireHit,
+                   ERightLeft rlInfo,
+                   const Vector3D& position,
+                   double perpS = 0);
+
+
       /// Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
       /** This translates the sim hit to a reconstructed hit mainly to be able to compare the
        *  reconstructed values from the algorithm with the Monte Carlo information.
@@ -74,6 +81,13 @@ namespace Belle2 {
       static CDCRecoHit3D reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                       const CDCTrajectory2D& trajectory2D);
 
+      /** Reconstructs the three dimensional hit from the wire hit and the given right left passage
+       *  information by shifting it to a z coordinate, where it touches the two dimensional trajectory
+       *  from the side indicated by the right left passage.*/
+      static CDCRecoHit3D reconstruct(const CDCWireHit* wireHit,
+                                      ERightLeft rlInfo,
+                                      const CDCTrajectory2D& trajectory2D);
+
       /**
        * Reconstruct a three dimensional hit from a wire hit (as in reconstruct(rlWireHit, trajectory2D)), but this time use a
        * wire hit without a right-left information as an input. The right-left information is chosen to be consistent with the
@@ -82,7 +96,7 @@ namespace Belle2 {
        * WARNING: This function is only to be used with axial hits (and asserts this). The corresponding rl-wire hit is taken
        * from the CDCWireHitTopology object.
        */
-      static CDCRecoHit3D reconstructNearest(const CDCWireHit& wireHit,
+      static CDCRecoHit3D reconstructNearest(const CDCWireHit* wireHit,
                                              const CDCTrajectory2D& trackTrajectory2D);
 
       /// Reconstructs the three dimensional hit from the two dimensional,

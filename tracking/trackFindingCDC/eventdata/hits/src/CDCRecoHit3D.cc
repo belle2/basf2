@@ -29,6 +29,17 @@ CDCRecoHit3D::CDCRecoHit3D(const CDCRLTaggedWireHit& rlWireHit,
 {
 }
 
+CDCRecoHit3D::CDCRecoHit3D(const CDCWireHit* wireHit,
+                           ERightLeft rlInfo,
+                           const Vector3D& recoPos3D,
+                           double perpS) :
+  m_rlWireHit(wireHit, rlInfo),
+  m_recoPos3D(recoPos3D),
+  m_arcLength2D(perpS)
+{
+}
+
+
 CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
                                       const CDCSimHit& simHit)
 {
@@ -50,6 +61,14 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
   return CDCRecoHit3D(recoHit2D.getRLWireHit(), recoPos3D, perpS);
 }
 
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
+                                       ERightLeft rlInfo,
+                                       const CDCTrajectory2D& trajectory2D)
+{
+  Vector3D recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
+  double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
+  return CDCRecoHit3D(wireHit, rlInfo, recoPos3D, perpS);
+}
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLTaggedWireHit& rlWireHit,
                                        const CDCTrajectory2D& trajectory2D)
@@ -92,11 +111,12 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
   B2FATAL("Reconstruction on invalid wire");
 }
 
-CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit& wireHit, const CDCTrajectory2D& trackTrajectory2D)
+CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit* wireHit,
+                                              const CDCTrajectory2D& trackTrajectory2D)
 {
-  B2ASSERT(wireHit.isAxial(), "This function can only be used with axial hits.");
-  ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit.getRefPos2D());
-  CDCRLTaggedWireHit rlWireHit(&wireHit, rlInfo);
+  B2ASSERT(wireHit->isAxial(), "This function can only be used with axial hits.");
+  ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
+  CDCRLTaggedWireHit rlWireHit(wireHit, rlInfo);
   return CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 }
 

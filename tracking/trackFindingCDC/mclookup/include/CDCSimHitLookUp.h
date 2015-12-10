@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
@@ -76,7 +75,7 @@ namespace Belle2 {
 
     public:
       /// Retrieve the wire hit including right left passage information from Monte Carlo from the wire hit topology.
-      const CDCRLWireHit* getRLWireHit(const CDCHit* ptrHit) const;
+      CDCRLTaggedWireHit getRLWireHit(const CDCHit* ptrHit) const;
 
       /// Construct an CDCRecoHit3D from the (potential secondary) CDCSimHit information related to the CDCHit.
       CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit) const;

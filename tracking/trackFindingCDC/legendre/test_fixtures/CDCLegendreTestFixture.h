@@ -105,7 +105,7 @@ namespace Belle2 {
         for (const CDCWireHit* item : trackHitList) {
           if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
 
-          const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*item, trackTrajectory2D);
+          const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(item, trackTrajectory2D);
           resultTrackCandidate.push_back(std::move(cdcRecoHit3D));
         }
 

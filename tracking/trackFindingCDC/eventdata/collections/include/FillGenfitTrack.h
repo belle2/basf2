@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 

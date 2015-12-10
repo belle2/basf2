@@ -23,7 +23,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <framework/gearbox/Const.h>

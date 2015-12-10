@@ -138,7 +138,7 @@ namespace Belle2 {
 
           if (chi2New < chi2 * 2.) {
             for (const CDCWireHit* hit : newAssignedHits) {
-              const CDCRecoHit3D& cdcRecoHit3D  = CDCRecoHit3D::reconstructNearest(*hit, trackTrajectory2D);
+              const CDCRecoHit3D& cdcRecoHit3D  = CDCRecoHit3D::reconstructNearest(hit, trackTrajectory2D);
               track.push_back(std::move(cdcRecoHit3D));
               cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
             }

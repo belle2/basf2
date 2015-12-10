@@ -18,8 +18,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRLWireHit;
     class CDCTrajectory2D;
+    class CDCRLTaggedWireHit;
     class CDCRecoHit3D;
     class CDCRecoSegment2D;
 
@@ -132,7 +132,7 @@ namespace Belle2 {
        * WARNING: We *create* CDCRecoHit3Ds here as pointers, but the ownership is handles over to the list.
        * Please delete the hits by yourself.
        */
-      void reconstructHit(const CDCRLWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
+      void reconstructHit(const CDCRLTaggedWireHit& rlWireHit, std::vector<CDCRecoHit3D>& hitsVector,
                           const CDCTrajectory2D& trackTrajectory, const bool isCurler, const double radius) const;
 
       /// Parameters

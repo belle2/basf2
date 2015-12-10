@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <iterator>
@@ -189,29 +189,6 @@ namespace Belle2 {
         const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
         const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
         return append(wireHit, rlInfo);
-      }
-
-      /** Appends the hit circle at wire reference position with a right left passage hypotheses.
-       *  \note Observations are skipped, if one of the contained variables is NAN.
-       *  \note The left right passage information is always set to the right left passage hypotheses of the give hit.
-       *  @param wireHit      Hit information to be appended as observation.
-       *                      XY position, signed drift length and inverse variance
-       *                      are taken at the wire reference position.
-       *  @return             Number of observations added. One if the observation was added.
-       *                      Zero if one of the given variables is NAN.
-       */
-      size_t append(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit)
-      {
-        const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
-        if (m_useDriftVariance) {
-          const double signedDriftLength = rlWireHit.getSignedRefDriftLength();
-          const double weight = 1.0 / rlWireHit.getRefDriftLengthVariance();
-          return append(wireRefPos2D, signedDriftLength, weight);
-        } else {
-          const double driftLength = fabs(rlWireHit.getRefDriftLength());
-          const double weight = 1.0 / driftLength;
-          return append(wireRefPos2D, 0, weight);
-        }
       }
 
       /// Appends the two observed position

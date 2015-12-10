@@ -54,17 +54,17 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
     for (const ConformalCDCWireHit* hit : axialHitList) {
       if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
 
-      ERightLeft rlInfo = ERightLeft::c_Right;
-      if (trackTrajectory2D.getDist2D(hit->getCDCWireHit()->getRefPos2D()) < 0)
-        rlInfo = ERightLeft::c_Left;
-      const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(hit->getCDCWireHit()->getHit(), rlInfo);
-      if (rlWireHit->getWireHit().getAutomatonCell().hasTakenFlag())
+      ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getCDCWireHit()->getRefPos2D());
+      // Is this lookup really necessary?
+      const CDCWireHit* wireHit = wireHitTopology.getWireHit(hit->getCDCWireHit()->getHit());
+      CDCRLTaggedWireHit rlWireHit(wireHit, rlInfo);
+      if (wireHit->getAutomatonCell().hasTakenFlag())
         continue;
 
       //        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
       //          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
 
-      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 
       if (fabs(trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D())) < 0.1) {
         trackCandidate.push_back(std::move(cdcRecoHit3D));
@@ -310,7 +310,7 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<Confo
       continue;
     }
 
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(*(hit.getCDCWireHit()), trackTrajectory2D);
+    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(hit.getCDCWireHit(), trackTrajectory2D);
     const Vector2D& recoPos2D = cdcRecoHit3D.getRecoPos2D();
 
     if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimal_distance_to_track) {

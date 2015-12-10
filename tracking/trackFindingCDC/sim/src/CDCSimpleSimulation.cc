@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -141,9 +141,8 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
     CDCTrack& mcTrack = mcTracks[simpleSimHit.m_iMCTrack];
 
-    const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(wireHit, simpleSimHit.m_rlInfo);
-
-    CDCRecoHit3D recoHit3D(*rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
+    CDCRLTaggedWireHit rlWireHit(&wireHit, simpleSimHit.m_rlInfo);
+    CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
     mcTrack.push_back(recoHit3D);
   }
 

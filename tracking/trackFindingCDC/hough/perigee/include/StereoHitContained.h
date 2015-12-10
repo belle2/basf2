@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/RLTagged.h>
 
 #include <tracking/trackFindingCDC/numerics/Sign.h>
@@ -116,21 +114,6 @@ namespace Belle2 {
 
         rlTaggedWireHit.setRLInfo(newRLInfo);
         return isValid(newRLInfo) ? 1.0 + std::abs(newRLInfo) * m_rlWeightGain : NAN;
-      }
-
-
-      /** Checks if the track hit is contained in a phi0 curv hough space.
-       *  Returns 1.0 if it is contained, returns NAN if it is not contained.
-       *  Accepts if either the right passage hypothesis or the left passage hypothesis
-       *  is in the hough box.
-       */
-      inline Weight operator()(const CDCRLWireHit* const& rlWireHit,
-                               const HoughBox* const& houghBox)
-      {
-        const CDCWire& wire = rlWireHit->getWire();
-        const double signedDriftLength = rlWireHit->getSignedRefDriftLength();
-        bool isIn = contains(*houghBox, wire, signedDriftLength);
-        return isIn ? 1.0 + m_rlWeightGain : NAN;
       }
 
       /** Checks if a wire hit at a drift length is contained in the hough space part

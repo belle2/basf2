@@ -16,9 +16,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
@@ -48,9 +46,6 @@ namespace Belle2 {
     public:
       /// A Range of const CDCWireHits - usable with range based for
       typedef Range<std::vector<Belle2::TrackFindingCDC::CDCWireHit>::const_iterator> CDCWireHitRange;
-
-      /// A Range of const CDCLRWireHits - usable with range based for
-      typedef Range<std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>::const_iterator> CDCRLWireHitRange;
 
       /// Getter of the singletone instance
       static CDCWireHitTopology& getInstance();
@@ -103,38 +98,14 @@ namespace Belle2 {
         return useAllBut(iHits);
       }
 
-      /// Getter for the oriented wire hit with the opposite orientation.
-      const Belle2::TrackFindingCDC::CDCRLWireHit*
-      getReverseOf(const Belle2::TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
-
       /// Getter for the wire hit that is based on the given CDCHit.
       const Belle2::TrackFindingCDC::CDCWireHit*
       getWireHit(const Belle2::CDCHit* ptrHit) const;
-
-      /// Getter for the two oriented wire hits that are based on the given wire hit
-      std::pair<const Belle2::TrackFindingCDC::CDCRLWireHit*,
-          const Belle2::TrackFindingCDC::CDCRLWireHit*>
-          getRLWireHitPair(const Belle2::TrackFindingCDC::CDCWireHit& wireHit) const;
-
-      /// Getter for the oriented wire hit that is based on the given wire hit with a specific right left passage hypotheses.
-      const Belle2::TrackFindingCDC::CDCRLWireHit*
-      getRLWireHit(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                   const ERightLeft rlInfo) const;
-
-      /// Getter for the oriented wire hit that is based on the given CDCHit with a specific right left passage hypotheses.
-      const Belle2::TrackFindingCDC::CDCRLWireHit*
-      getRLWireHit(const Belle2::CDCHit* ptrHit,
-                   const ERightLeft rlInfo) const;
 
       /// Getter for a coaligned subrange of wire hits.
       template<class ACoaligned>
       CDCWireHitRange getWireHits(const ACoaligned& coaligned) const
       { return std::equal_range(getWireHits().begin(), getWireHits().end(), coaligned); }
-
-      /// Getter for a coaligned subrange of oriented wire hits
-      template<class ACoaligned>
-      CDCRLWireHitRange getRLWireHits(const ACoaligned& coaligned) const
-      { return std::equal_range(getRLWireHits().begin(), getRLWireHits().end(), coaligned); }
 
       /// Constant getter for the wire hits
       const std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits() const
@@ -144,10 +115,6 @@ namespace Belle2 {
       std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits()
       { return m_wireHits; }
 
-      /// Getter for the wire hits
-      const std::vector<Belle2::TrackFindingCDC::CDCRLWireHit>& getRLWireHits() const
-      { return m_rlWireHits; }
-
       /// Getter for the tdc count translator that was used at the beginning of the event.
       CDC::TDCCountTranslatorBase& getTDCCountTranslator()
       { return *m_initialTDCCountTranslator; }
@@ -155,9 +122,6 @@ namespace Belle2 {
     private:
       /// Memory for the wire hits to be stored
       std::vector<CDCWireHit> m_wireHits; //!
-
-      /// Memory for the oriented wire hits to be stored
-      std::vector<CDCRLWireHit> m_rlWireHits; //!
 
       /// Reference of the tdc count translator used at the beginning of this event.
       CDC::TDCCountTranslatorBase* m_initialTDCCountTranslator; //!

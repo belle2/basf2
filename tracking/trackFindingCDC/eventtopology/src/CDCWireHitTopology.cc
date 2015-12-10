@@ -183,52 +183,13 @@ void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
   if (not std::is_sorted(m_wireHits.begin(), m_wireHits.end())) {
     B2ERROR("Wire hits are not sorted after creation");
   }
-
-  m_rlWireHits.reserve(m_rlWireHits.size() + 2 * wireHits.size());
-  for (const CDCWireHit& wireHit : m_wireHits) {
-    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Left));
-    m_rlWireHits.push_back(CDCRLWireHit(&wireHit, ERightLeft::c_Right));
-  }
-
-  if (not std::is_sorted(m_rlWireHits.begin(), m_rlWireHits.end())) {
-    B2ERROR("Oriented wire hits are not sorted after creation");
-  }
 }
 
 
 void CDCWireHitTopology::clear()
 {
-  m_rlWireHits.clear();
   m_wireHits.clear();
 }
-
-
-const CDCRLWireHit*
-CDCWireHitTopology::getReverseOf(const CDCRLWireHit& rlWireHit) const
-{
-  auto itRLWireHit = unique_lower_bound_fast(m_rlWireHits.begin(),
-                                             m_rlWireHits.end(),
-                                             rlWireHit);
-
-  if (itRLWireHit == m_rlWireHits.end()) {
-    B2ERROR("An oriented wire hit can not be found in the CDCWireHitTopology.");
-    return nullptr;
-  }
-  if (rlWireHit.getRLInfo() == ERightLeft::c_Right) {
-    // The oriented wire hit with left passage is stored in the vector just before this one -- see above in fill()
-    --itRLWireHit;
-
-  } else if (rlWireHit.getRLInfo() == ERightLeft::c_Left) {
-    // The oriented wire hit with right passage is stored in the vector just after this one -- see above in fill()
-    ++itRLWireHit;
-  } else {
-    B2ERROR("An oriented wire hit does not have the right left passage variable assigned correctly.");
-  }
-
-  return &*itRLWireHit;
-
-}
-
 
 /// Getter for the wire hit that is based on the given CDCHit.
 const CDCWireHit* CDCWireHitTopology::getWireHit(const CDCHit* ptrHit) const
@@ -245,48 +206,4 @@ const CDCWireHit* CDCWireHitTopology::getWireHit(const CDCHit* ptrHit) const
   const CDCWireHit& wireHit =  wireHitRange.front();
   return &wireHit;
 
-}
-
-
-
-
-
-std::pair<const CDCRLWireHit*, const CDCRLWireHit*>
-CDCWireHitTopology::getRLWireHitPair(const CDCWireHit& wireHit) const
-{
-  auto itWireHit = unique_lower_bound_fast(m_wireHits.begin(), m_wireHits.end(), wireHit);
-
-  if (itWireHit == m_wireHits.end()) {
-    B2ERROR("A wire hit can not be found in the CDCWireHitTopology.");
-    return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(nullptr, nullptr);
-  }
-
-  size_t idxWireHit = std::distance(m_wireHits.begin(), itWireHit);
-
-  size_t idxLeftWireHit = 2 * idxWireHit;
-  size_t idxRightWireHit = idxLeftWireHit + 1;
-
-  const CDCRLWireHit& leftWireHit = m_rlWireHits[idxLeftWireHit];
-  const CDCRLWireHit& rightWireHit = m_rlWireHits[idxRightWireHit];
-  return std::pair<const CDCRLWireHit*, const CDCRLWireHit*>(&leftWireHit, &rightWireHit);
-}
-
-const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const CDCWireHit& wireHit,
-                                                     const ERightLeft rlInfo) const
-{
-
-  std::pair<const CDCRLWireHit*, const CDCRLWireHit*> rlWireHitPair = getRLWireHitPair(wireHit);
-  if (rlInfo == ERightLeft::c_Left) {
-    return rlWireHitPair.first;
-  } else {
-    return rlWireHitPair.second;
-  }
-
-}
-
-const CDCRLWireHit* CDCWireHitTopology::getRLWireHit(const Belle2::CDCHit* ptrHit,
-                                                     const ERightLeft rlInfo) const
-{
-  const CDCWireHit* ptrWireHit = getWireHit(ptrHit);
-  return  ptrWireHit ? getRLWireHit(*ptrWireHit, rlInfo) : nullptr;
 }

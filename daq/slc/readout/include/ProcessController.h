@@ -30,7 +30,7 @@ namespace Belle2 {
     }
 
   public:
-    bool init(const std::string& name, int nodeid = 0);
+    bool init(const std::string& parname, int nodeid = 0);
     void clear();
     bool load(int timeout);
     bool start(int expno, int runno);
@@ -39,6 +39,7 @@ namespace Belle2 {
     bool stop();
     bool abort();
     const std::string& getName() { return m_name; }
+    const std::string& getParName() { return m_parname; }
     const std::string& getExecutable() { return m_exename; }
     RunInfoBuffer& getInfo() { return m_info; }
     RCCallback* getCallback() { return m_callback; }
@@ -62,6 +63,7 @@ namespace Belle2 {
   private:
     RunInfoBuffer m_info;
     std::string m_name;
+    std::string m_parname;
     RCCallback* m_callback;
     std::string m_exename;
     std::vector<std::string> m_arg_v;

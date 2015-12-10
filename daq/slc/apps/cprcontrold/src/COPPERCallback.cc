@@ -39,7 +39,7 @@ COPPERCallback::~COPPERCallback() throw()
 void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   allocData(getNode().getName(), "ronode_status", ronode_status_revision);
-  m_con.init("cprbasf2_" + getNode().getName(), 1);
+  m_con.init("basf2", 1);
   if (!m_dummymode) {
     m_ttrx.open();
     m_copper.open();
@@ -366,7 +366,8 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     m_con.addArgument(StringUtil::form("%d", copperid));
     m_con.addArgument(StringUtil::form("%d", flag));
     m_con.addArgument("1");
-    m_con.addArgument("cprbasf2_" + getNode().getName());
+    const std::string nodename = StringUtil::tolower(getNode().getName());
+    m_con.addArgument(nodename + "_" + "basf2");
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException(e.what()));
   }

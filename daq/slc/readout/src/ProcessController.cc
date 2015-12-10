@@ -7,20 +7,23 @@
 #include "daq/slc/system/PThread.h"
 #include "daq/slc/system/LogFile.h"
 
+#include "daq/slc/base/StringUtil.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
 
 using namespace Belle2;
 
-bool ProcessController::init(const std::string& name_in,
-                             int nodeid)
+bool ProcessController::init(const std::string& parname, int nodeid)
 {
-  m_name = (name_in.size() > 0) ? name_in : m_callback->getNode().getName();
+  m_name = StringUtil::tolower(m_callback->getNode().getName());
+  m_parname = parname;
   LogFile::open(m_name);
-  if (!m_info.open(m_name, nodeid, true)) {
+  if (!m_info.open(m_name + "_" + m_parname, nodeid, true)) {
     return false;
   }
+  m_callback->add(new NSMVHandlerInt(m_parname + ".pid", true, false, 0));
   return true;
 }
 
@@ -57,6 +60,7 @@ bool ProcessController::load(int timeout)
       return false;
     }
   }
+  m_callback->set(m_parname + ".pid", m_process.get_id());
   return true;
 }
 
@@ -121,6 +125,7 @@ bool ProcessController::abort()
     m_process.kill(SIGQUIT);
     m_process.kill(SIGKILL);
   }
+  m_callback->set(m_parname + ".pid", -1);
   return true;
 }
 

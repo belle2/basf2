@@ -54,6 +54,8 @@ bool EB0Controller::loadArguments(const DBObject& obj)
     m_callback->get(m_callback->getRC(), host + ".used", used);
     if (used) {
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : host.c_str()), port);
+      //const std::string nodename = StringUtil::tolower(m_callback->getNode().getName());
+      //m_con.addArgument(nodename+"_"+m_name);
     }
   }
   return true;

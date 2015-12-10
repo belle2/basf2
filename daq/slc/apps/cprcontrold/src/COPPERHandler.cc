@@ -253,7 +253,7 @@ bool NSMVHandlerHSLBRegFixed::handleGetInt(int& val)
 
 bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
 {
-  if (val > 0) {
+  if (val.size() > 0) {
     LogFile::info("Test HSLB:%c", m_hslb + 'a');
     try {
       val = m_callback.getHSLB(m_hslb).test();

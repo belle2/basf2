@@ -84,9 +84,7 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
   try {
     const DBObjectList& stream0(obj.getObjects("stream0"));
     m_eb0.init(this, 0, "eb0", obj);
-    add(new NSMVHandlerROPID(m_eb0, "eb0.pid"));
     m_stream1.init(this, 1, "stream1", obj);
-    add(new NSMVHandlerROPID(m_stream1, "stream1.pid"));
     add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
     add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
     m_stream0 = std::vector<Stream0Controller>();
@@ -97,7 +95,6 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       std::string name = StringUtil::form("stream0_%d", (int)i);
       m_stream0[i].init(this, i + 2, name, obj);
       std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
-      add(new NSMVHandlerROPID(m_stream0[i], vname + ".pid"));
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
@@ -122,15 +119,12 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_eb0.load(obj, 0)) {
     throw (RCHandlerException("Failed to boot eb0"));
   }
-  set("eb0.pid", m_eb0.getControl().getProcess().get_id());
   LogFile::debug("Booted eb0");
   try_wait();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     if (!m_stream0[i].load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
-    std::string vname = StringUtil::form("stream0[%d].pid", (int)i);
-    set(vname, m_stream0[i].getControl().getProcess().get_id());
     LogFile::debug("Booted %d-th stream0", i);
     try_wait();
   }
@@ -142,7 +136,6 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
     throw (RCHandlerException("Faield to boot eb1tx"));
   }
   */
-  set("stream1.pid", m_stream1.getControl().getProcess().get_id());
   LogFile::debug("Booted stream1");
   try_wait();
 }
@@ -220,12 +213,6 @@ void ROCallback::abort() throw(RCHandlerException)
     m_stream0[i].abort();
   }
   m_eb0.abort();
-  set("stream1.pid", -1);
-  for (size_t i = 0; i < m_stream0.size(); i++) {
-    std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
-    set(vname, -1);
-  }
-  set("eb0.pid", -1);
   //m_eb1tx.abort();
   //set("eb1tx.pid", -1);
 }

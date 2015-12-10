@@ -33,7 +33,8 @@ bool Stream1Controller::loadArguments(const DBObject& obj)
                                      script.c_str()));
   m_con.addArgument("1");
   m_con.addArgument(port);
-  m_con.addArgument(m_name);
+  const std::string nodename = StringUtil::tolower(m_callback->getNode().getName());
+  m_con.addArgument(nodename + "_" + m_name);
   return true;
 }
 

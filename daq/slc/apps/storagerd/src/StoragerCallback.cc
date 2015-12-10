@@ -57,20 +57,12 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_con.push_back(ProcessController(this));
     }
     m_eb2rx = ProcessController(this);
-    std::string nodename = StringUtil::tolower(getNode().getName());
-    m_eb2rx.init(nodename + "_eb2rx", 1);
-    m_con[0].init(nodename + "_storagein", 2);
-    m_con[1].init(nodename + "_storagerecord", 3);
-    m_con[2].init(nodename + "_storageout", 4);
+    m_eb2rx.init("eb2rx", 1);
+    m_con[0].init("storagein", 2);
+    m_con[1].init("storagerecord", 3);
+    m_con[2].init("storageout", 4);
     for (size_t i = 3; i < m_con.size(); i++) {
-      m_con[i].init(nodename + StringUtil::form("_storagebasf2_%d", i - 3), i + 2);
-    }
-    add(new NSMVHandlerInt("eb2rx.pid", true, false, 0));
-    add(new NSMVHandlerInt("storagein.pid", true, false, 0));
-    add(new NSMVHandlerInt("storagerecord.pid", true, false, 0));
-    add(new NSMVHandlerInt("storageout.pid", true, false, 0));
-    for (size_t i = 3; i < m_con.size(); i++) {
-      add(new NSMVHandlerInt(StringUtil::form("basf2[%d].pid", i - 3), true, false, 0));
+      m_con[i].init(StringUtil::form("basf2[%d]", i - 3), i + 2);
     }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException("Bad configuration : %s", e.what()));
@@ -204,7 +196,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].addArgument("%d", ibuf.getInt("size"));
       m_con[i].addArgument(rbuf.getText("name"));
       m_con[i].addArgument("%d", rbuf.getInt("size"));
-      m_con[i].addArgument("%s_storagebasf2_%d", nodename.c_str(), i - 3);
+      m_con[i].addArgument("%s_storagebasf2[%d]", nodename.c_str(), i - 3);
       m_con[i].addArgument("%d", i + 2);
       m_con[i].addArgument("1");
       if (!m_con[i].load(0)) {
@@ -233,7 +225,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000);
 }
 
-void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
+void StoragerCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
 {
   /*
   storage_status* status = (storage_status*)m_data.get();
@@ -259,7 +251,7 @@ void StoragerCallback::stop() throw(RCHandlerException)
 
 void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
 {
-  //abort();
+  abort();
   load(obj);
 }
 
@@ -304,47 +296,48 @@ void StoragerCallback::monitor() throw(RCHandlerException)
   storage_status* info = (storage_status*)data.get();
   info->ctime = Time().getSecond();
   info->nnodes = m_con.size();
-  bool connected = false;
-  bool writing = false;
-  for (size_t i = 0; i < m_flow.size() && i < 8; i++) {
-    ronode_status& rostatus(m_flow[i].monitor());
-    info->node[i].connection_in = rostatus.connection_in;
-    info->node[i].nevent_in = rostatus.nevent_in;
-    info->node[i].evtrate_in = rostatus.evtrate_in;
-    info->node[i].evtsize_in = rostatus.evtsize_in;
-    info->node[i].flowrate_in = rostatus.flowrate_in;
-    info->node[i].connection_out = rostatus.connection_out;
-    info->node[i].nevent_out = rostatus.nevent_out;
-    info->node[i].evtrate_out = rostatus.evtrate_out;
-    info->node[i].evtsize_out = rostatus.evtsize_out;
-    info->node[i].flowrate_out = rostatus.flowrate_out;
-    if (i == 0) { //IN
-      info->eflag = rostatus.eflag;
-      info->ctime = rostatus.ctime;
-      info->expno = rostatus.expno;
-      info->runno = rostatus.runno;
-      info->subno = rostatus.subno;
-      //info->node[0].nqueue_in = rostatus.nqueue_in;
-      info->node[0].nqueue_in = rostatus.nqueue_in / 1024;
-      SharedEventBuffer::Header* hd = m_ibuf.getHeader();
-      //info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
-      info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024;
-      connected = (info->node[0].connection_in > 0);
-    } else if (i == 1) {
-      SharedEventBuffer::Header* hd = m_rbuf.getHeader();
-      //info->node[1].nqueue_out = hd->nword_in - hd->nword_out;
-      info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024;
-      info->nfiles = rostatus.reserved_i[0];
-      info->diskid = rostatus.reserved_i[1];
-      info->nbytes = rostatus.reserved_f[0];
-      writing = (rostatus.flowrate_out > 0);
-    }
-  }
-  if (connected) {
-    if (writing) info->state = 2;
-    else info->state = 1;
+  if (state != RCState::RUNNING_S) {
+    memset(info, 0, sizeof(storage_status));
   } else {
-    info->state = 0;
+    bool connected = false;
+    bool writing = false;
+    for (size_t i = 0; i < m_flow.size() && i < 8; i++) {
+      ronode_status& rostatus(m_flow[i].monitor());
+      info->node[i].connection_in = rostatus.connection_in;
+      info->node[i].nevent_in = rostatus.nevent_in;
+      info->node[i].evtrate_in = rostatus.evtrate_in;
+      info->node[i].evtsize_in = rostatus.evtsize_in;
+      info->node[i].flowrate_in = rostatus.flowrate_in;
+      info->node[i].connection_out = rostatus.connection_out;
+      info->node[i].nevent_out = rostatus.nevent_out;
+      info->node[i].evtrate_out = rostatus.evtrate_out;
+      info->node[i].evtsize_out = rostatus.evtsize_out;
+      info->node[i].flowrate_out = rostatus.flowrate_out;
+      if (i == 0) { // input
+        info->eflag = rostatus.eflag;
+        info->ctime = rostatus.ctime;
+        info->expno = rostatus.expno;
+        info->runno = rostatus.runno;
+        info->subno = rostatus.subno;
+        info->node[0].nqueue_in = rostatus.nqueue_in / 1024; // B -> kB
+        SharedEventBuffer::Header* hd = m_ibuf.getHeader();
+        info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        connected = (info->node[0].connection_in > 0);
+      } else if (i == 1) { // record
+        SharedEventBuffer::Header* hd = m_rbuf.getHeader();
+        info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+        info->nfiles = rostatus.reserved_i[0];
+        info->diskid = rostatus.reserved_i[1];
+        info->nbytes = rostatus.reserved_f[0];
+        writing = (rostatus.flowrate_out > 0);
+      }
+    }
+    if (connected) {
+      if (writing) info->state = 2;
+      else info->state = 1;
+    } else {
+      info->state = 0;
+    }
   }
   struct statvfs statfs;
   const DBObject& record(getDBObject()("record"));

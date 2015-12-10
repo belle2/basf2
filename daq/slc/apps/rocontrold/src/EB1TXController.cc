@@ -42,6 +42,8 @@ bool EB1TXController::loadArguments(const DBObject& obj)
     int port = i->getInt("port");
     //m_con.addArgument("%s:%d", host.c_str(), port);
     m_con.addArgument(port);
+    //const std::string nodename = StringUtil::tolower(m_callback->getNode().getName());
+    //m_con.addArgument(nodename+"_"+m_name);
   }
   return true;
 }

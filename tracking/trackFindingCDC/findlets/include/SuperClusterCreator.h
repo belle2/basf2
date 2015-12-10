@@ -61,6 +61,9 @@ namespace Belle2 {
         for (CDCWireHitCluster& superCluster : outputSuperClusters) {
           ++iSuperCluster;
           superCluster.setISuperCluster(iSuperCluster);
+          for (CDCWireHit* wireHit : superCluster) {
+            wireHit->setISuperCluster(iSuperCluster);
+          }
           std::sort(superCluster.begin(), superCluster.end());
         }
       }

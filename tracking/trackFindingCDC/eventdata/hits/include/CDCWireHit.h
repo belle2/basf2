@@ -219,6 +219,14 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
+      /// Getter for the super cluster id
+      int getISuperCluster() const
+      { return m_iSuperCluster; }
+
+      /// Setter for the super cluster id
+      void setISuperCluster(int iSuperCluster)
+      { m_iSuperCluster = iSuperCluster; }
+
     private:
       /// Memory for the automaton cell.
       AutomatonCell m_automatonCell;
@@ -234,6 +242,9 @@ namespace Belle2 {
 
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;
+
+      /// Memory for the super cluster id
+      int m_iSuperCluster = -1;
 
     }; //class CDCWireHit
 

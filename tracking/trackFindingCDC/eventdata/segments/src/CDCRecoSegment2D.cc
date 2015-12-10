@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <genfit/TrackCand.h>
 
 
@@ -32,51 +33,6 @@ using namespace TrackFindingCDC;
 
 
 namespace {
-  /** Makes adjacent pairs from an input range,
-   *  invoking the map with two arguments and writes to the output iterator
-   */
-  template<class AInputIterator, class AOutputIterator, class ABinaryOperation>
-  AOutputIterator transform_adjacent_pairs(AInputIterator first, AInputIterator last,
-                                           AOutputIterator result, const ABinaryOperation& map)
-  {
-    if (first == last) return result;
-
-    AInputIterator second = first;
-    ++second;
-    while (second != last) {
-      *result = map(*first, *second);
-      ++result;
-      ++first;
-      ++second;
-    }
-    return result;
-  }
-
-  /** Makes adjacent triples from an input range,
-   *  invoking the map with three arguments and writes to the output iterator
-   */
-  template<class AInputIterator, class AOutputIterator, class ATrinaryOperation>
-  AOutputIterator transform_adjacent_triples(AInputIterator first, AInputIterator last,
-                                             AOutputIterator result, const ATrinaryOperation& map)
-  {
-    if (not(first != last)) return result;
-
-    AInputIterator second{first};
-    ++second;
-    if (not(second != last)) return result;
-
-    AInputIterator third{second};
-    ++third;
-    while (third != last) {
-      *result = map(*first, *second, *third);
-      ++result;
-      ++first;
-      ++second;
-      ++third;
-    }
-    return result;
-  }
-
   void createTangentSegment(const CDCRLWireHitSegment& rlWireHitSegment,
                             CDCTangentSegment& tangentSegment)
   {
@@ -160,8 +116,8 @@ namespace {
 
     }
 
+    result.receiveISuperCluster();
     return result;
-
   }
 
 
@@ -227,9 +183,9 @@ namespace {
       result.push_back(thirdFacet->getEndRecoHit2D());
     }
 
+    result.receiveISuperCluster();
     return result;
   }
-
 
 }
 
@@ -258,6 +214,10 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
   return ::condenseFacetSegment(facets);
 }
 
+CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
+{
+  return ::condenseFacetSegment(facetPath);
+}
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)
 {
@@ -269,19 +229,9 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegme
       result.push_back(recoHit2D);
     }
   }
+  result.receiveISuperCluster();
   return result;
 }
-
-
-
-
-CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
-{
-  return ::condenseFacetSegment(facetPath);
-}
-
-
-
 
 
 CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment)

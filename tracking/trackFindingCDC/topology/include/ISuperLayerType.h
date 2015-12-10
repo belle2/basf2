@@ -10,6 +10,7 @@
 #pragma once
 
 #include <iterator>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
 
@@ -49,18 +50,10 @@ namespace Belle2 {
     template<class AHits>
     ISuperLayerType getISuperLayer(const AHits& hits)
     {
-      auto itBegin = std::begin(hits);
-      auto itEnd   = std::end(hits);
-      if (itBegin == itEnd) return INVALID_ISUPERLAYER; // empty case
-      const ISuperLayerType iSuperLayer = (*itBegin)->getISuperLayer();
-      for (const auto& hit : hits) {
-        if (hit->getISuperLayer() != iSuperLayer) {
-          return INVALID_ISUPERLAYER;
-        };
-      }
-      return iSuperLayer;
+      using Hit = ValueType<AHits>;
+      auto getISuperLayerOfHit = [](const Hit & hit) {return hit->getISuperLayer();};
+      return common(hits, getISuperLayerOfHit, INVALID_ISUPERLAYER);
     }
-
 
   } // namespace TrackFindingCDC
 

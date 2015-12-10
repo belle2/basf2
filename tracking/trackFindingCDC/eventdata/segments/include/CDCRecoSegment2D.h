@@ -107,12 +107,21 @@ namespace Belle2 {
       void receiveMaskedFlag() const;
 
       /// Getter for the global super cluster id.
-      const size_t& getISuperCluster() const
+      int getISuperCluster() const
       { return m_iSuperCluster; }
 
       /// Setter for the globale super cluster id.
-      void setISuperCluster(const size_t& iSuperCluster)
+      void setISuperCluster(int iSuperCluster)
       { m_iSuperCluster = iSuperCluster; }
+
+      /// Setter for the super cluster id based on the hit content
+      void receiveISuperCluster()
+      {
+        auto getISuperClusterOfHit = [](const CDCRecoHit2D & recoHit2d) -> int
+        { return recoHit2d.getWireHit().getISuperCluster(); };
+        int iSuperCluster = common(*this, getISuperClusterOfHit, -1);
+        setISuperCluster(iSuperCluster);
+      }
 
       /// Returns false, if there is one hit in the range which does not have a taken flag.
       bool isFullyTaken() const;
@@ -125,7 +134,7 @@ namespace Belle2 {
       AutomatonCell m_automatonCell;
 
       /// Memory for the global super cluster id.
-      size_t m_iSuperCluster;
+      int m_iSuperCluster = -1;
     }; //end class CDCRecoSegment2D
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

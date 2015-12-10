@@ -214,7 +214,6 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
                 "cut": str(
                     self.tmva_cut)},
             SegmentsStoreObjName="__TempCDCRecoSegment2DVector",
-            CreateGFTrackCands=False,
             WriteGFTrackCands=False,
             FacetFilter="none",
             FacetRelationFilter="none",

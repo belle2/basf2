@@ -18,9 +18,9 @@ TrackFinderCDCAutomatonModule ::TrackFinderCDCAutomatonModule() :
   TrackFinderCDCBaseModule() // Virtual base class must be instantiated from the most derived class.
 {
   this->setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
-
-  using TrackFindingCDC::EPreferredDirection;
-  this->m_segmentOrienter.setSegmentOrientation(EPreferredDirection::c_Symmetric);
+  ModuleParamList moduleParamList = this->getParamList();
+  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
+  this->setParamList(moduleParamList);
   this->setTrackOrientation(ETrackOrientation::c_Outwards);
 }
 
@@ -48,4 +48,3 @@ void TrackFinderCDCAutomatonModule::terminate()
   this->TrackFinderCDCSegmentPairAutomatonModule::terminate();
   this->SegmentFinderCDCFacetAutomatonModule::terminate();
 }
-

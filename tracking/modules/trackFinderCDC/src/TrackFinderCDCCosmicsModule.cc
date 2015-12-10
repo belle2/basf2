@@ -18,8 +18,10 @@ TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule()
 {
   setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
 
-  using TrackFindingCDC::EPreferredDirection;
-  this->m_segmentOrienter.setSegmentOrientation(EPreferredDirection::c_Symmetric);
+  // Set the default segment to symmetric
+  ModuleParamList moduleParamList = this->getParamList();
+  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
+  this->setParamList(moduleParamList);
   this->setTrackOrientation(ETrackOrientation::c_Downwards);
 }
 

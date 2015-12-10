@@ -221,24 +221,64 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     # define variables that are monitored and specify
     # the corresponding histogram (#bins, low, high)
     # ('variable_name', number_of_bins, x_low, x_high)
-    tracks2hist_p = ('p', 100, 0.0, 3.0)
+    tracks2hist_KID = ('atcPIDBelle(3,2)', 100, 0.0, 1.0)
+    tracks2hist_PRKID = ('atcPIDBelle(4,3)', 100, 0.0, 1.0)
+    tracks2hist_PRPID = ('atcPIDBelle(4,2)', 100, 0.0, 1.0)
+    tracks2hist_EID = ('eIDBelle', 100, 0.0, 1.0)
+    tracks2hist_MUID = ('muIDBelle', 100, 0.0, 1.0)
+    tracks2hist_MUIDQ = ('muIDBelleQuality', 100, 0.0, 1.0)
+
     tracks2hist_px = ('px', 100, -3.0, 3.0)
+    tracks2hist_py = ('py', 100, -3.0, 3.0)
+    tracks2hist_pz = ('pz', 100, -3.0, 3.0)
+    tracks2hist_E = ('E', 100, 0.0, 4.0)
+    tracks2hist_x = ('x', 100, -5.0, 5.0)
+    tracks2hist_y = ('y', 100, -5.0, 5.0)
+    tracks2hist_z = ('z', 100, -5.0, 5.0)
 
-    tracks2hist_x = ('x', 100, -30.0, 30.0)
+    tracks2hist_Err00 = ('momVertCovM(0,0)', 100, -0.0001, 0.0001)
+    tracks2hist_Err01 = ('momVertCovM(0,1)', 100, -0.0001, 0.0001)
+    tracks2hist_Err02 = ('momVertCovM(0,2)', 100, -0.0001, 0.0001)
+    tracks2hist_Err03 = ('momVertCovM(0,3)', 100, -0.0001, 0.0001)
+    tracks2hist_Err04 = ('momVertCovM(0,4)', 100, -0.0001, 0.0001)
+    tracks2hist_Err05 = ('momVertCovM(0,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err06 = ('momVertCovM(0,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err11 = ('momVertCovM(1,1)', 100, -0.0001, 0.0001)
+    tracks2hist_Err12 = ('momVertCovM(1,2)', 100, -0.0001, 0.0001)
+    tracks2hist_Err13 = ('momVertCovM(1,3)', 100, -0.0001, 0.0001)
+    tracks2hist_Err14 = ('momVertCovM(1,4)', 100, -0.0001, 0.0001)
+    tracks2hist_Err15 = ('momVertCovM(1,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err16 = ('momVertCovM(1,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err22 = ('momVertCovM(2,2)', 100, -0.0001, 0.0001)
+    tracks2hist_Err23 = ('momVertCovM(2,3)', 100, -0.0001, 0.0001)
+    tracks2hist_Err24 = ('momVertCovM(2,4)', 100, -0.0001, 0.0001)
+    tracks2hist_Err25 = ('momVertCovM(2,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err26 = ('momVertCovM(2,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err33 = ('momVertCovM(3,3)', 100, -0.0001, 0.0001)
+    tracks2hist_Err34 = ('momVertCovM(3,4)', 100, -0.0001, 0.0001)
+    tracks2hist_Err35 = ('momVertCovM(3,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err36 = ('momVertCovM(3,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err44 = ('momVertCovM(4,4)', 100, -0.0001, 0.0001)
+    tracks2hist_Err45 = ('momVertCovM(4,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err46 = ('momVertCovM(4,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err55 = ('momVertCovM(5,5)', 100, -0.0001, 0.0001)
+    tracks2hist_Err56 = ('momVertCovM(5,6)', 100, -0.0001, 0.0001)
+    tracks2hist_Err66 = ('momVertCovM(6,6)', 100, -0.0001, 0.0001)
 
-    tracks2hist_Err00 = ('momVertCovM(0,0)', 100, 0.0, 0.0001)
+    tracks2hist.param('variables',
+                      [tracks2hist_KID, tracks2hist_PRKID, tracks2hist_PRPID,
+                       tracks2hist_EID, tracks2hist_MUID, tracks2hist_MUIDQ,
 
-    tracks2hist_KID = ('atcPIDBelle(3,2)', 120, -0.1, 1.1)
-    tracks2hist_PRKID = ('atcPIDBelle(4,3)', 120, -0.1, 1.1)
-    tracks2hist_PRPID = ('atcPIDBelle(4,2)', 120, -0.1, 1.1)
-    tracks2hist_MUID = ('muIDBelle', 120, -0.1, 1.1)
-    tracks2hist_MUIDQ = ('muIDBelleQuality', 120, -0.1, 1.1)
-    tracks2hist_EID = ('eIDBelle', 120, -0.1, 1.1)
+                       tracks2hist_px, tracks2hist_py, tracks2hist_pz, tracks2hist_E,
+                       tracks2hist_x, tracks2hist_y, tracks2hist_z,
 
-    tracks2hist.param('variables', [tracks2hist_p, tracks2hist_px, tracks2hist_x,
-                                    tracks2hist_Err00,
-                                    tracks2hist_KID, tracks2hist_PRKID, tracks2hist_PRPID,
-                                    tracks2hist_MUID, tracks2hist_MUIDQ, tracks2hist_EID])
+                       tracks2hist_Err00, tracks2hist_Err01, tracks2hist_Err02, tracks2hist_Err03,
+                       tracks2hist_Err04, tracks2hist_Err05, tracks2hist_Err06, tracks2hist_Err11,
+                       tracks2hist_Err12, tracks2hist_Err13, tracks2hist_Err14, tracks2hist_Err15,
+                       tracks2hist_Err16, tracks2hist_Err22, tracks2hist_Err23, tracks2hist_Err24,
+                       tracks2hist_Err25, tracks2hist_Err26, tracks2hist_Err33, tracks2hist_Err34,
+                       tracks2hist_Err35, tracks2hist_Err36, tracks2hist_Err44, tracks2hist_Err45,
+                       tracks2hist_Err46, tracks2hist_Err55, tracks2hist_Err56, tracks2hist_Err66])
 
     tracks2hist.param('fileName', outputRootFile)
     path.add_module(tracks2hist)

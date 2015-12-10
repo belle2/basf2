@@ -53,9 +53,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor initialising the filters with the default settings
-      TrackFinderCDCSegmentPairAutomatonImplModule(ETrackOrientation trackOrientation = c_None) :
-        TrackFinderCDCBaseModule(trackOrientation),
-        TrackFinderCDCFromSegmentsModule(trackOrientation),
+      TrackFinderCDCSegmentPairAutomatonImplModule() :
         m_ptrSegmentPairFilter(new SegmentPairFilter()),
         m_ptrSegmentPairRelationFilter(new SegmentPairRelationFilter()),
         m_ptrTrackRelationFilter(new TrackRelationFilter()),

@@ -26,13 +26,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule(ETrackOrientation segmentOrientation) :
+SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule() :
   TrackFinderCDCBaseModule(),
   m_param_segmentsStoreObjName("CDCRecoSegment2DVector"),
   m_param_segmentOrientationString(""),
   m_param_fitSegments(true),
   m_param_createGFTrackCands(false),
-  m_segmentOrientation(segmentOrientation)
+  m_segmentOrientation(ETrackOrientation::c_None)
 {
   addParam("SegmentsStoreObjName",
            m_param_segmentsStoreObjName,
@@ -46,7 +46,12 @@ SegmentFinderCDCBaseModule::SegmentFinderCDCBaseModule(ETrackOrientation segment
 
   addParam("SegmentOrientation",
            m_param_segmentOrientationString,
-           "Option which orientation of segments shall be generate. Valid options are '' (default of the finder), 'none' (one orientation, algorithm dependent), 'symmetric', 'outwards', 'downwards'.",
+           "Option which orientation of segments shall be generate. "
+           "Valid options are '' (default of the finder), "
+           "'none' (one orientation, algorithm dependent), "
+           "'symmetric', "
+           "'outwards', "
+           "'downwards'.",
            string(m_param_segmentOrientationString));
 
   addParam("CreateGFTrackCands",

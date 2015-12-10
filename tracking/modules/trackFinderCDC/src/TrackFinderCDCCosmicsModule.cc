@@ -14,11 +14,12 @@ using namespace Belle2;
 
 REG_MODULE(TrackFinderCDCCosmics);
 
-TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule() :
-  TrackFinderCDCBaseModule(c_Downwards), // Virtual base class must be instantiated from the most derived class.
-  SegmentFinderCDCFacetAutomatonModule(c_Symmetric)
+TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule()
 {
   setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
+
+  this->setSegmentOrientation(ETrackOrientation::c_Symmetric);
+  this->setTrackOrientation(ETrackOrientation::c_Downwards);
 }
 
 void TrackFinderCDCCosmicsModule::initialize()

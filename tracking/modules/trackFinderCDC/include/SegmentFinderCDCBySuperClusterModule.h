@@ -35,8 +35,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor initialising the filters with the default settings
-      SegmentFinderCDCBySuperClusterModule(ETrackOrientation segmentOrientation = c_None) :
-        SegmentFinderCDCBaseModule(segmentOrientation),
+      SegmentFinderCDCBySuperClusterModule() :
         m_ptrSegmentRelationFilter(new SegmentRelationFilter()),
         m_param_writeSuperClusters(false),
         m_param_superClustersStoreObjName("CDCWireHitSuperClusterVector")

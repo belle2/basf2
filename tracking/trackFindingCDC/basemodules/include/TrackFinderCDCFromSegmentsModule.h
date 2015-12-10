@@ -22,7 +22,7 @@ namespace Belle2 {
 
   public:
     /// Default constructor initialising the filters with the default settings.
-    TrackFinderCDCFromSegmentsModule(ETrackOrientation trackOrientation = c_None);
+    TrackFinderCDCFromSegmentsModule();
 
     /// Initialize the Module before event processing.
     void initialize() override;

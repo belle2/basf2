@@ -18,8 +18,8 @@ using namespace TrackFindingCDC;
 
 
 
-TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule(ETrackOrientation trackOrientation) :
-  TrackFinderCDCBaseModule(trackOrientation),
+TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule() :
+  TrackFinderCDCBaseModule(),
   m_param_segmentsStoreObjName("CDCRecoSegment2DVector"),
   m_minimalHitsForSingleSegmentTrackBySuperLayerId()
 {

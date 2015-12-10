@@ -15,16 +15,18 @@ using namespace Belle2;
 REG_MODULE(TrackFinderCDCAutomaton);
 
 TrackFinderCDCAutomatonModule::TrackFinderCDCAutomatonModule() :
-  TrackFinderCDCBaseModule(c_Outwards), // Virtual base class must be instantiated from the most derived class.
-  SegmentFinderCDCFacetAutomatonModule(c_Symmetric)
+  TrackFinderCDCBaseModule() // Virtual base class must be instantiated from the most derived class.
 {
-  setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
+  this->setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
+
+  this->setSegmentOrientation(ETrackOrientation::c_Symmetric);
+  this->setTrackOrientation(ETrackOrientation::c_Outwards);
 }
 
 void TrackFinderCDCAutomatonModule::initialize()
 {
-  SegmentFinderCDCFacetAutomatonModule::initialize();
-  TrackFinderCDCSegmentPairAutomatonModule::initialize();
+  this->SegmentFinderCDCFacetAutomatonModule::initialize();
+  this->TrackFinderCDCSegmentPairAutomatonModule::initialize();
 }
 
 void TrackFinderCDCAutomatonModule::event()
@@ -32,17 +34,17 @@ void TrackFinderCDCAutomatonModule::event()
   B2DEBUG(100, "########## TrackFinderCDCAutomaton begin ##########");
 
   // Stage one
-  SegmentFinderCDCFacetAutomatonModule::event();
+  this->SegmentFinderCDCFacetAutomatonModule::event();
 
   // Stage two
-  TrackFinderCDCSegmentPairAutomatonModule::event();
+  this->TrackFinderCDCSegmentPairAutomatonModule::event();
 
   B2DEBUG(100, "########## TrackFinderCDCAutomaton end ############");
 }
 
 void TrackFinderCDCAutomatonModule::terminate()
 {
-  TrackFinderCDCSegmentPairAutomatonModule::terminate();
-  SegmentFinderCDCFacetAutomatonModule::terminate();
+  this->TrackFinderCDCSegmentPairAutomatonModule::terminate();
+  this->SegmentFinderCDCFacetAutomatonModule::terminate();
 }
 

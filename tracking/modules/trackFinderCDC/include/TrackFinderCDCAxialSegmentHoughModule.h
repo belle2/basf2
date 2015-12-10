@@ -28,9 +28,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor initialising the filters with the default settings
-      TrackFinderCDCAxialSegmentHoughModule(ETrackOrientation trackOrientation = c_None) :
-        TrackFinderCDCBaseModule(trackOrientation),
-        TrackFinderCDCFromSegmentsModule(trackOrientation)
+      TrackFinderCDCAxialSegmentHoughModule()
       {
         setDescription("Generates axial tracks from segments using a hough space over phi0 impact and curvature for the spares case.");
       }

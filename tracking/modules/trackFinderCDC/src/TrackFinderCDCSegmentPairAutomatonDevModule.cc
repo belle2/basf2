@@ -25,7 +25,6 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCSegmentPairAutomatonDev);
 
 TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonDevModule() :
-  TrackFinderCDCSegmentPairAutomatonImplModule<>(c_None),
   m_segmentPairFilterFactory("simple"),
   m_segmentPairRelationFilterFactory("simple"),
   m_trackRelationFilterFactory("none")

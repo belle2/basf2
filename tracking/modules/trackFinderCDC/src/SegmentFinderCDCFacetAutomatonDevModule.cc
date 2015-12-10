@@ -24,13 +24,15 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
 SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule() :
-  Super(c_Symmetric),
   m_clusterFilterFactory("all"),
   m_facetFilterFactory("realistic"),
   m_facetRelationFilterFilterFactory("simple"),
   m_segmentRelationFilterFilterFactory("none")
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
+
+  // Set the default segment to symmetric
+  setSegmentOrientation(ETrackOrientation::c_Symmetric);
 
   ModuleParamList moduleParamList = this->getParamList();
 

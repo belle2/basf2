@@ -31,7 +31,7 @@ namespace Belle2 {
     };
 
     /// Constructor of the module. Setting up parameters and description.
-    TrackFinderCDCBaseModule(ETrackOrientation trackOrientation = c_None);
+    TrackFinderCDCBaseModule();
 
     ///  Initialize the Module before event processing
     void initialize() override;
@@ -60,6 +60,22 @@ namespace Belle2 {
     template<class T>
     const T& getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
                                                                 ModuleParamList::ModuleParameterTypeError);
+
+  public:
+    /** Set the default output orientation of the tracks.
+     *  * ETrackOrientation::c_None does not modify the orientation from the concret algorithm.
+     *  * ETrackOrientation::c_Symmetric makes to copies of each track with forward and backward to the original orientation.
+     *  * ETrackOrientation::c_Outwards flips the orientation of the track such that they point away from the interaction point.
+     *  * ETrackOrientation::c_Downwards flips the orientation of the track such that they point downwards.
+     *
+     *  This properties can also be overridden by the user to in a module parameter.
+     */
+    void setTrackOrientation(const ETrackOrientation& trackOrientation)
+    { m_trackOrientation = trackOrientation; }
+
+    /// Get the currentl default output orientation of the tracks.
+    const ETrackOrientation& getTrackOrientation() const
+    { return m_trackOrientation; }
 
   protected:
     /** Parameter: String that states the desired track orientation.
@@ -103,4 +119,3 @@ namespace Belle2 {
     return moduleParam.getValue();
   }
 }
-

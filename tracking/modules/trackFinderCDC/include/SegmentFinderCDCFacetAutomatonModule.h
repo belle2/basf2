@@ -63,12 +63,9 @@ namespace Belle2 {
       /// Type of the base class
       typedef SegmentFinderCDCBySuperClusterModule<SegmentRelationFilter> Super;
 
-      using ETrackOrientation = typename Super::ETrackOrientation;
-
     public:
       /// Default constructor initialising the filters with the default settings
-      SegmentFinderCDCFacetAutomatonImplModule(ETrackOrientation segmentOrientation = ETrackOrientation::c_None) :
-        Super(segmentOrientation),
+      SegmentFinderCDCFacetAutomatonImplModule() :
         m_ptrClusterFilter(new ClusterFilter()),
         m_ptrFacetFilter(new FacetFilter()),
         m_ptrFacetRelationFilter(new FacetRelationFilter()),

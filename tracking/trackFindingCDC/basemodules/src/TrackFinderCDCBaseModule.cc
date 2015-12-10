@@ -28,20 +28,25 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrackFinderCDCBaseModule::TrackFinderCDCBaseModule(ETrackOrientation trackOrientation) :
+TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
   Module(),
   m_param_trackOrientationString(""),
   m_param_tracksStoreObjName("CDCTrackVector"),
   m_param_tracksStoreObjNameIsInput(false),
   m_param_gfTrackCandsStoreArrayName(""),
   m_param_writeGFTrackCands(true),
-  m_trackOrientation(trackOrientation)
+  m_trackOrientation(ETrackOrientation::c_None)
 {
   setDescription("This a base module for all track finders in the CDC");
 
   addParam("TrackOrientation",
            m_param_trackOrientationString,
-           "Option which orientation of tracks shall be generate. Valid options are '' (default of the finder), 'none' (one orientation, algorithm dependent), 'symmetric', 'outwards', 'downwards'.",
+           "Option which orientation of tracks shall be generate. "
+           "Valid options are '' (default of the finder), "
+           "'none' (default of the finder, algorithm dependent), "
+           "'symmetric', "
+           "'outwards', "
+           "'downwards'.",
            string(""));
 
   addParam("TracksStoreObjName",

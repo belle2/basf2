@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 
 #include <vector>

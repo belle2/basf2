@@ -11,7 +11,7 @@
 
 #include <utility>
 
-#include <tracking/trackFindingCDC/hough/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

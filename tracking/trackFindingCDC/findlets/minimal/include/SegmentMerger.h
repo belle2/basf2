@@ -38,7 +38,7 @@ namespace Belle2 {
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList) override final
       {
-        getSegmentRelationFilter().exposeParameters(moduleParamList);
+        m_segmentRelationFilter.exposeParameters(moduleParamList);
       }
 
       /// Signals the beginning of the event processing
@@ -62,47 +62,52 @@ namespace Belle2 {
         Super::terminate();
       }
 
-      /// Getter for the contained segment relation filter
-      SegmentRelationFilter& getSegmentRelationFilter()
-      { return m_segmentRelationFilter; }
-
     public:
       /// Main algorithm applying the cluster refinement
       virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
                          std::vector<CDCRecoSegment2D>& outputSegments) override final
       {
-        std::vector<ConstVectorRange<CDCRecoSegment2D> > m_segmentsByISuperCluster =
-          adjacent_groupby(inputSegments.begin(), inputSegments.end(), [](const CDCRecoSegment2D & segment) -> int { return segment.getISuperCluster();});
+        auto getISuperCluster = [](const CDCRecoSegment2D & segment) -> int { return segment.getISuperCluster();};
+        std::vector<ConstVectorRange<CDCRecoSegment2D> > segmentsByISuperCluster =
+          adjacent_groupby(inputSegments.begin(), inputSegments.end(), getISuperCluster);
 
-        for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : m_segmentsByISuperCluster) {
-          std::vector<CDCRecoSegment2D> symmetricSegmentsInSuperCluster;
-          symmetricSegmentsInSuperCluster.reserve(2 * segmentsInSuperCluster.size());
+        for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster) {
+
+          m_symmetricSegmentsInSuperCluster.clear();
+          m_symmetricSegmentsInSuperCluster.reserve(2 * segmentsInSuperCluster.size());
 
           for (const CDCRecoSegment2D& segment : segmentsInSuperCluster) {
-            symmetricSegmentsInSuperCluster.push_back(segment);
-            symmetricSegmentsInSuperCluster.push_back(segment.reversed());
+            m_symmetricSegmentsInSuperCluster.push_back(segment);
+            m_symmetricSegmentsInSuperCluster.push_back(segment.reversed());
           }
 
-          WeightedNeighborhood<const CDCRecoSegment2D> segmentsNeighborhood;
-          segmentsNeighborhood.clear();
-          segmentsNeighborhood.createUsing(m_segmentRelationFilter,
-                                           symmetricSegmentsInSuperCluster);
+          m_segmentNeighborhood.clear();
+          m_segmentNeighborhood.createUsing(m_segmentRelationFilter,
+                                            m_symmetricSegmentsInSuperCluster);
 
-          MultipassCellularPathFinder<CDCRecoSegment2D> cellularPathFinder;
-          std::vector< std::vector<const CDCRecoSegment2D*> > segmentPaths;
-          cellularPathFinder.apply(symmetricSegmentsInSuperCluster,
-                                   segmentsNeighborhood,
-                                   segmentPaths);
+          m_segmentPaths.clear();
+          m_cellularPathFinder.apply(m_symmetricSegmentsInSuperCluster,
+                                     m_segmentNeighborhood,
+                                     m_segmentPaths);
 
-          for (const std::vector<const CDCRecoSegment2D*>& segmentPath : segmentPaths) {
+          for (const std::vector<const CDCRecoSegment2D*>& segmentPath : m_segmentPaths) {
             outputSegments.push_back(CDCRecoSegment2D::condense(segmentPath));
           }
         } // end super cluster loop
       }
 
     private:
+      /// Instance of the cellular automaton path finder
+      MultipassCellularPathFinder<CDCRecoSegment2D> m_cellularPathFinder;
+
+      /// Memory for the symmetrised segments
+      std::vector<CDCRecoSegment2D> m_symmetricSegmentsInSuperCluster;
+
       /// Memory for the wire hit neighborhood in a cluster.
       WeightedNeighborhood<const CDCRecoSegment2D> m_segmentNeighborhood;
+
+      /// Memory for the segment paths generated from the graph.
+      std::vector< std::vector<const CDCRecoSegment2D*> > m_segmentPaths;
 
       /// Wire hit neighborhood relation filter
       SegmentRelationFilter m_segmentRelationFilter;

@@ -25,7 +25,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentFinderFacetAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
@@ -89,11 +90,22 @@ namespace Belle2 {
                        "Name of the output StoreObjPtr of the clusters generated within this module.",
                        std::string("CDCWireHitClusterVector"));
 
+        this->addParam("WriteFacets",
+                       m_param_writeFacets,
+                       "Switch if facets shall be written to the DataStore",
+                       m_param_writeFacets);
+
+        this->addParam("FacetsStoreObjName",
+                       m_param_facetsStoreObjName,
+                       "Name of the output StoreObjPtr of the facets generated within this module.",
+                       m_param_facetsStoreObjName);
+
         ModuleParamList moduleParamList = this->getParamList();
         m_superClusterCreator.exposeParameters(&moduleParamList);
         m_clusterRefiner.exposeParameters(&moduleParamList);
         m_clusterBackgroundDetector.exposeParameters(&moduleParamList);
-        m_segmentFinder.exposeParameters(&moduleParamList);
+        m_facetCreator.exposeParameters(&moduleParamList);
+        m_segmentCreator.exposeParameters(&moduleParamList);
         m_segmentMerger.exposeParameters(&moduleParamList);
         this->setParamList(moduleParamList);
       }
@@ -105,9 +117,9 @@ namespace Belle2 {
         m_superClusterCreator.initialize();
         m_clusterRefiner.initialize();
         m_clusterBackgroundDetector.initialize();
-        m_segmentFinder.initialize();
+        m_facetCreator.initialize();
+        m_segmentCreator.initialize();
         m_segmentMerger.initialize();
-
 
         if (m_param_writeSuperClusters) {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_superClustersStoreObjName);
@@ -117,6 +129,9 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_clustersStoreObjName);
         }
 
+        if (m_param_writeFacets) {
+          StoreWrappedObjPtr< std::vector<CDCFacet> >::registerTransient(m_param_facetsStoreObjName);
+        }
       }
 
       /// Processes the current event
@@ -125,11 +140,13 @@ namespace Belle2 {
         m_superClusterCreator.beginEvent();
         m_clusterRefiner.beginEvent();
         m_clusterBackgroundDetector.beginEvent();
-        m_segmentFinder.beginEvent();
+        m_facetCreator.beginEvent();
+        m_segmentCreator.beginEvent();
         m_segmentMerger.beginEvent();
 
         m_superClusters.clear();
         m_clusters.clear();
+        m_facets.clear();
         m_segments.clear();
         m_mergedSegments.clear();
 
@@ -145,19 +162,24 @@ namespace Belle2 {
           storedClusters.create();
         }
 
+        /// Attain facet vector on the DataStore if needed.
+        if (m_param_writeFacets) {
+          StoreWrappedObjPtr< std::vector<CDCFacet> > storedFacets(m_param_facetsStoreObjName);
+          storedFacets.create();
+        }
+
         Super::event();
       }
-
 
       /// Generates the segment.
       virtual void generateSegments(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments) override final;
 
       // implementation below
-
       virtual void terminate() override
       {
         m_segmentMerger.terminate();
-        m_segmentFinder.terminate();
+        m_segmentCreator.terminate();
+        m_facetCreator.terminate();
         m_clusterBackgroundDetector.terminate();
         m_clusterRefiner.terminate();
         m_superClusterCreator.terminate();
@@ -177,6 +199,12 @@ namespace Belle2 {
       /// Parameter: Name of the output StoreObjPtr of the clusters generated within this module.
       std::string m_param_clustersStoreObjName = "CDCWireHitClusterVector";
 
+      /// Parameter: Switch if facets shall be written to the DataStore
+      bool m_param_writeFacets = false;
+
+      /// Parameter: Name of the output StoreObjPtr of the facets generated within this module.
+      std::string m_param_facetsStoreObjName = "CDCFacetVector";
+
     private:
       // Findlets
       /// Composes the super clusters.
@@ -189,7 +217,10 @@ namespace Belle2 {
       ClusterBackgroundDetector<ClusterFilter> m_clusterBackgroundDetector;
 
       /// Find the segments by composition of facets path from a cellular automaton
-      SegmentFinderFacetAutomaton<FacetFilter, FacetRelationFilter> m_segmentFinder;
+      FacetCreator<FacetFilter> m_facetCreator;
+
+      /// Find the segments by composition of facets path from a cellular automaton
+      SegmentCreatorFacetAutomaton<FacetRelationFilter> m_segmentCreator;
 
       /// Merges segments with closeby segments of the same super cluster
       SegmentMerger<SegmentRelationFilter> m_segmentMerger;
@@ -200,6 +231,9 @@ namespace Belle2 {
 
       /// Memory for the wire hit super cluster
       std::vector<CDCWireHitCluster> m_superClusters;
+
+      /// Memory for the reconstructed segments
+      std::vector<CDCFacet> m_facets;
 
       /// Memory for the reconstructed segments
       std::vector<CDCRecoSegment2D> m_segments;
@@ -227,7 +261,8 @@ namespace Belle2 {
       m_superClusterCreator.apply(wireHits, m_superClusters);
       m_clusterRefiner.apply(m_superClusters, m_clusters);
       m_clusterBackgroundDetector.apply(m_clusters);
-      m_segmentFinder.apply(m_clusters, m_segments);
+      m_facetCreator.apply(m_clusters, m_facets);
+      m_segmentCreator.apply(m_facets, m_segments);
       m_segmentMerger.apply(m_segments, m_mergedSegments);
 
       // Move superclusters to the DataStore
@@ -243,6 +278,13 @@ namespace Belle2 {
         StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);
         std::vector<CDCWireHitCluster>& clusters = *storedClusters;
         clusters.swap(m_clusters);
+      }
+
+      // Move facets to the DataStore
+      if (m_param_writeFacets) {
+        StoreWrappedObjPtr< std::vector<CDCFacet> > storedFacets(m_param_facetsStoreObjName);
+        std::vector<CDCFacet>& facets = *storedFacets;
+        facets.swap(m_facets);
       }
 
       outputSegments.swap(m_mergedSegments);

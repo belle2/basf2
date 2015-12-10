@@ -160,6 +160,14 @@ namespace Belle2 {
       const AutomatonCell& getAutomatonCell() const
       { return m_automatonCell; }
 
+      /// Getter for the cluster id
+      int getICluster() const
+      { return m_iCluster; }
+
+      /// Setter for the cluster id
+      void setICluster(int iCluster)
+      { m_iCluster = iCluster; }
+
     private:
       /// Memory for the tangential line between first and second hit.
       mutable ParameterLine2D m_startToMiddle;
@@ -172,6 +180,10 @@ namespace Belle2 {
 
       /// Memory for the cellular automaton cell assoziated with the facet.
       AutomatonCell m_automatonCell;
+
+      /// Memory for the cluster id of this facet
+      int m_iCluster = -1;
+
     }; //class
 
   } // namespace TrackFindingCDC

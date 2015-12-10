@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithSimpleSimulation.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>

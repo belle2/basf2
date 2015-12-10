@@ -15,9 +15,9 @@
 #include <tracking/trackFindingCDC/creators/SegmentPairCreator.h>
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 
-#include <tracking/trackFindingCDC/filters/segment_pair/SimpleSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_pair_relation/SimpleSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/track_relation/BaseTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/SimpleSegmentPairRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 

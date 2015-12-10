@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 

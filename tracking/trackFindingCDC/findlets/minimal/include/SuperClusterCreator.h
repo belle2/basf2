@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wirehit_relation/SecondaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterCreator.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 

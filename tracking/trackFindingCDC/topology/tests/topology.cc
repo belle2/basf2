@@ -17,7 +17,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <gtest/gtest.h>
 

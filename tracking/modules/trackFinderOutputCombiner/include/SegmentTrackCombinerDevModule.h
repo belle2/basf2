@@ -11,11 +11,11 @@
 
 #include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerModule.h>
 
-#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
 namespace Belle2 {

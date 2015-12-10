@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/legendre/precision_functions/BasePrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 template<class ANode>
 void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANode* leaf)

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

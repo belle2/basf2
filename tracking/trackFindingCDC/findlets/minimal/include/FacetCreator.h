@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 

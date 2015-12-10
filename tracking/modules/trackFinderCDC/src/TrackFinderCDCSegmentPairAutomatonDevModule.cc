@@ -10,9 +10,9 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
 
-#include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilters.h>
-#include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilters.h>
-#include <tracking/trackFindingCDC/filters/track_relation/TrackRelationFilters.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilters.h>
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/SegmentPairRelationFilters.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilters.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 

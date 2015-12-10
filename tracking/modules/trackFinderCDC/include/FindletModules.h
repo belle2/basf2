@@ -9,11 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wirehit_relation/PrimaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_relation/ChooseableSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
 
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>

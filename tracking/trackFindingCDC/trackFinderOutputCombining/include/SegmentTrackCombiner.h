@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_track/SegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_information_list_track/SegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilter.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>

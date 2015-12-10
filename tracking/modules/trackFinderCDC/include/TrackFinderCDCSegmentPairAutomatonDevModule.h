@@ -11,9 +11,9 @@
 
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonModule.h>
 
-#include <tracking/trackFindingCDC/filters/segment_pair/SegmentPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segment_pair_relation/SegmentPairRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/track_relation/TrackRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/SegmentPairRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
 
 namespace Belle2 {
 

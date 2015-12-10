@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/test_fixtures/TrackFindingCDCTestWithTopology.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <gtest/gtest.h>

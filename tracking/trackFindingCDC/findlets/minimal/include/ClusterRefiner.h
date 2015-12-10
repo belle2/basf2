@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/filters/wirehit_relation/PrimaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>

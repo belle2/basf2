@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 //#define DESY
-//#define NO_DATA_CHECK
+//#define NO_ERROR_STOP
 
 ClassImp(PostRawCOPPERFormat_latest);
 
@@ -304,8 +304,6 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       //
       printf("[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %d sub %d eve %8u fns %d : data(%x) calc(%x) fns nwords %d\n",
              GetRunNo(n), GetSubRunNo(n), GetEveNo(n), finesse_num,  *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
-//       sprintf(err_buf,"[ERROR] POST B2link event CRC16 error with B2link Packet CRC error run %8d sub %4d eve %8d : %x %x %d\n %s %s %d\n",
-//             GetRunNo(n), GetSubRunNo(n),   GetEveNo(n), *buf , temp_crc16, GetFINESSENwords(n, finesse_num), __FILE__, __PRETTY_FUNCTION__, __LINE__);
     } else {
       //
       // Stop taking data
@@ -320,11 +318,12 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       }
       printf("\n");
       fflush(stdout);
-
       sprintf(err_buf,
               "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PostRawCOPPERfromat class. Exiting... run %d sub %d eve %u\n %s %s %d\n",
               (unsigned short)(*buf & 0xFFFF), temp_crc16, GetRunNo(n), GetSubRunNo(n), GetEveNo(n), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifndef NO_ERROR_STOP
       string err_str = err_buf;     throw (err_str);
+#endif
     }
     // Modify XOR checksum due to adding a bit flag
     copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]

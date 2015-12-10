@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 //#define DESY
-//#define NO_DATA_CHECK
+//#define NO_ERROR_STOP
 //#define WO_FIRST_EVENUM_CHECK
 
 ClassImp(PreRawCOPPERFormat_latest);
@@ -172,10 +172,9 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] [ERROR] %s\n", err_buf);
-#ifndef NO_DATA_CHECK
+#ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
-
-#endif //NO_DATA_CHECK
+#endif //NO_ERROR_STOP
   }
   return eve_num;
 
@@ -398,7 +397,10 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
                   i,  temp_ctime_trgtype, temp_ctime_trgtype_footer, temp_eve, temp_eve_footer,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
+
+#ifndef NO_ERROR_STOP
           string err_str = err_buf; throw (err_str);
+#endif
         }
       }
     }
@@ -413,10 +415,10 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
     sprintf(err_buf, "CORRUPTED DATA: mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf; throw (err_str);
 
-    //     sleep(1234567);
-    //     exit(1);
+#ifndef NO_ERROR_STOP
+    string err_str = err_buf; throw (err_str);
+#endif
   }
   return;
 }
@@ -576,7 +578,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
     if ((m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
-      printf("[ERROR] B2link packet CRC error slot A eve %8u %.8x : %s %s %d\n", cur_ftsw_eve32,
+      printf("[ERROR] B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       PrintData(m_buffer, m_nwords);
@@ -585,8 +587,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
-      printf("[ERROR] B2link packet CRC error slot B eve %8u %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+      printf("[ERROR] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       PrintData(m_buffer, m_nwords);
     }
@@ -594,8 +596,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
-      printf("[ERROR] B2link packet CRC error slot C eve %8u %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+      printf("[ERROR] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       PrintData(m_buffer, m_nwords);
     }
@@ -603,8 +605,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
       m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
-      printf("[ERROR] B2link packet CRC error slot D eve %8u %.8x : %s %s %d\n",  cur_ftsw_eve32,
-             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+      printf("[ERROR] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+             m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
       PrintData(m_buffer, m_nwords);
     }
@@ -690,9 +692,11 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             GetMagicDriverTrailer(datablock_id),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] [ERROR] %s\n", err_buf);
-#ifndef NO_DATA_CHECK
+
+#ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
 #endif
+
   }
 
   //
@@ -708,7 +712,8 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   *cur_exprunsubrun_no = GetExpRunSubrun(datablock_id);
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
-#ifndef NO_DATA_CHECK
+
+#ifndef NO_ERROR_STOP
       char err_buf[500];
       sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %u crun %u\n %s %s %d\n",
               cur_ftsw_eve32, prev_eve32,
@@ -1125,13 +1130,16 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
     return 1;
   } else {
     PrintData(m_buffer, m_nwords);
+
     printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
            finesse_buf[ POS_MAGIC_B2LHSLB ],
            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+#ifndef NO_ERROR_STOP
     fflush(stdout);
     exit(-1);
     return -1;
+#endif
   }
 }
 

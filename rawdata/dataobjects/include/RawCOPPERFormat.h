@@ -17,9 +17,6 @@
 #include <rawdata/RawCOPPERPackerInfo.h>
 
 #include <framework/datastore/DataStore.h>
-
-
-
 #include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2

@@ -113,7 +113,10 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
           add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
         } else {
-          system((StringUtil::form("boothslb -%c ", (i + 'a')) + o_hslb.getText("firm")).c_str());
+          LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
+          system((StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm")).c_str());
+          LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s", (i + 'a'),
+                        o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
           system((StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
                                    (i + 'a')) + o_fee.getText("randfile") +
                   " " + o_fee.getText("lengthfile")).c_str());

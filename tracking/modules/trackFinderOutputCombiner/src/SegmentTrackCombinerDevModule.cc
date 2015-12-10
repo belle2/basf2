@@ -32,13 +32,17 @@ SegmentTrackCombinerDevModule::SegmentTrackCombinerDevModule() :
 {
   setDescription("Versatile module with adjustable filters for segment track combination.");
 
-  m_segmentTrackFilterFirstStepFactory.exposeParameters(this);
-  m_backgroundSegmentsFilterFactory.exposeParameters(this);
-  m_newSegmentsFilterFactory.exposeParameters(this);
-  m_segmentTrackFilterSecondStepFactory.exposeParameters(this);
-  m_segmentTrainFilterFactory.exposeParameters(this);
-  m_segmentInformationListTrackFilterFactory.exposeParameters(this);
-  m_trackFilterFactory.exposeParameters(this);
+  ModuleParamList moduleParamList = this->getParamList();
+
+  m_segmentTrackFilterFirstStepFactory.exposeParameters(&moduleParamList);
+  m_backgroundSegmentsFilterFactory.exposeParameters(&moduleParamList);
+  m_newSegmentsFilterFactory.exposeParameters(&moduleParamList);
+  m_segmentTrackFilterSecondStepFactory.exposeParameters(&moduleParamList);
+  m_segmentTrainFilterFactory.exposeParameters(&moduleParamList);
+  m_segmentInformationListTrackFilterFactory.exposeParameters(&moduleParamList);
+  m_trackFilterFactory.exposeParameters(&moduleParamList);
+
+  this->setParamList(moduleParamList);
 }
 
 void SegmentTrackCombinerDevModule::initialize()

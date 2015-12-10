@@ -32,9 +32,13 @@ TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonD
 {
   setDescription("Versatile module with adjustable filters for track generation.");
 
-  m_segmentPairFilterFactory.exposeParameters(this);
-  m_segmentPairRelationFilterFactory.exposeParameters(this);
-  m_trackRelationFilterFactory.exposeParameters(this);
+  ModuleParamList moduleParamList = this->getParamList();
+
+  m_segmentPairFilterFactory.exposeParameters(&moduleParamList);
+  m_segmentPairRelationFilterFactory.exposeParameters(&moduleParamList);
+  m_trackRelationFilterFactory.exposeParameters(&moduleParamList);
+
+  this->setParamList(moduleParamList);
 }
 
 void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()

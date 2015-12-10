@@ -32,10 +32,14 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
 
-  m_clusterFilterFactory.exposeParameters(this);
-  m_facetFilterFactory.exposeParameters(this);
-  m_facetRelationFilterFilterFactory.exposeParameters(this);
-  m_segmentRelationFilterFilterFactory.exposeParameters(this);
+  ModuleParamList moduleParamList = this->getParamList();
+
+  m_clusterFilterFactory.exposeParameters(&moduleParamList);
+  m_facetFilterFactory.exposeParameters(&moduleParamList);
+  m_facetRelationFilterFilterFactory.exposeParameters(&moduleParamList);
+  m_segmentRelationFilterFilterFactory.exposeParameters(&moduleParamList);
+
+  this->setParamList(moduleParamList);
 }
 
 void SegmentFinderCDCFacetAutomatonDevModule::initialize()

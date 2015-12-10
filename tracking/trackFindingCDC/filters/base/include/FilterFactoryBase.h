@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <string>
 #include <memory>
 #include <assert.h>
@@ -42,7 +44,7 @@ namespace Belle2 {
       virtual ~FilterFactoryBase() { }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(TrackFinderCDCBaseModule* module);
+      void exposeParameters(ModuleParamList* moduleParamList);
 
       /** Create a string with a description for the filter names parameter */
       std::string createFilterNamesDescription() const
@@ -158,22 +160,22 @@ namespace Belle2 {
 
 
     template<class AFilter>
-    void FilterFactoryBase<AFilter>::exposeParameters(TrackFinderCDCBaseModule* module)
+    void FilterFactoryBase<AFilter>::exposeParameters(ModuleParamList* moduleParamList)
     {
-      assert(module);
+      assert(moduleParamList);
 
       std::string prefix = getModuleParamPrefix();
 
       // Set the module parameters
-      module->addParam(prefix + "Filter",
-                       getFilterName(),
-                       createFilterNamesDescription(),
-                       std::string(m_filterName));
+      moduleParamList->addParameter(prefix + "Filter",
+                                    getFilterName(),
+                                    createFilterNamesDescription(),
+                                    std::string(m_filterName));
 
-      module->addParam(prefix + "FilterParameters",
-                       getFilterParameters(),
-                       createFilterParametersDescription(),
-                       std::map<std::string, std::string>(m_filterParameters));
+      moduleParamList->addParameter(prefix + "FilterParameters",
+                                    getFilterParameters(),
+                                    createFilterParametersDescription(),
+                                    std::map<std::string, std::string>(m_filterParameters));
     }
 
 

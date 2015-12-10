@@ -61,16 +61,6 @@ namespace Belle2 {
     const T& getParamValue(const std::string& name) const throw(ModuleParamList::ModuleParameterNotFoundError,
                                                                 ModuleParamList::ModuleParameterTypeError);
 
-    /// Same as in base Module class but public.
-    template<class T>
-    void addParam(const std::string& name,
-                  T& paramVariable,
-                  const std::string& description,
-                  const T& defaultValue)
-    {
-      Module::addParam(name, paramVariable, description, defaultValue);
-    }
-
   protected:
     /** Parameter: String that states the desired track orientation.
      *  Valid orientations are "none" (as generated), "symmetric", "outwards", "downwards".*/

@@ -95,6 +95,7 @@ namespace Belle2 {
         const CDCWire& wire = recoHit3D.getWire();
         const Vector3D& wireVector = wire.getWireVector();
         const Vector2D disp2D = recoHit3D.getRecoDisp2D();
+        const double driftlengthVariance = recoHit3D.getRecoDriftLengthVariance();
 
         double dispNorm = disp2D.norm();
 
@@ -106,7 +107,7 @@ namespace Belle2 {
         }
 
         //double weight = 1.0;
-        double weight = zeta * zeta / c_simpleDriftLengthVariance;
+        double weight = zeta * zeta / driftlengthVariance;
 
         size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z(), weight);
         // if (not appended_hit){

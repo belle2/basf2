@@ -25,8 +25,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    const double c_simpleDriftLengthVariance  = 0.000169;
-
     /** Class representing a hit wire in the central drift chamber.
      *
      *  This class combines the measurement information from a CDCHit
@@ -40,6 +38,9 @@ namespace Belle2 {
     public:
       /// Return an instance of the used TDC count translator.
       static CDC::TDCCountTranslatorBase& getTDCCountTranslator();
+
+      /// A default value for the drift length variance if no variance from the drift length translation is available.
+      static constexpr const double c_simpleDriftLengthVariance  = 0.000169;
 
       /// Default constructor for ROOT compatibility.
       CDCWireHit();

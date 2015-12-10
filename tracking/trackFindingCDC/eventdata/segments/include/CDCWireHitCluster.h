@@ -14,11 +14,23 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
+
     /// An aggregation of CDCWireHits.
     class CDCWireHitCluster : public std::vector<const Belle2::TrackFindingCDC::CDCWireHit*> {
+
+      /// Return if this was set as background
+      bool getBackgroundFlag() const
+      { return m_backgroundFlag; }
+
+      /// Set whether this cluster is consider as made of background
+      void setBackgroundFlag(bool backgroundFlag = true)
+      { m_backgroundFlag = backgroundFlag; }
+
+    private:
+      /// Memory for the flag marking this cluster as background
+      bool m_backgroundFlag;
+
     }; //end class CDCWireHitCluster
 
   }
 }
-
-

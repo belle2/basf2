@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
 
-#include <tracking/trackFindingCDC/findlets/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

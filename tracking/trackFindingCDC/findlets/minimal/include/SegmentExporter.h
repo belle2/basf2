@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/findlets/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <genfit/TrackCand.h>
 #include <framework/datastore/StoreArray.h>

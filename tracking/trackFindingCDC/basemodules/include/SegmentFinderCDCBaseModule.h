@@ -11,9 +11,9 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
-#include <tracking/trackFindingCDC/findlets/SegmentFitter.h>
-#include <tracking/trackFindingCDC/findlets/SegmentOrienter.h>
-#include <tracking/trackFindingCDC/findlets/SegmentExporter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentExporter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 

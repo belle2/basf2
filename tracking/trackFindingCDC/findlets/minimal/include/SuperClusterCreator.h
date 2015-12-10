@@ -9,11 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/filters/wirehit_relation/WholeWireHitRelationFilter.h>
-
+#include <tracking/trackFindingCDC/filters/wirehit_relation/SecondaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/ClusterCreator.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/findlets/Findlet.h>
 
 #include <vector>
 #include <iterator>
@@ -23,8 +21,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    template<class WireHitRelationFilter>
-    class ClusterCreator:
+    class SuperClusterCreator:
       public Findlet<CDCWireHit, CDCWireHitCluster> {
 
     private:
@@ -36,47 +33,44 @@ namespace Belle2 {
       void initialize() override
       {
         Super::initialize();
-        m_wireHitRelationFilter.initialize();
+        m_clusterCreator.initialize();
       }
 
       /// Signals the beginning of a new event
       void beginEvent() override
       {
         Super::beginEvent();
-        m_wireHitRelationFilter.beginEvent();
+        m_clusterCreator.beginEvent();
       }
 
       /// Signals the end of the event processing
       void terminate() override
       {
-        m_wireHitRelationFilter.terminate();
+        m_clusterCreator.terminate();
         Super::terminate();
       }
 
     public:
       /// Main algorithm applying the cluster refinement
       virtual void apply(std::vector<CDCWireHit>& inputWireHits,
-                         std::vector<CDCWireHitCluster>& outputClusters) override final
+                         std::vector<CDCWireHitCluster>& outputSuperClusters) override final
       {
-        // create the neighborhood
-        B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-        m_wirehitNeighborhood.clear();
-        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, inputWireHits);
-        B2ASSERT("Expect wire hit neighborhood to be symmetric ", m_wirehitNeighborhood.isSymmetric());
-        B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
+        m_clusterCreator.apply(inputWireHits, outputSuperClusters);
 
-        m_wirehitClusterizer.createFromPointers(inputWireHits, m_wirehitNeighborhood, outputClusters);
+        int iSuperCluster = -1;
+        for (CDCWireHitCluster& superCluster : outputSuperClusters) {
+          ++iSuperCluster;
+          superCluster.setISuperCluster(iSuperCluster);
+          for (CDCWireHit* wireHit : superCluster) {
+            wireHit->setISuperCluster(iSuperCluster);
+          }
+          std::sort(superCluster.begin(), superCluster.end());
+        }
       }
 
     private:
-      /// Instance of the hit cluster generator
-      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
-
-      /// Memory for the wire hit neighborhood in a cluster.
-      WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
-
-      /// Wire hit neighborhood relation filter
-      WireHitRelationFilter m_wireHitRelationFilter;
+      /// Creator of the super clusters
+      ClusterCreator<SecondaryWireHitRelationFilter> m_clusterCreator;
 
     }; // end class
   } // end namespace TrackFindingCDC

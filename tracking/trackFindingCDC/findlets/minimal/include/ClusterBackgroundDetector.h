@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/findlets/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
 #include <iterator>

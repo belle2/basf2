@@ -606,6 +606,27 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+
+    double isExtendedSignal(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      //abort early if PDG codes are different
+      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits, these are usually ok
+      status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissingResonance);
+      status &= (~MCMatching::c_MisID);
+      status &= (~MCMatching::c_AddedWrongParticle);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
     double genMotherPDG(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1228,6 +1249,9 @@ namespace Belle2 {
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
+    REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
+                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,

@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/background_segment/BackgroundSegmentsFilterFactory.h>
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 using namespace std;
 using namespace Belle2;

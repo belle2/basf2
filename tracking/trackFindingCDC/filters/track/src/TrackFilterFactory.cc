@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 using namespace std;
 using namespace Belle2;
@@ -47,4 +46,3 @@ TrackFilterFactory::create(const std::string& filterName) const
     return Super::create(filterName);
   }
 }
-

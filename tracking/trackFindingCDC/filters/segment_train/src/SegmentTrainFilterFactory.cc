@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/filters/segment_train/SegmentTrainFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segment_train/SimpleSegmentTrainFilter.h>
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

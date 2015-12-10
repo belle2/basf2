@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 #include <framework/core/ModuleParamList.h>

@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/new_segment/NewSegmentsFilterFactory.h>
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

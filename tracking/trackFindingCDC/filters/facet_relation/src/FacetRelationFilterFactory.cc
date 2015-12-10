@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilters.h>
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

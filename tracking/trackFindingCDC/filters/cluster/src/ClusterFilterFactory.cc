@@ -10,12 +10,9 @@
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 FilterFactory<Filter<CDCWireHitCluster> >::FilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)

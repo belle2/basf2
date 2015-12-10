@@ -30,6 +30,12 @@ CDCMCManager& CDCMCManager::getInstance()
 }
 
 
+void CDCMCManager::requireTruthInformation()
+{
+  StoreArray <CDCSimHit>::required();
+  StoreArray <MCParticle>::required();
+}
+
 void CDCMCManager::clear()
 {
   m_mcTrackLookUp.clear();

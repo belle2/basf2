@@ -27,7 +27,7 @@ namespace Belle2 {
     class CDCMCManager  {
 
     public:
-      ///Getter for the singletone instance
+      /// Getter for the singletone instance
       static CDCMCManager& getInstance();
 
       /// Getter for the singletone instance of the CDCMCMap
@@ -55,6 +55,9 @@ namespace Belle2 {
       { return getInstance().m_mcTrackLookUp; }
 
     public:
+      /// Require the mc information store arrays.
+      void requireTruthInformation();
+
       /// Clears all Monte Carlo information present in the last event
       void clear();
 

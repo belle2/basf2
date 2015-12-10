@@ -17,12 +17,9 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-
-#include <framework/datastore/StoreArray.h>
 
 #include <vector>
 #include <iterator>

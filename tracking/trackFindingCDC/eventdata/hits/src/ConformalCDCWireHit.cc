@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>
-
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 

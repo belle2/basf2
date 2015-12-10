@@ -15,6 +15,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include <stdexcept>
+
 using namespace Belle2;
 using namespace std;
 
@@ -100,7 +102,14 @@ void NtupleCustomFloatsTool::eval(const Particle* particle)
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
       int iPos = iVar * nDecayProducts + iProduct;
-      m_fVars[iPos] = m_functions[iVar](selparticles[iProduct]);
+
+      // Prevent crash if variable doesn't exist
+      // Write default value instead
+      try {
+        m_fVars[iPos] = m_functions[iVar](selparticles[iProduct]);
+      } catch (const runtime_error& error) {
+        m_fVars[iPos] = -999;
+      }
     }
   }
 }

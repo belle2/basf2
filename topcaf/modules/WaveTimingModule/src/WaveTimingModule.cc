@@ -148,7 +148,7 @@ void WaveTimingModule::event()
       //Create TOPDIGIT
       TOPDigit* this_topdigit = m_topdigits_ptr.appendNew(barID, channelID, TDC);
       this_topdigit->setADC(max_adc);
-      this_topdigit->setHardwareChannelID(hardwareID);
+      this_topdigit->setChannel(hardwareID);
 
       //Update EventWaveForm for Sample-to-Sample correction
       evtwaves_ptr[w]->SetTime(at40_t* sample_dt);

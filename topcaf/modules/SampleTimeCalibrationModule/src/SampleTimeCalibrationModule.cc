@@ -6,7 +6,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/conditions/ConditionsService.h>
 
-
 #include <iostream>
 #include <cstdlib>
 
@@ -163,7 +162,7 @@ void SampleTimeCalibrationModule::event()
           double corrTime = CalibrateWaveform(evtwave_ptr);
           int TDC = ((int)((double)old_topdigit->getTDC() - corrTime * m_time2tdc));
           B2INFO("s2s .. TDC_i: " << old_topdigit->getTDC() << "\tTDC_c: " << TDC << "\t corrTime: " << corrTime);
-          TOPDigit* this_topdigit = new TOPDigit(old_topdigit->getBarID(), old_topdigit->getChannelID(), TDC);
+          TOPDigit* this_topdigit = new TOPDigit(old_topdigit->getModuleID(), old_topdigit->getPixelID(), TDC);
           this_topdigit->setADC(old_topdigit->getADC());
 
           corr_topdigits.push_back(this_topdigit);

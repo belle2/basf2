@@ -22,7 +22,12 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Class representing a triple of neighboring wire hits.
+    /** Class representing a triple of neighboring oriented wire with additional trajectory information.
+     *
+     *  As trajectory information three tangent lines touching pairs on for each pair hits is used.
+     *  Depending on the how much the three lines deviate from each other it is possible to judge
+     *  if a particular triple is unlikely to be in a track and shall not be used as an element in
+     *  path construction. */
     class CDCFacet : public CDCRLWireHitTriple {
     public:
       /// Constructor taking three oriented wire hits.

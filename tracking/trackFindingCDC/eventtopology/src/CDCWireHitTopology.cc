@@ -44,16 +44,15 @@ void CDCWireHitTopology::initialize()
 }
 
 
-void CDCWireHitTopology::fill(const std::vector<CDCWireHit>& wireHits)
+void CDCWireHitTopology::fill(std::shared_ptr<std::vector<CDCWireHit> > wireHits)
 {
-  // Copy the wire hits
-  m_wireHits = wireHits;
+  B2ASSERT("Nullptr served to CDCWireHitTopology::fill",
+           wireHits);
 
-  std::sort(m_wireHits.begin(), m_wireHits.end());
+  m_wireHits = std::move(wireHits);
 
-  if (not std::is_sorted(m_wireHits.begin(), m_wireHits.end())) {
-    B2ERROR("Wire hits are not sorted after creation");
-  }
+  B2ASSERT("Expect the wire hits to be sorted",
+           std::is_sorted(getWireHits().begin(), getWireHits().end()));
 }
 
 /// Getter for the wire hit that is based on the given CDCHit.

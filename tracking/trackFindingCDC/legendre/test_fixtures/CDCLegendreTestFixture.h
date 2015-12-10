@@ -681,8 +681,11 @@ namespace Belle2 {
 
         EXPECT_EQ(m_hitList.size(), 110) << "Too few hits in the hit vector.";
 
+        std::sort(m_hitList.begin(), m_hitList.end());
+
+        std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(m_hitList)};
         CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        wireHitTopology.fill(m_hitList);
+        wireHitTopology.fill(std::move(sharedWireHits));
       }
 
     };

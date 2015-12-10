@@ -87,7 +87,9 @@ void WireHitTopologyPreparerModule::event()
     }
   }
 
-  wireHitTopology.fill(std::move(wireHits));
+  std::sort(wireHits.begin(), wireHits.end());
+  std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(std::move(wireHits))};
+  wireHitTopology.fill(std::move(sharedWireHits));
 
   B2DEBUG(100, "  Created number of CDCWireHits == " << useNHits);
   B2DEBUG(100, "  Number of usable CDCWireHits == " << useNHits);

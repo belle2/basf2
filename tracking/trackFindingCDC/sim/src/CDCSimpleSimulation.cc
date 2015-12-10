@@ -124,7 +124,9 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
       wireHits.push_back(simpleSimHit.m_wireHit);
     }
 
-    wireHitTopology.fill(std::move(wireHits));
+    std::sort(wireHits.begin(), wireHits.end());
+    std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(std::move(wireHits))};
+    wireHitTopology.fill(std::move(sharedWireHits));
     // TODO: Decide if the EventMeta should be incremented after write.
   }
 

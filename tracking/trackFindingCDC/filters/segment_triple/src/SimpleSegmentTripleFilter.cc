@@ -150,7 +150,8 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
     }
   }
 
-  const CDCTrajectorySZ& trajectorySZ = getFittedTrajectorySZ(segmentTriple);
+  // Fit the sz slope and intercept
+  /*const CDCTrajectorySZ& trajectorySZ = */ getFittedTrajectorySZ(segmentTriple);
 
   CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
 

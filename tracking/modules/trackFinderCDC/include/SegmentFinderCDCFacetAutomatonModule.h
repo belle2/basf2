@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet_relation/SimpleFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segment_relation/BaseSegmentRelationFilter.h>
@@ -41,7 +40,7 @@ namespace Belle2 {
 
   /// Module specialisation using the default Monte Carlo free filters. To be used in production.
   typedef TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
-  TrackFindingCDC::AllClusterFilter,
+  TrackFindingCDC::TMVAClusterFilter,
                   TrackFindingCDC::RealisticFacetFilter,
                   TrackFindingCDC::SimpleFacetRelationFilter >
                   SegmentFinderCDCFacetAutomatonModule;

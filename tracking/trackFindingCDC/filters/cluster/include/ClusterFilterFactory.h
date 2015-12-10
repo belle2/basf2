@@ -32,7 +32,7 @@ namespace Belle2 {
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "all");
+      FilterFactory(const std::string& defaultFilterName = "tmva");
 
       using Super::create;
 

@@ -17,10 +17,12 @@ REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
 SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule()
 {
-  this->setDescription("Versatile module with adjustable filters for segment generation.");
+  this->setDescription("This is a depricated alias for SegmentFinderCDCFacetAutomatonModule");
+}
 
-  // Set the default segment to symmetric
-  ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-  this->setParamList(moduleParamList);
+
+void SegmentFinderCDCFacetAutomatonDevModule::initialize()
+{
+  B2WARNING("SegmentFinderCDCFacetAutomatonDevModule is a depricated alias for SegmentFinderCDCFacetAutomatonModule");
+  SegmentFinderCDCFacetAutomatonModule::initialize();
 }

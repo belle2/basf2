@@ -11,28 +11,19 @@
 
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segment_relation/ChooseableSegmentRelationFilter.h>
-
 namespace Belle2 {
+  namespace TrackFindingCDC {
+    /// Module for the cellular automaton tracking for the CDC on regular events
+    class SegmentFinderCDCFacetAutomatonDevModule :
+      public SegmentFinderCDCFacetAutomatonModule {
 
-  /// Module for the cellular automaton tracking for the CDC on regular events
-  class SegmentFinderCDCFacetAutomatonDevModule:
-    public Belle2::TrackFindingCDC::SegmentFinderCDCFacetAutomatonImplModule <
-    TrackFindingCDC::ChooseableClusterFilter,
-    TrackFindingCDC::ChooseableFacetFilter,
-    TrackFindingCDC::ChooseableFacetRelationFilter,
-    TrackFindingCDC::ChooseableSegmentRelationFilter > {
+    public:
+      /// Constructor of the module. Setting up parameters and description.
+      SegmentFinderCDCFacetAutomatonDevModule();
 
-  private:
-    /// Type of the base class
-    typedef SegmentFinderCDCFacetAutomatonImplModule<> Super;
+      /// Signal beginning of event processing
+      virtual void initialize() override;
 
-  public:
-    /// Constructor of the module. Setting up parameters and description.
-    SegmentFinderCDCFacetAutomatonDevModule();
-
-  }; // end class
+    }; // end class
+  }
 } // end namespace Belle2

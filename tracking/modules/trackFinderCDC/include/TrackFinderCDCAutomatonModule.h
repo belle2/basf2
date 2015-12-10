@@ -16,26 +16,27 @@
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonModule.h>
 
 namespace Belle2 {
+  namespace TrackFindingCDC {
+    /// Module for the cellular automaton tracking for the CDC on regular events
+    class TrackFinderCDCAutomatonModule:
+      public SegmentFinderCDCFacetAutomatonModule,
+      public TrackFinderCDCSegmentPairAutomatonModule {
 
-  /// Module for the cellular automaton tracking for the CDC on regular events
-  class TrackFinderCDCAutomatonModule:
-    public SegmentFinderCDCFacetAutomatonModule,
-    public TrackFinderCDCSegmentPairAutomatonModule {
+    public:
 
-  public:
+      /// Constructor of the module. Setting up parameters and description.
+      TrackFinderCDCAutomatonModule();
 
-    /// Constructor of the module. Setting up parameters and description.
-    TrackFinderCDCAutomatonModule();
+      ///  Initialize the Module before event processing
+      virtual void initialize();
 
-    ///  Initialize the Module before event processing
-    virtual void initialize();
+      /// Processes the event and generates track candidates
+      virtual void event();
 
-    /// Processes the event and generates track candidates
-    virtual void event();
+      /// Terminate and free resources after last event has been processed
+      virtual void terminate();
 
-    /// Terminate and free resources after last event has been processed
-    virtual void terminate();
-
-  }; // end class
+    }; // end class
+  }
 } // end namespace Belle2
 

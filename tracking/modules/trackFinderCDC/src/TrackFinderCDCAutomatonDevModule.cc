@@ -17,11 +17,12 @@
 #include <time.h>
 
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
 REG_MODULE(TrackFinderCDCAutomatonDev);
 
 TrackFinderCDCAutomatonDevModule::TrackFinderCDCAutomatonDevModule() :
-  SegmentFinderCDCFacetAutomatonDevModule(),
+  SegmentFinderCDCFacetAutomatonModule(),
   TrackFinderCDCSegmentPairAutomatonDevModule()
 {
   setDescription("For development purposes of the cellular automaton track finding.");
@@ -31,7 +32,7 @@ TrackFinderCDCAutomatonDevModule::TrackFinderCDCAutomatonDevModule() :
 
 void TrackFinderCDCAutomatonDevModule::initialize()
 {
-  SegmentFinderCDCFacetAutomatonDevModule::initialize();
+  SegmentFinderCDCFacetAutomatonModule::initialize();
   if (m_param_runSecondStage) {
     TrackFinderCDCSegmentPairAutomatonDevModule::initialize();
   }
@@ -54,7 +55,7 @@ void TrackFinderCDCAutomatonDevModule::event()
   // Definitions need callgrind.h
 
   // Stage one
-  SegmentFinderCDCFacetAutomatonDevModule::event();
+  SegmentFinderCDCFacetAutomatonModule::event();
 
   // Stage two
   if (m_param_runSecondStage) {
@@ -66,7 +67,7 @@ void TrackFinderCDCAutomatonDevModule::event()
   CALLGRIND_STOP_INSTRUMENTATION;
 #endif
 
-  B2DEBUG(100, "########## TrackFinderCDCAutomatonDevModule end ############");
+  B2DEBUG(100, "########## TrackFinderCDCAutomatonModule end ############");
 }
 
 
@@ -76,7 +77,7 @@ void TrackFinderCDCAutomatonDevModule::terminate()
     TrackFinderCDCSegmentPairAutomatonDevModule::terminate();
   }
 
-  SegmentFinderCDCFacetAutomatonDevModule::terminate();
+  SegmentFinderCDCFacetAutomatonModule::terminate();
 
 #ifdef HAS_CALLGRIND
   CALLGRIND_DUMP_STATS;

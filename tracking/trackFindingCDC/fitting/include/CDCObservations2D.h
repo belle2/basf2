@@ -187,8 +187,8 @@ namespace Belle2 {
       size_t append(const Belle2::TrackFindingCDC::CDCRLTaggedWireHit& rlTaggedWireHit)
       {
         const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
-        const CDCWireHit* ptrWireHit = rlTaggedWireHit.getWireHit();
-        return append(*ptrWireHit, rlInfo);
+        const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
+        return append(wireHit, rlInfo);
       }
 
       /** Appends the hit circle at wire reference position with a right left passage hypotheses.

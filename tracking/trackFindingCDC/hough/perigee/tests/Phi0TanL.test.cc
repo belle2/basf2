@@ -167,7 +167,7 @@ namespace {
       }
 
       for (const CDCRLTaggedWireHit& rlTaggedWireHit : taggedHits) {
-        const CDCWireHit* wireHit = rlTaggedWireHit.getWireHit();
+        const CDCWireHit& wireHit = rlTaggedWireHit.getWireHit();
         std::string color = "blue";
         if (rlTaggedWireHit.getRLInfo() == ERightLeft::c_Right) {
           color = "green";
@@ -176,7 +176,7 @@ namespace {
         }
         //EventDataPlotter::AttributeMap strokeAttr {{"stroke", color}};
         EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
-        draw(*wireHit, strokeAttr);
+        draw(wireHit, strokeAttr);
       }
       ++iColor;
     }

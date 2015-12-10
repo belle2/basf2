@@ -29,7 +29,7 @@ void ConformalCDCWireHitCreator::copyHitsFromTopology(std::vector<ConformalCDCWi
   conformalCDCWireHitList.reserve(cdcWireHits.size());
   for (const CDCWireHit& cdcWireHit : cdcWireHits) {
     if (cdcWireHit.getAutomatonCell().hasTakenFlag()) continue;
-    conformalCDCWireHitList.emplace_back(cdcWireHit);
+    conformalCDCWireHitList.emplace_back(&cdcWireHit);
     const ConformalCDCWireHit& newlyAddedHit = conformalCDCWireHitList.back();
     if (not(newlyAddedHit.checkHitDriftLength() and newlyAddedHit.getCDCWireHit()->isAxial())) {
       conformalCDCWireHitList.pop_back();

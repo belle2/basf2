@@ -35,7 +35,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       FacetCreator()
       {
-        addSubordinaryProcessingSignalListener(&m_facetFilter);
+        addProcessingSignalListener(&m_facetFilter);
       }
 
       /// Short description of the findlet

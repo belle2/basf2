@@ -35,7 +35,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       ClusterCreator()
       {
-        addSubordinaryProcessingSignalListener(&m_wireHitRelationFilter);
+        addProcessingSignalListener(&m_wireHitRelationFilter);
       }
 
       /// Short description of the findlet

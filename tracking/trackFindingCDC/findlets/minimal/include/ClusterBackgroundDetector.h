@@ -34,7 +34,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       ClusterBackgroundDetector()
       {
-        addSubordinaryProcessingSignalListener(&m_clusterFilter);
+        addProcessingSignalListener(&m_clusterFilter);
       }
 
       /// Main algorithm applying the cluster refinement

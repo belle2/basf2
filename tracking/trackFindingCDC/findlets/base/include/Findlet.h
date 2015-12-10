@@ -75,7 +75,7 @@ namespace Belle2 {
       virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
 
       /// Register a processing signal listener that is contained in this findlet.
-      void addSubordinaryProcessingSignalListener(ProcessingSignalListener* psl)
+      void addProcessingSignalListener(ProcessingSignalListener* psl)
       { m_subordinaryProcessingSignalListeners.push_back(psl); }
 
       /// Receive signal before the start of the event processing

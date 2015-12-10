@@ -41,7 +41,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentCreatorFacetAutomaton()
       {
-        addSubordinaryProcessingSignalListener(&m_facetRelationFilter);
+        addProcessingSignalListener(&m_facetRelationFilter);
       }
 
       /// Short description of the findlet

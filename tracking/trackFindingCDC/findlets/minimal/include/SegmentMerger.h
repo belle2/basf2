@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentMerger()
       {
-        addSubordinaryProcessingSignalListener(&m_segmentRelationFilter);
+        addProcessingSignalListener(&m_segmentRelationFilter);
       }
 
       /// Short description of the findlet

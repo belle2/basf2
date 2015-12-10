@@ -327,7 +327,6 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
                 "cut": str(tmva_cut)},
             SegmentsStoreObjName=output_segments_store_vector_name,
             WriteGFTrackCands=False,
-            FitSegments=True,
             TracksStoreObjName="__TempCDCTracksVector")
 
         if output_track_cands_store_array_name is not None:

@@ -66,8 +66,8 @@ namespace Belle2 {
         return "(no description)";
       }
 
-      /** Forward the parameters of this findlet to the module parameter list */
-      virtual void exposeParameters(ModuleParamList*)
+      /** Forward prefixed parameters of this findlet to the module parameter list */
+      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
       {
       }
 

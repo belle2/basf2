@@ -33,7 +33,7 @@ namespace Belle2 {
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
-      virtual void exposeParameters(ModuleParamList*)
+      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
       {
       }
 

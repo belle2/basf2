@@ -51,7 +51,7 @@ namespace Belle2 {
           addProcessingSignalListener(&m_clusterRefiner);
           addProcessingSignalListener(&m_clusterBackgroundDetector);
           addProcessingSignalListener(&m_facetCreator);
-          addProcessingSignalListener(&m_segmentCreator);
+          addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
           addProcessingSignalListener(&m_segmentMerger);
           addProcessingSignalListener(&m_segmentOrienter);
 
@@ -71,22 +71,23 @@ namespace Belle2 {
         }
 
         /// Expose the parameters of the cluster filter to a module
-        virtual void exposeParameters(ModuleParamList* moduleParamList) override
+        virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
         {
-          m_superClusterCreator.exposeParameters(moduleParamList);
-          m_clusterRefiner.exposeParameters(moduleParamList);
-          m_clusterBackgroundDetector.exposeParameters(moduleParamList);
-          m_facetCreator.exposeParameters(moduleParamList);
-          m_segmentCreator.exposeParameters(moduleParamList);
-          m_segmentMerger.exposeParameters(moduleParamList);
+          m_superClusterCreator.exposeParameters(moduleParamList, prefix);
+          m_clusterRefiner.exposeParameters(moduleParamList, prefix);
+          m_clusterBackgroundDetector.exposeParameters(moduleParamList, addPrefix(prefix, "Cluster"));
+          m_facetCreator.exposeParameters(moduleParamList, addPrefix(prefix, "Facet"));
+          m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, addPrefix(prefix, "FacetRelation"));
+          m_segmentMerger.exposeParameters(moduleParamList, addPrefix(prefix, "Segemnt"));
+          // FIXME : make parameter names small
 
-          m_segmentFitter.exposeParameters(moduleParamList);
-          m_segmentOrienter.exposeParameters(moduleParamList);
-          m_segmentExporter.exposeParameters(moduleParamList);
+          m_segmentFitter.exposeParameters(moduleParamList, prefix);
+          m_segmentOrienter.exposeParameters(moduleParamList, prefix);
+          m_segmentExporter.exposeParameters(moduleParamList, prefix);
 
-          m_superClusterSwapper.exposeParameters(moduleParamList);
-          m_clusterSwapper.exposeParameters(moduleParamList);
-          m_facetSwapper.exposeParameters(moduleParamList);
+          m_superClusterSwapper.exposeParameters(moduleParamList, prefix);
+          m_clusterSwapper.exposeParameters(moduleParamList, prefix);
+          m_facetSwapper.exposeParameters(moduleParamList, prefix);
         }
 
         /// Processes the current event
@@ -119,7 +120,7 @@ namespace Belle2 {
         FacetCreator<AFacetFilter> m_facetCreator;
 
         /// Find the segments by composition of facets path from a cellular automaton
-        SegmentCreatorFacetAutomaton<AFacetRelationFilter> m_segmentCreator;
+        SegmentCreatorFacetAutomaton<AFacetRelationFilter> m_segmentCreatorFacetAutomaton;
 
         /// Merges segments with closeby segments of the same super cluster
         SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
@@ -186,7 +187,7 @@ namespace Belle2 {
       m_clusterRefiner.apply(m_superClusters, m_clusters);
       m_clusterBackgroundDetector.apply(m_clusters);
       m_facetCreator.apply(m_clusters, m_facets);
-      m_segmentCreator.apply(m_facets, m_segments);
+      m_segmentCreatorFacetAutomaton.apply(m_facets, m_segments);
       m_segmentMerger.apply(m_segments, m_mergedSegments);
       m_segmentFitter.apply(m_mergedSegments);
       m_segmentOrienter.apply(m_mergedSegments, outputSegments);

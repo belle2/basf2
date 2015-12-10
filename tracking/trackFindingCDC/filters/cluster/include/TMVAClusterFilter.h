@@ -20,11 +20,13 @@ namespace Belle2 {
     class TMVAClusterFilter: public TMVAFilter<CDCWireHitClusterBasicVarSet> {
 
     public:
+      using Super = TMVAFilter<CDCWireHitClusterBasicVarSet>;
+
+    public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.
       TMVAClusterFilter() :
         TMVAFilter<CDCWireHitClusterBasicVarSet>("BackgroundHitFinder")
       {}
-
     };
   }
 }

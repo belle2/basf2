@@ -44,7 +44,6 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
         segment_finder.param({
             "WriteFacets": True,
             "SegmentOrientation": "none",
-            "FitSegments": True,
         })
         main_path.add_module(segment_finder)
 

@@ -38,12 +38,6 @@ namespace Belle2 {
                "behaviour for modules that still rely on it.";
       }
 
-      /// Expose the parameters to a module
-      virtual void exposeParameters(ModuleParamList*) override final
-      {
-        // No parameters
-      }
-
       /// Signals the start of the event processing
       virtual void initialize() override final
       {

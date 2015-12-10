@@ -33,32 +33,18 @@ namespace Belle2 {
         return "Fits each segment with the Riemann method";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
-      {
-        moduleParamList->addParameter("FitSegments",
-                                      m_param_fitSegments,
-                                      "Switch to indicate if the segments shall be fitted.",
-                                      bool(m_param_fitSegments));
-      }
-
     public:
       /// Main algorithm applying the fit to each segment
       virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments) override final
       {
-        // Fit the segments if requested
-        if (m_param_fitSegments) {
-          for (const CDCRecoSegment2D& segment : outputSegments) {
-            CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
-            m_fitter.update(trajectory2D, segment);
-          }
+        for (const CDCRecoSegment2D& segment : outputSegments) {
+          CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+          m_fitter.update(trajectory2D, segment);
         }
+
       }
 
     private:
-      /// Parameter: Switch if the segments shall be fitted after the generation.
-      bool m_param_fitSegments = true;
-
       /// Instance of the fitter to be used.
       CDCRiemannFitter m_fitter;
 

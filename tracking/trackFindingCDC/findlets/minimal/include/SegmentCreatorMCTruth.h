@@ -38,12 +38,6 @@ namespace Belle2 {
         return "Constructs segments from wire hits using the mc truth information.";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList*) override final
-      {
-        // No parameters
-      }
-
       /// Initialize the Module before event processing
       virtual void initialize() override final
       {

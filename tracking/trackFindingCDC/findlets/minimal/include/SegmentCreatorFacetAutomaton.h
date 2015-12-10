@@ -51,9 +51,10 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
+      void exposeParameters(ModuleParamList* moduleParamList,
+                            const std::string& prefix = "") override final
       {
-        m_facetRelationFilter.exposeParameters(moduleParamList);
+        m_facetRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main function of the segment finding by the cellular automaton.

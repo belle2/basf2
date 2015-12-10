@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <string>
 #include <vector>
 
 namespace Belle2 {
@@ -42,10 +43,9 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList) override
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& = "") override
       {
-        m_wireHitCreator.exposeParameters(moduleParamList);
-        m_wireHitTopologyFiller.exposeParameters(moduleParamList);
+        // Chose to not expose the parameters
       }
 
       /// Generates the segment.

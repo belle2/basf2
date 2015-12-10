@@ -20,7 +20,6 @@ class CDCDebugDisplayRun(CDCDisplayRun):
         "FacetFilter": "none",
         "FacetRelationFilter": "none",
         # "CreateGFTrackCands" : True,
-        # "FitSegments" : True,
         # "SegmentOrientation": "none",
     })
 

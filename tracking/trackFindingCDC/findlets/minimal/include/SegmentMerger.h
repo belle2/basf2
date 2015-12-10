@@ -1,4 +1,5 @@
 /**************************************************************************
+
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
@@ -48,9 +49,9 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        m_segmentRelationFilter.exposeParameters(moduleParamList);
+        m_segmentRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:

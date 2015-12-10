@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
 #include <vector>
 
 namespace Belle2 {
@@ -33,9 +35,9 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        moduleParamList->addParameter("SegmentOrientation",
+        moduleParamList->addParameter(addPrefix(prefix, "SegmentOrientation"),
                                       m_param_segmentOrientationString,
                                       "Option which orientation of segments shall be generate. "
                                       "Valid options are '' (default of the finder), "

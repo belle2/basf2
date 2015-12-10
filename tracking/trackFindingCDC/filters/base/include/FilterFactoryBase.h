@@ -10,6 +10,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
+#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
 #include <framework/core/ModuleParamList.h>
 
 #include <string>
@@ -46,7 +47,11 @@ namespace Belle2 {
       virtual ~FilterFactoryBase() { }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList);
+      void exposeParameters(ModuleParamList* moduleParamList)
+      { exposeParameters(moduleParamList, getModuleParamPrefix()); }
+
+      /** Add the parameters of the filter to the module */
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /** Create a string with a description for the filter names parameter */
       std::string createFilterNamesDescription() const
@@ -77,9 +82,6 @@ namespace Belle2 {
       std::string createFilterParametersDescription() const
       {
         // Compose description for the filter parameters
-        std::string prefix = getModuleParamPrefix();
-
-
         std::ostringstream filterParametersDescription;
         filterParametersDescription << "Key -- value pairs depending on the filter.\n";
         for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
@@ -90,7 +92,7 @@ namespace Belle2 {
 
           std::unique_ptr<AFilter> filter = create(filterName);
           if (not filter) {
-            B2WARNING("Could not create a " << prefix << "Filter for name " << filterName);
+            B2WARNING("Could not create a filter for name " << filterName);
             continue;
           }
           std::map<std::string, std::string> filterParameters = filter->getParameterDescription();
@@ -162,25 +164,21 @@ namespace Belle2 {
       Meaning of the Key - Value pairs depend on the concrete filter
       */
       std::map<std::string, std::string> m_filterParameters;
-
     };
 
 
 
     template<class AFilter>
-    void FilterFactoryBase<AFilter>::exposeParameters(ModuleParamList* moduleParamList)
+    void FilterFactoryBase<AFilter>::exposeParameters(ModuleParamList* moduleParamList,
+                                                      const std::string& prefix)
     {
-      assert(moduleParamList);
-
-      std::string prefix = getModuleParamPrefix();
-
       // Set the module parameters
-      moduleParamList->addParameter(prefix + "Filter",
+      moduleParamList->addParameter(addPrefix(prefix, "filter"),
                                     m_filterName,
                                     createFilterNamesDescription(),
                                     std::string(m_filterName));
 
-      moduleParamList->addParameter(prefix + "FilterParameters",
+      moduleParamList->addParameter(addPrefix(prefix, "filterParameters"),
                                     m_filterParameters,
                                     createFilterParametersDescription(),
                                     std::map<std::string, std::string>(m_filterParameters));

@@ -45,9 +45,9 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        m_facetFilter.exposeParameters(moduleParamList);
+        m_facetFilter.exposeParameters(moduleParamList, prefix);
       }
 
       virtual void apply(const std::vector<CDCWireHitCluster>& inputClusters,

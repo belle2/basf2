@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
+
 #include <genfit/TrackCand.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -37,14 +39,14 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList) override final
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        moduleParamList->addParameter("ExportSegments",
+        moduleParamList->addParameter(addPrefix(prefix, "exportSegments"),
                                       m_param_exportSegments,
                                       "Switch for the creation of track candidates for each segment.",
                                       bool(m_param_exportSegments));
 
-        moduleParamList->addParameter("ExportSegmentsInto",
+        moduleParamList->addParameter(addPrefix(prefix, "exportSegmentsInto"),
                                       m_param_exportSegmentsInto,
                                       "Name of the output StoreArray of track candidates.",
                                       std::string(m_param_exportSegmentsInto));

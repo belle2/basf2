@@ -44,9 +44,9 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList) override final
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        m_clusterFilter.exposeParameters(moduleParamList);
+        m_clusterFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main algorithm applying the cluster background detection
@@ -73,4 +73,3 @@ namespace Belle2 {
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
-

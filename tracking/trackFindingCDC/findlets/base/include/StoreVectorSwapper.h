@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
@@ -56,24 +57,25 @@ namespace Belle2 {
       }
 
       /// Expose the parameters  to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList) override
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
 
-        moduleParamList->addParameter("Write" + classMnemomicCapitalName + "s",
+        moduleParamList->addParameter(addPrefix(prefix, "Write" + classMnemomicCapitalName + "s"),
                                       m_param_writeStoreVector,
                                       "Switch if " +
                                       m_classMnemomicDescription +
                                       " shall be written to the DataStore",
                                       bool(false));
 
-        moduleParamList->addParameter(classMnemomicCapitalName + "sStoreObjName",
+        moduleParamList->addParameter(addPrefix(prefix, classMnemomicCapitalName + "sStoreObjName"),
                                       m_param_storeVectorName,
                                       "Name of the output StoreObjPtr of the " +
                                       m_classMnemomicDescription +
                                       " generated within this module.",
                                       std::string(m_param_storeVectorName));
+        //FIXME: Small parameter names
       }
 
       /// Short description of the findlet

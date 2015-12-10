@@ -45,10 +45,10 @@ namespace Belle2 {
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
-      virtual void exposeParameters(ModuleParamList* moduleParamList) override final
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        m_filterFactory.exposeParameters(moduleParamList);
-        Super::exposeParameters(moduleParamList);
+        Super::exposeParameters(moduleParamList, prefix);
+        m_filterFactory.exposeParameters(moduleParamList, prefix);
       }
 
       /** Return the string holding the used filter name */

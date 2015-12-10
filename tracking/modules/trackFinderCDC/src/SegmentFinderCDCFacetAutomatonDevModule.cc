@@ -17,8 +17,9 @@ REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
 SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule()
 {
-  setDescription("Versatile module with adjustable filters for segment generation.");
+  this->setDescription("Versatile module with adjustable filters for segment generation.");
 
   // Set the default segment to symmetric
-  setSegmentOrientation(ETrackOrientation::c_Symmetric);
+  using TrackFindingCDC::EPreferredDirection;
+  this->m_segmentOrienter.setSegmentOrientation(EPreferredDirection::c_Symmetric);
 }

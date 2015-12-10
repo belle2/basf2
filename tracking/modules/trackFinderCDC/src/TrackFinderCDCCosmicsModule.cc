@@ -18,7 +18,8 @@ TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule()
 {
   setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
 
-  this->setSegmentOrientation(ETrackOrientation::c_Symmetric);
+  using TrackFindingCDC::EPreferredDirection;
+  this->m_segmentOrienter.setSegmentOrientation(EPreferredDirection::c_Symmetric);
   this->setTrackOrientation(ETrackOrientation::c_Downwards);
 }
 

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <iterator>
 
 namespace Belle2 {
@@ -17,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for the stereo property of the wire
-    enum class StereoType {
+    enum class EStereoType {
       /// Constant for an axial wire
       c_Axial = 0,
 
@@ -35,23 +36,13 @@ namespace Belle2 {
      *  INVALID_STEREOTYPE if there is no common super layer or the container is empty.
      */
     template<class AHits>
-    StereoType getStereoType(const AHits& hits)
+    EStereoType getStereoType(const AHits& hits)
     {
-      using std::begin;
-      using std::end;
-      auto itBegin = begin(hits);
-      auto itEnd = end(hits);
-      if (itBegin == itEnd) return StereoType::c_Invalid; // empty case
-      const StereoType stereoType = (*itBegin)->getStereoType();
-      for (const auto& hit : hits) {
-        if (hit->getStereoType() != stereoType) {
-          return StereoType::c_Invalid;
-        };
-      }
-      return stereoType;
+      using Hit = ValueType<AHits>;
+      auto getStereoTypeOfHit = [](const Hit & hit) {return hit->getStereoType();};
+      return common(hits, getStereoTypeOfHit, EStereoType::c_Invalid);
     }
 
   } // namespace TrackFindingCDC
 
 } // namespace Belle2
-

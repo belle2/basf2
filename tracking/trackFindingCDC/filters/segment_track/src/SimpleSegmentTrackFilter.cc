@@ -20,7 +20,7 @@ CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSeg
   Super::operator()(testPair);
 
   const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
-  bool is_stereo = testPair.first->getStereoType() != StereoType::c_Axial;
+  bool is_stereo = testPair.first->getStereoType() != EStereoType::c_Axial;
   double hit_distance = varSet.at("maxmimum_hit_distance_front");
 
   if (is_stereo) {

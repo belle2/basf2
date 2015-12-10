@@ -100,7 +100,7 @@ bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory = fitter.fit(*segment);
 
-  var<named("is_stereo")>() = segment->getStereoType() != StereoType::c_Axial;
+  var<named("is_stereo")>() = segment->getStereoType() != EStereoType::c_Axial;
   var<named("size")>() = size;
 
   var<named("number_of_taken_hits")>() = numberOfTakenHits;

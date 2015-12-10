@@ -76,7 +76,7 @@ namespace Belle2 {
 
       /// Checks if the two segments are of different axial type.
       bool checkSegmentsStereoTypes() const
-      { return getStartStereoType() == StereoType::c_Axial or getEndStereoType() == StereoType::c_Axial; }
+      { return (getStartStereoType() == EStereoType::c_Axial) xor(getEndStereoType() == EStereoType::c_Axial); }
 
       /// Checks the references to the contained three segment for nullptrs and exactly one of them is axial and one is stereo
       bool checkSegments() const
@@ -85,13 +85,13 @@ namespace Belle2 {
 
 
       /// Getter for the stereo type of the first segment.
-      StereoType getStartStereoType() const
-      { return getStartSegment() == nullptr ? StereoType::c_Invalid : getStartSegment()->getStereoType(); }
+      EStereoType getStartStereoType() const
+      { return getStartSegment() == nullptr ? EStereoType::c_Invalid : getStartSegment()->getStereoType(); }
 
 
       /// Getter for the stereo type of the second segment.
-      StereoType getEndStereoType() const
-      { return getEndSegment() == nullptr ? StereoType::c_Invalid : getEndSegment()->getStereoType(); }
+      EStereoType getEndStereoType() const
+      { return getEndSegment() == nullptr ? EStereoType::c_Invalid : getEndSegment()->getStereoType(); }
 
 
 
@@ -127,11 +127,11 @@ namespace Belle2 {
 
       /// Getter for the stereo segment
       const CDCRecoSegment2D* getStereoSegment() const
-      { return getStartStereoType() != StereoType::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getStartStereoType() != EStereoType::c_Axial ? getStartSegment() : getEndSegment(); }
 
       /// Getter for the axial segment
       const CDCRecoSegment2D* getAxialSegment() const
-      { return getStartStereoType() == StereoType::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getStartStereoType() == EStereoType::c_Axial ? getStartSegment() : getEndSegment(); }
 
 
       /// Setter for both segments simultaniously

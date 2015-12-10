@@ -141,7 +141,7 @@ namespace Belle2 {
       {
         CDCObservations2D observationsSZ;
         for (const CDCRecoHit3D& recoHit : track) {
-          if (recoHit.getStereoType() != StereoType::c_Axial) {
+          if (recoHit.getStereoType() != EStereoType::c_Axial) {
             appendSZ(observationsSZ, recoHit);
           }
         }

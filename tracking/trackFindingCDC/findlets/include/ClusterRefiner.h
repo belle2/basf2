@@ -59,6 +59,8 @@ namespace Belle2 {
                          std::vector<CDCWireHitCluster>& outputClusters) override final
       {
         for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
+          B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
+                                                                      superCluster.end()));
           m_wirehitNeighborhood.clear();
           m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, superCluster);
 

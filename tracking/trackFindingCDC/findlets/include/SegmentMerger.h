@@ -25,7 +25,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Refines the clustering of wire hits from  clusters to clusters
+    /// Merges segments in the same super cluster by linking paths of segments in a cellular automaton
     template<class SegmentRelationFilter>
     class SegmentMerger:
       public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
@@ -35,6 +35,12 @@ namespace Belle2 {
       typedef Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> Super;
 
     public:
+      /** Add the parameters of the filter to the module */
+      void exposeParameters(ModuleParamList* moduleParamList) override final
+      {
+        getSegmentRelationFilter().exposeParameters(moduleParamList);
+      }
+
       /// Signals the beginning of the event processing
       void initialize() override
       {
@@ -67,10 +73,6 @@ namespace Belle2 {
       {
         std::vector<ConstVectorRange<CDCRecoSegment2D> > m_segmentsByISuperCluster =
           adjacent_groupby(inputSegments.begin(), inputSegments.end(), [](const CDCRecoSegment2D & segment) -> int { return segment.getISuperCluster();});
-
-        for (ConstVectorRange<CDCRecoSegment2D> range : m_segmentsByISuperCluster) {
-          B2INFO("Supercluster with " << range.size() << " segments");
-        }
 
         for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : m_segmentsByISuperCluster) {
           std::vector<CDCRecoSegment2D> symmetricSegmentsInSuperCluster;

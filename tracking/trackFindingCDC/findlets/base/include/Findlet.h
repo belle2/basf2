@@ -12,32 +12,50 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <vector>
+#include <tuple>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Only forward a range for immutable types
-    template<class T>
-    struct ToRangesImpl {
-      /// A mutable range of Ts.
-      using Type = std::vector<T>;
-    };
-
-    /// Specialisation to only forward a range for immutable types.
-    template<class T>
-    struct ToRangesImpl<const T> {
-      /// An immutable range of Ts.
-      using Type = const std::vector<T>;
-    };
-
-    /// Short hand for ToRangeImpl
-    template<class T>
-    using ToRanges = typename ToRangesImpl<T>::Type;
-
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
-    template<class ... ScalarIOTypes>
+    template<class ... AIOTypes>
     class Findlet {
+
     public:
+      /// Types that should be served to apply on invokation
+      using IOTypes = std::tuple<AIOTypes...>;
+
+    private:
+      /// Only forward a range for immutable types
+      template<class T>
+      struct ToVectorImpl {
+        /// A mutable range of Ts.
+        using Type = std::vector<T>;
+      };
+
+      /// Specialisation to only forward a range for immutable types.
+      template<class T>
+      struct ToVectorImpl<const T> {
+        /// An immutable range of Ts.
+        using Type = const std::vector<T>;
+      };
+
+      /// Short hand for ToRangeImpl
+      template<class T>
+      using ToVector = typename ToVectorImpl<T>::Type;
+
+    public:
+      /// Vector types that should be served to apply on invokation
+      using IOVectors = std::tuple< std::vector<AIOTypes>... >;
+
+
+    public:
+      /// Brief description of the purpose of the concret findlet.
+      virtual std::string getDescription()
+      {
+        return "(no description)";
+      }
+
       /** Forward the parameters of this findlet to the module parameter list */
       virtual void exposeParameters(ModuleParamList*)
       {
@@ -59,7 +77,7 @@ namespace Belle2 {
       }
 
       /// Main function executing the algorithm
-      virtual void apply(ToRanges<ScalarIOTypes>& ... ranges) = 0;
+      virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
 
       /// End processing the current event
       virtual void endEvent()

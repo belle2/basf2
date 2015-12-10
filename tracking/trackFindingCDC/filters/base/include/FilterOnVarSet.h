@@ -19,25 +19,25 @@ namespace Belle2 {
     template<class AVarSet>
     class FilterOnVarSet: public Filter<typename AVarSet::Object> {
 
-    private:
-      /// Type of the super class
-      typedef Filter<typename AVarSet::Object> Super;
-
     public:
       /// Type of the object to be analysed.
       typedef typename AVarSet::Object Object;
 
+    private:
+      /// Type of the super class
+      typedef Filter<Object> Super;
+
     public:
       /// Constructor of the filter.
       FilterOnVarSet() :
-        Filter<Object>(),
+        Super(),
         m_varSet()
       {}
 
       /// Initialize the filter before event processing.
       virtual void initialize() override
       {
-        Filter<Object>::initialize();
+        Super::initialize();
         m_varSet.initialize();
       }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
       virtual void terminate() override
       {
         m_varSet.terminate();
-        Filter<Object>::terminate();
+        Super::terminate();
       }
 
       /// Checks if any variables need Monte Carlo information.

@@ -24,9 +24,7 @@ namespace Belle2 {
       "cell_weight",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a segment pair.
-     */
+    /** Name of the variables that should be extracted from the response of a filter. */
     template<class AFilter>
     class FilterVarNames : public VarNames<typename AFilter::Object> {
 
@@ -42,7 +40,11 @@ namespace Belle2 {
       }
     };
 
-    /** Class that computes floating point variables from segment pair.
+    /** A variable set based that represents the response of a filter.
+     *
+     *  The variables that are extracted from the filter response are the weight
+     *  and a boolean whether the response was NaN.
+     *  Class that computes floating point variables from segment pair.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
     template<class AFilter>
@@ -108,13 +110,5 @@ namespace Belle2 {
       std::unique_ptr<Filter> m_ptrFilter;
 
     };
-
-
-    // template<class AFilter>
-    // bool FilterVarSet<AFilter>::extract(const Object* obj)
-    // {
-
-    // }
-
   }
 }

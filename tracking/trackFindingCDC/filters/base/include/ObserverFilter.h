@@ -21,19 +21,26 @@ namespace Belle2 {
     /// Observer listening to the number of yes and no answers from the filter
     template<class ABaseFilter>
     class ObserverFilter : public ABaseFilter {
+
+    private:
+      /// Type of the filter base class
+      typedef ABaseFilter Super;
+
     public:
       using ABaseFilter::BaseFilter;
+
+      /// Object type to be filtered
       typedef typename ABaseFilter::Object Object;
 
     public:
       /// Constructor of the filter.
-      ObserverFilter() : ABaseFilter() {}
+      ObserverFilter() : Super() {}
 
       /// Terminate the filter after event processing.
       virtual void terminate() override
       {
         B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.");
-        ABaseFilter::terminate();
+        Super::terminate();
       }
 
     public:
@@ -46,7 +53,7 @@ namespace Belle2 {
        */
       virtual CellWeight operator()(const Object& object)
       {
-        CellWeight result = ABaseFilter::operator()(object);
+        CellWeight result = Super::operator()(object);
         if (isNotACell(result)) {
           m_noAnswers += 1;
         } else {

@@ -196,7 +196,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].addArgument("%d", ibuf.getInt("size"));
       m_con[i].addArgument(rbuf.getText("name"));
       m_con[i].addArgument("%d", rbuf.getInt("size"));
-      m_con[i].addArgument("%s_storagebasf2[%d]", nodename.c_str(), i - 3);
+      m_con[i].addArgument("%s_basf2[%d]", nodename.c_str(), i - 3);
       m_con[i].addArgument("%d", i + 2);
       m_con[i].addArgument("1");
       if (!m_con[i].load(0)) {

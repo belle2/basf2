@@ -74,21 +74,29 @@ namespace Belle2 {
       Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
 
     public:
-      /// Retrieve the wire hit including right left passage information from Monte Carlo from the wire hit topology.
-      CDCRLTaggedWireHit getRLWireHit(const CDCHit* ptrHit) const;
+      /// Retrieve the wire hit the given CDCHit form the given wire hits
+      const CDCWireHit* getWireHit(const CDCHit* ptrHit,
+                                   const std::vector<CDCWireHit>& wireHits) const;
+
+      /// Retrieve the wire hit including right left passage information for the given CDCHit form the given wire hits
+      CDCRLTaggedWireHit getRLWireHit(const CDCHit* ptrHit,
+                                      const std::vector<CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit3D from the (potential secondary) CDCSimHit information related to the CDCHit.
-      CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit) const;
+      CDCRecoHit3D getRecoHit3D(const CDCHit* ptrHit,
+                                const std::vector<CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit3D from the closest primary CDCSimHit information related to the CDCHit.
-      CDCRecoHit3D getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) const;
+      CDCRecoHit3D getClosestPrimaryRecoHit3D(const CDCHit* ptrHit,
+                                              const std::vector<CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit2D from the (potential secondary) CDCSimHit information related to the CDCHit.
-      CDCRecoHit2D getRecoHit2D(const CDCHit* ptrHit) const;
+      CDCRecoHit2D getRecoHit2D(const CDCHit* ptrHit,
+                                const std::vector<CDCWireHit>& wireHits) const;
 
       /// Construct an CDCRecoHit2D from the closest primary CDCSimHit information related to the CDCHit.
-      CDCRecoHit2D getClosestPrimaryRecoHit2D(const CDCHit* ptrHit) const;
-
+      CDCRecoHit2D getClosestPrimaryRecoHit2D(const CDCHit* ptrHit,
+                                              const std::vector<CDCWireHit>& wireHits) const;
 
     private:
       /// Reference to the CDCMCMap to be used in this event

@@ -12,11 +12,11 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
-
 
 #include <vector>
 
@@ -287,45 +287,53 @@ Vector3D CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
 }
 
 
-CDCRLTaggedWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit) const
+const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
+                                              const std::vector<CDCWireHit>& wireHits) const
 {
-  B2ASSERT("Asked to get SimHit from CDCHit ptr, that is null", ptrHit);
+  if (not ptrHit) return nullptr;
+  ConstVectorRange<CDCWireHit> wireHit = std::equal_range(wireHits.begin(),
+                                                          wireHits.end(),
+                                                          *ptrHit);
 
+  if (wireHit.empty()) return nullptr;
+  else return &(wireHit.front());
+}
+
+CDCRLTaggedWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit, const std::vector<CDCWireHit>& wireHits) const
+{
   ERightLeft rlInfo = getRLInfo(ptrHit);
-
-  const CDCWireHitTopology& theWireHitTopology = CDCWireHitTopology::getInstance();
-
-  const CDCWireHit* ptrWireHit = theWireHitTopology.getWireHit(ptrHit);
-  return CDCRLTaggedWireHit(ptrWireHit, rlInfo);
+  const CDCWireHit* wireHit = getWireHit(ptrHit, wireHits);
+  B2ASSERT("Could not find CDCWireHit for the requested hit", wireHit);
+  return CDCRLTaggedWireHit(wireHit, rlInfo);
 }
 
 
-CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit) const
+CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit, const std::vector<CDCWireHit>& wireHits) const
 {
-  CDCRLTaggedWireHit rlWireHit = getRLWireHit(ptrHit);
+  CDCRLTaggedWireHit rlWireHit = getRLWireHit(ptrHit, wireHits);
   Vector3D recoPos3D = getRecoPos3D(ptrHit);
   return CDCRecoHit3D(rlWireHit, recoPos3D);
 }
 
 
 
-CDCRecoHit3D CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit) const
+CDCRecoHit3D CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit, const std::vector<CDCWireHit>& wireHits) const
 {
-  CDCRLTaggedWireHit rlWireHit = getRLWireHit(ptrHit);
+  CDCRLTaggedWireHit rlWireHit = getRLWireHit(ptrHit, wireHits);
   Vector3D recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
   return CDCRecoHit3D(rlWireHit, recoPos3D);
 }
 
 
 
-CDCRecoHit2D CDCSimHitLookUp::getRecoHit2D(const CDCHit* ptrHit) const
+CDCRecoHit2D CDCSimHitLookUp::getRecoHit2D(const CDCHit* ptrHit, const std::vector<CDCWireHit>& wireHits) const
 {
-  return getRecoHit3D(ptrHit).getRecoHit2D();
+  return getRecoHit3D(ptrHit, wireHits).getRecoHit2D();
 }
 
 
 
-CDCRecoHit2D CDCSimHitLookUp::getClosestPrimaryRecoHit2D(const CDCHit* ptrHit) const
+CDCRecoHit2D CDCSimHitLookUp::getClosestPrimaryRecoHit2D(const CDCHit* ptrHit, const std::vector<CDCWireHit>& wireHits) const
 {
-  return getClosestPrimaryRecoHit3D(ptrHit).getRecoHit2D();
+  return getClosestPrimaryRecoHit3D(ptrHit, wireHits).getRecoHit2D();
 }

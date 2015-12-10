@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -42,6 +43,8 @@ void SegmentFinderCDCMCTruthModule::generateSegments(std::vector<CDCRecoSegment2
 
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const CDCSimHitLookUp& simHitLookUp = CDCSimHitLookUp::getInstance();
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  const std::vector<CDCWireHit> wireHits = wireHitTopology.getWireHits();
 
   typedef Belle2::TrackFindingCDC::CDCMCTrackStore::CDCHitVector CDCHitVector;
 
@@ -58,7 +61,7 @@ void SegmentFinderCDCMCTruthModule::generateSegments(std::vector<CDCRecoSegment2
       CDCRecoSegment2D& recoSegment2D = outputSegments.back();
 
       for (const CDCHit* ptrHit : mcSegment) {
-        CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit);
+        CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, wireHits);
         recoSegment2D.push_back(recoHit2D);
       }
     }

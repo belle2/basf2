@@ -18,6 +18,15 @@ namespace Belle2 {
     /// An aggregation of CDCWireHits.
     class CDCWireHitCluster : public std::vector<const Belle2::TrackFindingCDC::CDCWireHit*> {
 
+    public:
+      /// Get the super cluster id of this cluster
+      int getISuperCluster() const
+      { return m_iSuperCluster; }
+
+      /// Set the super cluster id of this cluster
+      void setISuperCluster(int iSuperCluster)
+      { m_iSuperCluster = iSuperCluster; }
+
       /// Return if this was set as background
       bool getBackgroundFlag() const
       { return m_backgroundFlag; }
@@ -27,8 +36,11 @@ namespace Belle2 {
       { m_backgroundFlag = backgroundFlag; }
 
     private:
+      /// Memory for the super cluster id
+      int m_iSuperCluster = -1;
+
       /// Memory for the flag marking this cluster as background
-      bool m_backgroundFlag;
+      bool m_backgroundFlag = false;
 
     }; //end class CDCWireHitCluster
 

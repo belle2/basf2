@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -33,14 +34,42 @@ namespace Belle2 {
       explicit TMVAFilter(const std::string& defaultTrainingName = "") :
         Super(),
         m_param_cut(NAN),
+        m_param_weightFolder("data/tracking"),
+        m_param_trainingName(defaultTrainingName),
         m_expert("data/tracking", defaultTrainingName)
       {}
+
+      /** Expose the set of parameters of the filter to the module parameter list.
+       *
+       *  Note that not all filters have yet exposed their parameters in this way.
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "")
+      {
+        moduleParamList->addParameter(addPrefix(prefix, "cut"),
+                                      m_param_cut,
+                                      "The cut value of the mva output below which the object is rejected",
+                                      m_param_cut);
+
+        moduleParamList->addParameter(addPrefix(prefix, "weightFolder"),
+                                      m_param_weightFolder,
+                                      "The name of the folder to look for weight files from trainings",
+                                      m_param_weightFolder);
+
+        moduleParamList->addParameter(addPrefix(prefix, "trainingName"),
+                                      m_param_trainingName,
+                                      "The name of the training that should be used for the prediction",
+                                      m_param_trainingName);
+
+      }
+
 
       /// Initialize the expert before event processing.
       virtual void initialize() override
       {
         Super::initialize();
         AVarSet& varSet = Super::getVarSet();
+        m_expert.setWeightFolderName(m_param_weightFolder);
+        m_expert.setTrainingName(m_param_trainingName);
         m_expert.initializeReader(varSet.getAllVariables());
       }
 
@@ -56,13 +85,12 @@ namespace Belle2 {
         if (key == "cut") {
           m_param_cut = stod(value);
           B2INFO("Filter received parameter 'cut' = " << m_param_cut);
-        } else if (key == "weight_folder") {
-          m_expert.setWeightFolderName(value);
+        } else if (key == "weightFolder") {
+          m_param_weightFolder = value;
           B2INFO("Filter received parameter 'weight_folder' = " << m_expert.getWeightFolderName());
-        } else if (key == "training_name") {
-          m_expert.setTrainingName(value);
+        } else if (key == "trainingName") {
+          m_param_trainingName = value;
           B2INFO("Filter received parameter 'training_name' = " << m_expert.getTrainingName());
-
         } else {
           Super::setParameter(key, value);
         }
@@ -74,8 +102,8 @@ namespace Belle2 {
       {
         std::map<std::string, std::string> des = Super::getParameterDescription();
         des["cut"] =  "The cut value of the mva output below which the object is rejected";
-        des["folder_weight"] = "The name of the folder to look for weight files from trainings";
-        des["training_name"] = "The name of the training that should be used for the prediction";
+        des["weightFolder"] = "The name of the folder to look for weight files from trainings";
+        des["trainingName"] = "The name of the training that should be used for the prediction";
         return des;
       }
     public:
@@ -95,7 +123,13 @@ namespace Belle2 {
       /// The cut on the TMVA output.
       double m_param_cut;
 
-      /// TMVA Expert to decide if a cluster is background or not.
+      /// The name of the folder to look for weight files from trainings
+      std::string m_param_weightFolder;
+
+      /// The name of the training that should be used for the prediction
+      std::string m_param_trainingName;
+
+      /// TMVA Expert to examine the object
       Expert m_expert;
     };
   }

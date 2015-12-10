@@ -34,6 +34,12 @@ namespace Belle2 {
       /// Main algorithm applying the cluster refinement
       virtual void apply(std::vector<CDCWireHitCluster>& outputClusters) override final;
 
+      /// Short description of the findlet
+      virtual std::string getDescription() override
+      {
+        return "Marks clusters as background if the used filter detectes them as such";
+      }
+
       /// Expose the parameters of the cluster filter to a module
       virtual void exposeParameters(ModuleParamList* moduleParamList) override final
       {

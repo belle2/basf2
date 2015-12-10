@@ -35,6 +35,12 @@ namespace Belle2 {
       typedef Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> Super;
 
     public:
+      /// Short description of the findlet
+      virtual std::string getDescription() override
+      {
+        return "Merges segments by extraction of segment paths in a cellular automaton.";
+      }
+
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList) override final
       {

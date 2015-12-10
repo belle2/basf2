@@ -26,6 +26,12 @@ namespace Belle2 {
       typedef Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> Super;
 
     public:
+      /// Short description of the findlet
+      virtual std::string getDescription() override
+      {
+        return "Fixes the flight direction of segments to a preferred orientation by simple heuristics.";
+      }
+
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList) override final
       {

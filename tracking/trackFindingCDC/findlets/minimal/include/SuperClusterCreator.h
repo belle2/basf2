@@ -29,6 +29,12 @@ namespace Belle2 {
       typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
 
     public:
+      /// Short description of the findlet
+      virtual std::string getDescription() override
+      {
+        return "Groups the wire hits into super cluster by expanding the secondary wire neighborhood";
+      }
+
       /// Signals the beginning of the event processing
       void initialize() override
       {

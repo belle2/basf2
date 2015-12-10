@@ -81,7 +81,6 @@ namespace Belle2 {
         m_clusterRefiner.exposeParameters(&moduleParamList);
         m_clusterBackgroundDetector.exposeParameters(&moduleParamList);
         m_segmentFinder.exposeParameters(&moduleParamList);
-        this->getSegmentRelationFilter()->exposeParameters(&moduleParamList);
         this->setParamList(moduleParamList);
       }
 
@@ -104,7 +103,6 @@ namespace Belle2 {
         m_clusterRefiner.beginEvent();
         m_clusterBackgroundDetector.beginEvent();
         m_segmentFinder.beginEvent();
-        this->getSegmentRelationFilter()->beginEvent();
 
         /// Attain cluster vector on the DataStore if needed.
         if (m_param_writeClusters) {

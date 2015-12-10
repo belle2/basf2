@@ -23,63 +23,15 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(SegmentFinderCDCFacetAutomatonDev);
 
-SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule() :
-  m_clusterFilterFactory("all"),
-  m_facetFilterFactory("realistic"),
-  m_facetRelationFilterFilterFactory("simple"),
-  m_segmentRelationFilterFilterFactory("none")
+SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule()
 {
   setDescription("Versatile module with adjustable filters for segment generation.");
 
   // Set the default segment to symmetric
   setSegmentOrientation(ETrackOrientation::c_Symmetric);
 
-  ModuleParamList moduleParamList = this->getParamList();
-
-  m_clusterFilterFactory.exposeParameters(&moduleParamList);
-  m_facetFilterFactory.exposeParameters(&moduleParamList);
-  m_facetRelationFilterFilterFactory.exposeParameters(&moduleParamList);
-  m_segmentRelationFilterFilterFactory.exposeParameters(&moduleParamList);
-
-  this->setParamList(moduleParamList);
-}
-
-void SegmentFinderCDCFacetAutomatonDevModule::initialize()
-{
-  // Set the filters before they get initialized in the base module.
-  std::unique_ptr<BaseClusterFilter> ptrClusterFilter = m_clusterFilterFactory.create();
-  setClusterFilter(std::move(ptrClusterFilter));
-
-  std::unique_ptr<BaseFacetFilter> ptrFacetFilter = m_facetFilterFactory.create();
-  setFacetFilter(std::move(ptrFacetFilter));
-
-  std::unique_ptr<BaseFacetRelationFilter>
-  ptrFacetRelationFilter = m_facetRelationFilterFilterFactory.create();
-  setFacetRelationFilter(std::move(ptrFacetRelationFilter));
-
-  std::unique_ptr<BaseSegmentRelationFilter>
-  ptrSegmentRelationFilter = m_segmentRelationFilterFilterFactory.create();
-  setSegmentRelationFilter(std::move(ptrSegmentRelationFilter));
-
-  Super::initialize();
-
-  if (getClusterFilter()->needsTruthInformation() or
-      getFacetFilter()->needsTruthInformation() or
-      getFacetRelationFilter()->needsTruthInformation() or
-      getSegmentRelationFilter()->needsTruthInformation()) {
-    StoreArray <CDCSimHit>::required();
-    StoreArray <MCParticle>::required();
-  }
-}
-
-void SegmentFinderCDCFacetAutomatonDevModule::event()
-{
-  if (getClusterFilter()->needsTruthInformation() or
-      getFacetFilter()->needsTruthInformation() or
-      getFacetRelationFilter()->needsTruthInformation() or
-      getSegmentRelationFilter()->needsTruthInformation()) {
-    CDCMCManager::getInstance().fill();
-  }
-
-  Super::event();
+  this->getClusterFilter()->setFilterName("all");
+  this->getFacetFilter()->setFilterName("realistic");
+  this->getFacetRelationFilter()->setFilterName("simple");
+  this->getSegmentRelationFilter()->setFilterName("none");
 }

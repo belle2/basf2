@@ -108,6 +108,15 @@ namespace Belle2 {
                        m_param_tangentSegmentsStoreObjName,
                        "Name of the output StoreObjPtr of the tangent segments generated within this module.",
                        std::string("CDCTangentSegmentVector"));
+
+        ModuleParamList moduleParamList = this->getParamList();
+
+        this->getClusterFilter()->exposeParameters(&moduleParamList);
+        this->getFacetFilter()->exposeParameters(&moduleParamList);
+        this->getFacetRelationFilter()->exposeParameters(&moduleParamList);
+        this->getSegmentRelationFilter()->exposeParameters(&moduleParamList);
+
+        this->setParamList(moduleParamList);
       }
 
       /// Initialize the Module before event processing
@@ -144,6 +153,11 @@ namespace Belle2 {
       /// Processes the current event
       void event() override
       {
+        this->getClusterFilter()->beginEvent();
+        this->getFacetFilter()->beginEvent();
+        this->getFacetRelationFilter()->beginEvent();
+        this->getSegmentRelationFilter()->beginEvent();
+
         /// Attain cluster vector on the DataStore if needed.
         if (m_param_writeClusters) {
           StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);

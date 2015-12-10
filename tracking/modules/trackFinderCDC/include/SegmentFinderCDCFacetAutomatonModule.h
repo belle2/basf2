@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+
 
 #include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
 
@@ -28,6 +28,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
+
+#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
@@ -69,37 +71,6 @@ namespace Belle2 {
       {
 
         this->setDescription("Generates segments from hits using a cellular automaton build from hit triples (facets).");
-
-        this->addParam("WriteSuperClusters",
-                       m_param_writeSuperClusters,
-                       "Switch if superclusters shall be written to the DataStore",
-                       false);
-
-        this->addParam("SuperClustersStoreObjName",
-                       m_param_superClustersStoreObjName,
-                       "Name of the output StoreObjPtr of the super clusters generated within this module.",
-                       std::string("CDCWireHitSuperClusterVector"));
-
-        this->addParam("WriteClusters",
-                       m_param_writeClusters,
-                       "Switch if clusters shall be written to the DataStore",
-                       false);
-
-        this->addParam("ClustersStoreObjName",
-                       m_param_clustersStoreObjName,
-                       "Name of the output StoreObjPtr of the clusters generated within this module.",
-                       std::string("CDCWireHitClusterVector"));
-
-        this->addParam("WriteFacets",
-                       m_param_writeFacets,
-                       "Switch if facets shall be written to the DataStore",
-                       m_param_writeFacets);
-
-        this->addParam("FacetsStoreObjName",
-                       m_param_facetsStoreObjName,
-                       "Name of the output StoreObjPtr of the facets generated within this module.",
-                       m_param_facetsStoreObjName);
-
         ModuleParamList moduleParamList = this->getParamList();
         m_superClusterCreator.exposeParameters(&moduleParamList);
         m_clusterRefiner.exposeParameters(&moduleParamList);
@@ -107,6 +78,11 @@ namespace Belle2 {
         m_facetCreator.exposeParameters(&moduleParamList);
         m_segmentCreator.exposeParameters(&moduleParamList);
         m_segmentMerger.exposeParameters(&moduleParamList);
+
+        m_superClusterSwapper.exposeParameters(&moduleParamList);
+        m_clusterSwapper.exposeParameters(&moduleParamList);
+        m_facetSwapper.exposeParameters(&moduleParamList);
+
         this->setParamList(moduleParamList);
       }
 
@@ -121,17 +97,9 @@ namespace Belle2 {
         m_segmentCreator.initialize();
         m_segmentMerger.initialize();
 
-        if (m_param_writeSuperClusters) {
-          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_superClustersStoreObjName);
-        }
-
-        if (m_param_writeClusters) {
-          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >::registerTransient(m_param_clustersStoreObjName);
-        }
-
-        if (m_param_writeFacets) {
-          StoreWrappedObjPtr< std::vector<CDCFacet> >::registerTransient(m_param_facetsStoreObjName);
-        }
+        m_superClusterSwapper.initialize();
+        m_clusterSwapper.initialize();
+        m_facetSwapper.initialize();
       }
 
       /// Processes the current event
@@ -144,29 +112,15 @@ namespace Belle2 {
         m_segmentCreator.beginEvent();
         m_segmentMerger.beginEvent();
 
+        m_superClusterSwapper.beginEvent();
+        m_clusterSwapper.beginEvent();
+        m_facetSwapper.beginEvent();
+
         m_superClusters.clear();
         m_clusters.clear();
         m_facets.clear();
         m_segments.clear();
         m_mergedSegments.clear();
-
-        /// Attain super cluster vector on the DataStore if needed.
-        if (m_param_writeSuperClusters) {
-          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedSuperClusters(m_param_superClustersStoreObjName);
-          storedSuperClusters.create();
-        }
-
-        /// Attain cluster vector on the DataStore if needed.
-        if (m_param_writeClusters) {
-          StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);
-          storedClusters.create();
-        }
-
-        /// Attain facet vector on the DataStore if needed.
-        if (m_param_writeFacets) {
-          StoreWrappedObjPtr< std::vector<CDCFacet> > storedFacets(m_param_facetsStoreObjName);
-          storedFacets.create();
-        }
 
         Super::event();
       }
@@ -177,6 +131,10 @@ namespace Belle2 {
       // implementation below
       virtual void terminate() override
       {
+        m_facetSwapper.terminate();
+        m_clusterSwapper.terminate();
+        m_superClusterSwapper.terminate();
+
         m_segmentMerger.terminate();
         m_segmentCreator.terminate();
         m_facetCreator.terminate();
@@ -185,25 +143,6 @@ namespace Belle2 {
         m_superClusterCreator.terminate();
         Super::terminate();
       }
-
-    private:
-      /// Parameter: Switch if superclusters shall be written to the DataStore
-      bool m_param_writeSuperClusters = false;
-
-      /// Parameter: Name of the output StoreObjPtr of the superclusters generated within this module.
-      std::string m_param_superClustersStoreObjName = "CDCWireHitSuperClusterVector";
-
-      /// Parameter: Switch if clusters shall be written to the DataStore
-      bool m_param_writeClusters = false;
-
-      /// Parameter: Name of the output StoreObjPtr of the clusters generated within this module.
-      std::string m_param_clustersStoreObjName = "CDCWireHitClusterVector";
-
-      /// Parameter: Switch if facets shall be written to the DataStore
-      bool m_param_writeFacets = false;
-
-      /// Parameter: Name of the output StoreObjPtr of the facets generated within this module.
-      std::string m_param_facetsStoreObjName = "CDCFacetVector";
 
     private:
       // Findlets
@@ -224,6 +163,20 @@ namespace Belle2 {
 
       /// Merges segments with closeby segments of the same super cluster
       SegmentMerger<SegmentRelationFilter> m_segmentMerger;
+
+      /// Puts the internal super clusters on the DataStore
+      StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{
+        "CDCWireHitSuperClusterVector",
+        "superCluster",
+        "wire hit super cluster"
+      };
+
+      /// Puts the internal clusters on the DataStore
+      StoreVectorSwapper<CDCWireHitCluster> m_clusterSwapper{"CDCWireHitClusterVector"};
+
+      /// Puts the internal clusters on the DataStore
+      StoreVectorSwapper<CDCFacet> m_facetSwapper{"CDCFacetVector"};
+
 
 
       /// Memory for the wire hit clusters
@@ -266,26 +219,11 @@ namespace Belle2 {
       m_segmentMerger.apply(m_segments, m_mergedSegments);
 
       // Move superclusters to the DataStore
-      if (m_param_writeSuperClusters) {
-        StoreWrappedObjPtr< std::vector<CDCWireHitCluster> >
-        storedSuperClusters(m_param_superClustersStoreObjName);
-        std::vector<CDCWireHitCluster>& superClusters = *storedSuperClusters;
-        superClusters.swap(m_superClusters);
-      }
-
+      m_superClusterSwapper.apply(m_superClusters);
       // Move clusters to the DataStore
-      if (m_param_writeClusters) {
-        StoreWrappedObjPtr< std::vector<CDCWireHitCluster> > storedClusters(m_param_clustersStoreObjName);
-        std::vector<CDCWireHitCluster>& clusters = *storedClusters;
-        clusters.swap(m_clusters);
-      }
-
+      m_clusterSwapper.apply(m_clusters);
       // Move facets to the DataStore
-      if (m_param_writeFacets) {
-        StoreWrappedObjPtr< std::vector<CDCFacet> > storedFacets(m_param_facetsStoreObjName);
-        std::vector<CDCFacet>& facets = *storedFacets;
-        facets.swap(m_facets);
-      }
+      m_facetSwapper.apply(m_facets);
 
       outputSegments.swap(m_mergedSegments);
     }

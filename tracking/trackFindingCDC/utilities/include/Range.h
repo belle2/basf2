@@ -20,9 +20,17 @@ namespace Belle2 {
     template<class AIterator>
     class Range : public std::pair<AIterator, AIterator> {
 
+    private:
+      /// Type of the base class
+      using Super = std::pair<AIterator, AIterator>;
+
     public:
+      /// Constructor from another range
+      template<class Ts>
+      Range(Ts& ts) : Super(std::begin(ts), std::end(ts)) {}
+
       /// Inheriting the constructor of the base class
-      using std::pair<AIterator, AIterator>::pair;
+      using Super::Super;
 
       /// The type the iterator references
       typedef typename std::iterator_traits<AIterator>::reference ReferenceType;

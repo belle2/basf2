@@ -208,7 +208,7 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
             return
 
         background_hit_finder_module = StandardEventGenerationRun.get_basf2_module(
-            "SegmentFinderCDCFacetAutomatonDev",
+            "SegmentFinderCDCFacetAutomaton",
             ClusterFilter="tmva",
             ClusterFilterParameters={
                 "cut": str(
@@ -320,7 +320,7 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
                  output_segments_store_vector_name="CDCRecoSegment2DVector"):
 
         local_track_finder_module = StandardEventGenerationRun.get_basf2_module(
-            "SegmentFinderCDCFacetAutomatonDev",
+            "SegmentFinderCDCFacetAutomaton",
             SegmentOrientation="outwards",
             ClusterFilter="tmva",
             ClusterFilterParameters={

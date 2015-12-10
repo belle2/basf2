@@ -43,7 +43,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     # segment_finder_module = "SegmentFinderCDCMCTruth"
 
     # MC Free
-    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     segment_finder_module.param({
         "FacetFilter": "realistic",
         "FacetRelationFilter": "simple",
@@ -51,7 +51,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     })
 
     # Proper generation logic of facets, filters use MC information
-    # segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    # segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     # segment_finder_module.param({
     #         "FacetFilter" : "mc",
     #         "FacetFilterParameters" : { "symmetric" : "false" },

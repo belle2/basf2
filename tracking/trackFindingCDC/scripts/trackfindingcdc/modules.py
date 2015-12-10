@@ -28,7 +28,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
     path.add_module("WireHitTopologyPreparer")
 
     # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomatonDev",
+    path.add_module("SegmentFinderCDCFacetAutomaton",
                     ClusterFilter="tmva",
                     ClusterFilterParameters={
                         "cut": str(0.2)},

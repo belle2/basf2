@@ -44,7 +44,7 @@ def hypot3(x, y, z):
 
 
 class FacetCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomatonDev")
+    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     segment_finder_module.param({
         "WriteFacets": True,
         "FacetFilter": "fitless_hard",

@@ -79,11 +79,6 @@ namespace Belle2 {
       /// Main function executing the algorithm
       virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
 
-      /// End processing the current event
-      virtual void endEvent()
-      {
-      }
-
       /// Signal the end of the run.
       virtual void endRun()
       {

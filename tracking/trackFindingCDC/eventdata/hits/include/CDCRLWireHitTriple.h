@@ -23,7 +23,9 @@ namespace Belle2 {
     public:
       /** Type for the different shapes of three neighboring hits
        *  (up to mirror and rotational symmetries).
-       *  Note: The names are inspired by the xylene molecules. */
+       *  Note: The names are inspired by the xylene molecules. Some illustrations can be found
+       *  <a href="https://belle2.cc.kek.jp/~twiki/bin/view/Software/CDCTrackFindingStrategy#hits">here</a>.
+       */
       enum EShape : signed int {
         /// Constant for an ill shaped wire hit triple
         c_Invalid = -999,

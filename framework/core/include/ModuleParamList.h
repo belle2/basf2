@@ -101,7 +101,7 @@ namespace Belle2 {
      * @param value The parameter value which should be assigned to the parameter given by its name.
      */
     template<typename T>
-    void setParameter(const std::string& name, T& value);
+    void setParameter(const std::string& name, const T& value);
 
     /** Set values for parameters from other parameter list. */
     void setParameters(const ModuleParamList& params);
@@ -239,7 +239,7 @@ namespace Belle2 {
 
 
   template<typename T>
-  void ModuleParamList::setParameter(const std::string& name, T& value)
+  void ModuleParamList::setParameter(const std::string& name, const T& value)
   {
     try {
       ModuleParam<T>& explModParam = getParameter<T>(name);

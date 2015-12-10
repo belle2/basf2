@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <vector>
@@ -19,7 +20,7 @@ namespace Belle2 {
 
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     template<class ... AIOTypes>
-    class Findlet {
+    class Findlet : public ProcessingSignalListener {
 
     public:
       /// Types that should be served to apply on invokation
@@ -61,33 +62,8 @@ namespace Belle2 {
       {
       }
 
-      /// Initialize the Module before event processing
-      virtual void initialize()
-      {
-      }
-
-      /// Signal the beginning of a new run.
-      virtual void beginRun()
-      {
-      }
-
-      /// Start processing the current event
-      virtual void beginEvent()
-      {
-      }
-
       /// Main function executing the algorithm
       virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
-
-      /// Signal the end of the run.
-      virtual void endRun()
-      {
-      }
-
-      /// Singal to terminate the event processing
-      virtual void terminate()
-      {
-      }
     };
 
   } //end namespace TrackFindingCDC

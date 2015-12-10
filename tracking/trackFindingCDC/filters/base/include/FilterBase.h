@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/ca/CellWeight.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -21,28 +22,13 @@ namespace Belle2 {
 
     /// Base class for filters on a generic object type.
     template<class AObject>
-    class FilterBase {
+    class FilterBase : public ProcessingSignalListener {
 
     public:
       /// Type of the object to be analysed.
       typedef AObject Object;
 
     public:
-      /// Constructor of the filter.
-      FilterBase() {}
-
-      /// Making destructor virtual
-      virtual ~FilterBase() {}
-
-      /// Signal the beginning of a new event - intended to clear information from former events.
-      virtual void beginEvent() {}
-
-      /// Initialize the filter before event processing.
-      virtual void initialize() {}
-
-      /// Terminate the filter after event processing.
-      virtual void terminate() {}
-
       /** Expose the set of parameters of the filter to the module parameter list.
        *
        *  Note that not all filters have yet exposed their parameters in this way.

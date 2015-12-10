@@ -19,7 +19,10 @@ namespace Belle2 {
     friend class ProcessSubmitter;
 
   public:
-    ProcessController() throw() {}
+    ProcessController() throw()
+    {
+      m_callback = NULL;
+    }
     ProcessController(RCCallback* callback) throw()
     {
       m_callback = callback;

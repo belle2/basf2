@@ -125,7 +125,8 @@ bool ProcessController::abort()
     m_process.kill(SIGQUIT);
     m_process.kill(SIGKILL);
   }
-  m_callback->set(m_parname + ".pid", -1);
+  if (m_callback != NULL)
+    m_callback->set(m_parname + ".pid", -1);
   return true;
 }
 

@@ -112,13 +112,19 @@ namespace Belle2 {
       }
 
       /** Return the string holding the used filter name */
-      std::string& getFilterName()
+      const std::string& getFilterName() const
       {
         return m_filterName;
       }
 
+      /** Set the filter name which should be created */
+      void setFilterName(const std::string& filterName)
+      {
+        m_filterName = filterName;
+      }
+
       /** Return the map holding the used filter parameters */
-      std::map<std::string, std::string>& getFilterParameters()
+      const std::map<std::string, std::string>& getFilterParameters() const
       {
         return m_filterParameters;
       }
@@ -166,12 +172,12 @@ namespace Belle2 {
 
       // Set the module parameters
       moduleParamList->addParameter(prefix + "Filter",
-                                    getFilterName(),
+                                    m_filterName,
                                     createFilterNamesDescription(),
                                     std::string(m_filterName));
 
       moduleParamList->addParameter(prefix + "FilterParameters",
-                                    getFilterParameters(),
+                                    m_filterParameters,
                                     createFilterParametersDescription(),
                                     std::map<std::string, std::string>(m_filterParameters));
     }

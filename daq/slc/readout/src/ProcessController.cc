@@ -29,6 +29,14 @@ void ProcessController::clear()
   m_info.clear();
 }
 
+bool ProcessController::waitReady(int timeout) throw()
+{
+  if (!m_info.waitReady(timeout)) {
+    return false;
+  }
+  return true;
+}
+
 bool ProcessController::load(int timeout)
 {
   m_info.clear();

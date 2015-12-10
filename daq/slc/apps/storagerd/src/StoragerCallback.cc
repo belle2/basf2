@@ -65,6 +65,13 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
     for (size_t i = 3; i < m_con.size(); i++) {
       m_con[i].init(nodename + StringUtil::form("_storagebasf2_%d", i - 3), i + 2);
     }
+    add(new NSMVHandlerInt("eb2rx.pid", true, false, 0));
+    add(new NSMVHandlerInt("storagein.pid", true, false, 0));
+    add(new NSMVHandlerInt("storagerecord.pid", true, false, 0));
+    add(new NSMVHandlerInt("storageout.pid", true, false, 0));
+    for (size_t i = 3; i < m_con.size(); i++) {
+      add(new NSMVHandlerInt(StringUtil::form("basf2[%d].pid", i - 3), true, false, 0));
+    }
   } catch (const std::out_of_range& e) {
     throw (RCHandlerException("Bad configuration : %s", e.what()));
   }
@@ -75,9 +82,24 @@ void StoragerCallback::term() throw()
   for (size_t i = 0; i < m_con.size(); i++) {
     m_con[i].abort();
     m_con[i].getInfo().unlink();
+    switch (i) {
+      case 0:
+        set("storagein.pid", 0);
+        break;
+      case 1:
+        set("storagerecord.pid", 0);
+        break;
+      case 2:
+        set("storageout.pid", 0);
+        break;
+      default:
+        set(StringUtil::form("basf2[%d].pid", i - 3), 0);
+        break;
+    }
   }
   m_eb2rx.abort();
   m_eb2rx.getInfo().unlink();
+  set("eb2rx.pid", 0);
 }
 
 void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -103,6 +125,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
     }
     m_eb2rx.load(0);
+    set("eb2rx.pid", m_eb2rx.getProcess().get_id());
     LogFile::debug("Booted eb2rx");
     try_wait();
   } else {
@@ -124,6 +147,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       LogFile::error(emsg);
       throw (RCHandlerException(emsg));
     }
+    set("storagein.pid", m_con[0].getProcess().get_id());
     LogFile::debug("Booted storagein");
     try_wait();
   }
@@ -147,6 +171,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       LogFile::error(emsg);
       throw (RCHandlerException(emsg));
     }
+    set("storagerecord.pid", m_con[1].getProcess().get_id());
     LogFile::debug("Booted storagerecord");
     try_wait();
   }
@@ -163,6 +188,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       LogFile::warning("storageout: Not accepted connection from EXPRECO");
     }
     LogFile::debug("Booted storageout");
+    set("storageout.pid", m_con[2].getProcess().get_id());
     try_wait();
   } else {
     LogFile::notice("storageout is off");
@@ -181,13 +207,20 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].addArgument("%s_storagebasf2_%d", nodename.c_str(), i - 3);
       m_con[i].addArgument("%d", i + 2);
       m_con[i].addArgument("1");
-      if (!m_con[i].load(10)) {
+      if (!m_con[i].load(0)) {
         std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
         LogFile::error(emsg);
         throw (RCHandlerException(emsg));
       }
-      LogFile::debug("Booted %d-th basf2", i - 3);
+      set(StringUtil::form("basf2[%d].pid", i - 3), m_con[i].getProcess().get_id());
       try_wait();
+    }
+  }
+  for (size_t i = 3; i < m_con.size(); i++) {
+    if (m_con[i].isAlive() && m_con[i].waitReady(10)) {
+      LogFile::debug("Booted %d-th basf2", i - 3);
+    } else {
+      throw (RCHandlerException("Failed to boot %d-th basf2", i - 3));
     }
   }
   m_flow = std::vector<FlowMonitor>();
@@ -234,8 +267,23 @@ void StoragerCallback::abort() throw(RCHandlerException)
 {
   for (size_t i = 0; i < m_con.size(); i++) {
     m_con[i].abort();
+    switch (i) {
+      case 0:
+        set("storagein.pid", 0);
+        break;
+      case 1:
+        set("storagerecord.pid", 0);
+        break;
+      case 2:
+        set("storageout.pid", 0);
+        break;
+      default:
+        set(StringUtil::form("basf2[%d].pid", i - 3), 0);
+        break;
+    }
   }
   m_eb2rx.abort();
+  set("eb2rx.pid", 0);
 }
 
 void StoragerCallback::monitor() throw(RCHandlerException)

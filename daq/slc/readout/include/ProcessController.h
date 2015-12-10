@@ -53,6 +53,7 @@ namespace Belle2 {
     void addArgument(T arg);
     void clearArguments() { m_arg_v = std::vector<std::string>(); }
     bool isAlive() throw() { return m_process.isAlive(); }
+    bool waitReady(int timeout) throw();
 
   public:
     void lock() { m_mutex.lock(); }

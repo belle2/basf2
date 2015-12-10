@@ -10,8 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <vector>
@@ -103,20 +101,23 @@ namespace Belle2 {
                                     const CDCWireHit& endWireHit,
                                     std::vector<CDCFacet>& facets) const
       {
+        /// Prepare a facet - without fitted tangent lines.
+        CDCRLTaggedWireHit startRLWireHit(&startWireHit, ERightLeft::c_Invalid);
+        CDCRLTaggedWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Invalid);
+        CDCRLTaggedWireHit endRLWireHit(&endWireHit, ERightLeft::c_Invalid);
+        CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, ParameterLine2D());
 
-        const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+        for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+          facet.setStartRLInfo(startRLInfo);
+          for (ERightLeft middleRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+            facet.setMiddleRLInfo(middleRLInfo);
+            for (ERightLeft endRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+              facet.setEndRLInfo(endRLInfo);
 
-        auto startRLWireHits = wireHitTopology.getRLWireHits(startWireHit);
-        auto middleRLWireHits = wireHitTopology.getRLWireHits(middleWireHit);
-        auto endRLWireHits = wireHitTopology.getRLWireHits(endWireHit);
-
-        for (const CDCRLWireHit& startRLWireHit : startRLWireHits) {
-          for (const CDCRLWireHit& middleRLWireHit : middleRLWireHits) {
-            for (const CDCRLWireHit& endRLWireHit : endRLWireHits) {
-
-              CDCFacet facet(&startRLWireHit, &middleRLWireHit, &endRLWireHit, ParameterLine2D());
-              // do not set the lines yet. The filter shall do that if it wants to.
+              // Reset the lines
+              // The filter shall do the fitting of the tangent lines if it wants to.
               // He should set them if he accepts the facet.
+              facet.invalidateLines();
 
               // Obtain a constant interface to pass to the filter method following
               const CDCFacet& constFacet = facet;

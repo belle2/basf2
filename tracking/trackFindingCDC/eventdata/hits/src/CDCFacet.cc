@@ -9,31 +9,25 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
-                   const CDCRLWireHit* middleRLWireHit,
-                   const CDCRLWireHit* endRLWireHit) :
+CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
+                   const CDCRLTaggedWireHit& middleRLWireHit,
+                   const CDCRLTaggedWireHit& endRLWireHit) :
   CDCRLWireHitTriple(startRLWireHit, middleRLWireHit, endRLWireHit),
   m_startToMiddle(),
   m_startToEnd(),
   m_middleToEnd(),
   m_automatonCell()
 {
-  B2ASSERT("CDCFacet initialized with nullptr as first oriented wire hit.", startRLWireHit);
-  B2ASSERT("CDCFacet initialized with nullptr as second oriented wire hit", middleRLWireHit);
-  B2ASSERT("CDCFacet initialized with nullptr as third oriented wire hit",  endRLWireHit);
-
   adjustLines();
 }
 
-CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
-                   const CDCRLWireHit* middleRLWireHit,
-                   const CDCRLWireHit* endRLWireHit,
+CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
+                   const CDCRLTaggedWireHit& middleRLWireHit,
+                   const CDCRLTaggedWireHit& endRLWireHit,
                    const ParameterLine2D& startToMiddle,
                    const ParameterLine2D& startToEnd,
                    const ParameterLine2D& middleToEnd) :
@@ -43,18 +37,16 @@ CDCFacet::CDCFacet(const CDCRLWireHit* startRLWireHit,
   m_middleToEnd(middleToEnd),
   m_automatonCell()
 {
-  B2ASSERT("CDCFacet initialized with nullptr as first oriented wire hit.", startRLWireHit);
-  B2ASSERT("CDCFacet initialized with nullptr as second oriented wire hit", middleRLWireHit);
-  B2ASSERT("CDCFacet initialized with nullptr as third oriented wire hit",  endRLWireHit);
 }
 
 CDCFacet CDCFacet::reversed() const
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  return CDCFacet(wireHitTopology.getReverseOf(getEndRLWireHit()),
-                  wireHitTopology.getReverseOf(getMiddleRLWireHit()),
-                  wireHitTopology.getReverseOf(getStartRLWireHit()));
+  return CDCFacet(getEndRLWireHit().reversed(),
+                  getMiddleRLWireHit().reversed(),
+                  getStartRLWireHit().reversed(),
+                  ParameterLine2D::throughPoints(getEndRecoPos2D(), getMiddleRecoPos2D()),
+                  ParameterLine2D::throughPoints(getEndRecoPos2D(), getStartRecoPos2D()),
+                  ParameterLine2D::throughPoints(getMiddleRecoPos2D(), getStartRecoPos2D()));
 }
 
 void CDCFacet::adjustLines() const
@@ -76,4 +68,11 @@ void CDCFacet::adjustLines() const
                                       getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
                                       getEndWireHit().getRefPos2D(),
                                       getEndRLInfo() * getEndWireHit().getRefDriftLength());
+}
+
+void CDCFacet::invalidateLines()
+{
+  m_startToMiddle.invalidate();
+  m_startToEnd.invalidate();
+  m_middleToEnd.invalidate();
 }

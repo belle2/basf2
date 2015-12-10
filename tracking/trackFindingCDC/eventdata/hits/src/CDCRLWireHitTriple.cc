@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <assert.h>
 
 using namespace std;
@@ -18,56 +17,28 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCRLWireHitTriple::CDCRLWireHitTriple(
-  const CDCRLWireHit* startRLWireHit,
-  const CDCRLWireHit* middleRLWireHit,
-  const CDCRLWireHit* endRLWireHit
+  const CDCRLTaggedWireHit& startRLWireHit,
+  const CDCRLTaggedWireHit& middleRLWireHit,
+  const CDCRLTaggedWireHit& endRLWireHit
 ):
   m_startRLWireHit(startRLWireHit),
   m_rearRLWireHitPair(middleRLWireHit, endRLWireHit)
 {
-  B2ASSERT("startRLWireHit is a nullptr",  startRLWireHit);
-  B2ASSERT("middleRLWireHit is a nullptr", middleRLWireHit);
-  B2ASSERT("endRLWireHit is a nullptr",    endRLWireHit);
 }
 
 CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  return CDCRLWireHitTriple(wireHitTopology.getReverseOf(getEndRLWireHit()),
-                            wireHitTopology.getReverseOf(getMiddleRLWireHit()),
-                            wireHitTopology.getReverseOf(getStartRLWireHit()));
+  return CDCRLWireHitTriple(getEndRLWireHit().reversed(),
+                            getMiddleRLWireHit().reversed(),
+                            getStartRLWireHit().reversed());
 }
 
 void CDCRLWireHitTriple::reverse()
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const CDCRLWireHit* newStartRLWireHit = wireHitTopology.getReverseOf(getEndRLWireHit());
-  const CDCRLWireHit* newMiddleRLWireHit = wireHitTopology.getReverseOf(getMiddleRLWireHit());
-  const CDCRLWireHit* newEndRLWireHit = wireHitTopology.getReverseOf(getStartRLWireHit());
-
-  setStartRLWireHit(newStartRLWireHit);
-  setMiddleRLWireHit(newMiddleRLWireHit);
+  CDCRLTaggedWireHit newEndRLWireHit = getStartRLWireHit().reversed();
+  setMiddleRLWireHit(getEndRLWireHit().reversed());
+  setMiddleRLWireHit(getMiddleRLWireHit().reversed());
   setEndRLWireHit(newEndRLWireHit);
-
-}
-
-void CDCRLWireHitTriple::setStartRLInfo(const ERightLeft startRLInfo)
-{
-  if (startRLInfo != getStartRLInfo()) {
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-    const CDCRLWireHit* newStartRLWireHit = wireHitTopology.getReverseOf(getStartRLWireHit());
-    setStartRLWireHit(newStartRLWireHit);
-  }
-}
-
-void CDCRLWireHitTriple::setMiddleRLInfo(const ERightLeft middleRLInfo)
-{
-  getRearRLWireHitPair().setFromRLInfo(middleRLInfo);
-}
-
-void CDCRLWireHitTriple::setEndRLInfo(const ERightLeft endRLInfo)
-{
-  getRearRLWireHitPair().setToRLInfo(endRLInfo);
 }
 
 CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const

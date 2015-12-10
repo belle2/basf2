@@ -33,17 +33,17 @@ bool CDCFacetFitlessVarSet::extract(const CDCFacet* ptrFacet)
   const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
   const ERightLeft endRLInfo = facet.getEndRLInfo();
 
-  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getRefDriftLength();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
   const double startDriftLengthSigma = sqrt(startDriftLengthVar);
 
-  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
   const double middleDriftLength = middleRLWirehit.getRefDriftLength();
   const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
   const double middleDriftLengthSigma = sqrt(middleDriftLengthVar);
 
-  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
   const double endDriftLength = endRLWirehit.getRefDriftLength();
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthSigma = sqrt(endDriftLengthVar);

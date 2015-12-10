@@ -31,14 +31,14 @@ namespace Belle2 {
     class CDCFacet : public CDCRLWireHitTriple {
     public:
       /// Constructor taking three oriented wire hits.
-      CDCFacet(const CDCRLWireHit* startRLWireHit,
-               const CDCRLWireHit* middleRLWireHit,
-               const CDCRLWireHit* endRLWireHit);
+      CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
+               const CDCRLTaggedWireHit& middleRLWireHit,
+               const CDCRLTaggedWireHit& endRLWireHit);
 
       /// Constructor taking three oriented wire hits and the tangent lines.
-      CDCFacet(const CDCRLWireHit* startRLWireHit,
-               const CDCRLWireHit* middleRLWireHit,
-               const CDCRLWireHit* endRLWireHit,
+      CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
+               const CDCRLTaggedWireHit& middleRLWireHit,
+               const CDCRLTaggedWireHit& endRLWireHit,
                const ParameterLine2D& startToMiddle,
                const ParameterLine2D& startToEnd = ParameterLine2D(),
                const ParameterLine2D& middleToEnd = ParameterLine2D());
@@ -78,6 +78,9 @@ namespace Belle2 {
       /// Construct and stores the three tangential lines corresponding to the three pairs of wire hits.
       void adjustLines() const;
 
+      /// Clear all information in the three tangential lines
+      void invalidateLines();
+
       /// Getter for the recostructed position at the first hit averaged
       /// from the two touching points of the tangential lines.
       Vector2D getStartRecoPos2D() const
@@ -110,15 +113,15 @@ namespace Belle2 {
 
       /// Getter for the tangential line including the hits from the first to the second hit.
       CDCTangent getStartToMiddle() const
-      { return CDCTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToMiddleLine()); }
+      { return CDCTangent(getStartRLWireHit(), getEndRLWireHit(), getStartToMiddleLine()); }
 
       /// Getter for the tangential line including the hits from the first to the third hit.
       CDCTangent getStartToEnd() const
-      { return CDCTangent(&(getStartRLWireHit()), &(getEndRLWireHit()), getStartToEndLine()); }
+      { return CDCTangent(getStartRLWireHit(), getEndRLWireHit(), getStartToEndLine()); }
 
       /// Getter for the tangential line including the hits from the second to the third hit.
       CDCTangent getMiddleToEnd() const
-      { return CDCTangent(&(getMiddleRLWireHit()), &(getEndRLWireHit()), getMiddleToEndLine()); }
+      { return CDCTangent(getMiddleRLWireHit(), getEndRLWireHit(), getMiddleToEndLine()); }
 
       /// Unset the masked flag of the facet's automaton cell and of the three contained wire hits.
       void unsetAndForwardMaskedFlag() const

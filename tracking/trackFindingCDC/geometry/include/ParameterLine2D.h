@@ -113,8 +113,13 @@ namespace Belle2 {
        */
       void normalize() { m_tangential.normalize(); }
 
+      /// Clear all information from the line
+      void invalidate()
+      { m_support.set(0, 0); m_tangential.set(0, 0); }
+
       /// Reverses the tangential vector inplace
       void reverse() { m_tangential.reverse(); }
+
       /// Makes a copy line which has the opposite tangential vector but same support point.
       ParameterLine2D reversed() const { return ParameterLine2D(support(), -tangential()); }
 

@@ -51,8 +51,8 @@ namespace Belle2 {
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 
       /// Construct a tangent from two oriented wire hits.
-      CDCTangent(const CDCRLWireHit* fromRLWireHit,
-                 const CDCRLWireHit* toRLWireHit);
+      CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
+                 const CDCRLTaggedWireHit& toRLWireHit);
 
       /// Construct a tangent from a pair of oriented wire hits taking the given
       /// tangential line instead of a computed one.
@@ -60,8 +60,8 @@ namespace Belle2 {
                  const ParameterLine2D& line);
 
       /// Construct a tangent from two oriented wire hits taking the given tangential line instead of a computed one.
-      CDCTangent(const CDCRLWireHit* fromRLWireHit,
-                 const CDCRLWireHit* toRLWireHit,
+      CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
+                 const CDCRLTaggedWireHit& toRLWireHit,
                  const ParameterLine2D& line);
 
       /// Print tangent for debuggin.

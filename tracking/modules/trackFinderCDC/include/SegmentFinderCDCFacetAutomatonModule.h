@@ -20,13 +20,15 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
+#include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
+
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
 
-#include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <vector>
 

@@ -63,15 +63,15 @@ CellWeight RealisticFacetFilter::operator()(const CDCFacet& facet)
 
   facet.adjustLines();
 
-  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
   const double startDriftLengthStd = sqrt(startDriftLengthVar);
 
-  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
   const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
   const double middleDriftLengthStd = sqrt(middleDriftLengthVar);
 
-  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthStd = sqrt(endDriftLengthVar);
 
@@ -122,7 +122,7 @@ CellWeight RealisticFacetFilter::operator()(const CDCFacet& facet)
 
   /* cut on the angle of */
   if (startPhiPull < m_param_phiPullCut and
-      middlePhiPull <  m_param_phiPullCut and
+      middlePhiPull < m_param_phiPullCut and
       endPhiPull < m_param_phiPullCut) {
 
     // Introducing a mini penilty to distiguish better facets.

@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace std;

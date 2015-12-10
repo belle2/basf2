@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <cmath>
 
 using namespace std;
@@ -23,8 +21,8 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair):
   adjustLine();
 }
 
-CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
-                       const CDCRLWireHit* toRLWireHit):
+CDCTangent::CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
+                       const CDCRLTaggedWireHit& toRLWireHit):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit), m_line()
 {
   adjustLine();
@@ -36,8 +34,8 @@ CDCTangent::CDCTangent(const CDCRLWireHitPair& rlWireHitPair,
   m_line(line)
 {}
 
-CDCTangent::CDCTangent(const CDCRLWireHit* fromRLWireHit,
-                       const CDCRLWireHit* toRLWireHit,
+CDCTangent::CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
+                       const CDCRLTaggedWireHit& toRLWireHit,
                        const ParameterLine2D& line):
   CDCRLWireHitPair(fromRLWireHit, toRLWireHit),
   m_line(line)

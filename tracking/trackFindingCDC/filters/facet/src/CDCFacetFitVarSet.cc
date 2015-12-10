@@ -40,15 +40,15 @@ bool CDCFacetFitVarSet::extract(const CDCFacet* ptrFacet)
   /// Fit tangents
   facet.adjustLines();
 
-  const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
+  const CDCRLTaggedWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
   const double startDriftLengthSigma = sqrt(startDriftLengthVar);
 
-  const CDCRLWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
+  const CDCRLTaggedWireHit& middleRLWirehit = facet.getMiddleRLWireHit();
   const double middleDriftLengthVar = middleRLWirehit.getRefDriftLengthVariance();
   const double middleDriftLengthSigma = sqrt(middleDriftLengthVar);
 
-  const CDCRLWireHit& endRLWirehit = facet.getEndRLWireHit();
+  const CDCRLTaggedWireHit& endRLWirehit = facet.getEndRLWireHit();
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthSigma = sqrt(endDriftLengthVar);
 

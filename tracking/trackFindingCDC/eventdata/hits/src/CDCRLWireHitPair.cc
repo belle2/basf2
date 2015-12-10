@@ -10,8 +10,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,48 +19,31 @@ CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair):
 {
 }
 
-CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit* fromRLWireHit,
-                                   const CDCRLWireHit* toRLWireHit):
+CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLTaggedWireHit& fromRLWireHit,
+                                   const CDCRLTaggedWireHit& toRLWireHit):
   m_fromRLWireHit(fromRLWireHit),
   m_toRLWireHit(toRLWireHit)
 {
-  B2ASSERT("fromRLWireHit is a nullptr", fromRLWireHit);
-  B2ASSERT("toRLWireHit is a nullptr",   toRLWireHit);
 }
 
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const CDCRLWireHit* newFromRLWireHit = wireHitTopology.getReverseOf(getToRLWireHit());
-  const CDCRLWireHit* newToRLWireHit = wireHitTopology.getReverseOf(getFromRLWireHit());
-
-  return CDCRLWireHitPair(newFromRLWireHit, newToRLWireHit);
+  return CDCRLWireHitPair(m_toRLWireHit.reversed(), m_fromRLWireHit.reversed());
 }
 
 void CDCRLWireHitPair::reverse()
 {
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const CDCRLWireHit* newFromRLWireHit = wireHitTopology.getReverseOf(getToRLWireHit());
-  const CDCRLWireHit* newToRLWireHit = wireHitTopology.getReverseOf(getFromRLWireHit());
-
-  setFromRLWireHit(newFromRLWireHit);
-  setToRLWireHit(newToRLWireHit);
+  std::swap(m_fromRLWireHit, m_toRLWireHit);
+  m_fromRLWireHit.reverse();
+  m_toRLWireHit.reverse();
 }
 
-void CDCRLWireHitPair::setFromRLInfo(const ERightLeft fromRLInfo)
+void CDCRLWireHitPair::setFromRLInfo(ERightLeft fromRLInfo)
 {
-  if (fromRLInfo != getFromRLInfo()) {
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-    const CDCRLWireHit* newFromRLWireHit = wireHitTopology.getReverseOf(getFromRLWireHit());
-    setFromRLWireHit(newFromRLWireHit);
-  }
+  m_fromRLWireHit.setRLInfo(fromRLInfo);
 }
 
-void CDCRLWireHitPair::setToRLInfo(const ERightLeft toRLInfo)
+void CDCRLWireHitPair::setToRLInfo(ERightLeft toRLInfo)
 {
-  if (toRLInfo != getToRLInfo()) {
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-    const CDCRLWireHit* newToRLWireHit = wireHitTopology.getReverseOf(getToRLWireHit());
-    setToRLWireHit(newToRLWireHit);
-  }
+  m_toRLWireHit.setRLInfo(toRLInfo);
 }

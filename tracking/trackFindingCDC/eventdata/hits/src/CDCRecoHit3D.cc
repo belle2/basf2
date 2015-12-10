@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 #include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace std;
@@ -67,7 +65,6 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
                                        const CDCTrajectory2D& trajectory2D,
                                        const CDCTrajectorySZ& trajectorySZ)
 {
-
   StereoType stereoType = recoHit.getStereoType();
   if (stereoType == StereoType::c_Axial) {
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
@@ -98,15 +95,9 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
 CDCRecoHit3D CDCRecoHit3D::reconstructNearest(const CDCWireHit& wireHit, const CDCTrajectory2D& trackTrajectory2D)
 {
   B2ASSERT(wireHit.isAxial(), "This function can only be used with axial hits.");
-
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-
-  ERightLeft rlInfo = ERightLeft::c_Right;
-  if (trackTrajectory2D.getDist2D(wireHit.getRefPos2D()) < 0)
-    rlInfo = ERightLeft::c_Left;
-  const CDCRLWireHit* rlWireHit = wireHitTopology.getRLWireHit(wireHit, rlInfo);
-
-  return CDCRecoHit3D::reconstruct(*rlWireHit, trackTrajectory2D);
+  ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit.getRefPos2D());
+  CDCRLTaggedWireHit rlWireHit(&wireHit, rlInfo);
+  return CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 }
 
 CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D& second)

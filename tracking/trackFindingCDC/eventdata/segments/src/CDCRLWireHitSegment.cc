@@ -10,11 +10,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 #include <genfit/WireTrackCandHit.h>
 #include <framework/gearbox/Const.h>
 
+#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -57,10 +56,9 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
         }
 
         const CDCHit* ptrHit = storedHits[hitId];
-        const CDCRLWireHit* ptrRLWireHit = wireHitTopology.getRLWireHit(ptrHit, rlInfo);
-
-        if (ptrRLWireHit) {
-          push_back(ptrRLWireHit);
+        const CDCWireHit* ptrWireHit = wireHitTopology.getWireHit(ptrHit);
+        if (ptrWireHit) {
+          push_back(CDCRLTaggedWireHit(ptrWireHit, rlInfo));
         }
 
       }
@@ -75,8 +73,8 @@ CDCRLWireHitSegment::CDCRLWireHitSegment(const genfit::TrackCand& gfTrackCand)
 vector<const CDCWire*> CDCRLWireHitSegment::getWireSegment() const
 {
   std::vector<const Belle2::TrackFindingCDC::CDCWire*> wireSegment;
-  for (const CDCRLWireHit* ptrRLWireHit : *this) {
-    ptrRLWireHit ? wireSegment.push_back(&(ptrRLWireHit->getWire())) : wireSegment.push_back(nullptr);
+  for (const CDCRLTaggedWireHit& rlWireHit : *this) {
+    wireSegment.push_back(&(rlWireHit.getWire()));
   }
   return wireSegment;
 }

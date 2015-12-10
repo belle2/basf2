@@ -140,6 +140,7 @@ void ARICHDatabaseImporter::importHapdQA()
 
       else if (strime.find("h2dscan") == 0) {
         hitData2D = (TH2F*)f->Get(strime.c_str());
+        hitData2D->SetDirectory(0);
       }
 
       else if (strime.find("gnoise_ch") == 0) {
@@ -149,6 +150,7 @@ void ARICHDatabaseImporter::importHapdQA()
 
       else if (strime.find("hchscan") == 0) {
         TH1F* hhist3 = (TH1F*)f->Get(strime.c_str());
+        hhist3->SetDirectory(0);
 
         // conversion TH1F -> TH1S
 
@@ -159,6 +161,7 @@ void ARICHDatabaseImporter::importHapdQA()
         for (int bin = 0; bin < hhist3_nbins; bin++) {
           hhist3short->SetBinContent(bin, hhist3->GetBinContent(bin));
         }
+        hhist3short->SetDirectory(0);
         hitCount.push_back(hhist3short);
 
       }
@@ -566,9 +569,9 @@ void ARICHDatabaseImporter::importHapdChipInfo()
     for (const auto& BG : hapdInfo.getNodes("bombardmentgain/ch")) {
       chip_i = 4 * hapd_i + chip_ABCD;
       string value = BG.getString("value");
-      string value_1 = value;
+      //string value_1 = value;
       string chip_label = value.erase(1);
-      string value_2 = value_1.substr(2);
+      //string value_2 = value_1.substr(2);
       //channel_label_bomb = atoi(value_2.c_str());
       for (const auto& BG2 : BG.getNodes("point")) {
         hv_bomb[i3] = (float) BG2.getDouble("hv");
@@ -631,23 +634,21 @@ void ARICHDatabaseImporter::importHapdChipInfo()
 
     chip_ABCD = 0;
     // prepare 2D histograms for bias voltage and current
-    int n5 = 150, i5_a, i5_b, i5_c, i5_d, chipnum[n5];
-    i5_a = i5_b = i5_c = i5_d = 0;
+    int n5 = 150, i5 = 0, chipnum[n5];
     float biasv[n5], biasi[n5];
     for (const auto& HI : hapdInfo.getNodes("bias2d/biasvalue")) {
       std::string chip_2d = HI.getString("@chip");
-      chipnum[i5_a] = HI.getInt("@ch");
-      biasv[i5_a] = (float) HI.getDouble("biasv");
-      biasi[i5_a] = (float) HI.getDouble("biasi");
-      if (chipnum[i5_a] == 36) {
+      chipnum[i5] = HI.getInt("@ch");
+      biasv[i5] = (float) HI.getDouble("biasv");
+      biasi[i5] = (float) HI.getDouble("biasi");
+      if (chipnum[i5] == 36) {
         chip_i = 4 * hapd_i + chip_ABCD;
         bias2DV[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "voltage", chipnum, biasv);
         bias2DI[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "current", chipnum, biasi);
-        chipnum[n5] = biasv[n5] = biasi[n5] = 0;
-        i5_a = 0;
+        i5 = -1;
         chip_ABCD++;
       }
-      i5_a++;
+      i5++;
     }
 
     hapd_i++;
@@ -792,31 +793,31 @@ TGraph* ARICHDatabaseImporter::getGraphGainCurrent(std::string bomb_aval, std::s
 int ARICHDatabaseImporter::getChannelPosition(std::string XY, std::string chip_2d, int chipnum)
 {
   // use correct mapping
-  int x, y = 100;
+  int x = 100, y = 100;
   if (chip_2d == "A") {
-    int y = 12;
-    int x = 0 + chipnum;
+    y = 12;
+    x = 0 + chipnum;
     while (x > 6) {
       x = x - 6;
       y = y - 1;
     }
   } else if (chip_2d == "B") {
-    int x = 12;
-    int y = 13 - chipnum;
+    x = 12;
+    y = 13 - chipnum;
     while (y < 7) {
       y = y + 6;
       x = x - 1;
     }
   } else if (chip_2d == "C") {
-    int y = 1;
-    int x = 13 - chipnum;
+    y = 1;
+    x = 13 - chipnum;
     while (x < 7) {
       x = x + 6;
       y = y + 1;
     }
   } else if (chip_2d == "D") {
-    int x = 1;
-    int y = 0 + chipnum;
+    x = 1;
+    y = 0 + chipnum;
     while (y > 6) {
       y = y - 6;
       x = x + 1;
@@ -845,7 +846,7 @@ TH2F* ARICHDatabaseImporter::getBiasGraph(std::string chip_2d, std::string volta
     }
     bias2d->SetBinContent(x, y, bias_v_i[XY]);
   }
-
+  bias2d->SetDirectory(0);
   return bias2d;
 }
 

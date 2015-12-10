@@ -12,7 +12,6 @@ from fnmatch import fnmatch
 # use_local_database("test_database.txt", "test_payloads", LogLevel.WARNING)
 use_local_database()
 # use_central_database("test_param", LogLevel.WARNING)
-conditionsdb = register_module("Conditions")
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
 # get rid of an error message with gearbox
@@ -67,7 +66,6 @@ for path, subdirs, files in os.walk(xdir):
 
 main = create_path()
 main.add_module(eventinfo)
-main.add_module(conditionsdb)
 process(main)
 
 # and run the importer

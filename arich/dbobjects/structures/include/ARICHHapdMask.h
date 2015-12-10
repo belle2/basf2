@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHHapdMask(unsigned char* mask)
+    explicit ARICHHapdMask(unsigned char* mask)
     {
       for (unsigned i = 0; i < c_Size; i++)
         m_mask[i] = mask[i];

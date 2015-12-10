@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
+    explicit ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
       m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_timeLV(),
       m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0) {};
 

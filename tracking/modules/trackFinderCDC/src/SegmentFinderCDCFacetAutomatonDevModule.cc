@@ -9,14 +9,6 @@
  **************************************************************************/
 #include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonDevModule.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
-#include <tracking/trackFindingCDC/filters/facet/FacetFilters.h>
-#include <tracking/trackFindingCDC/filters/facet_relation/FacetRelationFilters.h>
-
-#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-
-#include <framework/datastore/StoreArray.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -29,9 +21,4 @@ SegmentFinderCDCFacetAutomatonDevModule::SegmentFinderCDCFacetAutomatonDevModule
 
   // Set the default segment to symmetric
   setSegmentOrientation(ETrackOrientation::c_Symmetric);
-
-  this->getClusterFilter()->setFilterName("all");
-  this->getFacetFilter()->setFilterName("realistic");
-  this->getFacetRelationFilter()->setFilterName("simple");
-  this->getSegmentRelationFilter()->setFilterName("none");
 }

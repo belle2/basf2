@@ -34,6 +34,7 @@ int main(int argc, char** argv)
   if (argc > 3) config.read(argv[3]);
   NSMCommunicator com;
   com.init(NSMNode(node), config.get("nsm.host"), config.getInt("nsm.port"));
+  //NSMData data(stornode, "storage_status", storage_status_revision);
   NSMData data(stornode + "_STATUS", "storage_status", storage_status_revision);
   storage_status* info = (storage_status*)data.open(com);
   while (true) {
@@ -45,9 +46,12 @@ int main(int argc, char** argv)
     printf(" # of files: %4u, # of bytes : %4.2f [GB]\n", info->nfiles, info->nbytes / 1024);
     printf(" connection to eb2rx   : %s \x1b[49m\x1b[39m\n",
            ((info->node[0].connection_in == 1) ? "\x1b[49m\x1b[32mEstablished" : "\x1b[49m\x1b[31mNot ready"));
-    printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->node[0].nqueue_in / 1024.));
-    printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->node[0].nqueue_out * 4 / 1024.));
-    printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_in * 4 / 1024.));
+    //printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->node[0].nqueue_in / 1024.));
+    //printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->node[0].nqueue_out * 4 / 1024.));
+    //printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_out * 4 / 1024.));
+    printf(" rxqueue from eb2rx    : %4.1f [kB]\n", (float)(info->node[0].nqueue_in));
+    printf(" data in input  buffer : %4.1f [kB]\n", (float)(info->node[0].nqueue_out));
+    printf(" data in record buffer : %4.1f [kB]\n", (float)(info->node[1].nqueue_out));
     printf("\n");
     printf(" %13s | in |      count | freq [kHz] | rate [MB/s] | evtsize [kB]", "node");
     printf(" | out |      count | freq [kHz] | rate [MB/s] | evtsize [kB]\n");

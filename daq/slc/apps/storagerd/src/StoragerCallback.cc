@@ -324,13 +324,16 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       info->expno = rostatus.expno;
       info->runno = rostatus.runno;
       info->subno = rostatus.subno;
-      info->node[0].nqueue_in = rostatus.nqueue_in;
+      //info->node[0].nqueue_in = rostatus.nqueue_in;
+      info->node[0].nqueue_in = rostatus.nqueue_in / 1024;
       SharedEventBuffer::Header* hd = m_ibuf.getHeader();
-      info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
+      //info->node[0].nqueue_out = hd->nword_in - hd->nword_out;
+      info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024;
       connected = (info->node[0].connection_in > 0);
     } else if (i == 1) {
       SharedEventBuffer::Header* hd = m_rbuf.getHeader();
-      info->node[1].nqueue_out = hd->nword_in - hd->nword_out;
+      //info->node[1].nqueue_out = hd->nword_in - hd->nword_out;
+      info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024;
       info->nfiles = rostatus.reserved_i[0];
       info->diskid = rostatus.reserved_i[1];
       info->nbytes = rostatus.reserved_f[0];

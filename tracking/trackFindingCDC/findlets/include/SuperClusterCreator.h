@@ -22,11 +22,11 @@ namespace Belle2 {
 
     /// Refines the clustering of wire hits from  clusters to clusters
     class SuperClusterCreator:
-      public Findlet<const CDCWireHit, CDCWireHitCluster> {
+      public Findlet<CDCWireHit, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCWireHit, CDCWireHitCluster> Super;
+      typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
 
     public:
       /// Signals the beginning of the event processing
@@ -52,7 +52,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(const std::vector<CDCWireHit>& inputWireHits,
+      virtual void apply(std::vector<CDCWireHit>& inputWireHits,
                          std::vector<CDCWireHitCluster>& outputSuperClusters) override final
       {
         m_clusterCreator.apply(inputWireHits, outputSuperClusters);

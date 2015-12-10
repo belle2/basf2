@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/basemodules/SegmentFinderCDCBaseModule.h>
 
 #include <vector>
@@ -119,7 +120,7 @@ namespace Belle2 {
       std::vector<CDCWireHitCluster> m_superClustersInSuperLayer;
 
       /// Neighborhood type for wire hits
-      typedef WeightedNeighborhood<const CDCWireHit> CDCWireHitNeighborhood;
+      typedef WeightedNeighborhood<CDCWireHit> CDCWireHitNeighborhood;
 
       /// Memory for the secondary wire hit neighborhood in a super layer.
       CDCWireHitNeighborhood m_secondaryWirehitNeighborhood;
@@ -153,7 +154,8 @@ namespace Belle2 {
       }
 
       const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-      const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+      CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+      std::vector<CDCWireHit> wireHits = wireHitTopology.getWireHits();
 
       // Event global super cluster id for each super cluster.
       int iSuperCluster = -1;
@@ -162,8 +164,7 @@ namespace Belle2 {
       m_symmetricSegmentsByISuperCluster.clear();
 
       for (const CDCWireSuperLayer& wireSuperLayer : wireTopology.getWireSuperLayers()) {
-
-        const CDCWireHitTopology::CDCWireHitRange wireHitsInSuperlayer = wireHitTopology.getWireHits(wireSuperLayer);
+        VectorRange<CDCWireHit> wireHitsInSuperlayer = std::equal_range(wireHits.begin(), wireHits.end(), wireSuperLayer);
 
         //create the secondary neighborhood of wire hits
         B2DEBUG(100, "Creating the secondary CDCWireHit neighborhood");

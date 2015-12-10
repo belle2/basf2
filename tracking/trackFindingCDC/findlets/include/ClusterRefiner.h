@@ -81,7 +81,7 @@ namespace Belle2 {
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a super cluster.
-      WeightedNeighborhood<const CDCWireHit> m_wirehitNeighborhood;
+      WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
 
       /// Wire hit neighborhood relation filter
       WireHitRelationFilter m_wireHitRelationFilter;

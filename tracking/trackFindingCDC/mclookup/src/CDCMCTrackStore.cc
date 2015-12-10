@@ -136,7 +136,7 @@ void CDCMCTrackStore::fillMCSegments()
     hitsWithCells.insert(hitsWithCells.end(), mcTrack.begin(), mcTrack.end());
 
     //Safest way is to cluster the elements in the track for their nearest neighbors
-    WeightedNeighborhood<const WithAutomatonCell<const CDCHit*> > hitNeighborhood;
+    WeightedNeighborhood<WithAutomatonCell<const CDCHit*> > hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
     for (WithAutomatonCell<const CDCHit*>& hitWithCell : hitsWithCells) {
@@ -158,8 +158,8 @@ void CDCMCTrackStore::fillMCSegments()
                               neighborHit.getIWire());
 
         if (wireTopology.areNeighbors(wireID, neighborWireID) or wireID == neighborWireID) {
-          const WithAutomatonCell<const CDCHit* >* ptrHitWithCell = &hitWithCell;
-          const WithAutomatonCell<const CDCHit* >* ptrNeighborHitWithCell = &neighborHitWithCell;
+          WithAutomatonCell<const CDCHit* >* ptrHitWithCell = &hitWithCell;
+          WithAutomatonCell<const CDCHit* >* ptrNeighborHitWithCell = &neighborHitWithCell;
           hitNeighborhood.insert(ptrHitWithCell, ptrNeighborHitWithCell);
         }
 
@@ -167,7 +167,7 @@ void CDCMCTrackStore::fillMCSegments()
 
     }
 
-    typedef std::vector<const WithAutomatonCell<const CDCHit*>* > CDCHitCluster;
+    typedef std::vector<WithAutomatonCell<const CDCHit*>* > CDCHitCluster;
     Clusterizer<WithAutomatonCell<const CDCHit*>, CDCHitCluster> hitClusterizer;
     std::vector<CDCHitCluster> hitClusters;
     hitClusterizer.create(hitsWithCells, hitNeighborhood, hitClusters);
@@ -177,7 +177,7 @@ void CDCMCTrackStore::fillMCSegments()
     for (CDCHitCluster& hitCluster : hitClusters) {
       CDCHitVector mcSegment;
       mcSegment.reserve(hitCluster.size());
-      for (const WithAutomatonCell<const CDCHit*>* hitWithCell : hitCluster) {
+      for (WithAutomatonCell<const CDCHit*>* hitWithCell : hitCluster) {
         const CDCHit* hit = *hitWithCell;
         mcSegment.push_back(hit);
       }

@@ -126,7 +126,7 @@ namespace Belle2 {
       /// Allow automatic taking of the address.
       /** In places where a pointer is expected the object is implicitly casted to a
        *  pointer to itself.*/
-      operator const Belle2::TrackFindingCDC::CDCWireHit* () const&
+      operator Belle2::TrackFindingCDC::CDCWireHit* ()&
       { return this; }
       /**@}*/
 

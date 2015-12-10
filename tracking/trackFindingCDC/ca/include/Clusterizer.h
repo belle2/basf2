@@ -38,20 +38,20 @@ namespace Belle2 {
      *  suitable for indexing.
      *  The collection container must support BOOST_FOREACH for iteration over its ::value_type.
      *  Cluster can be anything that is default constructable and supports .insert(end(),const value_type *item).
-     * The neighborhood given to the clusterizer must be of type WeightedNeighborhood<const value_type>*/
+     * The neighborhood given to the clusterizer must be of type WeightedNeighborhood<value_type>*/
     template<class AItem, class ACluster>
     class Clusterizer {
 
     private:
       /// Type for the neighborhood of elements in the algorithm
-      typedef WeightedNeighborhood<const AItem> Neighborhood;
+      typedef WeightedNeighborhood<AItem> Neighborhood;
 
     public:
 
       /// Creates the clusters.
       /** Take the collection and its assoziated neighborhood and appends the clusters to the cluster vector give by non const reference*/
       template<class AItemRange>
-      void create(const AItemRange& items,
+      void create(AItemRange& items,
                   const Neighborhood& neighborhood,
                   std::vector<ACluster>& clusters) const
       {
@@ -59,12 +59,12 @@ namespace Belle2 {
         clusters.reserve(30);
 
         //Prepare states
-        for (AItem const& item : items) {
+        for (AItem& item : items) {
           setCellState(item, -1);
         }
 
         int iCluster = -1;
-        for (AItem const& item : items) {
+        for (AItem& item : items) {
 
           if (getCellState(item) == -1) {
 
@@ -83,7 +83,7 @@ namespace Belle2 {
        *  This is a variation of create() taking pointers to objects as vertices instead of references
        */
       template<class APtrItemRange>
-      void createFromPointers(const APtrItemRange& ptrItems,
+      void createFromPointers(APtrItemRange& ptrItems,
                               const Neighborhood& neighborhood,
                               std::vector<ACluster>& clusters) const
       {
@@ -92,24 +92,24 @@ namespace Belle2 {
         clusters.reserve(30);
 
         //Prepare states
-        for (AItem const* ptrItem : ptrItems) {
+        for (AItem* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
             continue;
           }
-          const AItem& item = *ptrItem;
+          AItem& item = *ptrItem;
           setCellState(item, -1);
         }
 
         int iCluster = -1;
-        for (const AItem* ptrItem : ptrItems) {
+        for (AItem* ptrItem : ptrItems) {
 
           if (ptrItem == nullptr) {
             B2WARNING("Nullptr given as item in Clusterizer");
             continue;
           }
-          const AItem& item = *ptrItem;
+          AItem& item = *ptrItem;
 
           if (getCellState(item) == -1) {
 
@@ -124,9 +124,9 @@ namespace Belle2 {
       }
 
       /// Setter for the cell state if the AItem inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
-      void setCellState(const AItem& item, CellState cellState) const
+      void setCellState(AItem& item, CellState cellState) const
       {
-        const AutomatonCell& automatonCell = item.getAutomatonCell();
+        AutomatonCell& automatonCell = item.getAutomatonCell();
         automatonCell.setCellState(cellState);
       }
 
@@ -138,9 +138,9 @@ namespace Belle2 {
       }
 
       // Set the cell weight - use the cell weight internal to the AutomtonCell.
-      void setCellWeight(const AItem& item, CellWeight cellWeight) const
+      void setCellWeight(AItem& item, CellWeight cellWeight) const
       {
-        const AutomatonCell& automatonCell = item.getAutomatonCell();
+        AutomatonCell& automatonCell = item.getAutomatonCell();
         automatonCell.setCellWeight(cellWeight);
       }
 
@@ -150,17 +150,17 @@ namespace Belle2 {
       inline void startCluster(const Neighborhood& neighborhood,
                                ACluster& newCluster,
                                int iCluster,
-                               const AItem& seedItem) const
+                               AItem& seedItem) const
       {
         //ACluster uses pointers as items instead of objects
-        const AItem* ptrSeedItem = &seedItem;
+        AItem* ptrSeedItem = &seedItem;
 
         setCellState(*ptrSeedItem, iCluster);
         newCluster.insert(newCluster.end(), ptrSeedItem);
 
         //grow the cluster
-        std::vector<const AItem*> itemsToCheckNow;
-        std::vector<const AItem*> itemsToCheckNext;
+        std::vector<AItem*> itemsToCheckNow;
+        std::vector<AItem*> itemsToCheckNext;
 
         itemsToCheckNow.reserve(10);
         itemsToCheckNext.reserve(10);
@@ -172,14 +172,14 @@ namespace Belle2 {
           itemsToCheckNow.swap(itemsToCheckNext);
           itemsToCheckNext.clear();
           // Check registered items for neighbors
-          for (AItem const* clusterItem : itemsToCheckNow) {
+          for (AItem* clusterItem : itemsToCheckNow) {
             size_t nNeighbors = 0;
 
             // Consider each neighbor
             for (const typename Neighborhood::WeightedRelation& relation : neighborhood.equal_range(clusterItem)) {
               ++nNeighbors;
 
-              const AItem* neighborItem = getNeighbor(relation);
+              AItem* neighborItem = getNeighbor(relation);
 
               CellState neighborICluster = getCellState(*neighborItem);
               if (neighborICluster == -1) {

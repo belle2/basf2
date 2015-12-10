@@ -136,8 +136,12 @@ namespace Belle2 {
       CDCRLWireHitRange getRLWireHits(const ACoaligned& coaligned) const
       { return std::equal_range(getRLWireHits().begin(), getRLWireHits().end(), coaligned); }
 
-      /// Getter for the wire hits
+      /// Constant getter for the wire hits
       const std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits() const
+      { return m_wireHits; }
+
+      /// Getter for the wire hits
+      std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits()
       { return m_wireHits; }
 
       /// Getter for the wire hits

@@ -38,9 +38,9 @@ namespace Belle2 {
 
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
       template<class ACDCWireHitIterator>
-      const std::vector<const CDCWireHit*>& getPossibleNeighbors(const CDCWireHit* ptrWireHit,
-                                                                 const ACDCWireHitIterator& itBegin,
-                                                                 const ACDCWireHitIterator& itEnd)
+      const std::vector<CDCWireHit*>& getPossibleNeighbors(const CDCWireHit* ptrWireHit,
+                                                           const ACDCWireHitIterator& itBegin,
+                                                           const ACDCWireHitIterator& itEnd)
       {
         m_wireNeighbors.clear();
         m_wireHitNeighbors.clear();
@@ -154,7 +154,7 @@ namespace Belle2 {
       std::vector<const CDCWire* > m_wireNeighbors;
 
       /// Storage for the current neighbors wire hits.
-      std::vector<const CDCWireHit*> m_wireHitNeighbors;
+      std::vector<CDCWireHit*> m_wireHitNeighbors;
 
     }; // end class
 

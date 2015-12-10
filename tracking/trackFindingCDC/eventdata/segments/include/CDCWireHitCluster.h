@@ -16,7 +16,7 @@ namespace Belle2 {
     class CDCWireHit;
 
     /// An aggregation of CDCWireHits.
-    class CDCWireHitCluster : public std::vector<const Belle2::TrackFindingCDC::CDCWireHit*> {
+    class CDCWireHitCluster : public std::vector<Belle2::TrackFindingCDC::CDCWireHit*> {
 
     public:
       /// Get the super cluster id of this cluster

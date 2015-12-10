@@ -25,11 +25,11 @@ namespace Belle2 {
     /// Refines the clustering of wire hits from  clusters to clusters
     template<class WireHitRelationFilter>
     class ClusterCreator:
-      public Findlet<const CDCWireHit, CDCWireHitCluster> {
+      public Findlet<CDCWireHit, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCWireHit, CDCWireHitCluster> Super;
+      typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
 
     public:
       /// Signals the beginning of the event processing
@@ -55,7 +55,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(const std::vector<CDCWireHit>& inputWireHits,
+      virtual void apply(std::vector<CDCWireHit>& inputWireHits,
                          std::vector<CDCWireHitCluster>& outputClusters) override final
       {
         // create the neighborhood
@@ -73,7 +73,7 @@ namespace Belle2 {
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
-      WeightedNeighborhood<const CDCWireHit> m_wirehitNeighborhood;
+      WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
 
       /// Wire hit neighborhood relation filter
       WireHitRelationFilter m_wireHitRelationFilter;

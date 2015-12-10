@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/ca/CellWeight.h>
 
+#include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 #include <string>
 #include <map>
@@ -41,6 +42,14 @@ namespace Belle2 {
 
       /// Terminate the filter after event processing.
       virtual void terminate() {}
+
+      /** Expose the set of parameters of the filter to the module parameter list.
+       *
+       *  Note that not all filters have yet exposed their parameters in this way.
+       */
+      virtual void exposeParameters(ModuleParamList*)
+      {
+      }
 
       /** Set a map of parameter key and string values.
        *  Meaning depends on the specific filter class implementation.

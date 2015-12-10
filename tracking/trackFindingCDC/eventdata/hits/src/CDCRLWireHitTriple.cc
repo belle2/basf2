@@ -70,7 +70,7 @@ void CDCRLWireHitTriple::setEndRLInfo(const ERightLeft endRLInfo)
   getRearRLWireHitPair().setToRLInfo(endRLInfo);
 }
 
-CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
+CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const
 {
   const CDCWire& startWire = getStartWire();
   const CDCWire& middleWire = getMiddleWire();
@@ -81,14 +81,14 @@ CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 
   if (startToMiddleNeighborType == NOT_NEIGHBORS or
       middleToEndNeighborType == NOT_NEIGHBORS) {
-    return ILLSHAPED;
+    return EShape::c_Invalid;
   }
 
   // Neighbor types are marked on the clock. Difference is so to say an angular value apart from a 12 / (2 * pi) factor
   const int clockDifference = (int)startToMiddleNeighborType - (int)middleToEndNeighborType;
 
   // Difference on the clock modulus 12 such that it is between -6 and 6.
-  Shape shape = (clockDifference + 18) % 12 - 6;
+  EShape shape = EShape((clockDifference + 18) % 12 - 6);
 
   return shape;
 }

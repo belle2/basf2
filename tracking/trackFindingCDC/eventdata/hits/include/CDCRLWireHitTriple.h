@@ -24,25 +24,25 @@ namespace Belle2 {
       /** Type for the different shapes of three neighboring hits
        *  (up to mirror and rotational symmetries).
        *  Note: The names are inspired by the xylene molecules. */
-      typedef signed int Shape;
+      enum EShape : signed int {
+        /// Constant for an ill shaped wire hit triple
+        c_Invalid = -999,
 
-      /// Constant for an ill shaped triple
-      static const Shape ILLSHAPED = -999;
+        /// Constant for ortho arrangement with clockwise twist
+        c_OrthoCW = -4,
 
-      /// Constant for ortho arrangement with clockwise twist
-      static const Shape ORTHO_CW = -4;
+        /// Constant for meta arrangement with clockwise twist
+        c_MetaCW = -2,
 
-      /// Constant for meta arrangement with clockwise twist
-      static const Shape META_CW = -2;
+        /// Constant for para arrangement, no twist here
+        c_Para = 0,
 
-      /// Constant for para arrangement, no twist here
-      static const Shape PARA = 0;
+        /// Constant for meta arrangement with counterclockwise twist
+        c_MetaCCW = 2,
 
-      /// Constant for meta arrangement with counterclockwise twist
-      static const Shape META_CCW = 2;
-
-      /// Constant for ortho arrangement with counterclockwise twist
-      static const Shape ORTHO_CCW = 4;
+        /// Constant for ortho arrangement with counterclockwise twist
+        c_OrthoCCW = 4
+      };
 
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLWireHit* startRLWireHit,
@@ -112,7 +112,7 @@ namespace Belle2 {
       { return this; }
 
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
-      Shape getShape() const;
+      EShape getShape() const;
 
       /// Getter for the common superlayer id of the pair
       ILayerType getISuperLayer() const

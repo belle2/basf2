@@ -230,27 +230,27 @@ class FacetCreationValidationModule(harvesting.HarvestingModule):
         end_rl_info = facet.getEndRLInfo()
         superlayer_id = facet.getISuperLayer()
 
-        if shape == facet.ORTHO_CW or shape == facet.ORTHO_CCW:
+        if shape == facet.c_OrthoCW or shape == facet.c_OrthoCCW:
             # Middle hit must be on the other side of the track
             # Track must at least cross ones between two hits
             select_fitless = (middle_rl_info * shape > 0 and
                               (middle_rl_info != start_rl_info or middle_rl_info != end_rl_info))
             select_fitless_hard = select_fitless
 
-        elif shape == facet.META_CW or shape == facet.META_CCW:
+        elif shape == facet.c_MetaCW or shape == facet.c_MetaCCW:
             select_fitless_hard = (middle_rl_info * shape > 0 and
                                    (middle_rl_info != start_rl_info or middle_rl_info != end_rl_info))
 
             select_fitless = (select_fitless_hard or
                               (middle_rl_info == start_rl_info and middle_rl_info == end_rl_info))
 
-        elif shape == facet.PARA:
+        elif shape == facet.c_Para:
             # Track must not cross between the hits twice
             select_fitless = (start_rl_info == middle_rl_info) or (middle_rl_info == end_rl_info)
             select_fitless_hard = select_fitless
 
         else:
-            # ILLSHAPE
+            # c_Invalid
             select_fitless = False
             select_fitless_hard = False
 

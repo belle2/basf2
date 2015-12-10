@@ -49,7 +49,8 @@ std::map<std::string, std::string> FitlessFacetFilter::getParameterDescription()
 
 CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 {
-  CDCFacet::Shape shape = facet.getShape();
+  using EShape = CDCFacet::EShape;
+  EShape shape = facet.getShape();
 
   const ERightLeft startRLInfo = facet.getStartRLInfo();
   const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
@@ -57,11 +58,13 @@ CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 
   bool selectFitless = true;
 
-  if (shape == facet.ORTHO_CW or shape == facet.ORTHO_CCW) {
+  if (shape == EShape::c_OrthoCW or
+      shape == EShape::c_OrthoCCW) {
     selectFitless = middleRLInfo * shape > 0 and (middleRLInfo != startRLInfo or
                                                   middleRLInfo != endRLInfo);
 
-  } else if (shape ==  facet.META_CW or shape ==  facet.META_CCW) {
+  } else if (shape == EShape::c_MetaCW or
+             shape == EShape::c_MetaCCW) {
 
     selectFitless = (middleRLInfo * shape > 0 and
                      (middleRLInfo != startRLInfo or middleRLInfo != endRLInfo));
@@ -70,7 +73,7 @@ CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
       selectFitless |= (middleRLInfo == startRLInfo and middleRLInfo == endRLInfo);
     }
 
-  } else if (shape ==  facet.PARA) {
+  } else if (shape == EShape::c_Para) {
     selectFitless = (startRLInfo == middleRLInfo) or (middleRLInfo == endRLInfo);
 
   } else {

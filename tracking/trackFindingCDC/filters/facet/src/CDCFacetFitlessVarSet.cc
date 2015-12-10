@@ -26,7 +26,7 @@ bool CDCFacetFitlessVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   /// Fitless variables
-  CDCFacet::Shape shape = facet.getShape();
+  CDCFacet::EShape shape = facet.getShape();
   ISuperLayerType superlayerID = facet.getISuperLayer();
 
   const ERightLeft startRLInfo = facet.getStartRLInfo();

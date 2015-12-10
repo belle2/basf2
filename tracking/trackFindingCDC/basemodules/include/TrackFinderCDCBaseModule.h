@@ -95,7 +95,7 @@ namespace Belle2 {
     bool m_param_writeGFTrackCands = true;
 
     /** Encoded desired track orientation.
-     *  Valid orientations are "c_None" (as generated), "c_Symmetric", "c_Outwards", "c_downwards.*/
+     *  Valid orientations are "c_None" (as generated), "c_Symmetric", "c_Outwards", "c_Downwards.*/
     ETrackOrientation m_trackOrientation = ETrackOrientation::c_None;
   };
 

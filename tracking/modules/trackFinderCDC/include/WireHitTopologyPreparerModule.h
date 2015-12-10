@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <framework/core/Module.h>
+#include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
 namespace Belle2 {
 
@@ -20,23 +21,15 @@ namespace Belle2 {
    * Please keep in mind that the taken flag is propagated to all modules. So if you set/unset the taken flag of one hit, this will be used by *all*
    * following modules. Also, in your own module, check for the taken flag/background flag and do not use already taken hits twice.
    */
-  class WireHitTopologyPreparerModule : public Module {
+  class WireHitTopologyPreparerModule:
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyPreparer> {
 
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyPreparer>;
   public:
-    /// Construct the module. IOt has no parameters.
-    WireHitTopologyPreparerModule() : Module()
+    WireHitTopologyPreparerModule() : Super( {"CDCWireHitVector"})
     {
-      setDescription("Combine the CDCHits from the DataStore with the geometry information to have them both at hand in the CDC tracking modules. "
-                     "Also set all CDCWireHits as unused.");
-
       setPropertyFlags(c_ParallelProcessingCertified);
     }
-
-    /// Create the StoreObject.
-    void initialize();
-
-    /// Load the hits from the StoreArray.
-    void event();
   };
-
 }

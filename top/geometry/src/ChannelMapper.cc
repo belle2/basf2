@@ -58,8 +58,8 @@ namespace Belle2 {
       // get parameters from Gearbox
       for (const GearDir& map : channelMapping.getNodes("map")) {
         std::vector<double> data = map.getArray("");
-        unsigned row = int(data[0]);
-        unsigned col = int(data[1]);
+        unsigned row = int(data[0]) - 1;
+        unsigned col = int(data[1]) - 1;
         unsigned asic = int(data[2]);
         unsigned chan = int(data[3]);
         m_mapping.push_back(TOPChannelMap(row, col, asic, chan));

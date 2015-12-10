@@ -38,16 +38,28 @@ namespace Belle2 {
     {}
 
     /**
-     * Return pixel row number within carrier board
+     * Return 0-based pixel row within carrier board
      * @return pixel row (0-based)
      */
     unsigned getRow() const {return m_row;}
 
     /**
-     * Return pixel column number within carrier board
+     * Return 0-based pixel column within carrier board
      * @return pixel column (0-based)
      */
     unsigned getColumn() const {return m_col;}
+
+    /**
+     * Return pixel row number within carrier board
+     * @return pixel row number
+     */
+    unsigned getRowNumber() const {return m_row + 1;}
+
+    /**
+     * Return pixel column number within carrier board
+     * @return pixel column number
+     */
+    unsigned getColumnNumber() const {return m_col + 1;}
 
     /**
      * Return ASIC number

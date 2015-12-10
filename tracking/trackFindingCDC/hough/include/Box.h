@@ -286,15 +286,15 @@ namespace Belle2 {
     public:
       /// Indicates if this box intersects with the other box
       bool intersects(const This& box) const
-      { return intersectsImpl(box, GenIndices<c_nTypes>());  }
+      { return intersectsImpl(box, Indices());  }
 
       /// Indicate if all given values are in the range of their coordinates.
       bool isIn(const Point& point) const
-      { return isInImpl(point, GenIndices<c_nTypes>()); }
+      { return isInImpl(point, Indices()); }
 
       /// Indicate if all given values are in the range of their coordinates.
       bool isIn(const FirstType& value, const ASubordinaryTypes& ... values) const
-      { return isInImpl(Point(value, values...), GenIndices<c_nTypes>()); }
+      { return isInImpl(Point(value, values...), Indices()); }
 
     private:
       /// Bound in the first coordindate

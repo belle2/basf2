@@ -94,7 +94,7 @@ void SampleTimeCalibrationModule::beginRun()
   }
 
   if (m_mode == 1) { // read mode
-    TList* list;
+    TList* list = nullptr;
 
     if (m_conditions == 1) { // read using conditions service
 

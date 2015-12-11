@@ -120,6 +120,7 @@ void B2BIIMdstInputModule::beginRun()
 bool B2BIIMdstInputModule::openNextFile()
 {
   // delete existing FileIO
+  BsClrTab(BBS_CLEAR_ALL);
   delete m_fd;
   m_fd = nullptr;
 

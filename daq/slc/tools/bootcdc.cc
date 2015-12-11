@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <unistd.h>
 
 #include <daq/slc/base/StringUtil.h>
 
@@ -38,6 +39,10 @@ int main(int argc, char** argv)
 {
   bool nsm = false;
   bool cpr = false;
+  if (argc == 1) {
+    nsm = true;
+    cpr = true;
+  }
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-nsm") == 0) {
       nsm = true;
@@ -54,28 +59,44 @@ int main(int argc, char** argv)
   int* cprcdc = getcopper(hostname, ncpr, ropcname);
   char s[256];
   if (nsm) {
-    system("ssh killall nsmd2 runcontrold rocontrold");
+    sprintf(s, "killall nsmd2 runcontrold rocontrold");
+    printf("%s\n", s);
+    system(s);
     for (int i = 0; i < ncpr; i++) {
-      sprintf(s, "ssh cpr%d killall nsmd2", cprcdc[i]);
+      sprintf(s, "ssh cpr%d \"killall nsmd2 cprcontrold\"", cprcdc[i]);
+      printf("%s\n", s);
       system(s);
     }
-    system("bootnsmd2; bootnsmd2");
-    system("bootnsmd2; bootnsmd2 -g");
+    usleep(100000);
+    sprintf(s, "bootnsmd2; bootnsmd2 -g");
+    printf("%s\n", s);
+    system(s);
     for (int i = 0; i < ncpr; i++) {
       sprintf(s, "ssh cpr%d \"source ~/.bash_profile; bootnsmd2 cpr%d\"",
               cprcdc[i], cprcdc[i]);
+      printf("%s\n", s);
       system(s);
     }
-  } else if (cpr) {
+  }
+  if (cpr) {
+    if (nsm) sleep(1);
+    sprintf(s, "killall runcontrold rocontrold");
+    printf("%s\n", s);
+    system(s);
     for (int i = 0; i < ncpr; i++) {
-      sprintf(s, "runcontrold %s -d; rocontrold %s -d",
-              hostname, ropcname.c_str());
-      system(s);
-      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2; "
-              "source ~/.bash_profile; cprcontrold cpr%d -d\"",
-              cprcdc[i], cprcdc[i]);
+      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2;\" ", cprcdc[i]);
+      printf("%s\n", s);
       system(s);
     }
+    usleep(100000);
+    for (int i = 0; i < ncpr; i++) {
+      sprintf(s, "ssh cpr%d \"source ~/.bash_profile; cprcontrold cpr%d -d\"", cprcdc[i], cprcdc[i]);
+      printf("%s\n", s);
+      system(s);
+    }
+    sprintf(s, "runcontrold %s -d; rocontrold %s -d", hostname, ropcname.c_str());
+    printf("%s\n", s);
+    system(s);
   }
   return 0;
 }

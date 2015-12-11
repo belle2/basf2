@@ -221,12 +221,12 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     # define variables that are monitored and specify
     # the corresponding histogram (#bins, low, high)
     # ('variable_name', number_of_bins, x_low, x_high)
-    tracks2hist_KID = ('atcPIDBelle(3,2)', 100, 0.0, 1.0)
-    tracks2hist_PRKID = ('atcPIDBelle(4,3)', 100, 0.0, 1.0)
-    tracks2hist_PRPID = ('atcPIDBelle(4,2)', 100, 0.0, 1.0)
-    tracks2hist_EID = ('eIDBelle', 100, 0.0, 1.0)
-    tracks2hist_MUID = ('muIDBelle', 100, 0.0, 1.0)
-    tracks2hist_MUIDQ = ('muIDBelleQuality', 100, 0.0, 1.0)
+    tracks2hist_KPID = ('atcPIDBelle(3,2)', 110, -0.05, 1.05)
+    tracks2hist_PRKID = ('atcPIDBelle(4,3)', 110, -0.05, 1.05)
+    tracks2hist_PRPID = ('atcPIDBelle(4,2)', 110, -0.05, 1.05)
+    tracks2hist_EID = ('eIDBelle', 110, -0.05, 1.05)
+    tracks2hist_MUID = ('muIDBelle', 110, -0.05, 1.05)
+    tracks2hist_MUIDQ = ('muIDBelleQuality', 110, -0.05, 1.05)
 
     tracks2hist_px = ('px', 100, -3.0, 3.0)
     tracks2hist_py = ('py', 100, -3.0, 3.0)
@@ -266,7 +266,7 @@ def addTrackConversionMonitors(outputRootFile='b2biiTrackConversionMonitors.root
     tracks2hist_Err66 = ('momVertCovM(6,6)', 100, -0.0001, 0.0001)
 
     tracks2hist.param('variables',
-                      [tracks2hist_KID, tracks2hist_PRKID, tracks2hist_PRPID,
+                      [tracks2hist_KPID, tracks2hist_PRKID, tracks2hist_PRPID,
                        tracks2hist_EID, tracks2hist_MUID, tracks2hist_MUIDQ,
 
                        tracks2hist_px, tracks2hist_py, tracks2hist_pz, tracks2hist_E,

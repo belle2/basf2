@@ -11,7 +11,7 @@ void plotComparisonBASF1vs2()
   
   // ADD BASF1 FILES
   TFile *f1 = new TFile("ntuple-Neutrals.root");
-  TFile *f2 = new TFile("Belle1-Tracks.root");
+  TFile *f2 = new TFile("TracksMonitor-testSample.root");
   TFile *gBASF = new TFile("BASFMonitors-testSample.root"); 
 
 
@@ -234,49 +234,49 @@ void plotComparisonBASF1vs2()
   else 
     {
       fileName = "TrackMonitorPlots";
-      drawHist(fileName, f2, gTracks, "h501", "atcPIDBelle__bo3__cm2__bc", "PID: kapi",    0);
-      drawHist(fileName, f2, gTracks, "h502", "atcPIDBelle__bo4__cm3__bc", "PID: prKa",    1);
-      drawHist(fileName, f2, gTracks, "h503", "atcPIDBelle__bo4__cm2__bc", "PID: prpi",    1);
-      drawHist(fileName, f2, gTracks, "h504", "eIDBelle",                  "PID: e",       1);
-      drawHist(fileName, f2, gTracks, "h505", "muIDBelle",                 "PID: mu",      1);
-      drawHist(fileName, f2, gTracks, "h506", "muIDBelleQuality",          "muID Quality", 1);
+      drawHist(fileName, f2, gTracks, "h601", "atcPIDBelle__bo3__cm2__bc", "PID: kapi",    0);
+      drawHist(fileName, f2, gTracks, "h602", "atcPIDBelle__bo4__cm3__bc", "PID: prKa",    1);
+      drawHist(fileName, f2, gTracks, "h603", "atcPIDBelle__bo4__cm2__bc", "PID: prpi",    1);
+      drawHist(fileName, f2, gTracks, "h604", "eIDBelle",                  "PID: e",       1);
+      drawHist(fileName, f2, gTracks, "h605", "muIDBelle",                 "PID: mu",      1);
+      drawHist(fileName, f2, gTracks, "h606", "muIDBelleQuality",          "muID Quality", 1);
 
-      drawHist(fileName, f2, gTracks, "h511", "px",                        "Px [GeV/c]",   1);
-      drawHist(fileName, f2, gTracks, "h512", "py",                        "Py [GeV/c]",   1);
-      drawHist(fileName, f2, gTracks, "h513", "pz",                        "Pz [GeV/c]",   1);
-      drawHist(fileName, f2, gTracks, "h514", "E",                         "E [GeV]",      1);
-      drawHist(fileName, f2, gTracks, "h515", "x",                         "X [cm]",       1);
-      drawHist(fileName, f2, gTracks, "h516", "y",                         "Y [cm]",       1);
-      drawHist(fileName, f2, gTracks, "h517", "z",                         "Z [cm]",       1);
+      drawHist(fileName, f2, gTracks, "h611", "px",                        "Px [GeV/c]",   1);
+      drawHist(fileName, f2, gTracks, "h612", "py",                        "Py [GeV/c]",   1);
+      drawHist(fileName, f2, gTracks, "h613", "pz",                        "Pz [GeV/c]",   1);
+      drawHist(fileName, f2, gTracks, "h614", "E",                         "E [GeV]",      1);
+      drawHist(fileName, f2, gTracks, "h615", "x",                         "X [cm]",       1);
+      drawHist(fileName, f2, gTracks, "h616", "y",                         "Y [cm]",       1);
+      drawHist(fileName, f2, gTracks, "h617", "z",                         "Z [cm]",       1);
 
-      drawHist(fileName, f2, gTracks, "h521", "momVertCovM__bo0__cm0__bc", "Err00",        1);
-      drawHist(fileName, f2, gTracks, "h522", "momVertCovM__bo0__cm1__bc", "Err10",        1);
-      drawHist(fileName, f2, gTracks, "h523", "momVertCovM__bo0__cm2__bc", "Err11",        1);
-      drawHist(fileName, f2, gTracks, "h524", "momVertCovM__bo0__cm3__bc", "Err20",        1);
-      drawHist(fileName, f2, gTracks, "h525", "momVertCovM__bo0__cm4__bc", "Err21",        1);
-      drawHist(fileName, f2, gTracks, "h526", "momVertCovM__bo0__cm5__bc", "Err22",        1);
-      drawHist(fileName, f2, gTracks, "h527", "momVertCovM__bo0__cm6__bc", "Err30",        1);
-      drawHist(fileName, f2, gTracks, "h528", "momVertCovM__bo1__cm1__bc", "Err31",        1);
-      drawHist(fileName, f2, gTracks, "h529", "momVertCovM__bo1__cm2__bc", "Err32",        1);
-      drawHist(fileName, f2, gTracks, "h530", "momVertCovM__bo1__cm3__bc", "Err33",        1);
-      drawHist(fileName, f2, gTracks, "h531", "momVertCovM__bo1__cm4__bc", "Err40",        1);
-      drawHist(fileName, f2, gTracks, "h532", "momVertCovM__bo1__cm5__bc", "Err41",        1);
-      drawHist(fileName, f2, gTracks, "h533", "momVertCovM__bo1__cm6__bc", "Err42",        1);
-      drawHist(fileName, f2, gTracks, "h534", "momVertCovM__bo2__cm2__bc", "Err43",        1);
-      drawHist(fileName, f2, gTracks, "h535", "momVertCovM__bo2__cm3__bc", "Err44",        1);
-      drawHist(fileName, f2, gTracks, "h536", "momVertCovM__bo2__cm4__bc", "Err50",        1);
-      drawHist(fileName, f2, gTracks, "h537", "momVertCovM__bo2__cm5__bc", "Err51",        1);
-      drawHist(fileName, f2, gTracks, "h538", "momVertCovM__bo2__cm6__bc", "Err52",        1);
-      drawHist(fileName, f2, gTracks, "h539", "momVertCovM__bo3__cm3__bc", "Err53",        1);
-      drawHist(fileName, f2, gTracks, "h540", "momVertCovM__bo3__cm4__bc", "Err54",        1);
-      drawHist(fileName, f2, gTracks, "h541", "momVertCovM__bo3__cm5__bc", "Err55",        1);
-      drawHist(fileName, f2, gTracks, "h542", "momVertCovM__bo3__cm6__bc", "Err60",        1);
-      drawHist(fileName, f2, gTracks, "h543", "momVertCovM__bo4__cm4__bc", "Err61",        1);
-      drawHist(fileName, f2, gTracks, "h544", "momVertCovM__bo4__cm5__bc", "Err62",        1);
-      drawHist(fileName, f2, gTracks, "h545", "momVertCovM__bo4__cm6__bc", "Err63",        1);
-      drawHist(fileName, f2, gTracks, "h546", "momVertCovM__bo5__cm5__bc", "Err64",        1);
-      drawHist(fileName, f2, gTracks, "h547", "momVertCovM__bo5__cm6__bc", "Err65",        1);
-      drawHist(fileName, f2, gTracks, "h548", "momVertCovM__bo6__cm6__bc", "Err66",        2);
+      drawHist(fileName, f2, gTracks, "h621", "momVertCovM__bo0__cm0__bc", "Err00",        1);
+      drawHist(fileName, f2, gTracks, "h622", "momVertCovM__bo0__cm1__bc", "Err10",        1);
+      drawHist(fileName, f2, gTracks, "h623", "momVertCovM__bo0__cm2__bc", "Err11",        1);
+      drawHist(fileName, f2, gTracks, "h624", "momVertCovM__bo0__cm3__bc", "Err20",        1);
+      drawHist(fileName, f2, gTracks, "h625", "momVertCovM__bo0__cm4__bc", "Err21",        1);
+      drawHist(fileName, f2, gTracks, "h626", "momVertCovM__bo0__cm5__bc", "Err22",        1);
+      drawHist(fileName, f2, gTracks, "h627", "momVertCovM__bo0__cm6__bc", "Err30",        1);
+      drawHist(fileName, f2, gTracks, "h628", "momVertCovM__bo1__cm1__bc", "Err31",        1);
+      drawHist(fileName, f2, gTracks, "h629", "momVertCovM__bo1__cm2__bc", "Err32",        1);
+      drawHist(fileName, f2, gTracks, "h630", "momVertCovM__bo1__cm3__bc", "Err33",        1);
+      drawHist(fileName, f2, gTracks, "h631", "momVertCovM__bo1__cm4__bc", "Err40",        1);
+      drawHist(fileName, f2, gTracks, "h632", "momVertCovM__bo1__cm5__bc", "Err41",        1);
+      drawHist(fileName, f2, gTracks, "h633", "momVertCovM__bo1__cm6__bc", "Err42",        1);
+      drawHist(fileName, f2, gTracks, "h634", "momVertCovM__bo2__cm2__bc", "Err43",        1);
+      drawHist(fileName, f2, gTracks, "h635", "momVertCovM__bo2__cm3__bc", "Err44",        1);
+      drawHist(fileName, f2, gTracks, "h636", "momVertCovM__bo2__cm4__bc", "Err50",        1);
+      drawHist(fileName, f2, gTracks, "h637", "momVertCovM__bo2__cm5__bc", "Err51",        1);
+      drawHist(fileName, f2, gTracks, "h638", "momVertCovM__bo2__cm6__bc", "Err52",        1);
+      drawHist(fileName, f2, gTracks, "h639", "momVertCovM__bo3__cm3__bc", "Err53",        1);
+      drawHist(fileName, f2, gTracks, "h640", "momVertCovM__bo3__cm4__bc", "Err54",        1);
+      drawHist(fileName, f2, gTracks, "h641", "momVertCovM__bo3__cm5__bc", "Err55",        1);
+      drawHist(fileName, f2, gTracks, "h642", "momVertCovM__bo3__cm6__bc", "Err60",        1);
+      drawHist(fileName, f2, gTracks, "h643", "momVertCovM__bo4__cm4__bc", "Err61",        1);
+      drawHist(fileName, f2, gTracks, "h644", "momVertCovM__bo4__cm5__bc", "Err62",        1);
+      drawHist(fileName, f2, gTracks, "h645", "momVertCovM__bo4__cm6__bc", "Err63",        1);
+      drawHist(fileName, f2, gTracks, "h646", "momVertCovM__bo5__cm5__bc", "Err64",        1);
+      drawHist(fileName, f2, gTracks, "h647", "momVertCovM__bo5__cm6__bc", "Err65",        1);
+      drawHist(fileName, f2, gTracks, "h648", "momVertCovM__bo6__cm6__bc", "Err66",        2);
     }
 
 

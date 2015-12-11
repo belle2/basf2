@@ -194,7 +194,6 @@ int DeSerializerPCModule::Connect()
     socPC.sin_family = AF_INET;
 
     struct hostent* host;
-    printf("############# HOSTNAME %d %s\n", i, m_hostname_from[ i ].c_str());
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];

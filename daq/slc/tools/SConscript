@@ -8,6 +8,7 @@ env['TOOLS_LIBS']['rfconfget']  = ['daq', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['bootnsmd2']  = ['daq']
 env['TOOLS_LIBS']['checknsm2']  = ['daq']
 env['TOOLS_LIBS']['semtest']  = ['framework', 'daq']
-env['TOOLS_LIBS']['boot_ecl']  = ['daq']
+env['TOOLS_LIBS']['bootecl']  = ['daq']
+env['TOOLS_LIBS']['bootcdc']  = ['daq']
 
 Return('env')

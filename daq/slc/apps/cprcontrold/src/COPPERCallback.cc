@@ -16,8 +16,28 @@
 #include <mgt/hsreg.h>
 
 #include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <sstream>
 
 using namespace Belle2;
+
+std::string popen(const std::string& cmd)
+{
+  char buf[1000];
+  FILE* fp;
+  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
+    perror("can not exec commad");
+    exit(EXIT_FAILURE);
+  }
+  std::stringstream ss;
+  while (!feof(fp)) {
+    fgets(buf, sizeof(buf), fp);
+    ss << buf << std::endl;
+  }
+  pclose(fp);
+  return ss.str();
+}
 
 COPPERCallback::COPPERCallback(FEE* fee[4], bool dummymode)
 {
@@ -51,6 +71,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
   try {
+    LogFile::info(obj.getName());
     m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
     add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
@@ -114,12 +135,14 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
         } else {
           LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
-          system((StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm")).c_str());
+          std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
+          LogFile::info(ret);
           LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s", (i + 'a'),
                         o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
-          system((StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
-                                   (i + 'a')) + o_fee.getText("randfile") +
-                  " " + o_fee.getText("lengthfile")).c_str());
+          ret = popen(StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
+                                       (i + 'a')) + o_fee.getText("randfile") +
+                      " " + o_fee.getText("lengthfile"));
+          LogFile::info(ret);
         }
       }
     }
@@ -174,8 +197,8 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_ttrx.open();
     m_ttrx.monitor();
     if (m_ttrx.isError()) {
-      m_ttrx.close();
-      throw (RCHandlerException("TTRX Link error"));
+      //m_ttrx.close();
+      //throw (RCHandlerException("TTRX Link error"));
     }
     try {
       for (int i = 0; i < 4; i++) {
@@ -309,7 +332,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       }
       int dummymode = 0;
       get("dummymode", dummymode);
-      if (!dummymode && state != RCState::NOTREADY_S && state.isStable()) {
+      if (!dummymode && state == RCState::RUNNING_S && state.isStable()) {
         logging(m_copper.isFifoEmpty(), LogFile::NOTICE, "COPPER FIFO empty");
         logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
         logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");

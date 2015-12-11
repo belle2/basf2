@@ -260,6 +260,32 @@ namespace Belle2 {
      */
     void setCurrentV99p(float currentV99p) {m_currentV99p = currentV99p; }
 
+    /**
+     * Return a channel number from the list of dead channels
+     * @param i index of the element in the list
+     * @return channel id
+     */
+    int getDeadChannel(unsigned int i) const;
+
+    /**
+     * Add a channel number to the list of dead channels
+     * @param channel FEB channel id
+     */
+    void appendDeadChannel(int channel) {m_deadChannel.push_back(channel); }
+
+    /**
+     * Set vector of dead channel numbers
+     * @param channel FEB channel id
+     */
+    void setDeadChannels(std::vector<int> deadChannels) {m_deadChannel = deadChannels; }
+
+    /**
+     * Return size of the list of dead channels
+     * @return size
+     */
+    int getDeadChannelsSize() const {return m_deadChannel.size();}
+
+
 
   private:
 
@@ -284,6 +310,8 @@ namespace Belle2 {
     float m_currentV38p;      /**< Current at 3.8 V */
     TTimeStamp m_timeHV;      /**< Test Date of FEB high voltage test */
     float m_currentV99p;      /**< Current at 99 V */
+    std::vector<int> m_deadChannel;    /**< List of dead channels on the FEB */
+
 
     ClassDef(ARICHFebTest, 1);  /**< ClassDef */
   };

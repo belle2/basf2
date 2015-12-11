@@ -25,7 +25,7 @@ namespace Belle2 {
 
   public:
     ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
-                          std::vector<std::string> inputFilesAsicTxt);
+                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE);
 
     virtual ~ARICHDatabaseImporter() {};
 
@@ -80,6 +80,11 @@ namespace Belle2 {
     void importFebTest();
 
     /**
+     * Returns list of dead channels on FEB
+     */
+//    std::vector<int> getDeadChFEB(std::string dna);
+
+    /**
      * Convert date (FEB) to TTimeStamp.
      */
     TTimeStamp timedate2(std::string time);
@@ -130,6 +135,16 @@ namespace Belle2 {
     void exportHapdChipInfo();
 
     /**
+     * Import HAPD quantum efficiency in the database.
+     */
+    void importHapdQE();
+
+    /**
+     * Export HAPD quantum efficiency from the database.
+     */
+    void exportHapdQE();
+
+    /**
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
      */
     void getBiasVoltagesForHapdChip(std::string serialNumber);
@@ -139,6 +154,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesHapdQA;
     std::vector<std::string> m_inputFilesAsicRoot;
     std::vector<std::string> m_inputFilesAsicTxt;
+    std::vector<std::string> m_inputFilesHapdQE;
 
     ClassDef(ARICHDatabaseImporter, 0);
   };

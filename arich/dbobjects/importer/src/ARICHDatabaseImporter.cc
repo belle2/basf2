@@ -15,6 +15,7 @@
 #include <arich/dbobjects/structures/ARICHFebTest.h>
 #include <arich/dbobjects/structures/ARICHHapdChipInfo.h>
 #include <arich/dbobjects/structures/ARICHHapdInfo.h>
+#include <arich/dbobjects/structures/ARICHHapdQE.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -43,11 +44,12 @@ using namespace Belle2;
 
 
 ARICHDatabaseImporter::ARICHDatabaseImporter(vector<string> inputFilesHapdQA, vector<string> inputFilesAsicRoot,
-                                             vector<string> inputFilesAsicTxt)
+                                             vector<string> inputFilesAsicTxt, vector<string> inputFilesHapdQE)
 {
   for (unsigned int i = 0; i < inputFilesHapdQA.size(); i++) {  m_inputFilesHapdQA.push_back(inputFilesHapdQA[i]); }
   for (unsigned int i = 0; i < inputFilesAsicRoot.size(); i++) {  m_inputFilesAsicRoot.push_back(inputFilesAsicRoot[i]); }
   for (unsigned int i = 0; i < inputFilesAsicTxt.size(); i++) {  m_inputFilesAsicTxt.push_back(inputFilesAsicTxt[i]); }
+  for (unsigned int i = 0; i < inputFilesHapdQE.size(); i++) {  m_inputFilesHapdQE.push_back(inputFilesHapdQE[i]); }
 }
 
 
@@ -390,6 +392,8 @@ void ARICHDatabaseImporter::importFebTest()
     febConst->setFebSerial(serial);
     febConst->setFebDna(dna);
 
+    //febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
+
     // slow control data
     for (const auto& testFEB : content2.getNodes("febtest")) {
       string timeSlowC = testFEB.getString("time");
@@ -486,6 +490,26 @@ void ARICHDatabaseImporter::importFebTest()
   IntervalOfValidity iov(0, 0, -1, -1);
   Database::Instance().storeData("testFeb", &febConstants, iov);
 }
+
+/*std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
+{
+  vector<int> listCHs;
+  string line;
+  ifstream fileFEB("FEBdeadChannels.txt");
+  if (fileFEB.is_open()) {
+    while (getline(fileFEB,line))
+    {
+      string ch2 = line.substr(line.find(",")+1);
+      string dna2 = line.erase(line.find(",")-1);
+      if (dna2 == dna) { listCHs.push_back(atoi(ch2.c_str())); }
+    }
+  }
+  else { B2INFO("No file FEBdeadChannels.txt"); }
+  fileFEB.close();
+
+
+  return listCHs;
+}*/
 
 
 TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
@@ -642,6 +666,7 @@ void ARICHDatabaseImporter::importHapdChipInfo()
       biasv[i5] = (float) HI.getDouble("biasv");
       biasi[i5] = (float) HI.getDouble("biasi");
       if (chipnum[i5] == 36) {
+        cout << "channel = 36, serial-chip, chip_i = " << serial[hapd_i] << "-" << chip_2d[chip_i] << ", " << chip_i << endl;
         chip_i = 4 * hapd_i + chip_ABCD;
         bias2DV[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "voltage", chipnum, biasv);
         bias2DI[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "current", chipnum, biasi);
@@ -873,6 +898,63 @@ void ARICHDatabaseImporter::exportHapdChipInfo()
 }
 
 
+void ARICHDatabaseImporter::importHapdQE()
+{
+  // define data array
+  TClonesArray hapdQEConstants("Belle2::ARICHHapdQE");
+  int hapd = 0;
+
+  // loop over root riles
+  for (const string& inputFile : m_inputFilesHapdQE) {
+
+    TFile* f = TFile::Open(inputFile.c_str(), "READ");
+
+    int size = inputFile.length();
+    string hapdSerial = inputFile.substr(size - 11, 6);
+    cout << "hapdserial=" << hapdSerial << endl;
+    TH2F* qe2D = 0;
+
+    // extract data
+    TIter next(f->GetListOfKeys());
+    TKey* key;
+    while ((key = (TKey*)next())) {
+
+      string strime = key->GetName();
+
+      if (strime.find("hqe2d_pixel") == 0) {
+        qe2D = (TH2F*)f->Get(strime.c_str());
+        qe2D->SetTitle("quantum efficiency");
+        qe2D->SetName("QE");
+        qe2D->SetDirectory(0);
+      }
+
+      else { B2INFO("Key name does not match 'hqe2d_pixel'!"); }
+    }
+
+    // save data as an element of the array
+    new(hapdQEConstants[hapd]) ARICHHapdQE(hapdSerial, qe2D);
+    hapd++;
+  }
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  Database::Instance().storeData("testHapdQE", &hapdQEConstants, iov);
+}
+
+
+void ARICHDatabaseImporter::exportHapdQE()
+{
+  DBArray<ARICHHapdQE> elements("testHapdQE");
+  elements.getEntries();
+
+  // Print serial numbers of HAPDs
+  unsigned int el = 0;
+  for (const auto& element : elements) {
+    B2INFO("Element Number: " << el << "; serial = " << element.getHapdSerialNumber());
+    el++;
+  }
+}
+
 void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
 {
   // example that shows how to extract and use data
@@ -916,7 +998,6 @@ void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
       }
       B2INFO("serial#-chip = " << element.getHapdSerial() << "-" << element.getChipLabel() << "; " << "V(gain=40) = " << (int)(
                gainnew->Eval(40) + 0.5));
-
     }
   }
 }

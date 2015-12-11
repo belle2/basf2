@@ -9,8 +9,9 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-# use_local_database("test_database.txt", "test_payloads", LogLevel.WARNING)
-use_local_database()
+# use_local_database()
+use_local_database("test_database.txt", "test_payloads")
+# use_central_database("ARICHdata", LogLevel.ERROR);
 # use_central_database("test_param", LogLevel.WARNING)
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -38,38 +39,49 @@ if not os.path.isfile('febTest/SN_dna.xml'):
 # files in that folder. What we do is that we set the backend to point to that
 # folder so that gearbox can find all files in there.
 paramloader = register_module('Gearbox')
-paramloader.param('backends', ['file:///home/manca/belle2/head/arich/dbdata/AllData/'])
+pathname = 'file://%s/AllData/' % (os.getcwd())
+paramloader.param('backends', [pathname])
 paramloader.param('fileName', 'ArichData.xml')
 paramloader.initialize()
 
 
 # create a std::vector<string>
-rootFiles = ROOT.vector('string')()
+rootFilesHapdQA = ROOT.vector('string')()
 # and add the files we want to read
-xdirHapdQA = '/home/manca/belle2/head/arich/dbdata/hapdQA_test/'
+xdirHapdQA = '%s/hapdQA_test/' % (os.getcwd())
 for path, subdirs, files in os.walk(xdirHapdQA):
     for name in files:
         if fnmatch(name, "*.root"):
-            rootFiles.push_back(os.path.join(path, name))
+            rootFilesHapdQA.push_back(os.path.join(path, name))
 
 # create a std::vector<string>
-rootFiles2 = ROOT.vector('string')()
-txtFiles2 = ROOT.vector('string')()
+rootFilesHapdQE = ROOT.vector('string')()
 # and add the files we want to read
-xdir = '/home/manca/belle2/head/arich/dbdata/asicData/'
+# QE can be downloaded from http://research.kek.jp/group/arich/internal/pixel_map/
+xdirHapdQE = '%s/hapdQE/' % (os.getcwd())
+for path, subdirs, files in os.walk(xdirHapdQE):
+    for name in files:
+        if fnmatch(name, "*.root"):
+            rootFilesHapdQE.push_back(os.path.join(path, name))
+
+# create a std::vector<string>
+rootFilesAsics = ROOT.vector('string')()
+txtFilesAsics = ROOT.vector('string')()
+# and add the files we want to read
+xdir = '%s/asicData/' % (os.getcwd())
 for path, subdirs, files in os.walk(xdir):
     for name in files:
         if fnmatch(name, "*.root"):
-            rootFiles2.push_back(os.path.join(path, name))
+            rootFilesAsics.push_back(os.path.join(path, name))
         if fnmatch(name, "*.txt"):
-            txtFiles2.push_back(os.path.join(path, name))
+            txtFilesAsics.push_back(os.path.join(path, name))
 
 main = create_path()
 main.add_module(eventinfo)
 process(main)
 
 # and run the importer
-dbImporter = ARICHDatabaseImporter(rootFiles, rootFiles2, txtFiles2)
+dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE)
 # dbImporter.importAerogelInfo()
 # dbImporter.exportAerogelInfo()
 # dbImporter.importHapdQA()
@@ -82,6 +94,8 @@ dbImporter = ARICHDatabaseImporter(rootFiles, rootFiles2, txtFiles2)
 # dbImporter.exportHapdInfo()
 # dbImporter.importHapdChipInfo()
 # dbImporter.exportHapdChipInfo()
+# dbImporter.importHapdQE()
+# dbImporter.exportHapdQE()
 
 # simple example that shows how to read data from databse and use it
 # dbImporter.getBiasVoltagesForHapdChip("KA0167")

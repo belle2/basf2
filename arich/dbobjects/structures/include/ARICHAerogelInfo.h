@@ -174,15 +174,15 @@ namespace Belle2 {
     float c_lambdaMax = 700.0;
     float c_lambdaStep = 10.0;
 
-    float m_version;                          /**< Aerogel data version (measurement number) */
-    std::string m_serial;                      /**< Aerogel Serial number */
-    std::string m_id;                          /**< Aerogel Identifier */
-    float m_refractiveIndex;                  /**< Refractive Index of the aerogel */
-    float m_transmissionLength;               /**< Transmission Length at 400 nm */
-    float m_thickness;                        /**< Thickness of the aerogel */
-    std::vector<int> m_lambda;                 /**< Lambda for transmittance */
-    std::vector<float> m_transmittance;       /**< Transmittance of aerogel */
-    std::string m_comment;                     /**< optional comment */
+    float m_version;                      /**< Aerogel data version (measurement number) */
+    std::string m_serial;                 /**< Aerogel Serial number */
+    std::string m_id;                     /**< Aerogel Identifier */
+    float m_refractiveIndex;              /**< Refractive Index of the aerogel */
+    float m_transmissionLength;           /**< Transmission Length at 400 nm */
+    float m_thickness;                    /**< Thickness of the aerogel */
+    std::vector<int> m_lambda;            /**< Lambda for transmittance */
+    std::vector<float> m_transmittance;   /**< Transmittance of aerogel */
+    std::string m_comment;                /**< optional comment */
 
 
     ClassDef(ARICHAerogelInfo, 3);  /**< ClassDef */

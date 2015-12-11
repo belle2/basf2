@@ -7,8 +7,6 @@ import os
 import random
 from basf2 import *
 
-use_local_database('db/database.txt', '', LogLevel.WARNING)
-
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 

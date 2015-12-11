@@ -117,7 +117,7 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
                                           iSegment);
             alignmentData = alignment->getAlignmentData(segment);
             if (alignmentData == NULL)
-              B2FATAL("Incomplete alignment data in the database.");
+              B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iPlane, iSegment, alignmentData))
               return false;
           }

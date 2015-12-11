@@ -36,9 +36,12 @@ namespace Belle2 {
 
       /**
        * Constructor.
-       * @param[in] global If true, load global transformations (false - local).
+       * @param[in] global            If true, load global transformations
+       *                              (false - local).
+       * @param[in] alignmentDataFile Alignment data file (NULL - use default
+       *                              positions).
        */
-      TransformData(bool global);
+      TransformData(bool global, const char* alignmentDataFile);
 
       /**
        * Destructor.

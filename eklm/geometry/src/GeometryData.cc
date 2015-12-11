@@ -465,6 +465,7 @@ EKLM::GeometryData::GeometryData()
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
   m_mode = (enum DetectorMode)mode;
+  m_DisplacementDataFile = gd.getString("Displacements");
   m_solenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   GearDir EndCap(gd);
   EndCap.append("/Endcap");
@@ -646,6 +647,16 @@ EKLM::GeometryData::~GeometryData()
 EKLM::DetectorMode EKLM::GeometryData::getDetectorMode() const
 {
   return m_mode;
+}
+
+bool EKLM::GeometryData::displacedGeometry() const
+{
+  return (m_DisplacementDataFile != "");
+}
+
+std::string EKLM::GeometryData::getDisplacementDataFile() const
+{
+  return m_DisplacementDataFile;
 }
 
 int EKLM::GeometryData::getNLayers() const

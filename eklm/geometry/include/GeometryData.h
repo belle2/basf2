@@ -322,6 +322,16 @@ namespace Belle2 {
       DetectorMode getDetectorMode() const;
 
       /**
+       * Check if displacements are used.
+       */
+      bool displacedGeometry() const;
+
+      /**
+       * Get name of displacement data file.
+       */
+      std::string getDisplacementDataFile() const;
+
+      /**
        * Get number of layers.
        */
       int getNLayers() const;
@@ -568,6 +578,9 @@ namespace Belle2 {
        * Calculate shield geometry data.
        */
       void calculateShieldGeometry();
+
+      /** Displacement data file. */
+      std::string m_DisplacementDataFile;
 
       /** Number of layers. */
       int m_nLayer;

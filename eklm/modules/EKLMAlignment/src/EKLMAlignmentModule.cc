@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TFile.h>
+
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
@@ -24,7 +27,9 @@ REG_MODULE(EKLMAlignment)
 
 EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
-  setDescription("Module for generation of EKLM alignment data.");
+  setDescription("Module for generation of EKLM displacement data.");
+  addParam("OutputFile", m_OutputFile, "Output file.",
+           std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -34,7 +39,7 @@ EKLMAlignmentModule::~EKLMAlignmentModule()
 
 void EKLMAlignmentModule::initialize()
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
+  TFile* f = new TFile(m_OutputFile.c_str(), "recreate");
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentData(0., 0., 0.);
   int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
@@ -52,7 +57,8 @@ void EKLMAlignmentModule::initialize()
       }
     }
   }
-  Database::Instance().storeData("EKLMAlignment", (TObject*)&alignment, iov);
+  alignment.Write("EKLMDisplacement");
+  delete f;
 }
 
 void EKLMAlignmentModule::beginRun()

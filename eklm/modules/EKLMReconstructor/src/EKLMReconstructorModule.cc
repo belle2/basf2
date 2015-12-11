@@ -35,7 +35,7 @@ void EKLMReconstructorModule::initialize()
   hit2ds.registerInDataStore();
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
-  m_TransformData = new EKLM::TransformData(true);
+  m_TransformData = new EKLM::TransformData(true, NULL);
 }
 
 void EKLMReconstructorModule::beginRun()

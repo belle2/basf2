@@ -31,6 +31,7 @@
     </ESTR>
     <xi:include href="DigitizationParams.xml"/>
     <Mode desc="0 -- normal operation, 1 -- bg study">0</Mode>
+    <Displacements desc="File with displacement data, empty - use default positions"></Displacements>
     <SensitiveDetector>
      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="MeV">0.0</EnergyDepositionThreshold>
      <HitTimeThreshold desc="All hits with larger time will be dropped at SensitiveDetector level" unit="ns">1000000000</HitTimeThreshold>

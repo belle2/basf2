@@ -62,6 +62,9 @@ namespace Belle2 {
 
   private:
 
+    /** Name of output file. */
+    std::string m_OutputFile;
+
   };
 
 }

@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <TFile.h>
+
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
@@ -20,12 +23,14 @@
 
 using namespace Belle2;
 
-EKLM::TransformData::TransformData(bool global)
+EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip, segment;
+  EKLMAlignment* alignment;
   EKLMAlignmentData* alignmentData;
   AlignmentChecker alignmentChecker;
   const GeometryData& geoDat = GeometryData::Instance();
+  TFile* f;
   for (iEndcap = 0; iEndcap < 2; iEndcap++) {
     geoDat.getEndcapTransform(&m_Endcap[iEndcap], iEndcap);
     for (iLayer = 0; iLayer < 14; iLayer++) {
@@ -43,10 +48,12 @@ EKLM::TransformData::TransformData(bool global)
       }
     }
   }
-#if 0
   /* Read alignment data from the database and modify transformations. */
-  DBObjPtr<EKLMAlignment> alignment("EKLMAlignment");
-  if (alignment.isValid()) {
+  if (alignmentDataFile != NULL) {
+    f = new TFile(alignmentDataFile);
+    alignment = (EKLMAlignment*)f->Get("EKLMDisplacement");
+    if (alignment == NULL)
+      B2FATAL("Alignment data does not exist in the input file.");
     if (!alignmentChecker.checkAlignment(&(*alignment)))
       B2FATAL("EKLM alignment data is incorrect, overlaps exist.");
     for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
@@ -58,6 +65,8 @@ EKLM::TransformData::TransformData(bool global)
               segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                             iSegment);
               alignmentData = alignment->getAlignmentData(segment);
+              if (alignmentData == NULL)
+                B2FATAL("Incomplete alignment data.");
               for (iStrip = 1; iStrip <= 15; iStrip++) {
                 m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
                   HepGeom::Translate3D(alignmentData->getDx(),
@@ -71,10 +80,8 @@ EKLM::TransformData::TransformData(bool global)
         }
       }
     }
-  } else
-    B2INFO("Could not read alignment data from the database, "
-           "using default positions.");
-#endif
+    delete f;
+  }
   if (global)
     transformsToGlobal();
 }

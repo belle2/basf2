@@ -51,7 +51,11 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   if (readESTRData(&m_ESTRPar) == ENOMEM)
     B2FATAL(MemErr);
   try {
-    m_TransformData = new EKLM::TransformData(false);
+    if (m_GeoDat->displacedGeometry())
+      m_TransformData = new EKLM::TransformData(
+        false, m_GeoDat->getDisplacementDataFile().c_str());
+    else
+      m_TransformData = new EKLM::TransformData(false, NULL);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

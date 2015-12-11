@@ -97,7 +97,7 @@ void EKLMTimeCalibrationModule::Prepare()
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
   StoreArray<ExtHit>::required();
-  m_TransformData = new EKLM::TransformData(true);
+  m_TransformData = new EKLM::TransformData(true, NULL);
   m_outputFile = new TFile(m_dataOutputFileName.c_str(), "recreate");
   if (m_outputFile->IsZombie())
     B2FATAL("Cannot open output file.");

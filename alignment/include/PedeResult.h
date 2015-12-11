@@ -54,6 +54,7 @@ namespace Belle2 {
       bool outOfBounds(int iparam) {if (iparam < 0) return true; if ((unsigned int)iparam >= data.size()) return true; return false;}
       //! Struct to hold data for a parameter
     public:
+      //! All data for a parameter
       struct parameterData {
         //! Constructor
         parameterData() {}

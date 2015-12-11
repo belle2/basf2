@@ -21,10 +21,61 @@ namespace Belle2 {
     {
       if (!valid)
         return;
-      //TODO: not implemented
+
+      string line;
       ifstream file(filename);
+
       if (!file.is_open())
         return;
+
+      int eigenPairIndex = -1;
+
+      for (auto& pData : data) {
+        pData.eigenweights.clear();
+        pData.eigenweights.reserve(20);
+      }
+
+      while (getline(file, line)) {
+        cout << line << endl;
+        stringstream ss;
+        ss << line;
+        string tmp1, tmp2, tmp3;
+        int eigenPairNumber;
+        double eigenvalue;
+        ss >> tmp1 >> eigenPairNumber >> tmp2 >> tmp3 >> eigenvalue;
+        cout << tmp1 << " " << tmp2 << " " << tmp3 << " " << eigenPairNumber << " " << eigenvalue << endl;
+        if (tmp1 == "Eigenvector")
+          ++eigenPairIndex;
+        else
+          continue;
+
+        // Read elements
+        vector<pair<int, double>> elements;
+        while (getline(file, line) && line.length() > 2) {
+          int lab1 = 0;
+          int lab2 = 0;
+          int lab3 = 0;
+          double w1, w2, w3;
+          stringstream triplet;
+          triplet << line;
+          triplet >> lab1 >> w1 >> lab2 >> w2 >> lab3 >> w3;
+          if (lab1) elements.push_back({lab1, w1});
+          if (lab2) elements.push_back({lab2, w2});
+          if (lab3) elements.push_back({lab3, w3});
+          //cout << lab1 << w1 << lab2 << w2 << lab3 << w3 << endl;
+        }
+        for (auto& pData : data) {
+          pData.eigenweights.push_back(0.);
+        }
+        for (auto el : elements) {
+          int index = getParameterIndex(el.first);
+          if (index >= 0)
+            data[index].eigenweights[eigenPairIndex] = el.second;
+        }
+        eigenNumbers.push_back(eigenvalue);
+      }
+
+
     }
     void PedeResult::read(string filename)
     {

@@ -101,6 +101,10 @@ parser.add_argument("--system", default=False, action="store_true",
                     help="If given, also record /proc/meminfo to check "
                     "consistency. This only works well if no other programs "
                     "are allocating memory while profile is recorded")
+parser.add_argument("--annotations", default=r"memoryusage annotate:\s*(.*)$",
+                    help="regular expession which to apply against output of "
+                    "program. If a match is found the contents of group 1 will "
+                    "be added to the plots at the time the output was processed")
 
 options, args = parser.parse_known_args()
 # remove the -- if present
@@ -311,6 +315,7 @@ def check_output():
     """check for the B2INFO output to determine process role"""
     prochandler = re.compile(r"ProcHandler:\s*(.*?)\s*forked."
                              r"\s*pid\s*=\s*([0-9]*)")
+    annotate = re.compile(options.annotations)
     while True:
         if child.poll() is not None:
             return
@@ -320,6 +325,10 @@ def check_output():
         if forkmessage:
             # jaay, update the process name
             process_names[int(forkmessage.group(2))] = forkmessage.group(1)
+        annotatemessage = annotate.search(line)
+        if annotatemessage:
+            message = annotatemessage.group(1).strip()
+            annotations.append((runtime, message))
         # forward output to stdout
         print(line, end="")
 
@@ -329,8 +338,10 @@ if do_record:
     # create a list of memory consumptions for each pid
     process_memory = {}
     process_names = {}
+    annotations = []
     total_memory = []
     system_memory = None
+    runtime = 0
     if options.system:
         system_offset = get_system_memory()
         system_memory = []
@@ -354,7 +365,6 @@ if do_record:
     # while child is running, check its memory usage
     while True:
         runtime = timer.wait()
-        diff.append(runtime - lasttime)
         lasttime = runtime
         # check if child is still running
         if child.poll() is not None:
@@ -400,6 +410,7 @@ if write_file:
             "total_memory": total_memory,
             "process_names": np.array(process_names.items()),
             "memory_types": np.array(memory_types),
+            "annotations": np.array(annotations),
         }
         if options.system:
             keys["system_memory"] = system_memory
@@ -430,6 +441,8 @@ if read_file:
                 memory_types = data
             elif key == "system_memory":
                 system_memory = data
+            elif key == "annotations":
+                annotations = data
             else:
                 process_memory[int(key)] = data
 
@@ -498,6 +511,18 @@ if do_plotting:
         a.axhline(maxvalue, c="k", ls="--", zorder=-1)
         a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
                    textcoords="offset points")
+
+        for time, text in annotations:
+            time_index = np.searchsorted(total_memory[:, 0], time)
+            annotvalue = total_memory[time_index, i + 1] / 1000
+            args = dict(xy=(time, annotvalue), xytext=(0, -20), textcoords="offset points",
+                        rotation="vertical", size="xx-small", arrowprops={"arrowstyle": "->"},
+                        ha="center", va="top")
+            if maxvalue == 0 or annotvalue/maxvalue < 0.5:
+                args["va"] = "bottom"
+                args["xytext"] = (0, -args["xytext"][1])
+
+            a.annotate(text, **args)
 
     # save plots
     with PdfPages(options.out) as pdf:

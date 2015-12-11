@@ -26,7 +26,7 @@ bool Stream0Controller::loadArguments(const DBObject& obj)
     return false;
   }
   int port = cobj.getInt("port");
-  m_host = cobj.getText("host");
+  m_host = StringUtil::tolower(cobj.getText("host"));
   std::string script = cobj.getText("script");
   try {
     m_callback->get(m_callback->getRC().getName(), m_host + ".used", used);

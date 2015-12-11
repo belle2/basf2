@@ -84,9 +84,11 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
   try {
     const DBObjectList& stream0(obj.getObjects("stream0"));
     m_eb0.init(this, 0, "eb0", obj);
-    m_stream1.init(this, 1, "stream1", obj);
-    add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
-    add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
+    if (obj.hasObject("stream1")) {
+      m_stream1.init(this, 1, "stream1", obj);
+      add(new NSMVHandlerROInputPort(m_stream1, "stream1.input.port"));
+      add(new NSMVHandlerROOutputPort(m_stream1, "stream1.output.port"));
+    }
     m_stream0 = std::vector<Stream0Controller>();
     for (size_t i = 0; i < stream0.size(); i++) {
       m_stream0.push_back(Stream0Controller());
@@ -128,8 +130,10 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
     LogFile::debug("Booted %d-th stream0", i);
     try_wait();
   }
-  if (!m_stream1.load(obj, 10)) {
-    throw (RCHandlerException("Faield to boot stream1"));
+  if (obj.hasObject("stream1")) {
+    if (!m_stream1.load(obj, 10)) {
+      throw (RCHandlerException("Faield to boot stream1"));
+    }
   }
   /*
   if (!m_eb1tx.load(obj, 0)) {
@@ -153,9 +157,11 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
       return;
     }
   }
+  /*
   if (!m_stream1.start(expno, runno)) {
     throw (RCHandlerException("Faield to start stream1"));
   }
+  */
   //m_eb1tx.start(expno, runno);
 }
 
@@ -248,7 +254,7 @@ void ROCallback::monitor() throw(RCHandlerException)
       state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
       state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
-      throw (RCHandlerException("eb0 : crashed"));
+      //throw (RCHandlerException("eb0 : crashed"));
     }
     if (!m_stream1.getControl().isAlive()) {
       //throw (RCHandlerException("Process down : stream1"));

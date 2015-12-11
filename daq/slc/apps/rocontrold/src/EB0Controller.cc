@@ -49,7 +49,7 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   for (int i = 0; i < nsenders; i++) {
     const DBObject& o_stream0(obj("stream0", i));
     const int port = o_stream0.getInt("port");
-    const std::string host = o_stream0.getText("host");
+    const std::string host = StringUtil::tolower(o_stream0.getText("host"));
     int used = 0;
     m_callback->get(m_callback->getRC(), host + ".used", used);
     if (used) {

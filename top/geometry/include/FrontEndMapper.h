@@ -14,6 +14,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBArray.h>
 
 #include <map>
 #include <unordered_set>
@@ -41,10 +42,20 @@ namespace Belle2 {
       ~FrontEndMapper();
 
       /**
-       * initialize: get mapping from DB
+       * initialize: get mappings from DB
        * @param frontEndMapping xpath to the mapping
        */
       void initialize(const GearDir& frontEndMapping);
+
+      /**
+       * re-do conversion maps when DBArray has changed
+       */
+      void update();
+
+      /**
+       * store mappings to database
+       */
+      void storeToDB();
 
       /**
        * Return map from TOP module side
@@ -109,7 +120,8 @@ namespace Belle2 {
        */
       enum {c_numModules = 16, c_numColumns = 4};
 
-      std::vector<TOPFrontEndMap> m_mapping; /**< mapping vector */
+      std::vector<TOPFrontEndMap> m_mapping; /**< mappings from gearbox */
+      //      DBArray<TOPFrontEndMap> m_dbmapping;   /**< mappings from database */
 
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
       const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns]; /**< conversion */

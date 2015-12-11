@@ -138,7 +138,7 @@ void LogPythonInterface::exposePythonAPI()
   global.attr("inspect") = import("inspect");
 
   //Interface LogLevel enum
-  enum_<LogConfig::ELogLevel>("LogLevel")
+  enum_<LogConfig::ELogLevel>("LogLevel", "enum encapsulating all the possible log levels")
   .value(LogConfig::logLevelToString(LogConfig::c_Debug), LogConfig::c_Debug)
   .value(LogConfig::logLevelToString(LogConfig::c_Info), LogConfig::c_Info)
   .value(LogConfig::logLevelToString(LogConfig::c_Result), LogConfig::c_Result)
@@ -161,16 +161,17 @@ void LogPythonInterface::exposePythonAPI()
   ;
 
   //Interface LogConfig class
-  class_<LogConfig>("LogConfig")
+  class_<LogConfig>("LogConfig", "Class providing configuration interface for the logging system")
   .def(init<optional<LogConfig::ELogLevel, int> >())
-  .add_property("log_level",  &LogConfig::getLogLevel,  &LogConfig::setLogLevel)
-  .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel)
-  .add_property("abort_level", &LogConfig::getAbortLevel, &LogConfig::setAbortLevel)
-  .def("set_log_level", &LogConfig::setLogLevel)
-  .def("set_debug_level", &LogConfig::setDebugLevel)
-  .def("set_abort_level", &LogConfig::setAbortLevel)
-  .def("set_info", &LogConfig::setLogInfo)
-  .def("get_info", &LogConfig::getLogInfo)
+  .add_property("log_level",  &LogConfig::getLogLevel,  &LogConfig::setLogLevel, "set or get the current log level")
+  .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
+  .add_property("abort_level", &LogConfig::getAbortLevel, &LogConfig::setAbortLevel,
+                "set or get the severity which causes program abort")
+  .def("set_log_level", &LogConfig::setLogLevel, "set the log level")
+  .def("set_debug_level", &LogConfig::setDebugLevel, "set the debug level")
+  .def("set_abort_level", &LogConfig::setAbortLevel, "set the severity which causes program abort")
+  .def("set_info", &LogConfig::setLogInfo, "set the bitmask of LogInfo members to show when printing messages")
+  .def("get_info", &LogConfig::getLogInfo, "get the current bitmask of which parts of the log message will be printed")
   ;
 
   //Interface the Interface class :)
@@ -192,12 +193,13 @@ void LogPythonInterface::exposePythonAPI()
   .def_readonly("log_stats", &LogPythonInterface::getLogStatistics)
   ;
 
-  def("B2DEBUG", &LogPythonInterface::logDebug);
-  def("B2INFO", &LogPythonInterface::logInfo);
-  def("B2RESULT", &LogPythonInterface::logResult);
-  def("B2WARNING", &LogPythonInterface::logWarning);
-  def("B2ERROR", &LogPythonInterface::logError);
-  def("B2FATAL", &LogPythonInterface::logFatal);
+  docstring_options doc_options(true, true, false);
+  def("B2DEBUG", &LogPythonInterface::logDebug, args("debuglevel", "message"), "create a debug message with the given debug level");
+  def("B2INFO", &LogPythonInterface::logInfo, args("message"), "create an info message");
+  def("B2RESULT", &LogPythonInterface::logResult, args("message"), "create an info message");
+  def("B2WARNING", &LogPythonInterface::logWarning, args("message"), "create a warning message");
+  def("B2ERROR", &LogPythonInterface::logError, args("message"), "create an error message");
+  def("B2FATAL", &LogPythonInterface::logFatal, args("message"), "create a fatal error message");
 
   //Create instance of interface class in pybasf2 module scope
   global.attr("logging") = object(ptr(&interface));

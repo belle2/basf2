@@ -10,6 +10,7 @@
 
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
+#include <boost/python/docstring_options.hpp>
 
 #include <framework/database/Database.h>
 
@@ -172,9 +173,59 @@ void Database::exposePythonAPI()
   // make sure the default instance is created
   Database::Instance();
 
-  def("reset_database", &Database::reset);
-  def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads());
-  def("use_local_database", &LocalDatabase::createInstance, local_createInstance_overloads());
-  def("use_central_database", &ConditionsDatabase::createDefaultInstance, condition_createDefaultInstance_overloads());
-  def("use_central_database", &ConditionsDatabase::createInstance, condition_createInstance_overloads());
+  //don't show c++ signature in python doc to keep it simple
+  docstring_options options(true, true, false);
+
+  def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
+  def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads(args("resetIoVs", "loglevel"), R"DOCSTRING(
+Use a database chain: Multiple database sources are used on a first found
+basis: If the payload is not found in one source try the next and so on.
+
+If the chain is enabled calls to use_local_database and use_central_database
+will add these sources to the chain instead of replacing the current source.
+If there was an exisiting single source setup the one source is kept in the
+chain. If there was already a DatabaseChain nothing changes.
+
+Args:
+    resetIoVs (bool): A flag to indicate whether IoVs from non-primary
+        databases should be set to only the current run and rechecked for the
+        next run.
+    loglevel (basf2.LogLevel): The LogLevel of messages from the database
+        chain, defaults to LogLevel.WARNING
+)DOCSTRING"));
+  def("use_local_database", &LocalDatabase::createInstance, local_createInstance_overloads(args("filename", "directory", "readonly", "loglevel"), R"DOCSTRING(
+Use a local database backend: a single file containing the payload information in plain text.
+
+Args:
+    filename (str): filename containing the payload information, defaults to
+        "database.txt"
+    directory (str): directory containing the payloads, defaults to current
+        directory
+    readonly (bool): if True the database will refuse to create new payloads
+    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+        payloads cannot be found, defaults to LogLevel.WARNING
+)DOCSTRING"));
+  def("use_central_database", &ConditionsDatabase::createDefaultInstance, condition_createDefaultInstance_overloads(
+              args("globalTag", "loglevel"), R"DOCSTRING(
+Use the central database via REST api and the default connection parameters.
+
+Args:
+    globalTag (str): name of the global tag to use for payload lookup
+    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+        payloads cannot be found, defaults to LogLevel.WARNING
+)DOCSTRING"));
+  def("use_central_database", &ConditionsDatabase::createInstance, condition_createInstance_overloads(
+              args("globalTag", "restBaseName", "fileBaseName", "fileBaseLocal", "loglevel"), R"DOCSTRING(
+Use the central database via REST api and the custom connection parameters.
+This version should only used by experts to debug the conditions database or
+use a different database.
+
+Args:
+    globalTag (str): name of the global tag to use for payload lookup
+    restBaseName: base URL for the REST api
+    fileBaseName: base URL for the payload download
+    fileBaseLocal: directory where to save downloaded payloads
+    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+        payloads cannot be found, defaults to LogLevel.WARNING
+)DOCSTRING"));
 }

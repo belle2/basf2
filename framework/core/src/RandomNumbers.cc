@@ -144,7 +144,12 @@ void RandomNumbers::exposePythonAPI()
 {
   using namespace boost::python;
 
+  //don't show c++ signature in python doc to keep it simple
+  docstring_options options(true, true, false);
   //Expose RandomNumbers class
-  def("set_random_seed", &setPythonSeed);
-  def("get_random_seed", &RandomNumbers::getSeed);
+  def("set_random_seed", &setPythonSeed, args("seed"), R"DOCSTRING(
+Set the random seed. The argument can be any object and will be converted to a
+string using the builtin str() function and will be used to initialize the
+random generator.)DOCSTRING");
+  def("get_random_seed", &RandomNumbers::getSeed, "Return the current random seed");
 }

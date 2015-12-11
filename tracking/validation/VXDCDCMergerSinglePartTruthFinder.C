@@ -26,6 +26,8 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //TCanvas *c1 = new TCanvas("c1","prova",10,10,700,500);
   //c1->SetFillColor(0);
 
+  //11122015 
+  /*
   TH1F *h1 = new TH1F("h1","Merged Tracks Truth Track Finder",10,0,10);
   h1->GetXaxis()->SetTitle("# of merged tracks");
   h1->GetListOfFunctions()->Add(new TNamed("Description","Number of merged tracks for single 1GeV charged muon")); 
@@ -132,7 +134,7 @@ void VXDCDCMergerSinglePartTruthFinder(){
   //TH1F *h21 = new TH1F("h21","VXDP",100,-4,4);
   //tree->Draw("VXDPz>>h21","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDPz_5GeV_muons_1000_Theta.jpg");
-
+  */
  /////////////SCANS//////////////
 
   TH1F *h22 = new TH1F("h22","Eff vs Pt Truth Track Finder",100,0.,5.);

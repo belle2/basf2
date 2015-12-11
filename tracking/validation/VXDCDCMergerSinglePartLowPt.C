@@ -51,6 +51,8 @@ void VXDCDCMergerSinglePartLowPt(){
   //h4->Write();
   //c1->SaveAs("plots/VXDTracks_5GeV_muons_1000_Theta.jpg");
 
+  //11122015 
+  /*
   TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
   gStyle->SetOptStat("e");
   tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
@@ -68,6 +70,7 @@ void VXDCDCMergerSinglePartLowPt(){
   h6->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   //c1->SaveAs("plots/PosRes_5GeV_muons_1000_Theta.jpg");
   h6->Write();
+  */
 
   //TH1F *h7 = new TH1F("h7","Dx",100,-0.05,0.05);
   //tree->Draw("Dx>>h7","GoodTag==1&&TruthTag==1");
@@ -81,7 +84,8 @@ void VXDCDCMergerSinglePartLowPt(){
   //tree->Draw("Dz>>h9","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/Dz_5GeV_muons_1000_Theta.jpg");
 
-
+  //11122015 
+  /*
   TH1F *h10 = new TH1F("h10","Momentum Resisual",100,0,0.5);
   gStyle->SetOptStat("e");
   tree->Draw("MomRes>>h10","GoodTag==1&&TruthTag==1");
@@ -89,6 +93,7 @@ void VXDCDCMergerSinglePartLowPt(){
   h10->GetListOfFunctions()->Add(new TNamed("Check","Should be peaked at 0"));
   h10->GetListOfFunctions()->Add(new TNamed("Contact","tracking@belle2.kek.jp")); 
   h10->Write();
+  */
 
   //TH1F *h11 = new TH1F("h11","DMomx",100,-2,2);
   //tree->Draw("DMomx>>h11","GoodTag==1&&TruthTag==1");

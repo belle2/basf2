@@ -54,11 +54,12 @@ void RandomNumbers::initialize(const std::string& seed)
   RandomGenerator* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
     delete gRandom;
-    gRandom = s_evtRng;
     B2DEBUG(100, "Replacing gRandom from " << gRandom << " to " << gen);
   }
-  s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
+  gRandom = s_evtRng;
+  s_evtRng->setMode(RandomGenerator::c_independent);
   s_evtRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
+  s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
 }
 
 void RandomNumbers::barrier()

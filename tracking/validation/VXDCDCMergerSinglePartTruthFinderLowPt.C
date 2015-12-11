@@ -55,6 +55,8 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   //h4->Write();
   //c1->SaveAs("plots/VXDTracks_5GeV_muons_1000_Theta.jpg");
 
+  //11122015 
+  /*
   TH1F *h5 = new TH1F("h5","Chi2",100,0,100);
   gStyle->SetOptStat("e");
   tree->Draw("Chi2>>h5","GoodTag==1&&TruthTag==1");
@@ -147,6 +149,7 @@ void VXDCDCMergerSinglePartTruthFinderLowPt(){
   //TH1F *h21 = new TH1F("h21","VXDP",100,-4,4);
   //tree->Draw("VXDPz>>h21","GoodTag==1&&TruthTag==1");
   //c1->SaveAs("plots/VXDPz_5GeV_muons_1000_Theta.jpg");
+  */
 
  /////////////SCANS//////////////
 

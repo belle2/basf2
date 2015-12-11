@@ -26,6 +26,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     #: {'UsePXDHits': True, 'UseSVDHits': True,'UseCDCHits': True, 'UseOnlyAxialCDCHits': False}
     tracking_coverage = {}
     fit_geometry = None  # Determines which fit geometry should be used.
+    fit_tracks = False  # If true, tracks will be fitted after they have been found
+    # This flag is ignored when running the full reco chain
     trackCandidatesColumnName = 'TrackCands'
 
     def create_argument_parser(self, **kwds):
@@ -51,7 +53,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
         argument_parser.add_argument(
             '--fit-geometry',
-            choices=['TGeo', 'Geant4'],
+            choices=['TGeo', 'Geant4', 'default'],
             default=self.fit_geometry,
             dest='fit_geometry',
             help='Geometry to be used with Genfit. If unset no fit is performed'
@@ -128,6 +130,20 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         if self.simulate_only:
             return main_path
 
+        # setting up fitting is only necessary when testing
+        # track finding comonenst ex-situ
+        if (self.fit_geometry and
+                self.finder_module != 'StandardReco' and
+                not isinstance(self.finder_module, StandardTrackingReconstructionModule)):
+
+            # Prepare Genfit extrapolation
+            setup_genfit_extrapolation_module = basf2.register_module('SetupGenfitExtrapolation')
+
+            # only set if the default is not requested
+            if not self.fit_geometry == "default":
+                setup_genfit_extrapolation_module.param({'whichGeometry': self.fit_geometry})
+            main_path.add_module(setup_genfit_extrapolation_module)
+
         if self.finder_module is not None:
             # Setup track finder
             # determine which sub-detector hits will be used
@@ -169,17 +185,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             mc_track_matcher_module.param(tracking_coverage)
             main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
-        # setting up fitting is only necessary when testing
-        # track finding comonenst ex-situ
-        if (self.fit_geometry and
-                self.finder_module != 'StandardReco' and
-                not isinstance(self.finder_module, StandardTrackingReconstructionModule)):
-
-            # Prepare Genfit extrapolation
-            setup_genfit_extrapolation_module = basf2.register_module('SetupGenfitExtrapolation')
-            setup_genfit_extrapolation_module.param({'whichGeometry': self.fit_geometry})
-            main_path.add_module(setup_genfit_extrapolation_module)
-
+        if self.fit_tracks:
             # Fit tracks
             gen_fitter_module = basf2.register_module('GenFitter')
             gen_fitter_module.param({'PDGCodes': [13]})

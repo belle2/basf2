@@ -42,7 +42,7 @@ class SVD4Layer(TrackingValidationRun):
         'UseCDCHits': False,
     }
 
-    fit_geometry = None
+    fit_geometry = "default"
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

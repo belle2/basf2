@@ -33,7 +33,7 @@ class VXD(TrackingValidationRun):
     finder_module = basf2.register_module('VXDTF')
     param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.22}
     finder_module.param(param_vxdtf)
-    fit_geometry = None
+    fit_geometry = "default"
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

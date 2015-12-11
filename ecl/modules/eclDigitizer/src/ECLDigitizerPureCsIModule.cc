@@ -30,6 +30,7 @@
 #include <TH1.h>
 #include <iostream>
 
+
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
@@ -90,50 +91,22 @@ void ECLDigitizerPureCsIModule::beginRun()
 
 void ECLDigitizerPureCsIModule::event()
 {
-  //Input Array
   StoreArray<ECLHit> eclHits;
-  if (!eclHits) {
-    B2DEBUG(100, "ECLHit array is empty in event " << m_nEvent);
-  }
 
-  // Output Arrays
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
   StoreArray<ECLDsp> eclDsps(eclDspArrayName());
 
   /* add trigger resolution defined in a module paramer
      shifting the waveform starting time by a random deltaT,
      assuming that t0=0 adc channel is determined by the trigger */
-
   double deltaT = m_sigmaTrigger == 0 ? 0 : gRandom->Gaus(0, m_sigmaTrigger);
-
-
-  /*
-    Not using trigger time for now
-  StoreArray<ECLTrig> eclTrigs;
-
-  double timeInt = 0;
-  const double trgtick = EclConfigurationPure::m_tickPure / EclConfigurationPure::m_ntrg;   // trigger tick
-  if (eclTrigs.getEntries() == 1) {
-    timeInt = eclTrigs[0]->getTimeTrig();
-  }
-  const double DeltaT = timeInt / trgtick;
-  const int      ttrig = int(DeltaT);
-
-
-  const double trgtick = m_tick / m_ntrg;   // trigger tick
-  const double  DeltaT = gRandom->Uniform(0, double(m_ntrg)); // trigger decision can come in any time ???
-  const double timeInt = DeltaT * trgtick;
-  const int      ttrig = int(DeltaT);
-
-  const auto eclTrig = eclTrigs.appendNew();
-  eclTrig->setTimeTrig(timeInt); //t0 (us)= (1520 - m_ltr)*24.*
-  */
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_type));
 
   // emulate response for ECL hits after ADC measurements
   vector< vector< const ECLHit*> > hitmap(EclConfigurationPure::m_nch);
+
   for (const auto& eclHit : eclHits) {
     int j = eclHit.getCellId() - 1; //0~8735
     if (isPureCsI(j + 1)) {
@@ -152,32 +125,21 @@ void ECLDigitizerPureCsIModule::event()
     if (! isPureCsI(j + 1)) continue;
     adccounts_type& a = m_adc[j];
 
-    if (m_calibration) {
-      // This has been added by Alex Bobrov for calibration
-      // of covariance matrix artificially generate 100 MeV in time for each crystal
-      double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + m_testsig, m_ss[m_tbl[j].iss]);
-    } else if (a.total < 0.0001)
-      continue;
+    if (! m_calibration && a.total < 0.0001) continue;
 
-    //Skip Noise generation for now
-
-    float z[EclConfigurationPure::m_nsmp];
-    for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
-      z[i] = gRandom->Gaus(0, 1);
-
+    //Noise generation
     float adcNoise[EclConfigurationPure::m_nsmp];
-    m_noise[0].generateCorrelatedNoise(z, adcNoise);
+    memset(adcNoise, 0, sizeof(adcNoise));
+    if (m_elecNoise > 0) {
+      float z[EclConfigurationPure::m_nsmp];
+      for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
+        z[i] = gRandom->Gaus(0, 1);
+      m_noise[0].generateCorrelatedNoise(z, adcNoise);
+    }
 
-    //    if (a.total < .0001) continue;
-    if (a.total < .0001) continue;
     int FitA[EclConfigurationPure::m_nsmp];
     for (int  i = 0; i < EclConfigurationPure::m_nsmp; i++) {
-      // skip noise for now
-      // FitA[i] = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
       FitA[i] = 20 * (1000 * a.c[i] + adcNoise[i]) + 3000;
-
-      // cout << FitA[i] << endl;
     }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits
@@ -185,14 +147,14 @@ void ECLDigitizerPureCsIModule::event()
     int qualityFit = 0; // fit output : quality    2 bits
     double fitChi2 = 0;
 
-    if (m_debug)
-      DSPFitterPure(m_fitparams[0], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
-    else
-      DSPFitterPure(m_fitparams[0], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
+    if (! m_calibration) {
+      if (m_debug)
+        DSPFitterPure(m_fitparams[0], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
+      else
+        DSPFitterPure(m_fitparams[0], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
+    }
 
-    //}
-
-    if (energyFit > 0) {
+    if (m_calibration || energyFit > 0) {
       int CellId = j + 1;
       const auto eclDsp = eclDsps.appendNew();
       eclDsp->setCellId(CellId);
@@ -262,11 +224,13 @@ void ECLDigitizerPureCsIModule::readDSPDB()
   // at the moment same noise for all crystals
   m_noise.resize(1);
   int index = 0;
+
   for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
-    for (int j = 0; j < EclConfigurationPure::m_nsmp; j++)
-      if (i <= j) {
-        if (i == j) m_noise[0].setMatrixElement(index++, m_elecNoise);     // units are MeV energy noise eq from electronics
-        else m_noise[0].setMatrixElement(index++, 0.);  //uncorrelated
-      }
+    for (int j = 0; j <= i; j++)
+      if (i == j) m_noise[0].setMatrixElement(index++, m_elecNoise);     // units are MeV energy noise eq from electronics
+      else m_noise[0].setMatrixElement(index++, 0.);  //uncorrelated
+
+  float testM[31][31];
+  m_noise[0].getMatrix(testM);
 
 }

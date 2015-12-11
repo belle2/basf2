@@ -15,12 +15,11 @@ void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun
   const int N = m_ns * m_nlPure;
   double r1 = 32 / m_ns;
   double r2 = EclConfiguration::m_tick / EclConfiguration::m_ntrg * 8  / EclConfigurationPure::m_tickPure ;
-  cout << "r1,r2 = " << r1 << " " << r2 << endl;
 
   ECLSampledShaper dsp(sampledfun, round(r1 / r2));
   dsp.fillarray(N, m_ft);
   double maxval = * max_element(m_ft, m_ft + N);
-  cout << "maxval = " << maxval << endl;
+
   for_each(m_ft1, m_ft1 + N, [maxval](double & a) { a /= maxval; });
   double sum = 0;
   for (int i = 0; i < N; i++) sum += m_ft[i];
@@ -29,7 +28,6 @@ void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun
   ECLSampledShaper dsp1(sampledfunDerivative, round(r1 / r2));
   dsp1.fillarray(N, m_ft1);
   for_each(m_ft1, m_ft1 + N, [r1, r2](double & a) { a *= r1 / r2; });
-
 }
 
 void EclConfigurationPure::adccountspure_t::AddHit(const double a, const double t0,

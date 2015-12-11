@@ -49,6 +49,7 @@ DeSerializerPCModule::DeSerializerPCModule() : DeSerializerModule()
   addParam("HostNameFrom", m_hostname_from, "Hostnames of data sources");
   addParam("PortFrom", m_port_from, "port numbers of data sources");
 
+
   B2INFO("DeSerializerPC: Constructor done.");
 
 
@@ -67,6 +68,10 @@ void DeSerializerPCModule::initialize()
   B2INFO("DeSerializerPC: initialize() started.");
 
   // Set m_socket
+  if (m_num_connections > (int)m_hostname_from.size() ||  m_num_connections > (int)m_port_from.size()) {
+    B2FATAL("Hostname or port# is not specified for all connections. Please check a python script. Exiting... \n");
+    exit(1);
+  }
   for (int i = 0; i < m_num_connections; i++) {
     m_socket.push_back(-1);
   }
@@ -189,6 +194,7 @@ int DeSerializerPCModule::Connect()
     socPC.sin_family = AF_INET;
 
     struct hostent* host;
+    printf("############# HOSTNAME %d %s\n", i, m_hostname_from[ i ].c_str());
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];

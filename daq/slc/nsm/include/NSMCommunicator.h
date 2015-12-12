@@ -63,7 +63,7 @@ namespace Belle2 {
     void setId(int id) throw() { m_id = id; }
     NSMMessage& getMessage() throw() { return m_message; }
     const NSMMessage& getMessage() const throw() { return m_message; }
-    void setMessage(const NSMMessage& msg) throw() { m_message = msg; }
+    void setMessage(const NSMMessage& msg) throw();// { m_message = msg; }
     const NSMNode& getNode() const throw() { return m_node; }
     int getNodeIdByName(const std::string& name) throw(NSMHandlerException);
     int getNodePidByName(const std::string& name) throw(NSMHandlerException);
@@ -76,12 +76,7 @@ namespace Belle2 {
     const std::string getNodeNameById(int id) throw(NSMHandlerException);
     void pushQueue(const NSMMessage& msg) { m_msg_q.push(msg); }
     bool hasQueue() const { return !m_msg_q.empty(); }
-    NSMMessage popQueue()
-    {
-      NSMMessage msg = m_msg_q.front();
-      m_msg_q.pop();
-      return msg;
-    }
+    NSMMessage popQueue();
 
   private:
     NSMcontext* getContext() { return m_nsmc; }

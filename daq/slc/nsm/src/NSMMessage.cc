@@ -239,11 +239,14 @@ const NSMMessage& NSMMessage::operator=(const NSMMessage& msg) throw()
 {
   m_nsmc = msg.m_nsmc;
   memcpy(&m_nsm_msg, &(msg.m_nsm_msg), sizeof(m_nsm_msg));
-  m_data = msg.m_data;
+  m_nsm_msg.npar = msg.m_nsm_msg.npar;
   m_nsm_msg.len = msg.m_nsm_msg.len;
   m_nodename = msg.m_nodename;
   m_reqname = msg.m_reqname;
   m_hasobj = msg.m_hasobj;
+  //m_data = msg.m_data;
+  m_data = Buffer(m_nsm_msg.len);
+  memcpy(m_data.ptr(), msg.m_data.ptr(), m_nsm_msg.len);
   return *this;
 }
 

@@ -293,3 +293,14 @@ const std::string NSMCommunicator::getNodeHost() throw()
   return "";
 }
 
+NSMMessage NSMCommunicator::popQueue()
+{
+  NSMMessage msg = m_msg_q.front();
+  m_msg_q.pop();
+  return msg;
+}
+
+void NSMCommunicator::setMessage(const NSMMessage& msg) throw()
+{
+  m_message = msg;
+}

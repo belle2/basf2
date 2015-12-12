@@ -108,9 +108,11 @@ bool NSMCallback::perform(NSMCommunicator& com) throw()
     }
     return true;
   } else if (cmd == NSMCommand::VSET) {
-    NSMVar var;
-    readVar(msg, var);
-    vset(com, var);
+    if (msg.getLength() > 0) {
+      NSMVar var;
+      readVar(msg, var);
+      vset(com, var);
+    }
     return true;
   } else if (cmd == NSMCommand::VREPLY) {
     vreply(com, msg.getData(), msg.getParam(0));

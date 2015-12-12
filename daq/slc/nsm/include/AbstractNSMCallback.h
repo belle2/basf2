@@ -80,11 +80,7 @@ namespace Belle2 {
 
   private:
     NSMNode m_node;
-
-  private:
     int m_timeout;
-
-  private:
     NSMNodeMapMap m_node_v_m;
 
   public:

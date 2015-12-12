@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     RunControlCallback* callback = new RunControlCallback();
     callback->setPriorityToDB(LogFile::getPriority(config.get("log.priority.db")));
     callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
-    callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
+    //callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
     callback->setLocalRunControls(StringUtil::split(config.get("localruncontrols"), ','));
     callback->setLogTable(config.get("log.dbtable"));
     callback->setRestartTime(config.getInt("restarttime"));

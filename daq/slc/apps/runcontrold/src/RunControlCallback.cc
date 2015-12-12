@@ -462,12 +462,14 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       get(node, "dbtable", table, 1);
     } catch (const TimeoutException& e) {}
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
+    //add(new NSMVHandlerText(vname + ".rcconfig", true, true, node.getConfig()));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
     add(new NSMVHandlerText(vname + ".dbtable", true, false, table));
     add(new NSMVHandlerRCConfig(*this, vname + ".rcconfig", node));
+    //add(new NSMVHandlerText(vname + ".rcconfig", true, true, node.getConfig()));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));

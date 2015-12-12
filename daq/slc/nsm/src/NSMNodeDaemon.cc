@@ -67,6 +67,13 @@ void NSMNodeDaemon::run() throw()
         NSMCommunicator& com(NSMCommunicator::select(m_timeout));
         com.getCallback().perform(com);
       } catch (const TimeoutException& e) {}
+      for (size_t i = 0; i < com_v.size(); i++) {
+        NSMCommunicator& com(*com_v[i]);
+        while (com.hasQueue()) {
+          com.setMessage(com.popQueue());
+          com.getCallback().perform(com);
+        }
+      }
       if (t1 <= 0) {
         for (size_t i = 0; i < com_v.size(); i++) {
           NSMCommunicator& com(*com_v[i]);

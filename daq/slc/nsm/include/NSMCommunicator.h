@@ -20,6 +20,7 @@ extern "C" {
 
 #include <math.h>
 
+#include <queue>
 #include <vector>
 #include <map>
 
@@ -73,6 +74,14 @@ namespace Belle2 {
     NSMCallback& getCallback() throw(std::out_of_range);
     bool isConnected(const std::string& node) throw();
     const std::string getNodeNameById(int id) throw(NSMHandlerException);
+    void pushQueue(const NSMMessage& msg) { m_msg_q.push(msg); }
+    bool hasQueue() const { return !m_msg_q.empty(); }
+    NSMMessage popQueue()
+    {
+      NSMMessage msg = m_msg_q.front();
+      m_msg_q.pop();
+      return msg;
+    }
 
   private:
     NSMcontext* getContext() { return m_nsmc; }
@@ -88,6 +97,7 @@ namespace Belle2 {
     std::string m_host;
     int m_port;
     NSMNode m_node;
+    std::queue<NSMMessage> m_msg_q;
 
   };
 

@@ -37,7 +37,7 @@ NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
         (node.getName().size() == 0 || msg.getNodeName() == node.getName())) {
       return com;
     }
-    com.getCallback().perform(com);
+    com.pushQueue(msg);
     t = Time().get();
   }
 }
@@ -77,7 +77,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
     double tout = timeout;
     while (true) {
       double t1 = (tout - (t - t0) > 0 ? tout - (t - t0) : 0);
-      NSMCommunicator& com(wait(node, NSMCommand::VSET, t1));
+      LogFile::info("%d wait VSET from %s", __LINE__, node.getName().c_str());
+      NSMCommunicator& com(wait(NSMNode(), NSMCommand::UNKNOWN, t1));
       NSMMessage msg = com.getMessage();
       NSMCommand cmd(msg.getRequestName());
       if (cmd == NSMCommand::VSET) {
@@ -85,12 +86,11 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
             var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
           readVar(msg, var);
           handler->setNode(node.getName());
-          bool ret = handler->handleSet(var);
-          return ret;
+          return handler->handleSet(var);
         }
-        com.getCallback().perform(com);
-        t = Time().get();
       }
+      com.pushQueue(msg);
+      t = Time().get();
     }
   }
   return false;
@@ -125,7 +125,7 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
           }
         }
       }
-      com.getCallback().perform(com);
+      com.pushQueue(msg);
       t = Time().get();
     }
   }
@@ -149,7 +149,7 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
         return msg.getParam(0) > 0;
       }
       LogFile::debug("%s:%d %s", __FILE__, __LINE__, msg.getRequestName());
-      com.getCallback().perform(com);
+      com.pushQueue(msg);
       t = Time().get();
     }
   }

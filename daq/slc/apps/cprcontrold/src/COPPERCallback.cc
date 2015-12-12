@@ -359,9 +359,11 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       NSMData& data(getData());
       if (data.isAvailable()) {
         ronode_status* nsm = (ronode_status*)data.get();
-        if (m_flow.isAvailable()) {
+        if (m_flow.isAvailable() && m_con.isAlive()) {
           ronode_status& status(m_flow.monitor());
           memcpy(nsm, &status, sizeof(ronode_status));
+        } else {
+          memset(nsm, 0, sizeof(ronode_status));
         }
         double loads[3];
         if (getloadavg(loads, 3) > 0) {

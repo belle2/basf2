@@ -26,6 +26,7 @@ MilleData& MilleData::operator=(const MilleData& other)
 {
   close();
   m_files = other.m_files;
+  m_doublePrecision = other.m_doublePrecision;
   return *this;
 }
 void MilleData::close()
@@ -48,7 +49,7 @@ void MilleData::open(string filename)
   if (m_binary) {
     close();
   }
-  m_binary = new gbl::MilleBinary(filename);
+  m_binary = new gbl::MilleBinary(filename, m_doublePrecision);
   m_files.push_back(filename);
 }
 

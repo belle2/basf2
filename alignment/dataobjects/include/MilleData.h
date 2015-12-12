@@ -11,8 +11,8 @@ namespace Belle2 {
   /// Mergeable class holding list of so far opened mille binaries and providing the binaries
   class MilleData : public Mergeable {
   public:
-    /// Constructor
-    MilleData() : Mergeable() {};
+    /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
+    MilleData(bool doublePrecision = false) : Mergeable(), m_doublePrecision(doublePrecision) {};
     /// Destructor
     virtual ~MilleData() { close(); }
 
@@ -36,10 +36,12 @@ namespace Belle2 {
     /// Construct from other object
     MilleData(const MilleData& other) : m_files(other.m_files), m_binary(nullptr) {}
   private:
-    std::vector<std::string> m_files = {}; /**< List of already created file names */
+    /// Use double-precision for binary files
+    bool m_doublePrecision{false};
+    std::vector<std::string> m_files{}; /**< List of already created file names */
     /// Pointer to current binary file
-    gbl::MilleBinary* m_binary = nullptr; //! Pointer to opened binary file (not streamed)
+    gbl::MilleBinary* m_binary{nullptr}; //! Pointer to opened binary file (not streamed)
 
-    ClassDef(MilleData, 1) /**< Mergeable list of opened mille binaries */
+    ClassDef(MilleData, 2) /**< Mergeable list of opened mille binaries */
   };
 }

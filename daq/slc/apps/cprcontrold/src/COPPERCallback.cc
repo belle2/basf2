@@ -32,6 +32,7 @@ std::string popen(const std::string& cmd)
   }
   std::stringstream ss;
   while (!feof(fp)) {
+    memset(buf, 0, 1000);
     fgets(buf, sizeof(buf), fp);
     ss << buf << std::endl;
   }

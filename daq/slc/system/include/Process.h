@@ -47,7 +47,7 @@ namespace Belle2 {
     bool isAlive() const { return kill(0); }
     bool kill(int signo) const
     {
-      if (m_pid < 0) return false;
+      if (m_pid <= 0) return false;
       return ::kill(m_pid, signo) == 0;
     }
     bool wait(int opt = 0)

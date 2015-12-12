@@ -58,7 +58,7 @@ COPPERCallback::~COPPERCallback() throw()
 
 void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName(), "ronode_status", ronode_status_revision);
+  allocData(getNode().getName(), "ronode", ronode_status_revision);
   m_con.init("basf2", 1);
   if (!m_dummymode) {
     m_ttrx.open();
@@ -74,7 +74,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     LogFile::info(obj.getName());
     m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
     add(new NSMVHandlerOutputPort(*this, "basf2.output.port"));
-    add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
+    //add(new NSMVHandlerCOPPERROPID(*this, "basf2.pid"));
     add(new NSMVHandlerFifoEmpty(*this, "copper.err.fifoempty"));
     add(new NSMVHandlerFifoFull(*this, "copper.err.fifofull"));
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));
@@ -232,8 +232,6 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 
 void COPPERCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  ronode_status* status = (ronode_status*)getData().get();
-  status->stime = Time().getSecond();
   if (!m_con.start(expno, runno)) {
     throw (RCHandlerException("Failed to start"));
   }
@@ -241,8 +239,6 @@ void COPPERCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void COPPERCallback::stop() throw(RCHandlerException)
 {
-  ronode_status* status = (ronode_status*)getData().get();
-  status->stime = 0;
   m_con.stop();
 }
 
@@ -359,7 +355,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       NSMData& data(getData());
       if (data.isAvailable()) {
         ronode_status* nsm = (ronode_status*)data.get();
-        if (m_flow.isAvailable() && m_con.isAlive()) {
+        if (m_flow.isAvailable()/* && m_con.isAlive()*/) {
           ronode_status& status(m_flow.monitor());
           memcpy(nsm, &status, sizeof(ronode_status));
         } else {

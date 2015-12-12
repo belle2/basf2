@@ -1,12 +1,11 @@
 #include "daq/slc/apps/rocontrold/ROCallback.h"
 
-#include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/apps/rocontrold/ropc_status.h"
 
-#include "daq/slc/database/DBObjectLoader.h"
+#include "daq/slc/nsm/NSMCommunicator.h"
 
 #include "daq/slc/readout/ronode_info.h"
 #include "daq/slc/readout/ronode_status.h"
-#include "daq/slc/readout/ro_summary.h"
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
@@ -75,7 +74,7 @@ ROCallback::ROCallback(const NSMNode& runcontrol)
 
 void ROCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName(), "ro_summary", ro_summary_revision);
+  allocData(getNode().getName(), "ropc", ropc_revision);
   configure(obj);
 }
 
@@ -94,9 +93,8 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_stream0.push_back(Stream0Controller());
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
-      std::string name = StringUtil::form("stream0_%d", (int)i);
-      m_stream0[i].init(this, i + 2, name, obj);
       std::string vname = (m_stream0.size() == 1) ? "stream0" : StringUtil::form("stream0[%d]", (int)i);
+      m_stream0[i].init(this, i + 2, vname, obj);
       add(new NSMVHandlerROInputPort(m_stream0[i], vname + ".input.port"));
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
@@ -227,19 +225,21 @@ void ROCallback::monitor() throw(RCHandlerException)
 {
   NSMData& data(getData());
   if (data.isAvailable()) {
-    ro_summary* nsm = (ro_summary*)data.get();
+    ropc_status* nsm = (ropc_status*)data.get();
     if (getNode().getState() == RCState::RUNNING_S) {
+      /*
       if (m_stream1.getFlow().isAvailable()) {
         ronode_status& status(m_stream1.getFlow().monitor());
         memcpy(nsm, &status, sizeof(ronode_status));
       }
+      */
       for (size_t i = 0; i < m_stream0.size(); i++) {
         m_stream0[i].check();
         ronode_status& status(m_stream0[i].getFlow().monitor());
-        memcpy(&(nsm->header[i + 1]), &(status.header), sizeof(event_header));
+        memcpy(&(nsm->stream0[i]), &(status), sizeof(ronode_status));
       }
     } else {
-      memset(nsm, 0, sizeof(ro_summary));
+      memset(nsm, 0, sizeof(ropc_status));
     }
     double loads[3];
     if (getloadavg(loads, 3) > 0) {

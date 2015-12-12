@@ -63,11 +63,11 @@ ronode_status& FlowMonitor::monitor()
     m_status.evtsize_out = 0;
     m_status.flowrate_out = 0;
     if (m_ioinfo[0].getLocalPort() > 0) {
-      m_status.connection_in = m_ioinfo[0].getState();
+      m_status.connection_in = m_ioinfo[0].getState() == 1;
       m_status.nqueue_in = m_ioinfo[0].getRXQueue();
     }
     if (m_ioinfo[1].getLocalPort() > 0) {
-      m_status.connection_out = m_ioinfo[1].getState();
+      m_status.connection_out = m_ioinfo[1].getState() == 1;
       m_status.nqueue_out = m_ioinfo[1].getRXQueue();
     }
     if ((dcount = info.io[0].count - m_status.nevent_in) > 0) {

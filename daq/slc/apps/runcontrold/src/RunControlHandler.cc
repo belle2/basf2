@@ -87,11 +87,16 @@ bool NSMVHandlerRCNodeUsed::handleGetInt(int& val)
 
 bool NSMVHandlerRCNodeUsed::handleSetInt(int val)
 {
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   m_rcnode.setUsed(val > 0);
+  LogFile::debug("%s:%d", __FILE__, __LINE__);
   if (val == 0) {
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     m_callback.setState(m_rcnode, RCState::OFF_S);
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
     try {
       NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
+      LogFile::debug("%s:%d", __FILE__, __LINE__);
     } catch (const NSMHandlerException& e) {
       LogFile::warning(e.what());
     }

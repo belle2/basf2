@@ -27,6 +27,7 @@ void ProcessListener::run()
   LogFile::debug(process_name + " : termineted");
   process.set_id(-1);
   callback.set(m_con->getParName() + ".pid", -1);
+  callback.setState(RCState::NOTREADY_S);
   try {
     callback.monitor();
   } catch (const RCHandlerFatalException& e) {

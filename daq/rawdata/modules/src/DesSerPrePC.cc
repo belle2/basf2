@@ -467,7 +467,7 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* delete_fla
     B2INFO("DeSerializerPrePC: Done. the size of the 1st packet " << total_buf_nwords << " words");
     m_start_flag = 1;
   }
-  m_totbytes += total_buf_nwords * sizeof(int);
+  m_recvd_totbytes += total_buf_nwords * sizeof(int);
 
   int temp_delete_flag = 0;
   temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, temp_delete_flag,
@@ -802,7 +802,7 @@ void DesSerPrePC::DataAcquisition()
       }
 
       try {
-        m_totbytes += sendByWriteV(&(raw_datablk[ j ]));
+        m_sent_totbytes += sendByWriteV(&(raw_datablk[ j ]));
       } catch (string err_str) {
 #ifdef NONSTOP
         break;
@@ -838,16 +838,18 @@ void DesSerPrePC::DataAcquisition()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 10000 == 0) {
       double interval = cur_time - m_prev_time;
       double total_time = cur_time - m_start_time;
-      printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+      printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
              n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
              (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
-             (m_totbytes - m_prev_totbytes) / interval / 1.e6,
+             (m_recvd_totbytes - m_recvd_prev_totbytes) / interval / 1.e6,
+             (m_sent_totbytes - m_sent_prev_totbytes) / interval / 1.e6,
              total_time,
              interval);
       fflush(stdout);
 
       m_prev_time = cur_time;
-      m_prev_totbytes = m_totbytes;
+      m_recvd_prev_totbytes = m_recvd_totbytes;
+      m_sent_prev_totbytes = m_sent_totbytes;
       m_prev_nevt = n_basf2evt;
       cur_time = getTimeSec();
     }
@@ -855,7 +857,7 @@ void DesSerPrePC::DataAcquisition()
     n_basf2evt++;
 
     if (m_status.isAvailable()) {
-      m_status.setInputNBytes(m_totbytes);
+      m_status.setInputNBytes(m_sent_totbytes);
       m_status.setInputCount(n_basf2evt);
     }
 

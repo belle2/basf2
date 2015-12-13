@@ -110,8 +110,10 @@ namespace Belle2 {
 
     // For monitoring
     timeval m_t0;
-    double m_totbytes;
-    double m_prev_totbytes;
+    double m_recvd_totbytes;
+    double m_recvd_prev_totbytes;
+    double m_sent_totbytes;
+    double m_sent_prev_totbytes;
     int m_ncycle;
     //! for time monitoring
     double cur_time;

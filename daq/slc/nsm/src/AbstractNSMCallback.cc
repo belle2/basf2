@@ -58,10 +58,6 @@ void AbstractNSMCallback::readVar(const NSMMessage& msg, NSMVar& var)
   const char* node = msg.getData();
   const char* name = (msg.getData() + pars[2] + 1);
   const char* value = (msg.getData() + pars[2] + 1 + pars[3] + 1);
-  LogFile::info("%d", msg.getLength());
-  LogFile::info("%d", pars[0]);
-  LogFile::info("%s", node);
-  LogFile::info("%s", name);
   var = NSMVar(name, (NSMVar::Type)pars[0], pars[1], value);
   var.setNode(node);
   var.setId(pars[3]);

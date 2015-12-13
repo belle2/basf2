@@ -9,6 +9,7 @@ void MilleData::merge(const Mergeable* other)
 {
   auto* data = static_cast<const MilleData*>(other);
   const vector<string>& files = data->getFiles();
+  m_numRecords += data->m_numRecords;
   for (auto& file : files) {
     bool exists = false;
     for (auto& myfile : m_files) {
@@ -27,6 +28,7 @@ MilleData& MilleData::operator=(const MilleData& other)
   close();
   m_files = other.m_files;
   m_doublePrecision = other.m_doublePrecision;
+  m_numRecords = other.m_numRecords;
   return *this;
 }
 void MilleData::close()
@@ -41,6 +43,7 @@ void MilleData::fill(gbl::GblTrajectory& trajectory)
 {
   if (m_binary) {
     trajectory.milleOut(*m_binary);
+    ++m_numRecords;
   }
 }
 

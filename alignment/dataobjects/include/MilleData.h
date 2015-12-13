@@ -12,14 +12,14 @@ namespace Belle2 {
   class MilleData : public Mergeable {
   public:
     /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
-    MilleData(bool doublePrecision = false) : Mergeable(), m_doublePrecision(doublePrecision) {};
+    explicit MilleData(bool doublePrecision = false) : Mergeable(), m_doublePrecision(doublePrecision) {};
     /// Destructor
     virtual ~MilleData() { close(); }
 
     /// Implementation of merging
     virtual void merge(const Mergeable* other);
     /// Implementation of clearing
-    virtual void clear() { m_files.clear(); }
+    virtual void clear() { m_files.clear(); m_numRecords = 0; }
 
     /// Open a new file and remember it. Filename should encode also process id!
     void open(std::string filename);
@@ -33,14 +33,22 @@ namespace Belle2 {
     const std::vector<std::string>& getFiles() const { return m_files; }
     /// Copy by assignment
     MilleData& operator=(const MilleData& other);
-    /// Construct from other object
-    MilleData(const MilleData& other) : m_files(other.m_files), m_binary(nullptr) {}
+    /// Construct from other object (pointer to binary file is not transfered - new file has to be opened by new object)
+    MilleData(const MilleData& other) : m_doublePrecision(other.m_doublePrecision), m_files(other.m_files), m_binary(nullptr),
+      m_numRecords(other.m_numRecords) {}
+
+    /// Get number of records (trajectories) written to binary files
+    int getNumRecords() {return m_numRecords;}
+    /// Are files written with double precision?
+    bool hasDoublePrecision() {return m_doublePrecision;}
   private:
     /// Use double-precision for binary files
     bool m_doublePrecision{false};
     std::vector<std::string> m_files{}; /**< List of already created file names */
     /// Pointer to current binary file
     gbl::MilleBinary* m_binary{nullptr}; //! Pointer to opened binary file (not streamed)
+    /// Number of written trajectories
+    int m_numRecords{0};
 
     ClassDef(MilleData, 2) /**< Mergeable list of opened mille binaries */
   };

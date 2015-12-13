@@ -14,22 +14,17 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 namespace Belle2 {
-  /**
-   *
-   *
-   *
-   */
+  /// Testing module for collection of calibration data
   class CaTestModule : public CalibrationCollectorModule {
-
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /// Constructor: Sets the description, the properties and the parameters of the module.
     CaTestModule();
 
+    /// Prepare collecction
     virtual void prepare();
+    /// Collect data event-wise
     virtual void collect();
 
   private:

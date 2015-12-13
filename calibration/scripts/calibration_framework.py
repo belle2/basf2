@@ -55,6 +55,7 @@ class SimpleCalibrationRunner(Module):
         self.runs.add((event.getExperiment(), event.getRun()))
 
     def execute(self, runs):
+        """Execute the algorithm over list of runs"""
         global _iteration
         # create std::vector<ExpRun> for the argument
         iov_vec = ROOT.vector("std::pair<int,int>")()

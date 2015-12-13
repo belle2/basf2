@@ -5,7 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-//#pragma link C++ class Belle2::calibration::CalibrationManager-;
 #pragma link C++ class Belle2::CalibrationAlgorithm+;
 #pragma link C++ class Belle2::TestCalibrationAlgorithm+;
 

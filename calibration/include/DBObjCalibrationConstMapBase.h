@@ -50,6 +50,7 @@ namespace Belle2 {
     /// Map of (element, parameter) and its values
     typedef std::map<ElementParameter, double> ElementParameterMap;
 
+    /// Get the underlying map of constants
     const ElementParameterMap& getMap() {return m_constants;}
 
     /// Constructor

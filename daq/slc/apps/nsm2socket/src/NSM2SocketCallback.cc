@@ -35,7 +35,6 @@ void NSM2SocketCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
   NSMMessage& msg(com.getMessage());
   NSMNode node(msg.getNodeName());
-  LogFile::debug("%s:%s:%s", msg.getNodeName(), var.getName().c_str(), ((var.getType() == NSMVar::TEXT) ? var.getText() : ""));
   m_bridge->send(NSMMessage(node, NSMCommand::VSET), var);
 }
 
@@ -59,14 +58,23 @@ bool NSM2SocketCallback::send(const NSMMessage& msg) throw()
     m_nodes.insert(NSMNodeMap::value_type(name, node));
   }
   try {
+    NSMCommunicator::connected(node.getName());
+  } catch (const NSMNotConnectedException&) {
+    if (m_nodes[name].getState() != NSMState::UNKNOWN) {
+      std::string emsg = StringUtil::form("Node %s is down.", node.getName().c_str());
+      LogFile::error(emsg);
+      DAQLogMessage log(getNode().getName(), LogFile::ERROR, emsg);
+      m_bridge->send(NSMMessage(getNode(), log));
+    }
+    m_nodes[name].setState(NSMState::UNKNOWN);
+    m_mutex.unlock();
+    return false;
+  }
+  try {
     if (NSMCommunicator::send(msg)) {
       m_nodes[name].setState(NSMState::ONLINE_S);
     } else {
       m_nodes[name].setState(NSMState::UNKNOWN);
-      std::string emsg = StringUtil::form("Node %s is already down.", node.getName().c_str());
-      LogFile::error(emsg);
-      DAQLogMessage log(getNode().getName(), LogFile::WARNING, emsg);
-      m_bridge->send(NSMMessage(getNode(), log));
     }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());
@@ -114,13 +122,12 @@ void NSM2SocketCallback::timeout(NSMCommunicator& com) throw()
         m_bridge->send(msg, data);
       }
     } catch (const NSMHandlerException& e) {
-      std::string log = StringUtil::form("Failed to open NSM data (%s:%s:%d) ",
-                                         data.getName().c_str(),
-                                         data.getFormat().c_str(),
-                                         data.getRevision());
-      LogFile::warning(e.what());
-      LogFile::warning(log);
-      m_bridge->send(DAQLogMessage(getNode().getName(), LogFile::WARNING, log));
+      //std::string log = StringUtil::form("Failed to open NSM data (%s:%s:%d) ",
+      //                                   data.getName().c_str(),
+      //                                   data.getFormat().c_str(),
+      //                                   data.getRevision());
+      //LogFile::warning(log);
+      // m_bridge->send(DAQLogMessage(getNode().getName(), LogFile::WARNING, log));
     }
   }
   n++;

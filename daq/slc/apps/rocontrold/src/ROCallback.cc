@@ -226,7 +226,7 @@ void ROCallback::monitor() throw(RCHandlerException)
   NSMData& data(getData());
   if (data.isAvailable()) {
     ropc_status* nsm = (ropc_status*)data.get();
-    if (getNode().getState() == RCState::RUNNING_S) {
+    if (getNode().getState() == RCState::RUNNING_S || getNode().getState() == RCState::READY_S) {
       /*
       if (m_stream1.getFlow().isAvailable()) {
         ronode_status& status(m_stream1.getFlow().monitor());
@@ -237,6 +237,8 @@ void ROCallback::monitor() throw(RCHandlerException)
         m_stream0[i].check();
         ronode_status& status(m_stream0[i].getFlow().monitor());
         memcpy(&(nsm->stream0[i]), &(status), sizeof(ronode_status));
+        nsm->stream0[i].nqueue_in /= 1024 / 1024;
+        nsm->stream0[i].nqueue_out /= 1024 / 1024;
       }
     } else {
       memset(nsm, 0, sizeof(ropc_status));

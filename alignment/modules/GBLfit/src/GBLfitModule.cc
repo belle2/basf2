@@ -96,6 +96,8 @@
 
 #include <framework/dataobjects/Helix.h>
 
+#include <genfit/TGeoMaterialInterface.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -243,9 +245,33 @@ void GBLfitModule::initialize()
 
   }
 
+
   if (!genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2FATAL("Material effects not set up, please use the SetupGenfitExtrapolationModule.");
+    if (gGeoManager == NULL) { //setup geometry and B-field for Genfit if not already there
+      geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+      geoManager.createTGeoRepresentation();
+    }
+    //pass the magnetic field to genfit
+    genfit::FieldManager::getInstance()->init(new GFGeant4RecoField());
+    genfit::FieldManager::getInstance()->useCache();
+
+    genfit::MaterialEffects::getInstance()->init(new genfit::TGeoMaterialInterface());
+
+    // activate / deactivate material effects in genfit
+    genfit::MaterialEffects::getInstance()->setEnergyLossBetheBloch(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBetheBloch(false); // Noise matrix not used by GBL
+    genfit::MaterialEffects::getInstance()->setNoiseCoulomb(false); // Noise matrix not used by GBL
+    genfit::MaterialEffects::getInstance()->setEnergyLossBrems(true);
+    genfit::MaterialEffects::getInstance()->setNoiseBrems(false); // Noise matrix not used by GBL
+
+    genfit::MaterialEffects::getInstance()->setMscModel("Highland");
+  } else {
+    B2WARNING("Material effects already set up! GBL uses own magnetic field interface and noise settings (no noise calculation)."
+              << std::endl <<
+              "By using your default field interface, you loose the possibility to process magnet ON/OFF data together. For noise, you are just wasting CPU time."
+             );
   }
+
 
   //read the pdgCode options and set attributes accordingly
   int nPdgCodes = m_pdgCodes.size();
@@ -279,7 +305,7 @@ void GBLfitModule::initialize()
   m_gbl.setOptions(m_gblInternalIterations, m_enableScatterers, m_enableIntermediateScatterer, m_gblExternalIterations,
                    m_recalcJacobians);
   // Turn off MS in CDC. GblFitter takes ownership of the controller
-  m_gbl.setTrackSegmentController(new GblMultipleScatteringController());
+  // m_gbl.setTrackSegmentController(new GblMultipleScatteringController());
 
 }
 
@@ -428,7 +454,9 @@ void GBLfitModule::event()
 
       // We reset the track's time after constructing it from the TrackCand.
       double timeSeed = aTrackCandPointer->getTimeSeed();
-      if (m_estimateSeedTime) {
+      // Cosmic rays should have seed at the top (far outside VXD radius)
+      // Especially for CDC - do not run following code for them!
+      if (m_estimateSeedTime && posSeed.Perp() < 100.) {
         // Particle velocity in cm / ns.
         const double m = part->Mass();
         const double p = momentumSeed.Mag();
@@ -437,16 +465,22 @@ void GBLfitModule::event()
         const double v = beta * Const::speedOfLight;
 
         // Arc length from IP to posSeed in cm.
+        // Calculate the arc-length.  Helix doesn't provide a way of
+        // obtaining this directly from the difference in z, as it
+        // only provide arc-lengths in the transverse plane, so we do
+        // it like this.
         const Helix h(posSeed, momentumSeed, part->Charge() / 3, 1.5);
+        const double s2D = h.getArcLength2DAtCylindricalR(posSeed.Perp());
+        const double s = s2D * hypot(1, h.getTanLambda());
 
-        // Arc length calculation doesn't work, do it ourselves until I can fix the Helix.
-        const double z0 = h.getZ0();
-        const double cotTh = h.getTanLambda();
-
-        const double s = fabs((posSeed.Z() - z0) * hypot(cotTh, 1.) / cotTh);
-
-        // Time from trigger (= 0 ns) to posSeed assuming constant velocity in ns.
+        // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
         timeSeed = s / v;
+
+        if (!(timeSeed > -1000)) {
+          // Guard against NaN or just something silly.
+          B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
+          timeSeed = 0;
+        }
       }
 
       B2DEBUG(99, "Fit track with start values: ");

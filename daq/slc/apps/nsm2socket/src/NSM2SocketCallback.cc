@@ -61,7 +61,8 @@ bool NSM2SocketCallback::send(const NSMMessage& msg) throw()
     NSMCommunicator::connected(node.getName());
   } catch (const NSMNotConnectedException&) {
     if (m_nodes[name].getState() != NSMState::UNKNOWN) {
-      std::string emsg = StringUtil::form("Node %s is down.", node.getName().c_str());
+      std::string emsg = StringUtil::form("Node %s is down.",
+                                          node.getName().c_str());
       LogFile::error(emsg);
       DAQLogMessage log(getNode().getName(), LogFile::ERROR, emsg);
       m_bridge->send(NSMMessage(getNode(), log));

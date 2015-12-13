@@ -227,18 +227,10 @@ void ROCallback::monitor() throw(RCHandlerException)
   if (data.isAvailable()) {
     ropc_status* nsm = (ropc_status*)data.get();
     if (getNode().getState() == RCState::RUNNING_S || getNode().getState() == RCState::READY_S) {
-      /*
-      if (m_stream1.getFlow().isAvailable()) {
-        ronode_status& status(m_stream1.getFlow().monitor());
-        memcpy(nsm, &status, sizeof(ronode_status));
-      }
-      */
       for (size_t i = 0; i < m_stream0.size(); i++) {
         m_stream0[i].check();
         ronode_status& status(m_stream0[i].getFlow().monitor());
         memcpy(&(nsm->stream0[i]), &(status), sizeof(ronode_status));
-        //nsm->stream0[i].nqueue_in *= 1e-6;
-        //nsm->stream0[i].nqueue_out *= 1e-6;
       }
     } else {
       memset(nsm, 0, sizeof(ropc_status));
@@ -252,25 +244,18 @@ void ROCallback::monitor() throw(RCHandlerException)
     data.flush();
   }
   const RCState state(getNode().getState());
-  if (state == RCState::RUNNING_S || state == RCState::READY_S ||
-      state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
+  if (state == RCState::RUNNING_S || state == RCState::LOADING_TS ||
       state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
-      //throw (RCHandlerException("eb0 : crashed"));
-    }
-    if (!m_stream1.getControl().isAlive()) {
-      //throw (RCHandlerException("Process down : stream1"));
+      setState(RCState::NOTREADY_S);
+      replyLog(LogFile::ERROR, "eb0 was crashed");
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
-        // throw (RCHandlerException("Process down : stream0-%d", (int)i));
+        setState(RCState::NOTREADY_S);
+        replyLog(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
       }
     }
-    /*
-    if (m_eb1tx.isUsed() && !m_eb1tx.getControl().isAlive()) {
-      throw (RCHandlerException("eb1tx : crashed"));
-      }
-    */
   }
 }
 

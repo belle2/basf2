@@ -2,6 +2,20 @@
 
 using namespace Belle2;
 
+EventHeaderPacket::EventHeaderPacket()
+  : Packet()
+  , m_freeze_date(0)
+  , m_evt_num(0)
+  , m_trigger(0)
+  , m_flag(0)
+  , m_nwaves(0)
+  , m_aux(0)
+  , m_ftsw(0)
+{
+
+};
+
+
 EventHeaderPacket::EventHeaderPacket(const unsigned int* temp_buffer,
                                      int nwords): Packet(temp_buffer, nwords)
 {

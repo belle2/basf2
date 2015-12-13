@@ -4,9 +4,32 @@
 
 using namespace Belle2;
 
+// default constructor
+// needs to be here to put this class into the object store
+// also needs to be here so all members can be explicitly initialized, otherwise Cppcheck complains
+EventWaveformPacket::EventWaveformPacket()
+  : Packet()
+  , m_channel_id(0)
+  , m_evt_num(0)
+  , m_asic_win(0)
+  , m_nwave_seg(0)
+  , m_nsamples(0)
+  , m_asic_ch(0)
+  , m_asic_row(0)
+  , m_asic_col(0)
+  , m_asic_refwin(0)
+  , m_time(0)
+  , m_amp(0)
+  , m_rate(0)
+  , m_quality(0)
+  , m_time_bin(0)
+{
+}
+
+
 EventWaveformPacket::EventWaveformPacket(const unsigned int* temp_buffer,
-                                         int nwords):
-  Packet(temp_buffer, nwords)
+                                         int nwords)
+  : Packet(temp_buffer, nwords)
 {
   m_asic_refwin = m_packet_payload[2];
   m_evt_num = m_packet_payload[3];

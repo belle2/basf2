@@ -16,12 +16,9 @@ namespace Belle2 {
 
   class EventWaveformPacket: public Packet {
 
-
-
   public:
-    EventWaveformPacket() : Packet() {};
+    EventWaveformPacket();
     EventWaveformPacket(const unsigned int* temp_buffer, int nwords);
-    // EventWaveformPacket(const EventWaveformPacket& in_wp);
 
     ~EventWaveformPacket();
 
@@ -55,12 +52,18 @@ namespace Belle2 {
   private:
     topcaf_channel_id_t m_channel_id;
     packet_word_t m_evt_num;
-    packet_word_t m_asic_win, m_nwave_seg;
+    packet_word_t m_asic_win;
+    packet_word_t m_nwave_seg;
     packet_word_t m_nsamples;
-    unsigned short m_asic_ch, m_asic_row, m_asic_col;
+    unsigned short m_asic_ch;
+    unsigned short m_asic_row;
+    unsigned short m_asic_col;
     unsigned short m_asic_refwin;
     std::vector< double > v_samples;
-    double m_time, m_amp, m_rate, m_quality;
+    double m_time;
+    double m_amp;
+    double m_rate;
+    double m_quality;
     int m_time_bin;
 
     ClassDef(EventWaveformPacket, 1);

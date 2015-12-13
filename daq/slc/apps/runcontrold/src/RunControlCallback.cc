@@ -114,10 +114,10 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    //std::for_each(m_node_v.begin(), m_node_v.end(),
-    //              Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
-    //setState(RCState::RECOVERING_RS);
-    //m_restarting = false;
+    std::for_each(m_node_v.begin(), m_node_v.end(),
+                  Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
+    setState(RCState::NOTREADY_S);
+    m_restarting = false;
     //m_starttime = -1;
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
@@ -175,7 +175,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
       RCNode& node(m_node_v[i]);
       std::string val;
       int count = 0;
-      while (count < 10) {
+      while (node.isUsed() && count < 10) {
         try {
           get(node, "rcconfig", val);
         } catch (const TimeoutException& e) {
@@ -408,6 +408,11 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
   } catch (const DBHandlerException& e) {
     db.close();
     LogFile::error("DB errir : %s", e.what());
+  }
+  if ((getNode().getState() == RCState::RUNNING_S ||
+       getNode().getState() == RCState::LOADING_TS ||
+       getNode().getState() == RCState::STARTING_TS) && pri >= LogFile::ERROR) {
+    setState(RCState::NOTREADY_S);
   }
   if (log.getPriority() >= m_priority_global) {
     reply(NSMMessage(log, true));

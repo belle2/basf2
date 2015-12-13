@@ -44,20 +44,15 @@ namespace Belle2 {
       float flowrate_out;
       float loadavg;
       float reserved_f[5];
-      struct event_header {
-        uint32 nword;
-        uint32 format;
-        uint32 exp_run;
-        uint32 evtno;
-        uint32 ctime_trgtype;
-        uint32 utime;
-        uint32 nodeid;
-        uint32 crc_err;
-      } header;
-    } stream0[20];
-    struct ronode eb0;
-    struct ronode eb1tx;
-
+      uint32 evt_nword;
+      uint32 evt_format;
+      uint32 evt_exp_run;
+      uint32 evt_evtno;
+      uint32 evt_ctime_trgtype;
+      uint32 evt_utime;
+      uint32 evt_nodeid;
+      uint32 evt_crc_err;
+    } node[22];
   };
 
 }

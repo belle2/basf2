@@ -237,8 +237,8 @@ void ROCallback::monitor() throw(RCHandlerException)
         m_stream0[i].check();
         ronode_status& status(m_stream0[i].getFlow().monitor());
         memcpy(&(nsm->stream0[i]), &(status), sizeof(ronode_status));
-        nsm->stream0[i].nqueue_in *= 1e-6;
-        nsm->stream0[i].nqueue_out *= 1e-6;
+        //nsm->stream0[i].nqueue_in *= 1e-6;
+        //nsm->stream0[i].nqueue_out *= 1e-6;
       }
     } else {
       memset(nsm, 0, sizeof(ropc_status));

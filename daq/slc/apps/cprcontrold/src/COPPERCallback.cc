@@ -71,6 +71,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
+  static bool initialized = false;
   try {
     LogFile::info(obj.getName());
     m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
@@ -134,7 +135,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           add(new NSMVHandlerInt(vname + ".ver", true, false, checked ? info.feever : -1));
           add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
           add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
-        } else {
+        } else if (initialized) {
           LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
           std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
           LogFile::info(ret);
@@ -148,8 +149,10 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       }
     }
   } catch (const std::exception& e) {
+    initialized = true;
     throw (RCHandlerException(e.what()));
   }
+  initialized = true;
 }
 
 void COPPERCallback::term() throw()

@@ -144,6 +144,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
 
 void ROCallback::start(int expno, int runno) throw(RCHandlerException)
 {
+  /*
   try {
     if (m_eb0.isUsed()) m_eb0.start(expno, runno);
   } catch (const RCHandlerException& e) {
@@ -155,7 +156,6 @@ void ROCallback::start(int expno, int runno) throw(RCHandlerException)
       return;
     }
   }
-  /*
   if (!m_stream1.start(expno, runno)) {
     throw (RCHandlerException("Faield to start stream1"));
   }

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONMODULE_H
-#define EKLMTIMECALIBRATIONMODULE_H
+#ifndef EKLMTIMECALIBRATIONCOLLECTORMODULE_H
+#define EKLMTIMECALIBRATIONCOLLECTORMODULE_H
 
 /* C++ headers. */
 #include <string>
@@ -19,19 +19,17 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
-#include <calibration/CalibrationModule.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
-#include <framework/core/Module.h>
 
 namespace Belle2 {
 
   /**
-   * Module EKLMTimeCalibrationModule.
-   * @details
-   * Module for generation of transformation and alignment data.
+   * EKLM time calibration (data collection).
    */
-  class EKLMTimeCalibrationModule : public calibration::CalibrationModule {
+  class EKLMTimeCalibrationCollectorModule :
+    public CalibrationCollectorModule {
 
     /**
      * Event (hit): time, distance from hit to SiPM.
@@ -46,60 +44,29 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMTimeCalibrationModule();
+    EKLMTimeCalibrationCollectorModule();
 
     /**
      * Destructor.
      */
-    ~EKLMTimeCalibrationModule();
+    ~EKLMTimeCalibrationCollectorModule();
 
     /**
      * Initializer.
      */
-    void Prepare();
+    void prepare();
 
     /**
      * This method is called for each event.
      */
-    void CollectData();
+    void collect();
 
     /**
-     * Close files opened in parallel event processes.
+     * This method is called at the end of the event processing.
      */
-    void closeParallelFiles();
-
-    /**
-     * Calibration.
-     */
-    calibration::CalibrationModule::ECalibrationModuleResult Calibrate();
-
-    /**
-     * Monitor calibration results.
-     */
-    calibration::CalibrationModule::ECalibrationModuleMonitoringResult
-    Monitor();
-
-    /**
-     * Store calibration results.
-     */
-    bool StoreInDataBase();
+    void terminate();
 
   private:
-
-    /** Perform data collection. */
-    bool m_performDataCollection;
-
-    /** Perform calibration. */
-    bool m_performCalibration;
-
-    /** Output file name. */
-    std::string m_dataOutputFileName;
-
-    /** Output file name. */
-    std::string m_calibrationOutputFileName;
-
-    /** Output file */
-    TFile* m_outputFile;
 
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
@@ -109,9 +76,6 @@ namespace Belle2 {
 
     /** Number of strips with different lengths. */
     int m_nStripDifferent;
-
-    /** Trees. */
-    TTree** m_Tree;
 
     /** Event (for tree branches). */
     struct event m_ev;

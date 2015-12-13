@@ -5,28 +5,18 @@
 
 from basf2 import *
 from reconstruction import *
+from ROOT import Belle2
 import sys
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
+root_input = register_module('RootInput')
+root_input.param('inputFileName', sys.argv[1])
+root_input.initialize()
 
 gearbox = register_module('Gearbox')
+gearbox.initialize()
 
-eklmtimecalibration = register_module('EKLMTimeCalibration')
-eklmtimecalibration.param('PerformDataCollection', False)
-eklmtimecalibration.param('DataOutputFile', sys.argv[1])
-
-# Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-main.add_module(eklmtimecalibration)
-
-# generate events
-process(main)
-
-# show call statistics
-print(statistics)
+algo = Belle2.EKLMTimeCalibrationAlgorithm()
+algo.execute()

@@ -33,14 +33,29 @@ EKLMAlignmentData::~EKLMAlignmentData()
 {
 }
 
+void EKLMAlignmentData::setDx(double dx)
+{
+  m_dx = dx;
+}
+
 double EKLMAlignmentData::getDx()
 {
   return m_dx;
 }
 
+void EKLMAlignmentData::setDy(double dy)
+{
+  m_dy = dy;
+}
+
 double EKLMAlignmentData::getDy()
 {
   return m_dy;
+}
+
+void EKLMAlignmentData::setDalpha(double dalpha)
+{
+  m_dalpha = dalpha;
 }
 
 double EKLMAlignmentData::getDalpha()

@@ -45,3 +45,8 @@ EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)
   return &(it->second);
 }
 
+void EKLMAlignment::cleanAlignmentData()
+{
+  m_data.clear();
+}
+

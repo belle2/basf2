@@ -55,6 +55,11 @@ namespace Belle2 {
      */
     EKLMAlignmentData* getAlignmentData(uint16_t segment);
 
+    /**
+     * Clean alignment data.
+     */
+    void cleanAlignmentData();
+
   private:
 
     /** Alignment data. */

@@ -31,6 +31,7 @@ namespace Belle2 {
 
     /**
      * Class for EKLM alignment checking.
+     * Note that this class internally works in CLHEP units.
      */
     class AlignmentChecker {
 

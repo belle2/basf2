@@ -13,6 +13,7 @@
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/Polygon2D.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -65,7 +66,7 @@ checkSegmentAlignment(int iPlane, int iSegment,
   const struct StripGeometry* stripGeometry = m_GeoDat->getStripGeometry();
   ly = 0.5 * stripGeometry->Width;
   for (i = 1; i <= 15; i++) {
-    iStrip = (iSegment - 1) + i;
+    iStrip = 15 * (iSegment - 1) + i;
     stripPosition = m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->Length;
     stripRectangle[0].setX(lx);
@@ -80,9 +81,10 @@ checkSegmentAlignment(int iPlane, int iSegment,
     stripRectangle[3].setX(lx);
     stripRectangle[3].setY(-ly);
     stripRectangle[3].setZ(0);
-    t = HepGeom::Translate3D(alignment->getDx(), alignment->getDy(), 0) *
+    t = HepGeom::Translate3D(alignment->getDx() * CLHEP::cm / Unit::cm,
+                             alignment->getDy() * CLHEP::cm / Unit::cm, 0) *
         HepGeom::Translate3D(stripPosition->X, stripPosition->Y, 0) *
-        HepGeom::RotateZ3D(alignment->getDalpha());
+        HepGeom::RotateZ3D(alignment->getDalpha() * CLHEP::rad / Unit::rad);
     if (iPlane == 1)
       t = HepGeom::Rotate3D(180. * CLHEP::deg,
                             HepGeom::Vector3D<double>(1., 1., 0.)) * t;

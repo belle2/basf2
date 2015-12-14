@@ -62,8 +62,22 @@ namespace Belle2 {
 
   private:
 
+    /** Mode. */
+    std::string m_Mode;
+
     /** Name of output file. */
     std::string m_OutputFile;
+
+    /**
+     * Generation of zero displacements.
+     */
+    void generateZeroDisplacement();
+
+    /**
+     * Generate random displacements and check if they are correct
+     * (no overlaps).
+     */
+    void studyAlignmentLimits();
 
   };
 

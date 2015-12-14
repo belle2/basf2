@@ -42,14 +42,29 @@ namespace Belle2 {
     ~EKLMAlignmentData();
 
     /**
+     * Set dx.
+     */
+    void setDx(double dx);
+
+    /**
      * Get dx.
      */
     double getDx();
 
     /**
+     * Set dy.
+     */
+    void setDy(double dy);
+
+    /**
      * Get dy.
      */
     double getDy();
+
+    /**
+     * Set dalpha.
+     */
+    void setDalpha(double dalpha);
 
     /**
      * Get dalpha.

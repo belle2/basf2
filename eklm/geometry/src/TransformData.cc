@@ -69,10 +69,12 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
                 B2FATAL("Incomplete alignment data.");
               for (iStrip = 1; iStrip <= 15; iStrip++) {
                 m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
-                  HepGeom::Translate3D(alignmentData->getDx(),
-                                       alignmentData->getDy(), 0) *
+                  HepGeom::Translate3D(
+                    alignmentData->getDx() * CLHEP::cm / Unit::cm,
+                    alignmentData->getDy() * CLHEP::cm / Unit::cm, 0) *
                   m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] *
-                  HepGeom::RotateZ3D(alignmentData->getDalpha());
+                  HepGeom::RotateZ3D(alignmentData->getDalpha() * CLHEP::rad /
+                                     Unit::rad);
               }
 
             }

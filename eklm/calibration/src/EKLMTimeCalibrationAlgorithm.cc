@@ -155,8 +155,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
       }
     }
     tOut->Fill();
-    delete timeArray;
-    delete distArray;
+    delete[] timeArray;
+    delete[] distArray;
     snprintf(str, 128, "time - (%g * dist + %g)", p0, p1);
     t2->Draw(str, (std::string(str) + "< 10").c_str());
     snprintf(str, 128, "corrtime%d.eps", i);

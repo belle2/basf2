@@ -50,12 +50,13 @@ namespace Belle2 {
       /**
        * re-do conversion maps when DBArray has changed
        */
-      void update();
+      void update() {B2ERROR("FrontEndMapper: function update() not implemented yet"); }
+
 
       /**
        * store mappings to database
        */
-      void storeToDB();
+      void storeData() {B2ERROR("FrontEndMapper: function storeData() not implemented yet"); }
 
       /**
        * Return map from TOP module side
@@ -121,7 +122,7 @@ namespace Belle2 {
       enum {c_numModules = 16, c_numColumns = 4};
 
       std::vector<TOPFrontEndMap> m_mapping; /**< mappings from gearbox */
-      //      DBArray<TOPFrontEndMap> m_dbmapping;   /**< mappings from database */
+      // DBArray<TOPFrontEndMap> m_dbmapping;   /**< mappings from database */
 
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
       const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns]; /**< conversion */

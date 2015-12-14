@@ -1,0 +1,2 @@
+dbstore/ECLCalibrationDigitLow 1 0,0,-1,-1
+dbstore/ECLCalibrationDigitHigh 1 0,0,-1,-1

@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <ecl/digitization/EclConfigurationPure.h>
 #include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <vector>
 
 class TH1F;
@@ -62,9 +63,13 @@ namespace Belle2 {
       virtual void terminate();
 
     private:
+      int m_thetaID[EclConfigurationPure::m_nch];
+      void mapGeometry();
       bool isPureCsI(int cellId)
       {
-        if (cellId <= 8736) return true;
+        if (cellId > EclConfigurationPure::m_nch) return false;
+        int thId = m_thetaID[cellId - 1];
+        if (thId >= m_thetaIdMin && thId <= m_thetaIdMax) return true;
         return false;
       }
 
@@ -94,6 +99,7 @@ namespace Belle2 {
       int    m_nEvent;
 
       /** Module parameters */
+      int m_thetaIdMin, m_thetaIdMax;
       bool m_background;
       bool m_calibration;
       int m_tickFactor;

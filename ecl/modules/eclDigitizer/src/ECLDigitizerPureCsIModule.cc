@@ -49,6 +49,8 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits for Pure CsI.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("FirstRing", m_thetaIdMin, "First ring (0-12)", 0);
+  addParam("LastRing", m_thetaIdMax, "Last ring (0-12)", 2);
   addParam("Background", m_background, "Flag to use the DigitizerPureCsI configuration with backgrounds; Default is no background",
            false);
   addParam("Calibration", m_calibration,
@@ -83,6 +85,8 @@ void ECLDigitizerPureCsIModule::initialize()
   readDSPDB();
 
   m_adc.resize(EclConfigurationPure::m_nch);
+
+  mapGeometry();
 }
 
 void ECLDigitizerPureCsIModule::beginRun()
@@ -110,6 +114,7 @@ void ECLDigitizerPureCsIModule::event()
   for (const auto& eclHit : eclHits) {
     int j = eclHit.getCellId() - 1; //0~8735
     if (isPureCsI(j + 1)) {
+      assert(j < EclConfigurationPure::m_nch);
       double hitE       = eclHit.getEnergyDep() / Unit::GeV;
       double hitTime    = eclHit.getTimeAve() / Unit::us;
       if (m_debug)
@@ -233,4 +238,13 @@ void ECLDigitizerPureCsIModule::readDSPDB()
   float testM[31][31];
   m_noise[0].getMatrix(testM);
 
+}
+
+void ECLDigitizerPureCsIModule::mapGeometry()
+{
+  ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
+  for (int cellId0 = 0; cellId0 < EclConfigurationPure::m_nch; cellId0++) {
+    eclgeo->Mapping(cellId0);
+    m_thetaID[cellId0] = eclgeo->GetThetaID();
+  }
 }

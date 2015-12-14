@@ -10,7 +10,7 @@ namespace Belle2 {
 
     class EclConfigurationPure {
     public:
-      static constexpr int    m_nch      = EclConfiguration::m_nch; // total number of electronic channels (crystals) in calorimeter
+      static constexpr int    m_nch      = 72 * 16; // total number of electronic channels (crystals) in fwd endcap calorimeter
 
       static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; // number of ADC measurements for signal fitting
       static constexpr double m_tmin     = -16; // lower range of the signal fitting region in ADC clocks

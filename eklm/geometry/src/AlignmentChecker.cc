@@ -20,11 +20,18 @@ using namespace Belle2;
 
 EKLM::AlignmentChecker::AlignmentChecker()
 {
+  int iPlane, iSegmentSupport, j;
+  double lx, ly;
+  HepGeom::Point3D<double> supportRectangle[4];
+  HepGeom::Transform3D t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   const SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
   const ElementPosition* sectorSupportPosition =
     m_GeoDat->getSectorSupportPosition();
+  const struct SegmentSupportPosition* segmentSupportPos;
+  const struct SegmentSupportGeometry* segmentSupportGeometry =
+    m_GeoDat->getSegmentSupportGeometry();
   m_LineCorner1 = new LineSegment2D(
     sectorSupportGeometry->Corner1AInner, sectorSupportGeometry->Corner1BInner);
   m_ArcOuter = new Arc2D(
@@ -43,15 +50,60 @@ EKLM::AlignmentChecker::AlignmentChecker()
           sectorSupportGeometry->Corner4Inner.x()));
   m_Line41 = new LineSegment2D(
     sectorSupportGeometry->Corner4Inner, sectorSupportGeometry->Corner1AInner);
+  m_SegmentSupport = new Polygon2D** [m_GeoDat->getNPlanes()];
+  for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+    m_SegmentSupport[iPlane - 1] =
+      new Polygon2D*[m_GeoDat->getNSegments() + 1];
+    for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
+         iSegmentSupport++) {
+      segmentSupportPos =
+        m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
+      lx = 0.5 * (segmentSupportPos->Length - segmentSupportPos->DeltaLLeft -
+                  segmentSupportPos->DeltaLRight);
+      ly = 0.5 * (segmentSupportGeometry->MiddleWidth);
+      supportRectangle[0].setX(lx);
+      supportRectangle[0].setY(ly);
+      supportRectangle[0].setZ(0);
+      supportRectangle[1].setX(-lx);
+      supportRectangle[1].setY(ly);
+      supportRectangle[1].setZ(0);
+      supportRectangle[2].setX(-lx);
+      supportRectangle[2].setY(-ly);
+      supportRectangle[2].setZ(0);
+      supportRectangle[3].setX(lx);
+      supportRectangle[3].setY(-ly);
+      supportRectangle[3].setZ(0);
+      t = HepGeom::Translate3D(
+            0.5 * (segmentSupportPos->DeltaLLeft -
+                   segmentSupportPos->DeltaLRight) +
+            segmentSupportPos->X, segmentSupportPos->Y, 0);
+      if (iPlane == 1)
+        t = HepGeom::Rotate3D(180. * CLHEP::deg,
+                              HepGeom::Vector3D<double>(1., 1., 0.)) * t;
+      for (j = 0; j < 4; j++)
+        supportRectangle[j] = t * supportRectangle[j];
+      m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] =
+        new Polygon2D(supportRectangle, 4);
+    }
+  }
 }
 
 EKLM::AlignmentChecker::~AlignmentChecker()
 {
+  int iPlane, iSegmentSupport;
   delete m_LineCorner1;
   delete m_ArcOuter;
   delete m_Line23;
   delete m_ArcInner;
   delete m_Line41;
+  for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+    for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
+         iSegmentSupport++) {
+      delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
+    }
+    delete[] m_SegmentSupport[iPlane - 1];
+  }
+  delete[] m_SegmentSupport;
 }
 
 bool EKLM::AlignmentChecker::
@@ -101,6 +153,10 @@ checkSegmentAlignment(int iPlane, int iSegment,
       return false;
     if (stripPolygon.hasIntersection(*m_Line41))
       return false;
+    for (j = 0; j <= m_GeoDat->getNSegments(); j++) {
+      if (stripPolygon.hasIntersection(*m_SegmentSupport[iPlane - 1][j]))
+        return false;
+    }
   }
   return true;
 }

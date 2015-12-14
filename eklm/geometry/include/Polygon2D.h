@@ -53,6 +53,12 @@ namespace Belle2 {
        */
       bool hasIntersection(const Arc2D& arc) const;
 
+      /**
+       * Check whether polygon has an intersection with a polygon.
+       * @param[in] lineSegment Line segment.
+       */
+      bool hasIntersection(const Polygon2D& polygon) const;
+
     private:
 
       /** Number of points. */

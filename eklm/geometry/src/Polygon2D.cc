@@ -56,3 +56,13 @@ bool EKLM::Polygon2D::hasIntersection(const Arc2D& arc) const
   return false;
 }
 
+bool EKLM::Polygon2D::hasIntersection(const Polygon2D& polygon) const
+{
+  int i;
+  for (i = 0; i < m_nPoints; i++) {
+    if (polygon.hasIntersection(*m_LineSegments[i]))
+      return true;
+  }
+  return false;
+}
+

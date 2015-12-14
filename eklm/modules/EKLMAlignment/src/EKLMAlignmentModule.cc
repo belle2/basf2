@@ -73,10 +73,10 @@ void EKLMAlignmentModule::studyAlignmentLimits()
   const int nPoints = 1000;
   const float maxDx = 9. * Unit::cm;
   const float minDx = -4. * Unit::cm;
-  const float maxDy = 0. * Unit::cm;
-  const float minDy = -0. * Unit::cm;
-  const float maxDalpha = 0. * Unit::rad;
-  const float minDalpha = -0. * Unit::rad;
+  const float maxDy = 0.2 * Unit::cm;
+  const float minDy = -0.2 * Unit::cm;
+  const float maxDalpha = 0.003 * Unit::rad;
+  const float minDalpha = -0.003 * Unit::rad;
   float dx, dy, dalpha;
   int i, alignmentStatus;
   int iEndcap, iLayer, iSector, iPlane, iSegment, jPlane, jSegment, segment;

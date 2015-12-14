@@ -19,6 +19,7 @@
 #include <eklm/geometry/Arc2D.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/LineSegment2D.h>
+#include <eklm/geometry/Polygon2D.h>
 
 /**
  * @file
@@ -83,6 +84,9 @@ namespace Belle2 {
 
       /** Sector support edge: line between corners 4 and 1. */
       LineSegment2D* m_Line41;
+
+      /** Segment support. */
+      Polygon2D*** m_SegmentSupport;
 
     };
 

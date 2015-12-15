@@ -153,8 +153,9 @@ void He3tubeStudyModule::event()
   //pulse heights of digitized waveforms
   for (int i = 0; i < Hits.getEntries(); i++) {
     He3tubeHit* aHit = Hits[i];
-    if (NeutronProcess[aHit->getdetNb()]) h_PulseHeights_Neutron->Fill(aHit->getPeakV());
-    else h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());
+    if (NeutronProcess[aHit->getdetNb()]) {
+      h_PulseHeights_Neutron->Fill(aHit->getPeakV());
+    } else h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());
   }
 
   for (int detNB = 0; detNB < 8; detNB++) {

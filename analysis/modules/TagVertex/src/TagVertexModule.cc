@@ -70,26 +70,11 @@ namespace Belle2 {
     addParam("askMCInformation", m_MCInfo,
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
 
-    //addParam("EventType", m_EventType, "Btag decay type", std::string(""));
 
   }
 
   void TagVertexModule::initialize()
   {
-
-    // The constraint used in the Single Track Fit needs to be shifted 120 um in the boost direction.
-    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      PCmsLabTransform T;
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
-
-      m_shiftZ = 120 * 0.0001; // shift of 120 um in the boost direction
-
-      m_BeamSpotCenter = TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
-    } else {
-      m_BeamSpotCenter = TVector3(0., 0., 0.); // Standard algorithm needs no shift
-    }
 
 
     // magnetic field
@@ -121,7 +106,6 @@ namespace Belle2 {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
-
 
     // input
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
@@ -165,13 +149,14 @@ namespace Belle2 {
     }
     plist->removeParticles(toRemove);
 
-//free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
+    //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
     analysis::RaveSetup::getInstance()->reset();
 
   }
 
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
+
     m_fitPval = 1;
     bool ok = false;
     if (!(Breco->getRelatedTo<RestOfEvent>())) return false;
@@ -181,16 +166,34 @@ namespace Belle2 {
       return false;
     }
 
-    // Each fit algorithm has its own constraint. Therefore, depending on the user's choice, the constraint will change.
-    if (m_useFitAlgorithm == "breco") ok = findConstraint(Breco, 0.03);
+    // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
+    PCmsLabTransform T;
+    TVector3 boost = T.getBoostVector().BoostVector();
+    TVector3 boostDir = boost.Unit();
+    float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
+    double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+
+    m_shiftZ = 4.184436e+02 * bg *  0.0001;   // shift of 120 um (Belle2) in the boost direction
+
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
-      ok = findConstraintBoost(0.025 - m_shiftZ); // The constraint size is specially squeezzed when using the Single Track Algorithm
+      m_BeamSpotCenter = m_beamParams->getVertex() +
+                         TVector3(m_shiftZ * TMath::Sin(boostAngle), 0., m_shiftZ * TMath::Cos(boostAngle)); // boost in the XZ plane
+    } else {
+      m_BeamSpotCenter = m_beamParams->getVertex(); // Standard algorithm needs no shift
+    }
+
+    double cut = 8.717575e-02 * bg;
+
+    // Each fit algorithm has its own constraint. Therefore, depending on the user's choice, the constraint will change.
+    if (m_useFitAlgorithm == "breco") ok = findConstraint(Breco, cut * 2000.);
+    if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
+      ok = findConstraintBoost(cut - m_shiftZ); // The constraint size is specially squeezzed when using the Single Track Algorithm
       if (ok && m_MCInfo) FlavorTagInfoMCMatch(
           Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
     }
-    if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(0.025);
-    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(2);
-    if (m_useFitAlgorithm == "no") ok = true;
+    if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(cut);
+    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(cut * 2000.);
+    if (m_useFitAlgorithm == "noConstraint") ok = true;
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -212,7 +215,7 @@ namespace Belle2 {
       if (ok) ok = makeGeneralFit();
     }
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
-        || m_useFitAlgorithm == "boost") {
+        || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
       ok = getTagTracks_standardAlgorithm(Breco, 0);
       if (ok) ok = makeGeneralFit();
     }
@@ -226,7 +229,8 @@ namespace Belle2 {
     if (Breco->getPValue() < 0.) return false;
 
     TMatrixDSym beamSpotCov(3);
-    beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = 1.9e-02 * 1.9e-02;
+    beamSpotCov = m_beamParams->getCovVertex();
+
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
     double pmag = Breco->getMomentumMagnitude();
@@ -357,8 +361,9 @@ namespace Belle2 {
     TVector3 boost = T.getBoostVector().BoostVector();
     TVector3 boostDir = boost.Unit();
 
-    TMatrix beamSpotCov(3, 3);
-    beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = cut * cut;
+    TMatrixDSym beamSpotCov(3);
+    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
 
@@ -500,6 +505,9 @@ namespace Belle2 {
 
     RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+
+    if (!flavorTagInfo) return;
+
 
     std::vector<int> FTGoodTracks;
     std::vector<int> FTTotalTracks;
@@ -694,8 +702,8 @@ namespace Belle2 {
     std::vector<Belle2::Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
     FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+    if (!flavorTagInfo) return false;
     std::vector<Belle2::Track*> ROETracks = roe->getTracks();
-
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
     std::vector<float> listTargetP = flavorTagInfo->getTargProb(); // Probability of a track to come directly from B_tag
     std::vector<float> listCategoryP = flavorTagInfo->getCatProb(); // Probability of a track to belong to a given category
@@ -703,6 +711,8 @@ namespace Belle2 {
     std::vector<Belle2::Track*> originalTracks = flavorTagInfo->getTracks();
     std::vector<Particle*> listParticle = flavorTagInfo->getParticle();
     std::vector<std::string> categories = flavorTagInfo->getCategories();
+
+    if (ROETracks.size() == 0) return false;
 
     if (m_MCInfo == 0) {
       flavorTagInfo->setGoodTracksROE(0);
@@ -766,10 +776,10 @@ namespace Belle2 {
       if ((listZ0[i] > 0.1 || listD0[i] > 0.1) && listTracks[i] != 0) eliminateTrack(listTracks, i);
     }
 
-//      B2ERROR("Required PXD hits " << reqPXDHits);
+    B2DEBUG(1, "Required PXD hits " << reqPXDHits);
     for (unsigned i = 0; i < listTracks.size(); i++) {
       if (listNPXDHits[i] < reqPXDHits) {
-//              B2ERROR("Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
+        B2DEBUG(1, "Track " << i << " eliminated with pxd hits " << listNPXDHits[i]);
         eliminateTrack(listTracks, i);
       }
     }
@@ -814,8 +824,8 @@ namespace Belle2 {
 
   }
 
-// This function puts a 0 in the position of listTracks where is placed the eliminated track.
-// It has been specially useful when using a track elimination algorithm, instead of a track selection
+  // This function puts a 0 in the position of listTracks where is placed the eliminated track.
+  // It has been specially useful when using a track elimination algorithm, instead of a track selection
   void TagVertexModule::eliminateTrack(std::vector<int>& listTracks, int trackPosition)
   {
     if (listTracks[trackPosition] == 0) return;
@@ -827,7 +837,7 @@ namespace Belle2 {
     }
   }
 
-// STANDARD FIT ALGORITHM
+  // STANDARD FIT ALGORITHM
   /* This algorithm basically takes all the tracks coming from the Rest Of Events and send them to perform a multi-track fit
    The option of requestion PXD hits for the tracks can be chosen by the user.
    */

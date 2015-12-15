@@ -15,6 +15,12 @@
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+// DataStore
+#include <framework/datastore/StoreObjPtr.h>
+
+// DataObjects
+#include <framework/dataobjects/BeamParameters.h>
+
 // kfitter
 #include <analysis/KFit/MassFitKFit.h>
 #include <analysis/KFit/MassVertexFitKFit.h>
@@ -72,6 +78,7 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
+    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent};/**< Beam parameters */
 
     /**
      * Main steering routine

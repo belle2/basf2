@@ -13,6 +13,9 @@
 
 #include <framework/core/Module.h>
 
+// DataStore
+#include <framework/datastore/StoreObjPtr.h>
+
 // rave
 #include <analysis/raveInterface/RaveSetup.h>
 #include <analysis/raveInterface/RaveVertexFitter.h>
@@ -22,6 +25,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/dataobjects/FlavorTagInfo.h>
+#include <framework/dataobjects/BeamParameters.h>
 
 #include <string>
 
@@ -61,6 +65,10 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+
+    const BeamParameters& getBeamParameters() const { return *m_beamParams; }
+
+
   private:
 
     //std::string m_EventType;      /**< Btag decay type */
@@ -82,15 +90,16 @@ namespace Belle2 {
     TMatrixDSym m_tube;           /**< constrained to be used in the tag vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     bool m_MCInfo;                /**< true if user wants to retrieve MC information out from the tracks used    in the fit */
-    double m_shiftZ;
+    double m_shiftZ;              /**< parameter for testing the systematic errror from the IP measurement*/
+    StoreObjPtr<BeamParameters> m_beamParams{"", DataStore::c_Persistent}; /**< Beam parameters */
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);
 
-    /** calculate the constraint for the vertex fit on the tag side */
+    /** calculate the constraint for the vertex fit on the tag side using Breco information*/
     bool findConstraint(Particle* Breco, double cut);
 
-    /** ADD COMMENT*/
+    /** calculate the standard constraint for the vertex fit on the tag side*/
     bool findConstraintBoost(double cut);
 
     /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */

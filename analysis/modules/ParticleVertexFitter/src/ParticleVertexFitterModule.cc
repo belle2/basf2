@@ -70,28 +70,15 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
+
+    //m_beamParams.required("", DataStore::c_Persistent);
+
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
 
-    m_BeamSpotCenter = TVector3(0., 0., 0.);
-    m_beamSpotCov.ResizeTo(3, 3);
-    // from gaussian fit using TDR values
-    m_beamSpotCov(0, 0) = 6.18e-4 * 6.18e-4; m_beamSpotCov(1, 1) = 5.9e-6 * 5.9e-06;
-    if (m_withConstraint == "ipprofile") {
-      m_beamSpotCov(2, 2) = 154e-4 * 154e-4;
-      m_beamSpotCov(0, 2) = TMath::Tan(-1.11e-2) * m_beamSpotCov(0, 0) * m_beamSpotCov(2, 2);
-    }
-    if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
-    if (m_withConstraint == "iptubecut") {
-      m_BeamSpotCenter = TVector3(0.001, 0., .013);
-      findConstraintBoost(0.03);
-    }
-
-    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
-      analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
     if (m_decayString != "")
       m_decaydescriptor.init(m_decayString);
@@ -120,12 +107,21 @@ namespace Belle2 {
       return;
     }
 
-    // get IP center and covariace matrix  (TO BE DEVOPED)
-    //Belle2::BeamParameters a;
-    //TMatrixDSym Vc = a.getCovVertex();
-    //TMatrixDSym Vc = a.getCovHER();
-    //Vc.Print();
-    //std::cout<<a.energyHER()<<std::endl;
+    analysis::RaveSetup::initialize(1, m_Bfield);
+    //B2INFO("ParticleVertexFitterModule : magnetic field = " << m_Bfield);
+
+
+    m_BeamSpotCenter = m_beamParams->getVertex();
+    m_beamSpotCov.ResizeTo(3, 3);
+    TMatrixDSym beamSpotCov(3);
+    if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
+    if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
+    if (m_withConstraint == "iptubecut") {  // for development pourpose only
+      m_BeamSpotCenter = TVector3(0.001, 0., .013);
+      findConstraintBoost(0.03);
+    }
+    if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut")
+      analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
 
 
     if (m_vertexFitter == "rave")
@@ -136,6 +132,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
 
+      //particle->print();
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
@@ -1027,13 +1024,9 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::addIPProfileToKFitter(analysis::VertexFitKFit& kv)
   {
-    //TODO: fix this once IPProfile is available from somewhere
+
     HepPoint3D pos(0.0, 0.0, 0.0);
     CLHEP::HepSymMatrix covMatrix(3, 0);
-
-    //covMatrix[0][0] = 1e-03;
-    //covMatrix[1][1] = 5.9e-06;
-    //covMatrix[2][2] = 1.9e-02;
 
     covMatrix[0][0] = m_beamSpotCov(0, 0);
     covMatrix[0][1] = m_beamSpotCov(0, 1);
@@ -1057,8 +1050,9 @@ namespace Belle2 {
     TVector3 boost = T.getBoostVector().BoostVector();
     TVector3 boostDir = boost.Unit();
 
-    TMatrix beamSpotCov(3, 3);
-    beamSpotCov(0, 0) = 1e-03 * 1e-03; beamSpotCov(1, 1) = 5.9e-06 * 5.9e-06; beamSpotCov(2, 2) = cut * cut;
+    TMatrixDSym beamSpotCov(3);
+    beamSpotCov = m_beamParams->getCovVertex();
+    beamSpotCov(2, 2) = cut * cut;
     double thetab = boostDir.Theta();
     double phib = boostDir.Phi();
 

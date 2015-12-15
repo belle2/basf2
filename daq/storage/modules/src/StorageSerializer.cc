@@ -37,7 +37,7 @@ StorageSerializerModule::StorageSerializerModule() : Module()
   setDescription("SeqROOT output module");
 
   //Parameter definition
-  addParam("compressionLevel", m_compressionLevel, "Compression Level", 1);
+  addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
   addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 10);
   B2DEBUG(1, "StorageSerializer: Constructor done.");
@@ -49,7 +49,7 @@ StorageSerializerModule::~StorageSerializerModule() { }
 void StorageSerializerModule::initialize()
 {
   m_msghandler = new MsgHandler(m_compressionLevel);
-  m_streamer = new DataStoreStreamer(m_compressionLevel);
+  //m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
   if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
@@ -129,7 +129,8 @@ void StorageSerializerModule::event()
     m_obuf.unlock();
   }
 
-  EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
+  EvtMessage* msg = StorageDeserializerModule::streamDataStore();
+  //EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.lock();
   m_obuf.write((int*)msg->buffer(), nword,

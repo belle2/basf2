@@ -37,8 +37,9 @@ namespace Belle2 {
 
   public:
     static StorageDeserializerModule* get() { return g_module; }
-    static DataStorePackage& getPackage() { return g_module->m_package; }
+    static DataStorePackage& getPackage() { return *(g_module->m_package); }
     static RunInfoBuffer& getInfo() { return g_module->m_info; }
+    static EvtMessage* streamDataStore();
 
     // Public functions
   public:
@@ -56,7 +57,7 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    DataStorePackage m_package;
+    DataStorePackage* m_package;
     std::string m_ibuf_name;
     int m_ibuf_size;
     SharedEventBuffer m_ibuf;
@@ -71,6 +72,8 @@ namespace Belle2 {
     unsigned int m_evtno;
     unsigned long long m_datasize;
     MsgHandler* m_handler;
+    //! DataStoreStreamer
+    DataStoreStreamer* m_streamer;
 
     StoreArray<RawCOPPER> rawcprarray;
 

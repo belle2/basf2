@@ -16,6 +16,9 @@
 #include <netinet/in.h>
 #include <fstream>
 
+#include <daq/storage/BinData.h>
+#include <daq/storage/EventBuffer.h>
+
 #include "daq/slc/system/TCPServerSocket.h"
 #include "daq/slc/system/Time.h"
 
@@ -46,21 +49,24 @@ int main(int argc, char** argv)
   TCPSocket socket = server_socket.accept();
   printf("file2socket::accepted\n");
   socket.setBufferSize(32 * 1024 * 1024);
-  char* buf = new char[MAXBUF];
+  //char* buf = new char[MAXBUF];
   int nrec = 0;
   Time t0;
   double datasize = 0;
-  std::ofstream fout("test.txt");
+  int* evtbuf = new int[10000000];
+  BinData data;
+  data.setBuffer(evtbuf);
   while (true) {
-    int sstat = read(fd, buf, sizeof(int));
+    int sstat = read(fd, data.getBuffer(), sizeof(int));
     if (sstat <= 0) {
       lseek(fd, 0, SEEK_SET);
       continue;
     }
-    int* recsize = (int*)buf;
-    int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
-    if (rstat <= 0) break;
-    socket.write(buf, *recsize * 4);
+    unsigned int nbyte = data.getByteSize() - sizeof(int);
+    int rstat = read(fd, (data.getBuffer() + 1), nbyte);
+    if (rstat <= 0) continue;
+    if (sstat + rstat != data.getByteSize()) continue;
+    socket.write(data.getBuffer(), nbyte + sizeof(int));
     nrec++;
     datasize += sstat;
     datasize += rstat;
@@ -72,7 +78,6 @@ int main(int argc, char** argv)
       double rate = datasize / dt / 1000. / 1000.;
       printf("Serial = %d Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event]\n",
              nrec, freq, rate, datasize / 1000. / nth);
-      fout << dt << " " << freq << " " << rate << " " << (datasize / 1000. / nth) << std::endl;
       t0 = t;
       datasize = 0;
     }

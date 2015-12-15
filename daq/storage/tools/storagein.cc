@@ -92,10 +92,10 @@ int main(int argc, char** argv)
           info.addInputNBytes(nbyte);
         }
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
-          B2WARNING("storagein: old run event detected : exp="
-                    << data.getExpNumber() << " runno="
-                    << data.getRunNumber() << " current = ("
-                    << expno << "," << runno << ")");
+          B2ERROR("storagein: old run event detected : exp="
+                  << data.getExpNumber() << " runno="
+                  << data.getRunNumber() << " current = ("
+                  << expno << "," << runno << ")");
           continue;
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();

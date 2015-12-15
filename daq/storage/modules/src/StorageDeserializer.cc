@@ -36,6 +36,11 @@ REG_MODULE(StorageDeserializer)
 
 StorageDeserializerModule* StorageDeserializerModule::g_module = NULL;
 
+EvtMessage* StorageDeserializerModule::streamDataStore()
+{
+  return g_module->m_streamer->streamDataStore(DataStore::c_Event);
+}
+
 StorageDeserializerModule::StorageDeserializerModule() : Module()
 {
   setDescription("Encode DataStore into RingBuffer");
@@ -74,21 +79,29 @@ void StorageDeserializerModule::initialize()
     }
   }
   m_handler = new MsgHandler(m_compressionLevel);
+  m_streamer = new DataStoreStreamer();
+  m_package = new DataStorePackage(m_streamer);
 
   StoreArray<RawPXD>::registerPersistent();
-  if (m_shmflag > 0) {
-    m_info.reportRunning();
+  if (m_info.isAvailable()) {
+    m_info.reportReady();
   }
   m_count = 0;
   while (true) {
-    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
-    if (m_package.restore()) {
+    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true));
+  }
+  /*
+    if (m_package->restore()) {
       if (m_info.isAvailable()) {
-        m_info.setInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputNBytes(m_package->getData().getByteSize());
         m_info.setInputCount(1);
       }
       break;
     }
+  }
+  */
+  if (m_info.isAvailable()) {
+    m_info.reportReady();
   }
   B2INFO("StorageDeserializer: initialize() done.");
 }
@@ -98,10 +111,10 @@ void StorageDeserializerModule::event()
   m_count++;
   if (m_count == 1) return;
   while (true) {
-    m_package.setSerial(m_ibuf.read((int*)m_package.getData().getBuffer(), true));
-    if (m_package.restore()) {
+    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true));
+    if (m_package->restore()) {
       if (m_info.isAvailable()) {
-        m_info.addInputNBytes(m_package.getData().getByteSize());
+        m_info.addInputNBytes(m_package->getData().getByteSize());
         m_info.setInputCount(m_count);
       }
       break;
@@ -112,7 +125,7 @@ void StorageDeserializerModule::event()
     if (m_expno != evtmetadata->getExperiment() ||
         m_runno != evtmetadata->getRun()) {
       if (m_info.isAvailable()) {
-        m_info.setInputNBytes(m_package.getData().getByteSize());
+        m_info.setInputNBytes(m_package->getData().getByteSize());
         m_info.setInputCount(1);
       }
     }
@@ -124,12 +137,12 @@ void StorageDeserializerModule::event()
       m_info.setRunNumber(m_runno);
     }
   } else {
-    B2WARNING("NO event meta data " << m_package.getData().getExpNumber() << "." <<
-              m_package.getData().getRunNumber() << "." <<
-              m_package.getData().getEventNumber() << " nword = " <<
-              m_package.getData().getWordSize());
+    B2WARNING("NO event meta data " << m_package->getData().getExpNumber() << "." <<
+              m_package->getData().getRunNumber() << "." <<
+              m_package->getData().getEventNumber() << " nword = " <<
+              m_package->getData().getWordSize());
     B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
-    DataStore::Instance().reset();
+    //DataStore::Instance().reset();
   }
 }
 

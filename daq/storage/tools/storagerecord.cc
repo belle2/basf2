@@ -42,7 +42,7 @@
 using namespace Belle2;
 
 const unsigned long long GB = 1024 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 1 * GB;
+const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "fileinfo";
 
 class FileHandler {

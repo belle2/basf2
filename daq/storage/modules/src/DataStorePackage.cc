@@ -21,6 +21,7 @@ using namespace Belle2;
 
 bool DataStorePackage::restore()
 {
+  static int count = 0;
   int nboard = m_data.getNBoard();
   if (nboard == 1) {
     m_data_hlt.setBuffer(m_data.getBuffer());
@@ -28,7 +29,8 @@ bool DataStorePackage::restore()
     m_data_hlt.setBuffer(m_data.getBody());
   }
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-    B2ERROR("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic());
+    B2ERROR("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
+            << " count = " << count);
     return false;
   }
   EvtMessage* msg = new EvtMessage((char*)m_data_hlt.getBody());
@@ -37,8 +39,9 @@ bool DataStorePackage::restore()
     delete msg;
     return false;
   }
-  m_streamer.restoreDataStore(msg);
+  m_streamer->restoreDataStore(msg);
   delete msg;
+  ///*
   if (nboard > 1) {
     m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
     if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
@@ -49,12 +52,13 @@ bool DataStorePackage::restore()
       return false;
     }
     if (m_data_pxd.getBuffer() != NULL) {
-      StoreArray<RawPXD> rawpxdary;
-      rawpxdary.appendNew(RawPXD((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize()));
+      m_rawpxdary.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
     }
   } else {
     m_data_pxd.setBuffer(NULL);
   }
+  //*/
+  //m_data_pxd.setBuffer(NULL);
   return true;
 }
 

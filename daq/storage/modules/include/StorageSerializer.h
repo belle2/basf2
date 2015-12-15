@@ -63,9 +63,6 @@ namespace Belle2 {
     //! Messaage handler
     MsgHandler* m_msghandler;
 
-    //! DataStoreStreamer
-    DataStoreStreamer* m_streamer;
-
     //! Ring Buffer to dump sampled output stream
     std::string m_obuf_name;
     int m_obuf_size;

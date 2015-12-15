@@ -6,6 +6,7 @@
 #include <string>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/DataStoreStreamer.h>
@@ -31,9 +32,10 @@ namespace Belle2 {
     };
 
   public:
-    DataStorePackage(unsigned int serial = 0)
+    DataStorePackage(DataStoreStreamer* streamer, unsigned int serial = 0)
       : m_serial(serial)
     {
+      m_streamer = streamer;
       m_buf = new int [MAX_BUFFER_WORDS];
       m_data.setBuffer(m_buf);
       m_data_hlt.setBuffer(NULL);
@@ -58,7 +60,9 @@ namespace Belle2 {
     BinData m_data_hlt;
     BinData m_data_pxd;
     int* m_buf;
-    DataStoreStreamer m_streamer;
+    //DataStoreStreamer m_streamer;
+    DataStoreStreamer* m_streamer;
+    StoreArray<RawPXD> m_rawpxdary;
 
   };
 

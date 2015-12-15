@@ -8,29 +8,47 @@ import math
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
+alpha = -45  # rotation angle of trigger counters
+
 
 class swimMCParticle(Module):
 
     '''
-    Move generated MC particles backward to position outside CDC
+    Rotate by alpha around z and move generated MC particles backward
+    to position outside CDC
     '''
 
     def event(self):
         '''
         Event processor
         '''
+
+        phi = math.radians(alpha)
+        cfi = math.cos(phi)
+        sfi = math.sin(phi)
+
         particles = Belle2.PyStoreArray('MCParticles')
         for particle in particles:
             pos = particle.getVertex()
-            mom = particle.getMomentum().Unit()
+            x = pos.X() * cfi - pos.Y() * sfi
+            y = pos.X() * sfi + pos.Y() * cfi
+            pos.SetX(x)
+            pos.SetY(y)
+            mom = particle.getMomentum()
+            px = mom.X() * cfi - mom.Y() * sfi
+            py = mom.X() * sfi + mom.Y() * cfi
+            mom.SetX(px)
+            mom.SetY(py)
+
             leng = 250
-            pos = pos - leng * mom
+            pos = pos - leng * mom.Unit()
             mass = particle.getMass()
-            p = particle.getMomentum().Mag()
+            p = mom.Mag()
             beta = p / math.sqrt(p * p + mass * mass)
             time = particle.getProductionTime() - leng / (Belle2.Const.speedOfLight * beta)
             particle.setProductionVertex(pos)
             particle.setProductionTime(time)
+            particle.setMomentum(mom)
 
 
 def momDistribution(p, katera=0):
@@ -81,7 +99,7 @@ particlegun.param('thetaParams', [30, 125])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [-100, -80])
 particlegun.param('vertexGeneration', 'uniform')
-particlegun.param('xVertexParams', [-5, 5])
+particlegun.param('xVertexParams', [-3, 3])
 particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [-10, 10])
 main.add_module(particlegun)
@@ -92,8 +110,9 @@ main.add_module(swimMCParticle())
 gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'geometry/CDCcosmicTests.xml')
 gearbox.param('override', [("/DetectorComponent[@name='TOP']//Nbar", '1', ''),
-                           ("/DetectorComponent[@name='TOP']//Phi0", '-90', 'deg'),
-                           ("/DetectorComponent[@name='TOP']//Bars/Radius", '165', 'cm')
+                           ("/DetectorComponent[@name='TOP']//Phi0", '-135', 'deg'),
+                           ("/DetectorComponent[@name='TOP']//Bars/Radius", '148', 'cm'),
+                           ("/DetectorComponent[@name='TOP']//QZBackward", '-103.5', 'cm'),
                            ])
 main.add_module(gearbox)
 
@@ -131,6 +150,7 @@ main.add_module(cdc_trackfinder)
 
 # new fitter
 trackfitter = register_module('CDCStraightLineFitter')
+trackfitter.param('alpha', alpha)
 # trackfitter.param('smearDriftLength', 0.015)
 # trackfitter.param('smearDedx', 0.30)
 main.add_module(trackfitter)

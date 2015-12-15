@@ -176,8 +176,9 @@ namespace Belle2 {
 
       // store fitted track
 
-      const TVector3 momFit = getMomentum();
+      TVector3 momFit = getMomentum();
       const TVector3 posFit = getStartPoint();
+      if (momFit.Y() > 0) momFit = -momFit;
 
       TMatrixDSym cov(6);
       float chi = getChi2() / getNDF();
@@ -283,7 +284,7 @@ namespace Belle2 {
     if (dirSeed.Y() > 0) dirSeed = -dirSeed; // upside down tracks
     CDCTB::StraightLine trackSeed(posSeed, dirSeed);
     if (!trackSeed.crossPlaneAlpha(m_alpha)) {
-      cout << "no X-sect\n";
+      B2ERROR("CDCStraightLineFitter: no X-sect");
       return false;
     }
     trackSeed.setReferencePoint();

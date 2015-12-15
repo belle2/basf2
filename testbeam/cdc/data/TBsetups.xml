@@ -12,7 +12,7 @@
       <type>TriggerCounter</type>
       <name>Trigger1</name>
       <detectorID>1</detectorID>
-      <z unit="mm">-20</z>
+      <z unit="mm">-22.5</z>
     </element>
     <element>
       <type>Plate</type>
@@ -23,7 +23,7 @@
       <type>TriggerCounter</type>
       <name>Trigger2</name>
       <detectorID>2</detectorID>
-      <z unit="mm">20</z>
+      <z unit="mm">22.5</z>
     </element>
   </CDCTrigger>
 

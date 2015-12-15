@@ -49,8 +49,26 @@ namespace Belle2 {
       /**  */
       virtual void terminate();
 
+      /** struct containing time and energy deposit, for sorting */
+      struct hit {
+        double time;
+        double edep;
+      };
+
+      /** sorter for above struct */
+      struct byTime {
+        bool operator()(hit const& a, hit const& b)
+        {
+          return a.time < b.time;
+        }
+      };
+
+
 
     private:
+
+      //creates waveform, returns peak
+      double WaveformMaker(std::vector<hit> hits, double lowTime);
 
       /** Reads drift data from file */
       virtual void getDriftData();
@@ -61,25 +79,19 @@ namespace Belle2 {
       /** Produces the impulse response function */
       virtual void impulseResponse();
 
-      /** Convolves the raw waveform with the impulse response function and returns the peak of the convolved waveform */
-      double convolveWaveform(double* waveform);
-
-      /** print the convolved wafeform to file. Useful for debugging */
-      virtual void printConvWaveform(int eventNum, int detNB, double* convolvedWaveform);
-
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 
       /** filename of drift datafile */
       std::string m_driftDataFile;
-      /** sigma of impulse response */
-      double m_impulseSigma;
       /** distance from center of tube */
       std::vector<double> radius_drift;
       /** drift time for each distance from center of tube */
       std::vector<double> time_drift;
       /** size of waveforms */
-      static const int waveformSize = 15000;
+      static const int waveformSize = 8000;
+      /** size of impulse response */
+      static const int iResponseLength = 5500;
       /** number of detectors. Read from HE3TUBE.xml*/
       int numOfTubes = 0;
       /** X coordinate of tube center */
@@ -87,11 +99,12 @@ namespace Belle2 {
       /** Y coordinate of tube center */
       std::vector<double> TubeCenterY;
       /** Impulse response function */
-      double iResponse[2400] = {0};
+      double iResponse[iResponseLength];
       /** Event counter */
       int Event = 0;
-      /** Conversion to ADC counts*/
-      double m_ConversionFactor = 6828 / 0.3538;
+      /** Conversion to ADC counts, set in steering file*/
+      double m_ConversionFactor;
+
 
     };
 

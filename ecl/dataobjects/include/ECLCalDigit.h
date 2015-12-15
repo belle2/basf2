@@ -20,7 +20,7 @@ namespace Belle2 {
   class ECLCalDigit : public RelationsObject {
   public:
 
-    // status enumerator
+    /** status enumerator */
     enum StatusBit {
       c_IsEnergyCalibrated = 1 << 0,
       c_IsTimeCalibrated = 1 << 1,

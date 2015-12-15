@@ -71,7 +71,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", false);
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_r22894_400k_events.root"));
+           std::string("/data/reconstruction/dedxPID_newPDFs_r22894_400k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -316,8 +316,8 @@ void CDCDedxPIDModule::event()
       }
 
       // find the position of the endpoints of the sense wire
-      const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID);
-      const TVector3& wirePosB = cdcgeo.wireBackwardPosition(wireID);
+      const TVector3& wirePosF = cdcgeo.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
+      const TVector3& wirePosB = cdcgeo.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
       const TVector3 wireDir = (wirePosB - wirePosF).Unit();
 
       int nWires = cdcgeo.nWiresInLayer(currentLayer);

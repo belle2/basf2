@@ -7,8 +7,6 @@ using namespace Belle2;
 
 REG_MODULE(iTopRawConverterV2)
 
-
-
 //Constructor
 iTopRawConverterV2Module::iTopRawConverterV2Module() : Module()
 {
@@ -39,17 +37,12 @@ iTopRawConverterV2Module::~iTopRawConverterV2Module()
 void iTopRawConverterV2Module::initialize()
 {
   std::string m_input_fileandpath = m_input_directory + m_input_filename;
-
   LoadRawFile(m_input_fileandpath.c_str());
 
   //output
-
   m_evtheader_ptr.registerInDataStore();
   m_evtwaves_ptr.registerInDataStore();
   m_filedata_ptr.registerInDataStore();
-
-
-
 }
 
 void iTopRawConverterV2Module::beginRun()
@@ -61,7 +54,6 @@ void iTopRawConverterV2Module::beginRun()
 
 void iTopRawConverterV2Module::event()
 {
-
   //output
   m_evtheader_ptr.create();
   //  m_evtheader_ptr.clear();
@@ -70,17 +62,16 @@ void iTopRawConverterV2Module::event()
   m_evt_no++;
 
   //  int packet_type = 0;
-  int c = 0;
   //  int lastWindow = 0;
   int readoutWindow = 0;
   //  int carrier = 0;
   int asic = 0;
   int channel = 0;
-  const int waveHeaderSize = 6;
-  const int wavePacketSize = waveHeaderSize + WORDS_PER_WINDOW;
-  const int eventPacketSize = 8;
-  unsigned int eventPacket[eventPacketSize];
-  unsigned int wavePacket[wavePacketSize];
+  const int WAVE_HEADER_SIZE = 6;
+  const int WAVE_PACKET_SIZE = WAVE_HEADER_SIZE + WORDS_PER_WINDOW;
+  const int EVENT_PACKET_SIZE = 8;
+  packet_word_t eventPacket[EVENT_PACKET_SIZE];
+  packet_word_t wavePacket[WAVE_PACKET_SIZE];
 
   eventPacket[0] = 1001;
   eventPacket[1] = m_scrod;
@@ -91,60 +82,45 @@ void iTopRawConverterV2Module::event()
   eventPacket[6] = 0;
   eventPacket[7] = 0;
 
-
   m_EvtPacket = new EventHeaderPacket(eventPacket,
-                                      eventPacketSize);
+                                      EVENT_PACKET_SIZE);
   EventHeaderPacket* headerpkt = GetEvtHeaderPacket();
   m_evtheader_ptr.assign(headerpkt, true);
-
 
   wavePacket[0] = 1011;
   wavePacket[1] = m_scrod;
 
-
-  while (1 == 1) {
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t)); //Grab one word and shift position (should make it per bit!!!)
-    unsigned int* word = (unsigned int*) m_temp_buffer;
-    unsigned int totalword = *word;
-    if (totalword == 0x6c617374) {
+  packet_word_t word;
+  while (true) {
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+    if (word == PACKET_LAST) {
       B2WARNING("End of file found.");
       return;
     }
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-    totalword--;//Grab one word and shift position (should make it per bit)
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
 
-    word = (unsigned int*) m_temp_buffer;
+    packet_word_t event = 0x7FFFF & word;
 
-    unsigned int event = (0x7FFFF) & (*word);
-    //    unsigned int trigger_pattern = (0xF) & ((*word) >> 28);
-    unsigned int windows = (0x1FF) & ((*word) >> 19);
-    windows++;
-
-    /*
-    B2INFO("total words : "<<(totalword)
-         <<"\theader: "<<std::hex<<std::setfill('0')<<std::setw(8)<<(*word)<<std::dec
-         <<"\tevent : "<<event<<"\ttrig pattern: "
-         <<trigger_pattern<<"\tnum windows: "<<windows);
-    */
-
-    while ((*word) != 0x6c617374) {
-      m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-      totalword--;//Grab one word and shift position (should make it pssser bit!!!)
-      word = (unsigned int*) m_temp_buffer;
-      if ((*word) == 0x6c617374) break;
-      m_carrier = ((*word) >> 30);
-      asic = 0x3 & ((*word) >> 28);
-      //      lastWindow = ((*word) >> 16) & 0x00FF;
-      readoutWindow = 0x1FF & (*word);
-      //      B2INFO("total words : "<<(totalword)<<"\tread : 0x"<<std::hex<<std::setfill('0')<<std::setw(8)<<(*word)<<std::dec);
-      //      B2INFO("carrier: "<<m_carrier<<"\tasic: "<<asic<<"\tlastWrAddr: "<<lastWindow<<"\tconvertAddr: "<<readoutWindow);
+    while (word != PACKET_LAST) {
+      m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+      if (word == PACKET_LAST) {
+        break;
+      }
+      m_carrier = (word >> 30);
+      asic = 0x3 & (word >> 28);
+      readoutWindow = 0x1FF & word;
       int row = m_carrier;
       int col = -1;
       for (channel = 0; channel < 8; channel++) {
-        if (((asic == 2) && (channel < 4)) || ((asic == 3) && (channel > 3))) col = 3;
-        else if (((asic == 2) && (channel > 3)) || ((asic == 3) && (channel < 4))) col = 2;
-        else if (((asic == 0) && (channel < 4)) || ((asic == 1) && (channel > 3))) col = 1;
-        else if (((asic == 0) && (channel > 3)) || ((asic == 1) && (channel < 4))) col = 0;
+        if (((asic == 2) && (channel < 4)) || ((asic == 3) && (channel > 3))) {
+          col = 3;
+        } else if (((asic == 2) && (channel > 3)) || ((asic == 3) && (channel < 4))) {
+          col = 2;
+        } else if (((asic == 0) && (channel < 4)) || ((asic == 1) && (channel > 3))) {
+          col = 1;
+        } else if (((asic == 0) && (channel > 3)) || ((asic == 1) && (channel < 4))) {
+          col = 0;
+        }
         wavePacket[2] = 0;
         wavePacket[3] = event;
         wavePacket[4] = 1;
@@ -152,69 +128,23 @@ void iTopRawConverterV2Module::event()
         wavePacket[6] = NPOINTS;
 
         for (int x = 0; x < NPOINTS / 2; x++) {
-          m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-          totalword--;//Grab one word and shift position (should make it per bit!!!)
-          word = (unsigned int*) m_temp_buffer;
-          wavePacket[waveHeaderSize + x + 1] = (*word);
-          //    B2INFO("\t0x"<<std::hex<<std::setfill('0')<<std::setw(8)<<(*word)<<std::dec);
-
+          m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+          wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
         }
-
-        //  B2INFO("readoutWindow: "<<readoutWindow<<"\tlastWindow: "<<lastWindow<<"\tasic: "<<asic<<"\tcarrier: "<<m_carrier<<"\tscrod: "<<m_scrod<<"\tmodule: "<<m_module<<"\tchannel: "<<channel<<"\tnumSamples: "<<wavePacket[6]<<"\tpacket[5]: "<<wavePacket[5]);
-        m_WfPacket = new EventWaveformPacket(wavePacket,
-                                             wavePacketSize);
+        m_WfPacket = new EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE);
         m_evtwaves_ptr.appendNew(EventWaveformPacket(*m_WfPacket));
       }
-
     }
-    c++;
     m_prev_pos = m_input_file.tellg();
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-    totalword--;//Grab one word and shift position (should make it per bit!!!)
-    word = (unsigned int*) m_temp_buffer;
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-    totalword--;//Grab one word and shift position (should make it per bit!!!)
-    word = (unsigned int*) m_temp_buffer;
-    unsigned int next_event = (0x7FFFF) & (*word);
-    if (next_event != event) { // Last ASIC read out for this event...
-      Rewind();
-      break;
-    }
+    // read ahead
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+    m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
+    packet_word_t next_event = (0x7FFFF) & word;
     Rewind();
-
-  }
-  /*
-
-
-  packet_type = FindNextPacket();
-  c++; if(c==1000000) break;
-  //    B2INFO("Processing packet with type "<<packet_type);
-  if (packet_type == -1) {
-    B2WARNING("Corrupt packet found.");
-    //      break;
-  } else if (packet_type == -11) {
-    B2WARNING("End of file.");
-    break;
-  } else if (packet_type == 1||packet_type==0) {
-    EventHeaderPacket* headerpkt = GetEvtHeaderPacket();
-    if (m_evtheader_ptr->GetPacketType() == -1)
-      m_evtheader_ptr.assign(headerpkt, true);
-    else if (headerpkt->GetEventNumber() != m_evtheader_ptr->GetEventNumber()) {
-      // Found next event.  Rewind and break.
-      Rewind();
-      //  B2INFO(" itop event " << m_evtheader_ptr->GetEventNumber() << " converted with " << m_evtwaves_ptr.getEntries() << " waveform packets.");
+    if (next_event != event) { // Last ASIC read out for this event...
       break;
     }
-  } else if (packet_type == 2) {
-    //    B2INFO("Found Waveform Packet Type: " << packet_type);
-    //      m_evtwaves_ptr.appendNew(GetWaveformPacket());
-    m_evtwaves_ptr.appendNew(EventWaveformPacket(*m_WfPacket));
-    //    B2INFO(" GetChannelID(): " <<   m_evtwave_ptr-> GetChannelID());
   }
-  packet_type=-1;
-  }
-  */
-  //  }
 }
 
 //Load file
@@ -241,84 +171,4 @@ EventWaveformPacket* iTopRawConverterV2Module::GetWaveformPacket()
 {
   EventWaveformPacket* ret = new EventWaveformPacket(*m_WfPacket);
   return ret;
-}
-
-int iTopRawConverterV2Module::FindNextPacket()
-{
-  //Erase previous packet object
-  if (m_WfPacket != nullptr) {
-    delete m_WfPacket;
-    m_WfPacket = nullptr;
-  }
-
-  if (m_EvtPacket != nullptr) {
-    delete m_EvtPacket;
-    m_EvtPacket = nullptr;
-  }
-
-  //Check file and if not at End-Of-File
-  if (!m_input_file || m_input_file.peek() == EOF) {
-    return -11;
-  }
-  //
-  int type = -1;
-  m_prev_pos = m_input_file.tellg();
-
-  m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t)); //Grab one word and shift position (should make it per bit!!!)
-  // int pos = m_input_file.tellg();
-
-  unsigned int* word = (unsigned int*) m_temp_buffer;
-  //  unsigned int word_value = *word;
-
-  //  B2INFO("packet word: 0x"<<std::hex<<word_value);
-
-  //Check if PACKET_HEADER
-  if (*word == PACKET_HEADER) {
-    //Grab next work which should be the length
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-
-    unsigned int packet_length = *((unsigned int*)(m_temp_buffer));
-
-    //Grab the rest of the packet
-    size_t ndata = (packet_length - 1) * sizeof(packet_word_t);
-    // FIXME magic number, cf header file
-    if (ndata > 1280) {
-      B2WARNING("Large payload: " << ndata << " ... skipping!");
-      return -1;
-    }
-
-    unsigned int temp_buffer1[ndata];
-    for (size_t i = 0; i < ndata; ++i) {
-      m_input_file >> temp_buffer1[i];
-    }
-    unsigned int* packet_type = &temp_buffer1[0];
-
-    if (*packet_type == PACKET_TYPE_EVENT) {
-      type = 1;
-      m_EvtPacket = new EventHeaderPacket(temp_buffer1,
-                                          ndata / sizeof(packet_word_t));
-    } else if (*packet_type == PACKET_TYPE_WAVEFORM) {
-      type = 2;
-      m_WfPacket = new EventWaveformPacket(temp_buffer1,
-                                           ndata / sizeof(packet_word_t));
-    }
-
-    //Do check sum
-    unsigned int this_checksum = 0;
-    this_checksum += PACKET_HEADER;
-    this_checksum += packet_length;
-    for (unsigned int i = 0; i < (packet_length - 1); i++) {
-      this_checksum += temp_buffer1[i * sizeof(packet_word_t)];
-    }
-
-    m_input_file.read((char*) m_temp_buffer, sizeof(packet_word_t));
-    unsigned int* checksum = (unsigned int*)(m_temp_buffer);
-    if (this_checksum == (*checksum)) {
-      return type;
-    } else {
-      return -1;
-    }
-  }
-  // End of PACKET_HEADER check
-  return -1;
 }

@@ -16,8 +16,9 @@
 namespace Belle2 {
 
 #define PACKET_HEADER (0x00004042) //hex:BELLE2
-#define PACKET_TYPE_EVENT (0x65766e74) //ascii:"evnt"
-#define PACKET_TYPE_WAVEFORM (0x77617665) //ascii:"wave"
+#define PACKET_TYPE_EVENT (0x65766e74) //ascii: "evnt"
+#define PACKET_TYPE_WAVEFORM (0x77617665) //ascii: "wave"
+#define PACKET_LAST (0x6c617374) //ascii: "last"
 #define NPOINTS 64
 #define WORDS_PER_WINDOW 256
 
@@ -36,7 +37,6 @@ namespace Belle2 {
 
 //Original function
     int LoadRawFile(const char* argc);
-    int FindNextPacket();
     EventHeaderPacket* GetEvtHeaderPacket();
     EventWaveformPacket* GetWaveformPacket();
     void Rewind() {m_input_file.seekg(m_prev_pos);}
@@ -47,7 +47,6 @@ namespace Belle2 {
     std::string m_input_fileandpath;
     std::ifstream m_input_file;
     std::string m_tmp;
-    unsigned int m_temp_buffer[1280];
     int m_current_pos, m_prev_pos;
     int m_carrier, m_scrod, m_module, m_evt_no;
     EventHeaderPacket* m_EvtPacket;

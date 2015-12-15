@@ -81,8 +81,6 @@ namespace Belle2 {
       int findIntersection(const Arc2D& arc,
                            HepGeom::Point3D<double> intersections[2]) const;
 
-    protected:
-
       /**
        * Find intersection with a line.
        * @param[in]  line         Line.
@@ -96,6 +94,8 @@ namespace Belle2 {
       int findIntersection(const Line2D& line,
                            HepGeom::Point3D<double>* intersection,
                            double t[2]) const;
+
+    protected:
 
       /**
        * Find intersections with a circle.

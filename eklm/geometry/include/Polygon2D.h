@@ -42,22 +42,35 @@ namespace Belle2 {
       ~Polygon2D();
 
       /**
-       * Check whether polygon has an intersection with a line segment.
+       * Check if point is inside the polygon.
+       */
+      bool pointInside(const HepGeom::Point3D<double>& point) const;
+
+      /**
+       * Check whether polygon has an intersection with a line segment or
+       * this line segment is fully inside the polygon.
        * @param[in] lineSegment Line segment.
        */
       bool hasIntersection(const LineSegment2D& lineSegment) const;
 
       /**
-       * Check whether polygon has an intersection with an arc.
+       * Check whether polygon has an intersection with an arc or
+       * this arc is fully inside the polygon.
        * @param[in] arc Arc.
        */
       bool hasIntersection(const Arc2D& arc) const;
 
       /**
-       * Check whether polygon has an intersection with a polygon.
+       * Check whether polygon has an intersection with a polygon
+       * or one of the polygons is fully inside another polygon.
        * @param[in] lineSegment Line segment.
        */
       bool hasIntersection(const Polygon2D& polygon) const;
+
+      /**
+       * Get line segments.
+       */
+      LineSegment2D** getLineSegments() const;
 
     private:
 

@@ -48,6 +48,11 @@ namespace Belle2 {
        */
       bool angleWithinRange(double angle) const;
 
+      /**
+       * Get initial point.
+       */
+      HepGeom::Point3D<double> getInitialPoint() const;
+
     private:
 
       /** Angle 1. */

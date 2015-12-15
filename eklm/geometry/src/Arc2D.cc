@@ -31,3 +31,12 @@ bool EKLM::Arc2D::angleWithinRange(double angle) const
   return (angle >= m_Angle1 || angle <= m_Angle2);
 }
 
+HepGeom::Point3D<double> EKLM::Arc2D::getInitialPoint() const
+{
+  HepGeom::Point3D<double> p;
+  p.setX(m_Radius * cos(m_Angle1));
+  p.setY(m_Radius * sin(m_Angle1));
+  p.setZ(0);
+  return p;
+}
+

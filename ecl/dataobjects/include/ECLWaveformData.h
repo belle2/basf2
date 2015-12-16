@@ -64,6 +64,24 @@ namespace Belle2 {
       }
     }
 
+    void storeMatrix(const float M[16][16])
+    {
+      float* A = m_matrixElement;
+      for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < i; j++) *A++ = M[i][j];
+        *A++ = M[i][i];
+      }
+    }
+
+    void storeMatrix(const double M[16][16])
+    {
+      float* A = m_matrixElement;
+      for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < i; j++) *A++ = static_cast<float>(M[i][j]);
+        *A++ = M[i][i];
+      }
+    }
+
     /** Setter method for waveform shape parameter */
 
     void setWaveformPar(size_t i, float value)

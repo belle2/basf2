@@ -3,4 +3,5 @@ env['TOOLS_LIBS']['ecldigiconfigfile'] = ['framework','ecl','ecl_dataobjects','$
 env['TOOLS_LIBS']['eclcovmat_cut'] = ['$ROOT_LIBS'];
 env['TOOLS_LIBS']['eclcovmat_calc'] = ['framework','$ROOT_LIBS'];
 env['TOOLS_LIBS']['eclcovmat_bit'] = ['ecl','$ROOT_LIBS'];
+env['TOOLS_LIBS']['eclcovmatpure'] = ['framework','ecl_dataobjects','$ROOT_LIBS'];	
 Return('env')

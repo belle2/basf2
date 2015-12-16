@@ -32,7 +32,8 @@ REG_MODULE(EKLMAlignment)
 EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
   setDescription("Module for generation of EKLM displacement data.");
-  addParam("Mode", m_Mode, "Mode ('Zero' or 'Limits').", std::string("Zero"));
+  addParam("Mode", m_Mode, "Mode ('Zero', 'Random' or 'Limits').",
+           std::string("Zero"));
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -54,6 +55,43 @@ void EKLMAlignmentModule::generateZeroDisplacement()
       for (iSector = 1; iSector <= 4; iSector++) {
         for (iPlane = 1; iPlane <= 2; iPlane++) {
           for (iSegment = 1; iSegment <= 5; iSegment++) {
+            segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                          iSegment);
+            alignment.setAlignmentData(segment, &alignmentData);
+          }
+        }
+      }
+    }
+  }
+  alignment.Write("EKLMDisplacement");
+  delete f;
+}
+
+void EKLMAlignmentModule::generateRandomDisplacement()
+{
+  TFile* f = new TFile(m_OutputFile.c_str(), "recreate");
+  const double maxDx = 1. * Unit::cm;
+  const double minDx = -1. * Unit::cm;
+  const double maxDy = 0.2 * Unit::cm;
+  const double minDy = -0.2 * Unit::cm;
+  const double maxDalpha = 0.003 * Unit::rad;
+  const double minDalpha = -0.003 * Unit::rad;
+  EKLMAlignment alignment;
+  EKLMAlignmentData alignmentData;
+  EKLM::AlignmentChecker alignmentChecker;
+  int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
+  for (iEndcap = 1; iEndcap <= 2; iEndcap++) {
+    for (iLayer = 1; iLayer <= EKLM::GeometryData::Instance().
+         getNDetectorLayers(iEndcap); iLayer++) {
+      for (iSector = 1; iSector <= 4; iSector++) {
+        for (iPlane = 1; iPlane <= 2; iPlane++) {
+          for (iSegment = 1; iSegment <= 5; iSegment++) {
+            do {
+              alignmentData.setDx(gRandom->Uniform(minDx, maxDx));
+              alignmentData.setDy(gRandom->Uniform(minDy, maxDy));
+              alignmentData.setDalpha(gRandom->Uniform(minDalpha, maxDalpha));
+            } while (!alignmentChecker.checkSegmentAlignment(iPlane, iSegment,
+                                                             &alignmentData));
             segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                           iSegment);
             alignment.setAlignmentData(segment, &alignmentData);
@@ -137,6 +175,8 @@ void EKLMAlignmentModule::initialize()
 {
   if (m_Mode == "Zero")
     generateZeroDisplacement();
+  else if (m_Mode == "Random")
+    generateRandomDisplacement();
   else if (m_Mode == "Limits")
     studyAlignmentLimits();
   else

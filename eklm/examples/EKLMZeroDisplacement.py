@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generates default EKLM alignment data (zero misalignemnts).
+# Generates default EKLM displacement data (zero displacements).
 
 import os
 import random

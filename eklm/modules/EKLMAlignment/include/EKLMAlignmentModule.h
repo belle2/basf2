@@ -74,6 +74,11 @@ namespace Belle2 {
     void generateZeroDisplacement();
 
     /**
+     * Generation of random displacements.
+     */
+    void generateRandomDisplacement();
+
+    /**
      * Generate random displacements and check if they are correct
      * (no overlaps).
      */

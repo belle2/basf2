@@ -55,8 +55,6 @@ namespace Belle2 {
        */
       bool checkAlignment(EKLMAlignment* alignment) const;
 
-    private:
-
       /**
        * Check segment alignment.
        * @param[in] iPlane    Plane number.
@@ -66,6 +64,8 @@ namespace Belle2 {
        */
       bool checkSegmentAlignment(int iPlane, int iSegment,
                                  EKLMAlignmentData* alignment) const;
+
+    private:
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;

@@ -5,6 +5,8 @@ import os
 import sys
 
 from basf2 import *
+import ROOT
+from ROOT import Belle2
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
@@ -22,6 +24,7 @@ from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addKshortConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
+from b2biiMonitors import addMCParticlesConversionMonitors
 
 if len(sys.argv) != 2:
     sys.exit('Must provide one input parameter: [input_Belle_MDST_file].\n'
@@ -48,6 +51,7 @@ addBeamParamsConversionMonitors()
 addTrackConversionMonitors()
 addKshortConversionMonitors()
 addNeutralsConversionMonitors()
+addMCParticlesConversionMonitors()
 
 # progress
 progress = register_module('Progress')

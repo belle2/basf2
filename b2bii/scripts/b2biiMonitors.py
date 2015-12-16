@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import ROOT
+from ROOT import Belle2
 from modularAnalysis import fillParticleList
 from modularAnalysis import copyParticles
 from modularAnalysis import copyList
@@ -34,7 +36,7 @@ def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMon
     beam2hist_evtno = ('modulo(evtNum,10000)', 10000, 0.0, 9999.0)
 
     beam2hist_Eher = ('Eher', 13000, 7.100, 8.400)
-    beam2hist_Eler = ('Eler',  6000, 3.100, 3.700)
+    beam2hist_Eler = ('Eler', 6000, 3.100, 3.700)
     beam2hist_Ecms = ('Ecms', 17000, 9.200, 10.900)
     beam2hist_Xang = ('XAngle', 100, 0.01, 0.03)
 
@@ -554,3 +556,20 @@ def addNeutralsConversionMonitors(outputRootFile='', path=analysis_main):
     path.add_module(gamma2hist)
     path.add_module(neutralPi2hist)
     path.add_module(MCneutralPi2hist)
+
+
+def addMCParticlesConversionMonitors(outputRootFile='b2biiMCParticlesConversionMonitors.root', path=analysis_main):
+    """
+    'HistoManager' and 'B2BIIMCParticlesMonitor' modules create and fill the monitoring
+    histograms using all MCParticles.
+    @param outputRootFile name of the output ROOT file to which the histograms are saved.
+    @param path modules are added to this path
+    """
+
+    histo = register_module("HistoManager")
+    MCParticles2hist = register_module('B2BIIMCParticlesMonitor')
+
+    histo.param("histoFileName", outputRootFile)
+
+    path.add_module(histo)
+    path.add_module(MCParticles2hist)

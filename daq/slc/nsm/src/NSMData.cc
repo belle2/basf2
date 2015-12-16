@@ -129,8 +129,9 @@ void* NSMData::open(NSMCommunicator& com) throw(NSMHandlerException)
     }
     if ((m_pdata = b2nsm_openmem(getName().c_str(), getFormat().c_str(),
                                  getRevision())) == NULL) {
-      throw (NSMHandlerException("Failed to open data memory %s",
-                                 nsmlib_strerror(com.getContext())));
+      throw (NSMHandlerException("Failed to open data memory %s (%s %s %d)",
+                                 nsmlib_strerror(com.getContext()), getName().c_str(), getFormat().c_str(),
+                                 getRevision()));
     }
     parse();
   }

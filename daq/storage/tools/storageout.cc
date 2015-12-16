@@ -19,6 +19,8 @@
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 
+#include <daq/slc/system/TCPServerSocket.h>
+#include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
 
@@ -48,55 +50,73 @@ int main(int argc, char** argv)
   unsigned int subno = 0;
   info.reportRunning();
   const int port = atoi(argv[3]);
-  while (true) {
-    if (use_info) info.setInputPort(0);
-    REvtSocketSend* socket = new REvtSocketSend(port);
-    B2INFO("Connected from expreco.");
-    if (use_info) {
-      info.setInputPort(port);
-    }
-    SharedEventBuffer::Header hdr;
+  TCPServerSocket serversocket("0.0.0.0", port);
+  try {
+    serversocket.open();
+  } catch (const IOException& e) {
+    B2ERROR("Failed to open server socket 0.0.0.0:" << port);
+  }
+  try {
     while (true) {
-      unsigned int nbyte = ibuf.read(evtbuf, false, &hdr);
-      if (expno < hdr.expno || runno < hdr.runno) {
-        expno = hdr.expno;
-        runno = hdr.runno;
-        if (use_info) {
-          info.setExpNumber(expno);
-          info.setRunNumber(runno);
-          info.setSubNumber(subno);
-          info.setInputCount(0);
-          info.setInputNBytes(0);
-          info.setOutputCount(0);
-          info.setOutputNBytes(0);
-          nbyte_in = nbyte_out = 0;
-          count_in = count_out = 0;
+      if (use_info) info.setInputPort(0);
+      TCPSocket socket = serversocket.accept();
+      TCPSocketWriter writer(socket);
+      //REvtSocketSend* socket = new REvtSocketSend(port);
+      B2INFO("Connected from expreco.");
+      if (use_info) info.setInputPort(port);
+      SharedEventBuffer::Header hdr;
+      while (true) {
+        long long nbyte = ibuf.read(evtbuf, false, &hdr);
+        if (expno < hdr.expno || runno < hdr.runno) {
+          expno = hdr.expno;
+          runno = hdr.runno;
+          if (use_info) {
+            info.setExpNumber(expno);
+            info.setRunNumber(runno);
+            info.setSubNumber(subno);
+            info.setInputCount(0);
+            info.setInputNBytes(0);
+            info.setOutputCount(0);
+            info.setOutputNBytes(0);
+            nbyte_in = nbyte_out = 0;
+            count_in = count_out = 0;
+          }
+        }
+        count_in++;
+        nbyte_in += nbyte;
+        if (use_info && count_in % 10 == 0) {
+          info.setInputCount(count_in);
+          info.addInputNBytes(nbyte_in);
+        }
+        EvtMessage* msg = new EvtMessage((char*)evtbuf);
+        try {
+          nbyte = writer.write((char*)msg->buffer(), msg->size());
+        } catch (const IOException& e) {
+          B2WARNING("Lost connection to expreco");
+          break;
+        }
+        //nbyte = socket->send(msg);
+        delete msg;
+        if (nbyte <= 0) {
+          B2WARNING("Connection to expreco broken.");
+          if (use_info) info.setInputPort(0);
+          info.reportError(RunInfoBuffer::SOCKET_OUT);
+          break;
+        }
+        nbyte_out += nbyte;
+        count_out++;
+        if (use_info && count_out % 10 == 0) {
+          info.setOutputCount(count_out);
+          info.addOutputNBytes(nbyte_out);
+          nbyte_out = 0;
         }
       }
-      count_in++;
-      nbyte_in += nbyte;
-      if (use_info && count_in % 10 == 0) {
-        info.setInputCount(count_in);
-        info.addInputNBytes(nbyte_in);
-      }
-      EvtMessage* msg = new EvtMessage((char*)evtbuf);
-      nbyte = socket->send(msg);
-      delete msg;
-      if (nbyte <= 0) {
-        B2WARNING("Connection to expreco broken.");
-        if (use_info) info.setInputPort(0);
-        info.reportError(RunInfoBuffer::SOCKET_OUT);
-        break;
-      }
-      nbyte_out += nbyte;
-      count_out++;
-      if (use_info && count_out % 10 == 0) {
-        info.setOutputCount(count_out);
-        info.addOutputNBytes(nbyte_out);
-        nbyte_out = 0;
-      }
+      B2INFO("Closing sender socket");
+      //delete socket;
+      socket.close();
     }
-    delete socket;
+  } catch (const std::exception& e) {
+    B2ERROR("Unknown error: " << e.what());
   }
   return 0;
 }

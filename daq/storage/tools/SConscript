@@ -8,6 +8,7 @@ env['TOOLS_LIBS']['storagerecord'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread
 env['TOOLS_LIBS']['storagetest'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
 env['TOOLS_LIBS']['offbuilder'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['scp_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['rsync_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 env['TOOLS_LIBS']['list_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
 
 Return('env')

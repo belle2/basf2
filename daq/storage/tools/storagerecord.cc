@@ -54,6 +54,7 @@ public:
   {
     m_file = NULL;
     m_buf = NULL;
+    m_filesize = 0;
   }
   ~FileHandler() throw()
   {
@@ -98,13 +99,13 @@ public:
         std::ifstream fin(filename);
         int flag = 0;
         fin >> flag;
-        if (fin.eof() || flag != 1) {
+        if (/*fin.eof() || */flag != 1) {
           available = true;
           B2INFO("disk : " << m_diskid << " is available");
           break;
         }
         fin.close();
-        B2INFO("disk : " << m_diskid << " is full");
+        B2INFO("disk : " << m_diskid << " is still full");
       } else {
         sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
         std::ofstream fout(filename);
@@ -161,8 +162,8 @@ public:
     if (m_file != NULL) {
       fclose(m_file);
       char sql[1000];
-      sprintf(sql, "update %s set time_close = "
-              "current_timestamp where id = %d", g_table, m_id);
+      sprintf(sql, "update %s set time_close = current_timestamp, "
+              "filesize = %u where id = %d", g_table, m_filesize, m_id);
       try {
         m_db.connect();
         m_db.execute(sql);
@@ -183,7 +184,9 @@ public:
 
   int write(char* evbuf, int nbyte)
   {
-    return fwrite(evbuf, nbyte, 1, m_file);
+    int ret = fwrite(evbuf, nbyte, 1, m_file);
+    m_filesize += nbyte;
+    return ret;
   }
 
   operator bool()
@@ -202,6 +205,7 @@ private:
   int m_fileid;
   FILE* m_file;
   char* m_buf;
+  unsigned int m_filesize;
 
 };
 
@@ -259,6 +263,7 @@ int main(int argc, char** argv)
   g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
   FileHandler& file(*g_file);
   SharedEventBuffer::Header iheader;
+  int ecount = 0;
   while (true) {
     ibuf.read(evtbuf, true, &iheader);
     if (use_info) info.reportRunning();
@@ -314,8 +319,11 @@ int main(int argc, char** argv)
         info.get()->reserved_f[0] = (float)info.getOutputNBytes() / 1024. / 1024.;
       }
     } else {
-      B2ERROR("storagerecord: no run was initialzed for recording");
-      return 1;
+      if (!ecount) {
+        B2WARNING("storagerecord: no run was initialzed for recording : " << iheader.expno << "." << iheader.runno);
+      }
+      ecount = 1;
+      //return 1;
     }
     //usleep(1000);
   }

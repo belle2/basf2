@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     try {
       TCPSocketReader reader(socket);
       B2INFO("storagein: Cconnected to eb2.");
+      int count = 0;
       while (true) {
         reader.read(data.getBuffer(), sizeof(int));
         unsigned int nbyte = data.getByteSize() - sizeof(int);
@@ -91,6 +92,7 @@ int main(int argc, char** argv)
           info.addInputCount(1);
           info.addInputNBytes(nbyte);
         }
+        //B2INFO("runno = " << runno);
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2ERROR("storagein: old run event detected : exp="
                   << data.getExpNumber() << " runno="
@@ -115,7 +117,14 @@ int main(int argc, char** argv)
             info.setOutputCount(0);
             info.setOutputNBytes(0);
           }
+          count = 0;
         }
+        if (count < 10000 && (count < 10 || (count > 10 && count < 100 && count % 10 == 0) ||
+                              (count > 100 && count < 1000 && count % 100 == 0) ||
+                              (count > 1000 && count < 10000 && count % 1000 == 0))) {
+          B2INFO("Storage count = " << count << " nword = " << nword);
+        }
+        count++;
         ibuf.write(data.getBuffer(), nword, true);
         if (info.isAvailable()) {
           info.addOutputCount(1);

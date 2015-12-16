@@ -17,7 +17,8 @@
 #include <TClass.h>
 #include <TList.h>
 
-#include <stdio.h>
+#include <iostream>
+#include <cstdio>
 
 using namespace std;
 using namespace Belle2;

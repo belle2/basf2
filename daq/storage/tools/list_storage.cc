@@ -60,13 +60,13 @@ int main(int argc, char** argv)
     if (strcmp(argv[i], "-h") == 0) {
       i++;
       if (i < argc) hostname = argv[i];
-    } else if (strcmp(argv[i], "-r") == 0) {
+    } else if (strcmp(argv[i], "-t") == 0) {
       i++;
       if (i < argc) runtype = argv[i];
     } else if (strcmp(argv[i], "-e") == 0) {
       i++;
       if (i < argc) expno = atoi(argv[i]);
-    } else if (strcmp(argv[i], "-t") == 0) {
+    } else if (strcmp(argv[i], "-r") == 0) {
       i++;
       if (i < argc) runno = atoi(argv[i]);
     } else if (strcmp(argv[i], "-n") == 0) {

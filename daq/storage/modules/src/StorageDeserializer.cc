@@ -89,8 +89,6 @@ void StorageDeserializerModule::initialize()
   m_count = 0;
   while (true) {
     m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true));
-  }
-  /*
     if (m_package->restore()) {
       if (m_info.isAvailable()) {
         m_info.setInputNBytes(m_package->getData().getByteSize());
@@ -99,7 +97,6 @@ void StorageDeserializerModule::initialize()
       break;
     }
   }
-  */
   if (m_info.isAvailable()) {
     m_info.reportReady();
   }

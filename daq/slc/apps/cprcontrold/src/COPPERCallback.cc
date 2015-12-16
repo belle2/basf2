@@ -139,7 +139,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
           std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
           LogFile::info(ret);
-          LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s", (i + 'a'),
+          LogFile::info("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c %s %s", (i + 'a'),
                         o_fee.getText("randfile").c_str(), o_fee.getText("lengthfile").c_str());
           ret = popen(StringUtil::form("/home/usr/b2daq/run/dumhslb/write-dumhslb -%c ",
                                        (i + 'a')) + o_fee.getText("randfile") +

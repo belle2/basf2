@@ -18,7 +18,8 @@ bool NSMVHandlerRCConfig::handleGetText(std::string& val)
     //val = m_rcnode.getConfig();
   } catch (const IOException& e) {
     LogFile::error("%s : %s rcconfig", e.what(), m_rcnode.getName().c_str());
-    return false;
+    val = "";
+    m_rcnode.setConfig(val);
   }
   return true;
 }
@@ -81,22 +82,17 @@ bool NSMVHandlerRCRequest::handleSetText(const std::string& val)
 
 bool NSMVHandlerRCNodeUsed::handleGetInt(int& val)
 {
-  val = m_rcnode.isUsed();
+  val = m_callback.getRCUsed() && m_rcnode.isUsed();
   return true;
 }
 
 bool NSMVHandlerRCNodeUsed::handleSetInt(int val)
 {
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   m_rcnode.setUsed(val > 0);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   if (val == 0) {
-    LogFile::debug("%s:%d", __FILE__, __LINE__);
     m_callback.setState(m_rcnode, RCState::OFF_S);
-    LogFile::debug("%s:%d", __FILE__, __LINE__);
     try {
       NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
-      LogFile::debug("%s:%d", __FILE__, __LINE__);
     } catch (const NSMHandlerException& e) {
       LogFile::warning(e.what());
     }

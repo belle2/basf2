@@ -410,7 +410,6 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
     LogFile::error("DB errir : %s", e.what());
   }
   if ((getNode().getState() == RCState::RUNNING_S ||
-       getNode().getState() == RCState::LOADING_TS ||
        getNode().getState() == RCState::STARTING_TS) && pri >= LogFile::ERROR) {
     setState(RCState::NOTREADY_S);
   }
@@ -573,6 +572,11 @@ void RunControlCallback::setExpNumber(int expno) throw()
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
   }
+}
+
+bool RunControlCallback::getRCUsed() throw()
+{
+  return getNode().isUsed();
 }
 
 bool RunControlCallback::setRCUsed(int val) throw()

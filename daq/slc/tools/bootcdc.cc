@@ -77,6 +77,9 @@ int main(int argc, char** argv)
       printf("%s\n", s);
       system(s);
     }
+    sprintf(s, "nsm2socket 9090 -d");
+    printf("%s\n", s);
+    system(s);
   }
   if (cpr) {
     if (nsm) sleep(1);

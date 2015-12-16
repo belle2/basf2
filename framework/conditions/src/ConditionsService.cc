@@ -115,7 +115,7 @@ void ConditionsService::parse_return(std::string temp)
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
-    B2FATAL("corrupt return from REST call: " << temp.c_str());
+    B2ERROR("corrupt return from REST call: " << temp.c_str());
   }
 
 
@@ -146,7 +146,7 @@ void ConditionsService::parse_payloads(std::string temp)
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
-    B2FATAL("corrupt return from REST call: " << temp.c_str());
+    B2ERROR("corrupt return from REST call: " << temp.c_str());
   }
 
   // take access to main node

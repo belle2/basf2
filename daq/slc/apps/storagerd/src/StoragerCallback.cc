@@ -31,7 +31,7 @@ StoragerCallback::~StoragerCallback() throw()
 
 void StoragerCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName() + "_STATUS", "storage_status",
+  allocData(getNode().getName(), "storage",
             storage_status_revision);
   configure(obj);
 }
@@ -296,7 +296,7 @@ void StoragerCallback::monitor() throw(RCHandlerException)
   storage_status* info = (storage_status*)data.get();
   info->ctime = Time().getSecond();
   info->nnodes = m_con.size();
-  if (state != RCState::RUNNING_S) {
+  if (!(state == RCState::RUNNING_S || state == RCState::READY_S)) {
     memset(info, 0, sizeof(storage_status));
   } else {
     bool connected = false;

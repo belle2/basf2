@@ -12,7 +12,7 @@ struct mwreader {
     char unit[8];
     char alarm[8];
     char cond[8];
-  } data[100];
+  } data[600];
   int32 date;
   int32 time;
   int32 nitem;

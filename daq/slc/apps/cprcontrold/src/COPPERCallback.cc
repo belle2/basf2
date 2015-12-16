@@ -20,6 +20,8 @@
 #include <cstdio>
 #include <sstream>
 
+bool initialized = false;
+
 using namespace Belle2;
 
 std::string popen(const std::string& cmd)
@@ -66,12 +68,13 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
     m_copper.open();
   }
   m_flow.open(&m_con.getInfo());
+  initialized = false;
   configure(obj);
+  initialized = true;
 }
 
 void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
-  static bool initialized = false;
   try {
     LogFile::info(obj.getName());
     m_dummymode = m_dummymode_org || (obj.hasValue("dummymode") && obj.getBool("dummymode"));
@@ -84,6 +87,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     const DBObject& o_ttrx(obj("ttrx"));
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
+    bool bootedttrx = false;
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
@@ -136,6 +140,12 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
           add(new NSMVHandlerInt(vname + ".hslbid", true, false, checked ? info.hslbid : -1));
           add(new NSMVHandlerInt(vname + ".hslbver", true, false, checked ? info.hslbver : -1));
         } else if (initialized) {
+          if (!bootedttrx) {
+            LogFile::info("bootrx ~/run/ttrx/tt5r036.bit");
+            std::string ret = popen("bootrx ~/run/ttrx/tt5r036.bit");
+            LogFile::info(ret);
+            bootedttrx = true;
+          }
           LogFile::info("booths -%c %s", (i + 'a'), o_hslb.getText("firm").c_str());
           std::string ret = popen(StringUtil::form("booths -%c ", (i + 'a')) + o_hslb.getText("firm"));
           LogFile::info(ret);
@@ -152,7 +162,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     initialized = true;
     throw (RCHandlerException(e.what()));
   }
-  initialized = true;
 }
 
 void COPPERCallback::term() throw()

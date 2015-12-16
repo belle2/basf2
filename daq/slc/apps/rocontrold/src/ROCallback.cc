@@ -128,12 +128,12 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
     LogFile::debug("Booted %d-th stream0", i);
     try_wait();
   }
+  /*
   if (obj.hasObject("stream1")) {
     if (!m_stream1.load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream1"));
     }
   }
-  /*
   if (!m_eb1tx.load(obj, 0)) {
     throw (RCHandlerException("Faield to boot eb1tx"));
   }

@@ -19,7 +19,7 @@ bool ProcessController::init(const std::string& parname, int nodeid)
 {
   m_name = StringUtil::tolower(m_callback->getNode().getName());
   m_parname = parname;
-  LogFile::open(m_name);
+  LogFile::open(m_name + "_" + m_parname);
   if (!m_info.open(m_name + "_" + m_parname, nodeid, true)) {
     return false;
   }

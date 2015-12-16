@@ -35,7 +35,7 @@ int main(int argc, char** argv)
   NSMCommunicator com;
   com.init(NSMNode(node), config.get("nsm.host"), config.getInt("nsm.port"));
   //NSMData data(stornode, "storage_status", storage_status_revision);
-  NSMData data(stornode + "_STATUS", "storage_status", storage_status_revision);
+  NSMData data(stornode, "storage", storage_status_revision);
   storage_status* info = (storage_status*)data.open(com);
   while (true) {
     sleep(2);

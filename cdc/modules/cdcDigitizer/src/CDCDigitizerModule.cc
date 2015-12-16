@@ -69,6 +69,10 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DoSmearing", m_doSmearing,
            "If false, drift length will not be smeared.", true);
 
+  addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
+
+  addParam("SimTrigTimeJitterIn2015Apr", m_simTrigTimeJitterIn2015Apr, "Simulate trigger timing jitter in cosmic runs in Apr. 2015.",
+           false);
   //Switches to control time information handling
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
@@ -159,13 +163,15 @@ void CDCDigitizerModule::event()
   RelationArray mcParticlesToCDCSimHits(mcParticles, simHits);  //RelationArray created by CDC SensitiveDetector
 
 
-  //--- Start Primitive Digitization --------------------------------------------------------------------------------------------
+  //--- Start Digitization --------------------------------------------------------------------------------------------
   // Merge the hits in the same cell and save them into CDC signal map.
 
   // Define signal map
   map<WireID, SignalInfo> signalMap;
   map<WireID, SignalInfo>::iterator iterSignalMap;
 
+  // Set trigger timing jitter for this event
+  double trigTiming = m_simTrigTimeJitterIn2015Apr ? 8.*(gRandom->Uniform() - 0.5) : 0.;
   // Loop over all hits
   int nHits = simHits.getEntries();
   B2DEBUG(250, "Number of CDCSimHits in the current event: " << nHits);
@@ -176,6 +182,10 @@ void CDCDigitizerModule::event()
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
+
+    // Special treatment for cosmic runs in April 2015
+    if (m_2015AprRun && m_wireID.getISuperLayer() != 4) continue;
+
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_posWire    = m_aCDCSimHit->getPosWire();
     m_posTrack   = m_aCDCSimHit->getPosTrack();
@@ -272,6 +282,9 @@ void CDCDigitizerModule::event()
     if (m_aCDCSimHit->getBackgroundTag() != 0) {
       hitDriftTime += m_globalTime - m_flightTime;
     }
+
+    //add trigger timing jitter
+    hitDriftTime += trigTiming;
 
     //apply time window cut
     double tMax = m_tMaxOuter;

@@ -136,6 +136,8 @@ namespace Belle2 {
 
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
+    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
+    bool m_simTrigTimeJitterIn2015Apr; /**< A switch to simulate trigger timing jitter for cosmic runs in April 2015. */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */

@@ -24,6 +24,8 @@ void plotComparisonBASF1vs2()
   
   TFile *gTracks = new TFile("b2biiTrackConversionMonitors.root");
 
+  TFile *gMCParticleMonitors = new TFile("b2biiMCParticlesConversionMonitors.root");
+
   // ADD COMPARISON PLOT LINES
   // This will put all plots in the same pdf file
   // Template:
@@ -229,6 +231,31 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gNeutralsPi0, "h454",   "momVertCovM__bo6__cm5__bc",    "Err65",   1);
       drawHist(fileName, gBASF, gNeutralsPi0, "h455",   "momVertCovM__bo6__cm6__bc",    "Err66",   2);
     }
+
+
+  // ---------------------------------------------------------------------------------
+  // MC Particles Monitor
+  // ---------------------------------------------------------------------------------
+
+  if(!gBASF || !gMCParticleMonitors || gBASF->IsZombie() || gMCParticleMonitors->IsZombie())
+    cout << "Error opening MC Particle monitor files!" << endl;
+  else 
+    {
+      fileName = "MCParticleMonitorPlots";
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h501",   "mcPDG",           "",                     0);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h502",   "mcM",             "M [GeV/c^{2}]",        1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h503",   "mcPx",            "Px [GeV/c]",           1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h504",   "mcPy",            "Py [GeV/c]",           1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h505",   "mcPz",            "Pz [GeV/c]",           1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h506",   "mcE",             "E [GeV]",              1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h507",   "mcVx",            "x [cm]",               1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h508",   "mcVy",            "y [cm]",               1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h509",   "mcVz",            "z [cm]",               1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h510",   "mcPiPlusMother",  "",                     1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h511",   "mcPiMinusMother", "",                     1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h512",   "mcPi0Mother",     "",                     1);
+      drawHist(fileName, gBASF, gMCParticleMonitors, "h513",   "mcNDau",          "",                     2);
+    } 
 
   // ---------------------------------------------------------------------------------
   // Track Monitor

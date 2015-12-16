@@ -10,12 +10,20 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/EKLMObjectNumbers.h>
+#include <eklm/geometry/GeometryData.h>
 
 using namespace Belle2;
 
 int EKLM::layerNumber(int endcap, int layer)
 {
   return 14 * (endcap - 1) + layer;
+}
+
+int EKLM::detectorLayerNumber(int endcap, int layer)
+{
+  if (endcap == 1)
+    return layer;
+  return EKLM::GeometryData::Instance().getNDetectorLayers(1) + layer;
 }
 
 int EKLM::sectorNumber(int endcap, int layer, int sector)
@@ -25,18 +33,18 @@ int EKLM::sectorNumber(int endcap, int layer, int sector)
 
 int EKLM::planeNumber(int endcap, int layer, int sector, int plane)
 {
-  return 2 * (4 * (14 * (endcap - 1) + (layer - 1)) + (sector - 1)) + plane;
+  return 2 * (4 * detectorLayerNumber(endcap, layer) + (sector - 1)) + plane;
 }
 
 int EKLM::segmentNumber(int endcap, int layer, int sector, int plane,
                         int segment)
 {
-  return 5 * (2 * (4 * (14 * (endcap - 1) + (layer - 1)) +
+  return 5 * (2 * (4 * detectorLayerNumber(endcap, layer) +
                    (sector - 1)) + (plane - 1)) + segment;
 }
 int EKLM::stripNumber(int endcap, int layer, int sector, int plane, int strip)
 {
-  return 75 * (2 * (4 * (14 * (endcap - 1) + (layer - 1)) +
+  return 75 * (2 * (4 * detectorLayerNumber(endcap, layer) +
                     (sector - 1)) + (plane - 1)) + strip;
 }
 

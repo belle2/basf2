@@ -25,6 +25,16 @@ namespace Belle2 {
     int layerNumber(int endcap, int layer);
 
     /**
+     * Get detector layer number.
+     * @param[in] endcap Endcap number.
+     * @param[in] layer  Layer number.
+     * @return Number of layer.
+     * @details
+     * Number is from 1 to 12 + 14 = 26.
+     */
+    int detectorLayerNumber(int endcap, int layer);
+
+    /**
      * Get sector number.
      * @param[in] endcap Endcap number.
      * @param[in] layer  Layer number.
@@ -43,7 +53,7 @@ namespace Belle2 {
      * @param[in] plane  Plane number.
      * @return Number of plane.
      * @details
-     * Number is from 1 to 2*4*14*2 = 224.
+     * Number is from 1 to 2*4*26 = 208.
      */
     int planeNumber(int endcap, int layer, int sector, int plane);
 
@@ -56,7 +66,7 @@ namespace Belle2 {
      * @param[in] segment Segment number.
      * @return Number of strip.
      * @details
-     * Number is from 1 to 5*2*4*14*2 = 1120.
+     * Number is from 1 to 5*2*4*26 = 1040.
      */
     int segmentNumber(int endcap, int layer, int sector, int plane, int strip);
 
@@ -69,7 +79,7 @@ namespace Belle2 {
      * @param[in] strip  Strip number.
      * @return Number of strip.
      * @details
-     * Number is from 1 to 75*2*4*14*2 = 16800.
+     * Number is from 1 to 75*2*4*26 = 15600.
      */
     int stripNumber(int endcap, int layer, int sector, int plane, int strip);
 

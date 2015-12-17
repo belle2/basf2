@@ -40,7 +40,8 @@ EclCovMatrixNtupleModule::EclCovMatrixNtupleModule() : Module()
   //Parameters definition
   addParam("outputFileName", m_dataOutFileName,
            "Output root file name of this module", string("EclCovMatrixNtuple"));
-
+  addParam("dspArrayName", m_dspArrayName, "name of input ECLDsp Array", string("ECLDsps"));
+  addParam("digiArrayName", m_digiArrayName, "name of input ECLDigit Array", string("ECLDigits"));
 }
 
 void EclCovMatrixNtupleModule::initialize()
@@ -78,8 +79,8 @@ void EclCovMatrixNtupleModule::terminate()
 
 void EclCovMatrixNtupleModule::event()
 {
-  StoreArray<ECLDsp> eclDspArray;
-  StoreArray<ECLDigit> eclDigiArray;
+  StoreArray<ECLDsp> eclDspArray(m_dspArrayName);
+  StoreArray<ECLDigit> eclDigiArray(m_digiArrayName);
   StoreArray<ECLTrig> eclTrigArray;
 
   m_nevt++;

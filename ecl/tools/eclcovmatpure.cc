@@ -39,9 +39,9 @@ void fillCrystalCat(vector<int>& crystalCat, vector< vector<int> >& grmap)
   }
 }
 
-void writeOutput(const char* filename, const vector<matrix_16x16>& mat, const vector< vector< int> >& grmap)
+void writeOutput(const char* filename, const vector<matrix_16x16>& mat, const vector< vector< int> >& grmap, const vector<int>& N)
 {
-  TFile* f = new TFile(filename);
+  TFile* f = new TFile(filename, "RECREATE");
   TTree* t =  new TTree("EclWF", "Waveform and covariance matrix");
   ECLWaveformData* data = new ECLWaveformData;
   Int_t ncellId;
@@ -51,15 +51,19 @@ void writeOutput(const char* filename, const vector<matrix_16x16>& mat, const ve
   t->Branch("cellId", cellId.data(), "cellId[ncellId]/I");
 
   for (size_t n = 0; n < grmap.size(); n++) {
-    const vector<int>& v = grmap[n];
-    ncellId = v.size();
-    if (ncellId == 0) continue;
-    cellId = v;
-    //    fmatrix_16x16 float_mat;
-    // for (auto i : mat[n] ) float_mat.push_back(float(*i)) ;
-    data->storeMatrix(mat[n]);
-    t->Fill();
+    if (N[n] > 50) {
+      const vector<int>& v = grmap[n];
+      ncellId = v.size();
+      if (ncellId == 0) continue;
+      cellId = v;
+      //    fmatrix_16x16 float_mat;
+      // for (auto i : mat[n] ) float_mat.push_back(float(*i)) ;
+      data->storeMatrix(mat[n]);
+      t->Fill();
+    }
   }
+
+  cout << "Done. Writing..." << endl;
   t->Write();
   f->Write();
   f->Close();
@@ -121,26 +125,33 @@ void matrix_cal(const char* inputFilename,
   cout << "file for calibration:" << inputFilename << endl;
   fChain.Add(inputFilename);
 
+  vector<int> crystalCat(8736, 0);
+  const int mapmax = 252;
+  vector< vector<int> >grmap(mapmax);
+  fillCrystalCat(crystalCat, grmap);
+
   Int_t           nhits;
   using int_31 = int[31];
   vector<int_31> hitA(8736);
+  vector<Int_t> cellId(8736);
   TBranch*        b_nhits;
   TBranch*        b_hitA;
+  TBranch*        b_cellId;
+
+
 
   fChain.SetBranchAddress("nhits", &nhits, &b_nhits);
   fChain.SetBranchAddress("hitA", hitA.data(), &b_hitA);
+  fChain.SetBranchAddress("cellID", cellId.data(), &b_cellId);
 
-  const int mapmax = 252;
 
   vector<matrix_16x16> XiXj(252), covM(252), invcovM(252);
   memset(XiXj.data(), 0., sizeof(matrix_16x16) * XiXj.size());
 
-  vector<double> mu;
-  vector<int> N(mapmax, 0);
-  vector<int> crystalCat(8736, 0);
-  vector< vector<int> >grmap(252);
+  vector<vector_16> mu(grmap.size());
+  memset(mu.data(), 0., sizeof(vector_16) * mu.size());
+  vector<int> N(grmap.size(), 0);
 
-  fillCrystalCat(crystalCat, grmap);
 
   int nevent = fChain.GetEntries();
   for (Int_t i = 0; i < nevent; i++) {
@@ -148,41 +159,58 @@ void matrix_cal(const char* inputFilename,
     if (i % 100 == 0) cout << " nevent=" << i << endl;
 
     for (int ic = 0; ic < nhits; ic++) {
-      double& mu_ref = mu[crystalCat[ic]];
-      matrix_16x16& XiXj_ref = XiXj[crystalCat[ic]];
+
+      int icell = cellId[ic];
+      //      cout << "cat: " << crystalCat[icell]  << " cid: " << icell << endl;
+      vector_16& mu_ref = mu[crystalCat[icell]];
+
+      matrix_16x16& XiXj_ref = XiXj[crystalCat[icell]];
       vector<double> Y(16, 0);
-      double sum = 0;
+      //      double sum = 0;
       for (int j = 0; j < 16; j++) {
+        //cout << hitA[ic][j] << endl;
         Y[0] += hitA[ic][j];
-        sum += hitA[ic][j];
       } // end of loop on first 16 adc channels
       Y[0] /= 16;
+      mu_ref[0] += Y[0];
       for (int j = 16; j < 31; j++) {
         Y[j - 15] = hitA[ic][j];
-        sum += hitA[ic][j];
+        mu_ref[j - 15] += hitA[ic][j];
       }// end of loop on the 16-30 adc channels
 
       for (int i = 0; i < 31; i++)
         for (int j = 0; j < 31; j++)
           XiXj_ref[i][j] += Y[i] * Y[j];
 
-      mu_ref += sum / 31;
-      N[crystalCat[ic]] ++;
+      // cout << "average before = " << mu_ref << endl;
+
+      N[crystalCat[icell]] ++;
+      // cout << "average = " << mu_ref << " N: "<< N[crystalCat[icell]] <<endl;
     } // end of loop on crystals
   } // end of loop on root entries
 
 
   for (size_t icat = 0; icat < grmap.size(); icat++) {
-    for (int i = 0; i < 31; i++)
-      for (int j = 0; j < 31; j++)
-        covM[icat][i][j] = (XiXj[icat][i][j] - mu[icat] * mu[icat] / N[icat]) / N[icat] ;
+    cout << "cat: " << icat << "N : " << N[icat] << endl;
+    if (N[icat] > 50) {
+      for (int i = 0; i < 31; i++)
+        for (int j = 0; j < 31; j++) {
+          covM[icat][i][j] = (XiXj[icat][i][j] - mu[icat][i] * mu[icat][j] / N[icat]) / N[icat] ;
+          cout << "i: " << i << " j: " << j
+               << "mu_j: " << mu[icat][j] / N[icat]
+               << " Xij: " << XiXj[icat][i][j] / N[icat]
+               << " cov: " << covM[icat][i][j]
+               << endl;
 
-    int dims = 16;
-    double dec = 0;
 
-    sim(& covM[icat][0][0] , &dims, & invcovM[icat][0][0] , &dec);
+        }
+      int dims = 16;
+      double dec = 0;
+
+      sim(& covM[icat][0][0] , &dims, & invcovM[icat][0][0] , &dec);
+    }
   }
-  writeOutput(outputFilename, invcovM, grmap);
+  writeOutput(outputFilename, invcovM, grmap, N);
 }
 
 

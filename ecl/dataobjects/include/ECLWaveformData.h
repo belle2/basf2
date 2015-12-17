@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <vector>
+#include <utility>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -40,6 +41,12 @@ namespace Belle2 {
       return m_matrixElement[i];
     }
 
+    /** Getter method for independent matrix element */
+    float getMatrixElement(size_t i, size_t j) const
+    {
+      if (i < j) std::swap(i, j);
+      return m_matrixElement[ i * (i + 1) / 2 + j];
+    }
     /** Getter method for all matrix as one dimentional array */
 
     void getArray(float WF[136]) const  {for (int i = 0; i < 136; i++) { WF[i] = (float) m_matrixElement[i];}   }

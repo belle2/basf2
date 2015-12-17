@@ -44,7 +44,7 @@ namespace Belle2 {
 
   protected:
     /** output root file name (given as Module parameter) */
-    std::string m_dataOutFileName;
+    std::string m_dataOutFileName, m_dspArrayName, m_digiArrayName;
 
     /** Root tree and file for saving the output */
     TTree* m_tree;

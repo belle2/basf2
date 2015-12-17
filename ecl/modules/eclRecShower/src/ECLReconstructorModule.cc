@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen, Vishal                                      *
+ * Contributors: Poyuan Chen, Vishal, Torben Ferber                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <ecl/modules/eclRecShower/ECLReconstructorModule.h>
-#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
 
@@ -54,14 +54,14 @@ using namespace ECL;
 //-----------------------------------------------------------------
 REG_MODULE(ECLReconstructor)
 REG_MODULE(ECLReconstructorPureCsI)
+
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
-
 ECLReconstructorModule::ECLReconstructorModule() : Module()
 {
   //Set module properties
-  setDescription("Creates ECLShower from ECLDigi and ECLCluster from ECLShower and Relations among them.");
+  setDescription("Creates ECLShower from ECLCalDigit and ECLCluster from ECLShower and Relations among them.");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -80,17 +80,18 @@ void ECLReconstructorModule::initialize()
   m_timeCPU = clock() * Unit::us;
 
   // ECL relevant objects.
-
   StoreArray<ECLHitAssignment> eclHitAssignments(eclHitAssignmentArrayName());
   StoreArray<ECLShower> eclShowers(eclShowerArrayName());
   StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
 
+  // Register them in the datastore
   eclHitAssignments.registerInDataStore();
   eclShowers.registerInDataStore();
   eclClusters.registerInDataStore();
   eclClusters.registerRelationTo(eclShowers);
 
-  ReadCorrection(); // read correction accounting shower leakage to get unbiased photon energy
+  // Read correction accounting shower leakage to get unbiased photon energy
+  ReadCorrection();
 
   string tmpCorrectionsFileName;
   if (EclConfiguration::get().background())
@@ -145,9 +146,9 @@ void ECLReconstructorModule::beginRun()
 void ECLReconstructorModule::event()
 {
   // Input Array
-  StoreArray<ECLDigit> eclDigiArray(eclDigitArrayName());
-  if (!eclDigiArray) {
-    B2DEBUG(100, "ECLDigit in empty in event " << m_nEvent);
+  StoreArray<ECLCalDigit> eclCalDigitArray(eclCalDigitArrayName());
+  if (!eclCalDigitArray) {
+    B2DEBUG(100, "ECLCalDigit in empty in event " << m_nEvent);
     return;
   }
   // Output Arrays
@@ -160,14 +161,18 @@ void ECLReconstructorModule::event()
   TRecEclCF& cf = TRecEclCF::Instance();
   cf.Clear();
 
-  for (const auto& aECLDigi : eclDigiArray) {
-    const double FitEnergy = (aECLDigi.getAmp()) / 20000.; // ADC count to GeV
+  // Loop over all ECLCalDigits and add them to the reclib cluster finder
+  for (const auto& aECLCalDigi : eclCalDigitArray) {
+    const double FitEnergy = (aECLCalDigi.getEnergy());
+
     //float FitTime = (1520 - aECLDigi->getTimeFit())*24.*12/508/(3072/2) ;
     //in us -> obsolete, for record. 20150529 KM.
 
-    const int cId = (aECLDigi.getCellId() - 1);
-    if (FitEnergy < 0.) {continue;}
-    // Register hit to cluster finder, cf.
+    const int cId = (aECLCalDigi.getCellId() - 1);
+
+    if (FitEnergy < 0.) {continue;} //skip negative energy values
+
+    // Register hit to cluster finder (cf)
     cf.Accumulate(m_nEvent, FitEnergy, cId);
   }
 
@@ -179,6 +184,7 @@ void ECLReconstructorModule::event()
 
   // Loop over Connected Region (CR).
   for (const auto& cr : cf.CRs()) {
+
     // Each Shower is pointed from the CR.
     for (const auto& shower : cr.Showers()) {
       TEclCFShower iSh = shower.second;
@@ -199,10 +205,10 @@ void ECLReconstructorModule::event()
 
         // From ECLDigit information, the highest energy crystal is found.
         // To speed up, Mapping to be used, by Vishal
-        for (const auto& aECLDigi : eclDigiArray) {
-          if (aECLDigi.getCellId() != (iHA->Id() + 1)) continue;
-          const double v_FitEnergy    = (aECLDigi.getAmp()) / 20000.;
-          const double v_FitTime      =  aECLDigi.getTimeFit();
+        for (const auto& aECLCalDigi : eclCalDigitArray) {
+          if (aECLCalDigi.getCellId() != (iHA->Id() + 1)) continue;
+          const double v_FitEnergy    = aECLCalDigi.getEnergy(); //TF
+          const double v_FitTime      = aECLCalDigi.getTime(); //TF
           // If the crystal has highest energy, keep its information.
           if (v_HiEnergy < v_FitEnergy) {
             v_HiEnergy = v_FitEnergy;

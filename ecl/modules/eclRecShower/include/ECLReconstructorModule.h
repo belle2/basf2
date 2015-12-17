@@ -66,7 +66,7 @@ namespace Belle2 {
       /** Event number */
       int    m_nEvent;
 
-      /** function of sruare */
+      /** function of square */
       double squ(double x) { return x * x; }
 
       /**calculate error of Energy with Energy  */
@@ -128,8 +128,8 @@ namespace Belle2 {
       { return "ECLShowers" ; }
       virtual const char* eclClusterArrayName() const
       { return "ECLClusters"; }
-      virtual const char* eclDigitArrayName() const
-      { return "ECLDigits" ; }
+      virtual const char* eclCalDigitArrayName() const
+      { return "ECLCalDigits" ; }
     };
 
     class ECLReconstructorPureCsIModule : public ECLReconstructorModule {
@@ -140,8 +140,8 @@ namespace Belle2 {
       { return "ECLShowersPureCsI" ; }
       virtual const char* eclClusterArrayName() const override
       { return "ECLClustersPureCsI"; }
-      virtual const char* eclDigitArrayName() const override
-      { return "ECLDigitsPureCsI" ; }
+      virtual const char* eclCalDigitArrayName() const override
+      { return "ECLCalDigitsPureCsI" ; }
     };
 
   }//ECL

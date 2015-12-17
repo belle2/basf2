@@ -18,7 +18,7 @@
 
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLHitAssignment.h>
 
@@ -72,11 +72,11 @@ void MCMatcherECLClustersModule::initialize()
   m_timeCPU = clock() * Unit::us;
   StoreArray<MCParticle> mcParticles;
   StoreArray<ECLHit> eclHits;
-  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLCalDigit> eclCalDigits;
   StoreArray<ECLShower> eclShowers;
   StoreArray<ECLCluster> eclClusters;
   mcParticles.registerRelationTo(eclHits);
-  eclDigits.registerRelationTo(mcParticles);
+  eclCalDigits.registerRelationTo(mcParticles);
   eclShowers.registerRelationTo(mcParticles);
   eclClusters.registerRelationTo(mcParticles);
   StoreArray<ECLSimHit> ECLSimHitArray;
@@ -91,10 +91,10 @@ void MCMatcherECLClustersModule::event()
 {
   StoreArray<MCParticle> mcParticles;
   StoreArray<ECLHit> eclHits;
-  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLCalDigit> eclCalDigits;
   StoreArray<ECLSimHit> eclSimHits;
   RelationArray mcParticleToECLHitRelationArray(mcParticles, eclHits);
-  RelationArray eclDigitToMCParticleRelationArray(eclDigits, mcParticles);
+  RelationArray eclCalDigitToMCParticleRelationArray(eclCalDigits, mcParticles);
   RelationArray eclHitToSimHitRelationArray(eclHits, eclSimHits);
   RelationArray mcParticleToECLSimHitRelationArray(mcParticles, eclSimHits);
 
@@ -106,13 +106,15 @@ void MCMatcherECLClustersModule::event()
   std::fill_n(DigiIndex, 8736, -1);
   std::fill_n(DigiOldTrack, 8736, -1);
 
-  for (const auto& eclDigit : eclDigits) {
-    float fitEnergy    = (eclDigit.getAmp()) / 20000.; //ADC count to GeV
-    int cId            = (eclDigit.getCellId() - 1);
-    if (fitEnergy < 0.) {
+  for (const auto& eclCalDigit : eclCalDigits) {
+//    float fitEnergy    = (eclDigit.getAmp()) / 20000.; //ADC count to GeV
+    float calEnergy    = eclCalDigit.getEnergy(); // Calibrated Energy in GeV
+    int cId            = (eclCalDigit.getCellId() - 1);
+
+    if (calEnergy < 0.) {
       continue;
     }
-    DigiIndex[cId] = eclDigit.getArrayIndex();
+    DigiIndex[cId] = eclCalDigit.getArrayIndex();
   }
 
   PrimaryTrackMap eclPrimaryMap;  // map<int, int>
@@ -146,7 +148,7 @@ void MCMatcherECLClustersModule::event()
       if (aECLHit->getBackgroundTag() != 0) continue;
 
       if (DigiIndex[hitCellId] != -1 && DigiOldTrack[hitCellId] != PrimaryIndex) {
-        eclDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
+        eclCalDigitToMCParticleRelationArray.add(DigiIndex[hitCellId], PrimaryIndex);
         DigiOldTrack[hitCellId] = PrimaryIndex;
       }
     }//for (int hit = 0

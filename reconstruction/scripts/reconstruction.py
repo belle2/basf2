@@ -26,8 +26,12 @@ def add_posttracking_reconstruction(path, components=None):
         arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 
-    # ECL reconstruction
+    # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
+
+        # digit calibration
+        ecl_digit_calibration = register_module('ECLDigitCalibrator')
+        path.add_module(ecl_digit_calibration)
 
         # shower reconstruction
         ecl_shower_rec = register_module('ECLReconstructor')

@@ -157,8 +157,8 @@ class Chi2Test(ComparisonBase):
         """
         if not self.correct_types():
             raise ObjectsNotSupported(
-                "Comparison of {} (Type {}) with {} (Type {}) not supported." +
-                "Please contact Thomas.Hauth@kit.edu if you need this supported.".format(
+                """Comparison of {} (Type {}) with {} (Type {}) not supported.
+Please contact Thomas.Hauth@kit.edu if you need this supported.""".format(
                     self.objectA.GetName(),
                     self.objectA.ClassName(),
                     self.objectB.GetName(),

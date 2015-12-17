@@ -60,8 +60,7 @@ namespace Belle2 {
     if (paramId > maxPID) {
       return label();
     }
-    gid = gid - pid + paramId;
-    pid = paramId;
+    construct(eid, paramId);
     return label();
   }
   VxdID GlobalLabel::getVxdID() const

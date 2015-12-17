@@ -55,6 +55,14 @@ namespace Belle2 {
       /** terminate.*/
       virtual void terminate();
 
+      /** get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
+      virtual const char* eclDigitArrayName() const
+      { return "ECLDigits" ; }
+
+      /** get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
+      virtual const char* eclCalDigitArrayName() const
+      { return "ECLCalDigits" ; }
+
     protected:
 
     private:
@@ -74,6 +82,19 @@ namespace Belle2 {
       void prepareCalibrationConstants(); //< reads calibration constants, performs checks, put them into a vector
 
     };
+
+    // Class derived from ECLDigitCalibratorModule, only difference are the ECLDigit and ECLCalDigit names
+    class ECLDigitCalibratorPureCsIModule : public ECLDigitCalibratorModule {
+    public:
+      /** get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
+      virtual const char* eclDigitArrayName() const override
+      { return "ECLDigitsPureCsI" ; }
+
+      /** get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
+      virtual const char* eclCalDigitArrayName() const override
+      { return "ECLCalDigitsPureCsI" ; }
+    };
+
   } // end ECL namespace
 } // end Belle2 namespace
 

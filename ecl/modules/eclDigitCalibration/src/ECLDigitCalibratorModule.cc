@@ -42,9 +42,10 @@ using namespace Belle2;
 using namespace ECL;
 
 //-----------------------------------------------------------------
-//                 Register the Module
+//                 Register the Modules
 //-----------------------------------------------------------------
 REG_MODULE(ECLDigitCalibrator)
+REG_MODULE(ECLDigitCalibratorPureCsI)
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -71,8 +72,8 @@ ECLDigitCalibratorModule::~ECLDigitCalibratorModule()
 void ECLDigitCalibratorModule::initialize()
 {
   // ECL dataobjects
-  StoreArray<ECLDigit> eclDigits;
-  StoreArray<ECLCalDigit> eclCalDigits;
+  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
+  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
   // Register Digits, CalDigits and their relation in datastore
   eclDigits.registerInDataStore();
@@ -101,10 +102,10 @@ void ECLDigitCalibratorModule::beginRun()
 void ECLDigitCalibratorModule::event()
 {
   // Input Array(s)
-  StoreArray<ECLDigit> eclDigits;
+  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
 
   // Output Array(s)
-  StoreArray<ECLCalDigit> eclCalDigits;
+  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
   // Loop over the input array
   for (auto& aECLDigit : eclDigits) {
@@ -170,7 +171,6 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
   const float c1  = m_calibrationC1.at(cellid);
   double calenergy = c0 * (1.0 + c1 * std::log(static_cast<double>(amplitude))) * static_cast<double>(amplitude);
 
-
   // get the correct sign back
   calenergy *= sign;
 
@@ -194,9 +194,9 @@ void ECLDigitCalibratorModule::prepareCalibrationConstants()
   int nCalibrationLowEnergy = 0;
 
   for (const ECLCalibrationDigit& calLow : m_calibrationLow) {
-    const int cellid     = calLow.getCellID();
+    const int cellid      = calLow.getCellID();
     const float amplitude = calLow.getAmplitude();
-    const float energy   = calLow.getEnergy();
+    const float energy    = calLow.getEnergy();
 
     if (cellid < 1 || cellid > c_nCrystals) { // check if the cellid is withing range
       B2ERROR("[ECLDigitCalibratorModule::prepareCalibrationConstants()], low energy: Wrong cell id [0.." << c_nCrystals << "]: " <<
@@ -223,9 +223,9 @@ void ECLDigitCalibratorModule::prepareCalibrationConstants()
   int nCalibrationHighEnergy = 0;
 
   for (const ECLCalibrationDigit& calHigh : m_calibrationHigh) {
-    const int cellid     = calHigh.getCellID();
+    const int cellid      = calHigh.getCellID();
     const float amplitude = calHigh.getAmplitude();
-    const float energy   = calHigh.getEnergy();
+    const float energy    = calHigh.getEnergy();
 
     if (cellid < 1 || cellid > c_nCrystals) { // check if the cellid is withing range
       B2ERROR("[ECLDigitCalibratorModule::prepareCalibrationConstants()], high energy: Wrong cell id [0.." << c_nCrystals << "]: " <<

@@ -115,7 +115,7 @@ void ConditionsService::parse_return(std::string temp)
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
-    B2ERROR("corrupt return from REST call: " << temp.c_str());
+    B2WARNING("corrupt return from REST call: " << temp.c_str());
   }
 
 
@@ -146,7 +146,7 @@ void ConditionsService::parse_payloads(std::string temp)
 
   XMLDocPointer_t xmldoc = xml->ParseString(temp.c_str());
   if (xmldoc == 0) {
-    B2ERROR("corrupt return from REST call: " << temp.c_str());
+    B2WARNING("corrupt return from REST call: " << temp.c_str());
   }
 
   // take access to main node
@@ -384,7 +384,7 @@ std::string ConditionsService::getPayloadFileURL(std::string packageName, std::s
 {
 
   if (!payloadExists(packageName + moduleName)) {
-    B2FATAL("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
+    B2ERROR("Unable to find conditions payload for requested package " << packageName << "\t and module " << moduleName);
   }
   std::string remote_file = m_payloads[packageName + moduleName].logicalFileName;
   std::string local_file = m_FILEbase + remote_file; // This will work for local files and CVMFS.

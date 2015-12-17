@@ -33,37 +33,69 @@ using namespace std;
 
 
 ////////////////////////////////////////////////////////////
+
+int getModuleCNumber() {
+  // Helper function for next two functions to return correct scrod mappings for each module.
+  // Sadly a "magic number" at present - Change to the (Construction) Number of the Module in question.
+  return 3;
+}
+
+
 short map_Scrod_to_position(unsigned int Scrod){
-  switch(Scrod){
-    //LM: magic numbers! replace with correct mapping these are fine for M01
-    case 14: return(0); break;
-    case 15: return(1); break;
-    case 16: return(2); break;
-    case 13: return(3); break;
-    case 42: return(0); break;
-    case 26: return(1); break;
-    case 30: return(2); break;
-    case 25: return(3); break;
-    default:  printf("Error! No Scrod %d in module!\n",Scrod); return -1;
-  }
+
+  //LM: magic numbers! 
+  
+  // ModuleC01  
+  if (14 == Scrod) {return 0;}
+  if (15 == Scrod) {return 1;}
+  if (16 == Scrod) {return 2;}
+  if (13 == Scrod) {return 3;}
+
+  // ModuleC03  
+  if (42 == Scrod) {return 0;}
+  if (26 == Scrod) {return 1;}
+  if (30 == Scrod) {return 2;}
+  if (25 == Scrod) {return 3;}
+
+  // ModuleC04  
+  if (45 == Scrod) {return 0;}
+  if (50 == Scrod) {return 1;}
+  if (48 == Scrod) {return 2;}
+  if (46 == Scrod) {return 3;}
+
+  std::cout << "Error! No Scrod with ID " << Scrod << " in module " << getModuleCNumber() << "!" << std::endl; 
+  return -1;
+  
 }
 
 
 short map_position_to_Scrod(unsigned int pos){
-  switch(pos){
-    //LM: magic numbers! replace with correct mapping these are fine for M01
-/*
-    case 0: return(14); break;
-    case 1: return(15); break;
-    case 2: return(16); break;
-    case 3: return(13); break;
-*/
-    case 0: return(42); break;
-    case 1: return(26); break;
-    case 2: return(30); break;
-    case 3: return(25); break;
-    default:  printf("Error! Wrong logical scrod position in module!\n"); exit(1);
+
+  //LM: magic numbers!
+  if (1 == getModuleCNumber()) {
+    if (0 == pos) {return 14;}
+    if (1 == pos) {return 15;}
+    if (2 == pos) {return 16;}
+    if (3 == pos) {return 13;}
   }
+
+  if (3 == getModuleCNumber()) {
+    if (0 == pos) {return 42;}
+    if (1 == pos) {return 26;}
+    if (2 == pos) {return 30;}
+    if (3 == pos) {return 25;}
+  }  
+  
+  if (4 == getModuleCNumber()) {
+    if (0 == pos) {return 45;}
+    if (1 == pos) {return 50;}
+    if (2 == pos) {return 48;}
+    if (3 == pos) {return 46;}
+  }
+
+  std::cout << "Error in map_position_to_Scrod: boardstack position must be an integer betweeen 0 and 3 inclusive." << std::endl; 
+  exit(1);
+
 }
 
 

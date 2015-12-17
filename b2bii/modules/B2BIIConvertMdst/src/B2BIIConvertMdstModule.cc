@@ -56,6 +56,8 @@
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
 
+#include <cmath>
+#include <cfloat>
 using namespace Belle2;
 
 const Const::ChargedStable B2BIIConvertMdstModule::c_belleHyp_to_chargedStable[c_nHyp] = { Const::electron, Const::muon, Const::pion, Const::kaon, Const::proton };
@@ -1272,11 +1274,15 @@ void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float
   unsigned int size = 5;
   for (unsigned int i = 0; i < size; i++) {
     for (unsigned int j = 0; j < size; j++) {
-      error5x5[i][j] = Ea[i][j];
       if (i == 2)
         error5x5[i][j] *= KAPPA2OMEGA;
       if (j == 2)
         error5x5[i][j] *= KAPPA2OMEGA;
+
+      if (std::isinf(error5x5[i][j])) {
+        B2INFO("Helix covariance matrix element found to be infinite. Setting value to DBL_MAX/2.0.");
+        error5x5[i][j] = DBL_MAX / 2.0;
+      }
     }
   }
 }

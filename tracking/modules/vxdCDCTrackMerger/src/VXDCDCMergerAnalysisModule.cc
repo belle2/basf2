@@ -342,7 +342,7 @@ void VXDCDCMergerAnalysisModule::event()
         continue;
       }
       cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
-      std::cout << cdc_mcp_index << std::endl;
+      //std::cout << cdc_mcp_index << std::endl;
 
       const genfit::TrackCand* vxd_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(VXDGFTracks[jtrack],
                                                 m_VXDGFTrackCandsColName);

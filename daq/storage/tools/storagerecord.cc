@@ -260,6 +260,7 @@ int main(int argc, char** argv)
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
+  bool newrun = false;
   g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
   FileHandler& file(*g_file);
   SharedEventBuffer::Header iheader;
@@ -269,7 +270,8 @@ int main(int argc, char** argv)
     if (use_info) info.reportRunning();
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
-    if (expno < iheader.expno || runno < iheader.runno) {
+    if (!newrun || expno < iheader.expno || runno < iheader.runno) {
+      newrun = true;
       expno = iheader.expno;
       runno = iheader.runno;
       if (use_info) {

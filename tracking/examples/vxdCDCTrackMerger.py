@@ -94,12 +94,12 @@ si_mctrackfinder_param = {
     'UseCDCHits': 0,
     'UseSVDHits': 1,
     'UsePXDHits': 0,
-    'GFTrackCandidatesColName': 'VXDTrackCands'
+    'GFTrackCandidatesColName': 'VXDGFTrackCands'
 }
 si_mctrackfinder.param(si_mctrackfinder_param)
 
 vxd_trackfinder = register_module('VXDTF')
-vxd_trackfinder.param('GFTrackCandidatesColName', 'VXDTrackCands')
+vxd_trackfinder.param('GFTrackCandidatesColName', 'VXDGFTrackCands')
 # if components is not None and 'PXD' not in components:
 #    vxd_trackfinder.param('sectorSetup',
 #                          ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
@@ -121,7 +121,7 @@ cdc_mctrackfinder_param = {
     'UseCDCHits': 1,
     'UseSVDHits': 0,
     'UsePXDHits': 0,
-    'GFTrackCandidatesColName': 'CDCTrackCands',
+    'GFTrackCandidatesColName': 'CDCGFTrackCands',
 }
 # 'Force2DSVDClusters': 1,
 # 'forceExisting2DClusters4SVD': 0
@@ -129,7 +129,7 @@ cdc_mctrackfinder.param(cdc_mctrackfinder_param)
 
 cdc_trackfinder = register_module('Trasan')
 cdc_trackfinder.logging.log_level = LogLevel.WARNING
-cdc_trackfinder_param = {'GFTrackCandidatesColName': 'CDCTrackCands'}  # 'UseCDCHits': 1,
+cdc_trackfinder_param = {'GFTrackCandidatesColName': 'CDCGFTrackCands'}  # 'UseCDCHits': 1,
 # 'UseSVDHits': 0,
 # 'UsePXDHits': 0,
 # 'Force2DSVDClusters': 1,
@@ -137,9 +137,9 @@ cdc_trackfinder_param = {'GFTrackCandidatesColName': 'CDCTrackCands'}  # 'UseCDC
 cdc_trackfinder.param(cdc_trackfinder_param)
 
 cand_merger = register_module('TrackCandMerger')
-cand_merger_param = {'SiTrackCandidatesColName': 'VXDTrackCands',
-                     'CDCTrackCandidatesColName': 'CDCTrackCands',
-                     'TrackCandidatesCollection': 'TracksCand'}
+cand_merger_param = {'SiTrackCandidatesColName': 'VXDGFTrackCands',
+                     'CDCTrackCandidatesColName': 'CDCGFTrackCands',
+                     'TrackCandidatesCollection': 'GFTrackCands'}
 cand_merger.param(cand_merger_param)
 
 setupgen = register_module('SetupGenfitExtrapolation')
@@ -150,7 +150,7 @@ fitting_param = {  # ---    'FilterId': 1,
                    # 'MCParticlesColName': 'mcParticlesTruth',
                    # 'TracksColName': 'cdc_mcTracks',
                    # 'PDGCodes': [],
-    'GFTrackCandidatesColName': 'TracksCand',
+    'GFTrackCandidatesColName': 'GFTrackCands',
     'GFTracksColName': 'GFTracks',
     'NMaxIterations': 10,
     'ProbCut': 0.001,
@@ -161,10 +161,10 @@ fitting.param(fitting_param)
 
 track_splitter = register_module('GFTrackSplitter')
 track_splitter_param = {
-    'SiGFTracksColName': 'VXDTracks',
-    'CDCGFTracksColName': 'CDCTracks',
+    'SiGFTracksColName': 'VXDGFTracks',
+    'CDCGFTracksColName': 'CDCGFTracks',
     'GFTracksColName': 'GFTracks',
-    'storeTrackCandName': 'TracksCand',
+    'storeTrackCandName': 'GFTrackCands',
 }
 # 'CDCHitColName' :
 track_splitter.param(track_splitter_param)
@@ -173,11 +173,11 @@ track_splitter.param(track_splitter_param)
 # track merger
 vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
 trackMerger_param = {
-    'VXDGFTracksColName': 'VXDTracks',
-    'CDCGFTracksColName': 'CDCTracks',
-    'VXDGFTrackCandsColName': 'VXDTrackCands',
-    'CDCGFTrackCandsColName': 'CDCTrackCands',
-    #    'TrackCandColName': 'TracksCand',
+    'VXDGFTracksColName': 'VXDGFTracks',
+    'CDCGFTracksColName': 'CDCGFTracks',
+    'VXDGFTrackCandsColName': 'VXDGFTrackCands',
+    'CDCGFTrackCandsColName': 'CDCGFTrackCands',
+    #    'TrackCandColName': 'TrackCands',
     'relMatchedTracks': 'MatchedTracksIdx',
     'chi2_max': 100,
     'merge_radius': 2.0,
@@ -195,14 +195,14 @@ trackMergerAnalysis_param = {  # (in cm) use cdc inner wall
                                # default False
                                # 'MCParticlesColName': 'mcParticlesTruth',
                                #    'CDC_wall_radius': 16.25,
-    'VXDGFTracksColName': 'VXDTracks',
-    'CDCGFTracksColName': 'CDCTracks',
-    'VXDGFTrackCandsColName': 'VXDTrackCands',
-    'CDCGFTrackCandsColName': 'CDCTrackCands',
+    'VXDGFTracksColName': 'VXDGFTracks',
+    'CDCGFTracksColName': 'CDCGFTracks',
+    'VXDGFTrackCandsColName': 'VXDGFTrackCands',
+    'CDCGFTrackCandsColName': 'CDCGFTrackCands',
     # 'GFTracksColName': 'GFTracks',
-    # 'TrackCandColName': 'TracksCand',
+    # 'TrackCandColName': 'TrackCands',
     # 'UnMergedCands': 'UnMergedCand',
-    'root_output_filename': 'VXDCDCMergerSinglePartTruthFinder.root',
+    'root_output_filename': 'VXDCDCMergerAnalysis.root',
     #    'chi2_max': 100,
     #    'merge_radius': 2.0,
 }
@@ -251,7 +251,7 @@ mcparticleprinter.param('maxLevel', -1)
 
 # match the found track candidates with MCParticles
 # cdcmcmatching = register_module('CDCMCMatching')
-# param_cdcmcmatching = {'GFTrackCandidatesColName': 'CDCTracksCand'}
+# param_cdcmcmatching = {'GFTrackCandidatesColName': 'CDCTrackCands'}
 # cdcmcmatching.param(param_cdcmcmatching)
 
 mctf = register_module('TrackFinderMCTruth')
@@ -259,24 +259,24 @@ mctf.param('GFTrackCandidatesColName', 'MCGFTrackCands')
 
 matcher1 = register_module('MCTrackMatcher')
 # matcher1.param('MCGFTrackCandsColName','MCGFTrackCands')
-matcher1.param('PRGFTrackCandsColName', 'VXDTrackCands')
+matcher1.param('PRGFTrackCandsColName', 'VXDGFTrackCands')
 
 matcher2 = register_module('MCTrackMatcher')
 # matcher2.param('MCGFTrackCandsColName','MCGFTrackCands')
-matcher2.param('PRGFTrackCandsColName', 'CDCTrackCands')
+matcher2.param('PRGFTrackCandsColName', 'CDCGFTrackCands')
 
 VXDtrackFitter = register_module('GenFitter')
-VXDtrackFitter.param('GFTrackCandidatesColName', 'VXDTrackCands')
+VXDtrackFitter.param('GFTrackCandidatesColName', 'VXDGFTrackCands')
 VXDtrackFitter.param('BuildBelle2Tracks', False)
 VXDtrackFitter.param("PDGCodes", [211])
-VXDtrackFitter.param('GFTracksColName', 'VXDTracks')
+VXDtrackFitter.param('GFTracksColName', 'VXDGFTracks')
 VXDtrackFitter.set_name('VXD-only')
 
 CDCtrackFitter = register_module('GenFitter')
-CDCtrackFitter.param('GFTrackCandidatesColName', 'CDCTrackCands')
+CDCtrackFitter.param('GFTrackCandidatesColName', 'CDCGFTrackCands')
 CDCtrackFitter.param('BuildBelle2Tracks', False)
 CDCtrackFitter.param("PDGCodes", [211])
-CDCtrackFitter.param('GFTracksColName', 'CDCTracks')
+CDCtrackFitter.param('GFTracksColName', 'CDCGFTracks')
 CDCtrackFitter.set_name('CDC-only')
 
 # Create paths
@@ -300,13 +300,14 @@ main.add_module(mctf)
 main.add_module(matcher1)
 main.add_module(matcher2)
 # main.add_module(cand_merger)
-main.add_module(setupgen)
+# main.add_module(setupgen)
 # main.add_module(si_fitting)
 # main.add_module(fitting)
 # main.add_module(track_splitter)
-main.add_module(VXDtrackFitter)
-main.add_module(CDCtrackFitter)
-main.add_module(vxd_cdcTracksMerger)
+# main.add_module(VXDtrackFitter)
+# main.add_module(CDCtrackFitter)
+# main.add_module(vxd_cdcTracksMerger)
+add_reconstruction(main)
 main.add_module(vxd_cdcMergerAnalysis)
 # main.add_module(HighlighterModule())
 # main.add_module(display)

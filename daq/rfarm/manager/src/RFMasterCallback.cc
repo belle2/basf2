@@ -39,7 +39,7 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
   const std::string format = obj("system").getText("nsmdata");
   // 0. Register DqmServer
   if (obj.hasObject("dqmserver")) {
-    m_nodes.push_back(NSMNode(obj("dqmserver").getText("nodename")));
+    //m_nodes.push_back(NSMNode(obj("dqmserver").getText("nodename")));
   }
   // 1. Register distributor
   std::string nodename = obj("distributor").getText("nodename");
@@ -78,8 +78,10 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
        it != m_nodes.end(); it++) {
     NSMNode& node(*it);
     RCState s(node.getState());
-    std::string vname = StringUtil::form("node[%d].name", i++);
-    add(new NSMVHandlerText(vname, true, false,
+    std::string vname = StringUtil::form("node[%d]", i++);
+    add(new NSMVHandlerText(vname + ".rcstate", true, false, s.getLabel()));
+    add(new NSMVHandlerText(vname + ".rcconfig", true, false, rcconf));
+    add(new NSMVHandlerText(vname + ".name", true, false,
                             StringUtil::tolower(node.getName())));
     vname = StringUtil::tolower(node.getName());
     add(new NSMVHandlerText(vname + ".rcstate", true, false, s.getLabel()));
@@ -90,6 +92,17 @@ void RFMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
 void RFMasterCallback::setState(NSMNode& node, const RCState& state)
 {
   node.setState(state);
+  int i = 0;
+  for (NSMNodeList::iterator it = m_nodes.begin();
+       it != m_nodes.end(); it++) {
+    NSMNode& rnode(*it);
+    if (StringUtil::toupper(rnode.getName()) == StringUtil::toupper(node.getName())) {
+      std::string vname = StringUtil::form("node[%d].rcstate", i);
+      set(vname, state.getLabel());
+      break;
+    }
+    i++;
+  }
   std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
   set(vname, state.getLabel());
 }
@@ -254,9 +267,45 @@ void RFMasterCallback::abort() throw(RCHandlerException)
 
 void RFMasterCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
 {
-  if (m_callback != NULL) {
-    m_callback->setState(RCState::RUNNING_S);
+  for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+    NSMNode& node(*it);
+    if (node.getName().find("EVP") == std::string::npos) {
+      while (true) {
+        bool configured = true;
+        for (NSMNodeList::iterator it2 = m_nodes.begin();
+             it2 != it; it2++) {
+          if (it2->getState() != RCState::RUNNING_S)
+            configured = false;
+        }
+        if (configured) break;
+        try {
+          perform(NSMCommunicator::select(30));
+        } catch (const TimeoutException& e) {}
+      }
+    }
+    if (node.getState() != RCState::RUNNING_S) {
+      if (NSMCommunicator::send(NSMMessage(node, RFCommand::START))) {
+        setState(node, RCState::STARTING_TS);
+        LogFile::debug("%s >> STARTING", node.getName().c_str());
+      } else {
+        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+      }
+    } else {
+      LogFile::debug("%s is RUNNING", node.getName().c_str());
+    }
   }
+  while (true) {
+    bool configured = true;
+    for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
+      if (it->getState() != RCState::RUNNING_S) configured = false;
+    }
+    if (configured) break;
+    try {
+      perform(NSMCommunicator::select(30));
+    } catch (const TimeoutException& e) {}
+  }
+  if (m_callback != NULL)
+    m_callback->setState(RCState::RUNNING_S);
   RCCallback::setState(RCState::RUNNING_S);
 }
 

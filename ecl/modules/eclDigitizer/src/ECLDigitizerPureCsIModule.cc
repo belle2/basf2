@@ -59,6 +59,10 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
   addParam("adcTickFactor", m_tickFactor, "multiplication factor to get adc tick from trigger tick", 8);
   addParam("sigmaTrigger", m_sigmaTrigger, "Trigger resolution used", 0.020);
   addParam("elecNoise", m_elecNoise, "Electronics noise energy equivalent in MeV", 0.5);
+  /* photo statistics resolution measurement at LNF sigma = 55 % at 1 MeV
+     Csi(Tl) is 12%
+  */
+  addParam("photostatresolution", m_photostatresolution, "sigma for 1 MeV energy deposit", 0.55);
   addParam("Debug", m_debug, "debug mode on (default off)", false);
   addParam("debugtrgtime", m_testtrg, "set fixed trigger time for testing purposes", 0);
   addParam("debugsigtimeshift", m_testsig, "shift signal arrival time for testing purposes (in microsec)", 0.);
@@ -119,8 +123,10 @@ void ECLDigitizerPureCsIModule::event()
       double hitTime    = eclHit.getTimeAve() / Unit::us;
       if (m_debug)
         m_adc[j].AddHit(hitE, hitTime + m_testsig, m_ss[m_tbl[j].iss]);
-      else
-        m_adc[j].AddHit(hitE, hitTime + deltaT, m_ss[m_tbl[j].iss]);
+      else {
+        hitE = gRandom->Gaus(hitE, m_photostatresolution * sqrt(hitE));
+        m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
+      }
       hitmap[j].push_back(&eclHit);
     }
   }
@@ -237,7 +243,6 @@ void ECLDigitizerPureCsIModule::readDSPDB()
 
   float testM[31][31];
   m_noise[0].getMatrix(testM);
-
 }
 
 void ECLDigitizerPureCsIModule::mapGeometry()

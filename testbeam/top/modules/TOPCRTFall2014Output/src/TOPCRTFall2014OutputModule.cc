@@ -32,6 +32,8 @@
 #include <testbeam/top/dataobjects/TOPTBDigit.h>
 
 #include <TRandom3.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -84,9 +86,7 @@ namespace Belle2 {
       return;
     }
 
-    char filename[m_outputFileName.size() + 1];
-    strcpy(filename, m_outputFileName.c_str());
-    m_file = new TFile(filename, "RECREATE");
+    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_treeTop = new TTree("top", "top data tree (simulation)");
 
     m_treeTop->Branch("runNum", &(m_top.runNum), "runNum/I");
@@ -141,7 +141,6 @@ namespace Belle2 {
 
   void TOPCRTFall2014OutputModule::event()
   {
-    B2WARNING("In TOPCRTFall2014OutputModule::event()");
 
     m_top.clear();
     m_topgp->setBasfUnits();
@@ -151,8 +150,10 @@ namespace Belle2 {
     m_top.eventNum = evtMetaData->getEvent();
     m_top.eventflag = 1;
 
-    float TDC[m_numChannels];
-    for (int i = 0; i < m_numChannels; i++) {TDC[i] = m_tdcOverflow;}
+    std::vector<float> TDC;
+    TDC.reserve(m_numChannels);
+
+    for (int i = 0; i < m_numChannels; ++i) {TDC.at(i) = m_tdcOverflow;}
 
     StoreArray<TOPDigit> topDigits;
     int nEntries(topDigits.getEntries());

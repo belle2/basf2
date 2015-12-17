@@ -85,8 +85,12 @@ void VXDCDCMergerAnalysisModule::initialize()
   //StoreArray<genfit::TrackCand>::registerPersistent(m_UnMergedCands);
   StoreArray<genfit::Track>::required(m_VXDGFTracksColName);
   StoreArray<genfit::Track>::required(m_CDCGFTracksColName);
+  StoreArray<genfit::TrackCand>::required(m_VXDGFTrackCandsColName);
   StoreArray<genfit::TrackCand>::required(m_CDCGFTrackCandsColName);
-  StoreArray<genfit::TrackCand>::required(m_CDCGFTrackCandsColName);
+
+  //m_VXDGFTrackCandsColName.requiredRelationTo(m_VXDGFTracksColName);
+  //m_CDCGFTrackCandsColName.requiredRelationTo(m_CDCGFTracksColName);
+  //StoreArray<MCParticle>
 
   //m_CDC_wall_radius = 16.25;
   m_total_pairs         = 0;
@@ -215,7 +219,11 @@ void VXDCDCMergerAnalysisModule::event()
   //StoreArray<genfit::TrackCand> UnMergedCands(m_UnMergedCands);
   //const StoreArray<genfit::TrackCand> TrackCand(m_TrackCandColName);
 
-  RelationArray CDCToVXDTracks(CDCGFTracks, VXDGFTracks);
+  //StoreArray<MCParticle> mcParticles;
+  //RelationArray ECLClusterToMC(clusters, mcParticles);
+  RelationArray CDCToVXDTracks(CDCGFTracks, VXDGFTracks);;
+  //RelationArray MCToVXDTrackCands(mcParticles, VXDGFTrackCands);;
+  //RelationArray MCToCDCTrackCands(mcParticles, CDCGFTrackCands);;
 
   TVector3 position(0., 0., 0.);
   TVector3 momentum(0., 0., 1.);
@@ -312,16 +320,11 @@ void VXDCDCMergerAnalysisModule::event()
 
       //Check if tracks were matched or recovered
       for (int itr = 0; itr < CDCToVXDTracks.getEntries(); itr++) {
-        //if(CDCToVXDTracks.getEntries){
         cdc_match = CDCToVXDTracks[itr].getFromIndex();
-        //if(cdc_match==itrack)
-        //  cdc_m=1;
         vxd_track = CDCToVXDTracks[itr].getToIndex();
         if ((cdc_match == itrack) && (vxd_track == jtrack)) {
           match_weight = CDCToVXDTracks[itr].getWeight();
           vxd_match = vxd_track;
-          //std::cout << "Matched pair: " << cdc_match << " from CDC, and " << vxd_match << " from VXD" << std::endl;
-          //}
           if (match_weight == 1) {
             matched_track = 1;
           }
@@ -331,21 +334,20 @@ void VXDCDCMergerAnalysisModule::event()
         }
       }
 
-      //RECOVER MC INFO (We have to loop on the original list (not splitted) of GFTracks)
-      //Recover track candidate index
-      /////TENTATIVE MODS
-      //genfit::Track* GFTrk = GFTracks[itrack];
-      //const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(GFTrk, m_TrackCandColName);
+      //RECOVER MC INFO
       const genfit::TrackCand* cdc_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(CDCGFTracks[itrack],
                                                 m_CDCGFTrackCandsColName);
       if (cdc_TrkCandPtr == NULL) {
+        //std::cout << "No CDC cand" << std::endl;
         continue;
       }
       cdc_mcp_index = cdc_TrkCandPtr->getMcTrackId();
-      //GFTrk = GFTracks[jtrack + nCDCTracks];
+      std::cout << cdc_mcp_index << std::endl;
+
       const genfit::TrackCand* vxd_TrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>(VXDGFTracks[jtrack],
                                                 m_VXDGFTrackCandsColName);
       if (vxd_TrkCandPtr == NULL) {
+        //std::cout << "No VXD cand" << std::endl;
         continue;
       }
       vxd_mcp_index = vxd_TrkCandPtr->getMcTrackId();
@@ -414,15 +416,12 @@ void VXDCDCMergerAnalysisModule::event()
         else
           m_right_match_vec->push_back(0);
       }
-      //std::cout << "Match: " << vxd_match << " , Truth: " << vxd_truth << std::endl;
     }
 
     if (((matched_track == 0) && (recovered_track == 0)) && (truth_matched == 1)) {
       m_match_vec->push_back(0);
       m_reco_vec->push_back(0);
       m_right_match_vec->push_back(0);
-      //const genfit::TrackCand* UnMergedTrkCandPtr = DataStore::getRelatedToObj<genfit::TrackCand>((GFTracks[itrack]), m_TrackCandColName);
-      //UnMergedCands.appendNew(*UnMergedTrkCandPtr);
     }
 
     if (((matched_track == 1) || (recovered_track == 1)) && (truth_matched == 0)) {

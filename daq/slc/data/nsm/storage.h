@@ -7,7 +7,13 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int storage_revision = 7;
+  const int storage_revision = 8;
+  struct eb_stat {
+    uint32 event;
+    float byte;
+    uint32 connection;
+    uint32 nqueue;
+  };
 
   struct storage {
     uint32 stime;
@@ -46,15 +52,8 @@ namespace Belle2 {
       float flowrate_out;
       float reserved_f[2];
     } node[8];
-    struct eb {
-      uint32 event;
-      uint32 byte;
-      uint32 nqueue;
-      uint32 ip;
-      uint32 port;
-      float flowrate;
-      float evtrate;
-    } eb[4];
+    struct eb_stat eb2in[2];
+    struct eb_stat eb2out;
   };
 
 }

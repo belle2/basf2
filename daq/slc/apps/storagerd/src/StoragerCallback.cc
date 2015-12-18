@@ -323,33 +323,25 @@ void StoragerCallback::monitor() throw(RCHandlerException)
     if (m_eb_stat) {
       std::vector<IOInfo> io_v;
       IOInfo io;
-      uint32 addr = ntohl(m_eb_stat->down(0).addr);
-      io.setLocalAddress(addr);
+      io.setLocalAddress(ntohl(m_eb_stat->down(0).addr));
       io.setLocalPort(m_eb_stat->down(0).port);
       io_v.push_back(io);
       for (int i = 0; i < m_nsenders; i++) {
         IOInfo io;
-        uint32 addr = ntohl(m_eb_stat->down(0).addr);
-        io.setLocalAddress(addr);
+        io.setLocalAddress(ntohl(m_eb_stat->down(0).addr));
         io.setLocalPort(m_eb_stat->up(i).port);
         io_v.push_back(io);
       }
       IOInfo::checkTCP(io_v);
-      uint64 event = info->eb[0].event = m_eb_stat->down(0).event;
-      uint64 byte = info->eb[0].byte = m_eb_stat->down(0).byte;
-      LogFile::info("downstream  : event = %lu, byte = %lu", event, byte);
-      uint32 port = m_eb_stat->down(0).port;
-      uint32 nqueue = info->eb[0].nqueue = io_v[0].getTXQueue();
-      const char* ip = io_v[0].getLocalIP();
-      LogFile::info("downstream  : ip = %s, port = %u, nqueue = %u", ip, port, nqueue);
+      info->eb2out.event = m_eb_stat->down(0).event;
+      info->eb2out.byte = m_eb_stat->down(0).byte;
+      info->eb2out.nqueue = io_v[0].getTXQueue();
+      info->eb2out.connection = (io_v[0].getState() == 1);
       for (int i = 0; i < m_nsenders; i++) {
-        event = info->eb[i + 1].event = m_eb_stat->up(i).event;
-        byte = info->eb[i + 1].byte = m_eb_stat->up(i).byte;
-        LogFile::info("upstream[%d] : event = %lu, byte = %lu", i, event, byte);
-        uint32 port = m_eb_stat->up(i).port;
-        uint32 nqueue = info->eb[i + 1].nqueue = io_v[i + 1].getRXQueue();
-        const char* ip = io_v[i + 1].getLocalIP();
-        LogFile::info("upstream[%d] : ip = %s, port = %u, nqueue = %u", i, ip, port, nqueue);
+        info->eb2in[1].event = m_eb_stat->up(i).event;
+        info->eb2in[i].byte = m_eb_stat->up(i).byte;
+        info->eb2in[i].nqueue = io_v[i + 1].getRXQueue();
+        info->eb2in[i].connection = (io_v[i + 1].getState() == 1);
       }
     }
 

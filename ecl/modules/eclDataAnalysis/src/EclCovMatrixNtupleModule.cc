@@ -18,12 +18,14 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
-
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
-
+using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -55,10 +57,10 @@ void EclCovMatrixNtupleModule::initialize()
   m_tree     = new TTree("m_tree", "EclCovMatrixNtuple tree");
 
   m_tree->Branch("energy",     &m_energy,     "energy/D");
-  m_tree->Branch("theta",      &m_theta,      "theta/D");
-  m_tree->Branch("phi",        &m_phi,        "phi/D");
   m_tree->Branch("nhits",      &m_nhits,      "nhits/I");
   m_tree->Branch("cellID",     m_cellID,      "cellID[nhits]/I");
+  m_tree->Branch("theta",      m_theta,       "theta[nhits]/I");
+  m_tree->Branch("phi",        m_phi,         "phi[nhits]/I");
   m_tree->Branch("hitA",       m_DspHit,      "hitA[nhits][31]/I");
   m_tree->Branch("hitT",       m_hitTime,     "hitT[nhits]/D");
   m_tree->Branch("deltaT",     m_DeltaT,      "deltaT[nhits]/D");
@@ -85,14 +87,15 @@ void EclCovMatrixNtupleModule::event()
 
   m_nevt++;
   m_energy = 0;
-  m_theta  = 0;
-  m_phi    = 0;
+
 
 
   m_nhits  = 0;
 
   for (int i = 0; i < 8736; i++) {
     m_cellID[i]  = 0;
+    m_theta[i]  = 0;
+    m_phi[i]    = 0;
     m_hitTime[i] = 0;
     m_hitE[i]    = 0.0;
     m_hitTime[i] = 0.0;
@@ -108,8 +111,18 @@ void EclCovMatrixNtupleModule::event()
 
   // There is only 1 ECLTrig per event
   assert(eclTrigArray.getEntries() == 1);
+  ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
   for (const auto& digit : eclDigiArray) {
     size_t cellIndex = static_cast<size_t>(digit.getCellId() - 1);
+    eclgeo->Mapping(cellIndex);
+    m_theta[cellIndex] =  eclgeo->GetThetaID();
+    m_phi[cellIndex] =  eclgeo->GetPhiID();
+    /*
+    cout << "cid : " << cellIndex
+    << " theta: " << m_theta[cellIndex]
+    << " phi: " << m_phi[cellIndex]
+    << endl;
+    */
     m_cellID[cellIndex] = cellIndex;
     m_hitE[cellIndex]     = digit.getAmp();
     m_DigiTime[cellIndex] = digit.getTimeFit();

@@ -51,13 +51,13 @@ namespace Belle2 {
     TFile* m_rootFile;
 
     double m_energy;
-    double m_theta;
-    double m_phi;
 
     int m_nevt;
     int m_nhits;
 
     int m_cellID[8736];
+    int m_theta[8736];
+    int m_phi[8736];
     int m_DspHit[8736][31];
     double m_hitE[8736];
     double m_hitTime[8736];

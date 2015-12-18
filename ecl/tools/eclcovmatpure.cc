@@ -178,8 +178,8 @@ void matrix_cal(const char* inputFilename,
         mu_ref[j - 15] += hitA[ic][j];
       }// end of loop on the 16-30 adc channels
 
-      for (int i = 0; i < 31; i++)
-        for (int j = 0; j < 31; j++)
+      for (int i = 0; i < 16; i++)
+        for (int j = 0; j < 16; j++)
           XiXj_ref[i][j] += Y[i] * Y[j];
 
       // cout << "average before = " << mu_ref << endl;
@@ -193,11 +193,11 @@ void matrix_cal(const char* inputFilename,
   for (size_t icat = 0; icat < grmap.size(); icat++) {
     cout << "cat: " << icat << "N : " << N[icat] << endl;
     if (N[icat] > 50) {
-      for (int i = 0; i < 31; i++)
-        for (int j = 0; j < 31; j++) {
+      for (int i = 0; i < 16; i++)
+        for (int j = 0; j < 16; j++) {
           covM[icat][i][j] = (XiXj[icat][i][j] - mu[icat][i] * mu[icat][j] / N[icat]) / N[icat] ;
           cout << "i: " << i << " j: " << j
-               << "mu_j: " << mu[icat][j] / N[icat]
+               << " mu_j: " << mu[icat][j] / N[icat]
                << " Xij: " << XiXj[icat][i][j] / N[icat]
                << " cov: " << covM[icat][i][j]
                << endl;

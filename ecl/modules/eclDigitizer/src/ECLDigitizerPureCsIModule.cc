@@ -16,6 +16,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -50,23 +51,23 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
   setDescription("Creates ECLDigiHits from ECLHits for Pure CsI.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("FirstRing", m_thetaIdMin, "First ring (0-12)", 0);
-  addParam("LastRing", m_thetaIdMax, "Last ring (0-12)", 2);
+  addParam("LastRing", m_thetaIdMax, "Last ring (0-12)", 12);
   addParam("Background", m_background, "Flag to use the DigitizerPureCsI configuration with backgrounds; Default is no background",
            false);
   addParam("Calibration", m_calibration,
            "Flag to use the DigitizerPureCsI for Waveform fit Covariance Matrix calibration; Default is false",
            false);
   addParam("adcTickFactor", m_tickFactor, "multiplication factor to get adc tick from trigger tick", 8);
-  addParam("sigmaTrigger", m_sigmaTrigger, "Trigger resolution used", 0.020);
+  addParam("sigmaTrigger", m_sigmaTrigger, "Trigger resolution used", 0.);
   addParam("elecNoise", m_elecNoise, "Electronics noise energy equivalent in MeV", 0.5);
   /* photo statistics resolution measurement at LNF sigma = 55 % at 1 MeV
      Csi(Tl) is 12%
   */
-  addParam("photostatresolution", m_photostatresolution, "sigma for 1 MeV energy deposit", 0.55);
+  addParam("photostatresolution", m_photostatresolution, "sigma for 1 MeV energy deposit", 0.22);
   addParam("Debug", m_debug, "debug mode on (default off)", false);
   addParam("debugtrgtime", m_testtrg, "set fixed trigger time for testing purposes", 0);
   addParam("debugsigtimeshift", m_testsig, "shift signal arrival time for testing purposes (in microsec)", 0.);
-
+  addParam("NoCovMatrix", m_NoCovMatrix, "Use a diagonal (neutral) Covariance matrix", true);
 
 }
 
@@ -160,9 +161,9 @@ void ECLDigitizerPureCsIModule::event()
 
     if (! m_calibration) {
       if (m_debug)
-        DSPFitterPure(m_fitparams[0], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
+        DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
       else
-        DSPFitterPure(m_fitparams[0], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
+        DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
     }
 
     if (m_calibration || energyFit > 0) {
@@ -180,8 +181,6 @@ void ECLDigitizerPureCsIModule::event()
       eclDigit->addRelationTo(eclDsp);
       for (const auto& hit : hitmap[j])
         eclDigit->addRelationTo(hit);
-
-
     }
   } //store each crystal hit
 
@@ -198,13 +197,17 @@ void ECLDigitizerPureCsIModule::terminate()
 
 void ECLDigitizerPureCsIModule::readDSPDB()
 {
-  string dataFileName;
+  string dataFileName, dataFileName2;
   if (m_background) {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Pure.root");
+    if (! m_calibration)
+      dataFileName2 = FileSystem::findFile("/data/ecl/ECL-WF-cov-Pure-BG.root");
     B2INFO("ECLDigitizerPureCsI: Reading configuration data with background from: " << dataFileName);
   } else {
     // for the moment it is the same file
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Pure.root");
+    if (! m_calibration)
+      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-cov-Pure.root");
     B2INFO("ECLDigitizerPureCsI: Reading configuration data without background from: " << dataFileName);
   }
   assert(! dataFileName.empty());
@@ -227,15 +230,44 @@ void ECLDigitizerPureCsIModule::readDSPDB()
 
   rootfile.Close();
 
-  // at the moment there is one set of fitparams
-  m_fitparams.resize(1);
+  if (!(m_calibration || m_NoCovMatrix)) {
+    TFile rootfile2(dataFileName2.c_str());
+    TTree* tree = (TTree*) rootfile2.Get("EclWF");
+    ECLWaveformData* eclWFData = new ECLWaveformData;
+    const int maxncellid = 512;
+    int ncellId;
+    vector<int> cellId(maxncellid);//[ncellId] buffer for crystal identification number
 
-  initParams(m_fitparams[0], m_ss[0]);
+    tree->SetBranchAddress("ncellId", &ncellId);
+    tree->SetBranchAddress("cellId", cellId.data());
+    tree->SetBranchAddress("CovarianceM", &eclWFData);
+    for (Long64_t j = 0, jmax = tree->GetEntries(); j < jmax; j++) {
+      tree->GetEntry(j);
+      assert(ncellId <= maxncellid);
+      for (int i = 0; i < ncellId; ++i)
+        m_tbl[cellId[i]].idn = m_fitparams.size();
+      fitparams_type params;
+      eclWFData->getMatrix(params.invC);
+      m_fitparams.push_back(params);
+    }
 
+
+    // at the moment there is one set of fitparams
+    if (m_NoCovMatrix) {
+      m_fitparams.resize(1);
+      for (int i = 0; i < EclConfigurationPure::m_nch; i++)
+        m_tbl[i].idn = 0;
+      for (int i = 0; i < 16; i++)
+        for (int j = 0; j < 16; j++)
+          if (i != j) m_fitparams[0].invC[i][j] = 0;
+          else m_fitparams[0].invC[i][j] = 1.0;
+      initParams(m_fitparams[0], m_ss[0]);
+    } else
+      for (auto& param : m_fitparams) initParams(param, m_ss[0]);
+  }
   // at the moment same noise for all crystals
   m_noise.resize(1);
   int index = 0;
-
   for (int i = 0; i < EclConfigurationPure::m_nsmp; i++)
     for (int j = 0; j <= i; j++)
       if (i == j) m_noise[0].setMatrixElement(index++, m_elecNoise);     // units are MeV energy noise eq from electronics

@@ -29,12 +29,6 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
 {
 
   double kdt = 0.001 / (EclConfigurationPure::m_tickPure / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
-  double sigma2 = 1.0;
-
-  for (int i = 0; i < 16; i++)
-    for (int j = 0; j < 16; j++)
-      if (i != j) params.invC[i][j] = 0;
-      else params.invC[i][j] = 1 / sigma2;
 
   params.c002 = 0;
   for (int h = 0; h < 16; h++) {
@@ -46,8 +40,6 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
     params.c001[h] *= 2;
   }
 
-
-
   for (int k = 0; k < EclConfigurationPure::m_ndtPure; k++) {
     params.c110[k] = 0;
     params.c200[k] = 0;
@@ -55,17 +47,7 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
     params.c101[k] = 0;
     params.c011[k] = 0;
     for (int i = 0; i < 16; i++) {
-      //int indexfi = i*EclConfigurationPure::m_ndtPure + k;
       for (int j = 0; j < 16; j++) {
-        /*
-        int indexfj = j*EclConfigurationPure::m_ndtPure + k;
-
-        params.c110[k] -= kdt * signal.m_ft1[indexfi] * params.invC[i][j] * signal.m_ft[indexfj] ;
-        params.c200[k] += signal.m_ft[indexfi] * params.invC[i][j] * signal.m_ft[indexfj];
-        params.c020[k] += kdt * signal.m_ft1[indexfi] * params.invC[i][j] * signal.m_ft1[indexfj] * kdt;
-        params.c101[k] += signal.m_ft[indexfi] * params.invC[i][j];
-        params.c011[k] += kdt * signal.m_ft1[indexfi] * params.invC[i][j];
-        */
         params.c110[k] += kdt * func1(i, k, signal) * params.invC[i][j] * func(j, k, signal);
         params.c200[k] += func(i, k, signal) * params.invC[i][j] * func(j, k, signal);
         params.c020[k] += kdt * func1(i, k, signal) * params.invC[i][j] * func1(j, k, signal) * kdt;

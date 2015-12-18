@@ -102,6 +102,7 @@ namespace Belle2 {
       int m_thetaIdMin, m_thetaIdMax;
       bool m_background;
       bool m_calibration;
+      bool m_NoCovMatrix;
       int m_tickFactor;
       double m_sigmaTrigger;
       double m_elecNoise;

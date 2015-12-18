@@ -1,4 +1,10 @@
-from __future__ import print_function
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Check that ROOT returns the correct values (ints, floats) when calling a C++
+function from python
+"""
 
 import sys
 import ROOT

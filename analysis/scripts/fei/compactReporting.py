@@ -7,6 +7,7 @@ import variables
 import pdg
 from fei import *
 from B2Tools import format
+from B2Tools import b2stat
 
 import pickle
 import os
@@ -258,7 +259,7 @@ def calcMin(hist):
     @param hist ROOT histogram
     @return float
     """
-    return hist.GetXaxis().GetBinCenter(hist.GetFirstBinAbove(0.0))
+    return hist.GetXaxis().GetBinCenter(hist.FindFirstBinAbove(0.0))
 
 
 def calcMax(hist):
@@ -267,7 +268,7 @@ def calcMax(hist):
     @param hist ROOT histogram
     @return float
     """
-    return hist.GetXaxis().GetBinCenter(hist.GetLastBinAbove(0.0))
+    return hist.GetXaxis().GetBinCenter(hist.FindLastBinAbove(0.0))
 
 
 def getMCCounts(obj, func=calcSum):
@@ -284,6 +285,8 @@ def getMCCounts(obj, func=calcSum):
         pdgcode = int(variable[len('NumberOfMCParticlesInEvent('):-len(")")])
         count = func(key.ReadObj())
         mc_counts[pdgcode] = count
+    if func is calcSum:
+        mc_counts['__total__'] = key.ReadObj().GetEntries()
     return mc_counts
 
 
@@ -323,20 +326,30 @@ def getModuleStatistics(obj):
 
     total_sum = 0.0
     statistics = {}
+
+    mt = ['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatch', 'TMVAExpert', 'Other']
+
     for m in stats.getAll():
         modtype = 'Other'
         listname = 'Other'
-        for mt in ['ParticleLoader', 'ParticleCombiner', 'ParticleVertexFitter', 'MCMatching', 'TMVAExpert', 'Other']:
-            splitted = m.getName().split('_')
-            if splitted[0] in mt:
-                modtype = mt
-                listname = splitted[1]
+        splitted = m.getName().split('_')
+        if len(splitted) == 1:
+            continue
+        if splitted[0] in mt:
+            modtype = splitted[0]
+            if modtype == 'MCMatch':
+                modtype = 'MCMatching'
+        if 'applyCuts' in m.getName():
+            listname = m.getName().split('_', 2)[2]
+        else:
+            listname = m.getName().split('_', 1)[1].split(' ==>')[0]
         if listname not in statistics:
             statistics[listname] = {}
         if modtype not in statistics[listname]:
             statistics[listname][modtype] = 0.0
         statistics[listname][modtype] += m.getTimeSum(m.c_Event) / 1e9
         total_sum += m.getTimeSum(m.c_Event) / 1e9
+
     return statistics, total_sum
 
 
@@ -376,11 +389,9 @@ def getMVARankings(obj):
 
 def getDetectorEfficiencies(obj, mc_counts):
     result = {}
-    for channel, mother, precuthist in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
-        if precuthist is None:
-            filename = None
-        else:
-            filename, key = precuthist
+    result['__values__'] = {}
+    result['__errors__'] = {}
+    for channel, mother, (filename, key) in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
         if filename is None:
             efficiency, purity = 0.0, 0.0
             signal, bckgrd = 0.0, 0.0
@@ -389,28 +400,36 @@ def getDetectorEfficiencies(obj, mc_counts):
             f = ROOT.TFile(filename)
             withoutCut = f.GetKey('withoutCut' + key).ReadObj()
             signal = withoutCut.GetBinContent(2)
-            bckgrd = withoutCut.GetBinContent(2)
+            bckgrd = withoutCut.GetBinContent(3)  # changed here 2 to 3... TODO: test if right!
             efficiency = signal / mc_count
             purity = signal / (signal + bckgrd) if signal > 0 else 0.0
-        if mother not in result:
-            result[mother] = {'__total__': (0.0, 0.0)}
-        result[mother][channel] = (efficiency, purity)
-        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + bckgrd)
+            eff_error = b2stat.binom_error(signal * 1.0, mc_count)
+            pur_error = b2stat.binom_error(signal * 1.0, signal + bckgrd)
 
-    for mother in result:
+        if mother not in result['__values__']:
+            result['__values__'][mother] = {'__total__': (0.0, 0.0)}
+            result['__errors__'][mother] = {}
+        result['__values__'][mother][channel] = (efficiency, purity)
+        result['__errors__'][mother][channel] = (eff_error, pur_error)
+        old_sig = result['__values__'][mother]['__total__'][0]
+        old_bkg = result['__values__'][mother]['__total__'][1]
+        result['__values__'][mother]['__total__'] = (old_sig + signal, old_bkg + bckgrd)
+
+    for mother in result['__values__']:
         total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
-        signal, bckgrd = result[mother]['__total__']
-        result[mother]['__total__'] = (signal / total, signal / (signal + bckgrd) if signal > 0 else 0.0)
+        signal, bckgrd = result['__values__'][mother]['__total__']
+        result['__values__'][mother]['__total__'] = (signal / total, signal / (signal + bckgrd) if signal > 0 else 0.0)
+        total_eff_error = b2stat.binom_error(signal * 1.0, total)
+        total_pur_error = b2stat.binom_error(signal * 1.0, signal + bckgrd)
+        result['__errors__'][mother] = {'__total__': (total_eff_error, total_pur_error)}
     return result
 
 
 def getUserCutEfficiencies(obj, mc_counts):
     result = {}
-    for channel, mother, precuthist in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
-        if precuthist is None:
-            filename = None
-        else:
-            filename, key = precuthist
+    result['__values__'] = {}
+    result['__errors__'] = {}
+    for channel, mother, (filename, key) in zip(obj['cnames'], obj['mothers'], obj['pre_cut_histograms']):
         if filename is None:
             efficiency, purity = 0.0, 0.0
             signal, bckgrd = 0.0, 0.0
@@ -423,20 +442,32 @@ def getUserCutEfficiencies(obj, mc_counts):
             all = calcSum(all_hist)
             efficiency = signal / mc_count
             purity = signal / all if all > 0 else 0.0
-        if mother not in result:
-            result[mother] = {'__total__': (0.0, 0.0)}
-        result[mother][channel] = (efficiency, purity)
-        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + all)
+            eff_error = b2stat.binom_error(signal * 1.0, mc_count)
+            pur_error = b2stat.binom_error(signal * 1.0, all)
 
-    for mother in result:
+        if mother not in result['__values__']:
+            result['__values__'][mother] = {'__total__': (0.0, 0.0)}
+            result['__errors__'][mother] = {}
+        result['__values__'][mother][channel] = (efficiency, purity)
+        result['__errors__'][mother][channel] = (eff_error, pur_error)
+        old_sig = result['__values__'][mother]['__total__'][0]
+        old_all = result['__values__'][mother]['__total__'][1]
+        result['__values__'][mother]['__total__'] = (old_sig + signal, old_all + all)
+
+    for mother in result['__values__']:
         total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
-        signal, all = result[mother]['__total__']
-        result[mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+        signal, all = result['__values__'][mother]['__total__']
+        result['__values__'][mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+        total_eff_error = b2stat.binom_error(signal * 1.0, total)
+        total_pur_error = b2stat.binom_error(signal * 1.0, all)
+        result['__errors__'][mother] = {'__total__': (total_eff_error, total_pur_error)}
     return result
 
 
 def getPostCutEfficiencies(obj, mc_counts, list_counts):
     result = {}
+    result['__values__'] = {}
+    result['__errors__'] = {}
     for particle, ntuple_filename in zip(obj['particles'], obj['ntuples']):
         if ntuple_filename is None:
             efficiency, purity, unique_efficiency, unique_purity = (0.0, 0.0, 0.0, 0.0)
@@ -447,22 +478,29 @@ def getPostCutEfficiencies(obj, mc_counts, list_counts):
             mc_count = mc_counts[abs(pdg.from_name(particle.name))]
             signal_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 1'))
             bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
-            efficiency = signal_count * 100. / mc_count,
-            purity = signal_count * 100. / (signal_count + bckgrd_count),
+            efficiency = signal_count * 100. / mc_count
+            eff_error = b2stat.binom_error(signal_count * 1.0, mc_count) * 100.0
+            purity = signal_count * 100. / (signal_count + bckgrd_count)
+            pur_error = b2stat.binom_error(signal_count * 1.0, signal_count * 1.0 + bckgrd_count) * 100.0
 
             # TODO Background can also be counted twice! uniqueBackground Tag?
             unique_signal_count = int(GetEntriesSafe(ntuple,
-                                                     particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
+                                      particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
             unique_bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
             unique_efficiency = unique_signal_count * 100. / mc_count
+            unique_eff_error = b2stat.binom_error(unique_signal_count, mc_count) * 100.0
             unique_purity = unique_signal_count * 100. / (unique_signal_count + unique_bckgrd_count)
+            unique_pur_error = b2stat.binom_error(unique_signal_count, unique_signal_count + unique_bckgrd_count) * 100.0
 
-        result[particle.identifier] = (efficiency, purity, unique_efficiency, unique_purity)
+        result['__values__'][particle.identifier] = (efficiency, purity, unique_efficiency, unique_purity)
+        result['__errors__'][particle.identifier] = (eff_error, pur_error, unique_eff_error, unique_pur_error)
     return result
 
 
 def getPreCutEfficiencies(obj, mc_counts, list_counts):
     result = {}
+    result['__values__'] = {}
+    result['__errors__'] = {}
     for listname, channel, mother in zip(obj['mlists'], obj['cnames'], obj['mothers']):
         if listname is None or listname not in list_counts:
             efficiency, purity = (0.0, 0.0)
@@ -473,16 +511,25 @@ def getPreCutEfficiencies(obj, mc_counts, list_counts):
             all = list_counts[listname]['All']
             efficiency = signal * 100. / total
             purity = signal * 100. / all if all > 0 else 0.0
+            eff_error = b2stat.binom_error(signal * 1.0, total) * 100.0
+            pur_error = b2stat.binom_error(signal * 1.0, all) * 100.0
 
-        if mother not in result:
-            result[mother] = {'__total__': (0.0, 0.0)}
-        result[mother][channel] = (efficiency, purity)
-        result[mother]['__total__'] = (result[mother]['__total__'][0] + signal, result[mother]['__total__'][1] + all)
+        if mother not in result['__values__']:
+            result['__values__'][mother] = {'__total__': (0.0, 0.0)}
+            result['__errors__'][mother] = {}
+        result['__values__'][mother][channel] = (efficiency, purity)
+        result['__errors__'][mother][channel] = (eff_error, pur_error)
+        old_sig = result['__values__'][mother]['__total__'][0]
+        old_all = result['__values__'][mother]['__total__'][1]
+        result['__values__'][mother]['__total__'] = (old_sig + signal, old_all + all)
 
-    for mother in result:
+    for mother in result['__values__']:
         total = mc_counts[abs(pdg.from_name(mother.split(':', 1)[0]))]
-        signal, all = result[mother]['__total__']
-        result[mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+        signal, all = result['__values__'][mother]['__total__']
+        result['__values__'][mother]['__total__'] = (signal / total, signal / all if all > 0 else 0.0)
+        total_eff_error = b2stat.binom_error(signal * 1.0, total) * 100.0
+        total_pur_error = b2stat.binom_error(signal * 1.0, all) * 100.0
+        result['__errors__'][mother] = {'__total__': (total_eff_error, total_pur_error)}
     return result
 
 
@@ -562,8 +609,8 @@ def loadBranchingFractions(filename=None):
                 fields = fields[:-1]
             if len(fields) < 1 or not all(isValidParticle(p) for p in fields[1:]):
                 continue
-            daughters = tuple(sorted(p for p in fields[1:] if p not in ['nu_e', 'nu_mu', 'nu_tau', 'anti-nu_e',
-                                                                        'anti-nu_mu', 'anti-nu_tau']))
+            neutrinoTag_list = ['nu_e', 'nu_mu', 'nu_tau', 'anti-nu_e', 'anti-nu_mu', 'anti-nu_tau']
+            daughters = tuple(sorted(p for p in fields[1:] if p not in neutrinoTag_list))
             if mother not in branching_fractions:
                 branching_fractions[mother] = HashableDict()
             if daughters not in branching_fractions[mother]:
@@ -631,8 +678,9 @@ def getCoveredBranchingFractions(obj):
             if any(daughter.endswith(':V0') for daughter in channel.daughters):
                 fraction = 0.0
             if fraction == 0.0:
-                print('WARNING: Branching fraction for ' + particle.identifier +
-                      ' ' + str(tuple(sorted(channel.daughters))) + ' is zero')
+                print('WARNING: Branching fraction for {p} {ch} is zero'.format(
+                                              p=particle.identifier,
+                                              ch=str(tuple(sorted(channel.daughters)))))
             branching_fractions[particle.identifier][tuple(sorted(channel.daughters))] = fraction
 
     covered = {}
@@ -674,20 +722,20 @@ if __name__ == '__main__':
     print('MVA Ranking')
     print(pretty_format(rankings))
 
-    detectorEfficiencies = getDetectorEfficiencies(obj, mc_counts)
+    detectorEfficiencies = getDetectorEfficiencies(obj, mc_counts)['__values__']
     print('DetectorEfficiencies')
     print(pretty_format(detectorEfficiencies))
 
-    userCutEfficiencies = getUserCutEfficiencies(obj, mc_counts)
+    userCutEfficiencies = getUserCutEfficiencies(obj, mc_counts)['__values__']
     print('UserCutEfficiencies')
     print(pretty_format(userCutEfficiencies))
 
     list_counts = getListCounts(obj)
-    preCutEfficiencies = getPreCutEfficiencies(obj, mc_counts, list_counts)
+    preCutEfficiencies = getPreCutEfficiencies(obj, mc_counts, list_counts)['__values__']
     print('PreCutEfficiencies')
     print(pretty_format(preCutEfficiencies))
 
-    postCutEfficiencies = getPostCutEfficiencies(obj, mc_counts, list_counts)
+    postCutEfficiencies = getPostCutEfficiencies(obj, mc_counts, list_counts)['__values__']
     print('PostCutEfficiencies')
     print(pretty_format(postCutEfficiencies))
 

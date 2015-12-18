@@ -3,6 +3,8 @@
 
 import os
 from basf2 import *
+from simulation import add_simulation
+from reconstruction import add_tracking_reconstruction
 
 set_log_level(LogLevel.ERROR)
 
@@ -21,7 +23,7 @@ geometry = register_module('Geometry')
 g4sim = register_module('FullSim')
 
 # one event
-eventinfosetter.param({'evtNumList': [3], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 import random
 intseed = random.randint(1, 10000000)
@@ -46,17 +48,17 @@ pGun.param(param_pGun)
 
 eclDigi = register_module('ECLDigitizer')
 eclRecShower = register_module('ECLReconstructor')
-makeGamma = register_module('ECLGammaReconstructor')
-makePi0 = register_module('ECLPi0Reconstructor')
-makeMatch = register_module('ECLMCMatching')
-param_Gamma = {
-    'gammaEnergyCut': 0.02,
-    'gammaE9o25Cut': 0.75,
-    'gammaWidthCut': 6.0,
-    'gammaNhitsCut': 0,
-    }
+# makeGamma = register_module('ECLGammaReconstructor')
+# makePi0 = register_module('ECLPi0Reconstructor')
+makeMatch = register_module('MCMatcherECLClusters')
+# param_Gamma = {
+#     'gammaEnergyCut': 0.02,
+#     'gammaE9o25Cut': 0.75,
+#     'gammaWidthCut': 6.0,
+#     'gammaNhitsCut': 0,
+#     }
 
-makeGamma.param(param_Gamma)
+# makeGamma.param(param_Gamma)
 
 cdcDigitizer = register_module('CDCDigitizer')
 param_cdcdigi = {'Fraction': 1, 'Resolution1': 0.01, 'Resolution2': 0.0}
@@ -78,11 +80,11 @@ trackfitter = register_module('GenFitter')
 trackfitter.logging.log_level = LogLevel.WARNING
 trackfitter.param('NMinIterations', 3)
 
-trackfitchecker = register_module('TrackFitChecker')
-trackfitchecker.logging.log_level = LogLevel.INFO
-trackfitchecker.param('testSi', True)
-trackfitchecker.param('testCdc', False)
-trackfitchecker.param('writeToTextFile', True)
+# trackfitchecker = register_module('TrackFitChecker')
+# trackfitchecker.logging.log_level = LogLevel.INFO
+# trackfitchecker.param('testSi', True)
+# trackfitchecker.param('testCdc', False)
+# trackfitchecker.param('writeToTextFile', True)
 
 # Create paths
 main = create_path()
@@ -90,17 +92,19 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(pGun)
-main.add_module(g4sim)
-main.add_module(cdcDigitizer)
-main.add_module(mctrackfinder)
-main.add_module(trackfitter)
+# main.add_module(pGun)
+# main.add_module(g4sim)
+add_simulation(main)
+# main.add_module(cdcDigitizer)
+# main.add_module(mctrackfinder)
+# main.add_module(trackfitter)
 # main.add_module(trackfitchecker)
-main.add_module(ext)
+# main.add_module(ext)
+add_tracking_reconstruction(main)
 main.add_module(eclDigi)
 main.add_module(eclRecShower)
-main.add_module(makeGamma)
-main.add_module(makePi0)
+# main.add_module(makeGamma)
+# main.add_module(makePi0)
 main.add_module(makeMatch)
 simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')

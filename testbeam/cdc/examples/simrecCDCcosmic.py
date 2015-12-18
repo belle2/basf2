@@ -5,6 +5,10 @@ from basf2 import *
 from ROOT import Belle2
 import math
 
+# ------------------------------------------------------------------------
+# A complete simulation and reconstruction of CDC-TOP cosmic tests
+# ------------------------------------------------------------------------
+
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
@@ -104,9 +108,10 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [-10, 10])
 main.add_module(particlegun)
 
+# rotate muons by aplha around z and propagate them back in time to start outside CDC
 main.add_module(swimMCParticle())
 
-# geometry parameter database
+# geometry parameters
 gearbox = register_module('Gearbox')
 gearbox.param('fileName', 'geometry/CDCcosmicTests.xml')
 gearbox.param('override', [("/DetectorComponent[@name='TOP']//Nbar", '1', ''),
@@ -148,7 +153,7 @@ cdc_trackfinder = register_module('Trasan')
 # cdc_trackfinder = register_module('TrackFinderCDCCosmics')
 main.add_module(cdc_trackfinder)
 
-# new fitter
+# Dedicated track fitter (performs also track extrapolation to TOP and dE/dx measurement)
 trackfitter = register_module('CDCStraightLineFitter')
 trackfitter.param('alpha', alpha)
 # trackfitter.param('smearDriftLength', 0.015)
@@ -159,9 +164,19 @@ main.add_module(trackfitter)
 topreco = register_module('TOPReconstructor')
 main.add_module(topreco)
 
-# flat ntuple
+# Output to flat ntuple
 ntuple = register_module('CDCTOPNtuple')
 main.add_module(ntuple)
+
+# Standard output (uncomment if you need it)
+# output = register_module('RootOutput')
+# output.param('outputFileName', 'simrecCDCcosmic.root')
+# main.add_module(output)
+
+# Event display (uncomment if you want to use)
+# display = main.add_module('Display') # or AsyncDisplay
+# display.param('showCDCHits', True)
+# display.param('fullGeometry', True)
 
 # Show progress of processing
 progress = register_module('Progress')

@@ -7,13 +7,13 @@ extern "C" {
 
 namespace Belle2 {
 
-  const int storage_status_revision = 8;
+  const int storage_status_revision = 9;
 
   struct eb_stat {
     uint32 event;
     float byte;
     uint32 connection;
-    uint32 nqueue;
+    float nqueue;
   };
 
   struct storage_status {

@@ -334,13 +334,13 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       }
       IOInfo::checkTCP(io_v);
       info->eb2out.event = m_eb_stat->down(0).event;
-      info->eb2out.byte = m_eb_stat->down(0).byte;
-      info->eb2out.nqueue = io_v[0].getTXQueue();
+      info->eb2out.byte = m_eb_stat->down(0).byte / 1024.;
+      info->eb2out.nqueue = io_v[0].getTXQueue() / 1024.;
       info->eb2out.connection = (io_v[0].getState() == 1);
       for (int i = 0; i < m_nsenders; i++) {
         info->eb2in[1].event = m_eb_stat->up(i).event;
-        info->eb2in[i].byte = m_eb_stat->up(i).byte;
-        info->eb2in[i].nqueue = io_v[i + 1].getRXQueue();
+        info->eb2in[i].byte = m_eb_stat->up(i).byte / 1024.;
+        info->eb2in[i].nqueue = io_v[i + 1].getRXQueue() / 1024.;
         info->eb2in[i].connection = (io_v[i + 1].getState() == 1);
       }
     }

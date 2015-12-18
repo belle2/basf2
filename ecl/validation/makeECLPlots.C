@@ -23,7 +23,6 @@ void ECL2D(TTree* bkg_tree);
 void ECLBkg(TTree* bkg_tree);
 void ECLCluster(TTree* cluster_tree);
 void ECLMuon(TTree* muon_tree);
-//void ECLPi0(TTree* pi0_tree);
 void ECLPion(TTree* pion_tree);
 
 void makeECLPlots() 
@@ -38,8 +37,6 @@ void makeECLPlots()
   TTree* cluster_tree = (TTree*) cluster_input->Get("m_tree");
   TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
   TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
-  //  TFile* pi0_input = TFile::Open("../ECLPi0Output.root");
-  //  TTree* pi0_tree = (TTree*) pi0_input->Get("m_tree");
   TFile* pion_input = TFile::Open("../ECLPionOutput.root");
   TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
 

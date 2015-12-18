@@ -879,6 +879,7 @@ void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, Vx
   unsigned int words_in_cluster = 0; //counts 16bit words in cluster
   nr_words = length / 2;
   ubig16_t sor;
+  sor = 0x0000;
 
   for (int i = 2 ; i < nr_words ; i++) {
     if (i != 2) { //skip header
@@ -1093,6 +1094,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     }
   }
 
+  //please check if this mask is suitable. At least we are limited by the 16 bit trigger number
+  //we can use more bits in the START frame
+  if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
+    B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
+            "(MetaInfo) mask");
+    m_errorMask |= ONSEN_ERR_FLAG_DHC_META_MM;
+  }
 
   // please check if this mask is suitable. At least here we are limited by the 16 bit trigger number in the DHH packet header.
   // we can use more bits in the START Frame

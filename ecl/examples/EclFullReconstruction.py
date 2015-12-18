@@ -42,7 +42,7 @@ param_pGun = {
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
-    }
+}
 
 pGun.param(param_pGun)
 
@@ -73,7 +73,7 @@ param_mctrackfinder = {
     'UseSVDHits': 1,
     'UsePXDHits': 1,
     'Smearing': 0,
-    }
+}
 mctrackfinder.param(param_mctrackfinder)
 
 trackfitter = register_module('GenFitter')

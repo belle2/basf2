@@ -42,7 +42,7 @@ param_pGun = {
     'xVertexParams': [0.0, 0.0],
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
-    }
+}
 
 pGun.param(param_pGun)
 

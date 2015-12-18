@@ -9,7 +9,9 @@
 # The user should provide input and output root filnames
 # as first and second argument respectively.
 #
-# Example steering file - 2014 Belle II Collaboration
+# Author: The Belle II Collaboration
+# Contributors: Benjamin Oberhof
+#
 ########################################################
 
 import os

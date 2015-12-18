@@ -9,13 +9,19 @@
 # The user should provide input and output root filnames
 # as first and second argument respectively.
 #
-# Example steering file - 2014 Belle II Collaboration
+# Author: The Belle II Collaboration
+# Contributors: Benjamin Oberhof
+#
 ########################################################
 
-import os
+# import os
+# import random
 from basf2 import *
+from ROOT import Belle2
+from modularAnalysis import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
 
 # Create paths
 main = create_path()
@@ -29,13 +35,13 @@ main.add_module(eventinfosetter)
 import random
 intseed = random.randint(1, 10000000)
 
-# single particle generator settings
+# generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [22],
+    'pdgCodes': [111],
     'nTracks': 1,
     'momentumGeneration': 'fixed',
-    'momentumParams': [0.1],
+    'momentumParams': [1.0],
     'thetaGeneration': 'uniform',
     'thetaParams': [30., 40.],
     'phiGeneration': 'uniform',
@@ -45,32 +51,19 @@ param_pGun = {
     'yVertexParams': [0.0, 0.0],
     'zVertexParams': [0.0, 0.0],
 }
-
 pGun.param(param_pGun)
 main.add_module(pGun)
+
+# evtgen = register_module('EvtGenInput')
+# main.add_module(evtgen)
 
 bkgdir = 'bkg/'
 # bkg = glob.glob(bkgdir+'*.root')
 
-bkgFiles = [
-    bkgdir + 'Coulomb_HER_100us.root',
-    bkgdir + 'Coulomb_LER_100us.root',
-    bkgdir + 'Coulomb_HER_100usECL.root',
-    bkgdir + 'Coulomb_LER_100usECL.root',
-    bkgdir + 'RBB_HER_100us.root',
-    bkgdir + 'RBB_LER_100us.root',
-    bkgdir + 'RBB_HER_100usECL.root',
-    bkgdir + 'RBB_LER_100usECL.root',
-    bkgdir + 'Touschek_HER_100us.root',
-    bkgdir + 'Touschek_LER_100us.root',
-    bkgdir + 'Touschek_HER_100usECL.root',
-    bkgdir + 'Touschek_LER_100usECL.root',
-]
-
 add_simulation(main)
 add_reconstruction(main)
 
-display = register_module('Display')
+# display = register_module('Display')
 # main.add_module(display)
 
 # eclDataAnalysis module

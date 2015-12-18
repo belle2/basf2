@@ -3,6 +3,11 @@
 
 #include <daq/storage/SharedEventBuffer.h>
 
+#include <sys/types.h>
+#include <netinet/in.h>
+
+#include <daq/slc/apps/storagerd/mmap_statistics.h>
+
 #include <daq/slc/readout/ProcessController.h>
 #include <daq/slc/readout/FlowMonitor.h>
 
@@ -11,6 +16,7 @@
 #include <daq/slc/nsm/NSMData.h>
 
 #include <daq/slc/system/PThread.h>
+#include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/ConfigFile.h>
 
@@ -43,6 +49,9 @@ namespace Belle2 {
     SharedEventBuffer m_ibuf;
     SharedEventBuffer m_rbuf;
     ConfigFile m_file;
+    eb_statistics* m_eb_stat;
+    int m_nsenders;
+    Time m_time;
 
   };
 

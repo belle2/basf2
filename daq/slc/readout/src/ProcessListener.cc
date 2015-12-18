@@ -17,7 +17,7 @@ using namespace Belle2;
 void ProcessListener::run()
 {
   Process& process(m_con->getProcess());
-  std::string process_name = m_con->getName();
+  std::string process_name = m_con->getParName();
   if (process.wait() < 0) {
     LogFile::fatal("Failed to wait processed process %s",
                    process_name.c_str());

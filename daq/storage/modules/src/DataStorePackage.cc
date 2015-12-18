@@ -23,9 +23,9 @@ bool DataStorePackage::restore()
 {
   static int count = 0;
   int nboard = m_data.getNBoard();
-  if (nboard == 1) {
+  if (m_eb2 == 0 && nboard == 1) {
     m_data_hlt.setBuffer(m_data.getBuffer());
-  } else if (nboard > 1) {
+  } else if (m_eb2 > 0 || nboard > 1) {
     m_data_hlt.setBuffer(m_data.getBody());
   }
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {

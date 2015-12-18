@@ -74,6 +74,7 @@ namespace Belle2 {
     MsgHandler* m_handler;
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
+    int m_eb2;
 
     StoreArray<RawCOPPER> rawcprarray;
 

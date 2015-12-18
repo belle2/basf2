@@ -10,6 +10,7 @@
 
 #include <sys/statvfs.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 
 using namespace Belle2;
 
@@ -22,6 +23,7 @@ StoragerCallback::StoragerCallback()
   system("killall storageout");
   system("killall basf2");
   */
+  m_eb_stat = NULL;
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -105,20 +107,34 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   const DBObject& isocket(input("socket"));
   const DBObject& osocket(output("socket"));
 
+  bool use_eb2 = false;
   if (!m_eb2rx.isAlive() && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
     const DBObject& eb2rx(obj("eb2rx"));
+    use_eb2 = true;
     m_eb2rx.clearArguments();
     m_eb2rx.setExecutable(eb2rx.getText("exe"));
     m_eb2rx.addArgument("-l");
     m_eb2rx.addArgument("%d", eb2rx.getInt("port"));
     const DBObjectList& sender(eb2rx.getObjects("sender"));
+    m_nsenders = 0;
     for (DBObjectList::const_iterator it = sender.begin();
          it != sender.end(); it++) {
       m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
+      m_nsenders++;
     }
+    std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_up";
+    std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_down";
+    if (m_eb_stat) delete m_eb_stat;
+    LogFile::debug("wcreating eb_statistics(%s, %d, %s, %d)", upname.c_str(), m_nsenders, downname.c_str(), 1);
+    m_eb_stat = new eb_statistics(upname.c_str(), m_nsenders, downname.c_str(), 1);
+    m_eb2rx.addArgument("-u");
+    m_eb2rx.addArgument(upname);
+    m_eb2rx.addArgument("-d");
+    m_eb2rx.addArgument(downname);
     m_eb2rx.load(0);
     set("eb2rx.pid", m_eb2rx.getProcess().get_id());
     LogFile::debug("Booted eb2rx");
+    m_time = Time();
     try_wait();
   } else {
     LogFile::notice("eb2rx is off");
@@ -198,6 +214,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].addArgument("%d", rbuf.getInt("size"));
       m_con[i].addArgument("%s_basf2[%d]", nodename.c_str(), i - 3);
       m_con[i].addArgument("%d", i + 2);
+      m_con[i].addArgument("%d", (int)use_eb2);
       m_con[i].addArgument("1");
       if (!m_con[i].load(0)) {
         std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
@@ -284,10 +301,14 @@ void StoragerCallback::monitor() throw(RCHandlerException)
   if (state == RCState::RUNNING_S || state == RCState::READY_S ||
       state == RCState::PAUSED_S || state == RCState::LOADING_TS ||
       state == RCState::STARTING_TS) {
+    if (!m_eb2rx.isAlive()) {
+      setState(RCState::NOTREADY_S);
+      throw (RCHandlerException(m_eb2rx.getParName() + " : crashed"));
+    }
     for (size_t i = 0; i < m_con.size(); i++) {
       if (!m_con[i].isAlive()) {
         setState(RCState::NOTREADY_S);
-        throw (RCHandlerException(m_con[i].getName() + " : crashed"));
+        throw (RCHandlerException(m_con[i].getParName() + " : crashed"));
       }
     }
   }
@@ -299,6 +320,50 @@ void StoragerCallback::monitor() throw(RCHandlerException)
   if (!(state == RCState::RUNNING_S || state == RCState::READY_S)) {
     memset(info, 0, sizeof(storage_status));
   } else {
+    if (m_eb_stat) {
+      std::vector<IOInfo> io_v;
+      IOInfo io;
+      uint32 addr = ntohs(m_eb_stat->down(0).addr);
+      io.setLocalAddress(addr);
+      io.setLocalPort(m_eb_stat->down(0).port);
+      io_v.push_back(io);
+      for (int i = 0; i < m_nsenders; i++) {
+        IOInfo io;
+        uint32 addr = ntohs(m_eb_stat->down(0).addr);
+        io.setLocalAddress(addr);
+        io.setLocalPort(m_eb_stat->up(i).port);
+        io_v.push_back(io);
+      }
+      IOInfo::checkTCP(io_v);
+      info->eb[0].event = m_eb_stat->down(0).event;
+      info->eb[0].byte = m_eb_stat->down(0).byte;
+      uint64 event = info->eb[0].event;
+      uint64 byte = info->eb[0].byte;
+      LogFile::info("downstream  : event = %lu, byte = %lu", event, byte);
+      uint32 port = m_eb_stat->down(0).port;
+      uint32 nqueue = info->eb[0].nqueue = io_v[0].getTXQueue();
+      const char* ip = io_v[0].getLocalIP();
+      LogFile::info("downstream  : ip = %s, port = %u, nqueue = %u", ip, port, nqueue);
+      Time t;
+      double dt = t.get() - m_time.get();
+      m_time = t;
+      info->eb[0].evtrate = (info->eb[0].event - event) / dt;
+      info->eb[0].flowrate = (info->eb[0].byte - byte) / dt;
+      for (int i = 0; i < m_nsenders; i++) {
+        info->eb[i + 1].event = m_eb_stat->up(i).event;
+        info->eb[i + 1].byte = m_eb_stat->up(i).byte;
+        event = info->eb[i + 1].event;
+        byte = info->eb[i + 1].byte;
+        LogFile::info("upstream[%d] : event = %lu, byte = %lu", i, event, byte);
+        uint32 port = m_eb_stat->up(i).port;
+        uint32 nqueue = info->eb[i + 1].nqueue = io_v[i + 1].getRXQueue();
+        const char* ip = io_v[i + 1].getLocalIP();
+        LogFile::info("upstream[%d] : ip = %s, port = %u, nqueue = %u", i, ip, port, nqueue);
+        info->eb[i + 1].evtrate = (info->eb[i + 1].event - event) / dt;
+        info->eb[i + 1].flowrate = (info->eb[i + 1].byte - byte) / dt;
+      }
+    }
+
     bool connected = false;
     bool writing = false;
     for (size_t i = 0; i < m_flow.size() && i < 8; i++) {

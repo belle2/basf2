@@ -43,6 +43,7 @@ if len(argv) >= 6:
     deserializer.param('NodeName', argv[5])
     deserializer.param('NodeID', int(argv[6]))
     deserializer.param('UseShmFlag', int(argv[7]))
+    deserializer.param('EB2', int(argv[8]))
 output = register_module('StorageSerializer')
 output.param('OutputBufferName', argv[3])
 output.param('OutputBufferSize', int(argv[4]))

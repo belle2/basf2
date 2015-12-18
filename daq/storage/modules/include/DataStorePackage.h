@@ -32,7 +32,7 @@ namespace Belle2 {
     };
 
   public:
-    DataStorePackage(DataStoreStreamer* streamer, unsigned int serial = 0)
+    DataStorePackage(DataStoreStreamer* streamer, int eb2, unsigned int serial = 0)
       : m_serial(serial)
     {
       m_streamer = streamer;
@@ -40,6 +40,7 @@ namespace Belle2 {
       m_data.setBuffer(m_buf);
       m_data_hlt.setBuffer(NULL);
       m_data_pxd.setBuffer(NULL);
+      m_eb2 = eb2;
     }
     ~DataStorePackage()
     {
@@ -60,6 +61,7 @@ namespace Belle2 {
     BinData m_data_hlt;
     BinData m_data_pxd;
     int* m_buf;
+    int m_eb2;
     //DataStoreStreamer m_streamer;
     DataStoreStreamer* m_streamer;
     StoreArray<RawPXD> m_rawpxdary;

@@ -46,6 +46,7 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   setDescription("Encode DataStore into RingBuffer");
 
   addParam("CompressionLevel", m_compressionLevel, "Compression level", 0);
+  addParam("EB2", m_eb2, "EB2", 1);
   addParam("InputBufferName", m_ibuf_name, "Input buffer name", std::string(""));
   addParam("InputBufferSize", m_ibuf_size, "Input buffer size", 100);
   addParam("NodeName", m_nodename, "Node(subsystem) name", std::string(""));
@@ -80,7 +81,7 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer();
-  m_package = new DataStorePackage(m_streamer);
+  m_package = new DataStorePackage(m_streamer, 1);//m_eb2);
 
   StoreArray<RawPXD>::registerPersistent();
   if (m_info.isAvailable()) {

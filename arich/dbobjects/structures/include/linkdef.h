@@ -9,6 +9,7 @@
 #pragma link C++ class Belle2::ARICHAerogelMap+;
 #pragma link C++ class Belle2::ARICHAsicChannelMask+;
 #pragma link C++ class Belle2::ARICHAsicInfo+;
+#pragma link C++ class Belle2::ARICHBadChannels+;
 #pragma link C++ class Belle2::ARICHB2LinkInfo+;
 #pragma link C++ class Belle2::ARICHCableInfo+;
 #pragma link C++ class Belle2::ARICHComponentTest+;

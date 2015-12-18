@@ -28,14 +28,14 @@ namespace Belle2 {
      */
     ARICHHapdChipInfo(): m_serial(""), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL), m_bombardmentGain(NULL),
       m_bombardmentCurrent(), m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL), m_biasCurrent2D(NULL), m_channelId(0),
-      m_deadChannel(), m_badChannel() {};
+      m_cutChannel(), m_badChannel() {};
 
     /**
      * Constructor
      */
     explicit ARICHHapdChipInfo(std::string serial): m_serial(serial), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL),
       m_bombardmentGain(NULL), m_bombardmentCurrent(), m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL),
-      m_biasCurrent2D(NULL), m_channelId(0), m_deadChannel(), m_badChannel() {};
+      m_biasCurrent2D(NULL), m_channelId(0), m_cutChannel(), m_badChannel() {};
 
     /**
      * Destructor
@@ -184,29 +184,29 @@ namespace Belle2 {
     void setChannelNumber(int channel) {m_channelId = channel;}
 
     /**
-     * Return a channel number from the list of dead channels
+     * Return a channel number from the list of cut channels
      * @param i index of the element in the list
      * @return channel number
      */
-    int getDeadChannel(unsigned int i) const;
+    int getCutChannel(unsigned int i) const;
 
     /**
-     * Add a channel number to the list of dead channels
+     * Add a channel number to the list of cut channels
      * @param channel HAPD channel number
      */
-    void appendDeadChannel(int channel) {m_deadChannel.push_back(channel); }
+    void appendCutChannel(int channel) {m_cutChannel.push_back(channel); }
 
     /**
-     * Set the list of dead channels
+     * Set the list of cut channels
      * @param channel HAPD channel numbers
      */
-    void setDeadChannel(std::vector<int> channels) {m_deadChannel = channels; }
+    void setCutChannel(std::vector<int> channels) {m_cutChannel = channels; }
 
     /**
-     * Return size of the list of dead channels
+     * Return size of the list of cut channels
      * @return size
      */
-    int getDeadChannelsSize() const {return m_deadChannel.size();}
+    int getCutChannelsSize() const {return m_cutChannel.size();}
 
     /**
      * Return a channel number from the list of cut channels
@@ -246,8 +246,8 @@ namespace Belle2 {
     TH2F* m_biasVoltage2D;                     /**< Bias Voltage as a function of the channel */
     TH2F* m_biasCurrent2D;                     /**< Bias Current as a function of the channel */
     int m_channelId;                           /**< Channel Number for the Bombardment and Avalanche measurements information */
-    std::vector<int> m_deadChannel;            /**< List of dead channels on the HAPD chip */ // - glej cutch
-    std::vector<int> m_badChannel;             /**< List of bad (cut and dead channels) on the HAPD chip */ // - glej deadch
+    std::vector<int> m_cutChannel;             /**< List of cut channels on the HAPD chip */
+    std::vector<int> m_badChannel;             /**< List of bad (cut and dead channels) on the HAPD chip */
 
 
     ClassDef(ARICHHapdChipInfo, 3); /**< ClassDef */

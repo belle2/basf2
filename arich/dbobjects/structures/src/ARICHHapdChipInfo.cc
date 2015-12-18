@@ -42,9 +42,9 @@ void ARICHHapdChipInfo::setAvalancheCurrent(std::vector<TGraph*> acurrent)
 }
 
 
-int ARICHHapdChipInfo::getDeadChannel(unsigned int i) const
+int ARICHHapdChipInfo::getCutChannel(unsigned int i) const
 {
-  if (i < m_deadChannel.size()) return m_deadChannel[i];
+  if (i < m_cutChannel.size()) return m_cutChannel[i];
   else return -1;
 }
 

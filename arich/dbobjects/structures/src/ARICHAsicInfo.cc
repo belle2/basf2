@@ -53,7 +53,7 @@ TH3F* ARICHAsicInfo::getGainMeasurement(unsigned int i) const
 
 void ARICHAsicInfo::setGainMeasurement(std::vector<TH3F*> gain)
 {
-  for (unsigned int i = 0; i < m_gain.size(); i++) m_gain.push_back(gain[i]);
+  for (unsigned int i = 0; i < gain.size(); i++) m_gain.push_back(gain[i]);
 }
 
 
@@ -66,7 +66,7 @@ TH3F* ARICHAsicInfo::getOffsetMeasurement(unsigned int i) const
 
 void ARICHAsicInfo::setOffsetMeasurement(std::vector<TH3F*> offset)
 {
-  for (unsigned int i = 0; i < m_offset.size(); i++) m_offset.push_back(offset[i]);
+  for (unsigned int i = 0; i < offset.size(); i++) m_offset.push_back(offset[i]);
 }
 
 

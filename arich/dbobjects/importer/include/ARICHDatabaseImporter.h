@@ -72,7 +72,7 @@ namespace Belle2 {
     /**
      * Get lists of problematic ASIC channels.
      */
-    std::vector<int> channelsList(std::string asicSerial, std::string type);
+    std::vector<int> channelsList(std::string asicSerial, std::string type, int chDelay);
 
     /**
      * Import ARICH FEB test data in the database.
@@ -82,7 +82,7 @@ namespace Belle2 {
     /**
      * Returns list of dead channels on FEB
      */
-//    std::vector<int> getDeadChFEB(std::string dna);
+    std::vector<int> getDeadChFEB(std::string dna);
 
     /**
      * Convert date (FEB) to TTimeStamp.
@@ -107,7 +107,7 @@ namespace Belle2 {
     /**
      * Get lists of problematic HAPD channels.
      */
-    std::vector<int> channelsListHapd(std::string chlist);
+    std::vector<int> channelsListHapd(std::string chlist, int channelDelay);
 
     /**
      * Get position of channel on HAPD.
@@ -143,6 +143,16 @@ namespace Belle2 {
      * Export HAPD quantum efficiency from the database.
      */
     void exportHapdQE();
+
+    /**
+     * Import lists of bad channels in the database.
+     */
+    void importBadChannels();
+
+    /**
+     * Export lists of bad channels from the database.
+     */
+    void exportBadChannels();
 
     /**
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.

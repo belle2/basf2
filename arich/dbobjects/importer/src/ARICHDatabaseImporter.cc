@@ -16,6 +16,7 @@
 #include <arich/dbobjects/structures/ARICHHapdChipInfo.h>
 #include <arich/dbobjects/structures/ARICHHapdInfo.h>
 #include <arich/dbobjects/structures/ARICHHapdQE.h>
+#include <arich/dbobjects/structures/ARICHBadChannels.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -89,14 +90,14 @@ void ARICHDatabaseImporter::importAerogelInfo()
   //Database::Instance().storeData(&agelConstants, iov);
 
   // store under user defined name:
-  Database::Instance().storeData("testAerogel", &agelConstants, iov);
+  Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
 }
 
 
 void ARICHDatabaseImporter::exportAerogelInfo()
 {
 
-  DBArray<ARICHAerogelInfo> elements("testAerogel");
+  DBArray<ARICHAerogelInfo> elements("ARICHAerogelInfo");
   elements.getEntries();
 
   // Print aerogel info
@@ -180,13 +181,13 @@ void ARICHDatabaseImporter::importHapdQA()
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Database::Instance().storeData("testHapd", &hapdQAConstants, iov);
+  Database::Instance().storeData("ARICHHapdQA", &hapdQAConstants, iov);
 }
 
 
 void ARICHDatabaseImporter::exportHapdQA()
 {
-  DBArray<ARICHHapdQA> elements("testHapd");
+  DBArray<ARICHHapdQA> elements("ARICHHapdQA");
   elements.getEntries();
 
   // Print serial numbers of HAPDs
@@ -235,17 +236,16 @@ void ARICHDatabaseImporter::importAsicInfo()
           m_offset.push_back(hist3d);
         } else { B2INFO("Key name does not match any of the following: gain, offset!"); }
       }
-      f->Close();
 
       // get time of measurement
       timeFinishGain = ARICHDatabaseImporter::getAsicDate(asicSerial, "gain");
       timeFinishOffset = ARICHDatabaseImporter::getAsicDate(asicSerial, "offset");
 
       // get lists of bad channels
-      vector<int> nosignalCHs = ARICHDatabaseImporter::channelsList(asicSerial, "nosignal");
-      vector<int> badconnCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badconn");
-      vector<int> badoffsetCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badoffset");
-      vector<int> badlinCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badlin");
+      vector<int> nosignalCHs = ARICHDatabaseImporter::channelsList(asicSerial, "nosignal", 0);
+      vector<int> badconnCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badconn", 0);
+      vector<int> badoffsetCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badoffset", 0);
+      vector<int> badlinCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badlin", 0);
 
       int num = 0;
       string numCH = "";
@@ -261,14 +261,30 @@ void ARICHDatabaseImporter::importAsicInfo()
       else {num = atoi(numCH.c_str()); }
 
       // save data as an element of the array
-      new(asicConstants[asic])  ARICHAsicInfo(asicSerial, timeFinishGain, timeFinishOffset, nosignalCHs, badconnCHs, badoffsetCHs,
-                                              badlinCHs, num,  m_gain, m_offset);
+//     new(asicConstants[asic])  ARICHAsicInfo(asicSerial, timeFinishGain, timeFinishOffset, nosignalCHs, badconnCHs, badoffsetCHs, badlinCHs, num, m_gain, m_offset);
+      new(asicConstants[asic])  ARICHAsicInfo();
+      auto* asicConst = static_cast<ARICHAsicInfo*>(asicConstants[asic]);
+
+
+      asicConst->setAsicID(asicSerial);
+      asicConst->setTimeFinishGain(timeFinishGain);
+      asicConst->setTimeFinishOffset(timeFinishOffset);
+      asicConst->setDeadChannels(nosignalCHs);
+      asicConst->setBadConnChannels(badconnCHs);
+      asicConst->setBadOffsetChannels(badoffsetCHs);
+      asicConst->setBadLinChannels(badlinCHs);
+      asicConst->setNumOfProblematicChannels(num);
+      asicConst->setGainMeasurement(m_gain);
+      asicConst->setOffsetMeasurement(m_offset);
+
+      f->Close();
+
       asic++;
     }
   }
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("testAsic", &asicConstants, iov);
+  Database::Instance().storeData("ARICHAsicInfo", &asicConstants, iov);
 }
 
 TTimeStamp ARICHDatabaseImporter::getAsicDate(string asicSerial, string type)
@@ -318,7 +334,7 @@ TTimeStamp ARICHDatabaseImporter::timedate(std::string enddate)
   return datum;
 }
 
-vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type)
+vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type, int chDelay)
 {
 
   GearDir content = GearDir("/ArichData/AllData/asicList");
@@ -330,23 +346,28 @@ vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type)
     if (asicSerial == serial)  {
       string badCH = asicInfo.getString(type.c_str());
       // parse string to get numbers of all bad channels
-      if (badCH.find(",") != string::npos) {
-        while (badCH.find(",") != string::npos) {
-          string CH = badCH.substr(0, badCH.find(","));
-          CHs.push_back(atoi(CH.c_str()));
-          badCH = badCH.substr(badCH.find(",") + 1);
+      if (!badCH.empty()) {
+        if (badCH.find(",") != string::npos) {
+          while (badCH.find(",") != string::npos) {
+            string CH = badCH.substr(0, badCH.find(","));
+            int badchannel = atoi(CH.c_str()) + chDelay;
+            CHs.push_back(badchannel);
+            badCH = badCH.substr(badCH.find(",") + 1);
+          }
+          int badchannel = atoi(badCH.c_str()) + chDelay;
+          CHs.push_back(badchannel);
         }
-        CHs.push_back(atoi(badCH.c_str()));
-      }
-      // store 5000 if there are many bad channels
-      else if (badCH.find("many") != string::npos) {
-        CHs.push_back(5000);
-      }
-      // store 10000 if all channels are bad
-      else if (badCH.find("all") != string::npos) {
-        CHs.push_back(10000);
-      } else {
-        CHs.push_back(atoi(badCH.c_str()));
+        // store 5000 if there are many bad channels
+        else if (badCH.find("many") != string::npos) {
+          CHs.push_back(5000);
+        }
+        // store 10000 if all channels are bad
+        else if (badCH.find("all") != string::npos) {
+          CHs.push_back(10000);
+        } else {
+          int badchannel = atoi(badCH.c_str()) + chDelay;
+          CHs.push_back(badchannel);
+        }
       }
     }
   }
@@ -356,16 +377,23 @@ vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type)
 
 void ARICHDatabaseImporter::exportAsicInfo()
 {
-  DBArray<ARICHAsicInfo> elements("testAsic");
+  DBArray<ARICHAsicInfo> elements("ARICHAsicInfo");
   elements.getEntries();
 
   // Print serial numbers of ASICs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getAsicID());
+    B2INFO("Element Number: " << el << "; serial = " << element.getAsicID() << "; dead ch no.1 = " << element.getDeadChannel(
+             0) << "; all bad ch, N = " << element.getNumOfProblematicChannels());
+    TH3F* hist1 = element.getOffsetMeasurement(0);
+    TFile file("histogrami.root", "update");
+    hist1->Write();
+    file.Close();
+
     el++;
   }
 }
+
 
 
 
@@ -392,7 +420,7 @@ void ARICHDatabaseImporter::importFebTest()
     febConst->setFebSerial(serial);
     febConst->setFebDna(dna);
 
-    //febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
+    febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
 
     // slow control data
     for (const auto& testFEB : content2.getNodes("febtest")) {
@@ -488,28 +516,26 @@ void ARICHDatabaseImporter::importFebTest()
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("testFeb", &febConstants, iov);
+  Database::Instance().storeData("ARICHFebTest", &febConstants, iov);
 }
 
-/*std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
+std::vector<int> ARICHDatabaseImporter::getDeadChFEB(std::string dna)
 {
   vector<int> listCHs;
   string line;
   ifstream fileFEB("FEBdeadChannels.txt");
   if (fileFEB.is_open()) {
-    while (getline(fileFEB,line))
-    {
-      string ch2 = line.substr(line.find(",")+1);
-      string dna2 = line.erase(line.find(",")-1);
+    while (getline(fileFEB, line)) {
+      string ch2 = line.substr(line.find(",") + 1);
+      string dna2 = line.erase(line.find(",") - 1);
       if (dna2 == dna) { listCHs.push_back(atoi(ch2.c_str())); }
     }
-  }
-  else { B2INFO("No file FEBdeadChannels.txt"); }
+  } else { B2INFO("No file FEBdeadChannels.txt"); }
   fileFEB.close();
 
 
   return listCHs;
-}*/
+}
 
 
 TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
@@ -538,7 +564,7 @@ TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
 
 void ARICHDatabaseImporter::exportFebTest()
 {
-  DBArray<ARICHFebTest> elements("testFeb");
+  DBArray<ARICHFebTest> elements("ARICHFebTest");
   elements.getEntries();
 
   // Print serial numbers of FEBs
@@ -565,7 +591,7 @@ void ARICHDatabaseImporter::importHapdChipInfo()
   TH2F** bias2DV, **bias2DI;
   bias2DV = new TH2F *[4000];
   bias2DI = new TH2F *[4000];
-  vector<int> deadlist[4000], cutlist[4000];
+  vector<int> badlist[4000], cutlist[4000];
   vector<TGraph*> bombCurrents[4000], avalCurrents[4000];
 
   // extract chip info, such as bias voltage, lists of dead and bad channels etc.
@@ -576,10 +602,10 @@ void ARICHDatabaseImporter::importHapdChipInfo()
       chip_i = 4 * hapd_i + chip_ABCD;
       chip[chip_i] = chipInfo.getString("chip");
       bias[chip_i] = chipInfo.getInt("bias");
-      string deadL = chipInfo.getString("deadlist");
+      string badL = chipInfo.getString("deadlist");
       string cutL = chipInfo.getString("cutlist");
-      if (deadL.find("ch") != string::npos) { string deadLsub = deadL.substr(3); cutlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(deadLsub.c_str()); }
-      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); deadlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str()); }
+      if (badL.find("ch") != string::npos) { string badLsub = badL.substr(3); badlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), 0); }
+      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); cutlist[chip_i] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), 0); }
       string gain_str = chipInfo.getString("gain");
       gain[chip_i] = atoi(gain_str.c_str());
       chip_ABCD++;
@@ -666,7 +692,6 @@ void ARICHDatabaseImporter::importHapdChipInfo()
       biasv[i5] = (float) HI.getDouble("biasv");
       biasi[i5] = (float) HI.getDouble("biasi");
       if (chipnum[i5] == 36) {
-        cout << "channel = 36, serial-chip, chip_i = " << serial[hapd_i] << "-" << chip_2d[chip_i] << ", " << chip_i << endl;
         chip_i = 4 * hapd_i + chip_ABCD;
         bias2DV[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "voltage", chipnum, biasv);
         bias2DI[chip_i] = ARICHDatabaseImporter::getBiasGraph(chip_2d, "current", chipnum, biasi);
@@ -688,8 +713,8 @@ void ARICHDatabaseImporter::importHapdChipInfo()
     chipConst->setChipLabel(chip[l]);
     chipConst->setBiasVoltage(bias[l]);
     chipConst->setGain(gain[l]);
-    chipConst->setDeadChannel(deadlist[l]);
-    chipConst->setBadChannel(cutlist[l]);
+    chipConst->setBadChannel(badlist[l]);
+    chipConst->setCutChannel(cutlist[l]);
     chipConst->setBombardmentGain(bombardmentGain[l]);
     chipConst->setBombardmentCurrent(bombCurrents[l]);
     chipConst->setAvalancheGain(avalancheGain[l]);
@@ -702,7 +727,7 @@ void ARICHDatabaseImporter::importHapdChipInfo()
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("testHapdChip", &chipConstants, iov);
+  Database::Instance().storeData("ARICHHapdChipInfo", &chipConstants, iov);
 }
 
 void ARICHDatabaseImporter::importHapdInfo()
@@ -783,23 +808,25 @@ void ARICHDatabaseImporter::importHapdInfo()
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
-  Database::Instance().storeData("testHapd", &hapdConstants, iov);
+  Database::Instance().storeData("ARICHHapdInfo", &hapdConstants, iov);
 }
 
-std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist)
+std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist, int channelDelay)
 {
   vector<int> CHs;
-
   // parse string to get numbers of all bad channels
   if (chlist.find(",") != string::npos) {
     while (chlist.find(",") != string::npos) {
       string CH = chlist.substr(0, chlist.find(","));
-      CHs.push_back(atoi(CH.c_str()));
+      int badChannel = atoi(CH.c_str()) + channelDelay;
+      CHs.push_back(badChannel);
       chlist = chlist.substr(chlist.find(",") + 1);
     }
-    CHs.push_back(atoi(chlist.c_str()));
+    int badChannel = atoi(chlist.c_str()) + channelDelay;
+    CHs.push_back(badChannel);
   } else {
-    CHs.push_back(atoi(chlist.c_str()));
+    int badChannel = atoi(chlist.c_str()) + channelDelay;
+    CHs.push_back(badChannel);
   }
   return CHs;
 }
@@ -877,23 +904,34 @@ TH2F* ARICHDatabaseImporter::getBiasGraph(std::string chip_2d, std::string volta
 
 void ARICHDatabaseImporter::exportHapdInfo()
 {
-  DBArray<ARICHHapdInfo> elements("testHapd");
+  DBArray<ARICHHapdInfo> elements("ARICHHapdInfo");
   elements.getEntries();
 
   for (const auto& element : elements) {
     B2INFO("Serial = " << element.getSerialNumber() << "; HV = " << element.getHighVoltage() << "; qe400 = " <<
            element.getQuantumEfficiency400());
+    TGraph* adc = element.getPulseHeightDistribution();
+    TFile file("histogrami.root", "update");
+    adc->Write();
+    file.Close();
+
+
   }
 }
 
 void ARICHDatabaseImporter::exportHapdChipInfo()
 {
-  DBArray<ARICHHapdChipInfo> elements("testHapdChip");
+  DBArray<ARICHHapdChipInfo> elements("ARICHHapdChipInfo");
   elements.getEntries();
 
   for (const auto& element : elements) {
     B2INFO("Serial = " << element.getHapdSerial() << "; chip = " << element.getChipLabel() << "; bias voltage = " <<
            element.getBiasVoltage());
+    TGraph* bombardmentcurr =  element.getBombardmentCurrent(1);
+    TFile file("histogrami.root", "update");
+    bombardmentcurr->Write();
+    file.Close();
+
   }
 }
 
@@ -911,7 +949,6 @@ void ARICHDatabaseImporter::importHapdQE()
 
     int size = inputFile.length();
     string hapdSerial = inputFile.substr(size - 11, 6);
-    cout << "hapdserial=" << hapdSerial << endl;
     TH2F* qe2D = 0;
 
     // extract data
@@ -938,29 +975,206 @@ void ARICHDatabaseImporter::importHapdQE()
 
   // define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Database::Instance().storeData("testHapdQE", &hapdQEConstants, iov);
+  Database::Instance().storeData("ARICHHapdQE", &hapdQEConstants, iov);
 }
 
 
 void ARICHDatabaseImporter::exportHapdQE()
 {
-  DBArray<ARICHHapdQE> elements("testHapdQE");
+  DBArray<ARICHHapdQE> elements("ARICHHapdQE");
   elements.getEntries();
 
   // Print serial numbers of HAPDs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getHapdSerialNumber());
+    B2INFO("SN = " << element.getHapdSerialNumber());
+    /* TH2F* qe2d = element.getQuantumEfficiency2D();
+      TFile file("histogrami.root", "update");
+      qe2d->Write();
+      file.Close(); */
+
     el++;
   }
 }
+
+void ARICHDatabaseImporter::importBadChannels()
+{
+  // define array
+  TClonesArray channelConstants("Belle2::ARICHBadChannels");
+
+  int i = 0, j = 0;
+
+  GearDir hapdContent = GearDir("/ArichData/AllData/hapdData/Content");
+  GearDir febContent = GearDir("/ArichData/AllData/febmapping");
+  GearDir asicContent = GearDir("/ArichData/AllData/febasicmapping");
+
+  string hapdSerial[1000], chip;
+  vector<int> hapdBadlist[1000], hapdCutlist[1000], febDeadlist[1000], asicNosignalCHs[1000], asicBadconnCHs[1000],
+         asicBadoffsetCHs[1000], asicBadlinCHs[1000];
+  int febSerial[1000];
+
+  // extract chip info, such as bias voltage, lists of dead and bad channels etc.
+  for (const auto& hapdInfo : hapdContent.getNodes("hapd")) {
+    hapdSerial[i] = hapdInfo.getString("serial");
+    for (const auto& chipInfo : hapdInfo.getNodes("chipinfo")) {
+      chip = chipInfo.getString("chip");
+      string badL = chipInfo.getString("deadlist");
+      string cutL = chipInfo.getString("cutlist");
+      int channelDelay = 0;
+      if (chip == "B") channelDelay = 36;
+      if (chip == "C") channelDelay = 2 * 36;
+      if (chip == "D") channelDelay = 3 * 36;
+
+      if (badL.find("ch") != string::npos) {  string badLsub = badL.substr(3); hapdBadlist[i] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), channelDelay); }
+
+      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); hapdCutlist[i] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), channelDelay); }
+    }
+    i++;
+  }
+
+  // find matching sn and dna and get list of dead channels
+  for (const auto& febmap : febContent.getNodes("feb")) {
+    febSerial[j] = febmap.getInt("sn");
+    string dna = febmap.getString("dna");
+    febDeadlist[j] = ARICHDatabaseImporter::getDeadChFEB(dna);
+    for (const auto& asicmap : asicContent.getNodes("febasic")) {
+      int febSerial2 = asicmap.getInt("sn");
+      if (febSerial2 == febSerial[j]) {
+        string asic1 = asicmap.getString("asic1");
+        string asic2 = asicmap.getString("asic2");
+        string asic3 = asicmap.getString("asic3");
+        string asic4 = asicmap.getString("asic4");
+
+        vector<int> asic_NosignalCHs[4], asic_BadconnCHs[4], asic_BadoffsetCHs[4], asic_BadlinCHs[4];
+        string asicNo = "";
+        int chDelay = 0;
+
+        for (int n = 0; n < 4; n++)  {
+          if (n == 0) { asicNo = asic1; chDelay = 0;}
+          if (n == 1) { asicNo = asic2; chDelay = 36;}
+          if (n == 2) { asicNo = asic3; chDelay = 2 * 36;}
+          if (n == 3) { asicNo = asic4; chDelay = 3 * 36;}
+          asic_NosignalCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "nosignal", chDelay);
+          asic_BadconnCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badconn", chDelay);
+          asic_BadoffsetCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badoffset", chDelay);
+          asic_BadlinCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badlin", chDelay);
+        }
+
+        for (int n = 0; n < 4; n++) {
+          asicNosignalCHs[j].insert(asicNosignalCHs[j].end(), asic_NosignalCHs[n].begin(), asic_NosignalCHs[n].end()) ;
+          asicBadconnCHs[j].insert(asicBadconnCHs[j].end(), asic_BadconnCHs[n].begin(), asic_BadconnCHs[n].end()) ;
+          asicBadoffsetCHs[j].insert(asicBadoffsetCHs[j].end(), asic_BadoffsetCHs[n].begin(), asic_BadoffsetCHs[n].end()) ;
+          asicBadlinCHs[j].insert(asicBadlinCHs[j].end(), asic_BadlinCHs[n].begin(), asic_BadlinCHs[n].end()) ;
+        }
+      }
+    }
+    j++;
+  }
+
+
+  int l = 0;
+  // fill HAPD data to ARICHBadChannels class
+  for (l = 0; l < i; l++) {
+    new(channelConstants[l])  ARICHBadChannels();
+    auto* channelConst = static_cast<ARICHBadChannels*>(channelConstants[l]);
+    channelConst->setHapdSerial(hapdSerial[l]);
+    channelConst->setHapdBadChannel(hapdBadlist[l]);
+    channelConst->setHapdCutChannel(hapdCutlist[l]);
+  }
+
+  // fill FEB data to ARICHBadChannels class
+  for (int k = l; k < (i + j); k++) {
+    new(channelConstants[k])  ARICHBadChannels();
+    auto* channelConst = static_cast<ARICHBadChannels*>(channelConstants[k]);
+    channelConst->setFebSerial(febSerial[k - l]);
+    channelConst->setFebDeadChannels(febDeadlist[k - l]);
+    channelConst->setAsicDeadChannels(asicNosignalCHs[k - l]);
+    channelConst->setAsicBadConnChannels(asicBadconnCHs[k - l]);
+    channelConst->setAsicBadOffsetChannels(asicBadoffsetCHs[k - l]);
+    channelConst->setAsicBadLinChannels(asicBadlinCHs[k - l]);
+  }
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("ARICHBadChannels", &channelConstants, iov);
+
+}
+
+void ARICHDatabaseImporter::exportBadChannels()
+{
+  DBArray<ARICHBadChannels> elements("ARICHBadChannels");
+  elements.getEntries();
+
+  // Print bad channels
+  for (const auto& element : elements) {
+    if (!(element.getHapdSerial()).empty()) {
+      B2INFO("HAPD sn = " << element.getHapdSerial());
+      if (element.getHapdListOfBadChannelsSize() != 0) B2INFO("all bad CHs: ");
+      for (int i = 0; i < element.getHapdListOfBadChannelsSize(); i++) {
+        B2INFO(element.getHapdListOfBadChannel(i));
+      }
+      if (element.getHapdCutChannelsSize() != 0) {
+        B2INFO("cut CHs: ");
+        for (int i = 0; i < element.getHapdCutChannelsSize(); i++) {
+          B2INFO(element.getHapdCutChannel(i));
+        }
+      }
+      if (element.getHapdBadChannelsSize() != 0) {
+        B2INFO("bad CHs: ");
+        for (int i = 0; i < element.getHapdBadChannelsSize(); i++) {
+          B2INFO(element.getHapdBadChannel(i));
+        }
+      }
+    } else {
+      B2INFO("FEB sn = " << element.getFebSerial());
+      int numAllCh = element.getFebDeadChannelsSize() + element.getAsicDeadChannelsSize() + element.getAsicBadConnChannelsSize() +
+                     element.getAsicBadOffsetChannelsSize() + element.getAsicBadLinChannelsSize();
+      if (numAllCh != 0) B2INFO("all bad CHs: ");
+      for (int i = 0; i < numAllCh; i++) {
+        B2INFO(element.getFebListOfBadChannel(i));
+      }
+      if (element.getFebDeadChannelsSize() != 0) {
+        B2INFO("dead CHs (FEB test): ");
+        for (int i = 0; i < element.getFebDeadChannelsSize(); i++) {
+          B2INFO(element.getFebDeadChannel(i));
+        }
+      }
+      if (element.getAsicDeadChannelsSize() != 0) {
+        B2INFO("dead CHs (asic): ");
+        for (int i = 0; i < element.getAsicDeadChannelsSize(); i++) {
+          B2INFO(element.getAsicDeadChannel(i));
+        }
+      }
+      if (element.getAsicBadConnChannelsSize() != 0) {
+        B2INFO("bad conn CHs (asic): ");
+        for (int i = 0; i < element.getAsicBadConnChannelsSize(); i++) {
+          B2INFO(element.getAsicBadConnChannel(i));
+        }
+      }
+      if (element.getAsicBadOffsetChannelsSize() != 0) {
+        B2INFO("bad offset CHs (asic): ");
+        for (int i = 0; i < element.getAsicBadOffsetChannelsSize(); i++) {
+          B2INFO(element.getAsicBadOffsetChannel(i));
+        }
+      }
+      if (element.getAsicBadLinChannelsSize() != 0) {
+        B2INFO("bad lin CHs (asic): ");
+        for (int i = 0; i < element.getAsicBadLinChannelsSize(); i++) {
+          B2INFO(element.getAsicBadLinChannel(i));
+        }
+      }
+    }
+  }
+}
+
+
 
 void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
 {
   // example that shows how to extract and use data
   // it calculates bias voltage at gain = 40 for each chip
 
-  DBArray<ARICHHapdChipInfo> elements("testHapdChip");
+  DBArray<ARICHHapdChipInfo> elements("ARICHHapdChipInfo");
   elements.getEntries();
 
   for (const auto& element : elements) {

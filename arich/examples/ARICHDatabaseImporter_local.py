@@ -10,10 +10,10 @@ import subprocess
 from fnmatch import fnmatch
 
 # use_local_database()
-# use_local_database("test_database.txt", "test_payloads")
+use_local_database("test_database.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
 # use_central_database("ARICHdata", LogLevel.ERROR);
-use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
+# use_central_database("test_ARICHReconstruction", LogLevel.ERROR)
 
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to
@@ -84,7 +84,7 @@ process(main)
 
 # and run the importer
 dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsics, rootFilesHapdQE)
-dbImporter.importAerogelInfo()
+# dbImporter.importAerogelInfo()
 # dbImporter.exportAerogelInfo()
 # dbImporter.importHapdQA()
 # dbImporter.exportHapdQA()
@@ -96,9 +96,9 @@ dbImporter.importAerogelInfo()
 # dbImporter.exportHapdInfo()
 # dbImporter.importHapdChipInfo()
 # dbImporter.exportHapdChipInfo()
-dbImporter.importHapdQE()
+# dbImporter.importHapdQE()
 # dbImporter.exportHapdQE()
-dbImporter.importBadChannels()
+# dbImporter.importBadChannels()
 # dbImporter.exportBadChannels()
 
 # simple example that shows how to read data from databse and use it

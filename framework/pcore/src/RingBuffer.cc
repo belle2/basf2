@@ -447,6 +447,16 @@ int RingBuffer::clear()
 
   return 0;
 }
+
+void RingBuffer::forceClear()
+{
+  int val = 1;
+  if (semctl(m_semid, 0, SETVAL, val) == -1) { //set 0th semaphore to semval
+    B2ERROR("Initializing semaphore with semctl() failed.");
+  }
+  clear();
+}
+
 int RingBuffer::tryClear()
 {
   if (SemaphoreLocker::isLocked(m_semid))

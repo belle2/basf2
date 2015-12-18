@@ -11,16 +11,19 @@ using namespace Belle2;
 
 int SemaphoreLocker::create(key_t semkey)
 {
-  int semid = semget(semkey, 1, IPC_CREAT | 0600);
+  int semid = semget(semkey, 1, IPC_CREAT | IPC_EXCL | 0600);
+  if (semid >= 0) {
+    // POSIX doesn't guarantee any particular state of our fresh semaphore
+    int semval = 1; //unlocked state
+    if (semctl(semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
+      B2ERROR("Initializing semaphore with semctl() failed.");
+    }
+  } else if (errno == EEXIST) {
+    semid = semget(semkey, 1, 0600);
+  }
   if (semid < 0) {
     B2ERROR("Couldn't create semaphore with semget()! Maybe you have semaphores from aborted processes lying around, you can clean those up using 'clear_basf2_ipc'.");
     return semid;
-  }
-
-  // POSIX doesn't guarantee any particular state of our fresh semaphore
-  int semval = 1; //unlocked state
-  if (semctl(semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
-    B2ERROR("Initializing semaphore with semctl() failed.");
   }
 
   return semid;

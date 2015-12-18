@@ -156,6 +156,8 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
     for (int j = 0; j < 16; j++)
       chi2 += y[i] * f.invC[i][j] * y[j];
 
-  time = ttrig - C[1] / C[0] ;
+  time = - C[1] / C[0] ;
   iter++;
+  return;
+
 }

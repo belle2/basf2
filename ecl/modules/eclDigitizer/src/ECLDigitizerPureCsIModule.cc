@@ -133,6 +133,7 @@ void ECLDigitizerPureCsIModule::event()
   }
 
   // loop over entire calorimeter
+
   for (int j = 0; j < EclConfigurationPure::m_nch; j++) {
     if (! isPureCsI(j + 1)) continue;
     adccounts_type& a = m_adc[j];
@@ -203,12 +204,14 @@ void ECLDigitizerPureCsIModule::readDSPDB()
     if (! m_calibration)
       dataFileName2 = FileSystem::findFile("/data/ecl/ECL-WF-cov-Pure-BG.root");
     B2INFO("ECLDigitizerPureCsI: Reading configuration data with background from: " << dataFileName);
+    B2INFO("ECLDigitizerPureCsI: Reading configuration data with background from: " << dataFileName2);
+
   } else {
-    // for the moment it is the same file
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Pure.root");
     if (! m_calibration)
-      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-cov-Pure.root");
+      dataFileName2 = FileSystem::findFile("/data/ecl/ECL-WF-cov-Pure.root");
     B2INFO("ECLDigitizerPureCsI: Reading configuration data without background from: " << dataFileName);
+    B2INFO("ECLDigitizerPureCsI: Reading configuration data without background from: " << dataFileName2);
   }
   assert(! dataFileName.empty());
 
@@ -250,21 +253,24 @@ void ECLDigitizerPureCsIModule::readDSPDB()
       eclWFData->getMatrix(params.invC);
       m_fitparams.push_back(params);
     }
-
-
-    // at the moment there is one set of fitparams
-    if (m_NoCovMatrix) {
-      m_fitparams.resize(1);
-      for (int i = 0; i < EclConfigurationPure::m_nch; i++)
-        m_tbl[i].idn = 0;
-      for (int i = 0; i < 16; i++)
-        for (int j = 0; j < 16; j++)
-          if (i != j) m_fitparams[0].invC[i][j] = 0;
-          else m_fitparams[0].invC[i][j] = 1.0;
-      initParams(m_fitparams[0], m_ss[0]);
-    } else
-      for (auto& param : m_fitparams) initParams(param, m_ss[0]);
   }
+  B2INFO("ECLDigitizerPureCsI: parameters vector size : " << m_fitparams.size());
+  // at the moment there is one set of fitparams
+  if (m_NoCovMatrix) {
+    m_fitparams.resize(1);
+    for (int i = 0; i < EclConfigurationPure::m_nch; i++)
+      m_tbl[i].idn = 0;
+    for (int i = 0; i < 16; i++)
+      for (int j = 0; j < 16; j++)
+        if (i != j) m_fitparams[0].invC[i][j] = 0;
+        else m_fitparams[0].invC[i][j] = 1.0;
+    initParams(m_fitparams[0], m_ss[0]);
+  } else {
+    for (auto& param : m_fitparams) {
+      initParams(param, m_ss[0]);
+    }
+  }
+
   // at the moment same noise for all crystals
   m_noise.resize(1);
   int index = 0;

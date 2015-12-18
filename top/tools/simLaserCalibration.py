@@ -77,7 +77,8 @@ main.add_module(topdigi)
 # Output
 output = register_module('RootOutput')
 output.param('outputFileName', 'laserSimulation.root')
-output.param('branchNames', ['TOPDigits'])  # comment it to write all branches
+output.param('branchNames', ['TOPDigits', 'TOPSimHits', 'TOPSimPhotons',
+                             'TOPDigitsToTOPSimHits', 'TOPSimHitsToTOPSimPhotons'])
 main.add_module(output)
 
 # Show progress of processing

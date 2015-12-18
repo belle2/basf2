@@ -79,9 +79,9 @@ namespace Belle2 {
         }
       }
 
-      // pmt and bar ID
+      // pmt and module ID
       int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(2);
-      int barID = photon.GetTouchableHandle()->GetReplicaNumber(5);
+      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(5);
 
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();
@@ -114,16 +114,29 @@ namespace Belle2 {
 
       StoreArray<TOPSimHit> simHits;
       if (!simHits.isValid()) simHits.create();
-      TOPSimHit* simHit = simHits.appendNew(barID, pmtID, xLocal, yLocal, detTime, energy);
+      TOPSimHit* simHit = simHits.appendNew(moduleID, pmtID, xLocal, yLocal,
+                                            detTime, energy);
 
       StoreArray<MCParticle> particles;
       RelationArray relParticleHit(particles, simHits);
       int parentID = photon.GetParentID();
+      if (parentID == 0) parentID = photon.GetTrackID();
       relParticleHit.add(parentID, simHit->getArrayIndex());
 
       StoreArray<TOPSimPhoton> simPhotons;
       if (!simPhotons.isValid()) simPhotons.create();
-      TOPSimPhoton* simPhoton = simPhotons.appendNew(barID, emiPoint, emiMomDir, emiTime,
+      const auto* Qbar = m_topgp->getQbar(moduleID);
+      if (Qbar) {
+        // transform to local frame
+        emiPoint = Qbar->pointToLocal(emiPoint);
+        detPoint = Qbar->pointToLocal(detPoint);
+        emiMomDir = Qbar->momentumToLocal(emiMomDir);
+        detMomDir = Qbar->momentumToLocal(detMomDir);
+      } else {
+        B2ERROR("SensitivePMT: undefined TOPQbar for moduleID = " << moduleID);
+      }
+      TOPSimPhoton* simPhoton = simPhotons.appendNew(moduleID,
+                                                     emiPoint, emiMomDir, emiTime,
                                                      detPoint, detMomDir, detTime,
                                                      length, energy);
 

@@ -129,7 +129,7 @@ namespace Belle2 {
       tracklength = tracklength * Unit::mm;
 
       //! Get bar ID
-      int barID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
+      int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
 
       //! Get PDG
       int PDG = (int)(particle->GetPDGEncoding());
@@ -137,7 +137,7 @@ namespace Belle2 {
       //! write the hit to datastore
       StoreArray<TOPBarHit> barHits;
       if (!barHits.isValid()) barHits.create();
-      TOPBarHit* hit = barHits.appendNew(barID, PDG, TOrigin, TPosition, TMomentum,
+      TOPBarHit* hit = barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
                                          globalTime, tracklength);
 
       //! set the relation

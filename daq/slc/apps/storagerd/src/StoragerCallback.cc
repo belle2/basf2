@@ -323,44 +323,33 @@ void StoragerCallback::monitor() throw(RCHandlerException)
     if (m_eb_stat) {
       std::vector<IOInfo> io_v;
       IOInfo io;
-      uint32 addr = ntohs(m_eb_stat->down(0).addr);
+      uint32 addr = ntohl(m_eb_stat->down(0).addr);
       io.setLocalAddress(addr);
       io.setLocalPort(m_eb_stat->down(0).port);
       io_v.push_back(io);
       for (int i = 0; i < m_nsenders; i++) {
         IOInfo io;
-        uint32 addr = ntohs(m_eb_stat->down(0).addr);
+        uint32 addr = ntohl(m_eb_stat->down(0).addr);
         io.setLocalAddress(addr);
         io.setLocalPort(m_eb_stat->up(i).port);
         io_v.push_back(io);
       }
       IOInfo::checkTCP(io_v);
-      info->eb[0].event = m_eb_stat->down(0).event;
-      info->eb[0].byte = m_eb_stat->down(0).byte;
-      uint64 event = info->eb[0].event;
-      uint64 byte = info->eb[0].byte;
+      uint64 event = info->eb[0].event = m_eb_stat->down(0).event;
+      uint64 byte = info->eb[0].byte = m_eb_stat->down(0).byte;
       LogFile::info("downstream  : event = %lu, byte = %lu", event, byte);
       uint32 port = m_eb_stat->down(0).port;
       uint32 nqueue = info->eb[0].nqueue = io_v[0].getTXQueue();
       const char* ip = io_v[0].getLocalIP();
       LogFile::info("downstream  : ip = %s, port = %u, nqueue = %u", ip, port, nqueue);
-      Time t;
-      double dt = t.get() - m_time.get();
-      m_time = t;
-      info->eb[0].evtrate = (info->eb[0].event - event) / dt;
-      info->eb[0].flowrate = (info->eb[0].byte - byte) / dt;
       for (int i = 0; i < m_nsenders; i++) {
-        info->eb[i + 1].event = m_eb_stat->up(i).event;
-        info->eb[i + 1].byte = m_eb_stat->up(i).byte;
-        event = info->eb[i + 1].event;
-        byte = info->eb[i + 1].byte;
+        event = info->eb[i + 1].event = m_eb_stat->up(i).event;
+        byte = info->eb[i + 1].byte = m_eb_stat->up(i).byte;
         LogFile::info("upstream[%d] : event = %lu, byte = %lu", i, event, byte);
         uint32 port = m_eb_stat->up(i).port;
         uint32 nqueue = info->eb[i + 1].nqueue = io_v[i + 1].getRXQueue();
         const char* ip = io_v[i + 1].getLocalIP();
         LogFile::info("upstream[%d] : ip = %s, port = %u, nqueue = %u", i, ip, port, nqueue);
-        info->eb[i + 1].evtrate = (info->eb[i + 1].event - event) / dt;
-        info->eb[i + 1].flowrate = (info->eb[i + 1].byte - byte) / dt;
       }
     }
 

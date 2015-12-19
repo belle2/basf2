@@ -67,30 +67,30 @@ namespace Belle2 {
 
     private:
 
-      const int c_nCrystals = 8736;
-      std::vector < float > m_calibrationAmplitudesLowEnergy;  //< vector with single crystal calibration amplitudes low energy
-      std::vector < float > m_calibrationEnergiesLowEnergy;  //< vector with single crystal calibration energy values low energy
-      std::vector < float > m_calibrationAmplitudesHighEnergy;  //< vector with single crystal calibration amplitudes high energy
-      std::vector < float > m_calibrationEnergiesHighEnergy;  //< vector with single crystal calibration energy values high energy
-      std::vector < double > m_calibrationC0;  //< vector with single crystal calibration energy values c0
-      std::vector < double > m_calibrationC1;  //< vector with single crystal calibration  values c1
-      DBArray<ECLCalibrationDigit> m_calibrationLow;  //< single crystal calibration constants low energy
-      DBArray<ECLCalibrationDigit> m_calibrationHigh;  //< single crystal calibration constants high energy
+      const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
+      std::vector < float > m_calibrationAmplitudesLowEnergy;  /**< vector with single crystal calibration amplitudes low energy */
+      std::vector < float > m_calibrationEnergiesLowEnergy;  /**< vector with single crystal calibration energy values low energy */
+      std::vector < float > m_calibrationAmplitudesHighEnergy;  /**< vector with single crystal calibration amplitudes high energy */
+      std::vector < float > m_calibrationEnergiesHighEnergy;  /**< vector with single crystal calibration energy values high energy */
+      std::vector < double > m_calibrationC0;  /**< vector with single crystal calibration energy values c0 */
+      std::vector < double > m_calibrationC1;  /**< vector with single crystal calibration  values c1 */
+      DBArray<ECLCalibrationDigit> m_calibrationLow;  /**< single crystal calibration constants low energy */
+      DBArray<ECLCalibrationDigit> m_calibrationHigh;  /**< single crystal calibration constants high energy */
 
-      double getCalibratedEnergy(int cellid, int energy); //< log interpolated value from the calibration amplitudes and energies
-      double getCalibratedTime(int cellid, int time); //< timing correction
-      void prepareCalibrationConstants(); //< reads calibration constants, performs checks, put them into a vector
+      double getCalibratedEnergy(int cellid, int energy); /**< log interpolated value from the calibration amplitudes and energies */
+      double getCalibratedTime(int cellid, int time); /**< timing correction */
+      void prepareCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
 
     };
 
-    // Class derived from ECLDigitCalibratorModule, only difference are the ECLDigit and ECLCalDigit names
+    /**< Class derived from ECLDigitCalibratorModule, only difference are the ECLDigit and ECLCalDigit names */
     class ECLDigitCalibratorPureCsIModule : public ECLDigitCalibratorModule {
     public:
-      /** get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
+      /**< get name of the ECLDigit (needed to differentiate between default and PureCsI).*/
       virtual const char* eclDigitArrayName() const override
       { return "ECLDigitsPureCsI" ; }
 
-      /** get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
+      /**< get name of the ECLCalDigit (needed to differentiate between default and PureCsI).*/
       virtual const char* eclCalDigitArrayName() const override
       { return "ECLCalDigitsPureCsI" ; }
     };

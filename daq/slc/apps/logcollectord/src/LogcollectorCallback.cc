@@ -34,6 +34,7 @@ void LogcollectorCallback::timeout(NSMCommunicator&) throw()
 
 void LogcollectorCallback::logset(const DAQLogMessage& msg) throw()
 {
+  LogFile::put(msg.getPriority(), msg.getNodeName() + " : " + msg.getMessage());
   try {
     if (!m_db.isConnected()) m_db.connect();
     DAQLogDB::createLog(m_db, m_logtable, msg);
@@ -55,6 +56,7 @@ void LogcollectorCallback::logget(const std::string& nodename,
                                   LogFile::Priority pri) throw()
 {
   if (m_nodes.find(nodename) == m_nodes.end()) {
+    LogFile::info("Added listner node " + nodename);
     m_nodes.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     m_pris.insert(PriorityList::value_type(nodename, pri));
     return;

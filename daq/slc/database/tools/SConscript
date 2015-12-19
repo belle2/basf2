@@ -21,5 +21,7 @@ env['TOOLS_LIBS']['daqdbprovider'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['daqdbremove'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['daqdbsample'] = ['daq', 'framework', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['daqdbtable'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['addsrootfile'] = ['daq', 'framework', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['sendsrootfile'] = ['daq', 'framework', '$PGSQL_LIBS']
 
 Return('env')

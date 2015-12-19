@@ -66,6 +66,8 @@ void NSM2SocketBridge::run() throw()
             }
           }
         }
+      } else if (cmd == NSMCommand::LOGGET) {
+        m_callback->requestLog();
       } else if (cmd == NSMCommand::DBSET) {
         if (msg.getLength() > 0) {
           DBObject obj;

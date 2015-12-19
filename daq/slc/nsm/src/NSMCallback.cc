@@ -23,6 +23,7 @@ NSMCallback::NSMCallback(const int timeout) throw()
   reg(NSMCommand::OK);
   reg(NSMCommand::ERROR);
   reg(NSMCommand::LOG);
+  reg(NSMCommand::LOGSET);
   reg(NSMCommand::LOGGET);
   reg(NSMCommand::VGET);
   reg(NSMCommand::VSET);
@@ -69,10 +70,12 @@ void NSMCallback::log(LogFile::Priority pri, const char* format, ...)
 
 void NSMCallback::log(LogFile::Priority pri, const std::string& msg)
 {
+  LogFile::put(pri, msg);
   try {
     if (getLogNode().getName().size() > 0) {
       NSMCommunicator::send(NSMMessage(getLogNode().getName(),
-                                       DAQLogMessage(getNode().getName(), pri, msg)));
+                                       DAQLogMessage(getNode().getName(),
+                                                     pri, msg)));
     }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());

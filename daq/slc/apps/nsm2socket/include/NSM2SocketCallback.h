@@ -34,7 +34,9 @@ namespace Belle2 {
   public:
     virtual bool perform(NSMCommunicator& com) throw();
     virtual void timeout(NSMCommunicator& com) throw();
+    virtual void logset(const DAQLogMessage& logmsg) throw();
     virtual void vset(NSMCommunicator& com, const NSMVar& v) throw();
+    void requestLog() throw();
 
   protected:
     NSM2SocketBridge* m_bridge;

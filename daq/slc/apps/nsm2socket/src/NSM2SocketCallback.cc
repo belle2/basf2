@@ -23,12 +23,29 @@ bool NSM2SocketCallback::perform(NSMCommunicator& com) throw()
   NSMCommand cmd(msg.getRequestName());
   if (cmd == NSMCommand::VSET) {
     NSMCallback::perform(com);
-  } else if (cmd == NSMCommand::LOG) {
-    m_bridge->send(msg);
+  } else if (cmd == NSMCommand::LOGSET) {
+    NSMCallback::perform(com);
   } else {
     m_bridge->send(msg);
   }
   return true;
+}
+
+void NSM2SocketCallback::logset(const DAQLogMessage& logmsg) throw()
+{
+  LogFile::put(logmsg.getPriority(), "%s :%s ",
+               logmsg.getNodeName().c_str(), logmsg.getMessage().c_str());
+  m_bridge->send(NSMMessage(NSMNode(logmsg.getNodeName()), logmsg));
+}
+
+void NSM2SocketCallback::requestLog() throw()
+{
+  try {
+    NSMCommunicator::send(NSMMessage(getLogNode().getName(),
+                                     NSMCommand::LOGGET));
+  } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
+  }
 }
 
 void NSM2SocketCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
@@ -65,7 +82,7 @@ bool NSM2SocketCallback::send(const NSMMessage& msg) throw()
                                           node.getName().c_str());
       LogFile::error(emsg);
       DAQLogMessage log(getNode().getName(), LogFile::ERROR, emsg);
-      m_bridge->send(NSMMessage(getNode(), log));
+      m_bridge->send(NSMMessage(getNode().getName(), log));
     }
     m_nodes[name].setState(NSMState::UNKNOWN);
     m_mutex.unlock();

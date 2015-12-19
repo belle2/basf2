@@ -128,7 +128,7 @@ void ECLDigitizerPureCsIModule::event()
         hitE = gRandom->Gaus(hitE, m_photostatresolution * sqrt(hitE));
         m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
       }
-      hitmap[j].push_back(&eclHit);
+      if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
     }
   }
 
@@ -163,8 +163,13 @@ void ECLDigitizerPureCsIModule::event()
     if (! m_calibration) {
       if (m_debug)
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
-      else
+      else {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
+        cout << "energy: " << energyFit
+             << " tFit: " << tFit
+             << " qualityfit: " << qualityFit
+             << endl;
+      }
     }
 
     if (m_calibration || energyFit > 0) {

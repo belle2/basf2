@@ -37,8 +37,8 @@ namespace Belle2 {
       };
 
       struct fitparamspure_t {
-        typedef double double_matrix[16][m_ndtPure];
-        typedef double fine_array[m_ndtPure];
+        typedef double double_matrix[16][2 * m_ndtPure];
+        typedef double fine_array[2 * m_ndtPure];
         double invC[16][16];
         double_matrix f, f1;
         double_matrix c100, c010;

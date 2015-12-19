@@ -48,23 +48,3 @@ int EKLM::stripNumber(int endcap, int layer, int sector, int plane, int strip)
                     (sector - 1)) + (plane - 1)) + strip;
 }
 
-int EKLM::layerLocalNumber(int gnum)
-{
-  return (gnum - 1) % 14 + 1;
-}
-
-int EKLM::sectorLocalNumber(int gnum)
-{
-  return (gnum - 1) % 4 + 1;
-}
-
-int EKLM::planeLocalNumber(int gnum)
-{
-  return (gnum - 1) % 2 + 1;
-}
-
-int EKLM::stripLocalNumber(int gnum)
-{
-  return (gnum - 1) % 75 + 1;
-}
-

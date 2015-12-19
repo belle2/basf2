@@ -83,34 +83,6 @@ namespace Belle2 {
      */
     int stripNumber(int endcap, int layer, int sector, int plane, int strip);
 
-    /**
-     * Get layer local number.
-     * @param[in] gnum Layer global number.
-     * @return Local number.
-     */
-    int layerLocalNumber(int gnum);
-
-    /**
-     * Get sector local number.
-     * @param[in] gnum Sector global number.
-     * @return Local number.
-     */
-    int sectorLocalNumber(int gnum);
-
-    /**
-     * Get plane local number.
-     * @param[in] gnum Plane global number.
-     * @return Local number.
-     */
-    int planeLocalNumber(int gnum);
-
-    /**
-     * Get strip local number.
-     * @param[in] gnum Strip global number.
-     * @return Local number.
-     */
-    int stripLocalNumber(int gnum);
-
   }
 }
 

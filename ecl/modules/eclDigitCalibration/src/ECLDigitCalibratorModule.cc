@@ -156,6 +156,10 @@ void ECLDigitCalibratorModule::terminate()
 // energy calibration
 double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
 {
+  if (cellid < 1 || cellid > c_nCrystals) {
+    B2FATAL("ECLDigitCalibrationModule:getCalibratedEnergy():" << cellid << " out od range!");
+  }
+
   //get sign of amplitude (can be negative as result of the fit!)
   int sign = 1;
   if (amplitude < 0) {
@@ -180,6 +184,10 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude)
 // time calibration (skeleton only)
 double ECLDigitCalibratorModule::getCalibratedTime(int cellid, int time)
 {
+  if (cellid < 1 || cellid > c_nCrystals) {
+    B2FATAL("ECLDigitCalibrationModule:getCalibratedTime():" << cellid << " out od range!");
+  }
+
   double caltime = 1.0 * time;
 
   return caltime;

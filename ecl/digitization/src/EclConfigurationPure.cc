@@ -3,6 +3,7 @@
 #include <TH1F.h>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 
 using namespace Belle2;
 using namespace Belle2::ECL;
@@ -21,13 +22,15 @@ void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun
   double maxval = * max_element(m_ft, m_ft + N);
 
   for_each(m_ft1, m_ft1 + N, [maxval](double & a) { a /= maxval; });
+  double maxval2 = * max_element(m_ft, m_ft + N);
+  assert(maxval2 - 1.0 < 0.001);
   double sum = 0;
   for (int i = 0; i < N; i++) sum += m_ft[i];
   m_sumscale = m_ns / sum;
   //  for (int i = 0; i < N; ++i) m_ft1[i] = sampledfunDerivative->GetBinContent(i + 1);
   ECLSampledShaper dsp1(sampledfunDerivative, round(r1 / r2));
   dsp1.fillarray(N, m_ft1);
-  for_each(m_ft1, m_ft1 + N, [r1, r2](double & a) { a *= r1 / r2; });
+  for_each(m_ft1, m_ft1 + N, [r1, r2, maxval](double & a) { a *= (r1 / r2) / maxval; });
 }
 
 void EclConfigurationPure::adccountspure_t::AddHit(const double a, const double t0,
@@ -79,10 +82,15 @@ double EclConfigurationPure::signalsamplepure_t::Accumulate(const double a, cons
   // calculate to fill output array
   const double w1 = a * w, w0 = a - w1;
   double sum = 0;
+  //cout <<"Filling energy: " << a << " time " << t << endl;
+  //cout <<"imin: " << imin << " imax: " << imax << endl;
   for (int i = imin, j = jmin; i < imax; i++, j += m_ns) {
     double amp = w0 * m_ft[j] + w1 * m_ft[j + 1];
+    //double amp = a * m_ft[j];
+    //cout << j << " " << m_ft[j] << " " << w * m_ft[j] + (1-w) * m_ft[j+1] << endl;
     s[i] += amp;
     sum  += amp;
   }
+  //cout << endl;
   return sum * m_sumscale;
 }

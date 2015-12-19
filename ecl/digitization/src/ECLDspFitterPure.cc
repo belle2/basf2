@@ -174,13 +174,13 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
   // C.Print();
   amp = C[0];
 
-
+  /*
   cout << "A  = " << C[0] << endl;
   cout << "t0 = " << ttrig << endl;
   //cout << "B = A * t  = " << C[1] << endl;
   cout << "P  = " << C[2] << endl;
   cout << "t = B / A = " << C[1] / C[0] << endl;
-
+  */
 
 
   double A = C[0];
@@ -196,8 +196,13 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
 
   int deltaTime = round(C[1] / C[0]) ;
   time = -ttrig - C[1] / C[0] ;
-  cout << "time : "  << time << endl;
+  //  cout << "time : "  << time << endl;
 
-  if (iter++ < 2 && abs(deltaTime) < EclConfigurationPure::m_ndtPure)
+  if (iter < 4 && abs(deltaTime) < EclConfigurationPure::m_ndtPure) {
+    iter++;
+    DSPFitterPure(f, FitA, deltaTime, amp, time, chi2, iter);
+  }
+
+  if (abs(deltaTime) < EclConfigurationPure::m_ndtPure && deltaTime > 2 && iter++ < 10)
     DSPFitterPure(f, FitA, deltaTime, amp, time, chi2, iter);
 }

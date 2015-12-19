@@ -13,7 +13,7 @@ namespace Belle2 {
       static constexpr int    m_nch      = 72 * 16; // total number of electronic channels (crystals) in fwd endcap calorimeter
 
       static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; // number of ADC measurements for signal fitting
-      static constexpr double m_tmin     = -16; // lower range of the signal fitting region in ADC clocks
+      static constexpr double m_tmin     = -15; // lower range of the signal fitting region in ADC clocks
       static constexpr int    m_ntrg     = EclConfiguration::m_ntrg; // number of trigger counts per ADC clock tick
       static double           m_tickPure;
       static constexpr int    m_nlPure   = EclConfiguration::m_nl * 15; // length of samples signal in number of ADC clocks

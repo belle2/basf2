@@ -125,7 +125,7 @@ void ECLDigitizerPureCsIModule::event()
       if (m_debug)
         m_adc[j].AddHit(hitE, hitTime + m_testsig, m_ss[m_tbl[j].iss]);
       else {
-        hitE = gRandom->Gaus(hitE, m_photostatresolution * sqrt(hitE));
+        hitE = gRandom->Gaus(hitE, m_photostatresolution / sqrt(hitE * 1000.));
         m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
       }
       if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
@@ -165,10 +165,12 @@ void ECLDigitizerPureCsIModule::event()
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
       else {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
+        /*
         cout << "energy: " << energyFit
-             << " tFit: " << tFit
-             << " qualityfit: " << qualityFit
-             << endl;
+        << " tFit: " << tFit
+        << " qualityfit: " << qualityFit
+        << endl;
+        */
       }
     }
 
@@ -181,7 +183,7 @@ void ECLDigitizerPureCsIModule::event()
       const auto eclDigit = eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
-      eclDigit->setTimeFit(int(tFit * 10)); // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
+      eclDigit->setTimeFit(int(tFit * 1000));
       eclDigit->setQuality(qualityFit);
 
       eclDigit->addRelationTo(eclDsp);

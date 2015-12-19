@@ -61,6 +61,9 @@ void ECLDigitizerModule::initialize()
   StoreArray<ECLDigit> ecldigi; ecldigi.registerInDataStore();
   StoreArray<ECLTrig>  ecltrig; ecltrig.registerInDataStore();
 
+  StoreArray<ECLHit> hitList;
+  ecldigi.registerRelationTo(hitList);
+
   readDSPDB();
 
   m_adc.resize(EclConfiguration::m_nch);
@@ -109,13 +112,14 @@ void ECLDigitizerModule::event()
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
-
+  vector< vector< const ECLHit*> > hitmap(EclConfiguration::m_nch);
   // emulate response for ECL hits after ADC measurements
   for (const auto& eclHit : eclHits) {
     int j = eclHit.getCellId() - 1; //0~8735
     double hitE       = eclHit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = eclHit.getTimeAve() / Unit::us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeInt - 0.32, m_ss[m_tbl[j].iss]);
+    if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
   }
 
   // loop over entire calorimeter
@@ -159,6 +163,8 @@ void ECLDigitizerModule::event()
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
+      for (const auto& hit : hitmap[j])
+        eclDigit->addRelationTo(hit);
     }
   } //store each crystal hit
 

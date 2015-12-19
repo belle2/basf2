@@ -109,7 +109,6 @@ throw(NSMHandlerException)
       if (node != NULL && req != NULL &&
           strlen(node) > 0 && strlen(req) > 0) {
         b2nsm_context(com.m_nsmc);
-        //LogFile::notice("%s >> %s ", node, req);
         if (b2nsm_sendany(node, req, msg.getNParams(), (int*)msg.getParams(),
                           msg.getLength(), msg.getData(), NULL) < 0) {
           g_mutex.unlock();
@@ -165,7 +164,6 @@ throw(NSMHandlerException)
   }
   g_comm.push_back(this);
   nsmlib_usesig(m_nsmc, 0);
-  //b2nsm_logging(stdout);
   m_id = m_nsmc->nodeid;
   m_node = node;
   g_mutex.unlock();

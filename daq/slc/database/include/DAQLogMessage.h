@@ -11,13 +11,7 @@
 
 namespace Belle2 {
 
-  class NSMMessage;
-
   class DAQLogMessage {
-
-  private:
-    static const std::string g_tablename;
-    static const int g_revision;
 
   public:
     DAQLogMessage() throw();
@@ -36,7 +30,7 @@ namespace Belle2 {
     virtual ~DAQLogMessage() throw() {}
 
   public:
-    bool read(const NSMMessage& msg) throw();
+    void setId(int id) throw() { m_id = id; }
     void setPriority(const std::string& priority) throw();
     void setPriority(LogFile::Priority priority) throw();
     void setNodeName(const std::string& name) throw();
@@ -44,6 +38,7 @@ namespace Belle2 {
     void setDate() throw();
     void setDate(int date) throw();
     void setDate(const Date& date) throw();
+    int getId() const throw() { return m_id; }
     LogFile::Priority getPriority() const throw();
     int getPriorityInt() const throw();
     const std::string getPriorityText() const throw();
@@ -57,6 +52,7 @@ namespace Belle2 {
     std::string m_nodename;
     int m_priority;
     std::string m_message;
+    int m_id;
 
   };
 

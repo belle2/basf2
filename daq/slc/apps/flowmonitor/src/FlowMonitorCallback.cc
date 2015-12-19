@@ -55,7 +55,7 @@ FlowMonitorCallback::FlowMonitorCallback(const std::string& node, const std::str
   : NSMCallback(20), m_runcontrol(rcnode)
 {
   setNode(NSMNode(node));
-  allocData(getNode().getName() + "_STATUS", "rorc_status", rorc_status_revision);
+  allocData(getNode().getName(), "rorc_status", rorc_status_revision);
 }
 
 void FlowMonitorCallback::init(NSMCommunicator& com) throw()

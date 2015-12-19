@@ -18,24 +18,22 @@ void ProcessListener::run()
 {
   Process& process(m_con->getProcess());
   std::string process_name = m_con->getParName();
+  RCCallback& callback(*(m_con->getCallback()));
   if (process.wait() < 0) {
-    LogFile::fatal("Failed to wait processed process %s",
-                   process_name.c_str());
+    callback.log(LogFile::FATAL, "Failed to wait processed process %s",
+                 process_name.c_str());
     return;
   }
-  RCCallback& callback(*(m_con->getCallback()));
   LogFile::debug(process_name + " : termineted");
   process.set_id(-1);
   callback.set(m_con->getParName() + ".pid", -1);
   try {
     callback.monitor();
   } catch (const RCHandlerFatalException& e) {
-    LogFile::fatal(e.what());
-    callback.reply(NSMMessage(NSMCommand::FATAL, e.what()));
+    callback.log(LogFile::FATAL, e.what());
   } catch (const RCHandlerException& e) {
-    LogFile::error(e.what());
-    callback.reply(NSMMessage(NSMCommand::ERROR, e.what()));
+    callback.log(LogFile::ERROR, e.what());
   } catch (const std::exception& e) {
-    LogFile::fatal("Unknown exception: %s. terminating process", e.what());
+    callback.log(LogFile::FATAL, "Unknown exception: %s. terminating process", e.what());
   }
 }

@@ -35,8 +35,11 @@ namespace Belle2 {
     virtual void ok(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void fatal(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void error(const char* /*node*/, const char* /*data*/) throw() {}
-    virtual void log(const char* /*node*/, const DAQLogMessage&, bool /*recorded*/) throw() {}
-    virtual void vget(const std::string& nodename, const std::string& vname) throw();
+    virtual void logset(const DAQLogMessage&) throw() {}
+    virtual void logget(const std::string& nodename,
+                        LogFile::Priority pri) throw() {}
+    virtual void vget(const std::string& nodename,
+                      const std::string& vname) throw();
     virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
     virtual void vlistget(NSMCommunicator& com) throw();
     virtual void vlistset(NSMCommunicator& com) throw();
@@ -46,8 +49,8 @@ namespace Belle2 {
 
   public:
     void reply(const NSMMessage& msg) throw(NSMHandlerException);
-    void replyLog(LogFile::Priority pri, const char* format, ...);
-    void replyLog(LogFile::Priority pri, const std::string& msg);
+    void log(LogFile::Priority pri, const char* format, ...);
+    void log(LogFile::Priority pri, const std::string& msg);
 
   public:
     NSMDataMap& getDataMap() throw() { return m_datas; }
@@ -63,6 +66,8 @@ namespace Belle2 {
     void reg(const NSMCommand& cmd) throw() { m_cmd_v.push_back(cmd); }
     void addNode(const NSMNode& node);
     const NSMNodeMap& getNodes() { return m_nodes; }
+    void setLogNode(const NSMNode& node) { m_lognode = node; }
+    const NSMNode& getLogNode() { return m_lognode; }
 
   private:
     typedef std::vector<NSMCommand> NSMCommandList;
@@ -76,6 +81,7 @@ namespace Belle2 {
     NSMNodeMap m_nodes;
     NSMData m_data;
     NSMDataMap m_datas;
+    NSMNode m_lognode;
 
   };
 

@@ -7,6 +7,7 @@
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
+#include <daq/slc/base/ConfigFile.h>
 
 #include <unistd.h>
 #include <cstdlib>
@@ -26,8 +27,11 @@ void NSMNodeDaemon::add(NSMCallback* callback,
       com->setCallback(callback);
       callback->init(*com);
       callback->alloc_open(*com);
-      //if (m_timeout == 0)
       m_timeout = callback->getTimeout();
+      if (callback->getLogNode().getName().size() == 0) {
+        ConfigFile file("slowcontrol");
+        callback->setLogNode(NSMNode(file.get("log.collector")));
+      }
       m_callback.push_back(callback);
     }
   } catch (const std::exception& e) {

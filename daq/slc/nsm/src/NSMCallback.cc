@@ -23,6 +23,7 @@ NSMCallback::NSMCallback(const int timeout) throw()
   reg(NSMCommand::OK);
   reg(NSMCommand::ERROR);
   reg(NSMCommand::LOG);
+  reg(NSMCommand::LOGGET);
   reg(NSMCommand::VGET);
   reg(NSMCommand::VSET);
   reg(NSMCommand::VREPLY);
@@ -56,25 +57,23 @@ throw(NSMHandlerException)
   }
 }
 
-void NSMCallback::replyLog(LogFile::Priority pri,
-                           const char* format, ...)
+void NSMCallback::log(LogFile::Priority pri, const char* format, ...)
 {
   va_list ap;
   char ss[1024 * 10];
   va_start(ap, format);
   vsprintf(ss, format, ap);
   va_end(ap);
-  try {
-    reply(NSMMessage(DAQLogMessage(getNode().getName(), pri, ss)));
-  } catch (const NSMHandlerException& e) {
-    LogFile::error(e.what());
-  }
+  log(pri, std::string(ss));
 }
 
-void NSMCallback::replyLog(LogFile::Priority pri, const std::string& msg)
+void NSMCallback::log(LogFile::Priority pri, const std::string& msg)
 {
   try {
-    reply(NSMMessage(DAQLogMessage(getNode().getName(), pri, msg)));
+    if (getLogNode().getName().size() > 0) {
+      NSMCommunicator::send(NSMMessage(getLogNode().getName(),
+                                       DAQLogMessage(getNode().getName(), pri, msg)));
+    }
   } catch (const NSMHandlerException& e) {
     LogFile::error(e.what());
   }
@@ -97,10 +96,33 @@ bool NSMCallback::perform(NSMCommunicator& com) throw()
     }
     return true;
   } else if (cmd == NSMCommand::LOG) {
+    int id = com.getNodeIdByName(msg.getNodeName());
     DAQLogMessage lmsg;
-    if (lmsg.read(msg)) {
-      log(msg.getNodeName(), lmsg, (bool)msg.getParam(2));
+    lmsg.setId(id);
+    lmsg.setNodeName(msg.getNodeName());
+    if (msg.getNParams() > 0) {
+      lmsg.setPriority((LogFile::Priority)msg.getParam(0));
     }
+    if (msg.getNParams() > 1) lmsg.setDate(msg.getParam(1));
+    lmsg.setMessage(msg.getLength() > 0 ? msg.getData() : "");
+    logset(lmsg);
+    return true;
+  } else if (cmd == NSMCommand::LOGSET) {
+    if (msg.getNParams() > 2 && msg.getLength() > 0) {
+      DAQLogMessage lmsg;
+      if (msg.getNParams() > 0) {
+        lmsg.setPriority((LogFile::Priority)msg.getParam(0));
+      }
+      if (msg.getNParams() > 1) lmsg.setDate(msg.getParam(1));
+      lmsg.setNodeName(com.getNodeNameById(msg.getParam(2)));
+      lmsg.setMessage(msg.getData());
+      logset(lmsg);
+    }
+    return true;
+  } else if (cmd == NSMCommand::LOGGET) {
+    std::string nodename = msg.getNodeName();
+    LogFile::Priority pri = (LogFile::Priority) msg.getParam(0);
+    logget(nodename, pri);
     return true;
   } else if (cmd == NSMCommand::VGET) {
     if (msg.getLength() > 0) {

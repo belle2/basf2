@@ -138,21 +138,6 @@ void RunControlCallback::fatal(const char* nodename, const char* data) throw()
   monitor();
 }
 
-void RunControlCallback::log(const char* nodename, const DAQLogMessage& lmsg,
-                             bool recorded) throw()
-{
-  try {
-    RCNode& node(findNode(nodename));
-    logging_imp(node, lmsg.getPriority(), lmsg.getDate(),
-                lmsg.getMessage(), recorded);
-  } catch (const std::out_of_range& e) {
-    LogFile::warning("Log from unknown node %s : %s", nodename,
-                     lmsg.getMessage().c_str());
-  } catch (const NSMHandlerException& e) {
-    LogFile::error(e.what());
-  }
-}
-
 void RunControlCallback::boot(const DBObject& obj) throw(RCHandlerException)
 {
   m_runno.setConfig(obj.getName());
@@ -390,31 +375,20 @@ void RunControlCallback::logging(const NSMNode& node, LogFile::Priority pri, con
   va_start(ap, text);
   vsprintf(buf, text, ap);
   va_end(ap);
-  logging_imp(node, pri, Date(), buf, false);
+  logging_imp(node, pri, Date(), buf);
 }
 
 void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
-                                     const Date& date, const std::string& msg,
-                                     bool recorded)
+                                     const Date& date, const std::string& msg)
 {
   DAQLogMessage log(node.getName(), pri, msg, date);
   LogFile::put(pri, msg);
-  DBInterface& db(*getDB());
-  try {
-    if (log.getPriority() >= m_priority_db && !recorded) {
-      if (!db.isConnected()) db.connect();
-      DAQLogDB::createLog(db, m_logtable, log);
-    }
-  } catch (const DBHandlerException& e) {
-    db.close();
-    LogFile::error("DB errir : %s", e.what());
-  }
   if ((getNode().getState() == RCState::RUNNING_S ||
        getNode().getState() == RCState::STARTING_TS) && pri >= LogFile::ERROR) {
     setState(RCState::NOTREADY_S);
   }
   if (log.getPriority() >= m_priority_global) {
-    reply(NSMMessage(log, true));
+    reply(NSMMessage(log));
   }
 }
 
@@ -568,7 +542,7 @@ void RunControlCallback::setExpNumber(int expno) throw()
     std::string msg = StringUtil::form("Set exp no = %d (run no =%d)", expno, runno);
     LogFile::info(msg);
     set("runno", runno);
-    reply(NSMMessage(DAQLogMessage(getNode().getName(), LogFile::INFO, msg), true));
+    log(LogFile::INFO, msg);
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
   }

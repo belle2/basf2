@@ -70,7 +70,7 @@ bool FEE32Handler::feeset(int val)
 unsigned int FEEHandler::bitmask(unsigned int max, unsigned int min)
 {
   unsigned int bit = 0;
-  for (int i = min; i <= max; i++) {
+  for (unsigned int i = min; i <= max; i++) {
     bit |= 0x1 << i;
   }
   return bit;

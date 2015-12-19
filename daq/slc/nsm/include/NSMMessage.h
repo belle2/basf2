@@ -41,8 +41,8 @@ namespace Belle2 {
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
                const std::string& data) throw();
     NSMMessage(const NSMNode& node, const NSMVar& var) throw();
-    NSMMessage(const NSMNode& node, const DAQLogMessage& log,
-               bool recorded = false) throw();
+    NSMMessage(const NSMNode& node, const DAQLogMessage& log) throw();
+    NSMMessage(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd) throw();
     NSMMessage(const NSMNode& node, const NSMData& data) throw();
     NSMMessage(const NSMCommand& cmd) throw();
     NSMMessage(const NSMCommand& cmd, int par) throw();
@@ -51,7 +51,7 @@ namespace Belle2 {
                const std::string& data) throw();
     NSMMessage(const NSMCommand& cmd, const std::string& data) throw();
     NSMMessage(const NSMVar& var) throw();
-    NSMMessage(const DAQLogMessage& log, bool recorded = false) throw();
+    NSMMessage(const DAQLogMessage& log) throw();
     NSMMessage(const NSMData& data) throw();
     NSMMessage(const NSMMessage& msg) throw();
     virtual ~NSMMessage() throw() { }
@@ -62,7 +62,8 @@ namespace Belle2 {
   public:
     void init() throw();
     void init(const NSMNode& node, const NSMVar& var) throw();
-    void init(const NSMNode& node, const DAQLogMessage& log, bool recorded) throw();
+    void init(const NSMNode& node, const DAQLogMessage& log) throw();
+    void init(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd) throw();
     void init(const NSMNode& node, const NSMData& data) throw();
     const char* getRequestName() const throw();
     const char* getNodeName() const throw();

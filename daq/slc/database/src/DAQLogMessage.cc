@@ -6,15 +6,13 @@
 
 using namespace Belle2;
 
-const std::string DAQLogMessage::g_tablename = "logmessage";
-const int DAQLogMessage::g_revision = 1;
-
 DAQLogMessage::DAQLogMessage() throw()
 {
   m_date = Date().get();
   m_nodename = "";
   m_priority = 0;
   m_message = "";
+  m_id = -1;
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -25,6 +23,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   m_nodename = nodename;
   m_priority = (int)priority;
   m_message = message;
+  m_id = -1;
 }
 
 DAQLogMessage::DAQLogMessage(const std::string& nodename,
@@ -36,6 +35,7 @@ DAQLogMessage::DAQLogMessage(const std::string& nodename,
   m_nodename = nodename;
   m_priority = (int)priority;
   m_message = message;
+  m_id = -1;
 }
 
 DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
@@ -44,23 +44,7 @@ DAQLogMessage::DAQLogMessage(const DAQLogMessage& log) throw()
   m_nodename = log.getNodeName();
   m_priority = log.getPriorityInt();
   m_message = log.getMessage();
-}
-
-bool DAQLogMessage::read(const NSMMessage& msg) throw()
-{
-  if (msg.getLength() > 0 && msg.getNParams() > 2) {
-    setPriority((LogFile::Priority)msg.getParam(0));
-    setDate(msg.getParam(1));
-    StringList s = StringUtil::split(msg.getData(), '\n');
-    if (s[0].size() == 0) {
-      setNodeName(msg.getNodeName());
-    } else {
-      setNodeName(s[0]);
-    }
-    setMessage(StringUtil::join(s, "<br/>", 1));
-    return true;
-  }
-  return false;
+  m_id = log.getId();
 }
 
 void DAQLogMessage::setPriority(LogFile::Priority priority) throw()

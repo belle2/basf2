@@ -32,7 +32,6 @@ namespace Belle2 {
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
     virtual void fatal(const char* nodename, const char* data) throw();
-    virtual void log(const char* nodename, const DAQLogMessage& lmsg, bool recorded) throw();
     virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
@@ -61,7 +60,7 @@ namespace Belle2 {
     void logging(const NSMNode& node, LogFile::Priority pri,
                  const char* text, ...);
     void logging_imp(const NSMNode& node, LogFile::Priority pri,
-                     const Date& date, const std::string& msg, bool recorded);
+                     const Date& date, const std::string& msg);
     bool addAll(const DBObject& obj) throw();
     using RCCallback::setState;
 

@@ -13,6 +13,8 @@ namespace Belle2 {
     static const NSMCommand ERROR;
     static const NSMCommand FATAL;
     static const NSMCommand LOG;
+    static const NSMCommand LOGSET;
+    static const NSMCommand LOGGET;
     static const NSMCommand VLISTGET;
     static const NSMCommand VLISTSET;
     static const NSMCommand VGET;

@@ -61,8 +61,7 @@ void NSMMessage::init(const NSMNode& node, const NSMVar& var) throw()
   }
 }
 
-void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
-                      bool recorded) throw()
+void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log) throw()
 {
   init();
   m_nodename = node.getName();
@@ -70,8 +69,21 @@ void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
   setNParams(3);
   setParam(0, (int)log.getPriority());
   setParam(1, log.getDateInt());
-  setParam(2, (recorded) ? 1 : 0);
-  setData(log.getNodeName() + "\n" + log.getMessage());
+  setParam(2, log.getId());
+  setData(log.getMessage());
+}
+
+void NSMMessage::init(const NSMNode& node, const DAQLogMessage& log,
+                      const NSMCommand& cmd) throw()
+{
+  init();
+  m_nodename = node.getName();
+  m_reqname = cmd.getLabel();
+  setNParams(3);
+  setParam(0, (int)log.getPriority());
+  setParam(1, log.getDateInt());
+  setParam(2, log.getId());
+  setData(log.getMessage());
 }
 
 void NSMMessage::init(const NSMNode& node, const NSMData& data) throw()
@@ -205,10 +217,15 @@ NSMMessage::NSMMessage(const NSMNode& node, const NSMData& data) throw()
   init(node, data);
 }
 
-NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log,
-                       bool recorded) throw()
+NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log) throw()
 {
-  init(node, log, recorded);
+  init(node, log);
+}
+
+NSMMessage::NSMMessage(const NSMNode& node, const DAQLogMessage& log,
+                       const NSMCommand& cmd) throw()
+{
+  init(node, log, cmd);
 }
 
 NSMMessage::NSMMessage(const NSMVar& var) throw()
@@ -221,9 +238,9 @@ NSMMessage::NSMMessage(const NSMData& data) throw()
   init(NSMNode(), data);
 }
 
-NSMMessage::NSMMessage(const DAQLogMessage& log, bool recorded) throw()
+NSMMessage::NSMMessage(const DAQLogMessage& log) throw()
 {
-  init(NSMNode(), log, recorded);
+  init(NSMNode(), log);
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,

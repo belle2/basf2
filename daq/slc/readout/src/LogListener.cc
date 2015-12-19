@@ -45,7 +45,7 @@ void LogListener::run()
         if (priority == LogFile::UNKNOWN) {
           priority = LogFile::DEBUG;
         }
-        LogFile::put(priority, s);
+        m_con->getCallback()->log(priority, s);
         if (node.getState() != RCState::STOPPING_TS &&
             node.getState() != RCState::ABORTING_RS &&
             node.getState() != RCState::RECOVERING_RS) {

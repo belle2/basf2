@@ -72,6 +72,8 @@ namespace Belle2 {
 
     /** Clear the RingBuffer */
     int clear();
+    /** Forcefully clear the RingBuffer with resetting semaphore*/
+    void forceClear();
 
     /** Clear the RingBuffer, if the semaphore isn't locked at the moment. See SemaphoreLocker::isLocked() for details */
     int tryClear();

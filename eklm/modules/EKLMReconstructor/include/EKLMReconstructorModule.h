@@ -12,6 +12,7 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/core/Module.h>

@@ -68,6 +68,9 @@ namespace Belle2 {
     /** Name of output file. */
     std::string m_OutputFile;
 
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
     /**
      * Generation of zero displacements.
      */

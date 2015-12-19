@@ -80,6 +80,9 @@ namespace Belle2 {
       /** Transformation data. */
       TransformData* m_TransformData;
 
+      /** Geometry data. */
+      const EKLM::GeometryData* m_GeoDat;
+
       /** Time calibration data. */
       struct TimeParams* m_TimeParams;
 

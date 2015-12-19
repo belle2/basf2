@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/GeoEKLMTypes.h>
 
 namespace Belle2 {
@@ -48,6 +49,10 @@ namespace Belle2 {
       bool step(G4Step* aStep, G4TouchableHistory* history);
 
     private:
+
+      /** Geometry data. */
+      const EKLM::GeometryData* m_GeoDat;
+
       /**
        * All hits with energies less than m_ThresholdEnergyDeposit
        * will be dropped.
@@ -60,14 +65,10 @@ namespace Belle2 {
        */
       G4double m_ThresholdHitTime;
 
-      /**
-       * Sensitive detector type.
-       */
+      /** Sensitive detector type. */
       enum SensitiveType m_type;
 
-      /**
-       * Sensitive detector operation mode.
-       */
+      /** Sensitive detector operation mode. */
       enum EKLM::DetectorMode m_mode;
 
     };

@@ -13,7 +13,6 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/reconstruction/Reconstructor.h>
 #include <framework/gearbox/Const.h>
@@ -27,10 +26,11 @@ using namespace Belle2;
 static bool comparePlane(EKLMDigit* d1, EKLMDigit* d2)
 {
   int s1, s2;
-  s1 = EKLM::planeNumber(d1->getEndcap(), d1->getLayer(), d1->getSector(),
-                         d1->getPlane());
-  s2 = EKLM::planeNumber(d2->getEndcap(), d2->getLayer(), d2->getSector(),
-                         d2->getPlane());
+  const EKLM::GeometryData& geoDat = EKLM::GeometryData::Instance();
+  s1 = geoDat.planeNumber(d1->getEndcap(), d1->getLayer(), d1->getSector(),
+                          d1->getPlane());
+  s2 = geoDat.planeNumber(d2->getEndcap(), d2->getLayer(), d2->getSector(),
+                          d2->getPlane());
   return s1 < s2;
 }
 
@@ -57,7 +57,8 @@ EKLM::Reconstructor::Reconstructor(TransformData* transformData)
   TTree* t;
   setDefDigitizationParams(&m_digPar);
   m_TransformData = transformData;
-  n = EKLM::GeometryData::Instance().getNStripsDifferentLength();
+  m_GeoDat = &(EKLM::GeometryData::Instance());
+  n = m_GeoDat->getNStripsDifferentLength();
   m_TimeParams = new struct TimeParams[n];
   f = new TFile(FileSystem::findFile(
                   "/data/eklm/TimeCalibration.root").c_str());

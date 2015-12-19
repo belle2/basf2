@@ -24,6 +24,8 @@ using namespace Belle2;
 static const char c_MemErr[] = "Memory allocation error.";
 static const char c_ModeErr[] =
   "Requested data are defined only for c_DetectorBackground mode.";
+static const char c_EndcapErr[] =
+  "Number of endcap must be 1 (backward) or 2 (forward).";
 static const char c_PlaneErr[] = "Number of plane must be from 1 to 2.";
 static const char c_SegmentErr[] = "Number of segment must be from 1 to 5.";
 static const char c_SupportErr[] =
@@ -700,6 +702,60 @@ int EKLM::GeometryData::getNStrips() const
 int EKLM::GeometryData::getNSegments() const
 {
   return m_nSegment;
+}
+
+int EKLM::GeometryData::detectorLayerNumber(int endcap, int layer) const
+{
+  if (endcap <= 0 || endcap > 2)
+    B2FATAL(c_EndcapErr);
+  if (layer <= 0)
+    B2FATAL("Number of layer must be nonnegative.");
+  if (endcap == 1) {
+    if (layer > m_nLayerBackward)
+      B2FATAL("Number of layer must be less than or equal to the number of "
+              "detector layers in the backward endcap.");
+    return layer;
+  }
+  if (layer > m_nLayerForward)
+    B2FATAL("Number of layer must be less than or equal to the number of "
+            "detector layers in the forward endcap.");
+  return m_nLayerBackward + layer;
+}
+
+int EKLM::GeometryData::sectorNumber(int endcap, int layer, int sector) const
+{
+  if (sector <= 0 || sector > 4)
+    B2FATAL("Number of sector must be from 1 to 4.");
+  return 4 * detectorLayerNumber(endcap, layer) + sector;
+}
+
+int EKLM::GeometryData::planeNumber(int endcap, int layer, int sector,
+                                    int plane) const
+{
+  if (plane <= 0 || plane > 2)
+    B2FATAL(c_PlaneErr);
+  return 2 * sectorNumber(endcap, layer, sector) + plane;
+}
+
+int EKLM::GeometryData::segmentNumber(int endcap, int layer, int sector,
+                                      int plane, int segment) const
+{
+  if (segment <= 0 || segment > 5)
+    B2FATAL(c_SegmentErr);
+  return 5 * planeNumber(endcap, layer, sector, plane);
+}
+
+int EKLM::GeometryData::stripNumber(int endcap, int layer, int sector,
+                                    int plane, int strip) const
+{
+  if (strip <= 0 || strip > 75)
+    B2FATAL(c_StripErr);
+  return 75 * planeNumber(endcap, layer, sector, plane);
+}
+
+int EKLM::GeometryData::getMaximalStripNumber() const
+{
+  return stripNumber(2, m_nLayerForward, 4, 2, 75);
 }
 
 double EKLM::GeometryData::getSolenoidZ() const

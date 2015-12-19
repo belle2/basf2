@@ -14,7 +14,6 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 #include <framework/database/DBObjPtr.h>
@@ -62,8 +61,8 @@ EKLM::TransformData::TransformData(bool global, const char* alignmentDataFile)
         for (iSector = 1; iSector <= 4; iSector++) {
           for (iPlane = 1; iPlane <= 2; iPlane++) {
             for (iSegment = 1; iSegment <= 5; iSegment++) {
-              segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                            iSegment);
+              segment = geoDat.segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                             iSegment);
               alignmentData = alignment->getAlignmentData(segment);
               if (alignmentData == NULL)
                 B2FATAL("Incomplete alignment data.");

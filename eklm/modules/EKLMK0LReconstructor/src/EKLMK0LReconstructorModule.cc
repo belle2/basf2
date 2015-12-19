@@ -21,7 +21,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/modules/EKLMK0LReconstructor/EKLMK0LReconstructorModule.h>
 #include <mdst/dataobjects/KLMCluster.h>
 

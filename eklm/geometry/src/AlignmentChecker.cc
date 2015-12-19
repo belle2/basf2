@@ -11,7 +11,6 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/Polygon2D.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -171,8 +170,8 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
       for (iSector = 1; iSector <= 4; iSector++) {
         for (iPlane = 1; iPlane <= 2; iPlane++) {
           for (iSegment = 1; iSegment <= 5; iSegment++) {
-            segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                          iSegment);
+            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                              iSegment);
             alignmentData = alignment->getAlignmentData(segment);
             if (alignmentData == NULL)
               B2FATAL("Incomplete alignment data.");

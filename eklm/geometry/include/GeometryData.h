@@ -368,6 +368,82 @@ namespace Belle2 {
       int getNSegments() const;
 
       /**
+       * Get layer number.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @return Number of layer.
+       * @details
+       * Number is from 1 to 14*2 = 28.
+       */
+      int layerNumber(int endcap, int layer) const;
+
+      /**
+       * Get detector layer number.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @return Number of layer.
+       * @details
+       * Number is from 1 to 12 + 14 = 26.
+       */
+      int detectorLayerNumber(int endcap, int layer) const;
+
+      /**
+       * Get sector number.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @return Number of sector.
+       * @details
+       * Number is from 1 to 4*14*2 = 112.
+       */
+      int sectorNumber(int endcap, int layer, int sector) const;
+
+      /**
+       * Get plane number.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @return Number of plane.
+       * @details
+       * Number is from 1 to 2*4*26 = 208.
+       */
+      int planeNumber(int endcap, int layer, int sector, int plane) const;
+
+      /**
+       * Get segment number.
+       * @param[in] endcap  Endcap number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
+       * @param[in] segment Segment number.
+       * @return Number of strip.
+       * @details
+       * Number is from 1 to 5*2*4*26 = 1040.
+       */
+      int segmentNumber(int endcap, int layer, int sector, int plane,
+                        int strip) const;
+
+      /**
+       * Get strip number.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @param[in] strip  Strip number.
+       * @return Number of strip.
+       * @details
+       * Number is from 1 to 75*2*4*26 = 15600.
+       */
+      int stripNumber(int endcap, int layer, int sector, int plane,
+                      int strip) const;
+
+      /**
+       * Get maximal strip number.
+       */
+      int getMaximalStripNumber() const;
+
+      /**
        * Get solenoid center Z coordinate.
        */
       double getSolenoidZ() const;

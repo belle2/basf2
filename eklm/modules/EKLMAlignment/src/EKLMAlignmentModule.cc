@@ -15,7 +15,6 @@
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
 #include <framework/core/ModuleManager.h>
@@ -37,6 +36,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
+  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 EKLMAlignmentModule::~EKLMAlignmentModule()
@@ -55,8 +55,8 @@ void EKLMAlignmentModule::generateZeroDisplacement()
       for (iSector = 1; iSector <= 4; iSector++) {
         for (iPlane = 1; iPlane <= 2; iPlane++) {
           for (iSegment = 1; iSegment <= 5; iSegment++) {
-            segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                          iSegment);
+            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                              iSegment);
             alignment.setAlignmentData(segment, &alignmentData);
           }
         }
@@ -92,8 +92,8 @@ void EKLMAlignmentModule::generateRandomDisplacement()
               alignmentData.setDalpha(gRandom->Uniform(minDalpha, maxDalpha));
             } while (!alignmentChecker.checkSegmentAlignment(iPlane, iSegment,
                                                              &alignmentData));
-            segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                          iSegment);
+            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                              iSegment);
             alignment.setAlignmentData(segment, &alignmentData);
           }
         }
@@ -147,8 +147,8 @@ void EKLMAlignmentModule::studyAlignmentLimits()
             for (iSector = 1; iSector <= 4; iSector++) {
               for (iPlane = 1; iPlane <= 2; iPlane++) {
                 for (iSegment = 1; iSegment <= 5; iSegment++) {
-                  segment = EKLM::segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                                iSegment);
+                  segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
+                                                    iPlane, iSegment);
                   if (iPlane == jPlane && iSegment == jSegment)
                     alignment.setAlignmentData(segment, &alignmentDataRandom);
                   else

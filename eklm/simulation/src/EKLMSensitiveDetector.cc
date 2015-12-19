@@ -13,7 +13,6 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <framework/datastore/StoreArray.h>
@@ -27,6 +26,7 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
+  m_GeoDat = &(EKLM::GeometryData::Instance());
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   m_mode = (enum DetectorMode)gd.getInt("Mode");
@@ -115,7 +115,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  if (GeometryData::Instance().getDetectorMode() == c_DetectorBackground)
+  if (m_GeoDat->getDetectorMode() == c_DetectorBackground)
     stripLevel = 2;
   /** Get information on mother volumes and store them to the hit. */
   switch (m_type) {
@@ -125,9 +125,9 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
       hit->setSector(hist->GetVolume(stripLevel + 2)->GetCopyNo());
       hit->setLayer(hist->GetVolume(stripLevel + 3)->GetCopyNo());
       hit->setEndcap(hist->GetVolume(stripLevel + 4)->GetCopyNo());
-      hit->setVolumeID(stripNumber(hit->getEndcap(), hit->getLayer(),
-                                   hit->getSector(), hit->getPlane(),
-                                   hit->getStrip()));
+      hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
+                                             hit->getSector(), hit->getPlane(),
+                                             hit->getStrip()));
       break;
     case c_SensitiveSiPM:
       hit->setStrip(hist->GetVolume(1)->GetCopyNo());
@@ -135,9 +135,9 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
       hit->setSector(hist->GetVolume(3)->GetCopyNo());
       hit->setLayer(hist->GetVolume(4)->GetCopyNo());
       hit->setEndcap(hist->GetVolume(5)->GetCopyNo());
-      hit->setVolumeID(stripNumber(hit->getEndcap(), hit->getLayer(),
-                                   hit->getSector(), hit->getPlane(),
-                                   hit->getStrip()) + 100000);
+      hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
+                                             hit->getSector(), hit->getPlane(),
+                                             hit->getStrip()) + 100000);
       break;
     case c_SensitiveBoard:
       int brd = hist->GetVolume(1)->GetCopyNo() - 1;
@@ -146,9 +146,10 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
       hit->setSector(hist->GetVolume(2)->GetCopyNo());
       hit->setLayer(hist->GetVolume(3)->GetCopyNo());
       hit->setEndcap(hist->GetVolume(4)->GetCopyNo());
-      hit->setVolumeID(segmentNumber(hit->getEndcap(), hit->getLayer(),
-                                     hit->getSector(), hit->getPlane(),
-                                     hit->getStrip()) + 200000);
+      hit->setVolumeID(
+        m_GeoDat->segmentNumber(hit->getEndcap(), hit->getLayer(),
+                                hit->getSector(), hit->getPlane(),
+                                hit->getStrip()) + 200000);
       break;
   }
   /* Relation. */

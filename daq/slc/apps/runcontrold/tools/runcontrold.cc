@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     callback->setPriorityToGlobal(LogFile::getPriority(config.get("log.priority.global")));
     //callback->setExcludedNodes(StringUtil::split(config.get("node.excluded"), ','));
     callback->setLocalRunControls(StringUtil::split(config.get("localruncontrols"), ','));
-    callback->setLogTable(config.get("log.dbtable"));
+    //callback->setLogTable(config.get("log.dbtable"));
     callback->setRestartTime(config.getInt("restarttime"));
     RCCallback* callback2 = new RunControlMasterCallback(callback);
     RCNodeDaemon(config, callback, callback2).run();

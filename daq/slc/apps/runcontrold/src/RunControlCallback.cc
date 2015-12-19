@@ -52,6 +52,7 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
       LogFile::debug(e.what());
     }
   }
+  getNode().setUsed(true);
 }
 
 void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException)

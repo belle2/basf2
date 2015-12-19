@@ -317,8 +317,8 @@ void COPPERCallback::logging(bool err, LogFile::Priority pri,
     va_start(ap, str);
     vsprintf(ss, str, ap);
     va_end(ap);
-    LogFile::put(pri, ss);
-    reply(NSMMessage(DAQLogMessage(getNode().getName(), pri, ss)));
+    //LogFile::put(pri, ss);
+    log(pri, ss);
     if (pri >= LogFile::ERROR)
       setState(RCState::NOTREADY_S);
   }
@@ -391,7 +391,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       getNode().getState() == RCState::PAUSED_S) {
     if (!m_con.isAlive()) {
       setState(RCState::NOTREADY_S);
-      replyLog(LogFile::ERROR, "basf2 was down");
+      log(LogFile::ERROR, "basf2 was down");
     }
   }
 }

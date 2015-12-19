@@ -2,7 +2,7 @@
 
 using namespace Belle2;
 
-RunSetting::RunSetting(const NSMNode& node)
+RunSetting::RunSetting(const NSMNode& /*node*/)
 {
   addInt("runnumberid", 0);
   //addInt("runcontrol", 0);

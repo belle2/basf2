@@ -119,13 +119,13 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   if (!m_eb0.load(obj, 0)) {
     throw (RCHandlerException("Failed to boot eb0"));
   }
-  LogFile::debug("Booted eb0");
+  log(LogFile::INFO, "Booted eb0");
   try_wait();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     if (!m_stream0[i].load(obj, 10)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
-    LogFile::debug("Booted %d-th stream0", i);
+    log(LogFile::INFO, "Booted %d-th stream0", i);
     try_wait();
   }
   /*
@@ -142,7 +142,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   try_wait();
 }
 
-void ROCallback::start(int expno, int runno) throw(RCHandlerException)
+void ROCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerException)
 {
   /*
   try {
@@ -169,7 +169,7 @@ bool ROCallback::pause() throw(RCHandlerException)
   try {
     if (m_eb0.isUsed()) m_eb0.pause();
   } catch (const RCHandlerException& e) {
-    LogFile::warning("eb0 did not start : %s", e.what());
+    log(LogFile::WARNING, "eb0 did not start : %s", e.what());
     return false;
   }
   for (size_t i = 0; i < m_stream0.size(); i++) {
@@ -185,7 +185,7 @@ bool ROCallback::resume(int subno) throw(RCHandlerException)
   try {
     if (m_eb0.isUsed()) m_eb0.resume(subno);
   } catch (const RCHandlerException& e) {
-    LogFile::warning("eb0 did not start : %s", e.what());
+    log(LogFile::WARNING, "eb0 did not restart : %s", e.what());
     return false;
   }
   for (size_t i = 0; i < m_stream0.size(); i++) {
@@ -248,12 +248,12 @@ void ROCallback::monitor() throw(RCHandlerException)
       state == RCState::STARTING_TS) {
     if (m_eb0.isUsed() && !m_eb0.getControl().isAlive()) {
       setState(RCState::NOTREADY_S);
-      replyLog(LogFile::ERROR, "eb0 was crashed");
+      log(LogFile::ERROR, "eb0 was crashed");
     }
     for (size_t i = 0; i < m_stream0.size(); i++) {
       if (m_stream0[i].isUsed() && !m_stream0[i].getControl().isAlive()) {
         setState(RCState::NOTREADY_S);
-        replyLog(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
+        log(LogFile::ERROR, "basf2 stream0-%d was crashed", (int)i);
       }
     }
   }

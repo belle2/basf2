@@ -63,7 +63,7 @@ bool ROController::pause() throw()
   return true;
 }
 
-bool ROController::resume(int subno) throw()
+bool ROController::resume(int /*subno*/) throw()
 {
   m_con.resume();
   return true;

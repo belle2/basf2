@@ -9,10 +9,11 @@
 #include <daq/slc/base/ConfigFile.h>
 
 #include <iostream>
+#include <unistd.h>
 
 using namespace Belle2;
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   daemon(0, 0);
   ConfigFile config("slowcontrol");

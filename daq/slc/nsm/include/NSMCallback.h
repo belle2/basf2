@@ -36,8 +36,8 @@ namespace Belle2 {
     virtual void fatal(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void error(const char* /*node*/, const char* /*data*/) throw() {}
     virtual void logset(const DAQLogMessage&) throw() {}
-    virtual void logget(const std::string& nodename,
-                        LogFile::Priority pri) throw() {}
+    virtual void logget(const std::string& /*nodename*/,
+                        LogFile::Priority /*priorit*/) throw() {}
     virtual void vget(const std::string& nodename,
                       const std::string& vname) throw();
     virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();

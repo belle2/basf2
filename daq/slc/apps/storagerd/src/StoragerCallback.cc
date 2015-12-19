@@ -328,7 +328,7 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       io_v.push_back(io);
       for (int i = 0; i < m_nsenders; i++) {
         IOInfo io;
-        io.setLocalAddress(ntohl(m_eb_stat->down(0).addr));
+        io.setLocalAddress(ntohl(m_eb_stat->up(i).addr));
         io.setLocalPort(m_eb_stat->up(i).port);
         io_v.push_back(io);
       }
@@ -338,7 +338,7 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       info->eb2out.nqueue = io_v[0].getTXQueue() / 1024.;
       info->eb2out.connection = (io_v[0].getState() == 1);
       for (int i = 0; i < m_nsenders; i++) {
-        info->eb2in[1].event = m_eb_stat->up(i).event;
+        info->eb2in[i].event = m_eb_stat->up(i).event;
         info->eb2in[i].byte = m_eb_stat->up(i).byte / 1024.;
         info->eb2in[i].nqueue = io_v[i + 1].getRXQueue() / 1024.;
         info->eb2in[i].connection = (io_v[i + 1].getState() == 1);

@@ -25,15 +25,13 @@ EKLMDigit::EKLMDigit()
   m_NPE = -1;
   m_generatedNPE = -1;
   m_fitStatus = -1;
-  m_volid = -1;
   m_sMCTime = -1;
 }
 
 EKLMDigit::EKLMDigit(const EKLMSim2Hit* hit)
   : EKLMHitBase((EKLMHitBase)(*hit)),
     m_Plane(hit->getPlane()),
-    m_Strip(hit->getStrip()),
-    m_volid(hit->getVolumeID())
+    m_Strip(hit->getStrip())
 {
   m_good = false;
   m_NPE = -1;
@@ -100,16 +98,6 @@ void EKLMDigit::setFitStatus(int s)
 int EKLMDigit::getFitStatus()
 {
   return m_fitStatus;
-}
-
-int EKLMDigit::getVolumeID() const
-{
-  return m_volid;
-}
-
-void EKLMDigit::setVolumeID(int id)
-{
-  m_volid = id;
 }
 
 float EKLMDigit::getSiPMMCTime() const

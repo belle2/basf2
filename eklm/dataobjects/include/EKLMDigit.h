@@ -69,18 +69,6 @@ namespace Belle2 {
     void setGeneratedNPE(int npe);
 
     /**
-     * Get volume identifier.
-     * @return Identifier.
-     */
-    int getVolumeID() const;
-
-    /**
-     * Set volume identifier.
-     * @param[in] id Identifier.
-     */
-    void setVolumeID(int id);
-
-    /**
      * Whether hit could be used late (if it passed discriminator threshold)
      * (getter).
      * @return True if could be used.
@@ -162,14 +150,11 @@ namespace Belle2 {
     /** Fit status. */
     int m_fitStatus;
 
-    /** Volume identifier. */
-    int m_volid;
-
     /** MC time at SiPM. */
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 3);
+    ClassDef(Belle2::EKLMDigit, 4);
 
   };
 

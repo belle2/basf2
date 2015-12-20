@@ -105,7 +105,9 @@ void EKLMTimeCalibrationCollectorModule::collect()
     for (j = 0; j < 2; j++) {
       entryHit[j] = NULL;
       exitHit[j] = NULL;
-      vol = digits[j]->getVolumeID();
+      vol = m_GeoDat->stripNumber(digits[i]->getEndcap(), digits[i]->getLayer(),
+                                  digits[i]->getSector(), digits[i]->getPlane(),
+                                  digits[i]->getStrip());
       itLower = mapExtHit.lower_bound(vol);
       itUpper = mapExtHit.upper_bound(vol);
       for (it = itLower; it != itUpper; ++it) {

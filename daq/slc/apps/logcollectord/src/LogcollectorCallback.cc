@@ -67,13 +67,17 @@ void LogcollectorCallback::logget(const std::string& nodename,
       NSMNode node(nodename);
       NSMCommunicator::send(NSMMessage(node, DAQLogMessage(getNode().getName(), LogFile::DEBUG,
                                                            "Registered in log collector"), NSMCommand::LOG));
-      for (std::vector<DAQLogMessage>::reverse_iterator it = m_msgs.rbegin();
-           it != m_msgs.rend(); it++) {
-        NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));
-      }
     } catch (const NSMHandlerException& e) {
       LogFile::error(e.what());
     }
-    return;
+  }
+  try {
+    NSMNode node(nodename);
+    for (std::vector<DAQLogMessage>::reverse_iterator it = m_msgs.rbegin();
+         it != m_msgs.rend(); it++) {
+      NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));
+    }
+  } catch (const NSMHandlerException& e) {
+    LogFile::error(e.what());
   }
 }

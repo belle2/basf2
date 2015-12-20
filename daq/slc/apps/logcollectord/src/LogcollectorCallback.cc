@@ -59,6 +59,12 @@ void LogcollectorCallback::logget(const std::string& nodename,
     LogFile::info("Added listner node " + nodename);
     m_nodes.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     m_pris.insert(PriorityList::value_type(nodename, pri));
+    try {
+      NSMCommunicator::send(NSMMessage(NSMNode(nodename), DAQLogMessage(getNode().getName(), LogFile::DEBUG,
+                                       "Registered in log collector"), NSMCommand::LOG));
+    } catch (const NSMHandlerException& e) {
+      LogFile::error(e.what());
+    }
     return;
   }
 }

@@ -5,6 +5,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -37,6 +38,7 @@ namespace Belle2 {
     std::string m_logtable;
     NSMNodeList m_nodes;
     PriorityList m_pris;
+    std::vector<DAQLogMessage> m_msgs;
 
   };
 

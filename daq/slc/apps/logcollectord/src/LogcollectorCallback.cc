@@ -50,6 +50,10 @@ void LogcollectorCallback::logset(const DAQLogMessage& msg) throw()
       LogFile::error(e.what());
     }
   }
+  m_msgs.push_back(msg);
+  if (m_msgs.size() > 1000) {
+    m_msgs.erase(m_msgs.begin());
+  }
 }
 
 void LogcollectorCallback::logget(const std::string& nodename,
@@ -60,8 +64,13 @@ void LogcollectorCallback::logget(const std::string& nodename,
     m_nodes.insert(NSMNodeList::value_type(nodename, NSMNode(nodename)));
     m_pris.insert(PriorityList::value_type(nodename, pri));
     try {
-      NSMCommunicator::send(NSMMessage(NSMNode(nodename), DAQLogMessage(getNode().getName(), LogFile::DEBUG,
-                                       "Registered in log collector"), NSMCommand::LOG));
+      NSMNode node(nodename);
+      NSMCommunicator::send(NSMMessage(node, DAQLogMessage(getNode().getName(), LogFile::DEBUG,
+                                                           "Registered in log collector"), NSMCommand::LOG));
+      for (std::vector<DAQLogMessage>::reverse_iterator it = m_msgs.rbegin();
+           it != m_msgs.rend(); it++) {
+        NSMCommunicator::send(NSMMessage(node, *it, NSMCommand::LOGSET));
+      }
     } catch (const NSMHandlerException& e) {
       LogFile::error(e.what());
     }

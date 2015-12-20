@@ -26,6 +26,8 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_discriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
+  addParam("CreateSim2Hits", m_CreateSim2Hits,
+           "Create merged EKLMSim2Hits", bool(false));
   addParam("Debug", m_digPar.debug,
            "Debug mode (generates additional output files with histograms).",
            bool(false));
@@ -37,8 +39,9 @@ EKLMDigitizerModule::~EKLMDigitizerModule()
 
 void EKLMDigitizerModule::initialize()
 {
-  StoreArray<EKLMSim2Hit>::registerPersistent();
   StoreArray<EKLMDigit>::registerPersistent();
+  if (m_CreateSim2Hits)
+    StoreArray<EKLMSim2Hit>::registerPersistent();
   EKLM::setDefDigitizationParams(&m_digPar);
 }
 
@@ -50,8 +53,8 @@ void EKLMDigitizerModule::event()
 {
   EKLM::Digitizer digi(&m_digPar);
   digi.readAndSortSimHits();
-  digi.makeSimHits();
-  digi.readAndSortSim2Hits();
+  if (m_CreateSim2Hits)
+    digi.makeSim2Hits();
   digi.mergeSimHitsToStripHits(m_discriminatorThreshold);
 }
 

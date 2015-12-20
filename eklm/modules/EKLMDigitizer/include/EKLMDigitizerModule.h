@@ -69,6 +69,9 @@ namespace Belle2 {
     /** Digitization parameters. */
     struct EKLM::DigitizationParams m_digPar;
 
+    /** Create EKLMSim2Hits? */
+    bool m_CreateSim2Hits;
+
   };
 
 }

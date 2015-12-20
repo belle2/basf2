@@ -26,8 +26,8 @@ using namespace Belle2;
 static const char MemErr[] = "Memory allocation error.";
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  std::multimap<int, EKLMSim2Hit*>::iterator& it,
-  std::multimap<int, EKLMSim2Hit*>::iterator& end,
+  std::multimap<int, EKLMSimHit*>::iterator& it,
+  std::multimap<int, EKLMSimHit*>::iterator& end,
   struct EKLM::DigitizationParams* digPar,
   FPGAFitter* fitter)
 {
@@ -69,8 +69,8 @@ void EKLM::FiberAndElectronics::processEntry()
   int i, gnpe;
   double l, d, t;
   double npe;
-  std::multimap<int, EKLMSim2Hit*>::iterator it;
-  EKLMSim2Hit* hit;
+  std::multimap<int, EKLMSimHit*>::iterator it;
+  EKLMSimHit* hit;
   m_MCTime = -1;
   for (it = m_hit; it != m_hitEnd; ++it) {
     hit = it->second;

@@ -12,7 +12,7 @@
 #define EKLMFIBERANDELECTRONICS_H
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FPGAFitter.h>
@@ -48,8 +48,8 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      FiberAndElectronics(std::multimap<int, EKLMSim2Hit*>::iterator& it,
-                          std::multimap<int, EKLMSim2Hit*>::iterator& end,
+      FiberAndElectronics(std::multimap<int, EKLMSimHit*>::iterator& it,
+                          std::multimap<int, EKLMSimHit*>::iterator& end,
                           struct EKLM::DigitizationParams* digPar,
                           FPGAFitter* fitter);
 
@@ -117,10 +117,10 @@ namespace Belle2 {
       int m_npe;
 
       /** First hit. */
-      std::multimap<int, EKLMSim2Hit*>::iterator m_hit;
+      std::multimap<int, EKLMSimHit*>::iterator m_hit;
 
       /** End of hits. */
-      std::multimap<int, EKLMSim2Hit*>::iterator m_hitEnd;
+      std::multimap<int, EKLMSimHit*>::iterator m_hitEnd;
 
       /** Name of the strip. */
       std::string m_stripName;

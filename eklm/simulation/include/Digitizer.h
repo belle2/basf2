@@ -22,6 +22,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -139,33 +140,28 @@ namespace Belle2 {
       void readAndSortSimHits();
 
       /**
-       * Create SimHits from SimHits using boost:graph mechanism.
+       * Create EKLMSim2Hits from EKLMSimHits using boost:graph mechanism.
        */
-      void makeSimHits();
-
-      /**
-       * Read hits from the store, sort sim hits and fill m_HitStripMap.
-       */
-      void readAndSortSim2Hits();
+      void makeSim2Hits();
 
       /**
        * Merge hits from the same strip. Create EKLMDigits.
        */
-      void mergeSimHitsToStripHits(double);
+      void mergeSimHitsToStripHits(double threshold);
 
     private:
 
       /** Parameters. */
       struct EKLM::DigitizationParams* m_digPar;
 
+      /** Geometry data. */
+      const EKLM::GeometryData* m_GeoDat;
+
       /** FPGA fitter. */
       FPGAFitter m_fitter;
 
       /** Map for EKLMSimHit sorting according sensitive volumes. */
       std::multimap<int, EKLMSimHit*> m_simHitVolumeMap;
-
-      /** Map for hits sorting according strip name. */
-      std::multimap<int, EKLMSim2Hit*> m_HitStripMap;
 
       /** Vector of EKLMDigits. */
       std::vector<EKLMDigit*> m_HitVector;

@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHitBase.h>
 #include <eklm/dataobjects/EKLMHitMCTime.h>
-#include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
@@ -37,7 +37,7 @@ namespace Belle2 {
      * Constructor from the EKLMSim2Hit.
      * @param[in] Hit EKLMSim2Hit.
      */
-    EKLMDigit(const EKLMSim2Hit* Hit);
+    EKLMDigit(const EKLMSimHit* Hit);
 
     /**
      * Destructor.

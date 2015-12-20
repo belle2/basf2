@@ -412,7 +412,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       node.setSequential(o_node.getBool("sequential"));
       if (o_node.hasObject("rcconfig")) {
         const std::string path = o_node("rcconfig").getPath();
-        log(LogFile::INFO, "found rcconfig :%s %s", node.getName().c_str(), path.c_str());
+        log(LogFile::DEBUG, "found rcconfig :%s %s", node.getName().c_str(), path.c_str());
         node.setConfig(path);
       } else {
         log(LogFile::WARNING, "Not found rcconfig");

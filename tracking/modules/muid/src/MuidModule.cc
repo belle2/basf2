@@ -33,7 +33,6 @@
 #include <simulation/kernel/ExtCylSurfaceTarget.h>
 #include <bklm/geometry/GeometryPar.h>
 #include <bklm/geometry/Module.h>
-#include <eklm/geometry/EKLMObjectNumbers.h>
 #include <eklm/geometry/GeometryData.h>
 
 #include <cmath>
@@ -668,11 +667,12 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
   // Endcap KLM scintillators:
   if (name.compare(0, 14, "StripSensitive") == 0) {
     detID = Const::EDetector::KLM;
-    copyID = EKLM::stripNumber(touch->GetVolume(5)->GetCopyNo(),
-                               touch->GetVolume(4)->GetCopyNo(),
-                               touch->GetVolume(3)->GetCopyNo(),
-                               touch->GetVolume(2)->GetCopyNo(),
-                               touch->GetVolume(1)->GetCopyNo());
+    copyID = EKLM::GeometryData::Instance().stripNumber(
+               touch->GetVolume(5)->GetCopyNo(),
+               touch->GetVolume(4)->GetCopyNo(),
+               touch->GetVolume(3)->GetCopyNo(),
+               touch->GetVolume(2)->GetCopyNo(),
+               touch->GetVolume(1)->GetCopyNo());
   }
 
 }

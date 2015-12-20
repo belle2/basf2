@@ -95,7 +95,7 @@ void RunControlCallback::setConfig(RCNode& node, const std::string& config) thro
 
 void RunControlCallback::ok(const char* nodename, const char* data) throw()
 {
-  LogFile::debug("OK from %s (state = %s)", nodename, data);
+  log(LogFile::DEBUG, "OK from %s (state = %s)", nodename, data);
   RCState state(data);
   try {
     RCNode& node(findNode(nodename));
@@ -112,6 +112,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
 {
+  log(LogFile::ERROR, "Error from %s : %s", nodename, data);
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
@@ -170,7 +171,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         }
         break;
       }
-      LogFile::info("%s config : %s", node.getName().c_str(), val.c_str());
+      log(LogFile::INFO, "%s config : %s", node.getName().c_str(), val.c_str());
       node.setConfig(val);
       std::string vname = StringUtil::form("node[%d]", (int)i);
       set(vname + ".rcconfig", val);
@@ -184,7 +185,6 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         m_runno = RunNumberTable(db).add(m_runno.getConfig(), expno, runno, 0);
         expno = m_runno.getExpNumber();
         runno = m_runno.getRunNumber();
-        std::cout << "record_time : " << m_runno.getRecordTime() << std::endl;
         set("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
         std::string comment;
@@ -205,7 +205,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
     int pars[2] = {expno, runno};
     distribute(NSMMessage(RCCommand::START, 2, pars));
   } catch (const DBHandlerException& e) {
-    LogFile::error(e.what());
+    log(LogFile::ERROR, e.what());
   }
   m_starttime = Time().get();
 }
@@ -252,7 +252,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       if (!m_restarting) {
         if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
-          LogFile::info("Run automatically stopped due to exceeding run length");
+          log(LogFile::INFO, "Run automatically stopped due to exceeding run length");
           stop();
           m_restarting = true;
         }
@@ -270,7 +270,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
         if (all_ready) {
           m_restarting = false;
           m_starttime = -1;
-          LogFile::info("Run automatically starting");
+          log(LogFile::INFO, "Run automatically starting");
           start(0, 0);
         }
       }
@@ -291,8 +291,8 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           std::string s;
           get(node, "rcstate", s, 1);
           if ((cstate = RCState(s)) != Enum::UNKNOWN) {
-            logging(getNode(), LogFile::NOTICE, "%s got up (state=%s).",
-                    node.getName().c_str(), cstate.getLabel());
+            log(LogFile::NOTICE, "%s got up (state=%s).",
+                node.getName().c_str(), cstate.getLabel());
             setState(node, cstate);
             std::string table = "";
             get(node, "dbtable", table, 1);
@@ -304,7 +304,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
-        logging(getNode(), LogFile::ERROR, "%s got down.", node.getName().c_str());
+        log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
         failed = true;
       }
@@ -346,7 +346,7 @@ void RunControlCallback::postRun() throw()
       RunNumberTable(db).add(m_runno);
     }
   } catch (const std::exception& e) {
-    LogFile::error(e.what());
+    log(LogFile::ERROR, e.what());
   }
 }
 
@@ -406,21 +406,21 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
         RCNode& node_i(findNode(node.getName()));
         node = node_i;
       } catch (const std::out_of_range& e) {
-        LogFile::info("New node : " + node.getName());
+        log(LogFile::INFO, "New node : " + node.getName());
       }
       node.setUsed(o_node.getBool("used"));
       node.setSequential(o_node.getBool("sequential"));
       if (o_node.hasObject("rcconfig")) {
         const std::string path = o_node("rcconfig").getPath();
-        LogFile::info("found rcconfig :%s %s", node.getName().c_str(), path.c_str());
+        log(LogFile::INFO, "found rcconfig :%s %s", node.getName().c_str(), path.c_str());
         node.setConfig(path);
       } else {
-        LogFile::warning("Not found rcconfig");
+        log(LogFile::WARNING, "Not found rcconfig");
       }
       node_v.push_back(node);
     }
   } catch (const DBHandlerException& e) {
-    LogFile::error("Failed to load db : %s", e.what());
+    log(LogFile::ERROR, "Failed to load db : %s", e.what());
     return false;
   }
   m_node_v = node_v;
@@ -476,8 +476,7 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
             } catch (const TimeoutException& e) {
               continue;
             } catch (const IOException& e) {
-              LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
-              //LogFile::error(e.what());
+              m_callback.log(LogFile::ERROR, "IOError %s", e.what());
               m_enabled = false;
               return;
             }
@@ -489,8 +488,8 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
             m_callback.setState(node, tstate);
         } else {
           if (node.getState() != RCState::UNKNOWN) {
-            m_callback.logging(m_callback.getNode(), LogFile::ERROR,
-                               "%s is down.", node.getName().c_str());
+            m_callback.log(LogFile::ERROR,
+                           "%s is down.", node.getName().c_str());
           }
           m_callback.setState(node, RCState::UNKNOWN);
           m_callback.setState(RCState::NOTREADY_S);
@@ -501,8 +500,8 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
         LogFile::fatal("Failed to NSM2 request");
         m_enabled = false;
       } catch (const IOException& e) {
-        LogFile::error("%s %s:%d", e.what(), __FILE__, __LINE__);
-        //LogFile::error(e.what());
+        //m_callback.log(LogFile::ERROR, "IOError %s", e.what());
+        LogFile::error(e.what());
         m_enabled = false;
         m_callback.setState(RCState::NOTREADY_S);
       }
@@ -527,7 +526,7 @@ void RunControlCallback::Recoveror::operator()(RCNode& node) throw()
         LogFile::fatal("Failed to NSM2 request");
         m_enabled = false;
       } catch (const IOException& e) {
-        LogFile::error(e.what());
+        m_callback.log(LogFile::ERROR, "IOError %s", e.what());
         m_enabled = false;
         m_callback.setState(RCState::NOTREADY_S);
       }
@@ -541,7 +540,6 @@ void RunControlCallback::setExpNumber(int expno) throw()
     m_runno.setExpNumber(expno);
     int runno = RunNumberTable(*getDB()).getRunNumber(expno);
     std::string msg = StringUtil::form("Set exp no = %d (run no =%d)", expno, runno);
-    LogFile::info(msg);
     set("runno", runno);
     log(LogFile::INFO, msg);
   } catch (const DBHandlerException& e) {
@@ -560,7 +558,6 @@ bool RunControlCallback::setRCUsed(int val) throw()
   if (val != used) {
     getNode().setUsed(val > 0);
     if (val == 0) {
-      LogFile::info("Masked");
       abort();
       RCCallback::setState(RCState::OFF_S);
       for (size_t i = 0; i < m_lrc_v.size(); i++) {
@@ -571,7 +568,6 @@ bool RunControlCallback::setRCUsed(int val) throw()
         }
       }
     } else {
-      LogFile::info("UnMasked");
       RCCallback::setState(RCState::NOTREADY_S);
       for (size_t i = 0; i < m_lrc_v.size(); i++) {
         try {
@@ -588,7 +584,6 @@ bool RunControlCallback::setRCUsed(int val) throw()
 void RunControlCallback::setLocalRunControls(const StringList& rc)
 {
   for (size_t i = 0; i < rc.size(); i++) {
-    LogFile::debug("Local RC: " + rc[i]);
     m_lrc_v.push_back(RCNode(rc[i]));
   }
 }

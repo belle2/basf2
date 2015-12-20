@@ -29,7 +29,7 @@ bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
   m_callback.setConfig(m_rcnode, val);
   try {
     NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::CONFIGURE, val));
-    LogFile::info("configured node : %s (config=%s)", m_rcnode.getName().c_str(), val.c_str());
+    m_callback.log(LogFile::INFO, "configuring node : %s (config=%s)", m_rcnode.getName().c_str(), val.c_str());
     return true;
   } catch (const IOException& e) {
     LogFile::error(e.what());
@@ -54,14 +54,13 @@ bool NSMVHandlerRCRequest::handleSetText(const std::string& val)
   std::string str = StringUtil::toupper(StringUtil::replace(val, ":", "_"));
   if (!StringUtil::find(str, "RC_")) str = "RC_" + str;
   RCCommand cmd(str);
-  LogFile::debug("rcrequest %s to %s", str.c_str(), m_rcnode.getName().c_str());
   try {
     NSMMessage msg(m_rcnode, cmd);
     if (cmd == RCCommand::CONFIGURE) {
       msg.setData(m_rcnode.getConfig());
     }
     if (!NSMCommunicator::send(msg)) {
-      LogFile::error("Failed to request %s to %s",
+      m_callback.log(LogFile::ERROR, "Failed to request %s to %s",
                      str.c_str(), m_rcnode.getName().c_str());
       return false;
     }

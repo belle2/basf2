@@ -8,10 +8,10 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
+#pragma link C++ class Belle2::TrackFindingCDC::WireLine-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWire-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireLayer-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireSuperLayer-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireTopology-;
 
 #endif
-

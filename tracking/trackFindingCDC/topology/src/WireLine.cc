@@ -7,19 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/topology/WireLine.h>
 
-#include <tracking/trackFindingCDC/geometry/WireLine.h>
-
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 WireLine::WireLine(const Vector3D& forward,
-                   const Vector3D& backward) :
-  m_refPos3D{(backward * forward.z() - forward * backward.z()) / (forward.z() - backward.z()) },
-  m_movePerZ{(forward.xy() - backward.xy()) / (forward.z() - backward.z())},
-  m_forwardZ{forward.z()},
-  m_backwardZ{backward.z()}
+                   const Vector3D& backward)
+  : m_refPos3D{(backward * forward.z() - forward * backward.z()) / (forward.z() - backward.z()) },
+    m_movePerZ{(forward.xy() - backward.xy()) / (forward.z() - backward.z())},
+    m_forwardZ{forward.z()},
+    m_backwardZ{backward.z()}
 {
   B2ASSERT("Wire reference position is not at 0", m_refPos3D.z() == 0);
 }

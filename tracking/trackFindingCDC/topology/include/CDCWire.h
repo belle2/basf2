@@ -9,37 +9,34 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-#include <iostream>
-
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/WireID.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/ILayerType.h>
 #include <tracking/trackFindingCDC/topology/IWireType.h>
 
 #include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
-
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/WireLine.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/WireID.h>
+
+#include <iostream>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-
-    /// Class representing a sense wire in the central drift chamber
     /**
-     * CDCWire represents a sense wire of the central drift chamber. \n
-     * It combines the wire id and a line representation of the wire from the CDC geometry. \n
-     * It also provides an interface for fetching the closest neighbors for local tracking purposes. \n
-     * Note : All possible wire object are stored in the CDCWireTopology
-     * which you can get with the static getInstance() functions. \n
-     * There is rarely a need for constructing a wire object it should be avoided for speed reasons.
+     *  Class representing a sense wire in the central drift chamber.
+     *  It combines the wire id and a line representation of the wire from the CDC geometry. \n
+     *  It also provides an interface for fetching the closest neighbors for local tracking purposes. \n
+     *  Note : All possible wire object are stored in the CDCWireTopology
+     *  which you can get with the static getInstance() functions. \n
+     *  There is rarely a need for constructing a wire object and it should be avoided for speed reasons.
      */
     class CDCWire  {
 
@@ -48,9 +45,6 @@ namespace Belle2 {
       typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
     public:
-      /// Default constructor for ROOT compatibility.
-      CDCWire() {}
-
       /// Constructor taking the WireID convenience object. Use rather getInstance() to avoid instance constructions.
       explicit CDCWire(const WireID& wireID);
 
@@ -155,8 +149,8 @@ namespace Belle2 {
        *  Read only. They get implicitly initialized from the CDCGeometryPar.
        */
       /**@{*/
-      /// Getter for the skew line represenation of the wire.
-      const WireLine& getSkewLine() const { return m_skewLine; }
+      /// Getter for the wire line represenation of the wire.
+      const WireLine& getWireLine() const { return m_wireLine; }
 
       /// Indicates if the wire is axial or stereo
       inline bool isAxial() const { return getStereoKind() == EStereoKind::c_Axial; }
@@ -172,19 +166,19 @@ namespace Belle2 {
 
       /// Gives the xy projected position of the wire at the given z coordinate
       Vector2D getWirePos2DAtZ(const double z) const
-      { return getSkewLine().pos2DAtZ(z); }
+      { return getWireLine().pos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
       Vector3D getWirePos3DAtZ(const double z) const
-      { return getSkewLine().pos3DAtZ(z); }
+      { return getWireLine().pos3DAtZ(z); }
 
       /// Calculates the distance from the position to the wire
       double getDistance(const Vector3D& pos3D) const
-      { return getSkewLine().distance(pos3D); }
+      { return getWireLine().distance(pos3D); }
 
       /// Calculates the closest approach in the wire to the position
       Vector3D getClosest(const Vector3D& pos3D) const
-      { return getSkewLine().closest3D(pos3D); }
+      { return getWireLine().closest3D(pos3D); }
 
       /** Calculates the straight drift length from the position to the wire
        *  This is essentially the same as the distance to the wire
@@ -200,49 +194,49 @@ namespace Belle2 {
        *  which is the point of closest approach to the beam axes.
        */
       const Vector3D& getRefPos3D() const
-      { return getSkewLine().refPos3D(); }
+      { return getWireLine().refPos3D(); }
 
       /// Getter for the wire reference position for 2D tracking
       /** Gives the wire's reference position projected to the xy plane.
        */
       const Vector2D& getRefPos2D() const
-      { return getSkewLine().refPos2D(); }
+      { return getWireLine().refPos2D(); }
 
       /// Getter for the wire reference z coordinate
       /** Gives the wire's reference z coordinate
        */
       double getRefZ() const
-      { return getSkewLine().refZ(); }
+      { return getWireLine().refZ(); }
 
       /// Getter for the tangents of the stereo angle of the wire.
-      double getTanStereoAngle() const { return getSkewLine().tanTheta(); }
+      double getTanStereoAngle() const { return getWireLine().tanTheta(); }
 
       /// Getter for the stereo angle of the wire.
-      double getStereoAngle() const { return getSkewLine().theta(); }
+      double getStereoAngle() const { return getWireLine().theta(); }
 
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
-      Vector3D getWireVector() const { return getSkewLine().tangential3D(); }
+      Vector3D getWireVector() const { return getWireLine().tangential3D(); }
 
       /// Getter for the vector describing the positional change in the xy plane per unit z.
-      Vector2D getMovePerZ() const { return getSkewLine().movePerZ(); }
+      Vector2D getMovePerZ() const { return getWireLine().movePerZ(); }
 
       /// Getter for the cylindrical radius at the wire reference position
       double getRefCylindricalR() const { return m_refCylindricalR; }
 
       /// Getter for the closest distance to the beamline ( z-axes )
-      double getMinCylindricalR() const { return getSkewLine().perigee2D().norm(); }
+      double getMinCylindricalR() const { return getWireLine().perigee2D().norm(); }
 
       ///Getter for the distance to the beamline ( z-axes ) at the forward joint point
-      double getForwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
+      double getForwardCylindricalR() const { return getWireLine().forwardCylindricalR(); };
 
       ///Getter for the distance to the beamline ( z-axes ) at the backward joint point
-      double getBackwardCylindricalR() const { return getSkewLine().forwardCylindricalR(); };
+      double getBackwardCylindricalR() const { return getWireLine().forwardCylindricalR(); };
 
       /// Getter for the z coordinate at the forward joint points of the wires
-      double getForwardZ() const { return getSkewLine().forwardZ(); }
+      double getForwardZ() const { return getWireLine().forwardZ(); }
 
       /// Getter for the z coordinate at the backward joint points of the wires
-      double getBackwardZ() const { return getSkewLine().backwardZ(); }
+      double getBackwardZ() const { return getWireLine().backwardZ(); }
 
       /// Checks whether the position is in the drift cell surrounding the wire
       bool isInCell(const Vector3D& pos3D) const;
@@ -378,7 +372,7 @@ namespace Belle2 {
     private:
       WireID m_wireID; ///< The wireID of the wire
 
-      WireLine m_skewLine; ///< The line representation of the wire
+      WireLine m_wireLine; ///< The line representation of the wire
       double m_refCylindricalR;  ///< Precomputed distance to the beam line at the reference position.
 
 

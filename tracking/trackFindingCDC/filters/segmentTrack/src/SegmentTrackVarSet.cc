@@ -84,8 +84,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack);
 
   if (segment->getStereoKind() != EStereoKind::c_Axial) {
-    double forwardZ = front.getWire().getSkewLine().forwardZ();
-    double backwardZ = front.getWire().getSkewLine().backwardZ();
+    double forwardZ = front.getWire().getWireLine().forwardZ();
+    double backwardZ = front.getWire().getWireLine().backwardZ();
 
     if (frontRecoPos3D.z() > forwardZ or frontRecoPos3D.z() < backwardZ or backRecoPos3D.z() > forwardZ
         or backRecoPos3D.z() < backwardZ) {

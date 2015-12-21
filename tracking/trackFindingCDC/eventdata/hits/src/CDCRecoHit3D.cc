@@ -94,15 +94,15 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
     return CDCRecoHit3D(recoHit.getRLWireHit(), recoPos3D, perpS);
 
   } else if (stereoType == EStereoKind::c_StereoU or stereoType == EStereoKind::c_StereoV) {
-    //the closest approach of a skew line to a helix
+    //the closest approach of a wire line to a helix
     //( in this case representated by the two trajectories )
     //can not be solved as a closed expression
     //in the common case the z fit has been derived from the reconstructed points generated
     //with the reconstruct methode above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
 
-    const WireLine skewLine = recoHit.getSkewLine();
-    Vector3D recoPos3D = trajectory2D.reconstruct3D(skewLine);
+    const WireLine wireLine = recoHit.getWireLine();
+    Vector3D recoPos3D = trajectory2D.reconstruct3D(wireLine);
     double perpS    = trajectory2D.calcArcLength2D(recoPos3D.xy());
     double z        = trajectorySZ.mapSToZ(perpS);
     recoPos3D.setZ(z);
@@ -136,10 +136,10 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
 Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
-  const WireLine& skewLine = wire.getSkewLine();
+  const WireLine& wireLine = wire.getWireLine();
   const double recoPosZ = getRecoPos3D().z();
 
-  Vector2D wirePos = skewLine.pos2DAtZ(recoPosZ);
+  Vector2D wirePos = wireLine.pos2DAtZ(recoPosZ);
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
   return disp2D;
 }

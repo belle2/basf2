@@ -80,11 +80,11 @@ void CDCWire::initialize()
   Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire)};
   Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire)};
 
-  m_skewLine = WireLine(forwardPos, backwardPos);
+  m_wireLine = WireLine(forwardPos, backwardPos);
   m_refCylindricalR = getRefPos2D().norm();
 
-  m_forwardPhiToRef = m_skewLine.forwardPhiToRef();
-  m_backwardPhiToRef = m_skewLine.backwardPhiToRef();
+  m_forwardPhiToRef = m_wireLine.forwardPhiToRef();
+  m_backwardPhiToRef = m_wireLine.backwardPhiToRef();
 
   /// used to check for odd stereo wires
   if ((m_forwardPhiToRef == 0 or
@@ -96,10 +96,10 @@ void CDCWire::initialize()
     B2WARNING("Odd wire " << *this);
     B2WARNING("wireForwardPosition  " << forwardPos);
     B2WARNING("wireBackwardPosition " << backwardPos);
-    B2WARNING("forward              " << m_skewLine.forward3D());
-    B2WARNING("backward             " << m_skewLine.backward3D());
-    B2WARNING("ref                  " << m_skewLine.refPos3D());
-    B2WARNING("tan theta            " << m_skewLine.tanTheta());
+    B2WARNING("forward              " << m_wireLine.forward3D());
+    B2WARNING("backward             " << m_wireLine.backward3D());
+    B2WARNING("ref                  " << m_wireLine.refPos3D());
+    B2WARNING("tan theta            " << m_wireLine.tanTheta());
     B2WARNING("m_forwardToRefAngle  " << m_forwardPhiToRef);
     B2WARNING("m_backwardToRefAngle " << m_backwardPhiToRef);
     //double d;

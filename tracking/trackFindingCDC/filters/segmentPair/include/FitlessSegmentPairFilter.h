@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Checks if a pair of segments is a good combination
-      virtual CellWeight operator()(const CDCSegmentPair& segmentPair) override final;
+      virtual Weight operator()(const CDCSegmentPair& segmentPair) override final;
 
     }; // end class FitlessSegmentPairFilter
 

@@ -30,8 +30,8 @@ namespace Belle2 {
       {}
 
       /// Checks if a segment relation is a good combination.
-      virtual NeighborWeight operator()(const CDCRecoSegment2D& fromSegment,
-                                        const CDCRecoSegment2D& toSegment) override final;
+      virtual Weight operator()(const CDCRecoSegment2D& fromSegment,
+                                const CDCRecoSegment2D& toSegment) override final;
 
     }; // end class MCSegmentRelationFilter
 

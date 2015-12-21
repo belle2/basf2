@@ -18,7 +18,7 @@ namespace Belle2 {
     class AllAxialSegmentPairFilter  : public Filter<CDCAxialSegmentPair> {
 
       /// Checks if a pair of axial segments is a good combination
-      virtual CellWeight operator()(const CDCAxialSegmentPair&) override final;
+      virtual Weight operator()(const CDCAxialSegmentPair&) override final;
 
     }; // end class AllAxialSegmentPairFilter
 

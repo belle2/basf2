@@ -56,10 +56,10 @@ std::map<std::string, std::string> SimpleFacetFilter::getParameterDescription()
   return des;
 }
 
-CellWeight SimpleFacetFilter::operator()(const CDCFacet& facet)
+Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
 {
-  CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
-  if (isNotACell(fitlessWeight)) return NOT_A_CELL;
+  Weight fitlessWeight = m_fitlessFacetFilter(facet);
+  if (std::isnan(fitlessWeight)) return NAN;
 
   facet.adjustLines();
 
@@ -81,7 +81,7 @@ CellWeight SimpleFacetFilter::operator()(const CDCFacet& facet)
   } else {
 
     //B2DEBUG(200,"Rejected facet because flight directions do not match");
-    return NOT_A_CELL;
+    return NAN;
 
   }
 

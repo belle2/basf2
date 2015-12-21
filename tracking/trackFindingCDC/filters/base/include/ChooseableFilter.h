@@ -106,9 +106,9 @@ namespace Belle2 {
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
-       *             NOT_A_CELL if the object is rejected.
+       *             NAN if the object is rejected.
        */
-      virtual CellWeight operator()(const Object& object) override final
+      virtual Weight operator()(const Object& object) override final
       {
         return (*m_filter)(object);
       }

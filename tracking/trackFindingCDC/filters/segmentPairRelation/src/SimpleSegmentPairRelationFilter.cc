@@ -14,8 +14,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-NeighborWeight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
-                                                           const CDCSegmentPair& toPair)
+Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
+                                                   const CDCSegmentPair& toPair)
 {
 
   // Just let all found neighors pass since we have the same start -> end segment

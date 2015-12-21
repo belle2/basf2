@@ -16,27 +16,27 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-NeighborWeight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
-                                                 const CDCTrack& toTrack)
+Weight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
+                                         const CDCTrack& toTrack)
 {
   const CDCMCTrackLookUp& mcTrackLookUp = CDCMCTrackLookUp::getInstance();
 
   // Check if the tracks are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo = mcTrackLookUp.areAlignedInMCTrack(&fromTrack, &toTrack);
-  if (pairFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
+  if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the track
     Index fromNPassedSuperLayers = mcTrackLookUp.getLastNPassedSuperLayers(&fromTrack);
-    if (fromNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;
 
     Index toNPassedSuperLayers = mcTrackLookUp.getFirstNPassedSuperLayers(&toTrack);
-    if (toNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (toNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (fromNPassedSuperLayers == toNPassedSuperLayers) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == toNPassedSuperLayers) return NAN;
 
     return fromTrack.size() + toTrack.size();
   }
 
-  return NOT_A_CELL;
+  return NAN;
 }

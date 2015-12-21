@@ -27,8 +27,8 @@ bool CDCFacetTruthVarSet::extract(const CDCFacet* ptrFacet)
   if (not extracted or not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  const CellWeight mcWeight = m_mcFacetFilter(facet);
-  var<named("truth")>() =  not isNotACell(mcWeight);
+  const Weight mcWeight = m_mcFacetFilter(facet);
+  var<named("truth")>() =  not std::isnan(mcWeight);
   return true;
 }
 

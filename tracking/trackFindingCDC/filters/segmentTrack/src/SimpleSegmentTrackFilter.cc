@@ -15,7 +15,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair)
+Weight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair)
 {
   Super::operator()(testPair);
 
@@ -26,19 +26,19 @@ CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSeg
   if (is_stereo) {
     if (hit_distance > 10) {
       B2DEBUG(120, "Hits too far away: " << hit_distance);
-      return NOT_A_CELL;
+      return NAN;
     }
   } else {
     if (hit_distance > 2) {
       B2DEBUG(120, "Hits too far away: " << hit_distance);
-      return NOT_A_CELL;
+      return NAN;
     }
   }
 
   bool out_of_CDC = varSet.at("out_of_CDC") == 1.0 ? true : false;
 
   if (is_stereo and out_of_CDC) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   unsigned int hits_in_same_region = static_cast<unsigned int>(varSet.at("hits_in_same_region"));
@@ -46,7 +46,7 @@ CellWeight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSeg
 
   if (hits_in_same_region > 5) {
     B2DEBUG(110, "Too many hits in the same region: " << hits_in_same_region);
-    return NOT_A_CELL;
+    return NAN;
   } else {
     B2DEBUG(110, "Hits in the region: " << hits_in_same_region << " while hits in segment: " << segment_size);
   }

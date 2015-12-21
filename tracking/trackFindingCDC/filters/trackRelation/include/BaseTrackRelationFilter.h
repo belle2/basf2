@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
@@ -37,29 +37,29 @@ namespace Belle2 {
       }
 
       /** Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NOT_A_NEIGHBOR to reject all track neighbors.
+       *  Return always returns NAN to reject all track neighbors.
        */
-      virtual NeighborWeight operator()(const CDCTrack& /* from */,
-                                        const CDCTrack& /* to */)
+      virtual Weight operator()(const CDCTrack& /* from */,
+                                const CDCTrack& /* to */)
       {
-        return NOT_A_NEIGHBOR;
+        return NAN;
       }
 
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCTrack>& relation) override
+      virtual Weight operator()(const Relation<CDCTrack>& relation) override
       {
         const CDCTrack* ptrFrom = relation.first;
         const CDCTrack* ptrTo = relation.second;
-        if (ptrFrom == ptrTo) return NOT_A_NEIGHBOR; // Prevent relation to same.
-        if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
+        if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
+        if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
 
       /// Legacy method
-      virtual NeighborWeight isGoodNeighbor(const CDCTrack& from,
-                                            const CDCTrack& to)
+      virtual Weight isGoodNeighbor(const CDCTrack& from,
+                                    const CDCTrack& to)
       {
         return operator()(from, to);
       }

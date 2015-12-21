@@ -25,7 +25,7 @@ namespace Belle2 {
       SimpleSegmentInformationListTrackFilter() : BaseSegmentInformationListTrackFilter() { }
 
     public:
-      virtual CellWeight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
+      virtual Weight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
       override final;
     };
   }

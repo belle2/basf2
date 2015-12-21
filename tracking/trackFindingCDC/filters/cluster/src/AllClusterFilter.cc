@@ -12,7 +12,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight AllClusterFilter::operator()(const CDCWireHitCluster& cluster)
+Weight AllClusterFilter::operator()(const CDCWireHitCluster& cluster)
 {
   return cluster.size();
 }

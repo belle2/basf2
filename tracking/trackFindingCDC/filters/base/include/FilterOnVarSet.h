@@ -67,10 +67,10 @@ namespace Belle2 {
 
     public:
       /// Function extracting the variables of the object into the variable set.
-      virtual CellWeight operator()(const Object& obj) override
+      virtual Weight operator()(const Object& obj) override
       {
         bool extracted = m_varSet.extract(&obj);
-        return extracted ? 1 : NOT_A_CELL;
+        return extracted ? 1 : NAN;
       }
 
     protected:

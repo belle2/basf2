@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
@@ -45,27 +45,27 @@ namespace Belle2 {
       }
 
       /// Legacy method
-      virtual NeighborWeight isGoodNeighbor(const CDCSegmentTriple& from,
-                                            const CDCSegmentTriple& to) final {
+      virtual Weight isGoodNeighbor(const CDCSegmentTriple& from,
+                                    const CDCSegmentTriple& to) final {
 
         return operator()(from, to);
       }
 
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight operator()(const CDCSegmentTriple& /* from */,
-                                        const CDCSegmentTriple& /* to */)
+      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
+      virtual Weight operator()(const CDCSegmentTriple& /* from */,
+                                const CDCSegmentTriple& /* to */)
       {
-        return NOT_A_NEIGHBOR;
+        return NAN;
       }
 
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual CellWeight operator()(const Relation<CDCSegmentTriple>& relation) override final
+      virtual Weight operator()(const Relation<CDCSegmentTriple>& relation) override final
       {
         const CDCSegmentTriple* ptrFrom = relation.first;
         const CDCSegmentTriple* ptrTo = relation.second;
-        if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
+        if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
 

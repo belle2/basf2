@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
+Weight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
 {
   Super::operator()(testPair);
 
@@ -31,7 +31,7 @@ CellWeight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<Segm
     double perpSFront = trajectory.calcArcLength2D(segmentInformation->getSegment()->front().getRecoPos2D());
     if (alreadySet and perpSFront < (1 - varSet.m_param_percentageForPerpSMeasurements) * lastPerpS) {
       // Means: no
-      return NOT_A_CELL;
+      return NAN;
     }
     alreadySet = true;
     lastPerpS = trajectory.calcArcLength2D(segmentInformation->getSegment()->back().getRecoPos2D());

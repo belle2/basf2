@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight AllAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
+Weight AllAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();

@@ -27,13 +27,13 @@ namespace Belle2 {
       MCFilter() : Super() { }
 
       /// Reject an item if the truth variable is 0, else accept it.
-      virtual CellWeight operator()(const Object& object) override
+      virtual Weight operator()(const Object& object) override
       {
         Super::operator()(object);
         const std::map<std::string, Float_t>& varSet = Super::getVarSet().getNamedValuesWithPrefix();
 
         if (varSet.at("truth") == 0.0)
-          return NOT_A_CELL;
+          return NAN;
         else
           return 1.0;
       }

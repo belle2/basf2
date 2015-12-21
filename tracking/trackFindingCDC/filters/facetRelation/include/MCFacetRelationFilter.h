@@ -46,10 +46,10 @@ namespace Belle2 {
 
     public:
       /** Main filter method returning the weight of the neighborhood relation.
-       *  Return NOT_A_NEIGHBOR if relation shall be rejected.
+       *  Return NAN if relation shall be rejected.
        */
-      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
-                                        const CDCFacet& toFacet) override final;
+      virtual Weight operator()(const CDCFacet& fromFacet,
+                                const CDCFacet& toFacet) override final;
 
     public:
       /// Setter for the allow reverse parameter

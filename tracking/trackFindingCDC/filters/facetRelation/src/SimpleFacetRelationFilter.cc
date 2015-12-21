@@ -35,11 +35,11 @@ std::map<std::string, std::string> SimpleFacetRelationFilter::getParameterDescri
 
 
 
-NeighborWeight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
-                                                     const CDCFacet& toFacet)
+Weight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
+                                             const CDCFacet& toFacet)
 {
 
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NOT_A_NEIGHBOR;
+  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
 
   // the compatibility of the short legs or all?
   // start end to continuation middle end
@@ -66,7 +66,7 @@ NeighborWeight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
 
   } else {
 
-    return NOT_A_NEIGHBOR;
+    return NAN;
 
   }
 }

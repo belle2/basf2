@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
+Weight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
   const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
@@ -28,7 +28,7 @@ CellWeight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTri
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
+  Weight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
   return result;
 }

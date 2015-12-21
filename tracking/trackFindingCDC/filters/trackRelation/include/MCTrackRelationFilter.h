@@ -31,8 +31,8 @@ namespace Belle2 {
 
     public:
       /// Checks if a track relation is a good combination.
-      virtual NeighborWeight operator()(const CDCTrack& fromTrack,
-                                        const CDCTrack& toTrack) override final;
+      virtual Weight operator()(const CDCTrack& fromTrack,
+                                const CDCTrack& toTrack) override final;
 
     }; // end class MCTrackRelationFilter
 

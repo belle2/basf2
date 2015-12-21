@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <boost/range/iterator_range.hpp>
 
 #include <cmath>
@@ -130,8 +130,8 @@ namespace Belle2 {
       }
 
       /** Legacy method */
-      inline NeighborWeight isGoodNeighbor(const CDCWireHit* fromWireHit,
-                                           const CDCWireHit* toWireHit)
+      inline Weight isGoodNeighbor(const CDCWireHit* fromWireHit,
+                                   const CDCWireHit* toWireHit)
       {
         assert(fromWireHit);
         assert(toWireHit);
@@ -141,11 +141,11 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      inline CellWeight operator()(const Relation<CDCWireHit>& relation) override final
+      inline Weight operator()(const Relation<CDCWireHit>& relation) override final
       {
         const CDCWireHit* ptrFrom = relation.first;
         const CDCWireHit* ptrTo = relation.second;
-        if (not ptrFrom or not ptrTo) return NOT_A_NEIGHBOR;
+        if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }
 

@@ -22,7 +22,7 @@ SimpleSegmentPairFilter::SimpleSegmentPairFilter() : m_riemannFitter()
   m_riemannFitter.useOnlyOrientation();
 }
 
-CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
+Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
   const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
@@ -42,7 +42,7 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   bool startSegmentIsCoaligned = endFit.getTotalArcLength2D(startSegment) >= 0.0;
 
   if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   // Check if there is a positive gap between start and end segment
@@ -50,7 +50,7 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   double endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
 
   if (startFitGap < -5 or startFitGap > 50 or endFitGap < -5 or endFitGap > 50) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   double startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
@@ -60,7 +60,7 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
       startFitFrontOffset > 50 or
       endFitBackOffset < 0 or
       endFitBackOffset > 50) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
@@ -77,7 +77,7 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
   double momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
 
   if (fabs(momAngleAtEndFront) > 1.0 or fabs(momAngleAtStartBack) > 1.0) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   // Proximity cut
@@ -88,7 +88,7 @@ CellWeight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair
     getFittedTrajectory3D(segmentPair);
     return startSegment.size() + endSegment.size();
   } else {
-    return NOT_A_CELL;
+    return NAN;
   }
 
 }

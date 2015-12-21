@@ -53,7 +53,7 @@ void MCSegmentTripleFilter::terminate()
 
 
 
-CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
+Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -62,15 +62,15 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
 
   if (ptrStartSegment == nullptr) {
     B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as start segment");
-    return NOT_A_CELL;
+    return NAN;
   }
   if (ptrMiddleSegment == nullptr) {
     B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as middle segment");
-    return NOT_A_CELL;
+    return NAN;
   }
   if (ptrEndSegment == nullptr) {
     B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as end segment");
-    return NOT_A_CELL;
+    return NAN;
   }
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
@@ -78,20 +78,20 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  CellWeight pairWeight =  m_mcAxialSegmentPairFilter(segmentTriple);
-  if (isNotACell(pairWeight)) return NOT_A_CELL;
+  Weight pairWeight =  m_mcAxialSegmentPairFilter(segmentTriple);
+  if (std::isnan(pairWeight)) return NAN;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
-  if (startToMiddleFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
+  if (startToMiddleFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   EForwardBackward middleToEndFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrMiddleSegment, ptrEndSegment);
-  if (middleToEndFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
+  if (middleToEndFBInfo == EForwardBackward::c_Invalid) return NAN;
 
 
-  if (startToMiddleFBInfo != middleToEndFBInfo) return NOT_A_CELL;
+  if (startToMiddleFBInfo != middleToEndFBInfo) return NAN;
 
 
   if ((startToMiddleFBInfo == EForwardBackward::c_Forward and middleToEndFBInfo == EForwardBackward::c_Forward) or
@@ -105,7 +105,7 @@ CellWeight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
 
   }
 
-  return NOT_A_CELL;
+  return NAN;
 }
 
 

@@ -21,7 +21,7 @@ namespace Belle2 {
        *  All implementation always accepts the total number of hits.
        */
       virtual
-      CellWeight operator()(const CDCSegmentPair& segmentPair) override final
+      Weight operator()(const CDCSegmentPair& segmentPair) override final
       {
         const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
         const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();

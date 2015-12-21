@@ -108,14 +108,14 @@ namespace Belle2 {
       }
     public:
       /// Function to evaluate the cluster for its backgroundness.
-      virtual CellWeight operator()(const Object& obj) override
+      virtual Weight operator()(const Object& obj) override
       {
-        CellWeight extracted = Super::operator()(obj);
-        if (isNotACell(extracted)) {
-          return NOT_A_CELL;
+        Weight extracted = Super::operator()(obj);
+        if (std::isnan(extracted)) {
+          return NAN;
         } else {
           double prediction = m_expert.predict();
-          return prediction < m_param_cut ? NOT_A_CELL : prediction;
+          return prediction < m_param_cut ? NAN : prediction;
         }
       }
 

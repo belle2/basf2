@@ -29,8 +29,8 @@ namespace Belle2 {
     public:
       /// TODO implement something sensable here.
       virtual
-      NeighborWeight operator()(const CDCSegmentPair& fromPair,
-                                const CDCSegmentPair& toPair) override final;
+      Weight operator()(const CDCSegmentPair& fromPair,
+                        const CDCSegmentPair& toPair) override final;
 
     }; // end class
 

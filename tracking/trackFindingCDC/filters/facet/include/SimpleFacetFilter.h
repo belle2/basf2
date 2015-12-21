@@ -51,9 +51,9 @@ namespace Belle2 {
       std::map<std::string, std::string> getParameterDescription() override;
 
       /** Main filter method returning the weight of the facet.
-       *  Returns NOT_A_CELL if the cell shall be rejected.
+       *  Returns NAN if the cell shall be rejected.
        */
-      virtual CellWeight operator()(const CDCFacet& facet) override final;
+      virtual Weight operator()(const CDCFacet& facet) override final;
 
     private:
       /// Basic filter to implement a fitless preselection.

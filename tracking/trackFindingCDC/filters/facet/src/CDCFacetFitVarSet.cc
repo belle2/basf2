@@ -34,8 +34,8 @@ bool CDCFacetFitVarSet::extract(const CDCFacet* ptrFacet)
   const CDCFacet& facet = *ptrFacet;
 
   // Make the feasibility cut on the right left passage information first
-  const CellWeight fitlessWeight = m_fitlessFacetFilter(facet);
-  if (isNotACell(fitlessWeight)) return false;
+  const Weight fitlessWeight = m_fitlessFacetFilter(facet);
+  if (std::isnan(fitlessWeight)) return false;
 
   /// Fit tangents
   facet.adjustLines();

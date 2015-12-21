@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -18,7 +18,7 @@ namespace Belle2 {
     class AllFilter : public AType {
     public:
       /** Accept all items. */
-      virtual CellWeight operator()(const typename AType::Object&) override final
+      virtual Weight operator()(const typename AType::Object&) override final
       {
         return 1;
       }

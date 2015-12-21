@@ -15,27 +15,27 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-NeighborWeight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromSegment,
-                                                   const CDCRecoSegment2D& toSegment)
+Weight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromSegment,
+                                           const CDCRecoSegment2D& toSegment)
 {
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(&fromSegment, &toSegment);
-  if (pairFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
+  if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(&fromSegment);
-    if (fromNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;
 
     Index toNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(&toSegment);
-    if (toNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (toNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (fromNPassedSuperLayers == toNPassedSuperLayers) return NOT_A_CELL;
+    if (fromNPassedSuperLayers == toNPassedSuperLayers) return NAN;
 
     return fromSegment.size() + toSegment.size();
   }
 
-  return NOT_A_CELL;
+  return NAN;
 }

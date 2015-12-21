@@ -21,7 +21,7 @@ SimpleAxialSegmentPairFilter::SimpleAxialSegmentPairFilter() : m_riemannFitter()
   m_riemannFitter.useOnlyOrientation();
 }
 
-CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
+Weight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
@@ -41,7 +41,7 @@ CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& a
   bool startSegmentIsCoaligned = endFit.getTotalArcLength2D(startSegment) >= 0.0;
 
   if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   // Check if there is a positive gap between start and end segment
@@ -49,14 +49,14 @@ CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& a
   double endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
 
   if (startFitGap < 0 or startFitGap > 100 or endFitGap < 0 or endFitGap > 100) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   double startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
   double endFitBackOffset = endFit.getArcLength2DBackOffset(startSegment, endSegment);
 
   if (startFitFrontOffset < 0 or endFitBackOffset < 0) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
@@ -73,7 +73,7 @@ CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& a
   double momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
 
   if (fabs(momAngleAtEndFront) > 2.0 or fabs(momAngleAtStartBack) > 2.0) {
-    return NOT_A_CELL;
+    return NAN;
   }
 
   // Proximity cut
@@ -83,7 +83,7 @@ CellWeight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& a
   if (startFit_dist2DToFront_endSegment < 6 and  endFit_dist2DToBack_startSegment < 6)
     return startSegment.size() + endSegment.size();
   else {
-    return NOT_A_CELL;
+    return NAN;
   }
 
 }

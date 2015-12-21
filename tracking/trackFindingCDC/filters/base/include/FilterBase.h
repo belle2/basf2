@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
@@ -76,11 +76,11 @@ namespace Belle2 {
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
-       *             NOT_A_CELL if the object is rejected.
+       *             NAN if the object is rejected.
        */
-      virtual CellWeight operator()(const Object&)
+      virtual Weight operator()(const Object&)
       {
-        return NOT_A_CELL;
+        return NAN;
       }
 
       /** Function to evaluate the object.
@@ -88,11 +88,11 @@ namespace Belle2 {
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
-       *             NOT_A_CELL if the object is rejected. Nullptr is always rejected.
+       *             NAN if the object is rejected. Nullptr is always rejected.
        */
-      CellWeight operator()(const Object* obj)
+      Weight operator()(const Object* obj)
       {
-        return obj ? operator()(*obj) : NOT_A_CELL;
+        return obj ? operator()(*obj) : NAN;
       }
 
     };

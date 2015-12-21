@@ -36,7 +36,7 @@ namespace Belle2 {
         m_recorder(nullptr),
         m_rootFileName(defaultRootFileName),
         m_treeName(defaultTreeName),
-        m_returnedCellWeight(NOT_A_CELL)
+        m_returnedWeight(NAN)
       {}
 
       /// Initialize the recorder before event processing.
@@ -60,7 +60,7 @@ namespace Belle2 {
        *  Parameters are:
        *  root_file_name = Name of the ROOT file to be written.
        *  tree_name -  Name of the Tree to be written.
-       *  returned_cell_weight - CellWeight this filter should return when called. Defaults to NOT_A_CELL
+       *  returned_cell_weight - Weight this filter should return when called. Defaults to NAN
        */
       virtual void setParameter(const std::string& key, const std::string& value) override
       {
@@ -71,8 +71,8 @@ namespace Belle2 {
           m_treeName = value;
           B2INFO("Filter received parameter 'tree_name' = " << m_treeName);
         } else if (key == "returned_cell_weight") {
-          m_returnedCellWeight = value == "NOT_A_CELL" ? NOT_A_CELL : std::stod(value);
-          B2INFO("Filter received parameter 'returned_cell_weight' = " << m_returnedCellWeight);
+          m_returnedWeight = value == "NAN" ? NAN : std::stod(value);
+          B2INFO("Filter received parameter 'returned_cell_weight' = " << m_returnedWeight);
         } else {
           Super::setParameter(key, value);
         }
@@ -86,19 +86,19 @@ namespace Belle2 {
         des["cut"] =  "The cut value of the mva output below which the object is rejected";
         des["root_file_name"] = "Name of the ROOT file to be written";
         des["tree_name"] = "Name of the Tree to be written";
-        des["returned_cell_weight"] = "CellWeight this filter should return when called. Defaults to NOT_A_CELL";
+        des["returned_cell_weight"] = "Weight this filter should return when called. Defaults to NAN";
         return des;
       }
     public:
       /// Function to evaluate the cluster for its backgroundness.
-      virtual CellWeight operator()(const Object& obj) override final
+      virtual Weight operator()(const Object& obj) override final
       {
-        CellWeight extracted = Super::operator()(obj);
-        if (not isNotACell(extracted)) {
+        Weight extracted = Super::operator()(obj);
+        if (not std::isnan(extracted)) {
           m_recorder->capture();
         }
 
-        return m_returnedCellWeight;
+        return m_returnedWeight;
       }
 
     private:
@@ -111,8 +111,8 @@ namespace Belle2 {
       /// Name of Tree to be written.
       std::string m_treeName;
 
-      /// Returns CellWeight when this filter is called
-      CellWeight m_returnedCellWeight;
+      /// Returns Weight when this filter is called
+      Weight m_returnedWeight;
     };
   }
 }

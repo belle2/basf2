@@ -17,13 +17,13 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>&
-    testPair)
+Weight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>&
+                                                           testPair)
 {
   const std::vector<SegmentInformation*>& train = testPair.first;
   const CDCTrack* track = testPair.second;
 
-  if (train.size() == 0) return NOT_A_CELL;
+  if (train.size() == 0) return NAN;
 
   const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
 

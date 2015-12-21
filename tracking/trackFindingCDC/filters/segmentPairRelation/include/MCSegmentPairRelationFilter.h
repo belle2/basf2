@@ -42,9 +42,9 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() override final;
 
-      /// Main filter method returning the weight of the neighborhood relation. Return NOT_A_NEIGHBOR if relation shall be rejected.
-      virtual NeighborWeight operator()(const CDCSegmentPair& fromSegmentPair,
-                                        const CDCSegmentPair& toSegmentPair) override final;
+      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
+      virtual Weight operator()(const CDCSegmentPair& fromSegmentPair,
+                                const CDCSegmentPair& toSegmentPair) override final;
 
     public:
       /// Setter for the allow reverse parameter

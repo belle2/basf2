@@ -73,7 +73,7 @@ namespace Belle2 {
        *  Parameters are:
        *  root_file_name = Name of the ROOT file to be written.
        *  tree_name -  Name of the Tree to be written.
-       *  returned_cell_weight - CellWeight this filter should return when called. Defaults to NOT_A_CELL
+       *  returned_cell_weight - Weight this filter should return when called. Defaults to NAN
        *  varsets - Comma separated list of names refering to concrete variable sets.
        */
       virtual void setParameter(const std::string& key, const std::string& value) override

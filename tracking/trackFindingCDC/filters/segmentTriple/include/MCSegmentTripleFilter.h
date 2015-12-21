@@ -39,8 +39,8 @@ namespace Belle2 {
       /// Forwards the modules initialize to the filter
       virtual void terminate() override final;
 
-      /// Check if the segment triple is aligned in the Monte Carlo track. Signals NOT_A_CELL if not.
-      virtual CellWeight operator()(const CDCSegmentTriple& triple) override final;
+      /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
+      virtual Weight operator()(const CDCSegmentTriple& triple) override final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.

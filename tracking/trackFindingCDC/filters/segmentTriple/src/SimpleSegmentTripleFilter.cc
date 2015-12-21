@@ -40,7 +40,7 @@ void SimpleSegmentTripleFilter::terminate()
 
 
 
-CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
+Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
 
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
@@ -124,7 +124,7 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
 
       //double d;
       //cin >> d;
-      return NOT_A_CELL;
+      return NAN;
     }
     //now check if the the fit and the middle segment are coaligned - is here the right point to check for this ??
     //if ( not middleSegment.isForwardFit(startFit) ) return false;
@@ -138,7 +138,7 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
 
   // Check if the middle segment is actually coaligned with the trajectory
   EForwardBackward fbInfo = fit.isForwardOrBackwardTo(middleSegment);
-  if (fbInfo != EForwardBackward::c_Forward) return NOT_A_CELL;
+  if (fbInfo != EForwardBackward::c_Forward) return NAN;
 
   //Reconstruct the
   CDCRecoSegment3D reconstructedMiddle;
@@ -149,16 +149,16 @@ CellWeight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segment
       B2DEBUG(100, "  RecoHit out of CDC");
       //double d;
       //cin >> d;
-      return NOT_A_CELL;
+      return NAN;
     }
   }
 
   // Fit the sz slope and intercept
   /*const CDCTrajectorySZ& trajectorySZ = */ getFittedTrajectorySZ(segmentTriple);
 
-  CellWeight result = startSegment.size() + middleSegment.size() + endSegment.size();
+  Weight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
-  if (not isNotACell(result)) {
+  if (not std::isnan(result)) {
 
     m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
     getFittedTrajectorySZ(segmentTriple);

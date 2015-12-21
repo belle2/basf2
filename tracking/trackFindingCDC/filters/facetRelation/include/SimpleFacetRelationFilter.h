@@ -54,8 +54,8 @@ namespace Belle2 {
 
     public:
       /** Main filter method returning the weight of the neighborhood relation.*/
-      virtual NeighborWeight operator()(const CDCFacet& fromFacet,
-                                        const CDCFacet& toFacet) override final;
+      virtual Weight operator()(const CDCFacet& fromFacet,
+                                const CDCFacet& toFacet) override final;
 
     private:
       /// Memory for the used direction of flight deviation.

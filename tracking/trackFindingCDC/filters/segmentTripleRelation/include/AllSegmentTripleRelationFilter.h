@@ -28,8 +28,8 @@ namespace Belle2 {
 
       /** Main filter method returning the weight of the neighborhood relation.
        *  Always return the overlap penatlty accepting all relations.*/
-      virtual NeighborWeight operator()(const CDCSegmentTriple& from,
-                                        const CDCSegmentTriple& to) override final;
+      virtual Weight operator()(const CDCSegmentTriple& from,
+                                const CDCSegmentTriple& to) override final;
 
     }; // end class
 

@@ -37,12 +37,12 @@ void MCSegmentTripleRelationFilter::terminate()
   Super::terminate();
 }
 
-NeighborWeight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,
-                                                         const CDCSegmentTriple& neighborTriple)
+Weight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,
+                                                 const CDCSegmentTriple& neighborTriple)
 {
-  CellWeight mcTripleWeight = m_mcSegmentTripleFilter(triple);
-  CellWeight mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
+  Weight mcTripleWeight = m_mcSegmentTripleFilter(triple);
+  Weight mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
 
-  bool mcDecision = (not isNotACell(mcTripleWeight)) and (not isNotACell(mcNeighborTripleWeight));
-  return mcDecision ? - neighborTriple.getStart()->size() : NOT_A_NEIGHBOR;
+  bool mcDecision = (not std::isnan(mcTripleWeight)) and (not std::isnan(mcNeighborTripleWeight));
+  return mcDecision ? - neighborTriple.getStart()->size() : NAN;
 }

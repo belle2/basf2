@@ -81,5 +81,5 @@ CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 
   }
 
-  return selectFitless ? 3 : NOT_A_CELL;
+  return selectFitless ? 3 : NAN;
 }

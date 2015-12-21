@@ -29,10 +29,10 @@ bool CDCFacetRelationTruthVarSet::extract(const Relation<CDCFacet>* ptrFacetRela
 
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets
-  CellWeight fromFacetWeight = m_mcFacetFilter(fromFacet);
-  CellWeight toFacetWeight = m_mcFacetFilter(toFacet);
+  Weight fromFacetWeight = m_mcFacetFilter(fromFacet);
+  Weight toFacetWeight = m_mcFacetFilter(toFacet);
 
-  bool mcDecision = (not isNotACell(fromFacetWeight)) and (not isNotACell(toFacetWeight));
+  bool mcDecision = (not std::isnan(fromFacetWeight)) and (not std::isnan(toFacetWeight));
   var<named("truth")>() = mcDecision;
   return true;
 }

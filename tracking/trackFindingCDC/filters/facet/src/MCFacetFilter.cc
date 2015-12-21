@@ -21,7 +21,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CellWeight MCFacetFilter::operator()(const CDCFacet& facet)
+Weight MCFacetFilter::operator()(const CDCFacet& facet)
 {
   const int inTrackHitDistanceTolerance = 3;
   bool isCorrectFacet = operator()(facet,
@@ -34,7 +34,7 @@ CellWeight MCFacetFilter::operator()(const CDCFacet& facet)
     facet.adjustLines();
     return 3.0;
   } else {
-    return NOT_A_CELL;
+    return NAN;
   }
 }
 

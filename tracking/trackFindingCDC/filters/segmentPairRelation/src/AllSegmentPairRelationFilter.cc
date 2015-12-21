@@ -14,8 +14,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-NeighborWeight AllSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
-                                                        const CDCSegmentPair& toPair)
+Weight AllSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
+                                                const CDCSegmentPair& toPair)
 {
   return  -toPair.getStartSegment()->size();
 }

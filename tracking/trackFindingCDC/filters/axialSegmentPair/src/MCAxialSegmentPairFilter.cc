@@ -26,7 +26,7 @@ MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
 }
 
 
-CellWeight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
+Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
   const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
   const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
@@ -42,22 +42,22 @@ CellWeight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo =
     mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
-  if (pairFBInfo == EForwardBackward::c_Invalid) return NOT_A_CELL;
+  if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
-    if (startNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (startNPassedSuperLayers == c_InvalidIndex) return NAN;
 
     Index endNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrEndSegment);
-    if (endNPassedSuperLayers == c_InvalidIndex) return NOT_A_CELL;
+    if (endNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 2) return NOT_A_CELL;
+    if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 2) return NAN;
 
     //do fits?
     return startSegment.size() + endSegment.size();
   }
 
-  return NOT_A_CELL;
+  return NAN;
 
 }

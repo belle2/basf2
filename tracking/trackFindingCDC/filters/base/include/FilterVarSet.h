@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <memory>
 
@@ -76,9 +76,9 @@ namespace Belle2 {
       {
         bool extracted = Super::extract(obj);
         if (m_ptrFilter and obj) {
-          CellWeight cellWeight = (*m_ptrFilter)(*obj);
+          Weight cellWeight = (*m_ptrFilter)(*obj);
           this->template var<named("cell_weight")>() = cellWeight;
-          this->template var<named("is_cell")>() = not isNotACell(cellWeight);
+          this->template var<named("is_cell")>() = not std::isnan(cellWeight);
           // Forward the nested result.
           return extracted;
         } else {

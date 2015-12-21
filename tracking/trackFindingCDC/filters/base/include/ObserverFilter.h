@@ -49,12 +49,12 @@ namespace Belle2 {
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
-       *             NOT_A_CELL if the object is rejected.
+       *             NAN if the object is rejected.
        */
-      virtual CellWeight operator()(const Object& object)
+      virtual Weight operator()(const Object& object)
       {
-        CellWeight result = Super::operator()(object);
-        if (isNotACell(result)) {
+        Weight result = Super::operator()(object);
+        if (std::isnan(result)) {
           m_noAnswers += 1;
         } else {
           m_yesAnswers += 1;

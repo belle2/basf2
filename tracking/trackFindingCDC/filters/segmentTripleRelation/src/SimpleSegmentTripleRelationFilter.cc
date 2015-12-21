@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-NeighborWeight
+Weight
 SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
                                               const CDCSegmentTriple& neighborTriple)
 {

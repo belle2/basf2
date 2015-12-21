@@ -43,13 +43,13 @@ void MCSegmentPairRelationFilter::terminate()
 }
 
 
-NeighborWeight
+Weight
 MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
                                         const CDCSegmentPair& toSegmentPair)
 {
-  CellWeight mcFromPairWeight = m_mcSegmentPairFilter(fromSegmentPair);
-  CellWeight mcToPairWeight = m_mcSegmentPairFilter(toSegmentPair);
+  Weight mcFromPairWeight = m_mcSegmentPairFilter(fromSegmentPair);
+  Weight mcToPairWeight = m_mcSegmentPairFilter(toSegmentPair);
 
-  bool mcDecision = (not isNotACell(mcFromPairWeight)) and (not isNotACell(mcToPairWeight));
-  return mcDecision ? -toSegmentPair.getStartSegment()->size() : NOT_A_NEIGHBOR;
+  bool mcDecision = (not std::isnan(mcFromPairWeight)) and (not std::isnan(mcToPairWeight));
+  return mcDecision ? -toSegmentPair.getStartSegment()->size() : NAN;
 }

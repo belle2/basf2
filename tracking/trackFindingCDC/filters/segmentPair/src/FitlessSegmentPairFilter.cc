@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CellWeight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
+Weight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
   const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
   const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();

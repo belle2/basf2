@@ -10,15 +10,10 @@
 #pragma once
 
 #include <iterator>
-#include <type_traits>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Type function to extract the bare value type from a range of values
-    template<class Ts>
-    using ValueType = typename std::remove_reference < decltype(*std::begin(Ts{})) >::type;
 
     /**
      *  Returns the common category value if all items in a range belong to the same category

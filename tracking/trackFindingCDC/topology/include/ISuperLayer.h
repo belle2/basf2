@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <iterator>
+#include <tracking/trackFindingCDC/utilities/GetValueType.h>
 #include <climits>
 
 namespace Belle2 {
@@ -93,7 +93,7 @@ namespace Belle2 {
       template<class AHits>
       static ISuperLayer getCommon(const AHits& hits)
       {
-        using Hit = ValueType<AHits>;
+        using Hit = GetValueType<AHits>;
         return common(hits, getFrom<Hit>, c_Invalid);
       }
 

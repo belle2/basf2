@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/GetValueType.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -46,7 +47,7 @@ namespace Belle2 {
       template<class AHits>
       static EStereoKind getCommon(const AHits& hits)
       {
-        using Hit = ValueType<AHits>;
+        using Hit = GetValueType<AHits>;
         return common(hits, getFrom<Hit>, EStereoKind::c_Invalid);
       }
 

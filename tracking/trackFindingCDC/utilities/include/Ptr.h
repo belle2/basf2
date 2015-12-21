@@ -34,11 +34,11 @@ namespace Belle2 {
       { return Ptr<const T>(m_obj); }
 
       /// Allow explicit unpacking.
-      explicit operator T*& ()
+      explicit operator T*& ()&
       { return m_obj; }
 
       /// Allow explicit unpacking.
-      explicit operator T* const& () const
+      explicit operator T* const& () const&
       { return m_obj; }
 
       /// Allow automatic from temporary return values unpacking.
@@ -46,12 +46,20 @@ namespace Belle2 {
       { return m_obj; }
 
       /// Mimic the original item pointer access.
-      T* operator->()
-      { return m_obj;}
-
-      /// Mimic the original item pointer access.
       T* operator->() const
       { return m_obj;}
+
+      /// Dereferencing the pointer
+      T& operator*() const
+      { return *m_obj; }
+
+      /// Transport ordering of pointer
+      bool operator<(const Ptr<T>& rhs) const
+      { return m_obj < rhs.m_obj; }
+
+      /// Transport equality of pointer
+      bool operator==(const Ptr<T>& rhs) const
+      { return m_obj == rhs.m_obj; }
 
     private:
       /// Reference to the marked items.

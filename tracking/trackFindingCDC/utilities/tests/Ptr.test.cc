@@ -21,6 +21,10 @@ namespace {
     int i = 4;
     Ptr<int> ptrIFromReference {i};
     Ptr<int> ptrIFromPointer {&i};
+
+    EXPECT_EQ(4, *ptrIFromReference);
+    EXPECT_EQ(4, *ptrIFromPointer);
+
   }
 
   TEST(TrackFindingCDCTest, utilities_Ptr_const_conversion)
@@ -28,5 +32,6 @@ namespace {
     int i = 4;
     Ptr<int> ptrI{i};
     Ptr<const int> ptrConstI = Ptr<const int>(ptrI);
+    EXPECT_EQ(4, *ptrConstI);
   }
 }

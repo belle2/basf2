@@ -158,8 +158,8 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
           CDCWireHit fromWireHit(fromHit);
           CDCWireHit toWireHit(toHit);
 
-          CDCRLTaggedWireHit fromRLWireHit(fromWireHit, ERightLeft::c_Unknown);
-          CDCRLTaggedWireHit toRLWireHit(toWireHit, ERightLeft::c_Unknown);
+          CDCRLTaggedWireHit fromRLWireHit(&fromWireHit, ERightLeft::c_Unknown);
+          CDCRLTaggedWireHit toRLWireHit(&toWireHit, ERightLeft::c_Unknown);
 
           Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
           Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());

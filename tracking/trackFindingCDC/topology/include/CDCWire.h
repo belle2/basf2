@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/topology/ILayerType.h>
 #include <tracking/trackFindingCDC/topology/IWireType.h>
 
-#include <tracking/trackFindingCDC/topology/WireNeighborType.h>
+#include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
 
 #include <tracking/trackFindingCDC/topology/EStereoType.h>
 
@@ -287,20 +287,24 @@ namespace Belle2 {
        */
       /**@{*/
 
-      /// Calculates whether the give wire is a neighbor of this wire
+      /// Returns gives the kind of neighborhood relation from this wire to the given wire.
       /** Gives the information if the given wire is a neighbor of this wire.
        *  A return value unequal zero states that the two are  indeed neighbors.
        *  Moreover the return value also gives the direction in which you have to go to get to the neighbor.
        *  Possible return values are: \n
-       *  CW_OUT_NEIGHBOR = 1  for clockwise outwards \n
-       *  CW_NEIGHBOR = 3 for clockwise \n
-       *  CW_IN_NEIGHBOR = 5 for clockwise inwards \n
-       *  CCW_IN_NEIGHBOR = 7 for counterclockwise inwards \n
-       *  CCW_NEIGHBOR = 9 for counterclockwise \n
-       *  CCW_OUT_NEIGHBOR = 11 for counterclockwise outwards \n
+       *  EWireNeighborKind::c_None = 0 for wires that are not neighbors \n
+       *  EWireNeighborKind::c_CWOut = 1 for clockwise outwards \n
+       *  EWireNeighborKind::c_CW = 3 for clockwise \n
+       *  EWireNeighborKind::c_CWIn = 5 for clockwise inwards \n
+       *  EWireNeighborKind::c_CCWIn = 7 for counterclockwise inwards \n
+       *  EWireNeighborKind::c_CCW = 9 for counterclockwise \n
+       *  EWireNeighborKind::c_CCWOut = 11 for counterclockwise outwards \n
        *  The values are choosen to have an assoziation with the numbers on a regular clock.
        */
-      WireNeighborType isNeighborWith(const CDCWire& wire) const;
+      EWireNeighborKind getNeighborKind(const CDCWire& wire) const;
+
+      /// Returns whether the give wire is a neighbor of this wire
+      bool isNeighborWith(const CDCWire& wire) const;
 
       /// Gives the two wires in the next layer inward.
       /** Gives the two wire in the next layer closer to the interaction point from this wire.

@@ -120,25 +120,20 @@ const CDCWireLayer* CDCWireSuperLayer::nextWireLayer(const CDCWireLayer* layer) 
   return nullptr;
 }
 
-WireNeighborType
-CDCWireSuperLayer::areNeighbors(
-  const ILayerType& iLayer,
-  const IWireType& iWire,
-
-  const ILayerType& iOtherLayer,
-  const IWireType& iOtherWire
-) const
+EWireNeighborKind CDCWireSuperLayer::getNeighborKind(const ILayerType& iLayer,
+                                                     const IWireType& iWire,
+                                                     const ILayerType& iOtherLayer,
+                                                     const IWireType& iOtherWire) const
 {
-
   ILayerType iLayerDifference = iOtherLayer - iLayer;
 
   if (iLayerDifference == 0 and
       isValidILayer(iLayer)) {
 
     const CDCWireLayer& layer = getWireLayer(iLayer);
-    if (iWire == (iOtherWire + 1) % layer.size()) return CW_NEIGHBOR;
-    else if ((iWire + 1) % layer.size()  ==  iOtherWire) return CCW_NEIGHBOR;
-    else return 0;
+    if (iWire == (iOtherWire + 1) % layer.size()) return EWireNeighborKind::c_CW;
+    else if ((iWire + 1) % layer.size()  ==  iOtherWire) return EWireNeighborKind::c_CCW;
+    else return EWireNeighborKind::c_None;
 
   } else if (iLayerDifference == -1 and
              isValidILayer(iLayer)  and
@@ -149,19 +144,19 @@ CDCWireSuperLayer::areNeighbors(
     const ERotation deltaShift = getShiftDelta(otherLayer.getShift(), layer.getShift());
 
     if (iWire == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return CW_IN_NEIGHBOR;
-      else if (deltaShift == ERotation::c_CounterClockwise) return CCW_IN_NEIGHBOR;
-      else  return 0;
+      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CWIn;
+      else if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CCWIn;
+      else return EWireNeighborKind::c_None;
 
     } else if (iWire == (iOtherWire + 1) % otherLayer.size()) {
-      if (deltaShift == ERotation::c_CounterClockwise) return CW_IN_NEIGHBOR;
-      else return 0;
+      if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CWIn;
+      else return EWireNeighborKind::c_None;
 
     } else if ((iWire + 1) % layer.size()  ==  iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return CCW_IN_NEIGHBOR;
-      else return 0;
+      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CCWIn;
+      else return EWireNeighborKind::c_None;
 
-    } else return 0;
+    } else return EWireNeighborKind::c_None;
 
   } else if (iLayerDifference == 1 and
              isValidILayer(iLayer) and
@@ -172,21 +167,21 @@ CDCWireSuperLayer::areNeighbors(
     const ERotation deltaShift = getShiftDelta(otherLayer.getShift(), layer.getShift());
 
     if (iWire == iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return CW_OUT_NEIGHBOR;
-      else if (deltaShift == ERotation::c_CounterClockwise) return CCW_OUT_NEIGHBOR;
-      else  return 0;
+      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CWOut;
+      else if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CCWOut;
+      else return EWireNeighborKind::c_None;
 
     } else if (iWire == (iOtherWire + 1) % otherLayer.size()) {
-      if (deltaShift == ERotation::c_CounterClockwise) return CW_OUT_NEIGHBOR;
-      else return 0;
+      if (deltaShift == ERotation::c_CounterClockwise) return EWireNeighborKind::c_CWOut;
+      else return EWireNeighborKind::c_None;
 
     } else if ((iWire + 1) % layer.size()  ==  iOtherWire) {
-      if (deltaShift == ERotation::c_Clockwise) return CCW_OUT_NEIGHBOR;
-      else return 0;
+      if (deltaShift == ERotation::c_Clockwise) return EWireNeighborKind::c_CCWOut;
+      else return EWireNeighborKind::c_None;
 
-    } else return 0;
+    } else return EWireNeighborKind::c_None;
 
-  } else return 0;
+  } else return EWireNeighborKind::c_None;
 
 }
 

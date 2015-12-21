@@ -47,16 +47,16 @@ CDCRLWireHitTriple::EShape CDCRLWireHitTriple::getShape() const
   const CDCWire& middleWire = getMiddleWire();
   const CDCWire& endWire = getEndWire();
 
-  WireNeighborType startToMiddleNeighborType = startWire.isNeighborWith(middleWire);
-  WireNeighborType middleToEndNeighborType   = middleWire.isNeighborWith(endWire);
+  EWireNeighborKind startToMiddleNeighborKind = startWire.getNeighborKind(middleWire);
+  EWireNeighborKind middleToEndNeighborKind   = middleWire.getNeighborKind(endWire);
 
-  if (startToMiddleNeighborType == NOT_NEIGHBORS or
-      middleToEndNeighborType == NOT_NEIGHBORS) {
+  if (startToMiddleNeighborKind == EWireNeighborKind::c_None or
+      middleToEndNeighborKind == EWireNeighborKind::c_None) {
     return EShape::c_Invalid;
   }
 
   // Neighbor types are marked on the clock. Difference is so to say an angular value apart from a 12 / (2 * pi) factor
-  const int clockDifference = (int)startToMiddleNeighborType - (int)middleToEndNeighborType;
+  const int clockDifference = (int)startToMiddleNeighborKind - (int)middleToEndNeighborKind;
 
   // Difference on the clock modulus 12 such that it is between -6 and 6.
   EShape shape = EShape((clockDifference + 18) % 12 - 6);

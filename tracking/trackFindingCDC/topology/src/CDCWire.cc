@@ -135,9 +135,11 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
 }
 
 
-WireNeighborType CDCWire::isNeighborWith(const CDCWire& wire) const
-{ return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID()); }
+EWireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
+{ return CDCWireTopology::getInstance().getNeighborKind(getWireID(), wire.getWireID()); }
 
+bool CDCWire::isNeighborWith(const CDCWire& wire) const
+{ return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID()); }
 
 
 CDCWire::NeighborPair CDCWire::getNeighborsInwards() const

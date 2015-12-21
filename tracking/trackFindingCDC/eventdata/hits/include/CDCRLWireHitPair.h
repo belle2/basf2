@@ -64,9 +64,9 @@ namespace Belle2 {
       const CDCRLWireHitPair* operator->() const
       { return this; }
 
-      /// Getter for the WireNeighborType of the two underlying wires - zero for none neighbors.
-      WireNeighborType getNeighborType() const
-      { return getFromWire().isNeighborWith(getToWire()); }
+      /// Getter for the EWireNeighborKind of the two underlying wires - zero for none neighbors.
+      EWireNeighborKind getNeighborKind() const
+      { return getFromWire().getNeighborKind(getToWire()); }
 
       /// Getter for the common superlayer id of the pair.
       ISuperLayerType getISuperLayer() const

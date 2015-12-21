@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Helper class template to get a closest wire neighbor by its neighborhood relation type
-    template<WireNeighborType NeighborType>
+    template<EWireNeighborKind NeighborKind>
     struct NeighborWireGetter {
       /// Getter for the closest neighbor
       static inline const CDCWire* get(const CDCWire& /*wire*/)
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     /// Helper class to get the clockwise outwards wire neighbor
     template<>
-    struct NeighborWireGetter<CW_OUT_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CWOut> {
       /// Getter for the clockwise outwards wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCWOutwards(); }
@@ -41,7 +41,7 @@ namespace Belle2 {
 
     /// Helper class to get the clockwise in wire neighbor
     template<>
-    struct NeighborWireGetter<CW_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CW> {
       /// Getter for the clockwise wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCW(); }
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /// Helper class to get the clockwise inwards wire neighbor
     template<>
-    struct NeighborWireGetter<CW_IN_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CWIn> {
       /// Getter for the clockwise inwards wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCWInwards(); }
@@ -57,7 +57,7 @@ namespace Belle2 {
 
     /// Helper class to get the counterclockwise inwards wire neighbor
     template<>
-    struct NeighborWireGetter<CCW_IN_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CCWIn> {
       /// Getter for the the counterclockwise inwards wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCCWInwards(); }
@@ -66,7 +66,7 @@ namespace Belle2 {
 
     /// Helper class to get the counterclockwise wire neighbor
     template<>
-    struct NeighborWireGetter<CCW_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CCW> {
       /// Getter for the the counterclockwise wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCCW(); }
@@ -74,7 +74,7 @@ namespace Belle2 {
 
     /// Helper class to get the counterclockwise outwards wire neighbor
     template<>
-    struct NeighborWireGetter<CCW_OUT_NEIGHBOR> {
+    struct NeighborWireGetter<EWireNeighborKind::c_CCWOut> {
       /// Getter for the the counterclockwise outwards wire neighbor
       static inline const CDCWire* get(const CDCWire& wire)
       { return wire.getNeighborCCWOutwards(); }
@@ -85,7 +85,7 @@ namespace Belle2 {
      *  Class providing the neighborhood filter interface to the NeighborhoodBuilder
      *  for the construction of wire neighborhoods
      */
-    template<WireNeighborType ConcreteNeighborType>
+    template<EWireNeighborKind ConcreteNeighborKind>
     class WireHitRelationFilter : public Filter<Relation<CDCWireHit>> {
 
     public:
@@ -100,7 +100,7 @@ namespace Belle2 {
       {
 
         const CDCWire& wire = wireHit.getWire();
-        const CDCWire* ptrNeighborWire = NeighborWireGetter<ConcreteNeighborType>::get(wire);
+        const CDCWire* ptrNeighborWire = NeighborWireGetter<ConcreteNeighborKind>::get(wire);
 
         if (ptrNeighborWire == nullptr) {
           return boost::iterator_range<ACDCWireHitIterator>(itEnd, itEnd);

@@ -180,21 +180,19 @@ namespace Belle2 {
        *  If they are neighbors the return value indicates
        *  the direction to go from the first wire to the second. \n
        *  The return value is one of \n
-       *  0 for the wires being no neighbors \n
-       *  CW_OUT_NEIGHBOR = 1  for clockwise outwards \n
-       *  CW_NEIGHBOR = 3 for clockwise \n
-       *  CW_IN_NEIGHBOR = 5 for clockwise inwards \n
-       *  CCW_IN_NEIGHBOR = 7 for counterclockwise inwards \n
-       *  CCW_NEIGHBOR = 9 for counterclockwise \n
-       *  CCW_OUT_NEIGHBOR = 11 for counterclockwise outwards \n
+       *  EWireNeighborKind::c_None for the wires being no neighbors \n
+       *  EWireNeighborKind::c_CWOut = 1  for clockwise outwards \n
+       *  EWireNeighborKind::c_CW = 3 for clockwise \n
+       *  EWireNeighborKind::c_CWIn = 5 for clockwise inwards \n
+       *  EWireNeighborKind::c_CCWIn = 7 for counterclockwise inwards \n
+       *  EWireNeighborKind::c_CCW = 9 for counterclockwise \n
+       *  EWireNeighborKind::c_CCWOut = 11 for counterclockwise outwards \n
        *  The values are choosen to have an assoziation with the numbers on a regular clock.
        *  ( compare secondary neighborhood ) */
-      WireNeighborType
-      areNeighbors(const ILayerType& iLayer,
-                   const IWireType& iWire,
-
-                   const ILayerType& iOtherLayer,
-                   const IWireType& iOtherWire) const;
+      EWireNeighborKind getNeighborKind(const ILayerType& iLayer,
+                                        const IWireType& iWire,
+                                        const ILayerType& iOtherLayer,
+                                        const IWireType& iOtherWire) const;
 
       /// Getter for the two closest neighbors in the layer outwards of the given on
       NeighborPair getNeighborsOutwards(const ILayerType& iLayer, const IWireType& iWire) const;

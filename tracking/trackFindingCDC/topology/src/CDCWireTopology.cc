@@ -87,15 +87,15 @@ const CDCWire * CDCWireTopology::nextWire(const CDCWire * wire) const{
 */
 
 
-WireNeighborType CDCWireTopology::areNeighbors(const WireID& wireID, const WireID& otherID) const
+EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
 {
 
   if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
       isValidISuperLayer(wireID.getISuperLayer())) {
-    return NOT_NEIGHBORS;
+    return EWireNeighborKind::c_None;
   } else {
     const CDCWireSuperLayer& superlayer = getWireSuperLayer(wireID.getISuperLayer());
-    return superlayer.areNeighbors(wireID.getILayer(), wireID.getIWire(), otherID.getILayer(), otherID.getIWire());
+    return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(), otherID.getILayer(), otherID.getIWire());
   }
 }
 

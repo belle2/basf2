@@ -75,10 +75,16 @@ namespace Belle2 {
        */
       static ISuperLayer getNextOutwards(ISuperLayer iSuperLayer);
 
-      /** Returns the superlayer of an object */
-      template<class T>
-      static ISuperLayer getFrom(const T& t)
-      { return t->getISuperLayer(); }
+      /**
+       *  Returns the common superlayer of two objects
+       *  ISuperLayerUtil::c_Invalid if there is no common super layer.
+       */
+      template<class T1, class T2>
+      static ISuperLayer getCommon(const T1& t1, const T2& t2)
+      {
+        ISuperLayer iSuperLayer = getFrom(t1);
+        return iSuperLayer == getFrom(t2) ? iSuperLayer : c_Invalid;
+      }
 
       /**
        *  Returns the common superlayer of hits in a container.
@@ -90,6 +96,23 @@ namespace Belle2 {
         using Hit = ValueType<AHits>;
         return common(hits, getFrom<Hit>, c_Invalid);
       }
+
+      /** Returns the superlayer of an object */
+      template<class T>
+      static ISuperLayer getFrom(const T& t)
+      { return getFromImpl(t, 0); }
+
+    private:
+      /** Returns the superlayer of an object. Favored option. */
+      template<class T>
+      static auto getFromImpl(const T& t, int) -> decltype(t.getISuperLayer())
+      { return t.getISuperLayer(); }
+
+      /** Returns the superlayer of an object. Unfavored option. */
+      template<class T>
+      static auto getFromImpl(const T& t, long) -> decltype(t->getISuperLayer())
+      { return t->getISuperLayer(); }
+
     };
 
   } // namespace TrackFindingCDC

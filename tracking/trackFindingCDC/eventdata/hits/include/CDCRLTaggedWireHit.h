@@ -114,7 +114,7 @@ namespace Belle2 {
       { return getWire().getWireID(); }
 
       /// Getter for the superlayer id.
-      ILayerType getISuperLayer() const
+      ISuperLayer getISuperLayer() const
       { return getWire().getISuperLayer(); }
 
       /// Getter for the stereo type of the underlying wire.

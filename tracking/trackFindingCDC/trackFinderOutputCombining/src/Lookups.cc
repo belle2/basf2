@@ -23,9 +23,9 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
     if (segment.getAutomatonCell().hasTakenFlag())
       continue;
 
-    ILayerType superlayerID = segment.getISuperLayer();
+    ISuperLayer iSuperLayer = segment.getISuperLayer();
     SegmentInformation* newSegmentInformation = new SegmentInformation(&segment);
-    m_lookup[superlayerID].push_back(newSegmentInformation);
+    m_lookup[iSuperLayer].push_back(newSegmentInformation);
 
     for (const CDCRecoHit2D& recoHit : segment) {
       const CDCHit* cdcHit = recoHit.getWireHit().getHit();

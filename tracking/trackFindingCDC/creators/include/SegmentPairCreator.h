@@ -94,7 +94,7 @@ namespace Belle2 {
 
           //make pairs of this superlayer and the superlayer more to the inside
           {
-            ILayerType iSuperLayerIn = iSuperLayer - 1;
+            ISuperLayer iSuperLayerIn = iSuperLayer - 1;
             if (not ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerIn];
               create(segmentPairFilter, startSegments, endSegments, segmentPairs);
@@ -103,7 +103,7 @@ namespace Belle2 {
 
           //make pairs of this superlayer and the superlayer more to the outside
           {
-            ILayerType iSuperLayerOut = iSuperLayer + 1;
+            ISuperLayer iSuperLayerOut = iSuperLayer + 1;
             if (not ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerOut];
               create(segmentPairFilter, startSegments, endSegments, segmentPairs);

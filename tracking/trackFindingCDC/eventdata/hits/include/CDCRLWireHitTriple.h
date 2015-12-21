@@ -117,11 +117,8 @@ namespace Belle2 {
       EShape getShape() const;
 
       /// Getter for the common superlayer id of the pair
-      ILayerType getISuperLayer() const
-      {
-        ILayerType result = getStartRLWireHit().getISuperLayer();
-        return result == getRearRLWireHitPair().getISuperLayer() ? result : ISuperLayerUtil::c_Invalid;
-      }
+      ISuperLayer getISuperLayer() const
+      { return ISuperLayerUtil::getCommon(getStartRLWireHit(), getRearRLWireHitPair()); }
 
       /// Getter for the common stereo type of the superlayer of the pair.
       EStereoKind getStereoKind() const

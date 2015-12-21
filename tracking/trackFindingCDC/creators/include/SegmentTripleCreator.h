@@ -41,7 +41,7 @@ namespace Belle2 {
         /// Divide segments by superlayer
         for (const CDCRecoSegment2D& segment : segments) {
 
-          ILayerType iSuperLayer =  segment.getISuperLayer();
+          ISuperLayer iSuperLayer =  segment.getISuperLayer();
           EStereoKind stereoType = segment.getStereoKind();
 
           if (stereoType == EStereoKind::c_Axial) {
@@ -95,7 +95,7 @@ namespace Belle2 {
         segmentTripleFilter.beginEvent();
 
         //Make pairs of closeby axial superlayers
-        for (ILayerType iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS;
+        for (ISuperLayer iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS;
              ++(++iAxialSuperLayer) /*only even slots are filled */) {
 
           //consider only axial superlayers
@@ -103,8 +103,8 @@ namespace Belle2 {
 
           //make pairs of this superlayer and the superlayer more to the inside
           {
-            ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
-            ILayerType iAxialSuperLayerIn = iAxialSuperLayer - 2;
+            ISuperLayer iStereoSuperLayerIn = iAxialSuperLayer - 1;
+            ISuperLayer iAxialSuperLayerIn = iAxialSuperLayer - 2;
 
             if (ISuperLayerUtil::isInCDC(iAxialSuperLayerIn)) {
 
@@ -126,8 +126,8 @@ namespace Belle2 {
 
           //make pairs of this superlayer and the superlayer more to the outside
           {
-            ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
-            ILayerType iAxialSuperLayerOut = iAxialSuperLayer + 2;
+            ISuperLayer iStereoSuperLayerOut = iAxialSuperLayer + 1;
+            ISuperLayer iAxialSuperLayerOut = iAxialSuperLayer + 2;
             if (ISuperLayerUtil::isInCDC(iAxialSuperLayerOut)) {
 
               const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
@@ -164,7 +164,7 @@ namespace Belle2 {
                 //make pairs from and to the same superlayer
                 {
                   // via the stereo superlayer outside
-                  ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
+                  ISuperLayer iStereoSuperLayerOut = iAxialSuperLayer + 1;
 
                   if (ISuperLayerUtil::isInCDC(iStereoSuperLayerOut)) {
 
@@ -178,7 +178,7 @@ namespace Belle2 {
 
                 {
                   // via the stereo superlayer inside
-                  ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
+                  ISuperLayer iStereoSuperLayerIn = iAxialSuperLayer - 1;
 
                   if (ISuperLayerUtil::isInCDC(iStereoSuperLayerIn)) {
 

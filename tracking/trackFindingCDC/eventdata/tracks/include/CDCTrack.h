@@ -67,11 +67,11 @@ namespace Belle2 {
 
 
       /// Getter for the superlayer id the track starts from.
-      ILayerType getStartISuperLayer() const
+      ISuperLayer getStartISuperLayer() const
       { return getStartRecoHit3D().getISuperLayer(); }
 
       /// Getter for the superlayer id the track ends in.
-      ILayerType getEndISuperLayer() const
+      ISuperLayer getEndISuperLayer() const
       { return getEndRecoHit3D().getISuperLayer(); }
 
 

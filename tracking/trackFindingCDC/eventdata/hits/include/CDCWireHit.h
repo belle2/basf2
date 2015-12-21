@@ -155,7 +155,7 @@ namespace Belle2 {
       { return getWire().isAxial(); }
 
       /// Getter for the super layer id.
-      ILayerType getISuperLayer() const
+      ISuperLayer getISuperLayer() const
       { return getWire().getISuperLayer(); }
 
       /// The two dimensional reference position (z=0) of the underlying wire.

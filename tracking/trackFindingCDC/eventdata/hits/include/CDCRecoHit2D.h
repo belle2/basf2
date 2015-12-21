@@ -154,7 +154,7 @@ namespace Belle2 {
       { return getWire().isAxial(); }
 
       /// Getter for the superlayer id.
-      ILayerType getISuperLayer() const
+      ISuperLayer getISuperLayer() const
       { return getRLWireHit().getISuperLayer(); }
 
       /// Getter for the wire the reconstructed hit assoziated to.

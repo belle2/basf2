@@ -22,7 +22,6 @@ def get_configpath(conffile):
 
 
 # Get Configuration from config file
-
 def get_rfgetconf(conffile, item1, item2='NULL', item3='NULL'):
 
     confdir = str(os.environ.get('RFARM_CONFDIR'))
@@ -173,8 +172,8 @@ def stop_eventserver(conffile):
     ringbuf = get_rfgetconf(conffile, 'distributor', 'ringbuffer')
     rbufname = unit + ':' + ringbuf
     shmname = unit + ':distributor'
-    p = subprocess.Popen('rfcommand ' + conffile
-                         + ' distributor RF_UNCONFIGURE', shell=True)
+    p = subprocess.Popen('rfcommand ' + conffile +
+                         ' distributor RF_UNCONFIGURE', shell=True)
     p.wait()
     pidfile = basedir + '/distributor/pid.data'
     for pid in open(pidfile, 'r'):
@@ -276,8 +275,8 @@ def stop_eventprocessor(conffile):
             nodename = 'evp_' + nodebase + nodeid
             shmname = unit + ':' + nodename
             print shmname
-            p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename
-                                 + ' RF_UNCONFIGURE', shell=True)
+            p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
+                                 ' RF_UNCONFIGURE', shell=True)
             p.wait()
             pidfile = basedir + '/' + nodename + '/pid.data'
             for pid in open(pidfile, 'r'):
@@ -343,11 +342,13 @@ def run_roisender(conffile):
 def stop_roisender(conffile):
     roihost = get_rfgetconf(conffile, 'roisender', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
+    unit = get_rfgetconf(conffile, 'system', 'unitname')
+    shmname = unit + ':roisender'
     p = subprocess.Popen('rfcommand ' + conffile + ' roisender RF_UNCONFIGURE', shell=True)
     p.wait()
     pidfile = basedir + '/roisender/pid.data'
     for pid in open(pidfile, 'r'):
-        cmd = 'ssh ' + roihost + ' "kill ' + pid + '"'
+        cmd = 'ssh ' + roihost + ' "kill ' + pid + '; removeshm ' + shmname + '"'
         print cmd
         p = subprocess.Popen(cmd, shell=True)
         p.wait()

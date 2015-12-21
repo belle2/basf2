@@ -12,42 +12,11 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace CDC;
-
 using namespace TrackFindingCDC;
 
-
-CDCWireLayer::CDCWireLayer()
-//averages of wire values
-  : m_shift(ERotation::c_Invalid),
-    m_tanStereoAngle(0.0),
-    m_minCylindricalR(1000000.0),
-    m_refCylindricalR(0.0),
-    m_refZ(0.0),
-    m_forwardCylindricalR(0.0), m_backwardCylindricalR(0.0),
-    m_forwardZ(0.0), m_backwardZ(0.0),
-    //form CDCGeometryPar
-    m_innerCylindricalR(0.0),
-    m_outerCylindricalR(0.0)
-{
-}
-
-CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& end)
-  : m_begin(begin),
-    m_end(end),
-    //averages of wire values
-    m_shift(ERotation::c_Invalid),
-    m_tanStereoAngle(0.0),
-    m_minCylindricalR(1000000.0),
-    m_refCylindricalR(0.0),
-    m_refZ(0.0),
-    m_forwardCylindricalR(0.0) , m_backwardCylindricalR(0.0),
-    m_forwardZ(0.0) , m_backwardZ(0.0),
-    //form CDCGeometryPar
-    m_innerCylindricalR(0.0),
-    m_outerCylindricalR(0.0)
+CDCWireLayer::CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange)
+  : Super(wireRange)
 {
   initialize();
 }
@@ -68,16 +37,16 @@ void CDCWireLayer::initialize()
   ILayer iCLayer = getICLayer();
 
   // values from CDCGeometryPar
-  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+  CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
 
   const double* innerRadiusWireLayer = cdcgp.innerRadiusWireLayer();
   const double* outerRadiusWireLayer = cdcgp.outerRadiusWireLayer();
 
   m_innerCylindricalR = innerRadiusWireLayer[iCLayer];
   m_outerCylindricalR = outerRadiusWireLayer[iCLayer];
-  //B2INFO("iCLayer : " << iCLayer);
-  //B2INFO("inner cylindrical r : " << getInnerCylindricalR());
-  //B2INFO("outer cylindrical r : " << getOuterCylindricalR());
+
+  /// Set the numbering shift
+  m_shift = ERotation(cdcgp.getShiftInSuperLayer(getISuperLayer(), getILayer()));
 
   // average values from wires
   m_tanStereoAngle = 0.0;
@@ -98,11 +67,11 @@ void CDCWireLayer::initialize()
     m_refZ += wire.getRefZ();
     m_refCylindricalR += wire.getRefCylindricalR();
 
-    //calculate the forward nad backward r in the xy projection. take the average
+    // calculate the forward nad backward r in the xy projection. take the average
     m_forwardCylindricalR  += wire.getForwardCylindricalR();
     m_backwardCylindricalR += wire.getBackwardCylindricalR();
 
-    //calculate the forward and backward z position. take the average of all wires
+    // calculate the forward and backward z position. take the average of all wires
     m_forwardZ += wire.getForwardZ();
     m_backwardZ += wire.getBackwardZ();
   }
@@ -121,7 +90,7 @@ void CDCWireLayer::initialize()
 
 const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const
 {
-  IWire iWire = CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
+  IWire iWire = CDC::CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
   // Safety measure against error in the cellId function
   iWire %= size();
   return getWire(iWire);

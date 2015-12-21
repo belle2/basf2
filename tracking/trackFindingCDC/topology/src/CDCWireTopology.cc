@@ -12,11 +12,8 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace CDC;
-
 
 CDCWireTopology& CDCWireTopology::getInstance()
 {
@@ -25,49 +22,41 @@ CDCWireTopology& CDCWireTopology::getInstance()
   return instance;
 }
 
-
-
 void CDCWireTopology::initialize()
 {
-
   m_wires.clear();
   m_wireLayers.clear();
   m_wireSuperLayers.clear();
 
-  m_wires.reserve(N_WIRES);
-  m_wireLayers.reserve(N_LAYERS);
-  m_wireSuperLayers.reserve(N_SUPERLAYERS);
+  m_wires.reserve(c_NWires);
+  m_wireLayers.reserve(c_NLayers);
+  m_wireSuperLayers.reserve(c_NSuperLayers);
 
-  //create all wires
-  CDCGeometryPar& cdcGeo = CDCGeometryPar::Instance();
+  // create all wires
+  CDC::CDCGeometryPar& cdcGeo = CDC::CDCGeometryPar::Instance();
   for (size_t iCLayer = 0; iCLayer < cdcGeo.nWireLayers() ; ++iCLayer) {
     for (size_t iWire = 0; iWire < cdcGeo.nWiresInLayer(iCLayer); ++iWire) {
       m_wires.push_back(CDCWire(WireID(iCLayer, iWire)));
     }
   }
-  iterator beginOfLayer = m_wires.begin();
 
-  //create all wire layers
-  for (iterator itWire = m_wires.begin(); itWire != m_wires.end(); ++itWire) {
-    if (itWire->getILayer() != beginOfLayer->getILayer()) {
-      m_wireLayers.push_back(CDCWireLayer(beginOfLayer , itWire));
-      beginOfLayer = itWire;
-    }
+  // create all wire layers
+  std::vector<VectorRange<CDCWire> > wiresByILayer =
+    adjacent_groupby(m_wires.begin(), m_wires.end(),
+                     ILayerUtil::getFrom<CDCWire>);
+
+  for (VectorRange<CDCWire> wiresForILayer : wiresByILayer) {
+    m_wireLayers.push_back(CDCWireLayer(wiresForILayer));
   }
-  m_wireLayers.push_back(CDCWireLayer(beginOfLayer , m_wires.end()));
 
-  //create all superlayers
-  CDCWireSuperLayer::const_iterator beginOfSuperlayer = m_wireLayers.begin();
+  // create all superlayers
+  std::vector<VectorRange<CDCWireLayer> > layersByISuperLayer =
+    adjacent_groupby(m_wireLayers.begin(), m_wireLayers.end(),
+                     ISuperLayerUtil::getFrom<CDCWireLayer>);
 
-  for (CDCWireSuperLayer::const_iterator itLayer = m_wireLayers.begin();
-       itLayer != m_wireLayers.end(); ++itLayer) {
-
-    if (itLayer->getISuperLayer() != beginOfSuperlayer->getISuperLayer()) {
-      m_wireSuperLayers.push_back(CDCWireSuperLayer(beginOfSuperlayer , itLayer));
-      beginOfSuperlayer = itLayer;
-    }
+  for (VectorRange<CDCWireLayer> layersForISuperLayer : layersByISuperLayer) {
+    m_wireSuperLayers.push_back(CDCWireSuperLayer(layersForISuperLayer));
   }
-  m_wireSuperLayers.push_back(CDCWireSuperLayer(beginOfSuperlayer , m_wireLayers.end()));
 }
 
 ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindricalR)
@@ -92,7 +81,6 @@ ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindric
   return ISuperLayerUtil::c_OuterVolume;
 }
 
-
 EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
 {
   if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
@@ -100,6 +88,7 @@ EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const W
     return EWireNeighborKind::c_None;
   } else {
     const CDCWireSuperLayer& superlayer = getWireSuperLayer(wireID.getISuperLayer());
-    return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(), otherID.getILayer(), otherID.getIWire());
+    return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(),
+                                      otherID.getILayer(), otherID.getIWire());
   }
 }

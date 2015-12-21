@@ -9,101 +9,75 @@
  **************************************************************************/
 #pragma once
 
-#include <algorithm>
-#include <set>
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 
-#include <TVector3.h>
+#include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborPair.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackFindingCDC/topology/IWire.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 #include <cdc/dataobjects/WireID.h>
 
-
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Class representating the sense wire arrangement in the whole of the central drift chamber.
-    /** This class represents the the whole CDC layer geometry and the neighborhood relations in it. \n
+    /**
+     *  Class representating the sense wire arrangement in the whole of the central drift chamber.
+     *  This class represents the the whole CDC layer geometry and the neighborhood relations in it. \n
      *  Since their is only one CDC at a time it is implemented as a singletone object, with getInstance(). \n
-     *  Their should rarely be the need to construct  additional instances. \n
+     *  Their should rarely be the need to construct additional instances. \n
      *  It provides getters for all wires, layers and superlayers and can check the validity of wire id combinations. \n
-     *  It also presents an iterable range of all wires in the CDC. \n
-     *  The range is sorted with increasing wire ids for maximal fast look up. \n
      *  Also there are methods for getting to the closest and secondary of each wire. \n
-     *  The class does provide the memory for all instances of wires, layers and superlayers by itself.
+     *  The class does provide the memory for all instances of wires, layers and superlayers.
      */
     class CDCWireTopology  {
 
     public:
-      /// Getter for the singleton instance of the wire topology. Used by the CDCWires.
+      /// Getter for the singleton instance of the wire topology.
       static CDCWireTopology& getInstance();
-
-      /// The underlying container type storing range of wires represented by this class
-      typedef std::vector<Belle2::TrackFindingCDC::CDCWire> Container;
-      /// The value type of the iterator range
-      typedef Belle2::TrackFindingCDC::CDCWire value_type;
-
-      /// The type of the iterator for the wire range
-      typedef Container::iterator iterator;
-
-      /// The type of the const_iterator for the wire range
-      typedef Container::const_iterator const_iterator;
 
     public:
       /// Default constructor for ROOT compatibility. Use rather getInstance to get the shared singleton instance.
-      CDCWireTopology() { initialize(); }
-
+      CDCWireTopology()
+      { initialize(); }
 
     public:
       /// Total number of wires
-      static const IWire N_WIRES = 14336;
-      ///Total number of layers
-      static const ILayer N_LAYERS = 56;
-      ///Total number of superlayers
-      static const ILayer N_SUPERLAYERS = 9;
+      static const IWire c_NWires = 14336;
+
+      /// Total number of layers
+      static const ILayer c_NLayers = 56;
+
+      /// Total number of superlayers
+      static const ISuperLayer c_NSuperLayers = 9;
 
     private:
       /// Initializes all wires, wire layers and wire superlayers their interdependences from the CDCGeometryPar.
       void initialize();
 
     public:
-      /** @name Wire range
+      /**
+       *  @name Wire getters
+       *  Gets the wires from a WireID.
        */
-      /**@{*/
-      /// Getter for the begin iterator of the whole wire range
-      const_iterator begin() const { return m_wires.begin(); }
-
-      /// Getter for the end iterator of the whole wire range
-      const_iterator end() const { return m_wires.end(); }
-
-      /// Getter for the total number of wires
-      IWire size() const { return m_wires.size(); }
-
-      /// Getter for the first wire in the whole cdc
-      const CDCWire& first() const { return *(begin()); }
-      /// Getter for the last wire in the whole cdc
-      const CDCWire& last() const { return *(--end()); }
-      /**@}*/
-
-      /** @name Wire getters
-       *  Gets the wires from a WireID. */
       ///@{
 
       /// Checks the validity of a wireID convinience object.
-      inline bool isValidWireID(const WireID& wireID) const
+      bool isValidWireID(const WireID& wireID) const
       { return isValidIWire(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Checks the validity of the continuous layer id, wire id combination.
-      inline bool isValidIWire(ILayer iCLayer, IWire iWire) const
+      bool isValidIWire(ILayer iCLayer, IWire iWire) const
       { return isValidICLayer(iCLayer) and getWireLayer(iCLayer).isValidIWire(iWire); }
 
       /// Checks the validity of the superlayer id, layer id, wire id combination.
-      inline
-      bool isValidIWire(ISuperLayer iSuperLayer,
-                        ILayer iLayer,
-                        IWire iWire) const
+      bool isValidIWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire) const
       { return isValidISuperLayer(iSuperLayer) and getWireSuperLayer(iSuperLayer).isValidIWire(iLayer, iWire); }
 
       /// Getter for wire getter by wireID object.
@@ -111,7 +85,7 @@ namespace Belle2 {
       { return getWireLayer(wireId.getICLayer()).getWire(wireId.getIWire()) ; }
 
       /// Getter for wire getter by continuous layer id and wire id.
-      const CDCWire& getWire(ILayer iCLayer , IWire iWire) const
+      const CDCWire& getWire(ILayer iCLayer, IWire iWire) const
       { return getWireLayer(iCLayer).getWire(iWire) ; }
 
       /// Getter for wire getter by superlayer id, layer id and wire id.
@@ -123,9 +97,12 @@ namespace Belle2 {
       { return m_wires; }
       ///@}
 
-      /** @name Wire layer getters
-       *  Getters for the wire layer*/
+      /**
+       *  @name Wire layer getters
+       *  Getters for the wire layer
+       */
       ///@{
+
       /// Getter for the total number of wire layers
       ILayer getNLayers() const
       { return getWireLayers().size(); }
@@ -155,9 +132,12 @@ namespace Belle2 {
       { return m_wireLayers; }
       ///@}
 
-      /** @name Wire superlayer getters
-       *  Getters for the wire superlayers */
+      /**
+       *  @name Wire superlayer getters
+       *  Getters for the wire superlayers
+       */
       ///@{
+
       /// Getter for the total number of superlayers
       ISuperLayer getNSuperLayers() const
       { return getWireSuperLayers().size(); }
@@ -182,16 +162,17 @@ namespace Belle2 {
       { return m_wireSuperLayers; }
       ///@}
 
-
-      /** @name Getters for the closest neighbors of a wire by wireID
+      /**
+       *  @name Getters for the closest neighbors of a wire by wireID
        *  They do not cross superlayer boundaries. \n
        *  Note : Not all neighbors might be present at the boundaries of the superlayer. \n
        *  In case the neighbor asked for does not exist the function return nullptr instead.
        */
       /**@{*/
 
-      /// Checks if two wires are closest neighbors. see details.
-      /** Returns the relation of the first wire to the second wire give by their
+      /**
+       *  Checks if two wires are closest neighbors. see details.
+       *  Returns the relation of the first wire to the second wire give by their
        *  layer id within the superlayer and the wire id.
        *  If they are not neighbors zero is returned.
        *  If they are neighbors the return value indicates
@@ -205,7 +186,8 @@ namespace Belle2 {
        *  EWireNeighborKind::c_CCW = 9 for counterclockwise \n
        *  EWireNeighborKind::c_CCWOut = 11 for counterclockwise outwards \n
        *  The values are choosen to have an assoziation with the numbers on a regular clock.
-       *  ( compare secondary neighborhood ) */
+       *  ( compare secondary neighborhood )
+       */
       EWireNeighborKind getNeighborKind(const WireID& wire, const WireID& other) const;
 
       /// Checks if two wires are primary neighbors.
@@ -214,44 +196,46 @@ namespace Belle2 {
 
       /// Getter for the two closest neighbors in the layer outwards.
       WireNeighborPair getNeighborsOutwards(const WireID& wireID) const
-      { return getNeighborsOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborsOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the two closest neighbors in the layer inwards.
       WireNeighborPair getNeighborsInwards(const WireID& wireID) const
-      { return getNeighborsInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborsInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
       MayBePtr<const CDCWire> getNeighborCCWOutwards(const WireID& wireID) const
-      { return getNeighborCCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
       MayBePtr<const CDCWire> getNeighborCWOutwards(const WireID& wireID) const
-      { return getNeighborCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest counterclockwise neighbor.
       MayBePtr<const CDCWire> getNeighborCCW(const WireID& wireID) const
-      { return getNeighborCCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest clockwise neighbor.
       MayBePtr<const CDCWire> getNeighborCW(const WireID& wireID) const
-      { return getNeighborCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
       MayBePtr<const CDCWire> getNeighborCCWInwards(const WireID& wireID) const
-      { return getNeighborCCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
       MayBePtr<const CDCWire> getNeighborCWInwards(const WireID& wireID) const
-      { return getNeighborCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getNeighborCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
       /**@}*/
 
 
-      /** @name Getters for the closest neighbors of a wire by superlayer id, layer id and wire id
+      /**
+       *  @name Getters for the closest neighbors of a wire by superlayer id, layer id and wire id
        *  They do not cross superlayer boundaries. \n
        *  Note : Not all neighbors might be present at the boundaries of the superlayer. \n
        *  In case the neighbor asked for does not exist the function return nullptr instead. \n
        */
       /**@{*/
+
       /// Getter for the two closest neighbors in the layer outwards.
       WireNeighborPair getNeighborsOutwards(ISuperLayer iSuperLayer,
                                             ILayer iLayer,
@@ -301,9 +285,8 @@ namespace Belle2 {
       { return getWireSuperLayer(iSuperLayer).getNeighborCWInwards(iLayer, iWire); }
       /**@}*/
 
-
-
-      /** @name Secondary neighbor getters by wireID object
+      /**
+       *  @name Secondary neighbor getters by wireID object
        *  The secondary neighbors are numbered like positions on the normal twelve hour clock.
        *
        *  The rational of this is that the secondary neighbors are positioned \n
@@ -315,58 +298,54 @@ namespace Belle2 {
        */
       /**@{*/
 
-      ///Getter for secondary neighbor at the one o'clock position
+      /// Getter for secondary neighbor at the one o'clock position
       MayBePtr<const CDCWire> getSecondNeighborOneOClock(const WireID& wireID) const
-      { return getSecondNeighborOneOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborOneOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the two o'clock position
+      /// Getter for secondary neighbor at the two o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTwoOClock(const WireID& wireID) const
-      { return getSecondNeighborTwoOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborTwoOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the three o'clock position - always exists
+      /// Getter for secondary neighbor at the three o'clock position - always exists
       MayBePtr<const CDCWire> getSecondNeighborThreeOClock(const WireID& wireID) const
-      { return getSecondNeighborThreeOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborThreeOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the four o'clock position
+      /// Getter for secondary neighbor at the four o'clock position
       MayBePtr<const CDCWire> getSecondNeighborFourOClock(const WireID& wireID) const
-      { return getSecondNeighborFourOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborFourOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the five o'clock position
+      /// Getter for secondary neighbor at the five o'clock position
       MayBePtr<const CDCWire> getSecondNeighborFiveOClock(const WireID& wireID) const
-      { return getSecondNeighborFiveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborFiveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the six o'clock position
+      /// Getter for secondary neighbor at the six o'clock position
       MayBePtr<const CDCWire> getSecondNeighborSixOClock(const WireID& wireID) const
-      { return getSecondNeighborSixOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborSixOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the seven o'clock position
+      /// Getter for secondary neighbor at the seven o'clock position
       MayBePtr<const CDCWire> getSecondNeighborSevenOClock(const WireID& wireID) const
-      { return getSecondNeighborSevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborSevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the eight o'clock position
+      /// Getter for secondary neighbor at the eight o'clock position
       MayBePtr<const CDCWire> getSecondNeighborEightOClock(const WireID& wireID) const
-      { return getSecondNeighborEightOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborEightOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the nine o'clock position - always exists
+      /// Getter for secondary neighbor at the nine o'clock position - always exists
       MayBePtr<const CDCWire> getSecondNeighborNineOClock(const WireID& wireID) const
-      { return getSecondNeighborNineOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborNineOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the ten o'clock position
+      /// Getter for secondary neighbor at the ten o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTenOClock(const WireID& wireID) const
-      { return getSecondNeighborTenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborTenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the eleven o'clock position
+      /// Getter for secondary neighbor at the eleven o'clock position
       MayBePtr<const CDCWire> getSecondNeighborElevenOClock(const WireID& wireID) const
-      { return getSecondNeighborElevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborElevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
-      ///Getter for secondary neighbor at the twelve o'clock position
+      /// Getter for secondary neighbor at the twelve o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTwelveOClock(const WireID& wireID) const
-      { return getSecondNeighborTwelveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
+      { return getSecondNeighborTwelveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
       /**@}*/
-
-
-
-
 
       /** @name Secondary neighbor getters by superlayer id , layer id and wire id.
        *  The secondary neighbors are numbered like positions on the normal twelve hour clock.
@@ -380,73 +359,73 @@ namespace Belle2 {
        */
       /**@{*/
 
-      ///Getter for secondary neighbor at the one o'clock position
+      /// Getter for secondary neighbor at the one o'clock position
       MayBePtr<const CDCWire> getSecondNeighborOneOClock(ISuperLayer iSuperLayer,
                                                          ILayer iLayer,
                                                          IWire  iWire) const
-      { return getWireSuperLayer(iSuperLayer).getSecondNeighborOneOClock(iLayer, iWire);  }
+      { return getWireSuperLayer(iSuperLayer).getSecondNeighborOneOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the two o'clock position
+      /// Getter for secondary neighbor at the two o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTwoOClock(ISuperLayer iSuperLayer,
                                                          ILayer iLayer,
                                                          IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTwoOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the three o'clock position - always exists
+      /// Getter for secondary neighbor at the three o'clock position - always exists
       MayBePtr<const CDCWire> getSecondNeighborThreeOClock(ISuperLayer iSuperLayer,
                                                            ILayer iLayer,
                                                            IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborThreeOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the four o'clock position
+      /// Getter for secondary neighbor at the four o'clock position
       MayBePtr<const CDCWire> getSecondNeighborFourOClock(ISuperLayer iSuperLayer,
                                                           ILayer iLayer,
                                                           IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborFourOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the five o'clock position
+      /// Getter for secondary neighbor at the five o'clock position
       MayBePtr<const CDCWire> getSecondNeighborFiveOClock(ISuperLayer iSuperLayer,
                                                           ILayer iLayer,
                                                           IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborFiveOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the six o'clock position
+      /// Getter for secondary neighbor at the six o'clock position
       MayBePtr<const CDCWire> getSecondNeighborSixOClock(ISuperLayer iSuperLayer,
                                                          ILayer iLayer,
                                                          IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborSixOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the seven o'clock position
+      /// Getter for secondary neighbor at the seven o'clock position
       MayBePtr<const CDCWire> getSecondNeighborSevenOClock(ISuperLayer iSuperLayer,
                                                            ILayer iLayer,
                                                            IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborSevenOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the eight o'clock position
+      /// Getter for secondary neighbor at the eight o'clock position
       MayBePtr<const CDCWire> getSecondNeighborEightOClock(ISuperLayer iSuperLayer,
                                                            ILayer iLayer,
                                                            IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborEightOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the nine o'clock position - always exists
+      /// Getter for secondary neighbor at the nine o'clock position - always exists
       MayBePtr<const CDCWire> getSecondNeighborNineOClock(ISuperLayer iSuperLayer,
                                                           ILayer iLayer,
                                                           IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborNineOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the ten o'clock position
+      /// Getter for secondary neighbor at the ten o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTenOClock(ISuperLayer iSuperLayer,
                                                          ILayer iLayer,
                                                          IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTenOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the eleven o'clock position
+      /// Getter for secondary neighbor at the eleven o'clock position
       MayBePtr<const CDCWire> getSecondNeighborElevenOClock(ISuperLayer iSuperLayer,
                                                             ILayer iLayer,
                                                             IWire  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborElevenOClock(iLayer, iWire); }
 
-      ///Getter for secondary neighbor at the twelve o'clock position
+      /// Getter for secondary neighbor at the twelve o'clock position
       MayBePtr<const CDCWire> getSecondNeighborTwelveOClock(ISuperLayer iSuperLayer,
                                                             ILayer iLayer,
                                                             IWire  iWire) const
@@ -465,11 +444,13 @@ namespace Belle2 {
     private:
       /// Storage for all wires in the CDC
       std::vector<Belle2::TrackFindingCDC::CDCWire> m_wires;
+
       /// Storage for all wire layers in the CDC
       std::vector<Belle2::TrackFindingCDC::CDCWireLayer> m_wireLayers;
+
       /// Storage for all wire superlayers in the CDC
       std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer> m_wireSuperLayers;
 
-    }; //class
+    }; // class CDCWireHitTopology
   } // namespace TrackFindingCDC
 } // namespace Belle2

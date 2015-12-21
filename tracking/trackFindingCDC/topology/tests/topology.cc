@@ -7,21 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
-
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <framework/gearbox/Gearbox.h>
-#include <framework/logging/Logger.h>
-
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-
 #include <gtest/gtest.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-using namespace std;
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,7 +23,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWInwards)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCWInwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCWOutwards();
@@ -45,7 +37,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWInwards
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCCWInwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCWOutwards();
@@ -59,7 +51,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CWOutwards
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCWOutwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCWInwards();
@@ -73,7 +65,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCWOutward
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCCWOutwards();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCWInwards();
@@ -87,7 +79,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CCW)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCCW();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCW();
@@ -101,7 +93,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_WireNeighborSymmetry_CW)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
 
-  for (const CDCWire& wire : theWireTopology) {
+  for (const CDCWire& wire : theWireTopology.getWires()) {
     const CDCWire* neighbor = wire.getNeighborCW();
     if (neighbor != nullptr) {
       const CDCWire* neighbor_of_neighbor = neighbor->getNeighborCCW();
@@ -115,15 +107,15 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 {
   // Test if the all wires in the same superlayer have similar skew parameters.
 
-  double tanThetaByICLayer[CDCWireTopology::N_LAYERS];
-  double stereoAngleByICLayer[CDCWireTopology::N_LAYERS];
-  double refCylindricalRByICLayer[CDCWireTopology::N_LAYERS];
+  double tanThetaByICLayer[CDCWireTopology::c_NLayers];
+  double stereoAngleByICLayer[CDCWireTopology::c_NLayers];
+  double refCylindricalRByICLayer[CDCWireTopology::c_NLayers];
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
     const ILayer iCLayer = wireLayer.getICLayer();
 
-    const CDCWire& firstWire = wireLayer.first();
+    const CDCWire& firstWire = wireLayer.front();
     tanThetaByICLayer[iCLayer] = firstWire.getTanStereoAngle();
     stereoAngleByICLayer[iCLayer] = firstWire.getStereoAngle();
     refCylindricalRByICLayer[iCLayer] = firstWire.getRefCylindricalR();

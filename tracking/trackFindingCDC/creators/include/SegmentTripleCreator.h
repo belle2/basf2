@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-
+#include <set>
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the segment triples.
@@ -76,10 +76,10 @@ namespace Belle2 {
 
     private:
       /// Storage structure type for axial segements by their superlayer id
-      typedef std::vector<const CDCAxialRecoSegment2D* > AxialSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
+      typedef std::vector<const CDCAxialRecoSegment2D* > AxialSegmentsBySuperLayer[CDCWireTopology::c_NSuperLayers];
 
       /// Storage structure type for stereo segements by their superlayer id
-      typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
+      typedef std::vector<const CDCStereoRecoSegment2D*> StereoSegmentsBySuperLayer[CDCWireTopology::c_NSuperLayers];
 
       /// Creates the segment triples from the segments, which have been grouped by their superlayer id.
       template<class AAxialSegmentPairFilter, class ASegmentTripleFilter>
@@ -95,7 +95,7 @@ namespace Belle2 {
         segmentTripleFilter.beginEvent();
 
         //Make pairs of closeby axial superlayers
-        for (ISuperLayer iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::N_SUPERLAYERS;
+        for (ISuperLayer iAxialSuperLayer = 0; iAxialSuperLayer < CDCWireTopology::c_NSuperLayers;
              ++(++iAxialSuperLayer) /*only even slots are filled */) {
 
           //consider only axial superlayers

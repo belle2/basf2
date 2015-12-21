@@ -31,7 +31,7 @@ namespace Belle2 {
       typedef std::vector<const CDCRecoSegment2D* > CDCRecoSegmentRange;
 
       /// Storage structure type for axial segements by their superlayer id
-      typedef CDCRecoSegmentRange SegmentRangesBySuperLayer[CDCWireTopology::N_SUPERLAYERS];
+      typedef CDCRecoSegmentRange SegmentRangesBySuperLayer[CDCWireTopology::c_NSuperLayers];
 
 
     public:
@@ -88,7 +88,7 @@ namespace Belle2 {
         segmentPairFilter.beginEvent();
 
         //Make pairs of closeby superlayers
-        for (ISuperLayer iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
+        for (ISuperLayer iSuperLayer = 0; iSuperLayer < CDCWireTopology::c_NSuperLayers; ++iSuperLayer) {
 
           const CDCRecoSegmentRange& startSegments = segmentRangesBySuperLayer[iSuperLayer];
 

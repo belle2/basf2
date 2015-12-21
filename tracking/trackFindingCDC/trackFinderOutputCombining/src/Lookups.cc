@@ -14,7 +14,7 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
 
   // Calculate a lookup SuperLayerID -> Segments
   m_lookup.clear();
-  m_lookup.resize(wireTopology.N_SUPERLAYERS);
+  m_lookup.resize(wireTopology.c_NSuperLayers);
 
   // Calculate a lookup cdcHit-> Segment (we use cdcHits here, not cdcWireHits)
   m_hitSegmentLookUp.clear();

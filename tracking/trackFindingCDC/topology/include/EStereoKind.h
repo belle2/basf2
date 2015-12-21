@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,16 +30,43 @@ namespace Belle2 {
       c_Invalid = -999,
     };
 
-    /** Returns the common stereo type of hits in a container.
-     *  INVALID_STEREOTYPE if there is no common super layer or the container is empty.
+    /**
+     *  This is a utility class for the free EStereoKind type.
+     *  It provides the basic methods to operate on the EStereoKind numbers.
      */
-    template<class AHits>
-    EStereoKind getStereoKind(const AHits& hits)
-    {
-      using Hit = ValueType<AHits>;
-      auto getStereoKindOfHit = [](const Hit & hit) {return hit->getStereoKind();};
-      return common(hits, getStereoKindOfHit, EStereoKind::c_Invalid);
-    }
+    struct EStereoKindUtil {
+
+      /// Utility classes should not be instantiated
+      EStereoKindUtil() = delete;
+
+      /**
+       *  Returns the common stereo type of hits in a container.
+       *  EStereoKind::c_Invalid if there is no common super layer or the container is empty.
+       */
+      template<class AHits>
+      static EStereoKind getCommon(const AHits& hits)
+      {
+        using Hit = ValueType<AHits>;
+        return common(hits, getFrom<Hit>, EStereoKind::c_Invalid);
+      }
+
+      /** Returns the superlayer of an object */
+      template<class T>
+      static EStereoKind getFrom(const T& t)
+      { return getFromImpl(t, 0); }
+
+    private:
+      /** Returns the stereo kind of an object. Favored option. */
+      template<class T>
+      static auto getFromImpl(const T& t, int) -> decltype(t.getStereoKind())
+      { return t.getStereoKind(); }
+
+      /** Returns the stereo kind of an object. Unfavored option. */
+      template<class T>
+      static auto getFromImpl(const T& t, long) -> decltype(t->getStereoKind())
+      { return t->getStereoKind(); }
+
+    }; // class EStereoKindUtil
 
   } // namespace TrackFindingCDC
 

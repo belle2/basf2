@@ -17,31 +17,19 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCWire::CDCWire(const WireID& wireID)
-  : m_wireID(wireID)
-{
-  initialize();
-}
-
-CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
-  : m_wireID(iSuperLayer, iLayer, iWire)
-{
-  initialize();
-}
-
-MayBePtr<const CDCWire> CDCWire::getInstance(const WireID& wireID)
+const CDCWire* CDCWire::getInstance(const WireID& wireID)
 {
   return &(CDCWireTopology::getInstance().getWire(wireID));
 }
 
-MayBePtr<const CDCWire> CDCWire::getInstance(ISuperLayer iSuperLayer,
-                                             ILayer iLayer,
-                                             IWire iWire)
+const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
+                                    ILayer iLayer,
+                                    IWire iWire)
 {
   return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire));
 }
 
-MayBePtr<const CDCWire> CDCWire::getInstance(const CDCHit& hit)
+const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 {
   if (not CDCWireTopology::getInstance().isValidWireID(WireID(hit.getID()))) {
     B2FATAL("Invalid wire id of cdc hit " <<  WireID(hit.getID()));
@@ -55,6 +43,18 @@ MayBePtr<const CDCWire> CDCWire::getInstance(const CDCHit& hit)
     B2ERROR("CDCHit.getEWire() : " << hit.getID());
   }
   return &wire;
+}
+
+CDCWire::CDCWire(const WireID& wireID)
+  : m_wireID(wireID)
+{
+  initialize();
+}
+
+CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
+  : m_wireID(iSuperLayer, iLayer, iWire)
+{
+  initialize();
 }
 
 void CDCWire::initialize()

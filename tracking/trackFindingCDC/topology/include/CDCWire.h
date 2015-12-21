@@ -45,12 +45,6 @@ namespace Belle2 {
     class CDCWire {
 
     public:
-      /// Constructor taking the combined wire id convenience object.
-      CDCWire(const WireID& wireID);
-
-      /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
-      CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);
-
       /**
        *  @name Static instance getters
        *  Getter for the already constructed instances form the CDCWireTopology::getInstance() object.
@@ -58,15 +52,20 @@ namespace Belle2 {
       /**@{*/
 
       /// Getter from the wireID convinience object. Does not construct a new object.
-      static MayBePtr<const CDCWire> getInstance(const WireID& wireID);
+      static const CDCWire* getInstance(const WireID& wireID);
 
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
-      static MayBePtr<const CDCWire> getInstance(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);
+      static const CDCWire* getInstance(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);
 
       /// Convenience getter for the wire from a hit object.
-      static MayBePtr<const CDCWire> getInstance(const CDCHit& hit);
+      static const CDCWire* getInstance(const CDCHit& hit);
       /**@}*/
 
+      /// Constructor taking the combined wire id convenience object.
+      CDCWire(const WireID& wireID);
+
+      /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
+      CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);
 
     public:
       /// Equality comparision based on wireID.

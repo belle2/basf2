@@ -39,7 +39,7 @@ namespace Belle2 {
        *  returns the stereo type of the later. Returns EStereoKind::c_Invalid if the superlayer \n
        *  is not shared among the tracking hits. */
       EStereoKind getStereoKind() const
-      { return TrackFindingCDC::getStereoKind(*this); }
+      { return EStereoKindUtil::getCommon(*this); }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const

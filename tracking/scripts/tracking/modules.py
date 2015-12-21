@@ -210,9 +210,7 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
         background_hit_finder_module = StandardEventGenerationRun.get_basf2_module(
             "SegmentFinderCDCFacetAutomaton",
             ClusterFilter="tmva",
-            ClusterFilterParameters={
-                "cut": str(
-                    self.tmva_cut)},
+            ClusterFilterParameters={"cut": float(self.tmva_cut)},
             SegmentsStoreObjName="__TempCDCRecoSegment2DVector",
             WriteGFTrackCands=False,
             FacetFilter="none",
@@ -323,8 +321,7 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
             "SegmentFinderCDCFacetAutomaton",
             SegmentOrientation="outwards",
             ClusterFilter="tmva",
-            ClusterFilterParameters={
-                "cut": str(tmva_cut)},
+            ClusterFilterParameters={"cut": float(tmva_cut)},
             SegmentsStoreObjName=output_segments_store_vector_name,
             WriteGFTrackCands=False,
             TracksStoreObjName="__TempCDCTracksVector")
@@ -425,27 +422,27 @@ class CDCSegmentTrackCombiner(metamodules.WrapperModule):
         if segment_track_filter_first_step_filter == "tmva":
             combiner_module.param(
                 'SegmentTrackFilterFirstStepFilterParameters', {
-                    "cut": str(segment_track_filter_first_step_cut)})
+                    "cut": float(segment_track_filter_first_step_cut)})
 
         if background_segment_filter == "tmva":
             combiner_module.param(
                 'BackgroundSegmentsFilterParameters', {
-                    "cut": str(background_segment_cut)})
+                    "cut": float(background_segment_cut)})
 
         if new_segment_filter == "tmva":
             combiner_module.param(
                 'NewSegmentsFilterParameters', {
-                    "cut": str(new_segment_cut)})
+                    "cut": float(new_segment_cut)})
 
         if segment_track_filter_second_step_filter == "tmva":
             combiner_module.param(
                 'SegmentTrackFilterSecondStepFilterParameters', {
-                    "cut": str(segment_track_filter_second_step_cut)})
+                    "cut": float(segment_track_filter_second_step_cut)})
 
         if track_filter == "tmva":
             combiner_module.param(
                 'TrackFilterParameters', {
-                    "cut": str(track_filter_cut)})
+                    "cut": float(track_filter_cut)})
 
         if output_track_cands_store_array_name is not None:
             combiner_module.param({'WriteGFTrackCands': True,

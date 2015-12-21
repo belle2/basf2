@@ -13,7 +13,7 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     finder_module.param({
         "ClusterFilter": "tmva",
-        "ClusterFilterParameters": {"cut": "0.2"},
+        "ClusterFilterParameters": {"cut": 0.2},
         "WriteSuperClusters": True,
         "WriteClusters": True,
         "RemainingCDCHitsStoreArrayName": "GoodCDCHits",

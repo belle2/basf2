@@ -70,7 +70,7 @@ class BackgroundHitFinderValidationRun(StandardEventGenerationRun):
         background_hit_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
         background_hit_finder_module.param({
             "ClusterFilter": "tmva",
-            "ClusterFilterParameters": {"cut": str(self.tmva_cut)},
+            "ClusterFilterParameters": {"cut": float(self.tmva_cut)},
             "RemainingCDCHitsStoreArrayName": "GoodCDCHits",
             "FacetFilter": "none",
             "FacetRelationFilter": "none",

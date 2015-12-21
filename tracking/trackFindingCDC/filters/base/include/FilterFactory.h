@@ -28,11 +28,17 @@ namespace Belle2 {
     template<class AFilter>
     class FilterFactory : public FilterFactoryBase<AFilter> {
 
+    private:
+      /// Type of the base class
+      using Super = FilterFactoryBase<AFilter>;
+
+      /// Type mapping names to filter parameter values
+      using FilterParamMap = typename Super::FilterParamMap;
+
     public:
       /** Fill the default filter name and parameter values*/
       FilterFactory(std::string filterName,
-                    std::map<std::string, std::string> filterParameters
-                    = std::map<std::string, std::string>()) :
+                    FilterParamMap filterParameters = FilterParamMap()) :
         FilterFactoryBase<AFilter>(filterName, filterParameters)
       {
       }

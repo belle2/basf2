@@ -10,8 +10,10 @@
 #pragma once
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
+
+#include <boost/variant.hpp>
 
 #include <string>
 #include <memory>
@@ -34,11 +36,51 @@ namespace Belle2 {
       /// Type of the filter that this factory creates.
       typedef AFilter CreatedFilter;
 
+      /// Type of allowed filter parameters
+      using FilterParamVariant =
+        boost::variant<bool, int, double, std::string, std::vector<std::string> >;
+
+      /// Type mapping names to filter parameter values
+      using FilterParamMap = std::map<std::string, FilterParamVariant>;
+
+      class SetParameterVisitor : public boost::static_visitor<> {
+      public:
+        SetParameterVisitor(AFilter* filter,
+                            ModuleParamList* moduleParamList,
+                            std::string paramName)
+          : m_filter(filter),
+            m_moduleParamList(moduleParamList),
+            m_paramName(paramName)
+        {}
+
+        void operator()(const std::string& t) const
+        {
+          B2INFO("Received " << PyObjConvUtils::Type<std::string>::name() << " " << t);
+          try {
+            m_moduleParamList->getParameter<std::string>(m_paramName).setDefaultValue(t);
+          } catch (...) {
+            m_filter->setParameter(m_paramName, t);
+          }
+        }
+
+        template<class T>
+        void operator()(const T& t) const
+        {
+          B2INFO("Received " << PyObjConvUtils::Type<T>::name());
+          m_moduleParamList->getParameter<T>(m_paramName).setDefaultValue(t);
+        }
+
+      private:
+        AFilter* m_filter;
+        ModuleParamList* m_moduleParamList;
+        std::string m_paramName;
+      };
+
     public:
       /** Fill the default filter name and parameter values*/
       FilterFactoryBase(std::string filterName,
-                        std::map<std::string, std::string> filterParameters
-                        = std::map<std::string, std::string>()) :
+                        FilterParamMap filterParameters
+                        = FilterParamMap()) :
         m_filterName(filterName),
         m_filterParameters(filterParameters)
       {
@@ -53,87 +95,11 @@ namespace Belle2 {
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-      /** Create a string with a description for the filter names parameter */
-      std::string createFilterNamesDescription() const
-      {
-        // Compose description for the filter names
-        std::ostringstream filterNameDescription;
-        filterNameDescription << getFilterPurpose();
-        filterNameDescription << "Allowed values are: ";
-        bool first = true;
-        for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
-          const std::string& filterName = filterNameAndDescription.first;
-          const std::string& filterDescription = filterNameAndDescription.second;
+      /** Create a string with a description for each filter  */
+      std::string createFiltersNameDescription() const;
 
-          if (not first) {
-            filterNameDescription << ", ";
-          }
-
-          filterNameDescription << "\"" << filterName << "\"";
-          filterNameDescription << " ";
-          filterNameDescription << "(" << filterDescription << ")";
-          first = false;
-
-        }
-
-        return filterNameDescription.str();
-      }
-      /** Create a string with a description for the filter parameters parameter */
-      std::string createFilterParametersDescription() const
-      {
-        // Compose description for the filter parameters
-        std::ostringstream filterParametersDescription;
-        filterParametersDescription << "Key -- value pairs depending on the filter.\n";
-        for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
-          const std::string& filterName = filterNameAndDescription.first;
-          // const std::string& filterDescription = filterNameAndDescription.second;
-
-          filterParametersDescription << "\"" << filterName << "\"" << " :\n";
-
-          std::unique_ptr<AFilter> filter = create(filterName);
-          if (not filter) {
-            B2WARNING("Could not create a filter for name " << filterName);
-            continue;
-          }
-          std::map<std::string, std::string> filterParameters = filter->getParameterDescription();
-          if (filterParameters.empty()) {
-            filterParametersDescription << "(no parameters)";
-          } else {
-            bool firstParameter = true;
-            for (const auto& parameterNameAndDescription : filterParameters) {
-              const std::string& parameterName = parameterNameAndDescription.first;
-              const std::string& parameterDescription = parameterNameAndDescription.second;
-              if (not firstParameter) filterParametersDescription << ",\n";
-              filterParametersDescription << " "; // Indent
-              filterParametersDescription << parameterName;
-              filterParametersDescription << " -- ";
-              filterParametersDescription << parameterDescription;
-              firstParameter = false;
-            }
-          }
-          filterParametersDescription << ";\n";
-        }
-
-        return filterParametersDescription.str();
-      }
-
-      /** Return the string holding the used filter name */
-      const std::string& getFilterName() const
-      {
-        return m_filterName;
-      }
-
-      /** Set the filter name which should be created */
-      void setFilterName(const std::string& filterName)
-      {
-        m_filterName = filterName;
-      }
-
-      /** Return the map holding the used filter parameters */
-      const std::map<std::string, std::string>& getFilterParameters() const
-      {
-        return m_filterParameters;
-      }
+      /** Create a string with a description for the filter parameters */
+      std::string createFiltersParametersDescription() const;
 
       /** Create the filter with the currently stored parameters. */
       std::unique_ptr<AFilter> create();
@@ -154,36 +120,107 @@ namespace Belle2 {
       virtual std::string getModuleParamPrefix() const
       { return ""; }
 
+      /** Return the string holding the used filter name */
+      const std::string& getFilterName() const
+      { return m_filterName; }
+
+      /** Set the filter name which should be created */
+      void setFilterName(const std::string& filterName)
+      { m_filterName = filterName; }
+
+      /** Return the map holding the used filter parameters */
+      const FilterParamMap& getFilterParameters() const
+      { return m_filterParameters; }
+
+    private:
       /**
-      Filter name identifying the name to be constructed.
-      */
+       * Filter name identifying the name to be constructed.
+       */
       std::string m_filterName;
 
       /**
-      Filter parameters forwarded to the filter
-      Meaning of the Key - Value pairs depend on the concrete filter
-      */
-      std::map<std::string, std::string> m_filterParameters;
+       * Filter parameters forwarded to the filter
+       * Meaning of the Key - Value pairs depend on the concrete filter
+       */
+      FilterParamMap m_filterParameters;
     };
-
-
 
     template<class AFilter>
     void FilterFactoryBase<AFilter>::exposeParameters(ModuleParamList* moduleParamList,
                                                       const std::string& prefix)
     {
       // Set the module parameters
-      moduleParamList->addParameter(addPrefix(prefix, "filter"),
+      moduleParamList->addParameter(prefixed(prefix, "filter"),
                                     m_filterName,
-                                    createFilterNamesDescription(),
+                                    createFiltersNameDescription(),
                                     std::string(m_filterName));
 
-      moduleParamList->addParameter(addPrefix(prefix, "filterParameters"),
+      moduleParamList->addParameter(prefixed(prefix, "filterParameters"),
                                     m_filterParameters,
-                                    createFilterParametersDescription(),
-                                    std::map<std::string, std::string>(m_filterParameters));
+                                    createFiltersParametersDescription(),
+                                    m_filterParameters);
     }
 
+    template<class AFilter>
+    std::string FilterFactoryBase<AFilter>::createFiltersNameDescription() const
+    {
+      // Compose description for the filter names
+      std::ostringstream filtersNameDescription;
+      filtersNameDescription << getFilterPurpose();
+      filtersNameDescription << "Allowed values are: ";
+      std::vector<std::string> filterNameAndDescriptions;
+      for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
+        const std::string& filterName = filterNameAndDescription.first;
+        const std::string& filterDescription = filterNameAndDescription.second;
+        filterNameAndDescriptions.push_back(quoted(filterName) + " " + bracketed(filterDescription));
+      }
+      filtersNameDescription << join(", ", filterNameAndDescriptions);
+      return filtersNameDescription.str();
+    }
+
+    template<class AFilter>
+    std::string FilterFactoryBase<AFilter>::createFiltersParametersDescription() const
+    {
+      // Compose description for the filter parameters
+      std::ostringstream filtersParametersDescription;
+      filtersParametersDescription << "Key -- value pairs depending on the filter." << std::endl;
+      for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
+        const std::string& filterName = filterNameAndDescription.first;
+        // const std::string& filterDescription = filterNameAndDescription.second;
+
+        std::unique_ptr<AFilter> filter = create(filterName);
+        if (not filter) {
+          B2WARNING("Could not create a filter for name " << filterName);
+          continue;
+        }
+
+        /// Old style
+        std::map<std::string, std::string> filterParameters = filter->getParameterDescription();
+
+        /// New Style
+        ModuleParamList moduleParamList;
+        filter->exposeParameters(&moduleParamList);
+        for (auto && name : moduleParamList.getParameterNames()) {
+          filterParameters[name] = moduleParamList.getParameterDescription(name);
+        }
+
+        filtersParametersDescription << quoted(filterName) << " :\n";
+
+        if (filterParameters.empty()) {
+          filtersParametersDescription << "(no parameters)";
+        } else {
+          std::vector<std::string> parameterDescriptions;
+          for (const auto& parameterNameAndDescription : filterParameters) {
+            const std::string& parameterName = parameterNameAndDescription.first;
+            const std::string& parameterDescription = parameterNameAndDescription.second;
+            parameterDescriptions.push_back(parameterName + " -- " + parameterDescription);
+          }
+          filtersParametersDescription << join(",\n", parameterDescriptions);
+        }
+        filtersParametersDescription << ";\n";
+      }
+      return filtersParametersDescription.str();
+    }
 
     template<class AFilter>
     std::unique_ptr<AFilter> FilterFactoryBase<AFilter>::create()
@@ -193,25 +230,28 @@ namespace Belle2 {
       if (not ptrFilter) {
         // Filter not valid
         std::ostringstream message;
-        message << "Unrecognised filter name \"" << m_filterName  << "\". ";
+        message << "Unrecognised filter name " << quoted(m_filterName) << ". ";
         message << "Allowed values are: ";
-        bool first = true;
+        std::vector<std::string> quotedFilterNames;
         for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
           const std::string& filterName = filterNameAndDescription.first;
-          // const std::string& filterDescription = filterNameAndDescription.second;
-
-          if (not first) {
-            message << ", ";
-          }
-          message << "\"" << filterName << "\"";
-          first = false;
+          quotedFilterNames.push_back(quoted(filterName));
         }
+        message << join(", ", quotedFilterNames);
         message << ".";
         B2ERROR(message.str());
-      } else {
-        ptrFilter->setParameters(m_filterParameters);
+      }
+
+      /// Set parameters
+      ModuleParamList moduleParamList;
+      ptrFilter->exposeParameters(&moduleParamList);
+      for (auto& nameAndValue : m_filterParameters) {
+        const std::string paramName = nameAndValue.first;
+        const FilterParamVariant& value = nameAndValue.second;
+        boost::apply_visitor(SetParameterVisitor(ptrFilter.get(), &moduleParamList, paramName), value);
       }
       return std::move(ptrFilter);
+
     }
 
   }

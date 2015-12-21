@@ -30,8 +30,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
     # Find segments and reduce background hits
     path.add_module("SegmentFinderCDCFacetAutomaton",
                     ClusterFilter="tmva",
-                    ClusterFilterParameters={
-                        "cut": str(0.2)},
+                    ClusterFilterParameters={"cut": 0.2},
                     WriteGFTrackCands=False,
                     TracksStoreObjName="__TempCDCTracksVector")
 
@@ -55,9 +54,9 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
                     TracksStoreObjNameIsInput=True,
                     WriteGFTrackCands=False,
                     SegmentTrackFilterFirstStepFilter="tmva",
-                    SegmentTrackFilterFirstStepFilterParameters={"cut": str(0.75)},
+                    SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
                     TrackFilter="tmva",
-                    TrackFilterParameters={"cut": str(0.1)})
+                    TrackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",

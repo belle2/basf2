@@ -1,16 +1,13 @@
 #ifndef _Belle2_DQMViewCallback_h
 #define _Belle2_DQMViewCallback_h
 
-#include "daq/slc/apps/dqmviewd/DQMFileReader.h"
-
-#include <daq/slc/dqm/DQMPackage.h>
-#include <daq/slc/dqm/DQMHistMap.h>
-
 #include <daq/slc/nsm/NSMCallback.h>
 
 #include <daq/slc/system/Cond.h>
 
 #include <daq/slc/base/ConfigFile.h>
+
+#include <daq/slc/apps/dqmviewd/HistMemory.h>
 
 #include <vector>
 
@@ -25,19 +22,9 @@ namespace Belle2 {
   public:
     virtual void init(NSMCommunicator& com) throw();
     virtual void timeout(NSMCommunicator& com) throw();
-    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
-
-    bool record() throw();
 
   public:
-    void addReader(const std::string& pack_name,
-                   const std::string& file_path)
-    {
-      m_reader_v.push_back(DQMFileReader(pack_name, file_path));
-    }
-    std::vector<DQMFileReader>& getReaders() { return m_reader_v; }
-    unsigned int getExpNumber() const { return m_expno; }
-    unsigned int getRunNumber() const { return m_runno; }
+    std::vector<TH1*>& getHists() { return m_hist; }
     void notify() { m_cond.broadcast(); }
     void wait() { m_cond.wait(m_mutex); }
     void lock() { m_mutex.lock(); }
@@ -48,13 +35,9 @@ namespace Belle2 {
     ConfigFile& m_config;
     Mutex m_mutex;
     Cond m_cond;
-    int m_expno;
-    int m_runno;
-    int m_subno;
     int m_count;
-    std::string m_dump_path;
-    std::vector<DQMFileReader> m_reader_v;
-    NSMNode m_runcontrol;
+    std::vector<HistMemory> m_memory;
+    std::vector<TH1*> m_hist;
 
   };
 

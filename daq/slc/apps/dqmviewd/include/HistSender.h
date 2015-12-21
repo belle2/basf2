@@ -26,11 +26,6 @@ namespace Belle2 {
     void run();
 
   private:
-    void sendContents(DQMFileReader& reader, Writer& writer)
-    throw(IOException);
-
-
-  private:
     DQMViewCallback* m_callback;
     TCPSocket m_socket;
 

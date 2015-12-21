@@ -180,18 +180,3 @@ throw(IOException)
   }
   writer.writeInt(0x7FFF);
 }
-/*
-  MsgHandler msghdl(0);
-  char* buffer = new char[MAXBUFSIZE];
-
-  msghdl.add(hx1, hx1->GetName());
-  msghdl.add(hy1, hy1->GetName());
-  msghdl.add(hxy1, hxy1->GetName());
-
-    EvtMessage* msg = msghdl.encode_msg(MSG_EVENT);
-    (msghdl.header())->reserved[0] = 0;
-    (msghdl.header())->reserved[1] = 3;
-    (msghdl.header())->reserved[2] = 0;
-    writer.write(msg->buffer(), msg->size());
-    delete msg;
-*/

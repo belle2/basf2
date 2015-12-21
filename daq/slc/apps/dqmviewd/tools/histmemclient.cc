@@ -1,5 +1,7 @@
 #include <daq/slc/apps/dqmviewd/HistMemory.h>
 
+#include <daq/slc/system/LogFile.h>
+
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -20,7 +22,7 @@ int main(int argc, char** argv)
     std::vector<TH1*>& hist(memory.deserialize());
     if (hist.size() > 0) {
       for (size_t i = 0; i < hist.size(); i++) {
-        std::cout << hist[i]->GetName() << " : " << hist[i]->GetEntries() << std::endl;
+        LogFile::info("%s : %f", hist[i]->GetName(), hist[i]->GetEntries());
       }
     }
     sleep(1);

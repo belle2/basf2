@@ -39,15 +39,6 @@ namespace Belle2 {
       Belle2::TrackFindingCDC::CDCTrack
       condense(const std::vector<const Belle2::TrackFindingCDC::CDCTrack*>& trackPath);
 
-      /// Allow automatic taking of the address.
-      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms
-       *  that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after the trailing const
-       *  to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCTrack* () const
-      { return this; }
-
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;
 

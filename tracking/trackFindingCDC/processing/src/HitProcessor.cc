@@ -134,8 +134,6 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
 
 std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& trackCandidate)
 {
-  assert(trackCandidate);
-
   std::vector<const CDCWireHit*> removedHits;
 
   if (trackCandidate.size() < 5) return removedHits;

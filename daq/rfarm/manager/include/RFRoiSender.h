@@ -14,9 +14,11 @@
 #include <sys/wait.h>
 
 #include "daq/rfarm/manager/RFConf.h"
+#include "daq/rfarm/manager/RFSharedMem.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
+#include "daq/rfarm/manager/RFFlowStat.h"
 
 #include "daq/rfarm/manager/RFServerBase.h"
 
@@ -43,6 +45,8 @@ namespace Belle2 {
     RFConf*            m_conf;
     RFProcessManager*  m_proc;
     RFLogManager*      m_log;
+    RFSharedMem*       m_shm;
+    RFFlowStat*        m_flow;
 
     int m_pid_merger;
     int m_pid_sender;

@@ -18,6 +18,7 @@
 
 #define RF_INPUT_ID  51
 #define RF_OUTPUT_ID 52
+#define RF_ROI_ID 53
 
 namespace Belle2 {
 

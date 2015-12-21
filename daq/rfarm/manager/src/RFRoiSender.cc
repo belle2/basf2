@@ -1,10 +1,9 @@
 //+
 // File : RFRoiSender.cc
-// Description : DQM server for RFARM to accumulate histograms
-//               in a TMapFile
+// Description : Manager of RoI sender applications
 //
 // Author : Ryosuke Itoh, IPNS, KEK
-// Date : 4 - Sep - 2013
+// Date : 18 - Dec - 2015
 //-
 
 #include "daq/rfarm/manager/RFRoiSender.h"
@@ -17,6 +16,8 @@ RFRoiSender::RFRoiSender(string conffile)
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
   char* nodename = m_conf->getconf("roisender", "nodename");
+  printf("RoiSender : nodename = %s\n", nodename);
+  fflush(stdout);
   //  char nodename[256];
   //  gethostname ( nodename, sizeof(nodename) );
 
@@ -26,11 +27,21 @@ RFRoiSender::RFRoiSender(string conffile)
   mkdir(execdir.c_str(), 0755);
   chdir(execdir.c_str());
 
-  // 2. Initialize process manager
+  // 2. Initialize local shared memory
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(nodename);
+  m_shm = new RFSharedMem((char*)shmname.c_str());
+  printf("RoiSender : shmname = %s\n", shmname.c_str());
+
+  // 3. Initialize process manager
   m_proc = new RFProcessManager(nodename);
 
-  // 3. Initialize LogManager
+  // 4. Initialize LogManager
   m_log = new RFLogManager(nodename);
+
+  // 5. Initialize data flow monitor
+  m_flow = new RFFlowStat((char*)shmname.c_str());
+
 }
 
 RFRoiSender::~RFRoiSender()
@@ -55,9 +66,14 @@ int RFRoiSender::Configure(NSMmsg*, NSMcontext*)
   char* onsenhost = m_conf->getconf("roisender", "onsenhost");
   char* onsenport = m_conf->getconf("roisender", "onsenport");
 
+  string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("roisender", "nodename"));
+
   // Note: merger should be run on a separate host in Belle2DAQ
   if (strstr(merger, "none") == 0) {
-    m_pid_merger = m_proc->Execute(merger, onsenhost, onsenport, mergerport);
+    char idbuf[3];
+    sprintf(idbuf, "%2.2d", RF_ROI_ID);
+    m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
     sleep(2);
   }
 
@@ -140,6 +156,7 @@ void RFRoiSender::server()
     } else if (st > 0) {
       m_log->ProcessLog(m_proc->GetFd());
     }
+    m_flow->fillNodeInfo(RF_ROI_ID, GetNodeInfo(), true);
   }
 }
 

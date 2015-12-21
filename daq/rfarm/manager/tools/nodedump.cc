@@ -68,6 +68,11 @@ int main(int argc, char** argv)
       idlist[nnodes] = RF_OUTPUT_ID;
       strcpy(item[nnodes], "OUT   ");
       nid = nnodes + 1;
+    } else if (strstr(argv[2], "roi") != NULL) {    // collector
+      strcpy(nodename, "roisender");
+      idlist[0] = RF_ROI_ID;
+      strcpy(item[0], "OUT   ");
+      nid = 1;
     }
   } else {
 #ifdef DESY

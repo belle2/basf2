@@ -37,7 +37,10 @@ void RFFlowStat::log(int size)
   struct timeval tnow;
 
   m_cell->nevent++;
-  m_cell->nqueue = m_rbuf->numq();
+  if (m_rbuf != NULL)
+    m_cell->nqueue = m_rbuf->numq();
+  else
+    m_cell->nqueue = 0;
   m_flowsize += (float)size;
   m_nevtint++;
   if (m_cell->nevent % m_interval == 0) {

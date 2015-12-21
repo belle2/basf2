@@ -14,6 +14,8 @@
 #include "daq/roisend/config.h"
 #include "daq/roisend/h2m.h"
 
+#include "daq/rfarm/manager/RFFlowStat.h"
+
 using namespace std;
 
 #define HRP_MALLOC_BUFFER_SIZE (ROI_MAX_PACKET_SIZE * 64) /* byte */
@@ -263,6 +265,8 @@ main(int argc, char* argv[])
   /* onsen_port = 24;   */
   unsigned short accept_port[MM_MAX_HLTOUT];
 
+  char shmname[1024];
+  int shmid;
 
   LOG_FPRINTF(stderr, "merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
@@ -277,15 +281,23 @@ main(int argc, char* argv[])
     size_t n_ports;
 
     p = argv[1];
-    strcpy(onsen_host, p);
+    strcpy(shmname, p);
 
     p = argv[2];
-    onsen_port = atoi(p);
+    shmid = atoi(p);
 
     p = argv[3];
+    strcpy(onsen_host, p);
+
+    p = argv[4];
+    onsen_port = atoi(p);
+
+    p = argv[5];
     n_hltout = perl_split_uint16t(':', p, accept_port);
   }
 
+  /* Flow monitor */
+  Belle2::RFFlowStat* flstat = new Belle2::RFFlowStat(shmname, shmid, NULL);
 
   /* acceot from hlt */
   {
@@ -394,6 +406,8 @@ main(int argc, char* argv[])
             goto ERROR_HANDLING;
             // exit(1);
           }
+
+          flstat->log(n_bytes_to_onsen);
 
           if (event_count < 40 || event_count % 10000 == 0) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [%d] sent event to ONSEN\n", event_count);

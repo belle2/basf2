@@ -19,7 +19,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter based on a tmva method.
+    /// A filter that records variables form given objects. It may record native varsets and returned weigths from other filters.
     template<class AFilterFactory>
     class UnionRecordingFilter:
       public RecordingFilter<UnionVarSet<typename AFilterFactory::CreatedFilter::Object> > {
@@ -43,6 +43,18 @@ namespace Belle2 {
         m_filterFactory("truth")
       {}
 
+      /// Expose the set of parameters of the filter to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      {
+        Super::exposeParameters(moduleParamList, prefix);
+
+        moduleParamList->addParameter(prefixed(prefix, "varSets"),
+                                      m_param_varSetNames,
+                                      "List of names refering to concrete variable sets."
+                                      "Valid names: " + join(", ", getValidVarSetNames()),
+                                      m_param_varSetNames);
+      }
+
       /// Initialize the recorder before event processing.
       virtual void initialize() override
       {
@@ -60,39 +72,12 @@ namespace Belle2 {
         Super::initialize();
       }
 
-      /// Initialize the recorder after event processing.
+      /// Terminate the recorder after event processing.
       virtual void terminate() override
       {
         Super::terminate();
         UnionVarSet<Object>& multiVarSet = Super::getVarSet();
         multiVarSet.clear();
-      }
-
-      /** Set the parameter with key to values.
-       *
-       *  Parameters are:
-       *  root_file_name = Name of the ROOT file to be written.
-       *  tree_name -  Name of the Tree to be written.
-       *  returned_cell_weight - Weight this filter should return when called. Defaults to NAN
-       *  varsets - Comma separated list of names refering to concrete variable sets.
-       */
-      virtual void setParameter(const std::string& key, const std::string& value) override
-      {
-        if (key == "varsets") {
-          m_commaSeparatedVarSetNames = value;
-          B2INFO("Filter received parameter 'varsets' = " << m_commaSeparatedVarSetNames);
-        } else {
-          Super::setParameter(key, value);
-        }
-      }
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual std::map<std::string, std::string> getParameterDescription() override
-      {
-        std::map<std::string, std::string> des = Super::getParameterDescription();
-        des["varset"] = "Comma separated list of names refering to concrete variable sets.";
-        return des;
       }
 
       /// Getter for the list of valid names of concret variable sets.
@@ -118,10 +103,6 @@ namespace Belle2 {
       /// Create a variable set for the given name.
       virtual std::unique_ptr<BaseVarSet<Object>> createVarSet(const std::string& name) const
       {
-        B2INFO("name = " << name);
-        B2INFO("name starts with filter( " << boost::starts_with(name, "filter("));
-        B2INFO("name ends with ) " << boost::ends_with(name, ")"));
-
         if (boost::starts_with(name, "filter(") and boost::ends_with(name, ")")) {
           B2INFO("Detected filter name");
           std::string filterName = name.substr(7, name.size() - 8);
@@ -142,20 +123,14 @@ namespace Belle2 {
       }
 
       /// Splits the comma separated variable names list into a vector of names.
-      std::vector<std::string> getVarSetNames() const
+      const std::vector<std::string>& getVarSetNames() const
       {
-        std::vector<std::string> varSetNames;
-        boost::split(varSetNames, m_commaSeparatedVarSetNames, boost::is_any_of(","));
-        // Remove leading and trailing white space.
-        for (std::string& varSetName : varSetNames) {
-          boost::trim(varSetName);
-        }
-        return varSetNames;
+        return m_param_varSetNames;
       }
 
     private:
-      /// A string containing the comma separated names of concrete variable sets to be recorded.
-      std::string m_commaSeparatedVarSetNames;
+      /// List of varsets that should be recorded.
+      std::vector<std::string> m_param_varSetNames;
 
       /// FilterFactory
       AFilterFactory m_filterFactory;

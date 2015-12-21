@@ -26,8 +26,8 @@ class CDCSegmentPairRecordingRun(RecordingRun):
     recording_finder_module.param({
         "SegmentPairFilter": "unionrecording",
         "SegmentPairFilterParameters": {
-            "root_file_name": output_file_name,
-            "varsets": ",".join(varsets),
+            "rootFileName": output_file_name,
+            "varSets": varsets,
         },
         "SegmentPairRelationFilter": "none"
     })

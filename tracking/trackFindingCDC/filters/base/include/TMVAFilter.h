@@ -39,12 +39,10 @@ namespace Belle2 {
         m_expert("data/tracking", defaultTrainingName)
       {}
 
-      /** Expose the set of parameters of the filter to the module parameter list.
-       *
-       *  Note that not all filters have yet exposed their parameters in this way.
-       */
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "")
+      /// Expose the set of parameters of the filter to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
       {
+        Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "cut"),
                                       m_param_cut,
                                       "The cut value of the mva output below which the object is rejected",
@@ -62,7 +60,6 @@ namespace Belle2 {
 
       }
 
-
       /// Initialize the expert before event processing.
       virtual void initialize() override
       {
@@ -73,39 +70,6 @@ namespace Belle2 {
         m_expert.initializeReader(varSet.getAllVariables());
       }
 
-      /** Set the parameter with key to values.
-       *
-       *  Parameters are:
-       *  cut           - The cut value of the mva output below which the object is rejected
-       *  weight_folder - The name of the folder to look for weight files from trainings.
-       *  training_name - The name of the training that should be used for the prediction.
-       */
-      virtual void setParameter(const std::string& key, const std::string& value) override
-      {
-        if (key == "cut") {
-          m_param_cut = stod(value);
-          B2INFO("Filter received parameter 'cut' = " << m_param_cut);
-        } else if (key == "weightFolder") {
-          m_param_weightFolder = value;
-          B2INFO("Filter received parameter 'weight_folder' = " << m_expert.getWeightFolderName());
-        } else if (key == "trainingName") {
-          m_param_trainingName = value;
-          B2INFO("Filter received parameter 'training_name' = " << m_expert.getTrainingName());
-        } else {
-          Super::setParameter(key, value);
-        }
-      }
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual std::map<std::string, std::string> getParameterDescription() override
-      {
-        std::map<std::string, std::string> des = Super::getParameterDescription();
-        des["cut"] =  "The cut value of the mva output below which the object is rejected";
-        des["weightFolder"] = "The name of the folder to look for weight files from trainings";
-        des["trainingName"] = "The name of the training that should be used for the prediction";
-        return des;
-      }
     public:
       /// Function to evaluate the cluster for its backgroundness.
       virtual Weight operator()(const Object& obj) override

@@ -39,8 +39,8 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
         self.recording_finder_module.param({
             self.recording_filter_parameter_name: {
-                "root_file_name": self.output_file_name,
-                "varsets": ",".join(self.varsets),
+                "rootFileName": self.output_file_name,
+                "varSets": self.varsets,
             },
         })
 

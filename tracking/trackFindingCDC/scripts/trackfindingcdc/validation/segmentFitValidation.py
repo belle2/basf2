@@ -54,9 +54,9 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     # segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     # segment_finder_module.param({
     #         "FacetFilter" : "mc",
-    #         "FacetFilterParameters" : { "symmetric" : "false" },
+    #         "FacetFilterParameters" : { "allowReverse" : false },
     #         "FacetRelationFilter" : "mc",
-    #         "FacetRelationFilterParameters" : { "symmetric" : "false" },
+    #         "FacetRelationFilterParameters" : { "allowReverse" : false },
     #         })
 
     fitter = Belle2.TrackFindingCDC.CDCRiemannFitter()

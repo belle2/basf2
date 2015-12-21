@@ -10,7 +10,9 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <map>
 #include <string>
@@ -34,6 +36,19 @@ namespace Belle2 {
       {
       }
 
+      /// Expose the set of parameters of the filter to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      {
+        Super::exposeParameters(moduleParamList, prefix);
+        moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
+                                      m_param_allowReverse,
+                                      "Indication whether the reverse to the truth is accepted"
+                                      "preserving the progagation reversal symmetry.",
+                                      m_param_allowReverse);
+
+      }
+
+
       /// Initialize the before event processing.
       virtual void initialize() override
       {
@@ -48,44 +63,6 @@ namespace Belle2 {
         if (needsTruthInformation()) {
           CDCMCManager::getInstance().fill();
         }
-      }
-
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  symmetric -  Accept the object if the reverse version of the object
-       *               is correct preserving the progagation reversal symmetry.
-       *               Allowed values "true", "false". Default is "true".
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) override
-      {
-        if (key == "symmetric") {
-          if (value == "true") {
-            setAllowReverse(true);
-            B2INFO("Filter received parameter '" << key << "' " << value);
-          } else if (value == "false") {
-            setAllowReverse(false);
-            B2INFO("Filter received parameter '" << key << "' " << value);
-          } else {
-            Super::setParameter(key, value);
-          }
-        } else {
-          Super::setParameter(key, value);
-        }
-      }
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() override
-      {
-        std::map<std::string, std::string> des = Super::getParameterDescription();
-        des["symmetric"] =
-          "Indication whether the reverse to the truth is accepted"
-          "preserving the progagation reversal symmetry."
-          "Allowed values 'true', 'false'. Default is 'true'.";
-        return des;
       }
 
       /// Indicates that the filter requires Monte Carlo information.

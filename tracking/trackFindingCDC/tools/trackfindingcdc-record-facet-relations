@@ -26,8 +26,8 @@ class CDCFacetRelationRecordingRun(RecordingRun):
     recording_finder_module.param({
         "FacetRelationFilter": "unionrecording",
         recording_filter_parameter_name : {
-            "root_file_name": output_file_name,
-            "varsets": ",".join(varsets),
+            "rootFileName": output_file_name,
+            "varsets": varsets,
         },
     })
 

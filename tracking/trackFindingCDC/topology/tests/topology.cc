@@ -138,7 +138,6 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
     B2INFO("   Tan Theta : " << tanThetaByICLayer[iCLayer]);
     B2INFO("   Stereo angle : " << stereoAngleByICLayer[iCLayer]);
     B2INFO("   Z range : " << wireLayer.getBackwardZ() << " to " << wireLayer.getForwardZ());
-    B2INFO("   Phi spread : " << wireLayer.getForwardPhiToRef() - wireLayer.getBackwardPhiToRef());
     B2INFO("   Ref. cylindricalR : " << refCylindricalRByICLayer[iCLayer]);
     B2INFO("   Max abs displacement : " << wireLayer.getWire(0).getWireVector().xy().norm());
   }

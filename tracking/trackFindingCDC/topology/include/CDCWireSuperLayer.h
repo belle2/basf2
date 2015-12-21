@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborPair.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -48,9 +49,6 @@ namespace Belle2 {
 
       /// The type of the const_iterator for the layer range
       typedef Container::const_iterator const_iterator;
-
-      /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()
-      typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
       CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end);
@@ -173,32 +171,32 @@ namespace Belle2 {
                                         IWire iOtherWire) const;
 
       /// Getter for the two closest neighbors in the layer outwards of the given on
-      NeighborPair getNeighborsOutwards(ILayer iLayer, IWire iWire) const;
+      WireNeighborPair getNeighborsOutwards(ILayer iLayer, IWire iWire) const;
       /// Getter for the two closest neighbors in the layer inwards of the given on
-      NeighborPair getNeighborsInwards(ILayer iLayer, IWire iWire) const;
+      WireNeighborPair getNeighborsInwards(ILayer iLayer, IWire iWire) const;
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCCWOutwards(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCCWOutwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsOutwards(iLayer, iWire).first; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCWOutwards(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCWOutwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsOutwards(iLayer, iWire).second; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCW(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCW(ILayer iLayer, IWire iWire) const
       { return &(getWireLayer(iLayer).getNeighborCW(iWire)); }
 
       /// Getter for the nearest counterclockwise neighbor by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCCW(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCCW(ILayer iLayer, IWire iWire) const
       { return &(getWireLayer(iLayer).getNeighborCCW(iWire)); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCCWInwards(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCCWInwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsInwards(iLayer, iWire).first; }  // not optimal since a second wire gets fetched additionally
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards by wire id and layer id with in this superlayer.
-      const CDCWire* getNeighborCWInwards(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getNeighborCWInwards(ILayer iLayer, IWire iWire) const
       { return getNeighborsInwards(iLayer, iWire).second; }  // not optimal since a second wire gets fetched additionally
       /**@}*/
 
@@ -215,55 +213,55 @@ namespace Belle2 {
       /**@{*/
 
       ///Getter for secondary neighbor at the one o'clock position
-      const CDCWire* getSecondNeighborOneOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborOneOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire - 1)) : nullptr;  }
 
 
       ///Getter for secondary neighbor at the two o'clock position
-      const CDCWire* getSecondNeighborTwoOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborTwoOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCWOutwards(iLayer, iWire - 1); }
 
       ///Getter for secondary neighbor at the three o'clock position
-      const CDCWire* getSecondNeighborThreeOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborThreeOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCW(iLayer, iWire - 1); }
 
       ///Getter for secondary neighbor at the four o'clock position
-      const CDCWire* getSecondNeighborFourOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborFourOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCWInwards(iLayer, iWire - 1); }
 
 
       ///Getter for secondary neighbor at the five o'clock position
-      const CDCWire* getSecondNeighborFiveOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborFiveOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire - 1)) : nullptr;  }
 
       ///Getter for secondary neighbor at the six o'clock position
-      const CDCWire* getSecondNeighborSixOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborSixOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire)) : nullptr;  }
 
       ///Getter for secondary neighbor at the seven o'clock position
-      const CDCWire* getSecondNeighborSevenOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborSevenOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer - 2) ? &(getWireLayer(iLayer - 2).getWireSafe(iWire + 1)) : nullptr;  }
 
 
       ///Getter for secondary neighbor at the eight o'clock position
-      const CDCWire* getSecondNeighborEightOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborEightOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCWInwards(iLayer , iWire + 1); }
 
       ///Getter for secondary neighbor at the nine o'clock position
-      const CDCWire* getSecondNeighborNineOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborNineOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCW(iLayer, iWire + 1); }
 
       ///Getter for secondary neighbor at the ten o'clock position
-      const CDCWire* getSecondNeighborTenOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborTenOClock(ILayer iLayer, IWire iWire) const
       { return getNeighborCCWOutwards(iLayer , iWire + 1); }
 
 
       ///Getter for secondary neighbor at the elven o'clock position
-      const CDCWire* getSecondNeighborElevenOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborElevenOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire + 1)) : nullptr;  }
 
       ///Getter for secondary neighbor at the twelve o'clock position
-      const CDCWire* getSecondNeighborTwelveOClock(ILayer iLayer, IWire iWire) const
+      MayBePtr<const CDCWire> getSecondNeighborTwelveOClock(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer + 2) ? &(getWireLayer(iLayer + 2).getWireSafe(iWire)) : nullptr;  }
       /**@}*/
 

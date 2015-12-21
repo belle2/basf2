@@ -18,6 +18,14 @@ using namespace TrackFindingCDC;
 using namespace CDC;
 
 
+CDCWireTopology& CDCWireTopology::getInstance()
+{
+  // Definition of the singleton instance
+  static CDCWireTopology instance;
+  return instance;
+}
+
+
 
 void CDCWireTopology::initialize()
 {
@@ -95,10 +103,3 @@ EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const W
     return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(), otherID.getILayer(), otherID.getIWire());
   }
 }
-
-// Definition of the singleton instance
-CDCWireTopology* CDCWireTopology::s_instance = nullptr;
-
-
-
-

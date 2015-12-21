@@ -12,51 +12,38 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCWire::CDCWire(const WireID& wireID)
-  : m_wireID(wireID),
-    m_forwardPhiToRef(0.0),
-    m_backwardPhiToRef(0.0),
-    m_phiRangeToRef(0.0, 0.0)
+  : m_wireID(wireID)
 {
   initialize();
 }
 
-CDCWire::CDCWire(ISuperLayer iSuperLayer,
-                 ILayer iLayer,
-                 IWire  iWire)
-  : m_wireID(iSuperLayer, iLayer, iWire),
-    m_forwardPhiToRef(0.0),
-    m_backwardPhiToRef(0.0),
-    m_phiRangeToRef(0.0, 0.0)
+CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
+  : m_wireID(iSuperLayer, iLayer, iWire)
 {
   initialize();
 }
 
-
-const CDCWire* CDCWire::getInstance(const WireID& wireID)
+MayBePtr<const CDCWire> CDCWire::getInstance(const WireID& wireID)
 {
   return &(CDCWireTopology::getInstance().getWire(wireID));
 }
 
-const CDCWire* CDCWire::getInstance(const CDCWire& wire)
-{
-  return &(CDCWireTopology::getInstance().getWire(wire.getWireID()));
-}
-
-const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
-                                    ILayer iLayer,
-                                    IWire iWire)
+MayBePtr<const CDCWire> CDCWire::getInstance(ISuperLayer iSuperLayer,
+                                             ILayer iLayer,
+                                             IWire iWire)
 {
   return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire));
 }
 
-const CDCWire* CDCWire::getInstance(const CDCHit& hit)
+MayBePtr<const CDCWire> CDCWire::getInstance(const CDCHit& hit)
 {
-  if (not CDCWireTopology::getInstance().isValidIWire(WireID(hit.getID()))) {
+  if (not CDCWireTopology::getInstance().isValidWireID(WireID(hit.getID()))) {
     B2FATAL("Invalid wire id of cdc hit " <<  WireID(hit.getID()));
   }
 
@@ -83,16 +70,8 @@ void CDCWire::initialize()
   m_wireLine = WireLine(forwardPos, backwardPos);
   m_refCylindricalR = getRefPos2D().norm();
 
-  m_forwardPhiToRef = m_wireLine.forwardPhiToRef();
-  m_backwardPhiToRef = m_wireLine.backwardPhiToRef();
-
   /// used to check for odd stereo wires
-  if ((m_forwardPhiToRef == 0 or
-       m_backwardPhiToRef == 0 or
-       std::isnan(m_forwardPhiToRef) or
-       std::isnan(m_backwardPhiToRef)) and
-      not isAxial()) {
-
+  if (not isAxial() and (m_wireLine.tanTheta() == 0)) {
     B2WARNING("Odd wire " << *this);
     B2WARNING("wireForwardPosition  " << forwardPos);
     B2WARNING("wireBackwardPosition " << backwardPos);
@@ -100,13 +79,7 @@ void CDCWire::initialize()
     B2WARNING("backward             " << m_wireLine.backward3D());
     B2WARNING("ref                  " << m_wireLine.refPos3D());
     B2WARNING("tan theta            " << m_wireLine.tanTheta());
-    B2WARNING("m_forwardToRefAngle  " << m_forwardPhiToRef);
-    B2WARNING("m_backwardToRefAngle " << m_backwardPhiToRef);
-    //double d;
-    //std::cin >> d;
   }
-
-  m_phiRangeToRef = std::minmax(m_forwardPhiToRef, m_backwardPhiToRef);
 }
 
 bool CDCWire::isInCell(const Vector3D& pos3D) const
@@ -140,42 +113,42 @@ bool CDCWire::isNeighborWith(const CDCWire& wire) const
   return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID());
 }
 
-CDCWire::NeighborPair CDCWire::getNeighborsInwards() const
+WireNeighborPair CDCWire::getNeighborsInwards() const
 {
   return CDCWireTopology::getInstance().getNeighborsInwards(getWireID());
 }
 
-CDCWire::NeighborPair CDCWire::getNeighborsOutwards() const
+WireNeighborPair CDCWire::getNeighborsOutwards() const
 {
   return CDCWireTopology::getInstance().getNeighborsOutwards(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCCW() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCCW() const
 {
   return CDCWireTopology::getInstance().getNeighborCCW(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCW() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCW() const
 {
   return CDCWireTopology::getInstance().getNeighborCW(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCCWInwards() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCCWInwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCCWInwards(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCWInwards() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCWInwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCWInwards(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCCWOutwards() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCCWOutwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCCWOutwards(getWireID());
 }
 
-const CDCWire* CDCWire::getNeighborCWOutwards() const
+MayBePtr<const CDCWire> CDCWire::getNeighborCWOutwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCWOutwards(getWireID());
 }

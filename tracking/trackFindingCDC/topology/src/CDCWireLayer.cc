@@ -28,7 +28,6 @@ CDCWireLayer::CDCWireLayer()
     m_refZ(0.0),
     m_forwardCylindricalR(0.0), m_backwardCylindricalR(0.0),
     m_forwardZ(0.0), m_backwardZ(0.0),
-    m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
     //form CDCGeometryPar
     m_innerCylindricalR(0.0),
     m_outerCylindricalR(0.0)
@@ -46,7 +45,6 @@ CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& en
     m_refZ(0.0),
     m_forwardCylindricalR(0.0) , m_backwardCylindricalR(0.0),
     m_forwardZ(0.0) , m_backwardZ(0.0),
-    m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
     //form CDCGeometryPar
     m_innerCylindricalR(0.0),
     m_outerCylindricalR(0.0)
@@ -81,7 +79,6 @@ void CDCWireLayer::initialize()
   //B2INFO("inner cylindrical r : " << getInnerCylindricalR());
   //B2INFO("outer cylindrical r : " << getOuterCylindricalR());
 
-
   // average values from wires
   m_tanStereoAngle = 0.0;
   m_minCylindricalR = 1000000.0;
@@ -91,13 +88,8 @@ void CDCWireLayer::initialize()
   m_backwardCylindricalR = 0.0;
   m_forwardZ = 0.0;
   m_backwardZ = 0.0;
-  m_forwardPhiToRef = 0.0;
-  m_backwardPhiToRef = 0.0;
 
-  for (const_iterator itWire = begin(); itWire != end(); ++itWire) {
-
-    const CDCWire& wire = *itWire;
-
+  for (const CDCWire& wire : *this) {
     m_tanStereoAngle += wire.getTanStereoAngle();
 
     double minROfWire = wire.getMinCylindricalR();
@@ -113,11 +105,6 @@ void CDCWireLayer::initialize()
     //calculate the forward and backward z position. take the average of all wires
     m_forwardZ += wire.getForwardZ();
     m_backwardZ += wire.getBackwardZ();
-
-    //calculate the forward and backward phi. take the average of all wires
-    m_forwardPhiToRef += wire.getForwardPhiToRef();
-    m_backwardPhiToRef += wire.getBackwardPhiToRef();
-
   }
 
   m_tanStereoAngle /= nWiresInLayer;
@@ -130,14 +117,6 @@ void CDCWireLayer::initialize()
 
   m_forwardZ /= nWiresInLayer;
   m_backwardZ /= nWiresInLayer;
-
-  m_forwardPhiToRef /= nWiresInLayer;
-  m_backwardPhiToRef /= nWiresInLayer;
-
-  m_phiRangeToRef = m_forwardPhiToRef < m_backwardPhiToRef ?
-                    std::make_pair(m_forwardPhiToRef , m_backwardPhiToRef) :
-                    std::make_pair(m_backwardPhiToRef , m_forwardPhiToRef) ;
-
 }
 
 const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const

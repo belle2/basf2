@@ -209,12 +209,6 @@ namespace Belle2 {
       /// Getter for the average z coordinate at the backward joint points of all wires in this layer
       double getBackwardZ() const { return m_backwardZ; }
 
-      /// Getter for the average azimuth angle of the forward joint points of the wires relativ to their references
-      double getForwardPhiToRef() const { return m_forwardPhiToRef; }
-
-      /// Getter for the average azimuth angle of the backward joint points of the wires relativ to their references
-      double getBackwardPhiToRef() const { return m_backwardPhiToRef; }
-
       /// Getter for the average azimuth angle range covered by the wires relativ to their respective reference points.
       /** Gives the range of azimuth angles the stereo wires cover relativ to their reference positions. \n
        *  A stereo wire has a certain extension visible as a stretch in the xy projection. \n
@@ -274,9 +268,6 @@ namespace Belle2 {
 
       double m_forwardZ; ///< Storage for z position of forward wire ends
       double m_backwardZ; ///< Storage for z position of backward wire ends
-
-      double m_forwardPhiToRef; ///< Storage of the average angle between forward and ref position in the xy projection (see getPhiRangeToRef() for details)
-      double m_backwardPhiToRef;///< Storage of the average angle between backward and ref position in the xy projection (see getPhiRangeToRef() for details)
 
       std::pair<double, double>
       m_phiRangeToRef; ///< Storage of the angle range to ref positions in the xy projection (see getPhiRangeToRef() for details)

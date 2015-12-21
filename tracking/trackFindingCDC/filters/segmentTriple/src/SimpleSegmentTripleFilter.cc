@@ -22,15 +22,11 @@ void SimpleSegmentTripleFilter::beginEvent()
   Super::beginEvent();
 }
 
-
-
 void SimpleSegmentTripleFilter::initialize()
 {
   m_simpleAxialSegmentPairFilter.initialize();
   Super::initialize();
 }
-
-
 
 void SimpleSegmentTripleFilter::terminate()
 {
@@ -38,11 +34,8 @@ void SimpleSegmentTripleFilter::terminate()
   m_simpleAxialSegmentPairFilter.terminate();
 }
 
-
-
 Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-
   const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
   const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
   const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
@@ -52,7 +45,7 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   assert(ptrEndSegment);
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCStereoRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   //check if the middle segment lies within the acceptable bounds in angular deviation
@@ -65,70 +58,15 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
     const CDCRecoHit2D& firstHit = middleSegment.front();
     const CDCRecoHit2D& lastHit = middleSegment.back();
 
-    Vector2D firstPosition = firstHit.getRecoPos2D();
-    Vector2D lastPosition  = lastHit.getRecoPos2D();
+    Vector3D firstRecoPos = firstHit.reconstruct3D(startFit);
+    Vector3D lastRecoPos = lastHit.reconstruct3D(endFit);
 
-    Vector2D firstReconstructed = startFit.getCloseSameCylindricalR(firstPosition);
-    Vector2D lastReconstructed = endFit.getCloseSameCylindricalR(lastPosition);
-
-    double first_refToReconstructedAngle = firstPosition.angleWith(firstReconstructed);
-    double last_refToReconstructedAngle = lastPosition.angleWith(lastReconstructed);
+    const double toleranceFraction = 0.0;
 
     const CDCWire& firstWire = firstHit.getWire();
-    const CDCWire& lastWire  = lastHit.getWire();
+    const CDCWire& lastWire = lastHit.getWire();
 
-    //Both wires are stereo wires by construction
-    //So they have both non zero twist
-    //check if the first and last are within the acceptable twist bounds
-    const std::pair<double, double>& first_phiRangeToRef = firstWire.getPhiRangeToRef();
-    const std::pair<double, double>& last_phiRangeToRef  = lastWire.getPhiRangeToRef();
-
-    const double tolerance = 0.0;
-
-    const bool agrees = (first_phiRangeToRef.first - tolerance) < first_refToReconstructedAngle and
-                        first_refToReconstructedAngle < (first_phiRangeToRef.second + tolerance) and
-
-                        (last_phiRangeToRef.first - tolerance) < last_refToReconstructedAngle and
-                        last_refToReconstructedAngle < (last_phiRangeToRef.second + tolerance) ;
-
-    //B2DEBUG(100,"    first_rangeToRefAngle.first < first_refToReconstructedAngle  = "
-    //              << (first_rangeToRefAngle.first < first_refToReconstructedAngle) );
-
-    //B2DEBUG(100,"    first_refToReconstructedAngle < first_rangeToRefAngle.second = "
-    //              << (first_refToReconstructedAngle < first_rangeToRefAngle.second) );
-
-    //B2DEBUG(100,"    last_rangeToRefAngle.first < last_refToReconstructedAngle    = "
-    //              << (last_rangeToRefAngle.first < last_refToReconstructedAngle) );
-
-    //B2DEBUG(100,"    last_refToReconstructedAngle < last_rangeToRefAngle.second   = "
-    //              << (last_refToReconstructedAngle < last_rangeToRefAngle.second) );
-
-
-    if (not agrees) {
-      B2DEBUG(100, "    first_rangeToRefAngle.first   = " <<  first_phiRangeToRef.first);
-      B2DEBUG(100, "    first_refToReconstructedAngle = " <<  first_refToReconstructedAngle);
-      B2DEBUG(100, "    first_rangeToRefAngle.second  = " <<  first_phiRangeToRef.second);
-
-      B2DEBUG(100, "    firstPosition                 = " <<  firstPosition);
-      B2DEBUG(100, "    firstReconstructed            = " <<  firstReconstructed);
-
-      B2DEBUG(100, "    last_rangeToRefAngle.first    = " <<  last_phiRangeToRef.first);
-      B2DEBUG(100, "    last_refToReconstructedAngle  = " <<  last_refToReconstructedAngle);
-      B2DEBUG(100, "    last_rangeToRefAngle.second   = " <<  last_phiRangeToRef.second);
-
-      B2DEBUG(100, "    lastPosition                  = " <<  firstPosition);
-      B2DEBUG(100, "    lastReconstructed             = " <<  lastReconstructed);
-
-      B2DEBUG(100, "  MiddleSegment rejected because of angular mismatch");
-
-
-      //double d;
-      //cin >> d;
-      return NAN;
-    }
-    //now check if the the fit and the middle segment are coaligned - is here the right point to check for this ??
-    //if ( not middleSegment.isForwardFit(startFit) ) return false;
-
+    const bool agrees = firstWire.isInCellZBounds(firstRecoPos) and lastWire.isInCellZBounds(lastRecoPos);
   }
 
   // make more complex judgement on fitness

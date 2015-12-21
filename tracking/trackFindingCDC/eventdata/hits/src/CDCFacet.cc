@@ -39,6 +39,20 @@ CDCFacet::CDCFacet(const CDCRLTaggedWireHit& startRLWireHit,
 {
 }
 
+void CDCFacet::reverse()
+{
+  CDCRLWireHitTriple::reverse();
+
+  m_startToMiddle.reverse();
+  m_startToMiddle.passiveMoveAtBy(-1);
+
+  m_startToEnd.reverse();
+  m_startToEnd.passiveMoveAtBy(-1);
+
+  m_middleToEnd.reverse();
+  m_middleToEnd.passiveMoveAtBy(-1);
+}
+
 CDCFacet CDCFacet::reversed() const
 {
   return CDCFacet(getEndRLWireHit().reversed(),

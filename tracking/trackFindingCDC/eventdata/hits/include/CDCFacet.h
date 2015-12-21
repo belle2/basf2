@@ -43,6 +43,9 @@ namespace Belle2 {
                const ParameterLine2D& startToEnd = ParameterLine2D(),
                const ParameterLine2D& middleToEnd = ParameterLine2D());
 
+      /// Reverses the facet inplace including the tangential lines.
+      void reverse();
+
       /// Constructs the reverse tiple from this one - this ignores the tangent lines.
       CDCFacet reversed() const;
 

@@ -35,6 +35,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCSVGPlotter::CDCSVGPlotter(bool animate)
+  : m_animate(animate),
+    m_eventdataPlotter(animate)
 {
   int top = -112;
   int left = -112;
@@ -44,10 +46,6 @@ CDCSVGPlotter::CDCSVGPlotter(bool animate)
   TrackFindingCDC::BoundingBox default_bound(left, bottom, right, top);
   int default_width = 1120;
   int default_height = 1120;
-
-  //Switch to indicating if an animated SVG should be generated
-  m_animate = animate;
-  EventDataPlotter m_eventdataPlotter(m_animate);
 
   m_eventdataPlotter.setBoundingBox(default_bound);
   m_eventdataPlotter.setCanvasHeight(default_height);

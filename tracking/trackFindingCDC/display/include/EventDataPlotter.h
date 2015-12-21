@@ -260,7 +260,7 @@ namespace Belle2 {
       PrimitivePlotter* m_ptrPrimitivePlotter;
 
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
-      bool m_animate;
+      bool m_animate = false;
 
     }; //class
 

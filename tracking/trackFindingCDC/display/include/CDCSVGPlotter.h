@@ -225,6 +225,7 @@ namespace Belle2 {
       template<class AIterable, class AColorizer>
       void drawIterable(const AIterable& iterable, AColorizer& colorizer);
 
+    private:
       bool m_animate = false;
       TrackFindingCDC::EventDataPlotter m_eventdataPlotter;
 

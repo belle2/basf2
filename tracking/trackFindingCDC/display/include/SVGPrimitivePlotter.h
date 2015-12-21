@@ -35,14 +35,11 @@ namespace Belle2 {
       /// Copy constructor
       SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter);
 
-      /// Make destructor virtual to handle polymorphic deconstruction.
-      virtual ~SVGPrimitivePlotter();
-
     public:
       /// Returns a newly created plotter instance containing all information of this.
       /** The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
        */
-      virtual SVGPrimitivePlotter* clone() const;
+      virtual std::unique_ptr<PrimitivePlotter> clone() const override;
 
     public:
       /** Adds a line to the plot
@@ -59,7 +56,7 @@ namespace Belle2 {
                             const float& startY,
                             const float& endX,
                             const float& endY,
-                            const AttributeMap& attributeMap = AttributeMap());
+                            const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Adds an arrow to the plot
        *
@@ -75,7 +72,7 @@ namespace Belle2 {
                              const float& startY,
                              const float& endX,
                              const float& endY,
-                             const AttributeMap& attributeMap = AttributeMap());
+                             const AttributeMap& attributeMap = AttributeMap()) override;
 
 
       /** Adds a circle to the plot
@@ -90,7 +87,7 @@ namespace Belle2 {
       virtual void drawCircle(const float& centerX,
                               const float& centerY,
                               const float& radius,
-                              const AttributeMap& attributeMap = AttributeMap());
+                              const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Adds a circle arc to the plot
        *
@@ -112,21 +109,21 @@ namespace Belle2 {
                                  const float& radius,
                                  const bool& longArc,
                                  const bool& sweepFlag,
-                                 const AttributeMap& attributeMap = AttributeMap());
+                                 const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
        *
        *  Does nothing in the base implementation
        *
        */
-      virtual void startGroup(const AttributeMap& attributeMap = AttributeMap());
+      virtual void startGroup(const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
        *
        *  Does nothing in the base implementation
        *
        */
-      virtual void endGroup();
+      virtual void endGroup() override;
 
       /** Saves the current plot state to a file.
        *
@@ -137,13 +134,13 @@ namespace Belle2 {
        *  @param fileName       fileName where the plot shall be saved
        *  @return               Potentially modifed file name where the file has actually been written to.
        */
-      virtual const std::string save(const std::string& fileName);
+      virtual const std::string save(const std::string& fileName) override;
 
       /** Clears all drawed elements from the plotter.
        *
        *  Base implementation only updates the bounding box.
        */
-      virtual void clear();
+      virtual void clear() override;
 
 
     private:

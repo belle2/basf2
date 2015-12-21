@@ -15,6 +15,7 @@
 #include <cmath>
 #include <utility>
 #include <map>
+#include <memory>
 
 
 namespace Belle2 {
@@ -49,7 +50,7 @@ namespace Belle2 {
       /// Returns a newly created plotter instance containing all information of this.
       /** The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
        */
-      virtual PrimitivePlotter* clone() const;
+      virtual std::unique_ptr<PrimitivePlotter> clone() const;
 
     public:
       /** Adds a line to the plot

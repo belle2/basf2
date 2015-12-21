@@ -40,27 +40,16 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const AttributeMap& svgAttributes) :
 
 SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter) :
   PrimitivePlotter(plotter),
-  m_svgContentStream(),
+  m_svgContentStream(plotter.m_svgContentStream.str()),
   m_nIndentationSpaces(plotter.m_nIndentationSpaces),
   m_svgAttributes(plotter.m_svgAttributes)
 {
-  // Copy the stream of the other plotter and rewind it to its original position.
-  m_svgContentStream << plotter.m_svgContentStream.rdbuf();
-  plotter.m_svgContentStream.rdbuf()->pubseekpos(0, std::ios_base::in);
 }
 
-SVGPrimitivePlotter::~SVGPrimitivePlotter()
+std::unique_ptr<PrimitivePlotter> SVGPrimitivePlotter::clone() const
 {
+  return std::unique_ptr<PrimitivePlotter>(new SVGPrimitivePlotter(*this));
 }
-
-
-SVGPrimitivePlotter* SVGPrimitivePlotter::clone() const
-{
-  SVGPrimitivePlotter* cloned = new SVGPrimitivePlotter(*this);
-  return cloned;
-}
-
-
 
 void SVGPrimitivePlotter::drawLine(const float& startX,
                                    const float& startY,
@@ -230,8 +219,7 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
   writeSVGDefs(outputFileStream);
 
   // Copy the stream the output and rewind it to its original position.
-  outputFileStream << m_svgContentStream.rdbuf();
-  m_svgContentStream.rdbuf()->pubseekpos(0, std::ios_base::in);
+  outputFileStream << m_svgContentStream.str();
 
   writeClosingTag(outputFileStream, "svg");
 

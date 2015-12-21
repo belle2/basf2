@@ -30,10 +30,9 @@ PrimitivePlotter::~PrimitivePlotter()
 }
 
 
-PrimitivePlotter* PrimitivePlotter::clone() const
+std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 {
-  PrimitivePlotter* cloned = new PrimitivePlotter(*this);
-  return cloned;
+  return std::unique_ptr<PrimitivePlotter>(new PrimitivePlotter(*this));
 }
 
 

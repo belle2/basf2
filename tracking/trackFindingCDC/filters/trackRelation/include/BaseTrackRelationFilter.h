@@ -22,8 +22,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     ///Base class for filtering the neighborhood of tracks
     template<>
-    class Filter<Relation<CDCTrack> > :
-      public FilterBase<Relation<CDCTrack> > {
+    class Filter<Relation<const CDCTrack> > :
+        public FilterBase<Relation<const CDCTrack> > {
 
     public:
       /// Returns the full range of tracks.
@@ -48,7 +48,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<CDCTrack>& relation) override
+      virtual Weight operator()(const Relation<const CDCTrack>& relation) override
       {
         const CDCTrack* ptrFrom = relation.first;
         const CDCTrack* ptrTo = relation.second;
@@ -66,7 +66,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of tracks.
-    typedef Filter<Relation<CDCTrack> >  BaseTrackRelationFilter;
+    typedef Filter<Relation<const CDCTrack> >  BaseTrackRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

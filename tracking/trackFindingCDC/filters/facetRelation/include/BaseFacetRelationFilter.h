@@ -27,8 +27,8 @@ namespace Belle2 {
      *  Besides that it accepts all facets.
      */
     template<>
-    class Filter<Relation<CDCFacet>>  :
-                                    public FilterBase<Relation<CDCFacet>> {
+    class Filter<Relation<const CDCFacet>>  :
+                                            public FilterBase<Relation<const CDCFacet>> {
 
     public:
       /** Returns a two iterator range covering the range of possible neighboring
@@ -67,7 +67,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<CDCFacet>& relation) override
+      virtual Weight operator()(const Relation<const CDCFacet>& relation) override
       {
         const CDCFacet* ptrFrom = relation.first;
         const CDCFacet* ptrTo = relation.second;
@@ -79,7 +79,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of facets.
-    typedef Filter<Relation<CDCFacet>> BaseFacetRelationFilter;
+    typedef Filter<Relation<const CDCFacet>> BaseFacetRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

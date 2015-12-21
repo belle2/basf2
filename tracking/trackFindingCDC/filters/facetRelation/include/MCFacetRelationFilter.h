@@ -17,11 +17,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetRelationFilter : public MCSymmetricFilterMixin<Filter<Relation<CDCFacet> > > {
+    class MCFacetRelationFilter : public MCSymmetricFilterMixin<Filter<Relation<const CDCFacet> > > {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<Relation<CDCFacet> > > Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<const CDCFacet> > > Super;
 
     public:
       /// Importing all overloads from the super class

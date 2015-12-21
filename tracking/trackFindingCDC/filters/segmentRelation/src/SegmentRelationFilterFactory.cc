@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::FilterFactory(const std::string& defaultFilterName) :
+FilterFactory<Filter<Relation<const CDCRecoSegment2D> > >::FilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::getFilterPurpose() const
+std::string FilterFactory<Filter<Relation<const CDCRecoSegment2D> > >::getFilterPurpose() const
 {
   return "Segment relation filter to be used during the construction of the segment network for in super layer merginig.";
 }
 
-std::string FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::getModuleParamPrefix() const
+std::string FilterFactory<Filter<Relation<const CDCRecoSegment2D> > >::getModuleParamPrefix() const
 {
   return "SegmentRelation";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::getValidFilterNamesAndDescriptions() const
+FilterFactory<Filter<Relation<const CDCRecoSegment2D> > >::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -45,15 +45,15 @@ FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::getValidFilterNamesAndDescr
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<CDCRecoSegment2D> > >
-FilterFactory<Filter<Relation<CDCRecoSegment2D> > >::create(const std::string& filterName) const
+std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >
+FilterFactory<Filter<Relation<const CDCRecoSegment2D> > >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<CDCRecoSegment2D> > >(new BaseSegmentRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new BaseSegmentRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<CDCRecoSegment2D> > >(new MCSegmentRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new MCSegmentRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<CDCRecoSegment2D> > >(new UnionRecordingSegmentRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > >(new UnionRecordingSegmentRelationFilter());
   } else {
     return Super::create(filterName);
   }

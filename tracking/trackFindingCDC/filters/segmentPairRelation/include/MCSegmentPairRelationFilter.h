@@ -18,11 +18,11 @@ namespace Belle2 {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
     class MCSegmentPairRelationFilter :
-      public MCSymmetricFilterMixin<Filter<Relation<CDCSegmentPair> > > {
+      public MCSymmetricFilterMixin<Filter<Relation<const CDCSegmentPair> > > {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<Relation<CDCSegmentPair> > > Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<const CDCSegmentPair> > > Super;
 
     public:
       /// Importing all overloads from the super class

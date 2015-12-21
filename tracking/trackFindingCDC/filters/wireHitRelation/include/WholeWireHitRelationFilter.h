@@ -26,7 +26,7 @@ namespace Belle2 {
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
     /** Class providing the neighborhood filter interface to the NeighborhoodBuilder for the construction of wire neighborhoods.*/
     template<bool withSecondaryNeighborhood = false>
-    class WholeWireHitRelationFilter : public Filter<Relation<CDCWireHit>> {
+    class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
 
     public:
       /// Empty constructor
@@ -141,7 +141,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      inline Weight operator()(const Relation<CDCWireHit>& relation) override final
+      inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
       {
         const CDCWireHit* ptrFrom = relation.first;
         const CDCWireHit* ptrTo = relation.second;

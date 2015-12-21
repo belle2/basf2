@@ -14,11 +14,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     ///Class filtering the neighborhood of facets with monte carlo information
-    class AllFacetRelationFilter : public Filter<Relation<CDCFacet>> {
+    class AllFacetRelationFilter : public Filter<Relation<const CDCFacet>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCFacet>> Super;
+      typedef Filter<Relation<const CDCFacet>> Super;
 
     public:
       /// Importing all overloads from the super class

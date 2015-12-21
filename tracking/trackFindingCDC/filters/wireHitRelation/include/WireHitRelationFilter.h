@@ -86,7 +86,7 @@ namespace Belle2 {
      *  for the construction of wire neighborhoods
      */
     template<EWireNeighborKind ConcreteNeighborKind>
-    class WireHitRelationFilter : public Filter<Relation<CDCWireHit>> {
+    class WireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
 
     public:
       /** Returns a two iterator range covering the range of possible neighboring wire hits of the
@@ -121,7 +121,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      inline Weight operator()(const Relation<CDCWireHit>& relation) override final
+      inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
       {
         const CDCWireHit* ptrFrom = relation.first;
         const CDCWireHit* ptrTo = relation.second;

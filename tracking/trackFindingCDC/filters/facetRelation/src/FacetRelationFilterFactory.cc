@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<Relation<CDCFacet> > >::FilterFactory(const std::string& defaultFilterName) :
+FilterFactory<Filter<Relation<const CDCFacet> > >::FilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<Relation<CDCFacet> > >::getFilterPurpose() const
+std::string FilterFactory<Filter<Relation<const CDCFacet> > >::getFilterPurpose() const
 {
   return "Facet relation filter to be used during the construction of the facet network.";
 }
 
-std::string FilterFactory<Filter<Relation<CDCFacet> > >::getModuleParamPrefix() const
+std::string FilterFactory<Filter<Relation<const CDCFacet> > >::getModuleParamPrefix() const
 {
   return "FacetRelation";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<Relation<CDCFacet> > >::getValidFilterNamesAndDescriptions() const
+FilterFactory<Filter<Relation<const CDCFacet> > >::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -48,21 +48,21 @@ FilterFactory<Filter<Relation<CDCFacet> > >::getValidFilterNamesAndDescriptions(
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<CDCFacet> > >
-FilterFactory<Filter<Relation<CDCFacet> > >::create(const std::string& filterName) const
+std::unique_ptr<Filter<Relation<const CDCFacet> > >
+FilterFactory<Filter<Relation<const CDCFacet> > >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new BaseFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new BaseFacetRelationFilter());
   } else if (filterName == string("all")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new AllFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new AllFacetRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new MCFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new MCFacetRelationFilter());
   } else if (filterName == string("simple")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new SimpleFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new SimpleFacetRelationFilter());
   } else if (filterName == string("recording")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new RecordingFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new RecordingFacetRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<CDCFacet> > >(new UnionRecordingFacetRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCFacet> > >(new UnionRecordingFacetRelationFilter());
   } else {
     return Super::create(filterName);
   }

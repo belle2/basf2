@@ -16,11 +16,11 @@ namespace Belle2 {
 
     /// Class filtering the neighborhood of axial stereo segment pairs based on simple criteria.
     class SimpleSegmentPairRelationFilter :
-      public Filter<Relation<CDCSegmentPair>> {
+      public Filter<Relation<const CDCSegmentPair>> {
 
     private:
       /// Type of the super class
-      typedef Filter<Relation<CDCSegmentPair>> Super;
+      typedef Filter<Relation<const CDCSegmentPair>> Super;
 
     public:
       /// Importing all overloads from the super class

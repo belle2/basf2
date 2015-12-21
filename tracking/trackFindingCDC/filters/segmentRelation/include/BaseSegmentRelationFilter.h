@@ -23,8 +23,8 @@ namespace Belle2 {
     ///Base class for filtering the neighborhood of segments
 
     template<>
-    class Filter<Relation<CDCRecoSegment2D>>  :
-                                            public FilterBase<Relation<CDCRecoSegment2D>> {
+    class Filter<Relation<const CDCRecoSegment2D>>  :
+                                                    public FilterBase<Relation<const CDCRecoSegment2D>> {
 
     public:
       /// Returns the full range of segments.
@@ -49,7 +49,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<CDCRecoSegment2D>& relation) override
+      virtual Weight operator()(const Relation<const CDCRecoSegment2D>& relation) override
       {
         const CDCRecoSegment2D* ptrFrom = relation.first;
         const CDCRecoSegment2D* ptrTo = relation.second;
@@ -67,7 +67,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of segments.
-    typedef Filter<Relation<CDCRecoSegment2D>>  BaseSegmentRelationFilter;
+    typedef Filter<Relation<const CDCRecoSegment2D>>  BaseSegmentRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

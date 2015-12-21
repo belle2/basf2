@@ -15,23 +15,23 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-FilterFactory<Filter<Relation<CDCTrack> > >::FilterFactory(const std::string& defaultFilterName) :
+FilterFactory<Filter<Relation<const CDCTrack> > >::FilterFactory(const std::string& defaultFilterName) :
   Super(defaultFilterName)
 {
 }
 
-std::string FilterFactory<Filter<Relation<CDCTrack> > >::getFilterPurpose() const
+std::string FilterFactory<Filter<Relation<const CDCTrack> > >::getFilterPurpose() const
 {
   return "Track relation filter to be used during the construction of the track network for in super layer merginig.";
 }
 
-std::string FilterFactory<Filter<Relation<CDCTrack> > >::getModuleParamPrefix() const
+std::string FilterFactory<Filter<Relation<const CDCTrack> > >::getModuleParamPrefix() const
 {
   return "TrackRelation";
 }
 
 std::map<std::string, std::string>
-FilterFactory<Filter<Relation<CDCTrack> > >::getValidFilterNamesAndDescriptions() const
+FilterFactory<Filter<Relation<const CDCTrack> > >::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string>
   filterNames = Super::getValidFilterNamesAndDescriptions();
@@ -45,15 +45,15 @@ FilterFactory<Filter<Relation<CDCTrack> > >::getValidFilterNamesAndDescriptions(
   return filterNames;
 }
 
-std::unique_ptr<Filter<Relation<CDCTrack> > >
-FilterFactory<Filter<Relation<CDCTrack> > >::create(const std::string& filterName) const
+std::unique_ptr<Filter<Relation<const CDCTrack> > >
+FilterFactory<Filter<Relation<const CDCTrack> > >::create(const std::string& filterName) const
 {
   if (filterName == string("none")) {
-    return std::unique_ptr<Filter<Relation<CDCTrack> > >(new BaseTrackRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new BaseTrackRelationFilter());
   } else if (filterName == string("truth")) {
-    return std::unique_ptr<Filter<Relation<CDCTrack> > >(new MCTrackRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new MCTrackRelationFilter());
   } else if (filterName == string("unionrecording")) {
-    return std::unique_ptr<Filter<Relation<CDCTrack> > >(new UnionRecordingTrackRelationFilter());
+    return std::unique_ptr<Filter<Relation<const CDCTrack> > >(new UnionRecordingTrackRelationFilter());
   } else {
     return Super::create(filterName);
   }

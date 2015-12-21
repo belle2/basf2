@@ -23,8 +23,8 @@ namespace Belle2 {
     ///Base class for filtering the neighborhood of axial stereo segment pairs
 
     template<>
-    class Filter<Relation<CDCSegmentPair>>  :
-                                          public FilterBase<Relation<CDCSegmentPair>> {
+    class Filter<Relation<const CDCSegmentPair>>  :
+                                                  public FilterBase<Relation<const CDCSegmentPair>> {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
@@ -55,7 +55,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<CDCSegmentPair>& relation) override final
+      virtual Weight operator()(const Relation<const CDCSegmentPair>& relation) override final
       {
         const CDCSegmentPair* ptrFrom = relation.first;
         const CDCSegmentPair* ptrTo = relation.second;
@@ -72,7 +72,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of axial stereo segment pairs.
-    typedef Filter<Relation<CDCSegmentPair>>  BaseSegmentPairRelationFilter;
+    typedef Filter<Relation<const CDCSegmentPair>>  BaseSegmentPairRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

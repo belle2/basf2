@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /// Create a concrete variables set for tracks from a name.
       virtual
-      std::unique_ptr<BaseVarSet<Relation<CDCTrack> > >
+      std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >
       createVarSet(const std::string& name) const override;
     };
   }

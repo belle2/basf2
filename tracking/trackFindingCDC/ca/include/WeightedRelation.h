@@ -18,7 +18,8 @@ namespace Belle2 {
 
     /// Type for two related objects of the same type.
     template<class T, template<class> class AsPtr = Star>
-    class WeightedRelation : public std::pair<WithWeight<AsPtr<T> >, AsPtr<T> > {
+    class WeightedRelation
+      : public std::pair<WithWeight<AsPtr<T> >, AsPtr<T> > {
 
     private:
       /// Type of the base class

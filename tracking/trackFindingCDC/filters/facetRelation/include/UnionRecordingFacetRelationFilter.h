@@ -29,7 +29,7 @@ namespace Belle2 {
 
       /// Create a concrete variables set for facets from a name.
       virtual
-      std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >
+      std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
       createVarSet(const std::string& name) const override;
     };
   }

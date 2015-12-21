@@ -40,7 +40,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a facet relation
      */
-    class CDCFacetRelationBasicVarNames : public VarNames<Relation<CDCFacet>> {
+    class CDCFacetRelationBasicVarNames : public VarNames<Relation<const CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
@@ -71,7 +71,7 @@ namespace Belle2 {
       explicit CDCFacetRelationBasicVarSet(const std::string& prefix = "");
 
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<CDCFacet>* ptrFacetRelation) override final;
+      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
     };
   }
 }

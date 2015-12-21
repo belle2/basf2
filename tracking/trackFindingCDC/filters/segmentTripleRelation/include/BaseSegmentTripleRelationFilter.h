@@ -25,8 +25,8 @@ namespace Belle2 {
 
     ///Base class for filtering the neighborhood of segment triples
     template<>
-    class Filter<Relation<CDCSegmentTriple>>  :
-                                            public FilterBase<Relation<CDCSegmentTriple>> {
+    class Filter<Relation<const CDCSegmentTriple>>  :
+                                                    public FilterBase<Relation<const CDCSegmentTriple>> {
 
     public:
       /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
@@ -61,7 +61,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<CDCSegmentTriple>& relation) override final
+      virtual Weight operator()(const Relation<const CDCSegmentTriple>& relation) override final
       {
         const CDCSegmentTriple* ptrFrom = relation.first;
         const CDCSegmentTriple* ptrTo = relation.second;
@@ -73,7 +73,7 @@ namespace Belle2 {
     }; // end class
 
     /// Alias for the base class for filtering the neighborhood of segment triples.
-    typedef Filter<Relation<CDCSegmentTriple>>  BaseSegmentTripleRelationFilter;
+    typedef Filter<Relation<const CDCSegmentTriple>>  BaseSegmentTripleRelationFilter;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

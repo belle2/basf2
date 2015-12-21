@@ -23,12 +23,12 @@ namespace Belle2 {
        Can collaborate with a Module and expose these parameters to the user in steering files.
     */
     template<>
-    class FilterFactory<Filter<Relation<CDCRecoSegment2D> > > :
-      public FilterFactoryBase<Filter<Relation<CDCRecoSegment2D> > > {
+    class FilterFactory<Filter<Relation<const CDCRecoSegment2D> > > :
+        public FilterFactoryBase<Filter<Relation<const CDCRecoSegment2D> > > {
 
     private:
       /// Type of the base class
-      typedef FilterFactoryBase<Filter<Relation<CDCRecoSegment2D> > > Super;
+      typedef FilterFactoryBase<Filter<Relation<const CDCRecoSegment2D> > > Super;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -37,7 +37,7 @@ namespace Belle2 {
       using Super::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter<Relation<CDCRecoSegment2D> > > create(const std::string& name) const override;
+      virtual std::unique_ptr<Filter<Relation<const CDCRecoSegment2D> > > create(const std::string& name) const override;
 
       /** Getter for a descriptive purpose of the clusterfilter.*/
       virtual std::string getFilterPurpose() const override;
@@ -51,7 +51,7 @@ namespace Belle2 {
     };
 
     /// Legacy alias for the segment relation filter factory
-    typedef FilterFactory<Filter<Relation<CDCRecoSegment2D> > > SegmentRelationFilterFactory;
+    typedef FilterFactory<Filter<Relation<const CDCRecoSegment2D> > > SegmentRelationFilterFactory;
 
   }
 }

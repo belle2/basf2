@@ -19,7 +19,7 @@ CDCFacetRelationBasicVarSet::CDCFacetRelationBasicVarSet(const std::string& pref
 {
 }
 
-bool CDCFacetRelationBasicVarSet::extract(const Relation<CDCFacet>* ptrFacetRelation)
+bool CDCFacetRelationBasicVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
   bool extracted = Super::extract(ptrFacetRelation);
   if (not extracted or not ptrFacetRelation) return false;

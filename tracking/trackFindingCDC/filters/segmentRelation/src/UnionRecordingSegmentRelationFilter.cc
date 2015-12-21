@@ -25,13 +25,13 @@ UnionRecordingSegmentRelationFilter::getValidVarSetNames() const
 }
 
 
-std::unique_ptr<BaseVarSet<Relation<CDCRecoSegment2D> > >
+std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >
 UnionRecordingSegmentRelationFilter::createVarSet(const std::string& name) const
 {
   // if (name == "basic") {
-  //   return std::unique_ptr<BaseVarSet<Relation<CDCRecoSegment2D> > >(new CDCSegmentRelationBasicVarSet());
+  //   return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new CDCSegmentRelationBasicVarSet());
   // } else if (name == "truth") {
-  //   return std::unique_ptr<BaseVarSet<Relation<CDCRecoSegment2D> > >(new CDCSegmentRelationTruthVarSet());
+  //   return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new CDCSegmentRelationTruthVarSet());
   // } else {
   return Super::createVarSet(name);
   // }

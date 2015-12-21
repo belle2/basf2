@@ -25,13 +25,13 @@ UnionRecordingTrackRelationFilter::getValidVarSetNames() const
 }
 
 
-std::unique_ptr<BaseVarSet<Relation<CDCTrack> > >
+std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >
 UnionRecordingTrackRelationFilter::createVarSet(const std::string& name) const
 {
   // if (name == "basic") {
-  //   return std::unique_ptr<BaseVarSet<Relation<CDCTrack> > >(new CDCTrackRelationBasicVarSet());
+  //   return std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >(new CDCTrackRelationBasicVarSet());
   // } else if (name == "truth") {
-  //   return std::unique_ptr<BaseVarSet<Relation<CDCTrack> > >(new CDCTrackRelationTruthVarSet());
+  //   return std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >(new CDCTrackRelationTruthVarSet());
   // } else {
   return Super::createVarSet(name);
   // }

@@ -17,11 +17,11 @@ namespace Belle2 {
 
     /// Filter for the constuction of segment relations based on MC information.
     class MCSegmentRelationFilter :
-      public MCSymmetricFilterMixin<Filter<Relation<CDCRecoSegment2D> > > {
+      public MCSymmetricFilterMixin<Filter<Relation<const CDCRecoSegment2D> > > {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<Relation<CDCRecoSegment2D> > > Super;
+      typedef MCSymmetricFilterMixin<Filter<Relation<const CDCRecoSegment2D> > > Super;
 
     public:
       /// Constructor

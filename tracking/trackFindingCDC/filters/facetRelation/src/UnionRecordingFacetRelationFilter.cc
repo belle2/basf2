@@ -25,13 +25,13 @@ UnionRecordingFacetRelationFilter::getValidVarSetNames() const
 }
 
 
-std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >
+std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
 UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(new CDCFacetRelationBasicVarSet());
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new CDCFacetRelationBasicVarSet());
   } else if (name == "truth") {
-    return std::unique_ptr<BaseVarSet<Relation<CDCFacet> > >(new CDCFacetRelationTruthVarSet());
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new CDCFacetRelationTruthVarSet());
   } else {
     return Super::createVarSet(name);
   }

@@ -56,10 +56,10 @@ namespace Belle2 {
        */
       /**@{*/
       /// Getter from the the continuous layer id. Does not construct a new object.
-      static const CDCWireLayer* getInstance(const ILayerType& iCLayer);
+      static const CDCWireLayer* getInstance(ILayer iCLayer);
       /// Getter from the superlayer id, the layer id. Does not construct a new object.
       static const CDCWireLayer* getInstance(ISuperLayer iSuperLayer,
-                                             const ILayerType& iLayer);
+                                             ILayer iLayer);
       /// Getter for the layer with superlayer id 0, layer id 0.
       static const CDCWireLayer* getLowest() { return getInstance(0, 0); }
       /**@}*/
@@ -74,10 +74,10 @@ namespace Belle2 {
        */
       /**@{*/
       /// Getter for the continuous layer id unique over all layers
-      ILayerType getICLayer() const { return first().getICLayer(); }
+      ILayer getICLayer() const { return first().getICLayer(); }
 
       /// Getter for the layer id unique within the superlayer
-      ILayerType getILayer() const { return first().getILayer(); }
+      ILayer getILayer() const { return first().getILayer(); }
 
       /// Getter for the super layer id
       ISuperLayer getISuperLayer() const { return first().getISuperLayer(); }
@@ -116,14 +116,14 @@ namespace Belle2 {
       const_iterator end() const { return m_end; }
 
       /// Getter for the number of wires in this layer
-      IWireType size() const { return m_end - m_begin; }
+      IWire size() const { return m_end - m_begin; }
 
       /// Checks if the given wire id belongs to a valid wire in this layer
-      inline bool isValidIWire(const IWireType& iWire) const
+      inline bool isValidIWire(IWire iWire) const
       { return 0 <= iWire and iWire < int(size()); }
 
       /// Gives the wire by its id in the layer.
-      const CDCWire& getWire(const IWireType& iWire) const
+      const CDCWire& getWire(IWire iWire) const
       { return *(begin() + iWire); }
 
       /// Getter for the first wire of the layer
@@ -145,23 +145,23 @@ namespace Belle2 {
        *  This makes the retrival of neighbors much easier if the neighborhood \n
        *  is around the discontinuity near the zero wires.
        */
-      const CDCWire& getWireSafe(const IWireType& iWire) const
+      const CDCWire& getWireSafe(IWire iWire) const
       { return *(begin() + (iWire % size() + size()) % size()); }
 
       /// Getter for the first counterclockwise neighbor by wire id in the layer.
-      const CDCWire& getNeighborCCW(const IWireType& iWire) const
+      const CDCWire& getNeighborCCW(IWire iWire) const
       { return getWire((iWire + 1) % size()); }
 
       /// Getter for the first clockwise neighbor by wire id in the layer.
-      const CDCWire& getNeighborCW(const IWireType& iWire) const
+      const CDCWire& getNeighborCW(IWire iWire) const
       { return getWire((iWire + size() - 1) % size()); }
 
       /// Getter for the first counterclockwise neighbor by wire id in the layer.
-      const CDCWire& getSecondNeighborCCW(const IWireType& iWire) const
+      const CDCWire& getSecondNeighborCCW(IWire iWire) const
       { return getWire((iWire + 2) % size()); }
 
       /// Getter for the first clockwise neighbor by wire id in the layer.
-      const CDCWire& getSecondNeighborCW(const IWireType& iWire) const
+      const CDCWire& getSecondNeighborCW(IWire iWire) const
       { return getWire((iWire + size() - 2) % size()); }
       /**@}*/
 

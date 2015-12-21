@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/topology/WireLine.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/ILayerType.h>
-#include <tracking/trackFindingCDC/topology/IWireType.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
+#include <tracking/trackFindingCDC/topology/IWire.h>
 
 #include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
@@ -50,8 +50,8 @@ namespace Belle2 {
 
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
       CDCWire(ISuperLayer iSuperLayer,
-              const ILayerType& iLayer,
-              const IWireType& iWire);
+              ILayer iLayer,
+              IWire iWire);
 
 
       /** @name Static instance getters
@@ -66,8 +66,8 @@ namespace Belle2 {
 
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
       static const CDCWire* getInstance(ISuperLayer iSuperLayer,
-                                        const ILayerType& iLayer,
-                                        const IWireType& iWire);
+                                        ILayer iLayer,
+                                        IWire iWire);
 
       /// Convinience getter for the wire from a hit object.
       static const CDCWire* getInstance(const CDCHit& hit);
@@ -122,17 +122,17 @@ namespace Belle2 {
        *   ranging from 0 - 319 for superlayer 6, \n
        *   ranging from 0 - 351 for superlayer 7, \n
        *   ranging from 0 - 383 for superlayer 8, */
-      IWireType getIWire() const { return getWireID().getIWire(); }
+      IWire getIWire() const { return getWireID().getIWire(); }
 
       /// Getter for the continious layer id
       /**  Gives the continious layer id ranging from 0 - 55. */
-      ILayerType getICLayer() const { return getWireID().getICLayer(); }
+      ILayer getICLayer() const { return getWireID().getICLayer(); }
 
       /// Getter for the layer id within its superlayer
       /**  Gives the layer id within its superlayer \n
        *   ranging from 0 - 7 for superlayer 0, \n
        *   ranging from 0 - 5 for superlayer 1 - 8. */
-      ILayerType getILayer() const { return getWireID().getILayer(); }
+      ILayer getILayer() const { return getWireID().getILayer(); }
 
 
       /// Getter for superlayer id.

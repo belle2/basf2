@@ -74,12 +74,12 @@ void CDCWireSuperLayer::initialize()
   m_outerRefZ = arcLength2DZLine.map(getOuterCylindricalR());
 }
 
-EWireNeighborKind CDCWireSuperLayer::getNeighborKind(const ILayerType& iLayer,
-                                                     const IWireType& iWire,
-                                                     const ILayerType& iOtherLayer,
-                                                     const IWireType& iOtherWire) const
+EWireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
+                                                     IWire iWire,
+                                                     ILayer iOtherLayer,
+                                                     IWire iOtherWire) const
 {
-  ILayerType iLayerDifference = iOtherLayer - iLayer;
+  ILayer iLayerDifference = iOtherLayer - iLayer;
 
   if (iLayerDifference == 0 and
       isValidILayer(iLayer)) {
@@ -139,7 +139,7 @@ EWireNeighborKind CDCWireSuperLayer::getNeighborKind(const ILayerType& iLayer,
 
 }
 
-CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsInwards(const ILayerType& iLayer, const IWireType& iWire) const
+CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsInwards(ILayer iLayer, IWire iWire) const
 {
 
   if (not isValidILayer(iLayer - 1)) return NeighborPair(nullptr , nullptr);
@@ -160,7 +160,7 @@ CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsInwards(const ILa
 
 }
 
-CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsOutwards(const ILayerType& iLayer, const IWireType& iWire) const
+CDCWireSuperLayer::NeighborPair CDCWireSuperLayer::getNeighborsOutwards(ILayer iLayer, IWire iWire) const
 {
 
   if (not isValidILayer(iLayer + 1)) return NeighborPair(nullptr, nullptr);

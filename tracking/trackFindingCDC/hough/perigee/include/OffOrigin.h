@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/topology/ILayerType.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -41,7 +41,7 @@ namespace Belle2 {
                                    const float& signedDriftLength,
                                    const float& dxdz = 0,
                                    const float& dydz = 0,
-                                   const ILayerType& /*iCLayer*/ = -1) const
+                                   ILayer /*iCLayer*/ = -1) const
       {
         return Super::getDistanceSign(houghBox,
                                       x - m_localOriginX,

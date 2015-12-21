@@ -121,7 +121,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCWire_stereoAngle)
 
   const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
-    const ILayerType iCLayer = wireLayer.getICLayer();
+    const ILayer iCLayer = wireLayer.getICLayer();
 
     const CDCWire& firstWire = wireLayer.first();
     tanThetaByICLayer[iCLayer] = firstWire.getTanStereoAngle();

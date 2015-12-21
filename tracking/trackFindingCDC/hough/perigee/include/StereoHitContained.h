@@ -154,7 +154,7 @@ namespace Belle2 {
         const Vector2D& pos2D = wire.getRefPos2D();
         //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
         const Vector2D& movePerZ = wire.getMovePerZ();
-        const ILayerType& iCLayer(wire.getICLayer());
+        ILayer iCLayer(wire.getICLayer());
         //B2INFO("movePerZ = " << movePerZ);
         const ESign distSign = this->getDistanceSign(houghBox,
                                                      pos2D.x(),  pos2D.y(),

@@ -29,7 +29,7 @@ CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
-    ILayerType iCLayer = wireLayer.getICLayer();
+    ILayer iCLayer = wireLayer.getICLayer();
     double cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
     double factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
 

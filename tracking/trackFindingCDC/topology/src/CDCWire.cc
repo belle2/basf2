@@ -26,8 +26,8 @@ CDCWire::CDCWire(const WireID& wireID)
 }
 
 CDCWire::CDCWire(ISuperLayer iSuperLayer,
-                 const ILayerType& iLayer,
-                 const IWireType&  iWire)
+                 ILayer iLayer,
+                 IWire  iWire)
   : m_wireID(iSuperLayer, iLayer, iWire),
     m_forwardPhiToRef(0.0),
     m_backwardPhiToRef(0.0),
@@ -48,8 +48,8 @@ const CDCWire* CDCWire::getInstance(const CDCWire& wire)
 }
 
 const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
-                                    const ILayerType& iLayer,
-                                    const IWireType& iWire)
+                                    ILayer iLayer,
+                                    IWire iWire)
 {
   return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire));
 }
@@ -74,8 +74,8 @@ void CDCWire::initialize()
 {
   CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
 
-  IWireType iWire = getIWire();
-  ILayerType iCLayer = getICLayer();
+  IWire iWire = getIWire();
+  ILayer iCLayer = getICLayer();
 
   Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire)};
   Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire)};
@@ -114,7 +114,7 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   bool inZ = getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
   if (not inZ) return false;
 
-  ILayerType iCLayer = getICLayer();
+  ILayer iCLayer = getICLayer();
   const CDCWireLayer& wireLayer = CDCWireTopology::getInstance().getWireLayer(iCLayer);
   const double innerCylindricalR = wireLayer.getInnerCylindricalR();
   const double outerCylindricalR = wireLayer.getOuterCylindricalR();
@@ -123,7 +123,7 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;
 
-  IWireType iWire = CDC::CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
+  IWire iWire = CDC::CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
   // Safety measure against error in the cellId function
   iWire %= wireLayer.size();
   bool inPhi = iWire == getIWire();

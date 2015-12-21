@@ -54,12 +54,12 @@ CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& en
   initialize();
 }
 
-const CDCWireLayer* CDCWireLayer::getInstance(const ILayerType& iCLayer)
+const CDCWireLayer* CDCWireLayer::getInstance(ILayer iCLayer)
 {
   return &(CDCWireTopology::getInstance().getWireLayer(iCLayer));
 }
 
-const CDCWireLayer* CDCWireLayer::getInstance(ISuperLayer iSuperLayer, const ILayerType& iLayer)
+const CDCWireLayer* CDCWireLayer::getInstance(ISuperLayer iSuperLayer, ILayer iLayer)
 {
   return &(CDCWireTopology::getInstance().getWireLayer(iSuperLayer, iLayer));
 }
@@ -67,7 +67,7 @@ const CDCWireLayer* CDCWireLayer::getInstance(ISuperLayer iSuperLayer, const ILa
 void CDCWireLayer::initialize()
 {
   size_t nWiresInLayer = size();
-  ILayerType iCLayer = getICLayer();
+  ILayer iCLayer = getICLayer();
 
   // values from CDCGeometryPar
   CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
@@ -142,7 +142,7 @@ void CDCWireLayer::initialize()
 
 const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const
 {
-  IWireType iWire = CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
+  IWire iWire = CDCGeometryPar::Instance().cellId(getICLayer(), pos3D);
   // Safety measure against error in the cellId function
   iWire %= size();
   return getWire(iWire);

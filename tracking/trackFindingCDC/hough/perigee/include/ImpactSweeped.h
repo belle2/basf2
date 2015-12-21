@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 #include <tracking/trackFindingCDC/hough/SweepBox.h>
 #include <tracking/trackFindingCDC/hough/SameSignChecker.h>
-#include <tracking/trackFindingCDC/topology/ILayerType.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -43,7 +43,7 @@ namespace Belle2 {
                                    const float& signedDriftLength,
                                    const float& dxdz = 0,
                                    const float& dydz = 0,
-                                   const ILayerType& iCLayer = -1) const
+                                   ILayer iCLayer = -1) const
       {
         const float& lowerImpact(houghBox.template getLowerBound<AImpact>());
         const float& upperImpact(houghBox.template getUpperBound<AImpact>());

@@ -199,7 +199,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCy
 
 void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
 {
-  ILayerType lastLayer = -1;
+  ILayer lastLayer = -1;
   Vector2D lastWirePosition;
 
   std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
@@ -213,10 +213,10 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
       currentTracklet = &(trackletList.back());
     }
 
-    const ILayerType currentLayer = recoHit.getWire().getICLayer();
+    const ILayer currentLayer = recoHit.getWire().getICLayer();
     const Vector2D& currentPosition = recoHit.getRecoPos2D();
     if (lastLayer != -1) {
-      const ILayerType delta = currentLayer - lastLayer;
+      const ILayer delta = currentLayer - lastLayer;
       const double distance = (currentPosition - lastWirePosition).norm();
       if (abs(delta) > 4 or distance > 50) {
         trackletList.emplace_back();

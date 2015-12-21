@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/DiscreteValue.h>
-#include <tracking/trackFindingCDC/topology/ILayerType.h>
+#include <tracking/trackFindingCDC/topology/ILayer.h>
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <array>
@@ -37,7 +37,7 @@ namespace Belle2 {
       { return m_curv; }
 
       /// Return the two dimensional arc length to the given layer id
-      float getArcLength2D(const ILayerType& iCLayer, bool secondArm = false) const
+      float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
       { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
 
       /// Output operator for debugging

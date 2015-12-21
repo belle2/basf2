@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -12,8 +12,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// The type of the wire ids enumerating wires within a given layer
-    using IWireType = signed short;
+    /// The type of the layer ids enumerating layers within a superlayer
+    using ILayer = signed short ;
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
+

@@ -59,6 +59,14 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             help='Geometry to be used with Genfit. If unset no fit is performed'
         )
 
+        argument_parser.add_argument(
+            '-so',
+            '--simulate-only',
+            action='store_true',
+            default=self.simulate_only,
+            dest='simulate_only',
+            help='Only generate and simulate the events, but do not run any tracking or validation code')
+
         return argument_parser
 
     @staticmethod
@@ -149,7 +157,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             # determine which sub-detector hits will be used
             tracking_coverage = self.determine_tracking_coverage(self.finder_module)
 
-            if tracking_coverage["UseCDCHits"]:
+            if tracking_coverage.get("UseCDCHits"):
                 main_path.add_module("WireHitTopologyPreparer")
 
             if self.finder_module == 'StandardReco':

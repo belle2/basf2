@@ -128,14 +128,6 @@ class ReadOrGenerateEventsRun(MinimalRun):
                  'Can be given multiple times.',
         )
 
-        argument_parser.add_argument(
-            '-so',
-            '--simulate-only',
-            action='store_true',
-            default=self.simulate_only,
-            dest='simulate_only',
-            help='Only generate and simulate the events, but do not run any tracking or validation code')
-
         return argument_parser
 
     def create_path(self):

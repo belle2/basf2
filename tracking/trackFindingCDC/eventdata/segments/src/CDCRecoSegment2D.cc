@@ -132,15 +132,15 @@ namespace {
     if (nFacets == 0) {
       //pass
     } else if (nFacets == 1) {
-      const CDCFacet* onlyFacet = facetSegment.front();
+      Ptr<const CDCFacet> onlyFacet{facetSegment.front()};
       result.push_back(onlyFacet->getStartRecoHit2D());
       result.push_back(onlyFacet->getMiddleRecoHit2D());
       result.push_back(onlyFacet->getEndRecoHit2D());
 
     } else if (nFacets == 2) {
       typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
-      const CDCFacet* firstFacet = *itFacet++;
-      const CDCFacet* secondFacet = *itFacet;
+      Ptr<const CDCFacet> firstFacet{*itFacet++};
+      Ptr<const CDCFacet> secondFacet{*itFacet};
 
       result.push_back(firstFacet->getStartRecoHit2D());
       result.push_back(CDCRecoHit2D::average(secondFacet->getStartRecoHit2D() ,
@@ -153,9 +153,9 @@ namespace {
 
     } else { // nFacets > 2
       typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
-      const CDCFacet* firstFacet  = *itFacet++;  // facetSegment[0];
-      const CDCFacet* secondFacet = *itFacet++;  // facetSegment[1];
-      const CDCFacet* thirdFacet  = *itFacet++;  // facetSegment[2];
+      Ptr<const CDCFacet> firstFacet{*itFacet++};   // facetSegment[0];
+      Ptr<const CDCFacet> secondFacet{*itFacet++};  // facetSegment[1];
+      Ptr<const CDCFacet> thirdFacet {*itFacet++};  // facetSegment[2];
 
       result.push_back(firstFacet->getStartRecoHit2D());
 
@@ -168,9 +168,9 @@ namespace {
 
       while (itFacet != facetSegment.end()) {
 
-        firstFacet = secondFacet;   //facetSegment[iFacet];
-        secondFacet = thirdFacet;   //facetSegment[iFacet+1];
-        thirdFacet = *itFacet++; //facetSegment[iFacet+2];
+        firstFacet = secondFacet;                   // facetSegment[iFacet];
+        secondFacet = thirdFacet;                   // facetSegment[iFacet+1];
+        thirdFacet = Ptr<const CDCFacet>(*itFacet++);  // facetSegment[iFacet+2];
 
         result.push_back(CDCRecoHit2D::average(firstFacet->getEndRecoHit2D(),
                                                secondFacet->getMiddleRecoHit2D(),

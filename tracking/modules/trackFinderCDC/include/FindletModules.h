@@ -39,8 +39,9 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitCreator>;
   public:
-    WireHitCreatorModule() : Super( {"CDCWireHitVector"}) {}
+    WireHitCreatorModule() : Super{{{"CDCWireHitVector"}}} {}
   };
+
 
   class WireHitTopologyFillerModule:
     public TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller> {
@@ -48,7 +49,7 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller>;
   public:
-    WireHitTopologyFillerModule() : Super( {"CDCWireHitVector"}) {}
+    WireHitTopologyFillerModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
   class SuperClusterCreatorModule :
@@ -57,7 +58,7 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SuperClusterCreator>;
   public:
-    SuperClusterCreatorModule() : Super( {"CDCWireHitVector", "CDCWireHitSuperClusterVector"}) {}
+    SuperClusterCreatorModule() : Super{{{"CDCWireHitVector", "CDCWireHitSuperClusterVector"}}} {}
   };
 
   class ClusterRefinerModule :
@@ -66,7 +67,7 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterRefiner<> >;
   public:
-    ClusterRefinerModule() : Super( {"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"}) {}
+    ClusterRefinerModule() : Super{{{"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"}}} {}
   };
 
   class ClusterBackgroundDetectorModule :
@@ -76,7 +77,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterBackgroundDetector<
                   TrackFindingCDC::ChooseableClusterFilter> >;
   public:
-    ClusterBackgroundDetectorModule() : Super( {"CDCWireHitClusterVector"}) {}
+    ClusterBackgroundDetectorModule() : Super{{{"CDCWireHitClusterVector"}}} {}
   };
 
   class FacetCreatorModule :
@@ -88,7 +89,7 @@ namespace Belle2 {
                   TrackFindingCDC::ChooseableFacetFilter> >;
 
   public:
-    FacetCreatorModule() : Super( {"CDCWireHitClusterVector", "CDCFacetVector"}) {}
+    FacetCreatorModule() : Super{{{"CDCWireHitClusterVector", "CDCFacetVector"}}} {}
   };
 
   class SegmentCreatorFacetAutomatonModule :
@@ -99,7 +100,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton<
                   TrackFindingCDC::ChooseableFacetRelationFilter> >;
 
-    SegmentCreatorFacetAutomatonModule() : Super( {"CDCFacetVector", "" /*to be set externally*/}) {}
+    SegmentCreatorFacetAutomatonModule() : Super{{{"CDCFacetVector", "" /*to be set externally*/}}} {}
   };
 
   class SegmentMergerModule :
@@ -124,7 +125,7 @@ namespace Belle2 {
   public:
     /// Type of the base class
     using Super =  TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth>;
-    SegmentCreatorMCTruthModule() : Super( {"CDCFacetVector", "CDCRecoSegment2DVector"}) {}
+    SegmentCreatorMCTruthModule() : Super{{{"CDCFacetVector", "CDCRecoSegment2DVector"}}} {}
   };
 
 

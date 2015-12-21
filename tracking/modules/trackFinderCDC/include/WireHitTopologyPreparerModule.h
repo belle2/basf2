@@ -27,7 +27,7 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyPreparer>;
   public:
-    WireHitTopologyPreparerModule() : Super( {"CDCWireHitVector"})
+    WireHitTopologyPreparerModule() : Super{{{"CDCWireHitVector"}}}
     {
       setPropertyFlags(c_ParallelProcessingCertified);
     }

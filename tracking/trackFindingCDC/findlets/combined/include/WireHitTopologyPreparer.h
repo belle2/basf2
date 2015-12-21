@@ -43,7 +43,7 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& = "") override
+      virtual void exposeParameters(ModuleParamList*, const std::string& = "") override
       {
         // Chose to not expose the parameters
       }

@@ -30,12 +30,6 @@ namespace Belle2 {
       }
     }
 
-    /// Adds a prefix and captialises the value if necessary to get a camelCase concatenated name.
-    inline std::string addPrefix(const std::string& prefix, const std::string& name)
-    {
-      return prefixed(prefix, name);
-    }
-
     /// Add quoting characters to a string.
     inline std::string quoted(std::string value)
     {

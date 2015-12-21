@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/tmva/Expert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
-#include <tracking/trackFindingCDC/utilities/AddPrefix.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -45,17 +45,17 @@ namespace Belle2 {
        */
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "")
       {
-        moduleParamList->addParameter(addPrefix(prefix, "cut"),
+        moduleParamList->addParameter(prefixed(prefix, "cut"),
                                       m_param_cut,
                                       "The cut value of the mva output below which the object is rejected",
                                       m_param_cut);
 
-        moduleParamList->addParameter(addPrefix(prefix, "weightFolder"),
+        moduleParamList->addParameter(prefixed(prefix, "weightFolder"),
                                       m_param_weightFolder,
                                       "The name of the folder to look for weight files from trainings",
                                       m_param_weightFolder);
 
-        moduleParamList->addParameter(addPrefix(prefix, "trainingName"),
+        moduleParamList->addParameter(prefixed(prefix, "trainingName"),
                                       m_param_trainingName,
                                       "The name of the training that should be used for the prediction",
                                       m_param_trainingName);

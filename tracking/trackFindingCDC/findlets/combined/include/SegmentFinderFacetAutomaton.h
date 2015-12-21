@@ -75,10 +75,10 @@ namespace Belle2 {
         {
           m_superClusterCreator.exposeParameters(moduleParamList, prefix);
           m_clusterRefiner.exposeParameters(moduleParamList, prefix);
-          m_clusterBackgroundDetector.exposeParameters(moduleParamList, addPrefix(prefix, "Cluster"));
-          m_facetCreator.exposeParameters(moduleParamList, addPrefix(prefix, "Facet"));
-          m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, addPrefix(prefix, "FacetRelation"));
-          m_segmentMerger.exposeParameters(moduleParamList, addPrefix(prefix, "Segemnt"));
+          m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
+          m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
+          m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
+          m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "Segemnt"));
           // FIXME : make parameter names small
 
           m_segmentFitter.exposeParameters(moduleParamList, prefix);

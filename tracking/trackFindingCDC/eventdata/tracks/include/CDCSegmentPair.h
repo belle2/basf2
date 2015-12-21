@@ -58,17 +58,6 @@ namespace Belle2 {
 
 
 
-      /// Allow automatic taking of the address.
-      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms
-       *  that work for objects and poiinters alike without code duplication.
-       *  \note Once reference qualifiers become available use an & after the trailing const
-       *  to constrain the cast to lvalues.*/
-      operator const Belle2::TrackFindingCDC::CDCSegmentPair* () const
-      { return this; }
-
-
-
       /// Checks if both stored segments are not nullptr. Returns true if check is succeded.
       bool checkSegmentsNonNullptr() const
       { return getStartSegment() != nullptr and getEndSegment() != nullptr; }

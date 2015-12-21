@@ -83,9 +83,9 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             is_background=is_background,
             is_ghost=is_ghost,
             is_clone_or_match=(is_matched or is_clone),
-            is_fake = not (is_matched or is_clone),
-            hit_efficiency = trackMatchLookUp.getRelatedEfficiency(track_cand),
-            hit_purity = trackMatchLookUp.getRelatedPurity(track_cand),
+            is_fake=not (is_matched or is_clone),
+            hit_efficiency=trackMatchLookUp.getRelatedEfficiency(track_cand),
+            hit_purity=trackMatchLookUp.getRelatedPurity(track_cand),
         )
 
     # Refiners to be executed on terminate #
@@ -184,7 +184,7 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
         trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
 
         # Building the confusion matrix once more :-)
-        list_of_connected_mc_tracks = set()
+        list_of_connected_mc_tracks = []
         list_of_numbers_of_hits_for_connected_tracks = []
         number_of_connected_tracks = 0
         number_of_wrong_hits = 0
@@ -195,7 +195,7 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
             mcTrackCand = mcTrackCands[mc_track_id]
             length_of_intersection = len(mcTrackCandHits & trackCandHits)
             if length_of_intersection > 0:
-                list_of_connected_mc_tracks.add(mcTrackCand)
+                list_of_connected_mc_tracks.append(mcTrackCand)
                 list_of_numbers_of_hits_for_connected_tracks.append(length_of_intersection)
 
         if len(list_of_numbers_of_hits_for_connected_tracks) == 0:

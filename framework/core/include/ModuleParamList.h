@@ -106,6 +106,32 @@ namespace Belle2 {
     /** Set values for parameters from other parameter list. */
     void setParameters(const ModuleParamList& params);
 
+    /**
+     * Returns the names of all parameters in this parameter list.
+     *
+     * @return The names of the parameters
+     */
+    std::vector<std::string> getParameterNames() const;
+
+    /**
+     * Returns the description of a parameter given by its name.
+     *
+     * Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
+     *
+     * @param name The unique name of the parameter.
+     * @return The description of the parameter as string
+     */
+    std::string getParameterDescription(const std::string& name) const;
+
+    /**
+     * Returns the type info of a parameter given by its name.
+     *
+     * Throws an exception of type ModuleParameterNotFoundError if a parameter with the given name does not exist.
+     *
+     * @param name The unique name of the parameter.
+     * @return The type information as descriptive string
+     */
+    std::string getParameterTypeInfo(const std::string& name) const;
 
     /**
      * Returns a reference to a parameter. The returned parameter has already the correct type.

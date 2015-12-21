@@ -70,6 +70,29 @@ void ModuleParamList::setParameters(const ModuleParamList& params)
   }
 }
 
+
+std::vector<std::string> ModuleParamList::getParameterNames() const
+{
+  std::vector<std::string> names;
+  names.reserve(m_paramMap.size());
+  for (const auto& nameAndParam : m_paramMap) {
+    names.push_back(nameAndParam.first);
+  }
+  return names;
+}
+
+std::string ModuleParamList::getParameterDescription(const std::string& name) const
+{
+  return getParameterPtr(name)->getDescription();
+}
+
+std::string ModuleParamList::getParameterTypeInfo(const std::string& name) const
+{
+  return getParameterPtr(name)->getTypeInfo();
+}
+
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

@@ -59,7 +59,7 @@ namespace Belle2 {
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(const WeightedRelation<T>& weightedRelation,
                             AsPtr<T> ptr)
-      { return weightedRelation.getFrom() <  ptr; }
+      { return weightedRelation.getFrom() < ptr; }
 
       /// Operator for easy unpacking of the relation destination
       operator AsPtr<T> () const
@@ -67,7 +67,7 @@ namespace Belle2 {
 
       /// Getter for the pointer to the from side object
       AsPtr<T> getFrom() const
-      { return this->first; }
+      { return AsPtr<T>(this->first); }
 
       /// Getter for the pointer to the weighted from side object
       const WithWeight<AsPtr<T> >& getWeightedFrom() const

@@ -140,7 +140,7 @@ void CDCMCTrackStore::fillMCSegments()
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
     for (WithAutomatonCell<const CDCHit*>& hitWithCell : hitsWithCells) {
-      const CDCHit* ptrHit = hitWithCell;
+      const CDCHit* ptrHit(hitWithCell);
       const CDCHit& hit = *ptrHit;
 
       WireID wireID(hit.getISuperLayer(),
@@ -149,7 +149,7 @@ void CDCMCTrackStore::fillMCSegments()
 
       for (WithAutomatonCell<const CDCHit*>& neighborHitWithCell : hitsWithCells) {
 
-        const CDCHit* ptrNeighborHit = neighborHitWithCell;
+        const CDCHit* ptrNeighborHit(neighborHitWithCell);
         if (ptrHit == ptrNeighborHit) continue;
 
         const CDCHit& neighborHit = *ptrNeighborHit;
@@ -178,7 +178,7 @@ void CDCMCTrackStore::fillMCSegments()
       CDCHitVector mcSegment;
       mcSegment.reserve(hitCluster.size());
       for (WithAutomatonCell<const CDCHit*>* hitWithCell : hitCluster) {
-        const CDCHit* hit = *hitWithCell;
+        const CDCHit* hit(*hitWithCell);
         mcSegment.push_back(hit);
       }
       arrangeMCTrack(mcSegment);

@@ -230,8 +230,9 @@ namespace Belle2 {
               assert(childNode.size() == 0);
               auto measure =
 
-              [&childNode, &weightItemInDomain](WithSharedMark<T>& item) -> Weight {
+              [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> Weight {
                 // Weighting function should not see the mark, but only the item itself.
+                T & item(markableItem);
                 return weightItemInDomain(item, &childNode);
               };
               childNode.insert(*node, measure);
@@ -249,8 +250,8 @@ namespace Belle2 {
       {
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
-          auto isMarked = [](const WithSharedMark<T>& item) -> bool {
-            return item.isMarked();
+          auto isMarked = [](const WithSharedMark<T>& markableItem) -> bool {
+            return markableItem.isMarked();
           };
           node->eraseIf(isMarked);
           return node->getWeight();

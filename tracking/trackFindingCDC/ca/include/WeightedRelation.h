@@ -16,7 +16,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type for two related objects of the same type.
+    /// Type for two related objects of the same type with a weight.
     template<class T, template<class> class AsPtr = Star>
     class WeightedRelation
       : public std::pair<WithWeight<AsPtr<T> >, AsPtr<T> > {
@@ -83,5 +83,5 @@ namespace Belle2 {
 
     };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  } // namespace TrackFindingCDC
+} // namespace Belle2

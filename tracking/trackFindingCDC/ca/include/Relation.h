@@ -9,14 +9,48 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Star.h>
 #include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for two related objects of the same type.
-    template<class AObject>
-    using Relation = std::pair<AObject*, AObject*>;
+    template<class T, template<class> class AsPtr = Star>
+    class Relation
+      : public std::pair<AsPtr<T>, AsPtr<T> > {
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    private:
+      /// Type of the base class
+      using Super = std::pair<AsPtr<T>, AsPtr<T> >;
+
+    public:
+      /// Make the constructor of the base type available
+      using Super::Super;
+
+      /// Operator to compare key type item to the relations for assoziative lookups.
+      friend bool operator<(AsPtr<T> ptr,
+                            const Relation<T>& relation)
+      { return ptr < relation.getFrom(); }
+
+      /// Operator to compare key type item to the relations for assoziative lookups.
+      friend bool operator<(const Relation<T>& relation,
+                            AsPtr<T> ptr)
+      { return relation.getFrom() < ptr; }
+
+      /// Operator for easy unpacking of the relation destination
+      operator AsPtr<T> () const
+      { return this->second; }
+
+      /// Getter for the pointer to the from side object
+      AsPtr<T> getFrom() const
+      { return this->first; }
+
+      /// Getter for the pointer to the to side object
+      AsPtr<T> getTo() const
+      { return this->second; }
+
+    };
+
+  } // namespace TrackFindingCDC
+} // namespace Belle2

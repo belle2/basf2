@@ -43,36 +43,31 @@ namespace Belle2 {
       /// Type mapping names to filter parameter values
       using FilterParamMap = std::map<std::string, FilterParamVariant>;
 
+      /// A helper class to unpack a boost::variant parameter value and set it in the parameter list.
       class SetParameterVisitor : public boost::static_visitor<> {
       public:
-        SetParameterVisitor(AFilter* filter,
-                            ModuleParamList* moduleParamList,
+        /**
+         * Constructor taking the module parameter list and the name of the parameter to be set from the boost::variant.
+         */
+        SetParameterVisitor(ModuleParamList* moduleParamList,
                             std::string paramName)
-          : m_filter(filter),
-            m_moduleParamList(moduleParamList),
+          : m_moduleParamList(moduleParamList),
             m_paramName(paramName)
         {}
 
-        void operator()(const std::string& t) const
-        {
-          B2INFO("Received " << PyObjConvUtils::Type<std::string>::name() << " " << t);
-          try {
-            m_moduleParamList->getParameter<std::string>(m_paramName).setDefaultValue(t);
-          } catch (...) {
-            m_filter->setParameter(m_paramName, t);
-          }
-        }
-
+        /// Function call that receives the parameter value from the boost::variant with the correct type.
         template<class T>
         void operator()(const T& t) const
         {
-          B2INFO("Received " << PyObjConvUtils::Type<T>::name());
+          B2DEBUG(200, "Received parameter of type" << PyObjConvUtils::Type<T>::name());
           m_moduleParamList->getParameter<T>(m_paramName).setDefaultValue(t);
         }
 
       private:
-        AFilter* m_filter;
+        /// Parameter list which contains the parameter to be set
         ModuleParamList* m_moduleParamList;
+
+        /// Name of the parameter to be set.
         std::string m_paramName;
       };
 
@@ -194,12 +189,10 @@ namespace Belle2 {
           continue;
         }
 
-        /// Old style
-        std::map<std::string, std::string> filterParameters = filter->getParameterDescription();
-
-        /// New Style
         ModuleParamList moduleParamList;
         filter->exposeParameters(&moduleParamList);
+
+        std::map<std::string, std::string> filterParameters;
         for (auto && name : moduleParamList.getParameterNames()) {
           filterParameters[name] = moduleParamList.getParameterDescription(name);
         }
@@ -248,7 +241,7 @@ namespace Belle2 {
       for (auto& nameAndValue : m_filterParameters) {
         const std::string paramName = nameAndValue.first;
         const FilterParamVariant& value = nameAndValue.second;
-        boost::apply_visitor(SetParameterVisitor(ptrFilter.get(), &moduleParamList, paramName), value);
+        boost::apply_visitor(SetParameterVisitor(&moduleParamList, paramName), value);
       }
       return std::move(ptrFilter);
 

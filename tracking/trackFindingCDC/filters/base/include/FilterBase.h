@@ -37,33 +37,6 @@ namespace Belle2 {
       {
       }
 
-      /** Set a map of parameter key and string values.
-       *  Meaning depends on the specific filter class implementation.
-       */
-      void setParameters(const std::map<std::string, std::string>& parameterMap)
-      {
-        for (const std::pair<std::string, std::string>& keyValue : parameterMap) {
-          setParameter(keyValue.first, keyValue.second);
-        }
-      }
-
-      /** Sets the parameter of key to the given value.
-       *  Base implementation emits a warning for each parameter that is given to it.
-       *  Derived class should forward parameters to their superclass if they do not expect them,
-       *  such that unexpected parameters propagate to this method.*/
-      virtual void setParameter(const std::string& key, const std::string& value)
-      {
-        // Base has no parameters.
-        B2WARNING("Filter received unexpected parameter " << key << " = " << value);
-      }
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual std::map<std::string, std::string> getParameterDescription()
-      {
-        return std::map<std::string, std::string>();
-      }
-
       /// Indicates if the filter requires Monte Carlo information.
       virtual bool needsTruthInformation()
       {

@@ -43,10 +43,10 @@ CDCTangent::CDCTangent(const CDCRLTaggedWireHit& fromRLWireHit,
 
 void CDCTangent::adjustLine()
 {
-  m_line  = constructTouchingLine(getFromWireHit().getRefPos2D(),
-                                  getFromRLInfo() * getFromWireHit().getRefDriftLength() ,
-                                  getToWireHit().getRefPos2D(),
-                                  getToRLInfo() * getToWireHit().getRefDriftLength());
+  m_line = ParameterLine2D::touchingCircles(getFromWireHit().getRefPos2D(),
+                                            getFromRLInfo() * getFromWireHit().getRefDriftLength(),
+                                            getToWireHit().getRefPos2D(),
+                                            getToRLInfo() * getToWireHit().getRefDriftLength());
 }
 
 void CDCTangent::adjustRLInfo()
@@ -73,26 +73,4 @@ CDCTangent CDCTangent::reversed() const
 {
   return CDCTangent(CDCRLWireHitPair::reversed(),
                     ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
-}
-
-ParameterLine2D CDCTangent::constructTouchingLine(const Vector2D& fromCenter,
-                                                  const double fromSignedRadius,
-                                                  const Vector2D& toCenter,
-                                                  const double toSignedRadius)
-{
-  Vector2D connecting = toCenter - fromCenter;
-
-  //Normalize to the coordinate system vector, but keep the original norm
-  const double norm = connecting.normalize();
-
-  double kappa = (fromSignedRadius - toSignedRadius) / norm;
-  double cokappa = sqrt(1 - kappa * kappa);
-
-  Vector2D fromPos = Vector2D(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
-  fromPos += fromCenter;
-
-  Vector2D toPos   = Vector2D(connecting, kappa * toSignedRadius,   cokappa * toSignedRadius);
-  toPos += toCenter;
-
-  return ParameterLine2D::throughPoints(fromPos, toPos);
 }

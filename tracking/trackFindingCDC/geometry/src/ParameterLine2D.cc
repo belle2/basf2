@@ -7,9 +7,30 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
+                                                 const double fromSignedRadius,
+                                                 const Vector2D& toCenter,
+                                                 const double toSignedRadius)
+{
+  Vector2D connecting = toCenter - fromCenter;
+
+  //Normalize to the coordinate system vector, but keep the original norm
+  const double norm = connecting.normalize();
+
+  double kappa = (fromSignedRadius - toSignedRadius) / norm;
+  double cokappa = sqrt(1 - kappa * kappa);
+
+  Vector2D fromPos = Vector2D(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
+  fromPos += fromCenter;
+
+  Vector2D toPos   = Vector2D(connecting, kappa * toSignedRadius,   cokappa * toSignedRadius);
+  toPos += toCenter;
+
+  return ParameterLine2D::throughPoints(fromPos, toPos);
+}

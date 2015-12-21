@@ -35,18 +35,6 @@ namespace Belle2 {
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
     class CDCTangent : public CDCRLWireHitPair {
     public:
-      /// Constructs a line touching two circles in one point each.
-      /** @param[in] fromCenter first circle center
-       *  @param[in] fromSignedRadius radius of the first circle multiplied with the right left passage information
-       *  @param[in] toCenter second circle center
-       *  @param[in] toSignedRadius radius of the first circle multiplied with the right left passage information.
-       *  @return the line being tangential to both circles.
-       *  Note : the touch points reside at(0) for the first and at(1) for the second */
-      static ParameterLine2D constructTouchingLine(const Vector2D& fromCenter,
-                                                   const double fromSignedRadius,
-                                                   const Vector2D& toCenter,
-                                                   const double toSignedRadius);
-
       /// Construct a tangent from a pair of oriented wire hits.
       explicit CDCTangent(const CDCRLWireHitPair& rlWireHitPair);
 

@@ -52,22 +52,22 @@ CDCFacet CDCFacet::reversed() const
 void CDCFacet::adjustLines() const
 {
   m_startToMiddle =
-    CDCTangent::constructTouchingLine(getStartWireHit().getRefPos2D(),
-                                      getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                                      getMiddleWireHit().getRefPos2D(),
-                                      getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength());
+    ParameterLine2D::touchingCircles(getStartWireHit().getRefPos2D(),
+                                     getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
+                                     getMiddleWireHit().getRefPos2D(),
+                                     getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength());
 
   m_startToEnd =
-    CDCTangent::constructTouchingLine(getStartWireHit().getRefPos2D(),
-                                      getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
-                                      getEndWireHit().getRefPos2D(),
-                                      getEndRLInfo() * getEndWireHit().getRefDriftLength());
+    ParameterLine2D::touchingCircles(getStartWireHit().getRefPos2D(),
+                                     getStartRLInfo() * getStartWireHit().getRefDriftLength() ,
+                                     getEndWireHit().getRefPos2D(),
+                                     getEndRLInfo() * getEndWireHit().getRefDriftLength());
 
   m_middleToEnd =
-    CDCTangent::constructTouchingLine(getMiddleWireHit().getRefPos2D(),
-                                      getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
-                                      getEndWireHit().getRefPos2D(),
-                                      getEndRLInfo() * getEndWireHit().getRefDriftLength());
+    ParameterLine2D::touchingCircles(getMiddleWireHit().getRefPos2D(),
+                                     getMiddleRLInfo() * getMiddleWireHit().getRefDriftLength() ,
+                                     getEndWireHit().getRefPos2D(),
+                                     getEndRLInfo() * getEndWireHit().getRefDriftLength());
 }
 
 void CDCFacet::invalidateLines()

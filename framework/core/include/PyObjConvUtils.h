@@ -17,6 +17,8 @@
 #include <boost/python/dict.hpp>
 #include <boost/python/extract.hpp>
 
+#include <boost/variant.hpp>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -38,6 +40,22 @@ namespace Belle2 {
      * We need forward declarations here, because otherwise the compiler ends up calling
      * the wrong function!
      */
+    bool checkPythonObject(const boost::python::object& pyObject, bool);
+    bool checkPythonObject(const boost::python::object& pyObject, float);
+    bool checkPythonObject(const boost::python::object& pyObject, double);
+    bool checkPythonObject(const boost::python::object& pyObject, int);
+    bool checkPythonObject(const boost::python::object& pyObject, unsigned int);
+    bool checkPythonObject(const boost::python::object& pyObject, unsigned long int);
+    bool checkPythonObject(const boost::python::object& pyObject, const std::string&);
+    template<typename Key, typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>&);
+    template<typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>&);
+    template<typename... Types>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>&);
+    template<typename... Types>
+    bool checkPythonObject(const boost::python::object& pyObject, const boost::variant<Types...>&);
+
     template<typename Scalar>
     Scalar convertPythonObject(const boost::python::object& pyObject, Scalar defaultValue);
     template<typename Key, typename Value>
@@ -46,6 +64,9 @@ namespace Belle2 {
     std::vector<Value> convertPythonObject(const boost::python::object& pyObject, std::vector<Value> defaultValue);
     template<typename... Types>
     std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, std::tuple<Types...>);
+    template<typename... Types>
+    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject, boost::variant<Types...>);
+
     template<typename Scalar>
     boost::python::object convertToPythonObject(const Scalar& value);
     template<typename Value>
@@ -54,11 +75,14 @@ namespace Belle2 {
     boost::python::dict convertToPythonObject(const std::map<Key, Value>& map);
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple);
+    template<typename... Types>
+    boost::python::object convertToPythonObject(const boost::variant<Types...>& tuple);
 
     template<typename T> struct Type;
     template<typename T> struct Type<std::vector<T> >;
     template<typename A, typename B> struct Type<std::map<A, B> >;
     template<typename... Types> struct Type<std::tuple<Types...> >;
+    template<typename... Types> struct Type<boost::variant<Types...> >;
     template<> struct Type<int>;
     template<> struct Type<bool>;
     template<> struct Type<float>;
@@ -105,6 +129,139 @@ namespace Belle2 {
 
     /** Converts a template argument into a string for corresponding Python type. */
     template<typename... Types> struct Type<std::tuple<Types...> > { /** type name. */ static std::string name() { return std::string("tuple(") + VariadicType<Types...>::name() + ")"; } };
+
+    /** Converts a template argument into a string for corresponding Python type. */
+    template<typename... Types> struct Type<boost::variant<Types...> > { /** type name. */ static std::string name() { return std::string("variant(") + VariadicType<Types...>::name() + ")"; } };
+
+
+    /// Helper construct for TMP that provides an index at compile time to recurse through type lists.
+    template < size_t > struct SizeT { };
+
+    /**
+     * --------------- Check python objects for exact type match ------------------------
+     */
+
+    /// Check if the python object is a boolean
+    inline bool checkPythonObject(const boost::python::object& pyObject, bool /*dispatch tag*/)
+    {
+      return PyBool_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is an integral number
+    inline bool checkPythonObject(const boost::python::object& pyObject, int /*dispatch tag*/)
+    {
+      return PyLong_Check(pyObject.ptr());
+    }
+    /// Check if the python object is an integral number
+    inline bool checkPythonObject(const boost::python::object& pyObject, unsigned int /*dispatch tag*/)
+    {
+      return PyLong_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is an integral number
+    inline bool checkPythonObject(const boost::python::object& pyObject, unsigned long int /*dispatch tag*/)
+    {
+      return PyLong_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is a float number
+    inline bool checkPythonObject(const boost::python::object& pyObject, float /*dispatch tag*/)
+    {
+      return PyNumber_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is a float number
+    inline bool checkPythonObject(const boost::python::object& pyObject, double /*dispatch tag*/)
+    {
+      return PyFloat_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is a string
+    inline bool checkPythonObject(const boost::python::object& pyObject, const std::string& /*dispatch tag*/)
+    {
+      return PyUnicode_Check(pyObject.ptr());
+    }
+
+    /// Check if the python object is a mapping of the correct key and value types
+    template<typename Key, typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::map<Key, Value>& /*dispatch tag*/)
+    {
+      if (not PyDict_Check(pyObject.ptr())) return false;
+      const boost::python::dict& pyDict = static_cast<const boost::python::dict&>(pyObject);
+      boost::python::list keys = pyDict.keys();
+      boost::python::list values = pyDict.values();
+      for (int i = 0; i < boost::python::len(keys); ++i) {
+        if (not checkPythonObject(keys[i], Key())) return false;
+        if (not checkPythonObject(values[i], Value())) return false;
+      }
+      return true;
+    }
+
+    /// Check if the python object is a list of objects of the correct value type
+    template<typename Value>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::vector<Value>& /*dispatch tag*/)
+    {
+      if (not PyList_Check(pyObject.ptr())) return false;
+      const boost::python::list& pyList = static_cast<const boost::python::list&>(pyObject);
+      for (int i = 0; i < boost::python::len(pyList); ++i) {
+        if (not checkPythonObject(pyList[i], Value())) return false;
+      }
+      return true;
+    }
+
+    /// Recursion sentinal for the case that all element checks succeeded.
+    template<typename TupleType>
+    bool CheckTuple(const TupleType&, const boost::python::tuple&, SizeT<0>)
+    {
+      return true;
+    }
+
+    /// Recursion through the tuple checking the element at position N - 1.
+    template<typename... Types, size_t N>
+    bool CheckTuple(const std::tuple<Types...>& tuple, const boost::python::tuple& pyTuple, SizeT<N>)
+    {
+      using Scalar = typename std::tuple_element < N - 1, std::tuple<Types...> >::type;
+      if (not checkPythonObject(pyTuple[N - 1] , Scalar())) return false;
+      return CheckTuple(tuple, pyTuple, SizeT < N - 1 > ());
+    }
+
+    /// Check if the python object is a tuple of objects of the correct types
+    template<typename... Types>
+    bool checkPythonObject(const boost::python::object& pyObject, const std::tuple<Types...>& tuple)
+    {
+      if (not PyTuple_Check(pyObject.ptr())) return false;
+      const boost::python::tuple& pyTuple = static_cast<const boost::python::tuple&>(pyObject);
+      return CheckTuple(tuple, pyTuple, SizeT<sizeof...(Types)>());
+    }
+
+    /// Recursion sentinal for the case that all former type checks failed for the variant.
+    template<typename VariantType>
+    bool CheckVariant(const VariantType&,
+                      const boost::python::object&,
+                      SizeT<0>)
+    {
+      return false;
+    }
+
+    /// Recursion through the variant types checking the python object for the type at position N - 1.
+    template<typename... Types, size_t N>
+    bool CheckVariant(const boost::variant<Types...>& variant,
+                      const boost::python::object& pyObject,
+                      SizeT<N>)
+    {
+      using Scalar = typename std::tuple_element < N - 1, std::tuple<Types...> >::type;
+      if (checkPythonObject(pyObject , Scalar())) {
+        return true;
+      }
+      return CheckVariant(variant, pyObject, SizeT < N - 1 > ());
+    }
+
+    /// Check if the python object is a tuple of objects of the correct types
+    template<typename... Types>
+    bool checkPythonObject(const boost::python::object& pyObject, const boost::variant<Types...> variant)
+    {
+      return CheckVariant(variant, pyObject, SizeT<sizeof...(Types)>());
+    }
 
     /**
      * --------------- From C++ TO Python Converter ------------------------
@@ -162,8 +319,6 @@ namespace Belle2 {
      * The variadic template std::tuple is copied by rthe ecursive defined template function GetTuple,
      * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
      */
-
-    template < size_t > struct SizeT { };
     template < typename TupleType >
     inline void GetTuple(const TupleType& tuple, boost::python::list& pyList)
     {
@@ -185,7 +340,7 @@ namespace Belle2 {
      * Writes content of a std::tuple to a python tuple.
      *
      * @param tuple The tuple whose items should be stored to a python tuple.
-     * @return tuple The python tuple where the the content of the map is stored.
+     * @return The python tuple where the the content of the map is stored.
      */
     template<typename... Types>
     boost::python::tuple convertToPythonObject(const std::tuple<Types...>& tuple)
@@ -194,6 +349,30 @@ namespace Belle2 {
       GetTuple(tuple, outputList);
       boost::python::tuple outputTuple(outputList);
       return outputTuple;
+    }
+
+    /**
+     * Helper function object to unpack a value from a variant to a python object
+     */
+    class convertToPythonObjectVisitor : public boost::static_visitor<boost::python::object> {
+    public:
+      template<class T>
+      boost::python::object operator()(const T& value) const
+      {
+        return convertToPythonObject(value);
+      }
+    };
+
+    /**
+     * Writes content of a boost::variant to a python object.
+     *
+     * @param var The variant whose content should be stored in a python object.
+     * @return The python object where the the content of the map is stored.
+     */
+    template<typename... Types>
+    boost::python::object convertToPythonObject(const boost::variant<Types...>& variant)
+    {
+      return boost::apply_visitor(convertToPythonObjectVisitor(), variant);
     }
 
     /**
@@ -260,7 +439,6 @@ namespace Belle2 {
     template<typename Key, typename Value>
     std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value>)
     {
-
       std::map<Key, Value> tmpMap;
       const boost::python::dict& pyDict = static_cast<const boost::python::dict&>(pyObject);
       boost::python::list keys = pyDict.keys();
@@ -287,8 +465,9 @@ namespace Belle2 {
     {
       static const unsigned N = std::tuple_size<TupleType>::value;
       if ((unsigned)boost::python::len(pyTuple) != N) {
-        throw std::runtime_error(std::string("Given python tuple has length ") + std::to_string(boost::python::len(
-                                   pyTuple)) + ", expected " + std::to_string(N));
+        throw std::runtime_error(std::string("Given python tuple has length ") +
+                                 std::to_string(boost::python::len(pyTuple)) +
+                                 ", expected " + std::to_string(N));
       }
       SetTuple(tuple, pyTuple, SizeT<N>());
     }
@@ -319,8 +498,56 @@ namespace Belle2 {
       SetTuple(tmpTuple, pyTuple);
       return tmpTuple;
     }
-  }
 
+    /**
+     * @{
+     * TMP (Template Meta Programming )
+     * The given python object is written into the given c++ boost variant.
+     * To fill the C++ boost::variant we need again TMP methods.
+     * The variadic template boost::variant is filled by the recursive defined template function SetVariant,
+     * the overloaded argument (type SizeT<>) of the function serves as a counter for the recursion depth.
+     */
+    template <typename... Types>
+    inline void SetVariant(boost::variant<Types...>&, const boost::python::object& pyObject, SizeT<0>)
+    {
+      throw std::runtime_error(std::string("Could not set module parameter: Expected type '") +
+                               Type<boost::variant<Types...> >::name() + "' instead of '" +
+                               pyObject.ptr()->ob_type->tp_name + "'.");
+    }
+
+    template < typename... Types, size_t N >
+    inline void SetVariant(boost::variant<Types...>& variant, const boost::python::object& pyObject, SizeT<N>)
+    {
+      using Scalar = typename std::tuple_element < N - 1, std::tuple<Types...> >::type;
+      if (checkPythonObject(pyObject, Scalar())) {
+        try {
+          Scalar value = convertPythonObject(pyObject, Scalar());
+          variant = value;
+          return;
+        } catch (std::runtime_error& e) {
+        }
+      }
+      // Conversion failed - try next type
+      SetVariant(variant, pyObject, SizeT < N - 1 > ());
+    }
+    /** @} */
+
+    /**
+     * Reads boost::variant from a python object.
+     *
+     * @param pyObject Python object which stores the value.
+     * @param boost::variant<Types... > dummy allows the compiler to infer the correct template.
+     * @return boost::variant<Types...>, which holds the value from the python object
+     */
+    template<typename... Types>
+    boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject,
+                                                 boost::variant<Types...>)
+    {
+      boost::variant<Types...> tmpVariant;
+      SetVariant(tmpVariant, pyObject, SizeT<sizeof...(Types)>());
+      return tmpVariant;
+    }
+  }
 }
 
 #endif /* PYOBJCONVUTILS_H_ */

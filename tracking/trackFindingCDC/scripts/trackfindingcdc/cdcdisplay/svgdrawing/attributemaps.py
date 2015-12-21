@@ -172,7 +172,7 @@ class RLColorMap(CDCHitColorMap):
         if rlInfo == 1:
             # Right
             return 'green'
-        elif rlInfo == -1:
+        elif rlInfo == -1 or rlInfo == 65535:  # <- The root interface mistakes the signed enum value for an unsigned value
             # Left
             return 'red'
         else:
@@ -624,7 +624,7 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
         fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(segment)
         if fbInfo == 1:
             return 'green'
-        elif fbInfo == -1:
+        elif fbInfo == -1 or fbInfo == 65535:  # <- The root interface mistakes the signed enum value for an unsigned value
             return 'red'
         else:
             print('Segment not orientable to match track')

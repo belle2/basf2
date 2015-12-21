@@ -67,8 +67,8 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   CDCTrajectory2D& axialFit =  axialSegment.getTrajectory2D();
   // CDCTrajectory2D& stereoFit = stereoSegment.getTrajectory2D();
 
-  ISuperLayerType startFitISuperLayer = startFit.getStartISuperLayer();
-  ISuperLayerType endFitISuperLayer = endFit.getStartISuperLayer();
+  ISuperLayer startFitISuperLayer = startFit.getStartISuperLayer();
+  ISuperLayer endFitISuperLayer = endFit.getStartISuperLayer();
 
   var<named("start_fit_superlayer_id")>() = startFitISuperLayer;
   var<named("end_fit_superlayer_id")>() = endFitISuperLayer;

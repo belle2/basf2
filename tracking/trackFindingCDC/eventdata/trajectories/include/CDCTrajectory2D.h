@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
 #include <tracking/trackFindingCDC/geometry/WireLine.h>
@@ -163,39 +163,41 @@ namespace Belle2 {
       { return getStartUnitMom2D().dot(getLocalOrigin()) > 0; }
 
     private:
-      /// Indicates which superlayer is traversed after the given one, considering if you want to follow the trajectory in the forward or backward direction and if the trajectory is currently moving outward or inward (interpreted in the forward direction) or might curling back in the current layer.
-      ISuperLayerType getISuperLayerAfter(const ISuperLayerType& fromISuperLayer,
-                                          bool movingOutward,
-                                          const EForwardBackward forwardBackwardInfo) const;
-      /// Indicates which superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
+      /// Returns which superlayer is traversed after the current one following the trajectory outward or inward as indicated by the boolean input.
+      ISuperLayer getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const;
+
+      /// Returns which superlayer is traversed after the current one following the trajectory outward or inward as indicated by the boolean input.
+      ISuperLayer getISuperLayerAfterStart(bool movingOutward) const;
+
+      /// Indicates which superlayer is traversed after the current one following the trajectory forward or backward as indicated by the input.
+      ISuperLayer getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
       /// Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
-      ISuperLayerType getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
+      ISuperLayer getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
     public:
       /// Indicates which superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
-      ISuperLayerType getNextISuperLayer() const;
+      ISuperLayer getNextISuperLayer() const;
 
       /// Indicates which superlayer the trajectory traverses before the one, where the start point of the trajectory is located.
-      ISuperLayerType getPreviousISuperLayer() const;
+      ISuperLayer getPreviousISuperLayer() const;
 
       /// Indicates which axial superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
-      ISuperLayerType getNextAxialISuperLayer() const;
+      ISuperLayer getNextAxialISuperLayer() const;
 
       /// Indicates which axial superlayer the trajectory traverses before the one, where the start point of the trajectory is located.
-      ISuperLayerType getPreviousAxialISuperLayer() const;
+      ISuperLayer getPreviousAxialISuperLayer() const;
 
 
 
       /// Indicates the maximal superlayer the trajectory traverses
-      ISuperLayerType getMaximalISuperLayer() const;
+      ISuperLayer getMaximalISuperLayer() const;
 
       /// Indicates the superlayer the trajectory starts in.
-      ISuperLayerType getStartISuperLayer() const;
+      ISuperLayer getStartISuperLayer() const;
 
       /// Indicates the minimal superlayer the trajectory traverses
-      ISuperLayerType getMinimalISuperLayer() const;
+      ISuperLayer getMinimalISuperLayer() const;
 
     public:
       /** Calculates the perpendicular travel distance from the last position of the fromHits

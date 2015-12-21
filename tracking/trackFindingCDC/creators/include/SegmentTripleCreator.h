@@ -106,7 +106,7 @@ namespace Belle2 {
             ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
             ILayerType iAxialSuperLayerIn = iAxialSuperLayer - 2;
 
-            if (CDCWireTopology::getInstance().isValidISuperLayer(iAxialSuperLayerIn)) {
+            if (ISuperLayerUtil::isInCDC(iAxialSuperLayerIn)) {
 
               const std::vector<const CDCStereoRecoSegment2D*>& middleSegments =
                 stereoSegmentsBySL[iStereoSuperLayerIn];
@@ -128,7 +128,7 @@ namespace Belle2 {
           {
             ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
             ILayerType iAxialSuperLayerOut = iAxialSuperLayer + 2;
-            if (CDCWireTopology::getInstance().isValidISuperLayer(iAxialSuperLayerOut)) {
+            if (ISuperLayerUtil::isInCDC(iAxialSuperLayerOut)) {
 
               const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
               const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayerOut];
@@ -166,7 +166,7 @@ namespace Belle2 {
                   // via the stereo superlayer outside
                   ILayerType iStereoSuperLayerOut = iAxialSuperLayer + 1;
 
-                  if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerOut)) {
+                  if (ISuperLayerUtil::isInCDC(iStereoSuperLayerOut)) {
 
                     const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerOut];
                     const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];
@@ -180,7 +180,7 @@ namespace Belle2 {
                   // via the stereo superlayer inside
                   ILayerType iStereoSuperLayerIn = iAxialSuperLayer - 1;
 
-                  if (CDCWireTopology::getInstance().isValidISuperLayer(iStereoSuperLayerIn)) {
+                  if (ISuperLayerUtil::isInCDC(iStereoSuperLayerIn)) {
 
                     const std::vector<const CDCStereoRecoSegment2D*>& middleSegments = stereoSegmentsBySL[iStereoSuperLayerIn];
                     const std::vector<const CDCAxialRecoSegment2D*>& endSegments  = axialSegmentsBySL[iAxialSuperLayer];

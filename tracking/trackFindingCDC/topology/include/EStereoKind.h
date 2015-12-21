@@ -14,7 +14,6 @@
 #include <iterator>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// Type for the stereo property of the wire

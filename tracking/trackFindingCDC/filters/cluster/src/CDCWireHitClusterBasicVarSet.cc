@@ -32,7 +32,7 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
   if (not ptrCluster) return false;
   const CDCWireHitCluster& cluster = *ptrCluster;
 
-  unsigned int superlayerID = getISuperLayer(cluster);
+  unsigned int superlayerID = ISuperLayerUtil::getCommon(cluster);
   unsigned int size =  cluster.size();
 
   int totalNNeighbors = 0;

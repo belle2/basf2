@@ -341,11 +341,11 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
 
 void TrackQualityTools::removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
 {
-  ISuperLayerType lastLayer = -1;
+  ISuperLayer lastLayer = -1;
   bool deleteTrack = true;
 
   for (const CDCRecoHit3D& recoHit : track) {
-    const ISuperLayerType currentLayer = recoHit.getISuperLayer();
+    const ISuperLayer currentLayer = recoHit.getISuperLayer();
     if (lastLayer != -1 and lastLayer != currentLayer) {
       deleteTrack = false;
       break;

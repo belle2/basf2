@@ -35,7 +35,7 @@ TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule() :
            "Map of super layer ids to minimum hit number, "
            "for which left over segments shall be forwarded as tracks, "
            "if the exceed the minimal hit requirement. Default empty.",
-           map<TrackFindingCDC::ISuperLayerType, size_t>());
+           map<TrackFindingCDC::ISuperLayer, size_t>());
 }
 
 
@@ -85,7 +85,7 @@ void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
     for (const CDCRecoSegment2D& segment : segments) {
       if (segment.getAutomatonCell().hasMaskedFlag()) continue;
 
-      ISuperLayerType iSuperLayer = segment.getISuperLayer();
+      ISuperLayer iSuperLayer = segment.getISuperLayer();
       if (m_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
           segment.size() >=  m_minimalHitsForSingleSegmentTrackBySuperLayerId[iSuperLayer]) {
 

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>

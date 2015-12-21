@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
-
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 
 namespace Belle2 {
@@ -54,15 +52,8 @@ namespace Belle2 {
       /// A wire pointer pair as returned from getNeighborsOutward(), getNeighborsInward()
       typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
-      /// Default constructor for ROOT compatibility.
-      CDCWireSuperLayer();
-
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
       CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end);
-
-
-
-
 
     public:
       /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
@@ -72,7 +63,7 @@ namespace Belle2 {
         */
       /**@{*/
       /// Getter for the super layer id
-      ISuperLayerType getISuperLayer() const { return first().getISuperLayer(); }
+      ISuperLayer getISuperLayer() const { return first().getISuperLayer(); }
       /**@}*/
 
       /** @name Layer range
@@ -83,14 +74,6 @@ namespace Belle2 {
       /// Getter for the end iterator of the layer range
       const_iterator end() const { return m_end; }
 
-      /// Iteration helper for python only
-      /** In order to retrieve layers from a superlayer from python the stl iterators are not usable, \n
-       *  so we give an other mechanism for iteration. \n
-       *  To get the first layer call the function with no argument. \n
-       *  Call the function with the last layer yielded to get the next one. \n
-       *  If there is no next layer anymore at the end of the layer range return nullptr */
-      const CDCWireLayer* nextWireLayer(const CDCWireLayer* obj = nullptr) const;
-
       /// Gives the number of wire in this superlayer
       size_t size() const { return m_end - m_begin; }
 
@@ -99,10 +82,6 @@ namespace Belle2 {
 
       /// Getter for the last layer of this superlayer
       const CDCWireLayer& last() const { return *(--end()); }
-
-      /// Setter for the range of the layers
-      void setWireLayerRange(const const_iterator& begin, const const_iterator& end)
-      { m_begin = begin; m_end = end; initialize(); }
       /**@}*/
 
       /** @name Layer getters
@@ -116,7 +95,6 @@ namespace Belle2 {
       const CDCWireLayer& getWireLayer(const ILayerType& iLayer) const
       { return *(begin() + iLayer); }
       /**@}*/
-
 
       /** @name Wire getters
        */
@@ -243,7 +221,7 @@ namespace Belle2 {
 
       ///Getter for secondary neighbor at the two o'clock position
       const CDCWire* getSecondNeighborTwoOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return getNeighborCWOutwards(iLayer , iWire - 1); }
+      { return getNeighborCWOutwards(iLayer, iWire - 1); }
 
       ///Getter for secondary neighbor at the three o'clock position
       const CDCWire* getSecondNeighborThreeOClock(const ILayerType& iLayer, const IWireType& iWire) const
@@ -251,7 +229,7 @@ namespace Belle2 {
 
       ///Getter for secondary neighbor at the four o'clock position
       const CDCWire* getSecondNeighborFourOClock(const ILayerType& iLayer, const IWireType& iWire) const
-      { return getNeighborCWInwards(iLayer , iWire - 1); }
+      { return getNeighborCWInwards(iLayer, iWire - 1); }
 
 
       ///Getter for secondary neighbor at the five o'clock position

@@ -22,14 +22,12 @@ using namespace CDC;
 using namespace TrackFindingCDC;
 
 
-CDCWireSuperLayer::CDCWireSuperLayer() {}
-
-CDCWireSuperLayer::CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end):
-  m_begin(begin),
-  m_end(end),
-  m_innerRefZ(0.0),
-  m_outerRefZ(0.0),
-  m_refTanLambda(0.0)
+CDCWireSuperLayer::CDCWireSuperLayer(const const_iterator& begin, const const_iterator& end)
+  : m_begin(begin),
+    m_end(end),
+    m_innerRefZ(0.0),
+    m_outerRefZ(0.0),
+    m_refTanLambda(0.0)
 {
   initialize();
 }
@@ -74,50 +72,6 @@ void CDCWireSuperLayer::initialize()
   m_refTanLambda = arcLength2DZLine.slope();
   m_innerRefZ = arcLength2DZLine.map(getInnerCylindricalR());
   m_outerRefZ = arcLength2DZLine.map(getOuterCylindricalR());
-
-
-  /*
-  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
-
-  //declared but not defined function
-  //int momBound = cdcgp.momBound();
-  int momBound = 7;
-  //Check what momZ and momRmin contain
-  for (int iBound = 0; iBound < momBound; ++iBound) {
-
-    double momZ = cdcgp.momZ(iBound);
-    double momRmin = cdcgp.momRmin(iBound);
-
-
-    B2INFO("iBound : " << iBound );
-    B2INFO("momZ : " << momZ );
-    B2INFO("momRmin : " << momRmin);
-
-
-  }
-  //cin >> momBound;
-  */
-
-}
-
-const CDCWireLayer* CDCWireSuperLayer::nextWireLayer(const CDCWireLayer* layer) const
-{
-  if (layer == nullptr) {
-    if (begin() == end()) {
-      return nullptr;
-    } else {
-      const CDCWireLayer& nextlayer = *begin();
-      return &nextlayer;
-    }
-  }
-  IWireType iLayer = layer->getILayer();
-  if (isValidILayer(iLayer + 1)) {
-    const CDCWireLayer& nextlayer = getWireLayer(iLayer + 1);
-    return &nextlayer;
-  } else {
-    return nullptr;
-  }
-  return nullptr;
 }
 
 EWireNeighborKind CDCWireSuperLayer::getNeighborKind(const ILayerType& iLayer,

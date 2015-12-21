@@ -147,126 +147,92 @@ Vector2D CDCTrajectory2D::getExit() const
   return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
 }
 
-
-
-ISuperLayerType CDCTrajectory2D::getISuperLayerAfter(const ISuperLayerType& fromISuperLayer, bool movingOutward,
-                                                     const EForwardBackward forwardBackwardInfo) const
+ISuperLayer CDCTrajectory2D::getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const
 {
-  if (forwardBackwardInfo != EForwardBackward::c_Forward
-      and forwardBackwardInfo != EForwardBackward::c_Backward) return INVALID_ISUPERLAYER;
-  if (fromISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
+  if (ISuperLayerUtil::isInvalid(iSuperLayer)) return ISuperLayerUtil::c_Invalid;
 
-  if (fromISuperLayer == INNER_ISUPERLAYER or fromISuperLayer == OUTER_ISUPERLAYER) {
-    // no extrapolation from the outside in yet
-    return fromISuperLayer;
-  } else {
-    // Start position is inside the CDC
-    ISuperLayerType minimalISuperLayer = getMinimalISuperLayer();
-    ISuperLayerType maximalISuperLayer = getMaximalISuperLayer();
+  ISuperLayer minimalISuperLayer = getMinimalISuperLayer();
+  ISuperLayer maximalISuperLayer = getMaximalISuperLayer();
+  if (minimalISuperLayer == maximalISuperLayer) return ISuperLayerUtil::c_Invalid; // No next super layer to go to
+  if (iSuperLayer == minimalISuperLayer) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
+  if (iSuperLayer == maximalISuperLayer) return ISuperLayerUtil::getNextInwards(iSuperLayer);
 
-    if (maximalISuperLayer == minimalISuperLayer) {
-      // Trajectory is limited to a single superlayer.
-      // There is no next superlayer.
-      return fromISuperLayer;
-
-    } else {
-      // Trajectory traverses several superlayers (including the logical INNER_ISUPERLAYER and OUTER_ISUPERLAYER)
-      if (fromISuperLayer == maximalISuperLayer) {
-        return fromISuperLayer - 1;
-      } else if (fromISuperLayer == minimalISuperLayer) {
-        return fromISuperLayer + 1;
-      } else {
-        ISuperLayerType iSuperLayerStep = movingOutward ? forwardBackwardInfo : -forwardBackwardInfo;
-        return fromISuperLayer + iSuperLayerStep;
-      }
-
-    }
-  }
+  if (movingOutward) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
+  else return ISuperLayerUtil::getNextInwards(iSuperLayer);
 }
 
-ISuperLayerType CDCTrajectory2D::getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
+ISuperLayer CDCTrajectory2D::getISuperLayerAfterStart(bool movingOutward) const
+{
+  ISuperLayer iSuperLayer = getStartISuperLayer();
+  return getISuperLayerAfter(iSuperLayer, movingOutward);
+}
+
+ISuperLayer CDCTrajectory2D::getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
 {
   bool movingOutward = isMovingOutward();
-  ISuperLayerType startISuperLayer = getStartISuperLayer();
-  return getISuperLayerAfter(startISuperLayer, movingOutward, forwardBackwardInfo);
+  if (forwardBackwardInfo == EForwardBackward::c_Backward) {
+    movingOutward = not movingOutward;
+  }
+  return getISuperLayerAfterStart(movingOutward);
 }
 
-
-ISuperLayerType CDCTrajectory2D::getNextISuperLayer() const
+ISuperLayer CDCTrajectory2D::getNextISuperLayer() const
 {
   return getISuperLayerAfterStart(EForwardBackward::c_Forward);
 }
 
-
-
-ISuperLayerType CDCTrajectory2D::getPreviousISuperLayer() const
+ISuperLayer CDCTrajectory2D::getPreviousISuperLayer() const
 {
   return getISuperLayerAfterStart(EForwardBackward::c_Backward);
 }
 
-
-
-ISuperLayerType CDCTrajectory2D::getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
+ISuperLayer CDCTrajectory2D::getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const
 {
-
-  ISuperLayerType startISuperLayer = getStartISuperLayer();
-  if (startISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
-
-  ISuperLayerType nextISuperLayer =  getISuperLayerAfterStart(forwardBackwardInfo);
-  if (nextISuperLayer == INVALID_ISUPERLAYER) return INVALID_ISUPERLAYER;
-
-  ISuperLayerType iSuperLayerStep = nextISuperLayer - startISuperLayer;
-
-  assert(std::abs(iSuperLayerStep) <= 1);
-
-  if (isAxialISuperLayer(nextISuperLayer)) return nextISuperLayer;
-  // do not try to attempt to come back from the outside
-  else if (nextISuperLayer == OUTER_ISUPERLAYER) return INVALID_ISUPERLAYER;
-  else if (nextISuperLayer == INNER_ISUPERLAYER) return 0;
-  else if (nextISuperLayer == startISuperLayer) {
-    // If the next superlayer is already the same as the current one and it is not an axial layer
-    // the trajectory is fully contained in a true axial layer which implies that there is no next axial layer.
-    return INVALID_ISUPERLAYER;
-  } else {
-    // the next layer is a true stereo layer go to the next layer which is always an axial layer.
-    bool movingOutward = iSuperLayerStep * forwardBackwardInfo > 0;
-    return getISuperLayerAfter(nextISuperLayer, movingOutward, forwardBackwardInfo);
+  bool movingOutward = isMovingOutward();
+  if (forwardBackwardInfo == EForwardBackward::c_Backward) {
+    movingOutward = not movingOutward;
   }
+  ISuperLayer startISuperLayer = getStartISuperLayer();
+  if (ISuperLayerUtil::isInvalid(startISuperLayer)) return ISuperLayerUtil::c_Invalid;
 
+  ISuperLayer nextISuperLayer = getISuperLayerAfter(startISuperLayer, movingOutward);
+  if (ISuperLayerUtil::isInvalid(nextISuperLayer)) return ISuperLayerUtil::c_Invalid;
+  if (ISuperLayerUtil::isAxial(nextISuperLayer)) return nextISuperLayer;
+
+  ISuperLayer iSuperLayerStep = nextISuperLayer - startISuperLayer;
+  assert(std::abs(iSuperLayerStep) == 1);
+  bool nextMovingOutward = iSuperLayerStep > 0;
+  return getISuperLayerAfter(nextISuperLayer, nextMovingOutward);
 }
 
-
-ISuperLayerType CDCTrajectory2D::getNextAxialISuperLayer() const
+ISuperLayer CDCTrajectory2D::getNextAxialISuperLayer() const
 {
   return getAxialISuperLayerAfterStart(EForwardBackward::c_Forward);
 }
 
-
-
-ISuperLayerType CDCTrajectory2D::getPreviousAxialISuperLayer() const
+ISuperLayer CDCTrajectory2D::getPreviousAxialISuperLayer() const
 {
   return getAxialISuperLayerAfterStart(EForwardBackward::c_Backward);
 }
 
 
-
-ISuperLayerType CDCTrajectory2D::getMaximalISuperLayer() const
+ISuperLayer CDCTrajectory2D::getMaximalISuperLayer() const
 {
   double maximalCylindricalR = getMaximalCylindricalR();
-  return getISuperLayerAtCylindricalR(maximalCylindricalR);
+  return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(maximalCylindricalR);
 }
 
 
-ISuperLayerType CDCTrajectory2D::getStartISuperLayer() const
+ISuperLayer CDCTrajectory2D::getStartISuperLayer() const
 {
   double startCylindricalR = getLocalOrigin().cylindricalR();
-  return getISuperLayerAtCylindricalR(startCylindricalR);
+  return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
 
 
-ISuperLayerType CDCTrajectory2D::getMinimalISuperLayer() const
+ISuperLayer CDCTrajectory2D::getMinimalISuperLayer() const
 {
   double minimalCylindricalR = getMinimalCylindricalR();
-  return getISuperLayerAtCylindricalR(minimalCylindricalR);
+  return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(minimalCylindricalR);
 }

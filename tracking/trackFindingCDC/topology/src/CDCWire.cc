@@ -10,52 +10,52 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
-
-using namespace std;
 using namespace Belle2;
-using namespace CDC;
-
 using namespace TrackFindingCDC;
 
+CDCWire::CDCWire(const WireID& wireID)
+  : m_wireID(wireID),
+    m_forwardPhiToRef(0.0),
+    m_backwardPhiToRef(0.0),
+    m_phiRangeToRef(0.0, 0.0)
+{
+  initialize();
+}
 
-
-
-CDCWire::CDCWire(const WireID& wireID) :
-  m_wireID(wireID),
-  m_forwardPhiToRef(0.0),
-  m_backwardPhiToRef(0.0),
-  m_phiRangeToRef(0.0, 0.0)
-{ initialize(); }
-
-CDCWire::CDCWire(
-  const ILayerType& iSuperLayer,
-  const ILayerType& iLayer,
-  const IWireType&   iWire
-) :
-  m_wireID(iSuperLayer, iLayer, iWire),
-  m_forwardPhiToRef(0.0),
-  m_backwardPhiToRef(0.0),
-  m_phiRangeToRef(0.0, 0.0)
-{ initialize(); }
+CDCWire::CDCWire(ISuperLayer iSuperLayer,
+                 const ILayerType& iLayer,
+                 const IWireType&  iWire)
+  : m_wireID(iSuperLayer, iLayer, iWire),
+    m_forwardPhiToRef(0.0),
+    m_backwardPhiToRef(0.0),
+    m_phiRangeToRef(0.0, 0.0)
+{
+  initialize();
+}
 
 
 const CDCWire* CDCWire::getInstance(const WireID& wireID)
-{ return &(CDCWireTopology::getInstance().getWire(wireID)); }
+{
+  return &(CDCWireTopology::getInstance().getWire(wireID));
+}
 
 const CDCWire* CDCWire::getInstance(const CDCWire& wire)
-{ return &(CDCWireTopology::getInstance().getWire(wire.getWireID())); }
+{
+  return &(CDCWireTopology::getInstance().getWire(wire.getWireID()));
+}
 
-const CDCWire* CDCWire::getInstance(const ILayerType& iSuperLayer,
+const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
                                     const ILayerType& iLayer,
                                     const IWireType& iWire)
-{ return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire)); }
+{
+  return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire));
+}
 
 const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 {
-
   if (not CDCWireTopology::getInstance().isValidIWire(WireID(hit.getID()))) {
     B2FATAL("Invalid wire id of cdc hit " <<  WireID(hit.getID()));
   }
@@ -68,14 +68,11 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
     B2ERROR("CDCHit.getEWire() : " << hit.getID());
   }
   return &wire;
-
 }
-
 
 void CDCWire::initialize()
 {
-
-  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+  CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
 
   IWireType iWire = getIWire();
   ILayerType iCLayer = getICLayer();
@@ -96,7 +93,7 @@ void CDCWire::initialize()
        std::isnan(m_backwardPhiToRef)) and
       not isAxial()) {
 
-    B2WARNING("Odd wire " << this);
+    B2WARNING("Odd wire " << *this);
     B2WARNING("wireForwardPosition  " << forwardPos);
     B2WARNING("wireBackwardPosition " << backwardPos);
     B2WARNING("forward              " << m_skewLine.forward3D());
@@ -109,9 +106,8 @@ void CDCWire::initialize()
     //std::cin >> d;
   }
 
-  m_phiRangeToRef = std::minmax(m_forwardPhiToRef , m_backwardPhiToRef);
+  m_phiRangeToRef = std::minmax(m_forwardPhiToRef, m_backwardPhiToRef);
 }
-
 
 bool CDCWire::isInCell(const Vector3D& pos3D) const
 {
@@ -127,56 +123,59 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;
 
-  IWireType iWire = CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
+  IWireType iWire = CDC::CDCGeometryPar::Instance().cellId(iCLayer, pos3D);
   // Safety measure against error in the cellId function
   iWire %= wireLayer.size();
   bool inPhi = iWire == getIWire();
   return inPhi;
 }
 
-
 EWireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
-{ return CDCWireTopology::getInstance().getNeighborKind(getWireID(), wire.getWireID()); }
+{
+  return CDCWireTopology::getInstance().getNeighborKind(getWireID(), wire.getWireID());
+}
 
 bool CDCWire::isNeighborWith(const CDCWire& wire) const
-{ return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID()); }
-
+{
+  return CDCWireTopology::getInstance().areNeighbors(getWireID(), wire.getWireID());
+}
 
 CDCWire::NeighborPair CDCWire::getNeighborsInwards() const
-{ return CDCWireTopology::getInstance().getNeighborsInwards(getWireID()); }
-
+{
+  return CDCWireTopology::getInstance().getNeighborsInwards(getWireID());
+}
 
 CDCWire::NeighborPair CDCWire::getNeighborsOutwards() const
-{ return CDCWireTopology::getInstance().getNeighborsOutwards(getWireID()); }
-
-
+{
+  return CDCWireTopology::getInstance().getNeighborsOutwards(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCCW() const
-{ return CDCWireTopology::getInstance().getNeighborCCW(getWireID()); }
-
+{
+  return CDCWireTopology::getInstance().getNeighborCCW(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCW() const
-{ return CDCWireTopology::getInstance().getNeighborCW(getWireID()); }
-
-
-
+{
+  return CDCWireTopology::getInstance().getNeighborCW(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCCWInwards() const
-{ return CDCWireTopology::getInstance().getNeighborCCWInwards(getWireID()); }
-
-
+{
+  return CDCWireTopology::getInstance().getNeighborCCWInwards(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCWInwards() const
-{ return CDCWireTopology::getInstance().getNeighborCWInwards(getWireID()); }
-
+{
+  return CDCWireTopology::getInstance().getNeighborCWInwards(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCCWOutwards() const
-{ return CDCWireTopology::getInstance().getNeighborCCWOutwards(getWireID()); }
-
+{
+  return CDCWireTopology::getInstance().getNeighborCCWOutwards(getWireID());
+}
 
 const CDCWire* CDCWire::getNeighborCWOutwards() const
-{ return CDCWireTopology::getInstance().getNeighborCWOutwards(getWireID()); }
-
-
-
-
+{
+  return CDCWireTopology::getInstance().getNeighborCWOutwards(getWireID());
+}

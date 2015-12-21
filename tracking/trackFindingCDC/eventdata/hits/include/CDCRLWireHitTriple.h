@@ -120,12 +120,12 @@ namespace Belle2 {
       ILayerType getISuperLayer() const
       {
         ILayerType result = getStartRLWireHit().getISuperLayer();
-        return result == getRearRLWireHitPair().getISuperLayer() ? result : INVALID_ISUPERLAYER;
+        return result == getRearRLWireHitPair().getISuperLayer() ? result : ISuperLayerUtil::c_Invalid;
       }
 
       /// Getter for the common stereo type of the superlayer of the pair.
       EStereoKind getStereoKind() const
-      { return isValidISuperLayer(getISuperLayer()) ? getStartRLWireHit().getStereoKind() : EStereoKind::c_Invalid; }
+      { return ISuperLayerUtil::getStereoKind(getISuperLayer()); }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const

@@ -20,9 +20,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-double dCurvOverDSZByISuperLayer[NSUPERLAYERS] = {0.0, 0.0027, 0.0, -0.0017, 0.0, 0.00116, 0.0, -0.000791};
+double dCurvOverDSZByISuperLayer[ISuperLayerUtil::c_N] = {0.0, 0.0027, 0.0, -0.0017, 0.0, 0.00116, 0.0, -0.000791};
 
-double dPhi0OverDZ0ByISuperLayer[NSUPERLAYERS] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
+double dPhi0OverDZ0ByISuperLayer[ISuperLayerUtil::c_N] = {0.0, -0.0023, 0.0, 0.0012, 0.0, -0.00097, 0.0, 0.00080};
 
 namespace {
 
@@ -34,7 +34,7 @@ namespace {
   {
 
     size_t nHits = segment.size();
-    ISuperLayerType iSuperLayer = segment.getISuperLayer();
+    ISuperLayer iSuperLayer = segment.getISuperLayer();
 
     double zeta = 0;
 

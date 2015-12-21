@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
 #include <vector>
@@ -47,10 +47,10 @@ namespace Belle2 {
 
       /** Returns the common super layer id of all stored tracking hits
        *  This checks if all items are located in the same superlayer and
-       *  returns the superlayer id of the later. Returns INVALID_ISUPERLAYER if the superlayer
+       *  returns the superlayer id of the later. Returns ISuperLayerUtil::c_Invalid if the superlayer
        *  is not shared among the tracking hits. */
-      ISuperLayerType getISuperLayer() const
-      { return TrackFindingCDC::getISuperLayer(*this); }
+      ISuperLayer getISuperLayer() const
+      { return ISuperLayerUtil::getCommon(*this); }
 
       /// Legacy accessor for the items of the segments, still used in some corners of python scripts.
       const std::vector<T>& items() const

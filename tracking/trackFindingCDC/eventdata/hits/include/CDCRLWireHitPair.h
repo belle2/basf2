@@ -69,15 +69,15 @@ namespace Belle2 {
       { return getFromWire().getNeighborKind(getToWire()); }
 
       /// Getter for the common superlayer id of the pair.
-      ISuperLayerType getISuperLayer() const
+      ISuperLayer getISuperLayer() const
       {
-        ISuperLayerType result = getFromRLWireHit().getISuperLayer();
-        return result == getToRLWireHit().getISuperLayer() ? result : INVALID_ISUPERLAYER;
+        ISuperLayer result = getFromRLWireHit().getISuperLayer();
+        return result == getToRLWireHit().getISuperLayer() ? result : ISuperLayerUtil::c_Invalid;
       }
 
       /// Getter for the common stereo type of the superlayer of the pair.
       EStereoKind getStereoKind() const
-      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoKind() : EStereoKind::c_Invalid; }
+      { return ISuperLayerUtil::getStereoKind(getISuperLayer()); }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const

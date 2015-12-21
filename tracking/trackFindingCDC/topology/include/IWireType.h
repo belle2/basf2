@@ -9,22 +9,11 @@
  **************************************************************************/
 #pragma once
 
-
-
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// The type of the wire ids enumerating wires within a given layer
-    // Sign is essential.
-    typedef signed short IWireType;
-
-    /// Constant making an invalid wire id
-    const IWireType INVALID_IWIRE = 32767;
-
-    /// Legacy constant
-    const IWireType INVALIDWIRE = INVALID_IWIRE;
+    using IWireType = signed short;
 
   } // namespace TrackFindingCDC
-
 } // namespace Belle2

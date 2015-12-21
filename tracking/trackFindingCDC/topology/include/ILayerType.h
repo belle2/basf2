@@ -9,22 +9,12 @@
  **************************************************************************/
 #pragma once
 
-
-
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    ///The type of the layer ids enumerating layers within a superlayer
-    typedef signed short ILayerType;
-
-    /// Constant making an invalid layer id
-    const ILayerType INVALID_ILAYER = 127;
-
-    ///Legacy constant
-    const ILayerType INVALIDLAYER = INVALID_ILAYER;
+    /// The type of the layer ids enumerating layers within a superlayer
+    using ILayerType = signed short ;
 
   } // namespace TrackFindingCDC
-
 } // namespace Belle2
 

@@ -69,11 +69,11 @@ namespace Belle2 {
 
       /// Getter for the superlayer id of the start segment.
       ILayerType getStartISuperLayer() const
-      { return getStart() == nullptr ? INVALID_ISUPERLAYER : getStart()->getISuperLayer(); }
+      { return getStart() == nullptr ? ISuperLayerUtil::c_Invalid : getStart()->getISuperLayer(); }
 
       /// Getter for the superlayer id of the end segment.
       ILayerType getEndISuperLayer() const
-      { return getEnd() == nullptr ? INVALID_ISUPERLAYER : getEnd()->getISuperLayer(); }
+      { return getEnd() == nullptr ? ISuperLayerUtil::c_Invalid : getEnd()->getISuperLayer(); }
 
       /// Getter for the start segment.
       const CDCAxialRecoSegment2D* getStart() const

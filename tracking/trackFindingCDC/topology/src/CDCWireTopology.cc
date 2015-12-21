@@ -62,34 +62,31 @@ void CDCWireTopology::initialize()
   m_wireSuperLayers.push_back(CDCWireSuperLayer(beginOfSuperlayer , m_wireLayers.end()));
 }
 
-/*
-const CDCWire * CDCWireTopology::nextWire(const CDCWire * wire) const{
+ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindricalR)
+{
+  const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();
+  const std::vector<CDCWireSuperLayer>& wireSuperLayers = cdcWireTopology.getWireSuperLayers();
 
-  if (wire == nullptr){
-    if ( begin() == end() ){
-      return nullptr;
-    } else {
-      const CDCWire & nextwire = *begin();
-      return &nextwire;
+  if (std::isnan(cylindricalR) or cylindricalR < 0) {
+    return ISuperLayerUtil::c_Invalid;
+  }
+
+  if (cylindricalR < cdcWireTopology.getWireSuperLayer(0).getInnerCylindricalR()) {
+    return ISuperLayerUtil::c_InnerVolume;
+  }
+
+  for (const CDCWireSuperLayer& wireSuperLayer : wireSuperLayers) {
+    if (cylindricalR <= wireSuperLayer.getOuterCylindricalR()) {
+      return wireSuperLayer.getISuperLayer();
     }
   }
-  IWireType iWire = wire->getIWire();
 
-  if ( isValidIWire(iWire + 1) ){
-    const CDCWire & nextwire = getWire(iWire + 1);
-    return &nextwire;
-  } else {
-    return nullptr;
-  }
-  return nullptr;
-
+  return ISuperLayerUtil::c_OuterVolume;
 }
-*/
 
 
 EWireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
 {
-
   if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
       isValidISuperLayer(wireID.getISuperLayer())) {
     return EWireNeighborKind::c_None;

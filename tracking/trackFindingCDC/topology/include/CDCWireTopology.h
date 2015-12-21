@@ -82,14 +82,6 @@ namespace Belle2 {
       /// Getter for the end iterator of the whole wire range
       const_iterator end() const { return m_wires.end(); }
 
-      /// Iteration helper for python only
-      /** In order to retrieve wires from a layer from python the stl iterators are not usable, \n
-       *  so we give an other mechanism for iteration. \n
-       *  To get the first wire call the function with no argument. \n
-       *  Call the function with the last wire yielded to get the next one. \n
-       *  If there is no next wire anymore at the end of the wire range return nullptr */
-      //const CDCWire * nextWire(const CDCWire * wire = nullptr) const;
-
       /// Getter for the total number of wires
       IWireType size() const { return m_wires.size(); }
 
@@ -97,7 +89,6 @@ namespace Belle2 {
       const CDCWire& first() const { return *(begin()); }
       /// Getter for the last wire in the whole cdc
       const CDCWire& last() const { return *(--end()); }
-
       /**@}*/
 
       /** @name Wire getters
@@ -114,12 +105,9 @@ namespace Belle2 {
 
       /// Checks the validity of the superlayer id, layer id, wire id combination.
       inline
-      bool
-      isValidIWire(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      bool isValidIWire(ISuperLayer iSuperLayer,
+                        const ILayerType& iLayer,
+                        const IWireType& iWire) const
       { return isValidISuperLayer(iSuperLayer) and getWireSuperLayer(iSuperLayer).isValidIWire(iLayer, iWire); }
 
       /// Getter for wire getter by wireID object.
@@ -131,7 +119,7 @@ namespace Belle2 {
       { return getWireLayer(iCLayer).getWire(iWire) ; }
 
       /// Getter for wire getter by superlayer id, layer id and wire id.
-      const CDCWire& getWire(const ILayerType& iSuperLayer, const ILayerType& iLayer , const IWireType& iWire) const
+      const CDCWire& getWire(ISuperLayer iSuperLayer, const ILayerType& iLayer , const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer).getWire(iWire) ; }
 
       /// Getter for the underlying storing wire vector.
@@ -143,14 +131,15 @@ namespace Belle2 {
        *  Getters for the wire layer*/
       ///@{
       /// Getter for the total number of wire layers
-      inline ILayerType getNLayers() const
+      ILayerType getNLayers() const
       { return getWireLayers().size(); }
 
       /// Checks the validity of the continuous layer id.
-      inline bool isValidICLayer(const ILayerType& iCLayer) const
+      bool isValidICLayer(const ILayerType& iCLayer) const
       { return 0 <= iCLayer and iCLayer < int(getWireLayers().size()); }
+
       /// Checks the validity of the superlayer id, layer id combination.
-      inline bool isValidILayer(const ILayerType& iSuperLayer, const ILayerType& iLayer) const
+      bool isValidILayer(ISuperLayer iSuperLayer, const ILayerType& iLayer) const
       { return isValidISuperLayer(iSuperLayer) and getWireSuperLayer(iSuperLayer).isValidILayer(iLayer); }
 
       /// Getter for wire layer getter by wireID object.
@@ -162,7 +151,7 @@ namespace Belle2 {
       { return m_wireLayers[ iCLayer ]; }
 
       /// Getter for wire layer getter by superlayer id and layer id.
-      const CDCWireLayer& getWireLayer(const ILayerType& iSuperLayer, const ILayerType& iLayer) const
+      const CDCWireLayer& getWireLayer(ISuperLayer iSuperLayer, const ILayerType& iLayer) const
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer); }
 
       /// Getter for the underlying storing layer vector
@@ -174,19 +163,22 @@ namespace Belle2 {
        *  Getters for the wire superlayers */
       ///@{
       /// Getter for the total number of superlayers
-      inline ILayerType getNSuperLayers() const
+      ISuperLayer getNSuperLayers() const
       { return getWireSuperLayers().size(); }
 
       /// Checks the validity of the superlayer id.
-      inline bool isValidISuperLayer(const ILayerType& iSuperLayer) const
+      bool isValidISuperLayer(ISuperLayer iSuperLayer) const
       { return 0 <= iSuperLayer and iSuperLayer < int(getWireSuperLayers().size()); }
+
+      /// Returns the logical superlayer number at the given radius
+      ISuperLayer getISuperLayerAtCylindricalR(const double cylindricalR);
 
       /// Getter for wire superlayer getter by wireID object.
       const CDCWireSuperLayer& getWireSuperLayer(const WireID& wireId) const
       { return getWireSuperLayer(wireId.getISuperLayer()); }
 
       /// Getter for wire superlayer getter by superlayer id.
-      const CDCWireSuperLayer& getWireSuperLayer(const ILayerType& iSuperLayer) const
+      const CDCWireSuperLayer& getWireSuperLayer(ISuperLayer iSuperLayer) const
       { return m_wireSuperLayers[ iSuperLayer ]; }
 
       /// Getter for the underlying storing superlayer vector
@@ -225,59 +217,35 @@ namespace Belle2 {
       { return getNeighborKind(wire, other) != EWireNeighborKind::c_None; }
 
       /// Getter for the two closest neighbors in the layer outwards.
-      NeighborPair
-      getNeighborsOutwards(
-        const WireID& wireID
-      ) const
+      NeighborPair getNeighborsOutwards(const WireID& wireID) const
       { return getNeighborsOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the two closest neighbors in the layer inwards.
-      NeighborPair
-      getNeighborsInwards(
-        const WireID& wireID
-      ) const
+      NeighborPair getNeighborsInwards(const WireID& wireID) const
       { return getNeighborsInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCCWOutwards(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCCWOutwards(const WireID& wireID) const
       { return getNeighborCCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCWOutwards(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCWOutwards(const WireID& wireID) const
       { return getNeighborCWOutwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest counterclockwise neighbor.
-      const CDCWire*
-      getNeighborCCW(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCCW(const WireID& wireID) const
       { return getNeighborCCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest clockwise neighbor.
-      const CDCWire*
-      getNeighborCW(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCW(const WireID& wireID) const
       { return getNeighborCW(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCCWInwards(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCCWInwards(const WireID& wireID) const
       { return getNeighborCCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCWInwards(
-        const WireID& wireID
-      ) const
+      const CDCWire* getNeighborCWInwards(const WireID& wireID) const
       { return getNeighborCWInwards(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
       /**@}*/
 
@@ -289,75 +257,52 @@ namespace Belle2 {
        */
       /**@{*/
       /// Getter for the two closest neighbors in the layer outwards.
-      NeighborPair
-      getNeighborsOutwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      NeighborPair getNeighborsOutwards(ISuperLayer iSuperLayer,
+                                        const ILayerType& iLayer,
+                                        const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborsOutwards(iLayer, iWire); }
 
       /// Getter for the two closest neighbors in the layer inwards.
-      NeighborPair
-      getNeighborsInwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      NeighborPair getNeighborsInwards(ISuperLayer iSuperLayer,
+                                       const ILayerType& iLayer,
+                                       const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborsInwards(iLayer, iWire); }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCCWOutwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getNeighborCCWOutwards(ISuperLayer iSuperLayer,
+                                            const ILayerType& iLayer,
+                                            const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCCWOutwards(iLayer, iWire); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCWOutwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getNeighborCWOutwards(ISuperLayer iSuperLayer,
+                                           const ILayerType& iLayer,
+                                           const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCWOutwards(iLayer, iWire); }
 
       /// Getter for the nearest counterclockwise neighbor.
-      const CDCWire*
-      getNeighborCCW(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getNeighborCCW(ISuperLayer iSuperLayer,
+                                    const ILayerType& iLayer,
+                                    const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCCW(iLayer, iWire); }
 
       /// Getter for the nearest clockwise neighbor.
-      const CDCWire*
-      getNeighborCW(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getNeighborCW(ISuperLayer iSuperLayer,
+                                   const ILayerType& iLayer,
+                                   const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCW(iLayer, iWire); }
 
       /// Getter for the nearest counterclockwise neighbor in the next layer outwards.
       const CDCWire*
-      getNeighborCCWInwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      getNeighborCCWInwards(ISuperLayer iSuperLayer,
+                            const ILayerType& iLayer,
+                            const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCCWInwards(iLayer, iWire); }
 
       /// Getter for the nearest clockwise neighbor in the next layer outwards.
-      const CDCWire*
-      getNeighborCWInwards(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getNeighborCWInwards(ISuperLayer iSuperLayer,
+                                          const ILayerType& iLayer,
+                                          const IWireType& iWire) const
       { return getWireSuperLayer(iSuperLayer).getNeighborCWInwards(iLayer, iWire); }
       /**@}*/
 
@@ -376,87 +321,51 @@ namespace Belle2 {
       /**@{*/
 
       ///Getter for secondary neighbor at the one o'clock position
-      const CDCWire*
-      getSecondNeighborOneOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborOneOClock(const WireID& wireID) const
       { return getSecondNeighborOneOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the two o'clock position
-      const CDCWire*
-      getSecondNeighborTwoOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborTwoOClock(const WireID& wireID) const
       { return getSecondNeighborTwoOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the three o'clock position
-      const CDCWire*
-      getSecondNeighborThreeOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborThreeOClock(const WireID& wireID) const
       { return getSecondNeighborThreeOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the four o'clock position
-      const CDCWire*
-      getSecondNeighborFourOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborFourOClock(const WireID& wireID) const
       { return getSecondNeighborFourOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the five o'clock position
-      const CDCWire*
-      getSecondNeighborFiveOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborFiveOClock(const WireID& wireID) const
       { return getSecondNeighborFiveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the six o'clock position
-      const CDCWire*
-      getSecondNeighborSixOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborSixOClock(const WireID& wireID) const
       { return getSecondNeighborSixOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the seven o'clock position
-      const CDCWire*
-      getSecondNeighborSevenOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborSevenOClock(const WireID& wireID) const
       { return getSecondNeighborSevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the eight o'clock position
-      const CDCWire*
-      getSecondNeighborEightOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborEightOClock(const WireID& wireID) const
       { return getSecondNeighborEightOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the nine o'clock position
-      const CDCWire*
-      getSecondNeighborNineOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborNineOClock(const WireID& wireID) const
       { return getSecondNeighborNineOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the ten o'clock position
-      const CDCWire*
-      getSecondNeighborTenOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborTenOClock(const WireID& wireID) const
       { return getSecondNeighborTenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the eleven o'clock position
-      const CDCWire*
-      getSecondNeighborElevenOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborElevenOClock(const WireID& wireID) const
       { return getSecondNeighborElevenOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
 
       ///Getter for secondary neighbor at the twelve o'clock position
-      const CDCWire*
-      getSecondNeighborTwelveOClock(
-        const WireID& wireID
-      ) const
+      const CDCWire* getSecondNeighborTwelveOClock(const WireID& wireID) const
       { return getSecondNeighborTwelveOClock(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire());  }
       /**@}*/
 
@@ -477,111 +386,75 @@ namespace Belle2 {
       /**@{*/
 
       ///Getter for secondary neighbor at the one o'clock position
-      const CDCWire*
-      getSecondNeighborOneOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType&   iWire
-      ) const
+      const CDCWire* getSecondNeighborOneOClock(ISuperLayer iSuperLayer,
+                                                const ILayerType& iLayer,
+                                                const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborOneOClock(iLayer, iWire);  }
 
       ///Getter for secondary neighbor at the two o'clock position
-      const CDCWire*
-      getSecondNeighborTwoOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborTwoOClock(ISuperLayer iSuperLayer,
+                                                const ILayerType& iLayer,
+                                                const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTwoOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the three o'clock position
-      const CDCWire*
-      getSecondNeighborThreeOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborThreeOClock(ISuperLayer iSuperLayer,
+                                                  const ILayerType& iLayer,
+                                                  const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborThreeOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the four o'clock position
-      const CDCWire*
-      getSecondNeighborFourOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborFourOClock(ISuperLayer iSuperLayer,
+                                                 const ILayerType& iLayer,
+                                                 const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborFourOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the five o'clock position
-      const CDCWire*
-      getSecondNeighborFiveOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborFiveOClock(ISuperLayer iSuperLayer,
+                                                 const ILayerType& iLayer,
+                                                 const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborFiveOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the six o'clock position
-      const CDCWire*
-      getSecondNeighborSixOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborSixOClock(ISuperLayer iSuperLayer,
+                                                const ILayerType& iLayer,
+                                                const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborSixOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the seven o'clock position
-      const CDCWire*
-      getSecondNeighborSevenOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborSevenOClock(ISuperLayer iSuperLayer,
+                                                  const ILayerType& iLayer,
+                                                  const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborSevenOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the eight o'clock position
-      const CDCWire*
-      getSecondNeighborEightOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborEightOClock(ISuperLayer iSuperLayer,
+                                                  const ILayerType& iLayer,
+                                                  const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborEightOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the nine o'clock position
-      const CDCWire*
-      getSecondNeighborNineOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborNineOClock(ISuperLayer iSuperLayer,
+                                                 const ILayerType& iLayer,
+                                                 const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborNineOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the ten o'clock position
-      const CDCWire*
-      getSecondNeighborTenOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborTenOClock(ISuperLayer iSuperLayer,
+                                                const ILayerType& iLayer,
+                                                const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTenOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the eleven o'clock position
-      const CDCWire*
-      getSecondNeighborElevenOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborElevenOClock(ISuperLayer iSuperLayer,
+                                                   const ILayerType& iLayer,
+                                                   const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborElevenOClock(iLayer, iWire); }
 
       ///Getter for secondary neighbor at the twelve o'clock position
-      const CDCWire*
-      getSecondNeighborTwelveOClock(
-        const ILayerType& iSuperLayer,
-        const ILayerType& iLayer,
-        const IWireType& iWire
-      ) const
+      const CDCWire* getSecondNeighborTwelveOClock(ISuperLayer iSuperLayer,
+                                                   const ILayerType& iLayer,
+                                                   const IWireType&  iWire) const
       { return getWireSuperLayer(iSuperLayer).getSecondNeighborTwelveOClock(iLayer, iWire); }
       /**@}*/
 

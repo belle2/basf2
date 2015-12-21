@@ -97,11 +97,11 @@ namespace Belle2 {
 
       /// Getter for the superlayer id of the start segment.
       ILayerType getStartISuperLayer() const
-      { return getStartSegment() == nullptr ? INVALID_ISUPERLAYER : getStartSegment()->getISuperLayer(); }
+      { return getStartSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getStartSegment()->getISuperLayer(); }
 
       /// Getter for the superlayer id of the end segment.
       ILayerType getEndISuperLayer() const
-      { return getEndSegment() == nullptr ? INVALID_ISUPERLAYER : getEndSegment()->getISuperLayer(); }
+      { return getEndSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getEndSegment()->getISuperLayer(); }
 
 
 

@@ -39,7 +39,7 @@ namespace Belle2 {
       {
         if (segments.empty()) return true;
 
-        ISuperLayerType lastISuperLayer = INNER_ISUPERLAYER;
+        ISuperLayer lastISuperLayer = ISuperLayerUtil::c_InnerVolume;
 
         for (const CDCRecoSegment2D& segment : segments) {
           if (lastISuperLayer > segment.getISuperLayer()) {
@@ -65,7 +65,7 @@ namespace Belle2 {
 
         for (const CDCRecoSegment2D& segment : segments) {
           const CDCRecoSegment2D* ptrSegment = &segment;
-          ISuperLayerType iSuperLayer = segment.getISuperLayer();
+          ISuperLayer iSuperLayer = segment.getISuperLayer();
           segmentRangesBySuperLayer[iSuperLayer].push_back(ptrSegment);
         }
 
@@ -88,14 +88,14 @@ namespace Belle2 {
         segmentPairFilter.beginEvent();
 
         //Make pairs of closeby superlayers
-        for (ISuperLayerType iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
+        for (ISuperLayer iSuperLayer = 0; iSuperLayer < CDCWireTopology::N_SUPERLAYERS; ++iSuperLayer) {
 
           const CDCRecoSegmentRange& startSegments = segmentRangesBySuperLayer[iSuperLayer];
 
           //make pairs of this superlayer and the superlayer more to the inside
           {
             ILayerType iSuperLayerIn = iSuperLayer - 1;
-            if (isValidISuperLayer(iSuperLayerIn)) {
+            if (not ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerIn];
               create(segmentPairFilter, startSegments, endSegments, segmentPairs);
             }
@@ -104,7 +104,7 @@ namespace Belle2 {
           //make pairs of this superlayer and the superlayer more to the outside
           {
             ILayerType iSuperLayerOut = iSuperLayer + 1;
-            if (isValidISuperLayer(iSuperLayerOut)) {
+            if (not ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
               const CDCRecoSegmentRange& endSegments = segmentRangesBySuperLayer[iSuperLayerOut];
               create(segmentPairFilter, startSegments, endSegments, segmentPairs);
             }

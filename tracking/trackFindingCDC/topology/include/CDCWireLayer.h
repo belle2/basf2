@@ -58,7 +58,7 @@ namespace Belle2 {
       /// Getter from the the continuous layer id. Does not construct a new object.
       static const CDCWireLayer* getInstance(const ILayerType& iCLayer);
       /// Getter from the superlayer id, the layer id. Does not construct a new object.
-      static const CDCWireLayer* getInstance(const ISuperLayerType& iSuperLayer,
+      static const CDCWireLayer* getInstance(ISuperLayer iSuperLayer,
                                              const ILayerType& iLayer);
       /// Getter for the layer with superlayer id 0, layer id 0.
       static const CDCWireLayer* getLowest() { return getInstance(0, 0); }
@@ -80,7 +80,7 @@ namespace Belle2 {
       ILayerType getILayer() const { return first().getILayer(); }
 
       /// Getter for the super layer id
-      ISuperLayerType getISuperLayer() const { return first().getISuperLayer(); }
+      ISuperLayer getISuperLayer() const { return first().getISuperLayer(); }
       /**@}*/
 
 
@@ -115,14 +115,6 @@ namespace Belle2 {
       /// Getter for the end iterator of the wire range
       const_iterator end() const { return m_end; }
 
-      /// Iteration helper for python only
-      /** In order to retrieve wires from a layer from python the stl iterators are not usable, \n
-       *  so we give an other mechanism for iteration. \n
-       *  To get the first wire call the function with no argument. \n
-       *  Call the function with the last wire yielded to get the next one. \n
-       *  If there is no next wire anymore at the end of the wire range return nullptr */
-      const CDCWire* nextWire(const CDCWire* wire = nullptr) const;
-
       /// Getter for the number of wires in this layer
       IWireType size() const { return m_end - m_begin; }
 
@@ -139,10 +131,6 @@ namespace Belle2 {
       /// Getter for the last wire of the layer
       const CDCWire& last() const { return *(--end()); }
 
-      /// Setter for the range of the wires
-      void setWireRange(const const_iterator& begin, const const_iterator& end)
-      { m_begin = begin; m_end = end; initialize(); }
-
       /// Gets the wire in this layer that is closest to the given position
       const CDCWire& getClosestWire(const Vector3D& pos3D) const;
       /**@}*/
@@ -158,7 +146,7 @@ namespace Belle2 {
        *  is around the discontinuity near the zero wires.
        */
       const CDCWire& getWireSafe(const IWireType& iWire) const
-      { return *(begin() + (iWire % size() + size())  % size()); }
+      { return *(begin() + (iWire % size() + size()) % size()); }
 
       /// Getter for the first counterclockwise neighbor by wire id in the layer.
       const CDCWire& getNeighborCCW(const IWireType& iWire) const

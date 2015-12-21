@@ -74,9 +74,9 @@ bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
 {
   vector<CDCRecoSegment3D> result;
-  ISuperLayerType lastISuperLayer = -1;
+  ISuperLayer lastISuperLayer = -1;
   for (const CDCRecoHit3D& recoHit3D : *this) {
-    ISuperLayerType iSuperLayer = recoHit3D.getISuperLayer();
+    ISuperLayer iSuperLayer = recoHit3D.getISuperLayer();
     if (result.empty() or lastISuperLayer != iSuperLayer) {
       result.emplace_back();
     }

@@ -15,7 +15,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/ILayerType.h>
 #include <tracking/trackFindingCDC/topology/IWireType.h>
 
@@ -48,7 +48,6 @@ namespace Belle2 {
       typedef std::pair<const Belle2::TrackFindingCDC::CDCWire*, const Belle2::TrackFindingCDC::CDCWire*> NeighborPair;
 
     public:
-
       /// Default constructor for ROOT compatibility.
       CDCWire() {}
 
@@ -56,11 +55,9 @@ namespace Belle2 {
       explicit CDCWire(const WireID& wireID);
 
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
-      CDCWire(const ISuperLayerType& iSuperLayer,
+      CDCWire(ISuperLayer iSuperLayer,
               const ILayerType& iLayer,
               const IWireType& iWire);
-
-
 
 
       /** @name Static instance getters
@@ -74,7 +71,7 @@ namespace Belle2 {
       static const CDCWire* getInstance(const CDCWire& wire);
 
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
-      static const CDCWire* getInstance(const ISuperLayerType& iSuperLayer,
+      static const CDCWire* getInstance(ISuperLayer iSuperLayer,
                                         const ILayerType& iLayer,
                                         const IWireType& iWire);
 
@@ -146,7 +143,7 @@ namespace Belle2 {
 
       /// Getter for superlayer id.
       /**  Gives the superlayer id ranging from 0 - 8. */
-      ISuperLayerType getISuperLayer() const { return getWireID().getISuperLayer(); }
+      ISuperLayer getISuperLayer() const { return getWireID().getISuperLayer(); }
 
       /// Setter for the wireID
       void setWireID(const WireID& wireID)
@@ -171,11 +168,7 @@ namespace Belle2 {
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
       inline EStereoKind getStereoKind() const
-      {
-        if ((getISuperLayer() % 2) == 0)  return EStereoKind::c_Axial;
-        else if ((getISuperLayer() % 4) == 1)  return EStereoKind::c_StereoU;
-        else return EStereoKind::c_StereoV;
-      }
+      { return ISuperLayerUtil::getStereoKind(getISuperLayer()); }
 
       /// Gives the xy projected position of the wire at the given z coordinate
       Vector2D getWirePos2DAtZ(const double z) const

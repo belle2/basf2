@@ -19,53 +19,53 @@ using namespace CDC;
 using namespace TrackFindingCDC;
 
 
-CDCWireLayer::CDCWireLayer() :
-
+CDCWireLayer::CDCWireLayer()
 //averages of wire values
-  m_shift(ERotation::c_Invalid),
-  m_tanStereoAngle(0.0),
-  m_minCylindricalR(1000000.0),
-  m_refCylindricalR(0.0),
-  m_refZ(0.0),
-  m_forwardCylindricalR(0.0), m_backwardCylindricalR(0.0),
-  m_forwardZ(0.0), m_backwardZ(0.0),
-  m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
+  : m_shift(ERotation::c_Invalid),
+    m_tanStereoAngle(0.0),
+    m_minCylindricalR(1000000.0),
+    m_refCylindricalR(0.0),
+    m_refZ(0.0),
+    m_forwardCylindricalR(0.0), m_backwardCylindricalR(0.0),
+    m_forwardZ(0.0), m_backwardZ(0.0),
+    m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
+    //form CDCGeometryPar
+    m_innerCylindricalR(0.0),
+    m_outerCylindricalR(0.0)
+{
+}
 
-//form CDCGeometryPar
-  m_innerCylindricalR(0.0),
-  m_outerCylindricalR(0.0)
+CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& end)
+  : m_begin(begin),
+    m_end(end),
+    //averages of wire values
+    m_shift(ERotation::c_Invalid),
+    m_tanStereoAngle(0.0),
+    m_minCylindricalR(1000000.0),
+    m_refCylindricalR(0.0),
+    m_refZ(0.0),
+    m_forwardCylindricalR(0.0) , m_backwardCylindricalR(0.0),
+    m_forwardZ(0.0) , m_backwardZ(0.0),
+    m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
+    //form CDCGeometryPar
+    m_innerCylindricalR(0.0),
+    m_outerCylindricalR(0.0)
+{
+  initialize();
+}
 
-{}
+const CDCWireLayer* CDCWireLayer::getInstance(const ILayerType& iCLayer)
+{
+  return &(CDCWireTopology::getInstance().getWireLayer(iCLayer));
+}
 
-CDCWireLayer::CDCWireLayer(const const_iterator& begin, const const_iterator& end) :
-  m_begin(begin), m_end(end),
-
-//averages of wire values
-  m_shift(ERotation::c_Invalid),
-  m_tanStereoAngle(0.0),
-  m_minCylindricalR(1000000.0),
-  m_refCylindricalR(0.0),
-  m_refZ(0.0),
-  m_forwardCylindricalR(0.0) , m_backwardCylindricalR(0.0),
-  m_forwardZ(0.0) , m_backwardZ(0.0),
-  m_forwardPhiToRef(0.0), m_backwardPhiToRef(0.0),
-
-//form CDCGeometryPar
-  m_innerCylindricalR(0.0),
-  m_outerCylindricalR(0.0)
-{ initialize();}
-
-const CDCWireLayer*
-CDCWireLayer::getInstance(const ILayerType& iCLayer)
-{ return &(CDCWireTopology::getInstance().getWireLayer(iCLayer)); }
-
-const CDCWireLayer*
-CDCWireLayer::getInstance(const ILayerType& iSuperLayer, const ILayerType& iLayer)
-{ return &(CDCWireTopology::getInstance().getWireLayer(iSuperLayer, iLayer)); }
+const CDCWireLayer* CDCWireLayer::getInstance(ISuperLayer iSuperLayer, const ILayerType& iLayer)
+{
+  return &(CDCWireTopology::getInstance().getWireLayer(iSuperLayer, iLayer));
+}
 
 void CDCWireLayer::initialize()
 {
-
   size_t nWiresInLayer = size();
   ILayerType iCLayer = getICLayer();
 
@@ -93,8 +93,6 @@ void CDCWireLayer::initialize()
   m_backwardZ = 0.0;
   m_forwardPhiToRef = 0.0;
   m_backwardPhiToRef = 0.0;
-
-
 
   for (const_iterator itWire = begin(); itWire != end(); ++itWire) {
 
@@ -141,27 +139,6 @@ void CDCWireLayer::initialize()
                     std::make_pair(m_backwardPhiToRef , m_forwardPhiToRef) ;
 
 }
-
-const CDCWire* CDCWireLayer::nextWire(const CDCWire* wire) const
-{
-  if (wire == nullptr) {
-    if (begin() == end()) {
-      return nullptr;
-    } else {
-      const CDCWire& nextwire = *begin();
-      return &nextwire;
-    }
-  }
-  IWireType iWire = wire->getIWire();
-  if (isValidIWire(iWire + 1)) {
-    const CDCWire& nextwire = getWire(iWire + 1);
-    return &nextwire;
-  } else {
-    return nullptr;
-  }
-  return nullptr;
-}
-
 
 const CDCWire& CDCWireLayer::getClosestWire(const Vector3D& pos3D) const
 {

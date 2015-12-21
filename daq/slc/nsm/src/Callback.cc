@@ -27,6 +27,7 @@ int Callback::add(NSMVHandler* handler)
           handler->getName() == m_handler[i]->getName()) {
         delete m_handler[i];
         m_handler[i] = handler;
+        notify(m_handler[i]->get());
         return i + 1;
       }
     }

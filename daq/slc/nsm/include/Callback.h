@@ -28,6 +28,7 @@ namespace Belle2 {
     virtual ~Callback() throw() {}
 
   public:
+    virtual void notify(const NSMVar& var) throw() = 0;
     int reset();
     int add(const DBObject& obj);
     int add(NSMVHandler* handler);

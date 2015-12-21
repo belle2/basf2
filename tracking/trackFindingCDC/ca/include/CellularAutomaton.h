@@ -37,10 +37,7 @@ namespace Belle2 {
       typedef WeightedNeighborhood<const AItem> Neighborhood;
 
       /// Type for the very basic exception signal used in the detection of cycles.
-      typedef int CycleDetectionMarker;
-
-      /// Instance for the very basic exception signal used in the detection of cycles.
-      const int CYCLE_DETECTED = -999;
+      class CycleException {};
 
     public:
 
@@ -95,7 +92,7 @@ namespace Belle2 {
               ptrHighestItem = &item;
             }
 
-          } catch (CycleDetectionMarker) {
+          } catch (CycleException) {
             // TODO: Come up with some handeling for cycles.
             // For now we continue to look for long paths in the graph
             // hoping to find a part that does not enter the cycle.
@@ -108,15 +105,14 @@ namespace Belle2 {
       }
 
     private:
-      /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CYCLE_DETECTED if it encounters a cycle in the graph.
+      /// Gets the cell state of the item. Determines it if necessary traversing the graph. Throws CycleException if it encounters a cycle in the graph.
       const CellState& getFinalCellState(const AItem& item, const Neighborhood& neighborhood) const
       {
         const AutomatonCell& automatonCell = item.getAutomatonCell();
         // Throw if this cell has already been traversed in this recursion cycle
         if (automatonCell.hasCycleFlag()) {
           B2WARNING("Cycle detected");
-          throw (CYCLE_DETECTED);
-
+          throw (CycleException());
         }
 
         if (automatonCell.hasAssignedFlag()) {

@@ -10,9 +10,9 @@
 
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 
-#include <cmath>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
-
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -37,24 +37,17 @@ RealisticFacetFilter::RealisticFacetFilter(double phiPullCut):
 {
 }
 
-void RealisticFacetFilter::setParameter(const std::string& key, const std::string& value)
+void RealisticFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                            const std::string& prefix)
 {
-  if (key == "phi_pull_cut") {
-    m_param_phiPullCut = stod(value);
-    B2INFO("Filter received parameter '" << key << "' " << value);
-  } else {
-    m_fitlessFacetFilter.setParameter(key, value);
-  }
+  Super::exposeParameters(moduleParamList, prefix);
+  m_fitlessFacetFilter.exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "phiPullCut"),
+                                m_param_phiPullCut,
+                                "Acceptable angle pull in the angle of adjacent tangents to the "
+                                "drift circles.",
+                                m_param_phiPullCut);
 }
-
-std::map<std::string, std::string> RealisticFacetFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = m_fitlessFacetFilter.getParameterDescription();
-  des["phi_pull_cut"] = "Acceptable angle pull in the angle of adjacent tangents to the "
-                        "drift circles.";
-  return des;
-}
-
 
 Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
 {

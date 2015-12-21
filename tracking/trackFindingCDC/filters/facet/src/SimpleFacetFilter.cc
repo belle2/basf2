@@ -10,17 +10,14 @@
 
 #include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
 
-#include <cmath>
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <framework/logging/Logger.h>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-
-
 
 SimpleFacetFilter::SimpleFacetFilter():
   m_fitlessFacetFilter(true),
@@ -29,31 +26,22 @@ SimpleFacetFilter::SimpleFacetFilter():
 }
 
 
-
-
-
 SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut):
   m_fitlessFacetFilter(true),
   m_param_deviationCosCut(deviationCosCut)
 {
 }
 
-void SimpleFacetFilter::setParameter(const std::string& key, const std::string& value)
+void SimpleFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                         const std::string& prefix)
 {
-  if (key == "deviation_cos_cut") {
-    m_param_deviationCosCut = stod(value);
-    B2INFO("Filter received parameter '" << key << "' " << value);
-  } else {
-    m_fitlessFacetFilter.setParameter(key, value);
-  }
-}
-
-std::map<std::string, std::string> SimpleFacetFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = m_fitlessFacetFilter.getParameterDescription();
-  des["deviation_cos_cut"] = "Acceptable deviation cosine in the angle of adjacent tangents to the "
-                             "drift circles.";
-  return des;
+  Super::exposeParameters(moduleParamList, prefix);
+  m_fitlessFacetFilter.exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "deviationCosCut"),
+                                m_param_deviationCosCut,
+                                "Acceptable deviation cosine in the angle of adjacent tangents "
+                                "to the drift circles.",
+                                m_param_deviationCosCut);
 }
 
 Weight SimpleFacetFilter::operator()(const CDCFacet& facet)

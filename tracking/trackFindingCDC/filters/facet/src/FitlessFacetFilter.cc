@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetFilter.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 using namespace std;
 using namespace Belle2;
@@ -20,32 +21,16 @@ FitlessFacetFilter::FitlessFacetFilter(bool hardCut) :
 {
 }
 
-void FitlessFacetFilter::setParameter(const std::string& key, const std::string& value)
+void FitlessFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                          const std::string& prefix)
 {
-  if (key == "hard_fitless_cut") {
-    if (value == "true") {
-      setHardCut(true);
-    } else if (value == "false") {
-      setHardCut(false);
-    } else {
-      Super::setParameter(key, value);
-      return;
-    }
-    B2INFO("Filter received parameter '" << key << "' " << value);
-  } else {
-    Super::setParameter(key, value);
-  }
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "hardCut"),
+                                m_param_hardCut,
+                                "Switch to disallow the boarderline possible hit and "
+                                "right left passage information.",
+                                m_param_hardCut);
 }
-
-std::map<std::string, std::string> FitlessFacetFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["hard_fitless_cut"] = "Switch to disallow the boarderline possible hit and "
-                            "right left passage information. "
-                            "Allowed values 'true', 'false'. Default is 'true'.";
-  return des;
-}
-
 
 CellState FitlessFacetFilter::operator()(const CDCFacet& facet)
 {

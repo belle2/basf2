@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 #include <assert.h>
+#include <float.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -68,7 +69,7 @@ namespace Belle2 {
         for (const auto& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
-          Weight weight = HIGHEST_WEIGHT;
+          Weight weight = DBL_MAX;
           topNode.insert(WithSharedMark<T>(item, &markOfItem), weight);
         }
       }
@@ -92,7 +93,7 @@ namespace Belle2 {
                          ASkipNodePredicate& skipNode)
       {
         std::vector<std::pair<ADomain,  std::vector<T> > > found;
-        auto isLeaf = [&](Node * node) {
+        auto isLeaf = [&found, &skipNode, maxLevel](Node * node) {
           // Skip the expansion and the filling of the children
           if (skipNode(node)) {
             return true;

@@ -9,20 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// An additive measure of quality
-    typedef double Weight;
-
-    /// Constant for the highest possible weight
-    extern const Weight HIGHEST_WEIGHT;
-
-    /// Constant for the lowest possible weight
-    extern const Weight LOWEST_WEIGHT;
+    using Weight = double;
 
   } // namespace TrackFindingCDC
-
 } // namespace Belle2

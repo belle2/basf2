@@ -32,7 +32,7 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
         argument_parser = super(CDCDisplayRun, self).create_argument_parser(**kwds)
 
         argument_parser.add_argument(
-            '-o',
+            '-d',
             '--output-folder',
             dest='output_folder',
             default=self.output_folder,
@@ -45,6 +45,26 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
             action='store_false',
             help='Run in batch mode and do not show each event.'
         )
+
+        argument_parser.add_argument(
+            '--use-python',
+            dest='use_python',
+            action='store_true',
+            help='Swtich to activate the legacy implementation written in python'
+            )
+
+        argument_parser.add_argument(
+            "--use_time_in_filename",
+            action='store_true',
+            help='Use the current time in the names of the generated files'
+            )
+
+        argument_parser.add_argument(
+            "-p",
+            '--filename_prefix',
+            default="",
+            help='Prefix to the names of the generated files'
+            )
 
         argument_parser.add_argument(
             '-m',
@@ -92,6 +112,11 @@ Note that some options are only relevant, if the cellular automaton finder in th
 
         cdc_display_module.output_folder = arguments.output_folder
         cdc_display_module.interactive = arguments.interactive
+
+        cdc_display_module.use_python = arguments.use_python
+        cdc_display_module.use_cpp = not arguments.use_python
+        cdc_display_module.use_time_in_filename = arguments.use_time_in_filename
+        cdc_display_module.filename_prefix = arguments.filename_prefix
 
         if self.show_all_drawoptions:
             drawoptions = cdc_display_module.all_drawoptions

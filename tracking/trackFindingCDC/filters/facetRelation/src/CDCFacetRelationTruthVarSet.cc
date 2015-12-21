@@ -21,8 +21,8 @@ CDCFacetRelationTruthVarSet::CDCFacetRelationTruthVarSet(const std::string& pref
 
 bool CDCFacetRelationTruthVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  const CDCFacet* ptrFromFacet = ptrFacetRelation->first;
-  const CDCFacet* ptrToFacet = ptrFacetRelation->second;
+  const CDCFacet* ptrFromFacet(ptrFacetRelation->getFrom());
+  const CDCFacet* ptrToFacet(ptrFacetRelation->getTo());
 
   const CDCFacet& fromFacet = *ptrFromFacet;
   const CDCFacet& toFacet = *ptrToFacet;

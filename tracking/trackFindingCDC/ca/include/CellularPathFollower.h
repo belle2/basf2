@@ -130,7 +130,7 @@ namespace Belle2 {
         for (const WeightedRelation<const AItem>& relation : neighborhood.equal_range(lastItem)) {
           if (isHighestContinuation(relation)) {
 
-            const AItem* ptrNeighbor = relation.getTo();
+            const AItem* ptrNeighbor(relation.getTo());
             path.push_back(ptrNeighbor);
 
             growPath(path, neighborhood, growMany);
@@ -168,8 +168,8 @@ namespace Belle2 {
       /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
       static bool isHighestContinuation(const WeightedRelation<const AItem>& relation)
       {
-        const AItem* ptrItem = relation.getFrom();
-        const AItem* ptrNeighbor = relation.getTo();
+        const AItem* ptrItem(relation.getFrom());
+        const AItem* ptrNeighbor(relation.getTo());
 
         if (not ptrItem or not ptrNeighbor) return false;
 

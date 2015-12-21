@@ -51,8 +51,8 @@ namespace Belle2 {
        *  the method implementing the rejection.*/
       virtual Weight operator()(const Relation<const CDCRecoSegment2D>& relation) override
       {
-        const CDCRecoSegment2D* ptrFrom = relation.first;
-        const CDCRecoSegment2D* ptrTo = relation.second;
+        const CDCRecoSegment2D* ptrFrom(relation.first);
+        const CDCRecoSegment2D* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);

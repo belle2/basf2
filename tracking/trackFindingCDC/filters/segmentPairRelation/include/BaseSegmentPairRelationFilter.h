@@ -57,8 +57,8 @@ namespace Belle2 {
        *  the method implementing the rejection.*/
       virtual Weight operator()(const Relation<const CDCSegmentPair>& relation) override final
       {
-        const CDCSegmentPair* ptrFrom = relation.first;
-        const CDCSegmentPair* ptrTo = relation.second;
+        const CDCSegmentPair* ptrFrom(relation.first);
+        const CDCSegmentPair* ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }

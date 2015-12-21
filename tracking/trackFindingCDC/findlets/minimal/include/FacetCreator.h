@@ -103,16 +103,20 @@ namespace Belle2 {
           if (middleWireHit.getAutomatonCell().hasTakenFlag()) continue;
 
           const auto neighbors = neighborhood.equal_range(ptrMiddleWireHit);
-          for (const CDCWireHit* ptrStartWireHit : neighbors) {
+          for (const WeightedRelation<const CDCWireHit>& startWireHitRelation : neighbors) {
+            const CDCWireHit* ptrStartWireHit(startWireHitRelation.getTo());
 
             if (not ptrStartWireHit) continue;
             const CDCWireHit& startWireHit = *ptrStartWireHit;
             if (startWireHit.getAutomatonCell().hasTakenFlag()) continue;
 
-            for (const CDCWireHit* ptrEndWireHit : neighbors) {
+            for (const WeightedRelation<const CDCWireHit>& endWireHitRelation : neighbors) {
+              const CDCWireHit* ptrEndWireHit(endWireHitRelation.getTo());
+
               if (not ptrEndWireHit) continue;
               const CDCWireHit& endWireHit = *ptrEndWireHit;
               if (endWireHit.getAutomatonCell().hasTakenFlag()) continue;
+
               // Skip combinations where the facet starts and ends on the same wire
               if (not(ptrStartWireHit->getWire() ==  ptrEndWireHit->getWire())) {
                 createFacetsForHitTriple(startWireHit,

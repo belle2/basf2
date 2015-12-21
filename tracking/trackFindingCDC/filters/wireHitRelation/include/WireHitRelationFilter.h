@@ -123,8 +123,8 @@ namespace Belle2 {
        *  the method implementing the rejection.*/
       inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
       {
-        const CDCWireHit* ptrFrom = relation.first;
-        const CDCWireHit* ptrTo = relation.second;
+        const CDCWireHit* ptrFrom(relation.first);
+        const CDCWireHit* ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }

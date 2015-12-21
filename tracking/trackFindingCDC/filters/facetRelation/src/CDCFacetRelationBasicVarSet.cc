@@ -24,8 +24,8 @@ bool CDCFacetRelationBasicVarSet::extract(const Relation<const CDCFacet>* ptrFac
   bool extracted = Super::extract(ptrFacetRelation);
   if (not extracted or not ptrFacetRelation) return false;
 
-  const CDCFacet* ptrFromFacet = ptrFacetRelation->first;
-  const CDCFacet* ptrToFacet = ptrFacetRelation->second;
+  const CDCFacet* ptrFromFacet(ptrFacetRelation->getFrom());
+  const CDCFacet* ptrToFacet(ptrFacetRelation->getTo());
 
   const CDCFacet& fromFacet = *ptrFromFacet;
   const CDCFacet& toFacet = *ptrToFacet;

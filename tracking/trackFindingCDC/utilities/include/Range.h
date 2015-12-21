@@ -25,22 +25,28 @@ namespace Belle2 {
       using Super = std::pair<AIterator, AIterator>;
 
     public:
+      /// Iterator type of the range
+      using Iterator = AIterator;
+
+      /// The type the iterator references
+      using Reference = typename std::iterator_traits<AIterator>::reference;
+
+    public:
       /// Constructor from another range
       template<class Ts>
-      Range(Ts& ts) : Super(std::begin(ts), std::end(ts)) {}
+      Range(Ts& ts)
+        : Super(std::begin(ts), std::end(ts))
+      {}
 
       /// Inheriting the constructor of the base class
       using Super::Super;
 
-      /// The type the iterator references
-      typedef typename std::iterator_traits<AIterator>::reference ReferenceType;
-
       /// Begin of the range for range based for.
-      const AIterator& begin() const
+      const Iterator& begin() const
       { return this->first; }
 
       /// End of the range for range based for.
-      const AIterator& end() const
+      const Iterator& end() const
       { return this->second; }
 
       /// Checks if the begin equals the end iterator, hence if the range is empty.
@@ -48,21 +54,29 @@ namespace Belle2 {
       { return begin() == end(); }
 
       /// Returns the total number of objects in this range
-      size_t size() const
+      std::size_t size() const
       { return std::distance(begin(), end()); }
 
-      /// Returns the derefenced begin iterator.
-      ReferenceType front() const
+      /// Returns the derefenced iterator at begin()
+      Reference front() const
       { return *(begin()); }
 
-      /// Returns the derefenced end iterator
-      ReferenceType back() const
-      { return *(end()); }
+      /// Returns the derefenced iterator before end()
+      Reference back() const
+      { return *(end() - 1); }
 
       /// Returns the object at index i
-      ReferenceType operator[](size_t pos) const
-      { return *std::advance(AIterator(begin()), pos); }
+      Reference operator[](std::size_t i) const
+      { return *(begin() + i); }
 
+      /// Returns the object at index i
+      Reference at(std::size_t i) const
+      {
+        if (not(i < size())) {
+          throw std::out_of_range("Range : Requested index " + std::to_string(i) + " is out of bounds.");
+        }
+        return operator[](i);
+      }
     };
   }
 }

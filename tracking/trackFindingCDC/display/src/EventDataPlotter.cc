@@ -63,31 +63,17 @@ m_animate(animate)
 {
 }
 
-EventDataPlotter::EventDataPlotter(PrimitivePlotter* ptrPrimitivePlotter, bool animate) :
-  m_ptrPrimitivePlotter(ptrPrimitivePlotter),
+EventDataPlotter::EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter, bool animate) :
+  m_ptrPrimitivePlotter(std::move(ptrPrimitivePlotter)),
   m_animate(animate)
 {
-  if (not m_ptrPrimitivePlotter) {
-    B2WARNING("EventDataPlotter initialized with nullptr. Using default backend SVGPrimitivePlotter.");
-    m_ptrPrimitivePlotter = new SVGPrimitivePlotter();
-  }
+  B2ASSERT("EventDataPlotter initialized with nullptr. Using default backend SVGPrimitivePlotter.", m_ptrPrimitivePlotter);
 }
 
 EventDataPlotter::EventDataPlotter(const EventDataPlotter& eventDataPlotter) :
-  m_ptrPrimitivePlotter(eventDataPlotter.m_ptrPrimitivePlotter ? eventDataPlotter.m_ptrPrimitivePlotter->clone() : nullptr),
+  m_ptrPrimitivePlotter(eventDataPlotter.m_ptrPrimitivePlotter->clone()),
   m_animate(eventDataPlotter.m_animate)
 {
-}
-
-EventDataPlotter::~EventDataPlotter()
-{
-  delete m_ptrPrimitivePlotter;
-  m_ptrPrimitivePlotter = nullptr;
-}
-
-EventDataPlotter* EventDataPlotter::clone()
-{
-  return new EventDataPlotter(*this);
 }
 
 const std::string EventDataPlotter::save(const std::string& fileName)

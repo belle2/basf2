@@ -27,6 +27,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <memory>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class Circle2D;
@@ -59,21 +61,12 @@ namespace Belle2 {
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(PrimitivePlotter* primitivePlotter, bool animate = false);
+      EventDataPlotter(std::unique_ptr<PrimitivePlotter> primitivePlotter, bool animate = false);
 
       /// Copy constructor
       EventDataPlotter(const EventDataPlotter& EventDataPlotter);
 
-      /// Make destructor virtual to handle polymorphic deconstruction.
-      virtual ~EventDataPlotter();
-
-      /// Returns a newly created plotter instance containing all information of this.
-      /** The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
-       */
-      virtual EventDataPlotter* clone();
-
     public:
-
       /** Saves the current plot stead to a file.
        *
        *  Deriving instances may should implement the approriate thing here and
@@ -257,7 +250,7 @@ namespace Belle2 {
 
     private:
       /// Reference to the primitivePlotter instance used as backend for the draw commands.
-      PrimitivePlotter* m_ptrPrimitivePlotter;
+      std::unique_ptr<PrimitivePlotter> m_ptrPrimitivePlotter;
 
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
       bool m_animate = false;

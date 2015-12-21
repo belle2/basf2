@@ -91,22 +91,22 @@ namespace {
     if (nTangents == 0) {
       //pass
     } else if (nTangents == 1) {
-      const CDCTangent* tangent = tangentSegment.front();
+      Ptr<const CDCTangent> tangent{tangentSegment.front()};
       result.push_back(tangent->getFromRecoHit2D());
       result.push_back(tangent->getToRecoHit2D());
 
     } else { // nTangents > 2
       typename std::vector<AMaybePtrTangent>::const_iterator itTangent = tangentSegment.begin();
 
-      const CDCTangent* firstTangent = *itTangent++;  // tangentSegment[0];
-      const CDCTangent* secondTangent = *itTangent++;  // tangentSegment[1];
+      Ptr<const CDCTangent> firstTangent{*itTangent++};  // tangentSegment[0];
+      Ptr<const CDCTangent> secondTangent{*itTangent++};  // tangentSegment[1];
 
       result.push_back(firstTangent->getFromRecoHit2D());
 
       while (itTangent != tangentSegment.end()) {
 
         firstTangent = secondTangent; // tangentSegment[iTangent];
-        secondTangent = *itTangent++; // tangentSegment[iTangent+1];
+        secondTangent = Ptr<const CDCTangent> {*itTangent++}; // tangentSegment[iTangent+1];
 
         result.push_back(CDCRecoHit2D::average(firstTangent->getToRecoHit2D(),
                                                secondTangent->getFromRecoHit2D()));

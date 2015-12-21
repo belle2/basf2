@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/Star.h>
+#include <tracking/trackFindingCDC/utilities/Ptr.h>
 #include <utility>
 
 namespace Belle2 {
@@ -27,6 +28,10 @@ namespace Belle2 {
     public:
       /// Make the constructor of the base type available
       using Super::Super;
+
+      /// Allow decay of the reference object types from non-const to const.
+      operator Relation<const T, AsPtr>() const
+      { return Relation<const T, AsPtr>(this->first, this->second); }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(AsPtr<T> ptr,

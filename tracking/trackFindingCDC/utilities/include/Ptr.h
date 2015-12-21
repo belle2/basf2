@@ -12,7 +12,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Class that behaves like T*.
+    /**
+     *  Class that behaves like T*.
      *  Needed because you cannot inherit from T* directly in
      *  a mixin based inheritance structure.
      *  I cannot believe I have to write this in C++ though...
@@ -20,9 +21,17 @@ namespace Belle2 {
     template<class T>
     class Ptr {
     public:
-      /// Wrap the object. Memory for the mark is provided from a shared position.
+      /// Wrap the pointer to an object.
       explicit Ptr(T* obj) : m_obj(obj)
       {}
+
+      /// Wrap the reference to an object. Constructing a pointer from a reference takes the address.
+      explicit Ptr(T& obj) : m_obj(&obj)
+      {}
+
+      /// Allow decay of the referenced object type from non-const to const.
+      operator Ptr<const T>() const
+      { return Ptr<const T>(m_obj); }
 
       /// Allow automatic unpacking.
       operator T*& ()
@@ -37,7 +46,7 @@ namespace Belle2 {
       { return m_obj;}
 
       /// Mimic the original item pointer access.
-      const T* operator->() const
+      T* operator->() const
       { return m_obj;}
 
     private:
@@ -46,22 +55,21 @@ namespace Belle2 {
     };
 
 
-    /// Helper trait to replace a T* with Ptr<T> when needed.
+    /// Helper type function to replace a T* with Ptr<T> when needed.
     template<class T>
     struct ReplaceStarWithPtrImpl {
       /// Base implementation just forwards the original type.
       using Type = T;
     };
 
-    /// Helper trait to replace a T* with Ptr<T> when needed.
+    /// Helper type function to replace a T* with Ptr<T> when needed.
     template<class T>
     struct ReplaceStarWithPtrImpl<T*> {
       /// Specilisation replaces T* with Ptr<T>.
       using Type = Ptr<T>;
     };
 
-
-    /// Helper trait to replace a T* with Ptr<T> when needed.
+    /// Helper type function to replace a T* with Ptr<T> when needed.
     template<class T>
     using StarToPtr = typename ReplaceStarWithPtrImpl<T>::Type;
 

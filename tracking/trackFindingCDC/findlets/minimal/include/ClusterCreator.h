@@ -56,7 +56,7 @@ namespace Belle2 {
         B2ASSERT("Expect wire hit neighborhood to be symmetric ", m_wirehitNeighborhood.isSymmetric());
         B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
-        m_wirehitClusterizer.createFromPointers(inputWireHits, m_wirehitNeighborhood, outputClusters);
+        m_wirehitClusterizer.create(inputWireHits, m_wirehitNeighborhood, outputClusters);
       }
 
     private:

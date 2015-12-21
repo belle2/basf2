@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -33,7 +32,6 @@ namespace Belle2 {
         m_filterFactory()
       {}
 
-
       /// Constructor of the chooseable filter taking the default filter name and parameters
       ChooseableFilter(std::string filterName,
                        std::map<std::string, std::string> filterParameters
@@ -45,7 +43,8 @@ namespace Belle2 {
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      virtual void exposeParameters(ModuleParamList* moduleParamList,
+                                    const std::string& prefix = "") override final
       {
         Super::exposeParameters(moduleParamList, prefix);
         m_filterFactory.exposeParameters(moduleParamList, prefix);
@@ -63,17 +62,12 @@ namespace Belle2 {
         m_filterFactory.setFilterName(filterName);
       }
 
-      /// Initialize the recorder before event processing.
+      /// Initialize before event processing.
       virtual void initialize() override
       {
         m_filter = m_filterFactory.create();
         m_filter->initialize();
         Super::initialize();
-
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().requireTruthInformation();
-        }
-
       }
 
       /// Indicates if the filter requires Monte Carlo information.
@@ -88,10 +82,6 @@ namespace Belle2 {
         B2ASSERT("No filter was set up. Forgot to initialise the ChooseableFilter", m_filter);
         m_filter->beginEvent();
         Super::beginEvent();
-
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().fill();
-        }
       }
 
       /// Initialize the recorder after event processing.
@@ -117,7 +107,7 @@ namespace Belle2 {
       /// FilterFactory
       AFilterFactory m_filterFactory;
 
-      /// Choosen filter
+      /// Chosen filter
       std::unique_ptr<typename AFilterFactory::CreatedFilter> m_filter = nullptr;
 
     };

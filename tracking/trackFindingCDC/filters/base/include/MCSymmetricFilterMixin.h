@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <map>
 #include <string>
@@ -31,6 +32,22 @@ namespace Belle2 {
         Super(),
         m_param_allowReverse(allowReverse)
       {
+      }
+
+      /// Initialize the before event processing.
+      virtual void initialize() override
+      {
+        if (needsTruthInformation()) {
+          CDCMCManager::getInstance().requireTruthInformation();
+        }
+      }
+
+      /// Signal the beginning of a new event
+      virtual void beginEvent() override
+      {
+        if (needsTruthInformation()) {
+          CDCMCManager::getInstance().fill();
+        }
       }
 
       /** Set the parameter with key to value.

@@ -42,15 +42,15 @@ namespace Belle2 {
         for (const CDCRecoSegment2D& segment : segments) {
 
           ILayerType iSuperLayer =  segment.getISuperLayer();
-          EStereoType stereoType = segment.getStereoType();
+          EStereoKind stereoType = segment.getStereoKind();
 
-          if (stereoType == EStereoType::c_Axial) {
+          if (stereoType == EStereoKind::c_Axial) {
 
             const CDCAxialRecoSegment2D* axialSegment = &segment;
             axialSegmentsBySL[iSuperLayer].push_back(axialSegment);
 
 
-          } else if (stereoType == EStereoType::c_StereoU or stereoType == EStereoType::c_StereoV) {
+          } else if (stereoType == EStereoKind::c_StereoU or stereoType == EStereoKind::c_StereoV) {
 
             const CDCStereoRecoSegment2D* stereoSegment = &segment;
             stereoSegmentsBySL[iSuperLayer].push_back(stereoSegment);

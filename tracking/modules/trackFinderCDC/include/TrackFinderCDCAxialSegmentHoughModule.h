@@ -141,7 +141,7 @@ namespace Belle2 {
       ptrAxialSegments.reserve(segments.size());
 
       for (const CDCRecoSegment2D& segment : segments) {
-        if (segment.getStereoType() == EStereoType::c_Axial) {
+        if (segment.getStereoKind() == EStereoKind::c_Axial) {
           ptrAxialSegments.push_back(&segment);
           nAxialHits += segment.size();
         }

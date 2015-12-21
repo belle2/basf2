@@ -76,12 +76,12 @@ namespace Belle2 {
       }
 
       /// Getter for the common stereo type of the superlayer of the pair.
-      EStereoType getStereoType() const
-      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoType() : EStereoType::c_Invalid; }
+      EStereoKind getStereoKind() const
+      { return isValidISuperLayer(getISuperLayer()) ? getFromRLWireHit().getStereoKind() : EStereoKind::c_Invalid; }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
-      { return getStereoType() == EStereoType::c_Axial; }
+      { return getStereoKind() == EStereoKind::c_Axial; }
 
       /// Getter for the wire the first oriented wire hit is based on.
       const CDCWire& getFromWire() const

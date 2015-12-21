@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for the stereo property of the wire
-    enum class EStereoType {
+    enum class EStereoKind {
       /// Constant for an axial wire
       c_Axial = 0,
 
@@ -36,11 +36,11 @@ namespace Belle2 {
      *  INVALID_STEREOTYPE if there is no common super layer or the container is empty.
      */
     template<class AHits>
-    EStereoType getStereoType(const AHits& hits)
+    EStereoKind getStereoKind(const AHits& hits)
     {
       using Hit = ValueType<AHits>;
-      auto getStereoTypeOfHit = [](const Hit & hit) {return hit->getStereoType();};
-      return common(hits, getStereoTypeOfHit, EStereoType::c_Invalid);
+      auto getStereoKindOfHit = [](const Hit & hit) {return hit->getStereoKind();};
+      return common(hits, getStereoKindOfHit, EStereoKind::c_Invalid);
     }
 
   } // namespace TrackFindingCDC

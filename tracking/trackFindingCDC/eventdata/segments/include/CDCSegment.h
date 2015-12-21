@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayerType.h>
-#include <tracking/trackFindingCDC/topology/EStereoType.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
 #include <vector>
 #include <assert.h>
@@ -36,14 +36,14 @@ namespace Belle2 {
 
       /// Returns the common stereo type of all tracking hits.
       /** This checks if all tracking hits are located in the same superlayer and \n
-       *  returns the stereo type of the later. Returns EStereoType::c_Invalid if the superlayer \n
+       *  returns the stereo type of the later. Returns EStereoKind::c_Invalid if the superlayer \n
        *  is not shared among the tracking hits. */
-      EStereoType getStereoType() const
-      { return TrackFindingCDC::getStereoType(*this); }
+      EStereoKind getStereoKind() const
+      { return TrackFindingCDC::getStereoKind(*this); }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const
-      { return getStereoType() == EStereoType::c_Axial; }
+      { return getStereoKind() == EStereoKind::c_Axial; }
 
       /** Returns the common super layer id of all stored tracking hits
        *  This checks if all items are located in the same superlayer and

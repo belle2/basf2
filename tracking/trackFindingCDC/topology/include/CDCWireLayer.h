@@ -184,15 +184,15 @@ namespace Belle2 {
       /**@{*/
 
       /// Indicates if the wire is axial or stereo
-      bool isAxial() const { return getStereoType() == EStereoType::c_Axial; }
+      bool isAxial() const { return getStereoKind() == EStereoKind::c_Axial; }
 
       /// Getter for the stereo type of the wire layer
       /** Gives the stereo type of the wire. \n
-       *  Result is one of EStereoType::c_Axial, EStereoType::c_StereoU and EStereoType::c_StereoV. \n
+       *  Result is one of EStereoKind::c_Axial, EStereoKind::c_StereoU and EStereoKind::c_StereoV. \n
        *  The stereo type is shared by all wires in the same superlayer. \n
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
-      EStereoType getStereoType() const { return first().getStereoType(); }
+      EStereoKind getStereoKind() const { return first().getStereoKind(); }
 
       /// Getter for the averaged tan stereo angle of all wires in this layer
       double getTanStereoAngle() const { return m_tanStereoAngle; }

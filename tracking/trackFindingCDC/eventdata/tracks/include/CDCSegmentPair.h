@@ -75,23 +75,23 @@ namespace Belle2 {
 
 
       /// Checks if the two segments are of different axial type.
-      bool checkSegmentsStereoTypes() const
-      { return (getStartStereoType() == EStereoType::c_Axial) xor(getEndStereoType() == EStereoType::c_Axial); }
+      bool checkSegmentsStereoKinds() const
+      { return (getStartStereoKind() == EStereoKind::c_Axial) xor(getEndStereoKind() == EStereoKind::c_Axial); }
 
       /// Checks the references to the contained three segment for nullptrs and exactly one of them is axial and one is stereo
       bool checkSegments() const
-      { return checkSegmentsNonNullptr() and checkSegmentsStereoTypes(); }
+      { return checkSegmentsNonNullptr() and checkSegmentsStereoKinds(); }
 
 
 
       /// Getter for the stereo type of the first segment.
-      EStereoType getStartStereoType() const
-      { return getStartSegment() == nullptr ? EStereoType::c_Invalid : getStartSegment()->getStereoType(); }
+      EStereoKind getStartStereoKind() const
+      { return getStartSegment() == nullptr ? EStereoKind::c_Invalid : getStartSegment()->getStereoKind(); }
 
 
       /// Getter for the stereo type of the second segment.
-      EStereoType getEndStereoType() const
-      { return getEndSegment() == nullptr ? EStereoType::c_Invalid : getEndSegment()->getStereoType(); }
+      EStereoKind getEndStereoKind() const
+      { return getEndSegment() == nullptr ? EStereoKind::c_Invalid : getEndSegment()->getStereoKind(); }
 
 
 
@@ -127,11 +127,11 @@ namespace Belle2 {
 
       /// Getter for the stereo segment
       const CDCRecoSegment2D* getStereoSegment() const
-      { return getStartStereoType() != EStereoType::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getStartStereoKind() != EStereoKind::c_Axial ? getStartSegment() : getEndSegment(); }
 
       /// Getter for the axial segment
       const CDCRecoSegment2D* getAxialSegment() const
-      { return getStartStereoType() == EStereoType::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getStartStereoKind() == EStereoKind::c_Axial ? getStartSegment() : getEndSegment(); }
 
 
       /// Setter for both segments simultaniously
@@ -140,7 +140,7 @@ namespace Belle2 {
         m_startSegment = startSegment;
         m_endSegment = endSegment;
         if (not checkSegmentsNonNullptr()) B2WARNING("CDCSegmentPair: one segment set to nullptr");
-        if (not checkSegmentsStereoTypes()) B2WARNING("CDCSegmentPair: segments set with same stereo type");
+        if (not checkSegmentsStereoKinds()) B2WARNING("CDCSegmentPair: segments set with same stereo type");
       }
 
       /** Determines the angle between the last reconstructed position of the start segment and

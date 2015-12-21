@@ -146,8 +146,8 @@ namespace Belle2 {
       { return getWire().getSkewLine().movedBy(getRecoDisp2D()); }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoType getStereoType() const
-      { return getRLWireHit().getStereoType(); }
+      EStereoKind getStereoKind() const
+      { return getRLWireHit().getStereoKind(); }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const

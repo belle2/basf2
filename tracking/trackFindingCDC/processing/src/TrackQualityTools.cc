@@ -19,7 +19,7 @@ using namespace std;
 void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track)
 {
   for (const CDCRecoHit3D& recoHit : track) {
-    if (recoHit.getStereoType() == EStereoType::c_Axial) {
+    if (recoHit.getStereoKind() == EStereoKind::c_Axial) {
       break;
     } else {
       recoHit.getWireHit().getAutomatonCell().setAssignedFlag();

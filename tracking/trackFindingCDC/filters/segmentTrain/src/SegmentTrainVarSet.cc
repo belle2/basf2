@@ -29,7 +29,7 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
 
   const CDCTrajectory2D& trajectory = track->getStartTrajectory3D().getTrajectory2D();
 
-  bool is_stereo = segmentTrain.front()->getSegment()->getStereoType() != EStereoType::c_Axial;
+  bool is_stereo = segmentTrain.front()->getSegment()->getStereoKind() != EStereoKind::c_Axial;
 
   var<named("is_stereo")>() = is_stereo;
   var<named("size")>() = segmentTrain.size();

@@ -118,8 +118,8 @@ namespace Belle2 {
       { return getWire().getISuperLayer(); }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoType getStereoType() const
-      { return getWire().getStereoType(); }
+      EStereoKind getStereoKind() const
+      { return getWire().getStereoKind(); }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const

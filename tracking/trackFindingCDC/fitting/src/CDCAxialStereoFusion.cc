@@ -463,7 +463,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     return CDCTrajectory3D();
   }
 
-  bool startIsAxial = startSegment.getStereoType() == EStereoType::c_Axial;
+  bool startIsAxial = startSegment.getStereoKind() == EStereoKind::c_Axial;
 
   const CDCAxialRecoSegment2D& axialSegment = startIsAxial ? startSegment : endSegment;
   const CDCStereoRecoSegment2D& stereoSegment = not startIsAxial ? startSegment : endSegment;

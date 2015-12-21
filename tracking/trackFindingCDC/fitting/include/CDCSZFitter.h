@@ -118,7 +118,7 @@ namespace Belle2 {
         //   B2WARNING("Reconstructed displacement: " << recoHit3D.getRecoDisp2D());
         //   B2WARNING("Reconstructed displacement norm: " << dispNorm);
         //   B2WARNING("Reconstructed displacement norm eq 0: " << (dispNorm == 0.0));
-        //   B2WARNING("Stereo type: " << recoHit3D.getStereoType());
+        //   B2WARNING("Stereo type: " << recoHit3D.getStereoKind());
         //   B2WARNING("Wire vector: " << wireVector);
         //   B2WARNING("Zeta: " << zeta);
         //   B2WARNING("Variance: " << 1.0 / weight);
@@ -141,7 +141,7 @@ namespace Belle2 {
       {
         CDCObservations2D observationsSZ;
         for (const CDCRecoHit3D& recoHit : track) {
-          if (recoHit.getStereoType() != EStereoType::c_Axial) {
+          if (recoHit.getStereoKind() != EStereoKind::c_Axial) {
             appendSZ(observationsSZ, recoHit);
           }
         }

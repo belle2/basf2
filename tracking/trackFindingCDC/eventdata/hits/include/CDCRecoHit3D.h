@@ -167,8 +167,8 @@ namespace Belle2 {
       { return wireHit < recoHit3D.getWireHit(); }
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoType getStereoType() const
-      { return getRLWireHit().getStereoType(); }
+      EStereoKind getStereoKind() const
+      { return getRLWireHit().getStereoKind(); }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const

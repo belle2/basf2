@@ -17,7 +17,7 @@ namespace {
   /** Returns a bool if the rlWire can be used as a stereo hit. */
   bool isValidStereoHit(const CDCWireHit& wireHit)
   {
-    return not(wireHit.getStereoType() == EStereoType::c_Axial or wireHit.getAutomatonCell().hasTakenFlag());
+    return not(wireHit.getStereoKind() == EStereoKind::c_Axial or wireHit.getAutomatonCell().hasTakenFlag());
     // TODO Check for number of layers in between
   }
 
@@ -25,7 +25,7 @@ namespace {
   bool isValidStereoSegment(const CDCRecoSegment2D& segment)
   {
     // Skip axial segments
-    return not(segment.getStereoType() == EStereoType::c_Axial or segment.isFullyTaken());
+    return not(segment.getStereoKind() == EStereoKind::c_Axial or segment.isFullyTaken());
   }
 }
 

@@ -21,7 +21,7 @@
 
 #include <tracking/trackFindingCDC/topology/EWireNeighborKind.h>
 
-#include <tracking/trackFindingCDC/topology/EStereoType.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -162,19 +162,19 @@ namespace Belle2 {
       const WireLine& getSkewLine() const { return m_skewLine; }
 
       /// Indicates if the wire is axial or stereo
-      inline bool isAxial() const { return getStereoType() == EStereoType::c_Axial; }
+      inline bool isAxial() const { return getStereoKind() == EStereoKind::c_Axial; }
 
       /// Getter for the stereo type of the wire
       /** Gives the stereo type of the wire.
-       *  Result is one of EStereoType::c_Axial, EStereoType::c_StereoU and EStereoType::c_StereoV
+       *  Result is one of EStereoKind::c_Axial, EStereoKind::c_StereoU and EStereoKind::c_StereoV
        *  The stereo type is shared by all wires in the same superlayer
        *  The superlayer pattern for Belle II is AUAVAUAVA according the TDR
        */
-      inline EStereoType getStereoType() const
+      inline EStereoKind getStereoKind() const
       {
-        if ((getISuperLayer() % 2) == 0)  return EStereoType::c_Axial;
-        else if ((getISuperLayer() % 4) == 1)  return EStereoType::c_StereoU;
-        else return EStereoType::c_StereoV;
+        if ((getISuperLayer() % 2) == 0)  return EStereoKind::c_Axial;
+        else if ((getISuperLayer() % 4) == 1)  return EStereoKind::c_StereoU;
+        else return EStereoKind::c_StereoV;
       }
 
       /// Gives the xy projected position of the wire at the given z coordinate

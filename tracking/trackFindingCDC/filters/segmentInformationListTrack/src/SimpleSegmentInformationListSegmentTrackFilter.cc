@@ -29,7 +29,7 @@ Weight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<std::
 
   CDCObservations2D observations;
 
-  bool isAxialSegment = train.front()->getSegment()->getStereoType() == EStereoType::c_Axial;
+  bool isAxialSegment = train.front()->getSegment()->getStereoKind() == EStereoKind::c_Axial;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     if (isAxialSegment) {

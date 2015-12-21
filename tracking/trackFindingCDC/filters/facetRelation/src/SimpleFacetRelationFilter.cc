@@ -10,30 +10,22 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-void SimpleFacetRelationFilter::setParameter(const std::string& key, const std::string& value)
+void SimpleFacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                                 const std::string& prefix)
 {
-  if (key == "deviation_cos_cut") {
-    m_param_deviationCosCut = stod(value);
-    B2INFO("Filter received parameter '" << key << "' " << value);
-  } else {
-    Super::setParameter(key, value);
-  }
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "deviationCosCut"),
+                                m_param_deviationCosCut,
+                                "Acceptable deviation cosine in the angle of adjacent tangents "
+                                "to the drift circles.",
+                                m_param_deviationCosCut);
 }
-
-std::map<std::string, std::string> SimpleFacetRelationFilter::getParameterDescription()
-{
-  std::map<std::string, std::string> des = Super::getParameterDescription();
-  des["deviation_cos_cut"] = "Acceptable deviation cosine in the angle of adjacent tangents to the "
-                             "drift circles.";
-  return des;
-}
-
-
 
 Weight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                              const CDCFacet& toFacet)

@@ -37,21 +37,8 @@ namespace Belle2 {
       {}
 
     public:
-      /** Set the parameter with key to value.
-       *
-       *  Parameters are:
-       *  deviation_cos_cut - Acceptable deviation cosine in the angle of adjacent tangents to the
-       *                      drift circles.
-       */
-      virtual
-      void setParameter(const std::string& key, const std::string& value) override;
-
-      /** Returns a map of keys to descriptions describing the individual parameters of the filter.
-       */
-      virtual
-      std::map<std::string, std::string> getParameterDescription() override;
-
-
+      /// Expose the set of parameters of the filter to the module parameter list.
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override;
     public:
       /** Main filter method returning the weight of the neighborhood relation.*/
       virtual Weight operator()(const CDCFacet& fromFacet,

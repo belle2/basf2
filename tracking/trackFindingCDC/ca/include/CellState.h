@@ -10,18 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for the cell states in the cellular automata
-    typedef Weight CellState;
-
-    /// Constant to mark that a certain cell is not a continuation to advance on
-    extern const CellState NO_CONTINUATION;
-    // Implementation note: Uses external linkage because ROOT cint can not handle the inclusion of numeric_limits<> constructs.
+    using CellState = Weight;
 
   } // namespace TrackFindingCDC
-
 } // namespace Belle2

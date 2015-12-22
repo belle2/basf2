@@ -173,7 +173,16 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
         mc_track_cands = Belle2.PyStoreArray(self.mcTrackCandidatesColumnName)
 
-        mc_track_cands_cdc_hit_ids = [frozenset(mc_track_cand.getHitIDs(Belle2.Const.CDC)) for mc_track_cand in mc_track_cands]
+        mc_track_cands_cdc_hit_ids = []
+        for mc_track_cand in mc_track_cands:
+            mc_track_cand_cdc_hit_ids = mc_track_cand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(mc_track_cand_cdc_hit_ids) == 0:
+                mc_track_cand_cdc_hit_ids = frozenset()
+            else:
+                mc_track_cand_cdc_hit_ids = frozenset(mc_track_cand_cdc_hit_ids)
+            mc_track_cands_cdc_hit_ids .append(mc_track_cand_cdc_hit_ids)
+
         self.mc_track_cands_cdc_hit_ids = mc_track_cands_cdc_hit_ids
 
     def peel(self, trackCand):
@@ -181,7 +190,12 @@ class ExpertPRSideTrackingValidationModule(PRSideTrackingValidationModule):
 
         trackMatchLookUp = self.trackMatchLookUp
 
-        trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
+        trackCandHits = trackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+        # Working around a bug in ROOT where you should not access empty std::vectors
+        if len(trackCandHits) == 0:
+            trackCandHits = set()
+        else:
+            trackCandHits = set(trackCandHits)
 
         # Building the confusion matrix once more :-)
         list_of_connected_mc_tracks = []

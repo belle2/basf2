@@ -121,12 +121,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         # # CDC Hits in MC tracks
         totalHitListMC = []
         for mcTrackCand in mcTrackCands:
-            cdcHitIDs = mcTrackCand.getHitIDs(Belle2.Const.CDC)
-            if len(cdcHitIDs):
-                # There seems to be a bug in PyROOT / gcc that results
-                # in a segmentation violation when trying to access an empty vector.
-                # Skip such instances.
-                continue
+            cdcHitIDs = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(cdcHitIDs) == 0:
+                cdcHitIDs = set()
+            else:
+                cdcHitIDs = set(cdcHitIDs)
             totalHitListMC.extend(cdcHitIDs)
 
         # Make the ids unqiue
@@ -142,12 +142,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 basf2.B2WARNING("Encountered a pattern recognition track with no hits")
                 continue
 
-            cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)
+            cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
-                # There seems to be a bug in PyROOT / gcc that results
-                # in a segmentation violation when trying to access an empty vector.
-                # Skip such instances.
-                continue
+                cdcHitIDs = set()
+            else:
+                cdcHitIDs = set(trackCandHits)
 
             totalHitListPR.extend(cdcHitIDs)
             if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand):
@@ -181,10 +181,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_matched = self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)
             is_clone = self.trackMatchLookUp.isClonePRTrackCand(trackCand)
 
-            cdcHitIDs = trackCand.getHitIDs(Belle2.Const.CDC)
+            trackCandHits = trackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
-                continue
-            trackCandHits = set(cdcHitIDs)
+                trackCandHits = set()
+            else:
+                trackCandHits = set(trackCandHits)
 
             # this is not very efficient...
             list_of_connected_mc_tracks = set()
@@ -193,7 +195,13 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             number_of_wrong_hits = 0
 
             for mcTrackCand in mcTrackCands:
-                mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+                mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+                # Working around a bug in ROOT where you should not access empty std::vectors
+                if len(mcTrackCandHits) == 0:
+                    mcTrackCandHits = set()
+                else:
+                    mcTrackCandHits = set(mcTrackCandHits)
+
                 length_of_intersection = len(mcTrackCandHits & trackCandHits)
                 if length_of_intersection > 0:
                     list_of_connected_mc_tracks.add(mcTrackCand)
@@ -214,7 +222,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             if is_matched or is_clone:
                 mcTrackCand = \
                     self.trackMatchLookUp.getRelatedMCTrackCand(trackCand)
-                mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+                mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+                # Working around a bug in ROOT where you should not access empty std::vectors
+                if len(mcTrackCandHits) == 0:
+                    mcTrackCandHits = set()
+                else:
+                    mcTrackCandHits = set(mcTrackCandHits)
 
                 is_hit_matched += len(trackCandHits & mcTrackCandHits)
 
@@ -224,7 +237,12 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_missing = \
                 self.trackMatchLookUp.isMissingMCTrackCand(mcTrackCand)
 
-            mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+            mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(mcTrackCandHits) == 0:
+                mcTrackCandHits = set()
+            else:
+                mcTrackCandHits = set(mcTrackCandHits)
 
             ratio = 1.0 * len(mcTrackCandHits & totalHitListPR) / len(mcTrackCandHits)
 

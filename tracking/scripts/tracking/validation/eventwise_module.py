@@ -71,7 +71,13 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         n_merged_mc_track_cands = 0
         n_missing_mc_track_cands = 0
         for mcTrackCand in mcTrackCands:
-            totalHitListMC.update(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+            mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(mcTrackCandHits) == 0:
+                mcTrackCandHits = set()
+            else:
+                mcTrackCandHits = set(mcTrackCandHits)
+            totalHitListMC.update(mcTrackCandHits)
 
             is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
             is_merged = trackMatchLookUp.isMergedMCTrackCand(mcTrackCand)
@@ -107,13 +113,22 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
             elif is_ghost:
                 n_ghost_track_cands += 1
 
-            trackCandHits = set(trackCand.getHitIDs(Belle2.Const.CDC))
-            totalHitListPR.update(trackCandHits)
+            trackCandHits = trackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(trackCandHits) == 0:
+                trackCandHits = set()
+            else:
+                trackCandHits = set(trackCandHits)
 
+            totalHitListPR.update(trackCandHits)
             if is_matched or is_clone:
                 mcTrackCand = self.trackMatchLookUp.getRelatedMCTrackCand(trackCand)
-                mcTrackCandHits = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
-
+                mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+                # Working around a bug in ROOT where you should not access empty std::vectors
+                if len(mcTrackCandHits) == 0:
+                    mcTrackCandHits = set()
+                else:
+                    mcTrackCandHits = set(mcTrackCandHits)
                 is_hit_matched += len(trackCandHits & mcTrackCandHits)
 
         return dict(

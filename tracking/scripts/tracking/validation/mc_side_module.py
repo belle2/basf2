@@ -154,7 +154,12 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
         pr_fake_cdc_hit_ids = set()
 
         for track_cand in track_cands:
-            cdc_hit_ids_of_track_cand = set(track_cand.getHitIDs(Belle2.Const.CDC))
+            cdc_hit_ids_of_track_cand = track_cand.getHitIDs(Belle2.Const.CDC)  # Checked
+            # Working around a bug in ROOT where you should not access empty std::vectors
+            if len(cdc_hit_ids_of_track_cand) == 0:
+                cdc_hit_ids_of_track_cand = set()
+            else:
+                cdc_hit_ids_of_track_cand = set(cdc_hit_ids_of_track_cand)
 
             pr_cdc_hit_ids |= cdc_hit_ids_of_track_cand
 
@@ -176,7 +181,12 @@ class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
     def peel(self, mcTrackCand):
         base_crops = super(ExpertMCSideTrackingValidationModule, self).peel(mcTrackCand)
 
-        mc_track_cand_cdc_hit_ids = set(mcTrackCand.getHitIDs(Belle2.Const.CDC))
+        mc_track_cand_cdc_hit_ids = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+        # Working around a bug in ROOT where you should not access empty std::vectors
+        if len(mc_track_cand_cdc_hit_ids) == 0:
+            mc_track_cand_cdc_hit_ids = set()
+        else:
+            mc_track_cand_cdc_hit_ids = set(mc_track_cand_cdc_hit_ids)
 
         ratio = np.divide(1.0 * len(mc_track_cand_cdc_hit_ids & self.pr_cdc_hit_ids), len(mc_track_cand_cdc_hit_ids))
         ratio_hits_in_mc_tracks_and_in_good_pr_tracks = np.divide(

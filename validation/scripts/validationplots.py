@@ -1168,6 +1168,9 @@ class RootObject:
         # Boolean value if it is an object from a reference file or not
         self.is_reference = self.data['is_reference']
 
+    def __str__(self):
+        return str(self.data)
+
     def dump(self):
         """!
         Allows to print out all information about a RootObject to the command

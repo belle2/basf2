@@ -333,7 +333,7 @@ class CDCSVGDisplayModule(Module):
         Setter for the option to draw all wires.
         """
 
-        self._draw_wires
+        self._draw_wires = draw_wires
 
     def initialize(self):
         """

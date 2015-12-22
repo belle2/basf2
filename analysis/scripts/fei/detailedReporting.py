@@ -280,9 +280,6 @@ if __name__ == '__main__':
     for particle, nTuple, pre_cuts in zip(obj['particles'], obj['ntuples'], obj['pre_cuts']):
         print(particle.identifier)
 
-        if particle.identifier not in 'e+:generic':
-            continue
-
         filename = createUniqueFilename(particle.identifier, obj_hash, suffix='png')
 
         o += b2latex.Section(format.decayDescriptor(particle.identifier)).finish()

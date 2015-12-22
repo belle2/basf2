@@ -69,16 +69,19 @@ int main(int argc, char* argv[])
   }
 
   //create momentum binning (larger bins for high momentum)
-  const int num_p_bins = 69;
+  const int num_p_bins = 59;
   double pbins[num_p_bins + 1];
-  for (int bin = 0; bin <= num_p_bins; bin++) {
-    if (bin <= 25)
-      pbins[bin] = 0.02 * bin;
-    else if (bin <= 65)
-      pbins[bin] = pbins[25] + 0.05 * (bin - 25);
+  pbins[0] = 0.0; pbins[1] = 0.05;
+  for (int bin = 2; bin <= num_p_bins; bin++) {
+    if (bin <= 19)
+      pbins[bin] = 0.025 + 0.025 * bin;
+    else if (bin <= 29)
+      pbins[bin] = pbins[19] + 0.05 * (bin - 19);
+    else if (bin <= 49)
+      pbins[bin] = pbins[29] + 0.1 * (bin - 29);
     else
-      pbins[bin] = pbins[65] + 0.4 * (bin - 65);
-    //std::cout << ": " << pbins[bin] << "\n";
+      pbins[bin] = pbins[49] + 0.25 * (bin - 49);
+    std::cout << ": " << pbins[bin] << "\n";
   }
 
   for (int i = 0; i < 2; i++) { //normal/truncated

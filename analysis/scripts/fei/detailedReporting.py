@@ -606,7 +606,7 @@ if __name__ == '__main__':
                 plot.add(tmvaTrainingData, Con_name, tmvaTrainingData['__isSignal__'], ~tmvaTrainingData['__isSignal__'])
                 plot.labels = ["Test", "Training"]
                 plot.finish()
-                plot.save(mvaROCPlot)
+                plot.save(mvaROCPlt)
 
                 mvaDiagPlt = 'mva_diag_' + filename
                 plot = b2plot.Diagonal()
@@ -615,7 +615,7 @@ if __name__ == '__main__':
                 plot.add(tmvaTrainingData, Con_name, tmvaTrainingData['__isSignal__'], ~tmvaTrainingData['__isSignal__'])
                 plot.labels = ["Test", "Training"]
                 plot.finish()
-                plot.save(mvaDiagPlot)
+                plot.save(mvaDiagPlt)
 
                 mvaOTrainPlt = 'mva_overtraining_' + filename
                 plot = b2plot.Overtraining()
@@ -624,7 +624,7 @@ if __name__ == '__main__':
                          tmvaData['__isTrain__'], ~tmvaData['__isTrain__'],
                          tmvaData['__isSignal__'], ~tmvaData['__isSignal__'])
                 plot.finish()
-                plot.save(mvaOvertrainingPlot)
+                plot.save(mvaOTrainPlt)
 
                 o += b2latex.Graphics().add(mvaOTrainPlt, width=0.7).add(mvaROCPlt, width=0.7).add(mvaDiagPlt, width=0.7).finish()
 

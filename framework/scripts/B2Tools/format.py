@@ -36,6 +36,9 @@ def decayDescriptor(decay_string):
         @return string latex version of the decay descriptor
     """
     decay_string = decay_string.replace(':generic', '')
+    decay_string = decay_string.replace(':semileptonic', '$_{SL}$')
+    decay_string = decay_string.replace(':FSP', '$_{FSP}$')
+    decay_string = decay_string.replace(':V0', '$_{V0}$')
     # Note: these are applied from top to bottom, so if you have
     # both B0 and anti-B0, put anti-B0 first.
     substitutes = [

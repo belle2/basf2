@@ -151,7 +151,8 @@ class Plotter(object):
         errorband_kwargs = copy.copy(self.errorband_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            color = next(axis._get_lines.color_cycle)
+            color = next(axis._get_lines.prop_cycler)
+            color = color['color']
             plot_kwargs['color'] = color
         else:
             color = plot_kwargs['color']
@@ -715,7 +716,7 @@ class Correlation(Plotter):
         for p in percentiles:
             distribution.add(data, column, data[cut_column] > p, weight_column)
         if mask is not None:
-            self.axis.set_color_cycle(None)
+            self.axis.set_prop_cycle(None)
             distribution.set_plot_options({'linestyle': '--'})
             distribution.set_errorbar_options(None)
             distribution.set_errorband_options(None)

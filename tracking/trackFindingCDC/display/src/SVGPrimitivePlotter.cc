@@ -40,7 +40,7 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const AttributeMap& svgAttributes) :
 
 SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter) :
   PrimitivePlotter(plotter),
-  m_svgContentStream(plotter.m_svgContentStream.str()),
+  m_svgContentStream(plotter.m_svgContentStream.str(), std::ostringstream::ate),
   m_nIndentationSpaces(plotter.m_nIndentationSpaces),
   m_svgAttributes(plotter.m_svgAttributes)
 {
@@ -135,7 +135,7 @@ void SVGPrimitivePlotter::drawCircleArc(const float& startX,
   const float radiusY = std::fabs(radius);
   const float rotationAngle = 0;
 
-  std::stringstream pathStream;
+  std::ostringstream pathStream;
 
   pathStream << "M" << ' ';
   pathStream << to_string(startX) << ' ';
@@ -196,7 +196,7 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
 
   // Combine the viewbox specification from the bounding box
   // Format "{left} {bottom} {width} {height}"
-  std::stringstream viewBoxStringStream;
+  std::ostringstream viewBoxStringStream;
 
   viewBoxStringStream << getBoundingBox().getLeft();
   viewBoxStringStream << " ";

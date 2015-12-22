@@ -223,7 +223,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the plotted elements. This contains only the fragment that is inbetween the svg tags and comes after the global svg definitions.
-      std::stringstream m_svgContentStream;
+      std::ostringstream m_svgContentStream;
 
       /// Memory for the number of spaces that shall be prepended to each line.
       int m_nIndentationSpaces;

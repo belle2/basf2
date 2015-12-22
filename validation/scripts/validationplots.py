@@ -260,6 +260,10 @@ def get_reference_files():
     # This is where we store the paths of reference ROOT files we've found
     results = {'local': [], 'central': []}
 
+    # validation folder name used by the packages to keep the validation reference
+    # plots
+    validation_folder_name = 'validation'
+
     # Now collect both local and central ROOT files:
     for location in ['local', 'central']:
 
@@ -268,20 +272,15 @@ def get_reference_files():
         if basepaths[location] is None:
             continue
 
-        # Get the files from the corresponding directory (either the local or
-        # the central release directory)
-        for root, dirs, files in os.walk(basepaths[location]):
-            # Loop over all these files
-            for current_file in files:
-                # Construct the full path = base path+filename
-                full_path = root + '/' + current_file
-                # If the file is a *.root file in a validation subfolder,
-                # we shall collect it as a reference file
-                # NB: This will only find ROOT files that lie directly in
-                # the /[pkg]/validation folder, not in any subdirs of it!
-                if (os.path.splitext(full_path)[1] == '.root' and
-                        os.path.dirname(full_path).endswith('validation')):
-                    results[location].append(os.path.abspath(full_path))
+        # list all available packages
+        root = basepaths[location]
+        # searches for a validation folder in any top-most folder (package folders) and
+        # lists all root-files within
+        glob_search = os.path.join(root, "*", validation_folder_name, "*.root")
+        revision_root_files = [os.path.abspath(f) for f in glob.glob(glob_search) if os.path.isfile(f)]
+
+        # this looks very much like a root file, store
+        results[location] += revision_root_files
 
     # Now we need to get a rid of all the duplicates: Since local > central,
     # we will delete all central reference files that have a local counterpart.

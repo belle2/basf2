@@ -7,5 +7,6 @@ mkdir time_calibration
 basf2 ${DIR}/EKLMTimeCalibrationGeneration.py time_calibration/gen.root
 basf2 ${DIR}/EKLMTimeCalibrationSimulation.py time_calibration/gen.root time_calibration/sim.root
 basf2 ${DIR}/EKLMTimeCalibrationReconstruction.py time_calibration/sim.root time_calibration/rec.root
-basf2 ${DIR}/EKLMTimeCalibrationCalibration.py time_calibration/rec.root
+basf2 ${DIR}/EKLMTimeCalibrationMerging.py time_calibration/rec_merged.root time_calibration/rec.root
+basf2 ${DIR}/EKLMTimeCalibrationCalibration.py time_calibration/rec_merged.root
 

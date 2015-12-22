@@ -65,7 +65,7 @@ void COPPERCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   m_con.init("basf2", 1);
   if (!m_dummymode) {
     m_ttrx.open();
-    m_copper.open();
+    //m_copper.open();
   }
   m_flow.open(&m_con.getInfo());
   initialized = false;
@@ -92,10 +92,12 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       const DBObject& o_hslb(obj("hslb", i));
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
+      /*
       hslb.open(i);
       if (!(o_hslb.hasValue("dummyhslb") && o_hslb.getBool("dummyhslb"))) {
         m_fee[i]->init(*this, hslb);
       }
+      */
       std::string vname = StringUtil::form("hslb[%d]", i);
       add(new NSMVHandlerHSLBBelle2LinkDown(*this, vname + ".err.b2linkdown", i));
       add(new NSMVHandlerHSLBCOPPERFifoFull(*this, vname + ".err.cprfifofull", i));
@@ -169,10 +171,10 @@ void COPPERCallback::term() throw()
   m_con.abort();
   m_con.getInfo().unlink();
   for (int i = 0; i < 4; i++) {
-    m_hslb[i].close();
+    //m_hslb[i].close();
   }
-  m_copper.close();
-  m_ttrx.close();
+  //m_copper.close();
+  //m_ttrx.close();
 }
 
 void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
@@ -206,6 +208,7 @@ void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
 void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
   //m_dummymode = obj.hasValue("dummymode") && obj.getBool("dummymode");
+  /*
   if (!m_dummymode) {
     m_ttrx.open();
     m_ttrx.monitor();
@@ -239,7 +242,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
     } catch (const std::out_of_range& e) {
       throw (RCHandlerException(e.what()));
     }
-  }
+    }*/
   bootBasf2(obj);
 }
 
@@ -330,15 +333,16 @@ void COPPERCallback::monitor() throw(RCHandlerException)
     try {
       RCState state = getNode().getState();
       try {
-        m_ttrx.monitor();
+        //m_ttrx.monitor();
       } catch (const IOException& e) {
         return;
       }
       try {
-        m_copper.monitor();
+        //m_copper.monitor();
       } catch (const IOException& e) {
         return;
       }
+      /*
       int dummymode = 0;
       get("dummymode", dummymode);
       if (!dummymode && state == RCState::RUNNING_S && state.isStable()) {
@@ -365,6 +369,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
         logging(m_ttrx.isBelle2LinkError(), LogFile::ERROR, "TTRX Belle2 link error");
         logging(m_ttrx.isLinkUpError(), LogFile::ERROR, "TTRX Link up error");
       }
+      */
       NSMData& data(getData());
       if (data.isAvailable()) {
         ronode_status* nsm = (ronode_status*)data.get();

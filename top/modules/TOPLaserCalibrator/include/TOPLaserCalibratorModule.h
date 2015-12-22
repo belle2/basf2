@@ -106,7 +106,13 @@ namespace Belle2 {
     float m_digimean[c_maxLaserFibers]; /**< (digi) time for the fiber illuminating the pixel */
     float m_digistd[c_maxLaserFibers]; /**< (digi) resolution for the fiber illuminating the pixel */
 
+    /**
+     * make fit with the 3-gaussian function.
+     */
     TF1* makeFit(TH1F* h, int ch);
+    /**
+     * make fit with a single gaussian function.
+     */
     TF1* makeGFit(TH1F* h);
 
   };

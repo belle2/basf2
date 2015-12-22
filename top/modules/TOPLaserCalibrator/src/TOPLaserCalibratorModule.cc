@@ -136,10 +136,12 @@ namespace Belle2 {
           string name;
           ss >> name;
           string title = "Times " + name;
-          histo = new TH1F(name.c_str(), title.c_str(), 1000, 10., 30.);
+          histo = new TH1F(name.c_str(), title.c_str(), 150, 0., 1.5);
           m_histo[channel] = histo;
         }
-        histo->Fill(digit.getTDC() * 0.025);
+        histo->Fill(digit.getTime());
+//         histo->Fill(0.025*digit.getTDC());
+//         cout << digit.getTime() << " " << 0.025*digit.getTDC() << endl;
       }
     }
   }

@@ -49,11 +49,11 @@ void LogFile::open(const std::string& filename, Priority threshold)
   if (!g_opened) {
     ConfigFile config("slowcontrol");
     std::string path = config.get("log.dir");
-    if (path.size() == 0) path = config.get("logfile.dir");
+    //if (path.size() == 0) path = config.get("logfile.dir");
     system(("mkdir -p " + path + "/" + filename).c_str());
     g_filename = filename;
     g_date = Date();
-    g_filepath = config.get("logfile.dir") + "/" + filename + "/latest.log";
+    g_filepath = path + "/" + filename + "/latest.log";
     //+ date.toString("%Y.%m.%d.log");
     g_threshold = threshold;
     g_opened = true;

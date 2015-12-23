@@ -9,9 +9,13 @@
  **************************************************************************/
 
 #pragma once
-
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <TLorentzVector.h>
 #include <map>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -23,20 +27,21 @@ namespace Belle2 {
      */
     double isInRestOfEvent(const Particle* particle);
 
+    /**TODO:
+     * Returns number of tracks in the event minus in the current RestOfEvent object
+     */
+    double nRemainingTracksInRestOfEvent(const Particle* particle);
+
+    /**TODO:
+     * Returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
+     * the signal photon yields the mass of the a neutral Pion.
+     */
+    double pionVeto(const Particle* particle);
+
     /**
      * Returns number of all the tracks in the related RestOfEvent object
      */
     double nAllROETracks(const Particle* particle);
-
-    /**
-     * Returns number of tracks in the related RestOfEvent object that pass the selection criteria
-     */
-    double nROETracks(const Particle* particle);
-
-    /**
-     * Returns number of tracks in the event minus in the current RestOfEvent object
-     */
-    double nRemainingTracksInRestOfEvent(const Particle* particle);
 
     /**
      * Returns number of all ECL clusters in the related RestOfEvent object
@@ -44,67 +49,14 @@ namespace Belle2 {
     double nAllROEECLClusters(const Particle* particle);
 
     /**
-     * Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria
-     */
-    double nROEECLClusters(const Particle* particle);
-
-    /**
-     * Returns number of remaining KLM clusters in the related RestOfEvent object
-     */
-    double nROEKLMClusters(const Particle* particle);
-
-    /**
-     * Returns 1 if the invariant mass of a combination of a photon in RestOfEvent with
-     * the signal photon yields the mass of the a neutral Pion.
-     */
-    double pionVeto(const Particle* particle);
-
-    /**
      * Returns number of all neutral ECL clusters in the related RestOfEvent object
      */
     double nAllROENeutralECLClusters(const Particle* particle);
 
     /**
-     * Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria
+     * Returns number of remaining KLM clusters in the related RestOfEvent object
      */
-    double nROENeutralECLClusters(const Particle* particle);
-
-    /**
-     * Returns number of lepton particles in the related RestOfEvent object (counts particles and anti-particles)
-     */
-    double nROELeptons(const Particle* particle);
-
-    /**
-     * Returns total charge of the related RestOfEvent object
-     */
-    double ROECharge(const Particle* particle);
-
-    /**
-     * return extra energy in the calorimeter that is not associated to the given Particle
-     */
-    double extraEnergy(const Particle* particle);
-
-    /**
-     * return extra energy in the calorimeter that is not associated to the given Particle
-     * ECLClusters passing goodGamma selection are used only.
-     */
-    double extraEnergyFromGoodGamma(const Particle* particle);
-
-    /**
-     * return extra energy in the calorimeter that is not associated to the given Particle
-     * ECLClusters passing goodBelleGamma (Belle 1 criteria) selection are used only.
-     */
-    double extraEnergyFromGoodBelleGamma(const Particle* particle);
-
-    /**
-     * Returns energy difference of the related RestOfEvent object with respect to E_cms/2
-     */
-    double ROEDeltaE(const Particle* particle);
-
-    /**
-     * Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2
-     */
-    double ROEMbc(const Particle* particle);
+    double nAllROEKLMClusters(const Particle* particle);
 
     /**
      * Returns MC Errors for an artificial tag side particle, which corresponds to the ROE object
@@ -112,14 +64,54 @@ namespace Belle2 {
     double ROEMCErrors(const Particle* particle);
 
     /**
+     * Returns number of tracks in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROETracks(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROEECLClusters(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROENeutralECLClusters(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns number of neutral pions, constructed from good gamma candidates in the related RestOfEvent object that passed the selection criteria
+     */
+    Manager::FunctionPtr nROEPi0s(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns total charge of the related RestOfEvent object
+     */
+    Manager::FunctionPtr ROECharge(const std::vector<std::string>& arguments);
+
+    /**
+     * return extra energy in the calorimeter that is not associated to the given Particle
+     */
+    Manager::FunctionPtr ROEExtraEnergy(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns energy difference of the related RestOfEvent object with respect to E_cms/2
+     */
+    Manager::FunctionPtr ROEDeltaE(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2
+     */
+    Manager::FunctionPtr ROEMbc(const std::vector<std::string>& arguments);
+
+    /**
      * Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2
      */
-    double correctedBMesonDeltaE(const Particle* particle);
+    Manager::FunctionPtr correctedBMesonDeltaE(const std::vector<std::string>& arguments);
 
     /**
      * Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2
      */
-    double correctedBMesonMbc(const Particle* particle);
+    Manager::FunctionPtr correctedBMesonMbc(const std::vector<std::string>& arguments);
 
     /**
      * Returns the missing mass squared.
@@ -129,7 +121,7 @@ namespace Belle2 {
      * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
      *           system in the direction of the ROE momentum
      */
-    double ROEMissingMass(const Particle* particle, const std::vector<double>& opt);
+    Manager::FunctionPtr ROEMissingMass(const std::vector<std::string>& arguments);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
@@ -143,12 +135,12 @@ namespace Belle2 {
      * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
      *           system in the direction of the ROE momentum
      */
-    TLorentzVector missing4VectorCMS(const Particle* particle, const std::vector<double>& opt);
+    TLorentzVector missing4VectorCMS(const Particle* particle, std::string maskName, std::string opt);
 
     /**
      * Returns the neutrino 4-momentum vector in CMS system. Mass of neutrino is 0 by definition: E == |p|
      */
-    TLorentzVector neutrino4VectorCMS(const Particle* particle);
+    TLorentzVector neutrino4VectorCMS(const Particle* particle, std::string maskName);
 
   }
 } // Belle2 namespace

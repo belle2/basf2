@@ -12,11 +12,15 @@
 
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/ROEVariables.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/Utility.h>
+
 
 #include <TBranch.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace Belle2::Variable;
 
 void NtupleExtraEnergyTool::setupTree()
 {
@@ -24,11 +28,9 @@ void NtupleExtraEnergyTool::setupTree()
   int nDecayProducts = strNames.size();
 
   m_extraE   = new float[nDecayProducts];
-  m_extraEGG = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_Eextra").c_str(),   &m_extraE[iProduct], (strNames[iProduct] + "_Eextra/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_EextraGG").c_str(),   &m_extraEGG[iProduct], (strNames[iProduct] + "_EextraGG/F").c_str());
   }
 }
 
@@ -38,7 +40,8 @@ void NtupleExtraEnergyTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_extraE[iProduct]   = Variable::extraEnergy(selparticles[iProduct]);
-    m_extraEGG[iProduct]   = Variable::extraEnergyFromGoodGamma(selparticles[iProduct]);
+
+    const Manager::Var* var = Manager::Instance().getVariable("ROE_eextra()");
+    m_extraE[iProduct]   = var->function(selparticles[iProduct]);
   }
 }

@@ -13,7 +13,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/VariableManager/Variables.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -45,12 +44,6 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 
   // Parameter definitions
   addParam("particleList", m_particleList, "Name of the ParticleList");
-  addParam("onlyGoodECLClusters", m_onlyGoodECLClusters, "If true, only good ECL clusters are added", true);
-  addParam("chargedStableFractions", m_fractions, "A set of probabilities of the ChargedStable particles in the process", {0, 0, 1, 0, 0, 0});
-
-  std::string defaultSelection = std::string("");
-  addParam("trackSelection", m_trackSelection, "Remaining track(s) selection criteria", defaultSelection);
-  addParam("eclClusterSelection", m_eclClusterSelection, "Remaining ECL shower(s) selection criteria", defaultSelection);
 }
 
 void RestOfEventBuilderModule::initialize()
@@ -64,12 +57,6 @@ void RestOfEventBuilderModule::initialize()
   StoreArray<RestOfEvent> roeArray;
   roeArray.registerInDataStore();
   particles.registerRelationTo(roeArray);
-
-  m_trackCut = Variable::Cut::Compile(m_trackSelection);
-  B2INFO("RestOfEventBuilder with track cuts  : " << m_trackSelection);
-
-  m_eclClusterCut = Variable::Cut::Compile(m_eclClusterSelection);
-  B2INFO("RestOfEventBuilder with ECLCluster cuts  : " << m_eclClusterSelection);
 }
 
 void RestOfEventBuilderModule::event()
@@ -83,6 +70,8 @@ void RestOfEventBuilderModule::event()
   for (unsigned i = 0; i < nParts; i++) {
     const Particle* particle = plist->getParticle(i);
 
+    //TODO: check if roe with this name already exists
+
     // create RestOfEvent object
     RestOfEvent* roe = roeArray.appendNew();
 
@@ -93,15 +82,12 @@ void RestOfEventBuilderModule::event()
     addRemainingTracks(particle, roe);
     addRemainingECLClusters(particle, roe);
     addRemainingKLMClusters(particle, roe);
-
-    roe->setChargedStableFractions(m_fractions);
   }
 }
 
 void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, RestOfEvent* roe)
 {
   StoreArray<Track> tracks;
-  std::map<int, bool> trackMasks;
 
   // vector of all final state particle daughters created from Tracks
   std::vector<int> fspTracks = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
@@ -117,27 +103,15 @@ void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, Rest
       }
     }
 
-    if (remainingTrack) {
-      const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
-      Particle p(track, pid->getMostLikely(m_frArray));
-      Particle* tempPart = &p;
-
-      if (m_trackCut->check(tempPart))
-        trackMasks[track->getArrayIndex()] = true;
-      else
-        trackMasks[track->getArrayIndex()] = false;
-
+    if (remainingTrack)
       roe->addTrack(track);
-    }
   }
-  roe->setTrackMasks(trackMasks);
 }
 
 void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle, RestOfEvent* roe)
 {
   StoreArray<ECLCluster> eclClusters;
   StoreArray<Track>      tracks;
-  std::map<int, bool> eclClusterMasks;
 
   // vector of all final state particle daughters created from energy cluster or charged track
   std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
@@ -146,26 +120,6 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   // Add remaining ECLClusters
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* shower = eclClusters[i];
-    bool passGoodCut = true;
-
-    if (m_onlyGoodECLClusters) {
-      // TODO: make this steerable
-      double energy = shower->getEnergy();
-      //double e9e25  = shower->getE9oE25();
-      int    region = 0;
-
-      float theta = shower->getTheta();
-      if (theta < 0.555) {
-        region = 1.0;
-      } else if (theta < 2.26) {
-        region = 2.0;
-      } else {
-        region = 3.0;
-      }
-
-      if (!Variable::isGoodGamma(region, energy, false))
-        passGoodCut = false;
-    }
 
     bool remainingCluster = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
@@ -175,9 +129,8 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       }
     }
 
-    if (!remainingCluster) {
+    if (!remainingCluster)
       continue;
-    }
 
     // check if the ECLCluster is matched to any track used in reconstruction
     for (unsigned j = 0; j < trackFSPs.size(); j++) {
@@ -193,19 +146,9 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       }
     }
 
-    if (remainingCluster) {
-      Particle p(shower);
-      Particle* tempPart = &p;
-
-      if (m_eclClusterCut->check(tempPart) and passGoodCut)
-        eclClusterMasks[shower->getArrayIndex()] = true;
-      else
-        eclClusterMasks[shower->getArrayIndex()] = false;
-
+    if (remainingCluster)
       roe->addECLCluster(shower);
-    }
   }
-  roe->setECLClusterMasks(eclClusterMasks);
 }
 
 void RestOfEventBuilderModule::addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe)
@@ -312,4 +255,3 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   std::cout << std::endl;
 
 }
-

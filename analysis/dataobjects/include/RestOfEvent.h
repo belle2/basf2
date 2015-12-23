@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Matic Lubej                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,7 @@
 #include <TLorentzVector.h>
 
 #include <vector>
+#include <string>
 #include <set>
 #include <map>
 
@@ -95,23 +96,23 @@ namespace Belle2 {
      */
     void addKLMCluster(const KLMCluster* cluster);
 
-    /**
-     * Set the probabilities of ChargedStable particles. This is used in ROEVariables, where mass hypotheses are needed.
+    /*
+     * Set the map of probabilities of ChargedStable particles. This is used whenever mass hypotheses are needed.
      * Default is pion-mass always.
      *
      * @param vector of probabilities of ChargedStable particles
      */
-    void setChargedStableFractions(const std::vector<double>& fractions);
+    void appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet);
 
     /**
      * Sets the map of masks for Tracks
      */
-    void setTrackMasks(std::map<int, bool> trackMasks);
+    void appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> trackMasks);
 
     /**
      * Sets the map of masks for ECLClusters
      */
-    void setECLClusterMasks(std::map<int, bool> clusterMasks);
+    void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> clusterMasks);
 
     /**
      * Add given StoreArray indices to the list of unused KLM Clusters in the event.
@@ -147,7 +148,7 @@ namespace Belle2 {
      *
      * @return total TLorentzVector in lab system of all tracks and clusters in ROE
      */
-    TLorentzVector getROE4Vector() const;
+    TLorentzVector getROE4Vector(std::string maskName);
 
     /**
      * Get number of all remaining tracks.
@@ -180,19 +181,24 @@ namespace Belle2 {
     }
 
     /**
+     * Getter for a specific mask for Tracks
+     */
+    std::map<unsigned int, bool> getTrackMask(std::string maskName);
+
+    /**
+     * Getter for a specific mask for ECLClusters
+     */
+    std::map<unsigned int, bool> getECLClusterMask(std::string maskName);
+
+    /**
+     * Getter for ChargedStable fractions with a specific mask name
+     */
+    void fillFractions(double fractions[], std::string maskName);
+
+    /**
      * Prints the contents of a RestOfEvent object to screen
      */
     void print() const;
-
-    /**
-     * Getter for the map of masks for Tracks
-     */
-    std::map<int, bool> getTrackMasks(void) const;
-
-    /**
-     * Getter for the map of masks for ECLClusters
-     */
-    std::map<int, bool> getECLClusterMasks(void) const;
 
 
   private:
@@ -202,18 +208,16 @@ namespace Belle2 {
     std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
     std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
 
-    /**
-     * A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables).
-     * If fractions = {-1}, the true particle mass based on MC information will be used, if available
-     * Default is pion always.
+    /*
+     * A map of sets of probabilities of the ChargedStable particles in the process (to be used in ROE variables).
+     * If fractions = {-1}, the true particle mass based on MC information will be used, if available.
+     * Default is pion-mass always.
      */
-    double m_fractions[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0};
-
-    bool m_useTrueMassHypothesis =
-      false; /**< To use generated particle mass hypothesis in ROE4Vector or not. If MC not available, default is used. */
-
-    std::map<int, bool> m_trackMasks; /**< Map of mask values for each track to be used in ROE or not */
-    std::map<int, bool> m_eclClusterMasks; /**< Map of mask values for each ECLCluster to be used in ROE or not */
+    std::map<std::string, std::vector<double>> m_fractionsSet;
+    std::map<std::string, std::map<unsigned int, bool>>
+                                                     m_trackMasks; /**< Map of masks of values for each track to be used in ROE interpretation or not */
+    std::map<std::string, std::map<unsigned int, bool>>
+                                                     m_eclClusterMasks; /**< Map of masks of values for each ECLCluster to be used in ROE interpretation or not */
     // TODO: add support for vee
 
     /**
@@ -230,7 +234,7 @@ namespace Belle2 {
         to.insert(from[i]);
     }
 
-    ClassDef(RestOfEvent, 4) /**< class definition */
+    ClassDef(RestOfEvent, 5) /**< class definition */
 
   };
 

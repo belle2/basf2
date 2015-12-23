@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Matic Lubej                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -53,28 +53,19 @@ void RestOfEvent::addKLMClusters(const std::vector<int>& indices)
   addIndices(indices, m_klmClusterIndices);
 }
 
-void RestOfEvent::setChargedStableFractions(const std::vector<double>& fractions)
+void RestOfEvent::appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet)
 {
-  const unsigned int n = Const::ChargedStable::c_SetSize;
-
-  if (fractions.size() == n) {
-    for (unsigned int i = 0; i < n; i++)
-      m_fractions[i] = fractions[i];
-  } else if (fractions.size() == 1 && fractions[0] == -1)
-    m_useTrueMassHypothesis = true;
-  else {
-    B2WARNING("Size of fractions vector not appropriate! Default value will be used.");
-  }
+  m_fractionsSet.insert(fractionsSet.begin(), fractionsSet.end());
 }
 
-void RestOfEvent::setTrackMasks(std::map<int, bool> masks)
+void RestOfEvent::appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
 {
-  m_trackMasks = masks;
+  m_trackMasks.insert(masks.begin(), masks.end());
 }
 
-void RestOfEvent::setECLClusterMasks(std::map<int, bool> masks)
+void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
 {
-  m_eclClusterMasks = masks;
+  m_eclClusterMasks.insert(masks.begin(), masks.end());
 }
 
 const std::vector<Belle2::Track*> RestOfEvent::getTracks() const
@@ -129,11 +120,17 @@ const std::vector<Belle2::KLMCluster*> RestOfEvent::getKLMClusters() const
   return remainKLMClusters;
 }
 
-TLorentzVector RestOfEvent::getROE4Vector() const
+TLorentzVector RestOfEvent::getROE4Vector(std::string maskName)
 {
   std::vector<Track*> roeTracks = RestOfEvent::getTracks();
   std::vector<ECLCluster*> roeClusters = RestOfEvent::getECLClusters();
   TLorentzVector roe4Vector;
+
+  std::map<unsigned int, bool> trackMask = RestOfEvent::getTrackMask(maskName);
+  std::map<unsigned int, bool> eclClusterMask = RestOfEvent::getECLClusterMask(maskName);
+  const unsigned int n = Const::ChargedStable::c_SetSize;
+  double fractions[n];
+  fillFractions(fractions, maskName);
 
   // Add all momentum from tracks
   for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
@@ -145,29 +142,29 @@ TLorentzVector RestOfEvent::getROE4Vector() const
       continue;
     }
 
-    if (!m_trackMasks.empty())
-      if (!m_trackMasks.at(roeTracks[iTrack]->getArrayIndex()))
+    if (!trackMask.empty())
+      if (!trackMask.at(roeTracks[iTrack]->getArrayIndex()))
         continue;
 
     int particlePDG;
 
-    if (m_useTrueMassHypothesis) {
+    if (fractions[0] == -1) {
       const MCParticle* mcp = roeTracks[iTrack]->getRelatedTo<MCParticle>();
 
       if (!mcp) {
-        B2ERROR("No related MCParticle found! Default will be used.");
+        B2WARNING("No related MCParticle found! Default will be used.");
         particlePDG = Const::pion.getPDGCode();
       }
 
       particlePDG = abs(mcp->getPDG());
     } else {
-      particlePDG = pid->getMostLikely(m_fractions).getPDGCode();
+      particlePDG = pid->getMostLikely(fractions).getPDGCode();
     }
 
     Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
     const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
 
-    // Update energy of tracks (default: pion always)
+    // Update energy of tracks
     float tempMass = trackParticle.getMass();
     TVector3 tempMom = tfr->getMomentum();
     TLorentzVector temp4Vector;
@@ -182,8 +179,8 @@ TLorentzVector RestOfEvent::getROE4Vector() const
 
     if (!roeClusters[iEcl]->isNeutral()) continue;
 
-    if (!m_eclClusterMasks.empty())
-      if (!m_eclClusterMasks.at(roeClusters[iEcl]->getArrayIndex()))
+    if (!eclClusterMask.empty())
+      if (!eclClusterMask.at(roeClusters[iEcl]->getArrayIndex()))
         continue;
 
     roe4Vector += roeClusters[iEcl]->get4Vector();
@@ -192,14 +189,61 @@ TLorentzVector RestOfEvent::getROE4Vector() const
   return roe4Vector;
 }
 
-std::map<int, bool> RestOfEvent::getTrackMasks() const
+std::map<unsigned int, bool> RestOfEvent::getTrackMask(std::string maskName)
 {
-  return m_trackMasks;
+  const std::map<unsigned int, bool> emptyMap;
+
+  if (maskName == "")
+    return emptyMap;
+
+  if (m_trackMasks.find(maskName) == m_trackMasks.end())
+    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
+
+  return m_trackMasks[maskName];
 }
 
-std::map<int, bool> RestOfEvent::getECLClusterMasks() const
+std::map<unsigned int, bool> RestOfEvent::getECLClusterMask(std::string maskName)
 {
-  return m_eclClusterMasks;
+  const std::map<unsigned int, bool> emptyMap;
+
+  if (maskName == "")
+    return emptyMap;
+
+  if (m_eclClusterMasks.find(maskName) == m_eclClusterMasks.end())
+    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
+
+  return m_eclClusterMasks[maskName];
+}
+
+void RestOfEvent::fillFractions(double fractions[], std::string maskName)
+{
+  const int n = Const::ChargedStable::c_SetSize;
+  double defaultFractions[n];
+
+  // Default is pion always (e, mu, pi, K, prot, deut)
+  for (unsigned i = 0; i < n; i++)
+    if (i != 2)
+      defaultFractions[i] = 0;
+    else
+      defaultFractions[i] = 1;
+
+  for (unsigned i = 0; i < n; i++)
+    fractions[i] = 0;
+
+  if (maskName == "")
+    for (unsigned i = 0; i < n; i++)
+      fractions[i] = defaultFractions[i];
+
+  else if (m_fractionsSet.find(maskName) != m_fractionsSet.end()) {
+    std::vector<double> fractionsVector = m_fractionsSet[maskName];
+
+    if (fractionsVector.size() == n)
+      for (unsigned i = 0; i < n; i++)
+        fractions[i] = fractionsVector[i];
+    else
+      fractions[0] = -1;
+  } else
+    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
 }
 
 void RestOfEvent::print() const

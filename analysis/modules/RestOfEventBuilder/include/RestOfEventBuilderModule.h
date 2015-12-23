@@ -17,10 +17,6 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/VariableManager/Utility.h>
 
-#include <string>
-#include <vector>
-#include <map>
-
 namespace Belle2 {
 
   /**
@@ -47,16 +43,6 @@ namespace Belle2 {
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
-    bool m_onlyGoodECLClusters;  /**< Include all(false) or only good(true) ECL clusters */
-    std::vector<double>
-    m_fractions; /**< A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables). Default is pion always.*/
-    double m_frArray[Const::ChargedStable::c_SetSize] = {0, 0, 1, 0, 0, 0}; /**< A set of probabilities of the ChargedStable particles in the process (to be used in ROE variables). Default is pion always.*/
-
-    std::string m_trackSelection; /**< Selection criteria for the remaining tracks */
-    std::unique_ptr<Variable::Cut> m_trackCut; /**< Cut object which performs the cuts on the remaining tracks */
-
-    std::string m_eclClusterSelection; /**< Selection criteria for the remaining ECLClusters */
-    std::unique_ptr<Variable::Cut> m_eclClusterCut; /**< Cut object which performs the cuts on the remaining ECLClusters */
 
     /**
      * Adds all tracks from StoreArray<Track> that are not used in reconstruction of given particle.

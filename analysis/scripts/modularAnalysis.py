@@ -896,47 +896,142 @@ def matchMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(
-        list_name,
-        trackSelection='',
-        eclClusterSelection='',
-        fractions=[
-            0,
-            0,
-            1,
-            0,
-            0,
-            0],
-        only_good_ecl=True,
-        path=analysis_main):
+def buildRestOfEvent(list_name, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
-    It is possible to add cuts for which tracks and clusters to use in calculations.
-    Pion mass hypothesis is used by default, otherwise ChargeStable fractions can
-    be given as input.
-
-    Example 1: Make track and cluster cuts, use equal ChargeStable probabilities
-        buildRestOfEvent('B+:sig', 'abs(d0) < 0.03 and -0.05 < z0 < 0.12', 'clusterE9E25 > 0.905', [1,1,1,1,1,1])
-    Example 2: Don't make any cuts, use generated particle mass hypothesis (MC info)
-        buildRestOfEvent('B+:sig', '', '', [-1])
 
     @param list_name name of the input ParticleList
-    @param track selection cut string
-    @param cluster selection cut string
-    @param array of ChargeStable probabilities/fractions (normalization not needed)
-    @param use only good clusters (true/false)
     @param path      modules are added to this path
     """
 
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + list_name)
     roeBuilder.param('particleList', list_name)
-    roeBuilder.param('trackSelection', trackSelection)
-    roeBuilder.param('eclClusterSelection', eclClusterSelection)
-    roeBuilder.param('chargedStableFractions', fractions)
-    roeBuilder.param('onlyGoodECLClusters', only_good_ecl)
     path.add_module(roeBuilder)
+
+
+def appendROEMasks(list_name, ROEMasks, path=analysis_main):
+    """
+    Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
+    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    Default ChargedStable fractions are used in this case (pion mass hypothesis always, 0,0,1,0,0,0]).
+
+    The multiple ROE masks with their own selection criteria are specified
+    via list tuples (mask_name, trackSelection, eclClusterSelection)
+
+    o) Example for two tuples
+       ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       goodROEGamma = ('goodROEGamma', '', 'goodGamma == 1')
+       appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
+
+    @param list_name             name of the input ParticleList
+    @param mask_name             name of the appended ROEMask
+    @param trackSelection        decay string for the tracks in ROE
+    @param eclClusterSelection   decay string for the tracks in ROE
+    @param path                  modules are added to this path
+    """
+
+    roeMask = register_module('RestOfEventInterpreter')
+    roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
+    roeMask.param('particleList', list_name)
+    roeMask.param('ROEMasks', ROEMasks)
+    path.add_module(roeMask)
+
+
+def appendROEMask(
+    list_name,
+    mask_name,
+    trackSelection,
+    eclClusterSelection,
+    path=analysis_main,
+):
+    """
+    Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
+    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    Default ChargedStable fractions are used in this case (pion mass hypothesis always, 0,0,1,0,0,0]).
+
+    o) append a ROE mask with all tracks in ROE coming from the IP region
+       - appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+
+    o) append a ROE mask with only ECLClusters that pass as good photon candidates
+       - appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+
+    @param list_name             name of the input ParticleList
+    @param mask_name             name of the appended ROEMask
+    @param trackSelection        decay string for the tracks in ROE
+    @param eclClusterSelection   decay string for the tracks in ROE
+    @param path                  modules are added to this path
+    """
+
+    roeMask = register_module('RestOfEventInterpreter')
+    roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
+    roeMask.param('particleList', list_name)
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
+    path.add_module(roeMask)
+
+
+def appendROEMasksWithFractions(list_name, ROEMasksWithFractions, path=analysis_main):
+    """
+    Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
+    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    Specific ChargedStable fractions can be provided. If fractions = [-1], MC truth will be used, if available.
+
+    The multiple ROE masks with their own selection criteria are specified
+    via list tuples (mask_name, trackSelection, eclClusterSelection)
+
+    o) Example for two tuples
+       IPtracksEqualFractions  = ('IPtracksEqualFractions', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', [1,1,1,1,1,1])
+       IPtracksMCHypothesis    = ('IPtracksMCHypothesis', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', [-1])
+       appendROEMasks('B+:sig', [IPtracksEqualFractions, IPtracksMCHypothesis])
+
+    @param list_name             name of the input ParticleList
+    @param mask_name             name of the appended ROEMask
+    @param trackSelection        decay string for the tracks in ROE
+    @param eclClusterSelection   decay string for the tracks in ROE
+    @param fractions             chargedStable particle fractions
+    @param path                  modules are added to this path
+    """
+
+    roeMask = register_module('RestOfEventInterpreter')
+    roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskListWithFractions')
+    roeMask.param('particleList', list_name)
+    roeMask.param('ROEMasksWithFractions', ROEMasksWithFractions)
+    path.add_module(roeMask)
+
+
+def appendROEMaskWithFractions(
+    list_name,
+    mask_name,
+    trackSelection,
+    eclClusterSelection,
+    fractions,
+    path=analysis_main,
+):
+    """
+    Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
+    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    Specific ChargedStable fractions can be provided. If fractions = [-1], MC truth will be used, if available.
+
+    o) append a ROE mask with all tracks in ROE coming from the IP region
+       - appendROEMask('B+:sig', 'IPtracksEqualFractions', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', [1,1,1,1,1,1])
+
+    o) append a ROE mask with only ECLClusters that pass as good photon candidates
+       - appendROEMask('B+:sig', 'IPtracksMCHypothesis', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', [-1])
+
+    @param list_name             name of the input ParticleList
+    @param mask_name             name of the appended ROEMask
+    @param trackSelection        decay string for the tracks in ROE
+    @param eclClusterSelection   decay string for the tracks in ROE
+    @param fractions             chargedStable particle fractions
+    @param path                  modules are added to this path
+    """
+
+    roeMask = register_module('RestOfEventInterpreter')
+    roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
+    roeMask.param('particleList', list_name)
+    roeMask.param('ROEMasksWithFractions', [(mask_name, trackSelection, eclClusterSelection, fractions)])
+    path.add_module(roeMask)
 
 
 def buildContinuumSuppression(list_name, path=analysis_main):

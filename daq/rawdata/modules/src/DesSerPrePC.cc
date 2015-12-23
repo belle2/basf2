@@ -179,10 +179,9 @@ void DesSerPrePC::initialize()
 #endif
 
   // For monitor
-  RunInfoBuffer& status(DeSerializerModule::getStatus());
-  if (status.isAvailable()) {
-    status.setOutputNBytes(0);
-    status.setOutputCount(0);
+  if (m_status.isAvailable()) {
+    m_status.setOutputNBytes(0);
+    m_status.setOutputCount(0);
   }
 
   B2INFO("DesSerPrePC: initialize() was done.");
@@ -842,7 +841,7 @@ void DesSerPrePC::DataAcquisition()
 #endif
     }
 
-    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 10000 == 0) {
+    if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 100000 == 0) {
       double interval = cur_time - m_prev_time;
       double total_time = cur_time - m_start_time;
       printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
@@ -863,10 +862,9 @@ void DesSerPrePC::DataAcquisition()
 
     n_basf2evt++;
 
-    RunInfoBuffer& status(DeSerializerModule::getStatus());
-    if (status.isAvailable()) {
-      status.setOutputNBytes(m_sent_totbytes);
-      status.addOutputCount(NUM_EVT_PER_BASF2LOOP_PC);
+    if (m_status.isAvailable()) {
+      m_status.setOutputNBytes(m_sent_totbytes);
+      m_status.setOutputCount(n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC);
     }
 
   }
@@ -1148,11 +1146,10 @@ void DesSerPrePC::Accept()
   //   ret = setsockopt(fd_accept, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag) );
   m_socket_send = fd_accept;
 
-  RunInfoBuffer& status(DeSerializerModule::getStatus());
-  if (status.isAvailable()) {
-    status.setOutputPort(ntohs(sock_listen.sin_port));
-    status.setOutputAddress(sock_listen.sin_addr.s_addr);
-    printf("%d %x\n", (int)ntohs(sock_listen.sin_port), (int)sock_listen.sin_addr.s_addr);
+  if (m_status.isAvailable()) {
+    m_status.setOutputPort(ntohs(sock_listen.sin_port));
+    m_status.setOutputAddress(sock_listen.sin_addr.s_addr);
+    B2INFO("Accepted " << (int)ntohs(sock_listen.sin_port) << " " << (int)sock_listen.sin_addr.s_addr);
   }
 
   return;

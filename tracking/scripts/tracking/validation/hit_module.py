@@ -147,7 +147,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             if len(cdcHitIDs) == 0:
                 cdcHitIDs = set()
             else:
-                cdcHitIDs = set(trackCandHits)
+                cdcHitIDs = set(cdcHitIDs)
 
             totalHitListPR.extend(cdcHitIDs)
             if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand):

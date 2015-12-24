@@ -179,8 +179,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   }
 
   // Clear RingBuffer
-  m_rbufin->clear();
-  m_rbufout->clear();
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
 
   printf("Unconfigure done\n");
   fflush(stdout);

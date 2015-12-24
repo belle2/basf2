@@ -188,8 +188,8 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   }
 
   // Clear RingBuffers
-  m_rbufin->clear();
-  m_rbufout->clear();
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
 
   printf("Unconfigure : done\n");
   fflush(stdout);

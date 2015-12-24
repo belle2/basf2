@@ -80,7 +80,7 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
     printf("RFProcessManager : invoking %s\n", scr);
     for (int i = 0; i < 10; i++) {
       if (argval[i] == NULL) break;
-      //      printf ( "argval[%d] = %s\n", i, argval[i] );
+      printf("argval[%d] = %s\n", i, argval[i]);
     }
     fflush(stdout);
     fflush(stderr);

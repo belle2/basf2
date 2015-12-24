@@ -10,7 +10,7 @@ public class LogLevel {
 	static final public LogLevel NOTICE = new LogLevel(3, "NOTICE", HtmlColor.BLUE, null);
 	static final public LogLevel WARNING = new LogLevel(4, "WARNING", HtmlColor.ORANGE, null);
 	static final public LogLevel ERROR = new LogLevel(5, "ERROR", HtmlColor.MAGENTA, null);
-	static final public LogLevel FATAL = new LogLevel(6, "FATAL", HtmlColor.WHITE, HtmlColor.RED);
+	static final public LogLevel FATAL = new LogLevel(6, "FATAL", HtmlColor.RED, null);
 	
 	static public LogLevel [] LIST = {
 		UNDEFINED, DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL

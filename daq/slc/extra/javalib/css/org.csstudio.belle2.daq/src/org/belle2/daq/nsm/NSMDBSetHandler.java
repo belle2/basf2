@@ -53,10 +53,10 @@ public abstract class NSMDBSetHandler extends NSMRequestHandler {
     }
 
     @Override
-    public boolean connected() {
+    public boolean connected(NSMCommunicator com) {
         try {
-        	if (m_com != null)
-        		m_com.requestDBGet(m_table + "/" + m_node + "@" + m_name, m_isfull);
+        	if (com != null)
+        		com.requestDBGet(m_table + "/" + m_node + "@" + m_name, m_isfull);
         } catch (IOException e) {
             e.printStackTrace();
         }

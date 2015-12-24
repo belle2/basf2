@@ -22,10 +22,10 @@ public abstract class NSMVListSetHandler extends NSMRequestHandler {
     }
 
     @Override
-    public boolean connected() {
+    public boolean connected(NSMCommunicator com) {
         try {
-        	if (m_com != null)
-        		m_com.requestVListGet(m_node);
+        	if (com != null)
+        		com.requestVListGet(m_node);
         } catch (IOException e) {
             e.printStackTrace();
         }

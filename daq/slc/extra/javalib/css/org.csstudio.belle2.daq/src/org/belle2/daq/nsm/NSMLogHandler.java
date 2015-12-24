@@ -12,7 +12,7 @@ public abstract class NSMLogHandler extends NSMRequestHandler {
 	}
 
 	@Override
-	public boolean connected() {
+	public boolean connected(NSMCommunicator com) {
 		return false;
 	}
 
@@ -22,11 +22,11 @@ public abstract class NSMLogHandler extends NSMRequestHandler {
             String node = msg.getNodeName();
             String log = msg.getData();
             LogMessage lmsg = new LogMessage(node, LogLevel.Get(msg.getParam(0)), new Date(1000l * msg.getParam(1)), log);
-            return handleLog(lmsg);
+            return handleLog(lmsg, com);
         }
         return false;
     }
     
-    abstract public boolean handleLog(LogMessage lsmg);
+    abstract public boolean handleLog(LogMessage lsmg, NSMCommunicator com);
 
 }

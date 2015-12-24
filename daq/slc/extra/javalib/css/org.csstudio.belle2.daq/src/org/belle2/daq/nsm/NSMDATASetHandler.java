@@ -40,10 +40,10 @@ public class NSMDATASetHandler extends NSMRequestHandler {
     }
 
     @Override
-    public boolean connected() {
+    public boolean connected(NSMCommunicator com) {
         try {
-        	if (m_com != null)
-        		m_com.requestDATAGet(m_name, m_format);
+        	if (com != null)
+        		com.requestDATAGet(m_name, m_format);
         } catch (IOException e) {
             e.printStackTrace();
         }

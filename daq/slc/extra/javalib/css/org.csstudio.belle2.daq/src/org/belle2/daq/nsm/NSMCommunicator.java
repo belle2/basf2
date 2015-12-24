@@ -8,12 +8,9 @@ package org.belle2.daq.nsm;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.belle2.daq.base.LogLevel;
-import org.belle2.daq.base.LogMessage;
 import org.belle2.daq.database.DBObject;
 import org.belle2.daq.io.SocketDataReader;
 import org.belle2.daq.io.SocketDataWriter;
@@ -41,7 +38,7 @@ public class NSMCommunicator extends Thread {
 	}
 
 	public void reconnect(String hostname, int port, String nsmnode,
-			String nsmhost, int nsmport) throws IOException {
+			String nsmhost, int nsmport) {
 		close();
 		interrupt();
 		m_hostname = hostname;
@@ -99,7 +96,7 @@ public class NSMCommunicator extends Thread {
 					synchronized (m_handler) {
 						int nhandlers = m_handler.size();
 						for (int n = 0; n < nhandlers; n++) {
-							m_handler.get(n).connected();
+							m_handler.get(n).connected(this);
 						}
 					}
 				} catch (IOException ex) {

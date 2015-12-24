@@ -12,7 +12,7 @@ package org.belle2.daq.nsm;
 public abstract class NSMRequestHandler {
 
     private boolean m_once;
-    abstract public boolean connected();
+    abstract public boolean connected(NSMCommunicator com);
     abstract public boolean handle(NSMCommand cmd, NSMMessage msg, NSMCommunicator com);
     protected NSMCommunicator m_com;
 

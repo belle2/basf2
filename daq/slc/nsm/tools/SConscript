@@ -8,5 +8,6 @@ env['TOOLS_LIBS']['nsmdataparse'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_cor
 env['TOOLS_LIBS']['nsmrequest']   = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['nsmdata2pv'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
 env['TOOLS_LIBS']['nsmvlist2pv'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['logfile2nsmd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib', 'pthread']
 
 Return('env')

@@ -1,8 +1,10 @@
-#include <daq/slc/database/PostgreSQLInterface.h>
-#include <daq/slc/database/DAQLogMessage.h>
+#include <daq/slc/nsm/NSMCallback.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
+#include <daq/slc/nsm/NSMNodeDaemon.h>
 
 #include <daq/slc/system/Inotify.h>
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/PThread.h>
 
 #include <daq/slc/base/Date.h>
 #include <daq/slc/base/ConfigFile.h>
@@ -32,41 +34,53 @@ time_t toUnixtime(const char* str)
   return mktime(&t);
 }
 
-int main()
+namespace Belle2 {
+
+  class Log2NSMCallback : public NSMCallback {
+
+  public:
+    Log2NSMCallback(const NSMNode& node)
+      : NSMCallback(5)
+    {
+      setNode(node);
+    }
+    virtual ~Log2NSMCallback() throw() {}
+
+  public:
+    virtual void init(NSMCommunicator&) throw()
+    {
+      try {
+      } catch (const IOException& e) {
+      }
+    }
+
+  };
+
+}
+
+int main(int argc, const char** argv)
 {
-  daemon(0, 0);
+  if (argc < 2) {
+    LogFile::debug("usage : %s <config>", argv[0]);
+  }
+  ConfigFile config("slowcontrol", argv[1]);
+  const std::string hostname = config.get("nsm.host");
+  const int port = config.getInt("nsm.port");
+  std::string nodename = config.get("nsm.nodename");
+  NSMNode lognode(config.get("log.collector"));
+  Log2NSMCallback* callback = new Log2NSMCallback(NSMNode(nodename));
+  PThread(new NSMNodeDaemon(callback, hostname, port));
+
+  //daemon(0, 0);
   Inotify inotify;
   inotify.open();
-  std::vector<std::string> dirs;
-  dirs.push_back("collector");
-  dirs.push_back("distributor");
-  dirs.push_back("dqmserver");
-  dirs.push_back("evp_hltwk01");
-  dirs.push_back("evp_hltwk02");
-  dirs.push_back("evp_hltwk03");
-  dirs.push_back("evp_hltwk04");
-  dirs.push_back("evp_hltwk05");
-  dirs.push_back("evp_hltwk06");
-  dirs.push_back("evp_hltwk07");
-  dirs.push_back("evp_hltwk08");
-  dirs.push_back("evp_hltwk09");
-  dirs.push_back("evp_hltwk10");
-  dirs.push_back("evp_hltwk11");
-  dirs.push_back("evp_hltwk12");
-  dirs.push_back("evp_hltwk13");
-  dirs.push_back("evp_hltwk14");
-  dirs.push_back("evp_hltwk15");
-  dirs.push_back("evp_hltwk16");
-  dirs.push_back("evp_hltwk17");
-  dirs.push_back("evp_hltwk18");
-  dirs.push_back("evp_hltwk19");
-  dirs.push_back("evp_hltwk20");
-  dirs.push_back("roisender");
+  const std::string dirbase = config.get("dir.base");
+  std::vector<std::string> dirs = StringUtil::split(config.get("dir.dir"), ',');
   std::map<std::string, unsigned long int> seek_m;
   std::vector<int> wds;
   for (std::vector<std::string>::iterator it = dirs.begin();
        it != dirs.end(); it++) {
-    std::string dir = "/home/usr/hltdaq/run/" + *it;
+    std::string dir = dirbase + *it;
     wds.push_back(inotify.add(dir,
                               Inotify::FILE_CREATE |
                               Inotify::FILE_OPEN |
@@ -85,12 +99,7 @@ int main()
     }
     closedir(dp);
   }
-  ConfigFile config("slowcontrol");
-  DBInterface* db = new PostgreSQLInterface(config.get("database.host"),
-                                            config.get("database.dbname"),
-                                            config.get("database.user"),
-                                            config.get("database.password"),
-                                            config.getInt("database.port"));
+
   while (true) {
     InotifyEventList list(inotify.wait(10));
     for (InotifyEventList::iterator it = list.begin();
@@ -102,7 +111,7 @@ int main()
       for (size_t i = 0; i < wds.size(); i++) {
         if (wd == wds[i]) {
           dir = dirs[i];
-          filename = "/home/usr/hltdaq/run/" + dir + "/" + filename;
+          filename = dirbase + "/" + dir + "/" + filename;
           break;
         }
       }
@@ -126,39 +135,39 @@ int main()
         stat(filename.c_str(), &st);
         seek_m[filename] = st.st_size;
         std::string buf;
-        try {
-          db->connect();
-          while (fin && getline(fin, buf)) {
-            unsigned int s = buf.find(" ");
-            std::string timestamp = buf.substr(0, s);
-            std::string message = buf.substr(s + 1);
-            time_t t = toUnixtime(timestamp.c_str());
-            LogFile::Priority pri = LogFile::DEBUG;
-            if (message.find("[INFO] ") == 0) {
-              message = message.substr(7);
-              pri = LogFile::INFO;
-            } else if (message.find("[NOTICE] ") == 0) {
-              message = message.substr(9);
-              pri = LogFile::NOTICE;
-            } else if (message.find("[WARNING] ") == 0) {
-              message = message.substr(10);
-              pri = LogFile::WARNING;
-            } else if (message.find("[ERROR] ") == 0) {
-              message = message.substr(8);
-              pri = LogFile::ERROR;
-            } else if (message.find("[FATAL] ") == 0) {
-              message = message.substr(8);
-              pri = LogFile::FATAL;
-            } else {
-            }
-            if (pri > LogFile::DEBUG) {
-              DAQLogMessage log(dir, pri, message, t);
-              LogFile::put(pri, message);
+        while (fin && getline(fin, buf)) {
+          unsigned int s = buf.find(" ");
+          std::string timestamp = buf.substr(0, s);
+          std::string message = buf.substr(s + 1);
+          time_t t = toUnixtime(timestamp.c_str());
+          LogFile::Priority pri = LogFile::DEBUG;
+          if (message.find("[INFO] ") == 0) {
+            message = message.substr(7);
+            pri = LogFile::INFO;
+          } else if (message.find("[NOTICE] ") == 0) {
+            message = message.substr(9);
+            pri = LogFile::NOTICE;
+          } else if (message.find("[WARNING] ") == 0) {
+            message = message.substr(10);
+            pri = LogFile::WARNING;
+          } else if (message.find("[ERROR] ") == 0) {
+            message = message.substr(8);
+            pri = LogFile::ERROR;
+          } else if (message.find("[FATAL] ") == 0) {
+            message = message.substr(8);
+            pri = LogFile::FATAL;
+          } else {
+          }
+          if (pri > LogFile::DEBUG) {
+            DAQLogMessage msg(dir, pri, message, t);
+            LogFile::put(pri, message);
+            try {
+              NSMCommunicator::send(NSMMessage(lognode, msg));
+            } catch (const NSMHandlerException& e) {
+              LogFile::error(e.what());
             }
           }
-        } catch (const DBHandlerException& e) {
         }
-        db->close();
       }
     }
   }

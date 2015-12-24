@@ -13,9 +13,13 @@
 
 using namespace Belle2;
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
-  daemon(0, 0);
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-d") == 0) {
+      daemon(0, 0);
+    }
+  }
   ConfigFile config("slowcontrol");
   std::string host = config.get("nsm.host");
   int port = config.getInt("nsm.port");

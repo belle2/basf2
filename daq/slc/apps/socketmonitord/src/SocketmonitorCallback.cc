@@ -68,6 +68,7 @@ SocketmonitorCallback::~SocketmonitorCallback() throw()
 
 void SocketmonitorCallback::init(NSMCommunicator&) throw()
 {
+  add(new NSMVHandlerInt("nsockets", true, false, m_hostname.size()));
   for (size_t i = 0; i < m_hostname.size(); i++) {
     std::string vname = StringUtil::form("socket[%d].", i);
     add(new NSMVHandlerText(vname + "hostname", true, false, m_hostname[i]));
@@ -87,6 +88,7 @@ void SocketmonitorCallback::init(NSMCommunicator&) throw()
 void SocketmonitorCallback::timeout(NSMCommunicator&) throw()
 {
   IOInfo::checkTCP(m_info);
+  static unsigned long long count = 0;
   try {
     for (size_t i = 0; i < m_hostname.size(); i++) {
       std::string vname = StringUtil::form("socket[%d].", i);
@@ -95,9 +97,16 @@ void SocketmonitorCallback::timeout(NSMCommunicator&) throw()
       st = m_info[i].getState();
       txqueue = m_info[i].getTXQueue();
       rxqueue = m_info[i].getRXQueue();
+      txqueue /= 1024;
+      rxqueue /= 1024;
       set(vname + "st", st);
       set(vname + "txqueue", txqueue);
       set(vname + "rxqueue", rxqueue);
+      if (count % 10 == 0) {
+        LogFile::debug("%s st=%d tx=%f rx=%f", m_hostname[i].c_str(), st, txqueue, rxqueue);
+        count = 1;
+      }
+      count++;
     }
   } catch (const IOException& e) {
 

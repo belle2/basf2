@@ -116,7 +116,8 @@ bool NSMCallback::perform(NSMCommunicator& com) throw()
       if (msg.getNParams() > 0) {
         lmsg.setPriority((LogFile::Priority)msg.getParam(0));
       }
-      if (msg.getNParams() > 1) lmsg.setDate(msg.getParam(1));
+      if (msg.getParam(1) > 0) lmsg.setDate(msg.getParam(1));
+      lmsg.setId(msg.getParam(2));
       lmsg.setNodeName(com.getNodeNameById(msg.getParam(2)));
       lmsg.setMessage(msg.getData());
       logset(lmsg);

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <sys/socket.h>
@@ -28,9 +29,7 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
     info[i].setState(0);
     info[i].setTXQueue(0);
     info[i].setRXQueue(0);
-    if (info[i].getLocalPort() != 0) count++;
   }
-  if (count == 0) return 0;
   count = 0;
   std::string line;
   std::stringstream ss;
@@ -43,13 +42,23 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
     ss >> sl >> local_address >> rem_address >> st >> queue;
     unsigned int addr = strtoul(local_address.substr(24, 8).c_str(), NULL, 16);
     int port = strtoul(local_address.substr(24 + 9).c_str(), NULL, 16);
+    unsigned int raddr = strtoul(rem_address.substr(24, 8).c_str(), NULL, 16);
+    int rport = strtoul(rem_address.substr(24 + 9).c_str(), NULL, 16);
     for (size_t i = 0; i < info.size(); i++) {
-      if (info[i].getLocalPort() <= 0 || info[i].getState() > 0) continue;
+      if (info[i].getState() > 0) continue;
       int sti = strtoul(st.substr(0).c_str(), NULL, 16);
       if (addr == info[i].getLocalAddress() &&
           port == info[i].getLocalPort() && sti == 1) {
-        info[i].setRemoteAddress(strtoul(rem_address.substr(24, 8).c_str(), NULL, 16));
-        info[i].setRemotePort(strtoul(rem_address.substr(24 + 9).c_str(), NULL, 16));
+        info[i].setRemoteAddress(raddr);
+        info[i].setRemotePort(rport);
+        info[i].setState(sti);
+        info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
+        info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));
+        count++;
+      } else if (raddr == info[i].getRemoteAddress() &&
+                 rport == info[i].getRemotePort() && sti == 1) {
+        info[i].setLocalAddress(addr);
+        info[i].setLocalPort(port);
         info[i].setState(sti);
         info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
         info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));
@@ -68,13 +77,23 @@ int IOInfo::checkTCP(std::vector<IOInfo>& info)
     ss >> sl >> local_address >> rem_address >> st >> queue;
     unsigned int addr = strtoul(local_address.substr(0, 8).c_str(), NULL, 16);
     int port = strtoul(local_address.substr(9).c_str(), NULL, 16);
+    unsigned int raddr = strtoul(rem_address.substr(0, 8).c_str(), NULL, 16);
+    int rport = strtoul(rem_address.substr(9).c_str(), NULL, 16);
     for (size_t i = 0; i < info.size(); i++) {
-      if (info[i].getLocalPort() <= 0 || info[i].getState() > 0) continue;
+      if (info[i].getState() > 0) continue;
       int sti = strtoul(st.substr(0).c_str(), NULL, 16);
       if (addr == info[i].getLocalAddress() &&
           port == info[i].getLocalPort() && sti == 1) {
-        info[i].setRemoteAddress(strtoul(rem_address.substr(0, 8).c_str(), NULL, 16));
-        info[i].setRemotePort(strtoul(rem_address.substr(9).c_str(), NULL, 16));
+        info[i].setRemoteAddress(raddr);
+        info[i].setRemotePort(rport);
+        info[i].setState(sti);
+        info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
+        info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));
+        count++;
+      } else if (raddr == info[i].getRemoteAddress() &&
+                 rport == info[i].getRemotePort() && sti == 1) {
+        info[i].setLocalAddress(addr);
+        info[i].setLocalPort(port);
         info[i].setState(sti);
         info[i].setTXQueue(strtoul(queue.substr(0, 8).c_str(), NULL, 16));
         info[i].setRXQueue(strtoul(queue.substr(9).c_str(), NULL, 16));

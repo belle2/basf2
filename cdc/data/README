@@ -90,3 +90,6 @@ Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward 
 
 * misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires.
 * alignment.dat:  : = misalignment.dat.
+
+* misalignment_v1.dat: assume (dx,dy,dz)=0 and measured tensions for all wires except for Layer#7 47 and Layer#8 47.
+* alignment_v1.dat:  : = misalignment_v1.dat.

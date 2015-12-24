@@ -34,11 +34,11 @@
 
     <!-- For misalignment -->
     <Misalignment desc="true: load misaligned sense wire positions; false: not.">true</Misalignment>
-    <misalignmentFileName desc="file which contains misalignment params.">misalignment.dat</misalignmentFileName>
+    <misalignmentFileName desc="file which contains misalignment params.">misalignment_v1.dat</misalignmentFileName>
 
     <!-- For alignment -->
     <Alignment desc="true: load aligned sense wire positions; false: not.">true</Alignment>
-    <alignmentFileName desc="file which contains alignment params.">alignment.dat</alignmentFileName>
+    <alignmentFileName desc="file which contains alignment params.">alignment_v1.dat</alignmentFileName>
 
     <!-- Switch for selecting x-t etc. to be used in reconstruction -->
     <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>

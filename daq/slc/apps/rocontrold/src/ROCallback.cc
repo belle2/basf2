@@ -106,7 +106,7 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
 
 void ROCallback::term() throw()
 {
-  m_stream1.term();
+  //m_stream1.term();
   m_eb0.term();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[0].term();
@@ -197,7 +197,7 @@ bool ROCallback::resume(int subno) throw(RCHandlerException)
 
 void ROCallback::stop() throw(RCHandlerException)
 {
-  m_stream1.stop();
+  //m_stream1.stop();
   for (size_t i = 0; i < m_stream0.size(); i++) {
     m_stream0[i].stop();
   }

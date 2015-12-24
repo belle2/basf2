@@ -1,6 +1,8 @@
 package org.csstudio.belle2.daq.nsm.log;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.security.auth.Subject;
 
@@ -18,50 +20,52 @@ import org.eclipse.draw2d.IFigure;
 
 public class NSMLogViewEditPart extends AbstractPVWidgetEditPart {
 
-	private final NSMCommunicator m_com = new NSMCommunicator();
+	private static final HashMap<String, NSMCommunicator> m_com = new HashMap<>();
+	private static final HashMap<NSMCommunicator, ArrayList<LogMessage>> m_msgs = new HashMap<>();
+	private final NSMLogViewHandler m_handler = new NSMLogViewHandler();
 
-	private NSMLogViewHandler m_handler;
-
-	private String nsmnode;
-	
-	private static int g_nfigure = 0;
-	
 	public NSMLogViewEditPart() {
-		nsmnode = "";
-		if (nsmnode.isEmpty()) {
-			IProduct product = Platform.getProduct();
-			if (null != product) nsmnode = product.getName() + "_";
-			Subject user = SecuritySupport.getSubject();
-			if (null != user) nsmnode += SecuritySupport.getSubjectName(user);
-		}
-		nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_LOG_" + g_nfigure;
-		g_nfigure++;
-		m_handler = new NSMLogViewHandler(m_com);
-		m_com.add(m_handler);
 	}
 
 	public void activate() {
 		super.activate();
-		m_com.close();
-		//m_com.stop();
 		String nsmhost = getWidgetModel().getNSMHost();
 		int nsmport = getWidgetModel().getNSMPort();
-		String host = getWidgetModel().getHost();
-		int port = getWidgetModel().getPort();
-		try {
-			m_com.reconnect(host, port, nsmnode, nsmhost, nsmport);
-		} catch (IOException e) {
-			e.printStackTrace();
+		NSMCommunicator com = null;
+		ArrayList<LogMessage> msgs = null;
+		if (m_com.containsKey(nsmhost+":"+nsmport)) {
+			com = m_com.get(nsmhost+":"+nsmport);
+			msgs = m_msgs.get(com);
+			for (LogMessage lmsg : msgs) {
+				((NSMLogViewFigure)figure).add(lmsg);
+			}
+		} else {
+			com = new NSMCommunicator();
+			String nsmnode = "";
+			if (nsmnode.isEmpty()) {
+				IProduct product = Platform.getProduct();
+				if (null != product) nsmnode = product.getName() + "_";
+				Subject user = SecuritySupport.getSubject();
+				if (null != user) nsmnode += SecuritySupport.getSubjectName(user);
+			}
+			nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_LOG";
+			String host = getWidgetModel().getHost();
+			int port = getWidgetModel().getPort();
+			com.reconnect(host, port, nsmnode, nsmhost, nsmport);
+			m_com.put(nsmhost+":"+nsmport, com);
+			msgs = new ArrayList<LogMessage>();
+			m_msgs.put(com, msgs);
+			System.out.println("activate : "+nsmnode);
 		}
-		System.out.println("activate : "+nsmnode);
+		com.add(m_handler);
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		m_com.close();
-		m_com.stop();
-		System.out.println("deactivate : "+nsmnode);
+		for (NSMCommunicator com : m_com.values()) {
+			com.remove(m_handler);
+		}
 	}
 	
 	@Override
@@ -90,22 +94,28 @@ public class NSMLogViewEditPart extends AbstractPVWidgetEditPart {
 
 	private class NSMLogViewHandler extends NSMLogHandler {
 
-		public NSMLogViewHandler(NSMCommunicator com) {
+		public NSMLogViewHandler() {
 			super(false);
-			m_com = com; 
 		}
 
-		public boolean connected() {
+		public boolean connected(NSMCommunicator com) {
 			try {
-				m_com.request(new NSMMessage(NSMCommand.LOGGET));
+				com.request(new NSMMessage(NSMCommand.LOGGET));
 			} catch (IOException e) {
 			}
 			return true;
 		}
 		
 		@Override
-		public boolean handleLog(final LogMessage lmsg) {
+		public boolean handleLog(final LogMessage lmsg, NSMCommunicator com) {
 			((NSMLogViewFigure)figure).add(lmsg);
+			if (m_msgs.get(com) != null) {
+				ArrayList<LogMessage> msgs = m_msgs.get(com);
+				msgs.add(lmsg);
+				while (msgs.size() > 200) {
+					msgs.remove(0);
+				}
+			}
 			return false;
 		}
 		

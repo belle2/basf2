@@ -10,7 +10,6 @@ import javax.security.auth.Subject;
 import org.belle2.daq.nsm.NSMCommand;
 import org.belle2.daq.nsm.NSMCommunicator;
 import org.belle2.daq.nsm.NSMData;
-import org.belle2.daq.nsm.NSMLogHandler;
 import org.belle2.daq.nsm.NSMMessage;
 import org.belle2.daq.nsm.NSMRequestHandler;
 import org.belle2.daq.nsm.NSMVar;
@@ -204,8 +203,18 @@ public class NSMDataSource extends DataSource {
 			}
 		}
 
-		public boolean connected() {
+		public boolean connected(NSMCommunicator com) {
 			for (String chname : m_chmap.keySet()) {
+				String s[] = chname.split(".");
+				try {
+					if (s.length > 1) {
+						connected(com, s[0], s[1]);
+					}
+				} catch (IOException e) {
+					System.err.println("Faield to connect to " + s[0]
+							+ ":" + s[1]);
+				}
+				/*
 				ArrayList<NSMCommunicator> coms = NSMCommunicator.get();
 				synchronized (coms) {
 					for (NSMCommunicator com : coms) {
@@ -220,6 +229,7 @@ public class NSMDataSource extends DataSource {
 						}
 					}
 				}
+				*/
 			}
 			return false;
 		}

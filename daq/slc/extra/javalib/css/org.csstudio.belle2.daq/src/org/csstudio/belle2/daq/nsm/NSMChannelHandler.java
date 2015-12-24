@@ -187,22 +187,10 @@ public class NSMChannelHandler extends MultiplexedChannelHandler<Object, Object>
 	}
 
 	public void updateValue(final VNumber newValue) {
-		/*
-		if (m_type.matches("data") && (null != currentValue) && (newValue.getValue().equals(currentValue))) {
-			return;
-		}
-		*/
-		//currentValue = newValue.getValue();
 		processMessage(newValue);
 	}
 
 	public void updateValue(final VString newValue) {
-		/*
-		if (m_type.matches("data") && (null != currentString) && (newValue.getValue().equals(currentString))) {
-			return;
-		}
-		*/
-		//currentString = newValue.getValue();
 		processMessage(newValue);
 	}
 

@@ -100,7 +100,7 @@ int main(int argc, char** argv)
     sprintf(s, "runcontrold %s -d; rocontrold %s -d", hostname, ropcname.c_str());
     printf("%s\n", s);
     system(s);
-    sprintf(s, "logcollectord");
+    sprintf(s, "logcollectord -d");
     printf("%s\n", s);
     system(s);
   }

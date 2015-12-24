@@ -1,3 +1,4 @@
+
 #include "daq/slc/apps/runcontrold/RunControlHandler.h"
 
 #include "daq/slc/apps/runcontrold/RunControlCallback.h"
@@ -13,11 +14,13 @@ using namespace Belle2;
 bool NSMVHandlerRCConfig::handleGetText(std::string& val)
 {
   try {
-    m_callback.get(m_rcnode, "rcconfig", val, 0);
+    m_callback.get(m_rcnode, "rcconfig", val);
+    std::vector<std::string> s = StringUtil::split(val, '@');
+    if (s.size() > 1) val = s[1];
     m_rcnode.setConfig(val);
     //val = m_rcnode.getConfig();
   } catch (const IOException& e) {
-    LogFile::error("%s : %s rcconfig", e.what(), m_rcnode.getName().c_str());
+    LogFile::debug("%s : %s rcconfig", e.what(), m_rcnode.getName().c_str());
     val = "";
     m_rcnode.setConfig(val);
   }

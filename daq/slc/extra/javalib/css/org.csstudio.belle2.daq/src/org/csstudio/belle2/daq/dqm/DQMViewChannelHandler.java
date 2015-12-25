@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.belle2.daq.dqm.Histo;
-import org.belle2.daq.dqm.HistoPackage;
-import org.belle2.daq.dqm.MonObject;
 import org.epics.pvmanager.ChannelWriteCallback;
 import org.epics.pvmanager.MultiplexedChannelHandler;
 import org.epics.vtype.VNumber;
@@ -17,7 +15,7 @@ public class DQMViewChannelHandler extends MultiplexedChannelHandler<Object, Obj
 
 	private Number currentValue = null;
 	private String currentString = null;
-	private String packname = "";
+	private String dirname = "";
 	private String histname = "";
 	private String parname = "";
 
@@ -25,15 +23,15 @@ public class DQMViewChannelHandler extends MultiplexedChannelHandler<Object, Obj
 		super(channelName);
 		String [] s = channelName.split(":");
 		if (s.length > 2) {
-			packname = s[0];
+			dirname = s[0];
 			histname = s[1];
 			parname = s[2];
 		} else if (s.length > 1) {
-			packname = "";
+			dirname = "";
 			histname = s[0];
 			parname = s[1];
 		} else if (s.length > 0) {
-			packname = "";
+			dirname = "";
 			histname = s[0];
 			parname = "title";
 		}
@@ -41,31 +39,30 @@ public class DQMViewChannelHandler extends MultiplexedChannelHandler<Object, Obj
 	}
 
 	public void update() {
-		for (HistoPackage pack : DQMViewCommunicator.getHistoPackages()) {
-			if (packname.equals(pack.getName())) {
-				for (MonObject m : pack.getMonObjects()) {
-					if (m instanceof Histo) {
-						Histo h = (Histo)m;
-						if (h.getName().equals(histname)) {
-							switch (parname) {
-							case "entries":
-								updateValue(h.getEntries());
-								break;
-							case "mean":
-								updateValue(h.getMean());
-								break;
-							case "rms":
-								updateValue(h.getRMS());
-								break;
-							case "title":
-								updateValue(ValueFactory.newVString(h.getTitle(), ValueFactory.alarmNone(), ValueFactory.timeNow()));
-								break;
-							default:
-								if (parname.startsWith("bincontent")) {
-									updateValueWithBinContent(h);
-								}
-								break;
+		for (String dname : DQMViewCommunicator.getHists().keySet()) {
+			if (dname.equals(dirname)) {
+				for (Histo h : DQMViewCommunicator.getHists().get(dname)) {
+					if (h.getName().equals(histname)) {
+						switch (parname) {
+						case "entries":
+							updateValue(h.getEntries());
+							break;
+						case "mean":
+							updateValue(h.getMean());
+							break;
+						case "rms":
+							updateValue(h.getRMS());
+							break;
+						case "title":
+							updateValue(ValueFactory.newVString(h.getTitle(),
+									ValueFactory.alarmNone(),
+									ValueFactory.timeNow()));
+							break;
+						default:
+							if (parname.startsWith("bincontent")) {
+								updateValueWithBinContent(h);
 							}
+							break;
 						}
 					}
 				}
@@ -101,7 +98,7 @@ public class DQMViewChannelHandler extends MultiplexedChannelHandler<Object, Obj
 
   public Map<String, Object> getProperties() {
     Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put("Package name", packname);
+    properties.put("Directory ", dirname);
     properties.put("Histogram name", histname);
     properties.put("Parameter type", parname);
     return properties;

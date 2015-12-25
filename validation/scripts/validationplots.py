@@ -803,6 +803,11 @@ def create_RootObjects_from_file(root_file, is_reference):
         name = key.GetName()
         file_keys.append(name)
 
+        # temporary workaround for dbstore files located (wrongly)
+        # in the validation results folder
+        if re.search(".*dbstore.*root", root_file):
+            continue
+
         # Get the ROOT object that belongs to that Key. If there is no
         # object, continue
         root_object = ROOT_Tfile.Get(name)

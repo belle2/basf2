@@ -68,6 +68,7 @@ public class NSMPreferencesPage extends FieldEditorPreferencePage implements IWo
 							return false;
 					}
 				}
+				setMessage("Restart CSS after pushing OK", IMessageProvider.INFORMATION);
 				return true;
 			}
 

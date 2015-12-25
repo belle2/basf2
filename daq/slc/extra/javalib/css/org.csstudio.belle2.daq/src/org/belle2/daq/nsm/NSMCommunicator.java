@@ -32,7 +32,8 @@ public class NSMCommunicator extends Thread {
 	private SocketDataReader m_reader;
 	private SocketDataWriter m_writer;
 	private Socket m_socket;
-
+	private int retry = 0;
+	
 	public static ArrayList<NSMCommunicator> get() {
 		return g_coms;
 	}
@@ -50,10 +51,13 @@ public class NSMCommunicator extends Thread {
 	}
 
 	private void reconnect() throws IOException {
-		System.out.println("connecting : " + m_hostname + ":" + m_port + " "
-				+ m_nsmnode + " " + m_nsmhost + ":" + m_nsmport);
+		if (retry == 0) {
+			System.out.println("connecting : " + m_hostname + ":" + m_port + " "
+					+ m_nsmnode + " " + m_nsmhost + ":" + m_nsmport);
+		}
 		m_socket = new Socket(m_hostname, m_port);
 		System.out.println("connected ");
+		retry = 0;
 		m_reader = new SocketDataReader(m_socket);
 		m_writer = new SocketDataWriter(m_socket);
 		m_writer.writeString(m_nsmnode);
@@ -100,6 +104,7 @@ public class NSMCommunicator extends Thread {
 						}
 					}
 				} catch (IOException ex) {
+					retry++;
 					close();
 					try {
 						Thread.sleep(5000);
@@ -108,7 +113,7 @@ public class NSMCommunicator extends Thread {
 						g_coms.remove(this);
 						return;
 					}
-					Logger.getLogger(NSMCommunicator.class.getName()).log(Level.SEVERE, null, m_hostname+":"+m_port+" closed");
+					//Logger.getLogger(NSMCommunicator.class.getName()).log(Level.SEVERE, null, m_hostname+":"+m_port+" closed");
 				}
 			}
 			try {
@@ -154,7 +159,9 @@ public class NSMCommunicator extends Thread {
 					g_coms.remove(this);
 					return;
 				}
-				System.err.println(m_hostname+":"+m_port+" closed"); 
+				if (retry <= 1) {
+					System.err.println(m_hostname+":"+m_port+" closed");
+				}
 				//Logger.getLogger(NSMCommunicator.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}

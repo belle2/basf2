@@ -1,18 +1,13 @@
 //+
 // File : DQMHistAnalysisExample.cc
-// Description : Sequential ROOT output module for pbasf2
+// Description :
 //
 // Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 13 - Aug - 2010
-//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
-//         9 - Dec - 2013, Modification for DAQ use
+// Date : 25 - Dec - 2015
 //-
 
 
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysisExample.h>
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysis.h>
-
-#include <iostream>
+#include <daq/dqm/analysis/modules/DQMHistAnalysisExample.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,7 +21,8 @@ REG_MODULE(DQMHistAnalysisExample)
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule() : DQMHistAnalysisModule()
+DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule()
+  : DQMHistAnalysisModule()
 {
   //Parameter definition
   B2DEBUG(1, "DQMHistAnalysisExample: Constructor done.");

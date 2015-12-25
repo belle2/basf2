@@ -1,23 +1,19 @@
 //+
-// File : storageoutput.h
-// Description : Sequential ROOT I/O output module for DAQ
+// File : DQMHistAnalysisOut.h
+// Description : Output module to NSM vars for DQM Histogram analysis
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//        9  - Dec - 2013 ; update for DAQ
+// Author : Tomoyuki Konno, Tokyo Metropolitan University
+// Date : 25 - Dec - 2015 ; first commit
 //-
 
 #ifndef _Belle2_DQMHistAnalysisOutputNSM_h
 #define _Belle2_DQMHistAnalysisOutputNSM_h
 
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysisOutput.h>
-#include <framework/core/Module.h>
-
-#include <string>
+#include <daq/dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
 
+  /*! Class definition for the output module of Sequential ROOT I/O */
   class NSMCallback;
 
   class DQMHistAnalysisOutputNSMModule : public DQMHistAnalysisOutputModule {

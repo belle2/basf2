@@ -1,10 +1,9 @@
 //+
-// File : storageoutput.h
-// Description : Sequential ROOT I/O output module for DAQ
+// File : DQMHistAnalysis.h
+// Description : Histogram analysis module for DQM
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//        9  - Dec - 2013 ; update for DAQ
+// Author : Tomoyuki Konno, Tokyo Metropolitan University
+// Date : 25 - Dec - 2015 ; first commit
 //-
 
 #ifndef _Belle2_HistAnalysisModule_h
@@ -12,7 +11,7 @@
 
 #include <framework/core/Module.h>
 
-#include <daq/slc/apps/dqmviewd/HistMemory.h>
+#include <TH1.h>
 
 #include <string>
 #include <map>

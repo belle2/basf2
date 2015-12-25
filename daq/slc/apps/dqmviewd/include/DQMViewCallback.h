@@ -7,7 +7,7 @@
 
 #include <daq/slc/base/ConfigFile.h>
 
-#include <daq/slc/apps/dqmviewd/HistMemory.h>
+#include <daq/dqm/analysis/HistMemory.h>
 
 #include <vector>
 

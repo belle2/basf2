@@ -1,31 +1,31 @@
 //+
-// File : storageoutput.h
-// Description : Sequential ROOT I/O output module for DAQ
+// File : DQMHistAnalysisExample.h
+// Description : An example module for DQM histogram analysis
 //
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 13 - Aug - 2010
-//        9  - Dec - 2013 ; update for DAQ
+// Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
+// Date : 25  - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisOutput_h
-#define _Belle2_DQMHistAnalysisOutput_h
+#ifndef _Belle2_DQMHistAnalysisExample_h
+#define _Belle2_DQMHistAnalysisExample_h
 
 #include <framework/core/Module.h>
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysis.h>
+
+#include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <string>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisOutputModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisExampleModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    DQMHistAnalysisOutputModule();
-    virtual ~DQMHistAnalysisOutputModule();
+    DQMHistAnalysisExampleModule();
+    virtual ~DQMHistAnalysisExampleModule();
 
     //! Module functions to be called from main process
     virtual void initialize();

@@ -1,16 +1,12 @@
 //+
 // File : DQMHistAnalysisOutputNSM.cc
-// Description : Sequential ROOT output module for pbasf2
+// Description :
 //
 // Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 13 - Aug - 2010
-//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
-//         9 - Dec - 2013, Modification for DAQ use
+// Date : 25 - Dec - 2015
 //-
 
-
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysisOutputNSM.h>
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysis.h>
+#include <daq/dqm/analysis/modules/DQMHistAnalysisOutputNSM.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMNodeDaemon.h>
@@ -21,8 +17,6 @@
 
 #include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
-
-#include <iostream>
 
 namespace Belle2 {
 

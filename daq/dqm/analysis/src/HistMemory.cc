@@ -1,4 +1,6 @@
-#include "daq/slc/apps/dqmviewd/HistMemory.h"
+#include "daq/dqm/analysis/HistMemory.h"
+
+#include <daq/slc/base/StringUtil.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -8,8 +10,6 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <sys/mman.h>
-
-#include <daq/slc/base/StringUtil.h>
 
 using namespace Belle2;
 
@@ -98,10 +98,8 @@ std::vector<TH1*>& HistMemory::deserialize(Header* header)
   EvtMessage* msg = new EvtMessage(m_buf);
   std::vector<TObject*> objlist;
   std::vector<std::string> strlist;
-  //int ds =
   m_handler.decode_msg(msg, objlist, strlist);
   int nobjs = (msg->header())->reserved[1];
-  //int narys = (msg->header())->reserved[2];
   for (int i = 0; i < nobjs; i++) {
     add((TH1*)objlist[i]->Clone());
   }

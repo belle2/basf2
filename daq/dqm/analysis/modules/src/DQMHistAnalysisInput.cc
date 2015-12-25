@@ -1,18 +1,13 @@
 //+
 // File : DQMHistAnalysisInput.cc
-// Description : Sequential ROOT output module for pbasf2
+// Description :
 //
 // Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 13 - Aug - 2010
-//         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
-//         9 - Dec - 2013, Modification for DAQ use
+// Date : 25 - Dec - 2015
 //-
 
 
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysisInput.h>
-#include <daq/slc/apps/dqmviewd/modules/DQMHistAnalysis.h>
-
-#include <iostream>
+#include <daq/dqm/analysis/modules/DQMHistAnalysisInput.h>
 
 using namespace std;
 using namespace Belle2;
@@ -26,7 +21,8 @@ REG_MODULE(DQMHistAnalysisInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisInputModule::DQMHistAnalysisInputModule() : DQMHistAnalysisModule()
+DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
+  : DQMHistAnalysisModule()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", string(""));
@@ -44,7 +40,8 @@ void DQMHistAnalysisInputModule::initialize()
   try {
     m_memory.open(m_mempath.c_str(), m_memsize);
   } catch (const IOException& e) {
-    B2FATAL("Failed to open HistMemory : " << m_mempath.c_str() << ":" << m_memsize);
+    B2FATAL("Failed to open HistMemory : " << m_mempath.c_str()
+            << ":" << m_memsize);
   }
   m_eventMetaDataPtr.registerPersistent();
   B2INFO("DQMHistAnalysisInput: initialized.");

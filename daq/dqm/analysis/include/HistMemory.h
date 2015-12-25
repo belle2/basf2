@@ -4,13 +4,13 @@
 #include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/EvtMessage.h>
 
-#include "daq/slc/system/SharedMemory.h"
-#include "daq/slc/system/MMutex.h"
-#include "daq/slc/system/MCond.h"
+#include <daq/slc/system/SharedMemory.h>
+#include <daq/slc/system/MMutex.h>
+#include <daq/slc/system/MCond.h>
 
-#include "daq/slc/base/IOException.h"
+#include <daq/slc/base/IOException.h>
 
-#include "TH1.h"
+#include <TH1.h>
 
 #include <string>
 #include <vector>

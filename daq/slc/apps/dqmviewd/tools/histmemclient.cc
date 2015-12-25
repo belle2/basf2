@@ -1,4 +1,4 @@
-#include <daq/slc/apps/dqmviewd/HistMemory.h>
+#include <daq/dqm/analysis/HistMemory.h>
 
 #include <daq/slc/system/LogFile.h>
 

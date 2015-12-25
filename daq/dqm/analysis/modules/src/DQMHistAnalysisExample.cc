@@ -34,6 +34,7 @@ DQMHistAnalysisExampleModule::~DQMHistAnalysisExampleModule() { }
 void DQMHistAnalysisExampleModule::initialize()
 {
   B2INFO("DQMHistAnalysisExample: initialized.");
+  m_f = new TF1("f1", "gaus(0)", -20, 20);
 }
 
 
@@ -46,9 +47,12 @@ void DQMHistAnalysisExampleModule::event()
 {
   TH1* h = findHist("FirstDet/h_HitXPositionCh01");
   if (h != NULL) {
-    setIntValue("firstdet.myresult", 1);
+    h->Fit("f1");
+    setFloatValue("firstdet.fit.mean", m_f->GetParameter(1));
+    setFloatValue("firstdet.fit.sigma", m_f->GetParameter(2));
   } else {
-    setIntValue("firstdet.myresult", 0);
+    setFloatValue("firstdet.fit.mean", 0);
+    setFloatValue("firstdet.fit.sigma", 0);
   }
 }
 

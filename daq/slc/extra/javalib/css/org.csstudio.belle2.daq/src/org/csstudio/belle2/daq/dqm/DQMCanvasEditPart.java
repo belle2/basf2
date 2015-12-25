@@ -116,9 +116,9 @@ public class DQMCanvasEditPart extends AbstractWidgetEditPart {
 						while (nhists < hists.size()) {
 							hists.remove(hists.size() - 1);
 						}
-						getWidgetModel().setHistoPropertyVisible(nhists);
-						dqm.update();
 					}
+					getWidgetModel().setHistoPropertyVisible(nhists);
+					dqm.update();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

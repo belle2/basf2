@@ -90,7 +90,7 @@ public class DQMCanvasModel extends AbstractContainerModel {
 			addProperty(new StringProperty(histName + n, "Name", category, "histo_" + n));
 			addProperty(new StringProperty(histTitle + n, "Tile", category, ""));
 		}
-		setHistoPropertyVisible(0);
+		setHistoPropertyVisible(getNHists());
 		addProperty(new ColorProperty(legendFillColor, "Fill Color", Legend, new RGB(255, 255, 255)));
 		addProperty(new ColorProperty(legendLineColor, "Line Color", Legend, new RGB(0, 0, 0)));
 		setLegendPropertyVisible(false);

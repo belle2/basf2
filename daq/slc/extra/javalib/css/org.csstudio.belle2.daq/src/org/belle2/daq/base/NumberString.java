@@ -14,11 +14,11 @@ public class NumberString {
 			v *= 10;
 		}
 		if (v >= 100000) {
-			return String.format("%s%." + ns + "e", (value < 0) ? "-1" : "", v);
+			return String.format("%s%." + ns + "e", (value < 0) ? "-" : "", v);
 		} else if (v <= 0.01) {
-			return String.format("%s%." + ns + "e", (value < 0) ? "-1" : "", v);
+			return String.format("%s%." + ns + "e", (value < 0) ? "-" : "", v);
 		} else {
-			return String.format("%s%." + ns + "f", (value < 0) ? "-1" : "", v);
+			return String.format("%s%." + ns + "f", (value < 0) ? "-" : "", v);
 		}
 	}
 

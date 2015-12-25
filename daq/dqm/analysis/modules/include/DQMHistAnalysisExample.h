@@ -13,7 +13,7 @@
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <string>
+#include <TF1.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -38,6 +38,7 @@ namespace Belle2 {
 
     // Data members
   private:
+    TF1* m_f;
 
   };
 } // end namespace Belle2

@@ -47,15 +47,21 @@ void DQMViewCallback::timeout(NSMCommunicator&) throw()
 void DQMViewCallback::update() throw()
 {
   lock();
-  m_hist = std::vector<TH1*>();
+  std::vector<TH1*> hist;
   for (size_t i = 0; i < m_memory.size(); i++) {
     HistMemory& memory(m_memory[i]);
     std::vector<TH1*>& h(memory.deserialize());
     for (size_t j = 0; j < h.size(); j++) {
-      m_hist.push_back(h[j]);
+      hist.push_back((TH1*)h[j]->Clone());
     }
   }
-  if (m_hist.size() > 0) notify();
+  if (hist.size() > 0) {
+    for (size_t i = 0; i < m_hist.size(); i++) {
+      delete m_hist[i];
+    }
+    m_hist = hist;
+    notify();
+  }
   unlock();
 }
 

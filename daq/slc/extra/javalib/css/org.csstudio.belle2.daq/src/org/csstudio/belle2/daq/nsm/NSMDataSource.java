@@ -3,6 +3,7 @@ package org.csstudio.belle2.daq.nsm;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -13,6 +14,7 @@ import org.belle2.daq.nsm.NSMData;
 import org.belle2.daq.nsm.NSMMessage;
 import org.belle2.daq.nsm.NSMRequestHandler;
 import org.belle2.daq.nsm.NSMVar;
+import org.csstudio.opibuilder.preferences.StringTableFieldEditor;
 import org.csstudio.security.SecuritySupport;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -137,38 +139,41 @@ public class NSMDataSource extends DataSource {
 	}
 
 	static public void startNSM() {
-		final IPreferencesService prefs = Platform.getPreferencesService();
-		final String s = prefs.getString(PLUGIN_ID, PreferenceConstants.HOST, "localhost:9090:eb02pc:9123", null);
-		
-		synchronized (g_source) {
-			String [] ss = s.split(",");
-			NSMCommunicator.closeAll();
-			int i = 0;
-			for (String cs : ss) {
-				try {
-					String [] css = cs.split(":"); 
-					String host = css[0];
-					int port = Integer.parseInt(css[1]);
-					String nsmhost = css[2];
-					int nsmport = Integer.parseInt(css[3]);
-					NSMCommunicator com = new NSMCommunicator();
-					com.add(g_source.m_datahandler);
-					com.add(g_source.m_sethandler);
-					//g_source.m_coms.add(com);
-					String nsmnode = "";
-					if (nsmnode.isEmpty()) {
-						IProduct product = Platform.getProduct();
-						if (null != product) nsmnode = product.getName() + "_";
-						Subject user = SecuritySupport.getSubject();
-						if (null != user) nsmnode += SecuritySupport.getSubjectName(user);
+		try {
+			final IPreferencesService prefs = Platform.getPreferencesService();
+			final String s = prefs.getString(PLUGIN_ID, PreferenceConstants.NSM, "localhost,9090,eb02pc,9123", null);
+			synchronized (g_source) {
+				List<String[]> ss = StringTableFieldEditor.decodeStringTable(s);
+				NSMCommunicator.closeAll();
+				int i = 0;
+				for (String[] cs : ss) {
+					try {
+						String host = cs[0];
+						int port = Integer.parseInt(cs[1]);
+						String nsmhost = cs[2];
+						int nsmport = Integer.parseInt(cs[3]);
+						NSMCommunicator com = new NSMCommunicator();
+						com.add(g_source.m_datahandler);
+						com.add(g_source.m_sethandler);
+						String nsmnode = "";
+						if (nsmnode.isEmpty()) {
+							IProduct product = Platform.getProduct();
+							if (null != product)
+								nsmnode = product.getName() + "_";
+							Subject user = SecuritySupport.getSubject();
+							if (null != user)
+								nsmnode += SecuritySupport.getSubjectName(user);
+						}
+						nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_" + i;
+						com.reconnect(host, port, nsmnode, nsmhost, nsmport);
+						NSMCommunicator.get().add(com);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					nsmnode = nsmnode.replaceAll("-", "_").replaceAll("\\.", "_") + "_" + i;
-					com.reconnect(host, port, nsmnode, nsmhost, nsmport);
-					NSMCommunicator.get().add(com);
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
 	}
 

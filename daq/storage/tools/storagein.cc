@@ -20,7 +20,6 @@
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
-#include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/base/Date.h>
 
@@ -52,12 +51,11 @@ int main(int argc, char** argv)
   int runno = 0;
   int subno = 0;
   int ntried = 0;
-  //File tmpfile(Date().toString("/rawdata/disk01/%Y-%m-%d-%H-%M-%S.dat"), "rw");
   while (true) {
     while (socket.get_fd() <= 0) {
       try {
         socket.connect();
-        B2INFO("storagein: Connected to data source");
+        B2INFO("Connected to data source");
         socket.setBufferSize(32 * 1024 * 1024);
         ntried = 0;
         if (info.isAvailable()) {
@@ -72,7 +70,7 @@ int main(int argc, char** argv)
           info.setInputAddress(0);
         }
         if (ntried < 5)
-          B2WARNING("storagein: failed to connect to eb2 (try=" << ntried++ << ")");
+          B2WARNING("failed to connect to eb2 (try=" << ntried++ << ")");
         sleep(5);
       }
     }
@@ -87,12 +85,10 @@ int main(int argc, char** argv)
         int nword = data.getWordSize();
         reader.read((data.getBuffer() + 1), nbyte);
         nbyte += sizeof(int);
-        //tmpfile.write(data.getBuffer(), nbyte);
         if (info.isAvailable()) {
           info.addInputCount(1);
           info.addInputNBytes(nbyte);
         }
-        //B2INFO("runno = " << runno);
         if (expno > data.getExpNumber() || runno > data.getRunNumber()) {
           B2ERROR("storagein: old run event detected : exp="
                   << data.getExpNumber() << " runno="
@@ -102,8 +98,7 @@ int main(int argc, char** argv)
         } else if (expno < data.getExpNumber() || runno < data.getRunNumber()) {
           expno = data.getExpNumber();
           runno = data.getRunNumber();
-          B2INFO("storagein: new run detected : exp="
-                 << expno << " runno=" << runno);
+          B2INFO("new run detected : exp=" << expno << " runno=" << runno);
           SharedEventBuffer::Header* iheader = ibuf.getHeader();
           iheader->expno = expno;
           iheader->runno = runno;
@@ -124,7 +119,7 @@ int main(int argc, char** argv)
                                 (count > 1000 && count < 10000 && count % 1000 == 0) ||
                                 (count > 10000 && count < 100000 && count % 10000 == 0) ||
                                 (count > 100000 && count < 1000000 && count % 100000 == 0))) {
-          B2INFO("Storage count = " << count << " nword = " << nword);
+          B2INFO("Event count = " << count << " nword = " << nword);
         }
         count++;
         ibuf.write(data.getBuffer(), nword, true);
@@ -136,7 +131,7 @@ int main(int argc, char** argv)
     } catch (const IOException& e) {
       socket.close();
       if (info.isAvailable()) info.setInputPort(0);
-      B2WARNING("storagein: Connection to eb2 broken.");
+      B2WARNING("Connection to eb2 broken.");
       sleep(5);
     }
   }

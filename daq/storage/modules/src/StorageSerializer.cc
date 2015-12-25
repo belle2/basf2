@@ -11,14 +11,10 @@
 
 #include <daq/storage/modules/StorageSerializer.h>
 #include <daq/storage/modules/StorageDeserializer.h>
-#include <rawdata/dataobjects/RawPXD.h>
-
-#include <TClonesArray.h>
-#include <TClass.h>
-#include <TList.h>
 
 #include <iostream>
-#include <cstdio>
+#include <TList.h>
+#include <TClass.h>
 
 using namespace std;
 using namespace Belle2;
@@ -41,7 +37,7 @@ StorageSerializerModule::StorageSerializerModule() : Module()
   addParam("compressionLevel", m_compressionLevel, "Compression Level", 0);
   addParam("OutputBufferName", m_obuf_name, "Output buffer name", string(""));
   addParam("OutputBufferSize", m_obuf_size, "Output buffer size", 10);
-  B2DEBUG(1, "StorageSerializer: Constructor done.");
+  std::cout << "[DEBUG] StorageSerializer: Constructor done." << std::endl;
 }
 
 
@@ -56,10 +52,10 @@ void StorageSerializerModule::initialize()
   if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
     m_obuf.open(m_obuf_name.c_str(), m_obuf_size * 1000000);
   } else {
-    B2ERROR("Failed to load arguments for shared buffer (" <<
+    B2FATAL("Failed to load arguments for shared buffer (" <<
             m_obuf_name.c_str() << ":" << m_obuf_size << ")");
   }
-  B2INFO("StorageSerializer: initialized.");
+  std::cout << "[DEBUG] StorageSerializer: initialized." << std::endl;
 }
 
 
@@ -76,7 +72,8 @@ int StorageSerializerModule::writeStreamerInfos()
     for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
       const TClass* entryClass = iter->second.objClass;
       TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
-      B2INFO("Recording StreamerInfo : durability " << durability << " : Class Name " << entryClass->GetName());
+      //std::cout << "Recording StreamerInfo : durability " << durability
+      //  << " : Class Name " << entryClass->GetName() << std::endl;
       if (!minilist) minilist  =  new TList();
       minilist->Add((TObject*)vinfo);
     }
@@ -115,9 +112,7 @@ void StorageSerializerModule::event()
   }
   SharedEventBuffer::Header* header = m_obuf.getHeader();
   m_obuf.lock();
-  bool configured = false;
   if (header->runno < runno || header->expno < expno) {
-    configured = true;
     m_count = 0;
     B2INFO("New run detected: expno = " << expno << " runno = " << runno << " subno = " << subno);
     header->expno = expno;
@@ -131,7 +126,6 @@ void StorageSerializerModule::event()
   }
 
   EvtMessage* msg = StorageDeserializerModule::streamDataStore();
-  //EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.lock();
   m_obuf.write((int*)msg->buffer(), nword,
@@ -142,7 +136,7 @@ void StorageSerializerModule::event()
   if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||
                           (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
                           (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
-    B2INFO("Storage count = " << m_count << " nword = " << nword);
+    std::cout << "[DEBUG] Storage count = " << m_count << " nword = " << nword << std::endl;
   }
   if (m_count % 10 == 0 && StorageDeserializerModule::get()) {
     RunInfoBuffer& info(StorageDeserializerModule::getInfo());
@@ -157,12 +151,12 @@ void StorageSerializerModule::event()
 
 void StorageSerializerModule::endRun()
 {
-  B2INFO("StorageSerializer : endRun called");
+  std::cout << "[DEBUG] StorageSerializer : endRun called" << std::endl;
 }
 
 
 void StorageSerializerModule::terminate()
 {
-  B2INFO("terminate called")
+  std::cout << "[DEBUG] terminate called" << std::endl;
 }
 

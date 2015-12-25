@@ -14,7 +14,7 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses #-ltinfo
+LIBS    += -lm -lpthread -ldl -lrt -lreadline %-lncurses -ltinfo
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm -ldaq_slc_runcontrol 
 LIBS    += -L$(BELLE2EX_LIB) -lnsm2_corelib -lnsm2_b2lib
 ifneq ($(NOT_USE_PSQL),yes)
@@ -29,7 +29,8 @@ ifneq ($(NOT_USE_PSQL),yes)
 CFLAGS  += -I$(PGSQL_INC_PATH)
 endif
 
-MAINS   = $(wildcard *.cc)
+#MAINS   = $(wildcard *.cc)
+MAINS   = rcrequest.cc
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)

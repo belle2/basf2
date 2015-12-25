@@ -24,6 +24,7 @@ StoragerCallback::StoragerCallback()
   system("killall basf2");
   */
   m_eb_stat = NULL;
+  m_errcount = 0;
 }
 
 StoragerCallback::~StoragerCallback() throw()
@@ -369,6 +370,15 @@ void StoragerCallback::monitor() throw(RCHandlerException)
         SharedEventBuffer::Header* hd = m_ibuf.getHeader();
         info->node[0].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
         connected = (info->node[0].connection_in > 0);
+        if (state == RCState::RUNNING_S && info->node[0].nevent_in > 0 &&
+            info->node[0].nqueue_out == 0 && info->node[0].evtrate_in == 0) {
+          m_errcount++;
+          if (m_errcount == 12) {
+            log(LogFile::FATAL, "Data flow was stopped over 1 mins");
+          }
+        } else {
+          m_errcount = 0;
+        }
       } else if (i == 1) { // record
         SharedEventBuffer::Header* hd = m_rbuf.getHeader();
         info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB

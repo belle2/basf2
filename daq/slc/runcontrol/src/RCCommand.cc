@@ -55,23 +55,25 @@ const RCCommand& RCCommand::operator=(const char* label) throw()
 
 int RCCommand::isAvailable(const RCState& state) const throw()
 {
-  if ((*this == LOAD || *this == CONFIGURE) &&
+  const RCCommand& cmd(*this);
+  if ((cmd == LOAD || cmd == CONFIGURE) &&
       state == RCState::NOTREADY_S) {
     return SUGGESTED;
-  } else if ((*this == LOAD || *this == CONFIGURE) &&
+  } else if ((cmd == LOAD || cmd == CONFIGURE) &&
              state == RCState::READY_S) {
     return ENABLED;
-  } else if (*this == START && state == RCState::READY_S) {
+  } else if (cmd == START && state == RCState::READY_S) {
     return SUGGESTED;
-  } else if (*this == STOP && (state == RCState::RUNNING_S ||
-                               state == RCState::PAUSED_S)) {
+  } else if (cmd == STOP && (state == RCState::RUNNING_S ||
+                             state == RCState::PAUSED_S)) {
     return SUGGESTED;
-  } else if (*this == PAUSE && state == RCState::RUNNING_S) {
+  } else if (cmd == PAUSE && state == RCState::RUNNING_S) {
     return ENABLED;
-  } else if (*this == RESUME && state == RCState::PAUSED_S) {
+  } else if (cmd == RESUME && state == RCState::PAUSED_S) {
     return ENABLED;
-  } else if (*this == RECOVER || *this == ABORT ||
-             *this == RECOVER || *this == BOOT) {
+  } else if (cmd == RECOVER || cmd == ABORT || cmd == BOOT) {
+    return ENABLED;
+  } else if (cmd == ABORT && state != RCState::ABORTING_RS) {
     return ENABLED;
   } else if (state == RCState::ERROR_ES) {
     return ENABLED;
@@ -82,27 +84,29 @@ int RCCommand::isAvailable(const RCState& state) const throw()
 
 RCState RCCommand::nextState() const throw()
 {
-  if (*this == LOAD) return RCState::READY_S;
-  else if (*this == START) return RCState::RUNNING_S;
-  else if (*this == STOP) return RCState::READY_S;
-  else if (*this == RESUME) return RCState::RUNNING_S;
-  else if (*this == PAUSE) return RCState::PAUSED_S;
-  else if (*this == RECOVER) return RCState::READY_S;
-  else if (*this == ABORT) return RCState::NOTREADY_S;
-  else if (*this == BOOT) return RCState::NOTREADY_S;
+  const RCCommand& cmd(*this);
+  if (cmd == LOAD) return RCState::READY_S;
+  else if (cmd == START) return RCState::RUNNING_S;
+  else if (cmd == STOP) return RCState::READY_S;
+  else if (cmd == RESUME) return RCState::RUNNING_S;
+  else if (cmd == PAUSE) return RCState::PAUSED_S;
+  else if (cmd == RECOVER) return RCState::READY_S;
+  else if (cmd == ABORT) return RCState::NOTREADY_S;
+  else if (cmd == BOOT) return RCState::NOTREADY_S;
   else return Enum::UNKNOWN;
 }
 
 RCState RCCommand::nextTState() const throw()
 {
-  if (*this == CONFIGURE) return RCState::CONFIGURING_TS;
-  else if (*this == LOAD) return RCState::LOADING_TS;
-  else if (*this == START) return RCState::STARTING_TS;
-  else if (*this == STOP) return RCState::STOPPING_TS;
-  else if (*this == RESUME) return RCState::RUNNING_S;
-  else if (*this == PAUSE) return RCState::PAUSED_S;
-  else if (*this == RECOVER) return RCState::RECOVERING_RS;
-  else if (*this == ABORT) return RCState::ABORTING_RS;
-  else if (*this == BOOT) return RCState::BOOTING_RS;
+  const RCCommand& cmd(*this);
+  if (cmd == CONFIGURE) return RCState::CONFIGURING_TS;
+  else if (cmd == LOAD) return RCState::LOADING_TS;
+  else if (cmd == START) return RCState::STARTING_TS;
+  else if (cmd == STOP) return RCState::STOPPING_TS;
+  else if (cmd == RESUME) return RCState::RUNNING_S;
+  else if (cmd == PAUSE) return RCState::PAUSED_S;
+  else if (cmd == RECOVER) return RCState::RECOVERING_RS;
+  else if (cmd == ABORT) return RCState::ABORTING_RS;
+  else if (cmd == BOOT) return RCState::BOOTING_RS;
   else return Enum::UNKNOWN;
 }

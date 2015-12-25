@@ -46,6 +46,11 @@ void LogListener::run()
           priority = LogFile::DEBUG;
         }
         m_con->getCallback()->log(priority, s);
+        if (priority == LogFile::ERROR) {
+          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+        } else if (priority == LogFile::FATAL) {
+          m_con->getCallback()->reply(NSMMessage(NSMCommand::FATAL, s));
+        }
         if (node.getState() != RCState::STOPPING_TS &&
             node.getState() != RCState::ABORTING_RS &&
             node.getState() != RCState::RECOVERING_RS) {

@@ -54,8 +54,8 @@ StorageDeserializerModule::StorageDeserializerModule() : Module()
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_count = 0;
-  B2INFO("StorageDeserializer: Constructor done.");
   g_module = this;
+  std::cout << "StorageDeserializer: Constructor done." << std::endl;
 }
 
 
@@ -65,11 +65,11 @@ StorageDeserializerModule::~StorageDeserializerModule()
 
 void StorageDeserializerModule::initialize()
 {
-  B2INFO("StorageDeserializer: initialize() started.");
+  std::cout << "StorageDeserializer: initialize() started." << std::endl;
   if (m_ibuf_name.size() > 0 && m_ibuf_size > 0) {
     m_ibuf.open(m_ibuf_name, m_ibuf_size * 1000000);
   } else {
-    B2ERROR("Failed to load arguments for shared buffer (" <<
+    B2FATAL("Failed to load arguments for shared buffer (" <<
             m_ibuf_name.c_str() << ":" << m_ibuf_size << ")");
   }
   if (m_shmflag > 0) {
@@ -81,7 +81,7 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer();
-  m_package = new DataStorePackage(m_streamer, 1);//m_eb2);
+  m_package = new DataStorePackage(m_streamer, m_eb2);
 
   StoreArray<RawPXD>::registerPersistent();
   if (m_info.isAvailable()) {
@@ -101,7 +101,7 @@ void StorageDeserializerModule::initialize()
   if (m_info.isAvailable()) {
     m_info.reportReady();
   }
-  B2INFO("StorageDeserializer: initialize() done.");
+  std::cout << "StorageDeserializer: initialize() done." << std::endl;
 }
 
 void StorageDeserializerModule::event()
@@ -140,24 +140,23 @@ void StorageDeserializerModule::event()
               m_package->getData().getEventNumber() << " nword = " <<
               m_package->getData().getWordSize());
     B2WARNING("Last event meta data " << m_expno << "." << m_runno << "." << m_evtno);
-    //DataStore::Instance().reset();
   }
 }
 
 void StorageDeserializerModule::beginRun()
 {
-  B2INFO("StorageDeserializer: beginRun called.");
+  std::cout << "StorageDeserializer: beginRun called." << std::endl;
 }
 
 void StorageDeserializerModule::endRun()
 {
-  B2INFO("StorageDeserializer: endRun done.");
+  std::cout << "StorageDeserializer: endRun done." << std::endl;
 }
 
 
 void StorageDeserializerModule::terminate()
 {
-  B2INFO("StorageDeserializer: terminate called")
+  std::cout << "StorageDeserializer: terminate called" << std::endl;
 }
 
 

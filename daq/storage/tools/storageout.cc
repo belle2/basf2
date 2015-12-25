@@ -61,7 +61,6 @@ int main(int argc, char** argv)
       if (use_info) info.setInputPort(0);
       TCPSocket socket = serversocket.accept();
       TCPSocketWriter writer(socket);
-      //REvtSocketSend* socket = new REvtSocketSend(port);
       B2INFO("Connected from expreco.");
       if (use_info) info.setInputPort(port);
       SharedEventBuffer::Header hdr;

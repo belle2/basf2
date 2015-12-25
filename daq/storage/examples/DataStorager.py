@@ -22,8 +22,8 @@ import sys
 argv = sys.argv
 
 # Set the log level to show only error and fatal messages
-set_log_level(LogLevel.ERROR)
-set_log_level(LogLevel.INFO)
+# set_log_level(LogLevel.ERROR)
+# set_log_level(LogLevel.INFO)
 
 gearbox = register_module('Gearbox')
 SVDUnpack = register_module('SVDUnpacker')

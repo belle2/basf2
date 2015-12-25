@@ -29,9 +29,8 @@ bool DataStorePackage::restore()
     m_data_hlt.setBuffer(m_data.getBody());
   }
   if (m_data_hlt.getBuffer() == NULL || m_data_hlt.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-    B2ERROR("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
+    B2FATAL("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
             << " count = " << count);
-    return false;
   }
   EvtMessage* msg = new EvtMessage((char*)m_data_hlt.getBody());
   if (msg->type() == MSG_TERMINATE) {
@@ -41,14 +40,13 @@ bool DataStorePackage::restore()
   }
   m_streamer->restoreDataStore(msg);
   delete msg;
-  ///*
   if (nboard > 1) {
     m_data_pxd.setBuffer(m_data.getBuffer() + m_data_hlt.getWordSize() + m_data.getHeaderWordSize());
     if (m_data_pxd.getBody()[0] != ONSENBinData::MAGIC) {
-      B2ERROR("Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
+      B2FATAL("Bad ONSEN magic for PXD = " << m_data_pxd.getTrailerMagic());
       return false;
     } else if (m_data_pxd.getTrailerMagic() != BinData::TRAILER_MAGIC) {
-      B2ERROR("Bad tarailer magic for PXD = " << m_data_pxd.getTrailerMagic());
+      B2FATAL("Bad tarailer magic for PXD = " << m_data_pxd.getTrailerMagic());
       return false;
     }
     if (m_data_pxd.getBuffer() != NULL) {
@@ -57,8 +55,6 @@ bool DataStorePackage::restore()
   } else {
     m_data_pxd.setBuffer(NULL);
   }
-  //*/
-  //m_data_pxd.setBuffer(NULL);
   return true;
 }
 

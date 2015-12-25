@@ -153,7 +153,7 @@ public:
     }
     m_buf = (char*)malloc(MAX_FILE_SIZE / 100);
     setvbuf(m_file, m_buf, _IOFBF, MAX_FILE_SIZE / 4000);
-    B2INFO("file " << filename << " opened");
+    B2INFO("New file " << filename << " is opened");
     return m_id;
   }
 
@@ -169,7 +169,7 @@ public:
         m_db.execute(sql);
         m_db.close();
       } catch (const DBHandlerException& e) {
-        LogFile::error("Failed to access db for update: %s", e.what());
+        B2ERROR("Failed to access db for update: " << e.what());
         std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
         fout << sql << std::endl;
         fout.close();
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
   SharedEventBuffer obuf;
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000, true);
   if (use_info) info.reportReady();
-  B2INFO("storagerecord: started recording.");
+  B2DEBUG(1, "started recording.");
   int* evtbuf = new int[10000000];
   unsigned long long nbyte_out = 0;
   unsigned int count_out = 0;
@@ -322,12 +322,10 @@ int main(int argc, char** argv)
       }
     } else {
       if (!ecount) {
-        B2WARNING("storagerecord: no run was initialzed for recording : " << iheader.expno << "." << iheader.runno);
+        B2WARNING("no run was initialzed for recording : " << iheader.expno << "." << iheader.runno);
       }
       ecount = 1;
-      //return 1;
     }
-    //usleep(1000);
   }
   return 0;
 }

@@ -112,15 +112,13 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
 {
-  log(LogFile::ERROR, "Error from %s : %s", nodename, data);
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
-    std::for_each(m_node_v.begin(), m_node_v.end(),
-                  Recoveror(*this, NSMMessage(RCCommand::RECOVER)));
-    setState(RCState::NOTREADY_S);
+    setState(RCState::ERROR_ES);
+    reply(NSMMessage(RCCommand::ERROR, "Error due to error on " + node.getName()));
+    m_starttime = -1;
     m_restarting = false;
-    //m_starttime = -1;
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -133,6 +131,7 @@ void RunControlCallback::fatal(const char* nodename, const char* data) throw()
     RCNode& node(findNode(nodename));
     logging(node, LogFile::FATAL, data);
     setState(RCState::ABORTING_RS);
+    reply(NSMMessage(RCCommand::ABORT, "Aborting due to error on " + node.getName()));
     abort();
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
@@ -171,7 +170,7 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         }
         break;
       }
-      log(LogFile::INFO, "%s config : %s", node.getName().c_str(), val.c_str());
+      log(LogFile::DEBUG, "%s config : %s", node.getName().c_str(), val.c_str());
       node.setConfig(val);
       std::string vname = StringUtil::form("node[%d]", (int)i);
       set(vname + ".rcconfig", val);
@@ -220,7 +219,7 @@ void RunControlCallback::stop() throw(RCHandlerException)
 
 void RunControlCallback::recover(const DBObject&) throw(RCHandlerException)
 {
-  distribute(NSMMessage(RCCommand::RECOVER));
+  distribute_r(NSMMessage(RCCommand::RECOVER));
   m_restarting = false;
   m_starttime = -1;
 }
@@ -252,7 +251,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       if (!m_restarting) {
         if (m_starttime > 0 && Time().get() - m_starttime > m_restarttime) {
-          log(LogFile::INFO, "Run automatically stopped due to exceeding run length");
+          log(LogFile::NOTICE, "Run automatically stopped due to exceeding run length");
           stop();
           m_restarting = true;
         }
@@ -270,7 +269,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
         if (all_ready) {
           m_restarting = false;
           m_starttime = -1;
-          log(LogFile::INFO, "Run automatically starting");
+          log(LogFile::NOTICE, "Run automatically starting");
           start(0, 0);
         }
       }
@@ -291,7 +290,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           std::string s;
           get(node, "rcstate", s, 1);
           if ((cstate = RCState(s)) != Enum::UNKNOWN) {
-            log(LogFile::NOTICE, "%s got up (state=%s).",
+            log(LogFile::INFO, "%s got up (state=%s).",
                 node.getName().c_str(), cstate.getLabel());
             setState(node, cstate);
             std::string table = "";
@@ -500,7 +499,6 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
         LogFile::fatal("Failed to NSM2 request");
         m_enabled = false;
       } catch (const IOException& e) {
-        //m_callback.log(LogFile::ERROR, "IOError %s", e.what());
         LogFile::error(e.what());
         m_enabled = false;
         m_callback.setState(RCState::NOTREADY_S);
@@ -516,8 +514,7 @@ void RunControlCallback::Recoveror::operator()(RCNode& node) throw()
   RCCommand cmd = RCCommand::RECOVER;
   if (m_msg.getNodeName() == node.getName()) {
     RCState state(node.getState());
-    if (node.isUsed() && state != RCState::RECOVERING_RS
-        && state != RCState::ABORTING_RS) {
+    if (node.isUsed() && state == RCState::NOTREADY_S) {
       try {
         if (NSMCommunicator::send(m_msg)) {
           m_callback.setState(node, RCState::RECOVERING_RS);

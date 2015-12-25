@@ -52,6 +52,7 @@ namespace Belle2 {
     eb_statistics* m_eb_stat;
     int m_nsenders;
     Time m_time;
+    int m_errcount;
 
   };
 

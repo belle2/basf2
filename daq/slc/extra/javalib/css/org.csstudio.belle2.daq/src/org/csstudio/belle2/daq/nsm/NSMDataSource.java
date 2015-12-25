@@ -199,8 +199,6 @@ public class NSMDataSource extends DataSource {
 						try {
 							connected(com, node, pname);
 						} catch (IOException e) {
-							System.err.println("Faield to connect to " + node
-									+ ":" + pname);
 						}
 					}
 				}

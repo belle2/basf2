@@ -184,7 +184,10 @@ void CDCDigitizerModule::event()
     B2DEBUG(250, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     // Special treatment for cosmic runs in April 2015
-    if (m_2015AprRun && m_wireID.getISuperLayer() != 4) continue;
+    if (m_2015AprRun) {
+      if (m_wireID.getISuperLayer() != 4) continue;
+      if (m_wireID.getIWire() > 15)       continue;
+    }
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_posWire    = m_aCDCSimHit->getPosWire();

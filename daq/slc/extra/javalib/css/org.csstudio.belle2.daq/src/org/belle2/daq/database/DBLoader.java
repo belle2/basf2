@@ -48,10 +48,8 @@ public class DBLoader {
 			for (int i = 0; i < nconf; i++) {
 				ss[i] = reader.readString();
 			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			//e.printStackTrace();
 		}
 		if (socket != null) {
 			try {

@@ -41,7 +41,7 @@ public class NSMChannelHandler extends MultiplexedChannelHandler<Object, Object>
 					m_parname = str[2].replace(":", ".");
 				} else if (m_type.matches("set")) {
 					m_parname = str[2].replace(":", ".");
-					update(0);
+					//update(0);
 				} else if (m_type.matches("req")) {
 					if (str.length>2) m_parname = str[2];
 					else m_parname = "";
@@ -69,6 +69,10 @@ public class NSMChannelHandler extends MultiplexedChannelHandler<Object, Object>
 			else if (currentString != null)
 				update(currentString);
 		} else if (m_type.matches("set")) {
+			try {
+				NSMDataSource.request(getChannelName(), m_nodename, m_parname);
+			} catch (IOException e) {
+			}
 			if (currentValue != null)
 				update(currentValue);
 			else if (currentString != null)

@@ -184,7 +184,7 @@ public class DQMViewCommunicator extends Thread {
 										figure.update();
 									}
 								} catch (Exception e) {
-									e.printStackTrace();
+									//e.printStackTrace();
 								}
 							}
 						});
@@ -194,7 +194,7 @@ public class DQMViewCommunicator extends Thread {
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				close();
 			}
 			try {

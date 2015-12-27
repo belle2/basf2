@@ -159,7 +159,7 @@ void HVCallback::addAll(const HVConfig& config) throw()
   add(new NSMVHandlerText("config.standby", true, true, m_configname_standby));
   add(new NSMVHandlerText("config.shoulder", true, true, m_configname_shoulder));
   add(new NSMVHandlerText("config.peak", true, true, m_configname_peak));
-  add(new NSMVHandlerText("state", true, false, getNode().getState().getLabel()));
+  add(new NSMVHandlerText("hvstate", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerInt("ncrates", true, false, (int)crate_v.size()));
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {

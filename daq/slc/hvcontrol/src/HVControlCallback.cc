@@ -150,7 +150,7 @@ void HVControlCallback::timeout(NSMCommunicator&) throw()
   if (isstable && m_state_demand != getNode().getState()) {
     LogFile::notice("State transit : %s", m_state_demand.getLabel());
     getNode().setState(m_state_demand);
-    set("state", m_state_demand.getLabel());
+    set("hvstate", m_state_demand.getLabel());
     reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
   }
 }

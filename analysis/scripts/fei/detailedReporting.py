@@ -518,7 +518,7 @@ if __name__ == '__main__':
             o += b2latex.SubSubSection("MC-based MVA")
             if tmvaTraining is None:
                 o += b2latex.String(r"""
-                        There is no MC-based TMVA training data available for this final state particle.
+                        There is no MC-based TMVA training data available for this particle.
                         Usually this means there wasn't enough statistics to perform a training,
                         or the training failed due to other reasons (cpu-, memory-, disk-, limitations?)
                         """)

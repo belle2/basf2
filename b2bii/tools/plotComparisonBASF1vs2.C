@@ -103,6 +103,51 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKSMonitors, "h294",   "extraInfo__boksnbStandard__bc",        "nisKs.standard",              2);
     }
 
+  if(!gBASF || !gKSAVFMonitors || gBASF->IsZombie() || gKSAVFMonitors->IsZombie())
+    cout << "Error opening K-short (AVF) monitor files!" << endl;
+  else 
+    {
+      fileName = "KS-MonitorPlots-AVF";
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h231",   "M",               "M (AVF)",               0);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h232",   "px",              "px (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h233",   "py",              "py (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h234",   "pz",              "pz (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h235",   "E",              "E (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h236",   "x",               "x (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h237",   "y",               "y (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h238",   "z",               "z (AVF)",              1);
+
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h241",   "momVertCovM__bo0__cm0__bc",              "Ks.errorMatrix(0,0)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h242",   "momVertCovM__bo0__cm1__bc",              "Ks.errorMatrix(0,1)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h243",   "momVertCovM__bo0__cm2__bc",              "Ks.errorMatrix(0,2)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h244",   "momVertCovM__bo0__cm3__bc",              "Ks.errorMatrix(0,3)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h245",   "momVertCovM__bo0__cm4__bc",              "Ks.errorMatrix(0,4)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h246",   "momVertCovM__bo0__cm5__bc",              "Ks.errorMatrix(0,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h247",   "momVertCovM__bo0__cm6__bc",              "Ks.errorMatrix(0,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h248",   "momVertCovM__bo1__cm1__bc",              "Ks.errorMatrix(1,1)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h249",   "momVertCovM__bo1__cm2__bc",              "Ks.errorMatrix(1,2)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h250",   "momVertCovM__bo1__cm3__bc",              "Ks.errorMatrix(1,3)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h251",   "momVertCovM__bo1__cm4__bc",              "Ks.errorMatrix(1,4)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h252",   "momVertCovM__bo1__cm5__bc",              "Ks.errorMatrix(1,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h253",   "momVertCovM__bo1__cm6__bc",              "Ks.errorMatrix(1,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h254",   "momVertCovM__bo2__cm2__bc",              "Ks.errorMatrix(2,2)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h255",   "momVertCovM__bo2__cm3__bc",              "Ks.errorMatrix(2,3)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h256",   "momVertCovM__bo2__cm4__bc",              "Ks.errorMatrix(2,4)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h257",   "momVertCovM__bo2__cm5__bc",              "Ks.errorMatrix(2,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h258",   "momVertCovM__bo2__cm6__bc",              "Ks.errorMatrix(2,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h259",   "momVertCovM__bo3__cm3__bc",              "Ks.errorMatrix(3,3)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h260",   "momVertCovM__bo3__cm4__bc",              "Ks.errorMatrix(3,4)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h261",   "momVertCovM__bo3__cm5__bc",              "Ks.errorMatrix(3,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h262",   "momVertCovM__bo3__cm6__bc",              "Ks.errorMatrix(3,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h263",   "momVertCovM__bo4__cm4__bc",              "Ks.errorMatrix(4,4)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h264",   "momVertCovM__bo4__cm5__bc",              "Ks.errorMatrix(4,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h265",   "momVertCovM__bo4__cm6__bc",              "Ks.errorMatrix(4,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h266",   "momVertCovM__bo5__cm5__bc",              "Ks.errorMatrix(5,5)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h267",   "momVertCovM__bo5__cm6__bc",              "Ks.errorMatrix(5,6)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h268",   "momVertCovM__bo6__cm6__bc",              "Ks.errorMatrix(6,6)",              2);
+    }
+
+
   // ---------------------------------------------------------------------------------
   // Gammas Monitor
   // ---------------------------------------------------------------------------------

@@ -1274,6 +1274,7 @@ void B2BIIConvertMdstModule::convertHelix(Belle::Helix& helix, std::vector<float
   unsigned int size = 5;
   for (unsigned int i = 0; i < size; i++) {
     for (unsigned int j = 0; j < size; j++) {
+      error5x5[i][j] = Ea[i][j];
       if (i == 2)
         error5x5[i][j] *= KAPPA2OMEGA;
       if (j == 2)

@@ -202,12 +202,11 @@ Particle::Particle(const KLMCluster* klmCluster) :
   m_mdstIndex = klmCluster->getArrayIndex();
 
   // set Chi^2 probability:
-  //TODO: gamma quality can be written here
+  //TODO: KL quality can be written here
   m_pValue = -1;
 
   // TODO: set error matrix
-  resetErrorMatrix();
-  //storeErrorMatrix(klmCluster->???);
+  storeErrorMatrix(klmCluster->getErrorMatrix());
 }
 
 Particle::Particle(const MCParticle* mcParticle) :

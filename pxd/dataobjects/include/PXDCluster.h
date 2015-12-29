@@ -22,6 +22,7 @@ namespace Belle2 {
     * ((m_uSigma^2, m_uvRho * m_uSigma * m_vSigma),
     *  (m_uvRho * m_uSigma * m_vSigma, m_vSigma^2))
     *  The correlation coefficient is derived from the shape of the cluster.
+    *  The cluster shape ID is use for correction of bias and error of position.
     */
   class PXDCluster: public RelationsObject {
   public:
@@ -30,7 +31,8 @@ namespace Belle2 {
     PXDCluster():
       m_sensorID(0), m_uPosition(0), m_vPosition(0), m_uPositionSigma(1),
       m_vPositionSigma(1), m_uvRho(0),  m_clsCharge(0), m_seedCharge(0),
-      m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0) {}
+      m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0),
+      m_clsShape(0) {}
 
     /** Deprecated constructor for backward compatibility - will be removed soon.
      * Doesn't contain error data.
@@ -49,7 +51,8 @@ namespace Belle2 {
       m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
       m_uPositionSigma(1), m_vPositionSigma(1), m_uvRho(0),
       m_clsCharge(clsCharge), m_seedCharge(seedCharge),  m_clsSize(clsSize),
-      m_uSize(uSize), m_vSize(vSize), m_uStart(uStart), m_vStart(vStart)
+      m_uSize(uSize), m_vSize(vSize), m_uStart(uStart), m_vStart(vStart),
+      m_clsShape(0)
     {}
 
     /** Constructor.
@@ -64,6 +67,7 @@ namespace Belle2 {
      * @param clsSize size of the cluster in pixels.
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
+     * @param clsShape ID of shape of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
                float vError, float uvRho, float clsCharge, float seedCharge,
@@ -73,7 +77,32 @@ namespace Belle2 {
       m_uPositionSigma(uError), m_vPositionSigma(vError),
       m_uvRho(uvRho), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
-      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart)
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsShape(0)
+    {}
+
+    /** Constructor for who want to add also cluster shape ID in one step.
+     * @param sensorID Sensor compact ID.
+     * @param uPosition Cluster u coordinate (r-phi).
+     * @param vPosition Cluster v coordinate (z).
+     * @param uError Error (estimate) of uPosition.
+     * @param vError Error (estiamte) of vPosition.
+     * @param uvRho u-v error correlation coefficient.
+     * @param clsCharge The cluster charge.
+     * @param seedCharge The charge of the cluster seed.
+     * @param clsSize size of the cluster in pixels.
+     * @param uSize number of pixel columns contributing to the cluster.
+     * @param vSize number of pixel rows contributing to the cluster.
+     * @param clsShape ID of shape of the cluster.
+     */
+    PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
+               float vError, float uvRho, float clsCharge, float seedCharge,
+               unsigned short clsSize, unsigned short uSize, unsigned short vSize,
+               unsigned short uStart, unsigned short vStart, short clsShape):
+      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
+      m_uPositionSigma(uError), m_vPositionSigma(vError),
+      m_uvRho(uvRho), m_clsCharge(clsCharge),
+      m_seedCharge(seedCharge),  m_clsSize(clsSize), m_uSize(uSize),
+      m_vSize(vSize), m_uStart(uStart), m_vStart(vStart), m_clsShape(clsShape)
     {}
 
     /** Get the sensor ID.
@@ -141,6 +170,15 @@ namespace Belle2 {
      */
     unsigned short getVStart() const { return m_vStart; }
 
+    /** Get cluster shape ID.
+     * @return cluster shape ID of the cluster.
+     */
+    short getShape() const { return m_clsShape; }
+
+    /** Set cluster shape ID.
+     */
+    void setShape(short NewClsShape) { m_clsShape = NewClsShape; }
+
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     float m_uPosition;         /**< Absolute cell position in r-phi. */
@@ -155,6 +193,7 @@ namespace Belle2 {
     unsigned short m_vSize;    /**< Cluster size in pixel rows  */
     unsigned short m_uStart;   /**< Start column of the cluster */
     unsigned short m_vStart;   /**< Start row of the cluster */
+    short m_clsShape;          /**< Cluster shape ID */
 
     ClassDef(PXDCluster, 3)
   };

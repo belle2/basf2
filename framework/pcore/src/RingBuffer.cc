@@ -431,10 +431,6 @@ int RingBuffer::remq_counter() const
 
 int RingBuffer::clear()
 {
-  int val = 1;
-  if (semctl(m_semid, 0, SETVAL, val) == -1) { //set 0th semaphore to semval
-    B2ERROR("Initializing semaphore with semctl() failed.");
-  }
   SemaphoreLocker locker(m_semid);
   //  m_bufinfo->size = m_shmsize - sizeof ( struct RingBufInfo );
   m_bufinfo->remain = m_bufinfo->size;

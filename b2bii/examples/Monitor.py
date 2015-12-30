@@ -23,6 +23,8 @@ from b2biiConversion import convertBelleMdstToBelleIIMdst
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addKshortConversionMonitors
+from b2biiMonitors import addConvertedPhotonConversionMonitors
+from b2biiMonitors import addLambda0ConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
 from b2biiMonitors import addMCParticlesConversionMonitors
 
@@ -50,6 +52,8 @@ loadGearbox()
 addBeamParamsConversionMonitors()
 addTrackConversionMonitors()
 addKshortConversionMonitors()
+addLambda0ConversionMonitors()
+addConvertedPhotonConversionMonitors()
 addNeutralsConversionMonitors()
 addMCParticlesConversionMonitors()
 

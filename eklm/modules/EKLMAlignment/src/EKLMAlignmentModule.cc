@@ -36,7 +36,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = &(EKLM::GeometryData::Instance());
+  m_GeoDat = NULL;
 }
 
 EKLMAlignmentModule::~EKLMAlignmentModule()
@@ -173,6 +173,7 @@ void EKLMAlignmentModule::studyAlignmentLimits()
 
 void EKLMAlignmentModule::initialize()
 {
+  m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_Mode == "Zero")
     generateZeroDisplacement();
   else if (m_Mode == "Random")

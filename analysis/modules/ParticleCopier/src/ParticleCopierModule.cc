@@ -73,28 +73,28 @@ namespace Belle2 {
       const StoreObjPtr<ParticleList> plist(m_inputListNames[i]);
 
       const unsigned int origSize = plist->getListSize();
-      std::vector<unsigned int> originals(origSize);
+      std::vector<Particle*> copies(origSize);
 
       for (unsigned i = 0; i < origSize; i++) {
         const Particle* origP = plist->getParticle(i);
 
-        // mark the original particle for removal from the list
-        originals.push_back(origP->getArrayIndex());
-
         // copy the particle
         Particle* copyP = ParticleCopy::copyParticle(origP);
-
-        // add it to the list
-        plist->addParticle(copyP);
+        copies.at(i) = copyP;
       }
 
-      plist->removeParticles(originals);
-      const unsigned int copySize = plist->getListSize();
+      // clear the original list and fill it with copies
+      plist->clear();
+      for (unsigned i = 0; i < origSize; i++)
+        plist->addParticle(copies[i]);
+
+      unsigned int copySize = plist->getListSize();
 
       if (copySize != origSize)
         B2FATAL("Size of the ParticleList " << m_inputListNames[i]
                 << " has changed while copying the Particles! original size = "
                 << origSize << " vs. new size = " << copySize);
+
     }
   }
 } // end Belle2 namespace

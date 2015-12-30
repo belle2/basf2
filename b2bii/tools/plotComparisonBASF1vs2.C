@@ -21,6 +21,10 @@ void plotComparisonBASF1vs2()
   TFile *gBeamParams = new TFile("b2biiBeamParamsConversionMonitors.root");
   TFile *gKSMonitors = new TFile("b2biiKshortConversionMonitors.root");
   TFile *gKSAVFMonitors = new TFile("b2biiKshortConversionMonitors-AVF.root");
+  TFile *gL0Monitors = new TFile("b2biiLambda0ConversionMonitors.root");
+  TFile *gL0AVFMonitors = new TFile("b2biiLambda0ConversionMonitors-AVF.root");
+  TFile *gGammaV0Monitors = new TFile("b2biiConvertedPhotonConversionMonitors.root");
+  TFile *gGammaV0AVFMonitors = new TFile("b2biiConvertedPhotonConversionMonitors-AVF.root");
   
   TFile *gTracks = new TFile("b2biiTrackConversionMonitors.root");
 
@@ -85,17 +89,17 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKSMonitors, "h213",   "daughter__bo0__cmpy__bc",              "py (BVF)",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h214",   "daughter__bo0__cmpz__bc",              "pz (BVF)",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h215",   "daughter__bo0__cmE__bc",               "E (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h216",   "daughter__bo0__cmx__bc",               "y (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h217",   "daughter__bo0__cmy__bc",               "z (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h218",   "daughter__bo0__cmy__bc",               "z (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h216",   "daughter__bo0__cmx__bc",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h217",   "daughter__bo0__cmy__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h218",   "daughter__bo0__cmz__bc",               "z (BVF)",              1);
 
       drawHist(fileName, gBASF, gKSMonitors, "h222",   "daughter__bo1__cmpx__bc",              "px (BVF)",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h223",   "daughter__bo1__cmpy__bc",              "py (BVF)",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h224",   "daughter__bo1__cmpz__bc",              "pz (BVF)",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h225",   "daughter__bo1__cmE__bc",               "E (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h226",   "daughter__bo1__cmx__bc",               "y (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h227",   "daughter__bo1__cmy__bc",               "z (BVF)",              1);
-      drawHist(fileName, gBASF, gKSMonitors, "h228",   "daughter__bo1__cmy__bc",               "z (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h226",   "daughter__bo1__cmx__bc",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h227",   "daughter__bo1__cmy__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gKSMonitors, "h228",   "daughter__bo1__cmz__bc",               "z (BVF)",              1);
 
       drawHist(fileName, gBASF, gKSMonitors, "h291",   "extraInfo__bogoodKs__bc",              "goodKs flag",              1);
       drawHist(fileName, gBASF, gKSMonitors, "h292",   "extraInfo__boksnbVLike__bc",           "nisKS.nbVlike",              1);
@@ -112,10 +116,12 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKSAVFMonitors, "h232",   "px",              "px (AVF)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h233",   "py",              "py (AVF)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h234",   "pz",              "pz (AVF)",              1);
-      drawHist(fileName, gBASF, gKSAVFMonitors, "h235",   "E",              "E (AVF)",              1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h235",   "E",               "E (AVF)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h236",   "x",               "x (AVF)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h237",   "y",               "y (AVF)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h238",   "z",               "z (AVF)",              1);
+
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h295",   "chiProb",               "fit pValue",     1);
 
       drawHist(fileName, gBASF, gKSAVFMonitors, "h241",   "momVertCovM__bo0__cm0__bc",              "Ks.errorMatrix(0,0)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h242",   "momVertCovM__bo0__cm1__bc",              "Ks.errorMatrix(0,1)",              1);
@@ -144,7 +150,98 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKSAVFMonitors, "h265",   "momVertCovM__bo4__cm6__bc",              "Ks.errorMatrix(4,6)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h266",   "momVertCovM__bo5__cm5__bc",              "Ks.errorMatrix(5,5)",              1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h267",   "momVertCovM__bo5__cm6__bc",              "Ks.errorMatrix(5,6)",              1);
-      drawHist(fileName, gBASF, gKSAVFMonitors, "h268",   "momVertCovM__bo6__cm6__bc",              "Ks.errorMatrix(6,6)",              2);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h268",   "momVertCovM__bo6__cm6__bc",              "Ks.errorMatrix(6,6)",              1);
+
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h271",   "abs__bodaughter__bo0__cmmcPDG__bc__bc",  "Ks.child(0).mcPDG",                1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h273",   "abs__bodaughter__bo1__cmmcPDG__bc__bc",  "Ks.child(1).mcPDG",                1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h272",   "daughter__bo0__cmmcP__bc",               "Ks.child(0).mcPtot",               1);
+      drawHist(fileName, gBASF, gKSAVFMonitors, "h274",   "daughter__bo1__cmmcP__bc",               "Ks.child(1).mcPtot",                2);
+    }
+
+  // ---------------------------------------------------------------------------------
+  // Converted Photons Monitor
+  // ---------------------------------------------------------------------------------
+
+  if(!gBASF || !gGammaV0Monitors || gBASF->IsZombie() || gGammaV0Monitors->IsZombie())
+    cout << "Error opening Converted Photons monitor files!" << endl;
+  else 
+    {
+      fileName = "Gamma-V0-MonitorPlots";
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h801",   "M",               "M (BVF)",               0);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h802",   "px",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h803",   "py",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h804",   "pz",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h805",   "E",               "E (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h806",   "x",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h807",   "y",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h808",   "z",               "z (BVF)",              1);
+
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h812",   "daughter__bo0__cmpx__bc",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h813",   "daughter__bo0__cmpy__bc",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h814",   "daughter__bo0__cmpz__bc",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h815",   "daughter__bo0__cmE__bc",               "E (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h816",   "daughter__bo0__cmx__bc",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h817",   "daughter__bo0__cmy__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h818",   "daughter__bo0__cmz__bc",               "z (BVF)",              1);
+
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h822",   "daughter__bo1__cmpx__bc",              "px (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h823",   "daughter__bo1__cmpy__bc",              "py (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h824",   "daughter__bo1__cmpz__bc",              "pz (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h825",   "daughter__bo1__cmE__bc",               "E (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h826",   "daughter__bo1__cmx__bc",               "x (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h827",   "daughter__bo1__cmy__bc",               "y (BVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0Monitors, "h828",   "daughter__bo1__cmz__bc",               "z (BVF)",              2);
+    }
+
+  if(!gBASF || !gGammaV0AVFMonitors || gBASF->IsZombie() || gGammaV0AVFMonitors->IsZombie())
+    cout << "Error opening Converted Photons (AVF) monitor files!" << endl;
+  else 
+    {
+      fileName = "Gamma-V0-MonitorPlots-AVF";
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h831",   "M",               "M (AVF)",               0);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h832",   "px",              "px (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h833",   "py",              "py (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h834",   "pz",              "pz (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h835",   "E",               "E (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h836",   "x",               "x (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h837",   "y",               "y (AVF)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h838",   "z",               "z (AVF)",              1);
+
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h895",   "chiProb",               "fit pValue",     1);
+
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h841",   "momVertCovM__bo0__cm0__bc",              "gammaV0.errorMatrix(0,0)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h842",   "momVertCovM__bo0__cm1__bc",              "gammaV0.errorMatrix(0,1)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h843",   "momVertCovM__bo0__cm2__bc",              "gammaV0.errorMatrix(0,2)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h844",   "momVertCovM__bo0__cm3__bc",              "gammaV0.errorMatrix(0,3)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h845",   "momVertCovM__bo0__cm4__bc",              "gammaV0.errorMatrix(0,4)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h846",   "momVertCovM__bo0__cm5__bc",              "gammaV0.errorMatrix(0,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h847",   "momVertCovM__bo0__cm6__bc",              "gammaV0.errorMatrix(0,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h848",   "momVertCovM__bo1__cm1__bc",              "gammaV0.errorMatrix(1,1)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h849",   "momVertCovM__bo1__cm2__bc",              "gammaV0.errorMatrix(1,2)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h850",   "momVertCovM__bo1__cm3__bc",              "gammaV0.errorMatrix(1,3)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h851",   "momVertCovM__bo1__cm4__bc",              "gammaV0.errorMatrix(1,4)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h852",   "momVertCovM__bo1__cm5__bc",              "gammaV0.errorMatrix(1,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h853",   "momVertCovM__bo1__cm6__bc",              "gammaV0.errorMatrix(1,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h854",   "momVertCovM__bo2__cm2__bc",              "gammaV0.errorMatrix(2,2)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h855",   "momVertCovM__bo2__cm3__bc",              "gammaV0.errorMatrix(2,3)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h856",   "momVertCovM__bo2__cm4__bc",              "gammaV0.errorMatrix(2,4)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h857",   "momVertCovM__bo2__cm5__bc",              "gammaV0.errorMatrix(2,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h858",   "momVertCovM__bo2__cm6__bc",              "gammaV0.errorMatrix(2,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h859",   "momVertCovM__bo3__cm3__bc",              "gammaV0.errorMatrix(3,3)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h860",   "momVertCovM__bo3__cm4__bc",              "gammaV0.errorMatrix(3,4)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h861",   "momVertCovM__bo3__cm5__bc",              "gammaV0.errorMatrix(3,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h862",   "momVertCovM__bo3__cm6__bc",              "gammaV0.errorMatrix(3,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h863",   "momVertCovM__bo4__cm4__bc",              "gammaV0.errorMatrix(4,4)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h864",   "momVertCovM__bo4__cm5__bc",              "gammaV0.errorMatrix(4,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h865",   "momVertCovM__bo4__cm6__bc",              "gammaV0.errorMatrix(4,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h866",   "momVertCovM__bo5__cm5__bc",              "gammaV0.errorMatrix(5,5)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h867",   "momVertCovM__bo5__cm6__bc",              "gammaV0.errorMatrix(5,6)",              1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h868",   "momVertCovM__bo6__cm6__bc",              "gammaV0.errorMatrix(6,6)",              1);
+
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h871",   "abs__bodaughter__bo0__cmmcPDG__bc__bc",  "gammaV0.child(0).mcPDG",                1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h873",   "abs__bodaughter__bo1__cmmcPDG__bc__bc",  "gammaV0.child(1).mcPDG",                1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h872",   "daughter__bo0__cmmcP__bc",               "gammaV0.child(0).mcPtot",               1);
+      drawHist(fileName, gBASF, gGammaV0AVFMonitors, "h874",   "daughter__bo1__cmmcP__bc",               "gammaV0.child(1).mcPtot",                2);
     }
 
 

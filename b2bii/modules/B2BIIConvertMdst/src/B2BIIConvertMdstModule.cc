@@ -200,6 +200,12 @@ void B2BIIConvertMdstModule::initializeDataStore()
   pi0ParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> kShortParticleList("K_S0:mdst");
   kShortParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> lambdaParticleList("Lambda0:mdst");
+  lambdaParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> antiLambdaParticleList("anti-Lambda0:mdst");
+  antiLambdaParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> gammaConversionsParticleList("gamma:v0mdst");
+  gammaConversionsParticleList.registerInDataStore();
 
   m_pidLikelihoods.registerInDataStore();
 
@@ -417,7 +423,23 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
   // Create and initialize K_S0 particle list
   StoreObjPtr<ParticleList> ksPList("K_S0:mdst");
   ksPList.create();
-  ksPList->initialize(310, "K_S0:mdst");
+  ksPList->initialize(310, ksPList.getName());
+
+  // Create and initialize Lambda0 and anti-Lamda0 particle list
+  StoreObjPtr<ParticleList> lambda0PList("Lambda0:mdst");
+  lambda0PList.create();
+  lambda0PList->initialize(3122, lambda0PList.getName());
+
+  StoreObjPtr<ParticleList> antiLambda0PList("anti-Lambda0:mdst");
+  antiLambda0PList.create();
+  antiLambda0PList->initialize(-3122, antiLambda0PList.getName());
+
+  antiLambda0PList->bindAntiParticleList(*lambda0PList);
+
+  // Create and initialize converted gamma particle list
+  StoreObjPtr<ParticleList> convGammaPList("gamma:v0mdst");
+  convGammaPList.create();
+  convGammaPList->initialize(22, convGammaPList.getName());
 
   // Loop over all Belle Vee2 candidates
   Belle::Mdst_vee2_Manager& m = Belle::Mdst_vee2_Manager::get_manager();
@@ -679,6 +701,27 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       std::cout << " error7x7 = " << std::endl;
       newKS->getDaughter(1)->getMomentumVertexErrorMatrix().Print();
       */
+    } else if (belleV0.kind() == 2) { // Lambda -> p+ pi-
+      Particle Lambda0(v0Momentum, 3122);
+      Lambda0.appendDaughter(newDaugP);
+      Lambda0.appendDaughter(newDaugM);
+      Lambda0.setVertex(v0Vertex);
+      Particle* newLambda0 = particles.appendNew(Lambda0);
+      lambda0PList->addParticle(newLambda0);
+    } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
+      Particle antiLambda0(v0Momentum, -3122);
+      antiLambda0.appendDaughter(newDaugM);
+      antiLambda0.appendDaughter(newDaugP);
+      antiLambda0.setVertex(v0Vertex);
+      Particle* newAntiLambda0 = particles.appendNew(antiLambda0);
+      antiLambda0PList->addParticle(newAntiLambda0);
+    } else if (belleV0.kind() == 4) { // gamma -> e+ e-
+      Particle gamma(v0Momentum, 22);
+      gamma.appendDaughter(newDaugP);
+      gamma.appendDaughter(newDaugM);
+      gamma.setVertex(v0Vertex);
+      Particle* newGamma = particles.appendNew(gamma);
+      convGammaPList->addParticle(newGamma);
     }
   }
 

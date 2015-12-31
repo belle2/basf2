@@ -54,13 +54,21 @@ void Alignment()
       {0,-45.,-40.}
     };
   */
-
+  /*
   double PlatePos[4][3] = 
     {
       {45.,0,30.},
       {-45.,0,30.},
       {0,45.,30.},
       {0,-45.,30.}
+    };
+  */
+    double PlatePos[4][3] = 
+    {
+      {51.8,0.8,0.4},
+      {-53.2,-0.3,37.7},
+      {0.1,52.1,37.9},
+      {2.1,-50.5,42.3}
     };
 
   /*
@@ -76,7 +84,9 @@ void Alignment()
   double dx_tpc = 15.0;
   double dy_tpc = 10.4;
   double tub_rad = 2.38;
-  double plate_hw = 2.54 * 0.35;
+  double plate_l = 40.;
+  double plate_w = 27.47788;
+  double plate_hw = 0.4765*2.;//2.54 * 0.35;
   double TPCpos[4][3];
   double Tubpos[4][3];
   for(int i=0;i<4;i++)
@@ -101,8 +111,10 @@ void Alignment()
 		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
 	      }
 	    else if(j==1){
-	      TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;
-	      Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
+	      //TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2;
+	      //Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
+	      TPCpos[i][j]=PlatePos[i][j]+plate_w/2.-dx_tpc/2.;
+	      Tubpos[i][j]=PlatePos[i][j]-plate_w/2.+tub_rad;
 	    }
 	  }else{
 	    if(j==1 && PlatePos[i][j]>0)
@@ -116,8 +128,10 @@ void Alignment()
 		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
               }
             else if(j==0){
-              TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;
-	      Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
+              //TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;
+	      //Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
+	      TPCpos[i][j]=PlatePos[i][j]+plate_w/2.-dx_tpc/2.;
+	      Tubpos[i][j]=PlatePos[i][j]-plate_w/2.+tub_rad;
             }
 	  }
 	  cout << " TPC " << TPCpos[i][j] << " r " << sqrt(TPCpos[i][0]*TPCpos[i][0]+TPCpos[i][1]*TPCpos[i][1])<< endl;; 

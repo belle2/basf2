@@ -100,12 +100,16 @@
   <Material name="LYSO">
     <density unit="g/cm3">7.1</density>
     <Components>
-      <Element fraction="1.8">Lu</Element>
+<!--      <Element fraction="1.8">Lu</Element>
       <Element fraction="0.2">Y</Element>
       <Element fraction="1">Si</Element>
-      <Element fraction="5">O</Element>
+      <Element fraction="5">O</Element> -->
+      <Element fraction="0.7143">Lu</Element> 
+      <Element fraction="0.0403">Y</Element>
+      <Element fraction="0.0637">Si</Element>
+      <Element fraction="0.1814">O</Element>
       <!-- Dopant concentration pulled ou of my (AB) hat... placeholder shouldn't affect anything -->
-      <Element fraction="1e-5">Ce</Element>
+      <Element fraction="0.0003">Ce</Element>
     </Components>
     <!-- Yield per MeV photon (75% of NaI) -->
     <Property name="SCINTILLATIONYIELD">

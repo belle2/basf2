@@ -19,7 +19,7 @@
     <Active>
       <Material>CAVE-Material</Material>
       <!--x_cave unit="mm">1890.0</x_cave-->
-      <x_cave unit="mm">1840.0</x_cave>
+      <x_cave unit="mm">1640.0</x_cave>
       <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
@@ -33,7 +33,7 @@
     <Active>
       <Material>CAVE-Material</Material>
       <!--x_cave unit="mm">-1140.0</x_cave-->
-      <x_cave unit="mm">-1190.0</x_cave>
+      <x_cave unit="mm">-1390.0</x_cave>
       <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
@@ -48,7 +48,7 @@
     <Active>
       <Material>CAVE-Material</Material>
       <!--x_cave unit="mm">375.0</x_cave-->
-      <x_cave unit="mm">325.0</x_cave>
+      <x_cave unit="mm">125.0</x_cave>
       <y_cave unit="mm">1395.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
@@ -62,7 +62,7 @@
  <Active>
       <Material>CAVE-Material</Material>
       <!--x_cave unit="mm">375.0</x_cave-->
-      <x_cave unit="mm">325.0</x_cave>
+      <x_cave unit="mm">125.0</x_cave>
       <y_cave unit="mm">-1135.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>

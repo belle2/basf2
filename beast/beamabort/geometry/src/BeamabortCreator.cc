@@ -86,10 +86,64 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         //Positioned PIN diodes
-        double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
-        double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
-        double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;
-        double thetaZ = activeParams.getAngle("ThetaZ");
+        double x_pos[100];
+        double y_pos[100];
+        double x_off[100];
+        double y_off[100];
+        double z_pos[100];
+        double phi[100];
+        double thetaZ[100];
+        double r[100];
+        int dimx = 0;
+        int dimy = 0;
+        int dimx_offset = 0;
+        int dimy_offset = 0;
+        int dimz = 0;
+        int dimr_dia = 0;
+        for (double x_offset : activeParams.getArray("x_offset", {0})) {
+          x_offset *= CLHEP::cm;
+          x_off[dimx_offset] = x_offset;
+          dimx_offset++;
+        }
+        for (double y_offset : activeParams.getArray("y_offset", {0})) {
+          y_offset *= CLHEP::cm;
+          y_off[dimy_offset] = y_offset;
+          dimy_offset++;
+        }
+        for (double x : activeParams.getArray("x", {0})) {
+          x *= CLHEP::cm;
+          x_pos[dimx] = x + x_off[dimx];
+          dimx++;
+        }
+        for (double y : activeParams.getArray("y", {0})) {
+          y *= CLHEP::cm;
+          y_pos[dimy] = y + y_off[dimy];
+          dimy++;
+        }
+        for (double z : activeParams.getArray("z", {0})) {
+          z *= CLHEP::cm;
+          z_pos[dimz] = z;
+          if (dimx != 0 && dimy != 0)
+            r[dimz] = sqrt(x_pos[dimz] * x_pos[dimz] + y_pos[dimz] * y_pos[dimz]);
+          dimz++;
+        }
+        int dimPhi = 0;
+        for (double Phi : activeParams.getArray("Phi", {0})) {
+          phi[dimPhi] = Phi  - 90. * CLHEP::deg;
+          dimPhi++;
+        }
+        int dimThetaZ = 0;
+        for (double ThetaZ : activeParams.getArray("ThetaZ", {0})) {
+          thetaZ[dimThetaZ] = ThetaZ;
+          dimThetaZ++;
+        }
+        if (dimx == 0 && dimy == 0) {
+          for (double r_dia : activeParams.getArray("r_dia", {0})) {
+            r_dia *= CLHEP::cm;
+            r[dimr_dia] = r_dia;
+            dimr_dia++;
+          }
+        }
 
         //create beamabort package
         G4double dx_opa = 10. / 2.*CLHEP::mm;
@@ -103,10 +157,10 @@ namespace Belle2 {
         s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 6.75 * CLHEP::mm, 0.));
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
         l_pa->SetVisAttributes(magenta);
-        G4Transform3D transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-
-        new G4PVPlacement(transform, l_pa, "p_pa", &topVolume, false, 0);
-
+        for (int i = 0; i < dimz; i++) {
+          G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+          new G4PVPlacement(transform, l_pa, "p_pa", &topVolume, false, 0);
+        }
 
         //create beamabort volumes
         G4double dx_ba = 4.5 / 2.*CLHEP::mm;
@@ -119,10 +173,12 @@ namespace Belle2 {
         //Lets limit the Geant4 stepsize inside the volume
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
         l_BEAMABORT->SetVisAttributes(orange);
-        transform = G4RotateZ3D(phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
-        new G4PVPlacement(transform, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
-
-        detID++;
+        for (int i = 0; i < dimz; i++) {
+          G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i],
+                                    z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
+          new G4PVPlacement(transform, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
+          detID++;
+        }
       }
     }
   } // beamabort namespace

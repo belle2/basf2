@@ -111,10 +111,65 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-        G4double r = activeParams.getLength("r_claw") * CLHEP::cm;
-        G4double z = activeParams.getLength("z_claw") * CLHEP::cm;
-        G4double phi = activeParams.getAngle("Phi");
-        G4double thetaZ = activeParams.getAngle("ThetaZ");
+        double x_pos[100];
+        double y_pos[100];
+        double x_off[100];
+        double y_off[100];
+        double z_pos[100];
+        double phi[100];
+        double thetaZ[100];
+        double r[100];
+        int dimx = 0;
+        int dimy = 0;
+        int dimx_offset = 0;
+        int dimy_offset = 0;
+        int dimz = 0;
+        int dimr_dia = 0;
+        for (double x_offset : activeParams.getArray("x_offset", {0})) {
+          x_offset *= CLHEP::cm;
+          x_off[dimx_offset] = x_offset;
+          dimx_offset++;
+        }
+        for (double y_offset : activeParams.getArray("y_offset", {0})) {
+          y_offset *= CLHEP::cm;
+          y_off[dimy_offset] = y_offset;
+          dimy_offset++;
+        }
+        for (double x : activeParams.getArray("x", {0})) {
+          x *= CLHEP::cm;
+          x_pos[dimx] = x + x_off[dimx];
+          dimx++;
+        }
+        for (double y : activeParams.getArray("y", {0})) {
+          y *= CLHEP::cm;
+          y_pos[dimy] = y + y_off[dimy];
+          dimy++;
+        }
+        for (double z : activeParams.getArray("z", {0})) {
+          z *= CLHEP::cm;
+          z_pos[dimz] = z;
+          if (dimx != 0 && dimy != 0)
+            r[dimz] = sqrt(x_pos[dimz] * x_pos[dimz] + y_pos[dimz] * y_pos[dimz]);
+          dimz++;
+        }
+        int dimPhi = 0;
+        for (double Phi : activeParams.getArray("Phi", {0})) {
+          phi[dimPhi] = Phi  - 90. * CLHEP::deg;
+          dimPhi++;
+        }
+        int dimThetaZ = 0;
+        for (double ThetaZ : activeParams.getArray("ThetaZ", {0})) {
+          thetaZ[dimThetaZ] = ThetaZ;
+          dimThetaZ++;
+        }
+        if (dimx == 0 && dimy == 0) {
+          for (double r_dia : activeParams.getArray("r_dia", {0})) {
+            r_dia *= CLHEP::cm;
+            r[dimr_dia] = r_dia;
+            dimr_dia++;
+          }
+        }
+        int Nscint = activeParams.getInt("Nscint");
         G4double dx_board = activeParams.getLength("dx_board") / 2.*CLHEP::cm;
         G4double dy_board = activeParams.getLength("dy_board") / 2.*CLHEP::cm;
         G4double dz_board = activeParams.getLength("dz_board") / 2.*CLHEP::cm;
@@ -127,42 +182,27 @@ namespace Belle2 {
         G4double dy_Al = dy_scint + Al_width;
         G4double dz_Al = dz_scint + Al_width;
         G4double dx_air = dx_Al;
-        G4double dy_air = dy_Al * 8.;
+        G4double dy_air = dy_Al * (double)Nscint;
         G4double dz_air = dz_board + 2. * dz_Culayer + dz_Al;
-        //cout << " dx sol 1 " << dx_air << " sol 2 " << dx_board << endl;
-        //cout << " dy sol 1 " << dy_air << " sol 2 " << dy_board << endl;
 
         //create air volume engloging ladder + scintillator + Al foil
         G4Box* s_air = new G4Box("s_air", dx_air, dy_air, dz_air);
         G4LogicalVolume* l_air = new G4LogicalVolume(s_air, geometry::Materials::get("G4_AIR"), "l_air");
-        G4Transform3D transform = G4RotateZ3D(-M_PI / 2 + phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_air, "p_air", &topVolume, false, 1);
 
         //create claw G10 board
         G4Box* s_board = new G4Box("s_board", dx_board, dy_board, dz_board);
         G4LogicalVolume* l_board = new G4LogicalVolume(s_board, geometry::Materials::get("G10"), "l_board");
         l_board->SetVisAttributes(green);
-        //G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        //new G4PVPlacement(transform, l_board, "p_board", &topVolume, false, 1);
-        //G4double r_board = -(dz_board + 2. * dz_Culayer + dz_scint + Al_width) / 2. + 2. * dz_Culayer + dz_board;
         G4double r_board = dz_air - 2. * dz_Culayer - dz_board;
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_board), l_board, "p_board", l_air, false, 1);
 
         //create copper layer on each side of the G10 board
         G4Box* s_Culayer = new G4Box("s_Culayer", dx_board, dy_board, dz_Culayer);
         G4LogicalVolume* l_Culayer = new G4LogicalVolume(s_Culayer, geometry::Materials::get("MetalCopper"), "l_Culayer");
         l_Culayer->SetVisAttributes(coppercolor);
-        /*
-        transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r + dz_board + dz_Culayer, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_Culayer, "p_Culayer_1", &topVolume, false, 1);
-        transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r - dz_board - dz_Culayer, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-        new G4PVPlacement(transform, l_Culayer, "p_Culayer_2", &topVolume, false, 1);
-        */
+
         G4double r_Culayer_bot = r_board - dz_board - dz_Culayer;
         G4double r_Culayer_top = r_board + dz_board + dz_Culayer;
         //cout << " cu bot sol 1 " << r_Culayer_bot << " sol 2 " << -dz_air + dz_Culayer<< endl;
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_Culayer_bot), l_Culayer, "p_Culayer_bot", l_air, false, 1);
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_Culayer_top), l_Culayer, "p_Culayer_top", l_air, false, 1);
 
         //create scintillator and Al foil around it
         G4VSolid* s_scint = new G4Box("s_scint", dx_scint, dy_scint, dz_scint);
@@ -173,23 +213,24 @@ namespace Belle2 {
 
         G4LogicalVolume* l_scint = new G4LogicalVolume(s_scint, geometry::Materials::get("G4_POLYSTYRENE"), "l_scint", 0, m_sensitive);
         l_scint->SetVisAttributes(red);
+
         //Lets limit the Geant4 stepsize inside the volume
         l_scint->SetUserLimits(new G4UserLimits(stepSize));
-
         G4double r_Al = r_Culayer_bot - dz_Culayer - dz_Al;
-        //cout << " dz_air " << dz_air << " x2 " << 2. * dz_air << " r_Al " << r_Al << " tot " << r_Al + dz_Al << " sol3 " << r_Culayer_top + dz_Culayer + dz_Al << endl;
         double z_0 = -dy_air + dy_Al;
 
-        for (int i = 0; i < 8; i++) {
-          double i_z = z_0 + i * 2. * dy_Al;
-          /*
-          transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r - dz_board - 2.*dz_Culayer - dz_Al, i_z) * G4RotateX3D(-M_PI / 2 - thetaZ);
-          new G4PVPlacement(transform, l_Al, "p_Al", &topVolume, false, 1);
-          new G4PVPlacement(transform, l_scint, "p_scint", &topVolume, false, detID);
-          */
-          new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_Al, "p_Al", l_air, false, 1);
-          new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_scint, "p_scint", l_air, false, detID);
-          detID++;
+        for (int i = 0; i < dimz; i++) {
+          G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+          new G4PVPlacement(transform, l_air, "p_air", &topVolume, false, 1);
+          new G4PVPlacement(0, G4ThreeVector(0, 0, r_board), l_board, "p_board", l_air, false, 1);
+          new G4PVPlacement(0, G4ThreeVector(0, 0, r_Culayer_bot), l_Culayer, "p_Culayer_bot", l_air, false, 1);
+          new G4PVPlacement(0, G4ThreeVector(0, 0, r_Culayer_top), l_Culayer, "p_Culayer_top", l_air, false, 1);
+          for (int j = 0; j < Nscint; j++) {
+            double i_z = z_0 + j * 2. * dy_Al;
+            new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_Al, "p_Al", l_air, false, 1);
+            new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_scint, "p_scint", l_air, false, detID);
+            detID++;
+          }
         }
       }
     }

@@ -41,16 +41,15 @@
   <!-- Subdedectors -->
 
   <xi:include href="../ir/FarBeamLine.xml"/>
-  <!--xi:include href="../beast/bgo/BGO.xml"/-->
+  <xi:include href="../beast/bgo/BGO-phase1.xml"/>
+  <xi:include href="../beast/ph1sustr/PH1SUSTR.xml"/>
   <xi:include href="../beast/pindiode/PINDIODE-phase1.xml"/>   
+  <xi:include href="../beast/beamabort/BEAMABORT-phase1.xml"/>
   <xi:include href="../beast/microtpc/MICROTPC-phase1.xml"/>
   <xi:include href="../beast/he3tube/HE3TUBE-phase1.xml"/>
   <xi:include href="../beast/claw/CLAW-phase1.xml"/>   
-  <xi:include href="../beast/ph1bpipe/PH1BPIPE.xml"/>
-  <xi:include href="../beast/cave/CAVE.xml"/>
-  <xi:include href="../beast/ph1sustr/PH1SUSTR.xml"/>
-  <!--xi:include href="../beast/srsensor/SRSENSOR.xml"/-->
   <xi:include href="../beast/csi/CSI.xml"/>
-  <xi:include href="../beast/beamabort/BEAMABORT-phase1.xml"/>
+  <xi:include href="../beast/cave/CAVE.xml"/>
+  <xi:include href="../beast/ph1bpipe/PH1BPIPE.xml"/>
 
 </Detector>

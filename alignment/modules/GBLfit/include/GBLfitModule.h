@@ -128,6 +128,7 @@ namespace Belle2 {
     bool m_useTrackTime;                             /**< If true, CDCRecoHits will use the track propagation time.  */
     bool m_estimateSeedTime;                         /**< If true, the starting time of each track will be estimated from its seed.  */
     bool m_buildBelle2Tracks;                        /**< Create Belle2::Tracks in the DataStore? */
+    bool m_addDummyVertexPoint;                       /**< Add point at beginning of the track at position of the seed with "negative" covariance */
 
   };
 }

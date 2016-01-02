@@ -96,6 +96,8 @@
 
 #include <framework/dataobjects/Helix.h>
 
+#include <genfit/FullMeasurement.h>
+
 #include <genfit/TGeoMaterialInterface.h>
 
 using namespace std;
@@ -186,6 +188,9 @@ GBLfitModule::GBLfitModule() :
            true);
   addParam("BuildBelle2Tracks", m_buildBelle2Tracks,
            "Option to build Belle2::Tracks. Not needed by default if the module is used only for refit.",
+           bool(false));
+  addParam("addDummyVertexPoint", m_addDummyVertexPoint,
+           "Adds point 0 to the track at position of seed with 'negative' covariance - does not contribute to the fit, but estimation in local system (n=z) will be calculated",
            bool(false));
 
   m_failedFitCounter = 0;
@@ -696,6 +701,7 @@ void GBLfitModule::event()
       }
 
       */
+
       if (m_seedFromDAF) {
         try {
           genfit::AbsFitter* dafFitter = new genfit::DAF();
@@ -711,6 +717,23 @@ void GBLfitModule::event()
         } catch (...) {
           B2WARNING("GBLfit: DAF prefit to determine seed failed");
         }
+      }
+
+      if (m_addDummyVertexPoint) {
+        TVector3 vertexPos = aTrackCandPointer->getPosSeed();
+        TVector3 vertexMom = aTrackCandPointer->getMomSeed();
+        genfit::StateOnPlane vertexSOP(trackRep);
+        TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
+        TVector3 vertexZDir(0, 0, vertexPos[2]);
+        genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+        vertexSOP.setPlane(vertexPlane);
+        vertexSOP.setPosMom(vertexPos, vertexMom);
+        TMatrixDSym vertexCov(5);
+        vertexCov.UnitMatrix();
+        vertexCov *= -1.;
+        genfit::MeasuredStateOnPlane mop(vertexSOP, vertexCov);
+        genfit::FullMeasurement* vertex = new genfit::FullMeasurement(mop, Const::IR);
+        gfTrack.insertMeasurement(vertex, 0);
       }
 
       //now fit the track
@@ -793,8 +816,10 @@ void GBLfitModule::event()
             ++trackCounter;
 
             //Create output tracks
-            gfTrack.prune(m_pruneFlags.c_str());
+            //gfTrack.prune(m_pruneFlags.c_str());
             gfTracks.appendNew(gfTrack);  //genfit::Track can be assigned directly
+            gfTrackCandidatesTogfTracks.add(iCand, trackCounter);
+
             tracks.appendNew(); //Track is created empty, helix parameters are not available because the fit failed, but other variables may give some hint on the reason for the failure
 
             //Create relation
@@ -825,7 +850,7 @@ void GBLfitModule::event()
              *                                 tracks[trackCounter]->setCotTheta(-999);
              */
             //Create relations
-            if (aTrackCandPointer->getMcTrackId() >= 0) {
+            if (m_buildBelle2Tracks && aTrackCandPointer->getMcTrackId() >= 0) {
               mcParticlesToTracks.add(aTrackCandPointer->getMcTrackId(), trackCounter);
             }
             //else B2WARNING("No MCParticle contributed to this track! No MCParticle<->Track relation will be created!");

@@ -212,7 +212,6 @@ void MillepedeCollectorModule::collect()
         extPrecisions[2] = 1. / extPrecisions[2];
 
         extDerivatives = vertexCov.GetEigenVectors();
-        extDerivatives.T();
 
         extMeasurements[0] = vertexResidual[0];
         extMeasurements[1] = vertexResidual[1];

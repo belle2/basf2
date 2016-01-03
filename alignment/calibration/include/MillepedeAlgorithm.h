@@ -12,6 +12,7 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <alignment/PedeResult.h>
+#include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
 
 namespace Belle2 {
@@ -33,6 +34,9 @@ namespace Belle2 {
     /// Get the result (invalid until executed) to get parameters etc.
     alignment::PedeResult& result() {return m_result;}
 
+    /// Get the Pede application (for status etc.)
+    alignment::PedeApplication& pede() {return m_pede;}
+
     /// Add (false, default behavior) or subtract (true) corrections to previous values?
     void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
 
@@ -48,6 +52,8 @@ namespace Belle2 {
     PedeSteering m_steering{"PedeSteering.txt"};
     /// The result (invalid until execution)
     alignment::PedeResult m_result{};
+    /// The Pede application (unsuccesfull until execution)
+    alignment::PedeApplication m_pede{};
 
     /// Convert IOV to string (to be able to use it as a key in map)
     std::string to_string(IntervalOfValidity iov)
@@ -67,7 +73,7 @@ namespace Belle2 {
       return IOV;
     }
 
-    ClassDef(MillepedeAlgorithm, 0); /**< Class implementing Millepede calibration algorithm */
+    ClassDef(MillepedeAlgorithm, 1); /**< Class implementing Millepede calibration algorithm */
 
   };
 } // namespace Belle2

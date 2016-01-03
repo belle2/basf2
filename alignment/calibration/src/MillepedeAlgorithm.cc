@@ -8,8 +8,6 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
-#include <TCanvas.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -29,14 +27,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     return c_Failure;
   }
 
-  m_steering.getFiles() = mille.getFiles();
+  for (auto file : mille.getFiles())
+    m_steering.addFile(file);
 
-  // Here the calibration is actually done
-  PedeApplication pede;
-  m_result = pede.calibrate(m_steering);
+  m_result = m_pede.calibrate(m_steering);
 
-  if (!pede.success() || !m_result.isValid()) {
-    B2INFO(pede.getExitMessage());
+  if (!m_pede.success() || !m_result.isValid()) {
+    B2INFO(m_pede.getExitMessage());
     return c_Failure;
   }
 
@@ -183,7 +180,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   for (auto& bklm : newBKLM)
     saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
 
-  commit();
+  //commit();
 
   if (paramChi2 / nParams > 1. || fabs(maxCorrectionPull) > 50.) {
     if (fabs(maxCorrectionPull) > 50.)

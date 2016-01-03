@@ -56,6 +56,19 @@ void PedeSteering::fixParameters(vector< int > labels, vector< double > values, 
     command(to_string(labels[i]) + " " + to_string(value) + " " + to_string(presigma));
   }
 }
+
+void PedeSteering::addFile(std::string filename, double weight)
+{
+  if (weight != 1.)
+    filename = filename + " -- " + std::to_string(weight);
+  bool exists = false;
+  for (auto file : files)
+    if (file == filename)
+      exists = true;
+  if (!exists)
+    files.push_back(filename);
+}
+
 /*
 void PedeSteering::addConstraint(double constraint, vector< int > labels, vector< double > coefficients) {
   command("Constraint " + to_string(constraint));

@@ -45,20 +45,23 @@ namespace Belle2 {
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
 
-    /** Get all useable daughter tracks for mother particle */
+    /** Get all useable tracks for particles */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
 
   private:
-    std::vector<std::string> m_tracks;  /**< Names of arrays with single genfit::Tracks fitted by GBL */
-    std::vector<std::string>
-    m_vertices;  /**< Name of particle list with mothers of daughters to be used with vertex constraint in calibration */
-    std::vector<std::string>
-    m_primaryVertices;  /**< Name of particle list with mothers of daughters to be used with vertex + IP profile constraint in calibration */
-    bool m_doublePrecision;  /**< Use double (instead of single/float) precision for binary files */
-
+    /** Names of arrays with single genfit::Tracks fitted by GBL */
+    std::vector<std::string> m_tracks;
+    /** Names of particle list with single particles */
+    std::vector<std::string> m_particles;
+    /** Name of particle list with mothers of daughters to be used with vertex constraint in calibration */
+    std::vector<std::string> m_vertices;
+    /** Name of particle list with mothers of daughters to be used with vertex + IP profile constraint in calibration */
+    std::vector<std::string> m_primaryVertices;
+    /** Use double (instead of single/float) precision for binary files */
+    bool m_doublePrecision;
   };
 }
 

@@ -45,6 +45,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   setDescription("Calibration data collector for Millepede Algorithm");
 
   addParam("tracks", m_tracks, "Names of collections of genfit::Tracks for calibration", vector<string>({""}));
+  addParam("particles", m_particles, "Names of particle list of single particles", vector<string>());
   addParam("vertices", m_vertices,
            "Name of particle list of (mother) particles with daughters for calibration using vertex constraint", vector<string>());
   addParam("primaryVertices", m_primaryVertices,
@@ -58,21 +59,26 @@ void MillepedeCollectorModule::prepare()
 {
   StoreObjPtr<EventMetaData>::required();
 
-  if (m_tracks.empty() && m_vertices.empty() && m_primaryVertices.empty())
-    B2ERROR("You have to specify either arrays of single tracks or particle lists of mothers with vertex constrained daughters.");
+  if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
+    B2ERROR("You have to specify either arrays of single tracks or particle lists single single particles or mothers with vertex constrained daughters.");
 
   if (!m_tracks.empty()) {
     for (auto arrayName : m_tracks)
       StoreArray<genfit::Track>::required(arrayName);
   }
 
-  if (!m_vertices.empty() || !m_primaryVertices.empty()) {
+  if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
     StoreArray<genfit::TrackCand> TrackCands;
     StoreArray<genfit::Track> GF2Tracks;
     RelationArray TrackCandsToGF2Tracks(TrackCands, GF2Tracks);
     TrackCands.isRequired();
     GF2Tracks.isRequired();
     TrackCandsToGF2Tracks.isRequired();
+  }
+
+  for (auto listName : m_particles) {
+    StoreObjPtr<ParticleList> list(listName);
+    list.isRequired();
   }
 
   for (auto listName : m_vertices) {
@@ -102,33 +108,46 @@ void MillepedeCollectorModule::collect()
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
 
-  if (!m_tracks.empty()) {
-    for (auto arrayName : m_tracks) {
 
-      // Input tracks (have to be fitted by GBL)
-      StoreArray<genfit::Track> tracks(arrayName);
+  for (auto arrayName : m_tracks) {
+    // Input tracks (have to be fitted by GBL)
+    StoreArray<genfit::Track> tracks(arrayName);
 
-      for (auto track : tracks) {
-        if (!track.hasFitStatus())
-          continue;
-        genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
-        if (!fs)
-          continue;
+    for (auto track : tracks) {
+      if (!track.hasFitStatus())
+        continue;
+      genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
+      if (!fs)
+        continue;
 
-        if (!fs->isFitConvergedFully())
-          continue;
+      if (!fs->isFittedWithReferenceTrack())
+        continue;
 
-        getObject<TH1F>("chi2/ndf").Fill(fs->getChi2() / fs->getNdf());
-        getObject<TH1F>("pval").Fill(fs->getPVal());
+      getObject<TH1F>("chi2/ndf").Fill(fs->getChi2() / fs->getNdf());
+      getObject<TH1F>("pval").Fill(fs->getPVal());
 
-        using namespace gbl;
-        GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
-        mille.fill(trajectory);
-
-      }
+      using namespace gbl;
+      GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
+      mille.fill(trajectory);
 
     }
 
+  }
+
+  for (auto listName : m_particles) {
+    StoreObjPtr<ParticleList> list(listName);
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+      for (auto track : getParticlesTracks({list->getParticle(iParticle)})) {
+        auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
+
+        getObject<TH1F>("chi2/ndf").Fill(gblfs->getChi2() / gblfs->getNdf());
+        getObject<TH1F>("pval").Fill(gblfs->getPVal());
+
+        gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
+        mille.fill(trajectory);
+
+      }
+    }
   }
 
   for (auto listName : m_vertices) {
@@ -188,6 +207,10 @@ void MillepedeCollectorModule::collect()
 
         TMatrixDSymEigen vertexCov(beam->getCovVertex());
         extPrecisions = vertexCov.GetEigenValues();
+        extPrecisions[0] = 1. / extPrecisions[0];
+        extPrecisions[1] = 1. / extPrecisions[1];
+        extPrecisions[2] = 1. / extPrecisions[2];
+
         extDerivatives = vertexCov.GetEigenVectors();
         extDerivatives.T();
 

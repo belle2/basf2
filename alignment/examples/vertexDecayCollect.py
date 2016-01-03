@@ -19,7 +19,7 @@ primary_vertices = ['Z0:mumu']
 
 main.add_module('UpdateParticleTrackCand', motherListNames=primary_vertices, removeBKLM=True, removeCDC=True)
 
-main.add_module('GBLfit', UseClusters=False, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True)
+main.add_module('GBLfit', UseClusters=True, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True)
 main.add_module('MillepedeCollector', tracks=[], primaryVertices=primary_vertices)
 main.add_module('GBLdiagnostics')
 main.add_module("RootOutput", branchNames=['EventMetaData'])

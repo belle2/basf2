@@ -61,13 +61,6 @@ namespace Belle2 {
        */
       static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
-      /// Allow automatic taking of the address.
-      /** Essentially pointers to (lvalue) objects is a subclass of the object itself.
-       *  This method activally exposes this inheritance to be able to write algorithms
-       *  that work for objects and poiinters alike without code duplication.*/
-      operator const Belle2::TrackFindingCDC::CDCRecoSegment2D* () const&
-      { return this; }
-
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 

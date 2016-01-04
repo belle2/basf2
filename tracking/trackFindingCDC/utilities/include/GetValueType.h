@@ -17,7 +17,7 @@ namespace Belle2 {
 
     /// Type function to extract the bare value type from a range of values
     template<class Ts>
-    using GetValueType = typename std::remove_reference < decltype(*std::begin(Ts{})) >::type;
+    using GetValueType = typename std::remove_reference < decltype(*std::begin(std::declval<Ts&>())) >::type;
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

@@ -35,18 +35,18 @@ namespace Belle2 {
       /// Constructor from another range
       template<class Ts>
       Range(Ts& ts)
-        : Super(std::begin(ts), std::end(ts))
+        : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 
       /// Inheriting the constructor of the base class
       using Super::Super;
 
       /// Begin of the range for range based for.
-      const Iterator& begin() const
+      Iterator begin() const
       { return this->first; }
 
       /// End of the range for range based for.
-      const Iterator& end() const
+      Iterator end() const
       { return this->second; }
 
       /// Checks if the begin equals the end iterator, hence if the range is empty.

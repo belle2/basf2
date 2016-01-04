@@ -164,7 +164,7 @@ class ProgressBarViewer(Basf2Widget):
         from IPython.core.display import display
 
         #: Part of the name representating the object for javascript
-        self.random_name = ''.join(random.choice(string.lowercase) for _ in range(10))
+        self.random_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
         #: The name representating the object for javascript
         self.js_name = "progress_bar_" + self.random_name
 

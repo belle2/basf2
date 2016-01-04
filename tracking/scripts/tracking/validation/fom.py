@@ -30,9 +30,10 @@ class ValidationFiguresOfMerit(collections.MutableMapping):
     def __str__(self):
         """Informal sting output listing the assigned figures of merit."""
 
-        return '\n'.join('%s : %s' % (key, value)
-                         for (key, value) in
-                         list(self.figures_by_name.items()))
+        figures_by_name = self.figures_by_name
+        return '\n'.join('%s : %s' % (key, figures_by_name[key])
+                         for key in
+                         sorted(figures_by_name.keys()))
 
     def write(self, tdirectory=None):
         """Writes the figures of merit as a TNtuple.

@@ -243,7 +243,7 @@ namespace Belle2 {
       // Create the segment triple neighorhood
       B2DEBUG(100, "Creating the CDCSegmentTriple neighborhood");
       m_segmentTripleNeighborhood.clear();
-      m_segmentTripleNeighborhood.createUsing(*m_ptrSegmentTripleRelationFilter, m_segmentTriples);
+      m_segmentTripleNeighborhood.appendUsing(*m_ptrSegmentTripleRelationFilter, m_segmentTriples);
       B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " SegmentTripleNeighborhoods");
 
       if (m_param_writeSegmentTriples) {

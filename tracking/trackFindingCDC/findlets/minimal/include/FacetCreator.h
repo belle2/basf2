@@ -14,9 +14,11 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
+#include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -35,6 +37,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       FacetCreator()
       {
+        addProcessingSignalListener(&m_wireHitRelationFilter);
         addProcessingSignalListener(&m_facetFilter);
       }
 
@@ -47,6 +50,7 @@ namespace Belle2 {
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
+        m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
         m_facetFilter.exposeParameters(moduleParamList, prefix);
       }
 
@@ -65,11 +69,9 @@ namespace Belle2 {
 
           // Create the neighborhood of wire hits on the cluster
           B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-          const bool primaryNeighborhoodOnly = false;
-          using PrimaryWireHitNeighborhoodFilter = WholeWireHitRelationFilter<primaryNeighborhoodOnly>;
-
           m_wirehitNeighborhood.clear();
-          m_wirehitNeighborhood.appendUsing<PrimaryWireHitNeighborhoodFilter>(cluster);
+          auto wireHits = cluster | boost::adaptors::indirected;
+          m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, wireHits);
           B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.", m_wirehitNeighborhood.isSymmetric());
           B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
@@ -175,8 +177,12 @@ namespace Belle2 {
       WeightedNeighborhood<const CDCWireHit> m_wirehitNeighborhood;
 
     private:
+      /// The filter for the hit neighborhood.
+      PrimaryWireHitRelationFilter m_wireHitRelationFilter;
+
       /// The filter to be used for the facet generation.
       AFacetFilter m_facetFilter;
+
 
     }; //end class FacetCreator
   } //end namespace TrackFindingCDC

@@ -58,11 +58,12 @@ namespace Belle2 {
         // create the neighborhood
         B2DEBUG(100, "Creating the CDCWireHit neighborhood");
         m_wirehitNeighborhood.clear();
-        auto ptrWireHits = inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
-        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, ptrWireHits);
+
+        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, inputWireHits);
         B2ASSERT("Expect wire hit neighborhood to be symmetric ", m_wirehitNeighborhood.isSymmetric());
         B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
+        auto ptrWireHits = inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
         m_wirehitClusterizer.createFromPointers(ptrWireHits, m_wirehitNeighborhood, outputClusters);
       }
 

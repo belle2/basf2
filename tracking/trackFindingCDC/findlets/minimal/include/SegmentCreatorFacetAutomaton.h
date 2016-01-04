@@ -96,7 +96,7 @@ namespace Belle2 {
         // Create the facet neighborhood
         B2DEBUG(100, "Creating the CDCFacet neighborhood");
         m_facetsNeighborhood.clear();
-        m_facetsNeighborhood.createUsing(m_facetRelationFilter, facetsInCluster);
+        m_facetsNeighborhood.appendUsing(m_facetRelationFilter, facetsInCluster);
         B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
 
         if (m_facetsNeighborhood.size() == 0) {

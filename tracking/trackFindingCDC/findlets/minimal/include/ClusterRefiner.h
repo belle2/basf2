@@ -21,6 +21,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <boost/range/adaptor/indirected.hpp>
+
 #include <vector>
 #include <iterator>
 #include <algorithm>
@@ -59,7 +61,8 @@ namespace Belle2 {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
                                                                       superCluster.end()));
           m_wirehitNeighborhood.clear();
-          m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, superCluster);
+          auto wireHits = superCluster | boost::adaptors::indirected;
+          m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, wireHits);
 
           const std::size_t nClustersBefore = outputClusters.size();
           m_wirehitClusterizer.createFromPointers(superCluster, m_wirehitNeighborhood, outputClusters);

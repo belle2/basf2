@@ -245,7 +245,7 @@ namespace Belle2 {
       //create the segment pair neighborhood
       B2DEBUG(100, "Creating the CDCSegmentPair neighborhood");
       m_segmentPairNeighborhood.clear();
-      m_segmentPairNeighborhood.createUsing(*m_ptrSegmentPairRelationFilter, m_segmentPairs);
+      m_segmentPairNeighborhood.appendUsing(*m_ptrSegmentPairRelationFilter, m_segmentPairs);
       B2DEBUG(100, "  Created " << m_segmentPairNeighborhood.size()  << " AxialStereoPairNeighborhoods");
 
       //multiple passes if growMany is active and one track is created at a time
@@ -271,7 +271,7 @@ namespace Belle2 {
 
       WeightedNeighborhood<const CDCTrack> tracksNeighborhood;
       tracksNeighborhood.clear();
-      tracksNeighborhood.createUsing(*m_ptrTrackRelationFilter,
+      tracksNeighborhood.appendUsing(*m_ptrTrackRelationFilter,
                                      m_preMergeSymmetricTracks);
 
       MultipassCellularPathFinder<CDCTrack> cellularPathFinder;

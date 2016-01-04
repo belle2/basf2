@@ -74,7 +74,7 @@ namespace Belle2 {
           }
 
           m_segmentNeighborhood.clear();
-          m_segmentNeighborhood.createUsing(m_segmentRelationFilter,
+          m_segmentNeighborhood.appendUsing(m_segmentRelationFilter,
                                             m_symmetricSegmentsInSuperCluster);
 
           m_segmentPaths.clear();

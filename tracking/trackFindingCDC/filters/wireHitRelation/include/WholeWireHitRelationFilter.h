@@ -29,29 +29,21 @@ namespace Belle2 {
     class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
 
     public:
-      /// Empty constructor
-      WholeWireHitRelationFilter()
-      {
-        m_wireNeighbors.reserve(withSecondaryNeighborhood ? 18 : 6);
-        m_wireHitNeighbors.reserve(withSecondaryNeighborhood ? 32 : 12);
-      }
-
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
       template<class ACDCWireHitIterator>
-      const std::vector<CDCWireHit*>& getPossibleNeighbors(const CDCWireHit* ptrWireHit,
-                                                           const ACDCWireHitIterator& itBegin,
-                                                           const ACDCWireHitIterator& itEnd)
+      std::vector<std::reference_wrapper<CDCWireHit> > getPossibleNeighbors(const CDCWireHit& wireHit,
+          const ACDCWireHitIterator& itBegin,
+          const ACDCWireHitIterator& itEnd)
       {
-        m_wireNeighbors.clear();
-        m_wireHitNeighbors.clear();
-        if (not ptrWireHit) return m_wireHitNeighbors;
-        const CDCWireHit& wireHit = *ptrWireHit;
+        std::vector<const CDCWire* > m_wireNeighbors;
+        m_wireNeighbors.reserve(withSecondaryNeighborhood ? 18 : 6);
+
+        std::vector<std::reference_wrapper<CDCWireHit> > m_wireHitNeighbors;
+        m_wireHitNeighbors.reserve(withSecondaryNeighborhood ? 32 : 12);
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
         const CDCWire& wire = wireHit.getWire();
-        m_wireNeighbors.reserve(withSecondaryNeighborhood ? 18 : 6);
-
         const CDCWire* ccwInWireNeighborPtr = wireTopology.getNeighborCCWInwards(wire);
         const CDCWire* cwInWireNeighborPtr = wireTopology.getNeighborCWInwards(wire);
 
@@ -150,11 +142,6 @@ namespace Belle2 {
       }
 
     private:
-      // Storage for the current neighboring wires.
-      std::vector<const CDCWire* > m_wireNeighbors;
-
-      /// Storage for the current neighbors wire hits.
-      std::vector<CDCWireHit*> m_wireHitNeighbors;
 
     }; // end class
 

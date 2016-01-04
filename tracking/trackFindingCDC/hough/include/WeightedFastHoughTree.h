@@ -62,11 +62,11 @@ namespace Belle2 {
     public:
       /// Take the item set and insert them into the top node of the hough space.
       template<class Ts>
-      void seed(Ts& items)
+      void seed(const Ts& items)
       {
         fell();
         Node& topNode = this->getTopNode();
-        for (const auto& item : items) {
+        for (const T& item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = DBL_MAX;

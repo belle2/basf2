@@ -12,20 +12,13 @@
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 
-//#include <tracking/trackFindingCDC/hough/perigee/Phi0Sweeped.h>
-//#include <tracking/trackFindingCDC/hough/perigee/TanLSweeped.h>
-//#include <tracking/trackFindingCDC/hough/perigee/XLine.h>
-
-//#include <tracking/trackFindingCDC/hough/perigee/TanLPhi0SweepedXLine.h>
-//#include <tracking/trackFindingCDC/hough/perigee/TanLSweepedXLine.h>
-//#include <tracking/trackFindingCDC/hough/perigee/Phi0TanLSweepedXLine.h>
-
 #include <tracking/trackFindingCDC/hough/perigee/InPhi0TanLBox.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/perigee/TanLRep.h>
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 
+#include <boost/range/adaptor/transformed.hpp>
 #include <vector>
 
 using namespace std;
@@ -213,7 +206,7 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-      houghTree.seed(m_mcSegment2Ds);
+      houghTree.seed(m_mcSegment2Ds | boost::adaptors::transformed(&std::addressof<CDCRecoSegment2D>));
 
       const double minWeight = 50.0;
       // candidates = houghTree.find(minWeight);

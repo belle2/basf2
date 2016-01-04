@@ -18,6 +18,7 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/InPhi0CurvTanLBox.h>
 
+#include <boost/range/adaptor/transformed.hpp>
 #include <vector>
 
 using namespace std;
@@ -203,8 +204,7 @@ namespace {
     TimeItResult timeItResult = timeIt(1, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-
-      houghTree.seed(m_mcSegment2Ds);
+      houghTree.seed(m_mcSegment2Ds | boost::adaptors::transformed(&std::addressof<CDCRecoSegment2D>));
 
       //candidates = houghTree.find(minWeight, maxCurvAcceptance);
       candidates = houghTree.findBest(minWeight, maxCurvAcceptance);

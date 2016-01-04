@@ -145,7 +145,7 @@ namespace Belle2 {
 
       /// Prepare the leave finding by filling the top node with given hits
       template<class AItemPtrs>
-      void seed(AItemPtrs& items)
+      void seed(const AItemPtrs& items)
       {
         if (not m_houghTree) { initialize(); }
         m_houghTree->seed(items);

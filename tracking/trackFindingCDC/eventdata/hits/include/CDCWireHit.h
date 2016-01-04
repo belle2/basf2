@@ -126,8 +126,8 @@ namespace Belle2 {
       /// Allow automatic taking of the address.
       /** In places where a pointer is expected the object is implicitly casted to a
        *  pointer to itself.*/
-      operator Belle2::TrackFindingCDC::CDCWireHit* ()&
-      { return this; }
+      // operator Belle2::TrackFindingCDC::CDCWireHit* ()&
+      // { return this; }
       /**@}*/
 
       /// Getter for the CDCHit pointer into the StoreArray.

@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -23,7 +22,8 @@
 
 #include <boost/range/adaptor/transformed.hpp>
 
-using namespace std;
+#include <memory>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -133,14 +133,20 @@ void CDCMCTrackStore::fillMCSegments()
 
     if (mcTrack.empty()) continue;
 
-    std::vector<WithAutomatonCell<const CDCHit*> > hitsWithCells;
+    // Safest way to make the segments is to cluster
+    // the elements in the track for their nearest neighbors.
+    // Bundle them together with a automaton cell and construct a relation
+    // to serve them to the Clusterizer for generation of the clusters.
+
+    using HitWithCell = WithAutomatonCell<const CDCHit*>;
+
+    std::vector<HitWithCell> hitsWithCells;
     hitsWithCells.insert(hitsWithCells.end(), mcTrack.begin(), mcTrack.end());
 
-    //Safest way is to cluster the elements in the track for their nearest neighbors
-    WeightedNeighborhood<WithAutomatonCell<const CDCHit*> > hitNeighborhood;
+    std::multimap<HitWithCell*, HitWithCell*> hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (WithAutomatonCell<const CDCHit*>& hitWithCell : hitsWithCells) {
+    for (HitWithCell& hitWithCell : hitsWithCells) {
       const CDCHit* ptrHit(hitWithCell);
       const CDCHit& hit = *ptrHit;
 
@@ -148,7 +154,7 @@ void CDCMCTrackStore::fillMCSegments()
                     hit.getILayer(),
                     hit.getIWire());
 
-      for (WithAutomatonCell<const CDCHit*>& neighborHitWithCell : hitsWithCells) {
+      for (HitWithCell& neighborHitWithCell : hitsWithCells) {
 
         const CDCHit* ptrNeighborHit(neighborHitWithCell);
         if (ptrHit == ptrNeighborHit) continue;
@@ -159,33 +165,36 @@ void CDCMCTrackStore::fillMCSegments()
                               neighborHit.getIWire());
 
         if (wireTopology.areNeighbors(wireID, neighborWireID) or wireID == neighborWireID) {
-          WithAutomatonCell<const CDCHit* >* ptrHitWithCell = &hitWithCell;
-          WithAutomatonCell<const CDCHit* >* ptrNeighborHitWithCell = &neighborHitWithCell;
-          hitNeighborhood.insert(ptrHitWithCell, ptrNeighborHitWithCell);
+          HitWithCell* ptrHitWithCell = &hitWithCell;
+          HitWithCell* ptrNeighborHitWithCell = &neighborHitWithCell;
+          hitNeighborhood.emplace(ptrHitWithCell, ptrNeighborHitWithCell);
         }
 
       }
 
     }
 
-    typedef std::vector<WithAutomatonCell<const CDCHit*>* > CDCHitCluster;
-    Clusterizer<WithAutomatonCell<const CDCHit*>, CDCHitCluster> hitClusterizer;
+    using CDCHitCluster = std::vector<HitWithCell*>;
+    Clusterizer<HitWithCell> hitClusterizer;
     std::vector<CDCHitCluster> hitClusters;
     auto hitsWithCellPtrs =
-      hitsWithCells | boost::adaptors::transformed(&std::addressof<WithAutomatonCell<const CDCHit* >>);
+      hitsWithCells | boost::adaptors::transformed(&std::addressof<HitWithCell>);
     hitClusterizer.createFromPointers(hitsWithCellPtrs, hitNeighborhood, hitClusters);
-    // mcSegments are not sorted for their time of flight internally, but they are in the right order
 
-    // Lets sort them along for the time of flight.
-    for (CDCHitCluster& hitCluster : hitClusters) {
+    // Strip the automaton cell
+    for (const CDCHitCluster& hitCluster : hitClusters) {
       CDCHitVector mcSegment;
       mcSegment.reserve(hitCluster.size());
-      for (WithAutomatonCell<const CDCHit*>* hitWithCell : hitCluster) {
+      for (HitWithCell* hitWithCell : hitCluster) {
         const CDCHit* hit(*hitWithCell);
         mcSegment.push_back(hit);
       }
-      arrangeMCTrack(mcSegment);
       mcSegments.push_back(std::move(mcSegment));
+    }
+
+    // Lets sort them along for the time of flight.
+    for (CDCHitVector& mcSegment : mcSegments) {
+      arrangeMCTrack(mcSegment);
     }
   }
 

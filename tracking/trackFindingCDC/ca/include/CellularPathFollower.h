@@ -11,8 +11,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-
 #include <tracking/trackFindingCDC/ca/CellWeight.h>
 #include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
@@ -25,180 +25,172 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Implements to pick up of the highest value path in neighborhood
-    /** Following high value paths can be done two ways. First construct a single path that has the highest
-     *  value of all. This carried out by follow single  which uses the highest item returned by the
+    /**
+     *  Implements to pick up of the highest value path in neighborhood
+     *  Following high value paths can be done two ways. First construct a single path that has the highest
+     *  value of all. This carried out by follow single  which uses the highest cell returned by the
      *  cellular automaton.
      *  Second construct all paths which are maximal. A maximal path means that there is no longer path
      *  including this path. If there are many disjoint paths this is the way to get them. However you most
      *  certainly pick up a lot of elements twice if there are many start culminating into a common long
-     *  path segment. This is carried out recursively by followAll over the start items marked with IS_START.*/
-    template<class AItem>
+     *  path. This is carried out recursively by followAll over the start cells marked with start flag.
+     */
+    template<class ACellHolder>
     class CellularPathFollower {
 
-    private:
-      /// Neighborhood type for the graph edges
-      typedef WeightedNeighborhood<const AItem> Neighborhood;
-
-      /// Resulting path type to be generated
-      typedef std::vector<const AItem*> Path;
-
     public:
-
-      /// Follow paths from all start items marked with the start flag
-      template<class AItemRange>
-      std::vector<Path> followAll(const AItemRange& itemRange,
-                                  const WeightedNeighborhood<const AItem>& neighborhood,
-                                  CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+      /// Follow paths from all start cells marked with the start flag
+      template<class ACellHolderRange>
+      std::vector<Path<ACellHolder> > followAll(ACellHolderRange& cellHolders,
+                                                const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+                                                CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
       {
+        // Result
+        std::vector<Path<ACellHolder> > paths;
 
-        m_paths.clear();
+        // Stack for back tracking
+        Path<ACellHolder> path;
 
-        // Segment to work on
-        Path path;
+        for (ACellHolder& cellHolder : cellHolders) {
+          const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
 
-        for (const AItem& item : itemRange) {
-          const AutomatonCell& cell = item.getAutomatonCell();
+          if (validStartCell(automatonCell, minStateToFollow)) {
+            // Cell marks a start point of a path
 
-          if (validStartCell(cell, minStateToFollow)) {
-            //item marks a start point of a path
-
-            //start new segment
+            // Start new path
             path.clear();
 
-            //insert a pointer to the item into the segment
-            path.push_back(&item);
+            // Insert a pointer to the cell into the path
+            path.push_back(&cellHolder);
 
             bool growMany = true;
 
-            //recursivly grow the segment
-            growPath(path, neighborhood, growMany);
+            // Recursivly grow the path
+            growAllPaths(path, cellHolderNeighborhood, paths);
             path.pop_back();
 
           }
         }
-
-        // Take out the actual path contents without copying it.
-        return std::move(m_paths);
-
+        return paths;
       }
 
-
-
-      /// Follows a single maximal path starting with the given start item. If the start item is nullptr or has a state lower than the minimum state to follow an empty vector is returned.
-      Path followSingle(const AItem* ptrStartItem,
-                        const WeightedNeighborhood<const AItem>& neighborhood,
-                        CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+      /**
+       *  Follows a single maximal path starting with the given start cell.
+       *  If the start cell is nullptr or has a state lower than the minimum state to follow
+       *  an empty vector is returned.
+       */
+      Path<ACellHolder> followSingle(ACellHolder* startCellHolderPtr,
+                                     const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
       {
+        Path<ACellHolder> path;
+        if (not startCellHolderPtr) return path;
+        const AutomatonCell& startCell = startCellHolderPtr->getAutomatonCell();
+        if (not validStartCell(startCell, minStateToFollow)) return path;
 
-        Path path;
+        // Start new path
+        path.reserve(20); // Just a guess
 
-        if (ptrStartItem == nullptr) return path;
+        // Insert a pointer to the cell into the path
+        path.push_back(startCellHolderPtr);
+        bool grew = true;
+        while (grew) {
+          grew = false;
+          ACellHolder* lastCellHolderPtr = path.back();
 
-        const AItem& startItem = *ptrStartItem;
-        const AutomatonCell& startCell = startItem.getAutomatonCell();
-
-        if (validStartCell(startCell, minStateToFollow)) {
-          // Start new segment
-          path.reserve(20); //Just a guess
-
-          // Insert a pointer to the item into the segment
-          path.push_back(ptrStartItem);
-
-          bool growMany = false;
-
-          growPath(path, neighborhood, growMany);
-
+          for (const WeightedRelation<ACellHolder>& relation
+               :  cellHolderNeighborhood.equal_range(lastCellHolderPtr)) {
+            if (isHighestContinuation(relation)) {
+              ACellHolder* neighbor(relation.getTo());
+              path.push_back(neighbor);
+              grew = true;
+              break;
+            }
+          }
         }
-
         return path;
-
       }
-
-
 
     private:
-      /// Helper function for recursively growing paths. If growMany is true it will follow all highest continuations and store the paths in the m_paths class member.
-      void growPath(Path& path,
-                    const Neighborhood& neighborhood,
-                    bool growMany = false) const
+      /**
+       *  Helper function for recursively growing paths.
+       *  @param[in] path           Current path to be extended
+       *  @param[in] neighborhood   Considered relations to follow to extend the path
+       *  @param[out] paths         Longest paths generated
+       */
+      void growAllPaths(Path<ACellHolder>& path,
+                        const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+                        std::vector<Path<ACellHolder> >& paths) const
       {
-
-        const AItem* lastItem = path.back();
+        ACellHolder* last = path.back();
 
         bool grew = false;
-        for (const WeightedRelation<const AItem>& relation : neighborhood.equal_range(lastItem)) {
+        for (const WeightedRelation<ACellHolder>& relation
+             : cellHolderNeighborhood.equal_range(last)) {
           if (isHighestContinuation(relation)) {
-
-            const AItem* ptrNeighbor(relation.getTo());
-            path.push_back(ptrNeighbor);
-
-            growPath(path, neighborhood, growMany);
-            if (growMany) {
-              grew = true;
-              path.pop_back();
-            } else {
-              return;
-            }
+            ACellHolder* neighbor(relation.getTo());
+            path.push_back(neighbor);
+            growAllPaths(path, cellHolderNeighborhood, paths);
+            grew = true;
+            path.pop_back();
           }
         }
 
         if (not grew) {
           // end point of the recursion copy maximal path to the vector.
-          m_paths.push_back(path);
+          paths.push_back(path);
         }
 
       }
 
-
-
-      /// Helper function to determine, if the cell has all flags
-      /// indicating to be a start cell and that its state exceeds the minimal requirement.
-      static bool validStartCell(const AutomatonCell& cell, const CellState& minStateToFollow)
+      /**
+       *  Helper function to determine, if the cell has all flags
+       *  indicating to be a start cell and that its state exceeds the minimal requirement.
+       */
+      static bool validStartCell(const AutomatonCell& automatonCell,
+                                 CellState minStateToFollow)
       {
         return
-          cell.hasStartFlag() and
-          not cell.hasMaskedFlag() and
-          not cell.hasCycleFlag() and
-          minStateToFollow <= cell.getCellState();
+          automatonCell.hasStartFlag() and
+          not automatonCell.hasMaskedFlag() and
+          not automatonCell.hasCycleFlag() and
+          minStateToFollow <= automatonCell.getCellState();
       }
 
-
-
-      /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const WeightedRelation<const AItem>& relation)
+      /**
+       *  Helper function determining if the given neighbor is one of the best to be followed.
+       *  Since this is an algebraic property on comparision to the other alternatives is necessary.
+       */
+      static bool isHighestContinuation(const WeightedRelation<ACellHolder>& relation)
       {
-        const AItem* ptrItem(relation.getFrom());
-        const AItem* ptrNeighbor(relation.getTo());
+        ACellHolder* cellHolderPtr(relation.getFrom());
+        ACellHolder* neighborCellHolderPtr(relation.getTo());
 
-        if (not ptrItem or not ptrNeighbor) return false;
+        if (not cellHolderPtr or not neighborCellHolderPtr) return false;
 
-        const NeighborWeight& weight = relation.getWeight();
+        ACellHolder& cellHolder = *cellHolderPtr;
+        NeighborWeight weight = relation.getWeight();
+        ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
 
-        const AItem& item = *ptrItem;
-        const AItem& neighbor = *ptrNeighbor;
-
-        return isHighestContinuation(item, weight, neighbor);
+        return isHighestContinuation(cellHolder, weight, neighborCellHolder);
       }
 
-
-
-      /// Helper function determining if the given neighbor is one of the best to be followed. Since this is an algebraic property on comparision to the other alternatives is necessary.
-      static bool isHighestContinuation(const AItem& item, const NeighborWeight& weight, const AItem& neighbor)
+      /**
+       *  Helper function determining if the given neighbor is one of the best to be followed.
+       *  Since this is an algebraic property no comparision to the other alternatives is necessary.
+       */
+      static bool isHighestContinuation(ACellHolder& cellHolder,
+                                        NeighborWeight weight,
+                                        ACellHolder& neighborCellHolder)
       {
-        const AutomatonCell& itemCell = item.getAutomatonCell();
-        const AutomatonCell& neighborCell = neighbor.getAutomatonCell();
+        const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
+        const AutomatonCell& neighborAutomatonCell = neighborCellHolder.getAutomatonCell();
 
-        return (
-                 not neighborCell.hasCycleFlag() and
-                 not neighborCell.hasMaskedFlag() and
-                 (itemCell.getCellState() == (neighborCell.getCellState() + weight + itemCell.getCellWeight()))
-               );
+        return
+          not neighborAutomatonCell.hasCycleFlag() and
+          not neighborAutomatonCell.hasMaskedFlag() and
+          (automatonCell.getCellState() == (neighborAutomatonCell.getCellState() + weight + automatonCell.getCellWeight()));
       }
-
-    private:
-      /// Temporal storage of all the generated paths on tree traversal.
-      mutable std::vector<Path> m_paths;
 
     }; // end class CellularPathFollower
 

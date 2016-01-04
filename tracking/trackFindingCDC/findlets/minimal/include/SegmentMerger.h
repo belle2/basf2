@@ -90,7 +90,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<CDCRecoSegment2D> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCRecoSegment2D> m_cellularPathFinder;
 
       /// Memory for the symmetrised segments
       std::vector<CDCRecoSegment2D> m_symmetricSegmentsInSuperCluster;

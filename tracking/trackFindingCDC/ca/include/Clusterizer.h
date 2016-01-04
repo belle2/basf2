@@ -23,10 +23,10 @@ namespace Belle2 {
     /**
      *  Implementation of the clustering
      *  Clusters elements of a given collection using the relations presented by a neighorhood.
-     *  A cluster is essentially a connected subset of all items
+     *  A cluster is essentially a connected subset of all cells
      *  that can reach each other by one more relations in a neighborhood.
      *  The algorithm is essentially an iterative expansion of the neighborhood relations keeping
-     *  track of the already used items by using the CellState of the AutomatonCell.
+     *  track of the already used cells by using the CellState of the AutomatonCell.
      *
      *  * ACellHolder must therefore provide an AutomatonCell accessable by a getAutomatonCell() method.
      *    In case the objects you what to cluster do not contain an automaton cell already you may adopt it
@@ -44,8 +44,8 @@ namespace Belle2 {
        *  Creates the clusters.
        *  Repeatly expands a neighborhood of reference objects that have an AutomatonCell.
        *  The CellState after the clusterization is the index of the generated cluster.
-       *  The CellWeight is set to the total number of relations each item has with in the neighborhood.
-       *  * ACellHolderRange is required to be a range of items convertable to ACellHolder*
+       *  The CellWeight is set to the total number of relations each cell has with in the neighborhood.
+       *  * ACellHolderRange is required to be a range of cells convertable to ACellHolder*
        *  * ACellHolderNeighborhood is required to have a .equal_range() method
        *    that yields a range of pairs which .second elements are the sought neighbors.
        *  @param cellHolderPtrs         Pointers to objects that should be clustered.

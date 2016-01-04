@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/ca/CellularPathFollower.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
+#include <tracking/trackFindingCDC/ca/Path.h>
+
 #include <framework/logging/Logger.h>
 
 #include <vector>
@@ -22,32 +24,26 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-
-    /** Class to combine the run of the cellular automaton and the repeated path extraction.
+    /**
+     *  Class to combine the run of the cellular automaton and the repeated path extraction.
      *  Execute the cellular automaton and extracting paths interatively blocking the already used
      *  knots until there is no more path fullfilling the minimal length / energy requirement given
-     *  as minStateToFollow to the constructor
+     *  as minStateToFollow to the constructor.
      */
-    template<class AItem>
+    template<class ACellHolder>
     class  MultipassCellularPathFinder {
 
-    private:
-      /// Type for the neighborhood of elements in the algorithm
-      typedef WeightedNeighborhood<const AItem> Neighborhood;
-
-      /// Type of the resulting
-      typedef std::vector<const AItem*> Path;
-
     public:
-      /// Empty constructor
-      explicit MultipassCellularPathFinder(const CellState& minStateToFollow = -std::numeric_limits<CellState>::infinity()):
-        m_minStateToFollow(minStateToFollow) {}
+      /// Constructor setting up the minimal length / energy cut off.
+      explicit MultipassCellularPathFinder(CellState minStateToFollow = -std::numeric_limits<CellState>::infinity())
+        : m_minStateToFollow(minStateToFollow)
+      {}
 
       /// Applies the cellular automaton to the collection and its neighborhood
-      template<class AItemRange>
-      void apply(const AItemRange& itemRange,
-                 const Neighborhood& neighborhood,
-                 std::vector<Path>& paths) const
+      template<class ACellHolderRange>
+      void apply(const ACellHolderRange& cellHolders,
+                 const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+                 std::vector<Path<ACellHolder> >& paths) const
       {
 
         // multiple passes of the cellular automat
@@ -57,32 +53,31 @@ namespace Belle2 {
         // no best candidate analysis needed
         // (only makes sense with minimal clusters to avoid evaluating of uncommon paths)
 
-
-        for (const AItem& item : itemRange) {
-          item.unsetAndForwardMaskedFlag();
+        for (ACellHolder& cellHolder : cellHolders) {
+          cellHolder.unsetAndForwardMaskedFlag();
         }
 
         bool created = false;
         B2DEBUG(100, "Apply multipass cellular automat");
         do {
-          //apply the cellular automation
-          //B2DEBUG(100,"Apply cellular automat");
-          const AItem* highestCell = m_cellularAutomaton.applyTo(itemRange, neighborhood);
+          const ACellHolder* highestCellHolder = m_cellularAutomaton.applyTo(cellHolders,
+                                                 cellHolderNeighborhood);
 
-          Path newPath = m_cellularPathFollower.followSingle(highestCell, neighborhood, m_minStateToFollow);
-
+          Path<ACellHolder> newPath = m_cellularPathFollower.followSingle(highestCellHolder,
+                                      cellHolderNeighborhood,
+                                      m_minStateToFollow);
           if (newPath.empty()) {
             created = false;
           } else {
 
-            //Block the used items
-            for (const AItem* item : newPath) {
-              item->setAndForwardMaskedFlag();
+            // Block the used items
+            for (ACellHolder* cellHolderPtr : newPath) {
+              cellHolderPtr->setAndForwardMaskedFlag();
             }
 
-            //Block the items that have already used components
-            for (const AItem& item : itemRange) {
-              item.receiveMaskedFlag();
+            // Block the items that have already used components
+            for (ACellHolder& cellHolder : cellHolders) {
+              cellHolder.receiveMaskedFlag();
             }
 
             paths.push_back(std::move(newPath));
@@ -99,10 +94,10 @@ namespace Belle2 {
       CellState m_minStateToFollow;
 
       /// The cellular automaton to be used.
-      CellularAutomaton<AItem> m_cellularAutomaton;
+      CellularAutomaton<ACellHolder> m_cellularAutomaton;
 
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
-      CellularPathFollower<AItem> m_cellularPathFollower;
+      CellularPathFollower<ACellHolder> m_cellularPathFollower;
 
     }; // end class MultipassCellularPathFinder
 

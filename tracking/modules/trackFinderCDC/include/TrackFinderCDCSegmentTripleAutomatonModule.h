@@ -203,7 +203,7 @@ namespace Belle2 {
 
       //cellular automat
       /// Instance of the cellular automaton.
-      MultipassCellularPathFinder<CDCSegmentTriple> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
 
       /// Instance of the track creator from paths.
       TrackCreator m_trackCreator;

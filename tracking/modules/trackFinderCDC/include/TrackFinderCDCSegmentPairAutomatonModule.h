@@ -202,7 +202,7 @@ namespace Belle2 {
 
       //cellular automat
       /// Instance of the cellular automaton.
-      MultipassCellularPathFinder<CDCSegmentPair> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegmentPair> m_cellularPathFinder;
 
       // Deprication:
       /// Instance of the track creator from paths.
@@ -274,7 +274,7 @@ namespace Belle2 {
       tracksNeighborhood.appendUsing(*m_ptrTrackRelationFilter,
                                      m_preMergeSymmetricTracks);
 
-      MultipassCellularPathFinder<CDCTrack> cellularPathFinder;
+      MultipassCellularPathFinder<const CDCTrack> cellularPathFinder;
       std::vector< std::vector<const CDCTrack*> > trackPaths;
       cellularPathFinder.apply(m_preMergeSymmetricTracks,
                                tracksNeighborhood,

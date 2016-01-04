@@ -14,9 +14,6 @@ import numpy as np
 import subprocess
 from datetime import datetime
 
-import seaborn as sb
-
-
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
 
@@ -39,6 +36,9 @@ class QuadTreePlotter(basf2.Module):
         """
         Draw the quad tree content coming from the root file if enabled.
         """
+
+        import seaborn as sb
+
         if not self.draw_quad_tree_content:
             return
 

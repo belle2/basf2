@@ -18,6 +18,7 @@ import os.path
 
 from basf2 import *
 from analysisPath import analysis_main
+from beamparameters import add_beamparameters
 from modularAnalysis import inputMdstList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
@@ -89,6 +90,8 @@ if not os.path.isfile(fei_pickle):
 path = get_path_from_file(fei_pickle)
 path = remove_module(path, 'RootInput')
 path = remove_module(path, 'ProgressBar')
+
+beamparameters = add_beamparameters(path, 'Y4S')
 
 # read the MDST
 # this is stupid, but ...

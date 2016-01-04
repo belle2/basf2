@@ -18,13 +18,8 @@ import os.path
 
 from basf2 import *
 from analysisPath import analysis_main
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import copyLists
-from modularAnalysis import buildRestOfEvent
-from modularAnalysis import cutAndCopyList
-from modularAnalysis import copyLists
-from modularAnalysis import summaryOfLists
+from beamparameters import add_beamparameters
+from modularAnalysis import *
 
 # this function removes a module from a given path
 # The RootInput module will be taken from the fei path
@@ -88,6 +83,8 @@ path = get_path_from_file(fei_pickle)
 path = remove_module(path, 'RootInput')
 path = remove_module(path, 'ProgressBar')
 
+beamparameters = add_beamparameters(path, 'Y4S')
+
 # read the MDST
 # this is stupid, but ...
 i = 0
@@ -118,28 +115,10 @@ cutAndCopyList('B0:SLTagGood', 'B0:semileptonic', 'abs(cosThetaBetweenParticleAn
 cutAndCopyList('B+:SLTagGood', 'B+:semileptonic', 'abs(cosThetaBetweenParticleAndTrueB)<10 and sigProb>0.001')
 
 # this interface will change in the future
-buildRestOfEvent('B0:generic', 'abs(d0) < 0.03 and z0 > -0.05 and z0 < 0.12', '')
-buildRestOfEvent('B+:generic', 'abs(d0) < 0.03 and z0 > -0.05 and z0 < 0.12', '')
-buildRestOfEvent('B0:semileptonic', 'abs(d0) < 0.03 and z0 > -0.05 and z0 < 0.12', '')
-buildRestOfEvent('B+:semileptonic', 'abs(d0) < 0.03 and z0 > -0.05 and z0 < 0.12', '')
-
-# ---------
-# Btag + single track
-#
-# Note: B:XYZTagGood ParticleList is subsample of the B:generic or B:semileptonic ParticleList
-# therefore the Particles in the former have the ROE set
-cutAndCopyList('B0:HadTagGood_singleTrack', 'B0:HadTagGood', 'nROETracks==1')
-cutAndCopyList('B+:HadTagGood_singleTrack', 'B+:HadTagGood', 'nROETracks==1')
-
-cutAndCopyList('B0:SLTagGood_singleTrack', 'B0:SLTagGood', 'nROETracks==1')
-cutAndCopyList('B+:SLTagGood_singleTrack', 'B+:SLTagGood', 'nROETracks==1')
-
-# ---------
-cutAndCopyList('B0:generic_singleTrack', 'B0:generic', 'nROETracks==1')
-cutAndCopyList('B+:generic_singleTrack', 'B+:generic', 'nROETracks==1')
-
-cutAndCopyList('B0:semileptonic_singleTrack', 'B0:semileptonic', 'nROETracks==1')
-cutAndCopyList('B+:semileptonic_singleTrack', 'B+:semileptonic', 'nROETracks==1')
+buildRestOfEvent('B0:generic')
+buildRestOfEvent('B+:generic')
+buildRestOfEvent('B0:semileptonic')
+buildRestOfEvent('B+:semileptonic')
 
 # ---------
 # Btag + lepton
@@ -150,25 +129,25 @@ muons = ('mu-:loose', 'DLLKaon>-5 and DLLPion>-5')
 fillParticleLists([electrons, muons])
 
 # ---------
-reconstructDecay('Upsilon(4S):BPHTagGood_elec_RS -> B+:HadTagGood e-:loose')
-reconstructDecay('Upsilon(4S):BPHTagGood_elec_WS -> B+:HadTagGood e+:loose')
-reconstructDecay('Upsilon(4S):BPHTagGood_muon_RS -> B+:HadTagGood mu-:loose')
-reconstructDecay('Upsilon(4S):BPHTagGood_muon_WS -> B+:HadTagGood mu+:loose')
+reconstructDecay('Upsilon(4S):BPHTagGood_elec_RS -> B+:HadTagGood e-:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagGood_elec_WS -> B+:HadTagGood e+:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagGood_muon_RS -> B+:HadTagGood mu-:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagGood_muon_WS -> B+:HadTagGood mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):B0HTagGood_elec_RS -> B0:HadTagGood e-:loose')
-reconstructDecay('Upsilon(4S):B0HTagGood_elec_WS -> B0:HadTagGood e+:loose')
-reconstructDecay('Upsilon(4S):B0HTagGood_muon_RS -> B0:HadTagGood mu-:loose')
-reconstructDecay('Upsilon(4S):B0HTagGood_muon_WS -> B0:HadTagGood mu+:loose')
+reconstructDecay('Upsilon(4S):B0HTagGood_elec_RS -> B0:HadTagGood e-:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagGood_elec_WS -> B0:HadTagGood e+:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagGood_muon_RS -> B0:HadTagGood mu-:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagGood_muon_WS -> B0:HadTagGood mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):BPSLTagGood_elec_RS -> B+:SLTagGood e-:loose')
-reconstructDecay('Upsilon(4S):BPSLTagGood_elec_WS -> B+:SLTagGood e+:loose')
-reconstructDecay('Upsilon(4S):BPSLTagGood_muon_RS -> B+:SLTagGood mu-:loose')
-reconstructDecay('Upsilon(4S):BPSLTagGood_muon_WS -> B+:SLTagGood mu+:loose')
+reconstructDecay('Upsilon(4S):BPSLTagGood_elec_RS -> B+:SLTagGood e-:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagGood_elec_WS -> B+:SLTagGood e+:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagGood_muon_RS -> B+:SLTagGood mu-:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagGood_muon_WS -> B+:SLTagGood mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):B0SLTagGood_elec_RS -> B0:SLTagGood e-:loose')
-reconstructDecay('Upsilon(4S):B0SLTagGood_elec_WS -> B0:SLTagGood e+:loose')
-reconstructDecay('Upsilon(4S):B0SLTagGood_muon_RS -> B0:SLTagGood mu-:loose')
-reconstructDecay('Upsilon(4S):B0SLTagGood_muon_WS -> B0:SLTagGood mu+:loose')
+reconstructDecay('Upsilon(4S):B0SLTagGood_elec_RS -> B0:SLTagGood e-:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagGood_elec_WS -> B0:SLTagGood e+:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagGood_muon_RS -> B0:SLTagGood mu-:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagGood_muon_WS -> B0:SLTagGood mu+:loose', '')
 
 copyLists('Upsilon(4S):BPHTagGood_ell_RS', ['Upsilon(4S):BPHTagGood_elec_RS', 'Upsilon(4S):BPHTagGood_muon_RS'])
 copyLists('Upsilon(4S):BPHTagGood_ell_WS', ['Upsilon(4S):BPHTagGood_elec_WS', 'Upsilon(4S):BPHTagGood_muon_WS'])
@@ -185,25 +164,25 @@ copyLists('Upsilon(4S):BPSLTagGood_ell', ['Upsilon(4S):BPSLTagGood_ell_WS', 'Ups
 copyLists('Upsilon(4S):B0SLTagGood_ell', ['Upsilon(4S):B0SLTagGood_ell_WS', 'Upsilon(4S):B0SLTagGood_ell_RS'])
 
 # ---------
-reconstructDecay('Upsilon(4S):BPTagAll_elec_RS -> B+:generic e-:loose')
-reconstructDecay('Upsilon(4S):BPTagAll_elec_WS -> B+:generic e+:loose')
-reconstructDecay('Upsilon(4S):BPTagAll_muon_RS -> B+:generic mu-:loose')
-reconstructDecay('Upsilon(4S):BPTagAll_muon_WS -> B+:generic mu+:loose')
+reconstructDecay('Upsilon(4S):BPHTagAll_elec_RS -> B+:generic e-:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagAll_elec_WS -> B+:generic e+:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagAll_muon_RS -> B+:generic mu-:loose', '')
+reconstructDecay('Upsilon(4S):BPHTagAll_muon_WS -> B+:generic mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):B0TagAll_elec_RS -> B0:generic e-:loose')
-reconstructDecay('Upsilon(4S):B0TagAll_elec_WS -> B0:generic e+:loose')
-reconstructDecay('Upsilon(4S):B0TagAll_muon_RS -> B0:generic mu-:loose')
-reconstructDecay('Upsilon(4S):B0TagAll_muon_WS -> B0:generic mu+:loose')
+reconstructDecay('Upsilon(4S):B0HTagAll_elec_RS -> B0:generic e-:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagAll_elec_WS -> B0:generic e+:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagAll_muon_RS -> B0:generic mu-:loose', '')
+reconstructDecay('Upsilon(4S):B0HTagAll_muon_WS -> B0:generic mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):BPSLTagAll_elec_RS -> B+:semielltonic e-:loose')
-reconstructDecay('Upsilon(4S):BPSLTagAll_elec_WS -> B+:semielltonic e+:loose')
-reconstructDecay('Upsilon(4S):BPSLTagAll_muon_RS -> B+:semielltonic mu-:loose')
-reconstructDecay('Upsilon(4S):BPSLTagAll_muon_WS -> B+:semielltonic mu+:loose')
+reconstructDecay('Upsilon(4S):BPSLTagAll_elec_RS -> B+:semileptonic e-:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagAll_elec_WS -> B+:semileptonic e+:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagAll_muon_RS -> B+:semileptonic mu-:loose', '')
+reconstructDecay('Upsilon(4S):BPSLTagAll_muon_WS -> B+:semileptonic mu+:loose', '')
 
-reconstructDecay('Upsilon(4S):B0SLTagAll_elec_RS -> B0:semielltonic e-:loose')
-reconstructDecay('Upsilon(4S):B0SLTagAll_elec_WS -> B0:semielltonic e+:loose')
-reconstructDecay('Upsilon(4S):B0SLTagAll_muon_RS -> B0:semielltonic mu-:loose')
-reconstructDecay('Upsilon(4S):B0SLTagAll_muon_WS -> B0:semielltonic mu+:loose')
+reconstructDecay('Upsilon(4S):B0SLTagAll_elec_RS -> B0:semileptonic e-:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagAll_elec_WS -> B0:semileptonic e+:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagAll_muon_RS -> B0:semileptonic mu-:loose', '')
+reconstructDecay('Upsilon(4S):B0SLTagAll_muon_WS -> B0:semileptonic mu+:loose', '')
 
 copyLists('Upsilon(4S):BPHTagAll_ell_RS', ['Upsilon(4S):BPHTagAll_elec_RS', 'Upsilon(4S):BPHTagAll_muon_RS'])
 copyLists('Upsilon(4S):BPHTagAll_ell_WS', ['Upsilon(4S):BPHTagAll_elec_WS', 'Upsilon(4S):BPHTagAll_muon_WS'])
@@ -223,10 +202,10 @@ copyLists('Upsilon(4S):B0SLTagAll_ell', ['Upsilon(4S):B0SLTagAll_ell_WS', 'Upsil
 # -------------
 # Btag all skim
 summaryOfLists(['B0:generic', 'B+:generic'])
-summaryOfLists(['B0:semielltonic', 'B+:semielltonic'])
-summaryOfLists(['B0:generic', 'B+:generic', 'B0:semielltonic', 'B+:semielltonic'])
-summaryOfLists(['B0:generic', 'B0:semielltonic'])
-summaryOfLists(['B+:generic', 'B+:semielltonic'])
+summaryOfLists(['B0:semileptonic', 'B+:semileptonic'])
+summaryOfLists(['B0:generic', 'B+:generic', 'B0:semileptonic', 'B+:semileptonic'])
+summaryOfLists(['B0:generic', 'B0:semileptonic'])
+summaryOfLists(['B+:generic', 'B+:semileptonic'])
 
 # -------------
 # Btag good skim
@@ -235,22 +214,6 @@ summaryOfLists(['B0:SLTagGood', 'B+:SLTagGood'])
 summaryOfLists(['B0:HadTagGood', 'B+:HadTagGood', 'B0:SLTagGood', 'B+:SLTagGood'])
 summaryOfLists(['B0:HadTagGood', 'B0:SLTagGood'])
 summaryOfLists(['B+:HadTagGood', 'B+:SLTagGood'])
-
-# -------------
-# Btag all + single track skim
-summaryOfLists(['B0:generic_singleTrack', 'B+:generic_singleTrack'])
-summaryOfLists(['B0:semielltonic_singleTrack', 'B+:semielltonic_singleTrack'])
-summaryOfLists(['B0:generic_singleTrack', 'B+:generic_singleTrack', 'B0:semielltonic_singleTrack', 'B+:semielltonic_singleTrack'])
-summaryOfLists(['B0:generic_singleTrack', 'B0:semielltonic_singleTrack'])
-summaryOfLists(['B+:generic_singleTrack', 'B+:semielltonic_singleTrack'])
-
-# -------------
-# Btag good + single track skim
-summaryOfLists(['B0:HadTagGood_singleTrack', 'B+:HadTagGood_singleTrack'])
-summaryOfLists(['B0:SLTagGood_singleTrack', 'B+:SLTagGood_singleTrack'])
-summaryOfLists(['B0:HadTagGood_singleTrack', 'B+:HadTagGood_singleTrack', 'B0:SLTagGood_singleTrack', 'B+:SLTagGood_singleTrack'])
-summaryOfLists(['B0:HadTagGood_singleTrack', 'B0:SLTagGood_singleTrack'])
-summaryOfLists(['B+:HadTagGood_singleTrack', 'B+:SLTagGood_singleTrack'])
 
 # -------------
 # Btag good + ell (RS) skim

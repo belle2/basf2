@@ -63,10 +63,6 @@ namespace Belle2 {
     template<class... ATypes>
     using FirstType = typename FirstTypeImpl<ATypes...>::Type;
 
-    /** Short form for std::enable_f */
-    template<bool cond, class T>
-    using EnableIf = typename std::enable_if<cond, T>::type;
-
     /** Looks up, at which index the given Type can be found in a tuple.
      *  Amounts to a type inheriting from std::integral_constant
      */

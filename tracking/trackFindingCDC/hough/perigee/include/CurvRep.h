@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/utilities/EnableIf.h>
 #include <array>
 
 namespace Belle2 {

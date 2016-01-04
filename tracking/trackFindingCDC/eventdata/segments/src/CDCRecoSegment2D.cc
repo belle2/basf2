@@ -20,10 +20,12 @@
 
 #include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/GetIterator.h>
 #include <genfit/TrackCand.h>
 
 
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/adaptor/indirected.hpp>
 #include <numeric>
 #include <iterator>
 
@@ -81,38 +83,40 @@ namespace {
 
 
 
-  template<class AMaybePtrTangent>
-  CDCRecoSegment2D condenseTangentSegment(const std::vector<AMaybePtrTangent>& tangentSegment)
+  template<class ATangentRange>
+  CDCRecoSegment2D condenseTangentSegment(const ATangentRange& tangentSegment)
   {
-    CDCRecoSegment2D result;
-    result.reserve(tangentSegment.size() + 1);
+    using TangentIt = GetIterator<const ATangentRange&>;
+    TangentIt tangentIt{tangentSegment.begin()};
+    TangentIt endTangentIt{tangentSegment.end()};
+    int nTangents = std::distance(tangentIt, endTangentIt);
 
-    size_t nTangents = tangentSegment.size();
+    CDCRecoSegment2D result;
+    result.reserve(nTangents + 1);
+
     if (nTangents == 0) {
       //pass
     } else if (nTangents == 1) {
-      Ptr<const CDCTangent> tangent{tangentSegment.front()};
-      result.push_back(tangent->getFromRecoHit2D());
-      result.push_back(tangent->getToRecoHit2D());
+      // Only one tangent no averaging necesssary
+      result.push_back(tangentIt->getFromRecoHit2D());
+      result.push_back(tangentIt->getToRecoHit2D());
 
     } else { // nTangents > 2
-      typename std::vector<AMaybePtrTangent>::const_iterator itTangent = tangentSegment.begin();
+      TangentIt firstTangentIt = tangentIt++;
+      TangentIt secondTangentIt = tangentIt++;
 
-      Ptr<const CDCTangent> firstTangent{*itTangent++};  // tangentSegment[0];
-      Ptr<const CDCTangent> secondTangent{*itTangent++};  // tangentSegment[1];
+      result.push_back(firstTangentIt->getFromRecoHit2D());
 
-      result.push_back(firstTangent->getFromRecoHit2D());
+      while (tangentIt != endTangentIt) {
 
-      while (itTangent != tangentSegment.end()) {
+        firstTangentIt = secondTangentIt; // tangentSegment[iTangent];
+        secondTangentIt = tangentIt++; // tangentSegment[iTangent+1];
 
-        firstTangent = secondTangent; // tangentSegment[iTangent];
-        secondTangent = Ptr<const CDCTangent> {*itTangent++}; // tangentSegment[iTangent+1];
-
-        result.push_back(CDCRecoHit2D::average(firstTangent->getToRecoHit2D(),
-                                               secondTangent->getFromRecoHit2D()));
+        result.push_back(CDCRecoHit2D::average(firstTangentIt->getToRecoHit2D(),
+                                               secondTangentIt->getFromRecoHit2D()));
       }
 
-      result.push_back(secondTangent->getToRecoHit2D());
+      result.push_back(secondTangentIt->getToRecoHit2D());
 
     }
 
@@ -120,67 +124,67 @@ namespace {
     return result;
   }
 
-
-
-  template<class AMaybePtrFacet>
-  CDCRecoSegment2D condenseFacetSegment(const std::vector<AMaybePtrFacet>& facetSegment)
+  template<class AFacetRange>
+  CDCRecoSegment2D condenseFacetSegment(const AFacetRange& facetSegment)
   {
+    using FacetIt = GetIterator<const AFacetRange&>;
+    FacetIt facetIt = facetSegment.begin();
+    FacetIt endFacetIt = facetSegment.end();
+    int nFacets = std::distance(facetIt, endFacetIt);
+
     CDCRecoSegment2D result;
-    size_t nFacets = facetSegment.size();
     result.reserve(nFacets + 2);
 
     if (nFacets == 0) {
       //pass
     } else if (nFacets == 1) {
-      Ptr<const CDCFacet> onlyFacet{facetSegment.front()};
-      result.push_back(onlyFacet->getStartRecoHit2D());
-      result.push_back(onlyFacet->getMiddleRecoHit2D());
-      result.push_back(onlyFacet->getEndRecoHit2D());
+      FacetIt onlyFacetIt = facetIt;
+      result.push_back(onlyFacetIt->getStartRecoHit2D());
+      result.push_back(onlyFacetIt->getMiddleRecoHit2D());
+      result.push_back(onlyFacetIt->getEndRecoHit2D());
 
     } else if (nFacets == 2) {
-      typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
-      Ptr<const CDCFacet> firstFacet{*itFacet++};
-      Ptr<const CDCFacet> secondFacet{*itFacet};
+      FacetIt firstFacetIt = facetIt++;
+      FacetIt secondFacetIt = facetIt;
 
-      result.push_back(firstFacet->getStartRecoHit2D());
-      result.push_back(CDCRecoHit2D::average(secondFacet->getStartRecoHit2D() ,
-                                             firstFacet->getMiddleRecoHit2D()));
+      result.push_back(firstFacetIt->getStartRecoHit2D());
+      result.push_back(CDCRecoHit2D::average(secondFacetIt->getStartRecoHit2D() ,
+                                             firstFacetIt->getMiddleRecoHit2D()));
 
-      result.push_back(CDCRecoHit2D::average(secondFacet->getMiddleRecoHit2D(),
-                                             firstFacet->getEndRecoHit2D()));
+      result.push_back(CDCRecoHit2D::average(secondFacetIt->getMiddleRecoHit2D(),
+                                             firstFacetIt->getEndRecoHit2D()));
 
-      result.push_back(secondFacet->getEndRecoHit2D());
+      result.push_back(secondFacetIt->getEndRecoHit2D());
 
     } else { // nFacets > 2
-      typename std::vector<AMaybePtrFacet>::const_iterator itFacet = facetSegment.begin();
-      Ptr<const CDCFacet> firstFacet{*itFacet++};   // facetSegment[0];
-      Ptr<const CDCFacet> secondFacet{*itFacet++};  // facetSegment[1];
-      Ptr<const CDCFacet> thirdFacet {*itFacet++};  // facetSegment[2];
+      FacetIt firstFacetIt = facetIt++;   // facetSegment[0];
+      FacetIt secondFacetIt = facetIt++;  // facetSegment[1];
+      FacetIt thirdFacetIt = facetIt++;  // facetSegment[2];
 
-      result.push_back(firstFacet->getStartRecoHit2D());
+      result.push_back(firstFacetIt->getStartRecoHit2D());
 
-      result.push_back(CDCRecoHit2D::average(firstFacet->getMiddleRecoHit2D(),
-                                             secondFacet->getStartRecoHit2D()));
+      result.push_back(CDCRecoHit2D::average(firstFacetIt->getMiddleRecoHit2D(),
+                                             secondFacetIt->getStartRecoHit2D()));
 
-      result.push_back(CDCRecoHit2D::average(firstFacet->getEndRecoHit2D(),
-                                             secondFacet->getMiddleRecoHit2D(),
-                                             thirdFacet->getStartRecoHit2D()));
+      result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
+                                             secondFacetIt->getMiddleRecoHit2D(),
+                                             thirdFacetIt->getStartRecoHit2D()));
 
-      while (itFacet != facetSegment.end()) {
+      while (facetIt != endFacetIt) {
 
-        firstFacet = secondFacet;                   // facetSegment[iFacet];
-        secondFacet = thirdFacet;                   // facetSegment[iFacet+1];
-        thirdFacet = Ptr<const CDCFacet>(*itFacet++);  // facetSegment[iFacet+2];
+        firstFacetIt = secondFacetIt;                   // facetSegment[iFacet];
+        secondFacetIt = thirdFacetIt;                   // facetSegment[iFacet+1];
+        thirdFacetIt = facetIt++;                     // facetSegment[iFacet+2];
 
-        result.push_back(CDCRecoHit2D::average(firstFacet->getEndRecoHit2D(),
-                                               secondFacet->getMiddleRecoHit2D(),
-                                               thirdFacet->getStartRecoHit2D()));
+        result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
+                                               secondFacetIt->getMiddleRecoHit2D(),
+                                               thirdFacetIt->getStartRecoHit2D()));
       }
 
-      result.push_back(CDCRecoHit2D::average(secondFacet->getEndRecoHit2D(),
-                                             thirdFacet->getMiddleRecoHit2D()));
+      result.push_back(CDCRecoHit2D::average(secondFacetIt->getEndRecoHit2D(),
+                                             thirdFacetIt->getMiddleRecoHit2D()));
 
-      result.push_back(thirdFacet->getEndRecoHit2D());
+      result.push_back(thirdFacetIt->getEndRecoHit2D());
     }
 
     result.receiveISuperCluster();
@@ -202,7 +206,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegm
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCTangent* >& tangentPath)
 {
-  return ::condenseTangentSegment(tangentPath);
+  return ::condenseTangentSegment(tangentPath | boost::adaptors::indirected);
 }
 
 
@@ -216,7 +220,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
 {
-  return ::condenseFacetSegment(facetPath);
+  return ::condenseFacetSegment(facetPath | boost::adaptors::indirected);
 }
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)

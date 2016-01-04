@@ -7,207 +7,155 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <boost/foreach.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits.hpp>
-
-
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+#include <tracking/trackFindingCDC/utilities/GetIterator.h>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 #include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-
-    /// Implementation of the clustering
-    /** Clusters elements of a given collection using the connections presented by a neighorhood.
-     *  A cluster is essentially a number of items that can reach each other by one more connections
-     *  in a neighborhood. A cluster therefore presents a minimal group to focus on for local tracking
-     *  purposes and can be used not dimish memory consumption as well as time complexity.
+    /**
+     *  Implementation of the clustering
+     *  Clusters elements of a given collection using the relations presented by a neighorhood.
+     *  A cluster is essentially a connected subset of all items
+     *  that can reach each other by one more relations in a neighborhood.
      *  The algorithm is essentially an iterative expansion of the neighborhood relations keeping
-     *  track of the alraedy used adopted items by using the cellState of the automaton cell.
-     *  The cellState after the clusterization could therefore be used as grouping tag directly,
-     *  but we return the clusters as a std::vector of clusters to avoid a reiteration over all elements
-     *  and also avoid the problems arising from the cellstate being a floating point number not
-     *  suitable for indexing.
-     *  The collection container must support BOOST_FOREACH for iteration over its ::value_type.
-     *  Cluster can be anything that is default constructable and supports .insert(end(),const value_type *item).
-     * The neighborhood given to the clusterizer must be of type WeightedNeighborhood<value_type>*/
-    template<class AItem, class ACluster>
+     *  track of the already used items by using the CellState of the AutomatonCell.
+     *
+     *  * ACellHolder must therefore provide an AutomatonCell accessable by a getAutomatonCell() method.
+     *    In case the objects you what to cluster do not contain an automaton cell already you may adopt it
+     *    by using the WithAutomatonCell mixin.
+     *  * ACluster can be anything that is default constructable and supports .insert(end(), ACellHolder*).
+     */
+    template<class ACellHolder, class ACluster = std::vector<ACellHolder*> >
     class Clusterizer {
 
-    private:
-      /// Type for the neighborhood of elements in the algorithm
-      typedef WeightedNeighborhood<AItem> Neighborhood;
+      /// Pointer type used to refer to the objects to be clustered.
+      using CellHolderPtr = ACellHolder*;
 
     public:
-
-      /// Creates the clusters.
-      /** Take the collection and its assoziated neighborhood and appends the clusters to the cluster vector give by non const reference*/
-      template<class AItemRange>
-      void create(AItemRange& items,
-                  const Neighborhood& neighborhood,
-                  std::vector<ACluster>& clusters) const
-      {
-
-        clusters.reserve(30);
-
-        //Prepare states
-        for (AItem& item : items) {
-          setCellState(item, -1);
-        }
-
-        int iCluster = -1;
-        for (AItem& item : items) {
-
-          if (getCellState(item) == -1) {
-
-            clusters.push_back(ACluster());
-            ACluster& newCluster = clusters.back();
-            ++iCluster;
-
-            startCluster(neighborhood, newCluster, iCluster, item);
-
-          }
-        }
-      }
-
-
-      /** Creates the clusters.
-       *  This is a variation of create() taking pointers to objects as vertices instead of references
+      /**
+       *  Creates the clusters.
+       *  Repeatly expands a neighborhood of reference objects that have an AutomatonCell.
+       *  The CellState after the clusterization is the index of the generated cluster.
+       *  The CellWeight is set to the total number of relations each item has with in the neighborhood.
+       *  * ACellHolderRange is required to be a range of items convertable to ACellHolder*
+       *  * ACellHolderNeighborhood is required to have a .equal_range() method
+       *    that yields a range of pairs which .second elements are the sought neighbors.
+       *  @param cellHolderPtrs         Pointers to objects that should be clustered.
+       *  @param cellHolderNeighorhood  Relations between the objects that should be clustered
+       *  @param[out]                   Groups of connected objects in the neighborhood.
        */
-      template<class APtrItemRange>
-      void createFromPointers(APtrItemRange& ptrItems,
-                              const Neighborhood& neighborhood,
+      template<class ACellHolderPtrRange, class ACellHolderNeighborhood>
+      void createFromPointers(const ACellHolderPtrRange& cellHolderPtrs,
+                              const ACellHolderNeighborhood& cellHolderNeighborhood,
                               std::vector<ACluster>& clusters) const
       {
-
-
         clusters.reserve(30);
 
-        //Prepare states
-        for (AItem* ptrItem : ptrItems) {
-
-          if (ptrItem == nullptr) {
-            B2WARNING("Nullptr given as item in Clusterizer");
-            continue;
-          }
-          AItem& item = *ptrItem;
-          setCellState(item, -1);
+        // Prepare states
+        for (CellHolderPtr cellHolderPtr : cellHolderPtrs) {
+          setCellState(cellHolderPtr, -1);
         }
 
         int iCluster = -1;
-        for (AItem* ptrItem : ptrItems) {
+        for (CellHolderPtr cellHolderPtr : cellHolderPtrs) {
+          if (getCellState(cellHolderPtr) != -1) continue;
 
-          if (ptrItem == nullptr) {
-            B2WARNING("Nullptr given as item in Clusterizer");
-            continue;
-          }
-          AItem& item = *ptrItem;
-
-          if (getCellState(item) == -1) {
-
-            clusters.push_back(ACluster());
-            ACluster& newCluster = clusters.back();
-            ++iCluster;
-
-            startCluster(neighborhood, newCluster, iCluster, item);
-
-          }
+          clusters.push_back(ACluster());
+          ACluster& newCluster = clusters.back();
+          ++iCluster;
+          startCluster(cellHolderPtr, cellHolderNeighborhood, iCluster, newCluster);
         }
       }
-
-      /// Setter for the cell state if the AItem inherits from AutomatonCell - use the cell state internal to the AutomtonCell.
-      void setCellState(AItem& item, CellState cellState) const
-      {
-        AutomatonCell& automatonCell = item.getAutomatonCell();
-        automatonCell.setCellState(cellState);
-      }
-
-      /// Getter for the cell state if the AItem inherits from Automaton cell - use the cell state internal to the AutomtonCell.
-      CellState getCellState(const AItem& item) const
-      {
-        const AutomatonCell& automatonCell = item.getAutomatonCell();
-        return automatonCell.getCellState();
-      }
-
-      // Set the cell weight - use the cell weight internal to the AutomtonCell.
-      void setCellWeight(AItem& item, CellWeight cellWeight) const
-      {
-        AutomatonCell& automatonCell = item.getAutomatonCell();
-        automatonCell.setCellWeight(cellWeight);
-      }
-
 
     private:
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
-      inline void startCluster(const Neighborhood& neighborhood,
-                               ACluster& newCluster,
+      template<class ACellHolderNeighborhood>
+      inline void startCluster(CellHolderPtr seedCellHolderPtr,
+                               const ACellHolderNeighborhood& cellHolderNeighborhood,
                                int iCluster,
-                               AItem& seedItem) const
+                               ACluster& newCluster) const
       {
-        //ACluster uses pointers as items instead of objects
-        AItem* ptrSeedItem = &seedItem;
+        setCellState(seedCellHolderPtr, iCluster);
+        newCluster.insert(newCluster.end(), seedCellHolderPtr);
 
-        setCellState(*ptrSeedItem, iCluster);
-        newCluster.insert(newCluster.end(), ptrSeedItem);
+        // Grow the cluster iterativelly
+        std::vector<CellHolderPtr> checkNow;
+        std::vector<CellHolderPtr> checkNext;
 
-        //grow the cluster
-        std::vector<AItem*> itemsToCheckNow;
-        std::vector<AItem*> itemsToCheckNext;
+        checkNow.reserve(10);
+        checkNext.reserve(10);
 
-        itemsToCheckNow.reserve(10);
-        itemsToCheckNext.reserve(10);
+        checkNext.push_back(seedCellHolderPtr);
 
-        itemsToCheckNext.push_back(ptrSeedItem);
+        while (not checkNext.empty()) {
 
-        while (not itemsToCheckNext.empty()) {
+          checkNow.swap(checkNext);
+          checkNext.clear();
 
-          itemsToCheckNow.swap(itemsToCheckNext);
-          itemsToCheckNext.clear();
-          // Check registered items for neighbors
-          for (AItem* clusterItem : itemsToCheckNow) {
+          for (CellHolderPtr cellHolderPtr : checkNow) {
             size_t nNeighbors = 0;
 
-            // Consider each neighbor
-            for (const WeightedRelation<AItem>& relation : neighborhood.equal_range(clusterItem)) {
+            auto cellHolderRelations = cellHolderNeighborhood.equal_range(cellHolderPtr);
+            using CellHolderRelationIterator = GetIterator<const ACellHolderNeighborhood>;
+            using CellHolderRelation = GetValueType<const ACellHolderNeighborhood>;
+            for (const CellHolderRelation & cellHolderRelation
+                 : Range<CellHolderRelationIterator>(cellHolderRelations)) {
+              CellHolderPtr neighborCellHolderPtr = cellHolderRelation.second;
               ++nNeighbors;
 
-              AItem* neighborItem = relation.getTo();
-
-              CellState neighborICluster = getCellState(*neighborItem);
+              CellState neighborICluster = getCellState(neighborCellHolderPtr);
               if (neighborICluster == -1) {
-                // Element not yet in cluster
-                //Add the element
-                setCellState(*neighborItem, iCluster);
-                newCluster.insert(newCluster.end(), neighborItem);
+                // Neighbor not yet in cluster
+                setCellState(neighborCellHolderPtr, iCluster);
+                newCluster.insert(newCluster.end(), neighborCellHolderPtr);
 
-                //register it for further expansion
-                itemsToCheckNext.insert(itemsToCheckNext.end(), neighborItem);
+                // Register neighbor for further expansion
+                checkNext.push_back(neighborCellHolderPtr);
 
               } else if (neighborICluster != iCluster) {
                 B2WARNING("Neighboring hit was already assigned to different cluster. Check if the neighborhood is symmetric.");
+
               } else {
-                //nothing to do
-                //continue;
+
               }
-            } //end for itNeighbor
+            }
 
-            setCellWeight(*clusterItem, nNeighbors);
+            // Setting the cell weight to the number of neighbors
+            setCellWeight(cellHolderPtr, nNeighbors);
 
-          } //end for itItem
-        } // end while  !itemsToCheckNext.empty()
+          } // end (CellHolderPtr cellHolderPtr : checkNow)
+        } // end while(not checkNext.empty())
+      }
 
-      } // end  startCluster(...)
+      /// Setter for the cell state of a pointed object that holds an AutomatonCell
+      void setCellState(CellHolderPtr cellHolderPtr, CellState cellState) const
+      {
+        AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        automatonCell.setCellState(cellState);
+      }
+
+      /// Getter for the cell state of a pointed object that holds an AutomatonCell
+      CellState getCellState(CellHolderPtr cellHolderPtr) const
+      {
+        const AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        return automatonCell.getCellState();
+      }
+
+      /// Setter for the cell weight of a pointed object that holds an AutomatonCell
+      void setCellWeight(CellHolderPtr cellHolderPtr, CellWeight cellWeight) const
+      {
+        AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        automatonCell.setCellWeight(cellWeight);
+      }
 
     }; // end class Clusterizer
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
-
+  } // end namespace TrackFindingCDC
+} // end namespace Belle2

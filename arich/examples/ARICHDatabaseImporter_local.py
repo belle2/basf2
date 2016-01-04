@@ -69,8 +69,10 @@ for path, subdirs, files in os.walk(xdirHapdQE):
 # create a std::vector<string>
 rootFilesAsics = ROOT.vector('string')()
 txtFilesAsics = ROOT.vector('string')()
+# create path to directory
+number = '00'
+xdir = ('%s/asicData' + number + '/') % (os.getcwd())
 # and add the files we want to read
-xdir = '%s/asicData/' % (os.getcwd())
 for path, subdirs, files in os.walk(xdir):
     for name in files:
         if fnmatch(name, "*.root"):
@@ -94,8 +96,6 @@ dbImporter = ARICHDatabaseImporter(rootFilesHapdQA, rootFilesAsics, txtFilesAsic
 # dbImporter.exportFebTest()
 # dbImporter.importHapdInfo()
 # dbImporter.exportHapdInfo()
-# dbImporter.importHapdChipInfo()
-# dbImporter.exportHapdChipInfo()
 # dbImporter.importHapdQE()
 # dbImporter.exportHapdQE()
 # dbImporter.importBadChannels()

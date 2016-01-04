@@ -34,8 +34,8 @@ dbImporter.exportAerogelInfo()
 # dbImporter.exportFebTest()
 # dbImporter.exportHapdInfo()
 # dbImporter.exportHapdChipInfo()
-dbImporter.exportHapdQE()
-dbImporter.exportBadChannels()
+# dbImporter.exportHapdQE()
+# dbImporter.exportBadChannels()
 
 # simple example that shows how to read data from databse and use it
 # dbImporter.getBiasVoltagesForHapdChip("KA0167")

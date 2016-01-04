@@ -9,6 +9,9 @@
 **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/IsIterable.h>
+#include <tracking/trackFindingCDC/utilities/EnableIf.h>
+
 #include <algorithm>
 #include <iterator>
 #include <utility>
@@ -32,9 +35,15 @@ namespace Belle2 {
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
     public:
+      /// Constructor to adapt a pair as returned by e.g. std::equal_range.
+      template<class AOtherIterator>
+      Range(const std::pair<AOtherIterator, AOtherIterator>& itPair)
+        : Super(AIterator(itPair.first), AIterator(itPair.second))
+      {}
+
       /// Constructor from another range
       template<class Ts>
-      Range(Ts& ts)
+      Range(EnableIf<IsIterable<Ts>() == true, Ts&> ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 

@@ -9,21 +9,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <iterator>
-#include <assert.h>
+#include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Refines the clustering of wire hits from super clusters to clusters
-    template<class WireHitRelationFilter = PrimaryWireHitRelationFilter>
+    /// Refines the clustering of wire hits from super clusters to clustexrs
+    template<class AWireHitRelationFilter = PrimaryWireHitRelationFilter>
     class ClusterRefiner:
       public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
 
@@ -77,7 +83,7 @@ namespace Belle2 {
       WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
 
       /// Wire hit neighborhood relation filter
-      WireHitRelationFilter m_wireHitRelationFilter;
+      AWireHitRelationFilter m_wireHitRelationFilter;
 
     }; // end class
 

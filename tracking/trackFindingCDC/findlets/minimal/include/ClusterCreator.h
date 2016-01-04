@@ -9,21 +9,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <framework/logging/Logger.h>
+
+#include <boost/range/adaptor/transformed.hpp>
+#include <memory>
 #include <vector>
-#include <iterator>
-#include <assert.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    template<class WireHitRelationFilter>
+    template<class AWireHitRelationFilter = SecondaryWireHitRelationFilter>
     class ClusterCreator:
       public Findlet<CDCWireHit, CDCWireHitCluster> {
 
@@ -52,11 +58,12 @@ namespace Belle2 {
         // create the neighborhood
         B2DEBUG(100, "Creating the CDCWireHit neighborhood");
         m_wirehitNeighborhood.clear();
-        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, inputWireHits);
+        auto ptrWireHits = inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, ptrWireHits);
         B2ASSERT("Expect wire hit neighborhood to be symmetric ", m_wirehitNeighborhood.isSymmetric());
         B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
 
-        m_wirehitClusterizer.create(inputWireHits, m_wirehitNeighborhood, outputClusters);
+        m_wirehitClusterizer.createFromPointers(ptrWireHits, m_wirehitNeighborhood, outputClusters);
       }
 
     private:
@@ -67,7 +74,7 @@ namespace Belle2 {
       WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
 
       /// Wire hit neighborhood relation filter
-      WireHitRelationFilter m_wireHitRelationFilter;
+      AWireHitRelationFilter m_wireHitRelationFilter;
 
     }; // end class
   } // end namespace TrackFindingCDC

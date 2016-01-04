@@ -255,7 +255,7 @@ namespace Belle2 {
       void appendUsing(ARelationFilter& relationFilter, AItemRange& itemRange)
       {
         //Relation<AItem> neighborRelation;
-        for (auto& item : itemRange) {
+        for (auto && item : itemRange) {
           //neighborRelation.first = Ptr<AItem>(item);
           for (auto& possibleNeighbor : relationFilter.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange))) {
             //neighborRelation.second = Ptr<AItem>(possibleNeighbor);

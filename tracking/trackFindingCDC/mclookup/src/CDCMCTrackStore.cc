@@ -21,6 +21,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <boost/range/adaptor/transformed.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -170,7 +171,9 @@ void CDCMCTrackStore::fillMCSegments()
     typedef std::vector<WithAutomatonCell<const CDCHit*>* > CDCHitCluster;
     Clusterizer<WithAutomatonCell<const CDCHit*>, CDCHitCluster> hitClusterizer;
     std::vector<CDCHitCluster> hitClusters;
-    hitClusterizer.create(hitsWithCells, hitNeighborhood, hitClusters);
+    auto hitsWithCellPtrs =
+      hitsWithCells | boost::adaptors::transformed(&std::addressof<WithAutomatonCell<const CDCHit* >>);
+    hitClusterizer.createFromPointers(hitsWithCellPtrs, hitNeighborhood, hitClusters);
     // mcSegments are not sorted for their time of flight internally, but they are in the right order
 
     // Lets sort them along for the time of flight.

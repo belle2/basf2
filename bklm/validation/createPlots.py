@@ -92,6 +92,7 @@ def draw_bklmhists(file_chain):
     inRPC.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if muon hit is in scintillator (0) or RPC (1)'))
     inRPC.GetListOfFunctions().Add(TNamed('Check', 'Mostly in RPC'))
     inRPC.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    inRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     inRPC.SetMinimum(0.0)
     inRPC.Write()
 
@@ -101,6 +102,7 @@ def draw_bklmhists(file_chain):
     isForward.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if muon hit is at z < 47 cm (0) or z > 47 cm (1)'))
     isForward.GetListOfFunctions().Add(TNamed('Check', 'Somewhat more at backward end'))
     isForward.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    isForward.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     isForward.SetMinimum(0.0)
     isForward.Write()
 
@@ -110,6 +112,7 @@ def draw_bklmhists(file_chain):
     isOnTrack.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if muon hit associated with a CDC track by Muid'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Check', 'Mostly associated'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    isOnTrack.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.9,pvalue-error=0.50'))
     isOnTrack.SetMinimum(0.0)
     isOnTrack.Write()
 
@@ -119,6 +122,7 @@ def draw_bklmhists(file_chain):
     sector.GetListOfFunctions().Add(TNamed('Description', 'Sector number of muon hit'))
     sector.GetListOfFunctions().Add(TNamed('Check', 'Roughly flat in sectors 1-8'))
     sector.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    sector.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     sector.SetMinimum(0.0)
     sector.Write()
 
@@ -128,6 +132,7 @@ def draw_bklmhists(file_chain):
     layer.GetListOfFunctions().Add(TNamed('Description', 'Layer number of muon hit'))
     layer.GetListOfFunctions().Add(TNamed('Check', 'Peak at layer 1 with tail above that'))
     layer.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    layer.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     layer.SetMinimum(0.0)
     layer.Write()
 
@@ -137,6 +142,7 @@ def draw_bklmhists(file_chain):
     phistrip.GetListOfFunctions().Add(TNamed('Description', 'Phi strip number of muon hit'))
     phistrip.GetListOfFunctions().Add(TNamed('Check', 'Roughly flat for 1-36 (all layers) and then for 37-48 (layers 6-15)'))
     phistrip.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    phistrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     phistrip.SetMinimum(0.0)
     phistrip.Write()
 
@@ -146,6 +152,7 @@ def draw_bklmhists(file_chain):
     zstrip.GetListOfFunctions().Add(TNamed('Description', 'Z strip number of muon hit'))
     zstrip.GetListOfFunctions().Add(TNamed('Check', 'Downward-sloping for 1-48 (all layers), shoulder for 49-54 (layers 1-2)'))
     zstrip.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    zstrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
@@ -155,6 +162,7 @@ def draw_bklmhists(file_chain):
     time.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit'))
     time.GetListOfFunctions().Add(TNamed('Check', 'Peak near 0'))
     time.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    time.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     time.Write()
 
     edep = TH1F('EDep', 'Energy deposition for BKLMHit2ds', 50, 0.0, 25.0)
@@ -163,6 +171,7 @@ def draw_bklmhists(file_chain):
     edep.GetListOfFunctions().Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))
     edep.GetListOfFunctions().Add(TNamed('Check', 'Peak near 3 keV'))
     edep.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    edep.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     edep.Write()
 
     r = TH1F('r', 'r for BKLMHit2ds', 30, 200.0, 350.0)
@@ -171,6 +180,7 @@ def draw_bklmhists(file_chain):
     r.GetListOfFunctions().Add(TNamed('Description', 'Distance from z axis in transverse plane of muon hit'))
     r.GetListOfFunctions().Add(TNamed('Check', 'Comb-like downward-sloping distribution (a la layers)'))
     r.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    r.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     r.Write()
 
     z = TH1F('z', 'z for BKLMHit2ds', 100, -200.0, 300.0)
@@ -179,6 +189,7 @@ def draw_bklmhists(file_chain):
     z.GetListOfFunctions().Add(TNamed('Description', 'Axial position of muon hit'))
     z.GetListOfFunctions().Add(TNamed('Check', 'Broad peak near zero with dip at 47 cm (forward-backward boundary)'))
     z.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
+    z.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.99,pvalue-error=0.90'))
     z.Write()
 
     xy = TH2F('xy', 'y vs x for BKLMHit2ds', 140, -350.0, 350.0, 140, -350.0, 350.0)

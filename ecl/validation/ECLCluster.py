@@ -12,7 +12,7 @@
 """
 <header>
 <output>ECLClusterOutput.root</output>
-<contact>Elisa Manoni, ecl2ml@bpost.kek.jp</contact>
+<contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
 </header>
 """
 
@@ -66,4 +66,4 @@ ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
 process(main)
-print(statistics)
+# print(statistics)

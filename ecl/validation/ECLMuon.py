@@ -57,4 +57,4 @@ main.add_module(eclanalysis)
 # main.add_module(simpleoutput)
 
 process(main)
-print(statistics)
+# print(statistics)

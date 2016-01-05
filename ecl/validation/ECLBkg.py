@@ -55,4 +55,4 @@ add_reconstruction(main)
 main.add_module(eclanalysis)
 
 process(main)
-print(statistics)
+# print(statistics)

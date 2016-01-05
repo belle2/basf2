@@ -157,7 +157,7 @@ namespace Belle2 {
 
       const auto& map = m_channels[row][col];
       if (!map) {
-        B2ERROR("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
+        B2WARNING("TOP::ChannelMapper: no channel mapped to pixel " << pixel);
         return c_invalidChannel;
       }
       unsigned asic = map->getASICNumber();

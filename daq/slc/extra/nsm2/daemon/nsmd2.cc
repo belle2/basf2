@@ -1519,7 +1519,9 @@ nsmd_tcpwriteq()
   while (1) { // just for EINTR and EAGAIN
     if ((ret = select(con.sock + 1, 0, &fdset, 0, &tv)) >= 0) break;
     if (errno == EINTR || errno == EAGAIN) continue;
-    ERRO("tcpwriteq: select"); // unexpected
+    close(con.sock);
+    con.sock = -1;
+    //ERRO("tcpwriteq: select"); // unexpected
   }
 
   // if timeout, mark it as WAIT-SELECT

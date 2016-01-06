@@ -337,6 +337,26 @@ namespace Belle2 {
     double AngleGTLE(const Particle*);
 
     /**
+     * return the angle between C1 and T1 in CMS
+     */
+    double AngleT1C1LE(const Particle*);
+
+    /**
+     * return the angle between C2 and T1 in CMS
+     */
+    double AngleT1C2LE(const Particle*);
+
+    /**
+     * return the angle between C1 and T2 in CMS
+     */
+    double AngleT2C1LE(const Particle*);
+
+    /**
+     * return the angle between C2 and T2 in CMS
+     */
+    double AngleT2C2LE(const Particle*);
+
+    /**
      * return trk1
      */
     const Particle* T1(const Particle*);

@@ -98,34 +98,35 @@ namespace Belle2 {
     {
       const  Particle* t = NULL;
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
+      double topp = -1.;
       if (pionshlt->getListSize() < 1) return t;
-      else if (pionshlt->getListSize() == 1)
-        t = pionshlt->getParticle(0);
-      else if (pionshlt->getListSize() > 1) {
-        Particle* t1 = pionshlt->getParticle(0);
-        Particle* t2 = pionshlt->getParticle(1);
-
-        if (t1->getMomentumMagnitude() > t2->getMomentumMagnitude())
-          t = t1;
-        else
-          t = t2;
+      else {
+        for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
+          const Particle* t1 = pionshlt->getParticle(i);
+          TLorentzVector V4p1 = t1->get4Vector();
+          if ((PCmsLabTransform::labToCms(V4p1)).Rho() > topp)
+          {t = t1; topp = (PCmsLabTransform::labToCms(V4p1)).Rho();}
+        }
       }
       return t;
     }
 
-    const Particle*  T2(const Particle*)
+    const Particle*  T2(const Particle* part)
     {
       const  Particle* t = NULL;
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
       if (pionshlt->getListSize() <= 1) return t;
-      else if (pionshlt->getListSize() > 1) {
-        Particle* t1 = pionshlt->getParticle(0);
-        Particle* t2 = pionshlt->getParticle(1);
 
-        if (t1->getMomentumMagnitude() > t2->getMomentumMagnitude())
-          t = t2;
-        else
-          t = t1;
+      double sedp = -1.;
+      const  Particle* t1 = T1(part);
+      TLorentzVector V4p1 = t1->get4Vector();
+      double topp = (PCmsLabTransform::labToCms(V4p1)).Rho();
+      for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
+        const Particle* t2 = pionshlt->getParticle(i);
+        TLorentzVector V4p2 = t2->get4Vector();
+        double mom = (PCmsLabTransform::labToCms(V4p2)).Rho();
+        if (mom > sedp && mom < topp)
+        {t = t2; sedp = mom;}
       }
       return t;
     }
@@ -170,11 +171,13 @@ namespace Belle2 {
 
     double AngleTTLE(const Particle* p)
     {
-      double result = -1.;
+      double result = -10.;
       if (T1(p) && T2(p)) {
         TLorentzVector V4p1 = (T1(p))->get4Vector();
         TLorentzVector V4p2 = (T2(p))->get4Vector();
-        result = V4p1.Angle(V4p2.Vect());
+        const TVector3 V3p1 =  PCmsLabTransform::labToCms(V4p1).Vect();
+        const TVector3 V3p2 =  PCmsLabTransform::labToCms(V4p2).Vect();
+        result = V3p1.Angle(V3p2);
       }
       return result;
     }
@@ -185,7 +188,10 @@ namespace Belle2 {
       if (T1(p) && T2(p)) {
         TLorentzVector V4p1 = (T1(p))->get4Vector();
         TLorentzVector V4p2 = (T2(p))->get4Vector();
-        result = (V4p1.Theta() + V4p2.Theta() - 3.1415926);
+        const TVector3 V3p1 =  PCmsLabTransform::labToCms(V4p1).Vect();
+        const TVector3 V3p2 =  PCmsLabTransform::labToCms(V4p2).Vect();
+
+        result = std::abs(V3p1.Theta() + V3p2.Theta() - M_PI);
       }
       return result;
     }
@@ -196,7 +202,9 @@ namespace Belle2 {
       if (T1(p) && T2(p)) {
         TLorentzVector V4p1 = (T1(p))->get4Vector();
         TLorentzVector V4p2 = (T2(p))->get4Vector();
-        result = V4p1.DeltaPhi(V4p2);
+        const TVector3 V3p1 =  PCmsLabTransform::labToCms(V4p1).Vect();
+        const TVector3 V3p2 =  PCmsLabTransform::labToCms(V4p2).Vect();
+        result = V3p1.DeltaPhi(V3p2);
       }
       return result;
     }
@@ -539,15 +547,14 @@ namespace Belle2 {
           Particle* par2 = pionshlt->getParticle(j);
           TLorentzVector V4p1 = par1->get4Vector();
           TLorentzVector V4p2 = par2->get4Vector();
-          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-          const TVector3 V3p1 = V4p1.Vect();
-          const TVector3 V3p2 = V4p2.Vect();
+          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          //const TVector3 V3p1 = V4p1.Vect();
+          //const TVector3 V3p2 = V4p2.Vect();
           temp = V3p1.Angle(V3p2);
           if (result < temp) result = temp;
         }
       }
-      result = result / 3.1415926 * 180.;
       return result;
     }
 
@@ -564,15 +571,14 @@ namespace Belle2 {
           Particle* par2 = pionshlt->getParticle(j);
           TLorentzVector V4p1 = par1->get4Vector();
           TLorentzVector V4p2 = par2->get4Vector();
-          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-          const TVector3 V3p1 = V4p1.Vect();
-          const TVector3 V3p2 = V4p2.Vect();
+          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          //const TVector3 V3p1 = V4p1.Vect();
+          //const TVector3 V3p2 = V4p2.Vect();
           temp = V3p1.DeltaPhi(V3p2);
           if (result < temp) result = temp;
         }
       }
-      result = result / 3.1415926 * 180.;
       return result;
     }
 
@@ -589,21 +595,20 @@ namespace Belle2 {
           Particle* par2 = pionshlt->getParticle(j);
           TLorentzVector V4p1 = par1->get4Vector();
           TLorentzVector V4p2 = par2->get4Vector();
-          //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
-          const TVector3 V3p1 = V4p1.Vect();
-          const TVector3 V3p2 = V4p2.Vect();
-          temp = std::abs(V3p1.Theta() + V3p2.Theta() - 3.1415926);
+          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          //const TVector3 V3p1 = V4p1.Vect();
+          //const TVector3 V3p2 = V4p2.Vect();
+          temp = std::abs(V3p1.Theta() + V3p2.Theta() - M_PI);
           if (result < temp) result = temp;
         }
       }
-      result = result / 3.1415926 * 180.;
       return result;
     }
 
     double maxAngleMMLE(const Particle*)
     {
-      double result = -1.;
+      double result = -10.;
       StoreArray<KLMCluster> klmClusters;
       for (int i = 0; i < klmClusters.getEntries() - 1; i++) {
         TLorentzVector v1 = klmClusters[i]->getMomentum();
@@ -613,12 +618,12 @@ namespace Belle2 {
           if (result < temp) result = temp;
         }
       }
-      return result / 3.1415926 * 180.;
+      return result ;
     }
 
     double maxAngleTMLE(const Particle*)
     {
-      double result = -1.;
+      double result = -10.;
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
       StoreArray<KLMCluster> klmClusters;
       for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
@@ -630,7 +635,7 @@ namespace Belle2 {
           if (result < temp) result = temp;
         }
       }
-      return result / 3.1415926 * 180.;
+      return result ;
     }
 
     const ECLCluster*  ECLClusterNeutralLE(const Particle*)
@@ -643,7 +648,8 @@ namespace Belle2 {
         const ECLCluster* ecle_tmp;
         p = gammahlt->getParticle(i);
         ecle_tmp = p->getECLCluster();
-        double e = ecle_tmp->getEnergy();
+        TLorentzVector V4p = ecle_tmp->get4Vector();
+        double e = (PCmsLabTransform::labToCms(V4p)).Rho();
         if (E1 < e) {E1 = e; ecle = ecle_tmp;}
       }
       return ecle;
@@ -707,7 +713,8 @@ namespace Belle2 {
           p = gammahlt->getParticle(i - pionshlt->getListSize());
           ecle_tmp = p->getECLCluster();
         }
-        double e = ecle_tmp->getEnergy();
+        TLorentzVector V4p1 = ecle_tmp->get4Vector();
+        double e = (PCmsLabTransform::labToCms(V4p1)).Rho();
         if (E1 < e) {E1 = e; ecle = ecle_tmp;}
       }
       return ecle;
@@ -763,7 +770,7 @@ namespace Belle2 {
       const ECLCluster*  ecle = NULL;
       double result = -1.;
       double Ehigh = -1.;
-      if (ECLClusterC1LE(particle))Ehigh = EC1LE(particle);
+      if (ECLClusterC1LE(particle)) Ehigh = EC1CMSLE(particle);
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
       StoreObjPtr<ParticleList> gammahlt("gamma:HLT");
       for (unsigned  int i = 0; i < (pionshlt->getListSize() + gammahlt->getListSize()); i++) {
@@ -779,8 +786,9 @@ namespace Belle2 {
           p = gammahlt->getParticle(i - pionshlt->getListSize());
           ecle_tmp = p->getECLCluster();
         }
-        double e = ecle_tmp->getEnergy();
-        if ((float)Ehigh == (float)e)continue;
+        TLorentzVector V4p2 = ecle_tmp->get4Vector();
+        double e = (PCmsLabTransform::labToCms(V4p2)).Rho();
+        if (e >= Ehigh) continue;
         else if (result < e) {result = e; ecle = ecle_tmp;}
       }
       return ecle;
@@ -835,46 +843,99 @@ namespace Belle2 {
 
     double AngleGGLE(const Particle* particle)
     {
-      double result = -1.;
+      double result = -10.;
       if (ECLClusterC1LE(particle) && ECLClusterC2LE(particle)) {
         const ECLCluster* E1 =  ECLClusterC1LE(particle);
         const ECLCluster* E2 =  ECLClusterC2LE(particle);
-        TVector3 v1 = E1->getMomentum();
-        TVector3 v2 = E2->getMomentum();
-        TLorentzVector V4p1(v1, v1.Mag());
-        TLorentzVector V4p2(v2, v2.Mag());
+        TLorentzVector V4p1 = E1->get4Vector();
+        TLorentzVector V4p2 = E2->get4Vector();
         const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 
         result = V3p1.Angle(V3p2);
-        result = result / 3.1415926 * 180.;
       }
       return result;
     }
 
     double AngleGTLE(const Particle* particle)
     {
-      double result = -1.;
+      double result = -10.;
 
       if (ECLClusterNeutralLE(particle)) {
-        TVector3 cv1 = ECLClusterNeutralLE(particle)->getMomentum();
+        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
         if (T1(particle)) {
-          TVector3 tv1 = (T1(particle))->getMomentum();
-          double theta1 = tv1.Angle(cv1);
+          TLorentzVector V4p1 = T1(particle)->get4Vector();
+          //  const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          double theta1 = (V4g1.Vect()).Angle(V4p1.Vect());
           if (result < theta1) result = theta1;
         }
         if (T2(particle)) {
-          TVector3 tv2 = (T2(particle))->getMomentum();
-          double theta2 = tv2.Angle(cv1);
+          TLorentzVector V4p2 = T2(particle)->get4Vector();
+          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          double theta2 = (V4g1.Vect()).Angle(V4p2.Vect());
           if (result < theta2) result = theta2;
         }
-
       }
-
-      return result / 3.1415926 * 180.;
-
+      return result ;
     }
 
+    double AngleT1C1LE(const Particle* particle)
+    {
+      double result = -10.;
+      if (T1(particle) && ECLClusterC1LE(particle)) {
+        TLorentzVector V4p1 = T1(particle)->get4Vector();
+        TLorentzVector V4e1 =  ECLClusterC1LE(particle)->get4Vector();
+        //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+        //const TVector3 V3e1 = (PCmsLabTransform::labToCms(V4e1)).Vect();
+        //result = V3p1.Angle(V3e1);
+        result = (V4p1.Vect()).Angle(V4e1.Vect());
+      }
+      return result;
+    }
+
+    double AngleT1C2LE(const Particle* particle)
+    {
+      double result = -10.;
+      if (T1(particle) && ECLClusterC2LE(particle)) {
+        TLorentzVector V4p1 = T1(particle)->get4Vector();
+        const ECLCluster* E2 =  ECLClusterC2LE(particle);
+        TLorentzVector V4e2 = E2->get4Vector();
+//     const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+//    const TVector3 V3e2 = (PCmsLabTransform::labToCms(V4e2)).Vect();
+        result = (V4p1.Vect()).Angle(V4e2.Vect());
+      }
+      return result;
+    }
+
+    double AngleT2C1LE(const Particle* particle)
+    {
+      double result = -10.;
+      if (T2(particle) && ECLClusterC1LE(particle)) {
+        TLorentzVector V4p2 = T2(particle)->get4Vector();
+        const ECLCluster* E1 =  ECLClusterC1LE(particle);
+        TLorentzVector V4e1 = E1->get4Vector();
+//     const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+//    const TVector3 V3e1 = (PCmsLabTransform::labToCms(V4e1)).Vect();
+        result = (V4p2.Vect()).Angle(V4e1.Vect());
+      }
+      return result;
+    }
+
+
+    double AngleT2C2LE(const Particle* particle)
+    {
+      double result = -10.;
+      if (T2(particle) && ECLClusterC2LE(particle)) {
+        TLorentzVector V4p2 = T2(particle)->get4Vector();
+        const ECLCluster* E2 =  ECLClusterC2LE(particle);
+        TLorentzVector V4e2 = E2->get4Vector();
+//     const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+//     const TVector3 V3e2 = (PCmsLabTransform::labToCms(V4e2)).Vect();
+        result = (V4p2.Vect()).Angle(V4e2.Vect());
+      }
+      return result;
+    }
 
     double nEidLE(const Particle*)
     {
@@ -949,19 +1010,19 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("VisibleEnergyHLT", VisibleEnergyLE,
                       "[Eventbased] total visible energy (the sum of the charged track's momenta and the ECL cluster's energies)");
-    REGISTER_VARIABLE("maxAngTTHLT", maxAngleTTLE,
-                      "[Eventbased] the maximum angle between two charged tracks");
-    REGISTER_VARIABLE("maxPhiTTHLT", maxPhiTTLE,
-                      "[Eventbased] the maximum azimuthal angle between two charged tracks");
-    REGISTER_VARIABLE("maxThetaTTHLT", maxThetaTTLE,
-                      "[Eventbased] the maximum accollinearity angle between two charged tracks");
+    REGISTER_VARIABLE("maxAngTTCMSHLT", maxAngleTTLE,
+                      "[Eventbased] the maximum angle between two charged tracks in CMS");
+    REGISTER_VARIABLE("maxPhiTTCMSHLT", maxPhiTTLE,
+                      "[Eventbased] the maximum azimuthal angle between two charged tracks in CMS");
+    REGISTER_VARIABLE("maxThetaTTCMSHLT", maxThetaTTLE,
+                      "[Eventbased] the maximum accollinearity angle between two charged tracks in CMS");
 
-    REGISTER_VARIABLE("AngTTHLT", AngleTTLE,
-                      "[Eventbased] the 3-D angle between trk1 and trk2");
-    REGISTER_VARIABLE("PhiTTHLT", PhiTTLE,
-                      "[Eventbased] the azimuthal angle between trk1 and trk2");
-    REGISTER_VARIABLE("ThetaTTHLT", ThetaTTLE,
-                      "[Eventbased] the accollinearity angle between trk1 and trk2");
+    REGISTER_VARIABLE("AngTTCMSHLT", AngleTTLE,
+                      "[Eventbased] the 3-D angle between trk1 and trk2 in CMS");
+    REGISTER_VARIABLE("PhiTTCMSHLT", PhiTTLE,
+                      "[Eventbased] the azimuthal angle between trk1 and trk2 in CMS");
+    REGISTER_VARIABLE("ThetaTTCMSHLT", ThetaTTLE,
+                      "[Eventbased] the accollinearity angle between trk1 and trk2 in CMS");
 
     REGISTER_VARIABLE("maxAngMMHLT", maxAngleMMLE, "[Eventbased] the maximum angle between two KLM Clusters");
     REGISTER_VARIABLE("maxAngTMHLT", maxAngleTMLE, "[Eventbased] the maximum angle between CDC tracks and  KLM Clusters");
@@ -981,7 +1042,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("RC2HLT", RC2LE, "[Eventbased] the distance between C2 and IP");
     REGISTER_VARIABLE("EC12HLT", EC12LE, "[Eventbased] the total energy of C1 and C2");
     REGISTER_VARIABLE("EC12CMSHLT", EC12CMSLE, "[Eventbased] the total energy of C1 and C2 in CMS");
-    REGISTER_VARIABLE("AngGGHLT", AngleGGLE, "[Eventbased] the angle between C1 and C2");
+    REGISTER_VARIABLE("AngGGCMSHLT", AngleGGLE, "[Eventbased] the angle between C1 and C2");
 
     REGISTER_VARIABLE("ThetaNeutralHLT", ThetaNeutralLE, "[Eventbased] the polar of the neutral cluster with the largest energy");
     REGISTER_VARIABLE("RNeutralHLT", RNeutralLE, "[Eventbased] the distance between the neutral cluster and IP");
@@ -989,7 +1050,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("ENeutralHLT", ENeutralLE, "[Eventbased] the largest energy of the neutral cluster");
     REGISTER_VARIABLE("ENeutralCMSHLT", ENeutralCMSLE, "[Eventbased] the secondary largest energy of the neutral cluster in CMS");
 
-    REGISTER_VARIABLE("AngGTHLT", AngleGTLE, "[Eventbased] the max angle between C1 (C2) and T1 (T2)");
+    REGISTER_VARIABLE("AngGTHLT", AngleGTLE, "[Eventbased] the max angle between the largest neutral cluster and T1 (T2) ");
+    REGISTER_VARIABLE("AngC1T1HLT", AngleT1C1LE, "[Eventbased] the angle between T1 and C1 ");
+    REGISTER_VARIABLE("AngC2T1HLT", AngleT1C2LE, "[Eventbased] the angle between T1 and C2 ");
+    REGISTER_VARIABLE("AngC1T2HLT", AngleT2C1LE, "[Eventbased] the angle between T2 and C1 ");
+    REGISTER_VARIABLE("AngC2T2HLT", AngleT2C2LE, "[Eventbased] the angle between T2 and C2 ");
 
   }
 }

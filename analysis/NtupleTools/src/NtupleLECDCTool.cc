@@ -41,14 +41,14 @@ void NtupleLECDCTool::setupTree()
   m_tree->Branch("P1CMS", &m_P1CMSBhabha, "P1CMS/F");
   m_tree->Branch("P2CMS", &m_P2CMSBhabha, "P2CMS/F");
 
-  m_P1Bhabha = new double[5];
-  m_P2Bhabha = new double[5];
+  m_P1Bhabha = new double[6];
+  m_P2Bhabha = new double[6];
   m_maxAng = new double[3];
   m_Ang = new double[3];
   m_tree->Branch("Angtt", &m_Ang[0], "Angtt[3]/D");
   m_tree->Branch("maxAngtt", &m_maxAng[0], "maxAngtt[3]/D");
-  m_tree->Branch("InfTrk1", &m_P1Bhabha[0], "InfTrk1[5]/D");
-  m_tree->Branch("InfTrk2", &m_P2Bhabha[0], "InfTrk2[5]/D");
+  m_tree->Branch("InfTrk1", &m_P1Bhabha[0], "InfTrk1[6]/D");
+  m_tree->Branch("InfTrk2", &m_P2Bhabha[0], "InfTrk2[6]/D");
 
 
 }
@@ -84,5 +84,7 @@ void NtupleLECDCTool::eval(const Particle* particle)
   m_P2Bhabha[3] = Variable::Charge2BhabhaLE(particle);
   m_P1Bhabha[4] = Variable::E1BhabhaLE(particle);
   m_P2Bhabha[4] = Variable::E2BhabhaLE(particle);
+  m_P1Bhabha[5] = Variable::E1CMSBhabhaLE(particle);
+  m_P2Bhabha[5] = Variable::E2CMSBhabhaLE(particle);
 
 }

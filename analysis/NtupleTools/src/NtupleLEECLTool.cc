@@ -43,11 +43,13 @@ void NtupleLEECLTool::setupTree()
   m_Vp4E2 = new float[3];
   m_Vp4Neutral = new float[3];
   m_ECMS = new float[4];
+  m_AngCT = new float[4];
 
   m_tree->Branch("InfCluster1",  &m_Vp4E1[0], "InfCluter1[3]/F");
   m_tree->Branch("InfCluster2",  &m_Vp4E2[0], "InfCluster2[3]/F");
   m_tree->Branch("InfNeutralCluster",  &m_Vp4Neutral[0], "InfNeutralCluster[3]/F");
   m_tree->Branch("ECMS",  &m_ECMS[0], "ECMS[4]/F");
+  m_tree->Branch("AngCT",  &m_AngCT[0], "AngCT[4]/F");
 
 }
 
@@ -79,4 +81,9 @@ void NtupleLEECLTool::eval(const Particle* particle)
 
   m_AngleGG = Variable::AngleGGLE(particle);
   m_AngleGT = Variable::AngleGTLE(particle);
+  m_AngCT[0] = Variable::AngleT1C1LE(particle);
+  m_AngCT[1] = Variable::AngleT1C2LE(particle);
+  m_AngCT[2] = Variable::AngleT2C1LE(particle);
+  m_AngCT[3] = Variable::AngleT2C2LE(particle);
+
 }

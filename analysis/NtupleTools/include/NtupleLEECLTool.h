@@ -55,8 +55,11 @@ namespace Belle2 {
     /**the angle between the most and the second most energnetic ECL clusters*/
     float m_AngleGG;
 
-    /**the angle between C1 (C2) and T1 (T2)*/
+    /**the max angle between the largest neutral cluster and T1 (T2) */
     float m_AngleGT;
+
+    /**the angle between C1 (C2) and T1 (T2)*/
+    float* m_AngCT;
 
 //    float m_EC12CMS;
 

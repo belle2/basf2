@@ -28,15 +28,17 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    MicrotpcRecoTrack(): m_detNb(0), m_chi2(0), m_theta(0), m_phi(0), m_esum(0), m_totsum(0), m_trl(0), m_time_range(0), m_parFit(),
+    MicrotpcRecoTrack(): m_detNb(0), m_pixnb(0), m_chi2(0), m_theta(0), m_phi(0), m_esum(0), m_totsum(0), m_trl(0), m_time_range(0),
+      m_parFit(),
       m_parFit_err(), m_cov(), m_impact_x() , m_impact_y(), m_side() {}
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    MicrotpcRecoTrack(int detNb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
+    MicrotpcRecoTrack(int detNb, int pixnb, float chi2, float theta, float phi, float esum, int totsum, float trl, int time_range,
                       const float parFit[5], const float parFit_err[5], const float cov[25], const float impact_x[4], const float impact_y[4],
-                      const int side[16]): m_detNb(detNb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum), m_trl(trl),
+                      const int side[16]): m_detNb(detNb), m_pixnb(pixnb), m_chi2(chi2), m_theta(theta), m_phi(phi), m_esum(esum), m_totsum(totsum),
+      m_trl(trl),
       m_time_range(time_range)
     {
       std::copy(parFit, parFit + 5, m_parFit);
@@ -50,6 +52,8 @@ namespace Belle2 {
     }
     /** Return detector number */
     int getdetNb() const { return m_detNb; }
+    /** Return pixel number */
+    int getpixnb() const { return m_pixnb; }
     /** Return the chi^2 */
     float getchi2() const { return m_chi2; }
     /** Return the polar angle in degrees */
@@ -85,6 +89,8 @@ namespace Belle2 {
   private:
     /** detector number */
     int m_detNb;
+    /** pixel number */
+    int m_pixnb;
     /** chi^2 of the fit */
     float m_chi2;
     /** Polar angle theta in degrees */

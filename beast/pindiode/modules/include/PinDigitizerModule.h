@@ -20,10 +20,6 @@
 #include <TF1.h>
 #include <TVector3.h>
 
-/** size of hit */
-const Int_t MAXSIZE         = 10000;
-/** size of pixel hit */
-const Int_t MAXtSIZE        = 1000;
 
 namespace Belle2 {
   namespace pindiode {
@@ -66,13 +62,15 @@ namespace Belle2 {
       virtual void getXMLData();
 
       /** number of detectors. Read from PINDIODE.xml*/
-      int nPIN = 0;
+      int nPIN = 32;
       /** PIN coordinate */
       std::vector<TVector3> PINCenter;
       /** Cremat gain */
       double m_CrematGain;
       /** Work function */
       double m_WorkFunction;
+      /** Fano Factor */
+      double m_FanoFactor;
       /** Event counter */
       //int Event = 0;
     };

@@ -216,14 +216,6 @@ void TpcDigitizerModule::event()
               Drift(GEM2.X(), GEM2.Y(), m_z_CG, x_CG, y_CG, z_CG, t_CG, m_Dt_CG, m_Dl_CG, m_v_CG);
 
               //determine col, row, and bc
-              /*
-              const int col = (int)((collectionGap.X() + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
-              const int row = (int)((collectionGap.Y() + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
-              const int pix = col +  m_ChipColumnNb * row;
-              const int quT = gRandom->Uniform(-1, 1);
-              int bci = (int)((driftGap.T() + transferGap.T() + collectionGap.T() - T0[detNb]) / (double)m_PixelTimeBin) + quT;
-              if (bci < 0)bci = 0;
-              */
               int col = (int)((x_CG + m_ChipColumnX) / (2. * m_ChipColumnX / (double)m_ChipColumnNb));
               int row = (int)((y_CG + m_ChipRowY) / (2. * m_ChipRowY / (double)m_ChipRowNb));
               int pix = col +  m_ChipColumnNb * row;
@@ -276,6 +268,7 @@ void TpcDigitizerModule::event()
   m_dchip_detNb_map.clear();
   m_dchip_pdg_map.clear();
   m_dchip_trkID_map.clear();
+
 }
 /*
 TLorentzVector TpcDigitizerModule::Drift(
@@ -386,6 +379,7 @@ void TpcDigitizerModule::Pixelization()
           kcounter ++;
         }
       }
+      //std::cout<<"kcounter " << kcounter << std::endl;
       //determined nb of bc per pixel
       //if good t0
       if (k0 != 1e9) {
@@ -451,7 +445,9 @@ void TpcDigitizerModule::Pixelization()
 
   //bool PixHit = false;
   //if entry
+
   if (bci.size() > 0) {
+    //std::cout << " size " << bci.size() << std::endl;
     //PixHit = true;
     //find start time
     sort(t0.begin(), t0.end());

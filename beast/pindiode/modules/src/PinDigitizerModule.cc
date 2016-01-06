@@ -61,6 +61,7 @@ PinDigitizerModule::PinDigitizerModule() : Module()
   //Default values are set here. New values can be in PINDIODE.xml.
   addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
   addParam("WorkFunction", m_WorkFunction, "Convert eV to e [e/eV] ", 1.12);
+  addParam("FanoFactor", m_FanoFactor, "e resolution ", 0.1);
 
 }
 
@@ -95,13 +96,13 @@ void PinDigitizerModule::event()
   }
 
   //Declare and initialze energy and time
-  nPIN = 2 * nPIN;
-  double edep[nPIN];
-  double time[nPIN];
-  double itime[nPIN];
-  double volt[nPIN];
+  //nPIN = 2 * nPIN;
+  double edep[100];
+  double time[100];
+  double itime[100];
+  double volt[100];
   int pdg[nPIN];
-  for (int i = 0; i < nPIN; i++) {
+  for (int i = 0; i < 64; i++) {
     edep[i] = 0;
     time[i] = 0;
     itime[i] = 0;
@@ -113,7 +114,7 @@ void PinDigitizerModule::event()
   for (int i = 0; i < nentries; i++) {
     PindiodeSimHit* aHit = PinSimHits[i];
     int detNb = aHit->getCellId();
-    if (detNb > nPIN)continue;
+    if (detNb > 64)continue;
     edep[detNb] += aHit->getEnergyDep();
     time[detNb] += aHit->getFlightTime();
     itime[detNb] ++;
@@ -121,11 +122,16 @@ void PinDigitizerModule::event()
     if (PDG == 22) pdg[detNb] = 1;
   }
 
-  for (int i = 0; i < nPIN; i++) {
+  for (int i = 0; i < 64; i++) {
     if (itime[i] > 0) {
       time[i] /= itime[i];
-      volt[i] = edep[i] / m_WorkFunction * 1e6 * 1.602176565e-19 * m_CrematGain * 1e12;
-      PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
+
+      const double meanEl = edep[i] / m_WorkFunction * 1e6; //MeV to eV
+      const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+      const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+      volt[i] = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
+      //PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
+      PinHits.appendNew(PindiodeHit(edep[i], volt[i], time[i], i, pdg[i]));
     }
   }
 
@@ -138,12 +144,14 @@ void PinDigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PINDIODE\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-    PINCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
-                                 activeParams.getLength("Phi")));
-    nPIN++;
-  }
+  // BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  //PINCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
+  //                           activeParams.getLength("Phi")));
+  //nPIN++;
+  //}
   m_CrematGain = content.getDouble("CrematGain");
+  m_WorkFunction = content.getDouble("WorkFunction");
+  m_FanoFactor = content.getDouble("FanoFactor");
 
   B2INFO("PinDigitizer: Aquired pin locations and gas parameters");
   B2INFO("              from PINDIODE.xml. There are " << nPIN << " PINs implemented");

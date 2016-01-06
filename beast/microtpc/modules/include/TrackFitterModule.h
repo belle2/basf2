@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
+#include <map>
+#include <tuple>
 
 //ROOT
 #include "TMath.h"
@@ -28,6 +30,7 @@
 #include <assert.h>
 #include <ctime>
 #include <TMinuit.h>
+
 
 using namespace ROOT::Math;
 static void SumDistance2_angles(int&, double*, double&, double*, int);
@@ -160,7 +163,9 @@ namespace Belle2 {
       /** Absorption in gas */
       double m_GasAbs;
       /** chip store arrays */
-      //int dchip[10][80][336][MAXtSIZE];
+      std::map<std::tuple<int, int, int>, int> m_dchip;
+      /** chip map arrays */
+      std::map<std::tuple<int, int>, int> m_dchip_map;
       /** number of detectors. Read from MICROTPC.xml*/
       int nTPC = 0;
       /** TPC coordinate */

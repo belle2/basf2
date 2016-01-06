@@ -55,13 +55,6 @@ PindiodeStudyModule::PindiodeStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Pindiodes (BEAST)");
 
-  //Default values are set here. New values can be in PINDIODE.xml.
-  for (int i = 0; i < 100; i++) {
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 10.);
-    h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 10.);
-    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 1000.);
-    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 1000.);
-  }
 }
 
 PindiodeStudyModule::~PindiodeStudyModule()
@@ -71,6 +64,13 @@ PindiodeStudyModule::~PindiodeStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void PindiodeStudyModule::defineHisto()
 {
+  //Default values are set here. New values can be in PINDIODE.xml.
+  for (int i = 0; i < 100; i++) {
+    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 10.);
+    h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 10.);
+    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 1000.);
+    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 1000.);
+  }
 
 }
 
@@ -104,7 +104,7 @@ void PindiodeStudyModule::event()
 
   //int nSimHits = SimHits.getEntries();
   int nHits = Hits.getEntries();
-
+  cout << "nHits " << nHits << endl;
 
 
   for (int i = 0; i < nHits; i++) {
@@ -125,7 +125,7 @@ void PindiodeStudyModule::event()
 void PindiodeStudyModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PINDIODE\"]/Content/");
-
+  /*
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
@@ -133,18 +133,13 @@ void PindiodeStudyModule::getXMLData()
                                  activeParams.getLength("Phi")));
     nPIN++;
   }
-
-  B2INFO("PinDigitizer: Aquired tpc locations and gas parameters");
-  B2INFO("              from PINDIODE.xml. There are " << nPIN << " PINs implemented");
+  */
+  B2INFO("PinDigitizer");
 
 }
 void PindiodeStudyModule::endRun()
 {
 
-  //B2RESULT("PindiodeStudyModule: # of p recoils: " << npHits);
-  //B2RESULT("PindiodeStudyModule: # of He recoils: " << nHeHits);
-  //B2RESULT("PindiodeStudyModule: # of O recoils: " << nOHits);
-  //B2RESULT("PindiodeStudyModule: # of C recoils: " << nCHits);
 
 }
 

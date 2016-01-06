@@ -39,7 +39,7 @@ fillParticleList('gamma:HLT', 'E>0.1')
 # The four veto logics  eclBhabha, BhabhaVeto, SBhabhaVeto, and ggVeto have to be defined firstly.
 
 # eclBhabhaVetoHLT
-L1Emulation('eclBhabhaVeto', 'EC1HLT>0 and EC2HLT>0.0 and EC12HLT>7.0 and AngGGHLT>100', analysis_main, [1])
+L1Emulation('eclBhabhaVeto', 'EC1HLT>0 and EC2HLT>0.0 and EC12HLT>7.0 and AngGGCMSHLT>1.745', analysis_main, [1])
 
 # BhabhaVetoHLT, the logic "eclBhabhaVetoHLT" could is available here
 L1Emulation('BhabhaVeto', 'eclBhabhaVetoHLT==1 and NtHLT==2 and NtcHLT==2', analysis_main, [1])
@@ -47,7 +47,7 @@ L1Emulation('BhabhaVeto', 'eclBhabhaVetoHLT==1 and NtHLT==2 and NtcHLT==2', anal
 # Bhabha veto with single track
 L1Emulation(
     'SBhabhaVeto',
-    'EC1HLT > 0 and EC2HLT > 0.0 and EC12HLT > 5.0 and AngGGHLT > 100 and' +
+    'EC1HLT > 0 and EC2HLT > 0.0 and EC12HLT > 5.0 and AngGGCMSHLT > 1.745 and' +
     ' NtHLT == 1 and NtcHLT == 1 and ENeutralHLT > 0.5 and PT1HLT > 2.5 and ET1HLT > 2.0',
     analysis_main,
     [1])
@@ -64,9 +64,9 @@ L1Emulation('ggVeto', 'eclBhabhaVetoHLT==1 and NtHLT==0', analysis_main, [1])
 # trigger path will be scaled as a function of the election's theta in lab frame by default.
 L1Emulation('TwoTracks', 'NltHLT==2 and BhabhaVetoHLT==0', analysis_main, [1])
 L1Emulation('TwoTracksScale', 'NltHLT==2', analysis_main, [2000])
-L1Emulation('OneTrkOneMu', 'NtHLT>=1 and Layer1KLMHLT>=3 and maxAngTMHLT>45', analysis_main, [1])
+L1Emulation('OneTrkOneMu', 'NtHLT>=1 and Layer1KLMHLT>=3 and maxAngTMHLT>0.785', analysis_main, [1])
 L1Emulation('Hadron1', 'NtHLT>=3 and NltHLT>=2', analysis_main, [1])
-L1Emulation('Neutral', 'NcHLT>=3 and AngGGHLT>20 and AngGGHLT<170 and eclBhabhaVetoHLT==0', analysis_main, [1])
+L1Emulation('Neutral', 'NcHLT>=3 and AngGGCMSHLT>0.349 and AngGGCMSHLT<2.967 and eclBhabhaVetoHLT==0', analysis_main, [1])
 
 # Finally, load L1EmulationPrint module to print the reigger result on screen.
 L1EmulationPrint(analysis_main)

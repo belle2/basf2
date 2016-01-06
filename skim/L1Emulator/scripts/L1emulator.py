@@ -22,7 +22,7 @@ def add_L1Emulation(path):
     L1Emulation('BhabhaAccept1', 'NtHLT>=1 and NtcHLT>=1 and eclBhabhaVetoHLT==1', path,
                 [1700, 1700, 600, 300, 100, 80, 50, 30, 30, 20, 15, 10, 10, 10, 10])
 
-    L1Emulation('BhabhaAccept2', 'NtHLT>=2 and NtcHLT>=1 and maxAngTTHLT>150 and [EC1HLT>3.0 or EC2HLT>1.0]', path, [
+    L1Emulation('BhabhaAccept2', 'NtHLT>=2 and NtcHLT>=1 and maxAngTTCMSHLT>2.618 and [EC1HLT>3.0 or EC2HLT>1.0]', path, [
                 1700, 1700, 600, 300, 100, 80, 50, 30, 30, 20, 15, 10, 10, 10, 10])
 
     # ggAccept
@@ -39,7 +39,7 @@ def add_L1Emulation(path):
     L1Emulation('TwoTracksScale', 'NltHLT==2', path, [2000])
 
     # one track one muon
-    L1Emulation('OneTrkOneMu', 'NtHLT>=1 and Layer1KLMHLT>=3 and maxAngTMHLT>45', path, [1])
+    L1Emulation('OneTrkOneMu', 'NtHLT>=1 and Layer1KLMHLT>=3 and maxAngTMHLT>0.785', path, [1])
 
     # two muons
     # L1Emulation('TwoMu','Layer1KLMHLT>=3 and Layer2KLMHLT>=3 and maxAngMMHLT>45',path,[10])
@@ -54,12 +54,12 @@ def add_L1Emulation(path):
     # one track one cluster
     L1Emulation(
         'OneTrkOneCluster',
-        'NcHLT>=1 and EC1HLT>0.5 and NtHLT>=1 and AngGTHLT>45 and BhabhaVetoHLT==0 and SBhabhaVetoHLT==0',
+        'NcHLT>=1 and EC1HLT>0.5 and NtHLT>=1 and AngGTHLT>0.785 and BhabhaVetoHLT==0 and SBhabhaVetoHLT==0',
         path,
         [1])
 
     # one track one cluster
-    L1Emulation('OneTrkOneClusterScale', 'NcHLT>=1 and EC1HLT>0.5 and NtHLT>=1 and AngGTHLT>45', path, [2000])
+    L1Emulation('OneTrkOneClusterScale', 'NcHLT>=1 and EC1HLT>0.5 and NtHLT>=1 and AngGTHLT>0.785', path, [2000])
 
     # two back to back tracks
     # L1Emulation('TwoBBtracks','NtHLT==2 and maxAngTTHLT>45 and BhabhaVetoHLT==0',path,[1])
@@ -75,9 +75,9 @@ def add_L1Emulation(path):
 
     L1Emulation('Hadron1', 'NtHLT>=3 and NltHLT>=2', path, [1])
 
-    L1Emulation('Hadron2', 'NcHLT>=4 and AngGGHLT>45 and AngGGHLT<170 and eclBhabhaVetoHLT==0', path, [1])
+    L1Emulation('Hadron2', 'NcHLT>=4 and AngGGCMSHLT>0.785 and AngGGCMSHLT<2.967 and eclBhabhaVetoHLT==0', path, [1])
 
-    L1Emulation('Neutral', 'NcHLT>=3 and AngGGHLT>20 and AngGGHLT<170 and eclBhabhaVetoHLT==0', path, [1])
+    L1Emulation('Neutral', 'NcHLT>=3 and AngGGCMSHLT>0.349 and AngGGCMSHLT<2.967 and eclBhabhaVetoHLT==0', path, [1])
 
     L1EmulationPrint(path)
 
@@ -87,7 +87,7 @@ def L1Emulation_Veto(path):
     This function adds the veto triggers to the path
     """
     # eclBhabhaVetoHLT
-    L1Emulation('eclBhabhaVeto', 'EC1HLT>0 and EC2HLT>0.0 and EC12HLT>7.0 and AngGGHLT>100', path, [1])
+    L1Emulation('eclBhabhaVeto', 'EC1HLT>0 and EC2HLT>0.0 and EC12HLT>7.0 and AngGGCMSHLT>1.745', path, [1])
 
     # BhabhaVetoHLT, the logic "eclBhabhaVetoHLT" could is available here
     L1Emulation('BhabhaVeto', 'eclBhabhaVetoHLT==1 and NtHLT==2 and NtcHLT==2', path, [1])
@@ -95,7 +95,7 @@ def L1Emulation_Veto(path):
     # Bhabha veto with single track
     L1Emulation(
         'SBhabhaVeto',
-        'EC1HLT > 0 and EC2HLT > 0.0 and EC12HLT > 5.0 and AngGGHLT > 100 and' +
+        'EC1HLT > 0 and EC2HLT > 0.0 and EC12HLT > 5.0 and AngGGCMSHLT > 1.745 and' +
         ' NtHLT == 1 and NtcHLT == 1 and ENeutralHLT > 0.5 and PT1HLT > 2.5 and ET1HLT > 2.0',
         path,
         [1])

@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <stdlib.h>
 
 using namespace std;
@@ -26,23 +25,14 @@ namespace Belle2 {
 
   namespace TOP {
 
-    TOPGeometryPar* TOPGeometryPar::p_B4TOPGeometryParDB = 0;
+    TOPGeometryPar* TOPGeometryPar::s_instance = 0;
 
     TOPGeometryPar* TOPGeometryPar::Instance()
     {
-      if (!p_B4TOPGeometryParDB) {
-        p_B4TOPGeometryParDB = new TOPGeometryPar();
+      if (!s_instance) {
+        s_instance = new TOPGeometryPar();
       }
-      return p_B4TOPGeometryParDB;
-    }
-
-    TOPGeometryPar::TOPGeometryPar()
-    {
-      clear();
-    }
-
-    TOPGeometryPar::~TOPGeometryPar()
-    {
+      return s_instance;
     }
 
     void TOPGeometryPar::Initialize(const GearDir& content)
@@ -61,103 +51,9 @@ namespace Belle2 {
       m_initialized = true;
     }
 
-    void TOPGeometryPar::clear(void)
-    {
-
-      //! Bars
-      m_Nbars = 0;
-      m_Radius = 0;
-      m_phi0 = 0;
-      m_Qwidth = 0;
-      m_Qthickness = 0;
-      m_Bposition = 0;
-      m_Length1 = 0;
-      m_Length2 = 0;
-      m_Length3 = 0;
-      m_WLength = 0;
-      m_Wwidth = 0;
-      m_Wextdown = 0;
-      m_Wflat = 0;
-      m_Gwidth1 = 0;
-      m_Gwidth2 = 0;
-      m_Gwidth3 = 0;
-      m_SigmaAlpha = 0;
-
-      //! PMT's
-      m_Xgap = 0;
-      m_Ygap = 0;
-      m_Npmtx = 0;
-      m_Npmty = 0;
-      m_Msizex = 0;
-      m_Msizey = 0;
-      m_Msizez = 0;
-      m_MWallThickness = 0;
-      m_Asizex = 0;
-      m_Asizey = 0;
-      m_Asizez = 0;
-      m_Winthickness = 0;
-      m_Botthickness = 0;
-      m_Npadx = 0;
-      m_Npady = 0;
-      m_padx = 0;
-      m_pady = 0;
-      m_AsizexHalf = 0;
-      m_AsizeyHalf = 0;
-      m_dGlue = 0;
-      m_pmtOffsetX = 0;
-      m_pmtOffsetY = 0;
-
-      //! TDC
-      m_NTDC = 0;
-      m_TDCwidth = 0;
-      m_TDCoffset = 0;
-      m_pileupTime = 0;
-      m_doubleHitResolution = 0;
-
-      //! electronics jitter and efficiency (not in xml!)
-      m_ELjitter = 0;
-      m_ELefficiency = 1.0;
-
-      //! TTS
-      m_NgaussTTS = 0;
-      for (int i = 0; i < MAXPTS_TTS; i++) {
-        m_TTSfrac[i] = 0;
-        m_TTSmean[i] = 0;
-        m_TTSsigma[i] = 0;
-      }
-
-      //! QE
-      m_ColEffi = 0;
-      m_LambdaFirst = 0;
-      m_LambdaStep = 0;
-      m_NpointsQE = 0;
-      for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0;}
-
-      //! Support structure
-      m_PannelThickness = 0;
-      m_PlateThickness = 0;
-      m_LowerGap = 0;
-      m_UpperGap = 0;
-      m_SideGap = 0;
-      m_ZForward = 0;
-      m_ZBackward = 0;
-
-      //! Mirror
-      m_Mirposx = 0;
-      m_Mirposy = 0;
-      m_Mirthickness = 0;
-      m_Mirradius = 0;
-
-      //! Other
-
-      m_unit = Unit::cm;
-      m_initialized = false;
-
-    }
-
     void TOPGeometryPar::read(const GearDir& content)
     {
-      //! Bars
+      // Bars
 
       GearDir barParams(content, "Bars");
       m_Nbars = barParams.getInt("Nbar");
@@ -189,85 +85,86 @@ namespace Belle2 {
       }
       m_unit = saved_unit;
 
-      //! PMT's
+      // PMT's
 
-      GearDir detParams(content, "PMTs");
-      m_Xgap = detParams.getLength("Xgap");
-      m_Ygap = detParams.getLength("Ygap");
-      m_Npmtx = detParams.getInt("nPMTx");
-      m_Npmty = detParams.getInt("nPMTy");
-      m_Msizex = detParams.getLength("Module/ModuleXSize");
-      m_Msizey = detParams.getLength("Module/ModuleYSize");
-      m_Msizez = detParams.getLength("Module/ModuleZSize");
-      m_MWallThickness = detParams.getLength("Module/ModuleWall");
-      m_Asizex = detParams.getLength("Module/SensXSize");
-      m_Asizey = detParams.getLength("Module/SensYSize");
-      m_Asizez = detParams.getLength("Module/SensThickness");
-      m_Winthickness = detParams.getLength("Module/WindowThickness");
-      m_Botthickness = detParams.getLength("Module/BottomThickness");
-      m_Npadx = detParams.getInt("Module/PadXNum");
-      m_Npady = detParams.getInt("Module/PadYNum");
-      m_dGlue = detParams.getLength("dGlue");
-      m_pmtOffsetX = detParams.getLength("offsetX", 0.0);
-      m_pmtOffsetY = detParams.getLength("offsetY", 0.0);
+      GearDir pmtParams(content, "PMTs");
+      m_Xgap = pmtParams.getLength("Xgap");
+      m_Ygap = pmtParams.getLength("Ygap");
+      m_Npmtx = pmtParams.getInt("nPMTx");
+      m_Npmty = pmtParams.getInt("nPMTy");
+      m_Msizex = pmtParams.getLength("Module/ModuleXSize");
+      m_Msizey = pmtParams.getLength("Module/ModuleYSize");
+      m_Msizez = pmtParams.getLength("Module/ModuleZSize");
+      m_MWallThickness = pmtParams.getLength("Module/ModuleWall");
+      m_Asizex = pmtParams.getLength("Module/SensXSize");
+      m_Asizey = pmtParams.getLength("Module/SensYSize");
+      m_Asizez = pmtParams.getLength("Module/SensThickness");
+      m_Winthickness = pmtParams.getLength("Module/WindowThickness");
+      m_Botthickness = pmtParams.getLength("Module/BottomThickness");
+      m_Npadx = pmtParams.getInt("Module/PadXNum");
+      m_Npady = pmtParams.getInt("Module/PadYNum");
+      m_dGlue = pmtParams.getLength("dGlue");
+      m_pmtOffsetX = pmtParams.getLength("offsetX", 0.0);
+      m_pmtOffsetY = pmtParams.getLength("offsetY", 0.0);
       m_padx = m_Asizex / (double)m_Npadx;
       m_pady = m_Asizey / (double)m_Npady;
       m_AsizexHalf = m_Asizex / 2;
       m_AsizeyHalf = m_Asizey / 2;
 
+      // TDC
 
-      //! TDC
+      GearDir tdcParams(content, "TDC");
+      if (tdcParams) {
+        int numWindows = tdcParams.getInt("numWindows");
+        int numSamples = numWindows * c_WindowSize;
+        int subBits = tdcParams.getInt("subBits");
+        m_NTDC = subBits - 1;
+        int k = numSamples;
+        do {
+          m_NTDC++;
+          k /= 2;
+        } while (k > 0);
+        double samplingRate = tdcParams.getDouble("samplingRate");
+        m_TDCwidth = 1.0 / samplingRate / (1 << subBits);
+        m_TDCoffset = tdcParams.getTime("offset");
+        m_pileupTime = tdcParams.getTime("pileupTime");
+        m_doubleHitResolution = tdcParams.getTime("doubleHitResolution");
+      } else {
+        m_NTDC = pmtParams.getInt("Module/TDCbits");
+        m_TDCwidth = pmtParams.getTime("Module/TDCbitwidth");
+        m_TDCoffset = pmtParams.getTime("Module/TDCoffset", 0);
+        m_pileupTime = pmtParams.getTime("Module/TDCpileupTime", 0);
+        m_doubleHitResolution = pmtParams.getTime("Module/TDCdoubleHitResolution", 0);
+      }
 
-      m_NTDC = detParams.getInt("Module/TDCbits");
-      m_TDCwidth = detParams.getTime("Module/TDCbitwidth");
-      m_TDCoffset = detParams.getTime("Module/TDCoffset", 0);
-      m_pileupTime = detParams.getTime("Module/TDCpileupTime", 0);
-      m_doubleHitResolution = detParams.getTime("Module/TDCdoubleHitResolution", 0);
+      // TTS
 
-      //! TTS
-
-      m_NgaussTTS = 0;
-      for (int i = 0; i < MAXPTS_TTS; i++) {
-        int ii = i + 1;
-        stringstream ss; string cc;
-        ss << ii; ss >> cc;
-        string path = "TTS/Gauss[@component='term-" + cc + "']/";
-        GearDir tts(detParams, path);
-        if (!tts) break;
-        m_NgaussTTS++;
-        m_TTSfrac[i] = tts.getDouble("fraction");
-        m_TTSmean[i] = tts.getTime("mean");
-        m_TTSsigma[i] = tts.getTime("sigma");
+      GearDir ttsParams(pmtParams, "TTS");
+      for (const GearDir& Gauss : ttsParams.getNodes("Gauss")) {
+        m_TTSfrac.push_back(Gauss.getDouble("fraction"));
+        m_TTSmean.push_back(Gauss.getTime("mean"));
+        m_TTSsigma.push_back(Gauss.getTime("sigma"));
       }
       double fracsum = 0;
-      for (int i = 0; i < m_NgaussTTS; i++) {fracsum += m_TTSfrac[i];}
+      for (unsigned i = 0; i < m_TTSfrac.size(); i++) {fracsum += m_TTSfrac[i];}
       if (fracsum > 0) {
-        for (int i = 0; i < m_NgaussTTS; i++) {m_TTSfrac[i] /= fracsum;}
-        B2INFO("TOPGeometryPar: TTS defined with " << m_NgaussTTS << " Gaussian terms");
+        for (unsigned i = 0; i < m_TTSfrac.size(); i++) {m_TTSfrac[i] /= fracsum;}
+        B2INFO("TOPGeometryPar: TTS defined with " << getNgaussTTS() << " Gaussian terms");
       } else {
-        m_NgaussTTS = 0;
-        B2ERROR("TOPGeometryPar: TTS - sum of fractions =0 -> Ngauss set to 0");
+        B2ERROR("TOPGeometryPar: TTS - sum of fractions = 0");
       }
 
-      //! quantum & collection efficiency
+      // quantum & collection efficiency
 
       GearDir qeParams(content, "QE");
       m_ColEffi = qeParams.getDouble("ColEffi");
       m_LambdaFirst = qeParams.getLength("LambdaFirst") / Unit::nm;
       m_LambdaStep = qeParams.getLength("LambdaStep") / Unit::nm;
-      m_NpointsQE = 0;
-      for (int i = 0; i < MAXPTS_QE; i++) {
-        int ii = i + 1;
-        stringstream ss; string cc;
-        ss << ii; ss >> cc;
-        string path = "Qeffi[@component='point-" + cc + "']/";
-        GearDir qe(qeParams, path);
-        if (!qe) break;
-        m_NpointsQE++;
-        m_QE[i] = qe.getDouble("qe");
+      for (const GearDir& Qeffi : qeParams.getNodes("Qeffi")) {
+        m_QE.push_back(Qeffi.getDouble(""));
       }
 
-      //! Mirror
+      // Mirror
 
       GearDir mirParams(content, "Mirror");
       m_Mirposx = mirParams.getLength("Xpos");
@@ -275,7 +172,7 @@ namespace Belle2 {
       m_Mirthickness = mirParams.getLength("mirrorThickness");
       m_Mirradius = mirParams.getLength("Radius");
 
-      //! Support structure
+      // Support structure
 
       GearDir supParams(content, "Support");
       m_PannelThickness = supParams.getLength("PannelThickness");
@@ -290,7 +187,7 @@ namespace Belle2 {
       double backGap = supParams.getLength("backGap");
       m_ZBackward = m_Bposition - m_Gwidth1 - m_WLength - backGap - m_PannelThickness;
 
-      //! store alignment directory
+      // store alignment directory
 
       m_alignment = GearDir(content, "Alignment/");
 
@@ -301,8 +198,8 @@ namespace Belle2 {
       if (e < 0.001) return 0;
       double dlam = 1240 / e - m_LambdaFirst;
       if (dlam < 0) return 0;
-      int i = int(dlam / m_LambdaStep);
-      if (i > m_NpointsQE - 2) return 0;
+      unsigned int i = int(dlam / m_LambdaStep);
+      if (i > m_QE.size() - 2) return 0;
       return m_QE[i] + (m_QE[i + 1] - m_QE[i]) / m_LambdaStep * (dlam - i * m_LambdaStep);
     }
 
@@ -374,35 +271,29 @@ namespace Belle2 {
 
     G4Transform3D TOPGeometryPar::getAlignment(const string& component)
     {
-      //! Format the path using BOOST
+      // Format the path using BOOST
       string path = (boost::format("Align[@component='%1%']/") % component).str();
-      //! Appendt path to alignement path
+      // Appendt path to alignement path
       GearDir params(m_alignment, path);
-      //! Check if parameter exists
+      // Check if parameter exists
       if (!params) {
         B2WARNING("Could not find alignment parameters for component " << component);
         return G4Transform3D();
       }
-      //! Read the translations
+      // Read the translations
       double dU = params.getLength("du") / m_unit;
       double dV = params.getLength("dv") / m_unit;
       double dW = params.getLength("dw") / m_unit;
-      //! Read the rotations
+      // Read the rotations
       double alpha = params.getAngle("alpha");
       double beta  = params.getAngle("beta");
       double gamma = params.getAngle("gamma");
-      //! Combine rotations and tralstions
+      // Combine rotations and tralstions
       G4RotationMatrix rotation(alpha, beta, gamma);
       G4ThreeVector translation(dU, dV, dW);
-      //! Return combine matrix
+      // Return combine matrix
       return G4Transform3D(rotation, translation);
     }
 
-
-    void TOPGeometryPar::Print(void) const
-    {
-      //! Here to be added the printout of the parameters
-    }
-
-  } //! End namespace TOP
-} //! End namespace Belle2
+  } // End namespace TOP
+} // End namespace Belle2

@@ -15,7 +15,6 @@
 #include <boost/python/list.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/str.hpp>
-#include <numpy/arrayobject.h>
 
 #include <framework/logging/Logger.h>
 #include <cstdio>
@@ -48,9 +47,7 @@ double PyEstimator::predict(const std::vector<double>& inputVariables)
   expand(nVars);
 
   for (size_t iVar = 0; iVar < nVars; ++iVar) {
-    double* cell = static_cast<double*>(PyArray_GETPTR2(m_array.ptr(), 0, iVar));
-    *cell = inputVariables[iVar];
-    // m_array[boost::python::make_tuple(0, iVar)] = inputVariables[iVar];
+    m_array[boost::python::make_tuple(0, iVar)] = inputVariables[iVar];
   }
   return predict(m_array);
 }
@@ -66,9 +63,7 @@ double PyEstimator::predict(const std::vector<NamedFloatTuple*>& floatTuples)
 
   for (NamedFloatTuple* floatTuple : floatTuples) {
     for (size_t iTuple = 0; iTuple < floatTuple->size(); ++iTuple) {
-      double* cell = static_cast<double*>(PyArray_GETPTR2(m_array.ptr(), 0, iVar));
-      *cell = floatTuple->get(iTuple);
-      // m_array[boost::python::make_tuple(0, iVar)] = floatTuple->get(iTuple);
+      m_array[boost::python::make_tuple(0, iVar)] = floatTuple->get(iTuple);
       ++iVar;
     }
   }
@@ -82,16 +77,12 @@ double PyEstimator::predict(boost::python::object& array)
     predictions = m_predict(array);
     if (m_is_binary_classification) {
       // In case of a binary classification we take the signal probability
-      double* cell = static_cast<double*>(PyArray_GETPTR2(predictions.ptr(), 0, 1));
-      return *cell;
-      // boost::python::object prediction = predictions[0];
-      // return boost::python::extract<double>(prediction[1]);
+      boost::python::object prediction = predictions[0];
+      return boost::python::extract<double>(prediction[1]);
     } else {
       // In case of regression we take the regression value
-      double* cell = static_cast<double*>(PyArray_GETPTR1(predictions.ptr(), 0));
-      return *cell;
-      // boost::python::object prediction = predictions[0];
-      // return boost::python::extract<double>(prediction);
+      boost::python::object prediction = predictions[0];
+      return boost::python::extract<double>(prediction);
     }
   } catch (const boost::python::error_already_set&) {
     PyErr_Print();

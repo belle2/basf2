@@ -66,10 +66,10 @@ void PindiodeStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in PINDIODE.xml.
   for (int i = 0; i < 100; i++) {
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 10.);
-    h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 10.);
-    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 1000.);
-    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 1000.);
+    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 1000.);
+    h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 100.);
+    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
+    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
   }
 
 }
@@ -104,8 +104,6 @@ void PindiodeStudyModule::event()
 
   //int nSimHits = SimHits.getEntries();
   int nHits = Hits.getEntries();
-  cout << "nHits " << nHits << endl;
-
 
   for (int i = 0; i < nHits; i++) {
     PindiodeHit* aHit = Hits[i];
@@ -113,8 +111,8 @@ void PindiodeStudyModule::event()
     double edep = aHit->getedep();
     double volt = aHit->getV();
     double time = aHit->gettime();
-    h_dose[detNb]->Fill(edep);
-    h_volt[detNb]->Fill(volt);
+    h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
+    h_volt[detNb]->Fill(volt * 1e3); //V to mV
     h_time[detNb]->Fill(time);
     h_vtime[detNb]->Fill(time, volt);
   }

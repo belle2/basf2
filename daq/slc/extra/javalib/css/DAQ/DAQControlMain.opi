@@ -2645,7 +2645,7 @@ $(pv_value)</tooltip>
       <auto_size>false</auto_size>
       <rotation_angle>0.0</rotation_angle>
       <scripts>
-        <path pathString="../Test/stateview.js" checkConnect="true" sfe="false" seoe="false">
+        <path pathString="stateview.js" checkConnect="true" sfe="false" seoe="false">
           <pv trig="true">nsm://get:${NSMTARGET}:rcstate</pv>
         </path>
       </scripts>

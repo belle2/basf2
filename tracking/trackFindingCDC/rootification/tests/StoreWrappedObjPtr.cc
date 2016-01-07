@@ -85,8 +85,8 @@ TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStor
   //ASSERT_NE(-1,PyRun_SimpleString("print 'pyStoreObj is',pyStoreObj"));
   ASSERT_NE(-1,
             PyRun_SimpleString("if not pyStoreObj: raise ValueError('PyStoreObj does not point to a valid object on the DataStore')"));
-  ASSERT_NE(-1, PyRun_SimpleString("print 'pyStoreObj.obj() is', pyStoreObj.obj()"));
-  ASSERT_NE(-1, PyRun_SimpleString("print 'pyStoreObj.obj().unwrap() is', pyStoreObj.obj().unwrap()"));
+  ASSERT_NE(-1, PyRun_SimpleString("print('pyStoreObj.obj() is', pyStoreObj.obj())"));
+  ASSERT_NE(-1, PyRun_SimpleString("print('pyStoreObj.obj().unwrap() is', pyStoreObj.obj().unwrap())"));
 
   //Note: if an error is raised in Python the return value is -1
   //ASSERT_EQ(-1,PyRun_SimpleString("raise ValueError('This is a test')"));

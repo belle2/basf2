@@ -86,7 +86,12 @@ void MCTrackCandClassifierModule::initialize()
 
   // MCParticles, MCTrackCands, MCTracks needed for this module
   StoreArray<MCParticle>::required(m_mcParticlesName);
-  StoreArray<genfit::TrackCand>::required(m_mcTrackCandsColName);
+  StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
+  mcTrackCands.isRequired();
+  //  m_selector.registerSubset( mcTrackCands, "idealMCTrackCands");
+  StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
+  idealMCTrackCands.registerInDataStore();
+  idealMCTrackCands.create();
 
   StoreArray<PXDTrueHit>::required("");
   StoreArray<SVDTrueHit>::required("");
@@ -205,6 +210,8 @@ void MCTrackCandClassifierModule::event()
 
 
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
+
+  StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
 
   //3. retrieve all MCTrackCands
   StoreArray<genfit::TrackCand> mcTrackCands;
@@ -419,6 +426,7 @@ void MCTrackCandClassifierModule::event()
           m_h3_GoodMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
           m_h1_nGood1dInfo->Fill(nGood1Dinfo);
+          idealMCTrackCands.appendNew(mcTrackCand);
         } else {
           B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
           m_h1_nBadTrueHits->Fill(nGoodTrueHits);
@@ -429,6 +437,7 @@ void MCTrackCandClassifierModule::event()
           B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGoodTrueHits << " TrueHits (" << nGood1Dinfo << " good 1D info)");
           m_h3_GoodMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
+          idealMCTrackCands.appendNew(mcTrackCand);
         } else {
           B2INFO("  too few good true hits " << nGoodTrueHits);
           m_h1_nBadTrueHits->Fill(nGoodTrueHits);
@@ -438,7 +447,7 @@ void MCTrackCandClassifierModule::event()
       B2DEBUG(1, "");
 
     } //close loop on MCParticles
-  }
+  }//close loop on MCTrackCands
 
 }
 

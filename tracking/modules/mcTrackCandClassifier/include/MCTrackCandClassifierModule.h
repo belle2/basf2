@@ -23,8 +23,9 @@
 
 #include <vxd/dataobjects/VXDTrueHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-//#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
+#include <framework/datastore/SelectSubset.h>
+#include <genfit/TrackCand.h>
 
 namespace Belle2 {
 
@@ -71,6 +72,8 @@ namespace Belle2 {
     virtual void terminate();
 
   protected:
+
+    //    SelectSubset< genfit::TrackCand > m_selector; /**<selector*/
 
     std::string m_mcTrackCandsColName; /**< TrackCand list name*/
     std::string m_mcParticlesName;  /**< MCParticle list name*/

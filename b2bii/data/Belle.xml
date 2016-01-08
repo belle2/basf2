@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Detector xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Name>BelleDetector</Name>
+  <Description>The Belle detector</Description>
+  <Global>
+    <material>Air</material>
+    <width  unit="m">8.0</width>
+    <length unit="m">8.0</length>
+    <height unit="m">8.0</height>
+  </Global>
+
+  <!-- Magnetic field -->
+  <xi:include href="../b2bii/BelleMagneticFieldConstant.xml"/>
+
+</Detector>

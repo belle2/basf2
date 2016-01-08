@@ -21,6 +21,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)
 
+    gearbox = register_module('Gearbox')
+    gearbox.param('fileName', 'b2bii/Belle.xml')
+    path.add_module(gearbox)
+
+    path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+
     # Fix MSDT Module
     fix = register_module('B2BIIFixMdst')
     # fix.logging.set_log_level(LogLevel.DEBUG)

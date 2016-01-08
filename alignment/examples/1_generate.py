@@ -39,11 +39,14 @@ class TrackFitCheck(Module):
         if track.getNumPointsWithMeasurement() > 24:
             print('Num points > 24 : ', str(track.getNumPointsWithMeasurement()))
             return False
-        if track.getNumPointsWithMeasurement() < 5:
-            print('Num points < 5 : ', str(track.getNumPointsWithMeasurement()))
+        if track.getNumPointsWithMeasurement() < 3:
+            print('Num points < 3 : ', str(track.getNumPointsWithMeasurement()))
             return False
         if track.getFitStatus().getPVal() < 0.001:
             print('P-value < 0.001 : ', str(track.getFitStatus().getPVal()))
+            return False
+        if not track.isFitConvergedFully():
+            print('Fit not completely sucessfull')
             return False
 
         return True
@@ -53,25 +56,34 @@ class TrackFitCheck(Module):
     def event(self):
         """ Return True if event is fine, False otherwise """
         tracks = Belle2.PyStoreArray('GF2Tracks')
-        ok = True
+        someOK = False
         if tracks.getEntries():
-            for track in tracks:
-                if not self.isOK(track):
-                    ok = False
-                    break
-        else:
-            ok = False
-        if not ok:
+            for itrack, track in enumerate(tracks):
+                if self.isOK(track):
+                    someOK = True
+                else:
+                    relations = Belle2.PyStoreObj('TrackCandsToGF2Tracks').obj()
+                    for irelation in range(0, relations.getEntries()):
+                        relation = relations.getElement(irelation)
+                        if relation.getToIndex() == itrack:
+                            cands = Belle2.PyStoreArray('TrackCands')
+                            print('Re-setting cand')
+                            cands[relation.getFromIndex()].reset()
+
+        if not someOK:
             print('Event has no good tracks. It will not be stored')
-        super(TrackFitCheck, self).return_value(ok)
+        super(TrackFitCheck, self).return_value(someOK)
 
 main = create_path()
 main.add_module('EventInfoSetter', expList=[experiment], runList=[run], evtNumList=[nevents])
 
+import beamparameters as beam
+beam.add_beamparameters(main, "Y4S")
+
 if cosmics_run:
     main.add_module('Cosmics')
 else:
-    main.add_module('ParticleGun')
+    main.add_module('EvtGenInput')
 
 main.add_module('Gearbox')
 
@@ -83,27 +95,20 @@ else:
 main.add_module('MagnetConfiguration')
 
 main.add_module('FullSim')
+main.add_module('PXDDigitizer')
+main.add_module('SVDDigitizer')
+main.add_module('PXDClusterizer')
+main.add_module('SVDClusterizer')
 # main.add_module('CDCDigitizer')
-main.add_module('TrackFinderMCTruth', UseClusters=False)
+main.add_module('TrackFinderMCTruth', UseClusters=True, WhichParticles='SVD')
 
 
 main.add_module('MagnetSwitcher')
-main.add_module('GBLfit', UseClusters=False)
+main.add_module('GBLfit', UseClusters=True)
 
 store = create_path()
-store.add_module(
-    'RootOutput',
-    outputFileName='DST_exp{:d}_run{:d}.root'.format(
-        experiment,
-        run),
-    branchNames=[
-        'EventMetaData',
-        'PXDTrueHits',
-        'SVDTrueHits',
-        'CDCHits',
-        'TrackCands',
-        'TrackFitResult',
-        'MagnetOffEvents'])
+store.add_module('RootOutput', outputFileName='DST_exp{:d}_run{:d}.root'.format(experiment, run))
+
 # main.add_module('Display')
 trackFitCheck = TrackFitCheck()
 trackFitCheck.if_true(store, AfterConditionPath.CONTINUE)

@@ -32,6 +32,8 @@ void makePlots()
   numberOfPhotons(top);
   trackResolutions(top);
 
+  input->Close();
+  
 }
 
 
@@ -64,6 +66,7 @@ void kaonID(TTree* top)
     "Kaon ID: efficiency in % for log L_K > log L_pi, "
     "for low (p < 2 GeV/c) and high (p > 2 GeV/c) momentum regions.");
   nt->SetAlias("Check", "Several % difference to the reference may signal a problem.");
+  nt->SetAlias("Contact", "marko.staric@ijs.si");
   nt->Write();
 
   // log likelihood differences
@@ -79,6 +82,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods for true pions below 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at negative values."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h102", "log likelihood difference for kaons (p < 2 GeV/c)", 
@@ -90,6 +94,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods for true kaons below 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at positive values."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h103", "log likelihood difference for pions (p > 2 GeV/c)", 
@@ -101,6 +106,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods for true pions above 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at negative values."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h104", "log likelihood difference for kaons (p > 2 GeV/c)", 
@@ -112,6 +118,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods for true kaons above 2 GeV/c"));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at positive values."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH2F("h105", "log likelihood difference vs. momentum for pions", 
@@ -123,6 +130,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods versus momentum for true pions."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed below zero."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH2F("h106", "log likelihood difference vs. momentum for kaons", 
@@ -134,6 +142,7 @@ void kaonID(TTree* top)
     "Difference between kaon and pion log likelihoods versus momentum for true kaons."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed above zero."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   output->Close();
@@ -158,6 +167,7 @@ void numberOfPhotons(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Distribution should peak at around 20 photons; bin at zero must be fairly small; "
     "long tail is normal."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH2F("h202", "number of detected photons per track vs polar angle", 
@@ -169,6 +179,7 @@ void numberOfPhotons(TTree* top)
     "Number of detected photons per track versus polar angle."));
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     ""));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   output->Close();
@@ -199,6 +210,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h302", "extrapolated track resolution in x (e.g. r#phi) for p < 2 GeV/c", 
@@ -212,6 +224,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h303", "extrapolated track resolution in #theta for p < 2 GeV/c", 
@@ -225,6 +238,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h304", "extrapolated track resolution in #phi for p < 2 GeV/c", 
@@ -238,6 +252,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h305", "extrapolated track resolution in time-of-flight for p < 2 GeV/c", 
@@ -252,6 +267,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   // resolutions above 2 GeV/c
@@ -269,6 +285,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h307", "extrapolated track resolution in x (e.g. r#phi) for p > 2 GeV/c", 
@@ -282,6 +299,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h308", "extrapolated track resolution in #theta for p > 2 GeV/c", 
@@ -295,6 +313,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h309", "extrapolated track resolution in #phi for p > 2 GeV/c", 
@@ -308,6 +327,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   h = new TH1F("h310", "extrapolated track resolution in time-of-flight for p > 2 GeV/c", 
@@ -322,6 +342,7 @@ void trackResolutions(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Significantly broader distribution or offset to zero signals problems in tracking "
     "and may cause severe PID performance degradation."));
+  h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
   h->Write();
 
   output->Close();

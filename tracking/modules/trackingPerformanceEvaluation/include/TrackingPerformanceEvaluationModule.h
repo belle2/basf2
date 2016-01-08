@@ -19,7 +19,8 @@
 #include <TH3F.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
+//#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
 
 // forward declarations
 class TTree;

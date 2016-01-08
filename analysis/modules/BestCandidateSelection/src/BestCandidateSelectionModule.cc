@@ -86,7 +86,7 @@ void BestCandidateSelectionModule::event()
     std::string root_compatible_VariableName = Variable::makeROOTCompatible(m_variableName);
     extraInfoName = root_compatible_VariableName + "_rank";
   } else {
-    extraInfoName = m_outputVariableName + "_rank";
+    extraInfoName = m_outputVariableName;
   }
   //remove everything but best candidates
   m_inputList->clear();

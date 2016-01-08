@@ -170,6 +170,37 @@ void CDCDedxPIDModule::initialize()
     //leaking pdf_file so I can access the histograms
   }
 
+  // load constants
+  // setting these manually for now, but they should be read in from the DB
+  m_curvepars[0] = 0.00545132;
+  m_curvepars[1] = 41.6793;
+  m_curvepars[2] = 2.97269;
+  m_curvepars[3] = -0.368886;
+  m_curvepars[4] = 9.21519;
+  m_curvepars[5] = 0.104981;
+  m_curvepars[6] = -2.02984;
+  m_curvepars[7] = -0.0001284;
+  m_curvepars[8] = 0.0029632;
+  m_curvepars[9] = -0.0132804;
+  m_curvepars[10] = 0.707393;
+  m_curvepars[11] = 0.103633;
+  m_curvepars[12] = 0.811629;
+  m_curvepars[13] = 0.556386;
+  m_curvepars[14] = 0.0111639;
+
+  m_sigmapars[0] = 0.0107285;
+  m_sigmapars[1] = 0.0751956;
+  m_sigmapars[2] = 1.94039e-05;
+  m_sigmapars[3] = -0.00186657;
+  m_sigmapars[4] = 0.0669173;
+  m_sigmapars[5] = -1.07031;
+  m_sigmapars[6] = 7.17788;
+  m_sigmapars[7] = 44.0723;
+  m_sigmapars[8] = -124.406;
+  m_sigmapars[9] = 127.586;
+  m_sigmapars[10] = -56.7571;
+  m_sigmapars[11] = 10.3158;
+
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
 
@@ -442,6 +473,8 @@ void CDCDedxPIDModule::event()
       const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
       const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
       dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_nHitsUsed);
     }
 
     // save the PID information if not using individual hits
@@ -547,5 +580,125 @@ void CDCDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_S
       probability = m_useIndividualHits ? (1e-5) : (1e-3); //likelihoods for truncated mean are much higher
 
     logl[iPart] += log(probability);
+  }
+}
+
+double CDCDedxPIDModule::bgCurve(double* x, double* par) const
+{
+  // calculate the predicted mean value as a function of beta-gamma (bg)
+  // this is done with a different function depending on the value of bg
+  double f = 0;
+  if (par[0] == 1)
+    f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
+        (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
+  else if (par[0] == 2)
+    f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+  else if (par[0] == 3)
+    f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+
+  return f;
+}
+
+double CDCDedxPIDModule::getMean(double bg) const
+{
+  // define the section of the curve to use
+  double A = 0, B = 0, C = 0;
+  if (bg < 4.5)
+    A = 1;
+  else if (bg < 10)
+    B = 1;
+  else
+    C = 1;
+
+  double x[1]; x[0] = bg;
+  double parsA[9];
+  double parsB[5];
+  double parsC[5];
+
+  parsA[0] = 1; parsB[0] = 2; parsC[0] = 3;
+  for (int i = 0; i < 15; ++i) {
+    if (i < 7) parsA[i + 1] = m_curvepars[i];
+    else if (i < 11) parsB[i % 7 + 1] = m_curvepars[i];
+    else parsC[i % 11 + 1] = m_curvepars[i];
+  }
+
+  // calculate dE/dx from the Bethe-Bloch curve
+  double partA = bgCurve(x, parsA);
+  double partB = bgCurve(x, parsB);
+  double partC = bgCurve(x, parsC);
+
+  return (A * partA + B * partB + C * partC);
+}
+
+double CDCDedxPIDModule::sigmaCurve(double* x, double* par) const
+{
+  // calculate the predicted mean value as a function of beta-gamma (bg)
+  // this is done with a different function depending dE/dx, nhit, and sin(theta)
+  double f = 0;
+  if (par[0] == 1) {
+    // return dedx parameterization
+    f = par[1] + par[2] * x[0];
+  } else if (par[0] == 2) {
+    // return nhit or sin(theta) parameterization
+    f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
+        par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
+  }
+
+  return f;
+}
+
+
+double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
+{
+  if (nhit < 5) nhit = 5;
+  if (sin > 0.99) sin = 0.99;
+
+  double x[1];
+  double dedxpar[3];
+  double nhitpar[6];
+  double sinpar[6];
+
+  dedxpar[0] = 1; nhitpar[0] = 2; sinpar[0] = 2;
+  for (int i = 0; i < 5; ++i) {
+    if (i < 2) dedxpar[i + 1] = m_sigmapars[i];
+    nhitpar[i + 1] = m_sigmapars[i + 2];
+    sinpar[i + 1] = m_sigmapars[i + 7];
+  }
+
+  // determine sigma from the parameterization
+  x[0] = dedx;
+  double cor_dedx = sigmaCurve(x, dedxpar);
+  x[0] = nhit;
+  double cor_nhit = sigmaCurve(x, nhitpar);
+  if (nhit > 35) cor_nhit = 1.0;
+  x[0] = sin;
+  double cor_sin = sigmaCurve(x, sinpar);
+
+  return (cor_dedx * cor_sin * cor_nhit);
+}
+
+
+void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
+                                    double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
+                                    double sin, int nhit) const
+{
+  // account for the fact that electron truncated mean peaks near 60 units -> scale to 1
+  // this should be done via calibration
+  dedx = dedx / 59.323877;
+
+  // determine a chi value for each particle type
+  Const::ParticleSet set = Const::chargedStableSet;
+  for (const Const::ChargedStable& pdgIter : set) {
+    double bg = p / pdgIter.getMass();
+
+    // determine the predicted mean and resolution
+    double mean = getMean(bg);
+    double sigma = getSigma(mean, nhit, sin);
+
+    predmean[pdgIter.getIndex()] = mean;
+    predsigma[pdgIter.getIndex()] = sigma;
+
+    // fill the chi value for this particle type
+    if (sigma != 0) chi[pdgIter.getIndex()] = ((dedx - mean) / (sigma));
   }
 }

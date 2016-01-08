@@ -70,10 +70,17 @@ namespace Belle2 {
 
   private:
 
-    /** counter for events */
-    int m_eventID;
-    /** counter for tracks in this event */
-    int m_trackID;
+    /** parameterized beta-gamma curve for predicted means */
+    double bgCurve(double* x, double* par) const;
+
+    /** calculate the predicted mean using the parameterized resolution */
+    double getMean(double bg) const;
+
+    /** parameterized resolution for predictions */
+    double sigmaCurve(double* x, double* par) const;
+
+    /** calculate the predicted resolution using the parameterized resolution */
+    double getSigma(double dedx, double nhit, double sin) const;
 
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
@@ -84,6 +91,17 @@ namespace Belle2 {
      */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
+    /** for all particles, save chi values into 'chi'.
+     *
+     * @param chi   array of chi values to be modified
+     * @param p     track momentum valid in the cdc
+     * @param dedx  dE/dx value
+     * @param sin   track sin(theta)
+     * @param nhit  number of hits used for this track
+     * */
+    void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
+                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
+
     /** for all particles, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
@@ -93,8 +111,13 @@ namespace Belle2 {
      * */
     void saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
 
-    /** dedx:momentum PDFs. */
-    TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize];
+    // parameters to determine the predicted means and resolutions
+    double m_curvepars[15];  /**< dE/dx curve parameters */
+    double m_sigmapars[12];  /**< dE/dx resolution parameters */
+
+    int m_eventID; /**< counter for events */
+    int m_trackID; /**< counter for tracks in this event */
+    TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

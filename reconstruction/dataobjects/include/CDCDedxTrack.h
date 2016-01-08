@@ -44,6 +44,7 @@ namespace Belle2 {
 
       //for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+        m_cdcChi[i] = -999.;
         m_cdcLogl[i] = 0.0;
       }
     }
@@ -188,9 +189,13 @@ namespace Belle2 {
     double m_dedx_avg_truncated;     /**< dE/dx averaged, truncated mean */
     double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */
 
+    double m_predmean[Const::ChargedStable::c_SetSize];
+    double m_predres[Const::ChargedStable::c_SetSize];
+
+    double m_cdcChi[Const::ChargedStable::c_SetSize]; /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(CDCDedxTrack, 1); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 2); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

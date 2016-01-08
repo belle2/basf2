@@ -45,7 +45,7 @@ class TrackFitCheck(Module):
         if track.getFitStatus().getPVal() < 0.001:
             print('P-value < 0.001 : ', str(track.getFitStatus().getPVal()))
             return False
-        if not track.isFitConvergedFully():
+        if not track.getFitStatus().isFitConvergedFully():
             print('Fit not completely sucessfull')
             return False
 

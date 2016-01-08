@@ -140,7 +140,7 @@ if read_file:
 
 if write_file:
     try:
-        f = open(options.profile, "w")
+        f = open(options.profile, "wb")
         f.close()
     except IOError:
         print("specified profile file could not be opened for writing",
@@ -319,7 +319,7 @@ def check_output():
     while True:
         if child.poll() is not None:
             return
-        line = child.stdout.readline().decode()
+        line = child.stdout.readline().decode("utf8", "ignore")
         # see if we have a ProcHandler message
         forkmessage = prochandler.search(line)
         if forkmessage:
@@ -330,7 +330,8 @@ def check_output():
             message = annotatemessage.group(1).strip()
             annotations.append((runtime, message))
         # forward output to stdout
-        print(line, end="")
+        sys.stdout.write(line)
+        sys.stdout.flush()
 
 # ok, if mode is record or both we now run the program and collect memory
 # information.
@@ -401,14 +402,14 @@ if do_record:
 # recording is done so let's write that data to file if requested. We use
 # numpy.savez to store all data as binary numpy arrays in that file.
 if write_file:
-    with open(options.profile, "w") as datafile:
+    with open(options.profile, "wb") as datafile:
         # numpy archives contain arrays by name so we create a dictionary with
         # all the name->data relations and save it. For total_memory this is
         # trivial, for process_names we convert it into a 2D char-array and for
         # process_memory we store each array with the pid as name
         keys = {
             "total_memory": total_memory,
-            "process_names": np.array(process_names.items()),
+            "process_names": np.array(list(process_names.items())),
             "memory_types": np.array(memory_types),
             "annotations": np.array(annotations),
         }
@@ -427,7 +428,7 @@ if read_file:
     process_memory = {}
     memory_types = None
     system_memory = None
-    with open(options.profile, "r") as datafile:
+    with open(options.profile, "rb") as datafile:
         contents = np.load(datafile)
         # loop over all elements in the file and assign to the correct
         # variables

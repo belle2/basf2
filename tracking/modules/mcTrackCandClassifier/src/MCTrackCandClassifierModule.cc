@@ -21,7 +21,7 @@
 
 #include <geometry/GeometryManager.h>
 #include <TGeoManager.h>
-
+#include <math.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <vxd/geometry/GeoCache.h>
@@ -89,6 +89,7 @@ void MCTrackCandClassifierModule::initialize()
   StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
   mcTrackCands.isRequired();
   //  m_selector.registerSubset( mcTrackCands, "idealMCTrackCands");
+  //  m_selector.inheritAllRelations();
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
   idealMCTrackCands.registerInDataStore();
   idealMCTrackCands.create();
@@ -167,7 +168,7 @@ void MCTrackCandClassifierModule::initialize()
   m_histoList->Add(m_h1_hitDistance_rejected);
   m_h1_hitDistance_rejected->GetXaxis()->SetTitle("hit distance (cm)");
 
-  m_h1_lapTime = new TH1F("h1LapTime", "lap time", 100, 0, 3);
+  m_h1_lapTime = new TH1F("h1LapTime", "lap time", 200, 0, 100);
   m_histoList->Add(m_h1_lapTime);
   m_h1_lapTime->GetXaxis()->SetTitle("lap time (ns)");
 
@@ -271,7 +272,7 @@ void MCTrackCandClassifierModule::event()
 
       double prevHitRadius = abs(1 / omega);
 
-      double lapTime = 2 * 3.14 * mcParticle.getMass() / 0.299792 / magField.Z();
+      double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / magField.Z();
       double FirstHitTime = -1;
       double HitTime = -1;
 
@@ -427,6 +428,7 @@ void MCTrackCandClassifierModule::event()
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
           m_h1_nGood1dInfo->Fill(nGood1Dinfo);
           idealMCTrackCands.appendNew(mcTrackCand);
+          //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
         } else {
           B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
           m_h1_nBadTrueHits->Fill(nGoodTrueHits);
@@ -438,6 +440,7 @@ void MCTrackCandClassifierModule::event()
           m_h3_GoodMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
           idealMCTrackCands.appendNew(mcTrackCand);
+          //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
         } else {
           B2INFO("  too few good true hits " << nGoodTrueHits);
           m_h1_nBadTrueHits->Fill(nGoodTrueHits);
@@ -603,7 +606,7 @@ bool MCTrackCandClassifierModule::isFirstLap(double FirstHitTime, double HitTime
   B2DEBUG(1, "          HitTime = " << HitTime);
   B2DEBUG(1, "       difference = " << HitTime - FirstHitTime);
 
-  m_h1_lapTime->Fill(HitTime);
+  m_h1_lapTime->Fill(LapTime);
   m_h1_timeDifference->Fill(HitTime - FirstHitTime);
   m_h1_diffOVERlap->Fill((HitTime - FirstHitTime) / LapTime);
 

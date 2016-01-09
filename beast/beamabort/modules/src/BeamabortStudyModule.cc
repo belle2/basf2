@@ -99,7 +99,7 @@ void BeamabortStudyModule::event()
 {
   //Here comes the actual event processing
 
-  StoreArray<BeamabortSimHit>  SimHits;
+  StoreArray<BeamabortSimHit> SimHits;
 
   //Skip events with no Hits
   if (SimHits.getEntries() == 0) {
@@ -115,13 +115,13 @@ void BeamabortStudyModule::event()
   }
   for (int i = 0; i < nSimHits; i++) {
     BeamabortSimHit* aHit = SimHits[i];
-    int detNb = aHit->getCellId();
-    double edep = aHit->getEnergyDep();
-    double time = aHit->getFlightTime();
+    const int detNb = aHit->getCellId();
+    const double edep = aHit->getEnergyDep();
+    const double time = aHit->getFlightTime();
     const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
     const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
     const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-    double Amp = NbEle / (6.25 * 1e18); // A x s
+    const double Amp = NbEle / (6.25 * 1e18); // A x s
     Edep[i] += edep;
     curr[i] += Amp;
     h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
@@ -135,7 +135,6 @@ void BeamabortStudyModule::event()
       h_edep[i]->Fill(Edep[i] * 1e6);
     }
   }
-
 }
 //read tube centers, impulse response, and garfield drift data filename from BEAMABORT.xml
 void BeamabortStudyModule::getXMLData()

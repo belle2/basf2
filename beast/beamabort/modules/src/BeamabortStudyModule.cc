@@ -71,6 +71,8 @@ void BeamabortStudyModule::defineHisto()
   for (int i = 0; i < 4; i++) {
     h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 1000.);
     h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 100.);
+    h_curr[i] = new TH1F(TString::Format("h_curr_%d", i), "", 10000, 0., 100.);
+    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 10000, 0., 100.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
   }
@@ -105,7 +107,12 @@ void BeamabortStudyModule::event()
   }
 
   int nSimHits = SimHits.getEntries();
-
+  double curr[4];
+  double Edep[4];
+  for (int i = 0; i < 4; i++) {
+    curr[i] = 0;
+    Edep[i] = 0;
+  }
   for (int i = 0; i < nSimHits; i++) {
     BeamabortSimHit* aHit = SimHits[i];
     int detNb = aHit->getCellId();
@@ -115,13 +122,19 @@ void BeamabortStudyModule::event()
     const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
     const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
     double Amp = NbEle / (6.25 * 1e18); // A x s
-
+    Edep[i] += edep;
+    curr[i] += Amp;
     h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
     h_amp[detNb]->Fill(Amp * 1e15); //A x s -> mA x s
     h_time[detNb]->Fill(time);
     h_vtime[detNb]->Fill(time, Amp * 1e15);
   }
-
+  for (int i = 0; i < 4; i++) {
+    if (curr[i] > 0) {
+      h_curr[i]->Fill(curr[i] * 1e15);
+      h_edep[i]->Fill(Edep[i] * 1e6);
+    }
+  }
 
 }
 //read tube centers, impulse response, and garfield drift data filename from BEAMABORT.xml

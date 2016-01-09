@@ -84,7 +84,7 @@ namespace Belle2 {
       /** histo amp */
       TH1F* h_amp[100];
       /** histo amp sum */
-      TH1F* h_curr[100];
+      TH1F* h_Amp[100];
       /** histo edep sum */
       TH1F* h_edep[100];
       /** histo time */

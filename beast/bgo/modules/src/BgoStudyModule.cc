@@ -92,6 +92,8 @@ void BgoStudyModule::beginRun()
 void BgoStudyModule::event()
 {
   //Here comes the actual event processing
+  double Edep[8];
+  for (int i = 0; i < 8; i ++)Edep[i] = 0;
 
   StoreArray<BgoSimHit>  SimHits;
 
@@ -101,8 +103,7 @@ void BgoStudyModule::event()
   }
 
   int nSimHits = SimHits.getEntries();
-  double Edep[8];
-  for (int i = 0; i < 8; i ++)Edep[i] = 0;
+
   for (int i = 0; i < nSimHits; i++) {
     BgoSimHit* aHit = SimHits[i];
     int detNb = aHit->getCellId();

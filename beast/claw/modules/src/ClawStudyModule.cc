@@ -195,7 +195,8 @@ void ClawStudyModule::beginRun()
 void ClawStudyModule::event()
 {
   //Here comes the actual event processing
-
+  double Edep[8];
+  for (int i  = 0 ; i < 8 ; i ++)Edep[i] = 0;
   StoreArray<ClawSimHit>  SimHits;
   StoreArray<ClawHit> Hits;
   /*
@@ -239,8 +240,7 @@ void ClawStudyModule::event()
   int nSimHits = SimHits.getEntries();
   //cout << nSimHits << endl;
 
-  double Edep[8];
-  for (int i  = 0 ; i < 8 ; i ++)Edep[i] = 0;
+
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     ClawSimHit* aHit = SimHits[i];

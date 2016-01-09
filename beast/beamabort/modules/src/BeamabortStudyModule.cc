@@ -69,10 +69,10 @@ void BeamabortStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in BEAMABORT.xml.
   for (int i = 0; i < 4; i++) {
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 1000.);
-    h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 100.);
-    h_curr[i] = new TH1F(TString::Format("h_curr_%d", i), "", 10000, 0., 100.);
-    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 10000, 0., 100.);
+    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 1000, 0., 1000.);
+    h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 10000.);
+    h_Amp[i] = new TH1F(TString::Format("h_Amp_%d", i), "", 100000, 0., 100000.);
+    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 4000, 0., 4000.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
   }
@@ -98,7 +98,12 @@ void BeamabortStudyModule::beginRun()
 void BeamabortStudyModule::event()
 {
   //Here comes the actual event processing
-
+  double curr[10];
+  double Edep[10];
+  for (int i = 0; i < 10; i++) {
+    curr[i] = 0;
+    Edep[i] = 0;
+  }
   StoreArray<BeamabortSimHit> SimHits;
 
   //Skip events with no Hits
@@ -107,21 +112,16 @@ void BeamabortStudyModule::event()
   }
 
   int nSimHits = SimHits.getEntries();
-  double curr[4];
-  double Edep[4];
-  for (int i = 0; i < 4; i++) {
-    curr[i] = 0;
-    Edep[i] = 0;
-  }
+
   for (int i = 0; i < nSimHits; i++) {
     BeamabortSimHit* aHit = SimHits[i];
-    const int detNb = aHit->getCellId();
-    const double edep = aHit->getEnergyDep();
-    const double time = aHit->getFlightTime();
-    const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
-    const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
-    const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-    const double Amp = NbEle / (6.25 * 1e18); // A x s
+    int detNb = aHit->getCellId();
+    double edep = aHit->getEnergyDep();
+    double time = aHit->getFlightTime();
+    double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+    double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+    int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+    double Amp = NbEle / (6.25 * 1e18); // A x s
     Edep[i] += edep;
     curr[i] += Amp;
     h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
@@ -130,8 +130,9 @@ void BeamabortStudyModule::event()
     h_vtime[detNb]->Fill(time, Amp * 1e15);
   }
   for (int i = 0; i < 4; i++) {
-    if (curr[i] > 0) {
-      h_curr[i]->Fill(curr[i] * 1e15);
+    if (curr[i] > 0 && Edep[i] > 0) {
+      //cout << " Nb el " << curr[i]*1e15 << " edep " << Edep[i]*1e6 << endl;
+      h_Amp[i]->Fill(curr[i] * 1e15);
       h_edep[i]->Fill(Edep[i] * 1e6);
     }
   }

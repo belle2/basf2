@@ -15,7 +15,8 @@
          whitespace, comma or semi-colon -->
     <bar unit="mm">1
     </bar>
-
+    <WorkFunction>4.9</WorkFunction>
+    <FanoFactor>0.1</FanoFactor>
     <Active>
       <Material>BEAMABORT-Material</Material>
       <x_offset unit="cm">0.,0,0,0</x_offset>

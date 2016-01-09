@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
 
 
 def add_packers(path, components=None):
@@ -79,20 +80,20 @@ def add_packers(path, components=None):
             ],
         ])
 
-#        path.add_module(pxdpacker)
+        path.add_module(pxdpacker)
 
     # SVD
-#    if components is None or 'SVD' in components:
-#        svdpacker = register_module('SVDPacker')
-#        path.add_module(svdpacker)
+    if components is None or 'SVD' in components:
+        svdpacker = register_module('SVDPacker')
+        path.add_module(svdpacker)
 
     # CDC (parameters from cdc_packer_unpacker.py)
-#    if components is None or 'CDC' in components:
-#        cdc_mapping_file = "../../cdc/data/ch_map.dat"
-#        cdcpacker = register_module('CDCPacker')
-#        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
-#        cdcpacker.param('cdcHitName', "CDCHits")
-#        path.add_module(cdcpacker)
+    if components is None or 'CDC' in components:
+        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
+        cdcpacker = register_module('CDCPacker')
+        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
+        cdcpacker.param('cdcHitName', "CDCHits")
+        path.add_module(cdcpacker)
 
     # TOP
     if components is None or 'TOP' in components:
@@ -100,14 +101,14 @@ def add_packers(path, components=None):
         path.add_module(toppacker)
 
     # ARICH
-#    if components is None or 'ARICH' in components:
-#        arichpacker = register_module('ARICHPacker')
-#        path.add_module(arichpacker)
+    if components is None or 'ARICH' in components:
+        arichpacker = register_module('ARICHPacker')
+        path.add_module(arichpacker)
 
     # BKLM
-#    if components is None or 'BKLM' in components:
-#        bklmpacker = register_module('BKLMRawPacker')
-#        path.add_module(bklmpacker)
+    if components is None or 'BKLM' in components:
+        bklmpacker = register_module('BKLMRawPacker')
+        path.add_module(bklmpacker)
 
 
 def add_unpackers(path, components=None):

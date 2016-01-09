@@ -126,7 +126,7 @@ void PinDigitizerModule::event()
     if (itime[i] > 0) {
       time[i] /= itime[i];
 
-      const double meanEl = edep[i] / m_WorkFunction * 1e9; //MeV to eV
+      const double meanEl = edep[i] / m_WorkFunction * 1e9; //GeV to eV
       const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
       const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
       volt[i] = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt

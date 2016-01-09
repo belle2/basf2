@@ -133,7 +133,7 @@ def add_unpackers(path, components=None):
 
     # CDC (parameters from cdc_packer_unpacker.py)
     if components is None or 'CDC' in components:
-        cdc_mapping_file = "../../cdc/data/ch_map.dat"
+        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
         cdc_hits_pack_unpack_collection = "CDCHits_test_output"
         cdcunpacker = register_module('CDCUnpacker')
         cdcunpacker.param('xmlMapFileName', cdc_mapping_file)

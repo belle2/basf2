@@ -259,7 +259,7 @@ void ClawStudyModule::event()
     if (fabs(pdg) == 11)h_edep1->Fill(detNB, adep * 1e3);
     if (pdg == 22)h_edep2->Fill(detNB, adep * 1e3);
     if (pdg != 22 && fabs(pdg) != 11)h_edep3->Fill(detNB, adep * 1e3);
-    if (adep > 50.*1e-6) {
+    if (adep > 50.*1e-3) {
       h_timeThres->Fill(detNB, timeBin);
       h_edepThres->Fill(detNB, adep * 1e3);
       if (fabs(pdg) == 11)h_edepThres1->Fill(detNB, adep * 1e3);

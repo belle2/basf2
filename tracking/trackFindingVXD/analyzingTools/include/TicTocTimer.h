@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
+
 #include <framework/datastore/RelationsObject.h>
 
 #include <chrono> // if inheritance from RelationObject is desired cannot use c++11 features
@@ -77,7 +79,7 @@ namespace Belle2 {
     // ClassDef(TicTocTimer, 1)
   };
 
-  TicTocTimer::TicTocTimer(unsigned convFactor, std::string name) :
+  inline TicTocTimer::TicTocTimer(unsigned convFactor, std::string name) :
     m_convFactor(convFactor),
     m_name(name),
     m_tocked(false),
@@ -99,25 +101,25 @@ namespace Belle2 {
     tic();
   }
 
-  void TicTocTimer::tic()
+  inline void TicTocTimer::tic()
   {
     m_tocked = false;
     m_start = internal_clock::now();
   }
 
-  void TicTocTimer::toc()
+  inline void TicTocTimer::toc()
   {
-    m_tocked = true;
     m_end = internal_clock::now();
+    m_tocked = true;
   }
 
-  double TicTocTimer::time()
+  inline double TicTocTimer::time()
   {
     if (!m_tocked) toc();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(m_end - m_start).count() / m_convFactor;
   }
 
-  std::string TicTocTimer::print()
+  inline std::string TicTocTimer::print()
   {
     std::stringstream ss{};
     ss << m_name << " elapsed time: " << time() << " " << getUnit();
@@ -125,7 +127,7 @@ namespace Belle2 {
   }
 
   /** stream operator overload for TicTocTimer */
-  std::ostream& operator<<(std::ostream& os, TicTocTimer& timer)
+  inline std::ostream& operator<<(std::ostream& os, TicTocTimer& timer)
   {
     os << timer.print();
     return os;

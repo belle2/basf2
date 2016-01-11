@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BEAMBKGMIXERMODULE_H
-#define BEAMBKGMIXERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -121,19 +120,21 @@ namespace Belle2 {
         tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
       {}
       /**
-       * constructor with tag, type, file name, and real time
+       * usefull constructor
        * @param bkgTag background tag
        * @param bkgType background type
        * @param fileName file name
-       * @param realTime real time that corresponds to background sample
+       * @param time real time that corresponds to background sample
+       * @param scaleFac scale factor for the rate
        * @param fileTyp file type
        */
       BkgFiles(SimHitBase::BG_TAG bkgTag,
                const std::string& bkgType,
                const std::string& fileName,
                double time,
+               double scaleFac,
                BackgroundMetaData::EFileType fileTyp = BackgroundMetaData::c_Usual):
-        tag(bkgTag), type(bkgType), realTime(time), scaleFactor(1.0),
+        tag(bkgTag), type(bkgType), realTime(time), scaleFactor(scaleFac),
         fileType(fileTyp),
         tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0)
       {
@@ -251,6 +252,7 @@ namespace Belle2 {
 
 
     std::vector<std::string> m_backgroundFiles; /**< names of beam background files */
+    double m_overallScaleFactor; /**< overall scale factor */
     std::vector<std::tuple<std::string, double> > m_scaleFactors; /**< scale factors */
     double m_minTime;  /**< minimal time shift of background event */
     double m_maxTime;  /**< maximal time shift of background event */
@@ -280,4 +282,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

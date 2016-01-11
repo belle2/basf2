@@ -77,6 +77,8 @@ namespace Belle2 {
              "Time window lower edge in nano seconds", -1000.0);
     addParam("maxTime", m_maxTime,
              "Time window upper edge in nano seconds", 800.0);
+    addParam("overallScaleFactor", m_overallScaleFactor,
+             "Overall factor to scale rates of backgrounds", 1.0);
     addParam("scaleFactors", m_scaleFactors,
              "Factors to scale rates of backgrounds. "
              "Possible tag names: " + m_bgTypes.getBGTypes(),
@@ -229,7 +231,7 @@ namespace Belle2 {
                 "Possible are: " + m_bgTypes.getBGTypes());
       for (auto& bkg : m_backgrounds) {
         if (bkg.type.find(type) != std::string::npos)
-          bkg.scaleFactor = std::get<1>(scaleFactor);
+          bkg.scaleFactor *= std::get<1>(scaleFactor);
       }
     }
 
@@ -490,7 +492,8 @@ namespace Belle2 {
     std::string ftype = type;
     if (fileType == BackgroundMetaData::c_ECL) ftype += "(ECL)";
     if (fileType == BackgroundMetaData::c_PXD) ftype += "(PXD)";
-    m_backgrounds.push_back(BkgFiles(tag, ftype, fileName, realTime, fileType));
+    m_backgrounds.push_back(BkgFiles(tag, ftype, fileName, realTime,
+                                     m_overallScaleFactor, fileType));
   }
 
 

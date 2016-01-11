@@ -67,6 +67,7 @@ ECLDigitizerPureCsIModule::ECLDigitizerPureCsIModule() : Module()
   addParam("Debug", m_debug, "debug mode on (default off)", false);
   addParam("debugtrgtime", m_testtrg, "set fixed trigger time for testing purposes", 0);
   addParam("debugsigtimeshift", m_testsig, "shift signal arrival time for testing purposes (in microsec)", 0.);
+  addParam("debugenergydeposit", m_testenedep, "energy deposit in all crystals for testing purposes", 0.);
   addParam("NoCovMatrix", m_NoCovMatrix, "Use a diagonal (neutral) Covariance matrix", true);
 
 }
@@ -122,12 +123,9 @@ void ECLDigitizerPureCsIModule::event()
       assert(j < EclConfigurationPure::m_nch);
       double hitE       = eclHit.getEnergyDep() / Unit::GeV;
       double hitTime    = eclHit.getTimeAve() / Unit::us;
-      if (m_debug)
-        m_adc[j].AddHit(hitE, hitTime + m_testsig, m_ss[m_tbl[j].iss]);
-      else {
+      if (m_photostatresolution > 0)
         hitE = gRandom->Gaus(hitE, m_photostatresolution / sqrt(hitE * 1000.));
-        m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
-      }
+      m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
       if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
     }
   }
@@ -136,8 +134,12 @@ void ECLDigitizerPureCsIModule::event()
 
   for (int j = 0; j < EclConfigurationPure::m_nch; j++) {
     if (! isPureCsI(j + 1)) continue;
-    adccounts_type& a = m_adc[j];
 
+    if (m_debug) {
+      m_adc[j].AddHit(m_testenedep, m_testsig, m_ss[m_tbl[j].iss]);
+      //cout << "Adding enedep = " << m_testenedep << " time: " << m_testsig << endl;
+    }
+    adccounts_type& a = m_adc[j];
     if (! m_calibration && a.total < 0.0001) continue;
 
     //Noise generation
@@ -161,9 +163,15 @@ void ECLDigitizerPureCsIModule::event()
     double fitChi2 = 0;
 
     if (! m_calibration) {
-      if (m_debug)
+      if (m_debug) {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
-      else {
+        /*
+        cout << "energy: " << energyFit
+              << " tFit: " << tFit
+              << " qualityfit: " << qualityFit
+              << endl;
+        */
+      } else {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, 0, energyFit, tFit, fitChi2, qualityFit);
         /*
         cout << "energy: " << energyFit

@@ -110,6 +110,7 @@ namespace Belle2 {
       bool m_debug;
       int m_testtrg;
       double m_testsig;
+      double m_testenedep;
       static constexpr const char* eclDigitArrayName() { return "ECLDigitsPureCsI"; }
       static constexpr const char* eclDspArrayName() { return "ECLDspsPureCsI"; }
     };

@@ -5,7 +5,7 @@
 #include <numeric>
 #include <algorithm>
 #include <iostream>
-
+#include <cassert>
 using namespace Belle2;
 using namespace Belle2::ECL;
 using namespace std;
@@ -37,6 +37,14 @@ double Belle2::ECL::func1(int i, int ifine,
 void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
                              EclConfigurationPure::signalsamplepure_t& signal)
 {
+
+  for (int i = 0; i < 16; i++) {
+    for (int k = -EclConfigurationPure::m_ndtPure; k < EclConfigurationPure::m_ndtPure; k++) {
+      // cout << i << ":" << k << " " << func( i, k, signal) << " " << func1(i, k, signal) << endl;
+      if (k < 0) params.f[i][ EclConfigurationPure::m_ndtPure - 1 - k] = func(i, k, signal);
+      else     params.f[i][k] = func(i, k, signal);
+    }
+  }
 
   double kdt = 0.001 / (EclConfigurationPure::m_tickPure / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
 
@@ -80,9 +88,9 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
     for (int i = 0; i < 16; i++) {
       for (int j = 0; j < 16; j++) {
         params.c110[k + off] += kdt * func1(i, -k, signal) * params.invC[i][j] * func(j, -k, signal);
-        params.c200[k + off] += func(i, k, signal) * params.invC[i][j] * func(j, k, signal);
+        params.c200[k + off] += func(i, -k, signal) * params.invC[i][j] * func(j, -k, signal);
         params.c020[k + off] += kdt * func1(i, -k, signal) * params.invC[i][j] * func1(j, -k, signal) * kdt;
-        params.c101[k + off] += func(i, k, signal) * params.invC[i][j];
+        params.c101[k + off] += func(i, -k, signal) * params.invC[i][j];
         params.c011[k + off] += kdt * func1(i, -k, signal) * params.invC[i][j];
       }
     }
@@ -126,7 +134,7 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
   const int* imax =  max_element(FitA, FitA + EclConfigurationPure::m_nsmp);
 
   amp = *imax - baseline;
-  time = imax - FitA;
+  //time = imax - FitA;
 
 
   int dt = ttrig;
@@ -175,17 +183,21 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
   amp = C[0];
 
   /*
-  cout << "A  = " << C[0] << endl;
   cout << "t0 = " << ttrig << endl;
-  //cout << "B = A * t  = " << C[1] << endl;
   cout << "P  = " << C[2] << endl;
-  cout << "t = B / A = " << C[1] / C[0] << endl;
+  cout << "A  = " << C[0] << endl;
+  cout << "B = A * t  = " << C[1] << endl;
+  cout << "dt = B / A = " << C[1] / C[0] << endl;
   */
-
 
   double A = C[0];
   double B = C[1];
   double P = C[2];
+
+  /*
+  for (int i=1; i<16; i++)
+    cout << "A= " << C[0] << " f = " << f.f[i][dt] << " A*f = " << C[0]*f.f[i][dt] << " y = " << y[i] << endl;
+  */
 
   chi2 = f.c200[dt] * A * A +  f.c020[dt] * B * B +  f.c002 * P * P +
          f.c110[dt] * A * B + f.c101[dt] * A * P + f.c011[dt] * B * P +
@@ -194,15 +206,18 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
     for (int j = 0; j < 16; j++)
       chi2 += y[i] * f.invC[i][j] * y[j];
 
-  int deltaTime = round(C[1] / C[0]) ;
-  time = -ttrig - C[1] / C[0] ;
-  //  cout << "time : "  << time << endl;
+  // cout << "chi2 = " << chi2 << endl;
+  double deltaT = C[1] / C[0] ;
+  int intTime = ttrig + round(deltaT) ;
+  //  time = -ttrig - C[1] / C[0] ;
+  time = -(ttrig + deltaT);
+  // cout << "time : "  << time << endl;
 
-  if (iter < 4 && abs(deltaTime) < EclConfigurationPure::m_ndtPure) {
+  if (iter < 3 && abs(deltaT) < EclConfigurationPure::m_ndtPure) {
     iter++;
-    DSPFitterPure(f, FitA, deltaTime, amp, time, chi2, iter);
+    DSPFitterPure(f, FitA, intTime, amp, time, chi2, iter);
   }
 
-  if (abs(deltaTime) < EclConfigurationPure::m_ndtPure && deltaTime > 2 && iter++ < 10)
-    DSPFitterPure(f, FitA, deltaTime, amp, time, chi2, iter);
+  if (abs(deltaT) < EclConfigurationPure::m_ndtPure && abs(deltaT) > 0.5 && iter++ < 10)
+    DSPFitterPure(f, FitA, intTime, amp, time, chi2, iter);
 }

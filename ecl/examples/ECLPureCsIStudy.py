@@ -14,6 +14,7 @@ import os
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
+from beamparameters import add_beamparameters
 
 import sys
 import glob
@@ -36,30 +37,41 @@ mdstfile += '-mdst.root'
 digistudyfile = par[3]
 digistudyfile += '-digi'
 
+generator = 0
+if (pdg == 0):
+    generator = 1
+
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
 main.add_module(eventinfosetter)
 
-# single particle generator settings
-pGun = register_module('ParticleGun')
-param_pGun = {
-    'pdgCodes': [pdg],
-    'nTracks': 1,
-    'momentumGeneration': 'fixed',
-    'momentumParams': [momentum],
-    'thetaGeneration': 'uniform',
-    'thetaParams': [13.0, 30.0],
-    'phiGeneration': 'uniform',
-    'phiParams': [0., 360.],
-    'vertexGeneration': 'uniform',
-    'xVertexParams': [0.0, 0.0],
-    'yVertexParams': [0.0, 0.0],
-    'zVertexParams': [0.0, 0.0],
-}
+if (generator == 0):
+    # single particle generator settings
+    pGun = register_module('ParticleGun')
+    param_pGun = {
+        'pdgCodes': [pdg],
+        'nTracks': 1,
+        'momentumGeneration': 'fixed',
+        'momentumParams': [momentum],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [13.0, 30.0],
+        'phiGeneration': 'uniform',
+        'phiParams': [0., 360.],
+        'vertexGeneration': 'uniform',
+        'xVertexParams': [0.0, 0.0],
+        'yVertexParams': [0.0, 0.0],
+        'zVertexParams': [0.0, 0.0],
+    }
 
-pGun.param(param_pGun)
-main.add_module(pGun)
+    pGun.param(param_pGun)
+    main.add_module(pGun)
+else:
+    # beam parameters
+    beamparameters = add_beamparameters(main, "Y4S")
+    evtgeninput = register_module('EvtGenInput')
+    main.add_module(evtgeninput)
+
 
 if (withbg == 1):
     bg = glob.glob(isbg + '/*.root')

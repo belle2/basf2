@@ -32,7 +32,7 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
+def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkgscale=1.0):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -46,6 +46,7 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None):
         else:
             if components:
                 bkgmixer.param('components', components)
+        bkgmixer.param('overallScaleFactor', bkgscale)
         path.add_module(bkgmixer)
 
     # geometry parameter database

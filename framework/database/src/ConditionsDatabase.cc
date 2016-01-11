@@ -33,7 +33,8 @@ namespace fs = boost::filesystem;
 
 void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel)
 {
-  ConditionsDatabase* database = new ConditionsDatabase(globalTag);
+  ConditionsDatabase* database = new ConditionsDatabase(globalTag, "centraldb");
+  ConditionsService::getInstance()->setFILEbaselocal("centraldb/");
   database->setLogLevel(logLevel);
   Database::setInstance(database);
 }
@@ -76,6 +77,10 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     B2LOG(m_logLevel, 0, "No payload " << package << "/" << module << " found in the conditions database for global tag " << m_globalTag
           << ".");
     return result;
+  }
+
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
   }
 
   std::string filename = ConditionsService::getInstance()->getPayloadFileURL(package, module);

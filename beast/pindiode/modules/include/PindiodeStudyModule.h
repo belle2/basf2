@@ -74,6 +74,12 @@ namespace Belle2 {
       std::vector<TVector3> PINCenter;
       /** Event counter */
       int Event = 0;
+      /** Cremat gain */
+      double m_CrematGain;
+      /** Work function */
+      double m_WorkFunction;
+      /** Fano Factor */
+      double m_FanoFactor;
 
       /** histo dose */
       TH1F* h_dose[100];
@@ -83,6 +89,14 @@ namespace Belle2 {
       TH1F* h_time[100];
       /** histo time weighted by volt */
       TH1F* h_vtime[100];
+      /** histo dose */
+      TH1F* h_idose[100];
+      /** histo volt */
+      TH1F* h_ivolt[100];
+      /** histo time */
+      TH1F* h_itime[100];
+      /** histo time weighted by volt */
+      TH1F* h_ivtime[100];
     };
 
   }

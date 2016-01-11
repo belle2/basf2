@@ -55,6 +55,10 @@ PindiodeStudyModule::PindiodeStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Pindiodes (BEAST)");
 
+  //Default values are set here. New values can be in PINDIODE.xml.
+  addParam("CrematGain", m_CrematGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
+  addParam("WorkFunction", m_WorkFunction, "Convert eV to e [e/eV] ", 1.12);
+  addParam("FanoFactor", m_FanoFactor, "e resolution ", 0.1);
 }
 
 PindiodeStudyModule::~PindiodeStudyModule()
@@ -70,6 +74,11 @@ void PindiodeStudyModule::defineHisto()
     h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 100.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
+
+    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 10000, 0., 1000.);
+    h_ivolt[i] = new TH1F(TString::Format("h_ivolt_%d", i), "", 10000, 0., 100.);
+    h_itime[i] = new TH1F(TString::Format("h_itime_%d", i), "", 1000, 0., 100.);
+    h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
   }
 
 }
@@ -98,23 +107,37 @@ void PindiodeStudyModule::event()
   StoreArray<PindiodeHit> Hits;
 
   //Skip events with no Hits
-  if (Hits.getEntries() == 0) {
+  if (SimHits.getEntries() == 0) {
     return;
   }
 
-  //int nSimHits = SimHits.getEntries();
+  int nSimHits = SimHits.getEntries();
+  for (int i = 0; i < nSimHits; i++) {
+    PindiodeSimHit* aHit = SimHits[i];
+    int detNb = aHit->getCellId();
+    double edep = aHit->getEnergyDep();
+    double time = aHit->getFlightTime();
+    int PDG = aHit->getPDGCode();
+    const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+    const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+    const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+    double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
+    h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
+    h_volt[detNb]->Fill(volt * 1e3); //V to mV
+    h_time[detNb]->Fill(time);
+    h_vtime[detNb]->Fill(time, volt);
+  }
   int nHits = Hits.getEntries();
-
   for (int i = 0; i < nHits; i++) {
     PindiodeHit* aHit = Hits[i];
     int detNb = aHit->getdetNb();
     double edep = aHit->getedep();
     double volt = aHit->getV();
     double time = aHit->gettime();
-    h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
-    h_volt[detNb]->Fill(volt * 1e3); //V to mV
-    h_time[detNb]->Fill(time);
-    h_vtime[detNb]->Fill(time, volt);
+    h_idose[detNb]->Fill(edep * 1e6); //GeV to keV
+    h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
+    h_itime[detNb]->Fill(time);
+    h_ivtime[detNb]->Fill(time, volt);
   }
 
 
@@ -132,6 +155,10 @@ void PindiodeStudyModule::getXMLData()
     nPIN++;
   }
   */
+  m_CrematGain = content.getDouble("CrematGain");
+  m_WorkFunction = content.getDouble("WorkFunction");
+  m_FanoFactor = content.getDouble("FanoFactor");
+
   B2INFO("PinDigitizer");
 
 }

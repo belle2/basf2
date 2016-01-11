@@ -22,6 +22,10 @@
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
+#include <genfit/IO.h>
+
+#include <boost/iostreams/stream_buffer.hpp>
+#include <boost/iostreams/concepts.hpp>
 
 #include <TGeoManager.h>
 
@@ -29,11 +33,48 @@ using namespace Belle2;
 
 REG_MODULE(SetupGenfitExtrapolation)
 
+namespace {
+//! Stream that writes to Belle II logging system at the debug level
+//! given by the template parameter.
+  template<size_t T_level>
+  class genfitSink : public boost::iostreams::sink {
+  public:
+    //! The actual function that does the writing.
+    std::streamsize write(const char* s, std::streamsize n)
+    {
+      B2DEBUG(T_level, s);
+      return n;
+    }
+  };
+
+//! Sink for debug output.
+  genfitSink<200> debugSink;
+//! Buffer for debug output.
+  boost::iostreams::stream_buffer<genfitSink<200> > debugStreamBuf(debugSink);
+//! Sink for error output.
+  genfitSink<100> errorSink;
+//! Buffer for error output.
+  boost::iostreams::stream_buffer<genfitSink<100> > errorStreamBuf(errorSink);
+//! Sink for output from ...::Print() callls.
+  genfitSink<150> printSink;
+//! Buffer for output from ...::Print() calls.
+  boost::iostreams::stream_buffer<genfitSink<150> > printStreamBuf(printSink);
+
+//! Directs output from genfit into the Belle II logging system.
+  void setupGenfitStreams()
+  {
+    genfit::debugOut.rdbuf(&debugStreamBuf);
+    genfit::errorOut.rdbuf(&errorStreamBuf);
+    genfit::printOut.rdbuf(&printStreamBuf);
+  }
+}
+
 SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
   Module()
 {
 
-  setDescription("Sets up material handling for genfit extrapolation.");
+  setDescription("Sets up material handling for genfit extrapolation.  Also setups up I/O streams for"
+                 " genfit in order to integrate it into basf2 logging system.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input
@@ -64,6 +105,8 @@ SetupGenfitExtrapolationModule::~SetupGenfitExtrapolationModule()
 
 void SetupGenfitExtrapolationModule::initialize()
 {
+  setupGenfitStreams();
+
   //pass the magnetic field to genfit
   if (genfit::FieldManager::getInstance()->isInitialized()) {
     B2ERROR("Magnetic field handling already initialized.  Not touching settings.");

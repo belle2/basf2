@@ -91,7 +91,7 @@ namespace Belle2 {
 
     TList* m_histoList;
     TH3F* m_h3_MCParticle;
-    TH3F* m_h3_GoodMCTrackCand;
+    TH3F* m_h3_idealMCTrackCand;
     TH3F* m_h3_MCTrackCand;
 
     TH1F* m_h1_thetaMS_SVD;

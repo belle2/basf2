@@ -85,6 +85,8 @@ void MCTrackCandClassifierModule::initialize()
 {
 
   // MCParticles, MCTrackCands, MCTracks needed for this module
+  StoreArray<PXDCluster>::required();
+  StoreArray<SVDCluster>::required();
   StoreArray<MCParticle>::required(m_mcParticlesName);
   StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
   mcTrackCands.isRequired();
@@ -115,19 +117,17 @@ void MCTrackCandClassifierModule::initialize()
 
   for (int bin = 0; bin < 10 + 1; bin++) {
     bins_lambda[bin] = - TMath::Pi() / 2 + bin * width_lambda;
-    //    bins_lambda[bin] = TMath::ATan(bins_theta[bin]) - TMath::Pi()/2;
     cout <<  bins_lambda[bin] << "   " <<  bins_theta[bin] << endl;
   }
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
                                       9, bins_pt, "p_{t} (GeV/c)",
-                                      //                                      10, bins_theta, "#theta",
                                       10, bins_lambda, "#lambda",
                                       14, bins_phi, "#phi" /*, m_histoList*/);
 
-  m_h3_GoodMCTrackCand = (TH3F*)duplicateHistogram("h3GoodMCTrackCand",
-                                                   "entry per Good MCTrackCand",
-                                                   m_h3_MCParticle /*, m_histoList*/);
+  m_h3_idealMCTrackCand = (TH3F*)duplicateHistogram("h3idealMCTrackCand",
+                                                    "entry per idealMCTrackCand",
+                                                    m_h3_MCParticle /*, m_histoList*/);
 
   m_h3_MCTrackCand = (TH3F*)duplicateHistogram("h3MCTrackCand",
                                                "entry per MCTrackCand",
@@ -170,7 +170,7 @@ void MCTrackCandClassifierModule::initialize()
 
   m_h1_lapTime = new TH1F("h1LapTime", "lap time", 200, 0, 100);
   m_histoList->Add(m_h1_lapTime);
-  m_h1_lapTime->GetXaxis()->SetTitle("lap time (ns)");
+  m_h1_lapTime->GetXaxis()->SetTitle("time (ns)");
 
   m_h1_timeDifference = (TH1F*)duplicateHistogram("h1TimeDiff", "Hit Time Difference",
                                                   m_h1_lapTime, m_histoList);
@@ -213,30 +213,27 @@ void MCTrackCandClassifierModule::event()
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
 
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
-
-  //3. retrieve all MCTrackCands
   StoreArray<genfit::TrackCand> mcTrackCands;
-  StoreArray<PXDTrueHit> pxdTrueHits;
-  StoreArray<SVDTrueHit> svdTrueHits;
-  //  StoreArray<CDCHit> cdcHit;
+  StoreArray<PXDCluster> pxdClusters;
+  StoreArray<SVDCluster> svdClusters;
 
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
+  //1.a retrieve the MCTrackCands
   BOOST_FOREACH(genfit::TrackCand & mcTrackCand, mcTrackCands) {
 
     int nGoodTrueHits = 0;
     int nBadTrueHits = 0;
     int nGood1Dinfo = 0;
-    //    int nBad1Dinfo = 0;
 
     B2DEBUG(1, " a NEW MCTrackCand ");
-    //    int nTrackCand = 0;
 
-    //3.a retrieve the MCParticle
+    //1.b retrieve the MCParticle
     RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
 
     B2DEBUG(1, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
+
       MCParticle mcParticle = *MCParticles_fromMCTrackCand[mcp];
 
       B2DEBUG(1, " a NEW charged MC Particle, " << mcParticle.getIndex() << ", " << mcParticle.getPDG());
@@ -254,7 +251,6 @@ void MCTrackCandClassifierModule::event()
       double y = decayVertex.Y();
       double R = 1 / abs(omega); //cm
 
-      //      m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
       m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
 
       double alpha =  R / pt * charge; //cm/GeV
@@ -263,13 +259,11 @@ void MCTrackCandClassifierModule::event()
 
       TVector3 center(Cx, Cy, 0);
 
-
-      //recover HITS and loop on the hit
+      //recover Clusters and loop on them
       int Nhits = mcTrackCand.getNHits();
 
-      int hit = 0;
+      int cluster = 0;
       bool isAccepted = true;
-
       double prevHitRadius = abs(1 / omega);
 
       double lapTime = 2 * M_PI * mcParticle.getEnergy() / 0.299792 / magField.Z();
@@ -278,12 +272,10 @@ void MCTrackCandClassifierModule::event()
 
       bool isFirstSVDhit = true;
 
-      while (hit < Nhits && isAccepted) {
-
-        //  B2INFO("hit = "<<hit<<" < "<<Nhits);
+      while (cluster < Nhits && isAccepted) {
 
         int detId, hitId;
-        mcTrackCand.getHit(hit, detId, hitId);
+        mcTrackCand.getHit(cluster, detId, hitId);
 
         bool hasPXDCluster = false;
         bool hasSVDuCluster = false;
@@ -294,30 +286,44 @@ void MCTrackCandClassifierModule::event()
         VxdID sensor = 0;
 
         double thetaMS = 0;
+
         if (detId == Const::PXD && m_usePXD) {
 
-          PXDTrueHit* aPXDTrueHit = pxdTrueHits[hitId];
+          PXDCluster* aPXDCluster = pxdClusters[hitId];
+          RelationVector<PXDTrueHit> PXDTrueHit_fromPXDCluster = DataStore::getRelationsFromObj<PXDTrueHit>(aPXDCluster);
+          if (PXDTrueHit_fromPXDCluster.size() == 0) {
+            B2WARNING("What's happening?!? no True Hit associated to the PXD Cluster");
+            isAccepted = false;
+            continue;
+          }
 
+          PXDTrueHit* aPXDTrueHit = PXDTrueHit_fromPXDCluster[0];
           thetaMS = compute_thetaMS(mcParticleInfo, aPXDTrueHit);
           m_h1_thetaMS_PXD->Fill(thetaMS / 2 * 1000); //PXD
 
           uCoor = aPXDTrueHit->getU();
           vCoor = aPXDTrueHit->getV();
           sensor = aPXDTrueHit->getSensorID();
-          if (hit == 0) {
+          if (cluster == 0) {
             FirstHitTime = aPXDTrueHit->getGlobalTime();
             HitTime = FirstHitTime;
           } else
             HitTime = aPXDTrueHit->getGlobalTime();
 
-          RelationVector<PXDCluster> PXDCluster_toVXDTrueHit = DataStore::getRelationsToObj<PXDCluster>(aPXDTrueHit);
-          if (PXDCluster_toVXDTrueHit.size() > 0) hasPXDCluster = true;
+          hasPXDCluster = true;
         } else if (detId == Const::SVD) {
+          SVDCluster* aSVDCluster = svdClusters[hitId];
+          RelationVector<SVDTrueHit> SVDTrueHit_fromSVDCluster = DataStore::getRelationsFromObj<SVDTrueHit>(aSVDCluster);
+          if (SVDTrueHit_fromSVDCluster.size() == 0) {
+            B2WARNING("What's happening?!? no True Hit associated to the SVD Cluster");
+            isAccepted = false;
+            continue;
+          }
 
-          SVDTrueHit* aSVDTrueHit = svdTrueHits[hitId];
+          SVDTrueHit* aSVDTrueHit = SVDTrueHit_fromSVDCluster[0];
 
           thetaMS = compute_thetaMS(mcParticleInfo, aSVDTrueHit);
-          m_h1_thetaMS_SVD->Fill(thetaMS * 1000); //PXD
+          m_h1_thetaMS_SVD->Fill(thetaMS * 1000); //SVD
 
           uCoor = aSVDTrueHit->getU();
           vCoor = aSVDTrueHit->getV();
@@ -326,27 +332,20 @@ void MCTrackCandClassifierModule::event()
             FirstHitTime = aSVDTrueHit->getGlobalTime();
             HitTime = FirstHitTime;
             isFirstSVDhit = false;
+
           } else
             HitTime = aSVDTrueHit->getGlobalTime();
-
-          RelationVector<SVDCluster> SVDCluster_toVXDTrueHit = DataStore::getRelationsToObj<SVDCluster>(aSVDTrueHit);
-          for (int i = 0; i < (int)SVDCluster_toVXDTrueHit.size(); i++)
-            if (SVDCluster_toVXDTrueHit[i]->isUCluster())
-              hasSVDuCluster = true;
-            else
-              hasSVDvCluster = true;
-
+          if (aSVDCluster->isUCluster())
+            hasSVDuCluster = true;
+          else
+            hasSVDvCluster = true;
         } else {
-          hit++;
+          cluster++;
           continue;
         }
 
         const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
         TVector3 globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
-        //  B2INFO(" !!!! a HIT is found =  ("<<globalHit.X()<<", "<<globalHit.Y()<<")");
-
-
-
         double hitRadius = theDistance(center, globalHit);
 
         bool accepted1 = true;
@@ -411,20 +410,18 @@ void MCTrackCandClassifierModule::event()
         if (hasPXDCluster || hasSVDuCluster || hasSVDvCluster)
           B2DEBUG(1, "cluster: ACCEPTED (" << nGood1Dinfo << ")");
 
-
         hasPXDCluster = false;
         hasSVDuCluster = false;
         hasSVDvCluster = false;
 
-        hit++;
+        cluster++;
 
-
-      }//close loop on hits
+      }//close loop on clusters
 
       if (m_mustHaveCluster) {
         if (nGood1Dinfo >= m_minHit) {
           B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGood1Dinfo << " 1D infos (" << nGoodTrueHits << " good true hits)");
-          m_h3_GoodMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
+          m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
           m_h1_nGood1dInfo->Fill(nGood1Dinfo);
           idealMCTrackCands.appendNew(mcTrackCand);
@@ -437,7 +434,7 @@ void MCTrackCandClassifierModule::event()
       } else {
         if (nGoodTrueHits >= m_minHit) {
           B2DEBUG(1, "  idealMCTrackCand FOUND!! " << nGoodTrueHits << " TrueHits (" << nGood1Dinfo << " good 1D info)");
-          m_h3_GoodMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
+          m_h3_idealMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getLambda(), mcParticleInfo.getPphi());
           m_h1_nGoodTrueHits->Fill(nGoodTrueHits);
           idealMCTrackCands.appendNew(mcTrackCand);
           //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
@@ -475,7 +472,7 @@ void MCTrackCandClassifierModule::endRun()
   double num = 0;
   double den = 0;
 
-  num = m_h3_GoodMCTrackCand->GetEntries();
+  num = m_h3_idealMCTrackCand->GetEntries();
   den = m_h3_MCTrackCand->GetEntries();
   double efficiency = num / den ;
   double efficiencyErr =  sqrt(efficiency * (1 - efficiency)) / sqrt(den);
@@ -692,15 +689,15 @@ void MCTrackCandClassifierModule::addEfficiencyPlots(TList* histoList)
 {
 
   //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "fraction of Good MCTrackCand VS pt", m_h3_GoodMCTrackCand,
+  TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "fraction of idealMCTrackCand VS pt", m_h3_idealMCTrackCand,
                                              m_h3_MCTrackCand, true, 0);
   histoList->Add(h_effMCTC_pt);
 
-  TH1F* h_effMCTC_theta = createHistogramsRatio("heffMCTCtheta", "fraction of Good MCTrackCandVS #lambda", m_h3_GoodMCTrackCand,
+  TH1F* h_effMCTC_theta = createHistogramsRatio("heffMCTCtheta", "fraction of idealMCTrackCandVS #lambda", m_h3_idealMCTrackCand,
                                                 m_h3_MCTrackCand, true, 1);
   histoList->Add(h_effMCTC_theta);
 
-  TH1F* h_effMCTC_phi = createHistogramsRatio("heffMCTCphi", "fraction of Good MCTrackCand VS #phi", m_h3_GoodMCTrackCand,
+  TH1F* h_effMCTC_phi = createHistogramsRatio("heffMCTCphi", "fraction of idealMCTrackCand VS #phi", m_h3_idealMCTrackCand,
                                               m_h3_MCTrackCand, true, 2);
   histoList->Add(h_effMCTC_phi);
 }
@@ -709,15 +706,15 @@ void MCTrackCandClassifierModule::addInefficiencyPlots(TList* histoList)
 {
 
   //normalized to MCTrackCands
-  TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "1 - fraction of Good MCTrackCand VS pt", m_h3_GoodMCTrackCand,
+  TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "1 - fraction of idealMCTrackCand VS pt", m_h3_idealMCTrackCand,
                                                m_h3_MCTrackCand, false, 0);
   histoList->Add(h_ineffMCTC_pt);
 
-  TH1F* h_ineffMCTC_theta = createHistogramsRatio("hineffMCTCtheta", "1 - fraction of Good MCTrackCandVS #lambda",
-                                                  m_h3_GoodMCTrackCand, m_h3_MCTrackCand, false, 1);
+  TH1F* h_ineffMCTC_theta = createHistogramsRatio("hineffMCTCtheta", "1 - fraction of idealMCTrackCandVS #lambda",
+                                                  m_h3_idealMCTrackCand, m_h3_MCTrackCand, false, 1);
   histoList->Add(h_ineffMCTC_theta);
 
-  TH1F* h_ineffMCTC_phi = createHistogramsRatio("hineffMCTCphi", "1 - fraction of Good MCTrackCand VS #phi", m_h3_GoodMCTrackCand,
+  TH1F* h_ineffMCTC_phi = createHistogramsRatio("hineffMCTCphi", "1 - fraction of idealMCTrackCand VS #phi", m_h3_idealMCTrackCand,
                                                 m_h3_MCTrackCand, false, 2);
   histoList->Add(h_ineffMCTC_phi);
 }

@@ -66,6 +66,8 @@ eventCounter.param('stepSize', 25)
 
 rootOutput = register_module('RootOutput')
 
+setupGenfit = register_module('SetupGenfitExtrapolation')
+
 pxdDataRed = register_module('PXDDataReduction')
 pxdDataRed.logging.log_level = LogLevel.INFO
 param_pxdDataRed = {
@@ -88,7 +90,7 @@ param_pxdDataRedAnalysis = {
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
-    'rootFileName': 'pxdDataRedAnalysis',
+    'rootFileName': 'pxdDataRedAnalysis_original',
 }
 pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
 
@@ -109,6 +111,7 @@ main.add_module(beamparameters)
 main.add_module(evtgeninput)
 add_simulation(main)
 main.add_module(track_finder_mc_truth)
+main.add_module(setupGenfit)
 main.add_module(pxdDataRed)
 main.add_module(pxdDataRedAnalysis)
 main.add_module(rootOutput)

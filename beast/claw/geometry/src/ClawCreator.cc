@@ -229,6 +229,7 @@ namespace Belle2 {
             double i_z = z_0 + j * 2. * dy_Al;
             new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_Al, "p_Al", l_air, false, 1);
             new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_scint, "p_scint", l_air, false, detID);
+            cout << "# CLAWS " << detID << endl;
             detID++;
           }
         }

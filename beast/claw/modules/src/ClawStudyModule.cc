@@ -172,7 +172,7 @@ void ClawStudyModule::defineHisto()
   }
 
   for (int i = 0; i < 2; i++) {
-    h_Edep[i] = new TH2F("h_Edep", "Time bin # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);
+    h_Edep[i] = new TH2F(TString::Format("h_Edep_%d", i) , "Time bin # vs. energy deposited", 20, 0., 20., 1000, 0., 10.);
     h_Edep[i] ->Sumw2();
   }
 }
@@ -240,7 +240,6 @@ void ClawStudyModule::event()
   int nSimHits = SimHits.getEntries();
   //cout << nSimHits << endl;
 
-
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     ClawSimHit* aHit = SimHits[i];
@@ -253,7 +252,7 @@ void ClawStudyModule::event()
     double r = sqrt(position.X() * position.X() + position.Y() * position.Y());
     int detNB = aHit->getdetNb();
     Edep[detNB] += adep;
-
+    //cout <<" detNB " << detNB << endl;
     h_time->Fill(detNB, timeBin);
     h_edep->Fill(detNB, adep * 1e3);
     if (fabs(pdg) == 11)h_edep1->Fill(detNB, adep * 1e3);
@@ -266,6 +265,7 @@ void ClawStudyModule::event()
       if (pdg == 22)h_edepThres2->Fill(detNB, adep * 1e3);
       if (pdg != 22 && fabs(pdg) != 11)h_edepThres3->Fill(detNB, adep * 1e3);
     }
+
     /*
     if (lad == 1) {
       h_zvedep[0]->Fill(position.Z());

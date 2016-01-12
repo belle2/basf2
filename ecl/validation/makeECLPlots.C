@@ -6,8 +6,8 @@
 
 /*
 <header>
-<input>ECLBkgOutput.root, ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
-<output>ECLBkg.root, ECL2D.root, ECLMuon.root, ECLPion.root, ECLCluster.root</output>
+<input>ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
+<output>ECLMuon.root, ECLPion.root, ECLCluster.root</output>
 <contact>ecl2ml@bpost.kek.jp</contact>
 </header>
 */
@@ -31,8 +31,8 @@ void makeECLPlots()
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
 
-  TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
-  TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
+  //TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
+  //TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
   TFile* cluster_input = TFile::Open("../ECLClusterOutput.root");
   TTree* cluster_tree = (TTree*) cluster_input->Get("m_tree");
   TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
@@ -40,8 +40,8 @@ void makeECLPlots()
   TFile* pion_input = TFile::Open("../ECLPionOutput.root");
   TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
 
-  ECL2D(bkg_tree);
-  ECLBkg(bkg_tree);
+  //ECL2D(bkg_tree);
+  //ECLBkg(bkg_tree);
   ECLCluster(cluster_tree);
   ECLMuon(muon_tree);
   //  ECLPi0(pi0_tree);

@@ -32,10 +32,12 @@ SharedMem::SharedMem(char* name, int size)
       return;
     }
     m_shmkey = ftok(m_pathname.c_str(), 1);
+    m_semkey = ftok(m_pathname.c_str(), 2);
   } else { // Private
     m_file = false;
     m_new = true;
     m_shmkey = IPC_PRIVATE;
+    m_semkey = IPC_PRIVATE;
     printf("SharedMem: Opening private shared memory\n");
   }
 
@@ -52,11 +54,27 @@ SharedMem::SharedMem(char* name, int size)
   }
   m_shmsize = size;
 
+  // 2. Open semaphore
+  m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
+  if (m_semid >= 0) {
+    // POSIX doesn't guarantee any particular state of our fresh semaphore
+    int semval = 1; //unlocked state
+    if (semctl(m_semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
+      printf("Initializing semaphore with semctl() failed.\n");
+    }
+  } else if (errno == EEXIST) {
+    m_semid = semget(m_semkey, 1, 0600);
+  }
+  if (m_semid < 0) {
+    perror("SharedMem::shmget");
+    return;
+  }
+
   // 3. Leave id of shm and semaphore in file name
   if (m_new) {
     /*
     m_strbuf = new char[1024];
-    sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-SHM_%s", m_shmid, 0, name);
+    sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-SHM_%s", m_shmid, m_semid, name);
     int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
     if (fd < 0) {
       printf("SharedMem ID file could not be created.\n");
@@ -64,13 +82,14 @@ SharedMem::SharedMem(char* name, int size)
       close(fd);
     }
     */
-    printf("SharedMem: leaving shmid in the path file %d fd=%d\n", m_shmid, m_pathfd);
+    //    printf("SharedMem: leaving shmid and semid in the path file %d %d fd=%d\n", m_shmid, m_semid, m_pathfd);
     char shminfo[256];
-    sprintf(shminfo, "%d\n", m_shmid);
+    sprintf(shminfo, "%d %d\n", m_shmid, m_semid);
     int is = write(m_pathfd, shminfo, strlen(shminfo));
     if (is < 0) perror("write");
     close(m_pathfd);
   }
+  printf("SharedMem: created. shmid = %d, semid = %d\n", m_shmid, m_semid);
 
 }
 
@@ -111,6 +130,48 @@ int SharedMem::shmid(void)
 bool SharedMem::IsCreated(void)
 {
   return m_new;
+}
+
+void SharedMem::lock()
+{
+  struct sembuf sb;
+  sb.sem_num = 0;
+  sb.sem_op = -1;
+  sb.sem_flg = 0;
+  while (semop(m_semid, &sb, 1) == -1) {
+    if (errno == EINTR) {
+      //interrupted by signal (e.g. window size changed), try again
+      continue;
+    } else {
+      perror("lock:semop");
+      exit(-1);
+    }
+  }
+}
+
+void SharedMem::unlock()
+{
+  struct sembuf sb;
+  sb.sem_num = 0;
+  sb.sem_op = 1;
+  sb.sem_flg = 0;
+  while (semop(m_semid, &sb, 1) == -1) {
+    if (errno == EINTR) {
+      //interrupted by signal (e.g. window size changed), try again
+      continue;
+    } else {
+      perror("unlock:semop");
+      exit(-1);
+    }
+  }
+}
+
+bool SharedMem::isLocked()
+{
+  int ignored = 0;
+  int val = semctl(m_semid, 0, GETVAL, ignored);
+  return (val == 0); //0: locked, 1: unlocked
+
 }
 
 

@@ -189,8 +189,8 @@ namespace Belle2 {
     double m_dedx_avg_truncated;     /**< dE/dx averaged, truncated mean */
     double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */
 
-    double m_predmean[Const::ChargedStable::c_SetSize];
-    double m_predres[Const::ChargedStable::c_SetSize];
+    double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
+    double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
 
     double m_cdcChi[Const::ChargedStable::c_SetSize]; /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */

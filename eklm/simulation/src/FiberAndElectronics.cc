@@ -72,6 +72,11 @@ void EKLM::FiberAndElectronics::processEntry()
   std::multimap<int, EKLMSimHit*>::iterator it;
   EKLMSimHit* hit;
   m_MCTime = -1;
+  m_npe = 0;
+  for (i = 0; i < m_digPar->nDigitizations; i++) {
+    m_amplitudeDirect[i] = 0;
+    m_amplitudeReflected[i] = 0;
+  }
   for (it = m_hit; it != m_hitEnd; ++it) {
     hit = it->second;
     /* Poisson mean for number of photoelectrons. */
@@ -87,7 +92,7 @@ void EKLM::FiberAndElectronics::processEntry()
       m_MCTime = t < m_MCTime ? t : m_MCTime;
     fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), false,
                    m_digPar, m_amplitudeDirect, &gnpe);
-    m_npe = gnpe;
+    m_npe = m_npe + gnpe;
     if (m_digPar->mirrorReflectiveIndex > 0) {
       fillSiPMOutput(l, d, gRandom->Poisson(npe), hit->getTime(), true,
                      m_digPar, m_amplitudeReflected, &gnpe);
@@ -144,8 +149,6 @@ void EKLM::fillSiPMOutput(double stripLen, double distSiPM,
   double sig, dt;
   *gnpe = 0;
   dt = 0.5 * digPar->ADCSamplingTime;
-  for (j = 0; j < digPar->nDigitizations; j++)
-    hist[j] = 0;
   for (i = 0; i < nPE; i++) {
     cosTheta = gRandom->Uniform(digPar->minCosTheta, 1);
     if (!isReflected)

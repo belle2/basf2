@@ -50,6 +50,10 @@ namespace Belle2 {
        * Minimum value of the transverse momentum
        */
       double ptmin;
+      /**
+       * Cylindrical radius of generation
+       */
+      double cylindricalR;
     };
 
     /**

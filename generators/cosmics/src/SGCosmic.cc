@@ -39,6 +39,7 @@ SGCosmic::SGCosmic()
   m_parameters.ipdr = 3.; // Only relevant for ipRequirement = 1
   m_parameters.ipdz = 3.; // Only relevant for ipRequirement = 1
   m_parameters.ptmin = 0.7;
+  m_parameters.cylindricalR = 125.0;
   setParameters(m_parameters);
 }
 
@@ -116,7 +117,7 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
     tanLambda = tanl;
     Helix CosmicMCHelix(d0, phi0, omega, z0, tanLambda);
 
-    const float cylindricalR = 125.0; // radius (cm) of ToP
+    const float cylindricalR = m_params.cylindricalR; // radius (cm) of generation
     float arcLength;
     // Get arc length at ToP radius
     arcLength = CosmicMCHelix.getArcLength2DAtCylindricalR(cylindricalR);

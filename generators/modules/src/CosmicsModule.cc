@@ -39,17 +39,24 @@ CosmicsModule::CosmicsModule() : Module()
   m_parameters.ipdr = 3.; // Only relevant for ipRequirement = 1
   m_parameters.ipdz = 3.; // Only relevant for ipRequirement = 1
   m_parameters.ptmin = 0.7;
+  m_parameters.cylindricalR = 125.0;
+
   // Parameter definition
   addParam("level", m_parameters.level,
-           "level of the generator (1 or 2 with slightly different kinematic distributions and mu+/mu- ratio), default is 1", m_parameters.level);
+           "level of the generator (1 or 2 with slightly different kinematic distributions and mu+/mu- ratio), default is 1",
+           m_parameters.level);
   addParam("ipRequirement", m_parameters.ipRequirement,
-           "Radial and longitudinal constraints near the Interaction Point can be required (ipRequirement == 1), default is 0 (no additional IP requirements)", m_parameters.ipRequirement);
+           "Radial and longitudinal constraints near the Interaction Point can be required (ipRequirement == 1), default is 0 (no additional IP requirements)",
+           m_parameters.ipRequirement);
   addParam("ipdr", m_parameters.ipdr,
            "Constraint on the radial distance from the IP in cm, default is 3.", m_parameters.ipdr);
   addParam("ipdz", m_parameters.ipdz,
            "Constraint on the longitudinal distance from the IP in cm, default is 3, default is 3.", m_parameters.ipdz);
   addParam("ptmin", m_parameters.ptmin,
            "Minimal value of the transverse momentum in GeV, default is 0.7", m_parameters.ptmin);
+  addParam("cylindricalR", m_parameters.cylindricalR,
+           "Radius of tube around detector at whose surface particles are generated (in cm), default is 125, but this does not include whole Belle 2 detector!",
+           m_parameters.cylindricalR);
 }
 
 void CosmicsModule::initialize()

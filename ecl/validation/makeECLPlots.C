@@ -19,8 +19,8 @@
 #include <TNtuple.h>
 #include <TCut.h>
 
-void ECL2D(TTree* bkg_tree);
-void ECLBkg(TTree* bkg_tree);
+//void ECL2D(TTree* bkg_tree);
+//void ECLBkg(TTree* bkg_tree);
 void ECLCluster(TTree* cluster_tree);
 void ECLMuon(TTree* muon_tree);
 void ECLPion(TTree* pion_tree);
@@ -31,8 +31,8 @@ void makeECLPlots()
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
 
-  //TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
-  //TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
+  TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
+  TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
   TFile* cluster_input = TFile::Open("../ECLClusterOutput.root");
   TTree* cluster_tree = (TTree*) cluster_input->Get("m_tree");
   TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
@@ -40,8 +40,8 @@ void makeECLPlots()
   TFile* pion_input = TFile::Open("../ECLPionOutput.root");
   TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
 
-  //ECL2D(bkg_tree);
-  //ECLBkg(bkg_tree);
+  //  ECL2D(bkg_tree);
+  //  ECLBkg(bkg_tree);
   ECLCluster(cluster_tree);
   ECLMuon(muon_tree);
   //  ECLPi0(pi0_tree);
@@ -144,15 +144,15 @@ void ECLCluster(TTree* cluster_tree)
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp")); 
 
 
-  TH1F* hEnergy = new TH1F("hEnergy","Reconstructed Cluster Energy", 120, 0., 0.6);
+  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy", 120, 0., 0.6);
   cluster_tree->Draw("eclClusterEnergy>>hEnergy");
-  hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Deposited energy for 500 MeV/c single photons"));
+  hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 500 MeV/c single photons"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 
   hEnergy->GetXaxis()->SetTitle("Cluster Energy (GeV)");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","ecl2ml@bpost.kek.jp"));
 
 
-  TH1F* hEnDepSum = new TH1F("hEnDepSum","Uncorrected Reconstructed Cluster Energy", 120, 0., 0.6);
+  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy", 120, 0., 0.6);
   cluster_tree->Draw("eclClusterEnergyDepSum>>hEnDepSum");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 500 MeV/c single photons"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 0.5 GeV and left-side tail.")); 

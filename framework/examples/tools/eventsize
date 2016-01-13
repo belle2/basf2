@@ -7,15 +7,15 @@ import argparse
 from collections import defaultdict
 import numpy as np
 
-#stuff for plotting
+# stuff for plotting
 try:
     import matplotlib as mpl
     mpl.use("Agg")
 except ImportError:
-    print """\
+    print("""\
 Could not find matplotlib which is required to create the charts. Please
 install it using
-    pip install matplotlib"""
+    pip install matplotlib""")
     sys.exit(1)
 
 from matplotlib import pyplot as pl
@@ -62,7 +62,7 @@ parser = argparse.ArgumentParser(
 
 )
 group1 = parser.add_argument_group("visual options", "Options influencing the"
-                                   + " visual style of the created pdf")
+                                   " visual style of the created pdf")
 
 group1.add_argument("-o", dest="output", default="eventsize.pdf",
                     help="""the output PDF filename for the generated graphs,
@@ -92,7 +92,7 @@ group2.add_argument("--skip-total", default=False, action="store_true",
                     omitted from the charts""")
 group2.add_argument("--show-members", default=False, action='store_true',
                     help="if given also plots for the size of the members of "
-                    + "top level objects will be created")
+                    "top level objects will be created")
 group2.add_argument("--skip-relations", default=False, action="store_true",
                     help="""if given, relations will be omitted from output""")
 group2.add_argument("--skip-mcrelations", default=False, action="store_true",
@@ -202,7 +202,8 @@ def create_plot(pdf, labels, legend, values, title, ylabel):
     # set x axis ticks
     a.set_xticks(bar_pos + (1. - args.bar_gap) / 2)
     a.set_xticklabels(labels, rotation=45, ha="right")
-    a.set_xlim(0, bar_pos[-1] + 1)
+    if len(bar_pos):
+        a.set_xlim(0, bar_pos[-1] + 1)
     # and y axis label and grid
     a.set_ylabel(ylabel)
     a.grid(axis="y")
@@ -233,14 +234,14 @@ def plot_sizes(pdf, files, skip=args.skip_object, branch=None):
     """
 
     Nfiles = len(files)
-    #create a list containing zeros when accessing a branch name. This makes
-    #sure that the code even works if the branch names are not the same in the
-    #different files
+    # create a list containing zeros when accessing a branch name. This makes
+    # sure that the code even works if the branch names are not the same in the
+    # different files
     sizes = defaultdict(lambda: [0] * Nfiles)
-    #remember labels
+    # remember labels
     legend = []
 
-    #loop over files
+    # loop over files
     for i, (tree, label, zipped) in enumerate(files):
         legend.append(label)
         # and fill list of sizes for each branch name
@@ -308,7 +309,7 @@ for item in args.filename:
         filename = filename[:-1]
 
     if not os.path.exists(filename):
-        print "file '{}' could not be found, exiting".format(filename)
+        print("file '{}' could not be found, exiting".format(filename))
         sys.exit(1)
 
     if label is None:
@@ -317,20 +318,20 @@ for item in args.filename:
     rfile = root.TFile(filename)
     rtree = rfile.Get("tree")
     if not rtree:
-        print "could not find basf2 tree in '{}', exiting".format(filename)
+        print("could not find basf2 tree in '{}', exiting".format(filename))
         sys.exit(1)
 
     # add TFile to list to prevent destruction
     rootfiles.append(rfile)
-    trees.append((rtree, label.decode("utf-8"), not uncompressed))
+    trees.append((rtree, label, not uncompressed))
 
 if not trees:
     parser.error("No files given, supply at least one filename to analyze")
 
 try:
     pdf = PdfPages(args.output)
-except IOError, e:
-    print "Could not open output file:", e
+except IOError as e:
+    print("Could not open output file:", e)
     sys.exit(1)
 
 plot_sizes(pdf, trees)

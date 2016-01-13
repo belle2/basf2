@@ -437,8 +437,20 @@ void CRY::storeParticle(MCParticleGraph& mcGraph, const double* mom, const doubl
   part.setEnergy(mom[3]);
   part.setProductionVertex(TVector3(vertex[0], vertex[1], vertex[2]));
 
-  B2INFO("CRY: Production time of particle (" << ptime + m_timeOffset << " is ignored and set to " << 0.0 + m_timeOffset << ")")
-  part.setProductionTime(0.0 + m_timeOffset);
+  // correct the time back such that t=0 at y=0
+  const TVector3 vertexVector(vertex[0], vertex[1], vertex[2]);
+  const TVector3 momentumVector(mom[0], mom[1], mom[2]);
+  const TVector3 normalVector(0., 1., 0.); // normal to the global generation plane
+  const double beta = momentumVector.Mag() / mom[3]; // lorentz beta factor of this particle
+  const double speed = beta  * Const::speedOfLight; // speed of this particle
+
+  const double d = ((TVector3(0, 0, 0) - vertexVector) * normalVector) / (momentumVector * normalVector);
+  TVector3 intersectionVector(0., 0., 0.);
+  intersectionVector = d * momentumVector + vertexVector; //intersection of extrapolated particle with global plane
+  const double trackLength = (vertexVector - intersectionVector).Mag();
+  const double flightTime = trackLength / speed; // flighttime from virtual starting point to y=0
+
+  part.setProductionTime(m_timeOffset - flightTime);
 }
 
 

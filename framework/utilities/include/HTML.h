@@ -28,6 +28,19 @@ namespace Belle2 {
     /** get a string with vector coordinates: (x, y, z). (uses fixed-length output). */
     std::string getString(const TVector3& vec, int precision = 2);
 
+    /** get a string with vector coordinates: (x, y, z). (uses fixed-length output).
+     * converts floating point value from standard framework unit to given unit.
+     *
+     * @param unitType Defines the unit to convert the vector values from standard framework unit.
+     */
+    std::string getStringConvertToUnit(const TVector3& vec, int precision = 2,
+                                       const std::string& unitType = "cm");
+
+    /** get a string with a unit type to convert a vector, so that it is easily readable.
+     * valid unit types are (um, cm) for now. the maximum of the vector entries defines the unit.
+     */
+    std::string chooseUnitOfLength(const TVector3& vec);
+
     /** Reformat given HTML string into terminal-friendly plain text. */
     std::string htmlToPlainText(const std::string& html);
   }

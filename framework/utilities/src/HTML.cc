@@ -7,6 +7,9 @@
 #include <TMatrixD.h>
 #include <TVector3.h>
 
+#include <framework/gearbox/Unit.h>
+#include <stdlib.h>
+
 #include <iomanip>
 #include <sstream>
 
@@ -73,6 +76,43 @@ std::string HTML::getString(const TVector3& vec, int precision)
   stream << std::fixed << "(" << vec.x() << ", " <<  vec.y() << ", " <<  vec.z() << ")";
   return stream.str();
 }
+
+std::string HTML::getStringConvertToUnit(const TVector3& vec, int precision, const std::string& unitType)
+{
+  std::stringstream stream;
+  stream.precision(precision);
+  std::string displayedUnitType = unitType;
+
+  if (unitType == "um")
+    displayedUnitType = "\x0b5m";
+
+
+  stream << std::fixed << "(" << Unit::convertValueToUnit(vec.x(), unitType) << ", "
+         <<  Unit::convertValueToUnit(vec.y(), unitType) << ", " <<  Unit::convertValueToUnit(vec.z(), unitType)
+         << ") " << displayedUnitType;
+
+
+  return stream.str();
+}
+std::string HTML::chooseUnitOfLength(const TVector3& vec)
+{
+  double xyz [3];
+  std::string unitType;
+  vec.GetXYZ(xyz);
+  double max = 0;
+
+  for (auto entry : xyz)
+    if (std::abs(entry) > max)
+      max = std::abs(entry);
+
+  // choose specific range for that the unit is useful
+  if (max < 0.1)
+    unitType = "um";
+  else
+    unitType = "cm";
+  return unitType;
+}
+
 
 std::string HTML::htmlToPlainText(const std::string& html)
 {

@@ -105,6 +105,9 @@ parser.add_argument("--annotations", default=r"memoryusage annotate:\s*(.*)$",
                     help="regular expession which to apply against output of "
                     "program. If a match is found the contents of group 1 will "
                     "be added to the plots at the time the output was processed")
+parser.add_argument("--no-legend", dest="no_legend", default=False,
+                    action="store_true", help="Omit legend from plot, useful "
+                    "for many cores as legend grows very large in that case")
 
 options, args = parser.parse_known_args()
 # remove the -- if present
@@ -328,7 +331,7 @@ def check_output():
         annotatemessage = annotate.search(line)
         if annotatemessage:
             message = annotatemessage.group(1).strip()
-            annotations.append((runtime, message))
+            annotations.append((timer.reltime(), message))
         # forward output to stdout
         sys.stdout.write(line)
         sys.stdout.flush()
@@ -399,6 +402,11 @@ if do_record:
     for pid in process_memory:
         process_memory[pid] = np.array(process_memory[pid])
 
+    # make annotations a structured array, otherwise numpy will convert
+    # timestamps to strings
+    annot_max_length = max(len(e[1]) for e in annotations) if len(annotations) else ""
+    annotations = np.array(annotations, dtype=[("time", "f4"), ("text", "U%s" % annot_max_length)])
+
 # recording is done so let's write that data to file if requested. We use
 # numpy.savez to store all data as binary numpy arrays in that file.
 if write_file:
@@ -411,7 +419,7 @@ if write_file:
             "total_memory": total_memory,
             "process_names": np.array(list(process_names.items())),
             "memory_types": np.array(memory_types),
-            "annotations": np.array(annotations),
+            "annotations": annotations,
         }
         if options.system:
             keys["system_memory"] = system_memory
@@ -419,7 +427,7 @@ if write_file:
             keys[str(pid)] = data
 
         # saving is trivial
-        np.savez(datafile, **keys)
+        np.savez_compressed(datafile, **keys)
 
 # apparently we want to load data from file so let's do that
 if read_file:
@@ -504,8 +512,9 @@ if do_plotting:
         a.set_ylim(ymin=0)
         a.grid()
         # and a legend
-        l = a.legend(loc="best")
-        l.get_frame().set_alpha(0.8)
+        if not options.no_legend:
+            l = a.legend(loc="best")
+            l.get_frame().set_alpha(0.8)
 
         # add max line and label it
         maxvalue = total_memory[:, i + 1].max() / 1000
@@ -513,13 +522,18 @@ if do_plotting:
         a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
                    textcoords="offset points")
 
-        for time, text in annotations:
-            time_index = np.searchsorted(total_memory[:, 0], time)
-            annotvalue = total_memory[time_index, i + 1] / 1000
-            args = dict(xy=(time, annotvalue), xytext=(0, -20), textcoords="offset points",
+        # add annotations if any. As the annotations are not necessarily at the
+        # same times as the memory consumption we let numpy linearly interpolate
+        # the total memory at the times of the annotations
+        annotation_values = np.interp(annotations["time"], total_memory[:, 0], total_memory[:, i + 1] / 1000)
+        # and add a an annotation for each one to the plot
+        for (time, text), value in zip(annotations, annotation_values):
+            args = dict(xy=(time, value), xytext=(0, -20), textcoords="offset points",
                         rotation="vertical", size="xx-small", arrowprops={"arrowstyle": "->"},
                         ha="center", va="top")
-            if maxvalue == 0 or annotvalue/maxvalue < 0.5:
+            # if total memory is below the center of the plot put the annotation
+            # above, otherwise put it below the line
+            if maxvalue == 0 or value/maxvalue < 0.5:
                 args["va"] = "bottom"
                 args["xytext"] = (0, -args["xytext"][1])
 

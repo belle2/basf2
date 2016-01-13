@@ -14,7 +14,7 @@ use_local_database()
 main = create_path()
 
 
-main.add_module('RootInput')
+main.add_module('RootInput', excludeBranchNames=['GF2TracksToMCParticles', 'TrackCandsToGF2Tracks', 'GF2Tracks'])
 main.add_module('Gearbox')
 main.add_module('Geometry', components=['BeamPipe', 'MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
 main.add_module('MagnetSwitcher')

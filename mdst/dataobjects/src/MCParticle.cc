@@ -119,7 +119,6 @@ std::string MCParticle::getName() const
 std::string MCParticle::getInfoHTML() const
 {
   std::stringstream out;
-
   out << "<b>Charge</b>=" << (int)getCharge();
   out << ", <b>PDG</b>=" << getPDG();
   out << " (" << getName() << ")";
@@ -128,7 +127,9 @@ std::string MCParticle::getInfoHTML() const
   out << "<b>pT</b>=" << getMomentum().Pt();
   out << ", <b>pZ</b>=" << m_momentum_z;
   out << "<br>";
-  out << "<b>V</b>=" << HTML::getString(getProductionVertex());
+  std::string unitType = HTML::chooseUnitOfLength(getProductionVertex());
+  int precision = 3;
+  out << "<b>V</b>=" << HTML::getStringConvertToUnit(getProductionVertex(), precision, unitType);
 
   const MCParticle* mom = getMother();
   if (mom) {

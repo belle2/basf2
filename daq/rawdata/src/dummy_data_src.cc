@@ -9,26 +9,28 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define NWORDS_PER_COPPER 16 // 16 -> 1kB/16COPER
 
 #define LISTENQ 1
 #define SERVER
+
 
 #define NW_SEND_HEADER 6
 #define NW_SEND_TRAILER 2
 #define NW_RAW_HEADER 12
 #define NW_RAW_TRAILER 2
 
+#define REDUCED_DATA
+
 #ifdef REDUCED_DATA
 #define NW_COPPER_HEADER 0
-#define NW_B2L_HEADER 6
-#define NW_B2L_TRAILER 3
-#define NW_COPPER_TRAILER 3
-#else
-#define NW_COPPER_HEADER 13
 #define NW_B2L_HEADER 2
 #define NW_B2L_TRAILER 1
 #define NW_COPPER_TRAILER 0
+#else
+#define NW_COPPER_HEADER 13
+#define NW_B2L_HEADER 6
+#define NW_B2L_TRAILER 3
+#define NW_COPPER_TRAILER 3
 #endif
 
 using namespace std;
@@ -47,6 +49,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
                         (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb
                         + NW_COPPER_TRAILER + NW_RAW_TRAILER);
 
+
   // Send Header
   int offset = 0;
   buf[ offset + 0 ] = nwords;
@@ -56,6 +59,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   buf[ offset + 3 ] = exp_run;
   buf[ offset + 5 ] = node_id;
   offset += 6;
+
 
   for (int k = 0; k < ncpr; k++) {
     //
@@ -79,7 +83,6 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  10 ] = buf[ offset +  9 ] + finesse_nwords;
     buf[ offset +  11 ] = buf[ offset +  10 ] + finesse_nwords;
     offset += 12;
-
 
 #ifdef REDUCED_DATA
 #else
@@ -154,20 +157,23 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr, int nhslb)
 //inline void addEvent(int* buf, int nwords, unsigned int event)
 {
-
   int offset = 0;
   buf[ offset + 4 ] = event;
   offset += NW_SEND_HEADER;
 
   for (int k = 0; k < ncpr; k++) {
     if (buf[ offset + 4 ] != 0x12345601) {
-      printf("ERROR 0x%.x", buf[ offset + 4 ]);
+      printf("ERROR 2 0x%.x", buf[ offset + 4 ]);
+      fflush(stdout);
       exit(1);
     }
     // RawHeader
     buf[ offset + 3] = event;
 
 #ifdef REDUCED_DATA
+    offset += NW_RAW_HEADER + NW_COPPER_HEADER +
+              nhslb * (NW_B2L_HEADER + nwords_per_fee + NW_B2L_TRAILER)
+              + NW_COPPER_TRAILER + NW_RAW_TRAILER;
 #else
     // COPPER header
     offset += NW_RAW_HEADER;
@@ -175,17 +181,18 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     offset += NW_COPPER_HEADER;
 
     for (int i = 0; i < nhslb ; i++) {
-      offset +=  NW_B2L_HEADER;
-      if (buf[ offset ] != 0xffaa0000) {
-        printf("ERROR 0x%.x", buf[ offset ]);
+      if ((buf[ offset ] & 0xffff0000) != 0xffaa0000) {
+        printf("ERROR 3 0x%.x hslb %d cpr %d\n", buf[ offset ], i, k);
+        fflush(stdout);
         exit(1);
       }
       buf[ offset +  0 ] = 0xffaa0000 + (event & 0xffff);
       buf[ offset +  2 ] = event;
-      offset += nwords_per_fee + NW_B2L_TRAILER;
+      offset += NW_B2L_HEADER + nwords_per_fee + NW_B2L_TRAILER;
     }
-#endif
     offset += NW_COPPER_TRAILER + NW_RAW_TRAILER;
+#endif
+
   }
 
 }
@@ -220,17 +227,20 @@ int main(int argc, char** argv)
   int total_words =  NW_SEND_HEADER + NW_SEND_TRAILER +
                      ncpr * (NW_RAW_HEADER + NW_COPPER_HEADER + (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb + NW_COPPER_TRAILER +
                              NW_RAW_TRAILER);
+  printf("TET %d %d %d %d %d\n ", NW_SEND_HEADER + NW_SEND_TRAILER, ncpr,
+         NW_RAW_HEADER + NW_COPPER_HEADER, (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb, NW_COPPER_TRAILER +   NW_RAW_TRAILER);
 
   int buff[total_words];
 
   //
   // Prepare header
   //
-  if (fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb) != total_words) {
-    printf("ERROR %d %d\n", fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb), total_words);
+  int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb);
+  if (temp_ret != total_words) {
+    printf("ERROR1 %d %d\n", total_words, temp_ret);
+    fflush(stdout);
     exit(1);
   }
-
 
   //  for(int i = 0 ; i < total_words ; i++){
   //     printf("%.8x ", buff[ i ]);

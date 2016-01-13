@@ -10,8 +10,26 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #define NWORDS_PER_COPPER 16 // 16 -> 1kB/16COPER
+
 #define LISTENQ 1
 #define SERVER
+
+#define NW_SEND_HEADER 6
+#define NW_SEND_TRAILER 2
+#define NW_RAW_HEADER 12
+#define NW_RAW_TRAILER 2
+
+#ifdef REDUCED_DATA
+#define NW_COPPER_HEADER 0
+#define NW_B2L_HEADER 6
+#define NW_B2L_TRAILER 3
+#define NW_COPPER_TRAILER 3
+#else
+#define NW_COPPER_HEADER 13
+#define NW_B2L_HEADER 2
+#define NW_B2L_TRAILER 1
+#define NW_COPPER_TRAILER 0
+#endif
 
 using namespace std;
 
@@ -22,150 +40,196 @@ double getTimeSec()
   return (t.tv_sec + t.tv_usec * 1.e-6 - 1417570000.);
 }
 
-void fillDataContents(int* buf, int nwords, unsigned int node_id)
+int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncpr, int nhslb)
 {
+  int nwords =  NW_SEND_HEADER + NW_SEND_TRAILER +
+                ncpr * (NW_RAW_HEADER + NW_COPPER_HEADER +
+                        (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb
+                        + NW_COPPER_TRAILER + NW_RAW_TRAILER);
 
-  // rawheader, copperheader, copper trailer, raw trailer, b2l header and trailer, send header, send trailer;
-
+  // Send Header
   int offset = 0;
   buf[ offset + 0 ] = nwords;
   buf[ offset + 1 ] = 6;
   buf[ offset + 2 ] = 0x00010001;
   unsigned int exp_run = 0x00400101;
   buf[ offset + 3 ] = exp_run;
-
   buf[ offset + 5 ] = node_id;
+  offset += 6;
 
-  //
-  // RawHeader
-  //
-  offset = 6;
-  buf[ offset +  0 ] = nwords - 6 - 2;
-  //  buf[ offset +  1 ] = 0x7f7f010c;
-  buf[ offset +  1 ] = 0x7f7f820c;
-  buf[ offset +  2 ] = exp_run;
-  unsigned int ctime = 0x12345601;
-  buf[ offset +  4 ] = ctime;
-  unsigned int utime = 0x98765432;
-  buf[ offset +  5 ] = utime;
-  buf[ offset +  6 ] = node_id;
-  buf[ offset +  7 ] = 0x34567890;
-  int finesse_nwords = (nwords - (6 + 12 + 13 + 3 + 2 + 2)) / 4;
-  int residual = (nwords - (6 + 12 + 13 + 3 + 2 + 2)) - finesse_nwords * 4;
-  buf[ offset +  8 ] = 12 + 13;
-  buf[ offset +  9 ] = buf[ offset +  8 ] + finesse_nwords;
-  buf[ offset +  10 ] = buf[ offset +  9 ] + finesse_nwords;
-  buf[ offset +  11 ] = buf[ offset +  10 ] + finesse_nwords;
-
-  offset = 6 + 12;
-
-  // COPPER header
-  buf[ offset +  0 ] = 0x7fff0008;
-  buf[ offset +  2 ] = 0;
-  buf[ offset +  3 ] = 0;
-  buf[ offset +  4 ] = 0;
-  buf[ offset +  5 ] = 0;
-  buf[ offset +  6 ] = 0;
-  buf[ offset +  7 ] = 0xfffffafa;
-  buf[ offset +  8 ] = nwords - (6 + 12 + 7 + 2 + 2 + 2);
-  buf[ offset +  9 ] = finesse_nwords;
-  buf[ offset +  10 ] = finesse_nwords;
-  buf[ offset +  11 ] = finesse_nwords;
-  buf[ offset +  12 ] = finesse_nwords + residual;
+  for (int k = 0; k < ncpr; k++) {
+    //
+    // RawHeader
+    //
+    int finesse_nwords = nwords_per_fee + NW_B2L_HEADER + NW_B2L_TRAILER;
+    unsigned int ctime = 0x12345601;
+    unsigned int utime = 0x98765432;
 
 
-  for (int i = 0; i < 4 ; i++) {
-    offset = 6 + 12 + 13 + i * finesse_nwords;
-    buf[ offset +  0 ] = 0xffaa0000;
-    buf[ offset +  1 ] = ctime;
-    buf[ offset +  3 ] = utime;
-    buf[ offset +  4 ] = exp_run;
-    buf[ offset +  5 ] = ctime;
+    buf[ offset +  0 ] = nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
+    //  buf[ offset +  1 ] = 0x7f7f010c;
+    buf[ offset +  1 ] = 0x7f7f820c;
+    buf[ offset +  2 ] = exp_run;
+    buf[ offset +  4 ] = ctime;
+    buf[ offset +  5 ] = utime;
+    buf[ offset +  6 ] = node_id + k;
+    buf[ offset +  7 ] = 0x34567890;
+    buf[ offset +  8 ] = NW_RAW_HEADER + NW_COPPER_HEADER;
+    buf[ offset +  9 ] = buf[ offset +  8 ] + finesse_nwords;
+    buf[ offset +  10 ] = buf[ offset +  9 ] + finesse_nwords;
+    buf[ offset +  11 ] = buf[ offset +  10 ] + finesse_nwords;
+    offset += 12;
 
-    int add = 0;
-    if (i == 3) add = residual;
 
-    offset = 6 + 12 + 13 + 5 + i * finesse_nwords;
-    for (int j = offset; j < offset + finesse_nwords + add - 3; j++) {
-      buf[ j ] = rand();
-      buf[ j ] = 0;
+#ifdef REDUCED_DATA
+#else
+    // COPPER header
+    buf[ offset +  0 ] = 0x7fff0008;
+    buf[ offset +  2 ] = 0;
+    buf[ offset +  3 ] = 0;
+    buf[ offset +  4 ] = 0;
+    buf[ offset +  5 ] = 0;
+    buf[ offset +  6 ] = 0;
+    buf[ offset +  7 ] = 0xfffffafa;
+    buf[ offset +  8 ] = nwords - (NW_SEND_HEADER + NW_RAW_HEADER + 7 + 2 + NW_RAW_TRAILER + NW_SEND_TRAILER);
+    buf[ offset +  9 ] = finesse_nwords;
+    buf[ offset +  10 ] = finesse_nwords;
+    buf[ offset +  11 ] = finesse_nwords;
+    buf[ offset +  12 ] = finesse_nwords;
+    offset += 13;
+#endif
+
+    for (int i = 0; i < nhslb ; i++) {
+#ifdef REDUCED_DATA
+      buf[ offset +  0 ] = 0xffaa0000;
+      buf[ offset +  1 ] = ctime;
+      offset += 2;
+#else
+      buf[ offset +  0 ] = 0xffaa0000;
+      buf[ offset +  1 ] = ctime;
+      buf[ offset +  3 ] = utime;
+      buf[ offset +  4 ] = exp_run;
+      buf[ offset +  5 ] = ctime;
+      offset += 6;
+#endif
+
+      for (int j = offset; j < offset + nwords_per_fee; j++) {
+        buf[ j ] = rand();
+      }
+      offset += nwords_per_fee;
+#ifdef REDUCED_DATA
+      buf[ offset  ] = 0;
+      offset += 1;
+#else
+      buf[ offset  ] = ctime;
+      buf[ offset + 1 ] = 0;
+      buf[ offset + 2 ] = 0xff550000;
+      offset += 3;
+#endif
     }
 
-    offset = 6 + 12 + 13 + (i + 1) * finesse_nwords + add;
-    buf[ offset - 3  ] = ctime;
-    buf[ offset - 2  ] = 0;
-    buf[ offset - 1  ] = 0xff550000;
-  }
+#ifdef REDUCED_DATA
+#else
+    // COPPER trailer/Raw Trailer
+    buf[ offset ] = 0xfffff5f5;
+    buf[ offset + 1 ] = 0;
+    buf[ offset + 2 ] = 0x7fff0009;
+    offset += 3;
+#endif
 
-  // COPPER trailer/Raw Trailer
-  offset = nwords - 2;
-  buf[ offset - 5  ] = 0xfffff5f5;
-  buf[ offset - 4  ] = 0;
-  buf[ offset - 3  ] = 0x7fff0009;
-  buf[ offset - 2  ] = 0;
-  buf[ offset - 1  ] = 0x7fff0006;
+    buf[ offset  ] = 0;
+    buf[ offset + 1 ] = 0x7fff0006;
+    offset += 2;
+  }
 
   // Send trailer
-  buf[ nwords - 2 ] = 0;
-  buf[ nwords - 1 ] = 0x7fff0000;
-
-  return;
+  buf[ offset ] = 0;
+  buf[ offset + 1 ] = 0x7fff0000;
+  offset += 2;
+  return offset;
 }
 
 
 
-inline void addEvent(int* buf, int nwords, unsigned int event)
+inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr, int nhslb)
+//inline void addEvent(int* buf, int nwords, unsigned int event)
 {
+
   int offset = 0;
   buf[ offset + 4 ] = event;
-  offset = 6;
-  buf[ offset + 3] = event;
-  offset = 6 + 12;
-  buf[ offset +  1 ] = event;
+  offset += NW_SEND_HEADER;
 
-  int finesse_nwords = (nwords - (6 + 12 + 13 + 3 + 2 + 2)) / 4;
-  for (int i = 0; i < 4 ; i++) {
-    offset = 6 + 12 + 13 + i * finesse_nwords;
-    buf[ offset +  0 ] = 0xffaa0000 + (event & 0xffff);
-    buf[ offset +  2 ] = event;
+  for (int k = 0; k < ncpr; k++) {
+    if (buf[ offset + 4 ] != 0x12345601) {
+      printf("ERROR 0x%.x", buf[ offset + 4 ]);
+      exit(1);
+    }
+    // RawHeader
+    buf[ offset + 3] = event;
+
+#ifdef REDUCED_DATA
+#else
+    // COPPER header
+    offset += NW_RAW_HEADER;
+    buf[ offset +  1 ] = event;
+    offset += NW_COPPER_HEADER;
+
+    for (int i = 0; i < nhslb ; i++) {
+      offset +=  NW_B2L_HEADER;
+      if (buf[ offset ] != 0xffaa0000) {
+        printf("ERROR 0x%.x", buf[ offset ]);
+        exit(1);
+      }
+      buf[ offset +  0 ] = 0xffaa0000 + (event & 0xffff);
+      buf[ offset +  2 ] = event;
+      offset += nwords_per_fee + NW_B2L_TRAILER;
+    }
+#endif
+    offset += NW_COPPER_TRAILER + NW_RAW_TRAILER;
   }
 
 }
+
 
 int main(int argc, char** argv)
 {
-  int run_no = 0;
 
 #ifdef SERVER
-  //  if( argc != 2 && argc != 3  ){
-  if (argc < 2) {
-    printf("Usage : %s <node ID> (run#)\n", argv[ 0 ]);
+  if (argc != 6) {
+    printf("Usage : %s <node ID> <run#> <nwords of det. buf per FEE> <# of CPR per COPPER> <# of HSLBs>\n", argv[ 0 ]);
     exit(1);
   }
 #else
-  if (argc != 4 && argc != 5) {
-    printf("Usage : %s <node ID> <run#> <ropc hostname> <ropc port> argc %d\n", argv[ 0 ], argc);
+  if (argc != 8) {
+    printf("Usage : %s <node ID> <run#> <nwords of det. buf per FEE> <# of CPR per COPPER>  <# of HSLBs> <ropc hostname> <ropc port> argc %d\n",
+           argv[ 0 ], argc);
     exit(1);
   }
-
 #endif
 
-  if (argc == 3 || argc == 5) run_no = atoi(argv[2]);
+  unsigned int node_id = atoi(argv[1]);
+  int run_no = atoi(argv[2]);
   printf("run_no %d\n", run_no); fflush(stdout);
 
-  unsigned int node_id = atoi(argv[1]);
-
+  int nwords_per_fee = atoi(argv[3]);
+  int ncpr = atoi(argv[4]);
+  int nhslb = atoi(argv[5]);
 
   int listenfd, connfd;
   struct sockaddr_in servaddr;
-  int total_words = NWORDS_PER_COPPER + 6 + 12 + 13 + (5 + 3) * 4 + 3 + 2 + 2;
+  int total_words =  NW_SEND_HEADER + NW_SEND_TRAILER +
+                     ncpr * (NW_RAW_HEADER + NW_COPPER_HEADER + (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb + NW_COPPER_TRAILER +
+                             NW_RAW_TRAILER);
 
   int buff[total_words];
 
   //
   // Prepare header
   //
-  fillDataContents(buff, total_words, node_id);
+  if (fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb) != total_words) {
+    printf("ERROR %d %d\n", fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb), total_words);
+    exit(1);
+  }
 
 
   //  for(int i = 0 ; i < total_words ; i++){
@@ -206,8 +270,8 @@ int main(int argc, char** argv)
 
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(atoi(argv[4]));
-  if (inet_pton(AF_INET, argv[3], &servaddr.sin_addr) <= 0) {
+  servaddr.sin_port = htons(atoi(argv[7]));
+  if (inet_pton(AF_INET, argv[6], &servaddr.sin_addr) <= 0) {
     perror("inetpton error");
     exit(1);
   }
@@ -234,7 +298,8 @@ int main(int argc, char** argv)
   unsigned long long int prev_cnt = 0;
   unsigned long long int start_cnt = 300000;
   for (;;) {
-    addEvent(buff, total_words, cnt);
+    //    addEvent(buff, total_words, cnt);
+    addEvent(buff, nwords_per_fee, cnt, ncpr, nhslb);
     //    printf("cnt %d bytes\n", cnt*total_words); fflush(stdout);
     //    sprintf( buff, "event %d dessa", cnt );
     int ret = 0;

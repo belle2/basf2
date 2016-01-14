@@ -80,6 +80,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  1 ] = 0x7f7f820c;
 #endif
     buf[ offset +  2 ] = exp_run;
+    printf("run_no %d\n", exp_run); fflush(stdout);
     buf[ offset +  4 ] = ctime;
     buf[ offset +  5 ] = utime;
     buf[ offset +  6 ] = node_id + k;
@@ -232,7 +233,7 @@ int main(int argc, char** argv)
   sscanf(argv[1], "0x%x", &node_id);
 
   int run_no = atoi(argv[2]);
-  printf("run_no %d\n", run_no); fflush(stdout);
+
 
   int nwords_per_fee = atoi(argv[3]);
   int ncpr = atoi(argv[4]);

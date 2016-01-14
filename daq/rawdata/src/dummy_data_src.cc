@@ -65,12 +65,15 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     //
     // RawHeader
     //
+    int cpr_nwords = NW_RAW_HEADER + NW_COPPER_HEADER +
+                     (NW_B2L_HEADER + NW_B2L_TRAILER + nwords_per_fee) * nhslb
+                     + NW_COPPER_TRAILER + NW_RAW_TRAILER;
     int finesse_nwords = nwords_per_fee + NW_B2L_HEADER + NW_B2L_TRAILER;
     unsigned int ctime = 0x12345601;
     unsigned int utime = 0x98765432;
 
 
-    buf[ offset +  0 ] = nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
+    buf[ offset +  0 ] = cpr_nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
     //  buf[ offset +  1 ] = 0x7f7f010c;
     buf[ offset +  1 ] = 0x7f7f820c;
     buf[ offset +  2 ] = exp_run;
@@ -94,7 +97,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  5 ] = 0;
     buf[ offset +  6 ] = 0;
     buf[ offset +  7 ] = 0xfffffafa;
-    buf[ offset +  8 ] = nwords - (NW_SEND_HEADER + NW_RAW_HEADER + 7 + 2 + NW_RAW_TRAILER + NW_SEND_TRAILER);
+    buf[ offset +  8 ] = cpr_nwords - (NW_RAW_HEADER + 7 + 2 + NW_RAW_TRAILER);
     buf[ offset +  9 ] = finesse_nwords;
     buf[ offset +  10 ] = finesse_nwords;
     buf[ offset +  11 ] = finesse_nwords;

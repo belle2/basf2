@@ -23,20 +23,20 @@
 #pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCWireHit>-;
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCWireHit> >-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCFacet>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCFacet> >-;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCFacet>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCFacet> >-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCRecoSegment2D>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCRecoSegment2D> >-;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCRecoSegment2D>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCRecoSegment2D> >-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCSegmentPair>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCSegmentPair> >-;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentPair>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentPair> >-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCSegmentTriple>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCSegmentTriple> >-;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentTriple>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentTriple> >-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCTrack>-;
-#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCTrack> >-;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCTrack>-;
+#pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCTrack> >-;
 
 #endif
 

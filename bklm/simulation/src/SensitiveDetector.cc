@@ -23,8 +23,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <boost/lexical_cast.hpp>
-
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Units/SystemOfUnits.h"
@@ -32,12 +30,14 @@
 #include "TRandom3.h"
 
 #include "G4Step.hh"
-#include "G4Event.hh"
-#include "G4EventManager.hh"
+#include "G4VProcess.hh"
 #include "G4Neutron.hh"
 
-#define DEPTH_RPC 9
-#define DEPTH_SCINT 11
+#define DEPTH_FORWARD 2
+#define DEPTH_SECTOR 3
+#define DEPTH_LAYER 5
+#define DEPTH_PLANE 9
+#define DEPTH_SCINT 10
 
 using namespace std;
 
@@ -45,7 +45,7 @@ namespace Belle2 {
 
   namespace bklm {
 
-    SensitiveDetector::SensitiveDetector() : SensitiveDetectorBase("BKLM", Const::KLM)
+    SensitiveDetector::SensitiveDetector() : SensitiveDetectorBase(G4String("BKLM"), Const::KLM)
     {
       m_FirstCall = true;
       m_NeutronPDG = 0;     // dummy initializer
@@ -105,56 +105,53 @@ namespace Belle2 {
 
       // Record a step for a charged track that deposits some energy.
       // Background study: Record every neutron passage, whether it deposits energy or not.
-      if (((eDep > 0.0) && (postStep->GetCharge() != 0.0)) ||
-          ((m_DoBackgroundStudy) && (pdg == m_NeutronPDG))) {
+      if (((eDep > 0.0) && (postStep->GetCharge() != 0.0)) || (m_DoBackgroundStudy && (pdg == m_NeutronPDG))) {
         const G4VTouchable* hist = preStep->GetTouchable();
-        int baseDepth = hist->GetHistoryDepth() - DEPTH_RPC;
-        if ((baseDepth < 0) || (baseDepth > DEPTH_SCINT - DEPTH_RPC)) {
-          B2WARNING("Touchable History baseDepth = " << baseDepth + DEPTH_RPC << " (should be 9=RPC or 11=scint)")
+        int depth = hist->GetHistoryDepth();
+        if (depth < DEPTH_PLANE) {
+          B2WARNING("Touchable History depth = " << depth << " should be at least " << DEPTH_PLANE)
           return false;
         }
-        int plane = hist->GetCopyNumber(baseDepth);
-        int layer = hist->GetCopyNumber(baseDepth + 4);
-        int sector = hist->GetCopyNumber(baseDepth + 6);
-        bool isForward = (hist->GetCopyNumber(baseDepth + 7) == BKLM_FORWARD);
+        int plane = hist->GetCopyNumber(depth - DEPTH_PLANE);
+        int layer = hist->GetCopyNumber(depth - DEPTH_LAYER);
+        int sector = hist->GetCopyNumber(depth - DEPTH_SECTOR);
+        bool isForward = (hist->GetCopyNumber(depth - DEPTH_FORWARD) == BKLM_FORWARD);
         int moduleID = (isForward ? BKLM_END_MASK : 0)
                        | ((sector - 1) << BKLM_SECTOR_BIT)
                        | ((layer - 1) << BKLM_LAYER_BIT)
                        | BKLM_MC_MASK;
-        const CLHEP::Hep3Vector mom = 0.5 * (preStep->GetMomentum() + postStep->GetMomentum());  // GEANT4: in MeV/c
-        const TVector3 momentum(mom.x(), mom.y(), mom.z());
         double time = 0.5 * (preStep->GetGlobalTime() + postStep->GetGlobalTime());  // GEANT4: in ns
-        const CLHEP::Hep3Vector gHitPos = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
+        const CLHEP::Hep3Vector globalPosition = 0.5 * (preStep->GetPosition() + postStep->GetPosition()) / CLHEP::cm; // in cm
         const Module* m = m_GeoPar->findModule(isForward, sector, layer);
-        const CLHEP::Hep3Vector lHitPos = m->globalToLocal(gHitPos);
-        const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(lHitPos);
+        const CLHEP::Hep3Vector localPosition = m->globalToLocal(globalPosition);
+        const CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(localPosition);
         if (postStep->GetProcessDefinedStep() != 0) {
           if (postStep->GetProcessDefinedStep()->GetProcessType() == fDecay) { moduleID |= BKLM_DECAYED_MASK; }
         }
         int trackID = track->GetTrackID();
-        if (baseDepth == 0) {
+        if (m->hasRPCs()) {
           moduleID |= BKLM_INRPC_MASK;
           int phiStripLower = -1;
           int phiStripUpper = -1;
           int zStripLower = -1;
           int zStripUpper = -1;
-          convertHitToRPCStrips(lHitPos, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
+          convertHitToRPCStrips(localPosition, m, phiStripLower, phiStripUpper, zStripLower, zStripUpper);
           if (zStripLower > 0) {
             int moduleIDZ = moduleID | ((zStripLower - 1) << BKLM_STRIP_BIT) | ((zStripUpper - 1) << BKLM_MAXSTRIP_BIT);
             BKLMSimHit* simHit = simHits.appendNew(moduleIDZ, propagationTimes.z(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
             simHitPosition->addRelationTo(simHit);
           }
           if (phiStripLower > 0) {
             moduleID |= ((phiStripLower - 1) << BKLM_STRIP_BIT) | ((phiStripUpper - 1) << BKLM_MAXSTRIP_BIT) | BKLM_PLANE_MASK;
             BKLMSimHit* simHit = simHits.appendNew(moduleID, propagationTimes.y(), time, eDep);
             particleToSimHits.add(trackID, simHits.getEntries() - 1);
-            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+            BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
             simHitPosition->addRelationTo(simHit);
           }
         } else {
-          int scint = hist->GetCopyNumber(1);
+          int scint = hist->GetCopyNumber(depth - DEPTH_SCINT);
           moduleID |= ((scint - 1) << BKLM_STRIP_BIT) | ((scint - 1) << BKLM_MAXSTRIP_BIT);
           double propTime = propagationTimes.z();
           if (plane == BKLM_INNER) {
@@ -163,7 +160,7 @@ namespace Belle2 {
           }
           BKLMSimHit* simHit = simHits.appendNew(moduleID, propTime, time, eDep);
           particleToSimHits.add(trackID, simHits.getEntries() - 1);
-          BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(gHitPos.x(), gHitPos.y(), gHitPos.z());
+          BKLMSimHitPosition* simHitPosition = simHitPositions.appendNew(globalPosition.x(), globalPosition.y(), globalPosition.z());
           simHitPosition->addRelationTo(simHit);
         }
         return true;
@@ -171,17 +168,17 @@ namespace Belle2 {
       return false;
     }
 
-    void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& lHitPos, const Module* m,
+    void SensitiveDetector::convertHitToRPCStrips(const CLHEP::Hep3Vector& localPosition, const Module* m,
                                                   int& phiStripLower, int& phiStripUpper, int& zStripLower, int& zStripUpper)
     {
-      double phiStripD = m->getPhiStrip(lHitPos);
+      double phiStripD = m->getPhiStrip(localPosition);
       int phiStrip = int(phiStripD);
       int pMin = m->getPhiStripMin();
       if (phiStrip < pMin) return;
       int pMax = m->getPhiStripMax();
       if (phiStrip > pMax) return;
 
-      double zStripD = m->getZStrip(lHitPos);
+      double zStripD = m->getZStrip(localPosition);
       int zStrip = int(zStripD);
       int zMin = m->getZStripMin();
       if (zStrip < zMin) return;

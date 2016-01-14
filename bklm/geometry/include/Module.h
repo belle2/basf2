@@ -100,6 +100,9 @@ namespace Belle2 {
       //! Destructor
       ~Module();
 
+      //! Determine if this module contains RPCs (true) or scintillators (false)
+      bool hasRPCs() const { return m_HasRPCs; }
+
       //! Get module's phi-strip minimum index
       int getPhiStripMin() const { return m_PhiStripMin; }
 
@@ -167,6 +170,9 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getGlobalOrigin() const {return m_GlobalOrigin;}
 
     private:
+
+      //! flag to indicate whether this module contains RPCs (true) or scintillators (false)
+      bool m_HasRPCs;
 
       //! to store the width (in cm) of each phi strip this module
       double m_PhiStripWidth;

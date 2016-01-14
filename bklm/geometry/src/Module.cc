@@ -23,6 +23,7 @@ namespace Belle2 {
   namespace bklm {
 
     Module::Module() :
+      m_HasRPCs(false),
       m_PhiStripWidth(0.0),
       m_PhiStripMin(0),
       m_PhiStripMax(0),
@@ -55,6 +56,7 @@ namespace Belle2 {
                    Hep3Vector globalOrigin,
                    Hep3Vector localReconstructionShift,
                    HepRotation rotation) :
+      m_HasRPCs(true),
       m_PhiStripWidth(phiStripWidth),
       m_PhiStripMin(phiStripMin),
       m_PhiStripMax(phiStripMax),
@@ -86,6 +88,7 @@ namespace Belle2 {
                    Hep3Vector globalOrigin,
                    Hep3Vector localReconstructionShift,
                    HepRotation rotation) :
+      m_HasRPCs(false),
       m_PhiStripWidth(stripWidth),
       m_PhiStripMin(1),
       m_PhiStripMax(phiStripNumber),
@@ -111,6 +114,7 @@ namespace Belle2 {
 
     // copy constructor
     Module::Module(const Module& m) :
+      m_HasRPCs(m.m_HasRPCs),
       m_PhiStripWidth(m.m_PhiStripWidth),
       m_PhiStripMin(m.m_PhiStripMin),
       m_PhiStripMax(m.m_PhiStripMax),

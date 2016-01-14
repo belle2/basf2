@@ -75,7 +75,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 
     buf[ offset +  0 ] = cpr_nwords;
     //  buf[ offset +  1 ] = 0x7f7f010c;
-    buf[ offset +  1 ] = 0x7f7f820c;
+    buf[ offset +  1 ] = 0x7f7f020c;
     buf[ offset +  2 ] = exp_run;
     buf[ offset +  4 ] = ctime;
     buf[ offset +  5 ] = utime;

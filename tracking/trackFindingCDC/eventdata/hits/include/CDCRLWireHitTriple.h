@@ -68,9 +68,11 @@ namespace Belle2 {
       /// Establish a total ordering  based on the three oriented wire hits.
       bool operator< (const CDCRLWireHitTriple& other) const
       {
-        return getStartRLWireHit() <  other.getStartRLWireHit() or
-               (getStartRLWireHit() == other.getStartRLWireHit() and
-                getRearRLWireHitPair() < other.getRearRLWireHitPair());
+        return getICluster() < other.getICluster() or
+               (getICluster() == other.getICluster() and
+                (getStartRLWireHit() <  other.getStartRLWireHit() or
+                 (getStartRLWireHit() == other.getStartRLWireHit() and
+                  getRearRLWireHitPair() < other.getRearRLWireHitPair())));
       }
 
       /// Define oriented wire hit pairs to be coaligned with oriented wire hit
@@ -78,9 +80,11 @@ namespace Belle2 {
       friend bool operator< (const CDCRLWireHitTriple& rlWireHitTriple,
                              const CDCRLWireHitPair& rlWireHitPair)
       {
-        return rlWireHitTriple.getStartRLWireHit() < rlWireHitPair.getFromRLWireHit() or
-               (rlWireHitTriple.getStartRLWireHit() == rlWireHitPair.getFromRLWireHit() and
-                rlWireHitTriple.getMiddleRLWireHit() < rlWireHitPair.getToRLWireHit());
+        return rlWireHitTriple.getICluster() < rlWireHitPair.getICluster() or
+               (rlWireHitTriple.getICluster() == rlWireHitPair.getICluster() and
+                (rlWireHitTriple.getStartRLWireHit() < rlWireHitPair.getFromRLWireHit() or
+                 (rlWireHitTriple.getStartRLWireHit() == rlWireHitPair.getFromRLWireHit() and
+                  rlWireHitTriple.getMiddleRLWireHit() < rlWireHitPair.getToRLWireHit())));
       }
 
       /// Define oriented wire hit pairs to be coaligned with orient wire hit triples
@@ -88,9 +92,11 @@ namespace Belle2 {
       friend bool operator< (const CDCRLWireHitPair& rlWireHitPair,
                              const CDCRLWireHitTriple& rlWireHitTriple)
       {
-        return rlWireHitPair.getFromRLWireHit() < rlWireHitTriple.getStartRLWireHit() or
-               (rlWireHitPair.getFromRLWireHit() == rlWireHitTriple.getStartRLWireHit() and
-                rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit());
+        return rlWireHitPair.getICluster() < rlWireHitTriple.getICluster() or
+               (rlWireHitPair.getICluster() == rlWireHitTriple.getICluster() and
+                (rlWireHitPair.getFromRLWireHit() < rlWireHitTriple.getStartRLWireHit() or
+                 (rlWireHitPair.getFromRLWireHit() == rlWireHitTriple.getStartRLWireHit() and
+                  rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit())));
       }
 
       /// Standard output operator for debugging purposes.
@@ -216,6 +222,13 @@ namespace Belle2 {
       void setEndRLInfo(const ERightLeft endRLInfo)
       {  getRearRLWireHitPair().setToRLInfo(endRLInfo); }
 
+      /// Getter for the cluster id
+      int getICluster() const
+      { return m_rearRLWireHitPair.getICluster(); }
+
+      /// Setter for the cluster id
+      void setICluster(int iCluster)
+      { m_rearRLWireHitPair.setICluster(iCluster); }
 
     protected:
       /// Memory for the start oriented wire hit.
@@ -223,6 +236,7 @@ namespace Belle2 {
 
       /// Memory for the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;
+
     }; //end class CDCRLWireHitTriple
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

@@ -17,9 +17,6 @@ namespace Belle2 {
     /// A pair of oriented wire hits.
     class CDCRLWireHitPair {
     public:
-      /// Copy constructor
-      CDCRLWireHitPair(const CDCRLWireHitPair& rlWireHitPair);
-
       /// Constructor taking two oriented wire hits.
       CDCRLWireHitPair(const CDCRLTaggedWireHit& fromRLWireHit,
                        const CDCRLTaggedWireHit& toRLWireHit);
@@ -43,9 +40,11 @@ namespace Belle2 {
        */
       bool operator<(const CDCRLWireHitPair& other) const
       {
-        return getFromRLWireHit() < other.getFromRLWireHit() or
-               (getFromRLWireHit() == other.getFromRLWireHit() and
-                getToRLWireHit() < other.getToRLWireHit());
+        return getICluster() < other.getICluster() or
+               (getICluster() == other.getICluster() and
+                (getFromRLWireHit() < other.getFromRLWireHit() or
+                 (getFromRLWireHit() == other.getFromRLWireHit() and
+                  getToRLWireHit() < other.getToRLWireHit())));
       }
 
       /// Defines wire hits and oriented wire hit pair as coaligned on the first wire hit.
@@ -137,12 +136,23 @@ namespace Belle2 {
       /// Setter for the right left passage information of the second oriented wire hit.
       void setToRLInfo(ERightLeft toRLInfo);
 
+      /// Getter for the cluster id
+      int getICluster() const
+      { return m_iCluster; }
+
+      /// Setter for the cluster id
+      void setICluster(int iCluster)
+      { m_iCluster = iCluster; }
+
     protected:
       /// Memory for the reference to the first oriented wire hit.
       CDCRLTaggedWireHit m_fromRLWireHit;
 
       /// Memory for the reference to the second oriented wire hit.
       CDCRLTaggedWireHit m_toRLWireHit;
+
+      /// Memory for the cluster id of this facet
+      int m_iCluster = -1;
 
     }; //end class CDCRLWireHitPair
   } //end namespace TrackFindingCDC

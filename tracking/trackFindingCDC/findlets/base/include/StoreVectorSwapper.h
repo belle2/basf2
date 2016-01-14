@@ -24,7 +24,7 @@ namespace Belle2 {
     /** Helper findlet to allow combined findlets to export more data to the DataStore.
      *  This is mainly to temporarily maintain the former behaviour of some finder parts
      *  that used to expose more of their internals. */
-    template<class IOType>
+    template<class IOType, bool a_alwaysWrite = false>
     class StoreVectorSwapper:
       public Findlet<IOType> {
 
@@ -62,18 +62,20 @@ namespace Belle2 {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
 
-        moduleParamList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
-                                      m_param_writeStoreVector,
-                                      "Switch if " +
-                                      m_classMnemomicDescription +
-                                      " shall be written to the DataStore",
-                                      bool(false));
+        if (not a_alwaysWrite) {
+          moduleParamList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
+                                        m_param_writeStoreVector,
+                                        "Switch if " +
+                                        m_classMnemomicDescription +
+                                        " shall be written to the DataStore",
+                                        m_param_writeStoreVector);
+        }
 
         moduleParamList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreObjName"),
                                       m_param_storeVectorName,
                                       "Name of the output StoreObjPtr of the " +
                                       m_classMnemomicDescription +
-                                      " generated within this module.",
+                                      "s generated within this module.",
                                       std::string(m_param_storeVectorName));
         //FIXME: Small parameter names
       }
@@ -102,10 +104,14 @@ namespace Belle2 {
         /// Attain super cluster vector on the DataStore if needed.
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
-          storeVector.create();
+          if (not storeVector.isValid()) {
+            storeVector.construct();
+          }
         }
+        m_backup.clear();
       }
 
+      /// Swaps the items to the DataStore or to the backup storage location.
       virtual void apply(std::vector<IOType>& input) override final
       {
         // Swap items to the DataStore
@@ -113,6 +119,8 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
           std::vector<IOType>& sink = *storeVector;
           sink.swap(input);
+        } else {
+          m_backup.swap(input);
         }
       }
 
@@ -121,7 +129,7 @@ namespace Belle2 {
       std::string m_param_storeVectorName;
 
       /// Switch if the store vector should be filled.
-      bool m_param_writeStoreVector = false;
+      bool m_param_writeStoreVector = a_alwaysWrite;
 
       /// Short name for the type of objects to be written out.
       std::string m_classMnemomicName;
@@ -131,6 +139,9 @@ namespace Belle2 {
 
       /// Helper object to lookup short hand names and descriptions
       ClassMnemomics m_classMnemomics;
+
+      /// Backup storage if the vector should not be written to the DataStore
+      std::vector<IOType> m_backup;
 
     }; // end class
   } // end namespace TrackFindingCDC

@@ -220,7 +220,9 @@ int main(int argc, char** argv)
   }
 #endif
 
-  unsigned int node_id = atoi(argv[1]);
+  unsigned int node_id = 0;
+  sscanf(argv[1], "0x%x", &node_id);
+
   int run_no = atoi(argv[2]);
   printf("run_no %d\n", run_no); fflush(stdout);
 

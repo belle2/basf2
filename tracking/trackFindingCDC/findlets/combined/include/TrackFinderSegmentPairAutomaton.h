@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentPairCreator.h>
-
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackMerger.h>
@@ -44,6 +44,7 @@ namespace Belle2 {
       TrackFinderSegmentPairAutomaton()
       {
         addProcessingSignalListener(&m_segmentPairCreator);
+        addProcessingSignalListener(&m_segmentPairRelationCreator);
         addProcessingSignalListener(&m_trackCreatorSegmentPairAutomaton);
         addProcessingSignalListener(&m_trackCreatorSingleSegments);
         addProcessingSignalListener(&m_trackMerger);
@@ -61,7 +62,8 @@ namespace Belle2 {
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
       {
         m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
-        m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
+        m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
+        m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
         m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
         m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);
@@ -72,6 +74,7 @@ namespace Belle2 {
       void beginEvent() override
       {
         m_segmentPairs.clear();
+        m_segmentPairRelations.clear();
         m_preMergeTracks.clear();
         m_mergedTracks.clear();
         Super::beginEvent();
@@ -82,11 +85,14 @@ namespace Belle2 {
                          std::vector<CDCTrack>& tracks) override final
       {
         m_segmentPairs.reserve(100);
+        m_segmentPairRelations.reserve(100);
         m_preMergeTracks.reserve(20);
         m_mergedTracks.reserve(20);
 
         m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
-        m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_preMergeTracks);
+        m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
+        m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preMergeTracks);
+
         m_trackCreatorSingleSegments.apply(inputSegments, m_preMergeTracks);
         m_trackMerger.apply(m_preMergeTracks, m_mergedTracks);
         m_trackOrienter.apply(m_mergedTracks, tracks);
@@ -100,8 +106,12 @@ namespace Belle2 {
       /// Findlet responsible for the creation of segment pairs
       SegmentPairCreator<ASegmentPairFilter> m_segmentPairCreator;
 
+      /// Findlet responsible for the creation of segment pairs relations of the CA.
+      WeightedRelationCreator<const CDCSegmentPair,
+                              ASegmentPairRelationFilter> m_segmentPairRelationCreator;
+
       /// Reference to the relation filter to be used to construct the segment pair network.
-      TrackCreatorSegmentPairAutomaton<ASegmentPairRelationFilter> m_trackCreatorSegmentPairAutomaton;
+      TrackCreatorSegmentPairAutomaton m_trackCreatorSegmentPairAutomaton;
 
       /// Creates tracks from left over segments
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
@@ -118,6 +128,9 @@ namespace Belle2 {
       // Object pools
       /// Memory for the axial stereo segment pairs.
       std::vector<CDCSegmentPair> m_segmentPairs;
+
+      /// Memory for the axial stereo segment pair relations.
+      std::vector<WeightedRelation<const CDCSegmentPair> > m_segmentPairRelations;
 
       /// Memory for the tracks before merging was applied.
       std::vector<CDCTrack> m_preMergeTracks;

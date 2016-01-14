@@ -57,14 +57,16 @@ namespace Belle2 {
       {
         // create the neighborhood
         B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-        m_wirehitNeighborhood.clear();
+        m_wireHitRelations.clear();
 
-        m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, inputWireHits);
-        B2ASSERT("Expect wire hit neighborhood to be symmetric ", m_wirehitNeighborhood.isSymmetric());
-        B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
+        WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, inputWireHits, m_wireHitRelations);
+        WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
+
+        B2ASSERT("Expect wire hit neighborhood to be symmetric ", wireHitNeighborhood.isSymmetric());
+        B2DEBUG(100, "  wirehitNeighborhood.size() = " << wireHitNeighborhood.size());
 
         auto ptrWireHits = inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
-        m_wirehitClusterizer.createFromPointers(ptrWireHits, m_wirehitNeighborhood, outputClusters);
+        m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
       }
 
     private:
@@ -72,7 +74,7 @@ namespace Belle2 {
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
-      WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
+      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;

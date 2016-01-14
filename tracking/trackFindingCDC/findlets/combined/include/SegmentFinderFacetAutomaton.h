@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
 
@@ -51,6 +52,7 @@ namespace Belle2 {
         addProcessingSignalListener(&m_clusterRefiner);
         addProcessingSignalListener(&m_clusterBackgroundDetector);
         addProcessingSignalListener(&m_facetCreator);
+        addProcessingSignalListener(&m_facetRelationCreator);
         addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
         addProcessingSignalListener(&m_segmentMerger);
         addProcessingSignalListener(&m_segmentOrienter);
@@ -77,7 +79,8 @@ namespace Belle2 {
         m_clusterRefiner.exposeParameters(moduleParamList, prefix);
         m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
         m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
-        m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
+        m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
+        m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
         m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "Segment"));
         // FIXME : make parameter names small
 
@@ -96,6 +99,7 @@ namespace Belle2 {
         m_superClusters.clear();
         m_clusters.clear();
         m_facets.clear();
+        m_facetRelations.clear();
         m_segments.clear();
         m_mergedSegments.clear();
         Super::beginEvent();
@@ -108,6 +112,7 @@ namespace Belle2 {
         m_superClusters.reserve(100);
         m_clusters.reserve(200);
         m_facets.reserve(800);
+        m_facetRelations.reserve(800);
         m_segments.reserve(200);
         m_mergedSegments.reserve(200);
         outputSegments.reserve(outputSegments.size() + 200);
@@ -116,7 +121,8 @@ namespace Belle2 {
         m_clusterRefiner.apply(m_superClusters, m_clusters);
         m_clusterBackgroundDetector.apply(m_clusters);
         m_facetCreator.apply(m_clusters, m_facets);
-        m_segmentCreatorFacetAutomaton.apply(m_facets, m_segments);
+        m_facetRelationCreator.apply(m_facets, m_facetRelations);
+        m_segmentCreatorFacetAutomaton.apply(m_facets,  m_facetRelations, m_segments);
         m_segmentMerger.apply(m_segments, m_mergedSegments);
         m_segmentFitter.apply(m_mergedSegments);
         m_segmentOrienter.apply(m_mergedSegments, outputSegments);
@@ -141,11 +147,15 @@ namespace Belle2 {
       /// Marks the clusters as background
       ClusterBackgroundDetector<AClusterFilter> m_clusterBackgroundDetector;
 
-      /// Find the segments by composition of facets path from a cellular automaton
+      /// Creates the facet (hit triplet) cells of the cellular automaton
       FacetCreator<AFacetFilter> m_facetCreator;
 
+      /// Creates the facet (hit triplet) relations of the cellular automaton
+      WeightedRelationCreator<const CDCFacet,
+                              AFacetRelationFilter> m_facetRelationCreator;
+
       /// Find the segments by composition of facets path from a cellular automaton
-      SegmentCreatorFacetAutomaton<AFacetRelationFilter> m_segmentCreatorFacetAutomaton;
+      SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
 
       /// Merges segments with closeby segments of the same super cluster
       SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
@@ -179,8 +189,11 @@ namespace Belle2 {
       /// Memory for the wire hit super cluster
       std::vector<CDCWireHitCluster> m_superClusters;
 
-      /// Memory for the reconstructed segments
+      /// Memory for the generated facets
       std::vector<CDCFacet> m_facets;
+
+      /// Memory for the generated facet relations
+      std::vector<WeightedRelation<const CDCFacet> > m_facetRelations;
 
       /// Memory for the reconstructed segments
       std::vector<CDCRecoSegment2D> m_segments;

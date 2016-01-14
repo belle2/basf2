@@ -29,91 +29,90 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet that generates segments within clusters based on a cellular automaton on triples of hits
-    template<class AFacetRelationFilter>
     class SegmentCreatorFacetAutomaton :
-      public Findlet<const CDCFacet, CDCRecoSegment2D> {
+      public Findlet<const CDCFacet,
+      const WeightedRelation<const CDCFacet>,
+      CDCRecoSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCFacet, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCFacet,
+            const WeightedRelation<const CDCFacet>,
+            CDCRecoSegment2D>;
 
     public:
-      /// Constructor adding the filter as a subordinary processing signal listener.
-      SegmentCreatorFacetAutomaton()
-      {
-        addProcessingSignalListener(&m_facetRelationFilter);
-      }
-
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
         return "Constructs segments by extraction of facet paths in a cellular automaton.";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix = "") override final
+      /// Add the parameters to the surrounding module
+      void exposeParameters(ModuleParamList*,
+                            const std::string&  = "") override final
       {
-        m_facetRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCFacet>& inputFacets,
-                         std::vector<CDCRecoSegment2D>& outputSegments) override final;
+                         const std::vector<WeightedRelation<const CDCFacet> >& inputFacetRelations,
+                         std::vector<CDCRecoSegment2D>& outputSegments) override final
+      {
+        auto getICluster = [](const CDCFacet & facet) -> int { return facet.getICluster();};
+        std::vector<ConstVectorRange<CDCFacet> > facetsByICluster =
+          adjacent_groupby(inputFacets.begin(), inputFacets.end(), getICluster);
 
-    private:
-      /// Reference to the relation filter to be used to construct the facet network.
-      AFacetRelationFilter m_facetRelationFilter;
+        for (const ConstVectorRange<CDCFacet>& facetsInCluster : facetsByICluster) {
+          if (facetsInCluster.empty()) continue;
 
-    private:
-      //cellular automaton
+          B2ASSERT("Expect the facets to be sorted",
+                   std::is_sorted(std::begin(facetsInCluster), std::end(facetsInCluster)));
+
+          // Create the facet neighborhood
+          B2DEBUG(100, "Creating the CDCFacet neighborhood");
+
+          // Cut out the chunk of relevant facet relations
+          const CDCFacet& firstFacet = facetsInCluster.front();
+          const CDCFacet& lastFacet = facetsInCluster.back();
+          auto beginFacetRelationInSuperCluster = std::lower_bound(inputFacetRelations.begin(),
+                                                                   inputFacetRelations.end(),
+                                                                   &firstFacet);
+          auto endFacetRelationInSuperCluster = std::upper_bound(inputFacetRelations.begin(),
+                                                                 inputFacetRelations.end(),
+                                                                 &lastFacet);
+
+          WeightedNeighborhood<const CDCFacet> facetNeighborhood(beginFacetRelationInSuperCluster,
+                                                                 endFacetRelationInSuperCluster);
+
+          B2DEBUG(100, "  Created " << facetNeighborhood.size()  << " FacetsNeighborhoods");
+
+          if (facetNeighborhood.size() == 0) {
+            continue; // No neighborhood generated. Next cluster.
+          }
+
+          // Apply the cellular automaton in a multipass manner
+          m_facetPaths.clear();
+          m_cellularPathFinder.apply(facetsInCluster, facetNeighborhood, m_facetPaths);
+
+          outputSegments.reserve(outputSegments.size() + m_facetPaths.size());
+          for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
+            outputSegments.push_back(CDCRecoSegment2D::condense(facetPath));
+          }
+
+          B2DEBUG(100, "  Created " << outputSegments.size()  << " selected CDCRecoSegment2Ds");
+        } // end cluster loop
+      }
+
+
+    private: // cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCFacet> m_cellularPathFinder;
 
     private: // object pools
-      /// Memory for the facet neighborhood.
-      WeightedNeighborhood<const CDCFacet> m_facetsNeighborhood;
-
       /// Memory for the facet paths generated from the graph.
       std::vector< std::vector<const CDCFacet*> > m_facetPaths;
 
     }; // end class SegmentCreator
 
-
-    template<class AFacetRelationFilter>
-    void SegmentCreatorFacetAutomaton<AFacetRelationFilter>::
-    apply(const std::vector<CDCFacet>& inputFacets,
-          std::vector<CDCRecoSegment2D>& outputSegments)
-    {
-      auto getICluster = [](const CDCFacet & facet) -> int { return facet.getICluster();};
-      std::vector<ConstVectorRange<CDCFacet> > facetsByICluster =
-        adjacent_groupby(inputFacets.begin(), inputFacets.end(), getICluster);
-
-      for (const ConstVectorRange<CDCFacet>& facetsInCluster : facetsByICluster) {
-        B2ASSERT("Expect the facets to be sorted",
-                 std::is_sorted(std::begin(facetsInCluster), std::end(facetsInCluster)));
-
-        // Create the facet neighborhood
-        B2DEBUG(100, "Creating the CDCFacet neighborhood");
-        m_facetsNeighborhood.clear();
-        m_facetsNeighborhood.appendUsing(m_facetRelationFilter, facetsInCluster);
-        B2DEBUG(100, "  Created " << m_facetsNeighborhood.size()  << " FacetsNeighborhoods");
-
-        if (m_facetsNeighborhood.size() == 0) {
-          continue; // No neighborhood generated. Next cluster.
-        }
-
-        // Apply the cellular automaton in a multipass manner
-        m_facetPaths.clear();
-        m_cellularPathFinder.apply(facetsInCluster, m_facetsNeighborhood, m_facetPaths);
-
-        outputSegments.reserve(outputSegments.size() + m_facetPaths.size());
-        for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
-          outputSegments.push_back(CDCRecoSegment2D::condense(facetPath));
-        }
-
-        B2DEBUG(100, "  Created " << outputSegments.size()  << " selected CDCRecoSegment2Ds");
-      } // end cluster loop
-    }
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

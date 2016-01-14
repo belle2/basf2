@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/ca/WeightedRelation.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/SortedRange.h>
 
 #include <vector>
 #include <utility>
@@ -33,18 +33,12 @@ namespace Belle2 {
      *  by the weight second.
      */
     template<class AItem>
-    class WeightedNeighborhood {
+    class WeightedNeighborhood
+      : public SortedRange<typename std::vector<WeightedRelation<AItem> >::const_iterator> {
 
     private:
       /// Container type that stores the neighborhood relations
-      typedef std::vector<WeightedRelation<AItem> > Container;
-
-    public:
-      /// Iterator type into the relations
-      using iterator = typename Container::const_iterator;
-
-      /// Iterator range type for a pair of iterators representing all the neighbors of a specific item.
-      using range = Range<iterator>;
+      using Super = SortedRange<typename std::vector<WeightedRelation<AItem> >::const_iterator>;
 
     public:
       /**
@@ -75,18 +69,19 @@ namespace Belle2 {
 
       /// Appends relations between elements in the given AItemRange using the ARelationFilter.
       template<class ARelationFilter, class AItemRange>
-      void appendUsing(ARelationFilter& relationFilter, AItemRange& itemRange)
+      static void appendUsing(ARelationFilter& relationFilter,
+                              AItemRange& itemRange,
+                              std::vector<WeightedRelation<AItem> >& weightedRelations)
       {
-        //Relation<AItem> neighborRelation;
         for (auto && item : itemRange) {
           AItem& itemRef(item);
           AItem* itemPtr = &itemRef; // Relations point to the elements. Take the address of the item here
-          //neighborRelation.setFrom(itemPtr);
-          auto possibleNeighbors = relationFilter.getPossibleNeighbors(item, std::begin(itemRange), std::end(itemRange));
+          auto possibleNeighbors = relationFilter.getPossibleNeighbors(item,
+                                   std::begin(itemRange),
+                                   std::end(itemRange));
           for (auto && neighbor : possibleNeighbors) {
             AItem& neighborRef(neighbor);
             AItem* neighborPtr = &neighborRef; // Relations point to the elements. Take the address of the item here
-            //neighborRelation.setTo(neighborPtr);
 
             Relation<AItem> neighborRelation(itemPtr, neighborPtr);
             Weight weight = relationFilter(neighborRelation);
@@ -94,9 +89,9 @@ namespace Belle2 {
             if (not std::isnan(weight)) {
               // The neighborhood takes references and keeps them
               // Make a emplace_back here and sort the whole vector afterwards
-              m_weightedNeighbors.push_back(WeightedRelation<AItem>(neighborRelation.getFrom(),
-                                                                    weight,
-                                                                    neighborRelation.getTo()));
+              weightedRelations.push_back(WeightedRelation<AItem>(neighborRelation.getFrom(),
+                                                                  weight,
+                                                                  neighborRelation.getTo()));
             }
 
           } //end for possibleNeighbor
@@ -104,138 +99,42 @@ namespace Belle2 {
         } // end for item
 
         // sort everything afterwards
-        std::sort(std::begin(m_weightedNeighbors), std::end(m_weightedNeighbors));
+        std::sort(std::begin(weightedRelations), std::end(weightedRelations));
       }
       /**@}*/
 
-      /**
-       * @name Inserting neighbor relations
-       */
-      /**@{*/
 
-      /**
-       *  Inserts a new relation. The item and neighbor are given by pointer. \n
-       *  Copys of the pointers are stored in the underlying container. \n
-       *  Additionally a weight can be given. If omited the weight defaults to one. \n
-       */
-      inline void insert(AItem* itemPtr,
-                         AItem* neighborPtr,
-                         Weight weight = 1)
+    public:
+      /// Using the constructors of the base class
+      using Super::Super;
+
+      /// Constructor to view a collection of relations as a neighborhood.
+      WeightedNeighborhood(const std::vector<WeightedRelation<AItem> >& weightedRelations)
+        : Super(weightedRelations.begin(), weightedRelations.end())
       {
-        insert(itemPtr, weight, neighborPtr);
       }
 
       /**
-       *  Inserts a new relation.
-       *  The item and neighbor are given by pointer. \n
-       *  Copys of the pointers are stored in the underlying container. \n
-       *  Additionally a weight must be given in the middle.
-       */
-      inline void insert(AItem* itemPtr,
-                         Weight weight,
-                         AItem* neighborPtr)
-      {
-        if (not std::isnan(weight)) {
-          WeightedRelation<AItem> newRelation(itemPtr, weight, neighborPtr);
-          auto itInsertAt = std::lower_bound(std::begin(m_weightedNeighbors), std::end(m_weightedNeighbors), newRelation);
-          m_weightedNeighbors.insert(itInsertAt, newRelation);
-        }
-      }
-      /**@}*/
-
-      /**
-       *  @name Retrival of neigbors
-       *  Important: Since the underlying container stores pointers the _same_ object address that have been \n
-       *  used to store the items have to be used for the retrival.
-       *  This should not be a problem since the memory holding the items should still be available. \n
-       *  If the memory was already freed the pointers are rendered invalid anyways and now valid object \n
-       *  can be retived anymore.
-       */
+      *  @name Retrival of neigbors
+      *  Important: Since the underlying container stores pointers the _same_ object address that have been \n
+      *  used to store the items have to be used for the retrival.
+      *  This should not be a problem since the memory holding the items should still be available. \n
+      *  If the memory was already freed the pointers are rendered invalid anyways and now valid object \n
+      *  can be retived anymore.
+      */
       /**@{*/
-
       /// Checks if the item given by pointers has neighbors in the neighborhood
       bool hasNeighbors(AItem* itemPtr) const
-      { return getLightestNeighbor(itemPtr) != m_weightedNeighbors.end(); }
-
-      /**
-       *  Returns an iterator to the neighbor relation with the lowest weight.
-       *  If the given item pointer has neighbors in the neighborhood return \n
-       *  an iterator pointing to the one with the smallest weight. \n
-       *  If their are no neighbors to the item given return the end() of the neighborhood.
-       */
-      iterator getLightestNeighbor(AItem* itemPtr) const
-      {
-        iterator lowerBound = std::lower_bound(std::begin(m_weightedNeighbors),
-                                               std::end(m_weightedNeighbors),
-                                               itemPtr);
-        return lowerBound.getItem() == itemPtr ? lowerBound : m_weightedNeighbors.end();
-      }
-
-      /**
-       *  Returns an iterator to the neighbor relation with the highest weight.
-       *  If the given item pointer has neighbors in the neighborhood return \n
-       *  an iterator pointing to the one with the highest weight. \n
-       *  If their are no neighbors to the item given return the end() of the neighborhood.
-       */
-      iterator getHeaviestNeighbor(AItem* itemPtr) const
-      {
-        iterator upperBound = std::upper_bound(std::begin(m_weightedNeighbors),
-                                               std::end(m_weightedNeighbors),
-                                               itemPtr);
-        if (upperBound == m_weightedNeighbors.begin()) return m_weightedNeighbors.end();
-        --upperBound;
-        return upperBound.getItem() == itemPtr ? upperBound : m_weightedNeighbors.end();
-      }
-
-      /// Same as equal_range()
-      range getNeighborRange(AItem* itemPtr) const
-      { return this->equal_range(itemPtr); }
-
-      /**
-       *  Returns an iterator range representing all neighbors.
-       *  Returns the range of all neighbors to the item given by pointer as a pair of iterators. \n
-       *  The range is sorted internally by the weight of the neighbor from smallest to biggest. \n
-       *  If there are no neighbor an empty range will be returned.
-       *  @return a pair of iterators for the range of neighbors
-       */
-      range equal_range(AItem* itemPtr) const
-      {
-        return range(std::equal_range(std::begin(m_weightedNeighbors),
-                                      std::end(m_weightedNeighbors),
-                                      itemPtr));
-      }
-
-      range equal_range(AItem* itemPtr, Weight weight) const
-      {
-        return range(std::equal_range(std::begin(m_weightedNeighbors),
-                                      std::end(m_weightedNeighbors),
-                                      std::pair<AItem*, Weight>(itemPtr, weight)));
-      }
-      /**@}*/
-
-      /// Returns the begin of all neighborhood relations
-      iterator begin() const
-      { return iterator(m_weightedNeighbors.begin()); }
-
-      /// Returns the end of all neighborhood relations
-      iterator end() const
-      { return iterator(m_weightedNeighbors.end()); }
-
-      /// Returns the number of neighborhood relations
-      size_t size()
-      { return m_weightedNeighbors.size(); }
-
-      /// Drops all stored neighborhood relations
-      void clear()
-      { m_weightedNeighbors.clear(); }
+      { return getLightestNeighbor(itemPtr) != this->end(); }
 
       /// Checks if the two given elements are registered as neighbors with the given weight.
       bool areNeighborsWithWeight(AItem* itemPtr,
                                   Weight weight,
                                   AItem* neighborPtr) const
       {
-        for (const WeightedRelation<AItem>& relation : equal_range(itemPtr, weight)) {
-          if (relation.getTo() == neighborPtr) {
+        for (const WeightedRelation<AItem>& relation
+             : this->equal_range(std::make_pair(itemPtr, weight))) {
+          if (relation.getTo() == neighborPtr and relation.getWeight() == weight) {
             return true;
           }
         }
@@ -245,7 +144,7 @@ namespace Belle2 {
       /// Checks if the two given elements are registered as neighbors with any weight.
       bool areNeighbors(AItem* itemPtr, AItem* neighborPtr) const
       {
-        for (const WeightedRelation<AItem>& relation : equal_range(itemPtr)) {
+        for (const WeightedRelation<AItem>& relation : this->equal_range(itemPtr)) {
           if (relation.getTo == neighborPtr) {
             return true;
           }
@@ -274,10 +173,6 @@ namespace Belle2 {
         }
         return result;
       }
-
-    private:
-      /// Memory of the neighborhood relations.
-      Container m_weightedNeighbors;
 
     }; // class WeightedNeighborhood
   } // namespace TrackFindingCDC

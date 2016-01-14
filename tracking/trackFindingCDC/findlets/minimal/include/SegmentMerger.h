@@ -73,13 +73,15 @@ namespace Belle2 {
             m_symmetricSegmentsInSuperCluster.push_back(segment.reversed());
           }
 
-          m_segmentNeighborhood.clear();
-          m_segmentNeighborhood.appendUsing(m_segmentRelationFilter,
-                                            m_symmetricSegmentsInSuperCluster);
+          m_segmentRelations.clear();
+          WeightedNeighborhood<const CDCRecoSegment2D>::appendUsing(m_segmentRelationFilter,
+                                                                    m_symmetricSegmentsInSuperCluster,
+                                                                    m_segmentRelations);
+          WeightedNeighborhood<const CDCRecoSegment2D> segmentNeighborhood(m_segmentRelations);
 
           m_segmentPaths.clear();
           m_cellularPathFinder.apply(m_symmetricSegmentsInSuperCluster,
-                                     m_segmentNeighborhood,
+                                     segmentNeighborhood,
                                      m_segmentPaths);
 
           for (const std::vector<const CDCRecoSegment2D*>& segmentPath : m_segmentPaths) {
@@ -95,8 +97,8 @@ namespace Belle2 {
       /// Memory for the symmetrised segments
       std::vector<CDCRecoSegment2D> m_symmetricSegmentsInSuperCluster;
 
-      /// Memory for the wire hit neighborhood in a cluster.
-      WeightedNeighborhood<const CDCRecoSegment2D> m_segmentNeighborhood;
+      /// Memory for the relations between segments to be followed on merge
+      std::vector<WeightedRelation<const CDCRecoSegment2D> > m_segmentRelations;
 
       /// Memory for the segment paths generated from the graph.
       std::vector< std::vector<const CDCRecoSegment2D*> > m_segmentPaths;

@@ -93,12 +93,10 @@ namespace Belle2 {
   };
 
   class SegmentCreatorFacetAutomatonModule :
-    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton<
-    TrackFindingCDC::ChooseableFacetRelationFilter> > {
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton> {
   public:
     /// Type of the base class
-    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton<
-                  TrackFindingCDC::ChooseableFacetRelationFilter> >;
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton>;
 
     SegmentCreatorFacetAutomatonModule() : Super{{{"CDCFacetVector", "" /*to be set externally*/}}} {}
   };

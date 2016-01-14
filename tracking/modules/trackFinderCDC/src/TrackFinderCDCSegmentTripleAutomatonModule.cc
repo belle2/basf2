@@ -12,5 +12,6 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
 REG_MODULE(TrackFinderCDCSegmentTripleAutomaton);

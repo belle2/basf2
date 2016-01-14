@@ -69,16 +69,18 @@ namespace Belle2 {
 
           // Create the neighborhood of wire hits on the cluster
           B2DEBUG(100, "Creating the CDCWireHit neighborhood");
-          m_wirehitNeighborhood.clear();
+          m_wireHitRelations.clear();
           auto wireHits = cluster | boost::adaptors::indirected;
-          m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, wireHits);
-          B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.", m_wirehitNeighborhood.isSymmetric());
-          B2DEBUG(100, "  wirehitNeighborhood.size() = " << m_wirehitNeighborhood.size());
+          WeightedNeighborhood<const CDCWireHit>::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
+          WeightedNeighborhood<const CDCWireHit> wirehitNeighborhood(m_wireHitRelations);
+
+          B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.", wirehitNeighborhood.isSymmetric());
+          B2DEBUG(100, "  wirehitNeighborhood.size() = " << wirehitNeighborhood.size());
 
           // Create the facets
           B2DEBUG(100, "Creating the CDCFacets");
           std::size_t nBefore = facets.size();
-          createFacets(cluster, m_wirehitNeighborhood, facets);
+          createFacets(cluster, wirehitNeighborhood, facets);
           std::size_t nAfter = facets.size();
 
           VectorRange<CDCFacet> facetsInCluster(facets.begin() + nBefore, facets.begin() + nAfter);
@@ -174,7 +176,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hit neighborhood in within a cluster.
-      WeightedNeighborhood<const CDCWireHit> m_wirehitNeighborhood;
+      std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
 
     private:
       /// The filter for the hit neighborhood.

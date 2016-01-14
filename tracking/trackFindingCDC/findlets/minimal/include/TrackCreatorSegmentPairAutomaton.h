@@ -31,47 +31,43 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet that generates tracks based on a cellular automaton of segment pairs
-    template<class ASegmentPairRelationFilter>
     class TrackCreatorSegmentPairAutomaton :
-      public Findlet<const CDCSegmentPair, CDCTrack> {
+      public Findlet<const CDCSegmentPair,
+      const WeightedRelation<const CDCSegmentPair>,
+      CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegmentPair, CDCTrack>;
+      using Super = Findlet<const CDCSegmentPair,
+            const WeightedRelation<const CDCSegmentPair>,
+            CDCTrack>;
 
     public:
-      /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackCreatorSegmentPairAutomaton()
-      {
-        addProcessingSignalListener(&m_segmentPairRelationFilter);
-      }
-
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
         return "Constructs tracks by extraction of segment pair paths in a cellular automaton.";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix = "") override final
+      /// Add the parameters
+      void exposeParameters(ModuleParamList*,
+                            const std::string& = "") override final
       {
-        m_segmentPairRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCSegmentPair>& inputSegmentPairs,
+                         const std::vector<WeightedRelation<const CDCSegmentPair> >& inputSegmentPairRelations,
                          std::vector<CDCTrack>& outputTracks) override final
       {
-        // Create the segment pair neighborhood
-        B2DEBUG(100, "Creating the CDCSegmentPair neighborhood");
-        m_segmentPairNeighborhood.clear();
-        m_segmentPairNeighborhood.appendUsing(m_segmentPairRelationFilter, inputSegmentPairs);
-        B2DEBUG(100, "  Created " << m_segmentPairNeighborhood.size()  << " AxialStereoPairNeighborhoods");
         // Multiple passes if growMany is active and one track is created at a time
         // No best candidate analysis needed
         m_segmentPairPaths.clear();
-        m_cellularPathFinder.apply(inputSegmentPairs, m_segmentPairNeighborhood, m_segmentPairPaths);
+
+        m_cellularPathFinder.apply(inputSegmentPairs,
+                                   WeightedNeighborhood<const CDCSegmentPair>(inputSegmentPairRelations),
+                                   m_segmentPairPaths);
+
         B2DEBUG(100, "  Created " << m_segmentPairPaths.size()  << " SegmentTripleTracks");
 
         // Reduce to plain tracks
@@ -79,13 +75,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Reference to the relation filter to be used to construct the segmentPair network.
-      ASegmentPairRelationFilter m_segmentPairRelationFilter;
-
-    private: // object pools
-      /// Memory for the segmentPair neighborhood.
-      WeightedNeighborhood<const CDCSegmentPair> m_segmentPairNeighborhood;
-
+      // object pools
       /// Memory for the segmentPair paths generated from the graph.
       std::vector< Path<const CDCSegmentPair> > m_segmentPairPaths;
 

@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Types that should be served to apply on invokation
       using IOTypes = std::tuple<AIOTypes...>;
 
-    private:
+    protected:
       /// Only forward a range for immutable types
       template<class T>
       struct ToVectorImpl {

@@ -60,12 +60,14 @@ namespace Belle2 {
         for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
                                                                       superCluster.end()));
-          m_wirehitNeighborhood.clear();
+
+          m_wireHitRelations.clear();
           auto wireHits = superCluster | boost::adaptors::indirected;
-          m_wirehitNeighborhood.appendUsing(m_wireHitRelationFilter, wireHits);
+          WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
+          WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
 
           const std::size_t nClustersBefore = outputClusters.size();
-          m_wirehitClusterizer.createFromPointers(superCluster, m_wirehitNeighborhood, outputClusters);
+          m_wireHitClusterizer.createFromPointers(superCluster, wireHitNeighborhood, outputClusters);
           const std::size_t nClustersAfter = outputClusters.size();
 
           // Update the super cluster id of the just created clusters
@@ -80,10 +82,10 @@ namespace Belle2 {
 
     private:
       /// Instance of the hit cluster generator
-      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wireHitClusterizer;
 
       /// Memory for the wire hit neighborhood in a super cluster.
-      WeightedNeighborhood<CDCWireHit> m_wirehitNeighborhood;
+      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;

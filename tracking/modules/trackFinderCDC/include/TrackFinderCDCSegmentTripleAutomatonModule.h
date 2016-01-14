@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTripleCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentTripleAutomaton.h>
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/SimpleAxialSegmentPairFilter.h>
@@ -58,7 +59,8 @@ namespace Belle2 {
         ModuleParamList moduleParamList = this->getParamList();
         m_axialSegmentPairCreator.exposeParameters(&moduleParamList, "axialSegmentPair");
         m_segmentTripleCreator.exposeParameters(&moduleParamList, "segmentTriple");
-        m_trackCreatorSegmentTripleAutomaton.exposeParameters(&moduleParamList, "segmentTripleRelation");
+        m_segmentTripleRelationCreator.exposeParameters(&moduleParamList, "segmentTripleRelation");
+        m_trackCreatorSegmentTripleAutomaton.exposeParameters(&moduleParamList);
         this->setParamList(moduleParamList);
       }
 
@@ -68,6 +70,7 @@ namespace Belle2 {
         TrackFinderCDCFromSegmentsModule::initialize();
         m_axialSegmentPairCreator.initialize();
         m_segmentTripleCreator.initialize();
+        m_segmentTripleRelationCreator.initialize();
         m_trackCreatorSegmentTripleAutomaton.initialize();
         m_segmentTripleSwapper.initialize();
       }
@@ -79,24 +82,27 @@ namespace Belle2 {
 
         m_axialSegmentPairCreator.beginEvent();
         m_segmentTripleCreator.beginEvent();
+        m_segmentTripleRelationCreator.beginEvent();
         m_trackCreatorSegmentTripleAutomaton.beginEvent();
         m_segmentTripleSwapper.beginEvent();
 
         m_axialSegmentPairs.clear();
         m_segmentTriples.clear();
+        m_segmentTripleRelations.clear();
         m_segmentTriplePaths.clear();
 
         m_axialSegmentPairCreator.apply(segments, m_axialSegmentPairs);
         m_segmentTripleCreator.apply(segments, m_axialSegmentPairs, m_segmentTriples);
-        m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, tracks);
+        m_segmentTripleRelationCreator.apply(m_segmentTriples, m_segmentTripleRelations);
+        m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, m_segmentTripleRelations, tracks);
         m_segmentTripleSwapper.apply(m_segmentTriples);
-
       }
 
       virtual void terminate() override
       {
         m_segmentTripleSwapper.terminate();
         m_trackCreatorSegmentTripleAutomaton.terminate();
+        m_segmentTripleRelationCreator.terminate();
         m_segmentTripleCreator.terminate();
         m_axialSegmentPairCreator.terminate();
         TrackFinderCDCFromSegmentsModule::terminate();
@@ -110,6 +116,9 @@ namespace Belle2 {
       /// Memory for the segment triples
       std::vector<CDCSegmentTriple> m_segmentTriples;
 
+      /// Memory for the segment triple relations
+      std::vector<WeightedRelation<const CDCSegmentTriple> > m_segmentTripleRelations;
+
       /// Memory for the segment triple paths generated from the graph.
       std::vector< std::vector<const CDCSegmentTriple*> > m_segmentTriplePaths;
 
@@ -120,8 +129,12 @@ namespace Belle2 {
       /// Instance of the segment triple creator
       SegmentTripleCreator<SegmentTripleFilter> m_segmentTripleCreator;
 
+      /// Instance of the segment triple relation creator
+      WeightedRelationCreator<const CDCSegmentTriple,
+                              SegmentTripleRelationFilter> m_segmentTripleRelationCreator;
+
       /// Instance of the cellular automaton creating  creating tracks over segment triple
-      TrackCreatorSegmentTripleAutomaton<SegmentTripleRelationFilter> m_trackCreatorSegmentTripleAutomaton;
+      TrackCreatorSegmentTripleAutomaton m_trackCreatorSegmentTripleAutomaton;
 
       /// Helper to swap the local segment triples out to the DataStore
       StoreVectorSwapper<CDCSegmentTriple> m_segmentTripleSwapper{"CDCSegmentTripleVector"};

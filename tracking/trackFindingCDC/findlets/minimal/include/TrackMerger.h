@@ -67,13 +67,15 @@ namespace Belle2 {
           m_symmetricTracks.push_back(track.reversed());
         }
 
-        m_trackNeighborhood.clear();
-        m_trackNeighborhood.appendUsing(m_trackRelationFilter,
-                                        m_symmetricTracks);
+        m_trackRelations.clear();
+        WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
+                                                          m_symmetricTracks,
+                                                          m_trackRelations);
+        WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
 
         m_trackPaths.clear();
         m_cellularPathFinder.apply(m_symmetricTracks,
-                                   m_trackNeighborhood,
+                                   trackNeighborhood,
                                    m_trackPaths);
 
         for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths) {
@@ -88,8 +90,8 @@ namespace Belle2 {
       /// Memory for the symmetrised tracks
       std::vector<CDCTrack> m_symmetricTracks;
 
-      /// Memory for the wire hit neighborhood in a cluster.
-      WeightedNeighborhood<const CDCTrack> m_trackNeighborhood;
+      /// Memory for the relations between tracks to be followed on merge
+      std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;
 
       /// Memory for the track paths generated from the graph.
       std::vector< std::vector<const CDCTrack*> > m_trackPaths;

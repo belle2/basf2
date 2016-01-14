@@ -31,21 +31,18 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet that generates tracks based on a cellular automaton of segment triples
-    template<class ASegmentTripleRelationFilter>
-    class TrackCreatorSegmentTripleAutomaton :
-      public Findlet<const CDCSegmentTriple, CDCTrack> {
+    class TrackCreatorSegmentTripleAutomaton
+      : public Findlet<const CDCSegmentTriple,
+        const WeightedRelation<const CDCSegmentTriple>,
+        CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegmentTriple, CDCTrack>;
+      using Super = Findlet<const CDCSegmentTriple,
+            const WeightedRelation<const CDCSegmentTriple>,
+            CDCTrack>;
 
     public:
-      /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackCreatorSegmentTripleAutomaton()
-      {
-        addProcessingSignalListener(&m_segmentTripleRelationFilter);
-      }
-
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
@@ -53,25 +50,20 @@ namespace Belle2 {
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix = "") override final
+      void exposeParameters(ModuleParamList*,
+                            const std::string& = "") override final
       {
-        m_segmentTripleRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
+                         const std::vector<WeightedRelation<const CDCSegmentTriple> >& inputSegmentTripleRelations,
                          std::vector<CDCTrack>& outputTracks) override final
       {
-        // Create the segment triple neighborhood
-        B2DEBUG(100, "Creating the CDCSegmentTriple neighborhood");
-        m_segmentTripleNeighborhood.clear();
-        m_segmentTripleNeighborhood.appendUsing(m_segmentTripleRelationFilter, inputSegmentTriples);
-        B2DEBUG(100, "  Created " << m_segmentTripleNeighborhood.size()  << " AxialStereoTripleNeighborhoods");
-        // Multiple passes if growMany is active and one track is created at a time
-        // No best candidate analysis needed
         m_segmentTriplePaths.clear();
-        m_cellularPathFinder.apply(inputSegmentTriples, m_segmentTripleNeighborhood, m_segmentTriplePaths);
+        m_cellularPathFinder.apply(inputSegmentTriples,
+                                   WeightedNeighborhood<const CDCSegmentTriple>(inputSegmentTripleRelations),
+                                   m_segmentTriplePaths);
         B2DEBUG(100, "  Created " << m_segmentTriplePaths.size()  << " SegmentTripleTracks");
 
         // Reduce to plain tracks
@@ -79,18 +71,12 @@ namespace Belle2 {
       }
 
     private:
-      /// Reference to the relation filter to be used to construct the segmentTriple network.
-      ASegmentTripleRelationFilter m_segmentTripleRelationFilter;
-
-    private: // object pools
-      /// Memory for the segmentTriple neighborhood.
-      WeightedNeighborhood<const CDCSegmentTriple> m_segmentTripleNeighborhood;
-
+      // object pools
       /// Memory for the segmentTriple paths generated from the graph.
       std::vector< Path<const CDCSegmentTriple> > m_segmentTriplePaths;
 
     private:
-      //cellular automaton
+      // cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
 

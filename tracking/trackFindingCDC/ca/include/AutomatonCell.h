@@ -191,7 +191,6 @@ namespace Belle2 {
         else clearFlags(cellFlag);
       }
 
-    private:
       /** Getter for the ored combination of the cell flags to mark some status of the cell.
        *  Give the ored combination of all cell flags, therefore providing a bit pattern. \n
        *  Cell flags can be \n

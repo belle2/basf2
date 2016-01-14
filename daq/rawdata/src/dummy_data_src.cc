@@ -55,7 +55,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   buf[ offset + 0 ] = nwords;
   buf[ offset + 1 ] = 6;
   buf[ offset + 2 ] = (1 << 16) | ncpr;
-  unsigned int exp_run = run;
+  unsigned int exp_run = run << 8;
   buf[ offset + 3 ] = exp_run;
   buf[ offset + 5 ] = node_id;
   offset += 6;
@@ -231,6 +231,7 @@ int main(int argc, char** argv)
 
   unsigned int node_id = 0;
   sscanf(argv[1], "0x%x", &node_id);
+
 
   int run_no = atoi(argv[2]);
 

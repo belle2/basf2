@@ -77,6 +77,10 @@ namespace Belle2 {
       T* getTo() const
       { return this->second; }
 
+      /// Make a relation in the opposite direciton with the same weight
+      WeightedRelation<T> reversed() const
+      { return WeightedRelation<T>(getTo(), getWeight(), getFrom()); }
+
     };
 
   } // namespace TrackFindingCDC

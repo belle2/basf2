@@ -23,7 +23,7 @@ namespace Belle2 {
       /** Construct the Estimator
        *  @param pickleFileName   Name of the file that contains the pickled estimator object eg from sklearn
        */
-      PyEstimator(const std::string& pickleFileName);
+      explicit PyEstimator(const std::string& pickleFileName);
 
       /// Call the predict method of the estimator
       double predict(const std::vector<double>& inputVariable);

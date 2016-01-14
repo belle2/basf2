@@ -61,7 +61,7 @@ namespace Belle2 {
        *  Constructor taking the range of wires the layer shall contain.
        *  Use rather getInstance() to avoid instance constructions.
        */
-      CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange);
+      explicit CDCWireLayer(const ConstVectorRange<CDCWire>& wireRange);
 
     public:
       /// Intializes the wire layer variables to the average of according variables in the wire range

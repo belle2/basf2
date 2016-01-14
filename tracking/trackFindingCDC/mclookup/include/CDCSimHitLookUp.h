@@ -38,6 +38,9 @@ namespace Belle2 {
       /// Getter for the singletone instance
       static const CDCSimHitLookUp& getInstance();
 
+      /// Default constructor - for cppcheck
+      CDCSimHitLookUp() = default;
+
       /// Clear all information from the last event
       void clear();
 

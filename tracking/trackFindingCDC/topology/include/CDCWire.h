@@ -62,7 +62,7 @@ namespace Belle2 {
       /**@}*/
 
       /// Constructor taking the combined wire id convenience object.
-      CDCWire(const WireID& wireID);
+      explicit CDCWire(const WireID& wireID);
 
       /// Constructor taking the superlayer id, the layer id and the wire id. Use rather getInstance() to avoid instance constructions.
       CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire);

@@ -32,6 +32,10 @@ namespace Belle2 {
       static const CDCMCTrackStore& getInstance();
 
     public:
+      /// Default constructor - for cppcheck
+      CDCMCTrackStore() = default;
+
+    public:
       /// Clear all Monte Carlo hits
       void clear();
 
@@ -39,7 +43,6 @@ namespace Belle2 {
        *  It uses the CDCMCMap to construct the Monte Carlo tracks.
        */
       void fill(const CDCMCMap* ptrMCMap);
-
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id

@@ -141,7 +141,9 @@ void CDCMCTrackStore::fillMCSegments()
     using HitWithCell = WithAutomatonCell<const CDCHit*>;
 
     std::vector<HitWithCell> hitsWithCells;
-    hitsWithCells.insert(hitsWithCells.end(), mcTrack.begin(), mcTrack.end());
+    for (const CDCHit* hit : mcTrack) {
+      hitsWithCells.push_back(HitWithCell(hit));
+    }
 
     std::multimap<HitWithCell*, HitWithCell*> hitNeighborhood;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();

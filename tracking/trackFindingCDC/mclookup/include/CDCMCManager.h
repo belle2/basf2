@@ -54,6 +54,10 @@ namespace Belle2 {
       static const CDCMCTrackLookUp& getMCTrackLookUp()
       { return getInstance().m_mcTrackLookUp; }
 
+    private:
+      /// Default constructor only accessable for getInstance()
+      CDCMCManager() = default;
+
     public:
       /// Require the mc information store arrays.
       void requireTruthInformation();

@@ -45,9 +45,6 @@ namespace Belle2 {
        *  Care must be taken to feed it a reference that comes from a vector*/
       explicit DiscreteValue(T& value) : Super(&value) {}
 
-      /// Default copy constructor
-      DiscreteValue(const This&) = default;
-
       /// Allow explicit conversion to the container type.
       explicit operator const T& () const
       { return **this; }

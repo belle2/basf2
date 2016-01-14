@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /// Mixin class wraps an object a
-      WithAutomatonCell(const T& obj) :
+      explicit WithAutomatonCell(const T& obj) :
         Super(obj),
         m_automatonCell()
       {}

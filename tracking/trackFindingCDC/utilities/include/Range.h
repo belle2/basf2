@@ -86,6 +86,11 @@ namespace Belle2 {
         }
         return operator[](i);
       }
+
+      /// Counts the number of equivalent items in the range
+      bool count(Reference t)
+      { return std::count(this->begin(), this->end(), t); }
+
     };
   }
 }

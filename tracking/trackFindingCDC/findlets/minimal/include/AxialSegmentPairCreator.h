@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
@@ -20,36 +20,36 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    template<class ASegmentPairFilter>
-    class SegmentPairCreator
-      : public Findlet<const CDCRecoSegment2D, CDCSegmentPair> {
+    template<class AAxialSegmentPairFilter>
+    class AxialSegmentPairCreator
+      : public Findlet<const CDCRecoSegment2D, CDCAxialSegmentPair> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCSegmentPair>;
+      using Super = Findlet<const CDCRecoSegment2D, CDCAxialSegmentPair>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      SegmentPairCreator()
+      AxialSegmentPairCreator()
       {
-        addProcessingSignalListener(&m_segmentPairFilter);
+        addProcessingSignalListener(&m_axialSegmentPairFilter);
       }
 
       /// Short description of the findlet
       virtual std::string getDescription() override
       {
-        return "Creates axial stereo segment pairs from a set of segments filtered by some acceptance criterion";
+        return "Creates axial axial segment pairs from a set of segments filtered by some acceptance criterion";
       }
 
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
-        m_segmentPairFilter.exposeParameters(moduleParamList, prefix);
+        m_axialSegmentPairFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main method constructing pairs in adjacent super layers
       virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCSegmentPair>& segmentPairs) override
+                         std::vector<CDCAxialSegmentPair>& axialSegmentPairs) override
       {
         // Group the segments by their super layer id
         for (std::vector<const CDCRecoSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
@@ -64,61 +64,55 @@ namespace Belle2 {
 
         // Make pairs of closeby superlayers
         for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer) {
+          if (not ISuperLayerUtil::isAxial(iSuperLayer)) continue;
 
           const std::vector<const CDCRecoSegment2D*>& startSegments = m_segmentsBySuperLayer[iSuperLayer];
 
           // Make pairs of this superlayer and the superlayer more to the inside
           {
-            ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
-            if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
-              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerIn];
-              create(startSegments, endSegments, segmentPairs);
+            ISuperLayer iStereoSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
+            ISuperLayer iAxialSuperLayerIn = ISuperLayerUtil::getNextInwards(iStereoSuperLayerIn);
+            if (ISuperLayerUtil::isInCDC(iAxialSuperLayerIn)) {
+              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iAxialSuperLayerIn];
+              create(startSegments, endSegments, axialSegmentPairs);
             }
           }
 
           // Make pairs of this superlayer and the superlayer more to the outside
           {
-            ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
-            if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
-              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerOut];
-              create(startSegments, endSegments, segmentPairs);
+            ISuperLayer iStereoSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
+            ISuperLayer iAxialSuperLayerOut = ISuperLayerUtil::getNextOutwards(iStereoSuperLayerOut);
+            if (ISuperLayerUtil::isInCDC(iAxialSuperLayerOut)) {
+              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iAxialSuperLayerOut];
+              create(startSegments, endSegments, axialSegmentPairs);
             }
           }
 
         } // end for iSuperLayer
 
-        std::sort(std::begin(segmentPairs), std::end(segmentPairs));
+        std::sort(std::begin(axialSegmentPairs), std::end(axialSegmentPairs));
       }
 
     private:
       /// Creates segment pairs from a combination of start segments and end segments.
       inline void create(const std::vector<const CDCRecoSegment2D*>& startSegments,
                          const std::vector<const CDCRecoSegment2D*>& endSegments,
-                         std::vector<CDCSegmentPair>& segmentPairs)
+                         std::vector<CDCAxialSegmentPair>& axialSegmentPairs)
       {
-        CDCSegmentPair segmentPair;
+        CDCAxialSegmentPair axialSegmentPair;
         for (const CDCRecoSegment2D* ptrStartSegment : startSegments) {
           for (const CDCRecoSegment2D* ptrEndSegment : endSegments) {
 
             if (ptrStartSegment == ptrEndSegment) continue; // Just for safety
-            segmentPair.setSegments(ptrStartSegment, ptrEndSegment);
-            segmentPair.clearTrajectory3D();
+            axialSegmentPair.setSegments(ptrStartSegment, ptrEndSegment);
+            axialSegmentPair.clearTrajectory2D();
 
-            if (segmentPair.getTrajectory3D().isFitted()) {
-              B2ERROR("CDCSegmentPair still fitted after clearing.");
-              continue;
-            }
-
-            if (not segmentPair.checkSegments()) {
-              B2ERROR("CDCAxialSegmentPair containing nullptr encountered in SegmentPairCreator");
-              continue;
-            }
-
-            Weight pairWeight = m_segmentPairFilter(segmentPair);
+            Weight pairWeight = m_axialSegmentPairFilter(axialSegmentPair);
             if (not isNotACell(pairWeight)) {
-              segmentPair.getAutomatonCell().setCellWeight(pairWeight);
-              segmentPairs.push_back(segmentPair);
+              axialSegmentPair.getAutomatonCell().setCellWeight(pairWeight);
+              axialSegmentPairs.push_back(axialSegmentPair);
             }
+
           }
         }
       }
@@ -128,7 +122,7 @@ namespace Belle2 {
       std::array<std::vector<const CDCRecoSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
       /// The filter to be used for the segment pair generation.
-      ASegmentPairFilter m_segmentPairFilter;
+      AAxialSegmentPairFilter m_axialSegmentPairFilter;
 
     }; //end class FacetCreator
   } //end namespace TrackFindingCDC

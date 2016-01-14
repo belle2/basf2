@@ -30,6 +30,13 @@ CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
 }
 
 
+CDCSegmentTriple:: CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair) :
+  CDCAxialSegmentPair(segmentPair),
+  m_middleSegment(nullptr)
+{
+}
+
+
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
                                    const CDCStereoRecoSegment2D* middleSegment,
                                    const CDCAxialRecoSegment2D* endSegment) :

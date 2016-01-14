@@ -83,6 +83,13 @@ namespace Belle2 {
       void setEnd(const CDCAxialRecoSegment2D* endSegment)
       { m_endSegment = endSegment; }
 
+      /// Setter for both segments simultaniously
+      void setSegments(const CDCRecoSegment2D* startSegment, const CDCRecoSegment2D* endSegment)
+      {
+        m_startSegment = startSegment;
+        m_endSegment = endSegment;
+        checkSegments();
+      }
 
       /// Getter for the trajectory of the two dimensional trajectory
       CDCTrajectory2D& getTrajectory2D() const

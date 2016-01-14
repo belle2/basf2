@@ -61,13 +61,24 @@ BeamParametersModule::BeamParametersModule() : Module()
            "generating initial events", true);
   addParam("generateCMS", m_generateCMS, "if true, generate events in CMS, not "
            "lab system", false);
+  addParam("overwrite", m_overwrite, "if true overwrite existing beam"
+           "parameters, otherwise do nothing", false);
 }
 
 void BeamParametersModule::initialize()
 {
   StoreObjPtr<BeamParameters> beamParams("", DataStore::c_Persistent);
   beamParams.registerInDataStore();
-  beamParams.create();
+  // Check if we already have a beamparameter object
+  if (!beamParams.isValid()) {
+    beamParams.create();
+  } else {
+    if (!m_overwrite) {
+      B2WARNING("BeamParameters already exist, doing nothing");
+    } else {
+      B2WARNING("overwriting existing BeamParameters");
+    }
+  }
   beamParams->setHER(m_energyHER, m_angleHER, m_covHER);
   beamParams->setLER(m_energyLER, m_angleLER, m_covLER);
   TVector3 vertex;

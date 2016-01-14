@@ -189,11 +189,8 @@ def add_beamparameters(path, name, **argk):
         return None
 
     # check if we have a BeamParameters module in the path. If not create one
-    for module in path.modules():
-        if module.type() == "BeamParameters":
-            break
-    else:
-        module = path.add_module("BeamParameters")
+    module = path.add_module("BeamParameters")
+    module.set_name("BeamParameters:%s" % name)
 
     # copy the defaults
     values = beamparameter_defaults.copy()

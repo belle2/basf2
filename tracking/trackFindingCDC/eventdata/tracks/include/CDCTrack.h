@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <tracking/trackFindingCDC/ca/Path.h>
 
 #include <vector>
 
@@ -23,6 +24,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
     class CDCRecoSegment3D;
+    class CDCSegmentPair;
+    class CDCSegmentTriple;
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D> {
@@ -35,9 +38,16 @@ namespace Belle2 {
       explicit CDCTrack(const CDCRecoSegment2D& segment);
 
       /// Concats several tracks from a path
-      static
-      Belle2::TrackFindingCDC::CDCTrack
-      condense(const std::vector<const Belle2::TrackFindingCDC::CDCTrack*>& trackPath);
+      static CDCTrack condense(const Path<const CDCTrack>& trackPath);
+
+      /// Reconstructs the hit content of the segment triple track to a CDCTrack averaging overlapping parts
+      static CDCTrack condense(const Path<const CDCSegmentTriple>& segmentTriplePath);
+
+      /// Reconstructs the hit content of the axial stereo segment pair path to a CDCTrack averaging overlapping parts.
+      static CDCTrack condense(const Path<const CDCSegmentPair>& segmentPairPath);
+
+      /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
+      void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
 
       /// Copies the hit and trajectory content of this track to the Genfit track candidate
       bool fillInto(genfit::TrackCand& trackCand) const;

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/creators/TrackCreator.h>
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
@@ -67,7 +66,9 @@ namespace Belle2 {
         B2DEBUG(100, "  Created " << m_segmentTriplePaths.size()  << " SegmentTripleTracks");
 
         // Reduce to plain tracks
-        m_trackCreator.create(m_segmentTriplePaths, outputTracks);
+        for (const Path<const CDCSegmentTriple>& segmentTriplePath : m_segmentTriplePaths) {
+          outputTracks.push_back(CDCTrack::condense(segmentTriplePath));
+        }
       }
 
     private:
@@ -80,11 +81,7 @@ namespace Belle2 {
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
 
-      // Deprication:
-      /// Instance of the track creator from paths.
-      TrackCreator m_trackCreator;
     }; // end class SegmentCreator
-
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

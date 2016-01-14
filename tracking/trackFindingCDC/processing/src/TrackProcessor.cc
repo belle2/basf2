@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-#include <tracking/trackFindingCDC/creators/TrackCreator.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -39,10 +38,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
 
   CDCTrack& track = cdcTrackList.createEmptyTrack();
   track.setStartTrajectory3D(trajectory3D);
-
-  TrackCreator trackCreator;
-  trackCreator.create(hits, track);
-
+  track.appendNotTaken(hits);
   postprocessTrack(track, conformalCDCWireHitList, cdcTrackList);
 }
 

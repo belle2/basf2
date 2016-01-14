@@ -23,6 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration.
+    class CDCTrajectory3D;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
 
@@ -110,6 +111,10 @@ namespace Belle2 {
        *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.*/
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+                                      const CDCTrajectory3D& trajectory3D);
+
+
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);

@@ -13,7 +13,6 @@
 #include <gtest/gtest.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/creators/TrackCreator.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/ConformalCDCWireHit.h>

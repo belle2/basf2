@@ -270,12 +270,13 @@ namespace Belle2 {
       /// Setter for the origin of the local coordinate system.
       /** This sets the origin point the local helix representation is subjected.
        *  The local helix is changed such that the set of points in global space is not changed.*/
-      void setLocalOrigin(const Vector3D& localOrigin)
+      double setLocalOrigin(const Vector3D& localOrigin)
       {
+        double result = calcArcLength2D(localOrigin);
         m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);
         m_localOrigin = localOrigin;
+        return result;
       }
-
 
 
     private:

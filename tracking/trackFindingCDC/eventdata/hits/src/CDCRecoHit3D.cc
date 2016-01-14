@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
@@ -81,11 +82,23 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLTaggedWireHit& rlWireHit,
 
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
+                                       const CDCTrajectory3D& trajectory3D)
+{
+  // This this is quite legacy behaviour - do something smarter.
+  CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
+  CDCTrajectorySZ trajectorySZ = trajectory3D.getTrajectorySZ();
+
+  return reconstruct(recoHit, trajectory2D, trajectorySZ);
+}
+
+
+CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit,
                                        const CDCTrajectory2D& trajectory2D,
                                        const CDCTrajectorySZ& trajectorySZ)
 {
   EStereoKind stereoType = recoHit.getStereoKind();
   if (stereoType == EStereoKind::c_Axial) {
+
     Vector2D recoPos2D = trajectory2D.getClosest(recoHit.getRecoPos2D());
     double perpS    = trajectory2D.calcArcLength2D(recoPos2D);
     double z        = trajectorySZ.mapSToZ(perpS);

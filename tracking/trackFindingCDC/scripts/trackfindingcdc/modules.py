@@ -30,9 +30,7 @@ def add_cdc_tracking(path, cdc_trackcands="TrackCands"):
     # Find segments and reduce background hits
     path.add_module("SegmentFinderCDCFacetAutomaton",
                     ClusterFilter="tmva",
-                    ClusterFilterParameters={"cut": 0.2},
-                    WriteGFTrackCands=False,
-                    TracksStoreObjName="__TempCDCTracksVector")
+                    ClusterFilterParameters={"cut": 0.2})
 
     # Find axial tracks
     path.add_module("TrackFinderCDCLegendreTracking",

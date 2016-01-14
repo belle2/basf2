@@ -14,39 +14,3 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 REG_MODULE(TrackFinderCDCCosmics);
-
-TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule()
-{
-  setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
-
-  // Set the default segment to symmetric
-  ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-  moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
-  this->setParamList(moduleParamList);
-}
-
-void TrackFinderCDCCosmicsModule::initialize()
-{
-  SegmentFinderCDCFacetAutomatonModule::initialize();
-  TrackFinderCDCSegmentPairAutomatonModule::initialize();
-}
-
-void TrackFinderCDCCosmicsModule::event()
-{
-  B2DEBUG(100, "########## TrackFinderCDCCosmics begin ##########");
-
-  // Stage one
-  SegmentFinderCDCFacetAutomatonModule::event();
-
-  // Stage two
-  TrackFinderCDCSegmentPairAutomatonModule::event();
-
-  B2DEBUG(100, "########## TrackFinderCDCCosmics end ############");
-}
-
-void TrackFinderCDCCosmicsModule::terminate()
-{
-  TrackFinderCDCSegmentPairAutomatonModule::terminate();
-  SegmentFinderCDCFacetAutomatonModule::terminate();
-}

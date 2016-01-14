@@ -211,11 +211,10 @@ class CDCBackgroundHitFinder(metamodules.WrapperModule):
             "SegmentFinderCDCFacetAutomaton",
             ClusterFilter="tmva",
             ClusterFilterParameters={"cut": float(self.tmva_cut)},
-            SegmentsStoreObjName="__TempCDCRecoSegment2DVector",
-            WriteGFTrackCands=False,
+            segmentVector="__TempCDCRecoSegment2DVector",
+            exportSegments=False,
             FacetFilter="none",
-            FacetRelationFilter="none",
-            TracksStoreObjName="__TempCDCTracksVector")
+            FacetRelationFilter="none")
 
         super(CDCBackgroundHitFinder, self).__init__(background_hit_finder_module)
 
@@ -309,8 +308,6 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
     If output_track_cands_store_array_name is None, do not write out the track cands to a genfit store array (default)
     With output_segments_store_vector_name you can control the output vector of the CDCRecoSegments2D. Be aware that every content
     in this vector will be deleted before executing this module!
-
-    The vector with _Temp gets registered but not created
     """
 
     def __init__(self, output_track_cands_store_array_name=None,
@@ -322,14 +319,12 @@ class CDCLocalTrackFinder(metamodules.WrapperModule):
             SegmentOrientation="outwards",
             ClusterFilter="tmva",
             ClusterFilterParameters={"cut": float(tmva_cut)},
-            SegmentsStoreObjName=output_segments_store_vector_name,
-            WriteGFTrackCands=False,
-            TracksStoreObjName="__TempCDCTracksVector")
+            segmentVector=output_segments_store_vector_name,
+            exportSegments=False)
 
         if output_track_cands_store_array_name is not None:
-            local_track_finder_module.param({'WriteGFTrackCands': True,
-                                             'GFTrackCandsStoreArrayName': output_track_cands_store_array_name,
-                                             'CreateGFTrackCands': True})
+            local_track_finder_module.param({'exportSegments': True,
+                                             'exportSegmentsInto': output_track_cands_store_array_name})
 
         super(CDCLocalTrackFinder, self).__init__(local_track_finder_module)
 

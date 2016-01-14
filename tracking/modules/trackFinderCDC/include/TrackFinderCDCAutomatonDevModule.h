@@ -12,15 +12,14 @@
 //#define LOG_NO_B2DEBUG
 
 // Base track finder module
-#include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
+#include <tracking/modules/trackFinderCDC/TrackFinderCDCAutomatonModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Module for development of the cellular automaton tracking for the CDC
-    class TrackFinderCDCAutomatonDevModule :
-      public SegmentFinderCDCFacetAutomatonModule,
-      public TrackFinderCDCSegmentPairAutomatonDevModule {
+
+    /// Deprecated : Module for development of the cellular automaton tracking for the CDC
+    class TrackFinderCDCAutomatonDevModule
+      : public TrackFinderCDCAutomatonModule {
 
     public:
       /// Constructor of the module. Setting up parameters and description.
@@ -29,17 +28,8 @@ namespace Belle2 {
       ///  Initialize the Module before event processing
       virtual void initialize();
 
-      /// Processes the event and generates track candidates
-      virtual void event();
-
-      /// Terminate and free resources after last event has been processed
-      virtual void terminate();
-
-    private:
-      /// Parameter: Switch in indicating if the second stage, which is the building of tracks from segments, shall be run.
-      bool m_param_runSecondStage;
-
     }; // end class
+
   }
 } // end namespace Belle2
 

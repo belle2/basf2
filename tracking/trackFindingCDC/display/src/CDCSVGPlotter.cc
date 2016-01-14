@@ -25,6 +25,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <cmath>
 
 using genfit::AbsTrackRep;

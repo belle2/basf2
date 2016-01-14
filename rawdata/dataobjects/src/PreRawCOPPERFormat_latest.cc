@@ -59,6 +59,7 @@ int PreRawCOPPERFormat_latest::GetBufferPos(int n)
 
       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      PrintData(m_buffer, m_nwords);
       printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf;     throw (err_str);
       //      exit(1);

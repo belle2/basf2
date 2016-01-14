@@ -38,8 +38,6 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
   ModuleParamList moduleParamList = this->getParamList();
   m_trackOrienter.exposeParameters(&moduleParamList);
   m_trackExporter.exposeParameters(&moduleParamList);
-  moduleParamList.getParameter<bool>("exportTracks").setDefaultValue(true);
-  moduleParamList.getParameter<bool>("WriteGFTrackCands").setDefaultValue(true); // Aliased
   this->setParamList(moduleParamList);
 
   addParam("TracksStoreObjName",

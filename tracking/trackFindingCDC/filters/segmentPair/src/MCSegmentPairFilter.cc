@@ -23,8 +23,8 @@ using namespace TrackFindingCDC;
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);

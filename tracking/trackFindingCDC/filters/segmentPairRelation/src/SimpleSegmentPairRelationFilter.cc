@@ -28,6 +28,6 @@ Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
   // count it to times
   // could also be a better measure of fit quality
 
-  return  -toPair.getStartSegment()->size();
+  return  -toPair.getFromSegment()->size();
 
 }

@@ -49,8 +49,8 @@ bool CDCSegmentPairFitlessVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   const CDCSegmentPair segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   const CDCRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCRecoSegment2D& endSegment = *ptrEndSegment;

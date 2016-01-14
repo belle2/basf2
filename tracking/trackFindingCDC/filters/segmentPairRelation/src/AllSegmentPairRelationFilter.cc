@@ -17,5 +17,5 @@ using namespace TrackFindingCDC;
 Weight AllSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
                                                 const CDCSegmentPair& toPair)
 {
-  return  -toPair.getStartSegment()->size();
+  return  -toPair.getFromSegment()->size();
 }

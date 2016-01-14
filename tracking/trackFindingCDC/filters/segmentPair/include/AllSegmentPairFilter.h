@@ -23,8 +23,8 @@ namespace Belle2 {
       virtual
       Weight operator()(const CDCSegmentPair& segmentPair) override final
       {
-        const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+        const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
         assert(ptrStartSegment);
         assert(ptrEndSegment);

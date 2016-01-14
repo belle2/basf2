@@ -25,47 +25,47 @@ namespace Belle2 {
       CDCSegmentPair();
 
       /// Constructor from two segments
-      CDCSegmentPair(const CDCRecoSegment2D* startSegment,
-                     const CDCRecoSegment2D* endSegment);
+      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
+                     const CDCRecoSegment2D* toSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCSegmentPair(const CDCRecoSegment2D* startSegment,
-                     const CDCRecoSegment2D* endSegment,
+      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
+                     const CDCRecoSegment2D* toSegment,
                      const CDCTrajectory3D& trajectory3D);
 
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCSegmentPair const& rhs) const
-      { return getStartSegment() == rhs.getStartSegment() and getEndSegment() == rhs.getEndSegment(); }
+      { return getFromSegment() == rhs.getFromSegment() and getToSegment() == rhs.getToSegment(); }
 
 
 
       /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCSegmentPair const& rhs) const
       {
-        return (getStartSegment() < rhs.getStartSegment()  or
-                (getStartSegment() == rhs.getStartSegment() and getEndSegment() < rhs.getEndSegment()));
+        return (getFromSegment() < rhs.getFromSegment()  or
+                (getFromSegment() == rhs.getFromSegment() and getToSegment() < rhs.getToSegment()));
       }
 
-      /// Define reconstructed segments and axial stereo segment pairs as coaligned on the start segment
+      /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
       friend bool operator<(const CDCSegmentPair& segmentPair,
                             const CDCRecoSegment2D* segment)
-      { return segmentPair.getStartSegment() < segment; }
+      { return segmentPair.getFromSegment() < segment; }
 
-      /// Define reconstructed segments and axial stereo segment pairs as coaligned on the start segment
+      /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
       friend bool operator<(const CDCRecoSegment2D* segment,
                             const CDCSegmentPair& segmentPair)
-      { return segment < segmentPair.getStartSegment(); }
+      { return segment < segmentPair.getFromSegment(); }
 
 
 
       /// Checks if both stored segments are not nullptr. Returns true if check is succeded.
       bool checkSegmentsNonNullptr() const
-      { return getStartSegment() != nullptr and getEndSegment() != nullptr; }
+      { return getFromSegment() != nullptr and getToSegment() != nullptr; }
 
 
       /// Checks if the two segments are of different axial type.
       bool checkSegmentsStereoKinds() const
-      { return (getStartStereoKind() == EStereoKind::c_Axial) xor(getEndStereoKind() == EStereoKind::c_Axial); }
+      { return (getFromStereoKind() == EStereoKind::c_Axial) xor(getToStereoKind() == EStereoKind::c_Axial); }
 
       /// Checks the references to the contained three segment for nullptrs and exactly one of them is axial and one is stereo
       bool checkSegments() const
@@ -74,87 +74,87 @@ namespace Belle2 {
 
 
       /// Getter for the stereo type of the first segment.
-      EStereoKind getStartStereoKind() const
-      { return getStartSegment() == nullptr ? EStereoKind::c_Invalid : getStartSegment()->getStereoKind(); }
+      EStereoKind getFromStereoKind() const
+      { return getFromSegment() == nullptr ? EStereoKind::c_Invalid : getFromSegment()->getStereoKind(); }
 
 
       /// Getter for the stereo type of the second segment.
-      EStereoKind getEndStereoKind() const
-      { return getEndSegment() == nullptr ? EStereoKind::c_Invalid : getEndSegment()->getStereoKind(); }
+      EStereoKind getToStereoKind() const
+      { return getToSegment() == nullptr ? EStereoKind::c_Invalid : getToSegment()->getStereoKind(); }
 
 
 
-      /// Getter for the superlayer id of the start segment.
-      ISuperLayer getStartISuperLayer() const
-      { return getStartSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getStartSegment()->getISuperLayer(); }
+      /// Getter for the superlayer id of the from segment.
+      ISuperLayer getFromISuperLayer() const
+      { return getFromSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getFromSegment()->getISuperLayer(); }
 
-      /// Getter for the superlayer id of the end segment.
-      ISuperLayer getEndISuperLayer() const
-      { return getEndSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getEndSegment()->getISuperLayer(); }
-
-
-
-      /// Getter for the start segment.
-      const CDCRecoSegment2D* getStartSegment() const
-      { return m_startSegment; }
-
-      /// Setter for the start segment.
-      void setStartSegment(const CDCRecoSegment2D* startSegment)
-      { setSegments(startSegment, getEndSegment()); }
+      /// Getter for the superlayer id of the to segment.
+      ISuperLayer getToISuperLayer() const
+      { return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getToSegment()->getISuperLayer(); }
 
 
 
-      /// Getter for the end segment.
-      const CDCRecoSegment2D* getEndSegment() const
-      { return m_endSegment; }
+      /// Getter for the from segment.
+      const CDCRecoSegment2D* getFromSegment() const
+      { return m_fromSegment; }
 
-      /// Setter for the end segment.
-      void setEndSegment(const CDCRecoSegment2D* endSegment)
-      { setSegments(getStartSegment(), endSegment); }
+      /// Setter for the from segment.
+      void setFromSegment(const CDCRecoSegment2D* fromSegment)
+      { setSegments(fromSegment, getToSegment()); }
+
+
+
+      /// Getter for the to segment.
+      const CDCRecoSegment2D* getToSegment() const
+      { return m_toSegment; }
+
+      /// Setter for the to segment.
+      void setToSegment(const CDCRecoSegment2D* toSegment)
+      { setSegments(getFromSegment(), toSegment); }
 
 
 
       /// Getter for the stereo segment
       const CDCRecoSegment2D* getStereoSegment() const
-      { return getStartStereoKind() != EStereoKind::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getFromStereoKind() != EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
       /// Getter for the axial segment
       const CDCRecoSegment2D* getAxialSegment() const
-      { return getStartStereoKind() == EStereoKind::c_Axial ? getStartSegment() : getEndSegment(); }
+      { return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
 
       /// Setter for both segments simultaniously
-      void setSegments(const CDCRecoSegment2D* startSegment, const CDCRecoSegment2D* endSegment)
+      void setSegments(const CDCRecoSegment2D* fromSegment, const CDCRecoSegment2D* toSegment)
       {
-        m_startSegment = startSegment;
-        m_endSegment = endSegment;
+        m_fromSegment = fromSegment;
+        m_toSegment = toSegment;
         if (not checkSegmentsNonNullptr()) B2WARNING("CDCSegmentPair: one segment set to nullptr");
         if (not checkSegmentsStereoKinds()) B2WARNING("CDCSegmentPair: segments set with same stereo type");
       }
 
-      /** Determines the angle between the last reconstructed position of the start segment and
-       *  the first reconstructed position of the end segment.*/
+      /** Determines the angle between the last reconstructed position of the from segment and
+       *  the first reconstructed position of the to segment.*/
       double computeDeltaPhiAtSuperLayerBound() const;
 
-      /** Indicator if the start segment lies before the end segment */
-      double computeStartIsBeforeEnd() const
-      { return computeStartIsBeforeEndFitless(); }
+      /** Indicator if the from segment lies before the to segment */
+      double computeFromIsBeforeTo() const
+      { return computeFromIsBeforeToFitless(); }
 
-      /** Indicator if the start segment lies before the end segment */
-      double computeEndIsAfterStart() const
-      { return computeEndIsAfterStartFitless(); }
+      /** Indicator if the from segment lies before the to segment */
+      double computeToIsAfterFrom() const
+      { return computeToIsAfterFromFitless(); }
 
-      /** Indicator if the start segment and the end segment have roughly the same travel direction.*/
+      /** Indicator if the from segment and the to segment have roughly the same travel direction.*/
       double computeIsCoaligned() const
       { return computeIsCoalignedFitless(); }
 
-      /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
-      double computeStartIsBeforeEndFitless() const;
+      /** Indicator if the from segment lies before the to segment, build without using the trajectories, which may not have been fitted yet. */
+      double computeFromIsBeforeToFitless() const;
 
-      /** Indicator if the start segment lies before the end segment, build without using the trajectories, which may not have been fitted yet. */
-      double computeEndIsAfterStartFitless() const;
+      /** Indicator if the from segment lies before the to segment, build without using the trajectories, which may not have been fitted yet. */
+      double computeToIsAfterFromFitless() const;
 
-      /** Indicator if the start segment and the end segment have roughly the same travel direction without using the common fit*/
+      /** Indicator if the from segment and the to segment have roughly the same travel direction without using the common fit*/
       double computeIsCoalignedFitless() const;
 
       /// Checks if the last entity in the vector lies greater or lower travel distance than the last entity.
@@ -164,14 +164,14 @@ namespace Belle2 {
        */
       EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
       {
-        EForwardBackward startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStartSegment()));
-        EForwardBackward endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEndSegment()));
+        EForwardBackward fromIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getFromSegment()));
+        EForwardBackward toIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getToSegment()));
 
-        if (startIsCoaligned == EForwardBackward::c_Forward and
-            endIsCoaligned == EForwardBackward::c_Forward) {
+        if (fromIsCoaligned == EForwardBackward::c_Forward and
+            toIsCoaligned == EForwardBackward::c_Forward) {
           return EForwardBackward::c_Forward;
-        } else if (startIsCoaligned == EForwardBackward::c_Backward and
-                   endIsCoaligned == EForwardBackward::c_Backward) {
+        } else if (fromIsCoaligned == EForwardBackward::c_Backward and
+                   toIsCoaligned == EForwardBackward::c_Backward) {
           return EForwardBackward::c_Backward;
         } else {
           return EForwardBackward::c_Invalid;
@@ -203,26 +203,26 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getStartSegment()->unsetAndForwardMaskedFlag();
-        getEndSegment()->unsetAndForwardMaskedFlag();
+        getFromSegment()->unsetAndForwardMaskedFlag();
+        getToSegment()->unsetAndForwardMaskedFlag();
       }
 
       /// Sets the masked flag of the segment triple's automaton cell and of the three contained segments.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getStartSegment()->setAndForwardMaskedFlag();
-        getEndSegment()->setAndForwardMaskedFlag();
+        getFromSegment()->setAndForwardMaskedFlag();
+        getToSegment()->setAndForwardMaskedFlag();
       }
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getStartSegment()->receiveMaskedFlag();
-        getEndSegment()->receiveMaskedFlag();
+        getFromSegment()->receiveMaskedFlag();
+        getToSegment()->receiveMaskedFlag();
 
-        if (getStartSegment()->getAutomatonCell().hasMaskedFlag() or
-            getEndSegment()->getAutomatonCell().hasMaskedFlag()) {
+        if (getFromSegment()->getAutomatonCell().hasMaskedFlag() or
+            getToSegment()->getAutomatonCell().hasMaskedFlag()) {
           getAutomatonCell().setMaskedFlag();
         }
       }
@@ -236,11 +236,11 @@ namespace Belle2 {
       { return m_automatonCell; }
 
     private:
-      /// Reference to the start segment
-      const CDCRecoSegment2D* m_startSegment;
+      /// Reference to the from segment
+      const CDCRecoSegment2D* m_fromSegment;
 
-      /// Reference to the end segment
-      const CDCRecoSegment2D* m_endSegment;
+      /// Reference to the to segment
+      const CDCRecoSegment2D* m_toSegment;
 
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;
@@ -248,7 +248,7 @@ namespace Belle2 {
       /// Automaton cell assoziated with the pair of segments
       mutable AutomatonCell m_automatonCell;
 
-    }; //end class CDCSegmentPair
+    }; // end class CDCSegmentPair
 
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

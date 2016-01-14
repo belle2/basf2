@@ -554,8 +554,8 @@ void EventDataPlotter::draw(const CDCSegmentPair& segmentPair,
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
 
   if (not ptrFromSegment or not ptrToSegment) return;
 

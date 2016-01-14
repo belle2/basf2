@@ -51,5 +51,5 @@ MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
   Weight mcToPairWeight = m_mcSegmentPairFilter(toSegmentPair);
 
   bool mcDecision = (not std::isnan(mcFromPairWeight)) and (not std::isnan(mcToPairWeight));
-  return mcDecision ? -toSegmentPair.getStartSegment()->size() : NAN;
+  return mcDecision ? -toSegmentPair.getFromSegment()->size() : NAN;
 }

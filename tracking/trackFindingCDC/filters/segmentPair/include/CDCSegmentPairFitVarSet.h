@@ -105,7 +105,7 @@ namespace Belle2 {
       const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment2D*>
       getNested(const CDCSegmentPair* segmentPair)
       {
-        return std::make_pair(segmentPair->getStartSegment(), segmentPair->getEndSegment());
+        return std::make_pair(segmentPair->getFromSegment(), segmentPair->getToSegment());
       }
     };
 

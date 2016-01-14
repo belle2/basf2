@@ -24,8 +24,8 @@ SimpleSegmentPairFilter::SimpleSegmentPairFilter() : m_riemannFitter()
 
 Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
@@ -109,8 +109,8 @@ const CDCTrajectory2D& SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCA
 const CDCTrajectory3D& SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair&
     segmentPair) const
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;

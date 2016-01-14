@@ -247,7 +247,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   CDCTrajectory3D startTrajectory3D = firstSegmentPair->getTrajectory3D();
 
   double perpSOffset = 0.0;
-  appendReconstructed(firstSegmentPair->getStartSegment(),
+  appendReconstructed(firstSegmentPair->getFromSegment(),
                       firstSegmentPair->getTrajectory3D(),
                       perpSOffset, track);
 
@@ -256,9 +256,9 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
     const CDCSegmentPair* secondSegmentPair = *itSegmentPair++;
 
     B2ASSERT("Two segement pairs do not overlap in their segments",
-             firstSegmentPair->getEndSegment() == secondSegmentPair->getStartSegment());
+             firstSegmentPair->getToSegment() == secondSegmentPair->getFromSegment());
 
-    perpSOffset = appendReconstructedAverage(firstSegmentPair->getEndSegment(),
+    perpSOffset = appendReconstructedAverage(firstSegmentPair->getToSegment(),
                                              firstSegmentPair->getTrajectory3D(),
                                              perpSOffset,
                                              secondSegmentPair->getTrajectory3D(),
@@ -268,7 +268,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   }
 
   const CDCSegmentPair* lastSegmentPair = firstSegmentPair;
-  appendReconstructed(lastSegmentPair->getEndSegment(),
+  appendReconstructed(lastSegmentPair->getToSegment(),
                       lastSegmentPair->getTrajectory3D(),
                       perpSOffset, track);
 

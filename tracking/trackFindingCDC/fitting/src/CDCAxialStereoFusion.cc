@@ -424,23 +424,23 @@ CDCTrajectory3D CDCAxialStereoFusion::fuseTrajectories(const CDCRecoSegment2D& s
 
 void CDCAxialStereoFusion::fuseTrajectories(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  if (not ptrStartSegment) {
-    B2WARNING("Start segment unset.");
+  if (not ptrFromSegment) {
+    B2WARNING("From segment unset.");
     return;
   }
 
-  if (not ptrEndSegment) {
-    B2WARNING("End segment unset.");
+  if (not ptrToSegment) {
+    B2WARNING("To segment unset.");
     return;
   }
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  CDCTrajectory3D trajectory3D = fuseTrajectories(startSegment, endSegment);
+  CDCTrajectory3D trajectory3D = fuseTrajectories(fromSegment, toSegment);
   segmentPair.setTrajectory3D(trajectory3D);
 
 
@@ -546,22 +546,22 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
 void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegmentPair& segmentPair,
                                                        bool priorityOnSZ)
 {
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  if (not ptrStartSegment) {
-    B2WARNING("Start segment unset.");
+  if (not ptrFromSegment) {
+    B2WARNING("From segment unset.");
     return;
   }
 
-  if (not ptrEndSegment) {
-    B2WARNING("End segment unset.");
+  if (not ptrToSegment) {
+    B2WARNING("To segment unset.");
     return;
   }
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(startSegment, endSegment, priorityOnSZ);
+  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(fromSegment, toSegment, priorityOnSZ);
   segmentPair.setTrajectory3D(trajectory3D);
 }

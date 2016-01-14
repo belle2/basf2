@@ -31,8 +31,8 @@ bool CDCSegmentPairFitVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   const CDCSegmentPair segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);

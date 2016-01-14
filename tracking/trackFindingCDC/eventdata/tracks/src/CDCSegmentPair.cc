@@ -16,179 +16,179 @@ using namespace TrackFindingCDC;
 
 
 CDCSegmentPair::CDCSegmentPair() :
-  m_startSegment(nullptr),
-  m_endSegment(nullptr)
+  m_fromSegment(nullptr),
+  m_toSegment(nullptr)
 {
 }
 
 
 
-CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* startSegment,
-                               const CDCRecoSegment2D* endSegment):
-  m_startSegment(startSegment),
-  m_endSegment(endSegment)
+CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
+                               const CDCRecoSegment2D* toSegment):
+  m_fromSegment(fromSegment),
+  m_toSegment(toSegment)
 {
-  B2ASSERT("CDCSegmentPair initialized with nullptr as start segment", startSegment);
-  B2ASSERT("CDCSegmentPair initialized with nullptr as end segment", endSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as from segment", fromSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as to segment", toSegment);
 }
 
 
-CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* startSegment,
-                               const CDCRecoSegment2D* endSegment,
+CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
+                               const CDCRecoSegment2D* toSegment,
                                const CDCTrajectory3D& trajectory3D) :
-  m_startSegment(startSegment),
-  m_endSegment(endSegment),
+  m_fromSegment(fromSegment),
+  m_toSegment(toSegment),
   m_trajectory3D(trajectory3D)
 {
-  B2ASSERT("CDCSegmentPair initialized with nullptr as start segment", startSegment);
-  B2ASSERT("CDCSegmentPair initialized with nullptr as end segment", endSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as from segment", fromSegment);
+  B2ASSERT("CDCSegmentPair initialized with nullptr as to segment", toSegment);
 }
 
 
 double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 {
-  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = getToSegment();
 
-  if (not ptrStartSegment) {
+  if (not ptrFromSegment) {
     return NAN;
   }
 
-  if (not ptrEndSegment) {
+  if (not ptrToSegment) {
     return NAN;
   }
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  if (startSegment.empty() or endSegment.empty()) {
+  if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
   }
 
-  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
-  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
+  const CDCRecoHit2D& lastRecoHit_fromSegment = fromSegment.back();
+  const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
 
-  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
-  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
+  const Vector2D lastPos2D_fromSegment =  lastRecoHit_fromSegment.getRecoPos2D();
+  const Vector2D firstPos2D_toSegment =  firstRecoHit_toSegment.getRecoPos2D();
 
-  return lastPos2D_startSegment.angleWith(firstPos2D_endSegment);
+  return lastPos2D_fromSegment.angleWith(firstPos2D_toSegment);
 }
 
 
 
 
 
-double CDCSegmentPair::computeStartIsBeforeEndFitless() const
+double CDCSegmentPair::computeFromIsBeforeToFitless() const
 {
-  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = getToSegment();
 
-  if (not ptrStartSegment) {
+  if (not ptrFromSegment) {
     return NAN;
   }
 
-  if (not ptrEndSegment) {
+  if (not ptrToSegment) {
     return NAN;
   }
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  if (startSegment.empty() or endSegment.empty()) {
+  if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
   }
 
-  const CDCRecoHit2D& firstRecoHit_startSegment = startSegment.front();
-  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+  const CDCRecoHit2D& firstRecoHit_fromSegment = fromSegment.front();
+  const CDCRecoHit2D& lastRecoHit_fromSegment = fromSegment.back();
 
-  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
+  const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
 
-  const Vector2D firstPos2D_startSegment =  firstRecoHit_startSegment.getRecoPos2D();
-  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
-  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
+  const Vector2D firstPos2D_fromSegment =  firstRecoHit_fromSegment.getRecoPos2D();
+  const Vector2D lastPos2D_fromSegment =  lastRecoHit_fromSegment.getRecoPos2D();
+  const Vector2D firstPos2D_toSegment =  firstRecoHit_toSegment.getRecoPos2D();
 
-  Vector2D firstToLast_startSegment = lastPos2D_startSegment - firstPos2D_startSegment;
-  Vector2D firstToFirst = firstPos2D_endSegment - firstPos2D_startSegment;
+  Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
+  Vector2D firstToFirst = firstPos2D_toSegment - firstPos2D_fromSegment;
 
-  return firstToLast_startSegment.angleWith(firstToFirst);
+  return firstToLast_fromSegment.angleWith(firstToFirst);
 
 }
 
 
 
-double CDCSegmentPair::computeEndIsAfterStartFitless() const
+double CDCSegmentPair::computeToIsAfterFromFitless() const
 {
-  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = getToSegment();
 
-  if (not ptrStartSegment) {
+  if (not ptrFromSegment) {
     return NAN;
   }
 
-  if (not ptrEndSegment) {
+  if (not ptrToSegment) {
     return NAN;
   }
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  if (startSegment.empty() or endSegment.empty()) {
+  if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
   }
 
-  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+  const CDCRecoHit2D& lastRecoHit_fromSegment = fromSegment.back();
 
-  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
-  const CDCRecoHit2D& lastRecoHit_endSegment = endSegment.back();
+  const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
+  const CDCRecoHit2D& lastRecoHit_toSegment = toSegment.back();
 
-  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
-  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
-  const Vector2D lastPos2D_endSegment =  lastRecoHit_endSegment.getRecoPos2D();
+  const Vector2D lastPos2D_fromSegment =  lastRecoHit_fromSegment.getRecoPos2D();
+  const Vector2D firstPos2D_toSegment =  firstRecoHit_toSegment.getRecoPos2D();
+  const Vector2D lastPos2D_toSegment =  lastRecoHit_toSegment.getRecoPos2D();
 
-  Vector2D firstToLast_endSegment = lastPos2D_endSegment - firstPos2D_endSegment;
-  Vector2D lastToLast = lastPos2D_endSegment - lastPos2D_startSegment;
+  Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
+  Vector2D lastToLast = lastPos2D_toSegment - lastPos2D_fromSegment;
 
-  return firstToLast_endSegment.angleWith(lastToLast);
+  return firstToLast_toSegment.angleWith(lastToLast);
 
 }
 
 
 double CDCSegmentPair::computeIsCoalignedFitless() const
 {
-  const CDCRecoSegment2D* ptrStartSegment = getStartSegment();
-  const CDCRecoSegment2D* ptrEndSegment = getEndSegment();
+  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = getToSegment();
 
-  if (not ptrStartSegment) {
+  if (not ptrFromSegment) {
     return NAN;
   }
 
-  if (not ptrEndSegment) {
+  if (not ptrToSegment) {
     return NAN;
   }
 
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  if (startSegment.empty() or endSegment.empty()) {
+  if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
   }
 
-  const CDCRecoHit2D& firstRecoHit_startSegment = startSegment.front();
-  const CDCRecoHit2D& lastRecoHit_startSegment = startSegment.back();
+  const CDCRecoHit2D& firstRecoHit_fromSegment = fromSegment.front();
+  const CDCRecoHit2D& lastRecoHit_fromSegment = fromSegment.back();
 
-  const CDCRecoHit2D& firstRecoHit_endSegment = endSegment.front();
-  const CDCRecoHit2D& lastRecoHit_endSegment = endSegment.back();
+  const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
+  const CDCRecoHit2D& lastRecoHit_toSegment = toSegment.back();
 
-  const Vector2D firstPos2D_startSegment =  firstRecoHit_startSegment.getRecoPos2D();
-  const Vector2D lastPos2D_startSegment =  lastRecoHit_startSegment.getRecoPos2D();
+  const Vector2D firstPos2D_fromSegment =  firstRecoHit_fromSegment.getRecoPos2D();
+  const Vector2D lastPos2D_fromSegment =  lastRecoHit_fromSegment.getRecoPos2D();
 
-  const Vector2D firstPos2D_endSegment =  firstRecoHit_endSegment.getRecoPos2D();
-  const Vector2D lastPos2D_endSegment =  lastRecoHit_endSegment.getRecoPos2D();
+  const Vector2D firstPos2D_toSegment =  firstRecoHit_toSegment.getRecoPos2D();
+  const Vector2D lastPos2D_toSegment =  lastRecoHit_toSegment.getRecoPos2D();
 
 
-  Vector2D firstToLast_startSegment = lastPos2D_startSegment - firstPos2D_startSegment;
-  Vector2D firstToLast_endSegment = lastPos2D_endSegment - firstPos2D_endSegment;
+  Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
+  Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
 
-  return firstToLast_startSegment.angleWith(firstToLast_endSegment);
+  return firstToLast_fromSegment.angleWith(firstToLast_toSegment);
 }

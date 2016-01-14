@@ -35,7 +35,7 @@ namespace Belle2 {
                            const ACDCSegmentPairIterator& itEnd) const
       {
 
-        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getEndSegment();
+        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
         if (not ptrEndSegment) boost::iterator_range<ACDCSegmentPairIterator>(itEnd, itEnd);
 
         std::pair<ACDCSegmentPairIterator, ACDCSegmentPairIterator> itPairPossibleNeighbors = std::equal_range(itBegin,

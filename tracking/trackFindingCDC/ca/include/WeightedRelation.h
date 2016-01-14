@@ -9,29 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/utilities/Star.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <utility>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for two related objects of the same type with a weight.
-    template<class T, template<class> class AsPtr = Star>
-    class WeightedRelation
-      : public std::pair<WithWeight<AsPtr<T> >, AsPtr<T> > {
+    template<class T>
+    class WeightedRelation : public std::pair<std::pair<T*, Weight>, T*> {
 
-    private:
       /// Type of the base class
-      using Super = std::pair<WithWeight<AsPtr<T> >, AsPtr<T> >;
+      using Super = std::pair<std::pair<T*, Weight>, T*>;
 
     public:
-      /// Make the constructor of the base type available
-      using Super::Super;
+      /// Default constructor
+      WeightedRelation()
+        : Super(std::pair<T *, Weight>(nullptr, NAN), nullptr)
+      {}
 
       /// Creating a relation with one object on the from side, one on the to side and a weight.
-      WeightedRelation(AsPtr<T> from, Weight weight, AsPtr<T> to) :
-        Super(WithWeight<AsPtr<T> >(from, weight), to)
+      WeightedRelation(T* from, Weight weight, T* to)
+        : Super(std::pair<T *, Weight>(from, weight), to)
       {}
 
       /// Operator for ordering of relations.
@@ -42,43 +42,39 @@ namespace Belle2 {
       }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
-      friend bool operator<(const WithWeight<AsPtr<T> >& weightedPtr,
+      friend bool operator<(const std::pair<T*, Weight>& weightedPtr,
                             const WeightedRelation<T>& weightedRelation)
       { return weightedPtr < weightedRelation.getWeightedFrom(); }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
       friend bool operator<(const WeightedRelation<T>& weightedRelation,
-                            const WithWeight<AsPtr<T> >& weightedPtr)
+                            const std::pair<T*, Weight>& weightedPtr)
       { return weightedRelation.getWeightedFrom() < weightedPtr; }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(AsPtr<T> ptr,
+      friend bool operator<(T* ptr,
                             const WeightedRelation<T>& weightedRelation)
       { return ptr < weightedRelation.getFrom(); }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(const WeightedRelation<T>& weightedRelation,
-                            AsPtr<T> ptr)
+                            T* ptr)
       { return weightedRelation.getFrom() < ptr; }
 
-      /// Operator for easy unpacking of the relation destination
-      operator AsPtr<T> () const
-      { return this->second; }
-
       /// Getter for the pointer to the from side object
-      AsPtr<T> getFrom() const
-      { return AsPtr<T>(this->first); }
-
-      /// Getter for the pointer to the weighted from side object
-      const WithWeight<AsPtr<T> >& getWeightedFrom() const
-      { return this->first; }
+      T* getFrom() const
+      { return getWeightedFrom().first; }
 
       /// Getter for the weight
       Weight getWeight() const
-      { return this->first.getWeight(); }
+      { return getWeightedFrom().second; }
+
+      /// Getter for the pointer to the weighted from side object
+      const std::pair<T*, Weight>& getWeightedFrom() const
+      { return this->first; }
 
       /// Getter for the pointer to the to side object
-      AsPtr<T> getTo() const
+      T* getTo() const
       { return this->second; }
 
     };

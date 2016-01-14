@@ -9,50 +9,48 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Star.h>
-#include <tracking/trackFindingCDC/utilities/Ptr.h>
 #include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for two related objects of the same type.
-    template<class T, template<class> class AsPtr = Star>
+    template<class T>
     class Relation
-      : public std::pair<AsPtr<T>, AsPtr<T> > {
+      : public std::pair<T*, T*> {
 
     private:
       /// Type of the base class
-      using Super = std::pair<AsPtr<T>, AsPtr<T> >;
+      using Super = std::pair<T*, T*>;
 
     public:
       /// Make the constructor of the base type available
       using Super::Super;
 
       /// Allow decay of the reference object types from non-const to const.
-      operator Relation<const T, AsPtr>() const
-      { return Relation<const T, AsPtr>(this->first, this->second); }
+      operator Relation<const T>() const
+      { return Relation<const T>(this->first, this->second); }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(AsPtr<T> ptr,
+      friend bool operator<(T* ptr,
                             const Relation<T>& relation)
       { return ptr < relation.getFrom(); }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(const Relation<T>& relation,
-                            AsPtr<T> ptr)
+                            T* ptr)
       { return relation.getFrom() < ptr; }
 
       /// Operator for easy unpacking of the relation destination
-      operator AsPtr<T> () const
+      operator T* () const
       { return this->second; }
 
       /// Getter for the pointer to the from side object
-      AsPtr<T> getFrom() const
+      T* getFrom() const
       { return this->first; }
 
       /// Getter for the pointer to the to side object
-      AsPtr<T> getTo() const
+      T* getTo() const
       { return this->second; }
 
     };

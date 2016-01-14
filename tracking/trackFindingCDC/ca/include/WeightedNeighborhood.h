@@ -209,7 +209,7 @@ namespace Belle2 {
       {
         return range(std::equal_range(std::begin(m_weightedNeighbors),
                                       std::end(m_weightedNeighbors),
-                                      WithWeight<AItem*>(itemPtr, weight)));
+                                      std::pair<AItem*, Weight>(itemPtr, weight)));
       }
       /**@}*/
 

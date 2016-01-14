@@ -28,66 +28,66 @@ namespace Belle2 {
 
     public:
       /// Returns a short name for class CDCWireHit to be used in names of parameters.
-      static std::string getParameterName(CDCWireHit*) { return "wireHit"; }
+      static std::string getParameterName(const CDCWireHit*) { return "wireHit"; }
 
       /// Returns a short description for class CDCWireHit to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCWireHit*) { return "wire hit"; }
+      static std::string getParameterDescription(const CDCWireHit*) { return "wire hit"; }
 
 
 
       /// Returns a short name for class ConformalCDCWireHit to be used in names of parameters.
-      static std::string getParameterName(ConformalCDCWireHit*) { return "conformalHit"; }
+      static std::string getParameterName(const ConformalCDCWireHit*) { return "conformalHit"; }
 
       /// Returns a short description for class ConformalCDCWireHit to be used in descriptions of parameters.
-      static std::string getParameterDescription(ConformalCDCWireHit*) { return "conformal hit"; }
+      static std::string getParameterDescription(const ConformalCDCWireHit*) { return "conformal hit"; }
 
 
 
       /// Returns a short name for class CDCWireHitCluster to be used in names of parameters.
-      static std::string getParameterName(CDCWireHitCluster*) { return "cluster"; }
+      static std::string getParameterName(const CDCWireHitCluster*) { return "cluster"; }
 
       /// Returns a short description for class CDCWireHitCluster to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCWireHitCluster*) { return "wire hit cluster"; }
+      static std::string getParameterDescription(const CDCWireHitCluster*) { return "wire hit cluster"; }
 
 
 
       /// Returns a short name for class CDCFacet to be used in names of parameters.
-      static std::string getParameterName(CDCFacet*) { return "facet"; }
+      static std::string getParameterName(const CDCFacet*) { return "facet"; }
 
       /// Returns a short description for class CDCFacet to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCFacet*) { return "facet"; }
+      static std::string getParameterDescription(const CDCFacet*) { return "facet"; }
 
 
 
       /// Returns a short name for class CDCRecoSegment2D to be used in names of parameters.
-      static std::string getParameterName(CDCRecoSegment2D*) { return "segment"; }
+      static std::string getParameterName(const CDCRecoSegment2D*) { return "segment"; }
 
       /// Returns a short description for class CDCRecoSegment2D to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCRecoSegment2D*) { return "segment"; }
+      static std::string getParameterDescription(const CDCRecoSegment2D*) { return "segment"; }
 
 
 
       /// Returns a short name for class CDCSegmentPair to be used in names of parameters.
-      static std::string getParameterName(CDCSegmentPair*) { return "segmentPair"; }
+      static std::string getParameterName(const CDCSegmentPair*) { return "segmentPair"; }
 
       /// Returns a short description for class CDCSegmentPair to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCSegmentPair*) { return "segment pair"; }
+      static std::string getParameterDescription(const CDCSegmentPair*) { return "segment pair"; }
 
 
 
       /// Returns a short name for class CDCSegmentTriple to be used in names of parameters.
-      static std::string getParameterName(CDCSegmentTriple*) { return "segmentTriple"; }
+      static std::string getParameterName(const CDCSegmentTriple*) { return "segmentTriple"; }
 
       /// Returns a short description for class CDCSegmentTriple to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCSegmentTriple*) { return "segment triple"; }
+      static std::string getParameterDescription(const CDCSegmentTriple*) { return "segment triple"; }
 
 
 
       /// Returns a short name for class CDCTrack to be used in names of parameters.
-      static std::string getParameterName(CDCTrack*) { return "track"; }
+      static std::string getParameterName(const CDCTrack*) { return "track"; }
 
       /// Returns a short description for class CDCTrack to be used in descriptions of parameters.
-      static std::string getParameterDescription(CDCTrack*) { return "track"; }
+      static std::string getParameterDescription(const CDCTrack*) { return "track"; }
 
 
     };

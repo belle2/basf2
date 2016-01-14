@@ -54,14 +54,16 @@ namespace Belle2 {
     public:
       /// Default constructor initialising the filters with the default settings
       TrackFinderCDCSegmentPairAutomatonImplModule() :
-        m_ptrSegmentPairFilter(new SegmentPairFilter()),
-        m_ptrSegmentPairRelationFilter(new SegmentPairRelationFilter()),
-        m_ptrTrackRelationFilter(new TrackRelationFilter()),
         m_param_writeSegmentPairs(false),
         m_param_segmentPairsStoreObjName("CDCSegmentPairVector")
       {
-
         setDescription("Generates tracks from segments using a cellular automaton build from segment pairs.");
+
+        ModuleParamList moduleParamList = this->getParamList();
+        m_segmentPairFilter.exposeParameters(&moduleParamList, "SegmentPair");
+        m_segmentPairRelationFilter.exposeParameters(&moduleParamList, "SegmentPairRelation");
+        m_trackRelationFilter.exposeParameters(&moduleParamList, "TrackRelation");
+        this->setParamList(moduleParamList);
 
         addParam("WriteSegmentPairs",
                  m_param_writeSegmentPairs,
@@ -84,18 +86,9 @@ namespace Belle2 {
           StoreWrappedObjPtr< std::vector<CDCSegmentPair> >::registerTransient(m_param_segmentPairsStoreObjName);
         }
 
-        if (m_ptrSegmentPairFilter) {
-          m_ptrSegmentPairFilter->initialize();
-        }
-
-        if (m_ptrSegmentPairRelationFilter) {
-          m_ptrSegmentPairRelationFilter->initialize();
-        }
-
-        if (m_ptrTrackRelationFilter) {
-          m_ptrTrackRelationFilter->initialize();
-        }
-
+        m_segmentPairFilter.initialize();
+        m_segmentPairRelationFilter.initialize();
+        m_trackRelationFilter.initialize();
       }
 
       /// Generates the tracks from the given segments into the output argument.
@@ -104,72 +97,21 @@ namespace Belle2 {
 
       virtual void terminate() override
       {
-        if (m_ptrSegmentPairFilter) {
-          m_ptrSegmentPairFilter->terminate();
-        }
-
-        if (m_ptrSegmentPairRelationFilter) {
-          m_ptrSegmentPairRelationFilter->terminate();
-        }
-
-        if (m_ptrTrackRelationFilter) {
-          m_ptrTrackRelationFilter->terminate();
-        }
-
+        m_trackRelationFilter.terminate();
+        m_segmentPairRelationFilter.terminate();
+        m_segmentPairFilter.terminate();
         TrackFinderCDCFromSegmentsModule::terminate();
       }
 
-    public:
-      /// Getter for the current segment pair filter. The module keeps ownership of the pointer.
-      SegmentPairFilter* getSegmentPairFilter()
-      {
-        return m_ptrSegmentPairFilter.get();
-      }
-
-      /// Setter for the segment pair filter used in the segment pair creation. The module takes ownership of the pointer.
-      void setSegmentPairFilter(std::unique_ptr<SegmentPairFilter>
-                                ptrSegmentPairFilter)
-      {
-        m_ptrSegmentPairFilter = std::move(ptrSegmentPairFilter);
-      }
-
-      /// Getter for the current segment pair relation filter. The module keeps ownership of the pointer.
-      SegmentPairRelationFilter* getSegmentPairRelationFilter()
-      {
-        return m_ptrSegmentPairRelationFilter.get();
-      }
-
-      /// Setter for the segment relation filter. The module takes ownership of the pointer.
-      void setSegmentPairRelationFilter(std::unique_ptr<SegmentPairRelationFilter>
-                                        ptrSegmentPairRelationFilter)
-      {
-        m_ptrSegmentPairRelationFilter = std::move(ptrSegmentPairRelationFilter);
-      }
-
-      /// Getter for the current track relation filter. The module keeps ownership of the pointer.
-      TrackRelationFilter* getTrackRelationFilter()
-      {
-        return m_ptrTrackRelationFilter.get();
-      }
-
-      /// Setter for the track relation filter. The module takes ownership of the pointer.
-      void setTrackRelationFilter(std::unique_ptr<TrackRelationFilter> ptrTrackRelationFilter)
-      {
-        m_ptrTrackRelationFilter = std::move(ptrTrackRelationFilter);
-      }
-
-
-
     private:
       /// Reference to the filter to be used for the segment pair generation.
-      std::unique_ptr<SegmentPairFilter> m_ptrSegmentPairFilter;
+      SegmentPairFilter m_segmentPairFilter;
 
       /// Reference to the relation filter to be used to construct the segment pair network.
-      std::unique_ptr<SegmentPairRelationFilter> m_ptrSegmentPairRelationFilter;
+      SegmentPairRelationFilter m_segmentPairRelationFilter;
 
       /// Reference to the relation filter to be used to construct the track network for merging.
-      std::unique_ptr<TrackRelationFilter> m_ptrTrackRelationFilter;
-
+      TrackRelationFilter m_trackRelationFilter;
 
     private:
       /// Parameter: Switch if segment pairs shall be written to the DataStore
@@ -177,7 +119,6 @@ namespace Belle2 {
 
       /// Parameter: Name of the output StoreObjPtr of the axial stereo segment pairs generated within this module.
       std::string m_param_segmentPairsStoreObjName;
-
 
     private:
       //object pools
@@ -220,6 +161,10 @@ namespace Belle2 {
                                                  generate(std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D>& segments,
                                                           std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
     {
+      m_segmentPairFilter.beginEvent();
+      m_segmentPairRelationFilter.beginEvent();
+      m_trackRelationFilter.beginEvent();
+
       // Attain segment pair vector on the DataStore if needed.
       std::vector<CDCSegmentPair>* ptrSegmentPairs = nullptr;
       if (m_param_writeSegmentPairs) {
@@ -232,7 +177,7 @@ namespace Belle2 {
       // Create the segment pairs
       B2DEBUG(100, "Combining CDCReco2DSegments to CDCSegmentPairs");
       m_segmentPairs.clear();
-      m_segmentPairCreator.create(*m_ptrSegmentPairFilter, segments, m_segmentPairs);
+      m_segmentPairCreator.create(m_segmentPairFilter, segments, m_segmentPairs);
       B2DEBUG(100, "  Created " << m_segmentPairs.size()  << " CDCSegmentPair");
 
       if (m_param_writeSegmentPairs) {
@@ -245,7 +190,7 @@ namespace Belle2 {
       //create the segment pair neighborhood
       B2DEBUG(100, "Creating the CDCSegmentPair neighborhood");
       m_segmentPairNeighborhood.clear();
-      m_segmentPairNeighborhood.appendUsing(*m_ptrSegmentPairRelationFilter, m_segmentPairs);
+      m_segmentPairNeighborhood.appendUsing(m_segmentPairRelationFilter, m_segmentPairs);
       B2DEBUG(100, "  Created " << m_segmentPairNeighborhood.size()  << " AxialStereoPairNeighborhoods");
 
       //multiple passes if growMany is active and one track is created at a time
@@ -271,7 +216,7 @@ namespace Belle2 {
 
       WeightedNeighborhood<const CDCTrack> tracksNeighborhood;
       tracksNeighborhood.clear();
-      tracksNeighborhood.appendUsing(*m_ptrTrackRelationFilter,
+      tracksNeighborhood.appendUsing(m_trackRelationFilter,
                                      m_preMergeSymmetricTracks);
 
       MultipassCellularPathFinder<const CDCTrack> cellularPathFinder;

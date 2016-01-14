@@ -6,8 +6,8 @@
 
 /*
 <header>
-<input>ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
-<output>ECLMuon.root, ECLPion.root, ECLCluster.root</output>
+<input>ECLBkgOutput.root, ECLClusterOutput.root, ECLMuonOutput.root, ECLPionOutput.root</input>
+<output>ECLBkg.root, ECL2D.root, ECLMuon.root, ECLPion.root, ECLCluster.root</output>
 <contact>ecl2ml@bpost.kek.jp</contact>
 </header>
 */
@@ -19,8 +19,8 @@
 #include <TNtuple.h>
 #include <TCut.h>
 
-//void ECL2D(TTree* bkg_tree);
-//void ECLBkg(TTree* bkg_tree);
+void ECL2D(TTree* bkg_tree);
+void ECLBkg(TTree* bkg_tree);
 void ECLCluster(TTree* cluster_tree);
 void ECLMuon(TTree* muon_tree);
 void ECLPion(TTree* pion_tree);
@@ -40,8 +40,8 @@ void makeECLPlots()
   TFile* pion_input = TFile::Open("../ECLPionOutput.root");
   TTree* pion_tree = (TTree*) pion_input->Get("m_tree");
 
-  //  ECL2D(bkg_tree);
-  //  ECLBkg(bkg_tree);
+  ECL2D(bkg_tree);
+  ECLBkg(bkg_tree);
   ECLCluster(cluster_tree);
   ECLMuon(muon_tree);
   //  ECLPi0(pi0_tree);

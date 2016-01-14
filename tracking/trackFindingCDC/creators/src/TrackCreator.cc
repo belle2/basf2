@@ -7,63 +7,39 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <tracking/trackFindingCDC/creators/TrackCreator.h>
-
-#include <boost/foreach.hpp>
 #include <framework/logging/Logger.h>
 
-
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
-void TrackCreator::create(const std::vector<CDCSegmentTripleTrack>& segmentTripleTracks,
+void TrackCreator::create(const std::vector<Path<const CDCSegmentTriple> >& segmentTriplePaths,
                           std::vector<CDCTrack>& tracks) const
 {
-
-  for (const CDCSegmentTripleTrack& segmentTripleTrack : segmentTripleTracks) {
-
+  for (const Path<const CDCSegmentTriple>& segmentTriplePath : segmentTriplePaths) {
     tracks.push_back(CDCTrack());
     CDCTrack& track = tracks.back();
-    create(segmentTripleTrack, track);
-
+    create(segmentTriplePath, track);
   }
-
 }
 
-
-
-
-void TrackCreator::create(const std::vector<CDCSegmentPairTrack>& segmentPairTracks,
+void TrackCreator::create(const std::vector<Path<const CDCSegmentPair> >& segmentPairPaths,
                           std::vector<CDCTrack>& tracks) const
 {
-
-  for (const CDCSegmentPairTrack& segmentPairTrack : segmentPairTracks) {
-
+  for (const Path<const CDCSegmentPair>& segmentPairPath : segmentPairPaths) {
     tracks.push_back(CDCTrack());
     CDCTrack& track = tracks.back();
-    create(segmentPairTrack, track);
-
+    create(segmentPairPath, track);
   }
-
 }
 
-
-
-
-
-void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
+void TrackCreator::create(const Path<const CDCSegmentTriple>& segmentTripleTrack,
                           CDCTrack& track) const
 {
-
   //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
   if (not segmentTripleTrack.empty()) {
 
-    CDCSegmentTripleTrack::const_iterator itSegmentTriple = segmentTripleTrack.begin();
+    Path<const CDCSegmentTriple>::const_iterator itSegmentTriple = segmentTripleTrack.begin();
     const CDCSegmentTriple* firstTriple = *itSegmentTriple++;
 
     // Set the start fits of the track to the ones of the first segment
@@ -110,18 +86,18 @@ void TrackCreator::create(const CDCSegmentTripleTrack& segmentTripleTrack,
 
 
 
-void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
+void TrackCreator::create(const Path<const CDCSegmentPair>& segmentPairTrack,
                           CDCTrack& track) const
 {
 
   //B2DEBUG(200,"Lenght of segmentTripleTrack is " << segmentTripleTrack.size() );
   if (not  segmentPairTrack.empty()) {
 
-    CDCSegmentPairTrack::const_iterator itSegmentPair = segmentPairTrack.begin();
+    Path<const CDCSegmentPair>::const_iterator itSegmentPair = segmentPairTrack.begin();
     const CDCSegmentPair* ptrFirstSegmentPair = *itSegmentPair++;
 
     if (not ptrFirstSegmentPair) {
-      B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+      B2ERROR("Nullptr encounter in Path<const CDCSegmentPair>");
       return;
     }
     const CDCSegmentPair& firstSegmentPair = *ptrFirstSegmentPair;
@@ -136,7 +112,7 @@ void TrackCreator::create(const CDCSegmentPairTrack& segmentPairTrack,
 
       const CDCSegmentPair* ptrSecondSegmentPair = *itSegmentPair++;
       if (not ptrSecondSegmentPair) {
-        B2ERROR("Nullptr encounter in CDCSegmentPairTrack");
+        B2ERROR("Nullptr encounter in Path<const CDCSegmentPair>");
         return;
       }
 
@@ -286,15 +262,11 @@ void TrackCreator::appendRecoHits3D(const CDCRecoSegment2D& segment,
                                     double perpSOffset,
                                     CDCTrack& recohits3D) const
 {
-  BOOST_FOREACH(const CDCRecoHit2D & recohit2D, segment) {
-    //for ( CDCRecoSegment2D::const_iterator itRecoHit2D = segment->begin();
-    //      itRecoHit2D  != segment->end(); ++itRecoHit2D ){
-
+  for (const CDCRecoHit2D& recohit2D : segment) {
     recohits3D.push_back(CDCRecoHit3D::reconstruct(recohit2D,
                                                    trajectory2D,
                                                    trajectorySZ));
     recohits3D.back().shiftArcLength2D(perpSOffset);
-
   }
 }
 

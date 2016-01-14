@@ -57,6 +57,8 @@ namespace Belle2 {
       /// Main algorithm creating the wire hits
       virtual void apply(std::vector<CDCWireHit>& outputWireHits) override final
       {
+        if (not outputWireHits.empty()) return;
+
         StoreArray<CDCHit> hits;
         hits.isRequired();
 

@@ -46,6 +46,11 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkg
         else:
             if components:
                 bkgmixer.param('components', components)
+            else:
+                # temporary fix till new BG samples become available
+                comptmp = ['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'ECL', 'BKLM']
+                bkgmixer.param('components', comptmp)
+                B2WARNING("EKLM temporary excluded from BG mixing")
         bkgmixer.param('overallScaleFactor', bkgscale)
         path.add_module(bkgmixer)
 

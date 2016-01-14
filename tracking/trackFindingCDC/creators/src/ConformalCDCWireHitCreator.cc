@@ -19,7 +19,7 @@ using namespace TrackFindingCDC;
 void ConformalCDCWireHitCreator::copyHitsFromTopology(std::vector<ConformalCDCWireHit>& conformalCDCWireHitList)
 {
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const std::vector<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
+  const VectorRange<CDCWireHit>& cdcWireHits = wireHitTopology.getWireHits();
 
   B2DEBUG(90, "Number of digitized hits: " << cdcWireHits.size());
   if (cdcWireHits.size() == 0) {

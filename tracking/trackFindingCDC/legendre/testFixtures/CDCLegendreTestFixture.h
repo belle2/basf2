@@ -684,8 +684,16 @@ namespace Belle2 {
         std::sort(m_hitList.begin(), m_hitList.end());
 
         std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(m_hitList)};
+
+        auto keepSharedWireHitsAlive = [sharedWireHits](VectorRange<CDCWireHit>*) {};
+
+        std::shared_ptr<VectorRange<CDCWireHit> > sharedWireHitRange{
+          new VectorRange<CDCWireHit>(sharedWireHits->begin(), sharedWireHits->end()), keepSharedWireHitsAlive
+        };
+
         CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        wireHitTopology.fill(std::move(sharedWireHits));
+        wireHitTopology.fill(std::move(sharedWireHitRange));
+
       }
 
     };

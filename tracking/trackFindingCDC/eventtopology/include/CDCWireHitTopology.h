@@ -44,20 +44,20 @@ namespace Belle2 {
       static void initialize();
 
       /** Fill the topology with preconstructed wire hits*/
-      void fill(std::shared_ptr<std::vector<CDCWireHit> > wireHits);
+      void fill(std::shared_ptr<VectorRange<CDCWireHit> > wireHits);
 
       /// Getter for the wire hit that is based on the given CDCHit.
       const Belle2::TrackFindingCDC::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
 
       /// Constant getter for the wire hits
-      const std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits() const
+      const VectorRange<CDCWireHit>& getWireHits() const
       {
         B2ASSERT("CDCWireHitTopology was not filled with hits. Have you executed the WireHitPreparer?", m_wireHits);
         return *m_wireHits;
       }
 
       /// Getter for the wire hits
-      std::vector<Belle2::TrackFindingCDC::CDCWireHit>& getWireHits()
+      VectorRange<CDCWireHit> getWireHits()
       {
         B2ASSERT("CDCWireHitTopology was not filled with hits. Have you executed the WireHitPreparer?", m_wireHits);
         return *m_wireHits;
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hits to be stored
-      std::shared_ptr<std::vector<CDCWireHit> > m_wireHits {nullptr}; //!
+      std::shared_ptr<VectorRange<CDCWireHit> > m_wireHits {nullptr}; //!
 
       ClassDef(CDCWireHitTopology, 1);
     }; //class

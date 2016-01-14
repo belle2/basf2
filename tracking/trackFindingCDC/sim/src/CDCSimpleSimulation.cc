@@ -23,6 +23,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -126,14 +128,22 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
     std::sort(wireHits.begin(), wireHits.end());
     std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(std::move(wireHits))};
-    wireHitTopology.fill(std::move(sharedWireHits));
+
+    auto keepSharedWireHitsAlive = [sharedWireHits](VectorRange<CDCWireHit>*) {};
+
+    std::shared_ptr<VectorRange<CDCWireHit> > sharedWireHitRange{
+      new VectorRange<CDCWireHit>(sharedWireHits->begin(), sharedWireHits->end()), keepSharedWireHitsAlive
+    };
+
+    wireHitTopology.fill(std::move(sharedWireHitRange));
+
     // TODO: Decide if the EventMeta should be incremented after write.
   }
 
   // Now construct the tracks.
   vector<CDCTrack> mcTracks;
   mcTracks.resize(nMCTracks);
-  const std::vector<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+  const VectorRange<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
   const size_t nWireHits = wireHits.size();
 
   for (size_t iWireHit = 0; iWireHit < nWireHits; ++iWireHit) {

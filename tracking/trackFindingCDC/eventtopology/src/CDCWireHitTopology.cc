@@ -43,8 +43,7 @@ void CDCWireHitTopology::initialize()
   }
 }
 
-
-void CDCWireHitTopology::fill(std::shared_ptr<std::vector<CDCWireHit> > wireHits)
+void CDCWireHitTopology::fill(std::shared_ptr<VectorRange<CDCWireHit> > wireHits)
 {
   B2ASSERT("Nullptr served to CDCWireHitTopology::fill",
            wireHits);

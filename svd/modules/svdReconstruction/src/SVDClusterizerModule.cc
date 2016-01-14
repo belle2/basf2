@@ -439,14 +439,12 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     double totalCharge = 0.0;
     double clusterPosition = 0.0;
     double clusterPositionError = 0.0;
+    for (auto strip_charge : stripCharges) {
+      double stripPos = isU ? info.getUCellPosition(strip_charge.first) : info.getVCellPosition(strip_charge.first);
+      clusterPosition += stripPos * strip_charge.second;
+      totalCharge     += strip_charge.second;
+    }
     if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
-      std::map<unsigned int, float>::const_iterator strip_charge = stripCharges.begin();
-      for (; strip_charge != stripCharges.end(); ++strip_charge) {
-        double stripPos = isU ? info.getUCellPosition(strip_charge->first)
-                          : info.getVCellPosition(strip_charge->first);
-        clusterPosition += stripPos * strip_charge->second;
-        totalCharge     += strip_charge->second;
-      }
       clusterPosition /= totalCharge;
       // Compute position error
       if (clusterSize == 1) {

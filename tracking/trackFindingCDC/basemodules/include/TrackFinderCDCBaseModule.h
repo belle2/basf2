@@ -10,9 +10,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
 #include <framework/core/ModuleParamList.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC { class CDCTrack; }

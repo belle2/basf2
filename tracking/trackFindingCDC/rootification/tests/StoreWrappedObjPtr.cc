@@ -7,12 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
-#include <framework/datastore/StoreObjPtr.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -29,13 +30,11 @@ using namespace std;
 
 TEST(TrackFindingCDCTest, cpp_storeWrapper)
 {
-  StoreObjPtr<StoreWrapper<CDCWireHit> > storedHit;
   StoreObjPtr<StoreWrapper<std::vector<CDCWireHit> > > stdVector;
 }
 
 TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 {
-  StoreWrappedObjPtr<CDCWireHit> storedHit;
   StoreWrappedObjPtr<std::vector<CDCWireHit> > stdVector;
 }
 
@@ -43,10 +42,9 @@ template<class T>
 class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {};
 
 typedef ::testing::Types <
-CDCWireHit,
 std::vector<CDCWireHit>,
-std::vector<CDCRecoSegment2D>
-> RootifiedTypes;
+    std::vector<CDCRecoSegment2D>
+    > RootifiedTypes;
 
 
 TYPED_TEST_CASE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);

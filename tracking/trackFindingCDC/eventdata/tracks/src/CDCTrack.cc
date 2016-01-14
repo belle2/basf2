@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
+#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
 #include <genfit/TrackCand.h>
 
 using namespace std;
@@ -64,8 +64,7 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
 
 bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
 {
-  bool reverseRLInfo = false;
-  fillHitsInto(*this, trackCand, reverseRLInfo);
+  GenfitUtil::fill(trackCand, *this);
   return getStartTrajectory3D().fillInto(trackCand);
 }
 
@@ -158,7 +157,7 @@ void CDCTrack::forwardTakenFlag(bool takenFlag) const
 
 void CDCTrack::sortByRadius()
 {
-  std::sort(begin(), end(), [](const CDCRecoHit3D & a, const CDCRecoHit3D & b) -> bool {
+  std::stable_sort(begin(), end(), [](const CDCRecoHit3D & a, const CDCRecoHit3D & b) -> bool {
     return a.getRefPos2D().norm() < b.getRefPos2D().norm();
   });
 }

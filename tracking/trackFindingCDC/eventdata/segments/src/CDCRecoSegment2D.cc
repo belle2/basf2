@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/collections/FillGenfitTrack.h>
+#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 #include <genfit/TrackCand.h>
@@ -286,7 +286,7 @@ bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
     trajectory3D.setLocalOrigin(startPos3D);
   }
 
-  fillHitsInto(*this, gfTrackCand);
+  GenfitUtil::fill(gfTrackCand, *this);
   return trajectory3D.fillInto(gfTrackCand);
 }
 

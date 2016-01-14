@@ -52,7 +52,13 @@ namespace Belle2 {
       FindletModule(const std::array<std::string, c_nTypes>& storeVectorNames = {})
         : m_param_storeVectorNames(storeVectorNames)
       {
-        std::string description = "Findlet: " + m_findlet.getDescription();
+        std::string description = "Findlet: ";
+        if (std::tuple_size<IOTypes>() == 0) {
+          // Drop Findlet prefix for full finders with no IOTypes
+          description = "";
+        }
+
+        description += m_findlet.getDescription();
         this->setDescription(description);
 
         addStoreVectorParameters(Indices());
@@ -139,7 +145,9 @@ namespace Belle2 {
       template<std::size_t I>
       void createStoreVector()
       {
-        getStoreVector<I>().create();
+        if (not getStoreVector<I>().isValid()) {
+          getStoreVector<I>().construct();
+        }
       }
 
       /** Get the vector with index I from the DataStore.*/

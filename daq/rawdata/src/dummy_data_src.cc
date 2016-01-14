@@ -74,8 +74,11 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 
 
     buf[ offset +  0 ] = cpr_nwords;
-    //  buf[ offset +  1 ] = 0x7f7f010c;
+#ifdef REDUCED_DATA
     buf[ offset +  1 ] = 0x7f7f020c;
+#else
+    buf[ offset +  1 ] = 0x7f7f820c;
+#endif
     buf[ offset +  2 ] = exp_run;
     buf[ offset +  4 ] = ctime;
     buf[ offset +  5 ] = utime;

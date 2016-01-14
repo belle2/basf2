@@ -55,7 +55,7 @@ namespace Belle2 {
       }
 
     public:
-      /// Main algorithm applying the cluster refinement
+      /// Main algorithm
       virtual void apply(const std::vector<CDCTrack>& inputTracks,
                          std::vector<CDCTrack>& outputTracks) override final
       {

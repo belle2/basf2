@@ -7,14 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/SimpleSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCFromSegmentsModule.h>
 
@@ -22,31 +21,12 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Forward declaration of the module implementing the track generation by cellular automaton on segment pairs using specific filter instances.
-    template < class SegmentPairFilter = BaseSegmentPairFilter,
-               class SegmentPairRelationFilter = BaseSegmentPairRelationFilter,
-               class TrackRelationFilter = BaseTrackRelationFilter>
-    class TrackFinderCDCSegmentPairAutomatonImplModule;
-  }
-
-  /// Module specialisation using the default Monte Carlo free filters. To be used in production.
-  using TrackFinderCDCSegmentPairAutomatonModule =
-    TrackFindingCDC::
-    TrackFinderCDCSegmentPairAutomatonImplModule<TrackFindingCDC::SimpleSegmentPairFilter,
-    TrackFindingCDC::SimpleSegmentPairRelationFilter,
-    TrackFindingCDC::BaseTrackRelationFilter>;
-
-  namespace TrackFindingCDC {
-    template<class SegmentPairFilter,
-             class SegmentPairRelationFilter,
-             class TrackRelationFilter>
-    class TrackFinderCDCSegmentPairAutomatonImplModule :
+    class TrackFinderCDCSegmentPairAutomatonModule :
       public TrackFinderCDCFromSegmentsModule {
 
     public:
       /// Default constructor initialising the filters with the default settings
-      TrackFinderCDCSegmentPairAutomatonImplModule()
+      TrackFinderCDCSegmentPairAutomatonModule()
       {
         setDescription("Generates tracks from segments using a cellular automaton build from segment pairs.");
 
@@ -78,9 +58,9 @@ namespace Belle2 {
 
     private:
       /// Combined findlet implementing the generation of tracks from segments in a segment pair cellular automaton.
-      TrackFinderSegmentPairAutomaton<SegmentPairFilter,
-                                      SegmentPairRelationFilter,
-                                      TrackRelationFilter> m_trackFinderSegmentPairAutomaton;
+      TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
+                                      ChooseableSegmentPairRelationFilter,
+                                      ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
 
     }; // end class TrackFinderCDCSegmentPairAutomatonImplModule
 

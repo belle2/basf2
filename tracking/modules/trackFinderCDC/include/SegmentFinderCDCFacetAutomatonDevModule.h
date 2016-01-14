@@ -13,9 +13,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Module for the cellular automaton tracking for the CDC on regular events
-    class SegmentFinderCDCFacetAutomatonDevModule :
-      public SegmentFinderCDCFacetAutomatonModule {
+    /// Deprecated : Module for the cellular automaton tracking for the CDC on regular events
+    class SegmentFinderCDCFacetAutomatonDevModule
+      : public SegmentFinderCDCFacetAutomatonModule {
 
     public:
       /// Constructor of the module. Setting up parameters and description.

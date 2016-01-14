@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCSegmentPairAutomatonDevModule.h>
 
 using namespace Belle2;
@@ -17,5 +16,11 @@ REG_MODULE(TrackFinderCDCSegmentPairAutomatonDev);
 
 TrackFinderCDCSegmentPairAutomatonDevModule::TrackFinderCDCSegmentPairAutomatonDevModule()
 {
-  this->setDescription("Versatile module with adjustable filters for track generation.");
+  this->setDescription("This is a depricated alias for TrackFinderCDCSegmentPairAutomatonModule");
+}
+
+void TrackFinderCDCSegmentPairAutomatonDevModule::initialize()
+{
+  B2WARNING("TrackFinderCDCSegmentPairAutomatonDevModule is a depricated alias for TrackFinderCDCSegmentPairAutomatonModule");
+  TrackFinderCDCSegmentPairAutomatonModule::initialize();
 }

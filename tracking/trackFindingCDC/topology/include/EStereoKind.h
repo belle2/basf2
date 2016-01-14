@@ -65,7 +65,7 @@ namespace Belle2 {
       /** Returns the stereo kind of an object. Unfavored option. */
       template<class T>
       static auto getFromImpl(const T& t, long) -> decltype(t->getStereoKind())
-      { return t->getStereoKind(); }
+      { return &*t == nullptr ? EStereoKind::c_Invalid  : t->getStereoKind(); }
 
     }; // class EStereoKindUtil
 

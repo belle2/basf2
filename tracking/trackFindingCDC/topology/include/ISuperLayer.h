@@ -111,7 +111,7 @@ namespace Belle2 {
       /** Returns the superlayer of an object. Unfavored option. */
       template<class T>
       static auto getFromImpl(const T& t, long) -> decltype(t->getISuperLayer())
-      { return t->getISuperLayer(); }
+      { return &*t == nullptr ? c_Invalid : t->getISuperLayer(); }
 
     };
 

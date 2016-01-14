@@ -16,9 +16,9 @@ using namespace TrackFindingCDC;
 
 Weight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrMiddleSegment);

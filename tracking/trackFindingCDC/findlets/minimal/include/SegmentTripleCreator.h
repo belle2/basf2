@@ -65,8 +65,8 @@ namespace Belle2 {
         }
 
         for (const CDCAxialSegmentPair& axialSegmentPair : inputAxialSegmentPairs) {
-          const CDCRecoSegment2D* startSegmentPtr = axialSegmentPair.getStart();
-          const CDCRecoSegment2D* endSegmentPtr = axialSegmentPair.getEnd();
+          const CDCRecoSegment2D* startSegmentPtr = axialSegmentPair.getStartSegment();
+          const CDCRecoSegment2D* endSegmentPtr = axialSegmentPair.getEndSegment();
 
           ISuperLayer startISuperLayer = startSegmentPtr->getISuperLayer();
           ISuperLayer endISuperLayer = endSegmentPtr->getISuperLayer();
@@ -108,8 +108,8 @@ namespace Belle2 {
       {
         CDCSegmentTriple segmentTriple(axialSegmentPair);
         for (const CDCRecoSegment2D* middleSegmentPtr : middleSegmentPtrs) {
-          segmentTriple.setMiddle(middleSegmentPtr);
-          segmentTriple.getTrajectorySZ().clear();
+          segmentTriple.setMiddleSegment(middleSegmentPtr);
+          segmentTriple.clearTrajectory3D();
 
           if (not segmentTriple.checkSegments()) {
             B2ERROR("CDCSegmentTriple containing nullptr encountered in SegmentTripleCreator");

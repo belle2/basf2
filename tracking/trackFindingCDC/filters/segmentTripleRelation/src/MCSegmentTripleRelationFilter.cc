@@ -44,5 +44,5 @@ Weight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,
   Weight mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
 
   bool mcDecision = (not std::isnan(mcTripleWeight)) and (not std::isnan(mcNeighborTripleWeight));
-  return mcDecision ? - neighborTriple.getStart()->size() : NAN;
+  return mcDecision ? - neighborTriple.getStartSegment()->size() : NAN;
 }

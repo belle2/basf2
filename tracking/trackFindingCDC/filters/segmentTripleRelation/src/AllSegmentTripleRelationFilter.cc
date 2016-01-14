@@ -21,5 +21,5 @@ AllSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
 {
   // Just let all found neighors pass for the base implementation
   // with the default weight
-  return  -toTriple.getStart()->size();
+  return  -toTriple.getStartSegment()->size();
 }

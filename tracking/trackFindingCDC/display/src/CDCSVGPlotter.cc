@@ -421,7 +421,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     }
     B2INFO("#Triples: " << goodSegmentTriples.size());
 
-    InputValueColorizer<CDCAxialSegmentPair> colorizer;
+    InputValueColorizer<CDCSegmentTriple> colorizer;
     colorizer.setStroke(stroke);
     drawIterable(goodSegmentTriples, colorizer);
   } else

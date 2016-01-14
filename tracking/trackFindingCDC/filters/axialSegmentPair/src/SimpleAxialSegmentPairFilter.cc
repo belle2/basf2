@@ -23,8 +23,8 @@ SimpleAxialSegmentPairFilter::SimpleAxialSegmentPairFilter() : m_riemannFitter()
 
 Weight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);

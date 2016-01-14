@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
+#include<tuple>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -20,7 +22,7 @@ namespace Belle2 {
     class CDCAxialSegmentPair  {
     public:
 
-      /// Default constructor - for ROOT compatability
+      /// Default constructor setting the contained segmetns to nullptr.
       CDCAxialSegmentPair();
 
       /// Constructor from two segments
@@ -34,53 +36,57 @@ namespace Belle2 {
 
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCAxialSegmentPair const& rhs) const
-      { return getStart() == rhs.getStart() and getEnd() == rhs.getEnd(); }
+      {
+        return
+          std::tie(m_startSegment, m_endSegment) ==
+          std::tie(rhs.m_startSegment, rhs.m_endSegment);
+      }
 
       /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCAxialSegmentPair const& rhs) const
       {
-        return (getStart() < rhs.getStart()  or
-                (getStart() == rhs.getStart() and getEnd() < rhs.getEnd()));
+        return
+          std::tie(m_startSegment, m_endSegment) <
+          std::tie(rhs.m_startSegment, rhs.m_endSegment);
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(CDCAxialSegmentPair const& segmentTriple,
+      friend bool operator<(CDCAxialSegmentPair const& segmentPair,
                             const CDCAxialRecoSegment2D* axialSegment)
-      { return segmentTriple.getStart() < axialSegment; }
+      { return segmentPair.getStartSegment() < axialSegment; }
 
-      /// Define reconstructed segments and segment triples as coaligned on the start segment
+      /// Define reconstructed segments and segment pairs as coaligned on the start segment
       friend bool operator<(const CDCAxialRecoSegment2D* axialSegment,
-                            CDCAxialSegmentPair const& segmentTriple)
-      { return axialSegment < segmentTriple.getStart(); }
+                            CDCAxialSegmentPair const& segmentPair)
+      { return axialSegment < segmentPair.getStartSegment(); }
 
 
       /// Checks the references to the contained three segment for nullptrs.
       bool checkSegments() const
       { return not(m_startSegment == nullptr or m_endSegment == nullptr); }
 
-
-      /// Getter for the superlayer id of the start segment.
+      /// Getter for the superlayer id of the start segment
       ISuperLayer getStartISuperLayer() const
-      { return getStart() == nullptr ? ISuperLayerUtil::c_Invalid : getStart()->getISuperLayer(); }
+      { return ISuperLayerUtil::getFrom(getStartSegment()); }
 
-      /// Getter for the superlayer id of the end segment.
+      /// Getter for the superlayer id of the end segment
       ISuperLayer getEndISuperLayer() const
-      { return getEnd() == nullptr ? ISuperLayerUtil::c_Invalid : getEnd()->getISuperLayer(); }
+      { return ISuperLayerUtil::getFrom(getEndSegment()); }
 
       /// Getter for the start segment.
-      const CDCAxialRecoSegment2D* getStart() const
+      const CDCAxialRecoSegment2D* getStartSegment() const
       { return m_startSegment; }
 
       /// Setter for the start segment.
-      void setStart(const CDCAxialRecoSegment2D* startSegment)
+      void setStartSegment(const CDCAxialRecoSegment2D* startSegment)
       { m_startSegment = startSegment; }
 
       /// Getter for the end segment.
-      const CDCAxialRecoSegment2D* getEnd() const
+      const CDCAxialRecoSegment2D* getEndSegment() const
       { return m_endSegment; }
 
       /// Setter for the end segment.
-      void setEnd(const CDCAxialRecoSegment2D* endSegment)
+      void setEndSegment(const CDCAxialRecoSegment2D* endSegment)
       { m_endSegment = endSegment; }
 
       /// Setter for both segments simultaniously
@@ -108,26 +114,26 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getStart()->unsetAndForwardMaskedFlag();
-        getEnd()->unsetAndForwardMaskedFlag();
+        getStartSegment()->unsetAndForwardMaskedFlag();
+        getEndSegment()->unsetAndForwardMaskedFlag();
       }
 
       /// Sets the masked flag of the segment pair's automaton cell. Also forward the masked flag to the contained segments and the contained wire hits.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getStart()->setAndForwardMaskedFlag();
-        getEnd()->setAndForwardMaskedFlag();
+        getStartSegment()->setAndForwardMaskedFlag();
+        getEndSegment()->setAndForwardMaskedFlag();
       }
 
-      /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
+      /// If one of the contained segments is marked as masked this segment pair is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getStart()->receiveMaskedFlag();
-        getEnd()->receiveMaskedFlag();
+        getStartSegment()->receiveMaskedFlag();
+        getEndSegment()->receiveMaskedFlag();
 
-        if (getStart()->getAutomatonCell().hasMaskedFlag() or
-            getEnd()->getAutomatonCell().hasMaskedFlag()) {
+        if (getStartSegment()->getAutomatonCell().hasMaskedFlag() or
+            getEndSegment()->getAutomatonCell().hasMaskedFlag()) {
           getAutomatonCell().setMaskedFlag();
         }
 
@@ -140,8 +146,8 @@ namespace Belle2 {
        */
       EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
       {
-        EForwardBackward startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStart()));
-        EForwardBackward endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEnd()));
+        EForwardBackward startIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getStartSegment()));
+        EForwardBackward endIsCoaligned = trajectory2D.isForwardOrBackwardTo(*(getEndSegment()));
         if (startIsCoaligned == EForwardBackward::c_Forward and
             endIsCoaligned == EForwardBackward::c_Forward) {
           return EForwardBackward::c_Forward;

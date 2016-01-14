@@ -517,8 +517,8 @@ void EventDataPlotter::draw(const CDCAxialSegmentPair& axialSegmentPair,
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const CDCRecoSegment2D* ptrFromSegment = axialSegmentPair.getStart();
-  const CDCRecoSegment2D* ptrToSegment = axialSegmentPair.getEnd();
+  const CDCRecoSegment2D* ptrFromSegment = axialSegmentPair.getStartSegment();
+  const CDCRecoSegment2D* ptrToSegment = axialSegmentPair.getEndSegment();
 
   if (not ptrFromSegment or not ptrToSegment) return;
 
@@ -590,9 +590,9 @@ void EventDataPlotter::draw(const CDCSegmentTriple& segmentTriple,
   if (not m_ptrPrimitivePlotter) return;
   PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
 
-  const CDCRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
-  const CDCRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
-  const CDCRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
+  const CDCRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   if (not ptrStartSegment or not ptrMiddleSegment or not ptrEndSegment) return;
 

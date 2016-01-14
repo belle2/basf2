@@ -55,30 +55,18 @@ void MCSegmentTripleFilter::terminate()
 
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
-
-  if (ptrStartSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as start segment");
-    return NAN;
-  }
-  if (ptrMiddleSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as middle segment");
-    return NAN;
-  }
-  if (ptrEndSegment == nullptr) {
-    B2ERROR("MCSegmentTripleFilter::isGoodSegmentTriple invoked with nullptr as end segment");
-    return NAN;
-  }
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
-  Weight pairWeight =  m_mcAxialSegmentPairFilter(segmentTriple);
+  Weight pairWeight =
+    m_mcAxialSegmentPairFilter(CDCAxialSegmentPair(ptrStartSegment, ptrEndSegment));
+
   if (std::isnan(pairWeight)) return NAN;
 
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
@@ -118,7 +106,7 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
     return;
   }
 
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
   if (not ptrStartSegment) {
     B2WARNING("Start segment of segmentTriple is nullptr. Could not set fits.");
     return;
@@ -127,8 +115,5 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   CDCTrajectory3D trajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
-
-  segmentTriple.setTrajectory2D(trajectory3D.getTrajectory2D());
-  segmentTriple.setTrajectorySZ(trajectory3D.getTrajectorySZ());
-
+  segmentTriple.setTrajectory3D(trajectory3D);
 }

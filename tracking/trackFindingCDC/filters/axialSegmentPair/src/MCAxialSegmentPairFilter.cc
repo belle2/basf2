@@ -28,8 +28,8 @@ MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
 
 Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStart();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);

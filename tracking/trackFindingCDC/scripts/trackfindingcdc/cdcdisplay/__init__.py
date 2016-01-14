@@ -736,9 +736,9 @@ class CDCSVGDisplayModule(Module):
                          for endSegment in axial_segments)
 
                     def is_good_triple(triple):
-                        start = triple.getStart()
-                        middle = triple.getMiddle()
-                        end = triple.getEnd()
+                        start = triple.getStartSegment()
+                        middle = triple.getMiddleSegment()
+                        end = triple.getEndSegment()
 
                         pairWeight = \
                             mc_axial_segment_pair_segment_filter.isGoodAxialSegmentPair(triple)

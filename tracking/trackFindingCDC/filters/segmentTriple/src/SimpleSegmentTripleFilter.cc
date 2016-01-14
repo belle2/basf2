@@ -16,29 +16,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void SimpleSegmentTripleFilter::beginEvent()
-{
-  m_simpleAxialSegmentPairFilter.beginEvent();
-  Super::beginEvent();
-}
-
-void SimpleSegmentTripleFilter::initialize()
-{
-  m_simpleAxialSegmentPairFilter.initialize();
-  Super::initialize();
-}
-
-void SimpleSegmentTripleFilter::terminate()
-{
-  Super::terminate();
-  m_simpleAxialSegmentPairFilter.terminate();
-}
 
 Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStart();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEnd();
+  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrMiddleSegment);
@@ -48,11 +31,13 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   const CDCStereoRecoSegment2D& middleSegment = *ptrMiddleSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
-  //check if the middle segment lies within the acceptable bounds in angular deviation
+  const double toleranceFraction = 0.0;
+
+  // Check if the middle segment lies within the acceptable bounds in angular deviation
   {
     //get the remembered fits
-    const CDCTrajectory2D& startFit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(startSegment);
-    const CDCTrajectory2D& endFit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(endSegment);
+    const CDCTrajectory2D& startFit = startSegment.getTrajectory2D();
+    const CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
 
     //use only the first and last hit for this check
     const CDCRecoHit2D& firstHit = middleSegment.front();
@@ -61,70 +46,42 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
     Vector3D firstRecoPos = firstHit.reconstruct3D(startFit);
     Vector3D lastRecoPos = lastHit.reconstruct3D(endFit);
 
-    const double toleranceFraction = 0.0;
-
     const CDCWire& firstWire = firstHit.getWire();
     const CDCWire& lastWire = lastHit.getWire();
 
-    const bool agrees = firstWire.isInCellZBounds(firstRecoPos) and lastWire.isInCellZBounds(lastRecoPos);
+    const bool agrees =
+      firstWire.isInCellZBounds(firstRecoPos, toleranceFraction) and
+      lastWire.isInCellZBounds(lastRecoPos, toleranceFraction);
+
+    if (not agrees) return NAN;
   }
 
   // make more complex judgement on fitness
 
   // Get the combined fit of start and end axial segment
-  const CDCTrajectory2D& fit = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
+  CDCTrajectory2D trajectory2D =  getFitter2D().fit(*(segmentTriple.getStartSegment()),
+                                                    *(segmentTriple.getEndSegment()));
 
   // Check if the middle segment is actually coaligned with the trajectory
-  EForwardBackward fbInfo = fit.isForwardOrBackwardTo(middleSegment);
+  EForwardBackward fbInfo = trajectory2D.isForwardOrBackwardTo(middleSegment);
   if (fbInfo != EForwardBackward::c_Forward) return NAN;
 
-  //Reconstruct the
+  // Reconstruct the middle stereo segment
   CDCRecoSegment3D reconstructedMiddle;
-  for (CDCStereoRecoSegment2D::const_iterator itRecoHits = middleSegment.begin();
-       itRecoHits != middleSegment.end(); ++itRecoHits) {
-    reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(*itRecoHits, fit));
-    if (not reconstructedMiddle.back().isInCellZBounds()) {
+  for (const CDCRecoHit2D& recoHit2D : middleSegment) {
+    reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D));
+    if (not reconstructedMiddle.back().isInCellZBounds(toleranceFraction)) {
       B2DEBUG(100, "  RecoHit out of CDC");
-      //double d;
-      //cin >> d;
       return NAN;
     }
   }
 
   // Fit the sz slope and intercept
-  /*const CDCTrajectorySZ& trajectorySZ = */ getFittedTrajectorySZ(segmentTriple);
+  CDCTrajectorySZ trajectorySZ;
+  getSZFitter().update(trajectorySZ, middleSegment, trajectory2D);
+  segmentTriple.setTrajectory3D(CDCTrajectory3D(trajectory2D, trajectorySZ));
 
   Weight result = startSegment.size() + middleSegment.size() + endSegment.size();
 
-  if (not std::isnan(result)) {
-
-    m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
-    getFittedTrajectorySZ(segmentTriple);
-
-  }
-
   return result;
-
-}
-
-
-
-const CDCTrajectorySZ& SimpleSegmentTripleFilter::getFittedTrajectorySZ(const CDCSegmentTriple& segmentTriple) const
-{
-
-  CDCTrajectorySZ& trajectorySZ = segmentTriple.getTrajectorySZ();
-
-  if (not trajectorySZ.isFitted()) {
-
-    const CDCTrajectory2D& trajectory2D = m_simpleAxialSegmentPairFilter.getFittedTrajectory2D(segmentTriple);
-
-    const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddle();
-    const CDCStereoRecoSegment2D middleSegment = *ptrMiddleSegment;
-
-    getSZFitter().update(trajectorySZ, middleSegment, trajectory2D);
-
-  }
-
-  return trajectorySZ;
-
 }

@@ -297,13 +297,13 @@ namespace Belle2 {
       size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair, bool useRecoPos)
       {
         size_t nAppendedHits = 0;
-        const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStart();
+        const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStartSegment();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
           nAppendedHits += appendRange(startSegment2D, useRecoPos);
         }
 
-        const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEnd();
+        const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEndSegment();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
           nAppendedHits += appendRange(endSegment2D, useRecoPos);

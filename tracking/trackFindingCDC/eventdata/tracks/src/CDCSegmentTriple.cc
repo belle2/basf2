@@ -15,33 +15,37 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCSegmentTriple::CDCSegmentTriple() :
-  CDCAxialSegmentPair(),
-  m_middleSegment(nullptr)
+CDCSegmentTriple::CDCSegmentTriple()
+  : m_startSegment(nullptr),
+    m_middleSegment(nullptr),
+    m_endSegment(nullptr)
 {
 }
 
 
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                                   const CDCAxialRecoSegment2D* endSegment) :
-  CDCAxialSegmentPair(startSegment, endSegment),
-  m_middleSegment(nullptr)
+                                   const CDCAxialRecoSegment2D* endSegment)
+  : m_startSegment(startSegment),
+    m_middleSegment(nullptr),
+    m_endSegment(endSegment)
 {
 }
 
 
-CDCSegmentTriple:: CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair) :
-  CDCAxialSegmentPair(segmentPair),
-  m_middleSegment(nullptr)
+CDCSegmentTriple:: CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair)
+  : m_startSegment(segmentPair.getStartSegment()),
+    m_middleSegment(nullptr),
+    m_endSegment(segmentPair.getEndSegment())
 {
 }
 
 
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
                                    const CDCStereoRecoSegment2D* middleSegment,
-                                   const CDCAxialRecoSegment2D* endSegment) :
-  CDCAxialSegmentPair(startSegment, endSegment),
-  m_middleSegment(middleSegment)
+                                   const CDCAxialRecoSegment2D* endSegment)
+  : m_startSegment(startSegment),
+    m_middleSegment(middleSegment),
+    m_endSegment(endSegment)
 {
   B2ASSERT("CDCSegmentTriple initialized with nullptr as start segment", startSegment);
   B2ASSERT("CDCSegmentTriple initialized with nullptr as middle segment", middleSegment);
@@ -52,11 +56,11 @@ CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
                                    const CDCStereoRecoSegment2D* middleSegment,
                                    const CDCAxialRecoSegment2D* endSegment,
-                                   const CDCTrajectory2D& trajectory2D,
-                                   const CDCTrajectorySZ& trajectorySZ) :
-  CDCAxialSegmentPair(startSegment, endSegment, trajectory2D),
-  m_middleSegment(middleSegment),
-  m_trajectorySZ(trajectorySZ)
+                                   const CDCTrajectory3D& trajectory3D)
+  : m_startSegment(startSegment),
+    m_middleSegment(middleSegment),
+    m_endSegment(endSegment),
+    m_trajectory3D(trajectory3D)
 {
   B2ASSERT("CDCSegmentTriple initialized with nullptr as start segment", startSegment);
   B2ASSERT("CDCSegmentTriple initialized with nullptr as middle segment", middleSegment);

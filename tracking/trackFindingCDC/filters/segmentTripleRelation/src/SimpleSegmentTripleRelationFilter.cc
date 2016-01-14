@@ -27,6 +27,6 @@ SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
   // neighbor weight is a penalty for the overlap of the segments since we would
   // count it to times
   // could also be a better measure of fit quality
-  return  -neighborTriple.getStart()->size();
+  return  -neighborTriple.getStartSegment()->size();
 }
 

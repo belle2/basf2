@@ -32,7 +32,7 @@ namespace Belle2 {
 
     public:
       /** Fill the default filter name and parameter values*/
-      FilterFactory(const std::string& defaultFilterName = "simple");
+      FilterFactory(const std::string& defaultFilterName = "none");
 
       using Super::create;
 

@@ -21,8 +21,8 @@ TrackFinderCDCAutomatonModule ::TrackFinderCDCAutomatonModule() :
   this->setDescription("Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.");
   ModuleParamList moduleParamList = this->getParamList();
   moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
+  moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
   this->setParamList(moduleParamList);
-  this->setTrackOrientation(ETrackOrientation::c_Outwards);
 }
 
 void TrackFinderCDCAutomatonModule::initialize()

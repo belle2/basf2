@@ -46,4 +46,5 @@ namespace Belle2 {
      */
     std::map<TrackFindingCDC::ISuperLayer, size_t> m_minimalHitsForSingleSegmentTrackBySuperLayerId;
   };
+
 }

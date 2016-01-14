@@ -30,24 +30,16 @@ using namespace TrackFindingCDC;
 
 TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
   Module(),
-  m_param_trackOrientationString(""),
   m_param_tracksStoreObjName("CDCTrackVector"),
   m_param_tracksStoreObjNameIsInput(false),
   m_param_gfTrackCandsStoreArrayName(""),
-  m_param_writeGFTrackCands(true),
-  m_trackOrientation(ETrackOrientation::c_None)
+  m_param_writeGFTrackCands(true)
 {
   setDescription("This a base module for all track finders in the CDC");
 
-  addParam("TrackOrientation",
-           m_param_trackOrientationString,
-           "Option which orientation of tracks shall be generate. "
-           "Valid options are '' (default of the finder), "
-           "'none' (default of the finder, algorithm dependent), "
-           "'symmetric', "
-           "'outwards', "
-           "'downwards'.",
-           string(""));
+  ModuleParamList moduleParamList = this->getParamList();
+  m_trackOrienter.exposeParameters(&moduleParamList);
+  this->setParamList(moduleParamList);
 
   addParam("TracksStoreObjName",
            m_param_tracksStoreObjName,
@@ -74,6 +66,8 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
 
 void TrackFinderCDCBaseModule::initialize()
 {
+  m_trackOrienter.initialize();
+
   // Output StoreArray
   if (m_param_writeGFTrackCands) {
     StoreArray <genfit::TrackCand>::registerPersistent(m_param_gfTrackCandsStoreArrayName);
@@ -83,26 +77,12 @@ void TrackFinderCDCBaseModule::initialize()
   } else {
     StoreWrappedObjPtr< std::vector<CDCTrack> >::registerTransient(m_param_tracksStoreObjName);
   }
-
-  if (m_param_trackOrientationString == string("")) {
-    // Keep the default value in this case, if the user did not specify anything.
-  } else if (m_param_trackOrientationString == string("none")) {
-    m_trackOrientation = c_None;
-  } else if (m_param_trackOrientationString == string("symmetric")) {
-    m_trackOrientation = c_Symmetric;
-  } else if (m_param_trackOrientationString == string("outwards")) {
-    m_trackOrientation = c_Outwards;
-  } else if (m_param_trackOrientationString == string("downwards")) {
-    m_trackOrientation = c_Downwards;
-  } else {
-    B2WARNING("Unexpected 'TrackOrientation' parameter of track finder module : '" << m_param_trackOrientationString <<
-              "'. Default to none");
-    m_trackOrientation = c_None;
-  }
 }
 
 void TrackFinderCDCBaseModule::event()
 {
+  m_trackOrienter.beginEvent();
+
   // Now aquire the store vector
   StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
   if (not m_param_tracksStoreObjNameIsInput) {
@@ -123,41 +103,7 @@ void TrackFinderCDCBaseModule::event()
     generate(generatedTracks);
 
     outputTracks.clear();
-
-    // Copy Tracks to output fixing their orientation
-    if (m_trackOrientation == c_None) {
-      std::swap(generatedTracks, outputTracks);
-    } else if (m_trackOrientation == c_Symmetric) {
-      outputTracks.reserve(2 * generatedTracks.size());
-      for (const CDCTrack& track : generatedTracks) {
-        outputTracks.push_back(track.reversed());
-        outputTracks.push_back(std::move(track));
-      }
-    } else if (m_trackOrientation == c_Outwards) {
-      outputTracks.reserve(generatedTracks.size());
-      for (const CDCTrack& track : generatedTracks) {
-        outputTracks.push_back(std::move(track));
-        CDCTrack& lastTrack = outputTracks.back();
-        const CDCRecoHit3D& firstHit = lastTrack.front();
-        const CDCRecoHit3D& lastHit = lastTrack.back();
-        if (lastHit.getRecoPos3D().cylindricalR() < firstHit.getRecoPos3D().cylindricalR()) {
-          lastTrack.reverse();
-        }
-      }
-    } else if (m_trackOrientation == c_Downwards) {
-      outputTracks.reserve(generatedTracks.size());
-      for (const CDCTrack& track : generatedTracks) {
-        outputTracks.push_back(std::move(track));
-        CDCTrack& lastTrack = outputTracks.back();
-        const CDCRecoHit3D& firstHit = lastTrack.front();
-        const CDCRecoHit3D& lastHit = lastTrack.back();
-        if (lastHit.getRecoPos3D().y() > firstHit.getRecoPos3D().y()) {
-          lastTrack.reverse();
-        }
-      }
-    } else {
-      B2WARNING("Unexpected 'TrackOrientation' parameter of track finder module : '" << m_trackOrientation << "'. No tracks generated.");
-    }
+    m_trackOrienter.apply(generatedTracks, outputTracks);
   }
 
   if (m_param_writeGFTrackCands) {

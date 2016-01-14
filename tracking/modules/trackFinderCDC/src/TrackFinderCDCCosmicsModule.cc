@@ -22,8 +22,8 @@ TrackFinderCDCCosmicsModule::TrackFinderCDCCosmicsModule()
   // Set the default segment to symmetric
   ModuleParamList moduleParamList = this->getParamList();
   moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
+  moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
   this->setParamList(moduleParamList);
-  this->setTrackOrientation(ETrackOrientation::c_Downwards);
 }
 
 void TrackFinderCDCCosmicsModule::initialize()
@@ -50,6 +50,3 @@ void TrackFinderCDCCosmicsModule::terminate()
   TrackFinderCDCSegmentPairAutomatonModule::terminate();
   SegmentFinderCDCFacetAutomatonModule::terminate();
 }
-
-
-

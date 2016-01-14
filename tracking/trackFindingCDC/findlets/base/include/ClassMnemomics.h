@@ -23,6 +23,9 @@ namespace Belle2 {
     class CDCSegmentTriple;
     class CDCTrack;
 
+    template<class T>
+    class WeightedRelation;
+
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     class ClassMnemomics {
 
@@ -89,6 +92,17 @@ namespace Belle2 {
       /// Returns a short description for class CDCTrack to be used in descriptions of parameters.
       static std::string getParameterDescription(const CDCTrack*) { return "track"; }
 
+
+
+      /// Returns a short name for class WeightedRelation<T> to be used in names of parameters.
+      template<class T>
+      static std::string getParameterName(const WeightedRelation<T>*)
+      { return getParameterName((T*)(nullptr)) + "Relation"; }
+
+      /// Returns a short description for class WeightedRelation<T> to be used in descriptions.
+      template<class T>
+      static std::string getParameterDescription(const WeightedRelation<T>*)
+      { return getParameterDescription((T*)(nullptr)) + " relation"; }
 
     };
 

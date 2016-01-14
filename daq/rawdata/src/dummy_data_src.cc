@@ -54,7 +54,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   int offset = 0;
   buf[ offset + 0 ] = nwords;
   buf[ offset + 1 ] = 6;
-  buf[ offset + 2 ] = 0x00010001;
+  buf[ offset + 2 ] = (1 << 16) | ncpr;
   unsigned int exp_run = 0x00400101;
   buf[ offset + 3 ] = exp_run;
   buf[ offset + 5 ] = node_id;
@@ -73,7 +73,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     unsigned int utime = 0x98765432;
 
 
-    buf[ offset +  0 ] = cpr_nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
+    buf[ offset +  0 ] = cpr_nwords;
     //  buf[ offset +  1 ] = 0x7f7f010c;
     buf[ offset +  1 ] = 0x7f7f820c;
     buf[ offset +  2 ] = exp_run;

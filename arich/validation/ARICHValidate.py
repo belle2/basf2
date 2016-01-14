@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-##############################################################################
-#
-# This is a steering file to generate and analyze 10000 events used for ARICH
-# validation plots.
-# Author: Luka Santelj
-# 11.3.2014
-#
-##############################################################################
+"""
+<header>
+  <output>ARICHEvents.root</output>
+  <contact>Luka Snatelj</contact>
+  <description>Generates 10000 particle gun events and makes performance plots</description>
+</header>
+"""
 
 from basf2 import *
 from optparse import OptionParser
@@ -29,7 +28,7 @@ filename = options.filename
 debugLevel = int(options.debugLevel)
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.INFO)
+set_log_level(LogLevel.ERROR)
 
 # Create path
 main = create_path()

@@ -1,7 +1,10 @@
-/* ARICHValidate.C 
- * ROOT macro for ARICH validation plots 
- * Author: Luka Santelj 
- * 11.3.2014
+/*
+<header>
+  <input>ARICHEvents.root</input>
+  <output>ARICHValidate.root</output>
+  <contact>Luka Santelj</contact>
+  <description>Makes validation histograms</description>
+</header>
 */
 
 void ARICHValidate(){

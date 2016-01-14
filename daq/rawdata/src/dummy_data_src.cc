@@ -42,7 +42,7 @@ double getTimeSec()
   return (t.tv_sec + t.tv_usec * 1.e-6 - 1417570000.);
 }
 
-int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncpr, int nhslb)
+int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncpr, int nhslb, int run)
 {
   int nwords =  NW_SEND_HEADER + NW_SEND_TRAILER +
                 ncpr * (NW_RAW_HEADER + NW_COPPER_HEADER +
@@ -55,7 +55,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   buf[ offset + 0 ] = nwords;
   buf[ offset + 1 ] = 6;
   buf[ offset + 2 ] = (1 << 16) | ncpr;
-  unsigned int exp_run = 0x00400101;
+  unsigned int exp_run = run;
   buf[ offset + 3 ] = exp_run;
   buf[ offset + 5 ] = node_id;
   offset += 6;
@@ -86,8 +86,16 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
     buf[ offset +  7 ] = 0x34567890;
     buf[ offset +  8 ] = NW_RAW_HEADER + NW_COPPER_HEADER;
     buf[ offset +  9 ] = buf[ offset +  8 ] + finesse_nwords;
-    buf[ offset +  10 ] = buf[ offset +  9 ] + finesse_nwords;
-    buf[ offset +  11 ] = buf[ offset +  10 ] + finesse_nwords;
+    if (nhslb > 1) {
+      buf[ offset +  10 ] = buf[ offset +  9 ] + finesse_nwords;
+    } else {
+      buf[ offset +  10 ] = buf[ offset +  9 ];
+    }
+    if (nhslb > 2) {
+      buf[ offset +  11 ] = buf[ offset +  10 ] + finesse_nwords;
+    } else {
+      buf[ offset +  11 ] = buf[ offset +  10 ];
+    }
     offset += 12;
 
 #ifdef REDUCED_DATA
@@ -243,7 +251,7 @@ int main(int argc, char** argv)
   //
   // Prepare header
   //
-  int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb);
+  int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb, run_no);
   if (temp_ret != total_words) {
     printf("ERROR1 %d %d\n", total_words, temp_ret);
     fflush(stdout);

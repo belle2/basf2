@@ -35,6 +35,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <cmath>
+#include <stdexcept>
 
 namespace Belle2 {
   namespace Variable {
@@ -97,7 +98,12 @@ namespace Belle2 {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
             return eventExtraInfo->getExtraInfo(extraInfoName);
           }
-          return particle->getExtraInfo(extraInfoName);
+          try {
+            return particle->getExtraInfo(extraInfoName);
+          } catch (const std::runtime_error& error)
+          {
+            return -999.;
+          }
         };
         return func;
       } else {

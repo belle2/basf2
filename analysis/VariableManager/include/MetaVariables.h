@@ -22,6 +22,7 @@ namespace Belle2 {
     /**
      * Returns function which returns extra info of a given particle
      * First argument in the argument vector must be the name of the extra info
+     * If the extraInfo does not exist -999 is returned.
      */
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments);
 

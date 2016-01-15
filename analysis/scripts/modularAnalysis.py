@@ -55,20 +55,36 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
     """
 
     import reconstruction
-    import ROOT
-    ROOT.gSystem.Load('libanalysis_DecayDescriptor')
-    from ROOT import Belle2
+    import pdg
     # also add anti-particle lists
     plSet = set(particleLists)
-    for name in particleLists:
-        antiName = Belle2.ParticleListName.antiParticleListName(name)
-        plSet.add(antiName)
+    for List in particleLists:
+        name, label = List.split(':')
+        plSet.add(pdg.conjugate(name) + ':' + label)
 
     partBranches = ['Particles', 'ParticlesToMCParticles',
                     'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
                     'EventExtraInfo'] + list(plSet)
     reconstruction.add_mdst_output(path, mc=True, filename=filename,
                                    additionalBranches=partBranches)
+
+
+def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
+    """
+    Create a new path for events that contain a non-empty particle list.
+    Write the accepted events as a udst file.
+    Currently mdst are also written. This is for testing purposes
+    and will be removed in the future.
+    """
+
+    skimfilter = register_module('SkimFilter')
+    skimfilter.set_name('SkimFilter_' + skimname)
+    skimfilter.param('particleLists', particleLists)
+    analysis_main.add_module(skimfilter)
+    skim_path = create_path()
+    skimfilter.if_value('=1', skim_path, AfterConditionPath.CONTINUE)
+    outputUdst(skimname + '.udst.root', particleLists, path=skim_path)
+    outputMdst(skimname + '.mdst.root', path=skim_path)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):

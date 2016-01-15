@@ -485,7 +485,7 @@ def getPostCutEfficiencies(obj, mc_counts, list_counts):
 
             # TODO Background can also be counted twice! uniqueBackground Tag?
             unique_signal_count = int(GetEntriesSafe(ntuple,
-                                      particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
+                                                     particle.mvaConfig.target + ' == 1 && extraInfo__bouniqueSignal__bc == 1'))
             unique_bckgrd_count = int(GetEntriesSafe(ntuple, particle.mvaConfig.target + ' == 0'))
             unique_efficiency = unique_signal_count * 100. / mc_count
             unique_eff_error = b2stat.binom_error(unique_signal_count, mc_count) * 100.0
@@ -557,6 +557,7 @@ class HashableDict(dict):
     Since we use this only as a trick so the lru cache of getCoveredBranchingFraction works,
     we return a dummy hash (always 1) and not a real hash.
     """
+
     def __hash__(self):
         return 1
 
@@ -679,8 +680,8 @@ def getCoveredBranchingFractions(obj):
                 fraction = 0.0
             if fraction == 0.0:
                 print('WARNING: Branching fraction for {p} {ch} is zero'.format(
-                                              p=particle.identifier,
-                                              ch=str(tuple(sorted(channel.daughters)))))
+                    p=particle.identifier,
+                    ch=str(tuple(sorted(channel.daughters)))))
             branching_fractions[particle.identifier][tuple(sorted(channel.daughters))] = fraction
 
     covered = {}

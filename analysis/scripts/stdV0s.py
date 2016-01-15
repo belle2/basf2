@@ -15,3 +15,15 @@ def stdKshorts(path=analysis_main):
     fillParticleList('K_S0:all', '0.3 < M < 0.7', True, path)
     vertexKFit('K_S0:all', 0.0, '', '', path)
     applyCuts('K_S0:all', '0.450 < M < 0.550', path)
+
+
+def loadStdKS(path=analysis_main):
+    stdKshorts(path)
+
+# def loadStdAllKS(path=analysis_main):
+#    loadStdAllPi(path)
+#    reconstructDecay('K_S0:all -> pi-:all pi+:all', '0.4 < M < 0.6', 1, True,
+#                     path)
+#    vertexKFit('K_S0:all', 0.0)
+#    applyCuts('K_S0:all', '0.477614<M<0.517614')
+#    matchMCTruth('K_S0:all')

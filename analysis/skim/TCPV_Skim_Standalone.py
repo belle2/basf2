@@ -13,7 +13,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
 from stdPi0 import *
-from stdKS import *
+from stdV0s import *
 from stdLightMesons import *
 
 set_log_level(LogLevel.INFO)

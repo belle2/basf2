@@ -12,7 +12,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPi0 import *
-from stdKS import *
+from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 

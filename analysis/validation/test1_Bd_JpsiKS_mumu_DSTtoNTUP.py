@@ -13,12 +13,10 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
+from stdCharged import *
 
 inputMdst('../Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root')
-stdFSParticles()
-stdLooseFSParticles()
+loadStdCharged()
 
 reconstructDecay('J/psi -> mu-:all mu+:all', '2.8 < M < 3.3')
 matchMCTruth('J/psi')

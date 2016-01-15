@@ -20,12 +20,12 @@ sys.stdout = open(logFileName, 'w')
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
+from stdCharged import *
+from stdPhotons import *
 
 inputMdst('../MDSTtoUDST.udst.root')
-stdVeryLoosePi()
-stdPhoton()
+loadStdCharged()
+loadStdPhoton()
 
 # Here the ParticleLists will be extracted from the UDST to dump to ntuple
 ntupleFile('../UDSTtoNTUP.ntup.root')

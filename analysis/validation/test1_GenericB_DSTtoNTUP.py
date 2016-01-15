@@ -13,15 +13,18 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
-from stdLightMesons import *
+from stdCharged import *
+from stdV0s import *
+from stdPhotons import *
+from stdPi0s import *
 
 inputMdst('../GenericB_GENSIMRECtoDST.dst.root')
-stdFSParticles()
-stdLooseFSParticles()
-stdLightMesons()
-stdVeryLoosePi()
+loadStdCharged()
+loadStdPhotons()
+loadStdPi0s()
+loadStdV0s()
+loadStdLightMesons()
+
 
 # ----> NtupleMaker module
 ntupleFile('../GenericB.ntup.root')

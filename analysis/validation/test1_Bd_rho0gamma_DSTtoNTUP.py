@@ -13,14 +13,12 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
-from stdLightMesons import *
+from stdCharged import *
+from stdPhotons import *
 
 inputMdst('../Bd_rho0gamma_GENSIMRECtoDST.dst.root')
-stdFSParticles()
-stdLooseFSParticles()
-stdLightMesons()
+loadStdCharged()
+loadStdPhoton()
 
 reconstructDecay('rho0 -> pi-:all pi+:all', '0.6 < M < 1.2')
 matchMCTruth('rho0')

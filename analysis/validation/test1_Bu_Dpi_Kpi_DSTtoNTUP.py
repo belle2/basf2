@@ -13,12 +13,10 @@ import sys
 import os
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
+from stdCharged import *
 
 inputMdst('../Bu_D0pi_Kpi_GENSIMRECtoDST.dst.root')
-stdFSParticles()
-stdLooseFSParticles()
+loadStdCharged()
 
 reconstructDecay('D0 -> K-:all pi+:all', '1.7 < M <2.0')
 applyCuts('D0', '1.81 < M < 1.91')

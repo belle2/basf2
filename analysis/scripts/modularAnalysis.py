@@ -323,6 +323,28 @@ def cutAndCopyList(
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
+def fillSignalSideParticleList(outputListName, decayString, path):
+    """
+    This function should only be used in the ROE path, that is a path
+    that is executed for each ROE object in the DataStore.
+
+    Example: fillSignalSideParticleList('gamma:sig','B0 -> K*0 ^gamma', roe_path)
+
+    Function will create a ParticleList with name 'gamma:sig' which will be filled
+    with the existing photon Particle, being the second daughter of the B0 candidate
+    to which the ROE object has to be related.
+
+    @param ouputListName name of the created ParticleList
+    @param decayString specify Particle to be added to the ParticleList
+    """
+
+    pload = register_module('SignalSideParticleListCreator')
+    pload.set_name('SSParticleList_' + outputListName)
+    pload.param('particleListName', outputListName)
+    pload.param('decayString', decayString)
+    path.add_module(pload)
+
+
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main):
     """
@@ -502,7 +524,7 @@ def reconstructDecay(
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main,
+    path=analysis_main
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -861,6 +883,32 @@ def variablesToExtraInfo(
     mod = register_module('VariablesToExtraInfo')
     mod.set_name('VariablesToExtraInfo_' + particleList)
     mod.param('particleList', particleList)
+    mod.param('variables', variables)
+    path.add_module(mod)
+
+
+def variablesToDaughterExtraInfo(
+    particleList,
+    decayString,
+    variables,
+    path=analysis_main,
+):
+    """
+    For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
+    are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
+    to specified daughter particle.
+    Should only be used in ROE path, that is path executed for each ROE object in an event.
+
+    @param particleList  The input ParticleList
+    @param decayString   Decay string that specifiec to which daughter the extra infor should be appended
+    @param variables     Dictionary of Variables and extraInfo names.
+    @param path          modules are added to this path
+    """
+
+    mod = register_module('VariablesToExtraInfo')
+    mod.set_name('VariablesToDaughterExtraInfo_' + particleList)
+    mod.param('particleList', particleList)
+    mod.param('decayString', decayString)
     mod.param('variables', variables)
     path.add_module(mod)
 

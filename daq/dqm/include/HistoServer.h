@@ -16,7 +16,7 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
-#include "TMapFile.h"
+#include <daq/dqm/DqmMemFile.h>
 
 #include <daq/dqm/HistoManager.h>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
     std::string m_filename;
-    TMapFile* m_mapfile;
+    DqmMemFile* m_memfile;
     HistoManager* m_hman;
   };
 }

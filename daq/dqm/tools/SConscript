@@ -1,8 +1,12 @@
 Import('env')
 
-env['TOOLS_LIBS']['hserver'] = ['daq', 'framework', 'libNew', '$ROOT_LIBS' ]
-env['TOOLS_LIBS']['hrelay'] = ['daq', 'framework', 'libNew', '$ROOT_LIBS' ]
-env['TOOLS_LIBS']['maptest'] = ['daq', 'framework', 'libNew', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hrelay'] = ['daq', 'framework', '$ROOT_LIBS' ]
+#env['TOOLS_LIBS']['maptest'] = ['daq', 'framework','$ROOT_LIBS' ]
+env['TOOLS_LIBS']['maptest'] = ['daq', 'framework', '$ROOT_LIBS', 'libNew' ]
+env['TOOLS_LIBS']['tmemtest'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['tmemread'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['hdump'] = ['daq', 'framework', '$ROOT_LIBS' ]
 #env['TOOLS_LIBS']['hprod'] = ['daq', 'framework', 'libNew', '$ROOT_LIBS' ]
 
 Return('env')

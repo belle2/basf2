@@ -13,9 +13,9 @@ using namespace std;
 
 // Constructor / Destructor
 
-HistoManager::HistoManager(TMapFile* mapfile)
+HistoManager::HistoManager(DqmMemFile* memfile)
 {
-  m_mapfile = mapfile;
+  m_memfile = memfile;
 }
 
 HistoManager::~HistoManager()
@@ -65,7 +65,7 @@ bool HistoManager::update(string& subdir, string& name, int pid, TH1* histo)
   map<int, TH1*>& hlist = dirlist[name];
 
   // Replace histogram
-  TH1* prevhisto = hlist[pid];
+  //   TH1* prevhisto = hlist[pid];
   //  delete prevhisto;
   hlist[pid] = histo;
   //  printf ( "HistoManager: histogram %s replaced in subdir %s, entry = %f\n",
@@ -92,15 +92,17 @@ bool HistoManager::merge()
     map<string, map<int, TH1*>>& dirlist = is->second;
     map<string, TH1*>& mergelist = m_mergedir[is->first];
     // Move to the root directory of TMapFile
-    m_mapfile->cd();
+    printf("TMemFile = %8.8x\n", m_memfile->GetMemFile());
+    if (m_memfile->GetMemFile() == NULL) exit(-99);
+    (m_memfile->GetMemFile())->cd();
     // cd to subdirectory if defined
     subdir = is->first;
     /*
     if ( is->first != "root" ) {
-      TDirectory* fdir = m_mapfile->GetDirectory();
+      TDirectory* fdir = (m_memfile->GetmemFile())->GetDirectory();
       fdir->mkdir ( (is->first).c_str() );
       fdir->cd ( (is->first).c_str() );
-      printf ( "TMapFile: subdir set to %s\n", (is->first).c_str() );
+      printf ( "TMemFile: subdir set to %s\n", (is->first).c_str() );
       fdir->ls();
     }
     */
@@ -117,7 +119,7 @@ bool HistoManager::merge()
       // Loop over pid list
       for (map<int, TH1*>::iterator ih = hmap.begin(); ih != hmap.end();
            ++ih) {
-        int pid = ih->first;
+        //        int pid = ih->first;
         TH1* hist = ih->second;
         //  printf ( "Retrieving histo %s from pid = %d\n", hist->GetName(), pid );
         //  hist->Print();
@@ -145,9 +147,12 @@ bool HistoManager::merge()
       }
     }
   }
-  m_mapfile->Update();
+  //  m_mapfile->Update();
+  m_memfile->UpdateSharedMem();
+
   //  m_mapfile->ls();
   //  printf ( "HistoManager: merge called and mapfile updated!!!!!\n" );
+  return true;
 }
 
 

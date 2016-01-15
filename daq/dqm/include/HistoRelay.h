@@ -12,11 +12,10 @@
 #include <string>
 
 #include "TH1.h"
-#include "TMapFile.h"
+#include "TMemFile.h"
 
 #include <daq/dataflow/EvtSocket.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/EvtMessage.h>
+#include <daq/dqm/DqmMemFile.h>
 
 namespace Belle2 {
   class HistoRelay {
@@ -27,7 +26,7 @@ namespace Belle2 {
     int collect();
   private:
     std::string m_filename;
-    TMapFile* m_map;
+    DqmMemFile* m_memfile;
     EvtSocketSend* m_sock;
     MsgHandler* m_msg;
 

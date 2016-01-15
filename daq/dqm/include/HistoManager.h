@@ -11,14 +11,15 @@
 #include <string>
 #include <map>
 
+#include <daq/dqm/DqmMemFile.h>
+
 #include "TH1.h"
-#include "TMapFile.h"
 
 namespace Belle2 {
 
   class HistoManager {
   public:
-    HistoManager(TMapFile* mapfile);
+    HistoManager(DqmMemFile* mapfile);
     ~HistoManager();
 
     // Register histogram
@@ -45,7 +46,7 @@ namespace Belle2 {
     //OBSOLETE    std::map<std::string, TH1*>  m_merge;
 
     // TMapFile
-    TMapFile* m_mapfile;
+    DqmMemFile* m_memfile;
   };
 }
 

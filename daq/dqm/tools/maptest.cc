@@ -1,4 +1,5 @@
-#include "daq/dqm/HistoServer.h"
+#include "TMapFile.h"
+#include "TH1.h"
 
 int main(int argc, char** argv)
 {

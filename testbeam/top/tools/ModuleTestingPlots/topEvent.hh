@@ -14,9 +14,10 @@
 #ifndef TOPEVENT_HH
 #define TOPEVENT_HH
 
-//Use exactly one of the following two lines based on the input ROOT format being used
-#define USEFALL2015ROOTFORMAT
+//Use exactly one of the following three lines based on the input ROOT format being used
+//#define USEFALL2015ROOTFORMAT
 //#define USETOPCAFROOTFORMAT
+#define USEPOCKETDAQROOTFORMAT
 
 #define MAXHITS 400
 
@@ -36,7 +37,7 @@ struct topEvent {
 
 
 #ifdef USETOPCAFROOTFORMAT
-  Int_t   nHits;
+  Int_t   nHit;
   Int_t   runNumber;
   Int_t   eventNumber;
   vector<unsigned int> pixel;
@@ -46,6 +47,25 @@ struct topEvent {
   vector<double>       charge;
   vector<unsigned int> adc; 
 #endif
+
+
+#ifdef USEPOCKETDAQROOTFORMAT
+  Int_t   nHit;
+  Int_t   runNumber;
+  Int_t   eventNumber;
+  Short_t pixel[MAXHITS];
+  Short_t pmt[MAXHITS];
+  Float_t time[MAXHITS];
+  Float_t tdc[MAXHITS];
+  Int_t   charge[MAXHITS];
+  Int_t   adc[MAXHITS]; 
+#endif
+
+
+
+
+
+
 
 } ;
 

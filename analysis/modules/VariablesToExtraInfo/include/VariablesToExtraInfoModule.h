@@ -15,8 +15,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <string>
 #include <map>
@@ -25,8 +28,15 @@
 namespace Belle2 {
   class Particle;
 
-  /** For each particle in the input list the selected variables are saved in an extra-info field with the given name,
-   *  Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");*/
+  /**
+   *  For each particle in the input list the selected variables are saved in an extra-info field with the given name,
+   *  Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.");
+   *
+   * The module can also write any variable as an extra-info filed to any of the daughter particles specified via the DecayString.
+   * This is usefull for example when calculating various vetos (pi0, J/psi, ...). Note that in general it is not advised
+   * to write anything to daughter particle, since the daughter particle is not unique, it can be daughter of some other particle
+   * in an event as well.
+   */
   class VariablesToExtraInfoModule : public Module {
   public:
 
@@ -50,6 +60,17 @@ namespace Belle2 {
     std::vector<Variable::Manager::FunctionPtr> m_functions;
     /**< Vector of extra info names */
     std::vector<std::string> m_extraInfoNames;
+
+    std::string m_decayString;  /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
+    DecayDescriptor m_pDDescriptor;         /**< Decay descriptor of the particle being selected */
+    bool m_writeToDaughter = false;
+
+    /**
+     * Adds extra info to the particle. The value is estimated for the source
+     * and added as an extra-info to the destination.
+     */
+    void addExtraInfo(const Particle* source, Particle* destination);
+
   };
 
 } // Belle2 namespace

@@ -3,24 +3,19 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Simon Kohl                                   *
+ * Contributors: Simon Kohl, Anze Zupanc                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <analysis/modules/VariablesToExtraInfo/VariablesToExtraInfoModule.h>
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <framework/logging/Logger.h>
-
 
 using namespace std;
 using namespace Belle2;
 
-
 REG_MODULE(VariablesToExtraInfo)
-
 
 VariablesToExtraInfoModule::VariablesToExtraInfoModule()
 {
@@ -30,8 +25,11 @@ VariablesToExtraInfoModule::VariablesToExtraInfoModule()
   std::map<std::string, std::string> emptymap;
   addParam("particleList", m_inputListName, "Name of particle list with reconstructed particles.");
   addParam("variables", m_variables,
-           "Dictionary of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           "Dictionary of variables and extraInfo names to save in the extra-info field.\n"
+           "Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptymap);
+  addParam("decayString", m_decayString, "DecayString specifying the daughter Particle to be included in the ParticleList",
+           std::string(""));
 }
 
 VariablesToExtraInfoModule::~VariablesToExtraInfoModule()
@@ -53,6 +51,14 @@ void VariablesToExtraInfoModule::initialize()
       m_extraInfoNames.push_back(pair.second);
     }
   }
+
+  if (not m_decayString.empty()) {
+    m_writeToDaughter = true;
+
+    bool valid = m_pDDescriptor.init(m_decayString);
+    if (!valid)
+      B2ERROR("VariablesToExtraInfoModule::initialize Invalid Decay Descriptor: " << m_decayString);
+  }
 }
 
 void VariablesToExtraInfoModule::event()
@@ -66,17 +72,30 @@ void VariablesToExtraInfoModule::event()
 
 
   const unsigned int numParticles = m_inputList->getListSize();
-  const unsigned int nVars = m_functions.size();
-
   for (unsigned int i = 0; i < numParticles; i++) {
     Particle* p = m_inputList->getParticle(i);
-    for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      double value = m_functions[iVar](p);
-      if (p->hasExtraInfo(m_extraInfoNames[iVar])) {
-        B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
-      } else {
-        p->addExtraInfo(m_extraInfoNames[iVar], value);
+
+    if (not m_writeToDaughter) {
+      addExtraInfo(p, p);
+    } else {
+      std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(p);
+      for (unsigned int iDaug = 0; iDaug < selparticles.size(); iDaug++) {
+        Particle* daug = particles[selparticles[iDaug]->getArrayIndex()];
+        addExtraInfo(p, daug);
       }
+    }
+  }
+}
+
+void VariablesToExtraInfoModule::addExtraInfo(const Particle* source, Particle* destination)
+{
+  const unsigned int nVars = m_functions.size();
+  for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+    double value = m_functions[iVar](source);
+    if (destination->hasExtraInfo(m_extraInfoNames[iVar])) {
+      B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
+    } else {
+      destination->addExtraInfo(m_extraInfoNames[iVar], value);
     }
   }
 }

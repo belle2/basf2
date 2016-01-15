@@ -18,8 +18,8 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
-from stdLooseFSParticles import *
+from stdCharged import *
+from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
 # gbasf2 setting
@@ -46,8 +46,7 @@ inputMdstList(filelistSIG)
 # stdHighEPhoton()
 
 # creates "pi+:loose" ParticleList (and c.c.)
-stdLoosePi()
-stdLooseK()
+loadStdCharged()
 # reconstruct D0 -> pi+ K- decay
 # keep only candidates with 1.5 < M(pi+K-) < 2.2 GeV
 reconstructDecay('D0 -> pi+:loose K-:loose', '1.5 < M < 2.2', True)

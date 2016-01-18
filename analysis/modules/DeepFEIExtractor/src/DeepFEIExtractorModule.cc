@@ -123,12 +123,25 @@ namespace Belle2 {
           binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        binaryWrite<int32_t>(m_file, 1);
-
-        binaryWrite<int32_t>(m_file, trackFitResult->getChargeSign());
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(trackFitResult->get4Momentum());
         TVector3 position = trackFitResult->getPosition();
+
+        if (not std::isfinite(momentum.Px()) or not std::isfinite(momentum.Py()) or not std::isfinite(momentum.Pz())) {
+          B2WARNING("Encountered nan value in momentum.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        if (not std::isfinite(position.X()) or not std::isfinite(position.Y()) or not std::isfinite(position.Z())) {
+          B2WARNING("Encountered nan value in position.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        binaryWrite<int32_t>(m_file, 1);
+
+        binaryWrite<int32_t>(m_file, trackFitResult->getChargeSign());
 
         binaryWrite<float>(m_file, position.X());
         binaryWrite<float>(m_file, position.Y());
@@ -153,10 +166,23 @@ namespace Belle2 {
           binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        binaryWrite<int32_t>(m_file, 1);
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(ecl_cluster->get4Vector());
         TVector3 position = ecl_cluster->getclusterPosition();
+
+        if (not std::isfinite(momentum.Px()) or not std::isfinite(momentum.Py()) or not std::isfinite(momentum.Pz())) {
+          B2WARNING("Encountered nan value in momentum.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        if (not std::isfinite(position.X()) or not std::isfinite(position.Y()) or not std::isfinite(position.Z())) {
+          B2WARNING("Encountered nan value in position.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        binaryWrite<int32_t>(m_file, 1);
         binaryWrite<float>(m_file, position.X());
         binaryWrite<float>(m_file, position.Y());
         binaryWrite<float>(m_file, position.Z());
@@ -176,10 +202,23 @@ namespace Belle2 {
           binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        binaryWrite<int32_t>(m_file, 1);
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(klm_cluster->getMomentum());
         TVector3 position = klm_cluster->getClusterPosition();
+
+        if (not std::isfinite(momentum.Px()) or not std::isfinite(momentum.Py()) or not std::isfinite(momentum.Pz())) {
+          B2WARNING("Encountered nan value in momentum.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        if (not std::isfinite(position.X()) or not std::isfinite(position.Y()) or not std::isfinite(position.Z())) {
+          B2WARNING("Encountered nan value in position.");
+          binaryWrite<int32_t>(m_file, 0);
+          continue;
+        }
+
+        binaryWrite<int32_t>(m_file, 1);
 
         binaryWrite<float>(m_file, position.X());
         binaryWrite<float>(m_file, position.Y());

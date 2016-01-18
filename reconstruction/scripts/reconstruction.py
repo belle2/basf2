@@ -134,14 +134,14 @@ def add_track_finding(path, components=None):
         VXDtrackFitter.param('BuildBelle2Tracks', False)
         VXDtrackFitter.param("PDGCodes", [211])
         VXDtrackFitter.param('GFTracksColName', vxd_tracklets)
-        VXDtrackFitter.set_name('VXD-only')
+        VXDtrackFitter.set_name('VXD-only GenFitter')
 
         CDCtrackFitter = register_module('GenFitter')
         CDCtrackFitter.param('GFTrackCandidatesColName', cdc_trackcands)
         CDCtrackFitter.param('BuildBelle2Tracks', False)
         CDCtrackFitter.param("PDGCodes", [211])
         CDCtrackFitter.param('GFTracksColName', cdc_tracklets)
-        CDCtrackFitter.set_name('CDC-only')
+        CDCtrackFitter.set_name('CDC-only GenFitter')
 
         vxd_cdcTracksMerger = register_module('VXDCDCTrackMerger')
         vxd_cdcTracksMerger_param = {
@@ -231,7 +231,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=True, mcTrack
     trackfitter = register_module('GenFitter')
     trackfitter.param({'BuildBelle2Tracks': False,
                        "PDGCodes": [211]})
-    trackfitter.set_name('combined')
+    trackfitter.set_name('combined GenFitter')
     path.add_module(trackfitter)
 
     # create Belle2 Tracks from the genfit Tracks

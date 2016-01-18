@@ -210,4 +210,30 @@ void PIDLikelihood::printArray() const
 
 }
 
+std::string PIDLikelihood::getInfoHTML() const
+{
+  string detectorName[Const::PIDDetectors::c_size] = {"SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"};
+
+  std::stringstream stream;
+  stream << std::setprecision(4);
+  stream << "<b>Likelihoods</b><br>";
+  stream << "<table>";
+  stream << "<tr><th>PID / Detector</th>";
+  for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++)
+    stream << "<th>" << detectorName[k] << "</th>";
+  stream << "</tr>";
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+    stream << "<tr>";
+    stream << "<td>" << Const::chargedStableSet.at(i).getPDGCode() << "</td>";
+    for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
+      stream << "<td>" << m_logl[k][i] << "</td>";
+    }
+    stream << "</tr>";
+  }
+  stream << "</table>";
+  stream << "<br>";
+
+  return stream.str();
+}
+
 

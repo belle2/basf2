@@ -127,6 +127,11 @@ namespace Belle2 {
      */
     void printArray() const;
 
+    /**
+     * Return HTML Info of PID Likelihoods
+     */
+    std::string getInfoHTML() const;
+
   private:
 
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */

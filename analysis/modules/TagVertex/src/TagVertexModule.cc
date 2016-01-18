@@ -217,7 +217,18 @@ namespace Belle2 {
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
         || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
       ok = getTagTracks_standardAlgorithm(Breco, 0);
-      if (ok) ok = makeGeneralFit();
+
+      if (ok) {
+        try {
+          ok = makeGeneralFit();
+        } catch (rave::CheckedFloatException) {
+          B2ERROR("Invalid inputs (nan/inf)?");
+          ok = false;
+        }
+      }
+
+      // if (ok) ok = makeGeneralFit();
+
     }
 
     return ok;

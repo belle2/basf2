@@ -3,13 +3,12 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka                                          *
+ * Contributors: Peter Kvasnicka, Marko staric                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMHITBASE_H
-#define SIMHITBASE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -43,6 +42,8 @@ namespace Belle2 {
                   bg_Touschek_HER_far = 12, /**< Touschek far HER */
                   bg_SynchRad_LER     = 13, /**< Synchrotron radiation LER */
                   bg_SynchRad_HER     = 14, /**< Synchrotron radiation HER */
+                  bg_BHWide_LER       = 15, /**< Wide angle radiative Bhabha LER */
+                  bg_BHWide_HER       = 16, /**< Wide angle radiative Bhabha HER */
                   bg_other            = 99  /**< Other type of background */
                 };
     /**
@@ -83,10 +84,9 @@ namespace Belle2 {
 
     unsigned short m_backgroundTag; /**< Background tag */
 
-    ClassDef(SimHitBase, 2)
+    ClassDef(SimHitBase, 3)
   };
 
 
 } // end namespace Belle2
 
-#endif

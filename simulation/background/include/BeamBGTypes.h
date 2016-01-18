@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BEAMBGTYPES_H
-#define BEAMBGTYPES_H
+#pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <string>
@@ -45,6 +44,8 @@ namespace Belle2 {
         m_tags["Touschek_HER_far"] = SimHitBase::bg_Touschek_HER_far;
         m_tags["SynchRad_LER"] = SimHitBase::bg_SynchRad_LER;
         m_tags["SynchRad_HER"] = SimHitBase::bg_SynchRad_HER;
+        m_tags["BHWide_LER"] = SimHitBase::bg_BHWide_LER;
+        m_tags["BHWide_HER"] = SimHitBase::bg_BHWide_HER;
         m_tags["other"] = SimHitBase::bg_other;
       }
 
@@ -109,4 +110,3 @@ namespace Belle2 {
   } // background
 } // Belle2
 
-#endif

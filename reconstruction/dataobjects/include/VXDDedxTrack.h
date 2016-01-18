@@ -38,11 +38,11 @@ namespace Belle2 {
       m_length(0.0), m_nHits(0), m_nHitsUsed(0),
       m_pdg(0), m_mother_pdg(0), m_p_true(0)
     {
-      //for all detectors
+      // set default values for all detectors
       for (int i = 0; i <= Dedx::c_SVD; i++)
         m_dedx_avg[i] = m_dedx_avg_truncated[i] = m_dedx_avg_truncated_err[i] = 0.0;
 
-      //for all particles
+      // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++)
         m_vxdLogl[i] = 0.0;
     }
@@ -57,7 +57,7 @@ namespace Belle2 {
       m_dEdx.push_back(dEdx);
     }
 
-    /** add a dE/dx value */
+    /** add dE/dx information for a VXD layer */
     void addDedx(int layer, double distance, double dedxValue)
     {
       dedxLayer.push_back(layer);
@@ -66,8 +66,7 @@ namespace Belle2 {
       m_length += distance;
     }
 
-
-    /** Get average dE/dx for given detector. */
+    /** Get the dE/dx mean for given detector */
     double getDedx(Const::EDetector detector) const
     {
       int iDet = (int)(detector - Const::PXD);
@@ -76,7 +75,7 @@ namespace Belle2 {
       return m_dedx_avg[iDet];
     }
 
-    /** Get truncated average dE/dx for given detector. */
+    /** Get dE/dx truncated mean for given detector */
     double getDedxTruncated(Const::EDetector detector) const
     {
       int iDet = (int)(detector - Const::PXD);
@@ -85,7 +84,7 @@ namespace Belle2 {
       return m_dedx_avg_truncated[iDet];
     }
 
-    /** Get truncated average dE/dx for given detector. */
+    /** Get the error on the dE/dx truncated mean for given detector */
     double getDedxTruncatedErr(Const::EDetector detector) const
     {
       int iDet = (int)(detector - Const::PXD);
@@ -98,14 +97,14 @@ namespace Belle2 {
     double eventID() const { return m_eventID; }
     /** Return the track ID */
     double trackID() const { return m_trackID; }
-    /** Return cos(theta) for this Track */
+    /** Return cos(theta) for this yrack */
     double getCosTheta() const { return m_cosTheta; }
 
-    /** Return the momentum */
+    /** Return the momentum valid at the IP */
     double getMomentum() const { return m_p; }
-    /** Return the number of hits on the track */
+    /** Return the number of hits for this track */
     double size() const { return m_nHits; }
-    /** Return the number of hits used in truncated mean */
+    /** Return the number of hits used to determine the truncated mean */
     double getNHitsUsed() const { return m_nHitsUsed; }
 
     /** Return the (global) layer number */
@@ -114,12 +113,12 @@ namespace Belle2 {
     int getSensorID(int i) const { return m_sensorID[i]; }
     /** Return the adcCount for this hit */
     int getADCCount(int i) const { return m_adcCount[i]; }
-    /** Return the path length through the cell */
+    /** Return the path length through the layer */
     double getDx(int i) const { return m_dx[i]; }
     /** Return the dE/dx value for this hit */
     double getDedx(int i) const { return m_dEdx[i]; }
 
-    /** Return the vector of dE/dx values for this object */
+    /** Return the vector of dE/dx values for this track */
     std::vector< double > getDedxList() const { return m_dEdx; }
 
   private:
@@ -128,32 +127,32 @@ namespace Belle2 {
     int m_trackID; /**< ID number of the Track */
 
     // hit level information
-    std::vector<int> m_layer;   /**< layer number */
+    std::vector<int> m_layer;    /**< VXD layer number */
     std::vector<int> m_sensorID; /**< unique sensor ID */
-    std::vector<int> m_adcCount;   /**< adcCount per hit */
-    std::vector<double> m_dx;   /**< path length in cell */
-    std::vector<double> m_dEdx; /**< charge per path length */
+    std::vector<int> m_adcCount; /**< adcCount per hit */
+    std::vector<double> m_dx;    /**< path length in layer */
+    std::vector<double> m_dEdx;  /**< charge per path length */
 
     // one entry per layer (just don't mix with the hit arrays)
-    std::vector<double> dedx; /**< extracted dE/dx (arb. units, detector dependent) */
-    std::vector<double> dist; /**< distance flown through active medium in current segment */
-    std::vector<double> dedxLayer; /**< layer id corresponding to dedx */
+    std::vector<double> dedx;      /**< extracted dE/dx (arb. units, detector dependent) */
+    std::vector<double> dist;      /**< distance flown through active medium in current segment */
+    std::vector<double> dedxLayer; /**< layer id corresponding to dE/dx measurement */
 
     // track level information
-    double m_p; /**< momentum at the IP */
+    double m_p;        /**< momentum at the IP */
     double m_cosTheta; /**< cos(theta) for the track */
-    short m_charge; /**< particle charge from tracking (+1 or -1) */
+    short m_charge;    /**< particle charge from tracking (+1 or -1) */
 
-    double m_length; /**< total distance travelled by the track */
-    short m_nHits; /**< number of hits on this track */
-    short m_nHitsUsed; /**< number of hits on this track used in truncated mean */
+    double m_length;   /**< total distance travelled by the track */
+    short m_nHits;     /**< number of hits on this track */
+    short m_nHitsUsed; /**< number of hits on this track used in the truncated mean */
 
-    double m_pdg; /**< MC PID */
+    double m_pdg;        /**< MC PID */
     double m_mother_pdg; /**< MC PID of mother particle */
-    double m_p_true; /**< MC true momentum */
+    double m_p_true;     /**< MC true momentum */
 
-    double m_dedx_avg[2];               /**< dE/dx averaged */
-    double m_dedx_avg_truncated[2];     /**< dE/dx averaged, truncated mean */
+    double m_dedx_avg[2];               /**< dE/dx mean value per track */
+    double m_dedx_avg_truncated[2];     /**< dE/dx truncated mean per track */
     double m_dedx_avg_truncated_err[2]; /**< standard deviation of m_dedx_avg_truncated */
 
     double m_vxdLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */

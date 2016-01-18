@@ -31,8 +31,6 @@
 #include <TTree.h>
 #include <TString.h>
 
-using namespace std;
-
 class TH2F;
 
 namespace Belle2 {
@@ -72,7 +70,7 @@ namespace Belle2 {
     /** Clear the arrays before filling an event */
     void clearEntries();
 
-    string m_filename; /**< name of output ROOT file */
+    std::string m_filename; /**< name of output ROOT file */
 
     TFile* m_file; /**< output ROOT file */
     TTree* m_tree; /**< output ROOT tree */

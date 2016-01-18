@@ -20,7 +20,7 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
 
   setDescription("Extract dE/dx information for calibration development.");
 
-  addParam("outputFileName", m_filename, "Name for output file", string("HLInfo.root"));
+  addParam("outputFileName", m_filename, "Name for output file", std::string("HLInfo.root"));
 }
 
 HitLevelInfoWriterModule::~HitLevelInfoWriterModule() { }

@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace Belle2 {
   class CDCDedxTrack;
 
@@ -56,12 +54,12 @@ namespace Belle2 {
     void initializeParameters();
 
     /** Perform a run gain correction */
-    double RunGainCorrection(int runNo, double& dedx) const;
+    double RunGainCorrection(double& dedx) const;
     /** Perform a wire gain correction */
     double WireGainCorrection(int wireID, double& dedx) const;
 
     /** Perform a standard set of corrections */
-    double StandardCorrection(int runNo, int wireID, double costheta, double dedx) const;
+    double StandardCorrection(int wireID, double costheta, double dedx) const;
 
     /** Perform a hadron saturation correction.
      * (Set the peak of the truncated mean for electrons to 1) */
@@ -79,20 +77,17 @@ namespace Belle2 {
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    /** the run number for this sample */
-    int m_runNo;
-
     /** lower bound for truncated mean */
     double m_removeLowest;
     /** upper bound for truncated mean */
     double m_removeHighest;
 
     /** validity of a particular wire */
-    double m_valid[NCDCWires];
+    double m_valid[c_NCDCWires];
     /** the wire gain correction parameters */
-    double m_wireGain[NCDCWires];
+    double m_wireGain[c_NCDCWires];
     /** the run gain correction parameters */
-    double m_runGain[NRuns];
+    double m_runGain;
 
     /** saturation correction parameter: alpha */
     double  m_alpha;

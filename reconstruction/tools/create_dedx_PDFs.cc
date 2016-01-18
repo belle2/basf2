@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jake Bennett, Christian Pulvermacher
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <framework/gearbox/Const.h>
 #include <framework/io/RootIOUtilities.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
@@ -21,7 +31,7 @@ using namespace Belle2;
 const int num_dedx_bins = 100;
 
 
-/** Save 2d PDFs of dE/dx vs. momentum for use with the CDCDedxPID module.
+/** Save 2d PDFs of dE/dx vs. momentum for use with the CDCDedxPID and VXDDedxPID modules.
  *
  *  PDFs for individual dE/dx measurements as well as their truncated means are
  *  produced.

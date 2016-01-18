@@ -126,8 +126,8 @@ void CDCDedxPIDModule::initialize()
     tracks.registerRelationTo(dedxLikelihoods);
 
     //load pdfs
-    TFile* pdf_file = new TFile(m_pdfFile.c_str(), "READ");
-    if (!pdf_file->IsOpen())
+    TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
+    if (!pdfFile->IsOpen())
       B2FATAL("Couldn't open pdf file: " << m_pdfFile);
 
     //load dedx:momentum PDFs
@@ -137,19 +137,19 @@ void CDCDedxPIDModule::initialize()
     nBinsX = nBinsY = -1;
     xMin = xMax = yMin = yMax = 0.0;
     for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-      const int pdg_code = Const::chargedStableSet.at(iPart).getPDGCode();
+      const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
       m_pdfs[2][iPart] =
-        dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_d%i_%i%s", 2, pdg_code, suffix)));
-      //dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_%i%s", pdg_code, suffix)));
+        dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_d%i_%i%s", 2, pdgCode, suffix)));
+      //dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_%i%s", pdgCode, suffix)));
 
       if (!m_pdfs[2][iPart]) {
         if (m_ignoreMissingParticles)
           continue;
-        B2FATAL("Couldn't find PDF for PDG " << pdg_code << suffix);
+        B2FATAL("Couldn't find PDF for PDG " << pdgCode << suffix);
       }
 
       //check that PDFs have the same dimensions and same binning
-      const double eps_factor = 1e-5;
+      const double epsFactor = 1e-5;
       if (nBinsX == -1 and nBinsY == -1) {
         nBinsX = m_pdfs[2][iPart]->GetNbinsX();
         nBinsY = m_pdfs[2][iPart]->GetNbinsY();
@@ -159,15 +159,15 @@ void CDCDedxPIDModule::initialize()
         yMax = m_pdfs[2][iPart]->GetYaxis()->GetXmax();
       } else if (nBinsX != m_pdfs[2][iPart]->GetNbinsX()
                  or nBinsY != m_pdfs[2][iPart]->GetNbinsY()
-                 or fabs(xMin - m_pdfs[2][iPart]->GetXaxis()->GetXmin()) > eps_factor * xMax
-                 or fabs(xMax - m_pdfs[2][iPart]->GetXaxis()->GetXmax()) > eps_factor * xMax
-                 or fabs(yMin - m_pdfs[2][iPart]->GetYaxis()->GetXmin()) > eps_factor * yMax
-                 or fabs(yMax - m_pdfs[2][iPart]->GetYaxis()->GetXmax()) > eps_factor * yMax) {
-        B2FATAL("PDF for PDG " << pdg_code << suffix << " has binning/dimensions differing from previous PDF.")
+                 or fabs(xMin - m_pdfs[2][iPart]->GetXaxis()->GetXmin()) > epsFactor * xMax
+                 or fabs(xMax - m_pdfs[2][iPart]->GetXaxis()->GetXmax()) > epsFactor * xMax
+                 or fabs(yMin - m_pdfs[2][iPart]->GetYaxis()->GetXmin()) > epsFactor * yMax
+                 or fabs(yMax - m_pdfs[2][iPart]->GetYaxis()->GetXmax()) > epsFactor * yMax) {
+        B2FATAL("PDF for PDG " << pdgCode << suffix << " has binning/dimensions differing from previous PDF.")
       }
     }
 
-    //leaking pdf_file so I can access the histograms
+    //leaking pdfFile so I can access the histograms
   }
 
   // load constants
@@ -222,7 +222,7 @@ void CDCDedxPIDModule::event()
   // inputs
   StoreArray<Track> tracks;
   StoreArray<MCParticle> mcparticles;
-  const int num_mcparticles = mcparticles.getEntries();
+  const int numMCParticles = mcparticles.getEntries();
 
   // outputs
   StoreArray<CDCDedxTrack> dedxArray;
@@ -254,7 +254,7 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
-    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and num_mcparticles != 0) {
+    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and numMCParticles != 0) {
       // find MCParticle corresponding to this track
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
@@ -268,8 +268,8 @@ void CDCDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
 
-        const TVector3 true_momentum = mcpart->getMomentum();
-        dedxTrack->m_p_true = true_momentum.Mag();
+        const TVector3 trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_p_true = trueMomentum.Mag();
       }
     }
 
@@ -514,7 +514,7 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;
-  double sum_of_squares = 0.0;
+  double sumOfSquares = 0.0;
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
 
@@ -525,7 +525,7 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
       truncatedMeanTmp += sortedDedx[i];
-      sum_of_squares += sortedDedx[i] * sortedDedx[i];
+      sumOfSquares += sortedDedx[i] * sortedDedx[i];
       numValuesTrunc++;
     }
   }
@@ -543,7 +543,7 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+    *truncatedMeanErr = sqrt(sumOfSquares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
                           numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;
@@ -554,8 +554,8 @@ void CDCDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_S
                                          TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
-  const Int_t bin_x = pdf[0]->GetXaxis()->FindFixBin(p);
-  const Int_t bin_y = pdf[0]->GetYaxis()->FindFixBin(dedx);
+  const Int_t binX = pdf[0]->GetXaxis()->FindFixBin(p);
+  const Int_t binY = pdf[0]->GetYaxis()->FindFixBin(dedx);
 
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
@@ -564,9 +564,9 @@ void CDCDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_S
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (bin_x < 1 or bin_x > pdf[iPart]->GetNbinsX()
-        or bin_y < 1 or bin_y > pdf[iPart]->GetNbinsY()) {
-      probability = pdf[iPart]->GetBinContent(bin_x, bin_y);
+    if (binX < 1 or binX > pdf[iPart]->GetNbinsX()
+        or binY < 1 or binY > pdf[iPart]->GetNbinsY()) {
+      probability = pdf[iPart]->GetBinContent(binX, binY);
     } else {
       //in normal histogram range
       probability = pdf[iPart]->Interpolate(p, dedx);
@@ -667,14 +667,14 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
 
   // determine sigma from the parameterization
   x[0] = dedx;
-  double cor_dedx = sigmaCurve(x, dedxpar);
+  double corDedx = sigmaCurve(x, dedxpar);
   x[0] = nhit;
-  double cor_nhit = sigmaCurve(x, nhitpar);
-  if (nhit > 35) cor_nhit = 1.0;
+  double corNHit = sigmaCurve(x, nhitpar);
+  if (nhit > 35) corNHit = 1.0;
   x[0] = sin;
-  double cor_sin = sigmaCurve(x, sinpar);
+  double corSin = sigmaCurve(x, sinpar);
 
-  return (cor_dedx * cor_sin * cor_nhit);
+  return (corDedx * corSin * corNHit);
 }
 
 

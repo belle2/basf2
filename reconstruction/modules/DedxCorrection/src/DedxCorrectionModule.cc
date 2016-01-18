@@ -37,8 +37,6 @@ DedxCorrectionModule::DedxCorrectionModule() : Module()
 
   setDescription("Apply hit level corrections to the dE/dx measurements.");
 
-  addParam("runNumber", m_runNo, "run number", int(-1));
-
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
 
@@ -106,7 +104,7 @@ void DedxCorrectionModule::event()
       // only look at CDC hits
       if (dedxTrack->getWire(i) > 15000) continue;
 
-      double newdedx = StandardCorrection(m_runNo, dedxTrack->getWire(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
+      double newdedx = StandardCorrection(dedxTrack->getWire(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
       dedxTrack->setDedx(i, newdedx);
     } // end loop over hits
 
@@ -131,10 +129,8 @@ void DedxCorrectionModule::initializeParameters()
   // For now just initialize the parameters to an arbitrary values for
   // debugging. Eventually, this should get the constants from the
   // calibration database.
-  for (int i = 0; i < NRuns; ++i) {
-    m_runGain[i] = 2.0;
-  }
-  for (int i = 0; i < NCDCWires; ++i) {
+  m_runGain = 1.0;
+  for (int i = 0; i < c_NCDCWires; ++i) {
     m_wireGain[i] = 2.0;
     m_valid[i] = 1.0;
   }
@@ -147,11 +143,11 @@ void DedxCorrectionModule::initializeParameters()
   m_ratio = 9.94775e-01;
 }
 
-double DedxCorrectionModule::RunGainCorrection(int runNo, double& dedx) const
+double DedxCorrectionModule::RunGainCorrection(double& dedx) const
 {
 
-  if (runNo > 0 && runNo < NRuns && m_runGain[runNo] != 0) {
-    double newDedx = dedx / m_runGain[runNo];
+  if (m_runGain != 0) {
+    double newDedx = dedx / m_runGain;
     return newDedx;
   } else
     return dedx;
@@ -175,12 +171,12 @@ double DedxCorrectionModule::HadronCorrection(double costheta, double dedx) cons
   return D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
 }
 
-double DedxCorrectionModule::StandardCorrection(int runNo, int wireID, double costheta, double dedx) const
+double DedxCorrectionModule::StandardCorrection(int wireID, double costheta, double dedx) const
 {
 
   double temp = dedx;
 
-  temp = RunGainCorrection(runNo, temp);
+  temp = RunGainCorrection(temp);
 
   temp = WireGainCorrection(wireID, temp);
 

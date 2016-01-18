@@ -2,10 +2,19 @@
 # -*- coding: utf-8 -*-
 
 #############################################################
-# Usage: basf2 pid_ttree_writer.py -i someMDSTFile.root
+# This steering file creates a ROOT file called PID_TTree.root
+# that contains some useful information on LL differences,
+# momenta, and MC truth for TOP and dE/dx.
 #
-# Creates PID_TTree.root with some useful information on
-# LL differences, momenta, and MC truth for TOP and dE/dx.
+# Usage: basf2 pid_ttree_writer.py -i output.root
+# --> saves PID information from ROOT file generated using
+#     example.py (must run example.py first) to ROOT file
+#
+# Input: mdst file specified by command line arguments
+#        (example above uses output.root from example.py)
+# Output: PID_TTree.root
+#
+# Example steering file - 2011 Belle II Collaboration
 #############################################################
 
 import sys
@@ -30,6 +39,8 @@ gROOT.ProcessLine('struct TreeStruct {\
                   )
 
 from ROOT import TreeStruct
+
+# define the python module to save the PID information
 
 
 class TreeWriterModule(Module):
@@ -64,7 +75,8 @@ class TreeWriterModule(Module):
         pids = Belle2.PyStoreArray('PIDLikelihoods')
         for pid in pids:
             track = pid.getRelatedFrom('Tracks')
-            mcpart = track.getRelatedFrom('MCParticles')
+            if track:
+                mcpart = track.getRelatedTo('MCParticles')
             try:
                 pdg = abs(mcpart.getPDG())
                 if pdg != 211 and pdg != 321:
@@ -83,8 +95,8 @@ class TreeWriterModule(Module):
 
                 # particle to compare with pions
                 selectedpart = Belle2.Const.kaon
-                pid_dedx = Belle2.Const.DetectorSet(Belle2.Const.CDC)
-                pid_top = Belle2.Const.DetectorSet(Belle2.Const.TOP)
+                pid_dedx = Belle2.Const.PIDDetectorSet(Belle2.Const.CDC)
+                pid_top = Belle2.Const.PIDDetectorSet(Belle2.Const.TOP)
                 logl_sel = pid.getLogL(selectedpart, pid_dedx)
                 logl_pi = pid.getLogL(Belle2.Const.pion, pid_dedx)
                 dedx_DLL = logl_pi - logl_sel
@@ -118,11 +130,15 @@ class TreeWriterModule(Module):
         self.file.Write()
         self.file.Close()
 
-
+# create path
 main = create_path()
 
+# use the input file defined via command line
 main.add_module(register_module('RootInput'))
+
+# add the python module defined above
 main.add_module(TreeWriterModule())
 
+# process events and print call statistics
 process(main)
 print(statistics)

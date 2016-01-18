@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#############################################################
+# This steering file generates events and uses python to draw
+# histograms of PID information.
+#
+# Usage: basf2 plot_LL_diff.py
+#
+# Input: None
+# Output: ll_diff.png
+#
+# Example steering file - 2011 Belle II Collaboration
+#############################################################
+
 from basf2 import *
 
 from ROOT import Belle2
@@ -22,6 +34,8 @@ hist[0].SetTitle('True pions, dE/dx')
 hist[1].SetTitle('True kaons, dE/dx')
 hist[2].SetTitle('True pions, TOP')
 hist[3].SetTitle('True kaons, TOP')
+
+# define the python module to extract and plot PID information
 
 
 class MinModule(Module):
@@ -96,22 +110,28 @@ class MinModule(Module):
         print('Output plots saved in ll_diff.png')
 
 
+# create path
 main = create_path()
 
+# define number of events
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 main.add_module(eventinfosetter)
 
+# set up beam parameters
 from beamparameters import add_beamparameters
 add_beamparameters(main, "Y4S")
 main.add_module('EvtGenInput')
 
+# do full simulation and reconstruction
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-
 add_simulation(main)
 add_reconstruction(main)
 
+# draw histograms of log likelihood differences
 main.add_module(MinModule())
 
+# process events and print call statistics
 process(main)
+print(statistics)

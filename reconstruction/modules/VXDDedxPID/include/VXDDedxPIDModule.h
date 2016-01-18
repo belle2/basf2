@@ -21,8 +21,6 @@
 #include <vector>
 #include <TVector3.h>
 
-using namespace std;
-
 class TH2F;
 
 namespace Belle2 {

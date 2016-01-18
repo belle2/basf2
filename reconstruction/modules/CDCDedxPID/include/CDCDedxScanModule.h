@@ -23,8 +23,6 @@
 #include <TTree.h>
 #include <TVector3.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   class CDCDedxTrack;

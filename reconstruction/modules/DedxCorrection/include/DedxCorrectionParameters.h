@@ -11,15 +11,7 @@
 #ifndef DEDXCORRECTIONPARAMETERS_H
 #define DEDXCORRECTIONPARAMETERS_H
 
-#define NCDCLayers                56
-#define NCDCWires                 14336
-
-#define NRuns                     1
-
-#define mass_e                    0.511e-3
-#define mass_mu                   105.658e-3
-#define mass_pi                   139.570e-3
-#define mass_k                    493.677e-3
-#define mass_p                    938.272e-3
+#define c_NCDCLayers                56
+#define c_NCDCWires                 14336
 
 #endif

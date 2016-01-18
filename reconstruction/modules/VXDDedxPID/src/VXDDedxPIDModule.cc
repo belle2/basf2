@@ -135,8 +135,8 @@ void VXDDedxPIDModule::initialize()
     tracks.registerRelationTo(dedxLikelihoods);
 
     //load pdfs
-    TFile* pdf_file = new TFile(m_pdfFile.c_str(), "READ");
-    if (!pdf_file->IsOpen())
+    TFile* pdfFile = new TFile(m_pdfFile.c_str(), "READ");
+    if (!pdfFile->IsOpen())
       B2FATAL("Couldn't open pdf file: " << m_pdfFile);
 
     //load dedx:momentum PDFs
@@ -147,18 +147,18 @@ void VXDDedxPIDModule::initialize()
       nBinsX = nBinsY = -1;
       xMin = xMax = yMin = yMax = 0.0;
       for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-        const int pdg_code = Const::chargedStableSet.at(iPart).getPDGCode();
+        const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
         m_pdfs[detector][iPart] =
-          dynamic_cast<TH2F*>(pdf_file->Get(TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix)));
+          dynamic_cast<TH2F*>(pdfFile->Get(TString::Format("hist_d%i_%i%s", detector, pdgCode, suffix)));
 
         if (!m_pdfs[detector][iPart]) {
           if (m_ignoreMissingParticles)
             continue;
-          B2FATAL("Couldn't find PDF for PDG " << pdg_code << ", detector " << detector << suffix);
+          B2FATAL("Couldn't find PDF for PDG " << pdgCode << ", detector " << detector << suffix);
         }
 
         //check that PDFs have the same dimensions and same binning
-        const double eps_factor = 1e-5;
+        const double epsFactor = 1e-5;
         if (nBinsX == -1 and nBinsY == -1) {
           nBinsX = m_pdfs[detector][iPart]->GetNbinsX();
           nBinsY = m_pdfs[detector][iPart]->GetNbinsY();
@@ -168,16 +168,16 @@ void VXDDedxPIDModule::initialize()
           yMax = m_pdfs[detector][iPart]->GetYaxis()->GetXmax();
         } else if (nBinsX != m_pdfs[detector][iPart]->GetNbinsX()
                    or nBinsY != m_pdfs[detector][iPart]->GetNbinsY()
-                   or fabs(xMin - m_pdfs[detector][iPart]->GetXaxis()->GetXmin()) > eps_factor * xMax
-                   or fabs(xMax - m_pdfs[detector][iPart]->GetXaxis()->GetXmax()) > eps_factor * xMax
-                   or fabs(yMin - m_pdfs[detector][iPart]->GetYaxis()->GetXmin()) > eps_factor * yMax
-                   or fabs(yMax - m_pdfs[detector][iPart]->GetYaxis()->GetXmax()) > eps_factor * yMax) {
-          B2FATAL("PDF for PDG " << pdg_code << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.")
+                   or fabs(xMin - m_pdfs[detector][iPart]->GetXaxis()->GetXmin()) > epsFactor * xMax
+                   or fabs(xMax - m_pdfs[detector][iPart]->GetXaxis()->GetXmax()) > epsFactor * xMax
+                   or fabs(yMin - m_pdfs[detector][iPart]->GetYaxis()->GetXmin()) > epsFactor * yMax
+                   or fabs(yMax - m_pdfs[detector][iPart]->GetYaxis()->GetXmax()) > epsFactor * yMax) {
+          B2FATAL("PDF for PDG " << pdgCode << ", detector " << detector << suffix << " has binning/dimensions differing from previous PDF.")
         }
       }
     }
 
-    //leaking pdf_file so I can access the histograms
+    //leaking pdfFile so I can access the histograms
   }
 
   // create instances here to not confuse profiling
@@ -201,7 +201,7 @@ void VXDDedxPIDModule::event()
   // inputs
   StoreArray<Track> tracks;
   StoreArray<MCParticle> mcparticles;
-  const int num_mcparticles = mcparticles.getEntries();
+  const int numMCParticles = mcparticles.getEntries();
 
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
@@ -233,7 +233,7 @@ void VXDDedxPIDModule::event()
       continue;
     }
 
-    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and num_mcparticles != 0) {
+    if ((m_enableDebugOutput or m_onlyPrimaryParticles) and numMCParticles != 0) {
       // find MCParticle corresponding to this track
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
@@ -247,8 +247,8 @@ void VXDDedxPIDModule::event()
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
 
-        const TVector3 true_momentum = mcpart->getMomentum();
-        dedxTrack->m_p_true = true_momentum.Mag();
+        const TVector3 trueMomentum = mcpart->getMomentum();
+        dedxTrack->m_p_true = trueMomentum.Mag();
       }
     }
 
@@ -349,7 +349,7 @@ void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;
-  double sum_of_squares = 0.0;
+  double sumOfSquares = 0.0;
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
 
@@ -360,7 +360,7 @@ void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
       truncatedMeanTmp += sortedDedx[i];
-      sum_of_squares += sortedDedx[i] * sortedDedx[i];
+      sumOfSquares += sortedDedx[i] * sortedDedx[i];
       numValuesTrunc++;
     }
   }
@@ -378,7 +378,7 @@ void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+    *truncatedMeanErr = sqrt(sumOfSquares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
                           numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;
@@ -391,12 +391,12 @@ double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHe
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
-  const TVector3& global_pos = sensor.pointToGlobal(local_pos);
-  const TVector3& local_momentum = helix->momentum(helix->pathLengthToPoint(global_pos));
+  const TVector3 localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+  const TVector3& globalPos = sensor.pointToGlobal(localPos);
+  const TVector3& localMomentum = helix->momentum(helix->pathLengthToPoint(globalPos));
 
-  const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
+  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
 
   //I'm assuming there's only one hit per sensor, there are _very_ rare exceptions to that (most likely curlers)
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
@@ -418,36 +418,36 @@ double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHe
     a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
     b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
   }
-  const double path_length = helix->pathLengthToLine(a, b);
-  const TVector3& local_momentum = helix->momentum(path_length);
+  const double pathLength = helix->pathLengthToLine(a, b);
+  const TVector3& localMomentum = helix->momentum(pathLength);
 
-  const TVector3& sensor_normal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
-  const double angle = sensor_normal.Angle(local_momentum); //includes theta and phi components
+  const TVector3& sensorNormal = sensor.vectorToGlobal(TVector3(0.0, 0.0, 1.0));
+  const double angle = sensorNormal.Angle(localMomentum); //includes theta and phi components
 
   return TMath::Min(sensor.getWidth(), sensor.getThickness() / fabs(cos(angle)));
 }
 
 
 template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const HelixHelper& helix,
-                                                            const StoreArray<HitClass>& hits, const std::vector<int>& hit_indices) const
+                                                            const StoreArray<HitClass>& hits, const std::vector<int>& hitIndices) const
 {
-  const int num_hits = hit_indices.size();
-  if (num_hits == 0)
+  const int numHits = hitIndices.size();
+  if (numHits == 0)
     return;
 
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //figure out which detector to assign hits to
-  const int current_detector = geo.get(hits[hit_indices.at(0)]->getSensorID()).getType();
-  assert(current_detector == VXD::SensorInfoBase::PXD or current_detector == VXD::SensorInfoBase::SVD);
-  assert(current_detector <= 1); //used as array index
+  const int currentDetector = geo.get(hits[hitIndices.at(0)]->getSensorID()).getType();
+  assert(currentDetector == VXD::SensorInfoBase::PXD or currentDetector == VXD::SensorInfoBase::SVD);
+  assert(currentDetector <= 1); //used as array index
 
-  std::vector<double> silicon_dedx; //used for averages
-  silicon_dedx.reserve(num_hits);
+  std::vector<double> siliconDedx; //used for averages
+  siliconDedx.reserve(numHits);
 
   VxdID prevSensor;
-  for (int i = 0; i < num_hits; i++) {
-    const HitClass* hit = hits[hit_indices.at(i)];
+  for (int i = 0; i < numHits; i++) {
+    const HitClass* hit = hits[hitIndices.at(i)];
     if (!hit) {
       B2ERROR(hits.getName() << " index out of bounds!");
       continue;
@@ -461,33 +461,33 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 
     //active medium traversed, in cm (can traverse one sensor at most)
     //assumption: Si detectors are close enough to the origin that helix is still accurate
-    const double total_distance = getTraversedLength(hit, &helix);
+    const double totalDistance = getTraversedLength(hit, &helix);
     const float charge = hit->getCharge();
-    const float dedx = charge / total_distance;
+    const float dedx = charge / totalDistance;
     if (dedx <= 0) {
       B2WARNING("dE/dx is " << dedx << " in layer " << layer);
     } else if (i == 0 or prevSensor != currentSensor) { //only save once per sensor (u and v hits share charge!)
       prevSensor = currentSensor;
       //store data
-      silicon_dedx.push_back(dedx);
-      track->m_dedx_avg[current_detector] += dedx;
-      track->addDedx(layer, total_distance, dedx);
+      siliconDedx.push_back(dedx);
+      track->m_dedx_avg[currentDetector] += dedx;
+      track->addDedx(layer, totalDistance, dedx);
       if (!m_pdfFile.empty() and m_useIndividualHits) {
-        saveLogLikelihood(track->m_vxdLogl, track->m_p, dedx, m_pdfs[current_detector]);
+        saveLogLikelihood(track->m_vxdLogl, track->m_p, dedx, m_pdfs[currentDetector]);
       }
     }
 
     if (m_enableDebugOutput) {
-      track->addHit(currentSensor, layer, charge, total_distance, dedx);
+      track->addHit(currentSensor, layer, charge, totalDistance, dedx);
     }
   }
 
   //save averages averages
   if (!m_useIndividualHits or m_enableDebugOutput) {
-    calculateMeans(&(track->m_dedx_avg[current_detector]),
-                   &(track->m_dedx_avg_truncated[current_detector]),
-                   &(track->m_dedx_avg_truncated_err[current_detector]),
-                   silicon_dedx);
+    calculateMeans(&(track->m_dedx_avg[currentDetector]),
+                   &(track->m_dedx_avg_truncated[currentDetector]),
+                   &(track->m_dedx_avg_truncated_err[currentDetector]),
+                   siliconDedx);
   }
 }
 
@@ -496,8 +496,8 @@ void VXDDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_S
                                          TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
-  const Int_t bin_x = pdf[0]->GetXaxis()->FindFixBin(p);
-  const Int_t bin_y = pdf[0]->GetYaxis()->FindFixBin(dedx);
+  const Int_t binX = pdf[0]->GetXaxis()->FindFixBin(p);
+  const Int_t binY = pdf[0]->GetYaxis()->FindFixBin(dedx);
 
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
@@ -506,9 +506,9 @@ void VXDDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_S
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (bin_x < 1 or bin_x > pdf[iPart]->GetNbinsX()
-        or bin_y < 1 or bin_y > pdf[iPart]->GetNbinsY()) {
-      probability = pdf[iPart]->GetBinContent(bin_x, bin_y);
+    if (binX < 1 or binX > pdf[iPart]->GetNbinsX()
+        or binY < 1 or binY > pdf[iPart]->GetNbinsY()) {
+      probability = pdf[iPart]->GetBinContent(binX, binY);
     } else {
       //in normal histogram range
       probability = pdf[iPart]->Interpolate(p, dedx);

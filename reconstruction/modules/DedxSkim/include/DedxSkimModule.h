@@ -23,8 +23,6 @@
 #include <utility>
 #include <TVector3.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /** This module may be used to skim a data sample according to a
@@ -65,14 +63,14 @@ namespace Belle2 {
 
     /** Event type: (0) bhabha, (1) radiative bhabha, (2) two photon (e+e-),
      * (3) di-muon, (4) radiative di-muon, (5) D-decays (D*->D0 pi; D0 -> K pi) */
-    vector<int> m_eventType;
+    std::vector<int> m_eventType;
 
     /** number of unmatched clusters per event */
     int m_unmatchedCluster;
     /** range for E/p per track */
-    vector<double> m_EoverP;
+    std::vector<double> m_EoverP;
     /** range for Ecc/Ecm */
-    vector<double> m_EccOverEcm;
+    std::vector<double> m_EccOverEcm;
 
   };
 }

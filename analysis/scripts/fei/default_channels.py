@@ -4,7 +4,7 @@
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, UserCutConfiguration
 
 
-def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True):
+def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True, convertedFromBelle=Flase):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -49,15 +49,30 @@ def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semile
     particles = []
 
 # ################## Charged FSP ###############################
-    mva_chargedFSP = MVAConfiguration(
-        variables=['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
-                   'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
-                   'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
-                   'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
-                   'p', 'pt', 'pz',
-                   'dr', 'dz', 'chiProb'],
-        target='isPrimarySignal',
-    )
+    if convertedFromBelle:
+        # Using Belle specific Variables for e-ID, mu-ID and K-ID
+        # atcPIDBelle(3,2) is used as K-ID
+        # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
+        # TODO Check how the respective *_dEdx, *_TOP, *_ARICH and *_ECL should be treated
+        mva_chargedFSP = MVAConfiguration(
+            variables=['eIDBelle', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
+                       'atcPIDBelle(3,2)', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
+                       'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
+                       'muIDBelle', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+                       'p', 'pt', 'pz',
+                       'dr', 'dz', 'chiProb'],
+            target='isPrimarySignal',
+        )
+    else:
+        mva_chargedFSP = MVAConfiguration(
+            variables=['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
+                       'Kid', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
+                       'prid', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
+                       'muid', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+                       'p', 'pt', 'pz',
+                       'dr', 'dz', 'chiProb'],
+            target='isPrimarySignal',
+        )
 
     pre_chargedFSP = PreCutConfiguration(
         variable='dr',

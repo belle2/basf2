@@ -15,6 +15,7 @@ except ImportError:
     import xml.etree.ElementTree as XMLTree
 
 from validationfunctions import find_creator
+import json_objects
 
 
 class ScriptStatus:
@@ -84,6 +85,8 @@ class Script:
         # steering file, but everything that is not a letter is replaced
         # by an underscore. Useful e.g. for cluster controls.
         self.name = Script.sanitize_file_name(str(os.path.basename(self.path)))
+        # useful when displaying the filename to the user
+        self.name_not_sanitized = str(os.path.basename(self.path))
 
         # The package to which the steering file belongs
         self.package = package
@@ -121,6 +124,25 @@ class Script:
         """
         print()
         pp.pprint(vars(self))
+
+    def to_json(self, current_tag):
+
+        string_status = ""
+
+        if self.status == ScriptStatus.failed:
+            string_status = "failed"
+        elif self.status == ScriptStatus.finished:
+            string_status = "finished"
+        elif self.status == ScriptStatus.running:
+            string_status = "running"
+        elif self.status == ScriptStatus.skipped:
+            string_status = "skipped"
+        elif self.status == ScriptStatus.waiting:
+            string_status = "waiting"
+
+        return json_objects.Script(self.name_not_sanitized, self.path, string_status,
+                                   log_url=os.path.join(current_tag, self.package, self.name_not_sanitized) + ".log",
+                                   return_code=self.returncode)
 
     def get_recursive_dependencies(self, list_of_scripts, level=0):
         """!

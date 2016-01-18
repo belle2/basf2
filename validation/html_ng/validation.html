@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang='en-GB'>
+<head>
+<meta charset='utf-8'>
+    <title>Belle II Validation</title>
+<link
+	href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700'
+	rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+</head>
+
+<body>
+	<!--
+       1. This is the element we'll render our Ractive to.
+  -->
+	<div id='wrap'>
+
+		<div id='navigation'>
+			<div id='menu'>
+				<div class='revisions menuhead'>
+					<img src="images/list.png" alt="Revisions">&nbsp; Revisions
+				</div>
+				<div id='revisions' class='submenu'
+					style='display: block; position: relative;'></div>
+
+				<div class='packages menuhead'>
+					<img src="images/cubes.png" alt="Packages">&nbsp; Packages
+				</div>
+				<div id='packages' class='packages_submenu'></div>
+				<!-- 
+				<label> <input name="packages" value="tracking" checked=""
+					type="checkbox">&nbsp;<a href="#tracking"
+					class="pkg_container_head" name="tracking">tracking »</a><br>
+				</label>
+			</div-->
+
+
+			</div>
+
+		</div>
+		<div id='content'></div>
+	</div>
+
+	<!--
+       3. You can always get the most recent stable version from the URL below.
+       If you want the newest features (unstable!), use the 'edge' version instead:
+
+           http://cdn.ractivejs.org/edge/ractive.min.js
+
+       If you need IE8 support, change 'ractive' to 'ractive-legacy'.
+  -->
+	<script src='js/ractive.min.js'></script>
+    <script src='js/ractive-transitions-fade.js'></script>
+	<!--
+       4. We've got an element in the DOM, we've created a template, and we've
+       loaded the library - now it's time to build our Hello World app.
+  -->
+	<!-- Load JavaScript last to speed up site creation -->
+	<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="js/jquery.sticky.js" type="text/javascript"></script>
+
+    <script src="js/jquery.magnific-popup.min.js"></script>
+
+	<!-- own code -->
+	<!-- todo: move all js libraries into dedicated folder -->
+    <script src="js/create-plots-waiting.js" type="text/javascript"></script>
+    <script src="js/ractive-support.js" type="text/javascript"></script>
+    <script src="js/validation-loading.js" type="text/javascript"></script>
+
+	<!-- script src="js/toggle-menus.js" type="text/javascript"></script>
+	<script src="js/make-plots.js" type="text/javascript"></script>
+	<script src="js/read-logs.js" type="text/javascript"></script>
+	<script src="js/apply-filters.js" type="text/javascript"></script>
+	<script src="js/window-resize.js" type="text/javascript"></script>
+	<script src="js/ping-server.js" type="text/javascript"></script>
+	<script src="js/floating-headers.js" type="text/javascript"></script>
+	<script src="js/url-parameters.js" type="text/javascript"></script-->
+
+
+	<script type="text/javascript">
+
+$( document ).ready(function() {
+    console.log("Document loaded, starting RestAPI calls");
+	loadRevisions();
+});
+	</script>
+</body>
+</html>

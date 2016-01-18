@@ -1,0 +1,143 @@
+<div id="topmost_viewselection">
+ 
+  <input id="check_show_overview" type="checkbox" checked='{{show_overview}}'><label for="check_show_overview">Overview</label>
+  <input id="check_show_expert_plots" type="checkbox" checked='{{show_expert_plots}}'><label for="check_show_expert_plots">Expert Plots</label>
+</div>
+
+      <div id="outer">
+	<div id="table-container">
+          <div id="table-cell">
+	    <img src="images/refresh.png" alt="Loading...">
+               <h1>Images are being created!</h1>
+               <h2 id="plot_creation_progress"></h2>
+               <h2 id="plot_creation_package"></h2>
+          </div>
+	</div>
+      </div>
+
+{{#packages}}
+<div intro="fade">
+    <!-- this is the overview -->
+	<h1>Package: {{ name }}</h1>
+
+	<h2>Script Files</h2>
+    {{>scriptfiles_accordion}}
+	<br>
+	{{#plotfiles}}
+    <a name="{{package}}-{{rootfile}}"></a>
+    <h2>{{rootfile}}</h2>
+
+    {{#ntuples}}
+    <div>NTuple: {{title}}</div>
+    <table id={{title}}></table>
+    <script type="text/javascript">
+        fill_ntuple_table("{{title}}","{{json_file_path}}");
+    </script>
+    {{>ntuple_description}}
+    {{/ntuples}}
+
+    {{#if !show_overview}}
+    {{>plot_full_view}}
+    {{else}}
+    {{>plot_matrix}}
+    {{/if}}
+	{{/plotfiles}}
+</div>
+{{/packages}}
+
+{{#partial scriptfiles_accordion}}
+<div id="accordion_script_files">
+  <h3>Failed Scripts</h3>
+  <div>
+	{{#scriptfiles}}
+    {{#if status == "failed" }}
+    <div class="failed_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>
+    {{/if}}
+	{{/scriptfiles}}
+  </div>
+  <h3>Finished Scripts</h3>
+  <div>
+	{{#scriptfiles}}
+    {{#if status == "finished" }}
+    <div class="finished_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>
+    {{/if}}
+	{{/scriptfiles}}
+  </div>
+  <h3>Skipped Scripts</h3>
+  <div>
+	{{#scriptfiles}}
+    {{#if status == "skipped" }}
+    <div class="skipped_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>
+    {{/if}}
+	{{/scriptfiles}}
+  </div>
+</div>
+{{/partial}}
+
+{{#partial plot_matrix}}
+    <section intro="fade" class="persistent-area">
+	<div class="plot_matrix">
+	{{#plots}}
+	{{#if !is_expert || show_expert_plots }}
+        <div class="plot_matrix_item">
+        <a class="open-popup-link" href="#popup-{{unique_id}}">
+        <img class="plot_matrix_image" height="150px" src="../{{ plot_path }}{{ png_filename }}">
+        </a>
+        </div>
+        {{! hidden segment which is only shown (as a popup) if the user clicks on the element}}
+        <div id="popup-{{unique_id}}" class="white-popup mfp-hide">
+            <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
+            <img class="plot_matrix_image" src="../{{ plot_path }}{{ png_filename }}">
+            </a>
+            {{>plot_description}}
+        </div>
+	{{/if}}
+	{{/plots}}
+    </div>
+    </section>
+{{/partial}}
+
+
+{{#partial plot_full_view}}
+    <section intro="fade" class="persistent-area">
+	{{#plots}}
+	{{#if !is_expert || show_expert_plots }}
+    <!-- put in extra div -->
+    <div>
+    <h2 class="persistent-header">{{ title }}</h2>
+	<div class="object">
+    <!-- todo: ../ should be removed for final deployment -->
+        <a target="_blank" href="../{{ plot_path }}{{ pdf_filename }}">
+    <img src="../{{ plot_path }}{{ png_filename }}">
+        </a>
+    </div>
+    {{>plot_description}}
+    </div>
+	{{/if}}
+	{{/plots}}
+    <!-- This section does not contain any plots. -->
+	<div>end of package</div>
+    </section>
+{{/partial}}
+
+{{#partial plot_description}}
+    <div class="wrap_boxes_descriptions">
+        <p><strong>Package: </strong>{{ package }}</p>
+        <p><strong>Description: </strong>{{ description }}</p>
+        <p><strong>ROOT file: </strong>{{ rootfile }}.root</p>
+        <p><strong>Chi^2 Test: </strong>{{ comparison_text }}</p>
+        <p><strong>Contact: </strong>{{ contact }}</p>
+        <p><strong>Check for: </strong>{{ check }}</p>
+        <!-- todo: share this plot -->
+    </div>
+{{/partial}}
+
+{{#partial ntuple_description}}
+    <div class="wrap_boxes_descriptions">
+        <p><strong>Package: </strong>{{ package }}</p>
+        <p><strong>Description: </strong>{{ description }}</p>
+        <p><strong>Contact: </strong>{{ contact }}</p>
+        <p><strong>Check for: </strong>{{ check }}</p>
+        <!-- todo: share this plot -->
+    </div>
+{{/partial}}

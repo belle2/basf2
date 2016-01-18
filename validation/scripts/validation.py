@@ -13,9 +13,12 @@ import timeit
 import sys
 import time
 import shutil
+import datetime
 
 # Import the controls for local multiprocessing
 import localcontrol
+
+import json_objects
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -29,10 +32,11 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
-    find_creator, parse_cmd_line_arguments, draw_progress_bar
+    find_creator, parse_cmd_line_arguments
 
 import validationserver
 import validationplots
+import validationscript
 
 
 def statistics_plots(
@@ -251,6 +255,64 @@ def event_timing_plot(
     if plotFile:
         plotFile.Close()
     save_dir.cd()
+
+
+def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
+    """
+    This function plots a progress bar of the validation, i.e. it shows which
+    percentage of the scripts has been executed yet.
+    It furthermore also shows which scripts are currently running, as well as
+    the total runtime of the validation.
+
+    @param delete_lines: The amount of lines which need to be deleted before
+        we can redraw the progress bar
+    @param barlength: The length of the progess bar (in characters)
+    @return: The number of lines that were printed by this function call.
+        Usefule if this function is called repeatedly.
+    """
+
+    # Get statistics: Number of finished scripts + number of scripts in total
+    finished_scripts = len([_ for _ in list_of_scripts if
+                            _.status in [validationscript.ScriptStatus.finished,
+                                         validationscript.ScriptStatus.failed,
+                                         validationscript.ScriptStatus.skipped]])
+    all_scripts = len(list_of_scripts)
+    percent = 100.0 * finished_scripts / all_scripts
+
+    # Get the runtime of the script
+    runtime = int(timeit.default_timer() - get_start_time())
+
+    # Move the cursor up and clear lines
+    for i in range(delete_lines):
+        print("\x1b[2K \x1b[1A", end=' ')
+
+    # Print the progress bar:
+    progressbar = ""
+    for i in range(barlength):
+        if i < int(barlength * percent / 100.0):
+            progressbar += '='
+        else:
+            progressbar += ' '
+    print('\x1b[0G[{0}] {1:6.1f}% ({2}/{3})'.format(progressbar, percent,
+                                                    finished_scripts,
+                                                    all_scripts))
+
+    # Print the total runtime:
+    print('Runtime: {0}s'.format(runtime))
+
+    # Print the list of currently running scripts:
+    running = [os.path.basename(__.path) for __ in list_of_scripts
+               if __.status == validationscript.ScriptStatus.running]
+
+    # If nothing is repeatedly running
+    if not running:
+        running = ['-']
+
+    print('Running: {0}'.format(running[0]))
+    for __ in running[1:]:
+        print('{0} {1}'.format(len('Running:') * " ", __))
+
+    return len(running) + 2
 
 
 ###############################################################################
@@ -627,6 +689,22 @@ class Validation:
                                  .format(script_obj.name))
                 script_obj.status = ScriptStatus.skipped
 
+    def store_run_results_json(self):
+
+        json_package = []
+        for p in self.list_of_packages:
+            this_package_scrits = [s for s in self.list_of_scripts if s.package == p]
+            json_scripts = [s.to_json(self.tag) for s in this_package_scrits]
+
+            # count the failed scripts
+            fail_count = sum([s.status == ScriptStatus.failed for s in this_package_scrits])
+            json_package.append(json_objects.Package(p, scriptfiles=json_scripts, fail_count=fail_count))
+
+        # todo: assign correct color here
+        rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
+        results_file = "./results/{}/revision.json".format(self.tag)
+        json_objects.dump(results_file, rev)
+
     def run_validation(self):
         """!
         This method runs the actual validation, i.e. it loops over all
@@ -795,6 +873,9 @@ class Validation:
         if not self.mode == "cluster":
             runtimes.close()
         print()
+
+        self.store_run_results_json()
+        # todo: update list of available revisions with the current run
 
     def create_plots(self):
         """!

@@ -9,12 +9,30 @@ g_start_time = timeit.default_timer()
 import os
 import glob
 import argparse
-
-import validationscript
+import ROOT
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
+
+
+def available_revisions():
+    """
+    Loops over the results folder and looks for revisions. It then returns an
+    ordered list, with the most recent revision being the first element in the
+    list and the oldest revision being the last element.
+    The 'age' of a revision is determined by the 'Last-modified'-timestamp of
+    the corresponding folder.
+    :return: A list of all revisions available for plotting
+    """
+
+    # Get all folders in ./results/ sorted descending by the date they were
+    # created (i.e. newest folder first)
+    revisions = sorted(os.listdir('./results'),
+                       key=lambda _: os.path.getmtime('./results/' + _),
+                       reverse=True)
+    # Return it
+    return revisions
 
 
 def get_start_time():
@@ -217,59 +235,79 @@ def scripts_in_dir(dirpath, log, ext='*'):
     return sorted(results)
 
 
-def draw_progress_bar(delete_lines, list_of_scripts, barlength=50):
+def strip_ext(path):
     """
-    This function plots a progress bar of the validation, i.e. it shows which
-    percentage of the scripts has been executed yet.
-    It furthermore also shows which scripts are currently running, as well as
-    the total runtime of the validation.
+    Takes a path and returns only the name of the file, without the
+    extension on the file name
+    """
+    return os.path.splitext(os.path.split(path)[1])[0]
 
-    @param delete_lines: The amount of lines which need to be deleted before
-        we can redraw the progress bar
-    @param barlength: The length of the progess bar (in characters)
-    @return: The number of lines that were printed by this function call.
-        Usefule if this function is called repeatedly.
+
+def get_style(index, overallItemCount=1):
+    """
+    Takes an index and returns the corresponding line attributes,
+    i.e. LineColor, LineWidth and LineStyle.
     """
 
-    # Get statistics: Number of finished scripts + number of scripts in total
-    finished_scripts = len([_ for _ in list_of_scripts if
-                            _.status in [validationscript.ScriptStatus.finished,
-                                         validationscript.ScriptStatus.failed,
-                                         validationscript.ScriptStatus.skipped]])
-    all_scripts = len(list_of_scripts)
-    percent = 100.0 * finished_scripts / all_scripts
+    # Define the colors for the plot
+    colors = [ROOT.kRed,
+              ROOT.kOrange,
+              ROOT.kPink + 9,
+              ROOT.kOrange - 8,
+              ROOT.kGreen + 2,
+              ROOT.kCyan + 2,
+              ROOT.kBlue + 1,
+              ROOT.kRed + 2,
+              ROOT.kOrange + 3,
+              ROOT.kYellow + 2,
+              ROOT.kSpring]
 
-    # Get the runtime of the script
-    runtime = int(timeit.default_timer() - get_start_time())
+    # Define the linestyles for the plot
+    linestyles = {'dashed': 2,    # Dashed: - - - - -
+                  'solid': 1,    # Solid: ----------
+                  'dashdot': 10}    # Dash-dot: -?-?-?-
+    ls_index = {0: 'dashed', 1: 'solid', 2: 'dashdot'}
 
-    # Move the cursor up and clear lines
-    for i in range(delete_lines):
-        print("\x1b[2K \x1b[1A", end=' ')
+    # Define the linewidth for the plots
+    linewidth = 2
 
-    # Print the progress bar:
-    progressbar = ""
-    for i in range(barlength):
-        if i < int(barlength * percent / 100.0):
-            progressbar += '='
-        else:
-            progressbar += ' '
-    print('\x1b[0G[{0}] {1:6.1f}% ({2}/{3})'.format(progressbar, percent,
-                                                    finished_scripts,
-                                                    all_scripts))
+    # make sure the index is set
+    if not index:
+        index = 0
 
-    # Print the total runtime:
-    print('Runtime: {0}s'.format(runtime))
+    # Get the color for the (index)th revisions
+    color = colors[index % len(colors)]
 
-    # Print the list of currently running scripts:
-    running = [os.path.basename(__.path) for __ in list_of_scripts
-               if __.status == validationscript.ScriptStatus.running]
+    # Figure out the linestyle
+    # If there is only one revision, make it solid!
+    # It cannot overlap with any other line
+    if overallItemCount == 1:
+        linestyle = linestyles['solid']
+    # Otherwise make sure the newest revision (which is drawn on top) gets a
+    # dashed linestyle
+    else:
+        linestyle = linestyles[ls_index[index % len(ls_index)]]
 
-    # If nothing is repeatedly running
-    if not running:
-        running = ['-']
+    return ROOT.TAttLine(color, linestyle, linewidth)
 
-    print('Running: {0}'.format(running[0]))
-    for __ in running[1:]:
-        print('{0} {1}'.format(len('Running:') * " ", __))
 
-    return len(running) + 2
+def index_from_revision(revision):
+    """
+    Takes the name of a revision and returns the corresponding index. Indices
+    are used to ensure that the color and style of a revision in a plot are
+    always the same, regardless of the displayed revisions.
+    Example: release-X is always red, and no other release get drawn in red if
+    release-X is not selected for display.
+    :param revision: A string containing the name of a revision
+    :return: The index of the requested revision, or None, if no index could
+        be found for 'revision'
+    """
+
+    # If the requested revision exists, return its index
+    if revision in available_revisions():
+        index = available_revisions().index(revision)
+    # Else return a None object
+    else:
+        index = None
+
+    return index

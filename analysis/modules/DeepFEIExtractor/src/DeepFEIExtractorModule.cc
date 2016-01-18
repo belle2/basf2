@@ -33,6 +33,8 @@
 #include <framework/gearbox/Const.h>
 
 
+#include <cstdint>
+
 namespace Belle2 {
 
 
@@ -59,6 +61,12 @@ namespace Belle2 {
     m_file.close();
   }
 
+  template<class T>
+  void binaryWrite(std::ofstream& stream, T x)
+  {
+    stream.write(reinterpret_cast<char*>(&x), sizeof(T));
+  }
+
   void DeepFEIExtractorModule::event()
   {
     StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -75,32 +83,34 @@ namespace Belle2 {
         TLorentzVector momentum = PCmsLabTransform::labToCms(particle->get4Vector());
         TVector3 position = particle->getVertex();
 
-        m_file << static_cast<float>(position.X());
-        m_file << static_cast<float>(position.Y());
-        m_file << static_cast<float>(position.Z());
+        binaryWrite<float>(m_file, position.X());
+        binaryWrite<float>(m_file, position.Y());
+        binaryWrite<float>(m_file, position.Z());
 
-        m_file << static_cast<float>(momentum.Px());
-        m_file << static_cast<float>(momentum.Py());
-        m_file << static_cast<float>(momentum.Pz());
+        binaryWrite<float>(m_file, momentum.Px());
+        binaryWrite<float>(m_file, momentum.Py());
+        binaryWrite<float>(m_file, momentum.Pz());
 
-        m_file << static_cast<float>(particle->getPValue());
-        m_file << static_cast<int>(Variable::particleMCErrors(particle));
-        m_file << static_cast<int>(Variable::isSignalAcceptMissingNeutrino(particle));
+        binaryWrite<float>(m_file, particle->getPValue());
+        binaryWrite<int32_t>(m_file, Variable::particleMCErrors(particle));
+        binaryWrite<int32_t>(m_file, Variable::isSignalAcceptMissingNeutrino(particle));
+
+        binaryWrite<int32_t>(m_file, roe->getNTracks());
+        binaryWrite<int32_t>(m_file, roe->getNECLClusters());
+        binaryWrite<int32_t>(m_file, roe->getNKLMClusters());
 
       }
-
-      m_file << static_cast<int>(roe->getNTracks());
 
       for (const auto& track : roe->getTracks()) {
         if (track == nullptr) {
           B2WARNING("Encountered nullptr as track in ROE.");
-          m_file << static_cast<int>(0);
+          binaryWrite<int32_t>(m_file, 0);
           continue;
         }
         PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
         if (pid == nullptr) {
           B2WARNING("Encountered nullptr as pid in ROE.");
-          m_file << static_cast<int>(0);
+          binaryWrite<int32_t>(m_file, 0);
           continue;
         }
 
@@ -108,78 +118,73 @@ namespace Belle2 {
         const TrackFitResult* trackFitResult = track->getTrackFitResult(mostLikely);
         if (trackFitResult == nullptr) {
           B2WARNING("Encountered nullptr as trackFitResult in ROE.");
-          m_file << static_cast<int>(0);
+          binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        m_file << static_cast<int>(1);
+        binaryWrite<int32_t>(m_file, 1);
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(trackFitResult->get4Momentum());
         TVector3 position = trackFitResult->getPosition();
 
-        m_file << static_cast<float>(position.X());
-        m_file << static_cast<float>(position.Y());
-        m_file << static_cast<float>(position.Z());
+        binaryWrite<float>(m_file, position.X());
+        binaryWrite<float>(m_file, position.Y());
+        binaryWrite<float>(m_file, position.Z());
 
-        m_file << static_cast<float>(momentum.Px());
-        m_file << static_cast<float>(momentum.Py());
-        m_file << static_cast<float>(momentum.Pz());
+        binaryWrite<float>(m_file, momentum.Px());
+        binaryWrite<float>(m_file, momentum.Py());
+        binaryWrite<float>(m_file, momentum.Pz());
 
-        m_file << static_cast<float>(pid->getProbability(Const::electron, Const::pion));
-        m_file << static_cast<float>(pid->getProbability(Const::muon, Const::pion));
-        m_file << static_cast<float>(pid->getProbability(Const::kaon, Const::pion));
-        m_file << static_cast<float>(pid->getProbability(Const::proton, Const::pion));
+        binaryWrite<float>(m_file, pid->getProbability(Const::electron, Const::pion));
+        binaryWrite<float>(m_file, pid->getProbability(Const::muon, Const::pion));
+        binaryWrite<float>(m_file, pid->getProbability(Const::kaon, Const::pion));
+        binaryWrite<float>(m_file, pid->getProbability(Const::proton, Const::pion));
 
       }
-
-      m_file << static_cast<int>(roe->getNECLClusters());
 
       for (const auto& ecl_cluster : roe->getECLClusters()) {
         if (ecl_cluster == nullptr) {
           B2WARNING("Encountered nullptr as ecl_cluster in ROE.");
-          m_file << static_cast<int>(0);
+          binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        m_file << static_cast<int>(1);
+        binaryWrite<int32_t>(m_file, 1);
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(ecl_cluster->get4Vector());
         TVector3 position = ecl_cluster->getclusterPosition();
-        m_file << static_cast<float>(position.X());
-        m_file << static_cast<float>(position.Y());
-        m_file << static_cast<float>(position.Z());
+        binaryWrite<float>(m_file, position.X());
+        binaryWrite<float>(m_file, position.Y());
+        binaryWrite<float>(m_file, position.Z());
 
-        m_file << static_cast<float>(momentum.E());
-        m_file << static_cast<float>(ecl_cluster->getTiming());
-        m_file << static_cast<float>(ecl_cluster->getE9oE25());
-        m_file << static_cast<float>(ecl_cluster->getLAT());
+        binaryWrite<float>(m_file, momentum.E());
+        binaryWrite<float>(m_file, ecl_cluster->getTiming());
+        binaryWrite<float>(m_file, ecl_cluster->getE9oE25());
+        binaryWrite<float>(m_file, ecl_cluster->getLAT());
 
-        m_file << static_cast<bool>(ecl_cluster->isNeutral());
+        binaryWrite<bool>(m_file, ecl_cluster->isNeutral());
 
       }
-
-      m_file << static_cast<int>(roe->getNKLMClusters());
 
       for (const auto& klm_cluster : roe->getKLMClusters()) {
         if (klm_cluster == nullptr) {
           B2WARNING("Encountered nullptr as klm_cluster in ROE.");
-          m_file << static_cast<int>(0);
+          binaryWrite<int32_t>(m_file, 0);
           continue;
         }
-        m_file << static_cast<int>(1);
+        binaryWrite<int32_t>(m_file, 1);
 
         TLorentzVector momentum = PCmsLabTransform::labToCms(klm_cluster->getMomentum());
         TVector3 position = klm_cluster->getClusterPosition();
-        m_file << static_cast<float>(position.X());
 
-        m_file << static_cast<float>(position.X());
-        m_file << static_cast<float>(position.Y());
-        m_file << static_cast<float>(position.Z());
+        binaryWrite<float>(m_file, position.X());
+        binaryWrite<float>(m_file, position.Y());
+        binaryWrite<float>(m_file, position.Z());
 
-        m_file << static_cast<float>(momentum.E());
-        m_file << static_cast<float>(klm_cluster->getTime());
-        m_file << static_cast<float>(klm_cluster->getLayers());
+        binaryWrite<float>(m_file, momentum.E());
+        binaryWrite<float>(m_file, klm_cluster->getTime());
+        binaryWrite<float>(m_file, klm_cluster->getLayers());
 
-        m_file << static_cast<bool>(klm_cluster->getAssociatedEclClusterFlag());
-        m_file << static_cast<bool>(klm_cluster->getAssociatedTrackFlag());
+        binaryWrite<bool>(m_file, klm_cluster->getAssociatedEclClusterFlag());
+        binaryWrite<bool>(m_file, klm_cluster->getAssociatedTrackFlag());
 
       }
     } else {

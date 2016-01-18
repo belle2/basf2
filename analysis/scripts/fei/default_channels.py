@@ -4,7 +4,7 @@
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, UserCutConfiguration
 
 
-def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True, convertedFromBelle=Flase):
+def get_default_channels(BlevelExtraCut='', neutralB=True, chargedB=True, semileptonicB=True, convertedFromBelle=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,

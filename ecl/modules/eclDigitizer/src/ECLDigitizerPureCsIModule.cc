@@ -123,8 +123,14 @@ void ECLDigitizerPureCsIModule::event()
       assert(j < EclConfigurationPure::m_nch);
       double hitE       = eclHit.getEnergyDep() / Unit::GeV;
       double hitTime    = eclHit.getTimeAve() / Unit::us;
-      if (m_photostatresolution > 0)
-        hitE = gRandom->Gaus(hitE, m_photostatresolution / sqrt(hitE * 1000.));
+      if (m_photostatresolution > 0) {
+        double nphotavg1MeV = 1 / (m_photostatresolution * m_photostatresolution);
+        int nphotavg = round((hitE / 0.001) * nphotavg1MeV);
+        int nphot = gRandom->Poisson(nphotavg);
+        hitE = (nphot / nphotavg1MeV) / 1000;
+
+        // hitE = gRandom->Gaus(hitE, 0.001 * m_photostatresolution * sqrt(hitE * 1000));
+      }
       m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
       if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
     }
@@ -184,11 +190,11 @@ void ECLDigitizerPureCsIModule::event()
 
     if (m_calibration || energyFit > 0) {
       int CellId = j + 1;
-      const auto eclDsp = eclDsps.appendNew();
+      auto eclDsp = eclDsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
 
-      const auto eclDigit = eclDigits.appendNew();
+      auto eclDigit = eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(int(tFit * 1000));
@@ -199,6 +205,23 @@ void ECLDigitizerPureCsIModule::event()
         eclDigit->addRelationTo(hit);
     }
   } //store each crystal hit
+
+  // temporary solution to run Pure CsI reconstruction
+  // and baseline independently and simultaneously
+  // cloning barrel and bwd digits
+
+  StoreArray<ECLDigit> baselineDigits("ECLDigits");
+  for (const auto& eclDigit : baselineDigits) {
+    int cellid = eclDigit.getCellId();
+    if (! isPureCsI(cellid)) {
+      auto eclDigitClone = eclDigits.appendNew();
+      eclDigitClone->setCellId(cellid);
+      eclDigitClone->setAmp(eclDigit.getAmp());
+      eclDigitClone->setTimeFit(eclDigit.getTimeFit());
+      eclDigitClone->setQuality(eclDigit.getQuality());
+    }
+  }
+
 
   m_nEvent++;
 }

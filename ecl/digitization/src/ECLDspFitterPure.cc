@@ -177,9 +177,15 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
   TDecompLU solver(M1);
   bool ok;
   C = solver.Solve(C, ok);
-  //if ( !ok ) cout << "Fit failed" << endl;
-  //cout << "solution -->" << endl;
-  // C.Print();
+  /*
+  if ( !ok ) {
+    cout << "Fit failed" << endl;
+    cout << "dt = " << dt << endl;
+    M1.Print();
+    cout << "solution -->" << endl;
+    C.Print();
+  }
+  */
   amp = C[0];
 
   /*
@@ -212,12 +218,12 @@ void Belle2::ECL::DSPFitterPure(const EclConfigurationPure::fitparamspure_t& f  
   //  time = -ttrig - C[1] / C[0] ;
   time = -(ttrig + deltaT);
   // cout << "time : "  << time << endl;
-
-  if (iter < 3 && abs(deltaT) < EclConfigurationPure::m_ndtPure) {
+  bool intime = abs(intTime) < EclConfigurationPure::m_ndtPure - 1;
+  if (iter < 3 && intime) {
     iter++;
     DSPFitterPure(f, FitA, intTime, amp, time, chi2, iter);
   }
 
-  if (abs(deltaT) < EclConfigurationPure::m_ndtPure && abs(deltaT) > 0.5 && iter++ < 10)
+  if (intime && abs(deltaT) > 0.5 && iter++ < 10)
     DSPFitterPure(f, FitA, intTime, amp, time, chi2, iter);
 }

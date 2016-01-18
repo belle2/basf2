@@ -39,7 +39,7 @@ def fitVertex(
     else:
         path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
-    beamparameters = add_beamparameters(analysis_main, evtType)
+    beamparameters = add_beamparameters(path, evtType)
     B2INFO('fitVertex: Evt Type: ' + evtType)
 
     pvfit = register_module('ParticleVertexFitter')
@@ -360,7 +360,7 @@ def TagV(
     list_name,
     MCassociation='',
     confidenceLevel=0.001,
-    useFitAlgorithm='standard',
+    useFitAlgorithm='standard_PXD',
     askMCInfo=False,
     path=analysis_main,
     evtType='Y4S',
@@ -383,7 +383,7 @@ def TagV(
     else:
         path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
-    beamparameters = add_beamparameters(analysis_main, evtType)
+    beamparameters = add_beamparameters(path, evtType)
     B2INFO('tagVertex: Evt Type: ' + evtType)
 
     tvfit = register_module('TagVertex')

@@ -3,8 +3,8 @@
 import struct
 import collections
 
-Header = collections.namedtuple('Header', 'x y z px py pz prob mcerrors isSignal nTracks nECLCluster nKLMCluster')
-header_format = '=7f5i'
+Header = collections.namedtuple('Header', 'x y z px py pz prob mcerrors isSignal isRoeB0 nTracks nECLCluster nKLMCluster')
+header_format = '=7f6i'
 header_size = struct.calcsize(header_format)
 header_entry = struct.Struct(header_format)
 
@@ -13,8 +13,8 @@ valid_format = '=i'
 valid_size = struct.calcsize(valid_format)
 valid_entry = struct.Struct(valid_format)
 
-Track = collections.namedtuple('Track', 'x y z px py pz eid muid kid prid')
-track_format = '=10f'
+Track = collections.namedtuple('Track', 'charge x y z px py pz prob eid muid kid prid')
+track_format = '=i11f'
 track_size = struct.calcsize(track_format)
 track_entry = struct.Struct(track_format)
 

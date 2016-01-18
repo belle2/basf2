@@ -18,6 +18,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/FlavorTaggingVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -94,6 +95,7 @@ namespace Belle2 {
         binaryWrite<float>(m_file, particle->getPValue());
         binaryWrite<int32_t>(m_file, Variable::particleMCErrors(particle));
         binaryWrite<int32_t>(m_file, Variable::isSignalAcceptMissingNeutrino(particle));
+        binaryWrite<int32_t>(m_file, Variable::isRestOfEventB0Flavor(particle));
 
         binaryWrite<int32_t>(m_file, roe->getNTracks());
         binaryWrite<int32_t>(m_file, roe->getNECLClusters());
@@ -123,6 +125,8 @@ namespace Belle2 {
         }
         binaryWrite<int32_t>(m_file, 1);
 
+        binaryWrite<int32_t>(m_file, trackFitResult->getChargeSign());
+
         TLorentzVector momentum = PCmsLabTransform::labToCms(trackFitResult->get4Momentum());
         TVector3 position = trackFitResult->getPosition();
 
@@ -133,6 +137,8 @@ namespace Belle2 {
         binaryWrite<float>(m_file, momentum.Px());
         binaryWrite<float>(m_file, momentum.Py());
         binaryWrite<float>(m_file, momentum.Pz());
+
+        binaryWrite<float>(m_file, trackFitResult->getPValue());
 
         binaryWrite<float>(m_file, pid->getProbability(Const::electron, Const::pion));
         binaryWrite<float>(m_file, pid->getProbability(Const::muon, Const::pion));

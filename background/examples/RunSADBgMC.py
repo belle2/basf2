@@ -4,8 +4,8 @@
 # -------------------------------------------------------------------------
 # BG simulation using SAD input files
 #
-# make a link to the SAD files before running it:
-#    ln -s /home/belle/nakayama/fs2/BGdata/10th_fullsim/ input
+# make a link to the SAD files before running it (at KEKCC):
+#    ln -s /home/belle/nakayama/fs2/BGdata/12th_fullsim/ input
 # -------------------------------------------------------------------------
 
 from basf2 import *
@@ -33,7 +33,7 @@ elif argc == 4:
     num = argvs[2]
     sampleType = argvs[3]
 else:
-    print('./RunSADBgMC.py [(RBB,Touschek,Coulomb)_(HER,LER)(,_far)] [num] [(study,usual,ECL,PXD)]')
+    print('./RunSADBgMC.py [(RBB,Touschek,Coulomb,BHWide)_(HER,LER)(,_far)] [num] [(study,usual,ECL,PXD)]')
     sys.exit()
 
 # set accring (0:LER, 1:HER)
@@ -102,6 +102,14 @@ elif name == 'Touschek_HER_far':
     readmode = 1
     readouttime = 100  # 0.1us
     seed = seed + '10'
+elif name == 'BHWide_HER':
+    readmode = 0
+    inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '11'
+elif name == 'BHWide_LER':
+    readmode = 0
+    inputfilename = 'input/EvtbyEvt/' + name + '_EvtbyEvt_' + nummod + '.root'
+    seed = seed + '12'
 else:
     print('Unknown name! (' + name + ')')
     sys.exit()
@@ -153,8 +161,8 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='EKLM']//Mode", '1', ''),
-    ])
+        # ("/DetectorComponent[@name='EKLM']//Mode", '1', ''),
+        ])
 else:
     gearbox.param('override', [('/Global/length', '40.0', 'm')])  # needed for FarBeamLine
 main.add_module(gearbox)
@@ -172,7 +180,7 @@ geometry.param('additionalComponents', ['FarBeamLine'])
 main.add_module(geometry)
 
 fullsim = register_module('FullSim')
-fullsim.param('PhysicsList', 'QGSP_BERT_HP')
+fullsim.param('PhysicsList', 'FTFP_BERT_HP')
 fullsim.param('UICommands', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux

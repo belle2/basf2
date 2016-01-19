@@ -7,7 +7,7 @@
 
 #include <daq/slc/base/ConfigFile.h>
 
-#include <daq/dqm/analysis/HistMemory.h>
+#include <daq/dqm/DqmMemFile.h>
 
 #include <vector>
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     Mutex m_mutex;
     Cond m_cond;
     int m_count;
-    std::vector<HistMemory> m_memory;
+    std::vector<DqmMemFile*> m_memory;
     std::vector<TH1*> m_hist;
 
   };

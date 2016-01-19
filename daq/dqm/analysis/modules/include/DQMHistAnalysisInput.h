@@ -12,7 +12,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <daq/dqm/analysis/HistMemory.h>
+#include <daq/dqm/DqmMemFile.h>
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <string>
@@ -41,9 +41,10 @@ namespace Belle2 {
     // Data members
   private:
     //! Hist memory
-    HistMemory m_memory;
+    DqmMemFile* m_memory;
     std::string m_mempath;
     int m_memsize;
+    int m_interval;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
@@ -51,7 +52,6 @@ namespace Belle2 {
     unsigned int m_expno;
     unsigned int m_runno;
     unsigned int m_count;
-
   };
 } // end namespace Belle2
 

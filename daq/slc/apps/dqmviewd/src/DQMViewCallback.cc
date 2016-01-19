@@ -25,15 +25,12 @@ void DQMViewCallback::init(NSMCommunicator&) throw()
   add(new NSMVHandlerText("host", true, false, host));
   add(new NSMVHandlerInt("port", true, false, port));
   for (int i = 0; i < ntmap; i++) {
-    m_memory.push_back(HistMemory());
-  }
-  for (size_t i = 0; i < m_memory.size(); i++) {
     std::string vname = StringUtil::form("dqm[%d]", i);
     const std::string map_name = m_config.get(vname + ".file");
-    std::string mapfile = map_path + "/" + map_name;
+    std::string mapfile = /*map_path + "/" +*/ map_name;
     add(new NSMVHandlerText(vname + ".map", true, false, map_name));
     add(new NSMVHandlerText(vname + ".mapfile", true, false, mapfile));
-    m_memory[i].open(mapfile.c_str(), 100000000);
+    m_memory.push_back(new DqmMemFile(mapfile));
   }
   update();
   PThread(new SocketAcceptor(host, port, this));
@@ -49,16 +46,15 @@ void DQMViewCallback::update() throw()
   lock();
   std::vector<TH1*> hist;
   for (size_t i = 0; i < m_memory.size(); i++) {
-    HistMemory& memory(m_memory[i]);
-    std::vector<TH1*>& h(memory.deserialize());
-    for (size_t j = 0; j < h.size(); j++) {
-      hist.push_back((TH1*)h[j]->Clone());
+    TMemFile* file = m_memory[i]->LoadMemFile();
+    file->cd();
+    TIter next(file->GetListOfKeys());
+    TKey* key = NULL;
+    while ((key = (TKey*)next())) {
+      hist.push_back((TH1*)key->ReadObj());
     }
   }
   if (hist.size() > 0) {
-    for (size_t i = 0; i < m_hist.size(); i++) {
-      delete m_hist[i];
-    }
     m_hist = hist;
     notify();
   }

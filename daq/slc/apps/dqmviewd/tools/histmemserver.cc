@@ -1,4 +1,5 @@
-#include <daq/dqm/analysis/HistMemory.h>
+//#include <daq/dqm/analysis/HistMemory.h>
+#include <daq/dqm/DqmMemFile.h>
 
 #include <TMapFile.h>
 #include <TH1F.h>
@@ -14,10 +15,9 @@ int main(int argc, char** argv)
     printf("Usage : %s <path_to_tmapfile>\n", argv[0]);
     return 1;
   }
-  HistMemory memory;
-  memory.open(argv[1], 10000000);
-  memory.init();
-
+  DqmMemFile* memory = new DqmMemFile(argv[1], "write");
+  TMemFile* file = memory->GetMemFile();
+  file->cd();
   TH1F* hx1 = new TH1F("FirstDet/h_HitXPositionCh01", "Hit X position (Ch-01);X [mm];Entires", 1000, -20, 20);
   TH1F* hy1 = new TH1F("FirstDet/h_HitYPositionCh01", "Hit Y position (Ch-01);Y [mm];Entires", 1000, -30, 30);
   TH2F* hxy1 = new TH2F("FirstDet/h_HitXYPositionCh01", "Hit X - Y (Ch-01);X [mm];Y [mm]", 90, -20, 20, 90, -30, 30);
@@ -33,6 +33,7 @@ int main(int argc, char** argv)
   h3->GetXaxis()->SetBinLabel(4, "EPID");
   h3->GetXaxis()->SetBinLabel(5, "KLM");
   std::vector<TH1*> hist;
+  /*
   memory.add(hx1);
   memory.add(hy1);
   memory.add(hxy1);
@@ -40,6 +41,7 @@ int main(int argc, char** argv)
     memory.add(h2[i]);
   }
   memory.add(h3);
+  */
 
   int count = 0;
   while (true) {
@@ -52,7 +54,7 @@ int main(int argc, char** argv)
     }
     for (Int_t i = 0; i < 20; i++) {
       for (Int_t j = 0; j < 500; j++) {
-        Double_t x = gRandom->Gaus(50, 10);
+        Double_t x = gRandom->Gaus(30 + i * 20, 10);
         h2[i]->Fill(x);
       }
     }
@@ -60,7 +62,7 @@ int main(int argc, char** argv)
       Double_t x = gRandom->Gaus(2, 3);
       h3->Fill(x);
     }
-    memory.serialize();
+    memory->UpdateSharedMem();
     sleep(30);
     count++;
   }

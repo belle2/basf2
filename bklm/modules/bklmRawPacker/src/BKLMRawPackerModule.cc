@@ -130,6 +130,8 @@ void BKLMRawPackerModule::event()
     buf[1] |= ((bword3 << 16));
     data_words[copperId][finesse].push_back(buf[0]);
     data_words[copperId][finesse].push_back(buf[1]);
+
+    delete [] buf;
   }
 
   //    Make RawKLM array

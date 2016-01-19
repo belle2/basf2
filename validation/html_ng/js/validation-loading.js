@@ -75,8 +75,11 @@ function loadValidationPlots(package_load_name, data) {
                 // setup the jquery ui toggle buttons
                 // this can only be done here, otherwise the initial values of the toggle buttons 
                 // will not be correct
+                /* 
+                do not enable jquery ui buttons atm, because the toggle option
+                cannot be properly initialized with color
                 $("#check_show_overview").button();
-                $("#check_show_expert_plots").button();
+                $("#check_show_expert_plots").button();*/
 
                 // make sure changes to the viewing settings are stored right away
                 ractive.observe( 'show_overview', function ( newValue, oldValue, keypath ) {
@@ -101,11 +104,11 @@ function loadValidationPlots(package_load_name, data) {
                 if (count > 0 ){
                     $("#no_skipped_scripts").hide();
                 } 
-
+/*
                 $('.open-popup-link').magnificPopup({
                   type:'inline',
                   midClick: true // Allow opening popup on middle mouse click. Always set it to true if you don't provide alternative source in href.
-                });
+                });*/
             },
             // on teardown
             function(ractive) { 

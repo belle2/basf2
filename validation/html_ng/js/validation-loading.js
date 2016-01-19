@@ -57,7 +57,7 @@ function loadValidationPlots(package_load_name, data) {
         // create unique ids for each plot, which can be used to create
         // links to individual plot images
         uniq_plot_id = 1
-        for ( var plotfile in loaded_package["plotfiles"] ) {
+        for ( var i in loaded_package["plotfiles"] ) {
             for (var ploti in loaded_package["plotfiles"][i]["plots"]) {
                 loaded_package["plotfiles"][i]["plots"][ploti]["unique_id"] = uniq_plot_id++;
             }

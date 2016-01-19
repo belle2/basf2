@@ -154,15 +154,15 @@ void BKLMUnpackerModule::event()
 
 
         for (int k = 0; k < rawKLM[i]->GetDetectorNwords(j, finesse_num); k++) {
-          char buffer[200];
+          char buffer[200] = "";
           sprintf(buffer, "%.8x\n", buf_slot[k]);
           B2INFO(buffer);
 
           //Brandon uses 4 16 bit words
           //          int firstBrandonWord;
           //          int secondBrandonWord;
-          char buffer1[100];
-          char buffer2[100];
+          char buffer1[100] = "";
+          char buffer2[100] = "";
 
           sprintf(buffer1, "%.4x\n", buf_slot[k] & 0xffff);
           sprintf(buffer2, "%.4x\n", (buf_slot[k] >> 16) & 0xffff);
@@ -188,7 +188,7 @@ void BKLMUnpackerModule::event()
         //either no data (finesse not connected) or with the count word
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           if (!m_keepEvenPackages) {
-            char buffer[200];
+            char buffer[200] = "";
             sprintf(buffer, "word count incorrect: %d\n", rawKLM[i]->GetDetectorNwords(j, finesse_num));
             B2ERROR(buffer);
             continue;
@@ -234,7 +234,7 @@ void BKLMUnpackerModule::event()
           int moduleId = 0;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
-              char buffer[200];
+              char buffer[200] = "";
               sprintf(buffer, "could not find copperid %d, finesse %d, lane %d, axis %d in mapping\n", copperId, finesse_num + 1, lane, axis);
 
               B2INFO(buffer);

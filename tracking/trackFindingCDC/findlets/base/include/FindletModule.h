@@ -52,6 +52,8 @@ namespace Belle2 {
       FindletModule(const std::array<std::string, c_nTypes>& storeVectorNames = {})
         : m_param_storeVectorNames(storeVectorNames)
       {
+        setPropertyFlags(c_ParallelProcessingCertified);
+
         std::string description = "Findlet: ";
         if (std::tuple_size<IOTypes>() == 0) {
           // Drop Findlet prefix for full finders with no IOTypes

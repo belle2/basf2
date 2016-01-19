@@ -23,7 +23,7 @@ map<topcaf_channel_id_t, TProfile*> fillCorrectedChannels(const char* filename)
   while (theReader.Next()) {
     for (Belle2::EventWaveformPacket& v : eventRV) {
       topcaf_channel_id_t channel_id = v.GetChannelID() + v.GetASICWindow();
-      nSamples = v.size();
+      size_t nSamples = v.GetSamples().size();
       string channel_name = to_string(channel_id);
       if (channelProfiles.find(channel_id) == channelProfiles.end()) {
         channelProfiles[channel_id] = new TProfile(channel_name.c_str(),

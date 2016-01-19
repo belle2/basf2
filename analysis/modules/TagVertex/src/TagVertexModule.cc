@@ -25,7 +25,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/FlavorTagInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 
 // utilities
 #include <analysis/utility/PCmsLabTransform.h>
@@ -188,7 +188,7 @@ namespace Belle2 {
     if (m_useFitAlgorithm == "breco") ok = findConstraint(Breco, cut * 2000.);
     if (m_useFitAlgorithm == "singleTrack" || m_useFitAlgorithm == "singleTrack_PXD") {
       ok = findConstraintBoost(cut - m_shiftZ); // The constraint size is specially squeezzed when using the Single Track Algorithm
-      if (ok && m_MCInfo) FlavorTagInfoMCMatch(
+      if (ok && m_MCInfo) FlavorTaggerInfoMCMatch(
           Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
     }
     if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(cut);
@@ -509,13 +509,13 @@ namespace Belle2 {
    The function has been created to investigate the procedence of each track so the user can elaborate cuts and selection criterias
    for the tracks when performing the vertex fit. It also extracts this information for the tracks inside the RestOfEvent.
    The MAIN interest is to know for a given track whether it comes directly from the B0 or from one of their immediately decaying daughters.
-   Finally, the function saves this information in a codified form inside the FlavorTagInfo dataObject.
+   Finally, the function saves this information in a codified form inside the FlavorTaggerInfo dataObject.
    */
-  void TagVertexModule::FlavorTagInfoMCMatch(Particle* Breco)
+  void TagVertexModule::FlavorTaggerInfoMCMatch(Particle* Breco)
   {
 
     RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
-    FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
 
     if (!flavorTagInfo) return;
 
@@ -529,7 +529,7 @@ namespace Belle2 {
 
 
     // FLAVOR TAG MC MATCHING
-    /* The loop runs through all the tracks stored in the FlavorTagInfo. For each one it tracks back the mother, grandmother, grand grand mother...
+    /* The loop runs through all the tracks stored in the FlavorTaggerInfo. For each one it tracks back the mother, grandmother, grand grand mother...
        The iteration will go on while the mother is an immediately decaying particle (PDG). The iteration will stop tracking back mothers once it reaches either the B0, or another particle coming from the B0 that does not decay immediately. In the later case it assumes that the correspondent track does not share its production point with the decaying point of the B0 */
     for (unsigned i = 0; i < tracksFT.size(); i++) {
 
@@ -597,8 +597,8 @@ namespace Belle2 {
       } while (exitFTWhile == false);
 
 
-      /* In this part of the function, the code finds hoy many tracks from the FlavorTagInfo come directly from the B_tag
-       (or from immediately decaying daughters, that is, code number > 0. This will be stored in the FlavorTagInfo DataObject
+      /* In this part of the function, the code finds hoy many tracks from the FlavorTaggerInfo come directly from the B_tag
+       (or from immediately decaying daughters, that is, code number > 0. This will be stored in the FlavorTaggerInfo DataObject
        NOTE: Good means coming from the B_tag, and Bad means not coming from the B_tag */
       if (i == 2 || i == 7) continue; // Skip KinLepton and MaxP categories, for they are repeated tracks from other categories
       unsigned totalsize = FTTotalTracks.size();
@@ -677,7 +677,7 @@ namespace Belle2 {
 
 
     // SET IN THE FT DATAOBJECT THE GOOD/BAD TRACKS INFORMATION FROM FT AND ROE
-    /* Finally the MC information is stored in the FlavorTagInfo DataObject for future uses. More concretely the number
+    /* Finally the MC information is stored in the FlavorTaggerInfo DataObject for future uses. More concretely the number
      of tracks coming directly from the B_tag and immediately decaying daughters (good tracks), and tracks coming from any
      other intermediate particle (bad track) */
     flavorTagInfo->setGoodTracksROE(ROEGoodTracks);
@@ -712,7 +712,7 @@ namespace Belle2 {
     RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     std::vector<Belle2::Track*> fitTracks; // Vector of track that will be returned after the selection. Now it must contain only 1
 
-    FlavorTagInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTagInfo>();
+    FlavorTaggerInfo* flavorTagInfo = Breco->getRelatedTo<FlavorTaggerInfo>();
     if (!flavorTagInfo) return false;
     std::vector<Belle2::Track*> ROETracks = roe->getTracks();
     std::vector<float> listMomentum = flavorTagInfo->getP(); // Momentum of the tracks
@@ -751,7 +751,7 @@ namespace Belle2 {
       float D0, Z0;
       D0 = originalTracks[i]->getTrackFitResult(constArray[i])->getD0();
       Z0 = originalTracks[i]->getTrackFitResult(constArray[i])->getZ0();
-      flavorTagInfo->setD0(D0); // Save them on the FlavorTagInfo
+      flavorTagInfo->setD0(D0); // Save them on the FlavorTaggerInfo
       flavorTagInfo->setZ0(Z0);
     }
     std::vector<float> listZ0 = flavorTagInfo->getZ0();
@@ -764,7 +764,7 @@ namespace Belle2 {
       listNPXDHits[i] = int(Variable::trackNPXDHits(listParticle[i]));
     }
 
-    // Here the program keeps track of the tracks that are repeated inside the FlavorTagInfo
+    // Here the program keeps track of the tracks that are repeated inside the FlavorTaggerInfo
     int nonRepeated = 1;
     bool repeatedTrack = false;
     for (unsigned i = 0; i < listTracks.size(); i++) {

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGINFOBUILDERMODULE_H
-#define FLAVORTAGINFOBUILDERMODULE_H
+#ifndef FLAVORTAGGERINFOBUILDERMODULE_H
+#define FLAVORTAGGERINFOBUILDERMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -18,18 +18,18 @@
 namespace Belle2 {
 
   /**
-   * Creates for each Particle and RestOfEvent object in the DataStore a FlavorTagInfo dataobject and makes BASF2 relation between them.
-   * NOTE: this module DOES NOT fill the FlavorTagInfo dataobject, but only initializes it so can be filled during the run
+   * Creates for each Particle and RestOfEvent object in the DataStore a FlavorTaggerInfo dataobject and makes BASF2 relation between them.
+   * NOTE: this module DOES NOT fill the FlavorTaggerInfo dataobject, but only initializes it so can be filled during the run
    * of FlavorTagger.py
    */
-  class FlavorTagInfoBuilderModule : public Module {
+  class FlavorTaggerInfoBuilderModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    FlavorTagInfoBuilderModule();
+    FlavorTaggerInfoBuilderModule();
 
     /**  */
     virtual void initialize() override;

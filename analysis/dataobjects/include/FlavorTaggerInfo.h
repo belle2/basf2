@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FLAVORTAGINFO_H
-#define FLAVORTAGINFO_H
+#ifndef FLAVORTAGGERINFO_H
+#define FLAVORTAGGERINFO_H
 
 #include <framework/datastore/RelationsObject.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
 #include <vector>
 #include <set>
@@ -23,6 +24,7 @@ namespace Belle2 {
 
   class Track;
   class MCParticle;
+  class FlavorTaggerInfoMap;
 
   /**
    * This class stores the relevant information for the TagV vertex fit, extracted mainly from the
@@ -42,7 +44,7 @@ namespace Belle2 {
    * This class is still in an early phase, thus some changes may be needed.
    */
 
-  class FlavorTagInfo : public RelationsObject {
+  class FlavorTaggerInfo : public RelationsObject {
 
   public:
 
@@ -50,7 +52,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    FlavorTagInfo()
+    FlavorTaggerInfo()
     {
       m_goodTracksPurityFT = 0;
       m_goodTracksPurityROE = 0;
@@ -71,44 +73,6 @@ namespace Belle2 {
      * setters described as Vector Fillers.
      */
 
-    /**
-    * Map filler: Set the category name and the pointer of the track with the highest target track probability
-    * for the corresponding category in Event Level.
-    * @param category string name of the given category
-    * @param track pointer to track object
-    */
-    void setTargetTrackLevel(std::string category, Belle2::Track* track);
-
-    /**
-    * Map filler: Set the category name and the corresponding highest target track probability.
-    * @param category string name of the given category
-    * @param probability highest target track probability
-    */
-    void setProbTrackLevel(std::string category, float probability);
-
-    /**
-    * Map filler: Set the category name and the pointer of the track with the highest category probability
-    * for the corresponding category in Event Level.
-    * @param category string name of the given category
-    * @param track pointer to track object
-    */
-    void setTargetEventLevel(std::string category, Belle2::Track* track);
-
-    /**
-    * Map filler: Set the category name and the highest category probability for the corresponding
-    * category in Event Level.
-    * @param category string name of the given category
-    * @param probability highest category probability
-    */
-    void setProbEventLevel(std::string category, float probability);
-
-    /**
-    * Map filler: Set the category name and the corresponding qr Output, i.e. the Combiner input value.
-    * They could be used for independent tags.
-    * @param category string name of the given category
-    * @param qr output of the given category
-    */
-    void setQrCategory(std::string category, float qr);
 
     /**
     * Saves the usemode of the FlavorTagger
@@ -117,30 +81,10 @@ namespace Belle2 {
     void setUseModeFlavorTagger(std::string mode);
 
     /**
-    * Saves the method used for the FlavorTagger
+    * Saves the method and the correspondig FlavorTaggerMap
     * @param method "TMVA" or "FANN".
     */
-    void setMethod(std::string method);
-
-    /**
-    * Saves qr Output of the Combiner. Output of the FlavorTagger after the complete process.
-    * @param qr final FlavorTagger output
-    */
-    void setQrCombined(float qr);
-
-    /**
-    * Saves the B0Probability output of the Combiner.
-    * @param B0Probability probability of being a B0
-    */
-    void setB0Probability(float B0Probability);
-
-    /**
-    * Saves the B0barProbability output of the Combiner.
-    * @param B0barProbability Probability of being a B0bar
-    */
-    void setB0barProbability(float B0barProbability);
-
-
+    void addMethodMap(std::string method);
 
     /**
     * Vector filler: Set the pointer of the track with the highest probability for each category.
@@ -274,30 +218,6 @@ namespace Belle2 {
      * GETTERS
      */
 
-    /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
-    * @return map
-    */
-    std::map<std::string, Belle2::Track*> getTargetTrackLevel();
-
-    /**< map containing the category name and thecorresponding highest target track probability in Track Level
-    * @return map
-    */
-    std::map<std::string, float> getProbTrackLevel();
-
-    /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
-    * @return map
-    */
-    std::map<std::string, Belle2::Track*> getTargetEventLevel();
-
-    /**< map containing the category name and the corresponding highest category probability in Event Level
-    * @return map
-    */
-    std::map<std::string, float> getProbEventLevel();
-
-    /**< map containing the category name and the corresponding qr Output
-    * @return map
-    */
-    std::map<std::string, float> getQrCategory();
 
     /**
     * usemode of the FlavorTagger
@@ -305,27 +225,11 @@ namespace Belle2 {
     */
     std::string getUseModeFlavorTagger();
 
-
-    /** method used for the FlavorTagger
-    * @return "TMVA" or "FANN".
+    /** method used for the FlavorTagger and corresponding FlavorTaggerInfoMap
+    * @param method "TMVA" or "FANN".
+    * @return FlavorTaggerInfoMap with all FlavorTagger Information
     */
-    std::string getMethod();
-
-    /**< qr Output of the Combiner
-    * @return qr
-    */
-    float getQrCombined();
-
-    /**Probability of being a B0.
-    * @return B0Probability
-    */
-    float getB0Probability();
-
-    /**Probability of being a B0bar.
-    * @return B0barProbability
-    */
-    float getB0barProbability(); /**< Direct Output of the Combiner: Probability of being a B0bar).*/
-
+    FlavorTaggerInfoMap* getMethodMap(std::string method);
 
     /**
     * Get all the tracks
@@ -454,22 +358,10 @@ namespace Belle2 {
 
     std::string m_useModeFlavorTagger; /**< Usemode of the FlavorTagger: "Teacher" or "Expert".*/
 
-    std::string m_method; /**< Method used for the FlavorTagger: "TMVA" or "FANN".*/
+    std::map<std::string, FlavorTaggerInfoMap*>
+    m_methodMap; /**< Map containing the methods used for the FlavorTagger: "TMVA" or "FANN", and the corresponding map.*/
 
-    std::map<std::string, Belle2::Track*>
-    m_targetTrackLevel; /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level*/
-    std::map<std::string, float>
-    m_probTrackLevel; /**< map containing the category name and thecorresponding highest target track probability in Track Level*/
-    std::map<std::string, Belle2::Track*>
-    m_targetEventLevel; /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level*/
-    std::map<std::string, float>
-    m_probEventLevel; /**< map containing the category name and the corresponding highest category probability in Event Level*/
-    std::map<std::string, float>
-    m_qrCategory; /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
 
-    float m_qrCombined; /**< qr Output of the Combiner. Output of the FlavorTagger after the complete process*/
-    float m_B0Probability; /**< Direct Output of the Combiner: Probability of being a B0.*/
-    float m_B0barProbability; /**< Direct Output of the Combiner: Probability of being a B0bar).*/
 
     std::vector<Belle2::Track*> m_tracks;  /**< highest probability track for each category */
     std::vector<Particle*> m_particle; /**< particle pointer related to each track */
@@ -491,7 +383,7 @@ namespace Belle2 {
     int m_badTracksFT; /**< number of tracksc not coming from Btag in this object */
     int m_goodTracksFT; /**< number of tracksc coming from Btag in this object */
 
-    ClassDef(FlavorTagInfo, 3) /**< class definition */
+    ClassDef(FlavorTaggerInfo, 3) /**< class definition */
 
   };
 

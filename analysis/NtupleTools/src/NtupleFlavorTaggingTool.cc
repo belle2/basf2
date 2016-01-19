@@ -14,7 +14,7 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/MCMatching.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/FlavorTagInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 
 #include <cmath>
 #include <TBranch.h>
@@ -37,7 +37,10 @@ void NtupleFlavorTaggingTool::setupTree()
     method = "TMVA";
     B2INFO("Flavor Tagger Output saved for default Multivariate Method: No arguments given.");
   } else {
-    if (m_strOption == "FANN") {
+    if (m_strOption == "TMVA") {
+      B2INFO("Flavor Tagger Output saved for TMVA Multivariate Method");
+      method = "TMVA";
+    } if (m_strOption == "FANN") {
       B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
       method = "FANN";
       m_useFANN = true;
@@ -77,15 +80,19 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     qrCombined[iProduct] = -2;
     qrMC[iProduct] = -2;
 
-    FlavorTagInfo* flavTag = selparticles[iProduct]->getRelatedTo<FlavorTagInfo>();
+    FlavorTaggerInfo* flavorTaggerInfo = selparticles[iProduct]->getRelatedTo<FlavorTaggerInfo>();
 
-    if (flavTag != nullptr) {
-      if (flavTag->getUseModeFlavorTagger() != "Expert") continue;
+    if (flavorTaggerInfo != nullptr) {
+      if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") continue;
 //       method[iProduct] = flavTag->getMethod();
       if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
-        B0Probability[iProduct] = flavTag->getB0Probability();
-        B0barProbability[iProduct] = flavTag->getB0barProbability();
-        qrCombined[iProduct] = flavTag->getQrCombined();
+        FlavorTaggerInfoMap* flavorTaggerInfoMap;
+        if (m_useFANN == true) flavorTaggerInfoMap = flavorTaggerInfo->getMethodMap("FANN");
+        else flavorTaggerInfoMap = flavorTaggerInfo->getMethodMap("TMVA");
+
+        B0Probability[iProduct] = flavorTaggerInfoMap->getB0Probability();
+        B0barProbability[iProduct] = flavorTaggerInfoMap->getB0barProbability();
+        qrCombined[iProduct] = flavorTaggerInfoMap->getQrCombined();
 
         //  MC Flavor is saved only if mcparticles is not empty
         StoreArray<MCParticle> mcparticles;
@@ -97,6 +104,7 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
             }
           }
         }
+
       }
     }
   }

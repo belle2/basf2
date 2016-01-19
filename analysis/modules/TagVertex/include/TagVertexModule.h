@@ -24,7 +24,7 @@
 // DataObjects
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <analysis/dataobjects/FlavorTagInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <framework/dataobjects/BeamParameters.h>
 
 #include <string>
@@ -109,7 +109,7 @@ namespace Belle2 {
     bool compBrecoBgen(Particle* Breco, MCParticle* Bgen);
 
     /** asks for the MC information of the tracks performing the vertex fit **/
-    void FlavorTagInfoMCMatch(Particle* Breco);
+    void FlavorTaggerInfoMCMatch(Particle* Breco);
 
 
     /** performs the fit using the standard algorithm - using all tracks in RoE

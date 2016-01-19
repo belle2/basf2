@@ -19,7 +19,7 @@ import os
 class FlavorTaggerInfoFiller(Module):
 
     """
-    Creates a new FlavorTagInfo DataObject and saves there all the relevant information of the
+    Creates a new FlavorTaggerInfo DataObject and saves there all the relevant information of the
     FlavorTagging:
     - Track probability of being the right target for every category (right target means
       coming directly from the B)
@@ -33,20 +33,21 @@ class FlavorTaggerInfoFiller(Module):
         weightFiles = 'B2JpsiKs_mu'
 
         roe = Belle2.PyStoreObj('RestOfEvent')
-        FlavorTaggerInfo = roe.obj().getRelated('FlavorTagInfos')
+        FlavorTaggerInfo = roe.obj().getRelated('FlavorTaggerInfos')
 
         qrCombined = 2 * (info.obj().getExtraInfo('qrCombined') - 0.5)
         B0Probability = info.obj().getExtraInfo('qrCombined')
         B0barProbability = 1 - info.obj().getExtraInfo('qrCombined')
 
         FlavorTaggerInfo.setUseModeFlavorTagger("Expert")
-        FlavorTaggerInfo.setMethod("TMVA")
-        FlavorTaggerInfo.setQrCombined(qrCombined)
-        FlavorTaggerInfo.setB0Probability(B0Probability)
-        FlavorTaggerInfo.setB0barProbability(B0barProbability)
+        FlavorTaggerInfo.addMethodMap("TMVA")
+        FlavorTaggerInfoMap = FlavorTaggerInfo.getMethodMap("TMVA")
+        FlavorTaggerInfoMap.setQrCombined(qrCombined)
+        FlavorTaggerInfoMap.setB0Probability(B0Probability)
+        FlavorTaggerInfoMap.setB0barProbability(B0barProbability)
 
         if not FlavorTaggerInfo:
-            B2ERROR('FlavorTaggerInfoFiller: FlavorTag does not exist')
+            B2ERROR('FlavorTaggerInfoFiller: FlavorTaggerInfo does not exist')
             return
 
         for (particleList, category) in TrackLevelParticleLists:
@@ -55,8 +56,8 @@ class FlavorTaggerInfoFiller(Module):
 
             # From the likelihood it is possible to have Kaon category with no actual kaons
             if plist.obj().getListSize() == 0:
-                FlavorTaggerInfo.setTargetTrackLevel(category, None)
-                FlavorTaggerInfo.setProbTrackLevel(category, 0)
+                FlavorTaggerInfoMap.setTargetTrackLevel(category, None)
+                FlavorTaggerInfoMap.setProbTrackLevel(category, 0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
@@ -66,8 +67,8 @@ class FlavorTaggerInfoFiller(Module):
                     # Prob of being the right target track
                     targetProb = particle.getExtraInfo('isRightTrack(' + category + ')')
                     track = particle.getTrack()  # Track of the particle
-                    FlavorTaggerInfo.setTargetTrackLevel(category, track)
-                    FlavorTaggerInfo.setProbTrackLevel(category, targetProb)
+                    FlavorTaggerInfoMap.setTargetTrackLevel(category, track)
+                    FlavorTaggerInfoMap.setProbTrackLevel(category, targetProb)
                     break
 
         for (particleList, category) in EventLevelParticleLists:
@@ -76,9 +77,9 @@ class FlavorTaggerInfoFiller(Module):
 
             # From the likelihood it is possible to have Kaon category with no actual kaons
             if plist.obj().getListSize() == 0:
-                FlavorTaggerInfo.setTargetEventLevel(category, None)
-                FlavorTaggerInfo.setProbEventLevel(category, 0)
-                FlavorTaggerInfo.setQrCategory(category, 0)
+                FlavorTaggerInfoMap.setTargetEventLevel(category, None)
+                FlavorTaggerInfoMap.setProbEventLevel(category, 0)
+                FlavorTaggerInfoMap.setQrCategory(category, 0)
 
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
@@ -90,10 +91,10 @@ class FlavorTaggerInfoFiller(Module):
                     track = particle.getTrack()  # Track of the particle
                     qrCategory = mc_variables.variables.evaluate(AvailableCategories[category][3], particle)
 
-                    # Save information in the FlavorTagInfo DataObject
-                    FlavorTaggerInfo.setTargetEventLevel(category, track)
-                    FlavorTaggerInfo.setProbEventLevel(category, categoryProb)
-                    FlavorTaggerInfo.setQrCategory(category, qrCategory)
+                    # Save information in the FlavorTaggerInfo DataObject
+                    FlavorTaggerInfoMap.setTargetEventLevel(category, track)
+                    FlavorTaggerInfoMap.setProbEventLevel(category, categoryProb)
+                    FlavorTaggerInfoMap.setQrCategory(category, qrCategory)
                     break
 
 
@@ -760,9 +761,9 @@ def FlavorTagger(
                     CombinerLevel(mode, weightFiles, workingDirectory, roe_path)
 
     if mode == 'Expert':
-            # Initialation of FlavorTagInfo dataObject needs to be done in the main path
-        FlavorTagInfoBuilder = register_module('FlavorTagInfoBuilder')
-        path.add_module(FlavorTagInfoBuilder)
+            # Initialation of FlavorTaggerInfo dataObject needs to be done in the main path
+        FlavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
+        path.add_module(FlavorTaggerInfoBuilder)
         roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists

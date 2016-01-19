@@ -3,17 +3,18 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Roca                                           *
+ * Contributors: Christian Roca and Fernando Abudinen                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/FlavorTagInfoBuilder/FlavorTagInfoBuilderModule.h>
+#include <analysis/modules/FlavorTaggerInfoBuilder/FlavorTaggerInfoBuilderModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/FlavorTagInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -28,50 +29,52 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FlavorTagInfoBuilder)
+REG_MODULE(FlavorTaggerInfoBuilder)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-FlavorTagInfoBuilderModule::FlavorTagInfoBuilderModule() : Module()
+FlavorTaggerInfoBuilderModule::FlavorTaggerInfoBuilderModule() : Module()
 {
   // Set module properties
-  setDescription("Initializes the FlavorTagInfo DataObject that will be used during the Flavor Tagging. Filling is done in the FlavorTagger.py script");
+  setDescription("Initializes the FlavorTaggerInfo DataObject that will be used during the Flavor Tagging. Filling is done in the FlavorTagger.py script");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void FlavorTagInfoBuilderModule::initialize()
+void FlavorTaggerInfoBuilderModule::initialize()
 {
   // input: Particles and RestOfEvent
   StoreArray<RestOfEvent> roeArray;
   StoreArray<Particle> particles;
   roeArray.isRequired();
 
-  // output: FlavorTagInfo
-  StoreArray<FlavorTagInfo> flavTagArray;
+  // output: FlavorTaggerInfo
+  StoreArray<FlavorTaggerInfo> flavTagArray;
   flavTagArray.registerInDataStore();
+  StoreArray<FlavorTaggerInfoMap> flavTagMap;
+  flavTagMap.registerInDataStore();
   particles.registerRelationTo(flavTagArray);
   roeArray.registerRelationTo(flavTagArray);
 }
 
-void FlavorTagInfoBuilderModule::event()
+void FlavorTaggerInfoBuilderModule::event()
 {
   // input
   StoreArray<RestOfEvent> roeArray;
 
   // output
-  StoreArray<FlavorTagInfo> flavTagArray;
+  StoreArray<FlavorTaggerInfo> flavTagArray;
 
 
   for (int i = 0; i < roeArray.getEntries(); i++) {
     const RestOfEvent* roe = roeArray[i];
     const Particle* particle = roe->getRelated<Particle>();
 
-    // create FlavorTagInfo object
-    FlavorTagInfo* flavTag = flavTagArray.appendNew();
+    // create FlavorTaggerInfo object
+    FlavorTaggerInfo* flavTag = flavTagArray.appendNew();
 
-    // create relations: Particle <-> FlavorTagInfo , RestOfEvent <-> FlavorTagInfo
+    // create relations: Particle <-> FlavorTaggerInfo , RestOfEvent <-> FlavorTaggerInfo
     particle->addRelationTo(flavTag);
     roe->addRelationTo(flavTag);
 

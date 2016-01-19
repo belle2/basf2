@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include <analysis/NtupleTools/NtupleFlavorTagInfoTool.h>
-#include <analysis/dataobjects/FlavorTagInfo.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <TBranch.h>
 
 using namespace Belle2;
@@ -79,7 +79,7 @@ void NtupleFlavorTagInfoTool::eval(const Particle* particle)
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) return;
 
-  FlavorTagInfo* flavTag = selparticles[0]->getRelatedTo<FlavorTagInfo>();
+  FlavorTaggerInfo* flavTag = selparticles[0]->getRelatedTo<FlavorTaggerInfo>();
 
   if (flavTag) {
     for (unsigned i = 0; i < flavTag->getCategories().size(); i++) {
@@ -99,7 +99,7 @@ void NtupleFlavorTagInfoTool::eval(const Particle* particle)
     m_goodTracksFT = float(flavTag->getGoodTracksFT());
 
   } else {
-    B2ERROR("FlavorTagInfo Object does not exist");
+    B2ERROR("FlavorTaggerInfo Object does not exist");
   }
 }
 

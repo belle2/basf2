@@ -127,7 +127,6 @@ class Plotuple:
         self.chi2test_result = 'n/a'
 
         self.comparison_result = "not_compared"
-        self.comparison_pvalue = None
 
         # The p-value that the Chi^2-Test returned.
         self.pvalue = 'n/a'

@@ -43,25 +43,12 @@ sender = register_module('Serializer')
 sender.param('DestPort', 36000)
 sender.param('LocalHostName', 'localhost')
 
-
-# output
-unpacker = register_module('CDCUnpacker')
-# FE channel <-> CDC cell ID map.
-unpacker.param('xmlMapFileName', '/home/usr/yamadas/basf2/release/cdc/examples/ch_map.dat')
-# Enable/Disable to store the RawCDC Object.
-unpacker.param('enableStoreRawCDC', True)
-# Enable/Disable print out the ADC/TDC data to the terminal.
-unpacker.param('enablePrintOut', True)
-# Set/Unset the relation between RawCDC and CDCHit.
-unpacker.param('setRelationRaw2Hit', False)
-
 # Create main path
 main = create_path()
 
 # Add modules to main path
 main.add_module(receiver)
 main.add_module(converter)
-# main.add_module(unpacker)
 # main.add_module(dump)
 # main.add_module(sender)
 

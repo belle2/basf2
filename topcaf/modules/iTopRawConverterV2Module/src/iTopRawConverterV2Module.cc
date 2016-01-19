@@ -23,10 +23,8 @@ iTopRawConverterV2Module::iTopRawConverterV2Module() : Module()
 
 iTopRawConverterV2Module::~iTopRawConverterV2Module()
 {
-  if (m_WfPacket != nullptr)
-    delete m_WfPacket;
-  if (m_EvtPacket != nullptr)
-    delete m_EvtPacket;
+  m_WfPacket = nullptr;
+  m_EvtPacket = nullptr;
 
   m_input_file.close();
 }
@@ -84,8 +82,7 @@ void iTopRawConverterV2Module::event()
 
   m_EvtPacket = new EventHeaderPacket(eventPacket,
                                       EVENT_PACKET_SIZE);
-  EventHeaderPacket* headerpkt = GetEvtHeaderPacket();
-  m_evtheader_ptr.assign(headerpkt, true);
+  m_evtheader_ptr.assign(m_EvtPacket, true);
 
   wavePacket[0] = 1011;
   wavePacket[1] = m_scrod;
@@ -131,8 +128,7 @@ void iTopRawConverterV2Module::event()
           m_input_file.read(reinterpret_cast<char*>(&word), sizeof(packet_word_t));
           wavePacket[WAVE_HEADER_SIZE + x + 1] = word;
         }
-        m_WfPacket = new EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE);
-        m_evtwaves_ptr.appendNew(EventWaveformPacket(*m_WfPacket));
+        m_WfPacket = m_evtwaves_ptr.appendNew(EventWaveformPacket(wavePacket, WAVE_PACKET_SIZE));
       }
     }
     m_prev_pos = m_input_file.tellg();

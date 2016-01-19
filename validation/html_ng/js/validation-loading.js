@@ -86,6 +86,21 @@ function loadValidationPlots(package_load_name, data) {
                       ractive_value_preserve(ractive,"show_expert_plots");
                 });
 
+                // check if an "empty" entry needs to be added to the script accordion
+                var count = $('.failed_script').length;
+                if (count > 0 ){
+                    $("#no_failed_scripts").hide();
+                } 
+
+                var count = $('.finished_script').length;
+                if (count > 0 ){
+                    $("#no_finished_scripts").hide();
+                } 
+
+                var count = $('.skipped_script').length;
+                if (count > 0 ){
+                    $("#no_skipped_scripts").hide();
+                } 
 
                 $('.open-popup-link').magnificPopup({
                   type:'inline',

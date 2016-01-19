@@ -48,7 +48,8 @@
 {{#partial scriptfiles_accordion}}
 <div id="accordion_script_files">
   <h3>Failed Scripts</h3>
-  <div>
+  <div >
+    <div id="no_failed_scripts">No failed scripts</div>
 	{{#scriptfiles}}
     {{#if status == "failed" }}
     <div class="failed_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>
@@ -57,6 +58,7 @@
   </div>
   <h3>Finished Scripts</h3>
   <div>
+    <div id="no_finished_scripts">No finished scripts</div>
 	{{#scriptfiles}}
     {{#if status == "finished" }}
     <div class="finished_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>
@@ -65,6 +67,7 @@
   </div>
   <h3>Skipped Scripts</h3>
   <div>
+    <div id="no_skipped_scripts">No skipped scripts</div>
 	{{#scriptfiles}}
     {{#if status == "skipped" }}
     <div class="skipped_script">{{name}} - {{status}} ( exit code: {{return_code}}) - <a href="../results/{{log_url}}" target="_blank">log</a></div>

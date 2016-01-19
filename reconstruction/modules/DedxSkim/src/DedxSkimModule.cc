@@ -188,7 +188,7 @@ bool DedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStable&
   int nCDCHits = gftrackcand->getNHits();
 
   // apply track quality cuts
-  if (trackPVal < 0.00001 || nCDCHits < 1 || abs(d0) <= 0.1 || abs(z0) <= 10) {
+  if (trackPVal < 0.00001 || nCDCHits < 1 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {
     return false;
   }
 

@@ -56,9 +56,9 @@ namespace Belle2 {
     double length(const DedxPoint& p)
     {
       // horizontal line
-      if (m_y == p.getY()) return abs(m_x - p.getX());
+      if (m_y == p.getY()) return std::abs(m_x - p.getX());
       // vertical line
-      else if (m_x == p.getX()) return abs(m_y - p.getY());
+      else if (m_x == p.getX()) return std::abs(m_y - p.getY());
       // else use Pythagorean Theorem
       else return sqrt((m_x - p.getX()) * (m_x - p.getX()) +
                          (m_y - p.getY()) * (m_y - p.getY()));

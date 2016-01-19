@@ -57,6 +57,17 @@ BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
   double errorU = module->getPhiStripWidth() / sqrt(12);
   double errorV = module->getZStripWidth() / sqrt(12);
 
+  //+++ scale localU and localV based on measured-in-Belle resolution
+  int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1;
+  double dn = nStrips - 1.5;
+  double factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.60;//measured-in-Belle resolution
+  errorU = errorU * sqrt(factor);
+
+  nStrips = hit->getZStripMax() - hit->getZStripMin() + 1;
+  dn = nStrips - 1.5;
+  factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55;//measured-in-Belle resolution
+  errorV = errorV * sqrt(factor);
+
   //Set positions
   rawHitCoords_(0) = localU;
   rawHitCoords_(1) = localV;

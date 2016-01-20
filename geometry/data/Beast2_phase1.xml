@@ -34,6 +34,7 @@
   <xi:include href="../beast/csi/CSI-Materials.xml"/>
   <xi:include href="../beast/claw/CLAW-Materials.xml"/>
   <xi:include href="../beast/beamabort/BEAMABORT-Materials.xml"/>
+  <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
   
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
@@ -49,6 +50,7 @@
   <xi:include href="../beast/he3tube/HE3TUBE-phase1.xml"/>
   <xi:include href="../beast/claw/CLAW-phase1.xml"/>   
   <xi:include href="../beast/csi/CSI.xml"/>
+  <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase1.xml"/>
   <xi:include href="../beast/cave/CAVE.xml"/>
   <xi:include href="../beast/ph1bpipe/PH1BPIPE.xml"/>
 

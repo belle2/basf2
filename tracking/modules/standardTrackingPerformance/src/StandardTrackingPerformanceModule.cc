@@ -44,8 +44,9 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
   Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999), m_nGeneratedChargedStableMcParticles(-999),
   m_nReconstructedChargedStableTracks(-999), m_nFittedChargedStabletracks(-999)
 {
-
   setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("StandardTrackingPerformanceOutput.root"));
   addParam("gfTrackColName", m_gfTrackColName, "Name of genfit::Track collection.",

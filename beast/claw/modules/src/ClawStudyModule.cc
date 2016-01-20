@@ -236,6 +236,7 @@ void ClawStudyModule::event()
     }
   }
   */
+  /*
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
   //cout << nSimHits << endl;
@@ -266,55 +267,6 @@ void ClawStudyModule::event()
       if (pdg != 22 && fabs(pdg) != 11)h_edepThres3->Fill(detNB, adep * 1e3);
     }
 
-    /*
-    if (lad == 1) {
-      h_zvedep[0]->Fill(position.Z());
-      h_xvzvedep[0]->Fill(position.X(), position.Z());
-      h_yvzvedep[0]->Fill(position.Y(), position.Z());
-      h_xvyvedep[0]->Fill(position.X(), position.Y());
-      h_rvzvedep[0]->Fill(r, position.Z());
-      h_zvedepW[0]->Fill(position.Z(), adep * 1e3);
-      h_xvzvedepW[0]->Fill(position.X(), position.Z(), adep * 1e3);
-      h_yvzvedepW[0]->Fill(position.Y(), position.Z(), adep * 1e3);
-      h_xvyvedepW[0]->Fill(position.X(), position.Y(), adep * 1e3);
-      h_rvzvedepW[0]->Fill(r, position.Z(), adep * 1e3);
-      if (adep > 50.*1e-6) {
-        h_zvedepT[0]->Fill(position.Z());
-        h_xvzvedepT[0]->Fill(position.X(), position.Z());
-        h_yvzvedepT[0]->Fill(position.Y(), position.Z());
-        h_xvyvedepT[0]->Fill(position.X(), position.Y());
-        h_rvzvedepT[0]->Fill(r, position.Z());
-        h_zvedepWT[0]->Fill(position.Z(), adep * 1e3);
-        h_xvzvedepWT[0]->Fill(position.X(), position.Z(), adep * 1e3);
-        h_yvzvedepWT[0]->Fill(position.Y(), position.Z(), adep * 1e3);
-        h_xvyvedepWT[0]->Fill(position.X(), position.Y(), adep * 1e3);
-        h_rvzvedepWT[0]->Fill(r, position.Z(), adep * 1e3);
-      }
-    } else if (lad == 2) {
-      h_zvedep[1]->Fill(position.Z());
-      h_xvzvedep[1]->Fill(position.X(), position.Z());
-      h_yvzvedep[1]->Fill(position.Y(), position.Z());
-      h_xvyvedep[1]->Fill(position.X(), position.Y());
-      h_rvzvedep[1]->Fill(r, position.Z());
-      h_zvedepW[1]->Fill(position.Z(), adep * 1e3);
-      h_xvzvedepW[1]->Fill(position.X(), position.Z(), adep * 1e3);
-      h_yvzvedepW[1]->Fill(position.Y(), position.Z(), adep * 1e3);
-      h_xvyvedepW[1]->Fill(position.X(), position.Y(), adep * 1e3);
-      h_rvzvedepW[1]->Fill(r, position.Z(), adep * 1e3);
-      if (adep > 50.*1e-6) {
-        h_zvedepT[1]->Fill(position.Z());
-        h_xvzvedepT[1]->Fill(position.X(), position.Z());
-        h_yvzvedepT[1]->Fill(position.Y(), position.Z());
-        h_xvyvedepT[1]->Fill(position.X(), position.Y());
-        h_rvzvedepT[1]->Fill(r, position.Z());
-        h_zvedepWT[1]->Fill(position.Z(), adep * 1e3);
-        h_xvzvedepWT[1]->Fill(position.X(), position.Z(), adep * 1e3);
-        h_yvzvedepWT[1]->Fill(position.Y(), position.Z(), adep * 1e3);
-        h_xvyvedepWT[1]->Fill(position.X(), position.Y(), adep * 1e3);
-        h_rvzvedepWT[1]->Fill(r, position.Z(), adep * 1e3);
-      }
-    }
-    */
   }
   for (int i = 0; i < 8; i++) {
     if (Edep[i] > 0) {
@@ -323,6 +275,7 @@ void ClawStudyModule::event()
         h_Edep[1]->Fill(i, Edep[i]);
     }
   }
+  */
   eventNum++;
 }
 

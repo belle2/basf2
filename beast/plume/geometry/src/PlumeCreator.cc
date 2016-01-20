@@ -122,7 +122,7 @@ namespace Belle2 {
         G4Box* s_env = new G4Box("s_env", dx_foam, dy_foam, dz_env);
         G4LogicalVolume* l_env = new G4LogicalVolume(s_env, geometry::Materials::get("G4_AIR"), "l_env");
         G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2.0) * G4Translate3D(0, r, z) * G4RotateX3D(- M_PI / 2.0 - thetaZ);
-        new G4PVPlacement(transform, l_env, "p_env", &topVolume, false, 0);
+        new G4PVPlacement(transform, l_env, "p_env", &topVolume, false, 1);
 
         //create foam layer
         G4Box* s_foam = new G4Box("Foam", dx_foam, dy_foam, DistanceFromFoamCenter);
@@ -133,22 +133,22 @@ namespace Belle2 {
         G4Box* s_glue = new G4Box("s_glue", dx_foam, dy_foam, GlueThickness / 2.);
         G4LogicalVolume* l_glue = new G4LogicalVolume(s_glue, geometry::Materials::get("Glue"), "s_glue");
         G4double r_glue = DistanceFromFoamCenter + AirGap + GlueThickness / 2.;
-        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_glue), l_glue, "p_glue_0", l_env, false, 0);
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_glue), l_glue, "p_glue_1", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_glue), l_glue, "p_glue_0", l_env, false, 1);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_glue), l_glue, "p_glue_1", l_env, false, 1);
 
         //create Kapton layers
         G4Box* s_Kapton = new G4Box("s_Kapton", dx_foam, dy_foam, KaptonThickness / 2.);
         G4LogicalVolume* l_Kapton = new G4LogicalVolume(s_Kapton, geometry::Materials::get("Kapton") , "l_Kapton");
         G4double r_Kapton = r_glue + AirGap + (GlueThickness + KaptonThickness) / 2.;
-        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_Kapton), l_Kapton, "p_Kapton_0", l_env, false, 0);
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_Kapton), l_Kapton, "p_Kapton_1", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_Kapton), l_Kapton, "p_Kapton_0", l_env, false, 1);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_Kapton), l_Kapton, "p_Kapton_1", l_env, false, 1);
 
         //create metal layers
         G4Box* s_metal = new G4Box("s_metal", dx_foam, dy_foam, AluminiumThickness / 2.);
         G4LogicalVolume* l_metal = new G4LogicalVolume(s_metal, geometry::Materials::get("Aluminium"), "l_metal");
         G4double r_metal = r_Kapton + AirGap + (KaptonThickness + AluminiumThickness) / 2.;
-        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_metal), l_metal, "p_metal_0", l_env, false, 0);
-        new G4PVPlacement(0, G4ThreeVector(0, 0, r_metal), l_metal, "p_metal_1", l_env, false, 0);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, -r_metal), l_metal, "p_metal_0", l_env, false, 1);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, r_metal), l_metal, "p_metal_1", l_env, false, 1);
 
         l_foam->SetVisAttributes(FoamVisAtt);
         l_Kapton->SetVisAttributes(KaptonVisAtt);
@@ -195,7 +195,7 @@ namespace Belle2 {
             name = "p_substrate_top";
             MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i - 6], r_substrate);
           }
-          new G4PVPlacement(0, MSpos, l_substrate, name,  l_env, false, 0);
+          new G4PVPlacement(0, MSpos, l_substrate, name,  l_env, false, 1);
           //----------------------------------------------------------------------------//
           //                            Epitaxial Layer                                 //
           //----------------------------------------------------------------------------//
@@ -217,7 +217,7 @@ namespace Belle2 {
             name = "p_metalized_top";
             MSpos = G4ThreeVector(0, -(SensorLengthX + SensorDistance) * x_array[i - 6], r_metalized);
           }
-          new G4PVPlacement(0, MSpos, l_metalized, name,  l_env, false, 0);
+          new G4PVPlacement(0, MSpos, l_metalized, name,  l_env, false, 1);
         }
         LadderID++;
       }

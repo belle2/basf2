@@ -96,7 +96,7 @@ void QcsmonitorDigitizerModule::event()
   if (QcsmonitorSimHits.getEntries() == 0) {
     return;
   }
-
+  /*
   //auto edepArray = new vector<double>[m_ScintCell](); //energy deposits per scintillator cell
   auto adepArray = new vector<double>[m_ScintCell](); //energy deposits corrected per scintillator cell
   auto timeArray = new vector<double>[m_ScintCell](); //time cell bin nmber
@@ -152,6 +152,7 @@ void QcsmonitorDigitizerModule::event()
   //delete array
   delete [] adepArray;
   delete [] timeArray;
+  */
 }
 
 //read tube centers, impulse response, and garfield drift data filename from QCSMONITOR.xml

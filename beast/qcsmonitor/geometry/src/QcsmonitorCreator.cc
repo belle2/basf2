@@ -89,25 +89,48 @@ namespace Belle2 {
         l_scint->SetVisAttributes(red);
         //Lets limit the Geant4 stepsize inside the volume
         l_scint->SetUserLimits(new G4UserLimits(stepSize));
+        double x_pos[100];
+        double y_pos[100];
         double z_pos[100];
         double r_pos[100];
         int dim = 0;
-        for (double z : activeParams.getArray("z", {0})) {
-          z *= CLHEP::cm;
-          z_pos[dim] = z;
+        Bool_t flag = false;
+        for (double x : activeParams.getArray("x", {0})) {
+          flag = true;
+          x *= CLHEP::cm;
+          x_pos[dim] = x;
           dim++;
         }
         dim = 0;
-        for (double r : activeParams.getArray("r", {0})) {
-          r *= CLHEP::cm;
-          r_pos[dim] = r + dz_scint;
+        for (double y : activeParams.getArray("y", {0})) {
+          y *= CLHEP::cm;
+          y_pos[dim] = y;
           dim++;
         }
+        dim = 0;
+        for (double z : activeParams.getArray("z", {0})) {
+          z *= CLHEP::cm;
+          z_pos[dim] = z;
+          if (flag) {
+            r_pos[dim] = sqrt(x_pos[dim] * x_pos[dim] + y_pos[dim] * y_pos[dim]);
+          }
+          dim++;
+        }
+        if (!flag) {
+          dim = 0;
+          for (double r : activeParams.getArray("r", {0})) {
+            r *= CLHEP::cm;
+            r_pos[dim] = r + dz_scint;
+            dim++;
+          }
+        }
+
         for (double phi : activeParams.getArray("Phi", {M_PI / 2})) {
           //phi  *= CLHEP::deg;
           for (int i = 0; i < dim; i++) {
             cout << " r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << endl;
             G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
+            if (flag) transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateZ3D(phi) * G4RotateX3D(thetaZ);
             new G4PVPlacement(transform, l_scint, "p_scint", &topVolume, false, detID);
             detID++;
           }

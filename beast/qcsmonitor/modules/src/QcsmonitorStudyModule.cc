@@ -106,7 +106,7 @@ void QcsmonitorStudyModule::event()
 
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
-
+  /*
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     QcsmonitorSimHit* aHit = SimHits[i];
@@ -138,7 +138,7 @@ void QcsmonitorStudyModule::event()
       h_timeWeightedThres->Fill(detNb, timeBin, edep);
     }
   }
-
+  */
   eventNum++;
 }
 

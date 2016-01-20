@@ -12,7 +12,7 @@ evtmeta = register_module('EventInfoSetter')
 
 # Geometry parameter loader
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', '/geometry/Beast2_phase1_test.xml')
+gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
 
 # Geometry builder
 geometry = register_module('Geometry')

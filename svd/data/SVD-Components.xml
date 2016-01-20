@@ -3,7 +3,7 @@
 	<!-- For more documentation refer to pxd/PXD-Components.xml -->
 	<Ladder layer="3">
 		<shift  unit="mm"> -4.680</shift>
-		<radius unit="mm"> 38.990</radius>
+		<radius unit="mm"> 37.990</radius>
 		<Sensor type="Layer3"   id="1" unit="mm">  92.350</Sensor>
 		<Sensor type="Layer3"   id="2" unit="mm"> -32.650</Sensor>
 	</Ladder>

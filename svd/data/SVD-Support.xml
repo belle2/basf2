@@ -239,7 +239,7 @@
 				<width unit="mm">15.000</width>
 				<length unit="mm">73.000</length>
 				<z unit="mm">194.500</z>
-				<r unit="mm">-0.200</r>
+				<r unit="mm">0.800</r>
 			</Endmount>
 			<Endmount name="Backward">
 				<height unit="mm">8.000</height>

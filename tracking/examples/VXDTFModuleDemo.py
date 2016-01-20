@@ -43,16 +43,39 @@ if len(argv) > 4:
 
 tuneValue = 0.06
 
+# standard secMap until r24443:
+# secSetup = [
+# 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
+# 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
+# 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
+# test geometry for comparison with L3-shifted one:
+# secSetup = [
+# 'secMapsDec2015SVDStd-moreThan400MeV_SVD',
+# 'secMapsDec2015SVDStd-100to400MeV_SVD',
+# 'secMapsDec2015SVDStd-25to100MeV_SVD']
+# secMap for new shifted geometry:
 secSetup = [
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
-
+    'shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+    'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+    'shiftedL3IssueTestSVDStd-25to100MeV_SVD']
 if usePXD:
+    # standard secMap until r24443:
+    # secSetup = \
+    # ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
+    # 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
+    # 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+    # ]
+    # test geometry for comparison with L3-shifted one:
     secSetup = \
-        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+        ['secMapsDec2015VXDStd-moreThan400MeV_PXDSVD',
+         'secMapsDec2015VXDStd-100to400MeV_PXDSVD',
+         'secMapsDec2015VXDStd-25to100MeV_PXDSVD'
+         ]
+    # secMap for new shifted geometry:
+    secSetup = \
+        ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
          ]
     tuneValue = 0.22
 

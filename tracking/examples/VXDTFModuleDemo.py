@@ -66,11 +66,11 @@ if usePXD:
     # 'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
     # ]
     # test geometry for comparison with L3-shifted one:
-    secSetup = \
-        ['secMapsDec2015VXDStd-moreThan400MeV_PXDSVD',
-         'secMapsDec2015VXDStd-100to400MeV_PXDSVD',
-         'secMapsDec2015VXDStd-25to100MeV_PXDSVD'
-         ]
+    # secSetup = \
+    # ['secMapsDec2015VXDStd-moreThan400MeV_PXDSVD',
+    # 'secMapsDec2015VXDStd-100to400MeV_PXDSVD',
+    # 'secMapsDec2015VXDStd-25to100MeV_PXDSVD'
+    # ]
     # secMap for new shifted geometry:
     secSetup = \
         ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',

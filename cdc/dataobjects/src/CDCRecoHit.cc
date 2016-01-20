@@ -44,13 +44,13 @@ void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTransla
 }
 
 CDCRecoHit::CDCRecoHit()
-  : genfit::AbsMeasurement(),
+  : genfit::AbsMeasurement(1),
     m_tdcCount(0), m_adcCount(0), m_wireID(WireID()), m_cdcHit(NULL), m_leftRight(0)
 {
 }
 
 CDCRecoHit::CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit)
-  : genfit::AbsMeasurement(), m_cdcHit(cdcHit), m_leftRight(0)
+  : genfit::AbsMeasurement(1), m_cdcHit(cdcHit), m_leftRight(0)
 {
   if (s_adcCountTranslator == 0 || s_cdcGeometryTranslator == 0 || s_tdcCountTranslator == 0) {
     B2FATAL("Can't produce CDCRecoHits without setting of the translators.")

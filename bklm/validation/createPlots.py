@@ -112,7 +112,7 @@ def draw_bklmhists(file_chain):
     isOnTrack.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if muon hit associated with a CDC track by Muid'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Check', 'Mostly associated'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Contact', 'piilonen@vt.edu'))
-    isOnTrack.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.9,pvalue-error=0.50'))
+    isOnTrack.GetListOfFunctions().Add(TNamed('MetaOptions', 'pvalue-warn=0.50,pvalue-error=0.10'))
     isOnTrack.SetMinimum(0.0)
     isOnTrack.Write()
 

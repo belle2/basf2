@@ -17,4 +17,23 @@
 	<xi:include href="../tracking/BeastPhase2TrainingNov2015VXDStd-25to100MeV_PXDSVD.xml"/>
 	<xi:include href="../tracking/BeastPhase2TrainingNov2015VXDStd-100to400MeV_PXDSVD.xml"/>
 	<xi:include href="../tracking/BeastPhase2TrainingNov2015VXDStd-moreThan400MeV_PXDSVD.xml"/>
+	
+	<!-- 	L3 by 1mm - shift - sector maps -->
+	<xi:include href="../tracking/shiftedL3IssueTestSVDStd-25to100MeV_SVD.xml"/>
+	<xi:include href="../tracking/shiftedL3IssueTestSVDStd-100to400MeV_SVD.xml"/>
+	<xi:include href="../tracking/shiftedL3IssueTestSVDStd-moreThan400MeV_SVD.xml"/>
+	
+	<xi:include href="../tracking/shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD.xml"/>
+	
+	<!-- 	L3 old position for L3-shift-comparison - sector maps -->
+<!--	<xi:include href="../tracking/secMapsDec2015SVDStd-25to100MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapsDec2015SVDStd-100to400MeV_SVD.xml"/>
+	<xi:include href="../tracking/secMapsDec2015SVDStd-moreThan400MeV_SVD.xml"/>
+	
+	<xi:include href="../tracking/secMapsDec2015VXDStd-25to100MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/secMapsDec2015VXDStd-100to400MeV_PXDSVD.xml"/>
+	<xi:include href="../tracking/secMapsDec2015VXDStd-moreThan400MeV_PXDSVD.xml"/>-->
+	
 </CATFParameters>

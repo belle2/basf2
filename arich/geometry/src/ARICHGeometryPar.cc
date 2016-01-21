@@ -107,6 +107,13 @@ namespace Belle2 {
     m_windowAbsorbtion = 0.;
     m_chipNegativeCrosstalk = 0;
     for (int i = 0; i < MAXPTS_QE; i++) {m_QE[i] = 0.;}
+
+    m_tileNr = 0;
+    m_tileGap = 0.;
+    m_aeroRin = 0.;
+    m_aeroRout = 0.;
+    for (int i = 0; i < 5; i++) m_tileNphi[i] = 0;
+
   }
 
   void ARICHGeometryPar::read(const GearDir& content)
@@ -156,6 +163,19 @@ namespace Belle2 {
       m_NpointsQE++;
       m_QE[i] = qe.getDouble("qe");
     }
+
+    GearDir aerogel(content, "Aerogel");
+    m_tileNr = aerogel.getInt("tileNr");
+    m_tileGap = aerogel.getLength("tileGap") / Unit::cm;
+    m_aeroRin = aerogel.getLength("tubeInnerRadius") / Unit::cm;
+    m_aeroRout = aerogel.getLength("tubeOuterRadius") / Unit::cm;
+
+    int i = 0;
+    for (const GearDir& ring : aerogel.getNodes("tileNphi/Ring")) {
+      m_tileNphi[i] = ring.getInt();
+      i++;
+    }
+
   }
 
   void ARICHGeometryPar::frontEndMapping(const GearDir& content)
@@ -550,6 +570,29 @@ namespace Belle2 {
     }
   }
 
+
+  int ARICHGeometryPar::getAerogelTileID(TVector2 locpos)
+  {
+
+    double size = (m_aeroRout - m_aeroRin) / double(m_tileNr);
+    double r = locpos.Mod();
+    double phi = TVector2::Phi_0_2pi(locpos.Phi());
+    int nr = int((r - m_aeroRin) / size);
+
+    if (r < m_aeroRin + nr * size + m_tileGap / 2. || r >  m_aeroRin + (nr + 1)*size - m_tileGap / 2.) return 0;
+
+    double dphi = 2.*M_PI / double(m_tileNphi[nr]);
+    double gapPhi = m_tileGap / (m_aeroRin + (nr + 1) * size - m_tileGap / 2.);
+
+    int nphi = int(phi / dphi);
+    if (phi < nphi * dphi + gapPhi / 2. || phi > (nphi + 1)*dphi - gapPhi / 2.) return 0;
+
+    int tileID = nphi;
+    for (int i = 0; i < nr; i++) tileID += m_tileNphi[i];
+
+    return tileID + 1;
+
+  }
 
 
 } // namespace Belle2

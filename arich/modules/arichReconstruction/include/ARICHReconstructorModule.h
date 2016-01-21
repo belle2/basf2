@@ -13,11 +13,13 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
+#include <arich/dataobjects/ARICHTrack.h>
+#include <mdst/dataobjects/Track.h>
+
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 #include <string>
-#include <TFile.h>
 
 namespace Belle2 {
 
@@ -79,41 +81,20 @@ namespace Belle2 {
   protected:
 
     /*! Print module parameters.*/
-    void printModuleParams() const;
+    void printModuleParams();
 
   private:
 
-    // Input collections
-    std::string m_inputAeroHits;     /**< Input AeroHits collection name */
-    std::string m_inputTracks;       /**< MDST tracks collection name*/
-    std::string m_inputExtHits;      /**< Extrapolated tracks collection name*/
-
-    // Output collection
-    std::string m_outputLikelihoods; /**< Output likelihoods collection name*/
-    std::string m_outfileName;       /**< Name of output file containing distribution of reconostructed Cherenkov angle
-*/
-
     // Other members.
     ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
-    double m_timeCPU;                /**< CPU time.     */
-    int    m_nRun;                   /**< Run number.   */
-    int    m_nEvent;                 /**< Event number. */
     double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
     double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
     double m_backgroundLevel;        /**< Photon background level. */
     double m_singleResolution;       /**< Resolution of single photon emission angle. */
     std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-    int    m_storeHist;               /**< store tree with individual photon information (cherenkov angle distribution) */
     int    m_beamtest;               /**< If >=1 ARICH beamtest, default 0 (off) */
-    TFile* m_file;                   /**< Beamtest analysis output file */
-    //! Function fills the internal vector ARICHTracks from ext module
-    /*!
-      \param tracks Internal ARICH vector reference.
-      \param hypothesis The hypothesis for the particle.
-     */
-    void getTracks(std::vector<ARICHTrack>& tracks, Const::ChargedStable hypothesis);
-
+    int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
   };
 
 } // Belle2 namespace

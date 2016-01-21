@@ -1,16 +1,13 @@
-/*
-<header>
-  <input>ARICHEvents.root</input>
-  <output>ARICHValidate.root</output>
-  <contact>Luka Santelj</contact>
-  <description>Makes validation histograms</description>
-</header>
+/* ARICHValidate.C 
+ * ROOT macro for ARICH validation plots 
+ * Author: Luka Santelj 
+ * 11.3.2014
 */
 
 void ARICHValidate(){
 
   // intput tree
-  TChain* ch = new TChain("tree");   
+  TChain* ch = new TChain("arich");   
   ch->Add("../ARICHEvents.root");
 
   // output file
@@ -22,11 +19,11 @@ void ARICHValidate(){
   TH1F* hall = new TH1F("hall","Likelihood difference for  K and #pi;L_{#pi}-L_{K}",500,-100,100);
 
   // plot likelihood difference for K and pi tracks (only tracks within ARICH acceptance and with p>3GeV are included)
-  ch->Draw("(m_logl.pi-m_logl.K)>>hpi","abs(m_pdg)==211 && m_flag==1 && sqrt((m_truePosition.x - m_position.x)**2 +(m_truePosition.y-m_position.y)**2)<1 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_status>105");
-
-  ch->Draw("(m_logl.pi-m_logl.K)>>hk","abs(m_pdg)==321 && m_flag==1 && sqrt((m_truePosition.x - m_position.x)**2 +(m_truePosition.y-m_position.y)**2)<1 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_status>105");
-
-  ch->Draw("(m_logl.pi-m_logl.K)>>hall","(abs(m_pdg)==321 || abs(m_pdg)==211) && m_flag==1 && sqrt((m_truePosition.x - m_position.x)**2 +(m_truePosition.y-m_position.y)**2)<1 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_status>105");
+  ch->Draw("(logL.pi-logL.K)>>hpi","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
+  
+  ch->Draw("(logL.pi-logL.K)>>hk","abs(PDG)==321 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
+  
+  ch->Draw("(logL.pi-logL.K)>>hall","(abs(PDG)==321 || abs(PDG)==211) && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
 
   hall->GetListOfFunctions()->Add(new TNamed("Description", "Difference of ARICHLikelihood value for K and #pi hypothesis, for K and #pi tracks with 3.0 - 3.5 GeV (particle gun from the IP). TrackFinderMCTruth is used for track matching."));
   hall->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));
@@ -65,7 +62,7 @@ void ARICHValidate(){
   
   TH1F* hnphot = new TH1F("hnphot","Number of detected photons;# of photons;Entries", 35,-0.5,34.5);
  
-  ch->Draw("m_detPhotons>>hnphot","abs(m_pdg)==211 && sqrt(m_trueMomentum.x**2+m_trueMomentum.y**2+m_trueMomentum.z**2)>3 && m_flag==1 && m_status>105");
+  ch->Draw("detPhot.pi>>hnphot","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
   
   hnphot->GetListOfFunctions()->Add(new TNamed("Description", "Number of detected photons in a 3#sigma band around the expected Cherenkov angle, for #pi with momenta 3.0-3.5 GeV."));
   hnphot->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@kek.jp"));

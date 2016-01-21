@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-<header>
-  <output>ARICHEvents.root</output>
-  <contact>Luka Snatelj</contact>
-  <description>Generates 10000 particle gun events and makes performance plots</description>
-</header>
-"""
+##############################################################################
+#
+# This is a steering file to generate and analyze 10000 events used for ARICH
+# validation plots.
+# Author: Luka Santelj
+# 11.3.2014
+#
+##############################################################################
 
 from basf2 import *
 from optparse import OptionParser
@@ -28,7 +29,7 @@ filename = options.filename
 debugLevel = int(options.debugLevel)
 
 # suppress messages and warnings during processing DEBUG, INFO, WARNING, ERROR
-set_log_level(LogLevel.ERROR)
+set_log_level(LogLevel.INFO)
 
 # Create path
 main = create_path()
@@ -77,19 +78,14 @@ add_mc_reconstruction(main, components_nr)
 ext = register_module('Ext')
 main.add_module(ext)
 
-# Add module that creates relation between ExtHits and ARICHAeroHits
-arichREL = register_module('ARICHRelate')
-main.add_module(arichREL)
-
 # Add ARICH reconstruction module
 arichRECO = register_module('ARICHReconstructor')
 arichRECO.logging.log_level = LogLevel.DEBUG
 arichRECO.logging.debug_level = 20
-arichRECO.param('inputTrackType', 0)
 main.add_module(arichRECO)
 
 # Add module fpr ARICH efficiency analysis
-arichEfficiency = register_module('ARICHAnalysis')
+arichEfficiency = register_module('ARICHNtuple')
 arichEfficiency.logging.log_level = LogLevel.DEBUG
 arichEfficiency.logging.debug_level = debugLevel
 arichEfficiency.param('outputFile', filename)

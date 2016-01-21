@@ -33,12 +33,18 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase("ARICH", Const::ARICH)
     {
 
-      StoreArray<MCParticle> particles;
-      StoreArray<ARICHAeroHit> hits;
-      RelationArray relation(particles, hits);
-      registerMCParticleRelation(relation);
-      hits.registerInDataStore();
-      particles.registerRelationTo(hits);
+      // registration of store arrays and relations
+
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<ARICHAeroHit> aeroHits;
+      aeroHits.registerInDataStore();
+      mcParticles.registerRelationTo(aeroHits);
+
+      // additional registration of MCParticle relation (required for correct relations)
+
+      RelationArray relation(mcParticles, aeroHits);
+      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
+
     }
 
     bool SensitiveAero::step(G4Step* aStep, G4TouchableHistory*)
@@ -46,17 +52,18 @@ namespace Belle2 {
       // Get track parameters
 
       G4Track* aTrack = aStep->GetTrack();
-      //G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
+
       G4StepPoint* PostPosition = aStep->GetPostStepPoint();
       G4ThreeVector worldPosition = PostPosition->GetPosition();
       G4ParticleDefinition* particle = aTrack->GetDefinition();
       G4double  PDGCharge = particle->GetPDGCharge();
       G4ThreeVector momentum = PostPosition->GetMomentum();
+
       // Save only tracks of charged particles
       if (PDGCharge == 0) return (true);
 
       // Track parameters are saved at the entrance in aerogel
-      //if (((PrePosition->GetStepStatus() == fGeomBoundary)) && (momentum.z() > 0)) {
+
       if ((PostPosition->GetStepStatus() == fGeomBoundary) && (momentum.z() > 0.0)) {
 
         /*       B2INFO ("SensAero: " << aTrack->GetDefinition()->GetParticleName()
@@ -69,28 +76,26 @@ namespace Belle2 {
         */
 
         int trackID = aTrack->GetTrackID();
-        int  PDGEncoding = particle->GetPDGEncoding();
+        int PDGEncoding = particle->GetPDGEncoding();
 
-        G4ThreeVector localPosition = PostPosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
         TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
         TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV , momentum.z() * Unit::MeV);
 
-        // Tracks are saved in "arichAeroHits"
-        StoreArray<ARICHAeroHit> arichAeroHits;
-        if (!arichAeroHits.isValid()) arichAeroHits.create();
-
-        ARICHAeroHit* hit = arichAeroHits.appendNew(PDGEncoding, TPosition, TMomentum);
+        // write the hit in datastore"
+        StoreArray<ARICHAeroHit> aeroHits;
+        if (!aeroHits.isValid()) aeroHits.create();
+        ARICHAeroHit* aeroHit = aeroHits.appendNew(PDGEncoding, TPosition, TMomentum);
 
         // Create relation to MCParticle
-
         StoreArray<MCParticle> mcParticles;
-        RelationArray arichAeroHitRel(mcParticles, arichAeroHits);
-        arichAeroHitRel.add(trackID, hit->getArrayIndex());
+        RelationArray rel(mcParticles, aeroHits);
+        rel.add(trackID, aeroHit->getArrayIndex());
+
       }
 
       return true;
-    }
 
+    }
 
   } // end of namespace arich
 } // end of namespace Belle2

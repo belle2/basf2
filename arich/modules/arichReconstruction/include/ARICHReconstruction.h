@@ -12,16 +12,18 @@
 #define ARICHRECONSTRUCTION_H
 
 #include <arich/geometry/ARICHGeometryPar.h>
-#include <arich/modules/arichReconstruction/ARICHTrack.h>
+#include "framework/datastore/StoreArray.h"
+#include "arich/dataobjects/ARICHDigit.h"
+#include "arich/dataobjects/ARICHTrack.h"
+#include "arich/dataobjects/ARICHLikelihood.h"
 
 #include <TVector3.h>
-#include <TNtuple.h>
 #include <cmath>
 #include <boost/format.hpp>
 
 namespace Belle2 {
   /** Internal ARICH track reconstruction
-    *
+   *
     * The class contains objects and methods needed for internal ARICH track
     * reconstruction.
     * The main method is likelihood2, which returns
@@ -47,11 +49,14 @@ namespace Belle2 {
     //! Destructor
     ~ARICHReconstruction() {};
 
+
+    void initialize();
+
     //! Smeares track parameters ("simulate" the uncertainties of tracking).
-    int smearTracks(std::vector<ARICHTrack>&);
+    int smearTrack(ARICHTrack& arichTrack);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
-    int likelihood2(std::vector<ARICHTrack>&);
+    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHDigit>& arichDigits, ARICHLikelihood& arichLikelihood);
     //! Sets detector background level (photon hits / m^2)
     void setBackgroundLevel(double nbkg);
     //! Sets track position resolution (from tracking)
@@ -69,15 +74,21 @@ namespace Belle2 {
     static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
     double p_mass[Const::ChargedStable::c_SetSize];  /**< particle masses */
     ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
-    TNtuple* m_hitstuple;  /**< beamtest/debug output hit-track pairs */
-    TNtuple* m_tracktuple; /**< beamtest/debug output tracks */
-    int m_storeHist; /**< store individual photon information (cherenkov angle distribution) */
     int m_beamtest; /**< in the case of beamtest analysis >=1, default 0 */
     double m_bkgLevel; /**< detector photon background level */
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
     double m_singleRes;   /**< single photon emission angle resolution */
     std::vector<double> m_aeroMerit; /**< aerogel layer figure of merit */
+    unsigned int m_nAerogelLayers; /**< number of aerogel layers */
+    double  m_refractiveInd[c_noOfAerogels]; /**< refractive indices of aerogel layers */
+    double  m_zaero[c_noOfAerogels]; /**< z-positions of aerogel layers */
+    double  m_thickness[c_noOfAerogels]; /**< thicknesses of areogel layers */
+    double  m_transmissionLen[c_noOfAerogels]; /** transmission lengths of aerogel layers */
+    double  m_n0[c_noOfAerogels];  /** number of emmited photons per unit length */
+    TVector3 m_anorm[c_noOfAerogels]; /** normal vector of the aerogle plane */
+    int m_storePhot; /** set to 1 to store individual reconstructed photon information */
+
     //! Returns 1 if vector "a" lies on "copyno"-th detector active surface of detector and 0 else.
     int InsideDetector(TVector3 a, int copyno);
     //! Returns the hit virtual position, assuming that it was reflected from mirror.
@@ -95,7 +106,8 @@ namespace Belle2 {
       \param refind array of layers refractive indices
       \param z array of z coordinates of borders between layers
      */
-    TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n);
+    TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n, int opt);
+//    TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n);
 
 //! Calculates the intersection of the Cherenkov photon emitted from point "r" in "dirf" direction with the detector plane. (For the case of simple (beamtest) geometry.)
     /*!
@@ -122,6 +134,13 @@ namespace Belle2 {
     int  CherenkovPhoton(TVector3 r, TVector3 rh,
                          TVector3& rf, TVector3& dirf,
                          double* refind, double* z, int n);
+
+    //! Returns mean emission position of Cherenkov photons from i-th aerogel layer.
+    TVector3 getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero);
+
+    //! Returns track direction at point with z coordinate "zout" (assumes straight track).
+    TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
+
   };
 
 } // end of namespace Belle2

@@ -210,8 +210,6 @@ namespace Belle2 {
       // get aerogel parameters
       double rin = aeroParam.getLength("tubeInnerRadius") / Unit::mm;
       double rout = aeroParam.getLength("tubeOuterRadius") / Unit::mm;
-      double tileX = aeroParam.getLength("tileXSize") / Unit::mm;
-      double tileY = aeroParam.getLength("tileYSize") / Unit::mm;
       double tileGap = aeroParam.getLength("tileGap") / Unit::mm;
       double supportZ(0);
 
@@ -254,13 +252,12 @@ namespace Belle2 {
         // build and place aerogel tiles in tube
 
         // number of tiles in radial direction
-        int nRTiles = int((rout - rin) / (tileX + tileGap)) + 1;
-        // size of the tile in radial direction
-        double rSize = (rout - rin) / nRTiles - tileGap;
+        int nRTiles = m_arichgp->getNrTiles();
+        double rSize = (rout - rin) / double(nRTiles) - tileGap;
+
         for (int iRad = 0; iRad < nRTiles; iRad++) {
           double routT = rin + tileGap / 2. + rSize + iRad * (rSize + tileGap);
-          double circ = 2.*M_PI * routT;
-          int nPhiTiles = int(circ / (tileY + tileGap)) + 1;
+          int nPhiTiles = m_arichgp->getNphiTiles(iRad);
           double dphi = 2.*M_PI / double(nPhiTiles);
           G4Tubs* tileShape = new G4Tubs("tileShape", routT - rSize, routT, thick / 2. / Unit::mm, -dphi / 2. + tileGap / 2. / routT,
                                          dphi  - tileGap / routT);

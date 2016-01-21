@@ -48,10 +48,10 @@ int main(int argc, char** argv)
   printf("file2socket::accepting\n");
   TCPSocket socket = server_socket.accept();
   printf("file2socket::accepted\n");
-  socket.setBufferSize(32 * 1024 * 1024);
+  //socket.setBufferSize(32 * 1024 * 1024);
   //char* buf = new char[MAXBUF];
   int nrec = 0;
-  Time t0;
+  Time t0, t1;
   double datasize = 0;
   int* evtbuf = new int[10000000];
   BinData data;
@@ -76,8 +76,8 @@ int main(int argc, char** argv)
       double dt = (t.get() - t0.get());
       double freq = nth / dt  / 1000.;
       double rate = datasize / dt / 1000. / 1000.;
-      printf("Serial = %d Freq = %f [kHz], Rate = %f [MB/s], DataSize = %f [kB/event]\n",
-             nrec, freq, rate, datasize / 1000. / nth);
+      printf("Serial = %d Freq = %f [kHz] (%f [kHz]), Rate = %f [MB/s], DataSize = %f [kB/event]\n",
+             nrec, freq, (nrec / (t.get() - t1.get()) / 1000), rate, datasize / 1000. / nth);
       t0 = t;
       datasize = 0;
     }

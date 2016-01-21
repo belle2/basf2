@@ -42,6 +42,25 @@ NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
   }
 }
 
+int AbstractNSMCallback::wait(double timeout) throw(IOException)
+{
+  double t0 = Time().get();
+  double t = Time().get();
+  int count = 0;
+  try {
+    while (true) {
+      double t1 = (timeout - (t - t0) > 0 ? timeout - (t - t0) : 0);
+      if (t1 == 0) break;
+      perform(NSMCommunicator::select(t1));
+      count++;
+      t = Time().get();
+    }
+  } catch (const TimeoutException& e) {
+
+  }
+  return count;
+}
+
 bool AbstractNSMCallback::try_wait() throw()
 {
   try {

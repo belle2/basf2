@@ -60,6 +60,7 @@ namespace Belle2 {
     bool set(const std::string& node, const std::string& name, const std::string& val) { return set_t(node, name, val); }
     bool set(const std::string& node, const std::string& name, const std::vector<int>& val) { return set_t(node, name, val); }
     bool set(const std::string& node, const std::string& name, const std::vector<float>& val) { return set_t(node, name, val); }
+    int wait(double timeout = 5) throw(IOException);
 
   protected:
     NSMCommunicator& wait(const NSMNode& node, const NSMCommand& cmd,

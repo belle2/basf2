@@ -1,0 +1,755 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
+  <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
+  <macros>
+    <include_parent_macros>true</include_parent_macros>
+    <NSMTARGET>KONNO_HV</NSMTARGET>
+  </macros>
+  <wuid>76eb71a0:15171c733ed:-7f90</wuid>
+  <boy_version>3.2.18.qualifier</boy_version>
+  <scripts />
+  <show_ruler>true</show_ruler>
+  <height>720</height>
+  <name></name>
+  <snap_to_geometry>true</snap_to_geometry>
+  <show_grid>true</show_grid>
+  <background_color>
+    <color red="240" green="240" blue="240" />
+  </background_color>
+  <foreground_color>
+    <color red="192" green="192" blue="192" />
+  </foreground_color>
+  <widget_type>Display</widget_type>
+  <show_close_button>true</show_close_button>
+  <width>800</width>
+  <rules />
+  <show_edit_range>true</show_edit_range>
+  <grid_space>6</grid_space>
+  <auto_scale_widgets>
+    <auto_scale_widgets>false</auto_scale_widgets>
+    <min_width>-1</min_width>
+    <min_height>-1</min_height>
+  </auto_scale_widgets>
+  <actions hook="false" hook_all="false" />
+  <y>-1</y>
+  <x>-1</x>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <canvasXTitle></canvasXTitle>
+    <canvasTitle></canvasTitle>
+    <visible>true</visible>
+    <histUseFillColor0>true</histUseFillColor0>
+    <canvasYTitle></canvasYTitle>
+    <scripts>
+      <path pathString="EmbeddedJs" checkConnect="true" sfe="false" seoe="false">
+        <scriptName>EmbeddedScript</scriptName>
+        <scriptText><![CDATA[importPackage(Packages.org.csstudio.opibuilder.scriptUtil);
+var pv0 = PVUtil.getDouble(pvs[0]);
+if(pv0 < 10000) {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(255,0,0));
+} else if(pv0=="PEAK") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(255,255,207));
+}]]></scriptText>
+        <pv trig="true">dqm://TEST:h_HitYPositionCh01:entries</pv>
+      </path>
+    </scripts>
+    <histName0>TEST/h_HitYPositionCh01</histName0>
+    <height>295</height>
+    <nhists>1</nhists>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <enabled>true</enabled>
+    <widget_type>DQMCanvas</widget_type>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>343</width>
+    <histLineColor0>
+      <color red="255" green="0" blue="0" />
+    </histLineColor0>
+    <border_style>1</border_style>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <border_width>1</border_width>
+    <histFillColor0>
+      <color red="192" green="255" blue="255" />
+    </histFillColor0>
+    <canvasFillColor>
+      <color red="255" green="255" blue="207" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <wuid>-285ad813:15173132e45:-7ffc</wuid>
+    <name>DQMCanvas</name>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <useLegend>false</useLegend>
+    <histTitle0></histTitle0>
+    <rules />
+    <histUseLineColor0>true</histUseLineColor0>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <y>0</y>
+    <actions hook="false" hook_all="false" />
+    <x>0</x>
+    <tooltip></tooltip>
+    <widget typeId="DQMCanvas" version="1.0.0">
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <padLineColor>
+        <color red="0" green="0" blue="0" />
+      </padLineColor>
+      <canvasXTitle>X Axis KONNO</canvasXTitle>
+      <canvasTitle>KONNO's test</canvasTitle>
+      <visible>true</visible>
+      <canvasYTitle>Y axis TOMOYUKI</canvasYTitle>
+      <scripts />
+      <height>295</height>
+      <nhists>4</nhists>
+      <background_color>
+        <color red="240" green="240" blue="240" />
+      </background_color>
+      <enabled>true</enabled>
+      <widget_type>DQMCanvas</widget_type>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+      </font>
+      <width>343</width>
+      <border_style>1</border_style>
+      <padFillColor>
+        <color red="255" green="255" blue="255" />
+      </padFillColor>
+      <border_width>1</border_width>
+      <canvasFillColor>
+        <color red="255" green="255" blue="255" />
+      </canvasFillColor>
+      <canvasLineColor>
+        <color red="0" green="0" blue="0" />
+      </canvasLineColor>
+      <wuid>2bd99c03:15173307a1e:-7ff2</wuid>
+      <name>DQMCanvas</name>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <foreground_color>
+        <color red="192" green="192" blue="192" />
+      </foreground_color>
+      <useLegend>false</useLegend>
+      <rules />
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <y>186</y>
+      <actions hook="false" hook_all="false" />
+      <x>314</x>
+      <tooltip></tooltip>
+    </widget>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <canvasXTitle>X Axis KONNO</canvasXTitle>
+    <canvasTitle>KONNO's test 2</canvasTitle>
+    <visible>true</visible>
+    <histUseFillColor0>true</histUseFillColor0>
+    <legendFillColor>
+      <color red="255" green="255" blue="255" />
+    </legendFillColor>
+    <canvasYTitle>Y axis TOMOYUKI</canvasYTitle>
+    <scripts>
+      <path pathString="EmbeddedJs" checkConnect="true" sfe="false" seoe="false">
+        <scriptName>EmbeddedScript</scriptName>
+        <scriptText><![CDATA[importPackage(Packages.org.csstudio.opibuilder.scriptUtil);
+var pv0 = PVUtil.getString(pvs[0]);
+if(pv0=="STANDBY") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(0,255,0));
+} else if(pv0=="PEAK") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(0,255,255));
+} else if(pv0=="RAMPINGUP" || pv0=="RAMPINGDOWN") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(255,128,0));
+} else if(pv0=="TRIP" || pv0=="RECOVERING") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(255,0,255));
+} else if(pv0=="OFF") {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(192,192,192));
+  widget.setPropertyValue("foreground_color",ColorFontUtil.getColorFromRGB(0,0,0));
+} else {
+  widget.setPropertyValue("canvasFillColor",ColorFontUtil.getColorFromRGB(255,255,255));
+}]]></scriptText>
+        <pv trig="true">nsm://KONNO_HV:get:state</pv>
+      </path>
+    </scripts>
+    <histName0>TEST/h_HitXPositionCh01</histName0>
+    <height>289</height>
+    <nhists>1</nhists>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <enabled>true</enabled>
+    <widget_type>DQMCanvas</widget_type>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>565</width>
+    <histLineColor0>
+      <color red="255" green="0" blue="0" />
+    </histLineColor0>
+    <border_style>1</border_style>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <legendLineColor>
+      <color red="0" green="0" blue="0" />
+    </legendLineColor>
+    <border_width>1</border_width>
+    <histFillColor0>
+      <color red="255" green="192" blue="192" />
+    </histFillColor0>
+    <canvasFillColor>
+      <color red="255" green="255" blue="207" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <wuid>2bd99c03:15173307a1e:-7fe4</wuid>
+    <name>canvas1</name>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <useLegend>true</useLegend>
+    <histTitle0></histTitle0>
+    <rules />
+    <histUseLineColor0>true</histUseLineColor0>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <y>306</y>
+    <actions hook="false" hook_all="false" />
+    <x>174</x>
+    <tooltip></tooltip>
+    <widget typeId="DQMCanvas" version="1.0.0">
+      <macros>
+        <include_parent_macros>true</include_parent_macros>
+      </macros>
+      <padLineColor>
+        <color red="0" green="0" blue="0" />
+      </padLineColor>
+      <canvasXTitle>X Axis KONNO</canvasXTitle>
+      <canvasTitle>KONNO's test</canvasTitle>
+      <visible>true</visible>
+      <canvasYTitle>Y axis TOMOYUKI</canvasYTitle>
+      <scripts />
+      <height>295</height>
+      <nhists>4</nhists>
+      <background_color>
+        <color red="240" green="240" blue="240" />
+      </background_color>
+      <enabled>true</enabled>
+      <widget_type>DQMCanvas</widget_type>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+      </font>
+      <width>343</width>
+      <border_style>1</border_style>
+      <padFillColor>
+        <color red="255" green="255" blue="255" />
+      </padFillColor>
+      <border_width>1</border_width>
+      <canvasFillColor>
+        <color red="255" green="255" blue="255" />
+      </canvasFillColor>
+      <canvasLineColor>
+        <color red="0" green="0" blue="0" />
+      </canvasLineColor>
+      <wuid>2bd99c03:15173307a1e:-7fe3</wuid>
+      <name>DQMCanvas</name>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <foreground_color>
+        <color red="192" green="192" blue="192" />
+      </foreground_color>
+      <useLegend>false</useLegend>
+      <rules />
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <y>186</y>
+      <actions hook="false" hook_all="false" />
+      <x>314</x>
+      <tooltip></tooltip>
+    </widget>
+  </widget>
+  <widget typeId="DQMCanvas" version="1.0.0">
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <padLineColor>
+      <color red="0" green="0" blue="0" />
+    </padLineColor>
+    <canvasXTitle></canvasXTitle>
+    <canvasTitle></canvasTitle>
+    <visible>true</visible>
+    <histUseFillColor0>false</histUseFillColor0>
+    <canvasYTitle></canvasYTitle>
+    <scripts />
+    <histName0>TEST/h_HitXYPositionCh01</histName0>
+    <height>286</height>
+    <nhists>1</nhists>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <enabled>true</enabled>
+    <widget_type>DQMCanvas</widget_type>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>379</width>
+    <histLineColor0>
+      <color red="255" green="0" blue="0" />
+    </histLineColor0>
+    <border_style>1</border_style>
+    <padFillColor>
+      <color red="255" green="255" blue="255" />
+    </padFillColor>
+    <border_width>1</border_width>
+    <histFillColor0>
+      <color red="255" green="255" blue="255" />
+    </histFillColor0>
+    <canvasFillColor>
+      <color red="255" green="255" blue="255" />
+    </canvasFillColor>
+    <canvasLineColor>
+      <color red="0" green="0" blue="0" />
+    </canvasLineColor>
+    <wuid>-6eaafa95:15177446783:-7f75</wuid>
+    <name>DQMCanvas_2</name>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <useLegend>false</useLegend>
+    <histTitle0></histTitle0>
+    <rules />
+    <histUseLineColor0>false</histUseLineColor0>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <y>3</y>
+    <actions hook="false" hook_all="false" />
+    <x>396</x>
+    <tooltip></tooltip>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <visible>true</visible>
+    <vertical_alignment>1</vertical_alignment>
+    <show_units>true</show_units>
+    <wuid>-4a9b9ba8:151776bc886:-7e68</wuid>
+    <auto_size>false</auto_size>
+    <rotation_angle>0.0</rotation_angle>
+    <scripts>
+      <path pathString="hvstate.js" checkConnect="true" sfe="false" seoe="false">
+        <pv trig="true">B2_nsm:get:${NSMTARGET}:state</pv>
+      </path>
+    </scripts>
+    <height>26</height>
+    <name>Text Update_12</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <format_type>0</format_type>
+    <precision_from_pv>true</precision_from_pv>
+    <transparent>false</transparent>
+    <pv_name>B2_nsm:get:KONNO_HV:state</pv_name>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Text Update</widget_type>
+    <enabled>true</enabled>
+    <text>######</text>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <precision>0</precision>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="1">Default Bold</opifont.name>
+    </font>
+    <width>116</width>
+    <border_style>1</border_style>
+    <rules />
+    <pv_value />
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <horizontal_alignment>1</horizontal_alignment>
+    <actions hook="false" hook_all="false" />
+    <y>312</y>
+    <wrap_words>false</wrap_words>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>24</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <visible>true</visible>
+    <wuid>-60b13570:15179fb6bfa:-7ea9</wuid>
+    <scripts />
+    <height>120</height>
+    <name>Grouping Container</name>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <transparent>false</transparent>
+    <show_scrollbar>true</show_scrollbar>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <enabled>true</enabled>
+    <widget_type>Grouping Container</widget_type>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>137</width>
+    <border_style>1</border_style>
+    <rules />
+    <fc>false</fc>
+    <lock_children>false</lock_children>
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <y>432</y>
+    <actions hook="false" hook_all="false" />
+    <x>24</x>
+    <tooltip></tooltip>
+    <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+      <border_alarm_sensitive>true</border_alarm_sensitive>
+      <visible>true</visible>
+      <vertical_alignment>1</vertical_alignment>
+      <show_units>false</show_units>
+      <wuid>-60b13570:15179fb6bfa:-7fe7</wuid>
+      <auto_size>false</auto_size>
+      <rotation_angle>0.0</rotation_angle>
+      <scripts />
+      <height>20</height>
+      <name>Text Update_2</name>
+      <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <format_type>1</format_type>
+      <precision_from_pv>false</precision_from_pv>
+      <transparent>false</transparent>
+      <pv_name>dqm://TEST:h_HitXPositionCh01:mean</pv_name>
+      <background_color>
+        <color red="255" green="255" blue="255" />
+      </background_color>
+      <foreground_color>
+        <color red="0" green="0" blue="0" />
+      </foreground_color>
+      <widget_type>Text Update</widget_type>
+      <enabled>true</enabled>
+      <text>######</text>
+      <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+      <precision>2</precision>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+      </font>
+      <width>100</width>
+      <border_style>0</border_style>
+      <rules />
+      <pv_value />
+      <border_width>1</border_width>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <horizontal_alignment>0</horizontal_alignment>
+      <actions hook="false" hook_all="false" />
+      <y>90</y>
+      <wrap_words>false</wrap_words>
+      <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+      <x>12</x>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+      <border_alarm_sensitive>true</border_alarm_sensitive>
+      <visible>true</visible>
+      <vertical_alignment>1</vertical_alignment>
+      <show_units>false</show_units>
+      <wuid>272b21e9:15179ede272:-7ff6</wuid>
+      <auto_size>false</auto_size>
+      <rotation_angle>0.0</rotation_angle>
+      <scripts />
+      <height>20</height>
+      <name>Text Update</name>
+      <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <format_type>2</format_type>
+      <precision_from_pv>false</precision_from_pv>
+      <transparent>false</transparent>
+      <pv_name>dqm://TEST:h_HitXPositionCh01:entries</pv_name>
+      <background_color>
+        <color red="255" green="255" blue="255" />
+      </background_color>
+      <foreground_color>
+        <color red="0" green="0" blue="0" />
+      </foreground_color>
+      <widget_type>Text Update</widget_type>
+      <enabled>true</enabled>
+      <text>######</text>
+      <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+      <precision>3</precision>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+      </font>
+      <width>100</width>
+      <border_style>0</border_style>
+      <rules />
+      <pv_value />
+      <border_width>1</border_width>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <horizontal_alignment>0</horizontal_alignment>
+      <actions hook="false" hook_all="false" />
+      <y>36</y>
+      <wrap_words>false</wrap_words>
+      <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+      <x>12</x>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+      <visible>true</visible>
+      <vertical_alignment>1</vertical_alignment>
+      <wuid>-60b13570:15179fb6bfa:-7ea5</wuid>
+      <auto_size>false</auto_size>
+      <scripts />
+      <height>20</height>
+      <name>Label</name>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <transparent>true</transparent>
+      <background_color>
+        <color red="255" green="255" blue="255" />
+      </background_color>
+      <foreground_color>
+        <color red="0" green="0" blue="0" />
+      </foreground_color>
+      <widget_type>Label</widget_type>
+      <enabled>true</enabled>
+      <text>Event entries</text>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="1">Default Bold</opifont.name>
+      </font>
+      <width>115</width>
+      <border_style>0</border_style>
+      <rules />
+      <border_width>1</border_width>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <horizontal_alignment>0</horizontal_alignment>
+      <actions hook="false" hook_all="false" />
+      <y>6</y>
+      <wrap_words>false</wrap_words>
+      <tooltip></tooltip>
+      <x>6</x>
+    </widget>
+    <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+      <visible>true</visible>
+      <vertical_alignment>1</vertical_alignment>
+      <wuid>-60b13570:15179fb6bfa:-7e91</wuid>
+      <auto_size>false</auto_size>
+      <scripts />
+      <height>20</height>
+      <name>Label</name>
+      <scale_options>
+        <width_scalable>true</width_scalable>
+        <height_scalable>true</height_scalable>
+        <keep_wh_ratio>false</keep_wh_ratio>
+      </scale_options>
+      <transparent>true</transparent>
+      <background_color>
+        <color red="255" green="255" blue="255" />
+      </background_color>
+      <foreground_color>
+        <color red="0" green="0" blue="0" />
+      </foreground_color>
+      <widget_type>Label</widget_type>
+      <enabled>true</enabled>
+      <text>Mean value</text>
+      <font>
+        <opifont.name fontName="Sans" height="10" style="1">Default Bold</opifont.name>
+      </font>
+      <width>101</width>
+      <border_style>0</border_style>
+      <rules />
+      <border_width>1</border_width>
+      <border_color>
+        <color red="0" green="128" blue="255" />
+      </border_color>
+      <horizontal_alignment>0</horizontal_alignment>
+      <actions hook="false" hook_all="false" />
+      <y>65</y>
+      <wrap_words>false</wrap_words>
+      <tooltip></tooltip>
+      <x>6</x>
+    </widget>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <visible>true</visible>
+    <vertical_alignment>1</vertical_alignment>
+    <show_units>true</show_units>
+    <wuid>5362a2d1:151800f1736:-7f33</wuid>
+    <auto_size>false</auto_size>
+    <rotation_angle>0.0</rotation_angle>
+    <scripts />
+    <height>20</height>
+    <name>Text Update</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <format_type>0</format_type>
+    <precision_from_pv>true</precision_from_pv>
+    <transparent>false</transparent>
+    <pv_name>dqm://TEST:h_HitXPositionCh01:bincontent[500]</pv_name>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Text Update</widget_type>
+    <enabled>true</enabled>
+    <text>######</text>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <precision>0</precision>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>100</width>
+    <border_style>0</border_style>
+    <rules />
+    <pv_value />
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <horizontal_alignment>0</horizontal_alignment>
+    <actions hook="false" hook_all="false" />
+    <y>366</y>
+    <wrap_words>false</wrap_words>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>39</x>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <visible>true</visible>
+    <vertical_alignment>1</vertical_alignment>
+    <show_units>true</show_units>
+    <wuid>66ca9d01:15180130241:-7fdd</wuid>
+    <auto_size>false</auto_size>
+    <rotation_angle>0.0</rotation_angle>
+    <scripts />
+    <height>20</height>
+    <name>Text Update_2</name>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <format_type>0</format_type>
+    <precision_from_pv>true</precision_from_pv>
+    <transparent>false</transparent>
+    <pv_name>dqm://TEST:h_HitXYPositionCh01:bincontent[10][10]</pv_name>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <widget_type>Text Update</widget_type>
+    <enabled>true</enabled>
+    <text>######</text>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <precision>0</precision>
+    <font>
+      <opifont.name fontName="Sans" height="10" style="0">Default</opifont.name>
+    </font>
+    <width>100</width>
+    <border_style>0</border_style>
+    <rules />
+    <pv_value />
+    <border_width>1</border_width>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <horizontal_alignment>0</horizontal_alignment>
+    <actions hook="false" hook_all="false" />
+    <y>402</y>
+    <wrap_words>false</wrap_words>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <x>39</x>
+  </widget>
+</display>

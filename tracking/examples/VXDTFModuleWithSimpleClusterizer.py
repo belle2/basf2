@@ -18,15 +18,15 @@ initialValue = 2
 tuneValue = 0.06
 
 secSetup = [
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
-    'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD']
+    'shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+    'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+    'shiftedL3IssueTestSVDStd-25to100MeV_SVD']
 
 if usePXD:
     secSetup = \
-        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+        ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
          ]
     tuneValue = 0.22
 

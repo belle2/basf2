@@ -27,9 +27,9 @@ class VXD(TrackingValidationRun):
     components = ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'
                   ]
     secSetup = \
-        ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
-         'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD']
+        ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+         'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD']
     finder_module = basf2.register_module('VXDTF')
     param_vxdtf = {'sectorSetup': secSetup, 'tuneCutoffs': 0.22}
     finder_module.param(param_vxdtf)

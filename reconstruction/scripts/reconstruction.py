@@ -110,16 +110,16 @@ def add_track_finding(path, components=None):
         vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
         if components is not None and 'PXD' not in components:
             vxd_trackfinder.param('sectorSetup',
-                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-moreThan500MeV_SVD',
-                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-125to500MeV_SVD',
-                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014SVDStd-30to125MeV_SVD'
+                                  ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+                                   'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+                                   'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
                                    ])
             vxd_trackfinder.param('tuneCutoffs', 0.06)
         else:
             vxd_trackfinder.param('sectorSetup',
-                                  ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-moreThan500MeV_PXDSVD',
-                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD',
-                                   'secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-30to125MeV_PXDSVD'
+                                  ['shiftedL3IssueTestVXDStd-moreThan400MeV_PXDSVD',
+                                   'shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD',
+                                   'shiftedL3IssueTestVXDStd-25to100MeV_PXDSVD'
                                    ])
             vxd_trackfinder.param('tuneCutoffs', 0.22)
         path.add_module(vxd_trackfinder)

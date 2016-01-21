@@ -49,7 +49,7 @@ if len(argv) > 4:
     print('4th argument given, new value for numTracks: ' + str(numTracks))
 
 
-secSetup = ['secMapEvtGenAndPGunWithSVDGeo2p2OnR13760Nov2014VXDStd-125to500MeV_PXDSVD']
+secSetup = ['shiftedL3IssueTestVXDStd-100to400MeV_PXDSVD']
 tuneValue = 0.22
 
 set_log_level(LogLevel.WARNING)

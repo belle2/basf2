@@ -36,18 +36,18 @@ namespace Belle2 {
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_detPhot[i] = 0;
     }
 
-    /*! full constructor
+    /*!
+     * Set values
      * @param flag:     reconstruction flag
-     * @param logL log likelihoods in the order of Const::ChargedStableSet
-     * @param expPhot expected number of photons in the order of Const::ChargedStableSet
-     * @param detPhot detected number of photons in the order of Const::ChargedStableSet
+     * @param logL      log likelihoods in the order of Const::ChargedStableSet
+     * @param expPhot   expected number of photons in the order of Const::ChargedStableSet
+     * @param detPhot   detected number of photons in the order of Const::ChargedStableSet
      */
-
-    ARICHLikelihood(int flag,
-                    const double* logL,
-                    const int* detPhot,
-                    const double* expPhot
-                   )
+    void setValues(int flag,
+                   const double* logL,
+                   const int* detPhot,
+                   const double* expPhot
+                  )
     {
       m_flag = flag;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)

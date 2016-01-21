@@ -231,7 +231,7 @@ void CDCPackerModule::event()
       const short dataLength = nwords[j] * 4 - packet_header_words * 4;
       const int trigNum = m_event;
 
-      std::cout << "data length " << dataLength << std::endl;
+      //      std::cout << "data length " << dataLength << std::endl;
 
       *(buf[j] + 0) = (type << 24) | (ver << 16) | fee_id;
       *(buf[j] + 1) = ((trigTime << 16) | dataLength);

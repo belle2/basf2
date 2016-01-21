@@ -180,8 +180,8 @@ void BKLMUnpackerModule::event()
           //TDC (lowest 11 bits)
           //fourth word:
           //charge (lowest 12bits)
-          if (!((k - 1) % (hitLength)))
-            cout << endl;
+          //if (!((k - 1) % (hitLength)))
+          //  cout << endl;
         }
 
 

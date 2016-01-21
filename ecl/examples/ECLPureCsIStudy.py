@@ -95,6 +95,8 @@ if (withbg == 1):
 
 main.add_module(ecl_digitizerPureCsI)
 
+ecl_calibrator_PureCsI = register_module('ECLDigitCalibratorPureCsI')
+main.add_module(ecl_calibrator_PureCsI)
 ecl_shower_rec_PureCsI = register_module('ECLReconstructorPureCsI')
 main.add_module(ecl_shower_rec_PureCsI)
 
@@ -117,6 +119,7 @@ add_mdst_output(
         'ECLDigits',
         'ECLCalDigits',
         'ECLDigitsPureCsI',
+        'ECLCalDigitsPureCsI',
         'ECLDigitsPureCsIToECLDspsPureCsI',
         'ECLDigitsPureCsIToECLHits'])
 

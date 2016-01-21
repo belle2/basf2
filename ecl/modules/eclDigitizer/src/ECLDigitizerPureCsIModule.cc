@@ -197,7 +197,7 @@ void ECLDigitizerPureCsIModule::event()
       auto eclDigit = eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
-      eclDigit->setTimeFit(int(tFit * 1000));
+      eclDigit->setTimeFit(int(tFit * 10)); // time is in 0.1 ns units
       eclDigit->setQuality(qualityFit);
 
       eclDigit->addRelationTo(eclDsp);

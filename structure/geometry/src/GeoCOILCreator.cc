@@ -73,7 +73,7 @@ namespace Belle2 {
 
     GeoCOILCreator::~GeoCOILCreator()
     {
-      for (G4VisAttributes * visAttr : m_VisAttributes) delete visAttr;
+      for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
     }
 
@@ -84,10 +84,10 @@ namespace Belle2 {
       double GlobalRotAngle = content.getAngle("Rotation") / Unit::rad;
       double GlobalOffsetZ  = content.getLength("OffsetZ") / Unit::mm;
 
-      string strMatCryo = content.getString("Cryostat/Material");
-
       //Get Material
-      //TGeoMedium* strMedCryo = gGeoManager->GetMedium(strMatCryo.c_str());
+      //TO DO: also propagete to other components so they get their material fro the xml file
+      string strMatCryo = content.getString("Cryostat/Material", "Air");
+      G4Material* matCryostat = Materials::get(strMatCryo);
 
       double CryoRmin   = content.getLength("Cryostat/Rmin") / Unit::mm;
       double CryoRmax   = content.getLength("Cryostat/Rmax") / Unit::mm;
@@ -96,7 +96,7 @@ namespace Belle2 {
       G4Tubs* CryoTube =
         new G4Tubs("Cryostat", CryoRmin, CryoRmax, CryoLength, 0.0, M_PI * 2.0);
       G4LogicalVolume* CryoLV =
-        new G4LogicalVolume(CryoTube, Materials::get("G4_Fe"), "LVCryo", 0, 0, 0);
+        new G4LogicalVolume(CryoTube, matCryostat, "LVCryo", 0, 0, 0);
       new G4PVPlacement(G4TranslateZ3D(GlobalOffsetZ) * G4RotateZ3D(GlobalRotAngle),
                         CryoLV, "PVCryo", &topVolume, false, 0);
 

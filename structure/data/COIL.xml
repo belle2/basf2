@@ -8,14 +8,14 @@
 		<Rmin unit="cm">170.0</Rmin>
 		<Rmax unit="cm">200.0</Rmax>
 		<HalfLength unit="cm">220.5</HalfLength>
-		<Material desc="Starting material of Coil Vessel : Cryostat">Iron</Material>
+		<Material desc="Starting material of Coil Vessel : Cryostat">G4_Fe</Material>
 	</Cryostat>
 
 	<Cavity1>
 		<Rmin unit="cm">170.6</Rmin>
 		<Rmax unit="cm">198.0</Rmax>
 		<HalfLength unit="cm">216.7</HalfLength>
-		<Material desc="material of Coil empty space">Air</Material>
+		<Material desc="material of Coil empty space">G4_Air</Material>
 	</Cavity1>
 
 	<RadShield>
@@ -29,7 +29,7 @@
 		<Rmin unit="cm">173.5</Rmin>
 		<Rmax unit="cm">193.8</Rmax>
 		<HalfLength unit="cm">211.5</HalfLength>
-		<Material desc="material of Coil empty space">Air</Material>
+		<Material desc="material of Coil empty space">G4_AIR</Material>
 	</Cavity2>
 
 	<Coil>

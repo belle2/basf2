@@ -55,6 +55,16 @@ namespace Belle2 {
       return 1.0;
     }
 
+    double isNotContinuumEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      for (int i = 0; i < mcParticles.getEntries(); ++i) {
+        if (mcParticles[i]->getPDG() == 300553)
+          return 1.0;
+      }
+      return 0.0;
+    }
+
     double nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
@@ -182,6 +192,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
+    REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
+                      "[Eventbased] 1.0 if event does contain an Y(4S) and therefore is not a continuum Event");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");

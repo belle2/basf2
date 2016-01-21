@@ -22,6 +22,12 @@ namespace Belle2 {
      */
     double isContinuumEvent(const Particle*);
 
+    /*
+     * Variable used as target for Continuum Suppression Training
+     * Returns 1.0 if the Event is not a continuum event, else 0.0
+    */
+    double isNotContinuumEvent(const Particle*);
+
     /**
      * return number of tracks in event
      */

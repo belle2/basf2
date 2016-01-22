@@ -451,6 +451,8 @@ void CRY::storeParticle(MCParticleGraph& mcGraph, const double* mom, const doubl
   const double flightTime = trackLength / speed; // flighttime from virtual starting point to y=0
 
   part.setProductionTime(m_timeOffset - flightTime);
+
+  B2DEBUG(100, "Original time from CRY: " << ptime);
 }
 
 

@@ -880,6 +880,42 @@ namespace Belle2 {
       return result ;
     }
 
+
+    double AngleG1T1LE(const Particle* particle)
+    {
+      double result = -10.;
+
+      if (ECLClusterNeutralLE(particle)) {
+        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
+        if (T1(particle)) {
+          TLorentzVector V4p1 = T1(particle)->get4Vector();
+          //  const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          result = (V4g1.Vect()).Angle(V4p1.Vect());
+        }
+      }
+      return result ;
+    }
+
+
+    double AngleG1T2LE(const Particle* particle)
+    {
+      double result = -10.;
+
+      if (ECLClusterNeutralLE(particle)) {
+        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
+        if (T2(particle)) {
+          TLorentzVector V4p2 = T2(particle)->get4Vector();
+          //const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          result = (V4g1.Vect()).Angle(V4p2.Vect());
+        }
+      }
+      return result ;
+    }
+
+
+
     double AngleT1C1LE(const Particle* particle)
     {
       double result = -10.;
@@ -1051,6 +1087,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("ENeutralCMSHLT", ENeutralCMSLE, "[Eventbased] the secondary largest energy of the neutral cluster in CMS");
 
     REGISTER_VARIABLE("AngGTHLT", AngleGTLE, "[Eventbased] the max angle between the largest neutral cluster and T1 (T2) ");
+    REGISTER_VARIABLE("AngG1T1HLT", AngleG1T1LE, "[Eventbased] the angle between the largest neutral cluster and T1 ");
+    REGISTER_VARIABLE("AngG1T2HLT", AngleG1T2LE, "[Eventbased] the angle between the largest neutral cluster and T2 ");
     REGISTER_VARIABLE("AngC1T1HLT", AngleT1C1LE, "[Eventbased] the angle between T1 and C1 ");
     REGISTER_VARIABLE("AngC2T1HLT", AngleT1C2LE, "[Eventbased] the angle between T1 and C2 ");
     REGISTER_VARIABLE("AngC1T2HLT", AngleT2C1LE, "[Eventbased] the angle between T2 and C1 ");

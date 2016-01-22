@@ -329,10 +329,10 @@ namespace Belle2 {
 
     double  logL[c_noOfHypotheses] = {0.0};
     double  nBgr[c_noOfHypotheses] = {0.0};
-    double  nSig_w_acc[c_noOfHypotheses][c_noOfAerogels] = {0.0}; // expected no. of signal photons, including geometrical acceptance
-    double  nSig_wo_acc[c_noOfHypotheses][c_noOfAerogels][20] = {0.0}; // expected no. of signal photons, without geometrical acceptance, divided in 20 phi bins (used for PDF normalization)
+    double  nSig_w_acc[c_noOfHypotheses][c_noOfAerogels] = { {0.0} }; // expected no. of signal photons, including geometrical acceptance
+    double  nSig_wo_acc[c_noOfHypotheses][c_noOfAerogels][20] = { { {0.0} } }; // expected no. of signal photons, without geometrical acceptance, divided in 20 phi bins (used for PDF normalization)
     double  esigi[c_noOfHypotheses] = {0.0}; // expected number of signal photons in hit pixel
-    double  thetaCh[c_noOfHypotheses][c_noOfAerogels] = {0.0}; // expected Cherenkov angle
+    double  thetaCh[c_noOfHypotheses][c_noOfAerogels] = { {0.0} }; // expected Cherenkov angle
 
     // read some geometry parameters
     double padSize = m_arichGeoParameters->getDetectorPadSize();

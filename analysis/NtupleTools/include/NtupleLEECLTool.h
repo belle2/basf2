@@ -61,6 +61,8 @@ namespace Belle2 {
     /**the angle between C1 (C2) and T1 (T2)*/
     float* m_AngCT;
 
+    /**the angle between G1 and T1 (T2)*/
+    float* m_AngGT;
 //    float m_EC12CMS;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */

@@ -32,6 +32,10 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb)
     std::string vname = StringUtil::form("cdc[%d].ped[%d]", hslb.get_finid(), i);
     callback.add(new CDCPedestalHandler(vname, callback, hslb, *this, i));
   }
+  callback.add(new NSMVHandlerFloat(vname + ".tem", true, false, 0));
+  callback.add(new NSMVHandlerFloat(vname + ".vccint", true, false, 0));
+  callback.add(new NSMVHandlerFloat(vname + ".vccaux", true, false, 0));
+  callback.add(new NSMVHandlerFloat(vname + ".vcc5v", true, false, 0));
 }
 
 void CDCFEE::boot(HSLB& hslb,  const DBObject& obj)
@@ -93,6 +97,52 @@ void CDCFEE::load(HSLB& hslb, const DBObject& obj)
           | ((o_ped[2 * i + 1].getInt("val") << 16) & 0xFFFF0000);
     hslb.writefee32(0x0020 + i, val);
   }
+}
+
+void CDCFEE::monitor(RCCallback& callback, HSLB& hslb)
+{
+  std::string vname = StringUtil::form("cdc[%d]", hslb.get_finid());
+
+  // System monitor
+  hslb.writefee32(0X0016, 0x00480F00);
+  callback.wait(0.5);
+  hslb.writefee32(0X0016, 0x00400400);
+  callback.wait(0.5);
+  hslb.writefee32(0X0016, 0x004120F0);
+  callback.wait(0.5);
+
+  // temparature
+  hslb.writefee32(0X0016, 0x80000000);
+  callback.wait(0.5);
+  int ret = hslb.readfee32(0X0016);
+  int v0 = ret & 0xffff;
+  float tem = (v0 / 64.) * (503.975 / 1024.) - 273.15;
+  callback.set(vname + ".tem", tem);
+
+  // VCCINT
+  hslb.writefee32(0X0016, 0x80010000);
+  callback.wait(0.5);
+  int ret = hslb.readfee32(0X0016);
+  int v0 = ret & 0xffff;
+  float vccint = (v0 / 64.) * (3.0 / 1024.);
+  callback.set(vname + ".vccint", vccint);
+
+  // VCCAUX
+  hslb.writefee32(0X0016, 0x80020000);
+  callback.wait(0.5);
+  int ret = hslb.readfee32(0X0016);
+  int v0 = ret & 0xffff;
+  float vccaux = (v0 / 64.) * (3.0 / 1024.);
+  callback.set(vname + ".vccaux", vccaux);
+
+  // VCC5V
+  hslb.writefee32(0X0016, 0x80030000);
+  callback.wait(0.5);
+  int ret = hslb.readfee32(0X0016);
+  int v0 = ret & 0xffff;
+  float vcc5v = ((390. + 51. + 39.) * v0 / (64.*1024.)) / 51.;
+  callback.set(vname + ".vcc5v", vcc5v);
+
 }
 
 extern "C" {

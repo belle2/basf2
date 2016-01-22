@@ -26,7 +26,7 @@
     <!-- Switch for loadding x-t etc. (from disk) to be used in digitization -->
     <XTetc desc="true: load x-t etc. params. from disk; false: not load.">true</XTetc>
     <xtFileName desc="file which contains x-t relation">xt_v2.1.dat</xtFileName>
-    <sigmaFileName desc="file which contains space resol.">sigma_v0.dat</sigmaFileName>
+    <sigmaFileName desc="file which contains space resol.">sigma_v0.1.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
     <t0FileName desc="file which contains t0">t0.dat</t0FileName>
     <twFileName desc="file which contains time-walk">tw_off.dat</twFileName>
@@ -43,7 +43,7 @@
     <!-- Switch for selecting x-t etc. to be used in reconstruction -->
     <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
     <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v2.1.dat</xt4ReconFileName>
-    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.dat</sigma4ReconFileName>
+    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.1.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
     <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
     <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName>

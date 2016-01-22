@@ -584,7 +584,8 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
   }
 
   int iL;
-  const int np = 6;
+  //  const int np = 6;
+  const int np = 7;
   double sigma[np];
   unsigned nRead = 0;
 
@@ -601,11 +602,13 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
       m_Sigma[iL][i] = sigma[i];
     }
 
-    m_Sigma[iL][np] = 0.5 * m_cellSize[iL] - 0.75;
+    //    m_Sigma[iL][np] = 0.5 * m_cellSize[iL] - 0.75;
+    //    std::cout <<"L,p6= " << iL <<" "<< m_Sigma[iL][np] << std::endl;
 
     if (m_debug) {
       cout << iL;
-      for (int i = 0; i < np + 1; ++i) {
+      //      for (int i = 0; i < np + 1; ++i) {
+      for (int i = 0; i < np; ++i) {
         cout << " " << m_Sigma[iL][i];
       }
       cout << endl;

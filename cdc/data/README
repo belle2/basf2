@@ -40,12 +40,15 @@ Format: layerID (0-55), param (0-6)
 param[0],[1]: primary-ion statistics term
 param[2]    : diffusion term
 param[3]    : electronics noise term
-param[4],[5]: term describes electric distortion near cell boundary
+param[4-6]  : term describes electric distortion near cell boundary
 
-See xx for detail.
+See CDCGeometryPar::getSigma() for detail.
 
 * sigma_simple.dat: assume ideal sigma^2 = 130um^2, indep. of layer or driftL.
-* sigma_v0.dat    : more realistic one, obtained in beam test.
+* sigma_v0.dat    : obsolete. more realistic one, obtained in beam test.
+* sigma_v0.1.dat  : param[6] is added to sigma_v0.dat so that one can change it 
+                    externally (it was fixed to the half cell-size - 0.75cm in 
+                    the code previously).
 
 
 

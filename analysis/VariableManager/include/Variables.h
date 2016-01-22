@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
 namespace Belle2 {
@@ -281,6 +282,16 @@ namespace Belle2 {
      * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
      */
     double particleMCPrimaryParticle(const Particle* particle);
+
+    /**
+     * return the type of the particle decay (no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2, lower level leptonic = 3
+     */
+    double particleMCDecayType(const Particle* particle);
+
+    /**
+     * recursive helper function used by the particleMCDecayType variable
+     */
+    void checkMCParticleDecay(MCParticle* mcp, int& run, int& decayType);
 
     /**
      * return px of matched MCParticle (-999.0 if the particle is not matched)

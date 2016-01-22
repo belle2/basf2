@@ -499,53 +499,29 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("correctedB_deltae(mask1)");
+    var = Manager::Instance().getVariable("correctedB_deltae(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0 - corrRec4vecCMS.E());
 
-    var = Manager::Instance().getVariable("correctedB_deltae(mask2)");
+    var = Manager::Instance().getVariable("correctedB_deltae(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0 - rec4vecCMS.E() - rec4vecCMS.Vect().Mag());
 
-    var = Manager::Instance().getVariable("correctedB_mbc(mask1)");
+    var = Manager::Instance().getVariable("correctedB_mbc(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()));
 
-    var = Manager::Instance().getVariable("correctedB_mbc(mask2)");
+    var = Manager::Instance().getVariable("correctedB_mbc(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("roeMissMass(mask1,0)");
+    var = Manager::Instance().getVariable("missM2(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), m4v0.Mag2());
 
-    var = Manager::Instance().getVariable("roeMissMass(mask2,0)");
+    var = Manager::Instance().getVariable("missM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask1,1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), m4v1.Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask2,1)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), (E0 - rec4vecCMS.E()) * (E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask1,2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), m4v2.Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask2,2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), (E0 - rec4vecCMS.E()) * (E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask1,3)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), m4v3.Mag2());
-
-    var = Manager::Instance().getVariable("roeMissMass(mask2,3)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), (E0 - rec4vecCMS.E()) * (E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
 
     EXPECT_FLOAT_EQ(1.0, nAllROETracks(part));
     EXPECT_FLOAT_EQ(1.0, nAllROEECLClusters(part));
@@ -553,7 +529,6 @@ namespace {
     EXPECT_FLOAT_EQ(1.0, nAllROEKLMClusters(part));
 
   }
-
 
   class MetaVariableTest : public ::testing::Test {
   protected:

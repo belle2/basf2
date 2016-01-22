@@ -516,7 +516,95 @@ namespace Belle2 {
       }
     }
 
-// MC related ------------------------------------------------------------
+    double recoilParticleMCDecayType(const Particle* particle)
+    {
+
+      MCParticle* mcp = particle->getRelatedTo<MCParticle>();
+
+      if (!mcp)
+        return -1.0;
+
+      MCParticle* mcMother = mcp->getMother();
+
+      if (!mcMother)
+        return -1.0;
+
+      std::vector<MCParticle*> daughters = mcMother->getDaughters();
+
+      if (daughters.size() != 2)
+        return -1.0;
+
+      MCParticle* recoilMC;
+      if (daughters[0]->getArrayIndex() == mcp->getArrayIndex())
+        recoilMC = daughters[1];
+      else
+        recoilMC = daughters[0];
+
+      if (!recoilMC->hasStatus(MCParticle::c_PrimaryParticle))
+        return -1.0;
+
+      int run = 0;
+      int decayType = 0;
+
+      checkMCParticleDecay(recoilMC, run, decayType);
+
+      return decayType;
+    }
+
+    void checkMCParticleDecay(MCParticle* mcp, int& run, int& decayType)
+    {
+      int nHadronicParticles = 0;
+      int nPrimaryParticleDaughters = 0;
+      std::vector<MCParticle*> daughters = mcp->getDaughters();
+
+      // Are any of the daughters primary particles? How many of them are hadrons?
+      for (unsigned i = 0; i < daughters.size(); i++) {
+        if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+          continue;
+
+        nPrimaryParticleDaughters++;
+        if (abs(daughters[i]->getPDG()) > 22)
+          nHadronicParticles++;
+      }
+
+      // If yes, loop through the primary ones
+      if (nPrimaryParticleDaughters > 1) {
+        // Is the decay (semi-) leptonic?
+        if (run == 0) {
+          for (unsigned i = 0; i < daughters.size(); i++) {
+            if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+              continue;
+
+            if (abs(daughters[i]->getPDG()) == 12 or abs(daughters[i]->getPDG()) == 14 or abs(daughters[i]->getPDG()) == 16) {
+              if (nHadronicParticles == 0) {
+                decayType = 1.0;
+                break;
+              } else {
+                decayType = 2.0;
+                break;
+              }
+            }
+          }
+          run++;
+        }
+
+        // Is the decay leptonic in the lower level?
+        if (decayType == 0) {
+          for (unsigned i = 0; i < daughters.size(); i++) {
+            if (!daughters[i]->hasStatus(MCParticle::c_PrimaryParticle))
+              continue;
+
+            if (abs(daughters[i]->getPDG()) == 12 or abs(daughters[i]->getPDG()) == 14 or abs(daughters[i]->getPDG()) == 16) {
+              decayType = 3.0;
+              break;
+            } else
+              checkMCParticleDecay(daughters[i], run, decayType);
+          }
+        }
+      }
+    }
+
+    // MC related ------------------------------------------------------------
     double particleMCVirtualParticle(const Particle* p)
     {
       const MCParticle* mcp = p->getRelated<MCParticle>();
@@ -1336,6 +1424,8 @@ namespace Belle2 {
                       "Returns status bits of related MCParticle or -1 if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
                       "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.");
+    REGISTER_VARIABLE("recoilMCDecayType", recoilParticleMCDecayType,
+                      "Returns the type of the particle decay (no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2, lower level leptonic = 3.");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,

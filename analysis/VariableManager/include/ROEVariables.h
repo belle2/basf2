@@ -114,33 +114,67 @@ namespace Belle2 {
     Manager::FunctionPtr correctedBMesonMbc(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the missing mass squared.
-     * Option 0: Take momentum and energy of all ROE tracks and clusters into account
-     * Option 1: Take only momentum of ROE tracks and clusters into account, energy set to E_beam
-     * Option 2: Don't take any ROE tracks and clusters into account, use signal side only
-     * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
-     *           system in the direction of the ROE momentum
+     * Returns the invariant mass squared of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr ROEMissingMass(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr missM2(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns Xi_z in event (for Bhabha suppression and two-photon scattering)
+     */
+    Manager::FunctionPtr xiZ(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the polar angle of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missPTheta(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the magnitude of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missP(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the x component of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missPx(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the y component of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missPy(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the z component of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missPz(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the energy of the missing momentum (see possible options)
+     */
+    Manager::FunctionPtr missE(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns custom variable missing mass squared over missing energy
+     */
+    Manager::FunctionPtr missM2OverMissE(const std::vector<std::string>& arguments);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
     /**
-     * Returns the missing 4-momentum vector in CMS system.
-     * Option 0: Take momentum and energy of all ROE tracks and clusters into account
-     * Option 1: Take only momentum of ROE tracks and clusters into account, energy set to E_beam
-     * Option 2: Don't take any ROE tracks and clusters into account, use signal side only
-     * Option 3: Same as option 2, but use the correction of the B meson momentum magnitude in LAB
-     *           system in the direction of the ROE momentum
+     * Returns the missing 4-momentum vector.
+     * Option 0: CMS: Take momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
+     * Option 1: CMS: Same as option 0, but fix Emiss = pmiss (missing mass set to 0)
+     * Option 2: CMS: Same as option 0, but fix Eroe = Ecms/2 (ignore energy from ROE side)
+     * Option 3: CMS: Don't take any ROE tracks and clusters into account, use signal side only (signal based variable)
+     * Option 4: CMS: Same as option 3, but use the correction of the B meson momentum magnitude in LAB (update with pB in opposite ROE direction)
+     *           system in the opposite direction of the ROE momentum
+     * Option 5: LAB: Use momentum and energy of all ROE and REC side tracks and clusters into account ("event based" variable)
+     * Option 6: LAB: Same as option 5, but fix Emiss = pmiss (missing mass set to 0)
+     * Option 7: LAB: Same as 6, correct pmiss 4vector with factor
      */
-    TLorentzVector missing4VectorCMS(const Particle* particle, std::string maskName, std::string opt);
-
-    /**
-     * Returns the neutrino 4-momentum vector in CMS system. Mass of neutrino is 0 by definition: E == |p|
-     */
-    TLorentzVector neutrino4VectorCMS(const Particle* particle, std::string maskName);
+    TLorentzVector missing4Vector(const Particle* particle, std::string maskName, std::string opt);
 
   }
 } // Belle2 namespace

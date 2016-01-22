@@ -286,12 +286,17 @@ namespace Belle2 {
     /**
      * return the type of the particle decay (no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2, lower level leptonic = 3
      */
-    double particleMCDecayType(const Particle* particle);
+    double recoilParticleMCDecayType(const Particle* particle);
 
     /**
      * recursive helper function used by the particleMCDecayType variable
      */
     void checkMCParticleDecay(MCParticle* mcp, int& run, int& decayType);
+
+    /*
+     * return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay
+     */
+    double particleMCMomentumTransfer2(const Particle* part);
 
     /**
      * return px of matched MCParticle (-999.0 if the particle is not matched)

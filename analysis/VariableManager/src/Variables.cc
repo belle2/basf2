@@ -604,6 +604,39 @@ namespace Belle2 {
       }
     }
 
+    double particleMCMomentumTransfer2(const Particle* part)
+    {
+      // for B meson MC particles only
+      const MCParticle* mcB = part->getRelated<MCParticle>();
+
+      if (!mcB)
+        return -999.9;
+
+      TLorentzVector pB = mcB->get4Vector();
+
+      std::vector<MCParticle*> mcDaug = mcB->getDaughters();
+
+      if (mcDaug.empty())
+        return -999.9;
+
+      // B -> X l nu
+      // q = pB - pX
+      TLorentzVector pX;
+
+      for (unsigned i = 0; i < mcDaug.size(); i++) {
+        const MCParticle* mcTemp = mcDaug[i];
+
+        if (abs(mcTemp->getPDG()) <= 16)
+          continue;
+
+        pX += mcTemp->get4Vector();
+      }
+
+      TLorentzVector q = pB - pX;
+
+      return q.Mag2();
+    }
+
     // MC related ------------------------------------------------------------
     double particleMCVirtualParticle(const Particle* p)
     {
@@ -1426,6 +1459,8 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("recoilMCDecayType", recoilParticleMCDecayType,
                       "Returns the type of the particle decay (no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2, lower level leptonic = 3.");
+    REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
+                      "Return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay.");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,

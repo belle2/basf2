@@ -240,15 +240,14 @@ double PostRawCOPPERFormat_v1::GetEventUnixTime(int n)
 
 }
 
-unsigned int PostRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
-                                                           unsigned int m_trunc_mask, unsigned int prev_eve32,
+unsigned int PostRawCOPPERFormat_v1::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
                                                            unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   char err_buf[500];
   sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u %u %u\n",
-         m_node_id, m_data_type, m_trunc_mask, prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
+  printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u\n",
+         m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
   string err_str = err_buf;
   throw (err_str);
 

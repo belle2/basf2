@@ -246,7 +246,7 @@ namespace Belle2 {
     unsigned int GetTTUtime(int n);
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
-    unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type, unsigned int m_trunc_mask,
+    unsigned int FillTopBlockRawHeader(unsigned int m_node_id,
                                        unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
 
     //! read COPPER driver's checksum value
@@ -696,13 +696,11 @@ namespace Belle2 {
     return m_access->GetB2LHeaderWord(n, finesse_buffer_pos);
   }
 
-  inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int m_data_type,
-                                                        unsigned int m_trunc_mask, unsigned int prev_eve32,
+  inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
                                                         unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
   {
     CheckVersionSetBuffer();
-    return m_access->FillTopBlockRawHeader(m_node_id, m_data_type,
-                                           m_trunc_mask, prev_eve32,
+    return m_access->FillTopBlockRawHeader(m_node_id, prev_eve32,
                                            prev_exprunsubrun_no, cur_exprunsubrun_no);
   }
 

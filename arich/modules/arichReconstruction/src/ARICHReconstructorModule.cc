@@ -177,6 +177,7 @@ namespace Belle2 {
           if (extHit->getDetectorID() != myDetID) continue;
           if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
           if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
+          if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
           // if aeroHit cannot be found using MCParticle check if it was already related to the extHit (by ARICHRelate module)
           if (!aeroHit) aeroHit = extHit->getRelated<ARICHAeroHit>();
 
@@ -193,7 +194,6 @@ namespace Belle2 {
         ARICHLikelihood* like = arichLikelihoods.appendNew();
         // calculate and set likelihood values
         m_ana->likelihood2(*arichTrack, arichDigits, *like);
-
         // make relations
         track->addRelationTo(like);
         arichTrack->addRelationTo(like);

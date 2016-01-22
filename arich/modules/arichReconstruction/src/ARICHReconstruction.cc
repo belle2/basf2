@@ -346,7 +346,7 @@ namespace Belle2 {
 
     // reconstructed track direction
     TVector3 edir = arichTrack.getDirection();
-
+    if (edir.z() < 0) return 0;
 
     //------------------------------------------------------
     // Calculate number of expected detected photons (emmited x geometrical acceptance).
@@ -384,7 +384,7 @@ namespace Belle2 {
           TVector3 epoint = exit_point - (0.5 + iepoint) * dxx * edir;
           abs *= exp(-dxx / m_transmissionLen[iAerogel]);
           unsigned int genPhot = nPhot * abs; // number of photons to emmit in current step, including absorbtion correction
-
+          if (genPhot > 500) std::cout << genPhot << std::endl;
           // loop over emmited "photons"
           for (unsigned int iPhoton = 0; iPhoton < genPhot; iPhoton++) {
             double fi = 2 * M_PI * iPhoton / float(genPhot);
@@ -592,7 +592,7 @@ namespace Belle2 {
     // set values of ARICHLikelihood
     arichLikelihood.setValues(flag, logL, nDetPhotons, exppho);
 
-    return 0;
+    return 1;
   }
 
   void ARICHReconstruction::setBackgroundLevel(double bkgLevel)

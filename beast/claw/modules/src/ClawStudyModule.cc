@@ -126,6 +126,8 @@ void ClawStudyModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CLAW\"]/Content/");
   m_Ethres = content.getDouble("Ethres");
+
+  B2INFO("ClawStudy");
 }
 
 

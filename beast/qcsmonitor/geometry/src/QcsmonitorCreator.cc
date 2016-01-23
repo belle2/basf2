@@ -76,7 +76,6 @@ namespace Belle2 {
       G4VisAttributes* coppercolor = new G4VisAttributes(G4Colour(218. / 255., 138. / 255., 103. / 255.));
       coppercolor->SetForceAuxEdgeVisible(true);
 
-      int detID = 0;
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
@@ -125,6 +124,7 @@ namespace Belle2 {
           }
         }
 
+        int detID = 0;
         for (double phi : activeParams.getArray("Phi", {M_PI / 2})) {
           //phi  *= CLHEP::deg;
           for (int i = 0; i < dim; i++) {

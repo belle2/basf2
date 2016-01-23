@@ -474,7 +474,7 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
 
   char err_buf[500];
   sprintf(err_buf,
-          "This function for format ver.0 is not supported. (node %.8x type %.8x trunc %.8x preveve %u prevrun %u currun %u ) Exiting...\n %s %s %d\n",
+          "This function for format ver.0 is not supported. (node %.8x preveve %u prevrun %u currun %u ) Exiting...\n %s %s %d\n",
           m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf;

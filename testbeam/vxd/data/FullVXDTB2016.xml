@@ -19,8 +19,8 @@
   <xi:include href="./TB-Materials.xml" />
   
   <!-- TODO: This makes genfitter working, because it tries to initialize CDC translators which read params from GearBox -->
-  <DetectorComponent name="CDCGearBoxData" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
-    <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <DetectorComponent name="CDC" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+    <xi:include href="../../cdc/CDC.xml" xpointer="xpointer(//DetectorComponent[@name='CDC']/*)" />
   </DetectorComponent>
   
   <!-- Magnetic field inside PCMag @ DESY -->

@@ -67,23 +67,18 @@ namespace Belle2 {
 
       /** reads data from BGO.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
+      /** Energy threshold */
+      double m_Ethres;
 
-      /** number of detectors. Read from BGO.xml*/
-      int nDIA = 0;
-      /** PIN coordinate */
-      std::vector<TVector3> PINCenter;
-      /** Event counter */
-      int Event = 0;
+      /** Energy deposited vs TOF */
+      TH2F* h_bgos_Evtof1[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_bgos_Evtof2[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_bgos_Evtof3[8];
+      /** Energy deposited */
+      TH1F* h_bgos_edep[8];
 
-
-      /** histo dose */
-      TH1F* h_dose[100];
-      /** histo energy deposited */
-      TH1F* h_edep[100];
-      /** histo time */
-      TH1F* h_time[100];
-      /** histo time weighted by volt */
-      TH1F* h_vtime[100];
     };
 
   }

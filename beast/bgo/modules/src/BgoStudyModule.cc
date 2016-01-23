@@ -54,6 +54,7 @@ BgoStudyModule::BgoStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Bgos (BEAST)");
 
+  addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
 }
 
 BgoStudyModule::~BgoStudyModule()
@@ -63,12 +64,14 @@ BgoStudyModule::~BgoStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void BgoStudyModule::defineHisto()
 {
-  //Default values are set here. New values can be in BGO.xml.
   for (int i = 0; i < 8; i++) {
-    h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 10000, 0., 1000.);
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 1000.);
-    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
-    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
+    h_bgos_Evtof1[i] = new TH2F(TString::Format("h_bgos_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
+                                1000, 0., 10.);
+    h_bgos_Evtof2[i] = new TH2F(TString::Format("h_bgos_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
+                                1000., 1000, 0., 10.);
+    h_bgos_Evtof3[i] = new TH2F(TString::Format("h_bgos_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                1000., 1000, 0., 10.);
+    h_bgos_edep[i] = new TH1F(TString::Format("h_bgos_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 
 }
@@ -92,9 +95,6 @@ void BgoStudyModule::beginRun()
 void BgoStudyModule::event()
 {
   //Here comes the actual event processing
-  double Edep[8];
-  for (int i = 0; i < 8; i ++)Edep[i] = 0;
-
   StoreArray<BgoSimHit>  SimHits;
 
   //Skip events with no Hits
@@ -104,25 +104,29 @@ void BgoStudyModule::event()
 
   int nSimHits = SimHits.getEntries();
 
+  //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     BgoSimHit* aHit = SimHits[i];
-    int detNb = aHit->getCellId();
-    double edep = aHit->getEnergyDep();
-    double time = aHit->getFlightTime();
-    Edep[detNb] += edep * 1e3;
-    h_dose[detNb]->Fill(edep * 1e3); //GeV to MeV
-    h_time[detNb]->Fill(time);
-    h_vtime[detNb]->Fill(time, edep * 1e3);
+    int detNB = aHit->getCellId();
+    //int trkID = aHit->getTrackId();
+    int pdg = aHit->getPDGCode();
+    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+    double tof = aHit->getFlightTime(); //ns
+
+    h_bgos_Evtof1[detNB]->Fill(tof, Edep);
+    if (pdg == 22) h_bgos_Evtof2[detNB]->Fill(tof, Edep);
+    else if (fabs(pdg) == 11) h_bgos_Evtof3[detNB]->Fill(tof, Edep);
+    else h_bgos_Evtof3[detNB]->Fill(tof, Edep);
+    if (Edep > m_Ethres)h_bgos_edep[detNB]->Fill(Edep);
   }
-  for (int i = 0; i < 8; i ++) {
-    if (Edep[i] > 0)h_edep[i]->Fill(Edep[i]);
-  }
+
 
 }
 //read tube centers, impulse response, and garfield drift data filename from BGO.xml
 void BgoStudyModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"BGO\"]/Content/");
+  m_Ethres = content.getDouble("Ethres");
 
   B2INFO("BgoStudy");
 

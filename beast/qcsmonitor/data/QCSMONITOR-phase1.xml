@@ -20,7 +20,7 @@
     <MinTime>0.0</MinTime>
     <MaxTime>600.0</MaxTime>
     <Ethres>0.0</Ethres>
-    <Ethres>0.0</Ethres>
+    <Ethres>0.2</Ethres>
     <ConvFac>1.0</ConvFac>
 
     <Active>

@@ -65,20 +65,19 @@ namespace Belle2 {
 
     private:
 
-      /** Time distribution */
-      TH2F* h_time;
-      /** Time distribution weighted per the energy deposited */
-      TH2F* h_timeWeighted;
-      /** Time distribution with energy threshold applied */
-      TH2F* h_timeThres;
-      /** Time distribution weighted per the energy deposited with energy threshold applied */
-      TH2F* h_timeWeightedThres;
-      /** Energy deposited per time bin */
-      TH2F* h_edep;
-      /** Energy deposited above threshold per time bin */
-      TH2F* h_edepThres;
-      /** Energy deposited vs z */
-      TH1F* h_zvedep[2];
+      /** reads data from QCSMONITOR.xml */
+      virtual void getXMLData();
+      /** Energy threshold */
+      double m_Ethres;
+
+      /** Energy deposited vs TOF */
+      TH2F* h_qcsms_Evtof1[2];
+      /** Energy deposited vs TOF */
+      TH2F* h_qcsms_Evtof2[2];
+      /** Energy deposited vs TOF */
+      TH2F* h_qcsms_Evtof3[2];
+      /** Energy deposited */
+      TH1F* h_qcsms_edep[2];
 
     };
 

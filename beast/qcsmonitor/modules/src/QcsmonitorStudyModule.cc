@@ -16,6 +16,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/GearDir.h>
 #include <cmath>
 #include <boost/foreach.hpp>
 
@@ -54,6 +56,7 @@ QcsmonitorStudyModule::QcsmonitorStudyModule() : HistoModule()
   // Set module properties
   setDescription("Study module for Qcsmonitors (BEAST)");
 
+  addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
 }
 
 QcsmonitorStudyModule::~QcsmonitorStudyModule()
@@ -63,22 +66,14 @@ QcsmonitorStudyModule::~QcsmonitorStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void QcsmonitorStudyModule::defineHisto()
 {
-  h_time = new TH2F("h_time", "Detector # vs. time", 16, 0., 16., 750, 0., 750.);
-  h_time->Sumw2();
-  h_timeWeighted = new TH2F("h_timeWeigthed", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0., 750.);
-  h_timeWeighted->Sumw2();
-  h_timeThres = new TH2F("h_timeThres", "Detector # vs. time", 16, 0., 16., 750, 0., 750.);
-  h_timeThres->Sumw2();
-  h_timeWeightedThres = new TH2F("h_timeWeigthedThres", "Detector # vs. time weighted by the energy deposited", 16, 0., 16., 750, 0.,
-                                 750.);
-  h_timeWeightedThres->Sumw2();
-  h_edep = new TH2F("h_edep", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
-  h_edep->Sumw2();
-  h_edepThres = new TH2F("h_edepThres", "Time bin # vs. energy deposited", 750, 0., 750., 3000, 0., 3.);
-  h_edepThres->Sumw2();
   for (int i = 0; i < 2; i++) {
-    h_zvedep[i] = new TH1F(TString::Format("h_zvedep_%d", i) , "edep [MeV] vs. z [cm]", 200, -10., 10.);
-    h_zvedep[i]->Sumw2();
+    h_qcsms_Evtof1[i] = new TH2F(TString::Format("h_qcsms_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
+                                 1000, 0., 10.);
+    h_qcsms_Evtof2[i] = new TH2F(TString::Format("h_qcsms_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
+                                 1000., 1000, 0., 10.);
+    h_qcsms_Evtof3[i] = new TH2F(TString::Format("h_qcsms_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                 1000., 1000, 0., 10.);
+    h_qcsms_edep[i] = new TH1F(TString::Format("h_qcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 }
 
@@ -102,44 +97,37 @@ void QcsmonitorStudyModule::event()
   //Here comes the actual event processing
 
   StoreArray<QcsmonitorSimHit>  SimHits;
-  StoreArray<QcsmonitorHit> Hits;
 
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
-  /*
+
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     QcsmonitorSimHit* aHit = SimHits[i];
-    int detNb = aHit->getdetNb();
-    double adep = aHit->getEnergyNiel();
-    TVector3 position = aHit->gettkPos();
+    int detNB = aHit->getCellId();
+    //int trkID = aHit->getTrackId();
+    int pdg = aHit->getPDGCode();
+    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+    double tof = aHit->getFlightTime(); //ns
 
-    if (0 <= detNb && detNb <= 7)
-      h_zvedep[0]->Fill(position.Z() / 100., adep);
-    else if (8 <= detNb && detNb <= 15)
-      h_zvedep[1]->Fill(position.Z() / 100., adep);
+    h_qcsms_Evtof1[detNB]->Fill(tof, Edep);
+    if (pdg == 22) h_qcsms_Evtof2[detNB]->Fill(tof, Edep);
+    else if (fabs(pdg) == 11) h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
+    else h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
+    if (Edep > m_Ethres)h_qcsms_edep[detNB]->Fill(Edep);
   }
 
-  //number of entries in Hit
-  int nHits = Hits.getEntries();
 
-  //loop over all Hit entries
-  for (int i = 0; i < nHits; i++) {
-    QcsmonitorHit* aHit = Hits[i];
-    int detNb = aHit->getdetNb();
-    float edep = aHit->getedep();
-    int timeBin = aHit->gettime();
-    h_time->Fill(detNb, timeBin);
-    h_timeWeighted->Fill(detNb, timeBin, edep);
-    h_edep->Fill(timeBin, edep);
-    if (edep > 1.0) {
-      h_edepThres->Fill(timeBin, edep);
-      h_timeThres->Fill(detNb, timeBin);
-      h_timeWeightedThres->Fill(detNb, timeBin, edep);
-    }
-  }
-  */
   eventNum++;
+}
+
+//read energy threshold from QCSMONITOR.xml
+void QcsmonitorStudyModule::getXMLData()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"QCSMONITOR\"]/Content/");
+  m_Ethres = content.getDouble("Ethres");
+
+  B2INFO("QcsmonitorStudy");
 }
 
 void QcsmonitorStudyModule::endRun()

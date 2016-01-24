@@ -172,6 +172,7 @@ void PXDValidation()
   treeSimHit->Draw(expr);
   hValidSimEnergyDepositMicron->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
   hValidSimEnergyDepositMicron->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum, should be 60."));
+  hValidSimEnergyDepositMicron->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidSimEnergyDepositMicron->Write();
 
 //  2: EDepositionLost 2D (Energy lost vs energy deposition) [from TrueHits]
@@ -185,6 +186,8 @@ void PXDValidation()
   tree->Draw("truehit_charge:truehit_LossMomentum>>hValidTrueDepositChargeTrueLostMomentum","","COLZ");
   hValidTrueDepositChargeTrueLostMomentum->GetListOfFunctions()->Add(new TNamed("Description", "Validation: true deposit energy vs. true lost momentum."));
   hValidTrueDepositChargeTrueLostMomentum->GetListOfFunctions()->Add(new TNamed("Check", "Validation: should be bit bellow 45 deg."));
+  hValidTrueDepositChargeTrueLostMomentum->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
+  hValidTrueDepositChargeTrueLostMomentum->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   hValidTrueDepositChargeTrueLostMomentum->Write();
   TLine *line = new TLine(lplot2,lplot2,hplot2,hplot2);
   line->SetLineWidth(2);
@@ -240,6 +243,7 @@ void PXDValidation()
   hValidParticleMovementThru->GetXaxis()->SetBinLabel(7,"particle growth and die inside (should be 0)");
   hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Statistics particle movement thru detector."));
   hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check bin content, should first be highest, res of bins less 1 percent."));
+  hValidParticleMovementThru->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidParticleMovementThru->Write();
 
 // -----------------------------------------------------
@@ -259,6 +263,7 @@ void PXDValidation()
     treeDigit->Draw(expr,cond);
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should have visible maxima in 20."));
+    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidDigitSignalToNoise[ipixtype]->Write();
   }
 
@@ -280,6 +285,8 @@ void PXDValidation()
   line2->Draw();
   hValidTrueDepositChargeRecoDepositCharge->GetListOfFunctions()->Add(new TNamed("Description", "Validation: true and reconstructed deposit energy."));
   hValidTrueDepositChargeRecoDepositCharge->GetListOfFunctions()->Add(new TNamed("Check", "Validation: should be bit bellow 45 deg."));
+  hValidTrueDepositChargeRecoDepositCharge->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
+  hValidTrueDepositChargeRecoDepositCharge->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   hValidTrueDepositChargeRecoDepositCharge->Write();
   cValidTrueDepositChargeRecoDepositCharge->Write();
 
@@ -324,6 +331,7 @@ void PXDValidation()
       tree->Draw(exprU1,cond);
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check RMS, should be less 2.0."));
+      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->Write();
       // v direction
       TString title2(Form("Validation: Error distribution in v, for cluster size in v: %s, pixel size in v: %i microns, layer %i, region %i",textclsize[iclsize].Data(),(int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2),ipixtype%2));
@@ -342,6 +350,7 @@ void PXDValidation()
       tree->Draw(exprV1,cond2);
       hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
       hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check RMS, should be less 2.0."));
+      hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
       hValidErrorDistrV[ipixtype*nPixSizeGroups+iclsize]->Write();
     }
   }
@@ -389,6 +398,7 @@ void PXDValidation()
     hValidEtaDistU[ipixtype]->SetLineColor(kRed);
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
+    hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidEtaDistU[ipixtype]->Write();
     // v direction
     TString title2(Form("Validation: Reconstructed in-pixel eta distribution in v, for pixel size in v: %i microns, layer %i, region %i",(int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2),ipixtype%2));
@@ -413,6 +423,7 @@ void PXDValidation()
     }
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
     hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
+    hValidEtaDistV[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidEtaDistV[ipixtype]->Write();
   }
   cValidEtaDist->Write();
@@ -424,6 +435,7 @@ void PXDValidation()
   tree->Draw("cluster_charge>>hValidRecoDepositEnergy");
   hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed Deposit Energy."));
   hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of energy plot, should be in about 6200."));
+  hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidRecoDepositEnergy->Write();
 
 // 10: Seed 1D (Seed) [from Clasterizer]
@@ -433,6 +445,7 @@ void PXDValidation()
   tree->Draw("cluster_seed>>hValidRecoSeed");
   hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed seed."));
   hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of seed plot, should be in about 5000."));
+  hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidRecoSeed->Write();
 
 // 11: ClusterSizeUV 1D (Cluster size) [from Clasterizer]
@@ -442,6 +455,7 @@ void PXDValidation()
   tree->Draw("cluster_size>>hClusterSizeUV");
   hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels over threshold."));
   hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in range 2-4."));
+  hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeUV->Write();
 
 // 12: ClusterSizeU 1D (Cluster size in u projection) [from Clasterizer]
@@ -451,6 +465,7 @@ void PXDValidation()
   tree->Draw("cluster_uSize>>hClusterSizeU");
   hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels in u projection over threshold."));
   hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 2."));
+  hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeU->Write();
 
 // 13: ClusterSizeV 1D (Cluster size in v projection) [from Clasterizer]
@@ -460,6 +475,7 @@ void PXDValidation()
   tree->Draw("cluster_vSize>>hClusterSizeV");
   hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels in v projection over threshold."));
   hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 2."));
+  hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeV->Write();
 
 // -----------------------------------------------------

@@ -52,6 +52,7 @@ void plot(const TString &input_filename)
     TH1* hist = (TH1*)output_file->Get(TString::Format("dedx_p_%d", idet));
     hist->SetTitle(TString::Format("dE/dx curve for %s; p [GeV]; dE/dx", detectors[idet]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
+    hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
     if (idet == 2) { //CDC
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Distinct bands for pions/kaons/protons below 1GeV, relativistic rise visible . Some misreconstructed tracks at very low dE/dx values."));
     } else { //PXD/SVD

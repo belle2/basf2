@@ -76,6 +76,8 @@ namespace Belle2 {
       TH2F* h_bgos_Evtof2[8];
       /** Energy deposited vs TOF */
       TH2F* h_bgos_Evtof3[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_bgos_Evtof4[8];
       /** Energy deposited */
       TH1F* h_bgos_edep[8];
 

@@ -19,7 +19,8 @@
     <FanoFactor>0.1</FanoFactor>
     <Active>
       <Material>BEAMABORT-Material</Material>
-      <x_offset unit="cm">0.,0,0,0</x_offset>
+      <phase >1</phase>
+      <x_offset unit="cm">0,0,0,0</x_offset>
       <y_offset unit="cm">0,0,0,0</y_offset>
       <!--x unit="cm">8.0,8.1,-4.8,-4.5</x-->
       <x unit="cm">4.5,4.5,-4.5,-4.5</x>

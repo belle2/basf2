@@ -15,7 +15,7 @@
          whitespace, comma or semi-colon -->
     <bar unit="cm">1 
     </bar>
-    <ScintCell>1</ScintCell>
+    <ScintCell>16</ScintCell>
     <TimeStep>0.8</TimeStep>
     <MinTime>0.0</MinTime>
     <MaxTime>600.0</MaxTime>
@@ -23,31 +23,20 @@
     <ConvFac>1.0</ConvFac>
 
     <Active>
-      <phase >1</phase>
       <Material>QCSMONITOR-Material</Material>
+      <phase >2</phase>
       <ThetaZ unit="deg">0.0</ThetaZ>
-      <Phi unit="deg">90.,90.</Phi>
-      <dx_scint unit="cm">0.25</dx_scint>
+      <!--Phi unit="deg">-15.,15.,75.,105,165.,195.,-75.,-105.</Phi-->
+      <Phi unit="deg">0.,90.,180.,-90.</Phi>
+      <dx_scint unit="cm">5.0</dx_scint>
       <dy_scint unit="cm">2.0</dy_scint>
-      <dz_scint unit="cm">15.</dz_scint>
-      <x unit="cm">19.5,19.5</x>
-      <y unit="cm">27.4,27.4</y>
-      <z unit="cm">55,-55</z>
+      <dz_scint unit="cm">0.25</dz_scint>
+      <z unit="cm">300,267,240,200,135,109.99,-80.00,-160.0,-180.0,-222.39,-274.675,-318.1</z>
+      <!--z unit="cm">300,267,240,200,135,109.99,-87.69,-160.0,-180.0,-222.39,-274.675,-318.1</z-->
+      <r unit="cm">31.65,30.89,34.95,26.36,26.25,22.75,21.95,25.25,25.25,32.75,41.25,55.25</r>
     </Active>
 
 
   </Content>
 </DetectorComponent>
-
-<!--      24.  /104.3+4.+5.6+4. 
-      26.  /104.3+4.+5.6+8.+42.+4.
-      34.7 /104.3+4.+5.6+8.+42.+8.+24.45+4.
-      51.30/104.3+4.+5.6+8.+42.+8.+24.45+8.+43.95+4.
-      68.  /104.3+4.+5.6+8.+42.+8.+24.45+8.+43.95+8.+35.4+4.
-
-      21.70/-76.30-4.-5.6-4.
-      25.00/-76.30-4.-5.6-8.-42.-4.
-      32.50/-76.30-4.-5.6-8.-42.-8.-24.45-4.
-      60.00/-76.30-4.-5.6-8.-42.-8.-24.45-8.-43.95-4.
-      75.00/-76.30-4.-5.6-8.-42.-8.-24.45-8.-43.95-8.-35.4-4. -->
 

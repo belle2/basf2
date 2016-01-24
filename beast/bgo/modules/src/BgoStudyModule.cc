@@ -71,6 +71,8 @@ void BgoStudyModule::defineHisto()
                                 1000., 1000, 0., 10.);
     h_bgos_Evtof3[i] = new TH2F(TString::Format("h_bgos_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                 1000., 1000, 0., 10.);
+    h_bgos_Evtof4[i] = new TH2F(TString::Format("h_bgos_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                1000., 1000, 0., 10.);
     h_bgos_edep[i] = new TH1F(TString::Format("h_bgos_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 
@@ -110,13 +112,13 @@ void BgoStudyModule::event()
     int detNB = aHit->getCellId();
     //int trkID = aHit->getTrackId();
     int pdg = aHit->getPDGCode();
-    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+    double Edep = aHit->getEnergyDep(); //GeV
     double tof = aHit->getFlightTime(); //ns
 
     h_bgos_Evtof1[detNB]->Fill(tof, Edep);
     if (pdg == 22) h_bgos_Evtof2[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_bgos_Evtof3[detNB]->Fill(tof, Edep);
-    else h_bgos_Evtof3[detNB]->Fill(tof, Edep);
+    else h_bgos_Evtof4[detNB]->Fill(tof, Edep);
     if (Edep > m_Ethres)h_bgos_edep[detNB]->Fill(Edep);
   }
 

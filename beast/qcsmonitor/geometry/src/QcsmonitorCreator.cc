@@ -78,7 +78,7 @@ namespace Belle2 {
 
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-
+        int phase = activeParams.getInt("phase");
         G4double dx_scint = activeParams.getLength("dx_scint") / 2.*CLHEP::cm;
         G4double dy_scint = activeParams.getLength("dy_scint") / 2.*CLHEP::cm;
         G4double dz_scint = activeParams.getLength("dz_scint") / 2.*CLHEP::cm;
@@ -93,9 +93,7 @@ namespace Belle2 {
         double z_pos[100];
         double r_pos[100];
         int dim = 0;
-        Bool_t flag = false;
         for (double x : activeParams.getArray("x", {0})) {
-          flag = true;
           x *= CLHEP::cm;
           x_pos[dim] = x;
           dim++;
@@ -110,28 +108,42 @@ namespace Belle2 {
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos[dim] = z;
-          if (flag) {
+          if (phase == 1) {
             r_pos[dim] = sqrt(x_pos[dim] * x_pos[dim] + y_pos[dim] * y_pos[dim]);
           }
           dim++;
         }
-        if (!flag) {
-          dim = 0;
-          for (double r : activeParams.getArray("r", {0})) {
-            r *= CLHEP::cm;
+        dim = 0;
+        for (double r : activeParams.getArray("r", {0})) {
+          r *= CLHEP::cm;
+          if (phase == 2)
             r_pos[dim] = r + dz_scint;
-            dim++;
+          dim++;
+        }
+        if (phase == 2) {
+          for (int i = 0; i < 100; i++) {
+            x_pos[i] = 0;
+            y_pos[i] = 0;
+            //x_off[i] = 0;
+            //y_off[i] = 0;
           }
         }
-
         int detID = 0;
+        G4Transform3D transform;
         for (double phi : activeParams.getArray("Phi", {M_PI / 2})) {
           //phi  *= CLHEP::deg;
           for (int i = 0; i < dim; i++) {
-            cout << " r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << endl;
-            G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
-            if (flag) transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateZ3D(phi) * G4RotateX3D(thetaZ);
-            new G4PVPlacement(transform, l_scint, "p_scint", &topVolume, false, detID);
+            cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
+                 y_pos[i] << endl;
+            if (phase == 2) {
+              transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
+              cout << "phase 2" << endl;
+            }
+            if (phase == 1) {
+              transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateZ3D(phi) * G4RotateX3D(thetaZ);
+              cout << "phase 1" << endl;
+            }
+            new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data() , &topVolume, false, detID);
             detID++;
           }
         }

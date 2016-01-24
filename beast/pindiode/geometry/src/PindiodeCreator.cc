@@ -111,6 +111,7 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
+        int phase = activeParams.getInt("phase");
         //Positioned PIN diodes
         double x_pos[100];
         double y_pos[100];
@@ -171,7 +172,7 @@ namespace Belle2 {
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos[dimz] = z;
-          r[dimz] = sqrt(x_pos[dimz] * x_pos[dimz] + y_pos[dimz] * y_pos[dimz]);
+          if (phase == 1)r[dimz] = sqrt(x_pos[dimz] * x_pos[dimz] + y_pos[dimz] * y_pos[dimz]);
           dimz++;
         }
         int dimPhi = 0;
@@ -189,26 +190,22 @@ namespace Belle2 {
           thetaY[dimThetaY] = ThetaY;
           dimThetaY++;
           }*/
-        if (dimx == 0 && dimy == 0) {
-          for (double r_dia : activeParams.getArray("r_dia", {0})) {
-            r_dia *= CLHEP::cm;
-            r[dimr_dia] = r_dia;
-            dimr_dia++;
+        for (double r_pin : activeParams.getArray("r_pin", {0})) {
+          r_pin *= CLHEP::cm;
+          if (phase == 2)r[dimr_dia] = r_pin;
+          dimr_dia++;
+        }
+        if (phase == 2) {
+          for (int i = 0; i < 100; i++) {
+            x_pos[i] = 0;
+            y_pos[i] = 0;
+            x_off[i] = 0;
+            y_off[i] = 0;
           }
-        } /*else {
-    for (int i = 0; i < dimz; i++) {
-      if(x_pos[i] > 0 && y_pos[i] >= 0)
-        phi[i] = TMath::ATan(y_pos[i] / x_pos[i]) * TMath::RadToDeg() * CLHEP::deg - 90. * CLHEP::deg;
-      else if(x_pos[i] > 0 && y_pos[i] < 0)
-        phi[i] = TMath::ATan(y_pos[i] / x_pos[i]) * TMath::RadToDeg() * CLHEP::deg - 90. * CLHEP::deg + 360. * CLHEP::deg;
-      else if(x_pos[i] < 0)
-        phi[i] = TMath::ATan(y_pos[i] / x_pos[i]) * TMath::RadToDeg() * CLHEP::deg - 90. * CLHEP::deg + 180. * CLHEP::deg;
-      else if(x_pos[i] == 0 && y_pos[i] > 0)
-        phi[i] =  90. * CLHEP::deg - 90. * CLHEP::deg;
-      else if(x_pos[i] == 0 && y_pos[i] < 0)
-        phi[i] =  3. * 90. * CLHEP::deg - 90. * CLHEP::deg;
-    }
-    }*/
+          for (int i = 0; i < dimz; i++) {
+            cout << "pin z " << z_pos[i] / CLHEP::cm << " r " << r[i] / CLHEP::cm << endl;
+          }
+        }
         //double r = activeParams.getLength("r_pindiode") * CLHEP::cm;
         //double z = activeParams.getLength("z_pindiode") * CLHEP::cm;
         //double phi = activeParams.getAngle("Phi") - 90. * CLHEP::deg;

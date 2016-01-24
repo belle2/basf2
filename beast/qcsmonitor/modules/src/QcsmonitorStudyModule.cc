@@ -73,6 +73,8 @@ void QcsmonitorStudyModule::defineHisto()
                                  1000., 1000, 0., 10.);
     h_qcsms_Evtof3[i] = new TH2F(TString::Format("h_qcsms_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                  1000., 1000, 0., 10.);
+    h_qcsms_Evtof4[i] = new TH2F(TString::Format("h_qcsms_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                                 1000., 1000, 0., 10.);
     h_qcsms_edep[i] = new TH1F(TString::Format("h_qcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 }
@@ -114,7 +116,7 @@ void QcsmonitorStudyModule::event()
     h_qcsms_Evtof1[detNB]->Fill(tof, Edep);
     if (pdg == 22) h_qcsms_Evtof2[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
-    else h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
+    else h_qcsms_Evtof4[detNB]->Fill(tof, Edep);
     if (Edep > m_Ethres)h_qcsms_edep[detNB]->Fill(Edep);
   }
 

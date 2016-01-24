@@ -196,7 +196,7 @@ void PXDDigitizerModule::beginRun()
 void PXDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.clear();
   }
   m_currentSensor = 0;
@@ -315,7 +315,8 @@ void PXDDigitizerModule::processHit()
   if (m_applyWindow) {
     //Ignore hits which are outside of the PXD active time frame
     B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentSensorInfo->getIntegrationStart() << " <= " << m_currentHit->getGlobalTime() << " <= " << m_currentSensorInfo->getIntegrationEnd());
+            "Checking if hit is in timeframe " << m_currentSensorInfo->getIntegrationStart() << " <= " << m_currentHit->getGlobalTime() <<
+            " <= " << m_currentSensorInfo->getIntegrationEnd());
 
     if (m_currentHit->getGlobalTime()
         < m_currentSensorInfo->getIntegrationStart()
@@ -343,7 +344,7 @@ void PXDDigitizerModule::processHit()
     double lastFraction {0};
     double lastElectrons {0};
 
-    for (auto & segment : segments) {
+    for (auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
       const double f = (segment.first + lastFraction) / 2;
@@ -370,7 +371,8 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
   static double weightGL[5] = { walpha, wbeta, 128.0 / 225.0, wbeta, walpha };
 
   B2DEBUG(30,
-          "Drifting " << electrons << " electrons at position (" << position.x() << ", " << position.y() << ", " << position.z() << ") with " << (m_useSimpleDrift ? "old" : "new") << " drift model");
+          "Drifting " << electrons << " electrons at position (" << position.x() << ", " << position.y() << ", " << position.z() << ") with "
+          << (m_useSimpleDrift ? "old" : "new") << " drift model");
 
   if (m_useSimpleDrift) {
     driftChargeSimple(position, electrons);
@@ -503,7 +505,8 @@ void PXDDigitizerModule::driftCharge(const TVector3& position,
       B2DEBUG(50,
               " --> charge position: u=" << uPos << ", v=" << vPos << ", uID=" << info.getUCellID(uPos) << ", vID=" << info.getVCellID(vPos));
       B2DEBUG(50,
-              " --> nearest pixel:    u=" << info.getUCellPosition(uID) << ", v=" << info.getVCellPosition(vID) << ", uID=" << uID << ", vID=" << vID);
+              " --> nearest pixel:    u=" << info.getUCellPosition(uID) << ", v=" << info.getVCellPosition(
+                vID) << ", uID=" << uID << ", vID=" << vID);
       if (m_histSteps)
         m_histSteps->Fill(m_elMaxSteps);
     }
@@ -617,7 +620,7 @@ void PXDDigitizerModule::addNoiseDigits()
     return;
 
   double fraction = 1 - m_noiseFraction;
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     Sensor& s = sensor.second;
     //FIXME: Backwards compatible
     //if (s.size() == 0) continue;
@@ -654,11 +657,11 @@ void PXDDigitizerModule::saveDigits()
   //Zero supression cut in electrons
   double charge_threshold = m_SNAdjacent * m_elNoise;
 
-  for (Sensors::value_type & sensor : m_sensors) {
+  for (Sensors::value_type& sensor : m_sensors) {
     int sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
-    for (Sensor::value_type & digit : sensor.second) {
+    for (Sensor::value_type& digit : sensor.second) {
       const Digit& d = digit.first;
       const DigitValue& v = digit.second;
 
@@ -698,12 +701,19 @@ void PXDDigitizerModule::terminate()
   if (m_rootFile) {
     m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
     m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
+    m_histSteps->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
+    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check",
+                                                          "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
+    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
+    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check",
+                                                          "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
+    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
+    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check",
+                                                          "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
+    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     m_rootFile->Write();
     m_rootFile->Close();
   }

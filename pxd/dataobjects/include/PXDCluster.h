@@ -67,7 +67,6 @@ namespace Belle2 {
      * @param clsSize size of the cluster in pixels.
      * @param uSize number of pixel columns contributing to the cluster.
      * @param vSize number of pixel rows contributing to the cluster.
-     * @param clsShape ID of shape of the cluster.
      */
     PXDCluster(VxdID sensorID, float uPosition, float vPosition, float uError,
                float vError, float uvRho, float clsCharge, float seedCharge,

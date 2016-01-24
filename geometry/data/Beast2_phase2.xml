@@ -29,6 +29,7 @@
   <xi:include href="../beast/claws/CLAWS-Materials.xml"/>
   <xi:include href="../beast/fangs/FANGS-Materials.xml"/>
   <xi:include href="../beast/plume/PLUME-Materials.xml"/>
+  <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
 
 
   <!-- Magnetic field -->
@@ -59,12 +60,13 @@
   <xi:include href="../eklm/EKLM.xml"/>
 
   <xi:include href="../beast/microtpc/MICROTPC-phase2.xml"/>
-  <!--xi:include href="../beast/pindiode/PINDIODE-phase2.xml"/-->
+  <xi:include href="../beast/pindiode/PINDIODE-phase2.xml"/>
   <xi:include href="../beast/beamabort/BEAMABORT-phase2.xml"/>
   <xi:include href="../beast/he3tube/HE3TUBE-phase2.xml"/>
   <xi:include href="../beast/claws/CLAWS.xml"/>
   <xi:include href="../beast/fangs/FANGS.xml"/>
-  <xi:include href="../beast/plume/PLUME.xml"/>
+  <xi:include href="../beast/plume/PLUME_pos2.xml"/>
+  <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml"/>
 
 
   <!-- VXD Tracking and MUID muon identification -->

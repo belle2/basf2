@@ -82,6 +82,7 @@ default_generator_params_by_generator_name = {
         'nTracks': 1,
         'varyNTracks': False,
         'momentumGeneration': 'uniform',
+        'momentumParams': [0.6, 1.4],
         'thetaGeneration': 'uniform',
         'thetaParams': [30., 31.],
     },
@@ -100,12 +101,23 @@ class ReadOrGenerateEventsRun(MinimalRun):
     # Declarative section which can be redefined in a subclass
     generator_module = None
     bkg_files = []
+    components = []
     simulate_only = False
     components = ['PXD', 'SVD', 'CDC', 'BeamPipe',
                   'MagneticFieldConstant4LimitedRCDC']
 
     def create_argument_parser(self, **kwds):
         argument_parser = super(ReadOrGenerateEventsRun, self).create_argument_parser(**kwds)
+
+        argument_parser.add_argument(
+            '-c',
+            '--component',
+            dest='components',
+            default=None,
+            action='append',
+            help=('Add component. Multiple repeatition adds more components.'
+                  'If not given use the default settings of the run: %s' % type(self).components)
+        )
 
         argument_parser.add_argument(
             '-g',
@@ -146,6 +158,15 @@ class ReadOrGenerateEventsRun(MinimalRun):
 
                 # Allow for Background only execution
                 main_path.add_module(generator_module)
+
+            # gearbox & geometry needs to be registered any way
+            gearbox_module = basf2.register_module('Gearbox')
+            main_path.add_module(gearbox_module)
+
+            components = self.components
+            geometry_module = basf2.register_module('Geometry')
+            geometry_module.param('components', components)
+            main_path.add_module(geometry_module)
 
             random_barrier_module = basf2.register_module("RandomBarrier")
             main_path.add_module(random_barrier_module)

@@ -26,7 +26,6 @@ class MinimalRun(object):
     # Declarative section which can be redefined in a subclass
     n_events = 10000
     root_input_file = None
-    components = []
     random_seed = None
     n_processes = 0
 
@@ -51,16 +50,6 @@ class MinimalRun(object):
                 dest='root_input_file',
                 help='File path to the ROOT file from which the simulated events shall be loaded.'
             )
-
-        argument_parser.add_argument(
-            '-c',
-            '--component',
-            dest='components',
-            default=None,
-            action='append',
-            help=('Add component. Multiple repeatition adds more components.'
-                  'If not given use the default settings of the run: %s' % type(self).components)
-        )
 
         argument_parser.add_argument(
             '-n',
@@ -142,15 +131,6 @@ class MinimalRun(object):
         if self.n_processes:
             environment = Belle2.Environment.Instance()
             environment.setNumberProcessesOverride(self.n_processes)
-
-        # gearbox & geometry needs to be registered any way
-        gearbox_module = basf2.register_module('Gearbox')
-        main_path.add_module(gearbox_module)
-
-        components = self.components
-        geometry_module = basf2.register_module('Geometry')
-        geometry_module.param('components', components)
-        main_path.add_module(geometry_module)
 
         return main_path
 

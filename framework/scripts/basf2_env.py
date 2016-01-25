@@ -32,7 +32,7 @@ _avoidPyRootHang()
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
 basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010-2015  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2016  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2

@@ -123,8 +123,6 @@ namespace Belle2 {
   public:
     /// Type of the base class
     using Super =  TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth>;
-    SegmentCreatorMCTruthModule() : Super{{{"CDCFacetVector", "CDCRecoSegment2DVector"}}} {}
+    SegmentCreatorMCTruthModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
   };
-
-
 }

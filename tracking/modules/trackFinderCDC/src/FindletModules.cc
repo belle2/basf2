@@ -24,3 +24,4 @@ REG_MODULE(SegmentMerger);
 REG_MODULE(SegmentFitter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentExporter);
+REG_MODULE(SegmentCreatorMCTruth);

@@ -238,9 +238,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 self.trackMatchLookUp.isMissingMCTrackCand(mcTrackCand)
 
             mcTrackCandHits = mcTrackCand.getHitIDs(Belle2.Const.CDC)  # Checked
+
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(mcTrackCandHits) == 0:
-                mcTrackCandHits = set()
+                continue
             else:
                 mcTrackCandHits = set(mcTrackCandHits)
 

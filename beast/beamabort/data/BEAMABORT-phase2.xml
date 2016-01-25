@@ -15,9 +15,8 @@
          whitespace, comma or semi-colon -->
     <bar unit="cm">1 2 3 4 5 6 7 8 
     </bar>
-    
-    <PreampGain>1.4</PreampGain>
-    
+    <WorkFunction>4.9</WorkFunction>
+    <FanoFactor>0.1</FanoFactor>    
     <Active>
       <Material>BEAMABORT-Material</Material>
       <phase >2</phase>

@@ -75,7 +75,7 @@ namespace Belle2 {
     }
 
     // open the input file
-    TFile* m_file = TFile::Open(m_inputFileName.c_str(), "READ");
+    m_file = TFile::Open(m_inputFileName.c_str(), "READ");
     if (!m_file) {
       B2FATAL(m_inputFileName << ": file not found");
       return;
@@ -183,7 +183,7 @@ namespace Belle2 {
 
   void TOPCRTEventBuilderModule::terminate()
   {
-    //    m_file->Close();
+    if (m_file) m_file->Close();
   }
 
 
@@ -227,6 +227,9 @@ namespace Belle2 {
       Buffer[finesse].push_back(1); // number of gigE packets
       for (int i = i0; i < size - 1; i++) {
         Buffer[finesse].push_back(swap32(data[i]));
+      }
+      if (data[size - 1] != 0x7473616c) {
+        B2ERROR("RawTOP: inconsistent magic trailer word");
       }
     }
 

@@ -1,14 +1,8 @@
 import basf2
-import reconstruction
 
 import ROOT
 
 import logging
-
-import tracking.metamodules as metamodules
-import tracking.root_utils as root_utils
-from tracking.run.event_generation import StandardEventGenerationRun
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 from ROOT import Belle2
 

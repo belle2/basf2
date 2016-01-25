@@ -1,4 +1,5 @@
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
 #include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ROEVariables.h>
@@ -529,6 +530,116 @@ namespace {
     EXPECT_FLOAT_EQ(1.0, nAllROEKLMClusters(part));
 
   }
+
+
+  class EventVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreArray<Particle>::registerPersistent();
+      StoreArray<MCParticle>::registerPersistent();
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(EventVariableTest, TestIfContinuumEvent_ForContinuumEvent)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    auto* mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(mcParticle);
+
+    mcParticle = mcParticles.appendNew();
+    mcParticle->setPDG(-11);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p2->addRelationTo(mcParticle);
+
+    const Manager::Var* var = Manager::Instance().getVariable("isContinuumEvent");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 1.0);
+    EXPECT_FLOAT_EQ(var->function(p2), 1.0);
+    const Manager::Var* varN = Manager::Instance().getVariable("isNotContinuumEvent");
+    ASSERT_NE(varN, nullptr);
+    EXPECT_FLOAT_EQ(varN->function(p1), 0.0);
+    EXPECT_FLOAT_EQ(varN->function(p2), 0.0);
+  }
+
+  TEST_F(EventVariableTest, TestIfContinuumEvent_ForUpsilon4SEvent)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles2;
+    StoreArray<Particle> particles2;
+    particles2.registerRelationTo(mcParticles2);
+    DataStore::Instance().setInitializeActive(false);
+
+    auto* mcParticle = mcParticles2.appendNew();
+    mcParticle->setPDG(22);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p3 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p3->addRelationTo(mcParticle);
+
+    mcParticle = mcParticles2.appendNew();
+    mcParticle->setPDG(300553);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p4 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 300553);
+    p4->addRelationTo(mcParticle);
+
+    const Manager::Var* var2 = Manager::Instance().getVariable("isContinuumEvent");
+    ASSERT_NE(var2, nullptr);
+    EXPECT_FLOAT_EQ(var2->function(p3), 0.0);
+    EXPECT_FLOAT_EQ(var2->function(p4), 0.0);
+    const Manager::Var* var2N = Manager::Instance().getVariable("isNotContinuumEvent");
+    ASSERT_NE(var2N, nullptr);
+    EXPECT_FLOAT_EQ(var2N->function(p3), 1.0);
+    EXPECT_FLOAT_EQ(var2N->function(p4), 1.0);
+  }
+
+  TEST_F(EventVariableTest, TestIfContinuumEvent_ForWrongReconstructedUpsilon4SEvent)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles3;
+    StoreArray<Particle> particles3;
+    particles3.registerRelationTo(mcParticles3);
+    DataStore::Instance().setInitializeActive(false);
+
+    auto* mcParticle = mcParticles3.appendNew();
+    mcParticle->setPDG(22);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p5 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p5->addRelationTo(mcParticle);
+
+    mcParticle = mcParticles3.appendNew();
+    mcParticle->setPDG(300553);
+    mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+    auto* p6 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 15);
+    p6->addRelationTo(mcParticle);
+
+    const Manager::Var* var3 = Manager::Instance().getVariable("isContinuumEvent");
+    ASSERT_NE(var3, nullptr);
+    EXPECT_FLOAT_EQ(var3->function(p5), 0.0);
+    EXPECT_FLOAT_EQ(var3->function(p6), 0.0);
+    const Manager::Var* var3N = Manager::Instance().getVariable("isNotContinuumEvent");
+    ASSERT_NE(var3N, nullptr);
+    EXPECT_FLOAT_EQ(var3N->function(p5), 1.0);
+    EXPECT_FLOAT_EQ(var3N->function(p6), 1.0);
+  }
+
 
   class MetaVariableTest : public ::testing::Test {
   protected:

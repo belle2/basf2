@@ -2,7 +2,7 @@
 <DetectorComponent name="FANGS">
   <Creator library="beast">FANGSCreator</Creator>
   <Content>
-    <PixelThreshold>3000</PixelThreshold>
+    <PixelThreshold>810</PixelThreshold>
     <PixelThresholdRMS>150</PixelThresholdRMS>
     <ChipColumnNb>80</ChipColumnNb>
     <ChipColumnX>1</ChipColumnX>
@@ -10,14 +10,14 @@
     <ChipRowY>0.84</ChipRowY>
     <PixelTimeBinNb>256</PixelTimeBinNb>
     <PixelTimeBin>25</PixelTimeBin>
-    <TOTA1>10640.8</TOTA1>
-    <TOTB1>-18.4</TOTB1>
-    <TOTC1>96007.6</TOTC1>
-    <TOTQ1>57.</TOTQ1>
-    <TOTA2>29.4</TOTA2>
-    <TOTB2>64.7</TOTB2>
-    <TOTC2>1082.7</TOTC2>
-    <TOTQ2>57.</TOTQ2>
+    <TOTA1>118.25</TOTA1>
+    <TOTB1>-17.2194</TOTB1>
+    <TOTC1>35.7857</TOTC1>
+    <TOTQ1>75</TOTQ1>
+    <TOTA2>493.11</TOTA2>
+    <TOTB2>19.1809</TOTB2>
+    <TOTC2>771.924</TOTC2>
+    <TOTQ2>75</TOTQ2>
     <Workfct>3.6</Workfct>
     <Fanofac>0.1</Fanofac>
     <sensor_width>0.02</sensor_width>

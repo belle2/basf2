@@ -32,13 +32,16 @@ bool StereoHitTruthVarSet::extract(const std::pair<const CDCRecoHit3D*, const CD
 
   ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(track);
   ITrackType hitMCMatch = hitLookup.getMCTrackId(recoHit->getWireHit().getHit());
+  ERightLeft hitMCRLInfo = hitLookup.getRLInfo(recoHit->getWireHit().getHit());
 
   if (trackMCMatch == INVALID_ITRACK) {
     var<named("track_is_fake_truth")>() = true;
+    var<named("truth_but_reversed")>() = false;
     var<named("truth")>() = false;
   } else {
     var<named("track_is_fake_truth")>() = false;
-    var<named("truth")>() = trackMCMatch == hitMCMatch;
+    var<named("truth_but_reversed")>() = trackMCMatch == hitMCMatch;
+    var<named("truth")>() = trackMCMatch == hitMCMatch and hitMCRLInfo == recoHit->getRLInfo();
   }
 
   return true;

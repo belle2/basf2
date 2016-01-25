@@ -20,8 +20,23 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const stereoHitNames[] = {
-      "size",
-      "pt"
+      "track_size",
+      "pt",
+      "reco_s",
+      "reco_z",
+      "phi_track",
+      "phi_hit",
+      "theta_hit",
+      "drift_length",
+      "adc_count",
+      "xy_distance_zero_z",
+      "right_hit",
+      "track_back_s",
+      "track_front_s",
+      "track_mean_s",
+      "s_distance",
+      "track_radius",
+      "superlayer_id"
     };
 
     /** Class that specifies the names of the variables
@@ -31,7 +46,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 2;
+      static const size_t nNames = 17;
 
       constexpr
       static char const* getName(int iName)

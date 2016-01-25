@@ -21,6 +21,7 @@ namespace Belle2 {
     constexpr
     static char const* const stereoHitTruthNames[] = {
       "truth",
+      "truth_but_reversed",
       "track_is_fake_truth"
     };
 
@@ -31,7 +32,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 2;
+      static const size_t nNames = 3;
 
       constexpr
       static char const* getName(int iName)

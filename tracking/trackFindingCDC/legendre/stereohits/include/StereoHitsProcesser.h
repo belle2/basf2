@@ -66,6 +66,12 @@ namespace Belle2 {
        */
       void addStereoHitsWithQuadTree(CDCTrack& track, const std::vector<CDCRecoSegment2D>& segments);
 
+      /**
+       * The stereo hit finder can assign the same stereo hit to more than one track. This method just
+       * find these double-assigned hits and delete them according to a criteria to all but one track.
+       */
+      void reassignDoubledHits(std::vector<CDCTrack>& tracks) const;
+
       /// Postprocessing: sort by arc length, set all arc lengths to be positive and fit the tracks.
       void postprocessTrack(CDCTrack& track) const;
 

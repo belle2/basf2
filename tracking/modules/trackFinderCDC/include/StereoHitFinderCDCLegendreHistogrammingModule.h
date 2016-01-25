@@ -43,7 +43,11 @@ namespace Belle2 {
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
 
     /// Parameter
-    bool m_param_useSegments = false; /**< Whether to use the segments or the hits in the quad tree. */
+    /// Whether to use the segments or the hits in the quad tree.
+    bool m_param_useSegments = false;
+
+    /// Instead of deleting used hits, leave them where they are and check for double assignment later.
+    bool m_param_checkForDoubleHits = false;
 
     /// Processor
     TrackFindingCDC::StereoHitsProcesser m_stereohitsProcesser; /**< The stereo quad tree processor to use. */

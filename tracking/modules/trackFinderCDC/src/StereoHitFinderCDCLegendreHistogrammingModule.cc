@@ -35,6 +35,11 @@ StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogr
            m_stereohitsProcesser.getCheckForB2BTracksParameter(),
            "Set to false to skip the check for back-2-back tracks (good for cosmics)",
            m_stereohitsProcesser.getCheckForB2BTracksValue());
+
+  addParam("checkForDoubleHits",
+           m_param_checkForDoubleHits,
+           "Set to true to turn on checking for double hits which does not delete found hits but count the number of assignments afterwards.",
+           m_param_checkForDoubleHits);
 }
 
 /** Initialize the stereo quad trees */
@@ -61,10 +66,15 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
       m_stereohitsProcesser.addStereoHitsWithQuadTree(track, segments);
       m_stereohitsProcesser.postprocessTrack(track);
     }
+
   } else {
     for (CDCTrack& track : tracks) {
       m_stereohitsProcesser.addStereoHitsWithQuadTree(track);
       m_stereohitsProcesser.postprocessTrack(track);
     }
+  }
+
+  if (m_param_checkForDoubleHits) {
+    m_stereohitsProcesser.reassignDoubledHits(tracks);
   }
 }

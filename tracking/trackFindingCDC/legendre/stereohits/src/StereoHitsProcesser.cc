@@ -203,11 +203,15 @@ void StereoHitsProcesser::addStereoHitsWithQuadTree(CDCTrack& track)
     }
   }
 
+  for (const CDCRecoHit3D& recoHit : foundStereoHits) {
+    recoHit.getWireHit().getAutomatonCell().unsetMaskedFlag();
+  }
+
   // Add the hits to the track
+  // We do NOT check if hit was attached to another track here. You have to do this later!
   for (const CDCRecoHit3D& recoHit : hitsToUse) {
-    B2ASSERT("Found hit should not have taken flag!", not recoHit->getWireHit().getAutomatonCell().hasTakenFlag());
     track.push_back(recoHit);
-    recoHit->getWireHit().getAutomatonCell().setTakenFlag();
+    recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
 }
 
@@ -256,3 +260,42 @@ void StereoHitsProcesser::postprocessTrack(CDCTrack& track) const
   CDCTrajectory3D newStartTrajectory(track.getStartTrajectory3D().getTrajectory2D(), szTrajectory);
   track.setStartTrajectory3D(newStartTrajectory);
 }
+
+void assignHitToOnlyOneTrack(const CDCHit* cdcHitPtr, const std::vector<CDCTrack*>& attachedTrackList)
+{
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+  const CDCWireHit* wireHitPtr = wireHitTopology.getWireHit(cdcHitPtr);
+
+  B2INFO("Test: " << attachedTrackList.size());
+}
+
+void StereoHitsProcesser::reassignDoubledHits(std::vector<CDCTrack>& tracks) const
+{
+  std::map<const CDCHit*, std::vector<CDCTrack*>> wireHitToTrackListMap;
+
+  // fill hit -> track matchup
+  for (CDCTrack& track : tracks) {
+    CDCTrack* trackPtr = &track;
+    for (const CDCRecoHit3D& recoHit : track) {
+      if (recoHit.isAxial()) {
+        continue;
+      }
+
+      const CDCWireHit& wireHit = recoHit.getWireHit();
+      const CDCHit* cdcHitPtr = wireHit.getHit();
+      if (wireHitToTrackListMap.find(cdcHitPtr) != wireHitToTrackListMap.end()) {
+        wireHitToTrackListMap.at(cdcHitPtr).push_back(trackPtr);
+      } else {
+        wireHitToTrackListMap.insert({cdcHitPtr, {trackPtr}});
+      }
+    }
+  }
+
+  // check all entries which have more than one track
+  for (const auto& wireHitToTrackListItem : wireHitToTrackListMap) {
+    const CDCHit* cdcHitPtr = wireHitToTrackListItem.first;
+    const std::vector<CDCTrack*>& attachedTrackList = wireHitToTrackListItem.second;
+    assignHitToOnlyOneTrack(cdcHitPtr, attachedTrackList);
+  }
+}
+

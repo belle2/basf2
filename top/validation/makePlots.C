@@ -131,6 +131,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed below zero."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   h = new TH2F("h106", "log likelihood difference vs. momentum for kaons", 
@@ -143,6 +144,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed above zero."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   output->Close();
@@ -180,6 +182,7 @@ void numberOfPhotons(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     ""));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   output->Close();

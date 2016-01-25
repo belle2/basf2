@@ -108,6 +108,49 @@ class ClassificationAnalysis(object):
             cut_value = None
             cut_direction = self.cut_direction
 
+        # Stacked histogram
+        signal_bkg_histogram_name = formatter.format(plot_name, subplot_name="signal_bkg_histogram")
+        signal_bkg_histogram = ValidationPlot(signal_bkg_histogram_name)
+        signal_bkg_histogram.hist(
+            estimates,
+            stackby=truths,
+            lower_bound=self.lower_bound,
+            upper_bound=self.upper_bound,
+            outlier_z_score=self.outlier_z_score,
+            allow_discrete=self.allow_discrete,
+        )
+        signal_bkg_histogram.xlabel = axis_label
+
+        self.plots['signal_bkg'] = signal_bkg_histogram
+
+        # Purity profile
+        purity_profile_name = formatter.format(plot_name, subplot_name="purity_profile")
+
+        purity_profile = ValidationPlot(purity_profile_name)
+        purity_profile.profile(
+            estimates,
+            truths,
+            lower_bound=self.lower_bound,
+            upper_bound=self.upper_bound,
+            outlier_z_score=self.outlier_z_score,
+            allow_discrete=self.allow_discrete,
+        )
+
+        purity_profile.xlabel = axis_label
+        purity_profile.ylabel = 'purity'
+        self.plots["purity"] = purity_profile
+
+        # Try to guess the cur direction form the correlation
+        if cut_direction is None:
+            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot)
+            correlation = purity_grapherrors.GetCorrelationFactor()
+            if correlation > 0.1:
+                print("Determined cut direction", -1)
+                cut_direction = -1  # reject low values
+            elif correlation < -0.1:
+                print("Determined cut direction", 1)
+                cut_direction = +1  # reject high values
+
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
@@ -141,49 +184,17 @@ class ClassificationAnalysis(object):
 
             self.fom = classification_fom
 
-        # Stacked histogram
-        signal_bkg_histogram_name = formatter.format(plot_name, subplot_name="signal_bkg_histogram")
-        signal_bkg_histogram = ValidationPlot(signal_bkg_histogram_name)
-        signal_bkg_histogram.hist(
-            estimates,
-            stackby=truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
-            outlier_z_score=self.outlier_z_score,
-            allow_discrete=self.allow_discrete,
-        )
-        signal_bkg_histogram.xlabel = axis_label
-
-        self.plots['signal_bkg'] = signal_bkg_histogram
-
-        # Purity profile
-        purity_profile_name = formatter.format(plot_name, subplot_name="purity_profile")
-
-        purity_profile = ValidationPlot(purity_profile_name)
-        purity_profile.profile(
-            estimates,
-            truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
-            outlier_z_score=self.outlier_z_score,
-            allow_discrete=self.allow_discrete,
-        )
-
-        purity_profile.xlabel = axis_label
-        purity_profile.ylabel = 'purity'
-
-        self.plots["purity"] = purity_profile
-
         if not estimate_is_binary and cut_direction is not None:
             n_data = len(estimates)
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals
 
-            sorting_indices = np.argsort(estimates)
+            # work around for numpy sorting nan values as high but we want it as low
+            reverse_sorting_indices = np.argsort(-estimates)
             if cut_direction < 0:  # reject low
-                # Keep a reference to keep the content alive
-                orginal_sorting_indices = sorting_indices
-                sorting_indices = sorting_indices[::-1]
+                sorting_indices = reverse_sorting_indices
+            else:
+                sorting_indices = reverse_sorting_indices[::-1]
 
             sorted_truths = truths[sorting_indices]
             sorted_estimates = estimates[sorting_indices]

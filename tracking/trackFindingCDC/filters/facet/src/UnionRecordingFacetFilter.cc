@@ -31,6 +31,8 @@ UnionRecordingFacetFilter::createVarSet(const std::string& name) const
     return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitlessFacetVarSet());
   } else if (name == "fit") {
     return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitFacetVarSet());
+  } else if (name == "tmva") {
+    return std::unique_ptr<BaseVarSet<CDCFacet> >(new TMVAFacetVarSet());
   } else if (name == "truth") {
     return std::unique_ptr<BaseVarSet<CDCFacet> >(new TruthFacetVarSet());
   } else {

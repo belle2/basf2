@@ -11,13 +11,13 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/TMVAFacetVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Background facet detection based on TMVA.
-    class TMVAFacetFilter: public TMVAFilter<FitFacetVarSet> {
+    class TMVAFacetFilter: public TMVAFilter<TMVAFacetVarSet> {
 
     public:
       using Super = TMVAFilter<FitFacetVarSet>;
@@ -25,7 +25,7 @@ namespace Belle2 {
     public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.
       TMVAFacetFilter()
-        : Super("FacetFilter", 0.1)
+        : Super("FacetFilter", 2.82)
       {}
 
     public:

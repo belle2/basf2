@@ -10,4 +10,5 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/TMVAFacetRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/TruthFacetRelationVarSet.h>

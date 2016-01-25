@@ -7,9 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/TMVAFacetVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/TruthFacetVarSet.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /// Variable set used in the application of tmva methods for facet filtering
+    using TMVAFacetVarSet = FitFacetVarSet;
+
+  }
+}

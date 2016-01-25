@@ -23,9 +23,9 @@ TEST(TrackFindingCDCTest, fitting_CDCObservations2D_centralize)
 {
   CDCObservations2D observations;
 
-  observations.append(Vector2D(0, 0));
-  observations.append(Vector2D(1, 2));
-  observations.append(Vector2D(2, 4));
+  observations.fill(Vector2D(0, 0));
+  observations.fill(Vector2D(1, 2));
+  observations.fill(Vector2D(2, 4));
 
   Vector2D centralPoint = observations.centralize();
 

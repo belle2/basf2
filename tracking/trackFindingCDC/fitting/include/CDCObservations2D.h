@@ -98,10 +98,10 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const double x,
-                    const double y,
-                    const double signedRadius = 0.0,
-                    const double weight = 1.0)
+      size_t fill(const double x,
+                  const double y,
+                  const double signedRadius = 0.0,
+                  const double weight = 1.0)
       {
         if (std::isnan(x)) return 0;
         if (std::isnan(y)) return 0;
@@ -134,10 +134,10 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t append(const Belle2::TrackFindingCDC::Vector2D& pos2D,
-                    const double signedRadius = 0.0,
-                    const double weight = 1.0)
-      { return append(pos2D.x(), pos2D.y(), signedRadius, weight); }
+      size_t fill(const Belle2::TrackFindingCDC::Vector2D& pos2D,
+                  const double signedRadius = 0.0,
+                  const double weight = 1.0)
+      { return fill(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
       /** Appends the hit circle at wire reference position without a right left passage hypotheses.
        *  \note Observations are skipped, if one of the contained variables is NAN.
@@ -159,12 +159,12 @@ namespace Belle2 {
                                               wireHit.getRefDriftLengthVariance() :
                                               getPseudoDriftLengthVariance(wireHit));
           const double weight = 1.0 / driftLengthVariance;
-          size_t nAppendedHits = append(wireRefPos2D, driftLength, weight);
+          size_t nAppendedHits = fill(wireRefPos2D, driftLength, weight);
           return nAppendedHits;
         } else {
           const double driftLength = wireHit.getRefDriftLength();
           const double weight = fabs(1.0 / driftLength);
-          size_t nAppendedHits = append(wireRefPos2D, 0, weight);
+          size_t nAppendedHits = fill(wireRefPos2D, 0, weight);
           return nAppendedHits;
         }
       }
@@ -211,10 +211,10 @@ namespace Belle2 {
           const double driftLength = 0.0;
           if (m_useDriftVariance) {
             const double weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
-            return append(recoPos2D, driftLength, weight);
+            return fill(recoPos2D, driftLength, weight);
           } else {
             const double weight = fabs(1.0 / recoHit2D.getWireHit().getRefDriftLength());
-            return append(recoPos2D, driftLength, weight);
+            return fill(recoPos2D, driftLength, weight);
           }
         } else {
           return append(recoHit2D.getRLWireHit());
@@ -233,20 +233,20 @@ namespace Belle2 {
           const double driftLength = 0.0;
           if (m_useDriftVariance) {
             const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-            return append(recoPos2D, driftLength, weight);
+            return fill(recoPos2D, driftLength, weight);
           } else {
             const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
-            return append(recoPos2D, driftLength, weight);
+            return fill(recoPos2D, driftLength, weight);
           }
         } else {
           const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
           const double driftLength = recoHit3D.getSignedRecoDriftLength();
           if (m_useDriftVariance) {
             const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-            return append(recoWirePos2D, driftLength, weight);
+            return fill(recoWirePos2D, driftLength, weight);
           } else {
             const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
-            return append(recoWirePos2D, 0, weight);
+            return fill(recoWirePos2D, 0, weight);
           }
         }
       }
@@ -330,7 +330,7 @@ namespace Belle2 {
           const Vector2D& wirePos = wire.getRefPos2D();
           const double driftLength = 0.0;
           const double weight = 1.0;
-          nAppendedHits += append(wirePos, driftLength, weight);
+          nAppendedHits += fill(wirePos, driftLength, weight);
         }
         return nAppendedHits;
       }

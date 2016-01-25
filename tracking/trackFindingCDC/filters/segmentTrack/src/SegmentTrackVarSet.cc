@@ -65,7 +65,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack2D);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
-      observations.append(s, z);
+      observations.fill(s, z);
     }
 
     if (observations.size() > 3) {
@@ -137,16 +137,16 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   for (const CDCRecoHit3D& recoHit : *track) {
     if (isAxialSegment and recoHit.getStereoKind() == EStereoKind::c_Axial) {
-      observationsFull.append(recoHit.getWireHit().getRefPos2D());
+      observationsFull.fill(recoHit.getWireHit().getRefPos2D());
       if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) < 3) {
-        observationsNeigh.append(recoHit.getWireHit().getRefPos2D());
+        observationsNeigh.fill(recoHit.getWireHit().getRefPos2D());
       }
     } else if (not isAxialSegment and recoHit.getStereoKind() != EStereoKind::c_Axial) {
       double s = recoHit.getArcLength2D();
       double z = recoHit.getRecoZ();
-      observationsFull.append(s, z);
+      observationsFull.fill(s, z);
       if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) < 3) {
-        observationsNeigh.append(s, z);
+        observationsNeigh.fill(s, z);
       }
     }
   }
@@ -188,15 +188,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   for (const CDCRecoHit2D& recoHit : *segment) {
     if (isAxialSegment) {
-      observationsFull.append(recoHit.getRecoPos2D());
-      observationsNeigh.append(recoHit.getRecoPos2D());
+      observationsFull.fill(recoHit.getRecoPos2D());
+      observationsNeigh.fill(recoHit.getRecoPos2D());
     } else {
       const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectoryTrack2D);
       double s = recoHit3D.getArcLength2D();
       double z = recoHit3D.getRecoZ();
-      observationsFull.append(s, z);
-      observationsNeigh.append(s, z);
+      observationsFull.fill(s, z);
+      observationsNeigh.fill(s, z);
     }
   }
 

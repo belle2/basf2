@@ -53,12 +53,12 @@ namespace {
     if (withDriftLength) {
       for (const Vector2D& observationCenter : observationCenters) {
         double distance = generalCircle.distance(observationCenter);
-        observations2D.append(observationCenter, distance);
+        observations2D.fill(observationCenter, distance);
       }
     } else {
       for (const Vector2D& observationCenter : observationCenters) {
         Vector2D onCircle = generalCircle.closest(observationCenter);
-        observations2D.append(onCircle, 0.0);
+        observations2D.fill(onCircle, 0.0);
       }
     }
     return observations2D;
@@ -111,9 +111,9 @@ namespace {
   {
 
     CDCObservations2D observations2D;
-    observations2D.append(Vector2D(0, 0), 0.5);
-    observations2D.append(Vector2D(1, -1), -0.5);
-    observations2D.append(Vector2D(2, 0), 0.5);
+    observations2D.fill(Vector2D(0, 0), 0.5);
+    observations2D.fill(Vector2D(1, -1), -0.5);
+    observations2D.fill(Vector2D(2, 0), 0.5);
 
     CDCTrajectory2D trajectory2D;
 

@@ -33,24 +33,24 @@ Weight SimpleSegmentInformationListTrackFilter::operator()(const std::pair<std::
 
   for (const CDCRecoHit3D& recoHit : *track) {
     if (isAxialSegment) {
-      observations.append(recoHit.getWireHit().getRefPos2D());
+      observations.fill(recoHit.getWireHit().getRefPos2D());
     } else {
       double s = recoHit.getArcLength2D();
       double z = recoHit.getRecoZ();
-      observations.append(s, z);
+      observations.fill(s, z);
     }
   }
 
   for (SegmentInformation* segmentInformation : train) {
     for (const CDCRecoHit2D& recoHit : * (segmentInformation->getSegment())) {
       if (isAxialSegment) {
-        observations.append(recoHit.getRecoPos2D());
+        observations.fill(recoHit.getRecoPos2D());
       } else {
         const CDCRLTaggedWireHit& rlWireHit = recoHit.getRLWireHit();
         CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
         double s = recoHit3D.getArcLength2D();
         double z = recoHit3D.getRecoZ();
-        observations.append(s, z);
+        observations.fill(s, z);
       }
     }
   }

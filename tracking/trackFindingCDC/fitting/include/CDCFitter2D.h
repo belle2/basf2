@@ -89,23 +89,27 @@ namespace Belle2 {
                   const AEndHits& endHits) const
       {
         CDCObservations2D observations2D;
-        observations2D.setUseDriftVariance(m_doUseDriftVariance);
+        if (m_doUseDriftVariance) {
+          observations2D.setFitVariance(EFitVariance::c_Proper);
+        } else {
+          observations2D.setFitVariance(EFitVariance::c_DriftLength);
+        }
 
         if (m_usePosition) {
-          observations2D.setUseRecoPos(true);
+          observations2D.setFitPos(EFitPos::c_RecoPos);
           observations2D.appendRange(startHits);
         }
         if (m_useOrientation) {
-          observations2D.setUseRecoPos(false);
+          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
           observations2D.appendRange(startHits);
         }
 
         if (m_usePosition) {
-          observations2D.setUseRecoPos(true);
+          observations2D.setFitPos(EFitPos::c_RecoPos);
           observations2D.appendRange(endHits);
         }
         if (m_useOrientation) {
-          observations2D.setUseRecoPos(false);
+          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
           observations2D.appendRange(endHits);
         }
 
@@ -123,14 +127,18 @@ namespace Belle2 {
       void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
       {
         CDCObservations2D observations2D;
-        observations2D.setUseDriftVariance(m_doUseDriftVariance);
+        if (m_doUseDriftVariance) {
+          observations2D.setFitVariance(EFitVariance::c_Proper);
+        } else {
+          observations2D.setFitVariance(EFitVariance::c_DriftLength);
+        }
 
         if (m_usePosition) {
-          observations2D.setUseRecoPos(true);
+          observations2D.setFitPos(EFitPos::c_RecoPos);
           observations2D.appendRange(hits);
         }
         if (m_useOrientation) {
-          observations2D.setUseRecoPos(false);
+          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
           observations2D.appendRange(hits);
         }
 

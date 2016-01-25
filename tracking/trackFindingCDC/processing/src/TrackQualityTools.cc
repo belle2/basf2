@@ -62,11 +62,9 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
 
   HitProcessor::unmaskHitsInTrack(track);
 
-  bool m_usePosition = true;
-  CDCObservations2D observations2D;
-  observations2D.setUseRecoPos(m_usePosition);
+  CDCObservations2D observations2D(EFitPos::c_RecoPos);
   for (const CDCRecoHit3D& item : track) {
-    observations2D.append(item, m_usePosition);
+    observations2D.append(item);
   }
 
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();

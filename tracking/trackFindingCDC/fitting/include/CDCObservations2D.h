@@ -21,6 +21,9 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLTaggedWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <tracking/trackFindingCDC/fitting/EFitPos.h>
+#include <tracking/trackFindingCDC/fitting/EFitVariance.h>
+
 #include <iterator>
 
 namespace Belle2 {
@@ -30,17 +33,26 @@ namespace Belle2 {
     class CDCObservations2D {
 
     public:
-      /** Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
+      /**
+       *  Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
-      explicit CDCObservations2D(bool useRecoPos = false) : m_useRecoPos(useRecoPos), m_useDriftVariance(true) {}
+      explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RLDriftCircle,
+                                 EFitVariance fitVariance = EFitVariance::c_Proper)
+        : m_fitPos(fitPos),
+          m_fitVariance(fitVariance)
+      {
+      }
 
     public:
-      /// Matrix type used to wrap the raw memory chunk of values
-      //  generated from the various hit types for structured vectorized access.
+      /**
+       *  Matrix type used to wrap the raw memory chunk of values
+       *  generated from the various hit types for structured vectorized access.
+       */
       typedef Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
 
-      /** Gets the pseudo variance.
+      /**
+       *  Gets the pseudo variance.
        *  The pseudo drift length variance is a measure that tries to incorporate the drift length
        *  into the fit to drift circles where the right left passage ambiguity could not be resolved.
        *  In such situations only the position of an hit can be used, however if only the position
@@ -49,9 +61,17 @@ namespace Belle2 {
        *  The pseudo variance is therefore the square of the drift length itself (square for unit conformity)
        *  plus its reference drift length variance.
        */
+      static double getPseudoDriftLengthVariance(const double driftLength,
+                                                 const double driftLengthVariance)
+      {
+        return square(driftLength) + driftLengthVariance;
+      }
+
+      /// Calculate the pseudo variance from the drift length and its variance.
       static double getPseudoDriftLengthVariance(const CDCWireHit& wireHit)
       {
-        return square(wireHit.getRefDriftLength()) + wireHit.getRefDriftLengthVariance();
+        return getPseudoDriftLengthVariance(wireHit.getRefDriftLength(),
+                                            wireHit.getRefDriftLengthVariance());
       }
 
       /// Returns the number of observations stored
@@ -86,7 +106,8 @@ namespace Belle2 {
       double getWeight(const int iObservation) const
       { return m_observations[iObservation * 4 + 3]; }
 
-      /** Appends the observed position.
+      /**
+       *  Appends the observed position.
        *  \note Observations are skipped, if one of the given variables is NAN.
        *  @param x            X coordinate of the center of the observed circle.
        *  @param y            Y coordinate of the center of the observed circle.
@@ -123,7 +144,8 @@ namespace Belle2 {
         return 1;
       }
 
-      /** Appends the observed position.
+      /**
+       *  Appends the observed position.
        *  \note Observations are skipped, if one of the given variables is NAN.
        *  @param pos2D        X, Y coordinate of the center of the observed circle.
        *  @param signedRadius The radius of the observed circle signed with right left passage hypotheses.
@@ -134,12 +156,14 @@ namespace Belle2 {
        *  @return             Number of observations added. One if the observation was added.
        *                      Zero if one of the given variables is NAN.
        */
-      size_t fill(const Belle2::TrackFindingCDC::Vector2D& pos2D,
+      size_t fill(const Vector2D& pos2D,
                   const double signedRadius = 0.0,
                   const double weight = 1.0)
       { return fill(pos2D.x(), pos2D.y(), signedRadius, weight); }
 
-      /** Appends the hit circle at wire reference position without a right left passage hypotheses.
+
+      /**
+       *  Appends the hit circle at wire reference position without a right left passage hypotheses.
        *  \note Observations are skipped, if one of the contained variables is NAN.
        *  \note The left right passage information is always set to ERightLeft::c_Right,
        *  since on specific assumption can be made from the wire hit alone.
@@ -149,24 +173,34 @@ namespace Belle2 {
        *                      Zero if one of the given variables is NAN.
        */
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit& wireHit,
-                    const ERightLeft rlInfo = ERightLeft::c_Unknown)
+                    ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
         const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
 
-        if (m_useDriftVariance) {
-          const double driftLength = isValid(rlInfo) ? rlInfo * wireHit.getRefDriftLength() : 0;
-          const double driftLengthVariance = (abs(rlInfo) == 1 ?
-                                              wireHit.getRefDriftLengthVariance() :
-                                              getPseudoDriftLengthVariance(wireHit));
-          const double weight = 1.0 / driftLengthVariance;
-          size_t nAppendedHits = fill(wireRefPos2D, driftLength, weight);
-          return nAppendedHits;
+        double signedDriftLength = 0;
+        if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
+          signedDriftLength = rlInfo * wireHit.getRefDriftLength();
         } else {
-          const double driftLength = wireHit.getRefDriftLength();
-          const double weight = fabs(1.0 / driftLength);
-          size_t nAppendedHits = fill(wireRefPos2D, 0, weight);
-          return nAppendedHits;
+          signedDriftLength = 0;
         }
+
+        double variance = 1;
+        if (m_fitVariance == EFitVariance::c_Unit) {
+          variance = 1;
+        } else if (m_fitVariance == EFitVariance::c_DriftLength) {
+          const double driftLength = wireHit.getRefDriftLength();
+          variance = fabs(driftLength);
+        } else if (m_fitVariance == EFitVariance::c_Pseudo) {
+          variance = getPseudoDriftLengthVariance(wireHit);
+        } else if (m_fitVariance == EFitVariance::c_Proper) {
+          if (abs(rlInfo) != 1) {
+            variance = getPseudoDriftLengthVariance(wireHit);
+          } else {
+            variance = wireHit.getRefDriftLengthVariance();
+          }
+        }
+
+        return fill(wireRefPos2D, signedDriftLength, 1 / variance);
       }
 
       size_t append(const Belle2::TrackFindingCDC::CDCWireHit* wireHit,
@@ -204,116 +238,117 @@ namespace Belle2 {
       }
 
       /// Appends the hit using the reconstructed position if useRecoPos indicates it
-      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D, bool useRecoPos)
-      {
-        if (useRecoPos) {
-          const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
-          const double driftLength = 0.0;
-          if (m_useDriftVariance) {
-            const double weight = 1.0 / recoHit2D.getWireHit().getRefDriftLengthVariance();
-            return fill(recoPos2D, driftLength, weight);
-          } else {
-            const double weight = fabs(1.0 / recoHit2D.getWireHit().getRefDriftLength());
-            return fill(recoPos2D, driftLength, weight);
-          }
-        } else {
-          return append(recoHit2D.getRLWireHit());
-        }
-      }
-
-      /// Appends the hit using the reconstructed position if the property m_useRecoPos of this class indicates it
       size_t append(const Belle2::TrackFindingCDC::CDCRecoHit2D& recoHit2D)
-      { return append(recoHit2D, m_useRecoPos); }
+      {
+        Vector2D fitPos2D;
+        double signedDriftLength = 0;
+        if (m_fitPos == EFitPos::c_RecoPos) {
+          fitPos2D = recoHit2D.getRecoPos2D();
+          signedDriftLength = 0;
+        } else if (m_fitPos == EFitPos::c_RLDriftCircle) {
+          fitPos2D = recoHit2D.getWire().getRefPos2D();
+          signedDriftLength = recoHit2D.getSignedRefDriftLength();
+        } else if (m_fitPos == EFitPos::c_WirePos) {
+          fitPos2D = recoHit2D.getWire().getRefPos2D();
+          signedDriftLength = 0;
+        }
+
+        const double driftLength = recoHit2D.getRefDriftLength();
+        const ERightLeft rlInfo = recoHit2D.getRLInfo();
+
+        double variance = recoHit2D.getRefDriftLengthVariance();
+        if (m_fitVariance == EFitVariance::c_Unit) {
+          variance = 1;
+        } else if (m_fitVariance == EFitVariance::c_DriftLength) {
+          variance = std::fabs(driftLength);
+        } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
+          // Fall back to the pseudo variance if the rl information is not known
+          variance = getPseudoDriftLengthVariance(driftLength, variance);
+        } else if (m_fitVariance == EFitVariance::c_Proper) {
+          variance = recoHit2D.getRefDriftLengthVariance();
+        }
+        return fill(fitPos2D, signedDriftLength, 1 / variance);
+      }
 
       /// Appends the observed position
-      size_t append(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D, bool useRecoPos)
-      {
-        if (useRecoPos) {
-          const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
-          const double driftLength = 0.0;
-          if (m_useDriftVariance) {
-            const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-            return fill(recoPos2D, driftLength, weight);
-          } else {
-            const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
-            return fill(recoPos2D, driftLength, weight);
-          }
-        } else {
-          const Vector2D& recoWirePos2D = recoHit3D.getRecoWirePos2D();
-          const double driftLength = recoHit3D.getSignedRecoDriftLength();
-          if (m_useDriftVariance) {
-            const double weight = 1.0 / recoHit3D.getRecoDriftLengthVariance();
-            return fill(recoWirePos2D, driftLength, weight);
-          } else {
-            const double weight = 1.0 / recoHit3D.getWireHit().getRefDriftLength();
-            return fill(recoWirePos2D, 0, weight);
-          }
-        }
-      }
-
-      /// Appends the hit using the reconstructed position if the property m_useRecoPos of this class indicates it
       size_t append(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D)
-      { return append(recoHit3D, m_useRecoPos); }
+      {
+        Vector2D fitPos2D = recoHit3D.getRecoPos2D();
+        double signedDriftLength = 0;
+        if (m_fitPos == EFitPos::c_RecoPos) {
+          fitPos2D = recoHit3D.getRecoPos2D();
+          signedDriftLength = 0;
+        } else if (m_fitPos == EFitPos::c_RLDriftCircle) {
+          fitPos2D = recoHit3D.getRecoWirePos2D();
+          signedDriftLength = recoHit3D.getSignedRecoDriftLength();
+        } else if (m_fitPos == EFitPos::c_WirePos) {
+          fitPos2D = recoHit3D.getRecoWirePos2D();
+          signedDriftLength = 0;
+        }
+
+        const double driftLength = std::fabs(recoHit3D.getSignedRecoDriftLength());
+        const ERightLeft rlInfo = recoHit3D.getRLInfo();
+
+        double variance = recoHit3D.getRecoDriftLengthVariance();
+        if (m_fitVariance == EFitVariance::c_Unit) {
+          variance = 1;
+        } else if (m_fitVariance == EFitVariance::c_DriftLength) {
+          variance = std::fabs(driftLength);
+        } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
+          // Fall back to the pseudo variance if the rl information is not known
+          variance = getPseudoDriftLengthVariance(driftLength, variance);
+        } else if (m_fitVariance == EFitVariance::c_Proper) {
+          variance = recoHit3D.getRecoDriftLengthVariance();
+        }
+        return fill(fitPos2D, signedDriftLength, 1 / variance);
+      }
 
       /** Appends all reconstructed hits from the two dimensional segment.
        *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
        *                    instead of the wire positon, right left passage information and drift length
        */
-      size_t appendRange(const CDCRecoSegment2D& recoSegment2D, bool useRecoPos)
+      size_t appendRange(const CDCRecoSegment2D& recoSegment2D)
       {
         size_t nAppendedHits = 0;
         for (const CDCRecoHit2D& recoHit2D :  recoSegment2D) {
-          nAppendedHits += append(recoHit2D, useRecoPos);
+          nAppendedHits += append(recoHit2D);
         }
         return nAppendedHits;
       }
-
-      /** Appends all reconstructed hits from the two dimensional segment. */
-      size_t appendRange(const CDCRecoSegment2D& recoSegment2D)
-      { return appendRange(recoSegment2D, m_useRecoPos); }
 
       /** Appends all reconstructed hits from the three dimensional segment.
        *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
        *                    instead of the wire positon, right left passage information and drift length
        */
-      size_t appendRange(const CDCRecoSegment3D& recoSegment3D, bool useRecoPos)
+      size_t appendRange(const CDCRecoSegment3D& recoSegment3D)
       {
         size_t nAppendedHits = 0;
         for (const CDCRecoHit3D& recoHit3D :  recoSegment3D) {
-          nAppendedHits += append(recoHit3D, useRecoPos);
+          nAppendedHits += append(recoHit3D);
         }
         return nAppendedHits;
       }
-
-      /** Appends all reconstructed hits from the two dimensional segment. */
-      size_t appendRange(const CDCRecoSegment3D& recoSegment3D)
-      { return appendRange(recoSegment3D, m_useRecoPos); }
-
 
       /** Appends all reconstructed hits from the two axial segments,
        *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
        *                    instead of the wire positon, right left passage information and drift length
        */
-      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair, bool useRecoPos)
+      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair)
       {
         size_t nAppendedHits = 0;
         const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStartSegment();
         if (ptrStartSegment2D) {
           const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
-          nAppendedHits += appendRange(startSegment2D, useRecoPos);
+          nAppendedHits += appendRange(startSegment2D);
         }
 
         const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEndSegment();
         if (ptrEndSegment2D) {
           const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
-          nAppendedHits += appendRange(endSegment2D, useRecoPos);
+          nAppendedHits += appendRange(endSegment2D);
         }
         return nAppendedHits;
       }
-
-      /** Appends all reconstructed hits from the two axial segments */
-      size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair)
-      { return appendRange(axialSegmentPair, m_useRecoPos); }
 
       /** Appends all the reference wire positions.
        *  @param useRecoPos Indicates whether the reconstructed position shall be used,
@@ -491,18 +526,16 @@ namespace Belle2 {
 
     public:
       /// Getter for the indicator that the reconstructed position should be favoured.
-      bool getUseRecoPos() const
-      { return m_useRecoPos; }
+      EFitPos getFitPos() const
+      { return m_fitPos; }
 
       /// Setter for the indicator that the reconstructed position should be favoured.
-      void setUseRecoPos(bool useRecoPos)
-      { m_useRecoPos = useRecoPos; }
+      void setFitPos(EFitPos fitPos)
+      { m_fitPos = fitPos; }
 
       /// Setter for the indicator that the drift variance should be used.
-      void setUseDriftVariance(bool useDriftVariance)
-      {
-        m_useDriftVariance = useDriftVariance;
-      }
+      void setFitVariance(EFitVariance fitVariance)
+      { m_fitVariance = fitVariance; }
 
     private:
       /** Memory for the individual observations.
@@ -510,20 +543,19 @@ namespace Belle2 {
        */
       std::vector<double> m_observations;
 
-      /** Indicator if the reconstructed position of hits shall be used in favour
-       *  of the wire position and the drift length for hits where it is available
-       *  This only indicates the mode of adding the next hits. So you may change it
-       *  in between append() calls.
+      /**
+       *  Indicator which positional information should preferably be extracted
+       *  from hits in calls to append.
+       *  Meaning of the constants detailed in EFitPos.
        */
-      bool m_useRecoPos;
+      EFitPos m_fitPos;
 
       /**
-       * Indicator if the position + 1/the drift length as the weight should be used (if set to false)
-       * instead of position, drift length & 1/drift length variance as a weight (if set to true).
-       * Setting this to false is only reasonable for a few special cases to be consistent with the
-       * legendre implementation.
+       *  Indicator which variance information should preferably be extracted from
+       *  hits in calls to append.
+       *  Meaning of the constants detailed in EFitVariance.
        */
-      bool m_useDriftVariance;
+      EFitVariance m_fitVariance;
 
     }; // end class CDCObservations2D
 

@@ -33,10 +33,10 @@ std::string ZeroDriftLengthStrokeWidthMap::map(const int, const CDCHit& cdcHit)
 
 std::string TakenFlagColorMap::map(const int, const CDCHit& cdcHit)
 {
-  CDCWireHitTopology wireHitTopology;
+  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
   const CDCHit* cdcHitptr = &cdcHit;
   const CDCWireHit* wirehit = wireHitTopology.getWireHit(cdcHitptr);
-  if (wirehit->getRefDriftLength() == 0.0) {
+  if (wirehit->getAutomatonCell().hasTakenFlag()) {
     return "red";
   } else return m_bkgHitColor;
 }

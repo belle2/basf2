@@ -104,6 +104,9 @@ namespace Belle2 {
     //! Constructor
     ARICHBtestGeometryPar();
 
+    //! copy constructor
+    ARICHBtestGeometryPar(const ARICHBtestGeometryPar& arichPar);
+
     //! Destructor
     virtual ~ARICHBtestGeometryPar();
 

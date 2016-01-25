@@ -100,7 +100,7 @@ namespace Belle2 {
 
       TrackHit recHit;  /**< extrapolated Track hit */
       TrackHit mcHit;  /**< related MC particle hit */
-      Int_t nRec; /** number of reconstructed photons */
+      Int_t nRec; /**< number of reconstructed photons */
       Float_t  photons[200][4]; /**< array of reconstructed photons information (cherenkov angle,...) */
 
       /**

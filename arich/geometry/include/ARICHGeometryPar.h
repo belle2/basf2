@@ -215,11 +215,11 @@ namespace Belle2 {
     double m_chipNegativeCrosstalk;       /*!< to simulate opposite polarity crosstalk among channels on chip */
     double m_QE[MAXPTS_QE];               /*!< quantum efficiency curve */
 
-    int m_tileNr;                         /*! Number of aerogel tiles in radial direction */
-    int m_tileNphi[5];                    /*! Number of aerogel tiles in phi direction of each "radial" ring */
-    double m_tileGap;                     /*! Gap size between two aerogel tiles */
-    double m_aeroRin;                     /*! Inner radius of aerogel tube */
-    double m_aeroRout;                    /*! Outer radius of aerogel tube */
+    int m_tileNr;                         /*!< Number of aerogel tiles in radial direction */
+    int m_tileNphi[5];                    /*!< Number of aerogel tiles in phi direction of each "radial" ring */
+    double m_tileGap;                     /*!< Gap size between two aerogel tiles */
+    double m_aeroRin;                     /*!< Inner radius of aerogel tube */
+    double m_aeroRout;                    /*!< Outer radius of aerogel tube */
 
     //! calculates the positions of HAPD modules, with the parameters from xml.
     void modulesPosition(const GearDir& content);

@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -33,5 +34,7 @@ namespace Belle2 {
     using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
 
     using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitTruthVarSet>;
+
+    using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
   }
 }

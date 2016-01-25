@@ -24,6 +24,7 @@ StereoHitFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "set all segments as good."},
     {"none", "no segment track combination is valid."},
     {"recording", "record variables to a TTree."},
+    {"random", "returns a random weight (for testing)."},
     {"simple", "give back a weight based on very simple variables you can give as a parameter."}
   });
   return filterNames;
@@ -42,6 +43,8 @@ StereoHitFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<BaseStereoHitFilter>(new RecordingStereoHitFilter("StereoHit.root"));
   } else if (filterName == string("simple")) {
     return std::unique_ptr<BaseStereoHitFilter>(new SimpleStereoHitFilter());
+  } else if (filterName == string("random")) {
+    return std::unique_ptr<BaseStereoHitFilter>(new RandomStereoHitFilter());
   } else {
     return Super::create(filterName);
   }

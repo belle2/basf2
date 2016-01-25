@@ -36,5 +36,7 @@ namespace Belle2 {
     using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitTruthVarSet>;
 
     using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
+
+    using TMVAStereoHitFilter = TMVAFilter<StereoHitVarSet>;
   }
 }

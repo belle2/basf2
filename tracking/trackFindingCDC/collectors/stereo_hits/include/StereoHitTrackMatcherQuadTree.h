@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/collectors/base/FirstMatchCollector.h>
 #include <tracking/trackFindingCDC/collectors/quadtree/QuadTreeBasedMatcher.h>
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
